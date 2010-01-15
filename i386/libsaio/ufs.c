@@ -127,12 +127,12 @@ long UFSInitPartition( CICell ih )
     gCurrentIH = 0;
 
 #ifdef __i386__
-    if (!gULBuf) gULBuf = (char *) malloc(UFS_LABEL_SIZE);
-    if (!gFSBuf) gFSBuf = (char *) malloc(SBSIZE);
-    if (!gTempName) gTempName = (char *) malloc(MAXNAMLEN + 1);
-    if (!gTempName2) gTempName2 = (char *) malloc(MAXNAMLEN + 1);
-    if (!gRootInodePtr) gRootInodePtr = (InodePtr) malloc(sizeof(Inode));
-    if (!gFileInodePtr) gFileInodePtr = (InodePtr) malloc(sizeof(Inode));
+    if (!gULBuf) gULBuf = (char *) MALLOC(UFS_LABEL_SIZE);
+    if (!gFSBuf) gFSBuf = (char *) MALLOC(SBSIZE);
+    if (!gTempName) gTempName = (char *) MALLOC(MAXNAMLEN + 1);
+    if (!gTempName2) gTempName2 = (char *) MALLOC(MAXNAMLEN + 1);
+    if (!gRootInodePtr) gRootInodePtr = (InodePtr) MALLOC(sizeof(Inode));
+    if (!gFileInodePtr) gFileInodePtr = (InodePtr) MALLOC(sizeof(Inode));
     if (!gULBuf || !gFSBuf || !gTempName || !gTempName2 ||
         !gRootInodePtr || !gFileInodePtr) return -1;
 #endif
@@ -168,7 +168,7 @@ long UFSInitPartition( CICell ih )
     gFragSize  = gFS->fs_fsize;
     gFragsPerBlock = gBlockSize / gFragSize;
     if (gTempBlock != 0) free(gTempBlock);
-    gTempBlock = malloc(gBlockSize);
+    gTempBlock = MALLOC(gBlockSize);
     CacheInit(ih, gBlockSize);
 
     gCurrentIH = ih;

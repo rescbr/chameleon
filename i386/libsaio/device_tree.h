@@ -27,7 +27,7 @@ typedef struct _Node {
 
 
 extern Property *
-DT__AddProperty(Node *node, char *name, uint32_t length, void *value);
+DT__AddProperty(Node *node, const char * name, uint32_t length, void *value);
 
 extern Node *
 DT__AddChild(Node *parent, char *name);

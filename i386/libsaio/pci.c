@@ -67,7 +67,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			if (!id || id == 0xffffffff)
 				continue;
 
-			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));
+			new = (pci_dt_t*)MALLOC(sizeof(pci_dt_t));
 			if (!new)
 				return;
 			memset(new, 0, sizeof(pci_dt_t));
@@ -116,7 +116,7 @@ void enable_pci_devs(void)
 
 void build_pci_dt(void)
 {
-	root_pci_dev = malloc(sizeof(pci_dt_t));
+	root_pci_dev = MALLOC(sizeof(pci_dt_t));
 	
 	if (!root_pci_dev)
 		return;
@@ -132,9 +132,12 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	pci_dt_t *current, *end;
 	char tmp[30];
+	int uid = 0;
 
 	dev_path[0] = 0;
 	end = root_pci_dev;
+
+	uid = getPciRootUID();
 
 	while (end != pci_dt)
 	{
@@ -142,10 +145,14 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 		while (current->parent != end)
 			current = current->parent;			
 		end = current;
-
-		sprintf(tmp, "%s/Pci(0x%x,0x%x)",
-			(current->parent == root_pci_dev) ? "PciRoot(0x0)" : "",
+		if (current->parent == root_pci_dev)
+		{
+			sprintf(tmp, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
 			current->dev.bits.dev, current->dev.bits.func);
+		} else {
+			sprintf(tmp, "/Pci(0x%x,0x%x)", 
+				current->dev.bits.dev, current->dev.bits.func);
+		}
 		strcat(dev_path, tmp);
 	}
 

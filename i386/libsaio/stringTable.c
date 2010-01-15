@@ -106,7 +106,7 @@ removeKeyFromTable(const char *key, char *table)
 
     len = strlen(key);
     tab = (char *)table;
-    buf = (char *)malloc(len + 3);
+    buf = (char *)MALLOC(len + 3);
 
     sprintf(buf, "\"%s\"", key);
     len = strlen(buf);
@@ -164,7 +164,7 @@ newStringFromList(
     if (begin == end)
 	return 0;
     bufsize = end - begin + 1;
-    newstr = malloc(bufsize);
+    newstr = MALLOC(bufsize);
     strlcpy(newstr, begin, bufsize);
     *list = end;
     *size = newsize;
@@ -241,7 +241,7 @@ char *newStringForStringTableKey(
     int size;
     
     if (getValueForConfigTableKey(config, key, &val, &size)) {
-	newstr = (char *)malloc(size+1);
+	newstr = (char *)MALLOC(size+1);
 	for (p = newstr; size; size--, p++, val++) {
 	    if ((*p = *val) == '\\') {
 		switch (*++val) {
@@ -278,7 +278,7 @@ newStringForKey(char *key, config_file_t *config)
     int size;
     
     if (getValueForKey(key, &val, &size, config) && size) {
-	newstr = (char *)malloc(size + 1);
+	newstr = (char *)MALLOC(size + 1);
 	strlcpy(newstr, val, size + 1);
 	return newstr;
     } else {
@@ -336,6 +336,15 @@ BOOL getValueForBootKey(const char *line, const char *match, const char **matchv
 	}
     }
     return retval;
+}
+
+/* Return NULL if no option has been successfully retrieved, or the string otherwise */
+const char * getStringForKey(const char * key,  config_file_t *config)
+{
+  static const char* value =0;
+  int len=0;
+  if(getValueForKey(key, &value, &len, config)!=YES) value = 0;
+  return value;
 }
 
 /* Returns TRUE if a value was found, FALSE otherwise.
@@ -550,7 +559,7 @@ long ParseXMLFile( char * buffer, TagPtr * dict )
     pos = 0;
     char       *configBuffer;
   
-    configBuffer = malloc(strlen(buffer)+1);
+    configBuffer = MALLOC(strlen(buffer)+1);
     strcpy(configBuffer, buffer);
 
     while (1)
@@ -716,7 +725,7 @@ int loadHelperConfig(config_file_t *config)
 char * newString(const char * oldString)
 {
     if ( oldString )
-        return strcpy(malloc(strlen(oldString)+1), oldString);
+        return strcpy(MALLOC(strlen(oldString)+1), oldString);
     else
         return NULL;
 }

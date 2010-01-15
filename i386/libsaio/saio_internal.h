@@ -150,6 +150,7 @@ extern char * newStringForStringTableKey(config_file_t *config, char *key);
 extern char * newStringForKey(char *key, config_file_t *configBuff);
 extern BOOL   getValueForBootKey(const char *line, const char *match, const char **matchval, int *len);
 extern BOOL   getValueForKey(const char *key, const char **val, int *size, config_file_t *configBuff);
+extern const char * getStringForKey(const char * key,  config_file_t *config);
 extern BOOL   getBoolForKey(const char *key, BOOL *val, config_file_t *configBuff);
 extern BOOL   getIntForKey(const char *key, int *val, config_file_t *configBuff);
 extern BOOL   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);

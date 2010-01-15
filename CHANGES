@@ -1,0 +1,5 @@
+- Added SystemID option permitting to change the System UUID to a fixed/reproduceable value.
+- Added the PciRoot autodetection feature imported from pcefi10.5
+ - Added automatic "system-id" injection from dmi bios, also compatible with SystemID boot option and former SMUUID from smbios,plist
+ - Added "system-type' automatic injection (1=Desktop) plus override possibility with the new system-type option in bootConfig
+- Added SMserial and SMproductname new options for smbios.plist

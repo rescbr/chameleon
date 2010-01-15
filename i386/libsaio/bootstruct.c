@@ -48,8 +48,8 @@ void initKernBootStruct( void )
 
     if ( !init_done )
     {
-        bootArgs = (boot_args *)malloc(sizeof(boot_args));
-        bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
+        bootArgs = (boot_args *)MALLOC(sizeof(boot_args));
+        bootInfo = (PrivateBootInfo_t *)MALLOC(sizeof(PrivateBootInfo_t));
         if (bootArgs == 0 || bootInfo == 0)
             stop("Couldn't allocate boot info\n");
 

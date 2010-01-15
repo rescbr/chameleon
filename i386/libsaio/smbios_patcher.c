@@ -227,7 +227,7 @@ struct smbios_table_description smbios_table_descriptions[]=
 	{.type=132,	.len=0x06,	.numfunc=sm_one}
 };
 
-static inline struct SMBEntryPoint * getAddressOfSmbiosTable()
+struct SMBEntryPoint * getAddressOfSmbiosTable()
 {
 	/* First see if we can even find the damn SMBIOS table
      * The logic here is to start at 0xf0000 and end at 0xfffff iterating 16 bytes at a time looking

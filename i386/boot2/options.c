@@ -634,7 +634,7 @@ char *getMemoryInfoString()
 {
     int i;
     MemoryRange *mp = bootInfo->memoryMap;
-	char *buff = malloc(sizeof(char)*1024);
+	char *buff = MALLOC(sizeof(char)*1024);
 	if(!buff) return 0;
 	
 	char info[] = "BIOS reported memory ranges:\n";
@@ -771,12 +771,12 @@ getBootOptions(BOOL firstRun)
 
         if (getValueForKey( kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig )) {
             cnt += 1;
-            prompt = malloc(cnt);
+            prompt = MALLOC(cnt);
             strlcpy(prompt, val, cnt);
         } else {
-			name = malloc(80);
+			name = MALLOC(80);
 			getBootVolumeDescription( gBootVolume, name, 80, NO );
-			prompt = malloc(256);
+			prompt = MALLOC(256);
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
 			cnt = 0;
@@ -851,7 +851,7 @@ getBootOptions(BOOL firstRun)
     if ( gDeviceCount )
     {
         // Allocate memory for an array of menu items.
-        menuItems = (MenuItem *) malloc( sizeof(MenuItem) * gDeviceCount );
+        menuItems = (MenuItem *) MALLOC( sizeof(MenuItem) * gDeviceCount );
         if ( menuItems == NULL ) goto done;
 
 		// Associate a menu item for each BVRef.
@@ -1187,7 +1187,7 @@ processBootOptions()
     char *           configKernelFlags;
     char *           valueBuffer;
 
-    valueBuffer = (char *)malloc(VALUE_SIZE);
+    valueBuffer = (char *)MALLOC(VALUE_SIZE);
     
     skipblanks( &cp );
 
@@ -1263,7 +1263,7 @@ processBootOptions()
         val = "";
         cnt = 0;
     }
-    configKernelFlags = (char *)malloc(cnt + 1);
+    configKernelFlags = (char *)MALLOC(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
     if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
@@ -1417,7 +1417,7 @@ void showTextFile(const char * filename)
         size = file_size(fd);
         if (size > MAX_TEXT_FILE_SIZE)
 			size = MAX_TEXT_FILE_SIZE;
-        buffer = malloc( size + 1 );
+        buffer = MALLOC( size + 1 );
         read(fd, buffer, size);
         close(fd);
 		

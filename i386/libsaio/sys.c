@@ -324,7 +324,7 @@ long GetFileInfo(const char * dirSpec, const char * name,
     const char * entryName;
 
     if (gMakeDirSpec == 0)
-        gMakeDirSpec = (char *)malloc(1024);
+        gMakeDirSpec = (char *)MALLOC(1024);
 
     if (!dirSpec) {
         long       idx, len;
@@ -559,7 +559,7 @@ struct dirstuff * vol_opendir(BVRef bvr, const char * path)
 {
     struct dirstuff * dirp = 0;
 
-    dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
+    dirp = (struct dirstuff *) MALLOC(sizeof(struct dirstuff));
     if (dirp == NULL)
         goto error;
 
@@ -587,7 +587,7 @@ struct dirstuff * opendir(const char * path)
     if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
         goto error;
 
-    dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
+    dirp = (struct dirstuff *) MALLOC(sizeof(struct dirstuff));
     if (dirp == NULL)
         goto error;
 

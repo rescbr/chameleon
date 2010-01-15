@@ -293,7 +293,7 @@ unsigned char * readAtomBIOS(pci_dt_t *ati_dev)
 	REG32W(0xa8, 0);
 	REG32R(0xac);	
 	
-	BIOSBase = malloc(0x10000);
+	BIOSBase = MALLOC(0x10000);
 	if(BIOSBase)
 	{
 		REG32W(0xa8, 0);
@@ -428,7 +428,7 @@ int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *ati_dev
 	printf("dumping pci config space, 256 bytes\n");
 	int i;
 	uint8_t *config_space;
-	config_space = malloc(256);
+	config_space = MALLOC(256);
 	for(i=0; i<=255; i++)
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
 	devprop_add_value(device, "ATY,PCIConfigSpace", config_space, 256);
@@ -648,7 +648,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	if (!string)
 		string = devprop_create_string();
 
-	struct DevPropDevice *device = malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = MALLOC(sizeof(struct DevPropDevice));
 	device = devprop_add_device(string, devicepath);
 	
 	if(!device)
@@ -713,7 +713,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	{
 		sprintf(romfilename, "ati_%04x_%04x.rom", (uint16_t)ati_dev->device_id, (uint16_t)ati_dev->vendor_id);
 		verbose("looking for file /Extra/%s\n", romfilename);
-		rom = malloc(0x20000);
+		rom = MALLOC(0x20000);
 		rom_size = load_ati_bios_file((char *)romfilename, (char *)rom);
 		if(rom_size > 0x10000) rom_size = 0x10000; //we dont need rest anyway;
 		if(rom_size == 0) printf("file not found\n");
@@ -762,7 +762,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		} else verbose("Bios image not found at  %x, content %x %x\n", biosimage, (uint8_t)biosimage[0], (uint8_t)biosimage[1]);
 		if(toFree) free(biosimage);
 	}
-	stringdata = malloc(sizeof(uint8_t) * string->length);
+	stringdata = MALLOC(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{
 		printf("no stringdata press a key...\n");

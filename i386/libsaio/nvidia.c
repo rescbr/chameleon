@@ -610,7 +610,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
 			devicepath);
 
-	rom = malloc(0x10000);
+	rom = MALLOC(0x10000);
 
 	if(!rom)
 	{
@@ -697,7 +697,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (!string)
 		string = devprop_create_string();
 
-	struct DevPropDevice *device = malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = MALLOC(sizeof(struct DevPropDevice));
 	device = devprop_add_device(string, devicepath);
 	
 	if(!device)
@@ -733,7 +733,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (set_vbios_prop)
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
 
-	stringdata = malloc(sizeof(uint8_t) * string->length);
+	stringdata = MALLOC(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{
 		printf("no stringdata press a key...\n");

@@ -115,11 +115,12 @@ static void zeroBSS()
 //==========================================================================
 // Malloc error function
 
-static void malloc_error(char *addr, size_t size)
+//==========================================================================
+// Malloc error function
+
+static void malloc_error(char *addr, size_t size, const char *file, int line)
 {
-    printf("\nMemory allocation error (0x%x, 0x%x)\n",
-           (unsigned)addr, (unsigned)size);
-    asm volatile ("hlt");
+	stop("\nMemory allocation error! Addr=0x%x, Size=0x%x, File=%s, Line=%d\n", (unsigned)addr, (unsigned)size, file, line);
 }
 
 /*!

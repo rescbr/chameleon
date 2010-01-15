@@ -70,7 +70,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
   if (len > 1)
   {
     // the resulting binary will be the half size of the input hex string
-    binStr = malloc(len / 2);
+    binStr = MALLOC(len / 2);
     binStrIdx = 0;
     hexNibbleIdx = 0;
     for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
@@ -127,7 +127,7 @@ void setupDeviceProperties(Node *node)
   char *string = efi_inject_get_devprop_string(&strlength);
 
   /* Use the static "device-properties" boot config key contents if available,
-   * otheriwse use the generated one.
+   * otherwise use the generated one.
    */  
   if (!getValueForKey(DEVICE_PROPERTIES_PROP, &val, &cnt, &bootInfo->bootConfig) && string)
   {
@@ -157,7 +157,7 @@ uint32_t dp_swap32(uint32_t toswap)
 
 struct DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
+	string = (struct DevPropString*)MALLOC(sizeof(struct DevPropString));
 	
 	if(string == NULL)
 		return NULL;
@@ -174,7 +174,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	const char *val;
 	int len;
 
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = (struct DevPropDevice*)MALLOC(sizeof(struct DevPropDevice));
 	if(!device || !string || !path) {
 		if(device)
 			free(device);
@@ -186,6 +186,8 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 
 	if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig))
 	  PciRootID = atoi(val);
+	else // rekursor: if no default pciroot is set in the boot.plist file  then go and get this PciRootID:
+	  PciRootID =	(uint32_t) ascii_hex_to_int(&path[strlen(pciroot_string)]);
 	
 	if(strncmp(path, pciroot_string, strlen(pciroot_string)))
 	{
@@ -270,10 +272,10 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	string->length += device->length;
 	
 	if(!string->entries)
-		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
+		if((string->entries = (struct DevPropDevice**)MALLOC(sizeof(device)))== NULL)
 			return 0;
 	
-	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
+	string->entries[string->numentries++] = (struct DevPropDevice*)MALLOC(sizeof(device));
 	string->entries[string->numentries-1] = device;
 	
 	return device;
@@ -286,7 +288,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		return 0;
 	
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
-	uint8_t *data = (uint8_t*)malloc(length);
+	uint8_t *data = (uint8_t*)MALLOC(length);
 	{
 		if(!data)
 			return 0;
@@ -316,7 +318,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	
 	uint32_t offset = device->length - (24 + (6 * device->num_pci_devpaths));
 	
-	uint8_t *newdata = (uint8_t*)malloc((length + offset));
+	uint8_t *newdata = (uint8_t*)MALLOC((length + offset));
 	if(!newdata)
 		return 0;
 	if(device->data)
@@ -330,7 +332,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	device->numentries++;
 	
 	if(!device->data)
-		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+		device->data = (uint8_t*)MALLOC(sizeof(uint8_t));
 	else
 		free(device->data);
 	
@@ -342,7 +344,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 
 char *devprop_generate_string(struct DevPropString *string)
 {
-	char *buffer = (char*)malloc(string->length * 2);
+	char *buffer = (char*)MALLOC(string->length * 2);
 	char *ptr = buffer;
 	
 	if(!buffer)
@@ -423,12 +425,16 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 	if(!device)
 		return 0;
 	uint8_t builtin = 0x0;
+	char tmp[10];
 	if((vendor_id != 0x168c) && (builtin_set == 0)) 
 	{
 		builtin_set = 1;
 		builtin = 0x01;
 	}
 	if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+		return 0;
+	sprintf(tmp, "Slot-%x",devices_number); // 1 - vga card. FIXME - for 2+ vgas
+	if(!devprop_add_value(device, "AAPL,slot-name", tmp, strlen(tmp)))
 		return 0;
 	devices_number++;
 	return 1;
@@ -437,7 +443,7 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = (struct DevPropDevice*)MALLOC(sizeof(struct DevPropDevice));
 
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
@@ -449,7 +455,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 	{
 		verbose("Setting up lan keys\n");
 		devprop_add_network_template(device, eth_dev->vendor_id);
-		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
+		stringdata = (uint8_t*)MALLOC(sizeof(uint8_t) * string->length);
 		if(stringdata)
 		{
 			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);

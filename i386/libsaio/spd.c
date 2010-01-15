@@ -92,7 +92,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 		{
 			slot->InUse = YES;
 
-			slot->spd = malloc(spd_size);
+			slot->spd = MALLOC(spd_size);
 			if (slot->spd)
 			{
 				bzero(slot->spd, spd_size);

@@ -30,10 +30,16 @@
 #include <mach-o/loader.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /*
  * string.c
  */
+static inline int isxdigit(char c)
+{
+    return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
+}
+
 #ifndef bcopy
 extern void   bcopy(const void * src, void * dst, size_t len);
 #endif
@@ -91,8 +97,9 @@ extern int slvprintf(char * buffer, int len, const char * fmt, va_list arg);
 /*
  * zalloc.c
  */
-extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
-extern void * malloc(size_t size);
+#define MALLOC(size)	malloc(size, __FILE__, __LINE__)
+extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
+extern void * malloc(size_t size,const char *file, int line);
 extern void   free(void * start);
 extern void * realloc(void * ptr, size_t size);
 

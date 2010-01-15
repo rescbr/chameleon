@@ -157,7 +157,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     size_t nameSize;
     char *buf;
 
-    buf = (char *)malloc(MAX_CLUSTER_SIZE);
+    buf = (char *)MALLOC(MAX_CLUSTER_SIZE);
     if (buf == 0) {
         goto error;
     }

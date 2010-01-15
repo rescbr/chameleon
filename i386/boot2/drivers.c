@@ -145,11 +145,11 @@ Alder32( unsigned char * buffer, long length )
 static long
 InitDriverSupport( void )
 {
-    gExtensionsSpec = (char *) malloc( 4096 );
-    gDriverSpec     = (char *) malloc( 4096 );
-    gFileSpec       = (char *) malloc( 4096 );
-    gTempSpec       = (char *) malloc( 4096 );
-    gFileName       = (char *) malloc( 4096 );
+    gExtensionsSpec = (char *) MALLOC( 4096 );
+    gDriverSpec     = (char *) MALLOC( 4096 );
+    gFileSpec       = (char *) MALLOC( 4096 );
+    gTempSpec       = (char *) MALLOC( 4096 );
+    gFileName       = (char *) MALLOC( 4096 );
 
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         stop("InitDriverSupport error");
@@ -434,7 +434,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
                 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 
-        tmpExecutablePath = malloc(executablePathLength);
+        tmpExecutablePath = MALLOC(executablePathLength);
         if (tmpExecutablePath == 0) break;
 
         strcpy(tmpExecutablePath, gFileSpec);
@@ -442,7 +442,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         sprintf(gFileSpec, "%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 
-        tmpBundlePath = malloc(bundlePathLength);
+        tmpBundlePath = MALLOC(bundlePathLength);
         if (tmpBundlePath == 0) break;
 
         strcpy(tmpBundlePath, gFileSpec);
@@ -456,7 +456,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         if (length == -1) break;
 
         length = length + 1;
-        buffer = malloc(length);
+        buffer = MALLOC(length);
         if (buffer == 0) break;
 
         strlcpy(buffer, (char *)kLoadAddr, length);
@@ -471,7 +471,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         module->executablePath = tmpExecutablePath;
         module->bundlePath = tmpBundlePath;
         module->bundlePathLength = bundlePathLength;
-        module->plistAddr = (void *)malloc(length);
+        module->plistAddr = (void *)MALLOC(length);
   
         if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
             break;
@@ -727,7 +727,7 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
         return -2;
     }
 
-    tmpModule = (ModulePtr)malloc(sizeof(Module));
+    tmpModule = (ModulePtr)MALLOC(sizeof(Module));
     if (tmpModule == 0)
     {
         XMLFreeTag(moduleDict);
@@ -784,7 +784,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 #endif
     
         uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
-        binary = buffer = malloc(uncompressed_size);
+        binary = buffer = MALLOC(uncompressed_size);
     
         size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
                                OSSwapBigToHostInt32(kernel_header->compressed_size));

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2007 David F. Elliott.  All rights reserved.
  */
@@ -14,6 +15,7 @@
 #include "device_inject.h"
 #include "pci.h"
 #include "sl.h"
+#include "SMBIOS.h"
 
 extern struct SMBEntryPoint * getSmbios();
 extern void setup_pci_devs(pci_dt_t *pci_dt);
@@ -55,7 +57,7 @@ necessary hardware.
 
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
-    char *string = malloc(37);
+    char *string = MALLOC(37);
     efi_guid_unparse_upper(pGuid, string);
     return string;
 }
@@ -79,7 +81,7 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n'
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10};//random value gen by uuidgen
+static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF";//random value gen by uuidgen
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
@@ -273,9 +275,9 @@ the console is available.
  */
 
 /* These should be const but DT__AddProperty takes char* */
-static char TSC_Frequency_prop[] = "TSCFrequency";
-static char FSB_Frequency_prop[] = "FSBFrequency";
-static char CPU_Frequency_prop[] = "CPUFrequency";
+static const char const TSC_Frequency_prop[] = "TSCFrequency";
+static const char const FSB_Frequency_prop[] = "FSBFrequency";
+static const char const CPU_Frequency_prop[] = "CPUFrequency";
 
 /*==========================================================================
  * SMBIOS
@@ -316,17 +318,176 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
  */
 
 /* These should be const but DT__AddProperty takes char* */
-static char FIRMWARE_REVISION_PROP[] = "firmware-revision";
-static char FIRMWARE_ABI_PROP[] = "firmware-abi";
-static char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static char FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
-static char SYSTEM_ID_PROP[]	 = "system-id";
+static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
+static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
+static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
+static const char const FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
+static const char const SYSTEM_ID_PROP[] = "system-id";
+static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
+static const char const SYSTEM_TYPE_PROP[] = "system-type";
+static const char const MODEL_PROP[] = "Model";
 
-void
-setupEfiDeviceTree(void)
+#define UUID_LEN	16
+
+/* Get an smbios option string option to convert to EFI_CHAR16 string */
+static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
+  const char * src=0;
+  EFI_CHAR16* dst = 0;
+  size_t i;
+
+  if (!key || !(*key) || !len || !(src = getStringForKey(key, &bootInfo->smbiosConfig)))
+    return 0;
+
+  *len = strlen(src);
+  dst = (EFI_CHAR16*) MALLOC(((*len)+1)*2);
+  for (i=0; i<*len; i++)  dst[i] = src[i];
+  dst[*len] = '\0';
+
+  return dst;
+}
+
+#define DEBUG_SMBIOS 1
+
+/* Get the SystemID from the bios dmi info */
+static EFI_CHAR8* getSmbiosUUID()
+{
+	struct SMBEntryPoint	*smbios;
+	struct DMIHeader	*dmihdr;
+	SMBByte			*p;
+	int			i, found, isZero, isOnes;
+	static EFI_CHAR8        uuid[UUID_LEN+1]="";
+	
+	smbios = getAddressOfSmbiosTable();	/* checks for _SM_ anchor and table header checksum */
+	if (memcmp( &smbios->dmi.anchor[0], "_DMI_", 5) != 0) {
+		return 0;
+	}
+	verbose(">>> SMBIOSAddr=0x%08x\n", smbios);
+	verbose(">>> DMI: addr=0x%08x, len=0x%d, count=%d\n", smbios->dmi.tableAddress, 
+		smbios->dmi.tableLength, smbios->dmi.structureCount);
+	i = 0;
+	found = 0;
+	p = (SMBByte *) smbios->dmi.tableAddress;
+	while (i < smbios->dmi.structureCount && p + 4 <= (SMBByte *)smbios->dmi.tableAddress + smbios->dmi.tableLength) {
+		dmihdr = (struct DMIHeader *) p;
+		verbose(">>>>>> DMI(%d): type=0x%02x, len=0x%d\n",i,dmihdr->type,dmihdr->length);
+		if (dmihdr->length < 4 || dmihdr->type == 127 /* EOT */) break;
+		if (dmihdr->type == 1) {		/* 3.3.2 System Information */
+			if (dmihdr->length >= 0x19) found = 1;
+			break;
+		}
+		p = p + dmihdr->length;
+		while ((p - (SMBByte *)smbios->dmi.tableAddress + 1 < smbios->dmi.tableLength) && (p[0] != 0x00 || p[1] != 0x00)) 
+			p++;
+		p += 2;
+		i++;
+	}
+
+	if (!found) return 0;
+
+	verbose("Found SMBIOS System Information Table 1\n");
+	p += 8;
+
+	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) {
+		if (p[i] != 0x00) isZero = 0;
+		if (p[i] != 0xff) isOnes = 0;
+	}
+	if (isZero || isOnes) {	/* empty or setable means: no uuid present */
+		verbose("No UUID present in SMBIOS System Information Table\n");
+		return 0;
+	}
+
+	memcpy(uuid, p, UUID_LEN+1);
+	return uuid;
+}
+
+static EFI_CHAR8*  getUUIDFromString(const char *source)
+{
+        if (!source) return 0;
+
+	char	*p = (char *)source;
+	int	i;
+	char	buf[3];
+	static EFI_CHAR8 uuid[UUID_LEN+1]="";
+
+	buf[2] = '\0';
+	for (i=0; i<UUID_LEN; i++) {
+		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
+			verbose("[ERROR] UUID='%s' syntax error\n", source);
+			return 0;
+		}
+		buf[0] = *p++;
+		buf[1] = *p++;
+		uuid[i] = (unsigned char) strtoul(buf, NULL, 16);
+		if (*p == '-' && (i % 2) == 1 && i < UUID_LEN - 1) {
+			p++;
+		}
+	}
+	uuid[UUID_LEN]='\0';
+
+	if (*p != '\0') {
+		verbose("[ERROR] UUID='%s' syntax error\n", source);
+		return 0;
+	}
+	return uuid;
+}
+
+/* Parse an UUID string into an (EFI_CHAR8*) buffer */
+
+// FIXME: can't use my original code here,
+// Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
+/*
+static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
+{
+  char szUUID[UUID_LEN+1], *p=szUUID;
+  int size=0;
+  void* ret;
+
+  if (!szInUUID || strlen(szInUUID)<UUID_LEN) return (EFI_CHAR8*) 0;
+
+  while(*szInUUID) if (*szInUUID!='-') *p++=*szInUUID++; else szInUUID++;
+  *p='\0';
+  ret = convertHexStr2Binary(szUUID, &size);
+  if (!ret || size!=UUID_LEN) 
+  {
+      verbose("UUID: cannot convert string <%s> to valid UUID.\n", szUUID);
+      return (EFI_CHAR8*) 0;
+  }
+  return (EFI_CHAR8*) ret; // new allocated buffer containing the converted string to bin
+}
+*/
+
+/* return a binary UUID value from the overriden SystemID and SMUUID if ound, 
+ * or from the bios if not, or from a fixed value if no bios value is found 
+ */
+static EFI_CHAR8* getSystemID()
+{	// unable to determine UUID for host. Error: 35 fix
+    const char * sysId = getStringForKey("SystemID", &bootInfo->bootConfig);
+    EFI_CHAR8* ret = getUUIDFromString(sysId);
+    if(!sysId || !ret)   // try smbios.plist SMUUID override
+      ret=getUUIDFromString((sysId = getStringForKey("SMUUID",&bootInfo->smbiosConfig)));
+    if(!sysId || !ret)  { // try bios dmi info UUID extraction 
+      ret = getSmbiosUUID();
+      sysId=0;
+    }
+    if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
+      ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
+
+    verbose("Customizing SystemID with : %s\n", sysId ? sysId :"BIOS internal UUID");
+    return ret;
+}
+
+void setupEfiDeviceTree(void)
+{
+    EFI_CHAR16* ret16=0;
+    EFI_CHAR8* ret=0;
+    size_t len=0;
     Node *node;
+    EFI_CHAR8 SystemType=1;
+    const char *value;
+
     node = DT__FindNode("/", false);
+    
     if (node == 0) {
         stop("Couldn't get root node");
     }
@@ -348,7 +509,7 @@ setupEfiDeviceTree(void)
     Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 
     /* The value of the table property is the 32-bit physical address for the RuntimeServices table.
-     * Sice the EFI system table already has a pointer to it, we simply use the address of that pointer
+     * Since the EFI system table already has a pointer to it, we simply use the address of that pointer
      * for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
      * the only thing to use a non-malloc'd pointer for something in the DT
      */
@@ -369,15 +530,34 @@ setupEfiDeviceTree(void)
     if(fsbFrequency != 0)
         DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &fsbFrequency);
 
-	// unable to determine UUID for host. Error: 35 fix
-	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, sizeof(SYSTEM_ID), (EFI_UINT32*)&SYSTEM_ID);
-
-	/* Export TSC and CPU frequencies for use by the kernel or KEXTs
+    /* Export TSC and CPU frequencies for use by the kernel or KEXTs
      */
     if(tscFrequency != 0)
         DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &tscFrequency);
+
     if(cpuFrequency != 0)
         DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &cpuFrequency);
+
+    /* Export system-id. Can be disabled with system-id=No in com.apple.Boot.plist */
+    if((ret=getSystemID()))
+       DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
+
+    /* Export system-type. Allowed values are: 0x01 for desktop computer (default),  0x02 for portable computers */
+    if (getValueForKey("system-type", &value, (int*) &len, &bootInfo->bootConfig) && value != NULL) {
+      if (*value != '1' && *value != '2') 
+	verbose("Error: system-type must be 1 (desktop) or 2 (portable). Defaulting to 1!\n");
+      else
+	SystemType = (unsigned char) (*value-'0');
+    }
+    DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(EFI_CHAR8), &SystemType);
+
+    /* Export SystemSerialNumber if present */
+    if ((ret16=getSmbiosChar16("SMserial", &len)))
+      DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
+
+    /* Export Model if present */
+    if ((ret16=getSmbiosChar16("SMproductname", &len)))
+      DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 
     /* Fill /efi/device-properties node.
      */
@@ -417,3 +597,4 @@ void setupFakeEfi(void)
   // Add configuration table entries to both the services table and the device tree
   setupEfiConfigurationTable();
 }
+

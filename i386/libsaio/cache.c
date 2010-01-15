@@ -90,8 +90,8 @@ void CacheInit( CICell ih, long blockSize )
     gCacheIH = ih;
 
 #ifdef __i386__
-    if (!gCacheBuffer) gCacheBuffer = (char *) malloc(kCacheSize);
-    if (!gCacheEntries) gCacheEntries = (CacheEntry *) malloc(kCacheMaxEntries * sizeof(CacheEntry));
+    if (!gCacheBuffer) gCacheBuffer = (char *) MALLOC(kCacheSize);
+    if (!gCacheEntries) gCacheEntries = (CacheEntry *) MALLOC(kCacheMaxEntries * sizeof(CacheEntry));
     if ( !gCacheBuffer || !gCacheEntries )
     {
         gCacheIH = 0;  // invalidate cache

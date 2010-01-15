@@ -53,5 +53,6 @@ struct smbios_table_description
 	int (*numfunc)(int tablen);
 };
 
+struct SMBEntryPoint * getAddressOfSmbiosTable();
 
 #endif /* !__LIBSAIO_SMBIOS_PATCHER_H */

@@ -45,7 +45,7 @@ void png_alloc_add_node(void *addr, size_t size)
 	png_alloc_node_t *node;
 	if (png_alloc_find_node(addr))
 		return;
-	node = malloc(sizeof (png_alloc_node_t));
+	node = MALLOC(sizeof (png_alloc_node_t));
 	node->addr = addr;
 	node->size = size;
 	node->prev = png_alloc_tail;
@@ -73,7 +73,7 @@ void png_alloc_remove_node(png_alloc_node_t *node)
 
 void *png_alloc_malloc(size_t size)
 {
-	void *addr = malloc(size);
+	void *addr = MALLOC(size);
 	png_alloc_add_node(addr, size);
 	return addr;
 }
@@ -1097,7 +1097,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	insize = (uint32_t) statbuf.st_size;
-	inbuf = malloc(insize);
+	inbuf = MALLOC(insize);
 	infp = fopen(fname, "rb");
 	if (!infp) {
 		perror("fopen");

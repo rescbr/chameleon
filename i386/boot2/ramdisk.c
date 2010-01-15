@@ -73,8 +73,8 @@ int mountRAMDisk(const char * param)
     strcpy(gRAMDiskFile, param);
 
     // Set gMI as well for the multiboot ramdisk driver hook.
-    gMI = gRAMDiskMI = malloc(sizeof(multiboot_info));
-    struct multiboot_module * ramdisk_module = malloc(sizeof(multiboot_module));
+    gMI = gRAMDiskMI = MALLOC(sizeof(multiboot_info));
+    struct multiboot_module * ramdisk_module = MALLOC(sizeof(multiboot_module));
     
     // Fill in multiboot info and module structures.
     if (gRAMDiskMI != NULL && ramdisk_module != NULL)
