@@ -39,7 +39,7 @@ typedef UInt16 SMBWord;
 typedef UInt32 SMBDWord;
 typedef UInt64 SMBQWord;
 
-struct DMIHeader {
+struct DMIHeader{
     SMBByte    type;
     SMBByte    length;
     SMBWord    handle;

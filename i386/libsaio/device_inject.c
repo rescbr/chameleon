@@ -6,8 +6,10 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
+#include "pci_root.h"
 #include "device_inject.h"
 
 
@@ -29,15 +31,15 @@ uint32_t stringlength = 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
-	if(string)
-	{
+	if(string) {
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
-	printf("efi_inject_get_devprop_string NULL trying stringdata\n");
+	verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
 	return NULL;
 }
 
+/* XXX AsereBLN replace by strtoul */
 uint32_t ascii_hex_to_int(char *buff) 
 {
 	uint32_t	value = 0, i, digit;
@@ -127,9 +129,9 @@ void setupDeviceProperties(Node *node)
   char *string = efi_inject_get_devprop_string(&strlength);
 
   /* Use the static "device-properties" boot config key contents if available,
-   * otherwise use the generated one.
+   * otheriwse use the generated one.
    */  
-  if (!getValueForKey(DEVICE_PROPERTIES_PROP, &val, &cnt, &bootInfo->bootConfig) && string)
+  if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->bootConfig) && string)
   {
     val = (const char*)string;
     cnt = strlength * 2;
@@ -170,43 +172,29 @@ struct DevPropString *devprop_create_string(void)
  
 struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
 {
-	uint32_t PciRootID = 0;
-	const char *val;
-	int len;
+	struct DevPropDevice	*device;
+	const char		pciroot_string[] = "PciRoot(0x";
+	const char		pci_device_string[] = "Pci(0x";
 
-	struct DevPropDevice *device = (struct DevPropDevice*)MALLOC(sizeof(struct DevPropDevice));
-	if(!device || !string || !path) {
-		if(device)
-			free(device);
+	if (string == NULL || path == NULL) {
 		return NULL;
 	}
+	device = MALLOC(sizeof(struct DevPropDevice));
 
-	const char pciroot_string[]		= "PciRoot(0x";
-	const char pci_device_string[]	= "Pci(0x";
-
-	if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig))
-	  PciRootID = atoi(val);
-	else // rekursor: if no default pciroot is set in the boot.plist file  then go and get this PciRootID:
-	  PciRootID =	(uint32_t) ascii_hex_to_int(&path[strlen(pciroot_string)]);
-	
-	if(strncmp(path, pciroot_string, strlen(pciroot_string)))
-	{
+	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
-	
+
 	memset(device, 0, sizeof(struct DevPropDevice));
-	
-	device->acpi_dev_path._UID = PciRootID;
-	
+	device->acpi_dev_path._UID = getPciRootUID();
+
 	int numpaths = 0;
 	int		x, curr = 0;
 	char	buff[] = "00";
 
-	for(x = 0; x < strlen(path); x++)
-	{
-		if(!strncmp(&path[x], pci_device_string, strlen(pci_device_string)))
-		{
+	for (x = 0; x < strlen(path); x++) {
+		if (!strncmp(&path[x], pci_device_string, strlen(pci_device_string))) {
 			x+=strlen(pci_device_string);
 			curr=x;
 			while(path[++x] != ',');
@@ -425,16 +413,12 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 	if(!device)
 		return 0;
 	uint8_t builtin = 0x0;
-	char tmp[10];
 	if((vendor_id != 0x168c) && (builtin_set == 0)) 
 	{
 		builtin_set = 1;
 		builtin = 0x01;
 	}
 	if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
-		return 0;
-	sprintf(tmp, "Slot-%x",devices_number); // 1 - vga card. FIXME - for 2+ vgas
-	if(!devprop_add_value(device, "AAPL,slot-name", tmp, strlen(tmp)))
 		return 0;
 	devices_number++;
 	return 1;

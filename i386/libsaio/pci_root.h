@@ -8,6 +8,6 @@
 #include "libsaio.h"
 
 
-extern int getPciRootUID();
+extern int getPciRootUID(void);
 
 #endif /* !__LIBSAIO_DSDT_PATCHER_H */

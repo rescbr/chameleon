@@ -55,8 +55,9 @@
 #define UFS_SUPPORT 0
 #endif
 
-#include "bootstruct.h"
 #include "libsaio.h"
+#include "boot.h"
+#include "bootstruct.h"
 #include "fdisk.h"
 #if UFS_SUPPORT
 #include "ufs.h"
@@ -218,7 +219,7 @@ static const char * bios_error(int errnum)
 // Return:
 //   0 on success, or an error code from INT13/F2 or INT13/F42 BIOS call.
 
-static BOOL cache_valid = FALSE;
+static bool cache_valid = false;
 
 static int Biosread( int biosdev, unsigned long long secno )
 {
@@ -264,7 +265,7 @@ static int Biosread( int biosdev, unsigned long long secno )
 
         xnsecs = N_CACHE_SECS;
         xsec   = (secno / divisor) * divisor;
-        cache_valid = FALSE;
+        cache_valid = false;
 
         while ((rc = ebiosread(biosdev, secno / divisor, xnsecs / divisor)) && (++tries < 5))
         {
@@ -305,7 +306,7 @@ static int Biosread( int biosdev, unsigned long long secno )
         xhead  = head;
         xsec   = sec;
         xnsecs = ((unsigned int)(sec + N_CACHE_SECS) > di.di.params.phys_spt) ? (di.di.params.phys_spt - sec) : N_CACHE_SECS;
-        cache_valid = FALSE;
+        cache_valid = false;
 
         while ((rc = biosread(biosdev, cyl, head, sec, xnsecs)) &&
                (++tries < 5))
@@ -325,7 +326,7 @@ static int Biosread( int biosdev, unsigned long long secno )
     // If the BIOS reported success, mark the sector cache as valid.
 
     if (rc == 0) {
-        cache_valid = TRUE;
+        cache_valid = true;
     }
     biosbuf  = trackbuf + (secno % divisor) * BPS;
     xbiosdev = biosdev;
@@ -1465,7 +1466,7 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
     {
         verbose("Resetting BIOS device %xh\n", biosdev);
         // Reset the biosbuf cache
-        cache_valid = FALSE;
+        cache_valid = false;
         if(map == gDiskBVMap)
             gDiskBVMap = map->next;
         else if(prevMap != NULL)
@@ -1580,25 +1581,25 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
        * Adjust the new bvr's fields.
        */
       newBVR->next = NULL;
-      newBVR->filtered = TRUE;
+      newBVR->filtered = true;
 
       if ( (!allowFlags || newBVR->flags & allowFlags)
           && (!denyFlags || !(newBVR->flags & denyFlags) )
           && (newBVR->biosdev >= minBIOSDev && newBVR->biosdev <= maxBIOSDev)
          )
-        newBVR->visible = TRUE;
+        newBVR->visible = true;
       
       /*
        * Looking for "Hide Partition" entries in "hd(x,y) hd(n,m)" format
        * to be able to hide foreign partitions from the boot menu.
        */
 			if ( (newBVR->flags & kBVFlagForeignBoot)
-					&& getValueForKey("Hide Partition", &val, &len, &bootInfo->bootConfig)
+					&& getValueForKey(kHidePartition, &val, &len, &bootInfo->bootConfig)
 				 )
     	{
     	  sprintf(devsw, "hd(%d,%d)", BIOS_DEV_UNIT(newBVR), newBVR->part_no);
     	  if (strstr(val, devsw) != NULL)
-          newBVR->visible = FALSE;
+          newBVR->visible = false;
     	}
 
       /*
@@ -1678,16 +1679,14 @@ static const struct NamedValue fdiskTypes[] =
 
 //==========================================================================
 
-void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, BOOL verbose )
+void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool verbose )
 {
     unsigned char type = (unsigned char) bvr->part_type;
     char *p;
 	
     p = str;
-    if (verbose)
-    {
-      sprintf( str, "hd(%d,%d) ",
-          BIOS_DEV_UNIT(bvr), bvr->part_no);
+    if (verbose) {
+      sprintf( str, "hd(%d,%d) ", BIOS_DEV_UNIT(bvr), bvr->part_no);
       for (; strMaxLen > 0 && *p != '\0'; p++, strMaxLen--);
     }
 
@@ -1815,7 +1814,7 @@ int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
     }
     secno += bvr->part_boff;
 
-    cache_valid = FALSE;
+    cache_valid = false;
 
     while (len > 0) {
         secs = len / BPS;
@@ -1854,7 +1853,7 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
     }
     secno += bvr->part_boff;
 
-    cache_valid = FALSE;
+    cache_valid = false;
 
     while (len > 0) {
         secs = len / BPS;

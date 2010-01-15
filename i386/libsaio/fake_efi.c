@@ -4,18 +4,18 @@
  */
 
 #include "libsaio.h"
-#include "bootstruct.h" /* for bootArgs */
+#include "boot.h"
+#include "bootstruct.h"
 #include "efi.h"
 #include "acpi.h"
 #include "fake_efi.h"
 #include "efi_tables.h"
-#include "freq_detect.h"
+#include "platform.h"
 #include "dsdt_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
 #include "pci.h"
 #include "sl.h"
-#include "SMBIOS.h"
 
 extern struct SMBEntryPoint * getSmbios();
 extern void setup_pci_devs(pci_dt_t *pci_dt);
@@ -527,16 +527,15 @@ void setupEfiDeviceTree(void)
      * the value in the fsbFrequency global and not an malloc'd pointer
      * because the DT_AddProperty function does not copy its args.
      */
-    if(fsbFrequency != 0)
-        DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &fsbFrequency);
+    if(Platform.CPU.FSBFrequency != 0) 
+      DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
+    
+    /* Export TSC and CPU frequencies for use by the kernel or KEXTs */
+    if(Platform.CPU.TSCFrequency != 0) 
+      DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 
-    /* Export TSC and CPU frequencies for use by the kernel or KEXTs
-     */
-    if(tscFrequency != 0)
-        DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &tscFrequency);
-
-    if(cpuFrequency != 0)
-        DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &cpuFrequency);
+    if(Platform.CPU.CPUFrequency != 0) 
+      DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 
     /* Export system-id. Can be disabled with system-id=No in com.apple.Boot.plist */
     if((ret=getSystemID()))
