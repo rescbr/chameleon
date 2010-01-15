@@ -346,7 +346,7 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
   return dst;
 }
 
-#define DEBUG_SMBIOS 1
+#define DEBUG_SMBIOS 0
 
 /* Get the SystemID from the bios dmi info */
 static EFI_CHAR8* getSmbiosUUID()
@@ -361,23 +361,30 @@ static EFI_CHAR8* getSmbiosUUID()
 	if (memcmp( &smbios->dmi.anchor[0], "_DMI_", 5) != 0) {
 		return 0;
 	}
+#if DEBUG_SMBIOS
 	verbose(">>> SMBIOSAddr=0x%08x\n", smbios);
 	verbose(">>> DMI: addr=0x%08x, len=0x%d, count=%d\n", smbios->dmi.tableAddress, 
 		smbios->dmi.tableLength, smbios->dmi.structureCount);
+#endif
 	i = 0;
 	found = 0;
 	p = (SMBByte *) smbios->dmi.tableAddress;
 	while (i < smbios->dmi.structureCount && p + 4 <= (SMBByte *)smbios->dmi.tableAddress + smbios->dmi.tableLength) {
 		dmihdr = (struct DMIHeader *) p;
+#if DEBUG_SMBIOS
 		verbose(">>>>>> DMI(%d): type=0x%02x, len=0x%d\n",i,dmihdr->type,dmihdr->length);
+#endif
 		if (dmihdr->length < 4 || dmihdr->type == 127 /* EOT */) break;
-		if (dmihdr->type == 1) {		/* 3.3.2 System Information */
-			if (dmihdr->length >= 0x19) found = 1;
+		if (dmihdr->type == 1) 	/* 3.3.2 System Information */
+		{	
+		        if (dmihdr->length >= 0x19) found = 1;
 			break;
 		}
 		p = p + dmihdr->length;
 		while ((p - (SMBByte *)smbios->dmi.tableAddress + 1 < smbios->dmi.tableLength) && (p[0] != 0x00 || p[1] != 0x00)) 
+		{
 			p++;
+		}
 		p += 2;
 		i++;
 	}
@@ -600,10 +607,10 @@ void setupFakeEfi(void)
 	// Initialize the base table
 	setupEfiTables();
 	
-  // Initialize the device tree
-  setupEfiDeviceTree();
+        // Initialize the device tree
+        setupEfiDeviceTree();
 
-  // Add configuration table entries to both the services table and the device tree
-  setupEfiConfigurationTable();
+        // Add configuration table entries to both the services table and the device tree
+        setupEfiConfigurationTable();
 }
 
