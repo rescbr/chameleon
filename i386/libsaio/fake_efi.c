@@ -332,16 +332,15 @@ static const char const MODEL_PROP[] = "Model";
 /* Get an smbios option string option to convert to EFI_CHAR16 string */
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
-  const char * src=0;
+  const char * src= getStringForKey(key,  &bootInfo->smbiosConfig);
   EFI_CHAR16* dst = 0;
-  size_t i;
+  size_t i=0;
 
-  if (!key || !(*key) || !len || !(src = getStringForKey(key, &bootInfo->smbiosConfig)))
-    return 0;
+  if (!key || !(*key) || !len || !src)    return 0;
 
   *len = strlen(src);
   dst = (EFI_CHAR16*) MALLOC(((*len)+1)*2);
-  for (i=0; i<*len; i++)  dst[i] = src[i];
+  for (; i<*len; i++)  dst[i] = src[i];
   dst[*len] = '\0';
 
   return dst;
@@ -457,7 +456,7 @@ static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
 }
 */
 
-/* return a binary UUID value from the overriden SystemID and SMUUID if ound, 
+/* return a binary UUID value from the overriden SystemID and SMUUID if found, 
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 static EFI_CHAR8* getSystemID()
@@ -488,13 +487,11 @@ void setupEfiDeviceTree(void)
 
     node = DT__FindNode("/", false);
     
-    if (node == 0) {
-        stop("Couldn't get root node");
-    }
+    if (node == 0) stop("Couldn't get root node");
 
-    /* We could also just do DT__FindNode("/efi/platform", true)
-     * But I think eventually we want to fill stuff in the efi node
-     * too so we might as well create it so we have a pointer for it too.
+   /* We could also just do DT__FindNode("/efi/platform", true)
+    * But I think eventually we want to fill stuff in the efi node
+    * too so we might as well create it so we have a pointer for it too.
     */
     node = DT__AddChild(node, "efi");
 
@@ -522,7 +519,7 @@ void setupEfiDeviceTree(void)
 
     /* Now fill in the /efi/platform Node */
     Node *efiPlatformNode = DT__AddChild(node, "platform");
-
+    
     /* NOTE WELL: If you do add FSB Frequency detection, make sure to store
      * the value in the fsbFrequency global and not an malloc'd pointer
      * because the DT_AddProperty function does not copy its args.
@@ -542,7 +539,7 @@ void setupEfiDeviceTree(void)
        DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 
     /* Export system-type. Allowed values are: 0x01 for desktop computer (default),  0x02 for portable computers */
-    if (getValueForKey("system-type", &value, (int*) &len, &bootInfo->bootConfig) && value != NULL) {
+    if ((value=getStringForKey("system-type",  &bootInfo->bootConfig))) {
       if (*value != '1' && *value != '2') 
 	verbose("Error: system-type must be 1 (desktop) or 2 (portable). Defaulting to 1!\n");
       else
@@ -561,6 +558,16 @@ void setupEfiDeviceTree(void)
     /* Fill /efi/device-properties node.
      */
     setupDeviceProperties(node);
+}
+
+/* Load the smbios.plist override config file if any */
+static void setupSmbiosConfigFile()
+{
+  const char * value = getStringForKey(kSMBIOS, &bootInfo->bootConfig);
+    if (!value)  value = "/Extra/smbios.plist";
+    if (loadConfigFile(value, &bootInfo->smbiosConfig) == -1) {
+      verbose("No SMBIOS replacement found\n");
+    }
 }
 
 /* Installs all the needed configuration table entries */
@@ -584,7 +591,10 @@ void setupEfiDevices(void)
 /* Entrypoint from boot.c */
 void setupFakeEfi(void)
 {
-	// Generate efi device strings 
+        // load smbios.plist file if any
+        setupSmbiosConfigFile();
+	
+        // Generate efi device strings 
 	setupEfiDevices();
 	
 	// Initialize the base table
