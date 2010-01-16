@@ -12,6 +12,8 @@
 #include "appleboot.h"
 #include "vers.h"
 
+//#define EMBED_THEME
+
 #ifdef EMBED_THEME
 #include "art.h"
 #define LOADPNG(img)	if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len) != 0) { return 1; }
@@ -106,8 +108,8 @@ image_t images[] = {
 	{.name = "text_scroll_prev",			.image = NULL},
 	{.name = "text_scroll_next",			.image = NULL},
 
-	{.name = "font_small",				.image = NULL},
 	{.name = "font_console",			.image = NULL},
+	{.name = "font_small",				.image = NULL},
 };
 
 int imageCnt = 0;

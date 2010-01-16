@@ -407,6 +407,7 @@ static EFI_CHAR8* getSmbiosUUID()
 	return uuid;
 }
 
+/* Parse an UUID string into an (EFI_CHAR8*) buffer */
 static EFI_CHAR8*  getUUIDFromString(const char *source)
 {
         if (!source) return 0;
@@ -438,7 +439,6 @@ static EFI_CHAR8*  getUUIDFromString(const char *source)
 	return uuid;
 }
 
-/* Parse an UUID string into an (EFI_CHAR8*) buffer */
 
 // FIXME: can't use my original code here,
 // Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
