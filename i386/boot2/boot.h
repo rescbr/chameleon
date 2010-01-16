@@ -85,6 +85,7 @@
 #define kDefaultPartition	"Default Partition"	/* sys.c */
 #define kDeviceProperties	"device-properties"	/* device_inject.c */
 #define kHidePartition		"Hide Partition"	/* disk.c */
+#define kRenamePartition	"Rename Partition"	/* disk.c */
 
 /*
  * Flags to the booter or kernel

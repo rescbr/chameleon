@@ -1,3 +1,5 @@
+- Added a new 'Rename Partition Feature', now permitting to rename partition 
+  like 'System reserved' to a more meaningful name
 - Added SystemID option permitting to change the System UUID to a fixed/reproduceable value.
 - Added the PciRoot autodetection feature imported from pcefi10.5
  - Added automatic "system-id" injection from dmi bios, also compatible with SystemID boot option and former SMUUID from smbios,plist

@@ -1679,6 +1679,27 @@ static const struct NamedValue fdiskTypes[] =
 
 //==========================================================================
 
+/* If Rename Partition has defined an alias, then extract it  for description purpose */
+static const char * getVolumeLabelAlias( BVRef bvr, const char * str, long strMaxLen)
+{
+  const int MAX_ALIAS_SIZE=31;
+  static char szAlias[MAX_ALIAS_SIZE+1];
+  char *q=szAlias;
+  const char * szAliases = getStringForKey(kRenamePartition, &bootInfo->bootConfig);
+
+  if (!str || !*str || !szAliases) return 0; // no renaming wanted
+
+  const char * p = strstr(szAliases, str);
+  if(!p || !(*p)) return 0; // this volume must not be renamed, or option is malformed
+
+  p+= strlen(str); // skip the "hd(n,m) " field
+  // multiple aliases can be found separated by a semi-column
+  while(*p && *p != ';' && q<(szAlias+MAX_ALIAS_SIZE)) *q++=*p++;
+  *q='\0';
+
+  return szAlias;
+}
+
 void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool verbose )
 {
     unsigned char type = (unsigned char) bvr->part_type;
@@ -1690,6 +1711,14 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool verbo
       for (; strMaxLen > 0 && *p != '\0'; p++, strMaxLen--);
     }
 
+    // See if we should get the renamed alias name for this partion:
+    const char * szAliasName = getVolumeLabelAlias(bvr, str, strMaxLen);
+    if (szAliasName && *szAliasName)
+    {
+	strncpy(bvr->label, szAliasName, strMaxLen);
+	return; // we're done here no need to seek for real name
+    }
+      
     //
     // Get the volume label using filesystem specific functions
     // or use the alternate volume label if available.
@@ -1714,12 +1743,13 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool verbo
       }
     }
 
+    /* See if a partion rename is wanted: */
+
     // Set the devices label
     sprintf(bvr->label, p);
 }
 
 //==========================================================================
-
 int readBootSector( int biosdev, unsigned int secno, void * buffer )
 {
     struct disk_blk0 * bootSector = (struct disk_blk0 *) buffer;
