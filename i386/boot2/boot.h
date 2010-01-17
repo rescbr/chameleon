@@ -59,6 +59,7 @@
 #define kBootBannerKey      "Boot Banner"
 #define kWaitForKeypressKey "Wait"
 #define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
+#define kSystemType         "SystemType"        /* fake_efi.c */
 
 /*
  * Flags to the booter or kernel

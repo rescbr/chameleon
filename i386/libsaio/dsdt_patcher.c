@@ -153,6 +153,12 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 
+	// Set PM_Profile from System-type
+	if (fadt_mod->PM_Profile != Platform.Type) {
+		verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
+		fadt_mod->PM_Profile = Platform.Type;
+	}
+
 	// Patch FADT to fix restart
 	if (fix_restart)
 	{

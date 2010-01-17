@@ -71,8 +71,10 @@ struct acpi_2_fadt {
 	uint32_t        CreatorRevision;
 	uint32_t        FIRMWARE_CTRL;
 	uint32_t        DSDT;
+	uint8_t         Model;
+	uint8_t         PM_Profile;
 	/*We absolutely don't care about theese fields*/
-	uint8_t         notimp1[68];
+	uint8_t         notimp1[66];
 
 	//Reset Fix
 	uint32_t        Flags;

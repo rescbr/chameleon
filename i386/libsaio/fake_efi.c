@@ -278,6 +278,12 @@ static char FSB_Frequency_prop[] = "FSBFrequency";
 static char CPU_Frequency_prop[] = "CPUFrequency";
 
 /*==========================================================================
+ * SystemType
+ */
+
+static char SystemType_prop[] = "system-type";
+
+/*==========================================================================
  * SMBIOS
  */
 
@@ -329,6 +335,10 @@ setupEfiDeviceTree(void)
     if (node == 0) {
         stop("Couldn't get root node");
     }
+
+    /* Export system-type */
+    verbose("Using system-type=0x%02x\n", Platform.Type);
+    DT__AddProperty(node, SystemType_prop, sizeof(Platform.Type), &Platform.Type);
 
     /* We could also just do DT__FindNode("/efi/platform", true)
      * But I think eventually we want to fill stuff in the efi node
