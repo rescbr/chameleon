@@ -152,15 +152,15 @@ long HFSInitPartition(CICell ih)
     }
 
 #ifdef __i386__
-    if (!gTempStr) gTempStr = (char *)MALLOC(4096);
-    if (!gLinkTemp) gLinkTemp = (char *)MALLOC(64);
-    if (!gBTreeHeaderBuffer) gBTreeHeaderBuffer = (char *)MALLOC(512);
+    if (!gTempStr) gTempStr = (char *)malloc(4096);
+    if (!gLinkTemp) gLinkTemp = (char *)malloc(64);
+    if (!gBTreeHeaderBuffer) gBTreeHeaderBuffer = (char *)malloc(512);
     if (!gHFSMdbVib) {
-        gHFSMdbVib = (char *)MALLOC(kBlockSize);
+        gHFSMdbVib = (char *)malloc(kBlockSize);
         gHFSMDB = (HFSMasterDirectoryBlock *)gHFSMdbVib;
     }
     if (!gHFSPlusHeader) {
-        gHFSPlusHeader = (char *)MALLOC(kBlockSize);
+        gHFSPlusHeader = (char *)malloc(kBlockSize);
         gHFSPlus = (HFSPlusVolumeHeader *)gHFSPlusHeader;
     }
     if (!gTempStr || !gLinkTemp || !gBTreeHeaderBuffer ||
@@ -594,7 +594,7 @@ static long GetCatalogEntry(long * dirIndex, char ** name,
     }
 
     nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
-    nodeBuf  = (char *)MALLOC(nodeSize);
+    nodeBuf  = (char *)malloc(nodeSize);
     node     = (BTNodeDescriptor *)nodeBuf;
 
     index   = *dirIndex % nodeSize;
@@ -726,7 +726,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long * dirIndex
 
     curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
     nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
-    nodeBuf  = (char *)MALLOC(nodeSize);
+    nodeBuf  = (char *)malloc(nodeSize);
     node     = (BTNodeDescriptor *)nodeBuf;
 
     while (1) {
@@ -864,7 +864,7 @@ static long ReadExtent(char * extent, uint64_t extentSize,
             }
 
             if (extentBuffer == 0) {
-                extentBuffer = MALLOC(sizeofExtent * extentDensity);
+                extentBuffer = malloc(sizeofExtent * extentDensity);
                 if (extentBuffer == 0) return -1;
             }
 

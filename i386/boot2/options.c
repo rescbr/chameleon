@@ -631,7 +631,7 @@ char *getMemoryInfoString()
 {
     int i;
     MemoryRange *mp = bootInfo->memoryMap;
-	char *buff = MALLOC(sizeof(char)*1024);
+	char *buff = malloc(sizeof(char)*1024);
 	if(!buff) return 0;
 	
 	char info[] = "BIOS reported memory ranges:\n";
@@ -776,12 +776,12 @@ int getBootOptions(bool firstRun)
 
 		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
 			cnt += 1;
-			prompt = MALLOC(cnt);
+			prompt = malloc(cnt);
 			strlcpy(prompt, val, cnt);
 		} else {
-			name = MALLOC(80);
+			name = malloc(80);
 			getBootVolumeDescription(gBootVolume, name, 80, false);
-			prompt = MALLOC(256);
+			prompt = malloc(256);
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
 			cnt = 0;
@@ -849,7 +849,7 @@ int getBootOptions(bool firstRun)
 
 	if (gDeviceCount) {
 		// Allocate memory for an array of menu items.
-		menuItems = MALLOC(sizeof(MenuItem) * gDeviceCount);
+		menuItems = malloc(sizeof(MenuItem) * gDeviceCount);
 		if (menuItems == NULL) {
 			goto done;
 		}
@@ -1141,7 +1141,7 @@ processBootOptions()
     char *           configKernelFlags;
     char *           valueBuffer;
 
-    valueBuffer = MALLOC(VALUE_SIZE);
+    valueBuffer = malloc(VALUE_SIZE);
     
     skipblanks( &cp );
 
@@ -1217,7 +1217,7 @@ processBootOptions()
         val = "";
         cnt = 0;
     }
-    configKernelFlags = MALLOC(cnt + 1);
+    configKernelFlags = malloc(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
     if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
@@ -1429,7 +1429,7 @@ void showTextFile(const char * filename)
         if (size > MAX_TEXT_FILE_SIZE) {
 		size = MAX_TEXT_FILE_SIZE;
 	}
-        buf = MALLOC(size);
+        buf = malloc(size);
         read(fd, buf, size);
         close(fd);
 	showTextBuffer(buf, size);

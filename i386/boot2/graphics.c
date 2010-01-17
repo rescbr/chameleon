@@ -52,7 +52,7 @@ char *getVBEInfoString()
 {
 	VBEInfoBlock vbeInfo;
 	int err, small;
-	char *buff = MALLOC(sizeof(char)*256);
+	char *buff = malloc(sizeof(char)*256);
 	if(!buff) return 0;
 	
 	bzero( &vbeInfo, sizeof(vbeInfo) );
@@ -151,7 +151,7 @@ char *getVBEModeInfoString()
     if ( err != errSuccess )
         return 0;
 	
-	char *buff=MALLOC(sizeof(char)*3072);
+	char *buff=malloc(sizeof(char)*3072);
 	if(!buff) return 0;
 
 	// Loop through the mode list, and find the matching mode.
@@ -349,7 +349,7 @@ char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
         unsigned char value;
     } * bp = (struct RLEBlock *) rleData;
 
-    out = cp = MALLOC( outBytes );
+    out = cp = malloc( outBytes );
     if ( out == NULL ) return NULL;
 
     while ( rleBlocks-- )
@@ -483,7 +483,7 @@ convertImage( unsigned short width,
 
     switch ( VIDEO(depth) ) {
     case 16 :
-        img16 = MALLOC(width * height * 2);
+        img16 = malloc(width * height * 2);
         if ( !img16 ) break;
         for (cnt = 0; cnt < (width * height); cnt++)
             img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
@@ -491,7 +491,7 @@ convertImage( unsigned short width,
         break;
     
     case 32 :
-        img32 = MALLOC(width * height * 4);
+        img32 = malloc(width * height * 4);
         if ( !img32 ) break;
         for (cnt = 0; cnt < (width * height); cnt++)
             img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
@@ -499,7 +499,7 @@ convertImage( unsigned short width,
         break;
     
     default :
-        img = MALLOC(width * height);
+        img = malloc(width * height);
         bcopy(imageData, img, width * height);
         break;
     }
@@ -525,7 +525,7 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
         error = -1;
         goto failed;
     }
-    pngData = MALLOC(pngSize);
+    pngData = malloc(pngSize);
     if (read(pngFile, (char *) pngData, pngSize) != pngSize) {
         error = -1;
         goto failed;
@@ -543,7 +543,7 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
         error = -1;
         goto failed;
     }
-	uint8_t *result = MALLOC(info->width*4*info->height);
+	uint8_t *result = malloc(info->width*4*info->height);
     *width = info->width;
     *height = info->height;
 	memcpy(result, info->image->data, info->width*4*info->height);
@@ -575,7 +575,7 @@ int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_
         error = -1;
         goto failed;
     }
-	uint8_t *result = MALLOC(info->width*4*info->height);
+	uint8_t *result = malloc(info->width*4*info->height);
 	*width = info->width;
     *height = info->height;
 	memcpy(result, info->image->data, info->width*4*info->height);

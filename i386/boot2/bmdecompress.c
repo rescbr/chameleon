@@ -34,10 +34,10 @@ PreviewDecompress16(uint32_t * compressBuffer,
     int i, j;
     uint32_t * input;
     
-    uint16_t * sc0 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc1 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc2 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc3 = MALLOC((width+2) * sizeof(uint16_t));
+    uint16_t * sc0 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc1 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
     uint32_t   sr0, sr1, sr2, sr3;
 
     bzero(sc0, (width+2) * sizeof(uint16_t));
@@ -135,10 +135,10 @@ PreviewDecompress32(uint32_t * compressBuffer,
     int i, j;
     uint32_t * input;
     
-    uint16_t * sc0 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc1 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc2 = MALLOC((width+2) * sizeof(uint16_t));
-    uint16_t * sc3 = MALLOC((width+2) * sizeof(uint16_t));
+    uint16_t * sc0 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc1 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
+    uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
     uint32_t   sr0, sr1, sr2, sr3;
 
     bzero(sc0, (width+2) * sizeof(uint16_t));
@@ -238,7 +238,7 @@ DecompressData(void *srcbase, int *dw, int *dh, int *bitsPerPixel)
 	*dw = (int) src[1];
 	*dh = (int) src[2];
 	
-	ret = MALLOC ((*dw * *dh * *bitsPerPixel)/ 8);
+	ret = malloc ((*dw * *dh * *bitsPerPixel)/ 8);
 
     switch(*bitsPerPixel)
     {

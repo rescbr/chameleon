@@ -57,7 +57,7 @@ necessary hardware.
 
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
-    char *string = MALLOC(37);
+    char *string = malloc(37);
     efi_guid_unparse_upper(pGuid, string);
     return string;
 }
@@ -339,7 +339,7 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
   if (!key || !(*key) || !len || !src)    return 0;
 
   *len = strlen(src);
-  dst = (EFI_CHAR16*) MALLOC(((*len)+1)*2);
+  dst = (EFI_CHAR16*) malloc(((*len)+1)*2);
   for (; i<*len; i++)  dst[i] = src[i];
   dst[*len] = '\0';
 

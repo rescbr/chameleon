@@ -72,7 +72,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
   if (len > 1)
   {
     // the resulting binary will be the half size of the input hex string
-    binStr = MALLOC(len / 2);
+    binStr = malloc(len / 2);
     binStrIdx = 0;
     hexNibbleIdx = 0;
     for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
@@ -159,7 +159,7 @@ uint32_t dp_swap32(uint32_t toswap)
 
 struct DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString*)MALLOC(sizeof(struct DevPropString));
+	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
 	
 	if(string == NULL)
 		return NULL;
@@ -179,7 +179,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	if (string == NULL || path == NULL) {
 		return NULL;
 	}
-	device = MALLOC(sizeof(struct DevPropDevice));
+	device = malloc(sizeof(struct DevPropDevice));
 
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
 		printf("ERROR parsing device path\n");
@@ -260,10 +260,10 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	string->length += device->length;
 	
 	if(!string->entries)
-		if((string->entries = (struct DevPropDevice**)MALLOC(sizeof(device)))== NULL)
+		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
 			return 0;
 	
-	string->entries[string->numentries++] = (struct DevPropDevice*)MALLOC(sizeof(device));
+	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
 	string->entries[string->numentries-1] = device;
 	
 	return device;
@@ -276,7 +276,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		return 0;
 	
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
-	uint8_t *data = (uint8_t*)MALLOC(length);
+	uint8_t *data = (uint8_t*)malloc(length);
 	{
 		if(!data)
 			return 0;
@@ -306,7 +306,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	
 	uint32_t offset = device->length - (24 + (6 * device->num_pci_devpaths));
 	
-	uint8_t *newdata = (uint8_t*)MALLOC((length + offset));
+	uint8_t *newdata = (uint8_t*)malloc((length + offset));
 	if(!newdata)
 		return 0;
 	if(device->data)
@@ -320,7 +320,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	device->numentries++;
 	
 	if(!device->data)
-		device->data = (uint8_t*)MALLOC(sizeof(uint8_t));
+		device->data = (uint8_t*)malloc(sizeof(uint8_t));
 	else
 		free(device->data);
 	
@@ -332,7 +332,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 
 char *devprop_generate_string(struct DevPropString *string)
 {
-	char *buffer = (char*)MALLOC(string->length * 2);
+	char *buffer = (char*)malloc(string->length * 2);
 	char *ptr = buffer;
 	
 	if(!buffer)
@@ -427,7 +427,7 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
-	struct DevPropDevice *device = (struct DevPropDevice*)MALLOC(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
 
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
@@ -439,7 +439,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 	{
 		verbose("Setting up lan keys\n");
 		devprop_add_network_template(device, eth_dev->vendor_id);
-		stringdata = (uint8_t*)MALLOC(sizeof(uint8_t) * string->length);
+		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata)
 		{
 			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);

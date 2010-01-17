@@ -290,7 +290,7 @@ static uint8_t *readAtomBIOS(pci_dt_t *ati_dev)
 	REG32W(0xa8, 0);
 	REG32R(0xac);	
 
-	BIOSBase = MALLOC(0x10000);
+	BIOSBase = malloc(0x10000);
 	REG32W(0xa8, 0);
 	BIOSBase[0] = REG32R(0xac);
 	counter = 4;
@@ -420,7 +420,7 @@ static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *
 		return 0;
 	}
 	printf("dumping pci config space, 256 bytes\n");
-	config_space = MALLOC(256);
+	config_space = malloc(256);
 	for (i=0; i<=255; i++) {
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
 	}
@@ -698,7 +698,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	sprintf(tmp, "/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
 	if (getBoolForKey(kUseAtiROM, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("looking for ati video bios file %s\n", tmp);
-		rom = MALLOC(0x20000);
+		rom = malloc(0x20000);
 		rom_size = load_ati_bios_file(tmp, rom, 0x20000);
 		if (rom_size > 0x10000) {
 			rom_size = 0x10000; //we dont need rest anyway;
@@ -754,7 +754,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	if (toFree) {
 		free(bios);
 	}
-	stringdata = MALLOC(sizeof(uint8_t) * string->length);
+	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 

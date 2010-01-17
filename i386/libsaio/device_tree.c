@@ -68,7 +68,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 
     DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%x)\n", DT__GetName(node), name, length, value);
     if (freeProperties == NULL) {
-        void *buf = MALLOC(kAllocSize);
+        void *buf = malloc(kAllocSize);
         int i;
         
         DPRINTF("Allocating more free properties\n");
@@ -117,7 +117,7 @@ DT__AddChild(Node *parent, const char *name)
     Node *node;
 
     if (freeNodes == NULL) {
-        void *buf = MALLOC(kAllocSize);
+        void *buf = malloc(kAllocSize);
         int i;
         
         DPRINTF("Allocating more free nodes\n");
@@ -276,7 +276,7 @@ DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
             buf = 0;
         } else {
             if (*buffer_p == 0) {
-                buf = MALLOC(totalSize);
+                buf = malloc(totalSize);
             } else {
                 buf = *buffer_p;
             }
@@ -342,7 +342,7 @@ DT__FindNode(const char *path, bool createIfMissing)
         }
         if (child == 0 && createIfMissing) {
             DPRINTF("Creating node\n");
-            char *str = MALLOC(strlen(nameBuf) + 1);
+            char *str = malloc(strlen(nameBuf) + 1);
             // XXX this will leak
             strcpy(str, nameBuf);
 

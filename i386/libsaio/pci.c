@@ -81,7 +81,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			if (!id || id == 0xffffffff) {
 				continue;
 			}
-			new = (pci_dt_t*)MALLOC(sizeof(pci_dt_t));
+			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));
 			bzero(new, sizeof(pci_dt_t));
 			new->dev.addr	= pci_addr;
 			new->vendor_id	= id & 0xffff;
@@ -111,7 +111,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 
 void build_pci_dt(void)
 {
-	root_pci_dev = MALLOC(sizeof(pci_dt_t));
+	root_pci_dev = malloc(sizeof(pci_dt_t));
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	scan_pci_bus(root_pci_dev, 0);
 #if DEBUG_PCI

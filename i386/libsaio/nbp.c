@@ -120,7 +120,7 @@ BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
 
     if ( !gNetBVR )
     {
-        gNetBVR = MALLOC( sizeof(*gNetBVR) );
+        gNetBVR = malloc( sizeof(*gNetBVR) );
         if ( gNetBVR )
         {
             bzero(gNetBVR, sizeof(*gNetBVR));

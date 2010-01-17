@@ -158,7 +158,7 @@ static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, 
 	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
 		if (strcmp(image, images[i].name) == 0) {
 			if (images[i].image == NULL) {
-				images[i].image = MALLOC(sizeof(pixmap_t));
+				images[i].image = malloc(sizeof(pixmap_t));
 			}
 			width = 0;
 			height = 0;
@@ -191,7 +191,7 @@ static int loadThemeImage(const char *image)
 	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
 		if (strcmp(image, images[i].name) == 0) {
 			if (images[i].image == NULL) {
-				images[i].image = MALLOC(sizeof(pixmap_t));
+				images[i].image = malloc(sizeof(pixmap_t));
 			}
 			sprintf(dirspec,"/Extra/Themes/%s/%s.png", theme_name, image);
 			width = 0;
@@ -259,10 +259,10 @@ static int loadGraphics(void)
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
 	
-	pixmap_t *cropped = MALLOC( sizeof( pixmap_t ) );
+	pixmap_t *cropped = malloc( sizeof( pixmap_t ) );
 	if( !cropped )
 		return 0;
-	cropped->pixels = MALLOC( width * height * 4 );
+	cropped->pixels = malloc( width * height * 4 );
 	if ( !cropped->pixels )
 		return 0;
 	
@@ -284,11 +284,11 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 
 int createBackBuffer( window_t *window )
 {
-	gui.backbuffer = MALLOC(sizeof(pixmap_t));
+	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
 		return 1;
 	
-	gui.backbuffer->pixels = MALLOC( window->width * window->height * 4 );
+	gui.backbuffer->pixels = malloc( window->width * window->height * 4 );
 	if(!gui.backbuffer->pixels)
 	{
 		free(gui.backbuffer);
@@ -304,11 +304,11 @@ int createBackBuffer( window_t *window )
 
 int createWindowBuffer( window_t *window )
 {
-	window->pixmap = MALLOC(sizeof(pixmap_t));
+	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
 		return 1;
 
-	window->pixmap->pixels = MALLOC( window->width * window->height * 4 );
+	window->pixmap->pixels = malloc( window->width * window->height * 4 );
 	if(!window->pixmap->pixels)
 	{
 		free(window->pixmap);
@@ -916,7 +916,7 @@ int gprintf( window_t * window, const char * fmt, ...)
 	
 	struct putc_info pi;
 
-	if ((formattedtext = MALLOC(1024)) != NULL) {
+	if ((formattedtext = malloc(1024)) != NULL) {
 		// format the text
 		va_start(ap, fmt);
 		pi.str = formattedtext;
@@ -1001,7 +1001,7 @@ int dprintf( window_t * window, const char * fmt, ...)
 	
 	struct putc_info pi;
 	
-	if ((formattedtext = MALLOC(1024)) != NULL) {
+	if ((formattedtext = malloc(1024)) != NULL) {
 		// format the text
 		va_start(ap, fmt);
 		pi.str = formattedtext;
@@ -1088,7 +1088,7 @@ int vprf(const char * fmt, va_list ap)
 	position_t	origin, cursor, bounds;
 	font_t *font = &font_console;
 	
-	if ((formattedtext = MALLOC(1024)) != NULL) {
+	if ((formattedtext = malloc(1024)) != NULL) {
 		// format the text
 		pi.str = formattedtext;
 		pi.last_str = 0;
@@ -1238,12 +1238,12 @@ int initFont(font_t *font, image_t *data)
 		{
 			end = x + 1;
 
-			if( (font->chars[count] = MALLOC(sizeof(pixmap_t)) ) )
+			if( (font->chars[count] = malloc(sizeof(pixmap_t)) ) )
 			{
 				font->chars[count]->width = ( end - start) - 1;
 				font->chars[count]->height = font->height;
 			
-				if ( ( font->chars[count]->pixels = MALLOC( font->chars[count]->width * data->image->height * 4) ) )
+				if ( ( font->chars[count]->pixels = malloc( font->chars[count]->width * data->image->height * 4) ) )
 				{
 					space += ( font->chars[count]->width * data->image->height * 4 );
 					// we skip the first line because there are just the red pixels for the char width
@@ -1497,7 +1497,7 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 		return;
 	
 	pixmap_t progressbar;
-	progressbar.pixels=MALLOC(width * 4 * buff->height);
+	progressbar.pixels=malloc(width * 4 * buff->height);
 	if(!progressbar.pixels)
 		return; 
 	

@@ -35,7 +35,7 @@
 static unsigned short *
 UncompressStructure(struct compressed_block *bp, int count, int size)
 {
-    unsigned short *out = MALLOC(size);
+    unsigned short *out = malloc(size);
     unsigned short *op = out;
     unsigned short data;
     int i, j;

@@ -509,7 +509,7 @@ NewTag( void )
     if (gTagsFree == 0)
     {
 #if USEMALLOC
-        tag = (TagPtr)MALLOC(kTagsPerBlock * sizeof(Tag));
+        tag = (TagPtr)malloc(kTagsPerBlock * sizeof(Tag));
 #else
         tag = (TagPtr)AllocateBootXMemory(kTagsPerBlock * sizeof(Tag));
 #endif
@@ -590,7 +590,7 @@ static SymbolPtr lastGuy = 0;
     if (symbol == 0)
     {
 #if USEMALLOC
-        symbol = (SymbolPtr)MALLOC(sizeof(Symbol) + 1 + strlen(string));
+        symbol = (SymbolPtr)malloc(sizeof(Symbol) + 1 + strlen(string));
 #else
         symbol = (SymbolPtr)AllocateBootXMemory(sizeof(Symbol) + 1 + strlen(string));
 #endif

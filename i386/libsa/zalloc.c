@@ -86,7 +86,7 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 
 #define BEST_FIT 1
 
-void * malloc(size_t size, const char *file, int line)
+void * safe_malloc(size_t size, const char *file, int line)
 {
 	int    i;
 #if BEST_FIT
@@ -315,7 +315,7 @@ zcoalesce(void)
 /* This is the simplest way possible.  Should fix this. */
 void * realloc(void * start, size_t newsize)
 {
-    void * newstart = malloc(newsize, __FILE__, __LINE__);
+    void * newstart = safe_malloc(newsize, __FILE__, __LINE__);
     bcopy(start, newstart, newsize);
     free(start);
     return newstart;
