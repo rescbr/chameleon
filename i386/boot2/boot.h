@@ -58,6 +58,7 @@
 #define kGUIKey             "GUI"
 #define kBootBannerKey      "Boot Banner"
 #define kWaitForKeypressKey "Wait"
+#define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
 
 /*
  * Flags to the booter or kernel

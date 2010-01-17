@@ -9,6 +9,7 @@
 #include "efi_tables.h"
 #include "fake_efi.h"
 #include "dsdt_patcher.h"
+#include "platform.h"
 
 #ifndef DEBUG_DSDT
 #define DEBUG_DSDT 0
@@ -124,6 +125,19 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
 
 	struct acpi_2_fadt *fadt_mod;
 	BOOL fadt_rev2_needed = NO;
+	BOOL fix_restart;
+
+	// Restart Fix
+	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
+		fix_restart = YES;
+		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+	} else {
+		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
+		fix_restart = NO;
+	}
+
+	if (fix_restart)
+		fadt_rev2_needed = YES;
 
 	// Allocate new fadt table
 	if (fadt->Length < 0x84 && fadt_rev2_needed)
@@ -137,6 +151,19 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
 	{
 		fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(fadt->Length);
 		memcpy(fadt_mod, fadt, fadt->Length);
+	}
+
+	// Patch FADT to fix restart
+	if (fix_restart)
+	{
+		fadt_mod->Flags|= 0x400;
+		fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
+		fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
+		fadt_mod->Reset_BitOffset	= 0x00;   // Offset 0
+		fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
+		fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
+		fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
+		verbose("FADT: Restart Fix applied !\n");
 	}
 
 	// Patch DSDT Address
