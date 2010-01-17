@@ -118,6 +118,43 @@ void *loadACPITable (const char *filename)
 	return NULL;
 }
 
+struct acpi_2_fadt *
+patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
+{
+
+	struct acpi_2_fadt *fadt_mod;
+	BOOL fadt_rev2_needed = NO;
+
+	// Allocate new fadt table
+	if (fadt->Length < 0x84 && fadt_rev2_needed)
+	{
+		fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(0x84);
+		memcpy(fadt_mod, fadt, fadt->Length);
+		fadt_mod->Length   = 0x84;
+		fadt_mod->Revision = 0x02; // FADT rev 2 (ACPI 1.0B MS extensions)
+	}
+	else
+	{
+		fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(fadt->Length);
+		memcpy(fadt_mod, fadt, fadt->Length);
+	}
+
+	// Patch DSDT Address
+	DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
+
+	fadt_mod->DSDT=(uint32_t)new_dsdt;
+	if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+
+	DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
+
+	// Correct the checksum
+	fadt_mod->Checksum=0;
+	fadt_mod->Checksum=256-checksum8(fadt_mod,fadt_mod->Length);
+
+	return fadt_mod;
+}
+
 /* Setup ACPI without replacing DSDT. */
 int setupAcpiNoMod()
 {
@@ -235,26 +272,13 @@ int setupAcpi()
 						continue;
 					}
 					
-					fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(fadt->Length); 
-					memcpy(fadt_mod, fadt, fadt->Length);
+					fadt_mod = patch_fadt(fadt, new_dsdt);
 
-					// Patch DSDT Address
-					DBG("Old DSDT @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
-
-					fadt_mod->DSDT=(uint32_t)new_dsdt;
-					if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
-						fadt_mod->X_DSDT=(uint32_t)new_dsdt;
-
-					DBG("New DSDT @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
-
-					// Correct the checksum
-					fadt_mod->Checksum=0;
-					fadt_mod->Checksum=256-checksum8(fadt_mod,fadt_mod->Length);
-					
 					rsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
 					continue;
 				}
 			}
+			DBG("\n");
 
 			// Correct the checksum of RSDT
 			rsdt_mod->Length-=4*dropoffset;
@@ -326,22 +350,9 @@ int setupAcpi()
 							printf("FADT incorrect or after 4GB. Dropping XSDT\n");
 							goto drop_xsdt;
 						}
-						fadt_mod=(struct acpi_2_fadt*)AllocateKernelMemory(fadt->Length); 
-						memcpy(fadt_mod, fadt, fadt->Length);
 
-						// Patch DSDT Address
-						DBG("Old DSDT @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
+						fadt_mod = patch_fadt(fadt, new_dsdt);
 
-						fadt_mod->DSDT=(uint32_t)new_dsdt;
-						if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
-							fadt_mod->X_DSDT=(uint32_t)new_dsdt;
-
-						DBG("New DSDT @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
-
-						// Correct the checksum
-						fadt_mod->Checksum=0;
-						fadt_mod->Checksum=256-checksum8(fadt_mod,fadt_mod->Length);
-						
 						xsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
 
 						DBG("TABLE %c%c%c%c@%x,",table[0],table[1],table[2],table[3],xsdt_entries[i]);
