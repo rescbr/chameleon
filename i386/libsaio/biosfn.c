@@ -770,13 +770,13 @@ APMConnect32(void)
 #endif /* APM_SUPPORT */
 
 #ifdef EISA_SUPPORT
-BOOL
+bool
 eisa_present(
     void
 )
 {
-    static BOOL checked;
-    static BOOL isEISA;
+    static bool checked;
+    static bool isEISA;
 
     if (!checked) {
         if (strncmp((char *)0xfffd9, "EISA", 4) == 0)

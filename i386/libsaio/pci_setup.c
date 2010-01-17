@@ -12,7 +12,7 @@ extern void force_enable_hpet(pci_dt_t *lpc_dev);
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
-	BOOL do_eth_devprop, do_gfx_devprop, fix_ehci, fix_uhci, fix_usb, do_enable_hpet;
+	bool do_eth_devprop, do_gfx_devprop, fix_ehci, fix_uhci, fix_usb, do_enable_hpet;
 	pci_dt_t *current = pci_dt;
 
 	do_eth_devprop = do_gfx_devprop = fix_ehci = fix_uhci = fix_usb = do_enable_hpet = false;

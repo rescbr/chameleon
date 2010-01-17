@@ -59,15 +59,15 @@
 #include "gui.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
-BOOL gOverrideKernel;
+bool gOverrideKernel;
 static char gBootKernelCacheFile[512];
 static char gCacheNameAdler[64 + 256];
 char *gPlatformName = gCacheNameAdler;
 char gRootDevice[512];
 char gMKextName[512];
 char gMacOSVersion[8];
-BOOL gEnableCDROMRescan;
-BOOL gScanSingleDrive;
+bool gEnableCDROMRescan;
+bool gScanSingleDrive;
 
 int     bvCount = 0;
 //int		menucount = 0;
@@ -76,7 +76,7 @@ int     gDeviceCount = 0;
 BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;
-BOOL    useGUI = TRUE;
+bool    useGUI = true;
 
 //static void selectBiosDevice(void);
 
@@ -84,7 +84,7 @@ static
 unsigned long Adler32(unsigned char *buffer, long length);
 
 
-static BOOL gUnloadPXEOnExit = 0;
+static bool gUnloadPXEOnExit = false;
 
 /*
  * How long to wait (in seconds) to load the
@@ -182,7 +182,7 @@ static int ExecKernel(void *binary)
         }
     }
 
-	BOOL dummyVal;
+	bool dummyVal;
 
     if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal)
     {
@@ -254,10 +254,10 @@ void common_boot(int biosdev)
     int      status;
     char     *bootFile;
     unsigned long adler32;
-    BOOL     quiet;
-    BOOL     firstRun = YES;
-    BOOL     instantMenu;
-    BOOL     rescanPrompt;
+    bool     quiet;
+    bool     firstRun = YES;
+    bool     instantMenu;
+    bool     rescanPrompt;
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 
@@ -374,9 +374,9 @@ void common_boot(int biosdev)
         long flags, cachetime, kerneltime, exttime, sleeptime, time;
         int ret = -1;
         void *binary = (void *)kLoadAddr;
-        BOOL tryresume;
-        BOOL tryresumedefault;
-        BOOL forceresume;
+        bool tryresume;
+        bool tryresumedefault;
+        bool forceresume;
 
         config_file_t    systemVersion;		// system.plist of booting partition
 

@@ -13,7 +13,7 @@
 
 #define EX2ProbeSize	2048
 
-BOOL EX2Probe (const void *buf)
+bool EX2Probe (const void *buf)
 {
 	return (OSReadLittleInt16(buf+0x438,0)==0xEF53);
 }

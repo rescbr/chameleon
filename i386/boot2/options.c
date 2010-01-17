@@ -82,9 +82,9 @@ static void restoreCursor( const CursorState * cs )
  * characters was F8.
  */
 
-static BOOL flushKeyboardBuffer()
+static bool flushKeyboardBuffer()
 {
-    BOOL status = FALSE;
+    bool status = FALSE;
 
     while ( readKeyboardStatus() ) {
         if (bgetc() == 0x4200) status = TRUE;
@@ -191,7 +191,7 @@ static void clearBootArgs()
 
 //==========================================================================
 
-static void showBootPrompt( int row, BOOL visible )
+static void showBootPrompt( int row, bool visible )
 {
     extern char bootPrompt[];
     extern char bootRescanPrompt[];
@@ -656,7 +656,7 @@ char *getMemoryInfoString()
 extern void lspci(const char *booterParam);
 
 int
-getBootOptions(BOOL firstRun)
+getBootOptions(bool firstRun)
 {
   int     i;
   int     key;
@@ -665,7 +665,7 @@ getBootOptions(BOOL firstRun)
   int     bvCount;
   BVRef   bvr;
   BVRef   menuBVR;
-  BOOL    showPrompt, newShowPrompt, isCDROM;
+  bool    showPrompt, newShowPrompt, isCDROM;
 
   // Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(bvChain);
@@ -876,7 +876,7 @@ getBootOptions(BOOL firstRun)
 		if ( ! ( gBootMode & kBootModeQuiet ) )
 
 		{
-      BOOL showBootBanner = YES;  
+      bool showBootBanner = YES;
       
       // Check if "Boot Banner"=N switch is present in config file.
       getBoolForKey( kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
@@ -1108,7 +1108,7 @@ done:
 extern unsigned char chainbootdev;
 extern unsigned char chainbootflag;
 
-BOOL
+bool
 copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
     int argLen = argName ? strlen(argName) : 0;
@@ -1138,7 +1138,7 @@ copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cn
 // 
 // Returns TRUE if an argument was copied, FALSE otherwise
 
-BOOL
+bool
 processBootArgument(
                     const char *argName,      // The argument to search for
                     const char *userString,   // Typed-in boot arguments
@@ -1151,7 +1151,7 @@ processBootArgument(
 {
     const char *val;
     int cnt;
-    BOOL found = NO;
+    bool found = NO;
 
     if (getValueForBootKey(userString, argName, &val, &cnt)) {
         // Don't copy; these values will be copied at the end of argument processing.
@@ -1183,7 +1183,7 @@ processBootOptions()
     int              cntRemaining;
     char *           argP;
     char             uuidStr[64];
-    BOOL             uuidSet = NO;
+    bool             uuidSet = NO;
     char *           configKernelFlags;
     char *           valueBuffer;
 
@@ -1571,10 +1571,10 @@ int selectAlternateBootDevice(int bootdevice)
 }
 
  
-BOOL promptForRescanOption(void)
+bool promptForRescanOption(void)
 {
   int      key;
-  BOOL     result = FALSE;
+  bool     result = FALSE;
 
   printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
   key = getc();

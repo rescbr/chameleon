@@ -297,7 +297,7 @@ smbios_dry_run (struct SMBEntryPoint * origsmbios)
 	int origsmbiosnum=0;
 	int i, j;
 	int tablespresent[256];
-	BOOL do_auto=1;
+	bool do_auto=1;
 
 	getBoolForKey("SMBIOSdefaults",&do_auto,&bootInfo->bootConfig);
 
@@ -438,7 +438,7 @@ smbios_real_run (struct SMBEntryPoint * origsmbios,
 	uint16_t nexthandle=0;
 	int i, j;
 	int tablespresent[256];
-	BOOL do_auto=1;
+	bool do_auto=1;
 	
 	getBoolForKey("SMBIOSdefaults",&do_auto,&bootInfo->bootConfig);
 	

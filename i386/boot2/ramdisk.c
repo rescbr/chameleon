@@ -13,7 +13,7 @@ struct multiboot_info * gRAMDiskMI = NULL;
 
 // gRAMDiskVolume holds the bvr for the mounted ramdisk image.
 BVRef gRAMDiskVolume = NULL;
-BOOL gRAMDiskBTAliased = 0;
+bool gRAMDiskBTAliased = 0;
 char gRAMDiskFile[512];
 
 void umountRAMDisk()
@@ -121,7 +121,7 @@ int mountRAMDisk(const char * param)
   return error;
 }
 
-void setRAMDiskBTHook(BOOL mode)
+void setRAMDiskBTHook(bool mode)
 {
   gRAMDiskBTAliased = mode;
   if (mode == 1)

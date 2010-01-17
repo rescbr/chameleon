@@ -111,7 +111,7 @@ BVRef gBootVolume;
 
 // zef - ramdisk variables
 extern BVRef  gRAMDiskVolume;
-extern BOOL   gRAMDiskBTAliased;
+extern bool   gRAMDiskBTAliased;
 
 //static BVRef getBootVolumeRef( const char * path, const char ** outPath );
 static BVRef newBootVolumeRef( int biosdev, int partno );
@@ -700,9 +700,9 @@ void scanDisks(int biosdev, int *count)
 
 BVRef selectBootVolume( BVRef chain )
 {
-  BOOL filteredChain = FALSE;
-	BOOL foundPrimary = FALSE;
-  BVRef bvr, bvr1 = 0, bvr2 = 0;
+    bool filteredChain = FALSE;
+    bool foundPrimary = FALSE;
+    BVRef bvr, bvr1 = 0, bvr2 = 0;
 	
 	if (chain->filtered) filteredChain = TRUE;
 	

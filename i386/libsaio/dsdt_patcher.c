@@ -124,8 +124,8 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
 {
 
 	struct acpi_2_fadt *fadt_mod;
-	BOOL fadt_rev2_needed = NO;
-	BOOL fix_restart;
+	bool fadt_rev2_needed = NO;
+	bool fix_restart;
 
 	// Restart Fix
 	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
@@ -224,7 +224,7 @@ int setupAcpi()
 	DBG("New DSDT Loaded in memory\n");
 	
 	{
-		BOOL tmp;
+		bool tmp;
 		drop_ssdt=getBoolForKey("DropSSDT",&tmp, &bootInfo->bootConfig)&&tmp;
 	}
 	

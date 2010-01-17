@@ -143,12 +143,12 @@ void colorFont(font_t *font, uint32_t color);
 int  loadGraphics();
 void makeRoundedCorners(pixmap_t *p);
 
-BOOL testForQemu();
+bool testForQemu();
 
 int infoMenuSelection = 0;
 int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
-BOOL infoMenuNativeBoot = 0;
+bool infoMenuNativeBoot = false;
 
 unsigned long screen_params[4];		// here we store the used screen resolution
 
@@ -245,9 +245,9 @@ void drawBackground()
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
 
-void loadThemeValues(config_file_t *theme, BOOL overide)
+void loadThemeValues(config_file_t *theme, bool overide)
 {
-	BOOL themeEnabled;
+	bool themeEnabled;
 
 	if ( (getBoolForKey("Enabled", &themeEnabled, theme ) ) || ( overide ) )
 	{
@@ -1191,7 +1191,7 @@ int initFont(font_t *font, image_t *data)
 	
 	int start = 0, end = 0, count = 0, space = 0;
 	
-	BOOL monospaced = NO;
+	bool monospaced = NO;
 	
 	font->height = data->image->height;	
 
@@ -1682,7 +1682,7 @@ uint16_t bootImageHeight = 0;
 
 uint8_t *bootImageData = NULL; 
 
-BOOL usePngImage = YES;
+bool usePngImage = YES;
 
 //==========================================================================
 // loadBootGraphics
@@ -1713,7 +1713,7 @@ void drawBootGraphics()
 	int pos;
 	int length;
 	const char *dummyVal;
-	BOOL legacy_logo;
+	bool legacy_logo;
 	uint16_t x, y; 
 	
 	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo)
@@ -1785,7 +1785,7 @@ void drawBootGraphics()
 	return;
 }
 
-BOOL testForQemu()
+bool testForQemu()
 {
 	char *buffer = getVBEInfoString();
 	char qemutext[] = "Bochs/Plex86";

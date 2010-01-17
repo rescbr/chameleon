@@ -218,7 +218,7 @@ static const char * bios_error(int errnum)
 // Return:
 //   0 on success, or an error code from INT13/F2 or INT13/F42 BIOS call.
 
-static BOOL cache_valid = FALSE;
+static bool cache_valid = FALSE;
 
 static int Biosread( int biosdev, unsigned long long secno )
 {
@@ -1678,7 +1678,7 @@ static const struct NamedValue fdiskTypes[] =
 
 //==========================================================================
 
-void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, BOOL verbose )
+void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool verbose )
 {
     unsigned char type = (unsigned char) bvr->part_type;
     char *p;

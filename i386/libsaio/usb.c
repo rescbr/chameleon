@@ -29,8 +29,8 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	uint8_t		eecp;
 	uint8_t		legacy[8];
 	
-	BOOL isOwnershipConflict;	
-	BOOL alwaysHardBIOSReset;
+	bool isOwnershipConflict;
+	bool alwaysHardBIOSReset;
 
 	if (!getBoolForKey("EHCIhard", &alwaysHardBIOSReset, &bootInfo->bootConfig))
 		alwaysHardBIOSReset = 1;	

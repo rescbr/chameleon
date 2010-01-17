@@ -295,9 +295,9 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     return;
 }
 
-BOOL NTFSProbe(const void * buffer)
+bool NTFSProbe(const void * buffer)
 {
-	BOOL result = FALSE;
+	bool result = FALSE;
 	
 	const struct bootfile	* part_bootfile = buffer;			// NTFS boot sector structure
 	

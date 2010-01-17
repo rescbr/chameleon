@@ -728,7 +728,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, (strlen(biosVersion) + 1));
 
-	BOOL set_vbios_prop = false;
+	bool set_vbios_prop = false;
 	getBoolForKey("VBIOS", &set_vbios_prop, &bootInfo->bootConfig);
 	if (set_vbios_prop)
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));

@@ -125,7 +125,7 @@ void HFSFree(CICell ih)
     free(ih);
 }
 
-BOOL 
+bool
 HFSProbe (const void *buf)
 {
 	const HFSMasterDirectoryBlock *mdb;

@@ -57,8 +57,8 @@ enum {
 typedef struct {
 	position_t pos;
 	char *text;
-	BOOL enabled;
-	BOOL expandable;
+	bool enabled;
+	bool expandable;
 } menuitem_t;
 
 /*
@@ -95,7 +95,7 @@ typedef struct
 	uint32_t		fgcolor;			// Foreground color AARRGGBB
 	uint32_t		font_small_color;	// Color for small  font AARRGGBB
 	uint32_t		font_console_color;	// Color for consle font AARRGGBB
-	BOOL			draw;				// Draw flag
+	bool			draw;				// Draw flag
 } window_t;
 	
 /*
@@ -121,8 +121,8 @@ typedef struct
 	
 	window_t	debug;					// Debug
 
-	BOOL		initialised;			// Initialised
-	BOOL		redraw;					// Redraw flag
+	bool		initialised;			// Initialised
+	bool		redraw;					// Redraw flag
 } gui_t;
 
 

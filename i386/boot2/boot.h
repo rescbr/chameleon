@@ -83,16 +83,16 @@
  */
 extern int  gBIOSDev;
 extern long gBootMode;
-extern BOOL sysConfigValid;
+extern bool sysConfigValid;
 extern char bootBanner[];
 extern char bootPrompt[];
-extern BOOL gOverrideKernel;
+extern bool gOverrideKernel;
 extern char *gPlatformName;
 extern char gMKextName[];
 extern char gRootDevice[];
-extern BOOL gEnableCDROMRescan;
-extern BOOL gScanSingleDrive;
-extern BOOL useGUI;
+extern bool gEnableCDROMRescan;
+extern bool gScanSingleDrive;
+extern bool useGUI;
 
 // Boot Modes
 enum {
@@ -150,10 +150,10 @@ extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 /*
  * options.c
  */
-extern int getBootOptions(BOOL firstRun);
+extern int getBootOptions(bool firstRun);
 extern int processBootOptions();
 extern int selectAlternateBootDevice(int bootdevice);
-extern BOOL promptForRescanOption(void);
+extern bool promptForRescanOption(void);
 
 void showHelp();
 void showTextFile();

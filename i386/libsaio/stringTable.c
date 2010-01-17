@@ -81,7 +81,7 @@ keyncmp(const char *str, const char *key, int n)
 static void eatThru(char val, const char **table_p)
 {
 	register const char *table = *table_p;
-	register BOOL found = NO;
+	register bool found = NO;
 
 	while (*table && !found)
 	{
@@ -97,7 +97,7 @@ static void eatThru(char val, const char **table_p)
 
 /* Remove key and its associated value from the table. */
 
-BOOL
+bool
 removeKeyFromTable(const char *key, char *table)
 {
     register int len;
@@ -198,7 +198,7 @@ int stringLength(const char *table, int compress)
 }
 
 
-BOOL getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size)
+bool getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size)
 {
 	if (config->dictionary != 0 ) {
 		// Look up key in XML dictionary
@@ -308,11 +308,11 @@ static const char *getToken(const char *line, const char **begin, int *len)
     return line;
 }
 
-BOOL getValueForBootKey(const char *line, const char *match, const char **matchval, int *len)
+bool getValueForBootKey(const char *line, const char *match, const char **matchval, int *len)
 {
     const char *key, *value;
     int key_len, value_len;
-    BOOL retval = NO;
+    bool retval = NO;
     
     while (*line) {
 	/* look for keyword or argument */
@@ -342,7 +342,7 @@ BOOL getValueForBootKey(const char *line, const char *match, const char **matchv
  * The boolean value of the key is stored in 'val'.
  */
 
-BOOL getBoolForKey( const char *key, BOOL *result_val, config_file_t *config )
+bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
 {
     const char *key_val;
     int size;
@@ -358,11 +358,11 @@ BOOL getBoolForKey( const char *key, BOOL *result_val, config_file_t *config )
     return NO;
 }
 
-BOOL getIntForKey( const char *key, int *value, config_file_t *config )
+bool getIntForKey( const char *key, int *value, config_file_t *config )
 {
     const char *val;
     int size, sum;
-    BOOL negative = NO;
+    bool negative = NO;
     
     if (getValueForKey(key, &val, &size, config))
 	{
@@ -397,15 +397,15 @@ BOOL getIntForKey( const char *key, int *value, config_file_t *config )
  *
  */
 
-BOOL getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
+bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
 {
 	const char *val;
 	
     int size = 0;
 	int sum = 0;
     
-	BOOL negative = NO;
-	BOOL percentage = NO;
+	bool negative = NO;
+	bool percentage = NO;
 	
     if (getValueForKey(key, &val, &size, config))
 	{
@@ -459,7 +459,7 @@ BOOL getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
  *	get color value from plist format #RRGGBB
  */
 
-BOOL getColorForKey( const char *key, unsigned int *value, config_file_t *config )
+bool getColorForKey( const char *key, unsigned int *value, config_file_t *config )
 {
     const char *val;
     int size;
@@ -476,11 +476,11 @@ BOOL getColorForKey( const char *key, unsigned int *value, config_file_t *config
     return NO;
 }
 
-BOOL getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
+bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
 {
   const char *overrideVal;
   int overrideSize;
-  BOOL override, ret;
+  bool override, ret;
   
   if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
     return YES;
@@ -729,7 +729,7 @@ char * getNextArg(char ** argPtr, char * val)
   char * ptr = *argPtr;
   const char * strStart;
   int len = 0;
-  BOOL isQuoted = FALSE;
+  bool isQuoted = FALSE;
 
   *val = '\0';
 

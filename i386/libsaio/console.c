@@ -49,8 +49,8 @@
 
 extern int	vprf(const char * fmt, va_list ap);
 
-BOOL gVerboseMode;
-BOOL gErrors;
+bool gVerboseMode;
+bool gErrors;
 
 /*
  * write one character to console
