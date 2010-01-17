@@ -1,6 +1,5 @@
 /*
  * Copyright 2010 AsereBLN. All rights reserved. <aserebln@googlemail.com>
- * Released under version 2 of the Gnu Public License (GPLv2).
  *
  * mem.h
  */
