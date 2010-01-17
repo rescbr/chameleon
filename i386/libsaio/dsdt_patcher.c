@@ -72,6 +72,51 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
     return NULL;
 }
 
+void *loadACPITable (const char *filename)
+{
+	void *tableAddr;
+	int fd;
+	char dirspec[512];
+
+	// Check booting partition
+	sprintf(dirspec,"%s",filename);
+	fd=open (dirspec,0);
+	if (fd<0)
+	{	// Check Extra on booting partition
+		sprintf(dirspec,"/Extra/%s",filename);
+		fd=open (dirspec,0);
+		if (fd<0)
+		{	// Fall back to booter partition
+			sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
+			fd=open (dirspec,0);
+			if (fd<0)
+			{
+				verbose("ACPI Table not found: %s\n", filename);
+				return NULL;
+			}
+		}
+	}
+
+	tableAddr=(void*)AllocateKernelMemory(file_size (fd));
+	if (tableAddr)
+	{
+		if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
+		{
+			printf("Couldn't read table %s\n",dirspec);
+			free (tableAddr);
+			close (fd);
+			return NULL;
+		}
+
+		DBG("Table %s read and stored at: %x\n", dirspec, tableAddr);
+		close (fd);
+		return tableAddr;
+	}
+
+	printf("Couldn't allocate memory for table %s\n", dirspec);
+	close (fd);
+	return NULL;
+}
 
 /* Setup ACPI without replacing DSDT. */
 int setupAcpiNoMod()
@@ -88,10 +133,10 @@ int setupAcpiNoMod()
 /* Setup ACPI. Replace DSDT if DSDT.aml is found */
 int setupAcpi()
 {
-	int fd, version;
+	int version;
 	void *new_dsdt;
 	const char *dsdt_filename;
-	char dirspec[512];
+	/* const char *facp_filename; */
 	int len;
 	boolean_t drop_ssdt=NO;
 
@@ -100,39 +145,12 @@ int setupAcpi()
 	if (!getValueForKey("DSDT", &dsdt_filename, &len, &bootInfo->bootConfig))
 		dsdt_filename="DSDT.aml";
 	
-	// Check booting partition
-	sprintf(dirspec,"%s",dsdt_filename);
-	fd=open (dirspec,0);
-	if (fd<0)
-	{	// Check Extra on booting partition
-		sprintf(dirspec,"/Extra/%s",dsdt_filename);
-		fd=open (dirspec,0);
-		if (fd<0)
-		{	// Fall back to booter partition
-			sprintf(dirspec,"bt(0,0)/Extra/%s",dsdt_filename);
-			fd=open (dirspec,0);
-			if (fd<0)
-			{
-				verbose("No DSDT replacement found. Leaving ACPI data as is\n");
-				return setupAcpiNoMod();
-			}
-		}
-	}
-	
 	// Load replacement DSDT
-	new_dsdt=(void*)AllocateKernelMemory(file_size (fd));
+	new_dsdt=loadACPITable(dsdt_filename);
 	if (!new_dsdt)
 	{
-		printf("Couldn't allocate memory for DSDT\n");
 		return setupAcpiNoMod();
 	}
-	if (read (fd, new_dsdt, file_size (fd))!=file_size (fd))
-	{
-		printf("Couldn't read file\n");
-		return setupAcpiNoMod();
-	}
-	close (fd);
-	
 	DBG("New DSDT Loaded in memory\n");
 	
 	{
