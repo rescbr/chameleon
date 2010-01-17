@@ -3,19 +3,19 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h" /* for bootArgs */
 #include "efi.h"
 #include "acpi.h"
 #include "fake_efi.h"
 #include "efi_tables.h"
-#include "freq_detect.h"
+#include "platform.h"
 #include "dsdt_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
 #include "pci.h"
 #include "sl.h"
 
-extern struct SMBEntryPoint * getSmbios();
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -320,7 +320,6 @@ static char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
 static char FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
-static char SYSTEM_ID_PROP[]	 = "system-id";
 
 void
 setupEfiDeviceTree(void)
@@ -366,18 +365,15 @@ setupEfiDeviceTree(void)
      * the value in the fsbFrequency global and not an malloc'd pointer
      * because the DT_AddProperty function does not copy its args.
      */
-    if(fsbFrequency != 0)
-        DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &fsbFrequency);
-
-	// unable to determine UUID for host. Error: 35 fix
-	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, sizeof(SYSTEM_ID), (EFI_UINT32*)&SYSTEM_ID);
+    if(Platform.CPU.FSBFrequency != 0)
+        DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
 
 	/* Export TSC and CPU frequencies for use by the kernel or KEXTs
      */
-    if(tscFrequency != 0)
-        DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &tscFrequency);
-    if(cpuFrequency != 0)
-        DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &cpuFrequency);
+    if(Platform.CPU.TSCFrequency != 0)
+        DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
+    if(Platform.CPU.CPUFrequency != 0)
+        DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 
     /* Fill /efi/device-properties node.
      */

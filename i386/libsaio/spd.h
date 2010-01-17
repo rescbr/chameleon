@@ -6,6 +6,12 @@
 #ifndef __LIBSAIO_SPD_H
 #define __LIBSAIO_SPD_H
 
+#include "platform.h"
+
+extern void scan_spd(PlatformInfo_t *p);
+
+#if 0 // Old structures and functions
+
 #include "libsaio.h"
 
 void scan_smbus_controller(pci_dt_t *smbus_dev);
@@ -152,5 +158,7 @@ struct smbus_controllers_t {
 /* SPD_MODULE_ATTRIBUTES values. */
 #define MODULE_BUFFERED						1
 #define MODULE_REGISTERED					2
+
+#endif
 
 #endif /* !__LIBSAIO_SPD_H */

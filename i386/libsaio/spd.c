@@ -18,6 +18,12 @@
 #define DBG(x...)
 #endif
 
+void scan_spd(PlatformInfo_t *p)
+{
+            /* NYI */
+}
+
+#if 0 // Old structures and functions
 static const char *spd_memory_types[] =
 {
 	"RAM",          /* 00h  Undefined */
@@ -34,8 +40,8 @@ static const char *spd_memory_types[] =
 	"DDR3 SDRAM",   /* 0Bh  SDRAM DDR 3 */
 };
 
-#define rdtsc(low,high) \
-__asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
+#define rdtsc(low,high)									\
+   __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 
 #define SMBHSTSTS 0
 #define SMBHSTCNT 2
@@ -163,4 +169,4 @@ void scan_smbus_controller(pci_dt_t *smbus_dev)
 		}
 	
 }
-
+#endif

@@ -8,11 +8,29 @@
 
 #include "libsaio.h"
 
-#define bit(n)		(1ULL << (n))
-#define bitmask(h,l)	((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
-#define bitfield(x,h,l)	(((x) & bitmask(h,l)) >> l)
+extern bool platformCPUFeature(uint32_t);
+extern void scan_platform(void);
 
-extern void scan_platform();
+/* CPUID index into cpuid_raw */
+#define CPUID_0				0
+#define CPUID_1				1
+#define CPUID_2				2
+#define CPUID_3				3
+#define CPUID_4				4
+#define CPUID_80			5
+#define CPUID_81			6
+#define CPUID_MAX			7
+
+/* CPU Features */
+#define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set
+#define CPU_FEATURE_SSE			0x00000002		// SSE Instruction Set
+#define CPU_FEATURE_SSE2		0x00000004		// SSE2 Instruction Set
+#define CPU_FEATURE_SSE3		0x00000008		// SSE3 Instruction Set
+#define CPU_FEATURE_SSE41		0x00000010		// SSE41 Instruction Set
+#define CPU_FEATURE_SSE42		0x00000020		// SSE42 Instruction Set
+#define CPU_FEATURE_EM64T		0x00000040		// 64Bit Support
+#define CPU_FEATURE_HTT			0x00000080		// HyperThreading
+#define CPU_FEATURE_MOBILE		0x00000100		// Mobile CPU
 
 /* SMBIOS Memory Types */ 
 #define     SMB_MEM_TYPE_UNDEFINED	0 
@@ -45,52 +63,45 @@ extern void scan_platform();
 #define     SMB_MEM_CHANNEL_TRIPLE	3 
 
 /* Maximum number of ram slots */
-#define		MAX_RAM_SLOTS			16
+#define MAX_RAM_SLOTS			8
+
+/* Maximum number of SPD bytes */
+#define MAX_SPD_SIZE			256
 
 typedef struct _RamSlotInfo_t {
-	bool		InUse;							// Module Present
-	uint32_t	ModuleSize;						// Size of Module in MB
-	char		*spd;							// SPD Dump
+	bool		InUse;
+	uint32_t	ModuleSize;				// Size of Module in MB
+	uint8_t		Type;
+	char		Vendor[64];
+	char		PartNo[64];
+	char		SerialNo[16];
+	uint8_t		spd[MAX_SPD_SIZE];
 } RamSlotInfo_t;
 
 typedef struct _PlatformInfo_t {
-	bool	Mobile;								// Mobile Platform
-	bool	x86_64;								// 64 Bit Capable
-	struct PCI {
-		uint8_t			NoDevices;				// No of PCI devices
-	} PCI;
 	struct CPU {
-		uint32_t		Vendor;					// Vendor
-		uint32_t		Model;					// Model
-		uint32_t		ExtModel;				// Extended Model
-		uint32_t		Family;					// Family
-		uint32_t		ExtFamily;				// Extended Family
-		uint8_t			NoCores;				// No Cores per Package
-		uint8_t			NoThreads;				// Threads per Package
-		uint8_t			MaxCoef;				// Max Multiplier
+		uint32_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
+		uint32_t		Vendor;			// Vendor
+		uint32_t		Model;			// Model
+		uint32_t		ExtModel;		// Extended Model
+		uint32_t		Family;			// Family
+		uint32_t		ExtFamily;		// Extended Family
+		uint32_t		NoCores;		// No Cores per Package
+		uint32_t		NoThreads;		// Threads per Package
+		uint8_t			MaxCoef;		// Max Multiplier
 		uint8_t			MaxDiv;
 		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		float			MaxRatio;				
-		float			CurrRatio;				
-		uint64_t		TSCFrequency;			// TSC Frequency Hz
-		uint64_t		FSBFrequency;			// FSB Frequency Hz
-		uint64_t		CPUFrequency;			// CPU Frequency Hz
-		bool			Mobile;					// Mobile CPU
-		uint32_t		BrandString[16];		// 48 Byte Branding String
+		uint64_t		TSCFrequency;		// TSC Frequency Hz
+		uint64_t		FSBFrequency;		// FSB Frequency Hz
+		uint64_t		CPUFrequency;		// CPU Frequency Hz
+		uint32_t		BrandString[16];	// 48 Byte Branding String
+		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 	} CPU;
 	struct RAM {
-		uint64_t		Frequency;				// Ram Frequency
-		uint32_t		Divider;				// Memory divider
-		float			CAS;					// CAS 1/2/2.5/3/4/5/6/7
-		uint8_t			TRC;					
-		uint8_t			TRP;
-		uint8_t			RAS;
-		uint8_t			Channels;				// Channel Configuration Single,Dual or Triple
-		uint8_t			NoSlots;				// Maximum no of slots available
-		uint8_t			Type;					// Standard SMBIOS v2.5 Memory Type
-		char			*BrandString;			// Branding String Memory Controller
-		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];	// Information about each slot
+		RamSlotInfo_t		DIMM[MAX_RAM_SLOTS];	// Information about each slot
+		uint64_t		Frequency;		// Ram Frequency
+		//uint8_t			Type;			// Standard SMBIOS v2.5 Memory Type
 	} RAM;
 } PlatformInfo_t;
 

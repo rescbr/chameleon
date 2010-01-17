@@ -3,6 +3,7 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 #include "acpi.h"
 #include "efi_tables.h"
@@ -240,12 +241,12 @@ int setupAcpi()
 			// Correct the checksum of RSDT
 			rsdt_mod->Length-=4*dropoffset;
 
-			DBG("RSDT Original checksum %d\n", rsdt_mod->Checksum);
+			DBG("RSDT: Original checksum %d, ", rsdt_mod->Checksum);
 
 			rsdt_mod->Checksum=0;
 			rsdt_mod->Checksum=256-checksum8(rsdt_mod,rsdt_mod->Length);
 
-			DBG("RSDT New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
+			DBG("New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
 		}
 		else
 		{
@@ -356,7 +357,7 @@ int setupAcpi()
 
 		// Correct the checksum of RSDP      
 
-		DBG("Original checksum %d\n", rsdp_mod->Checksum);
+		DBG("RSDP: Original checksum %d, ", rsdp_mod->Checksum);
 
 		rsdp_mod->Checksum=0;
 		rsdp_mod->Checksum=256-checksum8(rsdp_mod,20);
@@ -365,7 +366,7 @@ int setupAcpi()
 
 		if (version)
 		{
-			DBG("Original extended checksum %d\n", rsdp_mod->ExtendedChecksum);
+			DBG("RSDP: Original extended checksum %d", rsdp_mod->ExtendedChecksum);
 
 			rsdp_mod->ExtendedChecksum=0;
 			rsdp_mod->ExtendedChecksum=256-checksum8(rsdp_mod,rsdp_mod->Length);
@@ -387,6 +388,7 @@ int setupAcpi()
 		}
 	}
 	#if DEBUG_DSDT
+	printf("Press a key to continue... (DEBUG_DSDT)\n");
 	getc();
 	#endif
 	return 1;

@@ -3,6 +3,7 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "acpi.h"
 #include "bootstruct.h"
 #include "efi_tables.h"
@@ -102,20 +103,20 @@ static char *sm_get_defstr(char *name, int table_num)
 	int i;
 	char (*sm_defaults)[2][40];
 
-	if (Platform.CPU.Mobile)
-		if (Platform.CPU.NoCores > 1) 
-		{
+	if (platformCPUFeature(CPU_FEATURE_MOBILE)) {
+		if (Platform.CPU.NoCores > 1) {
 			sm_defaults=sm_macbookpro_defaults;
 		} else {
 			sm_defaults=sm_macbook_defaults;
 		}
-	else
+	} else {
 		switch (Platform.CPU.NoCores)
 		{
 			case 1: sm_defaults=sm_macmini_defaults; break;
 			case 2: sm_defaults=sm_imac_defaults; break;
 		   default: sm_defaults=sm_macpro_defaults; break;
 		}
+	}
 
 	for (i=0;sm_defaults[i][0][0];i++)
 		if (!strcmp (sm_defaults[i][0],name))
@@ -156,32 +157,56 @@ static int sm_get_cputype (char *name, int table_num)
 
 static int sm_get_memtype (char *name, int table_num)
 {
-	if(Platform.RAM.Type)
-		return Platform.RAM.Type;
-	else
+	if (table_num < MAX_RAM_SLOTS &&
+	    Platform.RAM.DIMM[table_num].InUse &&
+	    Platform.RAM.DIMM[table_num].Type != 0)
+	{
+		return Platform.RAM.DIMM[table_num].Type;
+	}
 		return SMB_MEM_TYPE_DDR2;
 }
 
 static int sm_get_memspeed (char *name, int table_num)
 {
-	if(Platform.RAM.Type)
-		return round2( Platform.RAM.Frequency / 500000, 2);
-	else
+	if (Platform.RAM.Frequency != 0) {
+		return Platform.RAM.Frequency/1000000;
+	}
 		return 667;
 }
 
 static char *sm_get_memvendor (char *name, int table_num)
 {	
+	if (table_num < MAX_RAM_SLOTS &&
+	    Platform.RAM.DIMM[table_num].InUse &&
+	    strlen(Platform.RAM.DIMM[table_num].Vendor) > 0)
+	{
+		DBG("Vendor[%d]='%s'\n", table_num, Platform.RAM.DIMM[table_num].Vendor);
+		return Platform.RAM.DIMM[table_num].Vendor;
+	}
 	return "N/A";
 }
 	
 static char *sm_get_memserial (char *name, int table_num)
 {
+	if (table_num < MAX_RAM_SLOTS &&
+	    Platform.RAM.DIMM[table_num].InUse &&
+	    strlen(Platform.RAM.DIMM[table_num].SerialNo) > 0)
+	{
+		DBG("SerialNo[%d]='%s'\n", table_num, Platform.RAM.DIMM[table_num].SerialNo);
+		return Platform.RAM.DIMM[table_num].SerialNo;
+	}
 	return "N/A";
 }
 
 static char *sm_get_mempartno (char *name, int table_num)
 {
+	if (table_num < MAX_RAM_SLOTS &&
+	    Platform.RAM.DIMM[table_num].InUse &&
+	    strlen(Platform.RAM.DIMM[table_num].PartNo) > 0)
+	{
+		DBG("PartNo[%d]='%s'\n", table_num, Platform.RAM.DIMM[table_num].PartNo);
+		return Platform.RAM.DIMM[table_num].PartNo;
+	}
 	return "N/A";
 }
 
@@ -227,7 +252,7 @@ struct smbios_table_description smbios_table_descriptions[]=
 	{.type=132,	.len=0x06,	.numfunc=sm_one}
 };
 
-static inline struct SMBEntryPoint * getAddressOfSmbiosTable()
+struct SMBEntryPoint * getAddressOfSmbiosTable()
 {
 	/* First see if we can even find the damn SMBIOS table
      * The logic here is to start at 0xf0000 and end at 0xfffff iterating 16 bytes at a time looking
@@ -283,7 +308,11 @@ smbios_dry_run (struct SMBEntryPoint * origsmbios)
 	{
 		smbiostables=(char *)origsmbios->dmi.tableAddress;
 		origsmbiosnum=origsmbios->dmi.structureCount;
+	} else {
+		smbiostables = NULL;
+		origsmbiosnum = 0;
     }
+
 	// _SM_
 	ret->anchor[0]=0x5f;
 	ret->anchor[1]=0x53;
@@ -422,15 +451,17 @@ smbios_real_run (struct SMBEntryPoint * origsmbios,
     {
 		smbiostables=(char *) origsmbios->dmi.tableAddress;
 		origsmbiosnum=origsmbios->dmi.structureCount;
+	} else {
+		smbiostables = NULL;
+		origsmbiosnum = 0;
     }
 	tablesptr=smbiostables;
 	newtablesptr=(char *) newsmbios->dmi.tableAddress;
 	if (smbiostables)
 		for (i=0;i<origsmbiosnum;i++)
 		{
-			struct smbios_table_header *oldcur
-			=(struct smbios_table_header *) tablesptr,
-			*newcur=(struct smbios_table_header *) newtablesptr;
+			struct smbios_table_header	*oldcur = (struct smbios_table_header *) tablesptr;
+			struct smbios_table_header	*newcur = (struct smbios_table_header *) newtablesptr;
 			char *stringsptr;
 			int nstrings=0;
 			
