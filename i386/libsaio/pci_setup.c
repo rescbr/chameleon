@@ -5,6 +5,7 @@
 extern void set_eth_builtin(pci_dt_t *eth_dev);
 extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
+extern bool setup_gma_devprop(pci_dt_t *gma_dev);
 extern int ehci_acquire(pci_dt_t *pci_dev);
 extern int uhci_reset(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
@@ -49,11 +50,11 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							setup_ati_devprop(current); 
 							break;
 					
-						case PCI_VENDOR_ID_INTEL: 
-							/* message to be removed once support for these cards is added */
-							verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
+							case PCI_VENDOR_ID_INTEL:
+								verbose("Intel Graphics Controller [%04x:%04x] :: %s \n", 
 								current->vendor_id, current->device_id, devicepath);
-							break;
+								setup_gma_devprop(current); 
+								break;
 					
 						case PCI_VENDOR_ID_NVIDIA: 
 							setup_nvidia_devprop(current);

@@ -226,9 +226,9 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE029F, "Quadro FX 4500 X2" },
 	{ 0x10DE0240, "GeForce 6150" },
 	{ 0x10DE0241, "GeForce 6150 LE" },
-	{ 0x10DE0242, "GeForce 6100" },
-	{ 0x10DE0244, "GeForce Go 6150" },
-	{ 0x10DE0247, "GeForce Go 6100" },
+//	{ 0x10DE0242, "GeForce 6100" },  // We dont need support for these graphics card as they do not support OSX at all 
+//	{ 0x10DE0244, "GeForce Go 6150" }, // enabling this will only cause kernel panic therefore its safe to remove em
+//	{ 0x10DE0247, "GeForce Go 6100" },
 
 	/*************** G8x ***************/
 	{ 0x10DE0191, "GeForce 8800 GTX" },
