@@ -68,7 +68,8 @@ enum {
     funcGetSetPaletteFormat  = 0x4F08,
     funcGetSetPaletteData    = 0x4F09,
     funcGetProtModeInterdace = 0x4F0A,
-    funcGetSetPixelClock     = 0x4F0B
+    funcGetSetPixelClock     = 0x4F0B,
+	funcGetEDID              = 0x4f15
 };
 
 enum {
@@ -269,6 +270,8 @@ enum {
 typedef unsigned long VBEPalette[256];
 
 extern int getVBEInfo(void *vinfo_p);
+extern int getEDID( void * edidBlock, UInt8 blocks_left );
+
 extern int getVBEModeInfo(int mode, void *minfo_p);
 extern int getVBEDACFormat(unsigned char *format);
 extern int setVBEDACFormat(unsigned char format);

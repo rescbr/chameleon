@@ -700,13 +700,15 @@ getBootOptions(BOOL firstRun)
             timeout = sysConfigValid?kBootTimeout:0;
     }
 	
-    if (timeout < 0)
+    if (timeout < 0 || gDeviceCount <= 1)
 		gBootMode |= kBootModeQuiet;
 
     // If the user is holding down a modifier key,
-    // enter safe mode.
+    // abort quiet mode.
     if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 ) {
-        gBootMode |= kBootModeSafe;
+        //gBootMode |= kBootModeSafe;
+		gBootMode &= ~kBootModeQuiet;
+		firstRun = NO;
     }
 
     // If user typed F8, abort quiet mode,
@@ -837,7 +839,7 @@ getBootOptions(BOOL firstRun)
     }
 
     if ( firstRun && ( timeout > 0 ) &&
-         ( countdown("Press any key to enter startup options.",
+         ( countdown(""/*"Press any key to enter startup options."*/,
                      kMenuTopRow, timeout) == 0 ) )
     {
         // If the user is holding down a modifier key,

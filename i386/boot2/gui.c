@@ -11,6 +11,7 @@
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
+#include "edid.h"
 
 #ifdef EMBED_THEME
 #include "art.h"
@@ -494,8 +495,10 @@ const char *theme_name="Default";
 
 int initGUI()
 {
-	int val, len;
+	int len;
 	char dirspec[256];
+
+	
 
 #ifdef EMBED_THEME
 
@@ -504,12 +507,11 @@ int initGUI()
 	// build xml dictionary for embedded theme.plist
 	ParseXMLFile( (char *) __theme_plist, &embedded->dictionary);
 
-	// parse display size parameters
-	if(getIntForKey("screen_width", &val, &bootInfo->themeDefault))
-		screen_params[0] = val;
+	// determine screen params form edid
+	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+
+
 	
-	if(getIntForKey("screen_height", &val, &bootInfo->themeDefault))
-		screen_params[1] = val;
 #else
 
 	/*
@@ -523,22 +525,14 @@ int initGUI()
   // Initalizing GUI strucutre.
   bzero(&gui, sizeof(gui_t));
 	
-	screen_params[2] = 32;
 	
 	// find theme name in boot.plist
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
 	
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
 
-	if ( !loadConfigFile(dirspec, &bootInfo->themeConfig) )
-	{		
-		// parse display size parameters
-		if(getIntForKey("screen_width", &val, &bootInfo->themeConfig))
-			screen_params[0] = val;
+	loadConfigFile(dirspec, &bootInfo->themeConfig);
 
-		if(getIntForKey("screen_height", &val, &bootInfo->themeConfig))
-			screen_params[1] = val;
-	}
 
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
@@ -1707,14 +1701,18 @@ void loadBootGraphics()
 
 //==========================================================================
 // drawBootGraphics
+//		funciton used when starting up OS X.
 
 void drawBootGraphics()
 {
-	int pos;
 	int length;
 	const char *dummyVal;
 	BOOL legacy_logo;
 	uint16_t x, y; 
+	
+	/** Read default resolution from the graphics card, instead of the theme **/
+	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+
 	
 	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo)
 		usePngImage = NO; 
@@ -1722,18 +1720,7 @@ void drawBootGraphics()
 	else if (bootImageData == NULL)
 		loadBootGraphics();
 		
-	// parse screen size parameters
-	if(getIntForKey("boot_width", &pos, &bootInfo->themeConfig))
-		screen_params[0] = pos;
-	else
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	
-	if(getIntForKey("boot_height", &pos, &bootInfo->themeConfig))
-		screen_params[1] = pos;
-	else
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	
-	screen_params[2] = 32;
+
 	
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];

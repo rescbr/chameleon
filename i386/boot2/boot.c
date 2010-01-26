@@ -57,6 +57,10 @@
 #include "libsa.h"
 #include "ramdisk.h"
 #include "gui.h"
+#include "graphics.h"
+#include "vbe.h"
+#include "915resolution.h"
+#include "edid.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 BOOL gOverrideKernel;
@@ -356,6 +360,38 @@ void common_boot(int biosdev)
     if ( getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig) && !useGUI )
       useGUI = FALSE;
 		
+	// Before initGui, path the video bios with the correct resolution
+	
+	UInt32 x = 0, y = 0; 
+	UInt32 bp = 0;
+	
+	getResolution(&x, &y, &bp);
+	
+	
+	if (x!=0 && y!=0) {
+		vbios_map * map;
+
+		map = open_vbios(CT_UNKWN);
+
+		unlock_vbios(map);
+			
+		set_mode(map, x, y, bp, 0, 0);
+			
+		relock_vbios(map);
+			
+		close_vbios(map);
+
+		verbose("Patched first resolution mode to %dx%d.\n", x, y);
+
+			
+	}
+		
+	
+	//printf("Press any key to continue...");
+	//getc();
+
+	
+	
     // Try initialising the GUI unless disabled
     if( useGUI )
       initGUI();
