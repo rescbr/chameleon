@@ -14,6 +14,7 @@
 #include "dsdt_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "pci.h"
 #include "sl.h"
 
@@ -327,7 +328,6 @@ static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
 
-#define UUID_LEN	16
 
 /* Get an smbios option string option to convert to EFI_CHAR16 string */
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
@@ -339,28 +339,29 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
   if (!key || !(*key) || !len || !src)    return 0;
 
   *len = strlen(src);
-  dst = (EFI_CHAR16*) malloc(((*len)+1)*2);
-  for (; i<*len; i++)  dst[i] = src[i];
-  dst[*len] = '\0';
-
+  dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
+  for (; i < (*len); i++)  dst[i] = src[i];
+  dst[(*len)] = '\0';
+  *len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
   return dst;
 }
 
 #define DEBUG_SMBIOS 0
 
 /* Get the SystemID from the bios dmi info */
-static EFI_CHAR8* getSmbiosUUID()
+static  EFI_CHAR8* getSmbiosUUID()
 {
 	struct SMBEntryPoint	*smbios;
 	struct DMIHeader	*dmihdr;
 	SMBByte			*p;
 	int			i, found, isZero, isOnes;
-	static EFI_CHAR8        uuid[UUID_LEN+1]="";
-	
+	static EFI_CHAR8        uuid[UUID_LEN];
+
 	smbios = getAddressOfSmbiosTable();	/* checks for _SM_ anchor and table header checksum */
 	if (memcmp( &smbios->dmi.anchor[0], "_DMI_", 5) != 0) {
 		return 0;
 	}
+
 #if DEBUG_SMBIOS
 	verbose(">>> SMBIOSAddr=0x%08x\n", smbios);
 	verbose(">>> DMI: addr=0x%08x, len=0x%d, count=%d\n", smbios->dmi.tableAddress, 
@@ -369,7 +370,8 @@ static EFI_CHAR8* getSmbiosUUID()
 	i = 0;
 	found = 0;
 	p = (SMBByte *) smbios->dmi.tableAddress;
-	while (i < smbios->dmi.structureCount && p + 4 <= (SMBByte *)smbios->dmi.tableAddress + smbios->dmi.tableLength) {
+	while (i < smbios->dmi.structureCount && p + 4 <= (SMBByte *)smbios->dmi.tableAddress + smbios->dmi.tableLength) 
+	{
 		dmihdr = (struct DMIHeader *) p;
 #if DEBUG_SMBIOS
 		verbose(">>>>>> DMI(%d): type=0x%02x, len=0x%d\n",i,dmihdr->type,dmihdr->length);
@@ -390,7 +392,7 @@ static EFI_CHAR8* getSmbiosUUID()
 	}
 
 	if (!found) return 0;
-
+ 
 	verbose("Found SMBIOS System Information Table 1\n");
 	p += 8;
 
@@ -403,84 +405,40 @@ static EFI_CHAR8* getSmbiosUUID()
 		return 0;
 	}
 
-	memcpy(uuid, p, UUID_LEN+1);
+	memcpy(uuid, p, UUID_LEN);
 	return uuid;
 }
-
-/* Parse an UUID string into an (EFI_CHAR8*) buffer */
-static EFI_CHAR8*  getUUIDFromString(const char *source)
-{
-        if (!source) return 0;
-
-	char	*p = (char *)source;
-	int	i;
-	char	buf[3];
-	static EFI_CHAR8 uuid[UUID_LEN+1]="";
-
-	buf[2] = '\0';
-	for (i=0; i<UUID_LEN; i++) {
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
-			verbose("[ERROR] UUID='%s' syntax error\n", source);
-			return 0;
-		}
-		buf[0] = *p++;
-		buf[1] = *p++;
-		uuid[i] = (unsigned char) strtoul(buf, NULL, 16);
-		if (*p == '-' && (i % 2) == 1 && i < UUID_LEN - 1) {
-			p++;
-		}
-	}
-	uuid[UUID_LEN]='\0';
-
-	if (*p != '\0') {
-		verbose("[ERROR] UUID='%s' syntax error\n", source);
-		return 0;
-	}
-	return uuid;
-}
-
-
-// FIXME: can't use my original code here,
-// Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
-/*
-static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
-{
-  char szUUID[UUID_LEN+1], *p=szUUID;
-  int size=0;
-  void* ret;
-
-  if (!szInUUID || strlen(szInUUID)<UUID_LEN) return (EFI_CHAR8*) 0;
-
-  while(*szInUUID) if (*szInUUID!='-') *p++=*szInUUID++; else szInUUID++;
-  *p='\0';
-  ret = convertHexStr2Binary(szUUID, &size);
-  if (!ret || size!=UUID_LEN) 
-  {
-      verbose("UUID: cannot convert string <%s> to valid UUID.\n", szUUID);
-      return (EFI_CHAR8*) 0;
-  }
-  return (EFI_CHAR8*) ret; // new allocated buffer containing the converted string to bin
-}
-*/
 
 /* return a binary UUID value from the overriden SystemID and SMUUID if found, 
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 static EFI_CHAR8* getSystemID()
-{	// unable to determine UUID for host. Error: 35 fix
-    const char * sysId = getStringForKey("SystemID", &bootInfo->bootConfig);
+{   // unable to determine UUID for host. Error: 35 fix
+
+    // Rek: new SMsystemid option conforming to smbios notation standards, this option should
+    // belong to smbios config only ...
+    const char * sysId = getStringForKey(kSystemID, &bootInfo->bootConfig);
     EFI_CHAR8* ret = getUUIDFromString(sysId);
-    if(!sysId || !ret)   // try smbios.plist SMUUID override
-      ret=getUUIDFromString((sysId = getStringForKey("SMUUID",&bootInfo->smbiosConfig)));
+
     if(!sysId || !ret)  { // try bios dmi info UUID extraction 
       ret = getSmbiosUUID();
-      sysId=0;
+      sysId = 0;
     }
     if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
       ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
 
-    verbose("Customizing SystemID with : %s\n", sysId ? sysId :"BIOS internal UUID");
+    verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
     return ret;
+}
+
+// must be called AFTER setup Acpi because we need to take care of correct facp content to reflect in ioregs
+void setupSystemType()
+{
+    Node *node = DT__FindNode("/", false);
+    if (node == 0) stop("Couldn't get root node");
+    // we need to write this property after facp parsing
+    /* Export system-type only if it has been overrriden by the SystemType option */
+    DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
 }
 
 void setupEfiDeviceTree(void)
@@ -489,13 +447,11 @@ void setupEfiDeviceTree(void)
     EFI_CHAR8* ret=0;
     size_t len=0;
     Node *node;
-    EFI_CHAR8 SystemType=1;
-    const char *value;
 
     node = DT__FindNode("/", false);
     
     if (node == 0) stop("Couldn't get root node");
-
+    
    /* We could also just do DT__FindNode("/efi/platform", true)
     * But I think eventually we want to fill stuff in the efi node
     * too so we might as well create it so we have a pointer for it too.
@@ -545,16 +501,7 @@ void setupEfiDeviceTree(void)
     if((ret=getSystemID()))
        DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 
-    /* Export system-type. Allowed values are: 0x01 for desktop computer (default),  0x02 for portable computers */
-    if ((value=getStringForKey("system-type",  &bootInfo->bootConfig))) {
-      if (*value != '1' && *value != '2') 
-	verbose("Error: system-type must be 1 (desktop) or 2 (portable). Defaulting to 1!\n");
-      else
-	SystemType = (unsigned char) (*value-'0');
-    }
-    DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(EFI_CHAR8), &SystemType);
-
-    /* Export SystemSerialNumber if present */
+     /* Export SystemSerialNumber if present */
     if ((ret16=getSmbiosChar16("SMserial", &len)))
       DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
 

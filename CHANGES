@@ -1,3 +1,17 @@
+- Fixed the hibernation problem in boot2/resume.c
+- Fixed all new booter versions with SystemType would override the facp value even if correct,
+  now keeps the facp value if correct and no override has been done, implemented a best effort algo.
+  for maximizing the chance to get the most correct value before we decide to use a fixed value (1=desktop)
+- Fixed display cosmetics of UUID, now a convert.c file contains all 
+  conversions api, to be completed by function that we should reuse.
+  
+- Fixed SystemType would be always forced to a value, now optionally changed
+  only if ovveriden
+- Kept SystemID as the only option to change manually the system-id 
+  For theses reasons, SystemId from bootConfig and SMUUID from smbiosConfig aer now DEPRECATED.
+
+- Integrated JrCs fadt patch (kept for RC5 the existing DSDT.aml  retry algo that disapeared in his patch, should be more discussed for RC6)
+- Added JrCs modified convention name change to coding_standards
 - Now malloc (ex. MALLOC in Asere patch) is renamed malloc(size) and is an alias 
   to safe_malloc(size, file, line) with _FILE_ and _LINE_ prerocessor definitions
 - Added a new 'Rename Partition Feature', now permitting to rename partition 

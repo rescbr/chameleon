@@ -51,7 +51,7 @@ In the later case, consider decomposing your function in more manageable primiti
 but: if (fd < 0)
 
 10. types, variables, functions, naming
-non const variables should follow the (currently mostly used) following convention:
+non const variables should follow the (currently mostly used) CamelCase convention:
 int myVariableIsFine;
 instead of :
 int my_variable_is_ok;

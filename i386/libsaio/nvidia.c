@@ -265,12 +265,20 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05E2, "GeForce GTX 260" },
 	{ 0x10DE05E3, "GeForce GTX 285" },
 	{ 0x10DE05E6, "GeForce GTX 275" },
-	{ 0x10DE0600, "GeForce 8800 GTS 512" },
+	{ 0x10DE05EB, "GeForce GTX 295" },
+	{ 0x10DE05F9, "Quadro CX" },
+	{ 0x10DE05FD, "Quadro FX 5800" },
+	{ 0x10DE05FE, "Quadro FX 4800" },
+   	{ 0x10DE0600, "GeForce 8800 GTS 512" },
 	{ 0x10DE0602, "GeForce 8800 GT" },
 	{ 0x10DE0604, "GeForce 9800 GX2" },
 	{ 0x10DE0605, "GeForce 9800 GT" },
 	{ 0x10DE0606, "GeForce 8800 GS" },
+	{ 0x10DE0607, "GeForce GTS 240" },
+	{ 0x10DE0608, "GeForce 9800M GTX" },
 	{ 0x10DE0609, "GeForce 8800M GTS" },
+	{ 0x10DE060A, "GeForce GTX 280M" },
+	{ 0x10DE060B, "GeForce 9800M GT" },
 	{ 0x10DE060C, "GeForce 8800M GTX" },
 	{ 0x10DE060D, "GeForce 8800 GS" },
 	{ 0x10DE0610, "GeForce 9600 GSO" },
@@ -278,10 +286,16 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0612, "GeForce 9800 GTX" },
 	{ 0x10DE0613, "GeForce 9800 GTX+" },
 	{ 0x10DE0614, "GeForce 9800 GT" },
+	{ 0x10DE0615, "GeForce GTS 250" },
+	{ 0x10DE0617, "GeForce 9800M GTX" },
+	{ 0x10DE0618, "GeForce GTX 260M" },	
 	{ 0x10DE061A, "Quadro FX 3700" },
 	{ 0x10DE061C, "Quadro FX 3600M" },
+	{ 0x10DE061D, "Quadro FX 2800M" },
+	{ 0x10DE061F, "Quadro FX 3800M" },
 	{ 0x10DE0622, "GeForce 9600 GT" },
 	{ 0x10DE0623, "GeForce 9600 GS" },
+	{ 0x10DE0625, "GeForce 9600 GSO 512"},
 	{ 0x10DE0626, "GeForce GT 130" },
 	{ 0x10DE0627, "GeForce GT 140" },
 	{ 0x10DE0628, "GeForce 9800M GTS" },
@@ -297,8 +311,16 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0647, "GeForce 9600M GT" },
 	{ 0x10DE0648, "GeForce 9600M GS" },
 	{ 0x10DE0649, "GeForce 9600M GT" },
+	{ 0x10DE064A, "GeForce 9700M GT" },
 	{ 0x10DE064B, "GeForce 9500M G" },
+	{ 0x10DE064C, "GeForce 9650M GT" },
+	{ 0x10DE0652, "GeForce GT 130M" },
+	{ 0x10DE0658, "Quadro FX 380" },
+	{ 0x10DE0659, "Quadro FX 580" },
+	{ 0x10DE065A, "Quadro FX 1700M" },
 	{ 0x10DE065B, "GeForce 9400 GT" },
+	{ 0x10DE065C, "Quadro FX 770M" },
+	{ 0x10DE06E0, "GeForce 9300 GE" },
 	{ 0x10DE06E1, "GeForce 9300 GS" },
 	{ 0x10DE06E4, "GeForce 8400 GS" },
 	{ 0x10DE06E5, "GeForce 9300M GS" },
@@ -306,9 +328,26 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06E9, "GeForce 9300M GS" },
 	{ 0x10DE06EA, "Quadro NVS 150M" },
 	{ 0x10DE06EB, "Quadro NVS 160M" },
+	{ 0x10DE06EC, "GeForce G 105M" },
+	{ 0x10DE06EF, "GeForce G 103M" },
+	{ 0x10DE06F8, "Quadro NVS 420" },
+	{ 0x10DE06F9, "Quadro FX 370 LP" },
+	{ 0x10DE06FA, "Quadro NVS 450" },
+	{ 0x10DE06FD, "Quadro NVS 295" },
 	{ 0x10DE0A20, "GeForce GT220" },
+	{ 0x10DE0A23, "GeForce 210" },
+	{ 0x10DE0A2A, "GeForce GT 230M" },
+	{ 0x10DE0A34, "GeForce GT 240M" },
 	{ 0x10DE0A60, "GeForce G210" },
-	{ 0x10DE0A65, "GeForce 210" }
+	{ 0x10DE0A62, "GeForce 205" },
+	{ 0x10DE0A63, "GeForce 310" },
+	{ 0x10DE0A65, "GeForce 210" },
+	{ 0x10DE0A66, "GeForce 310" },
+	{ 0x10DE0A74, "GeForce G210M" },
+	{ 0x10DE0A78, "Quadro FX 380 LP" },
+	{ 0x10DE0CA3, "GeForce GT 240" },
+	{ 0x10DE0CA8, "GeForce GTS 260M" },
+	{ 0x10DE0CA9, "GeForce GTS 250M" }
 };
 
 static uint16_t swap16(uint16_t x)
@@ -549,7 +588,7 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 	}
 	size = read(fd, (char *)buf, size);
 	close(fd);
-	return size;
+	return size > 0 ? size : 0;
 }
 
 static int devprop_add_nvidia_template(struct DevPropDevice *device)
@@ -617,7 +656,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
-		DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
+		if (nvBiosOveride > 0) {
+			verbose("Using nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
+			DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
+		} else {
+			printf("ERROR: unable to open Vidia Video BIOS File %s\n", nvFilename);
+			return false;
+		}
 	} else {
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
@@ -647,8 +692,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 				
 				// Valid Signature ?
 				if (rom[0] != 0x55 && rom[1] != 0xaa) {
-					verbose("Unable to locate video bios.\n");
-					return 0;
+					printf("ERROR: Unable to locate nVidia Video BIOS\n");
+					return false;
 				} else {
 					DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
 				}
@@ -661,7 +706,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	}
 
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
-		printf("nVidia ROM Patching Failed!\n");
+		printf("ERROR: nVidia ROM Patching Failed!\n");
 		return false;
 	}
 

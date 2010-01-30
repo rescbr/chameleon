@@ -5,11 +5,13 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"
 #include "mem.h"
+#include "spd.h"
 
 #ifndef DEBUG_PLATFORM
 #define DEBUG_PLATFORM 0
@@ -34,9 +36,13 @@ bool platformCPUFeature(uint32_t feature)
 
 void scan_platform(void)
 {
+	const char	*value;
+	int		len;
+
 	memset(&Platform, 0, sizeof(Platform));
 	build_pci_dt();
 	scan_cpu(&Platform);
 	scan_memory(&Platform);
 	scan_spd(&Platform);
+
 }
