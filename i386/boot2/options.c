@@ -724,9 +724,11 @@ getBootOptions(BOOL firstRun)
 	* alt+v verbose (in mac its command +v)
 	* alt+x safe mode (aka boot args with -x , in macs its command +x)
 	* alt+l legacy mode (not sure why you need this)
+	* 6 +4 = 64-bit
+	* 3 + 2 = 32-bit
 	*/
 	{
-		bool f8 = false, altf = false, shiftf = false, alts = false, altv = false, altl = false, altx = false;
+		bool f8 = false, altf = false, shiftf = false, alts = false, altv = false, 32 = false,  64 = false altx = false;
 		int key;
 		while (readKeyboardStatus()) {
 			key = bgetc ();
@@ -736,7 +738,8 @@ getBootOptions(BOOL firstRun)
 			if (key == 0x1F00) alts = true;
 			if (key == 0x2F00) altv = true;
 			if (key == 0x2D00) altx = true;
-			if (key == 0x2600) altl = true;			
+			if (key == 0x0403) 32 = true;	
+			if (key == 0x0705) 64 = true;			
 		}
 		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
@@ -769,11 +772,31 @@ getBootOptions(BOOL firstRun)
 			//*(gBootArgsPtr++) = '';
 			//*(gBootArgsPtr++) = '';			
 		}
-		if ((altl) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+		if ((32) && (gBootArgsPtr + 3 < gBootArgsEnd)) {  // Boot into 32-bit Kernel 
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'legacy';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '3';
+			*(gBootArgsPtr++) = '2';
+			// gBootArgsPtr only takes increasement by one char 
 						
+		}
+		
+		if ((64) && (gBootArgsPtr + 3 < gBootArgsEnd)) {  // Boot into 64-bit Kernel (in case those who are using 32-bit and wanna try 64-bit)
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '6';
+			*(gBootArgsPtr++) = '4';
+			// gBootArgsPtr only takes increasement by one char 
+						
+		}
+		if ((altx) && (gBootArgsPtr + 5 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			//*(gBootArgsPtr++) = '';
+			//*(gBootArgsPtr++) = '';			
 		}		
 	}
 
