@@ -12,7 +12,7 @@
 #include "platform.h"
 
 #ifndef DEBUG_DSDT
-#define DEBUG_DSDT 0
+#define DEBUG_DSDT 1
 #endif
 
 #if DEBUG_DSDT==2
