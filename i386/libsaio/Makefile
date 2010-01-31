@@ -41,7 +41,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	smbios_patcher.o fake_efi.o ext2fs.o \
 	hpet.o spd.o usb.o pci_setup.o \
 	device_inject.o nvidia.o ati.o gma.o 915resolution.o edid.o \
-        mindrvr.o cddrvr.o \
+    mindrvr.o cddrvr.o \
 
 
 SAIO_EXTERN_OBJS = console.o
