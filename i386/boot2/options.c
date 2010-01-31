@@ -711,37 +711,71 @@ getBootOptions(BOOL firstRun)
 		firstRun = NO;
     }
 
-    // If user typed F8, abort quiet mode,
-    // and display the menu.
+
+	/*
+	Patch from 18seven & modified by me to make it even more mac like and to include couple of commands
+	
+    * Bootargs keyboard shortcut
+    * Keys were obtaiend from ApplePS2ToADBMap.h
+	* F8 abort quiet mode, and display the menu.
+	* alt+f old safe mode
+	* shift+f ignore boot configuration file
+	* alt+s single user mode 
+	* alt+v verbose (in mac its command +v)
+	* alt+x safe mode (aka boot args with -x , in macs its command +x)
+	* alt+l legacy mode (not sure why you need this)
+	*/
 	{
-		int f8press = FALSE, spress = FALSE, vpress = FALSE, key;
-	    while ( readKeyboardStatus() ) {
+		bool f8 = false, altf = false, shiftf = false, alts = false, altv = false, altl = false, altx = false;
+		int key;
+		while (readKeyboardStatus()) {
 			key = bgetc ();
-			if (key == 0x4200) f8press = TRUE;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = TRUE;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = TRUE;
-		}	
-		if (f8press)
-		{
+			if (key == 0x4200) f8 = true;
+			if (key == 0x2100) altf = true;
+			if (key == 0x2146) shiftf = true;
+			if (key == 0x1F00) alts = true;
+			if (key == 0x2F00) altv = true;
+			if (key == 0x2D00) altx = true;
+			if (key == 0x2600) altl = true;			
+		}
+		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
 			timeout = 0;
 		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd))
-		{
+		if ((altf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
+			*(gBootArgsPtr++) = 'f';
+		}		
+		if ((shiftf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'F';
+		}		
+		if ((alts) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 's';
+		}			
+		if ((altv) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'v';			
 		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd))
-		{
+		if ((altx) && (gBootArgsPtr + 5 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 's';			
-		}	
-
+			*(gBootArgsPtr++) = 'x';
+			//*(gBootArgsPtr++) = '';
+			//*(gBootArgsPtr++) = '';			
+		}
+		if ((altl) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'legacy';
+						
+		}		
 	}
-
-	clearBootArgs();
 
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
