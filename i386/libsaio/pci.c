@@ -151,13 +151,12 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 	end = root_pci_dev;
 	while (end != pci_dt) {
 		current = pci_dt;
-		while (current->parent != end) {
-			current = current->parent;
-		}
+		while (current->parent != end) 	current = current->parent;
 		end = current;
-		sprintf(tmp, "%s/Pci(0x%x,0x%x)",
-			(current->parent == root_pci_dev) ? "PciRoot(0x0)" : "",
-			current->dev.bits.dev, current->dev.bits.func);
+		if (current->parent == root_pci_dev) 
+		  sprintf(tmp, "PciRoot(0x%x)/Pci(0x%x,0x%x)", getPciRootUID(), current->dev.bits.dev, current->dev.bits.func);
+		else 
+		  sprintf(tmp, "/Pci(0x%x,0x%x)",  current->dev.bits.dev, current->dev.bits.func);
 		strcat(dev_path, tmp);
 	}
 	return dev_path;
