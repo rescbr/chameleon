@@ -724,35 +724,86 @@ int getBootOptions(bool firstRun)
 
 	// If the user is holding down a modifier key, enter safe mode.
 	if ((readKeyboardShiftFlags() & 0x0F) != 0) {
-		gBootMode |= kBootModeSafe;
+	    gBootMode |= kBootModeSafe;
 	}
 
-	// If user typed F8, abort quiet mode, and display the menu.
+
+	/*
+	Patch from 18seven & modified by me to make it even more mac like and to include couple of commands
+	
+	* Bootargs keyboard shortcut
+	* Keys were obtaiend from ApplePS2ToADBMap.h
+	* F8 abort quiet mode, and display the menu.
+	* alt+f old safe mode
+	* shift+f ignore boot configuration file
+	* alt+s single user mode 
+	* alt+v verbose (in mac its command +v)
+	* alt+x safe mode (aka boot args with -x , in macs its command +x)
+	* alt+l legacy mode (not sure why you need this)
+	* 6 +4 = 64-bit
+	* 3 + 2 = 32-bit
+	*/
+	clearBootArgs();
 	{
-		bool f8press = false, spress = false, vpress = false;
+		bool f8 = false, altf = false, shiftf = false, alts = false, 
+		  altv = false, x32 = false,  x64 = false, altx = false;
 		int key;
 		while (readKeyboardStatus()) {
 			key = bgetc ();
-			if (key == 0x4200) f8press = true;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
+			if (key == 0x4200) f8 = true;
+			if (key == 0x2100) altf = true;
+			if (key == 0x2146) shiftf = true;
+			if (key == 0x1F00) alts = true;
+			if (key == 0x2F00) altv = true;
+			if (key == 0x2D00) altx = true;
+			if (key == 0x0403) x32 = true;	
+			if (key == 0x0705) x64 = true;			
 		}
-		if (f8press) {
+		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
 			timeout = 0;
 		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+		if ((altf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = 'f';
+		}		
+		if ((shiftf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'F';
+		}		
+		if ((alts) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
 			*(gBootArgsPtr++) = 's';
-		}	
+		}			
+		if ((altv) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'v';			
+		}
+		if ((altx) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+		}
+		if ((x32) && (gBootArgsPtr + 5 < gBootArgsEnd)) {  // Boot into 32-bit Kernel 
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '3';
+			*(gBootArgsPtr++) = '2';
+		}
+		
+		if ((x64) && (gBootArgsPtr + 5 < gBootArgsEnd)) {  // Boot into 64-bit Kernel (in case those who are using 32-bit and wanna try 64-bit)
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '6';
+			*(gBootArgsPtr++) = '4';
+		}
 	}
-	clearBootArgs();
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);

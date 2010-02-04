@@ -7,7 +7,7 @@
 #include "bootstruct.h"
 
 #ifndef DEBUG_PCIROOT
-#define DEBUG_PCIROOT 1
+#define DEBUG_PCIROOT 0
 #endif
 
 #if DEBUG_PCIROOT
