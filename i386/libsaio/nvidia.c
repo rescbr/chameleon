@@ -594,7 +594,6 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 static int devprop_add_nvidia_template(struct DevPropDevice *device)
 {
 	char	tmp[16]; 
-	int	len;
 
 	if(!device)
 		return 0;
@@ -616,7 +615,7 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
 	sprintf(tmp, "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", tmp, strlen(tmp));
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
 	devices_number++;
 
 	return 1;
@@ -662,7 +661,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			verbose("Using nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
 			DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
 		} else {
-			printf("ERROR: unable to open Vidia Video BIOS File %s\n", nvFilename);
+			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
 			return false;
 		}
 	} else {
