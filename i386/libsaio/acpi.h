@@ -131,4 +131,26 @@ struct acpi_2_fadt {
 	struct acpi_2_gas	X_GPE1_BLK;
 } __attribute__((packed));
 
+/* ACPI utilities declarations, structures & functions  */
+#define ACPI_KEY_MAX_SIZE 8
+
+struct ACPIDropTableEntry
+{
+        char key[ACPI_KEY_MAX_SIZE+1];
+        void * content;
+};
+
+int acpiSearchAndGetFd(const char * key, const char ** outDirspec);
+void *acpiLoadTable(const char * key);
+void * acpiLoadSSDTTable(int ssdt_number);
+void acpiLoadUserTables();
+struct acpi_2_gas acpiFillGASStruct(uint32_t Address, uint8_t Length);
+struct acpi_2_rsdp* acpiGetAddressOfTable10();
+struct acpi_2_rsdp* acpiGetAddressOfTable20();
+
+struct ACPIDropTableEntry* acpiGetFirstDropTable();
+struct ACPIDropTableEntry* acpiGetNextDropTable();
+bool acpiIsTableDropped(const char * key);
+
+
 #endif /* !__LIBSAIO_ACPI_H */

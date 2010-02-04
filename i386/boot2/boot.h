@@ -85,13 +85,7 @@
 #define kOEMFADT		"oemFADT"		/* dsdt_patcher.c */
 #define kOEMAPIC		"oemAPIC"		/* dsdt_patcher.c */
 #define kOEMMCFG		"oemMCFG"		/* dsdt_patcher.c */
-#define kDropSSDT		"DropSSDT"		/* dsdt_patcher.c */
-#define kDropHPET		"DropHPET"		/* dsdt_patcher.c */
-#define kDropSLIC		"DropSLIC"		/* dsdt_patcher.c */
-#define kDropSBST		"DropSBST"		/* dsdt_patcher.c */
-#define kDropECDT		"DropECDT"		/* dsdt_patcher.c */
-#define kDropASFT		"DropASFT"		/* dsdt_patcher.c */
-#define kDropDMAR		"DropDMAR"		/* dsdt_patcher.c */
+#define kDrop		        "Drop"		        /* dsdt_patcher.c */
 #define kUpdateACPI		"UpdateACPI"	/* dsdt_patcher.c */
 #define kRestartFix		"RestartFix"		/* dsdt_patcher.c */
 #define kSMBIOS			"SMBIOS"		/* fake_efi.c */
