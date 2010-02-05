@@ -37,6 +37,12 @@ struct ati_data_key {
 	uint8_t data[];
 };
 
+
+#define DCB_MAX_NUM_ENTRIES 16
+#define DCB_MAX_NUM_I2C_ENTRIES 16
+
+#define DCB_LOC_ON_CHIP 0
+
 struct bios {
 	uint16_t	signature;		/* 0x55AA */
 	uint8_t		size;			/* Size in multiples of 512 */
