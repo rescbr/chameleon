@@ -13,6 +13,7 @@
 #include "dsdt_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "pci.h"
 #include "sl.h"
 
@@ -79,7 +80,7 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n'
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10};//random value gen by uuidgen
+static EFI_CHAR8 const SYSTEM_ID[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10}; //random value gen by uuidgen
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
@@ -326,6 +327,48 @@ static char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
 static char FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
+static const char const SYSTEM_ID_PROP[] = "system-id";
+
+/* return a binary UUID value from the overriden SystemID,
+ * or from a fixed value if none found
+ */
+static const EFI_CHAR8* getSystemID()
+{
+
+    bool        pause = FALSE;
+    int         len;
+    const char*       StrSystemId = NULL;
+    const EFI_CHAR8*  SystemId    = NULL;
+
+    // unable to determine UUID for host. Error: 35 fix
+
+    getValueForKey(kSystemID, &StrSystemId, &len, &bootInfo->bootConfig);
+    if (StrSystemId != NULL) {
+        SystemId = getUUIDFromString(StrSystemId);
+        if (SystemId == NULL) {
+            error("Error: invalid SystemID '%s'\n", StrSystemId);
+            pause = TRUE;
+        }
+    }
+
+    if (SystemId == NULL) {
+        // EFI_CHAR8* ret = getUUIDFromString(sysId);
+        //
+        // if(!sysId || !ret)  { // try bios dmi info UUID extraction
+        //   ret = getSmbiosUUID();
+        //   sysId = 0;
+        // }
+        // if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
+        SystemId = SYSTEM_ID;
+        error("Using a fixed SystemID: '%s'\n", getStringFromUUID(SystemId));
+        //
+        // verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
+    }
+
+    if (pause) getc();
+
+    return SystemId;
+}
 
 void
 setupEfiDeviceTree(void)
@@ -384,6 +427,11 @@ setupEfiDeviceTree(void)
         DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
     if(Platform.CPU.CPUFrequency != 0)
         DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
+
+    /* Set EFI system-id. */
+	const EFI_CHAR8* systemId = getSystemID();
+	verbose("Customizing %s with: %s\n", SYSTEM_ID_PROP, getStringFromUUID(systemId));
+	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, systemId);
 
     /* Fill /efi/device-properties node.
      */
