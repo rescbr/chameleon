@@ -9,10 +9,9 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 #SYMROOT=
 
 OPTIM = -Os -Oz
-DEBUG = NOTHING
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
-    -DRCZ_COMPRESSED_FILE_SUPPORT -D$(DEBUG) \
+    -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float
