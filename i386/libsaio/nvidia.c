@@ -574,7 +574,7 @@ int devprop_add_nvidia_template(struct DevPropDevice *device)
 
 	char tmp[10];
 	sprintf(tmp, "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", tmp, strlen(tmp));
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
 	devices_number++;
 	
 	return 1;
