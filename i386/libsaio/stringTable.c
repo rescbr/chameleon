@@ -37,11 +37,6 @@ int sysConfigValid;
 
 //static void eatThru(char val, const char **table_p);
 
-static inline int isspace(char c)
-{
-    return (c == ' ' || c == '\t');
-}
-
 /*
  * Compare a string to a key with quoted characters
  */

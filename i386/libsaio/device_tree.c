@@ -62,7 +62,7 @@ static Node *freeNodes, *allocedNodes;
 static Property *freeProperties, *allocedProperties;
 
 Property *
-DT__AddProperty(Node *node, char *name, uint32_t length, void *value)
+DT__AddProperty(Node *node, const char *name, uint32_t length, const void *value)
 {
     Property *prop;
 
@@ -92,7 +92,7 @@ DT__AddProperty(Node *node, char *name, uint32_t length, void *value)
 
     prop->name = name;
     prop->length = length;
-    prop->value = value;
+    prop->value = (void *) value;
 
     // Always add to end of list
     if (node->properties == 0) {
