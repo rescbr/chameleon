@@ -334,17 +334,16 @@ static const char const SYSTEM_ID_PROP[] = "system-id";
  */
 static const EFI_CHAR8* getSystemID()
 {
-
     bool        pause = FALSE;
     int         len;
-    const char*       StrSystemId = NULL;
-    const EFI_CHAR8*  SystemId    = NULL;
+    const char* StrSystemId   = NULL;
+    const EFI_CHAR8* SystemId = NULL;
 
     // unable to determine UUID for host. Error: 35 fix
 
     getValueForKey(kSystemID, &StrSystemId, &len, &bootInfo->bootConfig);
     if (StrSystemId != NULL) {
-        SystemId = getUUIDFromString(StrSystemId);
+        SystemId = newUUIDFromString(StrSystemId);
         if (SystemId == NULL) {
             error("Error: invalid SystemID '%s'\n", StrSystemId);
             pause = TRUE;

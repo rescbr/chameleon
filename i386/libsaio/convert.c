@@ -21,15 +21,18 @@ const char* getStringFromUUID(const EFI_CHAR8* eUUID)
   return msg;
 }
 
-/** Parse an UUID string into an (EFI_CHAR8*) buffer */
-EFI_CHAR8* getUUIDFromString(const char *source)
+/* Parse an UUID string into an (EFI_CHAR8*) buffer
+ * Return a new allocated uuid
+ */
+EFI_CHAR8* newUUIDFromString(const char *source)
 {
 	if (! source) return NULL;
 
 	char* p = (char*) source;
 	int   i;
 	char  buf[3];
-	static EFI_CHAR8 uuid[UUID_LEN+1]="";
+	EFI_CHAR8  uuid[UUID_LEN+1];
+	EFI_CHAR8* result;
 
 	buf[2] = '\0';
 	for (i=0; i < UUID_LEN; i++) {
@@ -48,7 +51,11 @@ EFI_CHAR8* getUUIDFromString(const char *source)
 	if (*p != '\0') {
 		return NULL;
 	}
-	return uuid;
+
+	result = malloc(UUID_LEN+1);
+	bcopy(uuid, result, UUID_LEN+1);
+
+	return result;
 }
 
 /** XXX AsereBLN replace by strtoul */
