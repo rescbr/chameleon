@@ -80,7 +80,7 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n'
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10}; //random value gen by uuidgen
+static uuid_t const SYSTEM_ID = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10}; //random value gen by uuidgen
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
@@ -332,12 +332,12 @@ static const char const SYSTEM_ID_PROP[] = "system-id";
 /* return a binary UUID value from the overriden SystemID,
  * or from a fixed value if none found
  */
-static const EFI_CHAR8* getSystemID()
+static uuid_t* getSystemID()
 {
     bool        pause = FALSE;
     int         len;
-    const char* StrSystemId   = NULL;
-    const EFI_CHAR8* SystemId = NULL;
+    const char* StrSystemId = NULL;
+    uuid_t*     SystemId    = NULL;
 
     // unable to determine UUID for host. Error: 35 fix
 
@@ -351,6 +351,7 @@ static const EFI_CHAR8* getSystemID()
     }
 
     if (SystemId == NULL) {
+        uuid_string_t UUIDstr;
         // EFI_CHAR8* ret = getUUIDFromString(sysId);
         //
         // if(!sysId || !ret)  { // try bios dmi info UUID extraction
@@ -358,8 +359,9 @@ static const EFI_CHAR8* getSystemID()
         //   sysId = 0;
         // }
         // if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
-        SystemId = SYSTEM_ID;
-        error("Using a fixed SystemID: '%s'\n", getStringFromUUID(SystemId));
+        SystemId = (uuid_t*) &SYSTEM_ID;
+        getStringFromUUID(*SystemId, UUIDstr);
+        error("Using a fixed SystemID: '%s'\n", UUIDstr);
         //
         // verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
     }
@@ -428,9 +430,13 @@ setupEfiDeviceTree(void)
         DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 
     /* Set EFI system-id. */
-	const EFI_CHAR8* systemId = getSystemID();
-	verbose("Customizing %s with: %s\n", SYSTEM_ID_PROP, getStringFromUUID(systemId));
-	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, systemId);
+	uuid_t* systemId = getSystemID();
+    if (gVerboseMode) {
+         uuid_string_t uuid_string;
+         getStringFromUUID(*systemId, uuid_string);
+         verbose("Customizing %s with: %s\n", SYSTEM_ID_PROP, uuid_string);
+    }
+	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, sizeof(uuid_t), systemId);
 
     /* Fill /efi/device-properties node.
      */

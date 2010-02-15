@@ -10,10 +10,12 @@
 #include "efi.h"
 
 #define UUID_LEN 16
+typedef unsigned char uuid_t[UUID_LEN];
+typedef unsigned char uuid_string_t[sizeof ("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx") ];
 
-const char * getStringFromUUID(const EFI_CHAR8* uuid);
-EFI_CHAR8*  newUUIDFromString(const char *source);
-void *convertHexStr2Binary(const char *hexStr, int *outLength);
+void getStringFromUUID(const uuid_t uuid, uuid_string_t out);
+uuid_t* newUUIDFromString(const char *source);
+void * convertHexStr2Binary(const char *hexStr, int *outLength);
 uint32_t ascii_hex_to_int(char *buff);
 
 static inline uint16_t dp_swap16(uint16_t toswap)
