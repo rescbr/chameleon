@@ -334,7 +334,6 @@ static const char const SYSTEM_ID_PROP[] = "system-id";
  */
 static uuid_t* getSystemID()
 {
-    bool        pause = FALSE;
     int         len;
     const char* StrSystemId = NULL;
     uuid_t*     SystemId    = NULL;
@@ -346,7 +345,6 @@ static uuid_t* getSystemID()
         SystemId = newUUIDFromString(StrSystemId);
         if (SystemId == NULL) {
             error("Error: invalid SystemID '%s'\n", StrSystemId);
-            pause = TRUE;
         }
     }
 
@@ -361,12 +359,10 @@ static uuid_t* getSystemID()
         // if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
         SystemId = (uuid_t*) &SYSTEM_ID;
         getStringFromUUID(*SystemId, UUIDstr);
-        error("Using a fixed SystemID: '%s'\n", UUIDstr);
+        warning("Using a fixed SystemID: '%s'\n", UUIDstr);
         //
         // verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
     }
-
-    if (pause) getc();
 
     return SystemId;
 }

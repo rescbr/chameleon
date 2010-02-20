@@ -138,8 +138,9 @@ void initialize_runtime()
 
 static int ExecKernel(void *binary)
 {
-    entry_t                   kernelEntry;
-    int                       ret;
+    entry_t kernelEntry;
+    int     ret;
+    bool    waitBeforeBoot = FALSE;
 
     bootArgs->kaddr = bootArgs->ksize = 0;
 
@@ -150,6 +151,8 @@ static int ExecKernel(void *binary)
 
     if ( ret != 0 )
         return ret;
+
+    getBoolForKey(kWaitForKeypressKey, &waitBeforeBoot, &bootInfo->bootConfig);
 
     // Reserve space for boot args
     reserveKernBootStruct();
@@ -162,15 +165,17 @@ static int ExecKernel(void *binary)
 
     clearActivityIndicator();
 
-    if (gErrors) {
-        printf("Errors encountered while starting up the computer.\n");
-        printf("Pausing %d seconds...\n", kBootErrorTimeout);
-        sleep(kBootErrorTimeout);
-    }
-
     setupFakeEfi();
 
-    verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
+    if (gErrors) {
+        warning("Errors encountered while starting up the computer.\n");
+        if (!waitBeforeBoot) {
+            printf("Pausing %d seconds...\n", kBootErrorTimeout);
+            sleep(kBootErrorTimeout);
+        }
+    }
+
+    verbose("Starting Darwin %s arch:%s\n", gMacOSVersion, ( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 
     // Cleanup the PXE base code.
 
@@ -182,9 +187,7 @@ static int ExecKernel(void *binary)
         }
     }
 
-	bool dummyVal;
-
-    if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal)
+    if (waitBeforeBoot)
     {
       printf("Press any key to continue...");
       getc();
