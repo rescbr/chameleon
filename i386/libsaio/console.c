@@ -95,15 +95,22 @@ int getchar()
 	return (c);
 }
 
+int printf_real (const char *fmt, va_list ap)
+{
+    int ret = 0;
+    if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+        prf(fmt, ap, putchar, 0);
+    else
+        ret = vprf(fmt, ap);
+    return ret;
+}
+
 int printf(const char * fmt, ...)
 {
     va_list ap;
-	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		prf(fmt, ap, putchar, 0);
-	else
-		vprf(fmt, ap);
-	va_end(ap);
+    va_start(ap, fmt);
+    printf_real(fmt,ap);
+    va_end(ap);
     return 0;
 }
 
@@ -111,11 +118,9 @@ int error(const char * fmt, ...)
 {
     va_list ap;
 
-    va_start(ap, fmt);
-
     gErrors = YES;
-    printf(fmt,ap);
-
+    va_start(ap, fmt);
+    printf_real(fmt, ap);
     va_end(ap);
 
     return(0);
@@ -127,9 +132,9 @@ void stop(const char * fmt, ...)
 
     va_start(ap, fmt);
 
-    printf("\n");
-    printf(fmt,ap);
-    printf("\n");
+    printf_real("\n",NULL);
+    printf_real(fmt, ap);
+    printf_real("\n",NULL);
 
     va_end(ap);
 
