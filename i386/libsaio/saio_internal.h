@@ -92,6 +92,7 @@ extern void   putchar(int ch);
 extern int    getchar(void);
 extern int    printf(const char *format, ...);
 #define verbose(...) if (gVerboseMode) printf(__VA_ARGS__)
+#define warning(...) printf(__VA_ARGS__)
 extern int    error(const char *format, ...);
 extern void   stop(const char *format, ...);
 
