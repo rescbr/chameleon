@@ -107,46 +107,31 @@ int printf(const char * fmt, ...)
     return 0;
 }
 
-int verbose(const char * fmt, ...)
-{
-    va_list ap;
-    
-    if (gVerboseMode)
-    {
-		va_start(ap, fmt);
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-			prf(fmt, ap, putchar, 0);
-		else
-			vprf(fmt, ap);
-        va_end(ap);
-    }
-    return(0);
-}
-
 int error(const char * fmt, ...)
 {
     va_list ap;
-    gErrors = YES;
+
     va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		prf(fmt, ap, putchar, 0);
-    else
-		vprf(fmt, ap);
-	va_end(ap);
+
+    gErrors = YES;
+    printf(fmt,ap);
+
+    va_end(ap);
+
     return(0);
 }
 
 void stop(const char * fmt, ...)
 {
     va_list ap;
-	
-    printf("\n");
+
     va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		prf(fmt, ap, putchar, 0);
-    else
-		vprf(fmt, ap);
-	va_end(ap);
+
     printf("\n");
+    printf(fmt,ap);
+    printf("\n");
+
+    va_end(ap);
+
     halt();
 }

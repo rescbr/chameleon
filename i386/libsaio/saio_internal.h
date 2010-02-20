@@ -91,8 +91,8 @@ extern bool   gErrors;
 extern void   putchar(int ch);
 extern int    getchar(void);
 extern int    printf(const char *format, ...);
+#define verbose(...) if (gVerboseMode) printf(__VA_ARGS__)
 extern int    error(const char *format, ...);
-extern int    verbose(const char *format, ...);
 extern void   stop(const char *format, ...);
 
 /* disk.c */
