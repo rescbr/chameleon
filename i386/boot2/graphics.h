@@ -10,6 +10,7 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "graphic_utils.h"
+#include "vbe.h"
 
 
 #ifndef __BOOT_GRAPHICS_H
@@ -41,5 +42,13 @@ int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_
 char *getVBEInfoString();
 char *getVBEModeInfoString();
 void getGraphicModeParams(unsigned long params[]);
+
+unsigned short getVESAModeWithProperties( unsigned short     width,
+						  unsigned short     height,
+						  unsigned char      bitsPerPixel,
+						  unsigned short     attributesSet,
+						  unsigned short     attributesClear,
+						  VBEModeInfoBlock * outModeInfo,
+						  unsigned short *   vesaVersion );
 
 #endif /* !__BOOT_GRAPHICS_H */

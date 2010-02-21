@@ -57,6 +57,10 @@
 #include "libsa.h"
 #include "ramdisk.h"
 #include "gui.h"
+#include "graphics.h"
+#include "vbe.h"
+#include "915resolution.h"
+#include "edid.h"
 #include "platform.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
@@ -319,7 +323,43 @@ void common_boot(int biosdev)
     useGUI = true;
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
-    if (useGUI) {
+    
+	
+	
+	// Before initGui, path the video bios with the correct resolution
+ 	
+ 	UInt32 x = 0, y = 0; 
+ 	UInt32 bp = 0;
+ 	
+ 	getResolution(&x, &y, &bp);
+ 	
+ 	
+ 	if (x!=0 && y!=0) {
+ 		vbios_map * map;
+		
+ 		map = open_vbios(CT_UNKWN);
+		
+ 		unlock_vbios(map);
+		
+ 		set_mode(map, x, y, bp, 0, 0);
+		
+ 		relock_vbios(map);
+		
+ 		close_vbios(map);
+		
+ 		verbose("Patched first resolution mode to %dx%d.\n", x, y);
+		
+		
+ 	}
+	
+ 	
+ 	//printf("Press any key to continue...");
+ 	//getc();
+	
+	// Try initialising the GUI unless disabled
+	
+	
+	if (useGUI) {
         /* XXX AsereBLN handle error */
 	initGUI();
     }
@@ -449,7 +489,7 @@ void common_boot(int biosdev)
 			if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				break;
 			
-			if (!forceresume && sleeptime+3<bvr->modTime) {
+			if (!forceresume && ((sleeptime+3) < bvr->modTime)) {	
 				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",bvr->modTime-sleeptime);
 				break;
 			}

@@ -68,7 +68,8 @@ enum {
     funcGetSetPaletteFormat  = 0x4F08,
     funcGetSetPaletteData    = 0x4F09,
     funcGetProtModeInterdace = 0x4F0A,
-    funcGetSetPixelClock     = 0x4F0B
+    funcGetSetPixelClock     = 0x4F0B,
+    funcGetEDID              = 0x4F15
 };
 
 enum {
