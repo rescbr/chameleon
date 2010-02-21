@@ -73,7 +73,7 @@ int getPciRootUID(void)
 		goto out;
 	}
 
-	int fd = search_and_get_acpi_fd("DSDT.aml", &dsdt_filename);
+	int fd = acpiSearchAndGetFd("DSDT", &dsdt_filename);
 
 	// Check booting partition
 	if (fd<0)
