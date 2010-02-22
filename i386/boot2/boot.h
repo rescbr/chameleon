@@ -66,27 +66,7 @@
 #define kProductVersion		"ProductVersion"	/* boot.c */
 #define karch			"arch"			/* boot.c */
 #define kDSDT			"DSDT"			/* dsdt_patcher.c */
-#define kSSDT			"SSDT"			/* dsdt_patcher.c */
-#define kHPET			"HPET"			/* dsdt_patcher.c */
-#define kSBST			"SBST"			/* dsdt_patcher.c */
-#define kECDT			"ECDT"			/* dsdt_patcher.c */
-#define kASFT			"ASFT"			/* dsdt_patcher.c */
-#define kDMAR			"DMAR"			/* dsdt_patcher.c */
-#define kFADT			"FADT"			/* dsdt_patcher.c */
-#define kAPIC			"APIC"			/* dsdt_patcher.c */
-#define kMCFG			"MCFG"			/* dsdt_patcher.c */
-#define kOEMDSDT		"oemDSDT"		/* dsdt_patcher.c */
-#define kOEMSSDT		"oemSSDT"		/* dsdt_patcher.c */
-#define kOEMHPET		"oemHPET"		/* dsdt_patcher.c */
-#define kOEMSBST		"oemSBST"		/* dsdt_patcher.c */
-#define kOEMECDT		"oemECDT"		/* dsdt_patcher.c */
-#define kOEMASFT		"oemASFT"		/* dsdt_patcher.c */
-#define kOEMDMAR		"oemDMAR"		/* dsdt_patcher.c */
-#define kOEMFADT		"oemFADT"		/* dsdt_patcher.c */
-#define kOEMAPIC		"oemAPIC"		/* dsdt_patcher.c */
-#define kOEMMCFG		"oemMCFG"		/* dsdt_patcher.c */
-#define kDrop		        "Drop"		        /* dsdt_patcher.c */
-#define kUpdateACPI		"UpdateACPI"	/* dsdt_patcher.c */
+#define kDropSSDT		"DropSSDT"		/* dsdt_patcher.c */
 #define kRestartFix		"RestartFix"		/* dsdt_patcher.c */
 #define kSMBIOS			"SMBIOS"		/* fake_efi.c */
 #define kSystemID		"SystemId"		/* fake_efi.c */
@@ -97,7 +77,6 @@
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kUSBBusFix		"USBBusFix"		/* pci_setup.c */
-#define kUSBLegacyOff	"USBLegacyOff"	/* pci_setup.c */
 #define kEHCIacquire		"EHCIacquire"		/* pci_setup.c */
 #define kUHCIreset		"UHCIreset"		/* pci_setup.c */
 #define kForceHPET		"ForceHPET"		/* pci_setup.c */
@@ -107,7 +86,8 @@
 #define kDeviceProperties	"device-properties"	/* device_inject.c */
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
+#define kUseMemDetect	        "UseMemDetect"	        /* platform.c */
+#define kRestartFix             "RestartFix"        /* dsdt_patcher.c */
 
 /*
  * Flags to the booter or kernel
@@ -118,7 +98,6 @@
 #define kIgnoreBootFileFlag	"-F"
 #define kSingleUserModeFlag	"-s"
 #define k32BitModeFlag		"-x32"
-#define k64BitModeFlag		"-x64"
 
 /*
  * Booter behavior control

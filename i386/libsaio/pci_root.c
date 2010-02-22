@@ -7,7 +7,7 @@
 #include "bootstruct.h"
 
 #ifndef DEBUG_PCIROOT
-#define DEBUG_PCIROOT 0
+#define DEBUG_PCIROOT 1
 #endif
 
 #if DEBUG_PCIROOT
@@ -80,7 +80,7 @@ int getPciRootUID(void)
 	{	  
 	  verbose("No DSDT found, using 0 as uid value.\n");
 	  rootuid = 0;
-	  return rootuid;
+	  goto out;
 	}
 	
 	fsize = file_size(fd);

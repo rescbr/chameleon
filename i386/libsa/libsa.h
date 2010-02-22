@@ -50,6 +50,11 @@ static inline int isalpha(char c)
     return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
 }
 
+static inline int isascii(char c)
+{
+    return ( (c >= 0x20) && (c < 0x7f) );
+}
+
 static inline int isspace(char c)
 {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\12');
@@ -91,6 +96,7 @@ extern int    ptol(const char * str);
 extern int    strlen(const char * str);
 extern char * strcat(char * s1, const char * s2);
 extern char * strncat(char * s1, const char * s2, size_t n);
+extern char * strdup(const char *s1);
 
 #if STRNCASECMP
 extern int    strncasecmp(const char * s1, const char * s2, size_t n);
