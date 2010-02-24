@@ -23,7 +23,9 @@
  */
 
 #include "libsaio.h"
-#include "915resolution.h"
+#include "ATIresolution.h"
+
+
 
 char * chipset_type_names[] = {
 	"UNKNOWN", "830",  "845G", "855GM", "865G", "915G", "915GM", "945G", "945GM", "945GME",
@@ -162,6 +164,12 @@ char detect_bios_type(vbios_map * map, char modeline, int entry_size) {
 
 void close_vbios(vbios_map * map);
 
+
+
+
+
+
+
 vbios_map * open_vbios(chipset_type forced_chipset) {
 	UInt32 z;
 	vbios_map * map = NEW(vbios_map);
@@ -190,8 +198,15 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	
 	/*
 	 * check if we have ATI Radeon
-	 */
-	    
+	 
+	
+	if (memmem(map->bios_ptr, VBIOS_SIZE, ATI_SIGNATURE1, strlen(ATI_SIGNATURE1)) ||
+		memmem(map->bios_ptr, VBIOS_SIZE, ATI_SIGNATURE2, strlen(ATI_SIGNATURE2)) ) {
+		printf("ATI chipset detected. \n");
+		printf("Chipset Id: %x\n", map->chipset_id);
+		return 0;
+	
+	}*/
 	/*
 	 * check if we have NVIDIA
 	 */
@@ -219,14 +234,14 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	
 	{
 		char* p = map->bios_ptr + 16;
-		char* limit = map->bios_ptr + VBIOS_SIZE - (3 * sizeof(vbios_mode));
+		char* limit = map->bios_ptr + VBIOS_SIZE;
 			
 		while (p < limit && map->mode_table == 0) {
 			vbios_mode * mode_ptr = (vbios_mode *) p;
 			            
-			if (((mode_ptr[0].mode & 0xf0) == 0x30) && ((mode_ptr[1].mode & 0xf0) == 0x30) &&
-				((mode_ptr[2].mode & 0xf0) == 0x30) && ((mode_ptr[3].mode & 0xf0) == 0x30)) {
-			
+			if ((mode_ptr[0].mode == 0x20) && (mode_ptr[1].mode == 0x03) &&
+				(mode_ptr[4].mode == 0x58) && (mode_ptr[5].mode == 0x02)) {
+				printf("We are onto something.\n");
 				map->mode_table = mode_ptr;
 			}
 			            
@@ -238,7 +253,10 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 			printf("Please run the program 'dump_bios' as root and\n");
 			printf("email the file 'vbios.dmp' to stomljen@yahoo.com.\n");
 			printf("Chipset: %s\n", chipset_type_names[map->chipset]);
+			printf("Size: %d\n", sizeof(vbios_map));
+			
 			close_vbios(map);
+				   getc();
 			return 0;
 		}
 	}
@@ -278,7 +296,7 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 		printf("Chipset: %s\n", chipset_type_names[map->chipset]);
 		printf("Mode Table Offset: $C0000 + $%x\n", ((UInt32)map->mode_table) - ((UInt32)map->bios_ptr));
 		printf("Mode Table Entries: %u\n", map->mode_table_size);
-		
+		getc();
 		//THis is now
 		
 		return 0;

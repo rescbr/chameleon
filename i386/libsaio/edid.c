@@ -30,11 +30,24 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		
 		// TODO: check *all* resolutions reported and eithe ruse the highest, or the native resolution (if there is a flag for that)
 		xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
-		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
+		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4); //1050
 		
 		
-		//printf("H Active = %d", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
-		//printf("V Active = %d", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
+		printf("EDID from 56 = %d \n", edidInfo[56]);
+		printf("EDID from 56 = %d \n", edidInfo[57]);
+		printf("EDID from 56 = %d \n", edidInfo[58]);
+		printf("EDID from 56 = %d \n", edidInfo[59]);
+		printf("EDID from 56 = %d \n", edidInfo[60]);
+		printf("EDID from 56 = %d \n", edidInfo[61]);
+		printf("EDID from 56 = %d \n", edidInfo[62]);
+												  
+		
+		printf("H Active = %d \n", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
+		printf("H Active = %d \n", edidInfo[57] | ((edidInfo[58] & 0xF0) << 4) );
+		printf("H Active = %d \n", edidInfo[57] | ((edidInfo[59] & 0xF0) << 4) );
+		printf("H Active = %d \n", edidInfo[55] | ((edidInfo[57] & 0xF0) << 4) );
+		
+		printf("V Active = %d \n", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
 		
 		
 		bpResolution = 32;	// assume 32bits

@@ -59,7 +59,7 @@
 #include "gui.h"
 #include "graphics.h"
 #include "vbe.h"
-#include "915resolution.h"
+#include "ATIresolution.h"
 #include "edid.h"
 #include "platform.h"
 

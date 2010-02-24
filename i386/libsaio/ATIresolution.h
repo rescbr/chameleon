@@ -21,20 +21,20 @@
  *
  * This source code is into the public domain.
  */
-
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
 
 #define NEW(a) ((a *)(malloc(sizeof(a))))
 #define FREE(a) (free(a))
 
-#define VBIOS_START         0xc0000
-#define VBIOS_SIZE          0x10000
-
 #define FALSE 0
 #define TRUE 1
 
-#define MODE_TABLE_OFFSET_845G 617
+#define VBIOS_START         0x0
+#define VBIOS_SIZE          0x10000
+
+
+//#define MODE_TABLE_OFFSET_845G 617
 
 
 #define ATI_SIGNATURE1 "ATI MOBILITY RADEON"
