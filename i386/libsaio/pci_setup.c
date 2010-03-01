@@ -43,6 +43,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				break;
 				
 			case PCI_CLASS_DISPLAY_VGA:
+			case PCI_CLASS_DISPLAY_OTHER:
 				if (do_gfx_devprop)
 					switch (current->vendor_id)
 					{

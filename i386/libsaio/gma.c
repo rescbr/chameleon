@@ -74,6 +74,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	uint32_t bar[7];
 	char *model;
 	uint8_t BuiltIn = 0x00;
+	uint8_t ClassFix[4] = { 0x00, 0x00, 0x03, 0x00 };
 
 	devicepath = get_pci_dev_path(gma_dev);
 
@@ -104,7 +105,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	if (model == (char *)"Mobile GMA950") {
 		devprop_add_value(device, "AAPL,HasPanel", reg_TRUE, 4);
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
-		devprop_add_value(device, "AAPL,HasPanel", (uint8_t)0x00, 1); // needed for some of the cards
+		devprop_add_value(device, "class-code", ClassFix, 4);
 	} else if (model == (char *)"Desktop GMA950") {
 		BuiltIn = 0x01;
 		devprop_add_value(device, "built-in", &BuiltIn, 1);

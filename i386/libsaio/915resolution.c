@@ -66,11 +66,19 @@ chipset_type get_chipset(UInt32 id) {
 		case 0x27a08086:
 			type = CT_945GM;
 			break;
-			
+
+		case 0x27a68086:
+			type = CT_945GM;
+			break;
+
 		case 0x27ac8086:
 			type = CT_945GME;
 			break;
-			
+
+		case 0x27ae8086:
+			type = CT_945GM;
+			break;
+
 		case 0x29708086:
 			type = CT_946GZ;
 			break;
