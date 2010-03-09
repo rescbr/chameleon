@@ -58,6 +58,7 @@
 #define kGUIKey             "GUI"
 #define kBootBannerKey      "Boot Banner"
 #define kWaitForKeypressKey "Wait"
+#define kUseAtiROM          "UseAtiROM"         /* ati.c */
 #define kSystemID           "SystemId"          /* fake_efi.c */
 #define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
 #define kSystemType         "SystemType"        /* fake_efi.c */
