@@ -63,10 +63,7 @@ struct DevPropString {
 	struct DevPropDevice **entries;
 };
 
-void					setupEfiDevices ();
-
 char					*efi_inject_get_devprop_string(uint32_t *len);
-int						 devprop_add_nvidia_template(struct DevPropDevice *device);
 int						 devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
 struct DevPropString	*devprop_create_string(void);
 struct DevPropDevice	*devprop_add_device(struct DevPropString *string, char *path);

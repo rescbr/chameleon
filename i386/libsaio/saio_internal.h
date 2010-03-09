@@ -178,6 +178,7 @@ extern long   GetFSUUID(char *spec, char *uuidStr);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
 extern int    openmem(char *buf, int len);
 extern int    open(const char *str, int how);
+extern int    open_bvdev(const char *bvd, const char *path, int flags);
 extern int    close(int fdesc);
 extern int    file_size(int fdesc);
 extern int    read(int fdesc, char *buf, int count);

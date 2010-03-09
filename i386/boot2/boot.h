@@ -61,6 +61,8 @@
 #define kSystemID           "SystemId"          /* fake_efi.c */
 #define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
 #define kSystemType         "SystemType"        /* fake_efi.c */
+#define kUseNvidiaROM       "UseNvidiaROM"      /* nvidia.c */
+#define kVBIOS              "VBIOS"             /* nvidia.c */
 
 /*
  * Flags to the booter or kernel
