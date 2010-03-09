@@ -130,7 +130,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].device =	ascii_hex_to_int(buff);
+			device->pci_dev_path[numpaths].device = strtoul(buff, NULL, 16);
 			
 			x += 3; // 0x
 			curr = x;
@@ -145,7 +145,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].function = ascii_hex_to_int(buff); // TODO: find dev from char *path
+			device->pci_dev_path[numpaths].function = strtoul(buff, NULL, 16);
 			
 			numpaths++;
 		}

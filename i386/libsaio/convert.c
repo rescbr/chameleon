@@ -48,26 +48,6 @@ uuid_t* newUUIDFromString(const char *source)
     return convertHexStr2Binary(uuid_hex, &len);
 }
 
-/** XXX AsereBLN replace by strtoul */
-uint32_t ascii_hex_to_int(char *buff)
-{
-	uint32_t	value = 0, i, digit;
-	for(i = 0; i < strlen(buff); i++)
-	{
-		if (buff[i] >= 48 && buff[i] <= 57)         // '0' through '9'
-			digit = buff[i] - 48;
-		else if (buff[i] >= 65 && buff[i] <= 70)    // 'A' through 'F'
-			digit = buff[i] - 55;
-		else if (buff[i] >= 97 && buff[i] <= 102)   // 'a' through 'f'
-			digit = buff[i] - 87;
-		else
-			return value;
-
-		value = digit + 16 * value;
-	}
-	return	value;
-}
-
 void *convertHexStr2Binary(const char *hexStr, int *outLength)
 {
   int len;
