@@ -159,7 +159,6 @@ extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
 extern int    loadSystemConfig(config_file_t *configBuff);
 extern int    loadHelperConfig(config_file_t *configBuff);
 extern int    loadOverrideConfig(config_file_t *configBuff);
-extern char * newString(const char *oldString);
 extern char * getNextArg(char ** ptr, char * val);
 extern long	  ParseXMLFile( char * buffer, TagPtr * dict );
 
