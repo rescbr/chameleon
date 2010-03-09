@@ -135,7 +135,6 @@ long AllocateMemoryRange(char * rangeName, long start, long length, long type);
 /* misc.c */
 extern void   enableA20(void);
 extern int    checkForSupportedHardware();
-extern int	  isLaptop();
 extern void   getPlatformName(char *nameBuf);
 
 /* nbp.c */
@@ -160,7 +159,7 @@ extern int    loadSystemConfig(config_file_t *configBuff);
 extern int    loadHelperConfig(config_file_t *configBuff);
 extern int    loadOverrideConfig(config_file_t *configBuff);
 extern char * getNextArg(char ** ptr, char * val);
-extern long	  ParseXMLFile( char * buffer, TagPtr * dict );
+extern int    ParseXMLFile( char * buffer, TagPtr * dict );
 
 /* sys.c */
 extern BVRef getBootVolumeRef( const char * path, const char ** outPath );

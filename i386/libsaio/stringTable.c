@@ -538,7 +538,7 @@ printSystemConfig(char *p1)
 // (and does not modify dict pointer).
 // Prints an error message if there is a parsing error.
 //
-long ParseXMLFile( char * buffer, TagPtr * dict )
+int ParseXMLFile( char * buffer, TagPtr * dict )
 {
     long       length, pos;
     TagPtr     tag;
