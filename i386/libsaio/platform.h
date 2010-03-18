@@ -11,6 +11,7 @@
 
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
+extern void dumpPhysAddr(const char * title, void * a, int len);
 
 /* CPUID index into cpuid_raw */
 #define CPUID_0				0
@@ -64,7 +65,7 @@ extern void scan_platform(void);
 #define SMB_MEM_CHANNEL_TRIPLE		3
 
 /* Maximum number of ram slots */
-#define MAX_RAM_SLOTS			12
+#define MAX_RAM_SLOTS			8
 #define RAM_SLOT_ENUMERATOR		{0, 2, 4, 1, 3, 5, 6, 8, 10, 7, 9, 11}
 
 /* Maximum number of SPD bytes */
@@ -74,11 +75,17 @@ extern void scan_platform(void);
 #define UUID_LEN			16
 
 typedef struct _RamSlotInfo_t {
-	bool		InUse;
-	uint8_t		Type;
-	char		Vendor[64];
-	char		PartNo[64];
-	char		SerialNo[16];
+    uint32_t            ModuleSize;						// Size of Module in MB
+    uint32_t            Frequency; // in Mhz
+    const char*		Vendor;
+    const char*		PartNo;
+    const char*		SerialNo;
+    char*		spd;							// SPD Dump
+    bool		InUse;
+    uint8_t		Type;
+    uint8_t             BankConnections; // table type 6, see (3.3.7)
+    uint8_t             BankConnCnt;
+
 } RamSlotInfo_t;
 
 typedef struct _PlatformInfo_t {
@@ -104,7 +111,6 @@ typedef struct _PlatformInfo_t {
 
 	struct RAM {
 		RamSlotInfo_t		DIMM[MAX_RAM_SLOTS];	// Information about each slot
-		uint64_t		Frequency;		// Ram Frequency
 	} RAM;
 
 	struct DMI {

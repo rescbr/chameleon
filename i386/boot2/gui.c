@@ -557,7 +557,7 @@ void loadThemeValues(config_file_t *theme, bool overide)
  
 int initGUI(void)
 {
-	//int		val;
+	//int val;
 #ifdef EMBED_THEME
 	config_file_t	*config;
 	
@@ -578,25 +578,15 @@ int initGUI(void)
 		return 1;
 	}
 #endif
-	/* parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
+	// parse display size parameters
+	/*if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
 		screen_params[0] = val;
 	}
 	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig)) {
 		screen_params[1] = val;
-	}
-	screen_params[2] = 32;*/
-	
-	
-	
-	
-	
-	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
-	
-	
-	
-	
-	
+	}*/
+	screen_params[2] = 32;
+
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
 	
@@ -1696,7 +1686,7 @@ static void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	//int pos;
+	int pos;
 	int length;
 	const char *dummyVal;
 	bool legacy_logo;
@@ -1707,29 +1697,32 @@ void drawBootGraphics(void)
 	} else if (bootImageData == NULL) {
 		loadBootGraphics();
 	}
+
+	if (autoResolution = TRUE) {
+ 		VBEModeInfoBlock  minfo;
+ 		unsigned short    mode_n;
+ 		unsigned short    vesaVersion;
+ 		
+ 		mode_n = getVESAModeWithProperties( screen_params[0], screen_params[1], 32, maColorModeBit             |
+ 										   maModeIsSupportedBit       |
+ 										   maGraphicsModeBit          |
+ 										   maLinearFrameBufferAvailBit,
+ 										   0,
+ 										   &minfo, &vesaVersion );
+ 	} else {
+ 		// parse screen size parameters
+ 		if(getIntForKey("boot_width", &pos, &bootInfo->themeConfig))
+ 			screen_params[0] = pos;
+ 		else
+ 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+ 		
+ 		if(getIntForKey("boot_height", &pos, &bootInfo->themeConfig))
+ 			screen_params[1] = pos;
+ 		else
+ 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+ 	}
 	
-	
-	
-	
-	
-	/** Read default resolution from the graphics card, instead of the theme **/
-	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
-	
-	
-	
-	
-	/* parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig)) {
-		screen_params[0] = pos;
-	} else {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig)) {
-		screen_params[1] = pos;
-	} else {
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	}
-	screen_params[2] = 32;*/
+	screen_params[2] = 32;
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];

@@ -30,13 +30,13 @@ struct smbios_table_header
 
 struct smbios_property
 {
-	char		*name;
+	const char		*name;
 	uint8_t		table_type;
 	enum {SMSTRING, SMWORD, SMBYTE, SMOWORD} value_type;
 	int		offset;
-	int		(*auto_int) (char *name, int table_num);
-	char		*(*auto_str) (char *name, int table_num);
-	char		*(*auto_oword) (char *name, int table_num);
+	int		(*auto_int) (const char *name, int table_num);
+	const char	*(*auto_str) (const char *name, int table_num);
+	const char	*(*auto_oword) (const char *name, int table_num);
 };
 
 struct smbios_table_description
@@ -49,6 +49,8 @@ struct smbios_table_description
 /** call with flag SMBIOS_ORIGINAL to get orig. entrypoint
    or call with flag SMBIOS_PATCHED to get patched smbios entrypoint
 */
-extern struct DMIHeader *getSmbiosTableStructure(struct SMBEntryPoint	*smbios, int type, int min_length);
 extern struct SMBEntryPoint	*getSmbios(int);
+extern struct DMIHeader* FindNextDmiTableOfType(int type, int minlen);
+extern struct DMIHeader* FindFirstDmiTableOfType(int type, int minlen);
+
 #endif /* !__LIBSAIO_SMBIOS_PATCHER_H */

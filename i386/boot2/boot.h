@@ -56,6 +56,7 @@
 #define kInsantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
 #define kGUIKey			"GUI"
+#define kAutoResolutionKey			"AutoResolution"
 #define kBootBannerKey		"Boot Banner"
 #define kWaitForKeypressKey	"Wait"
 /* AsereBLN: added the other keys */
@@ -86,7 +87,8 @@
 #define kDeviceProperties	"device-properties"	/* device_inject.c */
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
+#define kUseMemDetect	        "UseMemDetect"	        /* platform.c */
+#define kRestartFix             "RestartFix"        /* dsdt_patcher.c */
 
 /*
  * Flags to the booter or kernel
@@ -120,6 +122,7 @@ extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
 extern bool useGUI;
+extern bool autoResolution;
 
 /*
  * Boot Modes

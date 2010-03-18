@@ -124,16 +124,14 @@ printVBEModeInfo()
                modeInfo.ModeAttributes);
 
         if (line++ >= 20) {
-            printf("(Press a key to continue...)");
-            getc();
+            pause();
             line = 0;
             clearScreenRows(0, 24);
             setCursorPosition( 0, 0, 1 );
         }
     }    
     if (line != 0) {
-        printf("(Press a key to continue...)");
-        getc();
+        pause();
     }
     setActiveDisplayPage(0);
 }
@@ -1032,7 +1030,7 @@ setVESATextMode( unsigned short cols,
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int
+int
 getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )

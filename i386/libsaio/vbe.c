@@ -27,6 +27,7 @@
  */
 
 #include "libsaio.h"
+#include "edid.h"
 #include "vbe.h"
 
 /* 
@@ -74,21 +75,6 @@ int getVBEInfo( void * infoBlock )
     return(bb.eax.r.h);
 }
 
-int getEDID( void * edidBlock, UInt8 block)
-{
-	bzero(&bb, sizeof(bb));
-    bb.intno  = 0x10;
-    bb.eax.rr = funcGetEDID;
-	bb.ebx.r.l= 0x01;
-	bb.edx.rr = block;
-
-    bb.es     = SEG( edidBlock );
-    bb.edi.rr = OFF( edidBlock );
-
-    bios( &bb );
-    return(bb.eax.r.h);
-}
-
 int getVBEModeInfo( int mode, void * minfo_p )
 {
     bb.intno  = 0x10;
@@ -118,6 +104,22 @@ int setVBEDACFormat(unsigned char format)
     bb.ebx.r.h = format;
     bios(&bb);
     return(bb.eax.r.h);
+}
+
+/*
+ *EDID/DDC Readings
+ */
+
+int getEDID( void *ddcblock, uint8_t blocksleft )
+{
+	bb.intno    = 0x10;
+	bb.eax.rr   = FUNC_GET_EDID;
+	bb.ebx.r.l  = SERVICE_READ_EDID;
+	bb.es       = SEG( ddcblock );
+	bb.edi.rr   = OFF( ddcblock );
+	bb.edx.rr   = blocksleft;
+	bios( &bb );
+	return( bb.eax.r.h );
 }
 
 /*

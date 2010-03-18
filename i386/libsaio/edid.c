@@ -11,67 +11,76 @@
 #include "libsaio.h"
 #include "edid.h"
 #include "vbe.h"
+#include "bootstruct.h"
 //#include "graphics.h"
 
-static biosBuf_t bb;
+//static biosBuf_t bb;
 
 UInt32 xResolution = 0;
 UInt32 yResolution = 0;
 UInt32 bpResolution = 0;
 
+
 void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 {
-	if(!xResolution && !yResolution && !bpResolution)
-	{
+	unsigned char* edidInfo = readEDID();
+	
+	if(!edidInfo) {
+		xResolution = 1024;
+		yResolution = 768;
+		bpResolution = 32;
 		
-		char* edidInfo = readEDID();
-		
-		if(!edidInfo) return;
-		
+		free( edidInfo );
+	} else {
 		// TODO: check *all* resolutions reported and eithe ruse the highest, or the native resolution (if there is a flag for that)
 		xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
-		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4); //1050
-		
-		
-		printf("EDID from 56 = %d \n", edidInfo[56]);
-		printf("EDID from 56 = %d \n", edidInfo[57]);
-		printf("EDID from 56 = %d \n", edidInfo[58]);
-		printf("EDID from 56 = %d \n", edidInfo[59]);
-		printf("EDID from 56 = %d \n", edidInfo[60]);
-		printf("EDID from 56 = %d \n", edidInfo[61]);
-		printf("EDID from 56 = %d \n", edidInfo[62]);
-												  
-		
-		printf("H Active = %d \n", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
-		printf("H Active = %d \n", edidInfo[57] | ((edidInfo[58] & 0xF0) << 4) );
-		printf("H Active = %d \n", edidInfo[57] | ((edidInfo[59] & 0xF0) << 4) );
-		printf("H Active = %d \n", edidInfo[55] | ((edidInfo[57] & 0xF0) << 4) );
-		
-		printf("V Active = %d \n", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
-		
+		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
 		
 		bpResolution = 32;	// assume 32bits
 		
-		
 		free( edidInfo );
-		
-		if(!xResolution) xResolution = 1024; //DEFAULT_SCREEN_WIDTH;
-		if(!yResolution) yResolution = 768; //DEFAULT_SCREEN_HEIGTH;
-
 	}
-
+	
+	if (!xResolution) xResolution = 1024;
+	if (!yResolution) yResolution = 768;
+	
 	*x  = xResolution;
 	*y  = yResolution;
 	*bp = bpResolution;
 
 }
 
-char* readEDID()
+int getMode(edid_mode *mode)
+{
+	unsigned char* edidInfo = readEDID();
+		
+	if(!edidInfo) return 1;
+	
+	mode->pixel_clock = (edidInfo[55] << 8) | edidInfo[54];
+	mode->h_active =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
+	mode->h_blanking = ((edidInfo[58] & 0x0F) << 8) | edidInfo[57];
+	mode->v_active = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
+	mode->v_blanking = ((edidInfo[61] & 0x0F) << 8) | edidInfo[60];
+	mode->h_sync_offset = ((edidInfo[65] & 0xC0) >> 2) | edidInfo[62];
+	mode->h_sync_width = (edidInfo[65] & 0x30) | edidInfo[63];
+	mode->v_sync_offset = (edidInfo[65] & 0x0C) | ((edidInfo[64] & 0x0C) >> 2);
+	mode->v_sync_width = ((edidInfo[65] & 0x3) << 2) | (edidInfo[64] & 0x03);
+	
+	
+	free( edidInfo );
+	
+	if(!mode->h_active) return 1;
+	
+	return 0;
+	
+}
+
+unsigned char* readEDID()
 {
 	SInt16 last_reported = -1;
 	UInt8 edidInfo[EDID_BLOCK_SIZE];
 
-	UInt8 pointer;
+	//UInt8 pointer;
 
 	UInt8 header1[] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 	UInt8 header2[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -141,11 +150,12 @@ char* readEDID()
 				printf("Header2 = %d", memcmp(edidInfo, header2, sizeof(header2)) );
 				return 0;
 			}
-		}
+		} else return 0;
+		
 		blocks_left = 0;	
 	} while(blocks_left);
 
 	UInt8* ret = malloc(sizeof(edidInfo));
 	memcpy(ret, edidInfo, sizeof(edidInfo));
-	return ret;
+	return (ret);
 }

@@ -1,11 +1,3 @@
-/* Copied from 915 resolution created by steve tomljenovic
- * This source code is into the public domain.
- *
- * Included to Chameleon RC3 by meklort
- *
- * Included to RC4 and edited by deviato to match more intel chipsets
- *
- */
 
 /* Copied from 915 resolution created by steve tomljenovic
  *
@@ -21,9 +13,11 @@
  *
  * This source code is into the public domain.
  */
-
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
+
+#include "shortatombios.h"
+#include "edid.h"
 
 #define NEW(a) ((a *)(malloc(sizeof(a))))
 #define FREE(a) (free(a))
@@ -42,19 +36,80 @@
 #define NVIDIA_SIGNATURE "NVIDIA Corp"
 #define INTEL_SIGNATURE "Intel Corp"
 
+typedef struct {
+	unsigned char width;
+	unsigned char height;
+} s_aspect;
 
+/*
+ * NVidia Defines and structures
+ */
+
+#define OFFSET_TO_VESA_TABLE_INDEX 2
+
+typedef struct {
+	unsigned char	ucTable_Major;
+	unsigned char	ucTable_Minor;
+	unsigned char	ucTable_Rev;
+	unsigned short	usTable_Size;
+} NV_COMMON_TABLE_HEADER;
+
+typedef struct {
+	unsigned short	usPixel_Clock;
+	unsigned short	usH_Active;
+	unsigned short  usH_Active_minus_One;
+	unsigned short	reserved1;
+	unsigned short  usH_Active_minus_One_;
+	unsigned short	usH_SyncStart;
+	unsigned short	usH_SyncEnd;
+	unsigned short	usH_Total;
+	unsigned short	usV_Active;
+	unsigned short  usV_Active_minus_One;
+	unsigned short	reserved2;
+	unsigned short  usV_Active_minus_One_;
+	unsigned short	usV_SyncStart;
+	unsigned short	usV_SyncEnd;
+	unsigned short	usV_Total;
+	unsigned short	reserved3;
+} NV_MODELINE;
+
+typedef struct {
+	unsigned short h_disp;
+	unsigned short v_disp;
+	unsigned char  h_blank;
+	unsigned char  h_syncoffset;
+	unsigned char  h_syncwidth;
+	unsigned char  v_blank;
+	unsigned char  v_syncwidth;
+} NV_MODELINE_2;
+
+typedef struct {
+	NV_COMMON_TABLE_HEADER	sHeader;
+	NV_MODELINE	*			sModelines;
+} NV_VESA_TABLE;
+
+/*---*/
 
 
 typedef enum {
-	CT_UNKWN, CT_830, CT_845G, CT_855GM, CT_865G, CT_915G, CT_915GM, CT_945G, CT_945GM, CT_945GME,
-	CT_946GZ, CT_G965, CT_Q965, CT_965GM, CT_GM45, CT_G41, CT_G31, CT_G45, CT_500
+	CT_UNKWN, CT_830, CT_845G, CT_855GM, CT_865G, 
+	CT_915G, CT_915GM, CT_945G, CT_945GM, CT_945GME, CT_946GZ, 
+	CT_955X, CT_G965, CT_Q965, CT_965GM, CT_975X, 
+	CT_P35, CT_X48, CT_B43, CT_Q45, CT_P45,
+	CT_GM45, CT_G41, CT_G31, CT_G45, CT_500
 } chipset_type;
 
 
 typedef enum {
-	BT_UNKWN, BT_1, BT_2, BT_3
+	BT_UNKWN, BT_1, BT_2, BT_3, BT_ATI_1, BT_ATI_2, BT_NVDA
 } bios_type;
 
+typedef struct {
+    unsigned char         *base;
+    ATOM_ROM_HEADER  *AtomRomHeader;
+    unsigned short         *MasterCommandTables;
+    unsigned short         *MasterDataTables;
+} bios_tables_t;
 
 typedef struct {
 	UInt8 mode;
@@ -132,10 +187,17 @@ typedef struct {
 	chipset_type chipset;
 	bios_type bios;
 	
+	bios_tables_t ati_tables;
+	
 	UInt32 bios_fd;
-	char* bios_ptr;
+	unsigned char* bios_backup_ptr;
+	unsigned char* bios_ptr;
 	
 	vbios_mode * mode_table;
+	char * ati_mode_table;
+	char * nv_mode_table;
+	char * nv_mode_table_2;
+	
 	UInt32 mode_table_size;
 	UInt8 b1, b2;
 	
@@ -149,6 +211,8 @@ vbios_map * open_vbios(chipset_type);
 void close_vbios (vbios_map*);
 void unlock_vbios(vbios_map*);
 void relock_vbios(vbios_map*);
+void save_vbios(vbios_map*);
+void restore_vbios(vbios_map*);
 void set_mode(vbios_map*, UInt32, UInt32, UInt32, UInt32, UInt32);
 void list_modes(vbios_map *map, UInt32 raw);
 

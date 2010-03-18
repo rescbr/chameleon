@@ -7,6 +7,8 @@
  *
  */
 
+#ifndef _EDID_H
+#define _EDID_H
 
 #define EDID_BLOCK_SIZE	128
 #define EDID_V1_BLOCKS_TO_GO_OFFSET 126
@@ -17,6 +19,21 @@
 
 #define FUNC_GET_EDID		0x4F15
 
+typedef struct _edid_mode {
+	unsigned short pixel_clock;
+	unsigned short h_active;
+	unsigned short h_blanking;
+	unsigned short v_active;
+	unsigned short v_blanking;
+	unsigned short h_sync_offset;
+	unsigned short h_sync_width;
+	unsigned short v_sync_offset;
+	unsigned short v_sync_width;
+}edid_mode;
 
-char* readEDID();
+
+unsigned char* readEDID();
 void getResolution(UInt32* x, UInt32* y, UInt32* bp);
+int getMode(edid_mode* mode);
+
+#endif
