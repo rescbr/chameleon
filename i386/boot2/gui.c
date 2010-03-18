@@ -557,7 +557,7 @@ void loadThemeValues(config_file_t *theme, bool overide)
  
 int initGUI(void)
 {
-	//int val;
+	int val;
 #ifdef EMBED_THEME
 	config_file_t	*config;
 	
@@ -579,12 +579,30 @@ int initGUI(void)
 	}
 #endif
 	// parse display size parameters
-	/*if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
-		screen_params[0] = val;
-	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig)) {
-		screen_params[1] = val;
-	}*/
+	if (autoResolution == TRUE) {
+ 		VBEModeInfoBlock  minfo;
+ 		unsigned short    mode_n;
+ 		unsigned short    vesaVersion;
+ 		
+ 		mode_n = getVESAModeWithProperties( screen_params[0], screen_params[1], 32, maColorModeBit             |
+ 										   maModeIsSupportedBit       |
+ 										   maGraphicsModeBit          |
+ 										   maLinearFrameBufferAvailBit,
+ 										   0,
+ 										   &minfo, &vesaVersion );
+ 	} else {
+ 		// parse screen size parameters
+ 		if(getIntForKey("screen_width", &val, &bootInfo->themeConfig))
+ 			screen_params[0] = val;
+ 		else
+ 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+ 		
+ 		if(getIntForKey("screen_height", &val, &bootInfo->themeConfig))
+ 			screen_params[1] = val;
+ 		else
+ 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+ 	}
+	
 	screen_params[2] = 32;
 
 	// Initalizing GUI strucutre.
@@ -1698,7 +1716,7 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 
-	if (autoResolution = TRUE) {
+	if (autoResolution == TRUE) {
  		VBEModeInfoBlock  minfo;
  		unsigned short    mode_n;
  		unsigned short    vesaVersion;

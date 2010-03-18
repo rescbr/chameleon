@@ -1179,7 +1179,7 @@ processBootOptions()
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
+    // This is not a mandatory operation anymore.
 
     loadOverrideConfig(&bootInfo->overrideConfig);
 

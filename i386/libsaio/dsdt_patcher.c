@@ -72,7 +72,7 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
     }
     return NULL;
 }
-/** The folowing ACPI Table search algo. should be reused anywhere needed:*/
+/* The following ACPI Table search algo. should be reused anywhere needed:*/
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
   int fd=0;
@@ -81,7 +81,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
   static bool first_time =true; 
   int len=0;
 
-  /// Take in accound user overriding if it's DSDT only
+  // Take in accound user overriding if it's DSDT only
   if (strstr(filename, "DSDT") && 
       getValueForKey(kDSDT, &overriden_pathname, &len,  
 			   &bootInfo->bootConfig))

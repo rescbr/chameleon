@@ -56,7 +56,6 @@
 #define kInsantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
 #define kGUIKey			"GUI"
-#define kAutoResolutionKey			"AutoResolution"
 #define kBootBannerKey		"Boot Banner"
 #define kWaitForKeypressKey	"Wait"
 /* AsereBLN: added the other keys */
@@ -89,6 +88,7 @@
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kUseMemDetect	        "UseMemDetect"	        /* platform.c */
 #define kRestartFix             "RestartFix"        /* dsdt_patcher.c */
+#define kAutoResolutionKey	"AutoResolution" /* Azi: not present on lebibou diff */
 
 /*
  * Flags to the booter or kernel

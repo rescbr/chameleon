@@ -167,7 +167,7 @@ static int ExecKernel(void *binary, vbios_map *map)
         sleep(kBootErrorTimeout);
     }		
 	
-	//if the vbios patch have been applied retore it before performing fake efi stuff
+	//if the vbios patch have been applied restore it before performing fake efi stuff
 	if (autoResolution == TRUE) {
 		unlock_vbios(map);
 		restore_vbios(map);
@@ -402,13 +402,7 @@ void common_boot(int biosdev)
  			verbose("Patched resolution mode to %dx%d.\n", params[0], params[1]);
  		}
  	}
-	
-	
-	
-	
-	
-	
-	
+		
     if (useGUI) {
         /* XXX AsereBLN handle error */
 	initGUI();
