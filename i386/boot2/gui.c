@@ -609,6 +609,7 @@ int initGUI(void)
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
+	loadConfigFile(dirspec, &bootInfo->themeConfig);
 	getGraphicModeParams(screen_params);
 
 	// set our screen structure with the mode width & height

@@ -81,7 +81,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
   static bool first_time =true; 
   int len=0;
 
-  // Take in accound user overriding if it's DSDT only
+  // Take in account user overriding if it's DSDT only
   if (strstr(filename, "DSDT") && 
       getValueForKey(kDSDT, &overriden_pathname, &len,  
 			   &bootInfo->bootConfig))

@@ -932,5 +932,4 @@ void set_mode(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, UIn
 			}
 //		}
 //	}
-}   
-
+}
