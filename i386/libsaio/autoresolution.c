@@ -464,7 +464,6 @@ void restore_vbios(vbios_map * map)
 
 void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, UInt32 vtotal) {
 	UInt32 i = 0;
-	//bool err = TRUE;
 	/*
 	 * Get the aspect ratio for the requested mode
 	 */
