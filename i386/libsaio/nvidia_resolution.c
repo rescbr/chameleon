@@ -70,7 +70,36 @@ vbios_map * open_nvidia_vbios(vbios_map *map)
 	
 	//This won't be used as there is no garanty this is right
 	map->mode_table_size = std_vesa->sHeader.usTable_Size;
-
+		/*
+		 	 * Determine how many modes and tables sizes
+		 	 */
+		
+		NV_MODELINE *	mode_ptr =		(NV_MODELINE *)		map->mode_table;
+		NV_MODELINE_2 *	mode_2_ptr =	(NV_MODELINE_2 *)	map->nv_mode_table_2;
+		map->modeline_num = map->nv_modeline_num_2 = 0;
+		
+		//First Table
+		while ((mode_ptr[map->modeline_num].reserved3 & 0xff) == 0xff)
+				map->modeline_num++;
+		
+		verbose("First VESA Table has %d modes\n",map->modeline_num);
+		if (map->modeline_num == 0) {
+				verbose("%d is incorrect, make it a 16\n",map->modeline_num);
+				map->modeline_num = 16;
+			}
+		map->mode_table_size = map->modeline_num * sizeof(NV_MODELINE);
+		
+		//Second Table
+		while (mode_2_ptr[map->nv_modeline_num_2].h_disp <= 0x800)
+				map->nv_modeline_num_2++;
+		
+		printf("Second VESA Table has %d modes\n",map->nv_modeline_num_2);
+		if (map->nv_modeline_num_2 == 0) {
+				verbose("%d is incorrect, make it a 32\n",map->nv_modeline_num_2);
+				map->nv_modeline_num_2 = 32;
+			}
+		map->nv_mode_table_2_size = map->nv_modeline_num_2 * sizeof(NV_MODELINE_2);
+	
 	return map;
 }
 
@@ -84,14 +113,32 @@ bool nvidia_set_mode(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y, char Type)
 		if ((*x != 0) && (*y != 0) && ( mode_timing[idx].usH_Active >= 640 )) {
 			
 			verbose("Mode %dx%d -> %dx%d ", mode_timing[idx].usH_Active, mode_timing[idx].usV_Active,
-				   *x, *y);
+					*x, *y);
+			
+			generic_modeline modeline;
+			
+			cvt_timings(*x, *y, 60, &modeline.clock,
+						&modeline.hsyncstart, &modeline.hsyncend,
+						&modeline.htotal, &modeline.vsyncstart,
+						&modeline.vsyncend, &modeline.vtotal, FALSE);
 			
 			mode_timing[idx].usH_Active = *x;
 			mode_timing[idx].usH_Active_minus_One = *x - 1;
 			mode_timing[idx].usH_Active_minus_One_ = *x - 1;
+			
 			mode_timing[idx].usV_Active = *y;
 			mode_timing[idx].usV_Active_minus_One = *y - 1;
 			mode_timing[idx].usV_Active_minus_One_ = *y - 1;
+			
+			mode_timing[idx].usH_Total = modeline.htotal;
+			mode_timing[idx].usH_SyncStart = modeline.hsyncstart;
+			mode_timing[idx].usH_SyncEnd = modeline.hsyncend;
+			
+			mode_timing[idx].usV_Total = modeline.vtotal;
+			mode_timing[idx].usV_SyncStart = modeline.vsyncstart;
+			mode_timing[idx].usV_SyncEnd = modeline.vsyncend;
+			
+			mode_timing[idx].usPixel_Clock = modeline.clock;
 		}
 		
 		*x = mode_timing[idx + 1].usH_Active;
@@ -106,10 +153,21 @@ bool nvidia_set_mode(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y, char Type)
 		if ((*x != 0) && (*y != 0) && ( mode_timing[idx].h_disp >= 640 )) {
 			
 			verbose("Mode %dx%d -> %dx%d ", mode_timing[idx].h_disp, mode_timing[idx].v_disp,
-				   *x, *y);
+					*x, *y);
+			
+			generic_modeline modeline;
+			
+			cvt_timings(*x, *y, 60, &modeline.clock,
+						&modeline.hsyncstart, &modeline.hsyncend,
+						&modeline.htotal, &modeline.vsyncstart,
+						&modeline.vsyncend, &modeline.vtotal, TRUE);
 			
 			mode_timing[idx].h_disp = *x;
 			mode_timing[idx].v_disp = *y;
+			mode_timing[idx].h_blank = modeline.htotal - *x;
+			mode_timing[idx].h_syncoffset = modeline.hsyncstart - *x;
+			mode_timing[idx].h_syncwidth = modeline.hsyncend - modeline.hsyncstart;
+			mode_timing[idx].v_blank = modeline.vtotal - *y;
 		}
 		
 		*x = mode_timing[idx + 1].h_disp;

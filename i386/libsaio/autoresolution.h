@@ -46,6 +46,18 @@ typedef enum {
 	BT_UNKWN, BT_1, BT_2, BT_3, BT_ATI_1, BT_ATI_2, BT_NVDA
 } bios_type;
 
+typedef struct {
+		UInt32	clock;
+		UInt16	x;
+		UInt16	hsyncstart;
+		UInt16	hsyncend;
+		UInt16	htotal;
+		UInt16	y;
+		UInt16	vsyncstart;
+		UInt16	vsyncend;
+		UInt16	vtotal;
+	} generic_modeline;
+
 
 typedef struct {
 	UInt32 chipset_id;
@@ -58,9 +70,11 @@ typedef struct {
 	
 	char * mode_table;
 	char * nv_mode_table_2;
+	UInt32 nv_mode_table_2_size;
 	
 	UInt32 mode_table_size;
 	UInt32 modeline_num;
+	UInt32 nv_modeline_num_2;
 	UInt8 b1, b2;
 	
 	s_aspect aspect_ratio;
@@ -80,10 +94,10 @@ void gtf_timings(UInt32 x, UInt32 y, UInt32 freq,
 				 UInt16 *hsyncstart, UInt16 *hsyncend, UInt16 *hblank,
 				 UInt16 *vsyncstart, UInt16 *vsyncend, UInt16 *vblank);
 
-/*void cvt_timings(UInt32 x, UInt32 y, UInt32 freq,
+void cvt_timings(UInt32 x, UInt32 y, UInt32 freq,
 				 unsigned long *clock,
 				 UInt16 *hsyncstart, UInt16 *hsyncend, UInt16 *hblank,
-				 UInt16 *vsyncstart, UInt16 *vsyncend, UInt16 *vblank, BOOL reduced);*/
+				 UInt16 *vsyncstart, UInt16 *vsyncend, UInt16 *vblank, bool reduced);
 
 void patch_vbios(vbios_map*, UInt32, UInt32, UInt32, UInt32, UInt32);
 

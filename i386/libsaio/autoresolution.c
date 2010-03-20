@@ -321,12 +321,13 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	 * Unidentified Chipset
 	 */
 	
-	if (map->chipset == CT_UNKWN) {
-		verbose("Unknown chipset type and unrecognized bios.\n");
-		        
-		verbose("autoresolution only works with Intel 800/900 series graphic chipsets.\n");
-	
-		verbose("Chipset Id: %x\n", map->chipset_id);
+	if ( (map->chipset == CT_UNKWN) || ((map->bios != BT_ATI_1) && (map->bios != BT_NVDA) && (map->bios != BT_1)) )
+			{
+					printf("Unknown chipset type and unrecognized bios.\n");
+					
+					printf("autoresolution only works with Intel 800/900 series graphic chipsets.\n");
+					
+					printf("Chipset Id: %x\n", map->chipset_id);
 		close_vbios(map);
 		return 0;
 	}
@@ -463,7 +464,7 @@ void restore_vbios(vbios_map * map)
 
 void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, UInt32 vtotal) {
 	UInt32 i = 0;
-	bool err = TRUE;
+	//bool err = TRUE;
 	/*
 	 * Get the aspect ratio for the requested mode
 	 */
@@ -472,6 +473,7 @@ void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, 
 	i = x = y = 0;
 	
 	if (map->bios != BT_NVDA) {
+		verbose("%d modes to pacth\n", map->modeline_num);
 		while (i < map->modeline_num) {
 			if (x == 1400) x = 1440;
 			if (x == 1600) x = 1680;
@@ -501,25 +503,26 @@ void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, 
 	}
 	
 	if (map->bios == BT_NVDA) {
-		err = TRUE;
-		
-		x = y = 0;
-		while (err == TRUE) {
-			if (x == 1400) x = 1440;
-			if (x == 1600) x = 1680;
-			
-			y = x * map->aspect_ratio.height / map->aspect_ratio.width;
-			err = nvidia_set_mode(map, i, &x, &y, MAIN_VESA_TABLE);
-			
-		}
-		err = TRUE;
-		x = y = 0;
-		while (err == TRUE) {
-			if (x == 1400) x = 1440;
-			if (x == 1600) x = 1680;
-			
-			y = x * map->aspect_ratio.height / map->aspect_ratio.width;
-			err = nvidia_set_mode(map, i, &x, &y, SECOND_VESA_TABLE);
-		}
+				
+				i = x = y = 0;
+				while (i < map->modeline_num) {
+						if (x == 0)		x = 1024;
+						if (x == 1400)	x = 1440;
+						if (x == 1600)	x = 1680;
+						
+						y = x * map->aspect_ratio.height / map->aspect_ratio.width;
+						nvidia_set_mode(map, i, &x, &y, MAIN_VESA_TABLE);
+						i++;			
+					}
+				
+				i = x = y = 0;
+				while (i < map->nv_modeline_num_2) {
+						if (x == 1400) x = 1440;
+						if (x == 1600) x = 1680;
+						
+						y = x * map->aspect_ratio.height / map->aspect_ratio.width;
+						nvidia_set_mode(map, i, &x, &y, SECOND_VESA_TABLE);
+						i++;
+					}
 	}
 } 
