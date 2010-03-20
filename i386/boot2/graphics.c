@@ -387,6 +387,8 @@ setVESAGraphicsMode( unsigned short width,
             break;
         }
 
+		if (refreshRate != 60) refreshRate = 60;
+
 //
 // FIXME : generateCRTCTiming() causes crash.
 //
@@ -429,9 +431,7 @@ setVESAGraphicsMode( unsigned short width,
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
         if ( err != errSuccess )
-        {
             break;
-        }
 
         // Set 8-bit color palette.
 
@@ -461,7 +461,10 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_depth    = minfo.BitsPerPixel;
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
-
+#if DEBUG
+		gui.screen.mm				= minfo.MemoryModel;
+		gui.screen.attr				= minfo.ModeAttributes;
+#endif
     }
     while ( 0 );
 

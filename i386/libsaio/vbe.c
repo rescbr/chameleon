@@ -29,6 +29,7 @@
 #include "libsaio.h"
 #include "edid.h"
 #include "vbe.h"
+#include "autoresolution.h"
 
 /* 
  * Various inline routines for video I/O

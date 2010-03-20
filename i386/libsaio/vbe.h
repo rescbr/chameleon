@@ -176,7 +176,9 @@ enum {
     maGraphicsModeBit           = (1 << 4), /* 1 = graphics; 0 = text */
     maModeIsNotVGACompatableBit = (1 << 5), /* 1 = not compat; 0 = compat */
     maVGAMemoryModeNotAvailBit  = (1 << 6), /* 1 = not avail; 0 = avail */
-    maLinearFrameBufferAvailBit = (1 << 7)  /* 1 = avail; 0 = not avail */
+    maLinearFrameBufferAvailBit = (1 << 7), /* 1 = avail; 0 = not avail */
+	maDoubleScanAvailBit		= (1 << 8), /* 1 = avail; 0 = not avail */
+	maInterlacedAvailBit		= (1 << 9) /* 1 = avail; 0 = not avail */ 
 };
 
 /*

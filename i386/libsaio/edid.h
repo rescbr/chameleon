@@ -34,6 +34,5 @@ typedef struct _edid_mode {
 
 unsigned char* readEDID();
 void getResolution(UInt32* x, UInt32* y, UInt32* bp);
-int getMode(edid_mode* mode);
 
 #endif

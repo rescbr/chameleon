@@ -12,7 +12,7 @@
 #include "edid.h"
 #include "vbe.h"
 #include "bootstruct.h"
-//#include "graphics.h"
+
 
 //static biosBuf_t bb;
 
@@ -50,30 +50,6 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 
 }
 
-int getMode(edid_mode *mode)
-{
-	unsigned char* edidInfo = readEDID();
-		
-	if(!edidInfo) return 1;
-	
-	mode->pixel_clock = (edidInfo[55] << 8) | edidInfo[54];
-	mode->h_active =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
-	mode->h_blanking = ((edidInfo[58] & 0x0F) << 8) | edidInfo[57];
-	mode->v_active = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
-	mode->v_blanking = ((edidInfo[61] & 0x0F) << 8) | edidInfo[60];
-	mode->h_sync_offset = ((edidInfo[65] & 0xC0) >> 2) | edidInfo[62];
-	mode->h_sync_width = (edidInfo[65] & 0x30) | edidInfo[63];
-	mode->v_sync_offset = (edidInfo[65] & 0x0C) | ((edidInfo[64] & 0x0C) >> 2);
-	mode->v_sync_width = ((edidInfo[65] & 0x3) << 2) | (edidInfo[64] & 0x03);
-	
-	
-	free( edidInfo );
-	
-	if(!mode->h_active) return 1;
-	
-	return 0;
-	
-}
 
 unsigned char* readEDID()
 {
@@ -150,7 +126,10 @@ unsigned char* readEDID()
 				printf("Header2 = %d", memcmp(edidInfo, header2, sizeof(header2)) );
 				return 0;
 			}
-		} else return 0;
+		} else {
+			return 0;
+		}
+
 		
 		blocks_left = 0;	
 	} while(blocks_left);
