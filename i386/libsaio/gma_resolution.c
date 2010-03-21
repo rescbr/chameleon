@@ -46,7 +46,7 @@ char detect_bios_type(vbios_map * map, char modeline, int entry_size) {
 			}
 		}
 		
-		/*printf("r1 = %d  r2 = %d\n", r1, r2);*/
+		/*PRINT("r1 = %d  r2 = %d\n", r1, r2);*/
 	}
 	
 	return (r2-r1-6) % entry_size == 0;
@@ -73,13 +73,15 @@ vbios_map * open_intel_vbios(vbios_map *map)
 	}
 	
 	if (map->mode_table == 0) {
-		verbose("Unable to locate the mode table.\n");
-		verbose("Please run the program 'dump_bios' as root and\n");
-		verbose("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
+		PRINT("Unable to locate the mode table.\n");
+		PRINT("Please run the program 'dump_bios' as root and\n");
+		PRINT("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
 		
 		close_vbios(map);
 		return 0;
 	}
+	
+	PRINT("Mode Table at offset : 0x%x\n", ((unsigned char *)map->mode_table) - map->bios_ptr);
 	
 	/*
 	 * Determine size of mode table
@@ -93,6 +95,7 @@ vbios_map * open_intel_vbios(vbios_map *map)
 	}
 	
 	map->modeline_num = map->mode_table_size;
+	PRINT("Mode Table size : %d\n", map->modeline_num);
 	
 	/*
 	 * Figure out what type of bios we have
@@ -101,17 +104,20 @@ vbios_map * open_intel_vbios(vbios_map *map)
 	
 	if (detect_bios_type(map, TRUE, sizeof(vbios_modeline_type3))) {
 		map->bios = BT_3;
+		PRINT("Bios Type : BT_3\n");
 	}
 	else if (detect_bios_type(map, TRUE, sizeof(vbios_modeline_type2))) {
 		map->bios = BT_2;
+		PRINT("Bios Type : BT_2\n");
 	}
 	else if (detect_bios_type(map, FALSE, sizeof(vbios_resolution_type1))) {
 		map->bios = BT_1;
+		PRINT("Bios Type : BT_1\n");
 	}
 	else {
-		verbose("Unable to determine bios type.\n");
-		verbose("Please run the program 'dump_bios' as root and\n");
-		verbose("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
+		PRINT("Unable to determine bios type.\n");
+		PRINT("Please run the program 'dump_bios' as root and\n");
+		PRINT("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
 		
 		return 0;
 	}
@@ -131,7 +137,7 @@ bool intel_set_mode_1(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y)
 	
 	if ((*x != 0) && (*y != 0) && ( actual_x >= 640 )) {
 		
-		printf("Mode %dx%d -> %dx%d ", actual_x, actual_y, *x, *y);
+		PRINT("Mode %dx%d -> %dx%d \n", actual_x, actual_y, *x, *y);
 		
 		res->x2 = (res->x2 & 0x0f) | ((*x >> 4) & 0xf0);
 		res->x1 = (*x & 0xff);
@@ -160,7 +166,7 @@ bool intel_set_mode_2(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y)
 	
 	if ((*x != 0) && (*y != 0) && ((res->modelines[0].x1 + 1) >= 640 )) {
 		
-		printf("Mode %dx%d -> %dx%d ", res->modelines[0].x1 + 1, res->modelines[0].y1 + 1, *x, *y);
+		PRINT("Mode %dx%d -> %dx%d \n", res->modelines[0].x1 + 1, res->modelines[0].y1 + 1, *x, *y);
 		
 		res->xchars = *x / 8;
 		res->ychars = *y / 16 - 1;
@@ -202,7 +208,7 @@ bool intel_set_mode_3(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y)
 	
 	if ((*x != 0) && (*y != 0) && ((res->modelines[0].x1 + 1) >= 640 )) {
 		
-		printf("Mode %dx%d -> %dx%d ", res->modelines[0].x1 + 1, res->modelines[0].y1 + 1, *x, *y);
+		PRINT("Mode %dx%d -> %dx%d  \n", res->modelines[0].x1 + 1, res->modelines[0].y1 + 1, *x, *y);
 		
 		xprev = res->modelines[0].x1;
 		yprev = res->modelines[0].y1;

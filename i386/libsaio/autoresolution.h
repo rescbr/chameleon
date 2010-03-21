@@ -21,6 +21,12 @@
 #define NEW(a) ((a *)(malloc(sizeof(a))))
 #define FREE(a) (free(a))
 
+#ifdef AUTORES_DEBUG
+#define PRINT(a, b...) printf(a, ##b);
+#else 
+#define PRINT(a, b...) verbose(a, ##b);
+#endif
+
 #define VBIOS_START         0xc0000
 #define VBIOS_SIZE          0x10000
 
@@ -70,11 +76,13 @@ typedef struct {
 	
 	char * mode_table;
 	char * nv_mode_table_2;
-	UInt32 nv_mode_table_2_size;
 	
 	UInt32 mode_table_size;
+	UInt32 nv_mode_table_2_size;
+	
 	UInt32 modeline_num;
 	UInt32 nv_modeline_num_2;
+	
 	UInt8 b1, b2;
 	
 	s_aspect aspect_ratio;

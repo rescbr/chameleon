@@ -42,7 +42,7 @@ ALLSRC =  $(SFILES) $(CFILES) $(HFILES) $(OTHERFILES)
 LIBS = libsa.a
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme: $(DIRS_NEEDED) $(LIBS)
+all embedtheme autores_dbg: $(DIRS_NEEDED) $(LIBS)
 
 libsa.a: $(SA_OBJS)
 	rm -f $(SYMROOT)/$(@F)

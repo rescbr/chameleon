@@ -67,7 +67,8 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
 #SIG = $(SYMROOT)/sig
 
-all embedtheme: $(DIRS_NEEDED) libsaio.h $(LIBS)
+all embedtheme autores_dbg: $(DIRS_NEEDED) libsaio.h $(LIBS)
+autores_dbg: CFLAGS += -DAUTORES_DEBUG
 
 #libsaio_static.a: $(SAIO_OBJS)
 #	rm -f $(SYMROOT)/$@

@@ -178,7 +178,7 @@ void get_aspect_ratio(s_aspect* aspect, UInt32 x, UInt32 y)
 		aspect->width  = 4;
 		aspect->height = 3;
 	}
-	verbose("Aspect Ratio is %d/%d\n", aspect->width, aspect->height);
+	PRINT("Aspect Ratio is %d/%d\n", aspect->width, aspect->height);
 }
 
 void cvt_timings(UInt32 x, UInt32 y, UInt32 freq,
@@ -246,7 +246,7 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	if (forced_chipset == CT_UNKWN) {
 		map->chipset_id = get_chipset_id();
 		map->chipset = get_chipset(map->chipset_id);
-		verbose("Chipset is %s (pci id 0x%x)\n",chipset_type_names[map->chipset], map->chipset_id);
+		PRINT("Chipset is %s (pci id 0x%x)\n",chipset_type_names[map->chipset], map->chipset_id);
 	}
 	else if (forced_chipset != CT_UNKWN) {
 		map->chipset = forced_chipset;
@@ -270,7 +270,7 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	ati_tables.AtomRomHeader = (ATOM_ROM_HEADER *) (map->bios_ptr + *(unsigned short *) (map->bios_ptr + OFFSET_TO_POINTER_TO_ATOM_ROM_HEADER)); 
 	if (strcmp ((char *) ati_tables.AtomRomHeader->uaFirmWareSignature, "ATOM") == 0) {
 		map->bios = BT_ATI_1;
-		verbose("We have an AtomBios Card\n");
+		PRINT("We have an AtomBios Card\n");
 		return open_ati_vbios(map, ati_tables);
 	}
 
@@ -287,7 +287,7 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 				&& (map->bios_ptr[i+3] == 'D')) 
 			{
 				map->bios = BT_NVDA;
-				verbose("We have an NVIDIA Card\n");
+				PRINT("We have an NVIDIA Card\n");
 				return open_nvidia_vbios(map);
 				break;
 			}
@@ -309,7 +309,7 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 				&& (map->bios_ptr[i+4] == 'l')) 
 			{
 				map->bios = BT_1;
-				verbose("We have an Intel Card\n");
+				PRINT("We have an Intel Card\n");
 				return open_intel_vbios(map);
 				break;
 			}
@@ -323,11 +323,11 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 	
 	if ( (map->chipset == CT_UNKWN) || ((map->bios != BT_ATI_1) && (map->bios != BT_NVDA) && (map->bios != BT_1)) )
 			{
-					printf("Unknown chipset type and unrecognized bios.\n");
+		PRINT("Unknown chipset type and unrecognized bios.\n");
 					
-					printf("autoresolution only works with Intel 800/900 series graphic chipsets.\n");
+		PRINT("autoresolution only works with Intel 800/900 series graphic chipsets.\n");
 					
-					printf("Chipset Id: %x\n", map->chipset_id);
+		PRINT("Chipset Id: %x\n", map->chipset_id);
 		close_vbios(map);
 		return 0;
 	}
@@ -394,7 +394,7 @@ void unlock_vbios(vbios_map * map) {
 	#if DEBUG
 	{
 		UInt32 t = inl(0xcfc);
-		printf("unlock PAM: (0x%08x)\n", t);
+		PRINT("unlock PAM: (0x%08x)\n", t);
 	}
 #endif
 }
@@ -444,7 +444,7 @@ void relock_vbios(vbios_map * map) {
 	#if DEBUG
 	{
         UInt32 t = inl(0xcfc);
-		printf("relock PAM: (0x%08x)\n", t);
+		PRINT("relock PAM: (0x%08x)\n", t);
 	}
 	#endif
 }
@@ -464,6 +464,7 @@ void restore_vbios(vbios_map * map)
 
 void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, UInt32 vtotal) {
 	UInt32 i = 0;
+	
 	/*
 	 * Get the aspect ratio for the requested mode
 	 */
@@ -472,33 +473,62 @@ void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, 
 	i = x = y = 0;
 	
 	if (map->bios != BT_NVDA) {
-		verbose("%d modes to pacth\n", map->modeline_num);
+		PRINT("%d modes to patch\n", map->modeline_num);
+		switch (map->bios) {
+			case BT_1:
 		while (i < map->modeline_num) {
 			if (x == 1400) x = 1440;
 			if (x == 1600) x = 1680;
 			
 			y = x * map->aspect_ratio.height / map->aspect_ratio.width;
-			switch (map->bios) {
-				case BT_1:
 					intel_set_mode_1(map, i, &x, &y);
+					i++;
+				}
 					break;
 				case BT_2:
+				while (i < map->modeline_num) {
+					if (x == 1400) x = 1440;
+					if (x == 1600) x = 1680;
+					
+					y = x * map->aspect_ratio.height / map->aspect_ratio.width;
 					intel_set_mode_2(map, i, &x, &y);
+					i++;
+				}
 					break;
 				case BT_3:
+				while (i < map->modeline_num) {
+					if (x == 1400) x = 1440;
+					if (x == 1600) x = 1680;
+					
+					y = x * map->aspect_ratio.height / map->aspect_ratio.width;
 					intel_set_mode_3(map, i, &x, &y);
+					i++;
+				}
 					break;
 				case BT_ATI_1:
+				while (i < map->modeline_num) {
+					if (x == 1400) x = 1440;
+					if (x == 1600) x = 1680;
+					
+					y = x * map->aspect_ratio.height / map->aspect_ratio.width;
 					ati_set_mode_1(map, i, &x, &y);
+					i++;
+				}
 					break;
 				case BT_ATI_2:
+				while (i < map->modeline_num) {
+					if (x == 1400) x = 1440;
+					if (x == 1600) x = 1680;
+					
+					y = x * map->aspect_ratio.height / map->aspect_ratio.width;
 					ati_set_mode_2(map, i, &x, &y);
+					i++;
+				}
 					break;
 				default:
 					break;
 			}
-			i++;
-		}
+		return;
 	}
 	
 	if (map->bios == BT_NVDA) {
@@ -523,5 +553,6 @@ void patch_vbios(vbios_map * map, UInt32 x, UInt32 y, UInt32 bp, UInt32 htotal, 
 						nvidia_set_mode(map, i, &x, &y, SECOND_VESA_TABLE);
 						i++;
 					}
+		return;
 	}
 } 

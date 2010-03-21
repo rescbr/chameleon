@@ -361,7 +361,7 @@ void common_boot(int biosdev)
 			patch_vbios(map, params[0], params[1], params[2], 0, 0);
   			
   			relock_vbios(map);
-			#if DEBUG			
+			#if AUTORES_DEBUG			
 				printf("Press Any Key...\n");
 			 	getc();
 			#endif

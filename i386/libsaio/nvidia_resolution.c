@@ -49,56 +49,56 @@ vbios_map * open_nvidia_vbios(vbios_map *map)
 	nv_data_table = (unsigned short *) (map->bios_ptr + (nv_data_table_offset + OFFSET_TO_VESA_TABLE_INDEX));
 	std_vesa = (NV_VESA_TABLE *) (map->bios_ptr + *nv_data_table);
 	map->mode_table = (char *) std_vesa->sModelines;
-	verbose("First Standard VESA Table at offset 0x%x\n", *nv_data_table);
+	PRINT("First Standard VESA Table at offset 0x%x\n", *nv_data_table);
 	
 	if (nv_modeline_2_offset == (VBIOS_SIZE-1) || nv_modeline_2_offset == 0) {
 		map->nv_mode_table_2 = NULL;
-		verbose("There is no Second Standard VESA Table to patch\n");
+		PRINT("There is no Second Standard VESA Table to patch\n");
 	} else {
 		map->nv_mode_table_2 = (char*) map->bios_ptr + nv_modeline_2_offset;
-		verbose("Second Standard VESA Table at offset 0x%x\n", nv_modeline_2_offset);
+		PRINT("Second Standard VESA Table at offset 0x%x\n", nv_modeline_2_offset);
 	}
 	
 	if (map->mode_table == NULL) {
-		verbose("Unable to locate the mode table.\n");
-		verbose("Please run the program 'dump_bios' as root and\n");
-		verbose("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
+		PRINT("Unable to locate the mode table.\n");
+		PRINT("Please run the program 'dump_bios' as root and\n");
+		PRINT("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
 		
 		close_vbios(map);
 		return 0;
 	}
 	
-	//This won't be used as there is no garanty this is right
-	map->mode_table_size = std_vesa->sHeader.usTable_Size;
 		/*
-		 	 * Determine how many modes and tables sizes
+	 * Having trouble determining the number of table
+	 * so it's hardcode to 16 and 31 for the First VESA table
+	 * and the Second Vesa Table respectively
 		 	 */
 		
-		NV_MODELINE *	mode_ptr =		(NV_MODELINE *)		map->mode_table;
-		NV_MODELINE_2 *	mode_2_ptr =	(NV_MODELINE_2 *)	map->nv_mode_table_2;
+	map->modeline_num = 16;
+	map->nv_modeline_num_2 = 31;
+	
+	/*NV_MODELINE_2 *	mode_2_ptr =	(NV_MODELINE_2 *)	map->nv_mode_table_2;
 		map->modeline_num = map->nv_modeline_num_2 = 0;
 		
 		//First Table
-		while ((mode_ptr[map->modeline_num].reserved3 & 0xff) == 0xff)
-				map->modeline_num++;
+	map->modeline_num = std_vesa->sHeader.usTableSize;
 		
-		verbose("First VESA Table has %d modes\n",map->modeline_num);
+	PRINT("First VESA Table has %d modes\n",map->modeline_num);
 		if (map->modeline_num == 0) {
-				verbose("%d is incorrect, make it a 16\n",map->modeline_num);
+		PRINT("%d is incorrect, make it a 16\n",map->modeline_num);
 				map->modeline_num = 16;
 			}
 		map->mode_table_size = map->modeline_num * sizeof(NV_MODELINE);
 		
 		//Second Table
-		while (mode_2_ptr[map->nv_modeline_num_2].h_disp <= 0x800)
-				map->nv_modeline_num_2++;
+	map->nv_modeline_num_2 = *((UInt8 *)(mode_2_ptr - 2)) - 32;
 		
-		printf("Second VESA Table has %d modes\n",map->nv_modeline_num_2);
+	PRINT("Second VESA Table has %d modes\n",map->nv_modeline_num_2);
 		if (map->nv_modeline_num_2 == 0) {
-				verbose("%d is incorrect, make it a 32\n",map->nv_modeline_num_2);
+		PRINT("%d is incorrect, make it a 32\n",map->nv_modeline_num_2);
 				map->nv_modeline_num_2 = 32;
 			}
-		map->nv_mode_table_2_size = map->nv_modeline_num_2 * sizeof(NV_MODELINE_2);
+	map->nv_mode_table_2_size = map->nv_modeline_num_2 * sizeof(NV_MODELINE_2);*/
 	
 	return map;
 }
@@ -108,11 +108,9 @@ bool nvidia_set_mode(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y, char Type)
 	if (Type == MAIN_VESA_TABLE) {
 		NV_MODELINE * mode_timing = (NV_MODELINE *) map->mode_table;
 		
-		if ((mode_timing[idx].reserved3 & 0xff) != 0xff) return FALSE;
-		
 		if ((*x != 0) && (*y != 0) && ( mode_timing[idx].usH_Active >= 640 )) {
 			
-			verbose("Mode %dx%d -> %dx%d ", mode_timing[idx].usH_Active, mode_timing[idx].usV_Active,
+			PRINT("Mode %dx%d -> %dx%d ", mode_timing[idx].usH_Active, mode_timing[idx].usV_Active,
 					*x, *y);
 			
 			generic_modeline modeline;
@@ -152,7 +150,7 @@ bool nvidia_set_mode(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y, char Type)
 		
 		if ((*x != 0) && (*y != 0) && ( mode_timing[idx].h_disp >= 640 )) {
 			
-			verbose("Mode %dx%d -> %dx%d ", mode_timing[idx].h_disp, mode_timing[idx].v_disp,
+			PRINT("Mode %dx%d -> %dx%d ", mode_timing[idx].h_disp, mode_timing[idx].v_disp,
 					*x, *y);
 			
 			generic_modeline modeline;

@@ -24,11 +24,11 @@ vbios_map * open_ati_vbios(vbios_map * map, bios_tables_t ati_tables)
 	ATOM_STANDARD_VESA_TIMING * std_vesa = (ATOM_STANDARD_VESA_TIMING *) (map->bios_ptr + std_vesa_offset);
 	
 	map->mode_table = (char *) &std_vesa->aModeTimings;
-	verbose("Standard VESA Table at offset * 0x%x\n", std_vesa_offset);
+	PRINT("Standard VESA Table at offset * 0x%x\n", std_vesa_offset);
 	if (map->mode_table == 0) {
-		verbose("Unable to locate the mode table.\n");
-		verbose("Please run the program 'dump_bios' as root and\n");
-		verbose("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
+		PRINT("Unable to locate the mode table.\n");
+		PRINT("Please run the program 'dump_bios' as root and\n");
+		PRINT("email the file 'vbios.dmp' to gaeloulacuisse@yahoo.fr.\n");
 		
 		close_vbios(map);
 		return 0;
@@ -44,10 +44,10 @@ vbios_map * open_ati_vbios(vbios_map * map, bios_tables_t ati_tables)
 	if (!detect_ati_bios_type(map)) map->bios = BT_ATI_2;
 	if (map->bios == BT_ATI_2) {
 		map->modeline_num = map->mode_table_size / sizeof(ATOM_DTD_FORMAT);
-		verbose("Using DTD Format modelines\n");
+		PRINT("Using DTD Format modelines\n");
 	} else {
 		map->modeline_num = map->mode_table_size / sizeof(ATOM_MODE_TIMING);
-		verbose("Using Atom Mode Timing modelines\n");
+		PRINT("Using Atom Mode Timing modelines\n");
 	}
 	return map;
 }
@@ -58,7 +58,7 @@ bool ati_set_mode_1(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y)
 	
 	if ((*x != 0) && (*y != 0) && ( mode_timing[idx].usCRTC_H_Disp >= 640 )) {
 		
-		verbose("Mode %dx%d -> %dx%d\n",mode_timing[idx].usCRTC_H_Disp,mode_timing[idx].usCRTC_V_Disp,
+		PRINT("Mode %dx%d -> %dx%d\n",mode_timing[idx].usCRTC_H_Disp,mode_timing[idx].usCRTC_V_Disp,
 			   *x, *y);
 		
 		mode_timing[idx].usCRTC_H_Disp = *x;
@@ -77,7 +77,7 @@ bool ati_set_mode_2(vbios_map* map, UInt8 idx, UInt32* x, UInt32* y)
 	
 	if ((*x != 0) && (*y != 0) && ( mode_timing[idx].usHActive >= 640 )) {
 		
-		verbose("Mode %dx%d -> %dx%d\n", mode_timing[idx].usHActive, mode_timing[idx].usHActive,
+		PRINT("Mode %dx%d -> %dx%d\n", mode_timing[idx].usHActive, mode_timing[idx].usHActive,
 			   *x, *y);
 		
 		mode_timing[idx].usHActive = *x;
