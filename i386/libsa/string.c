@@ -241,6 +241,18 @@ char *strcat(char *s1, const char *s2)
 	return(strncat(s1, s2, strlen(s2)));
 }
 
+char * strdup (const char * str)
+{
+	char *clone;
+	size_t size;
+	
+	size = strlen (str) + 1;
+	clone = malloc (size);
+	memcpy (clone, str, size);
+	
+	return clone;
+}
+
 #if STRNCASECMP
 int strncasecmp(const char *s1, const char *s2, size_t len)
 {
@@ -264,4 +276,3 @@ uint8_t checksum8( void * start, unsigned int length )
 
     return csum;
 }
-

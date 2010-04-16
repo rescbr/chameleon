@@ -29,6 +29,16 @@ struct DevPropString *string = 0;
 uint8_t *stringdata = 0;
 uint32_t stringlength = 0;
 
+typedef struct DeviceEntryStruct DeviceEntry_t;
+
+struct DeviceEntryStruct {
+  DeviceEntry_t* next;
+  const char* path;
+  struct DevPropDevice* device;
+};
+
+DeviceEntry_t* TheDeviceRegistry = NULL;
+
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
 	if(string) {
@@ -86,6 +96,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	struct DevPropDevice	*device;
 	const char		pciroot_string[] = "PciRoot(0x";
 	const char		pci_device_string[] = "Pci(0x";
+	DeviceEntry_t* newDeviceEntry;
 
 	if (string == NULL || path == NULL) {
 		return NULL;
@@ -177,6 +188,13 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
 	string->entries[string->numentries-1] = device;
 	
+	// Register the device to the device entries
+	newDeviceEntry = malloc(sizeof(DeviceEntry_t));
+	newDeviceEntry->next = TheDeviceRegistry;
+	TheDeviceRegistry = newDeviceEntry;
+	newDeviceEntry->path = strdup(path);
+	newDeviceEntry->device = device;
+
 	return device;
 }
 
@@ -358,3 +376,15 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 		}
 	}
 }
+
+
+struct DevPropDevice *devprop_find_device(char *path)
+{
+  DeviceEntry_t* entry;
+
+  for (entry = TheDeviceRegistry; entry; entry = entry->next)
+	if (strcmp(entry->path, path) == 0)
+	  return entry->device;
+  return NULL;
+}
+

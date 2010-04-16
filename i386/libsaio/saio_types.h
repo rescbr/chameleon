@@ -64,7 +64,6 @@ typedef struct Tag Tag, *TagPtr;
 typedef struct {
 	char	plist[4096];	// buffer for plist
 	TagPtr	dictionary;		// buffer for xml dictionary
-	bool  canOverride;  // flag to mark a dictionary can be overriden
 } config_file_t;
 
 /*

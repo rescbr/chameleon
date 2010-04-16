@@ -1180,11 +1180,8 @@ processBootOptions()
       cnt = 0;
     }
 
-    // Load com.apple.Boot.plist from the selected volume
-    // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
-
-    loadOverrideConfig(&bootInfo->overrideConfig);
+    // reload the config, this time with the boot arg
+    loadSystemConfig(gBootArgs, &bootInfo->bootConfig, NULL, true);
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.

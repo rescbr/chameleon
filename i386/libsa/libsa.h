@@ -105,6 +105,10 @@ extern int    errno;
 extern char * strerror(int errnum);
 
 /*
+ * strdup.c
+ */
+extern char * strdup (const char * str);
+/*
  * strtol.c
  */
 extern long strtol(const char * nptr, char ** endptr, int base);

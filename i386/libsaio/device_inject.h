@@ -70,5 +70,6 @@ struct DevPropDevice	*devprop_add_device(struct DevPropString *string, char *pat
 int			devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);
 char			*devprop_generate_string(struct DevPropString *string);
 void			devprop_free_string(struct DevPropString *string);
+struct DevPropDevice    *devprop_find_device(char *path);
 
 #endif /* !__LIBSAIO_DEVICE_INJECT_H */

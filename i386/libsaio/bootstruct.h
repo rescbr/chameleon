@@ -125,11 +125,11 @@ typedef struct PrivateBootInfo {
     char             config[CONFIG_SIZE];
 
     config_file_t    bootConfig;		               // boot.plist
-    config_file_t    overrideConfig;               // additional boot.plist which can override bootConfig keys
     config_file_t    themeConfig;				           // theme.plist
     config_file_t    smbiosConfig;				         // smbios.plist
     config_file_t    helperConfig;                 // boot helper partition's boot.plist
     config_file_t    ramdiskConfig;                // RAMDisk.plist
+    config_file_t    pciConfig;		           // pci.plist
 } PrivateBootInfo_t;
 
 extern PrivateBootInfo_t *bootInfo; 

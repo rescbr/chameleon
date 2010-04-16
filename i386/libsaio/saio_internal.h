@@ -156,9 +156,8 @@ extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff)
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
-extern int    loadSystemConfig(config_file_t *configBuff);
+extern int    loadSystemConfig(const char* bootargs, config_file_t *configBuff, const char* filename, bool override);
 extern int    loadHelperConfig(config_file_t *configBuff);
-extern int    loadOverrideConfig(config_file_t *configBuff);
 extern char * newString(const char *oldString);
 extern char * getNextArg(char ** ptr, char * val);
 extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
@@ -203,6 +202,9 @@ extern int    gBIOSDev;
 extern int    gBootFileType;
 extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;
+
+/* pci_root.c */
+extern int search_and_get_acpi_fd(const char * filename, const char ** outDirspec);
 
 // Function pointer to be filled in if ramdisks are available
 extern int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip);

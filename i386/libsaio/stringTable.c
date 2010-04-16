@@ -481,41 +481,10 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
 
 bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
 {
-  const char *overrideVal;
-  int overrideSize;
-  bool override, ret;
-  
   if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
     return true;
 
-  ret = getValueForConfigTableKey(config, key, val, size);
-
-  // Try to find alternate keys in bootInfo->overrideConfig
-  // and prefer its values with the exceptions for
-  // "Kernel"="mach_kernel" and "Kernel Flags"="".
-
-  if (config->canOverride)
-  {
-    if (getValueForConfigTableKey(&bootInfo->overrideConfig, key, &overrideVal, &overrideSize))
-    {
-      override = true;
-
-      if (ret && (strcmp(key, "Kernel") == 0) && (strcmp(overrideVal, "mach_kernel") == 0))
-        override = false;
-
-      if (ret && (strcmp(key, "Kernel Flags") == 0) && (overrideSize == 0))
-        override = false;
-
-      if (override)
-      {
-        *val = overrideVal;
-        *size = overrideSize;
-        return true;
-      }
-    }
-  }
-
-  return ret;
+  return getValueForConfigTableKey(config, key, val, size);
 }
 
 
@@ -601,65 +570,93 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 
 /* loadSystemConfig
  *
- * Returns 0 - successful.
- *		  -1 - unsuccesful.
- */
-int loadSystemConfig(config_file_t *config)
-{
-	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
-		"bt(0,0)/Extra/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
-	};
-
-	int i, fd, count, ret=-1;
-
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
-	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
-		{
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
-			
-			// build xml dictionary
-			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
-			ret=0;
-			
-			// enable canOverride flag
-			config->canOverride = true;
-
-			break;
-		}
-	}
-	return ret;
-}
-
-/* loadOverrideConfig
+ * filename == NULL:
+ *   You are loading from com.apple.Boot.plist somewhere in the universe.
+ *   Also, bootarg's "config=" is considerd as replacement name.
  *
+ * filename != NULL:
+ *   Use it as file name.
+ *   
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadOverrideConfig(config_file_t *config)
+#define MAX_DIRSPECS (8)
+
+int loadSystemConfig(const char* bootargs, config_file_t *config, const char* filename, bool override)
 {
-	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",
-		"/Extra/com.apple.Boot.plist",
+	char config_filename[512];		// Will be filled with the name of boot.plist
+
+	char *defaultDirspec[MAX_DIRSPECS] = {
+		"/Extra/",
+		"bt(0,0)/Extra/",
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	};
+
+	char *overrideDirspec[MAX_DIRSPECS] = {
+		"rd(0,0)/Extra/",
+		"/Extra/",
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	};
+
+	char* moreBootPlist[4]  = {
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 	};
 
-	int i, fd, count, ret=-1;
+	int i, j, fd, count, size;
+	const char* val;
+	char filespec[512];
+	char *dirspec[MAX_DIRSPECS];
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	if (override)
+	  memcpy(dirspec, overrideDirspec, sizeof(overrideDirspec));
+	else
+	  memcpy(dirspec, defaultDirspec, sizeof(defaultDirspec));
+	
+
+	if (filename)
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
+        strcpy(config_filename, filename);
+	}
+	else
+	{
+        strcpy(config_filename, "com.apple.Boot.plist");
+        for (j = 0; dirspec[j]; j++) /* noop */;
+        memcpy(&dirspec[j], moreBootPlist, sizeof(moreBootPlist));
+	    // If there is a config designated, point boot.plist to something else.
+	    if (bootargs && getValueForBootKey(bootargs, "config", &val, &size))
+        {
+	        if (size > 480) size = 480;
+	        if (size > 0)
+            {
+                memcpy(config_filename, val, size);
+                config_filename[size] = 0;
+            }
+	    }
+	}
+
+	for(i = 0; dirspec[i]; i++)
+	{
+		strcpy(filespec, dirspec[i]);
+		/* If the last char is / then append the boot.plist name */
+		if (filespec[strlen(filespec)-1] == '/')
+		{
+			strcat(filespec, config_filename);
+		}
+
+		if ((fd = open(filespec, 0)) >= 0)
 		{
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
@@ -667,12 +664,12 @@ int loadOverrideConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
-			ret=0;
-			break;
+			sysConfigValid=true;
+			verbose("Config file %s loaded\n", filespec);
+			return 0;
 		}
 	}
-	return ret;
+	return -1;
 }
 
 /* loadHelperConfig
@@ -770,3 +767,5 @@ char * getNextArg(char ** argPtr, char * val)
 
   return ptr;
 }
+
+

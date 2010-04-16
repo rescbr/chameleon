@@ -266,8 +266,10 @@ void common_boot(int biosdev)
     bvChain = getBVChainForBIOSDev(gBIOSDev);
     setBootGlobals(bvChain);
     
-    // Load boot.plist config file
-    status = loadSystemConfig(&bootInfo->bootConfig);
+    // Load boot.plist config file. 
+    // At this point, since the boot args are not typed in yet, just use
+    // empty string so that loadSystemConfig gets the default.
+    status = loadSystemConfig("", &bootInfo->bootConfig, NULL, false);
 
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;

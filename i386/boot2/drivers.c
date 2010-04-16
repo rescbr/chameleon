@@ -163,6 +163,8 @@ InitDriverSupport( void )
 
 long LoadDrivers( char * dirSpec )
 {
+    int len, i;
+    const char *string;	
     char dirSpecExtra[1024];
 	bool loadTestDrivers = false;
 
@@ -198,7 +200,25 @@ long LoadDrivers( char * dirSpec )
         }
 
         // Next try to load Extra extensions from the selected root partition.
+        for (i = 0 ; i < 2; i++) {
         strcpy(dirSpecExtra, "/Extra/");
+
+	    if (i == 1) {
+	      len = 0;
+	      // Second time around, see if I really want to load
+	      if (!getValueForKey( "AdditionalExtensions", &string, &len, &bootInfo->bootConfig )) {
+		len = 0;
+	      }
+	      // Make sure there is something there.
+	      if (len > 0 && string) {
+		strcpy(dirSpecExtra, string);
+		if (dirSpecExtra[strlen(dirSpecExtra)-1] != '/') strcat(dirSpecExtra, "/");
+	      }
+	      else {
+		break;
+	      }
+	    }
+
         if (FileLoadDrivers(dirSpecExtra, 0) != 0)
         {
           // If failed, then try to load Extra extensions from the boot partition
@@ -215,6 +235,7 @@ long LoadDrivers( char * dirSpec )
 				  FileLoadDrivers(dirSpecExtra, 0);
 			  }
 		  }
+        }
         }
 
         // Also try to load Extensions from boot helper partitions.
