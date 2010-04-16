@@ -55,6 +55,8 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x80862A03, "GMAX3100" },
 	{ 0x80862A12, "GMAX3100" },
 	{ 0x80862A13, "GMAX3100" },
+	{ 0x80862A42, "GMAX3100" },
+	{ 0x80862A43, "GMAX3100" },
 };
 
 char *get_gma_model(uint32_t id) {
@@ -109,6 +111,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	} else if (model == (char *)"Desktop GMA950") {
 		BuiltIn = 0x01;
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
 	} else if (model == (char *)"GMAX3100") {
 		devprop_add_value(device, "AAPL,HasPanel",GMAX3100_vals[0], 4);
 		devprop_add_value(device, "AAPL,SelfRefreshSupported",GMAX3100_vals[1], 4);
@@ -132,8 +135,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,PixelFormat",GMAX3100_vals[19], 4);
 		devprop_add_value(device, "AAPL01,Refresh",GMAX3100_vals[20], 4);
 		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[21], 4);
+		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
-		
+
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{

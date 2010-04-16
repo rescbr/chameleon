@@ -84,6 +84,7 @@ enum {
 };
 
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
+long (*LoadTestingDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
 static unsigned long Alder32( unsigned char * buffer, long length );
 
@@ -163,6 +164,7 @@ InitDriverSupport( void )
 long LoadDrivers( char * dirSpec )
 {
     char dirSpecExtra[1024];
+	bool loadTestDrivers = false;
 
     if ( InitDriverSupport() != 0 )
         return 0;
@@ -171,6 +173,12 @@ long LoadDrivers( char * dirSpec )
     if (LoadExtraDrivers_p != NULL)
     {
         (*LoadExtraDrivers_p)(&FileLoadDrivers);
+    }
+
+	// Load test drivers if a hook has been installed.
+    if (LoadTestingDrivers_p != NULL)
+    {
+        (*LoadTestingDrivers_p)(&FileLoadDrivers);
     }
 
     if ( gBootFileType == kNetworkDeviceType )
@@ -236,6 +244,37 @@ long LoadDrivers( char * dirSpec )
             strcat(gExtensionsSpec, "System/Library/");
             FileLoadDrivers(gExtensionsSpec, 0);
         }
+
+		// Check wether or not to load Test drivers (disabled by default)
+		if (getBoolForKey(kLoadTestDrivers, &loadTestDrivers, &bootInfo->bootConfig) && loadTestDrivers)
+		{
+			// First try to load Test extensions from the ramdisk if isn't aliased as bt(0,0).
+			if (gRAMDiskVolume && !gRAMDiskBTAliased)
+			{
+				strcpy(dirSpecExtra, "rd(0,0)/Test/");
+				FileLoadDrivers(dirSpecExtra, 0);
+			}
+
+			// Next try to load Test extensions (if enabled explicitly in booter) from the selected root partition.
+			strcpy(dirSpecExtra, "/Test/");
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			{
+				// If failed, then try to load Test extensions from the boot partition
+				// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
+				if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
+					|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+				{
+					// First try a specfic OS version folder ie 10.5
+					sprintf(dirSpecExtra, "bt(0,0)/Test/%s/", &gMacOSVersion);
+					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					{	
+						// Next we'll try the base
+						strcpy(dirSpecExtra, "bt(0,0)/Test/");
+						FileLoadDrivers(dirSpecExtra, 0);
+					}
+				}
+			}
+		}
     }
     else
     {

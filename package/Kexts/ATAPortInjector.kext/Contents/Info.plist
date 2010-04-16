@@ -270,23 +270,6 @@
 			<key>Supported Transfer Modes</key>
 			<string>0x3f061d</string>
 		</dict>
-		<key>ICH7 ATA/100</key>
-		<dict>
-			<key>CFBundleIdentifier</key>
-			<string>com.apple.driver.AppleIntelPIIXATA</string>
-			<key>Controller Name</key>
-			<string>ICH7 ATA/100</string>
-			<key>IOClass</key>
-			<string>AppleIntelPIIXATARoot</string>
-			<key>IOPCIPrimaryMatch</key>
-			<string>0x27df8086</string>
-			<key>IOProbeScore</key>
-			<integer>2000</integer>
-			<key>IOProviderClass</key>
-			<string>IOPCIDevice</string>
-			<key>Supported Transfer Modes</key>
-			<string>0x3f061d</string>
-		</dict>
 		<key>ICH7 Serial ATA</key>
 		<dict>
 			<key>CFBundleIdentifier</key>

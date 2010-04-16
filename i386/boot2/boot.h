@@ -114,7 +114,7 @@
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kRestartFix         "RestartFix"        /* dsdt_patcher.c */
-
+#define kLoadTestDrivers	"LoadTestDrivers"	/* drivers.c */
 /*
  * Flags to the booter or kernel
  */
@@ -202,6 +202,7 @@ typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
     allows other code to cause additional drivers to be loaded.
  */
 extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
+extern long (*LoadTestingDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
 /*
  * options.c

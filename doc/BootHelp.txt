@@ -24,9 +24,9 @@ Example arguments include
 
 Example: mach_kernel rd=disk0s1 -v "Graphics Mode"="1920x1200x32"
 
-If the computer won't start up properly, you may be able to start it up 
-using safe mode.  Type -x to start up in safe mode, which ignores all 
-cached driver files.
+If the computer won't start up properly, you may be able to start it up using
+safe mode.  Type -x to start up in safe mode, which ignores all cached
+driver files.
 
 Special booter hotkeys:
   F5            Rescans optical drive.
@@ -41,97 +41,98 @@ Additional useful command-line options:
   config=<file>             Use an alternate Boot.plist file.
 
 Options useful in the com.apple.Boot.plist file:
-  Wait=Yes|No             Prompt for a key press before starting the kernel.
-  "Quiet Boot"=Yes|No     Use quiet boot mode (no messages or prompt).
-  Timeout=8               Number of seconds to pause at the boot: prompt.
-  "Instant Menu"=Yes      Force displaying the partition selection menu. 
+  Wait=Yes|No               Prompt for a key press before starting the kernel.
+  "Quiet Boot"=Yes|No       Use quiet boot mode (no messages or prompt).
+  Timeout=8                 Number of seconds to pause at the boot: prompt.
+  "Instant Menu"=Yes        Force displaying the partition selection menu. 
 
-  "Default Partition"     Sets the default boot partition,
-    =hd(x,y)                where 'x' & 'y' are the disk and partition numbers.
-  "Hide Partition"        Remove unwanted partition(s) from the boot menu.
-    =hd(x,y) [hd(m,n)]      only non mac osx boot partitions can be hidden.
+  "Default Partition"       Sets the default boot partition,
+    =hd(x,y)                  where 'x' is the disk number, 'y' the partition number.
+  "Hide Partition"          Remove unwanted partition(s) from the boot menu.
+    =hd(x,y) [hd(m,n)]
 
-  "Rename Partition"        Rename partition(s) for the boot menu.
-    =hd(x,y) <alias> [;hd(m,n) <alias2> ...]
+  arch=<i386/x86_64>        Force ABI to 32/64 bit and load 32/64 bit kernel.
+  -x32                      Enable forcing 32 bit ABI only and load 32 bit kernel.
+  -x64                      Enable forcing 64 bit ABI and load 64 bit kernel.
 
-  GUI=No                  Disable the GUI (enabled by default).
-  "Boot Banner"=Yes|No    Show boot banner in GUI mode (enabled by default).
-  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
+  LoadTestDrivers=Yes|No    Enable loading of test drivers from /Test/Extensions(.mkext)
+
+  GUI=No                    Disable the GUI (enabled by default).
+  "Boot Banner"=Yes|No      Show boot banner in GUI mode (enabled by default).
+  "Legacy Logo"=Yes|No      Use the legacy grey apple logo (disabled by default).
   
-  PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
+  PciRoot=<value>           Use an alternate value for PciRoot. (default value: 0).
 
-  GraphicsEnabler=Yes|No  Automatic device-properties generation for gfx cards.
-  UseAtiROM=Yes|No        Use an alternate Ati ROM image 
-                            (path: /Extra/<vendorid>_<devid>.rom)
-  UseNvidiaROM=Yes|No     Use an alternate Nvidia ROM image 
-                            (path:  /Extra/<vendorid>_<devid>.rom)
-  VBIOS=Yes|No            Inject VBIOS to device-properties.
+  GraphicsEnabler=Yes|No    Automatic device-properties generation for graphics cards.
+  VideoROM=<file>           Use an alternate ROM image (default path: /NVIDIA.ROM).
+  VBIOS=Yes|No              Inject VBIOS to device-properties.
 
-  EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
-                          for ethernet interfaces.
+  EthernetBuiltIn=Yes|No    Automatic "built-in"=yes device-properties generation
+                            for ethernet interfaces.
+  UpdateACPIVersion=Yes     Enable ACPI V1 to ACPI V4 upgrade (disabled by default).
+  FixRestart=Yes            Enable the restart fix (disabled by default).
+  ForceHPET=Yes             Force HPET on (disabled by default).
 
-  USBBusFix=Yes           Enable the EHCI and UHCI fixes (disabled by default).
-  USBLegacyOff=Yes        Enable the force USB legacy off fix (disabled by default).
-  EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
-  UHCIreset=Yes           Enable the UHCI fix (disabled by default).
-  ForceHPET=Yes|No        Force Enable HPET.
+  USBBusFix=Yes             Enable the EHCI and UHCI fixes (disabled by default).
+  EHCIacquire=Yes           Enable the EHCI fix (disabled by default).
+  UHCIreset=Yes             Enable the UHCI fix (disabled by default).
+  USBLegacyOff=Yes          Force USB Legacy off (disabled by default).
 
-  Wake=No                 Disable wake up after hibernation (default: enabled).
-  ForceWake=Yes           Force using the sleepimage (disabled by default).
-  WakeImage=<file>        Use an alternate sleepimage file. 
-                            (default path is /private/var/vm/sleepimage).
+  Wake=No                   Disable wake up after hibernation (enbaled by default).
+  ForceWake=Yes             Force using the sleepimage (disabled by default).
+  WakeImage=<file>          Use an alternate sleepimage file 
+                              (default path is /private/var/vm/sleepimage).
 
-  UpdateACPI=Yes          Upgrade automatically ACPI V1 tables to ACPI V4 tables.
-  DropSSDT=Yes            Skip the SSDT tables while relocating the ACPI tables.
-  DropHPET=Yes            Skip the HPET table while relocating the ACPI tables.
-  DropSLIC=Yes            Skip the SLIC table while relocating the ACPI tables.
-  DropSBST=Yes            Skip the SBST table while relocating the ACPI tables.
-  DropECDT=Yes            Skip the ECDT table while relocating the ACPI tables.
-  DropASFT=Yes            Skip the ASF! table while relocating the ACPI tables.
-  DropDMAR=Yes            Skip the DMAR table while relocating the ACPI tables.
-  oemDSDT=Yes             Use the standard DSDT and ACPI tables.
-  oemSSDT=Yes             Use the standard SSDT tables.
-  oemHPET=Yes             Use the standard HPET table.
-  oemSBST=Yes             Use the standard SBST table.
-  oemECDT=Yes             Use the standard ECDT table.
-  oemASFT=Yes             Use the standard ASF! table.
-  oemDMAR=Yes             Use the standard DMAR table.
-  oemAPIC=Yes             Use the standard APIC table.
-  oemMCFG=Yes             Use the standard MCFG table.
-  DSDT=<file>             Use an alternate DSDT.aml file 
-                            (default path: /DSDT.aml /Extra/DSDT.aml).
-  SSDT=<file_prefix>      Use alternative DSDT-X.aml file prefix
-                            (default prefix: /SSDT /Extra/SSDT).
-  HPET=<file>             Use an alternate HPET.aml file 
-                            (default path: /HPET.aml /Extra/HPET.aml).
-  SBST=<file>             Use an alternate SBST.aml file 
-                            (default path: /SBST.aml /Extra/SBST.aml).
-  ECDT=<file>             Use an alternate ECDT.aml file 
-                            (default path: /ECDT.aml /Extra/ECDT.aml).
-  ASFT=<file>             Use an alternate ASFT.aml file 
-                            (default path: /ASFT.aml /Extra/ASFT.aml).
-  DMAR=<file>             Use an alternate DMAR.aml file 
-                            (default path: /DMAR.aml /Extra/DMAR.aml).
-  APIC=<file>             Use an alternate APIC.aml file 
-                            (default path: /APIC.aml /Extra/APIC.aml).
-  MCFG=<file>             Use an alternate MCFG.aml file 
-                            (default path: /MCFG.aml /Extra/MCFG.aml).
-  FADT=<file>             Use an alternate FADT.aml file 
-                            (default path: /FADT.aml /Extra/FADT.aml).
+  PMProfile=<0-7>           Set preferred power management profile.
 
-  SMBIOS=<file>           Use an alternate smbios.plist file 
-                            (default path: /smbios.plist /Extra/smbios.plist
-                             bt(0,0)/Extra/smbios.plist).
+  oemDSDT=Yes               Use standard DSDT and don't patch ACPI.
+  oemHPET=Yes               Use standard HPET table.
+  oemSSDT=Yes               Use standard SSDT tables.
+  oemHPET=Yes               Use standard HPET table.
+  oemSBST=Yes               Use standard SBST table.
+  oemECDT=Yes               Use standard ECDT table.
+  oemASFT=Yes               Use standard ASF! table.
+  oemDMAR=Yes               Use standard DMAR table.
+  oemFADT=Yes               Use standard FADT table.
+  oemAPIC=Yes               Use standard APIC table.
+  oemMCFG=Yes               Use standard MCFG table.
+  DropSSDT=Yes              Skip the SSDT tables while relocating the ACPI tables.
+  DropHPET=Yes              Skip the HPET table while relocating the ACPI tables.
+  DropSLIC=Yes              Skip the SLIC table while relocating the ACPI tables.
+  DropSBST=Yes              Skip the SBST table while relocating the ACPI tables.
+  DropECDT=Yes              Skip the ECDT table while relocating the ACPI tables.
+  DropASFT=Yes              Skip the ASF! table while relocating the ACPI tables.
+  DropDMAR=Yes              Skip the DMAR table while relocating the ACPI tables.
+  DSDT=<file>               Use an alternate DSDT.aml file 
+                              (default path: /DSDT.aml /Extra/DSDT.aml)
+  HPET=<file>               Use an alternate HPET.aml file 
+                              (default path: /HPET.aml /Extra/HPET.aml)
+  SBST=<file>               Use an alternate SBST.aml file 
+                              (default path: /DSDT.aml /Extra/SBST.aml)
+  ECDT=<file>               Use an alternate ECDT.aml file 
+                              (default path: /ECDT.aml /Extra/ECDT.aml)
+  DSDT=<file>               Use an alternate DSDT.aml file 
+                              (default path: /DSDT.aml /Extra/DSDT.aml)
+  ASFT=<file>               Use an alternate ASFT.aml file 
+                              (default path: /ASFT.aml /Extra/ASFT.aml)
+  DMAR=<file>               Use an alternate DMAR.aml file 
+                              (default path: /DMAR.aml /Extra/DMAR.aml)
+  FADT=<file>               Use an alternate FADT.aml file 
+                              (default path: /FADT.aml /Extra/FADT.aml)
+  APIC=<file>               Use an alternate APIC.aml file 
+                              (default path: /APIC.aml /Extra/APIC.aml)
+  MCFG=<file>               Use an alternate MCFG.aml file 
+                              (default path: /MCFG.aml /Extra/MCFG.aml)
 
-  SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding
-                            if smbios.plist doesn't exist, factory
-                            values are kept.
+  SMBIOS=<file>             Use an alternate smbios.plist file 
+                              (default path: /smbios.plist /Extra/smbios.plist
+                               bt(0,0)/Extra/smbios.plist).
 
-  "Scan Single Drive"     Scan the drive only where the booter got loaded from.
-    =Yes|No               Fix rescan pbs when using a DVD reader in AHCI mode. 
-  Rescan=Yes              Enable CD-ROM rescan mode.
-  "Rescan Prompt"=Yes     Prompts for enable CD-ROM rescan mode.
-  SystemId=<UUID>         Set manually the system id UUID,
-                          SMUUID in smbios config (reserved field) isn't used.
-  SystemType=<n>          Set the system type where n is between 0..6
-                          (default =1 (Desktop)
+  SMBIOSdefaults=No         Don't use the Default values for SMBIOS overriding
+                              if smbios.plist doesn't exist, factory
+                              values are kept.
+
+  "Scan Single Drive"       Scan the drive only where the booter got loaded from.
+    =Yes|No                 Fix rescan issues when using a DVD reader in AHCI mode. 
+  Rescan=Yes                Enable CD-ROM rescan mode.
+  "Rescan Prompt"=Yes       Prompts for enable CD-ROM rescan mode.

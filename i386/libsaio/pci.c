@@ -9,9 +9,9 @@
 #include "pci.h"
 #include "pci_root.h"
 
-#ifndef DEBUG_PCI
-#define DEBUG_PCI 1
-#endif
+// #ifndef DEBUG_PCIROOT
+// #define DEBUG_PCIROOT 1
+// #endif
 
 #if DEBUG_PCI
 #define DBG(x...)		printf(x)

@@ -98,7 +98,10 @@ chipset_type get_chipset(UInt32 id) {
 		case 0x2a008086:
 			type = CT_965GM;
 			break;
-			
+
+		case 0x2a408086:
+			type = CT_965GM;
+			break;
 			
 		default:
 			type = CT_UNKWN;
