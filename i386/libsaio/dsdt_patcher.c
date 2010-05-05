@@ -1218,7 +1218,9 @@ int setupAcpi(void)
 		{
 	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi20_p = (uint32_t)rsdp_mod;
+			acpi10_p = (uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
+			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 		}
 		else
 		{

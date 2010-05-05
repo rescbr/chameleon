@@ -142,7 +142,7 @@ static int sm_get_cpu (char *name, int table_num)
 static int sm_get_cputype (char *name, int table_num)
 {
 	if (Platform.CPU.NoCores == 1) {
-		return 0x0101;   // <01 01> Intel Core Solo?
+		return 0x0201;   // <01 02> Intel Core Solo/Duo?
 	} else if (Platform.CPU.NoCores == 2) {
 		return 0x0301;   // <01 03> Intel Core 2 Duo
 	} else if (Platform.CPU.NoCores >= 4) {

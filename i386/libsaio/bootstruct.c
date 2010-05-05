@@ -39,10 +39,12 @@ PrivateBootInfo_t *bootInfo;
 Node              *gMemoryMapNode;
 
 static char platformName[64];
+static char SysVolName[1] = { 0xFF }; /* AnV - volume level fix */
 
 void initKernBootStruct( void )
 {
     Node *node;
+	Node *optionnode;
     int nameLen;
     static int init_done = 0;
 
@@ -87,6 +89,10 @@ void initKernBootStruct( void )
         nameLen = strlen(platformName) + 1;
         DT__AddProperty(node, "compatible", nameLen, platformName);
         DT__AddProperty(node, "model", nameLen, platformName);
+
+		/* AnV - options node fix */
+		optionnode = DT__AddChild(node, "options");
+		DT__AddProperty(optionnode, "SystemAudioVolume", 1, SysVolName);
 
         gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
 
