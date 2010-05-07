@@ -9,13 +9,12 @@
 #ifndef __BOOT2_KERNEL_PATCHER_H
 #define __BOOT2_KERNEL_PATCHER_H
 
-void patch_kernel();
+void patch_kernel(void* kernelData);
 
 #define KERNEL_64	1
 #define KERNEL_32	2
 
 int locate_symbols(void* kernelData);
-
 
 void patch_kernel_32(void* kernelData);
 void patch_kernel_64(void* kernelData);

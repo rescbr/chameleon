@@ -192,7 +192,6 @@ static int ExecKernel(void *binary)
     finalizeBootStruct();
     
     // Jump to kernel's entry point. There's no going back now.
-
     startprog( kernelEntry, bootArgs );
 
     // Not reached

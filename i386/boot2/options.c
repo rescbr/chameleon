@@ -721,7 +721,8 @@ int getBootOptions(bool firstRun)
 
 	// If the user is holding down a modifier key, enter safe mode.
 	if ((readKeyboardShiftFlags() & 0x0F) != 0) {
-		gBootMode |= kBootModeSafe;
+		
+		//gBootMode |= kBootModeSafe;
 	}
 
 	// If user typed F8, abort quiet mode, and display the menu.

@@ -807,6 +807,8 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	  ret = ThinFatFile(&binary, &len);
   }
   
+  patch_kernel(binary);
+	
   ret = DecodeMachO(binary, rentry, raddr, rsize);
 	
   if (ret<0 && archCpuType==CPU_TYPE_X86_64)
@@ -815,7 +817,6 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	  ret = DecodeMachO(binary, rentry, raddr, rsize);
   }
 	
-  patch_kernel();
   
   return ret;
 }

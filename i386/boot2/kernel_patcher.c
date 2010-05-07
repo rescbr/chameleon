@@ -36,16 +36,16 @@ UInt32 textAddress = 0;
 extern unsigned long gBinaryAddress;
 
 
-void patch_kernel()
+void patch_kernel(void* kernelData)
 {
-	switch (locate_symbols((void*)gBinaryAddress)) {
+	switch (locate_symbols((void*)kernelData)) {
 		case KERNEL_32:
-			patch_kernel_32((void*)gBinaryAddress);
+			patch_kernel_32((void*)kernelData);
 			break;
 			
 		case KERNEL_64:
 		default:
-			patch_kernel_64((void*)gBinaryAddress);
+			patch_kernel_64((void*)kernelData);
 			break;
 	}
 }

@@ -315,7 +315,7 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char const FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
+static const char const FIRMWARE_ABI_PROP_VALUE[] = "EFI32";
 static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
@@ -518,10 +518,10 @@ void setupFakeEfi(void)
         setupSmbiosConfigFile();
 	
         // Generate efi device strings 
-	setupEfiDevices();
+        setupEfiDevices();
 	
-	// Initialize the base table
-	setupEfiTables();
+        // Initialize the base table
+        setupEfiTables();
 	
         // Initialize the device tree
         setupEfiDeviceTree();
