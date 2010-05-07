@@ -29,8 +29,8 @@ UInt32 kernelSymbolAddresses[NUM_SYMBOLS] = {
 };
 
 
-UInt32 textSection;
-UInt32 textAddress;
+UInt32 textSection = 0;
+UInt32 textAddress = 0;
 
 
 extern unsigned long gBinaryAddress;
@@ -42,6 +42,7 @@ void patch_kernel()
 		case KERNEL_32:
 			patch_kernel_32((void*)gBinaryAddress);
 			break;
+			
 		case KERNEL_64:
 		default:
 			patch_kernel_64((void*)gBinaryAddress);
@@ -55,8 +56,9 @@ void patch_kernel_64(void* kernelData)
 	//  At the moment, the kernel patching code fails when used
 	// in 64bit mode, so we don't patch it. This is due to 32bit vs 64bit
 	// pointers as well as changes in structure sizes
-	verbose("Unable to patch 64bit kernel. Please use arch=i386.\n");
+	printf("Unable to patch 64bit kernel. Please use arch=i386.\n");
 }
+
 
 /**
  ** patch_kernel_32
@@ -64,13 +66,13 @@ void patch_kernel_64(void* kernelData)
  **			when an unsupported (read: non apple used cpu) is found. This routine locates that first _panic call
  **			and replaces the jump call (0xe8) with no ops (0x90).
  **/
-
 void patch_kernel_32(void* kernelData)
 {
 	patch_pmCPUExitHaltToOff(kernelData);
 	patch_cpuid_set_info(kernelData);
 
 }
+
 
 /**
  **		This functions located the following in the mach_kernel symbol table
@@ -91,6 +93,7 @@ int locate_symbols(void* kernelData)
 	kernelIndex += sizeof(struct mach_header);
 	
 	if(((struct mach_header*)kernelData)->magic != MH_MAGIC) return KERNEL_64;
+	
 	
 	//printf("%d load commands beginning at 0x%X\n", (unsigned int)header->ncmds, (unsigned int)kernelIndex);
 	//printf("Commands take up %d bytes\n", header->sizeofcmds);
@@ -135,6 +138,7 @@ int locate_symbols(void* kernelData)
 						symbolIndexes[i] = symbolIndex;
 						numSymbolsFound++;				
 					} 
+					i++;
 					
 				}
 				symbolString += strlen(symbolString) + 1;
@@ -157,6 +161,7 @@ int locate_symbols(void* kernelData)
 						kernelSymbolAddresses[i] = (UInt32)symbolEntry->n_value;
 						numSymbolsFound++;				
 					} 
+					i++;
 					
 				}
 				
@@ -189,7 +194,7 @@ int locate_symbols(void* kernelData)
 					
 					if(strcmp("__text", sect->sectname) == 0)
 					{
-						// __TEXT,__text found, save the offset and address for when looking for the panic call.
+						// __TEXT,__text found, save the offset and address for when looking for the calls.
 						textSection = sect->offset;
 						textAddress = sect->addr;
 						break;
@@ -207,15 +212,26 @@ int locate_symbols(void* kernelData)
 	return KERNEL_32;
 }
 
+
 /**
  ** Locate the fisrt instance of _panic inside of _cpuid_set_info, and remove it
  **/
 void patch_cpuid_set_info(void* kernelData)
 {
-	UInt8* bytes = (void*)kernelData;
+	UInt8* bytes = (UInt8*)kernelData;
 	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	UInt32 panidAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
-	
+	if(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] == 0)
+	{
+		printf("Unable to locate _cpuid_set_info\n");
+		return;
+		
+	}
+	if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	{
+		printf("Unable to locate _panic\n");
+		return;
+	}
 	
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
@@ -228,6 +244,7 @@ void patch_cpuid_set_info(void* kernelData)
 		  // (patchLocation < maxLocation)	// max location is not known... assuming there is a panic call somewhere after cpuid_set_info
 		  )
 	{
+		//printf("Looking at 0x%X\n", patchLocation);
 		patchLocation++;
 	}
 	
@@ -237,9 +254,8 @@ void patch_cpuid_set_info(void* kernelData)
 	bytes[patchLocation + 1] = 0x90;
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
-	
-	// Patching finished
 }
+
 
 /**
  ** SleepEnabler.kext replacement (for those that need it)
@@ -247,9 +263,15 @@ void patch_cpuid_set_info(void* kernelData)
  **/
 void patch_pmCPUExitHaltToOff(void* kernelData)
 {
-	UInt8* bytes = (void*)kernelData;
+	UInt8* bytes = (UInt8*)kernelData;
 	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] - textAddress + textSection);
 
+	if(kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] == 0)
+	{
+		printf("Unable to locate _pmCPUExitHaltToOff\n");
+		return;
+	}
+	
 	while(bytes[patchLocation - 1]	!= 0xB8 ||
 		  bytes[patchLocation]		!= 0x04 ||	// KERN_INVALID_ARGUMENT (0x00000004)
 		  bytes[patchLocation + 1]	!= 0x00 ||	// KERN_INVALID_ARGUMENT
@@ -260,5 +282,4 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 		patchLocation++;
 	}
 	bytes[patchLocation] = 0x00;	// KERN_SUCCESS;
-
 }

@@ -38,6 +38,7 @@
 #include "bootstruct.h"
 #include "xml.h"
 #include "ramdisk.h"
+#include "kernel_patcher.h"
 
 extern char gMacOSVersion;
 
@@ -813,6 +814,8 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	  archCpuType=CPU_TYPE_I386;
 	  ret = DecodeMachO(binary, rentry, raddr, rsize);
   }
+	
+  patch_kernel();
   
   return ret;
 }

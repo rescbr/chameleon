@@ -37,7 +37,7 @@ static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
 
 
-static unsigned long gBinaryAddress;
+unsigned long gBinaryAddress;
 bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
 cpu_type_t archCpuType=CPU_TYPE_I386;
 
