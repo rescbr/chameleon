@@ -220,6 +220,7 @@ void patch_cpuid_set_info(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
 	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
+	UInt32 jumpLocation = 0;
 	UInt32 panidAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
 	if(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] == 0)
 	{
@@ -236,24 +237,81 @@ void patch_cpuid_set_info(void* kernelData)
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
-		  ( ( (UInt32)(panidAddr - patchLocation  - 4) + textSection ) != (UInt32)((bytes[patchLocation] | 
-																					bytes[patchLocation + 1] << 8 | 
+		  ( ( (UInt32)(panidAddr - patchLocation  - 4) + textSection ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
+																					bytes[patchLocation + 1] << 8  | 
 																					bytes[patchLocation + 2] << 16 |
-																					bytes[patchLocation + 3] << 24))) //&&
-		  
-		  // (patchLocation < maxLocation)	// max location is not known... assuming there is a panic call somewhere after cpuid_set_info
+																					bytes[patchLocation + 3] << 24)))
 		  )
 	{
-		//printf("Looking at 0x%X\n", patchLocation);
 		patchLocation++;
 	}
+	patchLocation--;
 	
-	// repace with nops
-	bytes[patchLocation - 1] = 0x90;
-	bytes[patchLocation    ] = 0x90;
+/*
+ // repace with nops to disable the panic call
+	Old patch, nolonger used. This is a safer patch than before, however
+	the new patch allows the native pm kext to load without any extra kexts
+	bytes[patchLocation] = 0x90;
 	bytes[patchLocation + 1] = 0x90;
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
+	bytes[patchLocation + 4] = 0x90;
+*/	
+	
+	// Locate a JMP to patchLocation - sizeof(mov) + 2 (aka 8)
+	// ... NOTE: can *ONLY* be up to 0xFF - 8 bytes aways
+	jumpLocation = patchLocation - 15;
+	while((bytes[jumpLocation - 1] != 0x77 ||
+		  bytes[jumpLocation] != (patchLocation - jumpLocation - -8)) &&
+		  (patchLocation - jumpLocation) < 0xEF)
+	{
+		jumpLocation--;
+	}
+	
+	// If found... (not the end of the world if it isn't found, the panic is removed either way.
+	// But if it isn't found, then IntelCPUPM.kext might panic if an unknown cpu (atom)
+	// Jump to patchLocation - 17
+	if((patchLocation - jumpLocation) < 0xEF) bytes[jumpLocation] -= 10; // sizeof(movl	$0x6b5a4cd2,0x00872eb4)
+	
+	
+	// bytes[patchLocation - 17] = 0xC7;	// already here... not needed to be done
+	// bytes[patchLocation - 16] = 0x05;	// see above
+	UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 15] << 0  |
+									bytes[patchLocation - 14] << 8  |
+									bytes[patchLocation - 13] << 16 |
+									bytes[patchLocation - 12] << 24;
+	
+	// NOTE: may change, determined based on cpuid_info struct
+	UInt32 cpuid_model_addr = cpuid_cpufamily_addr - 299; 
+	
+	
+	// cpufamily = CPUFAMILY_INTEL_PENRYN
+	bytes[patchLocation - 11] = (CPUFAMILY_INTEL_PENRYN & 0x000000FF) >> 0;
+	bytes[patchLocation - 10] = (CPUFAMILY_INTEL_PENRYN & 0x0000FF00) >> 8;
+	bytes[patchLocation -  9] = (CPUFAMILY_INTEL_PENRYN & 0x00FF0000) >> 16;	
+	bytes[patchLocation -  8] = (CPUFAMILY_INTEL_PENRYN & 0xFF000000) >> 24;
+
+	// NOPS, just in case if the jmp call wasn't patched, we'll jump to a
+	// nop and continue with the rest of the patch
+	// Yay two free bytes :), 10 more can be reclamed if needed, as well as a few
+	// from the above code (only cpuid_model needs to be set.
+	bytes[patchLocation - 7] = 0x90;
+	bytes[patchLocation - 6] = 0x90;
+
+	bytes[patchLocation - 5] = 0xC7;
+	bytes[patchLocation - 4] = 0x05;
+	bytes[patchLocation - 3] = (cpuid_model_addr & 0x000000FF) >> 0;
+	bytes[patchLocation - 2] = (cpuid_model_addr & 0x0000FF00) >> 8;	
+	bytes[patchLocation - 1] = (cpuid_model_addr & 0x00FF0000) >> 16;
+	bytes[patchLocation - 0] = (cpuid_model_addr & 0xFF000000) >> 24;
+	
+	// Note: I could have just copied the 8bit cpuid_model in and saved about 4 bytes
+	// so if this function need a different patch it's still possible. Also, about ten bytes previous can be freed.
+	bytes[patchLocation + 1] = 0x17;	// cpuid_model
+	bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
+	bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
+	bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
+	
 }
 
 
