@@ -105,6 +105,23 @@ int setVBEDACFormat(unsigned char format)
     return(bb.eax.r.h);
 }
 
+int getEDID( void * edidBlock, UInt8 block)
+{
+	bzero(&bb, sizeof(bb));
+    bb.intno  = 0x10;
+    bb.eax.rr = funcGetEDID;
+	bb.ebx.r.l= 0x01;
+	bb.edx.rr = block;
+	
+    bb.es     = SEG( edidBlock );
+    bb.edi.rr = OFF( edidBlock );
+	
+    bios( &bb );
+    return(bb.eax.r.h);
+}
+
+
+
 /*
  * Default GTF parameter values.
  */

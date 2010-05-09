@@ -11,6 +11,7 @@
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
+#include "edid.h"
 
 #define THEME_NAME_DEFAULT	"Default"
 static const char *theme_name = THEME_NAME_DEFAULT;	
@@ -556,7 +557,7 @@ void loadThemeValues(config_file_t *theme, bool overide)
  
 int initGUI(void)
 {
-	int		val;
+	//int		val;
 #ifdef EMBED_THEME
 	config_file_t	*config;
 	
@@ -577,6 +578,7 @@ int initGUI(void)
 		return 1;
 	}
 #endif
+	/*
 	// parse display size parameters
 	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
 		screen_params[0] = val;
@@ -585,7 +587,10 @@ int initGUI(void)
 		screen_params[1] = val;
 	}
 	screen_params[2] = 32;
+	*/
+	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 
+	
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
 	
@@ -1685,7 +1690,7 @@ static void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	int pos;
+	//int pos;
 	int length;
 	const char *dummyVal;
 	bool legacy_logo;
@@ -1697,6 +1702,7 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 
+	/*
 	// parse screen size parameters
 	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig)) {
 		screen_params[0] = pos;
@@ -1709,6 +1715,10 @@ void drawBootGraphics(void)
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
 	screen_params[2] = 32;
+	*/
+	
+	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
