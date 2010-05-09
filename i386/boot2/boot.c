@@ -58,6 +58,7 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
+#include "resolution.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -319,8 +320,9 @@ void common_boot(int biosdev)
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
     if (useGUI) {
+		patchVideoBios();
         /* XXX AsereBLN handle error */
-	initGUI();
+		initGUI();
     }
 
     setBootGlobals(bvChain);

@@ -88,6 +88,8 @@
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kUseMemDetect	        "UseMemDetect"	        /* platform.c */
 #define kRestartFix             "RestartFix"        /* dsdt_patcher.c */
+#define kScreenWidth		"ScreenWidth"		/* edid.h */
+#define kScreenHeight		"ScreenHeight"		/* edid.h */
 
 /*
  * Flags to the booter or kernel

@@ -68,7 +68,7 @@ void patch_kernel_64(void* kernelData)
  **/
 void patch_kernel_32(void* kernelData)
 {
-	patch_pmCPUExitHaltToOff(kernelData);
+	//patch_pmCPUExitHaltToOff(kernelData);	// Not working as intended, disabled for now
 	patch_cpuid_set_info(kernelData);
 
 }
