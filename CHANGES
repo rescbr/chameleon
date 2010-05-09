@@ -1,3 +1,7 @@
+- Backup original dsdt to /dsdt/originaldsdt in the IORegistery
+- Added kernel patcher, removes the CPUID check panic in the kernel. Forces _cpuid_set_info to
+  return Penryn / cpuid model 23
+
 - Implemented SPD memory automatic detection and injection,seems to work really great ...
 - Factorized code to prepare a dynamic memory detection algorithm ...
 - Optimized smbios table address search

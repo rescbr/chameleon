@@ -93,4 +93,18 @@ struct acpi_2_fadt {
 	uint8_t		notimp2[96];
 } __attribute__((packed));
 
+struct acpi_2_dsdt {
+	char            Signature[4];
+	uint32_t        Length;
+	uint8_t         Revision;
+	uint8_t         Checksum;
+	char            OEMID[6];
+	char            OEMTableId[8];
+	char        	OEMRevision[4];
+	char	        CreatorId[4];
+	char	        CreatorRevision[4];
+	char			dsdtStart;		// actual length is .Length
+} __attribute__((packed));
+
+
 #endif /* !__LIBSAIO_ACPI_H */
