@@ -260,7 +260,7 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt)
 				
 		struct acpi_2_dsdt *dsdt;
 		dsdt = (struct acpi_2_dsdt*) (fadt_mod->DSDT);
-		DT__AddProperty(node, "originaldsdt", (dsdt->Length + sizeof(struct acpi_2_dsdt) - 1),  (void*)dsdt);	/// Inset old dsdt. Length is header length (36) + dsdt length
+		DT__AddProperty(node, "originaldsdt", (dsdt->Length + sizeof(struct acpi_2_dsdt) - 1),  (void*)dsdt);	/// Insert old dsdt. Length is header length (36) + dsdt length
 		
 	}
 	

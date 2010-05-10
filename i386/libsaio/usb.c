@@ -22,6 +22,168 @@
 #define DBG(x...)
 #endif
 
+
+#define MAX_USB_DEVS 9
+
+struct pciList
+{
+	pci_dt_t* pciDev;
+	struct pciList* next;
+};
+
+struct pciList* usbList = NULL;
+
+int legacy_off (pci_dt_t *pci_dev);
+int ehci_acquire (pci_dt_t *pci_dev);
+int uhci_reset (pci_dt_t *pci_dev);
+
+void notify_usb_dev(pci_dt_t *pci_dev)
+{
+	struct pciList* current = usbList;
+	if(!usbList)
+	{
+		usbList = (struct pciList*)malloc(sizeof(struct pciList));
+		usbList->next = NULL;
+		usbList->pciDev = pci_dev;
+	}
+	else {
+		while(current != NULL && current->next != NULL)
+		{
+			current = current->next;
+		}
+		current->next = (struct pciList*)malloc(sizeof(struct pciList));
+		current = current->next;
+		
+		current->pciDev = pci_dev;
+		current->next = NULL;
+	}
+
+	
+	
+	
+}
+
+int usb_loop()
+{
+	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
+	fix_ehci = fix_uhci = fix_usb = fix_legacy;
+	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig) && fix_usb) {
+		fix_ehci = fix_uhci = fix_legacy = true;
+	} else {
+		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
+		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
+		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+
+	}
+
+	
+	struct pciList* current = usbList;
+	while(current)
+	{
+		uhci_reset(current->pciDev);
+		legacy_off(current->pciDev);
+		ehci_acquire(current->pciDev);
+		
+		current = current->next;
+	}
+	return 1;
+}
+
+int legacy_off (pci_dt_t *pci_dev)
+{
+	// Set usb legacy off modification by Signal64
+	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
+	// NOTE2: This should be called after any getc() call. (aka, after the Wait=y keyworkd is used)
+	// AKA: Make this run immediatly before the kernel is calles
+	uint32_t	capaddr, opaddr;  		
+	uint8_t		eecp;			
+	uint32_t	usbcmd, usbsts, usbintr;			
+	uint32_t	usblegsup, usblegctlsts;		
+	
+	int isOSowned;
+	int isBIOSowned;
+	
+	verbose("Setting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
+			pci_dev->vendor_id, pci_dev->device_id,
+			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
+	
+	// capaddr = Capability Registers = dev.addr + offset stored in dev.addr + 0x10 (USBBASE)
+	capaddr = pci_config_read32(pci_dev->dev.addr, 0x10);	
+	
+	// opaddr = Operational Registers = capaddr + offset (8bit CAPLENGTH in Capability Registers + offset 0)
+	opaddr = capaddr + *((unsigned char*)(capaddr)); 		
+	
+	// eecp = EHCI Extended Capabilities offset = capaddr HCCPARAMS bits 15:8
+	eecp=*((unsigned char*)(capaddr + 9));
+	
+	DBG("capaddr=%x opaddr=%x eecp=%x\n", capaddr, opaddr, eecp);
+	
+	usbcmd = *((unsigned int*)(opaddr));			// Command Register
+	usbsts = *((unsigned int*)(opaddr + 4));		// Status Register
+	usbintr = *((unsigned int*)(opaddr + 8));		// Interrupt Enable Register
+	
+	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
+	
+	// read PCI Config 32bit USBLEGSUP (eecp+0) 
+	usblegsup = pci_config_read32(pci_dev->dev.addr, eecp);
+	
+	// informational only
+	isBIOSowned = !!((usblegsup) & (1 << (16)));
+	isOSowned = !!((usblegsup) & (1 << (24)));
+	
+	// read PCI Config 32bit USBLEGCTLSTS (eecp+4) 
+	usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
+	
+	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+	
+	// Reset registers to Legacy OFF
+	DBG("Clearing USBLEGCTLSTS\n");
+	pci_config_write32(pci_dev->dev.addr, eecp + 4, 0);	//usblegctlsts
+	
+	// if delay value is in milliseconds it doesn't appear to work. 
+	// setting value to anything up to 65535 does not add the expected delay here.
+	delay(100);
+	
+	usbcmd = *((unsigned int*)(opaddr));
+	usbsts = *((unsigned int*)(opaddr + 4));
+	usbintr = *((unsigned int*)(opaddr + 8));
+	
+	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
+	
+	DBG("Clearing Registers\n");
+	
+	// clear registers to default
+	usbcmd = (usbcmd & 0xffffff00);
+	*((unsigned int*)(opaddr)) = usbcmd;
+	*((unsigned int*)(opaddr + 8)) = 0;					//usbintr - clear interrupt registers
+	*((unsigned int*)(opaddr + 4)) = 0x1000;			//usbsts - clear status registers 	
+	pci_config_write32(pci_dev->dev.addr, eecp, 1);		//usblegsup
+	
+	// get the results
+	usbcmd = *((unsigned int*)(opaddr));
+	usbsts = *((unsigned int*)(opaddr + 4));
+	usbintr = *((unsigned int*)(opaddr + 8));
+	
+	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
+	
+	// read 32bit USBLEGSUP (eecp+0) 
+	usblegsup = pci_config_read32(pci_dev->dev.addr, eecp);
+	
+	// informational only
+	isBIOSowned = !!((usblegsup) & (1 << (16)));
+	isOSowned = !!((usblegsup) & (1 << (24)));
+	
+	// read 32bit USBLEGCTLSTS (eecp+4) 
+	usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
+	
+	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+	
+	verbose("Legacy USB Off Done\n");	
+	return 1;
+}
+
+
+
 int ehci_acquire (pci_dt_t *pci_dev)
 {
 	int		j, k;

@@ -86,6 +86,7 @@ static unsigned long Adler32(unsigned char *buffer, long length);
 
 static bool gUnloadPXEOnExit = false;
 
+extern int usb_loop();
 /*
  * How long to wait (in seconds) to load the
  * kernel after displaying the "boot:" prompt.
@@ -192,6 +193,7 @@ static int ExecKernel(void *binary)
 	
     finalizeBootStruct();
     
+	usb_loop();
     // Jump to kernel's entry point. There's no going back now.
     startprog( kernelEntry, bootArgs );
 

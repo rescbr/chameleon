@@ -46,9 +46,6 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		//printf("H Active = %d", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
 		//printf("V Active = %d", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
 		
-		
-		
-		
 		free( edidInfo );
 		
 		if(!xResolution) xResolution = DEFAULT_SCREEN_WIDTH;

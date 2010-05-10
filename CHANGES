@@ -1,3 +1,5 @@
+- Added USB Legacy Off patch. Modified to run immediately *before* the kernel is executed, that
+  way no files need to be loaded after the usb device is reset.
 - Backup original dsdt to /dsdt/originaldsdt in the IORegistery
 - Added kernel patcher, removes the CPUID check panic in the kernel. Forces _cpuid_set_info to
   return Penryn / cpuid model 23

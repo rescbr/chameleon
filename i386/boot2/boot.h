@@ -78,8 +78,9 @@
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kUSBBusFix		"USBBusFix"		/* pci_setup.c */
 #define kEHCIacquire		"EHCIacquire"		/* pci_setup.c */
-#define kUHCIreset		"UHCIreset"		/* pci_setup.c */
-#define kForceHPET		"ForceHPET"		/* pci_setup.c */
+#define kUHCIreset		"UHCIreset"		/* usb.c */
+#define kForceHPET		"ForceHPET"		/* usb.c */
+#define kLegacyOff		"USBLegacyOff"	/* usb.c */
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 #define kEHCIhard		"EHCIhard"		/* usb.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
