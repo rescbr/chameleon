@@ -72,7 +72,7 @@ bool gEnableCDROMRescan;
 bool gScanSingleDrive;
 
 int     bvCount = 0;
-//int		menucount = 0;
+//int	menucount = 0;
 int     gDeviceCount = 0; 
 
 BVRef   bvr;
@@ -86,7 +86,6 @@ static unsigned long Adler32(unsigned char *buffer, long length);
 
 static bool gUnloadPXEOnExit = false;
 
-extern int usb_loop();
 /*
  * How long to wait (in seconds) to load the
  * kernel after displaying the "boot:" prompt.
@@ -162,6 +161,8 @@ static int ExecKernel(void *binary)
         sleep(kBootErrorTimeout);
     }
 
+	md0Ramdisk();
+	
     setupFakeEfi();
 
     verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
