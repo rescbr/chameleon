@@ -79,8 +79,8 @@ int usb_loop()
 	while(current)
 	{
 		uhci_reset(current->pciDev);
-		legacy_off(current->pciDev);
 		ehci_acquire(current->pciDev);
+		legacy_off(current->pciDev);
 		
 		current = current->next;
 	}
