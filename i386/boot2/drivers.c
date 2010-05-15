@@ -41,6 +41,8 @@
 #include "kernel_patcher.h"
 
 extern char gMacOSVersion;
+extern int	recoveryMode;
+
 
 struct Module {  
   struct Module *nextModule;
@@ -184,31 +186,54 @@ long LoadDrivers( char * dirSpec )
     else if ( gBootFileType == kBlockDeviceType )
     {
         // First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
-        if (gRAMDiskVolume && !gRAMDiskBTAliased)
-        {
-          strcpy(dirSpecExtra, "rd(0,0)/Extra/");
-          FileLoadDrivers(dirSpecExtra, 0);
-        }
+		if(recoveryMode) 
+		{
+			verbose("Loading recovery extensions\n");
 
-        // Next try to load Extra extensions from the selected root partition.
-        strcpy(dirSpecExtra, "/Extra/");
-        if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-        {
-          // If failed, then try to load Extra extensions from the boot partition
-          // in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-          if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-               || (gRAMDiskVolume && gRAMDiskBTAliased) )
-          {
-			  // First try a specfic OS version folder ie 10.5
-			  sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
-			  if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-			  {	
-				  // Next we'll try the base
-				  strcpy(dirSpecExtra, "bt(0,0)/Extra/");
-				  FileLoadDrivers(dirSpecExtra, 0);
-			  }
-		  }
-        }
+			const char* recoveryFolder;
+			int len;
+			if (getValueForKey(kWakeImage, &recoveryFolder, &len, &bootInfo->bootConfig))
+			{
+				sprintf(dirSpecExtra, "/Extra/%s/", &recoveryFolder);
+				if(FileLoadDrivers(dirSpecExtra, 0) != 0)
+				{
+					verbose("Unable to locate recovery extensions\n");
+				}
+			}
+			else {
+				verbose("Unable to locate recovery extensions\n");
+			}
+
+		}
+		else
+		{
+			if (gRAMDiskVolume && !gRAMDiskBTAliased)
+			{
+				strcpy(dirSpecExtra, "rd(0,0)/Extra/");
+				FileLoadDrivers(dirSpecExtra, 0);
+			}
+			
+			// Next try to load Extra extensions from the selected root partition.
+			strcpy(dirSpecExtra, "/Extra/");
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			{
+				// If failed, then try to load Extra extensions from the boot partition
+				// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
+				if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
+					|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+				{
+					// First try a specfic OS version folder ie 10.5
+					sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					{	
+						// Next we'll try the base
+						strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+						FileLoadDrivers(dirSpecExtra, 0);
+					}
+				}
+			}
+			
+		}
 
         // Also try to load Extensions from boot helper partitions.
         strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");

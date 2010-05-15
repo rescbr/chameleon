@@ -75,6 +75,8 @@ int     bvCount = 0;
 //int	menucount = 0;
 int     gDeviceCount = 0; 
 
+bool	recoveryMode = false;
+
 BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;

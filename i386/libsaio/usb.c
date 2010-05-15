@@ -23,8 +23,6 @@
 #endif
 
 
-#define MAX_USB_DEVS 9
-
 struct pciList
 {
 	pci_dt_t* pciDev;

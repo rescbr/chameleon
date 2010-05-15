@@ -92,6 +92,9 @@
 #define kScreenWidth		"ScreenWidth"		/* edid.h */
 #define kScreenHeight		"ScreenHeight"		/* edid.h */
 
+#define kRecoveryFolder		"RecoveryFolder"	/* drivers.h */
+
+
 /*
  * Flags to the booter or kernel
  */
@@ -137,6 +140,12 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
+
+/*
+ * usb.c
+ */
+extern int usb_loop();
+
 
 /*
  * graphics.c

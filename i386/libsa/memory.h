@@ -84,10 +84,10 @@
 #define VIDEO_ADDR        0x000A0000    // unusable space
 #define VIDEO_LEN         0x00060000
 
-#define KERNEL_ADDR       0x00100000   // 64M kernel + drivers
-#define KERNEL_LEN        0x04000000
+#define KERNEL_ADDR       0x00100000   // 128M kernel + drivers // Was 64
+#define KERNEL_LEN        0x08000000
 
-#define ZALLOC_ADDR       0x04100000   // 256M zalloc area
+#define ZALLOC_ADDR       0x08100000   // 192M zalloc area	// Was 256
 #define ZALLOC_LEN        0x10000000
 
 #define LOAD_ADDR         0x14100000   // 95M File load buffer
