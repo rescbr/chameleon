@@ -64,13 +64,30 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 int usb_loop()
 {
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
-	fix_ehci = fix_uhci = fix_usb = fix_legacy;
-	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig) && fix_usb) {
-		fix_ehci = fix_uhci = fix_legacy = true;
-	} else {
-		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+	fix_ehci = fix_uhci = fix_usb = fix_legacy = true;
+	
+	
+	
+	if (!getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	{
+		fix_ehci = fix_uhci = fix_legacy = true;	// Enable all if none set
+	}
+	else 
+	{
+		if(!getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig))
+		{
+			fix_ehci = false;
+		}
+		
+		if(!getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig))
+		{
+			fix_uhci = false;
+		}
+		
+		if(!getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig))
+		{
+			fix_legacy = false;
+		}
 
 	}
 
@@ -78,12 +95,13 @@ int usb_loop()
 	struct pciList* current = usbList;
 	while(current)
 	{
-		uhci_reset(current->pciDev);
-		ehci_acquire(current->pciDev);
-		legacy_off(current->pciDev);
-		
+		if(fix_uhci) uhci_reset(current->pciDev);
+		if(fix_ehci) ehci_acquire(current->pciDev);
+		//if(fix_legacy) legacy_off(current->pciDev);
+
 		current = current->next;
 	}
+	
 	return 1;
 }
 
@@ -92,7 +110,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	// Set usb legacy off modification by Signal64
 	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
 	// NOTE2: This should be called after any getc() call. (aka, after the Wait=y keyworkd is used)
-	// AKA: Make this run immediatly before the kernel is calles
+	// AKA: Make this run immediatly before the kernel is called
 	uint32_t	capaddr, opaddr;  		
 	uint8_t		eecp;			
 	uint32_t	usbcmd, usbsts, usbintr;			

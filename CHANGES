@@ -1,3 +1,4 @@
+- Fixed lapic_init patch. Fixed _cpuid_set_info patch to work on the 10.6.0 / 10.6.1 kernel (patches cpumodel)
 - Added USB Legacy Off patch. Modified to run immediately *before* the kernel is executed, that
   way no files need to be loaded after the usb device is reset.
 - Backup original dsdt to /dsdt/originaldsdt in the IORegistery
