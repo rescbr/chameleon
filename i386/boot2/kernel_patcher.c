@@ -14,21 +14,25 @@ extern PlatformInfo_t    Platform;
 #define SYMBOL_PANIC						1
 #define SYMBOL_PMCPUEXITHALTTOOFF			2
 #define SYMBOL_LAPIC_INIT					3
-#define NUM_SYMBOLS							4
+#define SYMBOL_COMMPAGE_STUFF_ROUTINE		4
+#define NUM_SYMBOLS							5
 
 #define SYMBOL_CPUID_SET_INFO_STRING		"_cpuid_set_info"
 #define SYMBOL_PANIC_STRING					"_panic"
 #define SYMBOL_PMCPUEXITHALTTOOFF_STRING	"_pmCPUExitHaltToOff"
 #define SYMBOL_LAPIC_INIT_STRING			"_lapic_init"
+#define SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING	"_commpage_stuff_routine"
 
 char* kernelSymbols[NUM_SYMBOLS] = {
 	SYMBOL_CPUID_SET_INFO_STRING,
 	SYMBOL_PANIC_STRING,
 	SYMBOL_PMCPUEXITHALTTOOFF_STRING,
-	SYMBOL_LAPIC_INIT_STRING
+	SYMBOL_LAPIC_INIT_STRING,
+	SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING
 };
 
 UInt32 kernelSymbolAddresses[NUM_SYMBOLS] = {
+	0,
 	0,
 	0,
 	0,
@@ -73,6 +77,9 @@ void patch_kernel_64(void* kernelData)
  **/
 void patch_kernel_32(void* kernelData)
 {
+	// Remove panic in commpage
+	patch_commpage_stuff_routine(kernelData);
+	
 	//patch_pmCPUExitHaltToOff(kernelData);	// Not working as intended, disabled for now
 	
 	//	if(vmware_detected)
@@ -301,13 +308,11 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 		jumpLocation--;
 	}
 	
-	printf("Mode: %d Family %d P - JMP: 0x%X\n", impersonateModel, impersonateFamily, patchLocation - jumpLocation);
 	// If found... AND we want to impersonate a specific cpumodel / family...
 	if(impersonateFamily &&
 	   impersonateModel  &&
 	   ((patchLocation - jumpLocation) < 0xF0))
 	{
-		printf("Patching CPUID to %d.%d\n", impersonateFamily, impersonateModel);
 		
 		bytes[jumpLocation] -= 10;		// sizeof(movl	$0x6b5a4cd2,0x00872eb4) = 10bytes
 		
@@ -491,6 +496,49 @@ void patch_lapic_init(void* kernelData)
 	bytes[++patchLocation] = 0x90;
 	bytes[++patchLocation] = 0x90;
 	bytes[++patchLocation] = 0x90;
+	
+	
+}
+
+
+void patch_commpage_stuff_routine(void* kernelData)
+{
+	UInt8* bytes = (UInt8*)kernelData;
+	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] - textAddress + textSection);
+	UInt32 panicAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	
+	if(kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] == 0)
+	{
+		printf("Unable to locate %s\n", SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING);
+		return;
+		
+	}
+	if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	{
+		printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
+		return;
+	}
+	
+	
+	while(  
+		  (bytes[patchLocation -1] != 0xE8) ||
+		  ( ( (UInt32)(panicAddr - patchLocation  - 4) + textSection ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
+																					bytes[patchLocation + 1] << 8  | 
+																					bytes[patchLocation + 2] << 16 |
+																					bytes[patchLocation + 3] << 24)))
+		  )
+	{
+		patchLocation++;
+	}
+	patchLocation--;
+	
+	
+	// Remove panic call, just in case the following patch routines fail
+	bytes[patchLocation + 0] = 0x90;
+	bytes[patchLocation + 1] = 0x90;
+	bytes[patchLocation + 2] = 0x90;
+	bytes[patchLocation + 3] = 0x90;
+	bytes[patchLocation + 4] = 0x90;
 	
 	
 }
