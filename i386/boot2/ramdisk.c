@@ -16,6 +16,67 @@ BVRef gRAMDiskVolume = NULL;
 bool gRAMDiskBTAliased = false;
 char gRAMDiskFile[512];
 
+
+// Notify OS X that a ramdisk has been loaded. XNU will attach this to /dev/md0
+void md0Ramdisk()
+{
+	RAMDiskParam ramdiskPtr;
+	char* filename = 0;
+	int fh = 0;
+	
+	// Look for ramdisk at Postboot.img
+	filename = "bt(0,0)/Postboot.img";
+	if((fh = open(filename, 0)) == -1)
+	{
+		filename = "/Postboot.img";	// Check rd(0,0) if not in bt(0,0)
+		fh = open(filename, 0);
+
+	}
+	
+	
+	if (fh != -1)
+	{
+		verbose("Loading ramdisk %s\n", filename);
+
+		ramdiskPtr.size  = file_size(fh);
+		ramdiskPtr.base = AllocateKernelMemory(ramdiskPtr.size);
+		
+		if(ramdiskPtr.size && ramdiskPtr.base)
+		{
+			// Read new ramdisk image contents in kernel memory.
+			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
+			{
+				AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);
+				Node* node = DT__FindNode("/chosen/memory-map", false);
+				if(node != NULL)
+				{
+					DT__AddProperty(node, "RAMDisk", sizeof(RAMDiskParam),  (void*)&ramdiskPtr);		
+					
+				}
+				else
+				{
+					verbose("Unable to notify Mac OS X of the ramdisk %s.\n", filename);
+				}
+				
+			}
+			else {
+				verbose("Unable to read ramdisk %s\n", filename);
+			}
+			
+		} else {
+			verbose("Ramdisk %s is empty.\n", filename);
+		}
+		
+		
+		close(fh);
+		
+	}
+	else {
+		verbose("Unable to open %s\n", filename);
+	}
+}
+
+
 void umountRAMDisk()
 {
   if (gRAMDiskMI != NULL)

@@ -724,32 +724,84 @@ int getBootOptions(bool firstRun)
 		gBootMode |= kBootModeSafe;
 	}
 
-	// If user typed F8, abort quiet mode, and display the menu.
+#define QUICK_KEYS_ENABLED 1
+#if QUICK_KEYS_ENABLED
 	{
-		bool f8press = false, spress = false, vpress = false;
+	/*	 18seven's Quick-args macro	 */
+		bool f8 = false, altf = false, shiftf = false, alts = false, 
+		altv = false, x32 = false,  x64 = false, altx = false;
 		int key;
 		while (readKeyboardStatus()) {
 			key = bgetc ();
-			if (key == 0x4200) f8press = true;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
+			if (key == 0x4200) f8 = true;
+			if (key == 0x2100) altf = true;
+			if (key == 0x2146) shiftf = true;
+			if (key == 0x1F00) alts = true;
+			if (key == 0x2F00) altv = true;
+			if (key == 0x2D00) altx = true;
+			if (key == 0x0403) x32 = true;	
+			if (key == 0x0705) x64 = true;			
 		}
-		if (f8press) {
+		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
 			timeout = 0;
 		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+		if ((altf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
+			*(gBootArgsPtr++) = 'f';
+		}		
+		if ((shiftf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'F';
 		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+		if ((alts) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
 			*(gBootArgsPtr++) = 's';
 		}	
+		if ((altv) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'v';			
 	}
-	clearBootArgs();
+		if ((altx) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+		}
+		if ((x32) && (gBootArgsPtr + 5 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '3';
+			*(gBootArgsPtr++) = '2';
+		}
+		
+		if ((x64) && (gBootArgsPtr + 5 < gBootArgsEnd)) {
+			*(gBootArgsPtr++) = ' ';
+			*(gBootArgsPtr++) = '-';
+			*(gBootArgsPtr++) = 'x';
+			*(gBootArgsPtr++) = '6';
+			*(gBootArgsPtr++) = '4';
+		}
+	}
+
+#else
+	{
+		bool f8 = false;
+		int key;
+		while (readKeyboardStatus()) {
+			key = bgetc ();
+			if (key == 0x4200) f8 = true;		
+		}
+		if (f8) {
+			gBootMode &= ~kBootModeQuiet;
+			timeout = 0;
+		}		
+	}
+#endif
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);

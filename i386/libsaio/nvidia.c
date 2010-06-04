@@ -267,6 +267,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05E2, "GeForce GTX 260" },
 	{ 0x10DE05E3, "GeForce GTX 285" },
 	{ 0x10DE05E6, "GeForce GTX 275" },
+	{ 0x10DE05EA, "GeForce GTX 260" },
 	{ 0x10DE05EB, "GeForce GTX 295" },
 	{ 0x10DE05F9, "Quadro CX" },
 	{ 0x10DE05FD, "Quadro FX 5800" },
