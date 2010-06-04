@@ -17,6 +17,17 @@ Example arguments include
  flags: -v (verbose)    -s (single user mode), 
         -x (safe mode)  -F (ignore boot configuration file)
 
+ keystrokes :
+  F8                      Abort quiet mode, and display the menu.
+  alt+f                   Old safe mode
+  shift+f                 Ignore boot configuration file
+  alt+s                   Single user mode 
+  alt+v                   Verbose
+  alt+x                   Safe mode
+  alt+l                   Legacy mode (not sure why you need this)
+  6+4                     64-bit
+  3+2                     32-bit
+
  "Graphics Mode"="WIDTHxHEIGHTxDEPTH" (e.g. "1024x768x32")
 
  kernel flags                       (e.g. debug=0x144)
