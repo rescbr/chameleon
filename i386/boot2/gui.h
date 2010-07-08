@@ -134,7 +134,9 @@ font_t font_console;
 int  initGUI();
 void drawBackground();
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p);
+//blackosx - added extra value to be passed, 'rollover' as boolean. Usage: false = normal image / true = rollover image
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool rollover); 
+
 void drawDeviceList(int start, int end, int selection);
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
 

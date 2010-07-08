@@ -15,6 +15,8 @@
 #define THEME_NAME_DEFAULT	"Default"
 static const char *theme_name = THEME_NAME_DEFAULT;	
 
+static bool rolloverfail = false; // blackosx added to this as a flag to be raised if one or more rollover images are missing in the theme folder.
+
 #ifdef EMBED_THEME
 #include "art.h"
 #define LOADPNG(img) \
@@ -40,17 +42,25 @@ extern int gDeviceCount;
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
  */
+//blackosx - added extra variables to match rollover device images (with _o).
 enum {
 	iBackground = 0,
 	iLogo,
 
 	iDeviceGeneric,
+	iDeviceGeneric_o,
 	iDeviceHFS,
+	iDeviceHFS_o,
 	iDeviceEXT3,
+	iDeviceEXT3_o,
 	iDeviceFAT16,
+	iDeviceFAT16_o,
 	iDeviceFAT32,
+	iDeviceFAT32_o,
 	iDeviceNTFS,
+	iDeviceNTFS_o,
 	iDeviceCDROM,
+	iDeviceCDROM_o,
 	iSelection,
 	iDeviceScrollPrev,
 	iDeviceScrollNext,
@@ -77,17 +87,25 @@ enum {
 	iFontSmall,
 };
 
+//blackosx - added extra rollover device image (with _o) to images array after each normal device image.
 image_t images[] = {
 	{.name = "background",				.image = NULL},
 	{.name = "logo",				.image = NULL},
 
 	{.name = "device_generic",			.image = NULL},
+	{.name = "device_generic_o",			.image = NULL},
 	{.name = "device_hfsplus",			.image = NULL},
+	{.name = "device_hfsplus_o",			.image = NULL},
 	{.name = "device_ext3",				.image = NULL},
+	{.name = "device_ext3_o",			.image = NULL},
 	{.name = "device_fat16",			.image = NULL},
+	{.name = "device_fat16_o",			.image = NULL},
 	{.name = "device_fat32",			.image = NULL},
+	{.name = "device_fat32_o",			.image = NULL},
 	{.name = "device_ntfs",				.image = NULL},
+	{.name = "device_ntfs_o",			.image = NULL},
 	{.name = "device_cdrom",			.image = NULL},
+	{.name = "device_cdrom_o",			.image = NULL},
 	{.name = "device_selection",			.image = NULL},
 	{.name = "device_scroll_prev",			.image = NULL},
 	{.name = "device_scroll_next",			.image = NULL},
@@ -185,6 +203,7 @@ static int loadThemeImage(const char *image)
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
+	char		*cptr; // blackosx added
 
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
@@ -198,36 +217,54 @@ static int loadThemeImage(const char *image)
 			width = 0;
 			height = 0;
 			imagedata = NULL;
-			if ((loadPngImage(dirspec, &width, &height, &imagedata)) != 0) {
-#ifndef EMBED_THEME
-        printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
-        sleep(2);
-#endif
-				return 1;
-			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
+			if ((loadPngImage(dirspec, &width, &height, &imagedata)) == 0) { // blackosx - if loaded, carry on.
+				images[i].image->width = width;
+				images[i].image->height = height;
+				images[i].image->pixels = (pixel_t *)imagedata;
+				flipRB(images[i].image);
+				return 0;
+			} 
+			else // blackosx - graphic failed to load
+			{
+				cptr = (strstr(image,"_o")); // see if the image name that's missing contains '_o'.
+				if (cptr == NULL) { // We have no match for '_o' in image name, which means it's a normal theme graphic missing.
+     				 	printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
+       					sleep(2);
+					return 1; // This means we have to drop out of using the GUI.
+				}
+				else { // We have a match for '_o' in image name,  which means a rollover graphic is missing.
+        				//printf("ERROR: GUI: ROLLOVER: could not open '%s/%s.png'!\n", theme_name, image);
+					//sleep(2);
+					rolloverfail=true; 
+					return 0;
+				}
+			}			
 		}
 	}
 	return 1;
 }
 
 
+// blackosx added extra rollover devices.
 static int loadGraphics(void)
 {
 	LOADPNG(background);
 	LOADPNG(logo);
 
 	LOADPNG(device_generic);
+	LOADPNG(device_generic_o);
 	LOADPNG(device_hfsplus);
+	LOADPNG(device_hfsplus_o);
 	LOADPNG(device_ext3);
+	LOADPNG(device_ext3_o);
 	LOADPNG(device_fat16);
+	LOADPNG(device_fat16_o);
 	LOADPNG(device_fat32);
+	LOADPNG(device_fat32_o);
 	LOADPNG(device_ntfs);
+	LOADPNG(device_ntfs_o);
 	LOADPNG(device_cdrom);
+	LOADPNG(device_cdrom_o);
 	LOADPNG(device_selection);
 	LOADPNG(device_scroll_prev);
 	LOADPNG(device_scroll_next);
@@ -625,7 +662,7 @@ int initGUI(void)
 	return 1;
 }
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool rollover) //blackosx - accept extra BOOLEAN variable 'rollover' to check for rollover image
 {
 	int devicetype;
 	
@@ -663,6 +700,10 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
 				break;
 		}
 	}
+	//blackosx - check BOOLEAN 'rollover' variable to see if rollover image is required,
+	//blackosx - and if it is, then make devicetype point to next image in device list.
+	if (rollover)
+		devicetype++;
 	
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
@@ -732,6 +773,8 @@ void drawDeviceList (int start, int end, int selection)
 				drawInfoMenuItems();
 			 
 			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
+			if (rolloverfail == false)  // blackosx - if ALL the rollover graphics are in the theme folder 
+				drawDeviceIcon( param, gui.devicelist.pixmap, p, true ); //blackosx - then draw the rollover image.
 			
 #if DEBUG
 			gui.debug.cursor = pos( 10, 100);
@@ -751,7 +794,7 @@ void drawDeviceList (int start, int end, int selection)
 #endif
 		}
 		
-		drawDeviceIcon( param, gui.devicelist.pixmap, p );
+		drawDeviceIcon( param, gui.devicelist.pixmap, p, false ); //blackosx - added false to draw normal icon if it's not selected.
 		
 		if (gui.layout == HorizontalLayout)
 		{
