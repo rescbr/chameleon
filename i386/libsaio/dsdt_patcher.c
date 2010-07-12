@@ -109,7 +109,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	if (fd>=0) goto success_fd;
 	
 	// NOT FOUND:
-	verbose("ACPI Table not found: %s\n", filename);
+	//verbose("ACPI Table not found: %s\n", filename);
 	if (outDirspec) *outDirspec = "";
 	return -1;
 	// FOUND
@@ -220,7 +220,7 @@ void *loadSSDTTable(int ssdt_number)
 			fd=open (dirspec,0);
 			if (fd<0)
 			{
-				verbose("SSDT Table not found: %s\n", filename);
+				//verbose("SSDT Table not found: %s\n", filename);
 				return NULL;
 			}
 		}
@@ -358,7 +358,7 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt, bool UpdateFADT)
 	  else
 	    Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 	}
-	// Set Preferred_PM_Profile from System-type if only if user wanted this value to be forced
+	// Set Preferred_PM_Profile from System-type only if user wanted this value to be forced
 	if (fadt_mod->Preferred_PM_Profile != Platform.Type) 
 	{
 	    if (value) 
@@ -384,6 +384,9 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt, bool UpdateFADT)
 		verbose("FADT: Restart Fix applied !\n");
 	}
 
+	if (new_dsdt)
+	{
+
 	// Patch FACS Address
 	fadt_mod->FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
 	if ((uint32_t)(&(fadt_mod->X_FIRMWARE_CTRL))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
@@ -397,6 +400,8 @@ patch_fadt(struct acpi_2_fadt *fadt, void *new_dsdt, bool UpdateFADT)
 		fadt_mod->X_DSDT=(uint32_t)new_dsdt;
 
 	DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
+		verbose("FADT: Custom DSDT used !\n");
+	}
 
 	// Correct the checksum
 	fadt_mod->Checksum=0;
@@ -491,10 +496,10 @@ int setupAcpi(void)
 		}
 		curssdt=0;
 	}
-
+/*
 	if (!new_dsdt)
 		return setupAcpiNoMod();
-
+*/
 	DBG("New ACPI tables Loaded in memory\n");
 			
 	// Do the same procedure for both versions of ACPI

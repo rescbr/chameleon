@@ -33,6 +33,16 @@
 #include <stdbool.h>
 
 /*
+ * cpu.c
+ */
+/*#define rdmsr46(msr, val1, val2)					\
+do {								\
+	uint64_t val = rdmsr64((msr));			\
+	(val1) = (uint32_t)val;					\
+	(val2) = (uint32_t)(val >> 32);				\
+} while (0)*/
+
+/*
  * ctype stuff (aserebln)
  */
 static inline int isupper(char c)
@@ -116,6 +126,11 @@ extern char * strerror(int errnum);
 extern long strtol(const char * nptr, char ** endptr, int base);
 extern unsigned long strtoul(const char * nptr, char ** endptr, int base);
 extern unsigned long long strtouq(const char *nptr, char ** endptr, int base);
+
+/*
+ * strtod.c
+ */
+extern double strtod(const char *string, char ** endPtr);
 
 /*
  * prf.c

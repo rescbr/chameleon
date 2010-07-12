@@ -260,9 +260,6 @@ void common_boot(int biosdev)
     printf("after video_mode\n");
 #endif
 
-    // Scan and record the system's hardware information.
-    scan_platform();
-
     // First get info for boot volume.
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
@@ -270,6 +267,9 @@ void common_boot(int biosdev)
     
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
+
+    // Scan and record the system's hardware information.
+    scan_platform();
 
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;

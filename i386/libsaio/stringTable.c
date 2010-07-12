@@ -397,6 +397,40 @@ bool getIntForKey( const char *key, int *value, config_file_t *config )
 }
 
 /*
+// valv: getFloatForKey Begin
+bool getFloatForKey( const char *key, float *value, config_file_t *config )
+{
+    const char *val;
+    int size;
+    float sum;
+    
+    if (getValueForKey(key, &val, &size, config))
+	{
+		if ( size )
+		{
+			if (*val == '-')
+			{
+				return false;
+			}
+			
+			for (sum = 0; size > 0; size--)
+			{
+				if (*val < '2.5' || *val > '19.5')
+					return false;
+				
+				sum = strtof(*val++ - '0');
+			}
+			
+			*value = sum;
+			return true;
+		}
+	}
+    return false;
+}
+// valv: getFloatForKey End
+*/
+
+/*
  *
  */
 
@@ -607,8 +641,8 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
 		"bt(0,0)/Extra/com.apple.Boot.plist",
+		"/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",

@@ -58,7 +58,7 @@
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
 #define kWaitForKeypressKey	"Wait"
-/* AsereBLN: added the other keys */
+/* AsereBLN: added these keys */
 #define kUseAtiROM		"UseAtiROM"		/* ati.c */
 #define kWake			"Wake"			/* boot.c */
 #define kForceWake		"ForceWake"		/* boot.c */
@@ -114,7 +114,9 @@
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kUseMemDetect		"UseMemDetect"		/* platform.c */
-#define kRestartFix		"RestartFix"		/* dsdt_patcher.c */
+/* valv: added those keys */
+#define kFixFSB		"FixFSB"		/* cpu.c */
+#define kbusratio		"busratio"		/* cpu.c */
 
 /*
  * Flags to the booter or kernel

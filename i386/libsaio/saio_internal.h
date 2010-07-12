@@ -153,6 +153,7 @@ extern bool   getValueForBootKey(const char *line, const char *match, const char
 extern bool   getValueForKey(const char *key, const char **val, int *size, config_file_t *configBuff);
 extern const char * getStringForKey(const char * key,  config_file_t *config);
 extern bool   getBoolForKey(const char *key, bool *val, config_file_t *configBuff);
+/*extern bool   getFloatForKey(const char *key, float *val, config_file_t *configBuff);*/
 extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff);
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );

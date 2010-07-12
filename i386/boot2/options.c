@@ -739,8 +739,8 @@ int getBootOptions(bool firstRun)
 			if (key == 0x1F00) alts = true;
 			if (key == 0x2F00) altv = true;
 			if (key == 0x2D00) altx = true;
-			if (key == 0x0403) x32 = true;	
-			if (key == 0x0705) x64 = true;			
+			if (key == 0x0403) x32 = true;
+			if (key == 0x0705) x64 = true;
 		}
 		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
@@ -750,7 +750,7 @@ int getBootOptions(bool firstRun)
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
 			*(gBootArgsPtr++) = 'f';
-		}		
+		}
 		if ((shiftf) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
@@ -760,12 +760,12 @@ int getBootOptions(bool firstRun)
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
 			*(gBootArgsPtr++) = 's';
-		}	
+		}
 		if ((altv) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';			
-	}
+			*(gBootArgsPtr++) = 'v';
+		}
 		if ((altx) && (gBootArgsPtr + 3 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
@@ -778,7 +778,6 @@ int getBootOptions(bool firstRun)
 			*(gBootArgsPtr++) = '3';
 			*(gBootArgsPtr++) = '2';
 		}
-		
 		if ((x64) && (gBootArgsPtr + 5 < gBootArgsEnd)) {
 			*(gBootArgsPtr++) = ' ';
 			*(gBootArgsPtr++) = '-';
@@ -794,12 +793,12 @@ int getBootOptions(bool firstRun)
 		int key;
 		while (readKeyboardStatus()) {
 			key = bgetc ();
-			if (key == 0x4200) f8 = true;		
+			if (key == 0x4200) f8 = true;
 		}
 		if (f8) {
 			gBootMode &= ~kBootModeQuiet;
 			timeout = 0;
-		}		
+		}
 	}
 #endif
 
@@ -815,7 +814,7 @@ int getBootOptions(bool firstRun)
 		verbose("Scanning device %x...", gBIOSDev);
 	}
 
-	// When booting from CD, default to hard drive boot when possible. 
+	// When booting from CD, default to hard drive boot when possible.
 	if (isCDROM && firstRun) {
 		const char *val;
 		char *prompt;

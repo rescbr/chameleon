@@ -6,6 +6,8 @@
 #include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
+#include "boot.h"
+#include "bootstruct.h"
 
 #ifndef DEBUG_CPU
 #define DEBUG_CPU 0
@@ -51,6 +53,13 @@ static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *da
 	  "=d" (data[3])
 	  : "a" (selector), "c" (selector2));
 }
+
+/*static inline unsigned long long rdmsr46(unsigned int msr, unsigned low, unsigned high)
+{
+	//unsigned low, high;
+	asm volatile("rdmsr" : "=a" (low), "=d" (high));
+	return ((low) | ((uint64_t)(high) << 32));
+}*/
 
 // DFE: enable_PIT2 and disable_PIT2 come from older xnu
 
@@ -190,9 +199,13 @@ static uint64_t measure_tsc_frequency(void)
 
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
+	uint64_t	tscFrequency, fsbFrequency, cpuFrequency, minfsb, maxfsb;
 	uint64_t	msr, flex_ratio;
+	int			bus_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, currdiv;
+	bool		fix_fsb;
+//	const uint32_t fsb_cloud[] = {266666667, 133333333, 200000000, 166666667, 333333333, 100000000, 400000000, 0};
+//	uint32_t	lo, hi;
 
 	maxcoef = maxdiv = currcoef = currdiv = 0;
 
@@ -257,62 +270,234 @@ void scan_cpu(PlatformInfo_t *p)
 	tscFrequency = measure_tsc_frequency();
 	fsbFrequency = 0;
 	cpuFrequency = 0;
+	minfsb = 183000000;
+	maxfsb = 185000000;
+	fix_fsb = false;
 
 	if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
-			/* Nehalem CPU model */
-			if (p->CPU.Family == 0x06 && (p->CPU.Model == 0x1a || p->CPU.Model == 0x1e)) {
-				msr = rdmsr64(MSR_PLATFORM_INFO);
-				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
-				currcoef = (msr >> 8) & 0xff;
-				msr = rdmsr64(MSR_FLEX_RATIO);
-				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
-				if ((msr >> 16) & 0x01) {
-					flex_ratio = (msr >> 8) & 0xff;
-					if (currcoef > flex_ratio) {
-						currcoef = flex_ratio;
-					}
-				}
+			if (p->CPU.Family == 0x06) {
+/* TODO: Split detection algo into sections, maybe relying on ExtModel, like this:
+				if (p->CPU.ExtModel == 0x1) {
+				} else if (p->CPU.ExtModel == 0x2) {
+				}*/
+				int intelCPU = p->CPU.Model;
+				int bus;
 
-				if (currcoef) {
-					fsbFrequency = (tscFrequency / currcoef);
+				switch (intelCPU) {
+					case 0x1a:		// Core i7 LGA1366, Xeon 550, 45nm
+// TODO: 0x1e needs to be split to avoid 860 & 875k collision.
+					case 0x1e:		// Core i7, i5 LGA1156, "Lynnfield", "Jasper", 45nm
+					case 0x1f:		// Core i7, i5, Nehalem
+					case 0x25:		// Core i7, i5, i3 LGA1156, "Westmere", 32nm
+					case 0x2c:		// Core i7 LGA1366, Six-core, "Westmere", 32nm
+					case 0x2e:		// Core i7, Nehalem-Ex, Xeon
+					case 0x2f:
+						msr = rdmsr64(MSR_PLATFORM_INFO);
+						currcoef = (msr >> 8) & 0xff;
+						msr = rdmsr64(MSR_FLEX_RATIO);
+						if ((msr >> 16) & 0x01) {
+							flex_ratio = (msr >> 8) & 0xff;
+							if (currcoef > flex_ratio) {
+								currcoef = flex_ratio;
+							}
+						}
+						if (currcoef) {
+							fsbFrequency = (tscFrequency / currcoef);
+						}
+						cpuFrequency = tscFrequency;
+						break;
+					case 0xe:		// Core Duo/Solo, Pentium M DC
+					case 0xf:		// Core Xeon, Core 2 DC, 65nm
+					case 0x16:		// Celeron, Core 2 SC, 65nm
+					case 0x17:		// Core 2 Duo/Extreme, Xeon, 45nm
+					case 0x1c:		// Atom :)
+					case 0x27:		// Atom Lincroft, 45nm
+								getBoolForKey(kFixFSB, &fix_fsb, &bootInfo->bootConfig);
+								if (fix_fsb) {
+									msr = rdmsr64(MSR_FSB_FREQ);
+									bus = (msr >> 0) & 0x7;
+									switch (bus) {
+										case 0:
+											fsbFrequency = 266666667;
+											break;
+										case 1:
+											fsbFrequency = 133333333;
+											break;
+										case 2:
+											fsbFrequency = 200000000;
+											break;
+										case 3:
+											fsbFrequency = 166666667;
+											break;
+										case 4:
+											fsbFrequency = 333333333;
+											break;
+										case 5:
+											fsbFrequency = 100000000;
+											break;
+										case 6:
+											fsbFrequency = 400000000;
+											break;
+										default:
+											fsbFrequency = 200000000;
+											DBG("Defaulting the FSB frequency to 200Mhz \n");
+											break;
+									}
+									verbose("CPU: FSB Fix applied !\n");
+									if (!getIntForKey(kbusratio, &bus_ratio, &bootInfo->bootConfig)) {
+										verbose("CPU: using oldschool cpu freq detection !\n");
+										goto oldschool;
+									} else
+										cpuFrequency = (fsbFrequency * (bus_ratio / 10));
+										
+									if (((fsbFrequency) > (minfsb) && (fsbFrequency) < (maxfsb)) || (!fsbFrequency)) {
+											fsbFrequency = 200000000;
+									}
+								} else {
+									verbose("CPU: No FSB Fix applied ! fall back to oldschool \n");
+									goto oldschool;
+								}
+/*								msr = rdmsr64(IA32_PERF_STATUS);
+								currdiv = (msr >> 14) & 0x01;
+								maxdiv = (msr >> 46) & 0x01;
+								lo = (uint32_t)rdmsr64(IA32_PERF_STATUS);
+								hi = (uint32_t)(rdmsr64(IA32_PERF_STATUS) >> 32);
+								if (lo >> 31) {
+									currcoef = (hi >> 8) & 0x1f;
+								} else {
+									lo = (uint32_t)rdmsr64(MSR_IA32_PLATFORM_ID);
+									currcoef = (lo >> 8) & 0x1f;
+								}
+								if (maxdiv) {
+									cpuFrequency = (fsbFrequency * (currcoef + 1));
+								} else {
+									cpuFrequency = (fsbFrequency * currcoef);
+								}
+								if (currdiv) {
+									cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+								} else {
+									cpuFrequency = (fsbFrequency * currcoef);
+								}*/
+								//cpuFrequency = tscFrequency;
+								break;
+/*					case 0x17:		// Core 2 Duo/Extreme, Xeon, 45nm
+						lo = (uint32_t)rdmsr64(IA32_PERF_STATUS);
+						hi = (uint32_t)(rdmsr64(IA32_PERF_STATUS) >> 32);
+						//rdmsr46(IA32_PERF_STATUS, lo, hi);
+						if (lo >> 31) {
+							currcoef = (hi >> 8) & 0x1f;
+						} else {
+							lo = (uint32_t)rdmsr64(MSR_IA32_PLATFORM_ID);
+						//	hi = (uint32_t)(rdmsr64(MSR_IA32_PLATFORM_ID) >> 32);
+						//	rdmsr46(MSR_IA32_PLATFORM_ID, lo, hi);
+							currcoef = (lo >> 8) & 0x1f;
+						}
+						fsbFrequency = ((fsb_cloud[lo & 0x7]) * 2);
+						//cpuFrequency = (fsbFrequency * currcoef);
+						if (!fsbFrequency) {
+							fsbFrequency = (DEFAULT_FSB * 2000);
+							DBG("0 ! Defaulting the FSB frequency to 200Mhz !\n");
+						}*/
+					case 0x1d:		// Xeon MP MP 7400
+					default:
+						goto oldschool;
+						break;
 				}
-				cpuFrequency = tscFrequency;
 			} else {
-				msr = rdmsr64(IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
-				currcoef = (msr >> 8) & 0x1f;
-				/* Non-integer bus ratio for the max-multi*/
-				maxdiv = (msr >> 46) & 0x01;
-				/* Non-integer bus ratio for the current-multi (undocumented)*/
-				currdiv = (msr >> 14) & 0x01;
+oldschool:
+					msr = rdmsr64(IA32_PERF_STATUS);
+					DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
+					currcoef = (msr >> 8) & 0x1f;
+					/* Non-integer bus ratio for the max-multi*/
+					maxdiv = (msr >> 46) & 0x01;
+					/* Non-integer bus ratio for the current-multi (undocumented)*/
+					currdiv = (msr >> 14) & 0x01;
 
-				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f)) // This will always be model >= 3
-				{
-					/* On these models, maxcoef defines TSC freq */
-					maxcoef = (msr >> 40) & 0x1f;
-				} else {
-					/* On lower models, currcoef defines TSC freq */
-					/* XXX */
-					maxcoef = currcoef;
-				}
+					if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f)) // This will always be model >= 3
+					{
+						/* On these models, maxcoef defines TSC freq */
+						maxcoef = (msr >> 40) & 0x1f;
+					} else {
+						/* On lower models, currcoef defines TSC freq */
+						/* XXX */
+						maxcoef = currcoef;
+					}
 
-				if (maxcoef) {
-					if (maxdiv) {
-						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-					} else {
-						fsbFrequency = (tscFrequency / maxcoef);
+					if (maxcoef) {
+						if (!fix_fsb) {
+							if (maxdiv) {
+								fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+							} else {
+								fsbFrequency = (tscFrequency / maxcoef);
+							}
+						}
+						if (currdiv) {
+							cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+						} else {
+							cpuFrequency = (fsbFrequency * currcoef);
+						}
+						DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 					}
-					if (currdiv) {
-						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-					} else {
-						cpuFrequency = (fsbFrequency * currcoef);
+					/*if (p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e)
+					{
+						maxcoef = (msr >> 40) & 0x1f;
+						if (maxcoef) {
+							if (maxdiv) {
+								fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+							} else {
+								fsbFrequency = (tscFrequency / maxcoef);
+							}
+							if (currdiv) {
+								cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+							} else {
+								cpuFrequency = (fsbFrequency * currcoef);
+							}
+						}
+						if (((fsbFrequency) > (minfsb) && (fsbFrequency) < (maxfsb)) || (!fsbFrequency)) {
+							fsbFrequency = 200000000;
+							DBG("Defaulting FSB frequency to 200Mhz !\n");
+						}
 					}
-					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
+					if (p->CPU.Family == 0x0f) {
+						msr = rdmsr64(0x0000002C); // Xeon related register.
+						int bus;
+						bus = (msr >> 16) & 0x7;
+						switch (bus) {
+							case 0:
+								if (p->CPU.Model == 2) {
+									fsbFrequency = 100000000;
+								} else {
+									fsbFrequency = 266666667;
+								}
+								break;
+							case 1:
+								fsbFrequency = 133333333;
+								break;
+							case 2:
+								fsbFrequency = 200000000;
+								break;
+							case 3:
+								fsbFrequency = 166666667;
+								break;
+							case 4:
+								fsbFrequency = 333333333;
+								break;
+							default:
+								break;
+						}
+					} else {
+						fsbFrequency = 100000000;
+						DBG("Defaulting FSB frequency to 100Mhz !\n");
+					}*/
+					if (((fsbFrequency) > (minfsb) && (fsbFrequency) < (maxfsb)) || (!fsbFrequency)) {
+						fsbFrequency = 200000000;
+						DBG("Defaulting FSB frequency to 200Mhz !\n");
+					}
 				}
 			}
-		}
-		/* Mobile CPU ? */
+
+		// Mobile CPU ?
 		if (rdmsr64(0x17) & (1<<28)) {
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}

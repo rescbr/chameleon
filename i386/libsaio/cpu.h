@@ -7,18 +7,19 @@
 #define __LIBSAIO_CPU_H
 
 #include "libsaio.h"
-
 extern void scan_cpu(PlatformInfo_t *);
 
 #define bit(n)			(1UL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
-#define	IA32_PERF_STATUS	0x198
-#define MSR_FLEX_RATIO		0x194
-#define	MSR_PLATFORM_INFO	0xCE
-#define K8_FIDVID_STATUS	0xC0010042
-#define K10_COFVID_STATUS	0xC0010071
+#define MSR_FSB_FREQ			0x000000cd
+#define MSR_IA32_PLATFORM_ID	0x00000017
+#define	IA32_PERF_STATUS		0x198
+#define MSR_FLEX_RATIO			0x194
+#define	MSR_PLATFORM_INFO		0xCE
+#define K8_FIDVID_STATUS		0xC0010042
+#define K10_COFVID_STATUS		0xC0010071
 
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 

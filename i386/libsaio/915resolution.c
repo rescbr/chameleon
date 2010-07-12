@@ -210,11 +210,10 @@ vbios_map * open_vbios(chipset_type forced_chipset) {
 		 */
 	
 	if (map->chipset == CT_UNKWN) {
-		/*
-		printf("Unknown chipset type and unrecognized bios.\n");
+/*		printf("Unknown chipset type and unrecognized bios.\n");
 		        
 		printf("915resolution only works with Intel 800/900 series graphic chipsets.\n");
-		*/
+*/
 		printf("Chipset Id: %x\n", map->chipset_id);
 		close_vbios(map);
 		return 0;
