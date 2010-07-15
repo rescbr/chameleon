@@ -1,3 +1,7 @@
+- Revised the rollover theme functionality as it was drawing both the normal device image as well as the rollover image.
+- Added Conti's fix for overcoming a potential fail with deadbeef error due to a non standard specified resolution, or in my case of testing - on an empty value for the screen_width / screen_height in a theme.plist.
+- Added rollover theme functionality while retaining compatibility with existing themes. Note: Compiling with an embedded theme currently fails as I haven't added _o.pngs in to artwork folder. But then if I do, the filesize will exceed the limit. 
+
 - Implemented SPD memory automatic detection and injection,seems to work really great ...
 - Factorized code to prepare a dynamic memory detection algorithm ...
 - Optimized smbios table address search
