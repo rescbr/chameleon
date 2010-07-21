@@ -35,16 +35,20 @@ int legacy_off (pci_dt_t *pci_dev);
 int ehci_acquire (pci_dt_t *pci_dev);
 int uhci_reset (pci_dt_t *pci_dev);
 
+// Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
+	
 	struct pciList* current = usbList;
 	if(!usbList)
 	{
 		usbList = (struct pciList*)malloc(sizeof(struct pciList));
 		usbList->next = NULL;
 		usbList->pciDev = pci_dev;
+		
 	}
-	else {
+	else
+	{
 		while(current != NULL && current->next != NULL)
 		{
 			current = current->next;
@@ -55,54 +59,51 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 		current->pciDev = pci_dev;
 		current->next = NULL;
 	}
-
-	
-	
-	
 }
 
+// Loop through the list and call the apropriate patch function
 int usb_loop()
 {
+	int retVal = 1;
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
 	fix_ehci = fix_uhci = fix_usb = fix_legacy = true;
 	
 	
 	
-	if (!getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
 	{
-		fix_ehci = fix_uhci = fix_legacy = true;	// Enable all if none set
+		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Enable all if none set
 	}
 	else 
 	{
-		if(!getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig))
-		{
-			fix_ehci = false;
-		}
-		
-		if(!getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig))
-		{
-			fix_uhci = false;
-		}
-		
-		if(!getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig))
-		{
-			fix_legacy = false;
-		}
-
+		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
+		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
+		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
 	}
-
+	
 	
 	struct pciList* current = usbList;
-	while(current)
+	
+	while(current && current->next)
 	{
-		if(fix_uhci) uhci_reset(current->pciDev);
-		if(fix_ehci) ehci_acquire(current->pciDev);
-		//if(fix_legacy) legacy_off(current->pciDev);
-
+		switch (pci_config_read8(current->pciDev->dev.addr, PCI_CLASS_PROG))
+		{
+			// EHCI
+			case 0x20:
+		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
+		    	if(fix_legacy) retVal &= legacy_off(current->pciDev);
+				
+				break;
+				
+			// UHCI
+			case 0x00:
+				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
+				break;
+		}
+		
 		current = current->next;
 	}
-	
-	return 1;
+	return retVal;
 }
 
 int legacy_off (pci_dt_t *pci_dev)
@@ -122,6 +123,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	verbose("Setting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
 			pci_dev->vendor_id, pci_dev->device_id,
 			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
+	
 	
 	// capaddr = Capability Registers = dev.addr + offset stored in dev.addr + 0x10 (USBBASE)
 	capaddr = pci_config_read32(pci_dev->dev.addr, 0x10);	
