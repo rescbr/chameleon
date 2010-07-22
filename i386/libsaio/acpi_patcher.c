@@ -386,7 +386,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
 		
 		//dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt_size);
-		
+				
 		verbose ("SSDT with CPU C-States generated successfully\n");
 		
 		return ssdt;
@@ -893,12 +893,18 @@ int setupAcpi(void)
 					rsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
 					
 					// Generate _CST SSDT
-					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod))) 
+					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
+					{
+						generate_cstates = FALSE; // Generate SSDT only once!
 						ssdt_count++;
+					}
 					
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
+					{
+						generate_pstates = FALSE; // Generate SSDT only once!
 						ssdt_count++;
+					}
 					
 					continue;
 				}
@@ -1005,11 +1011,17 @@ int setupAcpi(void)
 						
 						// Generate _CST SSDT
 						if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod))) 
+						{
+							generate_cstates = FALSE; // Generate SSDT only once!
 							ssdt_count++;
+						}
 						
 						// Generating _PSS SSDT
 						if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
+						{
+							generate_pstates = FALSE; // Generate SSDT only once!
 							ssdt_count++;
+						}
 						
 						continue;
 					}
