@@ -906,7 +906,7 @@ int setupAcpi(void)
 			DBG("\n");
 			
 			// Allocate rsdt in Kernel memory area
-			rsdt_mod->Length += rsdt_mod->Length + 4*ssdt_count - 4*dropoffset;
+			rsdt_mod->Length += 4*ssdt_count - 4*dropoffset;
 			struct acpi_2_rsdt *rsdt_copy = (struct acpi_2_rsdt *)AllocateKernelMemory(rsdt_mod->Length);
 			memcpy (rsdt_copy, rsdt_mod, rsdt_mod->Length);
 			free(rsdt_mod); rsdt_mod = rsdt_copy;
