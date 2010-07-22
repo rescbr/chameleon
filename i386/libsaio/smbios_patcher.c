@@ -160,24 +160,30 @@ static int sm_get_cputype (const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		verbose("CPU is Intel, model 0x%x, ext.model 0x%x\n", Platform.CPU.Model, Platform.CPU.ExtModel);
+		verbose("CPU is Intel, family 0x%x, model 0x%x, ext.model 0x%x\n", Platform.CPU.Family, Platform.CPU.Model, Platform.CPU.ExtModel);
 		
-		switch (Platform.CPU.Model)
+		switch (Platform.CPU.Family) 
 		{
-			case 0x0F: // Intel Core (65nm)
-			case 0x17: // Intel Core (45nm)
-			case 0x1C: // Intel Atom (45nm)
-				return sm_get_simplecputype();
-			case 0x1A: // Intel Core i7 LGA1366 (45nm)
-				return 0x0701;
-			case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
-			case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
-				return 0x0601;
-			case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
-				return 0x0301;
-			case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
-			case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
-				return 0x0601;
+			case 0x06:
+			{
+				switch (Platform.CPU.Model)
+				{
+					case 0x0F: // Intel Core (65nm)
+					case 0x17: // Intel Core (45nm)
+					case 0x1C: // Intel Atom (45nm)
+						return sm_get_simplecputype();
+					case 0x1A: // Intel Core i7 LGA1366 (45nm)
+						return 0x0701;
+					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
+					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
+						return 0x0601;
+					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
+						return 0x0301;
+					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
+					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+						return 0x0601;
+				}
+			}
 		}
 	}
 	
