@@ -164,18 +164,15 @@ int getDDRspeedMhz(const char * spd)
 const char *getDDRSerial(const char* spd)
 {
     static char asciiSerial[16];
-    static uint8_t serialnum=0;
-    uint32_t ret=0;
 
-    if  (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) {// DDR3
-        ret = UIS(122) | (UIS(123)<<8) | (UIS(124)<<16) | ((UIS(125)&0x7f)<<24);
+	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
+	{
+		sprintf(asciiSerial, "%c%c%c%c", spd[125] & 0x7f, spd[124], spd[123], spd[122]);
     }
-    else if  (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) { // DDR2 or DDR
-        ret =  UIS(95) | (UIS(96)<<8) | (UIS(97)<<16) | ((UIS(98)&0x7f)<<24);
+    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) // DDR2 or DDR
+	{ 
+		sprintf(asciiSerial, "%c%c%c%c", spd[98] & 0x7f, spd[97], spd[96], spd[95]);
     }
-
-    if (!ret) sprintf(asciiSerial, "10000000%d", serialnum++);  
-    else      sprintf(asciiSerial, "%X", ret);  
 
 	return strdup(asciiSerial);
 }

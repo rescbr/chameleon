@@ -323,11 +323,12 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		struct acpi_2_ssdt *ssdt = (struct acpi_2_ssdt *)AllocateKernelMemory(root->Size);
 	
 		aml_write_node(root, (void*)ssdt, 0);
-		aml_destroy_node(root);
 		
 		ssdt->Length = root->Size;
 		ssdt->Checksum = 0;
 		ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
+		
+		aml_destroy_node(root);
 		
 		//dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt->Length);
 				
@@ -535,11 +536,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			struct acpi_2_ssdt *ssdt = (struct acpi_2_ssdt *)AllocateKernelMemory(root->Size);
 			
 			aml_write_node(root, (void*)ssdt, 0);
-			aml_destroy_node(root);
 			
 			ssdt->Length = root->Size;
 			ssdt->Checksum = 0;
 			ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
+			
+			aml_destroy_node(root);
 			
 			//dumpPhysAddr("P-States SSDT content: ", ssdt, ssdt->Length);
 			
