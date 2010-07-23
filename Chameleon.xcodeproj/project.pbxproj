@@ -166,7 +166,6 @@
 		B0056D7B11F3868000754B65 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		B0056D7C11F3868000754B65 /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		B0056D7D11F3868000754B65 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		B0056D7E11F3868000754B65 /* efisysinst.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = efisysinst.sh; sourceTree = "<group>"; };
 		B0056D7F11F3868000754B65 /* CREDITS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CREDITS; sourceTree = "<group>"; };
 		B0056D8011F3868000754B65 /* coding_standards.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = coding_standards.txt; sourceTree = "<group>"; };
 		B0056D8111F3868000754B65 /* CHANGES */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGES; sourceTree = "<group>"; };
@@ -308,7 +307,6 @@
 				B0056CD411F3868000754B65 /* sym */,
 				B0056D7C11F3868000754B65 /* TODO */,
 				B0056D7D11F3868000754B65 /* Makefile */,
-				B0056D7E11F3868000754B65 /* efisysinst.sh */,
 				B0056D7F11F3868000754B65 /* CREDITS */,
 				B0056D8011F3868000754B65 /* coding_standards.txt */,
 				B0056D8111F3868000754B65 /* CHANGES */,
