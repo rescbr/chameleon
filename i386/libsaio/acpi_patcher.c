@@ -268,6 +268,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	{
 		bool c2_enabled = fadt->C2_Latency < 100;
 		bool c3_enabled = fadt->C3_Latency < 1000;
+		bool c4_enabled = false;
+		
+		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
 
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
 		
@@ -279,7 +282,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						aml_add_byte(pack, cstates_count);
 		
 						struct aml_chunk* tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x10; // C1
+							cstate_resource_template[11] = 0x00; // C1
+							cstate_resource_template[10] = 0x00; // C1
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 							aml_add_byte(tmpl, 0x01); // C1
 							aml_add_byte(tmpl, 0x01); // Latency
@@ -289,22 +293,37 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						if (c2_enabled) 
 						{
 							tmpl = aml_add_package(pack);
-								cstate_resource_template[11] = 0x20; // C2
+								cstate_resource_template[11] = 0x10; // C2
+								cstate_resource_template[10] = 0x01; // C2
 								aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 								aml_add_byte(tmpl, 0x02); // C2
 								aml_add_byte(tmpl, fadt->C2_Latency);
 								aml_add_word(tmpl, 0x01f4); // Power
 						}
+						// C4
+						if (c4_enabled) 
+						{
+							tmpl = aml_add_package(pack);
+							cstate_resource_template[11] = 0x30; // C4
+							cstate_resource_template[10] = 0x03; // C4
+							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
+							aml_add_byte(tmpl, 0x04); // C4
+							aml_add_word(tmpl, fadt->C3_Latency); // TODO: right latency for C4
+							aml_add_byte(tmpl, 0xfa); // Power
+						}
+						else
 						// C3
 						if (c3_enabled) 
 						{
 							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x30; // C3
+							cstate_resource_template[11] = 0x20; // C3
+							cstate_resource_template[10] = 0x02; // C3
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 							aml_add_byte(tmpl, 0x03); // C3
 							aml_add_word(tmpl, fadt->C3_Latency);
 							aml_add_word(tmpl, 0x015e); // Power
 						}
+						
 			
 			// Aliaces
 			int i;
@@ -604,7 +623,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		else
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 	}
-	// Set PM_Profile from System-type if only if user wanted this value to be forced
+	// Set PM_Profile from System-type if only user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
 	{
 	    if (value) 
