@@ -12,17 +12,18 @@
 #include "appleboot.h"
 #include "vers.h"
 
+#define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
 static const char *theme_name = THEME_NAME_DEFAULT;	
 
 #ifdef EMBED_THEME
 #include "art.h"
-#define LOADPNG(img) \
-if (loadThemeImage(#img) != 0) \
-    if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len) != 0) \
+#define LOADPNG(img, alt_img) \
+if (loadThemeImage(#img, alt_img) != 0) \
+    if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len, alt_img) != 0) \
         return 1;
 #else
-#define LOADPNG(img)	if (loadThemeImage(#img) != 0) { return 1; }
+#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 #endif
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -32,7 +33,8 @@ if (loadThemeImage(#img) != 0) \
 
 #define vram VIDEO(baseAddr)
 
-int lasttime=0; // we need this for animating maybe
+int lasttime = 0; // we need this for animating maybe
+bool useRollOver = false;
 
 extern int gDeviceCount;
 
@@ -41,77 +43,93 @@ extern int gDeviceCount;
  * ATTENTION: the enum and the following array images[] MUST match !!!
  */
 enum {
-	iBackground = 0,
-	iLogo,
+    iBackground = 0,
+    iLogo,
 
-	iDeviceGeneric,
-	iDeviceHFS,
-	iDeviceEXT3,
-	iDeviceFAT16,
-	iDeviceFAT32,
-	iDeviceNTFS,
-	iDeviceCDROM,
-	iSelection,
-	iDeviceScrollPrev,
-	iDeviceScrollNext,
+    iDeviceGeneric,
+    iDeviceGeneric_o,
+    iDeviceHFS,
+    iDeviceHFS_o,
+    iDeviceEXT3,
+    iDeviceEXT3_o,
+    iDeviceFAT16,
+    iDeviceFAT16_o,
+    iDeviceFAT32,
+    iDeviceFAT32_o,
+    iDeviceNTFS,
+    iDeviceNTFS_o,
+    iDeviceCDROM,
+    iDeviceCDROM_o,
 
-	iMenuBoot,
-	iMenuVerbose,
-	iMenuIgnoreCaches,
-	iMenuSingleUser,
-	iMenuMemoryInfo,
-	iMenuVideoInfo,
-	iMenuHelp,
-	iMenuVerboseDisabled,
-	iMenuIgnoreCachesDisabled,
-	iMenuSingleUserDisabled,
-	iMenuSelection,
+    iSelection,
+    iDeviceScrollPrev,
+    iDeviceScrollNext,
 
-	iProgressBar,
-	iProgressBarBackground,
+    iMenuBoot,
+    iMenuVerbose,
+    iMenuIgnoreCaches,
+    iMenuSingleUser,
+    iMenuMemoryInfo,
+    iMenuVideoInfo,
+    iMenuHelp,
+    iMenuVerboseDisabled,
+    iMenuIgnoreCachesDisabled,
+    iMenuSingleUserDisabled,
+    iMenuSelection,
 
-	iTextScrollPrev,
-	iTextScrollNext,
+    iProgressBar,
+    iProgressBarBackground,
 
-	iFontConsole,
-	iFontSmall,
+    iTextScrollPrev,
+    iTextScrollNext,
+
+    iFontConsole,
+    iFontSmall,
 };
 
 image_t images[] = {
-	{.name = "background",				.image = NULL},
-	{.name = "logo",				.image = NULL},
+    {.name = "background",                  .image = NULL},
+    {.name = "logo",                        .image = NULL},
+    
+    {.name = "device_generic",              .image = NULL},
+    {.name = "device_generic_o",            .image = NULL},
+    {.name = "device_hfsplus",              .image = NULL},
+    {.name = "device_hfsplus_o",            .image = NULL},
+    {.name = "device_ext3",                 .image = NULL},
+    {.name = "device_ext3_o",               .image = NULL},
+    {.name = "device_fat16",                .image = NULL},
+    {.name = "device_fat16_o",              .image = NULL},
+    {.name = "device_fat32",                .image = NULL},
+    {.name = "device_fat32_o",              .image = NULL},
+    {.name = "device_ntfs",                 .image = NULL},
+    {.name = "device_ntfs_o",               .image = NULL},
+    {.name = "device_cdrom",                .image = NULL},
+    {.name = "device_cdrom_o",              .image = NULL},
 
-	{.name = "device_generic",			.image = NULL},
-	{.name = "device_hfsplus",			.image = NULL},
-	{.name = "device_ext3",				.image = NULL},
-	{.name = "device_fat16",			.image = NULL},
-	{.name = "device_fat32",			.image = NULL},
-	{.name = "device_ntfs",				.image = NULL},
-	{.name = "device_cdrom",			.image = NULL},
-	{.name = "device_selection",			.image = NULL},
-	{.name = "device_scroll_prev",			.image = NULL},
-	{.name = "device_scroll_next",			.image = NULL},
-
-	{.name = "menu_boot",				.image = NULL},
-	{.name = "menu_verbose",			.image = NULL},
-	{.name = "menu_ignore_caches",			.image = NULL},
-	{.name = "menu_single_user",			.image = NULL},
-	{.name = "menu_memory_info",			.image = NULL},
-	{.name = "menu_video_info",			.image = NULL},
-	{.name = "menu_help",				.image = NULL},
-	{.name = "menu_verbose_disabled",		.image = NULL},
-	{.name = "menu_ignore_caches_disabled",		.image = NULL},
-	{.name = "menu_single_user_disabled",		.image = NULL},
-	{.name = "menu_selection",			.image = NULL},
-
-	{.name = "progress_bar",			.image = NULL},
-	{.name = "progress_bar_background",		.image = NULL},
-
-	{.name = "text_scroll_prev",			.image = NULL},
-	{.name = "text_scroll_next",			.image = NULL},
-
-	{.name = "font_console",			.image = NULL},
-	{.name = "font_small",				.image = NULL},
+    {.name = "device_selection",            .image = NULL},
+    {.name = "device_scroll_prev",          .image = NULL},
+    {.name = "device_scroll_next",          .image = NULL},
+    
+    {.name = "menu_boot",                   .image = NULL},
+    {.name = "menu_verbose",                .image = NULL},
+    {.name = "menu_ignore_caches",          .image = NULL},
+    {.name = "menu_single_user",            .image = NULL},
+    {.name = "menu_memory_info",            .image = NULL},
+    {.name = "menu_video_info",             .image = NULL},
+    {.name = "menu_help",                   .image = NULL},
+    {.name = "menu_verbose_disabled",       .image = NULL},
+    {.name = "menu_ignore_caches_disabled", .image = NULL},
+    {.name = "menu_single_user_disabled",   .image = NULL},
+    {.name = "menu_selection",              .image = NULL},
+    
+    {.name = "progress_bar",                .image = NULL},
+    {.name = "progress_bar_background",     .image = NULL},
+    
+    {.name = "text_scroll_prev",            .image = NULL},
+    {.name = "text_scroll_next",            .image = NULL},
+    
+    {.name = "font_console",                .image = NULL},
+    {.name = "font_small",                  .image = NULL},
 };
 
 int imageCnt = 0;
@@ -149,39 +167,58 @@ static bool infoMenuNativeBoot = false;
 
 static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 
+static int getImageIndexByName(const char *name)
+{
+    int i;
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	{
+	    if (strcmp(name, images[i].name) == 0)
+	        return i; // found the name
+	}
+	return -1;
+}
+
 #ifdef EMBED_THEME
-static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, unsigned int image_size)
+static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, unsigned int image_size, int alt_image)
 {
 	int		i;
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
 
-	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(image, images[i].name) == 0) {
-			if (images[i].image == NULL) {
-				images[i].image = malloc(sizeof(pixmap_t));
-			}
-			width = 0;
-			height = 0;
-			imagedata = NULL;
-			if ((loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) != 0) {
-				return 1;
-			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
-		}
-	}
+    if ((i = getImageIndexByName(image)) >= 0)
+    {
+        if (images[i].image == NULL) {
+            images[i].image = malloc(sizeof(pixmap_t));
+        }
+        width = 0;
+        height = 0;
+        imagedata = NULL;
+        if (image_size > 0 && (loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) == 0)
+        {
+            images[i].image->width = width;
+            images[i].image->height = height;
+            images[i].image->pixels = (pixel_t *)imagedata;
+            flipRB(images[i].image);
+            return 0;
+        }
+        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
+        {
+            // Using the passed alternate image for non-mandatory images.
+            // We don't clone the already existing pixmap, but using its properties instead!
+            images[i].image->width = images[alt_image].image->width;
+            images[i].image->height = images[alt_image].image->height;
+            images[i].image->pixels = images[alt_image].image->pixels;
+            return 0;
+        }
+    }
 	return 1;
 }
 #endif
-static int loadThemeImage(const char *image)
+static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[256];
-	int		i;
+	int 		i;
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
@@ -189,69 +226,89 @@ static int loadThemeImage(const char *image)
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
 	}
-	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(image, images[i].name) == 0) {
-			if (images[i].image == NULL) {
-				images[i].image = malloc(sizeof(pixmap_t));
-			}
-			sprintf(dirspec,"/Extra/Themes/%s/%s.png", theme_name, image);
-			width = 0;
-			height = 0;
-			imagedata = NULL;
-			if ((loadPngImage(dirspec, &width, &height, &imagedata)) != 0) {
+
+    if ((i = getImageIndexByName(image)) >= 0)
+    {
+        if (images[i].image == NULL) {
+            images[i].image = malloc(sizeof(pixmap_t));
+        }
+        sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+        width = 0;
+        height = 0;
+        imagedata = NULL;
+        if ((loadPngImage(dirspec, &width, &height, &imagedata)) == 0)
+        {
+            images[i].image->width = width;
+            images[i].image->height = height;
+            images[i].image->pixels = (pixel_t *)imagedata;
+            flipRB(images[i].image);
+            return 0;
+        }
+        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
+        {
+            // Using the passed alternate image for non-mandatory images.
+            // We don't clone the already existing pixmap, but using its properties instead!
+            images[i].image->width = images[alt_image].image->width;
+            images[i].image->height = images[alt_image].image->height;
+            images[i].image->pixels = images[alt_image].image->pixels;
+            return 0;
+        }
+        else
+        {
 #ifndef EMBED_THEME
-        printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
-        sleep(2);
+            printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
+            sleep(2);
 #endif
-				return 1;
-			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
-		}
-	}
+            return 1;
+        }
+    }
 	return 1;
 }
 
-
 static int loadGraphics(void)
 {
-	LOADPNG(background);
-	LOADPNG(logo);
+	LOADPNG(background,                     IMG_REQUIRED);
+	LOADPNG(logo,                           IMG_REQUIRED);
 
-	LOADPNG(device_generic);
-	LOADPNG(device_hfsplus);
-	LOADPNG(device_ext3);
-	LOADPNG(device_fat16);
-	LOADPNG(device_fat32);
-	LOADPNG(device_ntfs);
-	LOADPNG(device_cdrom);
-	LOADPNG(device_selection);
-	LOADPNG(device_scroll_prev);
-	LOADPNG(device_scroll_next);
+	LOADPNG(device_generic,                 IMG_REQUIRED);
+	LOADPNG(device_generic_o,               iDeviceGeneric);
+	LOADPNG(device_hfsplus,                 iDeviceGeneric);
+	LOADPNG(device_hfsplus_o,               iDeviceGeneric_o);
+	LOADPNG(device_ext3,                    iDeviceGeneric);
+	LOADPNG(device_ext3_o,                  iDeviceGeneric_o);
+	LOADPNG(device_fat16,                   iDeviceGeneric);
+	LOADPNG(device_fat16_o,                 iDeviceGeneric_o);
+	LOADPNG(device_fat32,                   iDeviceGeneric);
+	LOADPNG(device_fat32_o,                 iDeviceGeneric_o);
+	LOADPNG(device_ntfs,                    iDeviceGeneric);
+	LOADPNG(device_ntfs_o,                  iDeviceGeneric_o);
+	LOADPNG(device_cdrom,                   iDeviceGeneric);
+	LOADPNG(device_cdrom_o,                 iDeviceGeneric_o);
 
-	LOADPNG(menu_boot);
-	LOADPNG(menu_verbose);
-	LOADPNG(menu_ignore_caches);
-	LOADPNG(menu_single_user);
-	LOADPNG(menu_memory_info);
-	LOADPNG(menu_video_info);
-	LOADPNG(menu_help);
-	LOADPNG(menu_verbose_disabled);
-	LOADPNG(menu_ignore_caches_disabled);
-	LOADPNG(menu_single_user_disabled);
-	LOADPNG(menu_selection);
+	LOADPNG(device_selection,               IMG_REQUIRED);
+	LOADPNG(device_scroll_prev,             IMG_REQUIRED);
+	LOADPNG(device_scroll_next,             IMG_REQUIRED);
 
-	LOADPNG(progress_bar);
-	LOADPNG(progress_bar_background);
+	LOADPNG(menu_boot,                      IMG_REQUIRED);
+	LOADPNG(menu_verbose,                   IMG_REQUIRED);
+	LOADPNG(menu_ignore_caches,             IMG_REQUIRED);
+	LOADPNG(menu_single_user,               IMG_REQUIRED);
+	LOADPNG(menu_memory_info,               IMG_REQUIRED);
+	LOADPNG(menu_video_info,                IMG_REQUIRED);
+	LOADPNG(menu_help,                      IMG_REQUIRED);
+	LOADPNG(menu_verbose_disabled,          IMG_REQUIRED);
+	LOADPNG(menu_ignore_caches_disabled,    IMG_REQUIRED);
+	LOADPNG(menu_single_user_disabled,      IMG_REQUIRED);
+	LOADPNG(menu_selection,                 IMG_REQUIRED);
 
-	LOADPNG(text_scroll_prev);
-	LOADPNG(text_scroll_next);
+	LOADPNG(progress_bar,                   IMG_REQUIRED);
+	LOADPNG(progress_bar_background,        IMG_REQUIRED);
 
-	LOADPNG(font_console);
-	LOADPNG(font_small);
+	LOADPNG(text_scroll_prev,               IMG_REQUIRED);
+	LOADPNG(text_scroll_next,               IMG_REQUIRED);
+
+	LOADPNG(font_console,                   IMG_REQUIRED);
+	LOADPNG(font_small,                     IMG_REQUIRED);
 
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
@@ -601,6 +658,9 @@ int initGUI(void)
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
 
+        // use the alternate images for the selected item if available.
+        useRollOver = (images[iDeviceGeneric].image->pixels != images[iDeviceGeneric_o].image->pixels) ? true : false;
+
 		// create the screen & window buffers
 		if (createBackBuffer(&gui.screen) == 0) {
 			if (createWindowBuffer(&gui.screen) == 0) {
@@ -624,7 +684,7 @@ int initGUI(void)
 	return 1;
 }
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
 	
@@ -663,6 +723,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
 		}
 	}
 	
+	// Use the next (device_*_o) image for the selected item if available.
+    if (isSelected && useRollOver) devicetype++;
+
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
 	
@@ -712,20 +775,23 @@ void drawDeviceList (int start, int end, int selection)
 	}
 	
 	// draw visible device icons
-	for ( i=0; i < gui.maxdevices; i++ )
+	for (i = 0; i < gui.maxdevices; i++)
 	{
-		BVRef param = menuItems[start+i].param;
+		BVRef param = menuItems[start + i].param;
 
-		if((start+i) == selection)
+        bool isSelected = ((start + i) == selection) ? true : false;
+		if (isSelected)
 		{
-			 if(param->flags & kBVFlagNativeBoot)
-				infoMenuNativeBoot = true;
-			 else
-			 {
-				infoMenuNativeBoot = false;
-				if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
-				infoMenuSelection = 0;
-			 }
+            if (param->flags & kBVFlagNativeBoot)
+            {
+                infoMenuNativeBoot = true;
+            }
+            else
+            {
+                infoMenuNativeBoot = false;
+                if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
+                infoMenuSelection = 0;
+            }
 			 
 			if(gui.menu.draw)
 				drawInfoMenuItems();
@@ -733,24 +799,24 @@ void drawDeviceList (int start, int end, int selection)
 			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
 			
 #if DEBUG
-			gui.debug.cursor = pos( 10, 100);
-			dprintf( &gui.screen, "label     %s\n",   param->label );
-			dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-                        dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-                        dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
-			dprintf( &gui.screen, "type      0x%x\n", param->type );
-			dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-			dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-			dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-			dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-			dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-			dprintf( &gui.screen, "name      %s\n",   param->name );
-			dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-			dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
+            gui.debug.cursor = pos( 10, 100);
+            dprintf( &gui.screen, "label     %s\n",   param->label );
+            dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
+            dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
+            dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
+            dprintf( &gui.screen, "type      0x%x\n", param->type );
+            dprintf( &gui.screen, "flags     0x%x\n", param->flags );
+            dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
+            dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
+            dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
+            dprintf( &gui.screen, "bps       0x%x\n", param->bps );
+            dprintf( &gui.screen, "name      %s\n",   param->name );
+            dprintf( &gui.screen, "type_name %s\n",   param->type_name );
+            dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
 #endif
 		}
 		
-		drawDeviceIcon( param, gui.devicelist.pixmap, p );
+		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
 		
 		if (gui.layout == HorizontalLayout)
 		{
