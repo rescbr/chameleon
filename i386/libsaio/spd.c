@@ -200,11 +200,11 @@ const char *getDDRSerial(const char* spd)
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
 	{
-		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(125) & 0x7, SLST(125), SMST(124), SLST(124), SMST(123), SLST(123), SMST(122), SLST(122));
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(122) /*& 0x7*/, SLST(122), SMST(123), SLST(123), SMST(124), SLST(124), SMST(125), SLST(125));
     }
     else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) // DDR2 or DDR
 	{ 
-		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(98) & 0x7, SLST(98), SMST(97), SLST(97), SMST(96), SLST(96), SMST(95), SLST(95));
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
     }
 
 	return strdup(asciiSerial);
@@ -224,9 +224,9 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 	}
 	
     // Check that the spd part name is zero terminated and that it is ascii:
-	bzero(asciiPartNo, 32);
+	bzero(asciiPartNo, sizeof(asciiPartNo));
 	char c;
-	for (i=start; i<start+32; i++) {
+	for (i=start; i < start + sizeof(asciiPartNo); i++) {
 		READ_SPD(spd, base, slot, i); // only read once the corresponding model part (ddr3 or ddr2)
 		c = spd[i];
 		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...

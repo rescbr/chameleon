@@ -189,19 +189,19 @@ void *loadACPITable (const char * filename)
 uint8_t	acpi_cpu_count = 0;
 char* acpi_cpu_name[32];
 
-void get_acpi_cpu_names(unsigned char* dsdt, unsigned int length)
+void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 {
-	unsigned int i;
+	uint32_t i;
 	
 	for (i=0; i<length-7; i++) 
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
-			unsigned int offset = i + 3 + (dsdt[i+2] >> 6);
+			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
 			
 			bool add_name = TRUE;
 
-			char j;
+			uint8_t j;
 			
 			for (j=0; j<4; j++) 
 			{
