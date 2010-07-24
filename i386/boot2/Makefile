@@ -95,6 +95,19 @@ art.h:
 	@echo "#define __BOOT2_ART_H" >> $(SYMROOT)/art.h
 	@cd $(SYMROOT)/embed && find . -name 'theme.plist' -exec xxd -i >> $(SYMROOT)/art.h {} \;
 	@cd $(SYMROOT)/embed && find . -name '*.png' -exec xxd -i >> $(SYMROOT)/art.h {} \;
+
+	@echo "typedef struct {" >> $(SYMROOT)/art.h
+	@echo "	char			name[32];" >> $(SYMROOT)/art.h
+	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
+	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
+	@echo "} embededpng_t;" >> $(SYMROOT)/art.h
+	@echo "" >> $(SYMROOT)/art.h
+	@echo "embededpng_t embededImages[] = {" >> $(SYMROOT)/art.h
+	cd $(SYMROOT)/embed && find . -name '*.png' -exec sh -c "echo {.name = \`echo '\"'\`\`echo '{}' | cut -f 2 -d \"/\" | cut -f 1 -d \".\" \`\`echo '\"'\`, .pngdata = \`echo {} | tr / _ | tr . _ \`, .length = \&\`echo {} | tr / _ | tr . _ \`_len}," \; >> $(SYMROOT)/art.h
+
+
+	@echo "};" >> $(SYMROOT)/art.h
+
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
 	rm -rf $(SYMROOT)/embed ;\
 
