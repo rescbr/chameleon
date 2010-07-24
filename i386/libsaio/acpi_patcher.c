@@ -197,7 +197,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, int length)
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
-			uint8_t offset = i+2+(dsdt[i+2] >> 6) + 1, j;
+			uint8_t offset = i+3+(dsdt[i+2] >> 6), j;
 			bool add_name = TRUE;
 
 			for (j=0; j<4; j++) 
@@ -207,12 +207,12 @@ void get_acpi_cpu_names(unsigned char* dsdt, int length)
 				if (!aml_isvalidchar(c)) 
 				{
 					add_name = FALSE;
-					verbose("Invalid characters found in ProcessorOP!\n");
+					verbose("Invalid characters found in ProcessorOP 0x%x!\n", c);
 					break;
 				}
 			}
 			
-			if (add_name && dsdt[offset+4] < 32 ) 
+			if (add_name) 
 			{
 				acpi_cpu_name[acpi_cpu_count] = malloc(4);
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
@@ -250,14 +250,14 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	}
 	
 	if (fadt == NULL) {
-		verbose ("FACP not exists: C-States not generated !!!\n");
+		verbose ("FACP not exists: C-States will not be generated !!!\n");
 		return NULL;
 	}
 	
 	struct acpi_2_dsdt* dsdt = (void*)fadt->DSDT;
 	
 	if (dsdt == NULL) {
-		verbose ("DSDT not found: C-States not generated !!!\n");
+		verbose ("DSDT not found: C-States will not be generated !!!\n");
 		return NULL;
 	}
 	
@@ -335,7 +335,6 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				scop = aml_add_scope(root, name);
 					aml_add_alias(scop, "CST_", "_CST");
 			}
-		
 		
 		aml_calculate_size(root);
 		
