@@ -108,11 +108,11 @@ static int countdown( const char * msg, int row, int timeout )
 
 	} else {
 
-		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
+		position_t p = pos( gui.screen.width / 2 , ( gui.devicelist.pos.y ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) ); // blackosx changed (though not sure as different resolutions show different results)
 	
 		char dummy[80];
 		getBootVolumeDescription( gBootVolume, dummy, 80, true );
-		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, false ); // blackosx added extra variable to pass. Usage: false = normal image
+		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, false );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
 		
 		// make this screen the new background

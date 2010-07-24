@@ -13,14 +13,13 @@
 #include "vers.h"
 
 #define THEME_NAME_DEFAULT	"Default"
-static const char *theme_name = THEME_NAME_DEFAULT;	
-
-static bool rolloverfail = false; // blackosx added to this as a flag to be raised if one or more rollover images are missing in the theme folder.
+static const char *theme_name = ""; //THEME_NAME_DEFAULT;	
+static bool rolloverfail = false;
 
 #ifdef EMBED_THEME
 #include "art.h"
 #define LOADPNG(img) \
-if (loadThemeImage(#img) != 0) \
+if (loadThemeImage(#img) == 2) \
     if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len) != 0) \
         return 1;
 #else
@@ -42,7 +41,6 @@ extern int gDeviceCount;
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
  */
-//blackosx - added extra variables to match rollover device images (with _o).
 enum {
 	iBackground = 0,
 	iLogo,
@@ -87,7 +85,6 @@ enum {
 	iFontSmall,
 };
 
-//blackosx - added extra rollover device image (with _o) to images array after each normal device image.
 image_t images[] = {
 	{.name = "background",				.image = NULL},
 	{.name = "logo",				.image = NULL},
@@ -165,7 +162,7 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {0, 0, 0, 0};	// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 
 #ifdef EMBED_THEME
 static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, unsigned int image_size)
@@ -183,14 +180,15 @@ static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, 
 			width = 0;
 			height = 0;
 			imagedata = NULL;
-			if ((loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) != 0) {
-				return 1;
+			if ((loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) == 0) {
+				images[i].image->width = width;
+				images[i].image->height = height;
+				images[i].image->pixels = (pixel_t *)imagedata;
+				flipRB(images[i].image);				
+				return 0;
 			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
+			else
+				return 1;
 		}
 	}
 	return 1;
@@ -205,6 +203,9 @@ static int loadThemeImage(const char *image)
 	uint8_t		*imagedata;
 	char		*cptr; // blackosx added
 
+ 	if (strlen(theme_name)==0) // blackosx - No theme asked for in com.apple.Boot.plist
+		return 2;	
+	
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
 	}
@@ -233,8 +234,6 @@ static int loadThemeImage(const char *image)
 					return 1; // This means we have to drop out of using the GUI.
 				}
 				else { // We have a match for '_o' in image name,  which means a rollover graphic is missing.
-        				//printf("ERROR: GUI: ROLLOVER: could not open '%s/%s.png'!\n", theme_name, image);
-					//sleep(2);
 					rolloverfail=true; 
 					return 0;
 				}
@@ -245,7 +244,6 @@ static int loadThemeImage(const char *image)
 }
 
 
-// blackosx added extra rollover devices.
 static int loadGraphics(void)
 {
 	LOADPNG(background);
@@ -615,24 +613,12 @@ int initGUI(void)
 #endif
 	}
 	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
+	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
 		screen_params[0] = val;
 	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig)) {
+	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
 		screen_params[1] = val;
 	}
-	screen_params[2] = 32;
-
-	// blackosx - This solved an issue when the theme.plist had blank values for screen_height and screen_width.
-	// Thanks to Al Schar for pointing out Conti's fix and thanks to Conti for the fix.
-	/* Fix for "Memory allocation error! Addr=0xdeadbeef, Size=0x0" - if no VESA resolution defined in com.apple.Boot.plist */
-	
-	if(!screen_params[0]) {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	}
-	
-	/* End Fix ~ Conti */	
 
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
@@ -645,6 +631,7 @@ int initGUI(void)
 	gui.screen.height = screen_params[1];
 
 	// load graphics otherwise fail and return
+
 	if (loadGraphics() == 0) {
 		loadThemeValues(&bootInfo->themeConfig, true);
 		colorFont(&font_small, gui.screen.font_small_color);
@@ -673,7 +660,7 @@ int initGUI(void)
 	return 1;
 }
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool rollover) //blackosx - accept extra BOOLEAN variable 'rollover' to check for rollover image
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool rollover) // blackosx - accept extra BOOLEAN variable
 {
 	int devicetype;
 	
@@ -783,10 +770,9 @@ void drawDeviceList (int start, int end, int selection)
 			if(gui.menu.draw)
 				drawInfoMenuItems();
 			 
-			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
-			if (rolloverfail == false)  // blackosx - if ALL the rollover graphics are in the theme folder 
-				drawDeviceIcon( param, gui.devicelist.pixmap, p, true ); //blackosx - then draw the rollover image.
-			
+			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) ); 
+			if (rolloverfail == false)
+				drawDeviceIcon( param, gui.devicelist.pixmap, p, true );
 #if DEBUG
 			gui.debug.cursor = pos( 10, 100);
 			dprintf( &gui.screen, "label     %s\n",   param->label );
@@ -805,11 +791,10 @@ void drawDeviceList (int start, int end, int selection)
 #endif
 		}
 		else if (rolloverfail ==false)
-			drawDeviceIcon( param, gui.devicelist.pixmap, p, false ); //blackosx - draw non-highlighted normal device icon 
-			
-		if (rolloverfail == true) // blackosx - draw the device icon on top of the device_selection only if we're not using rollover image.
-			drawDeviceIcon( param, gui.devicelist.pixmap, p, false ); //blackosx - added false to draw normal icon if it's not selected.
-
+			drawDeviceIcon( param, gui.devicelist.pixmap, p, false );
+		if (rolloverfail == true)
+			drawDeviceIcon( param, gui.devicelist.pixmap, p, false );
+		
 		if (gui.layout == HorizontalLayout)
 		{
 			p.x += images[iSelection].image->width + gui.devicelist.iconspacing; 
@@ -1730,12 +1715,16 @@ static void loadBootGraphics(void)
 		return;
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
-	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
+	
+
 #ifdef EMBED_THEME
   	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
-#endif
 		usePngImage = false; 
-	}
+#else
+	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) 
+		usePngImage = false; 
+#endif
+
 }
 
 //==========================================================================
@@ -1755,23 +1744,16 @@ void drawBootGraphics(void)
 	}
 
 	// parse screen size parameters
-	// blackosx - Thanks to Al Schar for pointing out Conti's fix and thanks to Conti for the fix.
-	/* Fix for "Memory allocation error! Addr=0xdeadbeef, Size=0x0" - if no VESA resolution defined in com.apple.Boot.plist */
-	
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig)) {
+	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
 		screen_params[0] = pos;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig)) {
-		screen_params[1] = pos;
-	}
-	screen_params[2] = 32;
-	
-	if(!screen_params[0]) {
+	} else {
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
+	}
+	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+		screen_params[1] = pos;
+	} else {
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
-	
-	/* End Fix ~ Conti */
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];

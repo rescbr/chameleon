@@ -11,7 +11,7 @@
 #include "fake_efi.h"
 #include "efi_tables.h"
 #include "platform.h"
-#include "dsdt_patcher.h"
+#include "acpi_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
 #include "convert.h"
@@ -514,19 +514,19 @@ static void setupEfiDevices(setup)
 /* Entrypoint from boot.c */
 void setupFakeEfi(void)
 {
-        // load smbios.plist file if any
-        setupSmbiosConfigFile();
+	// load smbios.plist file if any
+	setupSmbiosConfigFile();
 	
-        // Generate efi device strings 
+	// Generate efi device strings 
 	setupEfiDevices();
 	
 	// Initialize the base table
 	setupEfiTables();
 	
-        // Initialize the device tree
-        setupEfiDeviceTree();
-
-        // Add configuration table entries to both the services table and the device tree
-        setupEfiConfigurationTable();
+	// Initialize the device tree
+	setupEfiDeviceTree();
+	
+	// Add configuration table entries to both the services table and the device tree
+	setupEfiConfigurationTable();
 }
 

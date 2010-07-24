@@ -47,7 +47,8 @@ Options useful in the com.apple.Boot.plist file:
   "Instant Menu"=Yes      Force displaying the partition selection menu. 
 
   "Default Partition"     Sets the default boot partition,
-    =hd(x,y)                where 'x' & 'y' are the disk and partition numbers.
+    =hd(x,y)|             where 'x' & 'y' are the disk and partition numbers
+    =<UUID>                 or specify the selected volume UUID string.
   "Hide Partition"        Remove unwanted partition(s) from the boot menu.
     =hd(x,y) [hd(m,n)]      only non mac osx boot partitions can be hidden.
 
@@ -70,9 +71,11 @@ Options useful in the com.apple.Boot.plist file:
   EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
                           for ethernet interfaces.
 
-  USBBusFix=Yes           Enable the EHCI and UHCI fixes (disabled by default).
+  USBBusFix=Yes           Enable all USB fixes below:
   EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
   UHCIreset=Yes           Enable the UHCI fix (disabled by default).
+  USBLegacyOff=Yes        Enable the USB Legacy fix (disabled by default).
+
   ForceHPET=Yes|No        Force Enable HPET.
 
   Wake=No                 Disable wake up after hibernation (default: enabled).

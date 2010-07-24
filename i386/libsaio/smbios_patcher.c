@@ -142,17 +142,52 @@ static int sm_get_cpu (const char *name, int table_num)
 	return Platform.CPU.CPUFrequency/1000000;
 }
 
+static int sm_get_simplecputype()
+{
+	if (Platform.CPU.NoCores >= 4) 
+	{
+		return 0x0501;   // Quad-Core Xeon
+	}
+	else if (Platform.CPU.NoCores == 1) 
+	{
+		return 0x0201;   // Core Solo
+	};
+	
+	return 0x0301;   // Core 2 Duo
+}
+
 static int sm_get_cputype (const char *name, int table_num)
 {
-	if (Platform.CPU.NoCores == 1) {
-		return 0x0101;   // <01 01> Intel Core Solo?
-	} else if (Platform.CPU.NoCores == 2) {
-		return 0x0301;   // <01 03> Intel Core 2 Duo
-	} else if (Platform.CPU.NoCores >= 4) {
-		return 0x0501;   // <01 05> Quad-Core Intel Xeon
-	} else {
-		return 0x0301;   // Default to Core 2 Duo
+	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	{
+		verbose("CPU is Intel, family 0x%x, model 0x%x, ext.model 0x%x\n", Platform.CPU.Family, Platform.CPU.Model, Platform.CPU.ExtModel);
+		
+		switch (Platform.CPU.Family) 
+		{
+			case 0x06:
+			{
+				switch (Platform.CPU.Model)
+				{
+					case 0x0F: // Intel Core (65nm)
+					case 0x17: // Intel Core (45nm)
+					case 0x1C: // Intel Atom (45nm)
+						return sm_get_simplecputype();
+					case 0x1A: // Intel Core i7 LGA1366 (45nm)
+						return 0x0701;
+					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
+					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
+						return 0x0601;
+					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
+						return 0x0301;
+					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
+					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+						return 0x0601;
+				}
+			}
+		}
 	}
+	
+	return sm_get_simplecputype();
 }
 
 static int sm_get_memtype (const char *name, int table_num)
@@ -166,6 +201,7 @@ static int sm_get_memtype (const char *name, int table_num)
                     return Platform.RAM.DIMM[map].Type;
 		}
 	}
+	
 	return SMB_MEM_TYPE_DDR2;
 }
 
@@ -777,7 +813,7 @@ static void getSmbiosTableStructure(struct SMBEntryPoint *smbios)
                 DmiTablePairCount++;
             }
             else {
-                printf("DMI table entries list is full! next entries won't be stored\n");
+                printf("DMI table entries list is full! Next entries won't be stored.\n");
             }
 #if DEBUG_SMBIOS
             printf("DMI header found for table type %d, length = %d\n", dmihdr->type, dmihdr->length);

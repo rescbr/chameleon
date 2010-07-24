@@ -37,13 +37,17 @@ bool platformCPUFeature(uint32_t feature)
 
 /** scan mem for memory autodection purpose */
 void scan_mem() {
-    bool useAutodetection = false;
+    static bool done = false;
+    if (done) return;
+
+    bool useAutodetection = true;
     getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
 
     if (useAutodetection) {
-        scan_memory(&Platform);
+        scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
         scan_spd(&Platform);
     }
+    done = true;
 }
 
 /** 
@@ -52,11 +56,9 @@ void scan_mem() {
 */
 void scan_platform(void)
 {
-
 	memset(&Platform, 0, sizeof(Platform));
 	build_pci_dt();
 	scan_cpu(&Platform);
-        // disabled for now as options can't be read yet here: 
-        // scan_mem();
-        
+	// It's working after some changes in strdup
+	scan_mem();
 }

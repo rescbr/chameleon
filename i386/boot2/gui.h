@@ -144,7 +144,7 @@ void showInfoBox(char *title, char *text);
 
 int  dprintf( window_t * window, const char * fmt, ...);
 int  gprintf( window_t * window, const char * fmt, ...);
-int	 vprf(const char * fmt, va_list ap);
+int  vprf(const char * fmt, va_list ap);
 
 int  drawInfoMenu();
 int  updateInfoMenu(int key);
