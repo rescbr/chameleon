@@ -189,17 +189,20 @@ void *loadACPITable (const char * filename)
 uint8_t	acpi_cpu_count = 0;
 char* acpi_cpu_name[32];
 
-void get_acpi_cpu_names(unsigned char* dsdt, int length)
+void get_acpi_cpu_names(unsigned char* dsdt, unsigned int length)
 {
-	int i;
+	unsigned int i;
 	
 	for (i=0; i<length-7; i++) 
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
-			uint8_t offset = i+3+(dsdt[i+2] >> 6), j;
+			unsigned int offset = i + 3 + (dsdt[i+2] >> 6);
+			
 			bool add_name = TRUE;
 
+			char j;
+			
 			for (j=0; j<4; j++) 
 			{
 				char c = dsdt[offset+j];
@@ -207,7 +210,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, int length)
 				if (!aml_isvalidchar(c)) 
 				{
 					add_name = FALSE;
-					verbose("Invalid characters found in ProcessorOP 0x%x!\n", c);
+					verbose("Invalid character found in ProcessorOP 0x%x!\n", c);
 					break;
 				}
 			}
@@ -218,7 +221,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, int length)
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
 				
-				verbose("Found %c%c%c%c (from DSDT)\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
 				
 				if (++acpi_cpu_count == 32) return;
 			}
@@ -356,7 +359,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	}
 	else 
 	{
-		verbose ("DSDT CPUs not found: C-States not generated !!!\n");
+		verbose ("ACPI CPUs not found: C-States not generated !!!\n");
 	}
 
 	return NULL;
@@ -569,7 +572,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		}
 	}
 	else {
-		verbose ("DSDT CPUs not found: P-States not generated !!!\n");
+		verbose ("ACPI CPUs not found: P-States not generated !!!\n");
 	}
 	
 	return NULL;
