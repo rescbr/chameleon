@@ -181,7 +181,7 @@ static int sm_get_cputype (const char *name, int table_num)
 						return 0x0301;
 					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
 					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
-						return 0x0601;
+						return 0x0701;
 				}
 			}
 		}

@@ -190,7 +190,8 @@ int getDDRspeedMhz(const char * spd)
     return  800; // default freq for unknown types
 }
 
-#define UIS(a) ((uint32_t)spd[a])
+#define SMST(a) ((uint8_t)((spd[a] & 0xf0) >> 4))
+#define SLST(a) ((uint8_t)(spd[a] & 0x0f))
 
 /** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
 const char *getDDRSerial(const char* spd)
@@ -199,11 +200,11 @@ const char *getDDRSerial(const char* spd)
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
 	{
-		sprintf(asciiSerial, "%c%c%c%c", spd[125] & 0x7f, spd[124], spd[123], spd[122]);
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(125) & 0x7, SLST(125), SMST(124), SLST(124), SMST(123), SLST(123), SMST(122), SLST(122));
     }
     else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) // DDR2 or DDR
 	{ 
-		sprintf(asciiSerial, "%c%c%c%c", spd[98] & 0x7f, spd[97], spd[96], spd[95]);
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(98) & 0x7, SLST(98), SMST(97), SLST(97), SMST(96), SLST(96), SMST(95), SLST(95));
     }
 
 	return strdup(asciiSerial);
