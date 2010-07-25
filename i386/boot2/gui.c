@@ -45,6 +45,8 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+    iDeviceHFSRAID,
+    iDeviceHFSRAID_o,
     iDeviceEXT3,
     iDeviceEXT3_o,
     iDeviceFAT16,
@@ -90,6 +92,8 @@ image_t images[] = {
     {.name = "device_generic_o",            .image = NULL},
     {.name = "device_hfsplus",              .image = NULL},
     {.name = "device_hfsplus_o",            .image = NULL},
+    {.name = "device_hfsraid",              .image = NULL},
+    {.name = "device_hfsraid_o",            .image = NULL},
     {.name = "device_ext3",                 .image = NULL},
     {.name = "device_ext3_o",               .image = NULL},
     {.name = "device_fat16",                .image = NULL},
@@ -297,6 +301,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(device_hfsraid,                 iDeviceGeneric);
+	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
 	LOADPNG(device_ext3,                    iDeviceGeneric);
 	LOADPNG(device_ext3_o,                  iDeviceEXT3);
 	LOADPNG(device_fat16,                   iDeviceGeneric);
@@ -707,7 +713,7 @@ int initGUI(void)
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
-	
+
 	if( diskIsCDROM(device) )
 		devicetype = iDeviceCDROM;				// Use CDROM icon
 	else
@@ -716,27 +722,26 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		{
 			case kPartitionTypeHFS:
 
-				// TODO: add apple raid icon choices
-				
-				devicetype = iDeviceHFS;		// Use HFS icon
+				// Use HFS or HFSRAID icon depending on bvr flags.
+				devicetype = (device->flags & kBVFlagBooter) ? iDeviceHFSRAID : iDeviceHFS;
 				break;
-				
+
 			case kPartitionTypeHPFS:
 				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
 				break;
-				
+
 			case kPartitionTypeFAT16:
 				devicetype = iDeviceFAT16;		// Use FAT16 icon
 				break;
-				
+
 			case kPartitionTypeFAT32:
 				devicetype = iDeviceFAT32;		// Use FAT32 icon
 				break;
-				
+
 			case kPartitionTypeEXT3:
 				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
 				break;
-				
+
 			default:
 				devicetype = iDeviceGeneric;	// Use Generic icon
 				break;

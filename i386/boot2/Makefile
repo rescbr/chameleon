@@ -103,10 +103,8 @@ art.h:
 	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
 	@echo "" >> $(SYMROOT)/art.h
 	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name '*.png' -exec sh -c \
-		"echo {.name = \`echo '\"'\`\`echo '{}' | sort | cut -f 2 -d \"/\" | cut -f 1 -d \".\" \`\`echo '\"'\`, \
-		.pngdata = \`echo {} | sort | tr / _ | tr . _ \`, .length = \&\`echo {} | sort | tr / _ | tr . _ \`_len}," \; >> $(SYMROOT)/art.h
-
+	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
+		awk '{ printf "{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
 	@echo "};" >> $(SYMROOT)/art.h
 
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
