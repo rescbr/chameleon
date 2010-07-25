@@ -35,10 +35,10 @@ void md0Ramdisk()
 		
 		if(fh < 0)
 		{
-			sprintf(filename, "rd(0,0)/Extra/%s");
+			sprintf(filename, "rd(0,0)/Extra/%s", override_filename);
 			if((fh = open(filename, 0)) < 0)
 			{
-				sprintf(filename, "/Extra/%s");
+				sprintf(filename, "/Extra/%s", override_filename);
 				fh = open(filename, 0);
 				
 			}
