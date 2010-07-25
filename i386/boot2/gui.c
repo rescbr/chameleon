@@ -30,7 +30,7 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 #define vram VIDEO(baseAddr)
 
 int lasttime = 0; // we need this for animating maybe
-bool useRollOver = false;
+//bool useRollOver = false;
 
 extern int gDeviceCount;
 
@@ -299,17 +299,17 @@ static int loadGraphics(void)
 	LOADPNG(device_generic,                 IMG_REQUIRED);
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
-	LOADPNG(device_hfsplus_o,               iDeviceGeneric_o);
+	LOADPNG(device_hfsplus_o,               iDeviceHFS);
 	LOADPNG(device_ext3,                    iDeviceGeneric);
-	LOADPNG(device_ext3_o,                  iDeviceGeneric_o);
+	LOADPNG(device_ext3_o,                  iDeviceEXT3);
 	LOADPNG(device_fat16,                   iDeviceGeneric);
-	LOADPNG(device_fat16_o,                 iDeviceGeneric_o);
+	LOADPNG(device_fat16_o,                 iDeviceFAT16);
 	LOADPNG(device_fat32,                   iDeviceGeneric);
-	LOADPNG(device_fat32_o,                 iDeviceGeneric_o);
+	LOADPNG(device_fat32_o,                 iDeviceFAT32);
 	LOADPNG(device_ntfs,                    iDeviceGeneric);
-	LOADPNG(device_ntfs_o,                  iDeviceGeneric_o);
+	LOADPNG(device_ntfs_o,                  iDeviceNTFS);
 	LOADPNG(device_cdrom,                   iDeviceGeneric);
-	LOADPNG(device_cdrom_o,                 iDeviceGeneric_o);
+	LOADPNG(device_cdrom_o,                 iDeviceCDROM);
 
 	LOADPNG(device_selection,               IMG_REQUIRED);
 	LOADPNG(device_scroll_prev,             IMG_REQUIRED);
@@ -685,7 +685,7 @@ int initGUI(void)
 		colorFont(&font_console, gui.screen.font_console_color);
 
         // use the alternate images for the selected item if available.
-        useRollOver = (images[iDeviceGeneric].image->pixels != images[iDeviceGeneric_o].image->pixels) ? true : false;
+        //useRollOver = (images[iDeviceGeneric].image->pixels != images[iDeviceGeneric_o].image->pixels) ? true : false;
 
 		// create the screen & window buffers
 		if (createBackBuffer(&gui.screen) == 0) {
@@ -750,7 +750,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 	}
 	
 	// Use the next (device_*_o) image for the selected item if available.
-    if (isSelected && useRollOver) devicetype++;
+    if (isSelected/* && useRollOver*/) devicetype++;
 
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
