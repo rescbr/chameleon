@@ -100,9 +100,9 @@ art.h:
 	@echo "	char			name[32];" >> $(SYMROOT)/art.h
 	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
 	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
-	@echo "} embededpng_t;" >> $(SYMROOT)/art.h
+	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
 	@echo "" >> $(SYMROOT)/art.h
-	@echo "embededpng_t embededImages[] = {" >> $(SYMROOT)/art.h
+	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
 	@cd $(SYMROOT)/embed && find . -name '*.png' -exec sh -c \
 		"echo {.name = \`echo '\"'\`\`echo '{}' | sort | cut -f 2 -d \"/\" | cut -f 1 -d \".\" \`\`echo '\"'\`, \
 		.pngdata = \`echo {} | sort | tr / _ | tr . _ \`, .length = \&\`echo {} | sort | tr / _ | tr . _ \`_len}," \; >> $(SYMROOT)/art.h
