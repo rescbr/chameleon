@@ -49,6 +49,8 @@ enum {
     iDeviceHFSRAID_o,
     iDeviceEXT3,
     iDeviceEXT3_o,
+    iDeviceFAT,
+    iDeviceFAT_o,
     iDeviceFAT16,
     iDeviceFAT16_o,
     iDeviceFAT32,
@@ -96,6 +98,8 @@ image_t images[] = {
     {.name = "device_hfsraid_o",            .image = NULL},
     {.name = "device_ext3",                 .image = NULL},
     {.name = "device_ext3_o",               .image = NULL},
+    {.name = "device_fat",                .image = NULL},
+    {.name = "device_fat_o",              .image = NULL},
     {.name = "device_fat16",                .image = NULL},
     {.name = "device_fat16_o",              .image = NULL},
     {.name = "device_fat32",                .image = NULL},
@@ -305,10 +309,12 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
 	LOADPNG(device_ext3,                    iDeviceGeneric);
 	LOADPNG(device_ext3_o,                  iDeviceEXT3);
-	LOADPNG(device_fat16,                   iDeviceGeneric);
-	LOADPNG(device_fat16_o,                 iDeviceFAT16);
-	LOADPNG(device_fat32,                   iDeviceGeneric);
-	LOADPNG(device_fat32_o,                 iDeviceFAT32);
+	LOADPNG(device_fat,                     iDeviceGeneric);
+	LOADPNG(device_fat_o,                   iDeviceFAT);
+	LOADPNG(device_fat16,                   iDeviceFAT);
+	LOADPNG(device_fat16_o,                 iDeviceFAT_o);
+	LOADPNG(device_fat32,                   iDeviceFAT);
+	LOADPNG(device_fat32_o,                 iDeviceFAT_o);
 	LOADPNG(device_ntfs,                    iDeviceGeneric);
 	LOADPNG(device_ntfs_o,                  iDeviceNTFS);
 	LOADPNG(device_cdrom,                   iDeviceGeneric);
