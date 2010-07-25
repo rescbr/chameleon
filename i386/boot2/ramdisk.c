@@ -21,20 +21,45 @@ char gRAMDiskFile[512];
 void md0Ramdisk()
 {
 	RAMDiskParam ramdiskPtr;
-	char* filename = 0;
-	int fh = 0;
+	char filename[512];
+	const char* override_filename = 0;
+	int fh = -1;
+	int len;
 	
-	// Look for a ramdisk at Postboot.img (TODO: make configurable)
-	filename = "rd(0,0)/Extra/Postboot.img";
-	if((fh = open(filename, 0)) == -1)
+	if(getValueForKey(kMD0Image, &override_filename, &len,  
+				   &bootInfo->bootConfig))
 	{
-		filename = "/Extra/Postboot.img";	// Check /Extra if not in rd(0,0)
+		// Use user specified md0 file
+		sprintf(filename, "%s", override_filename);
 		fh = open(filename, 0);
-
+		
+		if(fh < 0)
+		{
+			sprintf(filename, "rd(0,0)/Extra/%s");
+			if((fh = open(filename, 0)) < 0)
+			{
+				sprintf(filename, "/Extra/%s");
+				fh = open(filename, 0);
+				
+			}
+		}		
 	}
 	
 	
-	if (fh != -1)
+	if(fh < 0)
+	{
+		// Fallback to Postboot.img
+		sprintf(filename, "rd(0,0)/Extra/Postboot.img");
+		fh = open(filename, 0);
+		if(fh < 0)
+		{
+			sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
+			fh = open(filename, 0);
+			
+		}
+	}		
+	
+	if (fh >= 0)
 	{
 		verbose("Enabling ramdisk %s\n", filename);
 
@@ -60,19 +85,16 @@ void md0Ramdisk()
 				
 			}
 			else {
-				verbose("Unable to read ramdisk %s\n", filename);
+				verbose("Unable to read md0 image %s.\n", filename);
 			}
 			
 		} else {
-			verbose("Ramdisk %s is empty.\n", filename);
+			verbose("md0 image %s is empty.\n", filename);
 		}
 		
 		
 		close(fh);
 		
-	}
-	else {
-		verbose("Unable to open %s\n", filename);
 	}
 }
 

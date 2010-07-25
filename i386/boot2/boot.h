@@ -94,6 +94,7 @@
 
 #define kRecoveryFolder		"RecoveryFolder"	/* drivers.h */
 
+#define kMD0Image			"md0"				/* ramdisk.h */
 
 /*
  * Flags to the booter or kernel
