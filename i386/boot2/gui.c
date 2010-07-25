@@ -18,13 +18,9 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 #ifdef EMBED_THEME
 #include "art.h"
-#define LOADPNG(img, alt_img) \
-if (loadThemeImage(#img, alt_img) != 0) \
-    if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len, alt_img) != 0) \
-        return 1;
-#else
-#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 #endif
+
+#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
@@ -178,47 +174,21 @@ static int getImageIndexByName(const char *name)
 	return -1;
 }
 
-#ifdef EMBED_THEME
-static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, unsigned int image_size, int alt_image)
+static int getEmbeddedImageIndexByName(const char *name)
 {
-	int		i;
-	uint16_t	width;
-	uint16_t	height;
-	uint8_t		*imagedata;
-
-    if ((i = getImageIndexByName(image)) >= 0)
-    {
-        if (images[i].image == NULL) {
-            images[i].image = malloc(sizeof(pixmap_t));
-        }
-        width = 0;
-        height = 0;
-        imagedata = NULL;
-        if (image_size > 0 && (loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) == 0)
-        {
-            images[i].image->width = width;
-            images[i].image->height = height;
-            images[i].image->pixels = (pixel_t *)imagedata;
-            flipRB(images[i].image);
-            return 0;
-        }
-        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
-        {
-            // Using the passed alternate image for non-mandatory images.
-            // We don't clone the already existing pixmap, but using its properties instead!
-            images[i].image->width = images[alt_image].image->width;
-            images[i].image->height = images[alt_image].image->height;
-            images[i].image->pixels = images[alt_image].image->pixels;
-            return 0;
-        }
-    }
-	return 1;
+    int i;
+	for (i = 0; i < sizeof(embeddedImages) / sizeof(embeddedImages[0]); i++)
+	{
+	    if (strcmp(name, embeddedImages[i].name) == 0)
+	        return i; // found the name
+	}
+	return -1;
 }
-#endif
+
 static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[256];
-	int 		i;
+	int 		i, e;
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
@@ -244,6 +214,25 @@ static int loadThemeImage(const char *image, int alt_image)
             flipRB(images[i].image);
             return 0;
         }
+#ifdef EMBED_THEME
+        else if ((e = getEmbeddedImageIndexByName(image)) >= 0)
+        {
+            printf("found embedded image: %s, %d\n", image, e);
+            getc();
+/*        
+            if (image_size > 0 && (loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) == 0)
+            {
+                images[i].image->width = width;
+                images[i].image->height = height;
+                images[i].image->pixels = (pixel_t *)imagedata;
+                flipRB(images[i].image);
+                return 0;
+            }
+*/
+            return 0;
+        }
+     
+#endif            
         else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
         {
             // Using the passed alternate image for non-mandatory images.
