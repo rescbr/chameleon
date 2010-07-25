@@ -286,7 +286,6 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		
 						struct aml_chunk* tmpl = aml_add_package(pack);
 							cstate_resource_template[11] = 0x00; // C1
-							cstate_resource_template[10] = 0x00; // C1
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 							aml_add_byte(tmpl, 0x01); // C1
 							aml_add_byte(tmpl, 0x01); // Latency
@@ -297,7 +296,6 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						{
 							tmpl = aml_add_package(pack);
 								cstate_resource_template[11] = 0x10; // C2
-								cstate_resource_template[10] = 0x01; // C2
 								aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 								aml_add_byte(tmpl, 0x02); // C2
 								aml_add_byte(tmpl, fadt->C2_Latency);
@@ -308,10 +306,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						{
 							tmpl = aml_add_package(pack);
 							cstate_resource_template[11] = 0x30; // C4
-							cstate_resource_template[10] = 0x03; // C4
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 							aml_add_byte(tmpl, 0x04); // C4
-							aml_add_word(tmpl, fadt->C3_Latency); // TODO: right latency for C4
+							aml_add_word(tmpl, fadt->C3_Latency / 2); // TODO: right latency for C4
 							aml_add_byte(tmpl, 0xfa); // Power
 						}
 						else
@@ -320,7 +317,6 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						{
 							tmpl = aml_add_package(pack);
 							cstate_resource_template[11] = 0x20; // C3
-							cstate_resource_template[10] = 0x02; // C3
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
 							aml_add_byte(tmpl, 0x03); // C3
 							aml_add_word(tmpl, fadt->C3_Latency);
