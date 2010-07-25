@@ -174,6 +174,7 @@ static int getImageIndexByName(const char *name)
 	return -1;
 }
 
+#ifdef EMBED_THEME
 static int getEmbeddedImageIndexByName(const char *name)
 {
     int i;
@@ -184,11 +185,15 @@ static int getEmbeddedImageIndexByName(const char *name)
 	}
 	return -1;
 }
+#endif
 
 static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[256];
-	int 		i, e;
+	int 		i;
+#ifdef EMBED_THEME
+	int 		e;
+#endif
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
@@ -222,7 +227,7 @@ static int loadThemeImage(const char *image, int alt_image)
             embed_data = embeddedImages[e].pngdata;
             embed_size = *embeddedImages[e].length;
        
-            if (embed_size > 0 && (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata)) == 0)
+            if (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata) == 0)
             {
                 images[i].image->width = width;
                 images[i].image->height = height;
@@ -233,8 +238,7 @@ static int loadThemeImage(const char *image, int alt_image)
 
             return 0;
         }
-     
-#endif            
+#endif
         else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
         {
             // Using the passed alternate image for non-mandatory images.
