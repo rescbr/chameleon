@@ -87,52 +87,52 @@ enum {
 };
 
 image_t images[] = {
-    {.name = "background",                  .image = NULL},
-    {.name = "logo",                        .image = NULL},
-    
-    {.name = "device_generic",              .image = NULL},
-    {.name = "device_generic_o",            .image = NULL},
-    {.name = "device_hfsplus",              .image = NULL},
-    {.name = "device_hfsplus_o",            .image = NULL},
-    {.name = "device_hfsraid",              .image = NULL},
-    {.name = "device_hfsraid_o",            .image = NULL},
-    {.name = "device_ext3",                 .image = NULL},
-    {.name = "device_ext3_o",               .image = NULL},
-    {.name = "device_fat",                .image = NULL},
-    {.name = "device_fat_o",              .image = NULL},
-    {.name = "device_fat16",                .image = NULL},
-    {.name = "device_fat16_o",              .image = NULL},
-    {.name = "device_fat32",                .image = NULL},
-    {.name = "device_fat32_o",              .image = NULL},
-    {.name = "device_ntfs",                 .image = NULL},
-    {.name = "device_ntfs_o",               .image = NULL},
-    {.name = "device_cdrom",                .image = NULL},
-    {.name = "device_cdrom_o",              .image = NULL},
+	{.name = "background",					.image = NULL},
+	{.name = "logo",						.image = NULL},
+	
+	{.name = "device_generic",				.image = NULL},
+	{.name = "device_generic_o",			.image = NULL},
+	{.name = "device_hfsplus",				.image = NULL},
+	{.name = "device_hfsplus_o",			.image = NULL},
+	{.name = "device_hfsraid",				.image = NULL},
+	{.name = "device_hfsraid_o",			.image = NULL},
+	{.name = "device_ext3",					.image = NULL},
+	{.name = "device_ext3_o",				.image = NULL},
+	{.name = "device_fat",					.image = NULL},
+	{.name = "device_fat_o",				.image = NULL},
+	{.name = "device_fat16",				.image = NULL},
+	{.name = "device_fat16_o",				.image = NULL},
+	{.name = "device_fat32",				.image = NULL},
+	{.name = "device_fat32_o",				.image = NULL},
+	{.name = "device_ntfs",					.image = NULL},
+	{.name = "device_ntfs_o",				.image = NULL},
+	{.name = "device_cdrom",				.image = NULL},
+	{.name = "device_cdrom_o",				.image = NULL},
 
-    {.name = "device_selection",            .image = NULL},
-    {.name = "device_scroll_prev",          .image = NULL},
-    {.name = "device_scroll_next",          .image = NULL},
-    
-    {.name = "menu_boot",                   .image = NULL},
-    {.name = "menu_verbose",                .image = NULL},
-    {.name = "menu_ignore_caches",          .image = NULL},
-    {.name = "menu_single_user",            .image = NULL},
-    {.name = "menu_memory_info",            .image = NULL},
-    {.name = "menu_video_info",             .image = NULL},
-    {.name = "menu_help",                   .image = NULL},
-    {.name = "menu_verbose_disabled",       .image = NULL},
-    {.name = "menu_ignore_caches_disabled", .image = NULL},
-    {.name = "menu_single_user_disabled",   .image = NULL},
-    {.name = "menu_selection",              .image = NULL},
-    
-    {.name = "progress_bar",                .image = NULL},
-    {.name = "progress_bar_background",     .image = NULL},
-    
-    {.name = "text_scroll_prev",            .image = NULL},
-    {.name = "text_scroll_next",            .image = NULL},
-    
-    {.name = "font_console",                .image = NULL},
-    {.name = "font_small",                  .image = NULL},
+	{.name = "device_selection",			.image = NULL},
+	{.name = "device_scroll_prev",			.image = NULL},
+	{.name = "device_scroll_next",			.image = NULL},
+	
+	{.name = "menu_boot",					.image = NULL},
+	{.name = "menu_verbose",				.image = NULL},
+	{.name = "menu_ignore_caches",			.image = NULL},
+	{.name = "menu_single_user",			.image = NULL},
+	{.name = "menu_memory_info",			.image = NULL},
+	{.name = "menu_video_info",				.image = NULL},
+	{.name = "menu_help",					.image = NULL},
+	{.name = "menu_verbose_disabled",		.image = NULL},
+	{.name = "menu_ignore_caches_disabled", .image = NULL},
+	{.name = "menu_single_user_disabled",	.image = NULL},
+	{.name = "menu_selection",				.image = NULL},
+	
+	{.name = "progress_bar",				.image = NULL},
+	{.name = "progress_bar_background",		.image = NULL},
+	
+	{.name = "text_scroll_prev",			.image = NULL},
+	{.name = "text_scroll_next",			.image = NULL},
+	
+	{.name = "font_console",				.image = NULL},
+	{.name = "font_small",					.image = NULL},
 };
 
 int imageCnt = 0;
@@ -1811,8 +1811,10 @@ void drawBootGraphics(void)
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 
-	setVideoMode(GRAPHICS_MODE, 0);
-
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+		setVideoMode(GRAPHICS_MODE, 0);
+	}
+	
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
 		drawCheckerBoard();
 	} else {
