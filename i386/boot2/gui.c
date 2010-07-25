@@ -30,7 +30,6 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 #define vram VIDEO(baseAddr)
 
 int lasttime = 0; // we need this for animating maybe
-//bool useRollOver = false;
 
 extern int gDeviceCount;
 
@@ -177,44 +176,13 @@ static int getImageIndexByName(const char *name)
 #ifdef EMBED_THEME
 static int getEmbeddedImageIndexByName(const char *name)
 {
-	int upperLimit = sizeof(embeddedImages) / sizeof(embeddedImages[0]) - 1;
-	int lowerLimit = 0;
-	int compareIndex = (upperLimit - lowerLimit + 1) >> 1; // Midpoint
-	int result;
-	
-	// NOTE: This algorithm assumes that the embeddedImages is sorted.
-	// This is currently done using the make file. If the array is every 
-	// manualy generated, this *will* fail to work properly.
-	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
+    int i;
+	for (i = 0; i < sizeof(embeddedImages) / sizeof(embeddedImages[0]); i++)
 	{
-
-		if(result > 0)	// We need to search a HIGHER index
-		{
-			if(compareIndex != upperLimit - 1)
-			{
-				lowerLimit = compareIndex;
-			}
-			else
-			{
-				return -1;
-			}
-
-		}
-		else //if(result < 0) // We Need to search a LOWER index
-		{
-			if(compareIndex != lowerLimit + 1)
-			{
-				upperLimit = compareIndex;
-			}
-			else
-			{
-				return -1;
-			}
-		}
-		compareIndex = (upperLimit + lowerLimit + 1) >> 1;	// Midpoint
+	    if (strcmp(name, embeddedImages[i].name) == 0)
+	        return i; // found the name
 	}
-	
-	return compareIndex;
+	return -1;
 }
 #endif
 
@@ -684,9 +652,6 @@ int initGUI(void)
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
 
-        // use the alternate images for the selected item if available.
-        //useRollOver = (images[iDeviceGeneric].image->pixels != images[iDeviceGeneric_o].image->pixels) ? true : false;
-
 		// create the screen & window buffers
 		if (createBackBuffer(&gui.screen) == 0) {
 			if (createWindowBuffer(&gui.screen) == 0) {
@@ -749,8 +714,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		}
 	}
 	
-	// Use the next (device_*_o) image for the selected item if available.
-    if (isSelected/* && useRollOver*/) devicetype++;
+	// Use the next (device_*_o) image for the selected item.
+    if (isSelected) devicetype++;
 
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
