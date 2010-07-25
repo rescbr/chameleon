@@ -176,13 +176,42 @@ static int getImageIndexByName(const char *name)
 #ifdef EMBED_THEME
 static int getEmbeddedImageIndexByName(const char *name)
 {
-    int i;
-	for (i = 0; i < sizeof(embeddedImages) / sizeof(embeddedImages[0]); i++)
+	int upperLimit = sizeof(embeddedImages) / sizeof(embeddedImages[0]) - 1;
+	int lowerLimit = 0;
+	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
+	int result;
+	
+	// NOTE: This algorithm assumes that the embeddedImages is sorted.
+	// This is currently done using the make file. If the array is every 
+	// manualy generated, this *will* fail to work properly.
+	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
-	    if (strcmp(name, embeddedImages[i].name) == 0)
-	        return i; // found the name
+		if(result > 0)	// We need to search a HIGHER index
+		{
+			if(compareIndex != lowerLimit)
+			{
+				lowerLimit = compareIndex;
+			}
+			else
+			{
+				return -1;
+			}
+			compareIndex = (upperLimit + lowerLimit + 1) >> 1;	// Midpoint, round up
+		}
+		else //if(result < 0) // We Need to search a LOWER index
+		{
+			if(compareIndex != upperLimit)
+			{
+				upperLimit = compareIndex;
+			}
+			else
+			{
+				return -1;
+			}
+			compareIndex = (upperLimit + lowerLimit) >> 1;	// Midpoint, round down
+		}
 	}
-	return -1;
+	return compareIndex;
 }
 #endif
 
@@ -251,7 +280,7 @@ static int loadThemeImage(const char *image, int alt_image)
         {
 #ifndef EMBED_THEME
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
-            sleep(2);
+			sleep(2);
 #endif
             return 1;
         }
