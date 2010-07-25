@@ -217,10 +217,12 @@ static int loadThemeImage(const char *image, int alt_image)
 #ifdef EMBED_THEME
         else if ((e = getEmbeddedImageIndexByName(image)) >= 0)
         {
-            printf("found embedded image: %s, %d\n", image, e);
-            getc();
-/*        
-            if (image_size > 0 && (loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) == 0)
+            unsigned char *embed_data;
+            unsigned int embed_size;
+            embed_data = embeddedImages[e].pngdata;
+            embed_size = *embeddedImages[e].length;
+       
+            if (embed_size > 0 && (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata)) == 0)
             {
                 images[i].image->width = width;
                 images[i].image->height = height;
@@ -228,7 +230,7 @@ static int loadThemeImage(const char *image, int alt_image)
                 flipRB(images[i].image);
                 return 0;
             }
-*/
+
             return 0;
         }
      
