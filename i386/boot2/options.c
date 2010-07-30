@@ -108,7 +108,7 @@ static int countdown( const char * msg, int row, int timeout )
 
 	} else {
 
-		position_t p = pos( gui.screen.width / 2 , ( gui.devicelist.pos.y ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) ); // blackosx changed (though not sure as different resolutions show different results)
+		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
 	
 		char dummy[80];
 		getBootVolumeDescription( gBootVolume, dummy, 80, true );

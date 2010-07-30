@@ -127,10 +127,10 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
     uint8_t bank = 0;
     uint8_t code = 0;
     int i = 0;
-    char * spd = slot->spd;
+    uint8_t * spd = (uint8_t *) slot->spd;
 
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) { // DDR3
-        bank = spd[SPD_DDR3_MEMORY_BANK];
+        bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
         code = spd[SPD_DDR3_MEMORY_CODE];
         for (i=0; i < VEN_MAP_SIZE; i++)
             if (bank==vendorMap[i].bank && code==vendorMap[i].code)
@@ -190,26 +190,24 @@ int getDDRspeedMhz(const char * spd)
     return  800; // default freq for unknown types
 }
 
-#define UIS(a) ((uint32_t)spd[a])
+#define SMST(a) ((uint8_t)((spd[a] & 0xf0) >> 4))
+#define SLST(a) ((uint8_t)(spd[a] & 0x0f))
 
 /** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
 const char *getDDRSerial(const char* spd)
 {
     static char asciiSerial[16];
-    static uint8_t serialnum=0;
-    uint32_t ret=0;
-
-    if  (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) {// DDR3
-        ret = UIS(122) | (UIS(123)<<8) | (UIS(124)<<16) | ((UIS(125)&0x7f)<<24);
+    
+    if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
+    {
+	sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(122) /*& 0x7*/, SLST(122), SMST(123), SLST(123), SMST(124), SLST(124), SMST(125), SLST(125));
     }
-    else if  (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) { // DDR2 or DDR
-        ret =  UIS(95) | (UIS(96)<<8) | (UIS(97)<<16) | ((UIS(98)&0x7f)<<24);
+    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) // DDR2 or DDR
+    { 
+	sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
     }
 
-    if (!ret) sprintf(asciiSerial, "10000000%d", serialnum++);  
-    else      sprintf(asciiSerial, "%X", ret);  
-
-	return strdup(asciiSerial);
+    return strdup(asciiSerial);
 }
 
 /** Get DDR3 or DDR2 Part Number, always return a valid ptr */
@@ -226,9 +224,9 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 	}
 	
     // Check that the spd part name is zero terminated and that it is ascii:
-	bzero(asciiPartNo, 32);
+    bzero(asciiPartNo, sizeof(asciiPartNo));
 	char c;
-	for (i=start; i<start+32; i++) {
+	for (i=start; i < start + sizeof(asciiPartNo); i++) {
 		READ_SPD(spd, base, slot, i); // only read once the corresponding model part (ddr3 or ddr2)
 		c = spd[i];
 		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...
@@ -302,7 +300,23 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
             // determine spd speed
             speed = getDDRspeedMhz(slot->spd);
-            if (slot->Frequency<speed) slot->Frequency = speed; // should test the mem controller to get potential overclocking info ? 
+            if (slot->Frequency<speed) slot->Frequency = speed;
+			
+			// pci memory controller if available, is more reliable
+			if (Platform.RAM.Frequency > 0) {
+				uint32_t freq = (uint32_t)Platform.RAM.Frequency / 500000;
+				// now round off special cases
+				uint32_t fmod100 = freq %100;
+				switch(fmod100) {
+					case  1:	freq--;	break;
+					case 32:	freq++;	break;
+					case 65:	freq++; break;
+					case 98:	freq+=2;break;
+					case 99:	freq++; break;
+				}
+				slot->Frequency = freq;
+			}
+			
 			printf("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
                        i, 
                        (int)slot->Type,
@@ -376,7 +390,5 @@ bool find_and_read_smbus_controller(pci_dt_t* pci_dt)
 
 void scan_spd(PlatformInfo_t *p)
 {
-	printf("\n--> Start of mem detect:\n");
     find_and_read_smbus_controller(root_pci_dev);
-	printf("\n<-- End   of mem detect.\n");
 }
