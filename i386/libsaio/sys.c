@@ -813,7 +813,6 @@ BVRef selectBootVolume( BVRef chain )
 	bool filteredChain = false;
 	bool foundPrimary = false;
 	BVRef bvr, bvr1 = 0, bvr2 = 0;
-    extern bool matchVolumeToString(BVRRef, const char *, bool);
 	
 	if (chain->filtered) filteredChain = true;
 	

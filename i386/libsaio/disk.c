@@ -68,6 +68,7 @@
 #include "ext2fs.h"
 
 #include "xml.h"
+#include "disk.h"
 
 #include <limits.h>
 #include <IOKit/storage/IOApplePartitionScheme.h>
@@ -1824,7 +1825,7 @@ bool getVolumeLabelAlias( BVRef bvr, char* str, long strMaxLen)
 void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool verbose )
 {
     unsigned char type;
-    char*p = str;
+    char *p = str;
     
     if(!bvr || !p || strMaxLen <= 0)
         return;
@@ -1834,8 +1835,12 @@ void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool verbos
     if (verbose)
     {
         int len = getDeviceDescription(bvr, str);
-        strcat(str, " ");
-        for (; strMaxLen > 0 && *p != '\0'; p++, strMaxLen--);
+        if(len >= strMaxLen)
+            return;
+        
+        strcpy(str[len++], " ");
+        strMaxLen -= len;
+        p += len;
     }
 	
     /* See if a partition rename is preferred */
