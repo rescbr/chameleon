@@ -269,8 +269,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	
 	if (acpi_cpu_count > 0) 
 	{
-		bool c2_enabled = fadt->C2_Latency < 100;
-		bool c3_enabled = fadt->C3_Latency < 1000;
+		bool c2_enabled = (fadt->C2_Latency = 1) < 100;
+		bool c3_enabled = (fadt->C3_Latency = 100) < 1000;
 		bool c4_enabled = false;
 		
 		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);

@@ -110,6 +110,64 @@ XMLGetProperty( TagPtr dict, const char * key )
     return 0;
 }
 
+/* Function for basic XML entity replacement. It *does not* handle unicode escapes */
+
+char*
+XMLDecode(const char* src)
+{
+    typedef const struct XMLEntity {
+        char* name;
+        size_t nameLen;
+        char value;
+    } XMLEntity;
+    
+    /* This is ugly, but better than specifying the lengths by hand */
+    #define _e(str,c) {str,sizeof(str)-1,c}
+    const XMLEntity ents[] = {
+        _e("quot;",'"'), _e("apos;",'\''),
+        _e("lt;",  '<'), _e("gt;",  '>'),
+        _e("amp;", '&')
+    };
+    
+    size_t len;
+    const char *s;
+    char *out, *o;
+    
+    if ( !src || !(len = strlen(src)) || !(out = malloc(len+1)) )
+        return 0;
+    
+    o = out;
+    s = src;
+    while (s <= src+len) /* Make sure the terminator is also copied */
+    {
+        if ( *s == '&' )
+        {
+            bool entFound = false;
+            XMLEntity* ent;
+            int i = 0;
+            
+            s++;
+            for ( ent=&ents[0]; i < sizeof(ents); ent = &ents[i++] )
+            {
+                if ( strncmp(s, ent->name, ent->nameLen) == 0 )
+                {
+                    entFound = true;
+                    break;
+                }
+            }
+            if ( entFound )
+            {
+                *o++ = ent->value;
+                s += ent->nameLen;
+                continue;
+            }
+        }
+        
+        *o++ = *s++;
+    }
+
+    return out;
+}                    
 
 #if UNUSED
 //==========================================================================
