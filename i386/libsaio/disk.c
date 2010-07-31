@@ -68,7 +68,6 @@
 #include "ext2fs.h"
 
 #include "xml.h"
-#include "disk.h"
 
 #include <limits.h>
 #include <IOKit/storage/IOApplePartitionScheme.h>
