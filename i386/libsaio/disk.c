@@ -1760,7 +1760,7 @@ bool getVolumeLabelAlias( BVRef bvr, char* str, long strMaxLen)
     if ( !str || strMaxLen <= 0)
         return false;
     
-    aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->bootConfig)));
+    aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->bootConfig));
     if ( !aliasList )
         return false;
         
@@ -1838,7 +1838,8 @@ void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool verbos
         if(len >= strMaxLen)
             return;
         
-        strcpy(str[len++], " ");
+        len++;
+        strcpy(str+len, " ");
         strMaxLen -= len;
         p += len;
     }
