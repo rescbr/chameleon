@@ -473,7 +473,6 @@
 		B0056D2411F3868000754B65 /* libsaio */ = {
 			isa = PBXGroup;
 			children = (
-				65ED53931204B83200B22507 /* disk.h */,
 				B0056D2511F3868000754B65 /* acpi.h */,
 				B0056D2611F3868000754B65 /* acpi_patcher.c */,
 				B0056D2711F3868000754B65 /* acpi_patcher.h */,
@@ -499,6 +498,7 @@
 				B0056D3911F3868000754B65 /* device_tree.c */,
 				B0056D3A11F3868000754B65 /* device_tree.h */,
 				B0056D3B11F3868000754B65 /* disk.c */,
+				65ED53931204B83200B22507 /* disk.h */,
 				0172D0DC11FB66820030222E /* dram_controllers.h */,
 				0172D0DD11FB66820030222E /* dram_controllers.c */,
 				B0056D3C11F3868000754B65 /* efi.h */,

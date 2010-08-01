@@ -1753,35 +1753,35 @@ char* matchVolumeToString( BVRef bvr, const char* match, bool matchParcial)
 bool getVolumeLabelAlias( BVRef bvr, char* str, long strMaxLen)
 {
     /* The format for the rename string is the following:
-       hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" etc; ...
+     * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" etc; ...
      */
-    char *aliasList;
-    char *next;
-    if( !str || strMaxLen <= 0)
+    char *aliasList, *next;
+    
+    if ( !str || strMaxLen <= 0)
         return false;
     
-    if( !(aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->bootConfig))) )
+    aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->bootConfig)));
+    if ( !aliasList )
         return false;
         
-    for(next = aliasList;
-        next && *next;
-    )
+    next = aliasList;
+    while ( next && *next )
     {
         char *start, *aliasStart, *aliasEnd;
         char *ret;
         
         start = aliasStart = (char*)matchVolumeToString(bvr, next, true);
-        if(!start || !*start)
+        if ( !start || !*start )
             break;
         
         /* Find and delimit the current entry's end */
         next = strstr(start, ";");
-        if(next)
+        if ( next )
         {
             /* Not enough characters for a successful match: we'd need at least
              * one space and another char. before the semicolon
              */
-            if(next-start < 2) {
+            if ( next-start < 2 ) {
                 next++;
                 continue;
             }
@@ -1791,22 +1791,22 @@ bool getVolumeLabelAlias( BVRef bvr, char* str, long strMaxLen)
         }
         
         /* Check for at least one space, but ignore the rest of them */
-        while(isspace(*aliasStart))
+        while ( isspace(*aliasStart) )
             aliasStart++;
-        if(start == aliasStart)
+        if ( start == aliasStart )
             continue;
 
-		switch(*aliasStart)
+		switch ( *aliasStart )
         {
             case '\0':
 				break;
-			/* If the string is quoted, skip the starting quote, find the ending
-             * one, and zero it to end the string.
-             * If we succeed, fall-through to the final copy-and-cleanup part */
             case '"':
+                /* If a starting quote is found, skip it, then find the ending one,
+                 * and replace it for a string terminator.
+                 */
                 aliasStart++;
 				aliasEnd = strstr(aliasStart, "\"");
-				if(!aliasEnd || aliasStart == aliasEnd)
+				if ( !aliasEnd || aliasStart == aliasEnd )
 					break;
                 
 				*aliasEnd = '\0';
