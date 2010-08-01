@@ -101,6 +101,21 @@ static const SMStrEntryPair const sm_macpro_defaults[]={
 	{ "",""	}
 };
 
+// defaults for an iMac11,1 core i5/i7
+static const SMStrEntryPair const sm_imacCore_i5_i7_defaults[]={
+	{"SMbiosvendor",	"Apple Inc."			},
+	{"SMbiosversion",	"IM111.0034.B00"	},
+	{"SMbiosdate",		"06/01/2009"			},
+	{"SMmanufacter",	"Apple Inc."			},
+	{"SMproductname",	"iMac11,1"			},	
+	{"SMsystemversion",	"1.0"				},
+	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMfamily",		"iMac"				},
+	{"SMboardmanufacter","Apple Computer, Inc."	},
+	{"SMboardproduct",	"Mac-F2268DAE"			},
+	{ "",""	}
+};
+
 static const char* sm_get_defstr(const char * key, int table_num)
 {
 	int	i;
@@ -113,13 +128,42 @@ static const char* sm_get_defstr(const char * key, int table_num)
 			sm_defaults=sm_macbook_defaults;
 		}
 	} else {
-		switch (Platform.CPU.NoCores) {
-		case 1: sm_defaults=sm_macmini_defaults; break;
-		case 2: sm_defaults=sm_imac_defaults; break;
-		default: sm_defaults=sm_macpro_defaults; break;
+		switch (Platform.CPU.NoCores) 
+		{
+			case 1: 
+				sm_defaults=sm_macmini_defaults; 
+				break;
+			case 2:
+				sm_defaults=sm_imac_defaults;
+				break;
+			default:
+			{
+				switch (Platform.CPU.Family) 
+				{
+					case 0x06:
+					{
+						switch (Platform.CPU.Model)
+						{
+							case 0x19: // Intel Core i5 650
+							case 0x1E: // Intel Core i7 LGA1156 (45nm)
+							case 0x1F: // Intel Core i5 LGA1156 (45nm)
+								sm_defaults=sm_imacCore_i5_i7_defaults; 
+								break;
+							default:
+								sm_defaults=sm_macpro_defaults; 
+								break;
+						}
+						break;
+					}
+					default:
+						sm_defaults=sm_macpro_defaults; 
+						break;
+				}
+				break;
+			}
 		}
 	}
-
+	
 	for (i=0; sm_defaults[i].key[0]; i++) {
 		if (!strcmp (sm_defaults[i].key, key)) {
 			return sm_defaults[i].value;
@@ -156,11 +200,48 @@ static int sm_get_simplecputype()
 	return 0x0301;   // Core 2 Duo
 }
 
-static int sm_get_cputype (const char *name, int table_num)
+static int sm_get_bus_speed (const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	{		
+		switch (Platform.CPU.Family) 
+		{
+			case 0x06:
+			{
+				switch (Platform.CPU.Model)
+				{
+					case 0x0F: // Intel Core (65nm)
+					case 0x17: // Intel Core (45nm)
+					case 0x1C: // Intel Atom (45nm)
+						return 0; // TODO: populate bus speed for these processors
+					case 0x19: // Intel Core i5 650 @3.20 Ghz
+						return 3600; // GT/s / 1000
+					case 0x1A: // Intel Core i7 LGA1366 (45nm)
+					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
+					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
+						return 4800; // GT/s / 1000
+					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
+						return 0; // TODO: populate bus speed for these processors
+					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
+					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+						return 0; // TODO: populate bus speed for these processors
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static int sm_get_cputype (const char *name, int table_num)
+{
+	static bool done = false;		
+		
+	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		verbose("CPU is Intel, family 0x%x, model 0x%x, ext.model 0x%x\n", Platform.CPU.Family, Platform.CPU.Model, Platform.CPU.ExtModel);
+		if (!done) {
+			verbose("CPU is Intel, family 0x%x, model 0x%x, ext.model 0x%x\n", Platform.CPU.Family, Platform.CPU.Model, Platform.CPU.ExtModel);
+			done = true;
+		}
 		
 		switch (Platform.CPU.Family) 
 		{
@@ -175,6 +256,9 @@ static int sm_get_cputype (const char *name, int table_num)
 					case 0x1A: // Intel Core i7 LGA1366 (45nm)
 						return 0x0701;
 					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
+						// get this opportunity to fill the known processor interconnect speed for cor i5/i7 in GT/s
+						return 0x0701;
+					case 0x19: // Intel Core i5 650 @3.20 Ghz
 					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
 						return 0x0601;
 					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
@@ -291,7 +375,7 @@ struct smbios_property smbios_properties[]=
 	{.name="SMmemserial",		.table_type=17,	.value_type=SMSTRING,	.offset=0x18,	.auto_str=sm_get_memserial},
 	{.name="SMmempart",		.table_type=17,	.value_type=SMSTRING,	.offset=0x1A,	.auto_str=sm_get_mempartno},
 	{.name="SMcputype",		.table_type=131,.value_type=SMWORD,	.offset=0x04,	.auto_int=sm_get_cputype},
-	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,	.offset=0x04,	.auto_str=0		}
+	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,	.offset=0x04,	.auto_int=sm_get_bus_speed}
 };
 
 struct smbios_table_description smbios_table_descriptions[]=
@@ -493,9 +577,11 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	int i, j;
 	int tablespresent[256];
 	bool do_auto=true;
-        
-        extern void dumpPhysAddr(const char * title, void * a, int len);
+	
+    static bool done = false; // IMPROVEME: called twice via getSmbios(), but only the second call can get all necessary info !
 
+	extern void dumpPhysAddr(const char * title, void * a, int len);
+	
 	bzero(tablespresent, sizeof(tablespresent));
 	bzero(handles, sizeof(handles));
 
@@ -765,7 +851,11 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	newsmbios->dmi.checksum = 256 - checksum8(&newsmbios->dmi, sizeof(newsmbios->dmi));
 	newsmbios->checksum = 0;
 	newsmbios->checksum = 256 - checksum8(newsmbios, sizeof(*newsmbios));
-	verbose("Patched DMI Table\n");
+	
+	if (!done) {
+		verbose("Patched DMI Table\n");
+		done=true;
+	}
 }
 
 #define MAX_DMI_TABLES 96
