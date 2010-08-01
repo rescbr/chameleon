@@ -89,31 +89,25 @@ static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
 /* movl $0x80000003,%eax; ret */
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
 
-
-/* We use the fake_efi_pages struct so that we only need to do one kernel
- * memory allocation for all needed EFI data.  Otherwise, small allocations
- * like the FIRMWARE_VENDOR string would take up an entire page.
- * NOTE WELL: Do NOT assume this struct has any particular layout within itself.
- * It is absolutely not intended to be publicly exposed anywhere
- * We say pages (plural) although right now we are well within the 1 page size
- * and probably will stay that way.
- */
-struct fake_efi_pages
-{
-    EFI_SYSTEM_TABLE_64 efiSystemTable;
-    EFI_RUNTIME_SERVICES_64 efiRuntimeServices;
-    EFI_CONFIGURATION_TABLE_64 efiConfigurationTable[MAX_CONFIGURATION_TABLE_ENTRIES];
-    EFI_CHAR16 firmwareVendor[sizeof(FIRMWARE_VENDOR)/sizeof(EFI_CHAR16)];
-    uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
-    uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
-};
-
-EFI_SYSTEM_TABLE_64 *gST = NULL;
+EFI_SYSTEM_TABLE_32 *gST32 = NULL;
+EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
-    EFI_UINTN i = gST->NumberOfTableEntries;
+    EFI_UINTN i = 0;
+	
+	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
+	// wich seems to cause no problem. In case it does, force i386 arch.
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		i = gST32->NumberOfTableEntries;
+	}
+	else
+	{
+		i = gST64->NumberOfTableEntries;
+	}
+	
     /* We only do adds, not modifications and deletes like InstallConfigurationTable */
     if(i >= MAX_CONFIGURATION_TABLE_ENTRIES)
         stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
@@ -146,11 +140,12 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
     return EFI_UNSUPPORTED;
 }
 
-static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
+//Azi: crc32 done in place, on the cases were it wasn't.
+/*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
 {
     efiSystemTable->Hdr.CRC32 = 0;
     efiSystemTable->Hdr.CRC32 = crc32(0L, efiSystemTable, efiSystemTable->Hdr.HeaderSize);
-}
+}*/
 
 /*
 What we do here is simply allocate a fake EFI system table and a fake EFI
@@ -159,109 +154,230 @@ runtime services table.
 Because we build against modern headers with kBootArgsRevision 4 we
 also take care to set efiMode = 32.
 */
-void
-setupEfiTables(void)
+void setupEfiTables32(void)
 {
-    struct fake_efi_pages *fakeEfiPages= (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
+	// We use the fake_efi_pages struct so that we only need to do one kernel
+	// memory allocation for all needed EFI data.  Otherwise, small allocations
+	// like the FIRMWARE_VENDOR string would take up an entire page.
+	// NOTE WELL: Do NOT assume this struct has any particular layout within itself.
+	// It is absolutely not intended to be publicly exposed anywhere
+	// We say pages (plural) although right now we are well within the 1 page size
+	// and probably will stay that way.
+	struct fake_efi_pages
+	{
+		EFI_SYSTEM_TABLE_32 efiSystemTable;
+		EFI_RUNTIME_SERVICES_32 efiRuntimeServices;
+		EFI_CONFIGURATION_TABLE_32 efiConfigurationTable[MAX_CONFIGURATION_TABLE_ENTRIES];
+		EFI_CHAR16 firmwareVendor[sizeof(FIRMWARE_VENDOR)/sizeof(EFI_CHAR16)];
+		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+	};
+	
+	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
+	
+	// Zero out all the tables in case fields are added later
+	bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
+	
+	// --------------------------------------------------------------------
+	// Initialize some machine code that will return EFI_UNSUPPORTED for
+	// functions returning int and simply return for void functions.
+	memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
+	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
+	
+	// --------------------------------------------------------------------
+	// System table
+	EFI_SYSTEM_TABLE_32 *efiSystemTable = gST32 = &fakeEfiPages->efiSystemTable;
+	efiSystemTable->Hdr.Signature = EFI_SYSTEM_TABLE_SIGNATURE;
+	efiSystemTable->Hdr.Revision = EFI_SYSTEM_TABLE_REVISION;
+	efiSystemTable->Hdr.HeaderSize = sizeof(EFI_SYSTEM_TABLE_32);
+	efiSystemTable->Hdr.CRC32 = 0; // Initialize to zero and then do CRC32
+	efiSystemTable->Hdr.Reserved = 0;
+	
+	efiSystemTable->FirmwareVendor = (EFI_PTR32)&fakeEfiPages->firmwareVendor;
+	memcpy(fakeEfiPages->firmwareVendor, FIRMWARE_VENDOR, sizeof(FIRMWARE_VENDOR));
+	efiSystemTable->FirmwareRevision = FIRMWARE_REVISION;
+	
+	// XXX: We may need to have basic implementations of ConIn/ConOut/StdErr
+	// The EFI spec states that all handles are invalid after boot services have been
+	// exited so we can probably get by with leaving the handles as zero.
+	efiSystemTable->ConsoleInHandle = 0;
+	efiSystemTable->ConIn = 0;
+	
+	efiSystemTable->ConsoleOutHandle = 0;
+	efiSystemTable->ConOut = 0;
+	
+	efiSystemTable->StandardErrorHandle = 0;
+	efiSystemTable->StdErr = 0;
+	
+	efiSystemTable->RuntimeServices = (EFI_PTR32)&fakeEfiPages->efiRuntimeServices;
+	
+	// According to the EFI spec, BootServices aren't valid after the
+	// boot process is exited so we can probably do without it.
+	// Apple didn't provide a definition for it in pexpert/i386/efi.h
+	// so I'm guessing they don't use it.
+	efiSystemTable->BootServices = 0;
+	
+	efiSystemTable->NumberOfTableEntries = 0;
+	efiSystemTable->ConfigurationTable = (EFI_PTR32)fakeEfiPages->efiConfigurationTable;
+	
+	// We're done. Now CRC32 the thing so the kernel will accept it.
+	// Must be initialized to zero before CRC32, done above.
+	gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
+	
+	// --------------------------------------------------------------------
+	// Runtime services
+	EFI_RUNTIME_SERVICES_32 *efiRuntimeServices = &fakeEfiPages->efiRuntimeServices;
+	efiRuntimeServices->Hdr.Signature = EFI_RUNTIME_SERVICES_SIGNATURE;
+	efiRuntimeServices->Hdr.Revision = EFI_RUNTIME_SERVICES_REVISION;
+	efiRuntimeServices->Hdr.HeaderSize = sizeof(EFI_RUNTIME_SERVICES_32);
+	efiRuntimeServices->Hdr.CRC32 = 0;
+	efiRuntimeServices->Hdr.Reserved = 0;
+	
+	// There are a number of function pointers in the efiRuntimeServices table.
+	// These are the Foundation (e.g. core) services and are expected to be present on
+	// all EFI-compliant machines.	Some kernel extensions (notably AppleEFIRuntime)
+	// will call these without checking to see if they are null.
+	//
+	// We don't really feel like doing an EFI implementation in the bootloader
+	// but it is nice if we can at least prevent a complete crash by
+	// at least providing some sort of implementation until one can be provided
+	// nicely in a kext.
+	void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
+	void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
+	efiRuntimeServices->GetTime = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->SetTime = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->GetWakeupTime = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->SetWakeupTime = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->SetVirtualAddressMap = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->ConvertPointer = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->GetVariable = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->GetNextVariableName = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->SetVariable = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->GetNextHighMonotonicCount = (EFI_PTR32)unsupportedret_fp;
+	efiRuntimeServices->ResetSystem = (EFI_PTR32)voidret_fp;
+	
+	// We're done.	Now CRC32 the thing so the kernel will accept it
+	efiRuntimeServices->Hdr.CRC32 = crc32(0L, efiRuntimeServices, efiRuntimeServices->Hdr.HeaderSize);
+	
+	// --------------------------------------------------------------------
+	// Finish filling in the rest of the boot args that we need.
+	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
+	bootArgs->efiMode = kBootArgsEfiMode32;
+	
+	// The bootArgs structure as a whole is bzero'd so we don't need to fill in
+	// things like efiRuntimeServices* and what not.
+	//
+	// In fact, the only code that seems to use that is the hibernate code so it
+	// knows not to save the pages.	 It even checks to make sure its nonzero.
+}
 
-    /* Zero out all the tables in case fields are added later */
-    bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
-
-    /* --------------------------------------------------------------------
-     * Initialize some machine code that will return EFI_UNSUPPORTED for
-     * functions returning int and simply return for void functions.
-     */
-    memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
-    memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
-
-    /* -------------------------------------------------------------------- */
-    /* System table */
-    EFI_SYSTEM_TABLE_64 *efiSystemTable = gST = &fakeEfiPages->efiSystemTable;
-    efiSystemTable->Hdr.Signature = EFI_SYSTEM_TABLE_SIGNATURE;
-    efiSystemTable->Hdr.Revision = EFI_SYSTEM_TABLE_REVISION;
-    efiSystemTable->Hdr.HeaderSize = sizeof(EFI_SYSTEM_TABLE_64);
-    efiSystemTable->Hdr.CRC32 = 0; /* Initialize to zero and then do CRC32 */
-    efiSystemTable->Hdr.Reserved = 0;
-
-    efiSystemTable->FirmwareVendor = (EFI_PTR32)&fakeEfiPages->firmwareVendor;
-    memcpy(fakeEfiPages->firmwareVendor, FIRMWARE_VENDOR, sizeof(FIRMWARE_VENDOR));
-    efiSystemTable->FirmwareRevision = FIRMWARE_REVISION;
-
-    /* XXX: We may need to have basic implementations of ConIn/ConOut/StdErr */
-    /* The EFI spec states that all handles are invalid after boot services have been
-     * exited so we can probably get by with leaving the handles as zero. */
-    efiSystemTable->ConsoleInHandle = 0;
-    efiSystemTable->ConIn = 0;
-
-    efiSystemTable->ConsoleOutHandle = 0;
-    efiSystemTable->ConOut = 0;
-
-    efiSystemTable->StandardErrorHandle = 0;
-    efiSystemTable->StdErr = 0;
-
-    efiSystemTable->RuntimeServices = ptov64((EFI_PTR32)&fakeEfiPages->efiRuntimeServices);
-    /* According to the EFI spec, BootServices aren't valid after the
-     * boot process is exited so we can probably do without it.
-     * Apple didn't provide a definition for it in pexpert/i386/efi.h
-     * so I'm guessing they don't use it.
-    */
-    efiSystemTable->BootServices = 0;
-
-    efiSystemTable->NumberOfTableEntries = 0;
-    efiSystemTable->ConfigurationTable = (EFI_PTR32)fakeEfiPages->efiConfigurationTable;
-
-
-    /* We're done.  Now CRC32 the thing so the kernel will accept it */
-    fixupEfiSystemTableCRC32(efiSystemTable);
-
-    /* -------------------------------------------------------------------- */
-    /* Runtime services */
-    EFI_RUNTIME_SERVICES_64 *efiRuntimeServices = &fakeEfiPages->efiRuntimeServices;
-    efiRuntimeServices->Hdr.Signature = EFI_RUNTIME_SERVICES_SIGNATURE;
-    efiRuntimeServices->Hdr.Revision = EFI_RUNTIME_SERVICES_REVISION;
-    efiRuntimeServices->Hdr.HeaderSize = sizeof(EFI_RUNTIME_SERVICES_64);
-    efiRuntimeServices->Hdr.CRC32 = 0;
-    efiRuntimeServices->Hdr.Reserved = 0;
-
-    /* There are a number of function pointers in the efiRuntimeServices table.
-     * These are the Foundation (e.g. core) services and are expected to be present on
-     * all EFI-compliant machines.  Some kernel extensions (notably AppleEFIRuntime)
-     * will call these without checking to see if they are null.
-     *
-     * We don't really feel like doing an EFI implementation in the bootloader
-     * but it is nice if we can at least prevent a complete crash by
-     * at least providing some sort of implementation until one can be provided
-     * nicely in a kext.
-     */
-    void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
-    void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
-    efiRuntimeServices->GetTime = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->SetTime = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->GetWakeupTime = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->SetWakeupTime = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->SetVirtualAddressMap = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->ConvertPointer = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->GetVariable = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->GetNextVariableName = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->SetVariable = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->GetNextHighMonotonicCount = ptov64((EFI_PTR32)unsupportedret_fp);
-    efiRuntimeServices->ResetSystem = ptov64((EFI_PTR32)voidret_fp);
-
-    /* We're done.  Now CRC32 the thing so the kernel will accept it */
-    efiRuntimeServices->Hdr.CRC32 = crc32(0L, efiRuntimeServices, efiRuntimeServices->Hdr.HeaderSize);
-
-
-    /* -------------------------------------------------------------------- */
-    /* Finish filling in the rest of the boot args that we need. */
-    bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
-    bootArgs->efiMode = kBootArgsEfiMode64;
-
-    /* The bootArgs structure as a whole is bzero'd so we don't need to fill in
-     * things like efiRuntimeServices* and what not.
-     *
-     * In fact, the only code that seems to use that is the hibernate code so it
-     * knows not to save the pages.  It even checks to make sure its nonzero.
-     */
+void setupEfiTables64(void)
+{
+	struct fake_efi_pages
+	{
+		EFI_SYSTEM_TABLE_64 efiSystemTable;
+		EFI_RUNTIME_SERVICES_64 efiRuntimeServices;
+		EFI_CONFIGURATION_TABLE_64 efiConfigurationTable[MAX_CONFIGURATION_TABLE_ENTRIES];
+		EFI_CHAR16 firmwareVendor[sizeof(FIRMWARE_VENDOR)/sizeof(EFI_CHAR16)];
+		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+	};
+	
+	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
+	
+	// Zero out all the tables in case fields are added later
+	bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
+	
+	// --------------------------------------------------------------------
+	// Initialize some machine code that will return EFI_UNSUPPORTED for
+	// functions returning int and simply return for void functions.
+	memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
+	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
+	
+	// --------------------------------------------------------------------
+	// System table
+	EFI_SYSTEM_TABLE_64 *efiSystemTable = gST64 = &fakeEfiPages->efiSystemTable;
+	efiSystemTable->Hdr.Signature = EFI_SYSTEM_TABLE_SIGNATURE;
+	efiSystemTable->Hdr.Revision = EFI_SYSTEM_TABLE_REVISION;
+	efiSystemTable->Hdr.HeaderSize = sizeof(EFI_SYSTEM_TABLE_64);
+	efiSystemTable->Hdr.CRC32 = 0; // Initialize to zero and then do CRC32
+	efiSystemTable->Hdr.Reserved = 0;
+	
+	efiSystemTable->FirmwareVendor = ptov64((EFI_PTR32)&fakeEfiPages->firmwareVendor);
+	memcpy(fakeEfiPages->firmwareVendor, FIRMWARE_VENDOR, sizeof(FIRMWARE_VENDOR));
+	efiSystemTable->FirmwareRevision = FIRMWARE_REVISION;
+	
+	// XXX: We may need to have basic implementations of ConIn/ConOut/StdErr
+	// The EFI spec states that all handles are invalid after boot services have been
+	// exited so we can probably get by with leaving the handles as zero.
+	efiSystemTable->ConsoleInHandle = 0;
+	efiSystemTable->ConIn = 0;
+	
+	efiSystemTable->ConsoleOutHandle = 0;
+	efiSystemTable->ConOut = 0;
+	
+	efiSystemTable->StandardErrorHandle = 0;
+	efiSystemTable->StdErr = 0;
+	
+	efiSystemTable->RuntimeServices = ptov64((EFI_PTR32)&fakeEfiPages->efiRuntimeServices);
+	// According to the EFI spec, BootServices aren't valid after the
+	// boot process is exited so we can probably do without it.
+	// Apple didn't provide a definition for it in pexpert/i386/efi.h
+	// so I'm guessing they don't use it.
+	efiSystemTable->BootServices = 0;
+	
+	efiSystemTable->NumberOfTableEntries = 0;
+	efiSystemTable->ConfigurationTable = ptov64((EFI_PTR32)fakeEfiPages->efiConfigurationTable);
+	
+	// We're done.	Now CRC32 the thing so the kernel will accept it
+	gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
+	
+	// --------------------------------------------------------------------
+	// Runtime services
+	EFI_RUNTIME_SERVICES_64 *efiRuntimeServices = &fakeEfiPages->efiRuntimeServices;
+	efiRuntimeServices->Hdr.Signature = EFI_RUNTIME_SERVICES_SIGNATURE;
+	efiRuntimeServices->Hdr.Revision = EFI_RUNTIME_SERVICES_REVISION;
+	efiRuntimeServices->Hdr.HeaderSize = sizeof(EFI_RUNTIME_SERVICES_64);
+	efiRuntimeServices->Hdr.CRC32 = 0;
+	efiRuntimeServices->Hdr.Reserved = 0;
+	
+	// There are a number of function pointers in the efiRuntimeServices table.
+	// These are the Foundation (e.g. core) services and are expected to be present on
+	// all EFI-compliant machines.	Some kernel extensions (notably AppleEFIRuntime)
+	// will call these without checking to see if they are null.
+	//
+	// We don't really feel like doing an EFI implementation in the bootloader
+	// but it is nice if we can at least prevent a complete crash by
+	// at least providing some sort of implementation until one can be provided
+	// nicely in a kext.
+	
+	void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
+	void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
+	efiRuntimeServices->GetTime = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->SetTime = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->GetWakeupTime = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->SetWakeupTime = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->SetVirtualAddressMap = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->ConvertPointer = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->GetVariable = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->GetNextVariableName = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->SetVariable = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->GetNextHighMonotonicCount = ptov64((EFI_PTR32)unsupportedret_fp);
+	efiRuntimeServices->ResetSystem = ptov64((EFI_PTR32)voidret_fp);
+	
+	// We're done.	Now CRC32 the thing so the kernel will accept it
+	efiRuntimeServices->Hdr.CRC32 = crc32(0L, efiRuntimeServices, efiRuntimeServices->Hdr.HeaderSize);
+	
+	// --------------------------------------------------------------------
+	// Finish filling in the rest of the boot args that we need.
+	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
+	bootArgs->efiMode = kBootArgsEfiMode64;
+	
+	// The bootArgs structure as a whole is bzero'd so we don't need to fill in
+	// things like efiRuntimeServices* and what not.
+	//
+	// In fact, the only code that seems to use that is the hibernate code so it
+	// knows not to save the pages.	 It even checks to make sure its nonzero.
 }
 
 /*
@@ -315,7 +431,8 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char const FIRMWARE_ABI_PROP_VALUE[] = "EFI64";
+static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
@@ -418,8 +535,16 @@ void setupEfiDeviceTree(void)
     */
     node = DT__AddChild(node, "efi");
 
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+	}
+	else
+	{
+		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
+	}
+	
     DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
-    DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_PROP_VALUE), (char*)FIRMWARE_ABI_PROP_VALUE);
     DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 
     /* TODO: Fill in other efi properties if necessary */
@@ -428,12 +553,19 @@ void setupEfiDeviceTree(void)
      * is set up.  That is, name and table properties */
     Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 
-    /* The value of the table property is the 32-bit physical address for the RuntimeServices table.
-     * Since the EFI system table already has a pointer to it, we simply use the address of that pointer
-     * for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
-     * the only thing to use a non-malloc'd pointer for something in the DT
-     */
-    DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST->RuntimeServices);
+    if (archCpuType == CPU_TYPE_I386)
+	{
+		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
+		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
+		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
+		// the only thing to use a non-malloc'd pointer for something in the DT
+		
+		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
+	}
+	else
+	{
+		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
+	}
 
     /* Set up the /efi/configuration-table node which will eventually have several child nodes for
      * all of the configuration tables needed by various kernel extensions.
@@ -496,14 +628,23 @@ static void setupSmbiosConfigFile()
 /* Installs all the needed configuration table entries */
 static void setupEfiConfigurationTable()
 {
-  smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-  addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-
-  // Setup ACPI with DSDT overrides (mackerintel's patch)
-  setupAcpi();
-  
-  // We've obviously changed the count.. so fix up the CRC32
-  fixupEfiSystemTableCRC32(gST);
+	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, "SMBIOS_P"); //Azi: give an "alias" to this stuff?
+	
+	// Setup ACPI with DSDT overrides (mackerintel's patch)
+	setupAcpi();
+	
+	// We've obviously changed the count.. so fix up the CRC32
+  	if (archCpuType == CPU_TYPE_I386)
+	{
+		gST32->Hdr.CRC32 = 0;
+		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
+	}
+	else
+	{
+		gST64->Hdr.CRC32 = 0;
+		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
+	}
 }
 
 
@@ -512,12 +653,19 @@ void setupFakeEfi(void)
 {
 	// Generate efi device strings 
 	setup_pci_devs(root_pci_dev);
-	
+
 	// load smbios.plist file if any
 	setupSmbiosConfigFile();
 	
 	// Initialize the base table
-	setupEfiTables();
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		setupEfiTables32();
+	}
+	else
+	{
+		setupEfiTables64();
+	}
 	
 	// Initialize the device tree
 	setupEfiDeviceTree();
