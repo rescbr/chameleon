@@ -1,0 +1,272 @@
+# Dependencies for File:  \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o:
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/Availability.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/AvailabilityInternal.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/alloca.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/architecture/byte_order.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/_structs.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/eflags.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/endian.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/signal.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/i386/types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/libkern/OSByteOrder.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/libkern/_OSByteOrder.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/libkern/i386/OSByteOrder.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/libkern/i386/_OSByteOrder.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach-o/loader.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/boolean.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/clock_priv.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/clock_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/error.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/exception_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/host_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/host_notify.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/host_priv.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/host_security.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/host_special_ports.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/_structs.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/boolean.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/exception.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/fp_reg.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/kern_return.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/processor_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/rpc.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/thread_state.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/thread_status.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/vm_param.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/i386/vm_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/kern_return.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/kmod.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/ledger.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/lock_set.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_error.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_host.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_init.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_interface.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_port.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_traps.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mach_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/boolean.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/exception.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/kern_return.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/processor_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/rpc.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/thread_state.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/thread_status.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/vm_param.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/machine/vm_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/memory_object_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/message.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mig.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/mig_errors.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/ndr.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/notify.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/policy.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/port.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/processor.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/processor_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/processor_set.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/rpc.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/semaphore.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/std_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/sync_policy.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/task.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/task_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/task_policy.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/task_special_ports.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_act.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_policy.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_special_ports.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_status.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/thread_switch.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/time_value.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_attributes.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_behavior.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_inherit.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_map.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_prot.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_purgable.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_region.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_statistics.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_sync.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/vm_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/x86_64/task.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach/x86_64/thread_act.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/hash_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/ipc_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/lockgroup_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/mach_debug_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/page_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/vm_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/mach_debug/zone_info.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/machine/_structs.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/machine/_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/machine/endian.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/machine/signal.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/machine/types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/secure/_common.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/secure/_stdio.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/secure/_string.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/stdio.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/stdlib.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/string.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/_endian.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/_select.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/_structs.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/_types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/appleapiopts.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/cdefs.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/fcntl.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/file.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/queue.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/resource.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/select.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/signal.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/types.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/unistd.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/sys/wait.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/include/unistd.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdarg.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdbool.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: /usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stdint.h
+ \
+ /Volumes/Home/Azi/ChopShop/Booters/Chameleon/Chazileon/obj/i386/util/machOconv.o: machOconv.c
