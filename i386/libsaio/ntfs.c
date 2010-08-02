@@ -295,6 +295,34 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     return;
 }
 
+long NTFSGetUUID(CICell ih, char *uuidStr)
+{
+    bool NTFSProbe(const void*);
+    
+    struct bootfile *boot;
+    void *buf = malloc(MAX_CLUSTER_SIZE);
+    if (!buf)
+        return -1;
+    
+    /*
+     * Read the boot sector, check signatures, and do some minimal
+     * sanity checking.  NOTE: the size of the read below is intended
+     * to be a multiple of all supported block sizes, so we don't
+     * have to determine or change the device's block size.
+     */
+    Seek(ih, 0);
+    Read(ih, (long)buf, MAX_BLOCK_SIZE);
+    
+    if(!NTFSProbe(buf))
+        return -1;
+    
+    boot = (struct bootfile *) buf;
+    if(!boot->bf_volsn)
+        return -1;
+       
+    return CreateUUIDString((uint8_t*)(&boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
+}    
+
 bool NTFSProbe(const void * buffer)
 {
 	bool result = false;

@@ -874,7 +874,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                                     biosdev, partno,
                                     part->relsect,
                                     part,
-                                    0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0,
+                                    NTFSGetUUID,
                                     NTFSGetDescription,
                                     (BVFree)free,
                                     0, kBIOSDevTypeHardDrive, 0);
@@ -1688,60 +1689,70 @@ static const struct NamedValue fdiskTypes[] =
 char* matchVolumeToString( BVRef bvr, const char* match, bool matchParcial)
 {
 	char testStr[64];
+    char *ret = 0;
+    int len = 0;
 	 
 	if ( !bvr || !match || !*match)
-		return false;
+		return 0;
 	
-	if ( bvr->biosdev >= 0x80 && bvr->biosdev < 0x100
-		&& ( bvr->flags & ( kBVFlagSystemVolume|kBVFlagForeignBoot ) ) )
-	{
-		// Trying to match hd(x,y) format.
-		int len;
-        char *ret = 0;
+	if ( bvr->biosdev < 0x80 || bvr->biosdev >= 0x100
+         || !(bvr->flags & (kBVFlagSystemVolume|kBVFlagForeignBoot)) )
+        return 0;
         
-        len = sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
-		if (matchParcial)
+    // Try to match hd(x,y) first.
+    len = snprintf(testStr, sizeof(testStr)-1, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
+    if ( matchParcial )
+        ret = strstr(match, testStr);
+    else if ( !strcmp(match, testStr) )
+        ret = (char*) match;
+    if(ret)
+        return ret+len;
+    
+    
+    // Try to match volume UUID.
+    if ( bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0 )
+    {
+        {
+            char* temp = malloc(64);
+            if(temp && bvr->description) {
+                bvr->description(bvr, temp, 63);
+                printf("Volume: UUID=%s, Label=%s\n", testStr, temp);
+                pause();
+            }
+        }
+        
+        len = strlen(testStr);
+        if ( matchParcial )
             ret = strstr(match, testStr);
-        else if (!strcmp(match, testStr))
-			ret = (char*)match;
+        else if ( !strcmp(match, testStr) )
+            ret = (char*) match;
         if(ret)
             return ret+len;
-		
-		// Trying to match volume UUID.
-		if (bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0)
-        {
-            if (matchParcial)
-                ret = strstr(match, testStr);
-            else if (!strcmp(match, testStr))
-                ret = (char*)match;
-            if (ret)
-                return ret+strlen(testStr);
-		}
+    }
+    
+    // Try to match volume label (always quoted).
+    if ( bvr->description )
+    {   
+        char *temp = 0;
         
-		// Trying to match volume label (always quoted).
-		if (bvr->description)
-        {   
-            char *ret = 0, *temp = 0;
-            
-            bvr->description(bvr, testStr, sizeof(testStr)-1); 
-			if ( !(len = strlen(testStr)) )
-                 return 0;
-            
-            len+=2; /* quoted */
-            temp = malloc(len+1);
-            if(!temp)
-                return 0;
-                
-            sprintf(temp, "\"%s\"", testStr);
-                
-            if(matchParcial)
+        bvr->description(bvr, testStr, sizeof(testStr)-1); 
+        len = strlen(testStr);
+        if ( !len )
+             return 0;
+        
+        len += 2; /* quoted */
+        temp = malloc(len+1);
+        
+        if(temp)
+        {
+            len = snprintf(temp, len, "\"%s\"", testStr);
+            if ( matchParcial )
                 ret = strstr(match, temp);
-            else if(!strcmp(match, temp))
-                ret = (char*)match;
-                
-            free(temp);
+            else if ( !strcmp(match, temp) )
+                ret = (char*) match;
             
-            if(ret)
+            free(temp);
+            if (ret)
                 return ret+len;
         }
 	}

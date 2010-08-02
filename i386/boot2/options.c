@@ -777,7 +777,7 @@ int getBootOptions(bool firstRun)
 			strlcpy(prompt, val, cnt);
 		} else {
 			name = malloc(80);
-			getBootVolumeDescription(gBootVolume, name, sizeof(name)-1, false);
+			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);

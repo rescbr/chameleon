@@ -276,7 +276,7 @@ struct bootfile {
 	u_int8_t        bf_mftrecsz;	/* MFT record size (clust) */
 					/* 0xF6 inducates 1/4 */
 	u_int32_t       bf_ibsz;	/* index buffer size */
-	u_int32_t       bf_volsn;	/* volume ser. num. */
+	u_int64_t       bf_volsn;	/* volume ser. num. */
 };
 
 /*
