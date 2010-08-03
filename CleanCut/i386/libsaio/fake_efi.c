@@ -22,35 +22,34 @@ extern struct SMBEntryPoint * getSmbios(int which); // now cached
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
-Modern Darwin kernels require some amount of EFI because Apple machines all
-have EFI.  Modifying the kernel source to not require EFI is of course
-possible but would have to be maintained as a separate patch because it is
-unlikely that Apple wishes to add legacy support to their kernel.
-
-As you can see from the Apple-supplied code in bootstruct.c, it seems that
-the intention was clearly to modify this booter to provide EFI-like structures
-to the kernel rather than modifying the kernel to handle non-EFI stuff.  This
-makes a lot of sense from an engineering point of view as it means the kernel
-for the as yet unreleased EFI-only Macs could still be booted by the non-EFI
-DTK systems so long as the kernel checked to ensure the boot tables were
-filled in appropriately.  Modern xnu requires a system table and a runtime
-services table and performs no checks whatsoever to ensure the pointers to
-these tables are non-NULL.  Therefore, any modern xnu kernel will page fault
-early on in the boot process if the system table pointer is zero.
-
-Even before that happens, the tsc_init function in modern xnu requires the FSB
-Frequency to be a property in the /efi/platform node of the device tree or else
-it panics the bootstrap process very early on.
-
-As of this writing, the current implementation found here is good enough
-to make the currently available xnu kernel boot without modification on a
-system with an appropriate processor.  With a minor source modification to
-the tsc_init function to remove the explicit check for Core or Core 2
-processors the kernel can be made to boot on other processors so long as
-the code can be executed by the processor and the machine contains the
-necessary hardware.
-*/
-
+ * Modern Darwin kernels require some amount of EFI because Apple machines all
+ * have EFI.  Modifying the kernel source to not require EFI is of course
+ * possible but would have to be maintained as a separate patch because it is
+ * unlikely that Apple wishes to add legacy support to their kernel.
+ *
+ * As you can see from the Apple-supplied code in bootstruct.c, it seems that
+ * the intention was clearly to modify this booter to provide EFI-like structures
+ * to the kernel rather than modifying the kernel to handle non-EFI stuff.	 This
+ * makes a lot of sense from an engineering point of view as it means the kernel
+ * for the as yet unreleased EFI-only Macs could still be booted by the non-EFI
+ * DTK systems so long as the kernel checked to ensure the boot tables were
+ * filled in appropriately.  Modern xnu requires a system table and a runtime
+ * services table and performs no checks whatsoever to ensure the pointers to
+ * these tables are non-NULL.	Therefore, any modern xnu kernel will page fault
+ * early on in the boot process if the system table pointer is zero.
+ *
+ * Even before that happens, the tsc_init function in modern xnu requires the FSB
+ * Frequency to be a property in the /efi/platform node of the device tree or else
+ * it panics the bootstrap process very early on.
+ *
+ * As of this writing, the current implementation found here is good enough
+ * to make the currently available xnu kernel boot without modification on a
+ * system with an appropriate processor.  With a minor source modification to
+ * the tsc_init function to remove the explicit check for Core or Core 2
+ * processors the kernel can be made to boot on other processors so long as
+ * the code can be executed by the processor and the machine contains the
+ * necessary hardware.
+ */
 
 /*==========================================================================
  * Utility function to make a device tree string from an EFI_GUID
@@ -58,20 +57,19 @@ necessary hardware.
 
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
-    char *string = malloc(37);
-    efi_guid_unparse_upper(pGuid, string);
-    return string;
+	char *string = malloc(37);
+	efi_guid_unparse_upper(pGuid, string);
+	return string;
 }
-
 
 /*==========================================================================
  * Function to map 32 bit physical address to 64 bit virtual address
  */
+
 static uint64_t ptov64(uint32_t addr)
 {
-  return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
+	return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
 }
-
 
 /*==========================================================================
  * Fake EFI implementation
@@ -82,10 +80,11 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n'
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF";//random value gen by uuidgen
+static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
+
 /* movl $0x80000003,%eax; ret */
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
 
@@ -108,36 +107,36 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		i = gST64->NumberOfTableEntries;
 	}
 	
-    /* We only do adds, not modifications and deletes like InstallConfigurationTable */
-    if(i >= MAX_CONFIGURATION_TABLE_ENTRIES)
-        stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
-
-    if(pGuid == NULL)
-        return EFI_INVALID_PARAMETER;
-
-    if(table != NULL)
-    {
-    	/* FIXME
-        ((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorGuid = *pGuid;
-        ((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorTable = (EFI_PTR64)table;
-
-        ++gST->NumberOfTableEntries;
-		  */
-      Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
-
-      /* Use the pointer to the GUID we just stuffed into the system table */
-	  	DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
-
-      /* The "table" property is the 32-bit (in our implementation) physical address of the table */
-  		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
-
-      /* Assume the alias pointer is a global or static piece of data */
-      if(alias != NULL)
-        DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
-
-      return EFI_SUCCESS;
-    }
-    return EFI_UNSUPPORTED;
+    // We only do adds, not modifications and deletes like InstallConfigurationTable
+	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
+		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
+	
+	if (pGuid == NULL)
+		return EFI_INVALID_PARAMETER;
+	
+	if (table != NULL)
+	{
+		// FIXME
+		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorGuid = *pGuid;
+		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorTable = (EFI_PTR64)table;
+		
+		//++gST->NumberOfTableEntries;
+		
+		Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
+		
+		// Use the pointer to the GUID we just stuffed into the system table
+		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
+		
+		// The "table" property is the 32-bit (in our implementation) physical address of the table
+		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
+		
+		// Assume the alias pointer is a global or static piece of data
+		if (alias != NULL)
+			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
+		
+		return EFI_SUCCESS;
+	}
+	return EFI_UNSUPPORTED;
 }
 
 //Azi: crc32 done in place, on the cases were it wasn't.
@@ -148,12 +147,13 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 }*/
 
 /*
-What we do here is simply allocate a fake EFI system table and a fake EFI
-runtime services table.
+ * What we do here is simply allocate a fake EFI system table and a fake EFI
+ * runtime services table.
+ *
+ * Because we build against modern headers with kBootArgsRevision 4 we
+ * also take care to set efiMode = 32.
+ */
 
-Because we build against modern headers with kBootArgsRevision 4 we
-also take care to set efiMode = 32.
-*/
 void setupEfiTables32(void)
 {
 	// We use the fake_efi_pages struct so that we only need to do one kernel
@@ -381,11 +381,11 @@ void setupEfiTables64(void)
 }
 
 /*
-In addition to the EFI tables there is also the EFI device tree node.
-In particular, we need /efi/platform to have an FSBFrequency key. Without it,
-the tsc_init function will panic very early on in kernel startup, before
-the console is available.
-*/
+ * In addition to the EFI tables there is also the EFI device tree node.
+ * In particular, we need /efi/platform to have an FSBFrequency key. Without it,
+ * the tsc_init function will panic very early on in kernel startup, before
+ * the console is available.
+ */
 
 /*==========================================================================
  * FSB Frequency detection
@@ -439,102 +439,118 @@ static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
 
 
-/* Get an smbios option string option to convert to EFI_CHAR16 string */
+/*
+ * Get an smbios option string option to convert to EFI_CHAR16 string
+ */
+
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
-  const char * src= getStringForKey(key,  &bootInfo->smbiosConfig);
-  EFI_CHAR16* dst = 0;
-  size_t i=0;
-
-  if (!key || !(*key) || !len || !src)    return 0;
-
-  *len = strlen(src);
-  dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
-  for (; i < (*len); i++)  dst[i] = src[i];
-  dst[(*len)] = '\0';
-  *len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
-  return dst;
+	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
+	EFI_CHAR16*  dst = 0;
+	size_t		 i = 0;
+	
+	if (!key || !(*key) || !len || !src) return 0;
+	
+	*len = strlen(src);
+	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
+	for (; i < (*len); i++)  dst[i] = src[i];
+	dst[(*len)] = '\0';
+	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+	return dst;
 }
 
-/* Get the SystemID from the bios dmi info */
-static  EFI_CHAR8* getSmbiosUUID()
+/*
+ * Get the SystemID from the bios dmi info
+ */
+
+static	EFI_CHAR8* getSmbiosUUID()
 {
+	static EFI_CHAR8		 uuid[UUID_LEN];
+	int						 i, isZero, isOnes;
 	struct SMBEntryPoint	*smbios;
-	SMBByte			*p;
-	int			i, isZero, isOnes;
-	static EFI_CHAR8        uuid[UUID_LEN];
-
-	smbios = getSmbios(SMBIOS_PATCHED);	/* checks for _SM_ anchor and table header checksum */
+	SMBByte					*p;
+	
+	smbios = getSmbios(SMBIOS_PATCHED); // checks for _SM_ anchor and table header checksum
 	if (smbios==NULL) return 0; // getSmbios() return a non null value if smbios is found
-
-	p = (SMBByte*) FindFirstDmiTableOfType(1, 0x19); /* Type 1: (3.3.2) System Information */
+	
+	p = (SMBByte*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
 	if (p==NULL) return NULL;
- 
+	
 	verbose("Found SMBIOS System Information Table 1\n");
 	p += 8;
-
-	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) {
+	
+	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
+	{
 		if (p[i] != 0x00) isZero = 0;
 		if (p[i] != 0xff) isOnes = 0;
 	}
-	if (isZero || isOnes) {	/* empty or setable means: no uuid present */
+	
+	if (isZero || isOnes) // empty or setable means: no uuid present
+	{
 		verbose("No UUID present in SMBIOS System Information Table\n");
 		return 0;
 	}
-
+	
 	memcpy(uuid, p, UUID_LEN);
 	return uuid;
 }
 
-/* return a binary UUID value from the overriden SystemID and SMUUID if found, 
+/*
+ * return a binary UUID value from the overriden SystemID and SMUUID if found, 
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
+
 static EFI_CHAR8* getSystemID()
-{   // unable to determine UUID for host. Error: 35 fix
+{
+	// unable to determine UUID for host. Error: 35 fix
+	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
+	// belong to smbios config only ...
+	const char *sysId = getStringForKey(kSystemID, &bootInfo->bootConfig);
+	EFI_CHAR8*  ret = getUUIDFromString(sysId);
 
-    // Rek: new SMsystemid option conforming to smbios notation standards, this option should
-    // belong to smbios config only ...
-    const char * sysId = getStringForKey(kSystemID, &bootInfo->bootConfig);
-    EFI_CHAR8* ret = getUUIDFromString(sysId);
-
-    if(!sysId || !ret)  { // try bios dmi info UUID extraction 
-      ret = getSmbiosUUID();
-      sysId = 0;
-    }
-    if(!ret)   // no bios dmi UUID available, set a fixed value for system-id
-      ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
-
-    verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
-    return ret;
+	if (!sysId || !ret) // try bios dmi info UUID extraction
+	{
+		ret = getSmbiosUUID();
+		sysId = 0;
+	}
+	
+	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
+		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
+	
+	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
+	return ret;
 }
 
-// must be called AFTER setup Acpi because we need to take care of correct facp content to reflect in ioregs
+/*
+ * Must be called AFTER setup Acpi because we need to take care of correct
+ * facp content to reflect in ioregs
+ */
+
 void setupSystemType()
 {
-    Node *node = DT__FindNode("/", false);
-    if (node == 0) stop("Couldn't get root node");
-    // we need to write this property after facp parsing
-    /* Export system-type only if it has been overrriden by the SystemType option */
-    DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
+	Node *node = DT__FindNode("/", false);
+	if (node == 0) stop("Couldn't get root node");
+	// we need to write this property after facp parsing
+	// Export system-type only if it has been overrriden by the SystemType option
+	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
 }
 
 void setupEfiDeviceTree(void)
 {
-    EFI_CHAR16* ret16=0;
-    EFI_CHAR8* ret=0;
-    size_t len=0;
-    Node *node;
-
-    node = DT__FindNode("/", false);
-    
-    if (node == 0) stop("Couldn't get root node");
-    
-   /* We could also just do DT__FindNode("/efi/platform", true)
-    * But I think eventually we want to fill stuff in the efi node
-    * too so we might as well create it so we have a pointer for it too.
-    */
-    node = DT__AddChild(node, "efi");
-
+    EFI_CHAR8*	 ret = 0;
+	EFI_CHAR16*  ret16 = 0;
+	size_t		 len = 0;
+	Node		*node;
+	
+	node = DT__FindNode("/", false);
+	
+	if (node == 0) stop("Couldn't get root node");
+	
+	// We could also just do DT__FindNode("/efi/platform", true)
+	// But I think eventually we want to fill stuff in the efi node
+	// too so we might as well create it so we have a pointer for it too.
+	node = DT__AddChild(node, "efi");
+	
 	if (archCpuType == CPU_TYPE_I386)
 	{
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
@@ -545,14 +561,14 @@ void setupEfiDeviceTree(void)
 	}
 	
     DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
-    DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
-
-    /* TODO: Fill in other efi properties if necessary */
-
-    /* Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
-     * is set up.  That is, name and table properties */
-    Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
-
+	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
+	
+	// TODO: Fill in other efi properties if necessary
+	
+	// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
+	// is set up.  That is, name and table properties
+	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
+	
     if (archCpuType == CPU_TYPE_I386)
 	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
@@ -567,65 +583,70 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
 	}
 
-    /* Set up the /efi/configuration-table node which will eventually have several child nodes for
-     * all of the configuration tables needed by various kernel extensions.
-     */
-    gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
+    // Set up the /efi/configuration-table node which will eventually have several child nodes for
+	// all of the configuration tables needed by various kernel extensions.
+	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
+	
+	// Now fill in the /efi/platform Node
+	Node *efiPlatformNode = DT__AddChild(node, "platform");
+	
+	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
+	// the value in the fsbFrequency global and not an malloc'd pointer
+	// because the DT_AddProperty function does not copy its args.
+	
+	if (Platform.CPU.FSBFrequency != 0)
+		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
+	
+	// Export TSC and CPU frequencies for use by the kernel or KEXTs
+	if (Platform.CPU.TSCFrequency != 0)
+		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
+	
+	if (Platform.CPU.CPUFrequency != 0)
+		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
+	
+	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
+	if ((ret=getSystemID()))
+		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 
-    /* Now fill in the /efi/platform Node */
-    Node *efiPlatformNode = DT__AddChild(node, "platform");
-    
-    /* NOTE WELL: If you do add FSB Frequency detection, make sure to store
-     * the value in the fsbFrequency global and not an malloc'd pointer
-     * because the DT_AddProperty function does not copy its args.
-     */
-    if(Platform.CPU.FSBFrequency != 0) 
-      DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
-    
-    /* Export TSC and CPU frequencies for use by the kernel or KEXTs */
-    if(Platform.CPU.TSCFrequency != 0) 
-      DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
-
-    if(Platform.CPU.CPUFrequency != 0) 
-      DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
-
-    /* Export system-id. Can be disabled with system-id=No in com.apple.Boot.plist */
-    if((ret=getSystemID()))
-       DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
-
-     /* Export SystemSerialNumber if present */
-    if ((ret16=getSmbiosChar16("SMserial", &len)))
-      DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
-
-    /* Export Model if present */
-    if ((ret16=getSmbiosChar16("SMproductname", &len)))
-      DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
-
-    /* Fill /efi/device-properties node.
-     */
-    setupDeviceProperties(node);
+	 // Export SystemSerialNumber if present
+	if ((ret16=getSmbiosChar16("SMserial", &len)))
+		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
+	
+	// Export Model if present
+	if ((ret16=getSmbiosChar16("SMproductname", &len)))
+		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
+	
+	// Fill /efi/device-properties node.
+	setupDeviceProperties(node);
 }
 
-/* Load the smbios.plist override config file if any */
+/*
+ * Load the smbios.plist override config file if any
+ */
+
 static void setupSmbiosConfigFile()
 {
-  const char * value = getStringForKey(kSMBIOS, &bootInfo->bootConfig);
-  extern void scan_mem();
-
-    if (!value)  value = "/Extra/smbios.plist";
-    if (loadConfigFile(value, &bootInfo->smbiosConfig) == -1) {
-      verbose("No SMBIOS replacement found\n");
+	const char * value = getStringForKey(kSMBIOS, &bootInfo->bootConfig);
+	extern void scan_mem();
+	
+	if (!value)  value = "/Extra/smbios.plist";
+	if (loadConfigFile(value, &bootInfo->smbiosConfig) == -1)
+	{
+		verbose("No SMBIOS replacement found\n");
     }
-
+	
     // get a chance to scan mem dynamically if user asks for it while having the config options loaded as well
     // as opposed to when it was in scan_platform(), also load the orig. smbios so that we can access dmi info without
     // patching the smbios yet
     getSmbios(SMBIOS_ORIGINAL);
     scan_mem(); 
-    smbios_p = (EFI_PTR32) getSmbios(SMBIOS_PATCHED);	// process smbios asap
+    smbios_p = (EFI_PTR32) getSmbios(SMBIOS_PATCHED); // process smbios asap
 }
 
-/* Installs all the needed configuration table entries */
+/*
+ * Installs all the needed configuration table entries
+ */
+
 static void setupEfiConfigurationTable()
 {
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
@@ -647,8 +668,10 @@ static void setupEfiConfigurationTable()
 	}
 }
 
+/*
+ * Entrypoint from boot.c
+ */
 
-/* Entrypoint from boot.c */
 void setupFakeEfi(void)
 {
 	// Generate efi device strings 
