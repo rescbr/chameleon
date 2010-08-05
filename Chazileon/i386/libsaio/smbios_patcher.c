@@ -217,7 +217,7 @@ static int sm_get_simplecputype()
 	return 0x0301;   // Core 2 Duo
 }
 //Azi: warning: ‘sm_get_bus_speed’ defined but not used
-/*static int sm_get_bus_speed(const char *name, int table_num)
+static int sm_get_bus_speed(const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{		
@@ -247,7 +247,7 @@ static int sm_get_simplecputype()
 		}
 	}
 	return 0;
-}*/
+}
 
 static int sm_get_cputype (const char *name, int table_num)
 {
@@ -392,7 +392,7 @@ struct smbios_property smbios_properties[]=
 	{.name="SMmemserial",		.table_type=17,	.value_type=SMSTRING,	.offset=0x18,	.auto_str=sm_get_memserial	},
 	{.name="SMmempart",			.table_type=17,	.value_type=SMSTRING,	.offset=0x1A,	.auto_str=sm_get_mempartno	},
 	{.name="SMcputype",			.table_type=131,.value_type=SMWORD,		.offset=0x04,	.auto_int=sm_get_cputype	},
-	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,		.offset=0x04,	.auto_str=0					}
+	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,		.offset=0x04,	.auto_int=sm_get_bus_speed	}
 };
 
 struct smbios_table_description smbios_table_descriptions[]=
