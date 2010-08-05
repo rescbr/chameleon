@@ -80,15 +80,13 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n'
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 // Default platform system_id (fix by IntVar)
-static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF";//random value gen by uuidgen
+static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
 
 // Just a ret instruction
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
 
 // movl $0x80000003,%eax; ret
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
-
-// struct fake_efi_pages Azi:efi32/64 - moved to setupEfiTables32/64
 
 EFI_SYSTEM_TABLE_32 *gST32 = NULL; //Azi:efi32/64
 EFI_SYSTEM_TABLE_64 *gST64 = NULL; //		||
@@ -141,7 +139,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	return EFI_UNSUPPORTED;
 }
 
-//Azi:efi32/64 - crc32 done in place.
+//Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
 {
 	efiSystemTable->Hdr.CRC32 = 0;

@@ -115,7 +115,6 @@ release: $(SYMROOT)
 	@tar -czf $(SYMROOT)/$(PRODUCT)-src.tar.gz ${EXCLUDE} .
 	@tar -cjf $(SYMROOT)/$(PRODUCT)-src.tar.bz2 ${EXCLUDE} .
 
-#Azi: is "dst" still needed?
 clean:
 	rm -rf sym obj dst revision
 

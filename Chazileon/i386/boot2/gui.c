@@ -167,7 +167,8 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0}; // here we store the used screen resolution
+// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};
 
 static int getImageIndexByName(const char *name)
 {
@@ -793,11 +794,15 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		}
 	}
 	
-	// Use the next (device_*_o) image for the selected item.
-    if (isSelected) devicetype++;
-
+	// Draw the selection image and use the next (device_*_o) image for the selected item.
+	if (isSelected)
+	{
+		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
+		devicetype++;
+	}
+	
 	// draw icon
-	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
+	blend(images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
 	
 	p.y += (images[iSelection].image->height / 2) + font_console.chars[0]->height;
 	
@@ -866,13 +871,11 @@ void drawDeviceList (int start, int end, int selection)
 
 			if (gui.menu.draw)
 				drawInfoMenuItems();
-
-			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
 		
 			//Azi: making this info more accessible. TODO: remove the stuff on graphics.c!
 			getBoolForKey(kDisplayInfoKey, &displayInfo, &bootInfo->bootConfig);
 			
-#ifdef AUTORES_DEBUG //Azi, LeBidou
+#ifdef AUTORES_DEBUG //Azi:autoresolution
 			displayInfo = true;
 #endif
 
@@ -1835,6 +1838,7 @@ void drawBootGraphics(void)
 	int pos;
 	int length, count;
 	const char *dummyVal;
+	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
 	uint16_t x, y; 
 	
@@ -1872,13 +1876,20 @@ void drawBootGraphics(void)
 		}
 	}
 
+	// Save current screen resolution.
+	oldScreenWidth = gui.screen.width;
+	oldScreenHeight = gui.screen.height;
+
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
 
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 	
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+    // Set graphics mode if the booter was in text mode or the screen resolution has changed.
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE
+		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
 	

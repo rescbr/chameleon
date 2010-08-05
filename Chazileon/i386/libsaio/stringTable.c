@@ -614,8 +614,8 @@ int loadSystemConfig(config_file_t *config) //Azi:searchalgo???
 	//Azi: Called from boot.c, commonBoot (firstrun).
 	// DEFAULT Boot.plist paths. These are checked before getting to boot prompt.
 	char *dirspec[] = {
+		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0) - review? only needed to load it from selected volume.
 		"bt(0,0)/Extra/com.apple.Boot.plist",
-		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0)
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",

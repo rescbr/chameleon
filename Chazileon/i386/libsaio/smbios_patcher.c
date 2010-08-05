@@ -216,7 +216,7 @@ static int sm_get_simplecputype()
 	
 	return 0x0301;   // Core 2 Duo
 }
-//Azi: defined but not used.
+//Azi: warning: ‘sm_get_bus_speed’ defined but not used
 /*static int sm_get_bus_speed(const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
