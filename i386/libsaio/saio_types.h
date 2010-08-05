@@ -247,7 +247,7 @@ enum {
 enum {
     kNetworkDeviceType = kBIOSDevTypeNetwork,
     kBlockDeviceType   = kBIOSDevTypeHardDrive
-} gBootFileType_t;
+};
 
 enum {
     kCursorTypeHidden    = 0x0100,
