@@ -38,14 +38,12 @@ int uhci_reset (pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	
 	struct pciList* current = usbList;
 	if(!usbList)
 	{
 		usbList = (struct pciList*)malloc(sizeof(struct pciList));
 		usbList->next = NULL;
 		usbList->pciDev = pci_dev;
-		
 	}
 	else
 	{
@@ -68,15 +66,15 @@ int usb_loop()
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
 	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
-	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	if (getBoolForKey(kUSBBusFixKey, &fix_usb, &bootInfo->bootConfig))
 	{
 		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
-		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+		getBoolForKey(kEHCIacquireKey, &fix_ehci, &bootInfo->bootConfig);
+		getBoolForKey(kUHCIresetKey, &fix_uhci, &bootInfo->bootConfig);
+		getBoolForKey(kLegacyOffKey, &fix_legacy, &bootInfo->bootConfig);
 	}
 	
 	struct pciList* current = usbList;
@@ -87,14 +85,18 @@ int usb_loop()
 		{
 			// EHCI
 			case 0x20:
-		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
-		    	if(fix_legacy) retVal &= legacy_off(current->pciDev);
+		    	if (fix_ehci)
+					retVal &= ehci_acquire(current->pciDev);
+				
+		    	if (fix_legacy)
+					retVal &= legacy_off(current->pciDev);
 				
 				break;
 				
 			// UHCI
 			case 0x00:
-				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
+				if (fix_uhci)
+					retVal &= uhci_reset(current->pciDev);
 
 				break;
 		}
@@ -122,7 +124,6 @@ int legacy_off (pci_dt_t *pci_dev)
 			pci_dev->vendor_id, pci_dev->device_id,
 			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
 	
-	
 	// capaddr = Capability Registers = dev.addr + offset stored in dev.addr + 0x10 (USBBASE)
 	capaddr = pci_config_read32(pci_dev->dev.addr, 0x10);	
 	
@@ -130,7 +131,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	opaddr = capaddr + *((unsigned char*)(capaddr)); 		
 	
 	// eecp = EHCI Extended Capabilities offset = capaddr HCCPARAMS bits 15:8
-	eecp=*((unsigned char*)(capaddr + 9));
+	eecp = *((unsigned char*)(capaddr + 9));
 	
 	DBG("capaddr=%x opaddr=%x eecp=%x\n", capaddr, opaddr, eecp);
 	
@@ -208,7 +209,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	bool		alwaysHardBIOSReset;
 
 	alwaysHardBIOSReset = false;	
-	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
+	if (!getBoolForKey(kEHCIhardKey, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
 		alwaysHardBIOSReset = true;
 	}
 

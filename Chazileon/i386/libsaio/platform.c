@@ -43,7 +43,7 @@ void scan_mem() {
     if (done) return;
 
     bool useAutodetection = true;
-    getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
+    getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
 
     if (useAutodetection) {
 		if (dram_controller_dev!=NULL) {
