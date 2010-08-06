@@ -91,8 +91,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
  */
 //definition					name				location/function							description/comment
 
-// Internal use: remove/move, if possible/benefitial?? leave for later...
-#define kBootDeviceKey			"Boot Device"		// options.c, getValFK						and this??
+// leave for later...
 #define kTextModeKey			"Text Mode"			// graphics.c, getNumberArrayFromProperty	textmode resolution??
 #define kProductVersion			"ProductVersion"	// boot.c, getValFK, internal				key on SystemVersion.plist
 
@@ -123,7 +122,9 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kKernelFlagsKey			"Kernel Flags"		// * options.c, getValFK
 #define kPatchKernelKey			"PatchKernel"		// # stringTable.c, getBollFK				Meklort
 
-#define kRootDeviceKey			"rd"				// * options.c, processBootArgument			test this
+#define kRootDeviceKey			"rd"				// * options.c, processBootArgument			test this,
+#define kBootDeviceKey			"Boot Device"		// options.c, getValFK						and this??
+
 #define kBootUUIDKey			"boot-uuid"			// options.c, processBootArgument			test this
 #define kHelperRootUUIDKey		"Root UUID"			// options.c, getValFK						can't test this
 
@@ -176,7 +177,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kArchX86_64Flag			"64"				// # boot.c, getValFK
 //----------
 #define kVerboseModeFlag		"-v"				// * options.c, getValFK
-#define kOldSafeModeFlag		"-f"				// kIgnoreCacheModeFlag*, options.c, getValFK
+#define kOldSafeModeFlag		"-f"				// kIgnoreCacheModeFlag***, options.c, getValFK
 #define kSafeModeFlag			"-x"				// * options.c, getValueFBK (5) & getValFK
 #define kSingleUserModeFlag		"-s"				// * options.c, getValFK
 #define kIgnoreBootFileFlag		"-F"				// * options.c, getValFBK

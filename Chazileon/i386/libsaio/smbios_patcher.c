@@ -86,23 +86,7 @@ static const SMStrEntryPair const sm_imac_defaults[]={
 	{ "",""	}
 };
 
-// defaults for a Mac Pro 2,1..
-//Azi: for testing..!
-static const SMStrEntryPair const sm_macpro21_defaults[]={
-	{"SMbiosvendor",	"Apple Computer, Inc."		},
-	{"SMbiosversion",	"MP21.88Z.007F.B06.0608221120"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Computer, Inc."		},
-	{"SMproductname",	"MacPro2,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"MacPro"			},
-	{"SMboardmanufacter",	"Apple Computer, Inc."		},
-	{"SMboardproduct",	"Mac-F4208DC8"			},
-	{ "",""	}
-};
-
-// defaults for a Mac Pro 3,1.. Change to/add 4,1?
+// defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro31_defaults[]={
 	{"SMbiosvendor",	"Apple Computer, Inc."		},
 	{"SMbiosversion",	"MP31.88Z.006C.B05.0802291410"	},
@@ -150,8 +134,7 @@ static const char* sm_get_defstr(const char * key, int table_num)
 				sm_defaults=sm_macmini_defaults;
 				break;
 			case 2:
-				//sm_defaults=sm_imac_defaults;
-				sm_defaults=sm_macpro21_defaults; //Azi: for testing..!
+				sm_defaults=sm_imac_defaults;
 				break;
 			default:
 			{
@@ -216,7 +199,7 @@ static int sm_get_simplecputype()
 	
 	return 0x0301;   // Core 2 Duo
 }
-//Azi: warning: ‘sm_get_bus_speed’ defined but not used
+
 static int sm_get_bus_speed(const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel

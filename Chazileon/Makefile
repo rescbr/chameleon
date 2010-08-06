@@ -116,7 +116,7 @@ release: $(SYMROOT)
 	@tar -cjf $(SYMROOT)/$(PRODUCT)-src.tar.bz2 ${EXCLUDE} .
 
 clean:
-	rm -rf sym obj dst revision
+	rm -rf sym obj dst
 
 #distclean: clean
 #	@rm -f $(SYMROOT)/$(PRODUCT)-src.*
