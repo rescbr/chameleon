@@ -14,8 +14,8 @@ extern PlatformInfo_t    Platform;
 #define SYMBOL_PANIC						1
 #define SYMBOL_PMCPUEXITHALTTOOFF			2
 #define SYMBOL_LAPIC_INIT					3
-#define SYMBOL_COMMPAGE_STUFF_ROUTINE		4 // not needed to boot -legacy :)
-#define NUM_SYMBOLS							5 // change according nr of simbols
+#define SYMBOL_COMMPAGE_STUFF_ROUTINE		4 //Azi: not needed to boot -legacy
+#define NUM_SYMBOLS							5
 
 #define SYMBOL_CPUID_SET_INFO_STRING			"_cpuid_set_info"
 #define SYMBOL_PANIC_STRING						"_panic"
@@ -109,7 +109,6 @@ void patch_kernel_32(void* kernelData)
 			// Unknown CPU's
 		default:	
 			// TODO: Impersonate CPU based on user selection
-			//patch_cpuid_set_info(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN);    // Impersonate CPU
 			patch_cpuid_set_info(kernelData, 0, 0);	// Remove Panic Call
 			
 			break;

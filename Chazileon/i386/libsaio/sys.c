@@ -95,7 +95,7 @@ static struct devsw devsw[] =
     { "hd", 0x80,  kBIOSDevTypeHardDrive }, /* DEV_HD */
     { "en", 0xE0,  kBIOSDevTypeNetwork   }, /* DEV_EN */
     { "rd", 0x100, kBIOSDevTypeHardDrive },
-    { "bt", 0x101, kBIOSDevTypeHardDrive }, // turbo - type for booter partition Azi: or ramdisk bt aliased!
+    { "bt", 0x101, kBIOSDevTypeHardDrive }, // turbo - type for booter partition Azi: or ramdisk bt aliased??
     { 0, 0 }
 };
 

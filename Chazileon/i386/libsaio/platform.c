@@ -38,26 +38,20 @@ bool platformCPUFeature(uint32_t feature)
 }
 
 /** scan mem for memory autodection purpose */
-void scan_mem()
-{
+void scan_mem() {
     static bool done = false;
+    if (done) return;
 
-    if (done)
-		return;
+    bool useAutodetection = true;
+    getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
 
-    bool useAutodetection = true; //Azi:default
-
-    getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
-
-    if (useAutodetection)
-	{
-		if (dram_controller_dev != NULL)
-		{
+    if (useAutodetection) {
+		if (dram_controller_dev!=NULL) {
 			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
 		}
         scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
         scan_spd(&Platform);
-		//pause(); //Azi:---
+		//getc();
     }
     done = true;
 }

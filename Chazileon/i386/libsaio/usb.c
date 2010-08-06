@@ -22,6 +22,7 @@
 #define DBG(x...)
 #endif
 
+
 struct pciList
 {
 	pci_dt_t* pciDev;
@@ -37,12 +38,14 @@ int uhci_reset (pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
+	
 	struct pciList* current = usbList;
 	if(!usbList)
 	{
 		usbList = (struct pciList*)malloc(sizeof(struct pciList));
 		usbList->next = NULL;
 		usbList->pciDev = pci_dev;
+		
 	}
 	else
 	{
@@ -58,24 +61,22 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 	}
 }
 
+// Loop through the list and call the apropriate patch function
 int usb_loop()
 {
 	int retVal = 1;
-	bool fix_ehci, fix_uhci, fix_legacy, fix_usb;
+	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
+	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
-	fix_ehci = fix_uhci = fix_legacy = fix_usb = false;
-	
-	getBoolForKey(kUSBBusFixKey, &fix_usb, &bootInfo->bootConfig);
-	
-	if (fix_usb)
+	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
 	{
-		fix_ehci = fix_uhci = fix_legacy = true;
+		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
-		getBoolForKey(kEHCIacquireKey, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIresetKey, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOffKey, &fix_legacy, &bootInfo->bootConfig);
+		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
+		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
+		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
 	}
 	
 	struct pciList* current = usbList;
@@ -86,20 +87,18 @@ int usb_loop()
 		{
 			// EHCI
 			case 0x20:
-		    	if (fix_ehci)
-					retVal &= ehci_acquire(current->pciDev);
-		    	if (fix_legacy)
-					retVal &= legacy_off(current->pciDev);
+		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
+		    	if(fix_legacy) retVal &= legacy_off(current->pciDev);
 				
 				break;
 				
 			// UHCI
 			case 0x00:
-				if (fix_uhci)
-					retVal &= uhci_reset(current->pciDev);
+				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
 
 				break;
 		}
+		
 		current = current->next;
 	}
 	return retVal;
@@ -201,7 +200,7 @@ int legacy_off (pci_dt_t *pci_dev)
 
 int ehci_acquire (pci_dt_t *pci_dev)
 {
-	int			j, k;
+	int		j, k;
 	uint32_t	base;
 	uint8_t		eecp;
 	uint8_t		legacy[8];
@@ -209,7 +208,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	bool		alwaysHardBIOSReset;
 
 	alwaysHardBIOSReset = false;	
-	if (!getBoolForKey(kEHCIhardKey, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
+	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
 		alwaysHardBIOSReset = true;
 	}
 
