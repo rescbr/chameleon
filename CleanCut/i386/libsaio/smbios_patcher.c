@@ -10,6 +10,7 @@
 #include "fake_efi.h"
 #include "platform.h"
 #include "smbios_patcher.h"
+#include "pci.h"
 
 #ifndef DEBUG_SMBIOS
 #define DEBUG_SMBIOS 0
@@ -28,91 +29,106 @@ typedef struct {
 
 // defaults for a MacBook
 static const SMStrEntryPair const sm_macbook_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MB41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"MacBook4,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"MacBook"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F42D89C8"			},
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"MB41.88Z.0073.B00.0809221748"	},
+	{"SMbiosdate",			"04/01/2008"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"MacBook4,1"					},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"MacBook"						},
+	{"SMboardmanufacter",	"Apple Inc."					},
+	{"SMboardproduct",		"Mac-F42D89C8"					},
 	{ "",""	}
 };
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MBP41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"MacBookPro4,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"MacBookPro"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F42D89C8"			},
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"MBP41.88Z.0073.B00.0809221748"	},
+	{"SMbiosdate",			"04/01/2008"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"MacBookPro4,1"					},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"MacBookPro"					},
+	{"SMboardmanufacter",	"Apple Inc."					},
+	{"SMboardproduct",		"Mac-F42D89C8"					},
 	{ "",""	}
 };
 
 // defaults for a Mac mini 
 static const SMStrEntryPair const sm_macmini_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MM21.88Z.009A.B00.0706281359"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"Macmini2,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"Napa Mac"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F4208EAA"			},
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"MM21.88Z.009A.B00.0706281359"	},
+	{"SMbiosdate",			"04/01/2008"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"Macmini2,1"					},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"Napa Mac"						},
+	{"SMboardmanufacter",	"Apple Inc."					},
+	{"SMboardproduct",		"Mac-F4208EAA"					},
 	{ "",""	}
 };
 
 // defaults for an iMac
 static const SMStrEntryPair const sm_imac_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"IM81.88Z.00C1.B00.0802091538"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"iMac8,1"			},	
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"Mac"				},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F227BEC8"			},
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"IM81.88Z.00C1.B00.0802091538"	},
+	{"SMbiosdate",			"04/01/2008"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"iMac8,1"						},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"Mac"							},
+	{"SMboardmanufacter",	"Apple Inc."					},
+	{"SMboardproduct",		"Mac-F227BEC8"					},
 	{ "",""	}
 };
 
 // defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro_defaults[]={
-	{"SMbiosvendor",	"Apple Computer, Inc."		},
-	{"SMbiosversion",	"MP31.88Z.006C.B05.0802291410"	},
-	{"SMbiosdate",		"04/01/2008"			},
-	{"SMmanufacter",	"Apple Computer, Inc."		},
-	{"SMproductname",	"MacPro3,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"MacPro"			},
-	{"SMboardmanufacter",	"Apple Computer, Inc."		},
-	{"SMboardproduct",	"Mac-F4208DC8"			},
+	{"SMbiosvendor",		"Apple Computer, Inc."			},
+	{"SMbiosversion",		"MP31.88Z.006C.B05.0802291410"	},
+	{"SMbiosdate",			"04/01/2008"					},
+	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMproductname",		"MacPro3,1"						},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"MacPro"						},
+	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardproduct",		"Mac-F4208DC8"					},
 	{ "",""	}
 };
 
-// defaults for an iMac11,1 core i5/i7
-static const SMStrEntryPair const sm_imacCore_i5_i7_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"IM111.0034.B00"	},
-	{"SMbiosdate",		"06/01/2009"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"iMac11,1"			},	
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
-	{"SMfamily",		"iMac"				},
-	{"SMboardmanufacter","Apple Computer, Inc."	},
-	{"SMboardproduct",	"Mac-F2268DAE"			},
+// defaults for an iMac11,1 core i3/i5/i7
+static const SMStrEntryPair const sm_imac_core_defaults[]={
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"IM111.88Z.0034.B00.0802091538"	},
+	{"SMbiosdate",			"06/01/2009"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"iMac11,1"						},	
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"iMac"							},
+	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardproduct",		"Mac-F2268DAE"					},
+	{ "",""	}
+};
+
+// defaults for a Mac Pro 4,1 core i7/Xeon
+static const SMStrEntryPair const sm_macpro_core_defaults[]={
+	{"SMbiosvendor",		"Apple Computer, Inc."			},
+	{"SMbiosversion",		"MP41.88Z.0081.B04.0903051113"	},
+	{"SMbiosdate",			"11/06/2009"					},
+	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMproductname",		"MacPro4,1"						},
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMfamily",			"MacPro"						},
+	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardproduct",		"Mac-F4208DC8"					},
 	{ "",""	}
 };
 
@@ -144,10 +160,17 @@ static const char* sm_get_defstr(const char * key, int table_num)
 					{
 						switch (Platform.CPU.Model)
 						{
-							case 0x19: // Intel Core i5 650
-							case 0x1E: // Intel Core i7 LGA1156 (45nm)
-							case 0x1F: // Intel Core i5 LGA1156 (45nm)
-								sm_defaults=sm_imacCore_i5_i7_defaults;
+							case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+							case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+							case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+							case 0x19: // Intel Core i5 650 @3.20 Ghz 
+								sm_defaults=sm_imac_core_defaults; 
+								break;
+							case CPU_MODEL_NEHALEM: 
+							case CPU_MODEL_NEHALEM_EX:
+							case CPU_MODEL_WESTMERE: 
+							case CPU_MODEL_WESTMERE_EX:
+								sm_defaults=sm_macpro_core_defaults; 
 								break;
 							default:
 								sm_defaults=sm_macpro_defaults;
@@ -200,7 +223,7 @@ static int sm_get_simplecputype()
 	return 0x0301;   // Core 2 Duo
 }
 
-static int sm_get_bus_speed (const char *name, int table_num)
+static int sm_get_bus_speed(const char *name, int table_num)
 {
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{		
@@ -210,21 +233,65 @@ static int sm_get_bus_speed (const char *name, int table_num)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case 0x0F: // Intel Core (65nm)
-					case 0x17: // Intel Core (45nm)
-					case 0x1C: // Intel Atom (45nm)
+					case 0x0D: // ?
+					case CPU_MODEL_YONAH:	// Yonah		0x0E
+					case CPU_MODEL_MEROM:	// Merom		0x0F
+					case CPU_MODEL_PENRYN:	// Penryn		0x17
+					case CPU_MODEL_ATOM:	// Atom 45nm	0x1C
 						return 0; // TODO: populate bus speed for these processors
+						
+//					case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+//						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+//							return 2500; // Core i5
+//						return 4800; // Core i7
+						
+//					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+//					case CPU_MODEL_NEHALEM_EX:
+//					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+//						return 4800; // GT/s / 1000
+//						
+					case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+						return 0; // TODO: populate bus speed for these processors
+						
+//					case 0x19: // Intel Core i5 650 @3.20 Ghz
+//						return 2500; // why? Intel spec says 2.5GT/s 
+
 					case 0x19: // Intel Core i5 650 @3.20 Ghz
-						return 3600; // GT/s / 1000
-					case 0x1A: // Intel Core i7 LGA1366 (45nm)
-					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
-					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
-						return 4800; // GT/s / 1000
-					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
-						return 0; // TODO: populate bus speed for these processors
-					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
-					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
-						return 0; // TODO: populate bus speed for these processors
+					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+					case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+					case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm)
+					case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPU_MODEL_NEHALEM_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+					{ // thanks to dgobe for i3/i5/i7 bus speed detection
+						int nhm_bus = 0x3F;
+						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
+						unsigned long did, vid;
+						int i;
+						
+						// Nehalem supports Scrubbing
+						// First, locate the PCI bus where the MCH is located
+						for(i = 0; i < sizeof(possible_nhm_bus); i++)
+						{
+							vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
+							did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
+							vid &= 0xFFFF;
+							did &= 0xFF00;
+							
+							if(vid == 0x8086 && did >= 0x2C00)
+								nhm_bus = possible_nhm_bus[i]; 
+						}
+						
+						unsigned long qpimult, qpibusspeed;
+						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
+						qpimult &= 0x7F;
+						DBG("qpimult %d\n", qpimult);
+						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
+						// Rek: rounding decimals to match original mac profile info
+						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
+						DBG("qpibusspeed %d\n", qpibusspeed);
+						return qpibusspeed;
+					}
 				}
 			}
 		}
@@ -239,7 +306,7 @@ static int sm_get_cputype (const char *name, int table_num)
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
 		if (!done) {
-			verbose("CPU is Intel, family 0x%x, model 0x%x, ext.model 0x%x\n", Platform.CPU.Family, Platform.CPU.Model, Platform.CPU.ExtModel);
+			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, Platform.CPU.Family, Platform.CPU.Model);
 			done = true;
 		}
 		
@@ -249,23 +316,39 @@ static int sm_get_cputype (const char *name, int table_num)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case 0x0F: // Intel Core (65nm)
-					case 0x17: // Intel Core (45nm)
-					case 0x1C: // Intel Atom (45nm)
+					case 0x0D: // ?
+					case CPU_MODEL_YONAH: // Yonah
+					case CPU_MODEL_MEROM: // Merom
+					case CPU_MODEL_PENRYN: // Penryn
+					case CPU_MODEL_ATOM: // Intel Atom (45nm)
 						return sm_get_simplecputype();
-					case 0x1A: // Intel Core i7 LGA1366 (45nm)
-						return 0x0701;
-					case 0x1E: // Intel Core i5, i7 LGA1156 (45nm)
-						// get this opportunity to fill the known processor interconnect speed for cor i5/i7 in GT/s
-						return 0x0701;
+						
+					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+						return 0x0701; // Core i7
+						
+					case CPU_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+							return 0x601; // Core i5
+						return 0x701; // Core i7
+						
+					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+							return 0x601; // Core i5
+						return 0x0701; // Core i7
+						
+					case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+							return 0x301; // Core i3
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+							return 0x601; // Core i5
+						return 0x0701; // Core i7
+						
+					case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
+					case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+						return 0x0701; // Core i7
+						
 					case 0x19: // Intel Core i5 650 @3.20 Ghz
-					case 0x1F: // Intel Core i5, i7 LGA1156 (45nm) ???
-						return 0x0601;
-					case 0x25: // Intel Core i3, i5, i7 LGA1156 (32nm)
-						return 0x0301;
-					case 0x2C: // Intel Core i7 LGA1366 (32nm) 6 Core
-					case 0x2E: // Intel Core i7 LGA1366 (45nm) 6 Core ???
-						return 0x0601;
+						return 0x601; // Core i5
 				}
 			}
 		}
@@ -354,28 +437,28 @@ static int sm_one (int tablen)
 
 struct smbios_property smbios_properties[]=
 {
-	{.name="SMbiosvendor",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr	},
-	{.name="SMbiosversion",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr	},
-	{.name="SMbiosdate",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x08,	.auto_str=sm_get_defstr	},
-	{.name="SMmanufacter",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr	},
-	{.name="SMproductname",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr	},
-	{.name="SMsystemversion",	.table_type= 1,	.value_type=SMSTRING,	.offset=0x06,	.auto_str=sm_get_defstr	},
-	{.name="SMserial",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x07,	.auto_str=sm_get_defstr	},
-	{.name="SMUUID",		.table_type= 1, .value_type=SMOWORD,	.offset=0x08,	.auto_oword=0		},
-	{.name="SMfamily",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x1a,	.auto_str=sm_get_defstr	},
-	{.name="SMboardmanufacter",	.table_type= 2, .value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr	},
-	{.name="SMboardproduct",	.table_type= 2, .value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr	},
-	{.name="SMexternalclock",	.table_type= 4,	.value_type=SMWORD,	.offset=0x12,	.auto_int=sm_get_fsb	},
-	{.name="SMmaximalclock",	.table_type= 4,	.value_type=SMWORD,	.offset=0x14,	.auto_int=sm_get_cpu	},
-	{.name="SMmemdevloc",		.table_type=17,	.value_type=SMSTRING,	.offset=0x10,	.auto_str=0		},
-	{.name="SMmembankloc",		.table_type=17,	.value_type=SMSTRING,	.offset=0x11,	.auto_str=0		},
-	{.name="SMmemtype",		.table_type=17,	.value_type=SMBYTE,	.offset=0x12,	.auto_int=sm_get_memtype},
-	{.name="SMmemspeed",		.table_type=17,	.value_type=SMWORD,	.offset=0x15,	.auto_int=sm_get_memspeed},
-	{.name="SMmemmanufacter",	.table_type=17,	.value_type=SMSTRING,	.offset=0x17,	.auto_str=sm_get_memvendor},
-	{.name="SMmemserial",		.table_type=17,	.value_type=SMSTRING,	.offset=0x18,	.auto_str=sm_get_memserial},
-	{.name="SMmempart",		.table_type=17,	.value_type=SMSTRING,	.offset=0x1A,	.auto_str=sm_get_mempartno},
-	{.name="SMcputype",		.table_type=131,.value_type=SMWORD,	.offset=0x04,	.auto_int=sm_get_cputype},
-	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,	.offset=0x04,	.auto_int=sm_get_bus_speed}
+	{.name="SMbiosvendor",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr		},
+	{.name="SMbiosversion",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr		},
+	{.name="SMbiosdate",		.table_type= 0,	.value_type=SMSTRING,	.offset=0x08,	.auto_str=sm_get_defstr		},
+	{.name="SMmanufacter",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr		},
+	{.name="SMproductname",		.table_type= 1,	.value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr		},
+	{.name="SMsystemversion",	.table_type= 1,	.value_type=SMSTRING,	.offset=0x06,	.auto_str=sm_get_defstr		},
+	{.name="SMserial",			.table_type= 1,	.value_type=SMSTRING,	.offset=0x07,	.auto_str=sm_get_defstr		},
+	{.name="SMUUID",			.table_type= 1, .value_type=SMOWORD,	.offset=0x08,	.auto_oword=0				},
+	{.name="SMfamily",			.table_type= 1,	.value_type=SMSTRING,	.offset=0x1a,	.auto_str=sm_get_defstr		},
+	{.name="SMboardmanufacter",	.table_type= 2, .value_type=SMSTRING,	.offset=0x04,	.auto_str=sm_get_defstr		},
+	{.name="SMboardproduct",	.table_type= 2, .value_type=SMSTRING,	.offset=0x05,	.auto_str=sm_get_defstr		},
+	{.name="SMexternalclock",	.table_type= 4,	.value_type=SMWORD,		.offset=0x12,	.auto_int=sm_get_fsb		},
+	{.name="SMmaximalclock",	.table_type= 4,	.value_type=SMWORD,		.offset=0x14,	.auto_int=sm_get_cpu		},
+	{.name="SMmemdevloc",		.table_type=17,	.value_type=SMSTRING,	.offset=0x10,	.auto_str=0					},
+	{.name="SMmembankloc",		.table_type=17,	.value_type=SMSTRING,	.offset=0x11,	.auto_str=0					},
+	{.name="SMmemtype",			.table_type=17,	.value_type=SMBYTE,		.offset=0x12,	.auto_int=sm_get_memtype	},
+	{.name="SMmemspeed",		.table_type=17,	.value_type=SMWORD,		.offset=0x15,	.auto_int=sm_get_memspeed	},
+	{.name="SMmemmanufacter",	.table_type=17,	.value_type=SMSTRING,	.offset=0x17,	.auto_str=sm_get_memvendor	},
+	{.name="SMmemserial",		.table_type=17,	.value_type=SMSTRING,	.offset=0x18,	.auto_str=sm_get_memserial	},
+	{.name="SMmempart",			.table_type=17,	.value_type=SMSTRING,	.offset=0x1A,	.auto_str=sm_get_mempartno	},
+	{.name="SMcputype",			.table_type=131,.value_type=SMWORD,		.offset=0x04,	.auto_int=sm_get_cputype	},
+	{.name="SMbusspeed",		.table_type=132,.value_type=SMWORD,		.offset=0x04,	.auto_int=sm_get_bus_speed	}
 };
 
 struct smbios_table_description smbios_table_descriptions[]=
