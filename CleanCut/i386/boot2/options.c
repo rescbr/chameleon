@@ -1171,11 +1171,11 @@ processBootOptions()
       return -1;
 
     // Load config table specified by the user, or use the default.
-
-    if (!getValueForBootKey(cp, "config", &val, &cnt)) {
-      val = 0;
-      cnt = 0;
-    }
+	//Azi: not working.
+    //if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+    //  val = 0;
+    //  cnt = 0;
+    //}
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.

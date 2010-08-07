@@ -42,22 +42,22 @@ Additional useful command-line options:
 
 Options useful in the com.apple.Boot.plist file:
   Wait=Yes|No             Prompt for a key press before starting the kernel.
-  "Quiet Boot"=Yes|No     Use quiet boot mode (no messages or prompt).
+  Quiet Boot=Yes|No       Use quiet boot mode (no messages or prompt).
   Timeout=8               Number of seconds to pause at the boot: prompt.
-  "Instant Menu"=Yes      Force displaying the partition selection menu. 
+  Instant Menu=Yes        Force displaying the partition selection menu. 
 
-  "Default Partition"     Sets the default boot partition,
+  Default Partition       Sets the default boot partition,
     =hd(x,y)|             where 'x' & 'y' are the disk and partition numbers
     =<UUID>                 or specify the selected volume UUID string.
-  "Hide Partition"        Remove unwanted partition(s) from the boot menu.
+  Hide Partition          Remove unwanted partition(s) from the boot menu.
     =hd(x,y) [hd(m,n)]      only non mac osx boot partitions can be hidden.
 
-  "Rename Partition"        Rename partition(s) for the boot menu.
+  Rename Partition        Rename partition(s) for the boot menu.
     =hd(x,y) <alias> [;hd(m,n) <alias2> ...]
 
   GUI=No                  Disable the GUI (enabled by default).
-  "Boot Banner"=Yes|No    Show boot banner in GUI mode (enabled by default).
-  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
+  Boot Banner=Yes|No      Show boot banner in GUI mode (enabled by default).
+  Legacy Logo=Yes|No      Use the legacy grey apple logo (disabled by default).
   
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
 
@@ -95,10 +95,10 @@ Options useful in the com.apple.Boot.plist file:
                             if smbios.plist doesn't exist, factory
                             values are kept.
 
-  "Scan Single Drive"     Scan the drive only where the booter got loaded from.
+  Scan Single Drive       Scan the drive only where the booter got loaded from.
     =Yes|No               Fix rescan pbs when using a DVD reader in AHCI mode. 
   Rescan=Yes              Enable CD-ROM rescan mode.
-  "Rescan Prompt"=Yes     Prompts for enable CD-ROM rescan mode.
+  Rescan Prompt=Yes       Prompts for enable CD-ROM rescan mode.
   SystemId=<UUID>         Set manually the system id UUID,
                           SMUUID in smbios config (reserved field) isn't used.
   SystemType=<n>          Set the system type where n is between 0..6

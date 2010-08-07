@@ -629,16 +629,20 @@ BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
 
 //==========================================================================
 
-// HFS+ GUID in LE form
-EFI_GUID const GPT_HFS_GUID	= { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
-// turbo - also our booter partition
-EFI_GUID const GPT_BOOT_GUID	= { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
-// turbo - or an efi system partition
-EFI_GUID const GPT_EFISYS_GUID	= { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } };
-// zef - basic data partition EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 for foreign OS support
-EFI_GUID const GPT_BASICDATA_GUID = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
-EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
+// HFS+ GUID in LE form - Hierarchical File System (HFS+) partition - 48465300-0000-11AA-AA11-00306543ECAC
+EFI_GUID const GPT_HFS_GUID		   = { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
 
+// turbo - Apple Boot partition - 426F6F74-0000-11AA-AA11-00306543ECAC
+EFI_GUID const GPT_BOOT_GUID	   = { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
+
+// turbo - or an EFI System partition - C12A7328-F81F-11D2-BA4B-00A0C93EC93B
+EFI_GUID const GPT_EFISYS_GUID	   = { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } };
+
+// zef - Basic Data partition - EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 for foreign OS support
+EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
+
+// Microsoft Reserved Partition E3C9E316-0B5C-4DB8-817DF92DF00215AE
+EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
 
 BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                    const gpt_ent * part,
@@ -1282,7 +1286,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
                                       kBIOSDevTypeHardDrive, bvrFlags);
             }
 
-						// zef - foreign OS support
+			// zef - foreign OS support
             if ( (efi_guid_compare(&GPT_BASICDATA_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
                  (efi_guid_compare(&GPT_BASICDATA2_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
             {
@@ -1679,7 +1683,7 @@ static const struct NamedValue fdiskTypes[] =
 
 //==========================================================================
 
-/* If Rename Partition has defined an alias, then extract it  for description purpose */
+/* If Rename Partition has defined an alias, then extract it for description purpose */
 static const char * getVolumeLabelAlias( BVRef bvr, const char * str, long strMaxLen)
 {
   const int MAX_ALIAS_SIZE=31;
@@ -1693,7 +1697,7 @@ static const char * getVolumeLabelAlias( BVRef bvr, const char * str, long strMa
   if(!p || !(*p)) return 0; // this volume must not be renamed, or option is malformed
 
   p+= strlen(str); // skip the "hd(n,m) " field
-  // multiple aliases can be found separated by a semi-column
+  // multiple aliases can be found separated by a semicolon
   while(*p && *p != ';' && q<(szAlias+MAX_ALIAS_SIZE)) *q++=*p++;
   *q='\0';
 

@@ -272,7 +272,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05F9, "Quadro CX" },
 	{ 0x10DE05FD, "Quadro FX 5800" },
 	{ 0x10DE05FE, "Quadro FX 4800" },
-  { 0x10DE0600, "GeForce 8800 GTS 512" },
+	{ 0x10DE0600, "GeForce 8800 GTS 512" },
 	{ 0x10DE0602, "GeForce 8800 GT" },
 	{ 0x10DE0604, "GeForce 9800 GX2" },
 	{ 0x10DE0605, "GeForce 9800 GT" },

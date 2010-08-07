@@ -32,77 +32,80 @@
 #include "libsaio.h"
 
 /*
+ * Default names
+ */
+#define kDefaultKernel		"mach_kernel"
+
+/*
  * Keys used in system Boot.plist
  */
-#define kGraphicsModeKey	"Graphics Mode"
-#define kTextModeKey		"Text Mode"
-#define kQuietBootKey		"Quiet Boot"
-#define kKernelFlagsKey		"Kernel Flags"
-#define kMKextCacheKey		"MKext Cache"
-#define kKernelNameKey		"Kernel"
-#define kKernelCacheKey		"Kernel Cache"
-#define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey			"Timeout"
-#define kRootDeviceKey		"rd"
-#define kBootUUIDKey		"boot-uuid"
-#define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
-#define kACPIKey			"acpi"
-#define kCDROMPromptKey		"CD-ROM Prompt"
-#define kCDROMOptionKey		"CD-ROM Option Key"
-#define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		    "Rescan"
-#define kScanSingleDriveKey	"Scan Single Drive"
-#define kInsantMenuKey		"Instant Menu"
-#define kDefaultKernel		"mach_kernel"
-#define kGUIKey				"GUI"
-#define kBootBannerKey		"Boot Banner"
-#define kWaitForKeypressKey	"Wait"
+#define kGraphicsModeKey	"Graphics Mode"		// graphics.c
+#define kTextModeKey		"Text Mode"			// graphics.c
+#define kQuietBootKey		"Quiet Boot"		// boot.c
+#define kKernelFlagsKey		"Kernel Flags"		// options.c
+#define kMKextCacheKey		"MKext Cache"		// options.c
+#define kKernelNameKey		"Kernel"			// options.c
+#define kKernelCacheKey		"Kernel Cache"		// boot.c
+#define kBootDeviceKey		"Boot Device"		// options.c
+#define kTimeoutKey			"Timeout"			// options.c
+#define kRootDeviceKey		"rd"				// options.c
+#define kBootUUIDKey		"boot-uuid"			// options.c
+#define kHelperRootUUIDKey	"Root UUID"			// options.c
+//#define kPlatformKey		"platform"			// options.c, removed
+//#define kACPIKey			"acpi"				gone
+#define kCDROMPromptKey		"CD-ROM Prompt"		// options.c
+#define kCDROMOptionKey		"CD-ROM Option Key"	// options.c
+#define kRescanPromptKey	"Rescan Prompt"		// boot.c
+#define kRescanKey		    "Rescan"			// boot.c
+#define kScanSingleDriveKey	"Scan Single Drive"	// boot.c
+#define kInstantMenuKey		"Instant Menu"		// boot.c
+#define kGUIKey				"GUI"				// boot.c
+#define kBootBannerKey		"Boot Banner"		// options.c
+#define kWaitForKeypressKey	"Wait"				// boot.c
 /* AsereBLN: added the other keys */
-#define kUseAtiROM			"UseAtiROM"			/* ati.c */
-#define kWake				"Wake"				/* boot.c */
-#define kForceWake			"ForceWake"			/* boot.c */
-#define kWakeImage			"WakeImage"			/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch				"arch"				/* boot.c */
-#define kDSDT				"DSDT"				/* acpi_patcher.c */
-#define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
-#define kRestartFix			"RestartFix"		/* acpi_patcher.c */
-#define kRestartFix			"RestartFix"        /* acpi_patcher.c */
-#define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
-#define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kEnableC4States		"EnableC4State"		/* acpi_patcher.c */
-#define kDeviceProperties	"device-properties"	/* device_inject.c */
-#define kHidePartition		"Hide Partition"	/* disk.c */
-#define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kSMBIOS				"SMBIOS"			/* fake_efi.c */
-#define kSystemID			"SystemId"			/* fake_efi.c */
-#define kSystemType			"SystemType"		/* fake_efi.c */
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS				"VBIOS"				/* nvidia.c */
-#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
-#define kForceHPET			"ForceHPET"			/* pci_setup.c */
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-#define kUSBBusFix			"USBBusFix"			/* usb.c */
-#define kEHCIacquire		"EHCIacquire"		/* usb.c */
-#define kUHCIreset			"UHCIreset"			/* usb.c */
-#define kLegacyOff			"USBLegacyOff"		/* usb.c */
-#define kEHCIhard			"EHCIhard"			/* usb.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
-#define kMD0Image			"md0"				/* ramdisk.h */
+#define kUseAtiROM			"UseAtiROM"			// ati.c
+#define kWake				"Wake"				// boot.c
+#define kForceWake			"ForceWake"			// boot.c
+#define kWakeImage			"WakeImage"			// boot.c
+#define kProductVersion		"ProductVersion"	// boot.c
+#define karch				"arch"				// boot.c
+#define kDSDT				"DSDT"				// acpi_patcher.c
+#define kDropSSDT			"DropSSDT"			// acpi_patcher.c
+#define kRestartFix			"RestartFix"        // acpi_patcher.c
+#define kGeneratePStates	"GeneratePStates"	// acpi_patcher.c
+#define kGenerateCStates	"GenerateCStates"	// acpi_patcher.c
+#define kEnableC4States		"EnableC4State"		// acpi_patcher.c
+#define kDeviceProperties	"device-properties"	// device_inject.c
+#define kHidePartition		"Hide Partition"	// disk.c
+#define kRenamePartition	"Rename Partition"	// disk.c
+#define kSMBIOS				"SMBIOS"			// fake_efi.c
+#define kSystemID			"SystemId"			// fake_efi.c
+#define kSystemType			"SystemType"		// fake_efi.c
+#define kUseNvidiaROM		"UseNvidiaROM"		// nvidia.c
+#define kVBIOS				"VBIOS"				// nvidia.c
+#define kPCIRootUID			"PCIRootUID"		// pci_root.c
+#define kEthernetBuiltIn	"EthernetBuiltIn"	// pci_setup.c
+#define kGraphicsEnabler	"GraphicsEnabler"	// pci_setup.c
+#define kForceHPET			"ForceHPET"			// pci_setup.c
+#define kUseMemDetect		"UseMemDetect"	    // platform.c
+#define kSMBIOSdefaults		"SMBIOSdefaults"	// smbios_patcher.c
+#define kUSBBusFix			"USBBusFix"			// usb.c
+#define kEHCIacquire		"EHCIacquire"		// usb.c
+#define kUHCIreset			"UHCIreset"			// usb.c
+#define kLegacyOff			"USBLegacyOff"		// usb.c
+#define kEHCIhard			"EHCIhard"			// usb.c
+#define kDefaultPartition	"Default Partition"	// sys.c
+#define kMD0Image			"md0"				// ramdisk.h
 
 /*
  * Flags to the booter or kernel
  */
-#define kVerboseModeFlag	"-v"
-#define kSafeModeFlag		"-x"
-#define kOldSafeModeFlag	"-f"
-#define kIgnoreBootFileFlag	"-F"
-#define kSingleUserModeFlag	"-s"
-#define k32BitModeFlag		"-x32"
+#define kVerboseModeFlag	"-v"				// options.c
+#define kSafeModeFlag		"-x"				// options.c
+#define kOldSafeModeFlag	"-f"				// options.c
+#define kIgnoreBootFileFlag	"-F"				// options.c
+#define kSingleUserModeFlag	"-s"				// options.c
+#define k32BitModeFlag		"-x32"				// boot.c
 
 /*
  * Booter behavior control
@@ -120,7 +123,7 @@ extern bool sysConfigValid;
 extern char bootBanner[];
 extern char bootPrompt[];
 extern bool gOverrideKernel;
-extern char *gPlatformName;
+//extern char *gPlatformName; disabled
 extern char gMKextName[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;

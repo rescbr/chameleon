@@ -16,7 +16,7 @@ BVRef gRAMDiskVolume = NULL;
 bool gRAMDiskBTAliased = false;
 char gRAMDiskFile[512];
 
-// Notify OS X that a ramdisk has been setup. XNU with attach this to /dev/md0
+// Notify OS X that a ramdisk has been setup. XNU will attach this to /dev/md0
 void md0Ramdisk()
 {
 	RAMDiskParam ramdiskPtr;

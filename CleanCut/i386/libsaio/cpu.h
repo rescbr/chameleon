@@ -22,7 +22,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
 
-#define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
+//#define DEFAULT_FSB		100000          // for now, hardcoding 100MHz for old CPUs - disabled
 
 // DFE: This constant comes from older xnu:
 #define CLKNUM			1193182		/* formerly 1193167 */

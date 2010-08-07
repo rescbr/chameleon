@@ -56,7 +56,7 @@ void scan_mem() {
     done = true;
 }
 
-/** 
+/**
     Scan platform hardware information, called by the main entry point (common_boot() ) 
     _before_ bootConfig xml parsing settings are loaded
 */

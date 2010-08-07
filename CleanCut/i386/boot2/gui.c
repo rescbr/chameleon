@@ -168,7 +168,8 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
+// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};
 
 static int getImageIndexByName(const char *name)
 {
@@ -189,8 +190,8 @@ static int getEmbeddedImageIndexByName(const char *name)
 	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
 	int result;
 	
-	// NOTE: This algorithm assumes that the embeddedImages is sorted.
-	// This is currently done using the make file. If the array is every 
+	// NOTE: This algorithm assumes that the embedded images are sorted.
+	// This is currently done using the make file. If the array is ever
 	// manualy generated, this *will* fail to work properly.
 	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
@@ -1796,7 +1797,7 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 
-	// parse screen size parameters
+	// parse display size parameters - Azi: shouldn't this stuff be like the one on initGUI? no "else"
 	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
 		screen_params[0] = pos;
 	} else {

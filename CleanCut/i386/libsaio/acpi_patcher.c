@@ -599,10 +599,14 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 	
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
-		fix_restart = true;
+	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	{
+		fix_restart = false; //Azi: think this should be false by default; i never needed any.
+		// On the other hand, i could use a shutdown fix now and then :)
 		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
-	} else {
+	}
+	else
+	{
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
 	}
@@ -630,13 +634,13 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			if(fadt_mod->PM_Profile<=6)
 				Platform.Type = fadt_mod->PM_Profile; // get the fadt if correct
 			else 
-				Platform.Type = 1;		/* Set a fixed value (Desktop) */
+				Platform.Type = 1; // Set a fixed value (Desktop)
 			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		}
 		else
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 	}
-	// Set PM_Profile from System-type if only user wanted this value to be forced
+	// Set PM_Profile from System-type only if user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
 	{
 	    if (value) 
@@ -687,18 +691,18 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	return fadt_mod;
 }
 
-/* Setup ACPI without replacing DSDT. */
+/* Setup ACPI without replacing DSDT. - not needed atm.
 int setupAcpiNoMod()
 {
 	//	addConfigurationTable(&gEfiAcpiTableGuid, getAddressOfAcpiTable(), "ACPI");
 	//	addConfigurationTable(&gEfiAcpi20TableGuid, getAddressOfAcpi20Table(), "ACPI_20");
-	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
+	// XXX aserebln why uint32 cast if pointer is uint64 ?
 	acpi10_p = (uint32_t)getAddressOfAcpiTable();
 	acpi20_p = (uint32_t)getAddressOfAcpi20Table();
 	addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 	if(acpi20_p) addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
 	return 1;
-}
+}*/
 
 /* Setup ACPI. Replace DSDT if DSDT.aml is found */
 int setupAcpi(void)

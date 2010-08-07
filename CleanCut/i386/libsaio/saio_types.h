@@ -64,7 +64,7 @@ typedef struct Tag Tag, *TagPtr;
 typedef struct {
 	char	plist[4096];	// buffer for plist
 	TagPtr	dictionary;		// buffer for xml dictionary
-	bool  canOverride;  // flag to mark a dictionary can be overriden
+	bool	canOverride;	// flag to mark a dictionary can be overriden
 } config_file_t;
 
 /*
@@ -184,20 +184,20 @@ struct BootVolume {
     char             type_name[BVSTRLEN]; /* (type of partition, eg. Apple_HFS) */
     BVFree           bv_free;         /* BVFree function */
     uint32_t         modTime;
-    char			       label[BVSTRLEN]; /* partition volume label */
-    char			       altlabel[BVSTRLEN]; /* partition volume label */
+    char			 label[BVSTRLEN]; /* partition volume label */
+    char			 altlabel[BVSTRLEN]; /* partition volume label */
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
 };
 
 enum {
-  kBVFlagPrimary          = 0x01,
-  kBVFlagNativeBoot       = 0x02,
-  kBVFlagForeignBoot      = 0x04,
-  kBVFlagBootable         = 0x08,
-  kBVFlagEFISystem        = 0x10,
-  kBVFlagBooter           = 0x20,
-  kBVFlagSystemVolume     = 0x40
+	kBVFlagPrimary          = 0x01,
+	kBVFlagNativeBoot       = 0x02,
+	kBVFlagForeignBoot      = 0x04,
+	kBVFlagBootable         = 0x08,
+	kBVFlagEFISystem        = 0x10,
+	kBVFlagBooter           = 0x20,
+	kBVFlagSystemVolume     = 0x40
 };
 
 enum {
@@ -210,12 +210,11 @@ enum {
 };
 
 enum {
-	
 	kPartitionTypeHFS	  = 0xAF,
 	kPartitionTypeHPFS    = 0x07,
 	kPartitionTypeFAT16   = 0x06,
 	kPartitionTypeFAT32   = 0x0c,
-	kPartitionTypeEXT3    = 0x83,
+	kPartitionTypeEXT3    = 0x83
 };
 
 //#define BIOS_DEV_TYPE(d)  ((d) & kBIOSDevTypeMask)

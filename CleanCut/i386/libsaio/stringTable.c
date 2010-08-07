@@ -582,7 +582,7 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadConfigFile (const char *configFile, config_file_t *config)
+int loadConfigFile(const char *configFile, config_file_t *config)
 {
 	int fd, count;
 
@@ -700,7 +700,7 @@ int loadHelperConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+			sysConfigValid = true;
 			ret=0;
 			break;
 		}

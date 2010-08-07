@@ -63,7 +63,7 @@ long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
 static char gBootKernelCacheFile[512];
 static char gCacheNameAdler[64 + 256];
-char *gPlatformName = gCacheNameAdler;
+//char *gPlatformName = gCacheNameAdler; disabled
 char gRootDevice[512];
 char gMKextName[512];
 char gMacOSVersion[8];
@@ -177,6 +177,9 @@ static int ExecKernel(void *binary)
     }
 
     bool dummyVal;
+
+	//Azi: Wait=y is breaking other keys when typed "after them" at boot prompt.
+	// Works properly if typed in first place or used on Boot.plist.
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
 		printf("Press any key to continue...");
 		getc();
@@ -276,7 +279,7 @@ void common_boot(int biosdev)
     }
 
     // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-    if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
+    if (getBoolForKey(kInstantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
         firstRun = false;
     }
 

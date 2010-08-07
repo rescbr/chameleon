@@ -128,10 +128,10 @@ static const char* sm_get_defstr(const char * key, int table_num)
 			sm_defaults=sm_macbook_defaults;
 		}
 	} else {
-		switch (Platform.CPU.NoCores) 
+		switch (Platform.CPU.NoCores)
 		{
 			case 1: 
-				sm_defaults=sm_macmini_defaults; 
+				sm_defaults=sm_macmini_defaults;
 				break;
 			case 2:
 				sm_defaults=sm_imac_defaults;
@@ -147,16 +147,16 @@ static const char* sm_get_defstr(const char * key, int table_num)
 							case 0x19: // Intel Core i5 650
 							case 0x1E: // Intel Core i7 LGA1156 (45nm)
 							case 0x1F: // Intel Core i5 LGA1156 (45nm)
-								sm_defaults=sm_imacCore_i5_i7_defaults; 
+								sm_defaults=sm_imacCore_i5_i7_defaults;
 								break;
 							default:
-								sm_defaults=sm_macpro_defaults; 
+								sm_defaults=sm_macpro_defaults;
 								break;
 						}
 						break;
 					}
 					default:
-						sm_defaults=sm_macpro_defaults; 
+						sm_defaults=sm_macpro_defaults;
 						break;
 				}
 				break;
