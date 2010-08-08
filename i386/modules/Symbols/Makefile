@@ -1,7 +1,7 @@
 
 MODULE_NAME = Symbols
 MODULE_VERSION = "1.0.0"
-MODULE_START = $(MODULE_NAME)_start
+MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 DIR = HelloWorld
 
@@ -20,7 +20,7 @@ DEBUG = -DNOTHING
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
-    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
+    -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common
 
@@ -59,17 +59,30 @@ dylib: $(OBJS)
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
 	-alias $(MODULE_START) start \
-	-e $(MODULE_START) \
-	-w \
 	-dylib -read_only_relocs suppress \
 	-S -x  -dead_strip_dylibs \
+	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version `svn info ../../ | grep Revision | awk '{print $$2}'` \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/$(MODULE_NAME)Init.o $(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \
 
 
 
-Symbols.o: Symbols.h
+Symbols.o: #Symbols.h
+	@rm -rf Symbols.h
+	@echo "typedef struct {" >> Symbols.h
+	@echo "	char*	symbol;" >> Symbols.h
+	@echo "	unsigned int	addr;" >> Symbols.h
+	@echo "} symbol_t;" >> Symbols.h 
+	@echo "" >> Symbols.h
+	
+	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "static char "$$3"_string[] = \""$$3"\";"}' >> Symbols.h
+
+	@echo "symbol_t symbolList[] = {" >> Symbols.h
+	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "	{.symbol = "$$3"_string, .addr = 0x"$$1"},";}' >> Symbols.h
+	@echo "};" >> Symbols.h
+
+
 	rm -rf $(MODULE_NAME)Init.c
 	echo "extern int load_dependency(const char*);" >> $(MODULE_NAME)Init.c
 	echo "" >> $(MODULE_NAME)Init.c

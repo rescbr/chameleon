@@ -21,7 +21,7 @@ void Symbols_start()
 
 unsigned int lookup_symbol(const char* symbol)
 {
-	int upperLimit = sizeof(symbolList) / sizeof(symbolList[0]) - 1;
+	int upperLimit = sizeof(symbolList) / sizeof(symbolList[0]) - 1;		
 	int lowerLimit = 0;
 	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
 	int result;
@@ -36,7 +36,7 @@ unsigned int lookup_symbol(const char* symbol)
 			}
 			else
 			{
-				return 0xFFFFFFFF;
+				return 0xFFFFFFFF;	// Symbol not found
 			}
 			compareIndex = (upperLimit + lowerLimit + 1) >> 1;	// Midpoint, round up
 		}
@@ -48,7 +48,7 @@ unsigned int lookup_symbol(const char* symbol)
 			}
 			else
 			{
-				return 0xFFFFFFFF;
+				return 0xFFFFFFFF;	// Symbol not found
 			}
 			compareIndex = (upperLimit + lowerLimit) >> 1;	// Midpoint, round down
 		}

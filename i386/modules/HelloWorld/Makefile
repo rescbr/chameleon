@@ -3,7 +3,7 @@ MODULE_NAME = HelloWorld
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
-MODULE_DEPENDENCIES = Symbols
+MODULE_DEPENDENCIES = 
 
 DIR = HelloWorld
 
@@ -27,7 +27,7 @@ DEBUG = -DNOTHING
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
-    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
+    -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common
 
@@ -65,8 +65,10 @@ all embedtheme: ${HELLO_WORLD_OBJS} dylib
 dylib: ${HELLO_WORLD_OBJS}
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
+	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x  -dead_strip_dylibs \
+	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/$(MODULE_NAME)Init.o \
