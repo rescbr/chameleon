@@ -69,6 +69,7 @@ dylib: ${HELLO_WORLD_OBJS}
 	-dylib -read_only_relocs suppress \
 	-S -x  -dead_strip_dylibs \
 	-no_uuid \
+	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/$(MODULE_NAME)Init.o \

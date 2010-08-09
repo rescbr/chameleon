@@ -59,6 +59,7 @@
 #include "gui.h"
 #include "platform.h"
 #include "resolution.h"
+#include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -284,6 +285,10 @@ void common_boot(int biosdev)
     // Loading preboot ramdisk if exists.
     loadPrebootRAMDisk();
 
+	// Intialize module system
+	load_module(SYMBOLS_MODULE);
+	load_module("HelloWorld");
+	
     // Disable rescan option by default
     gEnableCDROMRescan = false;
 

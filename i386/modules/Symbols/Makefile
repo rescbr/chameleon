@@ -62,6 +62,7 @@ dylib: $(OBJS)
 	-dylib -read_only_relocs suppress \
 	-S -x  -dead_strip_dylibs \
 	-no_uuid \
+	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version `svn info ../../ | grep Revision | awk '{print $$2}'` \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/$(MODULE_NAME)Init.o $(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \

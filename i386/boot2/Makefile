@@ -42,7 +42,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 # The ordering is important;
 # boot2.o must be first.
 OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o kernel_patcher.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o
+	ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o kernel_patcher.o
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util
