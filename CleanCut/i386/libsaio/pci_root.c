@@ -58,20 +58,6 @@ int getPciRootUID(void)
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
-	/* Chameleon compatibility */
-	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig)) {
-		if (isdigit(val[0])) rootuid = val[0] - '0';
-		goto out;
-	}
-	/* PCEFI compatibility */
-	else if (getValueForKey("-pci0", &val, &len, &bootInfo->bootConfig)) {
-		rootuid = 0;
-		goto out;
-	}
-	else if (getValueForKey("-pci1", &val, &len, &bootInfo->bootConfig)) {
-		rootuid = 1;
-		goto out;
-	}
 
 	int fd = search_and_get_acpi_fd("DSDT.aml", &dsdt_filename);
 

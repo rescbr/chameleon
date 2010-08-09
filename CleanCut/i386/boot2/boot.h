@@ -83,7 +83,7 @@
 #define kSystemType			"SystemType"		// fake_efi.c
 #define kUseNvidiaROM		"UseNvidiaROM"		// nvidia.c
 #define kVBIOS				"VBIOS"				// nvidia.c
-#define kPCIRootUID			"PCIRootUID"		// pci_root.c
+#define kPCIRootUID			"PciRoot"			// pci_root.c
 #define kEthernetBuiltIn	"EthernetBuiltIn"	// pci_setup.c
 #define kGraphicsEnabler	"GraphicsEnabler"	// pci_setup.c
 #define kForceHPET			"ForceHPET"			// pci_setup.c
