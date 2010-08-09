@@ -846,7 +846,7 @@ void add_symbol(const char* symbol, void* addr)
  */
 void module_loaded(const char* name, UInt32 version, UInt32 compat)
 {
-	printf("\%s.dylib Version %d.%d.%d oaded\n"
+	printf("\%s.dylib Version %d.%d.%d loaded\n"
 		   "\tCompatibility Version: %d.%d.%d\n",
 		   name,
 		   (version >> 16) & 0xFFFF,
