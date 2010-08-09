@@ -98,14 +98,16 @@
 #define kMD0Image			"md0"				// ramdisk.h
 
 /*
- * Flags to the booter or kernel
+ * Flags to the booter and/or kernel - these end with "Flag".
  */
 #define kVerboseModeFlag	"-v"				// options.c
 #define kSafeModeFlag		"-x"				// options.c
 #define kOldSafeModeFlag	"-f"				// options.c
 #define kIgnoreBootFileFlag	"-F"				// options.c
 #define kSingleUserModeFlag	"-s"				// options.c
-#define k32BitModeFlag		"-x32"				// boot.c
+#define kArchI386Flag		"32"				// boot.c
+#define kLegacyModeFlag		"-legacy"			// boot.c
+#define kArchX86_64Flag		"64"				// boot.c
 
 /*
  * Booter behavior control

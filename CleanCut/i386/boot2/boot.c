@@ -407,18 +407,25 @@ void common_boot(int biosdev)
 			}
 		}
 
-		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
+		// If cpu doesn't handle 64 bit instructions,...
+		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
+			// ... user forced i386 kernel architecture on cpu with "em64t"...
+			getValueForKey(kArchI386Flag, &val, &len, &bootInfo->bootConfig) ||
+			// ... or forced Legacy Mode...
+			getValueForKey(kLegacyModeFlag, &val, &len, &bootInfo->bootConfig))
+		{
+			// ... use i386 kernel arch.
+			archCpuType = CPU_TYPE_I386;
+		}
+		else
+		{
+			// Else use x86_64 kernel arch.
 			archCpuType = CPU_TYPE_X86_64;
-		} else {
-			archCpuType = CPU_TYPE_I386;
 		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) {
-			if (strncmp(val, "i386", 4) == 0) {
-				archCpuType = CPU_TYPE_I386;
-			}
-		}
-		if (getValueForKey(k32BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
-			archCpuType = CPU_TYPE_I386;
+		// Override i386/-legacy, if flagged on Boot.plist.
+		if (getValueForKey(kArchX86_64Flag, &val, &len, &bootInfo->bootConfig))
+		{
+			archCpuType = CPU_TYPE_X86_64;
 		}
 		
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
