@@ -194,11 +194,9 @@ long LoadDrivers( char * dirSpec )
 		}
 		
 		// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
-        if (gRAMDiskVolume && !gRAMDiskBTAliased)
-        {
-          strcpy(dirSpecExtra, "rd(0,0)/Extra/");
-          FileLoadDrivers(dirSpecExtra, 0);
-        }
+		strcpy(dirSpecExtra, "rd(0,0)/"); // check it's "root".
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
 
         // Next try to load Extra extensions from the selected root partition.
         strcpy(dirSpecExtra, "/Extra/");
