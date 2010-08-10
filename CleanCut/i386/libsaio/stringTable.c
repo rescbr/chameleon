@@ -650,31 +650,25 @@ int loadSystemConfig(config_file_t *config)
  */
 int loadOverrideConfig(config_file_t *config)
 {
-	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",
-		"/Extra/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
-	};
-
-	int i, fd, count, ret=-1;
-
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	int			 count, ret, fd;
+	
+success_fd:
+	
+	if (fd >= 0)
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
-		{
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
-			
-			// build xml dictionary
-			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
-			ret=0;
-			break;
-		}
+		// read file
+		count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+		close(fd);
+
+		// build xml dictionary
+		ParseXMLFile(config->plist, &config->dictionary);
+		sysConfigValid = true;
+		ret = 0;
+	}
+	else
+	{
+		printf("No override config provided!\n");
+		ret = -1;
 	}
 	return ret;
 }
