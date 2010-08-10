@@ -188,18 +188,19 @@ long LoadDrivers( char * dirSpec )
 		// Take in account user overriding.
 		if (getValueForKey(kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
 		{
-			// Specify a path to a folder, ending with / e.g. /Extra/testkext/
+			// Specify a path to a folder, ending with / e.g. kext=/Extra/testkext/
 			strcpy(dirSpecExtra, override_pathfolder);
 			fd = FileLoadDrivers(dirSpecExtra, 0);
 			if (fd >= 0) goto success_fd;
 		}
 		
-		// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
+		// No need to specify (gRAMDiskVolume && !gRAMDiskBTAliased).
+		// First try to load Extra extensions from a ramdisk if isn't aliased as bt(0,0).
 		strcpy(dirSpecExtra, "rd(0,0)/"); // check it's "root".
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
 		
-		// No need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
+		// Also no need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
 		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
 		// In this case the following two apply.
 		

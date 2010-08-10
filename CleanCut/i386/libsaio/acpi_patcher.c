@@ -98,7 +98,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	// Take in account user overriding
 	if (getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		// Specify a path to a file, e.g. /Extra/test.aml
+		// Specify a path to a file, e.g. DSDT=/Extra/test.aml
 		sprintf(dirSpecDSDT, override_pathname);
 		fd = open(dirSpecDSDT, 0);
 		if (fd >= 0) goto success_fd;

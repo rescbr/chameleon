@@ -635,7 +635,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	// Take in account user overriding
 	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		// Specify a path to a file, e.g. /Extra/macProXY.plist
+		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
 		sprintf(dirSpecSMBIOS, override_pathname);
 		fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 		if (fd >= 0) goto success_fd;
