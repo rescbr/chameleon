@@ -26,7 +26,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = `find ./ -type d -depth 1 -not -name ".*"`
+SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 
 all embedtheme tags debug install installhdrs:
 	@rm -rf $(OBJROOT)

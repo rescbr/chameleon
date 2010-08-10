@@ -9,6 +9,8 @@
 #include "modules.h"
 
 
+moduleList_t* loadedModules = NULL;
+symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
 
@@ -17,6 +19,13 @@ void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 int load_module(const char* module)
 {
+	// Check to see if the module has already been loaded
+	if(is_module_laoded(module))
+	{
+		printf("Module %s already loaded\n");
+		return 1;
+	}
+	
 	char modString[128];
 	int fh = -1;
 	sprintf(modString, "/Extra/modules/%s.dylib", module);
@@ -65,7 +74,6 @@ int load_module(const char* module)
 
 void* parse_mach(void* binary)
 {
-	int (*module_init)(void) = NULL;
 	void (*module_start)(void) = NULL;
 
 
@@ -75,17 +83,16 @@ void* parse_mach(void* binary)
 	
 	char* symbolStub = NULL;
 	char* nonlazy = NULL;
-	char* nonlazy_variables = NULL;
+	//char* nonlazy_variables = NULL;
 
-	char* symbolTable = NULL;
 	// TODO convert all of the structs a union
-	struct load_command *loadCommand;
-	struct dylib_command* dylibCommand;
-	struct dyld_info_command* dyldInfoCommand;
-	struct symtab_command* symtabCommand;
-	struct segment_command* segmentCommand;
-	struct dysymtab_command* dysymtabCommand;
-	struct section* section;
+	struct load_command *loadCommand = NULL;
+	struct dylib_command* dylibCommand = NULL;
+	struct dyld_info_command* dyldInfoCommand = NULL;
+	struct symtab_command* symtabCommand = NULL;
+	struct segment_command* segmentCommand = NULL;
+	struct dysymtab_command* dysymtabCommand = NULL;
+	struct section* section = NULL;
 	UInt32 binaryIndex = sizeof(struct mach_header);
 	UInt16 cmd = 0;
 
@@ -114,101 +121,7 @@ void* parse_mach(void* binary)
 		{
 			case LC_SYMTAB:
 				symtabCommand = binary + binaryIndex;
-
-				UInt32 symbolIndex = 0;
-				char* symbolString = (UInt32)binary + (char*)symtabCommand->stroff;
-				symbolTable = binary + symtabCommand->symoff;
-				
-				int externalIndex = 0;
-				while(symbolIndex < symtabCommand->nsyms)
-				{
-					
-					struct nlist* symbolEntry = binary + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
-					
-					// If the symbol is exported by this module
-					if(symbolEntry->n_value)
-					{
-						if(strcmp(symbolString + symbolEntry->n_un.n_strx, "_start") == 0)
-						{
-							// Module init located. Don't register it, only called once
-							module_init = binary + symbolEntry->n_value;
-						}
-						else if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
-						{
-							// Module start located. Start is an alias so don't register it
-							module_start = binary + symbolEntry->n_value;
-						}
-						else
-						{
-							add_symbol(symbolString + symbolEntry->n_un.n_strx, binary + symbolEntry->n_value); 
-						}
-					}
-					// External symbol
-					else if(symbolEntry->n_type & 0x01 && symbolStub)
-					{
-						printf("Located external symbol %s", symbolString + symbolEntry->n_un.n_strx);
-						printf(" stub at 0x%X, (0x%X)\n", symbolStub + STUB_ENTRY_SIZE * externalIndex - (UInt32)binary, symbolStub + STUB_ENTRY_SIZE * externalIndex);
-						getc();
-						// Patch stub
-						if(lookup_symbol == NULL)
-						{
-							printf("Symbol.dylib not loaded. Module loader not setup.\n");
-							return NULL;
-						}
-						else
-						{
-							void* symbolAddress = (void*)lookup_symbol(symbolString + symbolEntry->n_un.n_strx);
-							
-							if((0xFFFFFFFF == (UInt32)symbolAddress) && 
-							   strcmp(symbolString + symbolEntry->n_un.n_strx, SYMBOL_DYLD_STUB_BINDER) != 0)
-							{
-								printf("Unable to locate symbol %s\n", symbolString + symbolEntry->n_un.n_strx);
-								
-							}
-							else 
-							{
-								char* patchLocation = symbolStub + STUB_ENTRY_SIZE * externalIndex;
-								//patch with far jump ;
-								/*
-								printf("0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n", 
-									   patchLocation[0],
-									   patchLocation[1],
-									   patchLocation[2],
-									   patchLocation[3],
-									   patchLocation[4],
-									   patchLocation[5]);
-								*/
-								
-								// Point the symbol stub to the nonlazy pointers
-								patchLocation[0] = 0xFF;	// Should already be this
-								patchLocation[1] = 0x25;	// Should already be this
-								patchLocation[2] = ((UInt32)(nonlazy + externalIndex * 4) & 0x000000FF) >> 0;
-								patchLocation[3] = ((UInt32)(nonlazy + externalIndex * 4) & 0x0000FF00) >> 8;
-								patchLocation[4] = ((UInt32)(nonlazy + externalIndex * 4) & 0x00FF0000) >> 16;
-								patchLocation[5] = ((UInt32)(nonlazy + externalIndex * 4) & 0xFF000000) >> 24;
-								
-								// Set the nonlazy pointer to the correct address
-								patchLocation = (nonlazy + externalIndex*4);
-								patchLocation[0] =((UInt32)symbolAddress & 0x000000FF) >> 0;
-								patchLocation[1] =((UInt32)symbolAddress & 0x0000FF00) >> 8;
-								patchLocation[2] =((UInt32)symbolAddress & 0x00FF0000) >> 16;
-								patchLocation[3] =((UInt32)symbolAddress & 0xFF000000) >> 24;
-								
-								
-								externalIndex++;
-
-							}
-
-														
-						}
-											 
-					}
-
-					symbolEntry+= sizeof(struct nlist);
-					symbolIndex++;	// TODO remove
-				}
 				break;
-
 			case LC_SEGMENT:
 				segmentCommand = binary + binaryIndex;
 
@@ -217,7 +130,7 @@ void* parse_mach(void* binary)
 				while(sections)
 				{
 					// Look for the __symbol_stub section
-					if(strcmp(section->sectname, "__nl_symbol_ptr") == 0)
+					if(strcmp(section->sectname, SECT_NON_LAZY_SYMBOL_PTR) == 0)
 					{
 						/*printf("\tSection non lazy pointers at 0x%X, %d symbols\n",
 							   section->offset, 
@@ -226,8 +139,8 @@ void* parse_mach(void* binary)
 						switch(section->flags)
 						{
 							case S_NON_LAZY_SYMBOL_POINTERS:
-								nonlazy_variables = binary + section->offset;
-									break;
+								//nonlazy_variables = binary + section->offset;
+								break;
 								
 							case S_LAZY_SYMBOL_POINTERS:
 								nonlazy = binary + section->offset;
@@ -235,13 +148,13 @@ void* parse_mach(void* binary)
 								break;
 								
 							default:
-								printf("Unhandled __nl_symbol_ptr section\n");
+								printf("Unhandled %s section\n", SECT_NON_LAZY_SYMBOL_PTR);
 								getc();
 								break;
 						}
 						//getc();
 					}
-					else if(strcmp(section->sectname, "__symbol_stub") == 0)
+					else if(strcmp(section->sectname, SECT_SYMBOL_STUBS) == 0)
 					{
 						/*printf("\tSection __symbol_stub at 0x%X (0x%X), %d symbols\n",
 							   section->offset, 
@@ -264,7 +177,12 @@ void* parse_mach(void* binary)
 				break;
 				
 			case LC_LOAD_DYLIB:
-				//printf("Unhandled loadcommand LC_LOAD_DYLIB\n");
+			case LC_LOAD_WEAK_DYLIB:
+			{
+				// TODO: do this before 
+				struct dylib_command* weakLoad = binary + binaryIndex;
+				load_module((char*)((UInt32)*((UInt32*)&weakLoad->dylib.name)));
+			}
 				break;
 				
 			case LC_ID_DYLIB:
@@ -289,27 +207,10 @@ void* parse_mach(void* binary)
 					   dyldInfoCommand->lazy_bind_off,
 					   dyldInfoCommand->export_off);
 				*/
-				if(dyldInfoCommand->bind_off)
-				{
-					bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
-				}
-				
-				/*
-				 // This is done later on using the __symbol_stub instead
-				if(dyldInfoCommand->lazy_bind_off)
-				{
-					bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
-					
-				}*/
-				
-				if(dyldInfoCommand->rebase_off)
-				{
-					rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
-				}
 				
 				
 				break;
-
+				
 			case LC_UUID:
 				// We don't care about the UUID at the moment
 				break;
@@ -323,32 +224,31 @@ void* parse_mach(void* binary)
 		binaryIndex += cmdSize;
 	}
 	if(!moduleName) return NULL;
+		
 	
-	
-	// TODO: Initialize the module.
-	printf("Calling _start\n");
-	
-	getc();
-	if(module_init) 
+	// Module is loaded and all module dependencies have been loaded, bind the module
+	// NOTE: circular dependencies are not handled yet
+	if(dyldInfoCommand && dyldInfoCommand->bind_off)
 	{
-		jump_pointer(module_init);
-	 }
+		bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
+	{
+		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
+	}
+	
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbolStub, nonlazy);
+
+	
+	// To satisfy cicular deps, the module_loaded command shoudl be run before the module init();
 	module_loaded(moduleName, moduleVersion, moduleCompat);
 	getc();
-	 //*/
-	return module_start; // TODO populate w/ address of _start
+	
+	return module_start;
 	
 }
 
-
-// This is for debugging, remove the jump_pointer funciton later
-int jump_pointer(int (*pointer)())
-{
-	printf("Jumping to function at 0x%X\n", pointer);
-
-	getc();
-	return (*pointer)();
-}
 
 // Based on code from dylibinfo.cpp and ImageLoaderMachOCompressed.cpp
 void rebase_macho(void* base, char* rebase_stream, UInt32 size)
@@ -547,8 +447,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 // however the macho file is 32 bit, so it shouldn't matter too much
 void bind_macho(void* base, char* bind_stream, UInt32 size)
 {	
-	
-	
 	bind_stream += (UInt32)base;
 	
 	UInt8 immediate = 0;
@@ -559,12 +457,13 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	
 	UInt32 address = 0;
 	
-	SInt32 addend = 0;
+	SInt32 addend = 0;			// TODO: handle this
 	SInt32 libraryOrdinal = 0;
 
 	const char* symbolName = NULL;
 	UInt8 symboFlags = 0;
 	UInt32 symbolAddr = 0xFFFFFFFF;
+	
 	// Temperary variables
 	UInt8 bits = 0;
 	UInt32 tmp = 0;
@@ -618,7 +517,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				i += strlen((char*)&bind_stream[i]);
 				//printf("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
 
-				symbolAddr = lookup_symbol(symbolName);
+				symbolAddr = lookup_external_all(symbolName);
 
 				break;
 				
@@ -825,27 +724,51 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
  * TODO: actualy do something... 
  * possibly change to a pointer and add this to the Symbol module
  */
-void add_symbol(const char* symbol, void* addr)
+void add_symbol(char* symbol, void* addr)
 {
-	printf("Adding symbol %s at 0x%X\n", symbol, addr);
+	//printf("Adding symbol %s at 0x%X\n", symbol, addr);
 	
 	//hack
 	if(strcmp(symbol, "_lookup_symbol") == 0)
 	{
-		printf("Initializing lookup symbol function\n");
+		//printf("Initializing lookup symbol function\n");
 		lookup_symbol = addr;
 	}
+	else if(!moduleSymbols)
+	{
+		moduleSymbols = malloc(sizeof(symbolList_t));
+		moduleSymbols->next = NULL;
+		moduleSymbols->addr = (unsigned int)addr;
+		moduleSymbols->symbol = symbol;
+	}
+	else
+	{
+		symbolList_t* entry = moduleSymbols;
+		while(entry->next)
+		{
+			entry = entry->next;
+		}
+		
+		entry->next = malloc(sizeof(symbolList_t));
+		entry = entry->next;
+		
+		entry->next = NULL;
+		entry->addr = (unsigned int)addr;
+		entry->symbol = symbol;
+		
+	}
+							   
+
 }
 
 
 /*
  * print out the information about the loaded module
- * In the future, add to a list of laoded modules
- * so that if another module depends on it we don't
- * try to reload the same module.
+ 
  */
-void module_loaded(const char* name, UInt32 version, UInt32 compat)
+void module_loaded(char* name, UInt32 version, UInt32 compat)
 {
+	/*
 	printf("\%s.dylib Version %d.%d.%d loaded\n"
 		   "\tCompatibility Version: %d.%d.%d\n",
 		   name,
@@ -854,6 +777,182 @@ void module_loaded(const char* name, UInt32 version, UInt32 compat)
 		   (version >> 0) & 0x00FF,
 		   (compat >> 16) & 0xFFFF,
 		   (compat >> 8) & 0x00FF,
-		   (compat >> 0) & 0x00FF);		
+		   (compat >> 0) & 0x00FF);	
+	*/
+	if(loadedModules == NULL)
+	{
+		loadedModules = malloc(sizeof(moduleList_t));
+		loadedModules->next = NULL;
+		loadedModules->module = name;
+		loadedModules->version = version;
+		loadedModules->compat = compat;
+	}
+	else
+	{
+		moduleList_t* entry = loadedModules;
+		while(entry->next)
+		{
+			entry = entry->next;
+		}
+		
+		entry->next = malloc(sizeof(moduleList_t));
+		entry = entry->next;
+		
+		entry->next = NULL;
+		entry->module = name;
+		entry->version = version;
+		entry->compat = compat;
+	}
+
+	
+}
+
+int is_module_laoded(const char* name)
+{
+	moduleList_t* entry = loadedModules;
+	while(entry)
+	{
+		if(strcmp(entry->module, name) == 0)
+		{
+			return 1;
+		}
+		else
+		{
+			entry = entry->next;
+		}
+
+	}
+	return 0;
+}
+
+// Look for symbols using the Smbols moduel function.
+// If non are found, look through the list of module symbols
+unsigned int lookup_external_all(const char* name)
+{
+	unsigned int addr = 0xFFFFFFFF;
+	if(lookup_symbol)
+	{
+		addr = lookup_symbol(name);
+		if(addr != 0xFFFFFFFF)
+		{
+			return addr;
+		}
+	}
+	else
+	{
+		printf("Symbol.dylib not loaded. Module loader not setup.\n");
+		return 0xFFFFFFFF;
+	}
+
+
+	
+	symbolList_t* entry = moduleSymbols;
+	while(entry)
+	{
+		if(strcmp(entry->symbol, name) == 0)
+		{
+			return entry->addr;
+		}
+		else
+		{
+			entry = entry->next;
+		}
+
+	}
+	
+	return 0xFFFFFFFF;
+}
+
+
+/*
+ * parse the symbol table
+ * Lookup any undefined symbols
+ */
+ 
+unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, char* nonlazy)
+{
+	unsigned int module_start = 0xFFFFFFFF;
+	
+	UInt32 symbolIndex = 0;
+	char* symbolString = base + (char*)symtabCommand->stroff;
+	//char* symbolTable = base + symtabCommand->symoff;
+	
+	int externalIndex = 0;
+	while(symbolIndex < symtabCommand->nsyms)
+	{
+		
+		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
+		
+		// If the symbol is exported by this module
+		if(symbolEntry->n_value)
+		{
+			if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
+			{
+				// Module start located. Start is an alias so don't register it
+				module_start = base + symbolEntry->n_value;
+			}
+			else
+			{
+				add_symbol(symbolString + symbolEntry->n_un.n_strx, (void*)base + symbolEntry->n_value); 
+			}
+		}
+		// External symbol
+		else if(symbolEntry->n_type & 0x01 && symbolStub)
+		{
+			printf("Located external symbol %s", symbolString + symbolEntry->n_un.n_strx);
+			printf(" stub at 0x%X, (0x%X)\n", symbolStub + STUB_ENTRY_SIZE * externalIndex - base, symbolStub + STUB_ENTRY_SIZE * externalIndex);
+			getc();
+			
+			// Patch stub
+			void* symbolAddress = (void*)lookup_external_all(symbolString + symbolEntry->n_un.n_strx);
+			
+			if((0xFFFFFFFF == (UInt32)symbolAddress) && 
+			   strcmp(symbolString + symbolEntry->n_un.n_strx, SYMBOL_DYLD_STUB_BINDER) != 0)
+			{
+				printf("Unable to locate symbol %s\n", symbolString + symbolEntry->n_un.n_strx);
+				
+			}
+			else 
+			{
+				char* patchLocation = symbolStub + STUB_ENTRY_SIZE * externalIndex;
+				//patch with far jump ;
+				/*
+				 printf("0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n", 
+				 patchLocation[0],
+				 patchLocation[1],
+				 patchLocation[2],
+				 patchLocation[3],
+				 patchLocation[4],
+				 patchLocation[5]);
+				 */
+				
+				// Point the symbol stub to the nonlazy pointers
+				// TODO: do this *after* each module dep has been laoded.
+				// At the moment, module deps won't work
+				patchLocation[0] = 0xFF;	// Should already be this
+				patchLocation[1] = 0x25;	// Should already be this
+				patchLocation[2] = ((UInt32)(nonlazy + externalIndex * 4) & 0x000000FF) >> 0;
+				patchLocation[3] = ((UInt32)(nonlazy + externalIndex * 4) & 0x0000FF00) >> 8;
+				patchLocation[4] = ((UInt32)(nonlazy + externalIndex * 4) & 0x00FF0000) >> 16;
+				patchLocation[5] = ((UInt32)(nonlazy + externalIndex * 4) & 0xFF000000) >> 24;
+				
+				// Set the nonlazy pointer to the correct address
+				patchLocation = (nonlazy + externalIndex*4);
+				patchLocation[0] =((UInt32)symbolAddress & 0x000000FF) >> 0;
+				patchLocation[1] =((UInt32)symbolAddress & 0x0000FF00) >> 8;
+				patchLocation[2] =((UInt32)symbolAddress & 0x00FF0000) >> 16;
+				patchLocation[3] =((UInt32)symbolAddress & 0xFF000000) >> 24;
+				
+				
+				externalIndex++;
+				
+			}
+		}
+		
+		symbolEntry+= sizeof(struct nlist);
+		symbolIndex++;	// TODO remove
+	}
+	
+	return module_start;
 	
 }

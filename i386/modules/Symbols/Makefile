@@ -65,7 +65,7 @@ dylib: $(OBJS)
 	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version `svn info ../../ | grep Revision | awk '{print $$2}'` \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/$(MODULE_NAME)Init.o $(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \
+	$(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \
 
 
 
@@ -83,24 +83,6 @@ Symbols.o: #Symbols.h
 	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "	{.symbol = "$$3"_string, .addr = 0x"$$1"},";}' >> Symbols.h
 	@echo "};" >> Symbols.h
 
-
-	rm -rf $(MODULE_NAME)Init.c
-	echo "extern int load_dependency(const char*);" >> $(MODULE_NAME)Init.c
-	echo "" >> $(MODULE_NAME)Init.c
-
-	echo "int start() {" >> $(MODULE_NAME)Init.c
-	echo "	int returnValue = 1;" >> $(MODULE_NAME)Init.c
-
-	for i in ${MODULE_DEPENDENCIES}; \
-	do \
-		echo Adding dependency $$i.dylib; \
-		echo "	if(returnValue) returnValue &= load_dependency(\""$$i"\");" >> $(MODULE_NAME)Init.c; \
-	done
-	
-	echo "	return returnValue;" >> $(MODULE_NAME)Init.c;
-	echo "}" >> $(MODULE_NAME)Init.c;
-
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(MODULE_NAME)Init.c $(INC) -o $(OBJROOT)/$(MODULE_NAME)Init.o  
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
 
 Symbols.h:
