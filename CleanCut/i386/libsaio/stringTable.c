@@ -650,7 +650,18 @@ int loadSystemConfig(config_file_t *config)
  */
 int loadOverrideConfig(config_file_t *config)
 {
-	int			 count, ret, fd;
+	char		 dirSpecBplist[128] = ""; //Azi:alloc - reminder
+	const char	*override_pathname = NULL;
+	int			 count, ret, fd, len = 0;
+	
+	// Take in account user overriding the override :P
+	if (getValueForKey(kTestConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
+	{
+		// Specify a path to a file, e.g. config=/Extra/test.plist
+		strcpy(dirSpecBplist, override_pathname);
+		fd = open(dirSpecBplist, 0);
+		if (fd >= 0) goto success_fd;
+	}
 	
 success_fd:
 	

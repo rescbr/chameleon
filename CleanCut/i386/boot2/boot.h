@@ -96,6 +96,7 @@
 #define kEHCIhard			"EHCIhard"			// usb.c
 #define kDefaultPartition	"Default Partition"	// sys.c
 #define kMD0Image			"md0"				// ramdisk.h
+#define kTestConfigKey		"config"			// stringTable.c
 #define kCanOverrideKey		"CanOverride"		// stringTable.c
 
 /*

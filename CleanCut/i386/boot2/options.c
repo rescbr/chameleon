@@ -1169,9 +1169,9 @@ processBootOptions()
     // trying to load the config file anyway.
     else
       return -1;
-
+	
+	//Azi: implemented at loadOverrideConfig.
     // Load config table specified by the user, or use the default.
-	//Azi: not working.
     //if (!getValueForBootKey(cp, "config", &val, &cnt)) {
     //  val = 0;
     //  cnt = 0;
@@ -1179,7 +1179,7 @@ processBootOptions()
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
+    // This is not a mandatory operation anymore.
 
     loadOverrideConfig(&bootInfo->overrideConfig);
 
