@@ -624,23 +624,50 @@ void setupEfiDeviceTree(void)
  * Load the smbios.plist override config file if any
  */
 
-static void setupSmbiosConfigFile()
+static void setupSmbiosConfigFile(const char *filename)
 {
-	const char * value = getStringForKey(kSMBIOS, &bootInfo->bootConfig);
+	char		dirSpecSMBIOS[128] = "";
+	const char *override_pathname = NULL;
+	int			len = 0, fd = 0;
+	extern char gMacOSVersion;
 	extern void scan_mem();
 	
-	if (!value)  value = "/Extra/smbios.plist";
-	if (loadConfigFile(value, &bootInfo->smbiosConfig) == -1)
+	// Take in account user overriding
+	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		verbose("No SMBIOS replacement found\n");
-    }
+		// Specify a path to a file, e.g. /Extra/macProXY.plist
+		sprintf(dirSpecSMBIOS, override_pathname);
+		fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+		if (fd >= 0) goto success_fd;
+	}
 	
-    // get a chance to scan mem dynamically if user asks for it while having the config options loaded as well
-    // as opposed to when it was in scan_platform(), also load the orig. smbios so that we can access dmi info without
-    // patching the smbios yet
-    getSmbios(SMBIOS_ORIGINAL);
-    scan_mem(); 
-    smbios_p = (EFI_PTR32) getSmbios(SMBIOS_PATCHED); // process smbios asap
+	// Check rd's root.
+	sprintf(dirSpecSMBIOS, "rd(0,0)/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+	if (fd >= 0) goto success_fd;
+	
+	// Check booter volume/rdbt for OS specific folders.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+	if (fd >= 0) goto success_fd;
+	
+	// Check booter volume/rdbt Extra.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+	if (fd >= 0) goto success_fd;
+	
+	if (loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig) == -1)
+	{
+		verbose("No SMBIOS replacement provided.\n");
+	}
+	
+	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,
+	// as opposed to when it was in scan_platform(); also load the orig. smbios so that we can access dmi info without
+	// patching the smbios yet
+success_fd:
+	getSmbios(SMBIOS_ORIGINAL);
+	scan_mem(); 
+	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);	// process smbios asap
 }
 
 /*
@@ -678,7 +705,7 @@ void setupFakeEfi(void)
 	setup_pci_devs(root_pci_dev);
 
 	// load smbios.plist file if any
-	setupSmbiosConfigFile();
+	setupSmbiosConfigFile("smbios.plist");
 	
 	// Initialize the base table
 	if (archCpuType == CPU_TYPE_I386)
