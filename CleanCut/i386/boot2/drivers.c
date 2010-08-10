@@ -162,29 +162,30 @@ InitDriverSupport( void )
 
 long LoadDrivers( char * dirSpec )
 {
-    char dirSpecExtra[1024];
+	char dirSpecExtra[1024];
 	const char *override_pathfolder = NULL; // path to folder
 	int			fd = 0, len = 0;
-
-    if ( InitDriverSupport() != 0 )
-        return 0;
-
-    // Load extra drivers if a hook has been installed.
-    if (LoadExtraDrivers_p != NULL)
-    {
-        (*LoadExtraDrivers_p)(&FileLoadDrivers);
-    }
-
-    if ( gBootFileType == kNetworkDeviceType )
-    {
-        if (NetLoadDrivers(dirSpec) != 0) {
-            error("Could not load drivers from the network\n");
-            return -1;
-        }
-    }
-    else if ( gBootFileType == kBlockDeviceType )
-    {
-        // Take in account user overriding.
+	
+	if ( InitDriverSupport() != 0 )
+		return 0;
+	
+	// Load extra drivers if a hook has been installed.
+	if (LoadExtraDrivers_p != NULL)
+	{
+		(*LoadExtraDrivers_p)(&FileLoadDrivers);
+	}
+	
+	if ( gBootFileType == kNetworkDeviceType )
+	{
+		if (NetLoadDrivers(dirSpec) != 0)
+		{
+			error("Could not load drivers from the network\n");
+			return -1;
+		}
+	}
+	else if ( gBootFileType == kBlockDeviceType )
+	{
+		// Take in account user overriding.
 		if (getValueForKey(kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
 		{
 			// Specify a path to a folder, ending with / e.g. /Extra/testkext/
@@ -197,11 +198,11 @@ long LoadDrivers( char * dirSpec )
 		strcpy(dirSpecExtra, "rd(0,0)/"); // check it's "root".
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
-
-        // No need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
+		
+		// No need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
 		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
 		// In this case the following two apply.
-
+		
 		// Check booter volume/rdbt Extra for specific OS files, on specific OS folders.
 		sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
 		fd = FileLoadDrivers(dirSpecExtra, 0);
@@ -213,52 +214,52 @@ long LoadDrivers( char * dirSpec )
 		strcpy(dirSpecExtra, "bt(0,0)/Extra/");
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
-
-        // Also try to load Extensions from boot helper partitions.
-        if (gBootVolume->flags & kBVFlagBooter)
-        {
-         strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
-          if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-          {
-            strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
-            if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-            {
-              strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
-              FileLoadDrivers(dirSpecExtra, 0);
-            }
-          }
-        }
-
+		
+		// Also try to load Extensions from boot helper partitions.
+		if (gBootVolume->flags & kBVFlagBooter)
+		{
+			strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			{
+				strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
+				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				{
+					strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
+					FileLoadDrivers(dirSpecExtra, 0);
+				}
+			}
+		}
+		
 success_fd:
-
-        if (gMKextName[0] != '\0')
-        {
-            verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-            if ( LoadDriverMKext(gMKextName) != 0 )
-            {
-                error("Could not load %s\n", gMKextName);
-                return -1;
-            }
-        }
-        else
-        {
-            strcpy(gExtensionsSpec, dirSpec);
-            strcat(gExtensionsSpec, "System/Library/");
-            FileLoadDrivers(gExtensionsSpec, 0);
-        }
-    }
-    else
-    {
-        return 0;
-    }
-
-    MatchPersonalities();
-
-    MatchLibraries();
-
-    LoadMatchedModules();
-
-    return 0;
+		
+		if (gMKextName[0] != '\0')
+		{
+			verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
+			if ( LoadDriverMKext(gMKextName) != 0 )
+			{
+				error("Could not load %s\n", gMKextName);
+				return -1;
+			}
+		}
+		else
+		{
+			strcpy(gExtensionsSpec, dirSpec);
+			strcat(gExtensionsSpec, "System/Library/");
+			FileLoadDrivers(gExtensionsSpec, 0);
+		}
+	}
+	else
+	{
+		return 0;
+	}
+	
+	MatchPersonalities();
+	
+	MatchLibraries();
+	
+	LoadMatchedModules();
+	
+	return 0;
 }
 
 //==========================================================================
