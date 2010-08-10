@@ -608,7 +608,7 @@ int loadConfigFile(const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
+		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0)
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
