@@ -69,7 +69,7 @@
 #define kWakeImage			"WakeImage"			// boot.c
 #define kProductVersion		"ProductVersion"	// boot.c
 #define karch				"arch"				// boot.c
-#define kDSDT				"DSDT"				// acpi_patcher.c
+#define kDSDTKey			"DSDT"				// acpi_patcher.c
 #define kDropSSDT			"DropSSDT"			// acpi_patcher.c
 #define kRestartFix			"RestartFix"        // acpi_patcher.c
 #define kGeneratePStates	"GeneratePStates"	// acpi_patcher.c

@@ -86,72 +86,54 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
     }
     return NULL;
 }
-/** The folowing ACPI Table search algo. should be reused anywhere needed:*/
+
+/** The following ACPI Table search algo, should be reused anywhere needed: */
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	int fd=0;
-	const char * overriden_pathname=NULL;
-	static char dirspec[512]="";
-	static bool first_time =true; 
-	int len=0;
+	char		dirSpecDSDT[512] = "";
+	const char *override_pathname = NULL; // full path to a file.
+	int			len = 0, fd = 0;
+	extern char gMacOSVersion;
 	
-	/// Take in accound user overriding if it's DSDT only
-	if (strstr(filename, "DSDT") && 
-		getValueForKey(kDSDT, &overriden_pathname, &len,  
-					   &bootInfo->bootConfig))
-    {
-		sprintf(dirspec, "%s", overriden_pathname);
-		fd=open (dirspec,0);
-		if (fd>=0) goto success_fd;
-    }
-	// Check that dirspec is not already assigned with a path
-	if (!first_time && *dirspec) 
-	{ // it is so start searching this cached patch first
-		//extract path
-		for (len=strlen(dirspec)-1; len; len--)
-			if (dirspec[len]=='/' || len==0)
-			{
-				dirspec[len]='\0';
-				break;
-			}
-		// now concat with the filename
-		strncat(dirspec, "/", sizeof(dirspec));
-		strncat(dirspec, filename, sizeof(dirspec));
-		// and test to see if we don't have our big boy here:
-		fd=open (dirspec,0);
-		if (fd>=0) 
-		{
-			// printf("ACPI file search cache hit: file found at %s\n", dirspec);
-			goto success_fd;
-		}
+	// Take in account user overriding
+	if (getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
+	{
+		// Specify a path to a file, e.g. /Extra/test.aml
+		sprintf(dirSpecDSDT, override_pathname);
+		fd = open(dirSpecDSDT, 0);
+		if (fd >= 0) goto success_fd;
 	}
-	// Start searching any potential location for ACPI Table
-	// search the Extra folders first
-	sprintf(dirspec,"/Extra/%s",filename); 
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
 	
-	sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
+	// Check rd's root.
+	sprintf(dirSpecDSDT, "rd(0,0)/%s", filename);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
 	
-	sprintf(dirspec, "%s", filename); // search current dir
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
+	// Check booter volume/rdbt for OS specific folders.
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
 	
-	sprintf(dirspec, "/%s", filename); // search root
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
+	// Check booter volume/rdbt Extra.
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s", filename);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
+	
+	//Azi: All loaded files stay in Extra.. please!? :)
+	//sprintf(dirspec, "/%s", filename); // search root
+	//fd=open (dirspec,0);
+	//if (fd>=0) goto success_fd;
 	
 	// NOT FOUND:
+	//Azi: a reminder - handling this only on pci_root.c, getPciRootUID() (it's enough to check if .aml file exists),
+	// to reduce number of printed messages and the confusion caused by them on users.
 	//verbose("ACPI Table not found: %s\n", filename);
+	
 	if (outDirspec) *outDirspec = "";
-	first_time = false;
 	return -1;
 	// FOUND
 success_fd:
-	first_time = false;
-	if (outDirspec) *outDirspec = dirspec; 
+	if (outDirspec) *outDirspec = dirSpecDSDT;
 	return fd;
 }
 
