@@ -62,7 +62,7 @@
 #define kGUIKey				"GUI"				// boot.c
 #define kBootBannerKey		"Boot Banner"		// options.c
 #define kWaitForKeypressKey	"Wait"				// boot.c
-/* AsereBLN: added the other keys */
+#define kExtensionsKey		"kext"				// drivers.c
 #define kUseAtiROM			"UseAtiROM"			// ati.c
 #define kWake				"Wake"				// boot.c
 #define kForceWake			"ForceWake"			// boot.c
@@ -96,6 +96,7 @@
 #define kEHCIhard			"EHCIhard"			// usb.c
 #define kDefaultPartition	"Default Partition"	// sys.c
 #define kMD0Image			"md0"				// ramdisk.h
+#define kCanOverrideKey		"CanOverride"		// stringTable.c
 
 /*
  * Flags to the booter and/or kernel - these end with "Flag".

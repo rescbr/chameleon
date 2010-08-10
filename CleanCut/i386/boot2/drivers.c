@@ -163,6 +163,8 @@ InitDriverSupport( void )
 long LoadDrivers( char * dirSpec )
 {
     char dirSpecExtra[1024];
+	const char *override_pathfolder = NULL; // path to folder
+	int			fd = 0, len = 0;
 
     if ( InitDriverSupport() != 0 )
         return 0;
@@ -182,7 +184,16 @@ long LoadDrivers( char * dirSpec )
     }
     else if ( gBootFileType == kBlockDeviceType )
     {
-        // First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
+        // Take in account user overriding.
+		if (getValueForKey(kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
+		{
+			// Specify a path to a folder, ending with / e.g. /Extra/testkext/
+			strcpy(dirSpecExtra, override_pathfolder);
+			fd = FileLoadDrivers(dirSpecExtra, 0);
+			if (fd >= 0) goto success_fd;
+		}
+		
+		// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
         if (gRAMDiskVolume && !gRAMDiskBTAliased)
         {
           strcpy(dirSpecExtra, "rd(0,0)/Extra/");
@@ -223,6 +234,8 @@ long LoadDrivers( char * dirSpec )
             }
           }
         }
+
+success_fd:
 
         if (gMKextName[0] != '\0')
         {

@@ -26,8 +26,9 @@
  * All rights reserved.
  */
 
+#include "boot.h"
 #include "bootstruct.h"
-#include "libsaio.h"
+#include "libsaio.h" //Azi: this is included on boot.h - just a reminder.
 #include "xml.h"
 
 extern char *Language;
@@ -632,6 +633,9 @@ int loadSystemConfig(config_file_t *config)
 			
 			// enable canOverride flag
 			config->canOverride = true;
+			
+			// disable canOverride. Remove?
+			getBoolForKey(kCanOverrideKey, &config->canOverride, &bootInfo->bootConfig);
 
 			break;
 		}
