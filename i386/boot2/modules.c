@@ -517,7 +517,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				i += strlen((char*)&bind_stream[i]);
 				//printf("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
 
-				symbolAddr = lookup_external_all(symbolName);
+				symbolAddr = lookup_all_symbols(symbolName);
 
 				break;
 				
@@ -827,7 +827,7 @@ int is_module_laoded(const char* name)
 
 // Look for symbols using the Smbols moduel function.
 // If non are found, look through the list of module symbols
-unsigned int lookup_external_all(const char* name)
+unsigned int lookup_all_symbols(const char* name)
 {
 	unsigned int addr = 0xFFFFFFFF;
 	if(lookup_symbol)
@@ -904,7 +904,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			getc();
 			
 			// Patch stub
-			void* symbolAddress = (void*)lookup_external_all(symbolString + symbolEntry->n_un.n_strx);
+			void* symbolAddress = (void*)lookup_all_symbols(symbolString + symbolEntry->n_un.n_strx);
 			
 			if((0xFFFFFFFF == (UInt32)symbolAddress) && 
 			   strcmp(symbolString + symbolEntry->n_un.n_strx, SYMBOL_DYLD_STUB_BINDER) != 0)
