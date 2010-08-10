@@ -198,30 +198,26 @@ long LoadDrivers( char * dirSpec )
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
 
-        // Next try to load Extra extensions from the selected root partition.
-        strcpy(dirSpecExtra, "/Extra/");
-        if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-        {
-          // If failed, then try to load Extra extensions from the boot partition
-          // in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-          if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-               || (gRAMDiskVolume && gRAMDiskBTAliased) )
-          {
-            // Next try a specfic OS version folder ie 10.5
-            sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
-            if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-            {	
-              // Next we'll try the base
-              strcpy(dirSpecExtra, "bt(0,0)/Extra/");
-              FileLoadDrivers(dirSpecExtra, 0);
-            }
-          }
-        }
+        // No need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
+		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
+		// In this case the following two apply.
+
+		// Check booter volume/rdbt Extra for specific OS files, on specific OS folders.
+		sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
+		
+		// Removed /Extra path from search algo. If needed can be specified with override key!
+		
+		// Check booter volume/rdbt Extra in case we don't keep specific OS folders.
+		strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
 
         // Also try to load Extensions from boot helper partitions.
         if (gBootVolume->flags & kBVFlagBooter)
         {
-          strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
+         strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
           if (FileLoadDrivers(dirSpecExtra, 0) != 0)
           {
             strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
