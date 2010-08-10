@@ -7,6 +7,9 @@
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
 
+#ifndef __BOOT_MODULES_H
+#define __BOOT_MODULES_H
+
 
 typedef struct symbolList_t{
 	char* symbol;
@@ -21,8 +24,6 @@ typedef struct moduleList_t{
 	struct moduleList_t* next;
 } moduleList_t;
 
-#ifndef __BOOT_MODULES_H
-#define __BOOT_MODULES_H
 
 #define SYMBOLS_MODULE "Symbols"
 
@@ -45,5 +46,7 @@ void* parse_mach(void* binary);
 unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, char* nonlazy);
 
 unsigned int lookup_all_symbols(const char* name);
+
+extern unsigned int (*lookup_symbol)(const char*);
 
 #endif /* __BOOT_MODULES_H */

@@ -17,12 +17,15 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 
+/*
+ * Load a module file in /Extra/modules
+ * TODO: verify version number of module
+ */
 int load_module(const char* module)
 {
 	// Check to see if the module has already been loaded
 	if(is_module_laoded(module))
 	{
-		printf("Module %s already loaded\n");
 		return 1;
 	}
 	
@@ -177,12 +180,13 @@ void* parse_mach(void* binary)
 				break;
 				
 			case LC_LOAD_DYLIB:
-			case LC_LOAD_WEAK_DYLIB:
-			{
-				// TODO: do this before 
-				struct dylib_command* weakLoad = binary + binaryIndex;
-				load_module((char*)((UInt32)*((UInt32*)&weakLoad->dylib.name)));
-			}
+			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
+				dylibCommand = binary + binaryIndex;
+				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+				// =	dylibCommand->dylib.current_version;
+				// =	dylibCommand->dylib.compatibility_version;
+
+				load_module(module);
 				break;
 				
 			case LC_ID_DYLIB:
@@ -243,7 +247,6 @@ void* parse_mach(void* binary)
 	
 	// To satisfy cicular deps, the module_loaded command shoudl be run before the module init();
 	module_loaded(moduleName, moduleVersion, moduleCompat);
-	getc();
 	
 	return module_start;
 	
@@ -728,13 +731,7 @@ void add_symbol(char* symbol, void* addr)
 {
 	//printf("Adding symbol %s at 0x%X\n", symbol, addr);
 	
-	//hack
-	if(strcmp(symbol, "_lookup_symbol") == 0)
-	{
-		//printf("Initializing lookup symbol function\n");
-		lookup_symbol = addr;
-	}
-	else if(!moduleSymbols)
+	if(!moduleSymbols)
 	{
 		moduleSymbols = malloc(sizeof(symbolList_t));
 		moduleSymbols->next = NULL;
@@ -838,11 +835,11 @@ unsigned int lookup_all_symbols(const char* name)
 			return addr;
 		}
 	}
-	else
+	/*else
 	{
 		printf("Symbol.dylib not loaded. Module loader not setup.\n");
 		return 0xFFFFFFFF;
-	}
+	}*/
 
 
 	

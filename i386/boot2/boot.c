@@ -287,7 +287,10 @@ void common_boot(int biosdev)
 
 	// Intialize module system
 	load_module(SYMBOLS_MODULE);
-	load_module("HelloWorld");
+	lookup_symbol = (void*)lookup_all_symbols("_lookup_symbol");
+	
+	// Load a module
+	load_module("KernelPatcher");
 	
     // Disable rescan option by default
     gEnableCDROMRescan = false;
