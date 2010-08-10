@@ -652,7 +652,9 @@ int loadOverrideConfig(config_file_t *config)
 {
 	char		 dirSpecBplist[128] = ""; //Azi:alloc - reminder
 	const char	*override_pathname = NULL;
+	const char	*filename = "com.apple.Boot.plist";
 	int			 count, ret, fd, len = 0;
+	extern char  gMacOSVersion;
 	
 	// Take in account user overriding the override :P
 	if (getValueForKey(kTestConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
@@ -662,6 +664,25 @@ int loadOverrideConfig(config_file_t *config)
 		fd = open(dirSpecBplist, 0);
 		if (fd >= 0) goto success_fd;
 	}
+	
+	// Check rd's root for override config.
+	sprintf(dirSpecBplist, "rd(0,0)/%s", filename);
+	fd = open(dirSpecBplist, 0);
+	if (fd >= 0) goto success_fd;
+	
+	// Check OS specific folders.
+	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = open(dirSpecBplist, 0);
+//	if (fd >= 0) goto success_fd;
+	
+	//Azi: i really don't dig these two!
+	// "/Extra/com.apple.Boot.plist",
+	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	
+	// These, no way to test, need advice.
+	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
+	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
+	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
 	
 success_fd:
 	
