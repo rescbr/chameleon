@@ -326,10 +326,11 @@ void common_boot(int biosdev)
     useGUI = true;
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
-    if (useGUI) {
-        /* XXX AsereBLN handle error */
-	initGUI();
-    }
+    if (useGUI && initGUI())
+	{
+		// initGUI() returned with an error, disabling GUI.
+		useGUI = false;
+	}
 
     setBootGlobals(bvChain);
 
