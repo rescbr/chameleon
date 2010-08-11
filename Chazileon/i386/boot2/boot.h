@@ -116,7 +116,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 
 // Common: firstrun or secondrun
 #define kWaitForKeypressKey		"Wait"				// * boot.c, getBollFK						turn this into flag?
-#define kTestConfigFileKey		"config"			// # stringTable.c, getValFK
+#define kTestConfigKey			"config"			// # stringTable.c, getValFK
 #define kKernelNameKey			"Kernel"			// * options.c, getValFK,					override default name; at boot prompt typing the name is enough.
 #define kKernelCacheKey			"Kernel Cache"		// boot.c, getValFK							test this
 #define kKernelFlagsKey			"Kernel Flags"		// * options.c, getValFK
@@ -137,7 +137,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kWakeKey				"Wake"				// * boot.c, getBollFK						firstrun?
 #define kForceWakeKey			"ForceWake"			// * boot.c, getBollFK						firstrun?
 #define kWakeImageKey			"WakeImage"			// * boot.c, getValFK						firstrun?
-#define kPciRootKey				"PciRoot"			// * pci_root.c, getValFK,
+#define kPCIRootUIDKey			"PciRoot"			// * pci_root.c, getValFK,
 #define kUseAtiROMKey			"UseAtiROM"			// # ati.c, getBollFK						firstrun?
 #define kUseNvidiaROMKey		"UseNvidiaROM"		// # nvidia.c, getBollFK					firstrun?
 #define kVBIOSKey				"VBIOS"				// nvidia.c, getBollFK						firstrun?

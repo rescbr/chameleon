@@ -659,7 +659,7 @@ int loadOverrideConfig(config_file_t *config) //Azi:searchalgo
 	char		 dirSpecExtraBplist[128] = ""; //Azi:alloc
 	const char	*override_pathfile = NULL;
 	const char	*filename = "com.apple.Boot.plist";
-	int			 fd, count, ret, len = 0/*???*/;
+	int			 count, ret, fd, len = 0;
 	extern char  gMacOSVersion;
 	
 	//Azi: This Override stuff messed with my mind a lot of times; was totally unaware of it. Payback time!! :)
@@ -671,7 +671,7 @@ int loadOverrideConfig(config_file_t *config) //Azi:searchalgo
 	// Keys that are not present on the default Boot.plist will be used with existing ones.
 	
 	// Take in account user overriding the override :P
-	if (getValueForKey(kTestConfigFileKey, &override_pathfile, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kTestConfigKey, &override_pathfile, &len, &bootInfo->bootConfig))
 	{
 		// Specify a path to a file, e.g. /Extra/test.plist
 		strcpy(dirSpecExtraBplist, override_pathfile);

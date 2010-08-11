@@ -380,10 +380,10 @@ void common_boot(int biosdev)
 	}
 //Azi:autoresolution end
 
-	if (useGUI)
+	if (useGUI && initGUI())
 	{
-		/* XXX AsereBLN handle error */
-		initGUI();
+		// initGUI() returned with an error, disabling GUI.
+		useGUI = false;
 	}
 	
 	setBootGlobals(bvChain);
@@ -413,18 +413,19 @@ void common_boot(int biosdev)
 		firstRun = false;
 		if ( status == -1 ) continue;
 		
-		//Azi:sysversion related test
+		//Azi:sysversion related test 
 		if( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
-			drawBackground(); //Azi: just seems repeated and less complete than the next!? though to the eye,
-			updateVRAM();	//the next seems to do exactly the same??!  testing
+			gui.devicelist.draw = false; // Needed for when the verbose flips the screen.
+			drawBackground();
+			updateVRAM();
 		}
 				
 		// Turn off any GUI elements
 		/*if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
-			gui.devicelist.draw = false; // doesn't seem needed
-			gui.bootprompt.draw = false; // same as above
+			gui.devicelist.draw = false;
+			gui.bootprompt.draw = false; // doesn't seem needed
 			gui.menu.draw = false;       // same as above
 			gui.infobox.draw = false;    // Enter doesn't work with this drawn so...
 			drawBackground();
@@ -527,22 +528,23 @@ void common_boot(int biosdev)
 		// Can't be called only from here! Need advice. Check above.
 		//loadOverrideConfig(&bootInfo->overrideConfig); // call 2
 		
-		// If cpu does not understand 64 bit instructions,...
-		if ( !platformCPUFeature(CPU_FEATURE_EM64T) ||
-			// ... user forced i386 kernel architecture on cpu with em64t...
+		//Azi: default to x86_64 arch
+		// If cpu doesn't handle 64 bit instructions,...
+		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
+			// ... user forced i386 kernel architecture on cpu with "em64t"...
 			getValueForKey(kArchI386Flag, &val, &len, &bootInfo->bootConfig) ||
-			// ... or forced Legacy Mode... (not needed!)
-			getValueForKey(kLegacyModeFlag, &val, &len, &bootInfo->bootConfig) )
+			// ... or forced Legacy Mode... (not needed! but handy for some processors/situations)
+			getValueForKey(kLegacyModeFlag, &val, &len, &bootInfo->bootConfig))
 		{
-			// ... use i386 kernel arch!
+			// ... use i386 kernel arch.
 			archCpuType = CPU_TYPE_I386;
 		}
 		else
 		{
-			// Else use x86_64 kernel arch!
+			// Else use x86_64 kernel arch.
 			archCpuType = CPU_TYPE_X86_64;
 		}
-		// Force x86_64 kernel arch if i386/-legacy are flagged on Boot.plist.
+		// Override i386/-legacy, if flagged on Boot.plist.
 		if (getValueForKey(kArchX86_64Flag, &val, &len, &bootInfo->bootConfig))
 		{
 			archCpuType = CPU_TYPE_X86_64;

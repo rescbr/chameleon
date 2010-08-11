@@ -57,7 +57,7 @@ int getPciRootUID(void)
 	if (rootuid < 10) return rootuid;
 	
 	// If user supplied a key...
-	if (getValueForKey(kPciRootKey, &val, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kPCIRootUIDKey, &val, &len, &bootInfo->bootConfig))
 	{
 		if (isdigit(val[0]))
 			rootuid = val[0] - '0';
@@ -110,7 +110,7 @@ int getPciRootUID(void)
 		rootuid = 0; // ... default uid to 0.
 	}
 	else
-		printf("Found UID value on user supplied ACPI Table...\n");
+		printf("Found UID value on ACPI Table provided by user...\n");
 out:
 	verbose("Using PCI-Root-UID value: %d\n", rootuid);
 out_out:

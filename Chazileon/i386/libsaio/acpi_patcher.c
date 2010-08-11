@@ -94,43 +94,43 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 /** The following ACPI Table search algo, should be reused anywhere needed: */
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec) //Azi:searchalgo
 {
-	char		dirSpecExtraDsdt[128] = ""; //Azi:alloc - was 512
-	const char *override_pathfile = NULL;
+	char		dirSpecDSDT[128] = ""; //Azi:alloc - was 512
+	const char *override_pathname = NULL;
 	int			len = 0, fd = 0;
 	extern char gMacOSVersion;
 	
 	// Take in account user overriding
-	if (getValueForKey(kDSDTKey, &override_pathfile, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
 		// Specify a path to a file, e.g. /Extra/test.aml
-		sprintf(dirSpecExtraDsdt, override_pathfile);
-		fd = open(dirSpecExtraDsdt, 0);
+		sprintf(dirSpecDSDT, override_pathname);
+		fd = open(dirSpecDSDT, 0);
 		if (fd >= 0) goto success_fd;
 	}
 	
 	// Check drivers.c, LoadDrivers, for more comments on these.
 	
-	sprintf(dirSpecExtraDsdt, "rd(0,0)/%s", filename);
-	fd = open(dirSpecExtraDsdt, 0);
+	sprintf(dirSpecDSDT, "rd(0,0)/%s", filename);
+	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
-	sprintf(dirSpecExtraDsdt, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
-	fd = open(dirSpecExtraDsdt, 0);
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
 	// Removed /Extra path from search algo. If needed can be specified on override key!
 	
-	sprintf(dirSpecExtraDsdt, "bt(0,0)/Extra/%s", filename);
-	fd = open(dirSpecExtraDsdt, 0);
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s", filename);
+	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
 	// Add helper partitions??
 	
  	// Azi: ok, one gone.. let's kill this one too?
 	// All "config" files go in Extra!
-/*	sprintf(dirspec, "/%s", filename); // search root
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;*/
+	//sprintf(dirspec, "/%s", filename); // search root
+	//fd=open (dirspec,0);
+	//if (fd>=0) goto success_fd;
 	
 	// NOT FOUND:
 	//Azi: handling this only on pci_root.c, getPciRootUID() (it's enough to check if .aml file exists),
@@ -141,14 +141,14 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec) //Az
 	return -1;
 	// FOUND
 success_fd:
-	if (outDirspec) *outDirspec = dirSpecExtraDsdt;
+	if (outDirspec) *outDirspec = dirSpecDSDT;
 	return fd;
 }
 
 void *loadACPITable (const char * filename) //Azi: called on setupAcpi()
 {
 	void *tableAddr;
-	const char * dsdt_filename = NULL; //Azi: = dirSpecExtraDsdt
+	const char * dsdt_filename = NULL; //Azi: = dirSpecDSDT
 	
 	//Azi:dsdt - call 2; call 1 on pci_root.c (getPciRootUID), changed dirspec to dsdt_filename according (review this!!!).
 	int fd = search_and_get_acpi_fd(filename, &dsdt_filename);
@@ -353,7 +353,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 }
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
-{	
+{
 	char ssdt_header[] =
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
@@ -508,9 +508,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						}
 					} break;
 					case CPU_MODEL_FIELDS:
-					case CPU_MODEL_NEHALEM: 
 					case CPU_MODEL_DALES:
 					case CPU_MODEL_DALES_32NM:
+					case CPU_MODEL_NEHALEM:
+					case CPU_MODEL_NEHALEM_EX:
 					case CPU_MODEL_WESTMERE:
 					case CPU_MODEL_WESTMERE_EX:
 					default:

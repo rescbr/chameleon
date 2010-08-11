@@ -186,7 +186,7 @@ long LoadDrivers( char * dirSpec ) //Azi:searchalgo
 	else if ( gBootFileType == kBlockDeviceType )
 	{
 		// Take in account user overriding.
-		if (getValueForKey( kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig ))
+		if (getValueForKey(kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
 		{
 			// Specify a path to a folder ending with /, e.g. /Extra/testkext/
 			strcpy(dirSpecExtra, override_pathfolder);
