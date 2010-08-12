@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Evan Lojewski. All rights reserved.
+ * Copyright 2010 Evan Lojewski. All rights reserved.
  *
  */
 
@@ -88,7 +88,7 @@ void* parse_mach(void* binary)
 	char* nonlazy = NULL;
 	//char* nonlazy_variables = NULL;
 
-	// TODO convert all of the structs a union
+	// TODO convert all of the structs to a union
 	struct load_command *loadCommand = NULL;
 	struct dylib_command* dylibCommand = NULL;
 	struct dyld_info_command* dyldInfoCommand = NULL;
@@ -132,7 +132,7 @@ void* parse_mach(void* binary)
 				section = binary + binaryIndex + sizeof(struct segment_command);
 				while(sections)
 				{
-					// Look for the __symbol_stub section
+					// Look for some sections and save the addresses
 					if(strcmp(section->sectname, SECT_NON_LAZY_SYMBOL_PTR) == 0)
 					{
 						/*printf("\tSection non lazy pointers at 0x%X, %d symbols\n",
@@ -190,7 +190,7 @@ void* parse_mach(void* binary)
 				
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
-				dylibCommand = binary + binaryIndex;
+				dylibCommand  = binary + binaryIndex;
 				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
@@ -266,8 +266,7 @@ void* parse_mach(void* binary)
 
 	
 
-	
-	// To satisfy cicular deps, the module_loaded command shoudl be run before the module init();
+	// Notify the system that it was laoded
 	module_loaded(moduleName, moduleVersion, moduleCompat);
 	
 	return module_start;
@@ -856,7 +855,7 @@ int is_module_laoded(const char* name)
 unsigned int lookup_all_symbols(const char* name)
 {
 	unsigned int addr = 0xFFFFFFFF;
-	if(lookup_symbol)
+	if(lookup_symbol && lookup_symbol != 0xFFFFFFFF)
 	{
 		addr = lookup_symbol(name);
 		if(addr != 0xFFFFFFFF)
