@@ -142,17 +142,21 @@ void* parse_mach(void* binary)
 						switch(section->flags)
 						{
 							case S_NON_LAZY_SYMBOL_POINTERS:
+								//printf("%s S_NON_LAZY_SYMBOL_POINTERS section\n", SECT_NON_LAZY_SYMBOL_PTR);
+
 								//nonlazy_variables = binary + section->offset;
+								nonlazy = binary + section->offset;
 								break;
 								
 							case S_LAZY_SYMBOL_POINTERS:
-								nonlazy = binary + section->offset;
+								//nonlazy = binary + section->offset;
+								//printf("%s S_LAZY_SYMBOL_POINTERS section, 0x%X\n", SECT_NON_LAZY_SYMBOL_PTR, nonlazy);
 								// Fucntions
 								break;
 								
 							default:
-								printf("Unhandled %s section\n", SECT_NON_LAZY_SYMBOL_PTR);
-								getc();
+								//printf("Unhandled %s section\n", SECT_NON_LAZY_SYMBOL_PTR);
+								//getc();
 								break;
 						}
 						//getc();
@@ -165,6 +169,11 @@ void* parse_mach(void* binary)
 						symbolStub = binary + section->offset;
 						//getc();
 					}
+					else 
+					{
+						//printf("Unhandled section %s\n", section->sectname);
+					}
+
 
 					
 					sections--;
@@ -229,20 +238,33 @@ void* parse_mach(void* binary)
 	}
 	if(!moduleName) return NULL;
 		
-	
-	// Module is loaded and all module dependencies have been loaded, bind the module
-	// NOTE: circular dependencies are not handled yet
-	if(dyldInfoCommand && dyldInfoCommand->bind_off)
-	{
-		bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
-	}
+
+	// bind_macho uses the symbols added in for some reason...
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbolStub, (UInt32)nonlazy);
+
 	
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
 		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
 	}
 	
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbolStub, nonlazy);
+	if(dyldInfoCommand && dyldInfoCommand->bind_off)
+	{
+		bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off)
+	{
+		bind_macho(binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off)
+	{
+		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
+	}
+	
+
+	
 
 	
 	// To satisfy cicular deps, the module_loaded command shoudl be run before the module init();
@@ -360,7 +382,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 					
 					UInt32* addr = base + segmentAddress;
 					addr[0] += (UInt32)base;
-					
+					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
 					
 					segmentAddress += sizeof(void*);
 				}
@@ -384,6 +406,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 					
 					UInt32* addr = base + segmentAddress;
 					addr[0] += (UInt32)base;
+
+					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
 					
 					segmentAddress += sizeof(void*);
 				}
@@ -404,6 +428,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				//printf("\tRebasing 0x%X\n", segmentAddress);
 				UInt32* addr = base + segmentAddress;
 				addr[0] += (UInt32)base;
+
+				//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
 				
 				segmentAddress += tmp + sizeof(void*);
 				break;
@@ -435,6 +461,9 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 
 					UInt32* addr = base + segmentAddress;
 					addr[0] += (UInt32)base;
+
+					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
+
 					
 					segmentAddress += tmp2 + sizeof(void*);
 				}
@@ -599,7 +628,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-					
+
 					((char*)address)[0] = (symbolAddr & 0x000000FF) >> 0;
 					((char*)address)[1] = (symbolAddr & 0x0000FF00) >> 8;
 					((char*)address)[2] = (symbolAddr & 0x00FF0000) >> 16;
@@ -832,15 +861,10 @@ unsigned int lookup_all_symbols(const char* name)
 		addr = lookup_symbol(name);
 		if(addr != 0xFFFFFFFF)
 		{
+			//printf("Internal symbol %s located at 0x%X\n", name, addr);
 			return addr;
 		}
 	}
-	/*else
-	{
-		printf("Symbol.dylib not loaded. Module loader not setup.\n");
-		return 0xFFFFFFFF;
-	}*/
-
 
 	
 	symbolList_t* entry = moduleSymbols;
@@ -848,6 +872,7 @@ unsigned int lookup_all_symbols(const char* name)
 	{
 		if(strcmp(entry->symbol, name) == 0)
 		{
+			//printf("External symbol %s located at 0x%X\n", name, entry->addr);
 			return entry->addr;
 		}
 		else
@@ -856,7 +881,10 @@ unsigned int lookup_all_symbols(const char* name)
 		}
 
 	}
-	
+	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
+	{
+		printf("Unable to locate symbol %s\n", name);
+	}
 	return 0xFFFFFFFF;
 }
 
@@ -866,7 +894,7 @@ unsigned int lookup_all_symbols(const char* name)
  * Lookup any undefined symbols
  */
  
-unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, char* nonlazy)
+unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, UInt32 nonlazy)
 {
 	unsigned int module_start = 0xFFFFFFFF;
 	
@@ -874,7 +902,6 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	char* symbolString = base + (char*)symtabCommand->stroff;
 	//char* symbolTable = base + symtabCommand->symoff;
 	
-	int externalIndex = 0;
 	while(symbolIndex < symtabCommand->nsyms)
 	{
 		
@@ -891,58 +918,6 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			else
 			{
 				add_symbol(symbolString + symbolEntry->n_un.n_strx, (void*)base + symbolEntry->n_value); 
-			}
-		}
-		// External symbol
-		else if(symbolEntry->n_type & 0x01 && symbolStub)
-		{
-			printf("Located external symbol %s", symbolString + symbolEntry->n_un.n_strx);
-			printf(" stub at 0x%X, (0x%X)\n", symbolStub + STUB_ENTRY_SIZE * externalIndex - base, symbolStub + STUB_ENTRY_SIZE * externalIndex);
-			getc();
-			
-			// Patch stub
-			void* symbolAddress = (void*)lookup_all_symbols(symbolString + symbolEntry->n_un.n_strx);
-			
-			if((0xFFFFFFFF == (UInt32)symbolAddress) && 
-			   strcmp(symbolString + symbolEntry->n_un.n_strx, SYMBOL_DYLD_STUB_BINDER) != 0)
-			{
-				printf("Unable to locate symbol %s\n", symbolString + symbolEntry->n_un.n_strx);
-				
-			}
-			else 
-			{
-				char* patchLocation = symbolStub + STUB_ENTRY_SIZE * externalIndex;
-				//patch with far jump ;
-				/*
-				 printf("0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n", 
-				 patchLocation[0],
-				 patchLocation[1],
-				 patchLocation[2],
-				 patchLocation[3],
-				 patchLocation[4],
-				 patchLocation[5]);
-				 */
-				
-				// Point the symbol stub to the nonlazy pointers
-				// TODO: do this *after* each module dep has been laoded.
-				// At the moment, module deps won't work
-				patchLocation[0] = 0xFF;	// Should already be this
-				patchLocation[1] = 0x25;	// Should already be this
-				patchLocation[2] = ((UInt32)(nonlazy + externalIndex * 4) & 0x000000FF) >> 0;
-				patchLocation[3] = ((UInt32)(nonlazy + externalIndex * 4) & 0x0000FF00) >> 8;
-				patchLocation[4] = ((UInt32)(nonlazy + externalIndex * 4) & 0x00FF0000) >> 16;
-				patchLocation[5] = ((UInt32)(nonlazy + externalIndex * 4) & 0xFF000000) >> 24;
-				
-				// Set the nonlazy pointer to the correct address
-				patchLocation = (nonlazy + externalIndex*4);
-				patchLocation[0] =((UInt32)symbolAddress & 0x000000FF) >> 0;
-				patchLocation[1] =((UInt32)symbolAddress & 0x0000FF00) >> 8;
-				patchLocation[2] =((UInt32)symbolAddress & 0x00FF0000) >> 16;
-				patchLocation[3] =((UInt32)symbolAddress & 0xFF000000) >> 24;
-				
-				
-				externalIndex++;
-				
 			}
 		}
 		

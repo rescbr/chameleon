@@ -29,7 +29,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common -mdynamic-no-pic
 
 DEFINES=
 CONFIG = hd
@@ -67,13 +67,12 @@ dylib: ${HELLO_WORLD_OBJS}
 	-undefined suppress \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
-	-S -x  -dead_strip_dylibs \
+	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	-weak_library $(SYMROOT)/Symbols.dylib \
 	$(OBJROOT)/HelloWorld.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+
 
 
 HelloWorld.o: 	

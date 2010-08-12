@@ -7,7 +7,7 @@
 #include "kernel_patcher.h"
 #include "platform.h"
 
-//extern PlatformInfo_t    Platform;
+extern PlatformInfo_t    Platform;
 
 
 #define SYMBOL_CPUID_SET_INFO				0
@@ -49,8 +49,8 @@ void HelloWorld_start();
 void KernelPatcher_start()
 {
 	printf("KernelPatcher(), about to call HelloWorld_start()\n");
-	//getc();
-	//HelloWorld_start();
+	getc();
+	HelloWorld_start();
 
 }
 
