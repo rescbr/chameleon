@@ -41,7 +41,7 @@ Special booter commands:
 
 Additional useful command-line options:
   config=<file>           Use an alternate Boot.plist file.
-  Extensions=<folder>     Use an alternate folder with drivers, kext or mkext.
+  kext=<folder>           Use an alternate folder with drivers, kext or mkext.
 
 Options useful in the com.apple.Boot.plist file:
   Wait=Yes|No             Prompt for a key press before starting the kernel.

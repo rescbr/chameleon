@@ -51,8 +51,6 @@
 #define kRootDeviceKey		"rd"				// options.c
 #define kBootUUIDKey		"boot-uuid"			// options.c
 #define kHelperRootUUIDKey	"Root UUID"			// options.c
-//#define kPlatformKey		"platform"			// options.c, removed
-//#define kACPIKey			"acpi"				gone
 #define kCDROMPromptKey		"CD-ROM Prompt"		// options.c
 #define kCDROMOptionKey		"CD-ROM Option Key"	// options.c
 #define kRescanPromptKey	"Rescan Prompt"		// boot.c
@@ -68,7 +66,6 @@
 #define kForceWake			"ForceWake"			// boot.c
 #define kWakeImage			"WakeImage"			// boot.c
 #define kProductVersion		"ProductVersion"	// boot.c
-#define karch				"arch"				// boot.c
 #define kDSDTKey			"DSDT"				// acpi_patcher.c
 #define kDropSSDT			"DropSSDT"			// acpi_patcher.c
 #define kRestartFix			"RestartFix"        // acpi_patcher.c
