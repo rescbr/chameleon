@@ -675,14 +675,14 @@ int loadOverrideConfig(config_file_t *config)
 	fd = open(dirSpecBplist, 0);
 //	if (fd >= 0) goto success_fd;
 	
-	//Azi: i really don't dig these two!
-	// "/Extra/com.apple.Boot.plist",
+	//Azi: i really don't like these two!
+	// "/Extra/com.apple.Boot.plist"
 	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	
-	// These, no way to test, need advice.
-	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
-	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
-	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
+	// These i have no way to test, need advice.
+	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
 	
 success_fd:
 	
