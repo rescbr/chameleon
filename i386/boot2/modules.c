@@ -855,7 +855,7 @@ int is_module_laoded(const char* name)
 unsigned int lookup_all_symbols(const char* name)
 {
 	unsigned int addr = 0xFFFFFFFF;
-	if(lookup_symbol && lookup_symbol != 0xFFFFFFFF)
+	if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
 	{
 		addr = lookup_symbol(name);
 		if(addr != 0xFFFFFFFF)
@@ -926,4 +926,42 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	
 	return module_start;
 	
+}
+
+/*
+ * Modify a function to call this one, then return once finished.
+ */
+int hook_function(const char* symbol)
+{
+	return 0;
+}
+
+/*
+ * Locate the symbol for an already loaded function and modify the beginning of
+ * the function to jump directly to the new one
+ * example: replace_function("_HelloWorld_start", &replacement_start);
+ */
+int replace_function(const char* symbol, void* newAddress)
+{
+	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
+	// TODO: look into using the next four bytes of the function instead
+
+	UInt32 addr = lookup_all_symbols(symbol);
+	
+	char* binary = (char*)addr;
+	if(addr != 0xFFFFFFFF)
+	{
+		*binary++ = 0xFF;	// Jump
+		*binary++ = 0x25;	// Long Jump
+		*((UInt32*)binary) = (UInt32)jumpPointer;
+		
+		*jumpPointer = (UInt32)newAddress;
+		
+		return 1;
+	}
+	else 
+	{
+		return 0;
+	}
+
 }
