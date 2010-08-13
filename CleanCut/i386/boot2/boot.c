@@ -66,7 +66,6 @@ static char gCacheNameAdler[64 + 256];
 //char *gPlatformName = gCacheNameAdler; disabled
 char gRootDevice[512];
 char gMKextName[512];
-char gMacOSVersion[8];
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
 
@@ -346,7 +345,8 @@ void common_boot(int biosdev)
         bool tryresumedefault;
         bool forceresume;
 
-        config_file_t    systemVersion;		// system.plist of booting partition
+        config_file_t    systemVersion;	// system.plist of booting partition
+		char			 osxVersion[8]; // replaces gMacOSVersion here, for now.
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
@@ -359,6 +359,18 @@ void common_boot(int biosdev)
         status = getBootOptions(firstRun);
         firstRun = false;
         if (status == -1) continue;
+
+		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
+		// Draw background, turn off any GUI elements and update VRAM.
+		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
+		{	
+			drawBackground(); // order matters!!
+			gui.devicelist.draw = false; // Needed when the verbose "flips" the screen.
+			gui.bootprompt.draw = false; // ?
+			gui.menu.draw = false;       // ?
+			gui.infobox.draw = false;    // Enter doesn't work with this drawn; most probably it's not needed!?
+			updateVRAM();
+		}
 		 
         status = processBootOptions();
         // Status==1 means to chainboot
@@ -381,30 +393,17 @@ void common_boot(int biosdev)
         }
 		
         // Other status (e.g. 0) means that we should proceed with boot.
-		
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-			drawBackground();
-			
         // Found and loaded a config file. Proceed with boot.
-
-		// Turn off any GUI elements
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{
-			gui.devicelist.draw = false;
-			gui.bootprompt.draw = false;
-			gui.menu.draw = false;
-			gui.infobox.draw = false;
-			drawBackground();
-			updateVRAM();
-		}
 		
+		//Azi: still calling this here. The call on processBootOptions() gets hidden from verbose and
+		// for some reason gMacOSVersion doesn't get initialized on boot.c like on the others. Later...
 		// Find out which version mac os we're booting.
 		if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion)) {
 			if (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {	
 				// getValueForKey uses const char for val
 				// so copy it and trim
-				strncpy(gMacOSVersion, val, MIN(len, 4));
-				gMacOSVersion[MIN(len, 4)] = '\0';
+				strncpy(osxVersion, val, MIN(len, 4));
+				osxVersion[MIN(len, 4)] = '\0';
 			}
 		}
 
@@ -493,7 +492,7 @@ void common_boot(int biosdev)
                     (gMKextName[0] == '\0') &&
                     (gBootKernelCacheFile[0] != '\0'));
 
-		verbose("Loading Darwin %s\n", gMacOSVersion);
+		verbose("Loading Darwin %s\n", osxVersion);
 		
         if (trycache) do {
       

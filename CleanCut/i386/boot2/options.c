@@ -29,6 +29,7 @@
 #include "gui.h"
 #include "embedded.h"
 #include "pci.h"
+#include "sl.h"
 
 static bool shouldboot = false;
 
@@ -39,6 +40,7 @@ extern BVRef    bvChain;
 //extern int		menucount;
 
 extern int		gDeviceCount;
+char			gMacOSVersion[8];
 
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
@@ -1129,6 +1131,8 @@ processBootOptions()
     const char *     cp  = gBootArgs;
     const char *     val = 0;
     const char *     kernel;
+	const char		*value;
+	int				 len;
     int              cnt;
     int		     userCnt;
     int              cntRemaining;
@@ -1137,6 +1141,7 @@ processBootOptions()
     bool             uuidSet = false;
     char *           configKernelFlags;
     char *           valueBuffer;
+	config_file_t	 systemVersion;
 
     valueBuffer = malloc(VALUE_SIZE);
     
@@ -1169,6 +1174,19 @@ processBootOptions()
     // trying to load the config file anyway.
     else
       return -1;
+	
+	// Needed to enable search for override Boot.plist on OS specific folders
+	// from loadOverrideConfig(). Find out which version mac os we're booting.
+	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
+	{
+		if (getValueForKey(kProductVersion, &value, &len, &systemVersion))
+		{
+			// getValueForKey uses const char for val
+			// so copy it and trim
+			strncpy(gMacOSVersion, value, MIN(len, 4));
+			gMacOSVersion[MIN(len, 4)] = '\0';
+		}
+	} // doesn't print to screen here!
 	
 	//Azi: implemented at loadOverrideConfig.
     // Load config table specified by the user, or use the default.
