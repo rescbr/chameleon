@@ -37,7 +37,7 @@ int load_module(const char* module)
 	{
 		printf("Unable to locate module %s\n", modString);
 		getc();
-		return ERROR;
+		return 0;
 	}
 	
 	unsigned int moduleSize = file_size(fh);
@@ -76,10 +76,10 @@ int load_module(const char* module)
 
 
 void* parse_mach(void* binary)
-{
+{	
 	void (*module_start)(void) = NULL;
 
-
+	// Module info
 	char* moduleName = NULL;
 	UInt32 moduleVersion = 0;
 	UInt32 moduleCompat = 0;
@@ -94,12 +94,12 @@ void* parse_mach(void* binary)
 	struct dyld_info_command* dyldInfoCommand = NULL;
 	struct symtab_command* symtabCommand = NULL;
 	struct segment_command* segmentCommand = NULL;
-	struct dysymtab_command* dysymtabCommand = NULL;
+	//struct dysymtab_command* dysymtabCommand = NULL;
 	struct section* section = NULL;
 	UInt32 binaryIndex = sizeof(struct mach_header);
 	UInt16 cmd = 0;
 
-	// Parse hthrough th eload commands
+	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic != MH_MAGIC)
 	{
 		printf("Module is not 32bit\n");
@@ -130,7 +130,9 @@ void* parse_mach(void* binary)
 
 				UInt32 sections =  segmentCommand->nsects;
 				section = binary + binaryIndex + sizeof(struct segment_command);
-				while(sections)
+				
+				// Loop untill needed variables are found
+				while(!(nonlazy && symbolStub) && sections)	
 				{
 					// Look for some sections and save the addresses
 					if(strcmp(section->sectname, SECT_NON_LAZY_SYMBOL_PTR) == 0)
@@ -163,19 +165,14 @@ void* parse_mach(void* binary)
 					}
 					else if(strcmp(section->sectname, SECT_SYMBOL_STUBS) == 0)
 					{
-						/*printf("\tSection __symbol_stub at 0x%X (0x%X), %d symbols\n",
-							   section->offset, 
-							   section->size / 6);*/
 						symbolStub = binary + section->offset;
-						//getc();
 					}
+					/*
 					else 
 					{
-						//printf("Unhandled section %s\n", section->sectname);
+						printf("Unhandled section %s\n", section->sectname);
 					}
-
-
-					
+					*/
 					sections--;
 					section++;
 				}
@@ -184,7 +181,7 @@ void* parse_mach(void* binary)
 				break;
 				
 			case LC_DYSYMTAB:
-				dysymtabCommand = binary + binaryIndex;
+				//dysymtabCommand = binary + binaryIndex;
 				//printf("Unhandled loadcommand LC_DYSYMTAB\n");
 				break;
 				
@@ -192,10 +189,15 @@ void* parse_mach(void* binary)
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
 				dylibCommand  = binary + binaryIndex;
 				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+				// TODO: verify version
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
 
-				load_module(module);
+				if(!load_module(module))
+				{
+					// Unable to load dependancy
+					return NULL;
+				}
 				break;
 				
 			case LC_ID_DYLIB:
@@ -206,26 +208,11 @@ void* parse_mach(void* binary)
 				break;
 
 			case LC_DYLD_INFO:
+				// Bind and rebase info is stored here
 				dyldInfoCommand = binary + binaryIndex;
-				/*
-				 printf("LC_DYLD_INFO:\n"
-					   "\tRebase Offset: 0x%X\n"
-					   "\tBind Offset: 0x%X\n"
-					   "\tWeak Bind Offset: 0x%X\n"
-					   "\tLazy Bind Offset: 0x%X\n"
-					   "\tExport Offset: 0x%X\n",
-					   dyldInfoCommand->rebase_off,
-					   dyldInfoCommand->bind_off,
-					   dyldInfoCommand->weak_bind_off,
-					   dyldInfoCommand->lazy_bind_off,
-					   dyldInfoCommand->export_off);
-				*/
-				
-				
 				break;
 				
 			case LC_UUID:
-				// We don't care about the UUID at the moment
 				break;
 				
 			default:
@@ -242,7 +229,7 @@ void* parse_mach(void* binary)
 	// bind_macho uses the symbols added in for some reason...
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbolStub, (UInt32)nonlazy);
 
-	
+	// REbase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
 		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
@@ -284,7 +271,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt8 type = 0;
 	
 	UInt32 segmentAddress = 0;
-	UInt32 address = 0;
 	
 	
 	
@@ -309,12 +295,14 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				done = 1;
 				break;
 				
+				
 			case REBASE_OPCODE_SET_TYPE_IMM:
 				// Set rebase type (pointer, absolute32, pcrel32)
 				//printf("Rebase type = 0x%X\n", immediate);
 				// NOTE: This is currently NOT used
 				type = immediate;
 				break;
+				
 				
 			case REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
 				// Locate address to begin rebasing
@@ -347,9 +335,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				while(rebase_stream[i] & 0x80);
 				
 				segmentAddress += tmp;
-				
-				//printf("Address = 0x%X\n", segmentAddress);
 				break;
+				
 				
 			case REBASE_OPCODE_ADD_ADDR_ULEB:
 				// Add value to rebase address
@@ -363,29 +350,22 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				address +=	tmp; 
-				//printf("Address (add) = 0x%X\n", address);
+				segmentAddress +=	tmp; 
 				break;
 				
 			case REBASE_OPCODE_ADD_ADDR_IMM_SCALED:
-				address += immediate * sizeof(void*);
-				//printf("Address (immscaled) = 0x%X\n", address);
-
+				segmentAddress += immediate * sizeof(void*);
 				break;
 				
+				
 			case REBASE_OPCODE_DO_REBASE_IMM_TIMES:
-				//printf("Rebase %d time(s)\n", immediate);
 				index = 0;
 				for (index = 0; index < immediate; ++index) {
-					//printf("\tRebasing 0x%X\n", segmentAddress);
-					
-					UInt32* addr = base + segmentAddress;
-					addr[0] += (UInt32)base;
-					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
-					
+					rebase_location(base + segmentAddress, (char*)base);
 					segmentAddress += sizeof(void*);
 				}
 				break;
+			
 				
 			case REBASE_OPCODE_DO_REBASE_ULEB_TIMES:
 				tmp = 0;
@@ -397,17 +377,10 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				//printf("Rebase %d time(s)\n", tmp);
-				
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
 					//printf("\tRebasing 0x%X\n", segmentAddress);
-					
-					UInt32* addr = base + segmentAddress;
-					addr[0] += (UInt32)base;
-
-					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
-					
+					rebase_location(base + segmentAddress, (char*)base);					
 					segmentAddress += sizeof(void*);
 				}
 				break;
@@ -422,13 +395,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				
-				//printf("Rebase and add 0x%X\n", tmp);
-				//printf("\tRebasing 0x%X\n", segmentAddress);
-				UInt32* addr = base + segmentAddress;
-				addr[0] += (UInt32)base;
-
-				//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
+				rebase_location(base + segmentAddress, (char*)base);
 				
 				segmentAddress += tmp + sizeof(void*);
 				break;
@@ -453,16 +420,9 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				//printf("Rebase 0x%X times, skiping 0x%X\n",tmp, tmp2);
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
-					//printf("\tRebasing 0x%X\n", segmentAddress);
-
-					UInt32* addr = base + segmentAddress;
-					addr[0] += (UInt32)base;
-
-					//if(type != REBASE_TYPE_POINTER)  addr[0] -= 8;
-
+					rebase_location(base + segmentAddress, (char*)base);
 					
 					segmentAddress += tmp2 + sizeof(void*);
 				}
@@ -747,6 +707,11 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 		}
 		i++;
 	}
+}
+
+inline void rebase_location(UInt32* location, char* base)
+{
+	*location += (UInt32)base;
 }
 
 /*
