@@ -90,7 +90,7 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 /** The following ACPI Table search algo, should be reused anywhere needed: */
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	char		dirSpecDSDT[512] = "";
+	char		dirSpecDSDT[128] = "";
 	const char *override_pathname = NULL; // full path to a file.
 	int			len = 0, fd = 0;
 	extern char gMacOSVersion;

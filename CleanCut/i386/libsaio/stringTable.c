@@ -650,7 +650,7 @@ int loadSystemConfig(config_file_t *config)
  */
 int loadOverrideConfig(config_file_t *config)
 {
-	char		 dirSpecBplist[128] = ""; //Azi:alloc - reminder
+	char		 dirSpecBplist[128] = "";
 	const char	*override_pathname = NULL;
 	const char	*filename = "com.apple.Boot.plist";
 	int			 count, ret, fd, len = 0;

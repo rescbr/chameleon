@@ -162,7 +162,7 @@ InitDriverSupport( void )
 
 long LoadDrivers( char * dirSpec )
 {
-	char dirSpecExtra[1024];
+	char dirSpecExtra[128];
 	const char *override_pathfolder = NULL; // full path to a folder.
 	int			fd = 0, len = 0;
 	
