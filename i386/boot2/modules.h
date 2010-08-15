@@ -33,8 +33,13 @@ typedef struct moduleList_t{
 #define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
 #define SECT_SYMBOL_STUBS			"__symbol_stub"
 
-#define SUCCESS	1
-#define	ERROR	0
+
+
+int init_module_system();
+void load_all_modules();
+
+
+inline void rebase_location(UInt32* location, char* base);
 
 int load_module(const char* module);
 int is_module_laoded(const char* name);

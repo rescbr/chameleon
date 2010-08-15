@@ -17,6 +17,57 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 
+
+/*
+ * Initialize the module system by loading the Symbols.dylib module.
+ * Once laoded, locate the _lookup_symbol function so that internal
+ * symbols can be resolved.
+ */
+int init_module_system()
+{
+	// Intialize module system
+	if(load_module(SYMBOLS_MODULE))
+	{
+		lookup_symbol = (void*)lookup_all_symbols("_lookup_symbol");
+	}
+	
+	if((UInt32)lookup_symbol == 0xFFFFFFFF)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+/*
+ * Load all modules in the /Extra/modules/ directory
+ * Module depencdies will be loaded first
+ * MOdules will only be loaded once. When loaded  a module must
+ * setup apropriete function calls and hooks as required.
+ * NOTE: To ensure a module loads after another you may 
+ * link one module with the other. For dyld to allow this, you must
+ * reference at least one symbol within the module.
+ */
+void load_all_modules()
+{
+	char* name;
+	long flags;
+	long time;
+	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
+	{
+		// TODO: verify ends in .dylib
+		if(strlen(name) > sizeof(".dylib"))
+		{
+			name[strlen(name) - sizeof(".dylib")] = 0;
+			load_module(name);
+		}
+	}
+}
+
+
 /*
  * Load a module file in /Extra/modules
  * TODO: verify version number of module
@@ -74,7 +125,15 @@ int load_module(const char* module)
 	return 1;
 }
 
-
+/*
+ * Parse through a macho module. The module will be rebased and binded
+ * as specified in the macho header. If the module is sucessfuly laoded
+ * the module iinit address will be returned.
+ * NOTE; all dependecies will be loaded before this module is started
+ * NOTE: If the module is unable to load ot completeion, the modules
+ * symbols will still be available (TODO: fix this). This should not
+ * happen as all dependencies are verified before the sybols are read in.
+ */
 void* parse_mach(void* binary)
 {	
 	void (*module_start)(void) = NULL;
@@ -242,11 +301,14 @@ void* parse_mach(void* binary)
 	
 	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off)
 	{
+		// NOTE: this currently should never happen.
 		bind_macho(binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
 	}
 	
 	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off)
 	{
+		// NOTE: we are binding the lazy pointers as a module is laoded,
+		// This should be cahnged to bund when a symbol is referened at runtime.
 		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
 	
@@ -717,23 +779,22 @@ inline void rebase_location(UInt32* location, char* base)
 /*
  * add_symbol
  * This function adds a symbol from a module to the list of known symbols 
- * TODO: actualy do something... 
- * possibly change to a pointer and add this to the Symbol module
+ * possibly change to a pointer and add this to the Symbol module so that it can
+ * adjust it's internal symbol list (sort) to optimize locating new symbols
  */
 void add_symbol(char* symbol, void* addr)
 {
+	symbolList_t* entry;
 	//printf("Adding symbol %s at 0x%X\n", symbol, addr);
 	
 	if(!moduleSymbols)
 	{
-		moduleSymbols = malloc(sizeof(symbolList_t));
-		moduleSymbols->next = NULL;
-		moduleSymbols->addr = (unsigned int)addr;
-		moduleSymbols->symbol = symbol;
+		moduleSymbols = entry = malloc(sizeof(symbolList_t));
+
 	}
 	else
 	{
-		symbolList_t* entry = moduleSymbols;
+		entry = moduleSymbols;
 		while(entry->next)
 		{
 			entry = entry->next;
@@ -741,14 +802,11 @@ void add_symbol(char* symbol, void* addr)
 		
 		entry->next = malloc(sizeof(symbolList_t));
 		entry = entry->next;
-		
-		entry->next = NULL;
-		entry->addr = (unsigned int)addr;
-		entry->symbol = symbol;
-		
 	}
-							   
 
+	entry->next = NULL;
+	entry->addr = (unsigned int)addr;
+	entry->symbol = symbol;
 }
 
 
@@ -758,6 +816,7 @@ void add_symbol(char* symbol, void* addr)
  */
 void module_loaded(char* name, UInt32 version, UInt32 compat)
 {
+	moduleList_t* entry;
 	/*
 	printf("\%s.dylib Version %d.%d.%d loaded\n"
 		   "\tCompatibility Version: %d.%d.%d\n",
@@ -771,29 +830,24 @@ void module_loaded(char* name, UInt32 version, UInt32 compat)
 	*/
 	if(loadedModules == NULL)
 	{
-		loadedModules = malloc(sizeof(moduleList_t));
-		loadedModules->next = NULL;
-		loadedModules->module = name;
-		loadedModules->version = version;
-		loadedModules->compat = compat;
+		loadedModules = entry = malloc(sizeof(moduleList_t));
 	}
 	else
 	{
-		moduleList_t* entry = loadedModules;
+		entry = loadedModules;
 		while(entry->next)
 		{
 			entry = entry->next;
 		}
-		
 		entry->next = malloc(sizeof(moduleList_t));
 		entry = entry->next;
-		
-		entry->next = NULL;
-		entry->module = name;
-		entry->version = version;
-		entry->compat = compat;
 	}
-
+	
+	entry->next = NULL;
+	entry->module = name;
+	entry->version = version;
+	entry->compat = compat;
+	
 	
 }
 
@@ -893,13 +947,6 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	
 }
 
-/*
- * Modify a function to call this one, then return once finished.
- */
-int hook_function(const char* symbol)
-{
-	return 0;
-}
 
 /*
  * Locate the symbol for an already loaded function and modify the beginning of
@@ -910,7 +957,9 @@ int replace_function(const char* symbol, void* newAddress)
 {
 	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
 	// TODO: look into using the next four bytes of the function instead
-
+	// Most functions should support this, as they probably will be at 
+	// least 10 bytes long, but you never know, this is sligtly saver as
+	// function can be as small as 6 bytes.
 	UInt32 addr = lookup_all_symbols(symbol);
 	
 	char* binary = (char*)addr;
