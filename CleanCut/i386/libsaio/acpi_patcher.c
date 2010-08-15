@@ -615,7 +615,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Restart Fix
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		fix_restart = false; //Azi: think this should be false by default; i never needed any.
+		fix_restart = false; //Azi: think this should be false by default!?
 		// On the other hand, i could use a shutdown fix now and then :)
 		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
 	}
