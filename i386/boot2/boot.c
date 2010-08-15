@@ -286,12 +286,11 @@ void common_boot(int biosdev)
     loadPrebootRAMDisk();
 
 	// Intialize module system
-	load_module(SYMBOLS_MODULE);
-	lookup_symbol = (void*)lookup_all_symbols("_lookup_symbol");
-	
-	// Load a module
-	load_module("KernelPatcher");
-	
+	if(init_module_system())
+	{
+		load_all_modules();
+	}
+		
     // Disable rescan option by default
     gEnableCDROMRescan = false;
 

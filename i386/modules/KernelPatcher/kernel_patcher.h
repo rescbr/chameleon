@@ -9,6 +9,8 @@
 #ifndef __BOOT2_KERNEL_PATCHER_H
 #define __BOOT2_KERNEL_PATCHER_H
 
+#define CPUID_MODEL_ANY		0x00
+#define CPUID_MODEL_UNKNOWN	0x01
 
 #define CPUID_MODEL_YONAH	14
 #define CPUID_MODEL_MEROM	15
@@ -19,16 +21,35 @@
 #define CPUID_MODEL_DALES	31	/* Havendale, Auburndale */
 #define CPUID_MODEL_NEHALEM_EX	46
 
+#define KERNEL_ANY	0x00
+#define KERNEL_64	0x01
+#define KERNEL_32	0x02
+
+
+typedef struct patchRoutine_t
+{
+	void* patchRoutine;
+	int validArchs;
+	int validCpu;
+	struct patchRoutine_t* next;
+} patchRoutine_t;
+
+
+typedef struct kernSymbols_t
+{
+	char* symbol;
+	void* symbolAddress;
+	struct kernSymbols_t* next;
+} kernSymbols_t;
+
+void* lookup_kernel_symbol(const char* name);
 
 void patch_kernel(void* kernelData);
-
-#define KERNEL_64	1
-#define KERNEL_32	2
+void register_kernel_patch(void* patch, int arch, int cpus);
 
 int locate_symbols(void* kernelData);
 
 void patch_kernel_32(void* kernelData);
-void patch_kernel_64(void* kernelData);
 
 
 

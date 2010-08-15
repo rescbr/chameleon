@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright (c) 2009 Evan Lojewski. All rights reserved.
  *
  */
@@ -6,55 +6,105 @@
 #include "libsaio.h"
 #include "kernel_patcher.h"
 #include "platform.h"
-
 extern PlatformInfo_t    Platform;
 
+patchRoutine_t* patches = NULL;
+kernSymbols_t* kernelSymbols = NULL;
 
-#define SYMBOL_CPUID_SET_INFO				0
-#define SYMBOL_PANIC						1
-#define SYMBOL_PMCPUEXITHALTTOOFF			2
-#define SYMBOL_LAPIC_INIT					3
-#define SYMBOL_COMMPAGE_STUFF_ROUTINE		4
-#define NUM_SYMBOLS							5
-
-#define SYMBOL_CPUID_SET_INFO_STRING		"_cpuid_set_info"
-#define SYMBOL_PANIC_STRING					"_panic"
-#define SYMBOL_PMCPUEXITHALTTOOFF_STRING	"_pmCPUExitHaltToOff"
-#define SYMBOL_LAPIC_INIT_STRING			"_lapic_init"
-#define SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING	"_commpage_stuff_routine"
-
-char* kernelSymbols[NUM_SYMBOLS] = {
-	SYMBOL_CPUID_SET_INFO_STRING,
-	SYMBOL_PANIC_STRING,
-	SYMBOL_PMCPUEXITHALTTOOFF_STRING,
-	SYMBOL_LAPIC_INIT_STRING,
-	SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING
-};
-
-UInt32 kernelSymbolAddresses[NUM_SYMBOLS] = {
-	0,
-	0,
-	0,
-	0,
-	0
-};
 
 
 UInt32 textSection = 0;
 UInt32 textAddress = 0;
 
 
-void HelloWorld_start();
-
 void KernelPatcher_start()
 {
-	printf("KernelPatcher(), about to call HelloWorld_start()\n");
-	getc();
-	HelloWorld_start();
+	register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_ATOM);
+	register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_UNKNOWN);
 
+	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_32, CPUID_MODEL_ANY);
+	
+	register_kernel_patch(patch_lapic_init, KERNEL_32, CPUID_MODEL_ANY);
+	
+	// TODO: register needed symbols
+	
+	
+	// TODO: Hook main kernel patcher loop into chameleon
 }
 
+/*
+ * Register a kerenl patch
+ * TODO: chang efunction prototype to include patch argument
+ */
+void register_kernel_patch(void* patch, int arch, int cpus)
+{
+	// TODO: only insert valid patches based on current cpuid and architecture
+	// AKA, don't at 64bit patches if it's a 32bit only machine
+	patchRoutine_t* entry;
+	
+	// TODO: verify Platform.CPU.Model is populated this early in bootup
+	if(cpus != Platform.CPU.Model)
+	{
+		if(cpus != CPUID_MODEL_ANY)
+		{
+			if(cpus == CPUID_MODEL_UNKNOWN)
+			{
+				switch(Platform.CPU.Model)
+				{
+					case 13:
+					case CPUID_MODEL_YONAH:
+					case CPUID_MODEL_MEROM:
+					case CPUID_MODEL_PENRYN:
+					case CPUID_MODEL_NEHALEM:
+					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_DALES:
+					case CPUID_MODEL_NEHALEM_EX:
+						break;
 
+					default:
+						// CPU not in supported list.s
+						return;
+						
+				}
+			}
+			else
+			{
+				// Incalid cpuid for current cpu. Ignoring patch
+				return;
+			}
+
+		}
+	}
+	
+	// Check arch
+	
+
+	if(patches == NULL)
+	{
+		patches = entry = malloc(sizeof(patchRoutine_t));
+	}
+	else
+	{
+		entry = patches;
+		while(entry->next)
+		{
+			entry = entry->next;
+		}
+		
+		entry->next = malloc(sizeof(patchRoutine_t));
+		entry = entry->next;
+	}
+	
+	entry->next = NULL;
+	entry->patchRoutine = patch;
+	entry->validArchs = arch;
+	entry->validCpu = cpus;
+}
+
+void* lookup_kernel_symbol(const char* name)
+{
+	return NULL;
+}
 
 
 void patch_kernel(void* kernelData)
@@ -63,23 +113,8 @@ void patch_kernel(void* kernelData)
 		case KERNEL_32:
 			patch_kernel_32((void*)kernelData);
 			break;
-			
-		case KERNEL_64:
-		default:
-			patch_kernel_64((void*)kernelData);
-			break;
 	}
 }
-
-// patches a 64bit kernel.
-void patch_kernel_64(void* kernelData)
-{
-	//  At the moment, the kernel patching code fails when used
-	// in 64bit mode, so we don't patch it. This is due to 32bit vs 64bit
-	// pointers as well as changes in structure sizes
-	printf("Unable to patch 64bit kernel. Please use arch=i386.\n");
-}
-
 
 /**
  ** patch_kernel_32
@@ -135,11 +170,10 @@ void patch_kernel_32(void* kernelData)
  **/
 int locate_symbols(void* kernelData)
 {
-	UInt16 symbolIndexes[NUM_SYMBOLS];
 
 	struct load_command *loadCommand;
 	struct symtab_command *symtableData;
-	struct nlist *symbolEntry;
+	//	struct nlist *symbolEntry;
 	
 	char* symbolString;
 
@@ -179,10 +213,10 @@ int locate_symbols(void* kernelData)
 			symbolString = kernelData + symtableData->stroff; 
 			
 			
-			UInt16 symbolIndex = 0;
-			UInt8 numSymbolsFound = 0;
+			//UInt16 symbolIndex = 0;
+			//UInt8 numSymbolsFound = 0;
 
-			while(symbolIndex < symtableData->nsyms && numSymbolsFound < NUM_SYMBOLS)	// TODO: for loop
+			/*while(symbolIndex < symtableData->nsyms && numSymbolsFound < NUM_SYMBOLS)	// TODO: for loop
 			{
 				int i = 0;
 				while(i < NUM_SYMBOLS)
@@ -220,7 +254,8 @@ int locate_symbols(void* kernelData)
 				}
 				
 				symbolIndex ++;
-			}			
+			}	
+			 */
 		// Load commands should be anded with 0x7FFFFFFF to ignore the	LC_REQ_DYLD flag
 		} else if((loadCommand->cmd & 0x7FFFFFFF) == LC_SEGMENT)		// We only care about the __TEXT segment, any other load command can be ignored
 		{
@@ -274,16 +309,19 @@ int locate_symbols(void* kernelData)
 void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {
 	UInt8* bytes = (UInt8*)kernelData;
-	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
+	UInt32 patchLocation = (UInt32)lookup_kernel_symbol("_cpuid_set_info");
+
+	//	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	UInt32 jumpLocation = 0;
-	UInt32 panicAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
-	if(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] == 0)
+	UInt32 panicAddr = (UInt32)lookup_kernel_symbol("_panic");
+	//kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	if(patchLocation == 0)
 	{
 		printf("Unable to locate _cpuid_set_info\n");
 		return;
 		
 	}
-	if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	if(panicAddr == 0)
 	{
 		printf("Unable to locate _panic\n");
 		return;
@@ -445,9 +483,11 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 void patch_pmCPUExitHaltToOff(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
-	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] - textAddress + textSection);
+	UInt32 patchLocation = lookup_kernel_symbol("_PmCpuExitHaltToOff"); // verify
 
-	if(kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] == 0)
+	//(kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] - textAddress + textSection);
+
+	if(patchLocation == 0)
 	{
 		printf("Unable to locate _pmCPUExitHaltToOff\n");
 		return;
@@ -469,18 +509,18 @@ void patch_lapic_init(void* kernelData)
 {
 	UInt8 panicIndex = 0;
 	UInt8* bytes = (UInt8*)kernelData;
-	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_LAPIC_INIT] - textAddress + textSection);
-	UInt32 panicAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	UInt32 patchLocation = 0x00; // (kernelSymbolAddresses[SYMBOL_LAPIC_INIT] - textAddress + textSection);
+	UInt32 panicAddr = 0x00; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
 
-	if(kernelSymbolAddresses[SYMBOL_LAPIC_INIT] == 0)
+	//if(kernelSymbolAddresses[SYMBOL_LAPIC_INIT] == 0)
 	{
-		printf("Unable to locate %s\n", SYMBOL_LAPIC_INIT_STRING);
+		//printf("Unable to locate %s\n", SYMBOL_LAPIC_INIT_STRING);
 		return;
 		
 	}
-	if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	//if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
 	{
-		printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
+		//printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
 		return;
 	}
 	
@@ -517,18 +557,18 @@ void patch_lapic_init(void* kernelData)
 void patch_commpage_stuff_routine(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
-	UInt32 patchLocation = (kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] - textAddress + textSection);
-	UInt32 panicAddr = kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	UInt32 patchLocation = 0x00; // (kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] - textAddress + textSection);
+	UInt32 panicAddr = 0x00;// kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
 	
-	if(kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] == 0)
+	//if(kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] == 0)
 	{
-		printf("Unable to locate %s\n", SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING);
+		//	printf("Unable to locate %s\n", SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING);
 		return;
 		
 	}
-	if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	//if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
 	{
-		printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
+		//	printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
 		return;
 	}
 	
