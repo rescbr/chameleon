@@ -77,7 +77,6 @@ typedef struct gpt_ent gpt_ent;
 #include "efi.h"
 #include "efi_tables.h"
 
-#define BPS              512     /* sector size of the device */
 #define PROBEFS_SIZE     BPS * 4 /* buffer size for filesystem probe */
 #define CD_BPS           2048    /* CD-ROM block size */
 #define N_CACHE_SECS     (BIOS_LEN / BPS)  /* Must be a multiple of 4 for CD-ROMs */
@@ -1697,7 +1696,7 @@ static const char * getVolumeLabelAlias( BVRef bvr, const char * str, long strMa
   if(!p || !(*p)) return 0; // this volume must not be renamed, or option is malformed
 
   p+= strlen(str); // skip the "hd(n,m) " field
-  // multiple aliases can be found separated by a semicolon
+  // multiple aliases can be found separated by a semicolon.
   while(*p && *p != ';' && q<(szAlias+MAX_ALIAS_SIZE)) *q++=*p++;
   *q='\0';
 
