@@ -199,6 +199,8 @@ static int ExecKernel(void *binary)
     else
       drawBootGraphics();
 	
+	setupBooterLog();
+	
     finalizeBootStruct();
     
     // Jump to kernel's entry point. There's no going back now.
@@ -252,6 +254,8 @@ void common_boot(int biosdev)
 	
 	// Initialize boot info structure.
 	initKernBootStruct();
+	
+	initBooterLog();
 	
 	// Setup VGA text mode.
 	// Not sure if it is safe to call setVideoMode() before the
@@ -411,15 +415,15 @@ void common_boot(int biosdev)
 		if ( status == -1 ) continue;
 		
 		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
-		// Draw background, turn off any GUI elements and update VRAM.
+		// Turn off any GUI elements, draw background and update VRAM.
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{	
-			drawBackground(); // order matters!!
-			gui.devicelist.draw = false; // Needed when the verbose "flips" the screen.
-			gui.bootprompt.draw = false; // ?
-			gui.menu.draw = false;       // ?
-			gui.infobox.draw = false;    // Enter doesn't work with this drawn; most probably it's not needed!?
+		{
+			gui.devicelist.draw = false;
+			gui.bootprompt.draw = false;
+			gui.menu.draw = false;
+			gui.infobox.draw = false;
 			gui.logo.draw = false;
+			drawBackground();
 			updateVRAM();
 		}
 		
