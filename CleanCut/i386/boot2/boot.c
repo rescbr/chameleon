@@ -362,12 +362,13 @@ void common_boot(int biosdev)
 		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
 		// Draw background, turn off any GUI elements and update VRAM.
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{	
-			drawBackground(); // order matters!!
-			gui.devicelist.draw = false; // Needed when the verbose "flips" the screen.
-			gui.bootprompt.draw = false; // ?
-			gui.menu.draw = false;       // ?
-			gui.infobox.draw = false;    // Enter doesn't work with this drawn; most probably it's not needed!?
+		{
+			gui.devicelist.draw = false;
+			gui.bootprompt.draw = false;
+			gui.menu.draw = false;
+			gui.infobox.draw = false;
+			gui.logo.draw = false;
+			drawBackground();
 			updateVRAM();
 		}
 		 
@@ -387,6 +388,7 @@ void common_boot(int biosdev)
               
             bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
             setBootGlobals(bvChain);
+			setupDeviceList(&bootInfo->themeConfig);
           }
           continue;
         }
@@ -572,12 +574,8 @@ void common_boot(int biosdev)
         if (ret <= 0) {
 			printf("Can't find %s\n", bootFile);
 
-			if(gui.initialised) {
-				sleep(1);
-				drawBackground();
-				gui.devicelist.draw = true;
-				gui.redraw = true;
-			}
+			sleep(1);
+			
             if (gBootFileType == kNetworkDeviceType) {
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;

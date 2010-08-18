@@ -14,8 +14,8 @@ Example arguments include
 
  kernel: kernel name                (e.g. "mach_kernel" - must be in "/" )
 
- flags: -v (verbose)      -s (single user mode), 
-        -x (safe mode)    -F (ignore boot configuration file)
+ flags: -v (verbose)      -s (single user mode)      -x (safe mode) 
+        -F (ignore "Kernel Flags" specified in boot configuration file)
         32 (i386 arch)    -legacy (no 64 bit apps - kernel flag)
         64 (x86_64 arch)
 
