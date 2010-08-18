@@ -17,7 +17,6 @@ BVRef gRAMDiskVolume = NULL;
 bool gRAMDiskBTAliased = false;
 char gRAMDiskFile[512];
 
-
 // Notify OS X that a ramdisk has been setup. XNU will attach this to /dev/md0
 void md0Ramdisk()
 {
@@ -75,8 +74,7 @@ void md0Ramdisk()
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{
-					DT__AddProperty(node, "RAMDisk", sizeof(RAMDiskParam),  (void*)&ramdiskPtr);		
-					
+					DT__AddProperty(node, "RAMDisk", sizeof(RAMDiskParam),  (void*)&ramdiskPtr);
 				}
 				else
 				{

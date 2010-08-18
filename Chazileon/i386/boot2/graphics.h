@@ -14,7 +14,6 @@
 
 #include "vbe.h" //Azi:autoresolution
 
-
 #ifndef __BOOT_GRAPHICS_H
 #define __BOOT_GRAPHICS_H
 

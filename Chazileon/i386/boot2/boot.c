@@ -68,7 +68,7 @@ long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
 static char gBootKernelCacheFile[512];
 static char gCacheNameAdler[64 + 256];
-//char *gPlatformName = gCacheNameAdler; Azi: not in use
+//char *gPlatformName = gCacheNameAdler; disabled
 char gRootDevice[512];
 char gMKextName[512];
 //char gMacOSVersion[8]; //Azi:sysversion - TODO: check why doesn't work here.
@@ -415,10 +415,10 @@ void common_boot(int biosdev)
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{	
 			drawBackground(); // order matters!!
-			gui.devicelist.draw = false; // Needed when verbose "flips" the screen.
+			gui.devicelist.draw = false; // Needed when the verbose "flips" the screen.
 			gui.bootprompt.draw = false; // ?
 			gui.menu.draw = false;       // ?
-			gui.infobox.draw = false;    // We can't boot with this drawn; most probably it's not needed!?
+			gui.infobox.draw = false;    // Enter doesn't work with this drawn; most probably it's not needed!?
 			gui.logo.draw = false;
 			updateVRAM();
 		}

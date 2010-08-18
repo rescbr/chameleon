@@ -127,7 +127,7 @@ enum {
  * Per-mode info, returned in function 4f02.
  */
 typedef struct {
-    unsigned short  ModeAttributes;
+    unsigned short  ModeAttributes; //Azi:debuginfo
     unsigned char   WinAAttributes;
     unsigned char   WinBAttributes;
     unsigned short  WinGranularity;
@@ -143,7 +143,7 @@ typedef struct {
     unsigned char   NumberOfPlanes;
     unsigned char   BitsPerPixel;
     unsigned char   NumberOfBanks;
-    unsigned char   MemoryModel;
+    unsigned char   MemoryModel; //Azi:debuginfo
     unsigned char   BankSize;
     unsigned char   NumberOfImagePages;
     unsigned char   Reserved;

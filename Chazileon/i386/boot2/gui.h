@@ -106,12 +106,12 @@ typedef struct
 	uint16_t	hsyncend;
 	uint16_t	vsyncstart;			
 	uint16_t	vsyncend;
-	uint8_t		mm; // Azi:autoresolution - displayinfo
+	uint8_t		mm; // Azi:autoresolution - debuginfo
 	uint16_t	attr;
 } window_t;
 	
 /*
- * gui structure
+ * gui structure - Azi:--- take gui.screen.widht as example: gui+gui_t+window_t ??
  */
 typedef struct
 {
@@ -138,7 +138,7 @@ typedef struct
 } gui_t;
 
 
-gui_t gui;					// gui structure
+gui_t gui;					// gui structure - Azi:---
 
 font_t font_small;
 font_t font_console;

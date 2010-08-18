@@ -370,9 +370,9 @@ setVESAGraphicsMode( unsigned short width,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
 {
-	bool			  debugInfo = false; //Azi:displayinfo
+	bool			  debugInfo = false; //Azi:debuginfo
 	extern bool		  showBootBanner; //			||
-    VBEModeInfoBlock  minfo;
+    VBEModeInfoBlock  minfo; //						||		also need this on gui.c
     unsigned short    mode;
     unsigned short    vesaVersion;
     int               err = errFuncNotSupported;
@@ -475,7 +475,7 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 
-		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig); //Azi:displayinfo - gui.c, drawDeviceList.
+		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig); //Azi:debuginfo - gui.c, drawDeviceList.
 
 #if AUTORES_DEBUG
 		gui.screen.mm			   = minfo.MemoryModel;
@@ -530,11 +530,13 @@ convertImage( unsigned short width,
     return 0;
 }
 
-int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_t **imageData) //Azi:style
+int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
+        uint8_t **imageData)
 {
-    int         pngSize, pngFile = 0, error = 0;
-    uint8_t    *pngData = NULL;
+    uint8_t *pngData = NULL;
+    int pngFile = 0, pngSize;
     PNG_info_t *info;
+    int error = 0;
 
     pngFile = open_bvdev("bt(0,0)", filename, 0);
     if (pngFile == -1) {

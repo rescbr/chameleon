@@ -846,7 +846,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
-	bool		debugInfo = false; //Azi:displayinfo
+	bool		debugInfo = false; //Azi:debuginfo
 	extern bool	showBootBanner;
 	position_t	p, p_prev, p_next;
 
@@ -908,10 +908,11 @@ void drawDeviceList (int start, int end, int selection)
 			//Azi: making this info more accessible. TODO: remove the stuff on graphics.c!
 			getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
 			
-#ifdef AUTORES_DEBUG //Azi:autoresolution
+#ifdef AUTORES_DEBUG //Azi:autoresolution - debuginfo
 			debugInfo = true;
 #endif
 
+			//Azi:debuginfo: need to #include vbe.h and also "VBEModeInfoBlock  minfo;"
 			if (debugInfo && showBootBanner)
 			{
 				gui.debug.cursor = pos( 10, 100);

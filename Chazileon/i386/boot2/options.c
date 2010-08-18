@@ -34,10 +34,8 @@
 
 #include "autoresolution.h" //Azi:autoresolution - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 
-bool showBootBanner = true;
+bool showBootBanner = true; //Azi:debuginfo
 static bool shouldboot = false;
-
-char gMacOSVersion[8]; //Azi:sysversion
 
 extern int multiboot_timeout;
 extern int multiboot_timeout_set;
@@ -46,6 +44,7 @@ extern BVRef    bvChain;
 //extern int		menucount;
 
 extern int		gDeviceCount;
+char			gMacOSVersion[8]; //Azi:sysversion
 
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
@@ -115,8 +114,7 @@ static int countdown( const char * msg, int row, int timeout )
 
 	} else {
 
-		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) +
-							( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
+		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
 	
 		char dummy[80];
 		getBootVolumeDescription( gBootVolume, dummy, 80, true );

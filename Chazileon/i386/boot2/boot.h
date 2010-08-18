@@ -199,7 +199,7 @@ extern bool sysConfigValid;
 extern char bootBanner[];
 extern char bootPrompt[];
 extern bool gOverrideKernel;
-//extern char *gPlatformName; //Azi: not in use
+//extern char *gPlatformName; disabled
 extern char gMKextName[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
