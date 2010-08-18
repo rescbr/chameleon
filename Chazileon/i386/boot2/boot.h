@@ -47,7 +47,6 @@
 #define kPlatformKey		"platform"				// options.c, processBootArgument			removed, says on comment
 #define kACPIKey			"acpi"					//											not in use, afaics
 #define kPCIRootUIDKey		"PCIRootUID"			// pci_root.c, getValFK						removed by me
-#define k32BitModeFlag		"-x32" 					// boot.c, getValFK							removed by me
 "-pci0"												// pci_root.c, getValFK						removed by me
 "-pci1"												// pci_root.c, getValFK						removed by me
 
@@ -105,7 +104,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kThemeNameKey			"Theme"				// gui.c, getValFK							override default name
 #define kGUIKey					"GUI"				// * boot.c, getBollFK
 #define kBootBannerKey			"Boot Banner"		// * options.c, getBollFK
-#define kDisplayInfoKey			"DisplayInfo"		// #gui.c, graphics.c, getBollFK
+#define kDebugInfoKey			"DebugInfo"			// #gui.c, graphics.c, getBollFK
 #define kGraphicsModeKey		"Graphics Mode"		// * graphics.c, getNumberArrayFromProperty
 #define kCDROMPromptKey			"CD-ROM Prompt"		// options.c, getValFK
 #define kCDROMOptionKey			"CD-ROM Option Key"	// options.c, getIntFK & getValFK
@@ -181,7 +180,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kSafeModeFlag			"-x"				// * options.c, getValueFBK (5) & getValFK
 #define kSingleUserModeFlag		"-s"				// * options.c, getValFK
 #define kIgnoreBootFileFlag		"-F"				// * options.c, getValFBK
-// Can't remember if i ever tried -F; had an idea.. make this point to kTestConfigFileKey,
+// Can't remember if i ever tried -F; had an idea.. make this point to kTestConfigKey,
 // kind of a -config key.. like if "if you have a messed up config file" use -F to ignore it
 // and use a "safe default one".. investigate
 

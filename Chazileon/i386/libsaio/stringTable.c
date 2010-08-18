@@ -611,8 +611,6 @@ int loadConfigFile(const char *configFile, config_file_t *config)
  */
 int loadSystemConfig(config_file_t *config) //Azi:searchalgo???
 {
-	//Azi: Called from boot.c, commonBoot (firstrun).
-	// DEFAULT Boot.plist paths. These are checked before getting to boot prompt.
 	char *dirspec[] = {
 		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0) - review? only needed to load it from selected volume.
 		"bt(0,0)/Extra/com.apple.Boot.plist",
@@ -654,57 +652,50 @@ int loadSystemConfig(config_file_t *config) //Azi:searchalgo???
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadOverrideConfig(config_file_t *config) //Azi:searchalgo
+int loadOverrideConfig(config_file_t *config)
 {
-	char		 dirSpecExtraBplist[128] = ""; //Azi:alloc
-	const char	*override_pathfile = NULL;
+	char		 dirSpecBplist[128] = "";
+	const char	*override_pathname = NULL;
 	const char	*filename = "com.apple.Boot.plist";
 	int			 count, ret, fd, len = 0;
 	extern char  gMacOSVersion;
-	
-	//Azi: This Override stuff messed with my mind a lot of times; was totally unaware of it. Payback time!! :)
-	
-	// Called from options.c, processBootOptions and boot.c, commonBoot (secondrun).
-	// OVERRIDE Boot.plist paths. These are checked after we press Enter to boot a System; a Boot.plist found
-	// on these paths is parsed and keys on it are compared with the ones on the default Boot.plist.
-	// Keys that have different values, will override the default ones.
-	// Keys that are not present on the default Boot.plist will be used with existing ones.
-	
+
 	// Take in account user overriding the override :P
-	if (getValueForKey(kTestConfigKey, &override_pathfile, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kTestConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		// Specify a path to a file, e.g. /Extra/test.plist
-		strcpy(dirSpecExtraBplist, override_pathfile);
-		fd = open(dirSpecExtraBplist, 0);
+		// Specify a path to a file, e.g. config=/Extra/test.plist
+		strcpy(dirSpecBplist, override_pathname);
+		fd = open(dirSpecBplist, 0);
 		if (fd >= 0) goto success_fd;
 	}
-	
-	// Check drivers.c, LoadDrivers, for more comments on these.
-	
-	sprintf(dirSpecExtraBplist, "rd(0,0)/%s", filename);
-	fd = open(dirSpecExtraBplist, 0);
+
+	// Check rd's root for override config.
+	sprintf(dirSpecBplist, "rd(0,0)/%s", filename);
+	fd = open(dirSpecBplist, 0);
 	if (fd >= 0) goto success_fd;
-	
-	// gMacOSVersion "wasn't" set at this point; check function call on boot.c/options.c.
-	sprintf(dirSpecExtraBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
-	fd = open(dirSpecExtraBplist, 0);
+
+	// Check OS specific folders.
+	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = open(dirSpecBplist, 0);
 //	if (fd >= 0) goto success_fd;
-	
-	// These will just reload the DEFAULT Boot.plist!! Maybe we should use a diff name for this override plist??
-	// "/Extra/com.apple.Boot.plist",
+
+	//Azi: i really don't like these two!
+	// "/Extra/com.apple.Boot.plist"
 	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
-	// I have no way to test these; need advice!
-	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
-	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
-	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist);
-	
+
+	// These i have no way to test, need advice.
+	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+
 success_fd:
+
 	if (fd >= 0)
 	{
 		// read file
 		count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 		close(fd);
-		
+
 		// build xml dictionary
 		ParseXMLFile(config->plist, &config->dictionary);
 		sysConfigValid = true;
@@ -715,7 +706,6 @@ success_fd:
 		printf("No override config provided!\n");
 		ret = -1;
 	}
-	
 	return ret;
 }
 

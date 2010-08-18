@@ -273,14 +273,6 @@ void setupEfiTables32(void) //Azi:efi32/64
 
 void setupEfiTables64(void) //Azi:efi32/64
 {
-	// We use the fake_efi_pages struct so that we only need to do one kernel
-	// memory allocation for all needed EFI data.  Otherwise, small allocations
-	// like the FIRMWARE_VENDOR string would take up an entire page.
-	// NOTE WELL: Do NOT assume this struct has any particular layout within itself.
-	// It is absolutely not intended to be publicly exposed anywhere
-	// We say pages (plural) although right now we are well within the 1 page size
-	// and probably will stay that way.
-	
 	struct fake_efi_pages
 	{
 		EFI_SYSTEM_TABLE_64 efiSystemTable;
@@ -633,42 +625,41 @@ void setupEfiDeviceTree(void)
  * Load the smbios.plist override config file if any
  */
 
-static void setupSmbiosConfigFile(const char * filename) //Azi:searchalgo
+static void setupSmbiosConfigFile(const char *filename)
 {
-	char		dirSpecExtraSmbios[128] = ""; //Azi:alloc
-	const char *override_pathfile = NULL;
+	char		dirSpecSMBIOS[128] = "";
+	const char *override_pathname = NULL;
 	int			len = 0, fd = 0;
 	extern char gMacOSVersion;
 	extern void scan_mem();
 	
 	// Take in account user overriding
-	if (getValueForKey(kSMBIOSKey, &override_pathfile, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		// Specify a path to a file, e.g. /Extra/test.plist
-		sprintf(dirSpecExtraSmbios, override_pathfile);
-		fd = loadConfigFile(dirSpecExtraSmbios, &bootInfo->smbiosConfig);
+		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
+		sprintf(dirSpecSMBIOS, override_pathname);
+		fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 		if (fd >= 0) goto success_fd;
 	}
 	
-	// Check drivers.c, LoadDrivers, for more comments on these.
-	
-	sprintf(dirSpecExtraSmbios, "rd(0,0)/%s", filename);
-	fd = loadConfigFile(dirSpecExtraSmbios, &bootInfo->smbiosConfig);
+	// Check rd's root.
+	sprintf(dirSpecSMBIOS, "rd(0,0)/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	if (fd >= 0) goto success_fd;
 	
-	sprintf(dirSpecExtraSmbios, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
-	fd = loadConfigFile(dirSpecExtraSmbios, &bootInfo->smbiosConfig);
+	// Check booter volume/rdbt for OS specific folders.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	if (fd >= 0) goto success_fd;
 	
-	// Removed /Extra path from search algo. If needed can be specified on override key!
-	
-	sprintf(dirSpecExtraSmbios, "bt(0,0)/Extra/%s", filename);
-	fd = loadConfigFile(dirSpecExtraSmbios, &bootInfo->smbiosConfig);
+	// Check booter volume/rdbt Extra.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	if (fd >= 0) goto success_fd;
 	
-	if (loadConfigFile(dirSpecExtraSmbios, &bootInfo->smbiosConfig) == -1)
+	if (loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig) == -1)
 	{
-		verbose("No SMBIOS replacement found\n");
+		verbose("No SMBIOS replacement provided.\n");
 	}
 	
 	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,

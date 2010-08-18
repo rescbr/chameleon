@@ -159,12 +159,12 @@ InitDriverSupport( void )
 //==========================================================================
 // LoadDrivers
 
-long LoadDrivers( char * dirSpec ) //Azi:searchalgo
+long LoadDrivers( char * dirSpec )
 {
-	char		dirSpecExtra[128]; //Azi:alloc - was 1024 - just testing
-	const char *override_pathfolder = NULL;
+	char dirSpecExtra[128];
+	const char *override_pathfolder = NULL; // full path to a folder.
 	int			fd = 0, len = 0;
-	extern char gMacOSVersion; // moved here, only function were it's used.
+	extern char gMacOSVersion;
 	
 	if ( InitDriverSupport() != 0 )
 		return 0;
@@ -179,41 +179,39 @@ long LoadDrivers( char * dirSpec ) //Azi:searchalgo
 	{
 		if (NetLoadDrivers(dirSpec) != 0)
 		{
-            error("Could not load drivers from the network\n");
-            return -1;
-        }
+			error("Could not load drivers from the network\n");
+			return -1;
+		}
 	}
 	else if ( gBootFileType == kBlockDeviceType )
 	{
 		// Take in account user overriding.
 		if (getValueForKey(kExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
 		{
-			// Specify a path to a folder ending with /, e.g. /Extra/testkext/
+			// Specify a path to a folder, ending with / e.g. kext=/Extra/testkext/
 			strcpy(dirSpecExtra, override_pathfolder);
 			fd = FileLoadDrivers(dirSpecExtra, 0);
 			if (fd >= 0) goto success_fd;
 		}
 		
-		// Assuming we are using "only", bt(0,0) (booter partition) + specific OS folders + ramdisks
-		// to store and load files, things can be as simple as this:
-		
-		// If there is a ramdisk mounted that's not aliased as bt(0,0), check it's "root".
-		strcpy(dirSpecExtra, "rd(0,0)/"); // A little change on the path ;)
+		// No need to specify (gRAMDiskVolume && !gRAMDiskBTAliased).
+		// First try to load Extra extensions from a ramdisk if isn't aliased as bt(0,0).
+		strcpy(dirSpecExtra, "rd(0,0)/"); // check it's "root".
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
 		
-		// Checking paths on a ramdisk aliased as bt(0,0) (ramdiskbt), is the same as checking paths
-		// on boot volume so, no need to specify (gRAMDiskVolume && gRAMDiskBTAliased);
-		// in this case the following two rule.
-
-		// Check booter volume/ramdiskbt Extra for specific OS files, on specific OS folders.
+		// Also no need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
+		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
+		// In this case the following two apply.
+		
+		// Check booter volume/rdbt Extra for specific OS files, on specific OS folders.
 		sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
 		
-		// Removed /Extra path from search algo. If needed can be specified on override key! test again!!!
+		// Removed /Extra path from search algo. If needed can be specified with override key!
 		
-		// Check booter volume/ramdiskbt Extra in case we don't keep specific OS folders.
+		// Check booter volume/rdbt Extra in case we don't keep specific OS folders.
 		strcpy(dirSpecExtra, "bt(0,0)/Extra/");
 		fd = FileLoadDrivers(dirSpecExtra, 0);
 		if (fd >= 0) goto success_fd;
@@ -235,27 +233,27 @@ long LoadDrivers( char * dirSpec ) //Azi:searchalgo
 		
 success_fd:
 		
-        if (gMKextName[0] != '\0') // System drivers
-        {
-            verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-            if ( LoadDriverMKext(gMKextName) != 0 )
-            {
-                error("Could not load %s\n", gMKextName);
-                return -1;
-            }
-        }
-        else
-        {
-            strcpy(gExtensionsSpec, dirSpec);
-            strcat(gExtensionsSpec, "System/Library/");
-            FileLoadDrivers(gExtensionsSpec, 0);
-        }
-    }
+		if (gMKextName[0] != '\0')
+		{
+			verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
+			if ( LoadDriverMKext(gMKextName) != 0 )
+			{
+				error("Could not load %s\n", gMKextName);
+				return -1;
+			}
+		}
+		else
+		{
+			strcpy(gExtensionsSpec, dirSpec);
+			strcat(gExtensionsSpec, "System/Library/");
+			FileLoadDrivers(gExtensionsSpec, 0);
+		}
+	}
 	else
 	{
 		return 0;
 	}
-
+	
 	MatchPersonalities();
 	
 	MatchLibraries();

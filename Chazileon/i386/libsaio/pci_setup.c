@@ -45,7 +45,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					{
 						case PCI_VENDOR_ID_ATI:
 							verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-							current->vendor_id, current->device_id, devicepath);
+							current->vendor_id, current->device_id, devicepath); //Azi:ATI - correct.
 							setup_ati_devprop(current); 
 							break;
 					

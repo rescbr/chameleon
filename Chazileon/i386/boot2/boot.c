@@ -182,14 +182,11 @@ static int ExecKernel(void *binary)
 
     bool dummyVal;
 
-	//Azi: Wait=y or any other pause makes my boot hang here, when using UHCIReset fix.
-	// (see graphics.c 432, AUTORES_DEBUG/patch). (fixed with usb_loop)
-	
-	// It's also breaking other keys when typed "after them" at boot prompt.
-	// Works properly if Wait=y is typed in first place or used on Boot.plist.
-    if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
+	//Azi: Wait=y is breaking other keys when typed "after them" at boot prompt.
+	// Works properly if typed in first place or used on Boot.plist.
+	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
 		pause();
-    }
+	}
 
 	usb_loop();
 
@@ -399,7 +396,7 @@ void common_boot(int biosdev)
 		void		*binary = (void *)kLoadAddr;
 		
 		config_file_t	 systemVersion;		// system.plist of booting partition - Azi:sysversion
-		char		sysVersion[8]; // replaces gMacOSVersion here, for now.
+		char			 osxVersion[8]; // replaces gMacOSVersion here, for now.
 		
 		// additional variable for testing alternate kernel image locations on boot helper partitions.
 		char		bootFileSpec[512]; //Azi:HelperConfig - kernel
@@ -413,24 +410,17 @@ void common_boot(int biosdev)
 		firstRun = false;
 		if ( status == -1 ) continue;
 		
-		//Azi:sysversion related test 
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{
-			gui.devicelist.draw = false; // Needed for when the verbose flips the screen.
-			drawBackground();
+		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
+		// Draw background, turn off any GUI elements and update VRAM.
+		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
+		{	
+			drawBackground(); // order matters!!
+			gui.devicelist.draw = false; // Needed when verbose "flips" the screen.
+			gui.bootprompt.draw = false; // ?
+			gui.menu.draw = false;       // ?
+			gui.infobox.draw = false;    // We can't boot with this drawn; most probably it's not needed!?
 			updateVRAM();
 		}
-				
-		// Turn off any GUI elements
-		/*if ( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{
-			gui.devicelist.draw = false;
-			gui.bootprompt.draw = false; // doesn't seem needed
-			gui.menu.draw = false;       // same as above
-			gui.infobox.draw = false;    // Enter doesn't work with this drawn so...
-			drawBackground();
-			updateVRAM();                // don't know about this
-		}*/
 		
 //Azi:autoresolution begin
 		/*
@@ -503,37 +493,26 @@ void common_boot(int biosdev)
 		}
 		
 		// Other status (e.g. 0) means that we should proceed with boot.
-		// Found and loaded a config file (Azi: not mandatory anymore).
 		
 //Azi:autoresolution old - testing
 		
-		// Find out which version mac os we're booting. Azi:sysversion
-		// To avoid call loadOverrideConfig from here too and since moving this before calling
-		// processBootOptions() (which worked on a brief test) doesn't make sense,
-		// tried to move it to processBootOptions() on options.c (check there).
-		if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
-		{ //Azi: shouldn't this path start with / ?
-			if (getValueForKey(kProductVersion, &val, &len, &systemVersion))
-			{
+		//Azi: still calling this here. The call on processBootOptions() gets hidden from verbose and
+		// for some reason gMacOSVersion doesn't get initialized on boot.c like on the others. Later...
+		// Find out which version mac os we're booting.
+		if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion)) {
+			if (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {	
 				// getValueForKey uses const char for val
 				// so copy it and trim
-				strncpy(sysVersion, val, MIN(len, 4));
-				sysVersion[MIN(len, 4)] = '\0';
+				strncpy(osxVersion, val, MIN(len, 4));
+				osxVersion[MIN(len, 4)] = '\0';
 			}
 		}
-		
-		//Azi:sysversion - gMacOSVersion is only initialized above so, this call is only to get
-		// system version so we can override Boot.plist from specific OS folders; another plus is verbose.
-		// It seems to work fine though i'm not sure how sane is to call it twice?!
-		// Can't be called only from here! Need advice. Check above.
-		//loadOverrideConfig(&bootInfo->overrideConfig); // call 2
-		
-		//Azi: default to x86_64 arch
+
 		// If cpu doesn't handle 64 bit instructions,...
 		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
 			// ... user forced i386 kernel architecture on cpu with "em64t"...
 			getValueForKey(kArchI386Flag, &val, &len, &bootInfo->bootConfig) ||
-			// ... or forced Legacy Mode... (not needed! but handy for some processors/situations)
+			// ... or forced Legacy Mode...
 			getValueForKey(kLegacyModeFlag, &val, &len, &bootInfo->bootConfig))
 		{
 			// ... use i386 kernel arch.
@@ -624,7 +603,7 @@ void common_boot(int biosdev)
 					(gMKextName[0] == '\0') &&
 					(gBootKernelCacheFile[0] != '\0'));
 
-		verbose("Loading Darwin %s\n", sysVersion); //Azi:sysversion
+		verbose("Loading Darwin %s\n", osxVersion); //Azi:sysversion
 		
 		if (trycache) do
 		{

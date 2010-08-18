@@ -34,6 +34,7 @@
 
 #include "autoresolution.h" //Azi:autoresolution - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 
+bool showBootBanner = true;
 static bool shouldboot = false;
 
 char gMacOSVersion[8]; //Azi:sysversion
@@ -877,7 +878,7 @@ int getBootOptions(bool firstRun)
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-			bool showBootBanner = true;
+			//bool showBootBanner = true;
  
 			// Check if "Boot Banner"=N switch is present in config file.
 			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
@@ -1018,7 +1019,7 @@ int getBootOptions(bool firstRun)
 				 */
 				
 				//get the new Graphics Mode key
-				processBootOptions();
+				processBootOptions(); //Azi: calling this just to get the resolution??
 				if ((gAutoResolution == TRUE) && map)
 				{
 					UInt32 params[4];
@@ -1062,7 +1063,7 @@ int getBootOptions(bool firstRun)
 							gui.redraw = true;
 							if (!(gBootMode & kBootModeQuiet))
 							{
-								bool showBootBanner = true;
+								//bool showBootBanner = true;
 
 								// Check if "Boot Banner"=N switch is present in config file.
 								getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
@@ -1305,12 +1306,10 @@ processBootOptions()
     else
       return -1;
 
-	// Find out which version mac os we're booting. Azi:sysversion - Ok, if i move this here,
-	// which seems ideal to me, it gets hidden from verbose and this info been pretty helpful to me;
-	// plus, for some reason gMacOSVersion doesn't get initialized on boot.c?! i have to call this anyway
-	// with another variable name so, back to were i was. Need advice! Check below on loadOverrideConfig.
+	// Needed to enable search for override Boot.plist on OS specific folders
+	// from loadOverrideConfig(). Find out which version mac os we're booting.
 	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
-	{ //Azi: shouldn't this path start with / ?
+	{
 		if (getValueForKey(kProductVersion, &value, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
@@ -1320,20 +1319,18 @@ processBootOptions()
 		}
 	} // doesn't print to screen here!
 	
-	//Azi: check loadOverrideConfig().
-	// Load config table specified by the user, or use the default.
-/*    if (!getValueForBootKey(cp, "config", &val, &cnt)) {
-		val = 0;
-		cnt = 0;
-    }*/
+	//Azi: implemented at loadOverrideConfig.
+    // Load config table specified by the user, or use the default.
+    //if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+    //  val = 0;
+    //  cnt = 0;
+    //}
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory operation anymore. Azi: meaning, it desn't return -1 anymore.
+    // This is not a mandatory operation anymore.
 
-	// About overriding from OS specific folders: gMacOSVersion is not stored at this point;
-	// placed a "call 2" under common_boot, right after getting system version.
-	loadOverrideConfig(&bootInfo->overrideConfig); // call 1 - first to print to screen
+    loadOverrideConfig(&bootInfo->overrideConfig);
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.

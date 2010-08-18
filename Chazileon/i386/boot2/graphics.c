@@ -370,7 +370,8 @@ setVESAGraphicsMode( unsigned short width,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
 {
-	bool			  displayInfo = false; //Azi:displayinfo
+	bool			  debugInfo = false; //Azi:displayinfo
+	extern bool		  showBootBanner; //			||
     VBEModeInfoBlock  minfo;
     unsigned short    mode;
     unsigned short    vesaVersion;
@@ -474,12 +475,14 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 
+		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig); //Azi:displayinfo - gui.c, drawDeviceList.
+
 #if AUTORES_DEBUG
 		gui.screen.mm			   = minfo.MemoryModel;
 		gui.screen.attr			   = minfo.ModeAttributes;
 #endif
-		getBoolForKey(kDisplayInfoKey, &displayInfo, &bootInfo->bootConfig); //Azi:displayinfo - gui.c, drawDeviceList.
-		if (displayInfo == true)
+
+		if (debugInfo && showBootBanner)
 		{
 			gui.screen.mm		   = minfo.MemoryModel;
 			gui.screen.attr		   = minfo.ModeAttributes;

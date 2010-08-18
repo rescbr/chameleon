@@ -674,7 +674,7 @@ int initGUI(void)
 	/*
 	 * AutoResolution
 	 */
-	if (gAutoResolution == TRUE)
+	if (gAutoResolution == true)
 	{
 		// Get Resolution from Graphics Mode key
 		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
@@ -813,9 +813,10 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 
 void drawDeviceList (int start, int end, int selection)
 {
-	int		   i;
-	bool	   displayInfo = false; //Azi:displayinfo
-	position_t p, p_prev, p_next;
+	int			i;
+	bool		debugInfo = false; //Azi:displayinfo
+	extern bool	showBootBanner;
+	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
 		
@@ -873,13 +874,13 @@ void drawDeviceList (int start, int end, int selection)
 				drawInfoMenuItems();
 		
 			//Azi: making this info more accessible. TODO: remove the stuff on graphics.c!
-			getBoolForKey(kDisplayInfoKey, &displayInfo, &bootInfo->bootConfig);
+			getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
 			
 #ifdef AUTORES_DEBUG //Azi:autoresolution
-			displayInfo = true;
+			debugInfo = true;
 #endif
 
-			if (displayInfo == true)
+			if (debugInfo && showBootBanner)
 			{
 				gui.debug.cursor = pos( 10, 100);
 				dprintf( &gui.screen, "label:     %s\n",   param->label );
@@ -1851,7 +1852,7 @@ void drawBootGraphics(void)
 	/*
  	 * AutoResolution
  	 */
-	if (gAutoResolution == TRUE)
+	if (gAutoResolution == true)
 	{
 		// Get Resolution from Graphics Mode key
 		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
@@ -1864,7 +1865,7 @@ void drawBootGraphics(void)
  	}
 	else
 	{
- 		// parse display size parameters
+ 		// parse display size parameters //Azi: check this stuff!!!...
 		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[0] = pos;
@@ -1877,7 +1878,7 @@ void drawBootGraphics(void)
 	}
 
 	// Save current screen resolution.
-	oldScreenWidth = gui.screen.width;
+	oldScreenWidth = gui.screen.width; //Azi: ... and this stuff too!!!
 	oldScreenHeight = gui.screen.height;
 
 	gui.screen.width = screen_params[0];

@@ -432,7 +432,7 @@ static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *
 	if (!device || !ati_dev) {
 		return 0;
 	}
-	printf("dumping pci config space, 256 bytes\n");
+	printf("dumping pci config space, 256 bytes\n"); //Azi:ATI
 	config_space = malloc(256);
 	for (i=0; i<=255; i++) {
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
@@ -637,7 +637,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devicepath = get_pci_dev_path(ati_dev);
 
 	cmd = pci_config_read8(ati_dev->dev.addr, 4);
-	verbose("old pci command - %x\n", cmd);
+	verbose("old pci command - %x\n", cmd); //Azi:ATI - old pci command - 7
 	if (cmd == 0) {
 		pci_config_write8(ati_dev->dev.addr, 4, 6);	
 		cmd = pci_config_read8(ati_dev->dev.addr, 4);
@@ -662,7 +662,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	} else {
 		boot_display = 0;
 	}
-	verbose("boot display - %x\n", boot_display);
+	verbose("boot display - %x\n", boot_display); //Azi:ATI - boot display - 1
 	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
 
 	if((framebuffer[0] == 'M' && framebuffer[1] == 'o' && framebuffer[2] == 't') || 
@@ -739,13 +739,13 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	if (bios == NULL) {
 		bios = (uint8_t *)0x000C0000;
 		toFree = false;
-		verbose("Not going to use bios image file\n");
+		verbose("Not going to use bios image file\n"); //Azi: No bios image provided by user!?
 	} else {
 		toFree = true;
 	}
 
 	if (bios[0] == 0x55 && bios[1] == 0xaa) {
-		printf("Found bios image\n");
+		printf("Found bios image\n"); //Azi: found image on card.
 		bios_size = bios[2] * 512;
 
 		struct  pci_rom_pci_header_t *rom_pci_header;
@@ -758,7 +758,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 				if (toFree) {
 					verbose("Adding binimage to card %x from mmio space with size %x\n", ati_dev->device_id, bios_size);
 				} else {
-					verbose("Adding binimage to card %x from legacy space with size %x\n", ati_dev->device_id, bios_size);
+					verbose("Adding binimage to card %x from legacy space with size %x\n", ati_dev->device_id, bios_size); //Azi:ATI
 				}
 				devprop_add_value(device, "ATY,bin_image", bios, bios_size);
 			}

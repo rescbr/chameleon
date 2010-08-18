@@ -92,55 +92,82 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 }
 
 /** The following ACPI Table search algo, should be reused anywhere needed: */
-int search_and_get_acpi_fd(const char * filename, const char ** outDirspec) //Azi:searchalgo
+int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	char		dirSpecDSDT[128] = ""; //Azi:alloc - was 512
-	const char *override_pathname = NULL;
+	static bool first_time = true;
+	static char	dirSpecDSDT[128] = "";
+	const char *override_pathname = NULL; // full path to a file.
 	int			len = 0, fd = 0;
 	extern char gMacOSVersion;
 	
-	// Take in account user overriding
-	if (getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
+	// Take in account user overriding if it's DSDT only
+	if (strstr(filename, "DSDT") &&
+		getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
-		// Specify a path to a file, e.g. /Extra/test.aml
+		// Specify a path to a file, e.g. DSDT=/Extra/test.aml
 		sprintf(dirSpecDSDT, override_pathname);
 		fd = open(dirSpecDSDT, 0);
 		if (fd >= 0) goto success_fd;
 	}
 	
-	// Check drivers.c, LoadDrivers, for more comments on these.
+	// Check that dirSpecDSDT is not already assigned with a path
+	if (!first_time && *dirSpecDSDT) 
+	{ // it is so start searching this cached patch first
+		//extract path
+		for (len = strlen(dirSpecDSDT)-1; len; len--)
+		{
+			if (dirSpecDSDT[len] == '/' || len == 0)
+			{
+				dirSpecDSDT[len] = '\0';
+				break;
+			}
+		}
+		
+		// now concat with the filename
+		strncat(dirSpecDSDT, "/", sizeof(dirSpecDSDT));
+		strncat(dirSpecDSDT, filename, sizeof(dirSpecDSDT));
+		
+		// and test to see if we don't have our big boy here:
+		fd = open(dirSpecDSDT,0);
+		if (fd >= 0) 
+		{
+			printf("ACPI file search cache hit: file found at %s\n", dirSpecDSDT);
+			goto success_fd;
+		}
+	}
 	
+	// Start searching any potential location for ACPI Table
+	// Check rd's root.
 	sprintf(dirSpecDSDT, "rd(0,0)/%s", filename);
 	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
+	// Check booter volume/rdbt for OS specific folders.
 	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
-	// Removed /Extra path from search algo. If needed can be specified on override key!
-	
+	// Check booter volume/rdbt Extra.
 	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s", filename);
 	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
-	// Add helper partitions??
-	
- 	// Azi: ok, one gone.. let's kill this one too?
-	// All "config" files go in Extra!
+	//Azi: All loaded files stay in Extra.. please!? :)
 	//sprintf(dirspec, "/%s", filename); // search root
 	//fd=open (dirspec,0);
 	//if (fd>=0) goto success_fd;
 	
 	// NOT FOUND:
-	//Azi: handling this only on pci_root.c, getPciRootUID() (it's enough to check if .aml file exists),
-	// to reduce number of printed messages and the confusion caused by them on users.
+	//Azi: a reminder - handling this verbose only on pci_root.c, getPciRootUID()
+	// (it's enough to check if *.aml file exists), to reduce number of printed messages
+	// and the confusion caused by them on users.
 	//verbose("ACPI Table not found: %s\n", filename);
-	
 	if (outDirspec) *outDirspec = "";
+	first_time = false;
 	return -1;
 	// FOUND
 success_fd:
+	first_time = false;
 	if (outDirspec) *outDirspec = dirSpecDSDT;
 	return fd;
 }
@@ -591,10 +618,14 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 	
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
-		fix_restart = false; //Azi: I'm on Intel and i don't need this enabled by default!?
-		getBoolForKey(kRestartFixKey, &fix_restart, &bootInfo->bootConfig);
-	} else {
+	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	{
+		fix_restart = false; //Azi: think this should be false by default!?
+		// On the other hand, i could use a shutdown fix now and then :)
+		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+	}
+	else
+	{
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
 	}
