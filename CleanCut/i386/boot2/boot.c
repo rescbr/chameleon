@@ -194,6 +194,8 @@ static int ExecKernel(void *binary)
     else
       drawBootGraphics();
 	
+	setupBooterLog();
+	
     finalizeBootStruct();
     
     // Jump to kernel's entry point. There's no going back now.
@@ -249,6 +251,8 @@ void common_boot(int biosdev)
 
     // Initialize boot info structure.
     initKernBootStruct();
+
+	initBooterLog();
 
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the

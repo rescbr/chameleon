@@ -18,16 +18,20 @@ LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
 
-PROGRAMS = machOconv
+PROGRAMS = machOconv bdmesg
 
 OUTFILES = $(PROGRAMS)
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 
-all embedtheme: $(DIRS_NEEDED) $(PROGRAMS)
+all embedtheme autores_dbg debug: $(DIRS_NEEDED) $(PROGRAMS)
+debug: CFLAGS += -DDEBUG
 
 machOconv: machOconv.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) machOconv.o
+
+bdmesg: bdmesg.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -o $(SYMROOT)/$(@F) bdmesg.o
 
 include ../MakeInc.dir
 
