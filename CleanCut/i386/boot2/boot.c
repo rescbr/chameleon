@@ -180,8 +180,7 @@ static int ExecKernel(void *binary)
 	//Azi: Wait=y is breaking other keys when typed "after them" at boot prompt.
 	// Works properly if typed in first place or used on Boot.plist.
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
-		printf("Press any key to continue...");
-		getc();
+		pause();
 	}
 
 	usb_loop();
