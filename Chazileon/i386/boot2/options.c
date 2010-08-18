@@ -450,7 +450,7 @@ static int updateMenu( int key, void ** paramPtr )
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
 						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'f';
+						*gBootArgsPtr++ = 'x';
 						break;
 						
 					case BOOT_SINGLEUSER:
@@ -874,6 +874,7 @@ int getBootOptions(bool firstRun)
 
 	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 		// redraw the background buffer
+		gui.logo.draw = true;
 		drawBackground();
 		gui.devicelist.draw = true;
 		gui.redraw = true;
@@ -1449,24 +1450,20 @@ processBootOptions()
     strncpy(&argP[cnt], cp, userCnt);
     argP[cnt+userCnt] = '\0';
 
-    if(!shouldboot)
-    {
-    	gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
-            getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+	if(!shouldboot)
+	{
+		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
+			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+		
+		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
+			kBootModeSafe : kBootModeNormal;
+	}
 
-      gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
-	    kBootModeSafe : kBootModeNormal;
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+	{
+		strlcpy(gMKextName, val, cnt + 1);
+	}
 
-    	if ( getValueForKey( kOldSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
-        	gBootMode = kBootModeSafe;
-   	}
-
-   	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
-        	strlcpy(gMKextName, val, cnt + 1);
-    	}
-
-    }
-	 
     free(configKernelFlags);
     free(valueBuffer);
 

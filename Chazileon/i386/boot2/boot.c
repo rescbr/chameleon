@@ -419,6 +419,7 @@ void common_boot(int biosdev)
 			gui.bootprompt.draw = false; // ?
 			gui.menu.draw = false;       // ?
 			gui.infobox.draw = false;    // We can't boot with this drawn; most probably it's not needed!?
+			gui.logo.draw = false;
 			updateVRAM();
 		}
 		
@@ -488,6 +489,7 @@ void common_boot(int biosdev)
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
+				setupDeviceList(&bootInfo->themeConfig); //Azi: check this - position test!!!
 			}
 			continue;
 		}
@@ -701,15 +703,9 @@ void common_boot(int biosdev)
 		if (ret <= 0)
 		{
 			printf("Can't find %s\n", bootFile);
-			
-			if(gui.initialised)
-			{
-				sleep(1);
-				drawBackground();
-				gui.devicelist.draw = true;
-				gui.redraw = true;
-			}
-			
+
+			sleep(1);
+
 			if (gBootFileType == kNetworkDeviceType) {
 				// Return control back to PXE. Don't unload PXE base code.
 				gUnloadPXEOnExit = false;

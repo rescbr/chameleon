@@ -176,7 +176,6 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 #define kArchX86_64Flag			"64"				// # boot.c, getValFK
 //----------
 #define kVerboseModeFlag		"-v"				// * options.c, getValFK
-#define kOldSafeModeFlag		"-f"				// kIgnoreCacheModeFlag***, options.c, getValFK
 #define kSafeModeFlag			"-x"				// * options.c, getValueFBK (5) & getValFK
 #define kSingleUserModeFlag		"-s"				// * options.c, getValFK
 #define kIgnoreBootFileFlag		"-F"				// * options.c, getValFBK
