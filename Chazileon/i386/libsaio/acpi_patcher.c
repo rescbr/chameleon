@@ -622,7 +622,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	{
 		fix_restart = false; //Azi: think this should be false by default!?
 		// On the other hand, i could use a shutdown fix now and then :)
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFixKey, &fix_restart, &bootInfo->bootConfig);
 	}
 	else
 	{
