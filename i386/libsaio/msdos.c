@@ -54,7 +54,7 @@
 #include "msdos.h"
 
 #define LABEL_LENGTH		11
-#define MAX_DOS_BLOCKSIZE	2048
+#define MSDOS_CACHE_BLOCKSIZE BPS
 
 #define	CLUST_FIRST		2/* reserved cluster range */
 #define	CLUST_RSRVD32	0x0ffffff8	/* reserved cluster range */
@@ -151,7 +151,7 @@ MSDOSInitPartition (CICell ih)
 	
 	if (msdoscurrent == ih)
 	{
-		CacheInit(ih, msdosclustersize);
+		CacheInit(ih, MSDOS_CACHE_BLOCKSIZE);
 		return 0;
 	}
 	
@@ -220,10 +220,34 @@ MSDOSInitPartition (CICell ih)
 	}
 	
 	msdosclustersize = msdosbps * spc;
-
 	msdoscurrent = ih;
-	CacheInit(ih, msdosclustersize);
+
+	CacheInit(ih, MSDOS_CACHE_BLOCKSIZE);
 	free (buf);
+	return 0;
+}
+
+static int
+readSector(CICell ih, off_t readOffset, char *buf, int size)
+{
+    // Caching only FAT entries (4 bytes) by utlizing the cache with sector aligned read requests.
+	if (size < BPS)
+	{
+		long long sectorOffset = (uint64_t)readOffset / BPS * BPS;
+		long relOffset = readOffset % BPS;
+		char *cacheBuffer;
+	
+		cacheBuffer = malloc(MSDOS_CACHE_BLOCKSIZE);
+		CacheRead(ih, cacheBuffer, sectorOffset, MSDOS_CACHE_BLOCKSIZE, true);
+		bcopy(cacheBuffer + relOffset, buf, size);
+		free(cacheBuffer);
+	}
+	else
+	{
+		Seek(ih, readOffset);
+		Read(ih, (long)buf, size);
+	}
+
 	return 0;
 }
 
@@ -266,15 +290,15 @@ msdosreadcluster (CICell ih, uint8_t *buf, int size, off_t *cluster)
 		Seek(ih, readOffset);
 		Read(ih, (long)buf, size);
 	}
-	
+
 	/* Find first sector of FAT */
-	readOffset = msdosressector*msdosbps;
+	readOffset = msdosressector * msdosbps;
+
 	/* Find sector containing "cluster" entry in FAT */
-	readOffset += ((uint64_t)*cluster * (uint64_t)msdosfatbits)/8;
+	readOffset += ((uint64_t)*cluster * (uint64_t)msdosfatbits) / 8;
 	
 	/* Read one sector of the FAT */
-	Seek(ih, readOffset);
-	Read(ih, (long)tmpbuf, 4);
+	readSector(ih, readOffset, tmpbuf, 4);
 	
 	switch (msdosfatbits) {
 		case 32:

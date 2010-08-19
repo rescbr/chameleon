@@ -193,6 +193,8 @@ static int ExecKernel(void *binary)
     else
       drawBootGraphics();
 	
+	setupBooterLog();
+	
     finalizeBootStruct();
     
     // Jump to kernel's entry point. There's no going back now.
@@ -248,6 +250,8 @@ void common_boot(int biosdev)
 
     // Initialize boot info structure.
     initKernBootStruct();
+
+	initBooterLog();
 
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
@@ -320,13 +324,14 @@ void common_boot(int biosdev)
     getc();
 #endif
 
-    useGUI = true;
-    // Override useGUI default
-    getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
-    if (useGUI) {
-        /* XXX AsereBLN handle error */
-	initGUI();
-    }
+	useGUI = true;
+	// Override useGUI default
+	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+	if (useGUI && initGUI())
+	{
+		// initGUI() returned with an error, disabling GUI.
+		useGUI = false;
+	}
 
     setBootGlobals(bvChain);
 
@@ -372,17 +377,13 @@ void common_boot(int biosdev)
               
             bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
             setBootGlobals(bvChain);
+            setupDeviceList(&bootInfo->themeConfig);
           }
           continue;
         }
 		
         // Other status (e.g. 0) means that we should proceed with boot.
 		
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-			drawBackground();
-			
-        // Found and loaded a config file. Proceed with boot.
-
 		// Turn off any GUI elements
 		if( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
@@ -390,6 +391,7 @@ void common_boot(int biosdev)
 			gui.bootprompt.draw = false;
 			gui.menu.draw = false;
 			gui.infobox.draw = false;
+			gui.logo.draw = false;
 			drawBackground();
 			updateVRAM();
 		}
@@ -414,10 +416,7 @@ void common_boot(int biosdev)
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-		if (getValueForKey(k32BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
-			archCpuType = CPU_TYPE_I386;
-		}
-		
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
@@ -563,12 +562,8 @@ void common_boot(int biosdev)
         if (ret <= 0) {
 			printf("Can't find %s\n", bootFile);
 
-			if(gui.initialised) {
-				sleep(1);
-				drawBackground();
-				gui.devicelist.draw = true;
-				gui.redraw = true;
-			}
+			sleep(1);
+
             if (gBootFileType == kNetworkDeviceType) {
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
