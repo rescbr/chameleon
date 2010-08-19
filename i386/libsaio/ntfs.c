@@ -301,7 +301,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
     
     struct bootfile *boot;
     void *buf = malloc(MAX_BLOCK_SIZE);
-    if (!buf)
+    if ( !buf )
         return -1;
     
     /*
@@ -320,10 +320,14 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
         return -1;
     
     // Check for non-null volume serial number
-    if(!boot->bf_volsn)
+    if( !boot->bf_volsn )
         return -1;
     
-    return CreateUUIDString((uint8_t*)&(boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
+    // Use UUID like the one you get on Windows
+    return sprintf(uuidStr, "%04X-%04X", (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
+                                         (unsigned short)boot->bf_volsn & 0xFFFF);
+    
+    // return CreateUUIDString((uint8_t*)&(boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
 }    
 
 bool NTFSProbe(const void * buffer)
