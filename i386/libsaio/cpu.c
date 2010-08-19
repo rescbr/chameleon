@@ -14,7 +14,7 @@
 #if DEBUG_CPU
 #define DBG(x...)		printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)		msglog(x)
 #endif
 
 /*
@@ -120,6 +120,8 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 #endif
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
+	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
+	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
 	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
 	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
@@ -128,7 +130,37 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
-
+	
+	/* get brand string (if supported) */
+	/* Copyright: from Apple's XNU cpuid.c */
+	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004) {
+		uint32_t	reg[4];
+        char        str[128], *s;
+		/*
+		 * The brand string 48 bytes (max), guaranteed to
+		 * be NUL terminated.
+		 */
+		do_cpuid(0x80000002, reg);
+		bcopy((char *)reg, &str[0], 16);
+		do_cpuid(0x80000003, reg);
+		bcopy((char *)reg, &str[16], 16);
+		do_cpuid(0x80000004, reg);
+		bcopy((char *)reg, &str[32], 16);
+		for (s = str; *s != '\0'; s++) {
+			if (*s != ' ') break;
+		}
+		
+		strlcpy(p->CPU.BrandString,	s, sizeof(p->CPU.BrandString));
+		
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, min(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1))) {
+			 /*
+			  * This string means we have a firmware-programmable brand string,
+			  * and the firmware couldn't figure out what sort of CPU we have.
+			  */
+			 p->CPU.BrandString[0] = '\0';
+		 }
+	}
+	
 	/* setup features */
 	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
 		p->CPU.Features |= CPU_FEATURE_MMX;
@@ -265,7 +297,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-#if DEBUG_CPU
+
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
 	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
@@ -275,6 +307,7 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("CPU: CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
 	DBG("CPU: NoCores/NoThreads:     %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
 	DBG("CPU: Features:              0x%08x\n", p->CPU.Features);
+#if DEBUG_CPU
 	pause();
 #endif
 }

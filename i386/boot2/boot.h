@@ -99,10 +99,8 @@
  */
 #define kVerboseModeFlag	"-v"
 #define kSafeModeFlag		"-x"
-#define kOldSafeModeFlag	"-f"
 #define kIgnoreBootFileFlag	"-F"
 #define kSingleUserModeFlag	"-s"
-#define k32BitModeFlag		"-x32"
 
 /*
  * Booter behavior control

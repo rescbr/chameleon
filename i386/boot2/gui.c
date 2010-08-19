@@ -417,6 +417,18 @@ int createWindowBuffer( window_t *window )
 	return 0;
 }
 
+int freeWindowBuffer( window_t *window )
+{
+	if (window->pixmap && window->pixmap->pixels)
+    {
+		free(window->pixmap->pixels);
+		free(window->pixmap);
+		return 0;
+	}
+		
+	return 1;
+}
+
 void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 {
 	int x,y;
@@ -439,20 +451,86 @@ void drawBackground()
 	blend( images[iBackground].image, gui.screen.pixmap, gui.background.pos );
 	
 	// draw logo.png into background buffer
-	blend( images[iLogo].image, gui.screen.pixmap, gui.logo.pos);
+	if (gui.logo.draw)
+	{
+    	blend( images[iLogo].image, gui.screen.pixmap, gui.logo.pos);
+	}
 	
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
 
-void loadThemeValues(config_file_t *theme, bool overide)
+void setupDeviceList(config_file_t *theme)
+{
+	unsigned int pixel;
+	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
+	uint32_t color;			// color value formatted RRGGBB
+	int val, len;
+	const char *string;	
+
+	if(getIntForKey("devices_max_visible", &val, theme ))
+		gui.maxdevices = MIN( val, gDeviceCount );
+
+	if(getIntForKey("devices_iconspacing", &val, theme ))
+		gui.devicelist.iconspacing = val;
+
+	// check layout for horizontal or vertical
+	gui.layout = HorizontalLayout;
+	if(getValueForKey( "devices_layout", &string, &len, theme)) {
+		if (!strcmp (string, "vertical")) {
+			gui.layout = VerticalLayout;
+		}
+	}
+
+	switch (gui.layout) {
+	case VerticalLayout:
+		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
+		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
+
+		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
+			gui.devicelist.pos.x = pixel;
+
+		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
+			gui.devicelist.pos.y = pixel;
+		break;
+		
+	case HorizontalLayout:
+	default:
+		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
+		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
+
+		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
+			gui.devicelist.pos.x = pixel;
+		else
+			gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
+		
+		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
+			gui.devicelist.pos.y = pixel;
+		else
+			gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
+		break;
+	}
+
+	if(getColorForKey("devices_bgcolor", &color, theme))
+		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
+
+	if(getIntForKey("devices_transparency", &alpha, theme))
+		gui.devicelist.bgcolor = gui.devicelist.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
+
+	if (gui.devicelist.pixmap)
+	{
+	    freeWindowBuffer(&gui.devicelist);
+        createWindowBuffer(&gui.devicelist);
+    }
+}
+
+void loadThemeValues(config_file_t *theme)
 {
 	unsigned int screen_width  = gui.screen.width;
 	unsigned int screen_height = gui.screen.height;
 	unsigned int pixel;
 	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
 	uint32_t color;			// color value formatted RRGGBB
-	int val, len;
-	const char *string;	
+	int val;
 
 	/*
 	 * Parse screen parameters
@@ -502,57 +580,10 @@ void loadThemeValues(config_file_t *theme, bool overide)
 	if(getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.countdown.pos.y = pixel;
 
-	/*
+    /*
 	 * Parse devicelist parameters
 	 */
-	if(getIntForKey("devices_max_visible", &val, theme ))
-		gui.maxdevices = MIN( val, gDeviceCount );
-
-	if(getIntForKey("devices_iconspacing", &val, theme ))
-		gui.devicelist.iconspacing = val;
-
-	// check layout for horizontal or vertical
-	gui.layout = HorizontalLayout;
-	if(getValueForKey( "devices_layout", &string, &len, theme)) {
-		if (!strcmp (string, "vertical")) {
-			gui.layout = VerticalLayout;
-		}
-	}
-
-	switch (gui.layout) {
-	case VerticalLayout:
-		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
-		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
-			gui.devicelist.pos.x = pixel;
-
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
-			gui.devicelist.pos.y = pixel;
-		break;
-		
-	case HorizontalLayout:
-	default:
-		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
-		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
-			gui.devicelist.pos.x = pixel;
-		else
-			gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
-		
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
-			gui.devicelist.pos.y = pixel;
-		else
-			gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
-		break;
-	}
-
-	if(getColorForKey("devices_bgcolor", &color, theme))
-		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
-
-	if(getIntForKey("devices_transparency", &alpha, theme))
-		gui.devicelist.bgcolor = gui.devicelist.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
+	setupDeviceList(theme);
 
 	/*
 	 * Parse infobox parameters
@@ -689,7 +720,7 @@ int initGUI(void)
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
-		loadThemeValues(&bootInfo->themeConfig, true);
+		loadThemeValues(&bootInfo->themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
 
@@ -699,7 +730,8 @@ int initGUI(void)
 				if (createWindowBuffer(&gui.devicelist) == 0) {
 					if (createWindowBuffer(&gui.bootprompt) == 0) {
 						if (createWindowBuffer(&gui.infobox) == 0) {
-							if (createWindowBuffer(&gui.menu) == 0) {							
+							if (createWindowBuffer(&gui.menu) == 0) {
+							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -754,8 +786,12 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		}
 	}
 	
-	// Use the next (device_*_o) image for the selected item.
-    if (isSelected) devicetype++;
+	// Draw the selection image and use the next (device_*_o) image for the selected item.
+    if (isSelected)
+	{
+		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
+		devicetype++;
+	}
 
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
@@ -827,8 +863,6 @@ void drawDeviceList (int start, int end, int selection)
 			if(gui.menu.draw)
 				drawInfoMenuItems();
 			 
-			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
-			
 #if DEBUG
             gui.debug.cursor = pos( 10, 100);
             dprintf( &gui.screen, "label     %s\n",   param->label );
@@ -1784,6 +1818,7 @@ void drawBootGraphics(void)
 	int pos;
 	int length;
 	const char *dummyVal;
+	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
 	uint16_t x, y; 
 	
@@ -1805,16 +1840,23 @@ void drawBootGraphics(void)
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
 
+    // Save current screen resolution.
+	oldScreenWidth = gui.screen.width;
+	oldScreenHeight = gui.screen.height;
+
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
 
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+    // Set graphics mode if the booter was in text mode or the screen resolution has changed.
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE
+		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
-	
+
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
 		drawCheckerBoard();
 	} else {

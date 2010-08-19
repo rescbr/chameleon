@@ -300,7 +300,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
     bool NTFSProbe(const void*);
     
     struct bootfile *boot;
-    void *buf = malloc(MAX_CLUSTER_SIZE);
+    void *buf = malloc(MAX_BLOCK_SIZE);
     if (!buf)
         return -1;
     
@@ -313,14 +313,17 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
     Seek(ih, 0);
     Read(ih, (long)buf, MAX_BLOCK_SIZE);
     
-    if(!NTFSProbe(buf))
+    boot = (struct bootfile *) buf;
+    
+    // Check for NTFS signature
+    if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 )
         return -1;
     
-    boot = (struct bootfile *) buf;
+    // Check for non-null volume serial number
     if(!boot->bf_volsn)
         return -1;
-       
-    return CreateUUIDString((uint8_t*)(&boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
+    
+    return CreateUUIDString((uint8_t*)&(boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
 }    
 
 bool NTFSProbe(const void * buffer)
@@ -335,5 +338,3 @@ bool NTFSProbe(const void * buffer)
 	
 	return result;
 }
-
-
