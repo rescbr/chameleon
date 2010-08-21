@@ -110,7 +110,7 @@ int getPciRootUID(void)
 		rootuid = 0; // ... default uid to 0.
 	}
 	else
-		printf("Found UID value on ACPI Table provided by user...\n");
+		verbose("Found UID value on ACPI Table provided by user...\n");
 out:
 	verbose("Using PCI-Root-UID value: %d\n", rootuid);
 out_out:

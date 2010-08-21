@@ -702,7 +702,7 @@ success_fd:
 	}
 	else
 	{
-		printf("No override config provided!\n");
+		verbose("No override config provided!\n");
 		ret = -1;
 	}
 	return ret;

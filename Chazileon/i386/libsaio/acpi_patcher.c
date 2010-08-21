@@ -130,7 +130,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 		fd = open(dirSpecDSDT,0);
 		if (fd >= 0) 
 		{
-			printf("ACPI file search cache hit: file found at %s\n", dirSpecDSDT);
+			verbose("ACPI file search cache hit: file found at %s\n", dirSpecDSDT);
 			goto success_fd;
 		}
 	}
