@@ -360,8 +360,8 @@ void common_boot(int biosdev)
         firstRun = false;
         if (status == -1) continue;
 
-		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
-		// Draw background, turn off any GUI elements and update VRAM.
+		//Azi: i'm now almost sure that here is the right place to do this! - test (gBootVolume == NULL)
+		// Turn off any GUI elements, draw background and update VRAM.
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
 			gui.devicelist.draw = false;
@@ -374,25 +374,25 @@ void common_boot(int biosdev)
 		}
 		 
         status = processBootOptions();
-        // Status==1 means to chainboot
-        if ( status ==  1 ) break;
-        // Status==-1 means that the config file couldn't be loaded or that gBootVolume is NULL
-        if ( status == -1 )
-        {
-          // gBootVolume == NULL usually means the user hit escape.
-          if(gBootVolume == NULL)
-          {
-            freeFilteredBVChain(bvChain);
-
-            if (gEnableCDROMRescan)
-              rescanBIOSDevice(gBIOSDev);
-              
-            bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
-            setBootGlobals(bvChain);
-			setupDeviceList(&bootInfo->themeConfig);
-          }
-          continue;
-        }
+		// Status == 1 means to chainboot
+		if ( status ==	1 ) break;
+		// Status == -1 means that gBootVolume is NULL. Config file is not mandatory anymore! 
+		if ( status == -1 )
+		{
+			// gBootVolume == NULL usually means the user hit escape.
+			if (gBootVolume == NULL)
+			{
+				freeFilteredBVChain(bvChain);
+				
+				if (gEnableCDROMRescan)
+					rescanBIOSDevice(gBIOSDev);
+				
+				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+				setBootGlobals(bvChain);
+				setupDeviceList(&bootInfo->themeConfig);
+			}
+			continue;
+		}
 		
         // Other status (e.g. 0) means that we should proceed with boot.
 
