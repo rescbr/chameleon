@@ -348,9 +348,6 @@ void common_boot(int biosdev)
         bool tryresumedefault;
         bool forceresume;
 
-        config_file_t    systemVersion;	// system.plist of booting partition
-		char			 osxVersion[8]; // replaces gMacOSVersion here, for now.
-
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
 		
@@ -398,19 +395,6 @@ void common_boot(int biosdev)
         }
 		
         // Other status (e.g. 0) means that we should proceed with boot.
-        // Found and loaded a config file. Proceed with boot.
-		
-		//Azi: still calling this here. The call on processBootOptions() gets hidden from verbose and
-		// for some reason gMacOSVersion doesn't get initialized on boot.c like on the others. Later...
-		// Find out which version mac os we're booting.
-		if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion)) {
-			if (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {	
-				// getValueForKey uses const char for val
-				// so copy it and trim
-				strncpy(osxVersion, val, MIN(len, 4));
-				osxVersion[MIN(len, 4)] = '\0';
-			}
-		}
 
 		// If cpu doesn't handle 64 bit instructions,...
 		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
@@ -497,7 +481,7 @@ void common_boot(int biosdev)
                     (gMKextName[0] == '\0') &&
                     (gBootKernelCacheFile[0] != '\0'));
 
-		verbose("Loading Darwin %s\n", osxVersion);
+		verbose("Loading Darwin %s\n", gMacOSVersion);
 		
         if (trycache) do {
       

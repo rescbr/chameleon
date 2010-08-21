@@ -654,7 +654,6 @@ int loadOverrideConfig(config_file_t *config)
 	const char	*override_pathname = NULL;
 	const char	*filename = "com.apple.Boot.plist";
 	int			 count, ret, fd, len = 0;
-	extern char  gMacOSVersion;
 	
 	// Take in account user overriding the override :P
 	if (getValueForKey(kTestConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
