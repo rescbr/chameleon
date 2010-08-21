@@ -410,7 +410,7 @@ void common_boot(int biosdev)
 		firstRun = false;
 		if ( status == -1 ) continue;
 		
-		//Azi: doing this earlier to get the verbose from loadOverrideConfig.
+		//Azi: i'm now almost sure that here is the right place to do this! - test (gBootVolume == NULL)
 		// Turn off any GUI elements, draw background and update VRAM.
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
@@ -424,11 +424,11 @@ void common_boot(int biosdev)
 		}
 		
 //Azi:autoresolution begin
-		/*
-		 * AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
-		 *					or EDID Info was insane
-		 */ 
-		 getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+		
+		//
+		//AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
+		//					or EDID Info was insane
+		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
 		
 		//Restore the vbios for Cancelation
 		if ((gAutoResolution == false) && map)
@@ -467,20 +467,19 @@ void common_boot(int biosdev)
 			{
 				patchVbios(map, params[0], params[1], params[2], 0, 0);
 			}
-			closeVbios(map); // doesn't print to screen from here
+			closeVbios(map);
 		}
+		
 //Azi:autoresolution end
 		
 		status = processBootOptions();
-		
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;
-		
-		// Status == -1 means that gBootVolume is NULL - Azi: little edit to reflect current status.
+		// Status == -1 means that gBootVolume is NULL. Config file is not mandatory anymore! 
 		if ( status == -1 )
 		{
 			// gBootVolume == NULL usually means the user hit escape.
-			if (gBootVolume == NULL) //Azi: hitting escape makes me boot when "at" boot prompt.
+			if (gBootVolume == NULL)
 			{
 				freeFilteredBVChain(bvChain);
 				
@@ -489,7 +488,7 @@ void common_boot(int biosdev)
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
-				setupDeviceList(&bootInfo->themeConfig); //Azi: check this - position test!!!
+				setupDeviceList(&bootInfo->themeConfig);
 			}
 			continue;
 		}
