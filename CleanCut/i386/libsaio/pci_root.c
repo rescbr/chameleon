@@ -90,7 +90,7 @@ int getPciRootUID(void)
 	if (rootuid == 11) rootuid=0; //usually when _UID isnt present, it means uid is zero
 	else if (rootuid < 0 || rootuid > 9) 
 	{
-		printf("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
+		verbose("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
 		rootuid = 0;
 	}
 out:

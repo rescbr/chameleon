@@ -431,7 +431,7 @@ static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *
 	if (!device || !ati_dev) {
 		return 0;
 	}
-	printf("dumping pci config space, 256 bytes\n");
+	verbose("dumping pci config space, 256 bytes\n");
 	config_space = malloc(256);
 	for (i=0; i<=255; i++) {
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
@@ -744,7 +744,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 
 	if (bios[0] == 0x55 && bios[1] == 0xaa) {
-		printf("Found bios image\n");
+		verbose("Found bios image\n");
 		bios_size = bios[2] * 512;
 
 		struct  pci_rom_pci_header_t *rom_pci_header;

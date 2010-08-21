@@ -1176,8 +1176,8 @@ processBootOptions()
     else
       return -1;
 	
-	// Needed to enable search for override Boot.plist on OS specific folders
-	// from loadOverrideConfig(). Find out which version mac os we're booting.
+	// Needed here to enable search for override Boot.plist on OS specific folders.
+	// Find out which Mac OS version we're booting.
 	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		if (getValueForKey(kProductVersion, &value, &len, &systemVersion))
@@ -1187,7 +1187,7 @@ processBootOptions()
 			strncpy(gMacOSVersion, value, MIN(len, 4));
 			gMacOSVersion[MIN(len, 4)] = '\0';
 		}
-	} // doesn't print to screen here!
+	}
 	
 	//Azi: implemented at loadOverrideConfig.
     // Load config table specified by the user, or use the default.
