@@ -101,6 +101,7 @@
  */
 #define kVerboseModeFlag	"-v"				// options.c
 #define kSafeModeFlag		"-x"				// options.c
+#define kIgnoreCachesFlag	"-f"				// options.c
 #define kIgnoreBootFileFlag	"-F"				// options.c
 #define kSingleUserModeFlag	"-s"				// options.c
 #define kArchI386Flag		"32"				// boot.c
