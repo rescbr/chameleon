@@ -177,6 +177,7 @@ Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's 
 //----------
 #define kVerboseModeFlag		"-v"				// * options.c, getValFK
 #define kSafeModeFlag			"-x"				// * options.c, getValueFBK (5) & getValFK
+#define kIgnoreCachesFlag		"-f"				// * options.c, getValFK
 #define kSingleUserModeFlag		"-s"				// * options.c, getValFK
 #define kIgnoreBootFileFlag		"-F"				// * options.c, getValFBK
 // Can't remember if i ever tried -F; had an idea.. make this point to kTestConfigKey,

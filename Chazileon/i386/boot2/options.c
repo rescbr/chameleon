@@ -188,9 +188,19 @@ static void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
-	
+
 	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 		clearGraphicBootPrompt();
+	}
+}
+
+static void addBootArg(const char * argStr)
+{
+	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
+	{
+		*gBootArgsPtr++ = ' ';
+		strcat(gBootArgs, argStr);
+		gBootArgsPtr += strlen(argStr);
 	}
 }
 
@@ -440,22 +450,19 @@ static int updateMenu( int key, void ** paramPtr )
 					case BOOT_VERBOSE:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'v';
+						addBootArg(kVerboseModeFlag);
 						break;
 						
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'x';
+						addBootArg(kIgnoreCachesFlag);
 						break;
 						
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 's';
+						addBootArg(kSingleUserModeFlag);
 						break;
 				}
 				
@@ -695,11 +702,13 @@ int getBootOptions(bool firstRun)
 	}
 
 	// ensure we're in graphics mode if gui is setup
-	if (gui.initialised) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			setVideoMode(GRAPHICS_MODE, 0);
-		}
+	if (gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
+		setVideoMode(GRAPHICS_MODE, 0);
 	}
+
+	// Clear command line boot arguments
+	clearBootArgs();
 
 	// Allow user to override default timeout.
 	if (multiboot_timeout_set) {
@@ -730,32 +739,27 @@ int getBootOptions(bool firstRun)
 		gBootMode |= kBootModeSafe; //Azi: Mek has this commented out.
 	}
 
-	// If user typed F8, abort quiet mode, and display the menu.
-	{
-		bool f8press = false, spress = false, vpress = false;
-		int key;
-		while (readKeyboardStatus()) {
-			key = bgetc ();
-			if (key == 0x4200) f8press = true;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
-		}
-		if (f8press) {
-			gBootMode &= ~kBootModeQuiet;
-			timeout = 0;
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 's';
-		}	
+	// Checking user pressed keys
+	bool f8press = false, spress = false, vpress = false;
+	while (readKeyboardStatus()) {
+		key = bgetc ();
+		if (key == 0x4200) f8press = true;
+		if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
+		if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
 	}
-	clearBootArgs();
+	// If user typed F8, abort quiet mode, and display the menu.
+	if (f8press) {
+		gBootMode &= ~kBootModeQuiet;
+		timeout = 0;
+	}
+	// If user typed 'v' or 'V', boot in verbose mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && vpress) {
+		addBootArg(kVerboseModeFlag);
+	}
+	// If user typed 's' or 'S', boot in single user mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && spress) {
+		addBootArg(kSingleUserModeFlag);
+	}
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);
@@ -1455,6 +1459,10 @@ processBootOptions()
 		
 		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
+
+        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
+            gBootMode = kBootModeSafe;
+       }
 	}
 
 	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
