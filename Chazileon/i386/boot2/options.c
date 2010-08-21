@@ -30,7 +30,7 @@
 #include "gui.h"
 #include "pci.h"
 #include "ramdisk.h"
-#include "sl.h" //Azi:sysversion
+#include "sl.h"
 
 #include "autoresolution.h" //Azi:autoresolution - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 
@@ -44,7 +44,7 @@ extern BVRef    bvChain;
 //extern int		menucount;
 
 extern int		gDeviceCount;
-char			gMacOSVersion[8]; //Azi:sysversion
+char			gMacOSVersion[8];
 
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
@@ -1263,8 +1263,8 @@ processBootOptions()
     const char *     cp  = gBootArgs;
     const char *     val = 0;
     const char *     kernel;
-	const char		*value; //Azi:sysversion
-	int				 len; //Azi:sysversion
+	const char		*value;
+	int				 len;
     int              cnt;
 	int		     userCnt;
     int              cntRemaining;
@@ -1273,7 +1273,7 @@ processBootOptions()
     bool             uuidSet = false;
     char *           configKernelFlags;
     char *           valueBuffer;
-	config_file_t	 systemVersion;		//Azi:sysversion - system.plist of booting partition
+	config_file_t	 systemVersion;
 
     valueBuffer = malloc(VALUE_SIZE);
     

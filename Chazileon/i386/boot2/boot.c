@@ -71,7 +71,6 @@ static char gCacheNameAdler[64 + 256];
 //char *gPlatformName = gCacheNameAdler; disabled
 char gRootDevice[512];
 char gMKextName[512];
-//char gMacOSVersion[8]; //Azi:sysversion - TODO: check why doesn't work here.
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
 
@@ -399,9 +398,6 @@ void common_boot(int biosdev)
 		long		flags, cachetime, kerneltime, exttime, sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
 		
-		config_file_t	 systemVersion;		// system.plist of booting partition - Azi:sysversion
-		char			 osxVersion[8]; // replaces gMacOSVersion here, for now.
-		
 		// additional variable for testing alternate kernel image locations on boot helper partitions.
 		char		bootFileSpec[512]; //Azi:HelperConfig - kernel
 		
@@ -499,20 +495,6 @@ void common_boot(int biosdev)
 		}
 		
 		// Other status (e.g. 0) means that we should proceed with boot.
-		
-//Azi:autoresolution old - testing
-		
-		//Azi: still calling this here. The call on processBootOptions() gets hidden from verbose and
-		// for some reason gMacOSVersion doesn't get initialized on boot.c like on the others. Later...
-		// Find out which version mac os we're booting.
-		if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion)) {
-			if (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {	
-				// getValueForKey uses const char for val
-				// so copy it and trim
-				strncpy(osxVersion, val, MIN(len, 4));
-				osxVersion[MIN(len, 4)] = '\0';
-			}
-		}
 
 		// If cpu doesn't handle 64 bit instructions,...
 		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
@@ -609,7 +591,7 @@ void common_boot(int biosdev)
 					(gMKextName[0] == '\0') &&
 					(gBootKernelCacheFile[0] != '\0'));
 
-		verbose("Loading Darwin %s\n", osxVersion); //Azi:sysversion
+		verbose("Loading Darwin %s\n", gMacOSVersion);
 		
 		if (trycache) do
 		{

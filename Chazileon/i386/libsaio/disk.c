@@ -1429,7 +1429,7 @@ static void scanFSLevelBVRSettings(BVRef chain) //Azi: check this stuff
     //
     if (bvr->flags & kBVFlagNativeBoot)
     {
-      sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no); //Azi:sysversion
+      sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
       strcpy(fileSpec, "SystemVersion.plist");
       ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 

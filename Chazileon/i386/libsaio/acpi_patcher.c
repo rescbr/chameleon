@@ -98,7 +98,6 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	static char	dirSpecDSDT[128] = "";
 	const char *override_pathname = NULL; // full path to a file.
 	int			len = 0, fd = 0;
-	extern char gMacOSVersion;
 	
 	// Take in account user overriding if it's DSDT only
 	if (strstr(filename, "DSDT") &&

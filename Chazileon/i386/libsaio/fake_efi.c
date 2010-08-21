@@ -630,7 +630,6 @@ static void setupSmbiosConfigFile(const char *filename)
 	char		dirSpecSMBIOS[128] = "";
 	const char *override_pathname = NULL;
 	int			len = 0, fd = 0;
-	extern char gMacOSVersion;
 	extern void scan_mem();
 	
 	// Take in account user overriding

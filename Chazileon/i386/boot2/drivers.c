@@ -164,7 +164,6 @@ long LoadDrivers( char * dirSpec )
 	char dirSpecExtra[128];
 	const char *override_pathfolder = NULL; // full path to a folder.
 	int			fd = 0, len = 0;
-	extern char gMacOSVersion;
 	
 	if ( InitDriverSupport() != 0 )
 		return 0;

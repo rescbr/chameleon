@@ -201,6 +201,7 @@ extern char bootPrompt[];
 extern bool gOverrideKernel;
 //extern char *gPlatformName; disabled
 extern char gMKextName[];
+extern char gMacOSVersion[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
