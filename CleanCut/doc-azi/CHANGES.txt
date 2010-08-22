@@ -1,4 +1,128 @@
+Note: this text doesn't use the "most recent layout" of the main Chameleon CHANGES file.
+
+		---------------//---------------//---------------
+		
 - (rev )
 Change:
 
 Motif:
+
+		---------------//---------------//---------------
+
+- (rev 299)
+Change: added "hands off" setting of EFI32 values, for 32 bit only processors.
+		Works according to the architecture in use, either chosen by the booter or forced by user.
+  Note: on pre 10.6 systems, the default EFI values used for 64 bit processors while booting i386 arch
+		(normal arch on these systems) will still be EFI64, which causes absolutely no problem.
+		EFI32 values still can be forced by using the respective booter flag.
+		Tested only on Leopard.
+
+Motif:  fixes http://forge.voodooprojects.org/p/chameleon/issues/21/.
+
+		---------------//---------------//---------------
+
+- (rev 320)
+Change: using the original code i suggested to Mozodojo
+		(http://www.projectosx.com/forum/index.php?s=&showtopic=1337&view=findpost&p=8809)
+		for memory modules Part Number extraction.
+
+Motif:  If i don't do
+
+		if (isspace(sPart[i]))
+			break;
+		
+		i get extra characters that don't belong to the Part Number, according to CPU-Z or
+		Everest. This is consistent on the 2 brands of modules i own, Qimonda & Kingston
+		and others i saw on some user reports.
+		If someone wishes to test this, contact me and i'll cook a booter to help confirm
+		(or deny) this behavior.
+
+		---------------//---------------//---------------
+
+- (rev 321)
+Change: a change that got hidden on this commit; changed RestartFix from true to false, by default.
+
+Motif:  this goes against one of my "Guide Lines" for the booter! (check README on doc-azi).
+		It's absolutely not needed by all users! If someone proves me that this is needed by more
+		of 50% of the motherboards Chameleon will ever enconter, then i'll change it back to true ;)
+		There's a key for this and i'm not afraid to use it.
+
+		---------------//---------------//---------------
+
+- (rev 335)
+Change: merged the educational side of arch=i386 + the practical one of -x32, into a simple 32 flag.
+		Type just 32 to get you booted into i386 arch.
+
+  Note: only useful on 64 bit processors.
+
+Motif:  2 keys to do the same, should never had happen!
+		I really think that arch=i386 is a more "educational" designation, since what we're really
+		doing here is select an architecture to boot, but reading the Chameleon TODO "Integrate...
+		quick shortcut modified version of 18seven" and knowing that these shortcuts use the 3 + 2
+		key combination to select i386 arch, why not extend it to the prompt boot!?
+
+		---------------//---------------//---------------
+
+- (rev 335)
+Change: added -legacy kernel flag. This flag tells the booter to load i386 arch before is passed to
+		the kernel. This only needs to be done on Snow Leopard.
+		Type -legacy to get you booted into i386 arch, Legacy Mode.
+
+  Note: only useful on 64 bit processors.
+  Note: this is not really needed; typing "32 -legacy" (no quotes) does the trick. It's just handy!
+
+  Note: just out of curiosity and for those who don't know, Legacy Mode is in fact the mode used
+		by 32 bit "only" processors! Since the OS X kernel can handle 64 bit apps even on i386 arch,
+		64 bit processors need this flag to disable any handling of 64 bit instructions, when
+		"emulating" a full 32 bit environment.
+
+Motif:  this flag was not being passed on 10.6.x; the reason why is on the kernel code, Legacy Mode
+		is only available under i386 arch. So, while testing Meklort's kernel patcher,
+		i felt the need to add the key. Maybe i'll remove it later?!
+
+		---------------//---------------//---------------
+
+- (rev 335)
+Change: added 64 bit flag to keep company to the 32 one :)
+		Type just 64 to get you booted into x86_64 arch.
+
+Motif:  mainly to override 32 or -legacy if they are flagged on the Boot.plist.
+		Like -legacy, was born while testing kernel builds.
+
+		---------------//---------------//---------------
+
+- (rev 336)
+Change: removed 3 keys to handle PCI Root UID, two of them with exact same code (PCIRootUID & PciRoot).
+		Kept just the already existing PciRoot=X, plus the new code.
+
+Motif:  These many keys, should never had happened!
+		This came along when the Asere code was ported to Chameleon, but even on Asere's booter,
+		what's the need? None!
+		The only key in use on his booter is PCIRootUID. The rest is commented out.
+
+		---------------//---------------//---------------
+
+- (revs 337 --> 360)
+Change:  file loading related changes (search algo).
+				
+				This is were the fun stops :) to be continued...
+
+Motif:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

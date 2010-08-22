@@ -33,7 +33,17 @@ About the branch:
 	  everyone, like the AutoResolution i use on Ch. It's mean to be compared easily and keep the stuff
 	  i consider most useful to Chameleon "at hand". Stuff committed here will always come from Ch!
 
-  Any feedback is appreciated. I mean ANY! Good, bad, suggestion, opinion, etc...
+Guide Lines:
+
+  - simplify booter use as much as possible.
+  - make the code more understandable for learners.
+  - all files loaded by the booter stay confined to Extra folder.
+  - fixes that are not absolutely needed by all the users, should be disabled by default.
+  - a few more things that i can't remember right now.... etc etc etc...
+
+						---------------//---------------//---------------
+
+  Any feedback is highly appreciated. I mean ANY! Good, bad, suggestion, opinion, bug, issue, etc...
   About requests, keep in mind that my knowledge is limited!
   Think "baby steps" ;)
 
