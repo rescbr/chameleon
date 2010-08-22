@@ -114,7 +114,6 @@ art.h:
 	@echo "};" >> $(SYMROOT)/art.h
 
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
-	rm -rf $(SYMROOT)/embed ;\
 
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
