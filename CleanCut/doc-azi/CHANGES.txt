@@ -1,32 +1,37 @@
 Note: this text doesn't use the "most recent layout" of the main Chameleon CHANGES file.
+	  Also, not all the changes done on the code will end up here, for obvious reasons.
 
 		---------------//---------------//---------------
 		
 - (rev )
-Change:
+Change:				template
 
 Motif:
 
 		---------------//---------------//---------------
 
 - (rev 299)
-Change: added "hands off" setting of EFI32 values, for 32 bit only processors.
-		Works according to the architecture in use, either chosen by the booter or forced by user.
-  Note: on pre 10.6 systems, the default EFI values used for 64 bit processors while booting i386 arch
-		(normal arch on these systems) will still be EFI64, which causes absolutely no problem.
+Change: added "hands off" (without user intervention) setting of EFI32 values, for 32 bit only
+		processors. Works according to the architecture in use, either chosen by the booter or
+		forced by user.
+		
+  Note: on pre 10.6 systems, the default EFI values used for 64 bit processors while booting i386
+		arch (only arch on these systems), will still be EFI64, which causes absolutely no problem.
 		EFI32 values still can be forced by using the respective booter flag.
 		Tested only on Leopard.
+
+  Note: there's a typo on the comment of rev 299 commit;
+		RC3 should read RC4.
 
 Motif:  fixes http://forge.voodooprojects.org/p/chameleon/issues/21/.
 
 		---------------//---------------//---------------
 
 - (rev 320)
-Change: using the original code i suggested to Mozodojo
+Change: using the original code i suggested to Mozodojo, for memory modules Part Number extraction.
 		(http://www.projectosx.com/forum/index.php?s=&showtopic=1337&view=findpost&p=8809)
-		for memory modules Part Number extraction.
 
-Motif:  If i don't do
+Motif:  If i don't do:
 
 		if (isspace(sPart[i]))
 			break;
@@ -34,95 +39,223 @@ Motif:  If i don't do
 		i get extra characters that don't belong to the Part Number, according to CPU-Z or
 		Everest. This is consistent on the 2 brands of modules i own, Qimonda & Kingston
 		and others i saw on some user reports.
-		If someone wishes to test this, contact me and i'll cook a booter to help confirm
-		(or deny) this behavior.
+		If someone wishes to test this, contact me and i'll cook a booter to help debug
+		this behavior.
 
 		---------------//---------------//---------------
 
 - (rev 321)
-Change: a change that got hidden on this commit; changed RestartFix from true to false, by default.
+Change: a tweak that got hidden on this commit; changed RestartFix from true to false, by default.
 
-Motif:  this goes against one of my "Guide Lines" for the booter! (check README on doc-azi).
-		It's absolutely not needed by all users! If someone proves me that this is needed by more
-		of 50% of the motherboards Chameleon will ever enconter, then i'll change it back to true ;)
-		There's a key for this and i'm not afraid to use it.
+Motif:  this goes against at least one of my "Guidelines" for the booter!
+		(check README.txt). It's absolutely not needed by all users! If someone proves that this is
+		needed by more than 50% of the motherboards Chameleon needs to handle atm
+		(recommended OSx86 motherboards don't count), then i'll change it back to true.
 
 		---------------//---------------//---------------
 
 - (rev 335)
-Change: merged the educational side of arch=i386 + the practical one of -x32, into a simple 32 flag.
+Change: merged the educational side of arch=i386 + the practical one of -x32, into a simple 32
+		booter flag.
+		
 		Type just 32 to get you booted into i386 arch.
 
   Note: only useful on 64 bit processors.
+		32 bit only processors, will cause i386 arch to be loaded by default.
 
 Motif:  2 keys to do the same, should never had happen!
-		I really think that arch=i386 is a more "educational" designation, since what we're really
-		doing here is select an architecture to boot, but reading the Chameleon TODO "Integrate...
-		quick shortcut modified version of 18seven" and knowing that these shortcuts use the 3 + 2
-		key combination to select i386 arch, why not extend it to the prompt boot!?
+		I really think that arch=i386 is a more "educational" definition, since what we're really
+		doing here is select an architecture to boot, but while reading the Chameleon TODO
+		"Integrate... quick shortcut modified version of 18seven" and knowing that these shortcuts
+		use the 3 + 2 key combination to select i386 arch, i can't avoid to think,
+		why not extend it to the boot prompt now!?
 
 		---------------//---------------//---------------
 
 - (rev 335)
 Change: added -legacy kernel flag. This flag tells the booter to load i386 arch before is passed to
 		the kernel. This only needs to be done on Snow Leopard.
+		
 		Type -legacy to get you booted into i386 arch, Legacy Mode.
 
   Note: only useful on 64 bit processors.
-  Note: this is not really needed; typing "32 -legacy" (no quotes) does the trick. It's just handy!
+  Note: this flag is not really needed; typing "32 -legacy" (no "") does the trick. It's just handy!
 
   Note: just out of curiosity and for those who don't know, Legacy Mode is in fact the mode used
-		by 32 bit "only" processors! Since the OS X kernel can handle 64 bit apps even on i386 arch,
+		by 32 bit "only" processors! Since OS X kernel can handle 64 bit apps even on i386 arch,
 		64 bit processors need this flag to disable any handling of 64 bit instructions, when
-		"emulating" a full 32 bit environment.
+		"emulating a full" 32 bit environment.
 
-Motif:  this flag was not being passed on 10.6.x; the reason why is on the kernel code, Legacy Mode
-		is only available under i386 arch. So, while testing Meklort's kernel patcher,
-		i felt the need to add the key. Maybe i'll remove it later?!
+Motif:  this flag was not being passed on > 10.6; the reason why, is this mode is only available
+		under i386 arch. So, while testing Meklort's kernel patcher, i had this need to add the key.
 
 		---------------//---------------//---------------
 
 - (rev 335)
-Change: added 64 bit flag to keep company to the 32 one :)
-		Type just 64 to get you booted into x86_64 arch.
+Change: added 64 bit booter flag, to keep company to the 32 one :)
 
 Motif:  mainly to override 32 or -legacy if they are flagged on the Boot.plist.
-		Like -legacy, was born while testing kernel builds.
+		Like -legacy, was born while testing kernel builds and with the need to do the above.
 
 		---------------//---------------//---------------
 
 - (rev 336)
-Change: removed 3 keys to handle PCI Root UID, two of them with exact same code (PCIRootUID & PciRoot).
-		Kept just the already existing PciRoot=X, plus the new code.
+Change: removed 3 keys to handle PCI Root UID, two of them executing the exact same code
+		(PCIRootUID & PciRoot). Kept just the already existing PciRoot=<uid>, plus the new code.
+		
+		0 is still the default value, use the key to set any other.
 
-Motif:  These many keys, should never had happened!
+Motif:  these many keys, should never had happened!
 		This came along when the Asere code was ported to Chameleon, but even on Asere's booter,
-		what's the need? None!
-		The only key in use on his booter is PCIRootUID. The rest is commented out.
+		what's the point? Compatibility? None, it's seems!
+		The only key in use on Asere's booter is PCIRootUID. The others are commented out.
 
 		---------------//---------------//---------------
 
 - (revs 337 --> 360)
-Change:  file loading related changes (search algo).
+Changes: file loading related changes (search algo).
+
+		Change: added a key to disable "override" Boot.plist from overriding the values on the "default"
+				Boot.plist. Only the values overriding is disabled, not the file loading.
 				
-				This is were the fun stops :) to be continued...
+				CanOverride=n disables overriding of the default Boot.plist values.
+		
+		  Note: as far as i know, loading a override Boot.plist is not mandatory!
+				Please correct me if i'm wrong.
+		
+		Motif:  just in case ;)
+				I was totally unaware of this Boot.plist override for a long time; this messed with my mind
+				a lot of times! too many. So the first thing i did to the booter when i had the chance,
+				was make sure i had this under control.
+				The problem:
+				- first path checked: rd(0,0)/Extra/com.apple.Boot.plist
+				  nice, override Boot.plist can be loaded from a ramdisk.
+				- second path: /Extra/com.apple.Boot.plist (the plist on Selected volume)
+				  great, if we have the booter installed on a usb stick, that by the way it's the
+				  main device used these days to hold a rescue booter, the Boot.plist on it will be
+				  ignored (unlike one on a ramdisk) and the one on Selected volume loaded.
+				- and there's no way to override it (config=<file> is not working).
+				This can cause all sorts of anxiety and panic attacks, if you are unaware of this
+				like many people are.
+		
+		  Note: This key it's not mentioned on BootHelp.txt on purpose, since it's not needed
+				with my actual booter configuration.
+		
+				---------------//---------------//---------------
 
-Motif:
+				
+				Man paused for dinner while reviewing work :P uff... were is my beer??
+				::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+				
+				
+		Change: added a key to allow overriding the default paths to load Extra extensions.
+				kext=/path-to-folder/ loads drivers from an alternate folder.
+				
+				e.g. kext=/Extra/test
+		
+		  Note: with the introduction of this key, all main files can now be overrided by the user.
+				Well, not all yet.. keep reading ;)
+		
+		  Note: there's a typo on the comment of rev 337 commit;
+				Extensions=/path-to-folder/ should be read like kext=/path-to-folder/.
+		
+		Motif:  there was no key to do this. (read next)
+		
+				---------------//---------------//---------------
+
+		Change: added a "new" search algo, to load Extra extensions.
+				Pros:
+				- "hands off" search of all main files. If you don't want a certain file to be loaded,
+				  just don't place it on a default searched path (as usual) or override it with key.
+				  First file found, is the one loaded (also as usual).
+				  Check FileLoad.txt for info on searched paths.
+				- easy to configure with other paths.
+				- easy add to another file load functions.
+				- no ambiguous paths!! It's bt(0,0) or nothing! (yeah, i'll explain this else were).
+				- consistency.
+				
+				Cons:
+				- none that i can test, so far. The only booter install configuration that i can't
+				  really test is RAID.
+		
+		Motif:  after adding the kext= key, i still couldn't override the Extra extensions loaded from
+				the Selected volume, in case they were messed up and i needed to load another set from
+				else were. It happens that similarly as with override Boot.plist, /Extra/Extensions
+				(or /Extra/Extensions.mkext) is the first path to be checked on a HDD and worse,
+				there's no argument to limit the action; this path is ALWAYS checked and if files are
+				found they are loaded and will override any other files loaded from another path, like a
+				ramdisk (only path checked before /Extra/Extensions), making the recovery much more
+				complicated (not impossible).
+				So, according to at leas one of my guidelines (simplify booter use as much as possible),
+				changes to the code are/were needed.
+				This algo was initially a merge between the search algo found on search_and_get_acpi_fd()
+				(acpi_patcher.c), to load ACPI table and the one on LoadDrivers() (driver.c); also, the
+				/Extra/* path was still included. I tried a long time playing with the used arguments
+				(and others) to keep this path, as all i wanted was to give another priority to the file
+				loading, but there was always problems; a file that kept defaulting to the Booter volume
+				when i was trying to load it from Selected volume or the other way around.
+				So, as i always wanted to try taking advantage of Chameleon's ability to load files
+				from specific OS folders (e.g. /Extra/10.5), i gave it a try and here is the outcome.
+				
+		  Note: it doesn't make any sense taking advantage of this specific OS folders and still check
+				the Selected volume. Thus except for the obvious files like /kernel,
+				/System/Library/CoreServices/SystemVersion.plist, system caches, etc..., no other file is
+				loaded from Selected volume (paths started with / ).
+				To put it simple, as an example, when installed to a usb stick, this booter will not search
+				for any files on the Extra folder of the volume were the system is installed!
+				Or in other words, the booter will only check the Extra folder on the booter volume
+				(paths started with bt(0,0) ), the usb stick in this example.
+				Anyway, /Extra paths can still be passed with the use of override keys!
+
+				---------------//---------------//---------------
+		
+		Change: expanded this "new" search algo to dsdt.aml and smbios.plist.
+		
+		  Note: same override keys used.
+		
+		Motif:  check Guidelines.
+
+				---------------//---------------//---------------
+
+		Change: tweaked the loading of override Boot.plist (loadOverrideConfig(), stringTable.c) according
+				the new search algo guideline: everything loads from Booter volume.
+				The search for this file was also extended to specific OS folders, to "emulate" the search
+				on Selected volume. Also added a verbose message to signal when user doesn't provide a
+				override plist.
+
+		  Note: again, as far as i know, loading a override Boot.plist is not mandatory!
+
+		Motif:  payback for all the neurons i burned while i was not aware of override Boot.plist function!!
+				Not kidding :P
+
+				---------------//---------------//---------------
+
+		Change: reactivated config= key, included on loadOverrideConfig changes.
+				config=<file> loads override plist from specified path.
+		
+				e.g. config=/Extra/test.plist
+		
+		  Note: now all main files can be overrided by the user!
+		
+		Motif:  the key wasn't working anymore and it's useful.
+
+				---------------//---------------//---------------
+				
+Final note: there can be some inaccuracy on some of the mentioned facts. That's due to lack of time to test
+			all this stuff at all times; so, things can get fuzzy while trying to remember them.
+			And that's really what i'm trying to do, as i stupidly lost all the documentation i had ready to
+			add to the forge. Anyway, it's not coming out that bad so...F
+			Like i mention on the README.txt, any feedback is appreciated; if you read any bs, please return
+			it to me and i'll correct it.
+			
+			Thanks :)
+			
+			Don't forget to check FileLoad.txt for detailed info on file loading search paths
+
+		---------------//---------------//---------------
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Azimutz
 
 

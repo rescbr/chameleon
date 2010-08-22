@@ -1,10 +1,12 @@
 About me:
 
   Just the average curious guy, that likes to know a bit of this and that.
-  I'm not a skilled coder or even a developer, nor i pretend to be! Just trying to learn,
-  share my opinion (as noob as it may be) and give back some help, within my skills,
-  knowledge and available time.
-  So bare with me :) i'll remember to do the same with you.
+  I'm not a skilled coder or even a developer, nor i pretend to be! Most of what i'm doing here
+  is simply tweaking code that already exists, though lack of knowledge is not the only reason
+  for this behavior.
+  Just trying to learn, share my opinion (as noob as it may be) and give back some help,
+  within my skills, knowledge and available time.
+  So bare with me :) i'll remember to do the same with you when the time comes.
 
   Thanks. 
   Azi
@@ -33,13 +35,18 @@ About the branch:
 	  everyone, like the AutoResolution i use on Ch. It's mean to be compared easily and keep the stuff
 	  i consider most useful to Chameleon "at hand". Stuff committed here will always come from Ch!
 
-Guide Lines:
+Guidelines:
 
+  - learn and spread the knowledge.
   - simplify booter use as much as possible.
-  - make the code more understandable for learners.
+  - make the code more understandable for Sorcerer's Apprentice like my self.
   - all files loaded by the booter stay confined to Extra folder.
-  - fixes that are not absolutely needed by all the users, should be disabled by default.
-  - a few more things that i can't remember right now.... etc etc etc...
+  - fixes that are not absolutely needed by all users, should be disabled by default.
+  - help improving Chameleon documentation.
+  - help testing and integrating new useful code to Chameleon.
+  - help applying Coding Standards.
+  - no absolute priority to Selected volume.
+  - emulating a Mac it's not a priority!!!
 
 						---------------//---------------//---------------
 
@@ -54,3 +61,8 @@ Guide Lines:
 
 (*) http://forge.voodooprojects.org/
     http://forum.voodooprojects.org/
+
+
+Azimutz
+
+
