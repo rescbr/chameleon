@@ -1,0 +1,38 @@
+- file name
+- default name
+- default path
+- user override
+
+boot.plist
+
+override boot.plist
+
+
+
+
+
+
+Just a note on ramdisks: when a rd is aliased as bt(0,0), all paths started by bt(0,0) (booter volume)
+will point to the rd and not to the volume were the booter is installed; meaning that, with this algo
+that only uses bt(0,0) paths, when using a rd aliased as bt, the rd will be the only volume searched!!
+This makes rd's aliased as bt, ideal to load full sets of files, like when using pre-boot discs,
+were the files need to be all loaded from the ramdisk into memory.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Azimutz
+

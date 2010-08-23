@@ -2,13 +2,6 @@ Note: this text doesn't use the "most recent layout" of the main Chameleon CHANG
 	  Also, not all the changes done on the code will end up here, for obvious reasons.
 
 		---------------//---------------//---------------
-		
-- (rev )
-Change:				template
-
-Motif:
-
-		---------------//---------------//---------------
 
 - (rev 299)
 Change: added "hands off" (without user intervention) setting of EFI32 values, for 32 bit only
@@ -60,6 +53,8 @@ Change: merged the educational side of arch=i386 + the practical one of -x32, in
 		
 		Type just 32 to get you booted into i386 arch.
 
+  Note: -x32 was removed from trunk on rev 377.
+
   Note: only useful on 64 bit processors.
 		32 bit only processors, will cause i386 arch to be loaded by default.
 
@@ -74,11 +69,14 @@ Motif:  2 keys to do the same, should never had happen!
 
 - (rev 335)
 Change: added -legacy kernel flag. This flag tells the booter to load i386 arch before is passed to
-		the kernel. This only needs to be done on Snow Leopard.
+		the kernel. This procedure only needs to be done on Snow Leopard. -legacy tells the kernel
+		to disable "64 Bit Mode", which allows 64 bit processors to run 64 bit apps under i386
+		mach kernel.
 		
 		Type -legacy to get you booted into i386 arch, Legacy Mode.
 
   Note: only useful on 64 bit processors.
+
   Note: this flag is not really needed; typing "32 -legacy" (no "") does the trick. It's just handy!
 
   Note: just out of curiosity and for those who don't know, Legacy Mode is in fact the mode used
@@ -87,7 +85,7 @@ Change: added -legacy kernel flag. This flag tells the booter to load i386 arch 
 		"emulating a full" 32 bit environment.
 
 Motif:  this flag was not being passed on > 10.6; the reason why, is this mode is only available
-		under i386 arch. So, while testing Meklort's kernel patcher, i had this need to add the key.
+		under i386 arch. So, while testing Meklort's kernel patcher, i felt the need to add this key.
 
 		---------------//---------------//---------------
 
@@ -142,19 +140,14 @@ Changes: file loading related changes (search algo).
 				with my actual booter configuration.
 		
 				---------------//---------------//---------------
-
-				
-				Man paused for dinner while reviewing work :P uff... were is my beer??
-				::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-				
 				
 		Change: added a key to allow overriding the default paths to load Extra extensions.
 				kext=/path-to-folder/ loads drivers from an alternate folder.
 				
-				e.g. kext=/Extra/test
+				e.g. kext=/Extra/test/
 		
-		  Note: with the introduction of this key, all main files can now be overrided by the user.
-				Well, not all yet.. keep reading ;)
+		  Note: this key needs to point to a "folder" with kexts or Extensions.mkext,
+				thus always ends with / (slash).
 		
 		  Note: there's a typo on the comment of rev 337 commit;
 				Extensions=/path-to-folder/ should be read like kext=/path-to-folder/.
@@ -172,10 +165,10 @@ Changes: file loading related changes (search algo).
 				- easy to configure with other paths.
 				- easy add to another file load functions.
 				- no ambiguous paths!! It's bt(0,0) or nothing! (yeah, i'll explain this else were).
-				- consistency.
+				- consistency across all file loading.
 				
 				Cons:
-				- none that i can test, so far. The only booter install configuration that i can't
+				- none that i could test, so far. The only booter install configuration that i can't
 				  really test is RAID.
 		
 		Motif:  after adding the kext= key, i still couldn't override the Extra extensions loaded from
@@ -184,9 +177,9 @@ Changes: file loading related changes (search algo).
 				(or /Extra/Extensions.mkext) is the first path to be checked on a HDD and worse,
 				there's no argument to limit the action; this path is ALWAYS checked and if files are
 				found they are loaded and will override any other files loaded from another path, like a
-				ramdisk (only path checked before /Extra/Extensions), making the recovery much more
+				ramdisk (only path checked before /Extra/Extensions), making a recovery much more
 				complicated (not impossible).
-				So, according to at leas one of my guidelines (simplify booter use as much as possible),
+				So, according to at least one of my guidelines (simplify booter use as much as possible),
 				changes to the code are/were needed.
 				This algo was initially a merge between the search algo found on search_and_get_acpi_fd()
 				(acpi_patcher.c), to load ACPI table and the one on LoadDrivers() (driver.c); also, the
@@ -198,9 +191,8 @@ Changes: file loading related changes (search algo).
 				from specific OS folders (e.g. /Extra/10.5), i gave it a try and here is the outcome.
 				
 		  Note: it doesn't make any sense taking advantage of this specific OS folders and still check
-				the Selected volume. Thus except for the obvious files like /kernel,
-				/System/Library/CoreServices/SystemVersion.plist, system caches, etc..., no other file is
-				loaded from Selected volume (paths started with / ).
+				the Selected volume. Thus except for the obvious files like kernel, SystemVersion.plist,
+				system caches, etc..., no other file is loaded from Selected volume (paths started with / ).
 				To put it simple, as an example, when installed to a usb stick, this booter will not search
 				for any files on the Extra folder of the volume were the system is installed!
 				Or in other words, the booter will only check the Extra folder on the booter volume
@@ -235,22 +227,29 @@ Changes: file loading related changes (search algo).
 		
 				e.g. config=/Extra/test.plist
 		
-		  Note: now all main files can be overrided by the user!
+		  Note: with the introduction of this key, all main files can now be overrided by the user.
 		
 		Motif:  the key wasn't working anymore and it's useful.
 
 				---------------//---------------//---------------
-				
-Final note: there can be some inaccuracy on some of the mentioned facts. That's due to lack of time to test
-			all this stuff at all times; so, things can get fuzzy while trying to remember them.
-			And that's really what i'm trying to do, as i stupidly lost all the documentation i had ready to
-			add to the forge. Anyway, it's not coming out that bad so...F
-			Like i mention on the README.txt, any feedback is appreciated; if you read any bs, please return
-			it to me and i'll correct it.
-			
-			Thanks :)
 			
 			Don't forget to check FileLoad.txt for detailed info on file loading search paths
+
+		---------------//---------------//---------------
+
+- (rev 419)
+Change: started adding documentation, with the creation of a dedicated folder, doc-azi. It would get very
+		messy mixing these with main Chameleon documentation and as i want to keep things as clean as
+		possible on CleanCut, thought a separate folder would be better idea.
+
+Motif:  do i need to say? :) i thought so.
+
+		---------------//---------------//---------------
+		
+- (rev )
+Change:				template
+
+Motif:
 
 		---------------//---------------//---------------
 

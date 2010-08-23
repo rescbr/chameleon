@@ -1,5 +1,29 @@
+-
+- remove xcodeproj??
 - add documentation :)
 
 Done:
 
 Found issues:
+
+- no ambiguous paths.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Azimutz
+
+
