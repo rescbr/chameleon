@@ -269,46 +269,39 @@ char* strchr(const char *str, int c)
     return 0;
 }        
         
-
 char* strbreak(const char *str, char **next, long *len)
-{    
+{
     char *start = (char*)str, *end;
-    char *tmpNext;
+    bool quoted = false;
     
     if ( !start || !len )
         return 0;
+    
+    *len = 0;
     
     while ( isspace(*start) )
         start++;
     
     if (*start == '"')
     {
-        end = strchr(++start, '"');
+        start++;
+        
+        end = strchr(start, '"');
         if(end)
-        {         
-            *len = end - start;
-            tmpNext = end+1;
-        }
+            quoted = true;
         else
-        {
-            *len = strlen(start);
-            tmpNext = start + (*len) + 1;
-        }
+            end = strchr(start, '\0');
     }
     else
     {
-        for(end = start; *end; end++)
-        {
-            if(isspace(*end))
-                break;
-        }
-        
-        *len = end - start;
-        tmpNext = end;
+        for ( end = start; *end && !isspace(*end); end++ )
+        {}
     }
     
-    if(tmpNext)
-        *next = tmpNext;
+    *len = end - start;
+    
+    if(next)
+        *next = quoted ? end+1 : end;
     
     return start;
 }
