@@ -257,6 +257,62 @@ int strncasecmp(const char *s1, const char *s2, size_t len)
 }
 #endif
 
+char* strchr(const char *str, int c)
+{
+    do
+    {
+        if(*str == c)
+            return (char*)str;
+    }
+    while(*(str++));
+    
+    return 0;
+}        
+        
+
+char* strbreak(const char *str, char **next, long *len)
+{    
+    char *start = (char*)str, *end;
+    char *tmpNext;
+    
+    if ( !start || !len )
+        return 0;
+    
+    while ( isspace(*start) )
+        start++;
+    
+    if (*start == '"')
+    {
+        end = strchr(++start, '"');
+        if(end)
+        {         
+            *len = end - start;
+            tmpNext = end+1;
+        }
+        else
+        {
+            *len = strlen(start);
+            tmpNext = start + (*len) + 1;
+        }
+    }
+    else
+    {
+        for(end = start; *end; end++)
+        {
+            if(isspace(*end))
+                break;
+        }
+        
+        *len = end - start;
+        tmpNext = end;
+    }
+    
+    if(tmpNext)
+        *next = tmpNext;
+    
+    return start;
+}
+
 /* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
 uint8_t checksum8( void * start, unsigned int length )
 {

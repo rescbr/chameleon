@@ -297,8 +297,6 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 
 long NTFSGetUUID(CICell ih, char *uuidStr)
 {
-    bool NTFSProbe(const void*);
-    
     struct bootfile *boot;
     void *buf = malloc(MAX_BLOCK_SIZE);
     if ( !buf )
@@ -324,8 +322,10 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
         return -1;
     
     // Use UUID like the one you get on Windows
-    return sprintf(uuidStr, "%04X-%04X", (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
-                                         (unsigned short)boot->bf_volsn & 0xFFFF);
+    sprintf(uuidStr, "%04X-%04X", (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
+                                  (unsigned short)boot->bf_volsn & 0xFFFF);
+    
+    return 0;    
     
     // return CreateUUIDString((uint8_t*)&(boot->bf_volsn), sizeof(boot->bf_volsn), uuidStr);
 }    

@@ -827,13 +827,23 @@ BVRef selectBootVolume( BVRef chain )
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
 	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
-    if (val) {
-        for ( bvr = chain; bvr; bvr = bvr->next ) {
-            if (matchVolumeToString(bvr, val, false)) {
-                free(val);
-                return bvr;
+    if (val)
+    {
+        long len = 0;
+        char *vol = strbreak(val, 0, &len);
+        
+        if ( len )
+        {
+            for ( bvr = chain; bvr; bvr = bvr->next )
+            {
+                if ( (bvr->flags & (kBVFlagSystemVolume|kBVFlagForeignBoot)) && matchVolumeToString(bvr, vol, len) )
+                {
+                    free(val);
+                    return bvr;
+                }
             }
         }
+        
         free(val);
     }
 	
