@@ -247,6 +247,15 @@ Motif:  do i need to say? :) i thought so.
 		---------------//---------------//---------------
 		
 - (rev )
+Change: removed Chameleon.xcodeproj.
+
+Motif:  it's not up to date and i need time to update it properly, at least on Chazileon (Chazi).
+		Will reintroduce it later in the process. It's also giving me problems with the svn client
+		when i update it; need to check what i'm doing wrong!?
+
+		---------------//---------------//---------------
+		
+- (rev )
 Change:				template
 
 Motif:

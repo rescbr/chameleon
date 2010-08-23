@@ -1,12 +1,22 @@
--
-- remove xcodeproj??
-- add documentation :)
+- clean ramdisk.h #includes on Chazileon (Chazi).
+- test pre-boot again - "Turn off any GUI elements" doubt.
+
+
+---------------//---------------//---------------
 
 Done:
 
+- add documentation: work in progress... kind of, will always be :)
+- remove xcodeproj: reintroduce it later.
+
+---------------//---------------//---------------
+
 Found issues:
 
-- no ambiguous paths.
+
+---------------//---------------//---------------
+
+- no ambiguous paths?? - reminder
 
 
 
