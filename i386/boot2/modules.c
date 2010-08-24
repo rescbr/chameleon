@@ -8,7 +8,18 @@
 #include "multiboot.h"
 #include "modules.h"
 
+#ifndef DEBUG_MODULES
+#define DEBUG_MODULES 0
+#endif
 
+#if DEBUG_MODULES
+#define DBG(x...)	printf(x); getc()
+#else
+#define DBG(x...)
+#endif
+
+
+moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
@@ -29,17 +40,17 @@ int init_module_system()
 	if(load_module(SYMBOLS_MODULE))
 	{
 		lookup_symbol = (void*)lookup_all_symbols("_lookup_symbol");
+		
+		if((UInt32)lookup_symbol != 0xFFFFFFFF)
+		{
+			return 1;
+		}
+		
 	}
 	
-	if((UInt32)lookup_symbol == 0xFFFFFFFF)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
+	return 0;
 }
+
 
 /*
  * Load all modules in the /Extra/modules/ directory
@@ -58,10 +69,9 @@ void load_all_modules()
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
-		// TODO: verify ends in .dylib
-		if(strlen(name) > sizeof(".dylib"))
+		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
-			name[strlen(name) - sizeof(".dylib")] = 0;
+			name[strlen(name) - sizeof("dylib")] = 0;
 			load_module(name);
 		}
 	}
@@ -97,7 +107,7 @@ int load_module(const char* module)
 	{
 		void (*module_start)(void) = NULL;
 
-		printf("Module %s read in.\n", modString);
+		//printf("Module %s read in.\n", modString);
 
 		// Module loaded into memory, parse it
 		module_start = parse_mach(module_base);
@@ -105,15 +115,12 @@ int load_module(const char* module)
 		if(module_start)
 		{
 			(*module_start)();	// Start the module
-			printf("Module started\n");
+			DBG("Module %s.dylib Loaded.\n", module);
 		}
 		else {
-			printf("Unabel to locate module start\n");
+			printf("Unabel to start %s.dylib\n", module);
+			getc();
 		}
-
-		
-		getc();
-		
 		// TODO: Add module to loaded list if loaded successfuly
 		
 	}
@@ -124,6 +131,152 @@ int load_module(const char* module)
 	}
 	return 1;
 }
+
+
+/*
+ * register_hook( const char* name )
+ *		name - Name of the module Hook.
+ *			   NOTE: If the name already exists in the list, it'll
+ *			   still be added, however the entry will not be used, the first one
+ *			   will instead. That also means the the hook will most likely be
+ *			   called twice.
+ *
+ * Registers a hook with the module system, This allows modules to
+ * register a callback when the hook is executed.
+ */
+
+inline void register_hook(const char* name)
+{
+	moduleHook_t* hooks;
+	if(moduleCallbacks == NULL)
+	{
+		moduleCallbacks = malloc(sizeof(moduleHook_t));
+		moduleCallbacks->next = NULL;
+	}
+	
+	hooks = moduleCallbacks;
+	while(hooks->next != NULL)
+	{
+		hooks = hooks->next;
+	}
+	
+	
+	hooks->name = name;
+	hooks->callbacks = NULL;
+}
+
+
+/*
+ *	execute_hook(  const char* name )
+ *		name - Name of the module hook
+ *			If any callbacks have been registered for this hook
+ *			they will be executed now in the same order that the
+ *			hooks were added.
+ */
+int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	DBG("Attempting to execute hook '%s'\n", name);
+
+	if(moduleCallbacks != NULL)
+	{
+		moduleHook_t* hooks = moduleCallbacks;
+		
+		while(hooks != NULL && strcmp(name, hooks->name) != 0)
+		{
+			hooks = hooks->next;
+		}
+		
+		if(hooks != NULL)
+		{
+			// Loop through all callbacks for this module
+			callbackList_t* callbacks = hooks->callbacks;
+			
+			while(callbacks)
+			{
+				// Execute callback
+				callbacks->callback(arg1, arg2, arg3, arg4);
+				callbacks = callbacks->next;
+			}
+			DBG("Hook '%s' executed.\n", name);
+
+			return 1;
+		}
+		else
+		{
+			DBG("No callbacks for '%s' hook.\n", name);
+
+			// Callbaack for this module doesn't exist;
+			//verbose("Unable execute hook '%s', no callbacks registered.\n", name);
+			//pause();
+			return 0;
+		}
+
+
+	}	
+	DBG("No hooks have been registered.\n", name);
+	return 0;
+}
+
+
+
+/*
+ *	register_hook_callback(  const char* name,  void(*callback)())
+ *		name - Name of the module hook to attach to.
+ *		callbacks - The funciton pointer that will be called when the
+ *			hook is executed.
+ *			NOTE: the hooks take four void* arguments.
+ */
+/*
+ void register_hook_callback(const char* name,
+							void(*callback)(void*, void*, void*, void*),
+							)*/
+void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
+{
+	// Locate Module hook
+	if(moduleCallbacks == NULL)
+	{
+		register_hook(name);
+	}
+	volatile moduleHook_t* hooks = moduleCallbacks;
+	
+	while(hooks != NULL && strcmp(name, hooks->name) != 0)
+	{
+		hooks = hooks->next;
+	}
+	
+	if(hooks == NULL)
+	{
+		// Hook doesn't exist, add it.
+		register_hook(name);
+		
+		// This is just a pointer, the data was modified in the register_hook function.
+		hooks = hooks->next;
+	}
+	
+	// Module Hooks located
+	if(hooks->callbacks == NULL)
+	{
+		// Initialize hook list
+		hooks->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+		hooks->callbacks->callback = callback;
+		hooks->callbacks->next = NULL;
+	}
+	else
+	{
+		callbackList_t* callbacks = hooks->callbacks;
+		while(callbacks->next != NULL)
+		{
+			callbacks = callbacks->next;
+		}
+		// Add new entry to end of hook list.
+		callbacks->next = (callbackList_t*)malloc(sizeof(callbackList_t));
+		callbacks = callbacks->next;
+		callbacks->next = NULL;
+		callbacks->callback = callback;
+	}
+}
+
+
 
 /*
  * Parse through a macho module. The module will be rebased and binded
@@ -162,12 +315,14 @@ void* parse_mach(void* binary)
 	if(((struct mach_header*)binary)->magic != MH_MAGIC)
 	{
 		printf("Module is not 32bit\n");
+		getc();
 		return NULL;	// 32bit only
 	}
 	
 	if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	{
 		printf("Module is not a dylib. Unable to load.\n");
+		getc();
 		return NULL; // Module is in the incorrect format
 	}
 	
@@ -210,6 +365,7 @@ void* parse_mach(void* binary)
 								break;
 								
 							case S_LAZY_SYMBOL_POINTERS:
+								// NOTE: Theses currently are not handled.
 								//nonlazy = binary + section->offset;
 								//printf("%s S_LAZY_SYMBOL_POINTERS section, 0x%X\n", SECT_NON_LAZY_SYMBOL_PTR, nonlazy);
 								// Fucntions
@@ -275,7 +431,7 @@ void* parse_mach(void* binary)
 				break;
 				
 			default:
-				printf("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
+				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
 		
 		}
@@ -540,7 +696,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
 				libraryOrdinal = immediate;
-				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
+				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
@@ -553,14 +709,14 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
+				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
 
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
 				// NOTE: this is wrong, fortunately we don't use it
 				libraryOrdinal = -immediate;
-				//printf("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
+				//DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
 
 				break;
 				
@@ -568,7 +724,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				symboFlags = immediate;
 				symbolName = (char*)&bind_stream[++i];
 				i += strlen((char*)&bind_stream[i]);
-				//printf("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
+				//DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
 
 				symbolAddr = lookup_all_symbols(symbolName);
 
@@ -577,7 +733,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 			case BIND_OPCODE_SET_TYPE_IMM:
 				// Set bind type (pointer, absolute32, pcrel32)
 				type = immediate;
-				//printf("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
+				//DBG("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
 
 				break;
 				
@@ -593,7 +749,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 				if(!(bind_stream[i-1] & 0x40)) addend *= -1;
 				
-				//printf("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
+				//DBG("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
@@ -626,7 +782,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 				segmentAddress += tmp;
 				
-				//printf("BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB: 0x%X\n", segmentAddress);
+				//DBG("BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB: 0x%X\n", segmentAddress);
 				break;
 				
 			case BIND_OPCODE_ADD_ADDR_ULEB:
@@ -641,11 +797,11 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				segmentAddress += tmp;
-				//printf("BIND_OPCODE_ADD_ADDR_ULEB: 0x%X\n", segmentAddress);
+				//DBG("BIND_OPCODE_ADD_ADDR_ULEB: 0x%X\n", segmentAddress);
 				break;
 				
 			case BIND_OPCODE_DO_BIND:
-				//printf("BIND_OPCODE_DO_BIND\n");
+				//DBG("BIND_OPCODE_DO_BIND\n");
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
@@ -664,7 +820,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
-				//printf("BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB\n");
+				//DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB\n");
 				
 				
 				// Read in offset
@@ -698,7 +854,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
-				//printf("BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED\n");
+				//DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED\n");
 				
 				if(symbolAddr != 0xFFFFFFFF)
 				{
@@ -740,7 +896,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				
-				//printf("BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB 0x%X 0x%X\n", tmp, tmp2);
+				//DBG("BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB 0x%X 0x%X\n", tmp, tmp2);
 
 				
 				if(symbolAddr != 0xFFFFFFFF)
@@ -785,7 +941,7 @@ inline void rebase_location(UInt32* location, char* base)
 void add_symbol(char* symbol, void* addr)
 {
 	symbolList_t* entry;
-	//printf("Adding symbol %s at 0x%X\n", symbol, addr);
+	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
 	
 	if(!moduleSymbols)
 	{
@@ -818,7 +974,7 @@ void module_loaded(char* name, UInt32 version, UInt32 compat)
 {
 	moduleList_t* entry;
 	/*
-	printf("\%s.dylib Version %d.%d.%d loaded\n"
+	DBG("\%s.dylib Version %d.%d.%d loaded\n"
 		   "\tCompatibility Version: %d.%d.%d\n",
 		   name,
 		   (version >> 16) & 0xFFFF,
@@ -879,7 +1035,7 @@ unsigned int lookup_all_symbols(const char* name)
 		addr = lookup_symbol(name);
 		if(addr != 0xFFFFFFFF)
 		{
-			//printf("Internal symbol %s located at 0x%X\n", name, addr);
+			//DBG("Internal symbol %s located at 0x%X\n", name, addr);
 			return addr;
 		}
 	}
@@ -890,7 +1046,7 @@ unsigned int lookup_all_symbols(const char* name)
 	{
 		if(strcmp(entry->symbol, name) == 0)
 		{
-			//printf("External symbol %s located at 0x%X\n", name, entry->addr);
+			//DBG("External symbol %s located at 0x%X\n", name, entry->addr);
 			return entry->addr;
 		}
 		else
@@ -958,7 +1114,7 @@ int replace_function(const char* symbol, void* newAddress)
 	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
 	// TODO: look into using the next four bytes of the function instead
 	// Most functions should support this, as they probably will be at 
-	// least 10 bytes long, but you never know, this is sligtly saver as
+	// least 10 bytes long, but you never know, this is sligtly safer as
 	// function can be as small as 6 bytes.
 	UInt32 addr = lookup_all_symbols(symbol);
 	

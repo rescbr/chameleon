@@ -198,7 +198,10 @@ static int ExecKernel(void *binary)
     finalizeBootStruct();
     
 	usb_loop();
-    // Jump to kernel's entry point. There's no going back now.
+	
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+
+	// Jump to kernel's entry point. There's no going back now.
     startprog( kernelEntry, bootArgs );
 
     // Not reached
@@ -282,14 +285,16 @@ void common_boot(int biosdev)
         firstRun = false;
     }
 
-    // Loading preboot ramdisk if exists.
-    loadPrebootRAMDisk();
-
 	// Intialize module system
 	if(init_module_system())
 	{
 		load_all_modules();
 	}
+	
+	
+	
+    // Loading preboot ramdisk if exists.
+    loadPrebootRAMDisk();
 		
     // Disable rescan option by default
     gEnableCDROMRescan = false;
@@ -585,6 +590,8 @@ void common_boot(int biosdev)
             }
         } else {
             /* Won't return if successful. */
+			// Notify modules that ExecKernel is about to be called
+			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
             ret = ExecKernel(binary);
         }
     }

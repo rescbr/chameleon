@@ -23,7 +23,7 @@ TODO List for Chameleon Boot Loader
     to provide any other acpi table.
 
 - Add a new module capable of writing proprietary Chameleon data to ioreg:
-  Using the DT__xxx() API, we will creat e a set of functions to write
+  Using the DT__xxx() API, we will create a set of functions to write
   to log info, chameleon boot info to be retrieved by helper applications...
   the only public function for log info purpose of this module would be:
   logMessageToIOREG(...); // var args printf style format
