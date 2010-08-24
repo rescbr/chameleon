@@ -77,11 +77,14 @@ int load_module(const char* module);
 int is_module_laoded(const char* name);
 void module_loaded(char* name, UInt32 version, UInt32 compat);
 
-void add_symbol(char* symbol, void*  addr);
+void* add_symbol(char* symbol, void*  addr);
+
 void* parse_mach(void* binary);
 
-unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, UInt32 nonlazy);
-
+unsigned int handle_symtable(UInt32 base,
+							 struct symtab_command* symtabCommand,
+							 void*(*symbol_handler)(char*, void*));
+							 
 unsigned int lookup_all_symbols(const char* name);
 
 extern unsigned int (*lookup_symbol)(const char*);

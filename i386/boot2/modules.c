@@ -296,18 +296,12 @@ void* parse_mach(void* binary)
 	UInt32 moduleVersion = 0;
 	UInt32 moduleCompat = 0;
 	
-	char* symbolStub = NULL;
-	char* nonlazy = NULL;
-	//char* nonlazy_variables = NULL;
-
 	// TODO convert all of the structs to a union
 	struct load_command *loadCommand = NULL;
 	struct dylib_command* dylibCommand = NULL;
 	struct dyld_info_command* dyldInfoCommand = NULL;
 	struct symtab_command* symtabCommand = NULL;
-	struct segment_command* segmentCommand = NULL;
 	//struct dysymtab_command* dysymtabCommand = NULL;
-	struct section* section = NULL;
 	UInt32 binaryIndex = sizeof(struct mach_header);
 	UInt16 cmd = 0;
 
@@ -340,64 +334,9 @@ void* parse_mach(void* binary)
 				symtabCommand = binary + binaryIndex;
 				break;
 			case LC_SEGMENT:
-				segmentCommand = binary + binaryIndex;
-
-				UInt32 sections =  segmentCommand->nsects;
-				section = binary + binaryIndex + sizeof(struct segment_command);
-				
-				// Loop untill needed variables are found
-				while(!(nonlazy && symbolStub) && sections)	
-				{
-					// Look for some sections and save the addresses
-					if(strcmp(section->sectname, SECT_NON_LAZY_SYMBOL_PTR) == 0)
-					{
-						/*printf("\tSection non lazy pointers at 0x%X, %d symbols\n",
-							   section->offset, 
-							   section->size / 4);
-						*/
-						switch(section->flags)
-						{
-							case S_NON_LAZY_SYMBOL_POINTERS:
-								//printf("%s S_NON_LAZY_SYMBOL_POINTERS section\n", SECT_NON_LAZY_SYMBOL_PTR);
-
-								//nonlazy_variables = binary + section->offset;
-								nonlazy = binary + section->offset;
-								break;
-								
-							case S_LAZY_SYMBOL_POINTERS:
-								// NOTE: Theses currently are not handled.
-								//nonlazy = binary + section->offset;
-								//printf("%s S_LAZY_SYMBOL_POINTERS section, 0x%X\n", SECT_NON_LAZY_SYMBOL_PTR, nonlazy);
-								// Fucntions
-								break;
-								
-							default:
-								//printf("Unhandled %s section\n", SECT_NON_LAZY_SYMBOL_PTR);
-								//getc();
-								break;
-						}
-						//getc();
-					}
-					else if(strcmp(section->sectname, SECT_SYMBOL_STUBS) == 0)
-					{
-						symbolStub = binary + section->offset;
-					}
-					/*
-					else 
-					{
-						printf("Unhandled section %s\n", section->sectname);
-					}
-					*/
-					sections--;
-					section++;
-				}
-						  
-				
 				break;
 				
 			case LC_DYSYMTAB:
-				//dysymtabCommand = binary + binaryIndex;
-				//printf("Unhandled loadcommand LC_DYSYMTAB\n");
 				break;
 				
 			case LC_LOAD_DYLIB:
@@ -441,10 +380,10 @@ void* parse_mach(void* binary)
 	if(!moduleName) return NULL;
 		
 
-	// bind_macho uses the symbols added in for some reason...
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbolStub, (UInt32)nonlazy);
+	// bind_macho uses the symbols.
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, &add_symbol);
 
-	// REbase the module before binding it.
+	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
 		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
@@ -464,7 +403,7 @@ void* parse_mach(void* binary)
 	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off)
 	{
 		// NOTE: we are binding the lazy pointers as a module is laoded,
-		// This should be cahnged to bund when a symbol is referened at runtime.
+		// This should be changed to bind when a symbol is referened at runtime instead.
 		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
 	
@@ -937,8 +876,9 @@ inline void rebase_location(UInt32* location, char* base)
  * This function adds a symbol from a module to the list of known symbols 
  * possibly change to a pointer and add this to the Symbol module so that it can
  * adjust it's internal symbol list (sort) to optimize locating new symbols
+ * NOTE: returns the address if the symbol is "start", else returns 0xFFFFFFFF
  */
-void add_symbol(char* symbol, void* addr)
+void* add_symbol(char* symbol, void* addr)
 {
 	symbolList_t* entry;
 	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
@@ -963,6 +903,15 @@ void add_symbol(char* symbol, void* addr)
 	entry->next = NULL;
 	entry->addr = (unsigned int)addr;
 	entry->symbol = symbol;
+	
+	if(strcmp(symbol, "start") == 0)
+	{
+		return addr;
+	}
+	else
+	{
+		return (void*)0xFFFFFFFF;
+	}
 }
 
 
@@ -1068,7 +1017,7 @@ unsigned int lookup_all_symbols(const char* name)
  * Lookup any undefined symbols
  */
  
-unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, char* symbolStub, UInt32 nonlazy)
+unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, void*(*symbol_handler)(char*, void*))
 {
 	unsigned int module_start = 0xFFFFFFFF;
 	
@@ -1082,17 +1031,12 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
 		
 		// If the symbol is exported by this module
-		if(symbolEntry->n_value)
+		if(symbolEntry->n_value &&
+		   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (void*)base + symbolEntry->n_value) != (void*)0xFFFFFFFF)
 		{
-			if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
-			{
-				// Module start located. Start is an alias so don't register it
-				module_start = base + symbolEntry->n_value;
-			}
-			else
-			{
-				add_symbol(symbolString + symbolEntry->n_un.n_strx, (void*)base + symbolEntry->n_value); 
-			}
+		   
+			// Module start located. Start is an alias so don't register it
+			module_start = base + symbolEntry->n_value;
 		}
 		
 		symbolEntry+= sizeof(struct nlist);
