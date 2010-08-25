@@ -4,7 +4,7 @@ Note: this text doesn't use the "most recent layout" of the main Chameleon CHANG
 		---------------//---------------//---------------
 
 - (rev 299)
-Change: added "hands off" (without user intervention) setting of EFI32 values, for 32 bit only
+Change: added hands-off (without user intervention) setting of EFI32 values, for 32 bit only
 		processors. Works according to the architecture in use, either chosen by the booter or
 		forced by user.
 		
@@ -146,8 +146,8 @@ Changes: file loading related changes (search algo).
 				
 				e.g. kext=/Extra/test/
 		
-		  Note: this key needs to point to a "folder" with kexts or Extensions.mkext,
-				thus always ends with / (slash).
+		  Note: this key needs to point to a "folder" with either a Extensions sub folder or a
+				Extensions.mkext kext cache, thus always ends with / (slash).
 		
 		  Note: there's a typo on the comment of rev 337 commit;
 				Extensions=/path-to-folder/ should be read like kext=/path-to-folder/.
@@ -158,9 +158,9 @@ Changes: file loading related changes (search algo).
 
 		Change: added a "new" search algo, to load Extra extensions.
 				Pros:
-				- "hands off" search of all main files. If you don't want a certain file to be loaded,
+				- hands-off search of all main files. If you don't want a certain file to be loaded,
 				  just don't place it on a default searched path (as usual) or override it with key.
-				  First file found, is the one loaded (also as usual).
+				  First file found, is the one loaded.
 				  Check FileLoad.txt for info on searched paths.
 				- easy to configure with other paths.
 				- easy add to another file load functions.
@@ -233,7 +233,7 @@ Changes: file loading related changes (search algo).
 
 				---------------//---------------//---------------
 			
-			Don't forget to check FileLoad.txt for detailed info on file loading search paths
+	Don't forget to check FileLoad.txt/FileLoad-trunk.txt for detailed info on file loading search paths
 
 		---------------//---------------//---------------
 
@@ -246,7 +246,7 @@ Motif:  do i need to say? :) i thought so.
 
 		---------------//---------------//---------------
 		
-- (rev )
+- (rev 427)
 Change: removed Chameleon.xcodeproj.
 
 Motif:  it's not up to date and i need time to update it properly, at least on Chazileon (Chazi).

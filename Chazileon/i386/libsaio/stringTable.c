@@ -683,9 +683,9 @@ int loadOverrideConfig(config_file_t *config)
 	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 
 	// These i have no way to test, need advice.
-	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
-	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
-	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist)
+	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 
 success_fd:
 

@@ -200,7 +200,7 @@ long LoadDrivers( char * dirSpec )
 		
 		// Also no need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
 		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
-		// In this case the following two apply.
+		// In this case the following two will point to the ramdisk.
 		
 		// Check booter volume/rdbt Extra for specific OS files, on specific OS folders.
 		sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
