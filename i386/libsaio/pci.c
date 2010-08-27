@@ -134,6 +134,7 @@ void build_pci_dt(void)
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	enable_pci_devs();
 	scan_pci_bus(root_pci_dev, 0);
+
 #if DEBUG_PCI
 	dump_pci_dt(root_pci_dev->children);
 	pause();

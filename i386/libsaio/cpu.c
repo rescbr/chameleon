@@ -201,10 +201,10 @@ void scan_cpu(PlatformInfo_t *p)
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == 0x1a || p->CPU.Model == 0x1e
 			 || p->CPU.Model == 0x1f || p->CPU.Model == 0x25 || p->CPU.Model == 0x2c)) {
 				msr = rdmsr64(MSR_PLATFORM_INFO);
-				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
+				DBG("MSR_PLATFORM_INFO (0xCE): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				currcoef = (msr >> 8) & 0xff;
 				msr = rdmsr64(MSR_FLEX_RATIO);
-				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
+				DBG("MSR_FLEX_RATIO (0x194): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				if ((msr >> 16) & 0x01) {
 					flex_ratio = (msr >> 8) & 0xff;
 					if (currcoef > flex_ratio) {
@@ -218,7 +218,7 @@ void scan_cpu(PlatformInfo_t *p)
 				cpuFrequency = tscFrequency;
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
+				DBG("MSR_IA32_PERF_STATUS (0x198): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				currcoef = (msr >> 8) & 0x1f;
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = (msr >> 46) & 0x01;

@@ -12,13 +12,12 @@
 #include "efi_tables.h"
 #include "platform.h"
 #include "acpi_patcher.h"
-#include "smbios_patcher.h"
+#include "smbios.h"
 #include "device_inject.h"
 #include "convert.h"
 #include "pci.h"
 #include "sl.h"
 
-extern struct SMBEntryPoint * getSmbios(int which); // now cached
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -342,19 +341,12 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 /* Get the SystemID from the bios dmi info */
 static  EFI_CHAR8* getSmbiosUUID()
 {
-	struct SMBEntryPoint	*smbios;
-	SMBByte			*p;
-	int			i, isZero, isOnes;
-	static EFI_CHAR8        uuid[UUID_LEN];
+	SMBByte				*p;
+	int					i, isZero, isOnes;
+	static EFI_CHAR8	uuid[UUID_LEN];
 
-	smbios = getSmbios(SMBIOS_PATCHED);	/* checks for _SM_ anchor and table header checksum */
-	if (smbios==NULL) return 0; // getSmbios() return a non null value if smbios is found
-
-	p = (SMBByte*) FindFirstDmiTableOfType(1, 0x19); /* Type 1: (3.3.2) System Information */
+	p = (SMBByte*)Platform.UUID;
 	if (p==NULL) return NULL;
- 
-	verbose("Found SMBIOS System Information Table 1\n");
-	p += 8;
 
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) {
 		if (p[i] != 0x00) isZero = 0;
@@ -488,22 +480,21 @@ static void setupSmbiosConfigFile()
     // get a chance to scan mem dynamically if user asks for it while having the config options loaded as well
     // as opposed to when it was in scan_platform(), also load the orig. smbios so that we can access dmi info without
     // patching the smbios yet
-    getSmbios(SMBIOS_ORIGINAL);
+
     scan_mem(); 
-    smbios_p = (EFI_PTR32) getSmbios(SMBIOS_PATCHED);	// process smbios asap
 }
 
 /* Installs all the needed configuration table entries */
 static void setupEfiConfigurationTable()
 {
-  smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-  addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
+	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 
-  // Setup ACPI with DSDT overrides (mackerintel's patch)
-  setupAcpi();
+	// Setup ACPI with DSDT overrides (mackerintel's patch)
+	setupAcpi();
   
-  // We've obviously changed the count.. so fix up the CRC32
-  fixupEfiSystemTableCRC32(gST);
+	// We've obviously changed the count.. so fix up the CRC32
+	fixupEfiSystemTableCRC32(gST);
 }
 
 
@@ -512,16 +503,20 @@ void setupFakeEfi(void)
 {
 	// Generate efi device strings 
 	setup_pci_devs(root_pci_dev);
-	
+
+    readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
+
 	// load smbios.plist file if any
 	setupSmbiosConfigFile();
-	
+
+	setupSMBIOSTable();
+
 	// Initialize the base table
 	setupEfiTables();
-	
+
 	// Initialize the device tree
 	setupEfiDeviceTree();
-	
+
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
 }

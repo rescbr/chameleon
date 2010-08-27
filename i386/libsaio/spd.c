@@ -21,7 +21,7 @@
 #if DEBUG_SPD
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 static const char *spd_memory_types[] =
@@ -326,10 +326,10 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
-			if(DEBUG_SPD) {
+#if DEBUG_SPD
                   dumpPhysAddr("spd content: ",slot->spd, spd_size);
                     getc();
-            }
+#endif
         }
 
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
