@@ -471,7 +471,7 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	Platform.RAM.TRC = (mc_channel_bank_timing >> 9) & 0xF; 
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.CAS = (mc_channel_bank_timing >> 4) & 0x1F; 
+	Platform.RAM.RAS = (mc_channel_bank_timing >> 4) & 0x1F; 
 	
 	// RAS Active to precharge (tRAS)
 	Platform.RAM.TRP = mc_channel_bank_timing & 0xF;
