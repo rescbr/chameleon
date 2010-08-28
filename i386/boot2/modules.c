@@ -1007,6 +1007,7 @@ unsigned int lookup_all_symbols(const char* name)
 	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
 	{
 		printf("Unable to locate symbol %s\n", name);
+		getc();
 	}
 	return 0xFFFFFFFF;
 }
@@ -1019,6 +1020,9 @@ unsigned int lookup_all_symbols(const char* name)
  
 unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, void*(*symbol_handler)(char*, void*))
 {
+	// TODO: verify that the _TEXT,_text segment starts at the same locaiton in the file. If not
+	//			subtract the vmaddress and add the actual file address back on. (NOTE: if compiled properly, not needed)
+	
 	unsigned int module_start = 0xFFFFFFFF;
 	
 	UInt32 symbolIndex = 0;

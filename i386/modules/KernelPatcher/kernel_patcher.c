@@ -19,9 +19,10 @@ UInt32 textAddress = 0;
 
 void KernelPatcher_start()
 {
-	register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_ATOM);		// TODO: CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN
-	register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_UNKNOWN);	// 0, 0 
-	
+	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_ATOM);		// TODO: CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN
+	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_UNKNOWN);	// 0, 0 
+	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_32, CPUID_MODEL_UNKNOWN); 
+
 	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_32, CPUID_MODEL_ANY);
 	
 	register_kernel_patch(patch_lapic_init, KERNEL_32, CPUID_MODEL_ANY);
@@ -136,12 +137,7 @@ void register_kernel_symbol(int kernelType, const char* name)
 
 kernSymbols_t* lookup_kernel_symbol(const char* name)
 {
-	if(kernelSymbols == NULL)
-	{
-		return NULL;
-	}
 	kernSymbols_t *symbol = kernelSymbols;
-
 
 	while(symbol && strcmp(symbol->symbol, name) !=0)
 	{
@@ -162,24 +158,20 @@ kernSymbols_t* lookup_kernel_symbol(const char* name)
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 {
 	patchRoutine_t* entry = patches;
-	
-	printf("Patching kernel located at 0x%X\n", kernelData);
-	locate_symbols(kernelData);
-	printf("Symbols located\n", kernelData);
-	getc();
+
 	
 	int arch = determineKernelArchitecture(kernelData);
-	
-	// TODO:locate all symbols
+
+	locate_symbols(kernelData);
 	
 	
 	if(patches != NULL)
 	{
-		while(entry->next)
+		while(entry)
 		{
 			if(entry->validArchs == KERNEL_ANY || arch == entry->validArchs)
 			{
-				entry->patchRoutine(kernelData);
+				if(entry->patchRoutine) entry->patchRoutine(kernelData);
 			}
 			entry = entry->next;
 		}
@@ -283,9 +275,7 @@ int locate_symbols(void* kernelData)
 		}
 	}
 	
-	printf("Parseing symtabl.\n");
 	handle_symtable((UInt32)kernelData, symtableData, &symbol_handler);
-	getc();
 }
 
 void* symbol_handler(char* symbolName, void* addr)
@@ -296,8 +286,6 @@ void* symbol_handler(char* symbolName, void* addr)
 	
 	if(symbol)
 	{
-		printf("Located registered symbol %s at 0x%X\n", symbolName, addr);
-		getc();
 		symbol->addr = (UInt32)addr;
 	}
 	return (void*)0xFFFFFFFF;
@@ -308,33 +296,51 @@ void* symbol_handler(char* symbolName, void* addr)
  ** Locate the fisrt instance of _panic inside of _cpuid_set_info, and either remove it
  ** Or replace it so that the cpuid is set to a valid value.
  **/
-void patch_cpuid_set_info(void* kernelData/*, UInt32 impersonateFamily, UInt8 impersonateModel*/)
+void patch_cpuid_set_info_all(void* kernelData)
 {
-	printf("patch_cpuid_set_info\n");
-	getc();
-	UInt32 impersonateFamily = 0;
-	UInt8 impersonateModel = 0;
-	
+	switch(Platform.CPU.Model)
+	{
+		case CPUID_MODEL_ATOM:
+			patch_cpuid_set_info(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
+			break;
+			
+		default:
+			patch_cpuid_set_info(kernelData, 0, 0);
+			break;
+	}
+}
+
+void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
+{	
 	UInt8* bytes = (UInt8*)kernelData;
 	
 	kernSymbols_t *symbol = lookup_kernel_symbol("_cpuid_set_info");
-	UInt32 patchLocation = symbol ? symbol->addr : 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
+	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	
 	UInt32 jumpLocation = 0;
 	
-	symbol = lookup_kernel_symbol("_panic");
-	UInt32 panicAddr = symbol ? symbol->addr : 0; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
-	if(patchLocation == 0)
+	
+	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate _cpuid_set_info\n");
 		return;
 		
 	}
-	if(panicAddr == 0)
+
+	symbol = lookup_kernel_symbol("_panic");
+	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate _panic\n");
 		return;
 	}
+	
+	patchLocation -= (UInt32)kernelData;	// Remove offset
+	panicAddr -= (UInt32)kernelData;
+
+
+	
+	
 	
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
@@ -348,7 +354,6 @@ void patch_cpuid_set_info(void* kernelData/*, UInt32 impersonateFamily, UInt8 im
 		patchLocation++;
 	}
 	patchLocation--;
-	
 	
 	// Remove panic call, just in case the following patch routines fail
 	bytes[patchLocation + 0] = 0x90;
@@ -491,18 +496,20 @@ void patch_cpuid_set_info(void* kernelData/*, UInt32 impersonateFamily, UInt8 im
  **/
 void patch_pmCPUExitHaltToOff(void* kernelData)
 {
-	printf("patch_pmCPUExitHaltToOff\n");
-	getc();
 	UInt8* bytes = (UInt8*)kernelData;
 
 	kernSymbols_t *symbol = lookup_kernel_symbol("_PmCpuExitHaltToOff");
-	UInt32 patchLocation = symbol ? symbol->addr : 0; //(kernelSymbolAddresses[SYMBOL_PMCPUEXITHALTTOOFF] - textAddress + textSection);
-
-	if(patchLocation == 0)
+	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0;
+	
+	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate _pmCPUExitHaltToOff\n");
 		return;
 	}
+	
+	patchLocation -= (UInt32)kernelData;	// Remove offset
+	
+	
 	
 	while(bytes[patchLocation - 1]	!= 0xB8 ||
 		  bytes[patchLocation]		!= 0x04 ||	// KERN_INVALID_ARGUMENT (0x00000004)
@@ -518,31 +525,30 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 
 void patch_lapic_init(void* kernelData)
 {
-	printf("patch_lapic_init\n");
-	getc();
 
 	UInt8 panicIndex = 0;
 	UInt8* bytes = (UInt8*)kernelData;
+	
 	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_init");
-	UInt32 patchLocation = symbol ? symbol->addr : 0; 
-	
-	// (kernelSymbolAddresses[SYMBOL_LAPIC_INIT] - textAddress + textSection);
-	// kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
-	
-	symbol = lookup_kernel_symbol("_panic");
-	UInt32 panicAddr = symbol ? symbol->addr : 0; 
-
-	if(patchLocation == 0)
+	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; 
+	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate %s\n", "_lapic_init");
 		return;
 		
 	}
-	if(panicAddr == 0)
+	
+	symbol = lookup_kernel_symbol("_panic");
+	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; 
+	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate %s\n", "_panic");
 		return;
 	}
+	
+	patchLocation -= (UInt32)kernelData;	// Remove offset
+	panicAddr -= (UInt32)kernelData;	// Remove offset
+
 	
 	
 	
@@ -576,32 +582,29 @@ void patch_lapic_init(void* kernelData)
 
 void patch_commpage_stuff_routine(void* kernelData)
 {
-	printf("patch_commpage_stuff_routine\n");
-	getc();
-
 	UInt8* bytes = (UInt8*)kernelData;
+
 	kernSymbols_t *symbol = lookup_kernel_symbol("_commpage_stuff_routine");
-	UInt32 patchLocation = symbol ? symbol->addr : 0; 
-
-	
-	// (kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] - textAddress + textSection);
-	// kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
-	
-	symbol = lookup_kernel_symbol("_panic");
-	UInt32 panicAddr = symbol ? symbol->addr : 0; 
-
-	//if(kernelSymbolAddresses[SYMBOL_COMMPAGE_STUFF_ROUTINE] == 0)
+	if(symbol == 0 || symbol->addr == 0)
 	{
-		//	printf("Unable to locate %s\n", SYMBOL_COMMPAGE_STUFF_ROUTINE_STRING);
+		printf("Unable to locate %s\n", "_commpage_stuff_routine");
 		return;
 		
 	}
-	//if(kernelSymbolAddresses[SYMBOL_PANIC] == 0)
+	
+	UInt32 patchLocation = symbol->addr - textAddress + textSection; 
+
+	
+	symbol = lookup_kernel_symbol("_panic");
+	if(symbol == 0 || symbol->addr == 0)
 	{
-		//	printf("Unable to locate %s\n", SYMBOL_PANIC_STRING);
+		printf("Unable to locate %s\n", "_panic");
 		return;
 	}
-	
+	UInt32 panicAddr = symbol->addr - textAddress; 
+
+	patchLocation -= (UInt32)kernelData;
+	panicAddr -= (UInt32)kernelData;
 	
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
@@ -615,8 +618,7 @@ void patch_commpage_stuff_routine(void* kernelData)
 	}
 	patchLocation--;
 	
-	
-	// Remove panic call, just in case the following patch routines fail
+	// Replace panic with nops
 	bytes[patchLocation + 0] = 0x90;
 	bytes[patchLocation + 1] = 0x90;
 	bytes[patchLocation + 2] = 0x90;

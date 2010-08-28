@@ -56,7 +56,8 @@ int determineKernelArchitecture(void* kernelData);
 /*
  * Internal patches provided by this module.
  */
-void patch_cpuid_set_info(void* kernelData);
+void patch_cpuid_set_info_all(void* kernelData);
+void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel);
 void patch_pmCPUExitHaltToOff(void* kernelData);
 void patch_lapic_init(void* kernelData);
 void patch_commpage_stuff_routine(void* kernelData);
