@@ -10,6 +10,7 @@
 #include "pci.h"
 #include "platform.h"
 #include "spd.h"
+#include "cpu.h"
 #include "saio_internal.h"
 #include "bootstruct.h"
 #include "memvendors.h"
@@ -256,10 +257,10 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
     getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
     bool fullBanks =  // needed at least for laptops
-        Platform.DMI.MemoryModules ==  Platform.DMI.MaxMemorySlots;
-   // Search MAX_RAM_SLOTS slots
-	char spdbuf[256];
+		Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
+	char spdbuf[MAX_SPD_SIZE];
+    // Search MAX_RAM_SLOTS slots
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
@@ -334,7 +335,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
         Platform.DMI.DIMM[i]= 
-            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.MaxMemorySlots==2 ? 
+            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
             mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
         
 		slot->spd = NULL;

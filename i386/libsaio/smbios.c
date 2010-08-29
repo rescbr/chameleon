@@ -726,7 +726,9 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
 
 	int dimmnbr = 0;
-	Platform.DMI.MemoryModules = 0;
+	Platform.DMI.MaxMemorySlots	= 0;
+	Platform.DMI.CntMemorySlots	= 0;
+	Platform.DMI.MemoryModules	= 0;
 
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
 	{
@@ -741,6 +743,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 				break;
 
 			case kSMBTypeMemoryDevice:
+				Platform.DMI.CntMemorySlots++;
         		if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
 					Platform.DMI.MemoryModules++;
         		if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
