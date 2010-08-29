@@ -61,4 +61,7 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 void patch_pmCPUExitHaltToOff(void* kernelData);
 void patch_lapic_init(void* kernelData);
 void patch_commpage_stuff_routine(void* kernelData);
+void patch_lapic_configure(void* kernelData);
+void patch_lapic_interrupt(void* kernelData);
+
 #endif /* !__BOOT2_KERNEL_PATCHER_H */

@@ -26,13 +26,24 @@ void KernelPatcher_start()
 	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_32, CPUID_MODEL_ANY);
 	
 	register_kernel_patch(patch_lapic_init, KERNEL_32, CPUID_MODEL_ANY);
+
+	//register_kernel_patch(patch_lapic_configure, KERNEL_32, CPUID_MODEL_ANY);
+	register_kernel_patch(patch_lapic_interrupt, KERNEL_32, CPUID_MODEL_ANY);
+
 	
 	register_kernel_symbol(KERNEL_32, "_panic");
 	register_kernel_symbol(KERNEL_32, "_cpuid_set_info");
 	register_kernel_symbol(KERNEL_32, "_pmCPUExitHaltToOff");
 	register_kernel_symbol(KERNEL_32, "_lapic_init");
 	register_kernel_symbol(KERNEL_32, "_commpage_stuff_routine");
-		
+
+	// LAPIC configure symbols
+	register_kernel_symbol(KERNEL_32, "_lapic_configure");
+	register_kernel_symbol(KERNEL_32, "_lapic_interrupt");
+
+	register_kernel_symbol(KERNEL_32, "_lapic_start");
+	register_kernel_symbol(KERNEL_32, "_lapic_interrupt_base");
+
 	
 	// TODO: register needed symbols
 	
@@ -626,4 +637,134 @@ void patch_commpage_stuff_routine(void* kernelData)
 	bytes[patchLocation + 4] = 0x90;
 	
 	
+}
+
+void patch_lapic_interrupt(void* kernelData)
+{
+	UInt8* bytes = (UInt8*)kernelData;
+	
+	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_interrupt");
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate %s\n", "_lapic_interrupt");
+		return;
+		
+	}
+	
+	UInt32 patchLocation = symbol->addr - textAddress + textSection; 
+	
+	
+	symbol = lookup_kernel_symbol("_panic");
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate %s\n", "_panic");
+		return;
+	}
+	UInt32 panicAddr = symbol->addr - textAddress; 
+	
+	patchLocation -= (UInt32)kernelData;
+	panicAddr -= (UInt32)kernelData;
+	
+	while(  
+		  (bytes[patchLocation -1] != 0xE8) ||
+		  ( ( (UInt32)(panicAddr - patchLocation  - 4) + textSection ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
+																					bytes[patchLocation + 1] << 8  | 
+																					bytes[patchLocation + 2] << 16 |
+																					bytes[patchLocation + 3] << 24)))
+		  )
+	{
+		patchLocation++;
+	}
+	patchLocation--;
+	
+	// Replace panic with nops
+	bytes[patchLocation + 0] = 0x90;
+	bytes[patchLocation + 1] = 0x90;
+	bytes[patchLocation + 2] = 0x90;
+	bytes[patchLocation + 3] = 0x90;
+	bytes[patchLocation + 4] = 0x90;
+	
+	
+}
+
+
+void patch_lapic_configure(void* kernelData)
+{
+	UInt8* bytes = (UInt8*)kernelData;
+	
+	UInt32 patchLocation;
+	UInt32 lapicStart;
+	UInt32 lapicInterruptBase;
+	
+	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_configure");
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate %s\n", "_lapic_configure");
+		return;
+	}
+	patchLocation = symbol->addr - textAddress + textSection; 
+	
+	symbol = lookup_kernel_symbol("_lapic_start");
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate %s\n", "_lapic_start");
+		return;
+	}
+	lapicStart = symbol->addr; 
+
+
+	symbol = lookup_kernel_symbol("_lapic_interrupt_base");
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate %s\n", "_lapic_interrupt_base");
+		return;
+	}
+	lapicInterruptBase = symbol->addr - textAddress; 
+
+	patchLocation -= (UInt32)kernelData;
+	lapicStart -= (UInt32)kernelData;
+	lapicInterruptBase -= (UInt32)kernelData;
+	
+	
+	printf("\n\n\n\n\n\n\n"); // new lines so I can see things...
+	// Looking for the following:
+	//movl   _lapic_start,%e_x
+	//addl   $0x00000360,%e_x
+	//  8b 15 __ __ __ __ 81 c2 d0 00 00 00 65
+	while(  
+		  (bytes[patchLocation - 2] != 0x8b) ||
+		  //bytes[patchLocation -1] != 0x8b) ||	// Register, we don't care what it is
+		  ( lapicStart  != (UInt32)(
+									(bytes[patchLocation + 0] << 0  | 
+									 bytes[patchLocation + 1] << 8  | 
+									 bytes[patchLocation + 2] << 16 |
+									 bytes[patchLocation + 3] << 24
+									)
+								   )
+		   ) || 
+		  (bytes[patchLocation + 7 ] != 0x00) ||
+		  (bytes[patchLocation + 8 ] != 0x00) ||
+		  (bytes[patchLocation + 9 ] != 0x00) ||
+		  (bytes[patchLocation + 10] != 0x65)
+
+		  )
+	{
+		
+		printf("0x%X 0x%X 0x%X 0x%X 0x%X, 0x%X\n", bytes[patchLocation - 1], bytes[patchLocation + 0], bytes[patchLocation + 1], bytes[patchLocation + 2], bytes[patchLocation + 3], lapicStart);
+		//getc();
+		patchLocation++;
+	}
+	patchLocation-=2;
+	printf("Patch location located at 0x%X\n", patchLocation);
+	
+	printf("0x%X 0x%X 0x%X 0x%X 0x%X, 0x%X\n", bytes[patchLocation - 0], bytes[patchLocation + 1], bytes[patchLocation + 2], bytes[patchLocation + 3], bytes[patchLocation + 4], lapicStart);
+	getc();
+
+	// TODO: Patch location has been located, verify that the function hasen't changed to and unpachable state
+	
+	
+	// backup movl   _lapic_interrupt_base,%e_x, so we know what the register is
+	
+	
+
 }
