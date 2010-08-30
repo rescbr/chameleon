@@ -18,6 +18,8 @@ Change: added hands-off (without user intervention) setting of EFI32 values, for
 
 Motif:  fixes http://forge.voodooprojects.org/p/chameleon/issues/21/.
 
+  Note: included on the trunk at revs 449 & 450 :) Thanks!
+
 		---------------//---------------//---------------
 
 - (rev 320)

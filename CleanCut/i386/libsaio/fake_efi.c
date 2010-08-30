@@ -676,7 +676,7 @@ success_fd:
 static void setupEfiConfigurationTable()
 {
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, "SMBIOS_P"); //Azi: give an "alias" to this stuff?
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 	
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();

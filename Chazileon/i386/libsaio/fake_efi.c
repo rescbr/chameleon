@@ -75,28 +75,28 @@ static uint64_t ptov64(uint32_t addr)
  * Fake EFI implementation
  */
 
-// Identify ourselves as the EFI firmware vendor
+/* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','0', 0};
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
-// Default platform system_id (fix by IntVar)
+/* Default platform system_id (fix by IntVar) */
 static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
 
-// Just a ret instruction
+/* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
 
-// movl $0x80000003,%eax; ret
+/* movl $0x80000003,%eax; ret */
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
 
-EFI_SYSTEM_TABLE_32 *gST32 = NULL; //Azi:efi32/64
-EFI_SYSTEM_TABLE_64 *gST64 = NULL; //		||
+EFI_SYSTEM_TABLE_32 *gST32 = NULL;
+EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
-	EFI_UINTN i = 0; //Azi:efi32/64
+	EFI_UINTN i = 0;
 	
-	//Azi:efi32/64 - like this, cpu's with em64t will use EFI64 on pre 10.6 systems,
+	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
 	if (archCpuType == CPU_TYPE_I386)
 	{
@@ -154,7 +154,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
  * also take care to set efiMode = 32.
  */
 
-void setupEfiTables32(void) //Azi:efi32/64
+void setupEfiTables32(void)
 {
 	// We use the fake_efi_pages struct so that we only need to do one kernel
 	// memory allocation for all needed EFI data.  Otherwise, small allocations
@@ -271,7 +271,7 @@ void setupEfiTables32(void) //Azi:efi32/64
 	// knows not to save the pages.	 It even checks to make sure its nonzero.
 }
 
-void setupEfiTables64(void) //Azi:efi32/64
+void setupEfiTables64(void)
 {
 	struct fake_efi_pages
 	{
@@ -391,7 +391,7 @@ void setupEfiTables64(void) //Azi:efi32/64
  * FSB Frequency detection
  */
 
-// These should be const but DT__AddProperty takes char*
+/* These should be const but DT__AddProperty takes char* */
 static const char const TSC_Frequency_prop[] = "TSCFrequency";
 static const char const FSB_Frequency_prop[] = "FSBFrequency";
 static const char const CPU_Frequency_prop[] = "CPUFrequency";
@@ -402,13 +402,13 @@ static const char const CPU_Frequency_prop[] = "CPUFrequency";
 
 static uint64_t smbios_p; //Azi: asereBLN
 
-// From Foundation/Efi/Guid/Smbios/SmBios.c
+/* From Foundation/Efi/Guid/Smbios/SmBios.c */
 EFI_GUID const gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
 #define SMBIOS_RANGE_START		0x000F0000
 #define SMBIOS_RANGE_END		0x000FFFFF
 
-// '_SM_' in little endian:
+/* '_SM_' in little endian: */
 #define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
 
 #define EFI_ACPI_TABLE_GUID \
@@ -428,12 +428,12 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
  * Fake EFI implementation
  */
 
-// These should be const but DT__AddProperty takes char*
+/* These should be const but DT__AddProperty takes char* */
 static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32"; //Azi:efi32/64
-static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64"; //		||
+static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
@@ -551,7 +551,7 @@ void setupEfiDeviceTree(void)
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
 	
-	if (archCpuType == CPU_TYPE_I386) //Azi:efi32/64
+	if (archCpuType == CPU_TYPE_I386)
 	{
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
 	}
@@ -569,7 +569,7 @@ void setupEfiDeviceTree(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 	
-	if (archCpuType == CPU_TYPE_I386) //Azi:efi32/64
+	if (archCpuType == CPU_TYPE_I386)
 	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
@@ -676,16 +676,14 @@ success_fd:
 
 static void setupEfiConfigurationTable()
 {
-	// reminder: EFI_PTR64
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-	
-	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, "SMBIOS_P"); //Azi:efi32/64 - give an "alias" to this stuff :)
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 	
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();
 	
 	// We've obviously changed the count.. so fix up the CRC32
-	if (archCpuType == CPU_TYPE_I386) //Azi:efi32/64
+	if (archCpuType == CPU_TYPE_I386)
 	{
 		gST32->Hdr.CRC32 = 0;
 		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
@@ -707,10 +705,10 @@ void setupFakeEfi(void)
 	setup_pci_devs(root_pci_dev);
 	
 	// load smbios.plist file if any
-	setupSmbiosConfigFile("smbios.plist"); //Azi: smbios plist default name.
+	setupSmbiosConfigFile("smbios.plist");
 	
 	// Initialize the base table
-	if (archCpuType == CPU_TYPE_I386) //Azi:efi32/64
+	if (archCpuType == CPU_TYPE_I386)
 	{
 		setupEfiTables32();
 	}
