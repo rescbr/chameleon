@@ -1,5 +1,5 @@
 	/*
- * Copyright (c) 2009 Evan Lojewski. All rights reserved.
+ * Copyright (c) 2009-2010 Evan Lojewski. All rights reserved.
  *
  */
 
@@ -726,7 +726,6 @@ void patch_lapic_configure(void* kernelData)
 	lapicInterruptBase -= (UInt32)kernelData;
 	
 	
-	printf("\n\n\n\n\n\n\n"); // new lines so I can see things...
 	// Looking for the following:
 	//movl   _lapic_start,%e_x
 	//addl   $0x00000320,%e_x
