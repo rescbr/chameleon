@@ -1604,7 +1604,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
       /* Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format
        * to be able to hide foreign partitions from the boot menu.
        */
-      if ( (newBVR->flags & kBVFlagForeignBoot) )
+      if ( (newBVR->flags & kBVFlagForeignBoot) ) //Azi: enable hiding native boot?
       {
         char *start, *next = val;
         long len = 0;  
@@ -1699,7 +1699,7 @@ static const struct NamedValue fdiskTypes[] =
 bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 {
 	char testStr[128];
-	 
+
 	if ( !bvr || !match || !*match)
 		return 0;
 	
@@ -1729,9 +1729,9 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
     return false;
 }
 
-/* If Rename Partition has defined an alias, then extract it  for description purpose
+/* If Rename Partition has defined an alias, then extract it for description purpose.
  * The format for the rename string is the following:
- * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" etc; ...
+ * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias";etc...
  */
 
 bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
@@ -1770,7 +1770,7 @@ bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
         
         if ( matchVolumeToString(bvr, volStart, volLen) )
         {   
-            strncpy(str, aliasStart, min(strMaxLen, aliasLen));
+            strncat(str, aliasStart, min(strMaxLen, aliasLen));
             free(aliasList);
         
             return true;
@@ -1805,7 +1805,8 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 	
     /* See if a partition rename is preferred */
     if(getVolumeLabelAlias(bvr, p, strMaxLen)) {
-        //verbose("Renamed: %s\n", p); Azi:remove??
+	    //verbose("Renamed: %s\n", p); Azi:remove??
+        strncpy(bvr->label, p, strMaxLen); 
         return; // we're done here no need to seek for real name
     }
       

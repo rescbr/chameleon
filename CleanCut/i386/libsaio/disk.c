@@ -1699,7 +1699,7 @@ static const struct NamedValue fdiskTypes[] =
 bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 {
 	char testStr[128];
-	 
+
 	if ( !bvr || !match || !*match)
 		return 0;
 	
@@ -1729,9 +1729,9 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
     return false;
 }
 
-/* If Rename Partition has defined an alias, then extract it  for description purpose
+/* If Rename Partition has defined an alias, then extract it for description purpose.
  * The format for the rename string is the following:
- * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" etc; ...
+ * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias";etc...
  */
 
 bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
@@ -1770,7 +1770,7 @@ bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
         
         if ( matchVolumeToString(bvr, volStart, volLen) )
         {   
-            strncpy(str, aliasStart, min(strMaxLen, aliasLen));
+            strncat(str, aliasStart, min(strMaxLen, aliasLen));
             free(aliasList);
         
             return true;
