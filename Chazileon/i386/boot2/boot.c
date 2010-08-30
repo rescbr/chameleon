@@ -479,7 +479,7 @@ void common_boot(int biosdev)
 		if ( status == -1 )
 		{
 			// gBootVolume == NULL usually means the user hit escape.
-			if (gBootVolume == NULL)
+			if (gBootVolume == NULL) //Azi: reminder - hitting escape makes me boot when "at" boot prompt.
 			{
 				freeFilteredBVChain(bvChain);
 				
@@ -488,7 +488,7 @@ void common_boot(int biosdev)
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
-				setupDeviceList(&bootInfo->themeConfig);
+				setupDeviceList(&bootInfo->themeConfig); //Azi: test this!!!
 			}
 			continue;
 		}

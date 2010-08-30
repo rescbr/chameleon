@@ -28,14 +28,14 @@
  *
  *  DRI: Josh de Cesare
  */
-
+//Azi:include
 #include <mach-o/fat.h>
 #include <libkern/OSByteOrder.h>
 #include <mach/machine.h>
 
 #include "boot.h"
 #include "bootstruct.h"
-#include "ramdisk.h"
+//#include "ramdisk.h"
 #include "sl.h"
 #include "xml.h"
 #include "kernel_patcher.h" //Azi:kernelpatcher

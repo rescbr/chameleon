@@ -30,7 +30,6 @@
 #include "gui.h"
 #include "pci.h"
 #include "ramdisk.h"
-#include "sl.h"
 
 #include "autoresolution.h" //Azi:autoresolution - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 

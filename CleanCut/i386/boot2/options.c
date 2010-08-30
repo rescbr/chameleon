@@ -29,7 +29,6 @@
 #include "gui.h"
 #include "embedded.h"
 #include "pci.h"
-#include "sl.h"
 
 static bool shouldboot = false;
 

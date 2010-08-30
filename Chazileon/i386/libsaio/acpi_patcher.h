@@ -5,9 +5,7 @@
 #ifndef __LIBSAIO_ACPI_PATCHER_H
 #define __LIBSAIO_ACPI_PATCHER_H
 
-//Azi:include
 #include "libsaio.h"
-#include "ramdisk.h" //Azi:searchalgo - for dsdt_patcher.c & fake_efi.c
 
 /*Azi: "AsereBLN: this is bullsh*t... declaring vars in a header"
 uint64_t acpi10_p;

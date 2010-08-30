@@ -30,7 +30,6 @@
 #include "libsaio.h"
 #include "xml.h"
 #include "boot.h" //Azi:canoverride, gMacOSVersion
-#include "ramdisk.h" //Azi:searchalgo
 
 extern char *Language;
 extern char *LoadableFamilies;

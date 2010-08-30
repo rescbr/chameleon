@@ -37,7 +37,7 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "xml.h"
-#include "ramdisk.h"
+//#include "ramdisk.h"
 
 struct Module {  
   struct Module *nextModule;
