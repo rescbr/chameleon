@@ -15,8 +15,8 @@
 #include "edid.h" //Azi:autoresolution
 #include "autoresolution.h"
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
+//#define min(x, y) ((x) < (y) ? (x) : (y)) Azi: it's defined on saio_types.h
+//#define max(x, y) ((x) > (y) ? (x) : (y))				||			||
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
@@ -468,7 +468,7 @@ void setupDeviceList(config_file_t *theme)
 	const char *string;	
 
 	if(getIntForKey("devices_max_visible", &val, theme ))
-		gui.maxdevices = MIN( val, gDeviceCount );
+		gui.maxdevices = min( val, gDeviceCount );
 
 	if(getIntForKey("devices_iconspacing", &val, theme ))
 		gui.devicelist.iconspacing = val;
@@ -483,7 +483,7 @@ void setupDeviceList(config_file_t *theme)
 
 	switch (gui.layout) {
 	case VerticalLayout:
-		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
+		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * min(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
 		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
 
 		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
@@ -495,7 +495,7 @@ void setupDeviceList(config_file_t *theme)
 		
 	case HorizontalLayout:
 	default:
-		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
+		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * min(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
 		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
 
 		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
@@ -539,10 +539,10 @@ void loadThemeValues(config_file_t *theme)
 		gui.screen.bgcolor = (color & 0x00FFFFFF);
 
 	if(getIntForKey("screen_textmargin_h", &val, theme))
-		gui.screen.hborder = MIN( gui.screen.width , val );
+		gui.screen.hborder = min( gui.screen.width , val );
 
 	if(getIntForKey("screen_textmargin_v", &val, theme))
-		gui.screen.vborder = MIN( gui.screen.height , val );
+		gui.screen.vborder = min( gui.screen.height , val );
 
 	/*
 	 * Parse background parameters
@@ -589,10 +589,10 @@ void loadThemeValues(config_file_t *theme)
 	 * Parse infobox parameters
 	 */
 	if(getIntForKey("infobox_width", &val, theme))
-		gui.infobox.width = MIN( screen_width , val );
+		gui.infobox.width = min( screen_width , val );
 
 	if(getIntForKey("infobox_height", &val, theme))
-		gui.infobox.height = MIN( screen_height , val );
+		gui.infobox.height = min( screen_height , val );
 
 	if(getDimensionForKey("infobox_pos_x", &pixel, theme, screen_width , gui.infobox.width ) )
 		gui.infobox.pos.x = pixel;
@@ -601,10 +601,10 @@ void loadThemeValues(config_file_t *theme)
 		gui.infobox.pos.y = pixel;
 
 	if(getIntForKey("infobox_textmargin_h", &val, theme))
-		gui.infobox.hborder = MIN( gui.infobox.width , val );
+		gui.infobox.hborder = min( gui.infobox.width , val );
 
 	if(getIntForKey("infobox_textmargin_v", &val, theme))
-		gui.infobox.vborder = MIN( gui.infobox.height , val );
+		gui.infobox.vborder = min( gui.infobox.height , val );
 
 	if(getColorForKey("infobox_bgcolor", &color, theme))
 		gui.infobox.bgcolor = (color & 0x00FFFFFF);
@@ -632,10 +632,10 @@ void loadThemeValues(config_file_t *theme)
 		gui.menu.pos.y = pixel;
 
 	if(getIntForKey("menu_textmargin_h", &val, theme))
-		gui.menu.hborder = MIN( gui.menu.width , val );
+		gui.menu.hborder = min( gui.menu.width , val );
 
 	if(getIntForKey("menu_textmargin_v", &val, theme))
-		gui.menu.vborder = MIN( gui.menu.height , val );
+		gui.menu.vborder = min( gui.menu.height , val );
 
 	if(getColorForKey("menu_bgcolor", &color, theme))
 		gui.menu.bgcolor = (color & 0x00FFFFFF);
@@ -650,7 +650,7 @@ void loadThemeValues(config_file_t *theme)
 		gui.bootprompt.width = pixel;
 
 	if(getIntForKey("bootprompt_height", &val, theme))
-		gui.bootprompt.height = MIN( screen_height , val );
+		gui.bootprompt.height = min( screen_height , val );
 
 	if(getDimensionForKey("bootprompt_pos_x", &pixel, theme, screen_width , gui.bootprompt.width ) )
 		gui.bootprompt.pos.x = pixel;
@@ -659,10 +659,10 @@ void loadThemeValues(config_file_t *theme)
 		gui.bootprompt.pos.y = pixel;
 
 	if(getIntForKey("bootprompt_textmargin_h", &val, theme))
-		gui.bootprompt.hborder = MIN( gui.bootprompt.width , val );
+		gui.bootprompt.hborder = min( gui.bootprompt.width , val );
 
 	if(getIntForKey("bootprompt_textmargin_v", &val, theme))
-		gui.bootprompt.vborder = MIN( gui.bootprompt.height , val );
+		gui.bootprompt.vborder = min( gui.bootprompt.height , val );
 
 	if(getColorForKey("bootprompt_bgcolor", &color, theme))
 		gui.bootprompt.bgcolor = (color & 0x00FFFFFF);
@@ -850,7 +850,7 @@ void drawDeviceList (int start, int end, int selection)
 	extern bool	showBootBanner;
 	position_t	p, p_prev, p_next;
 
-	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
+	//uint8_t	maxDevices = min( gui.maxdevices, menucount );
 		
 	fillPixmapWithColor( gui.devicelist.pixmap, gui.devicelist.bgcolor);
 
@@ -1118,8 +1118,8 @@ int gprintf( window_t * window, const char * fmt, ...)
 		int i;
 		int character;
 
-		origin.x = MAX( window->cursor.x, window->hborder );
-		origin.y = MAX( window->cursor.y, window->vborder );
+		origin.x = max( window->cursor.x, window->hborder );
+		origin.y = max( window->cursor.y, window->vborder );
 		
 		bounds.x = ( window->width - window->hborder );
 		bounds.y = ( window->height - window->vborder );
@@ -1203,8 +1203,8 @@ int dprintf( window_t * window, const char * fmt, ...)
 		int i;
 		int character;
 		
-		origin.x = MAX( gui.debug.cursor.x, window->hborder );
-		origin.y = MAX( gui.debug.cursor.y, window->vborder );
+		origin.x = max( gui.debug.cursor.x, window->hborder );
+		origin.y = max( gui.debug.cursor.y, window->vborder );
 		
 		bounds.x = ( window->width - window->hborder );
 		bounds.y = ( window->height - window->vborder );
@@ -1283,8 +1283,8 @@ int vprf(const char * fmt, va_list ap)
 		prf(fmt, ap, sputc, &pi);
 		*pi.str = '\0';
 		
-		origin.x = MAX( window->cursor.x, window->hborder );
-		origin.y = MAX( window->cursor.y, window->vborder );
+		origin.x = max( window->cursor.x, window->hborder );
+		origin.y = max( window->cursor.y, window->vborder );
 		bounds.x = ( window->width - ( window->hborder * 2 ) );
 		bounds.y = ( window->height - ( window->vborder * 2 ) );
 		cursor = origin;
@@ -1934,8 +1934,8 @@ void drawBootGraphics(void)
 		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01); 
 	}
 	if ((bootImageData) && (usePngImage)) { 
-		x = (screen_params[0] - MIN(bootImageWidth, screen_params[0])) / 2; 
-		y = (screen_params[1] - MIN(bootImageHeight, screen_params[1])) / 2; 
+		x = (screen_params[0] - min(bootImageWidth, screen_params[0])) / 2; 
+		y = (screen_params[1] - min(bootImageHeight, screen_params[1])) / 2; 
 
 		// Draw the image in the center of the display. 
 		blendImage(x, y, bootImageWidth, bootImageHeight, bootImageData); 
@@ -1950,8 +1950,8 @@ void drawBootGraphics(void)
 		if (appleBootPict) { 
 			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
 			if (bootImageData) {	
-				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
-				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
+				x = (screen_params[0] - min(kAppleBootWidth, screen_params[0])) / 2; 
+				y = (screen_params[1] - min(kAppleBootHeight, screen_params[1])) / 2; 
 				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
 				free(bootImageData);
 			}
