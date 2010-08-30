@@ -27,8 +27,8 @@ void KernelPatcher_start()
 	
 	register_kernel_patch(patch_lapic_init, KERNEL_32, CPUID_MODEL_ANY);
 
-	//register_kernel_patch(patch_lapic_configure, KERNEL_32, CPUID_MODEL_ANY);
-	register_kernel_patch(patch_lapic_interrupt, KERNEL_32, CPUID_MODEL_ANY);
+	register_kernel_patch(patch_lapic_configure, KERNEL_32, CPUID_MODEL_ANY);
+	//register_kernel_patch(patch_lapic_interrupt, KERNEL_32, CPUID_MODEL_ANY);
 
 	
 	register_kernel_symbol(KERNEL_32, "_panic");
@@ -641,6 +641,7 @@ void patch_commpage_stuff_routine(void* kernelData)
 
 void patch_lapic_interrupt(void* kernelData)
 {
+	// NOTE: this is a hack untill I finish patch_lapic_configure
 	UInt8* bytes = (UInt8*)kernelData;
 	
 	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_interrupt");
@@ -719,8 +720,7 @@ void patch_lapic_configure(void* kernelData)
 		printf("Unable to locate %s\n", "_lapic_interrupt_base");
 		return;
 	}
-	lapicInterruptBase = symbol->addr - textAddress; 
-
+	lapicInterruptBase = symbol->addr;
 	patchLocation -= (UInt32)kernelData;
 	lapicStart -= (UInt32)kernelData;
 	lapicInterruptBase -= (UInt32)kernelData;
@@ -729,11 +729,11 @@ void patch_lapic_configure(void* kernelData)
 	printf("\n\n\n\n\n\n\n"); // new lines so I can see things...
 	// Looking for the following:
 	//movl   _lapic_start,%e_x
-	//addl   $0x00000360,%e_x
-	//  8b 15 __ __ __ __ 81 c2 d0 00 00 00 65
+	//addl   $0x00000320,%e_x
+	//  8b 15 __ __ __ __ 81 c2 20 03 00 00
 	while(  
 		  (bytes[patchLocation - 2] != 0x8b) ||
-		  //bytes[patchLocation -1] != 0x8b) ||	// Register, we don't care what it is
+		  //bytes[patchLocation -1] != 0x15) ||	// Register, we don't care what it is
 		  ( lapicStart  != (UInt32)(
 									(bytes[patchLocation + 0] << 0  | 
 									 bytes[patchLocation + 1] << 8  | 
@@ -742,29 +742,128 @@ void patch_lapic_configure(void* kernelData)
 									)
 								   )
 		   ) || 
-		  (bytes[patchLocation + 7 ] != 0x00) ||
+		  (bytes[patchLocation + 4 ] != 0x81) ||
+		  //(bytes[patchLocation + 5 ] != 0Cx2) ||	// register
+		  (bytes[patchLocation + 6 ] != 0x20) ||
+		  (bytes[patchLocation + 7 ] != 0x03) ||
 		  (bytes[patchLocation + 8 ] != 0x00) ||
-		  (bytes[patchLocation + 9 ] != 0x00) ||
-		  (bytes[patchLocation + 10] != 0x65)
+		  (bytes[patchLocation + 9] != 0x00)
 
 		  )
 	{
-		
-		printf("0x%X 0x%X 0x%X 0x%X 0x%X, 0x%X\n", bytes[patchLocation - 1], bytes[patchLocation + 0], bytes[patchLocation + 1], bytes[patchLocation + 2], bytes[patchLocation + 3], lapicStart);
-		//getc();
 		patchLocation++;
 	}
 	patchLocation-=2;
-	printf("Patch location located at 0x%X\n", patchLocation);
-	
-	printf("0x%X 0x%X 0x%X 0x%X 0x%X, 0x%X\n", bytes[patchLocation - 0], bytes[patchLocation + 1], bytes[patchLocation + 2], bytes[patchLocation + 3], bytes[patchLocation + 4], lapicStart);
-	getc();
 
-	// TODO: Patch location has been located, verify that the function hasen't changed to and unpachable state
+	// NOTE: this is currently hardcoded, change it to be more resilient to changes
+	// At a minimum, I should have this do a cheksup first and if not matching, remove the panic instead.
 	
+	// 8b 15 __ __ __ __ ->  movl		  _lapic_start,%edx (NOTE: this should already be here)
+	/*
+	bytes[patchLocation++] = 0x8B;
+	bytes[patchLocation++] = 0x15;
+	bytes[patchLocation++] = (lapicStart & 0x000000FF) >> 0;
+	bytes[patchLocation++] = (lapicStart & 0x0000FF00) >> 8;
+	bytes[patchLocation++] = (lapicStart & 0x00FF0000) >> 16;
+	bytes[patchLocation++] = (lapicStart & 0xFF000000) >> 24;
+	*/
+	patchLocation += 6;
 	
-	// backup movl   _lapic_interrupt_base,%e_x, so we know what the register is
-	
-	
+	// 81 c2 60 03 00 00 -> addl		  $0x00000320,%edx
+	/*
+	bytes[patchLocation++] = 0x81;
+	bytes[patchLocation++] = 0xC2;
+	*/
+	patchLocation += 2;
+	bytes[patchLocation++] = 0x60;
+	/*
+	bytes[patchLocation++];// = 0x03;
+	bytes[patchLocation++];// = 0x00;
+	bytes[patchLocation++];// = 0x00;
+	*/
+	 patchLocation += 3;
 
+	// c7 02 00 04 00 00 -> movl		  $0x00000400,(%edx)
+	bytes[patchLocation++] = 0xC7;
+	bytes[patchLocation++] = 0x02;
+	bytes[patchLocation++] = 0x00;
+	bytes[patchLocation++] = 0x04;
+	bytes[patchLocation++] = 0x00;
+	bytes[patchLocation++] = 0x00;
+	
+	// 83 ea 40 -> subl		  $0x40,edx
+	bytes[patchLocation++] = 0x83;
+	bytes[patchLocation++] = 0xEA;
+	bytes[patchLocation++] = 0x40;
+
+	// a1 __ __ __ __ -> movl		  _lapic_interrupt_base,%eax
+	bytes[patchLocation++] = 0xA1;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x000000FF) >> 0;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x0000FF00) >> 8;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x00FF0000) >> 16;
+	bytes[patchLocation++] = (lapicInterruptBase & 0xFF000000) >> 24;
+
+	// 83 c0 0e -> addl		  $0x0e,%eax
+	bytes[patchLocation++] = 0x83;
+	bytes[patchLocation++] = 0xC0;
+	bytes[patchLocation++] = 0x0E;
+
+	// 89 02 -> movl		  %eax,(%edx)
+	bytes[patchLocation++] = 0x89;
+	bytes[patchLocation++] = 0x02;
+	
+	// 81c230030000		  addl		  $0x00000330,%edx
+	bytes[patchLocation++] = 0x81;
+	bytes[patchLocation++] = 0xC2;
+	bytes[patchLocation++] = 0x30;
+	bytes[patchLocation++] = 0x03;
+	bytes[patchLocation++] = 0x00;
+	bytes[patchLocation++] = 0x00;
+	
+	// a1 __ __ __ __ -> movl		  _lapic_interrupt_base,%eax
+	bytes[patchLocation++] = 0xA1;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x000000FF) >> 0;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x0000FF00) >> 8;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x00FF0000) >> 16;
+	bytes[patchLocation++] = (lapicInterruptBase & 0xFF000000) >> 24;
+	
+	// 83 c0 0f -> addl		  $0x0f,%eax
+	bytes[patchLocation++] = 0x83;
+	bytes[patchLocation++] = 0xC0;
+	bytes[patchLocation++] = 0x0F;
+	
+	// 89 02 -> movl		  %eax,(%edx)
+	bytes[patchLocation++] = 0x89;
+	bytes[patchLocation++] = 0x02;
+	
+	// 83 ea 10 -> subl		  $0x10,edx
+	bytes[patchLocation++] = 0x83;
+	bytes[patchLocation++] = 0xEA;
+	bytes[patchLocation++] = 0x10;
+
+	// a1 __ __ __ __ -> movl		  _lapic_interrupt_base,%eax
+	bytes[patchLocation++] = 0xA1;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x000000FF) >> 0;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x0000FF00) >> 8;
+	bytes[patchLocation++] = (lapicInterruptBase & 0x00FF0000) >> 16;
+	bytes[patchLocation++] = (lapicInterruptBase & 0xFF000000) >> 24;
+	
+	// 83 c0 0c -> addl		  $0x0c,%eax
+	bytes[patchLocation++] = 0x83;
+	bytes[patchLocation++] = 0xC0;
+	bytes[patchLocation++] = 0x0C;
+
+	// 89 02 -> movl		  %eax,(%edx)
+	bytes[patchLocation++] = 0x89;
+	bytes[patchLocation++] = 0x02;
+
+	// Replace remaining with nops
+
+
+	bytes[patchLocation++] = 0x90;
+	bytes[patchLocation++] = 0x90;
+	bytes[patchLocation++] = 0x90;
+	bytes[patchLocation++] = 0x90;
+	//	bytes[patchLocation++] = 0x90; // double check the lenght of the patch...
+	//	bytes[patchLocation++] = 0x90;
 }
