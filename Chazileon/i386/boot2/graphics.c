@@ -44,7 +44,7 @@ uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
-//#define min(x, y) ((x) < (y) ? (x) : (y)) Azi: it's defined on saio_types.h
+//#define min(x, y) ((x) < (y) ? (x) : (y)) Azi: defined on saio_types.h
  
 //==========================================================================
 // getVBEInfoString

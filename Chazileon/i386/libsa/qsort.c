@@ -58,10 +58,12 @@
 #include <sys/types.h>
 #include <stdlib.h>
 
+#include "saio_types.h" //Azi: min/max
+
 static inline char	*med3 __P((char *, char *, char *, int (*)()));
 static inline void	 swapfunc __P((char *, char *, int, int));
 
-#define min(a, b)	(a) < (b) ? a : b
+//#define min(a, b)	(a) < (b) ? a : b Azi: defined on saio_types.h
 
 /*
  * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".

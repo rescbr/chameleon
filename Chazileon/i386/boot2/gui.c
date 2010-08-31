@@ -15,8 +15,8 @@
 #include "edid.h" //Azi:autoresolution
 #include "autoresolution.h"
 
-//#define min(x, y) ((x) < (y) ? (x) : (y)) Azi: it's defined on saio_types.h
-//#define max(x, y) ((x) > (y) ? (x) : (y))				||			||
+//#define min(x, y) ((x) < (y) ? (x) : (y)) Azi: defined on saio_types.h
+//#define max(x, y) ((x) > (y) ? (x) : (y))			||			||
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
@@ -761,12 +761,12 @@ int initGUI(void)
 					if (createWindowBuffer(&gui.bootprompt) == 0) {
 						if (createWindowBuffer(&gui.infobox) == 0) {
 							if (createWindowBuffer(&gui.menu) == 0) {
-							    gui.logo.draw = true;
 								
 #ifdef AUTORES_DEBUG
 								printf("Press Any Key...\n");
 								getc();
 #endif
+								gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );

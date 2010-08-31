@@ -232,13 +232,13 @@ enum {
     DEV_EN = 3
 };
 
-#ifndef max
+//#ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
-#endif
+//#endif
 
-#ifndef min
+//#ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
-#endif
+//#endif
 
 #define	round2(x, m)	(((x) + (m / 2)) & ~(m - 1))
 #define roundup2(x, m)  (((x) + m - 1) & ~(m - 1))
