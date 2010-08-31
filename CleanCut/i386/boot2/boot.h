@@ -59,6 +59,7 @@
 #define kInstantMenuKey		"Instant Menu"		// boot.c
 #define kGUIKey				"GUI"				// boot.c
 #define kBootBannerKey		"Boot Banner"		// options.c
+#define kDebugInfoKey		"DebugInfo"			// gui.c, graphics.c
 #define kWaitForKeypressKey	"Wait"				// boot.c
 #define kExtensionsKey		"kext"				// drivers.c
 #define kUseAtiROM			"UseAtiROM"			// ati.c

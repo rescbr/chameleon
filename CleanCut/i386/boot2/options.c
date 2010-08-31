@@ -30,6 +30,7 @@
 #include "embedded.h"
 #include "pci.h"
 
+bool showBootBanner = true; //Azi:debuginfo
 static bool shouldboot = false;
 
 extern int multiboot_timeout;
@@ -873,7 +874,7 @@ int getBootOptions(bool firstRun)
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-			bool showBootBanner = true;
+			//bool showBootBanner = true; Azi:debuginfo
  
 			// Check if "Boot Banner"=N switch is present in config file.
 			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 

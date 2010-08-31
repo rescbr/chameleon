@@ -96,6 +96,9 @@ typedef struct
 	uint32_t	font_small_color;	// Color for small  font AARRGGBB
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
+	//resolution specifics
+	uint8_t		mm;				// Azi: debuginfo
+	uint16_t	attr;
 } window_t;
 	
 /*

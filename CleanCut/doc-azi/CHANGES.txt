@@ -258,6 +258,21 @@ Motif:  it's not up to date and i need time to update it properly, at least on C
 		---------------//---------------//---------------
 		
 - (rev )
+Change: added a key to display some debug info, that can only be accessed via code edit.
+		Check http://forge.voodooprojects.org/p/chameleon/issues/12/ for history.
+		mm & attr, resolution specific info, are borrowed from AutoResolution branch.
+		
+		DebugInfo=y enables display of debug info.
+
+  Note: Boot Banner(*)=n will override DebugInfo=y , disabling the display of this info.
+		Key is disabled by default.
+
+Motif:  just making this info easily accessible.
+
+		---------------//---------------//---------------
+		---------------//---------------//---------------
+		
+- (rev )
 Change:				template
 
 Motif:
