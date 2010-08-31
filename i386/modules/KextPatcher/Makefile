@@ -1,11 +1,11 @@
 
-MODULE_NAME = KernelPatcher
+MODULE_NAME = KextPatcher
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = KernelPatcher
+DIR = KextPatcher
 
 include ../../MakePaths.dir
 
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-OBJS = kernel_patcher.o
+OBJS = kext_patcher.o
 
 
 SFILES =
@@ -73,11 +73,11 @@ dylib: ${OBJS}
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-weak_library $(SYMROOT)/Symbols.dylib \
-	$(OBJROOT)/kernel_patcher.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/kext_patcher.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
-kernel_patcher.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kernel_patcher.c" $(INC) -o "$(OBJROOT)/kernel_patcher.o"
+kext_patcher.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kext_patcher.c" $(INC) -o "$(OBJROOT)/kext_patcher.o"
 
 include ../../MakeInc.dir
 

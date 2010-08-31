@@ -38,6 +38,8 @@
 #include "bootstruct.h"
 #include "xml.h"
 #include "ramdisk.h"
+#include "modules.h"
+
 
 extern char gMacOSVersion;
 extern int	recoveryMode;
@@ -413,6 +415,10 @@ LoadDriverMKext( char * fileSpec )
     length = LoadThinFatFile(fileSpec, (void **)&package);
     if (length < sizeof (DriversPackage)) return -1;
 
+	// call hook to notify modules that the mkext has been loaded
+	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) length, NULL);
+
+	
     // Verify the MKext.
     if (( GetPackageElement(signature1) != kDriverPackageSignature1) ||
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
@@ -422,6 +428,7 @@ LoadDriverMKext( char * fileSpec )
     {
         return -1;
     }
+	
 
     // Make space for the MKext.
     driversLength = GetPackageElement(length);
@@ -591,6 +598,9 @@ LoadMatchedModules( void )
 		//}
 
                 // Make make in the image area.
+				
+				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
+
                 driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
                 driverAddr = AllocateKernelMemory(driverLength);
 
