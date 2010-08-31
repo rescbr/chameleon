@@ -646,7 +646,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	if (fd >= 0) goto success_fd;
 	
-	// Check booter volume/rdbt for OS specific folders.
+	// Check booter volume/rdbt for specific OS folders.
 	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	if (fd >= 0) goto success_fd;

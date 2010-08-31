@@ -160,7 +160,7 @@ int printf(const char * fmt, ...)
 {
     va_list ap;
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE) //Azi: reminder - verbose
 		prf(fmt, ap, putchar, 0);
 	else
 		vprf(fmt, ap);

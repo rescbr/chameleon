@@ -8,9 +8,9 @@
 #include "libsaio.h"
 
 /*Azi: "AsereBLN: this is bullsh*t... declaring vars in a header"
-uint64_t acpi10_p;
-uint64_t acpi20_p;
-uint64_t smbios_p;*/
+uint64_t acpi10_p; - acpi_patcher.c
+uint64_t acpi20_p; -		||
+uint64_t smbios_p; - fake_efi.c */
 
 extern int setupAcpi();
 

@@ -669,7 +669,7 @@ int loadOverrideConfig(config_file_t *config)
 	fd = open(dirSpecBplist, 0);
 	if (fd >= 0) goto success_fd;
 	
-	// Check OS specific folders.
+	// Check specific OS folders.
 	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = open(dirSpecBplist, 0);
 //	if (fd >= 0) goto success_fd;

@@ -141,7 +141,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
 	
-	// Check booter volume/rdbt for OS specific folders.
+	// Check booter volume/rdbt for specific OS folders.
 	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = open(dirSpecDSDT, 0);
 	if (fd >= 0) goto success_fd;
