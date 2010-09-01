@@ -4,6 +4,7 @@
 #include "pci.h"
 #include "nvidia.h"
 #include "ati.h"
+#include "gma.h" //Azi:autoresolution
 
 extern void set_eth_builtin(pci_dt_t *eth_dev);
 extern void notify_usb_dev(pci_dt_t *pci_dev);
@@ -30,7 +31,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 		switch (current->class_id)
 		{
 			case PCI_CLASS_BRIDGE_HOST:
-					dram_controller_dev = current;
+				dram_controller_dev = current;
 				break;
 				
 			case PCI_CLASS_NETWORK_ETHERNET: 
@@ -44,15 +45,19 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					{
 						case PCI_VENDOR_ID_ATI:
 							verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-							current->vendor_id, current->device_id, devicepath);
+									current->vendor_id, current->device_id, devicepath);
 							setup_ati_devprop(current); 
 							break;
 					
-						case PCI_VENDOR_ID_INTEL: 
-							/* message to be removed once support for these cards is added */
-							verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-								current->vendor_id, current->device_id, devicepath);
+						case PCI_VENDOR_ID_INTEL: // AutoResolution
+							verbose("Intel Graphics Controller [%04x:%04x] :: %s \n",
+									current->vendor_id, current->device_id, devicepath);
+							setup_gma_devprop(current);
 							break;
+							/* message to be removed once support for these cards is added 
+							verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
+									current->vendor_id, current->device_id, devicepath);
+							break;*/
 					
 						case PCI_VENDOR_ID_NVIDIA: 
 							setup_nvidia_devprop(current);

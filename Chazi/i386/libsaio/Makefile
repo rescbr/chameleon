@@ -47,7 +47,6 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	pci_root.o convert.o mem.o aml_generator.o \
 	autoresolution.o edid.o
 
-
 SAIO_EXTERN_OBJS = console.o
 
 SFILES =

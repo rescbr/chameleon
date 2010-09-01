@@ -9,8 +9,6 @@
 
 
 #include "libsaio.h"
-#include "edid.h"
-#include "vbe.h"
 #include "bootstruct.h"
 #include "graphics.h"
 #include "boot.h"

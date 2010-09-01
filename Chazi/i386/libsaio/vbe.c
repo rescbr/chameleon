@@ -106,6 +106,21 @@ int setVBEDACFormat(unsigned char format)
 }
 
 /*
+ *EDID/DDC Readings - AutoResolution
+ */
+int getEDID( void *ddcblock, uint8_t blocksleft )
+{
+	bb.intno    = 0x10;
+	bb.eax.rr   = FUNC_GET_EDID;
+	bb.ebx.r.l  = SERVICE_READ_EDID;
+	bb.es       = SEG( ddcblock );
+	bb.edi.rr   = OFF( ddcblock );
+	bb.edx.rr   = blocksleft;
+	bios( &bb );
+	return( bb.eax.r.h );
+}
+
+/*
  * Default GTF parameter values.
  */
 #define kCellGranularity  8.0    // character cell granularity

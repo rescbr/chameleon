@@ -680,9 +680,8 @@ void loadThemeValues(config_file_t *theme)
  
 int initGUI(void)
 {
-	int		val;
-	int	len;
-	char	dirspec[256];
+	int		val, len, count;
+	char	dirspec[128]; //Azi: a bit of testing***
 
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {

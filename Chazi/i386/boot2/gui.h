@@ -14,8 +14,6 @@
 //#include "graphic_utils.h" - same as above
 #include "graphics.h"
 #include "picopng.h"
-#include "autoresolution.h"
-#include "edid.h"
 
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
