@@ -96,6 +96,7 @@
 #define kMD0Image			"md0"				// ramdisk.h
 #define kTestConfigKey		"config"			// stringTable.c
 #define kCanOverrideKey		"CanOverride"		// stringTable.c
+#define kAutoResolutionKey	"AutoResolution"	// boot.c - don't forget F2 key, to change resolution!
 
 /*
  * Flags to the booter and/or kernel - these end with "Flag".

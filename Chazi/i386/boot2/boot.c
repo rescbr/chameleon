@@ -58,6 +58,8 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
+#include "edid.h" // Autoresolution
+#include "autoresolution.h" //Azi:includes - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -71,7 +73,7 @@ bool gScanSingleDrive;
 
 int     bvCount = 0;
 //int		menucount = 0;
-int     gDeviceCount = 0; 
+int     gDeviceCount = 0;
 
 BVRef   bvr;
 BVRef   menuBVR;
@@ -328,6 +330,44 @@ void common_boot(int biosdev)
     useGUI = true;
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+
+//Azi:autoresolution begin
+	// Before initGui, patch the video bios with the correct resolution
+	UInt32 params[4];
+	params[3] = 0;
+	
+	// default to "false" as it doesn't work for everyone atm.
+	// http://forum.voodooprojects.org/index.php/topic,1227.0.html
+	gAutoResolution = false;
+	
+	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+	
+	//Open the VBios and store VBios or Tables
+	map = openVbios(CT_UNKWN);
+	
+	if (gAutoResolution == true)
+	{
+		//Get Resolution from Graphics Mode key or EDID
+		int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+		if (count < 3)
+			getResolution(params);
+		else
+		{
+			if ( params[2] == 256 ) params[2] = 8;
+			if ( params[2] == 555 ) params[2] = 16;
+			if ( params[2] == 888 ) params[2] = 32;
+		}
+		
+#ifdef AUTORES_DEBUG
+	printf("Resolution: %dx%d\n",params[0], params[1]);
+#endif	
+		
+		//perfom the actual VBIOS patching
+		if (params[0] != 0 && params[1] != 0)
+			patchVbios(map, params[0], params[1], params[2], 0, 0);
+	}
+//Azi:autoresolution end
+
     if (useGUI && initGUI())
 	{
 		// initGUI() returned with an error, disabling GUI.
@@ -372,7 +412,54 @@ void common_boot(int biosdev)
 			drawBackground();
 			updateVRAM();
 		}
-		 
+		
+//Azi:autoresolution begin
+		//
+		//AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
+		//				   or EDID Info was insane
+		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+		
+		//Restore the vbios for Cancelation
+		if ((gAutoResolution == false) && map)
+		{
+			restoreVbios(map);
+			closeVbios(map);	
+		}
+		
+		if ((gAutoResolution == true) && map)
+		{
+			// If mode has been switched during boot menu
+			// use the new resolution
+			if (map->hasSwitched == true)
+			{
+				params[0] = map->currentX;
+				params[1] = map->currentY;
+				params[2] = 32;
+			}
+			else
+			{
+				//or get resolution from Graphics Mode or EDID
+				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+				if (count < 3)
+					getResolution(params);
+				else
+				{
+					if ( params[2] == 256 ) params[2] = 8;
+					if ( params[2] == 555 ) params[2] = 16;
+					if ( params[2] == 888 ) params[2] = 32;
+				}
+			}
+			
+			//Resolution has changed, reapply the patch
+			if ((params[0] != 0) && (params[1] != 0) && (params[0] != map->currentX) &&
+				(params[1] != map->currentY))
+			{
+				patchVbios(map, params[0], params[1], params[2], 0, 0);
+			}
+			closeVbios(map);
+		}
+//Azi:autoresolution end
+		
         status = processBootOptions();
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;
