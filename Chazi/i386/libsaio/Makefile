@@ -42,8 +42,10 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	cpu.o platform.o acpi_patcher.o \
 	smbios_patcher.o fake_efi.o ext2fs.o \
 	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
-	convert.o mem.o aml_generator.o
+	device_inject.o nvidia.o ati.o gma.o \
+	gma_resolution.o ati_resolution.o nvidia_resolution.o \
+	pci_root.o convert.o mem.o aml_generator.o \
+	autoresolution.o edid.o
 
 
 SAIO_EXTERN_OBJS = console.o
