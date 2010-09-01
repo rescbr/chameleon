@@ -265,7 +265,7 @@ Change: added a key to display some debug info, that can only be accessed via co
 		DebugInfo=y enables display of debug info.
 
   Note: Boot Banner(*)=n will override DebugInfo=y , disabling the display of this info.
-		Key is disabled by default.
+		Disabled by default.
 
 Motif:  just making this info easily accessible.
 
@@ -276,7 +276,23 @@ Motif:  just making this info easily accessible.
 Change:	creation of this project, replacing Chazileon as my work folder.
 		Ence, Chazileon is now frozen until archival and deletion.
 
-Motif:  Chazileon has no svn history.
+Motif:  Chazileon (Chazi) has no svn history.
+
+		---------------//---------------//---------------
+		
+- (revs 465 --> ??)
+Change:	added AutoResolution patch, by Lebidou (AutoResolution branch). The main intention of this
+		patch, is allowing native resolution after boot, even without graphics acceleration (qe/ci).
+		The "side effect" is that it also enables native resolution at boot prompt (Gui).
+		The con: doesn't work for all devices!!
+		
+		AutoResolution=y enables the patch.
+
+  Note: Obviously, it only works in Graphics Mode (Gui).
+		Disabled by default.
+
+Motif:  ... mentioned above. Check the topic for more details:
+		http://forum.voodooprojects.org/index.php/topic,1227.0.html
 
 		---------------//---------------//---------------
 		

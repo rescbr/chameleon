@@ -8,10 +8,6 @@
  *
  */
 
-//Azi:include
-//#include "boot.h" - included on graphics.h
-//#include "bootstruct.h" - same as above
-//#include "graphic_utils.h" - same as above
 #include "graphics.h"
 #include "picopng.h"
 
@@ -106,7 +102,7 @@ typedef struct
 	uint16_t	vsyncstart;			
 	uint16_t	vsyncend;
 	uint8_t		mm;				// Azi:autoresolution - debuginfo
-	uint16_t	attr;			//			||				||
+	uint16_t	attr;
 } window_t;
 	
 /*

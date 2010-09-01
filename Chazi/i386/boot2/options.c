@@ -22,9 +22,6 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-//Azi:include
-//#include "boot.h" - included on graphics.h, which is included on gui.h
-//#include "bootstruct.h" - same as above
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"
@@ -1089,10 +1086,8 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI) //Azi: check if Tab still works with AutoResolution (boot.c, 370)***
-			{
-				if (bootArgs->Video.v_display == GRAPHICS_MODE) //Azi: this is missing on Chazileon & AutoRes branch***
-				{
+			if (useGUI) {
+				if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1117,22 +1112,9 @@ int getBootOptions(bool firstRun)
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 					showBootPrompt(nextRow, showPrompt);
 					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
-					
-					/*
-					 * AutoResolution - make sure all values are set
-					 */
-					bootArgs->Video.v_display = VGA_TEXT_MODE;
-					useGUI = false;
 				} else {
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
-					
-					/*
-					 * AutoResolution - make sure all values are set
-					 */
-					bootArgs->Video.v_display = GRAPHICS_MODE;
-					useGUI = true;
-					
 					updateVRAM();
 				}
 			}

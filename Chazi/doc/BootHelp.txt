@@ -77,7 +77,7 @@ Options useful in the com.apple.Boot.plist file:
   VBIOS=Yes|No            Inject VBIOS to device-properties.
 
   EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
-                          for ethernet interfaces.
+                            for ethernet interfaces.
 
   USBBusFix=Yes           Enable all USB fixes below:
   EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
@@ -104,12 +104,19 @@ Options useful in the com.apple.Boot.plist file:
                             values are kept.
 
   Scan Single Drive       Scan the drive only where the booter got loaded from.
-    =Yes|No               Fix rescan pbs when using a DVD reader in AHCI mode. 
+    =Yes|No                 Fix rescan pbs when using a DVD reader in AHCI mode. 
   Rescan=Yes              Enable CD-ROM rescan mode.
   Rescan Prompt=Yes       Prompts for enable CD-ROM rescan mode.
-  SystemId=<UUID>         Set manually the system id UUID,
-                          SMUUID in smbios config (reserved field) isn't used.
+  SystemId=<UUID>         Set manually the system id UUID, SMUUID in smbios config
+                            (reserved field) isn't used.
   SystemType=<n>          Set the system type where n is between 0..6
-                          (default =1 (Desktop)
+                            (default =1 (Desktop)
   md0=<file>              Load raw img file into memory for use as XNU's md0
                           ramdisk. /Extra/Postboot.img is used otherwise.
+
+  AutoResolution=Yes      Enable native resolution setting for booter Gui and
+                          system, even without graphics acceleration.
+                            (disabled by default)
+Azi: quotes?? check with Danielkza...
+  Graphics Mode + F2      Change resolution while at boot prompt, e.g.:
+                            Graphics Mode=1024x768x32 + press F2 key.
