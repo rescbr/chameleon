@@ -26,8 +26,9 @@
  * All rights reserved.
  */
 
-#include "boot.h"
-#include "vbe.h"
+//Azi:include
+//#include "boot.h" - included on graphics.h, which is included on gui.h
+//#include "vbe.h" - same as above (needed if autoresolution is removed!)
 #include "appleClut8.h"
 #include "gui.h"
 #include "IOHibernatePrivate.h"
@@ -43,7 +44,7 @@ uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y)) //Azi: take care of this in the process***
  
 //==========================================================================
 // getVBEInfoString
@@ -180,7 +181,7 @@ char *getVBEModeInfoString()
 // Return the VESA mode that matches the properties specified.
 // If a mode is not found, then return the "best" available mode.
 
-static unsigned short
+unsigned short
 getVESAModeWithProperties( unsigned short     width,
                            unsigned short     height,
                            unsigned char      bitsPerPixel,
@@ -389,6 +390,8 @@ setVESAGraphicsMode( unsigned short width,
             break;
         }
 
+		if (refreshRate != 60) refreshRate = 60;
+
 //
 // FIXME : generateCRTCTiming() causes crash.
 //
@@ -426,13 +429,21 @@ setVESAGraphicsMode( unsigned short width,
 //             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 //         }
 
+#ifdef AUTORES_DEBUG
+		printf("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
+		//getc(); //Azi: i get the hangs, like "old" Wait=y issue.
+#endif
         // Set the mode with default refresh rate.
-
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
         if ( err != errSuccess )
         {
             break;
+#ifdef AUTORES_DEBUG
+			printf("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
+				   mode, minfo.XResolution, minfo.YResolution, err);
+			getc();
+#endif
         }
 
         // Set 8-bit color palette.
@@ -1040,7 +1051,7 @@ setVESATextMode( unsigned short cols,
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int
+int
 getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )

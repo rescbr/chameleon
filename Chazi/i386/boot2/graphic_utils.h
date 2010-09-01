@@ -9,7 +9,8 @@
 #ifndef GRAPHIC_UTILS_H
 #define GRAPHIC_UTILS_H
 
-#include "boot.h"
+//Azi:includes
+//#include "boot.h" - "graphic_utils.h" included only on graphics.h atm, that already includes boot.h.
 
 
 typedef union {

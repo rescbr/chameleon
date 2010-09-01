@@ -7,9 +7,11 @@
  *
  */
 
-#include "boot.h"
+//Azi:include	
+#include "boot.h" // was included on graphic_utils.h
 #include "bootstruct.h"
 #include "graphic_utils.h"
+#include "vbe.h"
 
 
 #ifndef __BOOT_GRAPHICS_H
@@ -37,9 +39,20 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t
 
 int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData);
 
+int getNumberArrayFromProperty( const char *  propKey,
+								unsigned long numbers[],
+								unsigned long maxArrayCount );
 
 char *getVBEInfoString();
 char *getVBEModeInfoString();
+unsigned short getVESAModeWithProperties( unsigned short     width,
+										  unsigned short     height,
+										  unsigned char      bitsPerPixel,
+										  unsigned short     attributesSet,
+										  unsigned short     attributesClear,
+										  VBEModeInfoBlock * outModeInfo,
+										  unsigned short *   vesaVersion );
+
 void getGraphicModeParams(unsigned long params[]);
 
 #endif /* !__BOOT_GRAPHICS_H */
