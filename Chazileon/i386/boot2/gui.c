@@ -847,7 +847,7 @@ void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
 	bool		debugInfo = false; //Azi:debuginfo
-	extern bool	showBootBanner;
+	extern bool	showBootBanner; //			||
 	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = min( gui.maxdevices, menucount );
@@ -905,14 +905,13 @@ void drawDeviceList (int start, int end, int selection)
 			if (gui.menu.draw)
 				drawInfoMenuItems();
 		
-			//Azi: making this info more accessible. TODO: remove the stuff on graphics.c!
+			//Azi: make this info more accessible.
 			getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
 			
 #ifdef AUTORES_DEBUG //Azi:autoresolution - debuginfo
 			debugInfo = true;
 #endif
 
-			//Azi:debuginfo: need to #include vbe.h and also "VBEModeInfoBlock  minfo;"
 			if (debugInfo && showBootBanner)
 			{
 				gui.debug.cursor = pos( 10, 100);
@@ -1903,11 +1902,19 @@ void drawBootGraphics(void)
 		{
 			screen_params[0] = pos;
 		}
+		/*else
+		{
+			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		}*/
 		
 		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[1] = pos;
 		}
+		/*else
+		{
+			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+		}*/
 	}
 
 	// Save current screen resolution.

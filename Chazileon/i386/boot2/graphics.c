@@ -372,7 +372,7 @@ setVESAGraphicsMode( unsigned short width,
 {
 	bool			  debugInfo = false; //Azi:debuginfo
 	extern bool		  showBootBanner; //			||
-    VBEModeInfoBlock  minfo; //						||		also need this on gui.c
+    VBEModeInfoBlock  minfo;
     unsigned short    mode;
     unsigned short    vesaVersion;
     int               err = errFuncNotSupported;
