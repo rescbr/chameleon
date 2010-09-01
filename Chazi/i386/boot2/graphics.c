@@ -43,8 +43,6 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y)) //Azi: take care of this in the process***
  
 //==========================================================================
 // getVBEInfoString
@@ -612,8 +610,8 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
     uint16_t drawWidth;
     uint8_t *vram = (uint8_t *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + 4 * x;
 
-    drawWidth = MIN(width, VIDEO(width) - x);
-    height = MIN(height, VIDEO(height) - y);
+    drawWidth = min(width, VIDEO(width) - x);
+    height = min(height, VIDEO(height) - y);
     while (height--) {
 		switch (VIDEO (depth))
 		{
@@ -792,8 +790,8 @@ void drawColorRectangle( unsigned short x,
     vram       = (char *) VIDEO(baseAddr) +
                  VIDEO(rowBytes) * y + pixelBytes * x;
 
-    width = MIN(width, VIDEO(width) - x);
-    height = MIN(height, VIDEO(height) - y);
+    width = min(width, VIDEO(width) - x);
+    height = min(height, VIDEO(height) - y);
 
     while ( height-- )
     {
@@ -818,8 +816,8 @@ void drawDataRectangle( unsigned short  x,
     unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) +
         VIDEO(rowBytes) * y + pixelBytes * x;
 
-    drawWidth = MIN(width, VIDEO(width) - x);
-    height = MIN(height, VIDEO(height) - y);
+    drawWidth = min(width, VIDEO(width) - x);
+    height = min(height, VIDEO(height) - y);
     while ( height-- ) {
         bcopy( data, vram, drawWidth * pixelBytes );
         vram += VIDEO(rowBytes);
