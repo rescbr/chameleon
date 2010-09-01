@@ -25,8 +25,8 @@ About the branch:
   Any other stuff can/should be reported to me directly, at the forum (*) by pm.
   I might miss a topic so, if you create one, pm me anyway.
 
-  The layout of the branch can change, but at least 2 folders will alway be present (at least for now):
-  CleanCut (CC) and Chazileon (Ch), (soon to be just Chazi, to avoid confusion):
+  The layout of the branch can change, but at least 2 folders will always be present (at least for now):
+  CleanCut (CC) and Chazi (Ch):
 
     - Ch is the main stuff; it's my work folder, test bed and personal booter. Comparing it to the trunk
 	  will probably be a "pain in" for anyone in the future. That's were CC comes in.

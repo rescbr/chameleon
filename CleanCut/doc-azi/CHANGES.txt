@@ -251,13 +251,13 @@ Motif:  do i need to say? :) i thought so.
 - (rev 427)
 Change: removed Chameleon.xcodeproj.
 
-Motif:  it's not up to date and i need time to update it properly, at least on Chazileon (Chazi).
+Motif:  it's not up to date and i need time to update it properly, at least on Chazi.
 		Will reintroduce it later in the process. It's also giving me problems with the svn client
 		when i update it; need to check what i'm doing wrong!?
 
 		---------------//---------------//---------------
 		
-- (rev )
+- (rev 460)
 Change: added a key to display some debug info, that can only be accessed via code edit.
 		Check http://forge.voodooprojects.org/p/chameleon/issues/12/ for history.
 		mm & attr, resolution specific info, are borrowed from AutoResolution branch.
@@ -272,10 +272,12 @@ Motif:  just making this info easily accessible.
 		---------------//---------------//---------------
 		---------------//---------------//---------------
 		
-- (rev )
-Change:				template
+- (rev 462)
+Change: forked this project into a new Chazi project, that will replace Chazileon; the latest will be
+		removed soon... i hope :)
 
-Motif:
+Motif:  this project (CleanCut), as the implies, it's meant to stay clean, as close as possible to the
+		trunk. More details on the README.txt , under Chazi project.
 
 		---------------//---------------//---------------
 
