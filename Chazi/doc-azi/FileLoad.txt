@@ -8,18 +8,23 @@ reflect the current Chameleon (trunk) status on the matter.
 
 To be honest, the info on this file will depend greatly on "feedback"; writing down this stuff it's
 not the most pleasing and fruitful task i have to do atm, time is never enough and i don't feel
-particularly inspired for the job; so if i see no interest in this, i will ditch it as quickly
-as i started it.
+particularly inspired for the job atm; so if i see no interest in this,
+i will ditch it as quickly as i started it.
 
 
 Note: unless other wise specified, first file found is the one used.
+
+Note: path/name search is not case sensitive! Meaning that:
+- this /Extra/DSDT.aml
+- or this /extra/dsdt.aml
+points exactly to the same location.
 
 Before we go on:
 - Selected volume = root volume (volume/partition were a system is installed)
 - Booter volume   = boot volume (volume/partition were the bootloader installed)
 
 				---------------//---------------//---------------
-									azimutz
+								Chazi - CleanCut
 				---------------//---------------//---------------
 
 
@@ -28,15 +33,17 @@ Before we go on:
 Default name:	Extensions (a directory with kext/s)
 Name override:	No
 
-Default path/s: User override
-				rd(0,0)/Extensions										- ramdisk
-				bt(0,0)/Extra/specificOSfolder/Extensions				- booter volume or ramdisk aliased as bt(0,0) (1*)
-				bt(0,0)/Extra/Extensions								- same as above
-				Helper partition/s:
-					- Apple_Boot (2*): checked only if exists
-						/com.apple.boot.P/System/Library/Extensions
-						/com.apple.boot.R/System/Library/Extensions
-						/com.apple.boot.S/System/Library/Extensions
+Default path/s: - User override
+				- ramdisk:
+					rd(0,0)/Extensions
+				- booter volume or ramdisk aliased as bt(0,0) (1*):
+					bt(0,0)/Extra/specificOSfolder/Extensions
+				- same as above:
+					bt(0,0)/Extra/Extensions
+				- Helper partition/s (Apple_Boot): checked only if exists (2*)
+					/com.apple.boot.P/System/Library/Extensions
+					/com.apple.boot.R/System/Library/Extensions
+					/com.apple.boot.S/System/Library/Extensions
 Path override:  Yes
 
 User override:  kext=path to folder with Extensions sub folder; e.g. /Extra/drivers/
@@ -53,10 +60,9 @@ Default path/s: User override
 				rd(0,0)/Extensions.mkext
 				bt(0,0)/Extra/specificOSfolder/Extensions.mkext
 				bt(0,0)/Extra/Extensions.mkext
-				Helper partition/s:
-						/com.apple.boot.P/System/Library/Extensions.mkext
-						/com.apple.boot.R/System/Library/Extensions.mkext
-						/com.apple.boot.S/System/Library/Extensions.mkext
+					/com.apple.boot.P/System/Library/Extensions.mkext
+					/com.apple.boot.R/System/Library/Extensions.mkext
+					/com.apple.boot.S/System/Library/Extensions.mkext
 Path override:  Yes
 
 User override:  kext=path to folder with a Extensions.mkext; e.g. /Extra/drivers/
@@ -72,7 +78,7 @@ Name override:  No
 Default path/s: (3*)
 				bt(0,0)/Extra/com.apple.Boot.plist
 				/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
-				Helper partition/s:
+				- Helper partition/s (Apple_Boot):
 						/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
 						/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
 						/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
@@ -97,13 +103,13 @@ User override:  config=path to file; e.g. /Extra/test/com.apple.Boot.plist or /E
 
 - ACPI table (aml)
 
-Default name:   dsdt.aml
+Default name:   DSDT.aml
 Name override:  Yes
 
 Default path/s: User override
-				rd(0,0)/dsdt.aml
-				bt(0,0)/Extra/specificOSfolder/dsdt.aml
-				bt(0,0)/Extra/dsdt.aml
+				rd(0,0)/DSDT.aml
+				bt(0,0)/Extra/specificOSfolder/DSDT.aml
+				bt(0,0)/Extra/DSDT.aml
 Path override:  Yes
 
 User override:  DSDT=path to file; e.g. rd(0,0)/Extra/dsdt.aml or /Extra/test.aml
@@ -114,13 +120,13 @@ ssdt.aml (5*)
 
 - SMBIOS (plist)
 
-Default name:   smbios.plist
+Default name:   SMBIOS.plist
 Name override:  Yes
 
 Default path/s: User override
-				rd(0,0)/smbios.plist
-				bt(0,0)/Extra/specificOSfolder/smbios.plist
-				bt(0,0)/Extra/smbios.plist
+				rd(0,0)/SMBIOS.plist
+				bt(0,0)/Extra/specificOSfolder/SMBIOS.plist
+				bt(0,0)/Extra/SMBIOS.plist
 Path override:  Yes
 
 User override:  SMBIOS=path to file; e.g. bt(0,0)/Extra/smbios.plist or /Extra/MP21.plist

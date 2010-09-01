@@ -704,7 +704,7 @@ void setupFakeEfi(void)
 	setup_pci_devs(root_pci_dev);
 
 	// load smbios.plist file if any
-	setupSmbiosConfigFile("smbios.plist");
+	setupSmbiosConfigFile("SMBIOS.plist");
 	
 	// Initialize the base table
 	if (archCpuType == CPU_TYPE_I386)

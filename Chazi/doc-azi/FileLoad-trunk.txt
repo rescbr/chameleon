@@ -12,19 +12,18 @@ Note: unless other wise specified, first file found is the one used.
 Default name:	Extensions (a directory with kext/s)
 Name override:	No
 
-Default path/s: rd(0,0)/Extra/Extensions
-					- ramdisk: checked only if exists
-				/Extra/Extensions
-					- selected volume: always checked, even if theres a hit on rd(0,0)
-				bt(0,0)/Extra/specificOSfolder/Extensions
-					- booter volume or ramdisk aliased as bt(0,0) (1*): checked only if there's no hit on /Extra
-				bt(0,0)/Extra/Extensions
-					- same as previous
-				Helper partition/s:
-					- Apple_Boot: checked only if exists (2*)
-						/com.apple.boot.P/System/Library/Extensions
-						/com.apple.boot.R/System/Library/Extensions
-						/com.apple.boot.S/System/Library/Extensions
+Default path/s: - ramdisk: checked only if exists
+					rd(0,0)/Extra/Extensions
+				- selected volume: always checked, even if theres a hit on rd(0,0)
+					/Extra/Extensions
+				- booter volume or ramdisk aliased as bt(0,0) (1*): checked only if there's no hit on the previous
+					bt(0,0)/Extra/specificOSfolder/Extensions
+				- same as previous
+					bt(0,0)/Extra/Extensions
+				- Helper partition/s (Apple_Boot): checked only if exists (2*)
+					/com.apple.boot.P/System/Library/Extensions
+					/com.apple.boot.R/System/Library/Extensions
+					/com.apple.boot.S/System/Library/Extensions
 				
 Path override:  No
 
@@ -39,10 +38,9 @@ Default path/s: rd(0,0)/Extensions.mkext
 				/Extra/Extensions.mkext
 				bt(0,0)/Extra/specificOSfolder/Extensions.mkext
 				bt(0,0)/Extra/Extensions.mkext
-				Helper partition/s:
-						/com.apple.boot.P/System/Library/Extensions.mkext
-						/com.apple.boot.R/System/Library/Extensions.mkext
-						/com.apple.boot.S/System/Library/Extensions.mkext
+					/com.apple.boot.P/System/Library/Extensions.mkext
+					/com.apple.boot.R/System/Library/Extensions.mkext
+					/com.apple.boot.S/System/Library/Extensions.mkext
 Path override:  No
 
 				---------------//---------------//---------------
@@ -55,7 +53,7 @@ Name override:  No
 Default path/s: /Extra/com.apple.Boot.plist
 				bt(0,0)/Extra/com.apple.Boot.plist
 				/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
-				Helper partition/s:
+				- Helper partition/s (Apple_Boot):
 						/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
 						/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
 						/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist
@@ -81,14 +79,16 @@ Path override:  No
 
 - ACPI table/s (aml)
 
-Default name:   dsdt.aml
+Default name:   DSDT.aml
 Name override:  Yes
 
-Default path/s: User override
-				/Extra/dsdt.aml
-				bt(0,0)/Extra/dsdt.aml
-				dsdt.aml (current dir)
-				/dsdt.aml
+Default path/s: - User override or default name:
+					user path or
+					DSDT.aml = current volume!?
+				- selected volume: checked only if there's no hit on the previous
+					/Extra/DSDT.aml
+				- booter volume or ramdisk aliased as bt(0,0) (1*): checked only if there's no hit on the previous
+					bt(0,0)/Extra/DSDT.aml
 Path override:  Yes
 
 User override:  DSDT=path to file; e.g. rd(0,0)/Extra/dsdt.aml or /Extra/test.aml
@@ -99,11 +99,14 @@ ssdt.aml (5*)
 
 - SMBIOS (plist)
 
-Default name:   smbios.plist
+Default name:   SMBIOS.plist
 Name override:  Yes
 
-Default path/s: User override
-				/Extra/smbios.plist
+Default path/s: - User override
+				- selected volume: checked only if there's no hit on the previous
+					/Extra/SMBIOS.plist
+				- booter volume or ramdisk aliased as bt(0,0) (1*): checked only if there's no hit on the previous
+					bt(0,0)/Extra/SMBIOS.plist
 Path override:  Yes
 
 User override:  SMBIOS=path to file; e.g. bt(0,0)/Extra/smbios.plist or /Extra/MP21.plist

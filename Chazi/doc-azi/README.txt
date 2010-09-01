@@ -15,8 +15,10 @@ About the branch:
 
   First, the usual warning: use it at your own risk!
   No, it's not going to set your machine on fire or something like that :)
-  Everything is tested on my machine first, but you never know. Be sure you understand
-  the changes before you use one of these booters and always keep a plan B!
+  Everything is tested on my machine first and i don't mess with stuff i don't have knowledge to mess
+  with, but you never know. Be sure you fully understand the changes before you use this booter
+  (CleanCut included) and always keep a plan B!!!
+  I will do my best to explain what these changes are and more.
   
   Although i use this stuff on a daily basis, this is not meant to be an alternative to Chameleon!
   Any use of this booter/s should be considered "testing". If you do find a certain patch or
@@ -26,14 +28,17 @@ About the branch:
   I might miss a topic so, if you create one, pm me anyway.
 
   The layout of the branch can change, but at least 2 folders will always be present (at least for now):
-  CleanCut (CC) and Chazi (Ch):
+  CleanCut and Chazi:
 
-    - Ch is the main stuff; it's my work folder, test bed and personal booter. Comparing it to the trunk
-	  will probably be a "pain in" for anyone in the future. That's were CC comes in.
-	
-	- CC will be as close to the trunk as possible and i won't commit there patches that don't work for
-	  everyone, like the AutoResolution i use on Ch. It's mean to be compared easily and keep the stuff
-	  i consider most useful to Chameleon "at hand". Stuff committed here will always come from Ch!
+    - Chazi is the main stuff! It's My Work Folder, Test Bed and "Personal" Booter. Comparing it to the
+	  trunk will probably be a "pain in" for anyone in the future. That's were CleanCut comes in.
+
+	- CleanCut, as the name implies, is a "clean" cut of Chazi; will always be as close to the trunk as
+	  possible and i won't commit there patches that don't work for everyone, like the AutoResolution
+	  one i use on Chazi (this may change in the future).
+	  It's mean to be compared easily and keep the stuff i consider most useful to Chameleon "at hand".
+	  Stuff committed there, besides trunk updates, will always come from and reflect changes on Chazi,
+	  keeping the limitations above in mind!
 
 Guidelines:
 
@@ -57,8 +62,15 @@ Guidelines:
   Read the rest of the docs for more info and keep an eye on the forge and forum (*) for news.
   Stay safe and enjoy.
 
+Thanks:
+  any contribution to this OSx86 scene, with a true sense of "community" deserves a "Thank you very much",
+  from the small post to the nice booter :)
 
 
+						---------------//---------------//---------------
+						---------------//---------------//---------------
+						
+						
 (*) http://forge.voodooprojects.org/
     http://forum.voodooprojects.org/
 
