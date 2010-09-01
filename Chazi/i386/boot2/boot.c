@@ -58,8 +58,6 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
-#include "edid.h" // Autoresolution
-#include "autoresolution.h" //Azi:includes - "was" included on boot.h, which is everywere!! -> gui.h -> graphics.h
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -331,7 +329,9 @@ void common_boot(int biosdev)
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
 
-//Azi:autoresolution begin
+	/*
+	 * AutoResolution
+	 */
 	// Before initGui, patch the video bios with the correct resolution
 	UInt32 params[4];
 	params[3] = 0;
@@ -366,7 +366,6 @@ void common_boot(int biosdev)
 		if (params[0] != 0 && params[1] != 0)
 			patchVbios(map, params[0], params[1], params[2], 0, 0);
 	}
-//Azi:autoresolution end
 
     if (useGUI && initGUI())
 	{
@@ -413,7 +412,6 @@ void common_boot(int biosdev)
 			updateVRAM();
 		}
 		
-//Azi:autoresolution begin
 		//
 		//AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
 		//				   or EDID Info was insane
@@ -458,7 +456,6 @@ void common_boot(int biosdev)
 			}
 			closeVbios(map);
 		}
-//Azi:autoresolution end
 		
         status = processBootOptions();
 		// Status == 1 means to chainboot

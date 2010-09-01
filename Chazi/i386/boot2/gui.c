@@ -22,7 +22,7 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 #define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y)) //Azi: take care of this in the process.***
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
@@ -701,23 +701,52 @@ int initGUI(void)
 		return 1;
 #endif
 	}
-	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[0] = val;
-	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[1] = val;
+	
+	/*
+	 * AutoResolution
+	 */
+	if (gAutoResolution == true)
+	{
+		// Get Resolution from Graphics Mode key
+		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
+		
+		// If no Graphics Mode key, get it from EDID
+		if ( count < 3 )
+		{
+			getResolution(screen_params);
+			
+			PRINT("Resolution : %dx%d (EDID)\n",screen_params[0], screen_params[1]);
+		}
+		else
+		{
+			PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
+		}
+ 	}
+	else
+	{
+ 		// parse display size parameters
+ 		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[0] = val;
+		}
+ 		
+ 		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[1] = val;
+		}
 	}
 
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
+	loadConfigFile(dirspec, &bootInfo->themeConfig); //Azi: check this later.
 	getGraphicModeParams(screen_params);
 
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
+	PRINT("Found mode %dx%d in VESA Table\n", gui.screen.width, gui.screen.height);
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
@@ -732,6 +761,11 @@ int initGUI(void)
 					if (createWindowBuffer(&gui.bootprompt) == 0) {
 						if (createWindowBuffer(&gui.infobox) == 0) {
 							if (createWindowBuffer(&gui.menu) == 0) {
+								
+#ifdef AUTORES_DEBUG
+								printf("Press Any Key...\n");
+								getc();
+#endif
 								gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
@@ -739,13 +773,14 @@ int initGUI(void)
 								setVideoMode( GRAPHICS_MODE, 0 );
 								gui.initialised = true;
 								return 0;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+							} else printf("createWindowBuffer(&gui.menu) Failed\n");
+						} else printf("createWindowBuffer(&gui.infobox) Failed\n");
+					} else printf("createWindowBuffer(&gui.bootprompt) Failed\n");
+				} else printf("createWindowBuffer(&gui.devicelist) Failed\n");
+			} else printf("createWindowBuffer(&gui.screen) Failed\n");
+		} else printf("createBackBuffer(&gui.screen) Failed\n");
+	} else printf("loadGraphics() Failed\n");
+	
 	return 1;
 }
 
@@ -888,7 +923,6 @@ void drawDeviceList (int start, int end, int selection)
 				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr );
 				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
 			}
-
 		}
 		
 		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
@@ -1826,7 +1860,7 @@ static void loadBootGraphics(void)
 void drawBootGraphics(void)
 {
 	int pos;
-	int length;
+	int length, count;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
@@ -1838,19 +1872,43 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 
-	// parse display size parameters - Azi: shouldn't this stuff be like the one on initGUI? no "else"
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[0] = pos;
-	} else {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[1] = pos;
-	} else {
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+	/*
+ 	 * AutoResolution - Azi: review this stuff...***
+ 	 */
+	if (gAutoResolution == true)
+	{
+		// Get Resolution from Graphics Mode key
+		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
+		
+		// If no Graphics Mode key, get it from EDID
+		if ( count < 3 )
+		{
+			getResolution(screen_params);
+		}
+ 	}
+	else
+	{
+ 		// parse display size parameters
+		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[0] = pos;
+		}
+		/*else
+		{
+			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		}*/
+		
+		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[1] = pos;
+		}
+		/*else
+		{
+			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+		}*/
 	}
 
-    // Save current screen resolution.
+    // Save current screen resolution. Azi: ... and this too.***
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
 

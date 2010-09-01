@@ -8,11 +8,14 @@
  *
  */
 
-#include "boot.h"
-#include "bootstruct.h"
+//Azi:include
+//#include "boot.h" - included on graphics.h
+//#include "bootstruct.h" - same as above
+//#include "graphic_utils.h" - same as above
 #include "graphics.h"
-#include "graphic_utils.h"
 #include "picopng.h"
+#include "autoresolution.h"
+#include "edid.h"
 
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
@@ -46,6 +49,7 @@ enum {
 	kUpArrowkey		= 0x4800, 
 	kDownArrowkey		= 0x5000,
 	kASCIIKeyMask		= 0x7f,
+	kF2Key			= 0x3c00,
 	kF5Key			= 0x3f00,
 	kF10Key			= 0x4400
 };
@@ -97,8 +101,14 @@ typedef struct
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
 	//resolution specifics
-	uint8_t		mm;				// Azi: debuginfo
-	uint16_t	attr;
+	uint16_t	htotal;				
+	uint16_t	vtotal;				
+	uint16_t	hsyncstart;			
+	uint16_t	hsyncend;
+	uint16_t	vsyncstart;			
+	uint16_t	vsyncend;
+	uint8_t		mm;				// Azi:autoresolution - debuginfo
+	uint16_t	attr;			//			||				||
 } window_t;
 	
 /*
