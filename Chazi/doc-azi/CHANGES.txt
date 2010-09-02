@@ -260,7 +260,7 @@ Motif:  it's not up to date and i need time to update it properly, at least on C
 - (rev 460)
 Change: added a key to display some debug info, that can only be accessed via code edit.
 		Check http://forge.voodooprojects.org/p/chameleon/issues/12/ for history.
-		mm & attr, resolution specific info, are borrowed from AutoResolution branch.
+		mm & attr, resolution specific info, are borrowed from autoResolution branch.
 		
 		DebugInfo=y enables display of debug info.
 
@@ -281,7 +281,7 @@ Motif:  Chazileon (Chazi) has no svn history.
 		---------------//---------------//---------------
 		
 - (revs 465 --> 467, 469 --> 471)
-Change:	added AutoResolution patch, by Lebidou (AutoResolution branch). The main intention of this
+Change:	added AutoResolution patch, by Lebidou (autoResolution branch). The main intention of this
 		patch, is allowing native resolution after boot, even without graphics acceleration (qe/ci).
 		The "side effect" is that it also enables native resolution at boot prompt (Gui).
 		The con: doesn't work for all devices!!

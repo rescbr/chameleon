@@ -473,7 +473,7 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 
-		//Azi: mm & attr info on DebugInfo - from AutoResolution branch.
+		//Azi: mm & attr info on DebugInfo - from autoResolution branch.
 		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
 
 		if (debugInfo && showBootBanner)
