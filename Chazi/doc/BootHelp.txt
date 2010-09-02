@@ -112,11 +112,12 @@ Options useful in the com.apple.Boot.plist file:
   SystemType=<n>          Set the system type where n is between 0..6
                             (default =1 (Desktop)
   md0=<file>              Load raw img file into memory for use as XNU's md0
-                          ramdisk. /Extra/Postboot.img is used otherwise.
+                            ramdisk. /Extra/Postboot.img is used otherwise.
 
   AutoResolution=Yes      Enable native resolution setting for booter Gui and
-                          system, even without graphics acceleration.
+                            system, even without graphics acceleration.
                             (disabled by default)
 Azi: quotes?? check with Danielkza...
-  Graphics Mode + F2      Change resolution while at boot prompt, e.g.:
-                            Graphics Mode=1024x768x32 + press F2 key.
+  Graphics Mode= + F2     Change resolution while at boot prompt, e.g.:
+                            type Graphics Mode=1024x768x32 + press F2 key
+                            to change current resolution.
