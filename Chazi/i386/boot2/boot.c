@@ -58,6 +58,7 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
+#include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -184,6 +185,9 @@ static int ExecKernel(void *binary)
 	}
 
 	usb_loop();
+	
+	// Notify modules that the kernel is about to be started
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
@@ -285,8 +289,14 @@ void common_boot(int biosdev)
         firstRun = false;
     }
 
-    // Loading preboot ramdisk if exists.
-    loadPrebootRAMDisk();
+	// Intialize module system
+	if(init_module_system())
+	{
+		load_all_modules();
+	}
+
+	// Loading preboot ramdisk if exists.
+	loadPrebootRAMDisk();
 
     // Disable rescan option by default
     gEnableCDROMRescan = false;
@@ -655,6 +665,8 @@ void common_boot(int biosdev)
             }
         } else {
             /* Won't return if successful. */
+			// Notify modules that ExecKernel is about to be called
+			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
             ret = ExecKernel(binary);
         }
     }

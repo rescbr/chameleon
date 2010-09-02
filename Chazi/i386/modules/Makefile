@@ -18,21 +18,23 @@ LD = ld
 #
 # these paths are only valid in subdirectories of this directory
 #
-OBJROOT=`pwd`/../../obj/i386
-SYMROOT=`pwd`/../../sym/i386
-DSTROOT=`pwd`/../../dst/i386
+OBJROOT=`pwd`/../../obj/i386/modules/
+SYMROOT=`pwd`/../../sym/i386/modules/
+DSTROOT=`pwd`/../../dst/i386/modules/
 SRCROOT=/tmp
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = util libsa libsaio boot2 boot1 boot0 cdboot modules
+SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 
 all embedtheme tags debug install installhdrs:
+	@rm -rf $(OBJROOT)
+	@mkdir $(OBJROOT)
 	@for i in ${SUBDIRS}; \
 	do \
 		echo ================= make $@ for $$i =================; \
-		( cd $$i; ${MAKE}					  \
+		( cd $$i; $(MKDIRS) $(OBJROOT)/$$i; ${MAKE}					  \
 			"OBJROOT=$(OBJROOT)/$$i"			  \
 		  	"SYMROOT=$(SYMROOT)"				  \
 			"DSTROOT=$(DSTROOT)"				  \

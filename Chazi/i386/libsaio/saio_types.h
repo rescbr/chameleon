@@ -242,7 +242,7 @@ enum {
 enum {
     kNetworkDeviceType = kBIOSDevTypeNetwork,
     kBlockDeviceType   = kBIOSDevTypeHardDrive
-} gBootFileType_t;
+} gBootFileType_t; //Azi: kernel patcher module, rev 307
 
 enum {
     kCursorTypeHidden    = 0x0100,
