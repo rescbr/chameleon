@@ -32,7 +32,8 @@ void getResolution(UInt32* params)
 		
 		free( edidInfo );
 	} else {
-		// TODO: check *all* resolutions reported and eithe ruse the highest, or the native resolution (if there is a flag for that)
+		// TODO: check *all* resolutions reported and either use the highest,
+		// or the native resolution (if there is a flag for that).
 		xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
 		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
 		
@@ -69,13 +70,14 @@ unsigned char* readEDID()
 	
 	do
 	{
-		// TODO: This currently only retrieves the *last* block, make the block buffer expand as needed / calculated from the first block
+		// TODO: This currently only retrieves the *last* block, make the block buffer expand
+		// as needed / calculated from the first block.
 
 		bzero( edidInfo, EDID_BLOCK_SIZE);
 
 		status = getEDID(edidInfo, blocks_left);
 		
-				//printf("Buffer location: 0x%X\n", SEG(buffer) << 16 | OFF(buffer));
+		//printf("Buffer location: 0x%X\n", SEG(buffer) << 16 | OFF(buffer));
 
 		/*
 		int j, i;

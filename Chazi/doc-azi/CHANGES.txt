@@ -288,8 +288,11 @@ Change:	added AutoResolution patch, by Lebidou (AutoResolution branch). The main
 		
 		AutoResolution=y enables the patch.
 
-  Note: Obviously, it only works in Graphics Mode (Gui).
-		Disabled by default.
+  Note: Obviously, it only works in Graphics Mode (Gui). Disabled by default.
+
+  Note: resolution set on theme.plist is overriding the native one set by AutoResolution. For now the
+		possible solutions are, remove the boot resolution (boot_width, boot_height) from theme.plist
+		or add "Graphics Mode"=<native resolution>.
 
 Motif:  ... mentioned above. Check the topic for more details:
 		http://forum.voodooprojects.org/index.php/topic,1227.0.html

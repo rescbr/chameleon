@@ -8,9 +8,12 @@
  *
  */
 
+//Azi:includes
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
+//#include "edid.h" //Azi: needed just for getResolution() call on drawBootGraphics()?? - No!! wtf... check later.
+//#include "autoresolution.h"
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
@@ -736,7 +739,7 @@ int initGUI(void)
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
-	loadConfigFile(dirspec, &bootInfo->themeConfig); //Azi: check this later.
+	//loadConfigFile(dirspec, &bootInfo->themeConfig); //Azi: check this later.
 	getGraphicModeParams(screen_params);
 
 	// set our screen structure with the mode width & height
@@ -1869,18 +1872,24 @@ void drawBootGraphics(void)
 	}
 
 	/*
- 	 * AutoResolution - Azi: review this stuff...***
+ 	 * AutoResolution - Azi: check this later; resolution on theme.plist overrides the native one!
  	 */
 	if (gAutoResolution == true)
 	{
 		// Get Resolution from Graphics Mode key
-		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
+		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4); //Azi: this is ok!
 		
 		// If no Graphics Mode key, get it from EDID
 		if ( count < 3 )
 		{
-			getResolution(screen_params);
+			getResolution(screen_params); //Azi: this returns default resolution (1024x768x32) if nothing found.
+			
+			//PRINT("Resolution : %dx%d (EDID)\n",screen_params[0], screen_params[1]);
 		}
+		/*else
+		{
+			PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
+		}*/
  	}
 	else
 	{

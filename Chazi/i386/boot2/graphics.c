@@ -26,7 +26,7 @@
  * All rights reserved.
  */
 
-//Azi:include
+//Azi:includes
 //#include "boot.h" - included on graphics.h, which is included on gui.h
 //#include "vbe.h" - same as above (needed if autoresolution is removed!)
 #include "appleClut8.h"

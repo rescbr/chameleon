@@ -7,7 +7,7 @@
  *
  */
 
-//Azi:include	
+//Azi:includes	
 #include "boot.h" // was included on graphic_utils.h
 #include "bootstruct.h"
 #include "graphic_utils.h"

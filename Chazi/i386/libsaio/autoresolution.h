@@ -16,6 +16,8 @@
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
 
+//#define AUTORES_DEBUG 1 // enable AutoResolution debug - review!
+
 #include "edid.h"
 
 #if DEBUG
