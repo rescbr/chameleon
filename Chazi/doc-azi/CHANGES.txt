@@ -299,14 +299,16 @@ Motif:  ... mentioned above. Check the topic for more details:
 
 		---------------//---------------//---------------
 
-- (rev 480)
+- (starting at rev 480)
 Change: Added Meklort's Modules support, plus Kernel Patcher (Kptchr) module.
 		Check Modules.txt for more info.
 		Some talk here: http://forum.voodooprojects.org/index.php/topic,1556.0.html
 		here: http://forum.voodooprojects.org/index.php/topic,1153.0.html
 		and here: http://forum.voodooprojects.org/index.php/topic,1565.0.html
 		
-  Note: Only i386 arch is supported at the moment; x86_64 support to be added.
+		PatchKernel=n disables Kernel Patcher. "Temporarily" enabled by default!!
+		
+  Note: Only i386 arch is supported at the moment; x86_64 support being added...
 
 Motif:  ... as if, booting vanilla kernel, is not reason enough!?
 

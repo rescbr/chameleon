@@ -215,7 +215,7 @@ int locate_symbols(void* kernelData)
 {
 
 	struct load_command *loadCommand;
-	struct symtab_command *symtableData;
+	struct symtab_command *symtableData = 0; //Azi:warning
 	//	struct nlist *symbolEntry;
 	
 	char* symbolString;
@@ -286,7 +286,8 @@ int locate_symbols(void* kernelData)
 		}
 	}
 	
-	handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
+	return handle_symtable((UInt32)kernelData, symtableData, &symbol_handler,
+							determineKernelArchitecture(kernelData) == KERNEL_64);
 }
 
 long long symbol_handler(char* symbolName, long long addr, char is64)
