@@ -299,26 +299,14 @@ Motif:  ... mentioned above. Check the topic for more details:
 
 		---------------//---------------//---------------
 
-						***Assume this to be in "Alpha" state!***
 - (rev 480)
-Change: Added Meklort's Modules support, plus Kernel Patcher (Kpatcher) module. The short story:
-		- get the source, compile; find modules at /sym/i386, with .dylib file extension.
-		- copy the .dylib files to a Modules folder created on your favorite Extra folder.
-		You are ready to go; modules are loaded at startup, before the Gui loads. As it is, Kpatcher
-		allows my Pentium D 925 to boot vanilla kernel, with the help of -legacy flag; to enter x86_64
-		world i still need to patch the kernel, as the 925 has no SSSE3 instructions. I assume that,
-		the great majority of the legacy/unsupported processors with at least SSE3 instructions,
-		will have the same treatment!
-		As far as i know, 3 patches are active at the moment: 
-		- cpuid, commpage_stuff and lapic_init.
+Change: Added Meklort's Modules support, plus Kernel Patcher (Kptchr) module.
+		Check Modules.txt for more info.
 		Some talk here: http://forum.voodooprojects.org/index.php/topic,1556.0.html
 		here: http://forum.voodooprojects.org/index.php/topic,1153.0.html
 		and here: http://forum.voodooprojects.org/index.php/topic,1565.0.html
-		More documentation later...
 		
   Note: Only i386 arch is supported at the moment; x86_64 support to be added.
-		There are still some loose ends to tie, on my side at least, hence the Alpha state.
-		Also, the patch can be affected by changes on the kernel code, though that can be "previewed".
 
 Motif:  ... as if, booting vanilla kernel, is not reason enough!?
 

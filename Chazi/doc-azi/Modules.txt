@@ -1,0 +1,65 @@
+The possible info at the moment:
+
+Installation:
+  - get the source, compile; find modules at /sym/i386, with .dylib file extension.
+
+  - copy the .dylib files to a Modules folder created on your favorite Extra folder.
+
+  - update boot file or reinstall the booter completely in case it's too old;
+	"old" in RC5 world means before rev 168 (atm).
+
+How to use?
+  - nothing to do! Modules are loaded at startup, before the Gui loads, providing you place
+	them in the correct place (check Issues below).
+	
+  - Symbols.dylib is always and the first module loaded. The booter will still perform as
+	usual if this module fails to load.
+
+What are modules?
+  - good question! Well, can't add much on the "geek" side... need to study the stuff so
+	i don't start dumping bs. The easy answer is they are like plugins, adding/replacing
+	booter functionality. For instance: the Kernel Patcher (Kptchr) is around for some time,
+	integrated on boot file like any other Chameleon function; with Modules support Kptchr
+	can now live as a module, freeing the space it occupied on boot file
+	(one of module's advantages).
+
+Kernel Patcher module:
+  - features cpuid_set, commpage_stuff and lapic_init patches (atm).
+
+  -	as it is, Kptchr allows my Pentium D 925 to boot vanilla kernel, with the help of
+	-legacy flag; to enter x86_64 world i still need to patch the kernel, as the 925 has no
+	Supplemental SSE3 instructions. I assume that, the great majority of the legacy/unsupported
+	processors with at least SSE3 instructions, will benefit of the same treatment!
+	For now let's just say that the only patch needed by the 925 on Legacy Mode(*) is
+	cpuid_set!
+
+(*) For those who "missed" the lesson, Legacy Mode is the mode, 32 bit only cpu's run on OS X.
+
+Issues:
+  - modules may fail to load, if you have the booter on a separate device/partition and try
+	to load modules from selected volume. Confirmed on MBR/boot0hfs install only.
+
+  - the Kernel Patcher can stop working due to changes on the kernel code, though that can be
+	"previewed" to some extent. Just so you know what to expect.
+
+  - this is work in progress; i will add updates as Meklort commits and only if they are in
+	functional state.
+
+
+Smith@@'s news :D
+
+  «  Sent to: Azimutz   on: Fri 03/09/2010 at 05:55:08 »
+
+	 "Hi azi, i've try last chazi with modules, it works like a charm ;)"
+
+						-------/-/-------
+
+  Grazie Amico - Azi
+
+		---------------//---------------//---------------
+
+
+
+Azimutz
+
+
