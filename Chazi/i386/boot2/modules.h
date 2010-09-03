@@ -39,10 +39,10 @@ typedef struct moduleHook_t
 	struct moduleHook_t* next;
 } moduleHook_t;
 
-
-#define SYMBOLS_MODULE "Symbols"
+#define SYMBOLS_MODULE "Symbols.dylib"
 
 #define SYMBOL_DYLD_STUB_BINDER	"dyld_stub_binder"
+#define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
 #define STUB_ENTRY_SIZE	6
 
 #define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
@@ -55,10 +55,6 @@ void load_all_modules();
 
 /*
  * Modules Interface
- * register_hook
- *		Notifies the module system that it should log requests
- *		for callbacks on the hool execution
- *
  * execute_hook
  *		Exexutes a registered hook. All callbaks are
  *		called in the same order that they were added
@@ -67,7 +63,6 @@ void load_all_modules();
  *		registers a void function to be executed when a
  *		hook is executed.
  */
-inline void register_hook(const char* name);
 int execute_hook(const char* name, void*, void*, void*, void*);
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
 
@@ -77,13 +72,14 @@ int load_module(const char* module);
 int is_module_laoded(const char* name);
 void module_loaded(char* name, UInt32 version, UInt32 compat);
 
-void* add_symbol(char* symbol, void*  addr);
+long long add_symbol(char* symbol, long long addr, char is64);
 
 void* parse_mach(void* binary);
 
 unsigned int handle_symtable(UInt32 base,
 							 struct symtab_command* symtabCommand,
-							 void*(*symbol_handler)(char*, void*));
+							 long long(*symbol_handler)(char*, long long, char),
+							 char is64);
 							 
 unsigned int lookup_all_symbols(const char* name);
 

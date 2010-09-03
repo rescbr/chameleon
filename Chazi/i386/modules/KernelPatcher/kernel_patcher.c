@@ -286,10 +286,10 @@ int locate_symbols(void* kernelData)
 		}
 	}
 	
-	handle_symtable((UInt32)kernelData, symtableData, &symbol_handler);
+	handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
 }
 
-void* symbol_handler(char* symbolName, void* addr)
+long long symbol_handler(char* symbolName, long long addr, char is64)
 {
 	// Locate the symbol in the list, if it exists, update it's address
 	kernSymbols_t *symbol = lookup_kernel_symbol(symbolName);
@@ -297,9 +297,9 @@ void* symbol_handler(char* symbolName, void* addr)
 	
 	if(symbol)
 	{
-		symbol->addr = (UInt32)addr;
+		symbol->addr = addr;
 	}
-	return (void*)0xFFFFFFFF;
+	return 0xFFFFFFFF; // fixme
 }
 
 

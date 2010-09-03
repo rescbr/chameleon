@@ -45,7 +45,7 @@ typedef struct kernSymbols_t
 kernSymbols_t* lookup_kernel_symbol(const char* name);
 void register_kernel_symbol(int kernelType, const char* name);
 
-void* symbol_handler(char* symbol, void* addr);
+long long symbol_handler(char* symbolName, long long addr, char is64);
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4);
 void register_kernel_patch(void* patch, int arch, int cpus);
 

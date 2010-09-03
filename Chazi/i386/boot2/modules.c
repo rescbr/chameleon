@@ -29,6 +29,19 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 
+
+#if DEBUG_MODULES
+void print_hook_list()
+{
+	moduleHook_t* hooks = moduleCallbacks;
+	while(hooks)
+	{
+		printf("Hook: %s\n", hooks->name);
+		hooks = hooks->next;
+	}
+}
+#endif
+
 /*
  * Initialize the module system by loading the Symbols.dylib module.
  * Once laoded, locate the _lookup_symbol function so that internal
@@ -39,7 +52,7 @@ int init_module_system()
 	// Intialize module system
 	if(load_module(SYMBOLS_MODULE))
 	{
-		lookup_symbol = (void*)lookup_all_symbols("_lookup_symbol");
+		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
@@ -66,12 +79,15 @@ void load_all_modules()
 	char* name;
 	long flags;
 	long time;
+	
+	//Azi: this path is resolving to bt(0,0) instead of selected volume; a perfect
+	// example of what made me gave up on /Extra path. Confirmed on MBR/boot0hfs only.
+	// Looking further into this...
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
-			name[strlen(name) - sizeof("dylib")] = 0;
 			load_module(name);
 		}
 	}
@@ -87,12 +103,16 @@ int load_module(const char* module)
 	// Check to see if the module has already been loaded
 	if(is_module_laoded(module))
 	{
+		// NOTE: Symbols.dylib tries to load twice, this catches it as well
+		// as when a module links with an already loaded module
 		return 1;
 	}
 	
 	char modString[128];
 	int fh = -1;
-	sprintf(modString, "/Extra/modules/%s.dylib", module);
+	
+	//Azi: same as #84
+	sprintf(modString, "/Extra/modules/%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
@@ -112,59 +132,23 @@ int load_module(const char* module)
 		// Module loaded into memory, parse it
 		module_start = parse_mach(module_base);
 
-		if(module_start)
+		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
 			(*module_start)();	// Start the module
-			DBG("Module %s.dylib Loaded.\n", module);
+			DBG("Module %s Loaded.\n", module);
 		}
 		else {
-			printf("Unabel to start %s.dylib\n", module);
+			printf("Unable to start %s\n", module);
 			getc();
-		}
-		// TODO: Add module to loaded list if loaded successfuly
-		
+		}		
 	}
 	else
 	{
-		printf("Unable to read in module %s.dylib\n.", module);
+		printf("Unable to read in module %s\n.", module);
 		getc();
 	}
 	return 1;
 }
-
-
-/*
- * register_hook( const char* name )
- *		name - Name of the module Hook.
- *			   NOTE: If the name already exists in the list, it'll
- *			   still be added, however the entry will not be used, the first one
- *			   will instead. That also means the the hook will most likely be
- *			   called twice.
- *
- * Registers a hook with the module system, This allows modules to
- * register a callback when the hook is executed.
- */
-
-inline void register_hook(const char* name)
-{
-	moduleHook_t* hooks;
-	if(moduleCallbacks == NULL)
-	{
-		moduleCallbacks = malloc(sizeof(moduleHook_t));
-		moduleCallbacks->next = NULL;
-	}
-	
-	hooks = moduleCallbacks;
-	while(hooks->next != NULL)
-	{
-		hooks = hooks->next;
-	}
-	
-	
-	hooks->name = name;
-	hooks->callbacks = NULL;
-}
-
 
 /*
  *	execute_hook(  const char* name )
@@ -181,12 +165,12 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 	{
 		moduleHook_t* hooks = moduleCallbacks;
 		
-		while(hooks != NULL && strcmp(name, hooks->name) != 0)
+		while(hooks != NULL && strcmp(name, hooks->name) < 0)
 		{
 			hooks = hooks->next;
 		}
 		
-		if(hooks != NULL)
+		if(strcmp(name, hooks->name) == 0)
 		{
 			// Loop through all callbacks for this module
 			callbackList_t* callbacks = hooks->callbacks;
@@ -223,59 +207,77 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
  *	register_hook_callback(  const char* name,  void(*callback)())
  *		name - Name of the module hook to attach to.
  *		callbacks - The funciton pointer that will be called when the
- *			hook is executed.
+ *			hook is executed. When registering a new callback name, the callback is added sorted.
  *			NOTE: the hooks take four void* arguments.
+ *			TODO: refactor
  */
-/*
- void register_hook_callback(const char* name,
-							void(*callback)(void*, void*, void*, void*),
-							)*/
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {
+	DBG("Registering %s\n", name);
 	// Locate Module hook
 	if(moduleCallbacks == NULL)
 	{
-		register_hook(name);
-	}
-	volatile moduleHook_t* hooks = moduleCallbacks;
-	
-	while(hooks != NULL && strcmp(name, hooks->name) != 0)
-	{
-		hooks = hooks->next;
-	}
-	
-	if(hooks == NULL)
-	{
-		// Hook doesn't exist, add it.
-		register_hook(name);
-		
-		// This is just a pointer, the data was modified in the register_hook function.
-		hooks = hooks->next;
-	}
-	
-	// Module Hooks located
-	if(hooks->callbacks == NULL)
-	{
+		moduleCallbacks = malloc(sizeof(moduleHook_t));
+		moduleCallbacks->next = NULL;
+		moduleCallbacks->name = name;
 		// Initialize hook list
-		hooks->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
-		hooks->callbacks->callback = callback;
-		hooks->callbacks->next = NULL;
+		moduleCallbacks->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+		moduleCallbacks->callbacks->callback = callback;
+		moduleCallbacks->callbacks->next = NULL;
 	}
 	else
 	{
-		callbackList_t* callbacks = hooks->callbacks;
-		while(callbacks->next != NULL)
+		moduleHook_t* hooks = moduleCallbacks;
+		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));;
+		
+		while(hooks->next != NULL && strcmp(name, hooks->name) < 0)
 		{
-			callbacks = callbacks->next;
+			hooks = hooks->next;
 		}
-		// Add new entry to end of hook list.
-		callbacks->next = (callbackList_t*)malloc(sizeof(callbackList_t));
-		callbacks = callbacks->next;
-		callbacks->next = NULL;
-		callbacks->callback = callback;
+		
+		DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
+		
+		if(hooks == NULL)
+		{
+			newHook->next = moduleCallbacks;
+			moduleCallbacks = newHook;
+			newHook->name = name;
+			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+			newHook->callbacks->callback = callback;
+			newHook->callbacks->next = NULL;
+			
+		}
+		else if(strcmp(name, hooks->name) != 0)
+		{
+			newHook->next = hooks->next;
+			hooks->next = newHook;
+			
+			newHook->name = name;
+			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+			newHook->callbacks->callback = callback;
+			newHook->callbacks->next = NULL;
+		}
+		else
+		{
+			callbackList_t* callbacks = hooks->callbacks;
+			while(callbacks->next != NULL)
+			{
+				callbacks = callbacks->next;
+			}
+			// Add new entry to end of hook list.
+			callbacks->next = (callbackList_t*)malloc(sizeof(callbackList_t));
+			callbacks = callbacks->next;
+			callbacks->next = NULL;
+			callbacks->callback = callback;
+			
+		}
 	}
+#if DEBUG_MODULES
+	print_hook_list();
+	getc();
+#endif
+	
 }
-
 
 
 /*
@@ -287,10 +289,11 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(void* binary)
+void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 {	
+	char is64 = false;
 	void (*module_start)(void) = NULL;
-
+	
 	// Module info
 	char* moduleName = NULL;
 	UInt32 moduleVersion = 0;
@@ -300,18 +303,30 @@ void* parse_mach(void* binary)
 	struct load_command *loadCommand = NULL;
 	struct dylib_command* dylibCommand = NULL;
 	struct dyld_info_command* dyldInfoCommand = NULL;
+	
 	struct symtab_command* symtabCommand = NULL;
+	
 	//struct dysymtab_command* dysymtabCommand = NULL;
 	UInt32 binaryIndex = sizeof(struct mach_header);
 	UInt16 cmd = 0;
 
 	// Parse through the load commands
-	if(((struct mach_header*)binary)->magic != MH_MAGIC)
+	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
-		printf("Module is not 32bit\n");
-		getc();
-		return NULL;	// 32bit only
+		is64 = 0;
 	}
+	else if(((struct mach_header_64*)binary)->magic != MH_MAGIC_64)
+	{
+		is64 = 1;
+	}
+	else
+	{
+		printf("Invalid mach magic\n");
+		getc();
+		return NULL;
+	}
+
+
 	
 	if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	{
@@ -381,7 +396,7 @@ void* parse_mach(void* binary)
 		
 
 	// bind_macho uses the symbols.
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, &add_symbol);
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, &add_symbol, is64);
 
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
@@ -465,7 +480,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				// Locate address to begin rebasing
 				segmentAddress = 0;
 
-				struct segment_command* segCommand = NULL;
+				 
+				struct segment_command* segCommand = NULL; // NOTE: 32bit only
 				
 				unsigned int binIndex = 0;
 				index = 0;
@@ -536,7 +552,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
-					//printf("\tRebasing 0x%X\n", segmentAddress);
+					//DBG("\tRebasing 0x%X\n", segmentAddress);
 					rebase_location(base + segmentAddress, (char*)base);					
 					segmentAddress += sizeof(void*);
 				}
@@ -695,7 +711,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				segmentAddress = 0;
 
 				// Locate address
-				struct segment_command* segCommand = NULL;
+				struct segment_command* segCommand = NULL;	// NOTE: 32bit only
 				
 				unsigned int binIndex = 0;
 				index = 0;
@@ -878,8 +894,11 @@ inline void rebase_location(UInt32* location, char* base)
  * adjust it's internal symbol list (sort) to optimize locating new symbols
  * NOTE: returns the address if the symbol is "start", else returns 0xFFFFFFFF
  */
-void* add_symbol(char* symbol, void* addr)
+long long add_symbol(char* symbol, long long addr, char is64)
 {
+	if(is64) return  0xFFFFFFFF; // Fixme
+
+	// This only can handle 32bit symbols 
 	symbolList_t* entry;
 	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
 	
@@ -901,7 +920,7 @@ void* add_symbol(char* symbol, void* addr)
 	}
 
 	entry->next = NULL;
-	entry->addr = (unsigned int)addr;
+	entry->addr = (UInt32)addr;
 	entry->symbol = symbol;
 	
 	if(strcmp(symbol, "start") == 0)
@@ -910,7 +929,7 @@ void* add_symbol(char* symbol, void* addr)
 	}
 	else
 	{
-		return (void*)0xFFFFFFFF;
+		return 0xFFFFFFFF; // fixme
 	}
 }
 
@@ -1018,7 +1037,7 @@ unsigned int lookup_all_symbols(const char* name)
  * Lookup any undefined symbols
  */
  
-unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, void*(*symbol_handler)(char*, void*))
+unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, long long, char), char is64)
 {
 	// TODO: verify that the _TEXT,_text segment starts at the same locaiton in the file. If not
 	//			subtract the vmaddress and add the actual file address back on. (NOTE: if compiled properly, not needed)
@@ -1028,25 +1047,49 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	UInt32 symbolIndex = 0;
 	char* symbolString = base + (char*)symtabCommand->stroff;
 	//char* symbolTable = base + symtabCommand->symoff;
-	
-	while(symbolIndex < symtabCommand->nsyms)
+	if(!is64)
 	{
 		
-		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
-		
-		// If the symbol is exported by this module
-		if(symbolEntry->n_value &&
-		   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (void*)base + symbolEntry->n_value) != (void*)0xFFFFFFFF)
+		while(symbolIndex < symtabCommand->nsyms)
 		{
-		   
-			// Module start located. Start is an alias so don't register it
-			module_start = base + symbolEntry->n_value;
+			
+			struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
+			
+			// If the symbol is exported by this module
+			if(symbolEntry->n_value &&
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			{
+				
+				// Module start located. Start is an alias so don't register it
+				module_start = base + symbolEntry->n_value;
+			}
+			
+			symbolEntry+= sizeof(struct nlist);
+			symbolIndex++;	// TODO remove
 		}
-		
-		symbolEntry+= sizeof(struct nlist);
-		symbolIndex++;	// TODO remove
 	}
-	
+	else
+	{
+		
+		while(symbolIndex < symtabCommand->nsyms)
+		{
+			
+			struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist_64));
+			
+			// If the symbol is exported by this module
+			if(symbolEntry->n_value &&
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			{
+				
+				// Module start located. Start is an alias so don't register it
+				module_start = base + symbolEntry->n_value;
+			}
+			
+			symbolEntry+= sizeof(struct nlist);
+			symbolIndex++;	// TODO remove
+		}
+	}
+		
 	return module_start;
 	
 }
