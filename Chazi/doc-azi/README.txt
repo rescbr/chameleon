@@ -43,13 +43,14 @@ About the branch:
 Guidelines:
 
   - learn and spread the knowledge.
-  - simplify booter use as much as possible.
   - make the code more understandable for Sorcerer's Apprentice like my self.
-  - all files loaded by the booter stay confined to Extra folder.
-  - fixes that are not absolutely needed by all users, should be disabled by default.
+  - help applying Coding Standards.
   - help improving Chameleon documentation.
   - help testing and integrating new useful code to Chameleon.
-  - help applying Coding Standards.
+
+  - simplify booter use as much as possible.
+  - all files loaded by the booter stay confined to Extra folder.
+  - fixes that are not absolutely needed by all users, are disabled by default. (reviewable)
   - no absolute priority to Selected volume.
   - emulating a Mac it's not a priority!!!
 
@@ -64,7 +65,7 @@ Guidelines:
 
 Thanks:
   any contribution to this OSx86 scene, with a true sense of "community" deserves a "Thank you very much",
-  from the small post to the nice booter :)
+  from the small post, to the nice booter :)
 
 
 						---------------//---------------//---------------

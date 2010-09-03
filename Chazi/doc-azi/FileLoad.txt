@@ -145,7 +145,7 @@ Path override:  Yes
 User override:  rd=path to file; e.g. /Extra/Preboot.dmg or /Leo.dmg
 
 				---------------//---------------//---------------
-
+The long story:
 				---------------//---------------//---------------
 
 
