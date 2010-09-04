@@ -1,34 +1,40 @@
 The possible info at the moment:
 
 Installation:
+
   - get the source, compile; find modules at /sym/i386, with .dylib file extension.
 
-  - copy the .dylib files to a Modules folder created on your favorite Extra folder.
+  - create a /Extra/modules folder, copy Symbols.dylib (mandatory) to modules folder,
+	plus any other module you wish to load.
 
-  - update boot file or reinstall the booter completely in case it's too old;
-	"old" in RC5 world means before rev 168 (atm).
+  - update boot file or reinstall the booter completely, as needed.
+
 
 How to use?
-  - Check if a key is needed to activate the module you pretend to use.
-	Modules are loaded at startup, before the Gui loads, providing they are located in
-	the right place (check Issues below).
+
+  - Just check if a key is needed to activate the module you pretend to use. Otherwise
+	modules are loaded at startup by the booter from default location. (check Issues below).
 
 	---------------//---------------//---------------
 
 What are modules?
+
   - good question! Well, can't add much on the "geek" side... need to study the stuff so
 	i don't start dumping bs. The easy answer is they are like plugins, adding/replacing
 	booter functionality. For instance: the Kernel Patcher (Kptchr) is around for some time,
 	integrated on boot file like any other Chameleon function; with Modules support Kptchr
 	can now live as a module, freeing the space it occupied on boot file
 	(one of module's advantages).
-	The booter will still perform as usual if a module fails to load.
+	
 	
 Featured modules:
-  - Symbols.dylib: first and always loaded. No key is foreseen for this module.
-	No other module will work if this one fails to load.
+
+  - Symbols.dylib: always needed to load other modules! It's the first one to load and no
+	other module will work if this one fails to load. The booter will still perform as
+	usual, if it fails to load.  
 
   - KernelPatcher.dylib:
+
 	- "will" need PatchKernel=y to be enabled.
   Note:*** this is still under consideration/testing so, for now the patcher is enabled by default***
 	
@@ -41,7 +47,7 @@ Featured modules:
 	  will benefit of the same treatment!
 	  Let's just say that the only patch needed by the 925 on Legacy Mode(*) is cpuid_set!
 	
-	- HelloWorld.dylib: just a notifier, i guess :P
+  - HelloWorld.dylib: just a notifier (not needed).
 
 
 (*) For those who "missed" the lesson, Legacy Mode is the mode 32 bit only cpu's run on OS X.
@@ -49,6 +55,7 @@ Featured modules:
 	---------------//---------------//---------------
 
 Issues:
+
   - modules may fail to load, if you have the booter on a separate device/partition and try
 	to load modules from selected volume. Confirmed on MBR/boot0hfs install only.
 
