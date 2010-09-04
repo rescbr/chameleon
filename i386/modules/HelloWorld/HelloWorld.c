@@ -4,7 +4,7 @@
  */
 
 #include "libsaio.h"
-
+#include "modules.h"
 
 void helloWorld(void* binary, void* arg2, void* arg3, void* arg4)
 {

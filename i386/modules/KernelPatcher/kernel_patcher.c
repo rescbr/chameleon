@@ -12,37 +12,40 @@ extern PlatformInfo_t    Platform;
 patchRoutine_t* patches = NULL;
 kernSymbols_t* kernelSymbols = NULL;
 
-
-UInt32 textSection = 0;
-UInt32 textAddress = 0;
-
+unsigned long long textAddress = 0;
+unsigned long long textSection = 0;
+//UInt64 vmaddr = 0;
 
 void KernelPatcher_start()
 {
 	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_ATOM);		// TODO: CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN
 	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_UNKNOWN);	// 0, 0 
-	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_32, CPUID_MODEL_UNKNOWN); 
+	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_ANY, CPUID_MODEL_UNKNOWN); 
 
-	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_32, CPUID_MODEL_ANY);
+	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPUID_MODEL_ANY);
 	
-	register_kernel_patch(patch_lapic_init, KERNEL_32, CPUID_MODEL_ANY);
+	register_kernel_patch(patch_lapic_init, KERNEL_ANY, CPUID_MODEL_ANY);
 
+	// NOTE: following is currently 32bit only
 	register_kernel_patch(patch_lapic_configure, KERNEL_32, CPUID_MODEL_ANY);
-	//register_kernel_patch(patch_lapic_interrupt, KERNEL_32, CPUID_MODEL_ANY);
 
 	
-	register_kernel_symbol(KERNEL_32, "_panic");
-	register_kernel_symbol(KERNEL_32, "_cpuid_set_info");
-	register_kernel_symbol(KERNEL_32, "_pmCPUExitHaltToOff");
-	register_kernel_symbol(KERNEL_32, "_lapic_init");
-	register_kernel_symbol(KERNEL_32, "_commpage_stuff_routine");
+	register_kernel_symbol(KERNEL_ANY, "_panic");
+	register_kernel_symbol(KERNEL_ANY, "_cpuid_set_info");
+	register_kernel_symbol(KERNEL_ANY, "_pmCPUExitHaltToOff");
+	register_kernel_symbol(KERNEL_ANY, "_lapic_init");
+	register_kernel_symbol(KERNEL_ANY, "_commpage_stuff_routine");
 
 	// LAPIC configure symbols
-	register_kernel_symbol(KERNEL_32, "_lapic_configure");
-	register_kernel_symbol(KERNEL_32, "_lapic_interrupt");
+	register_kernel_symbol(KERNEL_ANY, "_lapic_configure");
 
-	register_kernel_symbol(KERNEL_32, "_lapic_start");
-	register_kernel_symbol(KERNEL_32, "_lapic_interrupt_base");
+	register_kernel_symbol(KERNEL_ANY, "_lapic_start");
+	register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt_base");
+	
+	
+	//register_kernel_patch(patch_lapic_interrupt, KERNEL_ANY, CPUID_MODEL_ANY);
+	//register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt");
+
 
 	
 	// TODO: register needed symbols
@@ -213,17 +216,32 @@ int determineKernelArchitecture(void* kernelData)
  **/
 int locate_symbols(void* kernelData)
 {
-
+	char is64;
 	struct load_command *loadCommand;
-	struct symtab_command *symtableData;
-	//	struct nlist *symbolEntry;
-	
-	char* symbolString;
+	struct symtab_command *symtableData = NULL;
+	struct segment_command *segCommand = NULL;
+	struct segment_command_64 *segCommand64 = NULL;
 
 	UInt32 kernelIndex = 0;
-	kernelIndex += sizeof(struct mach_header);
 	
-	if(((struct mach_header*)kernelData)->magic != MH_MAGIC) return KERNEL_64;
+	if(((struct mach_header*)kernelData)->magic == MH_MAGIC)
+	{
+		is64 = 0;
+		kernelIndex += sizeof(struct mach_header);
+
+	}
+	else if(((struct mach_header_64*)kernelData)->magic == MH_MAGIC_64)
+	{
+		is64 = 1;
+		kernelIndex += sizeof(struct mach_header_64);
+
+	}
+	else
+	{
+		printf("Invalid mach magic 0x%X\n", ((struct mach_header*)kernelData)->magic);
+		getc();
+		return KERNEL_ERR;
+	}
 	
 	
 	int cmd = 0;
@@ -235,58 +253,84 @@ int locate_symbols(void* kernelData)
 		
 		UInt cmdSize = loadCommand->cmdsize;
 		
-		
-		if((loadCommand->cmd & 0x7FFFFFFF) == LC_SYMTAB)		// We only care about the symtab segment
+		switch ((loadCommand->cmd & 0x7FFFFFFF))
 		{
-			//printf("Located symtable, length is 0x%X, 0x%X\n", (unsigned int)loadCommand->cmdsize, (unsigned int)sizeof(symtableData));
-			
-			symtableData = kernelData + kernelIndex;
-			kernelIndex += sizeof(struct symtab_command);
-		
-			symbolString = kernelData + symtableData->stroff;
-		}
-		else if((loadCommand->cmd & 0x7FFFFFFF) == LC_SEGMENT)		// We only care about the __TEXT segment, any other load command can be ignored
-		{
-			
-			struct segment_command *segCommand;
-			
-			segCommand = kernelData + kernelIndex;
-			
-			//printf("Segment name is %s\n", segCommand->segname);
-			
-			if(strcmp("__TEXT", segCommand->segname) == 0)
-			{
-				UInt32 sectionIndex;
+			case LC_SYMTAB:
+				//printf("Located symtable, length is 0x%X, 0x%X\n", (unsigned int)loadCommand->cmdsize, (unsigned int)sizeof(symtableData));
+				symtableData = kernelData + kernelIndex;				
+				break;
 				
-				sectionIndex = sizeof(struct segment_command);
+			case LC_SEGMENT: // 32bit macho
+				segCommand = kernelData + kernelIndex;
 				
-				struct section *sect;
+				//printf("Segment name is %s\n", segCommand->segname);
 				
-				while(sectionIndex < segCommand->cmdsize)
+				if(strcmp("__TEXT", segCommand->segname) == 0)
 				{
-					sect = kernelData + kernelIndex + sectionIndex;
+					UInt32 sectionIndex;
 					
-					sectionIndex += sizeof(struct section);
+					sectionIndex = sizeof(struct segment_command);
 					
+					struct section *sect;
 					
-					if(strcmp("__text", sect->sectname) == 0)
+					while(sectionIndex < segCommand->cmdsize)
 					{
-						// __TEXT,__text found, save the offset and address for when looking for the calls.
-						textSection = sect->offset;
-						textAddress = sect->addr;
-						break;
-					}					
+						sect = kernelData + kernelIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+							break;
+						}					
+					}
 				}
-			}
-			
-			
-			kernelIndex += cmdSize;
-		} else {
-			kernelIndex += cmdSize;
+				break;
+			case LC_SEGMENT_64:	// 64bit macho's
+				segCommand64 = kernelData + kernelIndex;
+				
+				//printf("Segment name is %s\n", segCommand->segname);
+				
+				if(strcmp("__TEXT", segCommand64->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command_64);
+					
+					struct section_64 *sect;
+					
+					while(sectionIndex < segCommand64->cmdsize)
+					{
+						sect = kernelData + kernelIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section_64);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+
+							break;
+						}					
+					}
+				}
+				
+				break;
+				
+			default:
+				break;
+				
 		}
+		kernelIndex += cmdSize;
 	}
-	
 	handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
+	return 1 << is64;
 }
 
 long long symbol_handler(char* symbolName, long long addr, char is64)
@@ -295,8 +339,13 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
 	kernSymbols_t *symbol = lookup_kernel_symbol(symbolName);
 	
 	
+	
 	if(symbol)
 	{
+
+		//printf("Located %sbit symbol %s at 0x%lX\n", is64 ? "64" : "32", symbolName, addr);
+		//getc();
+		
 		symbol->addr = addr;
 	}
 	return 0xFFFFFFFF; // fixme

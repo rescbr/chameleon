@@ -301,17 +301,20 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 	struct symtab_command* symtabCommand = NULL;
 	
 	//struct dysymtab_command* dysymtabCommand = NULL;
-	UInt32 binaryIndex = sizeof(struct mach_header);
+	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
 
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
 		is64 = 0;
+		binaryIndex += sizeof(struct mach_header);
 	}
-	else if(((struct mach_header_64*)binary)->magic != MH_MAGIC_64)
+	else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
 	{
+		// NOTE: modules cannot be 64bit...
 		is64 = 1;
+		binaryIndex += sizeof(struct mach_header_64);
 	}
 	else
 	{
@@ -342,7 +345,9 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 			case LC_SYMTAB:
 				symtabCommand = binary + binaryIndex;
 				break;
+				
 			case LC_SEGMENT:
+			case LC_SEGMENT_64:
 				break;
 				
 			case LC_DYSYMTAB:
@@ -1043,12 +1048,9 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	//char* symbolTable = base + symtabCommand->symoff;
 	if(!is64)
 	{
-		
+		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
 		while(symbolIndex < symtabCommand->nsyms)
 		{
-			
-			struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
-			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
 			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
@@ -1058,17 +1060,17 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				module_start = base + symbolEntry->n_value;
 			}
 			
-			symbolEntry+= sizeof(struct nlist);
+			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
 	}
 	else
 	{
-		
+		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
+		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)
 		while(symbolIndex < symtabCommand->nsyms)
 		{
 			
-			struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist_64));
 			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
@@ -1079,7 +1081,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				module_start = base + symbolEntry->n_value;
 			}
 			
-			symbolEntry+= sizeof(struct nlist);
+			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
 	}

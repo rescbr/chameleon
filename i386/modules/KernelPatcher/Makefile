@@ -21,7 +21,7 @@ BOOT2DIR = ../../boot2
 
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
 
-OPTIM = -Os -Oz
+OPTIM = -O3
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_HELLO_WORLD=1
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
