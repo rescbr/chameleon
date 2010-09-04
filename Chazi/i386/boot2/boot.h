@@ -29,7 +29,7 @@
 #ifndef __BOOT2_BOOT_H
 #define __BOOT2_BOOT_H
 
-#include "libsaio.h"
+#include "saio_internal.h" //Azi: only one needed by boot.h it self, afaics.
 
 /*
  * Default names

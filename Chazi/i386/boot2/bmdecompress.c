@@ -19,7 +19,8 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-#include "boot.h"
+
+#include "libsa.h" // replaced boot.h
 
 typedef uint8_t  UInt8;
 typedef uint16_t UInt16;

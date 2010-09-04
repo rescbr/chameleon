@@ -7,12 +7,11 @@
  *
  */
 
-//Azi:includes	
+#include "libsaio.h"
 #include "boot.h" // was included on graphic_utils.h
 #include "bootstruct.h"
 #include "graphic_utils.h"
 #include "vbe.h"
-
 
 #ifndef __BOOT_GRAPHICS_H
 #define __BOOT_GRAPHICS_H

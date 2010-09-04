@@ -8,12 +8,9 @@
  *
  */
 
-//Azi:includes
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
-//#include "edid.h" //Azi: needed just for getResolution() call on drawBootGraphics()?? - No!! wtf... check later.
-//#include "autoresolution.h"
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"

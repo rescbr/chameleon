@@ -7,8 +7,7 @@
 #ifndef __BOOT_RAMDISK_H
 #define __BOOT_RAMDISK_H
 
-//Azi:includes
-#include "saio_internal.h" // get back to this later
+#include "libsaio.h"
 
 #define RAMDISKCONFIG_FILENAME "rd(0,0)/RAMDisk.plist"
 //#define kPostbootRamdisk
