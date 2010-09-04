@@ -18,6 +18,9 @@
 #define DBG(x...)
 #endif
 
+// NOTE: Global so that modules can link with this
+unsigned long long textAddress = 0;
+unsigned long long textSection = 0;
 
 moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
@@ -25,8 +28,6 @@ symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
 
-void rebase_macho(void* base, char* rebase_stream, UInt32 size);
-void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 
 
@@ -84,8 +85,16 @@ void load_all_modules()
 	{
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
-			load_module(name);
+			char* tmp = malloc(strlen(name) + 1); // TODO: look into this
+			strcpy(tmp, name);
+			DBG("Attempting to load %s\n", tmp);			
+			load_module(tmp);
 		}
+		else 
+		{
+			DBG("Ignoring %s\n", name);
+		}
+
 	}
 }
 
@@ -94,13 +103,14 @@ void load_all_modules()
  * Load a module file in /Extra/modules
  * TODO: verify version number of module
  */
-int load_module(const char* module)
+int load_module(char* module)
 {
 	// Check to see if the module has already been loaded
 	if(is_module_laoded(module))
 	{
 		// NOTE: Symbols.dylib tries to load twice, this catches it as well
 		// as when a module links with an already loaded module
+		DBG("Module %s already loaded\n", module);
 		return 1;
 	}
 	
@@ -124,10 +134,12 @@ int load_module(const char* module)
 		//printf("Module %s read in.\n", modString);
 
 		// Module loaded into memory, parse it
-		module_start = parse_mach(module_base);
+		module_start = parse_mach(module_base, &load_module, &add_symbol);
 
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
+			// Notify the system that it was laoded
+			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module);
 		}
@@ -283,23 +295,25 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(void* binary)	// TODO: add param to specify valid archs
+void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
 {	
 	char is64 = false;
 	void (*module_start)(void) = NULL;
 	
 	// Module info
-	char* moduleName = NULL;
+	/*char* moduleName = NULL;
 	UInt32 moduleVersion = 0;
 	UInt32 moduleCompat = 0;
-	
+	*/
 	// TODO convert all of the structs to a union
 	struct load_command *loadCommand = NULL;
 	struct dylib_command* dylibCommand = NULL;
 	struct dyld_info_command* dyldInfoCommand = NULL;
 	
 	struct symtab_command* symtabCommand = NULL;
-	
+	struct segment_command *segCommand = NULL;
+	struct segment_command_64 *segCommand64 = NULL;
+
 	//struct dysymtab_command* dysymtabCommand = NULL;
 	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
@@ -325,12 +339,12 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 
 
 	
-	if(((struct mach_header*)binary)->filetype != MH_DYLIB)
+	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	{
 		printf("Module is not a dylib. Unable to load.\n");
 		getc();
 		return NULL; // Module is in the incorrect format
-	}
+	}*/
 	
 	while(cmd < ((struct mach_header*)binary)->ncmds)	// TODO: for loop instead
 	{
@@ -346,8 +360,67 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 				symtabCommand = binary + binaryIndex;
 				break;
 				
-			case LC_SEGMENT:
-			case LC_SEGMENT_64:
+			case LC_SEGMENT: // 32bit macho
+				segCommand = binary + binaryIndex;
+				
+				//printf("Segment name is %s\n", segCommand->segname);
+				
+				if(strcmp("__TEXT", segCommand->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command);
+					
+					struct section *sect;
+					
+					while(sectionIndex < segCommand->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+							break;
+						}					
+					}
+				}
+				break;
+			case LC_SEGMENT_64:	// 64bit macho's
+				segCommand64 = binary + binaryIndex;
+				
+				//printf("Segment name is %s\n", segCommand->segname);
+				
+				if(strcmp("__TEXT", segCommand64->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command_64);
+					
+					struct section_64 *sect;
+					
+					while(sectionIndex < segCommand64->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section_64);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+							
+							break;
+						}					
+					}
+				}
+				
 				break;
 				
 			case LC_DYSYMTAB:
@@ -361,7 +434,7 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
 
-				if(!load_module(module))
+				if(dylib_loader && !dylib_loader(module))
 				{
 					// Unable to load dependancy
 					return NULL;
@@ -370,9 +443,10 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 				
 			case LC_ID_DYLIB:
 				dylibCommand = binary + binaryIndex;
-				moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+				/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 				moduleVersion =	dylibCommand->dylib.current_version;
 				moduleCompat =	dylibCommand->dylib.compatibility_version;
+				 */
 				break;
 
 			case LC_DYLD_INFO:
@@ -383,6 +457,9 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 			case LC_UUID:
 				break;
 				
+			case LC_UNIXTHREAD:
+				break;
+				
 			default:
 				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
@@ -391,11 +468,11 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 
 		binaryIndex += cmdSize;
 	}
-	if(!moduleName) return NULL;
+	//if(!moduleName) return NULL;
 		
 
 	// bind_macho uses the symbols.
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, &add_symbol, is64);
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
 
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
@@ -420,13 +497,7 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 		// This should be changed to bind when a symbol is referened at runtime instead.
 		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
-	
 
-	
-
-	// Notify the system that it was laoded
-	module_loaded(moduleName, moduleVersion, moduleCompat);
-	
 	return module_start;
 	
 }
@@ -937,7 +1008,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
  * print out the information about the loaded module
  
  */
-void module_loaded(char* name, UInt32 version, UInt32 compat)
+void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	moduleList_t* entry;
 	/*
@@ -967,9 +1038,9 @@ void module_loaded(char* name, UInt32 version, UInt32 compat)
 	}
 	
 	entry->next = NULL;
-	entry->module = name;
-	entry->version = version;
-	entry->compat = compat;
+	entry->module = (char*)name;
+	entry->version = 0; //version;
+	entry->compat = 0; //compat;
 	
 	
 }
@@ -979,8 +1050,10 @@ int is_module_laoded(const char* name)
 	moduleList_t* entry = loadedModules;
 	while(entry)
 	{
+		DBG("Comparing %s with %s\n", name, entry->module);
 		if(strcmp(entry->module, name) == 0)
 		{
+			DBG("Located module %s\n", name);
 			return 1;
 		}
 		else
@@ -989,6 +1062,8 @@ int is_module_laoded(const char* name)
 		}
 
 	}
+	DBG("Module %s not found\n", name);
+
 	return 0;
 }
 
@@ -1067,7 +1142,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	else
 	{
 		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
-		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)
+		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)	
 		while(symbolIndex < symtabCommand->nsyms)
 		{
 			
