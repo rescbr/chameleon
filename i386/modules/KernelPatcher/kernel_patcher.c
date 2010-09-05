@@ -388,7 +388,7 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 		}
 		
 		
-		if(patchLocation - jumpLocation) < 0x200)
+		if((patchLocation - jumpLocation) < 0x200)
 		{
 			// 64 bit kernel, 10.6.2+
 		}
@@ -445,12 +445,12 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 				
 			}
 		}
-		else 
+		/*else 
 		{
 			// Check for 64bit kernel.
 			
 			// Patching failed, using NOP replacement done initialy
-		}
+		}*/
 	}
 	else 
 	{
