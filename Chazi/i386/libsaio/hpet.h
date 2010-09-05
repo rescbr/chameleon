@@ -5,7 +5,7 @@
 #ifndef __LIBSAIO_HPET_H
 #define __LIBSAIO_HPET_H
 
-#include "libsaio.h"
+//#include "libsaio.h" // check pci.h/hpet.c
 
 #define REG32(base, reg)  ((volatile uint32_t *)base)[(reg) >> 2]
 

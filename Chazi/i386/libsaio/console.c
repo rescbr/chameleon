@@ -44,8 +44,8 @@
  * All rights reserved.
  */
 
-#include "libsaio.h"
-#include "bootstruct.h"
+//#include "libsaio.h"
+#include "bootstruct.h" - most libsaio.h stuff is included here now.
 
 extern int	vprf(const char * fmt, va_list ap);
 

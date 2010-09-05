@@ -23,7 +23,7 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - included on sl.h
 #include "sl.h"
 
 #define BYTE_ORDER_MARK	0xFEFF

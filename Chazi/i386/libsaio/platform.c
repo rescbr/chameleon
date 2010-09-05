@@ -4,7 +4,7 @@
  * AsereBLN: cleanup
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - both bootstruct.h, platform.h, pci.h can resolve dependencies.
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"

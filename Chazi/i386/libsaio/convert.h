@@ -6,7 +6,11 @@
 
 #ifndef __CONVERT_H
 #define __CONVERT_H
-#include "libsaio.h"
+
+//#include "libsaio.h"
+#include "libsa.h"
+#include "saio_internal.h" // "external" to verbose function
+//---
 #include "efi.h"
 
 #define UUID_LEN	16

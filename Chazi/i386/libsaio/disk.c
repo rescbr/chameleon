@@ -55,7 +55,9 @@
 #define UFS_SUPPORT 0
 #endif
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "memory.h"
+//---
 #include "boot.h"
 #include "bootstruct.h"
 #include "fdisk.h"

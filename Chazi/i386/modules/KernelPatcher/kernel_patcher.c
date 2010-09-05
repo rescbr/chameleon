@@ -1,12 +1,15 @@
-	/*
+/*
  * Copyright (c) 2009-2010 Evan Lojewski. All rights reserved.
  *
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "saio_types.h"
+//---
 #include "kernel_patcher.h"
 #include "platform.h"
 #include "modules.h"
+
 extern PlatformInfo_t    Platform;
 
 patchRoutine_t* patches = NULL;

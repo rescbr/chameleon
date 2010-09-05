@@ -46,12 +46,12 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "sl.h"
-
 #include "msdos_private.h"
 #include "msdos.h"
+
+#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
 
 #define LABEL_LENGTH		11
 #define MSDOS_CACHE_BLOCKSIZE BPS

@@ -26,9 +26,9 @@
  * All rights reserved.
  */
 
+//#include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
-#include "libsaio.h" //Azi: this was included on boot.h - just a reminder.
 #include "xml.h"
 
 extern char *Language;

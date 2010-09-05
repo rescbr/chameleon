@@ -7,7 +7,9 @@
  *
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "io_inline.h"
+//---
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"

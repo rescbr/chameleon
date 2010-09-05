@@ -7,8 +7,9 @@
 #ifndef __LIBSAIO_SPD_H
 #define __LIBSAIO_SPD_H
 
-#include "platform.h"
-#include "libsaio.h"
+#include "platform.h" // already suplies most of the dependencies.
+//#include "libsaio.h"
+#include "io_inline.h"
 
 void scan_spd(PlatformInfo_t *p);
 

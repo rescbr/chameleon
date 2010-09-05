@@ -2,10 +2,12 @@
     File added by David F. Elliott <dfe@cox.net> on 2007/06/26
 */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "libsa.h"
+#include "memory.h"
+//---
 #include "boot.h"
 #include "bootstruct.h"
-
 #include "mboot.h"
 
 int multiboot_timeout=0;

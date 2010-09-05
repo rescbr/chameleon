@@ -4,7 +4,7 @@
  *
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - included on pci.h now. Don't forget bootstruct.h!!
 #include "bootstruct.h"
 #include "pci.h"
 #include "pci_root.h"

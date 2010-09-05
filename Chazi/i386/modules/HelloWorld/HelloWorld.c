@@ -3,14 +3,17 @@
  *
  */
 
-#include "libsaio.h"
-#include "modules.h" //Azi:warning
+//#include "libsaio.h"
+#include "saio_internal.h"
+#include "saio_types.h"
+//---
+#include "modules.h"
 
 
 void helloWorld(void* binary, void* arg2, void* arg3, void* arg4)
 {
 	printf("Hello world from ExecKernel hook. Binary located at 0x%X\n", binary);
-	//getc();
+	getc();
 	
 }
 

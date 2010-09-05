@@ -2,7 +2,7 @@
  * Copyright 2008 mackerintel
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "acpi.h"

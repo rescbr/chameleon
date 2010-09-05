@@ -13,7 +13,7 @@
  * http://www.canardpc.com - http://www.memtest.org
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - included on the header.
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"

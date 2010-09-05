@@ -10,7 +10,7 @@
 #ifndef _NVDA_RESOLUTION_HEADER_
 #define _NVDA_RESOLUTION_HEADER_
 
-#include "libsaio.h"
+#include "libsaio.h" // not worth it; 4 out of 5 are needed.
 #include "autoresolution.h"
 
 #define NVIDIA_SIGNATURE "NVIDIA Corp"

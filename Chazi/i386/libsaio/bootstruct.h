@@ -26,7 +26,13 @@
 #define __BOOTSTRUCT_H
 
 #include <pexpert/i386/boot.h>
+
+//Azi: this is acting now as a mini libsaio.h :P
+//#include "libsaio.h"
+#include "libsa.h"
 #include "saio_types.h"
+#include "saio_internal.h" // "external" to verbose function
+//---
 #include "bios.h"
 #include "device_tree.h"
 

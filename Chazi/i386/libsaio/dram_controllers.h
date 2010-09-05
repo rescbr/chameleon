@@ -16,7 +16,7 @@
 #ifndef __LIBSAIO_DRAM_CONTROLLERS_H
 #define __LIBSAIO_DRAM_CONTROLLERS_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
 
 void scan_dram_controller();
 

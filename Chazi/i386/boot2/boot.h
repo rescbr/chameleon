@@ -29,7 +29,11 @@
 #ifndef __BOOT2_BOOT_H
 #define __BOOT2_BOOT_H
 
-#include "saio_internal.h" //Azi: only one needed by boot.h it self, afaics.
+//Azi: keep it minimal for now.
+// Todo: check bootstruct.h, sl.h, platform.h, next; include bootstruct here??
+// don't include headers like libsaio.h on other headers?!
+
+#include "saio_internal.h" // the only one needed by boot.h it self, afaics.
 
 /*
  * Default names

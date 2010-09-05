@@ -8,8 +8,8 @@
  */
 
 
-#include "libsaio.h"
-#include "bootstruct.h"
+//#include "libsaio.h" --> bootstruct.h
+//#include "bootstruct.h" - included on graphics.h
 #include "graphics.h"
 #include "boot.h"
 

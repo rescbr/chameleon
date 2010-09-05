@@ -1,7 +1,8 @@
 /*
 Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
 */
-#include "libsaio.h"
+
+//#include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"

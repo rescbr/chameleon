@@ -2,7 +2,7 @@
  * 
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - was included on hpet.h; included on pci.h for now.
 #include "pci.h"
 #include "hpet.h"
 

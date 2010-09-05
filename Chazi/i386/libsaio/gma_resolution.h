@@ -10,7 +10,9 @@
 #ifndef _GMA_RESOLUTION_H_
 #define _GMA_RESOLTUION_H_
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "saio_internal.h"
+//---
 #include "autoresolution.h"
 
 #define MODE_TABLE_OFFSET_845G 617

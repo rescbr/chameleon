@@ -14,8 +14,10 @@
  * This source code is into the public domain.
  */
 
-#include "libsaio.h"
-#include "autoresolution.h"
+//#include "libsaio.h"
+#include "saio_internal.h"
+//---
+//#include "autoresolution.h" - included on ati_resolution.h
 #include "nvidia_resolution.h"
 #include "ati_resolution.h"
 #include "gma_resolution.h"

@@ -39,8 +39,12 @@
     2007-12-29 dfe
     - Added ebiosEjectMedia
  */
+
 #include "bootstruct.h"
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "memory.h"
+#include "libsa.h"
+#include "saio_internal.h"
 
 #define MAX_DRIVES 8
 

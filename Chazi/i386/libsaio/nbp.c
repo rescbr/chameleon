@@ -22,7 +22,8 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "saio_types.h"
 
 /*  This NBP code is pretty useless because it just blindly calls INT 2B.
     Presumably INT 2B was implemented by some first-stage bootloader that

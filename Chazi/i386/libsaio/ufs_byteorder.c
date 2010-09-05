@@ -32,7 +32,7 @@
 #include <ufs/ufs/dir.h>
 #include <libkern/OSByteOrder.h>
 #include "ufs_byteorder.h"
-#include "libsaio.h"
+#include "libsaio.h" // probably needed if ufs support is enabled.
 
 #define	swapBigLongToHost(thing) ((thing) = OSSwapBigToHostInt32(thing))
 #define	swapBigShortToHost(thing) ((thing) = OSSwapBigToHostInt16(thing))

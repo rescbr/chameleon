@@ -10,7 +10,9 @@
 #ifndef __LIBSAIO_AML_GENERATOR_H
 #define __LIBSAIO_AML_GENERATOR_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "libsa.h"
+#include "saio_internal.h"
 
 #define	AML_CHUNK_NONE		0xff
 #define	AML_CHUNK_ZERO		0x00
