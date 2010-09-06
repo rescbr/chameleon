@@ -21,8 +21,8 @@ What are modules?
 
   - good question! Well, can't add much on the "geek" side... need to study the stuff so
 	i don't start dumping bs. The easy answer is they are like plugins, adding/replacing
-	booter functionality. For instance: the Kernel Patcher (Kptchr) is around for some time,
-	integrated on boot file like any other Chameleon function; with Modules support Kptchr
+	booter functionality. For instance: the Kernel Patcher (Kpatcher) is around for some time,
+	integrated on boot file like any other Chameleon function; with Modules support Kpatcher
 	can now live as a module, freeing the space it occupied on boot file
 	(one of module's advantages).
 	
@@ -30,27 +30,37 @@ What are modules?
 Featured modules:
 
   - Symbols.dylib: always needed to load other modules! It's the first one to load and no
-	other module will work if this one fails to load. The booter will still perform as
-	usual, if it fails to load.  
+	other module will work if this one fails. The booter will still perform as usual,
+	if it fails to load.  
 
   - KernelPatcher.dylib:
 
-	- "will" need PatchKernel=y to be enabled.
-  Note:*** this is still under consideration/testing so, for now the patcher is enabled by default***
+	- needs key to be enabled:
 	
-	- features cpuid_set, commpage_stuff and lapic_init patches (atm).
+		PatchKernel=y			at boot prompt or,
 
-	- as it is, Kptchr allows my Pentium D 925 to boot vanilla kernel, with the help of
-	  -legacy flag; to enter x86_64 world i still need to patch the kernel, as the 925 has
-	  no Supplemental SSE3 instructions. I assume that, the great majority of the
-	  legacy/unsupported processors with at least SSE3 instructions,
-	  will benefit of the same treatment!
-	  Let's just say that the only patch needed by the 925 on Legacy Mode(*) is cpuid_set!
+		<key>PatchKernel</key>	on Boot.plist.
+		<string>Yes</string>
 	
-  - HelloWorld.dylib: just a notifier (not needed).
+	- featured patches: cpuid_set - 32/64 bit
+						commpage_stuff - 32/64 bit
+						lapic_init - 32 bit only.
+
+	Note on functionality: as it is, Kpatcher allows my Pentium D 925 to load vanilla(*)
+	kernel, with the help of -legacy flag; to enter x86_64 world i still need to patch
+	the kernel sources, as the 925 has no Supplemental SSE3 instructions and there's
+	no patch to fix this on Kpatcher atm (don't even know if is possible?!).
+	I assume that, the great majority of the legacy/unsupported processors with at least
+	SSE3 instructions, will benefit of the same treatment!
+	Let's just say that the only patch needed by the 925 on Legacy Mode(**) is cpuid_set!
+	
+  - HelloWorld.dylib: just a notifier (not mandatory).
 
 
-(*) For those who "missed" the lesson, Legacy Mode is the mode 32 bit only cpu's run on OS X.
+(*) In this context, "vanilla" means the use of a non pre-patched kernel; what we do here is
+	patch the kernel on the fly, in memory.
+
+(**) For those who "missed" the lesson, Legacy Mode is the mode 32 bit only cpu's run on OS X.
 
 	---------------//---------------//---------------
 
@@ -62,8 +72,15 @@ Issues:
   - the Kernel Patcher can stop working due to changes on the kernel code, though that can be
 	"previewed" to some extent. Just so you know what to expect.
 
-  - this is work in progress; i will add updates as Meklort commits and only if they are in
-	functional state.
+  - this is work in progress; i will add updates as Meklort commits.
+
+	---------------//---------------//---------------
+
+	
+	Some talk here: http://forum.voodooprojects.org/index.php/topic,1556.0.html
+	here: http://forum.voodooprojects.org/index.php/topic,1153.0.html
+	and here: http://forum.voodooprojects.org/index.php/topic,1565.0.html
+
 
 	---------------//---------------//---------------
 

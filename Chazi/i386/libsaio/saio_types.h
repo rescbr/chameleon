@@ -242,7 +242,7 @@ enum {
 enum {
     kNetworkDeviceType = kBIOSDevTypeNetwork,
     kBlockDeviceType   = kBIOSDevTypeHardDrive
-};// gBootFileType_t; //Kptchr module, rev 307
+};// gBootFileType_t; - Kpatcher
 
 enum {
     kCursorTypeHidden    = 0x0100,

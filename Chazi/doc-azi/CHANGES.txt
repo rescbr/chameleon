@@ -288,7 +288,7 @@ Change:	added AutoResolution patch, by Lebidou (autoResolution branch). The main
 		
 		AutoResolution=y enables the patch.
 
-  Note: Obviously, it only works in Graphics Mode (Gui). Disabled by default.
+  Note: Obviously, it only works in Graphics Mode (Gui).
 
   Note: resolution set on theme.plist is overriding the native one set by AutoResolution. For now the
 		possible solutions are, remove the boot resolution (boot_width, boot_height) from theme.plist
@@ -300,17 +300,13 @@ Motif:  ... mentioned above. Check the topic for more details:
 		---------------//---------------//---------------
 
 - (starting at rev 480)
-Change: Added Meklort's Modules support, plus Kernel Patcher (Kptchr) module.
-		Check Modules.txt for more info.
-		Some talk here: http://forum.voodooprojects.org/index.php/topic,1556.0.html
-		here: http://forum.voodooprojects.org/index.php/topic,1153.0.html
-		and here: http://forum.voodooprojects.org/index.php/topic,1565.0.html
+Change: added Meklort's Modules support, plus Kernel Patcher (Kpatcher) module.
 		
-		PatchKernel=n disables Kernel Patcher. "Temporarily" enabled by default!!
+		PatchKernel=y enables Kernel Patcher.
 		
-  Note: Only i386 arch is supported at the moment; x86_64 support being added...
+  Note: Check Modules.txt for more info.
 
-Motif:  ... as if, booting vanilla kernel, is not reason enough!?
+Motif:  Testing Modules support.
 
 		---------------//---------------//---------------
 		

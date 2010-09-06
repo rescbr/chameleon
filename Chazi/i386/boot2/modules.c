@@ -3,8 +3,10 @@
  *
  */
 
-#include "libsa.h" // replaced boot.h
-#include "saio_internal.h" //---//
+//#include "boot.h"
+#include "libsa.h"
+#include "saio_internal.h"
+//---
 #include "bootstruct.h"
 #include "multiboot.h"
 #include "modules.h"
@@ -19,6 +21,9 @@
 #define DBG(x...)
 #endif
 
+// NOTE: Global so that modules can link with this
+unsigned long long textAddress = 0;
+unsigned long long textSection = 0;
 
 moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
@@ -26,8 +31,6 @@ symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
 
-void rebase_macho(void* base, char* rebase_stream, UInt32 size);
-void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 
 
@@ -80,17 +83,21 @@ void load_all_modules()
 	char* name;
 	long flags;
 	long time;
-	
-	//Azi: this path is resolving to bt(0,0) instead of selected volume; a perfect
-	// example of what made me gave up on /Extra path. Confirmed on MBR/boot0hfs only.
-	// Looking further into this...
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
-			load_module(name);
+			char* tmp = malloc(strlen(name) + 1); // TODO: look into this
+			strcpy(tmp, name);
+			DBG("Attempting to load %s\n", tmp);			
+			load_module(tmp);
 		}
+		else 
+		{
+			DBG("Ignoring %s\n", name);
+		}
+
 	}
 }
 
@@ -99,20 +106,19 @@ void load_all_modules()
  * Load a module file in /Extra/modules
  * TODO: verify version number of module
  */
-int load_module(const char* module)
+int load_module(char* module)
 {
 	// Check to see if the module has already been loaded
 	if(is_module_laoded(module))
 	{
 		// NOTE: Symbols.dylib tries to load twice, this catches it as well
 		// as when a module links with an already loaded module
+		DBG("Module %s already loaded\n", module);
 		return 1;
 	}
 	
 	char modString[128];
 	int fh = -1;
-	
-	//Azi: same as #84
 	sprintf(modString, "/Extra/modules/%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
@@ -131,10 +137,12 @@ int load_module(const char* module)
 		//printf("Module %s read in.\n", modString);
 
 		// Module loaded into memory, parse it
-		module_start = parse_mach(module_base);
+		module_start = parse_mach(module_base, &load_module, &add_symbol);
 
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
+			// Notify the system that it was laoded
+			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module);
 		}
@@ -290,35 +298,40 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(void* binary)	// TODO: add param to specify valid archs
+void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
 {	
 	char is64 = false;
 	void (*module_start)(void) = NULL;
 	
 	// Module info
-	char* moduleName = NULL;
+	/*char* moduleName = NULL;
 	UInt32 moduleVersion = 0;
 	UInt32 moduleCompat = 0;
-	
+	*/
 	// TODO convert all of the structs to a union
 	struct load_command *loadCommand = NULL;
 	struct dylib_command* dylibCommand = NULL;
 	struct dyld_info_command* dyldInfoCommand = NULL;
 	
 	struct symtab_command* symtabCommand = NULL;
-	
+	struct segment_command *segCommand = NULL;
+	struct segment_command_64 *segCommand64 = NULL;
+
 	//struct dysymtab_command* dysymtabCommand = NULL;
-	UInt32 binaryIndex = sizeof(struct mach_header);
+	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
 
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
 		is64 = 0;
+		binaryIndex += sizeof(struct mach_header);
 	}
-	else if(((struct mach_header_64*)binary)->magic != MH_MAGIC_64)
+	else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
 	{
+		// NOTE: modules cannot be 64bit...
 		is64 = 1;
+		binaryIndex += sizeof(struct mach_header_64);
 	}
 	else
 	{
@@ -329,12 +342,12 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 
 
 	
-	if(((struct mach_header*)binary)->filetype != MH_DYLIB)
+	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	{
 		printf("Module is not a dylib. Unable to load.\n");
 		getc();
 		return NULL; // Module is in the incorrect format
-	}
+	}*/
 	
 	while(cmd < ((struct mach_header*)binary)->ncmds)	// TODO: for loop instead
 	{
@@ -349,7 +362,68 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 			case LC_SYMTAB:
 				symtabCommand = binary + binaryIndex;
 				break;
-			case LC_SEGMENT:
+				
+			case LC_SEGMENT: // 32bit macho
+				segCommand = binary + binaryIndex;
+				
+				//printf("Segment name is %s\n", segCommand->segname);
+				
+				if(strcmp("__TEXT", segCommand->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command);
+					
+					struct section *sect;
+					
+					while(sectionIndex < segCommand->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+							break;
+						}					
+					}
+				}
+				break;
+			case LC_SEGMENT_64:	// 64bit macho's
+				segCommand64 = binary + binaryIndex;
+				
+				//printf("Segment name is %s\n", segCommand->segname);
+				
+				if(strcmp("__TEXT", segCommand64->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command_64);
+					
+					struct section_64 *sect;
+					
+					while(sectionIndex < segCommand64->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section_64);
+						
+						
+						if(strcmp("__text", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							textSection = sect->offset;
+							textAddress = sect->addr;
+							
+							break;
+						}					
+					}
+				}
+				
 				break;
 				
 			case LC_DYSYMTAB:
@@ -363,7 +437,7 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
 
-				if(!load_module(module))
+				if(dylib_loader && !dylib_loader(module))
 				{
 					// Unable to load dependancy
 					return NULL;
@@ -372,9 +446,10 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 				
 			case LC_ID_DYLIB:
 				dylibCommand = binary + binaryIndex;
-				moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+				/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 				moduleVersion =	dylibCommand->dylib.current_version;
 				moduleCompat =	dylibCommand->dylib.compatibility_version;
+				 */
 				break;
 
 			case LC_DYLD_INFO:
@@ -385,6 +460,9 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 			case LC_UUID:
 				break;
 				
+			case LC_UNIXTHREAD:
+				break;
+				
 			default:
 				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
@@ -393,11 +471,11 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 
 		binaryIndex += cmdSize;
 	}
-	if(!moduleName) return NULL;
+	//if(!moduleName) return NULL;
 		
 
 	// bind_macho uses the symbols.
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, &add_symbol, is64);
+	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
 
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
@@ -422,13 +500,7 @@ void* parse_mach(void* binary)	// TODO: add param to specify valid archs
 		// This should be changed to bind when a symbol is referened at runtime instead.
 		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
-	
 
-	
-
-	// Notify the system that it was laoded
-	module_loaded(moduleName, moduleVersion, moduleCompat);
-	
 	return module_start;
 	
 }
@@ -939,7 +1011,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
  * print out the information about the loaded module
  
  */
-void module_loaded(char* name, UInt32 version, UInt32 compat)
+void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	moduleList_t* entry;
 	/*
@@ -969,9 +1041,9 @@ void module_loaded(char* name, UInt32 version, UInt32 compat)
 	}
 	
 	entry->next = NULL;
-	entry->module = name;
-	entry->version = version;
-	entry->compat = compat;
+	entry->module = (char*)name;
+	entry->version = 0; //version;
+	entry->compat = 0; //compat;
 	
 	
 }
@@ -981,8 +1053,10 @@ int is_module_laoded(const char* name)
 	moduleList_t* entry = loadedModules;
 	while(entry)
 	{
+		DBG("Comparing %s with %s\n", name, entry->module);
 		if(strcmp(entry->module, name) == 0)
 		{
+			DBG("Located module %s\n", name);
 			return 1;
 		}
 		else
@@ -991,6 +1065,8 @@ int is_module_laoded(const char* name)
 		}
 
 	}
+	DBG("Module %s not found\n", name);
+
 	return 0;
 }
 
@@ -1050,12 +1126,9 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	//char* symbolTable = base + symtabCommand->symoff;
 	if(!is64)
 	{
-		
+		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
 		while(symbolIndex < symtabCommand->nsyms)
 		{
-			
-			struct nlist* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist));
-			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
 			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
@@ -1065,17 +1138,17 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				module_start = base + symbolEntry->n_value;
 			}
 			
-			symbolEntry+= sizeof(struct nlist);
+			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
 	}
 	else
 	{
-		
+		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
+		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)	
 		while(symbolIndex < symtabCommand->nsyms)
 		{
 			
-			struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff + (symbolIndex * sizeof(struct nlist_64));
 			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
@@ -1086,7 +1159,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				module_start = base + symbolEntry->n_value;
 			}
 			
-			symbolEntry+= sizeof(struct nlist);
+			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
 	}

@@ -1,6 +1,7 @@
 
 MODULE_NAME = Symbols
 MODULE_VERSION = "1.0.0"
+MODULE_COMPAT_VERSION = `ls ../../.svn &> /dev/null && (svn info ../../ | grep Revision | awk '{print $$2}') || echo 0`
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 DIR = HelloWorld
@@ -63,7 +64,7 @@ dylib: $(OBJS)
 	-S -x  -dead_strip_dylibs \
 	-no_uuid \
 	-bind_at_load \
-	-current_version $(MODULE_VERSION) -compatibility_version `svn info ../../ | grep Revision | awk '{print $$2}'` \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \
 

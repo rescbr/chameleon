@@ -44,5 +44,21 @@ all embedtheme tags debug install installhdrs:
 		) || exit $$?; 						  \
 	done
 
+modules:
+	@for i in "modules"; \
+	do \
+		echo ================= make $@ for $$i =================; \
+		( cd $$i; ${MAKE}					  \
+			"OBJROOT=$(OBJROOT)/$$i"			  \
+		  	"SYMROOT=$(SYMROOT)"				  \
+			"DSTROOT=$(DSTROOT)"				  \
+			"SRCROOT=$(SRCROOT)"				  \
+			"RC_ARCHS=$(RC_ARCHS)"				  \
+			"RC_KANJI=$(RC_KANJI)"				  \
+			"JAPANESE=$(JAPANESE)"				  \
+			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
+		) || exit $$?; 						  \
+	done
+
 installsrc:
 	tar cf - . | (cd ${SRCROOT}; tar xfBp -)

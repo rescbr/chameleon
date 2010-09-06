@@ -10,6 +10,9 @@
 #ifndef __BOOT_MODULES_H
 #define __BOOT_MODULES_H
 
+extern unsigned long long textAddress;
+extern unsigned long long textSection;
+
 
 typedef struct symbolList_t
 {
@@ -67,14 +70,19 @@ int execute_hook(const char* name, void*, void*, void*, void*);
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
 
 inline void rebase_location(UInt32* location, char* base);
+void rebase_macho(void* base, char* rebase_stream, UInt32 size);
+void bind_macho(void* base, char* bind_stream, UInt32 size);
 
-int load_module(const char* module);
+int load_module(char* module);
 int is_module_laoded(const char* name);
-void module_loaded(char* name, UInt32 version, UInt32 compat);
+void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/);
 
 long long add_symbol(char* symbol, long long addr, char is64);
 
-void* parse_mach(void* binary);
+void* parse_mach(void* binary, 
+				 int(*dylib_loader)(char*),
+				 long long(*symbol_handler)(char*, long long, char)
+				 );
 
 unsigned int handle_symtable(UInt32 base,
 							 struct symtab_command* symtabCommand,

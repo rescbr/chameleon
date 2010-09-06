@@ -396,7 +396,7 @@ void common_boot(int biosdev)
         bool tryresume;
         bool tryresumedefault;
         bool forceresume;
-		bool patchKernel = true; //Kptchr - temporarely set to true, ude to testing!
+		bool patchKernel = false; //Kpatcher - default value.
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
