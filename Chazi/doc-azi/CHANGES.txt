@@ -273,8 +273,8 @@ Motif:  just making this info easily accessible.
 		---------------//---------------//---------------
 		
 - (rev 462)
-Change:	creation of this project, replacing Chazileon as my work folder.
-		Ence, Chazileon is now frozen until archival and deletion.
+Change:	creation of this project, replacing Chazileon as my work folder;
+		hence, Chazileon is now frozen until archival and deletion.
 
 Motif:  Chazileon (Chazi) has no svn history.
 

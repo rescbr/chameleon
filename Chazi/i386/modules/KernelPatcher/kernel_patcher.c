@@ -3,9 +3,9 @@
  *
  */
 
+#include "boot.h"
+#include "bootstruct.h" // replaces libsaio.h.
 //#include "libsaio.h"
-#include "saio_types.h"
-//---
 #include "kernel_patcher.h"
 #include "platform.h"
 #include "modules.h"
@@ -171,24 +171,26 @@ kernSymbols_t* lookup_kernel_symbol(const char* name)
 
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 {
+	bool			patchKernel = false; //Kpatcher - default value.
 	patchRoutine_t* entry = patches;
 
+	// check if kernel patcher is requested by user.
+	getBoolForKey(kKPatcherKey, &patchKernel, &bootInfo->bootConfig);
 	
 	int arch = determineKernelArchitecture(kernelData);
 
 	locate_symbols(kernelData);
 	
-	if(patches != NULL)
+	if (patches != NULL && patchKernel)
 	{
 		while(entry)
 		{
-			if(entry->validArchs == KERNEL_ANY || arch == entry->validArchs)
+			if (entry->validArchs == KERNEL_ANY || arch == entry->validArchs)
 			{
-				if(entry->patchRoutine) entry->patchRoutine(kernelData);
+				if (entry->patchRoutine) entry->patchRoutine(kernelData);
 			}
 			entry = entry->next;
 		}
-		
 	}
 }
 

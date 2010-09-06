@@ -396,7 +396,6 @@ void common_boot(int biosdev)
         bool tryresume;
         bool tryresumedefault;
         bool forceresume;
-		bool patchKernel = false; //Kpatcher - default value.
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
@@ -667,12 +666,8 @@ void common_boot(int biosdev)
         } else {
             /* Won't return if successful. */
 			// Notify modules that ExecKernel is about to be called
-			getBoolForKey(kKPatcherKey, &patchKernel, &bootInfo->bootConfig);
-
-			if (patchKernel == true)
-			{
-				execute_hook("ExecKernel", binary, NULL, NULL, NULL);
-			}
+			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
+			
             ret = ExecKernel(binary);
         }
     }
