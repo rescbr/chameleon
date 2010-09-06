@@ -54,11 +54,11 @@ void print_hook_list()
 int init_module_system()
 {
 	// Intialize module system
-	if(load_module(SYMBOLS_MODULE))
+	if (load_module(SYMBOLS_MODULE))
 	{
 		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
 		
-		if((UInt32)lookup_symbol != 0xFFFFFFFF)
+		if ((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
 			return 1;
 		}
@@ -78,12 +78,13 @@ int init_module_system()
  * link one module with the other. For dyld to allow this, you must
  * reference at least one symbol within the module.
  */
-void load_all_modules()
+void load_all_modules() // called on boot.c
 {
 	char* name;
 	long flags;
 	long time;
-	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+	//Azi: Modules.txt-->Issues
+	struct dirstuff* moduleDir = opendir("bt(0,0)/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
@@ -109,7 +110,7 @@ void load_all_modules()
 int load_module(char* module)
 {
 	// Check to see if the module has already been loaded
-	if(is_module_laoded(module))
+	if(is_module_loaded(module))
 	{
 		// NOTE: Symbols.dylib tries to load twice, this catches it as well
 		// as when a module links with an already loaded module
@@ -119,7 +120,8 @@ int load_module(char* module)
 	
 	char modString[128];
 	int fh = -1;
-	sprintf(modString, "/Extra/modules/%s", module);
+	//Azi: Modules.txt-->Issues
+	sprintf(modString, "bt(0,0)/Extra/modules/%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
@@ -1048,7 +1050,7 @@ void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 	
 }
 
-int is_module_laoded(const char* name)
+int is_module_loaded(const char* name)
 {
 	moduleList_t* entry = loadedModules;
 	while(entry)

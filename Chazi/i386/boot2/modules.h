@@ -74,7 +74,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 int load_module(char* module);
-int is_module_laoded(const char* name);
+int is_module_loaded(const char* name);
 void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/);
 
 long long add_symbol(char* symbol, long long addr, char is64);

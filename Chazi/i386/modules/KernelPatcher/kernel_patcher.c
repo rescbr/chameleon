@@ -315,7 +315,7 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 	bytes[patchLocation + 4] = 0x90;
 	printf("0x%X 0x%X 0x%X 0x%X 0x%X\n", bytes[patchLocation ], bytes[patchLocation +1], bytes[patchLocation +2], bytes[patchLocation +3], bytes[patchLocation +4]);
 
-	getc();
+	//getc();
 	
 	// Locate the jump call, so that 10 bytes can be reclamed.
 	// NOTE: This will *NOT* be located on pre 10.6.2 kernels

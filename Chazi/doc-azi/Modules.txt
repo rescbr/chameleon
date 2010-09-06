@@ -54,6 +54,8 @@ Featured modules:
 	SSE3 instructions, will benefit of the same treatment!
 	Let's just say that the only patch needed by the 925 on Legacy Mode(**) is cpuid_set!
 	
+	Note: Kernel Patcher can stop working due to changes on the kernel code.
+	
   - HelloWorld.dylib: just a notifier (not mandatory).
 
 
@@ -66,13 +68,11 @@ Featured modules:
 
 Issues:
 
-  - modules may fail to load, if you have the booter on a separate device/partition and try
-	to load modules from selected volume. Confirmed on MBR/boot0hfs install only.
-
-  - the Kernel Patcher can stop working due to changes on the kernel code, though that can be
-	"previewed" to some extent. Just so you know what to expect.
-
-  - this is work in progress; i will add updates as Meklort commits.
+  - the default path for loading modules (/Extra/modules/) is not being respected, the booter
+	always checks bt(0,0)/Extra/modules/ instead.
+	Anyway, i already intended to change the path due to the concept of this booter
+	and so i did it. Of course the problem is still there and needs to be fixed, at least if
+	one wants to be able to load modules from selected volume.
 
 	---------------//---------------//---------------
 

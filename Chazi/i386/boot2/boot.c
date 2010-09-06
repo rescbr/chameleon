@@ -290,7 +290,7 @@ void common_boot(int biosdev)
     }
 
 	// Intialize module system
-	if(init_module_system())
+	if (init_module_system())
 	{
 		load_all_modules();
 	}
