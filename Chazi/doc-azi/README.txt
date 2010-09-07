@@ -36,9 +36,10 @@ About the branch:
 	- CleanCut, as the name implies, is a "clean" cut of Chazi; will always be as close to the trunk as
 	  possible and i won't commit there patches that don't work for everyone, like the AutoResolution
 	  one i use on Chazi (this may change in the future).
-	  It's mean to be compared easily and keep the stuff i consider most useful to Chameleon "at hand".
+	  It's meant to be compared easily and keep the stuff i consider most useful to Chameleon "at hand".
 	  Stuff committed there, besides trunk updates, will always come from and reflect changes on Chazi,
-	  keeping the limitations above in mind!
+	  keeping the limitations above in mind.
+	  This project it's not meant to be used! Want to test something, use Chazi.
 
 Guidelines:
 

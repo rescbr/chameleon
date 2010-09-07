@@ -1,7 +1,8 @@
 About the CleanCut:
 
-  This is a "clean" cut of the Chazi project. Check the README.txt there for more info.
-  CHANGES.txt will still be updated as needed.
+  This is a "clean" cut of the Chazi project, it's not meant to be used!
+  If you want to test something, head to Chazi folder.
+  Check the README.txt there for more info (doc-azi folder).
 
   Thanks.
 
