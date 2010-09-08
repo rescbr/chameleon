@@ -15,8 +15,6 @@ kernSymbols_t* kernelSymbols = NULL;
 
 void KernelPatcher_start()
 {
-	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_ATOM);		// TODO: CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN
-	//register_kernel_patch(patch_cpuid_set_info, KERNEL_32, CPUID_MODEL_UNKNOWN);	// 0, 0 
 	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_ANY, CPUID_MODEL_UNKNOWN); 
 
 	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPUID_MODEL_ANY);
@@ -33,13 +31,12 @@ void KernelPatcher_start()
 	register_kernel_symbol(KERNEL_ANY, "_lapic_init");
 	register_kernel_symbol(KERNEL_ANY, "_commpage_stuff_routine");
 
-	// LAPIC configure symbols
+	// lapic_configure symbols
 	register_kernel_symbol(KERNEL_ANY, "_lapic_configure");
-
 	register_kernel_symbol(KERNEL_ANY, "_lapic_start");
 	register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt_base");
 	
-	
+	// lapic_interrup symbols
 	//register_kernel_patch(patch_lapic_interrupt, KERNEL_ANY, CPUID_MODEL_ANY);
 	//register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt");
 
@@ -246,16 +243,163 @@ void patch_cpuid_set_info_all(void* kernelData)
 	switch(Platform.CPU.Model)
 	{
 		case CPUID_MODEL_ATOM:
-			patch_cpuid_set_info(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
+			if(determineKernelArchitecture(kernelData) == KERNEL_32)
+			{
+				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
+			}
+			else 
+			{
+				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
+
+			}
+
 			break;
 			
 		default:
-			patch_cpuid_set_info(kernelData, 0, 0);
+			if(determineKernelArchitecture(kernelData) == KERNEL_32)
+			{
+				patch_cpuid_set_info_32(kernelData, 0, 0);
+			}
+			else
+			{
+				patch_cpuid_set_info_64(kernelData, 0, 0);
+			}
+
 			break;
 	}
 }
+void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
+{
+	UInt8* bytes = (UInt8*)kernelData;
+	
+	kernSymbols_t *symbol = lookup_kernel_symbol("_cpuid_set_info");
+	
+	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
+	patchLocation -= (UInt32)kernelData;	// Remove offset
+	
+	
+	
+	UInt32 jumpLocation = 0;
+	
+	
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate _cpuid_set_info\n");
+		return;
+		
+	}
+	
+	symbol = lookup_kernel_symbol("_panic");
+	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
+	if(symbol == 0 || symbol->addr == 0)
+	{
+		printf("Unable to locate _panic\n");
+		return;
+	}
+	panicAddr -= (UInt32)kernelData;
+	
+	
+	
+	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
+	while(  
+		  (bytes[patchLocation -1] != 0xE8) ||
+		  ( ( (UInt32)(panicAddr - patchLocation  - 4) + textSection ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
+																					bytes[patchLocation + 1] << 8  | 
+																					bytes[patchLocation + 2] << 16 |
+																					bytes[patchLocation + 3] << 24)))
+		  )
+	{
+		patchLocation++;
+	}
+	patchLocation--;
+	
+	// Remove panic just in ca se
+	// The panic instruction is exactly 5 bytes long.
+	bytes[patchLocation + 0] = 0x90;
+	bytes[patchLocation + 1] = 0x90;
+	bytes[patchLocation + 2] = 0x90;
+	bytes[patchLocation + 3] = 0x90;
+	bytes[patchLocation + 4] = 0x90;
+	
+	
+	
+	// Check for a 10.2.0+ kernel
+	if(bytes[patchLocation - 19] == 0xC7 && bytes[patchLocation - 18] == 0x05)
+	{
+		
+		UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 17] << 0  |
+										bytes[patchLocation - 16] << 8  |
+										bytes[patchLocation - 15] << 16 |
+										bytes[patchLocation - 14] << 24;
+		
+		// NOTE: may change, determined based on cpuid_info struct
+		UInt32 cpuid_model_addr = cpuid_cpufamily_addr  - 310; 
+		
+		
+		//ffffff8000228b3b -> 0x00490e8b
+		//ffffff8000228c28 -> -237 -> 0x490D9E -> -310
+		
+		
+		// The mov is 10 bytes
+		/*
+		 bytes[patchLocation - 19] = 0x90;	// c7
+		 bytes[patchLocation - 18] = 0x90;	// 05
+		 bytes[patchLocation - 17] = 0x90;	// family location
+		 bytes[patchLocation - 16] = 0x90;	// family location
+		 bytes[patchLocation - 15] = 0x90;	// family location
+		 bytes[patchLocation - 14] = 0x90;	// family location
+		 */
+		bytes[patchLocation - 13] = (impersonateFamily & 0x000000FF) >> 0;
+		bytes[patchLocation - 12] = (impersonateFamily & 0x0000FF00) >> 8;
+		bytes[patchLocation - 11] = (impersonateFamily & 0x00FF0000) >> 16;	
+		bytes[patchLocation - 10] = (impersonateFamily & 0xFF000000) >> 24;
+		
+		
+		// The lea (%rip),%rip is 7 bytes
+		bytes[patchLocation - 9] = 0xC7;
+		bytes[patchLocation - 8] = 0x05;
+		bytes[patchLocation - 7] = ((cpuid_model_addr -10) & 0x000000FF) >> 0;	// NOTE: this opcode is relative in 64bit mode, subtract offset
+		bytes[patchLocation - 6] = ((cpuid_model_addr -10) & 0x0000FF00) >> 8;	
+		bytes[patchLocation - 5] = ((cpuid_model_addr -10) & 0x00FF0000) >> 16;
+		bytes[patchLocation - 4] = ((cpuid_model_addr -10) & 0xFF000000) >> 24;
+		bytes[patchLocation - 3] = impersonateModel;	// cpuid_model
+		
+		 
+		 
+		 // The xor eax eax is 2 bytes
+		bytes[patchLocation - 2] = 0x01;	// cpuid_extmodel
+		bytes[patchLocation - 1] = 0x00;	// cpuid_extfamily
+		
+		// The panic instruction is exactly 5 bytes long.
+		bytes[patchLocation - 0] = 0x02;	// cpuid_stepping
+		/*bytes[patchLocation + 1] = 0x90;
+		bytes[patchLocation + 2] = 0x90;
+		bytes[patchLocation + 3] = 0x90;
+		bytes[patchLocation + 4] = 0x90;
+		*/
+		
+		// Panic call has been removed.
+		// Override the CPUID now. This requires ~ 10 bytes on 10.0.0 kernels
+		// On 10.2.0+ kernels, this requires ~16 bytes
+		
+		// Total: 24 bytes
+		printf("Running on a 10.2.0+ kernel\n");
+		getc();
 
-void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
+	}
+	else {
+		printf("Running on a 10.0.0 kernel, patch unsupported\n");
+		getc();
+	}
+
+	
+}
+
+
+
+
+
+void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {	
 	UInt8* bytes = (UInt8*)kernelData;
 	
@@ -300,21 +444,16 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 	}
 	patchLocation--;
 	
-	printf("0x%X 0x%X 0x%X 0x%X 0x%X\n", bytes[patchLocation ], bytes[patchLocation +1], bytes[patchLocation +2], bytes[patchLocation +3], bytes[patchLocation +4]);
-	
 	// Remove panic call, just in case the following patch routines fail
 	bytes[patchLocation + 0] = 0x90;
 	bytes[patchLocation + 1] = 0x90;
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
-	printf("0x%X 0x%X 0x%X 0x%X 0x%X\n", bytes[patchLocation ], bytes[patchLocation +1], bytes[patchLocation +2], bytes[patchLocation +3], bytes[patchLocation +4]);
-
-	getc();
+	
 	
 	// Locate the jump call, so that 10 bytes can be reclamed.
 	// NOTE: This will *NOT* be located on pre 10.6.2 kernels
-	// NOTE: This will work on a *32* bit kernel and *not* on a 64 bit ont
 	jumpLocation = patchLocation - 15;
 	while((bytes[jumpLocation - 1] != 0x77 ||
 		   bytes[jumpLocation] != (patchLocation - jumpLocation - -8)) &&
@@ -334,19 +473,19 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 		/* 
 		 * Inpersonate the specified CPU FAMILY and CPU Model
 		 */
-
+		
 		// bytes[patchLocation - 17] = 0xC7;	// already here... not needed to be done
 		// bytes[patchLocation - 16] = 0x05;	// see above
 		UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 15] << 0  |
-										bytes[patchLocation - 14] << 8  |
-										bytes[patchLocation - 13] << 16 |
-										bytes[patchLocation - 12] << 24;
+		bytes[patchLocation - 14] << 8  |
+		bytes[patchLocation - 13] << 16 |
+		bytes[patchLocation - 12] << 24;
 		
 		// NOTE: may change, determined based on cpuid_info struct
 		UInt32 cpuid_model_addr = cpuid_cpufamily_addr - 299; 
 		
 		
-		// cpufamily = CPUFAMILY_INTEL_PENRYN
+		// cpufamily
 		bytes[patchLocation - 11] = (impersonateFamily & 0x000000FF) >> 0;
 		bytes[patchLocation - 10] = (impersonateFamily & 0x0000FF00) >> 8;
 		bytes[patchLocation -  9] = (impersonateFamily & 0x00FF0000) >> 16;	
@@ -376,81 +515,59 @@ void patch_cpuid_set_info(void* kernelData, UInt32 impersonateFamily, UInt8 impe
 	}
 	else if(impersonateFamily && impersonateModel)
 	{
-		// Eitehr a 64bit kernel *or* a pre 10.6.2 kernel
-		// Look for 
-		jumpLocation = patchLocation - 15;
-		while((bytes[jumpLocation - 2] != 0x0F ||
-			   bytes[jumpLocation - 1] != 0x87 ||
-			   bytes[jumpLocation] != (patchLocation - jumpLocation - -31)) &&
-			  (patchLocation - jumpLocation) < 0x200)
+		// pre 10.6.2 kernel
+		// Locate the jump to directly *after* the panic call,
+		jumpLocation = patchLocation - 4;
+		while((bytes[jumpLocation - 1] != 0x77 ||
+			   bytes[jumpLocation] != (patchLocation - jumpLocation + 4)) &&
+			  (patchLocation - jumpLocation) < 0x20)
 		{
 			jumpLocation--;
 		}
+		// NOTE above isn't needed (I was going to use it, but I'm not, so instead,
+		// I'll just leave it to verify the binary stucture.
 		
+		// NOTE: the cpumodel_familt data is not set in _cpuid_set_info
+		// so we don't need to set it here, I'll get set later based on the model
+		// we set now.
 		
-		if((patchLocation - jumpLocation) < 0x200)
+		if((patchLocation - jumpLocation) < 0x20)
 		{
-			// 64 bit kernel, 10.6.2+
-		}
-		else
-		{	// 32 bit kernel
-		
-			// pre 10.6.2 kernel
-			// Locate the jump to directly *after* the panic call,
-			jumpLocation = patchLocation - 4;
-			while((bytes[jumpLocation - 1] != 0x77 ||
-				   bytes[jumpLocation] != (patchLocation - jumpLocation + 4)) &&
-				  (patchLocation - jumpLocation) < 0x20)
-			{
-				jumpLocation--;
-			}
-			// NOTE above isn't needed (I was going to use it, but I'm not, so instead,
-			// I'll just leave it to verify the binary stucture.
+			UInt32 cpuid_model_addr =	(bytes[patchLocation - 14] << 0  |
+										 bytes[patchLocation - 13] << 8  |
+										 bytes[patchLocation - 12] << 16 |
+										 bytes[patchLocation - 11] << 24);
+			// Remove jump
+			bytes[patchLocation - 9] = 0x90;		///  Was a jump if supported cpu
+			bytes[patchLocation - 8] = 0x90;		// jumped past the panic call, we want to override the panic
 			
-			// NOTE: the cpumodel_family data is not set in _cpuid_set_info
-			// so we don't need to set it here, I'll get set later based on the model
-			// we set now.
+			bytes[patchLocation - 7] = 0x90;
+			bytes[patchLocation - 6] = 0x90;
 			
-			if((patchLocation - jumpLocation) < 0x20)
-			{
-				UInt32 cpuid_model_addr =	(bytes[patchLocation - 14] << 0  |
-											 bytes[patchLocation - 13] << 8  |
-											 bytes[patchLocation - 12] << 16 |
-											 bytes[patchLocation - 11] << 24);
-				// Remove jump
-				bytes[patchLocation - 9] = 0x90;		///  Was a jump if supported cpu
-				bytes[patchLocation - 8] = 0x90;		// jumped past the panic call, we want to override the panic
-				
-				bytes[patchLocation - 7] = 0x90;
-				bytes[patchLocation - 6] = 0x90;
-				
-				bytes[patchLocation - 5] = 0xC7;
-				bytes[patchLocation - 4] = 0x05;
-				bytes[patchLocation - 3] = (cpuid_model_addr & 0x000000FF) >> 0;
-				bytes[patchLocation - 2] = (cpuid_model_addr & 0x0000FF00) >> 8;	
-				bytes[patchLocation - 1] = (cpuid_model_addr & 0x00FF0000) >> 16;
-				bytes[patchLocation - 0] = (cpuid_model_addr & 0xFF000000) >> 24;
-				
-				// Note: I could have just copied the 8bit cpuid_model in and saved about 4 bytes
-				// so if this function need a different patch it's still possible. Also, about ten bytes previous can be freed.
-				bytes[patchLocation + 1] = impersonateModel;	// cpuid_model
-				bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
-				bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
-				bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
-				
-				
-				
-				patchLocation = jumpLocation;
-				// We now have 14 bytes available for a patch
-				
-			}
+			bytes[patchLocation - 5] = 0xC7;
+			bytes[patchLocation - 4] = 0x05;
+			bytes[patchLocation - 3] = (cpuid_model_addr & 0x000000FF) >> 0;
+			bytes[patchLocation - 2] = (cpuid_model_addr & 0x0000FF00) >> 8;	
+			bytes[patchLocation - 1] = (cpuid_model_addr & 0x00FF0000) >> 16;
+			bytes[patchLocation - 0] = (cpuid_model_addr & 0xFF000000) >> 24;
+			
+			// Note: I could have just copied the 8bit cpuid_model in and saved about 4 bytes
+			// so if this function need a different patch it's still possible. Also, about ten bytes previous can be freed.
+			bytes[patchLocation + 1] = impersonateModel;	// cpuid_model
+			bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
+			bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
+			bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
+			
+			
+			
+			patchLocation = jumpLocation;
+			// We now have 14 bytes available for a patch
+			
 		}
-		/*else 
+		else 
 		{
-			// Check for 64bit kernel.
-			
 			// Patching failed, using NOP replacement done initialy
-		}*/
+		}
 	}
 	else 
 	{

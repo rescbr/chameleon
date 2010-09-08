@@ -106,7 +106,7 @@ void load_all_modules()
 int load_module(char* module)
 {
 	// Check to see if the module has already been loaded
-	if(is_module_laoded(module))
+	if(is_module_loaded(module))
 	{
 		// NOTE: Symbols.dylib tries to load twice, this catches it as well
 		// as when a module links with an already loaded module
@@ -1045,7 +1045,7 @@ void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 	
 }
 
-int is_module_laoded(const char* name)
+int is_module_loaded(const char* name)
 {
 	moduleList_t* entry = loadedModules;
 	while(entry)
