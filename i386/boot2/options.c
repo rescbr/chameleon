@@ -111,8 +111,8 @@ static int countdown( const char * msg, int row, int timeout )
 		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
 	
 		char dummy[80];
-		getBootVolumeDescription( gBootVolume, dummy, 80, true );
-		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p );
+		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
+		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
 		
 		// make this screen the new background
@@ -182,9 +182,19 @@ static void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
-	
+
 	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 		clearGraphicBootPrompt();
+	}
+}
+
+static void addBootArg(const char * argStr)
+{
+	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
+	{
+		*gBootArgsPtr++ = ' ';
+		strcat(gBootArgs, argStr);
+		gBootArgsPtr += strlen(argStr);
 	}
 }
 
@@ -434,22 +444,19 @@ static int updateMenu( int key, void ** paramPtr )
 					case BOOT_VERBOSE:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'v';
+						addBootArg(kVerboseModeFlag);
 						break;
 						
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'f';
+						addBootArg(kIgnoreCachesFlag);
 						break;
 						
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 's';
+						addBootArg(kSingleUserModeFlag);
 						break;
 				}
 				
@@ -689,11 +696,13 @@ int getBootOptions(bool firstRun)
 	}
 
 	// ensure we're in graphics mode if gui is setup
-	if (gui.initialised) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			setVideoMode(GRAPHICS_MODE, 0);
-		}
+	if (gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
+		setVideoMode(GRAPHICS_MODE, 0);
 	}
+
+	// Clear command line boot arguments
+	clearBootArgs();
 
 	// Allow user to override default timeout.
 	if (multiboot_timeout_set) {
@@ -725,32 +734,27 @@ int getBootOptions(bool firstRun)
 		//gBootMode |= kBootModeSafe;
 	}
 
-	// If user typed F8, abort quiet mode, and display the menu.
-	{
-		bool f8press = false, spress = false, vpress = false;
-		int key;
-		while (readKeyboardStatus()) {
-			key = bgetc ();
-			if (key == 0x4200) f8press = true;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
-		}
-		if (f8press) {
-			gBootMode &= ~kBootModeQuiet;
-			timeout = 0;
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 's';
-		}	
+	// Checking user pressed keys
+	bool f8press = false, spress = false, vpress = false;
+	while (readKeyboardStatus()) {
+		key = bgetc ();
+		if (key == 0x4200) f8press = true;
+		if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
+		if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
 	}
-	clearBootArgs();
+	// If user typed F8, abort quiet mode, and display the menu.
+	if (f8press) {
+		gBootMode &= ~kBootModeQuiet;
+		timeout = 0;
+	}
+	// If user typed 'v' or 'V', boot in verbose mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && vpress) {
+		addBootArg(kVerboseModeFlag);
+	}
+	// If user typed 's' or 'S', boot in single user mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && spress) {
+		addBootArg(kSingleUserModeFlag);
+	}
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);
@@ -767,28 +771,24 @@ int getBootOptions(bool firstRun)
 	// When booting from CD, default to hard drive boot when possible. 
 	if (isCDROM && firstRun) {
 		const char *val;
-		char *prompt;
-		char *name;
+		char *prompt = NULL;
+		char *name = NULL;
 		int cnt;
 		int optionKey;
 
 		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
-			cnt += 1;
-			prompt = malloc(cnt);
-			strlcpy(prompt, val, cnt);
+			prompt = malloc(cnt + 1);
+			strncat(prompt, val, cnt);
 		} else {
 			name = malloc(80);
-			getBootVolumeDescription(gBootVolume, name, 80, false);
+			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
-			cnt = 0;
 		}
 
 		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig )) {
 			// The key specified is a special key.
-		} else if (getValueForKey( kCDROMOptionKey, &val, &cnt, &bootInfo->bootConfig ) && cnt >= 1) {
-			optionKey = val[0];
 		} else {
 			// Default to F8.
 			optionKey = 0x4200;
@@ -803,7 +803,7 @@ int getBootOptions(bool firstRun)
 			key = optionKey;
 		}
 
-		if (cnt) {
+		if (prompt != NULL) {
 			free(prompt);
 		}
 
@@ -855,7 +855,7 @@ int getBootOptions(bool firstRun)
 		// Associate a menu item for each BVRef.
 		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next) {
 			if (bvr->visible) {
-				getBootVolumeDescription(bvr, menuItems[i].name, 80, true);
+				getBootVolumeDescription(bvr, menuItems[i].name, sizeof(menuItems[i].name) - 1, true);
 				menuItems[i].param = (void *) bvr;
 				if (bvr == menuBVR) {
 					selectIndex = i;
@@ -867,6 +867,7 @@ int getBootOptions(bool firstRun)
 
 	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 		// redraw the background buffer
+		gui.logo.draw = true;
 		drawBackground();
 		gui.devicelist.draw = true;
 		gui.redraw = true;
@@ -1305,24 +1306,24 @@ processBootOptions()
     strncpy(&argP[cnt], cp, userCnt);
     argP[cnt+userCnt] = '\0';
 
-    if(!shouldboot)
-    {
-    	gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
-            getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+	if(!shouldboot)
+	{
+		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
+			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+		
+		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
+			kBootModeSafe : kBootModeNormal;
 
-      gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
-	    kBootModeSafe : kBootModeNormal;
+        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
+            gBootMode = kBootModeSafe;
+       }
+	}
 
-    	if ( getValueForKey( kOldSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
-        	gBootMode = kBootModeSafe;
-   	}
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+	{
+		strlcpy(gMKextName, val, cnt + 1);
+	}
 
-   	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
-        	strlcpy(gMKextName, val, cnt + 1);
-    	}
-
-    }
-	 
     free(configKernelFlags);
     free(valueBuffer);
 

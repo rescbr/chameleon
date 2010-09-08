@@ -85,7 +85,7 @@ bool    useGUI;
 
 //static void selectBiosDevice(void);
 static unsigned long Adler32(unsigned char *buffer, long length);
-
+static bool getOSVersion(char *str);
 
 static bool gUnloadPXEOnExit = false;
 
@@ -168,6 +168,8 @@ static int ExecKernel(void *binary)
 	
     setupFakeEfi();
 
+    md0Ramdisk();
+
     verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 
     // Cleanup the PXE base code.
@@ -181,10 +183,12 @@ static int ExecKernel(void *binary)
     }
 
     bool dummyVal;
-    if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
-	printf("Press any key to continue...");
-	getc();
-    }
+	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
+		printf("Press any key to continue...");
+		getc();
+	}
+
+	usb_loop();
 
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
@@ -194,6 +198,8 @@ static int ExecKernel(void *binary)
       setVideoMode( GRAPHICS_MODE, 0 );
     else
       drawBootGraphics();
+	
+	setupBooterLog();
 	
     finalizeBootStruct();
     
@@ -253,6 +259,8 @@ void common_boot(int biosdev)
 
     // Initialize boot info structure.
     initKernBootStruct();
+
+	initBooterLog();
 
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
@@ -333,14 +341,14 @@ void common_boot(int biosdev)
     getc();
 #endif
 
-    useGUI = true;
-    // Override useGUI default
-    getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
-    if (useGUI) {
-		patchVideoBios();
-        /* XXX AsereBLN handle error */
-		initGUI();
-    }
+	useGUI = true;
+	// Override useGUI default
+	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+	if (useGUI && initGUI())
+	{
+		// initGUI() returned with an error, disabling GUI.
+		useGUI = false;
+	}
 
     setBootGlobals(bvChain);
 
@@ -355,8 +363,6 @@ void common_boot(int biosdev)
         bool tryresume;
         bool tryresumedefault;
         bool forceresume;
-
-        config_file_t    systemVersion;		// system.plist of booting partition
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
@@ -386,17 +392,13 @@ void common_boot(int biosdev)
               
             bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
             setBootGlobals(bvChain);
+            setupDeviceList(&bootInfo->themeConfig);
           }
           continue;
         }
 		
         // Other status (e.g. 0) means that we should proceed with boot.
 		
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-			drawBackground();
-			
-        // Found and loaded a config file. Proceed with boot.
-
 		// Turn off any GUI elements
 		if( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
@@ -404,19 +406,13 @@ void common_boot(int biosdev)
 			gui.bootprompt.draw = false;
 			gui.menu.draw = false;
 			gui.infobox.draw = false;
+			gui.logo.draw = false;
 			drawBackground();
 			updateVRAM();
 		}
 		
 		// Find out which version mac os we're booting.
-		if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion)) {
-			if (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {	
-				// getValueForKey uses const char for val
-				// so copy it and trim
-				strncpy(gMacOSVersion, val, MIN(len, 4));
-				gMacOSVersion[MIN(len, 4)] = '\0';
-			}
-		}
+		getOSVersion(gMacOSVersion);
 
 		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
 			archCpuType = CPU_TYPE_X86_64;
@@ -428,10 +424,7 @@ void common_boot(int biosdev)
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-		if (getValueForKey(k32BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
-			archCpuType = CPU_TYPE_I386;
-		}
-		
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
@@ -577,12 +570,8 @@ void common_boot(int biosdev)
         if (ret <= 0) {
 			printf("Can't find %s\n", bootFile);
 
-			if(gui.initialised) {
-				sleep(1);
-				drawBackground();
-				gui.devicelist.draw = true;
-				gui.redraw = true;
-			}
+			sleep(1);
+
             if (gBootFileType == kNetworkDeviceType) {
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
@@ -628,6 +617,38 @@ static void selectBiosDevice(void)
     gBIOSDev = dev;
 }
 */
+
+static bool getOSVersion(char *str)
+{
+	bool valid = false;
+	config_file_t systemVersion;
+	const char *val;
+	int len;
+
+	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
+	{
+		valid = true;
+	}
+	else if (!loadConfigFile("System/Library/CoreServices/ServerVersion.plist", &systemVersion))
+	{
+		valid = true;
+	}
+
+	if (valid)
+	{
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		{
+			// getValueForKey uses const char for val
+			// so copy it and trim
+			*str = '\0';
+			strncat(str, val, MIN(len, 4));
+		}
+		else
+			valid = false;
+	}
+
+	return valid;
+}
 
 #define BASE 65521L /* largest prime smaller than 65536 */
 #define NMAX 5000

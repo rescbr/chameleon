@@ -66,13 +66,11 @@ int usb_loop()
 {
 	int retVal = 1;
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
-	fix_ehci = fix_uhci = fix_usb = fix_legacy = true;
-	
-	
+	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
 	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
 	{
-		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Enable all if none set
+		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
@@ -81,10 +79,9 @@ int usb_loop()
 		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
 	}
 	
-	
 	struct pciList* current = usbList;
 	
-	while(current && current->next)
+	while(current)
 	{
 		switch (pci_config_read8(current->pciDev->dev.addr, PCI_CLASS_PROG))
 		{
@@ -98,6 +95,7 @@ int usb_loop()
 			// UHCI
 			case 0x00:
 				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
+
 				break;
 		}
 		
@@ -199,8 +197,6 @@ int legacy_off (pci_dt_t *pci_dev)
 	verbose("Legacy USB Off Done\n");	
 	return 1;
 }
-
-
 
 int ehci_acquire (pci_dt_t *pci_dev)
 {

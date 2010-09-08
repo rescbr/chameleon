@@ -6,10 +6,10 @@
 #include "ati.h"
 
 extern void set_eth_builtin(pci_dt_t *eth_dev);
-//extern int ehci_acquire(pci_dt_t *pci_dev);
-//extern int uhci_reset(pci_dt_t *pci_dev);
 extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
+
+extern pci_dt_t *dram_controller_dev;
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
@@ -29,6 +29,10 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 		switch (current->class_id)
 		{
+			case PCI_CLASS_BRIDGE_HOST:
+					dram_controller_dev = current;
+				break;
+				
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				if (do_eth_devprop)
 					set_eth_builtin(current);
@@ -58,22 +62,6 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 			case PCI_CLASS_SERIAL_USB:
 				notify_usb_dev(current);
-				/*
-				switch (pci_config_read8(current->dev.addr, PCI_CLASS_PROG))
-				{
-					// EHCI
-					case 0x20:
-				    	if (fix_ehci)
-							ehci_acquire(current);
-						break;
-
-					// UHCI
-					case 0x00:
-				    	if (fix_uhci)
-							uhci_reset(current);
-						break;
-				}
-				*/
 				break;
 
 			case PCI_CLASS_BRIDGE_ISA:

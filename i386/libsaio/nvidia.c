@@ -267,11 +267,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05E2, "GeForce GTX 260" },
 	{ 0x10DE05E3, "GeForce GTX 285" },
 	{ 0x10DE05E6, "GeForce GTX 275" },
+	{ 0x10DE05EA, "GeForce GTX 260" },
 	{ 0x10DE05EB, "GeForce GTX 295" },
 	{ 0x10DE05F9, "Quadro CX" },
 	{ 0x10DE05FD, "Quadro FX 5800" },
 	{ 0x10DE05FE, "Quadro FX 4800" },
-   	{ 0x10DE0600, "GeForce 8800 GTS 512" },
+	{ 0x10DE0600, "GeForce 8800 GTS 512" },
 	{ 0x10DE0602, "GeForce 8800 GT" },
 	{ 0x10DE0604, "GeForce 9800 GX2" },
 	{ 0x10DE0605, "GeForce 9800 GT" },
@@ -290,7 +291,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0614, "GeForce 9800 GT" },
 	{ 0x10DE0615, "GeForce GTS 250" },
 	{ 0x10DE0617, "GeForce 9800M GTX" },
-	{ 0x10DE0618, "GeForce GTX 260M" },	
+	{ 0x10DE0618, "GeForce GTX 260M" }, 
 	{ 0x10DE061A, "Quadro FX 3700" },
 	{ 0x10DE061C, "Quadro FX 3600M" },
 	{ 0x10DE061D, "Quadro FX 2800M" },
@@ -322,6 +323,10 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE065A, "Quadro FX 1700M" },
 	{ 0x10DE065B, "GeForce 9400 GT" },
 	{ 0x10DE065C, "Quadro FX 770M" },
+	{ 0x10DE06C0, "GeForce GTX 480" },
+	{ 0x10DE06C4, "GeForce GTX 465" },
+	{ 0x10DE06CA, "GeForce GTX 480M" },
+	{ 0x10DE06CD, "GeForce GTX 470" },
 	{ 0x10DE06E0, "GeForce 9300 GE" },
 	{ 0x10DE06E1, "GeForce 9300 GS" },
 	{ 0x10DE06E4, "GeForce 8400 GS" },
@@ -336,10 +341,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06F9, "Quadro FX 370 LP" },
 	{ 0x10DE06FA, "Quadro NVS 450" },
 	{ 0x10DE06FD, "Quadro NVS 295" },
-        { 0x10DE087D, "ION 9400M" },
-        { 0x10DE087E, "ION LE" },
+	{ 0x10DE086C, "GeForce 9300/nForce 730i" },
+	{ 0x10DE087D, "ION 9400M" },
+	{ 0x10DE087E, "ION LE" },
 	{ 0x10DE0A20, "GeForce GT220" },
 	{ 0x10DE0A23, "GeForce 210" },
+	{ 0x10DE0A28, "GeForce GT 230M" },
 	{ 0x10DE0A2A, "GeForce GT 230M" },
 	{ 0x10DE0A34, "GeForce GT 240M" },
 	{ 0x10DE0A60, "GeForce G210" },
@@ -351,7 +358,14 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A78, "Quadro FX 380 LP" },
 	{ 0x10DE0CA3, "GeForce GT 240" },
 	{ 0x10DE0CA8, "GeForce GTS 260M" },
-	{ 0x10DE0CA9, "GeForce GTS 250M" }
+	{ 0x10DE0CA9, "GeForce GTS 250M" },
+	{ 0x10DE0CA3, "GeForce GT240" },
+	{ 0x10DE0E22, "GeForce GTX 460" },
+	{ 0x10DE0E24, "GeForce GTX 460" },
+	{ 0x10DE06D1, "Tesla C2050" },	// TODO: sub-device id: 0x0771
+	{ 0x10DE06D1, "Tesla C2070" },	// TODO: sub-device id: 0x0772
+	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
+	{ 0x10DE06DE, "Tesla M2070" }	// TODO: sub-device id: ?
 };
 
 static uint16_t swap16(uint16_t x)
@@ -650,20 +664,43 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	return 0;
 }
 
+unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev)
+{
+	unsigned long long vram_size = 0;
+
+	if (nvCardType < NV_ARCH_50) {
+		vram_size  = REG32(NV04_PFB_FIFO_DATA);
+		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
+	}
+	else if (nvCardType >= NV_ARCH_C0) {
+		vram_size  = REG32(NVC0_MEM_CTRLR_COUNT);
+		vram_size *= REG32(NVC0_MEM_CTRLR_RAM_AMOUNT);
+		vram_size <<= 20;
+	}
+	else {
+		vram_size = REG32(NV04_PFB_FIFO_DATA);
+		vram_size |= (vram_size & 0xff) << 32;
+		vram_size &= 0xffffffff00ll;
+	}
+		
+	return vram_size;
+}
+
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
 	struct DevPropDevice		*device;
-	char				*devicepath;
+	char						*devicepath;
 	struct pci_rom_pci_header_t	*rom_pci_header;	
-	volatile uint8_t		*regs;
+	volatile uint8_t	*regs;
 	uint8_t				*rom;
 	uint8_t				*nvRom;
-	uint32_t			videoRam;
+	uint8_t				nvCardType;
+	unsigned long long	videoRam;
 	uint32_t			nvBiosOveride;
 	uint32_t			bar[7];
 	uint32_t			boot_display;
-	int				nvPatch;
-	int				len;
+	int					nvPatch;
+	int					len;
 	char				biosVersion[32];
 	char				nvFilename[32];
 	char				kNVCAP[12];
@@ -674,15 +711,20 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devicepath = get_pci_dev_path(nvda_dev);
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
+	
+	delay(50);
+		
+	// get card type
+	nvCardType = (REG32(0) >> 20) & 0x1ff;
 
 	// Amount of VRAM in kilobytes
-	videoRam = (REG32(0x10020c) & 0xfff00000) >> 10;
+	videoRam = mem_detect(regs, nvCardType, nvda_dev);
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
-
+	
 	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s\n",  
-		model, (videoRam / 1024),
-		(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
-		devicepath);
+			model, (uint32_t)(videoRam / 1024 / 1024),
+			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
+			devicepath);
 
 	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
@@ -768,9 +810,40 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		uint8_t built_in = 0x01;
 		devprop_add_value(device, "@0,built-in", &built_in, 1);
 	}
-
-	videoRam *= 1024;
-	sprintf(biosVersion, "xx.xx.xx - %s", (nvBiosOveride > 0) ? nvFilename : "internal");
+	
+	// get bios version
+	const int MAX_BIOS_VERSION_LENGTH = 32;
+	char* version_str = (char*)malloc(MAX_BIOS_VERSION_LENGTH);
+	memset(version_str, 0, MAX_BIOS_VERSION_LENGTH);
+	int i, version_start;
+	int crlf_count = 0;
+	// only search the first 384 bytes
+	for(i = 0; i < 0x180; i++) {
+		if(rom[i] == 0x0D && rom[i+1] == 0x0A) {
+			crlf_count++;
+			// second 0x0D0A was found, extract bios version
+			if(crlf_count == 2) {
+				if(rom[i-1] == 0x20) i--; // strip last " "
+				for(version_start = i; version_start > (i-MAX_BIOS_VERSION_LENGTH); version_start--) {
+					// find start
+					if(rom[version_start] == 0x00) {
+						version_start++;
+						
+						// strip "Version "
+						if(strncmp((const char*)rom+version_start, "Version ", 8) == 0) {
+							version_start += 8;
+						}
+						
+						strncpy(version_str, (const char*)rom+version_start, i-version_start);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
 
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->bootConfig) && len == NVCAP_LEN * 2) {

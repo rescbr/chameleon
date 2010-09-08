@@ -20,7 +20,7 @@ SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
 UTILDIR = ../util
-THEME = default
+THEME = embed
 THEMEDIR = ../../artwork/themes/$(THEME)
 INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
@@ -54,7 +54,7 @@ ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
-MAXBOOTSIZE = 392704
+MAXBOOTSIZE = 458240
 
 all: $(DIRS_NEEDED) boot
 
@@ -95,8 +95,19 @@ art.h:
 	@echo "#define __BOOT2_ART_H" >> $(SYMROOT)/art.h
 	@cd $(SYMROOT)/embed && find . -name 'theme.plist' -exec xxd -i >> $(SYMROOT)/art.h {} \;
 	@cd $(SYMROOT)/embed && find . -name '*.png' -exec xxd -i >> $(SYMROOT)/art.h {} \;
+
+	@echo "typedef struct {" >> $(SYMROOT)/art.h
+	@echo "	char			name[32];" >> $(SYMROOT)/art.h
+	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
+	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
+	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
+	@echo "" >> $(SYMROOT)/art.h
+	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
+	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
+		awk '{ printf "\t{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
+	@echo "};" >> $(SYMROOT)/art.h
+
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
-	rm -rf $(SYMROOT)/embed ;\
 
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h

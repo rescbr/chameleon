@@ -46,7 +46,7 @@ GENERIC_SUBDIRS =
 # Currently builds for i386
 #
 
-all embedtheme tags debug install installhdrs: $(SYMROOT) $(OBJROOT)
+all embedtheme tags debug install installhdrs modules: $(SYMROOT) $(OBJROOT)
 	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
 	@if [ -z "$(RC_ARCHS)" ]; then					  \
 		RC_ARCHS="i386";					  \
@@ -114,6 +114,7 @@ release: $(SYMROOT)
 	fi;
 	@tar -czf $(SYMROOT)/$(PRODUCT)-src.tar.gz ${EXCLUDE} .
 	@tar -cjf $(SYMROOT)/$(PRODUCT)-src.tar.bz2 ${EXCLUDE} .
+
 
 clean:
 	rm -rf sym obj dst

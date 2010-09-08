@@ -14,8 +14,9 @@ Example arguments include
 
  kernel: kernel name                (e.g. "mach_kernel" - must be in "/" )
 
- flags: -v (verbose)    -s (single user mode), 
-        -x (safe mode)  -F (ignore boot configuration file)
+ flags: -v (verbose)                -s (single user mode)
+        -x (safe mode)              -f (ignore caches)
+        -F (ignore "Kernel Flags" specified in boot configuration file)
 
  "Graphics Mode"="WIDTHxHEIGHTxDEPTH" (e.g. "1024x768x32")
 
@@ -47,12 +48,17 @@ Options useful in the com.apple.Boot.plist file:
   "Instant Menu"=Yes      Force displaying the partition selection menu. 
 
   "Default Partition"     Sets the default boot partition,
-    =hd(x,y)                where 'x' & 'y' are the disk and partition numbers.
+    =hd(x,y)|UUID|"Label"    Specified as a disk/partition pair, an UUID, or a 
+                             label enclosed in quotes.
+                             
   "Hide Partition"        Remove unwanted partition(s) from the boot menu.
-    =hd(x,y) [hd(m,n)]      only non mac osx boot partitions can be hidden.
-
-  "Rename Partition"        Rename partition(s) for the boot menu.
-    =hd(x,y) <alias> [;hd(m,n) <alias2> ...]
+    =partition               Specified, possibly multiple times, as hd(x,y), an
+     [;partition2 ...]       UUID or label enclosed in quotes.
+    
+  "Rename Partition"      Rename partition(s) for the boot menu.
+    =partition <alias>       Where partition is hd(x,y), UUID or label enclosed
+     [;partition2 <alias2>   in quotes. The alias can optionally be quoted too. 
+     ...]
 
   GUI=No                  Disable the GUI (enabled by default).
   "Boot Banner"=Yes|No    Show boot banner in GUI mode (enabled by default).
@@ -70,9 +76,11 @@ Options useful in the com.apple.Boot.plist file:
   EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
                           for ethernet interfaces.
 
-  USBBusFix=Yes           Enable the EHCI and UHCI fixes (disabled by default).
+  USBBusFix=Yes           Enable all USB fixes below:
   EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
   UHCIreset=Yes           Enable the UHCI fix (disabled by default).
+  USBLegacyOff=Yes        Enable the USB Legacy fix (disabled by default).
+
   ForceHPET=Yes|No        Force Enable HPET.
 
   Wake=No                 Disable wake up after hibernation (default: enabled).
@@ -82,11 +90,10 @@ Options useful in the com.apple.Boot.plist file:
 
   DropSSDT=Yes            Skip the SSDT tables while relocating the ACPI tables.
   DSDT=<file>             Use an alternate DSDT.aml file 
-                            (default path: /DSDT.aml /Extra/DSDT.aml).
+                            (default path: /DSDT.aml /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
 
-  SMBIOS=<file>           Use an alternate smbios.plist file 
-                            (default path: /smbios.plist /Extra/smbios.plist
-                             bt(0,0)/Extra/smbios.plist).
+  SMBIOS=<file>           Use an alternate SMBIOS.plist file 
+                            (default path: /Extra/SMBIOS.plist bt(0,0)/Extra/SMBIOS.plist).
 
   SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding
                             if smbios.plist doesn't exist, factory
@@ -100,3 +107,5 @@ Options useful in the com.apple.Boot.plist file:
                           SMUUID in smbios config (reserved field) isn't used.
   SystemType=<n>          Set the system type where n is between 0..6
                           (default =1 (Desktop)
+  md0=<file>              Load raw img file into memory for use as XNU's md0
+                          ramdisk. /Extra/Postboot.img is used otherwise.

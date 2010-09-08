@@ -12,6 +12,7 @@
 #include "cpu.h"
 #include "mem.h"
 #include "spd.h"
+#include "dram_controllers.h"
 
 #ifndef DEBUG_PLATFORM
 #define DEBUG_PLATFORM 0
@@ -24,6 +25,7 @@
 #endif
 
 PlatformInfo_t    Platform;
+pci_dt_t * dram_controller_dev = NULL;
 
 /** Return if a CPU feature specified by feature is activated (true) or not (false)  */
 bool platformCPUFeature(uint32_t feature)
@@ -37,13 +39,21 @@ bool platformCPUFeature(uint32_t feature)
 
 /** scan mem for memory autodection purpose */
 void scan_mem() {
-    bool useAutodetection = false;
+    static bool done = false;
+    if (done) return;
+
+    bool useAutodetection = true;
     getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
 
     if (useAutodetection) {
-        scan_memory(&Platform);
+		if (dram_controller_dev!=NULL) {
+			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
+		}
+        scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
         scan_spd(&Platform);
+		//getc();
     }
+    done = true;
 }
 
 /** 
@@ -52,11 +62,8 @@ void scan_mem() {
 */
 void scan_platform(void)
 {
-
 	memset(&Platform, 0, sizeof(Platform));
 	build_pci_dt();
 	scan_cpu(&Platform);
-        // disabled for now as options can't be read yet here: 
-        // scan_mem();
-        
+	//scan_mem(); Rek: called after pci devs init in fake_efi now ...
 }

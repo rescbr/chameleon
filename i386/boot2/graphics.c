@@ -1127,7 +1127,7 @@ setVideoMode( int mode, int drawgraphics)
             params[1] = 25;
         }
 
-        setVESATextMode( params[0], params[1], 4 );
+		setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
 
@@ -1193,21 +1193,25 @@ spinActivityIndicator(int sectors)
 		return;
 	}
  
-	if (gVerboseMode) {
-            currentTickTime = time18(); // late binding
-            if (currentTickTime < lastTickTime + MIN_TICKS) {
-                return;
-            } else {
-                lastTickTime = currentTickTime;
-            }
-            
-            if (getVideoMode() == VGA_TEXT_MODE) {
-                if (currentIndicator >= sizeof(indicator)) {
-                    currentIndicator = 0;
-                }
-                printf("%c\b", indicator[currentIndicator++]);
-            }
-        }
+	currentTickTime = time18(); // late binding
+	if (currentTickTime < lastTickTime + MIN_TICKS)
+	{
+		return;
+	}
+	else
+	{
+		lastTickTime = currentTickTime;
+	}
+	
+	if (getVideoMode() == VGA_TEXT_MODE)
+	{
+		if (currentIndicator >= sizeof(indicator))
+		{
+			currentIndicator = 0;
+		}
+		putc(indicator[currentIndicator++]);
+		putc('\b');
+	}
 }
 
 void
@@ -1215,7 +1219,8 @@ clearActivityIndicator( void )
 {
     if ( getVideoMode() == VGA_TEXT_MODE )
     {
-        printf(" \b");
+		putc(' ');
+		putc('\b');
     }
 }
 

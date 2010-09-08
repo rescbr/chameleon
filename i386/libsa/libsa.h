@@ -70,6 +70,11 @@ static inline int isxdigit(char c)
     return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
 }
 
+//Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
+static inline int ispunct(char c)
+{
+    return (c == '.' || c == '-');
+}
 
 /*
  * string.c
@@ -101,6 +106,9 @@ extern char * strdup(const char *s1);
 #if STRNCASECMP
 extern int    strncasecmp(const char * s1, const char * s2, size_t n);
 #endif
+
+extern char * strchr(const char *str, int c);
+extern char * strbreak(const char *str, char **next, long *len);
 
 extern uint8_t checksum8( void * start, unsigned int length );
 

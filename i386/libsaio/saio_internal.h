@@ -89,8 +89,11 @@ extern long   CacheRead(CICell ih, char *buffer, long long offset,
 /* console.c */
 extern bool   gVerboseMode;
 extern bool   gErrors;
+extern void   initBooterLog(void);
+extern void   setupBooterLog(void);
 extern void   putchar(int ch);
 extern int    getchar(void);
+extern void   msglog(const char * format, ...);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
 extern int    verbose(const char *format, ...);
@@ -170,7 +173,7 @@ extern long   LoadVolumeFile(BVRef bvr, const char *fileSpec);
 extern long   LoadFile(const char *fileSpec);
 extern long   ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length);
 extern long   LoadThinFatFile(const char *fileSpec, void **binary);
-extern long   GetDirEntry(const char *dirSpec, long *dirIndex, const char **name,
+extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char **name,
                           long *flags, long *time);
 extern long   GetFileInfo(const char *dirSpec, const char *name,
                           long *flags, long *time);
@@ -183,6 +186,9 @@ extern int    open_bvdev(const char *bvd, const char *path, int flags);
 extern int    close(int fdesc);
 extern int    file_size(int fdesc);
 extern int    read(int fdesc, char *buf, int count);
+extern int    write(int fdesc, const char *buf, int count);
+extern int    writebyte(int fdesc, char value);
+extern int    writeint(int fdesc, int value);
 extern int    b_lseek(int fdesc, int addr, int ptr);
 extern int    tell(int fdesc);
 extern const char * systemConfigDir(void);
@@ -199,6 +205,7 @@ extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);
 extern void   setRootVolume(BVRef volume);
 extern void   setBootGlobals(BVRef chain);
+extern int    getDeviceDescription(BVRef volume, char *str);
 
 extern int    gBIOSDev;
 extern int    gBootFileType;

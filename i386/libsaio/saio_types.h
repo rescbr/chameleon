@@ -132,10 +132,10 @@ typedef long (*FSInit)(CICell ih);
 typedef long (*FSLoadFile)(CICell ih, char * filePath);
 typedef long (*FSReadFile)(CICell ih, char *filePath, void *base, uint64_t offset, uint64_t length);
 typedef long (*FSGetFileBlock)(CICell ih, char *filePath, unsigned long long *firstBlock);
-typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long * dirIndex,
+typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long * dirIndex,
                               char ** name, long * flags, long * time,
                               FinderInfo * finderInfo, long * infoValid);
-typedef long (* FSGetUUID)(CICell ih, char *uuidStr);
+typedef long (*FSGetUUID)(CICell ih, char *uuidStr);
 typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
 // Can be just pointed to free or a special free function
 typedef void (*BVFree)(CICell ih);
@@ -147,6 +147,7 @@ struct iob {
     char *         i_buf;           /* file load address */
 };
 
+#define BPS        512              /* sector size of the device */
 #define F_READ     0x1              /* file opened for reading */
 #define F_WRITE    0x2              /* file opened for writing */
 #define F_ALLOC    0x4              /* buffer allocated */
@@ -157,7 +158,7 @@ struct iob {
 
 struct dirstuff {
     char *         dir_path;        /* directory path */
-    long           dir_index;       /* directory entry index */
+    long long      dir_index;       /* directory entry index */
     BVRef          dir_bvr;         /* volume reference */
 };
 
