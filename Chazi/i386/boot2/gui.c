@@ -13,23 +13,17 @@
 #include "vers.h"
 
 #define IMG_REQUIRED -1
-#define THEME_NAME_DEFAULT	"Default"
-static const char *theme_name = THEME_NAME_DEFAULT;	
+#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
+#define VIDEO(x) (bootArgs->Video.v_ ## x)
+#define vram VIDEO(baseAddr)
 
 #ifdef EMBED_THEME
 #include "art.h"
 #endif
 
-#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
-
-#define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define vram VIDEO(baseAddr)
-
 int lasttime = 0; // we need this for animating maybe
-
-extern int gDeviceCount;
-
+extern int gDeviceCount; // dup, line 132
+static const char *theme_name = kDefaultThemeName; // #define'ed on boot.h
 
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
@@ -134,7 +128,7 @@ image_t images[] = {
 
 int imageCnt = 0;
 
-extern int	gDeviceCount;
+//extern int	gDeviceCount; - dup, line 25
 extern int	selectIndex;
 
 extern MenuItem *menuItems;
@@ -680,7 +674,7 @@ int initGUI(void)
 	int		val, len, count;
 	char	dirspec[128]; //Azi: a bit of testing***
 
-	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
+	getValueForKey( kThemeNameKey, &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
@@ -1862,7 +1856,7 @@ void drawBootGraphics(void)
 	bool legacy_logo;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
+	if (getBoolForKey(kLegacyLogoKey, &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
 		usePngImage = false; 
 	} else if (bootImageData == NULL) {
 		loadBootGraphics();
