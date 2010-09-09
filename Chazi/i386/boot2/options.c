@@ -1286,11 +1286,11 @@ processBootOptions()
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
             strlcpy( bootInfo->bootFile, val, cnt+1 );
-            if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
+            if (strcmp( bootInfo->bootFile, kDefaultKernelName ) != 0) {
                 gOverrideKernel = true;
             }
         } else {
-            strcpy( bootInfo->bootFile, kDefaultKernel );
+            strcpy( bootInfo->bootFile, kDefaultKernelName );
         }
     }
 
