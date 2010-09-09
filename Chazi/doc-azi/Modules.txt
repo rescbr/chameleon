@@ -74,6 +74,8 @@ Issues:
 	and so i did it. Of course the problem is still there and needs to be fixed, at least if
 	one wants to be able to load modules from selected volume.
 
+  - compiling modules under Leo (XCode 3.1.4) is not possible at the moment.
+
 	---------------//---------------//---------------
 
 	

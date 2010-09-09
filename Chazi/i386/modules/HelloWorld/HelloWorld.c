@@ -12,8 +12,8 @@
 
 void helloWorld(void* binary, void* arg2, void* arg3, void* arg4)
 {
-	printf("Hello world from ExecKernel hook. Binary located at 0x%X\n", binary);
-	getc();
+	verbose("Hello world from ExecKernel hook. Binary located at 0x%X\n", binary);
+	//getc();
 	
 }
 
