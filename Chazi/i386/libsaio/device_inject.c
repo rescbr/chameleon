@@ -55,7 +55,7 @@ void setupDeviceProperties(Node *node)
   /* Use the static "device-properties" boot config key contents if available,
    * otheriwse use the generated one.
    */  
-  if (!getValueForKey(kRenamePartitionKey, &val, &cnt, &bootInfo->bootConfig) && string)
+  if (!getValueForKey(kDevicePropertiesKey, &val, &cnt, &bootInfo->bootConfig) && string)
   {
     val = (const char*)string;
     cnt = strlength * 2;
