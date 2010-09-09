@@ -231,6 +231,7 @@ enum {
     DEV_EN = 3
 };
 
+//Azi: change this stuff back to upercase??
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
 

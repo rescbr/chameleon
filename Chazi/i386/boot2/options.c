@@ -1447,7 +1447,7 @@ static bool getOSVersion(char *str) //Azi: moved from boot.c
 
 	if (valid)
 	{
-		if (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if (getValueForKey(kProductVersionKey, &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
 			// so copy it and trim

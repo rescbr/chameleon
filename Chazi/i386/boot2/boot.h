@@ -75,37 +75,37 @@ ramdisk specific:
 */
 
 /*
- * Internal or Boot.plist only keys (firstrun) - these end with "Key" (key/value pair).??
+ * Internal or "default" Boot.plist only keys (firstrun) - these end with "Key".
  *
  * keys that make no sense on "override" Boot.plist or at boot prompt;
  * like so, they won't be present on BootHelp.txt.
  *
  */
-//		identifier			string				location
-#define kTextModeKey		"Text Mode"			// graphics.c
-#define kProductVersion		"ProductVersion"	// boot.c
-#define kDefaultPartition	"Default Partition"	// sys.c
-#define kHidePartition		"Hide Partition"	// disk.c
-#define kRenamePartition	"Rename Partition"	// disk.c
-#define kInstantMenuKey		"Instant Menu"		// boot.c
-#define kQuietBootKey		"Quiet Boot"		// boot.c
-#define kTimeoutKey			"Timeout"			// options.c
-#define kThemeNameKey		"Theme"				// gui.c				getValFK??
-#define kGUIKey				"GUI"				// boot.c
-#define kBootBannerKey		"Boot Banner"		// options.c
-#define kDebugInfoKey		"DebugInfo"			// gui.c, graphics.c
-#define kCDROMPromptKey		"CD-ROM Prompt"		// options.c
-#define kCDROMOptionKey		"CD-ROM Option Key"	// options.c
-#define kRescanPromptKey	"Rescan Prompt"		// boot.c
-#define kRescanKey		    "Rescan"			// boot.c
-#define kScanSingleDriveKey	"Scan Single Drive"	// boot.c
-#define kDeviceProperties	"device-properties"	// device_inject.c
+//		identifier			 string				 location
+#define kTextModeKey		 "Text Mode"		 // graphics.c
+#define kProductVersionKey	 "ProductVersion"	 // options.c (boot.c on trunk)
+#define kDefaultPartitionKey "Default Partition" // sys.c
+#define kHidePartitionKey	 "Hide Partition"	 // disk.c
+#define kRenamePartitionKey	 "Rename Partition"	 // disk.c
+#define kInstantMenuKey		 "Instant Menu"		 // boot.c
+#define kQuietBootKey		 "Quiet Boot"		 // boot.c
+#define kTimeoutKey			 "Timeout"			 // options.c
+#define kThemeNameKey		 "Theme"			 // gui.c
+#define kGUIKey				 "GUI"				 // boot.c
+#define kBootBannerKey		 "Boot Banner"		 // options.c
+#define kDebugInfoKey		 "DebugInfo"		 // gui.c, graphics.c
+#define kCDROMPromptKey		 "CD-ROM Prompt"	 // options.c
+#define kCDROMOptionKey		 "CD-ROM Option Key" // options.c
+#define kRescanPromptKey	 "Rescan Prompt"	 // boot.c
+#define kRescanKey		     "Rescan"			 // boot.c
+#define kScanSingleDriveKey	 "Scan Single Drive" // boot.c
+#define kRenamePartitionKey	 "device-properties" // device_inject.c
 
 
 /*
- * Prompt or Boot.plist keys (secondrun) - these end with "Key"??
+ * Prompt or Boot.plist keys (secondrun) - these end with "Key".
  *
- * Keys that make some or all sense at boot prompt.
+ * Keys that make some/all sense at boot prompt or any Boot.plist.
  *
  */
 #define kWaitForKeypressKey	"Wait"				// boot.c
@@ -138,7 +138,7 @@ ramdisk specific:
 #define kGeneratePStates	"GeneratePStates"	// acpi_patcher.c
 #define kGenerateCStates	"GenerateCStates"	// acpi_patcher.c
 #define kEnableC4States		"EnableC4State"		// acpi_patcher.c
-#define kUseMemDetect		"UseMemDetect"	    // platform.c - change name-->memDetect?
+#define kUseMemDetect		"UseMemDetect"	    // platform.c
 #define kSMBIOSdefaults		"SMBIOSdefaults"	// smbios_patcher.c
 #define kSMBIOSKey			"SMBIOS"			// fake_efi.c
 #define kSystemID			"SystemId"			// fake_efi.c
