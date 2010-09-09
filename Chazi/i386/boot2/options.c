@@ -941,30 +941,51 @@ int getBootOptions(bool firstRun)
 				/*
 				* TODO: this needs to be refactored.
 				*/
-				if (strcmp( booterCommand, "video" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+				if (strcmp( booterCommand, "video" ) == 0)
+				{
+					if (bootArgs->Video.v_display == GRAPHICS_MODE)
+					{
 						showInfoBox(getVBEInfoString(), getVBEModeInfoString());
-					} else {
+					}
+					else
+					{
 						printVBEModeInfo();
 					}
-				} else if ( strcmp( booterCommand, "memory" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE ) {
+				}
+				else if ( strcmp( booterCommand, "memory" ) == 0)
+				{
+					if (bootArgs->Video.v_display == GRAPHICS_MODE )
+					{
 						showInfoBox("Memory Map", getMemoryInfoString());
-					} else {
+					}
+					else
+					{
 						printMemoryInfo();
 					}
-				} else if (strcmp(booterCommand, "lspci") == 0) {
+				}
+				else if (strcmp(booterCommand, "lspci") == 0)
+				{
 					lspci();
-				} else if (strcmp(booterCommand, "more") == 0) {
-					showTextFile(booterParam);
-				} else if (strcmp(booterCommand, "rd") == 0) {
+				}
+				else if (strcmp(booterCommand, "more") == 0) //Azi:?more
+				{
+//					showTextFile(booterParam);
+					showTextFile("bt(0,0)/Extra/BootExtra.txt");
+				}
+				else if (strcmp(booterCommand, "rd") == 0)
+				{
 					processRAMDiskCommand(&argPtr, booterParam);
-				} else if (strcmp(booterCommand, "norescan") == 0) {
-					if (gEnableCDROMRescan) {
+				}
+				else if (strcmp(booterCommand, "norescan") == 0)
+				{
+					if (gEnableCDROMRescan)
+					{
 						gEnableCDROMRescan = false;
 						break;
 					}
-				} else {
+				}
+				else
+				{
 					showHelp();
 				}
 				key = 0;
@@ -1357,15 +1378,6 @@ processBootOptions()
         strlcpy( gRootDevice, val, (cnt + 1));
     }
 
-    /*
-     * Removed. We don't need this anymore.
-     *
-    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gPlatformName)) {
-        getPlatformName(gPlatformName);
-        copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
-    }
-    */
-
     if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
         !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
         if (gBootMode & kBootModeSafe) {
@@ -1529,26 +1541,31 @@ void showHelp(void)
 	}
 }
 
-void showTextFile(const char * filename)
+void showTextFile(const char * filename)  //Azi:?more
 {
 #define MAX_TEXT_FILE_SIZE 65536
-	char	*buf;
-	int	fd;
-	int	size;
+	char *buf;
+	int	  fd;
+	int	  size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
-        size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+    size = file_size(fd);
+
+    if (size > MAX_TEXT_FILE_SIZE)
+    {
 		size = MAX_TEXT_FILE_SIZE;
 	}
-        buf = malloc(size);
-        read(fd, buf, size);
-        close(fd);
+    
+    buf = malloc(size);
+    read(fd, buf, size);
+    close(fd);
+
 	showTextBuffer(buf, size);
 	free(buf);
 }
