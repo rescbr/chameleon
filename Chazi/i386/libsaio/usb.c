@@ -68,15 +68,15 @@ int usb_loop()
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
 	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
-	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	if (getBoolForKey(kUSBBusFixKey, &fix_usb, &bootInfo->bootConfig))
 	{
 		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
-		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+		getBoolForKey(kEHCIacquireKey, &fix_ehci, &bootInfo->bootConfig);
+		getBoolForKey(kUHCIresetKey, &fix_uhci, &bootInfo->bootConfig);
+		getBoolForKey(kLegacyOffKey, &fix_legacy, &bootInfo->bootConfig);
 	}
 	
 	struct pciList* current = usbList;
@@ -211,7 +211,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	bool		alwaysHardBIOSReset;
 
 	alwaysHardBIOSReset = false;	
-	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
+	if (!getBoolForKey(kEHCIhardKey, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
 		alwaysHardBIOSReset = true;
 	}
 

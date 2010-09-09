@@ -511,14 +511,14 @@ void common_boot(int biosdev)
 			archCpuType = CPU_TYPE_X86_64;
 		}
 		
-		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
+		if (!getBoolForKey (kWakeKey, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
 		} else {
 			tryresumedefault = false;
 		}
 
-		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig)) {
+		if (!getBoolForKey (kForceWakeKey, &forceresume, &bootInfo->bootConfig)) {
 			forceresume = false;
 		}
 		
@@ -530,7 +530,7 @@ void common_boot(int biosdev)
 		while (tryresume) {
 			const char *tmp;
 			BVRef bvr;
-			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->bootConfig))
+			if (!getValueForKey(kWakeKeyImageKey, &val, &len, &bootInfo->bootConfig))
 				val="/private/var/vm/sleepimage";
 			
 			// Do this first to be sure that root volume is mounted

@@ -513,7 +513,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 
 	bzero(tablespresent, sizeof(tablespresent));
 
-	getBoolForKey(kSMBIOSdefaults, &do_auto, &bootInfo->bootConfig);
+	getBoolForKey(kSMBIOSdefaultsKey, &do_auto, &bootInfo->bootConfig);
 
 	ret = (struct SMBEntryPoint *)AllocateKernelMemory(sizeof(struct SMBEntryPoint));
 	if (origsmbios) {
@@ -668,7 +668,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	bzero(tablespresent, sizeof(tablespresent));
 	bzero(handles, sizeof(handles));
 
-	getBoolForKey(kSMBIOSdefaults, &do_auto, &bootInfo->bootConfig);
+	getBoolForKey(kSMBIOSdefaultsKey, &do_auto, &bootInfo->bootConfig);
 	
 	newsmbios->dmi.tableAddress = (uint32_t)AllocateKernelMemory(newsmbios->dmi.tableLength);
 	if (origsmbios) {

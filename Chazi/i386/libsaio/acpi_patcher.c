@@ -285,7 +285,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c3_enabled = fadt->C3_Latency < 1000;
 		bool c4_enabled = false;
 		
-		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC4StatesKey, &c4_enabled, &bootInfo->bootConfig);
 
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
 		
@@ -616,7 +616,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	{
 		fix_restart = false; //Azi: think this should be false by default!?
 		// On the other hand, i could use a shutdown fix now and then :)
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFixKey, &fix_restart, &bootInfo->bootConfig);
 	}
 	else
 	{
@@ -640,7 +640,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 	// Determine system type / PM_Model
-	if ( (value=getStringForKey(kSystemType, &bootInfo->bootConfig))!=NULL)
+	if ( (value=getStringForKey(kSystemTypeKey, &bootInfo->bootConfig))!=NULL)
 	{
 		if (Platform.Type > 6)  
 		{
@@ -738,9 +738,9 @@ int setupAcpi(void)
 	// SSDT Options
 	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false; 
 	
-	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->bootConfig);
-	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->bootConfig);
-	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->bootConfig);
+	getBoolForKey(kDropSSDTKey, &drop_ssdt, &bootInfo->bootConfig);
+	getBoolForKey(kGeneratePStatesKey, &generate_pstates, &bootInfo->bootConfig);
+	getBoolForKey(kGenerateCStatesKey, &generate_cstates, &bootInfo->bootConfig);
 	
 	{
 		int i;

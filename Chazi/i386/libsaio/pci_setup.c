@@ -21,9 +21,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 	do_eth_devprop = do_gfx_devprop = do_enable_hpet = false;
 
-	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->bootConfig);
-	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
-	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
+	getBoolForKey(kEthernetBuiltInKey, &do_eth_devprop, &bootInfo->bootConfig);
+	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
+	getBoolForKey(kForceHPETKey, &do_enable_hpet, &bootInfo->bootConfig);
 
 	while (current)
 	{

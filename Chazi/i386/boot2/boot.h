@@ -99,7 +99,7 @@ ramdisk specific:
 #define kRescanPromptKey	 "Rescan Prompt"	 // boot.c
 #define kRescanKey		     "Rescan"			 // boot.c
 #define kScanSingleDriveKey	 "Scan Single Drive" // boot.c
-#define kRenamePartitionKey	 "device-properties" // device_inject.c
+#define kDevicePropertiesKey "device-properties" // device_inject.c
 
 
 /*
@@ -108,67 +108,67 @@ ramdisk specific:
  * Keys that make some/all sense at boot prompt or any Boot.plist.
  *
  */
-#define kWaitForKeypressKey	"Wait"				// boot.c
-#define kTestConfigKey		"config"			// stringTable.c
-#define kCanOverrideKey		"CanOverride"		// stringTable.c
-#define kRootDeviceKey		"rd"				// options.c
-#define kBootDeviceKey		"Boot Device"		// options.c - ????? internal
-#define kBootUUIDKey		"boot-uuid"			// options.c
-#define kHelperRootUUIDKey	"Root UUID"			// options.c
-#define kKernelNameKey		"Kernel"			// options.c
-#define kKernelCacheKey		"Kernel Cache"		// boot.c
-#define kKernelFlagsKey		"Kernel Flags"		// options.c
-#define kKPatcherKey		"PatchKernel"		// kernel_patcher.c
-#define kExtensionsKey		"kext"				// drivers.c
-#define kMKextCacheKey		"MKext Cache"		// options.c
-#define kMD0Image			"md0"				// ramdisk.h
-#define kWake				"Wake"				// boot.c
-#define kForceWake			"ForceWake"			// boot.c
-#define kWakeImage			"WakeImage"			// boot.c
-#define kUseAtiROM			"UseAtiROM"			// ati.c
-#define kUseNvidiaROM		"UseNvidiaROM"		// nvidia.c
-#define kVBIOS				"VBIOS"				// nvidia.c
-#define kGraphicsModeKey	"Graphics Mode"		// graphics.c - here because of AutoResolution patch, which uses it + F2!!
-#define kAutoResolutionKey	"AutoResolution"	// boot.c
-#define kGraphicsEnabler	"GraphicsEnabler"	// pci_setup.c
-#define kLegacyLogoKey		"Legacy Logo"		// gui.c
-#define kDSDTKey			"DSDT"				// acpi_patcher.c
-#define kDropSSDT			"DropSSDT"			// acpi_patcher.c
-#define kRestartFix			"RestartFix"        // acpi_patcher.c
-#define kGeneratePStates	"GeneratePStates"	// acpi_patcher.c
-#define kGenerateCStates	"GenerateCStates"	// acpi_patcher.c
-#define kEnableC4States		"EnableC4State"		// acpi_patcher.c
-#define kUseMemDetect		"UseMemDetect"	    // platform.c
-#define kSMBIOSdefaults		"SMBIOSdefaults"	// smbios_patcher.c
-#define kSMBIOSKey			"SMBIOS"			// fake_efi.c
-#define kSystemID			"SystemId"			// fake_efi.c
-#define kSystemType			"SystemType"		// fake_efi.c
-#define kPCIRootUID			"PciRoot"			// pci_root.c
-#define kEthernetBuiltIn	"EthernetBuiltIn"	// pci_setup.c
-#define kForceHPET			"ForceHPET"			// pci_setup.c
-#define kUSBBusFix			"USBBusFix"			// usb.c
-#define kEHCIacquire		"EHCIacquire"		// usb.c
-#define kEHCIhard			"EHCIhard"			// usb.c - ????? internal
-#define kUHCIreset			"UHCIreset"			// usb.c
-#define kLegacyOff			"USBLegacyOff"		// usb.c
+#define kWaitForKeypressKey	 "Wait"				 // boot.c
+#define kTestConfigKey		 "config"			 // stringTable.c
+#define kCanOverrideKey		 "CanOverride"		 // stringTable.c
+#define kRootDeviceKey		 "rd"				 // options.c
+#define kBootDeviceKey		 "Boot Device"		 // options.c - ????? internal
+#define kBootUUIDKey		 "boot-uuid"		 // options.c
+#define kHelperRootUUIDKey	 "Root UUID"		 // options.c
+#define kKernelNameKey		 "Kernel"			 // options.c
+#define kKernelCacheKey		 "Kernel Cache"		 // boot.c
+#define kKernelFlagsKey		 "Kernel Flags"		 // options.c
+#define kKPatcherKey		 "PatchKernel"		 // kernel_patcher.c
+#define kExtensionsKey		 "kext"				 // drivers.c
+#define kMKextCacheKey		 "MKext Cache"		 // options.c
+#define kMD0ImageKey		 "md0"				 // ramdisk.c
+#define kWakeKey			 "Wake"				 // boot.c
+#define kForceWakeKey		 "ForceWake"		 // boot.c
+#define kWakeKeyImageKey	 "WakeImage"		 // boot.c
+#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c
+#define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c
+#define kVBIOSKey			 "VBIOS"			 // nvidia.c
+#define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c - here because of AutoResolution patch, which uses it + F2!!
+#define kAutoResolutionKey	 "AutoResolution"	 // boot.c
+#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // pci_setup.c
+#define kLegacyLogoKey		 "Legacy Logo"		 // gui.c
+#define kDSDTKey			 "DSDT"				 // acpi_patcher.c
+#define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c
+#define kRestartFixKey		 "RestartFix"        // acpi_patcher.c
+#define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c
+#define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c
+#define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c
+#define kUseMemDetectKey	 "UseMemDetect"	     // platform.c
+#define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c
+#define kSMBIOSKey			 "SMBIOS"			 // fake_efi.c
+#define kSystemIDKey		 "SystemId"			 // fake_efi.c
+#define kSystemTypeKey		 "SystemType"		 // fake_efi.c
+#define kPCIRootUIDKey		 "PciRoot"			 // pci_root.c
+#define kEthernetBuiltInKey	 "EthernetBuiltIn"	 // pci_setup.c
+#define kForceHPETKey		 "ForceHPET"		 // pci_setup.c
+#define kUSBBusFixKey		 "USBBusFix"		 // usb.c
+#define kEHCIacquireKey		 "EHCIacquire"		 // usb.c
+#define kEHCIhardKey		 "EHCIhard"			 // usb.c - ????? internal
+#define kUHCIresetKey		 "UHCIreset"		 // usb.c
+#define kLegacyOffKey		 "USBLegacyOff"		 // usb.c
 
 /*
  * Flags to the booter and/or kernel - these end with "Flag".
  */
-#define kVerboseModeFlag	"-v"				// options.c
-#define kSafeModeFlag		"-x"				// options.c
-#define kIgnoreCachesFlag	"-f"				// options.c
-#define kIgnoreBootFileFlag	"-F"				// options.c
-#define kSingleUserModeFlag	"-s"				// options.c
-#define kLegacyModeFlag		"-legacy"			// boot.c
-#define kArchI386Flag		"32"				// boot.c - to be reverted!?
-#define kArchX86_64Flag		"64"				// boot.c - to be reverted!?
+#define kVerboseModeFlag	 "-v"				 // options.c
+#define kSafeModeFlag		 "-x"				 // options.c
+#define kIgnoreCachesFlag	 "-f"				 // options.c
+#define kIgnoreBootFileFlag	 "-F"				 // options.c
+#define kSingleUserModeFlag	 "-s"				 // options.c
+#define kLegacyModeFlag		 "-legacy"			 // boot.c
+#define kArchI386Flag		 "32"				 // boot.c - to be reverted!?
+#define kArchX86_64Flag		 "64"				 // boot.c - to be reverted!?
 
 /*
  * Booter behavior control
  */
-#define kBootTimeout         -1
-#define kCDBootTimeout       8
+#define kBootTimeout          -1
+#define kCDBootTimeout        8
 
 /*
  * A global set by boot() to record the device that the booter

@@ -54,7 +54,7 @@ int getPciRootUID(void)
 	if (rootuid < 10) return rootuid;
 	rootuid = 0;	/* default uid = 0 */
 
-	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->bootConfig)) {
+	if (getValueForKey(kPCIRootUIDKey, &val, &len, &bootInfo->bootConfig)) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}

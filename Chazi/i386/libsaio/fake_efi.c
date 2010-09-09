@@ -505,7 +505,7 @@ static EFI_CHAR8* getSystemID()
 	// unable to determine UUID for host. Error: 35 fix
 	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
 	// belong to smbios config only ...
-	const char *sysId = getStringForKey(kSystemID, &bootInfo->bootConfig);
+	const char *sysId = getStringForKey(kSystemIDKey, &bootInfo->bootConfig);
 	EFI_CHAR8*  ret = getUUIDFromString(sysId);
 
 	if (!sysId || !ret) // try bios dmi info UUID extraction

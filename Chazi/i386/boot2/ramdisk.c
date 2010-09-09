@@ -25,7 +25,7 @@ void md0Ramdisk()
 	int fh = -1;
 	int len;
 	
-	if(getValueForKey(kMD0Image, &override_filename, &len,  
+	if(getValueForKey(kMD0ImageKey, &override_filename, &len,  
 				   &bootInfo->bootConfig))
 	{
 		// Use user specified md0 file

@@ -711,7 +711,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(device, (char *) ati_name_1[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
 	sprintf(tmp, "/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
-	if (getBoolForKey(kUseAtiROM, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kUseAtiROMKey, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("looking for ati video bios file %s\n", tmp);
 		rom = malloc(0x20000);
 		rom_size = load_ati_bios_file(tmp, rom, 0x20000);
