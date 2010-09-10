@@ -7,11 +7,11 @@
  *
  */
 
-#include "libsa.h"
+//#include "libsa.h"
+//#include "bootstruct.h"
+#include "boot.h"
 #include "IOHibernatePrivate.h"
 #include "memory.h"
-#include "bootstruct.h"
-#include "boot.h"
 #include "pci.h"
 
 extern int previewTotalSectors;

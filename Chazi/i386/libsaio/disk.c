@@ -44,10 +44,17 @@
  * All rights reserved.
  */
 
-/*  Copyright 2007 VMware Inc.
-    "Preboot" ramdisk support added by David Elliott
-    GPT support added by David Elliott.  Based on IOGUIDPartitionScheme.cpp.
+/*
+ * Copyright 2007 VMware Inc.
+ * "Preboot" ramdisk support added by David Elliott
+ * GPT support added by David Elliott.  Based on IOGUIDPartitionScheme.cpp.
  */
+
+//#define UFS_SUPPORT 1 //Azi: error: duplicate case value
+
+#include <limits.h>
+#include <IOKit/storage/IOApplePartitionScheme.h>
+#include <IOKit/storage/IOGUIDPartitionScheme.h>
 
 // Allow UFS_SUPPORT to be overridden with preprocessor option.
 #ifndef UFS_SUPPORT
@@ -56,31 +63,27 @@
 #endif
 
 //#include "libsaio.h"
-#include "memory.h"
-//---
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
+#include "memory.h"
 #include "fdisk.h"
+
 #if UFS_SUPPORT
 #include "ufs.h"
 #endif
+
 #include "hfs.h"
 #include "ntfs.h"
 #include "msdos.h"
 #include "ext2fs.h"
-
 #include "xml.h"
 #include "disk.h"
-
-#include <limits.h>
-#include <IOKit/storage/IOApplePartitionScheme.h>
-#include <IOKit/storage/IOGUIDPartitionScheme.h>
-typedef struct gpt_hdr gpt_hdr;
-typedef struct gpt_ent gpt_ent;
-
 // For EFI_GUID
 #include "efi.h"
 #include "efi_tables.h"
+
+typedef struct gpt_hdr gpt_hdr;
+typedef struct gpt_ent gpt_ent;
 
 #define PROBEFS_SIZE     BPS * 4 /* buffer size for filesystem probe */
 #define CD_BPS           2048    /* CD-ROM block size */

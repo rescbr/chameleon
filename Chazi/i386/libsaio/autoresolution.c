@@ -1,4 +1,3 @@
-
 /* Copied from 915 resolution created by steve tomljenovic
  *
  * This code is based on the techniques used in :
@@ -15,13 +14,11 @@
  */
 
 //#include "libsaio.h"
-#include "saio_internal.h"
-//---
-//#include "autoresolution.h" - included on ati_resolution.h
+//#include "autoresolution.h" - included on *_resolution.h
 #include "nvidia_resolution.h"
 #include "ati_resolution.h"
 #include "gma_resolution.h"
-#include "../boot2/graphics.h"
+#include "../boot2/graphics.h" //Azi:reminder
 
 char * chipsetTypeNames[] = {
 	"UNKNOWN", "830",  "845G", "855GM", "865G", "915G", "915GM", "945G", "945GM", "945GME",

@@ -23,12 +23,11 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-//#include "libsaio.h" - included on sl.h
+//#include "libsaio.h"
 #include "sl.h"
+#include "ntfs_private.h"
 
 #define BYTE_ORDER_MARK	0xFEFF
-
-#include "ntfs_private.h"
 
 #define FS_TYPE			"ntfs"
 #define FS_NAME_FILE		"NTFS"

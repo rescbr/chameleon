@@ -49,16 +49,15 @@
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
 
-
+//#include "bootstruct.h"
+//#include "libsa.h"
 #include "boot.h"
-#include "bootstruct.h"
-#include "fake_efi.h"
-#include "sl.h"
-#include "libsa.h"
-#include "ramdisk.h"
+#include "ramdisk.h" // bootstruct.h: memory.h instead of saio_internal.h
 #include "gui.h"
-#include "platform.h"
 #include "modules.h"
+#include "fake_efi.h"
+#include "platform.h" // bootstruct.h - device_tree.h
+#include "sl.h" // bootstruct.h: memory.h instead of saio_types.h
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;

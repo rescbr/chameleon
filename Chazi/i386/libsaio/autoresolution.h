@@ -18,6 +18,8 @@
 
 //#define AUTORES_DEBUG 1 // enable AutoResolution debug - review!
 
+#include "libsa.h"
+#include "saio_internal.h"
 #include "edid.h"
 
 #if DEBUG

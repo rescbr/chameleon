@@ -3,8 +3,8 @@
  */
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 
 #ifndef DEBUG_PCIROOT
 #define DEBUG_PCIROOT 1

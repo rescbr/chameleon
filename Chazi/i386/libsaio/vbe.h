@@ -35,7 +35,7 @@
 #ifndef __LIBSAIO_VBE_H
 #define __LIBSAIO_VBE_H
 
-#include "edid.h"			//Azi:autoresolution
+//#include "edid.h"			//Azi:autoresolution <-- included in
 #include "autoresolution.h"
 
 #define MIN_VESA_VERSION    0x200

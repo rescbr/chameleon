@@ -7,16 +7,15 @@
  *
  */
 
-//#include "libsaio.h"
-#include "libsa.h"
-//---
-#include "boot.h" // was included on graphic_utils.h
-#include "bootstruct.h"
-#include "graphic_utils.h"
-#include "vbe.h"
-
 #ifndef __BOOT_GRAPHICS_H
 #define __BOOT_GRAPHICS_H
+
+//#include "libsaio.h"
+//#include "bootstruct.h"
+//#include "boot.h"
+#include "saio_types.h"
+#include "graphic_utils.h"
+#include "vbe.h"
 
 #define DEFAULT_SCREEN_WIDTH 1024
 #define DEFAULT_SCREEN_HEIGHT 768

@@ -8,7 +8,7 @@
 #ifndef __LIBSAIO_SMBIOS_PATCHER_H
 #define __LIBSAIO_SMBIOS_PATCHER_H
 
-//#include "libsaio.h" - not needed??
+//#include "libsaio.h"
 #include "SMBIOS.h"
 
 /* From Foundation/Efi/Guid/Smbios/SmBios.h */

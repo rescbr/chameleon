@@ -3,7 +3,7 @@
  * AsereBLN: 2009: cleanup and bugfix
  */
 
-//#include "libsaio.h" - was included on both of the remaining; platform.h resolves dependencies.
+//#include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
 

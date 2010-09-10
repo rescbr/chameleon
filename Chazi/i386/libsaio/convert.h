@@ -9,8 +9,7 @@
 
 //#include "libsaio.h"
 #include "libsa.h"
-#include "saio_internal.h" // "external" to verbose function
-//---
+#include "saio_internal.h"
 #include "efi.h"
 
 #define UUID_LEN	16

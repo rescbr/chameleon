@@ -3,8 +3,8 @@
  */
 
 //#include "libsaio.h" - included on the hearder.
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "acpi.h"
 #include "efi_tables.h"
 #include "fake_efi.h"

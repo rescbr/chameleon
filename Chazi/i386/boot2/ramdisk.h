@@ -7,9 +7,6 @@
 #ifndef __BOOT_RAMDISK_H
 #define __BOOT_RAMDISK_H
 
-//#include "libsaio.h"
-#include "libsa.h"
-#include "saio_types.h"
 #include "memory.h"
 
 #define RAMDISKCONFIG_FILENAME "rd(0,0)/RAMDisk.plist"

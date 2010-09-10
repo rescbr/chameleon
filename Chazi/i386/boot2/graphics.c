@@ -26,6 +26,7 @@
  * All rights reserved.
  */
 
+#include "boot.h"
 #include "appleClut8.h"
 #include "gui.h"
 #include "IOHibernatePrivate.h"

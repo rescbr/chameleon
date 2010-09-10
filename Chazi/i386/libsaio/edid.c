@@ -8,10 +8,10 @@
  */
 
 
-//#include "libsaio.h" --> bootstruct.h
-//#include "bootstruct.h" - included on graphics.h
-#include "graphics.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
+#include "graphics.h"
 
 
 //static biosBuf_t bb;

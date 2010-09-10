@@ -4,8 +4,8 @@
  */
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "efi.h"
 #include "acpi.h"
 #include "fake_efi.h"

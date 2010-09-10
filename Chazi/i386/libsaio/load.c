@@ -30,7 +30,8 @@
 #include <mach-o/loader.h>
 #include <mach/machine/thread_status.h>
 
-#include <sl.h>
+//#include <sl.h>
+#include "sl.h" //Azi:???
 
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);

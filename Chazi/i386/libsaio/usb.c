@@ -8,10 +8,9 @@
  */
 
 //#include "libsaio.h"
-#include "io_inline.h"
-//---
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
+#include "io_inline.h"
 #include "pci.h"
 
 #ifndef DEBUG_USB

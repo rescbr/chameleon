@@ -22,10 +22,10 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "sl.h"
-#include "saio_internal.h"
+//#include "saio_internal.h"
+//#include "device_tree.h" - included on bootstruct.h
 #include "bootstruct.h"
-#include "device_tree.h"
+#include "sl.h"
 
 static long  gImageLastKernelAddr;
 

@@ -37,7 +37,6 @@ typedef char DTEntryNameBuf[32];
 //Azi: check location.
 //#include "libsaio.h"
 #include "libsa.h"
-//---
 #include "device_tree.h"
 
 #if DEBUG

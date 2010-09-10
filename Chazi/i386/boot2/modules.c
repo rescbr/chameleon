@@ -4,9 +4,8 @@
  */
 
 //#include "boot.h"
-#include "libsa.h"
-#include "saio_internal.h"
-//---
+//#include "libsa.h"
+//#include "saio_internal.h"
 #include "bootstruct.h"
 #include "multiboot.h"
 #include "modules.h"

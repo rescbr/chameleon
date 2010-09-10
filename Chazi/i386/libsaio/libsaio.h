@@ -26,6 +26,7 @@
 #ifndef __LIBSAIO_LIBSAIO_H
 #define __LIBSAIO_LIBSAIO_H
 
+//Azi: not used atm.
 #include "libsa.h"
 #include "memory.h"
 #include "io_inline.h"

@@ -4,8 +4,8 @@
  *
  */
 
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "multiboot.h"
 #include "ramdisk.h"
 

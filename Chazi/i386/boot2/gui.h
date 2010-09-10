@@ -8,11 +8,11 @@
  *
  */
 
-#include "graphics.h"
-#include "picopng.h"
-
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
+
+#include "graphics.h"
+#include "picopng.h"
 
 #define CHARACTERS_COUNT	223
 

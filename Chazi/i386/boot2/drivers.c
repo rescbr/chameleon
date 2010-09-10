@@ -33,11 +33,11 @@
 #include <libkern/OSByteOrder.h>
 #include <mach/machine.h>
 
-#include "sl.h"
-#include "boot.h"
-#include "bootstruct.h"
-#include "xml.h"
+//#include "bootstruct.h"
 //#include "ramdisk.h"
+#include "boot.h"
+#include "sl.h"
+#include "xml.h"
 
 struct Module {  
   struct Module *nextModule;

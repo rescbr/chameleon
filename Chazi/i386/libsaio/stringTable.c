@@ -27,8 +27,8 @@
  */
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "xml.h"
 
 extern char *Language;

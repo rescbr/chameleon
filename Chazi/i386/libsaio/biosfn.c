@@ -40,11 +40,11 @@
     - Added ebiosEjectMedia
  */
 
-#include "bootstruct.h"
 //#include "libsaio.h"
+//#include "libsa.h"
+//#include "saio_internal.h"
+#include "bootstruct.h"
 #include "memory.h"
-#include "libsa.h"
-#include "saio_internal.h"
 
 #define MAX_DRIVES 8
 

@@ -3,11 +3,11 @@
  *
  */
 
-#include <mach-o/loader.h>
-#include <mach-o/nlist.h>
-
 #ifndef __BOOT2_KERNEL_PATCHER_H
 #define __BOOT2_KERNEL_PATCHER_H
+
+#include <mach-o/loader.h>
+#include <mach-o/nlist.h>
 
 #define CPUID_MODEL_ANY		0x00
 #define CPUID_MODEL_UNKNOWN	0x01

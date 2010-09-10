@@ -3,11 +3,9 @@
 */
 
 //#include "libsaio.h"
-#include "libsa.h"
-#include "memory.h"
-//---
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
+#include "memory.h"
 #include "mboot.h"
 
 int multiboot_timeout=0;
@@ -354,6 +352,7 @@ enum {
     kASCIIKeyMask  = 0x7f
 };
 
+//Azi:reminder
 // This is the meat of our implementation.  It grabs the boot device from
 // the multiboot_info and returns it as is.  If it fails it returns
 // BAD_BOOT_DEVICE.  We can call an awful lot of libsa and libsaio but

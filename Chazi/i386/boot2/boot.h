@@ -30,10 +30,12 @@
 #define __BOOT2_BOOT_H
 
 //Azi: keep it minimal for now.
-// Todo: check bootstruct.h, sl.h, platform.h, next; include bootstruct here??
-// don't include headers like libsaio.h on other headers?!
+// Todo: don't include headers like boot.h on other headers, unless...!
 // move keys to the headers of the files they're in, if they have it!?
-#include "saio_internal.h" // the only one needed by boot.h it self, afaics.
+// check header wrappers...
+
+//#include "saio_internal.h" // the only one needed by boot.h it self, afaics.
+#include "bootstruct.h"
 
 /*
  * Default names - these end with "Name" (easier to sort them).

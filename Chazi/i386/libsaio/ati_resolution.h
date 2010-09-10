@@ -11,9 +11,6 @@
 #define _ATI_RESOLUTION_H_
 
 //#include "libsaio.h"
-#include "libsa.h"
-#include "saio_internal.h"
-//---
 #include "autoresolution.h"
 
 #define ATI_SIGNATURE1 "ATI MOBILITY RADEON"

@@ -22,6 +22,7 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
+#include "boot.h"
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"

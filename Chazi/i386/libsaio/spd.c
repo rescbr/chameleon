@@ -7,11 +7,11 @@
  */
 
 //#include "libsaio.h" - included on the header.
+//#include "saio_internal.h" - included on bootstruct.h
+#include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "spd.h"
-#include "saio_internal.h"
-#include "bootstruct.h"
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD

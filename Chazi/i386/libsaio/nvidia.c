@@ -49,8 +49,8 @@
  */
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"

@@ -1,7 +1,7 @@
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "pci.h"
 #include "nvidia.h"
 #include "ati.h"

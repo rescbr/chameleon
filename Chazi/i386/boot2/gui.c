@@ -8,6 +8,7 @@
  *
  */
 
+#include "boot.h"
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"

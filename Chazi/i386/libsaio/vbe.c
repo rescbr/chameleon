@@ -30,7 +30,6 @@
 #include "io_inline.h"
 #include "saio_types.h"
 #include "saio_internal.h"
-//--- hum, check again; getting the feeling that the headers feed on the included here!?
 #include "vbe.h"
 
 /* 

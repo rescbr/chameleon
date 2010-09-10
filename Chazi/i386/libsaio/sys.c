@@ -54,25 +54,29 @@
  *	@(#)sys.c	7.1 (Berkeley) 6/5/86
  */
 
-/*  Copyright 2007 VMware Inc.
-    "Preboot" ramdisk support added by David Elliott
+/*
+ * Copyright 2007 VMware Inc.
+ * "Preboot" ramdisk support added by David Elliott
  */
 
 #include <AvailabilityMacros.h>
+#include <uuid/uuid.h>
 
 //#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "disk.h"
 #include "ramdisk.h"
 #include "xml.h"
+
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 # include <Kernel/libkern/crypto/md5.h>
 #else
 # include <sys/md5.h>
 #endif
-#include <uuid/uuid.h>
-#if 0 /* No OS X release has ever included this. */
+
+/* No OS X release has ever included this. */
+#if 0
 #include <Kernel/uuid/namespace.h>
 #else
 /* copied from uuid/namespace.h, just like BootX's fs.c does. */

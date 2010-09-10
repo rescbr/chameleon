@@ -1,5 +1,5 @@
 /*
- *  nviviaresolution.h
+ *  nvidia_resolution.h
  *  
  *
  *  Created by Le Bidou on 19/03/10.
@@ -7,10 +7,11 @@
  *
  */
 
-#ifndef _NVDA_RESOLUTION_HEADER_
-#define _NVDA_RESOLUTION_HEADER_
+#ifndef _NVIDIA_RESOLUTION_HEADER_
+#define _NVIDIA_RESOLUTION_HEADER_
 
-#include "libsaio.h" // not worth it; 4 out of 5 are needed.
+//#include "libsaio.h"
+#include "io_inline.h"
 #include "autoresolution.h"
 
 #define NVIDIA_SIGNATURE "NVIDIA Corp"
