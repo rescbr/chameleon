@@ -42,7 +42,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	cpu.o platform.o acpi_patcher.o \
 	smbios_patcher.o fake_efi.o ext2fs.o \
 	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
+	device_inject.o pci_root.o \
 	convert.o mem.o aml_generator.o resolution.o edid.o
 
 

@@ -82,7 +82,6 @@
 #define kVBIOS				"VBIOS"				/* nvidia.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */
 #define kUseMemDetect		"UseMemDetect"	    /* platform.c */
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */

@@ -28,7 +28,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 # The order of building is important.
 SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 
-all embedtheme tags debug install installhdrs:
+all embedtheme optionrom tags debug install installhdrs:
 	@rm -rf $(OBJROOT)
 	@mkdir $(OBJROOT)
 	@for i in ${SUBDIRS}; \

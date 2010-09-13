@@ -6,7 +6,7 @@ NASM = /Developer/usr/bin/nasm
 INSTALLDIR = $(DSTROOT)/usr/standalone/i386
 DIRS_NEEDED = $(SYMROOT)
 
-all embedtheme: $(DIRS_NEEDED) cdboot
+all embedtheme optionrom: $(DIRS_NEEDED) cdboot
 
 cdboot: cdboot.s $(SYMROOT)/boot Makefile $(NASM)
 	$(NASM) cdboot.s -o $(SYMROOT)/cdboot
