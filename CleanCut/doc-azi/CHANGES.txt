@@ -49,11 +49,9 @@ Motif:  this goes against at least one of my "Guidelines" for the booter!
 
 		---------------//---------------//---------------
 
-- (rev 335)
+- (rev 335) (REVERTED to trunk way, rev 520)
 Change: merged the educational side of arch=i386 + the practical one of -x32, into a simple 32
 		booter flag.
-		
-		Type just 32 to get you booted into i386 arch.
 
   Note: -x32 was removed from trunk on rev 377.
 
@@ -69,17 +67,15 @@ Motif:  2 keys to do the same, should never had happen!
 
 		---------------//---------------//---------------
 
-- (rev 335)
+- (rev 335) (REMOVED, rev 520)
 Change: added -legacy kernel flag. This flag tells the booter to load i386 arch before is passed to
 		the kernel. This procedure only needs to be done on Snow Leopard. -legacy tells the kernel
 		to disable "64 Bit Mode", which allows 64 bit processors to run 64 bit apps under i386
 		mach kernel.
 		
-		Type -legacy to get you booted into i386 arch, Legacy Mode.
+		Type -legacy to get you booted into Legacy Mode.
 
   Note: only useful on 64 bit processors.
-
-  Note: this flag is not really needed; typing "32 -legacy" (no "") does the trick. It's just handy!
 
   Note: just out of curiosity and for those who don't know, Legacy Mode is in fact the mode used
 		by 32 bit "only" processors! Since OS X kernel can handle 64 bit apps even on i386 arch,
@@ -91,7 +87,7 @@ Motif:  this flag was not being passed on > 10.6; the reason why, is this mode i
 
 		---------------//---------------//---------------
 
-- (rev 335)
+- (rev 335) (REVERTED to trunk way, rev 520)
 Change: added 64 bit booter flag, to keep company to the 32 one :)
 
 Motif:  mainly to override 32 or -legacy if they are flagged on the Boot.plist.
@@ -278,6 +274,17 @@ Change: forked this project into a new Chazi project, that will replace Chazileo
 
 Motif:  this project (CleanCut), as the implies, it's meant to stay clean, as close as possible to the
 		trunk. More details on the README.txt , under Chazi project.
+
+		---------------//---------------//---------------
+		
+- (rev 520)
+Change: removed -legacy flag interaction with the booter and reverted 32/64 flags to the trunk way.
+		
+		Type arch=i386 to load i386 kernel architecture.
+		arch=x86_64 overrides i386 arch, if flagged on Boot.plist.
+		On Snow type arch=i386 -legacy to load i386 arch Legacy Mode.
+
+Motif:  don't want to contribute to confusion... and laziness ;)
 
 		---------------//---------------//---------------
 

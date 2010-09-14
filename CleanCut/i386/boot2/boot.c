@@ -396,25 +396,26 @@ void common_boot(int biosdev)
 		
         // Other status (e.g. 0) means that we should proceed with boot.
 
-		// If cpu doesn't handle 64 bit instructions,...
-		if (!platformCPUFeature(CPU_FEATURE_EM64T) ||
-			// ... user forced i386 kernel architecture on cpu with "em64t"...
-			getValueForKey(kArchI386Flag, &val, &len, &bootInfo->bootConfig) ||
-			// ... or forced Legacy Mode...
-			getValueForKey(kLegacyModeFlag, &val, &len, &bootInfo->bootConfig))
+		// If cpu handles 64 bit instructions...
+		if (platformCPUFeature(CPU_FEATURE_EM64T))
 		{
-			// ... use i386 kernel arch.
-			archCpuType = CPU_TYPE_I386;
+			// use x86_64 kernel arch,...
+			archCpuType = CPU_TYPE_X86_64;
 		}
 		else
 		{
-			// Else use x86_64 kernel arch.
-			archCpuType = CPU_TYPE_X86_64;
+			// else use i386 kernel arch.
+			archCpuType = CPU_TYPE_I386;
 		}
-		// Override i386/-legacy, if flagged on Boot.plist.
-		if (getValueForKey(kArchX86_64Flag, &val, &len, &bootInfo->bootConfig))
+		// If user override...
+		if (getValueForKey(kArchKey, &val, &len, &bootInfo->bootConfig))
 		{
-			archCpuType = CPU_TYPE_X86_64;
+			// matches i386...
+			if (strncmp(val, "i386", 4) == 0)
+			{
+				// use i386 kernel arch.
+				archCpuType = CPU_TYPE_I386;
+			}
 		}
 		
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {

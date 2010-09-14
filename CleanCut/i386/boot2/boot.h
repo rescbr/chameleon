@@ -67,6 +67,7 @@
 #define kForceWake			"ForceWake"			// boot.c
 #define kWakeImage			"WakeImage"			// boot.c
 #define kProductVersion		"ProductVersion"	// boot.c
+#define kArchKey			"arch"				// boot.c
 #define kDSDTKey			"DSDT"				// acpi_patcher.c
 #define kDropSSDT			"DropSSDT"			// acpi_patcher.c
 #define kRestartFix			"RestartFix"        // acpi_patcher.c
@@ -105,9 +106,6 @@
 #define kIgnoreCachesFlag	"-f"				// options.c
 #define kIgnoreBootFileFlag	"-F"				// options.c
 #define kSingleUserModeFlag	"-s"				// options.c
-#define kArchI386Flag		"32"				// boot.c
-#define kLegacyModeFlag		"-legacy"			// boot.c
-#define kArchX86_64Flag		"64"				// boot.c
 
 /*
  * Booter behavior control
