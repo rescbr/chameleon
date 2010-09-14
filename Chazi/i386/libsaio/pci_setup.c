@@ -31,13 +31,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				if (do_eth_devprop)
 					set_eth_builtin(current);
-				break;/*
-				
-			case PCI_CLASS_DISPLAY_VGA:
-				execute_hook(kGraphicsEnablerKey, current, NULL, NULL, NULL);
 				break;
 
-		*/	case PCI_CLASS_SERIAL_USB:
+			case PCI_CLASS_SERIAL_USB:
 				notify_usb_dev(current);
 				break;
 

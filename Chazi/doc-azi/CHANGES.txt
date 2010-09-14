@@ -320,9 +320,18 @@ Motif:  don't want to contribute to confusion... and laziness ;)
 - (rev 524)
 Change: Added GraphicsEnabler module. Needs no introduction :)
 		Feedback is welcome.
-		Working as usual with my ATI Radeon X1300, doing the injection thing.
+		Working as usual with my ATI Radeon X1300 openGL engine, doing the injection thing.
 
   Newsflash: looks like it's raining modules over Meklort's branch :D
+
+Motif:  ---
+
+		---------------//---------------//---------------
+		
+- (rev 526)
+Change: Added Memory detection module. Also needs no intro...
+		Working properly with my controler:
+		Intel Corporation 82945G/GZ/P/PL Memory Controller Hub [8086:2770] (rev 02)
 
 Motif:  ---
 
