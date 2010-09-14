@@ -24,8 +24,7 @@ OUTFILES = $(PROGRAMS)
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 
-all embedtheme autores_dbg debug: $(DIRS_NEEDED) $(PROGRAMS)
-debug: CFLAGS += -DDEBUG
+all embedtheme optionrom: $(DIRS_NEEDED) $(PROGRAMS)
 
 machOconv: machOconv.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) machOconv.o
