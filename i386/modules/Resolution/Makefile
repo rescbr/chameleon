@@ -1,11 +1,11 @@
 
-MODULE_NAME = GraphicsEnabler
+MODULE_NAME = Resolution
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = GraphicsEnabler
+DIR = Resolution
 
 include ../../MakePaths.dir
 
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o GraphicsEnabler.o
+RESOLUTION_OBJS = Resolution.o edid.o 915resolution.o
 
 
 SFILES =
@@ -59,10 +59,10 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
+all embedtheme optionrom: ${RESOLUTION_OBJS} dylib
 
 
-dylib: ${GRAPHICS_ENABLER_OBJS}
+dylib: ${RESOLUTION_OBJS}
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
 	-alias $(MODULE_START) start \
@@ -71,21 +71,21 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/ati.o \
-	$(OBJROOT)/nvidia.o \
-	$(OBJROOT)/GraphicsEnabler.o \
+	$(OBJROOT)/edid.o \
+	$(OBJROOT)/915resolution.o \
+	$(OBJROOT)/Resolution.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 
-GraphicsEnabler.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
+Resolution.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Resolution.c" $(INC) -o "$(OBJROOT)/Resolution.o"
 
-ati.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "ati.c" $(INC) -o "$(OBJROOT)/ati.o"
+915resolution.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "915resolution.c" $(INC) -o "$(OBJROOT)/915resolution.o"
 
-nvidia.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
+edid.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "edid.c" $(INC) -o "$(OBJROOT)/edid.o"
 
 
 include ../../MakeInc.dir

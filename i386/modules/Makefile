@@ -26,6 +26,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
+# TODO: exclude Symbols from find so it isn't compiled twice
 SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 
 all embedtheme optionrom tags debug install installhdrs:

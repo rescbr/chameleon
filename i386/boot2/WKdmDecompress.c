@@ -1,3 +1,5 @@
+#if UNUSED
+
 #include <sys/cdefs.h>
 #include "WKdm.h"
 
@@ -283,3 +285,5 @@ WKdm_decompress (WK_word* src_buf,
 #endif
   }
 }
+
+#endif

@@ -13,10 +13,13 @@
 #include "graphics.h"
 #include "graphic_utils.h"
 #include "picopng.h"
+#include "options.h"
 
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
 
+int GUI_initGraphicsMode ();
+int GUI_countdown( const char * msg, int row, int timeout );
 #define CHARACTERS_COUNT	223
 
 #define BOOT_NORMAL		0
@@ -38,17 +41,6 @@ enum {
 	VerticalLayout		= 1,
 };
 
-enum {
-	kBackspaceKey		= 0x08,
-	kTabKey			= 0x09,
-	kReturnKey		= 0x0d,
-	kEscapeKey		= 0x1b,
-	kUpArrowkey		= 0x4800, 
-	kDownArrowkey		= 0x5000,
-	kASCIIKeyMask		= 0x7f,
-	kF5Key			= 0x3f00,
-	kF10Key			= 0x4400
-};
 
 /*
  * Menu item structure.
@@ -126,12 +118,11 @@ typedef struct
 } gui_t;
 
 
-gui_t gui;					// gui structure
+extern gui_t gui;					// gui structure
 
-font_t font_small;
-font_t font_console;
 
 int  initGUI();
+void drawBootGraphics(void);
 void drawBackground();
 
 void setupDeviceList(config_file_t *theme);

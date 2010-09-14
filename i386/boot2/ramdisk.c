@@ -109,7 +109,10 @@ void umountRAMDisk()
 		if (gRAMDiskMI != NULL) free(gRAMDiskMI);
 
 		// Reset multiboot structures.
-		gMI = gRAMDiskMI = NULL;
+#ifdef UNUSED
+		gMI =
+#endif
+		gRAMDiskMI = NULL;
 		*gRAMDiskFile = '\0';
 
 		// Release ramdisk driver hooks.
@@ -154,7 +157,10 @@ int mountRAMDisk(const char * param)
 		strcpy(gRAMDiskFile, param);
 
 		// Set gMI as well for the multiboot ramdisk driver hook.
-		gMI = gRAMDiskMI = malloc(sizeof(multiboot_info));
+#ifdef UNUSED
+		gMI =
+#endif
+		gRAMDiskMI = malloc(sizeof(multiboot_info));
 		struct multiboot_module * ramdisk_module = malloc(sizeof(multiboot_module));
 
 		// Fill in multiboot info and module structures.
@@ -165,10 +171,11 @@ int mountRAMDisk(const char * param)
 			ramdisk_module->mm_mod_start = PREBOOT_DATA;
 			ramdisk_module->mm_mod_end = PREBOOT_DATA + ramDiskSize;
 
+#ifdef UNUSED
 			// Set ramdisk driver hooks.
 			p_get_ramdisk_info = &multiboot_get_ramdisk_info;
 			p_ramdiskReadBytes = &multibootRamdiskReadBytes;
-
+#endif
 			int partCount; // unused
 			// Save bvr of the mounted image.
 			gRAMDiskVolume = diskScanBootVolumes(0x100, &partCount);

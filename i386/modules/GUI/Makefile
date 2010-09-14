@@ -1,11 +1,11 @@
 
-MODULE_NAME = GraphicsEnabler
+MODULE_NAME = GUI
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = GraphicsEnabler
+DIR = GUI
 
 include ../../MakePaths.dir
 
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o GraphicsEnabler.o
+GUI_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
 
 
 SFILES =
@@ -59,10 +59,10 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
+all embedtheme optionrom: ${HELLO_WORLD_OBJS} dylib
 
 
-dylib: ${GRAPHICS_ENABLER_OBJS}
+dylib: ${GUI_OBJS}
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
 	-alias $(MODULE_START) start \
@@ -71,21 +71,24 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/ati.o \
-	$(OBJROOT)/nvidia.o \
-	$(OBJROOT)/GraphicsEnabler.o \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/GUI_module.o \
+	$(OBJROOT)/gui.o \
+	$(OBJROOT)/picopng.o \
+	$(OBJROOT)/graphic_utils.o \
+	 -o $(SYMROOT)/$(MODULE_NAME).dylib
+
+GUI_module.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
+
+gui.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
 
 
+picopng.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
 
-GraphicsEnabler.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
-
-ati.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "ati.c" $(INC) -o "$(OBJROOT)/ati.o"
-
-nvidia.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
+graphic_utils.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
 
 
 include ../../MakeInc.dir

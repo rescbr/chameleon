@@ -13,7 +13,7 @@
 
 #include "libsaio.h"
 #include "edid.h"
-#include "resolution.h"
+#include "915resolution.h"
 
 
 void patchVideoBios()

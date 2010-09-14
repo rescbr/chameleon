@@ -20,6 +20,11 @@
 #include "libsa.h"
 #include "picopng.h"
 
+/* sys.c */
+int open_bvdev(const char *bvd, const char *path, int flags);
+int read(int fdesc, char * buf, int count);
+int close(int fdesc);
+int file_size(int fdesc);
 /*************************************************************************************************/
 
 typedef struct png_alloc_node {
@@ -1148,3 +1153,85 @@ int main(int argc, char **argv)
 }
 
 #endif
+
+
+int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
+				 uint8_t **imageData)
+{
+    uint8_t *pngData = NULL;
+    int pngFile = 0, pngSize;
+    PNG_info_t *info;
+    int error = 0;
+	
+    pngFile = open_bvdev("bt(0,0)", filename, 0);
+    if (pngFile == -1) {
+        error = -1;
+        goto failed;
+    }
+    pngSize = file_size(pngFile);
+    if (!pngSize) {
+        error = -1;
+        goto failed;
+    }
+    pngData = malloc(pngSize);
+    if (read(pngFile, (char *) pngData, pngSize) != pngSize) {
+        error = -1;
+        goto failed;
+    }
+	
+    PNG_error = -1;
+    info = PNG_decode(pngData, pngSize);
+    if (PNG_error != 0) {
+        error = PNG_error;
+        goto failed;
+    } else if ((info->width > 0xffff) || (info->height > 0xffff)) {
+        error = -1;
+        goto failed;
+    } else if ((info->width * info->height * 4) != info->image->size) {
+        error = -1;
+        goto failed;
+    }
+	uint8_t *result = malloc(info->width*4*info->height);
+    *width = info->width;
+    *height = info->height;
+	memcpy(result, info->image->data, info->width*4*info->height);
+	*imageData = result;
+	
+failed:
+	png_alloc_free_all();
+    if (pngData)
+        free(pngData);
+    if (pngFile != -1)
+        close(pngFile);
+	
+    return error;
+}
+
+int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData) {
+    PNG_info_t *info;
+    int error = 0;
+	
+    PNG_error = -1;
+    info = PNG_decode(pngData, pngSize);
+	if (PNG_error != 0) {
+        error = PNG_error;
+        goto failed;
+    } else if ((info->width > 0xffff) || (info->height > 0xffff)) {
+        error = -1;
+        goto failed;
+    } else if ((info->width * info->height * 4) != info->image->size) {
+        error = -1;
+        goto failed;
+    }
+	uint8_t *result = malloc(info->width*4*info->height);
+	*width = info->width;
+    *height = info->height;
+	memcpy(result, info->image->data, info->width*4*info->height);
+	*imageData = result;
+	
+failed:
+	png_alloc_free_all();
+	
+    return error;
+}
+

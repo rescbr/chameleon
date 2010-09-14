@@ -11,7 +11,13 @@
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
-#include "edid.h"
+#include "modules.h"
+
+
+gui_t gui;					// gui structure
+font_t font_small;
+font_t font_console;
+
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
@@ -41,7 +47,7 @@ extern int gDeviceCount;
 enum {
     iBackground = 0,
     iLogo,
-
+	
     iDeviceGeneric,
     iDeviceGeneric_o,
     iDeviceHFS,
@@ -60,11 +66,11 @@ enum {
     iDeviceNTFS_o,
     iDeviceCDROM,
     iDeviceCDROM_o,
-
+	
     iSelection,
     iDeviceScrollPrev,
     iDeviceScrollNext,
-
+	
     iMenuBoot,
     iMenuVerbose,
     iMenuIgnoreCaches,
@@ -76,13 +82,13 @@ enum {
     iMenuIgnoreCachesDisabled,
     iMenuSingleUserDisabled,
     iMenuSelection,
-
+	
     iProgressBar,
     iProgressBarBackground,
-
+	
     iTextScrollPrev,
     iTextScrollNext,
-
+	
     iFontConsole,
     iFontSmall,
 };
@@ -109,7 +115,7 @@ image_t images[] = {
     {.name = "device_ntfs_o",               .image = NULL},
     {.name = "device_cdrom",                .image = NULL},
     {.name = "device_cdrom_o",              .image = NULL},
-
+	
     {.name = "device_selection",            .image = NULL},
     {.name = "device_scroll_prev",          .image = NULL},
     {.name = "device_scroll_next",          .image = NULL},
@@ -141,14 +147,12 @@ int imageCnt = 0;
 extern int	gDeviceCount;
 extern int	selectIndex;
 
-extern MenuItem *menuItems;
-
 char prompt[BOOT_STRING_LEN];
 
 int prompt_pos=0;
 
 char prompt_text[] = "boot: ";
- 
+
 menuitem_t infoMenuItems[] =
 {
 	{ .text = "Boot" },
@@ -234,11 +238,11 @@ static int loadThemeImage(const char *image, int alt_image)
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
-
+	
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
 	}
-
+	
     if ((i = getImageIndexByName(image)) >= 0)
     {
         if (images[i].image == NULL) {
@@ -263,7 +267,7 @@ static int loadThemeImage(const char *image, int alt_image)
             unsigned int embed_size;
             embed_data = embeddedImages[e].pngdata;
             embed_size = *embeddedImages[e].length;
-       
+			
             if (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata) == 0)
             {
                 images[i].image->width = width;
@@ -272,7 +276,7 @@ static int loadThemeImage(const char *image, int alt_image)
                 flipRB(images[i].image);
                 return 0;
             }
-
+			
             return 0;
         }
 #endif
@@ -301,7 +305,7 @@ static int loadGraphics(void)
 {
 	LOADPNG(background,                     IMG_REQUIRED);
 	LOADPNG(logo,                           IMG_REQUIRED);
-
+	
 	LOADPNG(device_generic,                 IMG_REQUIRED);
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
@@ -320,11 +324,11 @@ static int loadGraphics(void)
 	LOADPNG(device_ntfs_o,                  iDeviceNTFS);
 	LOADPNG(device_cdrom,                   iDeviceGeneric);
 	LOADPNG(device_cdrom_o,                 iDeviceCDROM);
-
+	
 	LOADPNG(device_selection,               IMG_REQUIRED);
 	LOADPNG(device_scroll_prev,             IMG_REQUIRED);
 	LOADPNG(device_scroll_next,             IMG_REQUIRED);
-
+	
 	LOADPNG(menu_boot,                      IMG_REQUIRED);
 	LOADPNG(menu_verbose,                   IMG_REQUIRED);
 	LOADPNG(menu_ignore_caches,             IMG_REQUIRED);
@@ -336,22 +340,22 @@ static int loadGraphics(void)
 	LOADPNG(menu_ignore_caches_disabled,    IMG_REQUIRED);
 	LOADPNG(menu_single_user_disabled,      IMG_REQUIRED);
 	LOADPNG(menu_selection,                 IMG_REQUIRED);
-
+	
 	LOADPNG(progress_bar,                   IMG_REQUIRED);
 	LOADPNG(progress_bar_background,        IMG_REQUIRED);
-
+	
 	LOADPNG(text_scroll_prev,               IMG_REQUIRED);
 	LOADPNG(text_scroll_next,               IMG_REQUIRED);
-
+	
 	LOADPNG(font_console,                   IMG_REQUIRED);
 	LOADPNG(font_small,                     IMG_REQUIRED);
-
+	
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
-
+	
 	return 0;
 }
- 
+
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
 	
@@ -394,7 +398,7 @@ int createBackBuffer( window_t *window )
 	
 	gui.backbuffer->width = gui.screen.width;
 	gui.backbuffer->height = gui.screen.height;
- 
+	
 	return 0;
 }
 
@@ -403,7 +407,7 @@ int createWindowBuffer( window_t *window )
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
 		return 1;
-
+	
 	window->pixmap->pixels = malloc( window->width * window->height * 4 );
 	if(!window->pixmap->pixels)
 	{
@@ -414,7 +418,7 @@ int createWindowBuffer( window_t *window )
 	
 	window->pixmap->width = window->width;
 	window->pixmap->height = window->height;
-		
+	
 	return 0;
 }
 
@@ -426,7 +430,7 @@ int freeWindowBuffer( window_t *window )
 		free(window->pixmap);
 		return 0;
 	}
-		
+	
 	return 1;
 }
 
@@ -467,13 +471,13 @@ void setupDeviceList(config_file_t *theme)
 	uint32_t color;			// color value formatted RRGGBB
 	int val, len;
 	const char *string;	
-
+	
 	if(getIntForKey("devices_max_visible", &val, theme ))
 		gui.maxdevices = MIN( val, gDeviceCount );
-
+	
 	if(getIntForKey("devices_iconspacing", &val, theme ))
 		gui.devicelist.iconspacing = val;
-
+	
 	// check layout for horizontal or vertical
 	gui.layout = HorizontalLayout;
 	if(getValueForKey( "devices_layout", &string, &len, theme)) {
@@ -481,42 +485,42 @@ void setupDeviceList(config_file_t *theme)
 			gui.layout = VerticalLayout;
 		}
 	}
-
+	
 	switch (gui.layout) {
-	case VerticalLayout:
-		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
-		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
-			gui.devicelist.pos.x = pixel;
-
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
-			gui.devicelist.pos.y = pixel;
-		break;
-		
-	case HorizontalLayout:
-	default:
-		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
-		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
-			gui.devicelist.pos.x = pixel;
-		else
-			gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
-		
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
-			gui.devicelist.pos.y = pixel;
-		else
-			gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
-		break;
+		case VerticalLayout:
+			gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
+			gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
+			
+			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
+				gui.devicelist.pos.x = pixel;
+			
+			if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
+				gui.devicelist.pos.y = pixel;
+			break;
+			
+		case HorizontalLayout:
+		default:
+			gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
+			gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
+			
+			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
+				gui.devicelist.pos.x = pixel;
+			else
+				gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
+			
+			if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
+				gui.devicelist.pos.y = pixel;
+			else
+				gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
+			break;
 	}
-
+	
 	if(getColorForKey("devices_bgcolor", &color, theme))
 		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
-
+	
 	if(getIntForKey("devices_transparency", &alpha, theme))
 		gui.devicelist.bgcolor = gui.devicelist.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
-
+	
 	if (gui.devicelist.pixmap)
 	{
 	    freeWindowBuffer(&gui.devicelist);
@@ -532,87 +536,87 @@ void loadThemeValues(config_file_t *theme)
 	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
 	uint32_t color;			// color value formatted RRGGBB
 	int val;
-
+	
 	/*
 	 * Parse screen parameters
 	 */
 	if(getColorForKey("screen_bgcolor", &color, theme ))
 		gui.screen.bgcolor = (color & 0x00FFFFFF);
-
+	
 	if(getIntForKey("screen_textmargin_h", &val, theme))
 		gui.screen.hborder = MIN( gui.screen.width , val );
-
+	
 	if(getIntForKey("screen_textmargin_v", &val, theme))
 		gui.screen.vborder = MIN( gui.screen.height , val );
-
+	
 	/*
 	 * Parse background parameters
 	 */
 	if(getDimensionForKey("background_pos_x", &pixel, theme, screen_width , images[iBackground].image->width ) )
 		gui.background.pos.x = pixel;
-
+	
 	if(getDimensionForKey("background_pos_y", &pixel, theme, screen_height , images[iBackground].image->height ) )
 		gui.background.pos.y = pixel;
-
+	
 	/*
 	 * Parse logo parameters
 	 */
 	if(getDimensionForKey("logo_pos_x", &pixel, theme, screen_width , images[iLogo].image->width ) )
 		gui.logo.pos.x = pixel;
-
+	
 	if(getDimensionForKey("logo_pos_y", &pixel, theme, screen_height , images[iLogo].image->height ) )
 		gui.logo.pos.y = pixel;
-
+	
 	/*
 	 * Parse progress bar parameters
 	 */
 	if(getDimensionForKey("progressbar_pos_x", &pixel, theme, screen_width , 0 ) )
 		gui.progressbar.pos.x = pixel;
-
+	
 	if(getDimensionForKey("progressbar_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.progressbar.pos.y = pixel;
-
+	
 	/*
 	 * Parse countdown text parameters
 	 */
 	if(getDimensionForKey("countdown_pos_x", &pixel, theme, screen_width , 0 ) )
 		gui.countdown.pos.x = pixel;
-
+	
 	if(getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.countdown.pos.y = pixel;
-
+	
     /*
 	 * Parse devicelist parameters
 	 */
 	setupDeviceList(theme);
-
+	
 	/*
 	 * Parse infobox parameters
 	 */
 	if(getIntForKey("infobox_width", &val, theme))
 		gui.infobox.width = MIN( screen_width , val );
-
+	
 	if(getIntForKey("infobox_height", &val, theme))
 		gui.infobox.height = MIN( screen_height , val );
-
+	
 	if(getDimensionForKey("infobox_pos_x", &pixel, theme, screen_width , gui.infobox.width ) )
 		gui.infobox.pos.x = pixel;
-
+	
 	if(getDimensionForKey("infobox_pos_y", &pixel, theme, screen_height , gui.infobox.height ) )
 		gui.infobox.pos.y = pixel;
-
+	
 	if(getIntForKey("infobox_textmargin_h", &val, theme))
 		gui.infobox.hborder = MIN( gui.infobox.width , val );
-
+	
 	if(getIntForKey("infobox_textmargin_v", &val, theme))
 		gui.infobox.vborder = MIN( gui.infobox.height , val );
-
+	
 	if(getColorForKey("infobox_bgcolor", &color, theme))
 		gui.infobox.bgcolor = (color & 0x00FFFFFF);
-
+	
 	if(getIntForKey("infobox_transparency", &alpha, theme))
 		gui.infobox.bgcolor = gui.infobox.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
-
+	
 	/*
 	 * Parse menu parameters
 	 */
@@ -620,70 +624,70 @@ void loadThemeValues(config_file_t *theme)
 		gui.menu.width = pixel;
 	else
 		gui.menu.width = images[iMenuSelection].image->width;
-
+	
 	if(getDimensionForKey("menu_height", &pixel, theme, gui.screen.height , 0 ) )
 		gui.menu.height = pixel;
 	else
 		gui.menu.height = (infoMenuItemsCount) * images[iMenuSelection].image->height;
-
+	
 	if(getDimensionForKey("menu_pos_x", &pixel, theme, screen_width , gui.menu.width ) )
 		gui.menu.pos.x = pixel;
-
+	
 	if(getDimensionForKey("menu_pos_y", &pixel, theme, screen_height , gui.menu.height ) )
 		gui.menu.pos.y = pixel;
-
+	
 	if(getIntForKey("menu_textmargin_h", &val, theme))
 		gui.menu.hborder = MIN( gui.menu.width , val );
-
+	
 	if(getIntForKey("menu_textmargin_v", &val, theme))
 		gui.menu.vborder = MIN( gui.menu.height , val );
-
+	
 	if(getColorForKey("menu_bgcolor", &color, theme))
 		gui.menu.bgcolor = (color & 0x00FFFFFF);
-
+	
 	if(getIntForKey("menu_transparency", &alpha, theme))
 		gui.menu.bgcolor = gui.menu.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);		
-
+	
 	/*
 	 * Parse bootprompt parameters
 	 */
 	if(getDimensionForKey("bootprompt_width", &pixel, theme, screen_width , 0 ) )
 		gui.bootprompt.width = pixel;
-
+	
 	if(getIntForKey("bootprompt_height", &val, theme))
 		gui.bootprompt.height = MIN( screen_height , val );
-
+	
 	if(getDimensionForKey("bootprompt_pos_x", &pixel, theme, screen_width , gui.bootprompt.width ) )
 		gui.bootprompt.pos.x = pixel;
-
+	
 	if(getDimensionForKey("bootprompt_pos_y", &pixel, theme, screen_height , gui.bootprompt.height ) )
 		gui.bootprompt.pos.y = pixel;
-
+	
 	if(getIntForKey("bootprompt_textmargin_h", &val, theme))
 		gui.bootprompt.hborder = MIN( gui.bootprompt.width , val );
-
+	
 	if(getIntForKey("bootprompt_textmargin_v", &val, theme))
 		gui.bootprompt.vborder = MIN( gui.bootprompt.height , val );
-
+	
 	if(getColorForKey("bootprompt_bgcolor", &color, theme))
 		gui.bootprompt.bgcolor = (color & 0x00FFFFFF);
-
+	
 	if(getIntForKey("bootprompt_transparency", &alpha, theme))
 		gui.bootprompt.bgcolor = gui.bootprompt.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
-
+	
 	if(getColorForKey("font_small_color", &color, theme))
 		gui.screen.font_small_color = (color & 0x00FFFFFF);
-
+	
 	if(getColorForKey("font_console_color", &color, theme))
 		gui.screen.font_console_color = (color & 0x00FFFFFF);
 }
- 
+
 int initGUI(void)
 {
 	//int		val;
 	int	len;
 	char	dirspec[256];
-
+	
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
@@ -691,51 +695,59 @@ int initGUI(void)
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
-    config_file_t	*config;
-    
-    config = &bootInfo->themeConfig;
-    if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-      return 1;
-    }
+		config_file_t	*config;
+		
+		config = &bootInfo->themeConfig;
+		if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
+			return 1;
+		}
 #else
 		return 1;
 #endif
 	}
 	/*
-	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[0] = val;
-	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[1] = val;
-	}
-	*/
-	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
-
+	 // parse display size parameters
+	 if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+	 screen_params[0] = val;
+	 }
+	 if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+	 screen_params[1] = val;
+	 }
+	 */
+	void(*res)(UInt32*, UInt32*, UInt32*) = (void*)lookup_all_symbols("_getResolution");
+	if(res && res != (void*)0xFFFFFFFF) res(&screen_params[0], &screen_params[1], &screen_params[2]);
+	
+	
 	
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
-
+	
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
-
+	
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
 		loadThemeValues(&bootInfo->themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
-
+		
 		// create the screen & window buffers
-		if (createBackBuffer(&gui.screen) == 0) {
-			if (createWindowBuffer(&gui.screen) == 0) {
-				if (createWindowBuffer(&gui.devicelist) == 0) {
-					if (createWindowBuffer(&gui.bootprompt) == 0) {
-						if (createWindowBuffer(&gui.infobox) == 0) {
-							if (createWindowBuffer(&gui.menu) == 0) {
+		if (createBackBuffer(&gui.screen) == 0)
+		{
+			if (createWindowBuffer(&gui.screen) == 0)
+			{
+				if (createWindowBuffer(&gui.devicelist) == 0)
+				{
+					if (createWindowBuffer(&gui.bootprompt) == 0)
+					{
+						if (createWindowBuffer(&gui.infobox) == 0)
+						{
+							if (createWindowBuffer(&gui.menu) == 0)
+							{
 							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
@@ -756,7 +768,7 @@ int initGUI(void)
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
-
+	
 	if( diskIsCDROM(device) )
 		devicetype = iDeviceCDROM;				// Use CDROM icon
 	else
@@ -764,27 +776,27 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		switch (device->part_type)
 		{
 			case kPartitionTypeHFS:
-
+				
 				// Use HFS or HFSRAID icon depending on bvr flags.
 				devicetype = (device->flags & kBVFlagBooter) ? iDeviceHFSRAID : iDeviceHFS;
 				break;
-
+				
 			case kPartitionTypeHPFS:
 				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
 				break;
-
+				
 			case kPartitionTypeFAT16:
 				devicetype = iDeviceFAT16;		// Use FAT16 icon
 				break;
-
+				
 			case kPartitionTypeFAT32:
 				devicetype = iDeviceFAT32;		// Use FAT32 icon
 				break;
-
+				
 			case kPartitionTypeEXT3:
 				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
 				break;
-
+				
 			default:
 				devicetype = iDeviceGeneric;	// Use Generic icon
 				break;
@@ -797,7 +809,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
 		devicetype++;
 	}
-
+	
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
 	
@@ -805,27 +817,27 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 	
 	// draw volume label 
 	drawStrCenteredAt( device->label, &font_small, buffer, p);	
-
+	
 }
 
 void drawDeviceList (int start, int end, int selection)
 {
 	int i;
 	position_t p, p_prev, p_next;
-
+	
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
-		
+	
 	fillPixmapWithColor( gui.devicelist.pixmap, gui.devicelist.bgcolor);
-
+	
 	makeRoundedCorners( gui.devicelist.pixmap);
-
+	
 	switch (gui.layout)
 	{
-
+			
 		case VerticalLayout:
 			p.x = (gui.devicelist.width /2);
 			p.y =  ( ( images[iSelection].image->height / 2 ) + images[iDeviceScrollPrev].image->height + gui.devicelist.iconspacing );
-
+			
 			// place scroll indicators at top & bottom edges
 			p_prev = pos ( gui.devicelist.width / 2 , gui.devicelist.iconspacing );
 			p_next = pos ( p_prev.x, gui.devicelist.height - gui.devicelist.iconspacing );
@@ -833,11 +845,11 @@ void drawDeviceList (int start, int end, int selection)
 			break;
 			
 		default:	// use Horizontal layout as the default
-
+			
 		case HorizontalLayout:
 			p.x = (gui.devicelist.width - ( gui.devicelist.width / gui.maxdevices ) * gui.maxdevices ) / 2 + ( images[iSelection].image->width / 2) + images[iDeviceScrollPrev].image->width + gui.devicelist.iconspacing;
 			p.y = ((gui.devicelist.height - font_console.chars[0]->height ) - images[iSelection].image->height) / 2 + ( images[iSelection].image->height / 2 );
-
+			
 			// place scroll indicators at left & right edges
 			p_prev = pos ( images[iDeviceScrollPrev].image->width / 2  + gui.devicelist.iconspacing / 2, gui.devicelist.height / 2 );
 			p_next = pos ( gui.devicelist.width - ( images[iDeviceScrollNext].image->width / 2 + gui.devicelist.iconspacing / 2), gui.devicelist.height / 2 );
@@ -850,7 +862,7 @@ void drawDeviceList (int start, int end, int selection)
 	for (i = 0; i < gui.maxdevices; i++)
 	{
 		BVRef param = menuItems[start + i].param;
-
+		
         bool isSelected = ((start + i) == selection) ? true : false;
 		if (isSelected)
 		{
@@ -862,12 +874,12 @@ void drawDeviceList (int start, int end, int selection)
             {
                 infoMenuNativeBoot = false;
                 if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
-                infoMenuSelection = 0;
+					infoMenuSelection = 0;
             }
-			 
+			
 			if(gui.menu.draw)
 				drawInfoMenuItems();
-			 
+			
 #if DEBUG
             gui.debug.cursor = pos( 10, 100);
             dprintf( &gui.screen, "label     %s\n",   param->label );
@@ -897,27 +909,27 @@ void drawDeviceList (int start, int end, int selection)
 			p.y += ( images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing ); 
 		}
 	}
-
+	
 	// draw prev indicator
 	if(start)
 		blend( images[iDeviceScrollPrev].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollPrev].image, p_prev ) );
-
+	
 	// draw next indicator
 	if( end < gDeviceCount - 1 )
 		blend( images[iDeviceScrollNext].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollNext].image, p_next ) );
-
+	
 	gui.redraw = true;
 	
 	updateVRAM();
 	
 }
- 
+
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
 	prompt[0] = '\0';
 	prompt_pos=0;
-
+	
 	
 	if(	gui.bootprompt.draw == true )
 	{
@@ -926,7 +938,7 @@ void clearGraphicBootPrompt()
 		// this causes extra frames to be drawn
 		//updateVRAM();
 	}
-
+	
 	return;
 }
 
@@ -940,27 +952,27 @@ void updateGraphicBootPrompt(int key)
 		prompt_pos++;
 		prompt[prompt_pos] = '\0';
 	}
-
+	
 	fillPixmapWithColor( gui.bootprompt.pixmap, gui.bootprompt.bgcolor);
-
+	
 	makeRoundedCorners( gui.bootprompt.pixmap);
-
+	
 	position_t p_text = pos( gui.bootprompt.hborder , ( ( gui.bootprompt.height -  font_console.chars[0]->height) ) / 2 );
-
+	
 	// print the boot prompt text
 	drawStr(prompt_text, &font_console, gui.bootprompt.pixmap, p_text);
 	
 	// get the position of the end of the boot prompt text to display user input
 	position_t p_prompt = pos( p_text.x + ( ( strlen(prompt_text) ) * font_console.chars[0]->width ), p_text.y );
-
+	
 	// calculate the position of the cursor
 	int	offset = (  prompt_pos - ( ( gui.bootprompt.width / font_console.chars[0]->width ) - strlen(prompt_text) - 2 ) );	
-
+	
 	if ( offset < 0)
 		offset = 0;
 	
 	drawStr( prompt+offset, &font_console, gui.bootprompt.pixmap, p_prompt);
-
+	
 	gui.menu.draw = false;
 	gui.bootprompt.draw = true;
 	gui.redraw = true;
@@ -1012,10 +1024,10 @@ void updateVRAM()
 	{
 		if (gui.devicelist.draw)
 			blend( gui.devicelist.pixmap, gui.backbuffer, gui.devicelist.pos );
-
+		
 		if (gui.bootprompt.draw)
 			blend( gui.bootprompt.pixmap, gui.backbuffer, gui.bootprompt.pos );
-				
+		
 		if (gui.menu.draw)
 			blend( gui.menu.pixmap, gui.backbuffer, gui.menu.pos );
 		
@@ -1024,7 +1036,7 @@ void updateVRAM()
 	}
 	
 	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width, gui.backbuffer->height );
-
+	
 	if (gui.redraw)
 	{
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -1051,11 +1063,11 @@ sputc(int c, struct putc_info * pi)
 int gprintf( window_t * window, const char * fmt, ...)
 {
 	char *formattedtext;
-
+	
 	va_list ap;
 	
 	struct putc_info pi;
-
+	
 	if ((formattedtext = malloc(1024)) != NULL) {
 		// format the text
 		va_start(ap, fmt);
@@ -1066,10 +1078,10 @@ int gprintf( window_t * window, const char * fmt, ...)
 		va_end(ap);
 		
 		position_t	origin, cursor, bounds;
-
+		
 		int i;
 		int character;
-
+		
 		origin.x = MAX( window->cursor.x, window->hborder );
 		origin.y = MAX( window->cursor.y, window->vborder );
 		
@@ -1077,27 +1089,27 @@ int gprintf( window_t * window, const char * fmt, ...)
 		bounds.y = ( window->height - window->vborder );
 		
 		cursor = origin;
-			
+		
 		font_t *font = &font_console;
-			
+		
 		for( i=0; i< strlen(formattedtext); i++ )
 		{
 			character = formattedtext[i];
 			
 			character -= 32;
-				
+			
 			// newline ?
 			if( formattedtext[i] == '\n' )
 			{
 				cursor.x = window->hborder;
 				cursor.y += font->height;
-
+				
 				if ( cursor.y > bounds.y )
 					cursor.y = origin.y;
-
+				
 				continue;
 			}
-				
+			
 			// tab ?
 			if( formattedtext[i] == '\t' )
 				cursor.x += ( font->chars[0]->width * 5 );
@@ -1105,9 +1117,9 @@ int gprintf( window_t * window, const char * fmt, ...)
 			// draw the character
 			if( font->chars[character])
 				blend(font->chars[character], window->pixmap, cursor);
-
+			
 			cursor.x += font->chars[character]->width;
-
+			
 			// check x pos and do newline
 			if ( cursor.x > bounds.x )
 			{
@@ -1119,14 +1131,14 @@ int gprintf( window_t * window, const char * fmt, ...)
 			if ( cursor.y > bounds.y )
 				cursor.y = origin.y;
 		}
-
+		
 		// update cursor postition
 		window->cursor = cursor;
 		
 		free(formattedtext);
 		
 		return 0;
-
+		
 	}
 	return 1;
 }
@@ -1190,7 +1202,7 @@ int dprintf( window_t * window, const char * fmt, ...)
 			// draw the character
 			if( font->chars[character])
 				blend(font->chars[character], gui.backbuffer, cursor);
-
+			
 			cursor.x += font->chars[character]->width;
 			
 			// check x pos and do newline
@@ -1220,7 +1232,7 @@ int vprf(const char * fmt, va_list ap)
 {
 	int i;
 	int character;
-
+	
 	char *formattedtext;
 	window_t *window = &gui.screen;
 	struct putc_info pi;
@@ -1240,7 +1252,7 @@ int vprf(const char * fmt, va_list ap)
 		bounds.x = ( window->width - ( window->hborder * 2 ) );
 		bounds.y = ( window->height - ( window->vborder * 2 ) );
 		cursor = origin;
-			
+		
 		for( i=0; i< strlen(formattedtext); i++ )
 		{
 			character = formattedtext[i];
@@ -1260,7 +1272,7 @@ int vprf(const char * fmt, va_list ap)
 				window->cursor.y = cursor.y;
 				continue;
 			}
-
+			
 			// tab ?
 			if( formattedtext[i] == '\t' )
 			{
@@ -1275,7 +1287,7 @@ int vprf(const char * fmt, va_list ap)
 				cursor.x = origin.x;
 				cursor.y += font->height;
 			}
-				
+			
 			// check y pos and reset to origin.y
 			if ( cursor.y > ( bounds.y + font->chars[0]->height) )
 			{
@@ -1331,11 +1343,11 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 {
 	int i = 0;
 	int width = 0;
-
+	
 	// calculate the width in pixels
 	for(i=0;i<strlen(text);i++)
 		width += font->chars[text[i]-32]->width;
-
+	
 	p.x = ( p.x - ( width / 2 ) );
 	p.y = ( p.y - ( font->height / 2 ) ); 
 	
@@ -1349,7 +1361,7 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 		int cha=(int)text[i];
 		
 		cha-=32;
- 
+		
 		if(font->chars[cha])
 		{
 			blend(font->chars[cha], blendInto, p);
@@ -1368,21 +1380,21 @@ int initFont(font_t *font, image_t *data)
 	bool monospaced = false;
 	
 	font->height = data->image->height;	
-
+	
 	for( x = 0; x < data->image->width; x++)
 	{
 		start = end;
-				
+		
 		// if the pixel is red we've reached the end of the char
 		if( pixel( data->image, x, 0 ).value == 0xFFFF0000)
 		{
 			end = x + 1;
-
+			
 			if( (font->chars[count] = malloc(sizeof(pixmap_t)) ) )
 			{
 				font->chars[count]->width = ( end - start) - 1;
 				font->chars[count]->height = font->height;
-			
+				
 				if ( ( font->chars[count]->pixels = malloc( font->chars[count]->width * data->image->height * 4) ) )
 				{
 					space += ( font->chars[count]->width * data->image->height * 4 );
@@ -1398,7 +1410,7 @@ int initFont(font_t *font, image_t *data)
 					// check if font is monospaced
 					if( ( count > 0 ) && ( font->width != font->chars[count]->width ) )
 						monospaced = true;
-						
+					
 					font->width = font->chars[count]->width;
 					
 					count++;
@@ -1406,10 +1418,10 @@ int initFont(font_t *font, image_t *data)
 			}
 		}
 	}
-
+	
 	if(monospaced)
 		font->width = 0;
-
+	
 	return 0;
 }
 
@@ -1475,13 +1487,13 @@ void makeRoundedCorners(pixmap_t *p)
 				alpha = ( roundedCorner[y][x] ? (uint8_t) (roundedCorner[y][x] * pixel(p, x, y).ch.a) / 255 : 0 );
 				// Upper left corner
 				pixel(p, x, y).ch.a = alpha;
-
+				
 				// upper right corner
 				pixel(p, width-x,y).ch.a = alpha;
-
+				
 				// lower left corner
 				pixel(p, x, height-y).ch.a = alpha;
-
+				
 				// lower right corner
 				pixel(p, width-x, height-y).ch.a = alpha;
 			}
@@ -1492,7 +1504,7 @@ void makeRoundedCorners(pixmap_t *p)
 void showInfoBox(char *title, char *text)
 {
 	int i, key, lines, visiblelines;
-
+	
 	int currentline=0;
 	int cnt=0;
 	int offset=0;
@@ -1501,7 +1513,7 @@ void showInfoBox(char *title, char *text)
 		return;
 	
 	position_t pos_title = pos ( gui.infobox.vborder, gui.infobox.vborder );
-
+	
 	// calculate number of lines in the title
 	for ( i = 0, lines = 1; i<strlen(title); i++ )
 		if( title[i] == '\n')
@@ -1532,7 +1544,7 @@ void showInfoBox(char *title, char *text)
 			if( text[offset] =='\n')
 				i++;
 		}
-
+		
 		// find last visible line in text and place \0
 		for( i = offset, cnt = 0; i < strlen(text); i++)
 		{
@@ -1544,18 +1556,18 @@ void showInfoBox(char *title, char *text)
 				break;
 			}
 		}
-				
+		
 		fillPixmapWithColor( gui.infobox.pixmap, gui.infobox.bgcolor);
-
+		
 		makeRoundedCorners( gui.infobox.pixmap);
-			
+		
 		// print the title if present
 		if( title )
 			drawStr(title, &font_console, gui.infobox.pixmap, pos_title);
-
+		
 		// print the text
 		drawStr( text + offset, &font_console, gui.infobox.pixmap, pos_text);
-
+		
 		// restore \n in text
 		if ( cnt == visiblelines )
 			text[i] = '\n';
@@ -1574,7 +1586,7 @@ void showInfoBox(char *title, char *text)
 			pos_indicator.y = ( gui.infobox.height - ( ( images[iTextScrollNext].image->width + gui.infobox.vborder ) / 2 ) );
 			blend( images[iTextScrollNext].image, gui.infobox.pixmap, centeredAt( images[iTextScrollNext].image, pos_indicator ) );
 		}
-
+		
 		gui.bootprompt.draw = false;
 		gui.infobox.draw = true;
 		gui.redraw = true;
@@ -1582,15 +1594,15 @@ void showInfoBox(char *title, char *text)
 		updateVRAM();
 		
 		key = getc();
-			
+		
 		if( key == kUpArrowkey )
 			if( currentline > 0 )
 				currentline--;
-
+		
 		if( key == kDownArrowkey )
 			if( lines > ( currentline + visiblelines ) )
 				currentline++;
-
+		
 		if( key == kEscapeKey || key == 'q' || key == 'Q')
 		{
 			gui.infobox.draw = false;
@@ -1608,16 +1620,16 @@ void animateProgressBar()
 	if( time18() > lasttime)
 	{
 		lasttime = time18();
-
+		
 		pixmap_t *buffBar = images[iProgressBar].image;
-
+		
 		uint32_t buff = buffBar->pixels[0].value;
-	
+		
 		memcpy( buffBar->pixels, buffBar->pixels + 1, ( (buffBar->width*buffBar->height) - 1 ) * 4 );
-
+		
 		for( y = buffBar->height - 1; y > 0; y--)
 			pixel(buffBar, buffBar->width - 1, y) = pixel(buffBar, buffBar->width - 1, y - 1);
-
+		
 		pixel(buffBar, buffBar->width-1, 0).value = buff;
 	}
 }
@@ -1628,9 +1640,9 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 		return;
 	
 	p.x = ( p.x - ( width / 2 ) );
-
+	
 	int todraw = (width * progress) / 100;
-
+	
 	pixmap_t *buff = images[iProgressBar].image;
 	pixmap_t *buffBG = images[iProgressBarBackground].image;
 	if(!buff || !buffBG)
@@ -1643,7 +1655,7 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 	
 	progressbar.width = width;
 	progressbar.height = buff->height;
-
+	
 	int x=0,x2=0,y=0;
 	
 	for(y=0; y<buff->height; y++)
@@ -1655,13 +1667,13 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 		}
 		x2=0;
 	}
-
+	
 	for(y=0; y<buff->height; y++)
 	{
 		for(x=todraw, x2 = 0; x < width - 1; x++, x2++)
 		{
 			if(x2 == (buffBG->width -2 )) x2 = 0;
-				pixel(&progressbar, x,y).value = pixel(buffBG, x2,y).value;
+			pixel(&progressbar, x,y).value = pixel(buffBG, x2,y).value;
 		}
 		if(progress < 100)
 			pixel(&progressbar, width - 1, y).value = pixel(buffBG, buffBG->width - 1, y).value;
@@ -1669,7 +1681,7 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 			pixel(&progressbar, 0, y).value = pixel(buffBG, buffBG->width - 1, y).value;
 		x2=0;
 	}
-	 
+	
 	blend(&progressbar, blendInto, p);
 	animateProgressBar();
 	free(progressbar.pixels);
@@ -1684,33 +1696,33 @@ void drawInfoMenuItems()
 	pixmap_t *selection = images[iMenuSelection].image;
 	
 	pixmap_t *pbuff;
-
+	
 	fillPixmapWithColor(gui.menu.pixmap, gui.menu.bgcolor);
-
+	
 	makeRoundedCorners(gui.menu.pixmap);
 	
 	uint8_t offset = infoMenuNativeBoot ? 0 : infoMenuItemsCount - 1;
-
+	
 	position = pos(0,0);
 	
 	for ( i = 0, n = iMenuBoot; i < infoMenuItemsCount; i++, n++)
 	{
 		if (i == infoMenuSelection)
 			blend(selection, gui.menu.pixmap, position);
-
+		
 		pbuff = images[n].image;
 		if (offset && i >= INFOMENU_NATIVEBOOT_START && i <= INFOMENU_NATIVEBOOT_END)
 			blend( images[n + (iMenuHelp - iMenuBoot)].image , gui.menu.pixmap, 
-				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+				  pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
 		else
 			blend( pbuff, gui.menu.pixmap, 
-				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
-
+				  pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+		
 		drawStr(infoMenuItems[i].text, &font_console, gui.menu.pixmap, 
-			pos(position.x + (pbuff->width + gui.menu.hborder), 
-				position.y + ((selection->height - font_console.height) / 2)));
+				pos(position.x + (pbuff->width + gui.menu.hborder), 
+					position.y + ((selection->height - font_console.height) / 2)));
 		position.y += images[iMenuSelection].image->height;
-	
+		
 	}
 	
 	gui.redraw = true;
@@ -1719,9 +1731,9 @@ void drawInfoMenuItems()
 int drawInfoMenu()
 {
 	drawInfoMenuItems();
-
+	
 	gui.menu.draw = true;
-
+	
 	updateVRAM();
 	
 	return 1;
@@ -1731,60 +1743,60 @@ int updateInfoMenu(int key)
 {
 	switch (key)
 	{
-
-		case kUpArrowkey:	// up arrow
-				if (infoMenuSelection > 0)
-				{
-					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
-						infoMenuSelection -= 4;
-					
-					else
-						infoMenuSelection--;
-						drawInfoMenuItems();
-						updateVRAM();
-					
-				} else {
-					
-					gui.menu.draw = false;
-					gui.redraw = true;
-
-					updateVRAM();
-					
-					return CLOSE_INFO_MENU;
-				}
-				break;
-
-		case kDownArrowkey:	// down arrow
-				if (infoMenuSelection < infoMenuItemsCount - 1)
-				{
-					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
-						infoMenuSelection += 4;
-					else
-						infoMenuSelection++;
-					drawInfoMenuItems();
-					updateVRAM();
-				}
-				break;
-
-		case kReturnKey:
-				key = 0;
-				if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
-					showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
-
-				else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO )
-					showInfoBox( getVBEInfoString(), getVBEModeInfoString() );
 			
-				else if( infoMenuSelection == MENU_SHOW_HELP )
-					showHelp();
-					
+		case kUpArrowkey:	// up arrow
+			if (infoMenuSelection > 0)
+			{
+				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
+					infoMenuSelection -= 4;
+				
 				else
-				{
-					int buff = infoMenuSelection;
-					infoMenuSelection = 0;
-					return buff;
-				}
-				break;
-		}
+					infoMenuSelection--;
+				drawInfoMenuItems();
+				updateVRAM();
+				
+			} else {
+				
+				gui.menu.draw = false;
+				gui.redraw = true;
+				
+				updateVRAM();
+				
+				return CLOSE_INFO_MENU;
+			}
+			break;
+			
+		case kDownArrowkey:	// down arrow
+			if (infoMenuSelection < infoMenuItemsCount - 1)
+			{
+				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
+					infoMenuSelection += 4;
+				else
+					infoMenuSelection++;
+				drawInfoMenuItems();
+				updateVRAM();
+			}
+			break;
+			
+		case kReturnKey:
+			key = 0;
+			if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
+				showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
+			
+			else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO )
+				showInfoBox( getVBEInfoString(), getVBEModeInfoString() );
+			
+			else if( infoMenuSelection == MENU_SHOW_HELP )
+				showHelp();
+			
+			else
+			{
+				int buff = infoMenuSelection;
+				infoMenuSelection = 0;
+				return buff;
+			}
+			break;
+	}
 	return DO_NOT_BOOT;
 }
 
@@ -1800,9 +1812,9 @@ static void loadBootGraphics(void)
 	if (bootImageData != NULL) {
 		return;
 	}
-
+	
 	char dirspec[256];
-
+	
 	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
 		usePngImage = false; 
 		return;
@@ -1810,9 +1822,9 @@ static void loadBootGraphics(void)
 	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
 #ifdef EMBED_THEME
-  	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
+		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
-		usePngImage = false; 
+			usePngImage = false; 
 	}
 }
 
@@ -1832,40 +1844,41 @@ void drawBootGraphics(void)
 	} else if (bootImageData == NULL) {
 		loadBootGraphics();
 	}
-
-	/*
-	// parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[0] = pos;
-	} else {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[1] = pos;
-	} else {
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	}
-	*/
 	
-	getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
-
+	/*
+	 // parse screen size parameters
+	 if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
+	 screen_params[0] = pos;
+	 } else {
+	 screen_params[0] = DEFAULT_SCREEN_WIDTH;
+	 }
+	 if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+	 screen_params[1] = pos;
+	 } else {
+	 screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+	 }
+	 */
+	
+	void(*res)(UInt32*, UInt32*, UInt32*) = (void*)lookup_all_symbols("_getResolution");
+	if(res && res != (void*)0xFFFFFFFF) res(&screen_params[0], &screen_params[1], &screen_params[2]);
+	
     // Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
-
+	
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
-
+	
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
-
+	
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE
 		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
 	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
-
+	
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
 		drawCheckerBoard();
 	} else {
@@ -1875,7 +1888,7 @@ void drawBootGraphics(void)
 	if ((bootImageData) && (usePngImage)) { 
 		x = (screen_params[0] - MIN(bootImageWidth, screen_params[0])) / 2; 
 		y = (screen_params[1] - MIN(bootImageHeight, screen_params[1])) / 2; 
-
+		
 		// Draw the image in the center of the display. 
 		blendImage(x, y, bootImageWidth, bootImageHeight, bootImageData); 
 	} else { 
@@ -1883,7 +1896,7 @@ void drawBootGraphics(void)
 		bootImageData = NULL; 
 		bootImageWidth = kAppleBootWidth; 
 		bootImageHeight = kAppleBootHeight; 
-
+		
 		// Prepare the data for the default Apple boot image. 
 		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
 		if (appleBootPict) { 
@@ -1898,3 +1911,114 @@ void drawBootGraphics(void)
 		} 
 	} 
 }
+
+int GUI_initGraphicsMode ()
+{
+	unsigned long params[4];
+	int           count;
+	
+	params[3] = 0;
+	count = getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
+	
+	// Try to find a resolution if "Graphics Mode" setting is not available.
+	if ( count < 3 )
+	{
+		// Use the default resolution if we don't have an initialized GUI.
+		if (gui.screen.width == 0 || gui.screen.height == 0)
+		{
+			gui.screen.width = DEFAULT_SCREEN_WIDTH;	
+			gui.screen.height = DEFAULT_SCREEN_HEIGHT;
+		}
+		
+		params[0] = gui.screen.width;
+		params[1] = gui.screen.height;
+		params[2] = 32;
+	}
+	
+	// Map from pixel format to bits per pixel.
+	
+	if ( params[2] == 256 ) params[2] = 8;
+	if ( params[2] == 555 ) params[2] = 16;
+	if ( params[2] == 888 ) params[2] = 32;
+	
+	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
+}
+
+
+int GUI_countdown( const char * msg, int row, int timeout )
+{
+    unsigned long time;
+    int ch  = 0;
+    int col = strlen(msg) + 1;
+	
+    flushKeyboardBuffer();
+	
+	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+	{
+		moveCursor( 0, row );
+		printf(msg);
+		
+	} else {
+		
+		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
+		
+		char dummy[80];
+		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
+		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
+		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
+		
+		// make this screen the new background
+		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
+		
+	}
+	
+	int multi_buff = 18 * (timeout);
+    int multi = ++multi_buff;
+	
+    int lasttime=0;
+	
+    for ( time = time18(), timeout++; timeout > 0; )
+    {
+		if( time18() > lasttime)
+		{
+			multi--; 
+			lasttime=time18();
+		}		
+		
+        if (ch = readKeyboardStatus())
+            break;
+		
+        // Count can be interrupted by holding down shift,
+        // control or alt key
+        if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
+		{
+            ch = 1;
+            break;
+        }
+		
+        if ( time18() >= time )
+        {
+            time += 18;
+            timeout--;
+			
+			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+			{
+				moveCursor( col, row );
+				printf("(%d) ", timeout);
+			}
+        }
+		
+		if( bootArgs->Video.v_display == GRAPHICS_MODE )
+		{
+			drawProgressBar( gui.screen.pixmap, 100, gui.progressbar.pos , ( multi * 100 / multi_buff ) );
+			gui.redraw = true;
+			updateVRAM();
+		}
+		
+    }
+	
+    flushKeyboardBuffer();
+	
+    return ch;
+}
+

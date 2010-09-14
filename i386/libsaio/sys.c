@@ -79,8 +79,10 @@
 UUID_DEFINE( kFSUUIDNamespaceSHA1, 0xB3, 0xE2, 0x0F, 0x39, 0xF2, 0x92, 0x11, 0xD6, 0x97, 0xA4, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC );
 #endif
 
+#ifdef UNUSED
 extern int multiboot_partition;
 extern int multiboot_partition_set;
+#endif
 
 struct devsw {
     const char *  name;
@@ -815,11 +817,12 @@ BVRef selectBootVolume( BVRef chain )
 	
 	if (chain->filtered) filteredChain = true;
 	
+#ifdef UNUSED
 	if (multiboot_partition_set)
 		for ( bvr = chain; bvr; bvr = bvr->next )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
-	
+#endif
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.

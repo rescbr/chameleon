@@ -8,6 +8,12 @@
 
 #include "mboot.h"
 
+#define OFFSET_1MEG 0x100000
+#define BAD_BOOT_DEVICE 0xffffffff
+
+
+#ifdef UNUSED
+
 int multiboot_timeout=0;
 int multiboot_timeout_set=0;
 int multiboot_partition=0;
@@ -27,8 +33,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig);
 // prototype dochainload for the same reason.
 void dochainload();
 
-#define OFFSET_1MEG 0x100000
-#define BAD_BOOT_DEVICE 0xffffffff
 
 // This assumes that the address of the first argument to the function will
 // be exactly 4 bytes above the address of the return address.
@@ -503,3 +507,4 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
     }
     return 0;
 }
+#endif

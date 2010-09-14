@@ -8,7 +8,6 @@ extern void set_eth_builtin(pci_dt_t *eth_dev);
 extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
 
-extern pci_dt_t *dram_controller_dev;
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
@@ -22,19 +21,12 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 	while (current)
 	{
-		switch (current->class_id)
-		{
-			case PCI_CLASS_BRIDGE_HOST:
-					dram_controller_dev = current;
-				break;
-				
+		execute_hook("PCIDevice", current, NULL, NULL, NULL);
+		
+		switch (current->class_id) {
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				if (do_eth_devprop)
 					set_eth_builtin(current);
-				break;
-				
-			case PCI_CLASS_DISPLAY_VGA:
-				execute_hook("GraphicsEnabler", current, NULL, NULL, NULL);
 				break;
 
 			case PCI_CLASS_SERIAL_USB:

@@ -4,7 +4,7 @@ MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = `ls ../../.svn &> /dev/null && (svn info ../../ | grep Revision | awk '{print $$2}') || echo 0`
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
-DIR = HelloWorld
+DIR = Symbols
 
 include ../../MakePaths.dir
 

@@ -42,13 +42,13 @@ VPATH = $(OBJROOT):$(SYMROOT)
 # The ordering is important;
 # boot2.o must be first.
 OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o
+	ramdisk.o resume.o bmdecompress.o modules.o
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util
 SFILES = boot2.s
-CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c picopng.c
-HFILES = boot.h appleClut8.h appleboot.h mboot.h multiboot.h picopng.h
+CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c
+HFILES = boot.h appleClut8.h appleboot.h mboot.h multiboot.h
 OTHERFILES = Makefile
 ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)

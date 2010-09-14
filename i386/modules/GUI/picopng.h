@@ -30,4 +30,10 @@ void png_alloc_free_all();
 
 extern int PNG_error;
 
+
+int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
+				 uint8_t **imageData);
+int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData);
+
+
 #endif

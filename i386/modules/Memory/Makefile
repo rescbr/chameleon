@@ -1,11 +1,11 @@
 
-MODULE_NAME = GraphicsEnabler
+MODULE_NAME = Memory
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = GraphicsEnabler
+DIR = Memory
 
 include ../../MakePaths.dir
 
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o GraphicsEnabler.o
+MEMORY_OBJS = dram_controllers.o mem.o spd.o Memory.o
 
 
 SFILES =
@@ -59,7 +59,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
+all embedtheme optionrom: ${MEMORY_OBJS} dylib
 
 
 dylib: ${GRAPHICS_ENABLER_OBJS}
@@ -71,21 +71,25 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/ati.o \
-	$(OBJROOT)/nvidia.o \
-	$(OBJROOT)/GraphicsEnabler.o \
+	$(OBJROOT)/dram_controllers.o \
+	$(OBJROOT)/spd.o \
+	$(OBJROOT)/mem.o \
+	$(OBJROOT)/Memory.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 
-GraphicsEnabler.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
+dram_controllers.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "dram_controllers.c" $(INC) -o "$(OBJROOT)/dram_controllers.o"
 
-ati.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "ati.c" $(INC) -o "$(OBJROOT)/ati.o"
+Memory.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Memory.c" $(INC) -o "$(OBJROOT)/Memory.o"
 
-nvidia.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
+spd.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "spd.c" $(INC) -o "$(OBJROOT)/spd.o"
+
+mem.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "mem.c" $(INC) -o "$(OBJROOT)/mem.o"
 
 
 include ../../MakeInc.dir

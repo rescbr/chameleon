@@ -99,6 +99,20 @@
 
 #define kMD0Image			"md0"				/* ramdisk.h */
 
+
+enum {
+	kBackspaceKey		= 0x08,
+	kTabKey			= 0x09,
+	kReturnKey		= 0x0d,
+	kEscapeKey		= 0x1b,
+	kUpArrowkey		= 0x4800, 
+	kDownArrowkey		= 0x5000,
+	kASCIIKeyMask		= 0x7f,
+	kF5Key			= 0x3f00,
+	kF10Key			= 0x4400
+};
+
+
 /*
  * Flags to the booter or kernel
  */
@@ -129,7 +143,6 @@ extern char gMKextName[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
-extern bool useGUI;
 
 /*
  * Boot Modes
