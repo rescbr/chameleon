@@ -28,16 +28,22 @@ void Memory_start()
 
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
+	printf("PCIDevice hook\n");
 	pci_dt_t* current = arg1;
 	if(current->class_id == PCI_CLASS_BRIDGE_HOST)
 	{
+		printf("  PCI_CLASS_BRIDGE_HOST located\n");
+
 		dram_controller_dev = current;
 	}
 }
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
+	printf("ScanMemory hook\n");
 	if (dram_controller_dev!=NULL) {
+		printf("  scan_dram_controller\n");
+
 		scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
 	}
 	scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
