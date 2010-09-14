@@ -333,6 +333,10 @@ Change: Added Memory detection module. Also needs no intro...
 		Working properly with my controler:
 		Intel Corporation 82945G/GZ/P/PL Memory Controller Hub [8086:2770] (rev 02)
 
+  Note: latest changes need a call for ATTENTION; the bootloader install procedure is gaining
+		new steps! So far, we wre just playing with KernelPatcher module, which most people
+		don't use. Check Modules.txt for info on installing modules.
+
 Motif:  ---
 
 		---------------//---------------//---------------

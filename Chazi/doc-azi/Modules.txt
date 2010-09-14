@@ -7,6 +7,8 @@ Installation:
   - create a /Extra/modules folder, copy Symbols.dylib (mandatory) to modules folder,
 	plus any other module you wish to load.
 
+  Note: GraphicsEnabler & MemDetect are now converted to modules.***
+
   - update boot file or reinstall the booter completely, as needed.
 
 
@@ -23,7 +25,7 @@ What are modules?
 	i don't start dumping bs. The easy answer is they are like plugins, adding/replacing
 	booter functionality. For instance: the Kernel Patcher (Kpatcher) is around for some time,
 	integrated on boot file like any other Chameleon function; with Modules support Kpatcher
-	can now live as a module, freeing the space it occupied on boot file
+	can now live as a module, freeing the space occupied on boot file
 	(one of module's advantages).
 	
 	
@@ -55,6 +57,14 @@ Featured modules:
 	Let's just say that the only patch needed by the 925 on Legacy Mode(**) is cpuid_set!
 	
 	Note: Kernel Patcher can stop working due to changes on the kernel code.
+
+  - GraphicsEnabler: graphics enabler option converted to module.
+
+	- same activation key used.
+
+  - Memory detection: memory detection option converted to module.
+
+	- same deactivation key used. (enabled by default)
 	
   - HelloWorld.dylib: just a notifier (not mandatory).
 
