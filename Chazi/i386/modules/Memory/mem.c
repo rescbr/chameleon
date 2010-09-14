@@ -4,7 +4,7 @@
  * mem.c - obtain system memory information
  */
 
-//#include "libsaio.h" - included on pci.h for now.
+#include "libsaio.h"
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"

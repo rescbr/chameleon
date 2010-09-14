@@ -6,12 +6,12 @@
  * System profiler fix and other fixes by Mozodojo.
  */
 
-//#include "libsaio.h" - included on the header.
-//#include "saio_internal.h" - included on bootstruct.h
-#include "bootstruct.h"
+#include "libsaio.h"
 #include "pci.h"
 #include "platform.h"
 #include "spd.h"
+#include "saio_internal.h"
+#include "bootstruct.h"
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD
@@ -231,7 +231,7 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 		c = spd[i];
 		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...
 			asciiPartNo[index++] = c;
-		if (isspace(c)) //Azi: this is the way that works properly for me!! The other gives me extra characters.
+		else if (!isascii(c))
 			break;
 	}
 	
@@ -325,7 +325,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Frequency,
                        slot->Vendor,
                        slot->PartNo,
-                       slot->SerialNo);
+                       slot->SerialNo); 
 			if(DEBUG_SPD) {
                   dumpPhysAddr("spd content: ",slot->spd, spd_size);
                     getc();

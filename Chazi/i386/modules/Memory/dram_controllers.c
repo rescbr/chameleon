@@ -13,7 +13,7 @@
  * http://www.canardpc.com - http://www.memtest.org
  */
 
-//#include "libsaio.h" - included on the header.
+#include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -471,10 +471,10 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	Platform.RAM.TRC = (mc_channel_bank_timing >> 9) & 0xF; 
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.TRP = mc_channel_bank_timing & 0xF;
+	Platform.RAM.CAS = (mc_channel_bank_timing >> 4) & 0x1F; 
 	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.RAS = (mc_channel_bank_timing >> 4) & 0x1F;
+	Platform.RAM.TRP = mc_channel_bank_timing & 0xF;
 	
 	// Single , Dual or Triple Channels
 	if (mc_control == 1 || mc_control == 2 || mc_control == 4 )

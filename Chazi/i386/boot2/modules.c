@@ -175,8 +175,9 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 	{
 		moduleHook_t* hooks = moduleCallbacks;
 		
-		while(hooks != NULL && strcmp(name, hooks->name) < 0)
+		while(hooks != NULL && strcmp(name, hooks->name) != 0) //TOOD: fixme
 		{
+			//DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
 			hooks = hooks->next;
 		}
 		

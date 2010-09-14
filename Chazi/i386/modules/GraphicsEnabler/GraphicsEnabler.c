@@ -21,13 +21,16 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
 void GraphicsEnabler_start()
 {
-	register_hook_callback(kGraphicsEnablerKey, &GraphicsEnabler_hook);
+	register_hook_callback("PCIDevice", &GraphicsEnabler_hook);
 }
 
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	pci_dt_t* current = arg1;
+	
+	if(current->class_id != PCI_CLASS_DISPLAY_VGA) return;
+	
 	char *devicepath = get_pci_dev_path(current);
 
 	bool do_gfx_devprop = false;

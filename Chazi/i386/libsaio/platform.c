@@ -10,9 +10,7 @@
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"
-#include "mem.h"
-#include "spd.h"
-#include "dram_controllers.h"
+#include "modules.h"
 
 #ifndef DEBUG_PLATFORM
 #define DEBUG_PLATFORM 0
@@ -38,21 +36,19 @@ bool platformCPUFeature(uint32_t feature)
 }
 
 /** scan mem for memory autodection purpose */
-void scan_mem() {
+void scan_mem()
+{
     static bool done = false;
     if (done) return;
 
     bool useAutodetection = true;
     getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
 
-    if (useAutodetection) {
-		if (dram_controller_dev!=NULL) {
-			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
-		}
-        scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
-        scan_spd(&Platform);
+    if (useAutodetection)
+	{
+		execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
 		//getc();
-    }
+	}
     done = true;
 }
 
