@@ -48,9 +48,9 @@
  * SOFTWARE.
  */
 
-//#include "libsaio.h"
-//#include "bootstruct.h"
+#include "libsaio.h"
 #include "boot.h"
+#include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
@@ -291,7 +291,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0614, "GeForce 9800 GT" },
 	{ 0x10DE0615, "GeForce GTS 250" },
 	{ 0x10DE0617, "GeForce 9800M GTX" },
-	{ 0x10DE0618, "GeForce GTX 260M" },
+	{ 0x10DE0618, "GeForce GTX 260M" }, 
 	{ 0x10DE061A, "Quadro FX 3700" },
 	{ 0x10DE061C, "Quadro FX 3600M" },
 	{ 0x10DE061D, "Quadro FX 2800M" },

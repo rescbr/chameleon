@@ -59,7 +59,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme: ${HELLO_WORLD_OBJS} dylib
+all embedtheme optionrom: ${HELLO_WORLD_OBJS} dylib
 
 
 dylib: ${HELLO_WORLD_OBJS}

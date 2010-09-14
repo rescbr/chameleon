@@ -109,7 +109,7 @@
 #define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
 #define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
 #define kAutoResolutionKey	 "AutoResolution"	 // boot.c				getBoolFK
-#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // pci_setup.c			getBoolFK
+#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
 #define kLegacyLogoKey		 "Legacy Logo"		 // gui.c				getBoolFK
 #define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
 #define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK

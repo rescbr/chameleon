@@ -211,15 +211,13 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 	return 0;
 }
 
-
-
 /*
- *	register_hook_callback(  const char* name,  void(*callback)())
- *		name - Name of the module hook to attach to.
- *		callbacks - The funciton pointer that will be called when the
- *			hook is executed. When registering a new callback name, the callback is added sorted.
- *			NOTE: the hooks take four void* arguments.
- *			TODO: refactor
+ * register_hook_callback(  const char* name,  void(*callback)())
+ *  name - Name of the module hook to attach to.
+ *  callbacks - The funciton pointer that will be called when the hook is executed.
+ *              When registering a new callback name, the callback is added sorted.
+ * NOTE: the hooks take four void* arguments.
+ * TODO: refactor
  */
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {

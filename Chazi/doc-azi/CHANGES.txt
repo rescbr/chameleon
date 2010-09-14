@@ -313,7 +313,18 @@ Change: removed -legacy flag interaction with the booter and reverted 32/64 flag
 		arch=x86_64 overrides i386 arch, if flagged on Boot.plist.
 		On Snow type arch=i386 -legacy to load i386 arch Legacy Mode.
 
-Motif:  don't want to contribute to confusion.
+Motif:  don't want to contribute to confusion... and laziness ;)
+
+		---------------//---------------//---------------
+		
+- (rev 524)
+Change: Added GraphicsEnabler module. Needs no introduction :)
+		Feedback is welcome.
+		Working as usual with my ATI Radeon X1300, doing the injection thing.
+
+  Newsflash: looks like it's raining modules over Meklort's branch :D
+
+Motif:  ---
 
 		---------------//---------------//---------------
 		

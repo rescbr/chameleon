@@ -1,11 +1,11 @@
 
-MODULE_NAME = KernelPatcher
+MODULE_NAME = GraphicsEnabler
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = KernelPatcher
+DIR = HelloWorld
 
 include ../../MakePaths.dir
 
@@ -21,7 +21,7 @@ BOOT2DIR = ../../boot2
 
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
 
-OPTIM = -O3
+OPTIM = -Os -Oz
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_HELLO_WORLD=1
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
@@ -29,7 +29,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common  -mdynamic-no-pic
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common -mdynamic-no-pic
 
 DEFINES=
 CONFIG = hd
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-OBJS = kernel_patcher.o
+GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
 
 
 SFILES =
@@ -59,25 +59,35 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${OBJS} dylib
+all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
 
 
-dylib: ${OBJS}
+dylib: ${GRAPHICS_ENABLER_OBJS}
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
-	-S -x  -dead_strip_dylibs \
+	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	-weak_library $(SYMROOT)/Symbols.dylib \
-	$(OBJROOT)/kernel_patcher.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/nvidia.o \
+	$(OBJROOT)/ati.o \
+	$(OBJROOT)/gma.o \
+	$(OBJROOT)/GraphicsEnabler.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
-kernel_patcher.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kernel_patcher.c" $(INC) -o "$(OBJROOT)/kernel_patcher.o"
+
+GraphicsEnabler.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
+
+ati.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "ati.c" $(INC) -o "$(OBJROOT)/ati.o"
+
+nvidia.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
+
 
 include ../../MakeInc.dir
 

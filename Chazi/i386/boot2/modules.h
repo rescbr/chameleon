@@ -59,7 +59,7 @@ void load_all_modules();
 /*
  * Modules Interface
  * execute_hook
- *		Exexutes a registered hook. All callbaks are
+ *		Executes a registered hook. All callbaks are
  *		called in the same order that they were added
  *
  * register_hook_callback
