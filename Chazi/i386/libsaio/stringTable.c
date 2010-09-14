@@ -656,7 +656,7 @@ int loadOverrideConfig(config_file_t *config)
 	int			 count, ret, fd, len = 0;
 	
 	// Take in account user overriding the override :P
-	if (getValueForKey(kTestConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kAltConfigKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
 		// Specify a path to a file, e.g. config=/Extra/test.plist
 		strcpy(dirSpecBplist, override_pathname);
@@ -672,6 +672,11 @@ int loadOverrideConfig(config_file_t *config)
 	// Check specific OS folders.
 	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = open(dirSpecBplist, 0);
+//	if (fd >= 0) goto success_fd;
+	
+//	restore?? can be useful with ramdisks...
+//	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s", filename);
+//	fd = open(dirSpecBplist, 0);
 //	if (fd >= 0) goto success_fd;
 	
 	//Azi: i really don't like these two!

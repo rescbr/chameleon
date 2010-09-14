@@ -25,8 +25,7 @@ void md0Ramdisk()
 	int fh = -1;
 	int len;
 	
-	if(getValueForKey(kMD0ImageKey, &override_filename, &len,  
-				   &bootInfo->bootConfig))
+	if(getValueForKey(kMD0ImageKey, &override_filename, &len, &bootInfo->bootConfig))
 	{
 		// Use user specified md0 file
 		sprintf(filename, "%s", override_filename);
@@ -246,9 +245,11 @@ void showInfoRAMDisk(void)
 int loadPrebootRAMDisk()
 {
 	mountRAMDisk("bt(0,0)/Extra/Preboot.dmg");
+	// change md0 to be handled with the menu below??
+	
 	if (gRAMDiskMI != NULL)
 	{
-		printf("\n");
+		printf("\n"); // damn line break :P
 		return 0;
 	}
 	else

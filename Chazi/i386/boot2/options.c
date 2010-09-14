@@ -777,20 +777,28 @@ int getBootOptions(bool firstRun)
 		int cnt;
 		int optionKey;
 
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
+		//Azi:---
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) 
+		{
 			prompt = malloc(cnt + 1);
 			strncat(prompt, val, cnt);
-		} else {
+		}
+		else
+		{
 			name = malloc(80);
 			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
+			//Azi: too long for 80X25, GUI=n, vmware, depending on the device name (more than 5 char).
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
 		}
 
-		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig )) {
+		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig ))
+		{
 			// The key specified is a special key.
-		} else {
+		}
+		else
+		{
 			// Default to F8.
 			optionKey = 0x4200;
 		}
@@ -968,10 +976,9 @@ int getBootOptions(bool firstRun)
 				{
 					lspci();
 				}
-				else if (strcmp(booterCommand, "more") == 0) //Azi:?more
+				else if (strcmp(booterCommand, "more") == 0)
 				{
-//					showTextFile(booterParam);
-					showTextFile("bt(0,0)/Extra/BootExtra.txt");
+					showTextFile(booterParam);
 				}
 				else if (strcmp(booterCommand, "rd") == 0)
 				{
@@ -1328,60 +1335,73 @@ processBootOptions()
     configKernelFlags = malloc(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
-    if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
-        // boot-uuid was set either on the command-line
-        // or in the config file.
+    if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0))
+	{
+        // boot-uuid was set either on the command-line or in the config file.
         uuidSet = true;
-    } else {
-
+    }
+	else
+	{
         //
         // Try an alternate method for getting the root UUID on boot helper partitions.
         //
         if (gBootVolume->flags & kBVFlagBooter)
         {
-        	if((loadHelperConfig(&bootInfo->helperConfig) == 0)
-        	    && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
+        	if ((loadHelperConfig(&bootInfo->helperConfig) == 0) &&
+				getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
         	{
-          	getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
-            copyArgument(kBootUUIDKey, val, cnt, &argP, &cntRemaining);
-            uuidSet = true;
+          		getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
+            	copyArgument(kBootUUIDKey, val, cnt, &argP, &cntRemaining);
+            	uuidSet = true;
         	}
         }
 
-        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
+        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0)
+		{
             verbose("Setting boot-uuid to: %s\n", uuidStr);
             copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
             uuidSet = true;
         }
     }
 
-    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
+    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice))
+	{
         cnt = 0;
-        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) {
+        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig))
+		{
             valueBuffer[0] = '*';
             cnt++;
             strlcpy(valueBuffer + 1, val, cnt);
             val = valueBuffer;
-        } else {
-            if (uuidSet) {
+        }
+		else
+		{
+            if (uuidSet)
+			{
                 val = "*uuid";
                 cnt = 5;
-            } else {
+            }
+			else
+			{
                 // Don't set "rd=.." if there is no boot device key
                 // and no UUID.
                 val = "";
                 cnt = 0;
             }
-        } 
-        if (cnt > 0) {
+        }
+ 
+        if (cnt > 0)
+		{
             copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
         }
         strlcpy( gRootDevice, val, (cnt + 1));
     }
 
     if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-        if (gBootMode & kBootModeSafe) {
+        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt))
+	{
+        if (gBootMode & kBootModeSafe)
+		{
             copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
         }
     }
@@ -1448,7 +1468,7 @@ static bool getOSVersion(char *str) //Azi: moved from boot.c
 
 	if (valid)
 	{
-		if (getValueForKey(kProductVersionKey, &val, &len, &systemVersion))
+		if (getValueForKey("ProductVersion", &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
 			// so copy it and trim
