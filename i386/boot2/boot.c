@@ -281,7 +281,7 @@ void common_boot(int biosdev)
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
     setBootGlobals(bvChain);
-    
+	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
 	
@@ -293,6 +293,9 @@ void common_boot(int biosdev)
     if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
         firstRun = false;
     }
+	
+	// Create a separated bvr chain using the specified filters.
+    bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 	
 	// Intialize module system
 	if(init_module_system())
@@ -330,9 +333,6 @@ void common_boot(int biosdev)
     } else {
 		scanDisks(gBIOSDev, &bvCount);
     }
-	
-    // Create a separated bvr chain using the specified filters.
-    bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 	
     gBootVolume = selectBootVolume(bvChain);
 	

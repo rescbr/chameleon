@@ -12,6 +12,7 @@
 #include "appleboot.h"
 #include "vers.h"
 #include "modules.h"
+#include "../Resolution/edid.h"
 
 
 gui_t gui;					// gui structure
@@ -684,7 +685,7 @@ void loadThemeValues(config_file_t *theme)
 
 int initGUI(void)
 {
-	//int		val;
+	int		val;
 	int	len;
 	char	dirspec[256];
 	
@@ -705,18 +706,21 @@ int initGUI(void)
 		return 1;
 #endif
 	}
-	/*
-	 // parse display size parameters
-	 if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
-	 screen_params[0] = val;
-	 }
-	 if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
-	 screen_params[1] = val;
-	 }
-	 */
-	void(*res)(UInt32*, UInt32*, UInt32*) = (void*)lookup_all_symbols("_getResolution");
-	if(res && res != (void*)0xFFFFFFFF) res(&screen_params[0], &screen_params[1], &screen_params[2]);
-	
+
+	if(is_module_loaded("Resolution"))
+	{
+		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+	}
+	else
+	{
+		// parse display size parameters
+		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+			screen_params[0] = val;
+		}
+		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+			screen_params[1] = val;
+		}		
+	}
 	
 	
 	// Initalizing GUI strucutre.
@@ -1832,7 +1836,7 @@ static void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	//int pos;
+	int pos;
 	int length;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
@@ -1845,22 +1849,24 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 	
-	/*
-	 // parse screen size parameters
-	 if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
-	 screen_params[0] = pos;
-	 } else {
-	 screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	 }
-	 if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
-	 screen_params[1] = pos;
-	 } else {
-	 screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	 }
-	 */
-	
-	void(*res)(UInt32*, UInt32*, UInt32*) = (void*)lookup_all_symbols("_getResolution");
-	if(res && res != (void*)0xFFFFFFFF) res(&screen_params[0], &screen_params[1], &screen_params[2]);
+	if(is_module_loaded("Resolution"))
+	{
+		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+	}
+	else
+	{
+		// parse screen size parameters
+		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
+			screen_params[0] = pos;
+		} else {
+			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		}
+		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+			screen_params[1] = pos;
+		} else {
+			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+		}
+	}	
 	
     // Save current screen resolution.
 	oldScreenWidth = gui.screen.width;

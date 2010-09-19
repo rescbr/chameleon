@@ -153,6 +153,7 @@ int load_module(char* module)
 		printf("Unable to read in module %s\n.", module);
 		getc();
 	}
+	close(fh);
 	return 1;
 }
 
@@ -435,11 +436,12 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				// TODO: verify version
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
-
-				if(dylib_loader && !dylib_loader(module))
+				char* name = malloc(strlen(module) + strlen(".dylib") + 1);
+				sprintf(name, "%s.dylib", module);
+				if(dylib_loader && !dylib_loader(name))
 				{
 					// Unable to load dependancy
-					return NULL;
+					//return NULL;
 				}
 				break;
 				

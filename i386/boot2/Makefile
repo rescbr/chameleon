@@ -20,8 +20,6 @@ SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
 UTILDIR = ../util
-THEME = embed
-THEMEDIR = ../../artwork/themes/$(THEME)
 INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
@@ -48,7 +46,7 @@ OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
 UTILDIR = ../util
 SFILES = boot2.s
 CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c
-HFILES = boot.h appleClut8.h appleboot.h mboot.h multiboot.h
+HFILES = boot.h appleClut8.h mboot.h multiboot.h
 OTHERFILES = Makefile
 ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
@@ -56,10 +54,7 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
-all: $(DIRS_NEEDED) boot
-
-embedtheme: CFLAGS += -DEMBED_THEME
-embedtheme: art.h all
+all embedtheme: $(DIRS_NEEDED) boot
 
 boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
@@ -83,34 +78,9 @@ vers.h:
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
 
-art.h:
-	@if [ "$(PNGCRUSH)" ]; then	\
-		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \
-		cd $(THEMEDIR) && find . -name '*.png' -exec $(PNGCRUSH) -q $(PNGOPTIONS) -d $(SYMROOT)/embed {} \;; \
-		cp theme.plist $(SYMROOT)/embed; \
-	else \
-		cp -R $(THEMEDIR) $(SYMROOT)/embed; \
-	fi;
-	@echo "#ifndef __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@echo "#define __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name 'theme.plist' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-	@cd $(SYMROOT)/embed && find . -name '*.png' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-
-	@echo "typedef struct {" >> $(SYMROOT)/art.h
-	@echo "	char			name[32];" >> $(SYMROOT)/art.h
-	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
-	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
-	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
-	@echo "" >> $(SYMROOT)/art.h
-	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
-		awk '{ printf "\t{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
-	@echo "};" >> $(SYMROOT)/art.h
-
-	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
-
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
+
 
 install_i386:: all $(INSTALLDIR)
 	cp $(SYMROOT)/boot $(OTHER_FILES) $(INSTALLDIR)
