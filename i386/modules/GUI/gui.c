@@ -22,7 +22,7 @@ font_t font_console;
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
-static const char *theme_name = THEME_NAME_DEFAULT;	
+static const char* theme_name = THEME_NAME_DEFAULT;	
 
 #ifdef EMBED_THEME
 #include "art.h"
@@ -169,14 +169,14 @@ int  initFont(font_t *font, image_t *image);
 void colorFont(font_t *font, uint32_t color);
 void makeRoundedCorners(pixmap_t *p);
 
-static int infoMenuSelection = 0;
-static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
+int infoMenuSelection = 0;
+int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
-static bool infoMenuNativeBoot = false;
+bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
+unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 
-static int getImageIndexByName(const char *name)
+int getImageIndexByName(const char *name)
 {
     int i;
 	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
@@ -239,7 +239,6 @@ static int loadThemeImage(const char *image, int alt_image)
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
-	
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
 	}
@@ -250,6 +249,7 @@ static int loadThemeImage(const char *image, int alt_image)
             images[i].image = malloc(sizeof(pixmap_t));
         }
         sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+
         width = 0;
         height = 0;
         imagedata = NULL;
@@ -811,7 +811,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
     if (isSelected)
 	{
 		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
-		devicetype++;
+		devicetype++; // selec override image 
 	}
 	
 	// draw icon
@@ -888,8 +888,8 @@ void drawDeviceList (int start, int end, int selection)
             gui.debug.cursor = pos( 10, 100);
             dprintf( &gui.screen, "label     %s\n",   param->label );
             dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-            dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-            dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
+            dprintf( &gui.screen, "width     %d\n",   gui.screen.width);
+            dprintf( &gui.screen, "height    %d\n",   gui.screen.height);
             dprintf( &gui.screen, "type      0x%x\n", param->type );
             dprintf( &gui.screen, "flags     0x%x\n", param->flags );
             dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
@@ -1712,15 +1712,21 @@ void drawInfoMenuItems()
 	for ( i = 0, n = iMenuBoot; i < infoMenuItemsCount; i++, n++)
 	{
 		if (i == infoMenuSelection)
+		{
 			blend(selection, gui.menu.pixmap, position);
+		}
 		
 		pbuff = images[n].image;
 		if (offset && i >= INFOMENU_NATIVEBOOT_START && i <= INFOMENU_NATIVEBOOT_END)
+		{
 			blend( images[n + (iMenuHelp - iMenuBoot)].image , gui.menu.pixmap, 
 				  pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+		}
 		else
+		{
 			blend( pbuff, gui.menu.pixmap, 
 				  pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+		}
 		
 		drawStr(infoMenuItems[i].text, &font_console, gui.menu.pixmap, 
 				pos(position.x + (pbuff->width + gui.menu.hborder), 
@@ -1752,14 +1758,19 @@ int updateInfoMenu(int key)
 			if (infoMenuSelection > 0)
 			{
 				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
+				{
 					infoMenuSelection -= 4;
-				
+				}
 				else
+				{
 					infoMenuSelection--;
+				}
 				drawInfoMenuItems();
 				updateVRAM();
 				
-			} else {
+			} 
+			else 
+			{
 				
 				gui.menu.draw = false;
 				gui.redraw = true;
@@ -1807,7 +1818,7 @@ int updateInfoMenu(int key)
 uint16_t bootImageWidth = 0; 
 uint16_t bootImageHeight = 0; 
 uint8_t *bootImageData = NULL; 
-static bool usePngImage = true;
+bool usePngImage = true;
 
 //==========================================================================
 // loadBootGraphics

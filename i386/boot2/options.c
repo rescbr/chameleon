@@ -1091,7 +1091,7 @@ processBootOptions()
 //==========================================================================
 // Load the help file and display the file contents on the screen.
 
-static void showTextBuffer(char *buf, int size)
+void showTextBuffer(char *buf, int size)
 {
 	char	*bp;
 	int	line;

@@ -7,6 +7,12 @@
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
 
+
+// There is a bug with the module system / rebasing / binding
+// that causes static variables to be incorrectly rebased or bound
+// Disable static variables for the moment
+#define static
+
 #ifndef __BOOT_MODULES_H
 #define __BOOT_MODULES_H
 
@@ -69,7 +75,8 @@ void load_all_modules();
 int execute_hook(const char* name, void*, void*, void*, void*);
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
 
-inline void rebase_location(UInt32* location, char* base);
+inline void rebase_location(UInt32* location, char* base, int type);
+inline void bind_location(UInt32* location, char* value, UInt32 addend, int type);
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 

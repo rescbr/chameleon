@@ -545,6 +545,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_SET_TYPE_IMM:
 				// Set rebase type (pointer, absolute32, pcrel32)
 				//printf("Rebase type = 0x%X\n", immediate);
+				//getc();
 				// NOTE: This is currently NOT used
 				type = immediate;
 				break;
@@ -608,7 +609,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_DO_REBASE_IMM_TIMES:
 				index = 0;
 				for (index = 0; index < immediate; ++index) {
-					rebase_location(base + segmentAddress, (char*)base);
+					rebase_location(base + segmentAddress, (char*)base, type);
 					segmentAddress += sizeof(void*);
 				}
 				break;
@@ -627,7 +628,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
 					//DBG("\tRebasing 0x%X\n", segmentAddress);
-					rebase_location(base + segmentAddress, (char*)base);					
+					rebase_location(base + segmentAddress, (char*)base, type);					
 					segmentAddress += sizeof(void*);
 				}
 				break;
@@ -642,7 +643,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				rebase_location(base + segmentAddress, (char*)base);
+				rebase_location(base + segmentAddress, (char*)base, type);
 				
 				segmentAddress += tmp + sizeof(void*);
 				break;
@@ -669,7 +670,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
-					rebase_location(base + segmentAddress, (char*)base);
+
+					rebase_location(base + segmentAddress, (char*)base, type);
 					
 					segmentAddress += tmp2 + sizeof(void*);
 				}
@@ -835,10 +837,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				{
 					address = segmentAddress + (UInt32)base;
 
-					((char*)address)[0] = (symbolAddr & 0x000000FF) >> 0;
-					((char*)address)[1] = (symbolAddr & 0x0000FF00) >> 8;
-					((char*)address)[2] = (symbolAddr & 0x00FF0000) >> 16;
-					((char*)address)[3] = (symbolAddr & 0xFF000000) >> 24;
+					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
@@ -867,11 +866,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-					
-					((char*)address)[0] = (symbolAddr & 0x000000FF) >> 0;
-					((char*)address)[1] = (symbolAddr & 0x0000FF00) >> 8;
-					((char*)address)[2] = (symbolAddr & 0x00FF0000) >> 16;
-					((char*)address)[3] = (symbolAddr & 0xFF000000) >> 24;
+
+					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
@@ -888,11 +884,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-					
-					((char*)address)[0] = (symbolAddr & 0x000000FF) >> 0;
-					((char*)address)[1] = (symbolAddr & 0x0000FF00) >> 8;
-					((char*)address)[2] = (symbolAddr & 0x00FF0000) >> 16;
-					((char*)address)[3] = (symbolAddr & 0xFF000000) >> 24;
+
+					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
@@ -934,11 +927,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					{
 						
 						address = segmentAddress + (UInt32)base;
-						
-						((char*)address)[0] = (symbolAddr & 0x000000FF) >> 0;
-						((char*)address)[1] = (symbolAddr & 0x0000FF00) >> 8;
-						((char*)address)[2] = (symbolAddr & 0x00FF0000) >> 16;
-						((char*)address)[3] = (symbolAddr & 0xFF000000) >> 24;
+
+						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 						
 						segmentAddress += tmp2 + sizeof(void*);
 					}
@@ -956,10 +946,42 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	}
 }
 
-inline void rebase_location(UInt32* location, char* base)
-{
-	*location += (UInt32)base;
+inline void rebase_location(UInt32* location, char* base, int type)
+{	
+	switch(type)
+	{
+		case REBASE_TYPE_POINTER:
+		case REBASE_TYPE_TEXT_ABSOLUTE32:
+			*location += (UInt32)base;
+			break;
+			
+		default:
+			break;
+	}
 }
+
+inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
+{	
+	// do actual update
+	char* newValue = value + addend;
+
+	switch (type) {
+		case BIND_TYPE_POINTER:
+		case BIND_TYPE_TEXT_ABSOLUTE32:
+			break;
+
+		case BIND_TYPE_TEXT_PCREL32:
+			newValue -=  ((UInt32)location + 4);
+
+			break;
+		default:
+			return;
+	}
+	*location = (UInt32)newValue;
+	
+
+}
+
 
 /*
  * add_symbol
