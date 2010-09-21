@@ -1281,7 +1281,7 @@ int selectAlternateBootDevice(int bootdevice)
 }
 #endif
 
-#ifdef OPTION_ROM
+#ifndef OPTION_ROM
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");

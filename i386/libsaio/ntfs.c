@@ -22,7 +22,7 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-
+#ifndef OPTION_ROM
 #include "libsaio.h"
 #include "sl.h"
 
@@ -342,3 +342,4 @@ bool NTFSProbe(const void * buffer)
 	
 	return result;
 }
+#endif

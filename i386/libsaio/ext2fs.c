@@ -6,7 +6,7 @@
  *  Copyright 2009 __MyCompanyName__. All rights reserved.
  *
  */
-
+#ifndef OPTION_ROM
 #include "libsaio.h"
 #include "sl.h"
 #include "ext2fs.h"
@@ -40,3 +40,4 @@ void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 	strncpy (str, buf+0x478, min (strMaxLen, 16));
 	free (buf);
 }
+#endif
