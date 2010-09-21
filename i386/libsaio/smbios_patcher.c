@@ -22,6 +22,9 @@
 #define DBG(x...)
 #endif
 
+uint64_t smbios_p;
+
+
 typedef struct {
     const char* key;
     const char* value;

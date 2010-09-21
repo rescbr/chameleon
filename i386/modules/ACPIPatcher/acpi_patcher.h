@@ -6,10 +6,11 @@
 #define __LIBSAIO_ACPI_PATCHER_H
 
 #include "libsaio.h"
+#include "efi.h"
 
-uint64_t acpi10_p;
-uint64_t acpi20_p;
-uint64_t smbios_p;
+extern uint64_t acpi10_p;
+extern uint64_t acpi20_p;
+extern uint64_t smbios_p;
 
 extern int setupAcpi();
 

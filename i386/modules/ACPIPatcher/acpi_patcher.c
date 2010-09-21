@@ -25,6 +25,10 @@
 #define DBG(x...)
 #endif
 
+uint64_t acpi10_p;
+uint64_t acpi20_p;
+
+
 // Slice: New signature compare function
 boolean_t tableSign(char *table, const char *sgn)
 {

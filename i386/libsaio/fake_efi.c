@@ -11,12 +11,12 @@
 #include "fake_efi.h"
 #include "efi_tables.h"
 #include "platform.h"
-#include "acpi_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
 #include "convert.h"
 #include "pci.h"
 #include "sl.h"
+#include "modules.h"
 
 extern struct SMBEntryPoint * getSmbios(int which); // now cached
 extern void setup_pci_devs(pci_dt_t *pci_dt);
@@ -672,8 +672,6 @@ static void setupEfiConfigurationTable()
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
 	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 	
-	// Setup ACPI with DSDT overrides (mackerintel's patch)
-	setupAcpi();
 	
 	// We've obviously changed the count.. so fix up the CRC32
 	if (archCpuType == CPU_TYPE_I386)
@@ -712,6 +710,9 @@ void setupFakeEfi(void)
 	
 	// Initialize the device tree
 	setupEfiDeviceTree();
+	
+	
+	execute_hook("setupEfiConfigurationTable", NULL, NULL, NULL, NULL);
 	
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
