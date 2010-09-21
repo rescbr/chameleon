@@ -86,15 +86,6 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
  **/
 void GUI_start()
 {
-	replace_function("_initGraphicsMode", &GUI_initGraphicsMode);
-	replace_function("_getBootOptions", &GUI_getBootOptions);
-	replace_function("_clearBootArgs", &GUI_clearBootArgs);
-	replace_function("_showHelp", &GUI_showHelp);
-
-	replace_function("_printf", &GUI_printf);
-	replace_function("_verbose", &GUI_verbose);
-	replace_function("_error", &GUI_error);
-	replace_function("_stop", &GUI_stop);
 	
 	// Start the gui
 	
@@ -106,10 +97,23 @@ void GUI_start()
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
+	else
+	{
+		replace_function("_initGraphicsMode", &GUI_initGraphicsMode);
+		replace_function("_getBootOptions", &GUI_getBootOptions);
+		replace_function("_clearBootArgs", &GUI_clearBootArgs);
+		replace_function("_showHelp", &GUI_showHelp);
+		
+		replace_function("_printf", &GUI_printf);
+		replace_function("_verbose", &GUI_verbose);
+		replace_function("_error", &GUI_error);
+		replace_function("_stop", &GUI_stop);		
+	}
 	
 	// Hoot for the boot screen 
 	register_hook_callback("Kernel Start", &GUI_Kernel_Start_hook);
-	register_hook_callback("PreBoot", &GUI_PreBoot_hook);
+	register_hook_callback("PreBoot", &GUI_PreBoot_hook);		
+	
 }
 
 /**

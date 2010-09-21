@@ -294,8 +294,23 @@ void common_boot(int biosdev)
         firstRun = false;
     }
 	
+
+	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
+    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
+        gScanSingleDrive = true;
+    }
+	
+	// Create a list of partitions on device(s).
+    if (gScanSingleDrive) {
+		scanBootVolumes(gBIOSDev, &bvCount);
+    } else {
+		scanDisks(gBIOSDev, &bvCount);
+    }
+	
 	// Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+	gBootVolume = selectBootVolume(bvChain);
+	
 	
 	// Intialize module system
 	if(init_module_system())
@@ -322,19 +337,8 @@ void common_boot(int biosdev)
         gEnableCDROMRescan = promptForRescanOption();
     }
 	
-    // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
-        gScanSingleDrive = true;
-    }
+
 	
-    // Create a list of partitions on device(s).
-    if (gScanSingleDrive) {
-		scanBootVolumes(gBIOSDev, &bvCount);
-    } else {
-		scanDisks(gBIOSDev, &bvCount);
-    }
-	
-    gBootVolume = selectBootVolume(bvChain);
 	
 #if DEBUG
     printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);

@@ -299,12 +299,14 @@ static int loadThemeImage(const char *image, int alt_image)
             return 1;
         }
     }
+
 	return 1;
 }
 
 static int loadGraphics(void)
 {
 	LOADPNG(background,                     IMG_REQUIRED);
+
 	LOADPNG(logo,                           IMG_REQUIRED);
 	
 	LOADPNG(device_generic,                 IMG_REQUIRED);
@@ -693,6 +695,7 @@ int initGUI(void)
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
+	
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
