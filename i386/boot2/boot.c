@@ -67,8 +67,10 @@ char *gPlatformName = gCacheNameAdler;
 char gRootDevice[512];
 char gMKextName[512];
 char gMacOSVersion[8];
+#ifndef OPTION_ROM
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
+#endif
 
 int     bvCount = 0;
 //int	menucount = 0;
@@ -164,11 +166,9 @@ static int ExecKernel(void *binary)
 	md0Ramdisk();
 	
     setupFakeEfi();
-	
-    md0Ramdisk();
-	
+		
     verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
-	
+#ifndef OPTION_ROM
     // Cleanup the PXE base code.
 	
     if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
@@ -178,7 +178,7 @@ static int ExecKernel(void *binary)
             sleep(2);
         }
     }
-	
+#endif 
     bool dummyVal;
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
 		printf("Press any key to continue...");
@@ -247,13 +247,17 @@ void common_boot(int biosdev)
     bool     quiet;
     bool     firstRun = true;
     bool     instantMenu;
+#ifndef OPTION_ROM
     bool     rescanPrompt;
+#endif
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 	
+#ifndef OPTION_ROM
     // Set reminder to unload the PXE base code. Neglect to unload
     // the base code will result in a hang or kernel panic.
     gUnloadPXEOnExit = true;
+#endif
 	
     // Record the device that the booter was loaded from.
     gBIOSDev = biosdev & kBIOSDevMask;
@@ -294,16 +298,20 @@ void common_boot(int biosdev)
         firstRun = false;
     }
 	
-
+#ifndef OPTION_ROM
 	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
     if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
         gScanSingleDrive = true;
     }
 	
 	// Create a list of partitions on device(s).
-    if (gScanSingleDrive) {
+    if (gScanSingleDrive)
+	{
 		scanBootVolumes(gBIOSDev, &bvCount);
-    } else {
+    } 
+	else 
+#endif
+	{
 		scanDisks(gBIOSDev, &bvCount);
     }
 	
@@ -319,7 +327,7 @@ void common_boot(int biosdev)
 	}
 	
 	
-	
+#ifndef OPTION_ROM
     // Loading preboot ramdisk if exists.
     loadPrebootRAMDisk();
 	
@@ -336,6 +344,7 @@ void common_boot(int biosdev)
     if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
         gEnableCDROMRescan = promptForRescanOption();
     }
+#endif
 	
 
 	
@@ -384,9 +393,10 @@ void common_boot(int biosdev)
 			if(gBootVolume == NULL)
 			{
 				freeFilteredBVChain(bvChain);
-				
+#ifndef OPTION_ROM
 				if (gEnableCDROMRescan)
 					rescanBIOSDevice(gBIOSDev);
+#endif
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
@@ -561,12 +571,13 @@ void common_boot(int biosdev)
 			printf("Can't find %s\n", bootFile);
 			
 			sleep(1);
-			
+#ifndef OPTION_ROM
             if (gBootFileType == kNetworkDeviceType) {
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
                 break;
             }
+#endif
         } else {
             /* Won't return if successful. */
 			// Notify modules that ExecKernel is about to be called
@@ -581,10 +592,11 @@ void common_boot(int biosdev)
 			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
 		}
     }
-	
+#ifndef OPTION_ROM
     if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit) {
 		nbpUnloadBaseCode();
     }
+#endif
 }
 
 /*!

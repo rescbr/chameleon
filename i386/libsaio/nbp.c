@@ -134,6 +134,7 @@ BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
     return gNetBVR;
 }
 #else
+#ifndef OPTION_ROM
 BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
 {
     return NULL;
@@ -142,4 +143,5 @@ UInt32 nbpUnloadBaseCode()
 {
     return 0;
 }
+#endif
 #endif

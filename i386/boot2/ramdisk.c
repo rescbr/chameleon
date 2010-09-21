@@ -94,7 +94,7 @@ void md0Ramdisk()
 
 	}
 }
-
+#ifndef OPTION_ROM
 void umountRAMDisk()
 {
 	if (gRAMDiskMI != NULL)
@@ -314,3 +314,4 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 		setActiveDisplayPage(0);
 	}
 }
+#endif

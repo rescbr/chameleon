@@ -17,7 +17,7 @@ else
   MKDIRS = /bin/mkdir -p
 endif
 
-all embedtheme: $(DIRS_NEEDED) $(VERSIONED_FILES)
+all embedtheme optionrom: $(DIRS_NEEDED) $(VERSIONED_FILES)
 
 boot1h: boot1.s Makefile
 	$(NASM) boot1.s -o $(SYMROOT)/boot1h

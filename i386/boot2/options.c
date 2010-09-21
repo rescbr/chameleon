@@ -27,9 +27,12 @@
 #include "graphics.h"
 #include "fdisk.h"
 #include "ramdisk.h"
-#include "embedded.h"
 #include "pci.h"
 #include "options.h"
+
+#ifndef OPTION_ROM
+#include "embedded.h"
+#endif
 
 
 bool shouldboot = false;
@@ -164,7 +167,9 @@ void addBootArg(const char * argStr)
 static void showBootPrompt(int row, bool visible)
 {
 	extern char bootPrompt[];
+#ifndef OPTION_ROM
 	extern char bootRescanPrompt[];
+#endif
 	
 	changeCursor( 0, row, kCursorTypeUnderline, 0 );    
 	clearScreenRows( row, kScreenLastRow );
@@ -172,9 +177,14 @@ static void showBootPrompt(int row, bool visible)
 	clearBootArgs();
 	
 	if (visible) {
-		if (gEnableCDROMRescan) {
+#ifndef OPTION_ROM
+		if (gEnableCDROMRescan)
+		{
 			printf( bootRescanPrompt );
-		} else {
+		}
+		else
+#endif
+		{
 			printf( bootPrompt );
 		}
 	} else {
@@ -524,7 +534,9 @@ int getBootOptions(bool firstRun)
 	int     key;
 	int     nextRow;
 	int     timeout;
+#ifndef OPTION_ROM
 	int     bvCount;
+#endif
 	BVRef   bvr;
 	BVRef   menuBVR;
 	bool    showPrompt, newShowPrompt, isCDROM;
@@ -725,12 +737,14 @@ int getBootOptions(bool firstRun)
 		updateMenu( key, (void **) &menuBVR );
 		newShowPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 		
-		if (newShowPrompt != showPrompt) {
+		if (newShowPrompt != showPrompt)
+		{
 			showPrompt = newShowPrompt;
 			showBootPrompt( nextRow, showPrompt );
 		}
 		
-		if (showPrompt) {
+		if (showPrompt)
+		{
 			updateBootArgs(key);
 		}
 		
@@ -747,24 +761,40 @@ int getBootOptions(bool firstRun)
 					/*
 					 * TODO: this needs to be refactored.
 					 */
-					if (strcmp( booterCommand, "video" ) == 0) {
+					if (strcmp( booterCommand, "video" ) == 0)
+					{
 						printVBEModeInfo();
-					} else if ( strcmp( booterCommand, "memory" ) == 0) {
+					} 
+					else if ( strcmp( booterCommand, "memory" ) == 0) 
+					{
 						printMemoryInfo();
-					} else if (strcmp(booterCommand, "lspci") == 0) {
+					}
+					else if (strcmp(booterCommand, "lspci") == 0) 
+					{
 						lspci();
-					} else if (strcmp(booterCommand, "more") == 0) {
+					} 
+#ifndef OPTION_ROM
+					else if (strcmp(booterCommand, "more") == 0) 
+					{
 						showTextFile(booterParam);
-					} else if (strcmp(booterCommand, "rd") == 0) {
+					}
+					else if (strcmp(booterCommand, "rd") == 0) 
+					{
 						processRAMDiskCommand(&argPtr, booterParam);
-					} else if (strcmp(booterCommand, "norescan") == 0) {
-						if (gEnableCDROMRescan) {
+					} 
+					else if (strcmp(booterCommand, "norescan") == 0)
+					{
+						if (gEnableCDROMRescan)
+						{
 							gEnableCDROMRescan = false;
 							break;
 						}
-					} else {
+					}
+					else
+					{
 						showHelp();
 					}
+#endif
 					key = 0;
 					showBootPrompt(nextRow, showPrompt);
 					break;
@@ -777,7 +807,7 @@ int getBootOptions(bool firstRun)
 			case kEscapeKey:
 				clearBootArgs();
 				break;
-				
+#ifndef OPTION_ROM
 			case kF5Key:
 				// New behavior:
 				// Clear gBootVolume to restart the loop
@@ -795,7 +825,7 @@ int getBootOptions(bool firstRun)
 				gBootVolume = NULL;
 				clearBootArgs();
 				break;
-				
+#endif
 			default:
 				key = 0;
 				break;
@@ -1087,6 +1117,7 @@ processBootOptions()
     return 0;
 }
 
+#ifndef OPTION_ROM
 
 //==========================================================================
 // Load the help file and display the file contents on the screen.
@@ -1183,11 +1214,12 @@ void showTextFile(const char * filename)
 	showTextBuffer(buf, size);
 	free(buf);
 }
+#endif
 
 // This is a very simplistic prompting scheme that just grabs two hex characters
 // Eventually we need to do something more user-friendly like display a menu
 // based off of the Multiboot device list
-
+#ifdef UNUSED
 int selectAlternateBootDevice(int bootdevice)
 {
 	int key;
@@ -1247,7 +1279,9 @@ int selectAlternateBootDevice(int bootdevice)
 	
 	return bootdevice;
 }
+#endif
 
+#ifdef OPTION_ROM
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
@@ -1257,3 +1291,4 @@ bool promptForRescanOption(void)
 		return false;
 	}
 }
+#endif

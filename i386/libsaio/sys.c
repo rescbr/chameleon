@@ -771,11 +771,13 @@ void scanBootVolumes( int biosdev, int * count )
   bvr = diskScanBootVolumes(biosdev, count);
   if (bvr == NULL)
   {
+#ifndef OPTION_ROM
     bvr = nbpScanBootVolumes(biosdev, count);
     if (bvr != NULL)
     {
       gBootFileType = kNetworkDeviceType;
     }
+#endif
   }
   else
   {

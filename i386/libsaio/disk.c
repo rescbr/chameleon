@@ -1445,7 +1445,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 
   }
 }
-
+#ifndef OPTION_ROM
 void rescanBIOSDevice(int biosdev)
 {
 	struct DiskBVMap *oldMap = diskResetBootVolumes(biosdev);
@@ -1454,6 +1454,7 @@ void rescanBIOSDevice(int biosdev)
 	oldMap = NULL;
 	scanBootVolumes(biosdev, 0);
 }
+#endif
 
 struct DiskBVMap* diskResetBootVolumes(int biosdev)
 {

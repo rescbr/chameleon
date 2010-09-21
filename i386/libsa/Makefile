@@ -42,7 +42,9 @@ ALLSRC =  $(SFILES) $(CFILES) $(HFILES) $(OTHERFILES)
 LIBS = libsa.a
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme: $(DIRS_NEEDED) $(LIBS)
+optionrom: CFLAGS += -DOPTION_ROM
+
+all embedtheme optionrom: $(DIRS_NEEDED) $(LIBS)
 
 libsa.a: $(SA_OBJS)
 	rm -f $(SYMROOT)/$(@F)

@@ -37,10 +37,10 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	disk.o sys.o cache.o bootstruct.o \
 	stringTable.o load.o pci.o allocate.o misc.o \
 	ufs.o ufs_byteorder.o \
-	vbe.o nbp.o hfs.o hfs_compare.o \
+	vbe.o nbp.o smbios_patcher.o hfs.o hfs_compare.o \
 	xml.o ntfs.o msdos.o md5c.o device_tree.o \
 	cpu.o platform.o \
-	smbios_patcher.o fake_efi.o ext2fs.o \
+	fake_efi.o ext2fs.o \
 	hpet.o usb.o pci_setup.o \
 	device_inject.o pci_root.o \
 	convert.o
@@ -65,7 +65,9 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
 #SIG = $(SYMROOT)/sig
 
-all embedtheme: $(DIRS_NEEDED) libsaio.h $(LIBS)
+optionrom: CFLAGS += -DOPTION_ROM
+
+all embedtheme optionrom: $(DIRS_NEEDED) libsaio.h $(LIBS)
 
 #libsaio_static.a: $(SAIO_OBJS)
 #	rm -f $(SYMROOT)/$@

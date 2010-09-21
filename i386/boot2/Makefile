@@ -54,7 +54,10 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
-all embedtheme: $(DIRS_NEEDED) boot
+
+optionrom: CFLAGS += -DOPTION_ROM
+
+all embedtheme optionrom: $(DIRS_NEEDED) boot
 
 boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \

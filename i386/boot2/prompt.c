@@ -38,9 +38,11 @@ char bootPrompt[] =
     "  Type ? and press Enter to learn about advanced startup options\n\n"
     "boot: ";
 
+#ifndef OPTION_ROM
 char bootRescanPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"
     "  Press F5 after you swapped the media. The drive will be rescanned.\n"
     "  Type -v and press Enter to start up with diagnostic messages\n"
     "  Type ? and press Enter to learn about advanced startup options\n\n"
     "boot: ";
+#endif
