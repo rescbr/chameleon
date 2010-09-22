@@ -676,7 +676,7 @@ void patch_commpage_stuff_routine(void* kernelData)
 	kernSymbols_t *symbol = lookup_kernel_symbol("_commpage_stuff_routine");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_commpage_stuff_routine");
+		//printf("Unable to locate %s\n", "_commpage_stuff_routine");
 		return;
 		
 	}

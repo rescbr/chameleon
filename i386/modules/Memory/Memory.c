@@ -43,4 +43,5 @@ void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	}
 	scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
 	scan_spd(&Platform);
+
 }

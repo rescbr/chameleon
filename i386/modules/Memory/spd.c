@@ -71,13 +71,19 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
+	printf("smb_read_byte_intel\n");
     int l1, h1, l2, h2;
     unsigned long long t;
 	
     outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
     outb(base + SMBHSTDAT, 0xff);
 	
-    while( inb(base + SMBHSTSTS) & 0x01);			// wait until ready
+    while( inb(base + SMBHSTSTS) & 0x01)
+	{
+		rdtsc(l2, h2);
+		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
+		if(t > 50) return 0xFF;	// hack, exit if unresponsive.
+	}
 	
     outb(base + SMBHSTCMD, cmd);
     outb(base + SMBHSTADD, (adr << 1) | 0x01 );
@@ -261,11 +267,12 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	char spdbuf[256];
 
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
+		DBG("Scanning slot %d\n", i);
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
         // Check spd is present
         if (spd_size && (spd_size != 0xff) ) {
-
+			printf("SPD is present\n");
 			slot->spd = spdbuf;
             slot->InUse = true;
 
@@ -331,7 +338,6 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                     getc();
             }
         }
-
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
         Platform.DMI.DIMM[i]= 
             i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.MaxMemorySlots==2 ? 
@@ -367,7 +373,7 @@ bool find_and_read_smbus_controller(pci_dt_t* pci_dt)
     int i;
 
     while (current) {
-#if 0
+#if DEBUG_SPD
         printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
                current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
                current->class_id, current->vendor_id, current->device_id, 
