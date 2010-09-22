@@ -71,7 +71,6 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
-	printf("smb_read_byte_intel\n");
     int l1, h1, l2, h2;
     unsigned long long t;
 	
@@ -272,7 +271,6 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
         // Check spd is present
         if (spd_size && (spd_size != 0xff) ) {
-			printf("SPD is present\n");
 			slot->spd = spdbuf;
             slot->InUse = true;
 
