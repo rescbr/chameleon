@@ -18,6 +18,10 @@
 #include "sl.h"
 #include "modules.h"
 
+#ifdef static
+#undef static
+#endif
+
 extern struct SMBEntryPoint * getSmbios(int which); // now cached
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
@@ -462,10 +466,9 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 /*
  * Get the SystemID from the bios dmi info
  */
-
+static EFI_CHAR8		 uuid[UUID_LEN];
 static	EFI_CHAR8* getSmbiosUUID()
 {
-	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
 	struct SMBEntryPoint	*smbios;
 	SMBByte					*p;
@@ -654,7 +657,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	{
 		verbose("No SMBIOS replacement found.\n");
 	}
-
+	
 	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,
 	// as opposed to when it was in scan_platform(); also load the orig. smbios so that we can access dmi info without
 	// patching the smbios yet

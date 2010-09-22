@@ -18,6 +18,7 @@
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
 
+void showTextBuffer(char *buf, int size);
 int GUI_initGraphicsMode ();
 int GUI_countdown( const char * msg, int row, int timeout );
 #define CHARACTERS_COUNT	223

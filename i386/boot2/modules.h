@@ -11,7 +11,7 @@
 // There is a bug with the module system / rebasing / binding
 // that causes static variables to be incorrectly rebased or bound
 // Disable static variables for the moment
-#define static
+// #define static
 
 #ifndef __BOOT_MODULES_H
 #define __BOOT_MODULES_H

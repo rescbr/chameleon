@@ -20,7 +20,7 @@ void ACPIPatcher_setupEfiConfigurationTable_hook(void* binary, void* arg2, void*
 
 void ACPIPatcher_start()
 {
-	replace_function("getPciRootUID", &ACPIPatcher_getPciRootUID);
+	replace_function("_getPciRootUID", &ACPIPatcher_getPciRootUID);
 	register_hook_callback("setupEfiConfigurationTable", &ACPIPatcher_setupEfiConfigurationTable_hook);
 }
 

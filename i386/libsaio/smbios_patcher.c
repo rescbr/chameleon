@@ -493,7 +493,7 @@ static struct SMBEntryPoint *getAddressOfSmbiosTable(void)
                 COMPARE_DWORD(smbios->dmi.anchor, DMITAG) &&
                 smbios->dmi.anchor[4]==DMITAG[4] &&
                 checksum8(smbios, sizeof(struct SMBEntryPoint)) == 0)
-	    {
+	    {			
                 return smbios;
 	    }
             smbios = (struct SMBEntryPoint*) ( ((char*) smbios) + 16 );
