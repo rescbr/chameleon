@@ -58,6 +58,12 @@ void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4
 	{
 		drawBootGraphics();
 	}
+	else
+	{
+		setVideoMode( GRAPHICS_MODE, 0 );
+		
+	}
+
 	
 }
 
