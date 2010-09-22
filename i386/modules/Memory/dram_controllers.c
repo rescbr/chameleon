@@ -470,12 +470,12 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	// RAS-To-CAS (tRCD)
 	Platform.RAM.TRC = (mc_channel_bank_timing >> 9) & 0xF; 
 	
-	// RAS Precharge (tRP)
-	Platform.RAM.CAS = (mc_channel_bank_timing >> 4) & 0x1F; 
-	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.TRP = mc_channel_bank_timing & 0xF;
+	Platform.RAM.RAS = (mc_channel_bank_timing >> 4) & 0x1F;
 	
+	// RAS Precharge (tRP)
+	Platform.RAM.TRP = mc_channel_bank_timing & 0xF; 
+		
 	// Single , Dual or Triple Channels
 	if (mc_control == 1 || mc_control == 2 || mc_control == 4 )
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
