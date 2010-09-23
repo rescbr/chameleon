@@ -100,7 +100,7 @@ void scan_cpu(PlatformInfo_t *p)
 	maxcoef = maxdiv = currcoef = currdiv = 0;
 
 	/* get cpuid values */
-	for( ; i < 3; i++)
+	for( ; i <= 3; i++)
 	{
 		do_cpuid(i, p->CPU.CPUID[i]);
 	}
