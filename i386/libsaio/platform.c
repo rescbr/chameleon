@@ -53,8 +53,8 @@ void scan_mem() {
 void scan_platform(void)
 {	
 	Platform = malloc(sizeof(Platform));
-	memset(&Platform, 0, sizeof(Platform));
+	memset(Platform, 0, sizeof(Platform));
 	build_pci_dt();
-	scan_cpu(&Platform);
+	scan_cpu(Platform);
 	//scan_mem(); Rek: called after pci devs init in fake_efi now ...
 }
