@@ -1034,16 +1034,21 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 	bvr = bvr1 = NULL;
 
     // Try resolving "rd" and "bt" devices first.
+#ifndef OPTION_ROM
 	if (biosdev == kPseudoBIOSDevRAMDisk)
 	{
 		if (gRAMDiskVolume)
 		    bvr1 = gRAMDiskVolume;
 	}
-	else if (biosdev == kPseudoBIOSDevBooter)
+	else 
+#endif
+	if (biosdev == kPseudoBIOSDevBooter)
 	{
+#ifndef OPTION_ROM
 		if (gRAMDiskVolume != NULL && gRAMDiskBTAliased)
 			bvr1 = gRAMDiskVolume;
 		else
+#endif
 			bvr1 = gBIOSBootVolume;
 	}
 	else

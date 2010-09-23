@@ -141,13 +141,13 @@ static const char* sm_get_defstr(const char * key, int table_num)
 	const SMStrEntryPair*	sm_defaults;
 
 	if (platformCPUFeature(CPU_FEATURE_MOBILE)) {
-		if (Platform.CPU.NoCores > 1) {
+		if (Platform->CPU.NoCores > 1) {
 			sm_defaults=sm_macbookpro_defaults;
 		} else {
 			sm_defaults=sm_macbook_defaults;
 		}
 	} else {
-		switch (Platform.CPU.NoCores) 
+		switch (Platform->CPU.NoCores) 
 		{
 			case 1: 
 				sm_defaults=sm_macmini_defaults; 
@@ -157,11 +157,11 @@ static const char* sm_get_defstr(const char * key, int table_num)
 				break;
 			default:
 			{
-				switch (Platform.CPU.Family) 
+				switch (Platform->CPU.Family) 
 				{
 					case 0x06:
 					{
-						switch (Platform.CPU.Model)
+						switch (Platform->CPU.Model)
 						{
 							case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
 							case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
@@ -204,23 +204,23 @@ static const char* sm_get_defstr(const char * key, int table_num)
 
 static int sm_get_fsb(const char *name, int table_num)
 {
-	return Platform.CPU.FSBFrequency/1000000;
+	return Platform->CPU.FSBFrequency/1000000;
 }
 
 static int sm_get_cpu (const char *name, int table_num)
 {
-	return Platform.CPU.CPUFrequency/1000000;
+	return Platform->CPU.CPUFrequency/1000000;
 }
 
 static int sm_get_bus_speed (const char *name, int table_num)
 {
-	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	if (Platform->CPU.Vendor == 0x756E6547) // Intel
 	{		
-		switch (Platform.CPU.Family) 
+		switch (Platform->CPU.Family) 
 		{
 			case 0x06:
 			{
-				switch (Platform.CPU.Model)
+				switch (Platform->CPU.Model)
 				{
 					case 0x0D: // ?
 					case CPU_MODEL_YONAH:	// Yonah		0x0E
@@ -275,7 +275,7 @@ static int sm_get_bus_speed (const char *name, int table_num)
 						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
 						qpimult &= 0x7F;
 						DBG("qpimult %d\n", qpimult);
-						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
+						qpibusspeed = (qpimult * 2 * (Platform->CPU.FSBFrequency/1000000));
 						// Rek: rounding decimals to match original mac profile info
 						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
 						DBG("qpibusspeed %d\n", qpibusspeed);
@@ -290,11 +290,11 @@ static int sm_get_bus_speed (const char *name, int table_num)
 
 static int sm_get_simplecputype()
 {
-	if (Platform.CPU.NoCores >= 4) 
+	if (Platform->CPU.NoCores >= 4) 
 	{
 		return 0x0501;   // Quad-Core Xeon
 	}
-	else if (Platform.CPU.NoCores == 1) 
+	else if (Platform->CPU.NoCores == 1) 
 	{
 		return 0x0201;   // Core Solo
 	};
@@ -306,18 +306,18 @@ static int sm_get_cputype (const char *name, int table_num)
 {
 	static bool done = false;		
 		
-	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	if (Platform->CPU.Vendor == 0x756E6547) // Intel
 	{
 		if (!done) {
-			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, Platform.CPU.Family, Platform.CPU.Model);
+			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform->CPU.BrandString, Platform->CPU.Family, Platform->CPU.Model);
 			done = true;
 		}
 		
-		switch (Platform.CPU.Family) 
+		switch (Platform->CPU.Family) 
 		{
 			case 0x06:
 			{
-				switch (Platform.CPU.Model)
+				switch (Platform->CPU.Model)
 				{
 					case 0x0D: // ?
 					case CPU_MODEL_YONAH: // Yonah
@@ -330,19 +330,19 @@ static int sm_get_cputype (const char *name, int table_num)
 						return 0x0701; // Core i7
 						
 					case CPU_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x701; // Core i7
 						
 					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x0701; // Core i7
 						
 					case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						if (strstr(Platform->CPU.BrandString, "Core(TM) i3"))
 							return 0x901; // Core i3
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x0701; // Core i7
 						
@@ -365,10 +365,10 @@ static int sm_get_memtype (const char *name, int table_num)
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform.DMI.DIMM[table_num];
-		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Type != 0) {
-                    DBG("RAM Detected Type = %d\n", Platform.RAM.DIMM[map].Type);
-                    return Platform.RAM.DIMM[map].Type;
+		map = Platform->DMI.DIMM[table_num];
+		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0) {
+                    DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
+                    return Platform->RAM.DIMM[map].Type;
 		}
 	}
 	
@@ -380,10 +380,10 @@ static int sm_get_memspeed (const char *name, int table_num)
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform.DMI.DIMM[table_num];
-		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Frequency != 0) {
-                    DBG("RAM Detected Freq = %d Mhz\n", Platform.RAM.DIMM[map].Frequency);
-                    return Platform.RAM.DIMM[map].Frequency;
+		map = Platform->DMI.DIMM[table_num];
+		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0) {
+                    DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
+                    return Platform->RAM.DIMM[map].Frequency;
 		}
 	}
 
@@ -395,10 +395,10 @@ static const char *sm_get_memvendor (const char *name, int table_num)
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform.DMI.DIMM[table_num];
-		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].Vendor) > 0) {
-			DBG("RAM Detected Vendor[%d]='%s'\n", table_num, Platform.RAM.DIMM[map].Vendor);
-			return Platform.RAM.DIMM[map].Vendor;
+		map = Platform->DMI.DIMM[table_num];
+		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].Vendor) > 0) {
+			DBG("RAM Detected Vendor[%d]='%s'\n", table_num, Platform->RAM.DIMM[map].Vendor);
+			return Platform->RAM.DIMM[map].Vendor;
 		}
 	}
 	return "N/A";
@@ -409,11 +409,11 @@ static const char *sm_get_memserial (const char *name, int table_num)
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform.DMI.DIMM[table_num];
-		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].SerialNo) > 0) {
+		map = Platform->DMI.DIMM[table_num];
+		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].SerialNo) > 0) {
                     DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
-                        map, table_num, Platform.RAM.DIMM[map].SerialNo);
-                    return Platform.RAM.DIMM[map].SerialNo;
+                        map, table_num, Platform->RAM.DIMM[map].SerialNo);
+                    return Platform->RAM.DIMM[map].SerialNo;
 		}
 	}
 	return "N/A";
@@ -424,10 +424,10 @@ static const char *sm_get_mempartno (const char *name, int table_num)
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform.DMI.DIMM[table_num];
-		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].PartNo) > 0) {
-			DBG("Ram Detected PartNo[%d]='%s'\n", table_num, Platform.RAM.DIMM[map].PartNo);
-			return Platform.RAM.DIMM[map].PartNo;
+		map = Platform->DMI.DIMM[table_num];
+		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].PartNo) > 0) {
+			DBG("Ram Detected PartNo[%d]='%s'\n", table_num, Platform->RAM.DIMM[map].PartNo);
+			return Platform->RAM.DIMM[map].PartNo;
 		}
 	}
 	return "N/A";

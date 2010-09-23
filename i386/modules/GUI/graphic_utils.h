@@ -12,6 +12,9 @@
 #include "boot.h"
 
 
+char *getVBEInfoString();
+
+
 typedef union {
     struct {
         uint8_t b;

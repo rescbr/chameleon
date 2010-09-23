@@ -215,7 +215,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x00, 0x00, 0x00, 0x79, 0x00
 	};
 
-	if (Platform.CPU.Vendor != 0x756E6547) {
+	if (Platform->CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
 	}
@@ -340,12 +340,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		0x31, 0x03, 0x10, 0x20,							/* 1.._		*/
 	};
 	
-	if (Platform.CPU.Vendor != 0x756E6547) {
+	if (Platform->CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: P-States will not be generated !!!\n");
 		return NULL;
 	}
 	
-	if (!(Platform.CPU.Features & CPU_FEATURE_MSR)) {
+	if (!(Platform->CPU.Features & CPU_FEATURE_MSR)) {
 		verbose ("Unsupported CPU: P-States will not be generated !!!\n");
 		return NULL;
 	}
@@ -359,10 +359,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		uint8_t p_states_count = 0;		
 		
 		// Retrieving P-States, ported from code by superhai (c)
-		switch (Platform.CPU.Family) {
+		switch (Platform->CPU.Family) {
 			case 0x06: 
 			{
-				switch (Platform.CPU.Model) 
+				switch (Platform->CPU.Model) 
 				{
 					case 0x0D: // ?
 					case CPU_MODEL_YONAH: // Yonah
@@ -474,7 +474,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 								uint32_t multiplier = p_states[i].FID & 0x1f;		// = 0x08
 								bool half = p_states[i].FID & 0x40;					// = 0x01
 								bool dfsb = p_states[i].FID & 0x80;					// = 0x00
-								uint32_t fsb = Platform.CPU.FSBFrequency / 1000000; // = 400
+								uint32_t fsb = Platform->CPU.FSBFrequency / 1000000; // = 400
 								uint32_t halffsb = (fsb + 1) >> 1;					// = 200
 								uint32_t frequency = (multiplier * fsb);			// = 3200
 								
@@ -568,7 +568,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 	
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
+	if (Platform->CPU.Vendor == 0x756E6547) {	/* Intel */
 		fix_restart = true;
 		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
 	} else {
@@ -594,28 +594,28 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Determine system type / PM_Model
 	if ( (value=getStringForKey(kSystemType, &bootInfo->bootConfig))!=NULL)
 	{
-		if (Platform.Type > 6)  
+		if (Platform->Type > 6)  
 		{
 			if(fadt_mod->PM_Profile<=6)
-				Platform.Type = fadt_mod->PM_Profile; // get the fadt if correct
+				Platform->Type = fadt_mod->PM_Profile; // get the fadt if correct
 			else 
-				Platform.Type = 1;		/* Set a fixed value (Desktop) */
-			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
+				Platform->Type = 1;		/* Set a fixed value (Desktop) */
+			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform->Type);
 		}
 		else
-			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
+			Platform->Type = (unsigned char) strtoul(value, NULL, 10);
 	}
 	// Set PM_Profile from System-type if only user wanted this value to be forced
-	if (fadt_mod->PM_Profile != Platform.Type) 
+	if (fadt_mod->PM_Profile != Platform->Type) 
 	{
 	    if (value) 
 		{ // user has overriden the SystemType so take care of it in FACP
-			verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
-			fadt_mod->PM_Profile = Platform.Type;
+			verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform->Type);
+			fadt_mod->PM_Profile = Platform->Type;
 	    }
 	    else
 	    { // PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
-			Platform.Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
+			Platform->Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
 	    }  
 	}
 	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()

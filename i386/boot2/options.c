@@ -449,6 +449,7 @@ static const char * extractKernelName( char ** cpp )
     return kn;
 }
 
+#ifndef OPTION_ROM
 //==========================================================================
 
 void printMemoryInfo(void)
@@ -506,7 +507,6 @@ char *getMemoryInfoString()
     }
 	return buff;
 }
-
 //==========================================================================
 
 void lspci(void)
@@ -525,6 +525,7 @@ void lspci(void)
 		setActiveDisplayPage(0);
 	}
 }
+#endif
 
 //==========================================================================
 
@@ -613,7 +614,6 @@ int getBootOptions(bool firstRun)
 	if (!(gBootMode & kBootModeQuiet)) {
 		// Display banner and show hardware info.
 		printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
-		printf(getVBEInfoString());
 	}
 	changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
 	verbose("Scanning device %x...", gBIOSDev);
@@ -761,11 +761,15 @@ int getBootOptions(bool firstRun)
 					/*
 					 * TODO: this needs to be refactored.
 					 */
+#ifndef OPTION_ROM
+#ifdef UNUSED
 					if (strcmp( booterCommand, "video" ) == 0)
 					{
 						printVBEModeInfo();
-					} 
-					else if ( strcmp( booterCommand, "memory" ) == 0) 
+					}
+					else
+#endif
+					if ( strcmp( booterCommand, "memory" ) == 0) 
 					{
 						printMemoryInfo();
 					}
@@ -773,7 +777,6 @@ int getBootOptions(bool firstRun)
 					{
 						lspci();
 					} 
-#ifndef OPTION_ROM
 					else if (strcmp(booterCommand, "more") == 0) 
 					{
 						showTextFile(booterParam);

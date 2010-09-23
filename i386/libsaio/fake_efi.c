@@ -519,8 +519,9 @@ static EFI_CHAR8* getSystemID()
 	
 	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
 		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
-	
+#ifndef OPTION_ROM
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
+#endif
 	return ret;
 }
 
@@ -535,7 +536,7 @@ void setupSystemType()
 	if (node == 0) stop("Couldn't get root node");
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
-	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
+	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform->Type), &Platform->Type);
 }
 
 void setupEfiDeviceTree(void)
@@ -597,15 +598,15 @@ void setupEfiDeviceTree(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 	
-	if (Platform.CPU.FSBFrequency != 0)
-		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
+	if (Platform->CPU.FSBFrequency != 0)
+		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);
 	
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform.CPU.TSCFrequency != 0)
-		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
+	if (Platform->CPU.TSCFrequency != 0)
+		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform->CPU.TSCFrequency);
 	
-	if (Platform.CPU.CPUFrequency != 0)
-		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
+	if (Platform->CPU.CPUFrequency != 0)
+		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform->CPU.CPUFrequency);
 	
 	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
 	if ((ret=getSystemID()))

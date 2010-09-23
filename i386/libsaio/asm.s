@@ -418,6 +418,7 @@ LABEL(__switch_stack)
     ret
 
 #ifndef BOOT1
+#if UNUSED
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // loader()
 //
@@ -458,6 +459,7 @@ LABEL(_loader)
     popal
     leave
     ret
+#endif
 #endif
 
 #if UNUSED

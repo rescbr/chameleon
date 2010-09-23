@@ -13,7 +13,7 @@
 #include "mem.h"
 #include "modules.h"
 
-pci_dt_t *dram_controller_dev;
+pci_dt_t * dram_controller_dev = NULL;
 
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4);

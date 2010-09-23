@@ -1920,6 +1920,7 @@ int diskRead( BVRef bvr, long addr, long length )
 					 length,
 					 (void *) addr );
 }
+#ifndef OPTION_ROM
 
 int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
 {
@@ -1995,7 +1996,7 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
 	
     return 0;
 }
-
+#endif
 
 int diskIsCDROM(BVRef bvr)
 {

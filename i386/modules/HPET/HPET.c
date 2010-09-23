@@ -1,10 +1,12 @@
 /*
- * Force HPET enabled
+ * Copyright (c) 2009 Evan Lojewski. All rights reserved.
  *
- * via fix from http://forum.voodooprojects.org/index.php/topic,1596.0.html
  */
 
 #include "libsaio.h"
+#include "modules.h"
+#include "boot.h"
+#include "bootstruct.h"
 #include "pci.h"
 #include "hpet.h"
 
@@ -20,6 +22,32 @@
 
 void force_enable_hpet_intel(pci_dt_t *lpc_dev);
 void force_enable_hpet_via(pci_dt_t *lpc_dev);
+
+
+void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	pci_dt_t* current = arg1;
+	
+	if(current->class_id != PCI_CLASS_BRIDGE_ISA) return;
+	
+	
+	bool do_enable_hpet = false;
+	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
+
+	if (do_enable_hpet)
+		force_enable_hpet(current);
+}
+
+void HPET_start()
+{
+	register_hook_callback("PCIDevice", &HPET_hook);
+}
+
+/*
+ * Force HPET enabled
+ *
+ * via fix from http://forum.voodooprojects.org/index.php/topic,1596.0.html
+ */
 
 static struct lpc_controller_t lpc_controllers_intel[] = {
 	
@@ -58,7 +86,7 @@ static struct lpc_controller_t lpc_controllers_intel[] = {
 static struct lpc_controller_t lpc_controllers_via[] = {
 	// Default unknown chipset
 	{ 0, 0, "" },
-
+	
 	{ 0x1106, 0x3372, "VT8237S" },
 };
 
@@ -87,7 +115,7 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 {
 	uint32_t	val, hpet_address = 0xFED00000;
 	int i;
-
+	
 	/* LPC on Intel ICH is always (?) at 00:1f.0 */
 	for(i = 1; i < sizeof(lpc_controllers_via) / sizeof(lpc_controllers_via[0]); i++)
 	{

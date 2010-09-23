@@ -9,12 +9,14 @@
 #include "multiboot.h"
 #include "ramdisk.h"
 
+#ifndef OPTION_ROM
 struct multiboot_info * gRAMDiskMI = NULL;
 
 // gRAMDiskVolume holds the bvr for the mounted ramdisk image.
 BVRef gRAMDiskVolume = NULL;
 bool gRAMDiskBTAliased = false;
 char gRAMDiskFile[512];
+#endif
 
 // Notify OS X that a ramdisk has been setup. XNU with attach this to /dev/md0
 void md0Ramdisk()

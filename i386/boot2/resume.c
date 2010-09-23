@@ -159,7 +159,9 @@ void HibernateBoot(char *image_filename)
 		uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
 			
 		ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader), preview_offset+header->previewSize);
+#ifndef OPTION_ROM
 		drawPreview ((void *)(long)(buffer+preview_offset + header->previewPageListSize), &(progressSaveUnder[0][0]));
+#endif
 		previewTotalSectors = (imageSize-(preview_offset+header->previewSize))/512;
 		previewLoadedSectors = 0;
 		previewSaveunder = &(progressSaveUnder[0][0]);

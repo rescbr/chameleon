@@ -35,7 +35,9 @@ char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386
 char bootPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"
     "  Type -v and press Enter to start up with diagnostic messages\n"
+#ifndef OPTION_ROM
     "  Type ? and press Enter to learn about advanced startup options\n\n"
+#endif
     "boot: ";
 
 #ifndef OPTION_ROM

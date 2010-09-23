@@ -21,7 +21,7 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-
+#ifndef OPTION_ROM
 #include "libsaio.h"
 
 /*  This NBP code is pretty useless because it just blindly calls INT 2B.
@@ -134,7 +134,6 @@ BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
     return gNetBVR;
 }
 #else
-#ifndef OPTION_ROM
 BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
 {
     return NULL;

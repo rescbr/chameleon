@@ -11,6 +11,8 @@
 #include "acpi_patcher.h"
 
 int ACPIPatcher_getPciRootUID(void);
+unsigned int findpciroot(unsigned char * dsdt,int len);
+static unsigned int findrootuid(unsigned char * dsdt, int len);
 
 void ACPIPatcher_setupEfiConfigurationTable_hook(void* binary, void* arg2, void* arg3, void* arg4)
 {
@@ -93,4 +95,29 @@ int ACPIPatcher_getPciRootUID(void)
 out:
 	verbose("Using PCI-Root-UID value: %d\n", ACPIPatcher_rootuid);
 	return ACPIPatcher_rootuid;
+}
+
+unsigned int findpciroot(unsigned char * dsdt,int len)
+{
+	int i;
+	
+	for (i=0; i<len-4; i++) {
+		if(dsdt[i] == 'P' && dsdt[i+1] == 'C' && dsdt[i+2] == 'I' && (dsdt[i+3] == 0x08 || dsdt [i+4] == 0x08)) {
+			return findrootuid(dsdt+i, len-i);
+		}
+	}
+	return 10;
+}
+
+static unsigned int findrootuid(unsigned char * dsdt, int len)
+{
+	int i;
+	for (i=0; i<64 && i<len-5; i++) //not far than 64 symbols from pci root 
+	{
+		if(dsdt[i] == '_' && dsdt[i+1] == 'U' && dsdt[i+2] == 'I' && dsdt[i+3] == 'D' && dsdt[i+5] == 0x08)
+		{
+			return dsdt[i+4];
+		}
+	}
+	return 11;
 }

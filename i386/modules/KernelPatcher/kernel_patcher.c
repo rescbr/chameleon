@@ -7,7 +7,7 @@
 #include "kernel_patcher.h"
 #include "platform.h"
 #include "modules.h"
-extern PlatformInfo_t    Platform;
+extern PlatformInfo_t*    Platform;
 
 patchRoutine_t* patches = NULL;
 kernSymbols_t* kernelSymbols = NULL;
@@ -57,16 +57,16 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 	// AKA, don't at 64bit patches if it's a 32bit only machine
 	patchRoutine_t* entry;
 	
-	// TODO: verify Platform.CPU.Model is populated this early in bootup
+	// TODO: verify Platform->CPU.Model is populated this early in bootup
 	// Check to ensure that the patch is valid on this machine
 	// If it is not, exit early form this function
-	if(cpus != Platform.CPU.Model)
+	if(cpus != Platform->CPU.Model)
 	{
 		if(cpus != CPUID_MODEL_ANY)
 		{
 			if(cpus == CPUID_MODEL_UNKNOWN)
 			{
-				switch(Platform.CPU.Model)
+				switch(Platform->CPU.Model)
 				{
 					case 13:
 					case CPUID_MODEL_YONAH:
@@ -240,7 +240,7 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
  **/
 void patch_cpuid_set_info_all(void* kernelData)
 {
-	switch(Platform.CPU.Model)
+	switch(Platform->CPU.Model)
 	{
 		case CPUID_MODEL_ATOM:
 			if(determineKernelArchitecture(kernelData) == KERNEL_32)

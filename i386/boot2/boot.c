@@ -76,8 +76,6 @@ int     bvCount = 0;
 //int	menucount = 0;
 int     gDeviceCount = 0; 
 
-bool	recoveryMode = false;
-
 BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;
@@ -86,7 +84,9 @@ BVRef   bvChain;
 static unsigned long Adler32(unsigned char *buffer, long length);
 static bool getOSVersion(char *str);
 
+#ifndef OPTION_ROM
 static bool gUnloadPXEOnExit = false;
+#endif
 
 /*
  * How long to wait (in seconds) to load the
@@ -184,9 +184,7 @@ static int ExecKernel(void *binary)
 		printf("Press any key to continue...");
 		getc();
 	}
-	
-	usb_loop();
-	
+		
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
     // verbose mode.
@@ -203,9 +201,7 @@ static int ExecKernel(void *binary)
 	setupBooterLog();
 	
     finalizeBootStruct();
-    
-	usb_loop();
-	
+    	
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
 	// Jump to kernel's entry point. There's no going back now.

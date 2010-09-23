@@ -7,6 +7,7 @@
 
 #include "convert.h"
 
+#ifndef OPTION_ROM
 /** Transform a 16 bytes hexadecimal value UUID to a string */
 const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 {
@@ -20,7 +21,7 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 		    uuid[12],uuid[13],uuid[14],uuid[15]);
   return msg ;
 }
-
+#endif
 /** Parse an UUID string into an (EFI_CHAR8*) buffer */
 EFI_CHAR8*  getUUIDFromString(const char *source)
 {

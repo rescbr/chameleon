@@ -159,9 +159,9 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 	DBG("mch_ratio %d\n", mch_ratio);
 
 	// Compute RAM Frequency
-	Platform.RAM.Frequency = (Platform.CPU.FSBFrequency * mch_ratio) / 100000;
+	Platform->RAM.Frequency = (Platform->CPU.FSBFrequency * mch_ratio) / 100000;
 	
-	DBG("ram_fsb %d\n", Platform.RAM.Frequency);
+	DBG("ram_fsb %d\n", Platform->RAM.Frequency);
 
 }
 
@@ -231,7 +231,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 	}
 	
 	// Compute RAM Frequency
-	Platform.RAM.Frequency = (Platform.CPU.FSBFrequency * mch_ratio) / 100000;
+	Platform->RAM.Frequency = (Platform->CPU.FSBFrequency * mch_ratio) / 100000;
 }
 
 
@@ -245,7 +245,7 @@ static void get_fsb_nhm(pci_dt_t *dram_dev)
 	mch_ratio = (mc_dimm_clk_ratio & 0x1F);
 	
 	// Compute RAM Frequency
-	Platform.RAM.Frequency = Platform.CPU.FSBFrequency * mch_ratio / 2;
+	Platform->RAM.Frequency = Platform->CPU.FSBFrequency * mch_ratio / 2;
 }
  
 /*
@@ -290,24 +290,24 @@ static void get_timings_i965(pci_dt_t *dram_dev)
 	Misc_Register = *ptr & 0xFFFFFFFF;
 	
 	// 965 Series only support DDR2
-	Platform.RAM.Type = SMB_MEM_TYPE_DDR2;
+	Platform->RAM.Type = SMB_MEM_TYPE_DDR2;
 	
 	// CAS Latency (tCAS)
-	Platform.RAM.CAS = ((ODT_Control_Register >> 17) & 7) + 3;
+	Platform->RAM.CAS = ((ODT_Control_Register >> 17) & 7) + 3;
 	
 	// RAS-To-CAS (tRCD)
-	Platform.RAM.TRC = (Read_Register >> 16) & 0xF;
+	Platform->RAM.TRC = (Read_Register >> 16) & 0xF;
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.TRP = (ACT_Register >> 13) & 0xF;
+	Platform->RAM.TRP = (ACT_Register >> 13) & 0xF;
 	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.RAS = (Precharge_Register >> 11) & 0x1F;
+	Platform->RAM.RAS = (Precharge_Register >> 11) & 0x1F;
 	
 	if ((c0ckectrl >> 20 & 0xF) && (c1ckectrl >> 20 & 0xF))
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 	else
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
 }
 
 // Get im965 Memory Timings
@@ -337,24 +337,24 @@ static void get_timings_im965(pci_dt_t *dram_dev)
 	Precharge_Register = *ptr & 0xFFFFFFFF;
 	
 	// Series only support DDR2
-	Platform.RAM.Type = SMB_MEM_TYPE_DDR2;
+	Platform->RAM.Type = SMB_MEM_TYPE_DDR2;
 	
 	// CAS Latency (tCAS)
-	Platform.RAM.CAS = ((ODT_Control_Register >> 23) & 7) + 3;
+	Platform->RAM.CAS = ((ODT_Control_Register >> 23) & 7) + 3;
 	
 	// RAS-To-CAS (tRCD)
-	Platform.RAM.TRC = ((Precharge_Register >> 5) & 7) + 2;
+	Platform->RAM.TRC = ((Precharge_Register >> 5) & 7) + 2;
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.TRP= (Precharge_Register & 7) + 2;
+	Platform->RAM.TRP= (Precharge_Register & 7) + 2;
 	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.RAS = (Precharge_Register >> 21) & 0x1F;
+	Platform->RAM.RAS = (Precharge_Register >> 21) & 0x1F;
 	
 	if ((c0ckectrl >> 20 & 0xF) && (c1ckectrl >> 20 & 0xF)) 
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 	else
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
 }
 
 // Get P35 Memory Timings
@@ -413,30 +413,30 @@ static void get_timings_p35(pci_dt_t *dram_dev)
 	
 	// Determine DDR-II or DDR-III
 	if (Memory_Check & 1)
-		Platform.RAM.Type = SMB_MEM_TYPE_DDR2;
+		Platform->RAM.Type = SMB_MEM_TYPE_DDR2;
 	else
-		Platform.RAM.Type = SMB_MEM_TYPE_DDR3;
+		Platform->RAM.Type = SMB_MEM_TYPE_DDR3;
 	
 	// CAS Latency (tCAS)
 	if(dram_dev->device_id > 0x2E00)
-		Platform.RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 6;
+		Platform->RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 6;
 	else
-		Platform.RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 9;
+		Platform->RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 9;
 	
 	// RAS-To-CAS (tRCD)
-	Platform.RAM.TRC = (Read_Register >> 17) & 0xF;
+	Platform->RAM.TRC = (Read_Register >> 17) & 0xF;
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.TRP = (ACT_Register >> 13) & 0xF;
+	Platform->RAM.TRP = (ACT_Register >> 13) & 0xF;
 	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.RAS = Precharge_Register & 0x3F;
+	Platform->RAM.RAS = Precharge_Register & 0x3F;
 	
 	// Channel configuration
 	if (((c0ckectrl >> 20) & 0xF) && ((c1ckectrl >> 20) & 0xF)) 
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 	else
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
 }
 
 // Get Nehalem Memory Timings
@@ -450,7 +450,7 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	mc_control = (mc_control >> 8) & 0x7;
 	
 	// DDR-III
-	Platform.RAM.Type = SMB_MEM_TYPE_DDR3;
+	Platform->RAM.Type = SMB_MEM_TYPE_DDR3;
 	
 	// Get the first valid channel
 	if(mc_control & 1)
@@ -465,24 +465,24 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	mc_channel_mrs_value = pci_config_read32(PCIADDR(nhm_bus, fvc_bn, 0), 0x70);
 	
 	// CAS Latency (tCAS)
-	Platform.RAM.CAS = ((mc_channel_mrs_value >> 4) & 0xF ) + 4;
+	Platform->RAM.CAS = ((mc_channel_mrs_value >> 4) & 0xF ) + 4;
 	
 	// RAS-To-CAS (tRCD)
-	Platform.RAM.TRC = (mc_channel_bank_timing >> 9) & 0xF; 
+	Platform->RAM.TRC = (mc_channel_bank_timing >> 9) & 0xF; 
 	
 	// RAS Active to precharge (tRAS)
-	Platform.RAM.RAS = (mc_channel_bank_timing >> 4) & 0x1F;
+	Platform->RAM.RAS = (mc_channel_bank_timing >> 4) & 0x1F;
 	
 	// RAS Precharge (tRP)
-	Platform.RAM.TRP = mc_channel_bank_timing & 0xF; 
+	Platform->RAM.TRP = mc_channel_bank_timing & 0xF; 
 		
 	// Single , Dual or Triple Channels
 	if (mc_control == 1 || mc_control == 2 || mc_control == 4 )
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
 	else if (mc_control == 7)
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_TRIPLE;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_TRIPLE;
 	else
-		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 }
 
 static struct mem_controller_t dram_controllers[] = {
@@ -552,10 +552,10 @@ void scan_dram_controller(pci_dt_t *dram_dev)
 				dram_controllers[i].poll_speed(dram_dev);
 
 			verbose("Frequency detected: %d MHz (%d) %s Channel %d-%d-%d-%d\n", 
-						(uint32_t)Platform.RAM.Frequency / 1000000,
-						(uint32_t)Platform.RAM.Frequency / 500000,
-						memory_channel_types[Platform.RAM.Channels],
-						Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS
+						(uint32_t)Platform->RAM.Frequency / 1000000,
+						(uint32_t)Platform->RAM.Frequency / 500000,
+						memory_channel_types[Platform->RAM.Channels],
+						Platform->RAM.CAS, Platform->RAM.TRC, Platform->RAM.TRP, Platform->RAM.RAS
 				   );
 			
 		}	
