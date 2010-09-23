@@ -92,6 +92,7 @@ static uint64_t measure_tsc_frequency(void)
 
 void scan_cpu(PlatformInfo_t *p)
 {
+	int i = 0;
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
 	uint64_t	msr, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, currdiv;
@@ -99,10 +100,11 @@ void scan_cpu(PlatformInfo_t *p)
 	maxcoef = maxdiv = currcoef = currdiv = 0;
 
 	/* get cpuid values */
-	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
-	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]);
-	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]);
-	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]);
+	for( ; i < 3; i++)
+	{
+		do_cpuid(i, p->CPU.CPUID[i]);
+	}
+	
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
 	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1) {
@@ -177,19 +179,28 @@ void scan_cpu(PlatformInfo_t *p)
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
-	if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
-		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
+	if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
+		((p->CPU.Family == 0x06) || 
+		 (p->CPU.Family == 0x0f)))
+	{
+		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || 
+			(p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))
+		{
 			/* Nehalem CPU model */
-			if (p->CPU.Family == 0x06 && (p->CPU.Model == 0x1a || p->CPU.Model == 0x1e
-			 || p->CPU.Model == 0x1f || p->CPU.Model == 0x25 || p->CPU.Model == 0x2c)) {
+			if (p->CPU.Family == 0x06 && (p->CPU.Model == 0x1a || p->CPU.Model == 0x1e ||
+										  p->CPU.Model == 0x1f || p->CPU.Model == 0x25 ||
+										  p->CPU.Model == 0x2c)) 
+			{
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
 				currcoef = (msr >> 8) & 0xff;
 				msr = rdmsr64(MSR_FLEX_RATIO);
 				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
-				if ((msr >> 16) & 0x01) {
+				if ((msr >> 16) & 0x01)
+				{
 					flex_ratio = (msr >> 8) & 0xff;
-					if (currcoef > flex_ratio) {
+					if (currcoef > flex_ratio) 
+					{
 						currcoef = flex_ratio;
 					}
 				}
@@ -198,7 +209,9 @@ void scan_cpu(PlatformInfo_t *p)
 					fsbFrequency = (tscFrequency / currcoef);
 				}
 				cpuFrequency = tscFrequency;
-			} else {
+			} 
+			else
+			{
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
 				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
 				currcoef = (msr >> 8) & 0x1f;
@@ -207,25 +220,36 @@ void scan_cpu(PlatformInfo_t *p)
 				/* Non-integer bus ratio for the current-multi (undocumented)*/
 				currdiv = (msr >> 14) & 0x01;
 
-				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f)) // This will always be model >= 3
+				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || 
+					(p->CPU.Family == 0x0f)) // This will always be model >= 3
 				{
 					/* On these models, maxcoef defines TSC freq */
 					maxcoef = (msr >> 40) & 0x1f;
-				} else {
+				} 
+				else 
+				{
 					/* On lower models, currcoef defines TSC freq */
 					/* XXX */
 					maxcoef = currcoef;
 				}
 
-				if (maxcoef) {
-					if (maxdiv) {
+				if (maxcoef) 
+				{
+					if (maxdiv)
+					{
 						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-					} else {
+					}
+					else 
+					{
 						fsbFrequency = (tscFrequency / maxcoef);
 					}
-					if (currdiv) {
+					
+					if (currdiv) 
+					{
 						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-					} else {
+					}
+					else 
+					{
 						cpuFrequency = (fsbFrequency * currcoef);
 					}
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
@@ -233,17 +257,22 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 		}
 		/* Mobile CPU ? */
-		if (rdmsr64(0x17) & (1<<28)) {
+		if (rdmsr64(0x17) & (1<<28))
+		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
 	}
 #if 0
-	else if((p->CPU.Vendor == 0x68747541 /* AMD */) && (p->CPU.Family == 0x0f)) {
-		if(p->CPU.ExtFamily == 0x00 /* K8 */) {
+	else if((p->CPU.Vendor == 0x68747541 /* AMD */) && (p->CPU.Family == 0x0f))
+	{
+		if(p->CPU.ExtFamily == 0x00 /* K8 */)
+		{
 			msr = rdmsr64(K8_FIDVID_STATUS);
 			currcoef = (msr & 0x3f) / 2 + 4;
 			currdiv = (msr & 0x01) * 2;
-		} else if(p->CPU.ExtFamily >= 0x01 /* K10+ */) {
+		} 
+		else if(p->CPU.ExtFamily >= 0x01 /* K10+ */)
+		{
 			msr = rdmsr64(K10_COFVID_STATUS);
 			if(p->CPU.ExtFamily == 0x01 /* K10 */)
 				currcoef = (msr & 0x3f) + 0x10;
@@ -252,11 +281,15 @@ void scan_cpu(PlatformInfo_t *p)
 			currdiv = (2 << ((msr >> 6) & 0x07));
 		}
 
-		if (currcoef) {
-			if (currdiv) {
+		if (currcoef) 
+		{
+			if (currdiv) 
+			{
 				fsbFrequency = ((tscFrequency * currdiv) / currcoef);
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			} else {
+			}
+			else
+			{
 				fsbFrequency = (tscFrequency / currcoef);
 				DBG("%d\n", currcoef);
 			}
@@ -265,7 +298,8 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 	}
 
-	if (!fsbFrequency) {
+	if (!fsbFrequency) 
+	{
 		fsbFrequency = (DEFAULT_FSB * 1000);
 		cpuFrequency = tscFrequency;
 		DBG("0 ! using the default value for FSB !\n");

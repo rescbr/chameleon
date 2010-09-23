@@ -51,7 +51,8 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_FEATURE_EM64T		bit(29)		// 64Bit Support
 #define CPU_FEATURE_HTT			bit(28)		// HyperThreading
 #define CPU_FEATURE_MSR			bit(5)		// MSR Support
-// NOTE: Determine correc tbit for bellow
+
+// NOTE: Determine correct bit for bellow (28 is already in use)
 #define CPU_FEATURE_MOBILE		bit(1)		// Mobile CPU
 
 
