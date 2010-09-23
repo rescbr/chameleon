@@ -48,6 +48,18 @@ void sputc(int c, struct putc_info * pi);
 extern char *msgbuf;
 extern char *cursor;
 
+
+
+
+char GUI_bootRescanPrompt[] =
+"Press Enter to start up Darwin/x86 with no options, or you can:\n"
+"  Press F5 after you swapped the media. The drive will be rescanned.\n"
+"  Type -v and press Enter to start up with diagnostic messages\n"
+"  Type ? and press Enter to learn about advanced startup options\n\n"
+"boot: ";
+
+
+
 /**
  ** The kernel is about to start, draw the boot graphics if we are not in
  ** verbose mode.
@@ -438,7 +450,6 @@ static void GUI_updateBootArgs( int key )
 static void GUI_showBootPrompt(int row, bool visible)
 {
 	extern char bootPrompt[];
-	extern char bootRescanPrompt[];
 	
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
@@ -454,7 +465,7 @@ static void GUI_showBootPrompt(int row, bool visible)
 		{
 			if (gEnableCDROMRescan)
 			{
-				printf( bootRescanPrompt );
+				printf( GUI_bootRescanPrompt );
 			} 
 			else
 			{

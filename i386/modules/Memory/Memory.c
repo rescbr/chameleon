@@ -41,7 +41,7 @@ void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	if (dram_controller_dev!=NULL) {
 		scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
 	}
-	scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
-	scan_spd(&Platform);
+	scan_memory(Platform); // unfortunately still necesary for some comp where spd cant read correct speed
+	scan_spd(Platform);
 
 }

@@ -9,7 +9,7 @@
 
 #include "boot.h"
 #include "bootstruct.h"
-
+#include "vbe.h"
 
 #ifndef __BOOT_GRAPHICS_H
 #define __BOOT_GRAPHICS_H
@@ -43,6 +43,16 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
 int getNumberArrayFromProperty( const char *  propKey,
 						   unsigned long numbers[],
 						   unsigned long maxArrayCount );
+
+
+unsigned short
+getVESAModeWithProperties( unsigned short     width,
+						  unsigned short     height,
+						  unsigned char      bitsPerPixel,
+						  unsigned short     attributesSet,
+						  unsigned short     attributesClear,
+						  VBEModeInfoBlock * outModeInfo,
+						  unsigned short *   vesaVersion );
 
 
 

@@ -279,7 +279,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	
 	
 	
-	UInt32 jumpLocation = 0;
+	//UInt32 jumpLocation = 0;
 	
 	
 	if(symbol == 0 || symbol->addr == 0)

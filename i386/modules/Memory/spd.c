@@ -71,7 +71,10 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
-    int l1, h1, l2, h2;
+    int l1 = 0;
+	int l2 = 0;
+	int h1 = 0;
+	int h2 = 0;
     unsigned long long t;
 	
     outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
