@@ -162,34 +162,16 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 	/* setup features */
-	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_MMX;
-	}
-	if ((bit(25) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_SSE;
-	}
-	if ((bit(26) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_SSE2;
-	}
-	if ((bit(0) & p->CPU.CPUID[CPUID_1][2]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_SSE3;
-	}
-	if ((bit(19) & p->CPU.CPUID[CPUID_1][2]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_SSE41;
-	}
-	if ((bit(20) & p->CPU.CPUID[CPUID_1][2]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_SSE42;
-	}
-	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_EM64T;
-	}
-	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-		p->CPU.Features |= CPU_FEATURE_MSR;
-	}
-	//if ((bit(28) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+	p->CPU.Features |= (CPU_FEATURE_MMX | CPU_FEATURE_SSE | CPU_FEATURE_SSE2 | CPU_FEATURE_MSR) & p->CPU.CPUID[CPUID_1][3];
+	p->CPU.Features |= (CPU_FEATURE_SSE3 | CPU_FEATURE_SSE41 | CPU_FEATURE_SSE42) & p->CPU.CPUID[CPUID_1][2];	
+	p->CPU.Features |= (CPU_FEATURE_EM64T) & p->CPU.CPUID[CPUID_81][3];
+
+
+	//if ((CPU_FEATURE_HTT & p->CPU.CPUID[CPUID_1][3]) != 0) {
 	if (p->CPU.NoThreads > p->CPU.NoCores) {
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
+	 
 
 	tscFrequency = measure_tsc_frequency();
 	fsbFrequency = 0;

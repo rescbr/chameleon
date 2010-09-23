@@ -22,17 +22,12 @@
 #define DBG(x...)
 #endif
 
-PlatformInfo_t    Platform;
-pci_dt_t * dram_controller_dev = NULL;
+PlatformInfo_t*    Platform;
 
 /** Return if a CPU feature specified by feature is activated (true) or not (false)  */
-bool platformCPUFeature(uint32_t feature)
+inline bool platformCPUFeature(uint32_t feature)
 {
-	if (Platform.CPU.Features & feature) {
-		return true;
-	} else {
-		return false;
-	}
+	return (Platform->CPU.Features & feature);
 }
 
 /** scan mem for memory autodection purpose */
@@ -56,7 +51,8 @@ void scan_mem() {
     _before_ bootConfig xml parsing settings are loaded
 */
 void scan_platform(void)
-{
+{	
+	Platform = malloc(sizeof(Platform));
 	memset(&Platform, 0, sizeof(Platform));
 	build_pci_dt();
 	scan_cpu(&Platform);
