@@ -45,7 +45,7 @@ void print_hook_list()
 
 /*
  * Initialize the module system by loading the Symbols.dylib module.
- * Once laoded, locate the _lookup_symbol function so that internal
+ * Once loaded, locate the _lookup_symbol function so that internal
  * symbols can be resolved.
  */
 int init_module_system()
@@ -85,8 +85,9 @@ void load_all_modules()
 	{
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
-			char* tmp = malloc(strlen(name) + 1); // TODO: look into this
+			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
+			
 			DBG("Attempting to load %s\n", tmp);			
 			load_module(tmp);
 		}
@@ -105,6 +106,9 @@ void load_all_modules()
  */
 int load_module(char* module)
 {
+	void (*module_start)(void) = NULL;
+
+	
 	// Check to see if the module has already been loaded
 	if(is_module_loaded(module))
 	{
@@ -127,9 +131,8 @@ int load_module(char* module)
 	
 	unsigned int moduleSize = file_size(fh);
 	char* module_base = (char*) malloc(moduleSize);
-	if (read(fh, module_base, moduleSize) == moduleSize)
+	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
-		void (*module_start)(void) = NULL;
 
 		//printf("Module %s read in.\n", modString);
 
@@ -144,13 +147,14 @@ int load_module(char* module)
 			DBG("Module %s Loaded.\n", module);
 		}
 		else {
+			// The module does not have a valid start function
 			printf("Unable to start %s\n", module);
 			getc();
 		}		
 	}
 	else
 	{
-		printf("Unable to read in module %s\n.", module);
+		DBG("Unable to read in module %s\n.", module);
 		getc();
 	}
 	close(fh);
@@ -349,7 +353,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 		return NULL; // Module is in the incorrect format
 	}*/
 	
-	while(cmd < ((struct mach_header*)binary)->ncmds)	// TODO: for loop instead
+	while(cmd < ((struct mach_header*)binary)->ncmds)
 	{
 		cmd++;
 		
@@ -1037,17 +1041,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	moduleList_t* entry;
-	/*
-	DBG("\%s.dylib Version %d.%d.%d loaded\n"
-		   "\tCompatibility Version: %d.%d.%d\n",
-		   name,
-		   (version >> 16) & 0xFFFF,
-		   (version >> 8) & 0x00FF,
-		   (version >> 0) & 0x00FF,
-		   (compat >> 16) & 0xFFFF,
-		   (compat >> 8) & 0x00FF,
-		   (compat >> 0) & 0x00FF);	
-	*/
+
 	if(loadedModules == NULL)
 	{
 		loadedModules = entry = malloc(sizeof(moduleList_t));
@@ -1123,11 +1117,13 @@ unsigned int lookup_all_symbols(const char* name)
 		}
 
 	}
+#if DEBUG_MODULES
 	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
 	{
-		printf("Unable to locate symbol %s\n", name);
-		getc();
+		verbose("Unable to locate symbol %s\n", name);
+		//getc();
 	}
+#endif
 	return 0xFFFFFFFF;
 }
 
@@ -1225,7 +1221,7 @@ int replace_function(const char* symbol, void* newAddress)
 }
 
 
-/* Nedded to devide 64bit numbers correctly. TODO: look into why modules need this
+/* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
  * And why it isn't needed when compiled into boot2
  */
 

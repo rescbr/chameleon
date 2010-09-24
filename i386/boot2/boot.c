@@ -57,6 +57,8 @@
 #include "libsa.h"
 #include "ramdisk.h"
 #include "platform.h"
+#include "graphics.h"
+
 #include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
@@ -185,19 +187,14 @@ static int ExecKernel(void *binary)
 		getc();
 	}
 		
-    // If we were in text mode, switch to graphics mode.
-    // This will draw the boot graphics unless we are in
-    // verbose mode.
-	
-    if(gVerboseMode)
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		{
-			setVideoMode( GRAPHICS_MODE, 0 );
-		}
-		
+		setVideoMode( GRAPHICS_MODE, 0 );
 	}
+	// Draw gray screen. NOTE: no boot image, that's in the gui module
+	if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
 
+	
 	setupBooterLog();
 	
     finalizeBootStruct();

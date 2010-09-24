@@ -63,7 +63,9 @@ static struct lpc_controller_t lpc_controllers_intel[] = {
 	{ 0x8086, 0x27b8, "ICH7" },
 	{ 0x8086, 0x27b9, "ICH7M" },
 	{ 0x8086, 0x27bd, "ICH7M DH" },
-	
+
+	{ 0x8086, 0x27bc, "NM10" },
+
 	{ 0x8086, 0x2810, "ICH8R" },
 	{ 0x8086, 0x2811, "ICH8M-E" },
 	{ 0x8086, 0x2812, "ICH8DH" },
@@ -116,7 +118,6 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 	uint32_t	val, hpet_address = 0xFED00000;
 	int i;
 	
-	/* LPC on Intel ICH is always (?) at 00:1f.0 */
 	for(i = 1; i < sizeof(lpc_controllers_via) / sizeof(lpc_controllers_via[0]); i++)
 	{
 		if (	(lpc_controllers_via[i].vendor == lpc_dev->vendor_id) 
@@ -125,7 +126,7 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 			val = pci_config_read32(lpc_dev->dev.addr, 0x68);
 			
 			DBG("VIA %s LPC Interface [%04x:%04x], MMIO\n", 
-				lpc_controllers[i].name, lpc_dev->vendor_id, lpc_dev->device_id);
+				lpc_controllers_via[i].name, lpc_dev->vendor_id, lpc_dev->device_id);
 			
 			if (val & 0x80) {
 				hpet_address = (val & ~0x3ff);
@@ -166,7 +167,7 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 			rcba = (void *)(pci_config_read32(lpc_dev->dev.addr, 0xF0) & 0xFFFFC000);
 			
 			DBG("Intel(R) %s LPC Interface [%04x:%04x], MMIO @ 0x%lx\n", 
-				lpc_controllers[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
+				lpc_controllers_intel[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
 			
 			if (rcba == 0)
 				printf(" RCBA disabled; cannot force enable HPET\n");

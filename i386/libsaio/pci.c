@@ -179,7 +179,7 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 	return dev_path;
 }
 
-#if DEBUG_PCI
+#ifndef OPTION_ROM
 void dump_pci_dt(pci_dt_t *pci_dt)
 {
 	pci_dt_t	*current;

@@ -220,16 +220,11 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
 	// Locate the symbol in the list, if it exists, update it's address
 	kernSymbols_t *symbol = lookup_kernel_symbol(symbolName);
 	
-	
-	
 	if(symbol)
 	{
-
-		//printf("Located %sbit symbol %s at 0x%lX\n", is64 ? "64" : "32", symbolName, addr);
-		//getc();
-		
 		symbol->addr = addr;
 	}
+	
 	return 0xFFFFFFFF; // fixme
 }
 
