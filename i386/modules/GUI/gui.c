@@ -710,7 +710,7 @@ int initGUI(void)
 #endif
 	}
 
-	if(is_module_loaded("Resolution"))
+	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 	}
@@ -1863,7 +1863,7 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 	
-	if(is_module_loaded("Resolution"))
+	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 	}

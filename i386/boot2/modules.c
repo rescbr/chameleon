@@ -190,9 +190,12 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 			
 			while(callbacks)
 			{
+				DBG("Executing '%s' with callback 0x%X.\n", name, callbacks->callback);
 				// Execute callback
 				callbacks->callback(arg1, arg2, arg3, arg4);
 				callbacks = callbacks->next;
+				DBG("Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
+
 			}
 			DBG("Hook '%s' executed.\n", name);
 
@@ -548,9 +551,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 			case REBASE_OPCODE_SET_TYPE_IMM:
 				// Set rebase type (pointer, absolute32, pcrel32)
-				//printf("Rebase type = 0x%X\n", immediate);
-				//getc();
-				// NOTE: This is currently NOT used
+				//DBG("Rebase type = 0x%X\n", immediate);
 				type = immediate;
 				break;
 				
@@ -559,7 +560,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				// Locate address to begin rebasing
 				segmentAddress = 0;
 
-				 
 				struct segment_command* segCommand = NULL; // NOTE: 32bit only
 				
 				unsigned int binIndex = 0;

@@ -342,6 +342,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06FA, "Quadro NVS 450" },
 	{ 0x10DE06FD, "Quadro NVS 295" },
 	{ 0x10DE086C, "GeForce 9300/nForce 730i" },
+	{ 0x10DE0876, "ION 9400M" },
 	{ 0x10DE087D, "ION 9400M" },
 	{ 0x10DE087E, "ION LE" },
 	{ 0x10DE0A20, "GeForce GT220" },
