@@ -25,7 +25,6 @@ void USBFix_start_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 
 void USBFix_start()
 {
-	//printf("Hooking 'ExecKernel'\n");
 	register_hook_callback("PCIDevice", &USBFix_pci_hook);
 	register_hook_callback("Kernel Start", &USBFix_start_hook);
 

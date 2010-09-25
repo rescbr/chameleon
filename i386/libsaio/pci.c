@@ -20,7 +20,7 @@
 #endif
 
 pci_dt_t	*root_pci_dev;
-static char* dev_path;
+static char* dev_path;	// TODO: Figure out what is going on here...
 
 
 uint8_t pci_config_read8(uint32_t pci_addr, uint8_t reg)
@@ -137,7 +137,8 @@ void enable_pci_devs(void)
 
 void build_pci_dt(void)
 {
-	dev_path = malloc(sizeof(char) * 256);
+	dev_path = malloc(sizeof(char) * 256);	// TODO: remove
+	
 	root_pci_dev = malloc(sizeof(pci_dt_t));
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	enable_pci_devs();
@@ -150,11 +151,13 @@ void build_pci_dt(void)
 
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
+	char* buffer = malloc(sizeof(char) * 256);
+
 	pci_dt_t	*current;
 	pci_dt_t	*end;
 	char		tmp[64];
 	
-	dev_path[0] = 0;
+	buffer[0] = 0;	
 	end = root_pci_dev;
 	
 	int uid = getPciRootUID();
@@ -174,9 +177,9 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 			sprintf(tmp, "/Pci(0x%x,0x%x)", 
 					current->dev.bits.dev, current->dev.bits.func);
 		}
-		strcat(dev_path, tmp);
+		sprintf(buffer, "%s%s", buffer, tmp);
 	}
-	return dev_path;
+	return buffer;
 }
 
 #ifndef OPTION_ROM

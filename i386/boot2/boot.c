@@ -140,11 +140,13 @@ static int ExecKernel(void *binary)
 	
     bootArgs->kaddr = bootArgs->ksize = 0;
 	
+	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
+
     ret = DecodeKernel(binary,
                        &kernelEntry,
                        (char **) &bootArgs->kaddr,
                        (int *)&bootArgs->ksize );
-	
+
     if ( ret != 0 )
         return ret;
 	
@@ -574,7 +576,6 @@ void common_boot(int biosdev)
         } else {
             /* Won't return if successful. */
 			// Notify modules that ExecKernel is about to be called
-			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
             ret = ExecKernel(binary);
         }
     }

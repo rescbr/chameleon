@@ -27,7 +27,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
 # TODO: exclude Symbols from find so it isn't compiled twice
-SUBDIRS = Symbols Resolution Memory KernelPatcher KextPatcher HelloWorld GUI GraphicsEnabler ACPIPatcher HPET USBFix
+SUBDIRS = Symbols Resolution KernelPatcher KextPatcher HelloWorld GUI GraphicsEnabler ACPIPatcher HPET USBFix
 
 all embedtheme optionrom tags debug install installhdrs:
 	@rm -rf $(OBJROOT)

@@ -46,18 +46,30 @@ void Ethernet_start()
 
 int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
 {
-	if(!device)
-		return 0;
 	uint8_t builtin = 0x0;
-	if((vendor_id != 0x168c) && (builtin_set == 0)) 
+
+	if(device)
 	{
-		builtin_set = 1;
-		builtin = 0x01;
+		
+		if((vendor_id != 0x168c) && (builtin_set == 0)) 
+		{
+			builtin_set = 1;
+			builtin = 0x01;
+		}
+		
+		if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+		{
+			return 0;
+		}
+		
+		devices_number++;
+		return 1;
 	}
-	if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+	else
+	{
 		return 0;
-	devices_number++;
-	return 1;
+	}
+
 }
 
 void set_eth_builtin(pci_dt_t *eth_dev)

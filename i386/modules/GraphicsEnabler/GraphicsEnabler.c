@@ -15,7 +15,8 @@
 
 #define kGraphicsEnabler	"GraphicsEnabler"
 
-void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
+
+void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4);
 
 void GraphicsEnabler_start()
 {
@@ -25,34 +26,35 @@ void GraphicsEnabler_start()
 
 void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
 {	
-	if(current->class_id != PCI_CLASS_DISPLAY_VGA) return;
-	
-	char *devicepath = get_pci_dev_path(current);
-	
-	bool do_gfx_devprop = false;
-	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
-	
-	if (do_gfx_devprop)
+	if(current && current->class_id == PCI_CLASS_DISPLAY_VGA)
 	{
-		switch (current->vendor_id)
-		{
-			case PCI_VENDOR_ID_ATI:
-				verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-						current->vendor_id, current->device_id, devicepath);
-				setup_ati_devprop(current); 
-				break;
-				
-			case PCI_VENDOR_ID_INTEL: 
-				//message to be removed once support for these cards is added
-				verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-						current->vendor_id, current->device_id, devicepath);
-				break;
-				
-			case PCI_VENDOR_ID_NVIDIA: 
-				setup_nvidia_devprop(current);
-				break;
-		}
-	}
+		char *devicepath = get_pci_dev_path(current);
 
-	
+		bool do_gfx_devprop = false;
+		getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
+		
+		
+		if (do_gfx_devprop)
+		{
+			switch (current->vendor_id)
+			{
+				case PCI_VENDOR_ID_ATI:
+					verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
+									current->vendor_id, current->device_id, devicepath);
+					setup_ati_devprop(current); 
+					break;
+					
+				case PCI_VENDOR_ID_INTEL: 
+					//message to be removed once support for these cards is added
+					verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
+									current->vendor_id, current->device_id, devicepath);
+					break;
+					
+				case PCI_VENDOR_ID_NVIDIA: 
+					setup_nvidia_devprop(current);
+					break;
+			}
+		}
+		 
+	}
 }
