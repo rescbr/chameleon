@@ -57,7 +57,7 @@
 #include "nvidia.h"
 
 #ifndef DEBUG_NVIDIA
-#define DEBUG_NVIDIA 0
+#define DEBUG_NVIDIA 1
 #endif
 
 #if DEBUG_NVIDIA
@@ -85,7 +85,7 @@ const char *nvidia_name_0[]		=	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]		=	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]		=	{ "AAPL,slot-name",	"Slot-1" };
 
-static uint8_t default_NVCAP[]= {
+uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
 	0x00, 0x00, 0x00, 0x00
@@ -93,7 +93,7 @@ static uint8_t default_NVCAP[]= {
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
 
-static struct nv_chipsets_t NVKnownChipsets[] = {
+struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
 	{ 0x10DE0040, "GeForce 6800 Ultra" },
 	{ 0x10DE0041, "GeForce 6800" },

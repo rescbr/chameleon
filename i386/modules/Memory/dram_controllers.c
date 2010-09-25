@@ -45,11 +45,11 @@ static void setup_p35(pci_dt_t *dram_dev)
 }
 
 int nhm_bus = 0x3F;
+long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 
 // Setup Nehalem Integrated Memory Controller
 static void setup_nhm(pci_dt_t *dram_dev)
 {
-	static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 	unsigned long did, vid;
 	int i;
 	
@@ -485,7 +485,7 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 }
 
-static struct mem_controller_t dram_controllers[] = {
+struct mem_controller_t dram_controllers[] = {
 
 	// Default unknown chipset
 	{ 0, 0, "",	NULL, NULL, NULL },
@@ -525,7 +525,7 @@ static struct mem_controller_t dram_controllers[] = {
 	
 };
 
-static const char *memory_channel_types[] =
+const char *memory_channel_types[] =
 {
 	"Unknown", "Single", "Dual", "Triple"
 };			

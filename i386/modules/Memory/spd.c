@@ -24,7 +24,7 @@
 #define DBG(x...)
 #endif
 
-static const char *spd_memory_types[] =
+const char *spd_memory_types[] =
 {
 	"RAM",          /* 00h  Undefined */
 	"FPM",          /* 01h  FPM */
@@ -41,7 +41,7 @@ static const char *spd_memory_types[] =
 };
 
 #define UNKNOWN_MEM_TYPE 2
-static uint8_t spd_mem_to_smbios[] =
+uint8_t spd_mem_to_smbios[] =
 {
 	UNKNOWN_MEM_TYPE,          /* 00h  Undefined */
 	UNKNOWN_MEM_TYPE,          /* 01h  FPM */
@@ -202,9 +202,9 @@ int getDDRspeedMhz(const char * spd)
 #define SLST(a) ((uint8_t)(spd[a] & 0x0f))
 
 /** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
+char asciiSerial[16];
 const char *getDDRSerial(const char* spd)
 {
-    static char asciiSerial[16];
     
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
     {
@@ -219,9 +219,9 @@ const char *getDDRSerial(const char* spd)
 }
 
 /** Get DDR3 or DDR2 Part Number, always return a valid ptr */
+char asciiPartNo[32];
 const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 {
-	static char asciiPartNo[32];
 	int i, start=0, index = 0;
 
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) {
@@ -349,7 +349,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     } // for
 }
 
-static struct smbus_controllers_t smbus_controllers[] = {
+struct smbus_controllers_t smbus_controllers[] = {
 
 	{0x8086, 0x269B, "ESB2",    read_smb_intel },
 	{0x8086, 0x25A4, "6300ESB", read_smb_intel },

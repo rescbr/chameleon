@@ -35,14 +35,7 @@ void scan_mem() {
     static bool done = false;
     if (done) return;
 
-	bool useAutodetection = true;
-    getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
-
-
-    if (useAutodetection) {
-		execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
-		//getc();
-    }
+	execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
     done = true;
 }
 

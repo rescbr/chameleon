@@ -17,5 +17,7 @@ void HelloWorld_start()
 {
 	//printf("Hooking 'ExecKernel'\n");
 	register_hook_callback("ExecKernel", &helloWorld);
+	register_hook_callback("Kernel Start", &helloWorld);
+
 }
 
