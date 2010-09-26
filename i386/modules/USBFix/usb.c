@@ -65,7 +65,7 @@ int usb_loop()
 {
 	int retVal = 1;
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
-	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
+	fix_ehci = fix_uhci = fix_usb = fix_legacy = true;
 	
 	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
 	{
