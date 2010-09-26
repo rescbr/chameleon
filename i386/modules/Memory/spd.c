@@ -15,7 +15,7 @@
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD
-#define DEBUG_SPD 1
+#define DEBUG_SPD 0
 #endif
 
 #if DEBUG_SPD

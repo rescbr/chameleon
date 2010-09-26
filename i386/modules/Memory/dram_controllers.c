@@ -20,7 +20,7 @@
 #include "dram_controllers.h"
 
 #ifndef DEBUG_DRAM
-#define DEBUG_DRAM 1
+#define DEBUG_DRAM 0
 #endif
 
 #if DEBUG_DRAM
