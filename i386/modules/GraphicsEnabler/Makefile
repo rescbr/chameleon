@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o GraphicsEnabler.o
+GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
 
 
 SFILES =
@@ -73,6 +73,7 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/ati.o \
 	$(OBJROOT)/nvidia.o \
+	$(OBJROOT)/gma.o \
 	$(OBJROOT)/GraphicsEnabler.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
@@ -87,6 +88,8 @@ ati.o:
 nvidia.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
 
+gma.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gma.c" $(INC) -o "$(OBJROOT)/gma.o"
 
 include ../../MakeInc.dir
 

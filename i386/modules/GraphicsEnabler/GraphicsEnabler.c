@@ -10,6 +10,7 @@
 #include "bootstruct.h"
 #include "nvidia.h"
 #include "ati.h"
+#include "gma.h"
 #include "modules.h"
 
 
@@ -45,9 +46,7 @@ void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
 					break;
 					
 				case PCI_VENDOR_ID_INTEL: 
-					//message to be removed once support for these cards is added
-					verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-									current->vendor_id, current->device_id, devicepath);
+					setup_gma_devprop(current);
 					break;
 					
 				case PCI_VENDOR_ID_NVIDIA: 
