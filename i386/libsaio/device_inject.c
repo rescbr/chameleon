@@ -24,7 +24,6 @@
 #endif
 
 uint32_t devices_number = 1;
-uint32_t builtin_set = 0;
 struct DevPropString *string = 0;
 uint8_t *stringdata = 0;
 uint32_t stringlength = 0;
