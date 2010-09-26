@@ -38,7 +38,6 @@ int uhci_reset (pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	
 	struct pciList* current = usbList;
 	if(!usbList)
 	{
@@ -87,8 +86,8 @@ int usb_loop()
 		{
 			// EHCI
 			case 0x20:
-		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
 		    	if(fix_legacy) retVal &= legacy_off(current->pciDev);
+		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
 				
 				break;
 				
