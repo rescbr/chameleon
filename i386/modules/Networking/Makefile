@@ -1,11 +1,11 @@
 
-MODULE_NAME = Ethernet
+MODULE_NAME = Networking
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = Ethernet
+DIR = Networking
 
 include ../../MakePaths.dir
 
@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-ETHERNET_OBJS = Ethernet.o
+NET_OBJS = Networking.o
 
 
 SFILES =
@@ -59,10 +59,10 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${ETHERNET_OBJS} dylib
+all embedtheme optionrom: ${NET_OBJS} dylib
 
 
-dylib: ${ETHERNET_OBJS}
+dylib: ${NET_OBJS}
 	ld -flat_namespace -arch i386 \
 	-undefined suppress \
 	-alias $(MODULE_START) start \
@@ -71,12 +71,12 @@ dylib: ${ETHERNET_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/Ethernet.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/Networking.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 
-Ethernet.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Ethernet.c" $(INC) -o "$(OBJROOT)/Ethernet.o"
+Networking.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Networking.c" $(INC) -o "$(OBJROOT)/Networking.o"
 
 include ../../MakeInc.dir
 

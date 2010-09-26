@@ -64,7 +64,7 @@ char GUI_bootRescanPrompt[] =
  ** The kernel is about to start, draw the boot graphics if we are not in
  ** verbose mode.
  **/
-void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
+void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 {
 	if(!gVerboseMode)
 	{
@@ -127,7 +127,8 @@ void GUI_start()
 	}
 	
 	// Hoot for the boot screen 
-	register_hook_callback("Kernel Start", &GUI_Kernel_Start_hook);
+	//ExecKernel register_hook_callback("Kernel Start", &GUI_Kernel_Start_hook);
+	register_hook_callback("ExecKernel", &GUI_ExecKernel_hook);
 	register_hook_callback("PreBoot", &GUI_PreBoot_hook);		
 	
 }

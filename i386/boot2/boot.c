@@ -192,9 +192,10 @@ static int ExecKernel(void *binary)
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );
+		// Draw gray screen. NOTE: no boot image, that's in the gui module
+		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
+
 	}
-	// Draw gray screen. NOTE: no boot image, that's in the gui module
-	if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
 
 	
 	setupBooterLog();
