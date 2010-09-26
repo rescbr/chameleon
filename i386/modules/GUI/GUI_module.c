@@ -68,6 +68,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 {
 	if(!gVerboseMode)
 	{
+		// Note: shouldn't be needed, but just in case
 		drawBootGraphics();
 	}
 	else
@@ -92,6 +93,14 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		gui.logo.draw = false;
 		drawBackground();
 		updateVRAM();
+
+		if(!gVerboseMode)
+		{
+			// Disable outputs, they will still show in the boot log.
+			replace_function("_printf", &GUI_verbose);
+			drawBootGraphics();
+		}
+		
 	}
 }
 
