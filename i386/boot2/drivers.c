@@ -38,52 +38,10 @@
 #include "bootstruct.h"
 #include "xml.h"
 #include "ramdisk.h"
+#include "drivers.h"
 #include "modules.h"
 
-
 extern char gMacOSVersion;
-
-struct Module {  
-	struct Module *nextModule;
-	long          willLoad;
-	TagPtr        dict;
-	char          *plistAddr;
-	long          plistLength;
-	char          *executablePath;
-	char          *bundlePath;
-	long          bundlePathLength;
-};
-typedef struct Module Module, *ModulePtr;
-
-struct DriverInfo {
-	char *plistAddr;
-	long plistLength;
-	void *executableAddr;
-	long executableLength;
-	void *bundlePathAddr;
-	long bundlePathLength;
-};
-typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
-
-#define kDriverPackageSignature1 'MKXT'
-#define kDriverPackageSignature2 'MOSX'
-
-struct DriversPackage {
-	unsigned long signature1;
-	unsigned long signature2;
-	unsigned long length;
-	unsigned long alder32;
-	unsigned long version;
-	unsigned long numDrivers;
-	unsigned long reserved1;
-	unsigned long reserved2;
-};
-typedef struct DriversPackage DriversPackage;
-
-enum {
-	kCFBundleType2,
-	kCFBundleType3
-};
 
 #ifndef OPTION_ROM
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);

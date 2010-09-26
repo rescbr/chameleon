@@ -10,10 +10,13 @@
 
 #include "libsaio.h"
 #include "kext_patcher.h"
-//#include "platform.h"
+#include "pci.h"
+#include "drivers.h"
+#include "mkext.h"
 #include "modules.h"
 
-//extern PlatformInfo_t    Platform;
+
+void KextPatcher_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4);
 
 /**
  ** KextPatcher_start -> module start
@@ -26,6 +29,7 @@ void KextPatcher_start()
 	//	execute_hook("LoadDriverMKext", (void*)package, (void*) length, NULL, NULL);
 	//  execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
 
+	register_hook_callback("PCIDevice", &KextPatcher_hook);
 	register_hook_callback("LoadMatchedModules", &kext_loaded); 
 	register_hook_callback("LoadDriverMKext", &mkext_loaded); 
 
@@ -36,8 +40,12 @@ void KextPatcher_start()
  **		This function will be used to patch kexts ( eg AppleInteIntegratedFramebuffer)
  **		and their plists when they are loaded into memmory
  **/
-void kext_loaded(void* module, void* length, void* executableAddr, void* arg3)
+void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* arg3)
 {
+	long length = *(long*)lengthprt;
+	ModulePtr module = moduletmp;
+	printf("Loading %s, lenght is %d\n", module->plistAddr, length);
+	getc();
 }
 
 /**
@@ -47,6 +55,14 @@ void kext_loaded(void* module, void* length, void* executableAddr, void* arg3)
  **		what sort of slowdown this will cause and if it's worth implimenting.
  **/
 
-void mkext_loaded(void* filespec, void* package, void* lenght, void* arg3)
+void mkext_loaded(void* filespec, void* packagetmp, void* length, void* arg3)
 {
+	DriversPackage * package = packagetmp;
+	printf("Loading %s, length %d\n", filespec, length);
+	getc();
+}
+
+void KextPatcher_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
+{
+	// Lets do some patching.
 }
