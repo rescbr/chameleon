@@ -43,8 +43,6 @@
 
 #define TYPE_GROUPED 0xff
 
-extern uint32_t devices_number;
-
 const char *ati_compatible_0[]			= { "@0,compatible", "ATY,%s" };
 const char *ati_compatible_1[]			= { "@1,compatible", "ATY,%s" };
 const char *ati_device_type_0[]			= { "@0,device_type", "display" };

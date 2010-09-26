@@ -74,8 +74,6 @@
 
 #define TYPE_GROUPED 0xff
 
-extern uint32_t devices_number;
-
 const char *nvidia_compatible_0[]	=	{ "@0,compatible",	"NVDA,NVMac" };
 const char *nvidia_compatible_1[]	=	{ "@1,compatible",	"NVDA,NVMac" };
 const char *nvidia_device_type_0[]	=	{ "@0,device_type",	"display" };

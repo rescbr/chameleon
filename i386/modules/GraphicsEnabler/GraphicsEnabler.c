@@ -30,7 +30,7 @@ void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
 	{
 		char *devicepath = get_pci_dev_path(current);
 
-		bool do_gfx_devprop = false;
+		bool do_gfx_devprop = true;
 		getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
 		
 		
