@@ -12,7 +12,7 @@
 #include "smbios_patcher.h"
 
 #ifndef DEBUG_MEM
-#define DEBUG_MEM 0
+#define DEBUG_MEM 1
 #endif
 
 #if DEBUG_MEM

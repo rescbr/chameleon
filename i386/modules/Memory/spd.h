@@ -10,7 +10,8 @@
 #include "platform.h"
 #include "libsaio.h"
 
-void scan_spd(PlatformInfo_t *p);
+bool is_smbus_controller(pci_dt_t* pci_dt);
+void scan_spd(PlatformInfo_t *p, pci_dt_t* smbus_controller_dev);
 
 struct smbus_controllers_t {
 	uint32_t	vendor;

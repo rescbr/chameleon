@@ -15,6 +15,7 @@
 #include "modules.h"
 
 pci_dt_t * dram_controller_dev = NULL;
+pci_dt_t * smbus_controller_dev = NULL;
 
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4);
@@ -35,12 +36,15 @@ void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	{
 		dram_controller_dev = current;
 	}
+	else if(is_smbus_controller(current))
+	{
+		smbus_controller_dev = current;
+	}
+
 }
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	
-	
 	bool useAutodetection = true;
     getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
 	
@@ -51,8 +55,11 @@ void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
 		}
 		scan_memory(Platform); // unfortunately still necesary for some comp where spd cant read correct speed
-		scan_spd(Platform);
-		//getc();
+		
+		if(smbus_controller_dev)
+		{
+			scan_spd(Platform, smbus_controller_dev);
+		}
     }
 	
 }
