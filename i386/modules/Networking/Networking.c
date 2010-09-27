@@ -129,7 +129,6 @@ struct wifi_cards known_wifi_cards[] =
 void set_wifi_airport(pci_dt_t *wlan_dev)
 {
 	char tmp[16];
-	uint32_t temp2;
 	
 	char *devicepath = get_pci_dev_path(wlan_dev);
 	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));

@@ -193,8 +193,9 @@ static int ExecKernel(void *binary)
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );
 		// Draw gray screen. NOTE: no boot image, that's in the gui module
+#ifndef OPTION_ROM
 		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
-
+#endif
 	}
 
 	

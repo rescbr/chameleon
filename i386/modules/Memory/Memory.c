@@ -10,6 +10,7 @@
 #include "platform.h"
 #include "dram_controllers.h"
 #include "spd.h"
+#include "mem.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "modules.h"

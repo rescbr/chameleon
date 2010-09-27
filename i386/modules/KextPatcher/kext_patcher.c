@@ -16,7 +16,7 @@
 #include "modules.h"
 
 
-void KextPatcher_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4);
+void KextPatcher_hook(void* current, void* arg2, void* arg3, void* arg4);
 
 /**
  ** KextPatcher_start -> module start
@@ -42,10 +42,15 @@ void KextPatcher_start()
  **/
 void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* arg3)
 {
-	long length = *(long*)lengthprt;
+	/*
 	ModulePtr module = moduletmp;
-	printf("Loading %s, lenght is %d\n", module->plistAddr, length);
+	long length = *(long*)lengthprt;
+	//long length2 = strlen(module->plistAddr);
+	// *(long*)lengthprt = length2 + 5 *  1024 * 1024;
+
+	printf("Loading %s, lenght is %d (%d), executable is 0x%X\n", module->plistAddr, length, length2, executableAddr);
 	getc();
+	 */
 }
 
 /**
@@ -57,12 +62,14 @@ void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* a
 
 void mkext_loaded(void* filespec, void* packagetmp, void* length, void* arg3)
 {
+	/*
 	DriversPackage * package = packagetmp;
 	printf("Loading %s, length %d\n", filespec, length);
 	getc();
+	 */
 }
 
-void KextPatcher_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
+void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	// Lets do some patching.
+	//pci_dt_t* current = arg1;
 }

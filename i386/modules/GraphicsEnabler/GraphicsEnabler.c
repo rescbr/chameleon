@@ -17,7 +17,7 @@
 #define kGraphicsEnabler	"GraphicsEnabler"
 
 
-void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4);
+void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
 void GraphicsEnabler_start()
 {
@@ -25,8 +25,9 @@ void GraphicsEnabler_start()
 }
 
 
-void GraphicsEnabler_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
+void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {	
+	pci_dt_t* current = arg1;
 	if(current && current->class_id == PCI_CLASS_DISPLAY_VGA)
 	{
 		char *devicepath = get_pci_dev_path(current);

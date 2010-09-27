@@ -10,8 +10,9 @@
 int usb_loop();
 void notify_usb_dev(pci_dt_t *pci_dev);
 
-void USBFix_pci_hook(pci_dt_t* current, void* arg2, void* arg3, void* arg4)
+void USBFix_pci_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
+	pci_dt_t* current = arg1;
 	if(current->class_id == PCI_CLASS_SERIAL_USB)
 	{
 		notify_usb_dev(current);
