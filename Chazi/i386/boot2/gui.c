@@ -236,7 +236,7 @@ static int loadThemeImage(const char *image, int alt_image)
         if (images[i].image == NULL) {
             images[i].image = malloc(sizeof(pixmap_t));
         }
-        sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+        sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/%s.png", theme_name, image);
         width = 0;
         height = 0;
         imagedata = NULL;
@@ -679,7 +679,7 @@ int initGUI(void)
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
-	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
+	sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
     config_file_t	*config;
@@ -715,7 +715,7 @@ int initGUI(void)
  	}
 	else
 	{
- 		// parse display size parameters
+		// parse display size parameters
  		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
 		{
 			screen_params[0] = val;
@@ -1837,7 +1837,7 @@ static void loadBootGraphics(void)
 		usePngImage = false; 
 		return;
 	}
-	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
+	sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/boot.png", theme_name);
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
 #ifdef EMBED_THEME
   	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
@@ -1850,64 +1850,56 @@ static void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	int pos;
-	int length, count;
-	const char *dummyVal;
-	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
+	const char *dummyVal;
+	int pos;//, count;
+	int length, oldScreenWidth, oldScreenHeight;
 	uint16_t x, y; 
 	
-	if (getBoolForKey(kLegacyLogoKey, &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
+	if (getBoolForKey(kLegacyLogoKey, &legacy_logo, &bootInfo->bootConfig) && legacy_logo)
+	{
 		usePngImage = false; 
-	} else if (bootImageData == NULL) {
+	}
+	else if (bootImageData == NULL)
+	{
 		loadBootGraphics();
 	}
+	
+    // Save current screen resolution.
+	oldScreenWidth = gui.screen.width;
+	oldScreenHeight = gui.screen.height;
 
 	/*
- 	 * AutoResolution - Azi: check this later; resolution on theme.plist overrides the native one!
+ 	 * AutoResolution
  	 */
 	if (gAutoResolution == true)
 	{
-		// Get Resolution from Graphics Mode key
-		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4); //Azi: this is ok!
-		
-		// If no Graphics Mode key, get it from EDID
-		if ( count < 3 )
-		{
-			getResolution(screen_params); //Azi: this returns default resolution (1024x768x32) if nothing found.
-			
-			//PRINT("Resolution : %dx%d (EDID)\n",screen_params[0], screen_params[1]);
-		}
-		/*else
-		{
-			PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
-		}*/
- 	}
+		//Azi: if this stuff is working properly, resolution is set, Vbios is closed and 
+		// most probably we want to use oldScreenWidth/Height so...
+		screen_params[0] = oldScreenWidth;
+		screen_params[1] = oldScreenHeight;
+	}
 	else
 	{
- 		// parse display size parameters
+		// parse display size parameters
 		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[0] = pos;
 		}
-		/*else
+		else
 		{
 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
-		}*/
+		}
 		
 		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[1] = pos;
 		}
-		/*else
+		else
 		{
 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-		}*/
+		}
 	}
-
-    // Save current screen resolution. Azi: ... and this too.***
-	oldScreenWidth = gui.screen.width;
-	oldScreenHeight = gui.screen.height;
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
@@ -1916,8 +1908,8 @@ void drawBootGraphics(void)
 	getGraphicModeParams(screen_params);
 
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE
-		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE ||
+		(screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
 	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}

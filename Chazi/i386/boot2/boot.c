@@ -358,8 +358,11 @@ void common_boot(int biosdev)
 	{
 		//Get Resolution from Graphics Mode key or EDID
 		int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+		
 		if (count < 3)
+		{
 			getResolution(params);
+		}
 		else
 		{
 			if ( params[2] == 256 ) params[2] = 8;
@@ -373,7 +376,9 @@ void common_boot(int biosdev)
 		
 		//perfom the actual VBIOS patching
 		if (params[0] != 0 && params[1] != 0)
+		{
 			patchVbios(map, params[0], params[1], params[2], 0, 0);
+		}
 	}
 
     if (useGUI && initGUI())
@@ -424,7 +429,7 @@ void common_boot(int biosdev)
 		//
 		//AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
 		//				   or EDID Info was insane
-		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+//		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
 		
 		//Restore the vbios for Cancelation
 		if ((gAutoResolution == false) && map)
@@ -447,8 +452,11 @@ void common_boot(int biosdev)
 			{
 				//or get resolution from Graphics Mode or EDID
 				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+				
 				if (count < 3)
+				{
 					getResolution(params);
+				}
 				else
 				{
 					if ( params[2] == 256 ) params[2] = 8;
@@ -464,6 +472,9 @@ void common_boot(int biosdev)
 				patchVbios(map, params[0], params[1], params[2], 0, 0);
 			}
 			closeVbios(map);
+			//Azi: gAutoResolution was just set to false on closeVbios;
+			// we need it to be true here for drawBootGraphics().
+			gAutoResolution = true;
 		}
 		
         status = processBootOptions();
@@ -623,26 +634,26 @@ void common_boot(int biosdev)
             ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
   	  	    if (ret == -1)
   	  	    {
-              sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
-              ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
-              if (ret == -1)
-              {
-                sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
-                ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
-                if (ret == -1)
-                {
-                  // Not found any alternate locations, using the original kernel image path.
-                  strcpy(bootFileSpec, bootFile);
-                }
-              }
+				sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
+				ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
+				if (ret == -1)
+				{
+					sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
+					ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
+					if (ret == -1)
+					{
+						// Not found any alternate locations, using the original kernel image path.
+						strcpy(bootFileSpec, bootFile);
+					}
+				}
             }
             			
             verbose("Loading kernel %s\n", bootFileSpec);
             ret = LoadThinFatFile(bootFileSpec, &binary);
             if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
             {
-              archCpuType = CPU_TYPE_I386;
-              ret = LoadThinFatFile(bootFileSpec, &binary);				
+				archCpuType = CPU_TYPE_I386;
+				ret = LoadThinFatFile(bootFileSpec, &binary);				
             }
 			
         } while (0);
@@ -674,13 +685,14 @@ void common_boot(int biosdev)
     
     // chainboot
     if (status==1) {
-	if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
-		setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
-	}
+		if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
+			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
+		}
     }
 	
-    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit) {
-	nbpUnloadBaseCode();
+    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit)
+	{
+		nbpUnloadBaseCode();
     }
 }
 

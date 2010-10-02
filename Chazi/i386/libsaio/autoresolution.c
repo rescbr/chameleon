@@ -232,7 +232,7 @@ sModeTable * intializeTables(vBiosMap * map, int tablesCount) {
 }
 
 
-void closeVbios(vBiosMap * map);
+//void closeVbios(vBiosMap * map); azi: dup - declared on header
 
 vBiosMap * openVbios(chipsetType forcedChipset)
 {

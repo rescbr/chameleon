@@ -1023,11 +1023,14 @@ int getBootOptions(bool firstRun)
 				params[3] = 0;
 				//Has the target Resolution Changed ?
 				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+				
 				if ( count < 3 )
+				{
 					getResolution(params);
+				}
 
-				if (	(params[0] != 0) && (params[1] != 0)
-					&&	(params[0] != map->currentX) && (params[1] != map->currentY))
+				if ((params[0] != 0) && (params[1] != 0) &&
+					(params[0] != map->currentX) && (params[1] != map->currentY))
 				{
 
 					//Go back to TEXT mode while we change  the mode
