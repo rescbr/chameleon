@@ -88,6 +88,9 @@ ati.o:
 nvidia.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
 
+gma.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gma.c" $(INC) -o "$(OBJROOT)/gma.o"
+
 
 include ../../MakeInc.dir
 

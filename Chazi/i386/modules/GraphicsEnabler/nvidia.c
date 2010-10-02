@@ -727,7 +727,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			devicepath);
 
 	rom = malloc(NVIDIA_ROM_SIZE);
-	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
+	sprintf(nvFilename, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 	if (getBoolForKey(kUseNvidiaROMKey, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);

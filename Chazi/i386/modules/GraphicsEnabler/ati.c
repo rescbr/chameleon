@@ -156,8 +156,8 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x1002945A,  "ATI Radeon 4800 Mobility Series"}  ,
 	{ 0x1002945B,  "ATI Radeon 4800 Mobility Series"}  ,
 	{ 0x1002944B,  "ATI Radeon 4800 Mobility Series"}  ,
-        { 0x10029490,  "ATI Radeon 4670 Series"}  ,
-        { 0x10029498,  "ATI Radeon 4650 Series"}  ,
+    { 0x10029490,  "ATI Radeon 4670 Series"}  ,
+    { 0x10029498,  "ATI Radeon 4650 Series"}  ,
 	{ 0x10029490,  "ATI Radeon 4600 Series"}  ,
 	{ 0x10029498,  "ATI Radeon 4600 Series"}  ,
 	{ 0x1002949E,  "ATI Radeon 4600 Series"}  ,
@@ -169,16 +169,16 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x10029552,  "ATI Radeon 4300 Mobility Series"}  ,
 	{ 0x10029553,  "ATI Radeon 4500 Mobility Series"}  ,
 	{ 0x1002954F,  "ATI Radeon 4300 Series"} ,
-        { 0x100294B3,  "ATI Radeon 4770 Series"} ,
-        { 0x100294B5,  "ATI Radeon 4770 Series"} ,
-        { 0x100268B8,  "ATI Radeon 5700 Series"} ,
-        { 0x100268BE,  "ATI Radeon 5700 Series"} ,
-        { 0x10026898,  "ATI Radeon 5800 Series"} ,
-        { 0x10026899,  "ATI Radeon 5800 Series"}
+    { 0x100294B3,  "ATI Radeon 4770 Series"} ,
+    { 0x100294B5,  "ATI Radeon 4770 Series"} ,
+    { 0x100268B8,  "ATI Radeon 5700 Series"} ,
+    { 0x100268BE,  "ATI Radeon 5700 Series"} ,
+    { 0x10026898,  "ATI Radeon 5800 Series"} ,
+    { 0x10026899,  "ATI Radeon 5800 Series"}
 };
 
 static struct ati_chipsets_t ATIKnownFramebuffers[] = {
-	{ 0x00000000, "Megalodon" },
+	{ 0x00000000,  "Megalodon" },
 	{ 0x10029589,  "Lamna"}  ,
 	{ 0x10029588,  "Lamna"}  ,
 	{ 0x100294C3,  "Iago"}  ,
@@ -222,23 +222,23 @@ static struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x1002945A,  "Motmot"}  ,
 	{ 0x1002945B,  "Motmot"}  ,
 	{ 0x1002944B,  "Motmot"}  ,
-        { 0x10029490,  "Peregrine"}  ,
-        { 0x10029498,  "Peregrine"}  ,
-        { 0x1002949E,  "Peregrine"}  ,
-        { 0x10029480,  "Peregrine"}  ,
-        { 0x10029488,  "Peregrine"}  ,
-        { 0x10029540,  "Peregrine"}  ,
-        { 0x10029541,  "Peregrine"}  ,
-        { 0x1002954E,  "Peregrine"}  ,
-        { 0x10029552,  "Peregrine"}  ,
-        { 0x10029553,  "Peregrine"}  ,
-        { 0x1002954F,  "Peregrine"}  ,
-        { 0x100294B3,  "Peregrine"},
-        { 0x100294B5,  "Peregrine"},
-        { 0x100268B8,  "Motmot"},
-        { 0x100268BE,  "Motmot"},
-        { 0x10026898,  "Motmot"},
-        { 0x10026899,  "Motmot"}
+    { 0x10029490,  "Peregrine"}  ,
+    { 0x10029498,  "Peregrine"}  ,
+    { 0x1002949E,  "Peregrine"}  ,
+    { 0x10029480,  "Peregrine"}  ,
+    { 0x10029488,  "Peregrine"}  ,
+    { 0x10029540,  "Peregrine"}  ,
+    { 0x10029541,  "Peregrine"}  ,
+    { 0x1002954E,  "Peregrine"}  ,
+    { 0x10029552,  "Peregrine"}  ,
+    { 0x10029553,  "Peregrine"}  ,
+    { 0x1002954F,  "Peregrine"}  ,
+    { 0x100294B3,  "Peregrine"},
+    { 0x100294B5,  "Peregrine"},
+    { 0x100268B8,  "Motmot"},
+    { 0x100268BE,  "Motmot"},
+    { 0x10026898,  "Motmot"},
+    { 0x10026899,  "Motmot"}
 };
 
 static uint32_t accessROM(pci_dt_t *ati_dev, unsigned int mode)
@@ -433,7 +433,7 @@ static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *
 	if (!device || !ati_dev) {
 		return 0;
 	}
-	printf("dumping pci config space, 256 bytes\n");
+	verbose("dumping pci config space, 256 bytes\n");
 	config_space = malloc(256);
 	for (i=0; i<=255; i++) {
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
@@ -711,7 +711,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	sprintf(tmp, ati_name_1[1], framebuffer);
 	devprop_add_value(device, (char *) ati_name_1[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
-	sprintf(tmp, "/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
+	sprintf(tmp, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
 	if (getBoolForKey(kUseAtiROMKey, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("looking for ati video bios file %s\n", tmp);
 		rom = malloc(0x20000);
@@ -730,7 +730,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 			bios = NULL;	// try to dump from legacy space, otherwise can result in 100% fan speed
 		} else {
 			// readAtomBios result in bug on some cards (100% fan speed and black screen),
-			// not using it for posted card, rading from legacy space instead
+			// not using it for posted card, reading from legacy space instead
 			bios = readAtomBIOS(ati_dev);
 		}
 	} else {
@@ -746,7 +746,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 
 	if (bios[0] == 0x55 && bios[1] == 0xaa) {
-		printf("Found bios image\n");
+		verbose("Found bios image\n");
 		bios_size = bios[2] * 512;
 
 		struct  pci_rom_pci_header_t *rom_pci_header;

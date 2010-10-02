@@ -231,7 +231,7 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 		c = spd[i];
 		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...
 			asciiPartNo[index++] = c;
-		if (isspace(c)) //Azi: this is the way that works properly for me!! The other gives me extra characters.
+		if (isspace(c)) //Azi: this is the way that works properly for me, else i get extra characters.
 			break;
 	}
 	
