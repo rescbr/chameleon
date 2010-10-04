@@ -49,29 +49,29 @@ long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
 static unsigned long Alder32( unsigned char * buffer, long length );
 
-static long FileLoadDrivers(char *dirSpec, long plugin);
+long FileLoadDrivers(char *dirSpec, long plugin);
 #ifndef OPTION_ROM
-static long NetLoadDrivers(char *dirSpec);
+long NetLoadDrivers(char *dirSpec);
 #endif
-static long LoadDriverMKext(char *fileSpec);
-static long LoadDriverPList(char *dirSpec, char *name, long bundleType);
-static long LoadMatchedModules(void);
-static long MatchPersonalities(void);
-static long MatchLibraries(void);
+long LoadDriverMKext(char *fileSpec);
+long LoadDriverPList(char *dirSpec, char *name, long bundleType);
+long LoadMatchedModules(void);
+long MatchPersonalities(void);
+long MatchLibraries(void);
 #ifdef NOTDEF
 static ModulePtr FindModule(char *name);
 static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
 #endif
 static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
-static long InitDriverSupport(void);
+long InitDriverSupport(void);
 
 static ModulePtr gModuleHead, gModuleTail;
 static TagPtr    gPersonalityHead, gPersonalityTail;
-static char *    gExtensionsSpec;
-static char *    gDriverSpec;
-static char *    gFileSpec;
-static char *    gTempSpec;
-static char *    gFileName;
+char *    gExtensionsSpec;
+char *    gDriverSpec;
+char *    gFileSpec;
+char *    gTempSpec;
+char *    gFileName;
 
 static unsigned long
 Alder32( unsigned char * buffer, long length )
@@ -106,7 +106,7 @@ Alder32( unsigned char * buffer, long length )
 //==========================================================================
 // InitDriverSupport
 
-static long
+long
 InitDriverSupport( void )
 {
     gExtensionsSpec = malloc( 4096 );
@@ -125,7 +125,7 @@ InitDriverSupport( void )
 // LoadDrivers
 
 long LoadDrivers( char * dirSpec )
-{
+{	
     char dirSpecExtra[1024];
 	
     if ( InitDriverSupport() != 0 )
@@ -255,7 +255,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 //==========================================================================
 // FileLoadDrivers
 
-static long
+long
 FileLoadDrivers( char * dirSpec, long plugin )
 {
     long         ret, length, flags, time, bundleType;
@@ -316,7 +316,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
 //==========================================================================
 // 
 #ifndef OPTION_ROM
-static long
+long
 NetLoadDrivers( char * dirSpec )
 {
     long tries;
@@ -352,7 +352,7 @@ NetLoadDrivers( char * dirSpec )
 //==========================================================================
 // loadDriverMKext
 
-static long
+long
 LoadDriverMKext( char * fileSpec )
 {
     unsigned long    driversAddr, driversLength;
@@ -399,7 +399,7 @@ LoadDriverMKext( char * fileSpec )
 //==========================================================================
 // LoadDriverPList
 
-static long
+long
 LoadDriverPList( char * dirSpec, char * name, long bundleType )
 {
     long      length, executablePathLength, bundlePathLength;
@@ -506,8 +506,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 //==========================================================================
 // LoadMatchedModules
 
-static long
-LoadMatchedModules( void )
+long LoadMatchedModules( void )
 {
     TagPtr        prop;
     ModulePtr     module;
@@ -597,8 +596,7 @@ LoadMatchedModules( void )
 //==========================================================================
 // MatchPersonalities
 
-static long
-MatchPersonalities( void )
+long MatchPersonalities( void )
 {
     /* IONameMatch support not implemented */
     return 0;
@@ -607,8 +605,7 @@ MatchPersonalities( void )
 //==========================================================================
 // MatchLibraries
 
-static long
-MatchLibraries( void )
+long MatchLibraries( void )
 {
     TagPtr     prop, prop2;
     ModulePtr  module, module2;
