@@ -11,8 +11,9 @@
 #define OFFSET_1MEG 0x100000
 #define BAD_BOOT_DEVICE 0xffffffff
 
+struct multiboot_info *gMI;
 
-#ifdef UNUSED
+//#ifdef UNUSED
 
 int multiboot_timeout=0;
 int multiboot_timeout_set=0;
@@ -20,7 +21,6 @@ int multiboot_partition=0;
 int multiboot_partition_set=0;
 
 // Global multiboot info, if using multiboot.
-struct multiboot_info *gMI;
 
 extern void continue_at_low_address(void);
 
@@ -349,13 +349,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     return bootdevice;
 }
 
-enum {
-    kReturnKey     = 0x0d,
-    kEscapeKey     = 0x1b,
-    kBackspaceKey  = 0x08,
-    kASCIIKeyMask  = 0x7f
-};
-
 // This is the meat of our implementation.  It grabs the boot device from
 // the multiboot_info and returns it as is.  If it fails it returns
 // BAD_BOOT_DEVICE.  We can call an awful lot of libsa and libsaio but
@@ -431,10 +424,12 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
             }
         }				
     }
+#if UNUSED
     if(doSelectDevice)
     {
         bootdevice = selectAlternateBootDevice(bootdevice);
     }
+#endif
     if(bootdevice == BAD_BOOT_DEVICE)
         sleep(2); // pause for a second before halting
     return bootdevice;
@@ -507,4 +502,4 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
     }
     return 0;
 }
-#endif
+//#endif

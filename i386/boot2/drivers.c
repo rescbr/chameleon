@@ -151,17 +151,13 @@ long LoadDrivers( char * dirSpec )
 		{
 			// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
 #ifndef OPTION_ROM
-			if (gRAMDiskVolume && !gRAMDiskBTAliased)
-			{
-				// First try a specfic OS version folder ie 10.5
-				sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", &gMacOSVersion);
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-				{	
-					// Next we'll try the base
-					strcpy(dirSpecExtra, "rd(0,0)/Extra/");
-					FileLoadDrivers(dirSpecExtra, 0);
-				}
-				
+			// First try a specfic OS version folder ie 10.5
+			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", &gMacOSVersion);
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			{	
+				// Next we'll try the base
+				strcpy(dirSpecExtra, "rd(0,0)/Extra/");
+				FileLoadDrivers(dirSpecExtra, 0);
 			}
 #endif
 			// Next try to load Extra extensions from the selected root partition.
