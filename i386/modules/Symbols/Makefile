@@ -57,8 +57,8 @@ all embedtheme optionrom: dylib
 
 
 dylib: $(OBJS)
-	ld -flat_namespace -arch i386 \
-	-undefined suppress \
+	ld -arch i386 \
+	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x  -dead_strip_dylibs \

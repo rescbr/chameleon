@@ -63,13 +63,14 @@ all embedtheme optionrom: ${NBI_OBJS} dylib
 
 
 dylib: ${HELLO_WORLD_OBJS}
-	ld -flat_namespace -arch i386 \
-	-undefined suppress \
+	ld -arch i386 \
+	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-weak_library $(SYMROOT)/GUI.dylib \
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/NBI.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
