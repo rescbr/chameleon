@@ -24,6 +24,7 @@
 
 uint64_t smbios_p;
 
+char* gSMBIOSBoardModel;
 
 typedef struct {
     const char* key;
@@ -1067,4 +1068,70 @@ struct DMIHeader* FindNextDmiTableOfType(int type, int minlength)
     }
     return NULL; // not found
 };
+
+
+const char * smbiosStringAtIndex(DMIHeader* smHeader, int index, int* length )
+{
+    const char * last = 0;
+    const char * next = (const char *) smHeader + smHeader->length;
+	
+    if ( length ) *length = 0;
+    while ( index-- )
+    {
+        last = 0;
+		const char * cp = 0;
+		for ( cp = next; *cp || cp[1]; cp++ )
+        {
+            if ( *cp == '\0' )
+            {
+                last = next;
+                next = cp + 1;
+                break;
+            }
+        }
+        if ( last == 0 ) break;
+    }
+	
+    if ( last )
+    {
+        while (*last == ' ') last++;
+        if (length)
+        {
+            UInt8 len;
+            for ( len = next - last - 1; len && last[len - 1] == ' '; len-- )
+                ;
+            *length = len; // number of chars not counting the terminating NULL
+        }
+    }
+	
+    return last ? last : "";
+}
+
+
+char* getSmbiosProductName()
+{
+	struct SMBEntryPoint	*smbios;
+	SMBSystemInformation	*p;
+	char*					tempString;
+	int						tmpLen;
+	
+	smbios = getSmbios(SMBIOS_ORIGINAL);
+	if (smbios==NULL) return 0; 
+	
+	p = (SMBSystemInformation*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
+	if (p==NULL) return NULL;
+	
+	
+	tempString = (char*)smbiosStringAtIndex((DMIHeader*)p, p->productName, &tmpLen);
+	tempString[tmpLen] = 0;
+	
+	gSMBIOSBoardModel = malloc(tmpLen + 1);
+	if(gSMBIOSBoardModel)
+	{
+		strncpy(gSMBIOSBoardModel, tempString, tmpLen);
+		Node* node = DT__FindNode("/", false);
+		DT__AddProperty(node, "orig-model", tmpLen, gSMBIOSBoardModel);
+	}
+	verbose("Actual model name is '%s'\n", tempString);
+}
 

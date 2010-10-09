@@ -55,5 +55,6 @@ struct smbios_table_description
 extern struct SMBEntryPoint	*getSmbios(int);
 extern struct DMIHeader* FindNextDmiTableOfType(int type, int minlen);
 extern struct DMIHeader* FindFirstDmiTableOfType(int type, int minlen);
+const char * smbiosStringAtIndex(DMIHeader*, int index, int *length );
 
 #endif /* !__LIBSAIO_SMBIOS_PATCHER_H */

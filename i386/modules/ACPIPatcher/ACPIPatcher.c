@@ -69,7 +69,7 @@ int ACPIPatcher_getPciRootUID(void)
 	}
 	
 	fsize = file_size(fd);
-	
+
 	if ((new_dsdt = malloc(fsize)) == NULL) {
 		verbose("[ERROR] alloc DSDT memory failed\n");
 		close (fd);

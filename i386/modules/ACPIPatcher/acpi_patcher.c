@@ -29,6 +29,8 @@ uint64_t acpi10_p;
 uint64_t acpi20_p;
 
 
+extern char* gSMBIOSBoardModel;
+
 // Slice: New signature compare function
 boolean_t tableSign(char *table, const char *sgn)
 {
@@ -93,24 +95,51 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 /** The folowing ACPI Table search algo. should be reused anywhere needed:*/
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	int fd = 0;
+	int fd = -1;
 	char dirSpec[512] = "";
 	
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	sprintf(dirSpec, "%s", filename); 
-	fd = open(dirSpec, 0);
+	
+	if(gSMBIOSBoardModel)
+	{
+		sprintf(dirSpec,"%s.%s", gSMBIOSBoardModel, filename);
+		fd = open(dirSpec, 0);
+	}
+	
 	if (fd < 0)
-	{	
-		sprintf(dirSpec, "/Extra/%s", filename); 
+	{
+		sprintf(dirSpec, "%s", filename); 
 		fd = open(dirSpec, 0);
 		if (fd < 0)
-		{
-			sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
-			fd = open(dirSpec, 0);
+		{	
+			if(gSMBIOSBoardModel)
+			{
+				sprintf(dirSpec, "/Extra/%s.%s", gSMBIOSBoardModel, filename);
+				fd = open(dirSpec, 0);
+			}
+			if (fd < 0)
+			{
+				sprintf(dirSpec, "/Extra/%s", filename); 
+				fd = open(dirSpec, 0);
+				if (fd < 0)
+				{
+					if(gSMBIOSBoardModel)
+					{
+						sprintf(dirSpec, "bt(0,0)/Extra/%s.%s", gSMBIOSBoardModel, filename);
+						fd = open(dirSpec, 0);
+					}
+					if (fd < 0)
+					{						
+						sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
+						fd = open(dirSpec, 0);
+					}
+				}
+				
+			}
 		}
 	}
-
+	
 	if (fd < 0)
 	{
 		// NOT FOUND:
@@ -168,7 +197,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
 			
 			bool add_name = true;
-
+			
 			uint8_t j;
 			
 			for (j=0; j<4; j++) 
@@ -214,7 +243,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x01, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 
 		0x00, 0x00, 0x00, 0x79, 0x00
 	};
-
+	
 	if (Platform->CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
@@ -242,71 +271,71 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c4_enabled = false;
 		
 		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
-
+		
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
 		
 		struct aml_chunk* root = aml_create_node(NULL);
-			aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
-			struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
-				struct aml_chunk* name = aml_add_name(scop, "CST_");
-					struct aml_chunk* pack = aml_add_package(name);
-						aml_add_byte(pack, cstates_count);
+		aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
+		struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
+		struct aml_chunk* name = aml_add_name(scop, "CST_");
+		struct aml_chunk* pack = aml_add_package(name);
+		aml_add_byte(pack, cstates_count);
 		
-						struct aml_chunk* tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x00; // C1
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x01); // C1
-							aml_add_byte(tmpl, 0x01); // Latency
-							aml_add_word(tmpl, 0x03e8); // Power
-
-						// C2
-						if (c2_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-								cstate_resource_template[11] = 0x10; // C2
-								aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-								aml_add_byte(tmpl, 0x02); // C2
-								aml_add_byte(tmpl, fadt->C2_Latency);
-								aml_add_word(tmpl, 0x01f4); // Power
-						}
-						// C4
-						if (c4_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x30; // C4
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x04); // C4
-							aml_add_word(tmpl, fadt->C3_Latency / 2); // TODO: right latency for C4
-							aml_add_byte(tmpl, 0xfa); // Power
-						}
-						else
-						// C3
-						if (c3_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x20; // C3
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x03); // C3
-							aml_add_word(tmpl, fadt->C3_Latency);
-							aml_add_word(tmpl, 0x015e); // Power
-						}
-						
-			
-			// Aliaces
-			int i;
-			for (i = 0; i < acpi_cpu_count; i++) 
+		struct aml_chunk* tmpl = aml_add_package(pack);
+		cstate_resource_template[11] = 0x00; // C1
+		aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
+		aml_add_byte(tmpl, 0x01); // C1
+		aml_add_byte(tmpl, 0x01); // Latency
+		aml_add_word(tmpl, 0x03e8); // Power
+		
+		// C2
+		if (c2_enabled) 
+		{
+			tmpl = aml_add_package(pack);
+			cstate_resource_template[11] = 0x10; // C2
+			aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
+			aml_add_byte(tmpl, 0x02); // C2
+			aml_add_byte(tmpl, fadt->C2_Latency);
+			aml_add_word(tmpl, 0x01f4); // Power
+		}
+		// C4
+		if (c4_enabled) 
+		{
+			tmpl = aml_add_package(pack);
+			cstate_resource_template[11] = 0x30; // C4
+			aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
+			aml_add_byte(tmpl, 0x04); // C4
+			aml_add_word(tmpl, fadt->C3_Latency / 2); // TODO: right latency for C4
+			aml_add_byte(tmpl, 0xfa); // Power
+		}
+		else
+			// C3
+			if (c3_enabled) 
 			{
-				char name[9];
-				sprintf(name, "_PR_%c%c%c%c", acpi_cpu_name[i][0], acpi_cpu_name[i][1], acpi_cpu_name[i][2], acpi_cpu_name[i][3]);
-				
-				scop = aml_add_scope(root, name);
-					aml_add_alias(scop, "CST_", "_CST");
+				tmpl = aml_add_package(pack);
+				cstate_resource_template[11] = 0x20; // C3
+				aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
+				aml_add_byte(tmpl, 0x03); // C3
+				aml_add_word(tmpl, fadt->C3_Latency);
+				aml_add_word(tmpl, 0x015e); // Power
 			}
+		
+		
+		// Aliaces
+		int i;
+		for (i = 0; i < acpi_cpu_count; i++) 
+		{
+			char name[9];
+			sprintf(name, "_PR_%c%c%c%c", acpi_cpu_name[i][0], acpi_cpu_name[i][1], acpi_cpu_name[i][2], acpi_cpu_name[i][3]);
+			
+			scop = aml_add_scope(root, name);
+			aml_add_alias(scop, "CST_", "_CST");
+		}
 		
 		aml_calculate_size(root);
 		
 		struct acpi_2_ssdt *ssdt = (struct acpi_2_ssdt *)AllocateKernelMemory(root->Size);
-	
+		
 		aml_write_node(root, (void*)ssdt, 0);
 		
 		ssdt->Length = root->Size;
@@ -316,7 +345,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		aml_destroy_node(root);
 		
 		//dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt->Length);
-				
+		
 		verbose ("SSDT with CPU C-States generated successfully\n");
 		
 		return ssdt;
@@ -325,7 +354,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	{
 		verbose ("ACPI CPUs not found: C-States not generated !!!\n");
 	}
-
+	
 	return NULL;
 }
 
@@ -504,23 +533,23 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			int i;
 			
 			struct aml_chunk* root = aml_create_node(NULL);
-				aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
-					struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
-						struct aml_chunk* name = aml_add_name(scop, "PSS_");
-							struct aml_chunk* pack = aml_add_package(name);
+			aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
+			struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
+			struct aml_chunk* name = aml_add_name(scop, "PSS_");
+			struct aml_chunk* pack = aml_add_package(name);
 			
-								for (i = 0; i < p_states_count; i++) 
-								{
-									struct aml_chunk* pstt = aml_add_package(pack);
-									
-									aml_add_dword(pstt, p_states[i].Frequency);
-									aml_add_dword(pstt, 0x00000000); // Power
-									aml_add_dword(pstt, 0x0000000A); // Latency
-									aml_add_dword(pstt, 0x0000000A); // Latency
-									aml_add_dword(pstt, p_states[i].Control);
-									aml_add_dword(pstt, i+1); // Status
-								}
+			for (i = 0; i < p_states_count; i++) 
+			{
+				struct aml_chunk* pstt = aml_add_package(pack);
 				
+				aml_add_dword(pstt, p_states[i].Frequency);
+				aml_add_dword(pstt, 0x00000000); // Power
+				aml_add_dword(pstt, 0x0000000A); // Latency
+				aml_add_dword(pstt, 0x0000000A); // Latency
+				aml_add_dword(pstt, p_states[i].Control);
+				aml_add_dword(pstt, i+1); // Status
+			}
+			
 			// Add aliaces
 			for (i = 0; i < acpi_cpu_count; i++) 
 			{
@@ -674,11 +703,11 @@ int setupAcpi(void)
 {
 	int version;
 	void *new_dsdt;
-
+	
 	const char *filename;
 	char dirSpec[128];
 	int len = 0;
-
+	
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->bootConfig))
 	{
@@ -714,7 +743,7 @@ int setupAcpi(void)
 		for (i=0; i<30; i++)
 		{
 			char filename[512];
-
+			
 			sprintf(filename, i>0?"SSDT-%d.aml":"SSDT.aml", i);
 			
 			if(new_ssdt[ssdt_count] = loadACPITable(filename)) 
@@ -727,7 +756,7 @@ int setupAcpi(void)
 			}
 		}
 	}
-		
+	
 	// Do the same procedure for both versions of ACPI
 	for (version=0; version<2; version++) {
 		struct acpi_2_rsdp *rsdp, *rsdp_mod;
@@ -793,7 +822,7 @@ int setupAcpi(void)
 					
 					if(new_dsdt)
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
-										
+					
 					continue;
 				}
 				if (tableSign(table, "FACP"))
@@ -847,10 +876,10 @@ int setupAcpi(void)
 				
 				for (j=0; j<ssdt_count; j++)
 					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
-					
+				
 				verbose("RSDT: Added %d SSDT table(s)\n", ssdt_count);
 			}
-
+			
 			// Correct the checksum of RSDT
 			DBG("RSDT: Original checksum %d, ", rsdt_mod->Checksum);
 			
@@ -966,10 +995,10 @@ int setupAcpi(void)
 					
 					for (j=0; j<ssdt_count; j++)
 						xsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
-						
+					
 					verbose("Added %d SSDT table(s) into XSDT\n", ssdt_count);
 				}
-
+				
 				// Correct the checksum of XSDT
 				xsdt_mod->Checksum=0;
 				xsdt_mod->Checksum=256-checksum8(xsdt_mod,xsdt_mod->Length);

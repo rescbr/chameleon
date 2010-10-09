@@ -471,16 +471,14 @@ static	EFI_CHAR8* getSmbiosUUID()
 {
 	int						 i, isZero, isOnes;
 	struct SMBEntryPoint	*smbios;
-	SMBByte					*p;
-	
+	SMBByte	*p;
 	smbios = getSmbios(SMBIOS_PATCHED); // checks for _SM_ anchor and table header checksum
 	if (smbios==NULL) return 0; // getSmbios() return a non null value if smbios is found
 	
 	p = (SMBByte*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
 	if (p==NULL) return NULL;
-	
-	verbose("Found SMBIOS System Information Table 1\n");
 	p += 8;
+	verbose("Found SMBIOS System Information Table 1\n");
 	
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
 	{
@@ -662,7 +660,6 @@ static void setupSmbiosConfigFile(const char *filename)
 	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,
 	// as opposed to when it was in scan_platform(); also load the orig. smbios so that we can access dmi info without
 	// patching the smbios yet
-	getSmbios(SMBIOS_ORIGINAL);
 	scan_mem(); 
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);	// process smbios asap
 }
@@ -715,6 +712,9 @@ void setupFakeEfi(void)
 	// Initialize the device tree
 	setupEfiDeviceTree();
 	
+	getSmbios(SMBIOS_ORIGINAL);
+	getSmbiosProductName();
+
 	
 	execute_hook("setupEfiConfigurationTable", NULL, NULL, NULL, NULL);
 	

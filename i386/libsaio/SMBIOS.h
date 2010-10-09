@@ -43,6 +43,7 @@ struct DMIHeader {
 	SMBByte			length;
 	SMBWord			handle;
 } __attribute__((packed));
+typedef struct DMIHeader DMIHeader;
 
 struct DMIEntryPoint {
 	SMBByte			anchor[5];
@@ -52,6 +53,7 @@ struct DMIEntryPoint {
 	SMBWord			structureCount;
 	SMBByte			bcdRevision;
 } __attribute__((packed));
+typedef struct DMIEntryPoint DMIEntryPoint;
 
 struct SMBEntryPoint {
 	SMBByte			anchor[4];
@@ -64,6 +66,7 @@ struct SMBEntryPoint {
 	SMBByte			formattedArea[5];
 	struct DMIEntryPoint	dmi;
 } __attribute__((packed));
+typedef struct SMBEntryPoint SMBEntryPoint;
 
 struct DMIMemoryControllerInfo {/* 3.3.6 Memory Controller Information (Type 5) */
 	struct DMIHeader	dmiHeader;
@@ -77,6 +80,7 @@ struct DMIMemoryControllerInfo {/* 3.3.6 Memory Controller Information (Type 5) 
 	SMBByte			memoryModuleVoltage;
 	SMBByte			numberOfMemorySlots;
 } __attribute__((packed));
+typedef struct DMIMemoryControllerInfo DMIMemoryControllerInfo;
 
 struct DMIMemoryModuleInfo {	/* 3.3.7 Memory Module Information (Type 6) */
 	struct DMIHeader	dmiHeader;
@@ -88,6 +92,8 @@ struct DMIMemoryModuleInfo {	/* 3.3.7 Memory Module Information (Type 6) */
 	SMBByte			enabledSize;
 	SMBByte			errorStatus;
 } __attribute__((packed));
+typedef struct DMIMemoryModuleInfo DMIMemoryModuleInfo;
+
 
 struct DMIPhysicalMemoryArray {	/* 3.3.17 Physical Memory Array (Type 16) */
 	struct DMIHeader	dmiHeader;
@@ -98,6 +104,7 @@ struct DMIPhysicalMemoryArray {	/* 3.3.17 Physical Memory Array (Type 16) */
 	SMBWord			memoryErrorInformationHandle;
 	SMBWord			numberOfMemoryDevices;
 } __attribute__((packed));
+typedef struct DMIPhysicalMemoryArray DMIPhysicalMemoryArray;
 
 struct DMIMemoryDevice {	/* 3.3.18 Memory Device (Type 17) */
 	struct DMIHeader	dmiHeader;
@@ -114,5 +121,31 @@ struct DMIMemoryDevice {	/* 3.3.18 Memory Device (Type 17) */
 	SMBWord			typeDetail;
         SMBWord                 speed;
 } __attribute__((packed));
+typedef struct DMIMemoryDevice DMIMemoryDevice;
+
+
+struct SMBStructHeader {
+    SMBByte    type;
+    SMBByte    length;
+    SMBWord    handle;
+};
+
+typedef struct SMBStructHeader SMBStructHeader;
+
+#define SMB_STRUCT_HEADER  SMBStructHeader header;
+
+struct SMBSystemInformation {
+	// 2.0+ spec (8 bytes)
+	SMB_STRUCT_HEADER               // Type 1
+	SMBString  manufacturer;
+	SMBString  productName;
+	SMBString  version;
+	SMBString  serialNumber;
+	// 2.1+ spec (25 bytes)
+	SMBByte    uuid[16];            // can be all 0 or all 1's
+	SMBByte    wakeupReason;        // reason for system wakeup
+};
+typedef struct SMBSystemInformation SMBSystemInformation;
+
 
 #endif /* !_LIBSAIO_SMBIOS_H */
