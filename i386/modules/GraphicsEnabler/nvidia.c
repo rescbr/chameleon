@@ -358,6 +358,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0CA3, "GeForce GT 240" },
 	{ 0x10DE0CA8, "GeForce GTS 260M" },
 	{ 0x10DE0CA9, "GeForce GTS 250M" },
+	{ 0x10DE0CB1, "GeForce GTS 360M" },
 	{ 0x10DE0CA3, "GeForce GT240" },
 	{ 0x10DE0E22, "GeForce GTX 460" },
 	{ 0x10DE0E24, "GeForce GTX 460" },
