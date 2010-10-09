@@ -22,7 +22,7 @@ font_t font_console;
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
-static const char* theme_name = THEME_NAME_DEFAULT;	
+const char* theme_name = THEME_NAME_DEFAULT;	
 
 #ifdef EMBED_THEME
 #include "art.h"
@@ -1825,7 +1825,7 @@ bool usePngImage = true;
 
 //==========================================================================
 // loadBootGraphics
-static void loadBootGraphics(void)
+void loadBootGraphics(void)
 {
 	if (bootImageData != NULL) {
 		return;
@@ -1854,12 +1854,9 @@ void drawBootGraphics(void)
 	int length;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
-	bool legacy_logo;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
-		usePngImage = false; 
-	} else if (bootImageData == NULL) {
+	if (usePngImage && bootImageData == NULL) {
 		loadBootGraphics();
 	}
 	
