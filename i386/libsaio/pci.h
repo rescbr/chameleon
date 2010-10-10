@@ -23,15 +23,24 @@ typedef union {
 } pci_dev_t;
 
 typedef struct pci_dt_t {
-	pci_dev_t		dev;
+	pci_dev_t				dev;
 
-	uint16_t	vendor_id;
-	uint16_t	device_id;
-	uint16_t	class_id;	
+	uint16_t				vendor_id;
+	uint16_t				device_id;
 
-	struct pci_dt_t	*parent;
-	struct pci_dt_t	*children;
-	struct pci_dt_t	*next;
+	union {
+		struct {
+			uint16_t	vendor_id;
+			uint16_t	device_id;
+		}			subsys;
+		uint32_t	subsys_id;
+	}						subsys_id;
+
+	uint16_t				class_id;	
+
+	struct pci_dt_t			*parent;
+	struct pci_dt_t			*children;
+	struct pci_dt_t			*next;
 } pci_dt_t;
 
 #define PCIADDR(bus, dev, func)	(1 << 31) | (bus << 16) | (dev << 11) | (func << 8)
@@ -42,12 +51,12 @@ extern pci_dt_t		*root_pci_dev;
 extern uint8_t		pci_config_read8(uint32_t, uint8_t);
 extern uint16_t		pci_config_read16(uint32_t, uint8_t);
 extern uint32_t		pci_config_read32(uint32_t, uint8_t);
-extern void		pci_config_write8(uint32_t, uint8_t, uint8_t);
-extern void		pci_config_write16(uint32_t, uint8_t, uint16_t);
-extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
-extern char		*get_pci_dev_path(pci_dt_t *);
-extern void		build_pci_dt(void);
-extern void		dump_pci_dt(pci_dt_t *);
+extern void			pci_config_write8(uint32_t, uint8_t, uint8_t);
+extern void			pci_config_write16(uint32_t, uint8_t, uint16_t);
+extern void			pci_config_write32(uint32_t, uint8_t, uint32_t);
+extern char			*get_pci_dev_path(pci_dt_t *);
+extern void			build_pci_dt(void);
+extern void			dump_pci_dt(pci_dt_t *);
 
 //-----------------------------------------------------------------------------
 // added by iNDi
