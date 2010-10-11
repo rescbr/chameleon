@@ -63,8 +63,8 @@ all embedtheme optionrom: ${MEMORY_OBJS} dylib
 
 
 dylib: ${GRAPHICS_ENABLER_OBJS}
-	ld -flat_namespace -arch i386 \
-	-undefined suppress \
+	ld -arch i386 \
+	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \

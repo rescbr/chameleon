@@ -533,30 +533,33 @@ static const char *memory_channel_types[] =
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i <  sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
-	if ((dram_controllers[i].vendor == dram_dev->vendor_id) 
-				&& (dram_controllers[i].device == dram_dev->device_id))
+	
+	for (i = 1; i <	sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
+	{
+		if ((dram_controllers[i].vendor == dram_dev->vendor_id) &&
+			(dram_controllers[i].device == dram_dev->device_id))
 		{
 			verbose("%s%s DRAM Controller [%4x:%4x] at %02x:%02x.%x\n", 
-						(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
-						dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
-						dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
-			
+					(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
+					dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
+					dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
+
 			if (dram_controllers[i].initialise != NULL)
 				dram_controllers[i].initialise(dram_dev);
-							
+
 			if (dram_controllers[i].poll_timings != NULL)
 				dram_controllers[i].poll_timings(dram_dev);
-								
+
 			if (dram_controllers[i].poll_speed != NULL)
 				dram_controllers[i].poll_speed(dram_dev);
 
-			verbose("Frequency detected: %d MHz (%d) %s Channel %d-%d-%d-%d\n", 
-						(uint32_t)Platform.RAM.Frequency / 1000000,
-						(uint32_t)Platform.RAM.Frequency / 500000,
-						memory_channel_types[Platform.RAM.Channels],
-						Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS
-				   );
-			
-		}	
-}	
+			verbose("Frequency detected: %d MHz (%d) %s Channel \n\tCAS:%d tRC:%d tRP:%d RAS:%d (%d-%d-%d-%d)\n", 
+					(uint32_t)Platform.RAM.Frequency / 1000000,
+					(uint32_t)Platform.RAM.Frequency / 500000,
+					memory_channel_types[Platform.RAM.Channels],
+					Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS,
+					Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS);
+			//getc();
+		}
+	}
+}
