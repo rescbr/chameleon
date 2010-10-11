@@ -236,7 +236,7 @@ static int loadThemeImage(const char *image, int alt_image)
         if (images[i].image == NULL) {
             images[i].image = malloc(sizeof(pixmap_t));
         }
-        sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/%s.png", theme_name, image);
+        sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/%s.png", theme_name, image);
         width = 0;
         height = 0;
         imagedata = NULL;
@@ -679,7 +679,7 @@ int initGUI(void)
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
-	sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/theme.plist", theme_name);
+	sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
     config_file_t	*config;
@@ -1837,7 +1837,7 @@ static void loadBootGraphics(void)
 		usePngImage = false; 
 		return;
 	}
-	sprintf(dirspec, "bt(0.0)/Extra/Themes/%s/boot.png", theme_name);
+	sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/boot.png", theme_name);
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
 #ifdef EMBED_THEME
   	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
