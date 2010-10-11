@@ -126,9 +126,12 @@ bool getSMBOemProcessorType(returnType *value)
 {
 	static bool done = false;		
 		
+	value->word = simpleGetSMBOemProcessorType();
+
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		if (!done) {
+		if (!done)
+		{
 			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, Platform.CPU.Family, Platform.CPU.Model);
 			done = true;
 		}
@@ -144,26 +147,25 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_MEROM:				// Merom
 					case CPU_MODEL_PENRYN:				// Penryn
 					case CPU_MODEL_ATOM:				// Intel Atom (45nm)
-						value->word = simpleGetSMBOemProcessorType();
-						break;
+						return true;
 
 					case CPU_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
 						value->word = 0x0701;			// Core i7
-						break;
+						return true;
 
 					case CPU_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x701;		// Core i7
-						break;
+						return true;
 
 					case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x0701;		// Core i7
-						break;
+						return true;
 
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
@@ -173,23 +175,22 @@ bool getSMBOemProcessorType(returnType *value)
 								value->word = 0x601;	// Core i5
 							else
 								value->word = 0x0701;	// Core i7
-						break;
+						return true;
 
 					case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
 					case CPU_MODEL_WESTMERE_EX:			// Intel Core i7 LGA1366 (45nm) 6 Core ???
 						value->word = 0x0701;			// Core i7
-						break;
+						return true;
 
 					case 0x19:							// Intel Core i5 650 @3.20 Ghz
 						value->word = 0x601;			// Core i5
-						break;
+						return true;
 				}
 			}
 		}
 	}
 	
-	value->word = simpleGetSMBOemProcessorType();
-	return true;
+	return false;
 }
 
 bool getSMBMemoryDeviceMemoryType(returnType *value)
@@ -209,8 +210,9 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 		}
 	}
 	
-	value->byte = SMB_MEM_TYPE_DDR2;
-	return true;
+	return false;
+//	value->byte = SMB_MEM_TYPE_DDR2;
+//	return true;
 }
 
 bool getSMBMemoryDeviceMemorySpeed(returnType *value)
@@ -230,8 +232,9 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 		}
 	}
 
-	value->dword = 800;
-	return true;
+	return false;
+//	value->dword = 800;
+//	return true;
 }
 
 bool getSMBMemoryDeviceManufacturer(returnType *value)
@@ -250,8 +253,10 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 			return true;
 		}
 	}
-	value->string = "N/A";
-	return true;
+
+	return false;
+//	value->string = "N/A";
+//	return true;
 }
 	
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
@@ -271,8 +276,10 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 			return true;
 		}
 	}
-	value->string = "N/A";
-	return true;
+
+	return false;
+//	value->string = "N/A";
+//	return true;
 }
 
 bool getSMBMemoryDevicePartNumber(returnType *value)
@@ -291,8 +298,10 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 			return true;
 		}
 	}
-	value->string = "N/A";
-	return true;
+
+	return false;
+//	value->string = "N/A";
+//	return true;
 }
 
 

@@ -369,7 +369,7 @@ void setDefaultSMBData(void)
 /* Used for SM*_N smbios.plist keys */
 bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, const char **string, returnType *value)
 {
-	static int idx = 0;
+	static int idx = -1;
 	static int current = -1;
 	int len;
 	char key[24];
@@ -380,7 +380,7 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 		current = structHeader->handle;
 	}
 
-	sprintf(key, "%s_%d", keyString, idx);
+	sprintf(key, "%s%d", keyString, idx);
 
 	if (value)
 		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
@@ -442,10 +442,8 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 						break;
 			}
 			if (SMBSetters[idx].getSMBValue)
-			{
-				SMBSetters[idx].getSMBValue((returnType *)&string);
-				break;
-			}
+				if (SMBSetters[idx].getSMBValue((returnType *)&string))
+					break;
 			if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue))
 			{
 				string = *(SMBSetters[idx].defaultValue);
