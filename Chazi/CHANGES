@@ -1,6 +1,5 @@
 - Added Booter Log Dump Tool
 - Added Booter message Logging (":/boot-log" ioreg property)
-- Removed obsolete -f option, use -x instead
 - Removed -x32 option, use arch=i386 instead
 - Added automatic SMBusspeed detection for lga1156 core i5/7 cpus
 - Added new iMac11,1 sbios default model for lga1156 core i5/17 mobos
@@ -26,7 +25,7 @@
 - Added ATI new framebuffers support and new cards from PCEFI10.6
 - improved ACPI file search algo by implementing a cache.
 - Nvidia injection fix
-- pciroot would not always return correct uuid in autodection mode
+- pciroot would not always return correct uid in autodection mode
 - Fixed the hibernation problem in boot2/resume.c
 - Fixed all new booter versions with SystemType would override the facp value even if correct,
   now keeps the facp value if correct and no override has been done, implemented a best effort algo.
