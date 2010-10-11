@@ -134,7 +134,7 @@ int load_module(char* module)
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
 
-		//printf("Module %s read in.\n", modString);
+		DBG("Module %s read in.\n", modString);
 
 		// Module loaded into memory, parse it
 		module_start = parse_mach(module_base, &load_module, &add_symbol);
@@ -331,13 +331,13 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
-		is64 = 0;
+		is64 = false;
 		binaryIndex += sizeof(struct mach_header);
 	}
 	else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
 	{
 		// NOTE: modules cannot be 64bit...
-		is64 = 1;
+		is64 = true;
 		binaryIndex += sizeof(struct mach_header_64);
 	}
 	else

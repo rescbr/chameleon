@@ -160,30 +160,36 @@ long LoadDrivers( char * dirSpec )
 				FileLoadDrivers(dirSpecExtra, 0);
 			}
 #endif
-			// Next try to load Extra extensions from the selected root partition.
-			strcpy(dirSpecExtra, "/Extra/");
+			
+			// First try a specfic OS version folder ie 10.5
+			sprintf(dirSpecExtra, "/Extra/%s/", &gMacOSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-			{
-				// If failed, then try to load Extra extensions from the boot partition
-				// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-				if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-#ifndef OPTION_ROM
-					|| (gRAMDiskVolume && gRAMDiskBTAliased) )
-#else
-					)
-#endif
+			{	
+				// Next try to load Extra extensions from the selected root partition.
+				strcpy(dirSpecExtra, "/Extra/");
+				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 				{
-					// First try a specfic OS version folder ie 10.5
-					sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
-					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-					{	
-						// Next we'll try the base
-						strcpy(dirSpecExtra, "bt(0,0)/Extra/");
-						FileLoadDrivers(dirSpecExtra, 0);
+					// If failed, then try to load Extra extensions from the boot partition
+					// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
+					if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
+#ifndef OPTION_ROM
+						|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+#else
+						)
+#endif
+					{
+						// First try a specfic OS version folder ie 10.5
+						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+						{	
+							// Next we'll try the base
+							strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+							FileLoadDrivers(dirSpecExtra, 0);
+						}
 					}
 				}
-			}
-			
+				
+			}			
 			// TODO: fix this, the order does matter, and it's not correct now.
 			// Also try to load Extensions from boot helper partitions.
 			if (gBootVolume->flags & kBVFlagBooter)

@@ -279,7 +279,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate _cpuid_set_info\n");
+		verbose("Unable to locate _cpuid_set_info\n");
 		return;
 		
 	}
@@ -410,7 +410,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate _cpuid_set_info\n");
+		verbose("Unable to locate _cpuid_set_info\n");
 		return;
 		
 	}

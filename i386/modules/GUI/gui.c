@@ -1821,7 +1821,7 @@ int updateInfoMenu(int key)
 uint16_t bootImageWidth = 0; 
 uint16_t bootImageHeight = 0; 
 uint8_t *bootImageData = NULL; 
-bool usePngImage = true;
+char usePngImage = 0;
 
 //==========================================================================
 // loadBootGraphics
@@ -1834,7 +1834,7 @@ void loadBootGraphics(void)
 	char dirspec[256];
 	
 	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
-		usePngImage = false; 
+		usePngImage = 0; 
 		return;
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
@@ -1842,7 +1842,7 @@ void loadBootGraphics(void)
 #ifdef EMBED_THEME
 		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
-			usePngImage = false; 
+			usePngImage = 0; 
 	}
 }
 
@@ -1855,6 +1855,11 @@ void drawBootGraphics(void)
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
 	uint16_t x, y; 
+	bool legacy_logo = false;
+	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && !legacy_logo)
+	{
+		usePngImage = 1; 
+	} 	
 	
 	if (usePngImage && bootImageData == NULL) {
 		loadBootGraphics();

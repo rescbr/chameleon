@@ -139,7 +139,6 @@ static int ExecKernel(void *binary)
     int                       ret;
 	
     bootArgs->kaddr = bootArgs->ksize = 0;
-	
 	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
 
     ret = DecodeKernel(binary,
@@ -405,8 +404,6 @@ void common_boot(int biosdev)
 		
         // Other status (e.g. 0) means that we should proceed with boot.
 				
-		// Notify moduals that we are attempting to boot
-		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
 		
 		// Find out which version mac os we're booting.
 		getOSVersion(gMacOSVersion);
@@ -422,6 +419,9 @@ void common_boot(int biosdev)
 			}
 		}
 		
+		// Notify moduals that we are attempting to boot
+		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;

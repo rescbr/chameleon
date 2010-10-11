@@ -49,7 +49,15 @@ extern char *    gFileName;
 
 void NetbookInstaller_start()
 {
+	//else printf("Unable to locate Extra/SystemVersion.LastPatched.plist\n");
 	
+	register_hook_callback("PreBoot", &NBI_PreBoot_hook);		
+	
+}
+
+void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	bool dummyVal = 0;
 	config_file_t systemVersion;
 	
 	char valid = false;
@@ -81,7 +89,6 @@ void NetbookInstaller_start()
 					   )
 					{
 						runNetbookInstaller = 1;
-						archCpuType = CPU_TYPE_I386;
 					}
 					else 
 					{
@@ -103,27 +110,25 @@ void NetbookInstaller_start()
 	
 	
 	
-	//else printf("Unable to locate Extra/SystemVersion.LastPatched.plist\n");
 	
-	register_hook_callback("PreBoot", &NBI_PreBoot_hook);		
 	
-}
-
-void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
-{
-	extern bool usePngImage;
-	bool dummyVal = 0;
-	if (getBoolForKey("recovery", &dummyVal, &bootInfo->bootConfig) && dummyVal)
+	if (!runNetbookInstaller && getBoolForKey("recovery", &dummyVal, &bootInfo->bootConfig) && dummyVal)
 	{
 		if(dummyVal) runNetbookInstaller = 2;
 	}
 	
 	if(runNetbookInstaller)
 	{
+		
 		replace_function("_LoadDrivers", &NBI_LoadDrivers);
-		replace_function("_md0Ramdisk", &NBI_md0Ramdisk);		
-		replace_function("_loadBootGraphics", &NBI_loadBootGraphics);		
-		usePngImage = true;
+		if(runNetbookInstaller == 1)
+		{
+			replace_function("_md0Ramdisk", &NBI_md0Ramdisk);		
+		}
+		
+		// Force arch=i386 + -v
+		archCpuType = CPU_TYPE_I386;
+		gVerboseMode = true;
 	}
 }
 
@@ -253,37 +258,4 @@ long NBI_LoadDrivers( char * dirSpec )
     LoadMatchedModules();
 	
     return 0;
-}
-
-
-extern int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_t **imageData);
-
-//==========================================================================
-// loadBootGraphics
-void NBI_loadBootGraphics(void)
-{
-	extern uint8_t *bootImageData;
-	extern uint16_t bootImageWidth; 
-	extern uint16_t bootImageHeight; 
-
-	extern const char* theme_name;
-	extern bool usePngImage;
-	
-	if (bootImageData != NULL) {
-		return;
-	}
-	
-	char dirspec[256];
-	
-	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
-		usePngImage = false; 
-		return;
-	}
-	sprintf(dirspec, "/Extra/Themes/%s/NBI.png", theme_name);
-	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
-#ifdef EMBED_THEME
-		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
-#endif
-			usePngImage = false; 
-	}
 }
