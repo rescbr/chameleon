@@ -57,7 +57,9 @@ static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{ "",""	}
 };
 
-// defaults for a Mac mini 
+// defaults for a Mac mini
+//Azi: this should be MacMini1,1, the only desktop model which used Core Solo.
+// Also check issue 37.
 static const SMStrEntryPair const sm_macmini_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
 	{"SMbiosversion",		"MM21.88Z.009A.B00.0706281359"	},
@@ -89,15 +91,15 @@ static const SMStrEntryPair const sm_imac_defaults[]={
 
 // defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro_defaults[]={
-	{"SMbiosvendor",		"Apple Computer, Inc."			},
+	{"SMbiosvendor",		"Apple Inc."					},
 	{"SMbiosversion",		"MP31.88Z.006C.B05.0802291410"	},
 	{"SMbiosdate",			"04/01/2008"					},
-	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacPro3,1"						},
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacPro"						},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F4208DC8"					},
 	{ "",""	}
 };
@@ -112,22 +114,22 @@ static const SMStrEntryPair const sm_imac_core_defaults[]={
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"iMac"							},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F2268DAE"					},
 	{ "",""	}
 };
 
 // defaults for a Mac Pro 4,1 core i7/Xeon
 static const SMStrEntryPair const sm_macpro_core_defaults[]={
-	{"SMbiosvendor",		"Apple Computer, Inc."			},
+	{"SMbiosvendor",		"Apple Inc."					},
 	{"SMbiosversion",		"MP41.88Z.0081.B04.0903051113"	},
 	{"SMbiosdate",			"11/06/2009"					},
-	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacPro4,1"						},
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacPro"						},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F4208DC8"					},
 	{ "",""	}
 };
@@ -137,7 +139,10 @@ static const char* sm_get_defstr(const char * key, int table_num)
 	int	i;
 	const SMStrEntryPair*	sm_defaults;
 
-	if (platformCPUFeature(CPU_FEATURE_MOBILE)) {
+	//Azi: reminder
+	// http://www.insanelymac.com/forum/index.php?s=&showtopic=225766&view=findpost&p=1557363
+	if (platformCPUFeature(CPU_FEATURE_MOBILE))
+	{
 		if (Platform.CPU.NoCores > 1) {
 			sm_defaults=sm_macbookpro_defaults;
 		} else {
@@ -251,7 +256,7 @@ static int sm_get_bus_speed(const char *name, int table_num)
 					case CPU_MODEL_NEHALEM_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
 					{ // thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
-						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
+						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F}; //Azi: static, dram_controllers
 						unsigned long did, vid;
 						int i;
 						
