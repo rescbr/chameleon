@@ -25,52 +25,40 @@ void md0Ramdisk()
 	int fh = -1;
 	int len;
 	
-	if(getValueForKey(kMD0ImageKey, &override_filename, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kMD0ImageKey, &override_filename, &len, &bootInfo->bootConfig))
 	{
 		// Use user specified md0 file
 		sprintf(filename, "%s", override_filename);
 		fh = open(filename, 0);
 		
-		if(fh < 0)
+		if (fh < 0)
 		{
-			sprintf(filename, "rd(0,0)/Extra/%s", override_filename);
+			sprintf(filename, "rd(0,0)/Extra/Postboot.img");
 			fh = open(filename, 0);
 
-			if(fh < 0)
+			if (fh < 0)
 			{
-				sprintf(filename, "/Extra/%s", override_filename);
+				sprintf(filename, "bt(0,0)/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
 				fh = open(filename, 0);
 			}
 		}		
-	}
-
-	if(fh < 0)
-	{
-		sprintf(filename, "rd(0,0)/Extra/Postboot.img");
-		fh = open(filename, 0);
-
-		if(fh < 0)
-		{
-			sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
-			fh = open(filename, 0);
-		}
 	}		
 
 	if (fh >= 0)
 	{
 		verbose("Enabling ramdisk %s\n", filename);
 
-		ramdiskPtr.size  = file_size(fh);
+		ramdiskPtr.size = file_size(fh);
 		ramdiskPtr.base = AllocateKernelMemory(ramdiskPtr.size);
 
-		if(ramdiskPtr.size && ramdiskPtr.base)
+		if (ramdiskPtr.size && ramdiskPtr.base)
 		{
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{
 				AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);
 				Node* node = DT__FindNode("/chosen/memory-map", false);
-				if(node != NULL)
+				if (node != NULL)
 				{
 					DT__AddProperty(node, "RAMDisk", sizeof(RAMDiskParam),  (void*)&ramdiskPtr);		
 				}
@@ -90,7 +78,6 @@ void md0Ramdisk()
 		}
 
 		close(fh);
-
 	}
 }
 
@@ -245,7 +232,6 @@ void showInfoRAMDisk(void)
 int loadPrebootRAMDisk()
 {
 	mountRAMDisk("bt(0,0)/Extra/Preboot.dmg");
-	// change md0 to be handled with the menu below??
 	
 	if (gRAMDiskMI != NULL)
 	{
