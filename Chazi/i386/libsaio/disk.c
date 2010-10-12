@@ -1606,10 +1606,13 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
          )
         newBVR->visible = true;
       
-      /* Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format
+      /*
+       * Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
        * to be able to hide foreign partitions from the boot menu.
+       *
+       * Azi: disable the limit to foreign partitions.
        */
-      if ( (newBVR->flags & kBVFlagForeignBoot) )
+      if ( (newBVR->flags/* & kBVFlagForeignBoot*/) )
       {
         char *start, *next = val;
         long len = 0;  
