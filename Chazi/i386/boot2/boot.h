@@ -41,7 +41,7 @@
  * Default names - these end with "Name" (easier to sort them).
  */
 #define kDefaultKernelName	"mach_kernel"
-#define kDefaultThemeName	"Default"
+#define kDefaultThemeName	"Default" // revert?
 /*
 #define kDefaultBootPlistName	"com.apple.Boot.plist"
 #define kDefaultDSDTName		"dsdt.aml"
@@ -70,25 +70,28 @@
 //		identifier			 string				 location				type					comment
 #define kTextModeKey		 "Text Mode"		 // graphics.c			getNumberArraiFP		- default 80x25 - kFlag - does it work??
 //#define kProductVersionKey	 "ProductVersion"	 // options.c			getValFK			- (boot.c on trunk) - reverted
+
 #define kDefaultPartitionKey "Default Partition" // sys.c				getStringFK
 #define kHidePartitionKey	 "Hide Partition"	 // disk.c				getValFK
 #define kRenamePartitionKey	 "Rename Partition"	 // disk.c				getStringFK
+
 #define kInstantMenuKey		 "Instant Menu"		 // boot.c				getBoolFK
 #define kQuietBootKey		 "Quiet Boot"		 // boot.c				getBoolFK				- kFlag
 #define kTimeoutKey			 "Timeout"			 // options.c			getIntFK
 #define kThemeNameKey		 "Theme"			 // gui.c				getValFK
 #define kGUIKey				 "GUI"				 // boot.c				getBoolFK
 #define kBootBannerKey		 "Boot Banner"		 // options.c			getBoolFK
+#define kLegacyLogoKey		 "Legacy Logo"		 // gui.c				getBoolFK				- revert?
 #define kDebugInfoKey		 "DebugInfo"		 // gui.c, graphics.c	getBoolFK
 #define kRescanPromptKey	 "Rescan Prompt"	 // boot.c				getBoolFK				- cdrom only - firstrun
 #define kRescanKey		     "Rescan"			 // boot.c				getBoolFK				- cdrom only?? - firstrun
 #define kCDROMPromptKey		 "CD-ROM Prompt"	 // options.c			getValFK				- internal??
 #define kCDROMOptionKey		 "CD-ROM Option Key" // options.c			getIntFK				- internal?? (F8)
 #define kScanSingleDriveKey	 "Scan Single Drive" // boot.c				getBoolFK
-#define kDevicePropertiesKey "device-properties" // device_inject.c		getValFK				- here because ??
+#define kDevicePropertiesKey "device-properties" // device_inject.c		getValFK
 #define kWaitForKeypressKey	 "Wait"				 // boot.c				getBoolFK
 #define kAltConfigKey		 "config"			 // stringTable.c		getValFK				- kFlag - hum.. handle like kFlag??
-#define kCanOverrideKey		 "CanOverride"		 // stringTable.c		getBoolFK
+#define kCanOverrideKey		 "CanOverride"		 // stringTable.c		getBoolFK				- remember -F ***
 #define kRootDeviceKey		 "rd"				 // options.c			processBootArg			- kFlag
 #define kBootDeviceKey		 "Boot Device"		 // options.c			getValFK				- kFlag/option??????
 #define kBootUUIDKey		 "boot-uuid"		 // options.c			processBootArg			- kFlag
@@ -110,10 +113,9 @@
 #define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
 #define kAutoResolutionKey	 "AutoResolution"	 // boot.c				getBoolFK
 #define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
-#define kLegacyLogoKey		 "Legacy Logo"		 // gui.c				getBoolFK
 #define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
 #define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK
-#define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK
+#define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?
 #define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c		getBoolFK
 #define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c		getBoolFK
 #define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK

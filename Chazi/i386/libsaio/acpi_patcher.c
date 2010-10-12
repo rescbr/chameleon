@@ -614,8 +614,8 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Restart Fix
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		fix_restart = false; //Azi: think this should be false by default!?
-		// On the other hand, i could use a shutdown fix now and then :)
+		fix_restart = false; //Azi: think this should be false by default, but...
+		
 		getBoolForKey(kRestartFixKey, &fix_restart, &bootInfo->bootConfig);
 	}
 	else
@@ -653,7 +653,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		else
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 	}
-	// Set PM_Profile from System-type only if user wanted this value to be forced
+	// Set PM_Profile from SystemType only if user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
 	{
 	    if (value) 
