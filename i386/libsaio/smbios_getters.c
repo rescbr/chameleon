@@ -104,7 +104,6 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			}
 		}
 	}
-	value->word = 0;
 	return true;
 }
 
