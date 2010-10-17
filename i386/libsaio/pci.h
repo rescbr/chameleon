@@ -868,7 +868,7 @@ struct pci_rom_bios_t {
 
 #define PCI_BASE_CLASS_CRYPT			0x10
 #define PCI_CLASS_CRYPT_NETWORK			0x1000
-#define PCI_CLASS_CRYPT_ENTERTAINMENT	0x1010
+#define PCI_CLASS_CRYPT_ENTERTAINMENT	0x01001
 #define PCI_CLASS_CRYPT_OTHER			0x1080
 
 #define PCI_BASE_CLASS_SIGNAL			0x11
@@ -882,7 +882,7 @@ struct pci_rom_bios_t {
 /* Several ID's we need in the library */
 
 #define PCI_VENDOR_ID_APPLE				0x106b
-#define PCI_VENDOR_ID_AMD				0x1002
+#define PCI_VENDOR_ID_AMD				0x1022
 #define PCI_VENDOR_ID_ATI				0x1002
 #define PCI_VENDOR_ID_INTEL				0x8086
 #define PCI_VENDOR_ID_NVIDIA			0x10de
