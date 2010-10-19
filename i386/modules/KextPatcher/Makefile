@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-OBJS = kext_patcher.o
+OBJS = kext_patcher.o inflate.o zutil.o inftrees.o inffast.o adler32.o
 
 
 SFILES =
@@ -73,11 +73,33 @@ dylib: ${OBJS}
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-weak_library $(SYMROOT)/Symbols.dylib \
-	$(OBJROOT)/kext_patcher.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	-weak_library $(SYMROOT)/GUI.dylib \
+	$(OBJROOT)/kext_patcher.o \
+	$(OBJROOT)/inflate.o \
+	$(OBJROOT)/inftrees.o \
+	$(OBJROOT)/zutil.o \
+	$(OBJROOT)/inffast.o \
+	$(OBJROOT)/adler32.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 kext_patcher.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kext_patcher.c" $(INC) -o "$(OBJROOT)/kext_patcher.o"
+
+inflate.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inflate.c" $(INC) -o "$(OBJROOT)/inflate.o"
+
+zutil.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "zutil.c" $(INC) -o "$(OBJROOT)/zutil.o"
+
+inftrees.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inftrees.c" $(INC) -o "$(OBJROOT)/inftrees.o"
+
+inffast.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inffast.c" $(INC) -o "$(OBJROOT)/inffast.o"
+
+adler32.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "adler32.c" $(INC) -o "$(OBJROOT)/adler32.o"
 
 include ../../MakeInc.dir
 
