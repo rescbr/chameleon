@@ -717,10 +717,6 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 			}
 
 		}
-		
-		if (negative)
-			integer = -integer;
-		
 	}
 	else if ( size )	// Decimal value
 	{
@@ -733,19 +729,21 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 		
 		for (integer = 0; size > 0; size--)
 		{
-			if (*val < '0' || *val > '9')
+			if(*val) // UGLY HACK, fix me.
 			{
-				printf("ParseTagInteger decimal error (0x%x) in buffer %s\n", *val, buffer);
-				getc();
-				return -1;
+				if (*val < '0' || *val > '9')
+				{
+					printf("ParseTagInteger decimal error (0x%x) in buffer %s\n", *val, buffer);
+					getc();
+					return -1;
+				}
+				
+				integer = (integer * 10) + (*val++ - '0');
 			}
-			
-			integer = (integer * 10) + (*val++ - '0');
 		}
 		
 		if (negative)
 			integer = -integer;
-		
 	}
 		
     tmpTag->type = kTagTypeInteger;
@@ -754,7 +752,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
-    
+    	
     return length;
 }
 
@@ -1109,7 +1107,11 @@ bool XMLCastBoolean(TagPtr dict)
 
 int XMLCastInteger(TagPtr dict)
 {
-	if(!dict) return 0;
-	if(dict->type == kTagTypeInteger) return (int)dict->string;
+	if(!dict)
+	{
+		printf("XMLCastInteger: null dict\n");
+		return 0;
+	}
+	if(dict->type == kTagTypeInteger) return (int)(dict->string);
 	return 0;
 }
