@@ -182,7 +182,6 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 			}
 			entry = entry->next;
 		}
-		
 	}
 }
 
@@ -395,7 +394,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 
 
 void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
-{	
+{
 	UInt8* bytes = (UInt8*)kernelData;
 	
 	kernSymbols_t *symbol = lookup_kernel_symbol("_cpuid_set_info");
@@ -451,18 +450,15 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	// NOTE: This will *NOT* be located on pre 10.6.2 kernels
 	jumpLocation = patchLocation - 15;
 	while((bytes[jumpLocation - 1] != 0x77 ||
-		   bytes[jumpLocation] != (patchLocation - jumpLocation - -8)) &&
+		   bytes[jumpLocation] != (patchLocation - jumpLocation - 18)) &&
 		  (patchLocation - jumpLocation) < 0xF0)
 	{
 		jumpLocation--;
 	}
-	
 	// If found... AND we want to impersonate a specific cpumodel / family...
-	if(impersonateFamily &&
-	   impersonateModel  &&
+	if(impersonateFamily && impersonateModel  &&
 	   ((patchLocation - jumpLocation) < 0xF0))
 	{
-		
 		bytes[jumpLocation] -= 10;		// sizeof(movl	$0x6b5a4cd2,0x00872eb4) = 10bytes
 		
 		/* 
@@ -510,6 +506,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	}
 	else if(impersonateFamily && impersonateModel)
 	{
+
 		// pre 10.6.2 kernel
 		// Locate the jump to directly *after* the panic call,
 		jumpLocation = patchLocation - 4;
@@ -609,7 +606,6 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 
 void patch_lapic_init(void* kernelData)
 {
-
 	UInt8 panicIndex = 0;
 	UInt8* bytes = (UInt8*)kernelData;
 	
