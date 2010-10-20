@@ -71,7 +71,9 @@ dylib: ${NET_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/Networking.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 

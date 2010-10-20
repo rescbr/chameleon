@@ -71,9 +71,8 @@ dylib: ${RESOLUTION_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/edid.o \
-	$(OBJROOT)/915resolution.o \
-	$(OBJROOT)/Resolution.o \
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

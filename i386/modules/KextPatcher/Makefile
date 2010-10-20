@@ -74,15 +74,8 @@ dylib: ${OBJS}
 	-final_output $(MODULE_NAME) \
 	-weak_library $(SYMROOT)/Symbols.dylib \
 	-weak_library $(SYMROOT)/GUI.dylib \
-	$(OBJROOT)/kext_patcher.o \
-	$(OBJROOT)/inflate.o \
-	$(OBJROOT)/deflate.o \
-	$(OBJROOT)/inftrees.o \
-	$(OBJROOT)/zutil.o \
-	$(OBJROOT)/inffast.o \
-	$(OBJROOT)/adler32.o \
-	$(OBJROOT)/trees.o \
-	$(OBJROOT)/hex_editor.o \
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

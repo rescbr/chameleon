@@ -73,7 +73,9 @@ dylib: ${OBJS}
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-weak_library $(SYMROOT)/Symbols.dylib \
-	$(OBJROOT)/kernel_patcher.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 kernel_patcher.o: 	

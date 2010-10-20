@@ -82,11 +82,8 @@ dylib: ${GUI_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/GUI_module.o \
-	$(OBJROOT)/gui.o \
-	$(OBJROOT)/picopng.o \
-	$(OBJROOT)/graphic_utils.o \
-	-weak_library $(SYMROOT)/Resolution.dylib \
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
 	 -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 GUI_module.o: 	

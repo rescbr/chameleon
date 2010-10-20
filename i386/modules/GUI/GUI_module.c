@@ -745,11 +745,10 @@ int GUI_getBootOptions(bool firstRun)
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet))
 		{
-			bool showBootBanner = true;
+			bool showBootBanner = false;
 			
 			// Check if "Boot Banner"=N switch is present in config file.
-			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
-			if (showBootBanner)
+			if (getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig) && !showBootBanner)
 			{
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
