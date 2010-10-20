@@ -15,6 +15,8 @@
 
 //#include "libsaio.h"
 //#include "autoresolution.h" - included on *_resolution.h
+//#include "boot.h"
+//#include "gui.h"
 #include "nvidia_resolution.h"
 #include "ati_resolution.h"
 #include "gma_resolution.h"
@@ -208,7 +210,7 @@ sModeTable * intializeTables(vBiosMap * map, int tablesCount) {
 	while ( i != 0 )
 	{		
 		table->id = tablesCount - i;
-		PRINT("New table with id : %d\n", table->id);
+		PRINT("New table with id: %d\n", table->id);
 		
 		// opening the chain if it's the first table
 		if (i == tablesCount)
@@ -271,7 +273,7 @@ vBiosMap * openVbios(chipsetType forcedChipset)
 	 *  Common initialisation
 	 */
 	
-	map->hasSwitched = false;
+//	map->hasSwitched = false;
 	
 	/*
 	 * check if we have ATI Radeon and open atombios
@@ -344,7 +346,7 @@ vBiosMap * openVbios(chipsetType forcedChipset)
 	{
 		PRINT("Unknown chipset type and unrecognized bios.\n");
 		
-		PRINT("autoresolution only works with Intel 800/900 series graphic chipsets.\n");
+		PRINT("autoresolution only works with Intel 800/900 series graphic chipsets.\n"); //Azi:reminder
 		
 		PRINT("Chipset Id: %x\n", map->chipsetId);
 		closeVbios(map);
@@ -361,8 +363,8 @@ void closeVbios(vBiosMap * map)
 {
 	PRINT("Closing VBios\n");
 	//make sure to turn autoResolution off
-	if (gAutoResolution == TRUE)
-		gAutoResolution = FALSE;
+	if (gAutoResolution == true)
+		gAutoResolution = false;
 	
 	// if we saved the vBios, free the copy
 	if (map->biosBackupPtr != NULL)
@@ -378,14 +380,14 @@ void closeVbios(vBiosMap * map)
 	{		
 		if (table->backup != NULL)
 		{
-			PRINT("Table #%d : Freeing backup\t", table->id);
+			PRINT("Table #%d: Freeing backup\t", table->id);
 			FREE(table->backup);
 			PRINT("[OK]\n");
 		}
 		
 		if (table != NULL)
 		{ 
-			PRINT("Table #%d : Freeing\t\t", table->id);
+			PRINT("Table #%d: Freeing\t\t", table->id);
 			FREE(table);
 			PRINT("[OK]\n");
 		}
@@ -404,7 +406,7 @@ void closeVbios(vBiosMap * map)
 void unlockVbios(vBiosMap * map)
 {
 
-	map->unlocked = TRUE;
+	map->unlocked = true;
 	    
 	switch (map->chipset)
 	{
@@ -462,7 +464,7 @@ void unlockVbios(vBiosMap * map)
 void relockVbios(vBiosMap * map)
 {
 
-	map->unlocked = FALSE;
+	map->unlocked = false;
 	
 	switch (map->chipset)
 	{
@@ -513,6 +515,7 @@ void relockVbios(vBiosMap * map)
 
 /*
  * saveVbios - save the entire vBios in case the patch has to be removed
+ * Azi: only on Intel??
  */
 void saveVbios(vBiosMap * map)
 {
@@ -560,6 +563,7 @@ void restoreTables(vBiosMap * map, sModeTable * table)
 	{
 		bcopy(table->backup, (uint8_t *)table->pointer, table->size);
 		table = table->next;
+//		verbose("Table/s restored...\n");
 	}
 	relockVbios(map);
 }
@@ -599,11 +603,11 @@ void patchVbios(vBiosMap * map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hT
 		x = map->currentX;
 		y = map->currentY;
 		
-		PRINT("Patching Table #%d : \n", table->id);
+		PRINT("Patching Table #%d: \n", table->id);
 		
 		map->setMode(table, i, &x, &y);
 #ifdef AUTORES_DEBUG
-		getc();
+		pause();
 #endif
 
 		table = table->next;
@@ -611,4 +615,146 @@ void patchVbios(vBiosMap * map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hT
 	
 	relockVbios(map);
 	return;
-}  
+}
+/*
+void patchRes()
+{
+//	UInt32 paramsAR[4];
+	paramsAR[3] = 0;
+
+	// Open the VBios and store VBios or Tables
+	map = openVbios(CT_UNKWN);
+
+	//Get Resolution from Graphics Mode key...
+	int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+
+	// ...  or EDID.
+	if (count < 3)
+	{
+		getResolution(paramsAR);
+		// check the DEBUG stuff... also on TEXT MODE (this is not printing).
+		PRINT("Resolution: %dx%d (EDID)\n",paramsAR[0], paramsAR[1]);
+	}
+	else
+	{
+		PRINT("Resolution: %dx%d (Graphics Mode key)\n",paramsAR[0], paramsAR[1]);
+
+		if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
+		if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
+		if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
+	}
+
+	// If using GUI, patch the video bios with the extracted resolution,
+	// before initGui.
+
+	// perfom the actual VBIOS patching
+	if (paramsAR[0] != 0 && paramsAR[1] != 0)
+	{
+		patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
+	}
+
+	closeVbios(map);
+	//Azi: gAutoResolution was just set to false on closeVbios().
+	gAutoResolution = true;
+
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
+		gui.screen.width = paramsAR[0];
+		gui.screen.height = paramsAR[1];
+	}
+
+	// If the patch is working properly, we're done. If not and it's just a matter
+	// of wrong resolution, we can try reapply the patch; see "case kF2Key:", options.c.
+
+	// The patch works properly but we're not using GUI; keep Vbios open and patch/close
+	// on drawBootGraphics().
+	// ??????Don't forget we´re maybe using this to get correct resolution after login,
+	// despite having qe/ci or not...!!!!
+}
+
+void reloadRes()
+{
+//	UInt32 paramsAR[4];
+	paramsAR[3] = 0;
+	
+	map = openVbios(CT_UNKWN);
+	// Has the target Resolution Changed ?
+	int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+	
+	if ( count < 3 ) // why this? we are implicitly trying to change the resolution
+	// at boot prompt, using Graphics Mode flag...
+	{
+		getResolution(paramsAR);
+	}
+	else
+	{
+		if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
+		if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
+		if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
+	}
+
+	// user changed resolution...
+	if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
+		(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
+	{
+		//Azi: same shit as "case kTabKey:" - check
+		// Go back to TEXT mode while we change the mode
+		if (bootArgs->Video.v_display == GRAPHICS_MODE)
+		{
+			CursorState cursorState;
+
+			setVideoMode(VGA_TEXT_MODE, 0);
+
+			setCursorPosition(0, 0, 0);
+			clearScreenRows(0, kScreenLastRow);
+			changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
+
+			// Reapply patch
+			patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
+
+			if (useGUI && (gui.initialised == true))
+				initGUI();
+			// Make sure all values are set
+			if (bootArgs->Video.v_display != GRAPHICS_MODE)
+				bootArgs->Video.v_display = GRAPHICS_MODE;
+
+			if (!useGUI)
+				useGUI = true;
+
+			// redraw the background buffer
+			drawBackground();
+			gui.devicelist.draw = true;
+			gui.redraw = true;
+			
+			if (showBootBanner)
+			{
+				// Display banner and show hardware info.
+				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
+			}
+
+			// redraw background
+			memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
+				   gui.backbuffer->width * gui.backbuffer->height * 4);
+
+			nextRow = kMenuTopRow;
+			showPrompt = true;
+
+			if (gDeviceCount)
+			{
+				showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
+				nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+			}
+
+			// Show the boot prompt.
+			showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+			showBootPrompt( nextRow, showPrompt );
+
+			// this is used to avoid resetting the incorrect mode while quiting the boot menu
+//						map->hasSwitched = true;
+		}
+	}
+		
+	closeVbios(map);
+	//Azi: gAutoResolution was just set to false on closeVbios.
+	gAutoResolution = true;
+}*/

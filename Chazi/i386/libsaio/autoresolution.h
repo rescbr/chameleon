@@ -16,11 +16,11 @@
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
 
-//#define AUTORES_DEBUG 1 // enable AutoResolution debug - review!
-
 #include "libsa.h"
 #include "saio_internal.h"
 #include "edid.h"
+
+//#define AUTORES_DEBUG 1 // enable AutoResolution debug - review!
 
 #if DEBUG
 #ifndef AUTORES_DEBUG
@@ -42,11 +42,12 @@
 #define VBIOS_START         0xc0000
 #define VBIOS_SIZE          0x10000
 
-#define FALSE 0
-#define TRUE 1
+//#define false 0			(Reviewing...)
+//#define true 1
 
 
 bool gAutoResolution;
+UInt32 paramsAR[4]; //Azi: testing autoresolution
 
 
 typedef struct
@@ -114,7 +115,7 @@ typedef struct
 	uint32_t currentX, currentY;
 	uint8_t b1, b2;
 	
-	bool hasSwitched;
+//	bool hasSwitched;
 	
 	bool (*setMode)(sModeTable *,uint8_t,uint32_t*,uint32_t*);
 	
@@ -145,5 +146,8 @@ void gtfTimings(uint32_t x, uint32_t y, uint32_t freq,
 sModeTable * intializeTables(vBiosMap * map, int tablesCount);
 
 void patchVbios(vBiosMap* map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hTotal, uint32_t vTotal);
+
+//void patchRes();
+//void reloadRes();
 
 #endif

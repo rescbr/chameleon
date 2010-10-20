@@ -427,19 +427,20 @@ setVESAGraphicsMode( unsigned short width,
 
 #ifdef AUTORES_DEBUG
 		printf("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
-		//getc(); //Azi: i get the hangs, like "old" Wait=y issue.
+		//getc(); //Azi: boot hangs, on the second call (like "old" Wait=y issue).
+		sleep(2);
 #endif
         // Set the mode with default refresh rate.
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
         if ( err != errSuccess )
         {
-            break;
 #ifdef AUTORES_DEBUG
 			printf("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
 				   mode, minfo.XResolution, minfo.YResolution, err);
-			getc();
+			sleep(2); //Azi: i suppose the same as above.
 #endif
+            break;
         }
 
         // Set 8-bit color palette.
@@ -1121,34 +1122,40 @@ setVideoMode( int mode, int drawgraphics)
 {
     unsigned long params[4];
     int           count;
-    int           err = errSuccess;
+    int           err = errSuccess; // = 0
 
     if ( mode == GRAPHICS_MODE )
     {
-  		if ( (err=initGraphicsMode ()) == errSuccess ) {
-        if (gVerboseMode) {
-            // Tell the kernel to use text mode on a linear frame buffer display
-            bootArgs->Video.v_display = FB_TEXT_MODE;
-        } else {
-            bootArgs->Video.v_display = GRAPHICS_MODE;
+        if ( (err = initGraphicsMode() ) == errSuccess )
+        {
+            if (gVerboseMode)
+            {
+                // Tell the kernel to use text mode on a linear frame buffer display
+                bootArgs->Video.v_display = FB_TEXT_MODE;
+            }
+            else
+            {
+                bootArgs->Video.v_display = GRAPHICS_MODE;
+            }
         }
-      }
     }
 
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
     {
-        count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		
         if ( count < 2 )
         {
             params[0] = 80;  // Default text mode is 80x25.
             params[1] = 25;
         }
 
-		setVESATextMode( params[0], params[1], 4 );
+        setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
-
-    currentIndicator = 0;
+//	printf("Res: %dx%d (setvm: gsw/h final?)\n", gui.screen.width, gui.screen.height);
+    
+	currentIndicator = 0;
 }
 
 void getGraphicModeParams(unsigned long params[]) {

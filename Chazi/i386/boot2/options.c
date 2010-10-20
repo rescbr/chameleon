@@ -180,7 +180,8 @@ static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
 static char   booterCommand[BOOT_STRING_LEN];
 static char   booterParam[BOOT_STRING_LEN];
 
-static void clearBootArgs(void)
+//static 
+void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
@@ -269,7 +270,8 @@ static void updateBootArgs( int key )
 					putchar(key);  // echo to screen
 				else
 					updateGraphicBootPrompt(key);
-			*gBootArgsPtr++ = key;
+				
+				*gBootArgsPtr++ = key;
 			}
             
 			break;
@@ -1008,32 +1010,28 @@ int getBootOptions(bool firstRun)
 		case kEscapeKey:
 			clearBootArgs();
 			break;
-							
-		/*
-		 * AutoResolution - Reapply the patch if Graphics Mode was incorrect
-		 *                  or EDID Info was insane
-		 */
+
+		// AutoResolution - Reapply the patch if Graphics Mode was incorrect or EDID Info was insane.
+		//Azi: 
 		case kF2Key:
 			
-			//get the new Graphics Mode key
-			processBootOptions();
-			if ((gAutoResolution == TRUE) && map)
+			if ((gAutoResolution == true) && map)
 			{
-				UInt32 params[4];
-				params[3] = 0;
-				//Has the target Resolution Changed ?
-				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+				// get the new Graphics Mode key
+				processBootOptions(); //Azi: use processBootArgument instead?
+
+//				reloadRes();
+//				UInt32 paramsAR[4];
+				paramsAR[3] = 0;
 				
-				if ( count < 3 )
+				getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+				
+				// user changed resolution...
+				if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
+					(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
 				{
-					getResolution(params);
-				}
-
-				if ((params[0] != 0) && (params[1] != 0) &&
-					(params[0] != map->currentX) && (params[1] != map->currentY))
-				{
-
-					//Go back to TEXT mode while we change  the mode
+					//Azi: same stuff as "case kTabKey:"			(Reviewing...)
+					// Go back to TEXT mode while we change the mode
 					if (bootArgs->Video.v_display == GRAPHICS_MODE)
 					{
 						CursorState cursorState;
@@ -1044,9 +1042,8 @@ int getBootOptions(bool firstRun)
 						clearScreenRows(0, kScreenLastRow);
 						changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
 
-						//Reapply patch in case resolution have changed
-
-						patchVbios(map, params[0], params[1], params[2], 0, 0);
+						// Reapply patch
+						patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
 
 						if (useGUI && (gui.initialised == true))
 							initGUI();
@@ -1061,18 +1058,16 @@ int getBootOptions(bool firstRun)
 						drawBackground();
 						gui.devicelist.draw = true;
 						gui.redraw = true;
-						if (!(gBootMode & kBootModeQuiet))
+						
+						if (showBootBanner)
 						{
-
-							// Check if "Boot Banner"=N switch is present in config file.
-							getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
-							if (showBootBanner)
-								// Display banner and show hardware info.
-								gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
-
-							// redraw background
-							memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4);
+							// Display banner and show hardware info.
+							gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
 						}
+
+						// redraw background
+						memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
+							   gui.backbuffer->width * gui.backbuffer->height * 4);
 
 						nextRow = kMenuTopRow;
 						showPrompt = true;
@@ -1087,10 +1082,17 @@ int getBootOptions(bool firstRun)
 						showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 						showBootPrompt( nextRow, showPrompt );
 
-						//this is used to avoid resetting the incorrect mode while quiting the boot menu
-						map->hasSwitched = true;
+						// this is used to avoid resetting the incorrect mode while quiting the boot menu
+//						map->hasSwitched = true; (check again later!)
 					}
 				}
+				
+				clearBootArgs();
+				key = 0;
+			}	
+			else // if gAutoResolution == false...
+			{
+				// ... do "nothing".
 				clearBootArgs();
 				key = 0;
 			}
@@ -1107,7 +1109,7 @@ int getBootOptions(bool firstRun)
 			}
 			break;
 
-		case kF10Key:
+		case kF10Key: //Azi: disable "Scan Single Drive"=y (if set) and rescan disks.
 			gScanSingleDrive = false;
 			scanDisks(gBIOSDev, &bvCount);
 			gBootVolume = NULL;
@@ -1598,6 +1600,7 @@ void showTextFile(const char * filename)  //Azi:?more
 // Eventually we need to do something more user-friendly like display a menu
 // based off of the Multiboot device list
 
+//Azi: is this stuff still used for anything?? check multiboot()...
 int selectAlternateBootDevice(int bootdevice)
 {
 	int key;

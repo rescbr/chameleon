@@ -78,7 +78,7 @@ bool atiSetMode_1(sModeTable * table, uint8_t idx, uint32_t * x, uint32_t * y)
 	*x = modeTiming[idx + 1].hActive;
 	*y = modeTiming[idx + 1].vActive;
 	
-	return TRUE;
+	return true;
 }
 
 bool atiSetMode_2(sModeTable * table, uint8_t idx, uint32_t* x, uint32_t* y)
@@ -100,5 +100,5 @@ bool atiSetMode_2(sModeTable * table, uint8_t idx, uint32_t* x, uint32_t* y)
 	*x = modeTiming[idx + 1].hActive;
 	*y = modeTiming[idx + 1].hActive;
 	
-	return TRUE;
+	return true;
 }

@@ -86,7 +86,7 @@ vBiosMap * openIntelVbios(vBiosMap *map)
 		return 0;
 	}
 	
-	PRINT("Mode Table at offset : 0x%x\n", (table->pointer) - map->biosPtr);
+	PRINT("Mode Table at offset: 0x%x\n", (table->pointer) - map->biosPtr);
 	
 	/*
 	 * Determine size of mode table
@@ -101,30 +101,30 @@ vBiosMap * openIntelVbios(vBiosMap *map)
 	}
 	
 	table->modeCount = table->size;
-	PRINT("Mode Table size : %d\n", table->modeCount);
+	PRINT("Mode Table size: %d\n", table->modeCount);
 	
 	/*
 	 * Figure out what type of bios we have
 	 *  order of detection is important
 	 */
 	
-	if (detectBiosType(map, TRUE, sizeof(vbiosModelineType3)))
+	if (detectBiosType(map, true, sizeof(vbiosModelineType3)))
 	{
 		map->bios = BT_3;
 		map->setMode = intelSetMode_3;
-		PRINT("Bios Type : BT_3\n");
+		PRINT("Bios Type: BT_3\n");
 	}
-	else if (detectBiosType(map, TRUE, sizeof(vbiosModelineType2)))
+	else if (detectBiosType(map, true, sizeof(vbiosModelineType2)))
 	{
 		map->bios = BT_2;
 		map->setMode = intelSetMode_2;
-		PRINT("Bios Type : BT_2\n");
+		PRINT("Bios Type: BT_2\n");
 	}
-	else if (detectBiosType(map, FALSE, sizeof(vbiosResolutionType1)))
+	else if (detectBiosType(map, false, sizeof(vbiosResolutionType1)))
 	{
 		map->bios = BT_1;
 		map->setMode = intelSetMode_1;
-		PRINT("Bios Type : BT_1\n");
+		PRINT("Bios Type: BT_1\n");
 	}
 	else
 	{

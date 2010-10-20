@@ -121,8 +121,7 @@ vBiosMap * openNvidiaVbios(vBiosMap *map)
 	saveTables(map->modeTables);
 	
 #ifdef AUTORES_DEBUG
-	PRINT("Press Any Key...\n");
-	getc();
+	pause();
 #endif
 	
 	return map;
@@ -215,5 +214,5 @@ bool nvidiaSetMode(sModeTable * table, uint8_t idx, uint32_t* x, uint32_t* y)
 			idx++;
 		}
 	}
-	return TRUE;
+	return true;
 }

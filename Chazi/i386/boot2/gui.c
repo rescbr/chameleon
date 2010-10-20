@@ -218,7 +218,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 
 static int loadThemeImage(const char *image, int alt_image)
 {
-	char		dirspec[256];
+	char		dirspec[128]; //Azi: testing
 	int 		i;
 #ifdef EMBED_THEME
 	int 		e;
@@ -386,7 +386,7 @@ int createBackBuffer( window_t *window )
 	
 	gui.backbuffer->width = gui.screen.width;
 	gui.backbuffer->height = gui.screen.height;
- 
+
 	return 0;
 }
 
@@ -672,8 +672,8 @@ void loadThemeValues(config_file_t *theme)
  
 int initGUI(void)
 {
-	int		val, len, count;
-	char	dirspec[128]; //Azi: a bit of testing***
+	int		val, len;
+	char	dirspec[128]; //Azi: testing
 
 	getValueForKey( kThemeNameKey, &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
@@ -693,29 +693,15 @@ int initGUI(void)
 #endif
 	}
 	
-	/*
-	 * AutoResolution
-	 */
+	// AutoResolution
 	if (gAutoResolution == true)
 	{
-		// Get Resolution from Graphics Mode key
-		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
-		
-		// If no Graphics Mode key, get it from EDID
-		if ( count < 3 )
-		{
-			getResolution(screen_params);
-			
-			PRINT("Resolution : %dx%d (EDID)\n",screen_params[0], screen_params[1]);
-		}
-		else
-		{
-			PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
-		}
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
  	}
 	else
 	{
-		// parse display size parameters
+		// parse screen size parameters
  		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
 		{
 			screen_params[0] = val;
@@ -725,6 +711,7 @@ int initGUI(void)
 		{
 			screen_params[1] = val;
 		}
+		//Azi: how about using default values?
 	}
 
 	// Initalizing GUI strucutre.
@@ -754,8 +741,7 @@ int initGUI(void)
 							if (createWindowBuffer(&gui.menu) == 0) {
 								
 #ifdef AUTORES_DEBUG
-								printf("Press Any Key...\n");
-								getc();
+								pause();
 #endif
 								gui.logo.draw = true;
 								drawBackground();
@@ -1827,21 +1813,29 @@ static bool usePngImage = true;
 // loadBootGraphics
 static void loadBootGraphics(void)
 {
-	if (bootImageData != NULL) {
+	if (bootImageData != NULL)
+	{
 		return;
 	}
-
-	char dirspec[256];
-
-	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
+	
+	char dirspec[128]; //Azi: testing
+	
+	if ((strlen(theme_name) + 24) > sizeof(dirspec))
+	{
 		usePngImage = false; 
 		return;
 	}
+	
 	sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/boot.png", theme_name);
-	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
+	
+	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0)
+	{
+
 #ifdef EMBED_THEME
-  	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
+			if ((loadEmbeddedPngImage(__boot_png, __boot_png_len,
+				&bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
+
 		usePngImage = false; 
 	}
 }
@@ -1852,8 +1846,7 @@ void drawBootGraphics(void)
 {
 	bool legacy_logo;
 	const char *dummyVal;
-	int pos;//, count;
-	int length, oldScreenWidth, oldScreenHeight;
+	int pos, length, oldScreenWidth, oldScreenHeight;
 	uint16_t x, y; 
 	
 	if (getBoolForKey(kLegacyLogoKey, &legacy_logo, &bootInfo->bootConfig) && legacy_logo)
@@ -1864,24 +1857,22 @@ void drawBootGraphics(void)
 	{
 		loadBootGraphics();
 	}
-	
-    // Save current screen resolution.
+
+	// Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
+//	printf("Res: %dx%d (drawbg: current/old)\n", oldScreenWidth, oldScreenHeight);
 
-	/*
- 	 * AutoResolution
- 	 */
+	// AutoResolution
 	if (gAutoResolution == true)
 	{
-		//Azi: if this stuff is working properly, resolution is set, Vbios is closed and 
-		// most probably we want to use oldScreenWidth/Height so...
-		screen_params[0] = oldScreenWidth;
-		screen_params[1] = oldScreenHeight;
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
+//		printf("Res: %dx%d (drawbg: AR)\n", screen_params[0], screen_params[1]);
 	}
 	else
 	{
-		// parse display size parameters
+		// parse boot screen size parameters
 		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[0] = pos;
@@ -1890,7 +1881,7 @@ void drawBootGraphics(void)
 		{
 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		}
-		
+
 		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
 		{
 			screen_params[1] = pos;
@@ -1899,17 +1890,19 @@ void drawBootGraphics(void)
 		{
 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 		}
+		//Azi: and how about not using default values here? like on initGUI...
 	}
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
-
+//	printf("Res: %dx%d (drawbg: gsw/h new)\n", gui.screen.width, gui.screen.height);
+	
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE ||
-		(screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE
+		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight))
 	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}

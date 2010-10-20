@@ -49,6 +49,8 @@
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
 
+//#define DEBUG 1
+
 //#include "bootstruct.h"
 //#include "libsa.h"
 #include "boot.h"
@@ -187,6 +189,17 @@ static int ExecKernel(void *binary)
 	
 	// Notify modules that the kernel is about to be started
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+	
+	if ((gAutoResolution == true) && map)
+	{
+		closeVbios(map);
+		//Azi: as a side note, while testing i didn't got any problems booting without
+		// closing Vbios... closing it just in case. (check again later!)
+		
+		// gAutoResolution was just set to false on closeVbios().
+		// We need to be "true" for drawBootGraphics().
+		gAutoResolution = true;
+	}
 
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
@@ -241,7 +254,7 @@ void common_boot(int biosdev)
     bool     quiet;
     bool     firstRun = true;
     bool     instantMenu;
-    bool     rescanPrompt;
+    bool     rescanPrompt = false;
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 
@@ -261,7 +274,7 @@ void common_boot(int biosdev)
     // Not sure if it is safe to call setVideoMode() before the
     // config table has been loaded. Call video_mode() instead.
 #if DEBUG
-    printf("before video_mode\n");
+    printf("before video_mode\n"); //Azi: this one is not printing... i remember it did
 #endif
     video_mode( 2 );  // 80x25 mono text mode.
 #if DEBUG
@@ -274,8 +287,18 @@ void common_boot(int biosdev)
     // First get info for boot volume.
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
+	//Azi: initialising gBIOSBootVolume & gBootVolume for the first time.. i think!?
+	// also, kDefaultPartitionKey is checked here, on selectBootVolume.
     setBootGlobals(bvChain);
-    
+
+	// Boot Volume is set as Root at this point so, pointing to Extra, /Extra or bt(0,0)/Extra
+	// is exactly the same.	Review bt(0,0)/bla bla paths......			(Reviewing...)
+	
+	//Azi: works as expected but... trying this because Kernel=mach_kernel doesn't work on a
+	// override Boot.plist; this makes it impossible to override e.g. Kernel=bt(0,0)mach_kernel
+	// on the main Boot.plist, when loading kernel from ramdisk btAliased.
+	loadPrebootRAMDisk();
+	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
 
@@ -288,41 +311,46 @@ void common_boot(int biosdev)
         firstRun = false;
     }
 
+	// Loading preboot ramdisk if exists.
+//	loadPrebootRAMDisk(); //Azi: this needs to be done before load_all_modules()
+	// because of btAlias...			(Reviewing...)
+
 	// Intialize module system
 	if (init_module_system())
 	{
 		load_all_modules();
 	}
 
-	// Loading preboot ramdisk if exists.
-	loadPrebootRAMDisk();
-
     // Disable rescan option by default
     gEnableCDROMRescan = false;
 
-    // Enable it with Rescan=y in system config
-    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan) {
-        gEnableCDROMRescan = true;
-    }
+    // If we're loading the booter from cd/dvd media...			(Reviewing...)
+	if (biosDevIsCDROM(gBIOSDev))
+	{
+		// ... ask the user for Rescan option by setting "Rescan Prompt"=y in system config...
+		if (getBoolForKey(kRescanPromptKey, &rescanPrompt, &bootInfo->bootConfig) && rescanPrompt)
+		{
+	        gEnableCDROMRescan = promptForRescanOption();
+	    }
+		else // ... or enable it with Rescan=y in system config.
+	    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan)
+		{
+	        gEnableCDROMRescan = true;
+	    }
+	}
 
-    // Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
-    rescanPrompt = false;
-    if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
-        gEnableCDROMRescan = promptForRescanOption();
-    }
-
+	//Azi: Is this a cdrom only thing?			(Reviewing...)
     // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
-        gScanSingleDrive = true;
+    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive)
+	{
+		scanBootVolumes(gBIOSDev, &bvCount);
     }
-
-    // Create a list of partitions on device(s).
-    if (gScanSingleDrive) {
-      scanBootVolumes(gBIOSDev, &bvCount);
-    } else {
-      scanDisks(gBIOSDev, &bvCount);
-    }
-
+	else
+	{
+		//Azi: scanDisks uses scanBootVolumes.
+		scanDisks(gBIOSDev, &bvCount);
+	}
+	
     // Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 
@@ -338,47 +366,57 @@ void common_boot(int biosdev)
     // Override useGUI default
     getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
 
-	/*
-	 * AutoResolution
-	 */
-	// Before initGui, patch the video bios with the correct resolution
-	UInt32 params[4];
-	params[3] = 0;
-	
-	// default to "false" as it doesn't work for everyone atm.
+	// AutoResolution - Azi: default to false
 	// http://forum.voodooprojects.org/index.php/topic,1227.0.html
 	gAutoResolution = false;
 	
+	// Check if user enabled AutoResolution on Boot.plist...
 	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
 	
-	//Open the VBios and store VBios or Tables
-	map = openVbios(CT_UNKWN);
-	
+	// Patch the Video Bios with the extracted resolution, before initGui.
 	if (gAutoResolution == true)
 	{
-		//Get Resolution from Graphics Mode key or EDID
-		int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+//		patchRes();
+//		UInt32 paramsAR[4];
+		paramsAR[3] = 0;
+
+		// Open the Vbios and store VBios or Tables
+		map = openVbios(CT_UNKWN);
+
+		//Get Resolution from Graphics Mode key...
+		int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
 		
+		// ...  or EDID.
 		if (count < 3)
 		{
-			getResolution(params);
+			getResolution(paramsAR);
+			// check the DEBUG stuff... also on TEXT MODE (this is not printing).
+			PRINT("Resolution: %dx%d (EDID)\n",paramsAR[0], paramsAR[1]);
 		}
 		else
 		{
-			if ( params[2] == 256 ) params[2] = 8;
-			if ( params[2] == 555 ) params[2] = 16;
-			if ( params[2] == 888 ) params[2] = 32;
+			PRINT("Resolution: %dx%d (Graphics Mode key)\n",paramsAR[0], paramsAR[1]);
+
+			if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
+			if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
+			if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
 		}
 		
-#ifdef AUTORES_DEBUG
-	printf("Resolution: %dx%d\n",params[0], params[1]);
-#endif	
-		
-		//perfom the actual VBIOS patching
-		if (params[0] != 0 && params[1] != 0)
+		// perfom the actual VBIOS patching
+		if (paramsAR[0] != 0 && paramsAR[1] != 0)
 		{
-			patchVbios(map, params[0], params[1], params[2], 0, 0);
+			patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
 		}
+		
+		//Azi: passing resolution for TEXT MODE "verbose" boot. (check again later!)
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			gui.screen.width = paramsAR[0];
+			gui.screen.height = paramsAR[1];
+		}
+		
+		// If the patch is working properly, we're done. If not and it's just a matter
+		// of wrong resolution, we can try reapply the patch; see "case kF2Key:", options.c.
 	}
 
     if (useGUI && initGUI())
@@ -413,7 +451,7 @@ void common_boot(int biosdev)
         firstRun = false;
         if (status == -1) continue;
 
-		//Azi: i'm now almost sure that here is the right place to do this! - test (gBootVolume == NULL)
+		//Azi: test (gBootVolume == NULL) - so far Ok!
 		// Turn off any GUI elements, draw background and update VRAM.
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
@@ -425,65 +463,31 @@ void common_boot(int biosdev)
 			drawBackground();
 			updateVRAM();
 		}
+
+		status = processBootOptions();
 		
-		//
-		//AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
-		//				   or EDID Info was insane
-//		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+		//AutoResolution - cancel if Graphics Mode was incorrect or EDID Info was insane.
+		// Check if user disabled AutoResolution at the boot prompt.
+		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
 		
-		//Restore the vbios for Cancelation
+		// Restore and close Vbios for patch cancelation.
 		if ((gAutoResolution == false) && map)
 		{
 			restoreVbios(map);
-			closeVbios(map);	
-		}
-		
-		if ((gAutoResolution == true) && map)
-		{
-			// If mode has been switched during boot menu
-			// use the new resolution
-			if (map->hasSwitched == true)
-			{
-				params[0] = map->currentX;
-				params[1] = map->currentY;
-				params[2] = 32;
-			}
-			else
-			{
-				//or get resolution from Graphics Mode or EDID
-				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
-				
-				if (count < 3)
-				{
-					getResolution(params);
-				}
-				else
-				{
-					if ( params[2] == 256 ) params[2] = 8;
-					if ( params[2] == 555 ) params[2] = 16;
-					if ( params[2] == 888 ) params[2] = 32;
-				}
-			}
-			
-			//Resolution has changed, reapply the patch
-			if ((params[0] != 0) && (params[1] != 0) && (params[0] != map->currentX) &&
-				(params[1] != map->currentY))
-			{
-				patchVbios(map, params[0], params[1], params[2], 0, 0);
-			}
 			closeVbios(map);
-			//Azi: gAutoResolution was just set to false on closeVbios;
-			// we need it to be true here for drawBootGraphics().
-			gAutoResolution = true;
+			
+			//Azi: closing Vbios here without restoring it as above, causes an allocation error,
+			// if the user tries to boot, after a e.g."Can't find bla_kernel" msg.
+			// Doing it on execKernel() instead.
 		}
-		
-        status = processBootOptions();
+
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;
+		
 		// Status == -1 means that gBootVolume is NULL. Config file is not mandatory anymore! 
 		if ( status == -1 )
 		{
-			// gBootVolume == NULL usually means the user hit escape.
+			// gBootVolume == NULL usually means the user hit escape.			(Reviewing...)
 			if (gBootVolume == NULL)
 			{
 				freeFilteredBVChain(bvChain);
@@ -659,16 +663,16 @@ void common_boot(int biosdev)
         } while (0);
 
         clearActivityIndicator();
-#if DEBUG
+/*#if DEBUG
         printf("Pausing...");
         sleep(8);
 #endif
-
+Azi: annoying stuff :P */
         if (ret <= 0) {
 			printf("Can't find %s\n", bootFile);
 
 			sleep(1);
-			
+
             if (gBootFileType == kNetworkDeviceType) {
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
