@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-OBJS = kext_patcher.o inflate.o zutil.o inftrees.o inffast.o adler32.o
+OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
 
 
 SFILES =
@@ -76,10 +76,13 @@ dylib: ${OBJS}
 	-weak_library $(SYMROOT)/GUI.dylib \
 	$(OBJROOT)/kext_patcher.o \
 	$(OBJROOT)/inflate.o \
+	$(OBJROOT)/deflate.o \
 	$(OBJROOT)/inftrees.o \
 	$(OBJROOT)/zutil.o \
 	$(OBJROOT)/inffast.o \
 	$(OBJROOT)/adler32.o \
+	$(OBJROOT)/trees.o \
+	$(OBJROOT)/hex_editor.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
@@ -88,6 +91,9 @@ kext_patcher.o:
 
 inflate.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inflate.c" $(INC) -o "$(OBJROOT)/inflate.o"
+
+deflate.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "deflate.c" $(INC) -o "$(OBJROOT)/deflate.o"
 
 zutil.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "zutil.c" $(INC) -o "$(OBJROOT)/zutil.o"
@@ -100,6 +106,12 @@ inffast.o:
 
 adler32.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "adler32.c" $(INC) -o "$(OBJROOT)/adler32.o"
+
+trees.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "trees.c" $(INC) -o "$(OBJROOT)/trees.o"
+
+hex_editor.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "hex_editor.c" $(INC) -o "$(OBJROOT)/hex_editor.o"
 
 include ../../MakeInc.dir
 
