@@ -76,7 +76,7 @@ int     bvCount = 0;
 int     gDeviceCount = 0;
 
 BVRef   bvr;
-BVRef   menuBVR;
+//BVRef   menuBVR; - doesn't seem used here
 BVRef   bvChain;
 bool    useGUI;
 
@@ -128,6 +128,8 @@ void initialize_runtime(void)
 
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
+extern void startAutoRes();
+extern void endAutoRes();
 
 static int ExecKernel(void *binary)
 {
@@ -189,17 +191,11 @@ static int ExecKernel(void *binary)
 	
 	// Notify modules that the kernel is about to be started
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
-	
-	if ((gAutoResolution == true) && map)
-	{
-		closeVbios(map);
-		//Azi: as a side note, while testing i didn't got any problems booting without
-		// closing Vbios... closing it just in case. (check again later!)
-		
-		// gAutoResolution was just set to false on closeVbios().
-		// We need to be "true" for drawBootGraphics().
-		gAutoResolution = true;
-	}
+
+	//AutoResolution - Check if user disabled AutoResolution at the boot prompt.
+	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+	// Cancel and/or finalize the patch. 
+	endAutoRes();
 
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
@@ -209,7 +205,7 @@ static int ExecKernel(void *binary)
       setVideoMode( GRAPHICS_MODE, 0 );
     else
       drawBootGraphics();
-	
+
 	setupBooterLog();
 	
     finalizeBootStruct();
@@ -376,47 +372,7 @@ void common_boot(int biosdev)
 	// Patch the Video Bios with the extracted resolution, before initGui.
 	if (gAutoResolution == true)
 	{
-//		patchRes();
-//		UInt32 paramsAR[4];
-		paramsAR[3] = 0;
-
-		// Open the Vbios and store VBios or Tables
-		map = openVbios(CT_UNKWN);
-
-		//Get Resolution from Graphics Mode key...
-		int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
-		
-		// ...  or EDID.
-		if (count < 3)
-		{
-			getResolution(paramsAR);
-			// check the DEBUG stuff... also on TEXT MODE (this is not printing).
-			PRINT("Resolution: %dx%d (EDID)\n",paramsAR[0], paramsAR[1]);
-		}
-		else
-		{
-			PRINT("Resolution: %dx%d (Graphics Mode key)\n",paramsAR[0], paramsAR[1]);
-
-			if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
-			if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
-			if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
-		}
-		
-		// perfom the actual VBIOS patching
-		if (paramsAR[0] != 0 && paramsAR[1] != 0)
-		{
-			patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
-		}
-		
-		//Azi: passing resolution for TEXT MODE "verbose" boot. (check again later!)
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		{
-			gui.screen.width = paramsAR[0];
-			gui.screen.height = paramsAR[1];
-		}
-		
-		// If the patch is working properly, we're done. If not and it's just a matter
-		// of wrong resolution, we can try reapply the patch; see "case kF2Key:", options.c.
+		startAutoRes();
 	}
 
     if (useGUI && initGUI())
@@ -465,21 +421,10 @@ void common_boot(int biosdev)
 		}
 
 		status = processBootOptions();
-		
-		//AutoResolution - cancel if Graphics Mode was incorrect or EDID Info was insane.
-		// Check if user disabled AutoResolution at the boot prompt.
-		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
-		
-		// Restore and close Vbios for patch cancelation.
-		if ((gAutoResolution == false) && map)
-		{
-			restoreVbios(map);
-			closeVbios(map);
-			
-			//Azi: closing Vbios here without restoring it as above, causes an allocation error,
-			// if the user tries to boot, after a e.g."Can't find bla_kernel" msg.
-			// Doing it on execKernel() instead.
-		}
+
+		//Azi: AutoResolution -  closing Vbios here without restoring, causes an allocation error,
+		// if the user tries to boot, after a e.g."Can't find bla_kernel" msg.
+		// Doing it on execKernel() instead.
 
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;

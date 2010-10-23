@@ -28,6 +28,7 @@
 #include "gui.h"
 #include "embedded.h"
 #include "pci.h"
+#include "options.h"
 
 bool showBootBanner = true; //Azi:debuginfo
 static bool shouldboot = false;
@@ -38,28 +39,17 @@ extern int multiboot_timeout_set;
 extern BVRef    bvChain;
 //extern int		menucount;
 
-extern int		gDeviceCount;
+//extern int		gDeviceCount; //Azi: header
 char			gMacOSVersion[8]; //Azi: moved from boot.c
 static bool getOSVersion(char *str); //			||
 
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
 
-enum {
-    kMenuTopRow    = 5,
-    kMenuMaxItems  = 10,
-    kScreenLastRow = 24
-};
-
 //==========================================================================
 
-typedef struct {
-    int x;
-    int y;
-    int type;
-} CursorState;
-
-static void changeCursor( int col, int row, int type, CursorState * cs )
+//static 
+void changeCursor( int col, int row, int type, CursorState * cs )
 {
     if (cs) getCursorPositionAndType( &cs->x, &cs->y, &cs->type );
     setCursorType( type );
@@ -203,7 +193,8 @@ static void addBootArg(const char * argStr)
 
 //==========================================================================
 
-static void showBootPrompt(int row, bool visible)
+//static 
+void showBootPrompt(int row, bool visible)
 {
 	extern char bootPrompt[];
 	extern char bootRescanPrompt[];
@@ -306,7 +297,8 @@ static void printMenuItem( const MenuItem * item, int highlight )
 
 //==========================================================================
 
-static void showMenu( const MenuItem * items, int count,
+//static 
+void showMenu( const MenuItem * items, int count,
                       int selection, int row, int height )
 {
     int         i;
@@ -678,17 +670,23 @@ void lspci(void)
 }
 
 //==========================================================================
+int     key;
+int     nextRow;
+BVRef   menuBVR;
+bool    showPrompt;
 
 int getBootOptions(bool firstRun)
 {
 	int     i;
-	int     key;
-	int     nextRow;
+//	int     key;
+//	int     nextRow;
 	int     timeout;
 	int     bvCount;
 	BVRef   bvr;
-	BVRef   menuBVR;
-	bool    showPrompt, newShowPrompt, isCDROM;
+//	BVRef   menuBVR;
+//	bool    showPrompt;
+	bool    newShowPrompt, isCDROM;
+	extern void reloadAutoRes(); //Azi: autoresolution
 
 	// Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(bvChain);
@@ -1011,91 +1009,10 @@ int getBootOptions(bool firstRun)
 			clearBootArgs();
 			break;
 
-		// AutoResolution - Reapply the patch if Graphics Mode was incorrect or EDID Info was insane.
-		//Azi: 
+		// AutoResolution - Reapply the patch if Graphics Mode was incorrect
+		// or EDID Info was insane. 
 		case kF2Key:
-			
-			if ((gAutoResolution == true) && map)
-			{
-				// get the new Graphics Mode key
-				processBootOptions(); //Azi: use processBootArgument instead?
-
-//				reloadRes();
-//				UInt32 paramsAR[4];
-				paramsAR[3] = 0;
-				
-				getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
-				
-				// user changed resolution...
-				if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
-					(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
-				{
-					//Azi: same stuff as "case kTabKey:"			(Reviewing...)
-					// Go back to TEXT mode while we change the mode
-					if (bootArgs->Video.v_display == GRAPHICS_MODE)
-					{
-						CursorState cursorState;
-
-						setVideoMode(VGA_TEXT_MODE, 0);
-
-						setCursorPosition(0, 0, 0);
-						clearScreenRows(0, kScreenLastRow);
-						changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
-
-						// Reapply patch
-						patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
-
-						if (useGUI && (gui.initialised == true))
-							initGUI();
-						// Make sure all values are set
-						if (bootArgs->Video.v_display != GRAPHICS_MODE)
-							bootArgs->Video.v_display = GRAPHICS_MODE;
-
-						if (!useGUI)
-							useGUI = true;
-
-						// redraw the background buffer
-						drawBackground();
-						gui.devicelist.draw = true;
-						gui.redraw = true;
-						
-						if (showBootBanner)
-						{
-							// Display banner and show hardware info.
-							gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
-						}
-
-						// redraw background
-						memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
-							   gui.backbuffer->width * gui.backbuffer->height * 4);
-
-						nextRow = kMenuTopRow;
-						showPrompt = true;
-
-						if (gDeviceCount)
-						{
-							showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-							nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
-						}
-
-						// Show the boot prompt.
-						showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
-						showBootPrompt( nextRow, showPrompt );
-
-						// this is used to avoid resetting the incorrect mode while quiting the boot menu
-//						map->hasSwitched = true; (check again later!)
-					}
-				}
-				
-				clearBootArgs();
-				key = 0;
-			}	
-			else // if gAutoResolution == false...
-			{
-				// ... do "nothing".
-				clearBootArgs();
-				key = 0;
-			}
+			reloadAutoRes();
 			break;
 			
 		case kF5Key:
@@ -1120,8 +1037,10 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI) {
-				if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+			if (useGUI)
+			{
+				if (bootArgs->Video.v_display == GRAPHICS_MODE)
+				{
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1137,7 +1056,8 @@ int getBootOptions(bool firstRun)
 					nextRow = kMenuTopRow;
 					showPrompt = true;
 
-					if (gDeviceCount) {
+					if (gDeviceCount)
+					{
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
 						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
@@ -1146,7 +1066,14 @@ int getBootOptions(bool firstRun)
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 					showBootPrompt(nextRow, showPrompt);
 					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
-				} else {
+					
+					// need to disable F2 here but can't do useGUI = false...
+					// not a big deal but since i disabled it when in TEXT MODE,
+					// were it makes no sense and it just hangs the prompt.. not fatal, though...
+					// back later...
+				}
+				else
+				{
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
 					updateVRAM();

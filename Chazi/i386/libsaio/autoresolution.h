@@ -1,4 +1,3 @@
-
 /* Copied from 915 resolution created by steve tomljenovic
  *
  * This code is based on the techniques used in :
@@ -13,6 +12,7 @@
  *
  * This source code is into the public domain.
  */
+
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
 
@@ -20,11 +20,10 @@
 #include "saio_internal.h"
 #include "edid.h"
 
-//#define AUTORES_DEBUG 1 // enable AutoResolution debug - review!
 
 #if DEBUG
 #ifndef AUTORES_DEBUG
-#define AUTORES_DEBUG
+#define AUTORES_DEBUG //Azi: review
 #endif
 #endif
 
@@ -42,9 +41,8 @@
 #define VBIOS_START         0xc0000
 #define VBIOS_SIZE          0x10000
 
-//#define false 0			(Reviewing...)
+//#define false 0			//Azi: (Reviewing...)
 //#define true 1
-
 
 bool gAutoResolution;
 UInt32 paramsAR[4]; //Azi: testing autoresolution
@@ -56,7 +54,6 @@ typedef struct
 	uint8_t height;
 } sAspect;
 
-
 typedef enum
 {
 	CT_UNKWN, CT_830, CT_845G, CT_855GM, CT_865G, 
@@ -65,7 +62,6 @@ typedef enum
 	CT_P35, CT_X48, CT_B43, CT_Q45, CT_P45,
 	CT_GM45, CT_G41, CT_G31, CT_G45, CT_500
 } chipsetType;
-
 
 typedef enum
 {
@@ -98,8 +94,6 @@ typedef struct sModeTable_
 	struct sModeTable_ *prev;
 	struct sModeTable_ *next;
 } sModeTable;
-	
-
 
 typedef struct
 {
@@ -146,8 +140,5 @@ void gtfTimings(uint32_t x, uint32_t y, uint32_t freq,
 sModeTable * intializeTables(vBiosMap * map, int tablesCount);
 
 void patchVbios(vBiosMap* map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hTotal, uint32_t vTotal);
-
-//void patchRes();
-//void reloadRes();
 
 #endif

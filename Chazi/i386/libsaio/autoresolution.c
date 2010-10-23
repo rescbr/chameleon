@@ -15,8 +15,10 @@
 
 //#include "libsaio.h"
 //#include "autoresolution.h" - included on *_resolution.h
-//#include "boot.h"
-//#include "gui.h"
+//------------
+#include "boot.h"
+#include "gui.h"
+#include "options.h"
 #include "nvidia_resolution.h"
 #include "ati_resolution.h"
 #include "gma_resolution.h"
@@ -563,7 +565,7 @@ void restoreTables(vBiosMap * map, sModeTable * table)
 	{
 		bcopy(table->backup, (uint8_t *)table->pointer, table->size);
 		table = table->next;
-//		verbose("Table/s restored...\n");
+		verbose("Restoring table/s for patch cancelation\n");
 	}
 	relockVbios(map);
 }
@@ -616,18 +618,18 @@ void patchVbios(vBiosMap * map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hT
 	relockVbios(map);
 	return;
 }
-/*
-void patchRes()
+
+void startAutoRes()
 {
 //	UInt32 paramsAR[4];
 	paramsAR[3] = 0;
 
-	// Open the VBios and store VBios or Tables
+	// Open the Vbios and store Vbios or Tables
 	map = openVbios(CT_UNKWN);
 
-	//Get Resolution from Graphics Mode key...
+	//Get resolution from Graphics Mode key...
 	int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
-
+	
 	// ...  or EDID.
 	if (count < 3)
 	{
@@ -643,118 +645,145 @@ void patchRes()
 		if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
 		if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
 	}
-
-	// If using GUI, patch the video bios with the extracted resolution,
-	// before initGui.
-
-	// perfom the actual VBIOS patching
+	
+	// perfom the actual Vbios patching
 	if (paramsAR[0] != 0 && paramsAR[1] != 0)
 	{
 		patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
 	}
-
-	closeVbios(map);
-	//Azi: gAutoResolution was just set to false on closeVbios().
-	gAutoResolution = true;
-
+	
+	//Azi: passing resolution for TEXT MODE "verbose" boot. (check again later!)
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
 		gui.screen.width = paramsAR[0];
 		gui.screen.height = paramsAR[1];
 	}
-
+	
 	// If the patch is working properly, we're done. If not and it's just a matter
 	// of wrong resolution, we can try reapply the patch; see "case kF2Key:", options.c.
-
-	// The patch works properly but we're not using GUI; keep Vbios open and patch/close
-	// on drawBootGraphics().
-	// ??????Don't forget we´re maybe using this to get correct resolution after login,
-	// despite having qe/ci or not...!!!!
 }
 
-void reloadRes()
+void reloadAutoRes()
 {
-//	UInt32 paramsAR[4];
-	paramsAR[3] = 0;
+	extern int	 key;
+	extern int	 nextRow;
+	extern BVRef menuBVR;
+	extern bool	 showPrompt;
 	
-	map = openVbios(CT_UNKWN);
-	// Has the target Resolution Changed ?
-	int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+	extern bool	 showBootBanner;
+	extern		 MenuItem * menuItems;
+	extern int	 selectIndex;
 	
-	if ( count < 3 ) // why this? we are implicitly trying to change the resolution
-	// at boot prompt, using Graphics Mode flag...
+	extern void showMenu( const MenuItem * items, int count, int selection, int row, int height );
+	extern void showBootPrompt(int row, bool visible);
+	extern void clearBootArgs(void);
+	extern void changeCursor( int col, int row, int type, CursorState * cs );
+	
+	if ((gAutoResolution == true) && useGUI && map )
 	{
-		getResolution(paramsAR);
-	}
-	else
-	{
-		if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
-		if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
-		if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
-	}
+		// get the new Graphics Mode key
+		processBootOptions(); //Azi: use processBootArgument instead?
 
-	// user changed resolution...
-	if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
-		(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
-	{
-		//Azi: same shit as "case kTabKey:" - check
-		// Go back to TEXT mode while we change the mode
-		if (bootArgs->Video.v_display == GRAPHICS_MODE)
-		{
-			CursorState cursorState;
-
-			setVideoMode(VGA_TEXT_MODE, 0);
-
-			setCursorPosition(0, 0, 0);
-			clearScreenRows(0, kScreenLastRow);
-			changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
-
-			// Reapply patch
-			patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
-
-			if (useGUI && (gui.initialised == true))
-				initGUI();
-			// Make sure all values are set
-			if (bootArgs->Video.v_display != GRAPHICS_MODE)
-				bootArgs->Video.v_display = GRAPHICS_MODE;
-
-			if (!useGUI)
-				useGUI = true;
-
-			// redraw the background buffer
-			drawBackground();
-			gui.devicelist.draw = true;
-			gui.redraw = true;
-			
-			if (showBootBanner)
-			{
-				// Display banner and show hardware info.
-				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
-			}
-
-			// redraw background
-			memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
-				   gui.backbuffer->width * gui.backbuffer->height * 4);
-
-			nextRow = kMenuTopRow;
-			showPrompt = true;
-
-			if (gDeviceCount)
-			{
-				showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-				nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
-			}
-
-			// Show the boot prompt.
-			showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
-			showBootPrompt( nextRow, showPrompt );
-
-			// this is used to avoid resetting the incorrect mode while quiting the boot menu
-//						map->hasSwitched = true;
-		}
-	}
+//		UInt32 paramsAR[4];
+		paramsAR[3] = 0;
 		
-	closeVbios(map);
-	//Azi: gAutoResolution was just set to false on closeVbios.
-	gAutoResolution = true;
-}*/
+		getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+		
+		// user changed resolution...
+		if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
+			(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
+		{
+			//Azi: identical to "case kTabKey:"			(check later)
+			if (bootArgs->Video.v_display == GRAPHICS_MODE)
+			{
+				CursorState cursorState;
+				
+				// Go back to TEXT MODE while we change the mode
+				setVideoMode(VGA_TEXT_MODE, 0);
+
+				setCursorPosition(0, 0, 0);
+				clearScreenRows(0, kScreenLastRow);
+				changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
+
+				// Reapply patch
+				patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
+
+				if (useGUI && (gui.initialised == true))
+					initGUI();
+				// Make sure all values are set
+				if (bootArgs->Video.v_display != GRAPHICS_MODE)
+					bootArgs->Video.v_display = GRAPHICS_MODE;
+
+				if (!useGUI)
+					useGUI = true;
+
+				// redraw the background buffer
+				drawBackground();
+				gui.devicelist.draw = true;
+				gui.redraw = true;
+				
+				if (showBootBanner)
+				{
+					// Display banner and show hardware info.
+					gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
+				}
+
+				// redraw background
+				memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
+					   gui.backbuffer->width * gui.backbuffer->height * 4);
+
+				nextRow = kMenuTopRow;
+				showPrompt = true;
+
+				if (gDeviceCount)
+				{
+					showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
+					nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+				}
+
+				// Show the boot prompt.
+				showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+				showBootPrompt( nextRow, showPrompt );
+
+				// this is used to avoid resetting the incorrect mode while quiting the boot menu
+//						map->hasSwitched = true; (check again later!)
+			}
+		}
+		
+		clearBootArgs();
+		key = 0;
+	}	
+	else // if gAutoResolution == false...
+	{
+		// ... do "nothing".			(Reviewing...)
+		clearBootArgs();
+		key = 0;
+	}
+}
+
+void endAutoRes()
+{
+	// Restore and close Vbios for patch cancelation.
+	if ((gAutoResolution == false) && map)
+	{
+		restoreVbios(map);
+		closeVbios(map);
+		
+		//Azi: closing Vbios here without restoring it as above, causes an allocation error,
+		// if the user tries to boot, after a e.g."Can't find bla_kernel" msg.
+		// Doing it on execKernel() instead.
+	}
+
+	//Azi: while testing i didn't got any problems booting without closing Vbios...
+	// closing it just in case. (check again later!)
+	if ((gAutoResolution == true) && map)
+	{
+		closeVbios(map);
+		
+		// gAutoResolution was just set to false on closeVbios().
+		// We need to be "true" for drawBootGraphics().
+		gAutoResolution = true;
+	}
+}
+
+
