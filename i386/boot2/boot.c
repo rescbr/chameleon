@@ -155,6 +155,9 @@ static int ExecKernel(void *binary)
 	
     // Load boot drivers from the specifed root path.
 	
+	
+	setupFakeEfi();
+	
     if (!gHaveKernelCache) {
 		LoadDrivers("/");
     }
@@ -169,8 +172,6 @@ static int ExecKernel(void *binary)
 	
 	md0Ramdisk();
 	
-    setupFakeEfi();
-		
     verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 #ifndef OPTION_ROM
     // Cleanup the PXE base code.
