@@ -53,7 +53,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: dylib
+all embedtheme: dylib
 
 
 dylib: $(OBJS)
@@ -66,7 +66,8 @@ dylib: $(OBJS)
 	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/Symbols.o -o $(SYMROOT)/$(MODULE_NAME).dylib \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 

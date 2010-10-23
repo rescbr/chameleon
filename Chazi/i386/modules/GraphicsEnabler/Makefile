@@ -59,7 +59,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
+all embedtheme: ${GRAPHICS_ENABLER_OBJS} dylib
 
 
 dylib: ${GRAPHICS_ENABLER_OBJS}
@@ -71,10 +71,8 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/nvidia.o \
-	$(OBJROOT)/ati.o \
-	$(OBJROOT)/gma.o \
-	$(OBJROOT)/GraphicsEnabler.o \
+	$(OBJROOT)/*.o \
+	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

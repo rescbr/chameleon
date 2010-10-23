@@ -27,11 +27,12 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
 # TODO: exclude Symbols from find so it isn't compiled twice
-#SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 #Azi:---
+#SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
 SUBDIRS = Symbols Memory KernelPatcher HelloWorld GraphicsEnabler
+#AutoResolution
 
-all embedtheme optionrom tags debug install installhdrs:
+all embedtheme tags debug install installhdrs:
 	@rm -rf $(OBJROOT)
 	@mkdir $(OBJROOT)
 	@for i in ${SUBDIRS}; \
