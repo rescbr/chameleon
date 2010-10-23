@@ -846,6 +846,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
+					getc();
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -876,6 +877,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
+					getc();
 				}
 				segmentAddress += tmp + sizeof(void*);
 
@@ -894,6 +896,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
+					getc();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 
@@ -940,6 +943,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
+					getc();
 				}
 				
 				
@@ -1121,7 +1125,7 @@ unsigned int lookup_all_symbols(const char* name)
 	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
 	{
 		verbose("Unable to locate symbol %s\n", name);
-		//getc();
+		getc();
 	}
 #endif
 	return 0xFFFFFFFF;

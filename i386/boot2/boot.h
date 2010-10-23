@@ -156,11 +156,7 @@ enum {
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
 
-/*
- * usb.c
- */
-extern int usb_loop();
-
+extern char* updateBooter;
 /*
  * graphics.c
  */

@@ -47,7 +47,7 @@ extern char gMacOSVersion;
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 #endif
 
-static unsigned long Alder32( unsigned char * buffer, long length );
+unsigned long Mkext_Alder32( unsigned char * buffer, long length );
 
 long FileLoadDrivers(char *dirSpec, long plugin);
 #ifndef OPTION_ROM
@@ -73,8 +73,8 @@ char *    gFileSpec;
 char *    gTempSpec;
 char *    gFileName;
 
-static unsigned long
-Alder32( unsigned char * buffer, long length )
+unsigned long
+Mkext_Alder32( unsigned char * buffer, long length )
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -376,7 +376,7 @@ LoadDriverMKext( char * fileSpec )
     if (length < sizeof (DriversPackage)) return -1;
 	
 	// call hook to notify modules that the mkext has been loaded
-	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) length, NULL);
+	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) &length, NULL);
 	
 	
     // Verify the MKext.
@@ -384,11 +384,10 @@ LoadDriverMKext( char * fileSpec )
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
         ( GetPackageElement(alder32)    !=
-		 Alder32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+		 Mkext_Alder32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
-	
 	
     // Make space for the MKext.
     driversLength = GetPackageElement(length);
@@ -785,7 +784,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             return -1;
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            Alder32(binary, uncompressed_size)) {
+            Mkext_Alder32(binary, uncompressed_size)) {
             printf("adler mismatch\n");
             return -1;
         }

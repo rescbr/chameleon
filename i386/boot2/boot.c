@@ -74,6 +74,7 @@ bool gEnableCDROMRescan;
 bool gScanSingleDrive;
 #endif
 
+
 int     bvCount = 0;
 //int	menucount = 0;
 int     gDeviceCount = 0; 

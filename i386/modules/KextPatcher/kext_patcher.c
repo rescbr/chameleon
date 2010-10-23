@@ -17,7 +17,17 @@
 #include "modules.h"
 #include "hex_editor.h"
 
-bool patch_kext(TagPtr plist, void* start);
+
+#ifndef DEBUG_KEXT_PATCHER
+#define DEBUG_KEXT_PATCHER 0
+#endif
+
+#if DEBUG_KEXT_PATCHER
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
+bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
 
 static void * z_alloc(void *, u_int items, u_int size);
 static void   z_free(void *, void *ptr);
@@ -106,7 +116,7 @@ void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* a
 void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 {
 	int version = 0;
-	int length = (int) lengthtmp;
+	//int length = *((int*)lengthtmp);
 	mkext_basic_header* package = packagetmp;
 
 	// Verify the MKext.
@@ -141,7 +151,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		int i;
 		for(i = 0; i < MKEXT_GET_COUNT(package); i++)
 		{
-			printf("Parsing kext %d\n", i);
+			DBG("Parsing kext %d\n", i);
 			//mkext_kext* kext = MKEXT1_GET_KEXT(package, i);
 			// uses decompress_lzss
 			// TODO: handle kext
@@ -150,7 +160,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 	}
 	else if((version & 0xFFFF0000) == 0x02000000) // mkext2
 	{
-		printf("Mkext2 package located at 0x%X\n", package);
+		DBG("Mkext2 package located at 0x%X\n", package);
 
 		// mkext2 uses zlib		
 		mkext2_header* package = packagetmp;
@@ -184,57 +194,95 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 
 		
 		zlib_result = inflate(&zstream, Z_FINISH);
-		printf("Inflated result is %d, in: %d bytes, out: %d bytes\n", zlib_result, zstream.total_in, zstream.total_out);
+		if (zstream_inited) inflateEnd(&zstream);
+
+		DBG("Inflated result is %d, in: %d bytes, out: %d bytes\n", zlib_result, zstream.total_in, zstream.total_out);
 		if (zlib_result == Z_STREAM_END || zlib_result == Z_OK)
-		{
-			//printf("Plist contains %s\n", plist);
-			
+		{			
 			config_file_t plistData;
 			config_file_t allDicts;
 			bzero(&plistData, sizeof(plistData));
 			bzero(&allDicts, sizeof(allDicts));
 			
-			//plist += strlen("<dict><key>_MKEXTInfoDictionaries</key><array>");	// Skip kMKEXTInfoDictionariesKey. Causes issues
-																				// NOTE: there will be an extra </array></dict> at the end
-			/*int len =*/ XMLParseFile( plist, &plistData.dictionary );
+			XMLParseFile( plist, &plistData.dictionary );
 
 			int count = 0;
 
-			count = XMLTagCount(plistData.dictionary);
-			if(count != 1)
-			{
-				error("Mkext has more than one entry, unable to patch.");
-				getc();
-				return;
-			}
 			allDicts.dictionary = XMLGetProperty(plistData.dictionary, kMKEXTInfoDictionariesKey);
 			count = XMLTagCount(allDicts.dictionary);
-			/*printf("Element type: %d\n", allDicts.dictionary->type);
-			printf("Element tag: %d\n", allDicts.dictionary->tag);
-			printf("Element tagNext: %d\n", allDicts.dictionary->tagNext);
-			*/
-			printf("Plist contains %d kexts\n", count);
+
+			DBG("Plist contains %d kexts\n", count);
 			
 			
 			bool patched = false;
 			for(; count--; count > 0)
 			{
 				TagPtr kextEntry = XMLGetElement(allDicts.dictionary, count);
-				patched |= patch_kext(kextEntry, package);
+				patched |= patch_kext(kextEntry, plist, package);
 			}
 			
+
 			if(patched)
 			{
+				zstream_inited = false;
+				// Recompress the plist
+				bzero(&zstream, sizeof(zstream));		
+				zstream.next_in   = (UInt8*)plist;
+				zstream.next_out  = (UInt8*)package + plist_offset;
+				zstream.avail_in  = MKEXT2_GET_PLIST_FULLSIZE(package);
+				zstream.avail_out = MKEXT2_GET_PLIST_FULLSIZE(package)<<2;	// Give us some extra free space, just in case
+				zstream.zalloc    = Z_NULL;
+				zstream.zfree     = Z_NULL;
+				zstream.opaque    = Z_NULL;
+				
+				
+				zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
+				if (Z_OK != zlib_result) {
+					printf("ZLIB Deflate Error: %s\n", zstream.msg);
+					getc();
+				}
+				else 
+				{
+					zstream_inited = true;
+				}
+				
+				zlib_result = deflate(&zstream, Z_FINISH);
+				
+				if (zlib_result == Z_STREAM_END)
+				{
+					DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, MKEXT2_GET_PLIST_FULLSIZE(package));
+				} 
+				else if (zlib_result == Z_OK)
+				{
+					/* deflate filled output buffer, meaning the data doesn't compress.
+					 */
+					DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, MKEXT2_GET_PLIST_FULLSIZE(package));
+					
+				} 
+				else if (zlib_result != Z_STREAM_ERROR)
+				{
+					printf("ZLIB Deflate Error: %s\n", zstream.msg);
+					getc();
+				}
+				
+				if(zstream.total_out != MKEXT2_GET_PLIST_COMPSIZE(package))
+				{
+					// Update the mkext length
+					MKEXT2_HDR_CAST(package)->length = MKEXT_SWAP(MKEXT_GET_LENGTH(package) - MKEXT2_GET_PLIST_COMPSIZE(package) + zstream.total_out);
+					MKEXT2_HDR_CAST(package)->plist_compressed_size = MKEXT_SWAP(zstream.total_out);
+					*((int*)lengthtmp) -= MKEXT2_GET_PLIST_COMPSIZE(package);
+					*((int*)lengthtmp) += zstream.total_out;
+				}
+								
+				if (zstream_inited) deflateEnd(&zstream);
+				
+				
+				
 				// re alder32 the new mkext2 package
 				MKEXT_HDR_CAST(package)->adler32 = 
 					MKEXT_SWAP(Mkext_Alder32((unsigned char *)&package->version,
 											 MKEXT_GET_LENGTH(package) - 0x10));
-
 			}
-			
-			printf("kexts parsed\n");
-
-			
 		}
 		else
 		{
@@ -256,17 +304,16 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		}
 		*/
 		
-		if (zstream_inited) inflateEnd(&zstream);
 
 	}
 
 	
-	printf("Loading %s, length %d, version 0x%x\n", filespec, length, version);
-	getc();
+	DBG("Loading %s, length %d, version 0x%x\n", filespec, length, version);
+	//getc();
 }
 
-// TODO: only handles mkext2 entries
-bool patch_kext(TagPtr plist, void* start)
+// FIXME: only handles mkext2 entries
+bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 {
 	int exeutable_offset;
 	mkext2_file_entry* kext;
@@ -276,11 +323,14 @@ bool patch_kext(TagPtr plist, void* start)
 	z_stream       zstream;
 	bool           zstream_inited = false;
 	int zlib_result;
+	TagPtr personality;
 	
 	if(XMLGetProperty(plist, kMKEXTExecutableKey) == NULL) return false;	// Kext is a plist only kext, don't patch
 	
 	bundleID = XMLCastString(XMLGetProperty(plist, kPropCFBundleIdentifier));
 	exeutable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	
+	
 	kext = (void*)((char*)start + exeutable_offset);
 
 	full_size = MKEXT2_GET_ENTRY_FULLSIZE(kext);
@@ -290,9 +340,26 @@ bool patch_kext(TagPtr plist, void* start)
 	if(	(strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
 		(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0))
 	{
-		printf("Located kext %s\n", bundleID);
-		printf("offset is 0x%x\n", exeutable_offset);
 		
+		
+		personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+		if(XMLGetProperty(personality, (const char*)"Intel915"))
+		{
+			personality =		XMLGetProperty(personality, (const char*)"Intel915");
+		}
+		else
+		{
+			personality =		XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer");	
+		}
+#if DEBUG_KEXT_PATCHER
+		char* pcimatch =	XMLCastString(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
+#endif
+		long offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
+		
+		replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset);
+					   
+		DBG("Located kext %s\n", bundleID);
+		DBG("PCI Match offset = %d, string = %s\n", offset, pcimatch);
 		char* executable = malloc(full_size);
 		
 		bzero(&zstream, sizeof(zstream));		
@@ -319,15 +386,16 @@ bool patch_kext(TagPtr plist, void* start)
 		
 		zlib_result = inflate(&zstream, Z_FINISH);
 		
-		printf("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 
-		printf("Replaced 0x27A28086 %d times.\n", 
-			   replace_word(0x27A28086, 0x27AE8086, executable, zstream.total_out));
+		replace_word(0x27A28086, 0x27AE8086, executable, zstream.total_out);
 		if (zstream_inited) inflateEnd(&zstream);
 
 		
 		zstream.next_in   = (UInt8*)executable;
+		//		zstream.next_out  = (UInt8*)((int)compressed_data<<1);
 		zstream.next_out  = (UInt8*)compressed_data;
+
 		zstream.avail_in  = full_size;
 		zstream.avail_out = compressed_size;
 		zstream.zalloc    = Z_NULL;
@@ -351,13 +419,13 @@ bool patch_kext(TagPtr plist, void* start)
 
 		if (zlib_result == Z_STREAM_END)
 		{
-			printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+			DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 		} 
 		else if (zlib_result == Z_OK)
 		{
 			/* deflate filled output buffer, meaning the data doesn't compress.
 			 */
-			printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+			DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 
 		} 
 		else if (zlib_result != Z_STREAM_ERROR)
@@ -366,9 +434,6 @@ bool patch_kext(TagPtr plist, void* start)
 			getc();
 		}
 		
-		/* TODO: Only accept the compression if it actually shrinks the file.
-		 */
-
 		if (zstream_inited) deflateEnd(&zstream);
 
 
@@ -379,7 +444,7 @@ bool patch_kext(TagPtr plist, void* start)
 		
 		//printf("\n");
 		
-		getc();		
+		//getc();		
 		
 		return true;
 	}

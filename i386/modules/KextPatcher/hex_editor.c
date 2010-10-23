@@ -74,3 +74,18 @@ int replace_word(uint32_t pattern, uint32_t repalcement, char* buffer, long buff
 	
 	return num_replaced;
 }
+
+void replace_string(char* find, char* replace, char* string)
+{
+	if(!find ||
+	   !replace ||
+	   !string ||
+	   strlen(find) != strlen(replace)) return;
+	
+	char* str = string;
+	while(strncmp(str, find, strlen(find)-1))
+	{
+		str++;
+	}
+	strncpy(str, replace, strlen(replace) - 1);	// don't copy the null char
+}

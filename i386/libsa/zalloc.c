@@ -250,7 +250,7 @@ void free(void * pointer)
 	return;
 }
 
-static void
+void
 zallocate(char * start,int size)
 {
 #if ZDEBUG

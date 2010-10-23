@@ -12,6 +12,6 @@
 
 int replace_patern(char* pattern, char* repalcement, char* buffer, long buffer_size);
 int replace_word(uint32_t pattern, uint32_t repalcement, char* buffer, long buffer_size);
-
+void replace_string(char* find, char* replace, char* string);
 
 #endif /* H_HEX_EDITOR */
