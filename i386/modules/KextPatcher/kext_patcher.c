@@ -28,9 +28,16 @@
 #define DBG(x...)
 #endif
 bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
+bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start);
+bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
 
 static void * z_alloc(void *, u_int items, u_int size);
 static void   z_free(void *, void *ptr);
+
+uint16_t patch_gma_deviceid = 0;
+uint16_t patch_bcm_deviceid = 0;
+
+#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid)
 
 typedef struct z_mem {
     uint32_t alloc_size;
@@ -115,6 +122,8 @@ void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* a
 
 void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 {
+	if(!NEEDS_PATCHING) return;	// No need to apply a patch, hardware doesn't need it
+	
 	int version = 0;
 	//int length = *((int*)lengthtmp);
 	mkext_basic_header* package = packagetmp;
@@ -315,144 +324,203 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 // FIXME: only handles mkext2 entries
 bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 {
-	int exeutable_offset;
-	mkext2_file_entry* kext;
 	char* bundleID;
-	int full_size, compressed_size;
-	void* compressed_data;
-	z_stream       zstream;
-	bool           zstream_inited = false;
-	int zlib_result;
-	TagPtr personality;
 	
 	if(XMLGetProperty(plist, kMKEXTExecutableKey) == NULL) return false;	// Kext is a plist only kext, don't patch
 	
 	bundleID = XMLCastString(XMLGetProperty(plist, kPropCFBundleIdentifier));
+	
+	
+	if(patch_gma_deviceid &&
+	    (
+			(strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
+			(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0)
+		 )
+	   )
+	{
+		return patch_gma_kexts(plist, plistbuffer, start);
+	}
+	else if(patch_bcm_deviceid && (strcmp(bundleID, "com.apple.driver.AirPortBrcm43xx") == 0))
+	{
+		return patch_bcm_kext(plist, plistbuffer, start);
+
+	}
+	return false;
+}
+
+void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	pci_dt_t* current = arg1;
+	if(current)
+	{
+		if(current->class_id == PCI_CLASS_DISPLAY_VGA)
+		{
+			if(current->vendor_id == 0x8086 && current->device_id == 0x27AE)
+			{
+				// TODO: patche based on dev id.
+				patch_gma_deviceid = current->device_id;
+			}
+		}
+		else if(current->class_id == PCI_CLASS_NETWORK_OTHER) 
+		{
+			// Patch BCM43xx
+			if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFF00) == 0x4300))
+			{
+				patch_bcm_deviceid = current->device_id;
+			}
+		}
+	}
+}
+
+bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
+{
+	TagPtr personality;
+	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+	personality =		XMLGetProperty(personality, (const char*)"Broadcom 802.11 PCI");	
+	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
+
+	
+	char* new_str = malloc(strlen("pci14e4,xxxx")+1);
+	sprintf(new_str, "pci14e4,%02x", patch_bcm_deviceid);
+
+	// Check to see if we *really* need to modify the plist, if not, return false
+	// so that *if* this were going ot be the only modified kext, the repacking code
+	// won't need to be executed.
+	int count = XMLTagCount(match_names);
+	while(count)
+	{
+		count--;
+		TagPtr replace =	XMLGetElement(match_names, count);	// Modify the second entry
+		char* orig_string = XMLCastString(replace);
+		if(strcmp(orig_string, new_str) == 0) return false;
+	}
+
+	
+	TagPtr replace =	XMLGetElement(match_names, 1);	// Modify the second entry
+	char* orig_string = XMLCastString(replace);
+	
+	DBG("Attemting to replace '%s' with '%s'\n", orig_string, new_str);
+
+	// TODO: verify string doesn't exist first.
+	
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace));
+	
+	return true;
+}
+
+bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
+{
+	int exeutable_offset, full_size, compressed_size;
+	TagPtr personality;
+	long offset;
+	int zlib_result;
+	z_stream       zstream;
+	bool           zstream_inited = false;
+	mkext2_file_entry* kext;
+	void* compressed_data;
+
 	exeutable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
-	
-	
 	kext = (void*)((char*)start + exeutable_offset);
 
 	full_size = MKEXT2_GET_ENTRY_FULLSIZE(kext);
 	compressed_size = MKEXT2_GET_ENTRY_COMPSIZE(kext);
 	compressed_data = MKEXT2_GET_ENTRY_DATA(kext);
 	
-	if(	(strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
-		(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0))
+	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+	if(XMLGetProperty(personality, (const char*)"Intel915"))
 	{
-		
-		
-		personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
-		if(XMLGetProperty(personality, (const char*)"Intel915"))
-		{
-			personality =		XMLGetProperty(personality, (const char*)"Intel915");
-		}
-		else
-		{
-			personality =		XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer");	
-		}
-#if DEBUG_KEXT_PATCHER
-		char* pcimatch =	XMLCastString(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
-#endif
-		long offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
-		
-		replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset);
-					   
-		DBG("Located kext %s\n", bundleID);
-		DBG("PCI Match offset = %d, string = %s\n", offset, pcimatch);
-		char* executable = malloc(full_size);
-		
-		bzero(&zstream, sizeof(zstream));		
-		zstream.next_in   = (UInt8*)compressed_data;
-		zstream.avail_in  = compressed_size;
-		
-		zstream.next_out  = (UInt8*)executable;
-		zstream.avail_out = full_size;
-		
-		zstream.zalloc    = z_alloc;
-		zstream.zfree     = z_free;
-		
-		zlib_result = inflateInit(&zstream);
-		if (Z_OK != zlib_result)
-		{
-			printf("ZLIB Inflate Error: %s\n", zstream.msg);
-			getc();
-		}
-		else 
-		{
-			zstream_inited = true;
-		}
-		
-		
-		zlib_result = inflate(&zstream, Z_FINISH);
-		
-		DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-
-		replace_word(0x27A28086, 0x27AE8086, executable, zstream.total_out);
-		if (zstream_inited) inflateEnd(&zstream);
-
-		
-		zstream.next_in   = (UInt8*)executable;
-		//		zstream.next_out  = (UInt8*)((int)compressed_data<<1);
-		zstream.next_out  = (UInt8*)compressed_data;
-
-		zstream.avail_in  = full_size;
-		zstream.avail_out = compressed_size;
-		zstream.zalloc    = Z_NULL;
-		zstream.zfree     = Z_NULL;
-		zstream.opaque    = Z_NULL;
-		
-		
-		
-		// Recompress the eecutable
-		zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
-		if (Z_OK != zlib_result) {
-			printf("ZLIB Deflate Error: %s\n", zstream.msg);
-			getc();
-		}
-		else 
-		{
-			zstream_inited = true;
-		}
-		
-		zlib_result = deflate(&zstream, Z_FINISH);
-
-		if (zlib_result == Z_STREAM_END)
-		{
-			DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-		} 
-		else if (zlib_result == Z_OK)
-		{
-			/* deflate filled output buffer, meaning the data doesn't compress.
-			 */
-			DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-
-		} 
-		else if (zlib_result != Z_STREAM_ERROR)
-		{
-			printf("ZLIB Deflate Error: %s\n", zstream.msg);
-			getc();
-		}
-		
-		if (zstream_inited) deflateEnd(&zstream);
-
-
-		
-		
-
-		free(executable);
-		
-		//printf("\n");
-		
-		//getc();		
-		
-		return true;
+		personality =		XMLGetProperty(personality, (const char*)"Intel915");
 	}
-	return false;
-}
-
-
-void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
-{
-	//pci_dt_t* current = arg1;
+	else
+	{
+		personality =		XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer");	
+	}
+#if DEBUG_KEXT_PATCHER
+	char* pcimatch =	XMLCastString(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
+#endif
+	offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
+	
+	replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset);
+	
+	DBG("Located kext %s\n", bundleID);
+	DBG("PCI Match offset = %d, string = %s\n", offset, pcimatch);
+	char* executable = malloc(full_size);
+	
+	bzero(&zstream, sizeof(zstream));		
+	zstream.next_in   = (UInt8*)compressed_data;
+	zstream.avail_in  = compressed_size;
+	
+	zstream.next_out  = (UInt8*)executable;
+	zstream.avail_out = full_size;
+	
+	zstream.zalloc    = z_alloc;
+	zstream.zfree     = z_free;
+	
+	zlib_result = inflateInit(&zstream);
+	if (Z_OK != zlib_result)
+	{
+		printf("ZLIB Inflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	else 
+	{
+		zstream_inited = true;
+	}
+	
+	
+	zlib_result = inflate(&zstream, Z_FINISH);
+	
+	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+	
+	replace_word(0x27A28086, 0x27AE8086, executable, zstream.total_out);
+	if (zstream_inited) inflateEnd(&zstream);
+	
+	
+	zstream.next_in   = (UInt8*)executable;
+	//		zstream.next_out  = (UInt8*)((int)compressed_data<<1);
+	zstream.next_out  = (UInt8*)compressed_data;
+	
+	zstream.avail_in  = full_size;
+	zstream.avail_out = compressed_size;
+	zstream.zalloc    = Z_NULL;
+	zstream.zfree     = Z_NULL;
+	zstream.opaque    = Z_NULL;
+	
+	
+	
+	// Recompress the eecutable
+	zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
+	if (Z_OK != zlib_result) {
+		printf("ZLIB Deflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	else 
+	{
+		zstream_inited = true;
+	}
+	
+	zlib_result = deflate(&zstream, Z_FINISH);
+	
+	if (zlib_result == Z_STREAM_END)
+	{
+		DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+	} 
+	else if (zlib_result == Z_OK)
+	{
+		/* deflate filled output buffer, meaning the data doesn't compress.
+		 */
+		DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		
+	} 
+	else if (zlib_result != Z_STREAM_ERROR)
+	{
+		printf("ZLIB Deflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	
+	if (zstream_inited) deflateEnd(&zstream);
+	
+	free(executable);
+	
+	return true;	
 }
