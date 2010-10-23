@@ -27,8 +27,10 @@
 #include "sl.h"
 #include "xml.h"
 
-string_ref* ref_strings = NULL;
+string_ref *ref_strings = NULL;
 
+/// TODO: remove below
+static char* buffer_start = NULL;
 // TODO: redo the next two functions
 void SaveRefString(char* string, int id)
 {
@@ -267,9 +269,13 @@ XMLParseFile( char * buffer, TagPtr * dict )
     pos = 0;
 	char       *configBuffer;
 	
+	
+	
     configBuffer = malloc(strlen(buffer)+1);
     strcpy(configBuffer, buffer);
 	
+	buffer_start = configBuffer;
+
     while (1)
     {
         length = XMLParseNextTag(configBuffer + pos, &tag);
@@ -392,6 +398,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			tmpTag->string = str;
 			tmpTag->tag = 0;
 			tmpTag->tagNext = 0;
+			tmpTag->offset = buffer_start ? buffer - buffer_start  + pos : 0;
 			*tag = tmpTag;
 			
 			length = 0;
@@ -464,6 +471,8 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			tmpTag->string = (char*) integer;
 			tmpTag->tag = 0;
 			tmpTag->tagNext = 0;
+			tmpTag->offset = buffer_start ? buffer - buffer_start + pos : 0;
+
 			*tag = tmpTag;
 			
 			length = 0;
@@ -575,6 +584,7 @@ ParseTagList( char * buffer, TagPtr * tag, long type, long empty )
 
     tmpTag->type = type;
     tmpTag->string = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start : 0;
     tmpTag->tag = tagList;
     tmpTag->tagNext = 0;
     
@@ -617,6 +627,7 @@ ParseTagKey( char * buffer, TagPtr * tag )
     tmpTag->type = kTagTypeKey;
     tmpTag->string = string;
     tmpTag->tag = subTag;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
   
     *tag = tmpTag;
@@ -650,6 +661,7 @@ ParseTagString( char * buffer, TagPtr * tag )
     tmpTag->type = kTagTypeString;
     tmpTag->string = string;
     tmpTag->tag = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
   
     *tag = tmpTag;
@@ -676,6 +688,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 		tmpTag->type = kTagTypeInteger;
 		tmpTag->string = 0;
 		tmpTag->tag = 0;
+		tmpTag->offset =  0;
 		tmpTag->tagNext = 0;
 		
 		*tag = tmpTag;
@@ -749,6 +762,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
     tmpTag->type = kTagTypeInteger;
 	tmpTag->string = (char *)integer;
 	tmpTag->tag = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
@@ -781,6 +795,7 @@ ParseTagData( char * buffer, TagPtr * tag )
     tmpTag->type = kTagTypeData;
     tmpTag->string = string;
     tmpTag->tag = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
@@ -809,6 +824,7 @@ ParseTagDate( char * buffer, TagPtr * tag )
     tmpTag->type = kTagTypeDate;
     tmpTag->string = 0;
     tmpTag->tag = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
@@ -830,6 +846,7 @@ ParseTagBoolean( char * buffer, TagPtr * tag, long type )
     tmpTag->type = type;
     tmpTag->string = 0;
     tmpTag->tag = 0;
+	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
@@ -951,6 +968,7 @@ XMLFreeTag( TagPtr tag )
     tag->type = kTagTypeNone;
     tag->string = 0;
     tag->tag = 0;
+	tag->offset = 0;
     tag->tagNext = gTagsFree;
     gTagsFree = tag;
 #else
@@ -1097,6 +1115,21 @@ char* XMLCastString(TagPtr dict)
 	
 	return NULL;
 }
+
+long XMLCastStringOffset(TagPtr dict)
+{
+	if(dict &&
+	   ((dict->type == kTagTypeString) ||
+	   (dict->type == kTagTypeKey)))
+	{
+		return dict->offset;
+	}
+	else 
+	{
+		return -1;
+	}
+}
+
 
 bool XMLCastBoolean(TagPtr dict)
 {

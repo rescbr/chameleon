@@ -92,6 +92,7 @@ bool XMLIsType(TagPtr dict, enum xmltype type);
 
 bool XMLCastBoolean( TagPtr dict );
 char* XMLCastString( TagPtr dict );
+long XMLCastStringOffset(TagPtr dict);
 int XMLCastInteger ( TagPtr dict );
 TagPtr XMLCastDict ( TagPtr dict );
 TagPtr XMLCastArray( TagPtr dict );
