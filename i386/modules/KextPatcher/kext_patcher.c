@@ -11,11 +11,16 @@
 #include "libsaio.h"
 #include "zlib.h"
 #include "kext_patcher.h"
+#include "boot.h"
+#include "bootstruct.h"
 #include "pci.h"
 #include "drivers.h"
 #include "mkext.h"
 #include "modules.h"
 #include "hex_editor.h"
+
+
+#define kHDACodec				"HDACodec"				/* acpi_patcher.c */
 
 
 #ifndef DEBUG_KEXT_PATCHER
@@ -33,6 +38,8 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start);
 
+int chartohex(char c);
+
 static void * z_alloc(void *, u_int items, u_int size);
 static void   z_free(void *, void *ptr);
 
@@ -41,7 +48,7 @@ uint16_t patch_bcm_deviceid = 0;
 // TODO: add detection code /  a method for users to enter the id
 uint16_t patch_hda_codec = 0;
 
-#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid | patch_hda_codec)
+#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid || patch_hda_codec)
 
 typedef struct z_mem {
     uint32_t alloc_size;
@@ -126,6 +133,22 @@ void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* a
 
 void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 {
+	const char* hda_codec;
+	int len = 0;
+	
+	if (getValueForKey(kHDACodec, &hda_codec, &len, &bootInfo->bootConfig))
+	{
+		int index = 0;
+		while(len)
+		{
+			patch_hda_codec <<= 4;
+			patch_hda_codec |= chartohex(hda_codec[index]);
+										 
+			len--;
+			index++;
+		}
+	}
+		
 	if(!NEEDS_PATCHING) return;	// No need to apply a patch, hardware doesn't need it
 	
 	int version = 0;
@@ -689,4 +712,21 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	free(executable);
 	
 	return true;	
+}
+
+int chartohex(char c)
+{
+	if(c <= '9' && c >= '0')
+	{
+		return c - '0';	// c is between 0 and 9
+	}
+	else if(c <= 'F' && c >= 'A')
+	{
+		return c - 'A' + 10; // c = 10 - 15;
+	}
+	else if(c <= 'f' && c >= 'a')
+	{
+		return c - 'a' + 10; // c = 10 - 15;
+	}
+	return 0;
 }
