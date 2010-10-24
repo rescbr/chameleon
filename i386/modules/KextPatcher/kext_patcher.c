@@ -30,14 +30,18 @@
 bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start);
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
+bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start);
+bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start);
 
 static void * z_alloc(void *, u_int items, u_int size);
 static void   z_free(void *, void *ptr);
 
 uint16_t patch_gma_deviceid = 0;
 uint16_t patch_bcm_deviceid = 0;
+// TODO: add detection code /  a method for users to enter the id
+uint16_t patch_hda_codec = 0;
 
-#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid)
+#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid | patch_hda_codec)
 
 typedef struct z_mem {
     uint32_t alloc_size;
@@ -345,6 +349,18 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 		return patch_bcm_kext(plist, plistbuffer, start);
 
 	}
+	else if(patch_hda_codec && strcmp(bundleID, "com.apple.driver.AppleHDA") == 0)
+	{
+		return patch_hda_kext(plist, plistbuffer, start);
+
+	}
+	/*
+	else if(patch_hda_codec && strcmp(bundleID, "com.apple.driver.AppleHDAController") == 0)
+	{
+		return patch_hda_controller(plist, plistbuffer, start);
+
+	}
+	*/
 	return false;
 }
 
@@ -370,6 +386,156 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			}
 		}
 	}
+}
+
+
+bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
+{
+	return false;
+	// change the PCI class code to match to. Note: A LegacyHDA plist should do this on it's own
+	// As such, it's disabled
+
+	// TODO: read class code
+	TagPtr personality;
+	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+	personality =		XMLGetProperty(personality, (const char*)"BuiltInHDA");	
+	TagPtr match_class =XMLCastArray(XMLGetProperty(personality, (const char*)"IOPCIClassMatch"));
+	
+	
+	char* new_str = malloc(strlen("0xXXXX000&0xFFFE0000")+1);
+	sprintf(new_str, "0x04030000&amp;0xFFFE0000"); // todo, pass in actual class id
+	
+	
+	char* orig_string = "0x04020000&amp;0xFFFE0000"; //XMLCastString(match_class);
+	
+	DBG("Attemting to replace '%s' with '%s'\n", orig_string, new_str);
+	
+	// TODO: verify string doesn't exist first.
+	
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(match_class), 1024);
+	
+	return true;
+	
+}
+
+
+bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
+{
+	uint16_t find_codec = 0;
+	int full_size, compressed_size, executable_offset;
+	void* compressed_data;
+	mkext2_file_entry* kext;
+	int zlib_result;
+	z_stream       zstream;
+	bool           zstream_inited = false;
+
+	switch(0xFF00 & patch_hda_codec)
+	{
+		case 0x0200:
+			find_codec = 0x0262;
+			break;
+
+		case 0x0800:
+			find_codec = 0x0885;
+			break;
+			
+		case 0x0600:	// specificaly the 662
+			find_codec = 0x0885;
+			break;
+	}
+	
+	if(!find_codec) return false;	// notify caller that we aren't patching the kext
+
+		
+	executable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	kext = (void*)((char*)start + executable_offset);
+
+	full_size = MKEXT2_GET_ENTRY_FULLSIZE(kext);
+	compressed_size = MKEXT2_GET_ENTRY_COMPSIZE(kext);
+	compressed_data = MKEXT2_GET_ENTRY_DATA(kext);	
+	executable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	
+	
+	char* executable = malloc(full_size);
+	
+	bzero(&zstream, sizeof(zstream));		
+	zstream.next_in   = (UInt8*)compressed_data;
+	zstream.avail_in  = compressed_size;
+	
+	zstream.next_out  = (UInt8*)executable;
+	zstream.avail_out = full_size;
+	
+	zstream.zalloc    = z_alloc;
+	zstream.zfree     = z_free;
+	
+	zlib_result = inflateInit(&zstream);
+	if (Z_OK != zlib_result)
+	{
+		printf("ZLIB Inflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	else 
+	{
+		zstream_inited = true;
+	}
+	
+	
+	zlib_result = inflate(&zstream, Z_FINISH);
+	
+	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		
+	replace_word(0x10EC | (find_codec << 8), 0xE10EC | (patch_hda_codec << 8), executable, zstream.total_out);
+	
+	if (zstream_inited) inflateEnd(&zstream);
+	
+	
+	zstream.next_in   = (UInt8*)executable;
+	zstream.next_out  = (UInt8*)compressed_data;
+	
+	zstream.avail_in  = full_size;
+	zstream.avail_out = compressed_size;
+	zstream.zalloc    = Z_NULL;
+	zstream.zfree     = Z_NULL;
+	zstream.opaque    = Z_NULL;
+	
+	
+	
+	// Recompress the eecutable
+	zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
+	if (Z_OK != zlib_result) {
+		printf("ZLIB Deflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	else 
+	{
+		zstream_inited = true;
+	}
+	
+	zlib_result = deflate(&zstream, Z_FINISH);
+	
+	if (zlib_result == Z_STREAM_END)
+	{
+		DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+	} 
+	else if (zlib_result == Z_OK)
+	{
+		/* deflate filled output buffer, meaning the data doesn't compress.
+		 */
+		DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		
+	} 
+	else if (zlib_result != Z_STREAM_ERROR)
+	{
+		printf("ZLIB Deflate Error: %s\n", zstream.msg);
+		getc();
+	}
+	
+	if (zstream_inited) deflateEnd(&zstream);
+	
+	free(executable);
+	
+	return true;	
+
 }
 
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
@@ -403,7 +569,7 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 
 	// TODO: verify string doesn't exist first.
 	
-	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace));
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 1024);
 	
 	return true;
 }
@@ -440,7 +606,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 #endif
 	offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
 	
-	replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset);
+	replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset, 1024);
 	
 	DBG("Located kext %s\n", bundleID);
 	DBG("PCI Match offset = %d, string = %s\n", offset, pcimatch);
