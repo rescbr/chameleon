@@ -8,7 +8,7 @@
  */
 
 #ifndef _GMA_RESOLUTION_H_
-#define _GMA_RESOLTUION_H_
+#define _GMA_RESOLUTION_H_
 
 //#include "libsaio.h"
 #include "autoresolution.h"
