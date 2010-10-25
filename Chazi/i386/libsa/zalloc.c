@@ -30,9 +30,13 @@
  */
 
 #include "libsa.h"
+//#include "saio_internal.h" //Azi: needed for ZDEBUG (printf).
+// Check other DEBUG's, i forgot those while messing with includes.
 #include "memory.h"
 
 #define ZDEBUG 0
+//Azi: this DEBUG is messed up; it hangs while "boot1: ..." with
+// black screen on my branch and instant reboot on trunk.
 
 #if ZDEBUG
 int zout;

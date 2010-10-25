@@ -53,8 +53,12 @@ bool gVerboseMode;
 bool gErrors;
 
 /* Kabyl: BooterLog */
-#define BOOTER_LOG_SIZE	(64 * 1024)
-#define SAFE_LOG_SIZE	80
+//Azi: Double log available size; this seems to fix some hangs and instant reboots caused by
+// booting with -f (ignore caches). 96kb are enough to hold full log, booting with -f; even so,
+// this depends on how much we "play" at the boot prompt and with what patches we're playing,
+// depending on how much they print to the log.
+#define BOOTER_LOG_SIZE	(128 * 1024)
+#define SAFE_LOG_SIZE	134
 
 char *msgbuf = 0;
 char *cursor = 0;
