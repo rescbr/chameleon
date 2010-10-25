@@ -396,8 +396,8 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			case PCI_CLASS_DISPLAY_VGA:
 				if(current->vendor_id == 0x8086 && 
 				   (
-					current->device_id == 0x27AE ||
-					/*
+					current->device_id == 0x27AE /*||
+					
 					current->device_id == 0xA001 ||
 					current->device_id == 0xA002 ||
 					current->device_id == 0xA011 ||
