@@ -143,7 +143,6 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		{
 			patch_hda_codec <<= 4;
 			patch_hda_codec |= chartohex(hda_codec[index]);
-										 
 			len--;
 			index++;
 		}
@@ -344,7 +343,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 	}
 
 	
-	DBG("Loading %s, length %d, version 0x%x\n", filespec, length, version);
+	DBG("Loading %s, version 0x%x\n", filespec, version);
 	//getc();
 }
 
@@ -392,21 +391,34 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	pci_dt_t* current = arg1;
 	if(current)
 	{
-		if(current->class_id == PCI_CLASS_DISPLAY_VGA)
+		switch(current->class_id)
 		{
-			if(current->vendor_id == 0x8086 && current->device_id == 0x27AE)
-			{
-				// TODO: patche based on dev id.
-				patch_gma_deviceid = current->device_id;
-			}
-		}
-		else if(current->class_id == PCI_CLASS_NETWORK_OTHER) 
-		{
-			// Patch BCM43xx
-			if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFF00) == 0x4300))
-			{
-				patch_bcm_deviceid = current->device_id;
-			}
+			case PCI_CLASS_DISPLAY_VGA:
+				if(current->vendor_id == 0x8086 && 
+				   (
+					current->device_id == 0x27AE ||
+					/*
+					current->device_id == 0xA001 ||
+					current->device_id == 0xA002 ||
+					current->device_id == 0xA011 ||
+					current->device_id == 0xA012
+					 */
+					
+					)
+				   )
+				{
+					patch_gma_deviceid = current->device_id;
+				}
+				break;
+				
+			case PCI_CLASS_NETWORK_OTHER:
+				
+				// Patch BCM43xx
+				if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFF00) == 0x4300))
+				{
+					patch_bcm_deviceid = current->device_id;
+				}
+				break;
 		}
 	}
 }
@@ -435,7 +447,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 	
 	// TODO: verify string doesn't exist first.
 	
-	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(match_class), 1024);
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(match_class), 10240);
 	
 	return true;
 	
@@ -507,7 +519,7 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 	
 	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 		
-	replace_word(0x10EC | (find_codec << 8), 0xE10EC | (patch_hda_codec << 8), executable, zstream.total_out);
+	replace_word(0x10EC | (find_codec << 16), 0xE10EC | (patch_hda_codec << 16), executable, zstream.total_out);
 	
 	if (zstream_inited) inflateEnd(&zstream);
 	
@@ -588,12 +600,11 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 	TagPtr replace =	XMLGetElement(match_names, 1);	// Modify the second entry
 	char* orig_string = XMLCastString(replace);
 	
-	DBG("Attemting to replace '%s' with '%s'\n", orig_string, new_str);
-
+	
 	// TODO: verify string doesn't exist first.
 	
-	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 1024);
-	
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 10240);
+
 	return true;
 }
 
@@ -629,10 +640,12 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 #endif
 	offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
 	
-	replace_string("0x27A28086", "0x27AE8086", plistbuffer + offset, 1024);
+	char* newstring = malloc(strlen("0x27A28086") + 1);
+	sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
 	
-	DBG("Located kext %s\n", bundleID);
-	DBG("PCI Match offset = %d, string = %s\n", offset, pcimatch);
+	DBG("Replacing %s with %s\n", "0x27A28086", newstring); 
+	replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
+	
 	char* executable = malloc(full_size);
 	
 	bzero(&zstream, sizeof(zstream));		
@@ -661,7 +674,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 	
-	replace_word(0x27A28086, 0x27AE8086, executable, zstream.total_out);
+	replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
 	if (zstream_inited) inflateEnd(&zstream);
 	
 	

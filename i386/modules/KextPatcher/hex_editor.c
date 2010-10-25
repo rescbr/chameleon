@@ -89,5 +89,5 @@ void replace_string(char* find, char* replace, char* string, int length)
 		length--;
 		str++;
 	}
-	strncpy(str, replace, strlen(replace) - 1);	// don't copy the null char
+	strncpy(str, replace, strlen(replace));	// don't copy the null char
 }
