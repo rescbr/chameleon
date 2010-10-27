@@ -97,9 +97,9 @@
 #define kBootUUIDKey		 "boot-uuid"		 // options.c			processBootArg			- kFlag
 #define kHelperRootUUIDKey	 "Root UUID"		 // options.c			getValFK
 #define kArchKey			 "arch"				 // boot.c				getValFK				- kFlag
-#define kKernelNameKey		 "Kernel"			 // options.c			getValFK
+#define kKernelNameKey		 "Kernel"			 // options.c			getValFK				- kFlag*** bFlag ?
 #define kKernelCacheKey		 "Kernel Cache"		 // boot.c				getValFK				- kFlag
-#define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK
+#define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK				- kFlags***
 #define kKPatcherKey		 "PatchKernel"		 // kernel_patcher.c	getBoolFK
 #define kAltExtensionsKey	 "kext"				 // drivers.c			getValFK
 #define kMKextCacheKey		 "MKext Cache"		 // options.c			getValFK				- kFlag
@@ -116,9 +116,11 @@
 #define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
 #define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK
 #define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?
-#define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c		getBoolFK
-#define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c		getBoolFK
-#define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK
+#define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c		getBoolFK				- add to BootHelp***
+#define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c		getBoolFK					||
+#define kEnableC2States		 "EnableC2State"	 // acpi_patcher.c		getBoolFK					||
+#define kEnableC3States		 "EnableC3State"	 // acpi_patcher.c		getBoolFK					||
+#define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK					||
 #define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
 #define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c	getBoolFK
 #define kSMBIOSKey			 "SMBIOS"			 // fake_efi.c			getValFK
