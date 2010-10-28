@@ -53,7 +53,7 @@
 #define FDISK_LINUX		0x83
 #define FDISK_UFS       0xa8    /* Apple UFS partition */
 #define FDISK_HFS       0xaf    /* Apple HFS partition */
-#define FDISK_BOOTER    0xab    /* Apple booter partition */
+#define FDISK_BOOTER    0xab    /* Apple booter partition - Azi: reminder */
 
 /*
  * Format of fdisk partion entry (if present).

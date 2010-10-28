@@ -82,7 +82,9 @@ void load_all_modules() // called on boot.c
 	char* name;
 	long flags;
 	long time;
-	//Azi: Modules.txt-->Issues
+	
+	//Azi: review; at this point /Extra/modules/ = bt(0,0)/Extra/modules/;
+	// same thing with all other files that load before the prompt.
 	struct dirstuff* moduleDir = opendir("bt(0,0)/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{

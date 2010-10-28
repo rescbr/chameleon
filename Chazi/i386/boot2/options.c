@@ -670,10 +670,12 @@ void lspci(void)
 }
 
 //==========================================================================
+//Azi: autoresolution
 int     key;
 int     nextRow;
 BVRef   menuBVR;
 bool    showPrompt;
+extern void reloadAutoRes();
 
 int getBootOptions(bool firstRun)
 {
@@ -686,7 +688,6 @@ int getBootOptions(bool firstRun)
 //	BVRef   menuBVR;
 //	bool    showPrompt;
 	bool    newShowPrompt, isCDROM;
-	extern void reloadAutoRes(); //Azi: autoresolution
 
 	// Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(bvChain);
@@ -1037,10 +1038,8 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI)
-			{
-				if (bootArgs->Video.v_display == GRAPHICS_MODE)
-				{
+			if (useGUI) {
+				if (bootArgs->Video.v_display == GRAPHICS_MODE) {
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1056,8 +1055,7 @@ int getBootOptions(bool firstRun)
 					nextRow = kMenuTopRow;
 					showPrompt = true;
 
-					if (gDeviceCount)
-					{
+					if (gDeviceCount) {
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
 						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
@@ -1066,14 +1064,7 @@ int getBootOptions(bool firstRun)
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 					showBootPrompt(nextRow, showPrompt);
 					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
-					
-					// need to disable F2 here but can't do useGUI = false...
-					// not a big deal but since i disabled it when in TEXT MODE,
-					// were it makes no sense and it just hangs the prompt.. not fatal, though...
-					// back later...
-				}
-				else
-				{
+				} else {
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
 					updateVRAM();

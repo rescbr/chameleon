@@ -1999,7 +1999,7 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
     return 0;
 }
 
-
+//Azi: for device drawing purposes (gui.c)
 int diskIsCDROM(BVRef bvr)
 {
     struct driveInfo          di;

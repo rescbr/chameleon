@@ -117,7 +117,7 @@ int mountRAMDisk(const char * param)
 	fh = open(param, 0);
 	if (fh != -1)
 	{
-		printf("\nreading ramdisk image: %s", param);
+		printf("\nreading ramdisk image: %s", param); //Azi: check this later...
 
 		ramDiskSize = file_size(fh);
 		if (ramDiskSize > 0)

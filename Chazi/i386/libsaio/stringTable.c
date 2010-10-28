@@ -608,7 +608,8 @@ int loadConfigFile(const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0)
+		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0)... BS!
+		//Azi: review; at this point /Extra/modules/ = bt(0,0)/Extra/modules/.
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
@@ -672,12 +673,12 @@ int loadOverrideConfig(config_file_t *config)
 	// Check specific OS folders.
 	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
 	fd = open(dirSpecBplist, 0);
-//	if (fd >= 0) goto success_fd;
+	if (fd >= 0) goto success_fd;
 	
-//	restore?? can be useful with ramdisks...
-//	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s", filename);
-//	fd = open(dirSpecBplist, 0);
-//	if (fd >= 0) goto success_fd;
+//	can be useful with ramdisks...
+	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s", filename);
+	fd = open(dirSpecBplist, 0);
+	if (fd >= 0) goto success_fd;
 	
 	//Azi: i really don't like these two!
 	// "/Extra/com.apple.Boot.plist"

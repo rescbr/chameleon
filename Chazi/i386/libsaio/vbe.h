@@ -37,6 +37,7 @@
 
 //#include "edid.h"			//Azi:autoresolution <-- included in
 #include "autoresolution.h"
+//#include "../modules/AutoResolution/autoresolution.h" //Azi: reminder
 
 #define MIN_VESA_VERSION    0x200
 

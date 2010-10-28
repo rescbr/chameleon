@@ -23,7 +23,6 @@
 #endif
 
 int lasttime = 0; // we need this for animating maybe
-extern int gDeviceCount; // dup, line 132
 static const char *theme_name = kDefaultThemeName; // #define'ed on boot.h
 
 /*
@@ -129,8 +128,8 @@ image_t images[] = {
 
 int imageCnt = 0;
 
-//extern int	gDeviceCount; - dup, line 25
-extern int	selectIndex;
+extern int	gDeviceCount;
+//extern int	selectIndex; Azi: not in use
 
 extern MenuItem *menuItems;
 
@@ -725,6 +724,7 @@ int initGUI(void)
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
 	PRINT("Found mode %dx%d in VESA Table\n", gui.screen.width, gui.screen.height);
+	//Azi: check why is this printing... (reloadAutoRes/debug)
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {

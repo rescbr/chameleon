@@ -754,14 +754,15 @@ int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
 }
 
 //==========================================================================
-
-const char * systemConfigDir()
+/*
+const char * systemConfigDir() //Azi: boot 132 loadSystemConfig remains.
 {
     if (gBootFileType == kNetworkDeviceType)
-	return "";
+		return "";
+
     return "/Library/Preferences/SystemConfiguration";
 }
-
+*/
 //==========================================================================
 
 int gBootFileType;
@@ -789,29 +790,29 @@ void scanBootVolumes( int biosdev, int * count )
 
 void scanDisks(int biosdev, int *count)
 {
-  #define MAX_HDD_COUNT 32
-  int bvCount;
-  int hd = 0;
-
-  // Testing up to MAX_HDD_COUNT hard drives.
-	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
+	#define MAX_HDD_COUNT 32
+	int bvCount;
+	int hd = 0;
+	
+	// Testing up to MAX_HDD_COUNT hard drives.
+	while (!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
 	{
-	  bvCount = 0;
-	  scanBootVolumes(0x80 + hd, &bvCount);
-    hd++;
+		bvCount = 0;
+		scanBootVolumes(0x80 + hd, &bvCount);
+		hd++;
 	}
-
-  // Also scanning CD/DVD drive.
+	
+	// Also scanning CD/DVD drive.
 	if (biosDevIsCDROM(gBIOSDev))
 	{
-	  bvCount = 0;
-  	scanBootVolumes(gBIOSDev, &bvCount);
+		bvCount = 0;
+		scanBootVolumes(gBIOSDev, &bvCount);
 	}
 }
 
 //==========================================================================
 
-BVRef selectBootVolume( BVRef chain )
+BVRef selectBootVolume( BVRef chain ) //Azi: return default boot volume.
 {
 	bool filteredChain = false;
 	bool foundPrimary = false;
@@ -913,7 +914,7 @@ void setBootGlobals(BVRef chain)
   // turbo - Save the ORIGINAL boot volume too for loading our mkext
   if (!gBIOSBootVolume) gBIOSBootVolume = gBootVolume;
   
-  setRootVolume(gBootVolume);	
+  setRootVolume(gBootVolume);
 }
 
 /*!

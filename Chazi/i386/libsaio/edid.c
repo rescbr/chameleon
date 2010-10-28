@@ -14,7 +14,7 @@
 #include "graphics.h"
 
 
-//static biosBuf_t bb;
+//static biosBuf_t bb; // reminder
 
 UInt32 xResolution = 0;
 UInt32 yResolution = 0;
@@ -53,7 +53,6 @@ void getResolution(UInt32* params)
 		params[2] = bpResolution;
 	}
 }
-
 
 unsigned char* readEDID()
 {
