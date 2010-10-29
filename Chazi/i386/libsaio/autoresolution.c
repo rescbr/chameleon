@@ -738,7 +738,7 @@ void reloadAutoRes()
 				if (gDeviceCount)
 				{
 					showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-					nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+					nextRow += MIN( gDeviceCount, kMenuMaxItems ) + 3;
 				}
 
 				// Show the boot prompt.

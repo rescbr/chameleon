@@ -178,9 +178,9 @@ loop:	SWAPINIT(a, es);
 	}
 
 	pn = a + n * es;
-	r = min(pa - (char *)a, pb - pa);
+	r = MIN(pa - (char *)a, pb - pa);
 	vecswap(a, pb - r, r);
-	r = min(pd - pc, (pn - pd) - (int)es);
+	r = MIN(pd - pc, (pn - pd) - (int)es);
 	vecswap(pb, pn - r, r);
 	if ((r = pb - pa) > (int)es)
 		qsort(a, r / es, es, cmp);

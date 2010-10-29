@@ -609,8 +609,8 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
     uint16_t drawWidth;
     uint8_t *vram = (uint8_t *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + 4 * x;
 
-    drawWidth = min(width, VIDEO(width) - x);
-    height = min(height, VIDEO(height) - y);
+    drawWidth = MIN(width, VIDEO(width) - x);
+    height = MIN(height, VIDEO(height) - y);
     while (height--) {
 		switch (VIDEO (depth))
 		{
@@ -789,8 +789,8 @@ void drawColorRectangle( unsigned short x,
     vram       = (char *) VIDEO(baseAddr) +
                  VIDEO(rowBytes) * y + pixelBytes * x;
 
-    width = min(width, VIDEO(width) - x);
-    height = min(height, VIDEO(height) - y);
+    width = MIN(width, VIDEO(width) - x);
+    height = MIN(height, VIDEO(height) - y);
 
     while ( height-- )
     {
@@ -815,8 +815,8 @@ void drawDataRectangle( unsigned short  x,
     unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) +
         VIDEO(rowBytes) * y + pixelBytes * x;
 
-    drawWidth = min(width, VIDEO(width) - x);
-    height = min(height, VIDEO(height) - y);
+    drawWidth = MIN(width, VIDEO(width) - x);
+    height = MIN(height, VIDEO(height) - y);
     while ( height-- ) {
         bcopy( data, vram, drawWidth * pixelBytes );
         vram += VIDEO(rowBytes);

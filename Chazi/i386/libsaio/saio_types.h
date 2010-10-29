@@ -232,8 +232,8 @@ enum {
 };
 
 //Azi: change this stuff back to upercase??
-#define max(a,b) ((a) > (b) ? (a) : (b))
-#define min(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 #define	round2(x, m)	(((x) + (m / 2)) & ~(m - 1))
 #define roundup2(x, m)  (((x) + m - 1) & ~(m - 1))

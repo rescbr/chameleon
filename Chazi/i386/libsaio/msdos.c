@@ -772,10 +772,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	if (length==0 || length>size-offset)
 		toread=size-offset;
 	wastoread=toread;
-	bcopy (buf+(offset%msdosclustersize),ptr,min(msdosclustersize-(offset%msdosclustersize), toread));
+	bcopy (buf+(offset%msdosclustersize),ptr,MIN(msdosclustersize-(offset%msdosclustersize), toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
 	toread-=msdosclustersize-(offset%msdosclustersize);
-	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, min(msdosclustersize,toread), &cluster))
+	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, MIN(msdosclustersize,toread), &cluster))
 	{
 		ptr+=msdosclustersize;
 		toread-=msdosclustersize;
