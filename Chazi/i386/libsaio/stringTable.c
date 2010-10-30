@@ -609,7 +609,7 @@ int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
 		//"/Extra/com.apple.Boot.plist", removed in favor of bt(0,0)... BS!
-		//Azi: review; at this point /Extra/modules/ = bt(0,0)/Extra/modules/.
+		//Azi: review; at this point /Extra = bt(0,0)/Extra.
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",

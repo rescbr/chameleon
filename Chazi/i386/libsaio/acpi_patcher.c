@@ -285,8 +285,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c3_enabled = false;
 		bool c4_enabled = false;
 		
-		getBoolForKey(kEnableC2States, &c2_enabled, &bootInfo->bootConfig);
-		getBoolForKey(kEnableC3States, &c3_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC2StatesKey, &c2_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC3StatesKey, &c3_enabled, &bootInfo->bootConfig);
 		getBoolForKey(kEnableC4StatesKey, &c4_enabled, &bootInfo->bootConfig);
 		
 		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);

@@ -118,8 +118,8 @@
 #define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?
 #define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c		getBoolFK				- add to BootHelp***
 #define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c		getBoolFK					||
-#define kEnableC2States		 "EnableC2State"	 // acpi_patcher.c		getBoolFK					||
-#define kEnableC3States		 "EnableC3State"	 // acpi_patcher.c		getBoolFK					||
+#define kEnableC2StatesKey	 "EnableC2State"	 // acpi_patcher.c		getBoolFK					||
+#define kEnableC3StatesKey	 "EnableC3State"	 // acpi_patcher.c		getBoolFK					||
 #define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK					||
 #define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
 #define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c	getBoolFK
