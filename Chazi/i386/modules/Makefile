@@ -25,12 +25,10 @@ SRCROOT=/tmp
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-# The order of building is important.
-# TODO: exclude Symbols from find so it isn't compiled twice
 #Azi:---
-#SUBDIRS = Symbols `find ./ -type d -depth 1 -not -name ".*"`
-SUBDIRS = Symbols Memory KernelPatcher HelloWorld GraphicsEnabler
-#AutoResolution
+# The order of building is important. ??
+SUBDIRS = Symbols Memory KernelPatcher GraphicsEnabler HPET
+#AutoResolution HelloWorld
 
 all embedtheme tags debug install installhdrs:
 	@rm -rf $(OBJROOT)

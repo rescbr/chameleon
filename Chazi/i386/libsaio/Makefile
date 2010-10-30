@@ -41,7 +41,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	xml.o ntfs.o msdos.o md5c.o device_tree.o \
 	cpu.o platform.o acpi_patcher.o \
 	smbios_patcher.o fake_efi.o ext2fs.o \
-	hpet.o usb.o pci_setup.o \
+	usb.o pci_setup.o \
 	device_inject.o pci_root.o convert.o aml_generator.o \
 	nvidia_resolution.o ati_resolution.o gma_resolution.o \
 	autoresolution.o edid.o
