@@ -224,16 +224,11 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
 	// Locate the symbol in the list, if it exists, update it's address
 	kernSymbols_t *symbol = lookup_kernel_symbol(symbolName);
 	
-	
-	
 	if(symbol)
 	{
-
-		//printf("Located %sbit symbol %s at 0x%lX\n", is64 ? "64" : "32", symbolName, addr);
-		//getc();
-		
 		symbol->addr = addr;
 	}
+	
 	return 0xFFFFFFFF; // fixme
 }
 
@@ -461,7 +456,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	// NOTE: This will *NOT* be located on pre 10.6.2 kernels
 	jumpLocation = patchLocation - 15;
 	while((bytes[jumpLocation - 1] != 0x77 ||
-		   bytes[jumpLocation] != (patchLocation - jumpLocation - -8)) &&
+		   bytes[jumpLocation] != (patchLocation - jumpLocation - 18)) &&
 		  (patchLocation - jumpLocation) < 0xF0)
 	{
 		jumpLocation--;
