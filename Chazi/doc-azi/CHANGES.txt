@@ -340,6 +340,31 @@ Change: Added Memory detection module. Also needs no intro...
 Motif:  ---
 
 		---------------//---------------//---------------
+
+		 Been a while since i last updated this file, as there were no major events to justify
+		doing so. There was however some activity, which deserves to be mentioned; resuming
+		the most relevant:
+		
+		- changed all the /Extra... paths to bt(0,0)/Extra... according to my approach to file
+		loading. I also spent time checking the code involved, which already revealed some BS
+		on this approach; the research isn't complete so, more news later.
+		
+		- (rev 592) disabled the limit to hide only foreign partitions. Did this mostly for
+		testing purposes as i don't have any "foreign" partition/s to hide. I understand the
+		logic behind this limit, but i just can't avoid to ask my self why?
+		
+		- studied and played a lot with AutoResolution code. No new functionality, just tweaked
+		the way it interacts with the booter, wich fixed some glitches and lost functionality,
+		mostly due to lack of maintenance to fit the changes on the trunk. Next on the plan it's
+		changing this code into a module, which i already started lining up.
+		Will add specific info soon.
+		
+		- (rev 614) Doubled the size of memory reserved for booter log, which is more than enough
+		to hold the full log generated booting with -f argument and turns out to also be a fix
+		for some problems related with -f arg boot.
+		Trunk'ed on rev 616.
+
+		---------------//---------------//---------------
 		
 - (rev )
 Change:				template
