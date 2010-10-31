@@ -1,8 +1,8 @@
 Note: this text doesn't use the "most recent layout" of the main Chameleon CHANGES file.
 	  Also, not all the changes done on the code will end up here, for obvious reasons.
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 299)
 Change: added hands-off (without user intervention) setting of EFI32 values, for 32 bit only
 		processors. Works according to the architecture in use, either chosen by the booter or
@@ -12,22 +12,22 @@ Change: added hands-off (without user intervention) setting of EFI32 values, for
 		arch (only arch on these systems), will still be EFI64, which causes absolutely no problem.
 		EFI32 values still can be forced by using the respective booter flag.
 		Tested only on Leopard.
-
+		
   Note: there's a typo on the comment of rev 299 commit;
 		RC3 should read RC4.
-
+		
 Motif:  fixes http://forge.voodooprojects.org/p/chameleon/issues/21/.
-
+		
   Note: included on the trunk at revs 449 & 450 :) Thanks!
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 320)
 Change: using the original code i suggested to Mozodojo, for memory modules Part Number extraction.
 		(http://www.projectosx.com/forum/index.php?s=&showtopic=1337&view=findpost&p=8809)
-
+		
 Motif:  If i don't do:
-
+		
 		if (isspace(sPart[i]))
 			break;
 		
@@ -36,37 +36,37 @@ Motif:  If i don't do:
 		and others i saw on some user reports.
 		If someone wishes to test this, contact me and i'll cook a booter to help debug
 		this behavior.
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 321)
 Change: a tweak that got hidden on this commit; changed RestartFix from true to false, by default.
-
+		
 Motif:  this goes against at least one of my "Guidelines" for the booter!
 		(check README.txt). It's absolutely not needed by all users! If someone proves that this is
 		needed by more than 50% of the motherboards Chameleon needs to handle atm
 		(recommended OSx86 motherboards don't count), then i'll change it back to true.
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 335) (REVERTED to trunk way, rev 520)
 Change: merged the educational side of arch=i386 + the practical one of -x32, into a simple 32
 		booter flag.
-
+		
   Note: -x32 was removed from trunk on rev 377.
-
+		
   Note: only useful on 64 bit processors.
 		32 bit only processors, will cause i386 arch to be loaded by default.
-
+		
 Motif:  2 keys to do the same, should never had happen!
 		I really think that arch=i386 is a more "educational" definition, since what we're really
 		doing here is select an architecture to boot, but while reading the Chameleon TODO
 		"Integrate... quick shortcut modified version of 18seven" and knowing that these shortcuts
 		use the 3 + 2 key combination to select i386 arch, i can't avoid to think,
 		why not extend it to the boot prompt now!?
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 335) (REMOVED, rev 520)
 Change: added -legacy kernel flag. This flag tells the booter to load i386 arch before is passed to
 		the kernel. This procedure only needs to be done on Snow Leopard. -legacy tells the kernel
@@ -74,43 +74,43 @@ Change: added -legacy kernel flag. This flag tells the booter to load i386 arch 
 		mach kernel.
 		
 		Type -legacy to get you booted into Legacy Mode.
-
+		
   Note: only useful on 64 bit processors.
-
+		
   Note: just out of curiosity and for those who don't know, Legacy Mode is in fact the mode used
 		by 32 bit "only" processors! Since OS X kernel can handle 64 bit apps even on i386 arch,
 		64 bit processors need this flag to disable any handling of 64 bit instructions, when
 		"emulating a full" 32 bit environment.
-
+		
 Motif:  this flag was not being passed on > 10.6; the reason why, is this mode is only available
 		under i386 arch. So, while testing Meklort's kernel patcher, i felt the need to add this key.
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 335) (REVERTED to trunk way, rev 520)
 Change: added 64 bit booter flag, to keep company to the 32 one :)
-
+		
 Motif:  mainly to override 32 or -legacy if they are flagged on the Boot.plist.
 		Like -legacy, was born while testing kernel builds and with the need to do the above.
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 336)
 Change: removed 3 keys to handle PCI Root UID, two of them executing the exact same code
 		(PCIRootUID & PciRoot). Kept just the already existing PciRoot=<uid>, plus the new code.
 		
 		0 is still the default value, use the key to set any other.
-
+		
 Motif:  these many keys, should never had happened!
 		This came along when the Asere code was ported to Chameleon, but even on Asere's booter,
 		what's the point? Compatibility? None, it's seems!
 		The only key in use on Asere's booter is PCIRootUID. The others are commented out.
-
+		
 		---------------//---------------//---------------
-
+		
 - (revs 337 --> 360)
 Changes: file loading related (search algo). The short story:
-
+		
 		Change: added a key to disable "override" Boot.plist from overriding the values on the "default"
 				Boot.plist. Only the values overriding is disabled, not the file loading.
 				
@@ -153,7 +153,7 @@ Changes: file loading related (search algo). The short story:
 		Motif:  there was no key to do this. (read next)
 		
 				---------------//---------------//---------------
-
+		
 		Change: added a "new" search algo, to load Extra extensions.
 				Pros:
 				- hands-off search of all main files. If you don't want a certain file to be loaded,
@@ -204,22 +204,22 @@ Changes: file loading related (search algo). The short story:
 		  Note: same override keys used.
 		
 		Motif:  check Guidelines.
-
+		
 				---------------//---------------//---------------
-
+		
 		Change: tweaked the loading of override Boot.plist (loadOverrideConfig(), stringTable.c) according
 				the new search algo guideline: everything loads from Booter volume.
 				The search for this file was also extended to specific OS folders, to "emulate" the search
 				on Selected volume. Also added a verbose message to signal when user doesn't provide a
 				override plist.
-
+		
 		  Note: again, as far as i know, loading a override Boot.plist is not mandatory!
-
+		
 		Motif:  payback for all the neurons i burned while i was not aware of override Boot.plist function!!
 				Not kidding :P
-
+		
 				---------------//---------------//---------------
-
+		
 		Change: reactivated config= key, included on loadOverrideConfig changes.
 				config=<file> loads override plist from specified path.
 		
@@ -228,29 +228,29 @@ Changes: file loading related (search algo). The short story:
 		  Note: with the introduction of this key, all main files can now be overrided by the user.
 		
 		Motif:  the key wasn't working anymore and it's useful.
-
+		
 				---------------//---------------//---------------
-			
+		
 	Don't forget to check FileLoad.txt/FileLoad-trunk.txt for detailed info on file loading search paths
-
+		
 		---------------//---------------//---------------
-
+		
 - (rev 419)
 Change: started adding documentation, with the creation of a dedicated folder, doc-azi. It would get very
 		messy mixing these with main Chameleon documentation and as i want to keep things as clean as
 		possible on CleanCut, thought a separate folder would be better idea.
-
+		
 Motif:  do i need to say? :) i thought so.
-
+		
 		---------------//---------------//---------------
 		
 - (rev 427)
 Change: removed Chameleon.xcodeproj.
-
+		
 Motif:  it's not up to date and i need time to update it properly, at least on Chazi.
 		Will reintroduce it later in the process. It's also giving me problems with the svn client
 		when i update it; need to check what i'm doing wrong!?
-
+		
 		---------------//---------------//---------------
 		
 - (rev 460)
@@ -259,21 +259,21 @@ Change: added a key to display some debug info, that can only be accessed via co
 		mm & attr, resolution specific info, are borrowed from autoResolution branch.
 		
 		DebugInfo=y enables display of debug info.
-
+		
   Note: Boot Banner(*)=n will override DebugInfo=y , disabling the display of this info.
 		Disabled by default.
-
+		
 Motif:  just making this info easily accessible.
-
+		
 		---------------//---------------//---------------
 		---------------//---------------//---------------
 		
 - (rev 462)
 Change:	creation of this project, replacing Chazileon as my work folder;
 		hence, Chazileon is now frozen until archival and deletion.
-
+		
 Motif:  Chazileon (Chazi) has no svn history.
-
+		
 		---------------//---------------//---------------
 		
 - (revs 465 --> 467, 469 --> 471)
@@ -283,27 +283,27 @@ Change:	added AutoResolution patch, by Lebidou (autoResolution branch). The main
 		The con: doesn't work for all devices!!
 		
 		AutoResolution=y enables the patch.
-
+		
   Note: Obviously, it only works in Graphics Mode (Gui).
-
+		
   Note: resolution set on theme.plist is overriding the native one set by AutoResolution. For now the
 		possible solutions are, remove the boot resolution (boot_width, boot_height) from theme.plist
 		or add Graphics Mode=<native resolution> to com.appleBoot.plist.								reminder: ""
-
+		
 Motif:  ... mentioned above. Check the topic for more details:
 		http://forum.voodooprojects.org/index.php/topic,1227.0.html
-
+		
 		---------------//---------------//---------------
-
+		
 - (starting at rev 480)
 Change: added Meklort's Modules support, plus Kernel Patcher (Kpatcher) module.
 		
 		PatchKernel=y enables Kernel Patcher.
 		
   Note: Check Modules.txt for more info.
-
+		
 Motif:  Testing Modules support.
-
+		
 		---------------//---------------//---------------
 		
 - (rev 520)
@@ -312,35 +312,37 @@ Change: removed -legacy flag interaction with the booter and reverted 32/64 flag
 		Type arch=i386 to load i386 kernel architecture.
 		arch=x86_64 overrides i386 arch, if flagged on Boot.plist.
 		On Snow type arch=i386 -legacy to load i386 arch Legacy Mode.
-
+		
 Motif:  don't want to contribute to confusion... and laziness ;)
-
+		
 		---------------//---------------//---------------
 		
 - (rev 524)
 Change: Added GraphicsEnabler module. Needs no introduction :)
 		Feedback is welcome.
 		Working as usual with my ATI Radeon X1300 openGL engine, doing the injection thing.
-
+		
   Newsflash: looks like it's raining modules over Meklort's branch :D
-
+		
 Motif:  ---
-
+		
 		---------------//---------------//---------------
 		
 - (rev 526)
 Change: Added Memory detection module. Also needs no intro...
 		Working properly with my controler:
 		Intel Corporation 82945G/GZ/P/PL Memory Controller Hub [8086:2770] (rev 02)
-
+		
+Motif:  ---
+		
+		---------------//---------------//---------------
+		
   Note: latest changes need a call for ATTENTION; the bootloader install procedure is gaining
 		new steps! So far, we wre just playing with KernelPatcher module, which most people
 		don't use. Check Modules.txt for info on installing modules.
-
-Motif:  ---
-
+		
 		---------------//---------------//---------------
-
+		
 		 Been a while since i last updated this file, as there were no major events to justify
 		doing so. There was however some activity, which deserves to be mentioned; resuming
 		the most relevant:
@@ -363,14 +365,24 @@ Motif:  ---
 		to hold the full log generated booting with -f argument and turns out to also be a fix
 		for some problems related with -f arg boot.
 		Trunk'ed on rev 616.
-
+		
+		---------------//---------------//---------------
+		
+- (rev 625)
+Change: Added HPET module, another existing patch converted to the modules cause. This carries
+		some new code to force enable HPET on VIA chipsets, contributed by bogdan-x86
+		(http://forum.voodooprojects.org/index.php/topic,1596.0.html).
+		Also carries any notebook support added by Meklort.
+		
+Motif:  ---
+		
 		---------------//---------------//---------------
 		
 - (rev )
 Change:				template
-
-Motif:
-
+		
+Motif:	
+		
 		---------------//---------------//---------------
 
 
