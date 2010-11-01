@@ -20,7 +20,7 @@
 #include "hex_editor.h"
 
 
-#define kHDACodec				"HDACodec"				/* acpi_patcher.c */
+#define kHDACodec				"HDACodec"
 
 
 #ifndef DEBUG_KEXT_PATCHER
@@ -32,6 +32,8 @@
 #else
 #define DBG(x...)
 #endif
+
+
 bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start);
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
@@ -364,7 +366,15 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 		 )
 	   )
 	{
-		return patch_gma_kexts(plist, plistbuffer, start);
+		if(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0 || patch_gma_deviceid == 0x27ae)
+		{
+			return patch_gma_kexts(plist, plistbuffer, start);
+		}
+		else
+		{
+			
+		}
+
 	}
 	else if(patch_bcm_deviceid && (strcmp(bundleID, "com.apple.driver.AirPortBrcm43xx") == 0))
 	{
@@ -373,7 +383,7 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 	}
 	else if(patch_hda_codec && strcmp(bundleID, "com.apple.driver.AppleHDA") == 0)
 	{
-		return patch_hda_kext(plist, plistbuffer, start);
+		//return patch_hda_kext(plist, plistbuffer, start);
 
 	}
 	/*
@@ -396,14 +406,12 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			case PCI_CLASS_DISPLAY_VGA:
 				if(current->vendor_id == 0x8086 && 
 				   (
-					current->device_id == 0x27AE /*||
-					
+					current->device_id == 0x27AE ||
 					current->device_id == 0xA001 ||
 					current->device_id == 0xA002 ||
 					current->device_id == 0xA011 ||
 					current->device_id == 0xA012
-					 */
-					
+
 					)
 				   )
 				{
@@ -672,14 +680,26 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	zlib_result = inflate(&zstream, Z_FINISH);
 	
-	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+	printf("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 	
 	replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+
+	
+	if(patch_gma_deviceid & 0xFF00 == 0xA000)	// GMA3150
+	{
+		// Cursor corruption fix.
+		// This patch changes the cursor address from
+		// a physical address (used in the gma950) to an offset (used in the gma3150).
+
+		char find_bytes[] = {0x8b, 0x55, 0x08, 0x83, 0xba, 0xb0, 0x00, 0x00, 0x00, 0x01, 0x7e, 0x36, 0x89, 0x04, 0x24, 0xe8, 0x32, 0xbb, 0xff, 0xff};	// getPhysicalAddress() and more
+		char new_bytes[]  = {0xb8, 0x00, 0x00, 0x00, 0x02, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xEB, 0x04, 0x00, 0x00, 0x00, 0x00};	// jump past getPhysicalAddress binding. NOTE: last six bytes are unusable
+		replace_bytes(find_bytes, sizeof(find_bytes), new_bytes, sizeof(new_bytes), executable, zstream.total_out);
+	}
+	
 	if (zstream_inited) inflateEnd(&zstream);
 	
 	
 	zstream.next_in   = (UInt8*)executable;
-	//		zstream.next_out  = (UInt8*)((int)compressed_data<<1);
 	zstream.next_out  = (UInt8*)compressed_data;
 	
 	zstream.avail_in  = full_size;
@@ -711,7 +731,9 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	{
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
-		DBG("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		prinff("ERROR: Unable to compress patched kext, not enough room.\n");
+		pause();
 		
 	} 
 	else if (zlib_result != Z_STREAM_ERROR)
@@ -719,6 +741,10 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 		printf("ZLIB Deflate Error: %s\n", zstream.msg);
 		getc();
 	}
+	//kext->compressed_size = MKEXT_SWAP(zstream.total_out);
+
+	
+	
 	
 	if (zstream_inited) deflateEnd(&zstream);
 	

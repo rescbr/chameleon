@@ -91,3 +91,28 @@ void replace_string(char* find, char* replace, char* string, int length)
 	}
 	strncpy(str, replace, strlen(replace));	// don't copy the null char
 }
+
+void replace_bytes(char* find, int find_size, char* replace, int replace_size, char* exec, int length)
+{
+	if(!find ||
+	   !replace ||
+	   !exec ||
+	   !length ||
+	   find_size != replace_size) return;
+	
+	char* search = exec;	
+	
+	
+	while(memcmp(search, find, find_size) != 0
+		  && ((search - exec) < length))
+	{
+		search++;
+	}
+
+	if((search - exec) < length)
+	{
+		// Mem found, replace it
+		memcpy(search, replace, replace_size);
+	}
+}
+
