@@ -586,9 +586,14 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
 
-	if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
+	/*if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
+		return -1;
+	}*/
+	
+	if ((fd = open(configFile, 0)) < 0) {
 		return -1;
 	}
+	
 	// read file
 	count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 	close(fd);
