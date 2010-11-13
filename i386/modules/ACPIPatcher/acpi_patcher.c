@@ -669,6 +669,25 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	{
 		DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
 		
+		
+		// Insert old dsdt into the IORegistery
+		Node* node = DT__FindNode("/dsdt", false);
+		if(node == NULL)
+		{
+			// Only add if not already here
+			Node* node = DT__FindNode("/", false);
+
+			if(node != NULL)
+			{
+				node = DT__AddChild(node, "dsdt");
+				
+				struct acpi_2_dsdt *dsdt;
+				dsdt = (struct acpi_2_dsdt*) (fadt_mod->DSDT);
+				DT__AddProperty(node, "originaldsdt", (dsdt->Length + sizeof(struct acpi_2_dsdt) - 1),  (void*)dsdt);	/// Insert old dsdt. Length is header length (36) + dsdt length
+				
+			}
+		}			
+		
 		fadt_mod->DSDT=(uint32_t)new_dsdt;
 		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
 			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
