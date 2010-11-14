@@ -492,7 +492,7 @@ static int getNextFDiskPartition( int biosdev, int * partno,
 
 //==========================================================================
 
-static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
+BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
 						   const struct fdisk_part * part,
 						   FSInit initFunc, FSLoadFile loadFunc,
 						   FSReadFile readFunc,
