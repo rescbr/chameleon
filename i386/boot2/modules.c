@@ -22,6 +22,7 @@
 unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
 
+/** Internal symbols, however there are accessor methods **/
 moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
@@ -34,6 +35,8 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 #if DEBUG_MODULES
 void print_hook_list()
 {
+	printf("---Hook Table---\n");
+
 	moduleHook_t* hooks = moduleCallbacks;
 	while(hooks)
 	{
@@ -171,50 +174,41 @@ int load_module(char* module)
 int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	DBG("Attempting to execute hook '%s'\n", name);
+	moduleHook_t* hooks = moduleCallbacks;
 
-	if(moduleCallbacks != NULL)
+	while(hooks && strcmp(name, hooks->name) < 0)
 	{
-		moduleHook_t* hooks = moduleCallbacks;
+		//DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
+		hooks = hooks->next;
+	}
+
+	if(hooks && strcmp(name, hooks->name) == 0)
+	{
+		// Loop through all callbacks for this module
+		callbackList_t* callbacks = hooks->callbacks;
 		
-
-		while(hooks != NULL && strcmp(name, hooks->name) != 0) //TOOD: fixme
+		while(callbacks)
 		{
-			//DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
-			hooks = hooks->next;
-		}
-
-		if(strcmp(name, hooks->name) == 0)
-		{
-			// Loop through all callbacks for this module
-			callbackList_t* callbacks = hooks->callbacks;
+			DBG("Executing '%s' with callback 0x%X.\n", name, callbacks->callback);
+			// Execute callback
+			callbacks->callback(arg1, arg2, arg3, arg4);
+			callbacks = callbacks->next;
+			DBG("Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
 			
-			while(callbacks)
-			{
-				DBG("Executing '%s' with callback 0x%X.\n", name, callbacks->callback);
-				// Execute callback
-				callbacks->callback(arg1, arg2, arg3, arg4);
-				callbacks = callbacks->next;
-				DBG("Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
-
-			}
-			DBG("Hook '%s' executed.\n", name);
-
-			return 1;
 		}
-		else
-		{
-			DBG("No callbacks for '%s' hook.\n", name);
-
-			// Callbaack for this module doesn't exist;
-			//verbose("Unable execute hook '%s', no callbacks registered.\n", name);
-			//pause();
-			return 0;
-		}
-
-
-	}	
-	DBG("No hooks have been registered.\n", name);
-	return 0;
+		DBG("Hook '%s' executed.\n", name);
+		
+		return 1;
+	}
+	else
+	{
+		DBG("No callbacks for '%s' hook.\n", name);
+		
+		// Callbaack for this module doesn't exist;
+		//verbose("Unable execute hook '%s', no callbacks registered.\n", name);
+		//pause();
+		return 0;
+	}
 }
 
 
@@ -228,54 +222,46 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
  *			TODO: refactor
  */
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
-{
-	DBG("Registering %s\n", name);
-	// Locate Module hook
-	if(moduleCallbacks == NULL)
+{	
+	DBG("Adding callback for '%s' hook.\n", name);
+
+	moduleHook_t* newHook = malloc(sizeof(moduleHook_t));
+	if(!moduleCallbacks)
 	{
-		moduleCallbacks = malloc(sizeof(moduleHook_t));
-		moduleCallbacks->next = NULL;
-		moduleCallbacks->name = name;
-		// Initialize hook list
-		moduleCallbacks->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
-		moduleCallbacks->callbacks->callback = callback;
-		moduleCallbacks->callbacks->next = NULL;
+		newHook->next = moduleCallbacks;
+		moduleCallbacks = newHook;
+		
+		newHook->name = name;
+		newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+		newHook->callbacks->callback = callback;
+		newHook->callbacks->next = NULL;
 	}
 	else
 	{
 		moduleHook_t* hooks = moduleCallbacks;
-		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));;
 		
-		while(hooks->next != NULL && strcmp(name, hooks->name) < 0)
+		while(hooks->next && strcmp(name, hooks->next->name) < 0)
 		{
 			hooks = hooks->next;
 		}
 		
-		DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
-		
-		if(hooks == NULL)
+		if(!hooks->next)
 		{
-			newHook->next = moduleCallbacks;
-			moduleCallbacks = newHook;
-			newHook->name = name;
-			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
-			newHook->callbacks->callback = callback;
-			newHook->callbacks->next = NULL;
-			
-		}
-		else if(strcmp(name, hooks->name) != 0)
-		{
-			newHook->next = hooks->next;
+			// Appent to the end
+			newHook->next = NULL;
 			hooks->next = newHook;
-			
 			newHook->name = name;
 			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
 			newHook->callbacks->callback = callback;
 			newHook->callbacks->next = NULL;
+			
+			
 		}
-		else
+		else if(strcmp(name, hooks->next->name) == 0)
 		{
-			callbackList_t* callbacks = hooks->callbacks;
+			// We found the hook
+			// Hook alreday exists, add a callback to this hook
+			callbackList_t* callbacks = hooks->next->callbacks;
 			while(callbacks->next != NULL)
 			{
 				callbacks = callbacks->next;
@@ -285,6 +271,16 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 			callbacks = callbacks->next;
 			callbacks->next = NULL;
 			callbacks->callback = callback;
+		}
+		else
+		{
+			// We are too far beyond the hook
+			newHook->next = hooks->next;
+			hooks->next = newHook;
+			newHook->name = name;
+			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
+			newHook->callbacks->callback = callback;
+			newHook->callbacks->next = NULL;
 			
 		}
 	}
@@ -532,7 +528,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt8 bits = 0;
 	int index = 0;
 	
-	int done = 0;
+	//int done = 0;
 	unsigned int i = 0;
 	
 	while(/*!done &&*/ i < size)
@@ -545,7 +541,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 		{
 			case REBASE_OPCODE_DONE:
 				// Rebase complete.
-				done = 1;
+				//done = 1;
+			default:
 				break;
 				
 				
@@ -714,7 +711,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	UInt32 tmp2 = 0;
 	
 	UInt32 index = 0;
-	int done = 0;
+	//int done = 0;
 	unsigned int i = 0;
 	
 	while(/*!done &&*/ i < size)
@@ -726,7 +723,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 		switch(opcode)
 		{
 			case BIND_OPCODE_DONE:
-				done = 1; 
+				//done = 1; 
+			default:
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
@@ -985,9 +983,8 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
 		default:
 			return;
 	}
-	*location = (UInt32)newValue;
 	
-
+	*location = (UInt32)newValue;
 }
 
 
@@ -1044,33 +1041,20 @@ long long add_symbol(char* symbol, long long addr, char is64)
  */
 void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
-	moduleList_t* entry;
+	// TODO: insert sorted
+	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
 
-	if(loadedModules == NULL)
-	{
-		loadedModules = entry = malloc(sizeof(moduleList_t));
-	}
-	else
-	{
-		entry = loadedModules;
-		while(entry->next)
-		{
-			entry = entry->next;
-		}
-		entry->next = malloc(sizeof(moduleList_t));
-		entry = entry->next;
-	}
+	new_entry->next = loadedModules;
+	loadedModules = new_entry;
 	
-	entry->next = NULL;
-	entry->module = (char*)name;
-	entry->version = 0; //version;
-	entry->compat = 0; //compat;
-	
-	
+	new_entry->module = (char*)name;
+	new_entry->version = 0; //version;
+	new_entry->compat = 0; //compat;
 }
 
 int is_module_loaded(const char* name)
 {
+	// todo sorted search
 	moduleList_t* entry = loadedModules;
 	while(entry)
 	{
