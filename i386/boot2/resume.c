@@ -51,7 +51,7 @@ static void WakeKernel(IOHibernateImageHeader * header)
 	u_int32_t 	lowHalf, highHalf;
 	u_int32_t 	sum;
 	
-	printf("\nWake Kernel!\n");
+	verbose("\nWake Kernel!\n");
 	
 	dst   = (unsigned long *) (header->restore1CodePage << 12);
 	count = header->restore1PageCount;
@@ -105,7 +105,7 @@ void HibernateBoot(char *image_filename)
 	long buffer;
 	
 	size = ReadFileAtOffset (image_filename, header, 0, sizeof(IOHibernateImageHeader));
-	printf("header read size %x\n", size);
+	verbose("header read size %x\n", size);
 		
 	imageSize = header->image1Size;
 	codeSize  = header->restore1PageCount << 12;
@@ -138,7 +138,7 @@ void HibernateBoot(char *image_filename)
 
 	mem_base = getmemorylimit() - allocSize;//TODO: lower this
 		
-	printf("mem_base %x\n", mem_base);
+	verbose("mem_base %x\n", mem_base);
 	// Rek : hibernate fix 
 	if (!((long long)mem_base+allocSize<1024*bootInfo->extmem+0x100000))
 	{

@@ -100,6 +100,6 @@ unsigned int lookup_all_symbols(const char* name);
 
 int replace_function(const char* symbol, void* newAddress);
 
-extern unsigned int (*lookup_symbol)(const char*);
+//extern unsigned int (*lookup_symbol)(const char*);
 
 #endif /* __BOOT_MODULES_H */

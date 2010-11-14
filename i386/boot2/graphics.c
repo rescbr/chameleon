@@ -327,6 +327,7 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
         // VESA mode.
 		
         bootArgs->Video.v_display  = GRAPHICS_MODE;
+		//		setVideoMode(GRAPHICS_MODE, 0);
         bootArgs->Video.v_width    = minfo.XResolution;
         bootArgs->Video.v_height   = minfo.YResolution;
         bootArgs->Video.v_depth    = minfo.BitsPerPixel;

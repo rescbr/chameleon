@@ -134,7 +134,7 @@ void initialize_runtime(void)
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
 
-static int ExecKernel(void *binary)
+int ExecKernel(void *binary)
 {
     entry_t                   kernelEntry;
     int                       ret;
@@ -149,12 +149,12 @@ static int ExecKernel(void *binary)
 
     if ( ret != 0 )
         return ret;
-	
     // Reserve space for boot args
     reserveKernBootStruct();
 	
     // Load boot drivers from the specifed root path.
-	
+	execute_hook("DecodedKernel", (void*)binary, NULL, NULL, NULL);
+
 	
 	setupFakeEfi();
 	
@@ -185,7 +185,8 @@ static int ExecKernel(void *binary)
     }
 #endif 
     bool dummyVal;
-	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
+	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal)
+	{
 		printf("Press any key to continue...");
 		getc();
 	}
@@ -324,6 +325,8 @@ void common_boot(int biosdev)
 		load_all_modules();
 	}
 	
+	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
+
 	
 #ifndef OPTION_ROM
     // Loading preboot ramdisk if exists.
