@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
+MODULE_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
 
 
 SFILES =
@@ -59,52 +59,40 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
-	-S -x  -dead_strip_dylibs \
+	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	-bind_at_load \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	-weak_library $(SYMROOT)/Symbols.dylib \
-	-weak_library $(SYMROOT)/GUI.dylib \
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
 
-kext_patcher.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kext_patcher.c" $(INC) -o "$(OBJROOT)/kext_patcher.o"
-
-inflate.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inflate.c" $(INC) -o "$(OBJROOT)/inflate.o"
-
-deflate.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "deflate.c" $(INC) -o "$(OBJROOT)/deflate.o"
-
-zutil.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "zutil.c" $(INC) -o "$(OBJROOT)/zutil.o"
-
-inftrees.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inftrees.c" $(INC) -o "$(OBJROOT)/inftrees.o"
-
-inffast.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "inffast.c" $(INC) -o "$(OBJROOT)/inffast.o"
-
-adler32.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "adler32.c" $(INC) -o "$(OBJROOT)/adler32.o"
-
-trees.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "trees.c" $(INC) -o "$(OBJROOT)/trees.o"
-
-hex_editor.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "hex_editor.c" $(INC) -o "$(OBJROOT)/hex_editor.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 include ../../MakeInc.dir
 

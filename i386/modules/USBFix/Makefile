@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-USB_OBJS = USBFix.o usb.o
+MODULE_OBJS = USBFix.o usb.o
 
 
 SFILES =
@@ -59,10 +59,12 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${USB_OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${USB_OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
@@ -74,14 +76,24 @@ dylib: ${USB_OBJS}
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
 
 
-USBFix.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "USBFix.c" $(INC) -o "$(OBJROOT)/USBFix.o"
-
-usb.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "usb.c" $(INC) -o "$(OBJROOT)/usb.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 include ../../MakeInc.dir
 

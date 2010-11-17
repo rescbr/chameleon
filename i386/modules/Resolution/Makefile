@@ -5,6 +5,7 @@ MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
+
 DIR = Resolution
 
 include ../../MakePaths.dir
@@ -46,7 +47,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-RESOLUTION_OBJS = Resolution.o edid.o 915resolution.o
+MODULE_OBJS = Resolution.o edid.o 915resolution.o
 
 
 SFILES =
@@ -59,10 +60,12 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${RESOLUTION_OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${RESOLUTION_OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
@@ -74,17 +77,22 @@ dylib: ${RESOLUTION_OBJS}
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
-
-
-Resolution.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Resolution.c" $(INC) -o "$(OBJROOT)/Resolution.o"
-
-915resolution.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "915resolution.c" $(INC) -o "$(OBJROOT)/915resolution.o"
-
-edid.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "edid.c" $(INC) -o "$(OBJROOT)/edid.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 
 include ../../MakeInc.dir

@@ -50,7 +50,7 @@ THEMEDIR = ../../../artwork/themes/$(THEME)
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GUI_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
+MODULE_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
 
 
 SFILES =
@@ -70,10 +70,12 @@ embedtheme: art.h all
 
 
 
-all optionrom: ${HELLO_WORLD_OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${GUI_OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
@@ -84,20 +86,23 @@ dylib: ${GUI_OBJS}
 	-final_output $(MODULE_NAME) \
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
-	 -o $(SYMROOT)/$(MODULE_NAME).dylib
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
-GUI_module.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
-
-gui.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
-
-
-picopng.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
-
-graphic_utils.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\

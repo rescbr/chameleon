@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
+MODULE_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
 
 
 SFILES =
@@ -59,10 +59,12 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${GRAPHICS_ENABLER_OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${GRAPHICS_ENABLER_OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
@@ -74,20 +76,24 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
 
 
-GraphicsEnabler.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
-
-ati.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "ati.c" $(INC) -o "$(OBJROOT)/ati.o"
-
-nvidia.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "nvidia.c" $(INC) -o "$(OBJROOT)/nvidia.o"
-
-gma.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gma.c" $(INC) -o "$(OBJROOT)/gma.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 include ../../MakeInc.dir
 

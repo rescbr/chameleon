@@ -46,7 +46,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-MEMORY_OBJS = dram_controllers.o mem.o spd.o Memory.o
+MODULE_OBJS = dram_controllers.o mem.o spd.o Memory.o
 
 
 SFILES =
@@ -59,10 +59,12 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: ${MEMORY_OBJS} dylib
+all embedtheme optionrom: dylib
 
 
-dylib: ${GRAPHICS_ENABLER_OBJS}
+HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
+ifneq ($(strip $(HAVE_MODULES)),) 
+dylib: ${MODULE_OBJS}
 	ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \
@@ -74,20 +76,24 @@ dylib: ${GRAPHICS_ENABLER_OBJS}
 	$(OBJROOT)/*.o \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
+else
+dylib: ${MODULE_OBJS}
+	ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias $(MODULE_START) start \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(OBJROOT)/*.o \
+	-o $(SYMROOT)/$(MODULE_NAME).dylib
+endif
 
 
 
-dram_controllers.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "dram_controllers.c" $(INC) -o "$(OBJROOT)/dram_controllers.o"
-
-Memory.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Memory.c" $(INC) -o "$(OBJROOT)/Memory.o"
-
-spd.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "spd.c" $(INC) -o "$(OBJROOT)/spd.o"
-
-mem.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "mem.c" $(INC) -o "$(OBJROOT)/mem.o"
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 
 include ../../MakeInc.dir
