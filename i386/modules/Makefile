@@ -26,9 +26,9 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-# TODO: exclude Symbols from find so it isn't compiled twice
-SUBDIRS = Symbols Resolution KernelPatcher GUI KextPatcher GraphicsEnabler ACPIPatcher HPET USBFix Memory Networking NetbookInstaller
+SUBDIRS = Resolution KernelPatcher GUI KextPatcher GraphicsEnabler ACPIPatcher HPET USBFix Memory Networking NetbookInstaller
 #SUBDIRS = USB
+#SUBDIRS = Symbols # This is made during the boot2 build stage
 
 all embedtheme optionrom tags debug install installhdrs:
 	@rm -rf $(OBJROOT)

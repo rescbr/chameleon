@@ -22,6 +22,8 @@
 unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
 
+void* symbols_module_start = (void*)0xFFFFFFFF;	// This will be modified post compile
+
 /** Internal symbols, however there are accessor methods **/
 moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
@@ -54,6 +56,14 @@ void print_hook_list()
 int init_module_system()
 {
 	// Intialize module system
+	if(symbols_module_start == (void*)0xFFFFFFFF)
+	{
+		printf("Module system not compiled in\n");
+	}
+	
+	// TODO: Load embeded module
+	/*
+
 	if(load_module(SYMBOLS_MODULE))
 	{
 		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
@@ -66,6 +76,9 @@ int init_module_system()
 	}
 	
 	return 0;
+	 */
+	
+	return -1;
 }
 
 
