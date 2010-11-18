@@ -385,7 +385,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		
 		// Total: 24 bytes
 		printf("Running on a 10.2.0+ kernel\n");
-		getc();
+//		getc();
 
 	}
 	else {
