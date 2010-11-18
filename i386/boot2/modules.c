@@ -1,6 +1,7 @@
 /*
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
+ * TODO: Zero out bss if needed
  */
 
 #include "boot.h"
@@ -9,7 +10,7 @@
 #include "modules.h"
 
 #ifndef DEBUG_MODULES
-#define DEBUG_MODULES 0
+#define DEBUG_MODULES 1
 #endif
 
 #if DEBUG_MODULES
@@ -55,30 +56,37 @@ void print_hook_list()
  */
 int init_module_system()
 {
+	void (*module_start)(void) = NULL;
+	char* module_data = symbols_module_start + BOOT2_ADDR;
 	// Intialize module system
 	if(symbols_module_start == (void*)0xFFFFFFFF)
 	{
 		printf("Module system not compiled in\n");
+		return 0;
 	}
-	
-	// TODO: Load embeded module
-	/*
 
-	if(load_module(SYMBOLS_MODULE))
+	module_start = parse_mach(module_data, &load_module, &add_symbol);
+	
+	if(module_start && module_start != (void*)0xFFFFFFFF)
 	{
+		// Notify the system that it was laoded
+		module_loaded(SYMBOLS_MODULE /*moduleName, moduleVersion, moduleCompat*/);
+		(*module_start)();	// Start the module
+		DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
+
 		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
 			return 1;
 		}
-		
 	}
-	
+	else {
+		// The module does not have a valid start function
+		printf("Unable to start %s\n", SYMBOLS_MODULE);
+		getc();
+	}		
 	return 0;
-	 */
-	
-	return -1;
 }
 
 

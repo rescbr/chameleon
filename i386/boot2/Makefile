@@ -60,9 +60,9 @@ MAXBOOTSIZE = 458240
 #
 SYMBOLS_MODULE = Symbols.dylib
 SYMBOL_START= _symbols_module_start
-SYMBOL_ADDR = $(shell printf "%d" 0x`nm -s __DATA __data $(SYMROOT)/boot.sys | grep " $(SYMBOL_START)$$" | cut -f 1 -d " "`)
-DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot.sys | grep __data -A 4  | grep __DATA -A 3 | tail -n 1 | cut -f 6 -d " ")
-DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
+SYMBOL_ADDR = $(shell printf "%d" 0x`nm -s __DATA __data $(SYMROOT)/boot_embeded.sys | grep " $(SYMBOL_START)$$" | cut -f 1 -d " "`)
+DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | tail -n 1 | cut -f 6 -d " ")
+DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
 PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 
@@ -70,12 +70,20 @@ optionrom: CFLAGS += -DOPTION_ROM
 
 all embedtheme optionrom: $(DIRS_NEEDED) boot
 
-boot: embedded.h $(OBJS) $(LIBDEP)
+boot: embedded.h machOconv $(OBJS) $(LIBDEP) 
 	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
-	
+	@make Symbols.dylib
+
+	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	        -nostdlib -arch i386 -Wl,-segalign,20 \
+		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
+		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext
+
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
+
+	${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
 	size $(SYMROOT)/boot.sys
 	ls -l $(SYMROOT)/boot
@@ -87,15 +95,14 @@ boot: embedded.h $(OBJS) $(LIBDEP)
 	    exit 1;\
 	  fi)
 
-embed_symbols: machOconv Symbols.dylib
+embed_symbols: machOconv
 	@echo ================= Embedding Symbols.dylib =================
 	machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
-	stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot.sys bs=1 count=4 seek=$(PATCH_ADDR)
 
-	machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
-	dd if=${SYMROOT}/${SYMBOLS_MODULE} of=${SYMROOT}/boot bs=1 seek=`stat -f%z $(SYMROOT)/boot`
-	${RM} $(SYMROOT)/${SYMBOLS_MODULE}
-	
+	echo ******* Patching at $(PATCH_ADDR) ******
+	stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	
+
+	machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot
 
 
 prompt.o: vers.h
