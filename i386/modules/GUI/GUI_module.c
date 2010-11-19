@@ -23,6 +23,7 @@ bool useGUI;
 
 void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4);
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4);
+void GUI_ModulesLoaded_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
 int GUI_getBootOptions(bool firstRun);
 
@@ -106,16 +107,9 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	}
 }
 
-/**
- ** Module startup code. Replace console only print functions as well as
- ** replace various menu functions. Finaly, initialize the gui and hook
- ** into important events.
- **/
-void GUI_start()
+void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 {
-	
 	// Start the gui
-	
 	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
@@ -137,11 +131,20 @@ void GUI_start()
 		replace_function("_stop", &GUI_stop);		
 	}
 	
+}
+
+/**
+ ** Module startup code. Replace console only print functions as well as
+ ** replace various menu functions. Finaly, initialize the gui and hook
+ ** into important events.
+ **/
+void GUI_start()
+{
 	// Hoot for the boot screen 
 	//ExecKernel register_hook_callback("Kernel Start", &GUI_Kernel_Start_hook);
 	register_hook_callback("ExecKernel", &GUI_ExecKernel_hook);
 	register_hook_callback("PreBoot", &GUI_PreBoot_hook);		
-	
+	register_hook_callback("ModulesLoaded", &GUI_ModulesLoaded_hook);
 }
 
 /**
@@ -748,7 +751,7 @@ int GUI_getBootOptions(bool firstRun)
 			bool showBootBanner = false;
 			
 			// Check if "Boot Banner"=N switch is present in config file.
-			if (getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig) && !showBootBanner)
+			if (getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig) && showBootBanner)
 			{
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);

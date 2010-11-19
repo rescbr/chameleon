@@ -716,14 +716,18 @@ int initGUI(void)
 	}
 	else
 	{
-		// parse display size parameters
-		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
+		{
 			screen_params[0] = val;
 		}
-		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0)
+		{
 			screen_params[1] = val;
 		}		
+		
 	}
+
+	
 	
 	
 	// Initalizing GUI strucutre.
@@ -1865,24 +1869,27 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 	
+	// parse screen size parameters
 	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 	}
 	else
 	{
-		// parse screen size parameters
-		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
+		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) 
+		{
 			screen_params[0] = pos;
 		} else {
 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		}
-		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) 
+		{
 			screen_params[1] = pos;
-		} else {
+		} else
+		{
 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-		}
-	}	
+		}		
+	}
 	
     // Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
