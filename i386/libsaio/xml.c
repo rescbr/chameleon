@@ -40,7 +40,7 @@ void SaveRefString(char* string, int id)
 	{
 		if(tmp->id == id)
 		{
-			tmp->string = malloc(strlen(string+1));
+			tmp->string = malloc(strlen(string)+1);
 			sprintf(tmp->string, "%s", string);
 			return;
 		}
@@ -64,7 +64,7 @@ char* GetRefString(int id)
 		tmp = tmp->next;
 	}
 	//verbose("Unable to locate Ref String %d\n", id);
-	return "Unknown";
+	return "";
 }
 
 
