@@ -98,7 +98,8 @@ void replace_bytes(char* find, int find_size, char* replace, int replace_size, c
 	   !replace ||
 	   !exec ||
 	   !length ||
-	   find_size != replace_size) return;
+	   find_size > replace_size)	// Allow find_size to be less than replace_size. Will overwrite bytes including and *after* located pattern
+		return;
 	
 	char* search = exec;	
 	
