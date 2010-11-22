@@ -401,7 +401,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 
 	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
+	UInt32 addrLocation = patchLocation;
 	
 
 	UInt32 jumpLocation = 0;
@@ -424,7 +424,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	panicAddr -= (UInt32)kernelData;
 
 	
-	
+
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
@@ -464,16 +464,17 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		/* 
 		 * Inpersonate the specified CPU FAMILY and CPU Model
 		 */
-		
+		//									cpuid_cpufamily_addr, impersonateFamily									cpuid_model_addr	  impersonateModel
+		//char new_bytes[] = {0xC7, 0x05, 0x__, 0x__, 0x__, 0x__, 0x__, 0x__, 0x__, 0x__, 0x90, 0x90, 0xC7, 0x05, 0x__, 0x__, 0x__, 0x__, 0x__, 0x01, 0x00, 0x02};
 		// bytes[patchLocation - 17] = 0xC7;	// already here... not needed to be done
 		// bytes[patchLocation - 16] = 0x05;	// see above
-		UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 15] << 0  |
-		bytes[patchLocation - 14] << 8  |
-		bytes[patchLocation - 13] << 16 |
-		bytes[patchLocation - 12] << 24;
+		//UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 15] << 0  |
+		//								bytes[patchLocation - 14] << 8  |
+		//								bytes[patchLocation - 13] << 16 |
+		//								bytes[patchLocation - 12] << 24;
 		
-		// NOTE: may change, determined based on cpuid_info struct
-		UInt32 cpuid_model_addr = cpuid_cpufamily_addr - 299; 
+		// NOTE: may change, determined based on cpuid_info struct: TODO: read from binary
+		//UInt32 cpuid_model_addr = cpuid_cpufamily_addr - 295; 
 		
 		
 		// cpufamily
@@ -491,18 +492,36 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		
 		bytes[patchLocation - 5] = 0xC7;
 		bytes[patchLocation - 4] = 0x05;
-		bytes[patchLocation - 3] = (cpuid_model_addr & 0x000000FF) >> 0;
-		bytes[patchLocation - 2] = (cpuid_model_addr & 0x0000FF00) >> 8;	
-		bytes[patchLocation - 1] = (cpuid_model_addr & 0x00FF0000) >> 16;
-		bytes[patchLocation - 0] = (cpuid_model_addr & 0xFF000000) >> 24;
+		
+		// Locate cpuid_addr_addr -> first four bytes after 8b 45 d8 25 f0 00 00 00 c1 e8 04 a2
+		while(bytes[addrLocation -12] != 0x8B ||
+			  bytes[addrLocation -11] != 0x45 ||
+			  bytes[addrLocation -10] != 0xD8 ||
+			  bytes[addrLocation -9] != 0x25 ||
+			  bytes[addrLocation -8] != 0xF0 ||
+			  bytes[addrLocation -7] != 0x00 ||
+			  bytes[addrLocation -6] != 0x00 ||
+			  bytes[addrLocation -5] != 0x00 ||
+			  bytes[addrLocation -4] != 0xC1 ||
+			  bytes[addrLocation -3] != 0xE8 ||
+			  bytes[addrLocation -2] != 0x04 ||
+			  bytes[addrLocation -1] != 0xA2)
+		{
+			// TODO: break if location is too large
+			addrLocation++;
+		}		
+		
+		bytes[patchLocation - 3] = bytes[addrLocation];
+		bytes[patchLocation - 2] = bytes[addrLocation+1];	
+		bytes[patchLocation - 1] = bytes[addrLocation+2];
+		bytes[patchLocation - 0] = bytes[addrLocation+3];
 		
 		// Note: I could have just copied the 8bit cpuid_model in and saved about 4 bytes
 		// so if this function need a different patch it's still possible. Also, about ten bytes previous can be freed.
 		bytes[patchLocation + 1] = impersonateModel;	// cpuid_model
 		bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
 		bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
-		bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
-		
+		bytes[patchLocation + 4] = 0x02;	// cpuid_stepping		
 	}
 	else if(impersonateFamily && impersonateModel)
 	{
@@ -552,9 +571,9 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 			
 			
 			
-			patchLocation = jumpLocation;
+			//patchLocation = jumpLocation;
 			// We now have 14 bytes available for a patch
-			
+
 		}
 		else 
 		{
