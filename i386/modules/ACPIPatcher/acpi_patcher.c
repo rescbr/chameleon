@@ -739,6 +739,11 @@ int setupAcpi(void)
 	
 	// Load replacement DSDT
 	new_dsdt = loadACPITable(dirSpec);
+	if(!new_dsdt)
+	{
+		sprintf(dirSpec, "DSDT.%s.aml", gSMBIOSBoardModel);
+		new_dsdt = loadACPITable(dirSpec);
+	}
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
 	 {
