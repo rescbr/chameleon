@@ -61,7 +61,16 @@ int init_module_system()
 	// Intialize module system
 	if(symbols_module_start == (void*)0xFFFFFFFF)
 	{
-		printf("Module system not compiled in\n");
+		DBG("Module system not compiled in\n");
+		load_module(SYMBOLS_MODULE);
+		
+		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
+		
+		if((UInt32)lookup_symbol != 0xFFFFFFFF)
+		{
+			return 1;
+		}
+		
 		return 0;
 	}
 
@@ -383,6 +392,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 		
 		switch ((loadCommand->cmd & 0x7FFFFFFF))
 		{
+				// TODO: sepeare function to handel appropriate sections
 			case LC_SYMTAB:
 				symtabCommand = binary + binaryIndex;
 				break;
@@ -416,6 +426,31 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 						}					
 					}
 				}
+				else if(strcmp("__DATA", segCommand->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command);
+					
+					struct section *sect;
+					
+					while(sectionIndex < segCommand->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section);
+						
+						
+						if(strcmp("__bss", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							//printf("__DATA,__bss found.\n"); getc();
+							break;
+						}					
+					}
+					
+				}
+
 				break;
 			case LC_SEGMENT_64:	// 64bit macho's
 				segCommand64 = binary + binaryIndex;
@@ -447,6 +482,31 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 						}					
 					}
 				}
+				else if(strcmp("__DATA", segCommand->segname) == 0)
+				{
+					UInt32 sectionIndex;
+					
+					sectionIndex = sizeof(struct segment_command_64);
+					
+					struct section_64 *sect;
+					
+					while(sectionIndex < segCommand->cmdsize)
+					{
+						sect = binary + binaryIndex + sectionIndex;
+						
+						sectionIndex += sizeof(struct section);
+						
+						
+						if(strcmp("__bss", sect->sectname) == 0)
+						{
+							// __TEXT,__text found, save the offset and address for when looking for the calls.
+							//printf("__DATA,__bss found.\n"); getc();
+							break;
+						}					
+					}
+					
+				}
+				
 				
 				break;
 				
@@ -1214,6 +1274,7 @@ int replace_function(const char* symbol, void* newAddress)
 	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
 	{
+		DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
 		*binary++ = 0xFF;	// Jump
 		*binary++ = 0x25;	// Long Jump
 		*((UInt32*)binary) = (UInt32)jumpPointer;

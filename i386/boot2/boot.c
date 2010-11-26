@@ -287,7 +287,7 @@ void common_boot(int biosdev)
 	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
-	
+
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;
     }
@@ -628,11 +628,11 @@ static bool getOSVersion(char *str)
 	const char *val;
 	int len;
 	
-	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
+	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		valid = true;
 	}
-	else if (!loadConfigFile("System/Library/CoreServices/ServerVersion.plist", &systemVersion))
+	else if (!loadConfigFile("/System/Library/CoreServices/ServerVersion.plist", &systemVersion))
 	{
 		valid = true;
 	}

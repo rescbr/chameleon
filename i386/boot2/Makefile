@@ -83,7 +83,7 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
-	${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
 	size $(SYMROOT)/boot.sys
 	ls -l $(SYMROOT)/boot
@@ -102,7 +102,7 @@ embed_symbols: machOconv
 	echo ******* Patching at $(PATCH_ADDR) ******
 	stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	
 
-	machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot
+	machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
 
 
 prompt.o: vers.h

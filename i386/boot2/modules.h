@@ -16,6 +16,18 @@
 #ifndef __BOOT_MODULES_H
 #define __BOOT_MODULES_H
 
+#define SYMBOLS_MODULE "Symbols.dylib"
+
+#define SYMBOL_DYLD_STUB_BINDER	"dyld_stub_binder"
+#define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
+#define STUB_ENTRY_SIZE	6
+
+#define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
+#define SECT_SYMBOL_STUBS			"__symbol_stub"
+
+
+#define VALID_FUNCTION(__x__)	(__x__ && (void*)__x__ != (void*)0xFFFFFFFF)
+
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
 
@@ -47,15 +59,6 @@ typedef struct moduleHook_t
 	callbackList_t* callbacks;
 	struct moduleHook_t* next;
 } moduleHook_t;
-
-#define SYMBOLS_MODULE "Symbols.dylib"
-
-#define SYMBOL_DYLD_STUB_BINDER	"dyld_stub_binder"
-#define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
-#define STUB_ENTRY_SIZE	6
-
-#define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
-#define SECT_SYMBOL_STUBS			"__symbol_stub"
 
 
 
