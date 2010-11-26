@@ -372,7 +372,7 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 		}
 		else
 		{
-			//return patch_gma_kexts(plist, plistbuffer, start);
+			return patch_gma_kexts(plist, plistbuffer, start);
 		}
 
 	}
@@ -562,12 +562,12 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
 		DBG("Buffer FULL: deflated result is %d, avail: %d bytes, out: %d bytes, full: %d\n", zlib_result, compressed_size, zstream.total_out, full_size);
-		printf("Unable to patch AppleHDA\n"
+		printf("Unable to patch AppleHDA\n");
 		
 	} 
 	else if (zlib_result != Z_STREAM_ERROR)
 	{
-		printf("ZLIB Deflate Error: %s\n", zstream.msg);
+		printf("AppleHDA: ZLIB Deflate Error: %s\n", zstream.msg);
 		getc();
 	}
 	
