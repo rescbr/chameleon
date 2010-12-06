@@ -161,7 +161,8 @@ chipset_type get_chipset(UInt32 id)
 			type = CT_G45;
 			break;
 			
-		case 0xA0108086:
+		case 0xA0108086:	// mobile
+		case 0xA0008086:	// desktop
 			type = CT_3150;
 			break;
 			
@@ -183,7 +184,8 @@ chipset_type get_chipset(UInt32 id)
 			{
 				//printf("Unknown chipset 0x%llX, please email id to meklort@gmail.com", id);
 				//getc();
-				type = CT_UNKWN_INTEL;
+				//type = CT_UNKWN_INTEL;
+				type = CT_UNKWN;
 
 			}
 			type = CT_UNKWN;
