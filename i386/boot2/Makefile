@@ -71,7 +71,7 @@ optionrom: CFLAGS += -DOPTION_ROM
 all embedtheme optionrom: $(DIRS_NEEDED) boot
 
 boot: embedded.h machOconv $(OBJS) $(LIBDEP) 
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
 	@make Symbols.dylib
@@ -130,6 +130,9 @@ Symbols.dylib: Symbols.o
 	${OBJROOT}/Symbols.o \
 	-o $(SYMROOT)/${SYMBOLS_MODULE} 
 
+	echo "start" >>  ${OBJROOT}/Symbols.save
+	echo "_lookup_symbol" >>  ${OBJROOT}/Symbols.save
+	strip -s ${OBJROOT}/Symbols.save $(SYMROOT)/${SYMBOLS_MODULE} 
 	@size $(SYMROOT)/${SYMBOLS_MODULE}
 
 Symbols.o:

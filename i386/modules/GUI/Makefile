@@ -1,4 +1,3 @@
-
 MODULE_NAME = GUI
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
@@ -7,19 +6,10 @@ MODULE_DEPENDENCIES =
 
 DIR = GUI
 
-include ../../MakePaths.dir
+MODULE_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
 
-OBJROOT=../../../obj/i386/modules/$(DIR)
-SYMROOT=../../../sym/i386/modules/
-DSTROOT=../../../dst/i386/modules/
-
-
-UTILDIR = ../../util
-LIBSADIR = ../../libsa
-LIBSAIODIR = ../../libsaio
-BOOT2DIR = ../../boot2
-
-INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
+THEME = embed
+THEMEDIR = ../../../artwork/themes/$(THEME)
 
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
@@ -34,24 +24,9 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
 DEFINES=
 CONFIG = hd
 INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(BOOT2DIR)
-ifneq "" "$(wildcard /bin/mkdirs)"
-  MKDIRS = /bin/mkdirs
-else
-  MKDIRS = /bin/mkdir -p
-endif
-AS = as
-LD = ld
-# LIBS= -lc_static
 LIBS=
 
-THEME = embed
-THEMEDIR = ../../../artwork/themes/$(THEME)
-
-
 VPATH = $(OBJROOT):$(SYMROOT)
-
-MODULE_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
-
 
 SFILES =
 CFILES = 
@@ -63,46 +38,10 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-
+all embedtheme optionrom: dylib
 
 embedtheme: CFLAGS += -DEMBED_THEME
 embedtheme: art.h all
-
-
-
-all embedtheme optionrom: dylib
-
-
-HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
-ifneq ($(strip $(HAVE_MODULES)),) 
-dylib: ${MODULE_OBJS}
-	ld -arch i386 \
-	-undefined dynamic_lookup \
-	-alias $(MODULE_START) start \
-	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
-	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
-	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/*.o \
-	-weak_library $(SYMROOT)/*.dylib \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
-else
-dylib: ${MODULE_OBJS}
-	ld -arch i386 \
-	-undefined dynamic_lookup \
-	-alias $(MODULE_START) start \
-	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
-	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
-	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/*.o \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
-endif
-
-%.o: %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\
@@ -130,11 +69,4 @@ art.h:
 
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
 
-
-
-
-
-include ../../MakeInc.dir
-
-# dependencies
--include $(OBJROOT)/Makedep
+include ../MakeInc.dir

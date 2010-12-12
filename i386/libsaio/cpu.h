@@ -8,6 +8,13 @@
 
 #include "libsaio.h"
 
+#define CPU_VIA_C3			0x07
+#define CPU_VIA_C3_Ezra_T	0x08
+
+#define CPU_VIA_NANO		0x0F
+
+
+
 extern void scan_cpu(PlatformInfo_t *);
 
 #define bit(n)			(1UL << (n))
@@ -19,10 +26,43 @@ extern void scan_cpu(PlatformInfo_t *);
 #define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199
 #define MSR_IA32_EXT_CONFIG		0x00EE
+#define MSR_IA32_EBL_CR_POWERON	0x2A
+
 #define MSR_FLEX_RATIO			0x194
 #define	MSR_PLATFORM_INFO		0xCE
+
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
+
+/* Centaur-Hauls/IDT defined MSRs. */
+#define MSR_IDT_FCR1			0x00000107
+#define MSR_IDT_FCR2			0x00000108
+#define MSR_IDT_FCR3			0x00000109
+#define MSR_IDT_FCR4			0x0000010a
+
+#define MSR_IDT_MCR0			0x00000110
+#define MSR_IDT_MCR1			0x00000111
+#define MSR_IDT_MCR2			0x00000112
+#define MSR_IDT_MCR3			0x00000113
+#define MSR_IDT_MCR4			0x00000114
+#define MSR_IDT_MCR5			0x00000115
+#define MSR_IDT_MCR6			0x00000116
+#define MSR_IDT_MCR7			0x00000117
+#define MSR_IDT_MCR_CTRL		0x00000120
+
+/* VIA Nano defined MSTs */
+#define MSR_NANO_FCR1 0x1204        // This MSR contains control bits and family, model, etc.
+#define MSR_NANO_FCR2 0x1206        // This MSR contains part of the vendor string
+#define MSR_NANO_FCR3 0x1207        // This MSR contains part of the vendor string
+#define VIA_ALTERNATIVE_VENDOR_BIT (1 << 8)  // This bit in MSR_IDT_FCR1 enables alternative vendor string
+
+/* VIA Cyrix defined MSRs */
+#define MSR_VIA_FCR				0x00001107
+#define MSR_VIA_LONGHAUL		0x0000110a
+#define MSR_VIA_RNG				0x0000110b
+#define MSR_VIA_BCR2			0x00001147
+
+
 
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 
@@ -52,10 +92,15 @@ static inline void wrmsr64(uint32_t msr, uint64_t val)
 	__asm__ volatile("wrmsr" : : "c" (msr), "A" (val));
 }
 
+
 static inline void intel_waitforsts(void) {
 	uint32_t inline_timeout = 100000;
 	while (rdmsr64(MSR_IA32_PERF_STATUS) & (1 << 21)) { if (!inline_timeout--) break; }
 }
+
+
+
+
 
 static inline void do_cpuid(uint32_t selector, uint32_t *data)
 {

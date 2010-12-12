@@ -12,6 +12,9 @@ else
   MKDIRS = /bin/mkdir -p
 endif
 
+CPP = g++ -fno-exceptions -fno-rtti
+
+
 # Toggle this as to whether you want a frame pointer (%ebp) to be used. It is
 # invaluable for debugging the booter. For example using GDB attached to VMware.
 # In fact, it's so invaluable that it's now the default.  Not only that but the

@@ -136,16 +136,17 @@ void HibernateBoot(char *image_filename)
 		
 	allocSize = imageSize + ((4095 + sizeof(hibernate_graphics_t)) & ~4095);
 
-	mem_base = getmemorylimit() - allocSize;//TODO: lower this
+	mem_base = getmemorylimit();
 		
-	verbose("mem_base %x\n", mem_base);
-	// Rek : hibernate fix 
-	if (!((long long)mem_base+allocSize<1024*bootInfo->extmem+0x100000))
+	if (mem_base < ((1024 * bootInfo->extmem) + 0x100000))
 	{
 		printf ("Not enough space to restore image. Press any key to proceed with normal boot.\n");
 		getc ();
 		return;
 	}
+	mem_base -= allocSize;//TODO: lower this
+	verbose("mem_base %x\n", mem_base);
+
 		
 	bcopy(header, (void *) mem_base, sizeof(IOHibernateImageHeader));
 	header = (IOHibernateImageHeader *) mem_base;

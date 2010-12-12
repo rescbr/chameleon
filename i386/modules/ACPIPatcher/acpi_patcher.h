@@ -8,6 +8,10 @@
 #include "libsaio.h"
 #include "efi.h"
 
+#define ACPI_2_0		2
+#define ACPI_1_0		1
+
+
 extern uint64_t acpi10_p;
 extern uint64_t acpi20_p;
 extern uint64_t smbios_p;

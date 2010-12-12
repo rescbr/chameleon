@@ -122,7 +122,11 @@ void load_all_modules()
 			strcpy(tmp, name);
 			
 			DBG("Attempting to load %s\n", tmp);			
-			load_module(tmp);
+			if(!load_module(tmp))
+			{
+				// failed to load
+				// free(tmp);
+			}
 		}
 		else 
 		{
@@ -520,13 +524,19 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				// TODO: verify version
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
-				char* name = malloc(strlen(module) + strlen(".dylib") + 1);
-				sprintf(name, "%s.dylib", module);
-				if(dylib_loader && !dylib_loader(name))
+				if(dylib_loader)
 				{
-					// Unable to load dependancy
-					//return NULL;
+					char* name = malloc(strlen(module) + strlen(".dylib") + 1);
+					sprintf(name, "%s.dylib", module);
+
+					if (!dylib_loader(name))
+					{
+						free(name);
+						// Unable to load dependancy
+						//return NULL;
+					}
 				}
+
 				break;
 				
 			case LC_ID_DYLIB:
@@ -922,7 +932,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
@@ -953,7 +963,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
@@ -972,7 +982,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
@@ -1019,7 +1029,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 						segmentAddress += tmp2 + sizeof(void*);
 					}
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
@@ -1186,13 +1196,12 @@ unsigned int lookup_all_symbols(const char* name)
 		}
 
 	}
+
 #if DEBUG_MODULES
-	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
-	{
-		verbose("Unable to locate symbol %s\n", name);
-		getc();
-	}
+	verbose("Unable to locate symbol %s\n", name);
+	getc();
 #endif
+
 	return 0xFFFFFFFF;
 }
 
@@ -1290,39 +1299,8 @@ int replace_function(const char* symbol, void* newAddress)
 
 }
 
-
-/* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
- * And why it isn't needed when compiled into boot2
- */
-
-uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
+void dyld_stub_binder()
 {
-	uint64_t quotient = 0, qbit = 1;
-	
-	if (denominator)
-	{
-		while ((int64_t) denominator >= 0)
-		{
-			denominator <<= 1;
-			qbit <<= 1;
-		}
-		
-		while (denominator)
-		{
-			if (denominator <= numerator)
-			{
-				numerator -= denominator;
-				quotient += qbit;
-			}
-			denominator >>= 1;
-			qbit >>= 1;
-		}
-		
-		return quotient;
-	}
-	else {
-		stop("Divide by 0");
-		return 0;
-	}
-	
+	// TODO: actualy impliment this function (asm)
+	stop("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
 }

@@ -31,7 +31,7 @@ void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	if(current->class_id != PCI_CLASS_BRIDGE_ISA) return;
 	
 	
-	bool do_enable_hpet = false;
+	bool do_enable_hpet = true;
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
 
 	if (do_enable_hpet)

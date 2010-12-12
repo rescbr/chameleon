@@ -349,11 +349,13 @@ bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
 {
     const char *key_val;
     int size;
-    
-    if (getValueForKey(key, &key_val, &size, config)) {
-        if ( (size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y') ) {
+    if (getValueForKey(key, &key_val, &size, config))
+	{
+        if ( (size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y') )
+		{
             *result_val = true;
-        } else {
+        } else
+		{
             *result_val = false;
         }
         return true;

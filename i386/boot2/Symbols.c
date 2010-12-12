@@ -16,11 +16,12 @@ static int strcmp(const char * s1, const char * s2);
 
 void Symbols_start()
 {
-	// load_dependency("Symbols", 300);
 }
 
 unsigned int lookup_symbol(const char* symbol)
 {
+	if(strcmp(symbol, "dyld_stub_binder") == 0) return lookup_symbol("_dyld_stub_binder");	// ugly hack
+	   
 	int upperLimit = sizeof(symbolList) / sizeof(symbolList[0]) - 1;		
 	int lowerLimit = 0;
 	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint

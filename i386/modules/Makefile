@@ -26,9 +26,8 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = Resolution KernelPatcher GUI KextPatcher GraphicsEnabler ACPIPatcher HPET USBFix Memory Networking NetbookInstaller
-#SUBDIRS = USB
-#SUBDIRS = Symbols # This is made during the boot2 build stage
+SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller ACPIPatcher HelloWorld
+#SUBDIRS = HelloWorld
 
 all embedtheme optionrom tags debug install installhdrs:
 	@rm -rf $(OBJROOT)

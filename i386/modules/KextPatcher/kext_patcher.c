@@ -243,16 +243,18 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 			
 			XMLParseFile( plist, &plistData.dictionary );
 
-			int count = 0;
+			int count;
 
 			allDicts.dictionary = XMLGetProperty(plistData.dictionary, kMKEXTInfoDictionariesKey);
-			count = XMLTagCount(allDicts.dictionary);
+			//count = XMLTagCount(allDicts.dictionary);
 
-			DBG("Plist contains %d kexts\n", count);
+			//DBG("Plist contains %d kexts\n", count);
 			
 			
 			bool patched = false;
-			for(; count--; count > 0)
+			for(count = XMLTagCount(allDicts.dictionary);
+				count > 0;
+				count--)
 			{
 				TagPtr kextEntry = XMLGetElement(allDicts.dictionary, count);
 				patched |= patch_kext(kextEntry, plist, package);
@@ -525,7 +527,7 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 	
 	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 		
-	int times = replace_word(0x10EC0000 | (find_codec), 0x10EC0000 | (patch_hda_codec), executable, zstream.total_out);
+	/*int times = */replace_word(0x10EC0000 | (find_codec), 0x10EC0000 | (patch_hda_codec), executable, zstream.total_out);
 	if (zstream_inited) inflateEnd(&zstream);
 	
 	
@@ -674,7 +676,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	if(XMLGetProperty(personality, (const char*)"Intel915"))
 	{
-		verbose("Patching AppleIntelGMA960.kext\n");
+		verbose("Patching AppleIntelGMA950.kext\n");
 		//getc();
 
 		personality =		XMLGetProperty(personality, (const char*)"Intel915");

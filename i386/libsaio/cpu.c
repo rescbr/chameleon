@@ -91,7 +91,7 @@ static uint64_t measure_tsc_frequency(void)
  */
 
 void scan_cpu(PlatformInfo_t *p)
-{
+{	
 	int i = 0;
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
 	uint64_t	msr, flex_ratio;
@@ -99,6 +99,11 @@ void scan_cpu(PlatformInfo_t *p)
 
 	maxcoef = maxdiv = currcoef = currdiv = 0;
 
+	
+	// Rename CPU to GeniuneIntel
+	//wrmsr64(MSR_VIA_FEAT_CONTROL2, 'GenuineI'/*'ntel'*/);
+
+	
 	/* get cpuid values */
 	for( ; i <= 3; i++)
 	{
@@ -305,7 +310,88 @@ void scan_cpu(PlatformInfo_t *p)
 		DBG("0 ! using the default value for FSB !\n");
 	}
 #endif
+	else if(p->CPU.Vendor == 0x746e6543 && p->CPU.Family == 6)
+	{
+		switch (p->CPU.Model) {
+			case CPU_VIA_NANO:
+				// NOTE: TSC is constant, irrelevent of speed steping 
+				break;
+			default:
+				break;
+		}
+		
+		msr = rdmsr64(MSR_NANO_FCR2);
+		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		
+		//msr = msr >> 32;
+		msr |= VIA_ALTERNATIVE_VENDOR_BIT;
+		//msr = msr << 32;
+		
+		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		wrmsr64(MSR_NANO_FCR2, msr);
+		msr = rdmsr64(MSR_NANO_FCR2);
+		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		
+		
+		/* get cpuid values */
+		for( ; i <= 3; i++)
+		{
+			do_cpuid(i, p->CPU.CPUID[i]);
+		}
+		//int numcpuid_supported = p->CPU.CPUID[CPUID_0][0];	// max number cpuid call
+		//int numextcpuid = p->CPU.CPUID[CPUID_80][0];
+															//p->CPU.Features = 0;
+															//		bitfield(p->CPU.CPUID[CPUID_1][1], 0, 0) FEATURE_C
+		
+		// CPUID_0 -> largest cpuid val in EAX
+		// CPUID_0 -> rem = vendor string
+		/*
+		CPUID_1 EDX:
+		 0 -> FPU
+		 1 -> VME
+		 2 -> DE
+		 3 -> PSE
+		 4 -> TSC
+		 5 -> MSR
+		 6 -> PAE
+		 7 -> MCE
+		 8 -> CX8
+		 9 -> APIC
+		 10 ->  Reserved
+		 11 -> Fast Call
+		 12 -> MTTR
+		 13 -> PGE
+		 14 -> MCA
+		 15 -> CMOV
+		 16 -> PAT
+		 17 -> PSE36
+		 18 -> Serial Number 
+		 23 -> MMX
+		 24 -> FXSR
+		 25 -> SSE
+		 */
+		
+		//CPUID_80 -> largest excpuid value in EAX
+		//CPUID_81,EAX -> Signature
+		//CPUID_80,EDX -> Ext Features
+		//CPUID_82 -> CPU String
+		//CPUID_83 -> CPU String
+		//CPUID_84 -> CPU String
+		p->CPU.NoThreads = p->CPU.NoCores;
+		
+	}
 
+	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
+	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
+	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
+	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
+	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
+	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
+	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
+	p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+	
+	
+	
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;
@@ -313,7 +399,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-
+	DBG("CPU: Brand:                 %s\n", p->CPU.BrandString);
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
 	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);

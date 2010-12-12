@@ -84,8 +84,6 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
  **/
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	bool legacy_logo;
-	
 	// Turn off any GUI elements
 	if( bootArgs->Video.v_display == GRAPHICS_MODE )
 	{

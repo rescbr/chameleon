@@ -18,7 +18,6 @@
 
 #define SYMBOLS_MODULE "Symbols.dylib"
 
-#define SYMBOL_DYLD_STUB_BINDER	"dyld_stub_binder"
 #define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
 #define STUB_ENTRY_SIZE	6
 

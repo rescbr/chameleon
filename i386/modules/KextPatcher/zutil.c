@@ -7,6 +7,8 @@
 
 #include "zutil.h"
 
+extern void *calloc(size_t nmemb, size_t size);
+
 #ifndef NO_DUMMY_DECL
 struct internal_state      {int dummy;}; /* for buggy compilers */
 #endif

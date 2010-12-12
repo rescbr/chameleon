@@ -386,7 +386,7 @@ static int GetFreeFd(void)
 			return fd;
 	    	}
 	}
-	stop("Out of file descriptors");
+	stop("Out of file descriptors (MAX = %d)", NFILES);
 	// not reached
 	return -1;
 }

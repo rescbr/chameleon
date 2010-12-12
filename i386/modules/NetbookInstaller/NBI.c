@@ -65,7 +65,6 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	int len;
 	const char* gPrevMacOSBuildVersion;
 	
-	
 	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		valid = true;
@@ -107,7 +106,6 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			}
 		}
 	}
-	
 	
 	
 	
