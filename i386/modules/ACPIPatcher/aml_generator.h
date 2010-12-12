@@ -11,6 +11,8 @@
 #define __LIBSAIO_AML_GENERATOR_H
 
 #include "libsaio.h"
+#include "ACPIPatcher.h"
+
 
 #define	AML_CHUNK_NONE		0xff
 #define	AML_CHUNK_ZERO		0x00

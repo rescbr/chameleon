@@ -16,7 +16,7 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 HAVE_MODULES := $(wildcard $(SYMROOT)/*.dylib)
 ifneq ($(strip $(HAVE_MODULES)),) 
 dylib: ${MODULE_OBJS}
-	@echo "\tLD $(MODULE_NAME).dylib"
+	@echo "\t[LD] $(MODULE_NAME).dylib"
 	@ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias $(MODULE_START) start \

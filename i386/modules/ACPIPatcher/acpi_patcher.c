@@ -25,11 +25,9 @@
 #define DBG(x...)
 #endif
 
-uint64_t acpi10_p;
-uint64_t acpi20_p;
-
 
 extern char* gSMBIOSBoardModel;
+
 
 // Slice: New signature compare function
 boolean_t tableSign(char *table, const char *sgn)
@@ -106,13 +104,12 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 		sprintf(dirSpec,"%s.%s", gSMBIOSBoardModel, filename);
 		fd = open(dirSpec, 0);
 	}
-	
 	if (fd < 0)
 	{
 		sprintf(dirSpec, "%s", filename); 
 		fd = open(dirSpec, 0);
 		if (fd < 0)
-		{	
+		{
 			if(gSMBIOSBoardModel)
 			{
 				sprintf(dirSpec, "/Extra/%s.%s", gSMBIOSBoardModel, filename);
@@ -130,12 +127,11 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 						fd = open(dirSpec, 0);
 					}
 					if (fd < 0)
-					{						
+					{
 						sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
 						fd = open(dirSpec, 0);
 					}
 				}
-				
 			}
 		}
 	}
@@ -146,7 +142,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 		verbose("ACPI table not found: %s\n", filename);
 		*dirSpec = '\0';
 	}
-
+	
 	if (outDirspec) *outDirspec = dirSpec; 
 	return fd;
 }
@@ -266,11 +262,16 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	
 	if (acpi_cpu_count > 0) 
 	{
-		bool c2_enabled = fadt->C2_Latency < 100;
-		bool c3_enabled = fadt->C3_Latency < 1000;
+		bool c2_enabled = false;
+		bool c3_enabled = false;
 		bool c4_enabled = false;
 		
+		getBoolForKey(kEnableC2States, &c2_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC3States, &c3_enabled, &bootInfo->bootConfig);
 		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
+		
+		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);
+		c3_enabled = c3_enabled | (fadt->C3_Latency < 1000);
 		
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
 		
@@ -462,7 +463,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						if (maximum.CID < minimum.CID) 
 						{
 							DBG("Insane FID values!");
-							p_states_count = 1;
+							p_states_count = 0;
 						}
 						else
 						{
@@ -512,7 +513,9 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 							
 							p_states_count -= invalid;
 						}
-					} break;
+						
+						break;
+					} 
 					case CPU_MODEL_FIELDS:
 					case CPU_MODEL_DALES:
 					case CPU_MODEL_DALES_32NM:
@@ -520,6 +523,34 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_NEHALEM_EX:
 					case CPU_MODEL_WESTMERE:
 					case CPU_MODEL_WESTMERE_EX:
+					{
+						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
+						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+						
+						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
+						
+						// Sanity check
+						if (maximum.Control < minimum.Control) 
+						{
+							DBG("Insane control values!");
+							p_states_count = 0;
+						}
+						else
+						{
+							uint8_t i;
+							p_states_count = 0;
+							
+							for (i = maximum.Control; i >= minimum.Control; i--) 
+							{
+								p_states[p_states_count].Control = i;
+								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
+								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
+								p_states_count++;
+							}
+						}
+						
+						break;
+					}	
 					default:
 						verbose ("Unsupported CPU: P-States not generated !!!\n");
 						break;
@@ -669,7 +700,6 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	{
 		DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
 		
-		
 		// Insert old dsdt into the IORegistery
 		Node* node = DT__FindNode("/dsdt", false);
 		if(node == NULL)
@@ -744,6 +774,7 @@ int setupAcpi(void)
 		sprintf(dirSpec, "DSDT.%s.aml", gSMBIOSBoardModel);
 		new_dsdt = loadACPITable(dirSpec);
 	}
+	
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
 	 {

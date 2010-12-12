@@ -7,6 +7,7 @@
 
 #include "libsaio.h"
 #include "efi.h"
+#include "ACPIPatcher.h"
 
 #define ACPI_2_0		2
 #define ACPI_1_0		1
