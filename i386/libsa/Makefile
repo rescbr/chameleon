@@ -47,9 +47,12 @@ optionrom: CFLAGS += -DOPTION_ROM
 all embedtheme optionrom: $(DIRS_NEEDED) $(LIBS)
 
 libsa.a: $(SA_OBJS)
-	rm -f $(SYMROOT)/$(@F)
-	ar q $(SYMROOT)/$(@F) $^
-	ranlib $(SYMROOT)/$(@F)
+	@echo "\t[RM] $(SYMROOT)/$(@F)"
+	@rm -f $(SYMROOT)/$(@F)
+	@echo "\t[AR] $@"
+	@ar q $(SYMROOT)/$(@F) $^ &> /dev/null
+	@echo "\t[RANLIB] $@"
+	@ranlib $(SYMROOT)/$(@F)
 
 $(INSTALL_SA_DIR) $(INSTALL_MD_DIR):
 	$(MKDIRS) $@

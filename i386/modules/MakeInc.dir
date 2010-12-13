@@ -1,4 +1,5 @@
 include ../../MakePaths.dir
+include ../../MakeInc.dir
 
 OBJROOT=../../../obj/i386/modules/$(DIR)
 SYMROOT=../../../sym/i386/modules/
@@ -53,7 +54,6 @@ endif
 
 
 
-include ../../MakeInc.dir
 
 # dependencies
--include $(OBJROOT)/Makedep
+#-include $(OBJROOT)/Makedep

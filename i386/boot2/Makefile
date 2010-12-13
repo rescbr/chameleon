@@ -71,22 +71,24 @@ optionrom: CFLAGS += -DOPTION_ROM
 all embedtheme optionrom: $(DIRS_NEEDED) boot
 
 boot: embedded.h machOconv $(OBJS) $(LIBDEP) 
-	$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	@echo "\t[LD] boot.sys"
+	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
 	@make Symbols.dylib
 
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	@echo "\t[LD] boot_embeded.sys"
+	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
 		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext
 
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
-	##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	@##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
-	size $(SYMROOT)/boot.sys
-	ls -l $(SYMROOT)/boot
+	@##size $(SYMROOT)/boot.sys
+	@ls -l $(SYMROOT)/boot
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
@@ -97,12 +99,13 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 
 embed_symbols: machOconv
 	@echo ================= Embedding Symbols.dylib =================
-	machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
+	@echo "\t[MACHOCONV] boot"
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
 
-	echo ******* Patching at $(PATCH_ADDR) ******
-	stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	
-
-	machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
+	@echo ******* Patching at $(PATCH_ADDR) ******
+	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
+	@echo "\t[MACHOCONV] boot_embeded"
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
 
 
 prompt.o: vers.h
@@ -117,6 +120,10 @@ embedded.h:
 
 Symbols.dylib: Symbols.o
 	@echo ================= Compiling ${SYMBOLS_MODULE} =================
+	@echo "start" >>  ${OBJROOT}/Symbols.save
+	@echo "_lookup_symbol" >>  ${OBJROOT}/Symbols.save
+
+	@echo "\t[LD] $@"
 	@ld -arch i386 \
 	-undefined dynamic_lookup \
 	-alias _Symbols_start start \
@@ -127,13 +134,11 @@ Symbols.dylib: Symbols.o
 	-current_version 1.0.0 \
 	-compatibility_version 1.0.0 \
 	-final_output Symbols \
+	-exported_symbols_list ${OBJROOT}/Symbols.save \
 	${OBJROOT}/Symbols.o \
 	-o $(SYMROOT)/${SYMBOLS_MODULE} 
 
-	echo "start" >>  ${OBJROOT}/Symbols.save
-	echo "_lookup_symbol" >>  ${OBJROOT}/Symbols.save
-	strip -s ${OBJROOT}/Symbols.save $(SYMROOT)/${SYMBOLS_MODULE} 
-	@size $(SYMROOT)/${SYMBOLS_MODULE}
+	@##size $(SYMROOT)/${SYMBOLS_MODULE} 
 
 Symbols.o:
 	@rm -rf $(SYMROOT)/Symbols.h
@@ -148,8 +153,8 @@ Symbols.o:
 	@echo "symbol_t symbolList[] = {" >> $(SYMROOT)/Symbols.h
 	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "	{.symbol = "$$3"_string, .addr = 0x"$$1"},";}' >> $(SYMROOT)/Symbols.h
 	@echo "};" >> $(SYMROOT)/Symbols.h
-
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
+	@echo "\t[CC] $@"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
 
 
 install_i386:: all $(INSTALLDIR)

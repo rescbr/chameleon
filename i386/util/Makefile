@@ -27,10 +27,12 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 all embedtheme optionrom: $(DIRS_NEEDED) $(PROGRAMS)
 
 machOconv: machOconv.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) machOconv.o
+	@echo "\t[LD] $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) machOconv.o
 
 bdmesg: bdmesg.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 -o $(SYMROOT)/$(@F) bdmesg.o
+	@echo "\t[LD] $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 -o $(SYMROOT)/$(@F) bdmesg.o
 
 include ../MakeInc.dir
 

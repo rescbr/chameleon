@@ -1133,5 +1133,6 @@ char* getSmbiosProductName()
 		DT__AddProperty(node, "orig-model", tmpLen, gSMBIOSBoardModel);
 	}
 	verbose("Actual model name is '%s'\n", tempString);
+	return gSMBIOSBoardModel;
 }
 

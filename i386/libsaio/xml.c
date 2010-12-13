@@ -643,12 +643,11 @@ ParseTagString( char * buffer, TagPtr * tag )
 {
     long   length;
     char * string;
-    TagPtr tmpTag;
   
     length = FixDataMatchingTag(buffer, kXMLTagString);
     if (length == -1) return -1;
   
-    tmpTag = NewTag();
+	TagPtr tmpTag = NewTag();
     if (tmpTag == 0) return -1;
   
     string = NewSymbol(buffer);
@@ -685,6 +684,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 	{
 		printf("Warning integer is non existant\n");
 		getc();
+		tmpTag = NewTag();
 		tmpTag->type = kTagTypeInteger;
 		tmpTag->string = 0;
 		tmpTag->tag = 0;
