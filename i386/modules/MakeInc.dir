@@ -57,6 +57,7 @@ dylib_final:
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
 	-L$(OBJROOT)/ \
 	-L$(OBJROOT)/../ \
 	-L$(OBJROOT)/../*/ \
