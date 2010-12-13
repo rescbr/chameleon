@@ -2,11 +2,11 @@
 #	Makefile for i386 boot program
 #	define FLOPPY and SMALL using DEFINES macro as necessary
 
-CFLAGS	= -O $(MORECPP) -arch i386 -g -static
+CFLAGS= -O $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBDIR = libsa
-INC = -I. -I$(LIBDIR)
+INC = -I. -I$(LIBDIR) 
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else

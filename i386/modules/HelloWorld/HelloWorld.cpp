@@ -2,11 +2,11 @@
  * Copyright (c) 2009 Evan Lojewski. All rights reserved.
  *
  */
-extern "C" 
-{
-#include "libsaio.h"
-#include "modules.h"
-}
+#include <cstdlib>
+#include <iostream>
+#include <modules>
+
+using namespace std;
 
 class HW {
 private:
@@ -29,7 +29,7 @@ void helloWorld(void* binary, void* arg2, void* arg3, void* arg4)
 	delete obj2;
 
 	printf("Hello world from ExecKernel hook. Binary located at 0x%X\n", binary);
-	getc();
+	getchar();
 	
 }
 
@@ -43,6 +43,7 @@ void HelloWorld_start()
 
 void HW::printHello()
 {
+	//cout << "[" << id << "] HelloWorld from a c++ function\n";
 	printf("[%d] HelloWorld from a c++ function\n", id);
 }
 

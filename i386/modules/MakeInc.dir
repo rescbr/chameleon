@@ -68,11 +68,11 @@ endif
 
 %.o: %.c
 	@echo "\t[CC] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -I../include/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 %.o: %.cpp
 	@echo "\t[CPP] $<"
-	@$(CPP) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
+	@$(CPP) $(CPPFLAGS) $(CFLAGS) -I../include/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 
 
