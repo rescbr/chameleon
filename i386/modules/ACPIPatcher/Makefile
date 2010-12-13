@@ -35,7 +35,7 @@ ALLSRC =  $(SFILES) $(CFILES) $(HFILES) $(OTHERFILES)
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: $(DIRS_NEEDED) dylib
+all embedtheme optionrom: dylib
 
 
 include ../MakeInc.dir

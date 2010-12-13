@@ -29,9 +29,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller ACPIPatcher HelloWorld
 #SUBDIRS = HelloWorld
 
-all embedtheme optionrom tags debug install installhdrs:
-	@rm -rf $(OBJROOT)
-	@mkdir $(OBJROOT)
+all embedtheme optionrom tags debug install installhdrs: objroot_dirs lazydylib1.o
 	@for i in ${SUBDIRS}; \
 	do \
 		echo ================= make $@ for $$i =================; \
@@ -46,6 +44,18 @@ all embedtheme optionrom tags debug install installhdrs:
 			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
 		) || exit $$?; 						  \
 	done
+
+objroot_dirs:
+	@rm -rf $(OBJROOT) 
+	@mkdir $(OBJROOT) &> /dev/null
+
+%.o: %.c
+	@echo "\t[CC] $<"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
+
+%.o: %.cpp
+	@echo "\t[CPP] $<"
+	@$(CPP) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 installsrc:
 	tar cf - . | (cd ${SRCROOT}; tar xfBp -)
