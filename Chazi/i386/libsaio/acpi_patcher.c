@@ -543,11 +543,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_WESTMERE:
 					case CPU_MODEL_WESTMERE_EX:
 					{
-						// Is it allways the maximum multiplier?
+						// Seems it always contains maximum multiplier value (with turbo, that's we need)...
 						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
+						
+						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 
-						// fix me: dirty method to get lowest multiplier... Hardcoded value!
-						minimum.Control = 0x09;
+						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
 
 						// Sanity check
 						if (maximum.Control < minimum.Control) 
