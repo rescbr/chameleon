@@ -379,18 +379,7 @@ void scan_cpu(PlatformInfo_t *p)
 		//CPUID_84 -> CPU String
 		p->CPU.NoThreads = p->CPU.NoCores;
 		
-	}
-
-	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
-	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
-	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
-	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
-	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
-	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
-	p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-	
-	
+	}	
 	
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
