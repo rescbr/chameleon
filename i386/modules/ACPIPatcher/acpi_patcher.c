@@ -555,7 +555,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						break;
 					}	
 					default:
-						verbose ("Unsupported CPU: P-States not generated !!!\n");
+						verbose ("Unsupported CPU (0x%X): P-States not generated !!!\n", Platform->CPU.Family);
 						break;
 				}
 			}
