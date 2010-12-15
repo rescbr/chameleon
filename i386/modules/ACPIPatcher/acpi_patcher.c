@@ -13,6 +13,9 @@
 #include "cpu.h"
 #include "aml_generator.h"
 
+uint64_t acpi10_p;
+uint64_t acpi20_p;
+
 #ifndef DEBUG_ACPI
 #define DEBUG_ACPI 0
 #endif
