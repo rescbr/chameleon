@@ -68,10 +68,12 @@ Options useful in the com.apple.Boot.plist file:
 
   GraphicsEnabler=Yes|No  Automatic device-properties generation for gfx cards.
   UseAtiROM=Yes|No        Use an alternate Ati ROM image 
-                            (path: /Extra/<vendorid>_<devid>.rom)
+                            (path: /Extra/<vendorid>_<devid>_<subsysid>.rom)
   UseNvidiaROM=Yes|No     Use an alternate Nvidia ROM image 
                             (path:  /Extra/<vendorid>_<devid>.rom)
   VBIOS=Yes|No            Inject VBIOS to device-properties.
+
+  AtiConfig=<cardcfg>     Use a different card config (the list can be found in ati.c).
 
   EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
                           for ethernet interfaces.
@@ -90,10 +92,19 @@ Options useful in the com.apple.Boot.plist file:
 
   DropSSDT=Yes            Skip the SSDT tables while relocating the ACPI tables.
   DSDT=<file>             Use an alternate DSDT.aml file 
-                            (default path: /DSDT.aml /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
+                            (default paths:
+                              /DSDT.aml /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
+
+  GenerateCStates=Yes     Enable auto generation of Processor (C-States) and/or
+  GeneratePStates=Yes       Performance (P-States) power states.
+
+  EnableC2State=Yes       Enable specific Processor power states, C2,
+  EnableC3State=Yes         C3
+  EnableC4State=Yes         and C4.
 
   SMBIOS=<file>           Use an alternate SMBIOS.plist file 
-                            (default path: /Extra/SMBIOS.plist bt(0,0)/Extra/SMBIOS.plist).
+                            (default paths:
+                              /Extra/SMBIOS.plist bt(0,0)/Extra/SMBIOS.plist).
 
   SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding
                             if smbios.plist doesn't exist, factory

@@ -323,10 +323,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE065A, "Quadro FX 1700M" },
 	{ 0x10DE065B, "GeForce 9400 GT" },
 	{ 0x10DE065C, "Quadro FX 770M" },
-	{ 0x10DE06C0, "GeForce GTX 480" },
-	{ 0x10DE06C4, "GeForce GTX 465" },
-	{ 0x10DE06CA, "GeForce GTX 480M" },
-	{ 0x10DE06CD, "GeForce GTX 470" },
 	{ 0x10DE06E0, "GeForce 9300 GE" },
 	{ 0x10DE06E1, "GeForce 9300 GS" },
 	{ 0x10DE06E4, "GeForce 8400 GS" },
@@ -341,12 +337,15 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06F9, "Quadro FX 370 LP" },
 	{ 0x10DE06FA, "Quadro NVS 450" },
 	{ 0x10DE06FD, "Quadro NVS 295" },
+	{ 0x10DE086A, "GeForce 9400" },
+	{ 0x10DE0874, "ION 9300M" },	
 	{ 0x10DE086C, "GeForce 9300/nForce 730i" },
 	{ 0x10DE087D, "ION 9400M" },
 	{ 0x10DE087E, "ION LE" },
 	{ 0x10DE0A20, "GeForce GT220" },
 	{ 0x10DE0A23, "GeForce 210" },
 	{ 0x10DE0A28, "GeForce GT 230M" },
+	{ 0x10DE0A29, "GeForce GT 330M" },
 	{ 0x10DE0A2A, "GeForce GT 230M" },
 	{ 0x10DE0A34, "GeForce GT 240M" },
 	{ 0x10DE0A60, "GeForce G210" },
@@ -355,17 +354,80 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A65, "GeForce 210" },
 	{ 0x10DE0A66, "GeForce 310" },
 	{ 0x10DE0A74, "GeForce G210M" },
+	{ 0x10DE0A75, "GeForce G310M" },
 	{ 0x10DE0A78, "Quadro FX 380 LP" },
 	{ 0x10DE0CA3, "GeForce GT 240" },
 	{ 0x10DE0CA8, "GeForce GTS 260M" },
 	{ 0x10DE0CA9, "GeForce GTS 250M" },
+	{ 0x10DE0CB1, "GeForce GTS 360M" },
 	{ 0x10DE0CA3, "GeForce GT240" },
-	{ 0x10DE0E22, "GeForce GTX 460" },
-	{ 0x10DE0E24, "GeForce GTX 460" },
+	
+	// 06C0 - 06DFF
+	{ 0x10DE06C0, "GeForce GTX 480" },
+	{ 0x10DE06C3, "GeForce GTX D12U" },
+	{ 0x10DE06C4, "GeForce GTX 465" },
+	{ 0x10DE06CA, "GeForce GTX 480M" },
+	{ 0x10DE06CD, "GeForce GTX 470" },
 	{ 0x10DE06D1, "Tesla C2050" },	// TODO: sub-device id: 0x0771
 	{ 0x10DE06D1, "Tesla C2070" },	// TODO: sub-device id: 0x0772
+	{ 0x10DE06D2, "Tesla M2070" },
+	{ 0x10DE06D8, "Quadro 6000" },
+	{ 0x10DE06D9, "Quadro 5000" },
+	{ 0x10DE06DA, "Quadro 5000M" },
+	{ 0x10DE06DC, "Quadro 6000" },
 	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
-	{ 0x10DE06DE, "Tesla M2070" }	// TODO: sub-device id: ?
+	{ 0x10DE06DE, "Tesla M2070" },	// TODO: sub-device id: ?
+	// 0x10DE06DE also applies to misc S2050, X2070, M2050, M2070
+	{ 0x10DE06DD, "Quadro 4000" },
+	
+	// 0DC0 - 0DFF
+	{ 0x10DE0DC0, "GeForce GT 440" },
+	{ 0x10DE0DC1, "D12-P1-35" },
+	{ 0x10DE0DC2, "D12-P1-35" },
+	{ 0x10DE0DC4, "GeForce GTS 450" },
+	{ 0x10DE0DC5, "GeForce GTS 450" },
+	{ 0x10DE0DC6, "GeForce GTS 450" },
+	{ 0x10DE0DCA, "GF10x" },
+	{ 0x10DE0DD1, "GeForce GTX 460M" },
+	{ 0x10DE0DD2, "GeForce GT 445M" },
+	{ 0x10DE0DD3, "GeForce GT 435M" },
+	{ 0x10DE0DD8, "Quadro 2000" },
+	{ 0x10DE0DDE, "GF106-ES" },
+	{ 0x10DE0DDF, "GF106-INT" },
+	{ 0x10DE0DE1, "GeForce GT 430" },
+	{ 0x10DE0DE2, "GeForce GT 420" },
+	{ 0x10DE0DEB, "GeForce GT 555M" },
+	{ 0x10DE0DEE, "GeForce GT 415M" },
+	{ 0x10DE0DF0, "GeForce GT 425M" },
+	{ 0x10DE0DF1, "GeForce GT 420M" },
+	{ 0x10DE0DF2, "GeForce GT 435M" },
+	{ 0x10DE0DF3, "GeForce GT 420M" },
+	{ 0x10DE0DF8, "Quadro 600" },
+	{ 0x10DE0DFE, "GF108 ES" },
+	{ 0x10DE0DFF, "GF108 INT" },
+	
+	// 0E20 - 0E3F
+	{ 0x10DE0E21, "D12U-25" },
+	{ 0x10DE0E22, "GeForce GTX 460" },
+	{ 0x10DE0E23, "GeForce GTX 460 SE" },
+	{ 0x10DE0E24, "GeForce GTX 460" },
+	{ 0x10DE0E25, "D12U-50" },
+	{ 0x10DE0E30, "GeForce GTX 470M" },
+	{ 0x10DE0E38, "GF104GL" },
+	{ 0x10DE0E3E, "GF104-ES" },
+	{ 0x10DE0E3F, "GF104-INT" },
+	
+	// 0EE0 - 0EFF: none yet
+	// 0F00 - 0F3F: none yet
+	// 1040 - 107F: none yet
+	
+	// 1080 - 109F
+	{ 0x10DE1080, "GeForce GTX 580" },
+	{ 0x10DE1081, "D13U" },
+	{ 0x10DE1082, "D13U" },
+	{ 0x10DE1083, "D13U" },
+	{ 0x10DE1098, "D13U" },
+	{ 0x10DE109A, "N12E-Q5" },
 };
 
 static uint16_t swap16(uint16_t x)
@@ -449,6 +511,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			return PATCH_ROM_FAILED;
 		}
 	} else {
+		printf("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
 		return PATCH_ROM_FAILED;
 	}
 	
@@ -672,15 +735,14 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		vram_size  = REG32(NV04_PFB_FIFO_DATA);
 		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
 	}
-	else if (nvCardType >= NV_ARCH_C0) {
-		vram_size  = REG32(NVC0_MEM_CTRLR_COUNT);
-		vram_size *= REG32(NVC0_MEM_CTRLR_RAM_AMOUNT);
-		vram_size <<= 20;
-	}
-	else {
+	else if (nvCardType < NV_ARCH_C0) {
 		vram_size = REG32(NV04_PFB_FIFO_DATA);
 		vram_size |= (vram_size & 0xff) << 32;
 		vram_size &= 0xffffffff00ll;
+	}
+	else { // >= NV_ARCH_C0
+		vram_size = REG32(NVC0_MEM_CTRLR_RAM_AMOUNT) << 20;
+		vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 	}
 		
 	return vram_size;
@@ -711,8 +773,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devicepath = get_pci_dev_path(nvda_dev);
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
-	
-	delay(50);
 		
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
@@ -780,24 +840,26 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-/*	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
+	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
 		printf("ERROR: nVidia ROM Patching Failed!\n");
-		return false;
+		//return false;
 	}
-*/
-	rom_pci_header = (option_rom_pci_header_t *)(rom + *(uint16_t *)&rom[24]);
+
+	rom_pci_header = (option_rom_pci_header_t*)(rom + *(uint16_t *)&rom[24]);
 
 	// check for 'PCIR' sig
-	if (rom_pci_header->signature == 0x53454550)//0x52494350)
-		if (rom_pci_header->device_id != nvda_dev->device_id)
+	if (rom_pci_header->signature == 0x50434952) {
+		if (rom_pci_header->device_id != nvda_dev->device_id) {
 			// Get Model from the OpROM
 			model = get_nvidia_model((rom_pci_header->vendor_id << 16) | rom_pci_header->device_id);
-	else
-		printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
+		} else {
+			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
+		}
+	}
 
-	if (!string)
+	if (!string) {
 		string = devprop_create_string();
-
+	}
 	device = devprop_add_device(string, devicepath);
 
 	/* FIXME: for primary graphics card only */
@@ -853,7 +915,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-#if DEBUG_NVCAP
+ #if DEBUG_NVCAP
         printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
 		default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
 		default_NVCAP[4], default_NVCAP[5], default_NVCAP[6], default_NVCAP[7],
