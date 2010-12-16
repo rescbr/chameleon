@@ -68,7 +68,39 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 #define SMBHSTADD 4
 #define SMBHSTDAT 5
 #define SBMBLKDAT 7
+#if 0
+/** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
+unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
+{
+    int l1, h1, l2, h2;
+    unsigned long long t;
+	
+#define Reg32(reg)					(*(volatile uint32_t *)(base + reg))
+#define RegRead32(reg)				(Reg32(reg))
+#define RegWrite32(reg, value)		(Reg32(reg) = value)
 
+    RegWrite32(SMBHSTSTS, 0x1f);					// reset SMBus Controller
+    RegWrite32(SMBHSTDAT, 0xff);
+	
+    while(RegRead32(SMBHSTSTS) & 0x01);			// wait until ready
+	
+    RegWrite32(SMBHSTCMD, cmd);
+    RegWrite32(SMBHSTADD, (adr << 1) | 0x01 );
+    RegWrite32(SMBHSTCNT, 0x48 );
+	
+    rdtsc(l1, h1);
+	
+ 	while (!( RegRead32(SMBHSTSTS) & 0x02))		// wait til command finished
+	{	
+		rdtsc(l2, h2);
+		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
+		if (t > 5)
+			break;									// break after 5ms
+    }
+    return RegRead32(SMBHSTDAT);
+}
+#endif
+//#if 0
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
@@ -95,6 +127,7 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
     }
     return inb(base + SMBHSTDAT);
 }
+//#endif
 
 /* SPD i2c read optimization: prefetch only what we need, read non prefetcheable bytes on the fly */
 #define READ_SPD(spd, base, slot, x) spd[x] = smb_read_byte_intel(base, 0x50 + slot, x)
@@ -248,24 +281,33 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
     int        i, speed;
     uint8_t    spd_size, spd_type;
-    uint32_t   base;
+    uint32_t   base, mmio, hostc;
     bool       dump = false;
     RamSlotInfo_t*  slot;
 
+	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
+	DBG("SMBus CmdReg: 0x%x\n", cmd);
+	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
+
+	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
     base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
-    DBG("Scanning smbus_dev <%04x, %04x> ...\n",smbus_dev->vendor_id, smbus_dev->device_id);
+	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
+    verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
+		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 
     getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
-    bool fullBanks =  // needed at least for laptops
-		Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
+	// needed at least for laptops
+    bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
 	char spdbuf[MAX_SPD_SIZE];
     // Search MAX_RAM_SLOTS slots
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
+		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
         // Check spd is present
-        if (spd_size && (spd_size != 0xff) ) {
+        if (spd_size && (spd_size != 0xff))
+        {
 
 			slot->spd = spdbuf;
             slot->InUse = true;
@@ -276,7 +318,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
             
 			//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
             init_spd(slot->spd, base, i);
-			
+		
             switch (slot->spd[SPD_MEMORY_TYPE])  {
             case SPD_MEMORY_TYPE_SDRAM_DDR2:
                 
@@ -317,7 +359,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				}
 				slot->Frequency = freq;
 			}
-			
+
 			verbose("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
                        i, 
                        (int)slot->Type,
@@ -327,8 +369,9 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
+
 #if DEBUG_SPD
-                  dumpPhysAddr("spd content: ",slot->spd, spd_size);
+                  dumpPhysAddr("spd content: ", slot->spd, spd_size);
                     getc();
 #endif
         }
@@ -393,3 +436,4 @@ void scan_spd(PlatformInfo_t *p)
 {
     find_and_read_smbus_controller(root_pci_dev);
 }
+
