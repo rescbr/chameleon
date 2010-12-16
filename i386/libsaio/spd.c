@@ -68,39 +68,7 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 #define SMBHSTADD 4
 #define SMBHSTDAT 5
 #define SBMBLKDAT 7
-#if 0
-/** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
-unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
-{
-    int l1, h1, l2, h2;
-    unsigned long long t;
-	
-#define Reg32(reg)					(*(volatile uint32_t *)(base + reg))
-#define RegRead32(reg)				(Reg32(reg))
-#define RegWrite32(reg, value)		(Reg32(reg) = value)
 
-    RegWrite32(SMBHSTSTS, 0x1f);					// reset SMBus Controller
-    RegWrite32(SMBHSTDAT, 0xff);
-	
-    while(RegRead32(SMBHSTSTS) & 0x01);			// wait until ready
-	
-    RegWrite32(SMBHSTCMD, cmd);
-    RegWrite32(SMBHSTADD, (adr << 1) | 0x01 );
-    RegWrite32(SMBHSTCNT, 0x48 );
-	
-    rdtsc(l1, h1);
-	
- 	while (!( RegRead32(SMBHSTSTS) & 0x02))		// wait til command finished
-	{	
-		rdtsc(l2, h2);
-		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
-		if (t > 5)
-			break;									// break after 5ms
-    }
-    return RegRead32(SMBHSTDAT);
-}
-#endif
-//#if 0
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
@@ -127,7 +95,6 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
     }
     return inb(base + SMBHSTDAT);
 }
-//#endif
 
 /* SPD i2c read optimization: prefetch only what we need, read non prefetcheable bytes on the fly */
 #define READ_SPD(spd, base, slot, x) spd[x] = smb_read_byte_intel(base, 0x50 + slot, x)
