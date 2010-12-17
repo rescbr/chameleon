@@ -1,0 +1,5 @@
+#!/bin/sh
+# (c) Slice 2010
+nvram -p >nvram.inf
+echo Hello! NVRAM is saved!
+
