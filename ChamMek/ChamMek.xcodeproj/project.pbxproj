@@ -26,7 +26,7 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		12C26D3912B0DE0A00AF7F4B /* meklort */ = {isa = PBXFileReference; lastKnownFileType = folder; name = meklort; path = ..; sourceTree = SOURCE_ROOT; };
+		12C26D3912B0DE0A00AF7F4B /* slice */ = {isa = PBXFileReference; lastKnownFileType = folder; name = slice; path = ..; sourceTree = SOURCE_ROOT; };
 		8DD76FB20486AB0100D96B5E /* ChamMek */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ChamMek; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6A0FF2C0290799A04C91782 /* ChamMek.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = ChamMek.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,7 +55,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				12C26D3912B0DE0A00AF7F4B /* meklort */,
+				12C26D3912B0DE0A00AF7F4B /* slice */,
 				08FB7796FE84155DC02AAC07 /* main.c */,
 			);
 			name = Source;

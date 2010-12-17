@@ -113,8 +113,8 @@ vers.h:
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONREVISION \"`cat ../../revision`\"" >> $(SYMROOT)/vers.h
-#	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
+#	@echo "#define I386BOOT_CHAMELEONREVISION \"`cat ../../revision`\"" >> $(SYMROOT)/vers.h
+	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
 
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h

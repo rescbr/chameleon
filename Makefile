@@ -48,7 +48,7 @@ GENERIC_SUBDIRS =
 #
 
 all embedtheme optionrom tags debug install installhdrs modules: $(SYMROOT) $(OBJROOT)
-#	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
+	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
 	@if [ -z "$(RC_ARCHS)" ]; then					  \
 		RC_ARCHS="i386";					  \
 	fi;								  \
@@ -109,7 +109,7 @@ pkg installer: embedtheme
 	fi;
 
 release: $(SYMROOT)
-#	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
+	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
 	@if [ -e "$(SYMROOT)" ]; then					  \
 	    sudo `pwd`/package/buildpkg `pwd`/sym/package;		  \
 	fi;
