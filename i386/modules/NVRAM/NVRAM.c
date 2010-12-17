@@ -66,6 +66,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	EFI_GUID*	ret = 0;
 	uint16_t	bootOptionNumber = 0;
 	msglog("NVRAM is not implemented yet\n");
+	
 	return;
 	
 	msglog("NVRAM started\n");
@@ -155,6 +156,10 @@ int readNVRAM()
 		return -1;
 	}
 	fsize = file_size(fd);
+	if (!fsize) {
+		close (fd);
+		return -1;
+	}
 	if ((nvr = malloc(fsize)) == NULL) {
 		verbose("[ERROR] alloc NVRAM memory failed\n");
 		close (fd);
