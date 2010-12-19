@@ -6,7 +6,6 @@
 
 #include "boot.h"
 #include "bootstruct.h"
-#include "multiboot.h"
 #include "modules.h"
 
 #ifndef DEBUG_MODULES
@@ -820,7 +819,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
 				libraryOrdinal = immediate;
-				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
+				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
@@ -833,14 +832,14 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
+				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
 
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
 				// NOTE: this is wrong, fortunately we don't use it
-				libraryOrdinal = -immediate;
-				//DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
+				libraryOrdinal = immediate ? (SInt8)(BIND_OPCODE_MASK | immediate) : immediate;				
+				//printf("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
 
 				break;
 				
@@ -926,16 +925,26 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 			case BIND_OPCODE_DO_BIND:
 				//DBG("BIND_OPCODE_DO_BIND\n");
-				if(symbolAddr != 0xFFFFFFFF)
+				if(libraryOrdinal == BIND_SPECIAL_DYLIB_FLAT_LOOKUP && type == BIND_TYPE_POINTER)
 				{
-					address = segmentAddress + (UInt32)base;
-
-					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					// HACK(ish)
+					// Internal symbol, don't bind
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
-					getc();
+					//printf("Binding symbol %s, libraryOrdinal = %d, symboFlags = %d, type = %d\n", symbolName, libraryOrdinal, symboFlags, type);
+					
+					if(symbolAddr != 0xFFFFFFFF)
+					{
+						address = segmentAddress + (UInt32)base;
+						
+						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					}
+					else
+					{
+						printf("Unable to bind symbol %s, libraryOrdinal = %d, symboFlags = %d, type = %d\n", symbolName, libraryOrdinal, symboFlags, type);
+						getc();
+					}
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -956,17 +965,23 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				
-				
-				if(symbolAddr != 0xFFFFFFFF)
+				if(libraryOrdinal == BIND_SPECIAL_DYLIB_FLAT_LOOKUP && type == BIND_TYPE_POINTER)
 				{
-					address = segmentAddress + (UInt32)base;
-
-					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					// Internal symbol, don't bind
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
-					getc();
+					if(symbolAddr != 0xFFFFFFFF)
+					{
+						address = segmentAddress + (UInt32)base;
+						
+						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					}
+					else
+					{
+						printf("Unable to bind symbol %s\n", symbolName);
+						getc();
+					}
 				}
 				segmentAddress += tmp + sizeof(void*);
 
@@ -975,17 +990,23 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
 				//DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED\n");
-				
-				if(symbolAddr != 0xFFFFFFFF)
+				if(libraryOrdinal == BIND_SPECIAL_DYLIB_FLAT_LOOKUP && type == BIND_TYPE_POINTER)
 				{
-					address = segmentAddress + (UInt32)base;
-
-					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					// Internal symbol, don't bind
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
-					getc();
+					if(symbolAddr != 0xFFFFFFFF)
+					{
+						address = segmentAddress + (UInt32)base;
+						
+						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+					}
+					else
+					{
+						printf("Unable to bind symbol %s\n", symbolName);
+						getc();
+					}
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 
@@ -1023,16 +1044,29 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					{
 						
 						address = segmentAddress + (UInt32)base;
-
-						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
-						
+						if(libraryOrdinal == BIND_SPECIAL_DYLIB_FLAT_LOOKUP && type == BIND_TYPE_POINTER)
+						{
+							// Internal symbol, don't bind
+						}
+						else
+						{
+							
+							bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
+						}						
 						segmentAddress += tmp2 + sizeof(void*);
 					}
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
-					getc();
+					if(libraryOrdinal == BIND_SPECIAL_DYLIB_FLAT_LOOKUP && type == BIND_TYPE_POINTER)
+					{
+						// Internal symbol, don't bind
+					}
+					else
+					{						
+						printf("Unable to bind symbol %s\n", symbolName);
+						getc();
+					}
 				}
 				
 				
@@ -1171,17 +1205,6 @@ int is_module_loaded(const char* name)
 unsigned int lookup_all_symbols(const char* name)
 {
 	unsigned int addr = 0xFFFFFFFF;
-	if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
-	{
-		addr = lookup_symbol(name);
-		if(addr != 0xFFFFFFFF)
-		{
-			//DBG("Internal symbol %s located at 0x%X\n", name, addr);
-			return addr;
-		}
-	}
-
-	
 	symbolList_t* entry = moduleSymbols;
 	while(entry)
 	{
@@ -1196,6 +1219,17 @@ unsigned int lookup_all_symbols(const char* name)
 		}
 
 	}
+	
+	if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
+	{
+		addr = lookup_symbol(name);
+		if(addr != 0xFFFFFFFF)
+		{
+			//DBG("Internal symbol %s located at 0x%X\n", name, addr);
+			return addr;
+		}
+	}
+	
 
 #if DEBUG_MODULES
 	verbose("Unable to locate symbol %s\n", name);
