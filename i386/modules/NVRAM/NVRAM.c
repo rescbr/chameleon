@@ -65,9 +65,9 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	char*		bnName;
 	EFI_GUID*	ret = 0;
 	uint16_t	bootOptionNumber = 0;
-	msglog("NVRAM is not implemented yet\n");
+//	msglog("NVRAM is not implemented yet\n");
 	
-	return;
+//	return;
 	
 	msglog("NVRAM started\n");
 	

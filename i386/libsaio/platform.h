@@ -128,11 +128,11 @@ typedef struct _PlatformInfo_t {
 		uint32_t		NoCores;		// No Cores per Package
 		uint32_t		NoThreads;		// Threads per Package
 		uint8_t			MaxCoef;		// Max Multiplier
-		uint8_t			MaxDiv;
-		uint8_t			MinCoef;
+		uint8_t			MaxDiv;			// Possible 0,5
+		uint8_t			MinCoef;		// Min Multiplier
 		uint8_t			CurrCoef;		// Current Multiplier
 		uint8_t			CurrDiv;
-		float			MaxRatio;				
+		float			MaxRatio;		// non-integer ratio		
 		float			CurrRatio;				
 		uint64_t		TSCFrequency;		// TSC Frequency Hz
 		uint64_t		FSBFrequency;		// FSB Frequency Hz

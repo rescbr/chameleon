@@ -10,7 +10,7 @@
 #include "cpu.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 0
+#define DEBUG_CPU 1
 #endif
 
 #if DEBUG_CPU
@@ -98,7 +98,7 @@ void scan_cpu() //PlatformInfo_t *p)
 	PlatformInfo_t *p = Platform;
 	int i = 0;
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
-	uint64_t	msr, flex_ratio;
+	uint64_t	msr; //, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, currdiv, mindiv;
 
 	maxcoef = maxdiv = currcoef = currdiv = mindiv = 0;
@@ -200,7 +200,7 @@ void scan_cpu() //PlatformInfo_t *p)
 				DBG("msr(0x%04x): platform_info %08x-%08x\n", MSR_PLATFORM_INFO,
 				(msr >> 32) & 0xffffffff, msr & 0xffffffff);
 				mindiv = (msr >> 40) & 0xff;
-				flex_ratio = (msr >> 8) & 0xff;
+				maxcoef = (msr >> 8) & 0xff;  
 				//Slice - doesn't work
 				/*
 				msr = rdmsr64(MSR_FLEX_RATIO);
@@ -215,9 +215,11 @@ void scan_cpu() //PlatformInfo_t *p)
 				if (msr) {
 					currcoef = msr & 0x1f;
 				}
-				if (currcoef < flex_ratio) {
-					currcoef = flex_ratio;
+				
+				if (!currcoef) {
+					currcoef = maxcoef;
 				}
+				
 				if (currcoef < mindiv) {
 					currcoef = mindiv;
 				}
@@ -230,8 +232,6 @@ void scan_cpu() //PlatformInfo_t *p)
 			else //not nehalem
 			{
 				//Slice - it is not FSB frequency. It is System Bus Speed: FSB = SBS * 4;	
-				//crash with i7?
-#if 1 //NOTI7	
 				if (p->CPU.Family != 0x0d){
 					msr = rdmsr64(MSR_FSB_FREQ);
 					switch (msr & 7) {
@@ -262,14 +262,18 @@ void scan_cpu() //PlatformInfo_t *p)
 					}
 					DBG("msr(0x%04x): MSR_FSB_FREQ %dMHz\n", MSR_FSB_FREQ, fsbFrequency/MEGA);
 				}
-#endif	
 				
 				msr = rdmsr64(MSR_PLATFORM_INFO);
-				uint32_t m2 = msr & 0xffffffff;
+				uint32_t m2 = msr >> 32;
 				DBG("msr(0x%04x): platform_info %08x-%08x\n", MSR_PLATFORM_INFO,
-					(msr >> 32) & 0xffffffff, m2);
-				currcoef = (msr >> 40) & 0xff;
+					m2 & 0xffffffff, msr & 0xffffffff);
+				
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
+				m2 = msr >> 32;
+				DBG("msr(0x%04x): MSR_IA32_PERF_STATUS %08x-%08x\n", MSR_IA32_PERF_STATUS,
+					m2 & 0xffffffff, msr & 0xffffffff);
+				
+				currcoef = (msr >> 8) & 0x1f;
 				mindiv = (msr >> 24) & 0xf;
 				if (currcoef < mindiv) {
 					currcoef = mindiv;
@@ -462,7 +466,7 @@ void scan_cpu() //PlatformInfo_t *p)
 		msglog("CPU: fsb=0 ! using the default value 100MHz !\n");
 	}
 	
-	
+/*	
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
 	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
@@ -471,7 +475,7 @@ void scan_cpu() //PlatformInfo_t *p)
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 	p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-	
+*/	
 
 
 	p->CPU.MaxCoef = maxcoef;

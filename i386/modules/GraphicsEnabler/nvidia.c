@@ -374,7 +374,6 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06C4, "GeForce GTX 465" },
 	{ 0x10DE06CA, "GeForce GTX 480M" },
 	{ 0x10DE06CD, "GeForce GTX 470" },
-	{ 0x10DE06DD, "Quadro 4000" },
 	{ 0x10DE06D1, "Tesla C2050" },	// TODO: sub-device id: 0x0771
 	{ 0x10DE06D1, "Tesla C2070" },	// TODO: sub-device id: 0x0772
 	{ 0x10DE06D2, "Tesla M2070" },
@@ -472,7 +471,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1082, "D13U" },
 	{ 0x10DE1083, "D13U" },
 	{ 0x10DE1098, "D13U" },
-	{ 0x10DE109A, "N12E-Q5" },
+	{ 0x10DE109A, "N12E-Q5" }
 };
 
 static uint16_t swap16(uint16_t x)
@@ -834,7 +833,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			devicepath);
 
 	rom = malloc(NVIDIA_ROM_SIZE);
-	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
+	sprintf(nvFilename, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);

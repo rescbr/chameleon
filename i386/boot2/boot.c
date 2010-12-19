@@ -91,7 +91,7 @@ BVRef   menuBVR;
 BVRef   bvChain;
 
 //static void selectBiosDevice(void);
-static unsigned long Adler32(unsigned char *buffer, long length);
+//static unsigned long Adler32(unsigned char *buffer, long length);
 static bool getOSVersion(char *str);
 
 #ifndef OPTION_ROM
@@ -547,12 +547,12 @@ void common_boot(int biosdev)
         } else {
 			if(gMacOSVersion[3] == '6') 
 				sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePathSnow, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", adler32);
-			else if(gMacOSVersion[3] == '5')
+			else //if(gMacOSVersion[3] == '5')
 				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
-			else
-				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePathTiger);
+//			else
+//				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePathTiger);
         }
-		verbose("Try cache %s\n", gBootKernelCacheFile);
+		msglog("Try cache %s\n", gBootKernelCacheFile);
         // Check for cache file.
         trycache = (((gBootMode & kBootModeSafe) == 0) &&
                     !gOverrideKernel &&
@@ -733,7 +733,7 @@ static bool getOSVersion(char *str)
 #define DO4(buf,i)  DO2(buf,i); DO2(buf,i+2);
 #define DO8(buf,i)  DO4(buf,i); DO4(buf,i+4);
 #define DO16(buf)   DO8(buf,0); DO8(buf,8);
-
+/*
 unsigned long Adler32(unsigned char *buf, long len)
 {
     unsigned long s1 = 1; // adler & 0xffff;
@@ -759,3 +759,4 @@ unsigned long Adler32(unsigned char *buf, long len)
     result = (s2 << 16) | s1;
     return OSSwapHostToBigInt32(result);
 }
+*/
