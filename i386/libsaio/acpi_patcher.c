@@ -560,7 +560,7 @@ uint16_t VID_to_mV(uint8_t VID) {
 }
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
-{	
+{
 	char ssdt_header[] =
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
@@ -572,13 +572,13 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	
 	char ssdt_pct[] =
 	{
-		0x08, 0x5F, 0x50, 0x43, 0x54, 0x12, 0x2C,	/* 00000030    "0._PCT.," */
-		0x02, 0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00,	/* 00000038    "........" */
-		0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* 00000040    "........" */
-		0x00, 0x00, 0x00, 0x00, 0x79, 0x00, 0x11, 0x14,	/* 00000048    "....y..." */
-		0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F, 0x00, 0x00,	/* 00000050    "........" */
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* 00000058    "........" */
-		0x00, 0x79, 0x00
+		0x08, 0x5F, 0x50, 0x43, 0x54, 0x12, 0x2C, 0x02,	/* 0._PCT., */
+		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F,	/* ........ */
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ........ */
+		0x00, 0x00, 0x00, 0x79, 0x00, 0x11, 0x14, 0x0A, /* ....y... */
+		0x11, 0x82, 0x0C, 0x00, 0x7F, 0x00, 0x00, 0x00, /* ........ */
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ........ */
+		0x79, 0x00
 	};
 
 	if (Platform.CPU.Vendor != 0x756E6547) {
@@ -672,7 +672,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 				msr = rdmsr64(MSR_IA32_PERF_CONTROL);
 				wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (minimum.FID << 8) | i);
 				intel_waitforsts();
-				minimum.VID = rdmsr64(MSR_IA32_PERF_STATUS) & 0x3F; 
+				minimum.VID = rdmsr64(MSR_IA32_PERF_STATUS) & 0x3F;
 				delay(1);
 			}
 
@@ -962,6 +962,30 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	return NULL;
 }
 
+/*valv: to be uncommented when finished ;)
+struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_dsdt* dsdt)
+{
+	char ssdt_header[] =
+	{
+        0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00,
+        0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x42,
+        0x43, 0x70, 0x75, 0x54, 0x73, 0x74, 0x00, 0x00,
+        0x00, 0x10, 0x00, 0x00, 0x49, 0x4E, 0x54, 0x4C,
+        0x31, 0x03, 0x10, 0x20
+	};
+	
+	char ssdt_ptc[] =
+	{
+		0x08, 0x5F, 0x50, 0x54, 0x43, 0x12, 0x2C, 0x02,
+		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x79, 0x00, 0x11, 0x14, 0x0A,
+		0x11, 0x82, 0x0C, 0x00, 0x7F, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x79, 0x00
+	};
+}*/
+
 void *loadSSDTTable(int ssdt_number)
 {
 	void *tableAddr;
@@ -1203,7 +1227,7 @@ int setupAcpi(void)
 	int version;
 	void *new_dsdt=NULL, *new_hpet=NULL, *new_sbst=NULL, *new_ecdt=NULL, *new_asft=NULL, *new_dmar=NULL, *new_apic=NULL, *new_mcfg=NULL;//, *new_ssdt[14];
 
-	struct acpi_2_ssdt *new_ssdt[16]; // 2 additional tables for pss & cst
+	struct acpi_2_ssdt *new_ssdt[16]; // 2 additional tables for pss/tss & cst
 	struct acpi_2_fadt *fadt; // will be used in CST generator
 
 	bool oem_dsdt=false, oem_ssdt=false, oem_hpet=false, oem_sbst=false, oem_ecdt=false, oem_asft=false, oem_dmar=false, oem_apic=false, oem_mcfg=false;
@@ -1211,7 +1235,7 @@ int setupAcpi(void)
 	bool update_acpi=false, gen_xsdt=false;
 	bool hpet_replaced=false, sbst_replaced=false, ecdt_replaced=false, asft_replaced=false, dmar_replaced=false, apic_replaced=false, mcfg_replaced=false;
 	bool hpet_added=false, sbst_added=false, ecdt_added=false, asft_added=false, dmar_added=false, apic_added=false, mcfg_added=false;
-	bool gen_cst=false, gen_pss=false;
+	bool gen_cst=false, gen_pss=false;//, gen_tss=false;
 
 	int curssdt=0, loadtotssdt=0, totssdt=0, newtotssdt=0;
 
@@ -1243,6 +1267,9 @@ int setupAcpi(void)
 				| (getBoolForKey(kEnableC6State, &tmpval6, &bootInfo->bootConfig)&&tmpval6);
 
 		gen_pss = getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
+
+//		gen_tss = getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
+
 		update_acpi = getBoolForKey(kUpdateACPI, &tmpval, &bootInfo->bootConfig)&&tmpval;
 	}
 
@@ -1271,7 +1298,7 @@ int setupAcpi(void)
 	if (!oem_mcfg)
 		new_mcfg=loadACPITable(kMCFG);
 
-	if (gen_cst || gen_pss) oem_ssdt = false;
+	if (gen_cst || gen_pss/* || gen_tss*/) oem_ssdt = false;
 
 	if (!oem_ssdt)
 	{
@@ -1568,7 +1595,14 @@ int setupAcpi(void)
 							gen_pss= false;
 							loadtotssdt++;
 						}
-					}
+/*					
+						// Generating _TSS SSDT
+						else if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+						{
+							gen_tss= false;
+							loadtotssdt++;
+						}
+*/					}
 
 					continue;
 				}
@@ -1907,7 +1941,14 @@ int setupAcpi(void)
 								gen_pss= false;
 								loadtotssdt++;
 							}
-						}
+/*						
+							// Generating _TSS SSDT
+							else if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+							{
+								gen_tss= false;
+								loadtotssdt++;
+							}
+*/						}
 
 						continue;
 					}

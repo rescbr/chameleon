@@ -464,7 +464,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DF0, "GeForce GT 425M" },
 	{ 0x10DE0E22, "GeForce GTX 460" },
 	{ 0x10DE0E24, "GeForce GTX 460" },
-	{ 0x10DE1080, "GeForce GTX 580" }
+	{ 0x10DE1080, "GeForce GTX 580" },
+	{ 0x10DE10C3, "GeForce 8400 GS" }
 };
 
 static uint16_t swap16(uint16_t x)

@@ -30,29 +30,29 @@ typedef struct {
 // defaults for a MacBook
 static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"MB41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",			"04/01/2008"					},
+	{"SMbiosversion",		"MB41.88Z.00C1.B00.0802091535"	},
+	{"SMbiosdate",			"02/09/08"						},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacBook4,1"					},
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacBook"						},
 	{"SMboardmanufacter",	"Apple Inc."					},
-	{"SMboardproduct",		"Mac-F42D89C8"					},
-	{"SMboardversion",		"MacBook4,1"					},
+	{"SMboardproduct",		"Mac-F22788A9"					},
+	{"SMboardversion",		"PVT"							},
 	{"SMchassismanufacter",	"Apple Inc."					},
-	{"SMchassisversion",	"Mac-F42D89C8"					},
+	{"SMchassisversion",	"Mac-F22788A9"					},
 	{"SMchassisserial",		"SOMESRLNMBR"					},
 /*	{"SMSKU",				"System SKU#"					},*/
-	{"SMboardserial",		"Base Board Serial#"			},
+	{"SMboardserial",		"1"								},
 	{ "",""	}
 };
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"MBP41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",			"04/01/2008"					},
+	{"SMbiosversion",		"MBP41.88Z.00C1.B03.0802271651"	},
+	{"SMbiosdate",			"02/27/08"						},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacBookPro4,1"					},
 	{"SMsystemversion",		"1.0"							},
@@ -60,12 +60,12 @@ static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMfamily",			"MacBook Pro"					},
 	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F42D89C8"					},
-	{"SMboardversion",		"MacBookPro4,1"					},
+	{"SMboardversion",		"PVT"							},
 	{"SMchassismanufacter",	"Apple Inc."					},
 	{"SMchassisversion",	"Mac-F42D89C8"					},
 	{"SMchassisserial",		"SOMESRLNMBR"					},
 /*	{"SMSKU",				"System SKU#"					},*/
-	{"SMboardserial",		"Base Board Serial#"			},
+	{"SMboardserial",		"1"								},
 	{ "",""	}
 };
 
@@ -94,7 +94,7 @@ static const SMStrEntryPair const sm_macbookpro_core_defaults[]={
 static const SMStrEntryPair const sm_macmini_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
 	{"SMbiosversion",		"MM21.88Z.009A.B00.0706281359"	},
-	{"SMbiosdate",			"04/01/2008"					},
+	{"SMbiosdate",			"06/28/08"						},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"Macmini2,1"					},
 	{"SMsystemversion",		"1.0"							},
@@ -102,12 +102,12 @@ static const SMStrEntryPair const sm_macmini_defaults[]={
 	{"SMfamily",			"Napa Mac"						},
 	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F4208EAA"					},
-	{"SMboardversion",		"Macmini2,1"					},
+	{"SMboardversion",		"PVT"							},
 	{"SMchassismanufacter",	"Apple Inc."					},
 	{"SMchassisversion",	"Mac-F4208EAA"					},
 	{"SMchassisserial",		"SOMESRLNMBR"					},
 /*	{"SMSKU",				"System SKU#"					},*/
-	{"SMboardserial",		"Base Board Serial#"			},
+	{"SMboardserial",		"1"								},
 	{ "",""	}
 };
 
@@ -134,19 +134,19 @@ static const SMStrEntryPair const sm_imac_defaults[]={
 
 // defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro_defaults[]={
-	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP31.88Z.006C.B05.0802291410"	},
-	{"SMbiosdate",			"04/01/2008"					},
-	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"MP31.88Z.006C.B02.0801021250"	},
+	{"SMbiosdate",			"01/02/08"						},
+	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacPro3,1"						},
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacPro"						},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F4208DC8"					},
-	{"SMboardversion",		"MacPro3,1"						},
-	{"SMchassismanufacter",	"Apple Computer, Inc."			},
-	{"SMchassisversion",	"Mac-F4208DC8"					},
+	{"SMboardproduct",		"Mac-F42C88C8"					},
+	{"SMboardversion",		"Proto1"						},
+	{"SMchassismanufacter",	"Apple Inc."					},
+	{"SMchassisversion",	"Mac-F42C88C8"					},
 	{"SMchassisserial",		"SOMESRLNMBR"					},
 /*	{"SMSKU",				"System SKU#"					},*/
 	{"SMboardserial",		"Base Board Serial#"			},
@@ -156,17 +156,17 @@ static const SMStrEntryPair const sm_macpro_defaults[]={
 // defaults for an iMac11,1 core i3/i5/i7
 static const SMStrEntryPair const sm_imac_core_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"IM111.88Z.0034.B00.0802091538"	},
-	{"SMbiosdate",			"06/01/2009"					},
+	{"SMbiosversion",		"IM111.88Z.0034.B00.0910301727"	},
+	{"SMbiosdate",			"10/30/09"						},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"iMac11,1"						},	
 	{"SMsystemversion",		"1.0"							},
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"iMac"							},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardmanufacter",	"Apple Inc."					},
 	{"SMboardproduct",		"Mac-F2268DAE"					},
-	{"SMboardversion",		"iMac11,1"						},
-	{"SMchassismanufacter",	"Apple Computer, Inc."			},
+	{"SMboardversion",		"Not Specified"					},
+	{"SMchassismanufacter",	"Apple Inc."					},
 	{"SMchassisversion",	"Mac-F2268DAE"					},
 	{"SMchassisserial",		"SOMESRLNMBR"					},
 /*	{"SMSKU",				"System SKU#"					},*/
