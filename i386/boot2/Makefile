@@ -19,8 +19,10 @@ CONFIG = hd
 SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
+KLIBCDIR = ../klibc
+
 UTILDIR = ../util
-INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
+INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR) -I$(KLIBCDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else
@@ -29,8 +31,8 @@ endif
 AS = as
 LD = gcc
 # LIBS= -lc_static
-LIBS= -L$(SYMDIR) -lsaio -lsa
-LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a
+LIBS= -L$(SYMDIR) -lsaio -lsa -lklibc 
+LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a $(SYMDIR)/libklibc.a
 
 OTHER_FILES =
 
@@ -39,14 +41,12 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o resume.o bmdecompress.o modules.o
-# button.o browser.o scrollbar.o == NOTYET	
+OBJS = boot2.o boot.o modules.o modules_support.o	
 
 UTILDIR = ../util
 SFILES = boot2.s
-CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c
-HFILES = boot.h appleClut8.h mboot.h multiboot.h
+CFILES = boot.c graphics.c drivers.c prompt.c options.c 
+HFILES = boot.h appleClut8.h multiboot.h
 OTHERFILES = Makefile
 ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
@@ -74,18 +74,34 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)
 	@make Symbols.dylib
 
 	@echo "\t[LD] boot_embeded.sys"
 	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext
+		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS)
+
+	@ld -arch i386 \
+	-undefined dynamic_lookup \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-final_output Symbols.dylib \
+	-L$(OBJROOT)/ \
+	-L$(OBJROOT)/../ \
+	-L$(OBJROOT)/../*/ \
+	-L$(SYMROOT)/ \
+	$(filter %.o,$^) $(LIBS) \
+	-weak_library $(SYMROOT)/boot.sys \
+	-o $(SYMROOT)/Symbols_NOTE_linker_use_only.dylib
+
+
 
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
-	@##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@##size $(SYMROOT)/boot.sys
 	@ls -l $(SYMROOT)/boot
@@ -105,7 +121,7 @@ embed_symbols: machOconv
 	@echo ******* Patching at $(PATCH_ADDR) ******
 	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
 	@echo "\t[MACHOCONV] boot_embeded"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot
 
 
 prompt.o: vers.h
