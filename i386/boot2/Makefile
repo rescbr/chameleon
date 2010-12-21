@@ -41,7 +41,10 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o modules.o modules_support.o	
+OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
+		    ramdisk.o resume.o bmdecompress.o modules.o modules_support.o
+
+#OBJS = boot2.o boot.o modules.o modules_support.o	
 
 UTILDIR = ../util
 SFILES = boot2.s
