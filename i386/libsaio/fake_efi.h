@@ -10,6 +10,7 @@
 
 extern void setupFakeEfi(void);
 extern char MacModel[8];
+extern char MacProduct[14];
 extern unsigned int ModelRev;
 
 #endif /* !__LIBSAIO_FAKE_EFI_H */

@@ -1178,4 +1178,3 @@ struct DMIHeader* FindNextDmiTableOfType(int type, int minlength)
     }
     return NULL; // not found
 };
-

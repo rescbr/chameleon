@@ -248,19 +248,19 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	};
 
 	if (Platform.CPU.Vendor != 0x756E6547) {
-		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
+		verbose ("C-States: Not an Intel platform !!!\n");
 		return NULL;
 	}
 	
 	if (fadt == NULL) {
-		verbose ("FACP not exists: C-States will not be generated !!!\n");
+		verbose ("C-States: FACP not found !!!\n");
 		return NULL;
 	}
 	
 	struct acpi_2_dsdt* dsdt = (void*)fadt->DSDT;
 	
 	if (dsdt == NULL) {
-		verbose ("DSDT not found: C-States will not be generated !!!\n");
+		verbose ("C-States: DSDT not found !!!\n");
 		return NULL;
 	}
 	
@@ -531,7 +531,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 	}
 	else 
 	{
-		verbose ("ACPI CPUs not found: C-States not generated !!!\n");
+		verbose ("C-States: ACPI CPUs not found !!!\n");
 	}
 
 	return NULL;
@@ -582,12 +582,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	};
 
 	if (Platform.CPU.Vendor != 0x756E6547) {
-		verbose ("Not an Intel platform: P-States will not be generated !!!\n");
+		verbose ("P-States: Not an Intel platform !!!\n");
 		return NULL;
 	}
 	
 	if (!(platformCPUFeature(CPU_FEATURE_MSR))) {
-		verbose ("Unsupported CPU: P-States will not be generated !!!\n");
+		verbose ("P-States: Unsupported CPU !!!\n");
 		return NULL;
 	}
 	
@@ -686,7 +686,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		// Sanity check
 		if (maximum.CID < minimum.CID)
 		{
-			DBG("Insane FID values!");
+			DBG("P-States: Insane FID values!");
 			p_states_count = 1;
 		}
 		else
@@ -783,11 +783,18 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			}
 			else verbose("P-State: Starting from state P%d\n", pstart);
 		}
-
+		
 		// Generating SSDT
 		if (p_states_count > 0)
 		{	
 			int i;
+			//valv: fix p-states number issue for some models. TODO: move to top
+			if(!strstr(MacProduct, "applemac2010"))
+			{
+				verbose("Model detected: %s\n", MacProduct);
+				if(strstr(MacProduct, "MacBookPro4,1") && ((p_states_count > 9) && ((pstart == 0) && (pstates == 0)))) pstates = 8;
+				if(strstr(MacProduct, "MacBookAir1,1") && ((p_states_count > 4) && ((pstart == 0) && (pstates == 0)))) pstates = 3;
+			}
 			
 			struct aml_chunk* root = aml_create_node(NULL);
 			aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
@@ -807,74 +814,6 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			struct aml_chunk* name_pss = aml_add_name(scop, "PSS_");
 			struct aml_chunk* pack_pss = aml_add_package(name_pss);
 
-//valv: this should not be
-/*			if(Platform.CPU.Turbo)
-			{
-				int turbo_one = Platform.CPU.Tone;
-				int turbo_two = Platform.CPU.Ttwo;
-				int turbo_thr = Platform.CPU.Tthr;
-				int turbo_for = Platform.CPU.Tfor;
-
-				uint8_t TFIDone = (turbo_one & 0x1F);
-				uint8_t TFIDtwo = (turbo_two & 0x1F);
-				uint8_t TFIDthr = (turbo_thr & 0x1F);
-				uint8_t TFIDfor = (turbo_for & 0x1F);
-
-				uint32_t fsb = Platform.CPU.FSBFrequency / 1000000;
-				uint32_t tfreq_one = (TFIDone * fsb);
-				uint32_t tfreq_two = (TFIDtwo * fsb);
-				uint32_t tfreq_thr = (TFIDthr * fsb);
-				uint32_t tfreq_for = (TFIDfor * fsb);
-
-				if(tfreq_one > 0)
-				{
-					struct aml_chunk* psturbo1 = aml_add_package(pack_pss);
-					aml_add_dword(psturbo1, tfreq_one);
-					aml_add_dword(psturbo1, 0x00000000); // Power
-					aml_add_dword(psturbo1, 0x0000000A); // Latency
-					aml_add_dword(psturbo1, 0x0000000A); // Latency
-					aml_add_dword(psturbo1, TFIDone);
-					aml_add_dword(psturbo1, TFIDone);
-					verbose("P-State: Added [TurboFreq %d MHz, FID 0x%x]\n", tfreq_one, TFIDone);
-				}
-
-				if((tfreq_one != tfreq_two) && (tfreq_two > 0))
-				{
-					struct aml_chunk* psturbo2 = aml_add_package(pack_pss);
-					aml_add_dword(psturbo2, tfreq_two);
-					aml_add_dword(psturbo2, 0x00000000); // Power
-					aml_add_dword(psturbo2, 0x0000000A); // Latency
-					aml_add_dword(psturbo2, 0x0000000A); // Latency
-					aml_add_dword(psturbo2, TFIDtwo);
-					aml_add_dword(psturbo2, TFIDtwo);
-					verbose("P-State: Added [TurboFreq %d MHz, FID 0x%x]\n", tfreq_two, TFIDtwo);
-				}
-
-				if((tfreq_two != tfreq_thr) && (tfreq_thr > 0))
-				{
-					struct aml_chunk* psturbo3 = aml_add_package(pack_pss);
-					aml_add_dword(psturbo3, tfreq_thr);
-					aml_add_dword(psturbo3, 0x00000000); // Power
-					aml_add_dword(psturbo3, 0x0000000A); // Latency
-					aml_add_dword(psturbo3, 0x0000000A); // Latency
-					aml_add_dword(psturbo3, TFIDthr);
-					aml_add_dword(psturbo3, TFIDthr);
-					verbose("P-State: Added [TurboFreq %d MHz, FID 0x%x]\n", tfreq_thr, TFIDthr);
-				}
-
-				if((tfreq_thr != tfreq_for) && (tfreq_for > 0))
-				{
-					struct aml_chunk* psturbo4 = aml_add_package(pack_pss);
-					aml_add_dword(psturbo4, tfreq_for);
-					aml_add_dword(psturbo4, 0x00000000); // Power
-					aml_add_dword(psturbo4, 0x0000000A); // Latency
-					aml_add_dword(psturbo4, 0x0000000A); // Latency
-					aml_add_dword(psturbo4, TFIDfor);
-					aml_add_dword(psturbo4, TFIDfor);
-					verbose("P-State: Added [TurboFreq %d MHz, FID 0x%x]\n", tfreq_for, TFIDfor);
-				}
-			}
-*/
 			for (i = pstart; i < p_states_count; i++)
 			{
 				if ((p_states[i].Frequency <= freq_max) && (p_states[i].Frequency >= freq_min))
@@ -921,8 +860,6 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			}
 			
 			struct aml_chunk* name_ppc = aml_add_name(scop, "PPC_");
-			/*struct aml_chunk* pack_ppc = aml_add_package(name_ppc);
-			struct aml_chunk* ppc = aml_add_package(pack_ppc);*/
 			aml_add_byte(name_ppc, 0x00);
 			
 			// Add aliaces
@@ -956,14 +893,13 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		}
 	}
 	else {
-		verbose ("ACPI CPUs not found: P-States not generated !!!\n");
+		verbose ("P-States: ACPI CPUs not found !!!\n");
 	}
 	
 	return NULL;
 }
 
-/*valv: to be uncommented when finished ;)
-struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_dsdt* dsdt)
+struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_fadt* fadt)
 {
 	char ssdt_header[] =
 	{
@@ -984,7 +920,146 @@ struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_dsdt* dsdt)
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x79, 0x00
 	};
-}*/
+	
+	if (Platform.CPU.Vendor != 0x756E6547) {
+		verbose ("T-States: Not an Intel platform !!!\n");
+		return NULL;
+	}
+	
+	if (!(platformCPUFeature(CPU_FEATURE_MSR))) {
+		verbose ("T-States: Unsupported CPU !!!\n");
+		return NULL;
+	}
+	
+	if (fadt == NULL) {
+		verbose ("FACP not found: T-States will not be generated !!!\n");
+		return NULL;
+	}
+	
+	struct acpi_2_dsdt* dsdt = (void*)fadt->DSDT;
+	
+	if (dsdt == NULL) {
+		verbose ("T-States: DSDT not found !!!\n");
+		return NULL;
+	}
+
+	if (acpi_cpu_count == 0)
+		get_acpi_cpu_names((void*)dsdt, dsdt->Length);
+	
+	if (acpi_cpu_count > 0)
+	{
+		
+		struct t_state t_states[32];
+		uint8_t t_states_count = 0, ctrl0 = 0x10, j = 0x01;
+		int i, step;
+		
+		if(!fadt->DUTY_WIDTH)
+		{
+			verbose("T-States: Unsupported CPU !!!\n");
+			return NULL;
+		}
+		
+		verbose("T-States: duty_offset=%d, duty_width=%d", fadt->DUTY_OFFSET, fadt->DUTY_WIDTH);
+		uint8_t duty_cycle = fadt->DUTY_WIDTH + fadt->DUTY_OFFSET;
+		
+		if (duty_cycle > 4)
+		{
+			verbose(", Spanning bit 4");
+			//return NULL;
+			t_states_count = 8;
+		}
+		else t_states_count = 1 << fadt->DUTY_WIDTH;
+
+		step = (1000 / t_states_count);
+		verbose("\nT-States: step=%d\n", step);
+		
+		for (i = 1; i < t_states_count; i++)
+		{
+			t_states[i].perf = (1000 - (step * i)) / 10;
+			t_states[i].pwer = 1000 - (step * i);
+			t_states[i].ctrl = ctrl0 - j;
+			j++;
+		}
+
+		// Generating SSDT
+		if (t_states_count > 0)
+		{
+			struct aml_chunk* root = aml_create_node(NULL);
+			aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
+			struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
+
+			struct aml_chunk* name_tpc = aml_add_name(scop, "TPC_");
+			aml_add_byte(name_tpc, 0x00);
+
+			aml_add_buffer(scop, ssdt_ptc, sizeof(ssdt_ptc));
+
+			struct aml_chunk* name_tss = aml_add_name(scop, "TSS_");
+			struct aml_chunk* pack_tss = aml_add_package(name_tss);
+
+			struct aml_chunk* tssp0 = aml_add_package(pack_tss);
+			aml_add_dword(tssp0, 0x64);		// Frequency %
+			aml_add_dword(tssp0, 0x03E8);	// Power
+			aml_add_dword(tssp0, 0x00);		// Latency
+			aml_add_dword(tssp0, 0x00);		// Control; spec says 0x07; apple uses 0;
+			aml_add_dword(tssp0, 0x00);		// Status
+			
+			for (i = 1; i < t_states_count; i++)
+			{
+				struct aml_chunk* tssp = aml_add_package(pack_tss);
+
+				aml_add_dword(tssp, t_states[i].perf);
+				aml_add_dword(tssp, t_states[i].pwer);
+				aml_add_dword(tssp, 0x00);
+				aml_add_dword(tssp, t_states[i].ctrl);
+				aml_add_dword(tssp, 0x00);
+			}
+
+			struct aml_chunk* name_tsd = aml_add_name(scop, "TSD_");
+			struct aml_chunk* pack_tsd = aml_add_package(name_tsd);
+			struct aml_chunk* tsd = aml_add_package(pack_tsd);
+			aml_add_byte(tsd, 0x05);
+			aml_add_byte(tsd, 0x00);
+			aml_add_dword(tsd, 0x00);
+			aml_add_dword(tsd, 0xfc);
+			aml_add_dword(tsd, Platform.CPU.NoCores);
+
+			// Add aliaces
+			for (i = 0; i < acpi_cpu_count; i++) 
+			{
+				char name[9];
+				sprintf(name, "_PR_%c%c%c%c", acpi_cpu_name[i][0], acpi_cpu_name[i][1], acpi_cpu_name[i][2], acpi_cpu_name[i][3]);
+				
+				scop = aml_add_scope(root, name);
+				aml_add_alias(scop, "TPC_", "_TPC");
+				aml_add_alias(scop, "PTC_", "_PTC");
+				aml_add_alias(scop, "TSS_", "_TSS");
+				aml_add_alias(scop, "TSD_", "_TSD");
+			}
+
+			aml_calculate_size(root);
+			
+			struct acpi_2_ssdt *ssdt = (struct acpi_2_ssdt *)AllocateKernelMemory(root->Size);
+			
+			aml_write_node(root, (void*)ssdt, 0);
+			
+			ssdt->Length = root->Size;
+			ssdt->Checksum = 0;
+			ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
+                        
+                        aml_destroy_node(root);
+                        			
+			verbose ("T-States: %d states were succefully generated\n");
+		
+			return ssdt;
+		}
+	}
+	else 
+	{
+		verbose ("ACPI CPUs not found: T-States not generated !!!\n");
+	}
+
+	return NULL;
+}
 
 void *loadSSDTTable(int ssdt_number)
 {
@@ -1235,7 +1310,7 @@ int setupAcpi(void)
 	bool update_acpi=false, gen_xsdt=false;
 	bool hpet_replaced=false, sbst_replaced=false, ecdt_replaced=false, asft_replaced=false, dmar_replaced=false, apic_replaced=false, mcfg_replaced=false;
 	bool hpet_added=false, sbst_added=false, ecdt_added=false, asft_added=false, dmar_added=false, apic_added=false, mcfg_added=false;
-	bool gen_cst=false, gen_pss=false;//, gen_tss=false;
+	bool gen_cst=false, gen_pss=false, gen_tss=false;
 
 	int curssdt=0, loadtotssdt=0, totssdt=0, newtotssdt=0;
 
@@ -1268,7 +1343,7 @@ int setupAcpi(void)
 
 		gen_pss = getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 
-//		gen_tss = getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		gen_tss = getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 
 		update_acpi = getBoolForKey(kUpdateACPI, &tmpval, &bootInfo->bootConfig)&&tmpval;
 	}
@@ -1298,7 +1373,7 @@ int setupAcpi(void)
 	if (!oem_mcfg)
 		new_mcfg=loadACPITable(kMCFG);
 
-	if (gen_cst || gen_pss/* || gen_tss*/) oem_ssdt = false;
+	if (gen_cst || gen_pss || gen_tss) oem_ssdt = false;
 
 	if (!oem_ssdt)
 	{
@@ -1595,14 +1670,14 @@ int setupAcpi(void)
 							gen_pss= false;
 							loadtotssdt++;
 						}
-/*					
+					
 						// Generating _TSS SSDT
-						else if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+						if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
 						{
 							gen_tss= false;
 							loadtotssdt++;
 						}
-*/					}
+					}
 
 					continue;
 				}
@@ -1941,14 +2016,14 @@ int setupAcpi(void)
 								gen_pss= false;
 								loadtotssdt++;
 							}
-/*						
+						
 							// Generating _TSS SSDT
-							else if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+							if (gen_tss && (new_ssdt[loadtotssdt] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
 							{
 								gen_tss= false;
 								loadtotssdt++;
 							}
-*/						}
+						}
 
 						continue;
 					}

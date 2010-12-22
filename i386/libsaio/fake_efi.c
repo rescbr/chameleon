@@ -443,6 +443,8 @@ static const char const MODEL_PROP[] = "Model";
 static EFI_CHAR16 Model[MAX_MODEL_LEN];
 static int ModelLength = 0;
 char MacModel[8] = "MacBook";
+//valv: dummy mac product
+char MacProduct[14] = "applemac2010";
 unsigned int ModelRev = 0x00010001;
 
 /*
@@ -623,10 +625,14 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 
 		if (len < MAX_MODEL_LEN) {
-			int n=0, first=0, rev1=0, rev2=0, i=0;
+			int n=0, q=0, first=0, rev1=0, rev2=0, i=0;
 			for (i=0; i<len; i++) {
 				char c = ret16[i];
 				Model[i] = c;
+				if (i<14){
+					MacProduct[i]=c;
+					q++;
+				}
 				if (isalpha(c)){
 					if (i<8){
 						MacModel[i]=c;
@@ -643,6 +649,9 @@ void setupEfiDeviceTree(void)
 			}
 			for (i=n; i<8; i++) {
 				MacModel[i] = 0x20;
+			}
+			for (i=q; i<14; i++) {
+				MacProduct[i] = 0x20;
 			}
 			ModelRev = (rev2 << 16) + rev1;
 			Model[len] = '\0';

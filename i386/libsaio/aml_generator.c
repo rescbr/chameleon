@@ -21,12 +21,12 @@ bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
 			case AML_CHUNK_DWORD:
 			case AML_CHUNK_QWORD:
 			case AML_CHUNK_ALIAS:
-				verbose("aml_add_to_parent: Node isn't supports child nodes!");
+				verbose("aml_add_to_parent: Node doesn't support child nodes!");
 				return FALSE;
 			case AML_CHUNK_NAME:
 				if (parent->First) 
 				{
-					verbose("aml_add_to_parent: Name node could have only one child node!");
+					verbose("aml_add_to_parent: Name node could only have one child!");
 					return FALSE;
 				}
 				break;

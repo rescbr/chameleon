@@ -34,4 +34,10 @@ struct p_state
 	uint32_t	Frequency;
 };
 
+struct t_state 
+{
+	uint32_t	perf;
+	uint32_t	pwer;
+	uint8_t		ctrl;
+};
 #endif /* !__LIBSAIO_ACPI_PATCHER_H */

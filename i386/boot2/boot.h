@@ -52,7 +52,7 @@
 #define kRootDeviceKey		"rd"
 #define kBootUUIDKey		"boot-uuid"
 #define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
+/*#define kPlatformKey		"platform"*/
 #define kACPIKey		"acpi"
 #define kCDROMPromptKey		"CD-ROM Prompt"
 #define kCDROMOptionKey		"CD-ROM Option Key"
@@ -158,6 +158,7 @@
 #define klessVoltage		"lessVolt"			/* acpi_patcher.c */
 #define kTjmax				"Tjmax"				/* acpi_patcher.c */
 #define kpstart				"PStart"			/* acpi_patcher.c */
+#define kGenerateTStates	"GenerateTStates"	/* apci_patcher.c */
 
 /*
  * Flags to the booter or kernel

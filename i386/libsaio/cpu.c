@@ -226,7 +226,7 @@ void scan_cpu(PlatformInfo_t *p)
 						msr = rdmsr64(MSR_PLATFORM_INFO);
 						bus_ratio_max = (msr >> 8) & 0xff;
 						bus_ratio_min = (msr >> 40) & 0xff; //valv: not sure about this one (Remarq.1)
-						verbose("Flex: %d ", bus_ratio_max);
+						verbose("CPU: Flex-Ratio = %d ", bus_ratio_max);
 						min_ratio = bus_ratio_min * 10;
 						msr = rdmsr64(MSR_FLEX_RATIO);
 						if ((msr >> 16) & 0x01)
@@ -336,7 +336,7 @@ void scan_cpu(PlatformInfo_t *p)
 							msr32 = rdmsr(MSR_IA32_MISC_ENABLE);
 
 							if(!(rdmsr64(MSR_IA32_MISC_ENABLE) & (1 << 3))) msr32.lo |= (1 << 3);
-							verbose("Thermal Monitor: TM, ");
+							verbose("CPU: Thermal Monitor:              TM, ");
 							if(platformCPUFeature(CPU_FEATURE_TM2))
 							{
 								msr32.lo |= (1 << 13);
@@ -524,7 +524,7 @@ void scan_cpu(PlatformInfo_t *p)
 							cpuFrequency = (fsbFrequency * bus_ratio_max);
 							max_ratio = bus_ratio_max * 10;
 						}
-						verbose("CPU: Sticking with [FSB: %dMhz, Bus-Ratio: %d%s] %s\n", myfsb, bus_ratio_max, maxdiv ? ".5" : "", newratio ? "instead" : "");
+						verbose("CPU: Sticking with: [FSB: %dMhz, Bus-Ratio: %d%s] %s\n", myfsb, bus_ratio_max, maxdiv ? ".5" : "", newratio ? "instead" : "");
 					}
 				}
 				else
@@ -574,7 +574,7 @@ void scan_cpu(PlatformInfo_t *p)
 				if (((msr >> 31) & 0x1) == 1)
 				{
 					temp = tjmax - ((msr >> 16) & 0x7F);
-					verbose("CPU: Tjmax ~ %d°C 	          Temperature= ~ %d°C\n", tjmax, temp);
+					verbose("CPU: Tjmax ~ %d°C 	           Temperature= ~ %d°C\n", tjmax, temp);
 				}
 				else temp = -1;
 			}
@@ -589,7 +589,7 @@ void scan_cpu(PlatformInfo_t *p)
 				if(bitfield(p->CPU.CPUID[CPUID_81][0], 0, 1) == 0) verbose("Failed!\n");
 				else verbose("Succeded!\n");
 			}
-			else verbose("CPU: Intel Dynamic Acceleration   Enabled!\n");
+			else verbose("CPU: IDA:                          Enabled!\n");
 		}
 	}
 #if 0
@@ -660,12 +660,12 @@ void scan_cpu(PlatformInfo_t *p)
 			if(rdmsr64(MSR_IA32_MISC_ENABLE) & (1 << 16))
 			{
 				p->CPU.EST = 1;
-				verbose("EIST Successfully Enabled!");
+				verbose("CPU: EIST Successfully Enabled!\n");
 			}
 			else
 			{
 				p->CPU.EST = 0;
-				verbose("EIST couldn't be enabled!");
+				verbose("CPU: EIST couldn't be enabled!\n");
 			}
 		}
 
@@ -673,25 +673,25 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 	if(core_i) p->CPU.ISerie = true;
-		DBG("CPU: Vendor/Family/ExtFamily: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
-		DBG("CPU: Model/ExtModel/Stepping: 0x%x/0x%x/0x%x\n", p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
-		DBG("CPU: Multipliers x10:         max=%d, min=%d\n", p->CPU.MaxRatio, p->CPU.MinRatio);
+		DBG("CPU: Vendor/Family/ExtFamily:      0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
+		DBG("CPU: Model/ExtModel/Stepping:      0x%x/0x%x/0x%x\n", p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
+		DBG("CPU: Multipliers x10:              max=%d, min=%d\n", p->CPU.MaxRatio, p->CPU.MinRatio);
 	if(turbo)
 	{
-		DBG("Turbo Ratio:                  %d/%d/%d/%d\n", p->CPU.Tone, p->CPU.Ttwo, p->CPU.Tthr, p->CPU.Tfor);
+		DBG("Turbo Ratio:                       %d/%d/%d/%d\n", p->CPU.Tone, p->CPU.Ttwo, p->CPU.Tthr, p->CPU.Tfor);
 		p->CPU.Turbo = true;
 	}
-		DBG("CPU: MaxDiv/CurrDiv:          0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);
-		DBG("CPU: TSCFreq:                 %dMHz\n", p->CPU.TSCFrequency / 1000000);
-		DBG("CPU: CPUFreq:                 %dMHz\n", p->CPU.CPUFrequency / 1000000);
-		DBG("CPU: FSBFreq:                 %dMHz\n", p->CPU.FSBFrequency / 1000000);
+		DBG("CPU: MaxDiv/CurrDiv:               0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);
+		DBG("CPU: TSCFreq:                      %dMHz\n", p->CPU.TSCFrequency / 1000000);
+		DBG("CPU: CPUFreq:                      %dMHz\n", p->CPU.CPUFrequency / 1000000);
+		DBG("CPU: FSBFreq:                      %dMHz\n", p->CPU.FSBFrequency / 1000000);
 	if(did)
 	{
 		p->CPU.SLFM = did;
-		DBG("CPU: SLFM:                    %d\n", p->CPU.SLFM);
+		DBG("CPU: SLFM:                         %d\n", p->CPU.SLFM);
 	}
 		if(platformCPUFeature(CPU_FEATURE_EST))
-		DBG("CPU: Enhanced SpeedStep:      %d\n", p->CPU.EST);
-		DBG("CPU: NoCores/NoThreads:       %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
-		DBG("CPU: Features:                0x%08x\n", p->CPU.Features);
+		DBG("CPU: Enhanced SpeedStep:           %d\n", p->CPU.EST);
+		DBG("CPU: NoCores/NoThreads:            %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
+		DBG("CPU: Features:                     0x%08x\n", p->CPU.Features);
 }

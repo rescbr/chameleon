@@ -194,7 +194,10 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x10026899,  "ATI Radeon HD 5850"} ,
 	{ 0x1002689E,  "ATI Radeon HD 5830"} ,
 	{ 0x10026898,  "ATI Radeon HD 5870"} ,
-	{ 0x1002689C,  "ATI Radeon HD 5970"}
+	{ 0x1002689C,  "ATI Radeon HD 5970"} ,
+	{ 0x24511682,	"ATI Radeon HD 4650"} ,
+	{ 0x24521682,	"ATI Radeon HD 4650"} ,
+	{ 0x24541682,	"ATI Radeon HD 4650"}
 };
 
 static struct ati_chipsets_t ATIKnownFramebuffers[] = {
