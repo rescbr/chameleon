@@ -19,7 +19,7 @@
 #endif
 
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -1034,8 +1034,8 @@ static void getSmbiosTableStructure(struct SMBEntryPoint *smbios)
     if (ftTablePairInit && smbios!=NULL) {
         ftTablePairInit = false;
 #if DEBUG_SMBIOS
-        printf(">>> SMBIOSAddr=0x%08x\n", smbios);
-        printf(">>> DMI: addr=0x%08x, len=%d, count=%d\n", smbios->dmi.tableAddress, 
+        verbose(">>> SMBIOSAddr=0x%08x\n", smbios);
+        verbose(">>> DMI: addr=0x%08x, len=%d, count=%d\n", smbios->dmi.tableAddress, 
                smbios->dmi.tableLength, smbios->dmi.structureCount);
 #endif
         p = (SMBByte *) smbios->dmi.tableAddress;
@@ -1055,10 +1055,10 @@ static void getSmbiosTableStructure(struct SMBEntryPoint *smbios)
                 DmiTablePairCount++;
             }
             else {
-                printf("DMI table entries list is full! Next entries won't be stored.\n");
+                verbose("DMI table entries list is full! Next entries won't be stored.\n");
             }
 #if DEBUG_SMBIOS
-            printf("DMI header found for table type %d, length = %d\n", dmihdr->type, dmihdr->length);
+            verbose("DMI header found for table type %d, length = %d\n", dmihdr->type, dmihdr->length);
 #endif
             p = p + dmihdr->length;
             while ((p - (SMBByte *)smbios->dmi.tableAddress + 1 < smbios->dmi.tableLength) && (p[0] != 0x00 || p[1] != 0x00))  {
@@ -1123,12 +1123,12 @@ struct SMBEntryPoint *getSmbios(int which)
         return orig;
     case SMBIOS_PATCHED:
         if (orig==NULL &&  (orig = getAddressOfSmbiosTable())==NULL ) {
-            printf("Could not find original SMBIOS !!\n");
+            verbose("Could not find original SMBIOS !!\n");
             pause();
         }  else {
             patched = smbios_dry_run(orig);
             if(patched==NULL) {
-                printf("Could not create new SMBIOS !!\n");
+                verbose("Could not create new SMBIOS !!\n");
                 pause();
             }
             else {
@@ -1138,7 +1138,7 @@ struct SMBEntryPoint *getSmbios(int which)
 			getSmbiosMacModel();	//Dunno if it is a right place to do that
        return patched;
     default:
-        printf("ERROR: invalid option for getSmbios() !!\n");
+        verbose("ERROR: invalid option for getSmbios() !!\n");
         break;
     }
 

@@ -114,7 +114,7 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 #ifdef VERBOSE  /* SAK */
 void SHAPrintContext(SHA1_CTX *context, char *msg){
-  printf("%s (%d,%d) %x %x %x %x %x\n",
+  verbose("%s (%d,%d) %x %x %x %x %x\n",
 	 msg,
 	 context->count[0], context->count[1],
 	 context->state[0],

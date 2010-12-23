@@ -370,7 +370,7 @@ long GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
     // Resolve the boot volume from the file spec.
 
     if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
-        printf("Boot volume for '%s' is bogus\n", fileSpec);
+        verbose("Boot volume for '%s' is bogus\n", fileSpec);
         return -1;
     }
 

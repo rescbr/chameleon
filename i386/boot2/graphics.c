@@ -104,7 +104,7 @@ getVESAModeWithProperties( unsigned short     width,
         }
 		
 #if DEBUG
-        printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
+        verbose("Mode %x: %dx%dx%d mm:%d attr:%x\n",
                *modePtr, modeInfo.XResolution, modeInfo.YResolution,
                modeInfo.BitsPerPixel, modeInfo.MemoryModel,
                modeInfo.ModeAttributes);
@@ -683,8 +683,15 @@ int initGraphicsMode ()
 	// Try to find a resolution if "Graphics Mode" setting is not available.
 	if ( count < 3 )
 	{
-		params[0] = DEFAULT_SCREEN_WIDTH;
-		params[1] = DEFAULT_SCREEN_HEIGHT;
+    // Use the default resolution if we don't have an initialized GUI.
+/* 	   if (gui.screen.width == 0 || gui.screen.height == 0)
+    	{
+    	  gui.screen.width = DEFAULT_SCREEN_WIDTH;	
+    	  gui.screen.height = DEFAULT_SCREEN_HEIGHT;
+   		}
+*/
+   		params[0] = DEFAULT_SCREEN_WIDTH; //gui.screen.width;
+    	params[1] = DEFAULT_SCREEN_HEIGHT; // gui.screen.height;
 		params[2] = 32;
 	}
 	

@@ -18,7 +18,7 @@
 #endif
 
 #if DEBUG_INJECT
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -96,7 +96,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	device = malloc(sizeof(struct DevPropDevice));
 	
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
-		printf("ERROR parsing device path\n");
+		verbose("ERROR parsing device path\n");
 		return NULL;
 	}
 	
@@ -124,7 +124,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 			}
 			else 
 			{
-				printf("ERROR parsing device path\n");
+				verbose("ERROR parsing device path\n");
 				numpaths = 0;
 				break;
 			}
@@ -143,7 +143,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 			}
 			else
 			{
-				printf("ERROR parsing device path\n");
+				verbose("ERROR parsing device path\n");
 				numpaths = 0;
 				break;
 			}

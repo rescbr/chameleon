@@ -755,12 +755,12 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	unsigned long len;
 	
 #if 0
-    printf("kernel header:\n");
-    printf("signature: 0x%x\n", kernel_header->signature);
-    printf("compress_type: 0x%x\n", kernel_header->compress_type);
-    printf("adler32: 0x%x\n", kernel_header->adler32);
-    printf("uncompressed_size: 0x%x\n", kernel_header->uncompressed_size);
-    printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
+    verbose("kernel header:\n");
+    verbose("signature: 0x%x\n", kernel_header->signature);
+    verbose("compress_type: 0x%x\n", kernel_header->compress_type);
+    verbose("adler32: 0x%x\n", kernel_header->adler32);
+    verbose("uncompressed_size: 0x%x\n", kernel_header->uncompressed_size);
+    verbose("compressed_size: 0x%x\n", kernel_header->compressed_size);
     getc();
 #endif
 	
@@ -787,7 +787,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
             Adler32(binary, uncompressed_size)) {
-            printf("adler mismatch\n");
+            verbose("adler mismatch\n");
             return -1;
         }
     }

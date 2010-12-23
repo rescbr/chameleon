@@ -28,7 +28,7 @@
 #endif
 
 #if DEBUG_KEXT_PATCHER
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -222,7 +222,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		zlib_result = inflateInit(&zstream);
 		if (Z_OK != zlib_result)
 		{
-			printf("ZLIB Error: %s\n", zstream.msg);
+			verbose("ZLIB Error: %s\n", zstream.msg);
 			getc();
 		}
 		else 
@@ -454,7 +454,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 	
 	char* orig_string = "0x04020000&amp;0xFFFE0000"; //XMLCastString(match_class);
 	
-	printf("Attemting to replace '%s' with '%s'\n", orig_string, new_str);
+	verbose("Attemting to replace '%s' with '%s'\n", orig_string, new_str);
 	
 	// TODO: verify string doesn't exist first.
 	
@@ -566,12 +566,12 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
 		DBG("Buffer FULL: deflated result is %d, avail: %d bytes, out: %d bytes, full: %d\n", zlib_result, compressed_size, zstream.total_out, full_size);
-		printf("Unable to patch AppleHDA\n");
+		verbose("Unable to patch AppleHDA\n");
 		
 	} 
 	else if (zlib_result != Z_STREAM_ERROR)
 	{
-		printf("AppleHDA: ZLIB Deflate Error: %s\n", zstream.msg);
+		verbose("AppleHDA: ZLIB Deflate Error: %s\n", zstream.msg);
 		getc();
 	}
 	
@@ -783,8 +783,8 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	{
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
-		printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-		printf("ERROR: Unable to compress patched kext, not enough room.\n");
+		verbose("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		verbose("ERROR: Unable to compress patched kext, not enough room.\n");
 		pause();
 		
 	} 

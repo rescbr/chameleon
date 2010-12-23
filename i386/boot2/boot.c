@@ -192,7 +192,7 @@ int ExecKernel(void *binary)
     if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
 		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
         {
-        	printf("nbpUnloadBaseCode error %d\n", (int) ret);
+        	verbose("nbpUnloadBaseCode error %d\n", (int) ret);
             sleep(2);
         }
     }
@@ -307,7 +307,7 @@ void common_boot(int biosdev)
     int              part_no;         /* partition number (1 based) */
 #endif
 #if DEBUG	
-    printf("get bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x80 - flash-stick
+    verbose("get bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x80 - flash-stick
 #endif
 	
     setBootGlobals(bvChain);
@@ -346,7 +346,7 @@ void common_boot(int biosdev)
 	gBootVolume = selectBootVolume(bvChain);
 	
 #if DEBUG	
-    printf("separated bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x81 - HDD
+    verbose("separated bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x81 - HDD
 	pause();
 #endif
 	
@@ -354,7 +354,7 @@ void common_boot(int biosdev)
 	if(init_module_system())
 	{
 #if DEBUG	
-		printf("begin load_all_modules\n");
+		verbose("begin load_all_modules\n");
 		pause();
 #endif
 		
@@ -363,7 +363,7 @@ void common_boot(int biosdev)
 	
 	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 #if DEBUG
-    printf("ModulesLoaded\n");
+    verbose("ModulesLoaded\n");
 	pause();
 #endif
 	
@@ -388,7 +388,7 @@ void common_boot(int biosdev)
 #endif
 	
 #if DEBUG
-    printf("After rescan\n");
+    verbose("After rescan\n");
 	pause();
 #endif
 	
@@ -472,8 +472,19 @@ void common_boot(int biosdev)
 		
 		
         // Other status (e.g. 0) means that we should proceed with boot.
-				
-		
+/*				
+		// Turn off any GUI elements
+		if( bootArgs->Video.v_display == GRAPHICS_MODE )
+		{
+			gui.devicelist.draw = false;
+			gui.bootprompt.draw = false;
+			gui.menu.draw = false;
+			gui.infobox.draw = false;
+			gui.logo.draw = false;
+			drawBackground();
+			updateVRAM();
+		}
+*/		
 		// Find out which version mac os we're booting.
 		getOSVersion(gMacOSVersion);
 		

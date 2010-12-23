@@ -67,6 +67,7 @@ extern void* gPlatform;
 #define kWaitForKeypressKey	"Wait"
 /* AsereBLN: added the other keys */
 #define kUseAtiROM			"UseAtiROM"			/* ati.c */
+#define kAtiConfig			"AtiConfig"			/* ati.c */
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */

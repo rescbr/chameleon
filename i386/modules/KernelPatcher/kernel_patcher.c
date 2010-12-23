@@ -287,7 +287,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate _panic\n");
+		verbose("Unable to locate _panic\n");
 		return;
 	}
 	panicAddr -= (UInt32)kernelData;
@@ -377,12 +377,12 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		// On 10.2.0+ kernels, this requires ~16 bytes
 		
 		// Total: 24 bytes
-		printf("Running on a 10.2.0+ kernel\n");
+		verbose("Running on a 10.2.0+ kernel\n");
 		getc();
 
 	}
 	else {
-		printf("Running on a 10.0.0 kernel, patch unsupported\n");
+		verbose("Running on a 10.0.0 kernel, patch unsupported\n");
 		getc();
 	}
 
@@ -418,7 +418,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; //kernelSymbolAddresses[SYMBOL_PANIC] - textAddress;
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate _panic\n");
+		verbose("Unable to locate _panic\n");
 		return;
 	}
 	panicAddr -= (UInt32)kernelData;
@@ -603,7 +603,7 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 	
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate _pmCPUExitHaltToOff\n");
+		verbose("Unable to locate _pmCPUExitHaltToOff\n");
 		return;
 	}
 	
@@ -632,7 +632,7 @@ void patch_lapic_init(void* kernelData)
 	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; 
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_lapic_init");
+		verbose("Unable to locate %s\n", "_lapic_init");
 		return;
 		
 	}
@@ -641,7 +641,7 @@ void patch_lapic_init(void* kernelData)
 	UInt32 panicAddr = symbol ? symbol->addr - textAddress: 0; 
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_panic");
+		verbose("Unable to locate %s\n", "_panic");
 		return;
 	}
 	
@@ -697,7 +697,7 @@ void patch_commpage_stuff_routine(void* kernelData)
 	symbol = lookup_kernel_symbol("_panic");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_panic");
+		verbose("Unable to locate %s\n", "_panic");
 		return;
 	}
 	UInt32 panicAddr = symbol->addr - textAddress; 
@@ -735,7 +735,7 @@ void patch_lapic_interrupt(void* kernelData)
 	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_interrupt");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_lapic_interrupt");
+		verbose("Unable to locate %s\n", "_lapic_interrupt");
 		return;
 		
 	}
@@ -746,7 +746,7 @@ void patch_lapic_interrupt(void* kernelData)
 	symbol = lookup_kernel_symbol("_panic");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_panic");
+		verbose("Unable to locate %s\n", "_panic");
 		return;
 	}
 	UInt32 panicAddr = symbol->addr - textAddress; 
@@ -788,7 +788,7 @@ void patch_lapic_configure(void* kernelData)
 	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_configure");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_lapic_configure");
+		verbose("Unable to locate %s\n", "_lapic_configure");
 		return;
 	}
 	patchLocation = symbol->addr - textAddress + textSection; 
@@ -796,7 +796,7 @@ void patch_lapic_configure(void* kernelData)
 	symbol = lookup_kernel_symbol("_lapic_start");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_lapic_start");
+		verbose("Unable to locate %s\n", "_lapic_start");
 		return;
 	}
 	lapicStart = symbol->addr; 
@@ -805,7 +805,7 @@ void patch_lapic_configure(void* kernelData)
 	symbol = lookup_kernel_symbol("_lapic_interrupt_base");
 	if(symbol == 0 || symbol->addr == 0)
 	{
-		printf("Unable to locate %s\n", "_lapic_interrupt_base");
+		verbose("Unable to locate %s\n", "_lapic_interrupt_base");
 		return;
 	}
 	lapicInterruptBase = symbol->addr;

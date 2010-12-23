@@ -357,7 +357,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 				}
 				else
 				{
-					printf("ParseStringID error (0x%x)\n", *val);
+					verbose("ParseStringID error (0x%x)\n", *val);
 					getc();
 					return -1;
 					
@@ -430,7 +430,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 				}
 				else
 				{
-					printf("ParseIntegerID error (0x%x)\n", *val);
+					verbose("ParseIntegerID error (0x%x)\n", *val);
 					getc();
 					return -1;
 					
@@ -457,7 +457,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 				}
 				else
 				{
-					printf("ParseStringIDREF error (0x%x)\n", *val);
+					verbose("ParseStringIDREF error (0x%x)\n", *val);
 					getc();
 					return -1;
 					
@@ -690,7 +690,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 	
 	if(buffer[0] == '<') 
 	{
-		printf("Warning integer is non existant\n");
+		verbose("Warning integer is non existant\n");
 		//getc();
 		tmpTag->type = kTagTypeInteger;
 		tmpTag->string = 0;
@@ -723,7 +723,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 			}
 			else
 			{
-				printf("ParseTagInteger hex error (0x%x) in buffer %s\n", *val, buffer);
+				verbose("ParseTagInteger hex error (0x%x) in buffer %s\n", *val, buffer);
 				getc();
 				return -1;
 				
@@ -746,7 +746,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 			{
 				if (*val < '0' || *val > '9')
 				{
-					printf("ParseTagInteger decimal error (0x%x) in buffer %s\n", *val, buffer);
+					verbose("ParseTagInteger decimal error (0x%x) in buffer %s\n", *val, buffer);
 					getc();
 					return -1;
 				}
@@ -818,7 +818,7 @@ ParseTagDate( char * buffer, TagPtr * tag )
     tmpTag = NewTag();
     if (tmpTag == 0) return -1;
     
-	printf("ParseTagDate unimplimented\n");
+	verbose("ParseTagDate unimplimented\n");
 	getc();
 	
     tmpTag->type = kTagTypeDate;
@@ -1142,7 +1142,7 @@ int XMLCastInteger(TagPtr dict)
 {
 	if(!dict)
 	{
-		printf("XMLCastInteger: null dict\n");
+		verbose("XMLCastInteger: null dict\n");
 		return 0;
 	}
 	if(dict->type == kTagTypeInteger) return (int)(dict->string);

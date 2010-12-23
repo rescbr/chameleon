@@ -365,7 +365,7 @@ DT__PrintNode(Node *node, int level)
     while (level--) *cp++ = ' ';
     *cp = '\0';
 
-    printf("%s===Node===\n", spaces);
+    verbose("%s===Node===\n", spaces);
     for (prop = node->properties; prop; prop = prop->next) {
         char c = *((char *)prop->value);
         if (prop->length < 64 && (
@@ -373,12 +373,12 @@ DT__PrintNode(Node *node, int level)
             (c >= '0' && c <= '9') ||
             (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') || c == '_')) {
-            printf("%s Property '%s' [%d] = '%s'\n", spaces, prop->name, prop->length, prop->value);
+            verbose("%s Property '%s' [%d] = '%s'\n", spaces, prop->name, prop->length, prop->value);
         } else {
-            printf("%s Property '%s' [%d] = (data)\n", spaces, prop->name, prop->length);
+            verbose("%s Property '%s' [%d] = (data)\n", spaces, prop->name, prop->length);
         }
     }
-    printf("%s==========\n", spaces);
+    verbose("%s==========\n", spaces);
 }
 
 static void
@@ -410,19 +410,19 @@ DT__PrintFlattenedNode(DTEntry entry, int level)
     while (level--) *cp++ = ' ';
     *cp = '\0';
 
-    printf("%s===Entry %p===\n", spaces, entry);
+    verbose("%s===Entry %p===\n", spaces, entry);
     if (kSuccess != DTCreatePropertyIterator(entry, &propIter)) {
-        printf("Couldn't create property iterator\n");
+        verbose("Couldn't create property iterator\n");
         return;
     }
     while( kSuccess == DTIterateProperties( propIter, &name)) {
         if(  kSuccess != DTGetProperty( entry, name, &prop, &propSize ))
             continue;
-        printf("%s Property %s = %s\n", spaces, name, prop);
+        verbose("%s Property %s = %s\n", spaces, name, prop);
     }
     DTDisposePropertyIterator(propIter);
 
-    printf("%s==========\n", spaces);
+    verbose("%s==========\n", spaces);
 }
 
 static void
@@ -482,17 +482,17 @@ main(int argc, char **argv)
     node = FindNode("/this/is/a/test", 1);
     AddProperty(node, "dddd", 12, "abcdefghijk");
 
-    printf("In-memory tree:\n\n");
+    verbose("In-memory tree:\n\n");
 
     PrintTree(rootNode);
 
     FlattenDeviceTree(&flatTree, &flatSize);
 
-    printf("Flat tree = %p, size %d\n", flatTree, flatSize);
+    verbose("Flat tree = %p, size %d\n", flatTree, flatSize);
 
     dtEntry = (DTEntry)flatTree;
 
-    printf("\n\nPrinting flat tree\n\n");
+    verbose("\n\nPrinting flat tree\n\n");
 
     DTInit(dtEntry);
 

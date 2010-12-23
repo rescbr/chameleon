@@ -14,7 +14,7 @@
 #endif
 
 #if DEBUG_MODULES
-#define DBG(x...)	printf(x); getc()
+#define DBG(x...)	verbose(x); //getc()
 #else
 #define DBG(x...)
 #endif
@@ -35,15 +35,15 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 
 
 
-#if DEBUG_MODULES
+#if 1 //DEBUG_MODULES
 void print_hook_list()
 {
-	printf("---Hook Table---\n");
+	msglog("---Hook Table---\n");
 
 	moduleHook_t* hooks = moduleCallbacks;
 	while(hooks)
 	{
-		printf("Hook: %s\n", hooks->name);
+		msglog("Hook: %s\n", hooks->name);
 		hooks = hooks->next;
 	}
 }
@@ -92,8 +92,8 @@ int init_module_system()
 	}
 	else {
 		// The module does not have a valid start function
-		printf("Unable to start %s\n", SYMBOLS_MODULE);
-		getc();
+		verbose("Unable to start %s\n", SYMBOLS_MODULE);
+		//getc();
 	}		
 	return 0;
 }
@@ -102,7 +102,7 @@ int init_module_system()
 /*
  * Load all modules in the /Extra/modules/ directory
  * Module depencdies will be loaded first
- * MOdules will only be loaded once. When loaded  a module must
+ * Modules will only be loaded once. When loaded  a module must
  * setup apropriete function calls and hooks as required.
  * NOTE: To ensure a module loads after another you may 
  * link one module with the other. For dyld to allow this, you must
@@ -126,7 +126,7 @@ void load_all_modules()
 			{
 				// failed to load
 				// free(tmp);
-				verbose("...failed to load\n");
+				DBG("...failed to load\n");
 			}
 		}
 		else 
@@ -162,7 +162,7 @@ int load_module(char* module)
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		printf("Unable to locate module %s\n", modString);
+		verbose("Unable to locate module %s\n", modString);
 		getc();
 		return 0;
 	}
@@ -182,18 +182,18 @@ int load_module(char* module)
 			// Notify the system that it was laoded
 			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
-			DBG("Module %s Loaded.\n", module);
+			verbose("Module %s Loaded.\n", module);
 		}
 		else {
 			// The module does not have a valid start function
-			printf("Unable to start %s\n", module);
+			verbose("Unable to start %s\n", module);
 			getc();
 		}		
 	}
 	else
 	{
 		DBG("Unable to read in module %s\n.", module);
-		getc();
+		//getc();
 	}
 	close(fh);
 	return 1;
@@ -319,9 +319,9 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 			
 		}
 	}
-#if DEBUG_MODULES
+#if 1 //DEBUG_MODULES
 	print_hook_list();
-	getc();
+	//getc();
 #endif
 	
 }
@@ -373,7 +373,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	}
 	else
 	{
-		printf("Invalid mach magic\n");
+		verbose("Invalid mach magic\n");
 		getc();
 		return NULL;
 	}
@@ -382,7 +382,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	
 	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	{
-		printf("Module is not a dylib. Unable to load.\n");
+		verbose("Module is not a dylib. Unable to load.\n");
 		getc();
 		return NULL; // Module is in the incorrect format
 	}*/
@@ -935,7 +935,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					verbose("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
 				
@@ -966,7 +966,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					verbose("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
 				segmentAddress += tmp + sizeof(void*);
@@ -985,7 +985,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					verbose("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
@@ -1032,7 +1032,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					verbose("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
 				

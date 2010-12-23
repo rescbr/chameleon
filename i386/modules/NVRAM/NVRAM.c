@@ -144,6 +144,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 
 void NVRAM_start()
 {
+	register_hook_callback("ExecKernel", &NVRAM_hook);
 	register_hook_callback("Kernel Start", &NVRAM_hook);
 }
 

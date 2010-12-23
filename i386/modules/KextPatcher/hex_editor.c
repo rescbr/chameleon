@@ -14,7 +14,7 @@ int replace_patern(char* pattern, char* replacement, char* buffer, long buffer_s
 	long index = 0;
 	int num_replaced = 0;
 	// NOTE: patehrn and replacement are null terminated. This may change later
-	// If I need to replce null bytes
+	// If I need to replace null bytes
 	
 	if(!pattern || 
 	   !replacement ||

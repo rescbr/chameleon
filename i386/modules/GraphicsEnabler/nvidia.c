@@ -61,7 +61,7 @@
 #endif
 
 #if DEBUG_NVIDIA
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -512,16 +512,16 @@ static uint32_t read32(uint8_t *ptr, uint16_t offset)
 static int patch_nvidia_rom(uint8_t *rom)
 {
 	if (!rom || (rom[0] != 0x55 && rom[1] != 0xaa)) {
-		printf("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
+		verbose("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
 		return PATCH_ROM_FAILED;
 	}
 	
 	uint16_t dcbptr = swap16(read16(rom, 0x36));
 	if(!dcbptr) {
-		printf("no dcb table found\n");
+		verbose("no dcb table found\n");
 		return PATCH_ROM_FAILED;
 	}/* else
-	 printf("dcb table at offset 0x%04x\n", dcbptr);
+	 verbose("dcb table at offset 0x%04x\n", dcbptr);
 	 */
 	uint8_t *dcbtable = &rom[dcbptr];
 	uint8_t dcbtable_version = dcbtable[0];
@@ -542,7 +542,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			headerlength = 8;
 		}
 		if (sig != 0x4edcbdcb) {
-			printf("bad display config block signature (0x%8x)\n", sig);
+			verbose("bad display config block signature (0x%8x)\n", sig);
 			return PATCH_ROM_FAILED;
 		}
 	} else if (dcbtable_version >= 0x14) { /* some NV15/16, and NV11+ */
@@ -551,11 +551,11 @@ static int patch_nvidia_rom(uint8_t *rom)
 		strncpy(sig, (char *)&dcbtable[-7], 7);
 		recordlength = 10;
 		if (strcmp(sig, "DEV_REC")) {
-			printf("Bad Display Configuration Block signature (%s)\n", sig);
+			verbose("Bad Display Configuration Block signature (%s)\n", sig);
 			return PATCH_ROM_FAILED;
 		}
 	} else {
-		printf("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
+		verbose("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
 		return PATCH_ROM_FAILED;
 	}
 	
@@ -753,7 +753,7 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	char	buf[3];
  
 	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
-		printf("[ERROR] bin2hex input error\n");
+		verbose("[ERROR] bin2hex input error\n");
 		return -1;
 	}
  
@@ -761,7 +761,7 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	p = (char *) hex;
 	for (i=0; i<len; i++) {
 		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
-			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
+			verbose("[ERROR] bin2hex '%s' syntax error\n", hex);
 			return -2;
 		}
 		buf[0] = *p++;
@@ -841,7 +841,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			verbose("Using nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
 			DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
 		} else {
-			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
+			verbose("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
 			return false;
 		}
 	} else {
@@ -873,7 +873,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 				
 				// Valid Signature ?
 				if (rom[0] != 0x55 && rom[1] != 0xaa) {
-					printf("ERROR: Unable to locate nVidia Video BIOS\n");
+					verbose("ERROR: Unable to locate nVidia Video BIOS\n");
 					return false;
 				} else {
 					DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
@@ -887,7 +887,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	}
 
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
-		printf("ERROR: nVidia ROM Patching Failed!\n");
+		verbose("ERROR: nVidia ROM Patching Failed!\n");
 		return false;
 	}
 
@@ -899,7 +899,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			// Get Model from the OpROM
 			model = get_nvidia_model((rom_pci_header->vendor << 16) | rom_pci_header->device);
 		} else {
-			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
+			verbose("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
 		}
 	}
 

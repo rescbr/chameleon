@@ -299,10 +299,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		map->ati_mode_table = (char *) &std_vesa->aModeTimings;
 		if (map->ati_mode_table == 0)
 		{
-			printf("Unable to locate the mode table.\n");
-			printf("Please run the program 'dump_bios' as root and\n");
-			printf("email the file 'vbios.dmp' to stomljen@yahoo.com.\n");
-			printf("Chipset: %d\n", map->chipset);
+			verbose("Unable to locate the mode table.\n");
+			verbose("Please run the program 'dump_bios' as root and\n");
+			verbose("email the file 'vbios.dmp' to stomljen@yahoo.com.\n");
+			verbose("Chipset: %d\n", map->chipset);
 			close_vbios(map);
 			return 0;
 		}
@@ -351,10 +351,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 				map->nv_mode_table = (char *) std_vesa->sModelines;
 				if (map->nv_mode_table == 0)
 				{
-					printf("Unable to locate the mode table.\n");
-					printf("Please run the program 'dump_bios' as root and\n");
-					printf("email the file 'vbios.dmp' to stomljen@yahoo.com.\n");
-					printf("Chipset: %s\n", map->chipset);
+					verbose("Unable to locate the mode table.\n");
+					verbose("Please run the program 'dump_bios' as root and\n");
+					verbose("email the file 'vbios.dmp' to stomljen@yahoo.com.\n");
+					verbose("Chipset: %s\n", map->chipset);
 					close_vbios(map);
 					return 0;
 				}

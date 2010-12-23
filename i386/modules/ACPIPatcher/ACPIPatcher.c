@@ -89,7 +89,7 @@ int ACPIPatcher_getPciRootUID(void)
 	if (ACPIPatcher_rootuid == 11) ACPIPatcher_rootuid=0; //usually when _UID isnt present, it means uid is zero
 	else if (ACPIPatcher_rootuid < 0 || ACPIPatcher_rootuid > 9) 
 	{
-		printf("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
+		verbose("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
 		ACPIPatcher_rootuid = 0;
 	}
 out:

@@ -250,9 +250,9 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 #if DEBUG
     {
         int i;
-        printf("%d total ranges\n", count);getc();
+        verbose("%d total ranges\n", count);getc();
         for (i=0, range = rangeArray; i<count; i++, range++) {
-            printf("range: type %d, base 0x%x, length 0x%x\n",
+            verbose("range: type %d, base 0x%x, length 0x%x\n",
                    range->type, (unsigned int)range->base, (unsigned int)range->length); getc();
         }
     }

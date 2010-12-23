@@ -101,7 +101,7 @@ char* readEDID()
 				if ( reported > blocks_left )
 				{
 					
-					printf("EDID claims %d more blocks left\n", reported);
+					verbose("EDID claims %d more blocks left\n", reported);
 				}
 				
 				if ( (last_reported <= reported && last_reported != -1)
@@ -110,8 +110,8 @@ char* readEDID()
 					//|| reported == MAGIC
 					)
 				{
-					printf("Last reported %d\n", last_reported);
-					printf( "EDID blocks left is wrong.\n"
+					verbose("Last reported %d\n", last_reported);
+					verbose( "EDID blocks left is wrong.\n"
 						   "Your EDID is probably invalid.\n");
 					return 0;
 				}
@@ -127,9 +127,9 @@ char* readEDID()
 			} 
 			else
 			{
-				printf("Invalid block %d\n", blocks_left);
-				printf("Header1 = %d", memcmp(edidInfo, header1, sizeof(header1)) );
-				printf("Header2 = %d", memcmp(edidInfo, header2, sizeof(header2)) );
+				verbose("Invalid block %d\n", blocks_left);
+				verbose("Header1 = %d", memcmp(edidInfo, header1, sizeof(header1)) );
+				verbose("Header2 = %d", memcmp(edidInfo, header2, sizeof(header2)) );
 				return 0;
 			}
 		}

@@ -10,11 +10,11 @@
 #include "cpu.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 1
+#define DEBUG_CPU 0
 #endif
 
 #if DEBUG_CPU
-#define DBG(x...)		printf(x)
+#define DBG(x...)		verbose(x)
 #else
 #define DBG(x...)		msglog(x)
 #endif
@@ -400,16 +400,16 @@ void scan_cpu() //PlatformInfo_t *p)
 		}
 		
 		msr = rdmsr64(MSR_NANO_FCR2);
-		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		verbose("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
 		
 		//msr = msr >> 32;
 		msr |= VIA_ALTERNATIVE_VENDOR_BIT;
 		//msr = msr << 32;
 		
-		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		verbose("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
 		wrmsr64(MSR_NANO_FCR2, msr);
 		msr = rdmsr64(MSR_NANO_FCR2);
-		printf("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
+		verbose("MSR_IA32_EBL_CR_POWERON Returns 0x%X 0x%X\n", msr >> 32,  msr & 0xffffffff);
 		
 		
 		/* get cpuid values */

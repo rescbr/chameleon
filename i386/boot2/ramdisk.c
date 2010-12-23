@@ -124,7 +124,7 @@ void umountRAMDisk()
 
 		// Reset ramdisk bvr
 		gRAMDiskVolume = NULL;
-		printf("\nunmounting: done");
+		verbose("\nunmounting: done");
 	}
 }
 
@@ -185,8 +185,8 @@ int mountRAMDisk(const char * param)
 			if(gRAMDiskVolume == NULL)
 			{
 				umountRAMDisk();
-				printf("\nRamdisk contains no partitions.\n");
-				pause();
+				verbose("\nRamdisk contains no partitions.\n");
+				//pause();
 
 			}
 			else
@@ -217,11 +217,11 @@ void setRAMDiskBTHook(bool mode)
 	gRAMDiskBTAliased = mode;
 	if (mode)
 	{
-		printf("\nEnabled bt(0,0) alias.");
+		verbose("\nEnabled bt(0,0) alias.");
 	}
 	else
 	{
-		printf("\nDisabled bt(0,0) alias.");
+		verbose("\nDisabled bt(0,0) alias.");
 	}
 }
 
@@ -234,23 +234,23 @@ void showInfoRAMDisk(void)
 	{
 		struct multiboot_module * ramdisk_module = (void *)gRAMDiskMI->mi_mods_addr;
 
-		printf("\nfile: %s %d", gRAMDiskFile,
+		verbose("\nfile: %s %d", gRAMDiskFile,
 		ramdisk_module->mm_mod_end - ramdisk_module->mm_mod_start);
-		printf("\nalias: %s", gRAMDiskBTAliased ? "enabled" : "disabled");
+		verbose("\nalias: %s", gRAMDiskBTAliased ? "enabled" : "disabled");
 
 		// Display ramdisk information if available.
 		if (getValueForKey("Info", &val, &len, &bootInfo->ramdiskConfig))
 		{
-			printf("\ninfo: %s", val);
+			verbose("\ninfo: %s", val);
 		}
 		else
 		{
-			printf("\nramdisk info not available.");
+			verbose("\nramdisk info not available.");
 		}
 	}
 	else
 	{
-		printf("\nNo ramdisk mounted.");
+		verbose("\nNo ramdisk mounted.");
 	}
 }
 
@@ -259,7 +259,7 @@ int loadPrebootRAMDisk()
 	mountRAMDisk("bt(0,0)/Extra/Preboot.dmg");
 	if (gRAMDiskMI != NULL)
 	{
-		printf("\n");
+		verbose("\n");
 		return 0;
 	}
 	else

@@ -12,13 +12,13 @@
 #endif
 
 #if DEBUG_PCIROOT
-#define DBG(x...)  printf(x)
+#define DBG(x...)  verbose(x)
 #else
 #define DBG(x...)		msglog(x)
 #endif
 
 static int rootuid = 10; //value means function wasnt ran yet
-
+#if NOTYET  //it present in ACPIPatcher
 static unsigned int findrootuid(unsigned char * dsdt, int len)
 {
 	int i;
@@ -43,7 +43,7 @@ static unsigned int findpciroot(unsigned char * dsdt,int len)
 	}
 	return 10;
 }
-
+#endif
 int getPciRootUID(void)
 {
 //	void *new_dsdt;

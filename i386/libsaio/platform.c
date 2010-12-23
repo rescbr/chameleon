@@ -17,7 +17,7 @@
 #endif
 
 #if DEBUG_PLATFORM
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif

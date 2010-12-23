@@ -255,12 +255,19 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
     int        i, speed;
     uint8_t    spd_size, spd_type;
-    uint32_t   base;
+    uint32_t   base, mmio, hostc;
     bool       dump = false;
     RamSlotInfo_t*  slot;
 	
+	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
+	DBG("SMBus CmdReg: 0x%x\n", cmd);
+	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
+
+	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
     base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
-    DBG("Scanning smbus_dev <%04x, %04x> ...\n",smbus_dev->vendor_id, smbus_dev->device_id);
+	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
+    verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
+		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 	
     getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
     bool fullBanks =  // needed at least for laptops
@@ -272,8 +279,11 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 		//DBG("Scanning slot %d\n", i);
         slot = &Platform->RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
+		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
         // Check spd is present
-        if (spd_size && (spd_size != 0xff) ) {
+        if (spd_size && (spd_size != 0xff))
+        {
+
 			slot->spd = spdbuf;
             slot->InUse = true;
 			

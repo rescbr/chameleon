@@ -13,7 +13,7 @@ Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029
 #endif
 
 #if DEBUG_GMA
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -99,7 +99,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	
 	if(!device)
 	{
-		printf("Failed initializing dev-prop string dev-entry, press any key...\n");
+		verbose("Failed initializing dev-prop string dev-entry, press any key...\n");
 		
 		getc();
 		return false;
@@ -152,7 +152,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{
-		printf("no stringdata press a key...\n");
+		verbose("no stringdata press a key...\n");
 		getc();
 		return false;
 	}

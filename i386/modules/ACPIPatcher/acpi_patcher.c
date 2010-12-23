@@ -184,7 +184,7 @@ void *loadACPITable (const char * filename)
 		{
 			if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
 			{
-				printf("Couldn't read table %s\n",dirspec);
+				verbose("Couldn't read table %s\n",dirspec);
 				free (tableAddr);
 				close (fd);
 				return NULL;
@@ -195,7 +195,7 @@ void *loadACPITable (const char * filename)
 			return tableAddr;
 		}
 		close (fd);
-		printf("Couldn't allocate memory for table \n", dirspec);
+		verbose("Couldn't allocate memory for table \n", dirspec);
 	}  
 	//printf("Couldn't find table %s\n", filename);
 	return NULL;
@@ -1104,7 +1104,7 @@ int setupAcpi(void)
 		else
 		{
 			rsdp_mod->RsdtAddress=0;
-			printf("RSDT not found or RSDT incorrect\n");
+			verbose("RSDT not found or RSDT incorrect\n");
 		}
 		
 		if (version)

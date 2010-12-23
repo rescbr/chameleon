@@ -34,7 +34,7 @@
 #endif
 
 #if DEBUG_ATI
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -113,8 +113,10 @@ struct pcir_s {
 // Known cards as of 2008/08/26
 struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x00000000, "Unknown" } ,
-	{ 0x10029589,  "ATI Radeon 2600 Series"}  ,
 	{ 0x10029588,  "ATI Radeon 2600 Series"}  ,
+	{ 0x10029589,  "ATI Radeon 3600 Series"}  ,
+	{ 0x10029591,  "ATI Radeon 3600 Series"}  ,
+	{ 0x100294C1,  "ATI Radeon 2400XT Series"}  ,
 	{ 0x100294C3,  "ATI Radeon 2400 Series"}  ,
 	{ 0x100294C4,  "ATI Radeon 2400 Series"}  ,
 	{ 0x100294C6,  "ATI Radeon 2400 Series"}  ,
@@ -134,8 +136,8 @@ struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x100295C5,  "ATI Radeon 3400 Series"}  ,
 	{ 0x100295C7,  "ATI Radeon 3400 Series"}  ,
 	{ 0x100295C0,  "ATI Radeon 3400 Series"}  ,
-	{ 0x10029596,  "ATI Radeon 3600 Series"}  ,
 	{ 0x10029590,  "ATI Radeon 3600 Series"}  ,
+	{ 0x10029596,  "ATI Radeon 3600 Series"}  ,
 	{ 0x10029599,  "ATI Radeon 3600 Series"}  ,
 	{ 0x10029597,  "ATI Radeon 3600 Series"}  ,
 	{ 0x10029598,  "ATI Radeon 3600 Series"}  ,
@@ -161,24 +163,39 @@ struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x1002949E,  "ATI Radeon 4600 Series"}  ,
 	{ 0x10029480,  "ATI Radeon 4600 Series"}  ,
 	{ 0x10029488,  "ATI Radeon 4600 Series"}  ,
+	{ 0x100294B3,  "ATI Radeon 4770 Series"} ,
+	{ 0x100294B5,  "ATI Radeon 4770 Series"} ,
 	{ 0x10029540,  "ATI Radeon 4500 Series"}  ,
 	{ 0x10029541,  "ATI Radeon 4500 Series"}  ,
 	{ 0x1002954E,  "ATI Radeon 4500 Series"}  ,
+	{ 0x1002954F,  "ATI Radeon 4300 Series"} ,
 	{ 0x10029552,  "ATI Radeon 4300 Mobility Series"}  ,
 	{ 0x10029553,  "ATI Radeon 4500 Mobility Series"}  ,
-	{ 0x1002954F,  "ATI Radeon 4300 Series"} ,
-	{ 0x100294B3,  "ATI Radeon 4770 Series"} ,
-	{ 0x100294B5,  "ATI Radeon 4770 Series"} ,
+	{ 0x10029610,  "ATI Radeon 3200 Mobility Series"}  ,
+	{ 0x10029611,  "ATI Radeon 3100 Mobility Series"}  ,
+	{ 0x10029614,  "ATI Radeon 3300 Mobility Series"}  ,
+	{ 0x10029616,  "AMD 760G Series"}  ,
+	{ 0x10029710,  "ATI Radeon 4200 Mobility Series"}  ,
+	{ 0x10029714,  "ATI Radeon 4290 Mobility Series"}  ,
+	{ 0x10029715,  "ATI Radeon 4250 Mobility Series"}  ,
+	
         { 0x100268B8,  "ATI Radeon 5770 Series"} ,
         { 0x100268BE,  "ATI Radeon 5750 Series"} ,
         { 0x10026898,  "ATI Radeon 5870 Series"} ,
-        { 0x10026899,  "ATI Radeon 5850 Series"}
+        { 0x10026899,  "ATI Radeon 5850 Series"},
+	{ 0x1002689C,  "ATI Radeon 5870 Series"} ,
+	{ 0x100268D8,  "ATI Radeon 5690 Series"},
+	{ 0x100268D9,  "ATI Radeon 5670 Series"},
+	{ 0x100268DA,  "ATI Radeon 5630 Series"},
+	{ 0x100268F9,  "ATI Radeon 5470 Series"}
 };
 
 struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x00000000, "Megalodon" },
-	{ 0x10029589,  "Lamna"}  ,
 	{ 0x10029588,  "Lamna"}  ,
+	{ 0x10029589,  "Lamna"}  ,
+	{ 0x10029591,  "Lamna"}  ,
+	{ 0x100294C1,  "Iago"}  ,
 	{ 0x100294C3,  "Iago"}  ,
 	{ 0x100294C4,  "Iago"}  ,
 	{ 0x100294C6,  "Iago"}  ,
@@ -198,8 +215,8 @@ struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x100295C5,  "Iago"}  ,
 	{ 0x100295C7,  "Iago"}  ,
 	{ 0x100295C0,  "Iago"}  ,
-	{ 0x10029596,  "Megalodon"}  ,
 	{ 0x10029590,  "Megalodon"}  ,
+	{ 0x10029596,  "Megalodon"}  ,
 	{ 0x10029599,  "Megalodon"}  ,
 	{ 0x10029597,  "Megalodon"}  ,
 	{ 0x10029598,  "Megalodon"}  ,
@@ -220,23 +237,35 @@ struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x1002945A,  "Motmot"}  ,
 	{ 0x1002945B,  "Motmot"}  ,
 	{ 0x1002944B,  "Motmot"}  ,
-	{ 0x10029490,  "Peregrine"}  ,
-	{ 0x10029498,  "Peregrine"}  ,
-	{ 0x1002949E,  "Peregrine"}  ,
 	{ 0x10029480,  "Peregrine"}  ,
 	{ 0x10029488,  "Peregrine"}  ,
+	{ 0x10029490,  "Flicker"}  ,
+	{ 0x10029498,  "Flicker"}  ,
+	{ 0x1002949E,  "Flicker"}  ,
+	{ 0x100294B3,  "Flicker"},
+	{ 0x100294B5,  "Flicker"},
 	{ 0x10029540,  "Peregrine"}  ,
 	{ 0x10029541,  "Peregrine"}  ,
 	{ 0x1002954E,  "Peregrine"}  ,
+	{ 0x1002954F,  "Peregrine"}  ,
 	{ 0x10029552,  "Peregrine"}  ,
 	{ 0x10029553,  "Peregrine"}  ,
-	{ 0x1002954F,  "Peregrine"}  ,
-	{ 0x100294B3,  "Peregrine"},
-	{ 0x100294B5,  "Peregrine"},
-        { 0x100268B8,  "Vervet"},
+	{ 0x10029610,  "ATI Radeon 3200 Mobility Series"}  ,
+	{ 0x10029611,  "ATI Radeon 3100 Mobility Series"}  ,
+	{ 0x10029614,  "ATI Radeon 3300 Mobility Series"}  ,
+	{ 0x10029616,  "AMD 760G Series"}  ,
+	{ 0x10029710,  "ATI Radeon 4200 Mobility Series"}  ,
+	{ 0x10029714,  "ATI Radeon 4290 Mobility Series"}  ,
+	{ 0x10029715,  "ATI Radeon 4250 Mobility Series"}  ,
+	{ 0x100268B8,  "Vervet"},
         { 0x100268BE,  "Vervet"},
         { 0x10026898,  "Uakari"},
-        { 0x10026899,  "Uakari"}
+        { 0x10026899,  "Uakari"},
+	{ 0x1002689C,  "Baboon"},
+	{ 0x100268D8,  "Baboon"},
+	{ 0x100268D9,  "Baboon"},
+	{ 0x100268DA,  "Baboon"},
+	{ 0x100268F9,  "Baboon"}
 };
 
 static uint32_t accessROM(pci_dt_t *ati_dev, unsigned int mode)
@@ -436,7 +465,7 @@ static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *
 	if (!device || !ati_dev) {
 		return 0;
 	}
-	printf("dumping pci config space, 256 bytes\n");
+	verbose("dumping pci config space, 256 bytes\n");
 	config_space = malloc(256);
 	for (i=0; i<=255; i++) {
 		config_space[i] = pci_config_read8( ati_dev->dev.addr, i);
@@ -529,8 +558,8 @@ static int devprop_add_ati_template_4xxx(struct DevPropDevice *device)
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mvad))
 		return 0;
-	if(!DP_ADD_TEMP_VAL_DATA(device, ati_saved_config))
-		return 0;
+//	if(!DP_ADD_TEMP_VAL_DATA(device, ati_saved_config))
+//		return 0;
 	return 1;
 }
 
@@ -615,8 +644,8 @@ static int devprop_add_ati_template(struct DevPropDevice *device)
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mvad_n4))
 		return 0;
-	if(!DP_ADD_TEMP_VAL_DATA(device, ati_saved_config_n4))
-		return 0;
+//	if(!DP_ADD_TEMP_VAL_DATA(device, ati_saved_config_n4))
+//		return 0;
 	return 1;
 }
 
@@ -727,7 +756,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 				rom_size = 0x10000; //we dont need rest anyway;
 			}
 		} else {
-			printf("ERROR: unable to open ATI Video BIOS File %s\n", tmp);
+			verbose("ERROR: unable to open ATI Video BIOS File %s\n", tmp);
 		}
 	}
 	if (rom_size == 0) {
@@ -751,7 +780,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 	
 	if (bios[0] == 0x55 && bios[1] == 0xaa) {
-		printf("Found bios image\n");
+		verbose("Found bios image\n");
 		bios_size = bios[2] * 512;
 		
 		struct  pci_rom_pci_header_t *rom_pci_header;
