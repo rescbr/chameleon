@@ -2,13 +2,14 @@
 DIR = boot0
 include ../MakePaths.dir
 
-NASM = /Developer/usr/bin/nasm
+NASM = $(shell which nasm)
+#/Developer/usr/bin/nasm
 INSTALLDIR = $(DSTROOT)/usr/standalone/i386
 DIRS_NEEDED = $(SYMROOT)
 
 all embedtheme optionrom: $(DIRS_NEEDED) boot0 boot0hfs chain0
 
-boot0: boot0.s Makefile $(NASM)
+boot0: boot0.s 
 	@echo "\t[NASM] $@"
 	@$(NASM) boot0.s -o $(SYMROOT)/$@
 

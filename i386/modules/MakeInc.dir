@@ -35,9 +35,9 @@ dylib_final:
 	-final_output $(MODULE_NAME) \
 	-L$(OBJROOT)/ \
 	-L$(OBJROOT)/../ \
-	-L$(OBJROOT)/../*/ \
-	-L$(SYMROOT)/ \
+    -L$(SYMROOT)/ \
 	$(OBJROOT)/*.o \
+    -weak_library $(OBJROOT)/../../boot2/Symbols_LINKER_ONLY.dylib \
 	-weak_library $(SYMROOT)/*.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 	
@@ -60,11 +60,10 @@ dylib_final:
 	-final_output $(MODULE_NAME) \
 	-L$(OBJROOT)/ \
 	-L$(OBJROOT)/../ \
-	-L$(OBJROOT)/../*/ \
 	-L$(SYMROOT)/ \
 	$(OBJROOT)/*.o \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
-	
+    -weak_library $(OBJROOT)/../../boot2/Symbols_LINKER_ONLY.dylib \
+    -o $(SYMROOT)/$(MODULE_NAME).dylib
 	@cp -rf include/* ../module_includes/ &> /dev/null || true
 endif
 

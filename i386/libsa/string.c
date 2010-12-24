@@ -56,6 +56,7 @@ void bzero(void * dst, size_t len)
     memset(dst, 0, len);
 }
 
+
 #else
 void * memcpy(void * dst, const void * src, size_t len)
 {

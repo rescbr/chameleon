@@ -2,11 +2,11 @@
  * strpbrk
  */
 
-#include <string.h>
-#include <stddef.h>
-#include <inttypes.h>
 #include <limits.h>
 #include "strxspn.h"
+
+
+
 
 size_t __strxspn(const char *s, const char *map, int parity)
 {

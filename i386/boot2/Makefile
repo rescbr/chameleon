@@ -19,10 +19,11 @@ CONFIG = hd
 SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
-KLIBCDIR = ../klibc
+#KLIBCDIR = ../klibc
 
 UTILDIR = ../util
-INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR) -I$(KLIBCDIR)
+INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR) 
+#-I$(KLIBCDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else
@@ -31,8 +32,10 @@ endif
 AS = as
 LD = gcc
 # LIBS= -lc_static
-LIBS= -L$(SYMDIR) -lsaio -lsa -lklibc 
-LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a $(SYMDIR)/libklibc.a
+LIBS= -L$(SYMDIR) -lsaio -lsa
+#-lklibc 
+LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a
+#$(SYMDIR)/libklibc.a
 
 OTHER_FILES =
 
@@ -77,14 +80,14 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
 	@make Symbols.dylib
 
 	@echo "\t[LD] boot_embeded.sys"
 	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS)
+		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
 
 	@ld -arch i386 \
 	-undefined dynamic_lookup \
@@ -92,13 +95,8 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
 	-final_output Symbols.dylib \
-	-L$(OBJROOT)/ \
-	-L$(OBJROOT)/../ \
-	-L$(OBJROOT)/../*/ \
-	-L$(SYMROOT)/ \
 	$(filter %.o,$^) $(LIBS) \
-	-weak_library $(SYMROOT)/boot.sys \
-	-o $(SYMROOT)/Symbols_NOTE_linker_use_only.dylib
+	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
 
 
