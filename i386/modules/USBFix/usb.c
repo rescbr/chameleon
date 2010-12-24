@@ -90,6 +90,8 @@ int usb_loop()
 		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
 				
 				break;
+			// OHCI
+			case 0x10: //same
 				
 			// UHCI
 			case 0x00:
@@ -193,7 +195,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	
 	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
 	
-	verbose("Legacy USB Off Done\n");	
+	msglog("Legacy USB Off Done\n");	
 	return 1;
 }
 
@@ -214,7 +216,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	pci_config_write16(pci_dev->dev.addr, 0x04, 0x0002);
 	base = pci_config_read32(pci_dev->dev.addr, 0x10);
 
-	verbose("EHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
+	msglog("EHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		base);
@@ -317,7 +319,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 		return 0;
 	}
 
-	DBG("EHCI Acquire OS Ownership done\n");	
+	msglog("EHCI Acquire OS Ownership done\n");	
 	return 1;
 }
 
@@ -328,7 +330,7 @@ int uhci_reset (pci_dt_t *pci_dev)
 	base = pci_config_read32(pci_dev->dev.addr, 0x20);
 	port_base = (base >> 5) & 0x07ff;
 
-	verbose("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
+	msglog("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		port_base, base);

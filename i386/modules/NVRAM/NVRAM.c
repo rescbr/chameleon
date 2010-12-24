@@ -1,5 +1,5 @@
 /*
- * Idea and template by (c) 2009 Evan Lojewski. All rights reserved.
+ * Template by (c) 2009 Evan Lojewski. All rights reserved.
  *
  * NVRAM module by Slice 2010.
  */
@@ -13,7 +13,7 @@
 #include "smbios_patcher.h"
 
 #ifndef DEBUG_NVRAM
-#define DEBUG_NVRAM 0
+#define DEBUG_NVRAM 1
 #endif
 
 #if DEBUG_NVRAM
@@ -45,21 +45,37 @@ EFI_UINT32 const STATIC_ZERO = 0;
 extern EFI_GUID* getSystemID();
 void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 void NVRAM_start(void);
-int readNVRAM(void);
 
 typedef struct {
 	char Name[32];
 	char Value[512];
 } variables;
-variables* var;
+int readNVRAM(variables* v);
+
+
+void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4);
+/*
+void NVRAM_start_hook(void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	msglog("NVRAM started with ExecKernel\n");
+
+}
+*/
+
+void NVRAM_start()
+{
+//	register_hook_callback("ExecKernel", &NVRAM_start_hook); 
+	//	register_hook_callback("Kernel Start", &NVRAM_hook);
+	register_hook_callback("ModulesLoaded", &NVRAM_hook);
+}
 
 void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	char		bootName[128];
-	
+	variables*	var;
 	char*		ffName;
 	uint8_t *	FirmwareFeatures;
-	uint8_t *	FirmwareFeaturesMask;
+	EFI_UINT32*	FirmwareFeaturesMask;
 	char*		ffmName;
 	char*		boName;
 	char*		bnName;
@@ -69,7 +85,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	
 //	return;
 	
-	msglog("NVRAM started\n");
+	msglog("NVRAM started with ModulesLoaded\n");
 	
 	//Slice create /options node -> /fakenvram
 	// I need to use fakenvram until I know what is happen
@@ -77,9 +93,10 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	bool ClearNVRAM = FALSE;
 	const char* buff;
 	int cnt;
+	var = malloc(sizeof(variables)+1);
 	ClearNVRAM = getValueForKey(kClearNVRAM, &buff, &cnt, &bootInfo->bootConfig);
-	if (!ClearNVRAM) {
-		readNVRAM();
+	if (!ClearNVRAM) {		
+		readNVRAM(var);
 	}
 		
 	Node* optionsNode = DT__FindNode("/options", true);
@@ -140,24 +157,40 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		 
 		 */
 		//end Slice
-}
+	int i,j;
+		for (i=0; i<32; i++) {
+			if (var[i].Name[0]) {
+				msglog("NVRAM get a name %s\n", var[i].Name);
+				if (isdigit(var[i].Name[0])) {
+					msglog(" ...it is digit...\n");
+					continue;
+				}
+				j=0; 
+				while (var[i].Value[j++]);
+				DT__AddProperty(optionsNode, var[i].Name, j,&var[i].Value);
+#if DEBUG_NVRAM
+				msglog("NVRAM add name=%s value=%s length=%d\n", var[i].Name, var[i].Value, j);
+#endif
+			} else {
+				return;
+			}
 
-void NVRAM_start()
-{
-	register_hook_callback("ExecKernel", &NVRAM_hook);
-	register_hook_callback("Kernel Start", &NVRAM_hook);
+		}
 }
 
 const char NVRAM_INF[] = "nvram.inf";
-int readNVRAM()
+int readNVRAM(variables* var)
 {
 	int fd, fsize;
 	char* nvr = 0;
+	msglog("Start NVRAM reading\n");
 	if ((fd = open(NVRAM_INF, 0)) < 0) {
+		msglog("[ERROR] open NVRAM failed\n");
 		return -1;
 	}
 	fsize = file_size(fd);
 	if (!fsize) {
+		msglog(" zero NVRAM file\n");
 		close (fd);
 		return -1;
 	}
@@ -201,17 +234,17 @@ int readNVRAM()
 				c = *nvr++;
 				if (c == 0x25) { //TODO this is hex 
 					int k1=*nvr++;
-					if ((k1 > 0x30) && (k1 < 0x39)) {
+					if ((k1 >= 0x30) && (k1 <= 0x39)) {
 						k1 = k1 - 0x30;
 					}
-					if ((k1 > 0x60) && (k1 < 0x69)) {
+					if ((k1 > 0x60) && (k1 <= 0x66)) {
 						k1 = k1 - 0x60 + 10;
 					}
 					int k2=*nvr++;
-					if ((k2 > 0x30) && (k2 < 0x39)) {
+					if ((k2 >= 0x30) && (k2 <= 0x39)) {
 						k2 = k2 - 0x30;
 					}
-					if ((k2 > 0x60) && (k2 < 0x69)) {
+					if ((k2 > 0x60) && (k2 <= 0x66)) {
 						k2 = k2 - 0x60 + 10;
 					}
 					c = (k1 << 4) + k2;

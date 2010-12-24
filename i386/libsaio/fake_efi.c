@@ -777,6 +777,18 @@ void setupFakeEfi(void)
 	
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		gST32->Hdr.CRC32 = 0;
+		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
+	}
+	else
+	{
+		gST64->Hdr.CRC32 = 0;
+		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
+	}
+	
 #if 1 //DEBUG	
 	struct DMIProcessorInformation* cpuInfo;
 	struct DMIHeader * dmihdr;
@@ -791,7 +803,7 @@ void setupFakeEfi(void)
 		msglog("Patched platform CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", Platform->CPU.FSBFrequency/MEGA, Platform->CPU.TSCFrequency/MEGA, Platform->CPU.CPUFrequency/MEGA);
 		
 		msglog("Patched SMBIOS CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", cpuInfo->externalClock, cpuInfo->maximumClock, cpuInfo->currentClock);
-		msglog("\n Family=%x\n Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
+		msglog(" Family=%x\n Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
 	}	
 #endif	
 }

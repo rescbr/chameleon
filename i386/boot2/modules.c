@@ -35,7 +35,7 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 
 
 
-#if 1 //DEBUG_MODULES
+#if DEBUG_MODULES
 void print_hook_list()
 {
 	msglog("---Hook Table---\n");
@@ -319,7 +319,7 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 			
 		}
 	}
-#if 1 //DEBUG_MODULES
+#if DEBUG_MODULES
 	print_hook_list();
 	//getc();
 #endif

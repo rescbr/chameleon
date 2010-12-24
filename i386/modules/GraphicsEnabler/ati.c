@@ -544,14 +544,14 @@ static int devprop_add_ati_template_4xxx(struct DevPropDevice *device)
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_efi_orientation))
 		return 0;
-	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mclk))
-		return 0;
+//	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mclk))
+//		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mem_rev_id))
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_mem_vend_id))
 		return 0;
-	if(!DP_ADD_TEMP_VAL_DATA(device, ati_sclk))
-		return 0;
+//	if(!DP_ADD_TEMP_VAL_DATA(device, ati_sclk))
+//		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_vendor_id))
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_platform_info))
@@ -620,7 +620,7 @@ static int devprop_add_ati_template(struct DevPropDevice *device)
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_fb_offset_n4))
 		return 0;
-	if(!DP_ADD_TEMP_VAL_DATA(device, ati_hwgpio_n4))
+/*	if(!DP_ADD_TEMP_VAL_DATA(device, ati_hwgpio_n4))
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_iospace_offset_n4))
 		return 0;
@@ -631,7 +631,7 @@ static int devprop_add_ati_template(struct DevPropDevice *device)
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_refclk_n4))
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_regspace_offset_n4))
-		return 0;
+		return 0; */
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_efi_orientation_n4))
 		return 0;
 	if(!DP_ADD_TEMP_VAL_DATA(device, ati_aapl_blackscr_prefs_0_n4))
@@ -678,7 +678,10 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 	
 	model = get_ati_model((ati_dev->vendor_id << 16) | ati_dev->device_id);
-	framebuffer = get_ati_fb((ati_dev->vendor_id << 16) | ati_dev->device_id);
+	framebuffer = getStringForKey(kAtiConfig, &bootInfo->bootConfig);
+	if (!framebuffer) {
+		framebuffer = get_ati_fb((ati_dev->vendor_id << 16) | ati_dev->device_id);
+	}
 	if (!string) {
 		string = devprop_create_string();
 	}

@@ -14,7 +14,7 @@
 #if DEBUG_PCIROOT
 #define DBG(x...)  verbose(x)
 #else
-#define DBG(x...)		msglog(x)
+#define DBG(x...)  msglog(x)
 #endif
 
 static int rootuid = 10; //value means function wasnt ran yet
