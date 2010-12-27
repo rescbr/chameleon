@@ -7,6 +7,54 @@
 #ifndef __LIBSAIO_PCI_H
 #define __LIBSAIO_PCI_H
 
+/* Option ROM header */
+typedef struct {
+	uint16_t	signature;		// 0xAA55
+	uint8_t		rom_size;
+	uint32_t	entry_point;
+	uint8_t		reserved[15];
+	uint16_t	pci_header_offset;
+	uint16_t	expansion_header_offset;
+} option_rom_header_t;
+
+/* Option ROM PCI Data Structure */
+typedef struct {
+	uint32_t	signature;		// 0x52494350	'PCIR'
+	uint16_t	vendor_id;
+	uint16_t	device_id;
+	uint16_t	vital_product_data_offset;
+	uint16_t	structure_length;
+	uint8_t		structure_revision;
+	uint8_t		class_code[3];
+	uint16_t	image_length;
+	uint16_t	image_revision;
+	uint8_t		code_type;
+	uint8_t		indicator;
+	uint16_t	reserved;
+} option_rom_pci_header_t;
+
+//-----------------------------------------------------------------------------
+// added by iNDi
+
+typedef struct {
+	uint32_t	signature;			// 0x24506E50 '$PnP'
+	uint8_t		revision;			//  1
+	uint8_t		length;				//
+	uint16_t	offset;				
+	uint8_t		checksum;
+	uint32_t	identifier;
+	uint16_t	manufacturer;
+	uint16_t	product;
+	uint8_t		class[3];
+	uint8_t		indicators;
+	uint16_t	boot_vector;
+	uint16_t	disconnect_vector;
+	uint16_t	bootstrap_vector;
+	uint16_t	reserved;
+	uint16_t	resource_vector;
+} option_rom_pnp_header_t;
+
+
 typedef struct {
 	uint32_t		:2;
 	uint32_t	reg	:6;

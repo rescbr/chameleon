@@ -540,6 +540,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 		}
 	}
 }
+
 void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 {
 	uint8_t * screen;
@@ -722,10 +723,13 @@ setVideoMode( int mode, int drawgraphics)
 			if (gVerboseMode) {
 				// Tell the kernel to use text mode on a linear frame buffer display
 				bootArgs->Video.v_display = FB_TEXT_MODE;
+				//video_mode(2);
 			} else {
 				bootArgs->Video.v_display = GRAPHICS_MODE;
+				//video_mode(1);
 			}
 		}
+		else video_mode(1);
     }
 	
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )

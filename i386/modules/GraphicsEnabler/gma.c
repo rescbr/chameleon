@@ -7,6 +7,7 @@ Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029
 #include "platform.h"
 #include "device_inject.h"
 #include "gma.h"
+#include "graphics.h"
 
 #ifndef DEBUG_GMA
 #define DEBUG_GMA 0
@@ -17,29 +18,31 @@ Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029
 #else
 #define DBG(x...)
 #endif
-
-uint8_t GMAX3100_vals[22][4] = {
-	{ 0x01,0x00,0x00,0x00 },
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x08 },	
-	{ 0x64,0x00,0x00,0x00 },
-	{ 0x00,0x00,0x00,0x08 },
-	{ 0x01,0x00,0x00,0x00 },
-	{ 0x20,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x20,0x03,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x08,0x52,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x3B,0x00,0x00,0x00 },
-	{ 0x00,0x00,0x00,0x00 }
+//Slice - correct all values, still not sure
+uint8_t GMAX3100_vals[23][4] = {
+	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
+	{ 0x01,0x00,0x00,0x00 },	//1 "AAPL,SelfRefreshSupported"
+	{ 0x01,0x00,0x00,0x00 },	//2 "AAPL,aux-power-connected"
+	{ 0x01,0x00,0x00,0x08 },	//3 "AAPL,backlight-control"
+	{ 0x00,0x00,0x00,0x00 },	//4 "AAPL00,blackscreen-preferences"
+	{ 0x56,0x00,0x00,0x08 },	//5 "AAPL01,BacklightIntensity"
+	{ 0x00,0x00,0x00,0x00 },	//6 "AAPL01,blackscreen-preferences"
+	{ 0x01,0x00,0x00,0x00 },	//7 "AAPL01,DataJustify"
+	{ 0x20,0x00,0x00,0x00 },	//8 "AAPL01,Depth"
+	{ 0x01,0x00,0x00,0x00 },	//9 "AAPL01,Dither"
+	{ 0x20,0x03,0x00,0x00 },	//10 "AAPL01,Height"
+	{ 0x00,0x00,0x00,0x00 },	//11 "AAPL01,Interlace"
+	{ 0x00,0x00,0x00,0x00 },	//12 "AAPL01,Inverter"
+	{ 0x08,0x52,0x00,0x00 },	//13 "AAPL01,InverterCurrent"
+	{ 0x00,0x00,0x00,0x00 },	//14 "AAPL01,LinkFormat"
+	{ 0x00,0x00,0x00,0x00 },	//15 "AAPL01,LinkType"
+	{ 0x01,0x00,0x00,0x00 },	//16 "AAPL01,Pipe"
+	{ 0x01,0x00,0x00,0x00 },	//17 "AAPL01,PixelFormat"
+	{ 0x01,0x00,0x00,0x00 },	//18 "AAPL01,Refresh"
+	{ 0x3B,0x00,0x00,0x00 },	//19 "AAPL01,Stretch"
+	{ 0xc8,0x95,0x00,0x00 },	//20 "AAPL01,InverterFrequency"
+	{ 0x6B,0x10,0x00,0x00 },	//21 "subsystem-vendor-id"
+	{ 0xA2,0x00,0x00,0x00 }		//22 "subsystem-id"
 };
 uint8_t reg_TRUE[] = { 0x01 ,0x00 ,0x00 ,0x00 };
 uint8_t reg_FALSE[] = { 0x00,0x00,0x00,0x00 };
@@ -124,6 +127,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	}
 	else if (model == (char *)"GMAX3100") 
 	{
+		BuiltIn = gDualLink;
 		devprop_add_value(device, "AAPL,HasPanel",GMAX3100_vals[0], 4);
 		devprop_add_value(device, "AAPL,SelfRefreshSupported",GMAX3100_vals[1], 4);
 		devprop_add_value(device, "AAPL,aux-power-connected",GMAX3100_vals[2], 4);
@@ -134,25 +138,28 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,DataJustify",GMAX3100_vals[7], 4);
 		devprop_add_value(device, "AAPL01,Depth",GMAX3100_vals[8], 4);
 		devprop_add_value(device, "AAPL01,Dither",GMAX3100_vals[9], 4);
-		devprop_add_value(device, "AAPL01,DualLink",GMAX3100_vals[10], 4);
-		devprop_add_value(device, "AAPL01,Height",GMAX3100_vals[11], 4);
-		devprop_add_value(device, "AAPL01,Interlace",GMAX3100_vals[12], 4);
-		devprop_add_value(device, "AAPL01,Inverter",GMAX3100_vals[13], 4);
-		devprop_add_value(device, "AAPL01,InverterCurrent",GMAX3100_vals[14], 4);
-		devprop_add_value(device, "AAPL01,InverterCurrency",GMAX3100_vals[15], 4);
-		devprop_add_value(device, "AAPL01,LinkFormat",GMAX3100_vals[16], 4);
-		devprop_add_value(device, "AAPL01,LinkType",GMAX3100_vals[17], 4);
-		devprop_add_value(device, "AAPL01,Pipe",GMAX3100_vals[18], 4);
-		devprop_add_value(device, "AAPL01,PixelFormat",GMAX3100_vals[19], 4);
-		devprop_add_value(device, "AAPL01,Refresh",GMAX3100_vals[20], 4);
-		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[21], 4);
+		devprop_add_value(device, "AAPL01,DualLink", &BuiltIn, 1);		//GMAX3100_vals[10]
+		devprop_add_value(device, "AAPL01,Height",GMAX3100_vals[10], 4);
+		devprop_add_value(device, "AAPL01,Interlace",GMAX3100_vals[11], 4);
+		devprop_add_value(device, "AAPL01,Inverter",GMAX3100_vals[12], 4);
+		devprop_add_value(device, "AAPL01,InverterCurrent",GMAX3100_vals[13], 4);
+//		devprop_add_value(device, "AAPL01,InverterCurrency",GMAX3100_vals[15], 4);
+		devprop_add_value(device, "AAPL01,LinkFormat",GMAX3100_vals[14], 4);
+		devprop_add_value(device, "AAPL01,LinkType",GMAX3100_vals[15], 4);
+		devprop_add_value(device, "AAPL01,Pipe",GMAX3100_vals[16], 4);
+		devprop_add_value(device, "AAPL01,PixelFormat",GMAX3100_vals[17], 4);
+		devprop_add_value(device, "AAPL01,Refresh",GMAX3100_vals[18], 4);
+		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[19], 4);
+		devprop_add_value(device, "AAPL01,InverterFrequency",GMAX3100_vals[20], 4);
 		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "subsystem-vendor-id", GMAX3100_vals[21], 4);
+		devprop_add_value(device, "subsystem-id", GMAX3100_vals[22], 4);
 	}
-
+	
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{
-		verbose("no stringdata press a key...\n");
+		verbose("no GMA stringdata press a key...\n");
 		getc();
 		return false;
 	}

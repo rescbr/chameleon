@@ -5,6 +5,7 @@
  *  Created by Evan Lojewski on 12/1/09.
  *  Copyright 2009. All rights reserved.
  *
+ * Slice 2010
  */
 //#ifndef __EDID_H__
 //#define __EDID_H__
@@ -14,7 +15,7 @@
 
 #define EDID_BLOCK_SIZE	128
 #define EDID_V1_BLOCKS_TO_GO_OFFSET 126
-//Slice - some more info aabout EDID
+//Slice - some more info about EDID
 #define EDID_LENGTH				0x80
 #define EDID_HEADER				0x00
 #define EDID_HEADER_END				0x07
@@ -150,7 +151,22 @@ struct EDID
     UInt8	checksum;					//127
 };
 
+
+typedef struct _edid_mode {
+	unsigned short pixel_clock;
+	unsigned short h_active;
+	unsigned short h_blanking;
+	unsigned short v_active;
+	unsigned short v_blanking;
+	unsigned short h_sync_offset;
+	unsigned short h_sync_width;
+	unsigned short v_sync_offset;
+	unsigned short v_sync_width;
+} edid_mode;
+
+
 char* readEDID();
 void getResolution(UInt32* x, UInt32* y, UInt32* bp);
+int fb_parse_edid(struct EDID *edid, edid_mode* var);
 
 //#endif

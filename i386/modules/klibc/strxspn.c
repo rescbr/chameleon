@@ -2,9 +2,6 @@
  * strpbrk
  */
 
-#include <string.h>
-#include <stddef.h>
-#include <inttypes.h>
 #include <limits.h>
 #include "strxspn.h"
 

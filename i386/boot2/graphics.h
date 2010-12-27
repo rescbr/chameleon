@@ -17,7 +17,7 @@
 #define DEFAULT_SCREEN_WIDTH 1024
 #define DEFAULT_SCREEN_HEIGHT 768
 
-
+extern int gDualLink;;
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth );
 
 void drawColorRectangle( unsigned short x, unsigned short y, unsigned short width, unsigned short height, unsigned char  colorIndex );
@@ -36,7 +36,7 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t
 
 char *getVBEInfoString();
 char *getVBEModeInfoString();
-void getGraphicModeParams(unsigned long params[]);
+unsigned short getGraphicModeParams(unsigned long params[]);
 
 int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
 

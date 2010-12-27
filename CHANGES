@@ -1,4 +1,10 @@
 Slice:
+rev692
+- add ATI 5xxx Enabler module on Kabyl's sources (not checked)
+- corrections to open standards: EFI, UUID, SMBIOS, ACPI, EDID
+- getResolution from BIOS EDID now works
+- exclude Intel BIOS from patch, because it has other structure
+rev673
 - not agree with claim "Removed obsolete -f option, use -x instead"
 	-f - ignore kernel cache (rebuild it)
 	-x - boot with restricted set of drivers (without Graphics card etc.)

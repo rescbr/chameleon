@@ -83,6 +83,17 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
 		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext
 
+#	@ld -arch i386 \
+#	-undefined dynamic_lookup \
+#	-dylib -read_only_relocs suppress \
+#	-S -x -Z -dead_strip_dylibs \
+#	-no_uuid \
+#	-final_output Symbols.dylib \
+#	$(filter %.o,$^) $(LIBS) \
+#	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
+
+
+
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
 	@##${RM} $(SYMROOT)/${SYMBOLS_MODULE}

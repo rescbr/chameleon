@@ -14,9 +14,9 @@
 #endif
 
 #if DEBUG_MODULES
-#define DBG(x...)	verbose(x); //getc()
+#define DBG(x...)	verbose(x) //;getc()
 #else
-#define DBG(x...)
+#define DBG(x...)	//msglog(x)
 #endif
 
 // NOTE: Global so that modules can link with this
@@ -38,12 +38,12 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
 #if DEBUG_MODULES
 void print_hook_list()
 {
-	msglog("---Hook Table---\n");
+	DBG("---Hook Table---\n");
 
 	moduleHook_t* hooks = moduleCallbacks;
 	while(hooks)
 	{
-		msglog("Hook: %s\n", hooks->name);
+		DBG("Hook: %s\n", hooks->name);
 		hooks = hooks->next;
 	}
 }
@@ -162,7 +162,7 @@ int load_module(char* module)
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		verbose("Unable to locate module %s\n", modString);
+		DBG("Unable to locate module %s\n", modString);
 		getc();
 		return 0;
 	}
@@ -182,7 +182,7 @@ int load_module(char* module)
 			// Notify the system that it was laoded
 			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
-			verbose("Module %s Loaded.\n", module);
+			DBG("Module %s Loaded.\n", module);
 		}
 		else {
 			// The module does not have a valid start function
@@ -840,7 +840,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
 				// NOTE: this is wrong, fortunately we don't use it
-				libraryOrdinal = -immediate;
+				libraryOrdinal = immediate ? (SInt8)(BIND_OPCODE_MASK | immediate) : immediate;				
 				//DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
 
 				break;
@@ -935,7 +935,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					verbose("Unable to bind symbol %s\n", symbolName);
+					verbose("Unable to bind symbol %s, libraryOrdinal = %d, symboFlags = %d, type = %d\n", symbolName, libraryOrdinal, symboFlags, type);
 					getc();
 				}
 				
@@ -1030,9 +1030,9 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 						segmentAddress += tmp2 + sizeof(void*);
 					}
 				}
-				else //if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else
 				{
-					verbose("Unable to bind symbol %s\n", symbolName);
+					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
 				
@@ -1198,11 +1198,8 @@ unsigned int lookup_all_symbols(const char* name)
 
 	}
 #if DEBUG_MODULES
-//	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
-//	{
 		verbose("Unable to locate symbol %s\n", name);
 		getc();
-//	}
 #endif
 	return 0xFFFFFFFF;
 }
@@ -1305,40 +1302,4 @@ void dyld_stub_binder()
 {
 	// TODO: actualy impliment this function (asm)
 	stop("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
-}
-
-/* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
- * And why it isn't needed when compiled into boot2
- */
-
-uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
-{
-	uint64_t quotient = 0, qbit = 1;
-	
-	if (denominator)
-	{
-		while ((int64_t) denominator >= 0)
-		{
-			denominator <<= 1;
-			qbit <<= 1;
-		}
-		
-		while (denominator)
-		{
-			if (denominator <= numerator)
-			{
-				numerator -= denominator;
-				quotient += qbit;
-			}
-			denominator >>= 1;
-			qbit >>= 1;
-		}
-		
-		return quotient;
-	}
-	else {
-		stop("Divide by 0");
-		return 0;
-	}
-	
 }

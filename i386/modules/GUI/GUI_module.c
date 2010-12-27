@@ -74,7 +74,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 	}
 	else
 	{
-		setVideoMode( GRAPHICS_MODE, 0 );
+		setVideoMode( GRAPHICS_MODE, 0 );  //Slice - Why GRAPHICS_MODE if gVerboseMode?
 		
 	}	
 }

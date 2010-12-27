@@ -304,7 +304,7 @@ void drawDataRectangle( unsigned short  x,
 
 
 
-void getGraphicModeParams(unsigned long params[]) {
+unsigned short getGraphicModeParams(unsigned long params[]) {
 	
 	params[3] = 0;
 	
@@ -326,6 +326,7 @@ void getGraphicModeParams(unsigned long params[]) {
 	params[0] = minfo.XResolution;
 	params[1] = minfo.YResolution;
 	params[2] = 32;
+	return mode;
 }
 
 

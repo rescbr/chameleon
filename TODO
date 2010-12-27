@@ -1,5 +1,32 @@
 TODO List for Chameleon Boot Loader
 ====================================
+27.12.2010 Slice
+- numerous errors, mistakes, reservation, non-finished codes... Spaghetti sources!
+- kernelcache never used (adler32 is wrong?)
+- more careful CPU detection
+- readNVRAM is wrong
+- graphicsEnabler for X3100 is not good
+- ATI Radeon enabler is not perfect
+
+
+16.12.2010 Slice
+- I want to implement NVRAM for use with nvram, bless, StartupDisk.prefPane, and with VoodooHDA in future. 
+1. Write a script rc.shutdown.local and place it into /etc
+<--------------
+#!/bin/sh
+nvram -p >nvram.inf
+echo Hello! NVRAM is saved!
+-------------->
+2. Read and interpret nvram.inf to place variables into /options node
+3. Prepare some other boot-time variables in the node (platform-uuid, BootOrder, FirmwareFeatures, efi-boot-device and so on)
+4. Implement boot flag -c to clear growing amount of nvram savings.
+
+- ATI GraphicsEnabler is not perfect. 
+1. ATY,SCLK, ATY,MCLK, ATY,RefCLK must be read from VideoBIOS but not constant values. Excluded!
+2. FakeDeviceID needed
+
+- Intel GraphicsEnabler needs to be corrected by calculating LCD info. Done!
+--------------------------------------------------------------------------------------------------------
 - Integrate Prasys current work on options and quick shortcut modified version of 18seven
 
 - Add autodetection of efistring algorythm to enabke graphics enabler to beanbled by default while not conflicting whith other efi string overriden content
@@ -68,20 +95,3 @@ TODO List for Chameleon Boot Loader
  - Case unsensitive parsing for the bootConfig options:
    should help the common/novice user to setup more easily.
 
-16.12.2010 Slice
-- I want to implement NVRAM for use with nvram, bless, StartupDisk.prefPane, and with VoodooHDA in future. 
-1. Write a script rc.shutdown.local and place it into /etc
-<--------------
-#!/bin/sh
-nvram -p >nvram.inf
-echo Hello! NVRAM is saved!
--------------->
-2. Read and interpret nvram.inf to place variables into /options node
-3. Prepare some other boot-time variables in the node (platform-uuid, BootOrder, FirmwareFeatures, efi-boot-device and so on)
-4. Implement boot flag -c to clear growing amount of nvram savings.
-
-- ATI GraphicsEnabler is not perfect. 
-1. ATY,SCLK, ATY,MCLK, ATY,RefCLK must be read from VideoBIOS but not constant values.
-2. FakeDeviceID needed
-
-- Intel GraphicsEnabler needs to be corrected by calculating LCD info.

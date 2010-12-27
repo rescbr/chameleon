@@ -187,7 +187,7 @@ int edid_is_timing_block(unsigned char *block)
 }
 //----------------------------------------------------------------------------------
 
-int fb_parse_edid(struct EDID *edid, UInt32* x, UInt32* y)
+int fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UInt32* x, UInt32* y)
 {
 	int i;
 	unsigned char *block;
@@ -198,8 +198,15 @@ int fb_parse_edid(struct EDID *edid, UInt32* x, UInt32* y)
 	
 	for (i = 0; i < 4; i++, block += DETAILED_TIMING_DESCRIPTION_SIZE) {
 		if (edid_is_timing_block(block)) {
-			*x = H_ACTIVE;
-			*y = V_ACTIVE;
+			var->h_active = H_ACTIVE;
+			var->v_active = V_ACTIVE;
+			var->h_sync_offset = H_SYNC_OFFSET;
+			var->h_sync_width = H_SYNC_WIDTH;
+			var->h_blanking = H_BLANKING;
+			var->v_blanking = V_BLANKING;
+			var->pixel_clock = PIXEL_CLOCK;
+			var->h_sync_width = H_SYNC_WIDTH;
+			var->v_sync_width = V_SYNC_WIDTH;
 			/*
 			var->xres = var->xres_virtual = H_ACTIVE;
 			var->yres = var->yres_virtual = V_ACTIVE;
@@ -221,10 +228,10 @@ int fb_parse_edid(struct EDID *edid, UInt32* x, UInt32* y)
 			if (VSYNC_POSITIVE)
 				var->sync |= FB_SYNC_VERT_HIGH_ACT;
 			 */
-			return 0;
+			return 1;
 		}
 	}
-	return 1;
+	return 0;
 }
 
 void getResolution(UInt32* x, UInt32* y, UInt32* bp)
@@ -251,15 +258,22 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		char* edidInfo = readEDID();
 		
 		if(!edidInfo) return;
-		
+		edid_mode mode;
 		// TODO: check *all* resolutions reported and either use the highest, or the native resolution (if there is a flag for that)
 		//xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);  
 		//yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4); 
-		if(fb_parse_edid(edidInfo, &xResolution, &yResolution))
+		//Slice - done here
+		
+		if(fb_parse_edid((struct EDID *)edidInfo, &mode) == 0)
 		{
 			xResolution = DEFAULT_SCREEN_WIDTH;
 			yResolution = DEFAULT_SCREEN_HEIGHT;
 		}
+		else {
+			xResolution = mode.h_active;
+			yResolution = mode.v_active;
+		}
+
 		/*
 		 0x00 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0x00 0x32 0x0C
 		 0x00 0xDF 0x00 0x00 0x00 0x00 0xFF 0xFF 0xFF 0x00
@@ -303,7 +317,7 @@ char* readEDID()
 	
 	SInt16 status;
 	UInt16 blocks_left = 1;
-	msglog("readEDID\n");
+//	msglog("readEDID\n");
 	do
 	{
 		// TODO: This currently only retrieves the *last* block, make the block buffer expand as needed / calculated from the first block

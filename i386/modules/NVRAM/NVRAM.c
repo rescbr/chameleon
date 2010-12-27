@@ -13,7 +13,7 @@
 #include "smbios_patcher.h"
 
 #ifndef DEBUG_NVRAM
-#define DEBUG_NVRAM 1
+#define DEBUG_NVRAM 0
 #endif
 
 #if DEBUG_NVRAM
@@ -85,7 +85,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	
 //	return;
 	
-	msglog("NVRAM started with ModulesLoaded\n");
+	DBG("NVRAM started with ModulesLoaded\n");
 	
 	//Slice create /options node -> /fakenvram
 	// I need to use fakenvram until I know what is happen
@@ -156,11 +156,11 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		 "Guid" -> "2B0585EB-D8B8-49A9-8B8C-E21B01AEF2B7"
 		 
 		 */
-		//end Slice
+		//
 	int i,j;
 		for (i=0; i<32; i++) {
+			DBG("NVRAM get a name %s\n", var[i].Name);
 			if (var[i].Name[0]) {
-				msglog("NVRAM get a name %s\n", var[i].Name);
 				if (isdigit(var[i].Name[0])) {
 					msglog(" ...it is digit...\n");
 					continue;
@@ -168,8 +168,8 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 				j=0; 
 				while (var[i].Value[j++]);
 				DT__AddProperty(optionsNode, var[i].Name, j,&var[i].Value);
-#if DEBUG_NVRAM
-				msglog("NVRAM add name=%s value=%s length=%d\n", var[i].Name, var[i].Value, j);
+#if 1 //DEBUG_NVRAM
+				DBG("NVRAM add name=%s value=%s length=%d\n", var[i].Name, var[i].Value, j);
 #endif
 			} else {
 				return;
@@ -183,30 +183,30 @@ int readNVRAM(variables* var)
 {
 	int fd, fsize;
 	char* nvr = 0;
-	msglog("Start NVRAM reading\n");
+	DBG("Start NVRAM reading\n");
 	if ((fd = open(NVRAM_INF, 0)) < 0) {
-		msglog("[ERROR] open NVRAM failed\n");
+		DBG("[ERROR] open NVRAM failed\n");
 		return -1;
 	}
 	fsize = file_size(fd);
 	if (!fsize) {
-		msglog(" zero NVRAM file\n");
+		DBG(" zero NVRAM file\n");
 		close (fd);
 		return -1;
 	}
 	if ((nvr = malloc(fsize)) == NULL) {
-		verbose("[ERROR] alloc NVRAM memory failed\n");
+		DBG("[ERROR] alloc NVRAM memory failed\n");
 		close (fd);
 		return -1;
 	}
 	if (read (fd, nvr, fsize) != fsize) {
-		verbose("[ERROR] read %s failed\n", NVRAM_INF);
+		DBG("[ERROR] read %s failed\n", NVRAM_INF);
 		close (fd);
 		return -1;
 	}
 	close (fd);
 	if ((var = malloc(fsize)) == NULL) {
-		verbose("[ERROR] alloc VAR memory failed\n");
+		DBG("[ERROR] alloc VAR memory failed\n");
 		return -1;
 	}
 	int i = 0;

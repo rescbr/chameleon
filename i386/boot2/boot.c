@@ -75,6 +75,7 @@ char gMacOSVersion[8];
 void *gRootPCIDev;
 void *gPlatform;
 void *gSMBIOS;
+int gDualLink;
 #ifndef OPTION_ROM
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
@@ -108,9 +109,9 @@ static bool gUnloadPXEOnExit = false;
  * Default path to kernel cache file
  */
  //Slice - first one for Leopard
-#define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/kernelcache"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
-#define kDefaultCachePathTiger "/System/Library/Extensions.kextcache"
+#define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+//#define kDefaultCachePathTiger "/System/Library/Extensions.kextcache"
 //file://localhost/System/Library/Extensions.kextcache
 
 
@@ -209,7 +210,7 @@ int ExecKernel(void *binary)
 		setVideoMode( GRAPHICS_MODE, 0 );
 		// Draw gray screen. NOTE: no boot image, that's in the gui module
 #ifndef OPTION_ROM
-		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
+		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); //Slice -???
 #endif
 	}
 
@@ -283,42 +284,27 @@ void common_boot(int biosdev)
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
     // config table has been loaded. Call video_mode() instead.
-#if DEBUG
-    printf("before video_mode\n");
-#endif
     video_mode( 2 );  // 80x25 mono text mode.
-#if DEBUG
-    printf("after video_mode\n");
-#endif
 	
     // Scan and record the system's hardware information.
     scan_platform();
-	
+
     // First get info for boot volume.
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
-
-#if 0
-	 BVRef            next;            /* list linkage pointer */
-    int              biosdev;         /* BIOS device number */
-    int              type;            /* device type (floppy, hd, network) */
-    unsigned int     flags;           /* attribute flags */
-    BVGetDescription description;     /* BVGetDescription function */
-    int              part_no;         /* partition number (1 based) */
-#endif
+	
 #if DEBUG	
-    verbose("get bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x80 - flash-stick
+    printf("get bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x80 - flash-stick
+		getc();
 #endif
 	
     setBootGlobals(bvChain);
 	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
-
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;
     }
-	
     // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
     if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
         firstRun = false;
@@ -346,7 +332,7 @@ void common_boot(int biosdev)
 	gBootVolume = selectBootVolume(bvChain);
 	
 #if DEBUG	
-    verbose("separated bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x81 - HDD
+    printf("separated bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x81 - HDD
 	pause();
 #endif
 	
@@ -354,7 +340,7 @@ void common_boot(int biosdev)
 	if(init_module_system())
 	{
 #if DEBUG	
-		verbose("begin load_all_modules\n");
+		printf("begin load_all_modules\n");
 		pause();
 #endif
 		
@@ -363,7 +349,7 @@ void common_boot(int biosdev)
 	
 	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 #if DEBUG
-    verbose("ModulesLoaded\n");
+    printf("ModulesLoaded\n");
 	pause();
 #endif
 	
@@ -388,16 +374,9 @@ void common_boot(int biosdev)
 #endif
 	
 #if DEBUG
-    verbose("After rescan\n");
-	pause();
-#endif
-	
-	
-	
-#if DEBUG
-    verbose(" Default: %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-    verbose(" bt(0,0): %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-   // getc();
+    printf(" Default: %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+    printf(" bt(0,0): %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+    getc();
 	/* Results
 	 Rescan found 1 HDD and bvCount=4
 	 bvr: 836bc10, dev: 80, part: 4, flags: 4a, vis: 1
@@ -470,21 +449,6 @@ void common_boot(int biosdev)
         }
 		
 		
-		
-        // Other status (e.g. 0) means that we should proceed with boot.
-/*				
-		// Turn off any GUI elements
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
-		{
-			gui.devicelist.draw = false;
-			gui.bootprompt.draw = false;
-			gui.menu.draw = false;
-			gui.infobox.draw = false;
-			gui.logo.draw = false;
-			drawBackground();
-			updateVRAM();
-		}
-*/		
 		// Find out which version mac os we're booting.
 		getOSVersion(gMacOSVersion);
 		
@@ -556,21 +520,39 @@ void common_boot(int biosdev)
         if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig) == true) {
             strlcpy(gBootKernelCacheFile, val, len+1);
         } else {
-			if(gMacOSVersion[3] == '6') 
-				sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePathSnow, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", adler32);
+			if(gMacOSVersion[3] == '6') {
+				sprintf(gBootKernelCacheFile, "%skernelcache_%s", kDefaultCachePathSnow, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64"); //, adler32);
+				//Slice - TODO
+				/*
+				 - but the name is longer .adler32 and more...
+				 kernelcache_i386.E102928C.qSs0
+				 so will opendir and scan for some file
+				 
+				char* name;
+				long flagsC;
+				long timeC;
+				struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
+				while(readdir(cacheDir, (const char**)&name, &flagsC, &timeC) >= 0)
+				{
+					if(strcmp(&name[0], gBootKernelCacheFile) == 0) //?
+					{
+						//char* tmp = malloc(strlen(name) + 1);
+						//strcpy(tmp, name);
+					}
+				}
+				*/		
+			}
 			else //if(gMacOSVersion[3] == '5')
-				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
-//			else
-//				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePathTiger);
+				sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePath);
         }
-		msglog("Try cache %s\n", gBootKernelCacheFile);
         // Check for cache file.
         trycache = (((gBootMode & kBootModeSafe) == 0) &&
                     !gOverrideKernel &&
                     (gBootFileType == kBlockDeviceType) &&
                     (gMKextName[0] == '\0') &&
-                    (gBootKernelCacheFile[0] != '\0') &&
-					(gMacOSVersion[3] != '4'));
+                    (gBootKernelCacheFile[0] != '\0')); // &&
+//					(gMacOSVersion[3] != '4'));
+		verbose("Try cache %s %s\n", gBootKernelCacheFile, trycache?"YES":"NO");
 		
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 		
@@ -586,6 +568,7 @@ void common_boot(int biosdev)
             if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
                 || (cachetime < kerneltime)) {
                 trycache = 0;
+                verbose("Try cache failed\n");
                 break;
             }
             ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);

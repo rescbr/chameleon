@@ -159,6 +159,7 @@ menuitem_t infoMenuItems[] =
 	{ .text = "Boot" },
 	{ .text = "Boot Verbose" },
 	{ .text = "Boot Ignore Caches" },
+//	{ .text = "Boot Safe Mode" },
 	{ .text = "Boot Single User" },
 	{ .text = "Memory Info" },
 	{ .text = "Video Info" },
@@ -713,10 +714,11 @@ int initGUI(void)
 	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
+		gDualLink =((screen_params[0] * screen_params[1]) > (1<<20))?1:0;
 		msglog("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
 	}
-	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
-	{
+//	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
+//	{
 		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
 		{
 			screen_params[0] = val;
@@ -726,20 +728,26 @@ int initGUI(void)
 			screen_params[1] = val;
 		}		
 		msglog("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
-	}
+//	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 		msglog("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
 	}	
-	
-	
+/*	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
+	{
+		screen_params[0] = 1280;
+		screen_params[1] = 1024;
+		verbose("GUI MAX VESA screen width=%d height=%d\n",screen_params[0], screen_params[1]);						
+	}*/
+	screen_params[2] = 32;
 	// Initalizing GUI structure.
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
-	getGraphicModeParams(screen_params);
+	int modeV = getGraphicModeParams(screen_params);
+	verbose("GUI: set mode %d: %dx%dx%d\n", modeV, screen_params[0], screen_params[1], screen_params[2]);
 	
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	

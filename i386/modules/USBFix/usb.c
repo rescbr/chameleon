@@ -330,7 +330,7 @@ int uhci_reset (pci_dt_t *pci_dev)
 	base = pci_config_read32(pci_dev->dev.addr, 0x20);
 	port_base = (base >> 5) & 0x07ff;
 
-	msglog("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
+	msglog("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x) reset\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		port_base, base);

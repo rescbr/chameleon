@@ -21,7 +21,7 @@ void patchVideoBios()
 	UInt32 x = 0, y = 0, bp = 0;
 	
 	getResolution(&x, &y, &bp);
-	
+	verbose("getResolution: %dx%dx%d\n", (int)x, (int)y, (int)bp);
 	
 	if (x != 0 &&
 		y != 0 && 
@@ -30,6 +30,7 @@ void patchVideoBios()
 		vbios_map * map;
 		
 		map = open_vbios(CT_UNKWN);
+	//	verbose("open_vbios\n");
 		if(map)
 		{
 			unlock_vbios(map);
@@ -319,7 +320,7 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 
 		int i = 0;
 		while (i < 512)
-		{ // we don't need to look through the whole bios, just the firs 512 bytes
+		{ // we don't need to look through the whole bios, just the first 512 bytes
 			if ((	map->bios_ptr[i]   == 'N') 
 				&& (map->bios_ptr[i+1] == 'V') 
 				&& (map->bios_ptr[i+2] == 'I') 
@@ -381,6 +382,28 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 	 close_vbios(map);
 	 return 0;
 	 }*/
+	//Slice - Intel = 49 6E 74 65 6C located @ 0xBE6
+	/*
+	   PCIptr @0x18 = 0x0040
+	   version @0x20 = 0x0AE0
+	 */
+	int i = 0;
+	while (i < 4096)
+	{ // we don't need to look through the whole bios, just the first 0x1000 bytes
+		if ((	map->bios_ptr[i]   == 0x49) 
+			&& (map->bios_ptr[i+1] == 0x6E) 
+			&& (map->bios_ptr[i+2] == 0x74) 
+			&& (map->bios_ptr[i+3] == 0x65) 
+			&& (map->bios_ptr[i+4] == 0x6C)) 
+		{
+			verbose( "Intel VideoBIOS detected. \n");
+			map->bios = BT_INTEL;
+			close_vbios(map);
+			return 0;		
+			//break;
+		}
+		i++;
+	}
 	
 	/*
 	 * check for others
@@ -578,9 +601,14 @@ int getMode(edid_mode *mode)
 {
 	char* edidInfo = readEDID();
 			
-	if(!edidInfo) return 1;
-		
-	mode->pixel_clock = (edidInfo[55] << 8) | edidInfo[54];
+	if(edidInfo == 0) return 1;
+//Slice
+	if(fb_parse_edid((struct EDID *)edidInfo, mode) == 0) 
+	{
+		free( edidInfo );
+		return 1;
+	}
+/*	mode->pixel_clock = (edidInfo[55] << 8) | edidInfo[54];
 	mode->h_active =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
 	mode->h_blanking = ((edidInfo[58] & 0x0F) << 8) | edidInfo[57];
 	mode->v_active = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
@@ -589,7 +617,7 @@ int getMode(edid_mode *mode)
 	mode->h_sync_width = (edidInfo[65] & 0x30) | edidInfo[63];
 	mode->v_sync_offset = (edidInfo[65] & 0x0C) | ((edidInfo[64] & 0x0C) >> 2);
 	mode->v_sync_width = ((edidInfo[65] & 0x3) << 2) | (edidInfo[64] & 0x03);
-		
+*/		
 		
 	free( edidInfo );
 		
@@ -629,6 +657,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 	//	for (i=0; i < map->mode_table_size; i++) {
 	//		if (map->mode_table[0].mode == mode) {
 	switch(map->bios) {
+		case BT_INTEL:
+			return;
+
 		case BT_1:
 		{
 			vbios_resolution_type1 * res = map_type1_resolution(map, map->mode_table[i].resolution);
