@@ -401,6 +401,8 @@ int createBackBuffer( window_t *window )
 	
 	gui.backbuffer->width = gui.screen.width;
 	gui.backbuffer->height = gui.screen.height;
+//	gui.backbuffer->width = window->width;
+//	gui.backbuffer->height = window->height;
 	
 	return 0;
 }
