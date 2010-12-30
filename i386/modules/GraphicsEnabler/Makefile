@@ -1,12 +1,12 @@
-MODULE_NAME = ATI5000Enabler
+MODULE_NAME = GraphicsEnabler
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = ATI5000Enabler
+DIR = GraphicsEnabler
 
-MODULE_OBJS = ati5.o ATIEnabler.o
+MODULE_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
 
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
