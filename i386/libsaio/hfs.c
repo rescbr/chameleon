@@ -303,7 +303,15 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 
     /*if (strstr(filePath, ".plist")) verbose("LoadConfig: [%s/%s] %d bytes.\n", devStr, filePath, (uint32_t)length);*/
     if (strstr(filePath, "com.apple.Boot.plist")) verbose("Config: [%s/%s] %d bytes.\n", devStr, filePath, (uint32_t)length);
-    if (strstr(filePath, "theme.plist")) verbose("Theme: [%s].\n", devStr);
+    if (strstr(filePath, "theme.plist"))
+    {
+    	//valv: inspired from toitione's rtrim
+    	int t_len = strlen(filePath) - 12;
+    	char *themePath = strncpy(malloc(t_len + 1), filePath, t_len);
+    	themePath[t_len+1] = '\0';
+    	verbose("Theme: [%s]/%s\n", devStr, themePath);
+    }
+//    if (strstr(filePath, "theme.plist")) verbose("Theme: [%s].\n", devStr);
     if (strstr(filePath, "smbios.plist")) verbose("SMBios: [%s/%s] %d bytes.\n", devStr, filePath, (uint32_t)length);
     if (strstr(filePath, ".aml")) verbose("ACPI: [%s/%s] %d bytes.\n", devStr, filePath, (uint32_t)length);
     return length;

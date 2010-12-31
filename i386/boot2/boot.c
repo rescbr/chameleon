@@ -477,7 +477,7 @@ void common_boot(int biosdev)
 			closeVbios(map);
 		}
 		
-		// Find out which version mac os we're booting.
+		// Find out which mac os version we're booting.
 		getOSVersion(gMacOSVersion);
 
 		if (platformCPUFeature(CPU_FEATURE_EM64T)) {

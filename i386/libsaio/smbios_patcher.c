@@ -319,7 +319,8 @@ static int sm_get_bus_speed (const char *name, int table_num)
 					case 0x0e:	// Core Solo/Duo, "Yonah", 65nm
 					case 0x0f:	// Pentium 4, Core 2, Xeon, "Merom", "Conroe", 65nm
 					case 0x17:	// Core 2 Extreme, Xeon, "Penryn", "Wolfdale", 45nm
-					case 0x1c:	// Intel Atom, 45nm
+					case 0x1c:	// Intel Atom
+					case 0x27:	// Intel Atom, "Lincroft", 45nm
 						return 0; // TODO: populate bus speed for these processors
 						break;
 					case 0x2f:	// Core i7, "Westmere-Ex", 45nm, Hexa-Core
@@ -445,7 +446,8 @@ static int sm_get_cputype (const char *name, int table_num)
 				break;
 			case 0x0f:					// Pentium 4, Core 2, Xeon, "Merom", "Conroe", 65nm
 			case 0x17:					// Core 2 Extreme, Xeon, "Penryn", "Wolfdale", 45nm
-			case 0x1c:					// Intel Atom, 45nm
+			case 0x1c:					// Intel Atom
+			case 0x27:					// Intel Atom, "Lincroft", 45nm
 			default:
 				return sm_get_cores();
 		}

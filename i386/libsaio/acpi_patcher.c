@@ -318,6 +318,16 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		struct aml_chunk* root = aml_create_node(NULL);
 		aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
 		struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
+
+		struct aml_chunk* name_csd = aml_add_name(scop, "CSD_");
+		struct aml_chunk* pack_csd = aml_add_package(name_csd);
+		struct aml_chunk* csd = aml_add_package(pack_csd);
+		aml_add_byte(csd, 0x05);
+		aml_add_byte(csd, 0x00);
+		aml_add_dword(csd, 0x00);
+		aml_add_dword(csd, 0xfd);
+		aml_add_dword(csd, Platform.CPU.NoCores);
+
 		struct aml_chunk* name = aml_add_name(scop, "CST_");
 		struct aml_chunk* pack = aml_add_package(name);
 		aml_add_byte(pack, cstates_count);
@@ -368,12 +378,13 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 								aml_add_word(tmpl, 0x015e); // Power
 								verbose ("C6");
 							}
-							verbose("\n");
+							//verbose("\n");
 
 						break;
 
 					case 0x1C: // Atom (45nm)
-					case 0x26: // Atom Lincroft
+					//valv: was 0x26 ??? rely on cpu.c & smbios_patcher.c
+					case 0x27: // Atom Lincroft
 
 							// C1
 							cstate_resource_template[11] = 0x00; // C1-Atom
@@ -430,7 +441,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 								aml_add_word(tmpl, 0x0096); // Power
 								verbose ("C6 ");
 							}
-							verbose("\n");
+							//verbose("\n");
 
 						break;
 
@@ -492,7 +503,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 								aml_add_word(tmpl, 0x0096); // Power 150
 								verbose ("C6");
 							}
-							verbose("\n");
+							//verbose("\n");
 
 						break;
 				}
@@ -521,11 +532,10 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		ssdt->Checksum = 0;
 		ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
 
+		verbose (" @ %x\n", ssdt);
 		aml_destroy_node(root);
 		
 		//dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt->Length);
-		
-		//verbose ("SSDT with CPU C-States generated successfully\n");
 		
 		return ssdt;
 	}
@@ -788,10 +798,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		if (p_states_count > 0)
 		{	
 			int i;
-			//valv: fix p-states number issue for some models. TODO: move to top
+			//valv: fix p-states number issue on some models.
+			verbose("Model detected: %s\n", MacProduct);
 			if(!strstr(MacProduct, "applemac2010"))
 			{
-				verbose("Model detected: %s\n", MacProduct);
 				if(strstr(MacProduct, "MacBookPro4,1") && ((p_states_count > 9) && ((pstart == 0) && (pstates == 0)))) pstates = 8;
 				if(strstr(MacProduct, "MacBookAir1,1") && ((p_states_count > 4) && ((pstart == 0) && (pstates == 0)))) pstates = 3;
 			}
@@ -808,12 +818,13 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			aml_add_byte(psd, 0x05);
 			aml_add_byte(psd, 0x00);
 			aml_add_dword(psd, 0x00);
-			aml_add_dword(psd, 0xfc);
+			aml_add_dword(psd, 0xfd);
 			aml_add_dword(psd, Platform.CPU.NoCores);
 			
 			struct aml_chunk* name_pss = aml_add_name(scop, "PSS_");
 			struct aml_chunk* pack_pss = aml_add_package(name_pss);
 
+			uint8_t p_states_num = 0;
 			for (i = pstart; i < p_states_count; i++)
 			{
 				if ((p_states[i].Frequency <= freq_max) && (p_states[i].Frequency >= freq_min))
@@ -821,9 +832,9 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					//valv: inspired from cparm's pss-drop; coded by me ;)
 					if ((i > pstates) && (pstates > 0))
 					{
-						if(Platform.CPU.ISerie) verbose("P-State: [Frequency %d MHz, FID 0x%x] is the %dth state. Removed!\n",
+						if(Platform.CPU.ISerie) verbose("P-State: [Frequency %d MHz\tFID 0x%x] is the %dth state. Removed!\n",
 								p_states[i].Frequency, p_states[i].FID, (i+1));
-						else verbose("P-State: [Frequency %d MHz, FID 0x%x, VID 0x%x] is the %dth state. Removed!\n",
+						else verbose("P-State: [Frequency %d MHz\tFID 0x%x \tVID 0x%x] is the %dth state. Removed!\n",
 								p_states[i].Frequency, p_states[i].FID, p_states[i].VID, (i+1));
 					}
 					else
@@ -838,23 +849,24 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						{
 							aml_add_dword(pstt, p_states[i].FID);
 							aml_add_dword(pstt, p_states[i].FID);
-							verbose("P-State: Added [Frequency %d MHz, FID 0x%x]\n", p_states[i].Frequency, p_states[i].FID);
+							verbose("P-State: Added [Frequency %d MHz\tFID 0x%x]\n", p_states[i].Frequency, p_states[i].FID);
 						}
 						else
 						{
 							aml_add_dword(pstt, p_states[i].Control);
 							aml_add_dword(pstt, p_states[i].Control);
 							//aml_add_dword(pstt, i+1); // Status
-							verbose("P-State: Added [Frequency %d MHz, FID 0x%x, VID 0x%x]\n",
+							verbose("P-State: Added [Frequency %d MHz\tFID 0x%x \tVID 0x%x]\n",
 								p_states[i].Frequency, p_states[i].FID, p_states[i].VID);
 						}
+						p_states_num++;
 					}
 				}
 				else
 				{
-					if(Platform.CPU.ISerie) verbose("P-State: [Frequency %d MHz, FID 0x%x] is over the limit. Removed!\n",
+					if(Platform.CPU.ISerie) verbose("P-State: [Frequency %d MHz\tFID 0x%x] is over the limit. Removed!\n",
 							p_states[i].Frequency, p_states[i].FID);
-					else verbose("P-State: [Frequency %d MHz, FID 0x%x, VID 0x%x] is over the limit. Removed!\n",
+					else verbose("P-State: [Frequency %d MHz\tFID 0x%x \tVID 0x%x] is over the limit. Removed!\n",
 							p_states[i].Frequency, p_states[i].FID, p_states[i].VID);
 				}
 			}
@@ -884,10 +896,9 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			ssdt->Length = root->Size;
 			ssdt->Checksum = 0;
 			ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
-                        
-                        aml_destroy_node(root);
-                        			
-			//verbose ("SSDT with CPU P-States generated successfully\n");
+			
+			verbose ("P-States: %d states were succefully generated @ %x\n", p_states_num, ssdt);
+			aml_destroy_node(root);
 			
 			return ssdt;
 		}
@@ -952,27 +963,55 @@ struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_fadt* fadt)
 		struct t_state t_states[32];
 		uint8_t t_states_count = 0, ctrl0 = 0x10, j = 0x01;
 		int i, step;
+		uint64_t msr;
+		uint32_t ext_mod; // *ret = 0;
 		
-		if(!fadt->DUTY_WIDTH)
+		do_cpuid(6, Platform.CPU.CPUID[CPUID_81]);
+		ext_mod = bitfield(Platform.CPU.CPUID[CPUID_81][0], 5, 5);
+		
+		if(ext_mod == 1)
 		{
 			verbose("T-States: Unsupported CPU !!!\n");
 			return NULL;
 		}
 		
-		verbose("T-States: duty_offset=%d, duty_width=%d", fadt->DUTY_OFFSET, fadt->DUTY_WIDTH);
+		msr = rdmsr64(MSR_IA32_CLOCK_MODULATION);
+		t_states_count = msr & 0xE;
+
+		//if(!fadt->DUTY_WIDTH)
+		if(t_states_count == 0)
+		{
+			verbose("T-States: Unsupported CPU !!!\n");
+			return NULL;
+		}
+/*		
+		verbose("T-States: duty_offset=%d, duty_width=%d\n", fadt->DUTY_OFFSET, fadt->DUTY_WIDTH);
 		uint8_t duty_cycle = fadt->DUTY_WIDTH + fadt->DUTY_OFFSET;
 		
-		if (duty_cycle > 4)
+		if(duty_cycle > 4)
 		{
-			verbose(", Spanning bit 4");
-			//return NULL;
-			t_states_count = 8;
+			verbose("T-States: Spanning bit 4\n");
+			for (i=2; i<21; i++)
+			{
+				if(duty_cycle > 4)
+				{
+					verbose("duty_cycle: %d\n", duty_cycle);
+					sleep(i);
+					i++;
+				}
+				//return NULL;
+				else
+				{
+					t_states_count = 8;
+					goto nrx;
+				}
+			}
 		}
 		else t_states_count = 1 << fadt->DUTY_WIDTH;
-
-		step = (1000 / t_states_count);
-		verbose("\nT-States: step=%d\n", step);
 		
+		nrx:
+*/
+		step = (1000 / t_states_count);
 		for (i = 1; i < t_states_count; i++)
 		{
 			t_states[i].perf = (1000 - (step * i)) / 10;
@@ -1020,7 +1059,7 @@ struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_fadt* fadt)
 			aml_add_byte(tsd, 0x05);
 			aml_add_byte(tsd, 0x00);
 			aml_add_dword(tsd, 0x00);
-			aml_add_dword(tsd, 0xfc);
+			aml_add_dword(tsd, 0xfd);
 			aml_add_dword(tsd, Platform.CPU.NoCores);
 
 			// Add aliaces
@@ -1045,10 +1084,10 @@ struct acpi_2_ssdt *generate_tss_ssdt(struct acpi_2_fadt* fadt)
 			ssdt->Length = root->Size;
 			ssdt->Checksum = 0;
 			ssdt->Checksum = 256 - checksum8(ssdt, ssdt->Length);
-                        
-                        aml_destroy_node(root);
-                        			
-			verbose ("T-States: %d states were succefully generated\n");
+			
+			verbose ("T-States: step=%d, %d states were succefully generated @ %x\n", step, t_states_count, ssdt);
+			
+			aml_destroy_node(root);
 		
 			return ssdt;
 		}
@@ -1114,7 +1153,7 @@ void *loadSSDTTable(int ssdt_number)
 			return NULL;
 		}
 		
-		DBG("Table %s read and stored at: %x\n", dirspec, tableAddr);
+		verbose("Table %s read and stored at: %x\n", dirspec, tableAddr);
 		close (fd);
 		return tableAddr;
 	}
@@ -1802,7 +1841,7 @@ int setupAcpi(void)
 		else
 		{
 			rsdp_mod->RsdtAddress=0;
-			printf("RSDT not found or RSDT incorrect\n");
+			printf("RSDT not found or incorrect\n");
 		}
 
 		if (version)
@@ -2154,7 +2193,7 @@ int setupAcpi(void)
 				 */
 
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
-				verbose("XSDT not found or XSDT incorrect\n");
+				verbose("XSDT not found or incorrect\n");
 			}
 		}
 

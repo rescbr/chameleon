@@ -124,6 +124,7 @@ typedef struct _PlatformInfo_t {
 		uint8_t			CurrDiv;				// Current Halving ID
 		uint64_t		TSCFrequency;			// TSC Frequency Hz
 		uint64_t		FSBFrequency;			// FSB Frequency Hz
+		uint64_t		FSBIFrequency;			// FSB Frequency Hz (initial)
 		uint64_t		CPUFrequency;			// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
