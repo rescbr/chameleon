@@ -45,23 +45,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_MEROM:		// Merom		0x0F
 					case CPU_MODEL_PENRYN:		// Penryn		0x17
 					case CPU_MODEL_ATOM:		// Atom 45nm	0x1C
-						value->word = 0;		// TODO: populate bus speed for these processors
-						
-//					case CPU_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
-//						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-//							return 2500;		// Core i5
-//						return 4800;			// Core i7
-						
-//					case CPU_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
-//					case CPU_MODEL_NEHALEM_EX:
-//					case CPU_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
-//						return 4800;			// GT/s / 1000
-//						
-					case CPU_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
-						value->word = 0;		// TODO: populate bus speed for these processors
-						
-//					case 0x19:					// Intel Core i5 650 @3.20 Ghz
-//						return 2500;			// why? Intel spec says 2.5GT/s 
+						return false;
 
 					case 0x19:					// Intel Core i5 650 @3.20 Ghz
 					case CPU_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
@@ -70,6 +54,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm)
 					case CPU_MODEL_WESTMERE:	// Intel Core i7 LGA1366 (32nm) 6 Core
 					case CPU_MODEL_NEHALEM_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPU_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
@@ -99,12 +84,13 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
 						DBG("qpibusspeed %d\n", qpibusspeed);
 						value->word = qpibusspeed;
+						return true;
 					}
 				}
 			}
 		}
 	}
-	return true;
+	return false;
 }
 
 uint16_t simpleGetSMBOemProcessorType(void)
