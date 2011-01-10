@@ -717,33 +717,36 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		else if(p->CPU.ExtFamily >= 0x01 /* K10+ */)
 		{
+			msr = rdmsr64(K10_COFVID_STATUS);
+			currdiv = (2 << ((msr >> 6) & 0x07)) / 2;
 			msr = rdmsr64(AMD_10H_11H_CONFIG);
 			if(p->CPU.ExtFamily == 0x01 /* K10 */)
 			{
 				bus_ratio_max = ((msr) & 0x3F);
-				currdiv = (((msr) >> 6) & 0x07);
-				cpuFrequency = 100 * (bus_ratio_max + 0x08) / (1 << currdiv);
+				//currdiv = (((msr) >> 6) & 0x07);
+				//cpuFrequency = 100 * (bus_ratio_max + 0x08) / (1 << currdiv);
 			}
 			else /* K11+ */
 			{
 				bus_ratio_max = ((msr) & 0x3F);
-				currdiv = (((msr) >> 6) & 0x07);
-				cpuFrequency = 100 * (bus_ratio_max + 0x10) / (1 << currdiv);
+				//currdiv = (((msr) >> 6) & 0x07);
+				//cpuFrequency = 100 * (bus_ratio_max + 0x10) / (1 << currdiv);
 			}
-			fsbFrequency = (cpuFrequency / bus_ratio_max);
+			fsbFrequency = (tscFrequency / bus_ratio_max);
+			cpuFrequency = tscFrequency;
 		}
 		
 		p->CPU.MaxRatio = bus_ratio_max * 10;
 		
 		// valv: to be moved to acpi_patcher when ready
-		msr_t amsr = rdmsr(K8_FIDVID_STATUS);
+/*		msr_t amsr = rdmsr(K8_FIDVID_STATUS);
 		uint8_t max_fid = (amsr.lo & 0x3F) >> 16;
 		uint8_t min_fid = (amsr.lo & 0x3F) >> 8;
 		uint8_t max_vid = (amsr.hi & 0x3F) >> 16;
 		uint8_t min_vid = (amsr.hi & 0x3F) >> 8;
 		verbose("AMD: max[fid: %d, vid: %d] min[fid: %d, vid: %d]\n", max_fid, max_vid, min_fid, min_vid);
 
-/*
+
 			case 0x10:	// phenom
 				msr = rdmsr64(AMD_10H_11H_CONFIG);
 				bus_ratio_max = ((msr) & 0x3F);
