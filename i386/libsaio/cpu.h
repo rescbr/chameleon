@@ -15,9 +15,10 @@ extern void scan_cpu(PlatformInfo_t *);
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
-#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
+#define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
 #define MSR_FSB_FREQ                   0xCD
+#define MSR_EBC_FREQUENCY_ID           0x2C
 #define MSR_TURBO_RATIO_LIMIT          0x1AD
 #define MSR_IA32_PLATFORM_ID           0x17
 #define	MSR_IA32_PERF_STATUS           0x198
@@ -30,6 +31,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define MSR_IA32_CLOCK_MODULATION      0x19A
 #define MSR_THERMAL_TARGET             0x01A2
 #define PIC_SENS_CFG                   0x1aa
+#define MSR_EBL_CR_POWERON             0x02a
 #define K8_FIDVID_STATUS               0xC0010042
 #define	AMD_10H_11H_CONFIG             0xc0010064
 #define K10_COFVID_STATUS              0xC0010071

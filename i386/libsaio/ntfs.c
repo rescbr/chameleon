@@ -328,7 +328,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 									(unsigned short)boot->bf_volsn & 0xFFFF);
 
 	return 0;
-}    
+}
 
 bool NTFSProbe(const void * buffer)
 {

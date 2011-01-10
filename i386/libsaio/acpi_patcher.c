@@ -288,6 +288,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 			int intelCPU = Platform.CPU.Model;
 			switch (intelCPU) 
 			{
+				case 0x0C:
+					if (strstr(Platform.CPU.BrandString, "Atom")) goto ncst_atm;
 				case 0x0F: // Core (65nm)
 				case 0x1A: // Core i7, Xeon 5500 series - Bloomfield, Gainstown NHM-EP - LGA1366 (45nm)
 				case 0x1E: // Core i5, i7 - Clarksfield, Lynnfield, Jasper Forest - LGA1156 (45nm)
@@ -301,6 +303,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 					break;
 				case 0x1C: // Atom (45nm)
 				case 0x26: // Atom Lincroft
+					ncst_atm:
 					cstates_count = 1 + (c2_enabled ? 1 : 0) + (c4_enabled ? 1 : 0) + (c6_enabled ? 1 : 0);
 					verbose("C-State: Adding %d states: ", cstates_count);
 					break;
@@ -338,6 +341,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 			{
 				switch (Platform.CPU.Model) 
 				{
+					case 0x0C:
+						if (strstr(Platform.CPU.BrandString, "Atom")) goto cst_atm;
 					case 0x0F: // Core (65nm)
 					case 0x1A: // Core i7, Xeon 5500 series - Bloomfield, Gainstown NHM-EP - LGA1366 (45nm)
 					case 0x1E: // Core i5, i7 - Clarksfield, Lynnfield, Jasper Forest - LGA1156 (45nm)
@@ -385,7 +390,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 					case 0x1C: // Atom (45nm)
 					//valv: was 0x26 ??? rely on cpu.c & smbios_patcher.c
 					case 0x27: // Atom Lincroft
-
+							cst_atm:
 							// C1
 							cstate_resource_template[11] = 0x00; // C1-Atom
 							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));

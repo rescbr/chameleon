@@ -93,8 +93,6 @@ typedef struct sModeTable_
 	struct sModeTable_ *prev;
 	struct sModeTable_ *next;
 } sModeTable;
-	
-
 
 typedef struct
 {

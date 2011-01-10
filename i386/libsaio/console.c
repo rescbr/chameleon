@@ -53,8 +53,8 @@ bool gVerboseMode;
 bool gErrors;
 
 /* Kabyl: BooterLog */
-#define BOOTER_LOG_SIZE	(64 * 1024)
-#define SAFE_LOG_SIZE	80
+#define BOOTER_LOG_SIZE	(128 * 1024)
+#define SAFE_LOG_SIZE	134
 
 char *msgbuf = 0;
 char *cursor = 0;
@@ -111,7 +111,6 @@ void setupBooterLog(void)
 		DT__AddProperty(node, "boot-log", strlen((char *)msgbuf) + 1, msgbuf);
 }
 /* Kabyl: !BooterLog */
-
 
 /*
  * write one character to console
@@ -249,6 +248,6 @@ void stop(const char * fmt, ...)
 /** Print a "Press a key to continue..." message and wait for a key press. */
 void pause() 
 {
-    printf("Press a key to continue...");
+    printf("Press a key to continue...\n");
     getc();
 }

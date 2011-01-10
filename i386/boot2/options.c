@@ -741,12 +741,12 @@ int getBootOptions(bool firstRun)
 			key = bgetc ();
 			if (key == 0x4200) f8 = true;
 			if (key == 0x2100) altf = true;
-			if (key == 0x2146) shiftf = true;
+			if (key == 0x0046) shiftf = true;
 			if (key == 0x1F00) alts = true;
 			if (key == 0x2F00) altv = true;
 			if (key == 0x2D00) altx = true;
-			if (key == 0x0403) x32 = true;
-			if (key == 0x0705) x64 = true;
+			if (key == 0x0004) x32 = true;
+			if (key == 0x0007) x64 = true;
 		}
 
 	// If user typed F8, abort quiet mode, and display the menu.

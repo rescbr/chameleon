@@ -56,9 +56,7 @@ vBiosMap * openNvidiaVbios(vBiosMap *map)
 		}
 		i++;
 	}
-	
-	
-	
+
 	if (nvModeline_2_Offset == (VBIOS_SIZE-1) || nvModeline_2_Offset == 0)
 	{
 		//If no second vesa table is available, free the corresponding table in chain
@@ -122,8 +120,7 @@ vBiosMap * openNvidiaVbios(vBiosMap *map)
 	
 	saveTables(map->modeTables);
 	
-#if AUTORES_DEBUG
-	PRINT("Press Any Key...\n");
+#ifdef AUTORES_DEBUG
 	getc();
 #endif
 	
@@ -216,9 +213,6 @@ bool nvidiaSetMode(sModeTable * table, uint8_t idx, uint32_t* x, uint32_t* y)
 			
 			idx++;
 		}
-		
-		
-		
 	}
 	return TRUE;
 }

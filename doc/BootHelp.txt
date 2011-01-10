@@ -14,7 +14,7 @@ Example arguments include
 
  kernel: kernel name                (e.g. "mach_kernel" - must be in "/" )
 
- flags: -v (verbose)    -s (single user mode), 
+ flags: -v (verbose)    -s (single user mode),
         -x (safe mode)  -F (ignore boot configuration file)
 
  "Graphics Mode"="WIDTHxHEIGHTxDEPTH" (e.g. "1024x768x32")
@@ -40,9 +40,9 @@ Special booter hotkeys:
   alt+v         Verbose
   alt+x         Safe mode
   alt+l         Legacy mode (not sure why you need this)
-  6+4           64-bit
-  3+2           32-bit
-  
+  6             64-bit
+  3             32-bit
+
 Special booter commands:
 ------------------------
   ?memory       Display information about the computer's memory.

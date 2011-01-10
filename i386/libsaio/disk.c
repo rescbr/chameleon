@@ -1313,7 +1313,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
                                       kBIOSDevTypeHardDrive, bvrFlags);
             }
 
-						// zef - foreign OS support
+			// zef - foreign OS support
             if ( (efi_guid_compare(&GPT_BASICDATA_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
                  (efi_guid_compare(&GPT_BASICDATA2_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
             {

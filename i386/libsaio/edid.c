@@ -77,7 +77,7 @@ unsigned char* readEDID()
 
 		status = getEDID(edidInfo, blocks_left);
 		
-				//printf("Buffer location: 0x%X\n", SEG(buffer) << 16 | OFF(buffer));
+		//printf("Buffer location: 0x%X\n", SEG(buffer) << 16 | OFF(buffer));
 
 		/*
 		int j, i;

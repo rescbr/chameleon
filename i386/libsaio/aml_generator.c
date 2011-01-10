@@ -26,7 +26,7 @@ bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
 			case AML_CHUNK_NAME:
 				if (parent->First) 
 				{
-					verbose("aml_add_to_parent: Name node could only have one child!");
+					verbose("aml_add_to_parent: Name node could have one child only!");
 					return FALSE;
 				}
 				break;

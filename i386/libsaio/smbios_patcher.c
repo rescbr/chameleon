@@ -315,7 +315,7 @@ static int sm_get_bus_speed (const char *name, int table_num)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case 0x0D:	// Pentium M model D
+					case 0x0d:	// Pentium M, "Dothan", 90nm
 					case 0x0e:	// Core Solo/Duo, "Yonah", 65nm
 					case 0x0f:	// Pentium 4, Core 2, Xeon, "Merom", "Conroe", 65nm
 					case 0x17:	// Core 2 Extreme, Xeon, "Penryn", "Wolfdale", 45nm
@@ -326,6 +326,8 @@ static int sm_get_bus_speed (const char *name, int table_num)
 					case 0x2f:	// Core i7, "Westmere-Ex", 45nm, Hexa-Core
 						return 0; // TODO: populate bus speed for these processors
 						break;
+					case 0x0c:	// Core i7 & Atom
+						if(strstr(Platform.CPU.BrandString, "Atom")) return 0;
 					case 0x19:	// Core i5 650
 					case 0x1a:	// Core i7 LGA1366, Xeon 550, 45nm
 					case 0x1e:	// Core i7, i5 LGA1156, "Lynnfield", "Jasper", 45nm
@@ -400,6 +402,10 @@ static int sm_get_cputype (const char *name, int table_num)
 
 		switch (intelPM)
 		{
+			case 0xc:					// Core i7 & Atom
+				if(strstr(Platform.CPU.BrandString, "Atom")) return sm_get_cores();
+				else return 0x0701;
+				break;
 			case 0x0d:					// Pentium M model D
 				return 0x0101;
 				break;

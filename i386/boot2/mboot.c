@@ -8,14 +8,13 @@
 
 #include "mboot.h"
 
-struct multiboot_info *gMI;
-
 int multiboot_timeout=0;
 int multiboot_timeout_set=0;
 int multiboot_partition=0;
 int multiboot_partition_set=0;
 
 // Global multiboot info, if using multiboot.
+struct multiboot_info *gMI;
 
 extern void continue_at_low_address(void);
 

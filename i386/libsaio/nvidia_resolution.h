@@ -1,5 +1,5 @@
 /*
- *  nviviaresolution.h
+ *  nvidia_resolution.h
  *  
  *
  *  Created by Le Bidou on 19/03/10.
@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _NVDA_RESOLUTION_HEADER_
-#define _NVDA_RESOLUTION_HEADER_
+#ifndef _NVIDIA_RESOLUTION_HEADER_
+#define _NVIDIA_RESOLUTION_HEADER_
 
 #include "libsaio.h"
 #include "autoresolution.h"
