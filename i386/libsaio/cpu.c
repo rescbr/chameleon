@@ -266,7 +266,7 @@ void scan_cpu(PlatformInfo_t *p)
 							max_ratio = (max_ratio * 10);
 							if (len >= 3) max_ratio = (max_ratio + 5);
 
-							verbose("Bus-Ratio: min=%d%s, max=%d%s\n", bus_ratio_min, bus_ratio_max);
+							verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 							// extreme overclockers may love 320 ;)
 							if ((max_ratio >= min_ratio) && (max_ratio <= 320))
@@ -274,7 +274,6 @@ void scan_cpu(PlatformInfo_t *p)
 								cpuFrequency = (fsbFrequency * max_ratio) / 10;
 								if (len >= 3) maxdiv = 1;
 								else maxdiv = 0;
-								verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %s]\n", myfsb, newratio);
 							}
 							else max_ratio = (bus_ratio_max * 10);
 						}
@@ -285,6 +284,8 @@ void scan_cpu(PlatformInfo_t *p)
 						
 						//fsbi = fsbFrequency;
 						if(getIntForKey(kForceFSB, &myfsb, &bootInfo->bootConfig)) goto forcefsb;
+						else myfsb = fsbFrequency / 1000000;
+						verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %s]\n", myfsb, newratio);
 						break;
 					case 0xd:		// Pentium M, Dothan, 90nm
 					case 0xe:		// Core Duo/Solo, Pentium M DC
@@ -763,7 +764,7 @@ void scan_cpu(PlatformInfo_t *p)
 			
 			if(maxrtio == ((bus_ratio_max * 10) - 5))
 			{
-				verbose("multi: max:%d.5, ", (bus_ratio_max - 1));
+				verbose("multi: max:%d.5, min:", (bus_ratio_max - 1));
 				maxdiv = 1;
 			}
 			else if(maxrtio == ((bus_ratio_max - 1) * 10))
@@ -827,7 +828,7 @@ void scan_cpu(PlatformInfo_t *p)
 					vid = bitfield(msr, 15, 9);
 					
 					if(i == 0) verbose("P-State %d: Frequency: %d, Multiplier: %d%s, vid: %d\n", i, state[i].freq, fid, maxdiv ? ".5" : "", vid);
-					else if((state[i].freq > state[i+1].freq) || (state[i].freq < 800)) verbose("P-State %d: Removed!", i);
+					else if((state[i].freq > state[i-1].freq) || (state[i].freq < 800)) verbose("P-State %d: Removed!\n", i);
 					else verbose("P-State %d: Frequency: %d, Multiplier: %d, vid: %d\n", i, state[i].freq, fid, vid);
 					state[i].pstate_id = i;
 					// valv: zeroed for now
