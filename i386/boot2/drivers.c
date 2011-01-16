@@ -38,6 +38,7 @@
 #include "bootstruct.h"
 #include "xml.h"
 #include "ramdisk.h"
+#include "kernel_patcher.h"
 
 extern char gMacOSVersion;
 
@@ -815,6 +816,8 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	  ret = ThinFatFile(&binary, &len);
   }
   
+  patch_kernel(binary);
+
   ret = DecodeMachO(binary, rentry, raddr, rsize);
 	
   if (ret<0 && archCpuType==CPU_TYPE_X86_64)

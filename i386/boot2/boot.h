@@ -148,6 +148,7 @@
 #define kC2EEnable			"C2E"				/* cpu.c */
 #define kC4EEnable			"C4E"				/* cpu.c */
 #define kHardC4EEnable		"HC4E"				/* cpu.c */
+#define kFixTM				"FixTM"				/* cpu.c */
 #define kdcfg0				"display_0"			/* nvidia.c */
 #define kdcfg1				"display_1"			/* nvidia.c */
 #define kpstates			"PStates"			/* acpi_patcher.c */

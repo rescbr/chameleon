@@ -496,7 +496,7 @@ void common_boot(int biosdev)
 		if (getValueForKey(k64BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
 			archCpuType = CPU_TYPE_X86_64;
 		}
-		
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;

@@ -10,6 +10,7 @@
 #include "pci.h"
 #include "platform.h"
 #include "spd.h"
+#include "cpu.h"
 #include "saio_internal.h"
 #include "bootstruct.h"
 #include "memvendors.h"
@@ -21,7 +22,7 @@
 #if DEBUG_SPD
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 static const char *spd_memory_types[] =
@@ -128,7 +129,7 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
     uint8_t code = 0;
     int i = 0;
     uint8_t * spd = (uint8_t *) slot->spd;
-	
+
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) { // DDR3
         bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
         code = spd[SPD_DDR3_MEMORY_CODE];
@@ -264,7 +265,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
         // Check spd is present
-        if (spd_size && (spd_size != 0xff) ) {
+        if (spd_size && (spd_size != 0xff))
+        {
 
 			slot->spd = spdbuf;
             slot->InUse = true;
@@ -275,7 +277,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
             
 			//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
             init_spd(slot->spd, base, i);
-			
+		
             switch (slot->spd[SPD_MEMORY_TYPE])  {
             case SPD_MEMORY_TYPE_SDRAM_DDR2:
                 
@@ -316,7 +318,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				}
 				slot->Frequency = freq;
 			}
-			
+
 			verbose("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
                        i, 
                        (int)slot->Type,
@@ -326,15 +328,16 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
-			if(DEBUG_SPD) {
-                  dumpPhysAddr("spd content: ",slot->spd, spd_size);
+
+#if DEBUG_SPD
+                  dumpPhysAddr("spd content: ", slot->spd, spd_size);
                     getc();
-            }
+#endif
         }
 
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
         Platform.DMI.DIMM[i]= 
-            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.MaxMemorySlots==2 ? 
+            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.MaxMemorySlots == 2 ? 
             mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
         
 		slot->spd = NULL;

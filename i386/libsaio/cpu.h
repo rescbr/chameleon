@@ -33,6 +33,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define PIC_SENS_CFG                   0x1aa
 #define MSR_EBL_CR_POWERON             0x02a
 #define K8_FIDVID_STATUS               0xC0010042
+#define	MSR_AMD_10H_11H_LIMIT          0xc0010061
 #define	AMD_10H_11H_CONFIG             0xc0010064
 #define K10_COFVID_STATUS              0xC0010071
 

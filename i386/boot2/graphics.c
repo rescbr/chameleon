@@ -1139,7 +1139,7 @@ setVideoMode( int mode, int drawgraphics)
             params[1] = 25;
         }
 
-		setVESATextMode( params[0], params[1], 4 );
+	setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
 

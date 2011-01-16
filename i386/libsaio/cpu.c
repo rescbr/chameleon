@@ -218,11 +218,12 @@ void scan_cpu(PlatformInfo_t *p)
 				switch (intelCPU)
 				{
 					case 0xc:		// Core i7 & Atom
-						if (strstr(p->CPU.BrandString, "Atom")) goto teleport;
+						if (strstr(p->CPU.BrandString, "Atom")) goto teleport1;
 					case 0x1a:		// Core i7 LGA1366, Xeon 5500, "Bloomfield", "Gainstown", 45nm
 					case 0x1e:		// Core i7, i5 LGA1156, "Clarksfield", "Lynnfield", "Jasper", 45nm
 					case 0x1f:		// Core i7, i5, Nehalem
 					case 0x25:		// Core i7, i5, i3 LGA1156, "Westmere", "Clarkdale", "Arrandale", 32nm
+					case 0x2a:		// Sandy Bridge, 32nm
 					case 0x2c:		// Core i7 LGA1366, Six-core, "Westmere", "Gulftown", 32nm
 					case 0x2e:		// Core i7, Nehalem-Ex Xeon, "Beckton"
 					case 0x2f:		// Core i7, Nehalem-Ex Xeon, "Eagleton"
@@ -287,7 +288,10 @@ void scan_cpu(PlatformInfo_t *p)
 						break;
 					case 0xd:		// Pentium M, Dothan, 90nm
 					case 0xe:		// Core Duo/Solo, Pentium M DC
-						goto teleport;
+							teleport1:
+							msr = rdmsr64(MSR_IA32_EXT_CONFIG);
+							if(msr & (1 << 30)) tjmax = 85;
+							goto teleport2;
 					case 0xf:		// Core Xeon, Core 2 DC, 65nm
 						switch (Stepp)
 						{
@@ -304,7 +308,6 @@ void scan_cpu(PlatformInfo_t *p)
 								break;
 							case 0xd:
 							default:
-							teleport:
 								msr = rdmsr64(MSR_IA32_EXT_CONFIG);
 								if(msr & (1 << 30)) tjmax = 85;
 								break;
@@ -335,6 +338,7 @@ void scan_cpu(PlatformInfo_t *p)
 						}
 					case 0x16:		// Celeron, Core 2 SC, 65nm
 					case 0x27:		// Atom Lincroft, 45nm
+						teleport2:
 						core_i = false;
 						//valv: todo: msr_therm2_ctl (0x19d) bit 16 (mode of automatic thermal monitor): 0=tm1, 1=tm2
 						//also, if bit 3 of misc_enable is cleared the above would have no effect
@@ -344,23 +348,26 @@ void scan_cpu(PlatformInfo_t *p)
 						{
 							msr_t msr32;
 							msr32 = rdmsr(MSR_IA32_MISC_ENABLE);
-
-							//thermally-initiated on-die modulation of the stop-clock duty cycle
-							if(!(rdmsr64(MSR_IA32_MISC_ENABLE) & (1 << 3))) msr32.lo |= (1 << 3);
-							verbose("CPU: Thermal Monitor:              TM, ");
-							
-							//BIOS must enable this feature if the TM2 feature flag (CPUID.1:ECX[8]) is set
-							if(platformCPUFeature(CPU_FEATURE_TM2))
-							{
-								//thermally-initiated frequency transitions
-								msr32.lo |= (1 << 13);
-								verbose("TM2, ");
+							bool tmfix = false;
+							getBoolForKey(kFixTM, &tmfix, &bootInfo->bootConfig);
+							if(tmfix)
+							{	
+								//thermally-initiated on-die modulation of the stop-clock duty cycle
+								if(!(rdmsr64(MSR_IA32_MISC_ENABLE) & (1 << 3))) msr32.lo |= (1 << 3);
+								verbose("CPU: Thermal Monitor:              TM, ");
+								
+								//BIOS must enable this feature if the TM2 feature flag (CPUID.1:ECX[8]) is set
+								if(platformCPUFeature(CPU_FEATURE_TM2))
+								{
+									//thermally-initiated frequency transitions
+									msr32.lo |= (1 << 13);
+									verbose("TM2, ");
+								}
+								msr32.lo |= (1 << 17);
+								verbose("PROCHOT, ");
+								msr32.lo |= (1 << 10);
+								verbose("FERR\n");
 							}
-							msr32.lo |= (1 << 17);
-							verbose("PROCHOT, ");
-							msr32.lo |= (1 << 10);
-							verbose("FERR\n");
-							
 							bool oem_ssdt, tmpval;
 							oem_ssdt = false;
 							
@@ -377,15 +384,20 @@ void scan_cpu(PlatformInfo_t *p)
 								if((c4e) && platformCPUFeature(CPU_FEATURE_MOBILE)) msr32.hi |= (1 << (32 - 32));
 								getBoolForKey(kHardC4EEnable, &hc4e, &bootInfo->bootConfig);
 								if((hc4e) && platformCPUFeature(CPU_FEATURE_MOBILE)) msr32.hi |= (1 << (33 - 32));
+								if(c2e || c4e || hc4e) tmfix = true;
 							}
 							
-							msr32.hi |= (1 << (36 - 32)); // EMTTM
-
-							wrmsr(MSR_IA32_MISC_ENABLE, msr32);
-							
-							msr32 = rdmsr(PIC_SENS_CFG);
-							msr32.lo |= (1 << 21);
-							wrmsr(PIC_SENS_CFG, msr32);
+							if(tmfix)
+							{
+								msr32.hi |= (1 << (36 - 32)); // EMTTM
+								wrmsr(MSR_IA32_MISC_ENABLE, msr32);
+							}
+							if(tmfix)
+							{
+								msr32 = rdmsr(PIC_SENS_CFG);
+								msr32.lo |= (1 << 21);
+								wrmsr(PIC_SENS_CFG, msr32);
+							}
 						}
 						
 						if (rdmsr64(MSR_IA32_EXT_CONFIG) & (1 << 27))
@@ -440,8 +452,8 @@ void scan_cpu(PlatformInfo_t *p)
 										break;
 								}
 							}
-							uint64_t minfsb = 183000000, maxfsb = 185000000;
-							if (((fsbFrequency > minfsb) && (fsbFrequency < maxfsb)) || (!fsbFrequency))
+							uint64_t minfsb = 182000000, maxfsb = 185000000;
+							if(((fsbFrequency > minfsb) && (fsbFrequency < maxfsb)) || !fsbFrequency)
 							{
 								fsbFrequency = 200000000;
 								fsbad = true;
@@ -666,7 +678,8 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 	}
 //#if 0
-	else if(p->CPU.Vendor == 0x68747541 /* AMD */ && p->CPU.Family == 0x0f) // valv: work in progress
+	// valv: work in progress. Most of this code is going to be moved when ready
+	else if(p->CPU.Vendor == 0x68747541 /* AMD */ && p->CPU.Family == 0x0f)
 	{
 		verbose("CPU: ");
 		// valv: very experimental mobility check
@@ -676,6 +689,9 @@ void scan_cpu(PlatformInfo_t *p)
 			do_cpuid(0x80000007, p->CPU.CPUID[CPUID_MAX]);
 			amo = bitfield(p->CPU.CPUID[CPUID_MAX][0], 6, 6);
 			const_tsc = bitfield(p->CPU.CPUID[CPUID_MAX][3], 8, 8);
+			// valv: p-state support verification
+			//uint32_t pstate_support = bitfield(p->CPU.CPUID[CPUID_MAX][3], 2, 1);
+			//if(pstate_support != 0) verbose("supproted p-state transition\n")
 			
 			if (const_tsc != 0) verbose("Constant TSC!\n");
 			if (amo == 1)
@@ -696,8 +712,11 @@ void scan_cpu(PlatformInfo_t *p)
 
 		if(p->CPU.ExtFamily == 0x00 /* K8 */)
 		{
+			// valv: this section needs some work
 			msr = rdmsr64(K8_FIDVID_STATUS);
-			bus_ratio_max = (msr & 0x3f) / 2 + 4;
+			bus_ratio_max = bitfield(msr, 21, 16);
+			//bus_ratio_max = (msr & 0x3f) / 2 + 4;
+			bus_ratio_min = bitfield(msr, 13, 8);
 			currdiv = (msr & 0x01) * 2;
 			if (bus_ratio_max)
 			{
@@ -715,52 +734,113 @@ void scan_cpu(PlatformInfo_t *p)
 				cpuFrequency = tscFrequency; // ?
 			}
 		}
+
 		else if(p->CPU.ExtFamily >= 0x01 /* K10+ */)
 		{
 			msr = rdmsr64(K10_COFVID_STATUS);
-			currdiv = (2 << ((msr >> 6) & 0x07)) / 2;
+			currdiv = (2 << ((msr >> 6) & 0x07));
 			msr = rdmsr64(AMD_10H_11H_CONFIG);
-			if(p->CPU.ExtFamily == 0x01 /* K10 */)
+			bus_ratio_max = ((msr) & 0x3F);
+			//verbose("max_multi: %d\n", bus_ratio_max);
+
+			/*msr_t divmsr;
+			divmsr = rdmsr(AMD_10H_11H_CONFIG);
+			maxdiv = (divmsr.hi >> 0x08) & 0x01;
+			verbose("maxdiv: %d, currdiv: %d\n", maxdiv, currdiv);*/
+
+			if(p->CPU.ExtFamily == 0x01) 
+				cpuFrequency = 100 * (bus_ratio_max + 0x10);
+			else 
+				cpuFrequency = 100 * (bus_ratio_max + 0x08);
+			
+			uint32_t minFreq = cpuFrequency / (1 << currdiv);
+
+			uint8_t maxrtio = (cpuFrequency / 20);
+			p->CPU.MaxRatio = maxrtio;
+			
+			fsbFrequency = ((tscFrequency / 100000) / maxrtio);
+			verbose("fsb: %d\n", fsbFrequency);
+			
+			if(maxrtio == ((bus_ratio_max * 10) - 5))
 			{
-				bus_ratio_max = ((msr) & 0x3F);
-				//currdiv = (((msr) >> 6) & 0x07);
-				//cpuFrequency = 100 * (bus_ratio_max + 0x08) / (1 << currdiv);
+				verbose("multi: max:%d.5, ", (bus_ratio_max - 1));
+				maxdiv = 1;
 			}
-			else /* K11+ */
+			else if(maxrtio == ((bus_ratio_max - 1) * 10))
 			{
-				bus_ratio_max = ((msr) & 0x3F);
-				//currdiv = (((msr) >> 6) & 0x07);
-				//cpuFrequency = 100 * (bus_ratio_max + 0x10) / (1 << currdiv);
+				verbose("multi: max:%d, min:", (bus_ratio_max - 1));
+				maxdiv = 0;
 			}
-			fsbFrequency = (tscFrequency / bus_ratio_max);
-			cpuFrequency = tscFrequency;
+
+			bus_ratio_min = (minFreq / fsbFrequency);
+			verbose("%d", bus_ratio_min);
+			while(minFreq < 800)
+			{
+				bus_ratio_min = bus_ratio_min + 1; // bus_ratio_min++; ???
+				verbose(" >> %d", bus_ratio_min);
+			}
+			verbose("\n");
+
+			struct hwpstate 
+			{
+				uint32_t	freq;		/* CPU clock in Mhz. */
+				uint32_t	volts;		/* Voltage in mV. */
+				uint32_t	power;		/* Power consumed in mW. */
+				uint8_t	lat;			/* Transition latency in us. */
+				uint8_t	pstate_id;		/* P-State id */
+			};
+			
+			struct hwpstate state[32];
+			int max_state, i,/* did,*/ vid;
+			uint8_t fid;
+			msr = rdmsr64(MSR_AMD_10H_11H_LIMIT);
+			max_state = 1 + (((msr) >> 4) & 0x7);
+
+			for(i=0; i<max_state; i++)
+			{
+				msr = rdmsr64(AMD_10H_11H_CONFIG + i);
+				//msr_t didmsr;
+				//didmsr = rdmsr(AMD_10H_11H_CONFIG + i);
+				if ((msr & ((uint64_t)1 << 63)) != ((uint64_t)1 << 63)) verbose("Invalid MSR!\n");
+				else
+				{
+					//did = (didmsr.hi >> 0x08) & 0x01;
+					if(i == 0) 
+					{
+						//maxdiv = did;
+						fid = p->CPU.MaxRatio;
+						state[i].freq = ((fid * fsbFrequency) / 10);
+						fid = (fid / 10);
+					}
+					else
+					{
+						fid = bitfield(msr, 5, 0);
+						state[i].freq = (fid * fsbFrequency);
+					}
+					
+					if(i == (max_state -1))
+					{
+						fid = bus_ratio_min;
+						state[i].freq = (fid * fsbFrequency);
+					}
+					
+					vid = bitfield(msr, 15, 9);
+					
+					if(i == 0) verbose("P-State %d: Frequency: %d, Multiplier: %d%s, vid: %d\n", i, state[i].freq, fid, maxdiv ? ".5" : "", vid);
+					else if((state[i].freq > state[i+1].freq) || (state[i].freq < 800)) verbose("P-State %d: Removed!", i);
+					else verbose("P-State %d: Frequency: %d, Multiplier: %d, vid: %d\n", i, state[i].freq, fid, vid);
+					state[i].pstate_id = i;
+					// valv: zeroed for now
+					state[i].volts = 0;
+					state[i].power = 0;
+					state[i].lat = 0;
+				}
+			}
+			fsbFrequency = (fsbFrequency * 1000000);
+			cpuFrequency = (state[0].freq * 1000000);
 		}
 		
-		p->CPU.MaxRatio = bus_ratio_max * 10;
-		
-		// valv: to be moved to acpi_patcher when ready
-/*		msr_t amsr = rdmsr(K8_FIDVID_STATUS);
-		uint8_t max_fid = (amsr.lo & 0x3F) >> 16;
-		uint8_t min_fid = (amsr.lo & 0x3F) >> 8;
-		uint8_t max_vid = (amsr.hi & 0x3F) >> 16;
-		uint8_t min_vid = (amsr.hi & 0x3F) >> 8;
-		verbose("AMD: max[fid: %d, vid: %d] min[fid: %d, vid: %d]\n", max_fid, max_vid, min_fid, min_vid);
-
-
-			case 0x10:	// phenom
-				msr = rdmsr64(AMD_10H_11H_CONFIG);
-				bus_ratio_max = ((msr) & 0x3F);
-				currdiv = (((msr) >> 6) & 0x07);
-				cpuFrequency = 100 * (bus_ratio_max + 0x08) / (1 << currdiv);
-				break;
-			case 0x11:	// shangai
-				msr = rdmsr64(AMD_10H_11H_CONFIG);
-				bus_ratio_max = ((msr) & 0x3F);
-				currdiv = (((msr) >> 6) & 0x07);
-				cpuFrequency = 100 * (bus_ratio_max + 0x10) / (1 << currdiv);
-				break;
-		}
-*/
+		p->CPU.MinRatio = bus_ratio_min * 10;
 	}
 	else if(p->CPU.Vendor == 0x746e6543 /* CENTAUR */ && p->CPU.Family == 6) //valv: partial!
 	{

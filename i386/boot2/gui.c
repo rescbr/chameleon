@@ -755,7 +755,6 @@ int initGUI(void)
 	gui.screen.height = screen_params[1];
 	PRINT("Found mode %dx%d in VESA Table\n", gui.screen.width, gui.screen.height);
 
-
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
 		loadThemeValues(&bootInfo->themeConfig);

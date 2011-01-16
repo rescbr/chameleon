@@ -216,6 +216,7 @@ static const char* sm_get_defstr(const char * key, int table_num)
 							else sm_defaults=sm_imac_core_defaults;
 							break;
 					case 0x1a: // Core i7 LGA1366, Xeon 550, 45nm
+					case 0x2a: // Sandy Bridge, 32nm
 					case 0x2c: // Core i7 LGA1366, "Westmere", 32nm, Hexa-Core
 					case 0x2e: // Core i7, Nehalem-Ex, Xeon
 					case 0x2f: // Core i7, "Westmere-Ex", 45nm, Hexa-Core
@@ -333,6 +334,7 @@ static int sm_get_bus_speed (const char *name, int table_num)
 					case 0x1e:	// Core i7, i5 LGA1156, "Lynnfield", "Jasper", 45nm
 					case 0x1f:	// Core i7, i5, Nehalem
 					case 0x25:	// Core i7, i5, i3 LGA1156, "Westmere", 32nm
+					case 0x2a:	// Sandy Bridge, 32nm
 					case 0x2c:	// Core i7 LGA1366, "Westmere", 32nm, Hexa-Core
 					case 0x2e:	// Core i7, Nehalem-Ex, Xeon
 					{
@@ -440,6 +442,7 @@ static int sm_get_cputype (const char *name, int table_num)
 			case 0x2f:					// Core i7, "Westmere-Ex", 45nm, Hexa-Core
 				return 0x0501;
 				break;
+			case 0x2a:					// Sandy Bridge, 32nm; valv: probably not here
 			case 0x25:					// Nehalem, "Clarkdale", 32nm
 				if(strstr(Platform.CPU.BrandString, "Core(TM) i3"))
 					return 0x0901;
