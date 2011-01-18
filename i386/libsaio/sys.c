@@ -806,19 +806,23 @@ void scanDisks(int biosdev, int *count)
 #define MAX_HDD_COUNT 32
   int bvCount;
   int hd = 0;
-
+	
   // Testing up to MAX_HDD_COUNT hard drives.
-	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
+	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT) 
 	{
 		bvCount = 0;
 		scanBootVolumes(0x80 + hd, &bvCount);
+		verbose("scanVolume %d\n", hd);
+		
 		hd++;
 	}
 
   // Also scanning CD/DVD drive.
-	if (biosDevIsCDROM(gBIOSDev))
+	// if (biosDevIsCDROM(gBIOSDev))
+	if (biosDevIsCDROM(gBIOSDev))  // 0 = CDROM
 	{
 		bvCount = 0;
+		//scanBootVolumes(gBIOSDev, &bvCount);
 		scanBootVolumes(gBIOSDev, &bvCount);
 		msglog("biosDevIsCDROM and bvCount=%d\n", bvCount);
 	}

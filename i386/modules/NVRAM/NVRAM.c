@@ -11,13 +11,14 @@
 #include "pci.h"
 #include "efi.h"
 #include "smbios_patcher.h"
+#include "xml.h"
 
 #ifndef DEBUG_NVRAM
-#define DEBUG_NVRAM 0
+#define DEBUG_NVRAM 1
 #endif
 
 #if DEBUG_NVRAM
-#define DBG(x...) verbose(x)
+#define DBG(x...) printf(x)
 #else
 #define DBG(x...) msglog(x)
 #endif
@@ -81,9 +82,9 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	char*		bnName;
 	EFI_GUID*	ret = 0;
 	uint16_t	bootOptionNumber = 0;
-//	msglog("NVRAM is not implemented yet\n");
+	int i, j;
 	
-//	return;
+	BLESS_EFI_LOAD_OPTION* NextBoot =(BLESS_EFI_LOAD_OPTION*)gBootOrder;
 	
 	DBG("NVRAM started with ModulesLoaded\n");
 	
@@ -92,14 +93,29 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 //	bool UseNVRAM = FALSE;
 	bool ClearNVRAM = FALSE;
 	const char* buff;
+	TagPtr	dictionary;
 	int cnt;
 	var = malloc(sizeof(variables)+1);
 	ClearNVRAM = getValueForKey(kClearNVRAM, &buff, &cnt, &bootInfo->bootConfig);
 	if (!ClearNVRAM) {		
 		readNVRAM(var);
 	}
-		
-	Node* optionsNode = DT__FindNode("/options", true);
+
+	for (i=0; i<32; i++) {
+		if (var[i].Name[0] == 0) {
+			break;
+		}
+		if (strcmp(var[i].Name, "efi-boot-device")==0) {
+			//XMLParseFile(var[i].Value, &dictionary);
+			//buff = XMLGetProperty(dictionary, "BLLastBSDName")->string;
+			verbose("Required boot device is %s\n", var[i].Value);
+			//NextBoot->FilePathListLength = 1;
+			//strcpy(NextBoot->Description, buff);
+			break;
+		}
+	}
+	
+	Node* optionsNode = DT__FindNode("/fakenvram", true);
 	ffName = malloc(sizeof(PLATFORM_UUID)+1);
 	strcpy(ffName, PLATFORM_UUID);
 	ret = getSystemID();
@@ -157,7 +173,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		 
 		 */
 		//
-	int i,j;
+
 		for (i=0; i<32; i++) {
 			DBG("NVRAM get a name %s\n", var[i].Name);
 			if (var[i].Name[0]) {
@@ -172,10 +188,13 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 				DBG("NVRAM add name=%s value=%s length=%d\n", var[i].Name, var[i].Value, j);
 #endif
 			} else {
-				return;
+				break;
 			}
 
 		}
+	//Serialization?
+	bnName[0] = bnName[1] = 0;
+	DT__AddProperty(optionsNode, bnName, sizeof(uint32_t), (EFI_UINT32*)&STATIC_ZERO);
 }
 
 const char NVRAM_INF[] = "nvram.inf";
@@ -205,31 +224,37 @@ int readNVRAM(variables* var)
 		return -1;
 	}
 	close (fd);
-	if ((var = malloc(fsize)) == NULL) {
+/*	if ((var = malloc(fsize)) == NULL) {
 		DBG("[ERROR] alloc VAR memory failed\n");
 		return -1;
-	}
+	}*/
 	int i = 0;
+	char * onvr = nvr;
 	bool skipGUID;
 	while (*nvr) {
 		int j = 0;
 		skipGUID = false;
+		DBG("Name[%d]:", i);
 		while (*nvr != 9) {
+//			DBG("%c", *nvr);
 			if (*nvr == 4) {
 				skipGUID = true; //TODO this is GUID
-			}
-			var[i].Name[j++] = *nvr++; 
+				nvr++;
+			} else 
+				var[i].Name[j++] = *nvr++; 
 		}
+		DBG("\n");
 		nvr++; //skip \09
 		var[i].Name[j] = 0; //end of c-string
 		if (skipGUID) {
 			//TODO this is GUID
+			DBG("skip GUID\n");
 			while (*nvr++ != 0x0A) {}
 			i--;
 		} else {
 			
 			j = 0;
-			char c;
+			unsigned char c;
 			while (*nvr != 0x0A) {
 				c = *nvr++;
 				if (c == 0x25) { //TODO this is hex 
@@ -248,16 +273,27 @@ int readNVRAM(variables* var)
 						k2 = k2 - 0x60 + 10;
 					}
 					c = (k1 << 4) + k2;
-					break; 
+					//break; 
 				}
 				var[i].Value[j++] = c; 
 			}
+			nvr++;
+			DBG("Value[%d]:", i);
+			int m;
+			for (m=0; m<j; m++) {
+//				DBG("%02x ", var[i].Value[m]);
+			}
+			//	DBG("Value[%d]:%s\n", i, var[i].Value);
+			DBG("\n");
 		}
 		i++;
-		if (i > fsize) {
+		if ((int)(nvr - onvr) > fsize) {
+			DBG("end of buffer\n");
 			break;
 		}
 	}
-	
+	var[i].Name[0]=0;
+	var[i].Name[1]=0;
+
 	return 0;
 }

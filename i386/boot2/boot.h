@@ -36,6 +36,7 @@ extern char gMacOSVersion[];
 extern int     bvCount; 
 extern void *gRootPCIDev;
 extern void* gPlatform;
+extern void* gBootOrder;
 
 
 /*
@@ -68,6 +69,8 @@ extern void* gPlatform;
 /* AsereBLN: added the other keys */
 #define kUseAtiROM			"UseAtiROM"			/* ati.c */
 #define kAtiConfig			"AtiConfig"			/* ati.c */
+#define kATYbinimage		"ATYbinimage"		/* ati.c */
+
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */

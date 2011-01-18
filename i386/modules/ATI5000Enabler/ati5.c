@@ -16,6 +16,7 @@
 #include "ati_reg.h"
 #include "ati5.h"
 
+#define	OFFSET_TO_GET_ATOMBIOS_STRINGS_START		0x6e
 #define Reg32(reg)					(*(volatile uint32_t *)(card->mmio + reg))
 #define RegRead32(reg)				(Reg32(reg))
 #define RegWrite32(reg, value)		(Reg32(reg) = value)
@@ -106,6 +107,8 @@ static card_config_t card_configs[] = {
 	{"Langur",		3},
 	{"Megalodon",	3},
 	{"Motmot",		2},
+	{"Nomascus",	5},
+	{"Orangutan",	2},
 	{"Peregrine",	2},
 	{"Quail",		3},
 	{"Raven",		3},
@@ -139,6 +142,8 @@ typedef enum {
 	kLangur,
 	kMegalodon,
 	kMotmot,
+	kNomascus,
+	kOrangutan,
 	kPeregrine,
 	kQuail,
 	kRaven,
@@ -343,7 +348,9 @@ static radeon_card_info_t radeon_cards[] = {
 	/* Evergreen */
 	{ 0x6898,	0x032E1043,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
 	{ 0x6898,	0xE140174B,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
+	{ 0x6898,	0x29611682,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
 	{ 0x6898,	0x0B001002,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kZonalis	},
+	{ 0x6898,	0x00D0106B,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kLangur		},
 
 	{ 0x6899,	0x21E41458,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		},
 	{ 0x6899,	0x200A1787,	CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		},
@@ -361,6 +368,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68B8,	0x29911682,	CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x200B1787,	CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x22881787,	CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
+	{ 0x68B8,	0x00CF106B,	CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kHoolock	},
 
 	{ 0x68D8,	0x301117AF,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",				kNull		},
 	{ 0x68D8,	0x301017AF,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",				kNull		},
@@ -503,6 +511,7 @@ bool get_model_val(value_t *val);
 bool get_conntype_val(value_t *val);
 bool get_vrammemsize_val(value_t *val);
 bool get_binimage_val(value_t *val);
+bool get_romrevision_val(value_t *val);
 bool get_deviceid_val(value_t *val);
 bool get_mclk_val(value_t *val);
 bool get_sclk_val(value_t *val);
@@ -535,6 +544,7 @@ dev_prop_t ati_devprop_list[] = {
 //	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,					DWRVAL((uint32_t)0)				},
 	{FLAGTRUE,	false,	"ATY,bin_image",			get_binimage_val,		NULVAL							},
 	{FLAGTRUE,	false,	"ATY,Copyright",			NULL,	STRVAL("Copyright AMD Inc. All Rights Reserved. 2005-2010")	},
+	{FLAGTRUE,	false,	"ATY,Card#",				get_romrevision_val,	NULVAL							},
 	{FLAGTRUE,	false,	"ATY,VendorID",				NULL,					WRDVAL((uint16_t)0x1002)		},
 	{FLAGTRUE,	false,	"ATY,DeviceID",				get_deviceid_val,		NULVAL							},
 
@@ -641,6 +651,26 @@ bool get_binimage_val(value_t *val)
 	val->type = kPtr;
 	val->size = card->rom_size;
 	val->data = card->rom;
+
+	return true;
+}
+
+bool get_romrevision_val(value_t *val)
+{
+	uint8_t *rev;
+	if (!card->rom)
+		return false;
+
+	rev = card->rom + *(uint8_t *)(card->rom + OFFSET_TO_GET_ATOMBIOS_STRINGS_START);
+
+	val->type = kPtr;
+	val->size = strlen((char *)rev);
+	val->data = malloc(val->size);
+
+	if (!val->data)
+		return false;
+	
+	memcpy(val->data, rev, val->size);
 
 	return true;
 }
@@ -1041,7 +1071,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	get_vram_size();
 
-	getBoolForKey(kVBIOS, &add_vbios, &bootInfo->bootConfig);
+	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->bootConfig);
 
 	if (add_vbios)
 		if (!load_vbios_file(kUseAtiROM, pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id))

@@ -119,6 +119,9 @@ void load_all_modules()
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
 			char* tmp = malloc(strlen(name) + 1);
+			if (name[0] == '.') {
+				continue;
+			}
 			strcpy(tmp, name);
 			
 			DBG("Attempting to load %s\n", tmp);			
@@ -163,7 +166,7 @@ int load_module(char* module)
 	if(fh < 0)
 	{
 		DBG("Unable to locate module %s\n", modString);
-		getc();
+		//getc();
 		return 0;
 	}
 	

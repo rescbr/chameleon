@@ -12,6 +12,20 @@
 			12C26D2E12B0DDF400AF7F4B /* ChamMek */,
 		);
 		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXBookmarksDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBookmarksDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					200,
+					200,
+					534.58349609375,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBookmarksDataSource_LocationID,
+					PBXBookmarksDataSource_NameID,
+					PBXBookmarksDataSource_CommentsID,
+				);
+			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
 				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
@@ -31,7 +45,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					725,
+					505,
 					20,
 					48,
 					43,
@@ -76,8 +90,8 @@
 					PBXSymbolsDataSource_ReferenceNameID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 315140248;
-			PBXWorkspaceStateSaveDate = 315140248;
+			PBXPerProjectTemplateStateSaveDate = 317053851;
+			PBXWorkspaceStateSaveDate = 317053851;
 		};
 		perUserProjectItems = {
 			120DFB1712BA3A4D00C7EAC8 /* PBXTextBookmark */ = 120DFB1712BA3A4D00C7EAC8 /* PBXTextBookmark */;
@@ -86,9 +100,8 @@
 			12121ED112B261EA00207E55 /* PBXTextBookmark */ = 12121ED112B261EA00207E55 /* PBXTextBookmark */;
 			1216139E12B65BB50019961E /* PBXTextBookmark */ = 1216139E12B65BB50019961E /* PBXTextBookmark */;
 			121613FF12B65D970019961E /* PBXTextBookmark */ = 121613FF12B65D970019961E /* PBXTextBookmark */;
-			123C5F8D12C8AB2C00DFC2D4 /* PBXTextBookmark */ = 123C5F8D12C8AB2C00DFC2D4 /* PBXTextBookmark */;
-			123C5F8E12C8AB2C00DFC2D4 /* PBXTextBookmark */ = 123C5F8E12C8AB2C00DFC2D4 /* PBXTextBookmark */;
-			123C5F9012C8AB2C00DFC2D4 /* PBXTextBookmark */ = 123C5F9012C8AB2C00DFC2D4 /* PBXTextBookmark */;
+			1223EF9012E5D63A0019EC66 /* PBXTextBookmark */ = 1223EF9012E5D63A0019EC66 /* PBXTextBookmark */;
+			12251A0412CE29EF00273689 /* PBXTextBookmark */ = 12251A0412CE29EF00273689 /* PBXTextBookmark */;
 			124C493212B8D846005AA276 /* PBXTextBookmark */ = 124C493212B8D846005AA276 /* PBXTextBookmark */;
 			124C493712B8D846005AA276 /* PBXTextBookmark */ = 124C493712B8D846005AA276 /* PBXTextBookmark */;
 			124C494212B8E8C2005AA276 /* PBXTextBookmark */ = 124C494212B8E8C2005AA276 /* PBXTextBookmark */;
@@ -99,17 +112,15 @@
 			1265C97712C7554E0050D02E /* PBXTextBookmark */ = 1265C97712C7554E0050D02E /* PBXTextBookmark */;
 			1267813012B7B13E00A25CED /* PBXTextBookmark */ = 1267813012B7B13E00A25CED /* PBXTextBookmark */;
 			12679BA312BE822E00E3637F /* PBXTextBookmark */ = 12679BA312BE822E00E3637F /* PBXTextBookmark */;
+			12783A9B12E5D46B0095C1BA /* PBXTextBookmark */ = 12783A9B12E5D46B0095C1BA /* PBXTextBookmark */;
 			1288318212C3608100EA4CB2 /* PBXTextBookmark */ = 1288318212C3608100EA4CB2 /* PBXTextBookmark */;
-			128835DC12C366AB00EA4CB2 /* PBXTextBookmark */ = 128835DC12C366AB00EA4CB2 /* PBXTextBookmark */;
 			128A97B712C2336000600556 /* PBXTextBookmark */ = 128A97B712C2336000600556 /* PBXTextBookmark */;
 			128A97B812C2336000600556 /* PBXTextBookmark */ = 128A97B812C2336000600556 /* PBXTextBookmark */;
 			128A9AF412C233CE00600556 /* PBXTextBookmark */ = 128A9AF412C233CE00600556 /* PBXTextBookmark */;
 			1299A51F12B3C328007ED516 /* PBXTextBookmark */ = 1299A51F12B3C328007ED516 /* PBXTextBookmark */;
 			1299A55612B3C4DF007ED516 /* PBXTextBookmark */ = 1299A55612B3C4DF007ED516 /* PBXTextBookmark */;
-			12A7376E12C854A600769789 /* PBXTextBookmark */ = 12A7376E12C854A600769789 /* PBXTextBookmark */;
 			12AB04BD12B663F5005A745F /* PBXTextBookmark */ = 12AB04BD12B663F5005A745F /* PBXTextBookmark */;
 			12AB04EC12B665EA005A745F /* PBXTextBookmark */ = 12AB04EC12B665EA005A745F /* PBXTextBookmark */;
-			12AD499312C7ADAB0082CD39 /* PBXTextBookmark */ = 12AD499312C7ADAB0082CD39 /* PBXTextBookmark */;
 			12AF764312BA614B003BBFD3 /* PBXTextBookmark */ = 12AF764312BA614B003BBFD3 /* PBXTextBookmark */;
 			12B46E6612B75631006C2B9C /* PBXTextBookmark */ = 12B46E6612B75631006C2B9C /* PBXTextBookmark */;
 			12B46E6812B75631006C2B9C /* PBXTextBookmark */ = 12B46E6812B75631006C2B9C /* PBXTextBookmark */;
@@ -124,6 +135,8 @@
 			12BF14DA12B3CF8E00D798FE /* PBXTextBookmark */ = 12BF14DA12B3CF8E00D798FE /* PBXTextBookmark */;
 			12C246F412C87C7C007E8339 /* PBXTextBookmark */ = 12C246F412C87C7C007E8339 /* PBXTextBookmark */;
 			12C2907612C8962900984F8F /* PBXTextBookmark */ = 12C2907612C8962900984F8F /* PBXTextBookmark */;
+			12C2B36812E5D8B600894A4E /* PBXTextBookmark */ = 12C2B36812E5D8B600894A4E /* PBXTextBookmark */;
+			12C5020712D8B82400EDCC4E /* PBXTextBookmark */ = 12C5020712D8B82400EDCC4E /* PBXTextBookmark */;
 			12C672F312C7C6BE0058B09B /* PBXTextBookmark */ = 12C672F312C7C6BE0058B09B /* PBXTextBookmark */;
 			12C672F512C7C6BE0058B09B /* PBXTextBookmark */ = 12C672F512C7C6BE0058B09B /* PBXTextBookmark */;
 			12C7009812B7BCE7006BD382 /* PBXTextBookmark */ = 12C7009812B7BCE7006BD382 /* PBXTextBookmark */;
@@ -133,29 +146,27 @@
 			12C7FC4E12B7BCD3006BD382 /* PlistBookmark */ = 12C7FC4E12B7BCD3006BD382 /* PlistBookmark */;
 			12C8CB6812B5529D003DA1E4 /* PBXTextBookmark */ = 12C8CB6812B5529D003DA1E4 /* PBXTextBookmark */;
 			12CC44C812B3947B007E0C76 /* PBXTextBookmark */ = 12CC44C812B3947B007E0C76 /* PBXTextBookmark */;
-			12D2040912C890B700CE318D /* PBXTextBookmark */ = 12D2040912C890B700CE318D /* PBXTextBookmark */;
 			12D331A312C61E950093EEDB /* PBXTextBookmark */ = 12D331A312C61E950093EEDB /* PBXTextBookmark */;
-			12D331BE12C621050093EEDB /* PBXTextBookmark */ = 12D331BE12C621050093EEDB /* PBXTextBookmark */;
-			12D331CC12C622FE0093EEDB /* PBXTextBookmark */ = 12D331CC12C622FE0093EEDB /* PBXTextBookmark */;
 			12D3321612C63DF20093EEDB /* PBXTextBookmark */ = 12D3321612C63DF20093EEDB /* PBXTextBookmark */;
 			12D3324112C63EB70093EEDB /* PBXTextBookmark */ = 12D3324112C63EB70093EEDB /* PBXTextBookmark */;
 			12D3329E12C669090093EEDB /* PBXTextBookmark */ = 12D3329E12C669090093EEDB /* PBXTextBookmark */;
 			12D332A512C669090093EEDB /* PBXTextBookmark */ = 12D332A512C669090093EEDB /* PBXTextBookmark */;
 			12D332AA12C669090093EEDB /* PBXTextBookmark */ = 12D332AA12C669090093EEDB /* PBXTextBookmark */;
-			12D378BF12C7F8F8000F1C6A /* PBXTextBookmark */ = 12D378BF12C7F8F8000F1C6A /* PBXTextBookmark */;
-			12D378C012C7F8F8000F1C6A /* PBXTextBookmark */ = 12D378C012C7F8F8000F1C6A /* PBXTextBookmark */;
-			12D37D3212C7FAB8000F1C6A /* PBXTextBookmark */ = 12D37D3212C7FAB8000F1C6A /* PBXTextBookmark */;
 			12D6232512BA5F380032F367 /* PBXTextBookmark */ = 12D6232512BA5F380032F367 /* PBXTextBookmark */;
 			12D6232612BA5F380032F367 /* PBXTextBookmark */ = 12D6232612BA5F380032F367 /* PBXTextBookmark */;
+			12D64B9F12D8EA0A00A1FE07 /* PBXTextBookmark */ = 12D64B9F12D8EA0A00A1FE07 /* PBXTextBookmark */;
+			12D7EC0512C8C5EA0021414C /* PBXTextBookmark */ = 12D7EC0512C8C5EA0021414C /* PBXTextBookmark */;
 			12DA422F12C52DAC009281B3 /* PBXTextBookmark */ = 12DA422F12C52DAC009281B3 /* PBXTextBookmark */;
 			12DCD38E12BBA5D600A20635 /* PBXTextBookmark */ = 12DCD38E12BBA5D600A20635 /* PBXTextBookmark */;
 			12E17AE612B2BA9B00607D8E /* PBXTextBookmark */ = 12E17AE612B2BA9B00607D8E /* PBXTextBookmark */;
 			12E6FB5712BB458400C2A021 /* PBXTextBookmark */ = 12E6FB5712BB458400C2A021 /* PBXTextBookmark */;
+			12E8842612D8F833004C76C8 /* PBXTextBookmark */ = 12E8842612D8F833004C76C8 /* PBXTextBookmark */;
 			12EFD98A12B510D9002A1712 /* PBXTextBookmark */ = 12EFD98A12B510D9002A1712 /* PBXTextBookmark */;
 			12EFE2FD12B51ED5002A1712 /* PBXTextBookmark */ = 12EFE2FD12B51ED5002A1712 /* PBXTextBookmark */;
 			12EFE65A12B547A7002A1712 /* PBXTextBookmark */ = 12EFE65A12B547A7002A1712 /* PBXTextBookmark */;
 			12EFE95E12B549B6002A1712 /* PBXTextBookmark */ = 12EFE95E12B549B6002A1712 /* PBXTextBookmark */;
 			12F1147112C7A41D0064D7EE /* PBXTextBookmark */ = 12F1147112C7A41D0064D7EE /* PBXTextBookmark */;
+			12F4456612E5DC0800121851 /* PBXTextBookmark */ = 12F4456612E5DC0800121851 /* PBXTextBookmark */;
 			12F7FF0012BB9F3200949DEC /* PBXTextBookmark */ = 12F7FF0012BB9F3200949DEC /* PBXTextBookmark */;
 			12FC0E7512BB4B5200E9CFA8 /* PBXTextBookmark */ = 12FC0E7512BB4B5200E9CFA8 /* PBXTextBookmark */;
 			12FC0E9412BB65A800E9CFA8 /* PBXTextBookmark */ = 12FC0E9412BB65A800E9CFA8 /* PBXTextBookmark */;
@@ -174,6 +185,13 @@
 			sepNavSelRange = "{192, 7}";
 			sepNavVisRange = "{0, 235}";
 		};
+	};
+	1201BC5312D8D9E8004F43CD /* saio_internal.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = saio_internal.h;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/libsaio/saio_internal.h;
+		sourceTree = "<absolute>";
 	};
 	12078D9812BA5AF400A1C013 /* fake_efi.c */ = {
 		isa = PBXFileReference;
@@ -284,44 +302,45 @@
 		path = /Users/slice/Projects/fakesmc/Chameleon/RC5m/i386/libsaio/smbios_patcher.c;
 		sourceTree = "<absolute>";
 	};
-	123C5F8D12C8AB2C00DFC2D4 /* PBXTextBookmark */ = {
+	1223EF9012E5D63A0019EC66 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
-		fRef = 12C2907A12C8962900984F8F /* gui.c */;
-		name = "gui.c: 1957";
-		rLen = 16;
-		rLoc = 52932;
+		fRef = 1223EF9112E5D63A0019EC66 /* stringTable.c */;
+		name = "stringTable.c: 199";
+		rLen = 14;
+		rLoc = 3922;
 		rType = 0;
-		vrLen = 882;
-		vrLoc = 52522;
+		vrLen = 594;
+		vrLoc = 3596;
 	};
-	123C5F8E12C8AB2C00DFC2D4 /* PBXTextBookmark */ = {
+	1223EF9112E5D63A0019EC66 /* stringTable.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = stringTable.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/libsaio/stringTable.c;
+		sourceTree = "<absolute>";
+	};
+	12251A0412CE29EF00273689 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
-		fRef = 123C5F8F12C8AB2C00DFC2D4 /* edid.h */;
-		rLen = 13;
-		rLoc = 5294;
+		fRef = 12436D8F12C9E14000F47D26 /* gui.c */;
+		name = "gui.c: 405";
+		rLen = 0;
+		rLoc = 11927;
 		rType = 0;
+		vrLen = 505;
+		vrLoc = 11479;
 	};
-	123C5F8F12C8AB2C00DFC2D4 /* edid.h */ = {
+	123C5F9112C8AB2C00DFC2D4 /* edid.h */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.h;
 		name = edid.h;
 		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/Resolution/edid.h;
 		sourceTree = "<absolute>";
 	};
-	123C5F9012C8AB2C00DFC2D4 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 123C5F9112C8AB2C00DFC2D4 /* edid.h */;
-		name = "edid.h: 170";
-		rLen = 13;
-		rLoc = 5294;
-		rType = 0;
-		vrLen = 691;
-		vrLoc = 4662;
-	};
-	123C5F9112C8AB2C00DFC2D4 /* edid.h */ = {
+	12436D8F12C9E14000F47D26 /* gui.c */ = {
 		isa = PBXFileReference;
-		name = edid.h;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/Resolution/edid.h;
+		lastKnownFileType = sourcecode.c.c;
+		name = gui.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GUI/gui.c;
 		sourceTree = "<absolute>";
 	};
 	124C492812B8C915005AA276 /* Memory.c */ = {
@@ -480,6 +499,23 @@
 		vrLen = 894;
 		vrLoc = 14871;
 	};
+	12783A8D12E5D3620095C1BA /* boot.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = boot.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/boot2/boot.c;
+		sourceTree = "<absolute>";
+	};
+	12783A9B12E5D46B0095C1BA /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 12783A8D12E5D3620095C1BA /* boot.c */;
+		name = "boot.c: 373";
+		rLen = 14;
+		rLoc = 10989;
+		rType = 0;
+		vrLen = 879;
+		vrLoc = 10251;
+	};
 	1279BD7512BF4D8700612F62 /* ACPIPatcher.c */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.c;
@@ -495,23 +531,6 @@
 		rLoc = 217;
 		rType = 0;
 		vrLen = 858;
-		vrLoc = 0;
-	};
-	1288318612C3608100EA4CB2 /* ati.h */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = ati.h;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GraphicsEnabler/ati.h;
-		sourceTree = "<absolute>";
-	};
-	128835DC12C366AB00EA4CB2 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 1288318612C3608100EA4CB2 /* ati.h */;
-		name = "ati.h: 1";
-		rLen = 0;
-		rLoc = 0;
-		rType = 0;
-		vrLen = 1032;
 		vrLoc = 0;
 	};
 	128A97B712C2336000600556 /* PBXTextBookmark */ = {
@@ -599,16 +618,6 @@
 		path = /Users/slice/Projects/fakesmc/Chameleon/RC5m/i386/boot2/modules.c;
 		sourceTree = "<absolute>";
 	};
-	12A7376E12C854A600769789 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D37D3612C7FAB8000F1C6A /* GUI_module.c */;
-		name = "GUI_module.c: 503";
-		rLen = 38;
-		rLoc = 11043;
-		rType = 0;
-		vrLen = 698;
-		vrLoc = 9616;
-	};
 	12A7377212C854A600769789 /* vbe.c */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.c;
@@ -649,16 +658,6 @@
 		rType = 0;
 		vrLen = 400;
 		vrLoc = 3028;
-	};
-	12AD499312C7ADAB0082CD39 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12B4E87B12C7A7E6005BEB1E /* NVRAM.c */;
-		name = "NVRAM.c: 69";
-		rLen = 13;
-		rLoc = 1876;
-		rType = 0;
-		vrLen = 604;
-		vrLoc = 1490;
 	};
 	12AD499712C7ADAB0082CD39 /* modules.h */ = {
 		isa = PBXFileReference;
@@ -729,13 +728,6 @@
 		lastKnownFileType = sourcecode.c.h;
 		name = smbios_patcher.h;
 		path = /Users/slice/Projects/fakesmc/Chameleon/RC5m/i386/libsaio/smbios_patcher.h;
-		sourceTree = "<absolute>";
-	};
-	12B4E87B12C7A7E6005BEB1E /* NVRAM.c */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.c;
-		name = NVRAM.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/NVRAM/NVRAM.c;
 		sourceTree = "<absolute>";
 	};
 	12B903AB12B2A00E00FE287A /* platform.h */ = {
@@ -875,6 +867,13 @@
 		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GraphicsEnabler/nvidia.c;
 		sourceTree = "<absolute>";
 	};
+	12BD8A5312D8EEE10051EE43 /* sys.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = sys.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/libsaio/sys.c;
+		sourceTree = "<absolute>";
+	};
 	12BF14DA12B3CF8E00D798FE /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 1299A55A12B3C4DF007ED516 /* Symbols.c */;
@@ -953,17 +952,32 @@
 		vrLen = 784;
 		vrLoc = 20063;
 	};
-	12C2907A12C8962900984F8F /* gui.c */ = {
+	12C2B36812E5D8B600894A4E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 12C2B36912E5D8B600894A4E /* NVRAM.c */;
+		name = "NVRAM.c: 284";
+		rLen = 0;
+		rLoc = 7929;
+		rType = 0;
+		vrLen = 466;
+		vrLoc = 7692;
+	};
+	12C2B36912E5D8B600894A4E /* NVRAM.c */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.c;
-		name = gui.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GUI/gui.c;
+		name = NVRAM.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/NVRAM/NVRAM.c;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {903, 26559}}";
-			sepNavSelRange = "{52932, 16}";
-			sepNavVisRange = "{52522, 882}";
-		};
+	};
+	12C5020712D8B82400EDCC4E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 12D52EA712D7377E00A23AEF /* resume.c */;
+		name = "resume.c: 114";
+		rLen = 15;
+		rLoc = 2532;
+		rType = 0;
+		vrLen = 698;
+		vrLoc = 2183;
 	};
 	12C672F312C7C6BE0058B09B /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -1106,23 +1120,6 @@
 		path = /Users/slice/Projects/fakesmc/Chameleon/RC5m/i386/libsaio/pci_setup.c;
 		sourceTree = "<absolute>";
 	};
-	12D170AB12BF114400B78E60 /* cpu.c */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.c;
-		name = cpu.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/libsaio/cpu.c;
-		sourceTree = "<absolute>";
-	};
-	12D2040912C890B700CE318D /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D4921B12C88EE6009975E9 /* boot.c */;
-		name = "boot.c: 657";
-		rLen = 12;
-		rLoc = 20109;
-		rType = 0;
-		vrLen = 821;
-		vrLoc = 19575;
-	};
 	12D2040D12C890B700CE318D /* graphics.c */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.c;
@@ -1146,40 +1143,6 @@
 		rType = 0;
 		vrLen = 633;
 		vrLoc = 1150;
-	};
-	12D331A712C61E950093EEDB /* boot.h */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = boot.h;
-		path = /System/Library/Frameworks/System.framework/PrivateHeaders/pexpert/pexpert/i386/boot.h;
-		sourceTree = "<absolute>";
-	};
-	12D331BE12C621050093EEDB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D331A712C61E950093EEDB /* boot.h */;
-		name = "boot.h: 97";
-		rLen = 12;
-		rLoc = 2853;
-		rType = 0;
-		vrLen = 922;
-		vrLoc = 2332;
-	};
-	12D331C012C621050093EEDB /* acpi_patcher.c */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.c;
-		name = acpi_patcher.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/ACPIPatcher/acpi_patcher.c;
-		sourceTree = "<absolute>";
-	};
-	12D331CC12C622FE0093EEDB /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D331C012C621050093EEDB /* acpi_patcher.c */;
-		name = "acpi_patcher.c: 683";
-		rLen = 15;
-		rLoc = 18749;
-		rType = 0;
-		vrLen = 1074;
-		vrLoc = 18246;
 	};
 	12D331EE12C63CB30093EEDB /* ati5.c */ = {
 		isa = PBXFileReference;
@@ -1273,62 +1236,11 @@
 		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GraphicsEnabler/gma.h;
 		sourceTree = "<absolute>";
 	};
-	12D378B312C7F861000F1C6A /* modules.c */ = {
+	12D52EA712D7377E00A23AEF /* resume.c */ = {
 		isa = PBXFileReference;
 		lastKnownFileType = sourcecode.c.c;
-		name = modules.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/boot2/modules.c;
-		sourceTree = "<absolute>";
-	};
-	12D378BF12C7F8F8000F1C6A /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D378B312C7F861000F1C6A /* modules.c */;
-		name = "modules.c: 231";
-		rLen = 17;
-		rLoc = 5480;
-		rType = 0;
-		vrLen = 723;
-		vrLoc = 5087;
-	};
-	12D378C012C7F8F8000F1C6A /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D170AB12BF114400B78E60 /* cpu.c */;
-		name = "cpu.c: 13";
-		rLen = 0;
-		rLoc = 269;
-		rType = 0;
-		vrLen = 1002;
-		vrLoc = 2849;
-	};
-	12D378C312C7F8F8000F1C6A /* cpu.h */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.h;
-		name = cpu.h;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/libsaio/cpu.h;
-		sourceTree = "<absolute>";
-	};
-	12D37D3212C7FAB8000F1C6A /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 12D378C312C7F8F8000F1C6A /* cpu.h */;
-		name = "cpu.h: 1";
-		rLen = 0;
-		rLoc = 0;
-		rType = 0;
-		vrLen = 802;
-		vrLoc = 2605;
-	};
-	12D37D3612C7FAB8000F1C6A /* GUI_module.c */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.c;
-		name = GUI_module.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/GUI/GUI_module.c;
-		sourceTree = "<absolute>";
-	};
-	12D4921B12C88EE6009975E9 /* boot.c */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.c;
-		name = boot.c;
-		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/boot2/boot.c;
+		name = resume.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/boot2/resume.c;
 		sourceTree = "<absolute>";
 	};
 	12D6232512BA5F380032F367 /* PBXTextBookmark */ = {
@@ -1350,6 +1262,26 @@
 		rType = 0;
 		vrLen = 419;
 		vrLoc = 398;
+	};
+	12D64B9F12D8EA0A00A1FE07 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 1201BC5312D8D9E8004F43CD /* saio_internal.h */;
+		name = "saio_internal.h: 202";
+		rLen = 15;
+		rLoc = 9325;
+		rType = 0;
+		vrLen = 1864;
+		vrLoc = 8297;
+	};
+	12D7EC0512C8C5EA0021414C /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 123C5F9112C8AB2C00DFC2D4 /* edid.h */;
+		name = "edid.h: 170";
+		rLen = 13;
+		rLoc = 5294;
+		rType = 0;
+		vrLen = 691;
+		vrLoc = 4662;
 	};
 	12D928BE12C7C8EB00269820 /* Makefile */ = {
 		isa = PBXFileReference;
@@ -1381,11 +1313,6 @@
 		name = edid.c;
 		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/Resolution/edid.c;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1048, 5200}}";
-			sepNavSelRange = "{6812, 0}";
-			sepNavVisRange = "{8696, 1093}";
-		};
 	};
 	12DCD38E12BBA5D600A20635 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -1437,6 +1364,16 @@
 		name = load.c;
 		path = /Users/slice/Projects/fakesmc/Chameleon/RC5m/i386/libsaio/load.c;
 		sourceTree = "<absolute>";
+	};
+	12E8842612D8F833004C76C8 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 12BD8A5312D8EEE10051EE43 /* sys.c */;
+		name = "sys.c: 822";
+		rLen = 14;
+		rLoc = 21356;
+		rType = 0;
+		vrLen = 763;
+		vrLoc = 20973;
 	};
 	12EFD98A12B510D9002A1712 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -1523,6 +1460,22 @@
 		vrLen = 991;
 		vrLoc = 0;
 	};
+	12F4456612E5DC0800121851 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 12F4456712E5DC0800121851 /* NVRAM.c */;
+		name = "NVRAM.c: 111";
+		rLen = 0;
+		rLoc = 2986;
+		rType = 0;
+		vrLen = 799;
+		vrLoc = 2442;
+	};
+	12F4456712E5DC0800121851 /* NVRAM.c */ = {
+		isa = PBXFileReference;
+		name = NVRAM.c;
+		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/NVRAM/NVRAM.c;
+		sourceTree = "<absolute>";
+	};
 	12F7FF0012BB9F3200949DEC /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 12FC25E812BB825300E9CFA8 /* drivers.c */;
@@ -1607,11 +1560,6 @@
 		name = 915resolution.c;
 		path = /Users/slice/Projects/Chameleons/chameleon/branches/slice/i386/modules/Resolution/915resolution.c;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1048, 11999}}";
-			sepNavSelRange = "{5145, 36}";
-			sepNavVisRange = "{4459, 1188}";
-		};
 	};
 	12FE987912C7E281001B1702 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;

@@ -74,6 +74,7 @@ char gMKextName[512];
 char gMacOSVersion[8];
 void *gRootPCIDev;
 void *gPlatform;
+void *gBootOrder;
 void *gSMBIOS;
 int gDualLink;
 #ifndef OPTION_ROM
@@ -374,9 +375,9 @@ void common_boot(int biosdev)
 #endif
 	
 #if DEBUG
-    printf(" Default: %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-    printf(" bt(0,0): %x, ->biosdev: %x, ->part_no: %d ->flags: %x\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-    getc();
+    printf(" Default: %x, ->gBootVolume: %x, ->part_no: %d ->flags: %x\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+    printf(" bt(0,0): %x, ->gBIOSBootVolume: %x, ->part_no: %d ->flags: %x\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+    pause();
 	/* Results
 	 Rescan found 1 HDD and bvCount=4
 	 bvr: 836bc10, dev: 80, part: 4, flags: 4a, vis: 1

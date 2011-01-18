@@ -1,7 +1,7 @@
 /*
  *  ATI injector
  *
- *  Copyright (C) 2009  Jasmin Fazlic, iNDi, netkas
+ *  Copyright (C) 2010  Kabyl
  *
  *  ATI injector is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

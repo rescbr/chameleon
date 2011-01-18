@@ -24,6 +24,7 @@
 #undef static
 #endif
 
+//BLESS_EFI_LOAD_OPTION* BootOrder;
 extern struct SMBEntryPoint * getSmbios(int which); // now cached
 //extern void setup_pci_devs(pci_dt_t *pci_dt);
 
@@ -750,6 +751,9 @@ void setupFakeEfi(void)
 	//Slice - remember globals
 	Platform = (PlatformInfo_t *)gPlatform;
 	root_pci_dev = (pci_dt_t*)gRootPCIDev;
+	
+	//gBootOrder = (void*)BootOrder;
+	
 //	verbose("setupFakeEfi: root_pci_dev_Vendor=%04x\n", (root_pci_dev->children)->vendor_id);
 	setup_pci_devs((pci_dt_t*)gRootPCIDev);
 
@@ -800,10 +804,11 @@ void setupFakeEfi(void)
 			continue;
 		}
 		//TODO validate
-		msglog("Patched platform CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", Platform->CPU.FSBFrequency/MEGA, Platform->CPU.TSCFrequency/MEGA, Platform->CPU.CPUFrequency/MEGA);
+		//msglog("Patched platform CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n",
+		//	   Platform->CPU.FSBFrequency/MEGA, Platform->CPU.TSCFrequency/MEGA, Platform->CPU.CPUFrequency/MEGA);
 		
 		msglog("Patched SMBIOS CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", cpuInfo->externalClock, cpuInfo->maximumClock, cpuInfo->currentClock);
-		msglog(" Family=%x\n Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
+		msglog(" Family=%x Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
 	}	
 #endif	
 }
