@@ -98,14 +98,14 @@ typedef struct
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
 	//resolution specifics
-	uint16_t		htotal;				
-	uint16_t		vtotal;				
-	uint16_t		hsyncstart;			
-	uint16_t		hsyncend;
-	uint16_t		vsyncstart;			
-	uint16_t		vsyncend;
-	uint8_t			mm;
-	uint16_t		attr;
+	uint16_t	htotal;				
+	uint16_t	vtotal;				
+	uint16_t	hsyncstart;			
+	uint16_t	hsyncend;
+	uint16_t	vsyncstart;			
+	uint16_t	vsyncend;
+	uint8_t		mm;
+	uint16_t	attr;
 } window_t;
 	
 /*

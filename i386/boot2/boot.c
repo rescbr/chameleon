@@ -80,7 +80,7 @@ BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;
 bool    useGUI;
-bool	autoResolution;
+//bool	autoResolution;
 
 //static void selectBiosDevice(void);
 static unsigned long Adler32(unsigned char *buffer, long length);
@@ -186,7 +186,18 @@ static int ExecKernel(void *binary)
 	}
 
 	usb_loop();
+	
+	//Azi:autoresolution - while testing, i didn't got any problems when booting without
+	// closing Vbios... closing it just in case. (check again later!)
+	if ((gAutoResolution == true) && map)
+	{
+		closeVbios(map);
 
+		// gAutoResolution was just set to false on closeVbios();
+		// we need it to be "true" for drawBootGraphics().
+		gAutoResolution = true;
+	}
+	
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
     // verbose mode.
@@ -327,26 +338,26 @@ void common_boot(int biosdev)
     getc();
 #endif
 
-	useGUI = TRUE;
+	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
  	
  	// Before initGui, patch the video bios with the correct resolution
  	
- 	UInt32 params[4];
- 	params[3] = 0;
  	
 	
- 	gAutoResolution = TRUE;
+ 	gAutoResolution = false;
  	// Override AutoResolution default
  	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
  	
-	//Open the VBios and store VBios or Tables
-	map = openVbios(CT_UNKWN);
+
 	
- 	if (gAutoResolution == TRUE)
+ 	if (gAutoResolution == true)
 	{
-		//Get Resolution from Graphics Mode key or EDID
+		params[3] = 0;
+		//Open the VBios and store VBios or Tables
+		map = openVbios(CT_UNKWN);
+		//Get resolution from Graphics Mode key or EDID
 		int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
 		if (count < 3)
 			getResolution(params);
@@ -360,15 +371,19 @@ void common_boot(int biosdev)
 #ifdef AUTORES_DEBUG
 		printf("Resolution: %dx%d\n",params[0], params[1]);
 #endif
- 		//perfom the actual VBIOS patching
+		//perfom the actual VBIOS patching
 		if (params[0] != 0 && params[1] != 0)
 			patchVbios(map, params[0], params[1], params[2], 0, 0);
+
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			gui.screen.width = params[0];
+			gui.screen.height = params[1];
+		}
 	}
-		
-     if (useGUI) {
-         /* XXX AsereBLN handle error */
- 	initGUI();
-    }
+	
+	if (useGUI && initGUI())
+		useGUI = false;
 
     setBootGlobals(bvChain);
 
@@ -434,17 +449,17 @@ void common_boot(int biosdev)
 		/*
 		 * AutoResolution - Reapply the patch or cancel if Graphics Mode was incorrect
 		 *                  or EDID Info was insane
-		 */	
-	     getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
-		
-		//Restore the vbios for Cancelation
-		if ((gAutoResolution == FALSE) && map)
+		 */
+		getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+
+		// Restore and close the vbios for cancelation
+		if ((gAutoResolution == false) && map)
 		{
 			restoreVbios(map);
-			closeVbios(map);	
+			closeVbios(map);
 		}
-		
-		if ((gAutoResolution == TRUE) && map)
+
+		if ((gAutoResolution == true) && map)
 		{
 			// If mode has been switched during boot menu
 			// use the new resolution
@@ -476,26 +491,14 @@ void common_boot(int biosdev)
 			
 			closeVbios(map);
 		}
-		
+
 		// Find out which mac os version we're booting.
 		getOSVersion(gMacOSVersion);
 
-		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
-			archCpuType = CPU_TYPE_X86_64;
-		} else {
+		if(((getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) && (strncmp(val, "i386", 4) == 0))
+		|| (!platformCPUFeature(CPU_FEATURE_EM64T)))
 			archCpuType = CPU_TYPE_I386;
-		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) {
-			if (strncmp(val, "i386", 4) == 0) {
-				archCpuType = CPU_TYPE_I386;
-			}
-		}
-		if (getValueForKey(k32BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
-			archCpuType = CPU_TYPE_I386;
-		}
-		if (getValueForKey(k64BitModeFlag, &val, &len, &bootInfo->bootConfig)) {
-			archCpuType = CPU_TYPE_X86_64;
-		}
+		else archCpuType = CPU_TYPE_X86_64;
 
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;

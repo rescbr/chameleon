@@ -429,47 +429,43 @@ setVESAGraphicsMode( unsigned short width,
         // Set the mode with default refresh rate.
 #ifdef AUTORES_DEBUG
 		printf("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
+		sleep(2);
 #endif
-        err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
+	err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
-        if ( err != errSuccess )
-        {
-            break;
+	if ( err != errSuccess )
+	{
 #ifdef AUTORES_DEBUG
-			printf("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
-				   mode, minfo.XResolution, minfo.YResolution, err);
-			getc();
+		printf("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
+			mode, minfo.XResolution, minfo.YResolution, err);
+		sleep(2);
 #endif
-		}
+		break;
+	}
 
-        // Set 8-bit color palette.
+	// Set 8-bit color palette.
 
-        if ( minfo.BitsPerPixel == 8 )
-        {
-            VBEPalette palette;
-            setupPalette( &palette, appleClut8 );
-            if ((err = setVBEPalette(palette)) != errSuccess)
-            {
-                break;
-            }
-        }
+	if ( minfo.BitsPerPixel == 8 )
+	{
+		VBEPalette palette;
+		setupPalette( &palette, appleClut8 );
+		if((err = setVBEPalette(palette)) != errSuccess)
+			break;
+	}
 
-        // Is this required for buggy Video BIOS implementations?
-        // On which adapter?
+	// Is this required for buggy Video BIOS implementations? On which adapter?
+	if ( minfo.BytesPerScanline == 0 )
+		minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
 
-        if ( minfo.BytesPerScanline == 0 )
-             minfo.BytesPerScanline = ( minfo.XResolution *
-                                        minfo.BitsPerPixel ) >> 3;
+	// Update KernBootStruct using info provided by the selected
+	// VESA mode.
 
-        // Update KernBootStruct using info provided by the selected
-        // VESA mode.
-
-        bootArgs->Video.v_display  = GRAPHICS_MODE;
-        bootArgs->Video.v_width    = minfo.XResolution;
-        bootArgs->Video.v_height   = minfo.YResolution;
-        bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-        bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-        bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+	bootArgs->Video.v_display  = GRAPHICS_MODE;
+	bootArgs->Video.v_width    = minfo.XResolution;
+	bootArgs->Video.v_height   = minfo.YResolution;
+	bootArgs->Video.v_depth    = minfo.BitsPerPixel;
+	bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
+	bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 #if AUTORES_DEBUG
 		gui.screen.mm				= minfo.MemoryModel;
 		gui.screen.attr				= minfo.ModeAttributes;
@@ -1042,8 +1038,7 @@ setVESATextMode( unsigned short cols,
 //==========================================================================
 // getNumberArrayFromProperty
 
-int
-getNumberArrayFromProperty( const char *  propKey,
+int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {

@@ -718,26 +718,27 @@ int initGUI(void)
 	/*
 	* AutoResolution
 	*/
-	if (gAutoResolution == TRUE) //Get Resolution from Graphics Mode key
+	if (gAutoResolution == true)
 	{
+		//Get Resolution from Graphics Mode key
 		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
+		//If no Graphics Mode key, get it from EDID
 		if ( count < 3 )
 		{
-			//If no Graphics Mode key, get it from EDID
 			getResolution(screen_params);
 			PRINT("Resolution : %dx%d (EDID)\n",screen_params[0], screen_params[1]);
-		} else 
-			PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
- 	} 
+		}
+		else PRINT("Resolution : %dx%d (Graphics Mode key)\n",screen_params[0], screen_params[1]);
+ 	}
 	else
 	{
  		// parse screen size parameters
- 		if(getIntForKey("screen_width", &val, &bootInfo->themeConfig))
+ 		if(getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
  			screen_params[0] = val;
  		else
  			screen_params[0] = DEFAULT_SCREEN_WIDTH;
  		
- 		if(getIntForKey("screen_height", &val, &bootInfo->themeConfig))
+ 		if(getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0)
  			screen_params[1] = val;
  		else
  			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
@@ -896,42 +897,40 @@ void drawDeviceList (int start, int end, int selection)
 	{
 		BVRef param = menuItems[start + i].param;
 
-        bool isSelected = ((start + i) == selection) ? true : false;
+		bool isSelected = ((start + i) == selection) ? true : false;
 		if (isSelected)
 		{
-            if (param->flags & kBVFlagNativeBoot)
-            {
-                infoMenuNativeBoot = true;
-            }
-            else
-            {
-                infoMenuNativeBoot = false;
-                if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
-                infoMenuSelection = 0;
-            }
-			 
+			if (param->flags & kBVFlagNativeBoot)
+				infoMenuNativeBoot = true;
+			else
+			{
+				infoMenuNativeBoot = false;
+				if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
+				infoMenuSelection = 0;
+			}
+			
 			if(gui.menu.draw)
 				drawInfoMenuItems();
 #ifdef AUTORES_DEBUG
 #define DEBUG
 #endif
 #ifdef DEBUG
-            gui.debug.cursor = pos( 10, 100);
-            dprintf( &gui.screen, "label     %s\n",   param->label );
-            dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-            dprintf( &gui.screen, "type      0x%x\n", param->type );
-            dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-            dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-            dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-            dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-            dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-            dprintf( &gui.screen, "name      %s\n",   param->name );
-            dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-            dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
-            dprintf( &gui.screen, "width     %d\n",	  gui.screen.width);
-            dprintf( &gui.screen, "height    %d\n",    gui.screen.height);
-            dprintf( &gui.screen, "attr:     0x%x\n",  gui.screen.attr);
-            dprintf( &gui.screen, "mm:       %d\n",    gui.screen.mm);
+			gui.debug.cursor = pos( 10, 100);
+			dprintf( &gui.screen, "label     %s\n",   param->label );
+			dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
+			dprintf( &gui.screen, "type      0x%x\n", param->type );
+			dprintf( &gui.screen, "flags     0x%x\n", param->flags );
+			dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
+			dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
+			dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
+			dprintf( &gui.screen, "bps       0x%x\n", param->bps );
+			dprintf( &gui.screen, "name      %s\n",   param->name );
+			dprintf( &gui.screen, "type_name %s\n",   param->type_name );
+			dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
+			dprintf( &gui.screen, "width     %d\n",	  gui.screen.width);
+			dprintf( &gui.screen, "height    %d\n",    gui.screen.height);
+			dprintf( &gui.screen, "attr:     0x%x\n",  gui.screen.attr);
+			dprintf( &gui.screen, "mm:       %d\n",    gui.screen.mm);
 #endif
 			
 #ifdef AUTORES_DEBUG
@@ -962,24 +961,21 @@ void drawDeviceList (int start, int end, int selection)
 	gui.redraw = true;
 	
 	updateVRAM();
-	
 }
- 
+
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
 	prompt[0] = '\0';
 	prompt_pos=0;
-
 	
-	if(	gui.bootprompt.draw == true )
+	if(gui.bootprompt.draw == true)
 	{
 		gui.bootprompt.draw = false;
 		gui.redraw = true;
 		// this causes extra frames to be drawn
 		//updateVRAM();
 	}
-
 	return;
 }
 
@@ -1889,29 +1885,30 @@ void drawBootGraphics(void)
 	/*
  	 * AutoResolution
  	 */
- 	if (gAutoResolution == TRUE)
+ 	if (gAutoResolution == true)
 	{
  		//Get Resolution from Graphics Mode key
  		count = getNumberArrayFromProperty(kGraphicsModeKey, screen_params, 4);
+		
+		//If no Graphics Mode key, get resolution from EDID
  		if ( count < 3 )
- 			//If no Graphics Mode key, get resolution from EDID
  			getResolution(screen_params);
 	}
 	else
 	{
  		// parse screen size parameters
- 		if(getIntForKey("boot_width", &pos, &bootInfo->themeConfig))
+ 		if(getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
  			screen_params[0] = pos;
  		else
 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
  		
- 		if(getIntForKey("boot_height", &pos, &bootInfo->themeConfig))
+ 		if(getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
  			screen_params[1] = pos;
  		else
 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
 
-    // Save current screen resolution.
+	// Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
 

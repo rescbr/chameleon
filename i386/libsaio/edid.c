@@ -13,7 +13,7 @@
 #include "vbe.h"
 #include "bootstruct.h"
 #include "graphics.h"
-#include "boot.h"
+//#include "boot.h"
 
 
 //static biosBuf_t bb;
@@ -34,7 +34,7 @@ void getResolution(UInt32* params)
 		
 		free( edidInfo );
 	} else {
-		// TODO: check *all* resolutions reported and eithe ruse the highest, or the native resolution (if there is a flag for that)
+		// TODO: check all reported resolutions and either use highest or native (if there is a flag for that)
 		xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
 		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
 		
@@ -55,7 +55,6 @@ void getResolution(UInt32* params)
 	}
 }
 
-
 unsigned char* readEDID()
 {
 	SInt16 last_reported = -1;
@@ -71,7 +70,7 @@ unsigned char* readEDID()
 	
 	do
 	{
-		// TODO: This currently only retrieves the *last* block, make the block buffer expand as needed / calculated from the first block
+		// TODO: This currently retrieves the last block only. Expand the block buffer as needed / calculated from first block
 
 		bzero( edidInfo, EDID_BLOCK_SIZE);
 

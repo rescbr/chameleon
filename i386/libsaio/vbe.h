@@ -271,7 +271,7 @@ enum {
 typedef unsigned long VBEPalette[256];
 
 extern int getVBEInfo(void *vinfo_p);
-extern int getEDID(void * edidBlock, UInt8 blocks_left);
+//extern int getEDID(void * edidBlock, UInt8 blocks_left);
 extern int getVBEModeInfo(int mode, void *minfo_p);
 extern int getVBEDACFormat(unsigned char *format);
 extern int setVBEDACFormat(unsigned char format);

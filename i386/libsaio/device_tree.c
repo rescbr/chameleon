@@ -397,7 +397,7 @@ DT__PrintTree(Node *node)
     _PrintTree(node, 0);
 }
 
-#if 0
+//#if 0
 void
 DT__PrintFlattenedNode(DTEntry entry, int level)
 {
@@ -536,6 +536,6 @@ main(int argc, char **argv)
 
     return 0;
 }
-#endif
+//#endif
 #endif
 

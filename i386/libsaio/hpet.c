@@ -174,7 +174,6 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 					printf(" Failed to force enable HPET\n");
 			}
 			break;
-			
 		}
 	}
 }

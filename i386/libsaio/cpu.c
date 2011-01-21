@@ -137,7 +137,13 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 	p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-	p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
+	if(p->CPU.Vendor == 0x68747541)
+	{
+		do_cpuid(0x80000008, p->CPU.CPUID[8]);
+		p->CPU.NoCores		= bitfield(p->CPU.CPUID[8][2], 7, 0) + 1;
+	}
+	else
+		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 
@@ -211,19 +217,44 @@ void scan_cpu(PlatformInfo_t *p)
 		{
 			if (p->CPU.Family == 0x06)
 			{
+				// valv: to be moved!
+				/*if(p->CPU.CPUID[CPUID_0][0] >= 11)
+				{
+					if((p->CPU.CPUID[0xB][1] != 0) && (bitfield(p->CPU.CPUID[CPUID_1][3], 28, 28)))
+				}*/
+				
+				/*int CoreOk = 0;
+				int ThreadOk = 0;
+				int lvlType, lvlShift;
+				do
+				{
+					if(p->CPU.CPUID[0xB][1] == 0) break;
+					lvlType = bitfield(p->CPU.CPUID[0xB][2], 15, 8);
+					lvlShift = bitfield(p->CPU.CPUID[0xB][0], 4, 0);
+					switch(lvlType)
+				}*/
 				int intelCPU = p->CPU.Model;
 				int Stepp = p->CPU.Stepping;
 				int bus;
 
 				switch (intelCPU)
 				{
+					// valv: hoardcoded to BrandString for now, till the code above is ready!
+					case 0x2a:		// Sandy Bridge, 32nm
+						if((strstr(p->CPU.BrandString, "i3")) 
+						|| (strstr(p->CPU.BrandString, "i5-2390T")) 
+						|| (strstr(p->CPU.BrandString, "i5-2100S")))
+							p->CPU.NoCores = 2;
+						else p->CPU.NoCores = 4;
+						if(strstr(p->CPU.BrandString, "i7"))
+							p->CPU.NoThreads = 8;
+						else p->CPU.NoThreads = 4;
 					case 0xc:		// Core i7 & Atom
 						if (strstr(p->CPU.BrandString, "Atom")) goto teleport1;
 					case 0x1a:		// Core i7 LGA1366, Xeon 5500, "Bloomfield", "Gainstown", 45nm
 					case 0x1e:		// Core i7, i5 LGA1156, "Clarksfield", "Lynnfield", "Jasper", 45nm
 					case 0x1f:		// Core i7, i5, Nehalem
 					case 0x25:		// Core i7, i5, i3 LGA1156, "Westmere", "Clarkdale", "Arrandale", 32nm
-					case 0x2a:		// Sandy Bridge, 32nm
 					case 0x2c:		// Core i7 LGA1366, Six-core, "Westmere", "Gulftown", 32nm
 					case 0x2e:		// Core i7, Nehalem-Ex Xeon, "Beckton"
 					case 0x2f:		// Core i7, Nehalem-Ex Xeon, "Eagleton"
@@ -392,9 +423,7 @@ void scan_cpu(PlatformInfo_t *p)
 							{
 								msr32.hi |= (1 << (36 - 32)); // EMTTM
 								wrmsr(MSR_IA32_MISC_ENABLE, msr32);
-							}
-							if(tmfix)
-							{
+								
 								msr32 = rdmsr(PIC_SENS_CFG);
 								msr32.lo |= (1 << 21);
 								wrmsr(PIC_SENS_CFG, msr32);

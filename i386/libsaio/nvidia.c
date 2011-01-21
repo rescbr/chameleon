@@ -81,8 +81,8 @@ const char *nvidia_compatible_1[]	=	{ "@1,compatible",	"NVDA,NVMac" };
 const char *nvidia_device_type_0[]	=	{ "@0,device_type",	"display" };
 const char *nvidia_device_type_1[]	=	{ "@1,device_type",	"display" };
 const char *nvidia_device_type[]	=	{ "device_type",	"NVDA,Parent" };
-const char *nvidia_name_0[]			=	{ "@0,name",		"NVDA,Display-A" };
-const char *nvidia_name_1[]			=	{ "@1,name",		"NVDA,Display-B" };
+const char *nvidia_name_0[]		=	{ "@0,name",		"NVDA,Display-A" };
+const char *nvidia_name_1[]		=	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]		=	{ "AAPL,slot-name",	"Slot-1" };
 
 static uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
@@ -391,11 +391,16 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE065C, "Quadro FX 770M" },
 	{ 0x10DE065F, "GeForce G210" },
 	{ 0x10DE06C0, "GeForce GTX 480" },
+	{ 0x10DE06C3, "GeForce GTX D12U" },
 	{ 0x10DE06C4, "GeForce GTX 465" },
 	{ 0x10DE06CA, "GeForce GTX 480M" },
 	{ 0x10DE06CD, "GeForce GTX 470" },
 	{ 0x10DE06D1, "Tesla C2050" },	// TODO: sub-device id: 0x0771
 	{ 0x10DE06D1, "Tesla C2070" },	// TODO: sub-device id: 0x0772
+	{ 0x10DE06D8, "Quadro 6000" },
+	{ 0x10DE06D9, "Quadro 5000" },
+	{ 0x10DE06DA, "Quadro 5000M" },
+	{ 0x10DE06DC, "Quadro 6000" },
 	{ 0x10DE06DD, "Quadro 4000" },
 	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
 	{ 0x10DE06DE, "Tesla M2070" },	// TODO: sub-device id: ?
@@ -452,7 +457,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0871, "GeForce 9200" },
 	{ 0x10DE0872, "GeForce G102M" },
 	{ 0x10DE0873, "GeForce G102M" },
-	{ 0x10DE0874, "ION" },
+	{ 0x10DE0874, "ION 9300M" },
 	{ 0x10DE0876, "ION" },
 	{ 0x10DE087A, "GeForce 9400" },
 	{ 0x10DE087D, "ION 9400M" },
@@ -503,12 +508,45 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0CB0, "GeForce GTS 350M" },
 	{ 0x10DE0CB1, "GeForce GT 360M" },
 	{ 0x10DE0CBC, "Quadro FX 1800M" },
+	{ 0x10DE0DC0, "GeForce GT 440" },
+	{ 0x10DE0DC1, "D12-P1-35" },
+	{ 0x10DE0DC2, "D12-P1-35" },
 	{ 0x10DE0DC4, "GeForce GTS 450" },
+	{ 0x10DE0DC5, "GeForce GTS 450" },
+	{ 0x10DE0DC6, "GeForce GTS 450" },
+	{ 0x10DE0DCA, "GF10x" },
+	{ 0x10DE0DD1, "GeForce GTX 460M" },
+	{ 0x10DE0DD2, "GeForce GT 445M" },
+	{ 0x10DE0DD3, "GeForce GT 435M" },
+	{ 0x10DE0DD8, "Quadro 2000" },
+	{ 0x10DE0DDE, "GF106-ES" },
+	{ 0x10DE0DDF, "GF106-INT" },
 	{ 0x10DE0DE1, "GeForce GT 430" },
+	{ 0x10DE0DE2, "GeForce GT 420" },
+	{ 0x10DE0DEB, "GeForce GT 555M" },
+	{ 0x10DE0DEE, "GeForce GT 415M" },
 	{ 0x10DE0DF0, "GeForce GT 425M" },
+	{ 0x10DE0DF1, "GeForce GT 420M" },
+	{ 0x10DE0DF2, "GeForce GT 435M" },
+	{ 0x10DE0DF3, "GeForce GT 420M" },
+	{ 0x10DE0DF8, "Quadro 600" },
+	{ 0x10DE0DFE, "GF108 ES" },
+	{ 0x10DE0DFF, "GF108 INT" },
+	{ 0x10DE0E21, "D12U-25" },
 	{ 0x10DE0E22, "GeForce GTX 460" },
+	{ 0x10DE0E23, "GeForce GTX 460 SE" },
 	{ 0x10DE0E24, "GeForce GTX 460" },
+	{ 0x10DE0E25, "D12U-50" },
+	{ 0x10DE0E30, "GeForce GTX 470M" },
+	{ 0x10DE0E38, "GF104GL" },
+	{ 0x10DE0E3E, "GF104-ES" },
+	{ 0x10DE0E3F, "GF104-INT" },
 	{ 0x10DE1080, "GeForce GTX 580" },
+	{ 0x10DE1081, "D13U" },
+	{ 0x10DE1082, "D13U" },
+	{ 0x10DE1083, "D13U" },
+	{ 0x10DE1098, "D13U" },
+	{ 0x10DE109A, "N12E-Q5" },
 	{ 0x10DE10C3, "GeForce 8400 GS" }
 };
 
@@ -593,6 +631,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			return PATCH_ROM_FAILED;
 		}
 	} else {
+		printf("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
 		return PATCH_ROM_FAILED;
 	}
 	
@@ -817,11 +856,11 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
 	}
 	else if (nvCardType >= NV_ARCH_C0) {
-		vram_size  = REG32(NVC0_MEM_CTRLR_COUNT);
+		vram_size  = REG32(NVC0_MEM_CTRLR_COUNT) << 20;
 		vram_size *= REG32(NVC0_MEM_CTRLR_RAM_AMOUNT);
-		vram_size <<= 20;
 	}
-	else {
+	else
+	{
 		vram_size = REG32(NV04_PFB_FIFO_DATA);
 		vram_size |= (vram_size & 0xff) << 32;
 		vram_size &= 0xffffffff00ll;
@@ -863,9 +902,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devicepath = get_pci_dev_path(nvda_dev);
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
-	
-	delay(50);
-		
+	//delay(50);
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
 
@@ -1007,19 +1044,21 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-//#if DEBUG_NVCAP
+#if DEBUG_NVCAP
         printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
 		default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
 		default_NVCAP[4], default_NVCAP[5], default_NVCAP[6], default_NVCAP[7],
 		default_NVCAP[8], default_NVCAP[9], default_NVCAP[10], default_NVCAP[11],
 		default_NVCAP[12], default_NVCAP[13], default_NVCAP[14], default_NVCAP[15],
 		default_NVCAP[16], default_NVCAP[17], default_NVCAP[18], default_NVCAP[19]);
-//#endif
+#endif
  
-	if (getValueForKey(kdcfg0, &value, &len, &bootInfo->bootConfig) && len == DCFG0_LEN * 2) {
+	if (getValueForKey(kdcfg0, &value, &len, &bootInfo->bootConfig) && len == DCFG0_LEN * 2)
+	{
 		uint8_t	new_dcfg0[DCFG0_LEN];
- 
-		if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0) {
+		
+		if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0)
+		{
 			verbose("Using user supplied @0,display-cfg\n");
 			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
 		}
@@ -1030,10 +1069,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3], default_dcfg_0[4]);
 //#endif
 
-	if (getValueForKey(kdcfg1, &value, &len, &bootInfo->bootConfig) && len == DCFG1_LEN * 2) {
+	if (getValueForKey(kdcfg1, &value, &len, &bootInfo->bootConfig) && len == DCFG1_LEN * 2)
+	{
 		uint8_t	new_dcfg1[DCFG1_LEN];
- 
-		if (hex2bin(value, new_dcfg1, DCFG1_LEN) == 0) {
+		
+		if (hex2bin(value, new_dcfg1, DCFG1_LEN) == 0)
+		{
 			verbose("Using user supplied @1,display-cfg\n");
 			memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
 		}
@@ -1052,9 +1093,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
 	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
 	devprop_add_value(device, "NVPM", default_NVPM, 28);
-	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit)
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
-	}
 
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);

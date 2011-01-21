@@ -90,20 +90,24 @@ void patch_kernel_32(void* kernelData)
 	switch(Platform.CPU.Model)
 	{
 			// Known good CPU's, no reason to patch kernel
-		case 13:
-		case CPUID_MODEL_YONAH:
-		case CPUID_MODEL_MEROM:
-		case CPUID_MODEL_PENRYN:
-		case CPUID_MODEL_NEHALEM:
-		case CPUID_MODEL_FIELDS:
-		case CPUID_MODEL_DALES:
-		case CPUID_MODEL_NEHALEM_EX:
+		case 0x0C:
+			if (strstr(Platform.CPU.BrandString, "Atom")) goto atom;
+		case 0x0D:
+		case 0x0E:
+		case 0x0F:
+		case 0x17:
+		case 0x1A:
+		case 0x1E:
+		case 0x1F:
+		case 0x2E:
 			break;
 			
 			// Known unsuported CPU's
-		case CPUID_MODEL_ATOM:
+		case 0x1C:
+		case 0x27:
+			atom:
 			// TODO: Impersonate CPU based on user selection
-			patch_cpuid_set_info(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN);	// Impersonate Penryn CPU
+			patch_cpuid_set_info(kernelData, CPUFAMILY_INTEL_PENRYN, 0x17);	// Impersonate Penryn CPU
 			break;
 			
 			// Unknown CPU's

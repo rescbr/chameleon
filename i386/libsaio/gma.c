@@ -108,15 +108,15 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);	
 
-	if ((model == (char *)"Mobile GMA950") ||
-		(model == (char *)"Mobile GMA3150"))
+	if ((model == (char *)"Mobile GMA950")
+	|| (model == (char *)"Mobile GMA3150"))
 	{
 		devprop_add_value(device, "AAPL,HasPanel", reg_TRUE, 4);
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	} 
-	else if ((model == (char *)"Desktop GMA950") || 
-			 (model == (char *)"Desktop GMA3150"))
+	else if ((model == (char *)"Desktop GMA950")
+	|| (model == (char *)"Desktop GMA3150"))
 	{
 		BuiltIn = 0x01;
 		devprop_add_value(device, "built-in", &BuiltIn, 1);

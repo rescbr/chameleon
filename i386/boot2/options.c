@@ -736,8 +736,9 @@ int getBootOptions(bool firstRun)
 
 	//	 18seven's Quick-args macro
 		bool f8 = false, altf = false, shiftf = false, alts = false, 
-		altv = false, x32 = false,  x64 = false, altx = false;
-		while (readKeyboardStatus()) {
+		altv = false, altx = false; // x32 = false,  x64 = false;
+		while (readKeyboardStatus())
+		{
 			key = bgetc ();
 			if (key == 0x4200) f8 = true;
 			if (key == 0x2100) altf = true;
@@ -745,9 +746,9 @@ int getBootOptions(bool firstRun)
 			if (key == 0x1F00) alts = true;
 			if (key == 0x2F00) altv = true;
 			if (key == 0x2D00) altx = true;
-			if (key == 0x0004) x32 = true;
+/*			if (key == 0x0004) x32 = true;
 			if (key == 0x0007) x64 = true;
-		}
+*/		}
 
 	// If user typed F8, abort quiet mode, and display the menu.
 	if (f8) {
@@ -776,7 +777,7 @@ int getBootOptions(bool firstRun)
 	if ((gBootMode & kBootModeQuiet) && firstRun && altx) {
 		addBootArg(kSafeModeFlag);
 	}
-
+/*
 	if ((gBootMode & kBootModeQuiet) && firstRun && x32) {
 		addBootArg(k32BitModeFlag);
 	}
@@ -784,7 +785,7 @@ int getBootOptions(bool firstRun)
 	if ((gBootMode & kBootModeQuiet) && firstRun && x64) {
 		addBootArg(k64BitModeFlag);
 	}
-
+*/
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);
 		clearScreenRows(0, kScreenLastRow);
@@ -1009,91 +1010,91 @@ int getBootOptions(bool firstRun)
 		case kEscapeKey:
 			clearBootArgs();
 			break;
-				
+		
 		case kF2Key:
-								
-				/*
-				 * AutoResolution - Reapply the patch if Graphics Mode was incorrect
-				 *                  or EDID Info was insane
-				 */	
-				
-				//get the new Graphics Mode key
+			
+			/*
+			 * AutoResolution - Reapply the patch if Graphics Mode was incorrect or EDID Info was insane
+			 */
+			
+			if ((gAutoResolution == TRUE) && map)
+			{
+				// get the new Graphics Mode key
 				processBootOptions();
-				if ((gAutoResolution == TRUE) && map)
+				
+				UInt32 params[4];
+				params[3] = 0;
+				//Has the target Resolution Changed ?
+				int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
+				if ( count < 3 )
+					getResolution(params);
+				
+				if ((params[0] != 0) && (params[1] != 0)
+				&& (params[0] != map->currentX) && (params[1] != map->currentY))
 				{
-					UInt32 params[4];
-					params[3] = 0;
-					//Has the target Resolution Changed ?
-					int count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
-					if ( count < 3 )
-						getResolution(params);
-					
-					if (	(params[0] != 0) && (params[1] != 0)
-						&&	(params[0] != map->currentX) && (params[1] != map->currentY))
+				
+					//Go back to TEXT mode while we change  the mode
+					if (bootArgs->Video.v_display == GRAPHICS_MODE)
 					{
+						CursorState cursorState;
 						
-						//Go back to TEXT mode while we change  the mode
-						if (bootArgs->Video.v_display == GRAPHICS_MODE)
+						setVideoMode(VGA_TEXT_MODE, 0);
+						
+						setCursorPosition(0, 0, 0);
+						clearScreenRows(0, kScreenLastRow);
+						changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
+						
+						//Reapply patch in case resolution have changed
+						
+						patchVbios(map, params[0], params[1], params[2], 0, 0);
+						
+						if (useGUI && (gui.initialised == true))
+							initGUI();
+						// Make sure all values are set
+						if (bootArgs->Video.v_display != GRAPHICS_MODE)
+							bootArgs->Video.v_display = GRAPHICS_MODE;
+						
+						if (!useGUI)
+							useGUI = true;
+						
+						// redraw the background buffer
+						drawBackground();
+						gui.devicelist.draw = true;
+						gui.redraw = true;
+						if (!(gBootMode & kBootModeQuiet))
 						{
-							CursorState cursorState;
+							bool showBootBanner = true;
 							
-							setVideoMode(VGA_TEXT_MODE, 0);
-							
-							setCursorPosition(0, 0, 0);
-							clearScreenRows(0, kScreenLastRow);
-							changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
-							
-							//Reapply patch in case resolution have changed
-							
-							patchVbios(map, params[0], params[1], params[2], 0, 0);
-							
-							if (useGUI && (gui.initialised == true))
-								initGUI();
-							// Make sure all values are set
-							if (bootArgs->Video.v_display != GRAPHICS_MODE)
-								bootArgs->Video.v_display = GRAPHICS_MODE;
-							
-							if (!useGUI)
-								useGUI = true;
-							
-							// redraw the background buffer
-							drawBackground();
-							gui.devicelist.draw = true;
-							gui.redraw = true;
-							if (!(gBootMode & kBootModeQuiet))
-							{
-								bool showBootBanner = true;
+							// Check config file.
+							getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
+							if (showBootBanner)
+								// Display banner and show hardware info.
+								gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
 								
-								// Check if "Boot Banner"=N switch is present in config file.
-								getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
-								if (showBootBanner)
-									// Display banner and show hardware info.
-									gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
-								
-								// redraw background
-								memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4);
-							}
-							
-							nextRow = kMenuTopRow;
-							showPrompt = true;
-							
-							if (gDeviceCount)
-							{
-								showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-								nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
-							}
-							
-							// Show the boot prompt.
-							showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
-							showBootPrompt( nextRow, showPrompt );
-							
-							//this is used to avoid resetting the incorrect mode while quiting the boot menu
-							map->hasSwitched = true;
+							// redraw background
+							memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4);
 						}
+						
+						nextRow = kMenuTopRow;
+						showPrompt = true;
+						
+						if (gDeviceCount)
+						{
+							showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
+							nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+						}
+						
+						// Show the boot prompt.
+						showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+						showBootPrompt( nextRow, showPrompt );
+						
+						//this is used to avoid resetting the incorrect mode while quiting the boot menu
+						map->hasSwitched = true;
 					}
-					clearBootArgs();
-					key = 0;
 				}
+				clearBootArgs();
+				key = 0;
+			}
 			break;
 
 		case kF5Key:
@@ -1118,31 +1119,33 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI) {
-					setVideoMode(VGA_TEXT_MODE, 0);
+			if (useGUI)
+			{
+				setVideoMode(VGA_TEXT_MODE, 0);
 
-					setCursorPosition(0, 0, 0);
-					clearScreenRows(0, kScreenLastRow);
+				setCursorPosition(0, 0, 0);
+				clearScreenRows(0, kScreenLastRow);
 
-					// Display banner and show hardware info.
-					printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
-					printf(getVBEInfoString());
+				// Display banner and show hardware info.
+				printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
+				printf(getVBEInfoString());
 
-					clearScreenRows(kMenuTopRow, kMenuTopRow + 2);
-					changeCursor(0, kMenuTopRow, kCursorTypeHidden, 0);
+				clearScreenRows(kMenuTopRow, kMenuTopRow + 2);
+				changeCursor(0, kMenuTopRow, kCursorTypeHidden, 0);
 
-					nextRow = kMenuTopRow;
-					showPrompt = true;
+				nextRow = kMenuTopRow;
+				showPrompt = true;
 
-					if (gDeviceCount) {
-						printf("Use \30\31 keys to select the startup volume.");
-						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
-						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
-					}
+				if (gDeviceCount)
+				{
+					printf("Use \30\31 keys to select the startup volume.");
+					showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
+					nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
+				}
 
-					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
-					showBootPrompt(nextRow, showPrompt);
-					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
+				showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+				showBootPrompt(nextRow, showPrompt);
+				//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
 				
 				/*
 				 * AutoResolution - make sure all values are set
@@ -1150,18 +1153,20 @@ int getBootOptions(bool firstRun)
 				
 				bootArgs->Video.v_display = VGA_TEXT_MODE;
 				useGUI = false;
-				} else {
-					gui.redraw = true;
-					setVideoMode(GRAPHICS_MODE, 0);
-					
-					/*
-					 * AutoResolution - make sure all values are set
-					 */
-					bootArgs->Video.v_display = GRAPHICS_MODE;
-					useGUI = true;
-					
-					updateVRAM();
-				}
+			}
+			else
+			{
+				gui.redraw = true;
+				setVideoMode(GRAPHICS_MODE, 0);
+				
+				/*
+				 * AutoResolution - make sure all values are set
+				 */
+				bootArgs->Video.v_display = GRAPHICS_MODE;
+				useGUI = true;
+				
+				updateVRAM();
+			}
 			key = 0;
 			break;
 

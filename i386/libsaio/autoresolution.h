@@ -1,4 +1,3 @@
-
 /* Copied from 915 resolution created by steve tomljenovic
  *
  * This code is based on the techniques used in :
@@ -13,6 +12,7 @@
  *
  * This source code is into the public domain.
  */
+
 #ifndef __915_RESOLUTION_H
 #define __915_RESOLUTION_H
 
@@ -38,12 +38,12 @@
 #define VBIOS_START         0xc0000
 #define VBIOS_SIZE          0x10000
 
-#define FALSE 0
-#define TRUE 1
+#define false 0
+#define true 1
 
 
 bool gAutoResolution;
-
+UInt32 params[4];
 
 typedef struct
 {

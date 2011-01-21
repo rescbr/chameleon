@@ -31,7 +31,7 @@
 
 #include "libsaio.h"
 #include "autoresolution.h"
- 
+
 #if DEBUG
 #ifndef AUTORES_DEBUG
 #define AUTORES_DEBUG
@@ -142,24 +142,25 @@
 #define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
 
 /* valv: added these keys */
-#define kFixFSB				"FixFSB"			/* cpu.c */
-#define kbusratio			"busratio"			/* cpu.c */
-#define kForceFSB			"ForceFSB"			/* cpu.c */
-#define kC2EEnable			"C2E"				/* cpu.c */
-#define kC4EEnable			"C4E"				/* cpu.c */
+#define kFixFSB			"FixFSB"			/* cpu.c */
+#define kbusratio		"busratio"			/* cpu.c */
+#define kForceFSB		"ForceFSB"			/* cpu.c */
+#define kC2EEnable		"C2E"				/* cpu.c */
+#define kC4EEnable		"C4E"				/* cpu.c */
 #define kHardC4EEnable		"HC4E"				/* cpu.c */
-#define kFixTM				"FixTM"				/* cpu.c */
-#define kdcfg0				"display_0"			/* nvidia.c */
-#define kdcfg1				"display_1"			/* nvidia.c */
-#define kpstates			"PStates"			/* acpi_patcher.c */
-#define kEnableC6State		"EnableC6State"		/* acpi_patcher.c */
-#define kmaxVoltage			"maxVolt"			/* acpi_patcher.c */
-#define kminVoltage			"minVolt"			/* acpi_patcher.c */
+#define kFixTM			"FixTM"				/* cpu.c */
+#define kdcfg0			"display_0"			/* nvidia.c */
+#define kdcfg1			"display_1"			/* nvidia.c */
+#define kpstates		"PStates"			/* acpi_patcher.c */
+#define kEnableC6State		"EnableC6State"			/* acpi_patcher.c */
+#define kmaxVoltage		"maxVolt"			/* acpi_patcher.c */
+#define kminVoltage		"minVolt"			/* acpi_patcher.c */
 #define kmoreVoltage		"moreVolt"			/* acpi_patcher.c */
 #define klessVoltage		"lessVolt"			/* acpi_patcher.c */
-#define kTjmax				"Tjmax"				/* acpi_patcher.c */
-#define kpstart				"PStart"			/* acpi_patcher.c */
-#define kGenerateTStates	"GenerateTStates"	/* apci_patcher.c */
+#define kTjmax			"Tjmax"				/* acpi_patcher.c */
+#define kpstart			"PStart"			/* acpi_patcher.c */
+#define kGenerateTStates	"GenerateTStates"		/* apci_patcher.c */
+#define kPatchKrn		"PatchKernel"			/* drivers.c */
 
 /*
  * Flags to the booter or kernel
@@ -169,8 +170,6 @@
 #define kIgnoreCachesFlag	"-f"
 #define kIgnoreBootFileFlag	"-F"
 #define kSingleUserModeFlag	"-s"
-#define k32BitModeFlag		"-x32"
-#define k64BitModeFlag		"-x64"
 
 /*
  * Booter behavior control

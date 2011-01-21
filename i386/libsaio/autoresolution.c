@@ -14,7 +14,7 @@
  */
 
 #include "libsaio.h"
-#include "autoresolution.h"
+//#include "autoresolution.h"
 #include "nvidia_resolution.h"
 #include "ati_resolution.h"
 #include "gma_resolution.h"
@@ -216,7 +216,7 @@ sModeTable * intializeTables(vBiosMap * map, int tablesCount) {
 	while ( i != 0 )
 	{		
 		table->id = tablesCount - i;
-		PRINT("New table with id : %d\n", table->id);
+		PRINT("New table with id: %d\n", table->id);
 		
 		// opening the chain if it's the first table
 		if (i == tablesCount)
@@ -240,7 +240,7 @@ sModeTable * intializeTables(vBiosMap * map, int tablesCount) {
 }
 
 
-void closeVbios(vBiosMap * map);
+//void closeVbios(vBiosMap * map); azi: dup - declared on header
 
 vBiosMap * openVbios(chipsetType forcedChipset)
 {
@@ -369,8 +369,8 @@ void closeVbios(vBiosMap * map)
 {
 	PRINT("Closing VBios\n");
 	//make sure to turn autoResolution off
-	if (gAutoResolution == TRUE)
-		gAutoResolution = FALSE;
+	if (gAutoResolution == true)
+		gAutoResolution = false;
 	
 	// if we saved the vBios, free the copy
 	if (map->biosBackupPtr != NULL)
@@ -386,14 +386,14 @@ void closeVbios(vBiosMap * map)
 	{		
 		if (table->backup != NULL)
 		{
-			PRINT("Table #%d : Freeing backup\t", table->id);
+			PRINT("Table #%d: Freeing backup\t", table->id);
 			FREE(table->backup);
 			PRINT("[OK]\n");
 		}
 		
 		if (table != NULL)
 		{ 
-			PRINT("Table #%d : Freeing\t\t", table->id);
+			PRINT("Table #%d: Freeing\t\t", table->id);
 			FREE(table);
 			PRINT("[OK]\n");
 		}
@@ -412,7 +412,7 @@ void closeVbios(vBiosMap * map)
 void unlockVbios(vBiosMap * map)
 {
 
-	map->unlocked = TRUE;
+	map->unlocked = true;
 	    
 	switch (map->chipset)
 	{
@@ -472,7 +472,7 @@ void unlockVbios(vBiosMap * map)
 void relockVbios(vBiosMap * map)
 {
 
-	map->unlocked = FALSE;
+	map->unlocked = false;
 	
 	switch (map->chipset)
 	{
@@ -610,11 +610,11 @@ void patchVbios(vBiosMap * map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hT
 		x = map->currentX;
 		y = map->currentY;
 		
-		PRINT("Patching Table #%d : \n", table->id);
+		PRINT("Patching Table #%d: \n", table->id);
 		
 		map->setMode(table, i, &x, &y);
 #ifdef AUTORES_DEBUG
-		getc();
+		pause();
 #endif
 
 		table = table->next;
@@ -622,4 +622,4 @@ void patchVbios(vBiosMap * map, uint32_t x, uint32_t y, uint32_t bp, uint32_t hT
 	
 	relockVbios(map);
 	return;
-}  
+}

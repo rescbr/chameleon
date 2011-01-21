@@ -816,7 +816,9 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	  ret = ThinFatFile(&binary, &len);
   }
   
-  patch_kernel(binary);
+  bool patchkrn = false;
+  getBoolForKey(kPatchKrn, &patchkrn, &bootInfo->bootConfig);
+  if(patchkrn) patch_kernel(binary);
 
   ret = DecodeMachO(binary, rentry, raddr, rsize);
 	
