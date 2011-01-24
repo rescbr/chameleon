@@ -40,8 +40,9 @@ VPATH = $(OBJROOT):$(SYMROOT)
 # The ordering is important;
 # boot2.o must be first.
 OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o resume.o bmdecompress.o modules.o
-# button.o browser.o scrollbar.o == NOTYET	
+		    ramdisk.o resume.o bmdecompress.o modules.o modules_support.o
+
+#OBJS = boot2.o boot.o modules.o modules_support.o	
 
 UTILDIR = ../util
 SFILES = boot2.s
@@ -60,9 +61,9 @@ MAXBOOTSIZE = 458240
 #
 SYMBOLS_MODULE = Symbols.dylib
 SYMBOL_START= _symbols_module_start
-SYMBOL_ADDR = $(shell printf "%d" 0x`nm -s __DATA __data $(SYMROOT)/boot_embeded.sys | grep " $(SYMBOL_START)$$" | cut -f 1 -d " "`)
-DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | tail -n 1 | cut -f 6 -d " ")
-DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
+SYMBOL_ADDR = $(shell printf "%d" 0x`nm -s __DATA __data $(SYMROOT)/boot.sys | grep " $(SYMBOL_START)$$" | cut -f 1 -d " "`)
+DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot.sys | grep __data -A 4  | grep __DATA -A 3 | tail -n 1 | cut -f 6 -d " ")
+DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
 PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 
@@ -75,28 +76,35 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
-	@make Symbols.dylib
 
-	@echo "\t[LD] boot_embeded.sys"
+	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
+
+	@make Symbols.dylib
+	@${RM} $(SYMROOT)/boot.sys
+
+	@echo "\t[LD] boot.sys"
 	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
 
-#	@ld -arch i386 \
-#	-undefined dynamic_lookup \
-#	-dylib -read_only_relocs suppress \
-#	-S -x -Z -dead_strip_dylibs \
-#	-no_uuid \
-#	-final_output Symbols.dylib \
-#	$(filter %.o,$^) $(LIBS) \
-#	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
+
+
+	@ld -arch i386 \
+	-undefined dynamic_lookup \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-final_output Symbols \
+	$(filter %.o,$^) $(LIBS) \
+	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
 
 
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
+	@${RM} $(SYMROOT)/boot2.sys
 
-	@##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@##size $(SYMROOT)/boot.sys
 	@ls -l $(SYMROOT)/boot
@@ -111,12 +119,12 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 embed_symbols: machOconv
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
 
 	@echo ******* Patching at $(PATCH_ADDR) ******
-	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
-	@echo "\t[MACHOCONV] boot_embeded"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
+	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
+	@echo "\t[MACHOCONV] boot"
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
 
 prompt.o: vers.h
@@ -124,7 +132,6 @@ vers.h:
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
-#	@echo "#define I386BOOT_CHAMELEONREVISION \"`cat ../../revision`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
 
 embedded.h:

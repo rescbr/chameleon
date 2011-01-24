@@ -9,7 +9,7 @@ DIRS_NEEDED = $(SYMROOT)
 
 all embedtheme optionrom: $(DIRS_NEEDED) boot0 boot0hfs chain0
 
-boot0: boot0.s Makefile $(NASM)
+boot0: boot0.s 
 	@echo "\t[NASM] $@"
 	@$(NASM) boot0.s -o $(SYMROOT)/$@
 

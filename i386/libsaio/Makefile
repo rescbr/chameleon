@@ -39,7 +39,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	ufs.o ufs_byteorder.o \
 	vbe.o nbp.o smbios_patcher.o hfs.o hfs_compare.o \
 	xml.o ntfs.o msdos.o md5c.o device_tree.o \
-	cpu.o platform.o \
+	cpu.o platform.o acpi_patcher.o aml_generator.o \
 	fake_efi.o ext2fs.o \
 	pci_setup.o \
 	device_inject.o pci_root.o \

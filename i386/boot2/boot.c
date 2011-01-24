@@ -53,6 +53,7 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "fake_efi.h"
+#include "acpi_patcher.h"
 #include "sl.h"
 #include "libsa.h"
 #include "ramdisk.h"
@@ -62,7 +63,7 @@
 
 #include "modules.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;

@@ -12,6 +12,7 @@
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
 extern void dumpPhysAddr(const char * title, void * a, int len);
+extern void scan_cpu();
 
 #define bit(n)			(1UL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))

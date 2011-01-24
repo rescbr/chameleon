@@ -84,7 +84,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	uint16_t	bootOptionNumber = 0;
 	int i, j;
 	
-	BLESS_EFI_LOAD_OPTION* NextBoot =(BLESS_EFI_LOAD_OPTION*)gBootOrder;
+//	BLESS_EFI_LOAD_OPTION* NextBoot =(BLESS_EFI_LOAD_OPTION*)gBootOrder;
 	
 	DBG("NVRAM started with ModulesLoaded\n");
 	
@@ -93,7 +93,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 //	bool UseNVRAM = FALSE;
 	bool ClearNVRAM = FALSE;
 	const char* buff;
-	TagPtr	dictionary;
+//	TagPtr	dictionary;
 	int cnt;
 	var = malloc(sizeof(variables)+1);
 	ClearNVRAM = getValueForKey(kClearNVRAM, &buff, &cnt, &bootInfo->bootConfig);
@@ -115,7 +115,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		}
 	}
 	
-	Node* optionsNode = DT__FindNode("/fakenvram", true);
+	Node* optionsNode = DT__FindNode("/options", true);  //"/fakenvram"
 	ffName = malloc(sizeof(PLATFORM_UUID)+1);
 	strcpy(ffName, PLATFORM_UUID);
 	ret = getSystemID();

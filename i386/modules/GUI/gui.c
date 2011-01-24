@@ -1883,7 +1883,7 @@ void drawBootGraphics(void)
 	if (usePngImage && bootImageData == NULL) {
 		loadBootGraphics();
 	}
-	
+//Slice - attention!	
 	// parse screen size parameters
 	if(is_module_loaded("Resolution.dylib"))
 	{

@@ -15,7 +15,7 @@
 
 bool EX2Probe (const void *buf)
 {
-	return (OSReadLittleInt16(buf+0x438,0)==0xEF53);
+	return (OSReadLittleInt16(buf+0x438,0)==0xEF53); //
 }
 
 void EX2GetDescription(CICell ih, char *str, long strMaxLen)

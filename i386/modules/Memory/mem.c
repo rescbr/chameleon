@@ -7,7 +7,7 @@
 #include "libsaio.h"
 #include "pci.h"
 #include "platform.h"
-#include "cpu.h"
+//#include "cpu.h"
 #include "mem.h"
 #include "smbios_patcher.h"
 

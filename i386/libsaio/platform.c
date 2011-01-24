@@ -9,7 +9,7 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
-#include "cpu.h"
+//#include "cpu.h"
 #include "modules.h"
 #include "efi.h"
 

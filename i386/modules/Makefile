@@ -26,8 +26,8 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller ACPIPatcher NVRAM ATI5000Enabler HelloWorld 
-#SUBDIRS = HelloWorld
+SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller NVRAM ATI5000Enabler HelloWorld 
+#SUBDIRS = HelloWorld ACPIPatcher
 
 all embedtheme optionrom tags debug install installhdrs: objroot_dirs lazydylib1.o
 	@for i in ${SUBDIRS}; \

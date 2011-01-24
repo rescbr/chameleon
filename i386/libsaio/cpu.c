@@ -97,7 +97,7 @@ void scan_cpu() //PlatformInfo_t *p)
 {
 	PlatformInfo_t *p = Platform;
 	int i = 0;
-	uint8_t turbo;
+	uint8_t turbo = 0;
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
 	uint64_t	msr; //, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, currdiv, mindiv;

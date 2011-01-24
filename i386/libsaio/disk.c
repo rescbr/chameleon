@@ -739,7 +739,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
     int                       spc;
     struct driveInfo          di;
     boot_drive_info_t         *dp;
-	
+	verbose("diskScanFDiskBootVolumes %d\n", biosdev);
     /* Initialize disk info */
     if (getDriveInfo(biosdev, &di) != 0) {
 		return NULL;
@@ -1503,7 +1503,7 @@ void diskFreeMap(struct DiskBVMap *map)
 
 BVRef diskScanBootVolumes( int biosdev, int * countPtr )
 {
-    struct DiskBVMap *        map;
+    struct DiskBVMap *        map = NULL;
     BVRef bvr;
     int count = 0;
 	
@@ -1642,7 +1642,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
     	msglog(" bvr: %x, dev: %x, part: %d, flags: %x, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
 	}
  	msglog("count: %d\n", bvCount);
- 	getc();
+// 	getc();
 #endif
 	
 	*count = bvCount;

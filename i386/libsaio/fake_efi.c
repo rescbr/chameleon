@@ -11,7 +11,7 @@
 #include "fake_efi.h"
 #include "efi_tables.h"
 #include "platform.h"
-//#include "acpi_patcher.h"
+#include "acpi_patcher.h"
 #include "smbios_patcher.h"
 #include "device_inject.h"
 #include "convert.h"
@@ -776,8 +776,8 @@ void setupFakeEfi(void)
 //	getSmbios(SMBIOS_ORIGINAL); //Slice - already done
 	getSmbiosProductName();
 
-	
-	execute_hook("setupEfiConfigurationTable", NULL, NULL, NULL, NULL);
+	setupAcpi();
+	//execute_hook("setupEfiConfigurationTable", NULL, NULL, NULL, NULL);
 	
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
