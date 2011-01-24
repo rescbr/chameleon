@@ -57,6 +57,7 @@ int init_module_system()
 {
 	void (*module_start)(void) = NULL;
 	char* module_data = symbols_module_start + BOOT2_ADDR;
+    
 	// Intialize module system
 	if(symbols_module_start == (void*)0xFFFFFFFF)
 	{
@@ -371,7 +372,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	}
 	else
 	{
-		printf("Invalid mach magic\n");
+		printf("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
 		getc();
 		return NULL;
 	}
