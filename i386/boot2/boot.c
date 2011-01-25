@@ -200,12 +200,11 @@ int ExecKernel(void *binary)
 #endif
 	}
 
-	
+    execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+
 	setupBooterLog();
 	
-    finalizeBootStruct();
-    	
-	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+    finalizeBootStruct();    	
 
 	// Jump to kernel's entry point. There's no going back now.
     startprog( kernelEntry, bootArgs );
