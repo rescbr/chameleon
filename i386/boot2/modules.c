@@ -10,7 +10,7 @@
 #include "modules.h"
 
 #ifndef DEBUG_MODULES
-#define DEBUG_MODULES 0
+#define DEBUG_MODULES 1
 #endif
 
 #if DEBUG_MODULES

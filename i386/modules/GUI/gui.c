@@ -14,6 +14,17 @@
 #include "modules.h"
 #include "../Resolution/edid.h"
 
+#ifndef DEBUG_GUI
+#define DEBUG_GUI 1
+#endif
+
+#if DEBUG_GUI
+#define DBG(x...)	verbose(x) //;getc()
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
+
 
 gui_t gui;					// gui structure
 font_t font_small;
@@ -691,7 +702,8 @@ int initGUI(void)
 {
 	int		val;
 	int		len;
-	char	dirspec[256];
+	char*	dirspec; //[256];
+	dirspec = (char*)malloc(256);
 	
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
@@ -702,13 +714,13 @@ int initGUI(void)
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
 		config_file_t	*config;
-		
+		DBG("Attention! EMBED_THEME!\n");
 		config = &bootInfo->themeConfig;
 		if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
 			return 1;
 		}
 #else
-		msglog(" GUI from themeConfig\n");
+		DBG(" GUI from themeConfig failed\n");
 		return 1;
 #endif
 	}
@@ -717,7 +729,7 @@ int initGUI(void)
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 		gDualLink =((screen_params[0] * screen_params[1]) > (1<<20))?1:0;
-		msglog("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
+		DBG("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
 	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
@@ -729,13 +741,13 @@ int initGUI(void)
 		{
 			screen_params[1] = val;
 		}		
-		msglog("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
+		DBG("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
 	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-		msglog("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
+		DBG("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
 	}	
 /*	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
 	{
@@ -749,7 +761,7 @@ int initGUI(void)
 	
 	// find best matching vesa mode for our requested width & height
 	int modeV = getGraphicModeParams(screen_params);
-	verbose("GUI: set mode %d: %dx%dx%d\n", modeV, screen_params[0], screen_params[1], screen_params[2]);
+	DBG("GUI: set mode %d: %dx%dx%d\n", modeV, screen_params[0], screen_params[1], screen_params[2]);
 	
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	

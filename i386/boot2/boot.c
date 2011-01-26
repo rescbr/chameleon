@@ -63,7 +63,7 @@
 
 #include "modules.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -285,7 +285,7 @@ void common_boot(int biosdev)
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
     // config table has been loaded. Call video_mode() instead.
- //   video_mode( 2 );  // 80x25 mono text mode.
+    video_mode( 2 );  // 80x25 mono text mode.
 	
     // Scan and record the system's hardware information.
     scan_platform();
@@ -296,7 +296,7 @@ void common_boot(int biosdev)
 	
 #if DEBUG	
     printf("get bvChain dev=%02x type=%02x part_no=%d\n", bvChain->biosdev, bvChain->type, bvChain->part_no); //dev=0x80 - flash-stick
-		getc();
+//		getc();
 #endif
 	
     setBootGlobals(bvChain);
@@ -344,7 +344,7 @@ void common_boot(int biosdev)
 	{
 #if DEBUG	
 		printf("begin load_all_modules\n");
-		pause();
+//		pause();
 #endif
 		
 		load_all_modules();
@@ -353,7 +353,7 @@ void common_boot(int biosdev)
 	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 #if DEBUG
     printf("ModulesLoaded\n");
-	pause();
+//	pause();
 #endif
 	
 	
@@ -530,8 +530,8 @@ void common_boot(int biosdev)
 				/*
 				 - but the name is longer .adler32 and more...
 				 kernelcache_i386.E102928C.qSs0
-				 so will opendir and scan for some file
-				 
+				 so will opendir and scan for some files
+				*/ 
 				char* name;
 				long flagsC;
 				long timeC;
@@ -542,9 +542,10 @@ void common_boot(int biosdev)
 					{
 						//char* tmp = malloc(strlen(name) + 1);
 						//strcpy(tmp, name);
+						verbose("find kernelcache=%s\n", name);
 					}
 				}
-				*/		
+						
 			}
 			else //if(gMacOSVersion[3] == '5')
 				sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePath);
