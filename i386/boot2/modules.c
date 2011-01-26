@@ -44,6 +44,13 @@ void print_hook_list()
 	while(hooks)
 	{
 		DBG("Hook: %s\n", hooks->name);
+		callbackList_t* callbacks = hooks->callbacks; 
+		while(callbacks->next != NULL)
+		{
+			DBG("\tcallbacks: %x\n", callbacks->callback);
+			callbacks = callbacks->next;
+		}
+		
 		hooks = hooks->next;
 	}
 }
@@ -113,6 +120,7 @@ void load_all_modules()
 	char* name;
 	long flags;
 	long time;
+	DBG("Loading modules...\n");
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
@@ -155,7 +163,7 @@ int load_module(char* module)
 	{
 		// NOTE: Symbols.dylib tries to load twice, this catches it as well
 		// as when a module links with an already loaded module
-		DBG("Module %s already loaded\n", module);
+		DBG("load_module: Module %s already loaded\n", module);
 		return 1;
 	}
 	
@@ -165,7 +173,7 @@ int load_module(char* module)
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		DBG("Unable to locate module %s\n", modString);
+		DBG("load_module: Unable to locate module %s\n", modString);
 		//getc();
 		return 0;
 	}
@@ -175,7 +183,7 @@ int load_module(char* module)
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
 
-		DBG("Module %s read in.\n", modString);
+		DBG("load_module: Module %s read in.\n", modString);
 
 		// Module loaded into memory, parse it
 		module_start = parse_mach(module_base, &load_module, &add_symbol);
@@ -185,17 +193,17 @@ int load_module(char* module)
 			// Notify the system that it was laoded
 			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
-			DBG("Module %s Loaded.\n", module);
+			DBG("load_module: Module %s Loaded.\n", module);
 		}
 		else {
 			// The module does not have a valid start function
-			verbose("Unable to start %s\n", module);
+			verbose("load_module: Unable to start %s\n", module);
 			getc();
 		}		
 	}
 	else
 	{
-		DBG("Unable to read in module %s\n.", module);
+		DBG("load_module: Unable to read in module %s\n.", module);
 		//getc();
 	}
 	close(fh);
@@ -211,38 +219,47 @@ int load_module(char* module)
  */
 int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	DBG("Attempting to execute hook '%s'\n", name);
+	DBG("execute_hook: Attempting to execute hook '%s'\n", name);
 	moduleHook_t* hooks = moduleCallbacks;
-
-	while(hooks && strcmp(name, hooks->name) < 0)
+//Slice - dunno why it not works
+/*	while(hooks && strcmp(name, hooks->name) < 0)
 	{
-		//DBG("%s cmp %s = %d\n", name, hooks->name, strcmp(name, hooks->name));
+		DBG("execute_hook: name=%s hook->name=%s cmp=%d try next\n", name, hooks->name, strcmp(name, hooks->name));
 		hooks = hooks->next;
-	}
+		
+	}*/
+	do {
+		
+		DBG("execute_hook: name=%s hook->name=%s cmp=%d try next\n", name, hooks->name, strcmp(name, hooks->name));
+		if (strcmp(name, hooks->name) == 0) {
+			break;
+		}
+		hooks = hooks->next;
+	} while (hooks);
 
-	if(hooks && strcmp(name, hooks->name) == 0)
+	if(hooks) // && strcmp(name, hooks->name) == 0)
 	{
 		// Loop through all callbacks for this module
 		callbackList_t* callbacks = hooks->callbacks;
 		
 		while(callbacks)
 		{
-			DBG("Executing '%s' with callback 0x%X.\n", name, callbacks->callback);
+			DBG("execute_hook: Executing '%s' with callback 0x%X.\n", name, callbacks->callback);
 			// Execute callback
 			callbacks->callback(arg1, arg2, arg3, arg4);
 			callbacks = callbacks->next;
-			DBG("Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
+//			DBG("execute_hook: Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
 			
 		}
-		DBG("Hook '%s' executed.\n", name);
+		DBG("execute_hook: Hook '%s' executed.\n", name);
 		
 		return 1;
 	}
 	else
 	{
-		DBG("No callbacks for '%s' hook.\n", name);
+		DBG("execute_hook: No callbacks for '%s' hook.\n", name);
 		
-		// Callbaack for this module doesn't exist;
+		// Callback for this module doesn't exist;
 		//verbose("Unable execute hook '%s', no callbacks registered.\n", name);
 		//pause();
 		return 0;
@@ -254,14 +271,14 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 /*
  *	register_hook_callback(  const char* name,  void(*callback)())
  *		name - Name of the module hook to attach to.
- *		callbacks - The funciton pointer that will be called when the
+ *		callbacks - The function pointer that will be called when the
  *			hook is executed. When registering a new callback name, the callback is added sorted.
  *			NOTE: the hooks take four void* arguments.
  *			TODO: refactor
  */
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {	
-	DBG("Adding callback for '%s' hook.\n", name);
+	DBG("register_hook_callback: Adding callback for '%s' hook.\n", name);
 
 	moduleHook_t* newHook = malloc(sizeof(moduleHook_t));
 	if(!moduleCallbacks)
@@ -273,16 +290,31 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 		newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
 		newHook->callbacks->callback = callback;
 		newHook->callbacks->next = NULL;
+		DBG("register_hook_callback: new moduleCallbacks with %s\n", name);
 	}
 	else
 	{
 		moduleHook_t* hooks = moduleCallbacks;
-		
+//Slice
+// ignored	first node where hooks->name == name ?!
+/*		
 		while(hooks->next && strcmp(name, hooks->next->name) < 0)
 		{
 			hooks = hooks->next;
 		}
-		
+*/		
+		moduleHook_t* backHook = moduleCallbacks; //I need to remember last node in chain if next=NULL
+		do {
+			DBG("register_hook_callback: found = %s\n", hooks->name);
+			if (strcmp(name, hooks->name) == 0) {
+				break;
+			}
+			backHook = hooks;
+			hooks = hooks->next;
+		} while (hooks);
+// There are only two variants: hooks found or not
+// if not found then hooks=NULL so remember backHook		
+/*		
 		if(!hooks->next)
 		{
 			// Appent to the end
@@ -292,14 +324,16 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
 			newHook->callbacks->callback = callback;
 			newHook->callbacks->next = NULL;
-			
+			DBG("register_hook_callback: Appent to the end\n");
 			
 		}
-		else if(strcmp(name, hooks->next->name) == 0)
+		else */
+//First	check for hook found. So hooks != NULL
+		if(hooks) //&& strcmp(name, hooks->name) == 0)
 		{
 			// We found the hook
-			// Hook alreday exists, add a callback to this hook
-			callbackList_t* callbacks = hooks->next->callbacks;
+			// Hook already exists, add a callback to this hook
+			callbackList_t* callbacks = hooks->callbacks; //hooks->next->callbacks
 			while(callbacks->next != NULL)
 			{
 				callbacks = callbacks->next;
@@ -309,17 +343,18 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 			callbacks = callbacks->next;
 			callbacks->next = NULL;
 			callbacks->callback = callback;
+			DBG("register_hook_callback: existing hook with new callback\n");
 		}
 		else
 		{
-			// We are too far beyond the hook
-			newHook->next = hooks->next;
+			hooks = backHook; //now hooks=NULL so remember last not NULL where hooks->next=NULL		
+			newHook->next = NULL;
 			hooks->next = newHook;
 			newHook->name = name;
 			newHook->callbacks = (callbackList_t*)malloc(sizeof(callbackList_t));
 			newHook->callbacks->callback = callback;
 			newHook->callbacks->next = NULL;
-			
+			DBG("register_hook_callback: add new hook %s\n", name);
 		}
 	}
 #if DEBUG_MODULES
@@ -337,7 +372,7 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
  * NOTE; all dependecies will be loaded before this module is started
  * NOTE: If the module is unable to load ot completeion, the modules
  * symbols will still be available (TODO: fix this). This should not
- * happen as all dependencies are verified before the sybols are read in.
+ * happen as all dependencies are verified before the symbols are read in.
  */
 void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
 {	
@@ -563,7 +598,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				break;
 				
 			default:
-				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
+				DBG("parse_mach: Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
 		
 		}
@@ -1173,7 +1208,7 @@ void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	// TODO: insert sorted
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
-
+//	DBG("module_loaded: %s\n", name);
 	new_entry->next = loadedModules;
 	loadedModules = new_entry;
 	
@@ -1188,10 +1223,10 @@ int is_module_loaded(const char* name)
 	moduleList_t* entry = loadedModules;
 	while(entry)
 	{
-		DBG("Comparing %s with %s\n", name, entry->module);
+//		DBG("\tis_module_loaded:Comparing %s with %s\n", name, entry->module);
 		if(strcmp(entry->module, name) == 0)
 		{
-			DBG("Located module %s\n", name);
+//			DBG("\tis_module_loaded:Located module %s\n", name);
 			return 1;
 		}
 		else
@@ -1200,12 +1235,12 @@ int is_module_loaded(const char* name)
 		}
 
 	}
-	DBG("Module %s not found\n", name);
+//	DBG("\tis_module_loaded:Module %s not found in list\n", name);
 
 	return 0;
 }
 
-// Look for symbols using the Smbols moduel function.
+// Look for symbols using the Symbols module function.
 // If non are found, look through the list of module symbols
 unsigned int lookup_all_symbols(const char* name)
 {

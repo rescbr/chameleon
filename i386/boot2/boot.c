@@ -63,7 +63,7 @@
 
 #include "modules.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -216,13 +216,12 @@ int ExecKernel(void *binary)
 #endif
 	}
 
+    execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
 	setupBooterLog();
 	
     finalizeBootStruct();
     	
-	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
-
 	// Jump to kernel's entry point. There's no going back now.
     startprog( kernelEntry, bootArgs );
 	
@@ -286,7 +285,7 @@ void common_boot(int biosdev)
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
     // config table has been loaded. Call video_mode() instead.
-    video_mode( 2 );  // 80x25 mono text mode.
+ //   video_mode( 2 );  // 80x25 mono text mode.
 	
     // Scan and record the system's hardware information.
     scan_platform();
@@ -304,9 +303,11 @@ void common_boot(int biosdev)
 	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
+
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;
     }
+	
     // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
     if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
         firstRun = false;
@@ -393,6 +394,7 @@ void common_boot(int biosdev)
 	
 	 */
 #endif
+	
 	
 	
     setBootGlobals(bvChain);
@@ -547,6 +549,7 @@ void common_boot(int biosdev)
 			else //if(gMacOSVersion[3] == '5')
 				sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePath);
         }
+		
         // Check for cache file.
         trycache = (((gBootMode & kBootModeSafe) == 0) &&
                     !gOverrideKernel &&

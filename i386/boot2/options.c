@@ -819,6 +819,7 @@ int getBootOptions(bool firstRun)
 				if (gEnableCDROMRescan) {
 					gBootVolume = NULL;
 					clearBootArgs();
+					key = 0;
 				}
 				break;
 				
@@ -827,6 +828,7 @@ int getBootOptions(bool firstRun)
 				scanDisks(gBIOSDev, &bvCount);
 				gBootVolume = NULL;
 				clearBootArgs();
+				key = 0;
 				break;
 #endif
 			default:

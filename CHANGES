@@ -1,4 +1,8 @@
 Slice:
+rev712
+- correct module system as Meklort did to be Symbols.dylib embedded.
+- return acpi_patcher to main sources to exclude obligatory module
+- correct modules.c procedure register_hook_callback.
 rev692
 - add ATI 5xxx Enabler module on Kabyl's sources (not checked)
 - corrections to open standards: EFI, UUID, SMBIOS, ACPI, EDID

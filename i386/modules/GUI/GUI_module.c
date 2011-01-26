@@ -18,6 +18,17 @@
 #define BOOTER_LOG_SIZE	(64 * 1024)
 #define SAFE_LOG_SIZE	80
 
+#ifndef DEBUG_GUI
+#define DEBUG_GUI 1
+#endif
+
+#if DEBUG_GUI
+#define DBG(x...) GUI_verbose(x)
+#else
+#define DBG(x...) 
+#endif
+
+
 
 bool useGUI;
 
@@ -75,7 +86,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 	else
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );  //Slice - Why GRAPHICS_MODE if gVerboseMode?
-		
+		DBG("GUI set GRAPHICS_MODE\n");
 	}	
 }
 
@@ -128,7 +139,7 @@ void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg
 		replace_function("_error", &GUI_error);
 		replace_function("_stop", &GUI_stop);		
 	}
-	
+	DBG("GUI loaded\n");
 }
 
 /**
@@ -535,6 +546,7 @@ int GUI_getBootOptions(bool firstRun)
 	if (biosDevIsCDROM(gBIOSDev))
 	{
 		isCDROM = true;
+		DBG("GUI gBIOSDev is CDROM\n");
 	} 
 	else
 	{
@@ -621,7 +633,7 @@ int GUI_getBootOptions(bool firstRun)
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
-		verbose("Scanning device %x...", gBIOSDev);
+		verbose("GUI_Scanning device %x...", gBIOSDev);
 	}
 	
 	// When booting from CD, default to hard drive boot when possible. 
@@ -732,6 +744,7 @@ int GUI_getBootOptions(bool firstRun)
 		// Associate a menu item for each BVRef.
 		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next)
 		{
+			DBG("GUI menu for device %d\n", bvr->biosdev);
 			if (bvr->visible)
 			{
 				getBootVolumeDescription(bvr, menuItems[i].name, sizeof(menuItems[i].name) - 1, true);
@@ -910,6 +923,7 @@ int GUI_getBootOptions(bool firstRun)
 				scanDisks(gBIOSDev, &bvCount);
 				gBootVolume = NULL;
 				clearBootArgs();
+				key = 0;
 				break;
 				
 			case kTabKey:

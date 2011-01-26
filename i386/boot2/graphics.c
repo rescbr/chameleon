@@ -33,6 +33,16 @@
 #include "bootstruct.h"
 #include "IOHibernatePrivate.h"
 
+#ifndef DEBUG_GR
+#define DEBUG_GR 1
+#endif
+
+#if DEBUG_GR
+#define DBG(x...) printf(x)
+#else
+#define DBG(x...) msglog(x)
+#endif
+
 /*
  * for spinning disk
  */

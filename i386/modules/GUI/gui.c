@@ -719,8 +719,8 @@ int initGUI(void)
 		gDualLink =((screen_params[0] * screen_params[1]) > (1<<20))?1:0;
 		msglog("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
 	}
-//	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
-//	{
+	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
+	{
 		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
 		{
 			screen_params[0] = val;
@@ -730,7 +730,7 @@ int initGUI(void)
 			screen_params[1] = val;
 		}		
 		msglog("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
-//	}
+	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
@@ -1869,7 +1869,7 @@ void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	int pos;
+//	int pos;
 	int length;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
@@ -1884,8 +1884,9 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 //Slice - attention!	
+// getResolution already done!	
 	// parse screen size parameters
-	if(is_module_loaded("Resolution.dylib"))
+/*	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 	}
@@ -1906,7 +1907,8 @@ void drawBootGraphics(void)
 		}		
 	}
 	msglog("boot_width=%d boot_height=%d\n", screen_params[0], screen_params[1]);
-    // Save current screen resolution.
+    // Save current screen resolution.  // for a what?
+ */
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
 	
