@@ -63,7 +63,7 @@
 
 #include "modules.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;

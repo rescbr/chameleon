@@ -704,10 +704,11 @@ int initGUI(void)
 	int		len;
 	char*	dirspec; //[256];
 	dirspec = (char*)malloc(256);
-	
+	msglog("initGUI\n");
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
-		return 1;
+		msglog("theme_name=%\n", theme_name);
+		sprintf(theme_name, "Default");
 	}
 	
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
@@ -720,7 +721,7 @@ int initGUI(void)
 			return 1;
 		}
 #else
-		DBG(" GUI from themeConfig failed\n");
+		msglog(" GUI from themeConfig failed\n");
 		return 1;
 #endif
 	}
@@ -729,7 +730,7 @@ int initGUI(void)
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 		gDualLink =((screen_params[0] * screen_params[1]) > (1<<20))?1:0;
-		DBG("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
+		msglog("GUI module screen width=%d height=%d\n",(int)screen_params[0], (int)screen_params[1]);
 	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
@@ -741,13 +742,13 @@ int initGUI(void)
 		{
 			screen_params[1] = val;
 		}		
-		DBG("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
+		msglog("GUI theme screen width=%d height=%d\n",screen_params[0], screen_params[1]);		
 	}
 	if (((int)screen_params[0]<800) || ((int)screen_params[1]<600))
 	{
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-		DBG("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
+		msglog("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
 	}	
 /*	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
 	{
@@ -761,7 +762,7 @@ int initGUI(void)
 	
 	// find best matching vesa mode for our requested width & height
 	int modeV = getGraphicModeParams(screen_params);
-	DBG("GUI: set mode %d: %dx%dx%d\n", modeV, screen_params[0], screen_params[1], screen_params[2]);
+	msglog("GUI: set mode %d: %dx%dx%d\n", modeV, screen_params[0], screen_params[1], screen_params[2]);
 	
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
@@ -1881,7 +1882,7 @@ void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-//	int pos;
+	int pos;
 	int length;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
@@ -1898,7 +1899,7 @@ void drawBootGraphics(void)
 //Slice - attention!	
 // getResolution already done!	
 	// parse screen size parameters
-/*	if(is_module_loaded("Resolution.dylib"))
+	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
 	}
@@ -1920,7 +1921,7 @@ void drawBootGraphics(void)
 	}
 	msglog("boot_width=%d boot_height=%d\n", screen_params[0], screen_params[1]);
     // Save current screen resolution.  // for a what?
- */
+ 
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
 	

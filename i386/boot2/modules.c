@@ -10,7 +10,7 @@
 #include "modules.h"
 
 #ifndef DEBUG_MODULES
-#define DEBUG_MODULES 1
+#define DEBUG_MODULES 0
 #endif
 
 #if DEBUG_MODULES
@@ -251,7 +251,7 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 //			DBG("execute_hook: Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
 			
 		}
-		DBG("execute_hook: Hook '%s' executed.\n", name);
+		msglog("execute_hook: Hook '%s' executed.\n", name);
 		
 		return 1;
 	}

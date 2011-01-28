@@ -19,7 +19,7 @@
 #define SAFE_LOG_SIZE	80
 
 #ifndef DEBUG_GUI
-#define DEBUG_GUI 1
+#define DEBUG_GUI 0
 #endif
 
 #if DEBUG_GUI
@@ -86,7 +86,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 	else
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );  //Slice - Why GRAPHICS_MODE if gVerboseMode?
-		DBG("GUI set GRAPHICS_MODE\n");
+//		DBG("GUI set GRAPHICS_MODE\n");
 	}	
 }
 
@@ -139,7 +139,7 @@ void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg
 		replace_function("_error", &GUI_error);
 		replace_function("_stop", &GUI_stop);		
 	}
-	DBG("GUI loaded\n");
+//	DBG("GUI loaded\n");
 }
 
 /**
