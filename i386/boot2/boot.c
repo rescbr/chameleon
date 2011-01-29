@@ -190,7 +190,9 @@ int ExecKernel(void *binary)
 		printf("Press any key to continue...");
 		getc();
 	}
-		
+	
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );
@@ -200,7 +202,6 @@ int ExecKernel(void *binary)
 #endif
 	}
 
-    execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 
 	setupBooterLog();
 	
@@ -326,7 +327,7 @@ void common_boot(int biosdev)
 	
 	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 
-	
+
 #ifndef OPTION_ROM
     // Loading preboot ramdisk if exists.
     loadPrebootRAMDisk();
