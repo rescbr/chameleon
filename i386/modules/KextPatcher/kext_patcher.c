@@ -447,7 +447,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 	TagPtr match_class =XMLCastArray(XMLGetProperty(personality, (const char*)"IOPCIClassMatch"));
 	
 	
-	char* new_str = malloc(strlen("0xXXXX000&0xFFFE0000")+1);
+	char* new_str = malloc(sizeof("0xXXXX000&0xFFFE0000"));
 	sprintf(new_str, "0x04030000&amp;0xFFFE0000"); // todo, pass in actual class id
 	
 	
@@ -592,7 +592,7 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
 
 	
-	char* new_str = malloc(strlen("pci14e4,xxxx")+1);
+	char* new_str = malloc(sizeof("pci14e4,xxxx"));
 	sprintf(new_str, "pci14e4,%02x", patch_bcm_deviceid);
 
 	// Check to see if we *really* need to modify the plist, if not, return false
@@ -670,7 +670,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 	
-	char* newstring = malloc(strlen("0x00008086") + 1);
+	char* newstring = malloc(sizeof("0x00008086"));
 	sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
 
 	
