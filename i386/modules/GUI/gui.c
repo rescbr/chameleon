@@ -12,7 +12,7 @@
 #include "appleboot.h"
 #include "vers.h"
 #include "modules.h"
-#include "../Resolution/edid.h"
+#include "edid.h"
 
 
 gui_t gui;					// gui structure

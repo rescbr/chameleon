@@ -117,7 +117,7 @@ release: $(SYMROOT)
 
 
 clean:
-	rm -rf sym obj dst
+	rm -rf sym obj dst i386/modules/module_includes
 
 #distclean: clean
 #	@rm -f $(SYMROOT)/$(PRODUCT)-src.*

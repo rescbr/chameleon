@@ -22,12 +22,10 @@ ifneq ($(strip $(HAVE_MODULES)),)
 #### Other modules Exist ####
 dylib_final: 
 	@rm -rf $(SYMROOT)/$(MODULE_NAME).dylib	#ensure module doesn't link with old version of self
-	@### Ugly hack, remove the c++ module if this module shouldn't link with it. Needed due to LD behavoir
 	@echo "\t[LD] $(MODULE_NAME).dylib"
-	@if [ -f "$(SYMROOT)/uClibc++.dylib" ]; then if [ x"$(shell nm $(OBJROOT)/*.o 2>/dev/null  | grep " __Z")" == x"" ]; then mv $(SYMROOT)/uClibc++.dylib $(SYMROOT)/../uClibc++.dylib; fi; fi;
 	
 	@ld -arch i386 \
-	-alias $(MODULE_START) start \
+	-alias $(MODULE_START) $(MODULE_NAME)_start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
@@ -44,8 +42,6 @@ dylib_final:
 	
 	@cp -rf include/* ../module_includes/ &> /dev/null || true
 	
-	@if [ -f "$(SYMROOT)/../uClibc++.dylib" ]; then if [ x"$(shell nm $(OBJROOT)/*.o 2>/dev/null | grep " __Z")" == x"" ]; then mv $(SYMROOT)/../uClibc++.dylib $(SYMROOT)/uClibc++.dylib; fi; fi;
-
 else
 
 #### This is the first module ####
@@ -53,7 +49,7 @@ dylib_final:
 	@rm -rf $(SYMROOT)/$(MODULE_NAME).dylib	#ensure module doesn't link with old version of self
 	@echo "\t[LD] $(MODULE_NAME).dylib"
 	@ld -arch i386 \
-	-alias $(MODULE_START) start \
+	-alias $(MODULE_START) $(MODULE_NAME)_start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \

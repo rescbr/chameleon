@@ -48,6 +48,9 @@ all embedtheme optionrom tags debug install installhdrs: objroot_dirs lazydylib1
 objroot_dirs:
 	@rm -rf $(OBJROOT) 
 	@mkdir $(OBJROOT) &> /dev/null
+	@rm -rf module_includes
+	@mkdir module_includes
+
 
 %.o: %.c
 	@echo "\t[CC] $<"
