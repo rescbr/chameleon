@@ -38,26 +38,11 @@ int uhci_reset (pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	struct pciList* current = usbList;
-	if(!usbList)
-	{
-		usbList = (struct pciList*)malloc(sizeof(struct pciList));
-		usbList->next = NULL;
-		usbList->pciDev = pci_dev;
-		
-	}
-	else
-	{
-		while(current != NULL && current->next != NULL)
-		{
-			current = current->next;
-		}
-		current->next = (struct pciList*)malloc(sizeof(struct pciList));
-		current = current->next;
-		
-		current->pciDev = pci_dev;
-		current->next = NULL;
-	}
+	struct pciList* current = (struct pciList*)malloc(sizeof(struct pciList));
+	current->next = usbList;
+	current->pciDev = pci_dev;
+	
+	usbList = current;
 }
 
 // Loop through the list and call the apropriate patch function

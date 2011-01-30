@@ -3,6 +3,7 @@
  */
 
 #include <limits.h>
+#include "libsaio.h"
 #include "strxspn.h"
 
 
