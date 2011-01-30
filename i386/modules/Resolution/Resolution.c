@@ -9,6 +9,6 @@
 
 void Resolution_start()
 {
-	//patchVideoBios();
+	patchVideoBios();
 }
 

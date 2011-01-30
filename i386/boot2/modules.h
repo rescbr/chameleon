@@ -64,44 +64,56 @@ typedef struct moduleHook_t
 int init_module_system();
 void load_all_modules();
 
-/*
- * Modules Interface
- * execute_hook
- *		Exexutes a registered hook. All callbaks are
- *		called in the same order that they were added
- *
- * register_hook_callback
- *		registers a void function to be executed when a
- *		hook is executed.
- */
-int execute_hook(const char* name, void*, void*, void*, void*);
-void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
 
-inline void rebase_location(UInt32* location, char* base, int type);
-inline void bind_location(UInt32* location, char* value, UInt32 addend, int type);
-void rebase_macho(void* base, char* rebase_stream, UInt32 size);
-void bind_macho(void* base, char* bind_stream, UInt32 size);
 
 int load_module(char* module);
 int is_module_loaded(const char* name);
 void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/);
 
-long long add_symbol(char* symbol, long long addr, char is64);
 
-void* parse_mach(void* binary, 
-				 int(*dylib_loader)(char*),
-				 long long(*symbol_handler)(char*, long long, char)
-				 );
 
-unsigned int handle_symtable(UInt32 base,
+
+/********************************************************************************/
+/*	Symbol Functions															*/
+/********************************************************************************/
+long long		add_symbol(char* symbol, long long addr, char is64);
+unsigned int	lookup_all_symbols(const char* name);
+
+
+
+/********************************************************************************/
+/*	Macho Parser																*/
+/********************************************************************************/
+void*			parse_mach(void* binary, 
+							int(*dylib_loader)(char*),
+							long long(*symbol_handler)(char*, long long, char));
+unsigned int	handle_symtable(UInt32 base,
 							 struct symtab_command* symtabCommand,
 							 long long(*symbol_handler)(char*, long long, char),
 							 char is64);
-							 
-unsigned int lookup_all_symbols(const char* name);
+void			rebase_macho(void* base, char* rebase_stream, UInt32 size);
+inline void		rebase_location(UInt32* location, char* base, int type);
+void			bind_macho(void* base, char* bind_stream, UInt32 size);
+inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
 
-int replace_function(const char* symbol, void* newAddress);
 
-//extern unsigned int (*lookup_symbol)(const char*);
+
+
+/********************************************************************************/
+/*	Module Interface														*/
+/********************************************************************************/
+int				replace_function(const char* symbol, void* newAddress);
+int				execute_hook(const char* name, void*, void*, void*, void*);
+void			register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
+moduleHook_t*	hook_exists(const char* name);
+
+#if DEBUG_MODULES
+void			print_hook_list();
+#endif
+
+/********************************************************************************/
+/*	dyld Interface																*/
+/********************************************************************************/
+void dyld_stub_binder();
 
 #endif /* __BOOT_MODULES_H */

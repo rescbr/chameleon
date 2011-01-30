@@ -424,7 +424,7 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			case PCI_CLASS_NETWORK_OTHER:
 				
 				// Patch BCM43xx
-				if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFF00) == 0x4300))
+				if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFFD0) == 0x4300))
 				{
 					patch_bcm_deviceid = current->device_id;
 				}

@@ -80,12 +80,7 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
     outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
     outb(base + SMBHSTDAT, 0xff);
 	
-    while( inb(base + SMBHSTSTS) & 0x01)
-	{
-		rdtsc(l2, h2);
-		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform->CPU.TSCFrequency / 100);
-		if(t > 50) return 0xFF;	// hack, exit if unresponsive.
-	}
+    while( inb(base + SMBHSTSTS) & 0x01);
 	
     outb(base + SMBHSTCMD, cmd);
     outb(base + SMBHSTADD, (adr << 1) | 0x01 );
