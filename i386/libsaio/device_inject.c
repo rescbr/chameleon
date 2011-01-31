@@ -355,7 +355,7 @@ void devprop_free_string(struct DevPropString *string)
 }
 
 /* a fine place for this code */
-
+//Slice - now it is not needed?
 int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
 {
 	if(!device)

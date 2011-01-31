@@ -12,10 +12,10 @@
 #include "appleboot.h"
 #include "vers.h"
 #include "modules.h"
-#include "../Resolution/edid.h"
+#include "edid.h"
 
 #ifndef DEBUG_GUI
-#define DEBUG_GUI 1
+#define DEBUG_GUI 0
 #endif
 
 #if DEBUG_GUI
@@ -33,7 +33,8 @@ font_t font_console;
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
-const char* theme_name = THEME_NAME_DEFAULT;	
+const char* def_theme_name = THEME_NAME_DEFAULT;
+char *theme_name; 
 
 #ifdef EMBED_THEME
 #include "art.h"
@@ -704,14 +705,26 @@ int initGUI(void)
 	int		len;
 	char*	dirspec; //[256];
 	dirspec = (char*)malloc(256);
-	msglog("initGUI\n");
-	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
-	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
-		msglog("theme_name=%\n", theme_name);
-		sprintf(theme_name, "Default");
+	theme_name = (char*)malloc(64);
+//	msglog("initGUI\n");
+	sprintf(theme_name, THEME_NAME_DEFAULT);
+//	msglog("theme_name = %s\n",theme_name);
+	if(getValueForKey( "Theme", &def_theme_name, &len, &bootInfo->bootConfig ))
+	{
+		sprintf(theme_name, def_theme_name);
 	}
+	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
+//		msglog("theme_name=%s len=%d\n", theme_name, strlen(theme_name));
+		sprintf(theme_name, THEME_NAME_DEFAULT);
+//		return 1;
+	}
+//	msglog(" stop before theme.plist\n");
+//	return 1;
 	
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
+//	msglog("theme_name=%s dirspec=%s\n",theme_name, dirspec);
+//	msglog("Address loadConfigFile=%x  bootInfo=%x\n", &loadConfigFile, &bootInfo);
+//	return 1;
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 #ifdef EMBED_THEME
 		config_file_t	*config;
@@ -725,7 +738,8 @@ int initGUI(void)
 		return 1;
 #endif
 	}
-
+//	msglog(" stop before Resolution.dylib\n");
+//	return 1;
 	if(is_module_loaded("Resolution.dylib"))
 	{
 		getResolution(&screen_params[0], &screen_params[1], &screen_params[2]);
@@ -750,12 +764,12 @@ int initGUI(void)
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 		msglog("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
 	}	
-/*	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
+	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
 	{
 		screen_params[0] = 1280;
 		screen_params[1] = 1024;
-		verbose("GUI MAX VESA screen width=%d height=%d\n",screen_params[0], screen_params[1]);						
-	}*/
+		msglog("GUI MAX VESA screen width=%d height=%d\n",screen_params[0], screen_params[1]);						
+	}
 	screen_params[2] = 32;
 	// Initalizing GUI structure.
 	bzero(&gui, sizeof(gui_t));

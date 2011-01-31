@@ -18,7 +18,7 @@
 #define DEBUG_MEMORY 0
 
 #if DEBUG_MEMORY
-#define DBG(x...)  msglog(x)
+#define DBG(x...)  verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -67,11 +67,11 @@ void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
 		}
 		scan_memory(Platform); // unfortunately still necesary for some comp where spd cant read correct speed
-		//DBG("scan_memory \n");
+		DBG("scan_memory \n");
 		if(smbus_controller_dev)
 		{
 			scan_spd(Platform, smbus_controller_dev);
-			//DBG("scan_spd \n");
+			DBG("scan_spd \n");
 		}
     }
 	

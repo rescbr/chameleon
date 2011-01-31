@@ -34,30 +34,16 @@ struct pciList* usbList = NULL;
 int legacy_off (pci_dt_t *pci_dev);
 int ehci_acquire (pci_dt_t *pci_dev);
 int uhci_reset (pci_dt_t *pci_dev);
+int ohci_handsoff (pci_dt_t *pci_dev);
 
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	struct pciList* current = usbList;
-	if(!usbList)
-	{
-		usbList = (struct pciList*)malloc(sizeof(struct pciList));
-		usbList->next = NULL;
-		usbList->pciDev = pci_dev;
+	struct pciList* current = (struct pciList*)malloc(sizeof(struct pciList));
+	current->next = usbList;
+	current->pciDev = pci_dev;
 		
-	}
-	else
-	{
-		while(current != NULL && current->next != NULL)
-		{
-			current = current->next;
-		}
-		current->next = (struct pciList*)malloc(sizeof(struct pciList));
-		current = current->next;
-		
-		current->pciDev = pci_dev;
-		current->next = NULL;
-	}
+	usbList = current;
 }
 
 // Loop through the list and call the apropriate patch function
@@ -91,7 +77,11 @@ int usb_loop()
 				
 				break;
 			// OHCI
-			case 0x10: //same
+			case 0x10: //
+				if (fix_uhci) retVal &= ohci_handsoff(current->pciDev);
+				
+				break;
+				
 				
 			// UHCI
 			case 0x00:
@@ -342,5 +332,46 @@ int uhci_reset (pci_dt_t *pci_dev)
 	outw (port_base+4,0);
 	delay(10);
 	outw (port_base,0);
+	return 1;
+}
+
+int ohci_handsoff (pci_dt_t *pci_dev)
+{
+	uint32_t base, control;
+#define OHCI_CTRL_MASK	(1 << 9)
+#define OHCI_CONTROL		0x04
+#define OHCI_INTRDISABLE	0x14
+#define OHCI_INTRSTATUS		0x0c
+	
+	base = pci_config_read32(pci_dev->dev.addr, 0x10);
+	msglog("OHCI controller [%04x:%04x] at %02x:%2x.%x base %x reset\n", 
+		   pci_dev->vendor_id, pci_dev->device_id,
+		   pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
+		   base);
+//Linux
+	/*
+	 if (control & OHCI_CTRL_IR) {
+             int wait_time = 500; // arbitrary; 5 seconds 
+            writel(OHCI_INTR_OC, base + OHCI_INTRENABLE);
+            writel(OHCI_OCR, base + OHCI_CMDSTATUS);
+            while (wait_time > 0 &&
+				   194                                 readl(base + OHCI_CONTROL) & OHCI_CTRL_IR) {
+                        wait_time -= 10;
+                        msleep(10);
+                }
+            if (wait_time <= 0)
+                        dev_warn(&pdev->dev, "OHCI: BIOS handoff failed"
+								" (BIOS bug?) %08x\n", readl(base + OHCI_CONTROL));
+    }
+	 */
+	control = *(uint32_t *)(base + OHCI_CONTROL);
+	*(uint32_t *)(base + OHCI_CONTROL) = control & OHCI_CTRL_MASK;
+//Linux
+	/*
+	 * disable interrupts         
+       writel(~(u32)0, base + OHCI_INTRDISABLE);
+       writel(~(u32)0, base + OHCI_INTRSTATUS);
+
+	 */
 	return 1;
 }

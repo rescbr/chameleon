@@ -19,7 +19,6 @@
 #define DBG(x...)		msglog(x)
 #endif
 
-
 /*
  * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
  */
@@ -531,10 +530,10 @@ void scan_cpu() //PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-
+	DBG("CPU: Brand:                 %s\n", p->CPU.BrandString);
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
-	DBG("CPU: MaxCoef/CurrCoef/Turbo:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef, turbo);
+	DBG("CPU: MaxCoef/CurrCoef/Turbo:      0x%x/0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef, turbo);
 	DBG("CPU: MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv?2:1, p->CPU.CurrDiv?2:1);
 	DBG("CPU: TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
 	DBG("CPU: FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);

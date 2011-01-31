@@ -9,6 +9,6 @@ extern void patchVideoBios(void);
 
 void Resolution_start()
 {
-	//patchVideoBios();
+	patchVideoBios();
 }
 

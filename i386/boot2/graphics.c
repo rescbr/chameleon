@@ -34,7 +34,7 @@
 #include "IOHibernatePrivate.h"
 
 #ifndef DEBUG_GR
-#define DEBUG_GR 1
+#define DEBUG_GR 0
 #endif
 
 #if DEBUG_GR

@@ -212,6 +212,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 			break;
 			
 		default:
+			msglog("default mch_ratio \n");
 		case 800:
 			switch ((mch_cfg >> 4) & 7)
 			{
@@ -522,6 +523,8 @@ struct mem_controller_t dram_controllers[] = {
 	{ 0x8086, 0x3405, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
 	{ 0x8086, 0x3406, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
 	{ 0x8086, 0x3407, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
+	//end of array
+	{ 0xFFFF, 0, "",	NULL, NULL, NULL },
 	
 };
 
@@ -533,7 +536,7 @@ const char *memory_channel_types[] =
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i <  sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
+	for(i = 1; /*i <  sizeof(dram_controllers) / sizeof(dram_controllers[1],*/ dram_controllers[i].vendor != 0xFFFF; i++)
 	if ((dram_controllers[i].vendor == dram_dev->vendor_id) 
 				&& (dram_controllers[i].device == dram_dev->device_id))
 		{

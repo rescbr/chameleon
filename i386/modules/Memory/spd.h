@@ -13,8 +13,6 @@
 bool is_smbus_controller(pci_dt_t* pci_dt);
 void scan_spd(PlatformInfo_t *p, pci_dt_t* smbus_controller_dev);
 
-//bool scan_spd(); //PlatformInfo_t *p);
-
 struct smbus_controllers_t {
 	uint32_t	vendor;
 	uint32_t	device;

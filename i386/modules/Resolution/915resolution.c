@@ -601,9 +601,9 @@ int getMode(edid_mode *mode)
 {
 	char* edidInfo = readEDID();
 			
-	if(edidInfo == 0) return 1;
+	if(!edidInfo) return 1;
 //Slice
-	if(fb_parse_edid((struct EDID *)edidInfo, mode) == 0) 
+	if(!fb_parse_edid((struct EDID *)edidInfo, mode)) 
 	{
 		free( edidInfo );
 		return 1;

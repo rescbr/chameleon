@@ -17,7 +17,6 @@
 
 #define ACPI_SIGNATURE_UINT64_LE UINT64_LE_FROM_CHARS('R','S','D',' ','P','T','R',' ')
 
-
 /* Per ACPI 3.0a spec */
 
 // TODO Migrate

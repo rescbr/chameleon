@@ -127,7 +127,7 @@ void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
-	else
+	if (useGUI)
 	{
 		replace_function("_initGraphicsMode", &GUI_initGraphicsMode);
 		replace_function("_getBootOptions", &GUI_getBootOptions);
@@ -633,7 +633,7 @@ int GUI_getBootOptions(bool firstRun)
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
-		verbose("GUI_Scanning device %x...", gBIOSDev);
+		msglog("GUI_Scanning device %x...", gBIOSDev);
 	}
 	
 	// When booting from CD, default to hard drive boot when possible. 

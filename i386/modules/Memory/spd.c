@@ -19,7 +19,7 @@
 #endif
 
 #if DEBUG_SPD
-#define DBG(x...)	msglog(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -37,7 +37,7 @@ const char *spd_memory_types[] =
 	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
 	"",				/* 09h  Undefined */
 	"",				/* 0Ah  Undefined */
-	"DDR3 SDRAM"   /* 0Bh  SDRAM DDR 3 */
+	"DDR3 SDRAM"    /* 0Bh  SDRAM DDR 3 */
 };
 
 #define UNKNOWN_MEM_TYPE 2
@@ -76,7 +76,7 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 	int h1 = 0;
 	int h2 = 0;
     unsigned long long t;
-	
+	if(!Platform->CPU.TSCFrequency) Platform->CPU.TSCFrequency = Platform->CPU.CPUFrequency;
     outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
     outb(base + SMBHSTDAT, 0xff);
 	
@@ -258,7 +258,9 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     uint32_t   base, mmio, hostc;
     bool       dump = false;
     RamSlotInfo_t*  slot;
-	
+	if (!Platform->CPU.TSCFrequency) {
+		Platform->CPU.TSCFrequency = Platform->CPU.CPUFrequency;
+	}
 	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
 	DBG("SMBus CmdReg: 0x%x\n", cmd);
 	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
@@ -266,7 +268,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
     base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
 	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
-    verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
+    DBG("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
 		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 	
     getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
@@ -276,7 +278,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	char spdbuf[256];
 	
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
-		//DBG("Scanning slot %d\n", i);
+		DBG("Scanning slot %d\n", i);
         slot = &Platform->RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
 		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
@@ -335,7 +337,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				slot->Frequency = freq;
 			}
 			
-			msglog("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
+			DBG("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
 					i, 
 					(int)slot->Type,
 					slot->ModuleSize, 
@@ -431,9 +433,3 @@ void scan_spd(PlatformInfo_t *p, pci_dt_t* smbus_controller_dev)
 		}        
 	}
 }
-/*
-bool scan_spd(void) // PlatformInfo_t *p)
-{
-   return find_and_read_smbus_controller(root_pci_dev);  //arg needed because of recursee
-}
-*/

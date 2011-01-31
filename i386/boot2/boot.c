@@ -113,10 +113,6 @@ static bool gUnloadPXEOnExit = false;
  //Slice - first one for Leopard
 #define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
-//#define kDefaultCachePathTiger "/System/Library/Extensions.kextcache"
-//file://localhost/System/Library/Extensions.kextcache
-
-
 
 //==========================================================================
 // Zero the BSS.
@@ -207,6 +203,8 @@ int ExecKernel(void *binary)
 		getc();
 	}
 		
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );
@@ -216,7 +214,6 @@ int ExecKernel(void *binary)
 #endif
 	}
 
-    execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
 	setupBooterLog();
 	
@@ -525,7 +522,9 @@ void common_boot(int biosdev)
             strlcpy(gBootKernelCacheFile, val, len+1);
         } else {
 			if(gMacOSVersion[3] == '6') {
-				sprintf(gBootKernelCacheFile, "%skernelcache_%s", kDefaultCachePathSnow, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64"); //, adler32);
+				sprintf(gBootKernelCacheFile, "kernelcache_%s", /*kDefaultCachePathSnow,*/ (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64"); //, adler32);
+				msglog("search for kernelcache %s\n", gBootKernelCacheFile);
+				int lnam = sizeof(gBootKernelCacheFile) + 9; //with adler32
 				//Slice - TODO
 				/*
 				 - but the name is longer .adler32 and more...
@@ -538,13 +537,16 @@ void common_boot(int biosdev)
 				struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
 				while(readdir(cacheDir, (const char**)&name, &flagsC, &timeC) >= 0)
 				{
-					if(strcmp(&name[0], gBootKernelCacheFile) == 0) //?
+					if(strstr(name, gBootKernelCacheFile)) //?
 					{
+						if(name[lnam] == '.') continue;
 						//char* tmp = malloc(strlen(name) + 1);
-						//strcpy(tmp, name);
-						verbose("find kernelcache=%s\n", name);
+						sprintf(gBootKernelCacheFile, "%s%s", kDefaultCachePathSnow, name);
+						verbose("find kernelcache=%s\n", gBootKernelCacheFile);
+						break;
 					}
 				}
+		//		close(cacheDir);
 						
 			}
 			else //if(gMacOSVersion[3] == '5')
@@ -698,7 +700,7 @@ static bool getOSVersion(char *str)
 //	config_file_t systemVersion;
 	const char *val;
 	int len;
-	
+	msglog("Address loadConfigFile=%x  bootInfo=%x\n", &loadConfigFile, &bootInfo);
 	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		valid = true;

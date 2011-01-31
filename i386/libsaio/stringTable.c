@@ -308,25 +308,25 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
     bool retval = false;
     
     while (*line) {
-	/* look for keyword or argument */
-	while (isspace(*line)) line++;
-
-	/* now look for '=' or whitespace */
-	line = getToken(line, &key, &key_len);
-	/* line now points to '=' or space */
-	if (*line && !isspace(*line)) {
-	    line = getToken(++line, &value, &value_len);
-	} else {
-	    value = line;
-	    value_len = 0;
-	}
-	if ((strlen(match) == key_len)
-	    && strncmp(match, key, key_len) == 0) {
-	    *matchval = value;
-	    *len = value_len;
-	    retval = true;
+		/* look for keyword or argument */
+		while (isspace(*line)) line++;
+		
+		/* now look for '=' or whitespace */
+		line = getToken(line, &key, &key_len);
+		/* line now points to '=' or space */
+		if (*line && !isspace(*line)) {
+			line = getToken(++line, &value, &value_len);
+		} else {
+			value = line;
+			value_len = 0;
+		}
+		if ((strlen(match) == key_len)
+			&& strncmp(match, key, key_len) == 0) {
+			*matchval = value;
+			*len = value_len;
+			retval = true;
             /* Continue to look for this key; last one wins. */
-	}
+		}
     }
     return retval;
 }

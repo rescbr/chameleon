@@ -14,7 +14,7 @@
 #include "xml.h"
 
 #ifndef DEBUG_NVRAM
-#define DEBUG_NVRAM 1
+#define DEBUG_NVRAM 0
 #endif
 
 #if DEBUG_NVRAM

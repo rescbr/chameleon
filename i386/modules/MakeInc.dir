@@ -44,7 +44,7 @@ dylib_final:
 	@cp -rf include/* ../module_includes/ &> /dev/null || true
 	
 	@if [ -f "$(SYMROOT)/../uClibc++.dylib" ]; then if [ x"$(shell nm $(OBJROOT)/*.o 2>/dev/null | grep " __Z")" == x"" ]; then mv $(SYMROOT)/../uClibc++.dylib $(SYMROOT)/uClibc++.dylib; fi; fi;
-
+	
 else
 
 #### This is the first module ####

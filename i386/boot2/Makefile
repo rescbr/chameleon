@@ -88,6 +88,19 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
 
+	@# Second pass, fixup global var locations
+	@${RM} $(OBJROOT)/Symbols.o
+	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	@${RM} $(SYMROOT)/Symbols.h
+	@make Symbols.dylib
+
+	@${RM} $(SYMROOT)/boot.sys
+	@echo "\t[LD] boot.sys"
+	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	        -nostdlib -arch i386 -Wl,-segalign,20 \
+		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
+
 
 
 	@ld -arch i386 \
