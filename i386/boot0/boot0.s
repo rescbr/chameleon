@@ -354,10 +354,12 @@ find_boot:
 
     call    loadBootSector
     jne     .continue
-    jmp	    initBootLoader
+;    jmp	    initBootLoader
+	jmp	    SHORT initBootLoader
 
 .continue:
-    add     si, part_size          			; advance SI to next partition entry
+;    add     si, part_size          			; advance SI to next partition entry
+	add     si, BYTE part_size
     loop    .loop                 		 	; loop through all partition entries
 
     ;
@@ -366,8 +368,11 @@ find_boot:
     ; for a possible GPT Header at LBA 1
     ;    
     dec	    bl
-    jz	    checkGPT						; found Protective MBR before
-
+;    jz	    checkGPT						; found Protective MBR before
+	jnz     .switchPass2					
+	call    checkGPT
+	
+.switchPass2
     ;
     ; Switching to Pass 2 
     ; try to find a boot1h aware HFS+ MBR partition
@@ -378,6 +383,22 @@ find_boot:
     
 .exit:
     ret										; Giving up.
+
+
+    ;
+    ; Jump to partition booter. The drive number is already in register DL.
+    ; SI is pointing to the modified partition entry.
+    ;
+initBootLoader:    
+
+DebugChar('J')
+
+%if VERBOSE
+    LogString(done_str)
+%endif
+
+    jmp     kBoot0LoadAddr
+
     
     ; 
     ; Found Protective MBR Partition Type: 0xEE
@@ -386,6 +407,7 @@ find_boot:
     ;
 checkGPT:
 
+	push    bx
     mov	    di, kLBA1Buffer						; address of GUID Partition Table Header
     cmp	    DWORD [di], kGPTSignatureLow		; looking for 'EFI '
     jne	    .exit								; not found. Giving up.
@@ -473,20 +495,21 @@ checkGPT:
     loop    .gpt_loop								; loop through all partition entries	
 
 .exit:
+	pop bx
     ret												; no more GUID partitions. Giving up.
 
-    DebugChar('J')
+;    DebugChar('J')
     ;
     ; Jump to partition booter. The drive number is already in register DL.
     ; SI is pointing to the modified partition entry.
     ;
-initBootLoader:    
+;initBootLoader:    
 
 %if VERBOSE
     LogString(done_str)
 %endif
 
-    jmp     kBoot0LoadAddr
+;    jmp     kBoot0LoadAddr
 
 
 ;--------------------------------------------------------------------------
@@ -609,7 +632,8 @@ read_lba:
     xor     ah, ah                  ; offset 3, must be 0
     push    ax                      ; offset 2, number of sectors
 
-    push    WORD 16                 ; offset 0-1, packet size
+;    push    WORD 16                 ; offset 0-1, packet size
+	push	BYTE 16
 
     DebugChar('<')
 %if DEBUG
@@ -746,6 +770,7 @@ print_hex:
 
     popad
     ret
+
 	
 print_nibble:
     and     al, 0x0f

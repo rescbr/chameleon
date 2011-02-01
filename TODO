@@ -1,10 +1,14 @@
 TODO List for Chameleon Boot Loader
 ====================================
+31.01.2011 Slice
+- linux detection
+- proper bootArgs when starting from CD
+
 27.12.2010 Slice
 - numerous errors, mistakes, reservation, non-finished codes... Spaghetti sources!
-- kernelcache never used (adler32 is wrong?)
+- kernelcache never used (adler32 is wrong?)  -- resolved
 - more careful CPU detection
-- readNVRAM is wrong
+- readNVRAM is wrong  -- resolved
 - graphicsEnabler for X3100 is not good
 - ATI Radeon enabler is not perfect
 
