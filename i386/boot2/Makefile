@@ -84,8 +84,9 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 
 	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
 
-	@make Symbols.dylib
-	@${RM} $(SYMROOT)/boot.sys
+	@# Generate the Symbols.dylib file
+	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/Symbols.dylib
 
 	@echo "\t[LD] boot.sys"
 	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
@@ -97,7 +98,10 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@${RM} $(OBJROOT)/Symbols.o
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 	@${RM} $(SYMROOT)/Symbols.h
-	@make Symbols.dylib
+
+	@# Generate the Symbols.dylib file
+	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/Symbols.dylib
 
 	@${RM} $(SYMROOT)/boot.sys
 	@echo "\t[LD] boot.sys"
@@ -154,46 +158,7 @@ vers.h:
 	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
 
 embedded.h:
-	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
-
-Symbols.dylib: Symbols.o
-	@echo ================= Compiling ${SYMBOLS_MODULE} =================
-	@echo "start" >>  ${OBJROOT}/Symbols.save
-	@echo "_lookup_symbol" >>  ${OBJROOT}/Symbols.save
-
-	@echo "\t[LD] $@"
-	@ld -arch i386 \
-	-undefined dynamic_lookup \
-	-alias _Symbols_start start \
-	-dylib -read_only_relocs suppress \
-	-S -x  -dead_strip_dylibs \
-	-no_uuid \
-	-bind_at_load \
-	-current_version 1.0.0 \
-	-compatibility_version 1.0.0 \
-	-final_output Symbols \
-	-exported_symbols_list ${OBJROOT}/Symbols.save \
-	${OBJROOT}/Symbols.o \
-	-macosx_version_min 10.6 \
-	-o $(SYMROOT)/${SYMBOLS_MODULE} 
-
-	@##size $(SYMROOT)/${SYMBOLS_MODULE} 
-
-Symbols.o:
-	@rm -rf $(SYMROOT)/Symbols.h
-	@echo "typedef struct {" >> $(SYMROOT)/Symbols.h
-	@echo "	char*	symbol;" >> $(SYMROOT)/Symbols.h
-	@echo "	unsigned int	addr;" >> $(SYMROOT)/Symbols.h
-	@echo "} symbol_t;" >> $(SYMROOT)/Symbols.h 
-	@echo "" >> $(SYMROOT)/Symbols.h
-	
-	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "static char "$$3"_string[] = \""$$3"\";"}' >> $(SYMROOT)/Symbols.h
-
-	@echo "symbol_t symbolList[] = {" >> $(SYMROOT)/Symbols.h
-	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "	{.symbol = "$$3"_string, .addr = 0x"$$1"},";}' >> $(SYMROOT)/Symbols.h
-	@echo "};" >> $(SYMROOT)/Symbols.h
-	@echo "\t[CC] $@"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
+	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h	
 
 
 install_i386:: all $(INSTALLDIR)

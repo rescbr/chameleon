@@ -20,6 +20,9 @@
 #include "hex_editor.h"
 
 
+unsigned long Adler32( unsigned char * buffer, long length );
+
+
 #define kHDACodec				"HDACodec"
 
 
@@ -89,7 +92,6 @@ z_free(void * notused __unused, void * ptr)
 }
 
 
-unsigned long Mkext_Alder32( unsigned char * buffer, long length );
 
 void KextPatcher_hook(void* current, void* arg2, void* arg3, void* arg4);
 
@@ -161,7 +163,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
         ( MKEXT_GET_SIGNATURE(package)	!= MKEXT_SIGN )  ||
         ( MKEXT_GET_LENGTH(package)		>  kLoadSize )	 ||
         ( MKEXT_GET_CHECKSUM(package)   !=
-		 Mkext_Alder32((unsigned char *)&package->version, MKEXT_GET_LENGTH(package) - 0x10) ) )
+		 Adler32((unsigned char *)&package->version, MKEXT_GET_LENGTH(package) - 0x10) ) )
     {
         return;
 		// Don't try to patch a b
@@ -317,9 +319,9 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 				
 				
 				
-				// re alder32 the new mkext2 package
+				// re adler32 the new mkext2 package
 				MKEXT_HDR_CAST(package)->adler32 = 
-					MKEXT_SWAP(Mkext_Alder32((unsigned char *)&package->version,
+					MKEXT_SWAP(Adler32((unsigned char *)&package->version,
 											 MKEXT_GET_LENGTH(package) - 0x10));
 			}
 		}

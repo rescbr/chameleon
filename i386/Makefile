@@ -27,7 +27,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
 SUBDIRS = util libsa libsaio boot2 boot1 boot0 cdboot modules
-
+#SUBDIRS=util
 all embedtheme optionrom tags debug install installhdrs:
 	@for i in ${SUBDIRS}; \
 	do \

@@ -31,6 +31,7 @@ extern unsigned long long textAddress;
 extern unsigned long long textSection;
 
 
+
 typedef struct symbolList_t
 {
 	char* symbol;
@@ -38,13 +39,6 @@ typedef struct symbolList_t
 	struct symbolList_t* next;
 } symbolList_t;
 
-typedef struct moduleList_t
-{
-	char* module;
-	unsigned int version;
-	unsigned int compat;
-	struct moduleList_t* next;
-} moduleList_t;
 
 typedef struct callbackList_t
 {
@@ -58,6 +52,20 @@ typedef struct moduleHook_t
 	callbackList_t* callbacks;
 	struct moduleHook_t* next;
 } moduleHook_t;
+
+typedef struct modulesList_t
+{
+	char*					name;
+	UInt32					version;
+	UInt32					compat;
+	
+	void*					base_addr;
+
+	symbolList_t*			exported_symbols;
+	symbolList_t*			udefined_symbols;
+	//moduleHook_t*			defined_hooks;
+	struct modulesList_t* next;
+} moduleList_t;
 
 
 

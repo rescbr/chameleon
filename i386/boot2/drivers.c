@@ -47,7 +47,7 @@ extern char gMacOSVersion;
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 #endif
 
-unsigned long Mkext_Alder32( unsigned char * buffer, long length );
+unsigned long Adler32( unsigned char * buffer, long length );
 
 long FileLoadDrivers(char *dirSpec, long plugin);
 #ifndef OPTION_ROM
@@ -74,7 +74,7 @@ char *    gTempSpec;
 char *    gFileName;
 
 unsigned long
-Mkext_Alder32( unsigned char * buffer, long length )
+Adler32( unsigned char * buffer, long length )
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -99,7 +99,7 @@ Mkext_Alder32( unsigned char * buffer, long length )
 	
 	result = (highHalf << 16) | lowHalf;
 	
-	return result;
+    return result;
 }
 
 
@@ -383,8 +383,8 @@ LoadDriverMKext( char * fileSpec )
     if (( GetPackageElement(signature1) != kDriverPackageSignature1) ||
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
-        ( GetPackageElement(alder32)    !=
-		 Mkext_Alder32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+        ( GetPackageElement(adler32)    !=
+		 Adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
@@ -784,7 +784,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             return -1;
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            Mkext_Alder32(binary, uncompressed_size)) {
+            Adler32(binary, uncompressed_size)) {
             printf("adler mismatch\n");
             return -1;
         }

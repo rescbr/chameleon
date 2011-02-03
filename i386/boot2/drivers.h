@@ -71,7 +71,7 @@ struct DriversPackage {
 	unsigned long signature1;
 	unsigned long signature2;
 	unsigned long length;
-	unsigned long alder32;
+	unsigned long adler32;
 	unsigned long version;
 	unsigned long numDrivers;
 	unsigned long reserved1;

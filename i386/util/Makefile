@@ -18,13 +18,18 @@ LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
 
-PROGRAMS = machOconv bdmesg
+PROGRAMS = machOconv bdmesg dyldsymboltool
 
 OUTFILES = $(PROGRAMS)
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 
 all embedtheme optionrom: $(DIRS_NEEDED) $(PROGRAMS)
+
+dyldsymboltool: dyldsymboltool.o
+	@echo "\t[LD] $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) dyldsymboltool.o
+
 
 machOconv: machOconv.o
 	@echo "\t[LD] $@"

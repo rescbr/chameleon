@@ -49,8 +49,8 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 int usb_loop()
 {
 	int retVal = 1;
-	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
-	fix_ehci = fix_uhci = fix_usb = fix_legacy = true;
+	bool fix_ehci, fix_uhci, fix_usb, fix_legacy = false;
+	fix_ehci = fix_uhci = fix_usb = true;
 	
 	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
 	{

@@ -77,8 +77,7 @@ int init_module_system()
 	}
 	else {
 		// The module does not have a valid start function
-		printf("Unable to start %s\n", SYMBOLS_MODULE); DBGPAUSE();
-		getc();
+		printf("Unable to start %s\n", SYMBOLS_MODULE); getc();
 	}		
 	return 0;
 }
@@ -164,6 +163,9 @@ int load_module(char* module)
 
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module); DBGPAUSE();
+			
+			//module_entry = malloc(sizeof(moduleList_t); TODO: mode to module_loaded
+							
 		}
 		else {
 			// The module does not have a valid start function
@@ -216,7 +218,6 @@ long long add_symbol(char* symbol, long long addr, char is64)
 	entry->next = NULL;
 	entry->addr = (UInt32)addr;
 	entry->symbol = symbol;
-	
 	if(strcmp(symbol, "start") == 0)
 	{
 		return addr;
@@ -239,7 +240,9 @@ void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 	new_entry->next = loadedModules;
 	loadedModules = new_entry;
 	
-	new_entry->module = (char*)name;
+	new_entry->name = (char*)name;
+	new_entry->base_addr = NULL;		// TODO
+	// todo; symbols
 	new_entry->version = 0; //version;
 	new_entry->compat = 0; //compat;
 }
@@ -250,7 +253,7 @@ int is_module_loaded(const char* name)
 	moduleList_t* entry = loadedModules;
 	while(entry)
 	{
-		if(strcmp(entry->module, name) == 0)
+		if(strcmp(entry->name, name) == 0)
 		{
 			DBG("Located module %s\n", name); DBGPAUSE();
 			return 1;
@@ -340,6 +343,9 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	//struct dysymtab_command* dysymtabCommand = NULL;
 	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
+	
+	textSection = 0;
+	textAddress = 0;	// reinitialize text location in case it doesn't exist;
 	
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
@@ -504,7 +510,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	//if(!moduleName) return NULL;
 	
 	
-	// bind_macho uses the symbols.
+	// bind_macho uses the symbols, if the textAdd does not exist (Symbols.dylib, no code), addresses are static and not relative
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
 	
 	// Rebase the module before binding it.
@@ -557,11 +563,11 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		{
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
-			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, textAddress ? (long long)base + symbolEntry->n_value : symbolEntry->n_value, is64) != 0xFFFFFFFF)
 			{
 				
 				// Module start located. Start is an alias so don't register it
-				module_start = base + symbolEntry->n_value;
+				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
 			
 			symbolEntry++;
@@ -578,11 +584,11 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
-			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, textAddress ? (long long)base + symbolEntry->n_value : symbolEntry->n_value, is64) != 0xFFFFFFFF)
 			{
 				
 				// Module start located. Start is an alias so don't register it
-				module_start = base + symbolEntry->n_value;
+				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
 			
 			symbolEntry++;
