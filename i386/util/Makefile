@@ -27,9 +27,9 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 all embedtheme: $(DIRS_NEEDED) $(PROGRAMS)
 
 dyldsymboltool: dyldsymboltool.o32 dyldsymboltool.o64
-	@echo "\t[LD32] $@"
+	@echo "\t[LD32] $@_32"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	@echo "\t[LD64] $@"
+	@echo "\t[LD64] $@_64"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
 	@echo "\t[LIPO] $@"
 	@lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
@@ -37,9 +37,9 @@ dyldsymboltool: dyldsymboltool.o32 dyldsymboltool.o64
 
 
 machOconv: machOconv.o32 machOconv.o64
-	@echo "\t[LD32] $@"
+	@echo "\t[LD32] $@_32"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	@echo "\t[LD64] $@"
+	@echo "\t[LD64] $@_64"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
 	@echo "\t[LIPO] $@"
 	@lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
@@ -47,10 +47,10 @@ machOconv: machOconv.o32 machOconv.o64
 
 
 bdmesg: bdmesg.o32 bdmesg.o64
-	@echo "\t[LD32] $@"
+	@echo "\t[LD32] $@_32"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 \
 		 -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	@echo "\t[LD64] $@"
+	@echo "\t[LD64] $@_64"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 \
 		 -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
 	@echo "\t[LIPO] $@"
