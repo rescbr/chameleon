@@ -38,7 +38,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: dylib
+all optionrom: dylib
 
 embedtheme: CFLAGS += -DEMBED_THEME
 embedtheme: art.h all
