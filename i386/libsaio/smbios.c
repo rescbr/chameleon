@@ -406,6 +406,8 @@ char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 
 void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uint8_t *field)
 {
+	int strSize;
+
 	if (!field)
 		return;
 	if (!string)
@@ -414,12 +416,17 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 		return;
 	}
 
-	int strSize = strlen(string) + 1;
+	strSize = strlen(string);
+
+	// remove any spaces found at the end
+	while (string[strSize - 1] == ' ')
+		strSize--;
+
 	memcpy((uint8_t *)structHeader + structHeader->length + stringsSize, string, strSize);
 	*field = stringIndex;
 
 	stringIndex++;
-	stringsSize += strSize;
+	stringsSize += strSize + 1;
 }
 
 bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
@@ -437,9 +444,10 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			{
 				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
 					break;
-				if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
-					if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
-						break;
+				else
+					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
+							break;
 			}
 			if (SMBSetters[idx].getSMBValue)
 				if (SMBSetters[idx].getSMBValue((returnType *)&string))
@@ -456,14 +464,18 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 		case kSMBWord:
 		case kSMBDWord:
 		//case kSMBQWord:
-			if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), SMBPlist))
-				return true;
-			else
-				if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
-					if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, value))
-						return true;
-			if (SMBSetters[idx].getSMBValue(value))
-				return true;
+			if (SMBSetters[idx].keyString)
+			{
+				if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), SMBPlist))
+					return true;
+				else
+					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, value))
+							return true;
+			}
+			if (SMBSetters[idx].getSMBValue)
+				if (SMBSetters[idx].getSMBValue(value))
+					return true;
 #if 0
 			if (*(SMBSetters[idx].defaultValue))
 			{
