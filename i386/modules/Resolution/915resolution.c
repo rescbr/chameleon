@@ -29,7 +29,7 @@ void patchVideoBios()
 	{
 		vbios_map * map;
 		
-		map = open_vbios(CT_UNKWN);
+		map = open_vbios(CT_UNKNOWN);
 		if(map)
 		{
 			unlock_vbios(map);
@@ -184,11 +184,14 @@ chipset_type get_chipset(UInt32 id)
 			{
 				//printf("Unknown chipset 0x%llX, please email id to meklort@gmail.com", id);
 				//getc();
-				//type = CT_UNKWN_INTEL;
-				type = CT_UNKWN;
+				type = CT_UNKNOWN_INTEL;
+				//type = CT_UNKNOWN;
 
 			}
-			type = CT_UNKWN;
+			else
+			{
+				type = CT_UNKNOWN;
+			}
 			break;
 	}
 	return type;
@@ -256,18 +259,18 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 	 * Determine chipset
 	 */
 	
-	if (forced_chipset == CT_UNKWN)
+	if (forced_chipset == CT_UNKNOWN)
 	{
 		map->chipset_id = get_chipset_id();
 		map->chipset = get_chipset(map->chipset_id);
 	}
-	else if (forced_chipset != CT_UNKWN)
+	else if (forced_chipset != CT_UNKNOWN)
 	{
 		map->chipset = forced_chipset;
 	}
 	
 	
-	if (map->chipset == CT_UNKWN)
+	if (map->chipset == CT_UNKNOWN)
 	{
 		//verbose("Unknown chipset type.\n");
 		//verbose("915resolution only works with Intel 800/900 series graphic chipsets.\n");
@@ -371,7 +374,7 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 	 * check if we have Intel
 	 */
 	
-	/*if (map->chipset == CT_UNKWN && memmem(map->bios_ptr, VBIOS_SIZE, INTEL_SIGNATURE, strlen(INTEL_SIGNATURE))) {
+	/*if (map->chipset == CT_UNKNOWN && memmem(map->bios_ptr, VBIOS_SIZE, INTEL_SIGNATURE, strlen(INTEL_SIGNATURE))) {
 	 printf( "Intel chipset detected.  However, 915resolution was unable to determine the chipset type.\n");
 	 
 	 printf("Chipset Id: %x\n", map->chipset_id);
@@ -468,7 +471,7 @@ void unlock_vbios(vbios_map * map)
 	map->unlocked = TRUE;
 
 	switch (map->chipset) {
-		case CT_UNKWN:
+		case CT_UNKNOWN:
 			break;
 		case CT_830:
 		case CT_855GM:
@@ -502,7 +505,7 @@ void unlock_vbios(vbios_map * map)
 		case CT_G31:
 		case CT_500:
 		case CT_3150:
-		case CT_UNKWN_INTEL:	// Assume newer intel chipset is the same as before
+		case CT_UNKNOWN_INTEL:	// Assume newer intel chipset is the same as before
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000090);
 			map->b1 = inb(CONFIG_MECH_ONE_DATA + 1);
 			map->b2 = inb(CONFIG_MECH_ONE_DATA + 2);
@@ -527,7 +530,7 @@ void relock_vbios(vbios_map * map)
 	
 	switch (map->chipset)
 	{
-		case CT_UNKWN:
+		case CT_UNKNOWN:
 			break;
 		case CT_830:
 		case CT_855GM:
@@ -558,7 +561,7 @@ void relock_vbios(vbios_map * map)
 		case CT_G31:
 		case CT_500:
 		case CT_3150:
-		case CT_UNKWN_INTEL:
+		case CT_UNKNOWN_INTEL:
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000090);
 			outb(CONFIG_MECH_ONE_DATA + 1, map->b1);
 			outb(CONFIG_MECH_ONE_DATA + 2, map->b2);
@@ -849,7 +852,7 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			 }*/
 			break;
 		}
-		case BT_UNKWN:
+		case BT_UNKNOWN:
 		{
 			break;
 		}

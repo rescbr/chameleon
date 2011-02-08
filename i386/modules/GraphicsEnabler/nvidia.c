@@ -354,6 +354,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A65, "GeForce 210" },
 	{ 0x10DE0A66, "GeForce 310" },
 	{ 0x10DE0A74, "GeForce G210M" },
+	{ 0x10DE0A76, "ION GT218" },
 	{ 0x10DE0A78, "Quadro FX 380 LP" },
 	{ 0x10DE0CA3, "GeForce GT 240" },
 	{ 0x10DE0CA8, "GeForce GTS 260M" },
