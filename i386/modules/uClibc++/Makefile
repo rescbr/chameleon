@@ -3,7 +3,7 @@ MODULE_NAME = uClibc++
 MODULE_VERSION = "0.2.2"
 MODULE_COMPAT_VERSION = "0.2.2"
 MODULE_START = _uClibcxx_start
-MODULE_DEPENDENCIES = 
+MODULE_DEPENDENCIES = klibc
 
 DIR = uClibc++
 # sstream.o fstream.o

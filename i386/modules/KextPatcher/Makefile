@@ -2,9 +2,9 @@ MODULE_NAME = KextPatcher
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
-MODULE_DEPENDENCIES = 
-
+MODULE_DEPENDENCIES =
 DIR = KextPatcher
+
 
 MODULE_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
 
@@ -38,5 +38,6 @@ ALLSRC =  $(SFILES) $(CFILES) \
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
 all embedtheme optionrom: dylib
+
 
 include ../MakeInc.dir

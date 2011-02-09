@@ -75,7 +75,7 @@ int replace_word(uint32_t pattern, uint32_t repalcement, char* buffer, long buff
 	return num_replaced;
 }
 
-void replace_string(char* find, char* replace, char* string, int length)
+void replace_string(char* find, const char* replace, char* string, int length)
 {
 	if(!find ||
 	   !replace ||

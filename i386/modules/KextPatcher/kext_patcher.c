@@ -530,7 +530,7 @@ bool patch_plist_entry(TagPtr plist, char* plistbuffer, const char* personalityN
 	char* orig_string	= XMLCastString(replace);
 	verbose("Patching %s, replacing %s with %s\n", personalityName, orig_string, nameMatch);
 	replace_string(orig_string, nameMatch, plistbuffer + XMLCastStringOffset(replace), 10240);
-	
+	return true;
 }
 
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
