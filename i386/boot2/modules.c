@@ -1,7 +1,6 @@
 /*
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
- * TODO: Zero out bss if needed
  */
 #ifndef DEBUG_MODULES
 #define DEBUG_MODULES 0
@@ -46,17 +45,7 @@ int init_module_system()
 	// Intialize module system
 	if(symbols_module_start == (void*)0xFFFFFFFF)
 	{
-		DBG("Module system not compiled in.\n"); DBGPAUSE();
-		load_module(SYMBOLS_MODULE);
-		
-		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
-		
-		if((UInt32)lookup_symbol != 0xFFFFFFFF)
-		{
-			return 1;
-		}
-		
-		return 0;
+		return 0;	// Module system (Symbols.dylib) was not compiled in
 	}
 
 	module_start = parse_mach(module_data, &load_module, &add_symbol);
@@ -65,18 +54,19 @@ int init_module_system()
 	{
 		// Notify the system that it was laoded
 		module_loaded(SYMBOLS_MODULE /*moduleName, moduleVersion, moduleCompat*/);
-		(*module_start)();	// Start the module
-		DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
 
 		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
+			(*module_start)();	// Start the module
 			execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
+			DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
 			return 1;
-		}
+		}		
 	}
-	else {
+	else
+	{
 		// The module does not have a valid start function
 		printf("Unable to start %s\n", SYMBOLS_MODULE); getc();
 	}		
