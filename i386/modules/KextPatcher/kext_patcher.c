@@ -1,12 +1,21 @@
-	/*
+/*
  * Copyright (c) 2010 Evan Lojewski. All rights reserved.
  *	
  *	KextPather
- *	This is an experimental module that I'm looking into implimenting.
- *	The main purpose is to replace the need for programs such as 
- *  NetbookInstaller's kext patching routines. THis way, Apple's kexts can be
+ *	The main purpose of this moduleis to replace the need for programs such as 
+ *  NetbookInstaller's kext patching routines. This way, Apple's kexts can be
  *  patched whe loaded instead. (eg: GMA950 kext, Bluetooth + Wifi kexts)
  */
+#ifndef DEBUG_KEXT_PATCHER
+#define DEBUG_KEXT_PATCHER 0
+#endif
+
+#if DEBUG_KEXT_PATCHER
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
+
 
 #include "libsaio.h"
 #include "zlib.h"
@@ -20,48 +29,11 @@
 #include "hex_editor.h"
 
 
-unsigned long Adler32( unsigned char * buffer, long length );
-
-
-#define kHDACodec				"HDACodec"
-
-
-#ifndef DEBUG_KEXT_PATCHER
-#define DEBUG_KEXT_PATCHER 0
-#endif
-
-#if DEBUG_KEXT_PATCHER
-#define DBG(x...)	printf(x)
-#else
-#define DBG(x...)
-#endif
-
-
-bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
-bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start);
-bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
-bool patch_atheros_kext(TagPtr plist, char* plistbuffer, void* start);
-bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start);
-bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start);
-
-int chartohex(char c);
-
-static void * z_alloc(void *, u_int items, u_int size);
-static void   z_free(void *, void *ptr);
-
 uint16_t patch_gma_deviceid = 0;
 uint16_t patch_bcm_deviceid = 0;
 uint16_t patch_atheros_deviceid = 0;
+uint16_t patch_hda_codec = 0x00;		// TODO; detect proper codec
 
-// TODO: add detection code
-uint16_t patch_hda_codec = 0x00;
-
-#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid || patch_hda_codec || patch_atheros_deviceid)
-
-typedef struct z_mem {
-    uint32_t alloc_size;
-    uint8_t  data[0];
-} z_mem;
 
 /*
  * Space allocation and freeing routines for use by zlib routines.
@@ -95,7 +67,6 @@ z_free(void * notused __unused, void * ptr)
 
 
 
-void KextPatcher_hook(void* current, void* arg2, void* arg3, void* arg4);
 
 /**
  ** KextPatcher_start -> module start
@@ -114,14 +85,14 @@ void KextPatcher_start()
 
 }
 
+
 /**
- ** kext_loaded -> Called whenever a kext is in read into memory
+ ** kext_loaded -> Called whenever a kext is read into memory
  **		This function will be used to patch kexts ( eg AppleInteIntegratedFramebuffer)
  **		and their plists when they are loaded into memmory
  **/
 void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* arg3)
 {
-	
 	//ModulePtr module = moduletmp;
 	//long length = *(long*)lengthprt;
 	//long length2 = strlen(module->plistAddr);
@@ -131,17 +102,20 @@ void kext_loaded(void* moduletmp, void* lengthprt, void* executableAddr, void* a
 	//getc();
 }
 
+
 /**
  ** mkext_loaded -> Called whenever an mkext is in read into memory
  **		This function will be used to patch mkext. Matching kexts will be
  **		Extracted, modified, and then compressed again. Note: I need to determine
  **		what sort of slowdown this will cause and if it's worth implimenting.
  **/
-
 void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 {
-	const char* hda_codec;
-	int len = 0;
+	const char* hda_codec		= 0;
+	int len						= 0;
+	mkext_basic_header* package = packagetmp;
+	int version					= MKEXT_GET_VERSION(package);
+
 	if (getValueForKey(kHDACodec, &hda_codec, &len, &bootInfo->bootConfig))
 	{
 		patch_hda_codec = 0;
@@ -156,9 +130,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		
 	if(!NEEDS_PATCHING) return;	// No need to apply a patch, hardware doesn't need it
 	
-	int version = 0;
-	//int length = *((int*)lengthtmp);
-	mkext_basic_header* package = packagetmp;
+
 
 	// Verify the MKext.
     if (( MKEXT_GET_MAGIC(package)		!= MKEXT_MAGIC ) ||
@@ -167,23 +139,9 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
         ( MKEXT_GET_CHECKSUM(package)   !=
 		 Adler32((unsigned char *)&package->version, MKEXT_GET_LENGTH(package) - 0x10) ) )
     {
-        return;
-		// Don't try to patch a b
+        return; // Don't try to patch a bad mkext
     }	
-	
-	/*
-	if(strcmp(filespec, "/System/Library/Caches/com.apple.kext.caches/Startup/Extensions.mkext") == 0)
-	{
-		printf("Invalidating mkext %s\n", filespec);
-		// 10.6 cache folder. Doesn't contain certain extensions we need, so invalidate it.
-		//package->adler32++;
-		// NOTE:  double check that this is needed
-		package->magic = 0x00;
-		return;
-	}*/
-	
-	
-	version = MKEXT_GET_VERSION(package);
+		
 	
 	if(version == 0x01008000) // mkext1
 	{
@@ -196,7 +154,6 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 			//mkext_kext* kext = MKEXT1_GET_KEXT(package, i);
 			// uses decompress_lzss
 			// TODO: handle kext
-
 		}
 	}
 	else if((version & 0xFFFF0000) == 0x02000000) // mkext2
@@ -204,11 +161,11 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		DBG("Mkext2 package located at 0x%X\n", package);
 
 		// mkext2 uses zlib		
-		mkext2_header* package = packagetmp;
-		z_stream       zstream;
-		bool           zstream_inited = false;
-		int            zlib_result;
-		int plist_offset = MKEXT2_GET_PLIST(package);
+		mkext2_header*	package = packagetmp;
+		z_stream		zstream;
+		bool			zstream_inited = false;
+		int				zlib_result;
+		int				plist_offset = MKEXT2_GET_PLIST(package);
 		
 		char* plist = malloc(MKEXT2_GET_PLIST_FULLSIZE(package));
 		
@@ -240,27 +197,23 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		DBG("Inflated result is %d, in: %d bytes, out: %d bytes\n", zlib_result, zstream.total_in, zstream.total_out);
 		if (zlib_result == Z_STREAM_END || zlib_result == Z_OK)
 		{			
-			config_file_t plistData;
-			config_file_t allDicts;
+			TagPtr plistData;
+			TagPtr allDicts;
 			bzero(&plistData, sizeof(plistData));
 			bzero(&allDicts, sizeof(allDicts));
 			
-			XMLParseFile( plist, &plistData.dictionary );
+			XMLParseFile( plist, &plistData );
 
 			int count;
 
-			allDicts.dictionary = XMLGetProperty(plistData.dictionary, kMKEXTInfoDictionariesKey);
-			//count = XMLTagCount(allDicts.dictionary);
-
-			//DBG("Plist contains %d kexts\n", count);
-			
+			allDicts = XMLGetProperty(plistData, kMKEXTInfoDictionariesKey);
 			
 			bool patched = false;
-			for(count = XMLTagCount(allDicts.dictionary);
+			for(count = XMLTagCount(allDicts);
 				count > 0;
 				count--)
 			{
-				TagPtr kextEntry = XMLGetElement(allDicts.dictionary, count);
+				TagPtr kextEntry = XMLGetElement(allDicts, count);
 				patched |= patch_kext(kextEntry, plist, package);
 			}
 			
@@ -322,9 +275,8 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 				
 				
 				// re adler32 the new mkext2 package
-				MKEXT_HDR_CAST(package)->adler32 = 
-					MKEXT_SWAP(Adler32((unsigned char *)&package->version,
-											 MKEXT_GET_LENGTH(package) - 0x10));
+				MKEXT_HDR_CAST(package)->adler32 = MKEXT_SWAP(Adler32((unsigned char *)&package->version,
+																	  MKEXT_GET_LENGTH(package) - 0x10));
 			}
 		}
 		else
@@ -332,27 +284,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 			printf("ZLIB Error: %s\n", zstream.msg);
 			getc();
 		}
-
-		//config_file_t mkextPlist;
-		//ParseXMLFile((char*) plist, &mkextPlist.dictionary);
-		
-		
-		
-		
-		
-		/*		int i;
-		for(i = 0; i < MKEXT_GET_COUNT(package); i++)
-		{
-			printf("Parsing kext %d\n", i);
-		}
-		*/
-		
-
 	}
-
-	
-	DBG("Loading %s, version 0x%x\n", filespec, version);
-	//getc();
 }
 
 // FIXME: only handles mkext2 entries
@@ -366,37 +298,22 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 	
 	
 	if(patch_gma_deviceid &&
-	    (
-			(strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
-			(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0)
-		 )
-	   )
+	    ((strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
+		 (strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0)))
 	{
-		if(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0 || patch_gma_deviceid == 0x27ae)
-		{
-			return patch_gma_kexts(plist, plistbuffer, start);
-		}
-		else
-		{
-			return patch_gma_kexts(plist, plistbuffer, start);
-		}
-
+		return patch_gma_kexts(plist, plistbuffer, start);
 	}
 	else if(patch_bcm_deviceid && (strcmp(bundleID, "com.apple.driver.AirPortBrcm43xx") == 0))
 	{
 		return patch_bcm_kext(plist, plistbuffer, start);
-
 	}
 	else if(patch_hda_codec && strcmp(bundleID, "com.apple.driver.AppleHDA") == 0)
 	{
 		return patch_hda_kext(plist, plistbuffer, start);
-
 	}
-	
 	else if(patch_hda_codec && strcmp(bundleID, "com.apple.driver.AppleHDAController") == 0)
 	{
 		return patch_hda_controller(plist, plistbuffer, start);
-
 	}
 	else if(patch_atheros_deviceid && strcmp(bundleID, "com.apple.driver.AirPort.Atheros21") == 0)
 	{
@@ -478,7 +395,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 
 bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 {
-	uint16_t find_codec = 0;
+	uint16_t find_codec	= 0;
 	int full_size, compressed_size, executable_offset;
 	void* compressed_data;
 	mkext2_file_entry* kext;
@@ -502,13 +419,12 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 	}
 	if(!find_codec) return false;	// notify caller that we aren't patching the kext
 		
-	executable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
-	kext = (void*)((char*)start + executable_offset);
-
-	full_size = MKEXT2_GET_ENTRY_FULLSIZE(kext);
-	compressed_size = MKEXT2_GET_ENTRY_COMPSIZE(kext);
-	compressed_data = MKEXT2_GET_ENTRY_DATA(kext);	
-	executable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	executable_offset	= XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	kext				= (void*)((char*)start + executable_offset);
+	full_size			= MKEXT2_GET_ENTRY_FULLSIZE(kext);
+	compressed_size		= MKEXT2_GET_ENTRY_COMPSIZE(kext);
+	compressed_data		= MKEXT2_GET_ENTRY_DATA(kext);	
+	executable_offset	= XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
 	
 	
 	char* executable = malloc(full_size);
@@ -595,104 +511,55 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 	return true;	
 
 }
-bool patch_atheros_kext(TagPtr plist, char* plistbuffer, void* start)
-{
-	TagPtr personality;
-	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
-	personality =		XMLGetProperty(personality, (const char*)"Atheros Wireless LAN PCI");	
-	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
-	
-	char* new_str = malloc(sizeof("pci168c,xxxx"));
-	sprintf(new_str, "pci168c,%02x", patch_atheros_deviceid);
 
-	// Check to see if we *really* need to modify the plist, if not, return false
-	// so that *if* this were going ot be the only modified kext, the repacking code
-	// won't need to be executed.
-	int count = XMLTagCount(match_names);
+
+/** Patches an array element within a personality. NOTE: string sizes should match **/
+bool patch_plist_entry(TagPtr plist, char* plistbuffer, const char* personalityName, const char* propertyName, const char* nameMatch)
+{
+	TagPtr personality	= XMLGetProperty(XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities)), personalityName);	
+	TagPtr match_names	= XMLCastArray(XMLGetProperty(personality, propertyName));
+	TagPtr replace		= XMLGetElement(match_names, 0);	// Modify the first entry
+	int count			= XMLTagCount(match_names);
+	
 	while(count)
 	{
-		count--;
-		TagPtr replace =	XMLGetElement(match_names, count);	// Modify the second entry
-		char* orig_string = XMLCastString(replace);
-		if(strcmp(orig_string, new_str) == 0) return false;
+		char* orig_string	= XMLCastString(XMLGetElement(match_names, --count));
+		if(strcmp(orig_string, nameMatch) == 0) return false;			// Entry already exists, no need tmo modify plist + recompress
 	}
-	
-	
 
-	TagPtr replace =	XMLGetElement(match_names, 0);	// Modify the second entry
-	char* orig_string = XMLCastString(replace);
-	
-	verbose("Patching AirPortAtheros21.kext, replacing %s with %s\n", orig_string, new_str);
-
-	// TODO: verify string doesn't exist first.
-	
+	char* orig_string	= XMLCastString(replace);
+	verbose("Patching %s, replacing %s with %s\n", personalityName, orig_string, nameMatch);
 	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 10240);
-	return true;
 	
 }
 
-
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 {
-	TagPtr personality;
-	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
-	personality =		XMLGetProperty(personality, (const char*)"Broadcom 802.11 PCI");	
-	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
-
-	
-	char* new_str = malloc(sizeof("pci14e4,xxxx"));
+	char* new_str		= malloc(sizeof("pci14e4,xxxx"));	
 	sprintf(new_str, "pci14e4,%02x", patch_bcm_deviceid);
+	return patch_plist_entry(plist, plistbuffer, "Broadcom 802.11 PCI", "IONameMatch", new_str);
+}
 
-	// Check to see if we *really* need to modify the plist, if not, return false
-	// so that *if* this were going ot be the only modified kext, the repacking code
-	// won't need to be executed.
-	int count = XMLTagCount(match_names);
-	while(count)
-	{
-		count--;
-		TagPtr replace =	XMLGetElement(match_names, count);	// Modify the second entry
-		char* orig_string = XMLCastString(replace);
-		if(strcmp(orig_string, new_str) == 0) return false;
-	}
-
-	verbose("Patching AppleAirPortBrcm4311.kext with %s\n", new_str);
-
-	TagPtr replace =	XMLGetElement(match_names, 1);	// Modify the second entry
-	char* orig_string = XMLCastString(replace);
-	
-	
-	// TODO: verify string doesn't exist first.
-	
-	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 10240);
-
-	return true;
+bool patch_atheros_kext(TagPtr plist, char* plistbuffer, void* start)
+{
+	char* new_str		= malloc(sizeof("pci14e4,xxxx"));	
+	sprintf(new_str, "pci168c,%02x", patch_atheros_deviceid);
+	return patch_plist_entry(plist, plistbuffer, "Atheros Wireless LAN PCI", "IONameMatch", new_str);
 }
 
 bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 {
-	// TODO: clean up this function / split into two / etc
-	int exeutable_offset, full_size, compressed_size;
-	TagPtr personality;
+	TagPtr personality			= XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+	int exeutable_offset		= XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
+	mkext2_file_entry* kext		= (void*)((char*)start + exeutable_offset);
+	int full_size				= MKEXT2_GET_ENTRY_FULLSIZE(kext);
+	int compressed_size			= MKEXT2_GET_ENTRY_COMPSIZE(kext);
+	void* compressed_data		= MKEXT2_GET_ENTRY_DATA(kext);
+	char* executable			= malloc(full_size);
+	int zlib_result				= Z_OK;
 	long offset;
-	int zlib_result;
-	z_stream       zstream;
-	bool           zstream_inited = false;
-	mkext2_file_entry* kext;
-	void* compressed_data;
+	z_stream zstream;
 
-	exeutable_offset = XMLCastInteger(XMLGetProperty(plist, kMKEXTExecutableKey));
-	kext = (void*)((char*)start + exeutable_offset);
-
-	full_size = MKEXT2_GET_ENTRY_FULLSIZE(kext);
-	compressed_size = MKEXT2_GET_ENTRY_COMPSIZE(kext);
-	compressed_data = MKEXT2_GET_ENTRY_DATA(kext);
-	
-	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
-	
-	
-	
-	char* executable = malloc(full_size);
-	
 	bzero(&zstream, sizeof(zstream));		
 	zstream.next_in   = (UInt8*)compressed_data;
 	zstream.avail_in  = compressed_size;
@@ -711,143 +578,114 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	}
 	else 
 	{
-		zstream_inited = true;
-	}
-	
-	
-	zlib_result = inflate(&zstream, Z_FINISH);
-	
-	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-	
-	char* newstring = malloc(sizeof("0x00008086"));
-	sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
-
-	
-	if(XMLGetProperty(personality, (const char*)"Intel915"))
-	{
-		if((patch_gma_deviceid & 0xFF00) != 0xA000)	// GMA3150
-		{
-			verbose("Patching AppleIntelGMA950.kext\n");
-			//getc();
-
-			personality =		XMLGetProperty(personality, (const char*)"Intel915"); // IOAccelerator kext
+		zlib_result = inflate(&zstream, Z_FINISH);
 		
+		DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		
+		char* newstring = malloc(sizeof("0x00008086"));
+		sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
+		
+		
+		if(XMLGetProperty(personality, (const char*)"Intel915"))
+		{
+			if((patch_gma_deviceid & 0xFF00) != 0xA000)	// not GMA3150
+			{
+				verbose("Patching AppleIntelGMA950.kext\n");
+				personality =	XMLGetProperty(personality, (const char*)"Intel915"); // IOAccelerator kext
+				offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+				
+				replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
+				replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+			}
+		}
+		else if(XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer"))
+		{
+			verbose("Patching AppleIntelIntegratedFramebuffer\n");
+			personality =	XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer");
 			offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+			
+			if((patch_gma_deviceid & 0xFF00) == 0xA000)	// GMA3150
+			{
+				// Cursor corruption fix.
+				// This patch changes the cursor address from
+				// a physical address (used in the gma950) to an offset (used in the gma3150).
+				//					{0x8b, 0x55, 0x08, 0x83, 0xba, 0xb0, 0x00, 0x00, 0x00, 0x01, 0x7e, 0x36, 0x89, 0x04, 0x24, 0xe8, 0x6b, 0xbc, 0xff, 0xff};
+				char find_bytes[] = {0x8b, 0x55, 0x08, 0x83, 0xba, 0xb0, 0x00, 0x00, 0x00, 0x01, 0x7e, 0x36, 0x89, 0x04, 0x24, 0xe8/*, 0x32, 0xbb, 0xff, 0xff*/};	// getPhysicalAddress() and more
+				char new_bytes[]  = {0xb8, 0x00, 0x00, 0x00, 0x02, 0xEB, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};	// jump past getPhysicalAddress binding. NOTE: last six bytes are unusable, set to 0 for compression
+				replace_bytes(find_bytes, sizeof(find_bytes), new_bytes, sizeof(new_bytes), executable, zstream.total_out);
+			}
 			replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
 			replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
-		}
-
-	}
-	else if(XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer"))
-	{
-		verbose("Patching AppleIntelIntegratedFramebuffer\n");
-		//getc();
-
-		personality =		XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer");
-		// Framebuffer Kext
-		
-		if((patch_gma_deviceid & 0xFF00) == 0xA000)	// GMA3150
-		{
-			// Cursor corruption fix.
-			// This patch changes the cursor address from
-			// a physical address (used in the gma950) to an offset (used in the gma3150).
-			//s					{0x8b, 0x55, 0x08, 0x83, 0xba, 0xb0, 0x00, 0x00, 0x00, 0x01, 0x7e, 0x36, 0x89, 0x04, 0x24, 0xe8, 0x6b, 0xbc, 0xff, 0xff};
-			char find_bytes[] = {0x8b, 0x55, 0x08, 0x83, 0xba, 0xb0, 0x00, 0x00, 0x00, 0x01, 0x7e, 0x36, 0x89, 0x04, 0x24, 0xe8/*, 0x32, 0xbb, 0xff, 0xff*/};	// getPhysicalAddress() and more
-			char new_bytes[]  = {0xb8, 0x00, 0x00, 0x00, 0x02, 0xEB, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};	// jump past getPhysicalAddress binding. NOTE: last six bytes are unusable
-			replace_bytes(find_bytes, sizeof(find_bytes), new_bytes, sizeof(new_bytes), executable, zstream.total_out);
 			
-
 		}
-		offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
-		replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
-		replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+		else if(XMLGetProperty(personality, (const char*)"Intel965"))
+		{
+			verbose("Patching AppleIntelGMAX3100.kext\n");
+			personality =	XMLGetProperty(personality, (const char*)"Intel965");
+			offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+			
+			replace_string("0x2a028086", newstring, plistbuffer + offset, 10240);
+		}
+		else if(XMLGetProperty(personality, (const char*)"AppleIntelGMAX3100FB"))
+		{
+			verbose("Patching AppleIntelGMAX3100FB.kext\n");
+			personality =	XMLGetProperty(personality, (const char*)"AppleIntelGMAX3100FB");
+			
+			offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+			replace_string("0x2A028086", newstring, plistbuffer + offset, 10240);
+			replace_word(0x2A028086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+		}
+		else
+		{
+			return false;
+		}
 		
-	}
-	else if(XMLGetProperty(personality, (const char*)"Intel965"))
-	{
-		verbose("Patching AppleIntelGMAX3100.kext\n");
-
-		personality =		XMLGetProperty(personality, (const char*)"Intel965");
 		
-		offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+		inflateEnd(&zstream);
 		
-		//printf("Intel965\n");
-		//printf("Replacing %c%c%c%c\n", (plistbuffer + offset)[0], (plistbuffer + offset)[1], (plistbuffer + offset)[2], (plistbuffer + offset)[3]);
-		//getc();
-
+		// Recompress the executable
+		zstream.next_in   = (UInt8*)executable;
+		zstream.next_out  = (UInt8*)compressed_data;
 		
-		//return true;
-
-		replace_string("0x2a028086", newstring, plistbuffer + offset, 10240);
-		//replace_word(0x2A028086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
-	}
-	else if(XMLGetProperty(personality, (const char*)"AppleIntelGMAX3100FB"))
-	{
-		verbose("Patching AppleIntelGMAX3100FB.kext\n");
-		//getc();
-		personality =		XMLGetProperty(personality, (const char*)"AppleIntelGMAX3100FB");
+		zstream.avail_in  = full_size;
+		zstream.avail_out = compressed_size;
+		zstream.zalloc    = Z_NULL;
+		zstream.zfree     = Z_NULL;
+		zstream.opaque    = Z_NULL;
 		
-		offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
-		replace_string("0x2A028086", newstring, plistbuffer + offset, 10240);
-		replace_word(0x2A028086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+		zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
+		if (Z_OK != zlib_result) {
+			printf("ZLIB Deflate Error: %s\n", zstream.msg);
+			getc();
+		}
+		else 
+		{		
+			zlib_result = deflate(&zstream, Z_FINISH);
+			
+			if (zlib_result == Z_STREAM_END)
+			{
+				DBG("Deflated result is %d, avail: %d bytes, out: %d bytes, full: %d\n", zlib_result, compressed_size, zstream.total_out, full_size);
+			} 
+			else if (zlib_result == Z_OK)
+			{
+				/* deflate filled output buffer, meaning the data doesn't compress.
+				 */
+				printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+				printf("ERROR: Unable to compress patched kext, not enough room.\n");
+				pause();
+				
+			} 
+			else if (zlib_result != Z_STREAM_ERROR)
+			{
+				printf("ZLIB Deflate Error: %s\n", zstream.msg);
+				getc();
+			}
+			if(zstream.total_out < compressed_size) kext->compressed_size = MKEXT_SWAP(zstream.total_out);
+			
+			
+			deflateEnd(&zstream);
+		}
 	}
-	else
-	{
-		return false;
-	}
-
-	
-	if (zstream_inited) inflateEnd(&zstream);
-	
-	
-	zstream.next_in   = (UInt8*)executable;
-	zstream.next_out  = (UInt8*)compressed_data;
-	
-	zstream.avail_in  = full_size;
-	zstream.avail_out = compressed_size;
-	zstream.zalloc    = Z_NULL;
-	zstream.zfree     = Z_NULL;
-	zstream.opaque    = Z_NULL;
-	
-	
-	
-	// Recompress the eecutable
-	zlib_result = deflateInit2(&zstream, Z_DEFAULT_COMPRESSION,  Z_DEFLATED,15, 8 /* memLevel */, Z_DEFAULT_STRATEGY);
-	if (Z_OK != zlib_result) {
-		printf("ZLIB Deflate Error: %s\n", zstream.msg);
-		getc();
-	}
-	else 
-	{
-		zstream_inited = true;
-	}
-	
-	zlib_result = deflate(&zstream, Z_FINISH);
-	
-	if (zlib_result == Z_STREAM_END)
-	{
-		DBG("Deflated result is %d, avail: %d bytes, out: %d bytes, full: %d\n", zlib_result, compressed_size, zstream.total_out, full_size);
-	} 
-	else if (zlib_result == Z_OK)
-	{
-		/* deflate filled output buffer, meaning the data doesn't compress.
-		 */
-		printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-		printf("ERROR: Unable to compress patched kext, not enough room.\n");
-		pause();
-		
-	} 
-	else if (zlib_result != Z_STREAM_ERROR)
-	{
-		printf("ZLIB Deflate Error: %s\n", zstream.msg);
-		getc();
-	}
-	if(zstream.total_out < compressed_size) kext->compressed_size = MKEXT_SWAP(zstream.total_out);
-
-	
-	
-	
-	if (zstream_inited) deflateEnd(&zstream);
 	
 	free(executable);
 	
@@ -856,17 +694,9 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 
 int chartohex(char c)
 {
-	if(c <= '9' && c >= '0')
-	{
-		return c - '0';	// c is between 0 and 9
-	}
-	else if(c <= 'F' && c >= 'A')
-	{
-		return c - 'A' + 10; // c = 10 - 15;
-	}
-	else if(c <= 'f' && c >= 'a')
-	{
-		return c - 'a' + 10; // c = 10 - 15;
-	}
+	if(c <= '9' && c >= '0')		return c - '0';	// c is between 0 and 9
+	else if(c <= 'F' && c >= 'A')	return c - 'A' + 10; // c = 10 - 15;
+	else if(c <= 'f' && c >= 'a')	return c - 'a' + 10; // c = 10 - 15;
+
 	return 0;
 }
