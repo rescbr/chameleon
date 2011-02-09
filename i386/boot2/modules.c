@@ -410,7 +410,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
 				dylibCommand  = binary + binaryIndex;
 				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-				// TODO: verify version
+				// Possible enhancments: verify version
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
 				if(dylib_loader)
@@ -483,8 +483,6 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	UInt32 symbolIndex			= 0;
 	char* symbolString			= base + (char*)symtabCommand->stroff;
 
-	// TODO: verify that the _TEXT,_text segment starts at the same locaiton in the file. If not
-	//			subtract the vmaddress and add the actual file address back on. (NOTE: if compiled properly, not needed)
 	if(!is64)
 	{
 		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
@@ -1120,7 +1118,6 @@ void print_hook_list()
 
 void dyld_stub_binder()
 {
-	// TODO: actualy impliment this function (asm)
 	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
 	getc();
 }
