@@ -312,7 +312,7 @@ void getGraphicModeParams(unsigned long params[]) {
 	
     unsigned short    vesaVersion;
     unsigned short    mode = modeEndOfList;
-	
+
 	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
 	
 	mode = getVESAModeWithProperties( params[0], params[1], params[2],

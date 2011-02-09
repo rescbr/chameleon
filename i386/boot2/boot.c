@@ -193,12 +193,13 @@ int ExecKernel(void *binary)
 	
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE || gVerboseMode)
 	{
-		setVideoMode( GRAPHICS_MODE, 0 );
 		// Draw gray screen. NOTE: no boot image, that's in the gui module
 #ifndef OPTION_ROM
 		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
+		setVideoMode( GRAPHICS_MODE, 0 );
+
 #endif
 	}
 
@@ -319,14 +320,9 @@ void common_boot(int biosdev)
 	gBootVolume = selectBootVolume(bvChain);
 	
 	
-	// Intialize module system
-	if(init_module_system())
-	{
-		load_all_modules();
-	}
+	// Intialize module system, module sytem will 
+	init_module_system();
 	
-	execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
-
 
 #ifndef OPTION_ROM
     // Loading preboot ramdisk if exists.

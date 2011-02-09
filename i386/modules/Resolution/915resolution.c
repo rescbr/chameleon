@@ -40,8 +40,7 @@ void patchVideoBios()
 			
 			close_vbios(map);
 		}
-	}		
-	
+	}
 }
 
 

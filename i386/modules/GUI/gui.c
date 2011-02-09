@@ -739,7 +739,7 @@ int initGUI(void)
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
-	
+
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
 		loadThemeValues(&bootInfo->themeConfig);

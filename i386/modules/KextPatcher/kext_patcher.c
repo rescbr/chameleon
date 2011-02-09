@@ -40,6 +40,7 @@ unsigned long Adler32( unsigned char * buffer, long length );
 bool patch_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start);
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start);
+bool patch_atheros_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start);
 bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start);
 
@@ -50,11 +51,12 @@ static void   z_free(void *, void *ptr);
 
 uint16_t patch_gma_deviceid = 0;
 uint16_t patch_bcm_deviceid = 0;
+uint16_t patch_atheros_deviceid = 0;
 
 // TODO: add detection code
 uint16_t patch_hda_codec = 0x00;
 
-#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid || patch_hda_codec)
+#define NEEDS_PATCHING		(patch_bcm_deviceid || patch_gma_deviceid || patch_hda_codec || patch_atheros_deviceid)
 
 typedef struct z_mem {
     uint32_t alloc_size;
@@ -396,6 +398,10 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 		return patch_hda_controller(plist, plistbuffer, start);
 
 	}
+	else if(patch_atheros_deviceid && strcmp(bundleID, "com.apple.driver.AirPort.Atheros21") == 0)
+	{
+		return patch_atheros_kext(plist, plistbuffer, start);
+	}
 	
 	return false;
 }
@@ -429,6 +435,10 @@ void KextPatcher_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 				if(current->vendor_id == 0x14E4 && ((current->device_id & 0xFFD0) == 0x4300))
 				{
 					patch_bcm_deviceid = current->device_id;
+				}
+				else if(current->vendor_id == 0x168C && current->device_id == 0x002B)
+				{
+					patch_atheros_deviceid = current->device_id;
 				}
 				break;
 		}
@@ -585,6 +595,42 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 	return true;	
 
 }
+bool patch_atheros_kext(TagPtr plist, char* plistbuffer, void* start)
+{
+	TagPtr personality;
+	personality =		XMLCastDict(XMLGetProperty(plist, kPropIOKitPersonalities));
+	personality =		XMLGetProperty(personality, (const char*)"Atheros Wireless LAN PCI");	
+	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
+	
+	char* new_str = malloc(sizeof("pci168c,xxxx"));
+	sprintf(new_str, "pci168c,%02x", patch_atheros_deviceid);
+
+	// Check to see if we *really* need to modify the plist, if not, return false
+	// so that *if* this were going ot be the only modified kext, the repacking code
+	// won't need to be executed.
+	int count = XMLTagCount(match_names);
+	while(count)
+	{
+		count--;
+		TagPtr replace =	XMLGetElement(match_names, count);	// Modify the second entry
+		char* orig_string = XMLCastString(replace);
+		if(strcmp(orig_string, new_str) == 0) return false;
+	}
+	
+	
+
+	TagPtr replace =	XMLGetElement(match_names, 0);	// Modify the second entry
+	char* orig_string = XMLCastString(replace);
+	
+	verbose("Patching AirPortAtheros21.kext, replacing %s with %s\n", orig_string, new_str);
+
+	// TODO: verify string doesn't exist first.
+	
+	replace_string(orig_string, new_str, plistbuffer + XMLCastStringOffset(replace), 10240);
+	return true;
+	
+}
+
 
 bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 {
@@ -609,7 +655,8 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 		if(strcmp(orig_string, new_str) == 0) return false;
 	}
 
-	
+	verbose("Patching AppleAirPortBrcm4311.kext with %s\n", new_str);
+
 	TagPtr replace =	XMLGetElement(match_names, 1);	// Modify the second entry
 	char* orig_string = XMLCastString(replace);
 	
@@ -678,15 +725,17 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	if(XMLGetProperty(personality, (const char*)"Intel915"))
 	{
-		verbose("Patching AppleIntelGMA950.kext\n");
-		//getc();
+		if((patch_gma_deviceid & 0xFF00) != 0xA000)	// GMA3150
+		{
+			verbose("Patching AppleIntelGMA950.kext\n");
+			//getc();
 
-		personality =		XMLGetProperty(personality, (const char*)"Intel915");
-		// IOAccelerator kext
+			personality =		XMLGetProperty(personality, (const char*)"Intel915"); // IOAccelerator kext
 		
-		offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
-		replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
-		replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+			offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));		
+			replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);
+			replace_word(0x27A28086, 0x8086 | (patch_gma_deviceid << 16), executable, zstream.total_out);
+		}
 
 	}
 	else if(XMLGetProperty(personality, (const char*)"AppleIntelIntegratedFramebuffer"))

@@ -72,6 +72,7 @@ int init_module_system()
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
+			execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 			return 1;
 		}
 	}
