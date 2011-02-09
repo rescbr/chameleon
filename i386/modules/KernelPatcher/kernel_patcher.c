@@ -36,7 +36,7 @@ void KernelPatcher_start()
 	register_kernel_symbol(KERNEL_ANY, "_lapic_start");
 	register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt_base");
 	
-	// lapic_interrup symbols
+	// lapic_interrupt symbols
 	//register_kernel_patch(patch_lapic_interrupt, KERNEL_ANY, CPUID_MODEL_ANY);
 	//register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt");
 
@@ -57,9 +57,8 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 	// AKA, don't at 64bit patches if it's a 32bit only machine
 	patchRoutine_t* entry;
 	
-	// TODO: verify Platform->CPU.Model is populated this early in bootup
 	// Check to ensure that the patch is valid on this machine
-	// If it is not, exit early form this function
+	// If it is not, exit early from this function
 	if(cpus != Platform->CPU.Model)
 	{
 		if(cpus != CPUID_MODEL_ANY)

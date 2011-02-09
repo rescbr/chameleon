@@ -108,7 +108,7 @@ void load_all_modules()
 
 
 /*
- * Load a module file in /Extra/modules
+ * Load a module file in /Extra/modules/
  */
 int load_module(char* module)
 {
@@ -127,7 +127,7 @@ int load_module(char* module)
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		printf("WARNING: Unable to locate module %s\n", modString); DBGPAUSE();
+		DBG("WARNING: Unable to locate module %s\n", modString); DBGPAUSE();
 		return 0;
 	}
 	
@@ -259,8 +259,11 @@ unsigned int lookup_all_symbols(const char* name)
 	verbose("Unable to locate symbol %s\n", name);
 	getc();
 #endif
-
-	return 0xFFFFFFFF;
+	
+	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
+	// In the event that a symbol does not exist
+	// Return a pointer to a void function.
+	else return lookup_all_symbols(VOID_SYMBOL);	
 }
 
 /********************************************************************************/
@@ -273,10 +276,9 @@ unsigned int lookup_all_symbols(const char* name)
  * the module iinit address will be returned.
  * NOTE; all dependecies will be loaded before this module is started
  * NOTE: If the module is unable to load ot completeion, the modules
- * symbols will still be available (TODO: fix this). This should not
- * happen as all dependencies are verified before the sybols are read in.
+ * symbols will still be available.
  */
-void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
+void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))
 {	
 	char is64 = false;
 	void (*module_start)(void) = NULL;
@@ -340,15 +342,12 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 		
 		switch ((loadCommand->cmd & 0x7FFFFFFF))
 		{
-			// TODO: sepeare function to handel appropriate sections
 			case LC_SYMTAB:
 				symtabCommand = binary + binaryIndex;
 				break;
 				
 			case LC_SEGMENT: // 32bit macho
 				segCommand = binary + binaryIndex;
-				
-				//printf("Segment name is %s\n", segCommand->segname);
 				
 				if(strcmp("__TEXT", segCommand->segname) == 0)
 				{
@@ -377,10 +376,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				
 				break;
 			case LC_SEGMENT_64:	// 64bit macho's
-				segCommand64 = binary + binaryIndex;
-				
-				//printf("Segment name is %s\n", segCommand->segname);
-				
+				segCommand64 = binary + binaryIndex;				
 				if(strcmp("__TEXT", segCommand64->segname) == 0)
 				{
 					UInt32 sectionIndex;
@@ -409,8 +405,6 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				
 				break;
 				
-			case LC_DYSYMTAB:
-				break;
 				
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
@@ -426,9 +420,8 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 					
 					if (!dylib_loader(name))
 					{
+						// NOTE: any symbols exported by dep will be replace with the void function
 						free(name);
-						// Unable to load dependancy
-						//return NULL;
 					}
 				}
 				
@@ -448,9 +441,8 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				dyldInfoCommand = binary + binaryIndex;
 				break;
 				
+			case LC_DYSYMTAB:
 			case LC_UUID:
-				break;
-				
 			case LC_UNIXTHREAD:
 				break;
 				
@@ -462,34 +454,18 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 		
 		binaryIndex += cmdSize;
 	}
-	//if(!moduleName) return NULL;
-	
-	
+
 	// bind_macho uses the symbols, if the textAdd does not exist (Symbols.dylib, no code), addresses are static and not relative
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
 	
-	// Rebase the module before binding it.
-	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
+	if(dyldInfoCommand)
 	{
-		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
-	}
-	
-	if(dyldInfoCommand && dyldInfoCommand->bind_off)
-	{
-		bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
-	}
-	
-	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off)
-	{
-		// NOTE: this currently should never happen.
-		bind_macho(binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
-	}
-	
-	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off)
-	{
-		// NOTE: we are binding the lazy pointers as a module is laoded,
-		// This should be changed to bind when a symbol is referened at runtime instead.
-		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
+		// Rebase the module before binding it.
+		if(dyldInfoCommand->rebase_off)		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off,	dyldInfoCommand->rebase_size);
+		// Bind all symbols. 
+		if(dyldInfoCommand->bind_off)		bind_macho(binary,   (char*)dyldInfoCommand->bind_off,		dyldInfoCommand->bind_size);
+		if(dyldInfoCommand->weak_bind_off)	bind_macho(binary,   (char*)dyldInfoCommand->weak_bind_off,	dyldInfoCommand->weak_bind_size);
+		if(dyldInfoCommand->lazy_bind_off)	bind_macho(binary,   (char*)dyldInfoCommand->lazy_bind_off,	dyldInfoCommand->lazy_bind_size);
 	}
 	
 	return module_start;
@@ -503,14 +479,12 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 
 unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, long long, char), char is64)
 {
+	unsigned int module_start	= 0xFFFFFFFF;	
+	UInt32 symbolIndex			= 0;
+	char* symbolString			= base + (char*)symtabCommand->stroff;
+
 	// TODO: verify that the _TEXT,_text segment starts at the same locaiton in the file. If not
 	//			subtract the vmaddress and add the actual file address back on. (NOTE: if compiled properly, not needed)
-	
-	unsigned int module_start = 0xFFFFFFFF;
-	
-	UInt32 symbolIndex = 0;
-	char* symbolString = base + (char*)symtabCommand->stroff;
-	//char* symbolTable = base + symtabCommand->symoff;
 	if(!is64)
 	{
 		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
@@ -532,7 +506,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 	else
 	{
 		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
-		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)	
+		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now, verify later)	
 		while(symbolIndex < symtabCommand->nsyms)
 		{
 			
@@ -550,9 +524,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			symbolIndex++;	// TODO remove
 		}
 	}
-	
 	return module_start;
-	
 }
 
 // Based on code from dylibinfo.cpp and ImageLoaderMachOCompressed.cpp
@@ -563,20 +535,16 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt8 immediate = 0;
 	UInt8 opcode = 0;
 	UInt8 type = 0;
-	
 	UInt32 segmentAddress = 0;
-	
 	
 	
 	UInt32 tmp  = 0;
 	UInt32 tmp2  = 0;
 	UInt8 bits = 0;
 	int index = 0;
-	
-	//int done = 0;
 	unsigned int i = 0;
 	
-	while(/*!done &&*/ i < size)
+	while(i < size)
 	{
 		immediate = rebase_stream[i] & REBASE_IMMEDIATE_MASK;
 		opcode = rebase_stream[i] & REBASE_OPCODE_MASK;
@@ -585,15 +553,16 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 		switch(opcode)
 		{
 			case REBASE_OPCODE_DONE:
-				// Rebase complete.
-				//done = 1;
+				// Rebase complete, reset vars
+				immediate = 0;
+				opcode = 0;
+				type = 0;
+				segmentAddress = 0;
 			default:
 				break;
 				
 				
 			case REBASE_OPCODE_SET_TYPE_IMM:
-				// Set rebase type (pointer, absolute32, pcrel32)
-				//DBG("Rebase type = 0x%X\n", immediate);
 				type = immediate;
 				break;
 				
@@ -601,7 +570,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
 				// Locate address to begin rebasing
 				segmentAddress = 0;
-				
 				struct segment_command* segCommand = NULL; // NOTE: 32bit only
 				
 				unsigned int binIndex = 0;
@@ -744,8 +712,8 @@ inline void rebase_location(UInt32* location, char* base, int type)
 
 // Based on code from dylibinfo.cpp and ImageLoaderMachOCompressed.cpp
 // NOTE: this uses 32bit values, and not 64bit values. 
-// There is apossibility that this could cause issues,
-// however the macho file is 32 bit, so it shouldn't matter too much
+// There is a possibility that this could cause issues,
+// however the modules are 32 bits, so it shouldn't matter too much
 void bind_macho(void* base, char* bind_stream, UInt32 size)
 {	
 	bind_stream += (UInt32)base;
@@ -769,12 +737,10 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	UInt8 bits = 0;
 	UInt32 tmp = 0;
 	UInt32 tmp2 = 0;
-	
 	UInt32 index = 0;
-	//int done = 0;
 	unsigned int i = 0;
 	
-	while(/*!done &&*/ i < size)
+	while(i < size)
 	{
 		immediate = bind_stream[i] & BIND_IMMEDIATE_MASK;
 		opcode = bind_stream[i] & BIND_OPCODE_MASK;
@@ -790,13 +756,11 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				addend = 0;
 				libraryOrdinal = 0;
 				symbolAddr = 0xFFFFFFFF;
-				//done = 1; 
 			default:
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
 				libraryOrdinal = immediate;
-				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
@@ -808,33 +772,22 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					bits += 7;
 				}
 				while(bind_stream[i] & 0x80);
-				
-				//printf("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
-				
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
-				// NOTE: this is wrong, fortunately we don't use it
 				libraryOrdinal = immediate ? (SInt8)(BIND_OPCODE_MASK | immediate) : immediate;				
-				//printf("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
-				
 				break;
 				
 			case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
 				symboFlags = immediate;
 				symbolName = (char*)&bind_stream[++i];
 				i += strlen((char*)&bind_stream[i]);
-				//DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X", symbolName, symboFlags);
-				
+
 				symbolAddr = lookup_all_symbols(symbolName);
-				//DBG(", addr = 0x%X\n", symbolAddr);
 				break;
 				
 			case BIND_OPCODE_SET_TYPE_IMM:
-				// Set bind type (pointer, absolute32, pcrel32)
 				type = immediate;
-				//DBG("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
-				
 				break;
 				
 			case BIND_OPCODE_SET_ADDEND_SLEB:
@@ -848,8 +801,6 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				if(!(bind_stream[i-1] & 0x40)) addend *= -1;
-				
-				//DBG("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
@@ -906,10 +857,9 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else
 				{
-					printf("Unable to bind symbol %s, libraryOrdinal = %d, symboFlags = %d, type = %d\n", symbolName, libraryOrdinal, symboFlags, type);
+					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
-				
 				
 				segmentAddress += sizeof(void*);
 				break;
@@ -960,7 +910,6 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-				
 				tmp  = 0;
 				bits = 0;
 				do
@@ -996,10 +945,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					printf("Unable to bind symbol %s\n", symbolName);
 					getc();
 				}
-				
-				
 				break;
-				
 		}
 		i++;
 	}
@@ -1038,10 +984,6 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
 int replace_function(const char* symbol, void* newAddress)
 {
 	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
-	// TODO: look into using the next four bytes of the function instead
-	// Most functions should support this, as they probably will be at 
-	// least 10 bytes long, but you never know, this is sligtly safer as
-	// function can be as small as 6 bytes.
 	UInt32 addr = lookup_all_symbols(symbol);
 	
 	char* binary = (char*)addr;
@@ -1053,14 +995,9 @@ int replace_function(const char* symbol, void* newAddress)
 		*((UInt32*)binary) = (UInt32)jumpPointer;
 		
 		*jumpPointer = (UInt32)newAddress;
-		
 		return 1;
 	}
-	else 
-	{
-		return 0;
-	}
-	
+	return 0;
 }
 
 
@@ -1080,15 +1017,12 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 	{
 		// Loop through all callbacks for this module
 		callbackList_t* callbacks = hook->callbacks;
-		
+
 		while(callbacks)
 		{
-			//DBG("Executing '%s' callback at 0x%X.\n", name, callbacks->callback);
 			// Execute callback
 			callbacks->callback(arg1, arg2, arg3, arg4);
 			callbacks = callbacks->next;
-			//DBG("Hook '%s' callback executed, next is 0x%X.\n", name, callbacks);
-			
 		}
 		DBG("Hook '%s' executed.\n", name); DBGPAUSE();
 		return 1;

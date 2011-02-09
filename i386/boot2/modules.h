@@ -13,7 +13,7 @@
 
 #define MODULE_PATH		"/Extra/modules/"
 #define SYMBOLS_MODULE "Symbols.dylib"
-
+#define VOID_SYMBOL		"dyld_void_start"
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
 
