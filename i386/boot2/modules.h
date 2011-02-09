@@ -8,24 +8,11 @@
 #include <mach-o/nlist.h>
 
 
-// There is a bug with the module system / rebasing / binding
-// that causes static variables to be incorrectly rebased or bound
-// Disable static variables for the moment
-// #define static
-
 #ifndef __BOOT_MODULES_H
 #define __BOOT_MODULES_H
 
+#define MODULE_PATH		"/Extra/modules/"
 #define SYMBOLS_MODULE "Symbols.dylib"
-
-#define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
-#define STUB_ENTRY_SIZE	6
-
-#define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
-#define SECT_SYMBOL_STUBS			"__symbol_stub"
-
-
-#define VALID_FUNCTION(__x__)	(__x__ && (void*)__x__ != (void*)0xFFFFFFFF)
 
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
@@ -56,14 +43,8 @@ typedef struct moduleHook_t
 typedef struct modulesList_t
 {
 	char*					name;
-	UInt32					version;
-	UInt32					compat;
-	
-	void*					base_addr;
-
-	symbolList_t*			exported_symbols;
-	symbolList_t*			udefined_symbols;
-	//moduleHook_t*			defined_hooks;
+//	UInt32					version;
+//	UInt32					compat;
 	struct modulesList_t* next;
 } moduleList_t;
 

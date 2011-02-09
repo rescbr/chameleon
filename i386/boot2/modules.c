@@ -23,7 +23,7 @@
 unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
 
-void* symbols_module_start = (void*)0xFFFFFFFF;	// This will be modified post compile
+void* symbols_module_start = (void*)0xFFFFFFFF;	// TGlobal, value is populated by the makefile with actual address
 
 /** Internal symbols, however there are accessor methods **/
 moduleHook_t* moduleCallbacks = NULL;
@@ -39,45 +39,41 @@ unsigned int (*lookup_symbol)(const char*) = NULL;
  */
 int init_module_system()
 {
+	int retVal = 0;
 	void (*module_start)(void) = NULL;
 	char* module_data = symbols_module_start + BOOT2_ADDR;
     
 	// Intialize module system
-	if(symbols_module_start == (void*)0xFFFFFFFF)
+	if(symbols_module_start != (void*)0xFFFFFFFF)
 	{
-		return 0;	// Module system (Symbols.dylib) was not compiled in
-	}
-
-	module_start = parse_mach(module_data, &load_module, &add_symbol);
-	
-	if(module_start && module_start != (void*)0xFFFFFFFF)
-	{
-		// Notify the system that it was laoded
-		module_loaded(SYMBOLS_MODULE /*moduleName, moduleVersion, moduleCompat*/);
-
-		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
+		// Module system  was compiled in (Symbols.dylib addr known)
+		module_start = parse_mach(module_data, &load_module, &add_symbol);
 		
-		if((UInt32)lookup_symbol != 0xFFFFFFFF)
+		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
-			(*module_start)();	// Start the module
+			// Notify the system that it was laoded
+			module_loaded(SYMBOLS_MODULE /*moduleName, moduleVersion, moduleCompat*/);
+			
+			(*module_start)();	// Start the module. This will point to load_all_modules due to the way the dylib was constructed.
 			execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 			DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
-			return 1;
+			retVal = 1;
+
+		}
+		else
+		{
+			// The module does not have a valid start function
+			printf("Unable to start %s\n", SYMBOLS_MODULE); getc();
 		}		
 	}
-	else
-	{
-		// The module does not have a valid start function
-		printf("Unable to start %s\n", SYMBOLS_MODULE); getc();
-	}		
-	return 0;
+	return retVal;
 }
 
 
 /*
  * Load all modules in the /Extra/modules/ directory
  * Module depencdies will be loaded first
- * MOdules will only be loaded once. When loaded  a module must
+ * Modules will only be loaded once. When loaded  a module must
  * setup apropriete function calls and hooks as required.
  * NOTE: To ensure a module loads after another you may 
  * link one module with the other. For dyld to allow this, you must
@@ -113,27 +109,25 @@ void load_all_modules()
 
 /*
  * Load a module file in /Extra/modules
- * TODO: verify version number of module
  */
 int load_module(char* module)
 {
+	int retVal = 1;
 	void (*module_start)(void) = NULL;
+	char modString[128];
+	int fh = -1;
 
-	
 	// Check to see if the module has already been loaded
 	if(is_module_loaded(module))
 	{
 		return 1;
 	}
 	
-	char modString[128];
-	int fh = -1;
-	sprintf(modString, "/Extra/modules/%s", module);
+	sprintf(modString, MODULE_PATH "%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		printf("Unable to locate module %s\n", modString); DBGPAUSE();
-		getc();
+		printf("WARNING: Unable to locate module %s\n", modString); DBGPAUSE();
 		return 0;
 	}
 	
@@ -141,9 +135,6 @@ int load_module(char* module)
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
-
-		//DBG("Module %s read in.\n", modString);
-
 		// Module loaded into memory, parse it
 		module_start = parse_mach(module_base, &load_module, &add_symbol);
 
@@ -151,27 +142,27 @@ int load_module(char* module)
 		{
 			// Notify the system that it was laoded
 			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
-
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module); DBGPAUSE();
-			
-			//module_entry = malloc(sizeof(moduleList_t); TODO: mode to module_loaded
-							
 		}
-		else {
-			// The module does not have a valid start function
-			printf("Unable to start %s\n", module);
+#if DEBUG_MODULES
+		else // The module does not have a valid start function. This may be a library.
+		{
+			printf("WARNING: Unable to start %s\n", module);
 			getc();
-		}		
+		}
+#else
+		else msglog("WARNING: Unable to start %s\n", module);
+#endif
 	}
 	else
 	{
-		DBG("Unable to read in module %s\n.", module);
-		getc();
+		DBG("Unable to read in module %s\n.", module); DBGPAUSE();
+		retVal = 0;
 	}
-	close(fh);
 
-	return 1;
+	close(fh);
+	return retVal;
 }
 
 /*
@@ -189,26 +180,13 @@ long long add_symbol(char* symbol, long long addr, char is64)
 	symbolList_t* entry;
 	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
 	
-	if(!moduleSymbols)
-	{
-		moduleSymbols = entry = malloc(sizeof(symbolList_t));
-
-	}
-	else
-	{
-		entry = moduleSymbols;
-		while(entry->next)
-		{
-			entry = entry->next;
-		}
-		
-		entry->next = malloc(sizeof(symbolList_t));
-		entry = entry->next;
-	}
-
-	entry->next = NULL;
+	entry = malloc(sizeof(symbolList_t));
+	entry->next = moduleSymbols;
+	moduleSymbols = entry;
+	
 	entry->addr = (UInt32)addr;
 	entry->symbol = symbol;
+	
 	if(strcmp(symbol, "start") == 0)
 	{
 		return addr;
@@ -225,17 +203,14 @@ long long add_symbol(char* symbol, long long addr, char is64)
  */
 void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
-	// TODO: insert sorted
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
-
 	new_entry->next = loadedModules;
+
 	loadedModules = new_entry;
 	
 	new_entry->name = (char*)name;
-	new_entry->base_addr = NULL;		// TODO
-	// todo; symbols
-	new_entry->version = 0; //version;
-	new_entry->compat = 0; //compat;
+//	new_entry->version = version;
+//	new_entry->compat = compat;
 }
 
 int is_module_loaded(const char* name)
@@ -255,16 +230,17 @@ int is_module_loaded(const char* name)
 		}
 
 	}
+	
 	DBG("Module %s not found\n", name); DBGPAUSE();
-
 	return 0;
 }
 
-// Look for symbols using the Smbols moduel function.
-// If non are found, look through the list of module symbols
+/*
+ *	lookup symbols in all loaded modules. Thins inludes boot syms due to Symbols.dylib construction
+ *
+ */
 unsigned int lookup_all_symbols(const char* name)
 {
-	unsigned int addr = 0xFFFFFFFF;
 	symbolList_t* entry = moduleSymbols;
 	while(entry)
 	{
@@ -277,20 +253,8 @@ unsigned int lookup_all_symbols(const char* name)
 		{
 			entry = entry->next;
 		}
-
 	}
 	
-	if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
-	{
-		addr = lookup_symbol(name);
-		if(addr != 0xFFFFFFFF)
-		{
-			//DBG("Internal symbol %s located at 0x%X\n", name, addr);
-			return addr;
-		}
-	}
-	
-
 #if DEBUG_MODULES
 	verbose("Unable to locate symbol %s\n", name);
 	getc();

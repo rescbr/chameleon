@@ -8,7 +8,7 @@ DIR = KextPatcher
 
 MODULE_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
 
-OPTIM = -Os -Oz
+OPTIM = -O3
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_HELLO_WORLD=1
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
