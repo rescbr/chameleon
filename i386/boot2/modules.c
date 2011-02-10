@@ -23,7 +23,7 @@
 unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
 
-void* symbols_module_start = (void*)0xFFFFFFFF;	// TGlobal, value is populated by the makefile with actual address
+void* symbols_module_start = (void*)0xFFFFFFFF;	// Global, value is populated by the makefile with actual address
 
 /** Internal symbols, however there are accessor methods **/
 moduleHook_t* moduleCallbacks = NULL;
