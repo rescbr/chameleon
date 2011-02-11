@@ -1,6 +1,10 @@
+#	Makefile for i386 modules
 
-#	Makefile for i386 boot program
-#	define FLOPPY and SMALL using DEFINES macro as necessary
+# The order of building is important.
+SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller ACPIPatcher
+#SUBDIRS = klibc uClibc++ ACPIPatcher PCI HDAC
+#SUBDIRS = HelloWorld
+
 
 CFLAGS= -O $(MORECPP) -arch i386 -g -static
 DEFINES=
@@ -18,16 +22,13 @@ LD = ld
 #
 # these paths are only valid in subdirectories of this directory
 #
-OBJROOT=`pwd`/../../obj/i386/modules/
-SYMROOT=`pwd`/../../sym/i386/modules/
-DSTROOT=`pwd`/../../dst/i386/modules/
+OBJROOT=`pwd`/../../obj/i386/
+SYMROOT=`pwd`/../../sym/i386/
+DSTROOT=`pwd`/../../dst/i386/
 SRCROOT=/tmp
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-# The order of building is important.
-SUBDIRS = klibc uClibc++ Resolution KernelPatcher GUI KextPatcher GraphicsEnabler HPET USBFix Memory Networking NetbookInstaller ACPIPatcher
-#SUBDIRS = HelloWorld
 
 all embedtheme optionrom tags debug install installhdrs: objroot_dirs lazydylib1.o
 	@for i in ${SUBDIRS}; \
@@ -46,10 +47,12 @@ all embedtheme optionrom tags debug install installhdrs: objroot_dirs lazydylib1
 	done
 
 objroot_dirs:
-	@rm -rf $(OBJROOT) 
-	@mkdir $(OBJROOT) &> /dev/null
+	@rm -rf "$(OBJROOT)" 
+	@mkdir "$(OBJROOT)" &> /dev/null
 	@rm -rf module_includes
 	@mkdir module_includes
+	@rm -rf "$(SYMROOT)/modules/"
+	@mkdir "$(SYMROOT)/modules/"
 
 
 %.o: %.c

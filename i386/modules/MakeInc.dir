@@ -1,9 +1,9 @@
 include ../../MakePaths.dir
 include ../../MakeInc.dir
 
-OBJROOT=../../../obj/i386/modules/$(DIR)
-SYMROOT=../../../sym/i386/modules/
-DSTROOT=../../../dst/i386/modules/
+OBJROOT=../../../obj/i386/$(DIR)
+SYMROOT=../../../sym/i386/
+DSTROOT=../../../dst/i386/
 
 
 UTILDIR = ../../util
@@ -11,7 +11,7 @@ LIBSADIR = ../../libsa
 LIBSAIODIR = ../../libsaio
 BOOT2DIR = ../../boot2
 
-MODULE_DEPENDENCIES := $(foreach x,$(MODULE_DEPENDENCIES),-weak_library $(SYMROOT)/$(x).dylib)
+MODULE_DEPENDENCIES := $(foreach x,$(MODULE_DEPENDENCIES),-weak_library $(SYMROOT)/modules/$(x).dylib)
 
 
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
@@ -36,7 +36,7 @@ dylib_final:
 	-weak_library $(OBJROOT)/../../boot2/Symbols_LINKER_ONLY.dylib \
 	$(MODULE_DEPENDENCIES) \
 	-macosx_version_min 10.6 \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
+	-o $(SYMROOT)/modules/$(MODULE_NAME).dylib
 	
 	@cp -rf include/* ../module_includes/ &> /dev/null || true
 	
