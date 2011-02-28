@@ -377,6 +377,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68D8,	0x5730174B,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",				kNull		},
 	{ 0x68D8,	0x21D91458,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
 	{ 0x68D8,	0x03561043,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
+	{ 0x68D8,	0xE151174B,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
 	{ 0x68D9,	0x301017AF,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
 	{ 0x68DA,	0x301017AF,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
 	{ 0x68DA,	0x30001787,	CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
@@ -1066,6 +1067,9 @@ static bool init_card(pci_dt_t *pci_dev)
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
 
+	verbose("Framebuffer @0x%08X  MMIO @0x%08X  I/O Port @0x%08X ROM Addr @0x%08X\n", 
+		card->fb, card->mmio, card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
+
 	card->posted	= radeon_card_posted();
 	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
 	
@@ -1103,8 +1107,8 @@ static bool init_card(pci_dt_t *pci_dev)
 	else
 	{
 		for (i = 0; i < kCfgEnd; i++)
-			if (strcmp(fb_name, card_configs[card->info->cfg_name].name) == 0)
-				card->ports = card_configs[card->info->cfg_name].ports;
+			if (strcmp(fb_name, card_configs[i].name) == 0)
+				card->ports = card_configs[i].ports;
 	}
 
 	sprintf(name, "ATY,%s", fb_name);
