@@ -32,7 +32,7 @@
 
 bool useGUI;
 
-void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4);
+//void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4);
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 void GUI_ModulesLoaded_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
@@ -83,7 +83,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 		// Note: shouldn't be needed, but just in case
 		drawBootGraphics();
 	}
-	else
+	else if(!useGUI)
 	{
 		setVideoMode( GRAPHICS_MODE, 0 );  //Slice - Why GRAPHICS_MODE if gVerboseMode?
 //		DBG("GUI set GRAPHICS_MODE\n");
@@ -96,7 +96,7 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4)
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	// Turn off any GUI elements
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( useGUI )
 	{
 		gui.devicelist.draw = false;
 		gui.bootprompt.draw = false;
@@ -110,7 +110,7 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		{
 			// Disable outputs, they will still show in the boot log.
 			replace_function("_printf", &GUI_verbose);
-			drawBootGraphics();
+//			drawBootGraphics();
 		}
 		
 	}
@@ -127,7 +127,7 @@ void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
-	if (useGUI)
+	else if(useGUI)
 	{
 		replace_function("_initGraphicsMode", &GUI_initGraphicsMode);
 		replace_function("_getBootOptions", &GUI_getBootOptions);
@@ -138,6 +138,10 @@ void GUI_ModulesLoaded_hook(void* kernelEntry, void* arg2, void* arg3, void* arg
 		replace_function("_verbose", &GUI_verbose);
 		replace_function("_error", &GUI_error);
 		replace_function("_stop", &GUI_stop);		
+		
+		setVideoMode( GRAPHICS_MODE, 0 );
+		drawBackground();
+	
 	}
 //	DBG("GUI loaded\n");
 }
@@ -251,13 +255,13 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 						addBootArg(kIgnoreCachesFlag);
 						break;
 						
-						
+/*						
 					case BOOT_SAFEMODE:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
 						addBootArg(kSafeModeFlag);
 						break;
-						
+*/						
 						
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
@@ -744,7 +748,7 @@ int GUI_getBootOptions(bool firstRun)
 		// Associate a menu item for each BVRef.
 		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next)
 		{
-			DBG("GUI menu for device %d\n", bvr->biosdev);
+//			DBG("GUI menu for device %d\n", bvr->biosdev);
 			if (bvr->visible)
 			{
 				getBootVolumeDescription(bvr, menuItems[i].name, sizeof(menuItems[i].name) - 1, true);

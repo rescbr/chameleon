@@ -764,10 +764,10 @@ int initGUI(void)
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 		msglog("GUI default screen width=%d height=%d\n",screen_params[0], screen_params[1]);				
 	}	
-	if (((int)screen_params[0]>1280) || ((int)screen_params[1]>1024))
+	if (((int)screen_params[0]>4000) || ((int)screen_params[1]>4000))
 	{
-		screen_params[0] = 1280;
-		screen_params[1] = 1024;
+		screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 		msglog("GUI MAX VESA screen width=%d height=%d\n",screen_params[0], screen_params[1]);						
 	}
 	screen_params[2] = 32;

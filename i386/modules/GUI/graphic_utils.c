@@ -77,7 +77,7 @@ printVBEModeInfo()
     clearScreenRows(0, 24);
     setCursorPosition( 0, 0, 1 );
 	
-	verbose("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
+	printf("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
 	
 	// Loop through the mode list, and find the matching mode.
 	
@@ -93,7 +93,7 @@ printVBEModeInfo()
             continue;
         }
 		
-        verbose("Mode %x: %dx%dx%d mm:%d attr:%x\n",
+        printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
                *modePtr, modeInfo.XResolution, modeInfo.YResolution,
                modeInfo.BitsPerPixel, modeInfo.MemoryModel,
                modeInfo.ModeAttributes);

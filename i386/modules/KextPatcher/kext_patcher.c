@@ -222,7 +222,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 		zlib_result = inflateInit(&zstream);
 		if (Z_OK != zlib_result)
 		{
-			verbose("ZLIB Error: %s\n", zstream.msg);
+			printf("ZLIB Error: %s\n", zstream.msg);
 			getc();
 		}
 		else 
@@ -318,7 +318,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg3)
 				
 				
 				
-				// re alder32 the new mkext2 package
+				// re adler32 the new mkext2 package
 				MKEXT_HDR_CAST(package)->adler32 = 
 					MKEXT_SWAP(Adler32((unsigned char *)&package->version,
 											 MKEXT_GET_LENGTH(package) - 0x10));
@@ -448,7 +448,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 	TagPtr match_class =XMLCastArray(XMLGetProperty(personality, (const char*)"IOPCIClassMatch"));
 	
 	
-	char* new_str = malloc(strlen("0xXXXX000&0xFFFE0000")+1);
+	char* new_str = malloc(sizeof("0xXXXX000&0xFFFE0000"));
 	sprintf(new_str, "0x04030000&amp;0xFFFE0000"); // todo, pass in actual class id
 	
 	
@@ -566,12 +566,12 @@ bool patch_hda_kext(TagPtr plist, char* plistbuffer, void* start)
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
 		DBG("Buffer FULL: deflated result is %d, avail: %d bytes, out: %d bytes, full: %d\n", zlib_result, compressed_size, zstream.total_out, full_size);
-		verbose("Unable to patch AppleHDA\n");
+		printf("Unable to patch AppleHDA\n");
 		
 	} 
 	else if (zlib_result != Z_STREAM_ERROR)
 	{
-		verbose("AppleHDA: ZLIB Deflate Error: %s\n", zstream.msg);
+		printf("AppleHDA: ZLIB Deflate Error: %s\n", zstream.msg);
 		getc();
 	}
 	
@@ -594,7 +594,7 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 	TagPtr match_names =XMLCastArray(XMLGetProperty(personality, (const char*)"IONameMatch"));
 
 	
-	char* new_str = malloc(strlen("pci14e4,xxxx")+1);
+	char* new_str = malloc(sizeof("pci14e4,xxxx"));
 	sprintf(new_str, "pci14e4,%02x", patch_bcm_deviceid);
 
 	// Check to see if we *really* need to modify the plist, if not, return false
@@ -672,7 +672,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	
 	DBG("Inflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
 	
-	char* newstring = malloc(strlen("0x00008086") + 1);
+	char* newstring = malloc(sizeof("0x00008086"));
 	sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
 
 	
@@ -783,8 +783,8 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	{
 		/* deflate filled output buffer, meaning the data doesn't compress.
 		 */
-		verbose("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
-		verbose("ERROR: Unable to compress patched kext, not enough room.\n");
+		printf("Deflated result is %d, in: %d bytes, out: %d bytes, full: %d\n", zlib_result, zstream.total_in, zstream.total_out, full_size);
+		printf("ERROR: Unable to compress patched kext, not enough room.\n");
 		pause();
 		
 	} 

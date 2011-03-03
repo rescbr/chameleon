@@ -2,7 +2,7 @@ MODULE_NAME = GUI
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
-MODULE_DEPENDENCIES = 
+MODULE_DEPENDENCIES = Resolution
 
 DIR = GUI
 
@@ -38,7 +38,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: dylib
+all optionrom: dylib
 
 embedtheme: CFLAGS += -DEMBED_THEME
 embedtheme: art.h all

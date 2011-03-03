@@ -205,13 +205,14 @@ int ExecKernel(void *binary)
 		
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
 
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE || gVerboseMode)
 	{
-		setVideoMode( GRAPHICS_MODE, 0 );
+//		setVideoMode( GRAPHICS_MODE, 0 );
 		// Draw gray screen. NOTE: no boot image, that's in the gui module
 #ifndef OPTION_ROM
 		if(!gVerboseMode) drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); //Slice -???
 #endif
+		setVideoMode( GRAPHICS_MODE, 0 );
 	}
 
 	
@@ -521,7 +522,7 @@ void common_boot(int biosdev)
         if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig) == true) {
             strlcpy(gBootKernelCacheFile, val, len+1);
         } else {
-			if(gMacOSVersion[3] == '6') {
+			if(gMacOSVersion[3] >= '6') {
 				sprintf(gBootKernelCacheFile, "kernelcache_%s", /*kDefaultCachePathSnow,*/ (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64"); //, adler32);
 				msglog("search for kernelcache %s\n", gBootKernelCacheFile);
 				int lnam = sizeof(gBootKernelCacheFile) + 9; //with adler32
@@ -700,7 +701,7 @@ static bool getOSVersion(char *str)
 //	config_file_t systemVersion;
 	const char *val;
 	int len;
-	msglog("Address loadConfigFile=%x  bootInfo=%x\n", &loadConfigFile, &bootInfo);
+//	msglog("Address loadConfigFile=%x  bootInfo=%x\n", &loadConfigFile, &bootInfo);
 	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		valid = true;

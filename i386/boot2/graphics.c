@@ -739,7 +739,7 @@ setVideoMode( int mode, int drawgraphics)
 				//video_mode(1);
 			}
 		}
-		else video_mode(1);
+//		else video_mode(1);
     }
 	
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )

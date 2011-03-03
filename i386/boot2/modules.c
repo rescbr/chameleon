@@ -87,7 +87,7 @@ int init_module_system()
 /*
  * Load all modules in the /Extra/modules/ directory
  * Module depencdies will be loaded first
- * MOdules will only be loaded once. When loaded  a module must
+ * Modules will only be loaded once. When loaded  a module must
  * setup apropriete function calls and hooks as required.
  * NOTE: To ensure a module loads after another you may 
  * link one module with the other. For dyld to allow this, you must
@@ -341,6 +341,9 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
 	
+	textSection = 0;
+	textAddress = 0;	// reinitialize text location in case it doesn't exist;
+	
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
@@ -557,11 +560,11 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		{
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
-			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, textAddress ? (long long)base + symbolEntry->n_value : symbolEntry->n_value, is64) != 0xFFFFFFFF)
 			{
 				
 				// Module start located. Start is an alias so don't register it
-				module_start = base + symbolEntry->n_value;
+				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
 			
 			symbolEntry++;
@@ -578,11 +581,11 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
-			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64) != 0xFFFFFFFF)
+			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, textAddress ? (long long)base + symbolEntry->n_value : symbolEntry->n_value, is64) != 0xFFFFFFFF)
 			{
 				
 				// Module start located. Start is an alias so don't register it
-				module_start = base + symbolEntry->n_value;
+				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
 			
 			symbolEntry++;
@@ -624,8 +627,11 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 		switch(opcode)
 		{
 			case REBASE_OPCODE_DONE:
-				// Rebase complete.
-				//done = 1;
+				// Rebase complete, reset vars
+				immediate = 0;
+				opcode = 0;
+				type = 0;
+				segmentAddress = 0;
 			default:
 				break;
 				
@@ -1095,13 +1101,9 @@ int replace_function(const char* symbol, void* newAddress)
 		
 		return 1;
 	}
-	else 
-	{
 		return 0;
-	}
-	
 }
-
+	
 
 /*
  *	execute_hook(  const char* name )
