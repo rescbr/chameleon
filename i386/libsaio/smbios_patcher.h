@@ -18,8 +18,8 @@
 #define SMBIOS_RANGE_START      0x000F0000
 #define SMBIOS_RANGE_END        0x000FFFFF
 
-#define SMBIOS_ORIGINAL		0
-#define SMBIOS_PATCHED		1
+#define SMBIOS_ORIGINAL			0
+#define SMBIOS_PATCHED			1
 
 struct smbios_table_header 
 {

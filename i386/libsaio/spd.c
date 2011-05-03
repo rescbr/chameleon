@@ -26,35 +26,35 @@
 
 static const char *spd_memory_types[] =
 {
-	"RAM",          /* 00h  Undefined */
-	"FPM",          /* 01h  FPM */
-	"EDO",          /* 02h  EDO */
-	"",				/* 03h  PIPELINE NIBBLE */
-	"SDRAM",        /* 04h  SDRAM */
-	"",				/* 05h  MULTIPLEXED ROM */
-	"DDR SGRAM",	/* 06h  SGRAM DDR */
-	"DDR SDRAM",	/* 07h  SDRAM DDR */
-	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
-	"",				/* 09h  Undefined */
-	"",				/* 0Ah  Undefined */
-	"DDR3 SDRAM"   /* 0Bh  SDRAM DDR 3 */
+	"RAM",					/* 00h  Undefined */
+	"FPM",					/* 01h  FPM */
+	"EDO",					/* 02h  EDO */
+	"",						/* 03h  PIPELINE NIBBLE */
+	"SDRAM",				/* 04h  SDRAM */
+	"",						/* 05h  MULTIPLEXED ROM */
+	"DDR SGRAM",			/* 06h  SGRAM DDR */
+	"DDR SDRAM",			/* 07h  SDRAM DDR */
+	"DDR2 SDRAM",			/* 08h  SDRAM DDR 2 */
+	"",						/* 09h  Undefined */
+	"",						/* 0Ah  Undefined */
+	"DDR3 SDRAM"			/* 0Bh  SDRAM DDR 3 */
 };
 
 #define UNKNOWN_MEM_TYPE 2
 static uint8_t spd_mem_to_smbios[] =
 {
-	UNKNOWN_MEM_TYPE,          /* 00h  Undefined */
-	UNKNOWN_MEM_TYPE,          /* 01h  FPM */
-	UNKNOWN_MEM_TYPE,          /* 02h  EDO */
-	UNKNOWN_MEM_TYPE,	   /* 03h  PIPELINE NIBBLE */
-	SMB_MEM_TYPE_SDRAM,        /* 04h  SDRAM */
-	SMB_MEM_TYPE_ROM,	   /* 05h  MULTIPLEXED ROM */
-	SMB_MEM_TYPE_SGRAM,        /* 06h  SGRAM DDR */
-	SMB_MEM_TYPE_DDR,          /* 07h  SDRAM DDR */
-	SMB_MEM_TYPE_DDR2,         /* 08h  SDRAM DDR 2 */
-	UNKNOWN_MEM_TYPE,  	   /* 09h  Undefined */
-	UNKNOWN_MEM_TYPE,	   /* 0Ah  Undefined */
-	SMB_MEM_TYPE_DDR3          /* 0Bh  SDRAM DDR 3 */
+	UNKNOWN_MEM_TYPE,		/* 00h  Undefined */
+	UNKNOWN_MEM_TYPE,		/* 01h  FPM */
+	UNKNOWN_MEM_TYPE,		/* 02h  EDO */
+	UNKNOWN_MEM_TYPE,		/* 03h  PIPELINE NIBBLE */
+	SMB_MEM_TYPE_SDRAM,		/* 04h  SDRAM */
+	SMB_MEM_TYPE_ROM,		/* 05h  MULTIPLEXED ROM */
+	SMB_MEM_TYPE_SGRAM,		/* 06h  SGRAM DDR */
+	SMB_MEM_TYPE_DDR,		/* 07h  SDRAM DDR */
+	SMB_MEM_TYPE_DDR2,		/* 08h  SDRAM DDR 2 */
+	UNKNOWN_MEM_TYPE,		/* 09h  Undefined */
+	UNKNOWN_MEM_TYPE,		/* 0Ah  Undefined */
+	SMB_MEM_TYPE_DDR3		/* 0Bh  SDRAM DDR 3 */
 };
 #define SPD_TO_SMBIOS_SIZE (sizeof(spd_mem_to_smbios)/sizeof(uint8_t))
 
@@ -344,18 +344,19 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
 static struct smbus_controllers_t smbus_controllers[] = {
 
-	{0x8086, 0x269B, "ESB2",    read_smb_intel },
-	{0x8086, 0x25A4, "6300ESB", read_smb_intel },
-	{0x8086, 0x24C3, "ICH4",    read_smb_intel },
-	{0x8086, 0x24D3, "ICH5",    read_smb_intel },
-	{0x8086, 0x266A, "ICH6",    read_smb_intel },
-	{0x8086, 0x27DA, "ICH7",    read_smb_intel },
-	{0x8086, 0x283E, "ICH8",    read_smb_intel },
-	{0x8086, 0x2930, "ICH9",    read_smb_intel },	
-	{0x8086, 0x3A30, "ICH10R",  read_smb_intel },
-	{0x8086, 0x3A60, "ICH10B",  read_smb_intel },
-	{0x8086, 0x3B30, "P55",     read_smb_intel },
-	{0x8086, 0x5032, "EP80579", read_smb_intel }
+	{0x8086, 0x269B, "ESB2",     read_smb_intel },
+	{0x8086, 0x25A4, "6300ESB",  read_smb_intel },
+	{0x8086, 0x24C3, "ICH4",     read_smb_intel },
+	{0x8086, 0x24D3, "ICH5",     read_smb_intel },
+	{0x8086, 0x266A, "ICH6",     read_smb_intel },
+	{0x8086, 0x27DA, "ICH7",     read_smb_intel },
+	{0x8086, 0x283E, "ICH8",     read_smb_intel },
+	{0x8086, 0x2930, "ICH9",     read_smb_intel },	
+	{0x8086, 0x3A30, "ICH10R",   read_smb_intel },
+	{0x8086, 0x3A60, "ICH10B",   read_smb_intel },
+	{0x8086, 0x3B30, "5 Series", read_smb_intel },
+	{0x8086, 0x1C22, "6 Series", read_smb_intel },
+	{0x8086, 0x5032, "EP80579",  read_smb_intel }
 
 };
 

@@ -27,6 +27,15 @@ typedef struct pci_dt_t {
 
 	uint16_t	vendor_id;
 	uint16_t	device_id;
+	
+	union {
+		struct {
+			uint16_t	vendor_id;
+			uint16_t	device_id;
+		} subsys;
+		uint32_t	subsys_id;
+	} subsys_id;
+	
 	uint16_t	class_id;	
 
 	struct pci_dt_t	*parent;
@@ -50,12 +59,26 @@ extern void		build_pci_dt(void);
 extern void		dump_pci_dt(pci_dt_t *);
 
 //-----------------------------------------------------------------------------
+// added by Kabyl, name changed to follow trunk naming scheme
+
+/* Option ROM header */
+typedef struct {
+	uint16_t	signature;		// 0xAA55
+	uint8_t		rom_size;
+	uint32_t	entry_point;
+	uint8_t		reserved[15];
+	uint16_t	pci_header_offset;
+	uint16_t	expansion_header_offset;
+} pci_rom_header_t;
+
+
+//-----------------------------------------------------------------------------
 // added by iNDi
 
 struct pci_rom_pci_header_t {
 	uint32_t	signature;			// 0x50434952 'PCIR'
-	uint16_t	vendor;
-	uint16_t	device;
+	uint16_t	vendor_id;
+	uint16_t	device_id;
 	uint16_t	product;
 	uint16_t	length;
 	uint8_t		revision;			// 0 = PCI 2.1

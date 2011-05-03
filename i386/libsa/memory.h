@@ -48,19 +48,19 @@
 # define BASE_SEG          BOOT2_SEG
 #endif
 
-#define STACK_SEG         0x1000			// zef: old STACK_SEG 0x5000
-#define STACK_OFS         0xFFF0      // stack pointer
+#define STACK_SEG         0x1000		// zef: old STACK_SEG 0x5000
+#define STACK_OFS         0xFFF0		// stack pointer
 
 #define BOOT1U_SEG        0x1000
 #define BOOT1U_OFS        0x0200
 
 #define BOOT2_SEG         0x2000
-#define BOOT2_OFS         0x0200      // 512 byte disk sector offset
+#define BOOT2_OFS         0x0200		// 512 byte disk sector offset
 
-#define BIOS_ADDR         0x8000      // BIOS disk I/O buffer
-#define BIOS_LEN          0x8000      // 32K - divisible by 512 and 2048
+#define BIOS_ADDR         0x8000		// BIOS disk I/O buffer
+#define BIOS_LEN          0x8000		// 32K - divisible by 512 and 2048
 
-#define BOOT0_ADDR        0x7E00      // boot0 gets loaded here
+#define BOOT0_ADDR        0x7E00		// boot0 gets loaded here
 
 
 /* These are all "virtual" addresses...
@@ -70,7 +70,7 @@
 
 #define MEMBASE           0x0
 
-#define BOOTSTRUCT_ADDR   0x00011000    // it's slightly smaller
+#define BOOTSTRUCT_ADDR   0x00011000	// it's slightly smaller
 #define BOOTSTRUCT_LEN    0x0000F000
 
 #define BASE_ADDR         ADDR32(BASE_SEG, 0)
@@ -78,33 +78,33 @@
 #define BOOT2_ADDR        ADDR32(BOOT2_SEG, BOOT2_OFS)
 // TODO: BOOT_ADDR ?
 
-#define HIB_ADDR          0x00040000  // special hibernation area
+#define HIB_ADDR          0x00040000	// special hibernation area
 #define HIB_LEN           0x00060000
 
-#define VIDEO_ADDR        0x000A0000  // unusable space
+#define VIDEO_ADDR        0x000A0000	// unusable space
 #define VIDEO_LEN         0x00060000
 
-#define KERNEL_ADDR       0x00100000  // 128M kernel + drivers
+#define KERNEL_ADDR       0x00100000	// 128M kernel + drivers
 #define KERNEL_LEN        0x08000000
 
-#define ZALLOC_ADDR       0x08100000  // 256M zalloc area
+#define ZALLOC_ADDR       0x08100000	// 256M zalloc area
 #define ZALLOC_LEN        0x10000000
 
-#define LOAD_ADDR         0x18100000  // 64M File load buffer
+#define LOAD_ADDR         0x18100000	// 64M File load buffer
 #define LOAD_LEN          0x04000000
 
 // Location of data fed to boot2 by the prebooter
-#define PREBOOT_DATA      0x1C100000  // Still have enough room for a 63M ramdisk image
-                                      // in case of 512MB system memory.
+#define PREBOOT_DATA      0x1C100000	// Still have enough room for a 63M ramdisk image
+										// in case of 512MB system memory.
 
-#define TFTP_ADDR         LOAD_ADDR   // tftp download buffer
+#define TFTP_ADDR         LOAD_ADDR		// tftp download buffer
 #define TFTP_LEN          LOAD_LEN
 
 #define kLoadAddr         LOAD_ADDR
 #define kLoadSize         LOAD_LEN
 
-#define CONVENTIONAL_LEN  0x0A0000    // 640k
-#define EXTENDED_ADDR     0x100000    // 1024k
+#define CONVENTIONAL_LEN  0x0A0000		// 640k
+#define EXTENDED_ADDR     0x100000		// 1024k
 
 #define ptov(paddr)       ((paddr) - MEMBASE)
 #define vtop(vaddr)       ((vaddr) + MEMBASE)

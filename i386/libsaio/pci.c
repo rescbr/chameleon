@@ -87,6 +87,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			new->dev.addr	= pci_addr;
 			new->vendor_id	= id & 0xffff;
 			new->device_id	= (id >> 16) & 0xffff;
+			new->subsys_id.subsys_id = pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
 			new->class_id	= pci_config_read16(pci_addr, PCI_CLASS_DEVICE);
 			new->parent	= start;
 
@@ -176,9 +177,10 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 
 	current = pci_dt;
 	while (current) {
-		printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
+		printf("%02x:%02x.%x [%04x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
 			current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
 			current->class_id, current->vendor_id, current->device_id, 
+			current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id, 
 			get_pci_dev_path(current));
 		dump_pci_dt(current->children);
 		current = current->next;
