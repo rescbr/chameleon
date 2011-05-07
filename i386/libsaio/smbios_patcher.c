@@ -30,7 +30,7 @@ typedef struct {
 // defaults for a MacBook
 static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"MB41.88Z.0073.B00.0809221748"	},
+	{"SMbiosversion",		"MB41.88Z.00C1.B00.0802091535"	},
 	{"SMbiosdate",			"04/01/2008"					},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacBook4,1"					},
@@ -38,14 +38,14 @@ static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacBook"						},
 	{"SMboardmanufacter",	"Apple Inc."					},
-	{"SMboardproduct",		"Mac-F42D89C8"					},
+	{"SMboardproduct",		"Mac-F22788A9"					},
 	{ "",""	}
 };
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"MBP41.88Z.0073.B00.0809221748"	},
+	{"SMbiosversion",		"MBP41.88Z.00C1.B03.0802271651"	},
 	{"SMbiosdate",			"04/01/2008"					},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacBookPro4,1"					},
@@ -53,7 +53,7 @@ static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMserial",			"SOMESRLNMBR"					},
 	{"SMfamily",			"MacBookPro"					},
 	{"SMboardmanufacter",	"Apple Inc."					},
-	{"SMboardproduct",		"Mac-F42D89C8"					},
+	{"SMboardproduct",		"Mac-F42C89C8"					},
 	{ "",""	}
 };
 
@@ -120,7 +120,7 @@ static const SMStrEntryPair const sm_macpro_defaults[]={
 // defaults for a Mac Pro 4,1 Core i7/Xeon
 static const SMStrEntryPair const sm_macpro_core_defaults[]={
 	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP41.88Z.0081.B04.0903051113"	},
+	{"SMbiosversion",		"MP41.88Z.0081.B07.0903051113"	},
 	{"SMbiosdate",			"11/06/2009"					},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"MacPro4,1"						},
