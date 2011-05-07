@@ -33,7 +33,7 @@ typedef enum {
 	CHIP_FAMILY_RS600,
 	CHIP_FAMILY_RS690,
 	CHIP_FAMILY_RS740,
-	CHIP_FAMILY_R600,	/* r600 */
+	CHIP_FAMILY_R600,		/* R600 */
 	CHIP_FAMILY_RV610,
 	CHIP_FAMILY_RV630,
 	CHIP_FAMILY_RV670,
@@ -41,17 +41,19 @@ typedef enum {
 	CHIP_FAMILY_RV635,
 	CHIP_FAMILY_RS780,
 	CHIP_FAMILY_RS880,
-	CHIP_FAMILY_RV770,   /* r700 */
+	CHIP_FAMILY_RV770,		/* R700 */
 	CHIP_FAMILY_RV730,
 	CHIP_FAMILY_RV710,
 	CHIP_FAMILY_RV740,
-	CHIP_FAMILY_CEDAR,   /* evergreen */
+	CHIP_FAMILY_CEDAR,		/* Evergreen */
 	CHIP_FAMILY_REDWOOD,
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_CYPRESS,
 	CHIP_FAMILY_HEMLOCK,
-	CHIP_FAMILY_BARTS,
+	CHIP_FAMILY_BARTS,		/* Northern Islands */
+	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
+	CHIP_FAMILY_TURKS,
 	CHIP_FAMILY_LAST
 } chip_family_t;
 
@@ -60,7 +62,7 @@ static const char *chip_family_name[] = {
 	"RS600",
 	"RS690",
 	"RS740",
-	/* r600 */
+	/* R600 */
 	"R600",
 	"RV610",
 	"RV630",
@@ -69,19 +71,22 @@ static const char *chip_family_name[] = {
 	"RV635",
 	"RS780",
 	"RS880",
-	/* r700 */
+	/* R700 */
 	"RV770",
 	"RV730",
 	"RV710",
 	"RV740",
-	/* evergreen */
+	/* Evergreen */
 	"Cedar",	// RV810
 	"Redwood",	// RV830
 	"Juniper",	// RV840
 	"Cypress",	// RV870
 	"Hemlock",
+	/* Northern Islands */
 	"Barts",
-	"Cayman",
+	"Caicos",
+	"Cayman".
+	"Turks"
 };
 
 typedef struct {
@@ -286,7 +291,6 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x94C3,	0x22471787,	CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 LE",			kNull		},
 	{ 0x94C3,	0x01011A93,	CHIP_FAMILY_RV610,		"Qimonda Radeon HD 2400 PRO",		kNull		},
 
-
 	{ 0x9501,	0x30001002,	CHIP_FAMILY_RV670,		"ATI Radeon HD 3690",				kNull		},
 	{ 0x9501,	0x25421002,	CHIP_FAMILY_RV670,		"ATI Radeon HD 3870",				kNull		},
 	{ 0x9501,	0x4750174B,	CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",				kNull		},
@@ -427,14 +431,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x5490174B,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x5530174B,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
 	
-	/* Barts */
-	{ 0x6738,	0x67381002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
-	{ 0x6739,	0x67391002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850 Series",		kDuckweed	},
-	
-	/* Cayman */
+	/* Northen Islands */
 	{ 0x6718,	0x0B001002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kBulrushes	},
 	{ 0x6718,	0x31301682,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kBulrushes	},
 	{ 0x6718,	0x67181002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kBulrushes	},
+	{ 0x6738,	0x67381002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
+	{ 0x6739,	0x67391002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850 Series",		kDuckweed	},
 	
 	/* standard/default models */
 	{ 0x9400,	0x00000000,	CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
@@ -485,6 +487,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9714,	0x00000000,	CHIP_FAMILY_RS880,		"ATI Radeon HD 4290",				kNull		},
 	
 	{ 0x6718,	0x00000000,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6900 Series",		kBulrushes	},
+
+	{ 0x6758,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",				kNull		},
+	{ 0x6759,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
+
+	{ 0x6770,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
+	{ 0x6779,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kNull		},
 	
 	{ 0x68F9,	0x00000000,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5400 Series",		kNull		},
 	
