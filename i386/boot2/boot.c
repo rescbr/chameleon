@@ -94,7 +94,9 @@ static bool gUnloadPXEOnExit = false;
 /*
  * Default path to kernel cache file
  */
-#define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/kernelcache"
+//Slice - first one for Leopard
+#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
 //==========================================================================
 // Zero the BSS.
@@ -195,12 +197,24 @@ static int ExecKernel(void *binary)
 	
 	setupBooterLog();
 	
-    finalizeBootStruct();
-    
-    // Jump to kernel's entry point. There's no going back now.
-
-    startprog( kernelEntry, bootArgs );
-
+	finalizeBootStruct();
+	
+	if (checkOSVersion("10.7")) {
+		
+		// Masking out so that Lion doesn't doublefault
+		outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
+		outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
+		
+		// Jump to kernel's entry point. There's no going back now.
+		
+		startprog( kernelEntry, bootArgs );
+	}
+	else {
+		// Jump to kernel's entry point. There's no going back now.
+		
+		startprog( kernelEntry, bootArgsPreLion );
+	}
+	
     // Not reached
 
     return 0;
@@ -462,7 +476,35 @@ void common_boot(int biosdev)
         if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig)) {
             strlcpy(gBootKernelCacheFile, val, len+1);
         } else {
-            sprintf(gBootKernelCacheFile, "%s.%08lX", kDefaultCachePath, adler32);
+			//Lion
+			if (checkOSVersion("10.7")) {
+				sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
+			}
+			// Snow Leopard
+			else if (checkOSVersion("10.6")) {
+				sprintf(gBootKernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64"); //, adler32);
+				int lnam = sizeof(gBootKernelCacheFile) + 9; //with adler32
+				//Slice - TODO
+				/*
+				 - but the name is longer .adler32 and more...
+				 kernelcache_i386.E102928C.qSs0
+				 so will opendir and scan for some files
+				 */ 
+				char* name;
+				long prev_time = 0;
+				
+				struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
+				
+				while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
+				{
+					if(((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time && strstr(name, gBootKernelCacheFile) && (name[lnam] != '.'))
+					{
+						sprintf(gBootKernelCacheFile, "%s%s", kDefaultCachePathSnow, name);
+						prev_time = time;
+					}
+				}
+			}
+			else sprintf(gBootKernelCacheFile, "%s.%08lX", kDefaultCachePathLeo, adler32);
         }
 
         // Check for cache file.
@@ -502,17 +544,30 @@ void common_boot(int biosdev)
                 break;
             }
         } while (0);
-
+		
+		if (getValueForKey("-usecache", &val, &len, &bootInfo->bootConfig)) 
+			trycache=1;
+		
         do {
             if (trycache) {
                 bootFile = gBootKernelCacheFile;
+				
                 verbose("Loading kernel cache %s\n", bootFile);
-                ret = LoadFile(bootFile);
-                binary = (void *)kLoadAddr;
-                if (ret >= 0) {
+				
+                if (checkOSVersion("10.7")) {
+                    ret = LoadThinFatFile(bootFile, &binary);
+				}
+				else {
+                	ret = LoadFile(bootFile);
+					binary = (void *)kLoadAddr;
+				}
+				
+                if (ret >= 0)
                     break;
-                }
+				
+				verbose("Kernel cache did not loaded %s\n ", bootFile);
             }
+			
             bootFile = bootInfo->bootFile;
 
             // Try to load kernel image from alternate locations on boot helper partitions.
@@ -534,13 +589,28 @@ void common_boot(int biosdev)
               }
             }
             			
-            verbose("Loading kernel %s\n", bootFileSpec);
-            ret = LoadThinFatFile(bootFileSpec, &binary);
-            if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
+            if (checkOSVersion("10.7"))
             {
-              archCpuType = CPU_TYPE_I386;
-              ret = LoadThinFatFile(bootFileSpec, &binary);				
-            }
+                // Lion, dont load kernel if you have cache
+                if (!trycache) {
+            		verbose("Loading kernel %s\n", bootFileSpec);
+            		ret = LoadThinFatFile(bootFileSpec, &binary);
+            		if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {
+              			archCpuType = CPU_TYPE_I386;
+              			ret = LoadThinFatFile(bootFileSpec, &binary);				
+            		}
+		        } 
+				else ret = 1;
+            } 
+			else {
+                // Snow Leopard or older
+                verbose("Loading kernel %s\n", bootFileSpec);
+                ret = LoadThinFatFile(bootFileSpec, &binary);
+                if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {
+                    archCpuType = CPU_TYPE_I386;
+                    ret = LoadThinFatFile(bootFileSpec, &binary);				
+                }
+            }			
 			
         } while (0);
 

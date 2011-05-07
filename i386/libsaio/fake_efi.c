@@ -76,8 +76,10 @@ static uint64_t ptov64(uint32_t addr)
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','i','m','e','r','a','_','1','.','1', 0};
-static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e'};
+static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a;
+//static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','i','m','e','r','a','_','1','.','1', 0};
+//static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
 static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
@@ -437,7 +439,7 @@ static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
-
+static const char const BOARDID_PROP[] = "board-id";
 
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
@@ -621,6 +623,22 @@ void setupEfiDeviceTree(void)
 }
 
 /*
+ * Must be called AFTER getSmbios
+ */
+
+void setupBoardId()
+{
+    Node *node;
+    node = DT__FindNode("/", false);
+    if (node == 0) {
+        stop("Couldn't get root node");
+    }
+    const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+    if (boardid)
+        DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+}
+
+/*
  * Load the smbios.plist override config file if any
  */
 
@@ -672,6 +690,8 @@ static void setupEfiConfigurationTable()
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
 	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 	
+	setupBoardId(); //need to be called after getSmbios
+
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();
 	

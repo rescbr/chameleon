@@ -39,7 +39,7 @@
 #include "xml.h"
 #include "ramdisk.h"
 
-extern char gMacOSVersion;
+//extern char gMacOSVersion;
 
 struct Module {  
   struct Module *nextModule;

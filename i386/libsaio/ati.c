@@ -85,7 +85,7 @@ static const char *chip_family_name[] = {
 	/* Northern Islands */
 	"Barts",
 	"Caicos",
-	"Cayman".
+	"Cayman",
 	"Turks"
 };
 
