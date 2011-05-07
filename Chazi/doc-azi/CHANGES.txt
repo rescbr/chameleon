@@ -358,7 +358,7 @@ Motif:  ---
 		- studied and played a lot with AutoResolution code. No new functionality, just tweaked
 		the way it interacts with the booter, wich fixed some glitches and lost functionality,
 		mostly due to lack of maintenance to fit the changes on the trunk. Next on the plan it's
-		changing this code into a module, which i already started lining up.
+		converting this code into a module, which i already started lining up.
 		Will add specific info soon.
 		
 		- (rev 614) Doubled the size of memory reserved for booter log, which is more than enough
@@ -374,8 +374,32 @@ Change: Added HPET module, another existing patch converted to the modules cause
 		(http://forum.voodooprojects.org/index.php/topic,1596.0.html).
 		Also carries any notebook support added by Meklort.
 		
+  Note: Changed DEBUG_HPET messages to verbose. Don't feel i's necessary in this case, unless
+		some user of the patch get's annoyed by seeing them all time, when booting verbose!?
+		Else, they only print if ForceHPET=y is used.
+		
 Motif:  ---
 		
+		---------------//---------------//---------------
+		
+		FAIR WARNING: till further notice, this branch should be considered obsolete and
+											OUT OF ORDER!
+			The main reasons are:
+			
+			- a "modules support" bug, when compiled with XCode 4; the booter will
+			  "instant reboot" when loading the kernel.
+			
+			- at least "DSDT", "SMBIOS" and "config" keys/boot args, are not working
+			  when typed at boot prompt. This stuff was all working properly when i
+			  committed it; now i'm lost :( i have no clue were this came from!?
+			  Looking for the cause is getting very frustrating; if anyone has a clue
+			  about the reason, i'll be very glad to hear from you. Thanks...
+			  I can confirm that this one is also present on the trunk so, beware.
+			
+			Stay safe, you all.
+			
+				Azi
+			
 		---------------//---------------//---------------
 		
 - (rev )
