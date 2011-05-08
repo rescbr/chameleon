@@ -65,6 +65,9 @@ Options useful in the com.apple.Boot.plist file:
   "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
   
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
+  
+  UseKernelCache=Yes|No   Default is No. Yes will load pre-linked kernel and will 
+                            ignore /E/E and /S/L/E/Extensions.mkext.
 
   GraphicsEnabler=Yes|No  Automatic device-properties generation for gfx cards.
     AtiConfig=<cardcfg>   Use a different card config

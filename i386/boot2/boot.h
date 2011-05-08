@@ -69,6 +69,7 @@
 #define kWakeImage			"WakeImage"			/* boot.c */
 #define kProductVersion		"ProductVersion"	/* boot.c */
 #define karch				"arch"				/* boot.c */
+#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 
 #define kDSDT				"DSDT"				/* acpi_patcher.c */
 #define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
