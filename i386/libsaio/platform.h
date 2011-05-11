@@ -11,7 +11,11 @@
 
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
-extern void dumpPhysAddr(const char * title, void * a, int len);
+
+#define bit(n)			(1UL << (n))
+#define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
+#define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
+
 
 /* CPUID index into cpuid_raw */
 #define CPUID_0				0
@@ -36,16 +40,20 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_WESTMERE_EX	0x2F
 
 /* CPU Features */
-#define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set
-#define CPU_FEATURE_SSE			0x00000002		// SSE Instruction Set
-#define CPU_FEATURE_SSE2		0x00000004		// SSE2 Instruction Set
-#define CPU_FEATURE_SSE3		0x00000008		// SSE3 Instruction Set
-#define CPU_FEATURE_SSE41		0x00000010		// SSE41 Instruction Set
-#define CPU_FEATURE_SSE42		0x00000020		// SSE42 Instruction Set
-#define CPU_FEATURE_EM64T		0x00000040		// 64Bit Support
-#define CPU_FEATURE_HTT			0x00000080		// HyperThreading
-#define CPU_FEATURE_MOBILE		0x00000100		// Mobile CPU
-#define CPU_FEATURE_MSR			0x00000200		// MSR Support
+// NOTE: Theses are currently mapped to the actual bit in the cpuid value
+#define CPU_FEATURE_MMX			bit(23)		// MMX Instruction Set
+#define CPU_FEATURE_SSE			bit(25)		// SSE Instruction Set
+#define CPU_FEATURE_SSE2		bit(26)		// SSE2 Instruction Set
+#define CPU_FEATURE_SSE3		bit(0)		// SSE3 Instruction Set
+#define CPU_FEATURE_SSE41		bit(19)		// SSE41 Instruction Set
+#define CPU_FEATURE_SSE42		bit(20)		// SSE42 Instruction Set
+#define CPU_FEATURE_EM64T		bit(29)		// 64Bit Support
+#define CPU_FEATURE_HTT			bit(28)		// HyperThreading
+#define CPU_FEATURE_MSR			bit(5)		// MSR Support
+
+// NOTE: Determine correct bit for bellow (28 is already in use)
+#define CPU_FEATURE_MOBILE		bit(1)		// Mobile CPU
+
 
 /* SMBIOS Memory Types */ 
 #define SMB_MEM_TYPE_UNDEFINED	0
@@ -144,8 +152,10 @@ typedef struct _PlatformInfo_t {
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				*UUID;          // SMBios UUID
+	//char				*Name;			// the Platorm/Product name 
+	uint32_t			hardware_signature;
 } PlatformInfo_t;
 
-extern PlatformInfo_t Platform;
-
+extern PlatformInfo_t    *Platform;
 #endif /* !__LIBSAIO_PLATFORM_H */

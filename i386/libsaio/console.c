@@ -46,6 +46,7 @@
 
 #include "libsaio.h"
 #include "bootstruct.h"
+#include "modules.h"
 
 extern int	vprf(const char * fmt, va_list ap);
 
@@ -53,15 +54,8 @@ bool gVerboseMode;
 bool gErrors;
 
 /* Kabyl: BooterLog */
-//Azi: Doubled log available size.
-// 64kb are not enough to hold the full log while booting with -f argument (ignore caches).
-// It also seems to fix some reported problems while booting with the mentioned argument.
-// Note: 96kb are enough to hold full log, booting with -f; even so, this depends on how much
-// we "play" at the boot prompt, with what patches we're playing and how much they print to the log,
-// kexts loaded, etc...
-// Please remove this comment when this gets checked by a "true" dev.
-#define BOOTER_LOG_SIZE	(128 * 1024)
-#define SAFE_LOG_SIZE	134
+#define BOOTER_LOG_SIZE    (128 * 1024)
+#define SAFE_LOG_SIZE    134
 
 char *msgbuf = 0;
 char *cursor = 0;
@@ -71,7 +65,7 @@ struct putc_info {
     char * last_str;
 };
 
-static void sputc(int c, struct putc_info * pi)
+void sputc(int c, struct putc_info * pi)
 {
 	if (pi->last_str)
 	if (pi->str == pi->last_str)
@@ -140,13 +134,15 @@ void putchar(int c)
 }
 
 int getc()
-{
-    int c = bgetc();
-
-    if ((c & 0xff) == 0)
+{	
+    int c = bgetc();		
+	
+	execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
+	
+    if ((c & 0xff) == 0) 		
         return c;
-    else
-        return (c & 0xff);
+    else 	
+		return (c & 0xff); 
 }
 
 // Read and echo a character from console.  This doesn't echo backspace
@@ -167,11 +163,9 @@ int printf(const char * fmt, ...)
 {
     va_list ap;
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		prf(fmt, ap, putchar, 0);
-	else
-		vprf(fmt, ap);
 
+	prf(fmt, ap, putchar, 0);
+	
 	{
 	/* Kabyl: BooterLog */
 		struct putc_info pi;
@@ -198,10 +192,7 @@ int verbose(const char * fmt, ...)
 	va_start(ap, fmt);
     if (gVerboseMode)
     {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-			prf(fmt, ap, putchar, 0);
-		else
-			vprf(fmt, ap);
+		prf(fmt, ap, putchar, 0);
     }
 
 	{
@@ -228,10 +219,9 @@ int error(const char * fmt, ...)
     va_list ap;
     gErrors = true;
     va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
-		prf(fmt, ap, putchar, 0);
-    else
-		vprf(fmt, ap);
+
+	prf(fmt, ap, putchar, 0);
+    
 	va_end(ap);
     return(0);
 }
@@ -242,11 +232,9 @@ void stop(const char * fmt, ...)
 
 	printf("\n");
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-		prf(fmt, ap, putchar, 0);
-	} else {
-		vprf(fmt, ap);
-	}
+
+	prf(fmt, ap, putchar, 0);
+	
 	va_end(ap);
 	printf("\nThis is a non recoverable error! System HALTED!!!");
 	halt();

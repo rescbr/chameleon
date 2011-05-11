@@ -26,7 +26,6 @@
  *
  *  DRI: Josh de Cesare
  */
-
 #include <sl.h>
 
 #include "ufs.h"

@@ -26,7 +26,6 @@
 #define __LIBSAIO_NBP_CMD_H
 
 #include <IOKit/IOTypes.h>
-
 /*==========================================================================
  * NBP return status codes.
  */
@@ -81,5 +80,4 @@ typedef union {
 	nbpCommandTFTPReadFile_s     tftpReadFile;
 	nbpCommandTFTPGetFileSize_s  tftpFileSize;
 } nbpCommand_u;
-
 #endif /* !__LIBSAIO_NBP_CMD_H */

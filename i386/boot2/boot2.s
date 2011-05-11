@@ -129,7 +129,7 @@ start_chain_boot:
     data32
     ljmp    $0, $0x7c00         # Jump to boot code already in memory
 
-
+/**/
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Multiboot support added by David F. Elliott <dfe@cox.net> on 2007/06/26
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -342,4 +342,5 @@ _cause_crash:
 _Gdtr_high:
     .word GDTLIMIT
     .long vtop(_Gdt + OFFSET_1MEG)
-
+	
+/**/

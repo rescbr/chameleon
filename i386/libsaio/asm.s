@@ -251,7 +251,6 @@ xprot:
     pushl   %eax
 
     ret
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // prot_to_real()
 //
@@ -418,6 +417,7 @@ LABEL(__switch_stack)
     ret
 
 #ifndef BOOT1
+#ifdef NBP_SUPPORT
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // loader()
 //
@@ -458,6 +458,7 @@ LABEL(_loader)
     popal
     leave
     ret
+#endif
 #endif
 
 #if UNUSED

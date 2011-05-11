@@ -34,16 +34,36 @@ LIBS=
 VPATH = $(OBJROOT):$(SYMROOT)
 
 SAIO_OBJS = table.o asm.o bios.o biosfn.o \
-	disk.o sys.o cache.o bootstruct.o \
-	stringTable.o load.o pci.o allocate.o misc.o \
-	ufs.o ufs_byteorder.o \
-	vbe.o nbp.o hfs.o hfs_compare.o \
-	xml.o ntfs.o msdos.o md5c.o device_tree.o \
-	cpu.o platform.o acpi_patcher.o \
-	smbios_patcher.o fake_efi.o ext2fs.o \
-	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
-	convert.o mem.o aml_generator.o
+        disk.o sys.o cache.o bootstruct.o \
+        stringTable.o load.o pci.o allocate.o misc.o \
+		vbe.o hfs.o hfs_compare.o \
+        xml.o md5c.o device_tree.o \
+        cpu.o platform.o \
+        fake_efi.o \
+		device_inject.o pci_root.o \
+        convert.o 
+
+# Options enabled by default:
+#CFLAGS += -DNO_WIN_SUPPORT # -7200 bytes
+SAIO_OBJS += ntfs.o msdos.o
+
+#CFLAGS += -DNO_LINUX_SUPPORT # -256 bytes
+SAIO_OBJS += ext2fs.o
+
+#CFLAGS += -DNO_OTHERS_BSD_SUPPORT # -512 bytes
+SAIO_OBJS += freebsd.o openbsd.o
+
+# Options disabled by default:
+
+#CFLAGS += -DUFS_SUPPORT # +3616 bytes
+#SAIO_OBJS += ufs.o ufs_byteorder.o
+
+#CFLAGS += -DAPPLE_PARTITION_MAP_SUPPORT # +704 bytes
+#CFLAGS += -DBOOT_HELPER_SUPPORT
+# for npb, you must also activate loader function in asm.s, 
+# and NBP_SUPPORT flag in boot2's makefile (it should compile it, but the result of this is untested)
+#CFLAGS += -DNBP_SUPPORT
+#SAIO_OBJS += nbp.o 
 
 
 SAIO_EXTERN_OBJS = console.o

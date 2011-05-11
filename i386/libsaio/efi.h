@@ -210,6 +210,7 @@ typedef struct {
   EFI_UINT32  Reserved;
 } __attribute__((aligned(8))) EFI_TABLE_HEADER;
 
+#define STRUCT_EFI_TABLE_HEADER  EFI_TABLE_HEADER Hdr;
 //
 // possible caching types for the memory range
 //
@@ -404,8 +405,7 @@ EFI_STATUS
 #define EFI_RUNTIME_SERVICES_REVISION   ((EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION))
 
 typedef struct {
-  EFI_TABLE_HEADER              Hdr;
-
+  STRUCT_EFI_TABLE_HEADER
   //
   // Time services
   //
@@ -445,8 +445,7 @@ typedef struct {
 } __attribute__((aligned(8))) EFI_RUNTIME_SERVICES_32;
 
 typedef struct {
-  EFI_TABLE_HEADER              Hdr;
-
+  STRUCT_EFI_TABLE_HEADER
   //
   // Time services
   //
@@ -508,8 +507,7 @@ typedef struct {
 #define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | 10)
 
 typedef struct EFI_SYSTEM_TABLE_32 {
-  EFI_TABLE_HEADER              Hdr;
-
+  STRUCT_EFI_TABLE_HEADER
   EFI_PTR32                     FirmwareVendor;
   EFI_UINT32                    FirmwareRevision;
 
@@ -531,8 +529,7 @@ typedef struct EFI_SYSTEM_TABLE_32 {
 } __attribute__((aligned(8))) EFI_SYSTEM_TABLE_32;
 
 typedef struct EFI_SYSTEM_TABLE_64 {
-  EFI_TABLE_HEADER              Hdr;
-
+  STRUCT_EFI_TABLE_HEADER
   EFI_PTR64                     FirmwareVendor;
   EFI_UINT32                    FirmwareRevision;
 

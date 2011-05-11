@@ -15,29 +15,37 @@
 extern struct DevPropString *string;
 extern uint8_t *stringdata;
 extern uint32_t stringlength;
-
+extern uint32_t devices_number;
 extern void setupDeviceProperties(Node *node);
 
+#define DEV_PATH_HEADER		\
+	uint8_t		type;		\
+	uint8_t		subtype;	\
+	uint16_t	length;
+
 struct ACPIDevPath {
-	uint8_t		type;		// = 2 ACPI device-path
-	uint8_t		subtype;	// = 1 ACPI Device-path
-	uint16_t	length;		// = 0x0c
+	//uint8_t		type;		// = 2 ACPI device-path
+	//uint8_t		subtype;	// = 1 ACPI Device-path
+	//uint16_t	    length;		// = 0x0c
+	DEV_PATH_HEADER
 	uint32_t	_HID;		// = 0xD041030A ?
 	uint32_t	_UID;		// = 0x00000000 PCI ROOT
 };
 
 struct PCIDevPath {
-	uint8_t		type;		// = 1 Hardware device-path
-	uint8_t		subtype;	// = 1 PCI
-	uint16_t	length;		// = 6
+	//uint8_t		type;		// = 1 Hardware device-path
+	//uint8_t		subtype;	// = 1 PCI
+	//uint16_t	    length;		// = 6
+	DEV_PATH_HEADER
 	uint8_t		function;	// pci func number
 	uint8_t		device;		// pci dev number
 };
 
 struct DevicePathEnd {
-	uint8_t		type;		// = 0x7f
-	uint8_t		subtype;	// = 0xff
-	uint16_t	length;		// = 4;
+	//uint8_t		type;		// = 0x7f
+	//uint8_t		subtype;	// = 0xff
+	//uint16_t		length;		// = 4;
+	DEV_PATH_HEADER
 };
 
 struct DevPropDevice {

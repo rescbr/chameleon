@@ -37,7 +37,7 @@ static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
 
 
-static unsigned long gBinaryAddress;
+unsigned long gBinaryAddress;
 bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
 cpu_type_t archCpuType=CPU_TYPE_I386;
 
@@ -248,9 +248,9 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
           (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
       stop("Kernel overflows available space");
   }
-	
-  if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
-	  gHaveKernelCache = true;
+
+	if (vmsize && (strcmp(segname, "__PRELINK") == 0 || strcmp(segname, "__PRELINK_INFO") == 0))
+		gHaveKernelCache = true;
   
   // Copy from file load area.
   if (vmsize>0 && filesize>0)
@@ -339,5 +339,6 @@ static long DecodeSymbolTable(long cmdBase)
 	
   bcopy((char *)(gBinaryAddress + symTab->symoff),
 	(char *)tmpAddr, totalSize);
+	
   return 0;
 }

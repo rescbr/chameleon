@@ -28,12 +28,12 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 THEME = default
 
 VERSION = `cat version`
-REVISION = `cat revision`
-PRODUCT = Chameleon-$(VERSION)-r$(REVISION)
+#REVISION = `cat revision`
+PRODUCT = Chameleon-$(VERSION)#-r$(REVISION)
 CDLABEL = ${PRODUCT}
 ISOIMAGE = ${SYMROOT}/${CDLABEL}.iso
 
-EXCLUDE = --exclude=.svn --exclude=.DS_Store --exclude=sym --exclude=obj \
+EXCLUDE = --exclude=.svn --exclude=.git --exclude=.DS_Store --exclude=sym --exclude=obj --exclude=build \
 		--exclude=package --exclude=archive --exclude=User_Guide_src --exclude=*.sh
 
 ARCHLESS_RC_CFLAGS=`echo $(RC_CFLAGS) | sed 's/-arch [a-z0-9]*//g'`
@@ -46,7 +46,7 @@ GENERIC_SUBDIRS =
 # Currently builds for i386
 #
 
-all embedtheme tags debug install installhdrs: $(SYMROOT) $(OBJROOT)
+all embedtheme tags debug install installhdrs modules: $(SYMROOT) $(OBJROOT)
 	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
 	@if [ -z "$(RC_ARCHS)" ]; then					  \
 		RC_ARCHS="i386";					  \
@@ -114,6 +114,7 @@ release: $(SYMROOT)
 	fi;
 	@tar -czf $(SYMROOT)/$(PRODUCT)-src.tar.gz ${EXCLUDE} .
 	@tar -cjf $(SYMROOT)/$(PRODUCT)-src.tar.bz2 ${EXCLUDE} .
+
 
 clean:
 	rm -rf sym obj dst

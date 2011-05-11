@@ -29,8 +29,13 @@
 #include <sys/reboot.h>
 #include <sys/types.h>
 #include "bios.h"
+#ifdef NBP_SUPPORT
 #include "nbp_cmd.h"
-#include "bootargs.h"
+#else
+#include <IOKit/IOTypes.h>
+#endif
+//#include <pexpert/i386/boot.h>
+#include "bootLion.h"
 
 #if DEBUG
 #define DEBUG_DISK(x)    printf x
@@ -56,6 +61,7 @@ struct driveParameters {
 struct Tag {
 	long       type;
 	char       *string;
+	long	   offset;
 	struct Tag *tag;
 	struct Tag *tagNext;
 };
@@ -197,7 +203,9 @@ enum {
   kBVFlagForeignBoot      = 0x04,
   kBVFlagBootable         = 0x08,
   kBVFlagEFISystem        = 0x10,
+#ifdef BOOT_HELPER_SUPPORT
   kBVFlagBooter           = 0x20,
+#endif
   kBVFlagSystemVolume     = 0x40
 };
 
@@ -217,6 +225,8 @@ enum {
 	kPartitionTypeFAT16   = 0x06,
 	kPartitionTypeFAT32   = 0x0c,
 	kPartitionTypeEXT3    = 0x83,
+	kPartitionTypeFreeBSD = 0xa5,
+	kPartitionTypeOpenBSD = 0xa6,
 };
 
 //#define BIOS_DEV_TYPE(d)  ((d) & kBIOSDevTypeMask)
@@ -225,13 +235,14 @@ enum {
 /*
  * KernBootStruct device types.
  */
+/*
 enum {
     DEV_SD = 0,
     DEV_HD = 1,
     DEV_FD = 2,
     DEV_EN = 3
 };
-
+*/
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #endif
@@ -248,7 +259,7 @@ enum {
 enum {
     kNetworkDeviceType = kBIOSDevTypeNetwork,
     kBlockDeviceType   = kBIOSDevTypeHardDrive
-} gBootFileType_t;
+};
 
 enum {
     kCursorTypeHidden    = 0x0100,

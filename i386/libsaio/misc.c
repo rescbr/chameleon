@@ -108,6 +108,18 @@ void enableA20()
     flushKeyboardInputBuffer();
 }
 
+void turnOffFloppy(void)
+{
+	/*
+	 * Disable floppy:
+	 * Hold controller in reset,
+	 * disable DMA and IRQ,
+	 * turn off floppy motors.
+	 */
+	outb(0x3F2, 0x00);
+}
+
+
 //==========================================================================
 // Return the platform name for this hardware.
 //

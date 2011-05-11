@@ -81,6 +81,7 @@ int readKeyboardShiftFlags(void)
     return bb.eax.r.l;
 }
 
+
 unsigned int time18(void)
 {
     union {
@@ -168,7 +169,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
     MemoryRange *	range = (MemoryRange *)BIOS_ADDR;
     unsigned long	count = 0;
-    //    unsigned long	rerangedCount;
+    //unsigned long	rerangedCount;
     unsigned long long	conMemSize = 0;
     unsigned long long	extMemSize = 0;
 
@@ -205,7 +206,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
         ||   bb.eax.rx != kMemoryMapSignature
         ||   bb.ecx.rx != kDescriptorSizeMin ) {
             //printf("Got an error %x %x %x\n", bb.flags.cf,
-            //       bb.eax.rx, bb.ecx.rx);
+             //      bb.eax.rx, bb.ecx.rx);
             break;
         }
 
@@ -246,15 +247,16 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
     // Copy out data
     bcopy((char *)BIOS_ADDR, rangeArray, ((char *)range - (char *)BIOS_ADDR));
-
+	
 #if DEBUG
     {
         int i;
         printf("%d total ranges\n", count);getc();
         for (i=0, range = rangeArray; i<count; i++, range++) {
             printf("range: type %d, base 0x%x, length 0x%x\n",
-                   range->type, (unsigned int)range->base, (unsigned int)range->length); getc();
+                   range->type, (unsigned int)range->base, (unsigned int)range->length); 
         }
+		//getc();
     }
 #endif
 

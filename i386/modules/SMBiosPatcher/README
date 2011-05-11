@@ -1,0 +1,1 @@
+please do not use SMBiosGetters and SMBiosPatcher together, you have to chose one of them (SMBiosGetters is recommended), this issue will be fixed in the next versions 

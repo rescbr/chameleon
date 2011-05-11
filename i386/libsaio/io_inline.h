@@ -79,4 +79,5 @@ __OUT(b, char)   /* outb() */
 __OUT(w, short)  /* outw() */
 __OUT(l, long)   /* outl() */
 
+
 #endif /* !__LIBSAIO_IO_INLINE_H */

@@ -1,6 +1,43 @@
-- Added automatic P-States & C-States generation for native power management.
+- Re-enabled Ignore Boot File Flag option , now  "-B"
+- Fixed a bug in get_PM_Profile(), where the function return the profile 0 = 'Unspecified' when the facp is incorrect or not found, and so, override the
+  PM type set by the cpu features
+- Added new drop acpi table mechanism, now it's really able to drop any tables
+- BootHelp is not anymore embed by default in the bootloader core, if you need the help at boot time, just install your BootHelp.txt in /Extra/ (for now GUI module still embed it)
+- Fixed the HelloWorld module (broken since i have increased module hook arguments number)
+
+- "-F" now mean do not use prelinked kernel
+- Fixed embedtheme resolution, random theme chooser now also include embedtheme in the list (if the GUI is compiled with the embedtheme option),
+  also fixed a potential memory leak in randomTheme()
+- Fixed a bug in modules.c introduced in the previous versions, the booloader should now load correctly 
+  with or without modules
+- Boot helper support (raid) is now an option (992 bytes saved)
+- Fixed an issue where the prelinked kernel can't be found (the bootloader should now be fully compatible with the kextcache command line tool).
+  (Also merged both adler32 function previously located in drivers.c and boot.c into one (local_adler32) located in boot.c)
+- returned to malloc by default, instead of safe_malloc, safe_malloc(+1280 bytes) is now an option (as in revolution 616+)
+- APM support is now optional (704 bytes saved)
+- Fixed add_symbol function 
+- Increased module hook arguments number to 6
+- Added Kabyl's pci subsystem id patch 
+- Added Kabyl's smbios implemention (SMBiosGetters, see Kabyl's branch.) as a module (legacy smbios implementation (SMBiosPatcher) have been also rewritten as a module)
+- Added valv's experimental amd support in CPUFreq module (untested)
+- Added Slice's smbios_patcher fix
+- Increased Booter Log size according to the chameleon trunck (thanck to Azimutz)
+
+- Added BSD support (Credits to: nawcom, valv)
+- moved hibernation and ramdisk into modules
+- Added a keyboard mapper module
+- Added CPUFreq module (Credits to: valv, cparm)
+- Added a random theme chooser in the GUI module
+- Added Slice's mobile detection fix
+- Added mozodojo's coreI fix in acpi patcher 
+- Applied many fixes and optimizations to the core
+- Moved to meklort's core architecture 
+- Added Andy Vandijck's Full ACPI tables override and ACPI V1 to V4 conversion patch
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
 - Added Booter Log Dump Tool
 - Added Booter message Logging (":/boot-log" ioreg property)
+- Removed obsolete -f option, use -x instead
 - Removed -x32 option, use arch=i386 instead
 - Added automatic SMBusspeed detection for lga1156 core i5/7 cpus
 - Added new iMac11,1 sbios default model for lga1156 core i5/17 mobos
@@ -21,12 +58,12 @@
 - Optimized cursor spinout in textmode if no verbose mode is set
 - Added ram table structures definitions
 - Added getSmbios() a param permitting to select between orig and new smbios entries
-- Changed "Default Partition" behavior to accept only native system volumes or foreign partitions.
+- Changed "Default Partition" behaviour to accept only native system volumes or foreign partitions.
 - Added NVIDIA new NVCAP customization support and support for ION gfx cards from aserebln
 - Added ATI new framebuffers support and new cards from PCEFI10.6
 - improved ACPI file search algo by implementing a cache.
 - Nvidia injection fix
-- pciroot would not always return correct uid in autodection mode
+- pciroot would not always return correct uuid in autodection mode
 - Fixed the hibernation problem in boot2/resume.c
 - Fixed all new booter versions with SystemType would override the facp value even if correct,
   now keeps the facp value if correct and no override has been done, implemented a best effort algo.
@@ -35,14 +72,14 @@
   conversions api, to be completed by function that we should reuse.
   
 - Fixed SystemType would be always forced to a value, now optionally changed
-  only if overriden
+  only if ovveriden
 - Kept SystemID as the only option to change manually the system-id 
-  For theses reasons, SystemId from bootConfig and SMUUID from smbiosConfig are now DEPRECATED.
+  For theses reasons, SystemId from bootConfig and SMUUID from smbiosConfig aer now DEPRECATED.
 
-- Integrated JrCs fadt patch (kept for RC5 the existing DSDT.aml  retry algo that disappeared in his patch, should be more discussed for RC6)
+- Integrated JrCs fadt patch (kept for RC5 the existing DSDT.aml  retry algo that disapeared in his patch, should be more discussed for RC6)
 - Added JrCs modified convention name change to coding_standards
 - Now malloc (ex. MALLOC in Asere patch) is renamed malloc(size) and is an alias 
-  to safe_malloc(size, file, line) with _FILE_ and _LINE_ preprocessor definitions
+  to safe_malloc(size, file, line) with _FILE_ and _LINE_ prerocessor definitions
 - Added a new 'Rename Partition Feature', now permitting to rename partition 
   like 'System reserved' to a more meaningful name
 - Added SystemID option permitting to change the System UUID to a fixed value.

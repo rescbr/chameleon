@@ -1,0 +1,165 @@
+GUI module:
+----------
+  GUI=No                Disable the GUI (enabled by default).
+  "Boot Banner"=Yes|No  Show boot banner in GUI mode (enabled by default).
+  "Legacy Logo"=Yes|No  Use the legacy grey apple logo (disabled by default).
+  RandomTheme=Yes|No    Enable/Disable switching skin randomly at boot time.
+  
+
+GraphicsEnabler module:
+----------------------
+  GraphicsEnabler=Yes|No  Automatic device-properties generation for gfx cards.
+  UseAtiROM=Yes|No        Use an alternate Ati ROM image 
+                            (path: /Extra/<vendorid>_<devid>.rom)
+  UseNvidiaROM=Yes|No     Use an alternate Nvidia ROM image 
+                            (path:  /Extra/<vendorid>_<devid>.rom)
+  VBIOS=Yes|No            Inject VBIOS to device-properties.
+
+
+Networking module:
+-----------------
+  EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
+                          for ethernet interfaces.
+						  
+Memory module:
+-------------
+  UseMemDetect=Yes|No	  Enable/Disable advanced memory detection
+
+USBFix module:
+----------
+  USBBusFix=Yes           Enable all USB fixes below:
+  EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
+  UHCIreset=Yes           Enable the UHCI fix (disabled by default).
+  USBLegacyOff=Yes        Enable the USB Legacy fix (disabled by default).
+  
+HPET module:
+-----------
+  ForceHPET=Yes|No        Force Enable HPET.
+
+HibernateEnabler:
+----------------
+  Wake=No                 Disable wake up after hibernation (default: enabled).
+  ForceWake=Yes           Force using the sleepimage (disabled by default).
+  WakeImage=<file>        Use an alternate sleepimage file. 
+                          (default path is /private/var/vm/sleepimage).
+
+SMBIOS modules:
+--------------
+  SMBIOS=<file>         Use an alternate SMBIOS.plist file 
+                        (default path: /Extra/SMBIOS.plist, 
+						bt(0,0)/Extra/SMBIOS.plist).
+
+  SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding
+                            if smbios.plist doesn't exist, factory
+                            values are kept.
+
+RamDiskLoader module:
+--------------------  
+  md0=<file>              Load raw img file into memory for use as XNU's md0
+                          ramdisk. /Extra/Postboot.img is used otherwise.	
+						  
+Keymapper module:
+----------------						  
+  KeyboardType=<value>    change the type of the Keyboard. (Default is QWERTY)
+			              for now only <value>="AZERTY" is supported.
+
+CPUfreq module:
+--------------
+  FixFSB=Yes		Enable alternative front side bus fix
+  
+  MaxBusRatio=<n>	(was BusRatio) Set the current Bus Ratio to n,
+  			         n must be a multiple of 10,
+			         (eg. if you want to set a bus ratio to 8.5, n will be
+			         8.5*10=85), 
+			         if n = 0, MaxBusRatio = Disable,
+			         if not set, n = the current
+			         bios bus ratio, set this value allow CPUfreq to 
+                     fix some cosmetic issues.
+						  			  
+
+Acpipatcher module:
+------------------
+  DropSSDT=Yes  	Skip the SSDT tables while relocating the ACPI tables.
+  DSDT=<file>   	Use an alternate DSDT.aml file,
+			        (default path: /DSDT.aml Extra/DSDT.aml,
+			        bt(0,0)/Extra/DSDT.aml).
+
+  quickSSDTsearch=Yes|No    If Yes, Acpipatcher will not search ssdt-(x+1).aml 
+			                if ssdt-x.aml do not exist,
+			                (eg. if ssdt-0.aml do not exist,
+                            Acpipather will not search ssdt-1.aml).
+
+  MaxBusRatio=<n>	(was BusRatio) Set the current Bus Ratio to n, 
+			        n must be a multiple of 10,
+					(eg. if you want to set a bus ratio to 8.5, n will be
+			        8.5*10=85), 
+			        if n = 0, MaxBusRatio = Disable,
+			        if set, Acpipatcher will drop every P-states with
+			        a bus ratio higher than n.
+						  
+  MinBusRatio=<n>	Set the Minimum Bus Ratio to n,
+			        n must be a multiple of 10,
+			        (eg. if you want to set the bus ratio to 8.5, n will be
+			        8.5*10=85), if set Acpipatcher will drop every 
+			        P-states with a bus ratio lower than n, 
+			        if n = 0, MinBusRatio = Disable.
+		  
+  P-States usage e.g: (by default all numbers must be expressed in base 16, 
+			          except the pss statue key and base key itself)
+		
+		<key>P-States</key>
+		<dict>
+		<key>0</key> // the pss status (must be expressed in Base 10)
+		<dict>
+		<key>Bus Master Latency</key>
+		<string>10</string>
+		<key>Control</key>
+		<string>18719</string>
+		<key>CoreFreq</key>
+		<string>3164</string>
+		<key>Transition Latency</key>
+		<string>10</string>
+		</dict>
+		<key>Base</key>
+		<string>10</string>  // must always be expressed in Base 10 
+		<key>Mode</key>
+		<string>Default</string>
+		</dict> 	
+									 
+
+  C-States usage e.g: (by default all numbers must be expressed in base 16, 
+			          except the base key itself)
+
+		<key>C-states</key>
+		<dict>
+		<key>C1</key>
+		<dict>
+		<key>Latency</key>
+		<string>THE LATENCY FOR THIS STATE</string>
+		<key>Power</key>
+		<string>THE POWER FOR THIS STATE</string>
+		</dict>
+		.
+		.							
+		<key>C4</key>
+		<dict>
+		.
+		.
+		</dict>
+		</dict>
+		
+DropTables usage e.g: 
+
+		<key>ACPIDropTables</key>
+		<dict>
+		<key>SSDT</key>
+		<string></string> // drop ssdt tables
+		<key>TAMG</key>
+		<string>Yes</string> //drop TAMG table
+		<key>ECDT</key>
+		<string>ANY_VALUE</string> //drop ECDT table
+		<key>XXXX</key>
+		<string></string> //drop XXXX table (if exist)
+		<key>YYYY</key>
+		<string>No</string> //do not drop YYYY table (if exist)
+		</dict>

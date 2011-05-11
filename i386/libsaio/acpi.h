@@ -4,18 +4,34 @@
 #define ACPI_RANGE_START    (0x0E0000)
 #define ACPI_RANGE_END      (0x0FFFFF)
 
-#define UINT64_LE_FROM_CHARS(a,b,c,d,e,f,g,h) \
-(   ((uint64_t)h << 56) \
-|   ((uint64_t)g << 48) \
-|   ((uint64_t)f << 40) \
-|   ((uint64_t)e << 32) \
-|   ((uint64_t)d << 24) \
-|   ((uint64_t)c << 16) \
-|   ((uint64_t)b <<  8) \
-|   ((uint64_t)a <<  0) \
-)
+/*
+ * SIGNATURE_16, SIGNATURE_32, SIGNATURE_64 are extracted from the edk2 project (Base.h), and are under the following license:
+ *
+ * Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.
+ * Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.
+ * This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php.
+ * THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ */
 
-#define ACPI_SIGNATURE_UINT64_LE UINT64_LE_FROM_CHARS('R','S','D',' ','P','T','R',' ')
+#define SIGNATURE_16(A, B)        ((A) | (B << 8))
+
+#define SIGNATURE_32(A, B, C, D)  (SIGNATURE_16 (A, B) | (SIGNATURE_16 (C, D) << 16))
+
+#define SIGNATURE_64(A, B, C, D, E, F, G, H) \
+(SIGNATURE_32 (A, B, C, D) | ((uint64_t) (SIGNATURE_32 (E, F, G, H)) << 32))
+
+#define ACPI_SIGNATURE_UINT64_LE SIGNATURE_64('R','S','D',' ','P','T','R',' ')
+
+#define Unspecified         0
+#define Desktop             1
+#define Mobile              2
+#define Workstation         3
+#define EnterpriseServer    4
+#define SOHOServer          5
+#define AppliancePC         6
+ 
+#define MaxSupportedPMProfile     AppliancePC // max profile currently supported 
+#define PMProfileError            MaxSupportedPMProfile + 1
 
 /* Per ACPI 3.0a spec */
 
@@ -32,69 +48,54 @@ struct acpi_2_rsdp {
     char            Reserved[3];
 } __attribute__((packed));
 
+
+#define ACPI_HEADER_CORE			\
+	char            Signature[4];	\
+	uint32_t        Length;			\
+	uint8_t         Revision;		\
+	uint8_t         Checksum;		\
+	char            OEMID[6];		\
+	char            OEMTableId[8];	\
+	uint32_t        OEMRevision;	\
+	uint32_t        CreatorId;		\
+	uint32_t        CreatorRevision;
+
+struct acpi_common_header {
+	ACPI_HEADER_CORE	
+} __attribute__((packed));
+
 // TODO Migrate
 struct acpi_2_rsdt {
-	char            Signature[4];
-	uint32_t        Length;
-	uint8_t         Revision;
-	uint8_t         Checksum;
-	char            OEMID[6];
-	char            OEMTableId[8];
-	uint32_t        OEMRevision;
-	uint32_t        CreatorId;
-	uint32_t        CreatorRevision;
+	ACPI_HEADER_CORE	
 } __attribute__((packed));
 
 // TODO Migrate
 struct acpi_2_xsdt {
-	char            Signature[4];
-	uint32_t        Length;
-	uint8_t         Revision;
-	uint8_t         Checksum;
-	char            OEMID[6];
-	char            OEMTableId[8];
-	uint32_t        OEMRevision;
-	uint32_t        CreatorId;
-	uint32_t        CreatorRevision;
+	ACPI_HEADER_CORE	
+} __attribute__((packed));
+
+// TODO Migrate
+struct acpi_2_gas {
+	uint8_t				Address_Space_ID;
+	uint8_t				Register_Bit_Width;
+	uint8_t				Register_Bit_Offset;
+	uint8_t				Access_Size;
+	uint64_t			Address;
 } __attribute__((packed));
 
 // TODO Migrate
 struct acpi_2_ssdt {
-	char            Signature[4];
-	uint32_t        Length;
-	uint8_t         Revision;
-	uint8_t         Checksum;
-	char            OEMID[6];
-	char            OEMTableId[8];
-	uint32_t        OEMRevision;
-	uint32_t        CreatorId;
-	uint32_t        CreatorRevision;
+	ACPI_HEADER_CORE	
 } __attribute__((packed));
 
 // TODO Migrate
 struct acpi_2_dsdt {
-	char            Signature[4];
-	uint32_t        Length;
-	uint8_t         Revision;
-	uint8_t         Checksum;
-	char            OEMID[6];
-	char            OEMTableId[8];
-	uint32_t        OEMRevision;
-	uint32_t        CreatorId;
-	uint32_t        CreatorRevision;
+	ACPI_HEADER_CORE	
 } __attribute__((packed));
 
 // TODO Migrate
 struct acpi_2_fadt {
-	char            Signature[4];
-	uint32_t        Length;
-	uint8_t         Revision;
-	uint8_t         Checksum;
-	char            OEMID[6];
-	char            OEMTableId[8];
-	uint32_t        OEMRevision;
-	uint32_t        CreatorId;
-	uint32_t        CreatorRevision;
+	ACPI_HEADER_CORE	
 	uint32_t        FIRMWARE_CTRL;
 	uint32_t        DSDT;
 	uint8_t         Model;			// JrCs
@@ -134,20 +135,41 @@ struct acpi_2_fadt {
 	uint8_t			Reserved0;
 /* Begin Asere */
 	//Reset Fix
-	uint32_t        Flags;
-	uint8_t         Reset_SpaceID;
-	uint8_t         Reset_BitWidth;
-	uint8_t         Reset_BitOffset;
-	uint8_t         Reset_AccessWidth;
-	uint64_t        Reset_Address;
-	uint8_t         Reset_Value;
-	uint8_t         Reserved[3];
+	uint32_t			Flags;
+	struct acpi_2_gas	RESET_REG;	
+	uint8_t				Reset_Value;
+	uint8_t				Reserved[3];
 
-	uint64_t	    X_FIRMWARE_CTRL;
-	uint64_t	    X_DSDT;
-/* End Asere */
+	uint64_t			X_FIRMWARE_CTRL;
+	uint64_t			X_DSDT;
+
+#if UNUSED
+	/* End Asere */
 	/*We absolutely don't care about theese fields*/
 	uint8_t		notimp2[96];
+#else
+	struct acpi_2_gas	X_PM1a_EVT_BLK;
+	struct acpi_2_gas	X_PM1b_EVT_BLK;
+	struct acpi_2_gas	X_PM1a_CNT_BLK;
+	struct acpi_2_gas	X_PM1b_CNT_BLK;
+	struct acpi_2_gas	X_PM2_CNT_BLK;
+	struct acpi_2_gas	X_PM_TMR_BLK;
+	struct acpi_2_gas	X_GPE0_BLK;
+	struct acpi_2_gas	X_GPE1_BLK;
+#endif
+	
 } __attribute__((packed));
+
+struct acpi_2_facs {
+	char			Signature[4];	
+	uint32_t        Length;			
+	uint32_t		hardware_signature;
+	uint32_t		firmware_waking_vector;
+	uint32_t		global_lock;
+	uint32_t		flags;
+	uint64_t		x_firmware_waking_vector;	
+	uint8_t			version;
+	uint8_t			Reserved[31];
+} __attribute__ ((packed));
 
 #endif /* !__LIBSAIO_ACPI_H */

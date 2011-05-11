@@ -128,26 +128,3 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
     return NULL;
   }
 }
-
-// FIXME: can't use my original code here,
-// Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
-/*
-static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
-{
-  char szUUID[UUID_LEN+1], *p=szUUID;
-  int size=0;
-  void* ret;
-
-  if (!szInUUID || strlen(szInUUID)<UUID_LEN) return (EFI_CHAR8*) 0;
-
-  while(*szInUUID) if (*szInUUID!='-') *p++=*szInUUID++; else szInUUID++;
-  *p='\0';
-  ret = convertHexStr2Binary(szUUID, &size);
-  if (!ret || size!=UUID_LEN) 
-  {
-      verbose("UUID: cannot convert string <%s> to valid UUID.\n", szUUID);
-      return (EFI_CHAR8*) 0;
-  }
-  return (EFI_CHAR8*) ret; // new allocated buffer containing the converted string to bin
-}
-*/

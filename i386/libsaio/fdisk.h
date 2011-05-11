@@ -54,7 +54,8 @@
 #define FDISK_UFS       0xa8    /* Apple UFS partition */
 #define FDISK_HFS       0xaf    /* Apple HFS partition */
 #define FDISK_BOOTER    0xab    /* Apple booter partition */
-
+#define FDISK_OPENBSD   0xa6    /* OpenBSD FFS partition */
+#define FDISK_FREEBSD   0xa5    /* FreeBSD UFS2 partition */
 /*
  * Format of fdisk partion entry (if present).
  */

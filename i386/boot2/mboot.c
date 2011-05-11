@@ -8,13 +8,18 @@
 
 #include "mboot.h"
 
+#define OFFSET_1MEG 0x100000
+#define BAD_BOOT_DEVICE 0xffffffff
+
+struct multiboot_info *gMI;
+
+#if UNUSED
 int multiboot_timeout=0;
 int multiboot_timeout_set=0;
 int multiboot_partition=0;
 int multiboot_partition_set=0;
-
+#endif
 // Global multiboot info, if using multiboot.
-struct multiboot_info *gMI;
 
 extern void continue_at_low_address(void);
 
@@ -27,8 +32,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig);
 // prototype dochainload for the same reason.
 void dochainload();
 
-#define OFFSET_1MEG 0x100000
-#define BAD_BOOT_DEVICE 0xffffffff
 
 // This assumes that the address of the first argument to the function will
 // be exactly 4 bytes above the address of the return address.
@@ -45,13 +48,13 @@ extern unsigned char chainbootflag;
 
 void chainLoad();
 void waitThenReload();
-
+/*
 int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
                       unsigned int byteoff,
                       unsigned int byteCount, void * buffer );
 int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
 static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
-
+*/
 // Starts off in the multiboot context 1 MB high but eventually gets into low memory
 // and winds up with a bootdevice in eax which is all that boot() wants
 // This lets the stack pointer remain very high.
@@ -115,19 +118,16 @@ void chainLoad()
 void waitThenReload()
 {
     /* FIXME: Ctrl+Alt+Del does not work under Boot Camp */
+	uint8_t i = 5;
     printf("Darwin booter exited for some reason.\n");
     printf("Please reboot (Ctrl+Alt+Del) your machine.\n");
-    printf("Restarting Darwin booter in 5 seconds...");
-    sleep(1);
-    printf("4...");
-    sleep(1);
-    printf("3...");
-    sleep(1);
-    printf("2...");
-    sleep(1);
-    printf("1...");
-    sleep(1);
-    printf("0\n");
+    printf("Restarting Darwin booter in %d seconds...",i);
+    sleep(1);	
+	while (1 < i--) {
+		printf("%d...",i);
+		sleep(1);
+	}
+	printf("0\n");
 }
 
 // Declare boot2_sym as an opaque struct so it can't be converted to a pointer
@@ -135,6 +135,8 @@ void waitThenReload()
 // Technically it's a function but it's real mode code and we sure don't
 // want to call it under any circumstances.
 extern struct {} boot2_sym asm("boot2");
+
+//char *patch_code_start;
 
 // prototype multiboot and keep its implementation below hi_multiboot to
 // ensure that it doesn't get inlined by the compiler
@@ -295,12 +297,15 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // because we're stuck in extended memory at this point.
     struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);
 
+	
+	//memcpy(patch_code_start, (char*)&boot2_sym + OFFSET_1MEG, 0x5fe00 /* 383.5k */);
+	
     // Get us in to low memory so we can run everything
 
     // We cannot possibly be more than 383.5k and copying extra won't really hurt anything
     // We use the address of the assembly entrypoint to get our starting location.
-    memcpy(&boot2_sym, (char*)&boot2_sym + OFFSET_1MEG, 0x5fe00 /* 383.5k */);
-
+    memcpy(&boot2_sym, (char*)&boot2_sym + OFFSET_1MEG, 0x5fe00 /* 383.5k */);	
+	
     // This is a little assembler routine that returns to us in the correct selector
     // instead of the kernel selector we're running in now and at the correct
     // instruction pointer ( current minus 1 MB ).  It does not fix our return
@@ -332,10 +337,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     bootArgs = &temporaryBootArgsData;
     bootArgs->Video.v_display = VGA_TEXT_MODE;
 
-    // Install ramdisk and extra driver hooks
-    p_get_ramdisk_info = &multiboot_get_ramdisk_info;
-    p_ramdiskReadBytes = &multibootRamdiskReadBytes;
-    LoadExtraDrivers_p = &multiboot_LoadExtraDrivers;
 
     // Since we call multiboot ourselves, its return address will be correct.
     // That is unless it's inlined in which case it does not matter.
@@ -344,13 +345,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     bootArgs = NULL;
     return bootdevice;
 }
-
-enum {
-    kReturnKey     = 0x0d,
-    kEscapeKey     = 0x1b,
-    kBackspaceKey  = 0x08,
-    kASCIIKeyMask  = 0x7f
-};
 
 // This is the meat of our implementation.  It grabs the boot device from
 // the multiboot_info and returns it as is.  If it fails it returns
@@ -402,7 +396,7 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
             else
                 doSelectDevice = true;
         }
-		
+#if UNUSED		
         if(getValueForBootKey(mi->mi_cmdline, "timeout", &val, &size))
         {
             char *endptr;
@@ -425,81 +419,10 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
                 multiboot_partition = intVal;
                 multiboot_partition_set = 1;
             }
-        }				
-    }
-    if(doSelectDevice)
-    {
-        bootdevice = selectAlternateBootDevice(bootdevice);
+        }
+#endif
     }
     if(bootdevice == BAD_BOOT_DEVICE)
         sleep(2); // pause for a second before halting
     return bootdevice;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// Ramdisk and extra drivers code
-
-int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
-                      unsigned int byteoff,
-                      unsigned int byteCount, void * buffer )
-{
-    int module_count = gMI->mi_mods_count;
-    struct multiboot_module *modules = (void*)gMI->mi_mods_addr;
-    if(biosdev < 0x100)
-        return -1;
-    if(biosdev >= (0x100 + module_count))
-        return -1;
-    struct multiboot_module *module = modules + (biosdev - 0x100);
-
-    void *p_initrd = (void*)module->mm_mod_start;
-    bcopy(p_initrd + blkno*512 + byteoff, buffer, byteCount);
-    return 0;
-}
-
-int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip)
-{
-    int module_count = gMI->mi_mods_count;
-    struct multiboot_module *modules = (void*)gMI->mi_mods_addr;
-    if(biosdev < 0x100)
-        return -1;
-    if(biosdev >= (0x100 + module_count))
-        return -1;
-    struct multiboot_module *module = modules + (biosdev - 0x100);
-    dip->biosdev = biosdev;
-    dip->uses_ebios = true;	// XXX aserebln uses_ebios isn't a boolean at all
-    dip->di.params.phys_sectors = (module->mm_mod_end - module->mm_mod_start + 511) / 512;
-    dip->valid = true;
-    return 0;
-}
-
-static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
-{
-    char extensionsSpec[1024];
-    int ramdiskUnit;
-    for(ramdiskUnit = 0; ramdiskUnit < gMI->mi_mods_count; ++ramdiskUnit)
-    {
-        int partCount; // unused
-        BVRef ramdiskChain = diskScanBootVolumes(0x100 + ramdiskUnit, &partCount);
-        if(ramdiskChain == NULL)
-        {
-            verbose("Ramdisk contains no partitions\n");
-            continue;
-        }
-        for(; ramdiskChain != NULL; ramdiskChain = ramdiskChain->next)
-        {
-            sprintf(extensionsSpec, "rd(%d,%d)/Extra/", ramdiskUnit, ramdiskChain->part_no);
-            struct dirstuff *extradir = opendir(extensionsSpec);
-            closedir(extradir);
-            if(extradir != NULL)
-            {
-                int ret = FileLoadDrivers_p(extensionsSpec, 0 /* this is a kext root dir, not a kext with plugins */);
-                if(ret != 0)
-                {
-                    verbose("FileLoadDrivers failed on a ramdisk\n");
-                    return ret;
-                }
-            }
-        }
-    }
-    return 0;
 }

@@ -20,8 +20,6 @@ SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
 UTILDIR = ../util
-THEME = embed
-THEMEDIR = ../../artwork/themes/$(THEME)
 INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
@@ -42,13 +40,13 @@ VPATH = $(OBJROOT):$(SYMROOT)
 # The ordering is important;
 # boot2.o must be first.
 OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o
+	modules.o
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util
 SFILES = boot2.s
-CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c picopng.c
-HFILES = boot.h appleClut8.h appleboot.h mboot.h multiboot.h picopng.h
+CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c
+HFILES = boot.h appleClut8.h mboot.h multiboot.h
 OTHERFILES = Makefile
 ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
@@ -56,18 +54,46 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
-all: $(DIRS_NEEDED) boot
 
-embedtheme: CFLAGS += -DEMBED_THEME
-embedtheme: art.h all
+#
+# Strings used to retrieve the start location for the Symbols.dylib module
+#
+SYMBOLS_MODULE = Symbols.dylib
+SYMBOL_START= _symbols_module_start
+SYMBOL_ADDR = $(shell printf "%d" 0x`nm -s __DATA __data $(SYMROOT)/boot_embeded.sys | grep " $(SYMBOL_START)$$" | cut -f 1 -d " "`)
+DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | tail -n 1 | cut -f 6 -d " ")
+DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
+PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
-boot: machOconv embedded.h $(OBJS) $(LIBDEP)
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+CFLAGS += -DSAFE_MALLOC 
+
+# CFLAGS += -DBOOT_HELPER_SUPPORT # +992 bytes
+
+# CFLAGS += -DNBP_SUPPORT
+
+all embedtheme: $(DIRS_NEEDED) boot
+
+boot: embedded.h machOconv $(OBJS) $(LIBDEP) 
+	@echo "\t[LD] boot.sys"
+	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
-	machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
-	size $(SYMROOT)/boot.sys
-	ls -l $(SYMROOT)/boot
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext		
+	@echo "\t[MACHOCONV] boot"
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
+	
+	@make Symbols.dylib	
+
+	@##echo "\t[LD] boot_embeded.sys"
+	@##$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	        -nostdlib -arch i386 -Wl,-segalign,20 \
+		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
+		-o $(SYMROOT)/boot_embeded.sys $(filter %.o,$^) $(LIBS) -lcc_kext	
+	@##make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
+
+	@##${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+
+	@##size $(SYMROOT)/boot.sys
+	@ls -l $(SYMROOT)/boot
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
@@ -76,6 +102,14 @@ boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	    exit 1;\
 	  fi)
 
+embed_symbols: machOconv
+	@echo ================= Embedding Symbols.dylib =================	
+	@echo ******* Patching at $(PATCH_ADDR) ******
+	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot_embeded.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
+	@echo "\t[MACHOCONV] boot_embeded"
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
+
+
 prompt.o: vers.h
 vers.h:
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
@@ -83,34 +117,47 @@ vers.h:
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
 
-art.h:
-	@if [ "$(PNGCRUSH)" ]; then	\
-		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \
-		cd $(THEMEDIR) && find . -name '*.png' -exec $(PNGCRUSH) -q $(PNGOPTIONS) -d $(SYMROOT)/embed {} \;; \
-		cp theme.plist $(SYMROOT)/embed; \
-	else \
-		cp -R $(THEMEDIR) $(SYMROOT)/embed; \
-	fi;
-	@echo "#ifndef __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@echo "#define __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name 'theme.plist' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-	@cd $(SYMROOT)/embed && find . -name '*.png' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-
-	@echo "typedef struct {" >> $(SYMROOT)/art.h
-	@echo "	char			name[32];" >> $(SYMROOT)/art.h
-	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
-	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
-	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
-	@echo "" >> $(SYMROOT)/art.h
-	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
-		awk '{ printf "\t{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
-	@echo "};" >> $(SYMROOT)/art.h
-
-	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
-
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
+
+Symbols.dylib: Symbols.o
+	@echo ================= Compiling ${SYMBOLS_MODULE} =================
+	@echo "start" >>  ${OBJROOT}/Symbols.save
+	@echo "_lookup_symbol" >>  ${OBJROOT}/Symbols.save
+
+	@echo "\t[LD] $@"
+	@ld -arch i386 \
+	-undefined dynamic_lookup \
+	-alias _Symbols_start start \
+	-dylib -read_only_relocs suppress \
+	-S -x  -dead_strip_dylibs \
+	-no_uuid \
+	-bind_at_load \
+	-current_version 1.0.0 \
+	-compatibility_version 1.0.0 \
+	-final_output Symbols \
+	-exported_symbols_list ${OBJROOT}/Symbols.save \
+	${OBJROOT}/Symbols.o \
+	-o $(SYMROOT)/${SYMBOLS_MODULE} 
+
+	@##size $(SYMROOT)/${SYMBOLS_MODULE} 
+
+Symbols.o:
+	@rm -rf $(SYMROOT)/Symbols.h
+	@echo "typedef struct {" >> $(SYMROOT)/Symbols.h
+	@echo "	char*	symbol;" >> $(SYMROOT)/Symbols.h
+	@echo "	unsigned int	addr;" >> $(SYMROOT)/Symbols.h
+	@echo "} symbol_t;" >> $(SYMROOT)/Symbols.h 
+	@echo "" >> $(SYMROOT)/Symbols.h
+	
+	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "static char "$$3"_string[] = \""$$3"\";"}' >> $(SYMROOT)/Symbols.h
+
+	@echo "symbol_t symbolList[] = {" >> $(SYMROOT)/Symbols.h
+	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "	{.symbol = "$$3"_string, .addr = 0x"$$1"},";}' >> $(SYMROOT)/Symbols.h
+	@echo "};" >> $(SYMROOT)/Symbols.h
+	@echo "\t[CC] $@"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(UTILDIR)/Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
+
 
 install_i386:: all $(INSTALLDIR)
 	cp $(SYMROOT)/boot $(OTHER_FILES) $(INSTALLDIR)

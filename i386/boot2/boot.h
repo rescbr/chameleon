@@ -40,14 +40,13 @@
 #define kKernelFlagsKey		"Kernel Flags"
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
-#define kKernelCacheKey		"Kernel Cache"
+#define kPrelinkKernelKey	"Prelinked Kernel"
 #define kBootDeviceKey		"Boot Device"
 #define kTimeoutKey			"Timeout"
 #define kRootDeviceKey		"rd"
 #define kBootUUIDKey		"boot-uuid"
 #define kHelperRootUUIDKey	"Root UUID"
 #define kPlatformKey		"platform"
-#define kACPIKey			"acpi"
 #define kCDROMPromptKey		"CD-ROM Prompt"
 #define kCDROMOptionKey		"CD-ROM Option Key"
 #define kRescanPromptKey	"Rescan Prompt"
@@ -55,46 +54,34 @@
 #define kScanSingleDriveKey	"Scan Single Drive"
 #define kInsantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
-#define kGUIKey				"GUI"
-#define kBootBannerKey		"Boot Banner"
 #define kWaitForKeypressKey	"Wait"
 /* AsereBLN: added the other keys */
-#define kUseAtiROM			"UseAtiROM"			/* ati.c */
-#define kWake				"Wake"				/* boot.c */
-#define kForceWake			"ForceWake"			/* boot.c */
-#define kWakeImage			"WakeImage"			/* boot.c */
+
 #define kProductVersion		"ProductVersion"	/* boot.c */
 #define karch				"arch"				/* boot.c */
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
-#define kDSDT				"DSDT"				/* acpi_patcher.c */
-#define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
-#define kRestartFix			"RestartFix"		/* acpi_patcher.c */
-#define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
-#define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kEnableC2States		"EnableC2State"		/* acpi_patcher.c */
-#define kEnableC3States		"EnableC3State"		/* acpi_patcher.c */
-#define kEnableC4States		"EnableC4State"		/* acpi_patcher.c */
 #define kDeviceProperties	"device-properties"	/* device_inject.c */
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS				"VBIOS"				/* nvidia.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
-#define kForceHPET			"ForceHPET"			/* pci_setup.c */
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-#define kUSBBusFix			"USBBusFix"			/* usb.c */
-#define kEHCIacquire		"EHCIacquire"		/* usb.c */
-#define kUHCIreset			"UHCIreset"			/* usb.c */
-#define kLegacyOff			"USBLegacyOff"		/* usb.c */
-#define kEHCIhard			"EHCIhard"			/* usb.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
-#define kMD0Image			"md0"				/* ramdisk.h */
+
+enum {
+	kBackspaceKey	= 0x08,
+	kTabKey			= 0x09,
+	kReturnKey		= 0x0d,
+	kEscapeKey		= 0x1b,
+	kUpArrowkey		= 0x4800, 
+	kDownArrowkey	= 0x5000,
+	kASCIIKeyMask	= 0x7f,
+	kF5Key			= 0x3f00,
+	kF10Key			= 0x4400
+};
+
+#define PLATFORM_NAME_LEN 64
+#define ROOT_PATH_LEN 256
 
 /*
  * Flags to the booter or kernel
@@ -102,8 +89,9 @@
 #define kVerboseModeFlag	"-v"
 #define kSafeModeFlag		"-x"
 #define kIgnoreCachesFlag	"-f"
-#define kIgnoreBootFileFlag	"-F"
 #define kSingleUserModeFlag	"-s"
+#define kIgnorePrelinkKern  "-F"
+#define kIgnoreBootFileFlag	"-B"
 
 /*
  * Booter behavior control
@@ -121,13 +109,14 @@ extern bool sysConfigValid;
 extern char bootBanner[];
 extern char bootPrompt[];
 extern bool gOverrideKernel;
-extern char *gPlatformName;
 extern char gMKextName[];
-extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
-extern bool useGUI;
+extern char *gPlatformName;
+//extern char gRootPath[];
 
+extern char *gRootDevice;
+extern bool uuidSet;
 /*
  * Boot Modes
  */
@@ -140,20 +129,19 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
+extern unsigned long
+local_adler32( unsigned char * buffer, long length );
 
-/*
- * usb.c
- */
-extern int usb_loop();
 
 /*
  * graphics.c
  */
 extern void printVBEModeInfo();
 extern void setVideoMode(int mode, int drawgraphics);
-extern int  getVideoMode();
+#if TEXT_SPINNER
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
+#endif
 extern void drawColorRectangle( unsigned short x,
                          unsigned short y,
                          unsigned short width,
@@ -178,7 +166,6 @@ extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, i
 /*
  * drivers.c
  */
-extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 
@@ -187,19 +174,20 @@ typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
     Hookable function pointer called during the driver loading phase that
     allows other code to cause additional drivers to be loaded.
  */
-extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
-
+extern struct multiboot_info *gMI;
 /*
  * options.c
  */
 extern int getBootOptions(bool firstRun);
 extern int processBootOptions();
-extern int selectAlternateBootDevice(int bootdevice);
 extern bool promptForRescanOption(void);
+extern bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP);
+
 
 void showHelp();
 void showTextFile();
 char *getMemoryInfoString();
+void showMessage(char * message);
 
 typedef struct {
     char   name[80];
@@ -218,16 +206,10 @@ struct compressed_kernel_header {
   u_int32_t uncompressed_size;
   u_int32_t compressed_size;
   u_int32_t reserved[11];
-  char      platform_name[64];
-  char      root_path[256];
+  char      platform_name[PLATFORM_NAME_LEN];
+  char      root_path[ROOT_PATH_LEN];
   u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
-
-/* resume.c */
-void HibernateBoot(char *boot_device);
-
-/* bmdecompress.c */
-void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
 #endif /* !__BOOT2_BOOT_H */

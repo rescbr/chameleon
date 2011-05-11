@@ -26,7 +26,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = util libsa libsaio boot2 boot1 boot0 cdboot
+SUBDIRS = util libsa libsaio boot2 boot1 boot0 cdboot modules
 
 all embedtheme tags debug install installhdrs:
 	@for i in ${SUBDIRS}; \
@@ -43,6 +43,23 @@ all embedtheme tags debug install installhdrs:
 			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
 		) || exit $$?; 						  \
 	done
+
+modules:
+	@for i in "modules"; \
+	do \
+		echo ================= make $@ for $$i =================; \
+		( cd $$i; ${MAKE}					  \
+			"OBJROOT=$(OBJROOT)/$$i"			  \
+		  	"SYMROOT=$(SYMROOT)"				  \
+			"DSTROOT=$(DSTROOT)"				  \
+			"SRCROOT=$(SRCROOT)"				  \
+			"RC_ARCHS=$(RC_ARCHS)"				  \
+			"RC_KANJI=$(RC_KANJI)"				  \
+			"JAPANESE=$(JAPANESE)"				  \
+			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
+		) || exit $$?; 						  \
+	done
+
 
 installsrc:
 	tar cf - . | (cd ${SRCROOT}; tar xfBp -)

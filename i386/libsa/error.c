@@ -24,7 +24,7 @@
 /* error handling */
 
 #include "libsa.h"
-
+#if UNUSED
 int errno;
 
 char * strerror(int errnum)
@@ -33,3 +33,4 @@ char * strerror(int errnum)
     sprintf(error_string,"Error %d", errnum);
     return error_string;
 }
+#endif

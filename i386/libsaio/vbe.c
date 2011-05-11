@@ -29,36 +29,6 @@
 #include "libsaio.h"
 #include "vbe.h"
 
-/* 
- * Various inline routines for video I/O
- */
-static inline void
-outi (int port, int index, int val)
-{
-    outw (port, (val << 8) | index);
-}
-
-static inline void
-outib (int port, int index, int val)
-{
-    outb (port, index);
-    outb (port + 1, val);
-}
-
-static inline int
-ini (int port, int index)
-{
-    outb (port, index);
-    return inb (port + 1);
-}
-
-static inline void
-rmwi (int port, int index, int clear, int set)
-{
-    outb (port, index);
-    outb (port + 1, (inb (port + 1) & ~clear) | set);
-}
-
 /*
  * Globals
  */
@@ -84,7 +54,7 @@ int getVBEModeInfo( int mode, void * minfo_p )
     bios(&bb);
     return(bb.eax.r.h);
 }
-
+#if UNUSED
 int getVBEDACFormat(unsigned char *format)
 {
     bb.intno = 0x10;
@@ -104,6 +74,24 @@ int setVBEDACFormat(unsigned char format)
     bios(&bb);
     return(bb.eax.r.h);
 }
+#endif
+
+int getEDID( void * edidBlock, UInt8 block)
+{
+	bzero(&bb, sizeof(bb));
+    bb.intno  = 0x10;
+    bb.eax.rr = funcGetEDID;
+	bb.ebx.r.l= 0x01;
+	bb.edx.rr = block;
+	
+    bb.es     = SEG( edidBlock );
+    bb.edi.rr = OFF( edidBlock );
+	
+    bios( &bb );
+    return(bb.eax.r.h);
+}
+
+
 
 /*
  * Default GTF parameter values.
@@ -124,7 +112,7 @@ int Round(double f)
 /*
  * from http://www.azillionmonkeys.com/qed/sqroot.html
  */
-
+#if UNUSED
 double Sqrt( double y )
 {
 	double x, z, tempf;
@@ -249,6 +237,8 @@ int generateCRTCTiming( unsigned short     width,
     return 0;
 }
 
+#endif 
+
 int setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
 {
     bb.intno  = 0x10;
@@ -262,6 +252,7 @@ int setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
     return(bb.eax.r.h);
 }
 
+
 int setVBEPalette(void *palette)
 {
     bb.intno = 0x10;
@@ -274,6 +265,8 @@ int setVBEPalette(void *palette)
     bios(&bb);
     return(bb.eax.r.h);
 }
+
+#if UNUSED
 
 int getVBEPalette(void *palette)
 {
@@ -308,3 +301,4 @@ int getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
     *pixelClock = bb.ecx.rx;
     return(bb.eax.r.h);
 }
+#endif

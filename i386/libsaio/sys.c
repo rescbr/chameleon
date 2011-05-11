@@ -64,7 +64,7 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "disk.h"
-#include "ramdisk.h"
+#include "modules.h"
 #include "xml.h"
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 # include <Kernel/libkern/crypto/md5.h>
@@ -79,8 +79,10 @@
 UUID_DEFINE( kFSUUIDNamespaceSHA1, 0xB3, 0xE2, 0x0F, 0x39, 0xF2, 0x92, 0x11, 0xD6, 0x97, 0xA4, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC );
 #endif
 
+#if UNUSED
 extern int multiboot_partition;
 extern int multiboot_partition_set;
+#endif
 
 struct devsw {
     const char *  name;
@@ -224,23 +226,6 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
     return length;
 }
 
-#if UNUSED
-long GetFSUUID(char *spec, char *uuidStr)
-{
-    BVRef      bvr;
-    long       rval = -1;
-    const char *devSpec;
-
-    if ((bvr = getBootVolumeRef(spec, &devSpec)) == NULL)
-        return -1;
-
-    if(bvr->fs_getuuid)
-        rval = bvr->fs_getuuid(bvr, uuidStr);
-
-    return rval;
-}
-#endif
-
 // filesystem-specific getUUID functions call this shared string generator
 long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 {
@@ -356,21 +341,6 @@ long GetFileInfo(const char * dirSpec, const char * name,
     return -1;  // file not found
 }
 
-long GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
-{
-    const char * filePath;
-    BVRef        bvr;
-
-    // Resolve the boot volume from the file spec.
-
-    if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
-        printf("Boot volume for '%s' is bogus\n", fileSpec);
-        return -1;
-    }
-
-    return bvr->fs_getfileblock(bvr, (char *)filePath, firstBlock);
-}
-
 //==========================================================================
 // GetFreeFD()
 
@@ -404,28 +374,6 @@ static struct iob * iob_from_fdesc(int fdesc)
         return NULL;
     else
         return io;
-}
-
-//==========================================================================
-// openmem()
-
-int openmem(char * buf, int len)
-{
-    int          fdesc;
-    struct iob * io;
-
-    fdesc = GetFreeFd();
-    io = &iob[fdesc];
-    bzero(io, sizeof(*io));
-
-    // Mark the descriptor as taken. Set the F_MEM flag to indicate
-    // that the file buffer is provided by the caller.
-
-    io->i_flgs     = F_ALLOC | F_MEM;
-    io->i_buf      = buf;
-    io->i_filesize = len;
-
-    return fdesc;
 }
 
 //==========================================================================
@@ -540,35 +488,6 @@ int close(int fdesc)
 }
 
 //==========================================================================
-// lseek() - Reposition the byte offset of the file descriptor from the
-//           beginning of the file. Returns the relocated offset.
-
-int b_lseek(int fdesc, int offset, int ptr)
-{
-    struct iob * io;
-
-    if ((io = iob_from_fdesc(fdesc)) == NULL)
-        return (-1);
-
-    io->i_offset = offset;
-
-    return offset;
-}
-
-//==========================================================================
-// tell() - Returns the byte offset of the file descriptor.
-
-int tell(int fdesc)
-{
-    struct iob * io;
-
-    if ((io = iob_from_fdesc(fdesc)) == NULL)
-        return 0;
-
-    return io->i_offset;
-}
-
-//==========================================================================
 // read() - Read up to 'count' bytes of data from the file descriptor
 //          into the buffer pointed to by buf.
 
@@ -590,6 +509,153 @@ int read(int fdesc, char * buf, int count)
     io->i_offset += count;
 
     return count;
+}
+
+//==========================================================================
+// file_size() - Returns the size of the file described by the file
+//               descriptor.
+
+int file_size(int fdesc)
+{
+    struct iob * io;
+
+    if ((io = iob_from_fdesc(fdesc)) == 0)
+        return 0;
+
+    return io->i_filesize;
+}
+
+//==========================================================================
+
+struct dirstuff * opendir(const char * path)
+{
+    struct dirstuff * dirp = 0;
+    const char *      dirPath;
+    BVRef             bvr;
+
+    if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
+        goto error;
+
+    dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
+    if (dirp == NULL)
+        goto error;
+
+    dirp->dir_path = newString(dirPath);
+    if (dirp->dir_path == NULL)
+        goto error;
+
+    dirp->dir_bvr = bvr;
+
+    return dirp;
+
+error:
+    closedir(dirp);
+    return NULL;
+}
+
+//==========================================================================
+
+int closedir(struct dirstuff * dirp)
+{
+    if (dirp) {
+        if (dirp->dir_path) free(dirp->dir_path);
+        free(dirp);
+    }
+    return 0;
+}
+
+//==========================================================================
+
+int readdir(struct dirstuff * dirp, const char ** name, long * flags,
+            long * time)
+{
+    return dirp->dir_bvr->fs_getdirentry( dirp->dir_bvr,
+                          /* dirPath */   dirp->dir_path,
+                          /* dirIndex */  &dirp->dir_index,
+                          /* dirEntry */  (char **)name, flags, time,
+                                          0, 0);
+}
+
+#if UNUSED
+long GetFSUUID(char *spec, char *uuidStr)
+{
+    BVRef      bvr;
+    long       rval = -1;
+    const char *devSpec;
+	
+    if ((bvr = getBootVolumeRef(spec, &devSpec)) == NULL)
+        return -1;
+	
+    if(bvr->fs_getuuid)
+        rval = bvr->fs_getuuid(bvr, uuidStr);
+	
+    return rval;
+}
+
+long GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
+{
+    const char * filePath;
+    BVRef        bvr;
+	
+    // Resolve the boot volume from the file spec.
+	
+    if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
+        printf("Boot volume for '%s' is bogus\n", fileSpec);
+        return -1;
+    }
+	
+    return bvr->fs_getfileblock(bvr, (char *)filePath, firstBlock);
+}
+
+//==========================================================================
+// openmem()
+
+int openmem(char * buf, int len)
+{
+    int          fdesc;
+    struct iob * io;
+	
+    fdesc = GetFreeFd();
+    io = &iob[fdesc];
+    bzero(io, sizeof(*io));
+	
+    // Mark the descriptor as taken. Set the F_MEM flag to indicate
+    // that the file buffer is provided by the caller.
+	
+    io->i_flgs     = F_ALLOC | F_MEM;
+    io->i_buf      = buf;
+    io->i_filesize = len;
+	
+    return fdesc;
+}
+
+//==========================================================================
+// lseek() - Reposition the byte offset of the file descriptor from the
+//           beginning of the file. Returns the relocated offset.
+
+int b_lseek(int fdesc, int offset, int ptr)
+{
+    struct iob * io;
+	
+    if ((io = iob_from_fdesc(fdesc)) == NULL)
+        return (-1);
+	
+    io->i_offset = offset;
+	
+    return offset;
+}
+
+//==========================================================================
+// tell() - Returns the byte offset of the file descriptor.
+
+int tell(int fdesc)
+{
+    struct iob * io;
+	
+    if ((io = iob_from_fdesc(fdesc)) == NULL)
+        return 0;
+	
+    return io->i_offset;
 }
 
 //==========================================================================
@@ -647,93 +713,27 @@ int writeint(int fdesc, int value)
 	
     return 4;
 }
-
-//==========================================================================
-// file_size() - Returns the size of the file described by the file
-//               descriptor.
-
-int file_size(int fdesc)
-{
-    struct iob * io;
-
-    if ((io = iob_from_fdesc(fdesc)) == 0)
-        return 0;
-
-    return io->i_filesize;
-}
-
 //==========================================================================
 
 struct dirstuff * vol_opendir(BVRef bvr, const char * path)
 {
     struct dirstuff * dirp = 0;
-
+	
     dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
     if (dirp == NULL)
         goto error;
-
+	
     dirp->dir_path = newString(path);
     if (dirp->dir_path == NULL)
         goto error;
-
+	
     dirp->dir_bvr = bvr;
-
+	
     return dirp;
-
+	
 error:
     closedir(dirp);
     return NULL;
-}
-
-//==========================================================================
-
-struct dirstuff * opendir(const char * path)
-{
-    struct dirstuff * dirp = 0;
-    const char *      dirPath;
-    BVRef             bvr;
-
-    if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
-        goto error;
-
-    dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
-    if (dirp == NULL)
-        goto error;
-
-    dirp->dir_path = newString(dirPath);
-    if (dirp->dir_path == NULL)
-        goto error;
-
-    dirp->dir_bvr = bvr;
-
-    return dirp;
-
-error:
-    closedir(dirp);
-    return NULL;
-}
-
-//==========================================================================
-
-int closedir(struct dirstuff * dirp)
-{
-    if (dirp) {
-        if (dirp->dir_path) free(dirp->dir_path);
-        free(dirp);
-    }
-    return 0;
-}
-
-//==========================================================================
-
-int readdir(struct dirstuff * dirp, const char ** name, long * flags,
-            long * time)
-{
-    return dirp->dir_bvr->fs_getdirentry( dirp->dir_bvr,
-                          /* dirPath */   dirp->dir_path,
-                          /* dirIndex */  &dirp->dir_index,
-                          /* dirEntry */  (char **)name, flags, time,
-                                          0, 0);
 }
 
 //==========================================================================
@@ -748,7 +748,6 @@ int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
                                           flags, time,
                                           finderInfo, infoValid);
 }
-
 //==========================================================================
 
 const char * systemConfigDir()
@@ -757,6 +756,8 @@ const char * systemConfigDir()
 	return "";
     return "/Library/Preferences/SystemConfiguration";
 }
+
+#endif
 
 //==========================================================================
 
@@ -769,11 +770,13 @@ void scanBootVolumes( int biosdev, int * count )
   bvr = diskScanBootVolumes(biosdev, count);
   if (bvr == NULL)
   {
+#ifdef NBP_SUPPORT
     bvr = nbpScanBootVolumes(biosdev, count);
     if (bvr != NULL)
     {
       gBootFileType = kNetworkDeviceType;
     }
+#endif
   }
   else
   {
@@ -815,11 +818,12 @@ BVRef selectBootVolume( BVRef chain )
 	
 	if (chain->filtered) filteredChain = true;
 	
+#if UNUSED
 	if (multiboot_partition_set)
 		for ( bvr = chain; bvr; bvr = bvr->next )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
-	
+#endif
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.
@@ -834,7 +838,7 @@ BVRef selectBootVolume( BVRef chain )
             }
         }
         free(val);
-    }
+    }	
 	
 	/*
 	 * Scannig the volume chain backwards and trying to find 
@@ -1029,16 +1033,13 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 	bvr = bvr1 = NULL;
 
     // Try resolving "rd" and "bt" devices first.
-	if (biosdev == kPseudoBIOSDevRAMDisk)
+	execute_hook("newRamDisk_BVR", &biosdev, &bvr1, NULL, NULL, NULL, NULL);
+	
+    // Try resolving "rd" and "bt" devices first.
+	
+	if (biosdev == kPseudoBIOSDevBooter)
 	{
-		if (gRAMDiskVolume)
-		    bvr1 = gRAMDiskVolume;
-	}
-	else if (biosdev == kPseudoBIOSDevBooter)
-	{
-		if (gRAMDiskVolume != NULL && gRAMDiskBTAliased)
-			bvr1 = gRAMDiskVolume;
-		else
+		if (bvr1 == NULL )
 			bvr1 = gBIOSBootVolume;
 	}
 	else

@@ -34,7 +34,7 @@ extern char *Language;
 extern char *LoadableFamilies;
 
 bool sysConfigValid;
-
+#if UNUSED
 /*
  * Compare a string to a key with quoted characters
  */
@@ -68,8 +68,6 @@ keyncmp(const char *str, const char *key, int n)
     }
     return 0;
 }
-
-#if UNUSED
 
 static void eatThru(char val, const char **table_p)
 {
@@ -164,8 +162,6 @@ newStringFromList(
     return newstr;
 }
 
-#endif
-
 /* 
  * compress == compress escaped characters to one character
  */
@@ -189,7 +185,7 @@ int stringLength(const char *table, int compress)
 	}
 	return ret;
 }
-
+#endif
 
 bool getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size)
 {
@@ -586,9 +582,14 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
 
-	if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
+	/*if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
+		return -1;
+	}*/
+	
+	if ((fd = open(configFile, 0)) < 0) {
 		return -1;
 	}
+	
 	// read file
 	count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 	close(fd);
@@ -610,9 +611,6 @@ int loadSystemConfig(config_file_t *config)
 		"/Extra/com.apple.Boot.plist",
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 
 	int i, fd, count, ret=-1;
@@ -636,6 +634,13 @@ int loadSystemConfig(config_file_t *config)
 			break;
 		}
 	}
+#ifdef BOOT_HELPER_SUPPORT
+	if(ret == -1)
+	{
+		ret = loadHelperConfig(config);
+	}
+#endif
+	
 	return ret;
 }
 
@@ -650,9 +655,6 @@ int loadOverrideConfig(config_file_t *config)
 		"rd(0,0)/Extra/com.apple.Boot.plist",
 		"/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 
 	int i, fd, count, ret=-1;
@@ -672,8 +674,17 @@ int loadOverrideConfig(config_file_t *config)
 			break;
 		}
 	}
+#ifdef BOOT_HELPER_SUPPORT	
+	if(ret == -1)
+	{
+		ret = loadHelperConfig(config);
+	}
+#endif
+
 	return ret;
 }
+
+#ifdef BOOT_HELPER_SUPPORT
 
 /* loadHelperConfig
  *
@@ -682,31 +693,102 @@ int loadOverrideConfig(config_file_t *config)
  */
 int loadHelperConfig(config_file_t *config)
 {
+	int rfd, pfd, sfd, count, ret=-1;
+
 	char *dirspec[] = {
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
-
-	int i, fd, count, ret=-1;
-
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	
+	// This is a simple rock - paper scissors algo. R beats S, P beats R, S beats P
+	// If all three, S is used for now. This should be change dto something else (say, timestamp?)
+	
+	pfd = open(dirspec[0], 0);
+	if(pfd >= 0)	// com.apple.boot.P exists
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
+		sfd = open(dirspec[2], 0); // com.apple.boot.S takes precidence if it also exists
+		if(sfd >= 0)
 		{
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
+			// Use sfd
+			count = read(sfd, config->plist, IO_CONFIG_DATA_SIZE);
+			close(sfd);
+			close(pfd);
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
 			sysConfigValid = true;	
 			ret=0;
-			break;
+			
 		}
+		else
+		{
+			// used pfd
+			count = read(pfd, config->plist, IO_CONFIG_DATA_SIZE);
+			close(pfd);
+			
+			// build xml dictionary
+			ParseXMLFile(config->plist, &config->dictionary);
+			sysConfigValid = true;	
+			ret=0;
+		}
+
 	}
+	else
+	{
+		rfd = open(dirspec[1], 0); // com.apple.boot.R exists
+		if(rfd >= 0)
+		{
+			pfd = open(dirspec[2], 0); // com.apple.boot.P takes recidence if it exists
+			if(pfd >= 0)
+			{
+				// use sfd
+				count = read(pfd, config->plist, IO_CONFIG_DATA_SIZE);
+				close(pfd);
+				close(rfd);
+
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;	
+				ret=0;
+				
+			}
+			else
+			{
+				// use rfd
+				count = read(rfd, config->plist, IO_CONFIG_DATA_SIZE);
+				close(rfd);
+				
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;	
+				ret=0;
+				
+			}
+
+		}
+		else
+		{
+			sfd = open(dirspec[2], 0); // com.apple.boot.S exists, but nothing else does
+			if(sfd >= 0)
+			{
+				// use sfd
+				count = read(sfd, config->plist, IO_CONFIG_DATA_SIZE);
+				close(sfd);
+				
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;	
+				ret=0;
+				
+			}
+		}
+
+	}
+
 	return ret;
 }
+#endif
 
 char * newString(const char * oldString)
 {

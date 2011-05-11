@@ -25,7 +25,6 @@ typedef struct _Node {
     struct _Node *     next;
 } Node;
 
-
 extern Property *
 DT__AddProperty(Node *node, const char *name, uint32_t length, void *value);
 
@@ -56,6 +55,5 @@ DT__Finalize(void);
 
 void
 DT__FlattenDeviceTree(void **result, uint32_t *length);
-
 
 #endif /* __DEVICE_TREE_H */

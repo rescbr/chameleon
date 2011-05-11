@@ -21,8 +21,8 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-
 #include "libsaio.h"
+#include "nbp_cmd.h"
 
 /*  This NBP code is pretty useless because it just blindly calls INT 2B.
     Presumably INT 2B was implemented by some first-stage bootloader that
@@ -35,11 +35,7 @@
     fail instead of attempting to use this NBP which will often
     hang the machine.
  */
-#ifndef NBP_SUPPORT
-#define NBP_SUPPORT 0
-#endif
 
-#if NBP_SUPPORT
 
 /*
  * Convert zero-based linear address to far pointer.
@@ -133,13 +129,3 @@ BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
     }
     return gNetBVR;
 }
-#else
-BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
-{
-    return NULL;
-}
-UInt32 nbpUnloadBaseCode()
-{
-    return 0;
-}
-#endif

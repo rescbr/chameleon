@@ -38,22 +38,24 @@ typedef uint16_t	SMBWord;
 typedef uint32_t	SMBDWord;
 typedef uint64_t	SMBQWord;
 
-struct DMIHeader {
+typedef struct DMIHeader {
 	SMBByte			type;
 	SMBByte			length;
 	SMBWord			handle;
-} __attribute__((packed));
+} __attribute__((packed)) DMIHeader;
 
-struct DMIEntryPoint {
+#define DMI_STRUCT_HEADER  DMIHeader dmiHeader;
+
+typedef struct DMIEntryPoint {
 	SMBByte			anchor[5];
 	SMBByte			checksum;
 	SMBWord			tableLength;
 	SMBDWord		tableAddress;
 	SMBWord			structureCount;
 	SMBByte			bcdRevision;
-} __attribute__((packed));
+} __attribute__((packed)) DMIEntryPoint;
 
-struct SMBEntryPoint {
+typedef struct SMBEntryPoint {
 	SMBByte			anchor[4];
 	SMBByte			checksum;
 	SMBByte			entryPointLength;
@@ -63,10 +65,10 @@ struct SMBEntryPoint {
 	SMBByte			entryPointRevision;
 	SMBByte			formattedArea[5];
 	struct DMIEntryPoint	dmi;
-} __attribute__((packed));
+} __attribute__((packed)) SMBEntryPoint;
 
-struct DMIMemoryControllerInfo {/* 3.3.6 Memory Controller Information (Type 5) */
-	struct DMIHeader	dmiHeader;
+typedef struct DMIMemoryControllerInfo {/* 3.3.6 Memory Controller Information (Type 5) */
+	DMI_STRUCT_HEADER
 	SMBByte			errorDetectingMethod;
 	SMBByte			errorCorrectingCapability;
 	SMBByte			supportedInterleave;
@@ -76,10 +78,10 @@ struct DMIMemoryControllerInfo {/* 3.3.6 Memory Controller Information (Type 5) 
 	SMBWord			supportedMemoryTypes;
 	SMBByte			memoryModuleVoltage;
 	SMBByte			numberOfMemorySlots;
-} __attribute__((packed));
+} __attribute__((packed)) DMIMemoryControllerInfo;
 
-struct DMIMemoryModuleInfo {	/* 3.3.7 Memory Module Information (Type 6) */
-	struct DMIHeader	dmiHeader;
+typedef struct DMIMemoryModuleInfo {	/* 3.3.7 Memory Module Information (Type 6) */
+	DMI_STRUCT_HEADER
 	SMBByte			socketDesignation;
 	SMBByte			bankConnections;
 	SMBByte			currentSpeed;
@@ -87,20 +89,20 @@ struct DMIMemoryModuleInfo {	/* 3.3.7 Memory Module Information (Type 6) */
 	SMBByte			installedSize;
 	SMBByte			enabledSize;
 	SMBByte			errorStatus;
-} __attribute__((packed));
+} __attribute__((packed)) DMIMemoryModuleInfo;
 
-struct DMIPhysicalMemoryArray {	/* 3.3.17 Physical Memory Array (Type 16) */
-	struct DMIHeader	dmiHeader;
+typedef struct DMIPhysicalMemoryArray {	/* 3.3.17 Physical Memory Array (Type 16) */
+	DMI_STRUCT_HEADER
 	SMBByte			location;
 	SMBByte			use;
 	SMBByte			memoryCorrectionError;
 	SMBDWord		maximumCapacity;
 	SMBWord			memoryErrorInformationHandle;
 	SMBWord			numberOfMemoryDevices;
-} __attribute__((packed));
+} __attribute__((packed)) DMIPhysicalMemoryArray;
 
-struct DMIMemoryDevice {	/* 3.3.18 Memory Device (Type 17) */
-	struct DMIHeader	dmiHeader;
+typedef struct DMIMemoryDevice {	/* 3.3.18 Memory Device (Type 17) */
+	DMI_STRUCT_HEADER
 	SMBWord			physicalMemoryArrayHandle;
 	SMBWord			memoryErrorInformationHandle;
 	SMBWord			totalWidth;
@@ -112,7 +114,30 @@ struct DMIMemoryDevice {	/* 3.3.18 Memory Device (Type 17) */
 	SMBByte			bankLocator;
 	SMBByte			memoryType;
 	SMBWord			typeDetail;
-        SMBWord                 speed;
-} __attribute__((packed));
+    SMBWord         speed;
+} __attribute__((packed)) DMIMemoryDevice;
+
+typedef struct SMBStructHeader {
+    SMBByte    type;
+    SMBByte    length;
+    SMBWord    handle;
+}__attribute__((packed)) SMBStructHeader;
+
+#define SMB_STRUCT_HEADER  SMBStructHeader header;
+
+typedef struct SMBSystemInformation {
+	// 2.0+ spec (8 bytes)
+	SMB_STRUCT_HEADER               // Type 1
+	SMBString  manufacturer;
+	SMBString  productName;
+	SMBString  version;
+	SMBString  serialNumber;
+	// 2.1+ spec (25 bytes)
+	SMBByte    uuid[16];            // can be all 0 or all 1's
+	SMBByte    wakeupReason;        // reason for system wakeup
+	// 2.4+ spec (27 bytes)
+    SMBString  skuNumber;
+    SMBString  family;
+}__attribute__((packed)) SMBSystemInformation;
 
 #endif /* !_LIBSAIO_SMBIOS_H */

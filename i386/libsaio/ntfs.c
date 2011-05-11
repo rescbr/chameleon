@@ -22,7 +22,6 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-
 #include "libsaio.h"
 #include "sl.h"
 

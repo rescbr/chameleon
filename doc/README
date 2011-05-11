@@ -37,7 +37,15 @@
   
    - Install boot to the partition's root directory:
   		sudo cp boot /
-  
+	
+   - Install Symbols and modules to the partition's root directory or the partition's booter  (if needed):   
+		* Symbols.dylib is absolutely needed if you plan to use any other module, 
+		* otherwise Symbols.dylib is useless, assume that /Extra is already created (if you need special permissions, use sudo)
+		
+		mkdir /Extra/modules
+		cp Symbols.dylib /Extra/modules 
+		cp "Any other module wanted".dylib /Extra/modules
+		
   No need to use startupfiletool anymore!
   
   

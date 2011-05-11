@@ -32,7 +32,9 @@ extern void   real_to_prot(void);
 extern void   prot_to_real(void);
 extern void   halt(void);
 extern void   startprog(unsigned int address, void *arg);
+#ifdef NBP_SUPPORT
 extern void   loader(UInt32 code, UInt32 cmdptr);
+#endif
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -79,6 +81,7 @@ extern void   initKernBootStruct(void);
 extern void   reserveKernBootStruct(void);
 extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
+extern void   reserveKernLegacyBootStruct(void);
 
 /* cache.c */
 extern void CacheReset();
@@ -141,9 +144,11 @@ extern int    checkForSupportedHardware();
 extern int	  isLaptop();
 extern void   getPlatformName(char *nameBuf);
 
+#ifdef NBP_SUPPORT
 /* nbp.c */
 extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
+#endif
 
 /* stringTable.c */
 extern char * newStringFromList(char **list, int *size);
@@ -161,7 +166,9 @@ extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
 extern int    loadSystemConfig(config_file_t *configBuff);
+#ifdef BOOT_HELPER_SUPPORT
 extern int    loadHelperConfig(config_file_t *configBuff);
+#endif
 extern int    loadOverrideConfig(config_file_t *configBuff);
 extern char * newString(const char *oldString);
 extern char * getNextArg(char ** ptr, char * val);
@@ -172,7 +179,7 @@ extern BVRef getBootVolumeRef( const char * path, const char ** outPath );
 extern long   LoadVolumeFile(BVRef bvr, const char *fileSpec);
 extern long   LoadFile(const char *fileSpec);
 extern long   ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length);
-extern long   LoadThinFatFile(const char *fileSpec, void **binary);
+extern long LoadThinFatFile(const char *fileSpec, void **binary);
 extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char **name,
                           long *flags, long *time);
 extern long   GetFileInfo(const char *dirSpec, const char *name,
@@ -212,10 +219,52 @@ extern int    gBootFileType;
 extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;
 
-// Function pointer to be filled in if ramdisks are available
-extern int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip);
-extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
-                      unsigned int byteoff,
-                      unsigned int byteCount, void * buffer );
+extern void turnOffFloppy(void);
+#if UNUSED
+extern void ichwd_init(void);
+extern void ichwd_event(int sec);
+extern void ichwd_free(void);
 
+/*
+ *  Exported globals here.
+ */
+
+/*
+ *  "imps_enabled" is non-zero if the probe sequence found IMPS
+ *  information and was successful.
+ */
+extern int imps_enabled;
+
+/*
+ *  This contains the local APIC hardware address.
+ */
+extern unsigned imps_lapic_addr;
+
+/*
+ *  This represents the number of CPUs found.
+ */
+extern int imps_num_cpus;
+
+/*
+ *  This is the primary function for probing for Intel MPS 1.1/1.4
+ *  compatible hardware and BIOS information.  While probing the CPUs
+ *  information returned from the BIOS, this also starts up each CPU
+ *  and gets it ready for use.
+ *
+ *  Call this during the early stages of OS startup, before memory can
+ *  be messed up.
+ *
+ *  Returns N if IMPS information was found (for number of CPUs started)
+ *  and is valid, else 0.
+ */
+
+extern int imps_probe(void);
+
+/*
+ *  This one is used as a "force" function.  Give it the number of CPUs
+ *  to start, and it will assume a certain number and try it.
+ */
+
+extern int imps_force(int ncpus);
+#endif
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

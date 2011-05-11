@@ -30,10 +30,9 @@
  */
 
 #include "libsa.h"
-//#include "saio_internal.h" - Azi: needed for ZDEBUG (printf)
 #include "memory.h"
 
-#define ZDEBUG 0 //Azi: booter doesn't load with this enabled; instant reboot at "boot1: ..."
+#define ZDEBUG 1
 
 #if ZDEBUG
 int zout;
@@ -49,7 +48,11 @@ static zmem * zavailable;
 static short  availableNodes, allocedNodes, totalNodes;
 static char * zalloc_base;
 static char * zalloc_end;
-static void   (*zerror)(char *, size_t, const char *, int);
+#ifdef SAFE_MALLOC
+static void  (*zerror)(char *, size_t, const char *, int);
+#else
+static void   (*zerror)(char *, size_t);
+#endif
 
 static void   zallocate(char * start,int size);
 static void   zinsert(zmem * zp, int ndx);
@@ -62,7 +65,11 @@ size_t zalloced_size;
 
 #define ZALLOC_NODES	16384
 
+#ifdef SAFE_MALLOC
 static void malloc_error(char *addr, size_t size, const char *file, int line)
+#else
+static void malloc_error(char *addr, size_t size)
+#endif
 {
 #ifdef i386
     asm volatile ("hlt");
@@ -70,7 +77,11 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 }
 
 // define the block of memory that the allocator will use
+#ifdef SAFE_MALLOC
 void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *, size_t, const char *, int))
+#else
+void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *, size_t))
+#endif
 {
 	zalloc_base         = start ? start : (char *)ZALLOC_ADDR;
 	totalNodes          = nodes ? nodes : ZALLOC_NODES;
@@ -87,7 +98,11 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 
 #define BEST_FIT 1
 
+#ifdef SAFE_MALLOC
 void * safe_malloc(size_t size, const char *file, int line)
+#else
+void * malloc(size_t size)
+#endif
 {
 	int    i;
 #if BEST_FIT
@@ -104,9 +119,16 @@ void * safe_malloc(size_t size, const char *file, int line)
 
 	size = ((size + 0xf) & ~0xf);
 
-        if (size == 0) {
+        /*if (size == 0) {
             if (zerror) (*zerror)((char *)0xdeadbeef, 0, file, line);
-        }
+        }*/
+	if (size == 0 && zerror)
+#ifdef SAFE_MALLOC
+        (*zerror)((char *)0xdeadbeef, 0, file, line);
+#else
+		(*zerror)((char *)0xdeadbeef, 0);
+#endif
+	
 #if BEST_FIT
         smallestSize = 0;
         bestFit = -1;
@@ -156,7 +178,12 @@ void * safe_malloc(size_t size, const char *file, int line)
 done:
 	if ((ret == 0) || (ret + size >= zalloc_end))
     {
-		if (zerror) (*zerror)(ret, size, file, line);
+		if (zerror) 
+#ifdef SAFE_MALLOC
+           (*zerror)(ret, size, file, line);
+#else
+		   (*zerror)(ret, size);
+#endif
     }
 	if (ret != 0)
     {
@@ -194,7 +221,7 @@ void free(void * pointer)
 			tsize = zalloced[i].size;
 #if ZDEBUG
 			zout -= tsize;
-			printf("    zz out %d\n",zout);
+			//printf("    zz out %d\n",zout);
 #endif
 			zdelete(zalloced, i); allocedNodes--;
 			found = 1;
@@ -205,7 +232,12 @@ void free(void * pointer)
 		}
 	}
 	if ( !found )  {
-            if (zerror) (*zerror)(pointer, rp, "free", 0);
+            if (zerror) 
+#ifdef SAFE_MALLOC
+				(*zerror)(pointer, rp, "free", 0);
+#else
+				(*zerror)(pointer, rp);
+#endif
             else return;
         }
 #if ZDEBUG
@@ -233,7 +265,12 @@ void free(void * pointer)
 		if ((start + tsize) < zavailable[i].start)
 		{
                         if (++availableNodes > totalNodes) {
-                            if (zerror) (*zerror)((char *)0xf000f000, 0, "free", 0);
+                            if (zerror) 
+#ifdef SAFE_MALLOC
+								(*zerror)((char *)0xf000f000, 0, "free", 0);
+#else
+								(*zerror)((char *)0xf000f000, 0);
+#endif
                         }
 			zinsert(zavailable, i); 
 			zavailable[i].start = start;
@@ -243,7 +280,12 @@ void free(void * pointer)
 	}
 
         if (++availableNodes > totalNodes) {
-            if (zerror) (*zerror)((char *)0xf000f000, 1, "free", 0);
+            if (zerror) 
+#ifdef SAFE_MALLOC
+				(*zerror)((char *)0xf000f000, 1, "free", 0);
+#else
+				(*zerror)((char *)0xf000f000, 1);
+#endif
         }
 	zavailable[i].start = start;
 	zavailable[i].size  = tsize;
@@ -256,12 +298,17 @@ zallocate(char * start,int size)
 {
 #if ZDEBUG
 	zout += size;
-	printf("    alloc %d, total 0x%x\n",size,zout);
+	//printf("    alloc %d, total 0x%x\n",size,zout);
 #endif
 	zalloced[allocedNodes].start = start;
 	zalloced[allocedNodes].size  = size;
 	if (++allocedNodes > totalNodes) {
-            if (zerror) (*zerror)((char *)0xf000f000, 2, "zallocate", 0);
+            if (zerror) 
+#ifdef SAFE_MALLOC
+				(*zerror)((char *)0xf000f000, 2, "zallocate", 0);
+#else
+				(*zerror)((char *)0xf000f000, 2);
+#endif
         };
 }
 
@@ -316,7 +363,11 @@ zcoalesce(void)
 /* This is the simplest way possible.  Should fix this. */
 void * realloc(void * start, size_t newsize)
 {
+#ifdef SAFE_MALLOC
     void * newstart = safe_malloc(newsize, __FILE__, __LINE__);
+#else
+    void * newstart = malloc(newsize);
+#endif
     bcopy(start, newstart, newsize);
     free(start);
     return newstart;

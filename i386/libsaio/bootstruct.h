@@ -25,17 +25,18 @@
 #ifndef __BOOTSTRUCT_H
 #define __BOOTSTRUCT_H
 
-#include "bootargs.h"
+//#include <pexpert/i386/boot.h>
+#include "bootLion.h"
 #include "saio_types.h"
 #include "bios.h"
 #include "device_tree.h"
-
+#include "efi.h"
 /*!
     Kernel boot args global also used by booter for its own data.
  */
 extern boot_args *bootArgs;
-extern boot_args_pre_lion *bootArgsPreLion;
 extern Node *gMemoryMapNode;
+extern boot_args_legacy  *bootArgsLegacy;
 
 #define VGA_TEXT_MODE 0
 
@@ -112,7 +113,7 @@ typedef struct PrivateBootInfo {
 #if 0
     int              numBootDrivers;               // number of drivers loaded
 #endif
-    char             bootFile[128];                // kernel file name
+    char             bootFile[128];                // kernel file name		
 
     unsigned long    memoryMapCount;
     MemoryRange      memoryMap[kMemoryMapCountMax];
@@ -123,14 +124,19 @@ typedef struct PrivateBootInfo {
     driver_config_t  driverConfig[NDRIVERS];
 #endif
     char *           configEnd;                    // pointer to end of config files
-    char             config[CONFIG_SIZE];
-
+    char             config[CONFIG_SIZE];	
+	
     config_file_t    bootConfig;		               // boot.plist
     config_file_t    overrideConfig;               // additional boot.plist which can override bootConfig keys
     config_file_t    themeConfig;				           // theme.plist
     config_file_t    smbiosConfig;				         // smbios.plist
     config_file_t    helperConfig;                 // boot helper partition's boot.plist
     config_file_t    ramdiskConfig;                // RAMDisk.plist
+	
+	unsigned long    adler32;
+	
+	char uuidStr[64+1];										//boot device  uuid
+	EFI_CHAR8	sysid[16];
 } PrivateBootInfo_t;
 
 extern PrivateBootInfo_t *bootInfo; 

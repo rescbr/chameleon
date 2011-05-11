@@ -60,7 +60,6 @@ static Node *rootNode;
 
 static Node *freeNodes, *allocedNodes;
 static Property *freeProperties, *allocedProperties;
-
 Property *
 DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
@@ -449,7 +448,7 @@ DT__PrintFlattenedTree(DTEntry entry)
     _PrintFlattenedTree(entry, 0);
 }
 
-
+#if UNUSED
 int
 main(int argc, char **argv)
 {
@@ -535,6 +534,7 @@ main(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 #endif
 

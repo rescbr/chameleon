@@ -60,54 +60,8 @@ Options useful in the com.apple.Boot.plist file:
      [;partition2 <alias2>   in quotes. The alias can optionally be quoted too. 
      ...]
 
-  GUI=No                  Disable the GUI (enabled by default).
-  "Boot Banner"=Yes|No    Show boot banner in GUI mode (enabled by default).
-  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
-  
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
-
-  GraphicsEnabler=Yes|No  Automatic device-properties generation for gfx cards.
-  UseAtiROM=Yes|No        Use an alternate Ati ROM image 
-                            (path: /Extra/<vendorid>_<devid>.rom)
-  UseNvidiaROM=Yes|No     Use an alternate Nvidia ROM image 
-                            (path:  /Extra/<vendorid>_<devid>.rom)
-  VBIOS=Yes|No            Inject VBIOS to device-properties.
-
-  EthernetBuiltIn=Yes|No  Automatic "built-in"=yes device-properties generation
-                          for ethernet interfaces.
-
-  USBBusFix=Yes           Enable all USB fixes below:
-  EHCIacquire=Yes         Enable the EHCI fix (disabled by default).
-  UHCIreset=Yes           Enable the UHCI fix (disabled by default).
-  USBLegacyOff=Yes        Enable the USB Legacy fix (disabled by default).
-
-  ForceHPET=Yes|No        Force Enable HPET.
-
-  Wake=No                 Disable wake up after hibernation (default: enabled).
-  ForceWake=Yes           Force using the sleepimage (disabled by default).
-  WakeImage=<file>        Use an alternate sleepimage file. 
-                            (default path is /private/var/vm/sleepimage).
-
-  DropSSDT=Yes            Skip the SSDT tables while relocating the ACPI tables.
-  DSDT=<file>             Use an alternate DSDT.aml file 
-                            (default paths:
-                              /DSDT.aml /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
-
-  GenerateCStates=Yes     Enable auto generation of Processor (C-States) and/or
-  GeneratePStates=Yes       Performance (P-States) power states.
-
-  EnableC2State=Yes       Enable specific Processor power states, C2,
-  EnableC3State=Yes         C3
-  EnableC4State=Yes         and C4.
-
-  SMBIOS=<file>           Use an alternate SMBIOS.plist file 
-                            (default paths:
-                              /Extra/SMBIOS.plist bt(0,0)/Extra/SMBIOS.plist).
-
-  SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding
-                            if smbios.plist doesn't exist, factory
-                            values are kept.
-
+  
   "Scan Single Drive"     Scan the drive only where the booter got loaded from.
     =Yes|No               Fix rescan pbs when using a DVD reader in AHCI mode. 
   Rescan=Yes              Enable CD-ROM rescan mode.
@@ -116,5 +70,4 @@ Options useful in the com.apple.Boot.plist file:
                           SMUUID in smbios config (reserved field) isn't used.
   SystemType=<n>          Set the system type where n is between 0..6
                           (default =1 (Desktop)
-  md0=<file>              Load raw img file into memory for use as XNU's md0
-                          ramdisk. /Extra/Postboot.img is used otherwise.
+						  
