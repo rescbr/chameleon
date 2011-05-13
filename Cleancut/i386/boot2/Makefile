@@ -112,6 +112,7 @@ boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	-no_uuid \
 	-final_output Symbols \
 	$(filter %.o,$^) $(LIBS) \
+	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
 

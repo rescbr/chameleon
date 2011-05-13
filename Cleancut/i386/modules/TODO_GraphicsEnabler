@@ -1,0 +1,10 @@
+- get testers for GraphicsEnabler module (new ATI code); i have no way to test it.
+- review & clean up
+- break these modules into e.g. ATIEnabler/ATIEnablerLegacy, NVIDIAEnabler, GMAEnabler ??
+- remove this file when done :)
+
+Note: No problems compiling with either XCode 3.2.6 or 4.0.2.
+	  GraphicsEnablerLegacy has support for some GMA graphics, basically the same
+	  that can be found on Meklort's branch.
+
+Thanks to everyone that worked on these patches; i'm mostly just gathering their work.
