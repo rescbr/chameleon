@@ -31,7 +31,7 @@
 #include "bios.h"
 #include "nbp_cmd.h"
 #include "bootargs.h"
-
+//Azi: shouldn't this be on disk.c ??
 #if DEBUG
 #define DEBUG_DISK(x)    printf x
 #else
@@ -54,9 +54,9 @@ struct driveParameters {
 };
 
 struct Tag {
-	long       type;
+	long        type;
 	char       *string;
-	long	   offset;
+	long	    offset;
 	struct Tag *tag;
 	struct Tag *tagNext;
 };
@@ -65,7 +65,7 @@ typedef struct Tag Tag, *TagPtr;
 typedef struct {
 	char	plist[4096];	// buffer for plist
 	TagPtr	dictionary;		// buffer for xml dictionary
-	bool  canOverride;  // flag to mark a dictionary can be overriden
+	bool	canOverride;	// flag to mark a dictionary can be overriden
 } config_file_t;
 
 /*
@@ -148,6 +148,9 @@ struct iob {
     char *         i_buf;           /* file load address */
 };
 
+//Azi: 4K drive fails everytime I try...??
+// http://forum.voodooprojects.org/index.php/topic,568.msg9763.html#msg9763
+// MSDOS_CACHE_BLOCKSIZE ??????
 #define BPS        512              /* sector size of the device */
 #define F_READ     0x1              /* file opened for reading */
 #define F_WRITE    0x2              /* file opened for writing */
@@ -186,20 +189,20 @@ struct BootVolume {
     char             type_name[BVSTRLEN]; /* (type of partition, eg. Apple_HFS) */
     BVFree           bv_free;         /* BVFree function */
     uint32_t         modTime;
-    char			       label[BVSTRLEN]; /* partition volume label */
-    char			       altlabel[BVSTRLEN]; /* partition volume label */
+    char			 label[BVSTRLEN]; /* partition volume label */
+    char			 altlabel[BVSTRLEN]; /* partition volume label */
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
 };
 
 enum {
-  kBVFlagPrimary          = 0x01,
-  kBVFlagNativeBoot       = 0x02,
-  kBVFlagForeignBoot      = 0x04,
-  kBVFlagBootable         = 0x08,
-  kBVFlagEFISystem        = 0x10,
-  kBVFlagBooter           = 0x20,
-  kBVFlagSystemVolume     = 0x40
+	kBVFlagPrimary          = 0x01,
+	kBVFlagNativeBoot       = 0x02,
+	kBVFlagForeignBoot      = 0x04,
+	kBVFlagBootable         = 0x08,
+	kBVFlagEFISystem        = 0x10,
+	kBVFlagBooter           = 0x20,
+	kBVFlagSystemVolume     = 0x40
 };
 
 enum {
@@ -212,12 +215,11 @@ enum {
 };
 
 enum {
-	
 	kPartitionTypeHFS	  = 0xAF,
 	kPartitionTypeHPFS    = 0x07,
 	kPartitionTypeFAT16   = 0x06,
 	kPartitionTypeFAT32   = 0x0c,
-	kPartitionTypeEXT3    = 0x83,
+	kPartitionTypeEXT3    = 0x83
 };
 
 //#define BIOS_DEV_TYPE(d)  ((d) & kBIOSDevTypeMask)
@@ -233,23 +235,28 @@ enum {
     DEV_EN = 3
 };
 
-#ifndef max
-#define max(a,b) ((a) > (b) ? (a) : (b))
+/*
+ * Macros for min/max.
+ *
+ * Azi: defined on <sys/param.h>; includes, check later...
+ */
+#ifndef MIN
+#define	MIN(a,b) ( ((a) < (b)) ? (a) : (b) )
+#endif
+#ifndef MAX
+#define	MAX(a,b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-#ifndef min
-#define min(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-#define	round2(x, m)	(((x) + (m / 2)) & ~(m - 1))
+//Azi: not in use
+/*#define	round2(x, m)	(((x) + (m / 2)) & ~(m - 1))
 #define roundup2(x, m)  (((x) + m - 1) & ~(m - 1))
 
-#define MAKEKERNDEV(t, u, p)  MAKEBOOTDEV(t, 0, 0, u, p)
+#define MAKEKERNDEV(t, u, p)  MAKEBOOTDEV(t, 0, 0, u, p)*/
 
 enum {
     kNetworkDeviceType = kBIOSDevTypeNetwork,
     kBlockDeviceType   = kBIOSDevTypeHardDrive
-}; //gBootFileType_t;
+};// gBootFileType_t; - Kpatcher; still needed???
 
 enum {
     kCursorTypeHidden    = 0x0100,

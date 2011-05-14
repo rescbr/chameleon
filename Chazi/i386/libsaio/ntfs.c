@@ -23,12 +23,11 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "sl.h"
+#include "ntfs_private.h"
 
 #define BYTE_ORDER_MARK	0xFEFF
-
-#include "ntfs_private.h"
 
 #define FS_TYPE			"ntfs"
 #define FS_NAME_FILE		"NTFS"
@@ -328,7 +327,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 									(unsigned short)boot->bf_volsn & 0xFFFF);
 
 	return 0;
-}    
+}
 
 bool NTFSProbe(const void * buffer)
 {

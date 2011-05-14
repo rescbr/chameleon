@@ -6,7 +6,7 @@
 #ifndef __LIBSAIO_CPU_H
 #define __LIBSAIO_CPU_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
 
 extern void scan_cpu(PlatformInfo_t *);
 
@@ -14,7 +14,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
-#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
+#define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
 #define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199
@@ -24,7 +24,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
 
-#define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
+//#define DEFAULT_FSB		100000          // for now, hardcoding 100MHz for old CPUs - disabled
 
 // DFE: This constant comes from older xnu:
 #define CLKNUM			1193182		/* formerly 1193167 */

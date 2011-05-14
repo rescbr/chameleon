@@ -1,24 +1,26 @@
 
 /*
- * Copyright 2007 David F. Elliott.	 All rights reserved.
+ * Copyright 2007 David F. Elliott.  All rights reserved.
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "efi.h"
 #include "acpi.h"
 #include "fake_efi.h"
 #include "efi_tables.h"
 #include "platform.h"
 #include "acpi_patcher.h"
+//#include "smbios_patcher.h" - not used with Kabil's smbios...
 #include "smbios.h"
 #include "device_inject.h"
 #include "convert.h"
-#include "pci.h"
+//#include "pci.h" - added to fake_efi.h
 #include "sl.h"
 
-extern void setup_pci_devs(pci_dt_t *pci_dt);
+//extern struct SMBEntryPoint * getSmbios(int which); // now cached
+//extern void setup_pci_devs(pci_dt_t *pci_dt); //Azi: think a better place...??
 
 /*
  * Modern Darwin kernels require some amount of EFI because Apple machines all
@@ -32,7 +34,7 @@ extern void setup_pci_devs(pci_dt_t *pci_dt);
  * makes a lot of sense from an engineering point of view as it means the kernel
  * for the as yet unreleased EFI-only Macs could still be booted by the non-EFI
  * DTK systems so long as the kernel checked to ensure the boot tables were
- * filled in appropriately.	 Modern xnu requires a system table and a runtime
+ * filled in appropriately.  Modern xnu requires a system table and a runtime
  * services table and performs no checks whatsoever to ensure the pointers to
  * these tables are non-NULL.	Therefore, any modern xnu kernel will page fault
  * early on in the boot process if the system table pointer is zero.
@@ -93,7 +95,7 @@ Node *gEfiConfigurationTableNode = NULL;
 
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
-	EFI_UINTN i = 0;
+    EFI_UINTN i = 0;
 	
 	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
@@ -106,7 +108,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		i = gST64->NumberOfTableEntries;
 	}
 	
-	// We only do adds, not modifications and deletes like InstallConfigurationTable
+    // We only do adds, not modifications and deletes like InstallConfigurationTable
 	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
 		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
 	
@@ -140,10 +142,10 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 
 //Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
- {
- efiSystemTable->Hdr.CRC32 = 0;
- efiSystemTable->Hdr.CRC32 = crc32(0L, efiSystemTable, efiSystemTable->Hdr.HeaderSize);
- }*/
+{
+    efiSystemTable->Hdr.CRC32 = 0;
+    efiSystemTable->Hdr.CRC32 = crc32(0L, efiSystemTable, efiSystemTable->Hdr.HeaderSize);
+}*/
 
 /*
  * What we do here is simply allocate a fake EFI system table and a fake EFI
@@ -400,23 +402,23 @@ static const char const CPU_Frequency_prop[] = "CPUFrequency";
  */
 
 /* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
+EFI_GUID const  gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
-#define SMBIOS_RANGE_START		0x000F0000
-#define SMBIOS_RANGE_END		0x000FFFFF
+#define SMBIOS_RANGE_START      0x000F0000
+#define SMBIOS_RANGE_END        0x000FFFFF
 
 /* '_SM_' in little endian: */
 #define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
 
 #define EFI_ACPI_TABLE_GUID \
-{ \
-0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-}
+  { \
+    0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+  }
 
 #define EFI_ACPI_20_TABLE_GUID \
-{ \
-0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-}
+  { \
+    0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
+  }
 
 EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
 EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
@@ -436,7 +438,25 @@ static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
-static const char const BOARDID_PROP[] = "board-id";
+//netkas
+static char				BOOT_UUID_PROP[] = "boot-uuid";
+static char				uuidStr[64]; //Azi: also declared on options.c (processBootOptions)
+
+static char				DEV_PATH_SUP[] = "DevicePathsSupported";
+static uint32_t			DevPathSup = 1;
+//DHP
+//static EFI_UINT8 const BOOT_ARGS[] = { 0x00 };
+static EFI_UINT8 const	BOOT_FILE_PATH[] =
+{
+	0x04, 0x04, 0x50, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00,
+	0x65, 0x00, 0x6d, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x62, 0x00, 0x72, 0x00,
+	0x61, 0x00, 0x72, 0x00, 0x79, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x72, 0x00,
+	0x65, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00,
+	0x65, 0x00, 0x73, 0x00, 0x5c, 0x00, 0x62, 0x00, 0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00,
+	0x2e, 0x00, 0x65, 0x00, 0x66, 0x00, 0x69, 0x00, 0x00, 0x00, 0x7f, 0xff, 0x04, 0x00
+};
+static EFI_UINT8 const MACHINE_SIGNATURE[] = { 0x00, 0x00, 0x00, 0x00 };
+
 
 
 /*
@@ -446,16 +466,16 @@ static const char const BOARDID_PROP[] = "board-id";
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
-	EFI_CHAR16*	 dst = 0;
+	EFI_CHAR16*  dst = 0;
 	size_t		 i = 0;
 	
 	if (!key || !(*key) || !len || !src) return 0;
 	
 	*len = strlen(src);
 	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
-	for (; i < (*len); i++)	 dst[i] = src[i];
+	for (; i < (*len); i++)  dst[i] = src[i];
 	dst[(*len)] = '\0';
-	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+	*len = ((*len)+1)*2; // return the CHAR16 bufsize including zero terminated CHAR16
 	return dst;
 }
 
@@ -467,9 +487,18 @@ static	EFI_CHAR8* getSmbiosUUID()
 {
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
+//	struct SMBEntryPoint	*smbios;
 	SMBByte					*p;
 	
+//	smbios = getSmbios(SMBIOS_PATCHED); // checks for _SM_ anchor and table header checksum
+//	if (smbios==NULL) return 0; // getSmbios() return a non null value if smbios is found
+	
+//	p = (SMBByte*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
 	p = (SMBByte*)Platform.UUID;
+//	if (p == NULL) return NULL;
+	
+//	verbose("Found SMBIOS System Information Table 1\n");
+//	p += 8;
 	
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
 	{
@@ -488,18 +517,16 @@ static	EFI_CHAR8* getSmbiosUUID()
 }
 
 /*
- * return a binary UUID value from the overriden SystemID and SMUUID if found, 
+ * return a binary UUID value from SystemId=<uuid> if found, 
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 
 static EFI_CHAR8* getSystemID()
 {
 	// unable to determine UUID for host. Error: 35 fix
-	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
-	// belong to smbios config only ...
-	const char *sysId = getStringForKey(kSystemID, &bootInfo->bootConfig);
-	EFI_CHAR8*	ret = getUUIDFromString(sysId);
-	
+	const char *sysId = getStringForKey(kSystemIDKey, &bootInfo->bootConfig);
+	EFI_CHAR8*  ret = getUUIDFromString(sysId);
+
 	if (!sysId || !ret) // try bios dmi info UUID extraction
 	{
 		ret = getSmbiosUUID();
@@ -509,7 +536,8 @@ static EFI_CHAR8* getSystemID()
 	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
 		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
 	
-	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
+	// apply a nice formatting to the displayed output
+	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret));
 	return ret;
 }
 
@@ -529,14 +557,19 @@ void setupSystemType()
 
 void setupEfiDeviceTree(void)
 {
-	EFI_CHAR8*	 ret = 0;
-	EFI_CHAR16*	 ret16 = 0;
+    EFI_CHAR8*	 ret = 0;
+	EFI_CHAR16*  ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
 	
 	node = DT__FindNode("/", false);
 	
 	if (node == 0) stop("Couldn't get root node");
+	
+	//Azi: "needed" on Lion; geekbench report: ?p?le Inc. Mac-F227BEC8 5.00
+	// it's catching stuff from the real board --> (5.00) - DHP ??
+	const char *boardID = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+	if (boardID) DT__AddProperty(node, "board-id", strlen(boardID) + 1, (EFI_CHAR16*)boardID);
 	
 	// We could also just do DT__FindNode("/efi/platform", true)
 	// But I think eventually we want to fill stuff in the efi node
@@ -552,7 +585,7 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
 	}
 	
-	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
+    DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 	
 	// TODO: Fill in other efi properties if necessary
@@ -561,7 +594,7 @@ void setupEfiDeviceTree(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 	
-	if (archCpuType == CPU_TYPE_I386)
+    if (archCpuType == CPU_TYPE_I386)
 	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
@@ -574,8 +607,8 @@ void setupEfiDeviceTree(void)
 	{
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
 	}
-	
-	// Set up the /efi/configuration-table node which will eventually have several child nodes for
+
+    // Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
 	
@@ -586,88 +619,119 @@ void setupEfiDeviceTree(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 	
+	// Export FSB, TSC and CPU frequencies for use by the kernel or KEXTs
 	if (Platform.CPU.FSBFrequency != 0)
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
-	
-	// Export TSC and CPU frequencies for use by the kernel or KEXTs
+/*	Azi: TSC & CPU don't show in any Mac dump (snow) i own in efiPlatformNode!!??? disable?
 	if (Platform.CPU.TSCFrequency != 0)
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 	
 	if (Platform.CPU.CPUFrequency != 0)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
-	
-	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID()))
+*/
+	// Export system-id.
+	if ((ret = getSystemID()))
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
-	
-	// Export SystemSerialNumber if present
-	if ((ret16=getSmbiosChar16("SMserial", &len)))
+
+	 // Export SystemSerialNumber if present
+	if ((ret16 = getSmbiosChar16("SMserial", &len)))
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
-	
+//Azi: this is done too late for kc adler generation... hum	
 	// Export Model if present
-	if ((ret16=getSmbiosChar16("SMproductname", &len)))
-		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
+	if ((ret16 = getSmbiosChar16("SMproductname", &len)))
+		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);//*****
+//*****: these seem the only ones that influence KC adler creation, specialy the one above...
 	
+//Azi: ?number? of supported device paths
+	// Satisfying AppleACPIPlatform.kext - DHP
+	DT__AddProperty(efiPlatformNode, DEV_PATH_SUP, sizeof(uint32_t), &DevPathSup);
+//Azi: nvram shit...
+//	static EFI_UINT8 const audioVolume[] = { 0x00 };
+//	Node *root = DT__FindNode("/AppleEFIRuntime", false);
+//	Node *nvramNode = DT__AddChild(root, "AppleEFINVRAM");
+//	Node *nvramNode = DT__FindNode("/options", true);
+//	DT__AddProperty(nvramNode, "SystemAudioVolume", sizeof(audioVolume), &audioVolume);
+//Azi: chosen stuff - move when complete?
+	// node created on bootstruct.c (initKernBootStruct) while creating /chosen/memory-map
+	Node *chosenNode = DT__FindNode("/chosen", false);
+	
+//	DT__AddProperty(chosenNode, "boot-args", sizeof(BOOT_ARGS), &BOOT_ARGS);
+	DT__AddProperty(chosenNode, "boot-args", sizeof(bootArgs->CommandLine), &bootArgs->CommandLine); //Azi: keep ??
+	
+	// Adding the root path for kextcache. - DHP
+//	DT__AddProperty(chosenNode, "boot-device-path", 38, ((gPlatform.OSType & 3) == 3)
+//					? "\\boot.efi" : "\\System\\Library\\CoreServices\\boot.efi");
+	//Azi: this data is not constant on Mac's and it's in "hex" format... investigate*****
+	DT__AddProperty(chosenNode, "boot-device-path", 38, "\\System\\Library\\CoreServices\\boot.efi");//*****
+	
+	// Adding the default kernel name (mach_kernel) for kextcache. - DHP
+	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);//*****
+	
+	DT__AddProperty(chosenNode, "boot-file-path", sizeof(BOOT_FILE_PATH), &BOOT_FILE_PATH);
+	
+	// rooting via boot-uuid from /chosen: ...
+	if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0)
+	{
+		DT__AddProperty(chosenNode, BOOT_UUID_PROP, 64, uuidStr);
+	}
+	
+	DT__AddProperty(chosenNode, "machine-signature", sizeof(MACHINE_SIGNATURE), &MACHINE_SIGNATURE);
+//Azi: end chosen stuff
 	// Fill /efi/device-properties node.
 	setupDeviceProperties(node);
 }
 
 /*
- * Must be called AFTER getSmbios
- */
-
-void setupBoardId()
-{
-	Node *node;
-	node = DT__FindNode("/", false);
-	if (node == 0) {
-		stop("Couldn't get root node");
-	}
-	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
-	if (boardid)
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
-}		
-
-/*
  * Load the smbios.plist override config file if any
  */
 
-static void setupSmbiosConfigFile(const char *filename)
+//static - testing earlier load of smbios.plist (read below)
+void setupSmbiosConfigFile(const char *filename)
 {
 	char		dirSpecSMBIOS[128] = "";
 	const char *override_pathname = NULL;
-	int			len = 0, err = 0;
-	extern void scan_mem();
+	int			len = 0, fd = 0;
+//	extern void scan_mem();
 	
 	// Take in account user overriding
-	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->bootConfig) && len > 0)
+	// also doesn't work ??????? damn it! :(
+	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->bootConfig))
 	{
 		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
-		sprintf(dirSpecSMBIOS, override_pathname);
-		err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
-	}
-	else
-	{
-		// Check selected volume's Extra.
-		sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
-		if (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig))
-		{
-			// Check booter volume/rdbt Extra.
-			sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
-			err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
-		}
+		strcpy(dirSpecSMBIOS, override_pathname);
+		fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+		if (fd >= 0) goto success_fd;
 	}
 	
-	if (err)
-	{
-		verbose("No SMBIOS replacement found.\n");
-	}
+	// Check rd's root.
+	sprintf(dirSpecSMBIOS, "rd(0,0)/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+	if (fd >= 0) goto success_fd;
+	
+	// Check booter volume/rdbt for specific OS folders.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+	if (fd >= 0) goto success_fd;
+	
+	// Check booter volume/rdbt Extra.
+	sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
+	fd = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+//	if (fd >= 0) goto success_fd;
+	
+success_fd:
+//	if (loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig) == -1) //Azi: causes double print.
+	if (fd >= 0)
+		verbose("SMBIOS replacement found and loaded.\n");
+	else
+		verbose("No SMBIOS replacement provided.\n");
 	
 	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,
 	// as opposed to when it was in scan_platform(); also load the orig. smbios so that we can access dmi info without
 	// patching the smbios yet
-	
-	scan_mem(); 
+//	getSmbios(SMBIOS_ORIGINAL);
+//	scan_mem(); //Azi: moved to setupFakeEfi, testing early load of smbios.plist to set
+				//	SMproductname & SMboardproduct for ioreg injection (kernelcache(adler) & Lion?)
+//	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);	// process smbios asap
 }
 
 /*
@@ -677,9 +741,7 @@ static void setupSmbiosConfigFile(const char *filename)
 static void setupEfiConfigurationTable()
 {
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-	
-	setupBoardId(); //need to be called after getSmbios
+	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL); //Azi: add alias back??
 	
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();
@@ -703,13 +765,16 @@ static void setupEfiConfigurationTable()
 
 void setupFakeEfi(void)
 {
+	extern void scan_mem();
+	
 	// Generate efi device strings 
 	setup_pci_devs(root_pci_dev);
 	
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
-	
+
 	// load smbios.plist file if any
-	setupSmbiosConfigFile("smbios.plist");
+//	setupSmbiosConfigFile("SMBIOS.plist");
+	scan_mem();
 	
 	setupSMBIOSTable();
 	

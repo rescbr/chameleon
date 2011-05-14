@@ -5,7 +5,7 @@
 #ifndef __LIBSAIO_ACPI_PATCHER_H
 #define __LIBSAIO_ACPI_PATCHER_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
 
 uint64_t acpi10_p;
 uint64_t acpi20_p;

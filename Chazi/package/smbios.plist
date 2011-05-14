@@ -46,3 +46,16 @@
         <string>0x48594D503131325336344350362D59352020</string>
 </dict>
 </plist>
+<!--
+missing on the example above:
+
+SMbiosvendor
+SMbiosdate
+SMfamily
+SMboardmanufacter
+SMboardproduct
+SMmemdevloc
+SMmembankloc
+SMcputype
+SMbusspeed
+-->

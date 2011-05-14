@@ -15,7 +15,7 @@
 #if DEBUG_SMBIOS
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+#define DBG(x...)	//msglog(x)
 #endif
 
 
@@ -48,7 +48,8 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 
 	if (minorVersion < 1 || structHeader->header.length < 25)
 		return;
-	uint8_t *uuid = structHeader->uuid;
+//Azi: if debug?
+//	uint8_t *uuid = structHeader->uuid;
 	DBG("\tuuid: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02x%02X-%02X%02X%02X%02X%02X%02X\n",
 		uuid[0], uuid[1], uuid[2], uuid[3],  
 		uuid[4], uuid[5], 

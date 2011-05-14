@@ -34,14 +34,14 @@
 #define kSMBBIOSInformationReleaseDateKey			"SMbiosdate"
 
 /* System Information */
-#define kSMBSystemInformationManufacturerKey		"SMmanufacturer"
+#define kSMBSystemInformationManufacturerKey		"SMmanufacter" //*** was SMmanufacturer 
 #define kSMBSystemInformationProductNameKey			"SMproductname"
 #define kSMBSystemInformationVersionKey				"SMsystemversion"
 #define kSMBSystemInformationSerialNumberKey		"SMserial"
 #define kSMBSystemInformationFamilyKey				"SMfamily"
 
 /* Base Board */
-#define kSMBBaseBoardManufacturerKey				"SMboardmanufacturer"
+#define kSMBBaseBoardManufacturerKey				"SMboardmanufacter" //***
 #define kSMBBaseBoardProductKey						"SMboardproduct"
 
 /* Processor Information */
@@ -53,7 +53,7 @@
 #define kSMBMemoryDeviceBankLocatorKey				"SMmembankloc"
 #define kSMBMemoryDeviceMemoryTypeKey				"SMmemtype"
 #define kSMBMemoryDeviceMemorySpeedKey				"SMmemspeed"
-#define kSMBMemoryDeviceManufacturerKey				"SMmemmanufacturer"
+#define kSMBMemoryDeviceManufacturerKey				"SMmemmanufacter" //***
 #define kSMBMemoryDeviceSerialNumberKey				"SMmemserial"
 #define kSMBMemoryDevicePartNumberKey				"SMmempart"
 
@@ -69,43 +69,53 @@
 #define kDefaultVendorManufacturer					"Apple Inc."
 #define kDefaultBIOSReleaseDate						"11/06/2009"
 #define kDefaultSerialNumber						"SOMESRLNMBR"
-#define kDefaultBoardProduct						"Mac-F4208DC8"
+#define kDefaultBoardProduct						kDefaultMacProBoardProduct //"Mac-F4208DC8" MacPro3,1
 #define kDefaultSystemVersion						"1.0"
 
+//Azi: this should be MacMini1,1 ?? , the only desktop model which used Core Solo.
+// Also check issue 37.
 // defaults for a Mac mini 
 #define kDefaultMacminiFamily						"Macmini"
 #define kDefaultMacmini								"Macmini2,1"
-#define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0903051113"
+#define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0706281359"
+#define kDefaultMacminiBoardProduct					"Mac-F4208EAA"
 
 // defaults for a MacBook
 #define kDefaultMacBookFamily						"MacBook"
 #define kDefaultMacBook								"MacBook4,1"
-#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0903051113"
+#define kDefaultMacBookBIOSVersion					"    IM81.88Z.00C1.B00.0802091538"
+#define kDefaultMacBookBoardProduct					"Mac-F42D89C8"
 
 // defaults for a MacBook Pro
 #define kDefaultMacBookProFamily					"MacBookPro"
 #define kDefaultMacBookPro							"MacBookPro4,1"
-#define kDefaultMacBookProBIOSVersion				"    MBP41.88Z.0073.B00.0903051113"
+#define kDefaultMacBookProBIOSVersion				"    MBP41.88Z.0073.B00.0809221748"
+#define kDefaultMacBookProBoardProduct				"Mac-F42D89C8"
 
 // defaults for an iMac
 #define kDefaultiMacFamily							"iMac"
 #define kDefaultiMac								"iMac8,1"
-#define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0903051113"
+#define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0802091538"
+#define kDefaultiMacBoardProduct					"Mac-F227BEC8" //Azi: 24"; F226BEC8 = 20"
 // defaults for an iMac11,1 core i3/i5/i7
 #define kDefaultiMacNehalem							"iMac11,1"
-#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0903051113"
+#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0802091538"
+#define kDefaultiMacNehalemBoardProduct				"Mac-F2268DAE"
 
 // defaults for a Mac Pro
 #define kDefaultMacProFamily						"MacPro"
 #define kDefaultMacPro								"MacPro3,1"
-#define kDefaultMacProBIOSVersion					"    MP31.88Z.006C.B05.0903051113"
+#define kDefaultMacProBIOSVersion					"    MP31.88Z.006C.B05.0802291410"
+#define kDefaultMacProBoardProduct					"Mac-F4208DC8"
 // defaults for a Mac Pro 4,1 core i7/Xeon
 #define kDefaultMacProNehalem						"MacPro4,1"
 #define kDefaultMacProNehalemBIOSVersion			"    MP41.88Z.0081.B04.0903051113"
+#define kDefaultMacProNehalemBoardProduct			"Mac-F4208DC8"
 // defaults for a Mac Pro 5,1 core i7/Xeon
 #define kDefaultMacProWestmere						"MacPro5,1"
 #define kDefaultMacProWestmereBIOSVersion			"    MP51.88Z.007F.B00.1008031144"
-#define kDefaulMacProWestmereBIOSReleaseDate		"08/03/10"
+#define kDefaultMacProWestmereBoardProduct			"Mac-F227BEC8"
+#define kDefaulMacProWestmereBIOSReleaseDate		"08/03/10" //***
 //-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -282,7 +292,7 @@ void setDefaultSMBData(void)
 	defaultSystemInfo.serialNumber	= kDefaultSerialNumber;
 
 	defaultBaseBoard.manufacturer	= kDefaultVendorManufacturer;
-	defaultBaseBoard.product		= kDefaultBoardProduct;
+//	defaultBaseBoard.product		= kDefaultBoardProduct;
 
 	if (platformCPUFeature(CPU_FEATURE_MOBILE))
 	{
@@ -291,28 +301,32 @@ void setDefaultSMBData(void)
 			defaultBIOSInfo.version			= kDefaultMacBookProBIOSVersion;
 			defaultSystemInfo.productName	= kDefaultMacBookPro;
 			defaultSystemInfo.family		= kDefaultMacBookProFamily;
+			defaultBaseBoard.product		= kDefaultMacBookProBoardProduct;
 		}
 		else
 		{
 			defaultBIOSInfo.version			= kDefaultMacBookBIOSVersion;
 			defaultSystemInfo.productName	= kDefaultMacBook;
 			defaultSystemInfo.family		= kDefaultMacBookFamily;
+			defaultBaseBoard.product		= kDefaultMacBookBoardProduct;
 		}
 	}
 	else
 	{
 		switch (Platform.CPU.NoCores) 
 		{
-			case 1: 
+			case 1: // one core/cpu
 				defaultBIOSInfo.version			= kDefaultMacminiBIOSVersion;
 				defaultSystemInfo.productName	= kDefaultMacmini;
 				defaultSystemInfo.family		= kDefaultMacminiFamily;
+				defaultBaseBoard.product		= kDefaultMacminiBoardProduct;
 				break;
 
 			case 2:
 				defaultBIOSInfo.version			= kDefaultiMacBIOSVersion;
 				defaultSystemInfo.productName	= kDefaultiMac;
 				defaultSystemInfo.family		= kDefaultiMacFamily;
+				defaultBaseBoard.product		= kDefaultiMacBoardProduct;
 				break;
 			default:
 			{
@@ -329,6 +343,7 @@ void setDefaultSMBData(void)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
+								defaultBaseBoard.product		= kDefaultiMacNehalemBoardProduct;
 								break;
 
 							case CPU_MODEL_NEHALEM: 
@@ -336,20 +351,23 @@ void setDefaultSMBData(void)
 								defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultMacProNehalem;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
+								defaultBaseBoard.product		= kDefaultMacProNehalemBoardProduct;
 								break;
 
 							case CPU_MODEL_WESTMERE: 
 							case CPU_MODEL_WESTMERE_EX:
 								defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
-								defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate;
+								defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate; //***
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
+								defaultBaseBoard.product		= kDefaultMacProWestmereBoardProduct;
 								break;
 
 							default:
 								defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultMacPro;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
+								defaultBaseBoard.product		= kDefaultBoardProduct;
 								break;
 						}
 						break;
@@ -358,6 +376,7 @@ void setDefaultSMBData(void)
 						defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
 						defaultSystemInfo.productName	= kDefaultMacPro;
 						defaultSystemInfo.family		= kDefaultMacProFamily;
+						defaultBaseBoard.product		= kDefaultBoardProduct;
 						break;
 				}
 				break;
@@ -668,7 +687,7 @@ void setupSMBIOSTable(void)
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
 
-	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->bootConfig);
+	getBoolForKey(kSMBIOSdefaultsKey, &setSMB, &bootInfo->bootConfig);
 	if (setSMB)
 		setDefaultSMBData();
 

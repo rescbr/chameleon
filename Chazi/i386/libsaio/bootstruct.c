@@ -26,7 +26,7 @@
  * All rights reserved.
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "bootstruct.h"
 
 /*==========================================================================
@@ -38,7 +38,9 @@ boot_args			*bootArgs;
 boot_args_pre_lion	*bootArgsPreLion;
 PrivateBootInfo_t	*bootInfo;
 Node				*gMemoryMapNode;
+//Node              *efiPlatformNode; //Azi: test
 
+//static Azi: modules ??????????????????????
 static char platformName[64];
 
 void initKernBootStruct( void )
@@ -92,6 +94,7 @@ void initKernBootStruct( void )
         DT__AddProperty(node, "model", nameLen, platformName);
 
         gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
+//		efiPlatformNode = DT__FindNode("/efi/platform", true); //Azi: test
 
         bootArgs->Version  = kBootArgsVersion;
         bootArgs->Revision = kBootArgsRevision;

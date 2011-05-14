@@ -2,7 +2,7 @@
  * Copyright (c) 2005 Apple Computer, Inc.  All Rights Reserved.
  */
 
-#if 1
+#if 1 //Azi: clean ??
 /*
  
  Structures for a Flattened Device Tree 
@@ -34,10 +34,14 @@ enum {
 typedef char DTEntryNameBuf[32];
 #endif
 
-#include "libsaio.h"
+//Azi: check location.
+//#include "libsaio.h"
+#include "libsa.h"
 #include "device_tree.h"
 
+//#define DEBUG 1
 #if DEBUG
+#include "saio_internal.h" //Azi: remember - see zalloc.c
 #define DPRINTF(args...) printf(args)
 void
 DT__PrintTree(Node *node);
@@ -397,6 +401,8 @@ DT__PrintTree(Node *node)
     _PrintTree(node, 0);
 }
 
+//Azi: from autoresolution - check this stuff
+#if 0
 void
 DT__PrintFlattenedNode(DTEntry entry, int level)
 {
@@ -535,6 +541,5 @@ main(int argc, char **argv)
 
     return 0;
 }
-
 #endif
-
+#endif

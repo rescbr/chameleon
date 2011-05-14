@@ -31,8 +31,9 @@
 #include <sys/vnode.h>
 #include <ufs/ufs/dir.h>
 #include <libkern/OSByteOrder.h>
+
+//#include "libsaio.h" // ufs support reminder (check disk.c)
 #include "ufs_byteorder.h"
-#include "libsaio.h"
 
 #define	swapBigLongToHost(thing) ((thing) = OSSwapBigToHostInt32(thing))
 #define	swapBigShortToHost(thing) ((thing) = OSSwapBigToHostInt16(thing))

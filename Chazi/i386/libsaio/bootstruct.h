@@ -25,6 +25,14 @@
 #ifndef __BOOTSTRUCT_H
 #define __BOOTSTRUCT_H
 
+//Azi: this is acting now as a mini libsaio.h :P
+//#include "libsaio.h"
+//#include "bios.h"
+//#include "libsa.h"
+//#include "saio_types.h"
+//#include "saio_internal.h"
+//#include "device_tree.h"
+
 #include "bootargs.h"
 #include "saio_types.h"
 #include "bios.h"
@@ -36,6 +44,7 @@
 extern boot_args *bootArgs;
 extern boot_args_pre_lion *bootArgsPreLion;
 extern Node *gMemoryMapNode;
+//extern Node *efiPlatformNode; //Azi: test
 
 #define VGA_TEXT_MODE 0
 
@@ -47,7 +56,7 @@ extern Node *gMemoryMapNode;
 #define CONFIG_SIZE (40 * 4096)
 
 /*
- * Max size fo config data array, in bytes.
+ * Max size for config data array, in bytes.
  */
 #define IO_CONFIG_DATA_SIZE		163840
 
@@ -125,10 +134,10 @@ typedef struct PrivateBootInfo {
     char *           configEnd;                    // pointer to end of config files
     char             config[CONFIG_SIZE];
 
-    config_file_t    bootConfig;		               // boot.plist
+    config_file_t    bootConfig;		           // boot.plist
     config_file_t    overrideConfig;               // additional boot.plist which can override bootConfig keys
-    config_file_t    themeConfig;				           // theme.plist
-    config_file_t    smbiosConfig;				         // smbios.plist
+    config_file_t    themeConfig;				   // theme.plist
+    config_file_t    smbiosConfig;				   // smbios.plist
     config_file_t    helperConfig;                 // boot helper partition's boot.plist
     config_file_t    ramdiskConfig;                // RAMDisk.plist
 } PrivateBootInfo_t;

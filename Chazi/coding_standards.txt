@@ -4,7 +4,7 @@ Coding Standard rev. 0 (First Draft)
    having seen most indentation styles going from 2 to 8 spaces, I would suggest a indentation of 4 spaces.
 
 2. Comments
-I see here two main differents cases:
+I see here two main different cases:
 function description comments and one-line code quite comments
 
 For functions documentation, I suggest to use this syntax
@@ -57,7 +57,7 @@ instead of :
 int my_variable_is_ok;
 
 Functions should follow the same conventions except for standard c lib related functions.
-Types should share the same convention but start with a Captial letter instead of lower case.
+Types should share the same convention but start with a Capital letter instead of lower case.
 
 11. Please make sure you extensively initialize variables:
 avoid as much as possible:

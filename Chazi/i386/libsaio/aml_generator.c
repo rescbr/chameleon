@@ -21,6 +21,7 @@ bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
 			case AML_CHUNK_DWORD:
 			case AML_CHUNK_QWORD:
 			case AML_CHUNK_ALIAS:
+				//Azi: add line breaks to these msgs (Valv)
 				verbose("aml_add_to_parent: node doesn't support child nodes!");
 				return false;
 			case AML_CHUNK_NAME:

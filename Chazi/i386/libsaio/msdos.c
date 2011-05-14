@@ -46,12 +46,12 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "sl.h"
-
 #include "msdos_private.h"
 #include "msdos.h"
+
+#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
 
 #define LABEL_LENGTH		11
 #define MSDOS_CACHE_BLOCKSIZE BPS
@@ -772,10 +772,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	if (length==0 || length>size-offset)
 		toread=size-offset;
 	wastoread=toread;
-	bcopy (buf+(offset%msdosclustersize),ptr,min(msdosclustersize-(offset%msdosclustersize), toread));
+	bcopy (buf+(offset%msdosclustersize),ptr,MIN(msdosclustersize-(offset%msdosclustersize), toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
 	toread-=msdosclustersize-(offset%msdosclustersize);
-	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, min(msdosclustersize,toread), &cluster))
+	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, MIN(msdosclustersize,toread), &cluster))
 	{
 		ptr+=msdosclustersize;
 		toread-=msdosclustersize;

@@ -139,7 +139,6 @@ bool getSMBOemProcessorType(returnType *value)
 							value->word = 0x0501;			// Xeon 
 						else
 							value->word = 0x0701;			// Core i7
-
 						return true;
 
 					case CPU_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper

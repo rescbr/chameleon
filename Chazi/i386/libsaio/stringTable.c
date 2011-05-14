@@ -26,8 +26,9 @@
  * All rights reserved.
  */
 
-#include "bootstruct.h"
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
+#include "boot.h"
 #include "xml.h"
 
 extern char *Language;
@@ -300,44 +301,52 @@ static const char *getToken(const char *line, const char **begin, int *len)
     }
     return line;
 }
-
+//				   bootArgs->CommandLine,               key,                   val,     size
 bool getValueForBootKey(const char *line, const char *match, const char **matchval, int *len)
 {
-    const char *key, *value;
-    int key_len, value_len;
-    bool retval = false;
-    
-    while (*line) {
-	/* look for keyword or argument */
-	while (isspace(*line)) line++;
-
-	/* now look for '=' or whitespace */
-	line = getToken(line, &key, &key_len);
-	/* line now points to '=' or space */
-	if (*line && !isspace(*line)) {
-	    line = getToken(++line, &value, &value_len);
-	} else {
-	    value = line;
-	    value_len = 0;
+	const char *key, *value;
+	int key_len, value_len;
+	bool retval = false;
+	
+	while (*line)
+	{
+		/* look for keyword or argument */
+		while (isspace(*line)) line++;
+		
+		/* now look for '=' or whitespace */
+		line = getToken(line, &key, &key_len);
+		
+		/* line now points to '=' or space */
+		if (*line && !isspace(*line)) {
+			line = getToken(++line, &value, &value_len);
+		}
+		else
+		{
+			value = line;
+			value_len = 0;
+		}
+		
+		if ((strlen(match) == key_len) && strncmp(match, key, key_len) == 0) {
+			*matchval = value;
+			*len = value_len;
+		
+			retval = true;
+			/* Continue to look for this key; last one wins. */
+		}
 	}
-	if ((strlen(match) == key_len)
-	    && strncmp(match, key, key_len) == 0) {
-	    *matchval = value;
-	    *len = value_len;
-	    retval = true;
-            /* Continue to look for this key; last one wins. */
-	}
-    }
-    return retval;
+	return retval;
 }
 
 /* Return NULL if no option has been successfully retrieved, or the string otherwise */
 const char * getStringForKey(const char * key,  config_file_t *config)
 {
-  static const char* value =0;
-  int len=0;
-  if(!getValueForKey(key, &value, &len, config)) value = 0;
-  return value;
+	static const char* value = 0;
+	int len = 0;
+	
+	if (!getValueForKey(key, &value, &len, config))
+		value = 0;
+	
+	return value;
 }
 
 
@@ -500,10 +509,10 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
     {
       override = true;
 
-      if (ret && (strcmp(key, "Kernel") == 0) && (strcmp(overrideVal, "mach_kernel") == 0))
+      if (ret && (strcmp(key, kKernelNameKey) == 0) && (strcmp(overrideVal, kDefaultKernelName) == 0))
         override = false;
 
-      if (ret && (strcmp(key, "Kernel Flags") == 0) && (overrideSize == 0))
+      if (ret && (strcmp(key, kKernelFlagsKey) == 0) && (overrideSize == 0))
         override = false;
 
       if (override)
@@ -582,10 +591,10 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadConfigFile (const char *configFile, config_file_t *config)
+int loadConfigFile(const char *configFile, config_file_t *config)
 {
 	int fd, count;
-
+	//Azi: check Mek ?? it makes sense, or doesn't ??? :P
 	if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
 		return -1;
 	}
@@ -607,8 +616,9 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
-		"bt(0,0)/Extra/com.apple.Boot.plist",
+		"/Extra/com.apple.Boot.plist", //Azi: Boot Volume is set as Root at this point so,
+		// pointing to Extra, /Extra or bt(0,0)/Extra, is exactly the same. Check setBootGlobals()
+		//"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
@@ -632,6 +642,9 @@ int loadSystemConfig(config_file_t *config)
 			
 			// enable canOverride flag
 			config->canOverride = true;
+			
+			// disable canOverride. Remove?
+			getBoolForKey(kCanOverrideKey, &config->canOverride, &bootInfo->bootConfig);
 
 			break;
 		}
@@ -643,34 +656,65 @@ int loadSystemConfig(config_file_t *config)
  *
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
- */
+bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config ) */
 int loadOverrideConfig(config_file_t *config)
 {
-	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",
-		"/Extra/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
-	};
-
-	int i, fd, count, ret=-1;
-
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	char		 dirSpecBplist[128] = "";
+	const char	*override_pathname = NULL;
+	const char	*filename = "com.apple.Boot.plist";
+	int			 count, ret, fd, len = 0;
+	
+	// Take in account user overriding the override :P
+	// Damn thing doesn't work anymore ?????? :-/
+	if (getValueForKey(kAltConfigKey, &override_pathname, &len, config))
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
-		{
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
-			
-			// build xml dictionary
-			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
-			ret=0;
-			break;
-		}
+		// Specify a path to a file, e.g. config=/Extra/test.plist
+		strcpy(dirSpecBplist, override_pathname);
+		fd = open(dirSpecBplist, 0);
+		if (fd >= 0) goto success_fd;
+	}
+	
+	// Check rd's root for override config.
+	sprintf(dirSpecBplist, "rd(0,0)/%s", filename);
+	fd = open(dirSpecBplist, 0);
+	if (fd >= 0) goto success_fd;
+	
+	// Check specific OS folders.
+	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+	fd = open(dirSpecBplist, 0);
+	if (fd >= 0) goto success_fd;
+	
+//	can be useful with ramdisks...
+	sprintf(dirSpecBplist, "bt(0,0)/Extra/%s", filename);
+	fd = open(dirSpecBplist, 0);
+	if (fd >= 0) goto success_fd;
+	
+	//Azi: i really don't like these two!
+	// "/Extra/com.apple.Boot.plist"
+	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	
+	// These i have no way to test, need advice.
+	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+	
+success_fd:
+	
+	if (fd >= 0)
+	{
+		// read file
+		count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+		close(fd);
+
+		// build xml dictionary
+		ParseXMLFile(config->plist, &config->dictionary);
+		sysConfigValid = true;
+		ret = 0;
+	}
+	else
+	{
+		verbose("No override config provided!\n");
+		ret = -1;
 	}
 	return ret;
 }
@@ -700,7 +744,7 @@ int loadHelperConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+			sysConfigValid = true;
 			ret=0;
 			break;
 		}

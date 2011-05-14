@@ -26,7 +26,10 @@
  * All rights reserved.
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "io_inline.h"
+#include "saio_types.h"
+#include "saio_internal.h"
 #include "vbe.h"
 
 /* 
@@ -103,6 +106,21 @@ int setVBEDACFormat(unsigned char format)
     bb.ebx.r.h = format;
     bios(&bb);
     return(bb.eax.r.h);
+}
+
+/*
+ *EDID/DDC Readings - AutoResolution
+ */
+int getEDID( void *ddcblock, uint8_t blocksleft )
+{
+	bb.intno    = 0x10;
+	bb.eax.rr   = FUNC_GET_EDID;
+	bb.ebx.r.l  = SERVICE_READ_EDID;
+	bb.es       = SEG( ddcblock );
+	bb.edi.rr   = OFF( ddcblock );
+	bb.edx.rr   = blocksleft;
+	bios( &bb );
+	return( bb.eax.r.h );
 }
 
 /*

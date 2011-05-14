@@ -5,9 +5,9 @@
  *	Cleaned and merged by iNDi
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "pci.h"
 #include "pci_root.h"
 #include "device_inject.h"
@@ -55,7 +55,7 @@ void setupDeviceProperties(Node *node)
   /* Use the static "device-properties" boot config key contents if available,
    * otheriwse use the generated one.
    */  
-  if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->bootConfig) && string)
+  if (!getValueForKey(kDevicePropertiesKey, &val, &cnt, &bootInfo->bootConfig) && string)
   {
     val = (const char*)string;
     cnt = strlength * 2;

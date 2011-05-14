@@ -35,6 +35,10 @@
 #ifndef __LIBSAIO_VBE_H
 #define __LIBSAIO_VBE_H
 
+//#include "edid.h"			//Azi:autoresolution <-- included in
+#include "autoresolution.h"
+//#include "../modules/AutoResolution/autoresolution.h" //Azi: reminder
+
 #define MIN_VESA_VERSION    0x200
 
 #define SEG(address) \
@@ -267,6 +271,11 @@ enum {
  * Palette
  */
 typedef unsigned long VBEPalette[256];
+
+/*
+ * DDC - AutoResolution
+ */
+extern int getEDID(void *ddcblock, uint8_t blocksleft);
 
 extern int getVBEInfo(void *vinfo_p);
 extern int getVBEModeInfo(int mode, void *minfo_p);

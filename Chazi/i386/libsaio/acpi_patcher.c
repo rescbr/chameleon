@@ -2,9 +2,9 @@
  * Copyright 2008 mackerintel
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "acpi.h"
 #include "efi_tables.h"
 #include "fake_efi.h"
@@ -86,52 +86,107 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
     }
     return NULL;
 }
-/** The folowing ACPI Table search algo. should be reused anywhere needed:*/
+
+/** The following ACPI Table search algo, should be reused anywhere needed: */
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	int fd = 0;
-	char dirSpec[512] = "";
+	static bool first_time = true;
+	static char	dirSpecDSDT[128] = "";
+	const char * override_pathname = NULL; // full path to a file.
+	int			len = 0, fd = 0;
 	
-	// Try finding 'filename' in the usual places
-	// Start searching any potential location for ACPI Table
-	sprintf(dirSpec, "%s", filename); 
-	fd = open(dirSpec, 0);
-	if (fd < 0)
-	{	
-		sprintf(dirSpec, "/Extra/%s", filename); 
-		fd = open(dirSpec, 0);
-		if (fd < 0)
+	// Take in account user overriding if it's DSDT only
+	// also doesn't work anymore... wtf ??????? :-/
+	// .aml needed ?? doesn't seem so!
+	if (strstr(filename, "DSDT.aml") &&
+		getValueForKey(kDSDTKey, &override_pathname, &len, &bootInfo->bootConfig))
+	{
+		// Specify a path to a file, e.g. DSDT=/Extra/test.aml
+		strcpy(dirSpecDSDT, override_pathname);
+		fd = open(dirSpecDSDT, 0);
+		if (fd >= 0) goto success_fd;
+	}
+	
+	// Check that dirSpecDSDT is not already assigned with a path
+	if (!first_time && *dirSpecDSDT) 
+	{
+		// it is so start searching this cached path first
+		// extract path
+		for (len = strlen(dirSpecDSDT)-1; len; len--)
 		{
-			sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
-			fd = open(dirSpec, 0);
+			if (dirSpecDSDT[len] == '/' || len == 0)
+			{
+				dirSpecDSDT[len] = '\0';
+				break;
+			}
+		}
+		
+		// now concat with the filename
+		strncat(dirSpecDSDT, "/", sizeof(dirSpecDSDT));
+		strncat(dirSpecDSDT, filename, sizeof(dirSpecDSDT));
+		
+		// and test to see if we don't have our big boy here:
+		fd = open(dirSpecDSDT,0);
+		if (fd >= 0) 
+		{
+			verbose("ACPI file search cache hit: file found at %s\n", dirSpecDSDT);
+			goto success_fd;
 		}
 	}
-
-	if (fd < 0)
-	{
-		// NOT FOUND:
-		verbose("ACPI table not found: %s\n", filename);
-		*dirSpec = '\0';
-	}
-
-	if (outDirspec) *outDirspec = dirSpec; 
+	
+	// Start searching any potential location for ACPI Table
+	// Check rd's root.
+	sprintf(dirSpecDSDT, "rd(0,0)/%s", filename);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
+	
+//	int n;
+	// Check booter volume/rdbt for specific OS folders.
+//	n = 
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s/%s", &gMacOSVersion, filename);
+//	printf ("[%s] is a %d char long string\n", dirSpecDSDT, n);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
+	
+	// Check booter volume/rdbt Extra.
+	sprintf(dirSpecDSDT, "bt(0,0)/Extra/%s", filename);
+	fd = open(dirSpecDSDT, 0);
+	if (fd >= 0) goto success_fd;
+	
+	//Azi: All loaded files stay in Extra.. please!? :)
+	//sprintf(dirspec, "/%s", filename); // search root
+	//fd=open (dirspec,0);
+	//if (fd>=0) goto success_fd;
+	
+	// NOT FOUND:
+	//Azi: a reminder - handling this verbose only on pci_root.c, getPciRootUID()
+	// (it's enough to check if *.aml file exists), to reduce number of printed messages
+	// and the confusion caused by them on users.
+	//verbose("ACPI Table not found: %s\n", filename);
+	if (outDirspec) *outDirspec = "";
+	first_time = false;
+	return -1;
+	// FOUND
+success_fd:
+	first_time = false;
+	if (outDirspec) *outDirspec = dirSpecDSDT;
 	return fd;
 }
-
 
 void *loadACPITable (const char * filename)
 {
 	void *tableAddr;
-	const char * dirspec=NULL;
+	const char * dirspec = NULL;
 	
+	verbose("(%s) ", __FUNCTION__);
 	int fd = search_and_get_acpi_fd(filename, &dirspec);
 	
-	if (fd>=0)
+	if (fd >= 0)
 	{
 		tableAddr=(void*)AllocateKernelMemory(file_size (fd));
 		if (tableAddr)
 		{
-			if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
+			if (read (fd, tableAddr, file_size (fd)) != file_size (fd))
 			{
 				printf("Couldn't read table %s\n",dirspec);
 				free (tableAddr);
@@ -237,9 +292,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c3_enabled = false;
 		bool c4_enabled = false;
 		
-		getBoolForKey(kEnableC2States, &c2_enabled, &bootInfo->bootConfig);
-		getBoolForKey(kEnableC3States, &c3_enabled, &bootInfo->bootConfig);
-		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC2StatesKey, &c2_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC3StatesKey, &c3_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC4StatesKey, &c4_enabled, &bootInfo->bootConfig);
 		
 		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);
 		c3_enabled = c3_enabled | (fadt->C3_Latency < 1000);
@@ -331,7 +386,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 }
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
-{	
+{
 	char ssdt_header[] =
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
@@ -365,7 +420,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			{
 				switch (Platform.CPU.Model) 
 				{
-					case 0x0D: // ?
+					case 0x0D: // ? - Azi: pentium M - Slice
 					case CPU_MODEL_YONAH: // Yonah
 					case CPU_MODEL_MEROM: // Merom
 					case CPU_MODEL_PENRYN: // Penryn
@@ -486,20 +541,22 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						}
 						
 						break;
-					} 
+					}
 					case CPU_MODEL_FIELDS:
 					case CPU_MODEL_DALES:
 					case CPU_MODEL_DALES_32NM:
-					case CPU_MODEL_NEHALEM: 
+					case CPU_MODEL_NEHALEM:
 					case CPU_MODEL_NEHALEM_EX:
 					case CPU_MODEL_WESTMERE:
 					case CPU_MODEL_WESTMERE_EX:
 					{
-						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
+						// Seems it always contains maximum multiplier value (with turbo, that's what we need)...
+						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
+						
 						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
-						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
-						
+
+						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
+
 						// Sanity check
 						if (maximum.Control < minimum.Control) 
 						{
@@ -510,7 +567,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						{
 							uint8_t i;
 							p_states_count = 0;
-							
+
 							for (i = maximum.Control; i >= minimum.Control; i--) 
 							{
 								p_states[p_states_count].Control = i;
@@ -519,9 +576,9 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 								p_states_count++;
 							}
 						}
-						
+
 						break;
-					}	
+					}
 					default:
 						verbose ("Unsupported CPU: P-States not generated !!!\n");
 						break;
@@ -599,10 +656,14 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 	
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
-		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
-	} else {
+	if (Platform.CPU.Vendor == 0x756E6547) // Intel
+	{
+		fix_restart = false; //Azi: think this should be false by default, but...
+		
+		getBoolForKey(kRestartFixKey, &fix_restart, &bootInfo->bootConfig);
+	}
+	else
+	{
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
 	}
@@ -623,20 +684,20 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 	// Determine system type / PM_Model
-	if ( (value=getStringForKey(kSystemType, &bootInfo->bootConfig))!=NULL)
+	if ( (value=getStringForKey(kSystemTypeKey, &bootInfo->bootConfig))!=NULL)
 	{
 		if (Platform.Type > 6)  
 		{
 			if(fadt_mod->PM_Profile<=6)
 				Platform.Type = fadt_mod->PM_Profile; // get the fadt if correct
 			else 
-				Platform.Type = 1;		/* Set a fixed value (Desktop) */
+				Platform.Type = 1; // Set a fixed value (Desktop)
 			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		}
 		else
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 	}
-	// Set PM_Profile from System-type if only user wanted this value to be forced
+	// Set PM_Profile from SystemType only if user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
 	{
 	    if (value) 
@@ -663,6 +724,10 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 		fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
 		fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
+//Azi: keyboard reset; http://forum.voodooprojects.org/index.php/topic,1056.msg9802.html#msg9802
+//		fadt_mod->Reset_Address = 0x64; // Address of the register
+//		fadt_mod->Reset_Value = 0xfe; // Value to write to reset the system
+		
 		verbose("FADT: Restart Fix applied!\n");
 	}
 	
@@ -687,41 +752,27 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	return fadt_mod;
 }
 
-/* Setup ACPI without replacing DSDT. */
+/* Setup ACPI without replacing DSDT. - not needed atm.
 int setupAcpiNoMod()
 {
 	//	addConfigurationTable(&gEfiAcpiTableGuid, getAddressOfAcpiTable(), "ACPI");
 	//	addConfigurationTable(&gEfiAcpi20TableGuid, getAddressOfAcpi20Table(), "ACPI_20");
-	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
+	// XXX aserebln why uint32 cast if pointer is uint64 ?
 	acpi10_p = (uint32_t)getAddressOfAcpiTable();
 	acpi20_p = (uint32_t)getAddressOfAcpi20Table();
 	addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 	if(acpi20_p) addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
 	return 1;
-}
+}*/
 
 /* Setup ACPI. Replace DSDT if DSDT.aml is found */
 int setupAcpi(void)
 {
 	int version;
 	void *new_dsdt;
-
-	const char *filename;
-	char dirSpec[128];
-	int len = 0;
-
-	// Try using the file specified with the DSDT option
-	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->bootConfig))
-	{
-		sprintf(dirSpec, filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "DSDT.aml");
-	}
 	
 	// Load replacement DSDT
-	new_dsdt = loadACPITable(dirSpec);
+	new_dsdt=loadACPITable("DSDT.aml");
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
 	 {
@@ -735,9 +786,9 @@ int setupAcpi(void)
 	// SSDT Options
 	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false; 
 	
-	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->bootConfig);
-	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->bootConfig);
-	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->bootConfig);
+	getBoolForKey(kDropSSDTKey, &drop_ssdt, &bootInfo->bootConfig);
+	getBoolForKey(kGeneratePStatesKey, &generate_pstates, &bootInfo->bootConfig);
+	getBoolForKey(kGenerateCStatesKey, &generate_cstates, &bootInfo->bootConfig);
 	
 	{
 		int i;
@@ -749,7 +800,7 @@ int setupAcpi(void)
 			sprintf(filename, i>0?"SSDT-%d.aml":"SSDT.aml", i);
 			
 			if(new_ssdt[ssdt_count] = loadACPITable(filename)) 
-			{				
+			{
 				ssdt_count++;
 			}
 			else 
@@ -1049,7 +1100,7 @@ int setupAcpi(void)
 		}
 		else
 		{
-			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
+			/* XXX aserebln why uint32 cast if pointer is uint64 ? Azi: check this***** */
 			acpi10_p = (uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 		}

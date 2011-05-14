@@ -30,7 +30,9 @@
 #include <mach-o/loader.h>
 #include <mach/machine/thread_status.h>
 
-#include <sl.h>
+#include "sl.h"
+
+//#define DEBUG
 
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
@@ -38,7 +40,7 @@ static long DecodeSymbolTable(long cmdBase);
 
 
 static unsigned long gBinaryAddress;
-bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
+bool   gHaveKernelCache; //Azi: bs!! - XXX aserebln: uninitialized? and only set to true, never to false
 cpu_type_t archCpuType=CPU_TYPE_I386;
 
 // Public Functions
@@ -127,7 +129,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			
   cmdBase = cmdstart;
 
-#if DEBUG
+#ifdef DEBUG
   printf("magic:      %x\n", (unsigned)mH->magic);
   printf("cputype:    %x\n", (unsigned)mH->cputype);
   printf("cpusubtype: %x\n", (unsigned)mH->cpusubtype);
@@ -151,8 +153,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
     case LC_SEGMENT:
       ret = DecodeSegment(cmdBase, &load_addr, &load_size);
       if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR) {
-          vmaddr = min(vmaddr, load_addr);
-          vmend = max(vmend, load_addr + load_size);
+          vmaddr = MIN(vmaddr, load_addr);
+          vmend = MAX(vmend, load_addr + load_size);
       }
       break;
       
@@ -202,7 +204,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
   long   vmsize, filesize;
   char *segname;
   
-  if (((long *)cmdBase)[0]==LC_SEGMENT_64)
+  if (((long *)cmdBase)[0]==LC_SEGMENT_64) //Azi: 64 bit
   {
 	  struct segment_command_64 *segCmd;
 	  
@@ -213,7 +215,13 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  fileaddr = (gBinaryAddress + segCmd->fileoff);
 	  filesize = segCmd->filesize;
 
-	  segname=segCmd->segname;	  
+	  segname=segCmd->segname;
+#ifdef DEBUG
+  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+  getc();
+#endif
   }
   else
   {
@@ -226,7 +234,13 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  fileaddr = (gBinaryAddress + segCmd->fileoff);
 	  filesize = segCmd->filesize;
 	  
-	  segname=segCmd->segname;	  
+	  segname=segCmd->segname;
+#ifdef DEBUG
+  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+  getc();
+#endif
   }
 
   if (vmsize == 0 || filesize == 0) {
@@ -235,22 +249,21 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
       return 0;
   }
   
-#if DEBUG
-  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getc();
-#endif
-  
   if (! ((vmaddr >= KERNEL_ADDR &&
           (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
          (vmaddr >= HIB_ADDR &&
           (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
       stop("Kernel overflows available space");
   }
-	
-  if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
-	  gHaveKernelCache = true;
+
+  //Azi: check for prelinked kernel.
+  // segname:
+  // Leo 10.5.8: __TEXT, __DATA, __HIB, __DESC, __VECTORS, __KLD, __PRELINK, __LINKEDIT
+  // Snow 10.6.6: __TEXT, __DATA, __INITGDT, __INITPT, __DESC, __VECTORS, __HIB, __SLEEP,
+  //              __KLD, __PRELINK_TEXT, __PRELINK_STATE, __PRELINK_INFO, __LINKEDIT
+  if (vmsize && ((strcmp(segname, "__PRELINK") == 0)
+                 || (strcmp(segname, "__PRELINK_TEXT") == 0))) //Azi: TEXT, STATE or INFO ??
+      gHaveKernelCache = true;
   
   // Copy from file load area.
   if (vmsize>0 && filesize>0)
@@ -315,7 +328,7 @@ static long DecodeSymbolTable(long cmdBase)
 
   symTab = (struct symtab_command *)cmdBase;
   
-#if DEBUG
+#ifdef DEBUG
   printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n",
 	 symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
 	getc ();

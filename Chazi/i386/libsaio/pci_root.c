@@ -2,9 +2,9 @@
  * Copyright 2009 netkas
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 
 #ifndef DEBUG_PCIROOT
 #define DEBUG_PCIROOT 1
@@ -47,36 +47,25 @@ int getPciRootUID(void)
 {
 	void *new_dsdt;
 	const char *val;
-	int len,fsize;
-	const char * dsdt_filename=NULL;
+	int len, fsize;
+	const char * dsdt_filename = NULL;
 	extern int search_and_get_acpi_fd(const char *, const char **);
 
-	if (rootuid < 10) return rootuid;
+	if (rootuid < 10)
+		return rootuid;
+	
 	rootuid = 0;	/* default uid = 0 */
 
-	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->bootConfig)) {
+	if (getValueForKey(kPCIRootUIDKey, &val, &len, &bootInfo->bootConfig)) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
-	/* Chameleon compatibility */
-	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig)) {
-		if (isdigit(val[0])) rootuid = val[0] - '0';
-		goto out;
-	}
-	/* PCEFI compatibility */
-	else if (getValueForKey("-pci0", &val, &len, &bootInfo->bootConfig)) {
-		rootuid = 0;
-		goto out;
-	}
-	else if (getValueForKey("-pci1", &val, &len, &bootInfo->bootConfig)) {
-		rootuid = 1;
-		goto out;
-	}
-
+	
+	verbose("(%s) ", __FUNCTION__);
 	int fd = search_and_get_acpi_fd("DSDT.aml", &dsdt_filename);
 
 	// Check booting partition
-	if (fd<0)
+	if (fd < 0)
 	{	  
 	  verbose("No DSDT found, using 0 as uid value.\n");
 	  rootuid = 0;
@@ -90,6 +79,7 @@ int getPciRootUID(void)
 		close (fd);
 		goto out;
 	}
+	
 	if (read (fd, new_dsdt, fsize) != fsize) {
 		verbose("[ERROR] read %s failed\n", dsdt_filename);
 		close (fd);
@@ -101,10 +91,11 @@ int getPciRootUID(void)
 	free(new_dsdt);
 
 	// make sure it really works: 
-	if (rootuid == 11) rootuid=0; //usually when _UID isnt present, it means uid is zero
+	if (rootuid == 11)
+		rootuid = 0; //usually when _UID isnt present, it means uid is zero
 	else if (rootuid < 0 || rootuid > 9) 
 	{
-		printf("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
+		verbose("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
 		rootuid = 0;
 	}
 out:

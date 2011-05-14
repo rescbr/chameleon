@@ -3,7 +3,7 @@
  * AsereBLN: 2009: cleanup and bugfix
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
 
@@ -54,7 +54,7 @@ static uint64_t measure_tsc_frequency(void)
          */
         if((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC)
             continue;
-        // tscDelta = min(tscDelta, (tscEnd - tscStart))
+        // tscDelta = MIN(tscDelta, (tscEnd - tscStart))
         if( (tscEnd - tscStart) < tscDelta )
             tscDelta = tscEnd - tscStart;
     }
@@ -152,7 +152,7 @@ void scan_cpu(PlatformInfo_t *p)
 		
 		strlcpy(p->CPU.BrandString,	s, sizeof(p->CPU.BrandString));
 		
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, min(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1))) {
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1))) {
 			 /*
 			  * This string means we have a firmware-programmable brand string,
 			  * and the firmware couldn't figure out what sort of CPU we have.
@@ -201,10 +201,12 @@ void scan_cpu(PlatformInfo_t *p)
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == 0x1a || p->CPU.Model == 0x1e
 			 || p->CPU.Model == 0x1f || p->CPU.Model == 0x25 || p->CPU.Model == 0x2c)) {
 				msr = rdmsr64(MSR_PLATFORM_INFO);
-				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
+//				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
+				DBG("MSR_PLATFORM_INFO (0xCE): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				currcoef = (msr >> 8) & 0xff;
 				msr = rdmsr64(MSR_FLEX_RATIO);
-				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
+//				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
+				DBG("MSR_FLEX_RATIO (0x194): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				if ((msr >> 16) & 0x01) {
 					flex_ratio = (msr >> 8) & 0xff;
 					if (currcoef > flex_ratio) {
@@ -218,7 +220,11 @@ void scan_cpu(PlatformInfo_t *p)
 				cpuFrequency = tscFrequency;
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
+//Azi: __FILE__ %d, __LINE__ %d, __FUNCTION__ %s
+//				msglog("%s - %d\n", __FUNCTION__, __LINE__);
+//				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
+				//Azi: 0x00000F2700000F27
+				DBG("MSR_IA32_PERF_STATUS (0x198): 0x%08X%08X\n", (uint32_t)(msr >> 32), (uint32_t)msr);
 				currcoef = (msr >> 8) & 0x1f;
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = (msr >> 46) & 0x01;
@@ -297,7 +303,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-
+	
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
 	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);

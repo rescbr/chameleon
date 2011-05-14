@@ -4,7 +4,7 @@
  *
  */
 
-#include "libsaio.h"
+//#include "libsaio.h" - included on pci.h now. Don't forget bootstruct.h!!
 #include "bootstruct.h"
 #include "pci.h"
 #include "pci_root.h"
@@ -177,12 +177,14 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 	pci_dt_t	*current;
 
 	current = pci_dt;
-	while (current) {
-		printf("%02x:%02x.%x [%04x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n", 
-			current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
-			current->class_id, current->vendor_id, current->device_id, 
-			current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id, 
-			get_pci_dev_path(current));
+	while (current)
+	{
+		printf("%02x:%02x.%x [%04x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
+				current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func,
+				current->class_id, current->vendor_id, current->device_id,
+				current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id,
+				get_pci_dev_path(current));
+		
 		dump_pci_dt(current->children);
 		current = current->next;
 	}

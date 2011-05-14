@@ -42,10 +42,11 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	cpu.o platform.o acpi_patcher.o \
 	smbios.o smbios_getters.o smbios_decode.o \
 	fake_efi.o ext2fs.o \
-	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
-	convert.o aml_generator.o
-
+	usb.o pci_setup.o \
+	device_inject.o pci_root.o convert.o aml_generator.o \
+	nvidia_resolution.o ati_resolution.o gma_resolution.o \
+	autoresolution.o edid.o
+# mem.o smbios_patcher.o - Kabyl
 
 SAIO_EXTERN_OBJS = console.o
 
@@ -74,13 +75,10 @@ all embedtheme: $(DIRS_NEEDED) libsaio.h $(LIBS)
 #	ranlib $(SYMROOT)/$@
 
 libsaio.a: $(SAIO_EXTERN_OBJS) $(SAIO_OBJS)
-	@echo "\t[RM] $(SYMROOT)/$(@F)"
-	@rm -f $(SYMROOT)/$(@F)
-	@echo "\t[AR] $@"
-	@ar q $(SYMROOT)/$(@F) $^ &> /dev/null
-	@echo "\t[RANLIB] $@"
-	@ranlib $(SYMROOT)/$(@F)
-	
+	rm -f $(SYMROOT)/$(@F)
+	ar q $(SYMROOT)/$(@F) $^
+	ranlib $(SYMROOT)/$(@F)
+
 #saio_internal.h: saio_external.h
 #saio_table.c: saio_external.h
 #saio_defs.h: saio_external.h

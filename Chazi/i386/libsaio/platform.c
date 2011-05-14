@@ -4,14 +4,13 @@
  * AsereBLN: cleanup
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"
-#include "spd.h"
-#include "dram_controllers.h"
+#include "modules.h"
 
 #ifndef DEBUG_PLATFORM
 #define DEBUG_PLATFORM 0
@@ -37,23 +36,23 @@ bool platformCPUFeature(uint32_t feature)
 }
 
 /** scan mem for memory autodection purpose */
-void scan_mem() {
+void scan_mem()
+{
     static bool done = false;
     if (done) return;
 
     bool useAutodetection = true;
-    getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
+    getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
 
-    if (useAutodetection) {
-		if (dram_controller_dev!=NULL) {
-			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
-		}
-        scan_spd(&Platform);
-    }
+    if (useAutodetection)
+	{
+		execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
+		//getc();
+	}
     done = true;
 }
 
-/** 
+/**
     Scan platform hardware information, called by the main entry point (common_boot() ) 
     _before_ bootConfig xml parsing settings are loaded
 */

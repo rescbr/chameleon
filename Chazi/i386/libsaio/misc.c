@@ -44,7 +44,10 @@
  * All rights reserved.
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "libsa.h"
+#include "saio_internal.h"
+#include "io_inline.h"
 
 /*
  * keyboard controller (8042) I/O port addresses
