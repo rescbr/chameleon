@@ -9,7 +9,7 @@ CFLAGS= -O $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBDIR = libsa
-INC = -I. -I$(LIBDIR) 
+INC = -I. -I$(LIBDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else
@@ -29,7 +29,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 
-all embedtheme optionrom tags debug install installhdrs: objroot_dirs
+all embedtheme tags debug install installhdrs: objroot_dirs
 	@for i in ${SUBDIRS}; \
 	do \
 		echo ================= make $@ for $$i =================; \
