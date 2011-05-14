@@ -42,63 +42,52 @@ installhdrs::
 .SUFFIXES: .s .i .c .o .o32 .o64
 
 .c.o32:
-	@echo "\t[CC32] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $(OBJROOT)/$*.o32 \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $(OBJROOT)/$*.o32 \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 .c.o64:
-	@echo "\t[CC64] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $(OBJROOT)/$*.o64 \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $(OBJROOT)/$*.o64 \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 .c.o .m.o:
-	@echo "\t[CC] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o: %.c
-	@echo "\t[CC] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o32: %.c
-	@echo "\t[CC32] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $(OBJROOT)/$*.o32 \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $(OBJROOT)/$*.o32 \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o64: %.c
-	@echo "\t[CC64] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $(OBJROOT)/$*.o64 \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $(OBJROOT)/$*.o64 \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o: %.m
-	@echo "\t[CC] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
+		-MD -dependency-file $(OBJROOT)/$*.d
+	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 #.s.o:
 #	cc $(INC) -E $< > $(OBJROOT)/$*.o2
 #	$(AS) -o $(OBJROOT)/$@ $(OBJROOT)/$*.o2
 
 .s.o:
-	@echo "\t[AS] $<"
-	@cc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
+	cc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
 
 boot2.o:
-	@echo "\t[AS] boot2.s"
-	@cc $(CPPFLAGS) -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s
+	cc $(CPPFLAGS) -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s
 	
 $(OBJROOT)/%.o: %.s
-	@echo "\t[CC] $<"
-	@cc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
+	cc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
 
 $(DIRS_NEEDED) $(INSTALLDIR) $(SRCROOT):
-	@echo "\t[MKDIR] $@"
-	@$(MKDIRS) $@
+	$(MKDIRS) $@

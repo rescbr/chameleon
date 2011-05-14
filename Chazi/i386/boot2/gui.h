@@ -8,14 +8,11 @@
  *
  */
 
-#include "boot.h"
-#include "bootstruct.h"
-#include "graphics.h"
-#include "graphic_utils.h"
-#include "picopng.h"
-
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
+
+#include "graphics.h"
+#include "picopng.h"
 
 #define CHARACTERS_COUNT	223
 
@@ -37,7 +34,7 @@ enum {
 	HorizontalLayout	= 0,
 	VerticalLayout		= 1,
 };
-
+/* moved to boot.h ??
 enum {
 	kBackspaceKey		= 0x08,
 	kTabKey			= 0x09,
@@ -46,9 +43,10 @@ enum {
 	kUpArrowkey		= 0x4800, 
 	kDownArrowkey		= 0x5000,
 	kASCIIKeyMask		= 0x7f,
+	kF2Key			= 0x3c00, //Azi:autoresolution
 	kF5Key			= 0x3f00,
 	kF10Key			= 0x4400
-};
+};*/
 
 /*
  * Menu item structure.
@@ -96,6 +94,16 @@ typedef struct
 	uint32_t	font_small_color;	// Color for small  font AARRGGBB
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
+	// Azi:autoresolution
+	//resolution specifics
+	uint16_t	htotal;				
+	uint16_t	vtotal;				
+	uint16_t	hsyncstart;			
+	uint16_t	hsyncend;
+	uint16_t	vsyncstart;			
+	uint16_t	vsyncend;
+	uint8_t		mm;				// Azi:autoresolution - debuginfo
+	uint16_t	attr;
 } window_t;
 	
 /*

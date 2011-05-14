@@ -1,0 +1,112 @@
+				---------------// Modules Info //---------------
+
+Installation:
+
+  - get the source, compile; find modules at /sym/i386, with .dylib file extension.
+
+  - create an /Extra/modules folder on the volume from were the booter is going to load from,
+	copy Symbols.dylib (mandatory) to modules folder, plus any other module you wish to load.
+
+  - update boot file or reinstall the booter completely, as needed.	
+
+  Note: GraphicsEnabler, MemDetect & ForceHPET patches are now converted to modules.
+
+
+How to use?
+
+  - Just check if a key is needed to activate the functionality you pretend to use. Otherwise
+	all modules are loaded at startup from the default location, before the boot prompt.
+
+	---------------//---------------//---------------
+
+What are modules?
+
+  - Modules can be refered as "plugins", adding and/or replacing booter functionality, without
+	touching the "core" of the booter. If you are familiar with e.g. browser plugins
+	(like Firefox's Addons), you know what i'm talking about; they either add completely new
+	functionality or replace/modify existing one; same thing with modules and Chameleon.
+	
+	More info can be found on Meklort's blog and links at the bottom of the page:
+	http://www.meklort.com/
+
+	---------------//---------------//---------------
+
+Featured modules:
+
+  - Symbols.dylib: first one to load, contains all the symbols found on the booter.
+	All other modules depend on it to load.
+
+	---------------//---------------
+
+  - KernelPatcher.dylib:
+
+	- needs key to enable patching:
+	
+		PatchKernel=y			at boot prompt or,
+
+		<key>PatchKernel</key>	on Boot.plist.
+		<string>Yes</string>
+	
+	- featured patches: cpuid_set - 32/64 bit ??
+						commpage_stuff - 32/64 bit
+						lapic_init - 32 bit only.
+
+	Note on functionality: as it is, Kpatcher allows my Pentium D 925 to load vanilla(*)
+	kernel, with the help of -legacy flag; to enter x86_64 world i still need to patch
+	the kernel sources, as the 925 has no Supplemental SSE3 instructions and there's
+	no patch to fix this on Kpatcher atm.
+	I assume that, the great majority of the legacy/unsupported processors with at least
+	SSE3 instructions, will benefit of the same treatment!
+	Let's just say that the only patch needed by the 925 on Legacy Mode(**) is cpuid_set!
+	
+	Note: Kernel Patcher can stop working due to changes on the kernel code.
+
+	---------------//---------------
+
+  - GraphicsEnabler.dylib: GraphicsEnabler converted to module.
+
+	---------------//---------------
+
+  - Memory.dylib: MemDetection converted to module.
+
+	---------------//---------------
+
+  - HPET.dylib: ForceHPET converted to module.
+
+	---------------//---------------
+	
+  - HelloWorld.dylib: just a notifier (not mandatory).
+
+	---------------//---------------//---------------
+
+
+(*) In this context, "vanilla" means the use of a non pre-patched kernel; what we do here is
+	patch the kernel on the fly, in memory.
+
+(**) For those who "missed" the lesson, Legacy Mode is the one 32 bit only cpu's run on OS X.
+
+
+	---------------//---------------//---------------
+
+Issues:
+
+  - compiling modules under Leo (Dev tools 3.1 (9M2809)) is not possible at the moment.
+
+	---------------//---------------//---------------
+
+	
+	Some talk here: http://forum.voodooprojects.org/index.php/topic,1556.0.html
+	here: http://forum.voodooprojects.org/index.php/topic,1153.0.html
+	and here: http://forum.voodooprojects.org/index.php/topic,1565.0.html
+
+
+	---------------//---------------//---------------
+
+
+Thanks fly out to Meklort for this precious and huge work!
+
+
+
+Azimutz
+
+

@@ -4,12 +4,12 @@
  *
  */
 
+#ifndef __BOOT_MODULES_H
+#define __BOOT_MODULES_H
+
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
 
-
-#ifndef __BOOT_MODULES_H
-#define __BOOT_MODULES_H
 
 #define MODULE_PATH		"/Extra/modules/"
 #define SYMBOLS_MODULE "Symbols.dylib"

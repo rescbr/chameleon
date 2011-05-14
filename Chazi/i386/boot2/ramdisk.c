@@ -4,8 +4,8 @@
  *
  */
 
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "multiboot.h"
 #include "ramdisk.h"
 
@@ -16,7 +16,7 @@ BVRef gRAMDiskVolume = NULL;
 bool gRAMDiskBTAliased = false;
 char gRAMDiskFile[512];
 
-// Notify OS X that a ramdisk has been setup. XNU with attach this to /dev/md0
+// Notify OS X that a ramdisk has been setup. XNU will attach this to /dev/md0
 void md0Ramdisk()
 {
 	RAMDiskParam ramdiskPtr;
@@ -25,53 +25,40 @@ void md0Ramdisk()
 	int fh = -1;
 	int len;
 	
-	if(getValueForKey(kMD0Image, &override_filename, &len,  
-				   &bootInfo->bootConfig))
+	if (getValueForKey(kMD0ImageKey, &override_filename, &len, &bootInfo->bootConfig))
 	{
 		// Use user specified md0 file
 		sprintf(filename, "%s", override_filename);
 		fh = open(filename, 0);
 		
-		if(fh < 0)
+		if (fh < 0)
 		{
-			sprintf(filename, "rd(0,0)/Extra/%s", override_filename);
+			sprintf(filename, "rd(0,0)/Extra/Postboot.img");
 			fh = open(filename, 0);
 
-			if(fh < 0)
+			if (fh < 0)
 			{
-				sprintf(filename, "/Extra/%s", override_filename);
+				sprintf(filename, "bt(0,0)/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
 				fh = open(filename, 0);
 			}
 		}		
-	}
-
-	if(fh < 0)
-	{
-		sprintf(filename, "rd(0,0)/Extra/Postboot.img");
-		fh = open(filename, 0);
-
-		if(fh < 0)
-		{
-			sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
-			fh = open(filename, 0);
-		}
 	}		
 
 	if (fh >= 0)
 	{
 		verbose("Enabling ramdisk %s\n", filename);
 
-		ramdiskPtr.size  = file_size(fh);
+		ramdiskPtr.size = file_size(fh);
 		ramdiskPtr.base = AllocateKernelMemory(ramdiskPtr.size);
 
-		if(ramdiskPtr.size && ramdiskPtr.base)
+		if (ramdiskPtr.size && ramdiskPtr.base)
 		{
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{
 				AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);
 				Node* node = DT__FindNode("/chosen/memory-map", false);
-				if(node != NULL)
+				if (node != NULL)
 				{
 					DT__AddProperty(node, "RAMDisk", sizeof(RAMDiskParam),  (void*)&ramdiskPtr);		
 				}
@@ -91,7 +78,6 @@ void md0Ramdisk()
 		}
 
 		close(fh);
-
 	}
 }
 
@@ -118,7 +104,7 @@ void umountRAMDisk()
 
 		// Reset ramdisk bvr
 		gRAMDiskVolume = NULL;
-		printf("\nunmounting: done");
+		printf("unmounting: done\n"); //Azi: change line breaks on all mesgs...***
 	}
 }
 
@@ -131,7 +117,7 @@ int mountRAMDisk(const char * param)
 	fh = open(param, 0);
 	if (fh != -1)
 	{
-		printf("\nreading ramdisk image: %s", param);
+		printf("reading ramdisk image: %s\n", param); //Azi: check this later...
 
 		ramDiskSize = file_size(fh);
 		if (ramDiskSize > 0)
@@ -175,7 +161,7 @@ int mountRAMDisk(const char * param)
 			if(gRAMDiskVolume == NULL)
 			{
 				umountRAMDisk();
-				printf("\nRamdisk contains no partitions.");
+				printf("Ramdisk contains no partitions.\n");
 			}
 			else
 			{
@@ -190,10 +176,10 @@ int mountRAMDisk(const char * param)
 				}
 				else
 				{
-					printf("\nno ramdisk config...\n");
+					printf("no ramdisk config...\n");
 				}
 
-				printf("\nmounting: done");
+				printf("mounting: done\n");
 			}
 		}
 	}
@@ -206,11 +192,11 @@ void setRAMDiskBTHook(bool mode)
 	gRAMDiskBTAliased = mode;
 	if (mode)
 	{
-		printf("\nEnabled bt(0,0) alias.");
+		printf("Enabled bt(0,0) alias.\n");
 	}
 	else
 	{
-		printf("\nDisabled bt(0,0) alias.");
+		printf("Disabled bt(0,0) alias.\n");
 	}
 }
 
@@ -223,32 +209,33 @@ void showInfoRAMDisk(void)
 	{
 		struct multiboot_module * ramdisk_module = (void *)gRAMDiskMI->mi_mods_addr;
 
-		printf("\nfile: %s %d", gRAMDiskFile,
+		printf("file: %s %d\n", gRAMDiskFile,
 		ramdisk_module->mm_mod_end - ramdisk_module->mm_mod_start);
-		printf("\nalias: %s", gRAMDiskBTAliased ? "enabled" : "disabled");
+		printf("alias: %s\n", gRAMDiskBTAliased ? "enabled" : "disabled");
 
 		// Display ramdisk information if available.
 		if (getValueForKey("Info", &val, &len, &bootInfo->ramdiskConfig))
 		{
-			printf("\ninfo: %s", val);
+			printf("info: %s\n", val);
 		}
 		else
 		{
-			printf("\nramdisk info not available.");
+			printf("ramdisk info not available.\n");
 		}
 	}
 	else
 	{
-		printf("\nNo ramdisk mounted.");
+		printf("No ramdisk mounted.\n");
 	}
 }
 
 int loadPrebootRAMDisk()
 {
 	mountRAMDisk("bt(0,0)/Extra/Preboot.dmg");
+	
 	if (gRAMDiskMI != NULL)
 	{
-		printf("\n");
+		printf("\n"); // just a line break.. helps separating bdmesg***
 		return 0;
 	}
 	else
@@ -289,6 +276,7 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 		clearScreenRows(0, 24);
 		setCursorPosition(0, 0, 1);
 		showInfoRAMDisk();
+		//Azi: check Chazileon on these line breaks here***
 		printf("\n\nPress any key to continue.\n");
 		getc();
 		setActiveDisplayPage(0);

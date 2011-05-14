@@ -23,13 +23,15 @@
  */
 
 #include "boot.h"
-#include "bootstruct.h"
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"
 #include "embedded.h"
 #include "pci.h"
+#include "options.h"
+#include "efi.h"
 
+bool showBootBanner = true; //Azi:debuginfo
 static bool shouldboot = false;
 
 extern int multiboot_timeout;
@@ -38,26 +40,17 @@ extern int multiboot_timeout_set;
 extern BVRef    bvChain;
 //extern int		menucount;
 
-extern int		gDeviceCount;
+//extern int		gDeviceCount; //Azi: header
+char			gMacOSVersion[8]; //Azi: moved from boot.c ??? declared on boot.h as extern :-/
+static bool getOSVersion(char *str); //			||
 
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
 
-enum {
-    kMenuTopRow    = 5,
-    kMenuMaxItems  = 10,
-    kScreenLastRow = 24
-};
-
 //==========================================================================
 
-typedef struct {
-    int x;
-    int y;
-    int type;
-} CursorState;
-
-static void changeCursor( int col, int row, int type, CursorState * cs )
+//static //Azi:autoresolution
+void changeCursor( int col, int row, int type, CursorState * cs )
 {
     if (cs) getCursorPositionAndType( &cs->x, &cs->y, &cs->type );
     setCursorType( type );
@@ -178,7 +171,8 @@ static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
 static char   booterCommand[BOOT_STRING_LEN];
 static char   booterParam[BOOT_STRING_LEN];
 
-static void clearBootArgs(void)
+//static //Azi:autoresolution
+void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
@@ -200,7 +194,8 @@ static void addBootArg(const char * argStr)
 
 //==========================================================================
 
-static void showBootPrompt(int row, bool visible)
+//static //Azi:autoresolution
+void showBootPrompt(int row, bool visible)
 {
 	extern char bootPrompt[];
 	extern char bootRescanPrompt[];
@@ -267,7 +262,8 @@ static void updateBootArgs( int key )
 					putchar(key);  // echo to screen
 				else
 					updateGraphicBootPrompt(key);
-			*gBootArgsPtr++ = key;
+				
+				*gBootArgsPtr++ = key;
 			}
             
 			break;
@@ -302,7 +298,8 @@ static void printMenuItem( const MenuItem * item, int highlight )
 
 //==========================================================================
 
-static void showMenu( const MenuItem * items, int count,
+//static //Azi:autoresolution
+void showMenu( const MenuItem * items, int count,
                       int selection, int row, int height )
 {
     int         i;
@@ -320,11 +317,11 @@ static void showMenu( const MenuItem * items, int count,
     gMenuHeight		= height;
     gMenuItemCount	= count;
     gMenuTop		= 0;
-    gMenuBottom		= min( count, height ) - 1;
+    gMenuBottom		= MIN( count, height ) - 1;
     gMenuSelection	= selection;
 
     gMenuStart		= 0;
-    gMenuEnd	    = min( count, gui.maxdevices ) - 1;
+    gMenuEnd	    = MIN( count, gui.maxdevices ) - 1;
 	
 	// If the selected item is not visible, shift the list down.
 
@@ -446,13 +443,15 @@ static int updateMenu( int key, void ** paramPtr )
 						gBootMode = kBootModeNormal;
 						addBootArg(kVerboseModeFlag);
 						break;
-						
+
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
 						addBootArg(kIgnoreCachesFlag);
+						//Azi: this one crossed my mind a lot of times.. nice going :)
+						addBootArg(kVerboseModeFlag);  //Slice - if ignore cache then verbose
 						break;
-						
+
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
@@ -674,17 +673,24 @@ void lspci(void)
 }
 
 //==========================================================================
+//Azi: autoresolution
+int     key;
+int     nextRow;
+BVRef   menuBVR;
+bool    showPrompt;
+extern void reloadAutoRes();
 
 int getBootOptions(bool firstRun)
 {
 	int     i;
-	int     key;
-	int     nextRow;
+//	int     key;
+//	int     nextRow;
 	int     timeout;
 	int     bvCount;
 	BVRef   bvr;
-	BVRef   menuBVR;
-	bool    showPrompt, newShowPrompt, isCDROM;
+//	BVRef   menuBVR;
+//	bool    showPrompt;
+	bool    newShowPrompt, isCDROM;
 
 	// Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(bvChain);
@@ -775,20 +781,28 @@ int getBootOptions(bool firstRun)
 		int cnt;
 		int optionKey;
 
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
+		//Azi:---
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) 
+		{
 			prompt = malloc(cnt + 1);
 			strncat(prompt, val, cnt);
-		} else {
+		}
+		else
+		{
 			name = malloc(80);
 			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
+			//Azi: too long for 80X25, GUI=n, vmware, depending on the device name (more than 5 char).
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
 		}
 
-		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig )) {
+		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig ))
+		{
 			// The key specified is a special key.
-		} else {
+		}
+		else
+		{
 			// Default to F8.
 			optionKey = 0x4200;
 		}
@@ -871,7 +885,6 @@ int getBootOptions(bool firstRun)
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-			bool showBootBanner = true;
  
 			// Check if "Boot Banner"=N switch is present in config file.
 			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
@@ -897,7 +910,7 @@ int getBootOptions(bool firstRun)
 			printf("Use \30\31 keys to select the startup volume.");
 		}
 		showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-		nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+		nextRow += MIN( gDeviceCount, kMenuMaxItems ) + 3;
 	}
 
 	// Show the boot prompt.
@@ -941,30 +954,50 @@ int getBootOptions(bool firstRun)
 				/*
 				* TODO: this needs to be refactored.
 				*/
-				if (strcmp( booterCommand, "video" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+				if (strcmp( booterCommand, "video" ) == 0)
+				{
+					if (bootArgs->Video.v_display == GRAPHICS_MODE)
+					{
 						showInfoBox(getVBEInfoString(), getVBEModeInfoString());
-					} else {
+					}
+					else
+					{
 						printVBEModeInfo();
 					}
-				} else if ( strcmp( booterCommand, "memory" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE ) {
+				}
+				else if ( strcmp( booterCommand, "memory" ) == 0)
+				{
+					if (bootArgs->Video.v_display == GRAPHICS_MODE )
+					{
 						showInfoBox("Memory Map", getMemoryInfoString());
-					} else {
+					}
+					else
+					{
 						printMemoryInfo();
 					}
-				} else if (strcmp(booterCommand, "lspci") == 0) {
+				}
+				else if (strcmp(booterCommand, "lspci") == 0)
+				{
 					lspci();
-				} else if (strcmp(booterCommand, "more") == 0) {
+				}
+				else if (strcmp(booterCommand, "more") == 0)
+				{
 					showTextFile(booterParam);
-				} else if (strcmp(booterCommand, "rd") == 0) {
+				}
+				else if (strcmp(booterCommand, "rd") == 0)
+				{
 					processRAMDiskCommand(&argPtr, booterParam);
-				} else if (strcmp(booterCommand, "norescan") == 0) {
-					if (gEnableCDROMRescan) {
+				}
+				else if (strcmp(booterCommand, "norescan") == 0)
+				{
+					if (gEnableCDROMRescan)
+					{
 						gEnableCDROMRescan = false;
 						break;
 					}
-				} else {
+				}
+				else
+				{
 					showHelp();
 				}
 				key = 0;
@@ -980,6 +1013,12 @@ int getBootOptions(bool firstRun)
 			clearBootArgs();
 			break;
 
+		// AutoResolution - Reapply the patch if Graphics Mode was incorrect
+		// or EDID Info was insane. 
+		case kF2Key:
+			reloadAutoRes();
+			break;
+			
 		case kF5Key:
 			// New behavior:
 			// Clear gBootVolume to restart the loop
@@ -991,7 +1030,7 @@ int getBootOptions(bool firstRun)
 			}
 			break;
 
-		case kF10Key:
+		case kF10Key: //Azi: disable "Scan Single Drive"=y (if set) and rescan disks.
 			gScanSingleDrive = false;
 			scanDisks(gBIOSDev, &bvCount);
 			gBootVolume = NULL;
@@ -1022,7 +1061,7 @@ int getBootOptions(bool firstRun)
 					if (gDeviceCount) {
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
-						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
+						nextRow += MIN(gDeviceCount, kMenuMaxItems) + 3;
 					}
 
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
@@ -1138,8 +1177,9 @@ processBootOptions()
     bool             uuidSet = false;
     char *           configKernelFlags;
     char *           valueBuffer;
+	extern void		 setupSmbiosConfigFile(); // test :P
 
-    valueBuffer = malloc(VALUE_SIZE);
+    valueBuffer = malloc(VALUE_SIZE); // 2048
     
     skipblanks( &cp );
 
@@ -1170,19 +1210,29 @@ processBootOptions()
     // trying to load the config file anyway.
     else
       return -1;
-
+	
+	// Moved here to enable search for override Boot.plist on OS specific folders.
+	// Find out which Mac OS version we're booting.
+	// make sure the damn thing get's cleaned, just in case... :)*
+	bzero(gMacOSVersion, sizeof(gMacOSVersion)); // do this to argP ??... check it*****
+	getOSVersion(gMacOSVersion);
+	
+	//Azi: implemented at loadOverrideConfig. ???
     // Load config table specified by the user, or use the default.
-
-    if (!getValueForBootKey(cp, "config", &val, &cnt)) {
-      val = 0;
-      cnt = 0;
-    }
+    //if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+    //  val = 0;
+    //  cnt = 0;
+    //}
+//	loadSystemConfig(val, cnt); Azi:reminder
+//  if ( !sysConfigValid ) return -1;
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
+    // This is not a mandatory operation anymore.
 
     loadOverrideConfig(&bootInfo->overrideConfig);
+	// testing ugly hack :P
+	setupSmbiosConfigFile("SMBIOS.plist");
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.
@@ -1191,121 +1241,142 @@ processBootOptions()
     // overriding the kernel, which causes the kernelcache not
     // to be used.
 
-    gOverrideKernel = false;
-    if (( kernel = extractKernelName((char **)&cp) )) {
-        strcpy( bootInfo->bootFile, kernel );
-        gOverrideKernel = true;
-    } else {
-        if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
-            strlcpy( bootInfo->bootFile, val, cnt+1 );
-            if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
-                gOverrideKernel = true;
-            }
-        } else {
-            strcpy( bootInfo->bootFile, kDefaultKernel );
-        }
-    }
+	gOverrideKernel = false;
+	//Azi: setting bootFile - kernel name (path) used in common_boot()
+	if (( kernel = extractKernelName((char **)&cp) )) // boot prompt
+	{
+		strcpy( bootInfo->bootFile, kernel );
+		gOverrideKernel = true;
+	}
+	else
+	{
+		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) // Boot.plist
+		{
+			strlcpy( bootInfo->bootFile, val, cnt+1 );
+			if (strcmp( bootInfo->bootFile, kDefaultKernelName ) != 0)
+			{
+				gOverrideKernel = true;
+			}
+		}
+		else
+		{
+			strcpy( bootInfo->bootFile, kDefaultKernelName ); // mach_kernel
+		}
+	}
 
     cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
     argP = bootArgs->CommandLine;
 
     // Get config table kernel flags, if not ignored.
-    if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
-            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
+    if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) || // if -F arg was used...
+			// don't get the value/s passed by "Kernel Flags" key on "override" Boot.plist.
+			//Azi: test this*****
+            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig ))
+	{
         val = "";
         cnt = 0;
     }
     configKernelFlags = malloc(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
-    if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
-        // boot-uuid was set either on the command-line
-        // or in the config file.
+	// user provided a uuid... at boot prompt or override Boot.plist ??
+    if (processBootArgument(kBootUUIDKey/*boot-uuid*/, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0))
+	{
+        // "boot-uuid" was set either on the command-line or in the config file.
         uuidSet = true;
-    } else {
-
-        //
+    }
+	else
+	{
         // Try an alternate method for getting the root UUID on boot helper partitions.
-        //
         if (gBootVolume->flags & kBVFlagBooter)
         {
-        	if((loadHelperConfig(&bootInfo->helperConfig) == 0)
-        	    && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
+        	if ((loadHelperConfig(&bootInfo->helperConfig) == 0) &&
+				getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
         	{
-          	getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
-            copyArgument(kBootUUIDKey, val, cnt, &argP, &cntRemaining);
-            uuidSet = true;
+          		getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
+            	copyArgument(kBootUUIDKey/*boot-uuid*/, val, cnt, &argP, &cntRemaining);
+            	uuidSet = true;
         	}
         }
 
-        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
+        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid(gBootVolume, uuidStr) == 0)
+		{
             verbose("Setting boot-uuid to: %s\n", uuidStr);
-            copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
+            copyArgument(kBootUUIDKey/*boot-uuid*/, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
             uuidSet = true;
         }
     }
 
-    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
+	// if no rd=diskXsY key issued by user... at boot prompt or override Boot.plist ??
+    if (!processBootArgument(kRootDeviceKey,
+		cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice))
+	{
         cnt = 0;
-        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) {
-            valueBuffer[0] = '*';
+		// try "Boot Device" key ???
+        if (getValueForKey(kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig))
+		{
+            valueBuffer[0] = '*'; // check for rd=*uuid ???
             cnt++;
             strlcpy(valueBuffer + 1, val, cnt);
             val = valueBuffer;
-        } else {
-            if (uuidSet) {
+        }
+		else
+		{
+            if (uuidSet)
+			{
                 val = "*uuid";
-                cnt = 5;
-            } else {
+                cnt = 5; // nr of characters on *uuid
+            }
+			else
+			{
                 // Don't set "rd=.." if there is no boot device key
                 // and no UUID.
                 val = "";
                 cnt = 0;
             }
-        } 
-        if (cnt > 0) {
-            copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
         }
-        strlcpy( gRootDevice, val, (cnt + 1));
+ 
+        if (cnt > 0)
+		{
+            copyArgument(kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+        }
+        strlcpy(gRootDevice, val, (cnt + 1));
     }
-
-    /*
-     * Removed. We don't need this anymore.
-     *
-    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gPlatformName)) {
-        getPlatformName(gPlatformName);
-        copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
-    }
-    */
 
     if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-        if (gBootMode & kBootModeSafe) {
+        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt))
+	{
+        if (gBootMode & kBootModeSafe)
+		{
             copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
         }
     }
 
     // Store the merged kernel flags and boot args.
-
-    cnt = strlen(configKernelFlags);
-    if (cnt) {
-        if (cnt > cntRemaining) {
-            error("Warning: boot arguments too long, truncating\n");
-            cnt = cntRemaining;
-        }
-        strncpy(argP, configKernelFlags, cnt);
-        argP[cnt++] = ' ';
-        cntRemaining -= cnt;
-    }
-    userCnt = strlen(cp);
-    if (userCnt > cntRemaining) {
-      error("Warning: boot arguments too long, truncating\n");
-      userCnt = cntRemaining;
-    }
-    strncpy(&argP[cnt], cp, userCnt);
-    argP[cnt+userCnt] = '\0';
-
-	if(!shouldboot)
+	cnt = strlen(configKernelFlags);
+	if (cnt)
+	{
+		if (cnt > cntRemaining) {
+			error("Warning: boot arguments too long, truncating\n");
+			cnt = cntRemaining;
+		}
+		strncpy(argP, configKernelFlags, cnt);
+		argP[cnt++] = ' ';
+		cntRemaining -= cnt;
+	}
+	
+	userCnt = strlen(cp);
+	if (userCnt > cntRemaining)
+	{
+	  error("Warning: boot arguments too long, truncating\n");
+	  userCnt = cntRemaining;
+	}
+	strncpy(&argP[cnt], cp, userCnt);
+	verbose("BootArgs = %s\n", argP); //Azi: checking...
+	argP[cnt+userCnt] = '\0';
+	verbose("BootArgs check = %s\n", argP); //  ||
+	
+	if (!shouldboot)
 	{
 		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
 			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
@@ -1314,7 +1385,7 @@ processBootOptions()
 			kBootModeSafe : kBootModeNormal;
 
         if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
-            gBootMode = kBootModeSafe;
+            gBootMode = kBootModeSafe; //Azi: ??
        }
 	}
 
@@ -1329,6 +1400,41 @@ processBootOptions()
     return 0;
 }
 
+static bool getOSVersion(char *str) //Azi: moved from boot.c
+{
+	bool valid = false;
+	config_file_t systemVersion;
+	const char *val;
+	int len;
+
+	if (!loadConfigFile("/System/Library/CoreServices/SystemVersion.plist", &systemVersion))
+	{ //Azi: so, is this path on selected or current volume?? ... clean!
+		valid = true;
+	}
+	else if (!loadConfigFile("/System/Library/CoreServices/ServerVersion.plist", &systemVersion))
+	{
+		valid = true;
+	}
+
+	if (valid)
+	{
+		if (getValueForKey("ProductVersion", &val, &len, &systemVersion))
+		{	
+			// getValueForKey uses const char for val
+			strncat(str, val, len); //Azi: nothing better to do :P
+//			msglog("System Version: %s\n", str);
+			verbose("Loading Darwin %s\n", str);
+			
+			// so copy it and trim
+			*str = '\0';
+			strncat(str, val, MIN(len, 4));
+		}
+		else
+			valid = false;
+	}
+
+	return valid;
+}
 
 //==========================================================================
 // Load the help file and display the file contents on the screen.
@@ -1410,26 +1516,31 @@ void showHelp(void)
 	}
 }
 
-void showTextFile(const char * filename)
+void showTextFile(const char * filename)  //Azi:?more
 {
 #define MAX_TEXT_FILE_SIZE 65536
-	char	*buf;
-	int	fd;
-	int	size;
+	char *buf;
+	int	  fd;
+	int	  size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
-        size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+    size = file_size(fd);
+
+    if (size > MAX_TEXT_FILE_SIZE)
+    {
 		size = MAX_TEXT_FILE_SIZE;
 	}
-        buf = malloc(size);
-        read(fd, buf, size);
-        close(fd);
+    
+    buf = malloc(size);
+    read(fd, buf, size);
+    close(fd);
+
 	showTextBuffer(buf, size);
 	free(buf);
 }
@@ -1438,6 +1549,7 @@ void showTextFile(const char * filename)
 // Eventually we need to do something more user-friendly like display a menu
 // based off of the Multiboot device list
 
+//Azi: is this stuff still used for anything?? check multiboot()...
 int selectAlternateBootDevice(int bootdevice)
 {
 	int key;

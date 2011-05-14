@@ -32,6 +32,9 @@ char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386
                     "Build date: " I386BOOT_BUILDDATE "\n"
                     "%dMB memory\n";
 
+char bootLogBanner[] = "\nChameleon v" I386BOOT_CHAMELEONVERSION " r" I386BOOT_CHAMELEONREVISION "\n"
+                    "Build date: " I386BOOT_BUILDDATE "\n\n";
+
 char bootPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"
     "  Type -v and press Enter to start up with diagnostic messages\n"

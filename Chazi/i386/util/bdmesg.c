@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	io_registry_entry_t root = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/");
 	if (!root)
 	{
-		printf("IORegistryEntry \"IOIOService:/\" not found.\n");
+		printf("IORegistryEntry \"IOService:/\" not found.\n");
 		return 0;
 	}
 

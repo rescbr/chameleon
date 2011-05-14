@@ -9,7 +9,6 @@
 #ifndef GRAPHIC_UTILS_H
 #define GRAPHIC_UTILS_H
 
-#include "boot.h"
 
 
 typedef union {

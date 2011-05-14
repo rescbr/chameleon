@@ -1,0 +1,271 @@
+kNVCAP nvidia.c, getValFK - key is declared as a "variable", char kNVCAP[12], on setup_nvidia_devprop().
+Check: http://efixusers.com/showthread.php?t=644, Update Version 1.1.9 (Asere's booter).
+"If you want to override the NVCAP value, you must determine the PCI DeviceID of your graphic card.
+For instance: my new GTX260 has the DeviceID 0×05e2. Knowing the DeviceID add this to your com.apple.Boot.plist:
+<key>NVCAP_05e2</key>
+<string>0000000000000000000000000000000000000000</string>
+The NVCAP value is exactly 20 bytes long. You have to specify it using ASCII-HEX (0-9,a-f)."
+
+
+00000000000000000000000000000000000000000000000000000000000000000000000000000080
+                              Chameleon Bootloader
+                                 boot time help
+
+The boot prompt waits for you to type advanced startup options. If you don't
+type anything, the computer continues starting up normally. It will use the
+kernel and configuration files on the selected/default device, which it also
+uses as the root device.
+Use the following syntax, when typing advanced startup options:
+
+  [device]<kernel> [arguments]
+
+Arguments consist of either just a name, e.g. -v or a key=value pair,
+e.g. rd=disk0s2. The latest are commonly referred to as "keys" and the first
+as "flags". ?????????????????
+Use the following syntax when typing arguments (recommended):
+
+  [flags] [Wait=y key] [any other key]
+
+WARNINGS: (feedback is welcome)
+- At least Wait=y is breaking other keys/flags?, when typed after them. This
+  is the main reason for the "argument" syntax above. If you have any problem
+  of this nature please try the recommended syntax or play with it.
+- Arguments with spaces on their name (marked with (*)) are failing when
+  wrapped in quotation marks.
+
+  Syntax examples:
+
+    backup_kernel -legacy -v DSDT=/extra/test.aml Wait=y  <-- :( DSDT= failed
+    backup_kernel -legacy -v Wait=y DSDT=/extra/test.aml  <-- :)
+
+    rd(0,0)/test_kernel -v debug=0x144
+    -v Wait=y UseMemDetect=n SMBIOSDefaults=n SMBIOS=/path/to/smbios.plist
+
+Argument's names are case sensitive, values are not. Thus:
+    /Extra/DSDT.aml = /extra/dsdt.aml, etc...
+
+                                  Thanks ?????
+ ============================================================================79
+
+Special booter hotkeys:
+
+  F5            Rescans optical drive.
+  F10           Scans and displays all BIOS accessible drives.
+
+Special booter commands:
+
+  ?            Displays this file.
+  ?memory      Displays information about the computer's memory.
+  ?video       Displays VESA video modes supported by the computer's BIOS.
+  ?norescan    Leaves optical drive rescan mode.
+  ?lspci       Displays information about PCI buses and devices in the system.
+  ?more        Displays the text on an extra txt file (needs to be supplied).
+    Ex: ?more /extra/MoreInfo.txt
+
+ ==============================================================================
+
+Most used "flags" include: ?????????????
+
+  rd=<BSD device name>  or  rd=*<IODeviceTree path>                     flag
+    Used to specify the root device (selected volume), from were the booter
+    will load start the System. ....when using Apple software RAID helper
+    partitions (apple boot).?????????
+      Ex: rd=disk0s2  or  rd=uuid (used in conjunction with boot-uuid=<UUID>)??
+      Ex: rd=*/PCI0@0/CHN0@0/@0:1
+
+  <kernel name>
+    Specify a different kernel to be loaded. Kernel must be in the "/" (root)
+    of the selected/default volume.
+      Ex: my_kernel
+
+  boot-uuid=<UUID>                                                      flag
+    Specify the UUID of the boot volume.
+      Ex: boot-uuid=12345678-1234-1234-1234-123456789012
+
+  -v       Verbose boot: see what booter and kernel are doing on your back :)
+  -s       Single User Mode: Boot into CLI to perform tasks.
+  -x       Safe Mode: ignore System caches and disable most devices.
+  -f       Ignore caches: ignore System caches and boot normally.
+  -F       Ignore "Kernel Flags" specified in boot configuration file.
+  32       Boot i386 architecture. <---revert??
+  -legacy  Legacy Mode: disable handling 64 bit apps on i386 arch boot.
+  64       Boot x86_64 architecture. <---revert??
+
+  kernel debug flags:  e.g. debug=0x144
+  IOkit debug flags:   e.g. io=0xffffffff (defined in IOKit/IOKitDebug.h)
+
+ ==============================================================================
+
+Options useful either at the prompt or in com.apple.Boot.plist file: ?????
+
+  "Root UUID"=<UUID> or y/n?????? (*) ...... man...... :-S                 key
+
+  "Boot Device"=hd(x,y) ??????????                                         key
+
+  Wait=Yes
+    Pause before starting the kernel.??????
+
+  config=<path to file>
+    Use an alternate/backup "override" Boot.plist file.
+      Ex: config=/extra/testBoot.plist
+
+  kext=<path to folder> (ends with a / (slash))
+    Use an alternate/backup folder with drivers, kext or mkext.
+      Ex: kext=/extra/test/
+
+  "MKext Cache"=<path to file>
+    Use an alternate/backup "System" cache file.
+      Ex: "MKext Cache"=rd(0,0)/Extensions.mkext
+
+  Kernel=<file name>
+
+  "Kernel Cache"=<path to file>
+    Use an alternate/backup "Kernel" cache file.
+      Ex: "Kernel Cache"=bt(0,0)/kernelcache_i386.A701C40B
+
+- Devices/Other:???
+
+  UseMemDetect=No
+    Disable memory modules?? info detection.
+0000000000000000000000000000000000000000000000000000000000000000000000000000079
+
+  EthernetBuiltIn=Yes
+    Automatic device-properties generation, that sets "built-in" property
+    for ethernet interfaces.
+
+  USBBusFix=Yes
+    Enable all USB fixes below (fixes can be used individually):
+      EHCIacquire=Yes - Enable the EHCI fix.
+      UHCIreset=Yes - Enable the UHCI fix.
+      USBLegacyOff=Yes - Enable the USB Legacy fix.
+
+  ForceHPET=Yes
+    Force enabling HPET device on the PC's BIOS.
+
+- Hibernation:
+
+  Wake=No   ????????change all to n/y and explain this + b.plist way.
+    Disable wake up after hibernation.
+
+  ForceWake=Yes
+    Force using the sleepimage (when desired), if you get the message:
+      "Hibernate image is too old by n seconds. Use ForceWake=y to override."
+
+  WakeImage=<path to file>
+    Use an alternate sleepimage file.
+      Default path: /private/var/vm/sleepimage
+
+- ACPI:
+
+  DSDT=<path to file> or <file name>??????????????
+    Override the default dsdt.aml paths/name.
+    Default name: dsdt.aml
+    Default paths:?????
+    Ex:
+0000000000000000000000000000000000000000000000000000000000000000000000000000079
+
+  DropSSDT=Yes
+    Skip the SSDT tables while relocating the ACPI tables.
+
+  PciRoot=<value>
+    Use an alternate value for PciRoot UID. Can be retrieved from dsdt.aml
+    by the booter, if supplied by the user and present on the ACPI table.
+      Default value: 0
+
+  RestartFix=yes
+    Enable restart fix for Intel chipsets.
+
+  GeneratePStates=Yes
+    Enable automatic generation PStates. ???????
+
+  GenerateCStates=Yes
+    Enable automatic generation of CStates.  ???????
+
+  EnableC4State=Yes
+    Enable automatic generation of C4State. ???????
+- Bios/smbios:???
+
+  SMBIOS=<path to file> or <file name>
+    Override the default smbios.plist paths/name.
+      Default name: smbios.plist
+      Default paths:?????
+      Ex:
+
+  SMBIOSdefaults=No
+    Disable the use of Default values for SMBIOS overriding, when smbios.plist
+    is not used.
+
+  SystemType=<value>
+    Set the system type where n is between 0..6 (default value =1 (Desktop).
+0000000000000000000000000000000000000000000000000000000000000000000000000000079
+
+According to CHANGES file, this should be SystemID, not SystemId! ????????
+  SystemId=<UUID>
+    Set manually the system UUID. (also known as Platform or Hardware UUID)
+    SMUUID (reserved field) in smbios.plist config is deprecated.
+      Ex: SystemId=12345678-1234-1234-1234-123456789012
+
+- CD-ROM: (dvd??)
+
+  "Rescan Prompt"=Yes (*)
+    Prompts for enable CD-ROM rescan mode.
+
+  Rescan=Yes
+    Enable CD-ROM rescan mode.
+
+  "Scan Single Drive"=Yes (*)
+    Scan "only" the drive where the booter got loaded from.
+    Fixes rescan pbs when using a DVD reader in AHCI mode, on some PC's.
+- Ramdisk:
+
+  add ramdisk stuff: ?rd, ?rd [m, u, e, d, i]
+
+  md0=<file name??>
+    Override the default "name"??? of raw img file, to be loaded into memory
+    for use as the kernel's md0 ramdisk.
+      Default name: Postboot.img
+      Default paths:?????
+      Ex:
+
+- Gui/Graphics:
+
+0000000000000000000000000000000000000000000000000000000000000000000000000000079
+  "Legacy Logo"=Yes (*)
+    Use the legacy grey apple logo on the boot screen.
+
+  GraphicsEnabler=Yes
+    Automatic device-properties generation for gfx cards.
+      Note: it doesn't work for all cards and you may have to perform
+            additional patching to get advantage of
+            the automatic dev-prop generation. (Leo??)
+
+  UseAtiROM=Yes
+    Use an alternate Ati ROM image 
+      Default path: /Extra/<vendorid>_<devid>.rom
+      Ex: /Extra/1002_1234.rom
+
+  UseNvidiaROM=Yes
+    Use an alternate Nvidia ROM image.
+      Default path: /Extra/<vendorid>_<devid>.rom)
+      Ex: /Extra/10DE_1234.rom
+
+  VBIOS=Yes                (nVidia only)
+    Inject VBIOS to device-properties.
+
+  NVCAP_<devid>=<value>    (nVidia only)
+    Specify NVCAP value. This value is a 20 bytes long hex string.
+      Ex: NVCAP_05e2=0000000000000000000000000000000000000000
+
+  AutoResolution=Yes
+    Enable native resolution setting for booter Gui and System, even when
+    graphics acceleration (qe/ci) is not available.
+
+  Graphics Mode=WIDTHxHEIGHTxDEPTH + F2 (*) (AutoResolution only)
+    Change or set current resolution while at boot prompt.
+      Ex: Graphics Mode=1024x768x32 + press F2 key
+
+- Modules:
+
+  PatchKernel=Yes
+    Enable on the fly kernel patching.
+ 

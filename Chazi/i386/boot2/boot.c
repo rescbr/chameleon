@@ -49,41 +49,47 @@
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
 
+//#define DEBUG 1
 
+//#include "bootstruct.h"
+//#include "libsa.h"
 #include "boot.h"
-#include "bootstruct.h"
-#include "fake_efi.h"
-#include "sl.h"
-#include "libsa.h"
-#include "ramdisk.h"
+//#include "io_inline.h" // Lion
+#include "ramdisk.h" // bootstruct.h: memory.h instead of saio_internal.h
 #include "gui.h"
-#include "platform.h"
 #include "modules.h"
+#include "fake_efi.h"
+#include "platform.h" // bootstruct.h - device_tree.h
+#include "sl.h" // bootstruct.h: memory.h instead of saio_types.h
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
+//--- testing
+#define PLATFORM_NAME_LEN 64
+#define ROOT_PATH_LEN 256
+static char gCacheNameAdler[PLATFORM_NAME_LEN + ROOT_PATH_LEN];
+#define BOOT_DEVICE_PATH "\\System\\Library\\CoreServices\\boot.efi"
 static char gBootKernelCacheFile[512];
-static char gCacheNameAdler[64 + 256];
-char *gPlatformName = gCacheNameAdler;
+//---
+char *gPlatformName = gCacheNameAdler; // disabled ??
 char gRootDevice[512];
 char gMKextName[512];
-char gMacOSVersion[8];
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
 
-int     bvCount = 0;
+int     bvCount = 0; // global ?? - Slice
 //int		menucount = 0;
-int     gDeviceCount = 0; 
+int     gDeviceCount = 0;
 
 BVRef   bvr;
-BVRef   menuBVR;
+//BVRef   menuBVR; - doesn't seem used here
 BVRef   bvChain;
 bool    useGUI;
 
 //static void selectBiosDevice(void);
+//Azi: this doesn't match the function; matches the "Alder32" on drivers.c
 static unsigned long Adler32(unsigned char *buffer, long length);
-static bool checkOSVersion(const char * version);
-static bool getOSVersion();
+
 
 static bool gUnloadPXEOnExit = false;
 
@@ -96,9 +102,10 @@ static bool gUnloadPXEOnExit = false;
 /*
  * Default path to kernel cache file
  */
-//Slice - first one for Leopard
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+// OS X 10.5 & 10.4
+#define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/kernelcache"
+// OS X 10.6
+#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
 
 //==========================================================================
 // Zero the BSS.
@@ -132,14 +139,17 @@ void initialize_runtime(void)
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
 
+//Azi:autoresolution
+extern void initAutoRes();
+extern void finishAutoRes();
+
 static int ExecKernel(void *binary)
 {
     entry_t                   kernelEntry;
     int                       ret;
 
     bootArgs->kaddr = bootArgs->ksize = 0;
-	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
-
+	//Azi: here we get to know if we have a kernel or a prelinked kernel
     ret = DecodeKernel(binary,
                        &kernelEntry,
                        (char **) &bootArgs->kaddr,
@@ -151,13 +161,12 @@ static int ExecKernel(void *binary)
     // Reserve space for boot args
     reserveKernBootStruct();
 
-	// Notify modules that the kernel has been decoded
-	execute_hook("DecodedKernel", (void*)binary, NULL, NULL, NULL);
-	
-    // Load boot drivers from the specifed root path.
-    if (!gHaveKernelCache)
-		LoadDrivers("/");
-
+    //Azi: ...
+    // Load boot drivers from the specifed root path,
+    // if we don't have a prelinked kernel - check load.c 43 & 264
+    if (!gHaveKernelCache) {
+          LoadDrivers("/");
+    }
 
     clearActivityIndicator();
 
@@ -167,7 +176,7 @@ static int ExecKernel(void *binary)
         sleep(kBootErrorTimeout);
     }
 
-    setupFakeEfi();
+    setupFakeEfi(); //Azi: check position on Mek (plkernel)
 
     md0Ramdisk();
 
@@ -184,15 +193,30 @@ static int ExecKernel(void *binary)
     }
 
     bool dummyVal;
+
+	//Azi: Wait=y is breaking other keys when typed "after them" at boot prompt.
+	// Works properly if typed in first place or used on Boot.plist.
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
-		printf("Press any key to continue...");
-		getc();
+		verbose("(Wait) ");
+		pause();
 	}
 
 	usb_loop();
 
+//autoresolution - Check if user disabled AutoResolution at the boot prompt.
+	// we can't check the plist here if we have AutoResolution=n there and we anabled it
+	// at boot prompt...?????
+//	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
 	
-	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
+	finishAutoRes();
+	
+	//Azi: closing Vbios after "if (gVerboseMode)" stuff eliminates the need for setting
+	// AutoResolution = true above; but creates another bug when booting in TextMode with -v arg.
+	// Simptoms include: staring some seconds at a nicely drawn white screen, after boot prompt.
+	// Think i'm just going to end up removing setting gAutoResolution = false
+	// on closeVbios().. the more i think, the less sense it makes doing it there!!
+//autoresolution - end
+
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
     // verbose mode.
@@ -201,29 +225,21 @@ static int ExecKernel(void *binary)
       setVideoMode( GRAPHICS_MODE, 0 );
     else
       drawBootGraphics();
-	
+
+	// Notify modules that the kernel is about to be started
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+
 	setupBooterLog();
 	
     finalizeBootStruct();
-	
-	if (checkOSVersion("10.7")) {
-		
-		// Masking out so that Lion doesn't doublefault
-		outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
-		outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
-		
-		// Jump to kernel's entry point. There's no going back now.
-		
-		startprog( kernelEntry, bootArgs );
-	}
-	else {
-		// Jump to kernel's entry point. There's no going back now.
-		
-		startprog( kernelEntry, bootArgsPreLion );
-	}
+    
+    // Jump to kernel's entry point. There's no going back now.
+//Azi: Lion - http://netkas.org/?p=745
+// see asm.s - same stuff by DHP http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
+//	outb(0x21, 0xff);
+//	outb(0xa1, 0xff);
+    startprog( kernelEntry, bootArgs );
 
-    
-    
     // Not reached
 
     return 0;
@@ -260,7 +276,7 @@ void common_boot(int biosdev)
     bool     quiet;
     bool     firstRun = true;
     bool     instantMenu;
-    bool     rescanPrompt;
+    bool     rescanPrompt = false;
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 
@@ -275,12 +291,15 @@ void common_boot(int biosdev)
     initKernBootStruct();
 
 	initBooterLog();
+	
+	//Azi: log booter version, revision & build date, for bdmesg.
+	msglog(bootLogBanner);
 
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the
     // config table has been loaded. Call video_mode() instead.
 #if DEBUG
-    printf("before video_mode\n");
+    printf("before video_mode\n"); //Azi: this one is not printing... i remember it did.. check trunk.
 #endif
     video_mode( 2 );  // 80x25 mono text mode.
 #if DEBUG
@@ -293,8 +312,20 @@ void common_boot(int biosdev)
     // First get info for boot volume.
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
+	//Azi: initialising gBIOSBootVolume & gBootVolume for the first time.. i think!?
+	// also, kDefaultPartitionKey is checked here, on selectBootVolume.
     setBootGlobals(bvChain);
-    
+	msglog("setBootGlobals:\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+    msglog(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+
+	// Boot Volume is set as Root at this point so, pointing to Extra, /Extra or bt(0,0)/Extra
+	// is exactly the same.	Review bt(0,0)/bla bla paths......			(Reviewing...)
+	
+	//Azi: works as expected but... trying this because Kernel=mach_kernel doesn't work on a
+	// override Boot.plist; this makes it impossible to override e.g. Kernel=bt(0,0)mach_kernel
+	// on the main Boot.plist, when loading kernel from ramdisk btAliased.
+	loadPrebootRAMDisk();
+	
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
 
@@ -303,76 +334,101 @@ void common_boot(int biosdev)
     }
 
     // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-    if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
+    if (getBoolForKey(kInstantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
         firstRun = false;
     }
 
-    // Loading preboot ramdisk if exists.
-    loadPrebootRAMDisk();
+	// Loading preboot ramdisk if exists.
+//	loadPrebootRAMDisk(); //Azi: this needs to be done before load_all_modules()
+	// because of btAlias...			(Reviewing...)
+
+	// Intialize module system
+	if (init_module_system())
+	{
+		load_all_modules();
+	}
 
     // Disable rescan option by default
     gEnableCDROMRescan = false;
 
-    // Enable it with Rescan=y in system config
-    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan) {
-        gEnableCDROMRescan = true;
-    }
+    // If we're loading the booter from optical media...			(Reviewing...)
+	if (biosDevIsCDROM(gBIOSDev))
+	{
+		// ... ask the user for Rescan option by setting "Rescan Prompt"=y in system config...
+		if (getBoolForKey(kRescanPromptKey, &rescanPrompt, &bootInfo->bootConfig) && rescanPrompt)
+		{
+	        gEnableCDROMRescan = promptForRescanOption();
+	    }
+		else // ... or enable it with Rescan=y in system config.
+	    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan)
+		{
+	        gEnableCDROMRescan = true;
+	    }
+	}
 
-    // Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
-    rescanPrompt = false;
-    if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
-        gEnableCDROMRescan = promptForRescanOption();
-    }
-
+	//Azi: Is this a cdrom only thing?			(Reviewing...)
     // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
-        gScanSingleDrive = true;
+    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive)
+	{
+		scanBootVolumes(gBIOSDev, &bvCount);
     }
-
-    // Create a list of partitions on device(s).
-    if (gScanSingleDrive) {
-      scanBootVolumes(gBIOSDev, &bvCount);
-    } else {
-      scanDisks(gBIOSDev, &bvCount);
-    }
-
+	else
+	{
+		//Azi: scanDisks uses scanBootVolumes.
+		scanDisks(gBIOSDev, &bvCount);
+	}
+	
     // Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 
     gBootVolume = selectBootVolume(bvChain);
 
-	// Intialize module system 
-	init_module_system();
-	
-#if DEBUG
-    printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-    printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-    getc();
-#endif
+//#if DEBUG
+//printf
+    msglog(":something...???\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+    msglog(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+//    getc();
+//#endif
 
-	useGUI = true;
-	// Override useGUI default
-	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
-	if (useGUI && initGUI())
+    useGUI = true;
+    // Override useGUI default
+    getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+
+	// AutoResolution - Azi: default to false
+	// http://forum.voodooprojects.org/index.php/topic,1227.0.html
+	gAutoResolution = false;
+	
+	// Check if user enabled AutoResolution on Boot.plist...
+	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+	
+	// Patch the Video Bios with the extracted resolution, before initGui.
+	if (gAutoResolution == true)
+	{
+		initAutoRes();
+	}
+
+    if (useGUI && initGUI())
 	{
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
 
     setBootGlobals(bvChain);
+	msglog("setBootGlobals:\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+    msglog(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
 
     // Parse args, load and start kernel.
     while (1) {
         const char *val;
         int len;
         int trycache;
-        long flags, cachetime, kerneltime, exttime, sleeptime, time;
+		long flags, cachetime, kerneltime, exttime, sleeptime, time;
         int ret = -1;
         void *binary = (void *)kLoadAddr;
         bool tryresume;
         bool tryresumedefault;
         bool forceresume;
-		bool usecache;
+		bool ignoreKC = false;
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
@@ -385,32 +441,11 @@ void common_boot(int biosdev)
         status = getBootOptions(firstRun);
         firstRun = false;
         if (status == -1) continue;
-		 
-        status = processBootOptions();
-        // Status==1 means to chainboot
-        if ( status ==  1 ) break;
-        // Status==-1 means that the config file couldn't be loaded or that gBootVolume is NULL
-        if ( status == -1 )
-        {
-          // gBootVolume == NULL usually means the user hit escape.
-          if(gBootVolume == NULL)
-          {
-            freeFilteredBVChain(bvChain);
 
-            if (gEnableCDROMRescan)
-              rescanBIOSDevice(gBIOSDev);
-              
-            bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
-            setBootGlobals(bvChain);
-            setupDeviceList(&bootInfo->themeConfig);
-          }
-          continue;
-        }
-		
-        // Other status (e.g. 0) means that we should proceed with boot.
-		
-		// Turn off any GUI elements
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
+		//Azi: test (gBootVolume == NULL) - so far Ok!
+		// test with optical media again...?
+		// Turn off any GUI elements, draw background and update VRAM.
+		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
 			gui.devicelist.draw = false;
 			gui.bootprompt.draw = false;
@@ -420,32 +455,66 @@ void common_boot(int biosdev)
 			drawBackground();
 			updateVRAM();
 		}
-		
-		// Find out which version mac os we're booting.
-		getOSVersion();
 
-		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
+		status = processBootOptions();
+
+		//Azi: AutoResolution -  closing Vbios here without restoring, causes an allocation error,
+		// if the user tries to boot, after a e.g."Can't find bla_kernel" msg.
+		// Doing it on execKernel() instead.
+
+		// Status == 1 means to chainboot
+		if ( status ==	1 ) break;
+		
+		// Status == -1 means that gBootVolume is NULL. Config file is not mandatory anymore! 
+		if ( status == -1 )
+		{
+			// gBootVolume == NULL usually means the user hit escape.			(Reviewing...)
+			if (gBootVolume == NULL)
+			{
+				freeFilteredBVChain(bvChain);
+				
+				if (gEnableCDROMRescan)
+					rescanBIOSDevice(gBIOSDev);
+				
+				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+				setBootGlobals(bvChain);
+				setupDeviceList(&bootInfo->themeConfig);
+			}
+			continue;
+		}
+		
+        // Other status (e.g. 0) means that we should proceed with boot.
+
+		// If cpu handles 64 bit instructions...
+		if (platformCPUFeature(CPU_FEATURE_EM64T))
+		{
+			// use x86_64 kernel arch,...
 			archCpuType = CPU_TYPE_X86_64;
-		} else {
+		}
+		else
+		{
+			// else use i386 kernel arch.
 			archCpuType = CPU_TYPE_I386;
 		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) {
-			if (strncmp(val, "i386", 4) == 0) {
+		// If user override...
+		if (getValueForKey(kArchKey, &val, &len, &bootInfo->bootConfig))
+		{
+			// matches i386...
+			if (strncmp(val, "i386", 4) == 0)
+			{
+				// use i386 kernel arch.
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-
-		// Notify moduals that we are attempting to boot
-		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
-
-		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
+		
+		if (!getBoolForKey (kWakeKey, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
 		} else {
 			tryresumedefault = false;
 		}
 
-		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig)) {
+		if (!getBoolForKey (kForceWakeKey, &forceresume, &bootInfo->bootConfig)) {
 			forceresume = false;
 		}
 		
@@ -457,7 +526,7 @@ void common_boot(int biosdev)
 		while (tryresume) {
 			const char *tmp;
 			BVRef bvr;
-			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->bootConfig))
+			if (!getValueForKey(kWakeKeyImageKey, &val, &len, &bootInfo->bootConfig))
 				val="/private/var/vm/sleepimage";
 			
 			// Do this first to be sure that root volume is mounted
@@ -474,119 +543,151 @@ void common_boot(int biosdev)
 				break;
 			
 			if (!forceresume && ((sleeptime+3)<bvr->modTime)) {
-				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",bvr->modTime-sleeptime);
+				//Azi: no need for printf at this point - reminder
+				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override.\n",bvr->modTime-sleeptime);
 				break;
 			}
 				
 			HibernateBoot((char *)val);
 			break;
 		}
-		
-		if(getBoolForKey(kUseKernelCache, &usecache, &bootInfo->bootConfig)) {
-			if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig)) {
-				strlcpy(gBootKernelCacheFile, val, len+1);
-			}
-			else {
-				//Lion
-				if (checkOSVersion("10.7")) {
-					sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
-				}
-				// Snow Leopard
-				else if (checkOSVersion("10.6")) {
-					sprintf(gBootKernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
-					int lnam = sizeof(gBootKernelCacheFile) + 9; //with adler32
-					//Slice - TODO
-					/*
-					 - but the name is longer .adler32 and more...
-					 kernelcache_i386.E102928C.qSs0
-					 so will opendir and scan for some files
-					 */ 
-					char* name;
-					long prev_time = 0;
-					
-					struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
-					
-					while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
-					{
-						if(((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time && strstr(name, gBootKernelCacheFile) && (name[lnam] != '.'))
-						{
-							sprintf(gBootKernelCacheFile, "%s%s", kDefaultCachePathSnow, name);
-							prev_time = time;
-						}
-					}
-				}
-				else {
-					// Reset cache name.
-					bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-					
-					sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
-					
-					adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-					
-					sprintf(gBootKernelCacheFile, "%s.%08lX", kDefaultCachePathLeo, adler32);
-				}
-			}
-		}
-			
-        // Check for cache file.
-        trycache = (usecache && 
-					((gBootMode & kBootModeSafe) == 0) &&
-                    !gOverrideKernel &&
-                    (gBootFileType == kBlockDeviceType) &&
-                    (gMKextName[0] == '\0') &&
-                    (gBootKernelCacheFile[0] != '\0'));
 
-		verbose("Loading Darwin %s\n", gMacOSVersion);
+//Azi:kernelcache stuff
+		//Azi: avoiding having to use -f to ignore kernel cache
+		//Azi: ignore kernel cache but still use kext cache (E/E.mkext & S/L/E.mkext). - explain...
+		getBoolForKey(kIgnoreKCKey, &ignoreKC, &bootInfo->bootConfig);
+		if (ignoreKC)
+		{
+			verbose("KC: cache ignored by user.\n");
+			// make sure the damn thing get's cleaned, just in case... :)*
+			bzero(gBootKernelCacheFile, sizeof(gBootKernelCacheFile));
+		}
+		else if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
+		{
+            strlcpy(gBootKernelCacheFile, val, len + 1);
+			verbose("KC: path set by user = %s\n", gBootKernelCacheFile);
+			//Azi: bypass time check when user sets path ???
+			// cache is still ignored if time doesn't match... (e.g. usb stick)
+        }
+		else
+		{
+			// Reset cache name.
+			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+			
+			// kextcache_main.c: Construct entry from UUID of boot volume...(reminder)
+			// assemble ?string? to generate adler from...
+//			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+			const char *ProductName = getStringForKey("SMproductname", &bootInfo->smbiosConfig);
+			sprintf(gCacheNameAdler, ProductName); // well, at least the smbios.plist can be loaded this early...
+			// to set/get "ProductName" this early, booter needs complete rewrite!!
+			verbose("KC: gCacheNameAdler 1 = %s\n", gCacheNameAdler);
+			sprintf(gCacheNameAdler + 64, "%s", "\\System\\Library\\CoreServices\\boot.efi");
+			verbose("KC: gCacheNameAdler 2 = %s\n", gCacheNameAdler + 64);
+			sprintf(gCacheNameAdler + (64 + 38), "%s", bootInfo->bootFile);
+			verbose("KC: gCacheNameAdler 3 = %s\n", gCacheNameAdler + (64 + 38));
+
+			// generate adler
+			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+			verbose("KC: Adler32 = %08X\n", adler32);
+			
+			// append arch and/or adler (checksum) to kc path...
+			if (gMacOSVersion[3] < '6') // change to >= for Lion?
+			{
+				sprintf(gBootKernelCacheFile, "%s.%08lX", kDefaultCachePath, adler32);
+				verbose("KC: adler added to path = %s\n", gBootKernelCacheFile);
+			}
+			else
+			{
+				sprintf(gBootKernelCacheFile, "%s_%s.%08X", kDefaultCachePathSnow,
+						(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", adler32);
+				verbose("KC: arch & adler added to path = %s\n", gBootKernelCacheFile);
+			}
+        }
+
+        // Check for cache file.
+		//Azi: trycache is done if...
+        trycache = ( ( (gBootMode & kBootModeSafe) == 0) //... we're not booting in safe mode (-x arg),
+					&& !gOverrideKernel // we're not overriding default kernel "name",
+					&& (gBootFileType == kBlockDeviceType) // we're booting from local storage device,
+					&& (gMKextName[0] == '\0') // "MKext Cache" key IS NOT in use, and
+					&& (gBootKernelCacheFile[0] != '\0') ); // gBootKernelCacheFile is populated.
+					// we could add the use of "kernelpatcher" to this bunch..??
+
+//		verbose("Loading Darwin %s\n", gMacOSVersion); //Azi: move?? to getOSVersion? :)
 		
-        if (trycache) do {
-      
+        if (trycache) do
+		{
+			verbose("KC: checking kernel cache (system prelinked kernel)...\n");
             // if we haven't found the kernel yet, don't use the cache
             ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
-            if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
-                trycache = 0;
+            if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
+            {
+				verbose("KC: no kernel found (shouldn't happen?!?)\n");
+                trycache = 0; // ignore kernel cache...
                 break;
             }
+			verbose("KC: kerneltime = %d\n", kerneltime);
+			
             ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
             if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
-                || (cachetime < kerneltime)) {
+                || (cachetime < kerneltime))
+            {
+				if (cachetime <= 100) // confirm: 100 = inexistent path, -xxxxxxxxx = wrong name
+				// not confirming... i also get -xxxxxxxxx with inexisting prelinked kernel
+					verbose("KC: cachetime  = %d, kernel cache path/adler is incorrect, ignoring it. ??? \n",
+							cachetime);
+				else
+					verbose("KC: cachetime  = %d, kernel cache is older than the kernel, ignoring it.\n",
+							cachetime);
                 trycache = 0;
                 break;
             }
+			verbose("KC: cachetime  = %d\n", cachetime);
+			
             ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
             if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
-                && (cachetime < exttime)) {
+                && (cachetime < exttime))
+            {
+				verbose("KC: exttime    = %d, kernel cache is older than S/L/E, ignoring it.\n", exttime);
                 trycache = 0;
                 break;
             }
-            if (kerneltime > exttime) {
+			verbose("KC: exttime    = %d\n", exttime);
+			
+            if (kerneltime > exttime) // if S/L/E is older than the kernel...
+            {
+				verbose("KC: S/L/E is older than the kernel, matching exttime with kerneltime...\n");
                 exttime = kerneltime;
             }
-            if (cachetime != (exttime + 1)) {
+			verbose("KC: exttime +1 = %d\n", exttime + 1);
+			
+            if (cachetime != (exttime + 1))
+            {
+				verbose("KC: kernel cache time is diff from S/L/E time, ignoring it.\n");
                 trycache = 0;
                 break;
             }
+			verbose("KC: kernel cache found and up to date, will be used.\n");
+
         } while (0);
 
-        do {
-            if (trycache) {
+        do
+        {
+			// Load kernel cache if not ignored.
+            if (trycache)
+            {
                 bootFile = gBootKernelCacheFile;
-                
-				verbose("Loading kernel cache %s\n", bootFile);
+                verbose("Loading kernel cache %s\n", bootFile);
 
-                if (checkOSVersion("10.7")) {
-                    ret = LoadThinFatFile(bootFile, &binary);
-				}
-				else {
-                	ret = LoadFile(bootFile);
-					binary = (void *)kLoadAddr;
-				}
-				
+                ret = LoadFile(bootFile);
+                binary = (void *)kLoadAddr;
+
                 if (ret >= 0)
+                {
                     break;
-				
-				verbose("Kernel cache did not loaded %s\n ", bootFile);
+                }
             }
-			
+
             bootFile = bootInfo->bootFile;
 
             // Try to load kernel image from alternate locations on boot helper partitions.
@@ -594,53 +695,38 @@ void common_boot(int biosdev)
             ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
   	  	    if (ret == -1)
   	  	    {
-              sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
-              ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
-              if (ret == -1)
-              {
-                sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
-                ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
-                if (ret == -1)
-                {
-                  // Not found any alternate locations, using the original kernel image path.
-                  strcpy(bootFileSpec, bootFile);
-                }
-              }
+				sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
+				ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
+				if (ret == -1)
+				{
+					sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
+					ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
+					if (ret == -1)
+					{
+						// No alternate locations found, using the original kernel image path.
+						strcpy(bootFileSpec, bootFile);
+					}
+				}
             }
             			
-            if (checkOSVersion("10.7"))
+            verbose("Loading kernel %s\n", bootFileSpec);
+            ret = LoadThinFatFile(bootFileSpec, &binary);
+            if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
             {
-                //Lion, dont load kernel if haz cache
-                if (!trycache) {
-            		verbose("Loading kernel %s\n", bootFileSpec);
-            		ret = LoadThinFatFile(bootFileSpec, &binary);
-            		if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {
-              			archCpuType = CPU_TYPE_I386;
-              			ret = LoadThinFatFile(bootFileSpec, &binary);				
-            		}
-		        } 
-				else ret = 1;
-            } 
-			else {
-                //Snow leopard or older
-                verbose("Loading kernel %s\n", bootFileSpec);
-                ret = LoadThinFatFile(bootFileSpec, &binary);
-                if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {
-                    archCpuType = CPU_TYPE_I386;
-                    ret = LoadThinFatFile(bootFileSpec, &binary);				
-                }
+				archCpuType = CPU_TYPE_I386;
+				ret = LoadThinFatFile(bootFileSpec, &binary);				
             }
-			
 			
         } while (0);
 
         clearActivityIndicator();
-#if DEBUG
+/*#if DEBUG
         printf("Pausing...");
         sleep(8);
 #endif
-
-        if (ret <= 0) {
+Azi: annoying stuff :P */
+        if (ret <= 0)
+		{
 			printf("Can't find %s\n", bootFile);
 
 			sleep(1);
@@ -650,21 +736,27 @@ void common_boot(int biosdev)
                 gUnloadPXEOnExit = false;
                 break;
             }
-        } else {
-            /* Won't return if successful. */
+        }
+		else
+		{
+            // Won't return if successful.
+			// Notify modules that ExecKernel is about to be called
+			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
+			
             ret = ExecKernel(binary);
         }
-    }
+    } // while (1)
     
     // chainboot
     if (status==1) {
-	if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
-		setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
-	}
+		if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
+			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
+		}
     }
 	
-    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit) {
-	nbpUnloadBaseCode();
+    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit)
+	{
+		nbpUnloadBaseCode();
     }
 }
 
@@ -688,43 +780,6 @@ static void selectBiosDevice(void)
     gBIOSDev = dev;
 }
 */
-
-bool checkOSVersion(const char * version) 
-{
-	return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1]) && (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
-}
-
-bool getOSVersion()
-{
-	bool valid = false;
-	config_file_t systemVersion;
-	const char *val;
-	int len;
-	
-	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	else if (!loadConfigFile("System/Library/CoreServices/ServerVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	
-	if (valid)
-	{
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
-		{
-			// getValueForKey uses const char for val
-			// so copy it and trim
-			*gMacOSVersion = '\0';
-			strncat(gMacOSVersion, val, MIN(len, 4));
-		}
-		else
-			valid = false;
-	}
-	
-	return valid;
-}
 
 #define BASE 65521L /* largest prime smaller than 65536 */
 #define NMAX 5000

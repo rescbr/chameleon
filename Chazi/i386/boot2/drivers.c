@@ -33,13 +33,11 @@
 #include <libkern/OSByteOrder.h>
 #include <mach/machine.h>
 
-#include "sl.h"
+//#include "bootstruct.h"
+//#include "ramdisk.h"
 #include "boot.h"
-#include "bootstruct.h"
+#include "sl.h"
 #include "xml.h"
-#include "ramdisk.h"
-
-//extern char gMacOSVersion[8];
 
 struct Module {  
   struct Module *nextModule;
@@ -70,7 +68,7 @@ struct DriversPackage {
   unsigned long signature1;
   unsigned long signature2;
   unsigned long length;
-  unsigned long adler32;
+  unsigned long alder32;
   unsigned long version;
   unsigned long numDrivers;
   unsigned long reserved1;
@@ -85,7 +83,7 @@ enum {
 
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
-/*static*/ unsigned long Adler32( unsigned char * buffer, long length );
+static unsigned long Alder32( unsigned char * buffer, long length );
 
 static long FileLoadDrivers(char *dirSpec, long plugin);
 static long NetLoadDrivers(char *dirSpec);
@@ -109,8 +107,8 @@ static char *    gFileSpec;
 static char *    gTempSpec;
 static char *    gFileName;
 
-/*static*/ unsigned long
-Adler32( unsigned char * buffer, long length )
+static unsigned long
+Alder32( unsigned char * buffer, long length )
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -162,96 +160,105 @@ InitDriverSupport( void )
 
 long LoadDrivers( char * dirSpec )
 {
-    char dirSpecExtra[1024];
-
-    if ( InitDriverSupport() != 0 )
-        return 0;
-
-    // Load extra drivers if a hook has been installed.
-    if (LoadExtraDrivers_p != NULL)
-    {
-        (*LoadExtraDrivers_p)(&FileLoadDrivers);
-    }
-
-    if ( gBootFileType == kNetworkDeviceType )
-    {
-        if (NetLoadDrivers(dirSpec) != 0) {
-            error("Could not load drivers from the network\n");
-            return -1;
-        }
-    }
-    else if ( gBootFileType == kBlockDeviceType )
-    {
-        // First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
-        if (gRAMDiskVolume && !gRAMDiskBTAliased)
-        {
-          strcpy(dirSpecExtra, "rd(0,0)/Extra/");
-          FileLoadDrivers(dirSpecExtra, 0);
-        }
-
-        // Next try to load Extra extensions from the selected root partition.
-        strcpy(dirSpecExtra, "/Extra/");
-        if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-        {
-          // If failed, then try to load Extra extensions from the boot partition
-          // in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-          if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-               || (gRAMDiskVolume && gRAMDiskBTAliased) )
-          {
-            // Next try a specfic OS version folder ie 10.5
-            sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
-            if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-            {	
-              // Next we'll try the base
-              strcpy(dirSpecExtra, "bt(0,0)/Extra/");
-              FileLoadDrivers(dirSpecExtra, 0);
-            }
-          }
-        }
-
-        // Also try to load Extensions from boot helper partitions.
-        if (gBootVolume->flags & kBVFlagBooter)
-        {
-          strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
-          if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-          {
-            strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
-            if (FileLoadDrivers(dirSpecExtra, 0) != 0)
-            {
-              strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
-              FileLoadDrivers(dirSpecExtra, 0);
-            }
-          }
-        }
-
-        if (gMKextName[0] != '\0')
-        {
-            verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-            if ( LoadDriverMKext(gMKextName) != 0 )
-            {
-                error("Could not load %s\n", gMKextName);
-                return -1;
-            }
-        }
-        else
-        {
-            strcpy(gExtensionsSpec, dirSpec);
-            strcat(gExtensionsSpec, "System/Library/");
-            FileLoadDrivers(gExtensionsSpec, 0);
-        }
-    }
-    else
-    {
-        return 0;
-    }
-
-    MatchPersonalities();
-
-    MatchLibraries();
-
-    LoadMatchedModules();
-
-    return 0;
+	char		dirSpecExtra[128];
+	const char *override_pathfolder = NULL; // full path to a folder.
+	int			fd = 0, len = 0;
+	
+	if ( InitDriverSupport() != 0 )
+		return 0;
+	
+	// Load extra drivers if a hook has been installed.
+	if (LoadExtraDrivers_p != NULL)
+	{
+		(*LoadExtraDrivers_p)(&FileLoadDrivers);
+	}
+	
+	if ( gBootFileType == kNetworkDeviceType )
+	{
+		if (NetLoadDrivers(dirSpec) != 0)
+		{
+			error("Could not load drivers from the network\n");
+			return -1;
+		}
+	}
+	else if ( gBootFileType == kBlockDeviceType )
+	{
+		// Take in account user overriding. - does this still work ???
+		if (getValueForKey(kAltExtensionsKey, &override_pathfolder, &len, &bootInfo->bootConfig))
+		{
+			// Specify a path to a folder, ending with / e.g. kext=/Extra/testkext/
+			strcpy(dirSpecExtra, override_pathfolder);
+			fd = FileLoadDrivers(dirSpecExtra, 0);
+			if (fd >= 0) goto success_fd;
+		}
+		
+		// No need to specify (gRAMDiskVolume && !gRAMDiskBTAliased).
+		// First try to load Extra extensions from a ramdisk if isn't aliased as bt(0,0).
+		strcpy(dirSpecExtra, "rd(0,0)/"); // check it's "root".
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
+		
+		// Also no need to specify (gRAMDiskVolume && gRAMDiskBTAliased); checking paths on a
+		// ramdisk aliased as bt(0,0) (rdbt), is the same as checking paths on booter volume. 
+		// In this case the following two will point to the ramdisk.
+		
+		// Check booter volume/rdbt Extra for specific OS files, on specific OS folders.
+		sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
+		
+		// Removed /Extra path from search algo. If needed can be specified with override key!
+		
+		// Check booter volume/rdbt Extra in case we don't keep specific OS folders.
+		strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+		fd = FileLoadDrivers(dirSpecExtra, 0);
+		if (fd >= 0) goto success_fd;
+		
+		// Also try to load Extensions from boot helper partitions.
+		if (gBootVolume->flags & kBVFlagBooter)
+		{
+			strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			{
+				strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
+				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				{
+					strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
+					FileLoadDrivers(dirSpecExtra, 0);
+				}
+			}
+		}
+		
+success_fd:
+		// if user initialized gMKextName ("MKext Cache" flag)...
+		if (gMKextName[0] != '\0')
+		{
+			verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
+			if ( LoadDriverMKext(gMKextName) != 0 )
+			{
+				error("Could not load %s\n", gMKextName);
+				return -1;
+			}
+		}
+		else // else load kext cache from default paths.
+		{
+			strcpy(gExtensionsSpec, dirSpec); // = "/"
+			strcat(gExtensionsSpec, "System/Library/"); // "/" + "System/Library/"
+			FileLoadDrivers(gExtensionsSpec, 0); // "/System/Library/" - legacy path
+		}
+	}
+	else
+	{
+		return 0;
+	}
+	
+	MatchPersonalities();
+	
+	MatchLibraries();
+	
+	LoadMatchedModules();
+	
+	return 0;
 }
 
 //==========================================================================
@@ -260,23 +267,32 @@ long LoadDrivers( char * dirSpec )
 static long
 FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 {
-  long  ret, flags, time, time2;
-  char altDirSpec[512];
+	long	ret, flags, time, time2;
+	char	altDirSpec[512];
 	
-  sprintf (altDirSpec, "%s%s", dirSpec, extDirSpec);
-  ret = GetFileInfo(altDirSpec, "Extensions.mkext", &flags, &time);
-  if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
-  {
-      ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
-      if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeDirectory) ||
-          (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
-      {
-          sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
-          verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
-          if (LoadDriverMKext(gDriverSpec) == 0) return 0;
-      }
-  }
-  return -1;
+	sprintf (altDirSpec, "%s%s", dirSpec, extDirSpec);
+	ret = GetFileInfo(altDirSpec, "Extensions.mkext", &flags, &time);
+	msglog("(%s) Extensions.mkext time = %d\n", __FUNCTION__, time);
+	
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
+	{
+		ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
+		//Azi: hum... finaly got it :P
+		verbose("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1);
+		
+		if ((ret != 0)
+			|| ((flags & kFileTypeMask) != kFileTypeDirectory)
+			|| (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
+		{
+			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
+			//Azi: hum... finaly got it :P
+			msglog("LoadDrivers: Loading from [%s]\n", gDriverSpec);
+			
+			if (LoadDriverMKext(gDriverSpec) == 0)
+				return 0;
+		}
+	}
+	return -1;
 }
 
 //==========================================================================
@@ -294,7 +310,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
     {
         // First try 10.6's path for loading Extensions.mkext.
         if (FileLoadMKext(dirSpec, "Caches/com.apple.kext.caches/Startup/") == 0)
-          return 0;
+			return 0; // "bt(0,0)/Extra/10.6/"
 
         // Next try the legacy path.
         else if (FileLoadMKext(dirSpec, "") == 0)
@@ -305,6 +321,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
 
     index = 0;
     while (1) {
+		
         ret = GetDirEntry(dirSpec, &index, &name, &flags, &time);
         if (ret == -1) break;
 
@@ -397,8 +414,8 @@ LoadDriverMKext( char * fileSpec )
     if (( GetPackageElement(signature1) != kDriverPackageSignature1) ||
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
-        ( GetPackageElement(adler32)    !=
-          Adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+        ( GetPackageElement(alder32)    !=
+          Alder32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
@@ -798,7 +815,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             return -1;
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            Adler32(binary, uncompressed_size)) {
+            Alder32(binary, uncompressed_size)) {
             printf("adler mismatch\n");
             return -1;
         }

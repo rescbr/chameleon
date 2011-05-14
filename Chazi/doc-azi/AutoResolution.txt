@@ -1,0 +1,70 @@
+
+				---------------// AutoResolution Info //---------------
+
+ Project topic: http://forum.voodooprojects.org/index.php/topic,1227.0.html
+there you can find latest sources and boot files posted by LeBidou, as well as most
+of the feedback and project history. Source can also be found, in a more or less
+up to date form on AutoResolution branch and CleanCut folder under my branch;
+as of this writing i'm considering those as "obsolete", replaced by what i have at
+the moment on Chazi folder.
+
+Some more references can be found on this topic by DieBuche:
+http://www.insanelymac.com/forum/index.php?showtopic=211294&st=0
+in fact, the first post is the best explanation you can get on how the patch works,
+with the difference that the patch does it "on the fly" while booting, in an "Auto"
+way (hence the AutResolution name) using the resolution retrieved from the display's
+EDID or provided with "Graphics Mode" argument.
+But, don't stay only with the first post! I won't get into technical details, simply
+because i don't have the knowledge to. All i do is try to keep the patch working with
+latest Chameleon changes and that's obviously because i use it :)
+Will add more info with time if it's justifiable.
+
+Enough talk...
+What can this patch do for you and when?
+
+Well, if you never experienced booting with your native resolution, or worse, you don't
+even have it after login, there's a chance that this can help you, providing you have
+the luck of having the right hardware. If it works, it will provide you with native
+resolution even if you don't have any graphics acceleration at all; remember, this has
+nothing to do with "Graphics Enabler" or depends on it in any way.
+Intel chipset is needed; the newer the worse :P read the topics and check the list below.
+Graphics card, it depends... ATI's are the best supported, but BIOS and motherboard have
+something to say so, the best is try it.
+
+How to try?
+
+
+
+
+
+
+
+
+
+
+
+Working:
+
+Intel X4500MHD, on Acer Aspire 1810TZ, (2a428086) (no qe/ci) - leader86
+GMA950, on MSI Wind u100 (Atom n270), (27ae8086) - smith@@
+GMA X3100, on Sony Vaio (old model), (2a028086) - smith@@
+nVidia 9800GT, on p5q deluxe and pro, (061410de) - smith@@
+nVidia 8600GTS, on p5q deluxe and pro, (040010de) - smith@@
+ATI Radeon X1300, on HP 7730, (81711002) - mine
+
+Not working:
+
+nVidia 9800GT, on p5k se epu, (061410de) - smith@@
+- the screen becomes completely green with some horizontal lines.
+GMA950, on HP 7730, (27728086) - mine
+
+
+
+
+http://www.insanelymac.com/forum/index.php?s=44134eab9a3c0832fdff3f5a43394a72&showtopic=211294&view=findpost&p=1422921
+
+
+
+Azimutz
+
+

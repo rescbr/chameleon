@@ -2,10 +2,10 @@
     File added by David F. Elliott <dfe@cox.net> on 2007/06/26
 */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
-
+#include "memory.h"
 #include "mboot.h"
 
 int multiboot_timeout=0;
@@ -344,14 +344,15 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     bootArgs = NULL;
     return bootdevice;
 }
-
+/* declared on gui.h - moved to boot.h
 enum {
     kReturnKey     = 0x0d,
     kEscapeKey     = 0x1b,
     kBackspaceKey  = 0x08,
     kASCIIKeyMask  = 0x7f
-};
+};*/
 
+//Azi:reminder
 // This is the meat of our implementation.  It grabs the boot device from
 // the multiboot_info and returns it as is.  If it fails it returns
 // BAD_BOOT_DEVICE.  We can call an awful lot of libsa and libsaio but

@@ -27,7 +27,6 @@
  */
 
 #include "boot.h"
-#include "vbe.h"
 #include "appleClut8.h"
 #include "gui.h"
 #include "IOHibernatePrivate.h"
@@ -42,8 +41,6 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
  
 //==========================================================================
 // getVBEInfoString
@@ -180,7 +177,8 @@ char *getVBEModeInfoString()
 // Return the VESA mode that matches the properties specified.
 // If a mode is not found, then return the "best" available mode.
 
-static unsigned short
+//static //Azi:autoresolution
+unsigned short
 getVESAModeWithProperties( unsigned short     width,
                            unsigned short     height,
                            unsigned char      bitsPerPixel,
@@ -369,6 +367,8 @@ setVESAGraphicsMode( unsigned short width,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
 {
+	bool			  debugInfo = false; //Azi:debuginfo
+	extern bool		  showBootBanner; //		||
     VBEModeInfoBlock  minfo;
     unsigned short    mode;
     unsigned short    vesaVersion;
@@ -386,6 +386,8 @@ setVESAGraphicsMode( unsigned short width,
         {
             break;
         }
+
+		if (refreshRate != 60) refreshRate = 60; //Azi:autoresolution
 
 //
 // FIXME : generateCRTCTiming() causes crash.
@@ -424,12 +426,22 @@ setVESAGraphicsMode( unsigned short width,
 //             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 //         }
 
+//Azi:autoresolution
+#ifdef AUTORES_DEBUG
+		printf("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
+		//getc(); //Azi: boot hangs, on the second call (like "old" Wait=y issue).
+		sleep(2);
+#endif
         // Set the mode with default refresh rate.
-
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
         if ( err != errSuccess )
         {
+#ifdef AUTORES_DEBUG
+			printf("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
+				   mode, minfo.XResolution, minfo.YResolution, err);
+			sleep(2); //Azi: i suppose the same as above.
+#endif
             break;
         }
 
@@ -438,7 +450,7 @@ setVESAGraphicsMode( unsigned short width,
         if ( minfo.BitsPerPixel == 8 )
         {
             VBEPalette palette;
-            setupPalette( &palette, appleClut8 );
+            setupPalette( &palette, appleClut8 ); //Azi:autoresolution - check this stuff, appleClut8
             if ((err = setVBEPalette(palette)) != errSuccess)
             {
                 break;
@@ -461,7 +473,19 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_depth    = minfo.BitsPerPixel;
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+/* Azi: keep this or i keep forgeting ??????
+#if AUTORES_DEBUG
+		gui.screen.mm				= minfo.MemoryModel;
+		gui.screen.attr				= minfo.ModeAttributes;
+#endif*/
+		//Azi: mm & attr info on DebugInfo - from autoResolution branch.
+		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
 
+		if (debugInfo && showBootBanner)
+		{
+			gui.screen.mm		   = minfo.MemoryModel;
+			gui.screen.attr		   = minfo.ModeAttributes;
+		}
     }
     while ( 0 );
 
@@ -1030,8 +1054,8 @@ setVESATextMode( unsigned short cols,
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int
-getNumberArrayFromProperty( const char *  propKey,
+//static //Azi:autoresolution
+int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
@@ -1104,34 +1128,40 @@ setVideoMode( int mode, int drawgraphics)
 {
     unsigned long params[4];
     int           count;
-    int           err = errSuccess;
+    int           err = errSuccess; // = 0
 
     if ( mode == GRAPHICS_MODE )
     {
-  		if ( (err=initGraphicsMode ()) == errSuccess ) {
-        if (gVerboseMode) {
-            // Tell the kernel to use text mode on a linear frame buffer display
-            bootArgs->Video.v_display = FB_TEXT_MODE;
-        } else {
-            bootArgs->Video.v_display = GRAPHICS_MODE;
+        if ( (err = initGraphicsMode() ) == errSuccess )
+        {
+            if (gVerboseMode)
+            {
+                // Tell the kernel to use text mode on a linear frame buffer display
+                bootArgs->Video.v_display = FB_TEXT_MODE;
+            }
+            else
+            {
+                bootArgs->Video.v_display = GRAPHICS_MODE;
+            }
         }
-      }
     }
 
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
     {
-        count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		
         if ( count < 2 )
         {
             params[0] = 80;  // Default text mode is 80x25.
             params[1] = 25;
         }
 
-		setVESATextMode( params[0], params[1], 4 );
+        setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
-
-    currentIndicator = 0;
+//	printf("Res: %dx%d (setvm: gsw/h final?)\n", gui.screen.width, gui.screen.height);
+    
+	currentIndicator = 0;
 }
 
 void getGraphicModeParams(unsigned long params[]) {
@@ -1202,7 +1232,7 @@ spinActivityIndicator(int sectors)
 	{
 		lastTickTime = currentTickTime;
 	}
-	
+
 	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		if (currentIndicator >= sizeof(indicator))
@@ -1219,7 +1249,7 @@ clearActivityIndicator( void )
 {
     if ( getVideoMode() == VGA_TEXT_MODE )
     {
-		putc(' ');
+        putc(' ');
 		putc('\b');
     }
 }

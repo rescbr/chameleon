@@ -29,101 +29,146 @@
 #ifndef __BOOT2_BOOT_H
 #define __BOOT2_BOOT_H
 
-#include "libsaio.h"
+//Azi:
+// Todo: don't include headers like boot.h on other headers, unless...!
+// move keys to the headers of the files they're in, if they have it!?
+// check header wrappers...
+
+//#include "saio_internal.h" // the only one needed by boot.h it self.
+#include "bootstruct.h"
 
 /*
- * Keys used in system Boot.plist
+ * Default names - these end with "Name" (easier to sort them).
  */
-#define kGraphicsModeKey	"Graphics Mode"
-#define kTextModeKey		"Text Mode"
-#define kQuietBootKey		"Quiet Boot"
-#define kKernelFlagsKey		"Kernel Flags"
-#define kMKextCacheKey		"MKext Cache"
-#define kKernelNameKey		"Kernel"
-#define kKernelCacheKey		"Kernel Cache"
-#define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey			"Timeout"
-#define kRootDeviceKey		"rd"
-#define kBootUUIDKey		"boot-uuid"
-#define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
-#define kACPIKey			"acpi"
-#define kCDROMPromptKey		"CD-ROM Prompt"
-#define kCDROMOptionKey		"CD-ROM Option Key"
-#define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		    "Rescan"
-#define kScanSingleDriveKey	"Scan Single Drive"
-#define kInsantMenuKey		"Instant Menu"
-#define kDefaultKernel		"mach_kernel"
-#define kGUIKey				"GUI"
-#define kBootBannerKey		"Boot Banner"
-#define kWaitForKeypressKey	"Wait"
-
-#define kUseAtiROM			"UseAtiROM"			/* ati.c */
-#define kAtiConfig			"AtiConfig"			/* ati.c */
-#define kATYbinimage		"ATYbinimage"		/* ati.c */
-
-#define kWake				"Wake"				/* boot.c */
-#define kForceWake			"ForceWake"			/* boot.c */
-#define kWakeImage			"WakeImage"			/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch				"arch"				/* boot.c */
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
-
-#define kDSDT				"DSDT"				/* acpi_patcher.c */
-#define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
-#define kRestartFix			"RestartFix"		/* acpi_patcher.c */
-#define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
-#define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kEnableC2States		"EnableC2State"		/* acpi_patcher.c */
-#define kEnableC3States		"EnableC3State"		/* acpi_patcher.c */
-#define kEnableC4States		"EnableC4State"		/* acpi_patcher.c */
-
-#define kDeviceProperties	"device-properties"	/* device_inject.c */
-
-#define kHidePartition		"Hide Partition"	/* disk.c */
-#define kRenamePartition	"Rename Partition"	/* disk.c */
-
-#define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
-#define kSystemID			"SystemId"			/* fake_efi.c */
-#define kSystemType			"SystemType"		/* fake_efi.c */
-
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS				"VBIOS"				/* nvidia.c */
-
-#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
-#define kForceHPET			"ForceHPET"			/* pci_setup.c */
-
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-
-#define kUSBBusFix			"USBBusFix"			/* usb.c */
-#define kEHCIacquire		"EHCIacquire"		/* usb.c */
-#define kUHCIreset			"UHCIreset"			/* usb.c */
-#define kLegacyOff			"USBLegacyOff"		/* usb.c */
-#define kEHCIhard			"EHCIhard"			/* usb.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
-
-#define kMD0Image			"md0"				/* ramdisk.h */
+#define kDefaultKernelName	"mach_kernel"
+#define kDefaultThemeName	"Default" // revert?
+/*
+#define kDefaultBootPlistName	"com.apple.Boot.plist"
+#define kDefaultDSDTName		"dsdt.aml"
+#define kDefaultSMBIOSName		"smbios.plist"
+#define kDefaultRamdiskName		"Preboot.dmg"
+???*/
 
 /*
- * Flags to the booter or kernel
+ * Default paths?????
  */
-#define kVerboseModeFlag	"-v"
-#define kSafeModeFlag		"-x"
-#define kIgnoreCachesFlag	"-f"
-#define kIgnoreBootFileFlag	"-F"
-#define kSingleUserModeFlag	"-s"
+
+/*
+ * Undeclared (or undeclared here)
+ */
+/*
+"-checkers" gui.c, getValFK;
+"biosdev" mboot.c, getValFBK
+"timeout" mboot.c, getValFBK
+"partno" mboot.c, getValFBK
+"DumpSPD" spd.c, getBollFK
+*/
+
+/*
+ * Keys used in system Boot.plist - these end with "Key".
+ */
+//		identifier			 string				 location				type					comment
+#define kTextModeKey		 "Text Mode"		 // graphics.c			getNumberArraiFP		- default 80x25 - kFlag - does it work??
+//#define kProductVersionKey	 "ProductVersion"	 // options.c			getValFK			- (boot.c on trunk) - reverted
+
+#define kDefaultPartitionKey "Default Partition" // sys.c				getStringFK
+#define kHidePartitionKey	 "Hide Partition"	 // disk.c				getValFK
+#define kRenamePartitionKey	 "Rename Partition"	 // disk.c				getStringFK
+
+#define kInstantMenuKey		 "Instant Menu"		 // boot.c				getBoolFK
+#define kQuietBootKey		 "Quiet Boot"		 // boot.c				getBoolFK				- kFlag
+#define kTimeoutKey			 "Timeout"			 // options.c			getIntFK
+#define kThemeNameKey		 "Theme"			 // gui.c				getValFK
+#define kGUIKey				 "GUI"				 // boot.c				getBoolFK
+#define kBootBannerKey		 "Boot Banner"		 // options.c			getBoolFK
+#define kLegacyLogoKey		 "Legacy Logo"		 // gui.c				getBoolFK				- revert?
+#define kDebugInfoKey		 "DebugInfo"		 // gui.c, graphics.c	getBoolFK
+#define kRescanPromptKey	 "Rescan Prompt"	 // boot.c				getBoolFK				- cdrom only - firstrun
+#define kRescanKey		     "Rescan"			 // boot.c				getBoolFK				- cdrom only?? - firstrun
+#define kCDROMPromptKey		 "CD-ROM Prompt"	 // options.c			getValFK				- internal??
+#define kCDROMOptionKey		 "CD-ROM Option Key" // options.c			getIntFK				- internal?? (F8)
+#define kScanSingleDriveKey	 "Scan Single Drive" // boot.c				getBoolFK
+#define kDevicePropertiesKey "device-properties" // device_inject.c		getValFK
+#define kWaitForKeypressKey	 "Wait"				 // boot.c				getBoolFK
+#define kAltConfigKey		 "config"			 // stringTable.c		getValFK				- kFlag - hum.. handle like kFlag??
+#define kCanOverrideKey		 "CanOverride"		 // stringTable.c		getBoolFK				- remember -F ***
+#define kRootDeviceKey		 "rd"				 // options.c			processBootArg			- kFlag
+#define kBootDeviceKey		 "Boot Device"		 // options.c			getValFK				- kFlag/option??????
+#define kBootUUIDKey		 "boot-uuid"		 // options.c			processBootArg			- kFlag
+#define kHelperRootUUIDKey	 "Root UUID"		 // options.c			getValFK				- kFlag
+#define kArchKey			 "arch"				 // boot.c				getValFK				- kFlag - after all,
+// it's to be passed via "kernel Flags" ?? - "man com.apple.Boot.plist"
+#define kKernelNameKey		 "Kernel"			 // options.c			getValFK				- kFlag*** bFlag ?
+#define kKernelCacheKey		 "Kernel Cache"		 // boot.c				getValFK				- kFlag
+#define kIgnoreKCKey		 "ignoreKC"			 // boot.c				getBoolFK				- testing***
+#define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK				- kFlags***
+#define kKPatcherKey		 "PatchKernel"		 // kernel_patcher.c	getBoolFK
+#define kAltExtensionsKey	 "kext"				 // drivers.c			getValFK
+#define kMKextCacheKey		 "MKext Cache"		 // options.c			getValFK				- kFlag
+#define kMD0ImageKey		 "md0"				 // ramdisk.c			getValFK
+#define kWakeKey			 "Wake"				 // boot.c				getBoolFK
+#define kForceWakeKey		 "ForceWake"		 // boot.c				getBoolFK
+#define kWakeKeyImageKey	 "WakeImage"		 // boot.c				getValFK				- location???
+#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK
+#define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c			getBoolFK
+#define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
+#define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
+#define kAutoResolutionKey	 "AutoResolution"	 // boot.c				getBoolFK
+#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
+#define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
+#define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK
+#define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?
+#define kGeneratePStatesKey	 "GeneratePStates"	 // acpi_patcher.c		getBoolFK
+#define kGenerateCStatesKey	 "GenerateCStates"	 // acpi_patcher.c		getBoolFK
+#define kEnableC2StatesKey	 "EnableC2State"	 // acpi_patcher.c		getBoolFK
+#define kEnableC3StatesKey	 "EnableC3State"	 // acpi_patcher.c		getBoolFK
+#define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK
+#define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
+#define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c	getBoolFK
+#define kSMBIOSKey			 "SMBIOS"			 // fake_efi.c			getValFK
+//Azi: should this be changed to "SystemID"? BootHelp.txt matches SystemId
+// cleaned obsolete comments on fake_efi.c, lines 500/508 & 608.
+// fixed CHANGES file, lines 39/40.
+#define kSystemIDKey		 "SystemId"			 // fake_efi.c			getStringFK
+#define kSystemTypeKey		 "SystemType"		 // fake_efi.c			getStringFK
+#define kPCIRootUIDKey		 "PciRoot"			 // pci_root.c			getValFK
+#define kEthernetBuiltInKey	 "EthernetBuiltIn"	 // pci_setup.c			getBoolFK
+#define kForceHPETKey		 "ForceHPET"		 // pci_setup.c			getBoolFK
+#define kUSBBusFixKey		 "USBBusFix"		 // usb.c				getBoolFK				- trouble! - USBLegacyOff + the other = hang
+#define kEHCIacquireKey		 "EHCIacquire"		 // usb.c				getBoolFK
+#define kEHCIhardKey		 "EHCIhard"			 // usb.c				getBoolFK				- ??
+#define kUHCIresetKey		 "UHCIreset"		 // usb.c				getBoolFK
+#define kLegacyOffKey		 "USBLegacyOff"		 // usb.c				getBoolFK
+
+/*
+ * Flags to the booter and/or kernel - these end with "Flag".
+ */
+//		identifier			 string				 location				type					comment
+#define kVerboseModeFlag	 "-v"				 // options.c			getValFK				- kFlag
+#define kSafeModeFlag		 "-x"				 // options.c			getValFBootK & getValFK - ?? - kFlag
+#define kIgnoreCachesFlag	 "-f"				 // options.c			getValFK				- kFlag
+#define kIgnoreBootFileFlag	 "-F"				 // options.c			getValFBootK			- kFlag
+#define kSingleUserModeFlag	 "-s"				 // options.c			getValFK				- kFlag
 
 /*
  * Booter behavior control
  */
-#define kBootTimeout         -1
-#define kCDBootTimeout       8
+#define kBootTimeout		 -1
+#define kCDBootTimeout		 8
+
+//Azi: place ??
+enum {
+	kBackspaceKey			 = 0x08,
+	kTabKey					 = 0x09,
+	kReturnKey				 = 0x0d,
+	kEscapeKey				 = 0x1b,
+	kUpArrowkey				 = 0x4800, 
+	kDownArrowkey			 = 0x5000,
+	kASCIIKeyMask			 = 0x7f,
+	kF2Key					 = 0x3c00, //Azi:autoresolution
+	kF5Key					 = 0x3f00,
+	kF10Key					 = 0x4400
+};
 
 /*
  * A global set by boot() to record the device that the booter
@@ -133,10 +178,12 @@ extern int  gBIOSDev;
 extern long gBootMode;
 extern bool sysConfigValid;
 extern char bootBanner[];
+extern char bootLogBanner[];
 extern char bootPrompt[];
 extern bool gOverrideKernel;
-extern char *gPlatformName;
+extern char *gPlatformName; // disabled ??
 extern char gMKextName[];
+extern char gMacOSVersion[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
@@ -192,7 +239,6 @@ extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, i
 /*
  * drivers.c
  */
-extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 

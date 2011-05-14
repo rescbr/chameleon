@@ -40,7 +40,8 @@
  *  DRI: Josh de Cesare
  */
 
-#include <sl.h>
+//#include <sl.h> // can't find this guy on the system; maybe we should stop looking for it there first!?
+#include "sl.h" //Azi:???
 
 #define N         4096  /* size of ring buffer - must be power of 2 */
 #define F         18    /* upper limit for match_length */

@@ -8,31 +8,22 @@
  *
  */
 
+#include "boot.h"
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
 
 #define IMG_REQUIRED -1
-#define THEME_NAME_DEFAULT	"Default"
-static const char *theme_name = THEME_NAME_DEFAULT;	
+#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
+#define VIDEO(x) (bootArgs->Video.v_ ## x)
+#define vram VIDEO(baseAddr)
 
 #ifdef EMBED_THEME
 #include "art.h"
 #endif
 
-#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-
-#define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define vram VIDEO(baseAddr)
-
 int lasttime = 0; // we need this for animating maybe
-
-extern int gDeviceCount;
-
+static const char *theme_name = kDefaultThemeName; // #define'ed on boot.h
 
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
@@ -138,7 +129,7 @@ image_t images[] = {
 int imageCnt = 0;
 
 extern int	gDeviceCount;
-extern int	selectIndex;
+//extern int	selectIndex; Azi: not in use
 
 extern MenuItem *menuItems;
 
@@ -168,7 +159,8 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
+// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};
 
 static int getImageIndexByName(const char *name)
 {
@@ -189,8 +181,8 @@ static int getEmbeddedImageIndexByName(const char *name)
 	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
 	int result;
 	
-	// NOTE: This algorithm assumes that the embeddedImages is sorted.
-	// This is currently done using the make file. If the array is every 
+	// NOTE: This algorithm assumes that the embedded images are sorted.
+	// This is currently done using the make file. If the array is ever
 	// manualy generated, this *will* fail to work properly.
 	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
@@ -225,7 +217,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 
 static int loadThemeImage(const char *image, int alt_image)
 {
-	char		dirspec[256];
+	char		dirspec[128]; //Azi: testing
 	int 		i;
 #ifdef EMBED_THEME
 	int 		e;
@@ -243,7 +235,7 @@ static int loadThemeImage(const char *image, int alt_image)
         if (images[i].image == NULL) {
             images[i].image = malloc(sizeof(pixmap_t));
         }
-        sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+        sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/%s.png", theme_name, image);
         width = 0;
         height = 0;
         imagedata = NULL;
@@ -393,7 +385,7 @@ int createBackBuffer( window_t *window )
 	
 	gui.backbuffer->width = gui.screen.width;
 	gui.backbuffer->height = gui.screen.height;
- 
+
 	return 0;
 }
 
@@ -530,7 +522,7 @@ void loadThemeValues(config_file_t *theme)
 	unsigned int pixel;
 	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
 	uint32_t color;			// color value formatted RRGGBB
-	int val;
+	int val;	
 
 	/*
 	 * Parse screen parameters
@@ -580,7 +572,7 @@ void loadThemeValues(config_file_t *theme)
 	if(getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.countdown.pos.y = pixel;
 
-    /*
+	/*
 	 * Parse devicelist parameters
 	 */
 	setupDeviceList(theme);
@@ -679,59 +671,108 @@ void loadThemeValues(config_file_t *theme)
  
 int initGUI(void)
 {
-	int		val;
-	int	len;
-	char	dirspec[256];
-
-	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
-	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
+	int		valW, valH, len; //Azi: messing... AR
+	char	dirspec[128]; //Azi: testing
+	
+	getValueForKey( kThemeNameKey, &theme_name, &len, &bootInfo->bootConfig );
+	if ((strlen(theme_name) + 27) > sizeof(dirspec))
+	{
 		return 1;
 	}
-	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
-	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
+	
+	sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/theme.plist", theme_name);
+	
+	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0)
+	{
 #ifdef EMBED_THEME
-    config_file_t	*config;
-    
-    config = &bootInfo->themeConfig;
-    if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-      return 1;
-    }
+		config_file_t	*config;
+		
+		config = &bootInfo->themeConfig;
+		if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0)
+		{
+			return 1;
+		}
 #else
 		return 1;
 #endif
 	}
-	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[0] = val;
+	else
+	{
+		//Azi: just messing around...
+		getIntForKey("screen_width", &valW, &bootInfo->themeConfig);
+		getIntForKey("screen_height", &valH, &bootInfo->themeConfig);
 	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[1] = val;
+	
+	// AutoResolution
+	if (gAutoResolution == true)
+	{
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
 	}
-
+	else
+	{
+		if (valW > 0)
+		{
+			screen_params[0] = valW;
+		}
+		
+		if (valH > 0)
+		{
+			screen_params[1] = valH;
+		}
+		/* parse screen size parameters
+		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[0] = val;
+		}
+		
+		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[1] = val;
+		}*/
+		//Azi: how about using default values? - think Azi...
+	}
+	
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
 	
 	// find best matching vesa mode for our requested width & height
+	//loadConfigFile(dirspec, &bootInfo->themeConfig); //Azi:autoresolution - check this later.
 	getGraphicModeParams(screen_params);
-
+	
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
-
+	
+	PRINT("Theme resolution: %dx%d (theme.plist)\n", valW, valH);
+	PRINT("Found mode %dx%d in VESA Table\n", gui.screen.width, gui.screen.height);
+	//Azi: check why is this printing... (reloadAutoRes/debug)
+	
 	// load graphics otherwise fail and return
-	if (loadGraphics() == 0) {
+	if (loadGraphics() == 0)
+	{
 		loadThemeValues(&bootInfo->themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
-
+		
 		// create the screen & window buffers
-		if (createBackBuffer(&gui.screen) == 0) {
-			if (createWindowBuffer(&gui.screen) == 0) {
-				if (createWindowBuffer(&gui.devicelist) == 0) {
-					if (createWindowBuffer(&gui.bootprompt) == 0) {
-						if (createWindowBuffer(&gui.infobox) == 0) {
-							if (createWindowBuffer(&gui.menu) == 0) {
-							    gui.logo.draw = true;
+		if (createBackBuffer(&gui.screen) == 0)
+		{
+			if (createWindowBuffer(&gui.screen) == 0)
+			{
+				if (createWindowBuffer(&gui.devicelist) == 0)
+				{
+					if (createWindowBuffer(&gui.bootprompt) == 0)
+					{
+						if (createWindowBuffer(&gui.infobox) == 0)
+						{
+							if (createWindowBuffer(&gui.menu) == 0)
+							{
+							
+#ifdef AUTORES_DEBUG
+								pause();
+#endif
+								gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -739,12 +780,20 @@ int initGUI(void)
 								gui.initialised = true;
 								return 0;
 							}
+							else printf("createWindowBuffer(&gui.menu) Failed\n");
 						}
+						else printf("createWindowBuffer(&gui.infobox) Failed\n");
 					}
+					else printf("createWindowBuffer(&gui.bootprompt) Failed\n");
 				}
+				else printf("createWindowBuffer(&gui.devicelist) Failed\n");
 			}
+			else printf("createWindowBuffer(&gui.screen) Failed\n");
 		}
+		else printf("createBackBuffer(&gui.screen) Failed\n");
 	}
+	else printf("loadGraphics() Failed\n");
+	
 	return 1;
 }
 
@@ -805,8 +854,10 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 
 void drawDeviceList (int start, int end, int selection)
 {
-	int i;
-	position_t p, p_prev, p_next;
+	int			i;
+	bool		debugInfo = false; //Azi:debuginfo
+	extern bool showBootBanner; //			||
+	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
 		
@@ -862,23 +913,29 @@ void drawDeviceList (int start, int end, int selection)
 			 
 			if(gui.menu.draw)
 				drawInfoMenuItems();
-			 
-#if DEBUG
-            gui.debug.cursor = pos( 10, 100);
-            dprintf( &gui.screen, "label     %s\n",   param->label );
-            dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-            dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-            dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
-            dprintf( &gui.screen, "type      0x%x\n", param->type );
-            dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-            dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-            dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-            dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-            dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-            dprintf( &gui.screen, "name      %s\n",   param->name );
-            dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-            dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
-#endif
+			
+			//Azi: make this info more accessible.
+			getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
+			
+			if (debugInfo && showBootBanner)
+			{
+				gui.debug.cursor = pos( 10, 100);
+				dprintf( &gui.screen, "label:     %s\n",   param->label );
+				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
+				dprintf( &gui.screen, "type:      0x%x\n", param->type );
+				dprintf( &gui.screen, "flags:     0x%x\n", param->flags );
+				dprintf( &gui.screen, "part_no:   %d\n",   param->part_no );
+				dprintf( &gui.screen, "part_boff: 0x%x\n", param->part_boff );
+				dprintf( &gui.screen, "part_type: 0x%x\n", param->part_type );
+				dprintf( &gui.screen, "bps:       0x%x\n", param->bps );
+				dprintf( &gui.screen, "name:      %s\n",   param->name );
+				dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
+				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
+				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
+				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr );
+				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
+			}
 		}
 		
 		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
@@ -1792,21 +1849,29 @@ static bool usePngImage = true;
 // loadBootGraphics
 static void loadBootGraphics(void)
 {
-	if (bootImageData != NULL) {
+	if (bootImageData != NULL)
+	{
 		return;
 	}
-
-	char dirspec[256];
-
-	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
+	
+	char dirspec[128]; //Azi: testing
+	
+	if ((strlen(theme_name) + 24) > sizeof(dirspec))
+	{
 		usePngImage = false; 
 		return;
 	}
-	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
-	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
+	
+	sprintf(dirspec, "bt(0,0)/Extra/Themes/%s/boot.png", theme_name);
+	
+	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0)
+	{
+
 #ifdef EMBED_THEME
-  	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
+			if ((loadEmbeddedPngImage(__boot_png, __boot_png_len,
+				&bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
+
 		usePngImage = false; 
 	}
 }
@@ -1815,44 +1880,66 @@ static void loadBootGraphics(void)
 // drawBootGraphics
 void drawBootGraphics(void)
 {
-	int pos;
-	int length;
-	const char *dummyVal;
-	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
+	const char *dummyVal;
+	int pos, length, oldScreenWidth, oldScreenHeight;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
+	if (getBoolForKey(kLegacyLogoKey, &legacy_logo, &bootInfo->bootConfig) && legacy_logo)
+	{
 		usePngImage = false; 
-	} else if (bootImageData == NULL) {
+	}
+	else if (bootImageData == NULL)
+	{
 		loadBootGraphics();
 	}
 
-	// parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[0] = pos;
-	} else {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[1] = pos;
-	} else {
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	}
-
-    // Save current screen resolution.
+	// Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
+//	printf("Res: %dx%d (drawbg: current/old)\n", oldScreenWidth, oldScreenHeight);
+
+	// AutoResolution
+	if (gAutoResolution == true)
+	{
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
+//		printf("Res: %dx%d (drawbg: AR)\n", screen_params[0], screen_params[1]);
+	}
+	else
+	{
+		// parse boot screen size parameters
+		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[0] = pos;
+		}
+		else
+		{
+			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		}
+
+		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[1] = pos;
+		}
+		else
+		{
+			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+		}
+		//Azi: and how about not using default values here? like on initGUI...
+	}
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
-
+//	printf("Res: %dx%d (drawbg: gsw/h new)\n", gui.screen.width, gui.screen.height);
+	
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 
+	//Azi: isn't this sort of done on ExecKernel() ??
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE
-		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight))
 	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}

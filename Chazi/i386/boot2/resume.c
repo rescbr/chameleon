@@ -7,12 +7,11 @@
  *
  */
 
-#include "saio_internal.h"
-#include "libsa.h"
+//#include "libsa.h"
+//#include "bootstruct.h"
+#include "boot.h"
 #include "IOHibernatePrivate.h"
 #include "memory.h"
-#include "bootstruct.h"
-#include "boot.h"
 #include "pci.h"
 
 extern int previewTotalSectors;
@@ -139,11 +138,14 @@ void HibernateBoot(char *image_filename)
 	mem_base = getmemorylimit() - allocSize;//TODO: lower this
 		
 	printf("mem_base %x\n", mem_base);
-	// Rek : hibernate fix 
-	if (!((long long)mem_base+allocSize<1024*bootInfo->extmem+0x100000))
+	// Rek : hibernate fix
+// http://www.insanelymac.com/forum/index.php?s=&showtopic=225766&view=findpost&p=1598473
+// http://www.insanelymac.com/forum/index.php?s=&showtopic=225766&view=findpost&p=1598502
+//Azi: ??? - check Mek's!
+	if ( (long long)mem_base + allocSize < 1024*bootInfo->extmem + 0x100000 )
 	{
-		printf ("Not enough space to restore image. Press any key to proceed with normal boot.\n");
-		getc ();
+		printf("Not enough space to restore image. Press any key to proceed with normal boot.\n");
+		getc();
 		return;
 	}
 		
