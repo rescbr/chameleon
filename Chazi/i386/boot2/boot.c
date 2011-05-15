@@ -217,6 +217,10 @@ static int ExecKernel(void *binary)
 	// on closeVbios().. the more i think, the less sense it makes doing it there!!
 //autoresolution - end
 
+	// Notify modules that the kernel is about to be started
+	// testing...
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
     // verbose mode.
@@ -225,9 +229,6 @@ static int ExecKernel(void *binary)
       setVideoMode( GRAPHICS_MODE, 0 );
     else
       drawBootGraphics();
-
-	// Notify modules that the kernel is about to be started
-	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
 	setupBooterLog();
 	
