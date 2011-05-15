@@ -2,20 +2,18 @@
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
  */
+
 #ifndef DEBUG_MODULES
-#define DEBUG_MODULES 0
+#define DEBUG_MODULES 1
 #endif
 
 //#include "boot.h"
 //#include "libsa.h"
 //#include "saio_internal.h"
-//#include "bootstruct.h"
 //#include "multiboot.h"
-//#include "modules.h"
-
-#include "boot.h"
 #include "bootstruct.h"
 #include "modules.h"
+#include "memory.h"
 
 
 #if DEBUG_MODULES

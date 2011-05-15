@@ -74,37 +74,32 @@ embedtheme: CFLAGS += -DEMBED_THEME
 embedtheme: art.h all
 
 boot: machOconv embedded.h $(OBJS) $(LIBDEP)
-	@echo "\t[LD] boot.sys"
-	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
 
-	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
+	cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
 
-	@# Generate the Symbols.dylib file
-	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	# Generate the Symbols.dylib file
+	$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@echo "\t[LD] boot.sys"
-	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
 
-	@# Second pass, fixup global var locations
-	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	# Second pass, fixup global var locations
+	${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@# Generate the Symbols.dylib file
-	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	# Generate the Symbols.dylib file
+	$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@${RM} $(SYMROOT)/boot.sys
-	@echo "\t[LD] boot.sys"
-	@$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	${RM} $(SYMROOT)/boot.sys
+	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
 		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
-
+#Azi: @ ??
 	@ld -arch i386 \
 	-undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
@@ -112,17 +107,16 @@ boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	-no_uuid \
 	-final_output Symbols \
 	$(filter %.o,$^) $(LIBS) \
+	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
-
-
-
-	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
-
-	@${RM} $(SYMROOT)/boot2.sys
-
-
-	@##size $(SYMROOT)/boot.sys
-	@ls -l $(SYMROOT)/boot
+#Azi: -macosx_version_min warning
+# @ ??
+	# this is done in a sub process after boot.sys exists so the strings are populated correctly
+	@make embed_symbols
+#Azi: @ ??
+	${RM} $(SYMROOT)/boot2.sys
+#Azi: @ ??
+	ls -l $(SYMROOT)/boot
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
@@ -131,8 +125,9 @@ boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	    exit 1;\
 	  fi)
 
-	
+
 embed_symbols: machOconv
+#Azi: @ ??
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
@@ -142,7 +137,6 @@ embed_symbols: machOconv
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
-	
 
 prompt.o: vers.h
 vers.h:

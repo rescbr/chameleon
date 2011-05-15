@@ -28,15 +28,11 @@
 //Azi: this is acting now as a mini libsaio.h :P
 //#include "libsaio.h"
 //#include "bios.h"
-//#include "libsa.h"
-//#include "saio_types.h"
-//#include "saio_internal.h"
-//#include "device_tree.h"
-
-#include "bootargs.h"
+#include "libsa.h"
 #include "saio_types.h"
-#include "bios.h"
+#include "saio_internal.h"
 #include "device_tree.h"
+#include "bootargs.h"
 
 /*!
     Kernel boot args global also used by booter for its own data.

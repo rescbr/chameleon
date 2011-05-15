@@ -1141,10 +1141,10 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	get_vram_size();
 
-	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->bootConfig);
+	getBoolForKey(kATYbinimageKey, &add_vbios, &bootInfo->bootConfig);
 
 	if (add_vbios)
-		if (!load_vbios_file(kUseAtiROM, pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id))
+		if (!load_vbios_file(kUseAtiROMKey, pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id))
 		{
 			verbose("reading VBIOS from %s", card->posted ? "legacy space" : "PCI ROM");
 			if (card->posted)
@@ -1164,7 +1164,7 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	atN = 0;
 
-	fb_name = getStringForKey(kAtiConfig, &bootInfo->bootConfig);
+	fb_name = getStringForKey(kAtiConfigKey, &bootInfo->bootConfig);
 	if (!fb_name)
 	{
 		fb_name = card_configs[card->info->cfg_name].name;

@@ -788,7 +788,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
-	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kUseNvidiaROMKey, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
 		if (nvBiosOveride > 0) {
@@ -930,7 +930,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
-	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kVBIOSKey, &doit, &bootInfo->bootConfig) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
 	}
 

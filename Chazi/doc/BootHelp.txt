@@ -17,7 +17,7 @@ Use the following syntax when typing arguments (recommended):
 
   [flags] [Wait=y key] [any other key]
 
-WARNINGS: (feedback is welcome)
+WARNINGS (OUTDATED*****): (feedback is welcome)
 - At least Wait=y is breaking other keys/flags?, when typed after them. This
   is the main reason for the "argument" syntax above. If you have any problem
   of this nature please try the recommended syntax or play with it.

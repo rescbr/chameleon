@@ -26,6 +26,13 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
 
 all embedtheme: $(DIRS_NEEDED) $(PROGRAMS)
 
+dyldsymboltool: dyldsymboltool.o32 dyldsymboltool.o64
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
+	lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
+	$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
+
+
 machOconv: machOconv.o32 machOconv.o64
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
 	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64

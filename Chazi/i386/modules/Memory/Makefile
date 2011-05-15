@@ -1,25 +1,13 @@
-
 MODULE_NAME = Memory
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
-MODULE_DEPENDENCIES = 
+MODULE_DEPENDENCIES = klibc
 
 DIR = Memory
 
-include ../../MakePaths.dir
-
-OBJROOT=../../../obj/i386/modules/$(DIR)
-SYMROOT=../../../sym/i386/modules/
-DSTROOT=../../../dst/i386/modules/
-
-
-UTILDIR = ../../util
-LIBSADIR = ../../libsa
-LIBSAIODIR = ../../libsaio
-BOOT2DIR = ../../boot2
-
-INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
+MODULE_OBJS = dram_controllers.o spd.o Memory.o
+# mem.o
 
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
@@ -34,22 +22,9 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
 DEFINES=
 CONFIG = hd
 INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(BOOT2DIR)
-ifneq "" "$(wildcard /bin/mkdirs)"
-  MKDIRS = /bin/mkdirs
-else
-  MKDIRS = /bin/mkdir -p
-endif
-AS = as
-LD = ld
-# LIBS= -lc_static
 LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
-
-#Azi: mem.o gone on Kabyl's
-MEMORY_OBJS = dram_controllers.o spd.o Memory.o
-# mem.o
-
 
 SFILES =
 CFILES = 
@@ -61,39 +36,6 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme: ${MEMORY_OBJS} dylib
+all embedtheme: dylib
 
-#Azi: wtf ?? graphics enabler :P
-dylib: ${GRAPHICS_ENABLER_OBJS}
-	ld -arch i386 \
-	-undefined dynamic_lookup \
-	-alias $(MODULE_START) start \
-	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
-	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
-	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/*.o \
-	-weak_library $(SYMROOT)/*.dylib \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
-
-
-
-dram_controllers.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "dram_controllers.c" $(INC) -o "$(OBJROOT)/dram_controllers.o"
-
-Memory.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Memory.c" $(INC) -o "$(OBJROOT)/Memory.o"
-
-spd.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "spd.c" $(INC) -o "$(OBJROOT)/spd.o"
-
-#Azi: gone on Kabyl's
-#mem.o: 	
-#	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "mem.c" $(INC) -o "$(OBJROOT)/mem.o"
-
-
-include ../../MakeInc.dir
-
-# dependencies
--include $(OBJROOT)/Makedep
+include ../MakeInc.dir

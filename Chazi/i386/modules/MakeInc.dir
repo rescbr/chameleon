@@ -14,8 +14,9 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 
 dylib: ${OBJROOT} ${MODULE_OBJS} dylib_final
 
-dylib_final: 
-	@rm -rf $(SYMROOT)/$(MODULE_NAME).dylib	#ensure module doesn't link with old version of self
+dylib_final:
+	#ensure module doesn't link with old version of self
+	@rm -rf $(SYMROOT)/$(MODULE_NAME).dylib
 	@echo "\t[LD] $(MODULE_NAME).dylib"
 	
 	@ld -arch i386 \
@@ -37,12 +38,16 @@ dylib_final:
 	@cp -rf include/* ../module_includes/ &> /dev/null || true
 	
 %.o: %.c
-	@echo "\t[CC] $<"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) -I../include/ -Iinclude/ -I../module_includes/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
+	#@echo "\t[CC] $<"
+	#@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I../include/ -Iinclude/ \
+	-I../module_includes/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 %.o: %.cpp
-	@echo "\t[CPP] $<"
-	@$(CPP) $(CPPFLAGS) $(CFLAGS) -I../include/ -Iinclude/ -I../module_includes/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
+	#@echo "\t[CPP] $<"
+	#@
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -I../include/ -Iinclude/ \
+	-I../module_includes/ -D__KLIBC__ $(DEFINES) -c "$<" $(INC) -o "$(OBJROOT)/$@"
 
 clean:
 	@echo "\t[RM] $(OBJROOT)"

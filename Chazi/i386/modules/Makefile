@@ -1,8 +1,10 @@
 #	Makefile for i386 modules
 
 # The order of building is important.
-SUBDIRS = klibc uClibc++ Resolution
-#SUBDIRS = klibc uClibc++ Resolution HelloWorld
+SUBDIRS = klibc uClibc++ GraphicsEnablerLegacy KernelPatcher Memory HPET
+#SUBDIRS = HelloWorld
+#		   Resolution (only tested on Meklort's branch, never did any good for my resolution; conflicts with AutoResolution)
+#		   GraphicsEnabler (no support for ATI legacy cards, e.g. 1000 series)
 
 
 CFLAGS= -O $(MORECPP) -arch i386 -g -static

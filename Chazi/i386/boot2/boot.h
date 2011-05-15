@@ -109,7 +109,11 @@
 #define kWakeKey			 "Wake"				 // boot.c				getBoolFK
 #define kForceWakeKey		 "ForceWake"		 // boot.c				getBoolFK
 #define kWakeKeyImageKey	 "WakeImage"		 // boot.c				getValFK				- location???
-#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK
+
+#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK ?? modules
+#define kAtiConfigKey		 "AtiConfig"		 // ati.c				getStringFK
+#define kATYbinimageKey		 "ATYbinimage"		 // ati.c				getBoolFK
+
 #define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c			getBoolFK
 #define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
 #define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
