@@ -1,0 +1,44 @@
+
+GraphicsEnabler & GraphicsEnablerLegacy modules:
+
+ GraphicsEnablerLegacy module is based on the old code, previous to r786. This module was created
+by Meklort; i just added the new ATI code in.
+
+Note: GraphicsEnablerLegacy has support for some GMA graphics, basically the same
+	  that can be found on Meklort's branch.
+
+- both modules work properly when compiled with XCode 3.2.6.
+- the use of XCode 4 causes problems atm, not only to the module system.
+  See: http://www.insanelymac.com/forum/index.php?s=&showtopic=231075&view=findpost&p=1683785
+  as an example.
+- i have no plans to keep working on these modules; the old ATI code was never meant to support
+  these legacy cards like my rv516 gpu, according to Netkas. So, i will try to resort to DSDT injection.
+  If i fail on doing that, then i may get back to this...? time and money to buy a new graphics
+  card, will tell :)
+
+
+Thanks to everyone that worked on these patches; i'm mostly just gathering their work.
+
+		--------------------//--------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Azimutz

@@ -132,7 +132,7 @@ boot: machOconv embedded.h $(OBJS) $(LIBDEP)
 	    exit 1;\
 	  fi)
 
-	
+
 embed_symbols: machOconv
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
@@ -143,7 +143,7 @@ embed_symbols: machOconv
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
-	
+
 
 prompt.o: vers.h
 vers.h:
