@@ -13,7 +13,7 @@
 
 #define kGraphicsEnabler	"GraphicsEnabler"
 
-extern bool setup_ati_devprop(pci_dt_t *ati_dev); //Azi: move to header ??
+extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
