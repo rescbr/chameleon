@@ -5,16 +5,15 @@
  *
  */
 
-#include "libsaio.h"
+#include "saio_internal.h"
 #include "bootstruct.h"
-#include "boot.h"
-#include "pci.h"
+#include "../modules/GraphicsEnablerLegacy/pci_old.h"
 #include "nvidia.h"
 #include "ati.h"
 #include "gma.h"
 #include "modules.h"
 
-
+#define kGraphicsEnablerKey		"GraphicsEnabler"
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
@@ -32,7 +31,7 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	
 	char *devicepath = get_pci_dev_path(current);
 
-	bool do_gfx_devprop = false;
+	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
 
 	if (do_gfx_devprop)

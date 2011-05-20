@@ -1,10 +1,10 @@
-/*
-Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
-*/
+/**
+	Original patch by nawcom
+	http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
+**/
 
-//#include "libsaio.h"
 #include "bootstruct.h"
-#include "../modules/GraphicsEnablerLegacy/pci.h"
+#include "../modules/GraphicsEnablerLegacy/pci_old.h"
 #include "platform.h"
 #include "device_inject.h"
 #include "gma.h"

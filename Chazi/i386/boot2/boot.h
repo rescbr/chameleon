@@ -111,15 +111,15 @@
 #define kForceWakeKey		 "ForceWake"		 // boot.c				getBoolFK
 #define kWakeKeyImageKey	 "WakeImage"		 // boot.c				getValFK				- location???
 
-#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK ?? modules
-#define kAtiConfigKey		 "AtiConfig"		 // ati.c				getStringFK
-#define kATYbinimageKey		 "ATYbinimage"		 // ati.c				getBoolFK
+//#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK ?? modules
+//#define kAtiConfigKey		 "AtiConfig"		 // ati.c				getStringFK
+//#define kATYbinimageKey		 "ATYbinimage"		 // ati.c				getBoolFK
 
-#define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c			getBoolFK
-#define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
+//#define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c			getBoolFK
+//#define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
 #define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
 #define kAutoResolutionKey	 "AutoResolution"	 // boot.c				getBoolFK
-#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
+//#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
 #define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
 #define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK
 #define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?

@@ -19,12 +19,9 @@
 /*
  * Alternatively you can choose to comply with APSL
  */
- 
- 
-#include "libsaio.h"
-#include "boot.h"
+
 #include "bootstruct.h"
-#include "../modules/GraphicsEnablerLegacy/pci.h"
+#include "../modules/GraphicsEnablerLegacy/pci_old.h"
 #include "platform.h"
 #include "device_inject.h"
 #include "ati.h"
@@ -38,6 +35,8 @@
 #else
 #define DBG(x...)
 #endif
+
+#define kUseAtiROMKey		"UseAtiROM"
 
 #define MAX_NUM_DCB_ENTRIES 16
 

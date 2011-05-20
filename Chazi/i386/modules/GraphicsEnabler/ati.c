@@ -5,15 +5,15 @@
  *
  */
 
-
-#include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
-
 #include "ati_reg.h"
+
+#define kUseAtiROMKey		"UseAtiROM"
+#define kAtiConfigKey		"AtiConfig"
+#define kATYbinimageKey		"ATYbinimage"
 
 #define	OFFSET_TO_GET_ATOMBIOS_STRINGS_START		0x6e
 
@@ -1221,7 +1221,8 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 
 	/* ------------------------------------------------- */
 	/* Find a better way to do this (in device_inject.c) */
-	stringdata = malloc(string->length);
+	//Azi: tried to fix a malloc error in vain; this is caused by XCode 4 compilation!
+	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 	/* ------------------------------------------------- */

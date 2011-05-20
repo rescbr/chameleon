@@ -7,11 +7,6 @@
 #ifndef __LIBSAIO_PCI_H
 #define __LIBSAIO_PCI_H
 
-//#include "libsaio.h" // moved from hpet.c/h; also remember mem.c.
-#include "libsa.h"
-#include "saio_internal.h"
-#include "saio_types.h"
-
 typedef struct {
 	uint32_t		:2;
 	uint32_t	reg	:6;
