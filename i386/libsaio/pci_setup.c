@@ -2,8 +2,9 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
+#include "nvidia.h"
 
-extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
+
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern void set_eth_builtin(pci_dt_t *eth_dev);
 extern void notify_usb_dev(pci_dt_t *pci_dev);
@@ -43,8 +44,6 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					switch (current->vendor_id)
 					{
 						case PCI_VENDOR_ID_ATI:
-							verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-							current->vendor_id, current->device_id, devicepath);
 							setup_ati_devprop(current); 
 							break;
 					

@@ -58,6 +58,7 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
+#include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -137,6 +138,7 @@ static int ExecKernel(void *binary)
     int                       ret;
 
     bootArgs->kaddr = bootArgs->ksize = 0;
+	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
 
     ret = DecodeKernel(binary,
                        &kernelEntry,
@@ -149,10 +151,14 @@ static int ExecKernel(void *binary)
     // Reserve space for boot args
     reserveKernBootStruct();
 
-    // Load boot drivers from the specifed root path.
-	if (!gHaveKernelCache)
-		LoadDrivers("/");
+	// Notify modules that the kernel has been decoded
+	execute_hook("DecodedKernel", (void*)binary, NULL, NULL, NULL);
 	
+    // Load boot drivers from the specifed root path.
+    if (!gHaveKernelCache)
+		LoadDrivers("/");
+
+
     clearActivityIndicator();
 
     if (gErrors) {
@@ -185,6 +191,8 @@ static int ExecKernel(void *binary)
 
 	usb_loop();
 
+	
+	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);	// Notify modules that the kernel is about to be started
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
     // verbose mode.
@@ -196,7 +204,7 @@ static int ExecKernel(void *binary)
 	
 	setupBooterLog();
 	
-	finalizeBootStruct();
+    finalizeBootStruct();
 	
 	if (checkOSVersion("10.7")) {
 		
@@ -213,7 +221,9 @@ static int ExecKernel(void *binary)
 		
 		startprog( kernelEntry, bootArgsPreLion );
 	}
-	
+
+    
+    
     // Not reached
 
     return 0;
@@ -331,6 +341,9 @@ void common_boot(int biosdev)
 
     gBootVolume = selectBootVolume(bvChain);
 
+	// Intialize module system 
+	init_module_system();
+	
 #if DEBUG
     printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
     printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
@@ -422,6 +435,9 @@ void common_boot(int biosdev)
 			}
 		}
 
+		// Notify moduals that we are attempting to boot
+		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
@@ -511,7 +527,7 @@ void common_boot(int biosdev)
 				}
 			}
 		}
-		
+			
         // Check for cache file.
         trycache = (usecache && 
 					((gBootMode & kBootModeSafe) == 0) &&
@@ -550,13 +566,13 @@ void common_boot(int biosdev)
                 break;
             }
         } while (0);
-		
+
         do {
             if (trycache) {
                 bootFile = gBootKernelCacheFile;
-				
-                verbose("Loading kernel cache %s\n", bootFile);
-				
+                
+				verbose("Loading kernel cache %s\n", bootFile);
+
                 if (checkOSVersion("10.7")) {
                     ret = LoadThinFatFile(bootFile, &binary);
 				}
@@ -594,7 +610,7 @@ void common_boot(int biosdev)
             			
             if (checkOSVersion("10.7"))
             {
-                // Lion, dont load kernel if you have cache
+                //Lion, dont load kernel if haz cache
                 if (!trycache) {
             		verbose("Loading kernel %s\n", bootFileSpec);
             		ret = LoadThinFatFile(bootFileSpec, &binary);
@@ -606,14 +622,15 @@ void common_boot(int biosdev)
 				else ret = 1;
             } 
 			else {
-                // Snow Leopard or older
+                //Snow leopard or older
                 verbose("Loading kernel %s\n", bootFileSpec);
                 ret = LoadThinFatFile(bootFileSpec, &binary);
                 if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {
                     archCpuType = CPU_TYPE_I386;
                     ret = LoadThinFatFile(bootFileSpec, &binary);				
                 }
-            }			
+            }
+			
 			
         } while (0);
 
@@ -683,7 +700,7 @@ bool getOSVersion()
 	config_file_t systemVersion;
 	const char *val;
 	int len;
-
+	
 	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
 		valid = true;
@@ -692,7 +709,7 @@ bool getOSVersion()
 	{
 		valid = true;
 	}
-
+	
 	if (valid)
 	{
 		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
@@ -705,7 +722,7 @@ bool getOSVersion()
 		else
 			valid = false;
 	}
-
+	
 	return valid;
 }
 

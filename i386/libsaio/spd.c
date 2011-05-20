@@ -10,6 +10,7 @@
 #include "pci.h"
 #include "platform.h"
 #include "spd.h"
+#include "cpu.h"
 #include "saio_internal.h"
 #include "bootstruct.h"
 #include "memvendors.h"
@@ -21,40 +22,40 @@
 #if DEBUG_SPD
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 static const char *spd_memory_types[] =
 {
-	"RAM",					/* 00h  Undefined */
-	"FPM",					/* 01h  FPM */
-	"EDO",					/* 02h  EDO */
-	"",						/* 03h  PIPELINE NIBBLE */
-	"SDRAM",				/* 04h  SDRAM */
-	"",						/* 05h  MULTIPLEXED ROM */
-	"DDR SGRAM",			/* 06h  SGRAM DDR */
-	"DDR SDRAM",			/* 07h  SDRAM DDR */
-	"DDR2 SDRAM",			/* 08h  SDRAM DDR 2 */
-	"",						/* 09h  Undefined */
-	"",						/* 0Ah  Undefined */
-	"DDR3 SDRAM"			/* 0Bh  SDRAM DDR 3 */
+	"RAM",          /* 00h  Undefined */
+	"FPM",          /* 01h  FPM */
+	"EDO",          /* 02h  EDO */
+	"",				/* 03h  PIPELINE NIBBLE */
+	"SDRAM",        /* 04h  SDRAM */
+	"",				/* 05h  MULTIPLEXED ROM */
+	"DDR SGRAM",	/* 06h  SGRAM DDR */
+	"DDR SDRAM",	/* 07h  SDRAM DDR */
+	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
+	"",				/* 09h  Undefined */
+	"",				/* 0Ah  Undefined */
+	"DDR3 SDRAM"   /* 0Bh  SDRAM DDR 3 */
 };
 
 #define UNKNOWN_MEM_TYPE 2
 static uint8_t spd_mem_to_smbios[] =
 {
-	UNKNOWN_MEM_TYPE,		/* 00h  Undefined */
-	UNKNOWN_MEM_TYPE,		/* 01h  FPM */
-	UNKNOWN_MEM_TYPE,		/* 02h  EDO */
-	UNKNOWN_MEM_TYPE,		/* 03h  PIPELINE NIBBLE */
-	SMB_MEM_TYPE_SDRAM,		/* 04h  SDRAM */
-	SMB_MEM_TYPE_ROM,		/* 05h  MULTIPLEXED ROM */
-	SMB_MEM_TYPE_SGRAM,		/* 06h  SGRAM DDR */
-	SMB_MEM_TYPE_DDR,		/* 07h  SDRAM DDR */
-	SMB_MEM_TYPE_DDR2,		/* 08h  SDRAM DDR 2 */
-	UNKNOWN_MEM_TYPE,		/* 09h  Undefined */
-	UNKNOWN_MEM_TYPE,		/* 0Ah  Undefined */
-	SMB_MEM_TYPE_DDR3		/* 0Bh  SDRAM DDR 3 */
+	UNKNOWN_MEM_TYPE,          /* 00h  Undefined */
+	UNKNOWN_MEM_TYPE,          /* 01h  FPM */
+	UNKNOWN_MEM_TYPE,          /* 02h  EDO */
+	UNKNOWN_MEM_TYPE,	   /* 03h  PIPELINE NIBBLE */
+	SMB_MEM_TYPE_SDRAM,        /* 04h  SDRAM */
+	SMB_MEM_TYPE_ROM,	   /* 05h  MULTIPLEXED ROM */
+	SMB_MEM_TYPE_SGRAM,        /* 06h  SGRAM DDR */
+	SMB_MEM_TYPE_DDR,          /* 07h  SDRAM DDR */
+	SMB_MEM_TYPE_DDR2,         /* 08h  SDRAM DDR 2 */
+	UNKNOWN_MEM_TYPE,  	   /* 09h  Undefined */
+	UNKNOWN_MEM_TYPE,	   /* 0Ah  Undefined */
+	SMB_MEM_TYPE_DDR3          /* 0Bh  SDRAM DDR 3 */
 };
 #define SPD_TO_SMBIOS_SIZE (sizeof(spd_mem_to_smbios)/sizeof(uint8_t))
 
@@ -77,7 +78,14 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
     outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
     outb(base + SMBHSTDAT, 0xff);
 	
-    while( inb(base + SMBHSTSTS) & 0x01);			// wait until ready
+    rdtsc(l1, h1);
+    while ( inb(base + SMBHSTSTS) & 0x01)    // wait until read
+    {  
+     rdtsc(l2, h2);
+     t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
+     if (t > 5)
+      return 0xFF;                  // break
+    }
 	
     outb(base + SMBHSTCMD, cmd);
     outb(base + SMBHSTADD, (adr << 1) | 0x01 );
@@ -236,7 +244,6 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 	}
 	
 	return strdup(asciiPartNo);
-    return NULL;
 }
 
 int mapping []= {0,2,1,3,4,6,5,7,8,10,9,11};
@@ -247,24 +254,33 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
     int        i, speed;
     uint8_t    spd_size, spd_type;
-    uint32_t   base;
+    uint32_t   base, mmio, hostc;
     bool       dump = false;
     RamSlotInfo_t*  slot;
 
+	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
+	DBG("SMBus CmdReg: 0x%x\n", cmd);
+	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
+
+	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
     base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
-    DBG("Scanning smbus_dev <%04x, %04x> ...\n",smbus_dev->vendor_id, smbus_dev->device_id);
+	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
+    verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
+		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 
     getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
-    bool fullBanks =  // needed at least for laptops
-        Platform.DMI.MemoryModules ==  Platform.DMI.MaxMemorySlots;
-   // Search MAX_RAM_SLOTS slots
-	char spdbuf[256];
+	// needed at least for laptops
+    bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
+	char spdbuf[MAX_SPD_SIZE];
+    // Search MAX_RAM_SLOTS slots
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
+		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
         // Check spd is present
-        if (spd_size && (spd_size != 0xff) ) {
+        if (spd_size && (spd_size != 0xff))
+        {
 
 			slot->spd = spdbuf;
             slot->InUse = true;
@@ -275,7 +291,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
             
 			//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
             init_spd(slot->spd, base, i);
-			
+		
             switch (slot->spd[SPD_MEMORY_TYPE])  {
             case SPD_MEMORY_TYPE_SDRAM_DDR2:
                 
@@ -316,7 +332,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				}
 				slot->Frequency = freq;
 			}
-			
+
 			verbose("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n", 
                        i, 
                        (int)slot->Type,
@@ -326,15 +342,16 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
-			if(DEBUG_SPD) {
-                  dumpPhysAddr("spd content: ",slot->spd, spd_size);
+
+#if DEBUG_SPD
+                  dumpPhysAddr("spd content: ", slot->spd, spd_size);
                     getc();
-            }
+#endif
         }
 
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
         Platform.DMI.DIMM[i]= 
-            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.MaxMemorySlots==2 ? 
+            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
             mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
         
 		slot->spd = NULL;
@@ -344,19 +361,18 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
 static struct smbus_controllers_t smbus_controllers[] = {
 
-	{0x8086, 0x269B, "ESB2",     read_smb_intel },
-	{0x8086, 0x25A4, "6300ESB",  read_smb_intel },
-	{0x8086, 0x24C3, "ICH4",     read_smb_intel },
-	{0x8086, 0x24D3, "ICH5",     read_smb_intel },
-	{0x8086, 0x266A, "ICH6",     read_smb_intel },
-	{0x8086, 0x27DA, "ICH7",     read_smb_intel },
-	{0x8086, 0x283E, "ICH8",     read_smb_intel },
-	{0x8086, 0x2930, "ICH9",     read_smb_intel },	
-	{0x8086, 0x3A30, "ICH10R",   read_smb_intel },
-	{0x8086, 0x3A60, "ICH10B",   read_smb_intel },
-	{0x8086, 0x3B30, "5 Series", read_smb_intel },
-	{0x8086, 0x1C22, "6 Series", read_smb_intel },
-	{0x8086, 0x5032, "EP80579",  read_smb_intel }
+	{0x8086, 0x269B, "ESB2",    read_smb_intel },
+	{0x8086, 0x25A4, "6300ESB", read_smb_intel },
+	{0x8086, 0x24C3, "ICH4",    read_smb_intel },
+	{0x8086, 0x24D3, "ICH5",    read_smb_intel },
+	{0x8086, 0x266A, "ICH6",    read_smb_intel },
+	{0x8086, 0x27DA, "ICH7",    read_smb_intel },
+	{0x8086, 0x283E, "ICH8",    read_smb_intel },
+	{0x8086, 0x2930, "ICH9",    read_smb_intel },	
+	{0x8086, 0x3A30, "ICH10R",  read_smb_intel },
+	{0x8086, 0x3A60, "ICH10B",  read_smb_intel },
+	{0x8086, 0x3B30, "P55",     read_smb_intel },
+	{0x8086, 0x5032, "EP80579", read_smb_intel }
 
 };
 
@@ -393,3 +409,4 @@ void scan_spd(PlatformInfo_t *p)
 {
     find_and_read_smbus_controller(root_pci_dev);
 }
+

@@ -60,7 +60,6 @@
 #define kWaitForKeypressKey	"Wait"
 
 #define kUseAtiROM			"UseAtiROM"			/* ati.c */
-/* Kabyl: added these keys */
 #define kAtiConfig			"AtiConfig"			/* ati.c */
 #define kATYbinimage		"ATYbinimage"		/* ati.c */
 
@@ -74,7 +73,6 @@
 #define kDSDT				"DSDT"				/* acpi_patcher.c */
 #define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
 #define kRestartFix			"RestartFix"		/* acpi_patcher.c */
-/* Mojodojo: added these keys */
 #define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
 #define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
 #define kEnableC2States		"EnableC2State"		/* acpi_patcher.c */
@@ -92,11 +90,9 @@
 
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"				/* nvidia.c */
-/* valv: added these keys */
-#define kdcfg0				"display_0"			/* nvidia.c */
-#define kdcfg1				"display_1"			/* nvidia.c */
 
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
+
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */
@@ -110,10 +106,10 @@
 #define kUHCIreset			"UHCIreset"			/* usb.c */
 #define kLegacyOff			"USBLegacyOff"		/* usb.c */
 #define kEHCIhard			"EHCIhard"			/* usb.c */
-
 #define kDefaultPartition	"Default Partition"	/* sys.c */
 
 #define kMD0Image			"md0"				/* ramdisk.h */
+#define kbusratio		"busratio"			/* cpu.c */
 
 /*
  * Flags to the booter or kernel

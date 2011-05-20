@@ -1,8 +1,10 @@
 TODO List for Chameleon Boot Loader
 ====================================
+- Fix the module system when booting chameleon with multiboot. Cleanup the xcode 4 fix.
+
 - Integrate Prasys current work on options and quick shortcut modified version of 18seven
 
-- Add auto-detection of efi string algorithm to enable graphics enabler to be enabled by default while not conflicting with other efi string overridden content
+- Add autodetection of efistring algorythm to enabke graphics enabler to beanbled by default while not conflicting whith other efi string overriden content
   (original idea of Galaxy)
 
 - Add a more sophisticated acpi loading mechanism to enable loading custom acpi tables when dsdtdrop=y
@@ -19,11 +21,11 @@ TODO List for Chameleon Boot Loader
     Now for each acpi file found, we should compare the name with an existing acpi table found in the system that
      we would normally load and replace this usual injection by the content of the file.
     
-    Once DropDSDT=y is set, no other acpi table than dsdt is loaded, then it is the responsibility of user
+    Once DropDSDT=y is set, no other acpi table than dsdt is loaded, then it is the responsability of user
     to provide any other acpi table.
 
 - Add a new module capable of writing proprietary Chameleon data to ioreg:
-  Using the DT__xxx() API, we will create a set of functions to write
+  Using the DT__xxx() API, we will creat e a set of functions to write
   to log info, chameleon boot info to be retrieved by helper applications...
   the only public function for log info purpose of this module would be:
   logMessageToIOREG(...); // var args printf style format
@@ -65,5 +67,5 @@ TODO List for Chameleon Boot Loader
        getc();
     }
 
- - Case insensitive parsing for the bootConfig options:
+ - Case unsensitive parsing for the bootConfig options:
    should help the common/novice user to setup more easily.

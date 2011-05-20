@@ -98,7 +98,7 @@ void initKernBootStruct( void )
 		
 		bootArgsPreLion->Version  = kBootArgsPreLionVersion;
         bootArgsPreLion->Revision = kBootArgsPreLionRevision;
-
+		
         init_done = 1;
     }
 
@@ -121,6 +121,7 @@ reserveKernBootStruct(void)
 		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
 		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
 	}
+
 }
 
 void
