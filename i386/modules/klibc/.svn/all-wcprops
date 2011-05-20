@@ -1,0 +1,437 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/825/trunk/i386/modules/klibc
+END
+strndup.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strndup.c
+END
+sha1hash.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/sha1hash.c
+END
+strtox.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtox.c
+END
+strcasecmp.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strcasecmp.c
+END
+__clzsi2.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__clzsi2.c
+END
+strtotimespec.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtotimespec.c
+END
+memmove.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memmove.c
+END
+__udivdi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__udivdi3.c
+END
+onexit.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/onexit.c
+END
+limits.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/limits.h
+END
+exit.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/exit.c
+END
+jrand48.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/jrand48.c
+END
+memchr.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memchr.c
+END
+lrand48.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/lrand48.c
+END
+mrand48.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/mrand48.c
+END
+nrand48.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/nrand48.c
+END
+srand48.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/srand48.c
+END
+__udivsi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__udivsi3.c
+END
+klibc.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/klibc.c
+END
+__ashldi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__ashldi3.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/Makefile
+END
+strtotimeval.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtotimeval.c
+END
+memrchr.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memrchr.c
+END
+__umoddi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__umoddi3.c
+END
+memswap.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memswap.c
+END
+atoll.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atoll.c
+END
+strlcat.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strlcat.c
+END
+memmem.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memmem.c
+END
+strsep.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strsep.c
+END
+strdup.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strdup.c
+END
+__umodsi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__umodsi3.c
+END
+strtotimex.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtotimex.c
+END
+strtok.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtok.c
+END
+vsnprintf.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/vsnprintf.c
+END
+strtoimax.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtoimax.c
+END
+atexit.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atexit.c
+END
+atol.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atol.c
+END
+snprintf.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/snprintf.c
+END
+atexit.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atexit.h
+END
+vsscanf.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/vsscanf.c
+END
+strtoumax.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtoumax.c
+END
+bsearch.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/bsearch.c
+END
+strntoimax.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strntoimax.c
+END
+atox.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atox.c
+END
+strtoul.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtoul.c
+END
+sscanf.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/sscanf.c
+END
+__divdi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__divdi3.c
+END
+strncasecmp.c
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strncasecmp.c
+END
+strntoumax.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strntoumax.c
+END
+strpbrk.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strpbrk.c
+END
+strtoull.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtoull.c
+END
+Readme.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/825/trunk/i386/modules/klibc/Readme.txt
+END
+__ashrdi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__ashrdi3.c
+END
+seed48.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/seed48.c
+END
+__divsi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__divsi3.c
+END
+LICENSE
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/LICENSE
+END
+strtoll.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtoll.c
+END
+version
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/version
+END
+__udivmoddi4.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__udivmoddi4.c
+END
+__lshrdi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__lshrdi3.c
+END
+strtok_r.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtok_r.c
+END
+qsort.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/qsort.c
+END
+__moddi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__moddi3.c
+END
+strxspn.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strxspn.c
+END
+strnlen.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strnlen.c
+END
+__udivmodsi4.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__udivmodsi4.c
+END
+strxspn.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strxspn.h
+END
+strtol.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/strtol.c
+END
+__modsi3.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/__modsi3.c
+END
+atoi.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/atoi.c
+END
+calloc.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/calloc.c
+END
+memccpy.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/777/trunk/i386/modules/klibc/memccpy.c
+END

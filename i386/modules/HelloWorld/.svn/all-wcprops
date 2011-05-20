@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/807/trunk/i386/modules/HelloWorld
+END
+HelloWorld.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/HelloWorld/HelloWorld.cpp
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/chameleon/!svn/ver/780/trunk/i386/modules/HelloWorld/Makefile
+END

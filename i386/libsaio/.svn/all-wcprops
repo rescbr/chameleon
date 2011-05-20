@@ -1,0 +1,527 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio
+END
+fake_efi.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/450/trunk/i386/libsaio/fake_efi.h
+END
+smbios_getters.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/828/trunk/i386/libsaio/smbios_getters.h
+END
+asm.s
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/asm.s
+END
+xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/796/trunk/i386/libsaio/xml.c
+END
+console.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/616/trunk/i386/libsaio/console.c
+END
+xml.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/796/trunk/i386/libsaio/xml.h
+END
+bootstruct.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/760/trunk/i386/libsaio/bootstruct.c
+END
+efi.h
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/efi.h
+END
+ntfs_private.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/413/trunk/i386/libsaio/ntfs_private.h
+END
+io_inline.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/io_inline.h
+END
+hfs_CaseTables.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/hfs_CaseTables.h
+END
+ext2fs.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/ext2fs.c
+END
+vbe.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/128/trunk/i386/libsaio/vbe.c
+END
+bootstruct.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/758/trunk/i386/libsaio/bootstruct.h
+END
+device_tree.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/device_tree.c
+END
+hfs.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/254/trunk/i386/libsaio/hfs.c
+END
+ext2fs.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/ext2fs.h
+END
+vbe.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/128/trunk/i386/libsaio/vbe.h
+END
+acpi_patcher.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/acpi_patcher.c
+END
+device_tree.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/device_tree.h
+END
+allocate.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/allocate.c
+END
+hfs.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/151/trunk/i386/libsaio/hfs.h
+END
+bootargs.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/758/trunk/i386/libsaio/bootargs.h
+END
+hfs_compare.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/hfs_compare.c
+END
+spd.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/828/trunk/i386/libsaio/spd.c
+END
+libsaio.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/libsaio.h
+END
+acpi_patcher.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/192/trunk/i386/libsaio/acpi_patcher.h
+END
+spd.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/210/trunk/i386/libsaio/spd.h
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/781/trunk/i386/libsaio/Makefile
+END
+ufs.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/151/trunk/i386/libsaio/ufs.c
+END
+bios.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/758/trunk/i386/libsaio/bios.h
+END
+ufs.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/151/trunk/i386/libsaio/ufs.h
+END
+nbp_cmd.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/nbp_cmd.h
+END
+bios.s
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/bios.s
+END
+pci_root.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/84/trunk/i386/libsaio/pci_root.c
+END
+aml_generator.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/644/trunk/i386/libsaio/aml_generator.c
+END
+pci_root.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/pci_root.h
+END
+msdos_private.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/msdos_private.h
+END
+memvendors.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/295/trunk/i386/libsaio/memvendors.h
+END
+aml_generator.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/243/trunk/i386/libsaio/aml_generator.h
+END
+table.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/779/trunk/i386/libsaio/table.c
+END
+usb.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/258/trunk/i386/libsaio/usb.c
+END
+device_inject.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/44/trunk/i386/libsaio/device_inject.c
+END
+device_inject.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/chameleon/!svn/ver/44/trunk/i386/libsaio/device_inject.h
+END
+fdisk.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/fdisk.h
+END
+dram_controllers.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/517/trunk/i386/libsaio/dram_controllers.c
+END
+nvidia.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/786/trunk/i386/libsaio/nvidia.c
+END
+ntfs.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/416/trunk/i386/libsaio/ntfs.c
+END
+ufs_byteorder.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/ufs_byteorder.c
+END
+ati.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/811/trunk/i386/libsaio/ati.c
+END
+dram_controllers.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/chameleon/!svn/ver/255/trunk/i386/libsaio/dram_controllers.h
+END
+sys.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/413/trunk/i386/libsaio/sys.c
+END
+nvidia.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/352/trunk/i386/libsaio/nvidia.h
+END
+ntfs.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/413/trunk/i386/libsaio/ntfs.h
+END
+nbp.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/151/trunk/i386/libsaio/nbp.c
+END
+load.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/758/trunk/i386/libsaio/load.c
+END
+acpi.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/192/trunk/i386/libsaio/acpi.h
+END
+ufs_byteorder.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/ufs_byteorder.h
+END
+sl.h
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/sl.h
+END
+platform.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/781/trunk/i386/libsaio/platform.c
+END
+cpu.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/cpu.c
+END
+platform.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/platform.h
+END
+disk.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/444/trunk/i386/libsaio/disk.c
+END
+pci_setup.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/chameleon/!svn/ver/786/trunk/i386/libsaio/pci_setup.c
+END
+cpu.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/cpu.h
+END
+smbios.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/smbios.c
+END
+disk.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/432/trunk/i386/libsaio/disk.h
+END
+smbios_decode.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/782/trunk/i386/libsaio/smbios_decode.c
+END
+hpet.c
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/hpet.c
+END
+smbios.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/826/trunk/i386/libsaio/smbios.h
+END
+cache.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/292/trunk/i386/libsaio/cache.c
+END
+hpet.h
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/chameleon/!svn/ver/1/trunk/i386/libsaio/hpet.h
+END
+pci.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/785/trunk/i386/libsaio/pci.c
+END
+stringTable.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/stringTable.c
+END
+ati_reg.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/chameleon/!svn/ver/786/trunk/i386/libsaio/ati_reg.h
+END
+pci.h
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/785/trunk/i386/libsaio/pci.h
+END
+biosfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/60/trunk/i386/libsaio/biosfn.c
+END
+convert.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/45/trunk/i386/libsaio/convert.c
+END
+saio_types.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/chameleon/!svn/ver/811/trunk/i386/libsaio/saio_types.h
+END
+msdos.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/374/trunk/i386/libsaio/msdos.c
+END
+convert.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/chameleon/!svn/ver/44/trunk/i386/libsaio/convert.h
+END
+md5c.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/chameleon/!svn/ver/770/trunk/i386/libsaio/md5c.c
+END
+fake_efi.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/chameleon/!svn/ver/828/trunk/i386/libsaio/fake_efi.c
+END
+smbios_getters.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/829/trunk/i386/libsaio/smbios_getters.c
+END
+msdos.h
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/chameleon/!svn/ver/151/trunk/i386/libsaio/msdos.h
+END
+misc.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/chameleon/!svn/ver/23/trunk/i386/libsaio/misc.c
+END
+saio_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/chameleon/!svn/ver/760/trunk/i386/libsaio/saio_internal.h
+END

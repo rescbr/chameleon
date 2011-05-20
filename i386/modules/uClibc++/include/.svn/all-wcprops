@@ -1,0 +1,395 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include
+END
+iostream
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/iostream
+END
+cstdio
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cstdio
+END
+cstdarg
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cstdarg
+END
+unwind-cxx.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/unwind-cxx.h
+END
+map.old
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/map.old
+END
+iomanip
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/iomanip
+END
+numeric
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/numeric
+END
+utility
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/utility
+END
+type_traits
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/type_traits
+END
+cwchar
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cwchar
+END
+set.old
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/set.old
+END
+memory
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/memory
+END
+cstddef
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cstddef
+END
+map
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/map
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/Makefile
+END
+cstdlib
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cstdlib
+END
+cctype
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cctype
+END
+iterator
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/iterator
+END
+bitset
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/bitset
+END
+set
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/set
+END
+iosfwd
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/iosfwd
+END
+cmath
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cmath
+END
+system_configuration.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/system_configuration.h
+END
+limits
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/limits
+END
+functional
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/functional
+END
+types
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/types
+END
+istream
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/istream
+END
+stack
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/stack
+END
+csetjmp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/csetjmp
+END
+string
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/string
+END
+complex
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/complex
+END
+cfloat
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cfloat
+END
+ostream
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/ostream
+END
+sstream
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/sstream
+END
+csignal
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/csignal
+END
+valarray
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/valarray
+END
+iterator_base
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/iterator_base
+END
+istream_helpers
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/istream_helpers
+END
+algorithm
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/algorithm
+END
+ostream_helpers
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/ostream_helpers
+END
+typeinfo
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/typeinfo
+END
+exception
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/exception
+END
+locale
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/locale
+END
+vector
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/vector
+END
+stdexcept
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/stdexcept
+END
+deque
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/deque
+END
+climits
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/climits
+END
+cstring
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cstring
+END
+list
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/list
+END
+basic_definitions
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/basic_definitions
+END
+cwctype
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cwctype
+END
+queue
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/queue
+END
+streambuf
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/streambuf
+END
+cerrno
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cerrno
+END
+new
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/new
+END
+ios
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/ios
+END
+ctime
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/ctime
+END
+fstream
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/fstream
+END
+clocale
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/clocale
+END
+char_traits
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/char_traits
+END
+cassert
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/cassert
+END
+associative_base
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/associative_base
+END
+string_iostream
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/string_iostream
+END
+func_exception
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/func_exception
+END
+support
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/chameleon/!svn/ver/775/trunk/i386/modules/uClibc++/include/support
+END
