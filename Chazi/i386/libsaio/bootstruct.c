@@ -40,9 +40,10 @@ PrivateBootInfo_t	*bootInfo;
 Node				*gMemoryMapNode;
 //Node              *efiPlatformNode; //Azi: test
 
-//static Azi: modules ??????????????????????
+//static Azi: modules ?? doesn't seem so.
 static char platformName[64];
 
+//Azi: bootargs - we can't retrive OS version at this point...
 void initKernBootStruct( void )
 {
     Node *node;
@@ -107,26 +108,26 @@ void initKernBootStruct( void )
 
 }
 
-
-/* Copy boot args after kernel and record address. */
-
+//Azi: ... but here we can... (done)
+/** Copy boot args after kernel and record address. */
 void
 reserveKernBootStruct(void)
 {
-	if ((gMacOSVersion[0] == '1') && (gMacOSVersion[1] == '0') && (gMacOSVersion[2] == '.') && (gMacOSVersion[3] == '7'))
+	if (gMacOSVersion[3] <= '6')
     {
-		void *oldAddr = bootArgs;
-		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
-		bcopy(oldAddr, bootArgs, sizeof(boot_args));
-	}
-	else {
 		void *oldAddr = bootArgsPreLion;
 		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
 		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
 	}
+	else {
+		void *oldAddr = bootArgs;
+		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
+		bcopy(oldAddr, bootArgs, sizeof(boot_args));
+	}
 
 }
 
+//Azi: ... and here too.
 void
 finalizeBootStruct(void)
 {
@@ -190,7 +191,7 @@ finalizeBootStruct(void)
     bootArgs->deviceTreeLength = size;
 	
 	// Copy BootArgs values to older structure
-	
+//Azi: Ok, stuff that uses same naming for both bootargs versions... neat ;)
 	memcpy(&bootArgsPreLion->CommandLine, &bootArgs->CommandLine, BOOT_LINE_LENGTH);
 	memcpy(&bootArgsPreLion->Video, &bootArgs->Video, sizeof(Boot_Video));
 	

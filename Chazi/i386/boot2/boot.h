@@ -100,8 +100,9 @@
 // it's to be passed via "kernel Flags" ?? - "man com.apple.Boot.plist"
 #define kKernelNameKey		 "Kernel"			 // options.c			getValFK				- kFlag*** bFlag ?
 #define kKernelCacheKey		 "Kernel Cache"		 // boot.c				getValFK				- kFlag
-#define kIgnoreKCKey		 "ignoreKC"			 // boot.c				getBoolFK				- testing***
 #define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK				- kFlags***
+#define kIgnoreKCKey		 "ignoreKC"			 // boot.c				getBoolFK				- testing***
+
 #define kKPatcherKey		 "PatchKernel"		 // kernel_patcher.c	getBoolFK
 #define kAltExtensionsKey	 "kext"				 // drivers.c			getValFK
 #define kMKextCacheKey		 "MKext Cache"		 // options.c			getValFK				- kFlag
@@ -187,7 +188,6 @@ extern char bootPrompt[];
 extern bool gOverrideKernel;
 extern char *gPlatformName; // disabled ??
 extern char gMKextName[];
-extern char gMacOSVersion[];
 extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;

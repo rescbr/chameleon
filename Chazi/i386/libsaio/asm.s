@@ -339,7 +339,8 @@ LABEL(_halt)
     jmp     _halt
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// disableIRQs() - Azi: DHP (see boot.c/ExecKernel)
+// disableIRQs() - Azi: DHP
+// http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
 //
 // Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
 //
@@ -347,20 +348,20 @@ LABEL(_halt)
 // must be disabled (that is, masked) when enabling the ACPI APIC operation
 // but this isn't done (apparently) on all mobo's and thus we do that here.
 //
-//LABEL(_disableIRQs)
+LABEL(_disableIRQs)
 
-//	push %eax // Saving register data
+	push %eax // Saving register data
 
-//	movb $0x80, %al // Block NMI
-//	outb %al, $0x70
+	movb $0x80, %al // Block NMI
+	outb %al, $0x70
 
-//	movb $0xff, %al // Load mask
-//	outb %al, $0x21 // Disable IRQ's 0-7 on Master PIC
-//	outb %al, $0xa1 // Disable IRQ's 8-15 on Slave PIC
+	movb $0xff, %al // Load mask
+	outb %al, $0x21 // Disable IRQ's 0-7 on Master PIC
+	outb %al, $0xa1 // Disable IRQ's 8-15 on Slave PIC
 
-//	popl %eax // Restore register data
+	popl %eax // Restore register data
 
-//	ret
+	ret
 
 #ifndef BOOT1
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -369,7 +370,7 @@ LABEL(_halt)
 // Passes arg to the program in %eax.
 //
 LABEL(_startprog)
-//    call _disableIRQs // Taking care of a ACPI bug. (Azi: calling the above - disabled for now)
+    call _disableIRQs        // Taking care of a ACPI bug. (Azi: calling the above)
 
     push    %ebp
     mov     %esp, %ebp

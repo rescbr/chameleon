@@ -782,7 +782,7 @@ int readDriveParameters(int drive, struct driveParameters *dp)
 
 }
 #endif
-
+//Azi: Advanced Power Management
 #ifdef APM_SUPPORT
 
 #define APM_INTNO   0x15
@@ -800,6 +800,7 @@ APMPresent(void)
         (bb.ebx.r.h == 'P') &&
         (bb.ebx.r.l == 'M')) {
         /* Success */
+//Azi: apmConfig not on boot_args
         bootArgs->apmConfig.major_vers = bb.eax.r.h;
         bootArgs->apmConfig.minor_vers = bb.eax.r.l;
         bootArgs->apmConfig.flags.data = bb.ecx.rr;

@@ -188,6 +188,6 @@ typedef struct boot_args_pre_lion {
     
 } boot_args_pre_lion;
 
-extern char gMacOSVersion[8];
+extern char gMacOSVersion[8]; // options.c
 
 #endif /* _PEXPERT_I386_BOOT_H */

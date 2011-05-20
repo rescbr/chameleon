@@ -1,17 +1,20 @@
 #	Makefile for i386 modules
 
 # The order of building is important.
-SUBDIRS = klibc uClibc++ GraphicsEnablerLegacy KernelPatcher HPET
+SUBDIRS = klibc uClibc++ GraphicsEnablerLegacy KernelPatcher Memory HPET
 #SUBDIRS = HelloWorld
 #	-	-  Resolution (only tested on Meklort's branch, never did any good for my resolution;
 #						conflicts with AutoResolution)
 
 #	-	-  GraphicsEnabler (no support for ATI legacy cards, e.g. 1000 series)
+#		testing = http://www.insanelymac.com/forum/index.php?s=&showtopic=231075&view=findpost&p=1683785
 
 #	-	-  Memory ("Attempting to execute hook ScanMemory"
 #						Divide by 0
 #					"This is a non recoverable error! System HALTED!!!")
-#		   (Based on previous tests whith Meklort's branch; here just instant reboots. XCode 4 specific)
+#		   (Based on previous tests whith Meklort's branch; here just instant reboots. XCode 4 SPECIFIC!!)
+
+#	-	-  KernelPatcher (hangs right after loading the kernel. XCode 4 SPECIFIC!!)
 
 
 CFLAGS= -O $(MORECPP) -arch i386 -g -static

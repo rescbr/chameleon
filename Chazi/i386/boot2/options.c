@@ -41,7 +41,7 @@ extern BVRef    bvChain;
 //extern int		menucount;
 
 //extern int		gDeviceCount; //Azi: header
-char			gMacOSVersion[8]; //Azi: moved from boot.c ??? declared on boot.h as extern :-/
+char			gMacOSVersion[8]; //Azi: moved from boot.c - extern on boot.h/bootargs.h
 static bool getOSVersion(char *str); //			||
 
 int			selectIndex = 0;
@@ -164,7 +164,7 @@ static int countdown( const char * msg, int row, int timeout )
 }
 
 //==========================================================================
-
+//Azi: bootargs reminder
 static char   gBootArgs[BOOT_STRING_LEN];
 static char * gBootArgsPtr = gBootArgs;
 static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
@@ -1213,7 +1213,7 @@ processBootOptions()
 	
 	// Moved here to enable search for override Boot.plist on OS specific folders.
 	// Find out which Mac OS version we're booting.
-	// make sure the damn thing get's cleaned, just in case... :)*
+	// make sure the damn thing get's zeroed, just in case... :)*
 	bzero(gMacOSVersion, sizeof(gMacOSVersion)); // do this to argP ??... check it*****
 	getOSVersion(gMacOSVersion);
 	
@@ -1373,7 +1373,7 @@ processBootOptions()
 	}
 	strncpy(&argP[cnt], cp, userCnt);
 	verbose("BootArgs = %s\n", argP); //Azi: checking...
-	argP[cnt+userCnt] = '\0';
+	argP[cnt+userCnt] = '\0'; // shouldn't this null argP ?? see getOSVersion***
 	verbose("BootArgs check = %s\n", argP); //  ||
 	
 	if (!shouldboot)

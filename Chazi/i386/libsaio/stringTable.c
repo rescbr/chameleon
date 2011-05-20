@@ -493,7 +493,7 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
   const char *overrideVal;
   int overrideSize;
   bool override, ret;
-  
+//Azi: bootargs
   if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
     return true;
 
@@ -666,7 +666,7 @@ int loadOverrideConfig(config_file_t *config)
 	
 	// Take in account user overriding the override :P
 	// Damn thing doesn't work anymore ?????? :-/
-	if (getValueForKey(kAltConfigKey, &override_pathname, &len, config))
+	if (getValueForKey(kAltConfigKey, &override_pathname, &len, config)) // config ??
 	{
 		// Specify a path to a file, e.g. config=/Extra/test.plist
 		strcpy(dirSpecBplist, override_pathname);
@@ -693,7 +693,7 @@ int loadOverrideConfig(config_file_t *config)
 	// "/Extra/com.apple.Boot.plist"
 	// "/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	
-	// These i have no way to test, need advice.
+	//Azi: RESTORE THESE PATHS!
 	// "/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	// "/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	// "/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
@@ -726,6 +726,7 @@ success_fd:
  */
 int loadHelperConfig(config_file_t *config)
 {
+	//Azi: UPDATE WITH MEK'S CODE!
 	char *dirspec[] = {
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",

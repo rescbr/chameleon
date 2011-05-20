@@ -102,10 +102,10 @@ static bool gUnloadPXEOnExit = false;
 /*
  * Default path to kernel cache file
  */
-// OS X 10.5 & 10.4
-#define kDefaultCachePath "/System/Library/Caches/com.apple.kernelcaches/kernelcache"
+// OS X 10.4 & 10.5
+#define kCachePathTigerLeopard "/System/Library/Caches/com.apple.kernelcaches/kernelcache"
 // OS X 10.6
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
+#define kCachePathSnowLion "/System/Library/Caches/com.apple.kext.caches/Startup/kernelcache"
 
 //==========================================================================
 // Zero the BSS.
@@ -128,7 +128,7 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 }
 
 //==========================================================================
-//Initializes the runtime.  Right now this means zeroing the BSS and initializing malloc.
+//Initializes the runtime. Right now this means zeroing the BSS and initializing malloc.
 //
 void initialize_runtime(void)
 {
@@ -149,7 +149,9 @@ static int ExecKernel(void *binary)
     int                       ret;
 
     bootArgs->kaddr = bootArgs->ksize = 0;
-	//Azi: here we get to know if we have a kernel or a prelinked kernel
+	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
+
+    //Azi: gHaveKernelCache is set here
     ret = DecodeKernel(binary,
                        &kernelEntry,
                        (char **) &bootArgs->kaddr,
@@ -207,7 +209,6 @@ static int ExecKernel(void *binary)
 	// we can't check the plist here if we have AutoResolution=n there and we anabled it
 	// at boot prompt...?????
 //	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
-	
 	finishAutoRes();
 	
 	//Azi: closing Vbios after "if (gVerboseMode)" stuff eliminates the need for setting
@@ -219,7 +220,11 @@ static int ExecKernel(void *binary)
 
 	// Notify modules that the kernel is about to be started
 	// testing...
-	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+	
+	if (gMacOSVersion[3] <= '6')
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
+	else
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
     // If we were in text mode, switch to graphics mode.
     // This will draw the boot graphics unless we are in
@@ -233,16 +238,18 @@ static int ExecKernel(void *binary)
 	setupBooterLog();
 	
     finalizeBootStruct();
-    
-    // Jump to kernel's entry point. There's no going back now.
-//Azi: Lion - http://netkas.org/?p=745
-// see asm.s - same stuff by DHP http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
+
+//Azi: see asm.s LABEL(_disableIRQs)
 //	outb(0x21, 0xff);
 //	outb(0xa1, 0xff);
-    startprog( kernelEntry, bootArgs );
+
+    // Jump to kernel's entry point. There's no going back now.
+	if (gMacOSVersion[3] <= '6')
+		startprog( kernelEntry, bootArgsPreLion );
+	else
+		startprog( kernelEntry, bootArgs );
 
     // Not reached
-
     return 0;
 }
 
@@ -328,6 +335,8 @@ void common_boot(int biosdev)
 	loadPrebootRAMDisk();
 	
     // Load boot.plist config file
+    //Azi: on this first check, boot.plist acts as both "booter config file"
+    // and bootargs/options "carrier".*****
     status = loadSystemConfig(&bootInfo->bootConfig);
 
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
@@ -554,13 +563,20 @@ void common_boot(int biosdev)
 		}
 
 //Azi:kernelcache stuff
+		bool patchKernel = false;
+		getBoolForKey(kKPatcherKey, &patchKernel, &bootInfo->bootConfig);
 		//Azi: avoiding having to use -f to ignore kernel cache
 		//Azi: ignore kernel cache but still use kext cache (E/E.mkext & S/L/E.mkext). - explain...
-		getBoolForKey(kIgnoreKCKey, &ignoreKC, &bootInfo->bootConfig);
+		getBoolForKey(kIgnoreKCKey, &ignoreKC, &bootInfo->bootConfig); // equivalent to UseKernelCache
 		if (ignoreKC)
 		{
 			verbose("KC: cache ignored by user.\n");
-			// make sure the damn thing get's cleaned, just in case... :)*
+			// make sure the damn thing get's zeroed, just in case... :)*
+			bzero(gBootKernelCacheFile, sizeof(gBootKernelCacheFile));
+		}
+		else if (patchKernel) // to be moved..?
+		{
+			verbose("KC: kernel patcher enabled, ignore cache.\n");
 			bzero(gBootKernelCacheFile, sizeof(gBootKernelCacheFile));
 		}
 		else if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
@@ -568,7 +584,7 @@ void common_boot(int biosdev)
             strlcpy(gBootKernelCacheFile, val, len + 1);
 			verbose("KC: path set by user = %s\n", gBootKernelCacheFile);
 			//Azi: bypass time check when user sets path ???
-			// cache is still ignored if time doesn't match... (e.g. usb stick)
+			// cache is still ignored if time doesn't match... (e.g. booter on usb stick)
         }
 		else
 		{
@@ -581,7 +597,9 @@ void common_boot(int biosdev)
 			const char *ProductName = getStringForKey("SMproductname", &bootInfo->smbiosConfig);
 			sprintf(gCacheNameAdler, ProductName); // well, at least the smbios.plist can be loaded this early...
 			// to set/get "ProductName" this early, booter needs complete rewrite!!
+			// see DHP's Revolution booter rework example!
 			verbose("KC: gCacheNameAdler 1 = %s\n", gCacheNameAdler);
+			//Azi: check the validity of this, e.g. on Helper Partitions
 			sprintf(gCacheNameAdler + 64, "%s", "\\System\\Library\\CoreServices\\boot.efi");
 			verbose("KC: gCacheNameAdler 2 = %s\n", gCacheNameAdler + 64);
 			sprintf(gCacheNameAdler + (64 + 38), "%s", bootInfo->bootFile);
@@ -590,16 +608,16 @@ void common_boot(int biosdev)
 			// generate adler
 			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 			verbose("KC: Adler32 = %08X\n", adler32);
-			
+//Azi: no check for OS version here ?? - yes there is :)
 			// append arch and/or adler (checksum) to kc path...
-			if (gMacOSVersion[3] < '6') // change to >= for Lion?
+			if (gMacOSVersion[3] <= '5')
 			{
-				sprintf(gBootKernelCacheFile, "%s.%08lX", kDefaultCachePath, adler32);
+				sprintf(gBootKernelCacheFile, "%s.%08lX", kCachePathTigerLeopard, adler32);
 				verbose("KC: adler added to path = %s\n", gBootKernelCacheFile);
 			}
 			else
 			{
-				sprintf(gBootKernelCacheFile, "%s_%s.%08X", kDefaultCachePathSnow,
+				sprintf(gBootKernelCacheFile, "%s_%s.%08X", kCachePathSnowLion,
 						(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", adler32);
 				verbose("KC: arch & adler added to path = %s\n", gBootKernelCacheFile);
 			}
@@ -741,9 +759,6 @@ Azi: annoying stuff :P */
 		else
 		{
             // Won't return if successful.
-			// Notify modules that ExecKernel is about to be called
-			execute_hook("ExecKernel", binary, NULL, NULL, NULL);
-			
             ret = ExecKernel(binary);
         }
     } // while (1)

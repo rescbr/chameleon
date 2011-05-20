@@ -4,7 +4,7 @@
  */
 
 #ifndef DEBUG_MODULES
-#define DEBUG_MODULES 1
+#define DEBUG_MODULES 0
 #endif
 
 //#include "boot.h"
@@ -340,6 +340,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 	}
 	else
 	{
+		//Azi: this is double printing when using kernelcache - that's new!
 		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
 		//getc();
 		return NULL;

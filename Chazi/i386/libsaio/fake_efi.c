@@ -262,6 +262,7 @@ void setupEfiTables32(void)
 	
 	// --------------------------------------------------------------------
 	// Finish filling in the rest of the boot args that we need.
+//Azi: bootargs
 	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
 	bootArgs->efiMode = kBootArgsEfiMode32;
 	
@@ -371,6 +372,7 @@ void setupEfiTables64(void)
 	
 	// --------------------------------------------------------------------
 	// Finish filling in the rest of the boot args that we need.
+//Azi: bootargs
 	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
 	bootArgs->efiMode = kBootArgsEfiMode64;
 	
