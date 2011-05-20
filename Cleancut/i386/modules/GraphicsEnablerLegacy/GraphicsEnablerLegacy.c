@@ -5,16 +5,15 @@
  *
  */
 
-#include "libsaio.h"
+#include "saio_internal.h"
 #include "bootstruct.h"
-#include "boot.h"
-#include "pci.h"
+#include "../modules/GraphicsEnablerLegacy/pci_old.h"
 #include "nvidia.h"
 #include "ati.h"
 #include "gma.h"
 #include "modules.h"
 
-
+#define kGraphicsEnabler	"GraphicsEnabler"
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
@@ -32,7 +31,7 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	
 	char *devicepath = get_pci_dev_path(current);
 
-	bool do_gfx_devprop = false;
+	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
 
 	if (do_gfx_devprop)
@@ -45,15 +44,11 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 				setup_ati_devprop(current); 
 				break;
 
-			case PCI_VENDOR_ID_INTEL: // AutoResolution
+			case PCI_VENDOR_ID_INTEL:
 				verbose("Intel Graphics Controller [%04x:%04x] :: %s \n",
 						current->vendor_id, current->device_id, devicepath);
 				setup_gma_devprop(current);
 				break;
-				//message to be removed once support for these cards is added 
-				//verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-				//		current->vendor_id, current->device_id, devicepath);
-				//break;
 
 			case PCI_VENDOR_ID_NVIDIA: 
 				setup_nvidia_devprop(current);

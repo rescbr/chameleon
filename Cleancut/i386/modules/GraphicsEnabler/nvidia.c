@@ -48,8 +48,6 @@
  * SOFTWARE.
  */
 
-#include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -65,6 +63,9 @@
 #else
 #define DBG(x...)
 #endif
+
+#define kUseNvidiaROM		"UseNvidiaROM"
+#define kVBIOS				"VBIOS"
 
 #define NVIDIA_ROM_SIZE 0x10000
 #define PATCH_ROM_SUCCESS 1

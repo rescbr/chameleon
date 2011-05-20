@@ -5,15 +5,15 @@
  *
  */
 
-
-#include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
-
 #include "ati_reg.h"
+
+#define kUseAtiROM			"UseAtiROM"
+#define kAtiConfig			"AtiConfig"
+#define kATYbinimage		"ATYbinimage"
 
 #define	OFFSET_TO_GET_ATOMBIOS_STRINGS_START		0x6e
 

@@ -5,12 +5,13 @@
  *
  */
 
-#include "libsaio.h"
+#include "saio_internal.h"
 #include "bootstruct.h"
-#include "boot.h"
 #include "pci.h"
 #include "nvidia.h"
 #include "modules.h"
+
+#define kGraphicsEnabler	"GraphicsEnabler"
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev); //Azi: move to header ??
 
@@ -30,7 +31,7 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	
 	char *devicepath = get_pci_dev_path(current);
 
-	bool do_gfx_devprop = false;
+	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
 
 	if (do_gfx_devprop)
