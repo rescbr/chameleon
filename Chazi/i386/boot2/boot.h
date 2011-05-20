@@ -144,6 +144,7 @@
 #define kEHCIhardKey		 "EHCIhard"			 // usb.c				getBoolFK				- ??
 #define kUHCIresetKey		 "UHCIreset"		 // usb.c				getBoolFK
 #define kLegacyOffKey		 "USBLegacyOff"		 // usb.c				getBoolFK
+#define kBusRatioKey		 "busratio"			 // cpu.c				getValFK
 
 /*
  * Flags to the booter and/or kernel - these end with "Flag".

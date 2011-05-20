@@ -101,6 +101,10 @@
 #define kDefaultiMacNehalem							"iMac11,1"
 #define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0802091538"
 #define kDefaultiMacNehalemBoardProduct				"Mac-F2268DAE"
+// defaults for an iMac12,1
+#define kDefaultiMacSandy							"iMac12,1"
+#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B00.1102091756"
+#define kDefaultiMacSandyBoardProduct				"Mac-F2268DAE" // find value ??
 
 // defaults for a Mac Pro
 #define kDefaultMacProFamily						"MacPro"
@@ -346,6 +350,13 @@ void setDefaultSMBData(void)
 								defaultBaseBoard.product		= kDefaultiMacNehalemBoardProduct;
 								break;
 
+							case CPU_MODEL_SANDY:
+							case CPU_MODEL_SANDY_XEON:
+								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
+								defaultSystemInfo.productName	= kDefaultiMacSandy;
+								defaultSystemInfo.family		= kDefaultiMacFamily;
+								defaultBaseBoard.product		= kDefaultiMacSandyBoardProduct; // ??
+								break;
 							case CPU_MODEL_NEHALEM: 
 							case CPU_MODEL_NEHALEM_EX:
 								defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
@@ -385,7 +396,7 @@ void setDefaultSMBData(void)
 	}
 }
 
-/* Used for SM*_N smbios.plist keys */
+/* Used for SM*n smbios.plist keys */
 bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, const char **string, returnType *value)
 {
 	static int idx = -1;

@@ -36,7 +36,9 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_FIELDS		0x1E					// Lynnfield, Clarksfield, Jasper
 #define CPU_MODEL_DALES			0x1F					// Havendale, Auburndale
 #define CPU_MODEL_DALES_32NM	0x25					// Clarkdale, Arrandale
+#define CPU_MODEL_SANDY			0x2a					// Sandy bridge
 #define CPU_MODEL_WESTMERE		0x2C					// Gulftown, Westmere-EP, Westmere-WS
+#define CPU_MODEL_SANDY_XEON	0x2D
 #define CPU_MODEL_NEHALEM_EX	0x2E
 #define CPU_MODEL_WESTMERE_EX	0x2F
 
@@ -127,6 +129,8 @@ typedef struct _PlatformInfo_t
 		uint64_t				TSCFrequency;			// TSC Frequency Hz
 		uint64_t				FSBFrequency;			// FSB Frequency Hz
 		uint64_t				CPUFrequency;			// CPU Frequency Hz
+		uint32_t				MaxRatio;				// Max Bus Ratio
+		uint32_t				MinRatio;				// Min Bus Ratio
 		char					BrandString[48];		// 48 Byte Branding String
 		uint32_t				CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 	} CPU;
