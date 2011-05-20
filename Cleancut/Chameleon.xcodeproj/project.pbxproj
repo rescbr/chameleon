@@ -14,6 +14,7 @@
 		0172D0DC11FB66820030222E /* dram_controllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dram_controllers.h; sourceTree = "<group>"; };
 		0172D0DD11FB66820030222E /* dram_controllers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dram_controllers.c; sourceTree = "<group>"; };
 		019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
+		032B502713863A8A00CA6C31 /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		0389368D137D4A74004AD9DC /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
 		0389368E137D4A74004AD9DC /* ati_reg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati_reg.h; sourceTree = "<group>"; };
 		0389368F137D4A74004AD9DC /* GraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsEnabler.c; sourceTree = "<group>"; };
@@ -180,7 +181,6 @@
 		03893738137D4A75004AD9DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		03893739137D4A75004AD9DC /* Resolution.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Resolution.c; sourceTree = "<group>"; };
 		0389373A137D4A75004AD9DC /* shortatombios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shortatombios.h; sourceTree = "<group>"; };
-		0389373B137D4A75004AD9DC /* TODO_GraphicsEnabler */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO_GraphicsEnabler; sourceTree = "<group>"; };
 		0389373D137D4A75004AD9DC /* abi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = abi.cpp; sourceTree = "<group>"; };
 		0389373E137D4A75004AD9DC /* algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
 		0389373F137D4A75004AD9DC /* associative_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = associative_base.cpp; sourceTree = "<group>"; };
@@ -567,6 +567,7 @@
 		0389368B137D4A74004AD9DC /* modules */ = {
 			isa = PBXGroup;
 			children = (
+				032B502713863A8A00CA6C31 /* TODO */,
 				0389368C137D4A74004AD9DC /* GraphicsEnabler */,
 				03893693137D4A74004AD9DC /* GraphicsEnablerLegacy */,
 				0389369D137D4A74004AD9DC /* HelloWorld */,
@@ -577,7 +578,6 @@
 				038936EE137D4A74004AD9DC /* module_includes */,
 				03893731137D4A75004AD9DC /* Modules.txt */,
 				03893732137D4A75004AD9DC /* Resolution */,
-				0389373B137D4A75004AD9DC /* TODO_GraphicsEnabler */,
 				0389373C137D4A75004AD9DC /* uClibc++ */,
 			);
 			path = modules;
