@@ -325,30 +325,29 @@ void setDefaultSMBData(void)
 					{
 						switch (Platform.CPU.Model)
 						{
-							case CPU_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
-							case CPU_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
-							case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-							case 0x19:					// Intel Core i5 650 @3.20 Ghz 
+							case CPU_MODEL_FIELDS:				// Intel Core i5, i7 LGA1156 (45nm)
+							case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+							case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
 
-							case CPU_MODEL_SANDY:
-                            case CPU_MODEL_SANDY_XEON:
+							case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 (32nm)
+                            case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
 								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
-							case CPU_MODEL_NEHALEM: 
-							case CPU_MODEL_NEHALEM_EX:
+							case CPU_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
+							case CPU_MODEL_NEHALEM_EX:			// Intel Xeon X7500
 								defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultMacProNehalem;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;
 
-							case CPU_MODEL_WESTMERE: 
-							case CPU_MODEL_WESTMERE_EX:
+							case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA13766 (32nm) 6 Core
+							case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
 								defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;

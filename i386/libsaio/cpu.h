@@ -23,6 +23,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define MSR_TURBO_RATIO_LIMIT	0x1AD
 #define	MSR_PLATFORM_INFO		0xCE
 #define MSR_CORE_THREAD_COUNT	0x35			// Undocumented
+#define MSR_IA32_PLATFORM_ID	0x17
 
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071

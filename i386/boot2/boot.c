@@ -610,7 +610,7 @@ void common_boot(int biosdev)
             			
             if (checkOSVersion("10.7"))
             {
-                //Lion, dont load kernel if haz cache
+                //Lion, don't load kernel if you have cache
                 if (!trycache) {
             		verbose("Loading kernel %s\n", bootFileSpec);
             		ret = LoadThinFatFile(bootFileSpec, &binary);
@@ -622,7 +622,7 @@ void common_boot(int biosdev)
 				else ret = 1;
             } 
 			else {
-                //Snow leopard or older
+                //Snow Leopard or older
                 verbose("Loading kernel %s\n", bootFileSpec);
                 ret = LoadThinFatFile(bootFileSpec, &binary);
                 if (ret <= 0 && archCpuType == CPU_TYPE_X86_64) {

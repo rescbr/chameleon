@@ -40,23 +40,25 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case 0x0D:					// ?
-					case CPU_MODEL_YONAH:		// Yonah		0x0E
-					case CPU_MODEL_MEROM:		// Merom		0x0F
-					case CPU_MODEL_PENRYN:		// Penryn		0x17
-					case CPU_MODEL_ATOM:		// Atom 45nm	0x1C
+					case CPU_MODEL_YONAH:			// Intel Mobile Core Solo, Duo
+					case CPU_MODEL_MEROM:			// Intel Mobile Core 2 Solo, Duo
+					case CPU_MODEL_PENRYN:			// Intel Core 2 Solo, Duo, Quad, Extreme
+					case CPU_MODEL_ATOM:			// Intel Atom (45nm)
 						return false;
 
-					case 0x19:					// Intel Core i5 650 @3.20 Ghz
-					case CPU_MODEL_SANDY:		// Intel Core i5, i7 LGA1155 sandy bridge
-                    case CPU_MODEL_SANDY_XEON:    
-					case CPU_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
-					case CPU_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
-					case CPU_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm)
-					case CPU_MODEL_WESTMERE:	// Intel Core i7 LGA1366 (32nm) 6 Core
-					case CPU_MODEL_NEHALEM_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
-					case CPU_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPU_MODEL_FIELDS:			// Intel Core i5, i7 LGA1156 (45nm)
+					case CPU_MODEL_DALES:
+					case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+						value->word = 4800;				// Temp fix to return a sane value like Apple does
+						return true;					// Since there is no QPI on this CPU family, only DMI
+					case CPU_MODEL_SANDY:			// Intel Core i3, i5, i7 LGA1155 (32nm)
+                    case CPU_MODEL_SANDY_XEON:
+						value->word = 5000;				// Temp fix to return a sane value 
+						return true;					// Since there is no QPI on this CPU family, only DMI
+					case CPU_MODEL_NEHALEM:			// Intel Core i7 LGA1366 (45nm)
+					case CPU_MODEL_WESTMERE:		// Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X7500
+					case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
@@ -129,54 +131,54 @@ bool getSMBOemProcessorType(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case 0x0D:							// ?
-					case CPU_MODEL_YONAH:				// Yonah
-					case CPU_MODEL_MEROM:				// Merom
-					case CPU_MODEL_PENRYN:				// Penryn
+					case CPU_MODEL_YONAH:				// Intel Mobile Core Solo, Duo
+					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo
+					case CPU_MODEL_PENRYN:				// Intel Core 2 Solo, Duo, Quad, Extreme
 					case CPU_MODEL_ATOM:				// Intel Atom (45nm)
 						return true;
 
-					case CPU_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
+					case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;			// Xeon 
+							value->word = 0x0501;		// Xeon 
 						else
-							value->word = 0x0701;			// Core i7
-
+							value->word = 0x0701;		// Core i7
 						return true;
 
-					case CPU_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper
+					case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+							value->word = 0x0501;		// Xeon 
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-							value->word = 0x601;		// Core i5
+							value->word = 0x0601;		// Core i5
 						else
 							value->word = 0x0701;		// Core i7
 						return true;
 
 					case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-							value->word = 0x601;		// Core i5
+							value->word = 0x0601;		// Core i5
 						else
 							value->word = 0x0701;		// Core i7
 						return true;
 
-					case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 sandy bridge
-                    case CPU_MODEL_SANDY_XEON:
+					case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
-							value->word = 0x901;		// Core i3
+							value->word = 0x0901;		// Core i3
 						else
 							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x601;	// Core i5
+								value->word = 0x0601;	// Core i5
 							else
 								value->word = 0x0701;	// Core i7
 						return true;
 
-					case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
-					case CPU_MODEL_WESTMERE_EX:			// Intel Core i7 LGA1366 (45nm) 6 Core ???
-						value->word = 0x0501;			// Core i7
+					case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+							value->word = 0x0501;		// Xeon 					
 						return true;
-
-					case 0x19:							// Intel Core i5 650 @3.20 Ghz
-						value->word = 0x601;			// Core i5
+						
+					case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
+						value->word = 0x0501;			// Xeon
 						return true;
 				}
 			}
