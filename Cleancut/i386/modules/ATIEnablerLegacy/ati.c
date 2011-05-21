@@ -21,7 +21,7 @@
  */
 
 #include "bootstruct.h"
-#include "../modules/GraphicsEnablerLegacy/pci_old.h"
+#include "../modules/ATIEnablerLegacy/pci_old.h"
 #include "platform.h"
 #include "device_inject.h"
 #include "ati.h"
@@ -36,8 +36,8 @@
 #define DBG(x...)
 #endif
 
-#define kUseAtiROM			"UseAtiROM"
-	
+#define kUseAtiROMKey		"UseAtiROM"
+
 #define MAX_NUM_DCB_ENTRIES 16
 
 #define TYPE_GROUPED 0xff
@@ -112,6 +112,7 @@ struct pcir_s {
 // Known cards as of 2008/08/26
 static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x00000000, "Unknown" } ,
+//	{ 0x10027181,  "ATI Radeon 1300 Series"}  ,
 	{ 0x10029589,  "ATI Radeon 2600 Series"}  ,
 	{ 0x10029588,  "ATI Radeon 2600 Series"}  ,
 	{ 0x100294C3,  "ATI Radeon 2400 Series"}  ,
@@ -178,7 +179,7 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 
 static struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x00000000,  "Megalodon" },
-//	{ 0x00000000,  "Caretta" },
+//	{ 0x10027181,  "Caretta" },
 	{ 0x10029589,  "Lamna"}  ,
 	{ 0x10029588,  "Lamna"}  ,
 	{ 0x100294C3,  "Iago"}  ,
@@ -322,7 +323,7 @@ static uint8_t *readAtomBIOS(pci_dt_t *ati_dev)
 	return (uint8_t *)BIOSBase;
 }
 
-#define R5XX_CONFIG_MEMSIZE	0x00F8
+#define R5XX_CONFIG_MEMSIZE	0x00F8 //Azi:---
 #define R6XX_CONFIG_MEMSIZE	0x5428
 
 uint32_t getvramsizekb(pci_dt_t *ati_dev)
@@ -403,9 +404,9 @@ static uint32_t load_ati_bios_file(const char *filename, uint8_t *buf, int bufsi
 
 static char *get_ati_model(uint32_t id)
 {
-	int	i;
-
-	for (i=0; i< (sizeof(ATIKnownChipsets) / sizeof(ATIKnownChipsets[0])); i++) {
+	int i;
+	
+	for (i = 0; i < (sizeof(ATIKnownChipsets) / sizeof(ATIKnownChipsets[0])); i++) {
 		if (ATIKnownChipsets[i].device == id) {
 			return ATIKnownChipsets[i].name;
 		}
@@ -416,8 +417,8 @@ static char *get_ati_model(uint32_t id)
 static char *get_ati_fb(uint32_t id)
 {
 	int	i;
-
-	for (i=0; i< (sizeof(ATIKnownFramebuffers) / sizeof(ATIKnownFramebuffers[0])); i++) {
+	
+	for (i = 0; i < (sizeof(ATIKnownFramebuffers) / sizeof(ATIKnownFramebuffers[0])); i++) {
 		if (ATIKnownFramebuffers[i].device == id) {
 			return ATIKnownFramebuffers[i].name;
 		}
@@ -712,7 +713,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(device, (char *) ati_name_1[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
 	sprintf(tmp, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
-	if (getBoolForKey(kUseAtiROM, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kUseAtiROMKey, &doit, &bootInfo->bootConfig) && doit) {
 		verbose("looking for ati video bios file %s\n", tmp);
 		rom = malloc(0x20000);
 		rom_size = load_ati_bios_file(tmp, rom, 0x20000);

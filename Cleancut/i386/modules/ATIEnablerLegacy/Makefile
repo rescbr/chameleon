@@ -1,4 +1,4 @@
-MODULE_NAME = GraphicsEnablerLegacy
+MODULE_NAME = ATIEnablerLegacy
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
@@ -6,7 +6,7 @@ MODULE_DEPENDENCIES =
 
 DIR = GraphicsEnabler
 
-MODULE_OBJS = nvidia.o ati.o gma.o GraphicsEnablerLegacy.o
+MODULE_OBJS = ati.o ATIEnablerLegacy.o
 
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
@@ -35,7 +35,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: dylib
+all embedtheme: dylib
 
 
 include ../MakeInc.dir

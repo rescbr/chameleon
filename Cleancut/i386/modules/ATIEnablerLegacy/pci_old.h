@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef __LIBSAIO_PCI_H
-#define __LIBSAIO_PCI_H
+#ifndef __PCI_OLD_H
+#define __PCI_OLD_H
 
 typedef struct {
 	uint32_t		:2;
@@ -900,4 +900,4 @@ struct pci_rom_bios_t {
 #define PCI_VENDOR_ID_TEXAS_INSTRUMENTS	0x104c
 #define PCI_VENDOR_ID_VIA				0x1106
 
-#endif /* !__LIBSAIO_PCI_H */
+#endif /* !__PCI_OLD_H */
