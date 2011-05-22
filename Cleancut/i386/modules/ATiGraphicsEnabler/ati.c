@@ -21,7 +21,7 @@
  */
 
 #include "bootstruct.h"
-#include "../modules/ATIEnablerLegacy/pci_old.h"
+#include "../modules/ATiGraphicsEnabler/pci_old.h"
 #include "platform.h"
 #include "device_inject.h"
 #include "ati.h"

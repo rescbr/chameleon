@@ -1,7 +1,8 @@
 #	Makefile for i386 modules
 
 # The order of building is important.
-SUBDIRS = klibc uClibc++ Resolution GraphicsEnabler ATIEnablerLegacy
+SUBDIRS = klibc uClibc++ Resolution \
+		  ATiGraphicsEnabler AMDGraphicsEnabler NVIDIAGraphicsEnabler IntelGraphicsEnabler
 #SUBDIRS = klibc uClibc++ Resolution HelloWorld
 
 

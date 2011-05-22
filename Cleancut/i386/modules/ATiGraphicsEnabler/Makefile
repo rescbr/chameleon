@@ -1,12 +1,12 @@
-MODULE_NAME = GraphicsEnabler
+MODULE_NAME = ATiGraphicsEnabler
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = GraphicsEnabler
+DIR = Enabler/ATiGraphicsEnabler
 
-MODULE_OBJS = nvidia.o ati.o GraphicsEnabler.o
+MODULE_OBJS = ati.o ATiGraphicsEnabler.o
 
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
@@ -35,7 +35,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme optionrom: dylib
+all embedtheme: dylib
 
 
 include ../MakeInc.dir

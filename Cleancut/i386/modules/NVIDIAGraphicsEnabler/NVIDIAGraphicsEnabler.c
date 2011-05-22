@@ -7,20 +7,21 @@
 
 #include "saio_internal.h"
 #include "bootstruct.h"
-#include "../modules/ATIEnablerLegacy/pci_old.h"
-#include "ati.h"
+#include "pci.h"
+#include "nvidia.h"
 #include "modules.h"
 
 
-#define kGraphicsEnablerKey		"GraphicsEnabler" // change?
+#define kGraphicsEnablerKey	"GraphicsEnabler"
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 
 
-void ATIEnablerLegacy_start()
+void NVIDIAGraphicsEnabler_start()
 {
 	register_hook_callback("PCIDevice", &GraphicsEnabler_hook);
 }
+
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
@@ -33,13 +34,13 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
 	
-	//Azi: ati.c doesn't seem to have "fail" code... check better!***
-	if (do_gfx_devprop && (current->vendor_id == PCI_VENDOR_ID_ATI))
+	//Azi: check "fail" code...
+	if (do_gfx_devprop && (current->vendor_id == PCI_VENDOR_ID_NVIDIA))
 	{
-		verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
+		verbose("NVIDIA VGA Controller [%04x:%04x] :: %s \n",
 				current->vendor_id, current->device_id, devicepath);
-		setup_ati_devprop(current);
+		setup_nvidia_devprop(current); // ---
 	}
 	else
-		verbose("Not an ATI card...??\n");
+		verbose("Not a NVIDIA VGA Controller.\n"); // ---
 }
