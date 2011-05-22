@@ -148,8 +148,8 @@ typedef struct {
 	char			**defaultValue;
 } SMBValueSetter;
 
-SMBValueSetter SMBSetters[] =                           
-{                                                           
+SMBValueSetter SMBSetters[] = 
+{
 	//-------------------------------------------------------------------------------------------------------------------------
 	// BIOSInformation
 	//-------------------------------------------------------------------------------------------------------------------------
@@ -193,13 +193,13 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, product),				kSMBBaseBoardProductKey,		
 		NULL,	&defaultBaseBoard.product		},
 
-    {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, version),				NULL,	NULL,	NULL},
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, version),				NULL,	NULL,	NULL},
 
-    {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, serialNumber),			NULL,	NULL,	NULL},
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, serialNumber),			NULL,	NULL,	NULL},
 
-    {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),		NULL,	NULL,	NULL},
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),		NULL,	NULL,	NULL},
 
-    {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),	NULL,	NULL,	NULL},
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),	NULL,	NULL,	NULL},
 
 
 	//-------------------------------------------------------------------------------------------------------------------------
@@ -335,7 +335,7 @@ void setDefaultSMBData(void)
 								break;
 
 							case CPU_MODEL_SANDY:
-                            case CPU_MODEL_SANDY_XEON:
+							case CPU_MODEL_SANDY_XEON:
 								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
@@ -540,6 +540,28 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
 
+	switch (Platform.CPU.Family) 
+	{
+		case 0x06:
+		{
+			switch (Platform.CPU.Model)
+			{
+				case 0x19:					// Intel Core i5 650 @3.20 Ghz
+				case CPU_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
+				case CPU_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
+				case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm)
+				case CPU_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
+				case CPU_MODEL_NEHALEM_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+				case CPU_MODEL_WESTMERE:	// Intel Core i7 LGA1366 (32nm) 6 Core
+				case CPU_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					break;
+
+				default:
+					return;
+			}
+		}
+	}
+
 	p->header.type		= kSMBTypeOemProcessorBusSpeed;
 	p->header.length	= sizeof(SMBOemProcessorBusSpeed);
 	p->header.handle	= handle++;
@@ -584,6 +606,8 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	for (i = 0; i < numOfSetters; i++)
 		if (structPtr->orig->type == SMBSetters[i].type)
 		{
+			if (SMBSetters[i].fieldOffset > structPtr->orig->length)
+				continue;
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
@@ -614,7 +638,7 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 
 	tableLength += structSize;
 
-	if (structSize >  maxStructSize)
+	if (structSize > maxStructSize)
 		maxStructSize = structSize;
 
 	structureCount++;
@@ -769,9 +793,9 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 
 			case kSMBTypeMemoryDevice:
 				Platform.DMI.CntMemorySlots++;
-        		if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
+				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
 					Platform.DMI.MemoryModules++;
-        		if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
+				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
 					Platform.RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
 				dimmnbr++;
 				break;
