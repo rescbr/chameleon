@@ -40,12 +40,12 @@ typedef struct moduleHook_t
 	struct moduleHook_t* next;
 } moduleHook_t;
 
-typedef struct modulesList_t
+typedef struct moduleList_t //Azi: modules or module? see modules/include/modules
 {
 	char*					name;
 //	UInt32					version;
 //	UInt32					compat;
-	struct modulesList_t* next;
+	struct moduleList_t*	next;
 } moduleList_t;
 
 
