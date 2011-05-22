@@ -1,12 +1,13 @@
 #	Makefile for i386 modules
 
 # The order of building is important.
-SUBDIRS = klibc uClibc++ GraphicsEnablerLegacy KernelPatcher Memory HPET
+SUBDIRS = klibc uClibc++ KernelPatcher Memory HPET \
+		  ATiGraphicsEnabler AMDGraphicsEnabler NVIDIAGraphicsEnabler IntelGraphicsEnabler
 #SUBDIRS = HelloWorld
 #	-	-  Resolution (only tested on Meklort's branch, never did any good for my resolution;
-#						conflicts with AutoResolution)
+#						conflicts with AutoResolution - fix! )
 
-#	-	-  GraphicsEnabler (no support for ATI legacy cards, e.g. 1000 series)
+#	-	-  AMDGraphicsEnabler (no support for ATI legacy cards, e.g. 1000 series)
 #		testing = http://www.insanelymac.com/forum/index.php?s=&showtopic=231075&view=findpost&p=1683785
 
 #	-	-  Memory ("Attempting to execute hook ScanMemory"
