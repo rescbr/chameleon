@@ -14,20 +14,6 @@
 		0172D0DC11FB66820030222E /* dram_controllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dram_controllers.h; sourceTree = "<group>"; };
 		0172D0DD11FB66820030222E /* dram_controllers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dram_controllers.c; sourceTree = "<group>"; };
 		019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
-		0389368D137D4A74004AD9DC /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
-		0389368E137D4A74004AD9DC /* ati_reg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati_reg.h; sourceTree = "<group>"; };
-		0389368F137D4A74004AD9DC /* GraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsEnabler.c; sourceTree = "<group>"; };
-		03893690137D4A74004AD9DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		03893691137D4A74004AD9DC /* nvidia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
-		03893692137D4A74004AD9DC /* nvidia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
-		03893694137D4A74004AD9DC /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
-		03893695137D4A74004AD9DC /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
-		03893696137D4A74004AD9DC /* gma.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
-		03893697137D4A74004AD9DC /* gma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
-		03893698137D4A74004AD9DC /* GraphicsEnablerLegacy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GraphicsEnablerLegacy.c; sourceTree = "<group>"; };
-		03893699137D4A74004AD9DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		0389369A137D4A74004AD9DC /* nvidia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
-		0389369B137D4A74004AD9DC /* nvidia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
 		0389369E137D4A74004AD9DC /* HelloWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HelloWorld.cpp; sourceTree = "<group>"; };
 		038936A0137D4A74004AD9DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		038936A2137D4A74004AD9DC /* modules */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = modules; sourceTree = "<group>"; };
@@ -290,7 +276,27 @@
 		038937AA137D4A75004AD9DC /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
 		038937AB137D4A75004AD9DC /* valarray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = valarray.cpp; sourceTree = "<group>"; };
 		038937AC137D4A75004AD9DC /* vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector.cpp; sourceTree = "<group>"; };
-		03C3ED6F138688BD002C3F2E /* pci_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pci_old.h; sourceTree = "<group>"; };
+		03DA89351389338300B43B35 /* AMDGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AMDGraphicsEnabler.c; sourceTree = "<group>"; };
+		03DA89361389338300B43B35 /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
+		03DA89371389338300B43B35 /* ati_reg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati_reg.h; sourceTree = "<group>"; };
+		03DA89381389338300B43B35 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		03DA89391389338300B43B35 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
+		03DA893B1389338300B43B35 /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
+		03DA893C1389338300B43B35 /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
+		03DA893D1389338300B43B35 /* ATiGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ATiGraphicsEnabler.c; sourceTree = "<group>"; };
+		03DA893E1389338300B43B35 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		03DA893F1389338300B43B35 /* pci_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pci_old.h; sourceTree = "<group>"; };
+		03DA89401389338300B43B35 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
+		03DA89421389338300B43B35 /* gma.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
+		03DA89431389338300B43B35 /* gma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
+		03DA89441389338300B43B35 /* IntelGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IntelGraphicsEnabler.c; sourceTree = "<group>"; };
+		03DA89451389338300B43B35 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		03DA89461389338300B43B35 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
+		03DA89481389338300B43B35 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		03DA89491389338300B43B35 /* nvidia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
+		03DA894A1389338300B43B35 /* nvidia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
+		03DA894B1389338300B43B35 /* NVIDIAGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NVIDIAGraphicsEnabler.c; sourceTree = "<group>"; };
+		03DA894C1389338300B43B35 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
 		1D145307137073F40050C0CD /* bootargs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
 		1D2A1AF513743A2600787720 /* bootargs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
 		65ED53931204B83200B22507 /* disk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disk.h; sourceTree = "<group>"; };
@@ -566,8 +572,10 @@
 		0389368B137D4A74004AD9DC /* modules */ = {
 			isa = PBXGroup;
 			children = (
-				0389368C137D4A74004AD9DC /* GraphicsEnabler */,
-				03893693137D4A74004AD9DC /* GraphicsEnablerLegacy */,
+				03DA89341389338300B43B35 /* AMDGraphicsEnabler */,
+				03DA893A1389338300B43B35 /* ATiGraphicsEnabler */,
+				03DA89411389338300B43B35 /* IntelGraphicsEnabler */,
+				03DA89471389338300B43B35 /* NVIDIAGraphicsEnabler */,
 				0389369D137D4A74004AD9DC /* HelloWorld */,
 				038936A1137D4A74004AD9DC /* include */,
 				038936A4137D4A74004AD9DC /* klibc */,
@@ -579,35 +587,6 @@
 				0389373C137D4A75004AD9DC /* uClibc++ */,
 			);
 			path = modules;
-			sourceTree = "<group>";
-		};
-		0389368C137D4A74004AD9DC /* GraphicsEnabler */ = {
-			isa = PBXGroup;
-			children = (
-				0389368D137D4A74004AD9DC /* ati.c */,
-				0389368E137D4A74004AD9DC /* ati_reg.h */,
-				0389368F137D4A74004AD9DC /* GraphicsEnabler.c */,
-				03893690137D4A74004AD9DC /* Makefile */,
-				03893691137D4A74004AD9DC /* nvidia.c */,
-				03893692137D4A74004AD9DC /* nvidia.h */,
-			);
-			path = GraphicsEnabler;
-			sourceTree = "<group>";
-		};
-		03893693137D4A74004AD9DC /* GraphicsEnablerLegacy */ = {
-			isa = PBXGroup;
-			children = (
-				03C3ED6F138688BD002C3F2E /* pci_old.h */,
-				03893694137D4A74004AD9DC /* ati.c */,
-				03893695137D4A74004AD9DC /* ati.h */,
-				03893696137D4A74004AD9DC /* gma.c */,
-				03893697137D4A74004AD9DC /* gma.h */,
-				03893698137D4A74004AD9DC /* GraphicsEnablerLegacy.c */,
-				03893699137D4A74004AD9DC /* Makefile */,
-				0389369A137D4A74004AD9DC /* nvidia.c */,
-				0389369B137D4A74004AD9DC /* nvidia.h */,
-			);
-			path = GraphicsEnablerLegacy;
 			sourceTree = "<group>";
 		};
 		0389369D137D4A74004AD9DC /* HelloWorld */ = {
@@ -933,6 +912,55 @@
 				0389378E137D4A75004AD9DC /* vector */,
 			);
 			path = include;
+			sourceTree = "<group>";
+		};
+		03DA89341389338300B43B35 /* AMDGraphicsEnabler */ = {
+			isa = PBXGroup;
+			children = (
+				03DA89351389338300B43B35 /* AMDGraphicsEnabler.c */,
+				03DA89361389338300B43B35 /* ati.c */,
+				03DA89371389338300B43B35 /* ati_reg.h */,
+				03DA89381389338300B43B35 /* Makefile */,
+				03DA89391389338300B43B35 /* Readme.txt */,
+			);
+			path = AMDGraphicsEnabler;
+			sourceTree = "<group>";
+		};
+		03DA893A1389338300B43B35 /* ATiGraphicsEnabler */ = {
+			isa = PBXGroup;
+			children = (
+				03DA893B1389338300B43B35 /* ati.c */,
+				03DA893C1389338300B43B35 /* ati.h */,
+				03DA893D1389338300B43B35 /* ATiGraphicsEnabler.c */,
+				03DA893E1389338300B43B35 /* Makefile */,
+				03DA893F1389338300B43B35 /* pci_old.h */,
+				03DA89401389338300B43B35 /* Readme.txt */,
+			);
+			path = ATiGraphicsEnabler;
+			sourceTree = "<group>";
+		};
+		03DA89411389338300B43B35 /* IntelGraphicsEnabler */ = {
+			isa = PBXGroup;
+			children = (
+				03DA89421389338300B43B35 /* gma.c */,
+				03DA89431389338300B43B35 /* gma.h */,
+				03DA89441389338300B43B35 /* IntelGraphicsEnabler.c */,
+				03DA89451389338300B43B35 /* Makefile */,
+				03DA89461389338300B43B35 /* Readme.txt */,
+			);
+			path = IntelGraphicsEnabler;
+			sourceTree = "<group>";
+		};
+		03DA89471389338300B43B35 /* NVIDIAGraphicsEnabler */ = {
+			isa = PBXGroup;
+			children = (
+				03DA89481389338300B43B35 /* Makefile */,
+				03DA89491389338300B43B35 /* nvidia.c */,
+				03DA894A1389338300B43B35 /* nvidia.h */,
+				03DA894B1389338300B43B35 /* NVIDIAGraphicsEnabler.c */,
+				03DA894C1389338300B43B35 /* Readme.txt */,
+			);
+			path = NVIDIAGraphicsEnabler;
 			sourceTree = "<group>";
 		};
 		08FB7794FE84155DC02AAC07 /* Chameleon */ = {
