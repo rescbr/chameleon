@@ -7,7 +7,7 @@
 
 #include "saio_internal.h"
 #include "bootstruct.h"
-#include "../modules/ATiGraphicsEnabler/pci_old.h"
+#include "pci.h"
 #include "ati.h"
 #include "modules.h"
 
@@ -34,7 +34,7 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
 	
-	//Azi: check "fail" code...
+	// AMD ?? i don't find any vga 1022 vendor!.. thou ATI isn't used anymore!
 	if (do_gfx_devprop && (current->vendor_id == PCI_VENDOR_ID_ATI))
 	{
 		verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
@@ -42,5 +42,6 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		setup_ati_devprop(current);
 	}
 	else
-		verbose("Not a ATI VGA Controller.\n"); // ---
+		verbose("[%04x:%04x] :: %s, is not a AMD/ATI VGA Controller.\n",// amd ??
+				current->vendor_id, current->device_id, devicepath);
 }

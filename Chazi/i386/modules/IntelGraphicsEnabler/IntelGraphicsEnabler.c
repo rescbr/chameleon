@@ -34,7 +34,6 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
 	
-	//Azi: check "fail" code...
 	if (do_gfx_devprop && (current->vendor_id == PCI_VENDOR_ID_INTEL))
 	{	
 		verbose("Intel VGA Controller [%04x:%04x] :: %s \n",
@@ -42,5 +41,6 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		setup_gma_devprop(current);
 	}
 	else
-		verbose("Not a Intel VGA Controller.\n"); // ---
+		verbose("[%04x:%04x] :: %s, is not a Intel VGA Controller.\n",
+				current->vendor_id, current->device_id, devicepath);
 }

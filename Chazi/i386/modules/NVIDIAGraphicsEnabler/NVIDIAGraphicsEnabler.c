@@ -34,13 +34,13 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	bool do_gfx_devprop = true;
 	getBoolForKey(kGraphicsEnablerKey, &do_gfx_devprop, &bootInfo->bootConfig);
 	
-	//Azi: check "fail" code...
 	if (do_gfx_devprop && (current->vendor_id == PCI_VENDOR_ID_NVIDIA))
 	{
 		verbose("NVIDIA VGA Controller [%04x:%04x] :: %s \n",
 				current->vendor_id, current->device_id, devicepath);
-		setup_nvidia_devprop(current); // ---
+		setup_nvidia_devprop(current);
 	}
 	else
-		verbose("Not a NVIDIA VGA Controller.\n"); // ---
+		verbose("[%04x:%04x] :: %s, is not a NVIDIA VGA Controller.\n",
+				current->vendor_id, current->device_id, devicepath);
 }

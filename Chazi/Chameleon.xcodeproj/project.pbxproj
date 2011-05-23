@@ -232,7 +232,6 @@
 		03DA89011389323F00B43B35 /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
 		03DA89021389323F00B43B35 /* ATiGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ATiGraphicsEnabler.c; sourceTree = "<group>"; };
 		03DA89031389323F00B43B35 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		03DA89041389323F00B43B35 /* pci_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pci_old.h; sourceTree = "<group>"; };
 		03DA89051389323F00B43B35 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
 		03DA89071389323F00B43B35 /* gma.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
 		03DA89081389323F00B43B35 /* gma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
@@ -841,7 +840,6 @@
 				03DA89011389323F00B43B35 /* ati.h */,
 				03DA89021389323F00B43B35 /* ATiGraphicsEnabler.c */,
 				03DA89031389323F00B43B35 /* Makefile */,
-				03DA89041389323F00B43B35 /* pci_old.h */,
 				03DA89051389323F00B43B35 /* Readme.txt */,
 			);
 			path = ATiGraphicsEnabler;

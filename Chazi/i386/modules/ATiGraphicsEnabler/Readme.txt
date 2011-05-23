@@ -12,5 +12,4 @@ Keys: GraphicsEnabler	(enabled by default)
 
 TODO:
 - naming: ATi or AMD ??
-- eliminate the need for pci_old.h
 - merge with AMDGraphicsEnabler ??

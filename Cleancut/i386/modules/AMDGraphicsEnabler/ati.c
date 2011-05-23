@@ -1221,7 +1221,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 
 	/* ------------------------------------------------- */
 	/* Find a better way to do this (in device_inject.c) */
-	//Azi: tried to fix a malloc error in vain; this is caused by XCode 4 compilation!
+	//Azi: tried to fix a malloc error in vain; this is related to XCode 4 compilation!
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;

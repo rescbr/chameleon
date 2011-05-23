@@ -694,6 +694,7 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 		return 0;
 	if(!DP_ADD_TEMP_VAL(device, nvidia_device_type))
 		return 0;
+	//Azi: reminder ---
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
 	sprintf(tmp, "Slot-%x",devices_number);

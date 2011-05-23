@@ -21,7 +21,7 @@
  */
 
 #include "bootstruct.h"
-#include "../modules/ATiGraphicsEnabler/pci_old.h"
+#include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
 #include "ati.h"
@@ -353,12 +353,12 @@ static bool radeon_card_posted(pci_dt_t *ati_dev)
 	
 	if ((uint8_t)biosimage[0] == 0x55 && (uint8_t)biosimage[1] == 0xaa)
 	{
-		struct  pci_rom_pci_header_t *rom_pci_header;   
-		rom_pci_header = (struct pci_rom_pci_header_t*)(biosimage + (uint8_t)biosimage[24] + (uint8_t)biosimage[25]*256);
+		option_rom_pci_header_t *rom_pci_header;   
+		rom_pci_header = (option_rom_pci_header_t*)(biosimage + (uint8_t)biosimage[24] + (uint8_t)biosimage[25]*256);
 	
     	if (rom_pci_header->signature == 0x52494350)
 		{
-     		if (rom_pci_header->device == ati_dev->device_id)
+     		if (rom_pci_header->device_id == ati_dev->device_id)
 			{
 				return true;
 				printf("Card was POSTed\n");
@@ -622,19 +622,20 @@ static int devprop_add_ati_template(struct DevPropDevice *device)
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	struct DevPropDevice	*device;
-	char			*devicepath;
-	char			*model;
-	char			*framebuffer;
-	char			tmp[64];
-	uint8_t			*rom = NULL;
-	uint32_t		rom_size = 0;
-	uint8_t			*bios;
-	uint32_t		bios_size;
-	uint32_t		vram_size;
-	uint32_t		boot_display;
-	uint8_t			cmd;
-	bool			doit;
-	bool			toFree;
+	char					*devicepath;
+	char					*model;
+	char					*framebuffer;
+	char					 tmp[64];
+	uint8_t					*rom = NULL;
+	uint32_t				 rom_size = 0;
+	option_rom_pci_header_t *rom_pci_header;
+	uint8_t					*bios;
+	uint32_t				 bios_size;
+	uint32_t				 vram_size;
+	uint32_t				 boot_display;
+	uint8_t					 cmd;
+	bool					 doit;
+	bool					 toFree;
 
 	devicepath = get_pci_dev_path(ati_dev);
 
@@ -750,16 +751,14 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		verbose("Found bios image\n");
 		bios_size = bios[2] * 512;
 
-		struct  pci_rom_pci_header_t *rom_pci_header;
-		rom_pci_header = (struct pci_rom_pci_header_t*)(bios + bios[24] + bios[25]*256);
+		rom_pci_header = (option_rom_pci_header_t*)(bios + bios[24] + bios[25]*256);
 
 		if (rom_pci_header->signature == 0x52494350) {
-			if (rom_pci_header->device != ati_dev->device_id) {
-				verbose("Bios image (%x) doesnt match card (%x), ignoring\n", rom_pci_header->device, ati_dev->device_id);
+			if (rom_pci_header->device_id != ati_dev->device_id) {
+				verbose("Bios image (%x) doesnt match card (%x), ignoring\n", rom_pci_header->device_id, ati_dev->device_id);
 			} else {
 				if (toFree)
 				{
-					//Azi: mmio, Memory-mapped I/O - Kabyl's smbios patcher stuff reminder.
 					verbose("Adding binimage to card %x from mmio space with size %x\n", ati_dev->device_id, bios_size);
 				} else {
 					verbose("Adding binimage to card %x from legacy space with size %x\n", ati_dev->device_id, bios_size);
