@@ -249,9 +249,9 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 		}
 	}
 
-//	return false;
-	value->string = NOT_AVAILABLE;
-	return true;
+	return false;
+//	value->string = NOT_AVAILABLE;
+//	return true;
 }
 	
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
@@ -271,9 +271,9 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 		}
 	}
 
-//	return false;
-	value->string = NOT_AVAILABLE;
-	return true;
+	return false;
+//	value->string = NOT_AVAILABLE;
+//	return true;
 }
 
 bool getSMBMemoryDevicePartNumber(returnType *value)
@@ -293,9 +293,9 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 		}
 	}
 
-//	return false;
-	value->string = NOT_AVAILABLE;
-	return true;
+	return false;
+//	value->string = NOT_AVAILABLE;
+//	return true;
 }
 
 

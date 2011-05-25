@@ -105,12 +105,13 @@
 
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 
+#define kDefaultPartition	"Default Partition"	/* sys.c */
+
 #define kUSBBusFix			"USBBusFix"			/* usb.c */
 #define kEHCIacquire		"EHCIacquire"		/* usb.c */
 #define kUHCIreset			"UHCIreset"			/* usb.c */
 #define kLegacyOff			"USBLegacyOff"		/* usb.c */
 #define kEHCIhard			"EHCIhard"			/* usb.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
 
 /*
  * Flags to the booter or kernel
