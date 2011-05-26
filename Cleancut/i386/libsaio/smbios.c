@@ -606,6 +606,8 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	for (i = 0; i < numOfSetters; i++)
 		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length))
 		{
+			if (SMBSetters[i].fieldOffset > structPtr->orig->length)
+				continue;
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}

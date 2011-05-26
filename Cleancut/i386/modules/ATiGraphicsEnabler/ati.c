@@ -20,6 +20,9 @@
  * Alternatively you can choose to comply with APSL
  */
 
+#include "libsa.h"
+#include "saio_internal.h"
+
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
