@@ -30,7 +30,9 @@ void Memory_start()
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	pci_dt_t* current = arg1;
-	if(current->class_id == PCI_CLASS_BRIDGE_HOST)
+	
+	if (current->class_id == PCI_CLASS_BRIDGE_HOST
+		&& (current->dev.addr == PCIADDR(0, 0, 0))
 	{
 		dram_controller_dev = current;
 	}

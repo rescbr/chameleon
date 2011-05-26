@@ -426,7 +426,7 @@ char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
 	if (!field)
-		return (char *)0;
+		return NULL;
 
 	for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
 		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
@@ -449,7 +449,7 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	strSize = strlen(string);
 
 	// remove any spaces found at the end
-	while (string[strSize - 1] == ' ')
+	while ((strSize != 0) && (string[strSize - 1] == ' '))
 		strSize--;
 
 	memcpy((uint8_t *)structHeader + structHeader->length + stringsSize, string, strSize);
@@ -618,10 +618,8 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
 
 	for (i = 0; i < numOfSetters; i++)
-		if (structPtr->orig->type == SMBSetters[i].type)
+		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length))
 		{
-			if (SMBSetters[i].fieldOffset > structPtr->orig->length)
-				continue;
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}

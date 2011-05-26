@@ -57,8 +57,8 @@ static void setup_nhm(pci_dt_t *dram_dev)
 	// First, locate the PCI bus where the MCH is located
 	for(i = 0; i < sizeof(possible_nhm_bus); i++)
 	{
-		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
-		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
+		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_VENDOR_ID);
+		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_DEVICE_ID);
 		vid &= 0xFFFF;
 		did &= 0xFF00;
 		
@@ -91,7 +91,7 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 	{
 		case 0: mch_fsb = 1066; break;
 		case 1: mch_fsb =  533; break;
-	   default: 
+		default: 
 		case 2: mch_fsb =  800; break;
 		case 3: mch_fsb =  667; break;		
 		case 4: mch_fsb = 1333; break;
@@ -489,40 +489,39 @@ static struct mem_controller_t dram_controllers[] = {
 
 	// Default unknown chipset
 	{ 0, 0, "",	NULL, NULL, NULL },
-
+	
 	// Intel
 	{ 0x8086, 0x7190, "VMWare",	NULL, NULL, NULL },
-
+	
 	{ 0x8086, 0x1A30, "i845",	NULL, NULL, NULL },
 	
-	{ 0x8086, 0x2970, "i946PL/GZ",		setup_p35, get_fsb_i965,  get_timings_i965 },
-	{ 0x8086, 0x2990, "Q963/Q965",		setup_p35, get_fsb_i965,  get_timings_i965 },
-	{ 0x8086, 0x29A0, "P965/G965",		setup_p35, get_fsb_i965,  get_timings_i965 },
-
-	{ 0x8086, 0x2A00, "GM965/GL960",	setup_p35, get_fsb_im965, get_timings_im965 },
+	{ 0x8086, 0x2970, "i946PL/GZ",		setup_p35, get_fsb_i965,  get_timings_i965	},
+	{ 0x8086, 0x2990, "Q963/Q965",		setup_p35, get_fsb_i965,  get_timings_i965	},
+	{ 0x8086, 0x29A0, "P965/G965",		setup_p35, get_fsb_i965,  get_timings_i965	},
+	
+	{ 0x8086, 0x2A00, "GM965/GL960",	setup_p35, get_fsb_im965, get_timings_im965	},
 	{ 0x8086, 0x2A10, "GME965/GLE960",	setup_p35, get_fsb_im965, get_timings_im965 },
 	{ 0x8086, 0x2A40, "PM/GM45/47",		setup_p35, get_fsb_im965, get_timings_im965 },	
-
-	{ 0x8086, 0x29B0, "Q35",			setup_p35, get_fsb_i965,  get_timings_p35 },	
-	{ 0x8086, 0x29C0, "P35/G33",		setup_p35, get_fsb_i965,  get_timings_p35 },	
-	{ 0x8086, 0x29D0, "Q33",			setup_p35, get_fsb_i965,  get_timings_p35 },	
-	{ 0x8086, 0x29E0, "X38/X48",		setup_p35, get_fsb_i965,  get_timings_p35 },			
-	{ 0x8086, 0x2E00, "Eaglelake",		setup_p35, get_fsb_i965,  get_timings_p35 },
-	{ 0x8086, 0x2E10, "Q45/Q43",		setup_p35, get_fsb_i965,  get_timings_p35 },	
-	{ 0x8086, 0x2E20, "P45/G45",		setup_p35, get_fsb_i965,  get_timings_p35 },	
-	{ 0x8086, 0x2E30, "G41",			setup_p35, get_fsb_i965,  get_timings_p35 },
 	
-	{ 0x8086, 0xD131, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0xD132, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3400, "NHM IMC",		setup_nhm, get_fsb_nhm,	  get_timings_nhm },
-	{ 0x8086, 0x3401, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3402, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3403, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3404, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3405, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3406, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
-	{ 0x8086, 0x3407, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm },
+	{ 0x8086, 0x29B0, "Q35",			setup_p35, get_fsb_i965,  get_timings_p35	},	
+	{ 0x8086, 0x29C0, "P35/G33",		setup_p35, get_fsb_i965,  get_timings_p35	},	
+	{ 0x8086, 0x29D0, "Q33",			setup_p35, get_fsb_i965,  get_timings_p35	},	
+	{ 0x8086, 0x29E0, "X38/X48",		setup_p35, get_fsb_i965,  get_timings_p35	},			
+	{ 0x8086, 0x2E00, "Eaglelake",		setup_p35, get_fsb_i965,  get_timings_p35	},
+	{ 0x8086, 0x2E10, "Q45/Q43",		setup_p35, get_fsb_i965,  get_timings_p35	},	
+	{ 0x8086, 0x2E20, "P45/G45",		setup_p35, get_fsb_i965,  get_timings_p35	},	
+	{ 0x8086, 0x2E30, "G41",			setup_p35, get_fsb_i965,  get_timings_p35	},
 	
+	{ 0x8086, 0xD131, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0xD132, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3400, "NHM IMC",		setup_nhm, get_fsb_nhm,	  get_timings_nhm	},
+	{ 0x8086, 0x3401, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3402, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3403, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3404, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3405, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3406, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	},
+	{ 0x8086, 0x3407, "NHM IMC",		setup_nhm, get_fsb_nhm,   get_timings_nhm	}
 };
 
 static const char *memory_channel_types[] =
