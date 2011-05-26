@@ -128,7 +128,7 @@
 #define kEnableC2StatesKey	 "EnableC2State"	 // acpi_patcher.c		getBoolFK
 #define kEnableC3StatesKey	 "EnableC3State"	 // acpi_patcher.c		getBoolFK
 #define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK
-#define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
+//#define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
 #define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c	getBoolFK
 #define kSMBIOSKey			 "SMBIOS"			 // fake_efi.c			getValFK
 //Azi: should this be changed to "SystemID"? BootHelp.txt matches SystemId

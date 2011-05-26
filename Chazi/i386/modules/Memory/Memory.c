@@ -1,17 +1,20 @@
 /*
- * DRAM Controller Module
- * Scans the dram controller and notifies OS X of the memory modules.
+ * Memory Module
+ * Scans the dram controller and(/or spd), and notifies OS X of the memory modules.
  *	This was converted from boot2 code to a boot2 module.
  *
  */
 
-#include "libsaio.h"
+//#include "libsaio.h"
+#include "boot.h"
 #include "pci.h"
 #include "platform.h"
 #include "dram_controllers.h"
 #include "spd.h"
 //#include "mem.h"
 #include "modules.h"
+
+#define kUseMemDetectKey "UseMemDetect"
 
 pci_dt_t *dram_controller_dev;
 
@@ -32,56 +35,28 @@ void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	pci_dt_t* current = arg1;
 	
 	if (current->class_id == PCI_CLASS_BRIDGE_HOST
-		&& (current->dev.addr == PCIADDR(0, 0, 0))
+		&& (current->dev.addr == PCIADDR(0, 0, 0)))
 	{
 		dram_controller_dev = current;
 	}
 }
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
-{
-	if (dram_controller_dev!=NULL) {
-		scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
-	}
-	//Azi: gone on Kabyl's...???
-//	scan_memory(&Platform); // unfortunately still necesary for some comp where spd cant read correct speed
-	scan_spd(&Platform);
-}
-
-
-
-/* Nedded to devide 64bit numbers correctly. TODO: look into why the module needs this
- * And why it isn't needed when compiled into boot2
- */
-
-uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
-{
-	uint64_t quotient = 0, qbit = 1;
+{	
+	bool useAutodetection = true;
+	getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
 	
-	if (denominator)
+	if (useAutodetection)
 	{
-		while ((int64_t) denominator >= 0)
+		if (dram_controller_dev != NULL)
 		{
-			denominator <<= 1;
-			qbit <<= 1;
+			// Rek: pci dev ram controller direct and fully informative scan ...
+			scan_dram_controller(dram_controller_dev);
 		}
-		
-		while (denominator)
-		{
-			if (denominator <= numerator)
-			{
-				numerator -= denominator;
-				quotient += qbit;
-			}
-			denominator >>= 1;
-			qbit >>= 1;
-		}
-		
-		return quotient;
 	}
-	else {
-		stop("Divide by 0");
-		return 0;
-	}
+	//Azi: gone on Kabyl's smbios update...???
+	// unfortunately still necesary for some comp where spd cant read correct speed
+//	scan_memory(&Platform);
 	
+	scan_spd(&Platform); // check Mek's implementation!
 }

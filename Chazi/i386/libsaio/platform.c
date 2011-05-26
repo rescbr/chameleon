@@ -38,18 +38,12 @@ bool platformCPUFeature(uint32_t feature)
 /** scan mem for memory autodection purpose */
 void scan_mem()
 {
-    static bool done = false;
-    if (done) return;
-
-    bool useAutodetection = true;
-    getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
-
-    if (useAutodetection)
-	{
-		execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
-		//getc();
-	}
-    done = true;
+	static bool done = false;
+	if (done) return;
+	
+	execute_hook("ScanMemory", NULL, NULL, NULL, NULL);
+	
+	done = true;
 }
 
 /**
