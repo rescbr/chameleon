@@ -170,14 +170,14 @@ extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
 extern void drawColorRectangle( unsigned short x,
-                         unsigned short y,
-                         unsigned short width,
-                         unsigned short height,
-                         unsigned char  colorIndex );
+                                unsigned short y,
+                                unsigned short width,
+                                unsigned short height,
+                                unsigned char  colorIndex );
 extern void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
+                               unsigned short  y,
+                               unsigned short  width,
+                               unsigned short  height,
                                unsigned char * data );
 extern int
 convertImage( unsigned short width,

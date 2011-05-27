@@ -121,9 +121,6 @@ ifeq (${CONFIG_MODULES}, y)
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
 
-
-
-
 endif
 
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
