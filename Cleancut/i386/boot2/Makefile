@@ -126,16 +126,15 @@ endif
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
 	@${RM} $(SYMROOT)/boot2.sys
-
-
-	@##size $(SYMROOT)/boot.sys
-	@ls -l $(SYMROOT)/boot
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
+	   	echo "\t******* boot is $$size bytes *******"; \
 	    echo "Booter executable larger than $(MAXBOOTSIZE) bytes" ;\
 	    rm $(SYMROOT)/boot ;\
 	    exit 1;\
+	  else \
+	  	echo "\t******* boot is $$size bytes *******"; \
 	  fi)
 
 
