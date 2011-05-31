@@ -15,15 +15,15 @@
 #define MODULE_PATH		"/Extra/modules/"
 #define SYMBOLS_MODULE "Symbols.dylib"
 #define VOID_SYMBOL		"dyld_void_start"
-extern unsigned long long textAddress;
-extern unsigned long long textSection;
+extern UInt64 textAddress;
+extern UInt64 textSection;
 
 
 
 typedef struct symbolList_t
 {
 	char* symbol;
-	unsigned int addr;
+	UInt64 addr;
 	struct symbolList_t* next;
 } symbolList_t;
 
@@ -77,14 +77,16 @@ unsigned int	lookup_all_symbols(const char* name);
 /********************************************************************************/
 void*			parse_mach(void* binary, 
 							int(*dylib_loader)(char*),
-							long long(*symbol_handler)(char*, long long, char));
+							long long(*symbol_handler)(char*, long long, char),
+                            void (*section_handler)(char* section, char* segment, long long offset, long long address)
+                           );
 unsigned int	handle_symtable(UInt32 base,
 							 struct symtab_command* symtabCommand,
 							 long long(*symbol_handler)(char*, long long, char),
 							 char is64);
 void			rebase_macho(void* base, char* rebase_stream, UInt32 size);
 inline void		rebase_location(UInt32* location, char* base, int type);
-void			bind_macho(void* base, char* bind_stream, UInt32 size);
+void			bind_macho(void* base, UInt8* bind_stream, UInt32 size);
 inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
 
 

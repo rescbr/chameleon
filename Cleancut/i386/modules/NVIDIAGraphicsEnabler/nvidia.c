@@ -245,7 +245,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0408, "GeForce 9650M GS" },
 	{ 0x10DE0409, "GeForce 8700M GT" },
 	{ 0x10DE040A, "Quadro FX 370" },
-	{ 0x10DE040B, "Quadro NVS 320M" },
+	{ 0x10DE040B, "Quadro NVS 320M" }, //Azi: 320M
 	{ 0x10DE040C, "Quadro FX 570M" },
 	{ 0x10DE040D, "Quadro FX 1600M" },
 	{ 0x10DE040E, "Quadro FX 570" },
@@ -402,7 +402,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DE2, "GeForce GT 420" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
 	{ 0x10DE0DEE, "GeForce GT 415M" },
-	{ 0x10DE0DF0, "GeForce GT 425M" },
+	{ 0x10DE0DF0, "GeForce GT 425M" }, //Azi: ?? GT 450M
 	{ 0x10DE0DF1, "GeForce GT 420M" },
 	{ 0x10DE0DF2, "GeForce GT 435M" },
 	{ 0x10DE0DF3, "GeForce GT 420M" },
