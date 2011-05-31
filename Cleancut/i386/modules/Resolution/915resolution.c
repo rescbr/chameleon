@@ -182,7 +182,7 @@ chipset_type get_chipset(UInt32 id)
 			if((id & 0x0000FFFF) == 0x00008086) // Intel chipset
 			{
 				//printf("Unknown chipset 0x%llX, please email id to meklort@gmail.com", id);
-				//getc();
+				//getchar();
 				type = CT_UNKNOWN_INTEL;
 				//type = CT_UNKNOWN;
 
