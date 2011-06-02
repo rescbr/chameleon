@@ -643,22 +643,22 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devicepath = get_pci_dev_path(ati_dev);
 
 	cmd = pci_config_read8(ati_dev->dev.addr, 4);
-	verbose("old pci command - %x\n", cmd); //Azi: 7
+	verbose("old pci command - %x\n", cmd);
 	if (cmd == 0) {
 		pci_config_write8(ati_dev->dev.addr, 4, 6);	
 		cmd = pci_config_read8(ati_dev->dev.addr, 4);
 		verbose("new pci command - %x\n", cmd);
 	}
 
-	model = get_ati_model((ati_dev->vendor_id << 16) | ati_dev->device_id); //Azi: Unknown
-	framebuffer = get_ati_fb((ati_dev->vendor_id << 16) | ati_dev->device_id); //Azi: Megalodon
+	model = get_ati_model((ati_dev->vendor_id << 16) | ati_dev->device_id);
+	framebuffer = get_ati_fb((ati_dev->vendor_id << 16) | ati_dev->device_id);
 	if (!string) {
 		string = devprop_create_string();
 	}
 	device = devprop_add_device(string, devicepath);
 	if (!device) {
 		printf("Failed initializing dev-prop string dev-entry, press any key...\n");
-		getchar();
+		getc();
 		return false;
 	}
 
@@ -668,21 +668,20 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	} else {
 		boot_display = 0;
 	}
-	verbose("boot display - %x\n", boot_display); //Azi: 1... thus, POSTed!
-	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4); //Azi: Ok!
+	verbose("boot display - %x\n", boot_display);
+	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
 
 	if ((framebuffer[0] == 'M' && framebuffer[1] == 'o' && framebuffer[2] == 't') ||
 		(framebuffer[0] == 'S' && framebuffer[1] == 'h' && framebuffer[2] == 'r') ||
 		(framebuffer[0] == 'P' && framebuffer[1] == 'e' && framebuffer[2] == 'r')) //faster than strcmp ;)
-		//Azi: if framebuffer = Motmot or Shrike (none!) or Peregrine
-		devprop_add_ati_template_4xxx(device); //Azi: 4000 series (or 4800 ??)
+		devprop_add_ati_template_4xxx(device);
 	else {
-		devprop_add_ati_template(device); //Azi: my scene!!!***
+		devprop_add_ati_template(device);
 		vram_size = getvramsizekb(ati_dev) * 1024;
 		if ((vram_size > 0x80000000) || (vram_size == 0)) {
 			vram_size = 0x10000000;	//vram reported wrong, defaulting to 256 mb
 		}
-		devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&vram_size, 4); //Azi: 0x20000000
+		devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&vram_size, 4);
 		ati_vram_memsize_0.data[6] = (vram_size >> 16) & 0xFF; //4,5 are 0x00 anyway
 		ati_vram_memsize_0.data[7] = (vram_size >> 24) & 0xFF;		
 		ati_vram_memsize_1.data[6] = (vram_size >> 16) & 0xFF; //4,5 are 0x00 anyway
@@ -691,13 +690,12 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		DP_ADD_TEMP_VAL_DATA(device, ati_vram_memsize_1);
 		devprop_add_iopciconfigspace(device, ati_dev);		
 	}
-	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1)); //Azi: Unknown
-	devprop_add_value(device, "ATY,DeviceID", (uint8_t*)&ati_dev->device_id, 2); //Azi: Ok! 8171 = (7181)
+	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
+	devprop_add_value(device, "ATY,DeviceID", (uint8_t*)&ati_dev->device_id, 2);
 
 	//fb setup
 	sprintf(tmp, "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", (uint8_t*)tmp, strlen(tmp) + 1); //Azi: OK! Slot-1
-	// don't think my card is on slot 1 ??... 0 ??
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t*)tmp, strlen(tmp) + 1);
 	devices_number++;
 
 	sprintf(tmp, ati_compatible_0[1], framebuffer);
@@ -707,10 +705,10 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(device, (char *) ati_compatible_1[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
 	sprintf(tmp, ati_device_type[1], framebuffer);
-	devprop_add_value(device, (char *) ati_device_type[0], (uint8_t *)tmp, strlen(tmp) + 1); //Azi: OK!
+	devprop_add_value(device, (char *) ati_device_type[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
 	sprintf(tmp, ati_name[1], framebuffer);
-	devprop_add_value(device, (char *) ati_name[0], (uint8_t *)tmp, strlen(tmp) + 1); //Azi: display ??
+	devprop_add_value(device, (char *) ati_name[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
 	sprintf(tmp, ati_name_0[1], framebuffer);
 	devprop_add_value(device, (char *) ati_name_0[0], (uint8_t *)tmp, strlen(tmp) + 1);
@@ -718,108 +716,67 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	sprintf(tmp, ati_name_1[1], framebuffer);
 	devprop_add_value(device, (char *) ati_name_1[0], (uint8_t *)tmp, strlen(tmp) + 1);
 
-	//Azi: Assemble default path for a custom rom...
 	sprintf(tmp, "bt(0,0)/Extra/%04x_%04x.rom", (uint16_t)ati_dev->vendor_id, (uint16_t)ati_dev->device_id);
-	
-	//Azi: if user enabled use of custom rom...
 	if (getBoolForKey(kUseAtiROMKey, &doit, &bootInfo->bootConfig) && doit) {
-		verbose("Looking for custom ATI rom %s...\n", tmp);
+		verbose("looking for ati video bios file %s\n", tmp);
 		rom = malloc(0x20000);
 		rom_size = load_ati_bios_file(tmp, rom, 0x20000);
-		
-		//Azi: if rom exists
-		if (rom_size > 0)
-		{
-			verbose("Using custom rom %s (%d Bytes)\n", tmp, rom_size);
+		if (rom_size > 0) {
+			verbose("Using ATI Video BIOS File %s (%d Bytes)\n", tmp, rom_size);
 			if (rom_size > 0x10000) {
-				rom_size = 0x10000; // we dont need the rest anyway;
-//Azi:			verbose("Trimmed %s to %d Bytes\n", tmp, rom_size);
+				rom_size = 0x10000; //we dont need rest anyway;
 			}
-		}
-		else
-		{
-			printf("ERROR: unable to open custom ATI rom %s.\n", tmp);
+		} else {
+			printf("ERROR: unable to open ATI Video BIOS File %s\n", tmp);
 		}
 	}
-	
-	if (rom_size == 0) //Azi: rom_size is still 0, user didn't enabled use of custom rom...
-	{	//Azi: if card posted...
-		if (boot_display) { // no custom rom	
-			bios = NULL; // try to dump from legacy space, otherwise can result in 100% fan speed
-//			bios = readAtomBIOS(ati_dev); //Azi: Wrong BIOS signature... returns 0 = NULL :-//
-		}
-		else
-		{
+	if (rom_size == 0) {
+		if (boot_display) {		// no custom rom
+			bios = NULL;	// try to dump from legacy space, otherwise can result in 100% fan speed
+		} else {
 			// readAtomBios result in bug on some cards (100% fan speed and black screen),
-			// not using it for posted card, reading from legacy space instead - Azi: reminder***
+			// not using it for posted card, reading from legacy space instead
 			bios = readAtomBIOS(ati_dev);
 		}
+	} else {
+		bios = rom;	//going custom rom way
+		verbose("Using rom %s\n", tmp);
 	}
-	else //Azi: rom_size is diff from 0, user enabled use of custom rom...
-	{
-		bios = rom; //going custom rom way //Azi: shouldn't this be bios = rom_size??*****
-		verbose("Using rom %s\n", tmp); //Azi: print just the path
-	}
-	
-	if (bios == NULL) //Azi: card was posted (boot_display = 1)
-	{
+	if (bios == NULL) {
 		bios = (uint8_t *)0x000C0000;
 		toFree = false;
-		verbose("Card posted, not going to use custom bios?? rom.\n"); //Azi: what file? custom rom??
-	}
-	else //Azi: anything but NULL, card wasn't posted (boot_display = 0), bios = readAtomBIOS(ati_dev), bios = rom_size... whatever :P ufff...
-	{
+		verbose("Not going to use bios image file\n");
+	} else {
 		toFree = true;
 	}
 
-	if (bios[0] == 0x55 && bios[1] == 0xaa) //Azi: check bios for 0xAA55 sig
-	{
+	if (bios[0] == 0x55 && bios[1] == 0xaa) {
 		verbose("Found bios image\n");
 		bios_size = bios[2] * 512;
 
 		rom_pci_header = (option_rom_pci_header_t*)(bios + bios[24] + bios[25]*256);
-		//Azi: Wrong pci header signature 558a1275 but still works!**** check later...
-		// ‘rom_header’ is used uninitialized in this function...
-//		rom_pci_header = (option_rom_pci_header_t *)((uint8_t *)rom_header + rom_header->pci_header_offset);
 
-		if (rom_pci_header->signature == 0x52494350) //Azi: ati pci header sig
-		{
+		if (rom_pci_header->signature == 0x52494350) {
 			if (rom_pci_header->device_id != ati_dev->device_id) {
 				verbose("Bios image (%x) doesnt match card (%x), ignoring\n", rom_pci_header->device_id, ati_dev->device_id);
-			}
-			else
-			{
-				if (toFree) //Azi: card wasn't posted (boot_display = 0)
+			} else {
+				if (toFree)
 				{
-					//Azi: mmio, Memory-mapped I/O - Kabyl's smbios patcher stuff reminder.
 					verbose("Adding binimage to card %x from mmio space with size %x\n", ati_dev->device_id, bios_size);
-				}
-				else //Azi: card was posted (boot_display = 1)
-				{
-					//Azi: check "legacy space/mmio" stuff again!!!***
+				} else {
 					verbose("Adding binimage to card %x from legacy space with size %x\n", ati_dev->device_id, bios_size);
 				}
-				//Azi: not all Mac's have this..!!
 				devprop_add_value(device, "ATY,bin_image", bios, bios_size);
 			}
-		}
-		else
-		{
-			// ATY,bin_image is not added... not all Mac's have this..!!
+		} else {
 			verbose("Wrong pci header signature %x\n", rom_pci_header->signature);
 		}
+	} else {
+		verbose("Bios image not found at  %x, content %x %x\n", bios, bios[0], bios[1]);
 	}
-	else
-	{
-		verbose("Bios image not found at %x, content %x %x\n", bios, bios[0], bios[1]);
-	}
-	
-	if (toFree) //Azi: card wasn't posted (boot_display = 0)
-	{
+	if (toFree) {
 		free(bios);
 	}
-	
-	//Azi: see ati.c AMDge; i have no problems here with xcode 4 compilation ???
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
