@@ -4,6 +4,7 @@
 #include "pci.h"
 #include "nvidia.h"
 #include "modules.h"
+#include "gma.h" //Azi:autoresolution
 
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
@@ -49,11 +50,15 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							setup_ati_devprop(current); 
 							break;
 					
-						case PCI_VENDOR_ID_INTEL: 
-							/* message to be removed once support for these cards is added */
-							verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-								current->vendor_id, current->device_id, devicepath);
+						case PCI_VENDOR_ID_INTEL: // AutoResolution
+							verbose("Intel Graphics Controller [%04x:%04x] :: %s \n",
+									current->vendor_id, current->device_id, devicepath);
+							setup_gma_devprop(current);
 							break;
+							//message to be removed once support for these cards is added 
+							//verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
+							//		current->vendor_id, current->device_id, devicepath);
+							//break;
 					
 						case PCI_VENDOR_ID_NVIDIA: 
 							setup_nvidia_devprop(current);

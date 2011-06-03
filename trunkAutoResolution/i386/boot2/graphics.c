@@ -31,6 +31,8 @@
 #include "appleClut8.h"
 #include "gui.h"
 #include "IOHibernatePrivate.h"
+#include "autoresolution.h"
+
 
 /*
  * for spinning disk
@@ -180,7 +182,8 @@ char *getVBEModeInfoString()
 // Return the VESA mode that matches the properties specified.
 // If a mode is not found, then return the "best" available mode.
 
-static unsigned short
+//static Azi:autoresolution
+unsigned short
 getVESAModeWithProperties( unsigned short     width,
                            unsigned short     height,
                            unsigned char      bitsPerPixel,
@@ -387,6 +390,8 @@ setVESAGraphicsMode( unsigned short width,
             break;
         }
 
+		if (refreshRate != 60) refreshRate = 60; //Azi:autoresolution
+
 //
 // FIXME : generateCRTCTiming() causes crash.
 //
@@ -424,12 +429,23 @@ setVESAGraphicsMode( unsigned short width,
 //             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 //         }
 
+//Azi:autoresolution
+#ifdef AUTORES_DEBUG
+		//Azi: who? who is about to set?? :P
+		PRINT("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
+		//getc(); //Azi: boot hangs, on the second call (like "old" Wait=y issue and usb fixes).
+		sleep(2);
+#endif
         // Set the mode with default refresh rate.
-
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 
         if ( err != errSuccess )
         {
+#ifdef AUTORES_DEBUG
+			PRINT("setVBEMode failed to set mode %d (%dx%d) with error #%d\n",
+				   mode, minfo.XResolution, minfo.YResolution, err);
+			sleep(2); //Azi: i suppose the same as above.
+#endif
             break;
         }
 
@@ -438,7 +454,7 @@ setVESAGraphicsMode( unsigned short width,
         if ( minfo.BitsPerPixel == 8 )
         {
             VBEPalette palette;
-            setupPalette( &palette, appleClut8 );
+            setupPalette( &palette, appleClut8 ); //Azi:autoresolution - check this stuff, appleClut8
             if ((err = setVBEPalette(palette)) != errSuccess)
             {
                 break;
@@ -461,7 +477,11 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_depth    = minfo.BitsPerPixel;
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
-
+//Azi:autoresolution
+#ifdef AUTORES_DEBUG //Azi: changed from if to ifdef
+		gui.screen.mm				= minfo.MemoryModel;
+		gui.screen.attr				= minfo.ModeAttributes;
+#endif
     }
     while ( 0 );
 
@@ -1030,8 +1050,8 @@ setVESATextMode( unsigned short cols,
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int
-getNumberArrayFromProperty( const char *  propKey,
+//static Azi:autoresolution
+int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {

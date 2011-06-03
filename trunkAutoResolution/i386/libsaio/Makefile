@@ -38,8 +38,10 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	smbios.o smbios_getters.o smbios_decode.o \
 	fake_efi.o ext2fs.o \
 	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
-	convert.o aml_generator.o console.o
+	device_inject.o convert.o aml_generator.o console.o \
+	pci_root.o nvidia.o ati.o gma.o \
+	nvidia_resolution.o ati_resolution.o gma_resolution.o \
+	autoresolution.o edid.o
 
 LIBS  = libsaio.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))

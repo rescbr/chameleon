@@ -29,7 +29,9 @@
 #include "gui.h"
 #include "embedded.h"
 #include "pci.h"
+#include "autoresolution.h" //Azi:autoresolution
 
+bool showBootBanner = true; //Azi:autoresolution
 static bool shouldboot = false;
 
 extern int multiboot_timeout;
@@ -875,7 +877,7 @@ int getBootOptions(bool firstRun)
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-			bool showBootBanner = true;
+//			bool showBootBanner = true; //Azi:autoresolution
  
 			// Check if "Boot Banner"=N switch is present in config file.
 			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
@@ -984,6 +986,92 @@ int getBootOptions(bool firstRun)
 			clearBootArgs();
 			break;
 
+		//Azi:autoresolution - Reapply the patch if Graphics Mode was incorrect
+		// or EDID Info was insane.
+		case kF2Key:
+		
+			if ((gAutoResolution == true) && useGUI && map )
+			{
+				// get the new Graphics Mode key
+				processBootOptions(); //Azi: use processBootArgument instead?
+
+//				UInt32 paramsAR[4];
+				paramsAR[3] = 0;
+
+				getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+
+				// user changed resolution...
+				if ((paramsAR[0] != 0) && (paramsAR[1] != 0) &&
+					(paramsAR[0] != map->currentX) && (paramsAR[1] != map->currentY))
+				{
+					//Azi: identical to "case kTabKey:"			(check later)
+					if (bootArgs->Video.v_display == GRAPHICS_MODE)
+					{
+						CursorState cursorState;
+
+						// Go back to TEXT MODE while we change the mode
+						setVideoMode(VGA_TEXT_MODE, 0);
+
+						setCursorPosition(0, 0, 0);
+						clearScreenRows(0, kScreenLastRow);
+						changeCursor( 0, 0, kCursorTypeHidden, &cursorState );
+
+						// Reapply patch
+						patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
+
+						if (useGUI && (gui.initialised == true))
+							initGUI();
+						// Make sure all values are set
+						if (bootArgs->Video.v_display != GRAPHICS_MODE)
+							bootArgs->Video.v_display = GRAPHICS_MODE;
+
+						if (!useGUI)
+							useGUI = true;
+
+						// redraw the background buffer
+						drawBackground();
+						gui.devicelist.draw = true;
+						gui.redraw = true;
+
+						if (showBootBanner)
+						{
+							// Display banner and show hardware info.
+							gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
+						}
+
+						// redraw background
+						memcpy(gui.backbuffer->pixels, gui.screen.pixmap->pixels,
+							   gui.backbuffer->width * gui.backbuffer->height * 4);
+
+						nextRow = kMenuTopRow;
+						showPrompt = true;
+
+						if (gDeviceCount)
+						{
+							showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
+							nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+						}
+
+						// Show the boot prompt.
+						showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+						showBootPrompt( nextRow, showPrompt );
+
+						// this is used to avoid resetting the incorrect mode while quiting the boot menu
+//						map->hasSwitched = true; (check again later!)
+					}
+				}
+
+				clearBootArgs();
+				key = 0;
+			}	
+			else // if gAutoResolution == false...
+			{
+				// ... do "nothing".			(Reviewing...)
+				clearBootArgs();
+				key = 0;
+			}
+			break;
+
 		case kF5Key:
 			// New behavior:
 			// Clear gBootVolume to restart the loop
@@ -1032,9 +1120,23 @@ int getBootOptions(bool firstRun)
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 					showBootPrompt(nextRow, showPrompt);
 					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
+					
+					/*
+					 * AutoResolution - make sure all values are set - Azi: think! it makes some sense!!
+					 */
+//					bootArgs->Video.v_display = VGA_TEXT_MODE;
+//					useGUI = false;
+					
 				} else {
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
+					
+					/*
+					 * AutoResolution - make sure all values are set - Azi: same as above...!?
+					 */
+//					bootArgs->Video.v_display = GRAPHICS_MODE;
+//					useGUI = true;
+					
 					updateVRAM();
 				}
 			}

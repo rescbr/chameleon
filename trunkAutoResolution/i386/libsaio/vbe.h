@@ -268,6 +268,11 @@ enum {
  */
 typedef unsigned long VBEPalette[256];
 
+/*
+ * DDC - AutoResolution
+ */
+extern int getEDID(void *ddcblock, uint8_t blocksleft);
+
 extern int getVBEInfo(void *vinfo_p);
 extern int getVBEModeInfo(int mode, void *minfo_p);
 extern int getVBEDACFormat(unsigned char *format);

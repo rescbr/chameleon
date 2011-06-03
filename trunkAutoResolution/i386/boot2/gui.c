@@ -11,6 +11,7 @@
 #include "gui.h"
 #include "appleboot.h"
 #include "vers.h"
+#include "autoresolution.h" //Azi:autoresolution
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
@@ -700,12 +701,25 @@ int initGUI(void)
 		return 1;
 #endif
 	}
-	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[0] = val;
-	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
-		screen_params[1] = val;
+	
+	//Azi:autoresolution
+	if (gAutoResolution == true)
+	{
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
+ 	}
+	else
+	{
+		// parse screen size parameters
+ 		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[0] = val;
+		}
+
+ 		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0)
+		{
+			screen_params[1] = val;
+		}
 	}
 
 	// Initalizing GUI strucutre.
@@ -717,7 +731,9 @@ int initGUI(void)
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
-
+	
+	PRINT("Found mode %dx%d in VESA Table\n", gui.screen.width, gui.screen.height); //Azi:autoresolution
+	
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
 		loadThemeValues(&bootInfo->themeConfig);
@@ -731,6 +747,9 @@ int initGUI(void)
 					if (createWindowBuffer(&gui.bootprompt) == 0) {
 						if (createWindowBuffer(&gui.infobox) == 0) {
 							if (createWindowBuffer(&gui.menu) == 0) {
+#ifdef AUTORES_DEBUG
+								pause();
+#endif
 							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
@@ -738,13 +757,15 @@ int initGUI(void)
 								setVideoMode( GRAPHICS_MODE, 0 );
 								gui.initialised = true;
 								return 0;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+							} else printf("createWindowBuffer(&gui.menu) Failed\n");
+						} else printf("createWindowBuffer(&gui.infobox) Failed\n");
+					} else printf("createWindowBuffer(&gui.bootprompt) Failed\n");
+				} else printf("createWindowBuffer(&gui.devicelist) Failed\n");
+			} else printf("createWindowBuffer(&gui.screen) Failed\n");
+		} else printf("createBackBuffer(&gui.screen) Failed\n");
+	} else printf("loadGraphics() Failed\n");
+//Azi: removed a #ifdef AUTORES_DEBUG from here, long time ago; was just a pause()
+// and if i'm not mistaken caused some problem ?!
 	return 1;
 }
 
@@ -860,24 +881,33 @@ void drawDeviceList (int start, int end, int selection)
                 infoMenuSelection = 0;
             }
 			 
-			if(gui.menu.draw)
+			if (gui.menu.draw)
 				drawInfoMenuItems();
+#ifdef AUTORES_DEBUG //Azi: update diff
+#define DEBUG
+#endif
 			 
-#if DEBUG
+#ifdef DEBUG //Azi: changed from if to ifdef
             gui.debug.cursor = pos( 10, 100);
-            dprintf( &gui.screen, "label     %s\n",   param->label );
-            dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-            dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-            dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
-            dprintf( &gui.screen, "type      0x%x\n", param->type );
-            dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-            dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-            dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-            dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-            dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-            dprintf( &gui.screen, "name      %s\n",   param->name );
-            dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-            dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
+			dprintf( &gui.screen, "label:     %s\n",   param->label );
+			dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
+			dprintf( &gui.screen, "type:      0x%x\n", param->type );
+			dprintf( &gui.screen, "flags:     0x%x\n", param->flags );
+			dprintf( &gui.screen, "part_no:   %d\n",   param->part_no );
+			dprintf( &gui.screen, "part_boff: 0x%x\n", param->part_boff );
+			dprintf( &gui.screen, "part_type: 0x%x\n", param->part_type );
+			dprintf( &gui.screen, "bps:       0x%x\n", param->bps );
+			dprintf( &gui.screen, "name:      %s\n",   param->name );
+			dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
+			dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+			dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
+			dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
+			dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr );
+			dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
+#endif
+
+#ifdef AUTORES_DEBUG
+#undef DEBUG
 #endif
 		}
 		
@@ -1821,24 +1851,43 @@ void drawBootGraphics(void)
 		loadBootGraphics();
 	}
 
-	// parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[0] = pos;
-	} else {
-		screen_params[0] = DEFAULT_SCREEN_WIDTH;
-	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
-		screen_params[1] = pos;
-	} else {
-		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
-	}
-
-    // Save current screen resolution.
+	// Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
 	oldScreenHeight = gui.screen.height;
+//	printf("Res: %dx%d (drawbg: current/old)\n", oldScreenWidth, oldScreenHeight);
+
+	//Azi:autoresolution
+	if (gAutoResolution == true)
+	{
+		screen_params[0] = paramsAR[0];
+		screen_params[1] = paramsAR[1];
+//		printf("Res: %dx%d (drawbg: AR)\n", screen_params[0], screen_params[1]);
+	}
+	else
+	{
+		// parse boot screen size parameters
+		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[0] = pos;
+		}
+		else
+		{
+			screen_params[0] = DEFAULT_SCREEN_WIDTH;
+		}
+
+		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
+		{
+			screen_params[1] = pos;
+		}
+		else
+		{
+			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
+		}
+	}
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
+//	printf("Res: %dx%d (drawbg: gsw/h new)\n", gui.screen.width, gui.screen.height);
 
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);

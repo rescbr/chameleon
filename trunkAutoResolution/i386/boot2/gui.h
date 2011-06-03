@@ -46,6 +46,7 @@ enum {
 	kUpArrowkey		= 0x4800, 
 	kDownArrowkey		= 0x5000,
 	kASCIIKeyMask		= 0x7f,
+	kF2Key			= 0x3c00, //Azi:autoresolution
 	kF5Key			= 0x3f00,
 	kF10Key			= 0x4400
 };
@@ -96,6 +97,16 @@ typedef struct
 	uint32_t	font_small_color;	// Color for small  font AARRGGBB
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
+	// Azi:autoresolution
+	//resolution specifics
+	uint16_t	htotal;				
+	uint16_t	vtotal;				
+	uint16_t	hsyncstart;			
+	uint16_t	hsyncend;
+	uint16_t	vsyncstart;			
+	uint16_t	vsyncend;
+	uint8_t		mm;
+	uint16_t	attr;
 } window_t;
 	
 /*

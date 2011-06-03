@@ -59,6 +59,8 @@
 #define kBootBannerKey		"Boot Banner"
 #define kWaitForKeypressKey	"Wait"
 
+#define kAutoResolutionKey	"AutoResolution"	/* boot.c */
+
 #define kUseAtiROM			"UseAtiROM"			/* ati.c */
 #define kAtiConfig			"AtiConfig"			/* ati.c */
 #define kATYbinimage		"ATYbinimage"		/* ati.c */

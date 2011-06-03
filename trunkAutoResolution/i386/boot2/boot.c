@@ -58,6 +58,8 @@
 #include "ramdisk.h"
 #include "gui.h"
 #include "platform.h"
+#include "autoresolution.h" //autoresolution
+#include "edid.h"			//		||
 #include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
@@ -189,6 +191,35 @@ static int ExecKernel(void *binary)
 	}
 	
 	usb_loop();
+	
+//autoresolution - Check if user disabled AutoResolution at the boot prompt.
+	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig); //Azi: bootConfig ??
+	
+	// User disabled AutoResolution at boot prompt...
+	if ((gAutoResolution == false) && map)
+	{
+		// restore and close Vbios for patch cancelation.
+		restoreVbios(map);
+		closeVbios(map);
+	}
+	
+	//Azi: while testing, i didn't got any problems when booting without
+	// closing Vbios... closing it just in case. (check again later!)
+	if ((gAutoResolution == true) && map)
+	{
+		closeVbios(map);
+
+		// gAutoResolution was just set to false on closeVbios();
+		// we need it to be "true" for drawBootGraphics().
+		gAutoResolution = true;
+	}
+	
+	//Azi: closing Vbios after "if (gVerboseMode)" stuff eliminates the need for setting
+	// AutoResolution = true above; but creates another bug when booting in TextMode with -v arg.
+	// Simptoms include: staring some seconds at a nicely drawn white screen, after boot prompt.
+	// Think i'm just going to end up removing setting gAutoResolution = false
+	// on closeVbios().. the more i think, the less sense it makes doing it there!!
+//autoresolution - end
 	
     if (checkOSVersion("10.7"))
     {
@@ -356,6 +387,64 @@ void common_boot(int biosdev)
 	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+	
+//autoresolution -  default to false
+	// http://forum.voodooprojects.org/index.php/topic,1227.0.html
+	gAutoResolution = false;
+
+	// Check if user enabled AutoResolution on Boot.plist...
+	getBoolForKey(kAutoResolutionKey, &gAutoResolution, &bootInfo->bootConfig);
+
+	// Patch the Video Bios with the extracted resolution, before initGui.
+	if (gAutoResolution == true)
+	{
+		paramsAR[3] = 0;
+
+		// Open the Vbios and store Vbios or Tables
+		//Azi: doing this only if gAutoResolution = true
+		map = openVbios(CT_UNKWN);
+
+		//Get resolution from Graphics Mode key...
+		int count = getNumberArrayFromProperty(kGraphicsModeKey, paramsAR, 4);
+		// ...  or EDID.
+		if (count < 3)
+		{
+			getResolution(paramsAR); //Azi: hum...
+			// check the DEBUG/PRINT stuff... also on TEXT MODE (this is not printing to screen). ???
+			// don't forget we now have boot-log and it prints fine there.
+//Azi:autoresolution - these PRINT replace a previous existing #ifdef AUTORES_DEBUG
+// and were moved from gui.c, initGUI().
+			PRINT("Resolution: %dx%d (EDID)\n",paramsAR[0], paramsAR[1]);
+		}
+		else //Azi: check theme.plist ??
+		{
+			PRINT("Resolution: %dx%d (Graphics Mode key)\n",paramsAR[0], paramsAR[1]);
+
+			//Azi: hum...
+			if ( paramsAR[2] == 256 ) paramsAR[2] = 8;
+			if ( paramsAR[2] == 555 ) paramsAR[2] = 16;
+			if ( paramsAR[2] == 888 ) paramsAR[2] = 32;
+		}
+
+		// perfom the actual Vbios patching
+		if (paramsAR[0] != 0 && paramsAR[1] != 0)
+		{
+			patchVbios(map, paramsAR[0], paramsAR[1], paramsAR[2], 0, 0);
+		}
+
+		//Azi: passing resolution for TEXT MODE "verbose" boot. (check again later!)***
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			gui.screen.width = paramsAR[0];
+			gui.screen.height = paramsAR[1];
+		}
+
+		// If the patch is working properly, we're almost done (we need? to close Vbios).
+		// If not and it's just a matter of wrong resolution, we can try re-apply the patch;
+		// see "case kF2Key:", options.c.
+	}
+//autoresolution - end
+	
 	if (useGUI && initGUI())
 	{
 		// initGUI() returned with an error, disabling GUI.
@@ -423,6 +512,9 @@ void common_boot(int biosdev)
 			drawBackground();
 			updateVRAM();
 		}
+		
+		//Azi: autoresolution stuff moved to ExecKernel();
+		// Closing Vbios here without restoring it, causes an allocation error.
 		
 		// Find out which version mac os we're booting.
 		getOSVersion();

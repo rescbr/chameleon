@@ -8,66 +8,77 @@
  */
 
 
-#include "edid.h"
-#include "vbe.h"
+//#include "libsaio.h"
+//#include "bootstruct.h"
+//#include "boot.h" - included on graphics.h
 #include "graphics.h"
- 
+#include "edid.h"
 
 
-void getResolution(UInt32* x, UInt32* y, UInt32* bp)
+//static biosBuf_t bb; // reminder
+
+UInt32 xResolution = 0;
+UInt32 yResolution = 0;
+UInt32 bpResolution = 0;
+
+
+void getResolution(UInt32* params)
 {
-	static UInt32 xResolution, yResolution, bpResolution;
-
-	bpResolution = 32;	// assume 32bits
+	unsigned char* edidInfo = readEDID();
 	
-	if(!xResolution || !yResolution || !bpResolution)
-	{
+	if(!edidInfo) {
+		xResolution = 1024;
+		yResolution = 768;
+		bpResolution = 32;
 		
-		char* edidInfo = readEDID();
-		
-		if(!edidInfo) return;
-		
-		// TODO: check *all* resolutions reported and either use the highest, or the native resolution (if there is a flag for that)
+		free( edidInfo );
+	} else {
+		// TODO: check *all* resolutions reported and either use the highest,
+		// or the native resolution (if there is a flag for that).
 		xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
 		yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
 		
-		//printf("H Active = %d", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
-		//printf("V Active = %d", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
+		bpResolution = 32;	// assume 32bits
 		
 		free( edidInfo );
 		
-		if(!xResolution) xResolution = DEFAULT_SCREEN_WIDTH;
-		if(!yResolution) yResolution = DEFAULT_SCREEN_HEIGHT;
-
+		// Mode Sanity check
+		if ((xResolution < 1024) || !yResolution || !xResolution) //Azi: is 1024 the minimum on notebooks ??
+		{
+			xResolution = 1024;
+			yResolution = 768;
+		}
+		
+		params[0]  = xResolution;
+		params[1]  = yResolution;
+		params[2] = bpResolution;
 	}
-
-	*x  = xResolution;
-	*y  = yResolution;
-	*bp = bpResolution;
-
 }
 
-char* readEDID()
+unsigned char* readEDID()
 {
 	SInt16 last_reported = -1;
 	UInt8 edidInfo[EDID_BLOCK_SIZE];
 
+	//UInt8 pointer;
+
 	UInt8 header1[] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 	UInt8 header2[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	
-	SInt16 status;
-	UInt16 blocks_left = 1;
+	int status;
+	unsigned int blocks_left = 1;
 	
 	do
 	{
-		// TODO: This currently only retrieves the *last* block, make the block buffer expand as needed / calculated from the first block
+		// TODO: This currently only retrieves the *last* block, make the block buffer expand
+		// as needed / calculated from the first block.
 
 		bzero( edidInfo, EDID_BLOCK_SIZE);
 
 		status = getEDID(edidInfo, blocks_left);
 		
-		
 		//printf("Buffer location: 0x%X\n", SEG(buffer) << 16 | OFF(buffer));
+
 		/*
 		int j, i;
 		for (j = 0; j < 8; j++) {
@@ -120,30 +131,15 @@ char* readEDID()
 				printf("Header2 = %d", memcmp(edidInfo, header2, sizeof(header2)) );
 				return 0;
 			}
+		} else {
+			return 0;
 		}
+
+		
 		blocks_left = 0;	
 	} while(blocks_left);
 
-	char* ret = malloc(sizeof(edidInfo));
+	UInt8* ret = malloc(sizeof(edidInfo));
 	memcpy(ret, edidInfo, sizeof(edidInfo));
-	return ret;
+	return (ret);
 }
-
-
-int getEDID( void * edidBlock, UInt8 block)
-{
-	biosBuf_t bb;
-	
-	bzero(&bb, sizeof(bb));
-    bb.intno  = 0x10;
-    bb.eax.rr = 0x4F15;
-	bb.ebx.r.l= 0x01;
-	bb.edx.rr = block;
-	
-    bb.es     = SEG( edidBlock );
-    bb.edi.rr = OFF( edidBlock );
-	
-    bios( &bb );
-    return(bb.eax.r.h);
-}
-
