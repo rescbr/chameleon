@@ -8,4 +8,4 @@ DIR = IntelGraphicsEnabler
 
 MODULE_OBJS = gma.o IntelGraphicsEnabler.o
 
-include ../MakeInc.dir
+include ../../MakeInc.dir

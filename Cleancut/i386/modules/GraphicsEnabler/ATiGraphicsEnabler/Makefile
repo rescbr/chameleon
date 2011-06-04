@@ -8,4 +8,4 @@ DIR = ATiGraphicsEnabler
 
 MODULE_OBJS = ati.o ATiGraphicsEnabler.o
 
-include ../MakeInc.dir
+include ../../MakeInc.dir

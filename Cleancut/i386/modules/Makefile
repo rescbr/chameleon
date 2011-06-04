@@ -12,14 +12,15 @@ include ${SRCROOT}/Make.rules
 
 # The order of building is important.
 SUBDIRS = klibc uClibcxx Resolution HelloWorld \
-		  ATiGraphicsEnabler AMDGraphicsEnabler NVIDIAGraphicsEnabler IntelGraphicsEnabler
+		  GraphicsEnabler/ATiGraphicsEnabler GraphicsEnabler/AMDGraphicsEnabler \
+		  GraphicsEnabler/NVIDIAGraphicsEnabler GraphicsEnabler/IntelGraphicsEnabler
 
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBSAIODIR = $(SRCROOT)/i386/libsaio
-INC = -I$(LIBSAIODIR) 
+INC = -I$(LIBSAIODIR)
 
 
 ifeq (${CONFIG_MODULES}, y)

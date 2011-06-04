@@ -8,4 +8,4 @@ DIR = AMDGraphicsEnabler
 
 MODULE_OBJS = ati.o AMDGraphicsEnabler.o
 
-include ../MakeInc.dir
+include ../../MakeInc.dir

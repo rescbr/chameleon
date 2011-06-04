@@ -8,4 +8,4 @@ DIR = NVIDIAGraphicsEnabler
 
 MODULE_OBJS = nvidia.o NVIDIAGraphicsEnabler.o
 
-include ../MakeInc.dir
+include ../../MakeInc.dir
