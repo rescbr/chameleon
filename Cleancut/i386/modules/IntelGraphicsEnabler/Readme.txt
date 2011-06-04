@@ -1,12 +1,16 @@
 Module:	IntelGraphicsEnabler
 
-Description: Enables "some" ?? Intel cards to be used out of the box ?? in OS X.
-This was converted from ...
+Description: Enables a few Intel cards to be used out of the box,
+			 mostly mobile ones.
 
 Dependencies: none
 
-Keys: GraphicsEnabler (enabled by default)
+Keys: GraphicsEnabler	Yes/No (enabled by default)
+						Disable GraphicsEnabler patch.
 
 
+Adaptation of Meklort's work.
+Original patch by Nawcom:
+http://forum.voodooprojects.org/index.php/topic,1029.0.html
 
-TODO: ---
+TODO: test my GMA desktop again (Azi)
