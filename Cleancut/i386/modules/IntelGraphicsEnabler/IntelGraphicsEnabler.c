@@ -1,7 +1,6 @@
 /*
- *	IntelGraphicsEnabler Module ---
- *	  Enables "some" Intel cards to be used out of the box ?? in OS X.
- *	  This was converted from ... // AutoResolution reminder ---
+ *	IntelGraphicsEnabler Module
+ *		Enables a few Intel cards to be used out of the box in OS X.
  *
  */
 

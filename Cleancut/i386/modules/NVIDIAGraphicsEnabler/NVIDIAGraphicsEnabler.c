@@ -1,7 +1,7 @@
 /*
- * GraphicsEnabler Module
- *	Enabled many nvidia and ati cards to be used out of the box in 
- *	OS X. This was converted from boot2 code to a boot2 module.
+ *	NVIDIAGraphicsEnabler Module
+ *		Enables many nVidia cards to be used out of the box in OS X.
+ *		This was converted from boot2 code to a boot2 module.
  *
  */
 
@@ -11,8 +11,7 @@
 #include "nvidia.h"
 #include "modules.h"
 
-
-#define kGraphicsEnablerKey	"GraphicsEnabler"
+#define kGraphicsEnablerKey "GraphicsEnabler"
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 

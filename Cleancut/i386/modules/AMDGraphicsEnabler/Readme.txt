@@ -6,18 +6,21 @@ Description: the GraphicsEnabler ATI code ( > r784) ported to a module.
 			 it missing on this, please file an issue at:
 			 http://forge.voodooprojects.org/p/chameleon/issues/
 			 The same applies to any missing card on this code.
-			 Only known to work cards will be added. 
+			 Only cards known to work will be added.
 
 Dependencies: none
 
 Keys: GraphicsEnabler	Yes/No (enabled by default)
 						Disable GraphicsEnabler patch.
+						
 	  ATYbinimage		Yes/No (enabled by default)
 						Disable adding VBIOS read from "legacy space or PCI ROM"
-						to "ATY,bin_image" ioreg property.
+						to "ATY,bin_image" ioreg property. ???confirm
+						
 	  UseAtiROM			Yes/No (disabled by default)
-						Enable the use of a costume VBIOS ROM image added
-						to "ATY,bin_image" ioreg property.
+						Enable the use of a custom VBIOS ROM image added
+						to "ATY,bin_image" ioreg property. ??? Azi: confirm
+						
 	  AtiConfig			Used to test a framebuffer different from the default one.
 
 		

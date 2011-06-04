@@ -7,7 +7,6 @@
 
 #include "libsa.h"
 #include "saio_internal.h"
-
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -16,13 +15,13 @@
 
 #define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 
+#define kUseAtiROM				"UseAtiROM"
+#define kAtiConfig				"AtiConfig"
+#define kATYbinimage			"ATYbinimage"
+
 #define Reg32(reg)				(*(volatile uint32_t *)(card->mmio + reg))
 #define RegRead32(reg)			(Reg32(reg))
 #define RegWrite32(reg, value)	(Reg32(reg) = value)
-
-#define kUseAtiROM			"UseAtiROM"
-#define kAtiConfig			"AtiConfig"
-#define kATYbinimage		"ATYbinimage"
 
 typedef enum {
 	kNul,

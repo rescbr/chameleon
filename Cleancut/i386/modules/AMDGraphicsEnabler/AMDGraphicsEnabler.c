@@ -1,7 +1,7 @@
 /*
- *	ATIGraphicsEnabler Module ---
- *	  Enables many ATI HD cards to be used out of the box in OS X.
- *	  This was converted from boot2 code ( > r784) to a boot2 module.
+ *	AMDGraphicsEnabler Module
+ *		Enables many AMD/ATI HD cards to be used out of the box in OS X.
+ *		This was converted from boot2 code ( > r784) to a boot2 module.
  *
  */
 
