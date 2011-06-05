@@ -9,6 +9,9 @@ it is not based on the one found in the AutoResolution branch, which was created
 by Diebuche to hold the original patch, for both documentation and eventual merge
 to the trunk.
 
+Also note that, the Resolution module is not present, since it's functionality is
+covered by AutoResolution.
+
 
 Credits and Thanks to Lebidou.
 
