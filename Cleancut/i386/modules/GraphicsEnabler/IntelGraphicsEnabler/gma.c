@@ -56,6 +56,7 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x808627A6, "Mobile GMA950"	},
 	{ 0x8086A011, "Mobile GMA3150"	},
 	{ 0x8086A012, "Mobile GMA3150"	},
+//Azi: i can get QE/CI but no framebuffer... more testing needed.
 	{ 0x80862772, "Desktop GMA950"	},
 	{ 0x80862776, "Desktop GMA950"	},
 	{ 0x8086A001, "Mobile GMA3150"	},
