@@ -131,15 +131,19 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 	
-	p->CPU.Model += (p->CPU.ExtModel << 4);
-	
-	if (p->CPU.Vendor == 0x756E6547 /* Intel */ && p->CPU.Family == 0x06 && p->CPU.Model >= 0x1a){
-		msr = rdmsr64(MSR_CORE_THREAD_COUNT);									// Undocumented MSR in Nehalem and newer CPUs
-		p->CPU.NoCores		= bitfield((uint32_t)msr, 31, 16);					// Using undocumented MSR to get actual values
-		p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);					// Using undocumented MSR to get actual values
+    p->CPU.Model += (p->CPU.ExtModel << 4);
+    
+    if (p->CPU.Vendor == 0x756E6547 /* Intel */ && 
+        p->CPU.Family == 0x06 && 
+        p->CPU.Model >= CPUID_MODEL_NEHALEM && 
+        p->CPU.Model != CPUID_MODEL_ATOM        // MSR is *NOT* available on the Intel Atom CPU
+        ){
+        msr = rdmsr64(MSR_CORE_THREAD_COUNT);									// Undocumented MSR in Nehalem and newer CPUs
+        p->CPU.NoCores		= bitfield((uint32_t)msr, 31, 16);					// Using undocumented MSR to get actual values
+        p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);					// Using undocumented MSR to get actual values
 	} else {
-		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);		// Use previous method for Cores and Threads
-		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
+        p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);		// Use previous method for Cores and Threads
+        p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
 	
 	/* get brand string (if supported) */
@@ -323,8 +327,8 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 			}
 		}
-		/* Mobile CPU ? */
-		if (rdmsr64(0x17) & (1<<28)) {
+		/* Mobile CPU */
+		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28)) {
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
 	}
@@ -370,16 +374,17 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-	
-	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
-	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
-	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
-	DBG("CPU: MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);
-	DBG("CPU: TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
-	DBG("CPU: FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
-	DBG("CPU: CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
-	DBG("CPU: NoCores/NoThreads:     %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
-	DBG("CPU: Features:              0x%08x\n", p->CPU.Features);
+
+	DBG("CPU: Brand String:             %s\n",				p->CPU.BrandString);
+	DBG("CPU: Vendor/Family/ExtFamily:  0x%x/0x%x/0x%x\n",	p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
+	DBG("CPU: Model/ExtModel/Stepping:  0x%x/0x%x/0x%x\n",	p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
+	DBG("CPU: MaxCoef/CurrCoef:         0x%x/0x%x\n",		p->CPU.MaxCoef, p->CPU.CurrCoef);
+	DBG("CPU: MaxDiv/CurrDiv:           0x%x/0x%x\n",		p->CPU.MaxDiv, p->CPU.CurrDiv);
+	DBG("CPU: TSCFreq:                  %dMHz\n",			p->CPU.TSCFrequency / 1000000);
+	DBG("CPU: FSBFreq:                  %dMHz\n",			p->CPU.FSBFrequency / 1000000);
+	DBG("CPU: CPUFreq:                  %dMHz\n",			p->CPU.CPUFrequency / 1000000);
+	DBG("CPU: NoCores/NoThreads:        %d/%d\n",			p->CPU.NoCores, p->CPU.NoThreads);
+	DBG("CPU: Features:                 0x%08x\n",			p->CPU.Features);
 #if DEBUG_CPU
 	pause();
 #endif

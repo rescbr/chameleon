@@ -105,10 +105,10 @@ enum {
 
 /*!
     PrivateBootInfo has fields used by the booter that used to be part of
-    KernelBootArgs_t *bootArgs.  When the switch was made to EFI the structure
-    completely changed to boot_args *bootArgs.  This (new to boot-132) structure
+    KernelBootArgs_t *bootArgs. When the switch was made to EFI the structure
+    completely changed to boot_args *bootArgs. This (new to boot-132) structure
     contains the fields the kernel no longer cares about but the booter still
-    uses internally.  Some fields (e.g. the video information) remain interesting
+    uses internally. Some fields (e.g. the video information) remain interesting
     to the kernel and are thus located in bootArgs although with different field names.
  */
 typedef struct PrivateBootInfo {
@@ -138,6 +138,6 @@ typedef struct PrivateBootInfo {
     config_file_t    ramdiskConfig;                // RAMDisk.plist
 } PrivateBootInfo_t;
 
-extern PrivateBootInfo_t *bootInfo; 
+extern PrivateBootInfo_t *bootInfo;
 
 #endif /* __BOOTSTRUCT_H */
