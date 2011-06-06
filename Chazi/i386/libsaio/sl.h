@@ -27,7 +27,7 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
-#include <sys/vnode.h>
+#include <mach/i386/thread_status.h>
 
 //#include "libsaio.h"
 #include "libsa.h"

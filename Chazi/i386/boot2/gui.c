@@ -18,7 +18,7 @@
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 #define vram VIDEO(baseAddr)
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 #include "art.h"
 #endif
 
@@ -173,7 +173,7 @@ static int getImageIndexByName(const char *name)
 	return -1;
 }
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 static int getEmbeddedImageIndexByName(const char *name)
 {
 	int upperLimit = sizeof(embeddedImages) / sizeof(embeddedImages[0]) - 1;
@@ -219,7 +219,7 @@ static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[128]; //Azi: testing
 	int 		i;
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 	int 		e;
 #endif
 	uint16_t	width;
@@ -247,7 +247,7 @@ static int loadThemeImage(const char *image, int alt_image)
             flipRB(images[i].image);
             return 0;
         }
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
         else if ((e = getEmbeddedImageIndexByName(image)) >= 0)
         {
             unsigned char *embed_data;
@@ -278,7 +278,7 @@ static int loadThemeImage(const char *image, int alt_image)
         }
         else
         {
-#ifndef EMBED_THEME
+#ifndef CONFIG_EMBED_THEME
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
 			sleep(2);
 #endif
@@ -684,7 +684,7 @@ int initGUI(void)
 	
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0)
 	{
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 		config_file_t	*config;
 		
 		config = &bootInfo->themeConfig;
@@ -1867,7 +1867,7 @@ static void loadBootGraphics(void)
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0)
 	{
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 			if ((loadEmbeddedPngImage(__boot_png, __boot_png_len,
 				&bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif

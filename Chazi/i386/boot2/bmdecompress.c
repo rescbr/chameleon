@@ -22,10 +22,6 @@
 
 #include "libsa.h" // replaced boot.h
 
-typedef uint8_t  UInt8;
-typedef uint16_t UInt16;
-typedef int8_t   SInt8;
-typedef int16_t  SInt16;
 
 static void 
 PreviewDecompress16(uint32_t * compressBuffer, 

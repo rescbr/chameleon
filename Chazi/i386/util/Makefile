@@ -3,53 +3,58 @@
 # we'll just keep the generated files in this directory
 # and install them directly, rather than generating them again.
 #
+SRCROOT = $(shell pwd)/../../
+OBJROOT = $(SRCROOT)/obj/i386/util
+SYMROOT = $(SRCROOT)/sym/i386
+DSTROOT = $(SRCROOT)/dst/i386
+DOCROOT = $(SRCROOT)/doc
+IMGROOT = $(SRCROOT)/sym/cache
+IMGSKELROOT = $(SRCROOT)/imgskel
+CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
+
 
 DIR = util
-include ../MakePaths.dir
+include ${SRCROOT}/Make.rules
 
-VPATH = $(OBJROOT):$(SYMROOT)
-
-INSTALLDIR = $(DSTROOT)/usr/standalone/i386
-LOCALBIN = $(DSTROOT)/usr/local/bin
-
-OPTIM = -Os -Oz
-CFLAGS = $(RC_CFLAGS) $(OPTIM) -Wmost -Werror -g
-LDFLAGS =
-CFILES = machOconv.c
-ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
-
-PROGRAMS = machOconv bdmesg dyldsymboltool
-
-OUTFILES = $(PROGRAMS)
-
-DIRS_NEEDED = $(OBJROOT) $(SYMROOT) $(LANGDIR)
-
-all embedtheme: $(DIRS_NEEDED) $(PROGRAMS)
-
-dyldsymboltool: dyldsymboltool.o32 dyldsymboltool.o64
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
-	lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
-	$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
+PROGRAMS = machOconv dyldsymboltool
+OBJECTS = dyldsymboltool.o32 dyldsymboltool.o64 machOconv.o32 machOconv.o64
 
 
-machOconv: machOconv.o32 machOconv.o64
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
-	lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
-	$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
+ifeq (${CONFIG_BDMESG}, y)
+PROGRAMS += bdmesg
+OBJECTS += bdmesg.o32 bdmesg.o64
+endif
+
+ifeq (${CONFIG_OPENUP}, y)
+PROGRAMS += openUp
+OBJECTS += openUp.o64 openUp.o32
+endif
 
 
-bdmesg: bdmesg.o32 bdmesg.o64
-	$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 \
-		-arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
-	$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 \
-		-arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
-	lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
-	$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
+LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5
+
+SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
+
+DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+
+all: $(DIRS_NEEDED) $(SYMPROG) fdisk440
+
+$(SYMPROG): $(addprefix $(OBJROOT)/, $(OBJECTS))
+	@echo "\t[LD32] $(@F)_32"
+	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/$(@F).o32
+	@echo "\t[LD64] $(@F)_64"
+	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/$(@F).o64
+	@echo "\t[LIPO] $(@F)"
+	@lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
+	@$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
 
 
-include ../MakeInc.dir
+
+.PHONY: fdisk440
+fdisk440:
+	@echo ================= make all for fdisk =================;
+	@$(MAKE) -C fdisk
+
 
 #dependencies
 -include $(OBJROOT)/Makedep

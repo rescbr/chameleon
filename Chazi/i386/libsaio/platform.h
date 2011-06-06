@@ -7,11 +7,13 @@
 #ifndef __LIBSAIO_PLATFORM_H
 #define __LIBSAIO_PLATFORM_H
 
+
 //Azi: this was already acting as a mini libsaio.h :P see bootstruct.h.
 //#include "libsaio.h"
 #include "libsa.h"
 #include "saio_types.h"
-#include "saio_internal.h"
+#include "saio_internal.h" //Updt - delete these and test!!!
+
 
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);

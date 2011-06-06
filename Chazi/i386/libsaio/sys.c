@@ -54,33 +54,26 @@
  *	@(#)sys.c	7.1 (Berkeley) 6/5/86
  */
 
-/*
- * Copyright 2007 VMware Inc.
- * "Preboot" ramdisk support added by David Elliott
+/*  Copyright 2007 VMware Inc.
+    "Preboot" ramdisk support added by David Elliott
  */
 
-#include <AvailabilityMacros.h>
-#include <uuid/uuid.h>
 
-//#include "libsaio.h"
-//#include "bootstruct.h"
+#include "libsaio.h"
 #include "boot.h"
+#include "bootstruct.h"
 #include "disk.h"
 #include "ramdisk.h"
 #include "xml.h"
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-# include <Kernel/libkern/crypto/md5.h>
-#else
-# include <sys/md5.h>
-#endif
+#include <libkern/crypto/md5.h>
+//#include <uuid/uuid.h>
 
-/* No OS X release has ever included this. */
-#if 0
+#if 0 /* No OS X release has ever included this. */
 #include <Kernel/uuid/namespace.h>
 #else
-/* copied from uuid/namespace.h, just like BootX's fs.c does. */
-UUID_DEFINE( kFSUUIDNamespaceSHA1, 0xB3, 0xE2, 0x0F, 0x39, 0xF2, 0x92, 0x11, 0xD6, 0x97, 0xA4, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC );
+// from our uuid/namespace.h (UFS and HFS uuids can live in the same space?)
+static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC};
 #endif
 
 extern int multiboot_partition;
@@ -458,7 +451,7 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 		if ((iob[i].i_flgs != F_ALLOC) || (i == fdesc)) {
 			continue;
 		}
-		io->i_buf = MAX(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
+		io->i_buf = max(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
 	}
 
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
@@ -485,7 +478,7 @@ int open(const char *path, int flags)
 
 int open_bvdev(const char *bvd, const char *path, int flags)
 {
-    const struct devsw	*dp;
+        const struct devsw	*dp;
 	const char		*cp;
 	BVRef			bvr;
 	int			i;
@@ -524,7 +517,7 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 			bvr = newBootVolumeRef(dp->biosdev + unit, partition);
 			return open_bvr(bvr, path, flags);
 		}
-    }
+        }
 	return -1;
 }
 
@@ -754,15 +747,14 @@ int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
 }
 
 //==========================================================================
-/*
-const char * systemConfigDir() //Azi: boot 132 loadSystemConfig remains.
+
+const char * systemConfigDir()
 {
     if (gBootFileType == kNetworkDeviceType)
-		return "";
-
+	return "";
     return "/Library/Preferences/SystemConfiguration";
 }
-*/
+
 //==========================================================================
 
 int gBootFileType;
@@ -790,29 +782,29 @@ void scanBootVolumes( int biosdev, int * count )
 
 void scanDisks(int biosdev, int *count)
 {
-	#define MAX_HDD_COUNT 32
-	int bvCount;
-	int hd = 0;
-	
-	// Testing up to MAX_HDD_COUNT hard drives.
-	while (!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
+  #define MAX_HDD_COUNT 32
+  int bvCount;
+  int hd = 0;
+
+  // Testing up to MAX_HDD_COUNT hard drives.
+	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
 	{
-		bvCount = 0;
-		scanBootVolumes(0x80 + hd, &bvCount);
-		hd++;
+	  bvCount = 0;
+	  scanBootVolumes(0x80 + hd, &bvCount);
+    hd++;
 	}
-	
-	// Also scanning CD/DVD drive.
+
+  // Also scanning CD/DVD drive.
 	if (biosDevIsCDROM(gBIOSDev))
 	{
-		bvCount = 0;
-		scanBootVolumes(gBIOSDev, &bvCount);
+	  bvCount = 0;
+  	scanBootVolumes(gBIOSDev, &bvCount);
 	}
 }
 
 //==========================================================================
 
-BVRef selectBootVolume( BVRef chain ) //Azi: return default boot volume
+BVRef selectBootVolume( BVRef chain )
 {
 	bool filteredChain = false;
 	bool foundPrimary = false;
@@ -830,7 +822,7 @@ BVRef selectBootVolume( BVRef chain ) //Azi: return default boot volume
 	 * to override the default selection.
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
-	char *val = XMLDecode(getStringForKey(kDefaultPartitionKey, &bootInfo->bootConfig));
+	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
     if (val) {
         for ( bvr = chain; bvr; bvr = bvr->next ) {
             if (matchVolumeToString(bvr, val, false)) {
@@ -878,7 +870,8 @@ BVRef selectBootVolume( BVRef chain ) //Azi: return default boot volume
 		}
 	}
 	
-	bvr = bvr2 ? bvr2 : bvr1 ? bvr1 : chain;
+	bvr = bvr2 ? bvr2 :
+	bvr1 ? bvr1 : chain;
 	
 	return bvr;
 }
@@ -907,14 +900,13 @@ void setRootVolume(BVRef volume)
 
 void setBootGlobals(BVRef chain)
 {
-	// Record default boot device. (Azi: device to be booted ??? wtf :-/ )
-	gBootVolume = selectBootVolume(chain);
-	
-	// turbo - Save the ORIGINAL boot volume too for loading our mkext
-	if (!gBIOSBootVolume)
-		gBIOSBootVolume = gBootVolume;
-	
-	setRootVolume(gBootVolume);
+  // Record default boot device.
+  gBootVolume = selectBootVolume(chain);
+  
+  // turbo - Save the ORIGINAL boot volume too for loading our mkext
+  if (!gBIOSBootVolume) gBIOSBootVolume = gBootVolume;
+  
+  setRootVolume(gBootVolume);	
 }
 
 /*!

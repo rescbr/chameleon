@@ -25,10 +25,10 @@
  * Copyright 1993 NeXT, Inc.
  * All rights reserved.
  */
-
+#if 0
 #include <sys/types.h>
 #include <sys/param.h>
-#include <sys/vnode.h>
+//#include <sys/vnode.h>
 #include <ufs/ufs/dir.h>
 #include <libkern/OSByteOrder.h>
 
@@ -170,3 +170,5 @@ byte_swap_dir_block_in(char *addr, int count)
 			break;
 	}
 }
+
+#endif

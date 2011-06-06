@@ -1,3 +1,13 @@
+SRCROOT = $(shell pwd)/../../
+OBJROOT = $(SRCROOT)/obj/i386/boot2
+SYMROOT = $(SRCROOT)/sym/i386
+DSTROOT = $(SRCROOT)/dst/i386
+DOCROOT = $(SRCROOT)/doc
+IMGROOT = $(SRCROOT)/sym/cache
+IMGSKELROOT = $(SRCROOT)/imgskel
+CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
+
+VPATH = $(SYMROOT)
 
 #	Makefile for i386 boot program
 #	define FLOPPY and SMALL using DEFINES macro as necessary
@@ -6,52 +16,37 @@ PNGCRUSH = `which pngcrush`
 PNGOPTIONS = -rem cHRM -rem gAMA -rem iCCP -rem sRGB
 
 DIR = boot2
-include ../MakePaths.dir
+include ${SRCROOT}/Make.rules
 
 OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float
+		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+	      
+CPPFLAGS := $(CPPFLAGS) -nostdinc++ -include $(SRCROOT)/autoconf.h
 
 DEFINES=
 CONFIG = hd
 SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
-UTILDIR = ../util
-THEME = embed
+THEME = $(CONFIG_EMBEDED_THEME)
 THEMEDIR = ../../artwork/themes/$(THEME)
-INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
-ifneq "" "$(wildcard /bin/mkdirs)"
-  MKDIRS = /bin/mkdirs
-else
-  MKDIRS = /bin/mkdir -p
-endif
-AS = as
-LD = gcc
-# LIBS= -lc_static
+INC = -I. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
+
 LIBS= -L$(SYMDIR) -lsaio -lsa
-LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a
+LIBDEP= libsaio.a libsa.a
 
 OTHER_FILES =
-
-INSTALLDIR = $(DSTROOT)/usr/standalone/i386
-VPATH = $(OBJROOT):$(SYMROOT)
 
 # The ordering is important;
 # boot2.o must be first.
 OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o modules_support.o
+	ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o modules_support.o boot_modules.o
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util
-SFILES = boot2.s
-CFILES = boot.c graphics.c drivers.c prompt.c options.c mboot.c picopng.c modules.c
-HFILES = boot.h appleClut8.h appleboot.h mboot.h multiboot.h picopng.h modules.h
-OTHERFILES = Makefile
-ALLSRC = $(FOREIGNSRC) $(FOREIGNBIN) $(SFILES) $(CFILES) \
-	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
@@ -68,84 +63,103 @@ DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot.sys | grep __data -A
 PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 
-all: $(DIRS_NEEDED) boot
+all: $(DIRS_NEEDED) boot 
 
-embedtheme: CFLAGS += -DEMBED_THEME
-embedtheme: art.h all
+ifeq (${CONFIG_EMBED_THEME}, y)
 
-boot: machOconv embedded.h $(OBJS) $(LIBDEP)
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
-	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext
+boot: $(SYMROOT)/art.h $(SYMROOT)/vers.h $(SYMROOT)/embedded.h $(addprefix $(OBJROOT)/, $(OBJS)) $(addprefix $(SYMROOT)/, $(LIBDEP))
 
-	cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
+else
 
-	# Generate the Symbols.dylib file
-	$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+boot: $(SYMROOT)/vers.h $(SYMROOT)/embedded.h $(addprefix $(OBJROOT)/, $(OBJS)) $(addprefix $(SYMROOT)/, $(LIBDEP))
 
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+
+endif
+
+	@${MKDIRS} $(OBJROOT)/../boot2_modules/
+	@echo "\t[LD] boot.sys"
+	@$(CC) -Wl,-segaddr,__INIT,$(BOOT2ADDR) -Wl,-segalign,20 -Wl,-preload \
+			-nostdlib -arch i386 -static \
+			-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o`  $(LIBS) -lcc_kext
+
+ifeq (${CONFIG_MODULES}, y)
+
+	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
+
+	@# Generate the Symbols.dylib file
+	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+
+	@echo "\t[LD] boot.sys"
+	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o` $(LIBS)  -lcc_kext
 
-	# Second pass, fixup global var locations
-	${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+	@# Second pass, fixup global var locations
+	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
-	# Generate the Symbols.dylib file
-	$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	@# Generate the Symbols.dylib file
+	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
-	${RM} $(SYMROOT)/boot.sys
-	$(LD) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
+	@${RM} $(SYMROOT)/boot.sys
+	@echo "\t[LD] boot.sys"
+	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS)  -lcc_kext
-#Azi: @ ??
-	@ld -arch i386 \
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o` $(LIBS)  -lcc_kext
+
+	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
+
+
+	@$(LD) -arch i386 \
 	-undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	-final_output Symbols \
 	$(filter %.o,$^) $(LIBS) \
+	-final_output Symbols \
 	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
-#Azi: -macosx_version_min warning
-# @ ??
-	# this is done in a sub process after boot.sys exists so the strings are populated correctly
-	@make embed_symbols
-#Azi: @ ??
-	${RM} $(SYMROOT)/boot2.sys
-#Azi: @ ??
-	ls -l $(SYMROOT)/boot
+	
+
+
+
+
+endif
+
+	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
+
+	@${RM} $(SYMROOT)/boot2.sys
+	
+
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
+	   	echo "\t******* boot is $$size bytes *******"; \
 	    echo "Booter executable larger than $(MAXBOOTSIZE) bytes" ;\
 	    rm $(SYMROOT)/boot ;\
 	    exit 1;\
+	  else \
+	  	echo "\t******* boot is $$size bytes *******"; \
 	  fi)
 
-
-embed_symbols: machOconv
-#Azi: @ ??
+	
+embed_symbols:
+ifeq (${CONFIG_MODULES}, y)
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
 
 	@echo "\t******* Patching at $(PATCH_ADDR) ******"
 	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot.sys bs=1 count=4 seek=$(PATCH_ADDR)	 &> /dev/null
+endif
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
-
-prompt.o: vers.h
-vers.h:
-	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
-
-art.h:
+	
+$(SYMROOT)/art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\
 		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \
 		cd $(THEMEDIR) && find . -name '*.png' -exec $(PNGCRUSH) -q $(PNGOPTIONS) -d $(SYMROOT)/embed {} \;; \
@@ -171,14 +185,11 @@ art.h:
 
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
 
-embedded.h:
+$(SYMROOT)/embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
 
-install_i386:: all $(INSTALLDIR)
-	cp $(SYMROOT)/boot $(OTHER_FILES) $(INSTALLDIR)
-	cd $(INSTALLDIR); chmod u+w boot $(OTHER_FILES)
 
-include ../MakeInc.dir
+.PHONY: $(SYMROOT)/vers.h
 
 #dependencies
 -include $(OBJROOT)/Makedep
