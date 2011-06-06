@@ -30,13 +30,10 @@
  */
 
 #include "libsa.h"
-//#include "saio_internal.h" //Azi: needed for ZDEBUG (printf).
-// Check other DEBUG's, i forgot those while messing with includes.
+//#include "saio_internal.h" - Azi: needed for ZDEBUG (printf)
 #include "memory.h"
 
-#define ZDEBUG 0
-//Azi: this DEBUG is messed up; it hangs while "boot1: ..." with
-// black screen on my branch and instant reboot on trunk.
+#define ZDEBUG 0 //Azi: booter doesn't load with this enabled; instant reboot at "boot1: ..."
 
 #if ZDEBUG
 int zout;
@@ -253,7 +250,7 @@ void free(void * pointer)
 	zcoalesce();
 	return;
 }
-//Azi: static - Mek
+//Azi: enable static? not in trunk...
 //static 
 void
 zallocate(char * start,int size)

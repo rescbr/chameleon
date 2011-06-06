@@ -48,9 +48,9 @@ config rebuild_config:
 		"JAPANESE=$(JAPANESE)"				  \
 		"RC_CFLAGS=$$XCFLAGS" $@			  \
 	) || exit $$?; 						  \
-	
 
-all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config
+
+all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config $(SYMROOT)/i386/vers.h
 	@if [ -e ".svn" ]; then svnversion -n | tr -d [:alpha:] > revision; fi
 	@if [ -z "$(RC_ARCHS)" ]; then					  \
 		RC_ARCHS="i386";					  \
@@ -89,7 +89,13 @@ all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)
 	    fi;								  \
 	done
 
+$(SYMROOT)/i386/vers.h: version
+	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $@
+	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $@
+	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat version`\"" >> $@
+	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $@
 
 
+.PHONY: $(SYMROOT)/i386/vers.h
 .PHONY: config
 .PHONY: clean
