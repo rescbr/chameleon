@@ -7,4 +7,8 @@ source "i386/modules/Resolution/Cconfig"
 source "i386/modules/klibc/Cconfig"
 source "i386/modules/uClibcxx/Cconfig"
 source "i386/modules/HelloWorld/Cconfig"
+source "i386/modules/GraphicsEnabler/AMDGraphicsEnabler/Cconfig"
+source "i386/modules/GraphicsEnabler/ATiGraphicsEnabler/Cconfig"
+source "i386/modules/GraphicsEnabler/IntelGraphicsEnabler/Cconfig"
+source "i386/modules/GraphicsEnabler/NVIDIAGraphicsEnabler/Cconfig"
 endmenu
