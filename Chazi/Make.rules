@@ -104,7 +104,7 @@ $(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
 	
 $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/.config:
 	@echo "\t[MAKE] config"
-	@cd $(SRCROOT) && make config
+	@cd $(SRCROOT) && make rebuild_config
 
 .PHONY: clean
 clean:
@@ -123,3 +123,5 @@ clean:
 			$(SRCROOT)/autoconf.h \
 			$(SRCROOT)/autoconf.inc
 
+
+.DEFAULT_GOAL := all
