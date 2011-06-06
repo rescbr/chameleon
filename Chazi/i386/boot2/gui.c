@@ -182,13 +182,13 @@ static int getEmbeddedImageIndexByName(const char *name)
 	int result;
 	
 	// NOTE: This algorithm assumes that the embedded images are sorted.
-	// This is currently done using the make file. If the array is ever
-	// manualy generated, this *will* fail to work properly.
+	// This is currently done using the make file. If the array is
+	// generated manualy, this *will* fail to work properly.
 	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
-		if(result > 0)	// We need to search a HIGHER index
+		if (result > 0)	// We need to search a HIGHER index
 		{
-			if(compareIndex != lowerLimit)
+			if (compareIndex != lowerLimit)
 			{
 				lowerLimit = compareIndex;
 			}
@@ -200,7 +200,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 		}
 		else  // We Need to search a LOWER index
 		{
-			if(compareIndex != upperLimit)
+			if (compareIndex != upperLimit)
 			{
 				upperLimit = compareIndex;
 			}

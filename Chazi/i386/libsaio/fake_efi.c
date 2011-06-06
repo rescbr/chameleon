@@ -24,19 +24,19 @@
 
 /*
  * Modern Darwin kernels require some amount of EFI because Apple machines all
- * have EFI.  Modifying the kernel source to not require EFI is of course
+ * have EFI. Modifying the kernel source to not require EFI is of course
  * possible but would have to be maintained as a separate patch because it is
  * unlikely that Apple wishes to add legacy support to their kernel.
  *
  * As you can see from the Apple-supplied code in bootstruct.c, it seems that
  * the intention was clearly to modify this booter to provide EFI-like structures
- * to the kernel rather than modifying the kernel to handle non-EFI stuff.	 This
+ * to the kernel rather than modifying the kernel to handle non-EFI stuff. This
  * makes a lot of sense from an engineering point of view as it means the kernel
  * for the as yet unreleased EFI-only Macs could still be booted by the non-EFI
  * DTK systems so long as the kernel checked to ensure the boot tables were
- * filled in appropriately.  Modern xnu requires a system table and a runtime
+ * filled in appropriately. Modern xnu requires a system table and a runtime
  * services table and performs no checks whatsoever to ensure the pointers to
- * these tables are non-NULL.	Therefore, any modern xnu kernel will page fault
+ * these tables are non-NULL. Therefore, any modern xnu kernel will page fault
  * early on in the boot process if the system table pointer is zero.
  *
  * Even before that happens, the tsc_init function in modern xnu requires the FSB
@@ -45,7 +45,7 @@
  *
  * As of this writing, the current implementation found here is good enough
  * to make the currently available xnu kernel boot without modification on a
- * system with an appropriate processor.  With a minor source modification to
+ * system with an appropriate processor. With a minor source modification to
  * the tsc_init function to remove the explicit check for Core or Core 2
  * processors the kernel can be made to boot on other processors so long as
  * the code can be executed by the processor and the machine contains the
@@ -55,7 +55,6 @@
 /*==========================================================================
  * Utility function to make a device tree string from an EFI_GUID
  */
-
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
 	char *string = malloc(37);
@@ -66,7 +65,6 @@ static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 /*==========================================================================
  * Function to map 32 bit physical address to 64 bit virtual address
  */
-
 static uint64_t ptov64(uint32_t addr)
 {
 	return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
@@ -154,7 +152,6 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
  * Because we build against modern headers with kBootArgsRevision 4 we
  * also take care to set efiMode = 32.
  */
-
 void setupEfiTables32(void)
 {
 	// We use the fake_efi_pages struct so that we only need to do one kernel
@@ -459,12 +456,9 @@ static EFI_UINT8 const	BOOT_FILE_PATH[] =
 };
 static EFI_UINT8 const MACHINE_SIGNATURE[] = { 0x00, 0x00, 0x00, 0x00 };
 
-
-
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
-
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
@@ -484,7 +478,6 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 /*
  * Get the SystemID from the bios dmi info
  */
-
 static	EFI_CHAR8* getSmbiosUUID()
 {
 	static EFI_CHAR8		 uuid[UUID_LEN];
@@ -522,7 +515,6 @@ static	EFI_CHAR8* getSmbiosUUID()
  * return a binary UUID value from SystemId=<uuid> if found, 
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
-
 static EFI_CHAR8* getSystemID()
 {
 	// unable to determine UUID for host. Error: 35 fix
@@ -547,7 +539,6 @@ static EFI_CHAR8* getSystemID()
  * Must be called AFTER setup Acpi because we need to take care of correct
  * facp content to reflect in ioregs
  */
-
 void setupSystemType()
 {
 	Node *node = DT__FindNode("/", false);
@@ -624,7 +615,7 @@ void setupEfiDeviceTree(void)
 	// Export FSB, TSC and CPU frequencies for use by the kernel or KEXTs
 	if (Platform.CPU.FSBFrequency != 0)
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
-/*	Azi: TSC & CPU don't show in any Mac dump (snow) i own in efiPlatformNode!!??? disable?
+/*	Azi: TSC & CPU don't show in any Mac dump on this node; doesn't seem "missed" by anything..?!
 	if (Platform.CPU.TSCFrequency != 0)
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 	
@@ -638,36 +629,48 @@ void setupEfiDeviceTree(void)
 	 // Export SystemSerialNumber if present
 	if ((ret16 = getSmbiosChar16("SMserial", &len)))
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
-//Azi: this is done too late for kc adler generation... hum	
-	// Export Model if present
-	if ((ret16 = getSmbiosChar16("SMproductname", &len)))
-		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);//*****
-//*****: these seem the only ones that influence KC adler creation, specialy the one above...
 	
-//Azi: ?number? of supported device paths
-	// Satisfying AppleACPIPlatform.kext - DHP
+	// Export Model if present
+	//Azi: so far, the only propperty we were using that matters for kernelcache adler creation;
+	// it's done too late to be useful on common_boot (reading it from smbios.plist for now).
+	// Note: SMproductname seems to not be taken in account when creating adler on Tiger & Leo.
+	if ((ret16 = getSmbiosChar16("SMproductname", &len)))
+		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);//***
+	
+	// Satisfying AppleACPIPlatform.kext - DHP (Lion?)
 	DT__AddProperty(efiPlatformNode, DEV_PATH_SUP, sizeof(uint32_t), &DevPathSup);
-//Azi: nvram shit...
+	
+	//Azi: nvram stuff
 //	static EFI_UINT8 const audioVolume[] = { 0x00 };
 //	Node *root = DT__FindNode("/AppleEFIRuntime", false);
 //	Node *nvramNode = DT__AddChild(root, "AppleEFINVRAM");
 //	Node *nvramNode = DT__FindNode("/options", true);
 //	DT__AddProperty(nvramNode, "SystemAudioVolume", sizeof(audioVolume), &audioVolume);
-//Azi: chosen stuff - move when complete?
+	
+	// options (AppleEFINVRAM) node can't be created by the booter!
+	// http://forum.voodooprojects.org/index.php/topic,200.msg668.html#msg668
+	// Even with AppleEFINVRAM disabled, creating the node with the booter, causes
+	// uuid "00000000-0000-1000-8000-suxyzwkvsger" to be added to it and used by the system
+	// as Platform uuid. It seems this was normal on some older Mac's!?
+	
+	//Azi: chosen stuff - move when complete?
 	// node created on bootstruct.c (initKernBootStruct) while creating /chosen/memory-map
 	Node *chosenNode = DT__FindNode("/chosen", false);
 	
+	//Azi: keep?.. all Mac dumps show 0x00...
 //	DT__AddProperty(chosenNode, "boot-args", sizeof(BOOT_ARGS), &BOOT_ARGS);
-	DT__AddProperty(chosenNode, "boot-args", sizeof(bootArgs->CommandLine), &bootArgs->CommandLine); //Azi: keep ??
+	DT__AddProperty(chosenNode, "boot-args", sizeof(bootArgs->CommandLine), &bootArgs->CommandLine);
 	
 	// Adding the root path for kextcache. - DHP
 //	DT__AddProperty(chosenNode, "boot-device-path", 38, ((gPlatform.OSType & 3) == 3)
 //					? "\\boot.efi" : "\\System\\Library\\CoreServices\\boot.efi");
-	//Azi: this data is not constant on Mac's and it's in "hex" format... investigate*****
-	DT__AddProperty(chosenNode, "boot-device-path", 38, "\\System\\Library\\CoreServices\\boot.efi");//*****
+	//Azi: this data seems to be "machine specific"!?
+	DT__AddProperty(chosenNode, "boot-device-path", 38, "\\System\\Library\\CoreServices\\boot.efi");//***
 	
-	// Adding the default kernel name (mach_kernel) for kextcache. - DHP
-	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);//*****
+	// Adding the kernel name (default = mach_kernel); used on kernelcache adler creation.
+	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);//***
+	
+//***: these seem to be the only ones that influence kernelcache adler creation (Snow).
 	
 	DT__AddProperty(chosenNode, "boot-file-path", sizeof(BOOT_FILE_PATH), &BOOT_FILE_PATH);
 	
@@ -678,7 +681,7 @@ void setupEfiDeviceTree(void)
 	}
 	
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(MACHINE_SIGNATURE), &MACHINE_SIGNATURE);
-//Azi: end chosen stuff
+	
 	// Fill /efi/device-properties node.
 	setupDeviceProperties(node);
 }
@@ -686,7 +689,6 @@ void setupEfiDeviceTree(void)
 /*
  * Load the smbios.plist override config file if any
  */
-
 //static - testing earlier load of smbios.plist (read below)
 void setupSmbiosConfigFile(const char *filename)
 {
@@ -727,9 +729,9 @@ success_fd:
 	else
 		verbose("No SMBIOS replacement provided.\n");
 	
-	// get a chance to scan mem dynamically if user asks for it while having the config options loaded as well,
-	// as opposed to when it was in scan_platform(); also load the orig. smbios so that we can access dmi info without
-	// patching the smbios yet
+	// get a chance to scan mem dynamically if user asks for it while having the config options
+	// loaded as well, as opposed to when it was in scan_platform(); also load the orig. smbios
+	// so that we can access dmi info, without patching the smbios yet.
 //	getSmbios(SMBIOS_ORIGINAL);
 //	scan_mem(); //Azi: moved to setupFakeEfi, testing early load of smbios.plist to set
 				//	SMproductname & SMboardproduct for ioreg injection (kernelcache(adler) & Lion?)
@@ -739,7 +741,6 @@ success_fd:
 /*
  * Installs all the needed configuration table entries
  */
-
 static void setupEfiConfigurationTable()
 {
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
@@ -763,7 +764,7 @@ static void setupEfiConfigurationTable()
 
 /**
 	what for ??
-**/
+*/
 void saveOriginalSMBIOS(void)
 {
 	Node *node;
@@ -796,7 +797,6 @@ void saveOriginalSMBIOS(void)
 /*
  * Entrypoint from boot.c
  */
-
 void setupFakeEfi(void)
 {
 	extern void scan_mem();

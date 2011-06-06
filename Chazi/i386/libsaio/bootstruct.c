@@ -105,7 +105,6 @@ void initKernBootStruct( void )
 		
         init_done = 1;
     }
-
 }
 
 //Azi: ... but here we can... (done)

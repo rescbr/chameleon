@@ -60,7 +60,7 @@ extern void			dump_pci_dt(pci_dt_t *);
 
 /* Option ROM header */
 typedef struct {
-	uint16_t	signature;		// 0xAA55
+	uint16_t	signature;			// 0xAA55
 	uint8_t		rom_size;
 	uint32_t	entry_point;
 	uint8_t		reserved[15];
@@ -70,7 +70,7 @@ typedef struct {
 
 /* Option ROM PCI Data Structure */
 typedef struct {
-	uint32_t	signature;		// 0x52494350	'PCIR'
+	uint32_t	signature;			// ati - 0x52494350, nvidia - 0x50434952	'PCIR'
 	uint16_t	vendor_id;
 	uint16_t	device_id;
 	uint16_t	vital_product_data_offset;

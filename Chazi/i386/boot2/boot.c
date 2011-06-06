@@ -722,7 +722,7 @@ void common_boot(int biosdev)
 					ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
 					if (ret == -1)
 					{
-						// No alternate locations found, using the original kernel image path.
+						// No alternate location found, using the original kernel image path.
 						strcpy(bootFileSpec, bootFile);
 					}
 				}

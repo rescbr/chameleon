@@ -216,6 +216,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  filesize = segCmd->filesize;
 
 	  segname=segCmd->segname;
+
 #ifdef DEBUG
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
@@ -235,6 +236,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  filesize = segCmd->filesize;
 	  
 	  segname=segCmd->segname;
+
 #ifdef DEBUG
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,

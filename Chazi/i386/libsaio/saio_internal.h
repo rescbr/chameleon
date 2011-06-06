@@ -56,6 +56,7 @@ extern int    readKeyboardShiftFlags(void);
 extern unsigned int time18(void);
 extern void   delay(int ms);
 extern unsigned int get_diskinfo(int dev);
+//Azi: reminder - apple partition map
 #if APM_SUPPORT
 extern int    APMPresent(void);
 extern int    APMConnect32(void);

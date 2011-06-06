@@ -4,7 +4,7 @@ MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = Enabler/ATiGraphicsEnabler
+DIR = ATiGraphicsEnabler
 
 MODULE_OBJS = ati.o ATiGraphicsEnabler.o
 

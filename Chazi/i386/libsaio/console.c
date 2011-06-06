@@ -52,23 +52,26 @@ extern int	vprf(const char * fmt, va_list ap);
 bool gVerboseMode;
 bool gErrors;
 
-/* Kabyl: BooterLog */
-//Azi: Double log available size; this seems to fix some hangs and instant reboots caused by
-// booting with -f (ignore caches). 96kb are enough to hold full log, booting with -f; even so,
-// this depends on how much we "play" at the boot prompt and with what patches we're playing,
-// depending on how much they print to the log.
+/*
+ *  Azi: Doubled available log size; this seems to fix some hangs and instant reboots caused by
+ *  booting with -f (ignore caches). 96kb are enough to hold full log, booting with -f; even so,
+ *  this depends on how much we "play" at the boot prompt and with what patches we're playing,
+ *  depending on how much they print to the log.
+ *	
+ *  Kabyl: BooterLog
+ */
 #define BOOTER_LOG_SIZE	(128 * 1024)
 #define SAFE_LOG_SIZE	134
 
 char *msgbuf = 0;
 char *cursor = 0;
 
-struct putc_info {
+struct putc_info { //Azi: exists on printf.c & gui.c
     char * str;
     char * last_str;
 };
 
-static void sputc(int c, struct putc_info * pi)
+static void sputc(int c, struct putc_info * pi) //Azi: same as above
 {
 	if (pi->last_str)
 	if (pi->str == pi->last_str)
@@ -169,7 +172,7 @@ int printf(const char * fmt, ...)
 		vprf(fmt, ap);
 
 	{
-	/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf)
@@ -201,7 +204,7 @@ int verbose(const char * fmt, ...)
     }
 
 	{
-	/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf)
@@ -244,7 +247,7 @@ void stop(const char * fmt, ...)
 		vprf(fmt, ap);
 	}
 	va_end(ap);
-	printf("\nThis is a non recoverable error! System HALTED!!!"); //Azi: line break ??
+	printf("\nThis is a non recoverable error! System HALTED!!!");
 	halt();
 	while (1);
 }
