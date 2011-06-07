@@ -37,9 +37,11 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	cpu.o platform.o acpi_patcher.o \
 	smbios.o smbios_getters.o smbios_decode.o \
 	fake_efi.o ext2fs.o \
-	hpet.o dram_controllers.o spd.o usb.o pci_setup.o \
-	device_inject.o nvidia.o ati.o pci_root.o \
-	convert.o aml_generator.o console.o
+	usb.o pci_setup.o \
+	device_inject.o pci_root.o convert.o aml_generator.o console.o \
+	nvidia_resolution.o ati_resolution.o gma_resolution.o \
+	autoresolution.o edid.o
+# mem.o smbios_patcher.o - Kabyl
 
 LIBS  = libsaio.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))

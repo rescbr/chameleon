@@ -7,8 +7,9 @@
 #define CONFIG_MODULE_DEBUG 0
 #endif
 
+//#include "bootstruct.h"
 #include "boot.h"
-#include "bootstruct.h"
+#include "memory.h"
 #include "modules.h"
 #include "boot_modules.h"
 #include <vers.h>

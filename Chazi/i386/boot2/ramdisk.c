@@ -278,7 +278,7 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 		showInfoRAMDisk();
 		//Azi: check Chazileon on these line breaks here***
 		printf("\n\nPress any key to continue.\n");
-		getc();
+		getchar(); //getc(); Azi: getc stuff
 		setActiveDisplayPage(0);
 	}
 	else
@@ -291,7 +291,7 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 		printf("\n?rd m <filename> - mount ramdisk image\n?rd u - unmount ramdisk image");
 		printf("\n?rd e - enable bt(0,0) alias\n?rd d - disable bt(0,0) alias");
 		printf("\n\nPress any key to continue.\n");
-		getc();
+		getchar(); //getc(); Azi: getc stuff
 		setActiveDisplayPage(0);
 	}
 }

@@ -924,7 +924,7 @@ int getBootOptions(bool firstRun)
 			// reset cursor co-ords
 			gui.debug.cursor = pos( gui.screen.width - 160 , 10 );
 		}
-		key = getc();
+		key = getchar(); //getc(); Azi: getc stuff
 		updateMenu( key, (void **) &menuBVR );
 		newShowPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 
@@ -1489,7 +1489,7 @@ static void showTextBuffer(char *buf, int size)
 			printf("[Type %s%sq to quit viewer]", (line_offset > 0) ? "p for previous page, " : "", (*bp != '\1') ? "space for next page, " : "");
 		}
 
-		c = getc();
+		c = getchar(); //getc(); Azi: getc stuff
 		if (c == 'q' || c == 'Q') {
 			break;
 		}
@@ -1562,7 +1562,7 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Typical boot devices are 80 (First HD), 81 (Second HD)\n");
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
-		key = getc();
+		key = getchar(); //getc(); Azi: getc stuff
 		switch (key & kASCIIKeyMask) {
 		case kBackspaceKey:
 			if (digitsI > 0) {
@@ -1613,7 +1613,7 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getc() == kReturnKey) {
+	if ( getchar()/*getc(); Azi: getc stuff*/ == kReturnKey) {
 		return true;
 	} else {
 		return false;

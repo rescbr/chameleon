@@ -11,9 +11,22 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = klibc uClibcxx Resolution HelloWorld \
+SUBDIRS = klibc uClibcxx KernelPatcher Memory HPET \
 		  GraphicsEnabler/ATiGraphicsEnabler GraphicsEnabler/AMDGraphicsEnabler \
-		  GraphicsEnabler/NVIDIAGraphicsEnabler GraphicsEnabler/IntelGraphicsEnabler
+		  GraphicsEnabler/NVIDIAGraphicsEnabler GraphicsEnabler/IntelGraphicsEnabler \
+		  HelloWorld Resolution
+#	-	-  Resolution (only tested on Meklort's branch, never did any good for my resolution;
+#						conflicts with AutoResolution - fix! )
+
+#	-	-  AMDGraphicsEnabler (no support for ATI legacy cards, e.g. 1000 series)
+#		testing = http://www.insanelymac.com/forum/index.php?s=&showtopic=231075&view=findpost&p=1683785
+
+#	-	-  Memory ("Attempting to execute hook ScanMemory"
+#						Divide by 0
+#					"This is a non recoverable error! System HALTED!!!")
+#		   (Based on previous tests whith Meklort's branch; here just instant reboots. XCode 4 SPECIFIC!!)
+
+#	-	-  KernelPatcher (hangs right after loading the kernel. XCode 4 SPECIFIC!!)
 
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static

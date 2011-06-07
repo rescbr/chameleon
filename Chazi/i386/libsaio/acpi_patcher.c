@@ -1107,7 +1107,7 @@ int setupAcpi(void)
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
-	getc();
+	getchar(); //getc(); Azi: getc stuff
 #endif
 	return 1;
 }

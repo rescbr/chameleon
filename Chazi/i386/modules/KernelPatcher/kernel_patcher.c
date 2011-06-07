@@ -214,7 +214,7 @@ int determineKernelArchitecture(void* kernelData)
 int locate_symbols(void* kernelData)
 {
 	char is64 = 1;
-	parse_mach(kernelData, NULL, symbol_handler);
+	parse_mach(kernelData, NULL, symbol_handler, NULL);
 	//handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
 	return 1 << is64;
 }
@@ -385,12 +385,12 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		
 		// Total: 24 bytes
 		printf("Running on a 10.2.0+ kernel\n");
-//		getc();
+//		getchar(); //getc(); Azi: getc stuff
 
 	}
 	else {
 		printf("Running on a 10.0.0 kernel, patch unsupported\n");
-		getc();
+		getchar(); //getc(); Azi: getc stuff
 	}
 
 	

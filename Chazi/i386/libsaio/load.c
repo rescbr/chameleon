@@ -137,7 +137,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   printf("ncmds:      %x\n", (unsigned)mH->ncmds);
   printf("sizeofcmds: %x\n", (unsigned)mH->sizeofcmds);
   printf("flags:      %x\n", (unsigned)mH->flags);
-  getc();
+  getchar(); //getc(); Azi: getc stuff
 #endif
   
   ncmds = mH->ncmds;
@@ -221,7 +221,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getc();
+  getchar(); //getc(); Azi: getc stuff
 #endif
   }
   else
@@ -241,7 +241,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getc();
+  getchar(); //getc(); Azi: getc stuff
 #endif
   }
 
@@ -325,7 +325,7 @@ static long DecodeSymbolTable(long cmdBase)
 #ifdef DEBUG
   printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n",
 	 symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
-	getc ();
+	getchar(); //getc(); Azi: getc stuff
 #endif
   
   symsSize = symTab->stroff - symTab->symoff;

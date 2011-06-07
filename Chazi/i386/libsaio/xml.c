@@ -27,6 +27,8 @@
 #include "sl.h"
 #include "xml.h"
 
+//getchar(); //getc(); Azi: getc stuff
+
 //Azi: start - this code is unchanged since boot132, were it was exactly the same
 // as the one in drivers.c. Atm, the one in drivers.c has some more stuff; it could be
 // added on xml.h which is included on drivers.c and here??

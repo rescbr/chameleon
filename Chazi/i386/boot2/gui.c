@@ -1634,7 +1634,7 @@ void showInfoBox(char *title, char *text)
 		
 		updateVRAM();
 		
-		key = getc();
+		key = getchar(); //getc(); Azi: getc stuff
 			
 		if( key == kUpArrowkey )
 			if( currentline > 0 )

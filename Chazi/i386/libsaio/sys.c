@@ -451,7 +451,7 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 		if ((iob[i].i_flgs != F_ALLOC) || (i == fdesc)) {
 			continue;
 		}
-		io->i_buf = max(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
+		io->i_buf = MAX(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
 	}
 
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
@@ -822,7 +822,7 @@ BVRef selectBootVolume( BVRef chain )
 	 * to override the default selection.
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
-	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
+	char *val = XMLDecode(getStringForKey(kDefaultPartitionKey, &bootInfo->bootConfig));
     if (val) {
         for ( bvr = chain; bvr; bvr = bvr->next ) {
             if (matchVolumeToString(bvr, val, false)) {

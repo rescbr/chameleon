@@ -6,7 +6,7 @@
 #ifndef __LIBSAIO_CPU_H
 #define __LIBSAIO_CPU_H
 
-//#include "libsaio.h" - enabled on trunk
+//#include "libsaio.h" - enabled on trunk ??
 
 extern void scan_cpu(PlatformInfo_t *);
 

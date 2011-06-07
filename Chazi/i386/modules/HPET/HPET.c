@@ -104,7 +104,7 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 	}
 	
 /*#if DEBUG_HPET
-	pause();
+	pause(); - getchar(); //getc(); Azi: getc stuff
 #endif*/
 }
 

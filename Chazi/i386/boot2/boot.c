@@ -397,7 +397,7 @@ void common_boot(int biosdev)
 //printf
     msglog(":something...???\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
     msglog(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-//    getc();
+//    getchar(); //getc(); Azi: getc stuff - DON'T FORGET pause() - take modules.c as reference.
 //#endif
 
     useGUI = true;
