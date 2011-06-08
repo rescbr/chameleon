@@ -47,14 +47,14 @@ typedef struct moduleHook_t
 	struct moduleHook_t* next;
 } moduleHook_t;
 
-typedef struct moduleList_t //Azi: modules or module? see modules/include/modules
+typedef struct modulesList_t
 {
 	const char*				name;
     const char*             author;
     const char*             description;
 	UInt32					version;
 	UInt32					compat;
-	struct moduleList_t*	next;
+	struct modulesList_t* next;
 } moduleList_t;
 
 

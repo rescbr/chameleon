@@ -3,7 +3,6 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "modules.h"
-#include "modules.h"
 
 
 extern void set_eth_builtin(pci_dt_t *eth_dev);
