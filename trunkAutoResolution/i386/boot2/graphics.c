@@ -431,7 +431,6 @@ setVESAGraphicsMode( unsigned short width,
 
 //Azi:autoresolution
 #ifdef AUTORES_DEBUG
-		//Azi: who? who is about to set?? :P
 		PRINT("Is about to set mode #%d with resolution %dx%d\n", mode, minfo.XResolution, minfo.YResolution);
 		//getc(); //Azi: boot hangs, on the second call (like "old" Wait=y issue and usb fixes).
 		sleep(2);
