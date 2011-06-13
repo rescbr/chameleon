@@ -38,9 +38,12 @@
 #define kTextModeKey		"Text Mode"
 #define kQuietBootKey		"Quiet Boot"
 #define kKernelFlagsKey		"Kernel Flags"
+#define karch				"arch"				/* boot.c */
+#define kProductVersion		"ProductVersion"	/* boot.c */
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
 #define kKernelCacheKey		"Kernel Cache"
+#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 #define kBootDeviceKey		"Boot Device"
 #define kTimeoutKey			"Timeout"
 #define kRootDeviceKey		"rd"
@@ -71,9 +74,6 @@
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch				"arch"				/* boot.c */
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 
 #define kbusratio			"busratio"			/* cpu.c */
 
@@ -81,10 +81,16 @@
 
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
+#define kDefaultPartition	"Default Partition"	/* sys.c */
 
 #define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
+#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
+
+#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
+
+#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
 
 //#define kUseAtiROM			"UseAtiROM"			/* ati.c */
 //#define kAtiConfig			"AtiConfig"			/* ati.c */
@@ -95,20 +101,11 @@
 //#define kdcfg0              "display_0"			/* nvidia.c */
 //#define kdcfg1              "display_1"			/* nvidia.c */
 
-
-#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */
 
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-
 #define kMD0Image			"md0"				/* ramdisk.h */
-
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-
-#define kDefaultPartition	"Default Partition"	/* sys.c */
 
 #define kUSBBusFix			"USBBusFix"			/* usb.c */
 #define kEHCIacquire		"EHCIacquire"		/* usb.c */

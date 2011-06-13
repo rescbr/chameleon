@@ -7,7 +7,7 @@
 #include "hpet.h"
 
 #ifndef DEBUG_HPET
-#define DEBUG_HPET 1
+#define DEBUG_HPET 0
 #endif
 
 #if DEBUG_HPET
@@ -97,7 +97,7 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 		}
 
 #if DEBUG_HPET
-	printf("Press [Enter] to continue...\n"); // replace by pause() function, console.c
-	getchar(); //getc(); Azi: getc stuff
+	printf("Press [Enter] to continue...\n");
+	getchar();
 #endif
 }

@@ -14,7 +14,7 @@
 #include "aml_generator.h"
 
 #ifndef DEBUG_ACPI
-#define DEBUG_ACPI 1
+#define DEBUG_ACPI 0
 #endif
 
 #if DEBUG_ACPI==2
@@ -1058,8 +1058,7 @@ int setupAcpi(void)
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
-//	getc();
-	getchar(); //getc(); Azi: getc stuff
+	getchar();
 #endif
 	return 1;
 }

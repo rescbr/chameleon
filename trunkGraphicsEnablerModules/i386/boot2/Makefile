@@ -23,7 +23,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
 		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
-
+	      
 CPPFLAGS := $(CPPFLAGS) -nostdinc++ -include $(SRCROOT)/autoconf.h
 
 DEFINES=
@@ -122,6 +122,9 @@ ifeq (${CONFIG_MODULES}, y)
 	-final_output Symbols \
 	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
+	
+
+
 
 
 endif
@@ -129,6 +132,8 @@ endif
 	@make embed_symbols		# this is done in a sub process after boot.sys exists so the strings are populated correctly
 
 	@${RM} $(SYMROOT)/boot2.sys
+	
+
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
 	  if expr "$$size" ">" "$(MAXBOOTSIZE)" > /dev/null ;\
 	  then \
@@ -140,7 +145,7 @@ endif
 	  	echo "\t******* boot is $$size bytes *******"; \
 	  fi)
 
-
+	
 embed_symbols:
 ifeq (${CONFIG_MODULES}, y)
 	@echo ================= Embedding Symbols.dylib =================
@@ -153,7 +158,7 @@ endif
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
-
+	
 $(SYMROOT)/art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\
 		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \

@@ -26,8 +26,6 @@
  *
  */
 
-//#define DEBUG 1
-
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
 #include <mach/machine/thread_status.h>
@@ -137,7 +135,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   printf("ncmds:      %x\n", (unsigned)mH->ncmds);
   printf("sizeofcmds: %x\n", (unsigned)mH->sizeofcmds);
   printf("flags:      %x\n", (unsigned)mH->flags);
-  getchar(); //getc(); Azi: getc stuff
+  getchar();
 #endif
   
   ncmds = mH->ncmds;
@@ -221,7 +219,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getchar(); //getc(); Azi: getc stuff
+  getchar();
 #endif	  
   }
   else
@@ -241,7 +239,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getchar(); //getc(); Azi: getc stuff
+  getchar();
 #endif	  
   }
 
@@ -250,13 +248,6 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
       *load_size = 0;
       return 0;
   }
-  
-/*#if DEBUG
-  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getc();
-#endif*/
   
   if (! ((vmaddr >= KERNEL_ADDR &&
           (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
@@ -326,7 +317,7 @@ static long DecodeSymbolTable(long cmdBase)
 #if DEBUG
   printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n",
 	 symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
-	getchar(); //getc(); Azi: getc stuff
+  getchar();
 #endif
   
   symsSize = symTab->stroff - symTab->symoff;
