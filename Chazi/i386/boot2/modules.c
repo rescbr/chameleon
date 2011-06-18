@@ -305,7 +305,7 @@ unsigned int lookup_all_symbols(const char* name)
 	
 #if CONFIG_MODULE_DEBUG
 	printf("Unable to locate symbol %s\n", name);
-	getc(); //getchar();
+	getc(); //Azi: getchar();
 #endif
 	
 	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
