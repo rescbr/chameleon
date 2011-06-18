@@ -17,7 +17,7 @@
 
 #if CONFIG_MODULE_DEBUG
 #define DBG(x...)	printf(x);
-#define DBGPAUSE()	getc() //getchar()
+#define DBGPAUSE()	getc() // getchar()
 #else
 #define DBG(x...)
 #define DBGPAUSE()
@@ -87,7 +87,7 @@ int init_module_system()
             else
             {
                 // The module does not have a valid start function
-                printf("Unable to start %s\n", SYMBOLS_MODULE); getc(); //getchar();
+                printf("Unable to start %s\n", SYMBOLS_MODULE); getc(); //Azi: getchar();
             }		
 		}		
 	}
@@ -186,7 +186,7 @@ int load_module(char* module)
 		else // The module does not have a valid start function. This may be a library.
 		{
 			printf("WARNING: Unable to start %s\n", module);
-			getc(); //getchar();
+			getc(); //Azi: getchar();
 		}
 #else
 		else msglog("WARNING: Unable to start %s\n", module);
@@ -371,7 +371,7 @@ void* parse_mach(void* binary,
 	else
 	{
 		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
-		//getchar();
+		//getc(); //Azi: getchar();
 		return NULL;
 	}
 	
@@ -380,7 +380,7 @@ void* parse_mach(void* binary,
 	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	 {
 	 printf("Module is not a dylib. Unable to load.\n");
-	 getchar();
+	 getc(); //Azi: getchar();
 	 return NULL; // Module is in the incorrect format
 	 }*/
 	
@@ -892,7 +892,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //getchar();
+					getc(); //Azi: getchar();
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -911,7 +911,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //getchar();
+					getc(); //Azi: getchar();
 				}
 
 				segmentAddress += tmp + sizeof(void*);
@@ -929,7 +929,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //getchar();
+					getc(); //Azi: getchar();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 				
@@ -954,7 +954,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //getchar();
+					getc(); //Azi: getchar();
 				}
 				break;
 		}
@@ -1086,7 +1086,7 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	
 #if CONFIG_MODULE_DEBUG
 	//print_hook_list();
-	//getchar();
+	//getc(); //Azi: getchar();
 #endif
 	
 }
@@ -1134,7 +1134,7 @@ void print_hook_list()
 void dyld_stub_binder()
 {
 	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
-	getc(); //getchar();
+	getc(); //Azi: getchar();
 }
 
 #else /* CONFIG_MODULES */
