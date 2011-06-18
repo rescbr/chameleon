@@ -17,7 +17,7 @@
 
 #if CONFIG_MODULE_DEBUG
 #define DBG(x...)	printf(x);
-#define DBGPAUSE()	getchar()
+#define DBGPAUSE()	getc() //getchar()
 #else
 #define DBG(x...)
 #define DBGPAUSE()
@@ -87,7 +87,7 @@ int init_module_system()
             else
             {
                 // The module does not have a valid start function
-                printf("Unable to start %s\n", SYMBOLS_MODULE); getchar();
+                printf("Unable to start %s\n", SYMBOLS_MODULE); getc(); //getchar();
             }		
 		}		
 	}
@@ -186,7 +186,7 @@ int load_module(char* module)
 		else // The module does not have a valid start function. This may be a library.
 		{
 			printf("WARNING: Unable to start %s\n", module);
-			getchar();
+			getc(); //getchar();
 		}
 #else
 		else msglog("WARNING: Unable to start %s\n", module);
@@ -305,7 +305,7 @@ unsigned int lookup_all_symbols(const char* name)
 	
 #if CONFIG_MODULE_DEBUG
 	printf("Unable to locate symbol %s\n", name);
-	getchar();
+	getc(); //getchar();
 #endif
 	
 	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
@@ -892,7 +892,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getchar();
+					getc(); //getchar();
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -911,7 +911,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getchar();
+					getc(); //getchar();
 				}
 
 				segmentAddress += tmp + sizeof(void*);
@@ -929,7 +929,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getchar();
+					getc(); //getchar();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 				
@@ -954,7 +954,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getchar();
+					getc(); //getchar();
 				}
 				break;
 		}
@@ -1134,7 +1134,7 @@ void print_hook_list()
 void dyld_stub_binder()
 {
 	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
-	getchar();
+	getc(); //getchar();
 }
 
 #else /* CONFIG_MODULES */

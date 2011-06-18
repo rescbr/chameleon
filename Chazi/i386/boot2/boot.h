@@ -162,7 +162,8 @@
 #define kBootTimeout		 -1
 #define kCDBootTimeout		 8
 
-//Azi: place ??
+//Azi: place ?? Well, somehow this change of place seemd a good idea
+// to me at the time; if i just remembered why ??? - check in what files are these used!***
 enum {
 	kBackspaceKey			 = 0x08,
 	kTabKey					 = 0x09,

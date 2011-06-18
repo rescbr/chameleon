@@ -344,13 +344,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     bootArgs = NULL;
     return bootdevice;
 }
-/* declared on gui.h - moved to boot.h
-enum {
-    kReturnKey     = 0x0d,
-    kEscapeKey     = 0x1b,
-    kBackspaceKey  = 0x08,
-    kASCIIKeyMask  = 0x7f
-};*/
 
 //Azi:reminder
 // This is the meat of our implementation.  It grabs the boot device from

@@ -390,7 +390,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	}
 	else {
 		printf("Running on a 10.0.0 kernel, patch unsupported\n");
-		getchar(); //getc(); Azi: getc stuff
+		getc(); //getchar(); Azi: getc stuff
 	}
 
 	

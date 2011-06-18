@@ -328,7 +328,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->SerialNo);
 #if DEBUG_SPD
                   dumpPhysAddr("spd content: ",slot->spd, spd_size);
-                    getchar(); //getc(); Azi: getc stuff
+                    getc(); //getchar(); Azi: getc stuff
 #endif
         }
 
