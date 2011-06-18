@@ -567,7 +567,7 @@ void common_boot(int biosdev)
 		getBoolForKey(kKPatcherKey, &patchKernel, &bootInfo->bootConfig);
 		//Azi: avoiding having to use -f to ignore kernel cache
 		//Azi: ignore kernel cache but still use kext cache (E/E.mkext & S/L/E.mkext). - explain...
-		getBoolForKey(kIgnoreKCKey, &ignoreKC, &bootInfo->bootConfig); // equivalent to UseKernelCache
+		getBoolForKey(kUseKCKey, &ignoreKC, &bootInfo->bootConfig); // equivalent to UseKernelCache
 		if (ignoreKC)
 		{
 			verbose("KC: cache ignored by user.\n");

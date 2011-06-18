@@ -132,6 +132,14 @@ Options useful either at the prompt or in com.apple.Boot.plist file: ?????
     Use an alternate/backup "Kernel" cache file.
       Ex: "Kernel Cache"=bt(0,0)/kernelcache_i386.A701C40B
 
+  Note: damn long keys to type at the boot prompt!? :-/ UseKC would be enough!!
+        Doesn't anyone use the prompt anymore? Going to keep this here just
+        because i hope this file ends up on the trunk, but my Chazi will use
+        UseKC :P - update above***
+  UseKernelCache=Yes
+    Yes will load the system prelinked kernel or the one specified by the user
+    with "Kernel Cache" arg, and ignore /E/E kexts/mkext and system kext cache.
+
 - Devices/Other:???
 
   UseMemDetect=No

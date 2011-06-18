@@ -101,7 +101,7 @@
 #define kKernelNameKey		 "Kernel"			 // options.c			getValFK				- kFlag*** bFlag ?
 #define kKernelCacheKey		 "Kernel Cache"		 // boot.c				getValFK				- kFlag
 #define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK				- kFlags***
-#define kIgnoreKCKey		 "ignoreKC"			 // boot.c				getBoolFK				- testing***
+#define kUseKCKey			 "UseKC"			 // boot.c				getBoolFK				- testing***
 
 #define kKPatcherKey		 "PatchKernel"		 // kernel_patcher.c	getBoolFK
 #define kAltExtensionsKey	 "kext"				 // drivers.c			getValFK

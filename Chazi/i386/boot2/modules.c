@@ -17,7 +17,7 @@
 
 #if CONFIG_MODULE_DEBUG
 #define DBG(x...)	printf(x);
-#define DBGPAUSE()	getc() // getchar()
+#define DBGPAUSE()	getc() // getchar() - ";" needed ?
 #else
 #define DBG(x...)
 #define DBGPAUSE()
