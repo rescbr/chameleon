@@ -65,7 +65,7 @@
 // Default SMBIOS Data
 //-------------------------------------------------------------------------------------------------------------------------
 /* Rewrite: use a struct */
-
+									//Azi: carefully review against trunk and ioreg dumps.
 #define kDefaultVendorManufacturer					"Apple Inc."
 #define kDefaultBIOSReleaseDate						"11/06/2009"
 #define kDefaultSerialNumber						"SOMESRLNMBR"
@@ -451,6 +451,12 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	// remove any spaces found at the end
 	while ((strSize != 0) && (string[strSize - 1] == ' '))
 		strSize--;
+	
+	if (strSize == 0)
+	{
+		*field = 0;
+		return;
+	}
 
 	memcpy((uint8_t *)structHeader + structHeader->length + stringsSize, string, strSize);
 	*field = stringIndex;
@@ -463,6 +469,8 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 {
 	const char *string = 0;
 	int len;
+	bool parsed;
+	int val;
 
 	if (numOfSetters <= idx)
 		return false;
@@ -496,13 +504,29 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 		//case kSMBQWord:
 			if (SMBSetters[idx].keyString)
 			{
-				if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), SMBPlist))
-					return true;
-				else
+				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
+				if (!parsed)
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
-						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, value))
-							return true;
+						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
+				if (parsed)
+				{
+					switch (SMBSetters[idx].valueType)
+					{
+						case kSMBByte:
+							value->byte = (uint8_t)val;
+							break;
+						case kSMBWord:
+							value->word = (uint16_t)val;
+							break;
+						case kSMBDWord:
+						default:
+							value->dword = (uint32_t)val;
+							break;
+					}
+					return true;
+				}
 			}
+			
 			if (SMBSetters[idx].getSMBValue)
 				if (SMBSetters[idx].getSMBValue(value))
 					return true;
@@ -570,7 +594,8 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 				case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
 					break;
-					default:
+				
+				default:
 					return;
 			}
 		}

@@ -5,13 +5,13 @@
  *
  */
 
+//#include "mem.h" - reminder
 //#include "libsaio.h"
 #include "boot.h"
 #include "pci.h"
 #include "platform.h"
-#include "dram_controllers.h"
 #include "spd.h"
-//#include "mem.h"
+#include "dram_controllers.h"
 #include "modules.h"
 
 #define kUseMemDetectKey "UseMemDetect"
@@ -43,20 +43,26 @@ void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {	
-	bool useAutodetection = true;
-	getBoolForKey(kUseMemDetectKey, &useAutodetection, &bootInfo->bootConfig);
-	
-	if (useAutodetection)
+	/* our code only works on Intel chipsets so make sure here */
+	if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086)
+		bootInfo->memDetect = false;
+    else
+		bootInfo->memDetect = true;
+	/* manually */
+    getBoolForKey(kUseMemDetectKey, &bootInfo->memDetect, &bootInfo->bootConfig);
+
+    if (bootInfo->memDetect)
 	{
 		if (dram_controller_dev != NULL)
 		{
 			// Rek: pci dev ram controller direct and fully informative scan ...
 			scan_dram_controller(dram_controller_dev);
 		}
-	}
-	//Azi: gone on Kabyl's smbios update...???
-	// unfortunately still necesary for some comp where spd cant read correct speed
-//	scan_memory(&Platform);
-	
-	scan_spd(&Platform); // check Mek's implementation!
+		
+		//Azi: gone on Kabyl's smbios update - reminder
+		// unfortunately still necesary for some comp where spd cant read correct speed
+		//	scan_memory(&Platform);
+		
+        scan_spd(&Platform); // check Mek's implementation!
+    }
 }

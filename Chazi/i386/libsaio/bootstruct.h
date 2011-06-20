@@ -43,6 +43,10 @@ extern Node *gMemoryMapNode;
 //extern Node *efiPlatformNode; //Azi: test
 
 #define VGA_TEXT_MODE 0
+//defined in /usr/../boot.h		//Azi:--- ??
+
+//#define GRAPHICS_MODE         1
+//#define FB_TEXT_MODE          2
 
 /*
  * Maximum number of boot drivers that can be loaded.
@@ -136,6 +140,8 @@ typedef struct PrivateBootInfo {
     config_file_t    smbiosConfig;				   // smbios.plist
     config_file_t    helperConfig;                 // boot helper partition's boot.plist
     config_file_t    ramdiskConfig;                // RAMDisk.plist
+
+	bool             memDetect;
 } PrivateBootInfo_t;
 
 extern PrivateBootInfo_t *bootInfo;

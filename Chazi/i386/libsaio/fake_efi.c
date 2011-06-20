@@ -528,7 +528,7 @@ static EFI_CHAR8* getSystemID()
 	}
 	
 	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
-		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
+		ret = getUUIDFromString((sysId = (const char*) SYSTEM_ID));
 	
 	// apply a nice formatting to the displayed output
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret));

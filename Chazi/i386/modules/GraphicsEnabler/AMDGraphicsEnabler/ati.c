@@ -182,7 +182,9 @@ typedef enum {
 	kTriakis,
 	kUakari,
 	kVervet,
+//	kWormy, // why is this missing ??
 	kZonalis,
+//=============== not in my ATIfb
 	kPithecia,
 	kBulrushes,
 	kCattail,
@@ -689,8 +691,9 @@ bool get_model_val(value_t *val)
 bool get_conntype_val(value_t *val)
 {
 //Connector types:
-//0x4 : DisplayPort
-//0x400: DL DVI-I
+//0x400 : DisplayPort
+//0x4: DL DVI-I
+//0x200: SL DVI-I	//Azi:---
 //0x800: HDMI
 
 	return false;

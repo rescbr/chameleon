@@ -384,7 +384,7 @@ int createBackBuffer( window_t *window )
 	}
 	
 	gui.backbuffer->width = gui.screen.width;
-	gui.backbuffer->height = gui.screen.height;
+	gui.backbuffer->height = gui.screen.height; //Azi: allocation error while testing "nVidia GT 220"
 
 	return 0;
 }
