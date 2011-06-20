@@ -68,6 +68,8 @@
 
 #define kUseNvidiaROM				"UseNvidiaROM"
 #define kVBIOS						"VBIOS"
+#define kdcfg0						"display_0"
+#define kdcfg1						"display_1"
 
 #define NVIDIA_ROM_SIZE				0x10000
 #define PATCH_ROM_SUCCESS			1
@@ -86,6 +88,7 @@ const char *nvidia_device_type[]	=	{ "device_type",	"NVDA,Parent"	 };
 const char *nvidia_name_0[]			=	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]			=	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]		=	{ "AAPL,slot-name", "Slot-1"		 };
+//const char *nvidia_display_cfg_0[] = { "@0,display-cfg
 
 static uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
@@ -94,6 +97,12 @@ static uint8_t default_NVCAP[]= {
 };
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
+
+static uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
+static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
+
+#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
+#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
@@ -897,7 +906,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		
 		if (sig != 0x4edcbdcb)
 		{
-			//Azi: match this with one below and add line number
+			//Azi: match this with one below and add line number ?
 			printf("Bad display config block signature (0x%8x)\n", sig);
 			return PATCH_ROM_FAILED;
 		}
@@ -911,6 +920,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		
 		if (strcmp(sig, "DEV_REC"))
 		{
+			//Azi: match this with one above and add line number ?? hum... this is string.. check before change!!
 			printf("Bad Display Configuration Block signature (%s)\n", sig);
 			return PATCH_ROM_FAILED;
 		}
@@ -1371,24 +1381,29 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			// second 0x0D0A was found, extract bios version
 			if (crlf_count == 2)
 			{
-				if (rom[i-1] == 0x20) i--; // strip last " "
+				//Azi: i had this stuff fucked up because of:
+				// if (rom[i-1] == 0x20) i--; // strip last " "
+				// i didn't noticed the "little" guy in the end because no {} used
+				// and being "glued" to the "for".. perfect example of poor readability!! :-/
+				// I did noticed something... the reminder is down there ;)
+				if (rom[i-1] == 0x20)
+					i--; // strip last " "
+				
+				for (version_start = i; version_start > (i-MAX_BIOS_VERSION_LENGTH); version_start--)
 				{
-					for (version_start = i; version_start > (i-MAX_BIOS_VERSION_LENGTH); version_start--)
+					// find start
+					if (rom[version_start] == 0x00)
 					{
-						// find start
-						if (rom[version_start] == 0x00)
+						version_start++;
+						
+						// strip "Version "
+						if (strncmp((const char*)rom+version_start, "Version ", 8) == 0)
 						{
-							version_start++;
-							
-							// strip "Version "
-							if (strncmp((const char*)rom+version_start, "Version ", 8) == 0)
-							{
-								version_start += 8;
-							}
-							strncpy(version_str, (const char*)rom+version_start, i-version_start);
-							
-							break;
+							version_start += 8;
 						}
+						
+						strncpy(version_str, (const char*)rom+version_start, i-version_start);
+						break;
 					}
 				}
 				break; //Azi: reminder
@@ -1410,6 +1425,40 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 	
+	if (getValueForKey(kdcfg0, &value, &len, &bootInfo->bootConfig) && len == DCFG0_LEN * 2){
+        
+        uint8_t new_dcfg0[DCFG0_LEN];
+        
+        if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0)
+        {
+            
+            memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
+            
+            verbose("Using user supplied @0,display-cfg\n");
+            printf("@0,display-cfg: %02x%02x%02x%02x\n",
+                   default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3]);        
+            
+           
+        }
+    }
+    
+    
+    if (getValueForKey(kdcfg1, &value, &len, &bootInfo->bootConfig) && len == DCFG1_LEN * 2){
+
+        uint8_t new_dcfg1[DCFG1_LEN];
+    
+        if (hex2bin(value, new_dcfg1, DCFG1_LEN) == 0)
+        {
+            memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
+            
+            verbose("Using user supplied @1,display-cfg\n");
+            printf("@1,display-cfg: %02x%02x%02x%02x\n",
+                   default_dcfg_1[0], default_dcfg_1[1], default_dcfg_1[2], default_dcfg_1[3]);
+
+        }
+        
+    }
+	
 #if DEBUG_NVCAP
 	printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
 	default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
@@ -1424,6 +1473,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
+	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
+	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
+	
+	//add HDMI Audio back to nvidia
+	//http://forge.voodooprojects.org/p/chameleon/issues/67/
+//	uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
+//	devprop_add_value(device, "@1,connector-type",connector_type_1, 4);
+	//end Nvidia HDMI Audio
 	
 	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit)
 	{
