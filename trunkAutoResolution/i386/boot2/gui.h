@@ -1,21 +1,21 @@
 /*
- *	gui.h
- *	
+ *  gui.h
+ *  
  *
- *	Created by Jasmin Fazlic on 18.12.08.
- *	Copyright 2008/09 Jasmin Fazlic All rights reserved.
- *	Copyright 2008/09 iNDi All rights reserved.
+ *  Created by Jasmin Fazlic on 18.12.08.
+ *  Copyright 2008/09 Jasmin Fazlic All rights reserved.
+ *  Copyright 2008/09 iNDi All rights reserved.
  *
  */
+
+#ifndef __BOOT2_GUI_H
+#define __BOOT2_GUI_H
 
 #include "boot.h"
 #include "bootstruct.h"
 #include "graphics.h"
 #include "graphic_utils.h"
 #include "picopng.h"
-
-#ifndef __BOOT2_GUI_H
-#define __BOOT2_GUI_H
 
 #define CHARACTERS_COUNT	223
 
@@ -41,11 +41,11 @@ enum {
 enum {
 	kBackspaceKey		= 0x08,
 	kTabKey				= 0x09,
-	kReturnKey			= 0x0d, // '\n', //Azi: r926
+	kReturnKey			= '\r',
 	kEscapeKey			= 0x1b,
 	kUpArrowkey			= 0x4800,
 	kDownArrowkey		= 0x5000,
-	kASCIIKeyMask		= 0x7f, //Azi: getchar()***
+	kASCIIKeyMask		= 0x7f,
 	kF2Key				= 0x3c00, //Azi:autoresolution
 	kF5Key				= 0x3f00,
 	kF10Key				= 0x4400
@@ -162,7 +162,7 @@ void drawInfoMenuItems();
 
 void showGraphicBootPrompt();
 void clearGraphicBootPrompt();
-void updateGraphicBootPrompt(int key);
+void updateGraphicBootPrompt();
 
 void updateVRAM();
 
