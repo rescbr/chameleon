@@ -320,7 +320,7 @@ void common_boot(int biosdev)
     // First get info for boot volume.
     scanBootVolumes(gBIOSDev, 0);
     bvChain = getBVChainForBIOSDev(gBIOSDev);
-	//Azi: initialising gBIOSBootVolume & gBootVolume for the first time.. i think!?
+	//Azi: initialising gBIOSBootVolume & gBootVolume (Startup volume) for the first time.. i think!?
 	// also, kDefaultPartitionKey is checked here, on selectBootVolume.
     setBootGlobals(bvChain);
 	msglog("setBootGlobals:\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
