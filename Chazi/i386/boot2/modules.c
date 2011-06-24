@@ -17,7 +17,7 @@
 
 #if CONFIG_MODULE_DEBUG
 #define DBG(x...)	printf(x);
-#define DBGPAUSE()	getc() // getchar() - ";" needed ?
+#define DBGPAUSE()	getchar() // ";" needed ?
 #else
 #define DBG(x...)
 #define DBGPAUSE()
@@ -87,7 +87,7 @@ int init_module_system()
             else
             {
                 // The module does not have a valid start function
-                printf("Unable to start %s\n", SYMBOLS_MODULE); getc(); //Azi: getchar();
+                printf("Unable to start %s\n", SYMBOLS_MODULE); getchar();
             }		
 		}		
 	}
@@ -186,7 +186,7 @@ int load_module(char* module)
 		else // The module does not have a valid start function. This may be a library.
 		{
 			printf("WARNING: Unable to start %s\n", module);
-			getc(); //Azi: getchar();
+			getchar();
 		}
 #else
 		else msglog("WARNING: Unable to start %s\n", module);
@@ -305,7 +305,7 @@ unsigned int lookup_all_symbols(const char* name)
 	
 #if CONFIG_MODULE_DEBUG
 	printf("Unable to locate symbol %s\n", name);
-	getc(); //Azi: getchar();
+	getchar();
 #endif
 	
 	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
@@ -371,16 +371,14 @@ void* parse_mach(void* binary,
 	else
 	{
 		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
-		//getc(); //Azi: getchar();
+//		getchar(); Azi: this gets a bit annoying when using kernelcache :P
 		return NULL;
 	}
-	
-	
 	
 	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	 {
 	 printf("Module is not a dylib. Unable to load.\n");
-	 getc(); //Azi: getchar();
+	 getchar();
 	 return NULL; // Module is in the incorrect format
 	 }*/
 	
@@ -390,7 +388,6 @@ void* parse_mach(void* binary,
 		
 		loadCommand = binary + binaryIndex;
 		UInt32 cmdSize = loadCommand->cmdsize;
-		
 		
 		switch ((loadCommand->cmd & 0x7FFFFFFF))
 		{
@@ -414,11 +411,11 @@ void* parse_mach(void* binary,
                         
                         sectionIndex += sizeof(struct section);
                         
-                        if(section_handler) section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
+                        if (section_handler)
+							section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
                         
-                        
-                        
-                        if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
+                        if ((strcmp("__TEXT", segCommand->segname) == 0)
+							&& (strcmp("__text", sect->sectname) == 0))
                         {
                             // __TEXT,__text found, save the offset and address for when looking for the calls.
                             textSection = sect->offset;
@@ -427,6 +424,7 @@ void* parse_mach(void* binary,
                     }
                 }
 				break;
+			
 			case LC_SEGMENT_64:	// 64bit macho's
                 {
                     segCommand64 = binary + binaryIndex;				
@@ -442,10 +440,11 @@ void* parse_mach(void* binary,
                         
                         sectionIndex += sizeof(struct section_64);
                         
-                        if(section_handler) section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
+                        if (section_handler)
+							section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
                         
-                        
-                        if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
+                        if ((strcmp("__TEXT", segCommand->segname) == 0)
+							&& (strcmp("__text", sect->sectname) == 0))
                         {
                             // __TEXT,__text found, save the offset and address for when looking for the calls.
                             textSection = sect->offset;
@@ -454,8 +453,7 @@ void* parse_mach(void* binary,
                     }	
 				}			
 				break;
-				
-				
+			
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
 				dylibCommand  = binary + binaryIndex;
@@ -463,7 +461,7 @@ void* parse_mach(void* binary,
 				// Possible enhancments: verify version
 				// =	dylibCommand->dylib.current_version;
 				// =	dylibCommand->dylib.compatibility_version;
-				if(dylib_loader)
+				if (dylib_loader)
 				{
 					char* name = malloc(strlen(module) + strlen(".dylib") + 1);
 					sprintf(name, "%s.dylib", module);
@@ -474,7 +472,6 @@ void* parse_mach(void* binary,
 						free(name);
 					}
 				}
-				
 				break;
 				
 			case LC_ID_DYLIB:
@@ -499,27 +496,29 @@ void* parse_mach(void* binary,
 			default:
 				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
-				
 		}
-		
 		binaryIndex += cmdSize;
 	}
 
-	// bind_macho uses the symbols, if the textAdd does not exist (Symbols.dylib, no code), addresses are static and not relative
+	// bind_macho uses the symbols, if the textAdd does not exist (Symbols.dylib, no code),
+	// addresses are static and not relative
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
 	
-	if(dyldInfoCommand)
+	if (dyldInfoCommand)
 	{
 		// Rebase the module before binding it.
-		if(dyldInfoCommand->rebase_off)		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off,	dyldInfoCommand->rebase_size);
+		if (dyldInfoCommand->rebase_off)
+			rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
 		// Bind all symbols. 
-		if(dyldInfoCommand->bind_off)		bind_macho(binary,   (UInt8*)dyldInfoCommand->bind_off,		dyldInfoCommand->bind_size);
-		if(dyldInfoCommand->weak_bind_off)	bind_macho(binary,   (UInt8*)dyldInfoCommand->weak_bind_off,	dyldInfoCommand->weak_bind_size);
-		if(dyldInfoCommand->lazy_bind_off)	bind_macho(binary,   (UInt8*)dyldInfoCommand->lazy_bind_off,	dyldInfoCommand->lazy_bind_size);
+		if (dyldInfoCommand->bind_off)
+			bind_macho(binary, (UInt8*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+		if (dyldInfoCommand->weak_bind_off)
+			bind_macho(binary, (UInt8*)dyldInfoCommand->weak_bind_off,dyldInfoCommand->weak_bind_size);
+		if (dyldInfoCommand->lazy_bind_off)
+			bind_macho(binary, (UInt8*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
 	
 	return module_start;
-	
 }
 
 /*
@@ -892,7 +891,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //Azi: getchar();
+					getchar();
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -911,7 +910,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //Azi: getchar();
+					getchar();
 				}
 
 				segmentAddress += tmp + sizeof(void*);
@@ -929,7 +928,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //Azi: getchar();
+					getchar();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 				
@@ -954,7 +953,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
-					getc(); //Azi: getchar();
+					getchar();
 				}
 				break;
 		}
@@ -1086,7 +1085,7 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	
 #if CONFIG_MODULE_DEBUG
 	//print_hook_list();
-	//getc(); //Azi: getchar();
+	//getchar();
 #endif
 	
 }
@@ -1134,7 +1133,7 @@ void print_hook_list()
 void dyld_stub_binder()
 {
 	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
-	getc(); //Azi: getchar();
+	getchar();
 }
 
 #else /* CONFIG_MODULES */

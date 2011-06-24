@@ -13,16 +13,18 @@
 #include "appleboot.h"
 #include "vers.h"
 
+#ifdef CONFIG_EMBED_THEME
+#include "art.h"
+#endif
+
 #define IMG_REQUIRED -1
 #define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 #define vram VIDEO(baseAddr)
 
-#ifdef CONFIG_EMBED_THEME
-#include "art.h"
-#endif
+int	gDeviceCount = 0;
+int	lasttime = 0; // we need this for animating maybe
 
-int lasttime = 0; // we need this for animating maybe
 static const char *theme_name = kDefaultThemeName; // #define'ed on boot.h
 
 /*
@@ -128,14 +130,13 @@ image_t images[] = {
 
 int imageCnt = 0;
 
-extern int	gDeviceCount;
+//extern int	gDeviceCount;
 //extern int	selectIndex; Azi: not in use
 
 extern MenuItem *menuItems;
 
-char prompt[BOOT_STRING_LEN];
-
-int prompt_pos=0;
+//char prompt[BOOT_STRING_LEN];
+extern char   gBootArgs[BOOT_STRING_LEN];
 
 char prompt_text[] = "boot: ";
  
@@ -967,8 +968,8 @@ void drawDeviceList (int start, int end, int selection)
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
-	prompt[0] = '\0';
-	prompt_pos=0;
+//	prompt[0] = '\0';
+//	prompt_pos=0;
 
 	
 	if(	gui.bootprompt.draw == true )
@@ -982,17 +983,8 @@ void clearGraphicBootPrompt()
 	return;
 }
 
-void updateGraphicBootPrompt(int key)
+void updateGraphicBootPrompt()
 {
-	if ( key == kBackspaceKey )
-		prompt[--prompt_pos] = '\0';
-	else 
-	{
-		prompt[prompt_pos] = key;
-		prompt_pos++;
-		prompt[prompt_pos] = '\0';
-	}
-
 	fillPixmapWithColor( gui.bootprompt.pixmap, gui.bootprompt.bgcolor);
 
 	makeRoundedCorners( gui.bootprompt.pixmap);
@@ -1004,14 +996,8 @@ void updateGraphicBootPrompt(int key)
 	
 	// get the position of the end of the boot prompt text to display user input
 	position_t p_prompt = pos( p_text.x + ( ( strlen(prompt_text) ) * font_console.chars[0]->width ), p_text.y );
-
-	// calculate the position of the cursor
-	int	offset = (  prompt_pos - ( ( gui.bootprompt.width / font_console.chars[0]->width ) - strlen(prompt_text) - 2 ) );	
-
-	if ( offset < 0)
-		offset = 0;
 	
-	drawStr( prompt+offset, &font_console, gui.bootprompt.pixmap, p_prompt);
+	drawStr( gBootArgs, &font_console, gui.bootprompt.pixmap, p_prompt);
 
 	gui.menu.draw = false;
 	gui.bootprompt.draw = true;
@@ -1634,7 +1620,7 @@ void showInfoBox(char *title, char *text)
 		
 		updateVRAM();
 		
-		key = getc(); //getchar(); Azi: getc stuff
+		key = getchar();
 			
 		if( key == kUpArrowkey )
 			if( currentline > 0 )

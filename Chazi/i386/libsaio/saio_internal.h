@@ -91,7 +91,6 @@ extern bool   gErrors;
 extern void   initBooterLog(void);
 extern void   setupBooterLog(void);
 extern int    putchar(int ch);
-extern int    getc(void); //Azi: getc stuff
 extern int    getchar(void);
 extern void   msglog(const char * format, ...);
 extern int    printf(const char *format, ...);

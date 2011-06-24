@@ -109,7 +109,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	{
 		printf("Failed initializing dev-prop string dev-entry, press any key...\n");
 		
-		getc(); //Azi: getchar();
+		getchar();
 		return false;
 	}
 	
@@ -161,7 +161,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	if (!stringdata)
 	{
 		printf("no stringdata press a key...\n");
-		getc(); //Azi: getchar();
+		getchar();
 		return false;
 	}
 	

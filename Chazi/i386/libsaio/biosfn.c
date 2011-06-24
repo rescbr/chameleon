@@ -187,7 +187,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
     // Some BIOSes will simply ignore the value of ECX on entry.
     // Probably best to keep its value at 20 to avoid surprises.
 
-    //printf("Get memory map 0x%x, %d\n", rangeArray);getc();
+    //printf("Get memory map 0x%x, %d\n", rangeArray); getchar();
     if (maxRangeCount > (BIOS_LEN / sizeof(MemoryRange))) {
         maxRangeCount = (BIOS_LEN / sizeof(MemoryRange));
     }
@@ -254,10 +254,10 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 #if DEBUG
     {
         int i;
-        printf("%d total ranges\n", count); getc(); //getchar(); Azi: getc stuff
+        printf("%d total ranges\n", count); getchar();
         for (i=0, range = rangeArray; i<count; i++, range++) {
             printf("range: type %d, base 0x%x, length 0x%x\n",
-                   range->type, (unsigned int)range->base, (unsigned int)range->length); getc(); //getchar(); Azi: getc stuff
+                   range->type, (unsigned int)range->base, (unsigned int)range->length); getchar();
         }
     }
 #endif

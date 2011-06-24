@@ -159,9 +159,9 @@ int getchar()
 {
 	register int c = getc();
 
-	if ( c == '\r' ) c = '\n';
+//	if ( c == '\r' ) c = '\n';
 
-	if ( c >= ' ' && c < 0x7f) putchar(c);
+//	if ( c >= ' ' && c < 0x7f) putchar(c);
 	
 	return (c);
 }
@@ -260,5 +260,5 @@ void stop(const char * fmt, ...)
 void pause() 
 {
     printf("Press a key to continue...\n");
-    getc();
+    getchar(); // replace getchar() by pause() ??
 }

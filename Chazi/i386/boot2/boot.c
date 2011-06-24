@@ -79,7 +79,7 @@ bool gScanSingleDrive;
 
 int     bvCount = 0; // global ?? - Slice
 //int		menucount = 0;
-int     gDeviceCount = 0;
+//int     gDeviceCount = 0;
 
 BVRef   bvr;
 //BVRef   menuBVR; - doesn't seem used here
@@ -199,7 +199,7 @@ static int ExecKernel(void *binary)
 	//Azi: Wait=y is breaking other keys when typed "after them" at boot prompt.
 	// Works properly if typed in first place or used on Boot.plist.
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
-		verbose("(Wait) ");
+		printf("(Wait) "); // Add to trunk?? don't forget that puse uses printf, not verbose!!
 		pause();
 	}
 
@@ -397,7 +397,7 @@ void common_boot(int biosdev)
 //printf
     msglog(":something...???\n Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
     msglog(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-//    getchar(); //getc(); Azi: getc stuff - DON'T FORGET pause() - take modules.c as reference.
+//    getchar();
 //#endif
 
     useGUI = true;

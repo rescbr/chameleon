@@ -579,7 +579,7 @@ LoadMatchedModules( void )
 					length = LoadFile(gFileSpec);
 					executableAddr = (void *)kLoadAddr;
 				}
-                //printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getc();
+                //printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
             }
             else
                 length = 0;
@@ -795,7 +795,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
     printf("adler32: 0x%x\n", kernel_header->adler32);
     printf("uncompressed_size: 0x%x\n", kernel_header->uncompressed_size);
     printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
-    getc();
+    getchar();
 #endif
 
     if (kernel_header->signature == OSSwapBigToHostConstInt32('comp')) {

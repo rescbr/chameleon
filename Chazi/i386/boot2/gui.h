@@ -16,38 +16,38 @@
 
 #define CHARACTERS_COUNT	223
 
-#define BOOT_NORMAL		0
+#define BOOT_NORMAL			0
 #define BOOT_VERBOSE		1
 #define BOOT_IGNORECACHE	2
 #define BOOT_SINGLEUSER		3
-#define DO_NOT_BOOT		4
+#define DO_NOT_BOOT			4
 #define CLOSE_INFO_MENU		5
 
-#define INFOMENU_NATIVEBOOT_START 1
-#define INFOMENU_NATIVEBOOT_END	3
+#define INFOMENU_NATIVEBOOT_START	1
+#define INFOMENU_NATIVEBOOT_END		3
 
-#define MENU_SHOW_MEMORY_INFO	4
-#define MENU_SHOW_VIDEO_INFO	5
-#define MENU_SHOW_HELP		6
+#define MENU_SHOW_MEMORY_INFO		4
+#define MENU_SHOW_VIDEO_INFO		5
+#define MENU_SHOW_HELP				6
 
 enum {
 	HorizontalLayout	= 0,
-	VerticalLayout		= 1,
+	VerticalLayout		= 1
 };
-/* moved to boot.h ??
+/*
 enum {
 	kBackspaceKey		= 0x08,
-	kTabKey			= 0x09,
-	kReturnKey		= 0x0d,
-	kEscapeKey		= 0x1b,
-	kUpArrowkey		= 0x4800, 
+	kTabKey				= 0x09,
+	kReturnKey			= '\r',
+	kEscapeKey			= 0x1b,
+	kUpArrowkey			= 0x4800,
 	kDownArrowkey		= 0x5000,
 	kASCIIKeyMask		= 0x7f,
-	kF2Key			= 0x3c00, //Azi:autoresolution
-	kF5Key			= 0x3f00,
-	kF10Key			= 0x4400
-};*/
-
+	kF2Key				= 0x3c00, //Azi:autoresolution
+	kF5Key				= 0x3f00,
+	kF10Key				= 0x4400
+};
+*/
 /*
  * Menu item structure.
  */
@@ -139,6 +139,8 @@ gui_t gui;					// gui structure
 font_t font_small;
 font_t font_console;
 
+extern int	gDeviceCount;
+
 int  initGUI();
 void drawBackground();
 
@@ -159,7 +161,7 @@ void drawInfoMenuItems();
 
 void showGraphicBootPrompt();
 void clearGraphicBootPrompt();
-void updateGraphicBootPrompt(int key);
+void updateGraphicBootPrompt();
 
 void updateVRAM();
 

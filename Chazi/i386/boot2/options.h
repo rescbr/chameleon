@@ -31,7 +31,7 @@
 
 //AZI: KEEP THIS FILE ???
 
-extern int	gDeviceCount;
+//extern int	gDeviceCount;
 void clearBootArgs(void);
 
 typedef struct {

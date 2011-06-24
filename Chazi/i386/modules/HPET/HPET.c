@@ -104,7 +104,7 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 	}
 	
 /*#if DEBUG_HPET
-	pause(); - getchar(); //getc(); Azi: getc stuff
+	pause();
 #endif*/
 }
 
@@ -195,7 +195,6 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 				if (!(val & 0x80))
 					verbose(" Failed to force enable HPET\n");
 			}
-			
 			break;
 		}
 	}

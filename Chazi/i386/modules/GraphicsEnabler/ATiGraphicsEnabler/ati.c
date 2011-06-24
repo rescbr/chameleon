@@ -658,7 +658,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	device = devprop_add_device(string, devicepath);
 	if (!device) {
 		printf("Failed initializing dev-prop string dev-entry, press any key...\n");
-		getc(); //Azi: getchar();
+		getchar();
 		return false;
 	}
 
