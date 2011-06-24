@@ -29,11 +29,6 @@
 #ifndef __BOOT2_BOOT_H
 #define __BOOT2_BOOT_H
 
-//Azi:
-// Todo: don't include headers like boot.h on other headers, unless...!
-// move keys to the headers of the files they're in, if they have it!?
-// check header wrappers...
-
 //#include "saio_internal.h" // the only one needed by boot.h it self.
 #include "bootstruct.h"
 
@@ -55,13 +50,40 @@
 
 /*
  * Undeclared (or undeclared here)
- */
-/*
-"-checkers" gui.c, getValFK;
+
+"ProductVersion" - options.c (boot.c on trunk) - getValFK
+
 "biosdev" mboot.c, getValFBK
 "timeout" mboot.c, getValFBK
 "partno" mboot.c, getValFBK
-"DumpSPD" spd.c, getBollFK
+
+"-checkers" gui.c, getValFK;
+
+"DumpSPD" spd.c, getBollFK - seems unsed***
+*/
+
+/*
+ * gone to modules:
+
+//#define kGraphicsEnablerKey	"GraphicsEnabler"	// GraphicsEnabler.c	getBoolFK
+//#define kUseAtiROMKey			"UseAtiROM"			// ati.c				getBoolFK ?? modules
+//#define kAtiConfigKey			"AtiConfig"			// ati.c				getStringFK
+//#define kATYbinimageKey		"ATYbinimage"		// ati.c				getBoolFK
+//#define kUseNvidiaROMKey		"UseNvidiaROM"		// nvidia.c				getBoolFK
+//#define kVBIOSKey				"VBIOS"				// nvidia.c				getBoolFK
+
+//#define kUseMemDetectKey		"UseMemDetect"		// platform.c			getBoolFK
+*/
+
+/*
+separate into:
+- internal use (change these to "blablabla")
+
+- kernel & booter flags/arguments
+	- no good at boot prompt
+	- good at boot prompt
+	
+- booter options/patches
 */
 
 /*
@@ -69,7 +91,6 @@
  */
 //		identifier			 string				 location				type					comment
 #define kTextModeKey		 "Text Mode"		 // graphics.c			getNumberArraiFP		- default 80x25 - kFlag - does it work??
-//#define kProductVersionKey	 "ProductVersion"	 // options.c			getValFK			- (boot.c on trunk) - reverted
 
 #define kDefaultPartitionKey "Default Partition" // sys.c				getStringFK
 #define kHidePartitionKey	 "Hide Partition"	 // disk.c				getValFK
@@ -110,16 +131,9 @@
 #define kWakeKey			 "Wake"				 // boot.c				getBoolFK
 #define kForceWakeKey		 "ForceWake"		 // boot.c				getBoolFK
 #define kWakeKeyImageKey	 "WakeImage"		 // boot.c				getValFK				- location???
-
-//#define kUseAtiROMKey		 "UseAtiROM"		 // ati.c				getBoolFK ?? modules
-//#define kAtiConfigKey		 "AtiConfig"		 // ati.c				getStringFK
-//#define kATYbinimageKey		 "ATYbinimage"		 // ati.c				getBoolFK
-
-//#define kUseNvidiaROMKey	 "UseNvidiaROM"		 // nvidia.c			getBoolFK
-//#define kVBIOSKey			 "VBIOS"			 // nvidia.c			getBoolFK
 #define kGraphicsModeKey	 "Graphics Mode"	 // graphics.c			getNumberArraiFP		- kFlag
 #define kAutoResolutionKey	 "AutoResolution"	 // boot.c				getBoolFK
-//#define kGraphicsEnablerKey	 "GraphicsEnabler"	 // GraphicsEnabler.c	getBoolFK
+
 #define kDSDTKey			 "DSDT"				 // acpi_patcher.c		getValFK
 #define kDropSSDTKey		 "DropSSDT"			 // acpi_patcher.c		getBoolFK
 #define kRestartFixKey		 "RestartFix"        // acpi_patcher.c		getBoolFK				- revert to true?
@@ -128,7 +142,7 @@
 #define kEnableC2StatesKey	 "EnableC2State"	 // acpi_patcher.c		getBoolFK
 #define kEnableC3StatesKey	 "EnableC3State"	 // acpi_patcher.c		getBoolFK
 #define kEnableC4StatesKey	 "EnableC4State"	 // acpi_patcher.c		getBoolFK
-//#define kUseMemDetectKey	 "UseMemDetect"	     // platform.c			getBoolFK
+
 #define kSMBIOSdefaultsKey	 "SMBIOSdefaults"	 // smbios_patcher.c	getBoolFK
 #define kSMBIOSKey			 "SMBIOS"			 // fake_efi.c			getValFK
 //Azi: should this be changed to "SystemID"? BootHelp.txt matches SystemId
@@ -161,21 +175,6 @@
  */
 #define kBootTimeout		 -1
 #define kCDBootTimeout		 8
-
-//Azi: place ?? Well, somehow this change of place seemd a good idea
-// to me at the time; if i just remembered why ??? - check in what files are these used!***
-enum {
-	kBackspaceKey			 = 0x08,
-	kTabKey					 = 0x09,
-	kReturnKey				 = 0x0d,
-	kEscapeKey				 = 0x1b,
-	kUpArrowkey				 = 0x4800, 
-	kDownArrowkey			 = 0x5000,
-	kASCIIKeyMask			 = 0x7f,
-	kF2Key					 = 0x3c00, //Azi:autoresolution
-	kF5Key					 = 0x3f00,
-	kF10Key					 = 0x4400
-};
 
 /*
  * A global set by boot() to record the device that the booter
