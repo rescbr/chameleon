@@ -896,7 +896,8 @@ static int patch_nvidia_rom(uint8_t *rom)
 			headerlength = 8;
 		}
 		if (sig != 0x4edcbdcb) {
-			printf("bad display config block signature (0x%8x)\n", sig);
+			//Azi: match this with one below and add line number ?
+			printf("Bad display config block signature (0x%8x)\n", sig);
 			return PATCH_ROM_FAILED;
 		}
 	} else if (dcbtable_version >= 0x14) { /* some NV15/16, and NV11+ */
@@ -1375,8 +1376,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
     devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
     devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
-
-
+	
+	//add HDMI Audio back to nvidia
+	//http://forge.voodooprojects.org/p/chameleon/issues/67/
+//    uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
+//    devprop_add_value(device, "@1,connector-type",connector_type_1, 4);
+	//end Nvidia HDMI Audio
+	
 	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
 	}

@@ -55,6 +55,7 @@ typedef enum {
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_CYPRESS,
 	CHIP_FAMILY_HEMLOCK,
+//	CHIP_FAMILY_GRANVILLE, //Azi: improvising ?? a bit here...
 	/* Northern Islands */
 	CHIP_FAMILY_BARTS,
 	CHIP_FAMILY_CAICOS,
@@ -88,6 +89,7 @@ static const char *chip_family_name[] = {
 	"Juniper",	// RV840
 	"Cypress",	// RV870
 	"Hemlock",
+//	"Granville"	//Azi: improvising ?? a bit here...
 	/* Northern Islands */
 	"Barts",
 	"Caicos",
@@ -209,7 +211,18 @@ typedef struct {
 } radeon_card_info_t;
 
 static radeon_card_info_t radeon_cards[] = {
-	//Azi: REVIEW
+	//Azi: added devices
+	// issue #88
+	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*???*/"AMD Radeon HD 6600M Series",		kNull		},
+	// issue #89
+	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, //Azi: CHIP_FAMILY_GRANVILLE ??
+	// issue #90
+	{ 0x68E4,	0x1c921043,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	},
+	// issue #91
+	{ 0x68C0,	0x1594103C,	CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		},
+	
+	//==================================//================================//============================//
+	
 	/* Earlier cards are not supported */
 	{ 0x9400,	0x30001002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 PRO",			kNull		},
 	{ 0x9400,	0x25521002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
@@ -441,14 +454,15 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x5530174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
 	
 	/* Northen Islands */
-	{ 0x6718,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+	{ 0x6718,	0x0B001002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+	{ 0x6718,	0x31301682,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+	{ 0x6718,	0x67181002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+
+	{ 0x6738,	0x67381002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
+	{ 0x6739,	0x67391002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
+	{ 0x6739,	0x21F81458,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
-	{ 0x6738,	0x67381002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
-	{ 0x6739,	0x67391002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
-	
-	{ 0x6759,	0xE193174B, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		},
+	{ 0x6759,	0xE193174B,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		},
 	
 	/* standard/default models */
 	{ 0x9400,	0x00000000, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
@@ -517,16 +531,20 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x68F9,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5400 Series",		kNull		},
 	
-	{ 0x6718,	0x00000000, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6900 Series",		kNull		},
-	
 	/* Northen Islands */
-	{ 0x6758,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",				kNull		},
-	{ 0x6759,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
+	{ 0x6718,	0x00000000,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kNull		},
+
+	{ 0x6738,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
+	{ 0x6739,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850 Series",		kDuckweed	},
+	{ 0x673E,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6790 Series",		kNull		},
 	
-	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
-	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kNull		},
+	{ 0x6758,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",		kNull		},
+	{ 0x6759,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
+
+	{ 0x6770,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
+	{ 0x6779,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kNull		},
 	
-	{ 0x0000,	0x00000000, CHIP_FAMILY_UNKNOW,		NULL,								kNull		}
+	{ 0x0000,	0x00000000,	CHIP_FAMILY_UNKNOW,		NULL,								kNull		}
 };
 
 typedef struct {
