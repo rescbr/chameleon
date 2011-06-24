@@ -197,7 +197,6 @@ extern int  gBIOSDev;
 extern long gBootMode;
 extern bool sysConfigValid;
 extern char bootBanner[];
-extern char bootLogBanner[];
 extern char bootPrompt[];
 extern bool gOverrideKernel;
 extern char *gPlatformName; // disabled ??

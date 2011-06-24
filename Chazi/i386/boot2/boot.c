@@ -299,9 +299,6 @@ void common_boot(int biosdev)
     initKernBootStruct();
 
 	initBooterLog();
-	
-	//Azi: log booter version, revision & build date, for bdmesg.
-	msglog(bootLogBanner);
 
     // Setup VGA text mode.
     // Not sure if it is safe to call setVideoMode() before the

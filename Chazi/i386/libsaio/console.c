@@ -46,6 +46,7 @@
 
 //#include "libsaio.h"
 #include "bootstruct.h"
+#include <vers.h>
 
 extern int	vprf(const char * fmt, va_list ap);
 
@@ -66,7 +67,8 @@ bool gErrors;
 char *msgbuf = 0;
 char *cursor = 0;
 
-struct putc_info { //Azi: exists on printf.c & gui.c
+struct putc_info //Azi: exists on gui.c & printf.c
+{
     char * str;
     char * last_str;
 };
@@ -89,6 +91,8 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
+	msglog("%s\n", "Chameleon " I386BOOT_CHAMELEONVERSION " (svn-r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
+	//Azi: shorten this
 }
 
 void msglog(const char * fmt, ...)
@@ -260,5 +264,5 @@ void stop(const char * fmt, ...)
 void pause() 
 {
     printf("Press a key to continue...\n");
-    getchar(); // replace getchar() by pause() ??
+    getchar(); // replace getchar() by pause() ?? were useful...?
 }

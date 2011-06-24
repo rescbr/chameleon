@@ -250,9 +250,9 @@ void free(void * pointer)
 	zcoalesce();
 	return;
 }
-//Azi: enable static? not in trunk...
-//static 
-void
+
+//Azi: keep an eye on this - me thinks modules related (kernelpatcher?)
+static void
 zallocate(char * start,int size)
 {
 #if ZDEBUG
