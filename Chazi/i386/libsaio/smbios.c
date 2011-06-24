@@ -34,14 +34,14 @@
 #define kSMBBIOSInformationReleaseDateKey			"SMbiosdate"
 
 /* System Information */
-#define kSMBSystemInformationManufacturerKey		"SMmanufacter" //*** was SMmanufacturer 
+#define kSMBSystemInformationManufacturerKey		"SMmanufacturer" //*** was SMmanufacter
 #define kSMBSystemInformationProductNameKey			"SMproductname"
 #define kSMBSystemInformationVersionKey				"SMsystemversion"
 #define kSMBSystemInformationSerialNumberKey		"SMserial"
 #define kSMBSystemInformationFamilyKey				"SMfamily"
 
 /* Base Board */
-#define kSMBBaseBoardManufacturerKey				"SMboardmanufacter" //***
+#define kSMBBaseBoardManufacturerKey				"SMboardmanufacturer" //***
 #define kSMBBaseBoardProductKey						"SMboardproduct"
 
 /* Processor Information */
@@ -53,7 +53,7 @@
 #define kSMBMemoryDeviceBankLocatorKey				"SMmembankloc"
 #define kSMBMemoryDeviceMemoryTypeKey				"SMmemtype"
 #define kSMBMemoryDeviceMemorySpeedKey				"SMmemspeed"
-#define kSMBMemoryDeviceManufacturerKey				"SMmemmanufacter" //***
+#define kSMBMemoryDeviceManufacturerKey				"SMmemmanufacturer" //***
 #define kSMBMemoryDeviceSerialNumberKey				"SMmemserial"
 #define kSMBMemoryDevicePartNumberKey				"SMmempart"
 
