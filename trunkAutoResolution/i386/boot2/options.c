@@ -324,11 +324,11 @@ static void showMenu( const MenuItem * items, int count,
     gMenuHeight		= height;
     gMenuItemCount	= count;
     gMenuTop		= 0;
-    gMenuBottom		= min( count, height ) - 1;
+    gMenuBottom		= MIN( count, height ) - 1;
     gMenuSelection	= selection;
 
     gMenuStart		= 0;
-    gMenuEnd	    = min( count, gui.maxdevices ) - 1;
+    gMenuEnd	    = MIN( count, gui.maxdevices ) - 1;
 	
 	// If the selected item is not visible, shift the list down.
 
@@ -901,7 +901,7 @@ int getBootOptions(bool firstRun)
 			printf("Use \30\31 keys to select the startup volume.");
 		}
 		showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-		nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+		nextRow += MIN( gDeviceCount, kMenuMaxItems ) + 3;
 	}
 
 	// Show the boot prompt.
@@ -1112,7 +1112,7 @@ int getBootOptions(bool firstRun)
 					if (gDeviceCount) {
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
-						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
+						nextRow += MIN(gDeviceCount, kMenuMaxItems) + 3;
 					}
 
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
