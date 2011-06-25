@@ -12,10 +12,6 @@ extern "C"
     void BiosDisk_start();
 }
 
-int _biosread(int dev, int cyl, int head, int sec, int num);
-int drive_exists(int devid);
-
-
 void BiosDisk_start()
 {
     BiosDisk* disk = new BiosDisk("bios:/hd0/");
