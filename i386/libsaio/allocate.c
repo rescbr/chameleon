@@ -24,7 +24,6 @@
 
 #include "sl.h"
 #include "saio_internal.h"
-#include "device_tree.h"
 
 #define kPageSize     4096
 #define RoundPage(x)  ((((unsigned)(x)) + kPageSize - 1) & ~(kPageSize - 1))

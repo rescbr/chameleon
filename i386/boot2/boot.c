@@ -53,7 +53,6 @@
 #include "boot.h"
 #include "sl.h"
 #include "libsa.h"
-#include "platform.h"
 #include "modules.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
