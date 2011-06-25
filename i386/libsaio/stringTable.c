@@ -481,41 +481,7 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
 
 bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
 {
-  const char *overrideVal;
-  int overrideSize;
-  bool override, ret;
-  
-  if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
-    return true;
-
-  ret = getValueForConfigTableKey(config, key, val, size);
-
-  // Try to find alternate keys in bootInfo->overrideConfig
-  // and prefer its values with the exceptions for
-  // "Kernel"="mach_kernel" and "Kernel Flags"="".
-
-  if (config->canOverride)
-  {
-    if (getValueForConfigTableKey(&bootInfo->overrideConfig, key, &overrideVal, &overrideSize))
-    {
-      override = true;
-
-      if (ret && (strcmp(key, "Kernel") == 0) && (strcmp(overrideVal, "mach_kernel") == 0))
-        override = false;
-
-      if (ret && (strcmp(key, "Kernel Flags") == 0) && (overrideSize == 0))
-        override = false;
-
-      if (override)
-      {
-        *val = overrideVal;
-        *size = overrideSize;
-        return true;
-      }
-    }
-  }
-
-  return ret;
+    return getValueForConfigTableKey(config, key, val, size);
 }
 
 

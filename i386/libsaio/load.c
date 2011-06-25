@@ -324,9 +324,9 @@ static long DecodeSymbolTable(long cmdBase)
   totalSize = symsSize + symTab->strsize;
   
   gSymbolTableSize = totalSize + sizeof(struct symtab_command);
-  gSymbolTableAddr = AllocateKernelMemory(gSymbolTableSize);
+//  gSymbolTableAddr = AllocateKernelMemory(gSymbolTableSize);
   // Add the SymTab to the memory-map.
-  AllocateMemoryRange("Kernel-__SYMTAB", gSymbolTableAddr, gSymbolTableSize, -1);
+//  AllocateMemoryRange("Kernel-__SYMTAB", gSymbolTableAddr, gSymbolTableSize, -1);
   
   symTableSave = (struct symtab_command *)gSymbolTableAddr;
   tmpAddr = gSymbolTableAddr + sizeof(struct symtab_command);

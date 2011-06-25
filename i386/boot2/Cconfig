@@ -13,17 +13,3 @@ config MODULE_DEBUG
 	  module system.
 
 source "i386/modules/Cconfig"
-
-config EMBED_THEME
-	bool "Embed Theme"
-	default n
-	---help---
-	  Say Y here if you want compile in a default theme.
-	
-config EMBEDED_THEME
-	string "Theme name"
-	default "embed"
-	depends on EMBED_THEME
-	---help---
-	  Specify the name of the theme to compile in.
-	

@@ -97,8 +97,7 @@ void scan_cpu(PlatformInfo_t *p)
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
 	uint64_t	msr, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, bus_ratio_max, currdiv;
-	const char *newratio;
-	int len, myfsb;
+	int myfsb;
 	uint8_t bus_ratio_min;
 	uint32_t max_ratio, min_ratio;
 
@@ -266,22 +265,7 @@ void scan_cpu(PlatformInfo_t *p)
 				} else {
 					cpuFrequency = tscFrequency;
 				}
-				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->bootConfig)) && (len <= 4)) {
-					max_ratio = atoi(newratio);
-					max_ratio = (max_ratio * 10);
-					if (len >= 3) max_ratio = (max_ratio + 5);
 
-					verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
-
-					// extreme overclockers may love 320 ;)
-					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
-						cpuFrequency = (fsbFrequency * max_ratio) / 10;
-						if (len >= 3) maxdiv = 1;
-						else maxdiv = 0;
-					} else {
-						max_ratio = (bus_ratio_max * 10);
-					}
-				}
 				//valv: to be uncommented if Remarq.1 didn't stick
 				/*if(bus_ratio_max > 0) bus_ratio = flex_ratio;*/
 				p->CPU.MaxRatio = max_ratio;

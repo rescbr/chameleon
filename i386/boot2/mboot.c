@@ -50,7 +50,7 @@ int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
                       unsigned int byteoff,
                       unsigned int byteCount, void * buffer );
 int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
-static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
+//static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
 
 // Starts off in the multiboot context 1 MB high but eventually gets into low memory
 // and winds up with a bootdevice in eax which is all that boot() wants
@@ -329,19 +329,19 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
      */
     boot_args temporaryBootArgsData;
     bzero(&temporaryBootArgsData, sizeof(boot_args));
-    bootArgs = &temporaryBootArgsData;
-    bootArgs->Video.v_display = VGA_TEXT_MODE;
+//    bootArgs = &temporaryBootArgsData;
+  //  bootArgs->Video.v_display = VGA_TEXT_MODE;
 
     // Install ramdisk and extra driver hooks
     p_get_ramdisk_info = &multiboot_get_ramdisk_info;
     p_ramdiskReadBytes = &multibootRamdiskReadBytes;
-    LoadExtraDrivers_p = &multiboot_LoadExtraDrivers;
+    //LoadExtraDrivers_p = &multiboot_LoadExtraDrivers;
 
     // Since we call multiboot ourselves, its return address will be correct.
     // That is unless it's inlined in which case it does not matter.
     uint32_t bootdevice = multiboot(multiboot_magic, mi_p);
     // We're about to exit and temporaryBootArgs will no longer be valid
-    bootArgs = NULL;
+    //bootArgs = NULL;
     return bootdevice;
 }
 
@@ -420,10 +420,7 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
             }
         }				
     }
-    if(doSelectDevice)
-    {
-        bootdevice = selectAlternateBootDevice(bootdevice);
-    }
+
     if(bootdevice == BAD_BOOT_DEVICE)
         sleep(2); // pause for a second before halting
     return bootdevice;
@@ -464,7 +461,7 @@ int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip)
     dip->valid = true;
     return 0;
 }
-
+#if 0
 static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
 {
     char extensionsSpec[1024];
@@ -496,3 +493,4 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
     }
     return 0;
 }
+#endif

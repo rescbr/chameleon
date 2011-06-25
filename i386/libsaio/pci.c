@@ -152,7 +152,7 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 	dev_path[0] = 0;
 	end = root_pci_dev;
 	
-	int uid = getPciRootUID();
+	int uid = 0; //getPciRootUID();
 	while (end != pci_dt)
 	{
 		current = pci_dt;

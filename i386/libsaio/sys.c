@@ -63,7 +63,6 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "disk.h"
-#include "ramdisk.h"
 #include "xml.h"
 
 #include <libkern/crypto/md5.h>
@@ -816,23 +815,7 @@ BVRef selectBootVolume( BVRef chain )
 		for ( bvr = chain; bvr; bvr = bvr->next )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
-	
-	/*
-	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
-	 * to override the default selection.
-	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
-	 */
-	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
-    if (val) {
-        for ( bvr = chain; bvr; bvr = bvr->next ) {
-            if (matchVolumeToString(bvr, val, false)) {
-                free(val);
-                return bvr;
-            }
-        }
-        free(val);
-    }
-	
+		
 	/*
 	 * Scannig the volume chain backwards and trying to find 
 	 * a HFS+ volume with valid boot record signature.
@@ -1025,20 +1008,6 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 
 	bvr = bvr1 = NULL;
 
-    // Try resolving "rd" and "bt" devices first.
-	if (biosdev == kPseudoBIOSDevRAMDisk)
-	{
-		if (gRAMDiskVolume)
-		    bvr1 = gRAMDiskVolume;
-	}
-	else if (biosdev == kPseudoBIOSDevBooter)
-	{
-		if (gRAMDiskVolume != NULL && gRAMDiskBTAliased)
-			bvr1 = gRAMDiskVolume;
-		else
-			bvr1 = gBIOSBootVolume;
-	}
-	else
 	{
 		// Fetch the volume list from the device.
 

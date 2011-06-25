@@ -42,10 +42,8 @@ OTHER_FILES =
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	   ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o \
-	   modules_support.o boot_modules.o
-# button.o browser.o scrollbar.o == NOTYET	
+OBJS = boot2.o boot.o mboot.o modules.o modules_support.o boot_modules.o
+# button.o browser.o scrollbar.o == NOTYET bmdecompress.o graphic_utils.o prompt.o options.o lzss.o	
 
 UTILDIR = ../util
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
