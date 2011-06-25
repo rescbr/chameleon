@@ -6,7 +6,6 @@
 #include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
-#include "bootstruct.h"
 #include "boot.h"
 
 #ifndef DEBUG_CPU

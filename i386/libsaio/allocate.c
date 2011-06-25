@@ -24,7 +24,6 @@
 
 #include "sl.h"
 #include "saio_internal.h"
-#include "bootstruct.h"
 #include "device_tree.h"
 
 #define kPageSize     4096

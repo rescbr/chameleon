@@ -51,8 +51,6 @@
 
 
 #include "boot.h"
-#include "bootstruct.h"
-#include "fake_efi.h"
 #include "sl.h"
 #include "libsa.h"
 #include "platform.h"

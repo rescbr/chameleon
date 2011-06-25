@@ -6,7 +6,6 @@
 
 #include "libsaio.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"

@@ -61,7 +61,6 @@
 
 #include "libsaio.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "disk.h"
 #include "xml.h"
 

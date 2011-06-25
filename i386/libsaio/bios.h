@@ -102,4 +102,17 @@ typedef struct MemoryRange {
     unsigned long      reserved;
 } MemoryRange;
 
+
+/*
+ * ACPI defined memory range types.
+ */
+enum {
+    kMemoryRangeUsable   = 1,    // RAM usable by the OS.
+    kMemoryRangeReserved = 2,    // Reserved. (Do not use)
+    kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.
+    kMemoryRangeNVS      = 4,    // ACPI NVS memory. (Do not use)
+    
+    /* Undefined types should be treated as kMemoryRangeReserved */
+};
+
 #endif /* !__LIBSAIO_BIOS_H */

@@ -4,7 +4,6 @@
 
 #include "libsaio.h"
 #include "boot.h"
-#include "bootstruct.h"
 
 #include "mboot.h"
 

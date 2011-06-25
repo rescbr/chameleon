@@ -66,7 +66,6 @@
 #include <IOKit/storage/IOGUIDPartitionScheme.h>
 #include "libsaio.h"
 #include "boot.h"
-#include "bootstruct.h"
 #include "memory.h"
 #include "fdisk.h"
 #include "hfs.h"

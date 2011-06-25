@@ -12,7 +12,6 @@
 #include "spd.h"
 #include "cpu.h"
 #include "saio_internal.h"
-#include "bootstruct.h"
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD

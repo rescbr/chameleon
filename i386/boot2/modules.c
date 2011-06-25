@@ -8,7 +8,6 @@
 #endif
 
 #include "boot.h"
-#include "bootstruct.h"
 #include "modules.h"
 #include "boot_modules.h"
 #include <vers.h>

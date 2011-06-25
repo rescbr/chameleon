@@ -22,7 +22,6 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "bootstruct.h"
 #include "libsaio.h"
 #include "sl.h"
 #include "xml.h"
