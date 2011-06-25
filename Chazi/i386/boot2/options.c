@@ -31,7 +31,7 @@
 #include "options.h"
 #include "efi.h"
 
-bool showBootBanner = true; //Azi:debuginfo
+bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
 extern int multiboot_timeout;

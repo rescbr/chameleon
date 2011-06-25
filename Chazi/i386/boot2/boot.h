@@ -103,7 +103,7 @@ separate into:
 #define kGUIKey				 "GUI"				 // boot.c				getBoolFK
 #define kBootBannerKey		 "Boot Banner"		 // options.c			getBoolFK
 #define kLegacyLogoKey		 "Legacy Logo"		 // gui.c				getBoolFK				- revert?
-#define kDebugInfoKey		 "DebugInfo"		 // gui.c, graphics.c	getBoolFK
+#define kShowInfoKey		 "ShowInfo"			 // gui.c, graphics.c	getBoolFK
 #define kRescanPromptKey	 "Rescan Prompt"	 // boot.c				getBoolFK				- cdrom only - firstrun
 #define kRescanKey		     "Rescan"			 // boot.c				getBoolFK				- cdrom only?? - firstrun
 #define kCDROMPromptKey		 "CD-ROM Prompt"	 // options.c			getValFK				- internal??
@@ -117,8 +117,8 @@ separate into:
 #define kBootDeviceKey		 "Boot Device"		 // options.c			getValFK				- kFlag/option??????
 #define kBootUUIDKey		 "boot-uuid"		 // options.c			processBootArg			- kFlag
 #define kHelperRootUUIDKey	 "Root UUID"		 // options.c			getValFK				- kFlag
-#define kArchKey			 "arch"				 // boot.c				getValFK				- kFlag - after all,
-// it's to be passed via "kernel Flags" ?? - "man com.apple.Boot.plist"
+// After all, it seems arch= is to be passed via "kernel Flags" ?? - "man com.apple.Boot.plist"
+#define kArchKey			 "arch"				 // boot.c				getValFK				- kFlag
 #define kKernelNameKey		 "Kernel"			 // options.c			getValFK				- kFlag*** bFlag ?
 #define kKernelCacheKey		 "Kernel Cache"		 // boot.c				getValFK				- kFlag
 #define kKernelFlagsKey		 "Kernel Flags"		 // options.c			getValFK				- kFlags***

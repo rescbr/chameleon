@@ -102,7 +102,7 @@ typedef struct
 	uint16_t	hsyncend;
 	uint16_t	vsyncstart;			
 	uint16_t	vsyncend;
-	uint8_t		mm;				// Azi:autoresolution - debuginfo
+	uint8_t		mm;				// Azi:autoresolution - showinfo
 	uint16_t	attr;
 } window_t;
 	

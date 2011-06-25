@@ -279,14 +279,13 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	{
 		ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
 		
-		verbose("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1);
+		msglog("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1);
 		
 		if ((ret != 0)
 			|| ((flags & kFileTypeMask) != kFileTypeDirectory)
 			|| (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
 			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
-			
 			msglog("LoadDrivers: Loading from [%s]\n", gDriverSpec);
 			
 			if (LoadDriverMKext(gDriverSpec) == 0)

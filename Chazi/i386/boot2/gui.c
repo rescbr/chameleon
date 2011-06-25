@@ -856,8 +856,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
-	bool		debugInfo = false; //Azi:debuginfo
-	extern bool showBootBanner; //			||
+	bool		shoWinfo = true; //Azi:showinfo
+	extern bool showBootBanner; //
 	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
@@ -916,9 +916,9 @@ void drawDeviceList (int start, int end, int selection)
 				drawInfoMenuItems();
 			
 			//Azi: make this info more accessible.
-			getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
+			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->bootConfig);
 			
-			if (debugInfo && showBootBanner)
+			if (shoWinfo && showBootBanner) // no boot banner, no showinfo.
 			{
 				gui.debug.cursor = pos( 10, 100);
 				dprintf( &gui.screen, "label:     %s\n",   param->label );
@@ -934,8 +934,8 @@ void drawDeviceList (int start, int end, int selection)
 				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
 				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
 				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
-				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr );
-				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
+				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr ); //Azi: 1024x768 hides these 2
+				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm ); // on my 1440x900 screen.. need feedback!
 			}
 		}
 		

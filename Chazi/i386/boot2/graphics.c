@@ -367,8 +367,8 @@ setVESAGraphicsMode( unsigned short width,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
 {
-	bool			  debugInfo = false; //Azi:debuginfo
-	extern bool		  showBootBanner; //		||
+	bool			  shoWinfo = true; //Azi:showinfo
+	extern bool		  showBootBanner; //
     VBEModeInfoBlock  minfo;
     unsigned short    mode;
     unsigned short    vesaVersion;
@@ -479,9 +479,9 @@ setVESAGraphicsMode( unsigned short width,
 		gui.screen.attr				= minfo.ModeAttributes;
 #endif*/
 		//Azi: mm & attr info on DebugInfo - from autoResolution branch.
-		getBoolForKey(kDebugInfoKey, &debugInfo, &bootInfo->bootConfig);
+		getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->bootConfig);
 
-		if (debugInfo && showBootBanner)
+		if (shoWinfo && showBootBanner) // no boot banner, no showinfo.
 		{
 			gui.screen.mm		   = minfo.MemoryModel;
 			gui.screen.attr		   = minfo.ModeAttributes;
