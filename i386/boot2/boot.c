@@ -139,32 +139,8 @@ void boot(int biosdev)
 // next boot device on its list.
 void common_boot(int biosdev)
 {
-    //unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
-//    unsigned int denyBVFlags = kBVFlagEFISystem;
-
-    // Setup VGA text mode.
-    // Not sure if it is safe to call setVideoMode() before the
-    // config table has been loaded. Call video_mode() instead.
     video_mode( 2 );  // 80x25 mono text mode.
 
-    // TOOD: move to a module
-    /*
-    // Scan and record the system's hardware information.
-    scan_platform();
-
-    // First get info for boot volume.
-    scanBootVolumes(gBIOSDev, 0);
-    
-    bvChain = getBVChainForBIOSDev(gBIOSDev);
-    
-    setBootGlobals(bvChain);
-    
-    scanDisks(gBIOSDev, &bvCount);
-
-    // Create a separated bvr chain using the specified filters.
-    bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
-
-    gBootVolume = selectBootVolume(bvChain);
      */
 	// Intialize module system 
 	init_module_system();
