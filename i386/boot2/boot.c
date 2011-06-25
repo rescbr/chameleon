@@ -141,7 +141,6 @@ void common_boot(int biosdev)
 {
     video_mode( 2 );  // 80x25 mono text mode.
 
-     */
 	// Intialize module system 
 	init_module_system();
     
