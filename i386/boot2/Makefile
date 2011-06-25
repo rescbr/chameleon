@@ -42,7 +42,7 @@ OTHER_FILES =
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o mboot.o modules.o modules_support.o boot_modules.o
+OBJS = boot2.o boot.o mboot.o boot_modules.o
 # button.o browser.o scrollbar.o == NOTYET bmdecompress.o graphic_utils.o prompt.o options.o lzss.o	
 
 UTILDIR = ../util

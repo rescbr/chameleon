@@ -762,17 +762,9 @@ void scanBootVolumes( int biosdev, int * count )
   BVRef bvr = 0;
 
   bvr = diskScanBootVolumes(biosdev, count);
-  if (bvr == NULL)
+  if (bvr != NULL)
   {
-    bvr = nbpScanBootVolumes(biosdev, count);
-    if (bvr != NULL)
-    {
-      gBootFileType = kNetworkDeviceType;
-    }
-  }
-  else
-  {
-    gBootFileType = kBlockDeviceType;
+      gBootFileType = kBlockDeviceType;
   }
 }
 
@@ -792,12 +784,6 @@ void scanDisks(int biosdev, int *count)
     hd++;
 	}
 
-  // Also scanning CD/DVD drive.
-	if (biosDevIsCDROM(gBIOSDev))
-	{
-	  bvCount = 0;
-  	scanBootVolumes(gBIOSDev, &bvCount);
-	}
 }
 
 //==========================================================================

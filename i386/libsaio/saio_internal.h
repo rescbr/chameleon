@@ -32,7 +32,7 @@ extern void   real_to_prot(void);
 extern void   prot_to_real(void);
 extern void   halt(void);
 extern void   startprog(unsigned int address, void *arg);
-extern void   loader(UInt32 code, UInt32 cmdptr);
+//extern void   loader(UInt32 code, UInt32 cmdptr);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -71,12 +71,6 @@ extern unsigned long getMemoryMap(struct MemoryRange * rangeArray, unsigned long
 extern unsigned long getExtendedMemorySize();
 extern unsigned long getConventionalMemorySize();
 extern void   sleep(int n);
-
-/* bootstruct.c */
-extern void   initKernBootStruct(void);
-extern void   reserveKernBootStruct(void);
-extern void   copyKernBootStruct(void);
-extern void   finalizeBootStruct(void);
 
 /* cache.c */
 extern void   CacheReset();
@@ -140,10 +134,6 @@ extern void   enableA20(void);
 extern int    checkForSupportedHardware();
 extern int	  isLaptop();
 extern void   getPlatformName(char *nameBuf);
-
-/* nbp.c */
-extern UInt32 nbpUnloadBaseCode();
-extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 
 /* stringTable.c */
 extern char * newStringFromList(char **list, int *size);

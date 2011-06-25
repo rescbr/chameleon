@@ -2,7 +2,24 @@
 # Chameleon Modules
 #
 
+config MODULESYSTEM_MODULE
+	bool "Module System"
+	default y
+	---help---
+	  Say Y here if you want to enable to use of modules.
+
+config MODULE_DEBUG
+	bool "debug support"
+	default n
+	depends on MODULES
+	---help---
+	  Say Y here if you want to enable debug mode for the
+	  module system.
+
 menu "Modules"
+# NOTE: ModuleSystem should always be compiled in
+source "i386/modules/ModuleSystem/Cconfig"
+
 # NOTE BiosDisk, FileSystem should both be enabled as well as at least one file system driver
 source "i386/modules/klibc/Cconfig"
 source "i386/modules/uClibcxx/Cconfig"

@@ -30,7 +30,6 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include "bios.h"
-#include "nbp_cmd.h"
 #include "bootargs.h"
 
 #if DEBUG

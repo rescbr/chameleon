@@ -53,7 +53,10 @@
 #include "boot.h"
 #include "sl.h"
 #include "libsa.h"
-#include "modules.h"
+
+extern void init_module_system();
+extern int execute_hook(const char* name, void*, void*, void*, void*);
+
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
@@ -144,7 +147,7 @@ void common_boot(int biosdev)
 	// Intialize module system 
 	init_module_system();
     
-    UInt32 loopCount = 0;
+    int loopCount = 0;
     while(1)
     {
         execute_hook("WorkLoop", (void*)loopCount++, NULL, NULL, NULL);	// Main work loop

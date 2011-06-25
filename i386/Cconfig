@@ -16,6 +16,8 @@ source "i386/boot1/Cconfig"
 
 source "i386/boot2/Cconfig"
 
+source "i386/modules/Cconfig"
+
 source "i386/libsa/Cconfig"
 
 source "i386/libsaio/Cconfig"

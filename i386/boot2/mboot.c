@@ -45,11 +45,13 @@ extern unsigned char chainbootflag;
 void chainLoad();
 void waitThenReload();
 
-int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
+/*
+ int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
                       unsigned int byteoff,
                       unsigned int byteCount, void * buffer );
 int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
-//static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
+static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
+*/
 
 // Starts off in the multiboot context 1 MB high but eventually gets into low memory
 // and winds up with a bootdevice in eax which is all that boot() wants
@@ -332,8 +334,8 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
   //  bootArgs->Video.v_display = VGA_TEXT_MODE;
 
     // Install ramdisk and extra driver hooks
-    p_get_ramdisk_info = &multiboot_get_ramdisk_info;
-    p_ramdiskReadBytes = &multibootRamdiskReadBytes;
+    //p_get_ramdisk_info = &multiboot_get_ramdisk_info;
+    //p_ramdiskReadBytes = &multibootRamdiskReadBytes;
     //LoadExtraDrivers_p = &multiboot_LoadExtraDrivers;
 
     // Since we call multiboot ourselves, its return address will be correct.
@@ -376,49 +378,6 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
         doSelectDevice = true;
         bootdevice = BAD_BOOT_DEVICE;
     }
-    if(mi->mi_flags & MULTIBOOT_INFO_HAS_CMDLINE)
-    {
-        const char *val;
-        int size;
-        
-        if(getValueForBootKey(mi->mi_cmdline, "biosdev", &val, &size))
-        {
-            char *endptr;
-            int intVal = strtol(val, &endptr, 16 /* always hex */);
-            if(*val != '\0' && (*endptr == '\0' || *endptr == ' ' || *endptr == '\t'))
-            {
-                printf("Boot device overridden to %02x with biosdev=%s\n", intVal, val);
-                bootdevice = intVal;
-                doSelectDevice = false;
-            }
-            else
-                doSelectDevice = true;
-        }
-		
-        if(getValueForBootKey(mi->mi_cmdline, "timeout", &val, &size))
-        {
-            char *endptr;
-            int intVal = strtol(val, &endptr, 0);
-            if(*val != '\0' && (*endptr == '\0' || *endptr == ' ' || *endptr == '\t'))
-            {
-                printf("Timeout overridden to %d with timeout=%s\n", intVal, val);
-                multiboot_timeout = intVal;
-                multiboot_timeout_set = 1;
-            }
-        }		
-		
-        if(getValueForBootKey(mi->mi_cmdline, "partno", &val, &size))
-        {
-            char *endptr;
-            int intVal = strtol(val, &endptr, 0);
-            if(*val != '\0' && (*endptr == '\0' || *endptr == ' ' || *endptr == '\t'))
-            {
-                printf("Default partition overridden to %d with timeout=%s\n", intVal, val);
-                multiboot_partition = intVal;
-                multiboot_partition_set = 1;
-            }
-        }				
-    }
 
     if(bootdevice == BAD_BOOT_DEVICE)
         sleep(2); // pause for a second before halting
@@ -427,7 +386,7 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
 
 ///////////////////////////////////////////////////////////////////////////
 // Ramdisk and extra drivers code
-
+#if 0
 int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
                       unsigned int byteoff,
                       unsigned int byteCount, void * buffer )
@@ -460,7 +419,6 @@ int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip)
     dip->valid = true;
     return 0;
 }
-#if 0
 static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
 {
     char extensionsSpec[1024];

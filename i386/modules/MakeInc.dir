@@ -51,10 +51,10 @@ LIBSADIR = ../../libsa
 LIBSAIODIR = ../../libsaio
 BOOT2DIR = ../../boot2
 
-MODULE_INCLUDES :=  $(foreach x,$(MODULE_DEPENDENCIES),-I$(SRCROOT)/i386/modules/$(x)/include/)
+MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/i386/modules/$(x)/include/)
 
 
-INC = -I$(SRCROOT)/i386/modules/include/ -Iinclude/ -I$(SRCROOT)/i386/libsaio/ -I$(SRCROOT)/i386/libsa/ -I$(SRCROOT)/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
+INC = -I$(SRCROOT)/sym/i386/ -I$(SRCROOT)/i386/modules/include/ -Iinclude/ -I$(SRCROOT)/i386/libsaio/ -I$(SRCROOT)/i386/libsa/ -I$(SRCROOT)/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
 DEFINES := -D__KLIBC__ $(DEFINES)
 
 MODULE_DEPENDENCIES :=  $(wildcard $(foreach x,$(MODULE_DEPENDENCIES),$(SYMROOT)/modules/$(x).dylib)) \
