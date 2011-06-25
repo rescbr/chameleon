@@ -68,59 +68,6 @@ typedef struct {
 	bool	canOverride;	// flag to mark a dictionary can be overriden
 } config_file_t;
 
-/*
- * BIOS drive information.
- */
-struct boot_drive_info {
-	struct drive_params {
-	unsigned short buf_size;
-	unsigned short info_flags;
-	unsigned long  phys_cyls;
-	unsigned long  phys_heads;
-	unsigned long  phys_spt;
-	unsigned long long phys_sectors;
-	unsigned short phys_nbps;
-	unsigned short dpte_offset;
-	unsigned short dpte_segment;
-	unsigned short key;
-	unsigned char  path_len;
-	unsigned char  reserved1;
-	unsigned short reserved2;
-	unsigned char  bus_type[4];
-	unsigned char  interface_type[8];
-	unsigned char  interface_path[8];
-	unsigned char  dev_path[8];
-	unsigned char  reserved3;
-	unsigned char  checksum;
-	} params;
-	struct drive_dpte {
-	unsigned short io_port_base;
-	unsigned short control_port_base;
-	unsigned char  head_flags;
-	unsigned char  vendor_info;
-	unsigned char  irq		   : 4;
-	unsigned char  irq_unused  : 4;
-	unsigned char  block_count;
-	unsigned char  dma_channel : 4;
-	unsigned char  dma_type	   : 4;
-	unsigned char  pio_type	   : 4;
-	unsigned char  pio_unused  : 4;
-	unsigned short option_flags;
-	unsigned short reserved;
-	unsigned char  revision;
-	unsigned char  checksum;
-	} dpte;
-} __attribute__((packed));
-typedef struct boot_drive_info boot_drive_info_t;
-
-struct driveInfo {
-	boot_drive_info_t di;
-	int uses_ebios;
-	int no_emulation;
-	int biosdev;
-	int valid;
-};
-
 typedef struct FinderInfo {
 	unsigned char data[16];
 } FinderInfo;

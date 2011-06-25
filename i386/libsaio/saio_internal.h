@@ -45,7 +45,6 @@ extern int    bgetc(void);
 extern int    biosread(int dev, int cyl, int head, int sec, int num);
 extern int    ebiosread(int dev, unsigned long long sec, int count);
 extern int    ebioswrite(int dev, long sec, int count);
-extern int    get_drive_info(int drive, struct driveInfo *dp);
 extern int    ebiosEjectMedia(int biosdev);
 extern void	  bios_putchar(int ch);
 extern void   putca(int ch, int attr, int repeat);
@@ -203,7 +202,6 @@ extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;
 
 // Function pointer to be filled in if ramdisks are available
-extern int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip);
 extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
                       unsigned int byteoff,
                       unsigned int byteCount, void * buffer );

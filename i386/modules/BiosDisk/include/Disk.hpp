@@ -14,14 +14,15 @@ public:
     Disk(const char* name);
     ~Disk();
         
-    virtual IOReturn    Read(UInt64 sector, UInt64 size, char* buffer) = 0;
-    virtual IOReturn    Write(UInt64 sector, UInt64 size, char* buffer) = 0;
+    virtual IOReturn    Read(UInt64 sector, UInt64 size, UInt8* buffer) = 0;
+    virtual IOReturn    Write(UInt64 sector, UInt64 size, UInt8* buffer) = 0;
 
-    bool        isValid() { return mName != NULL; };
+    virtual bool        isValid() { return mName != NULL && mBytesPerSector; };
 protected:
     const char      *mName;
-    const char      *busType;
+    const char      *mBusType;
     
+    UInt32          mBytesPerSector;
 private:
 
 };
