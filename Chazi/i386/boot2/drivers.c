@@ -69,7 +69,7 @@ struct DriversPackage {
   unsigned long signature1;
   unsigned long signature2;
   unsigned long length;
-  unsigned long alder32;
+  unsigned long adler32;
   unsigned long version;
   unsigned long numDrivers;
   unsigned long reserved1;
@@ -84,7 +84,7 @@ enum {
 
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
-static unsigned long Alder32( unsigned char * buffer, long length );
+/*static*/ unsigned long Adler32( unsigned char * buffer, long length );
 
 static long FileLoadDrivers(char *dirSpec, long plugin);
 static long NetLoadDrivers(char *dirSpec);
@@ -108,8 +108,8 @@ static char *    gFileSpec;
 static char *    gTempSpec;
 static char *    gFileName;
 
-static unsigned long
-Alder32( unsigned char * buffer, long length )
+/*static*/ unsigned long
+Adler32( unsigned char * buffer, long length )
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -278,7 +278,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
 	{
 		ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
-		//Azi: hum... finaly got it :P
+		
 		verbose("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1);
 		
 		if ((ret != 0)
@@ -286,7 +286,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 			|| (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
 			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
-			//Azi: hum... finaly got it :P
+			
 			msglog("LoadDrivers: Loading from [%s]\n", gDriverSpec);
 			
 			if (LoadDriverMKext(gDriverSpec) == 0)
@@ -322,7 +322,6 @@ FileLoadDrivers( char * dirSpec, long plugin )
 
     index = 0;
     while (1) {
-		
         ret = GetDirEntry(dirSpec, &index, &name, &flags, &time);
         if (ret == -1) break;
 
@@ -419,8 +418,8 @@ LoadDriverMKext( char * fileSpec )
     if (( GetPackageElement(signature1) != kDriverPackageSignature1) ||
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
-        ( GetPackageElement(alder32)    !=
-          Alder32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+        ( GetPackageElement(adler32)    !=
+          Adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
@@ -553,86 +552,86 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 static long
 LoadMatchedModules( void )
 {
-    TagPtr        prop;
-    ModulePtr     module;
-    char          *fileName, segName[32];
-    DriverInfoPtr driver;
-    long          length, driverAddr, driverLength;
-    void          *executableAddr = 0;
+	TagPtr		  prop;
+	ModulePtr	  module;
+	char		  *fileName, segName[32];
+	DriverInfoPtr driver;
+	long		  length, driverAddr, driverLength;
+	void		  *executableAddr = 0;
 
   
-    module = gModuleHead;
+	module = gModuleHead;
 
-    while (module != 0)
-    {
-        if (module->willLoad)
-        {
-            prop = XMLGetProperty(module->dict, kPropCFBundleExecutable);
+	while (module != 0)
+	{
+		if (module->willLoad)
+		{
+			prop = XMLGetProperty(module->dict, kPropCFBundleExecutable);
 
-            if (prop != 0)
-            {
-                fileName = prop->string;
-                sprintf(gFileSpec, "%s%s", module->executablePath, fileName);
-                length = LoadThinFatFile(gFileSpec, &executableAddr);
+			if (prop != 0)
+			{
+				fileName = prop->string;
+				sprintf(gFileSpec, "%s%s", module->executablePath, fileName);
+				length = LoadThinFatFile(gFileSpec, &executableAddr);
 				if (length == 0)
 				{
 					length = LoadFile(gFileSpec);
 					executableAddr = (void *)kLoadAddr;
 				}
-                //printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
-            }
-            else
-                length = 0;
+//				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
+			}
+			else
+				length = 0;
 
-            if (length != -1)
-            {
-		//driverModuleAddr = (void *)kLoadAddr;
-                //if (length != 0)
-                //{
-		//    ThinFatFile(&driverModuleAddr, &length);
-		//}
+			if (length != -1)
+			{
+//				driverModuleAddr = (void *)kLoadAddr;
+//				if (length != 0)
+//				{
+//					ThinFatFile(&driverModuleAddr, &length);
+//				}
 
-                // Make make in the image area.
-                driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
-                driverAddr = AllocateKernelMemory(driverLength);
+				// Make make in the image area.
+				driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
+				driverAddr = AllocateKernelMemory(driverLength);
 
-                // Set up the DriverInfo.
-                driver = (DriverInfoPtr)driverAddr;
-                driver->plistAddr = (char *)(driverAddr + sizeof(DriverInfo));
-                driver->plistLength = module->plistLength;
-                if (length != 0)
-                {
-                    driver->executableAddr = (void *)(driverAddr + sizeof(DriverInfo) +
-					                     module->plistLength);
-                    driver->executableLength = length;
-                }
-                else
-                {
-                    driver->executableAddr   = 0;
-                    driver->executableLength = 0;
-                }
-                driver->bundlePathAddr = (void *)(driverAddr + sizeof(DriverInfo) +
-				                     module->plistLength + driver->executableLength);
-                driver->bundlePathLength = module->bundlePathLength;
+				// Set up the DriverInfo.
+				driver = (DriverInfoPtr)driverAddr;
+				driver->plistAddr = (char *)(driverAddr + sizeof(DriverInfo));
+				driver->plistLength = module->plistLength;
+				if (length != 0)
+				{
+					driver->executableAddr = (void *)(driverAddr + sizeof(DriverInfo) +
+										 module->plistLength);
+					driver->executableLength = length;
+				}
+				else
+				{
+					driver->executableAddr	 = 0;
+					driver->executableLength = 0;
+				}
+				driver->bundlePathAddr = (void *)(driverAddr + sizeof(DriverInfo) +
+									 module->plistLength + driver->executableLength);
+				driver->bundlePathLength = module->bundlePathLength;
 
-                // Save the plist, module and bundle.
-                strcpy(driver->plistAddr, module->plistAddr);
-                if (length != 0)
-                {
-                    memcpy(driver->executableAddr, executableAddr, length);
-                }
-                strcpy(driver->bundlePathAddr, module->bundlePath);
+				// Save the plist, module and bundle.
+				strcpy(driver->plistAddr, module->plistAddr);
+				if (length != 0)
+				{
+					memcpy(driver->executableAddr, executableAddr, length);
+				}
+				strcpy(driver->bundlePathAddr, module->bundlePath);
 
-                // Add an entry to the memory map.
-                sprintf(segName, "Driver-%lx", (unsigned long)driver);
-                AllocateMemoryRange(segName, driverAddr, driverLength,
-                                    kBootDriverTypeKEXT);
-            }
-        }
-        module = module->nextModule;
-    }
+				// Add an entry to the memory map.
+				sprintf(segName, "Driver-%lx", (unsigned long)driver);
+				AllocateMemoryRange(segName, driverAddr, driverLength,
+									kBootDriverTypeKEXT);
+			}
+		}
+		module = module->nextModule;
+	}
 
-    return 0;
+	return 0;
 }
 
 //==========================================================================
@@ -782,64 +781,70 @@ static char gPlatformName[64];
 long 
 DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
-    long ret;
-    compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
-    u_int32_t uncompressed_size, size;
-    void *buffer;
+	long ret;
+	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
+	u_int32_t uncompressed_size, size;
+	void *buffer;
 	unsigned long len;
-  
-#if 0
-    printf("kernel header:\n");
-    printf("signature: 0x%x\n", kernel_header->signature);
-    printf("compress_type: 0x%x\n", kernel_header->compress_type);
-    printf("adler32: 0x%x\n", kernel_header->adler32);
-    printf("uncompressed_size: 0x%x\n", kernel_header->uncompressed_size);
-    printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
-    getchar();
-#endif
-
-    if (kernel_header->signature == OSSwapBigToHostConstInt32('comp')) {
-        if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) {
-            error("kernel compression is bad\n");
-            return -1;
-        }
-#if NOTDEF
-        if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
-            return -1;
-        if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
-            return -1;
-#endif
-    
-        uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
-        binary = buffer = malloc(uncompressed_size);
-    
-        size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
-                               OSSwapBigToHostInt32(kernel_header->compressed_size));
-        if (uncompressed_size != size) {
-            error("size mismatch from lzss: %x\n", size);
-            return -1;
-        }
-        if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            Alder32(binary, uncompressed_size)) {
-            printf("adler mismatch\n");
-            return -1;
-        }
-    }
-  
-  ret = ThinFatFile(&binary, &len);
-  if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
-  {
-	  archCpuType=CPU_TYPE_I386;
-	  ret = ThinFatFile(&binary, &len);
-  }
-  
-  ret = DecodeMachO(binary, rentry, raddr, rsize);
 	
-  if (ret<0 && archCpuType==CPU_TYPE_X86_64)
-  {
-	  archCpuType=CPU_TYPE_I386;
+#if 0
+	printf("kernel header:\n");
+	printf("signature: 0x%x\n", kernel_header->signature);
+	printf("compress_type: 0x%x\n", kernel_header->compress_type);
+	printf("adler32: 0x%x\n", kernel_header->adler32);
+	printf("uncompressed_size: 0x%x\n", kernel_header->uncompressed_size);
+	printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
+	getchar();
+#endif
+	
+	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
+	{
+		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+		{
+			error("kernel compression is bad\n");
+			return -1;
+		}
+#if NOTDEF
+		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
+			return -1;
+		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
+			return -1;
+#endif
+		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
+		binary = buffer = malloc(uncompressed_size);
+		
+		size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
+							   OSSwapBigToHostInt32(kernel_header->compressed_size));
+		if (uncompressed_size != size) {
+			error("size mismatch from lzss: %x\n", size);
+			return -1;
+		}
+		
+		if (OSSwapBigToHostInt32(kernel_header->adler32) !=
+			Adler32(binary, uncompressed_size))
+		{
+			printf("adler mismatch\n");
+			return -1;
+		}
+	}
+	
+	// Notify modules that the kernel has been decompressed, is about to be decoded
+	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
+	
+	ret = ThinFatFile(&binary, &len);
+	  if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
+	  {
+		  archCpuType=CPU_TYPE_I386;
+		  ret = ThinFatFile(&binary, &len);
+	  }
+
 	  ret = DecodeMachO(binary, rentry, raddr, rsize);
-  }
-  
-  return ret;
+
+	  if (ret<0 && archCpuType==CPU_TYPE_X86_64)
+	  {
+		  archCpuType=CPU_TYPE_I386;
+		  ret = DecodeMachO(binary, rentry, raddr, rsize);
+	  }
+
+	  return ret;
 }
