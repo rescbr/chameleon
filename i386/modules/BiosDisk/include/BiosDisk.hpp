@@ -84,7 +84,7 @@ private:
     bool                mNoEmulation;
     bool                mValid;
     
-    boot_drive_info_t mDriveInfo;
+    boot_drive_info_t* mDriveInfo;
 
 };
 

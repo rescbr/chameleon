@@ -75,10 +75,11 @@ BiosDisk::BiosDisk(const char* name)
     sscanf(name, "bios:/hd%d/", &mDiskID);
     mDiskID += 0x80;    // 0x80 = fixed disk
     
-    
+    mDriveInfo = (boot_drive_info_t*)malloc(sizeof(boot_drive_info_t));
+
     if(BIOSRead(0, 0, 1, 1) == 0 && GetDriveInfo() == 0) 
     {
-        mBytesPerSector = mDriveInfo.params.phys_nbps;
+        mBytesPerSector = mDriveInfo->params.phys_nbps;
         printf("Disk: 0x%X (%d sectors)\n", mDiskID, mBytesPerSector);   
     }
     else
@@ -89,7 +90,7 @@ BiosDisk::BiosDisk(const char* name)
 
 BiosDisk::~BiosDisk()
 {
-
+    if(mDriveInfo) free(mDriveInfo);
 }
 
 IOReturn BiosDisk::Read(UInt64 sector, UInt64 size, UInt8* buffer)
@@ -232,6 +233,111 @@ UInt8 BiosDisk::EBIOSWrite(UInt64 sector, UInt8 count)
 
 UInt8 BiosDisk::GetDriveInfo()
 {
-    return 0; // TODO: finish this
+    // we use the BIOS_ADDR (disk buffer) to ensure that the buffer
+    // is in low mem
+    boot_drive_info_t* actualInfo = mDriveInfo;
+    mDriveInfo = (boot_drive_info_t*)BIOS_ADDR;
+    biosBuf_t bb;
+	int ret = 0;
+	
+#if UNUSED
+	if (maxhd == 0) {
+		bb.intno = 0x13;
+		bb.eax.r.h = 0x08;
+		bb.edx.r.l = 0x80;
+		bios(&bb);
+		if (bb.flags.cf == 0)
+			maxhd = 0x7f + bb.edx.r.l;
+	};
+	
+#endif
+	
+	/* Check for El Torito no-emulation mode. */
+	//dp->no_emulation = is_no_emulation(drive);
+    
+	/* Check drive for EBIOS support. */
+	bb.intno = 0x13;
+	bb.eax.r.h = 0x41;
+	bb.edx.r.l = mDiskID;
+	bb.ebx.rr = 0x55aa;
+	bios(&bb);
+	
+	if ((bb.ebx.rr == 0xaa55) && (bb.flags.cf == 0)) {
+		/* Get flags for supported operations. */
+		mUsesEBIOS = bb.ecx.r.l;
+	}
+	
+	if (mUsesEBIOS & (EBIOS_ENHANCED_DRIVE_INFO | EBIOS_LOCKING_ACCESS | EBIOS_FIXED_DISK_ACCESS)) {
+		/* Get EBIOS drive info. */
+		
+		mDriveInfo->params.buf_size = sizeof(mDriveInfo->params);
+		bb.intno = 0x13;
+		bb.eax.r.h = 0x48;
+		bb.edx.r.l = mDiskID;
+		bb.esi.rr = NORMALIZED_OFFSET((unsigned)&mDriveInfo->params);
+		bb.ds	  = NORMALIZED_SEGMENT((unsigned)&mDriveInfo->params);
+		bios(&bb);
+        
+		if (bb.flags.cf != 0 /* || params.phys_sectors < 2097152 */) {
+			mUsesEBIOS = 0;
+			mDriveInfo->params.buf_size = 1;
+		}
+		else
+		{
+			if (mDiskID >= BASE_HD_DRIVE &&
+				(mUsesEBIOS & EBIOS_ENHANCED_DRIVE_INFO) &&
+				mDriveInfo->params.buf_size >= 30 &&
+				!(mDriveInfo->params.dpte_offset == 0xFFFF && mDriveInfo->params.dpte_segment == 0xFFFF)) {
+                void *ptr = (void *)(mDriveInfo->params.dpte_offset + ((unsigned int)mDriveInfo->params.dpte_segment << 4));
+                bcopy(ptr, &mDriveInfo->dpte, sizeof(mDriveInfo->dpte));
+			}
+		}
+	}
+    
+    /*
+     * zef: This code will fail on recent JMicron and Intel option ROMs
+     */ 
+    //	if (mDriveInfo->params.phys_heads == 0 || mDriveInfo->params.phys_spt == 0) {
+    //		/* Either it's not EBIOS, or EBIOS didn't tell us. */
+    //		bb.intno = 0x13;
+    //		bb.eax.r.h = 0x08;
+    //		bb.edx.r.l = drive;
+    //		bios(&bb);
+    //		if (bb.flags.cf == 0 && bb.eax.r.h == 0) {
+    //			unsigned long cyl;
+    //			unsigned long sec;
+    //			unsigned long hds;
+    //		
+    //			hds = bb.edx.r.h;
+    //			sec = bb.ecx.r.l & 0x3F;
+    //			if ((dp->uses_ebios & EBIOS_ENHANCED_DRIVE_INFO) && (sec != 0)) {
+    //				cyl = (mDriveInfo->params.phys_sectors / ((hds + 1) * sec)) - 1;
+    //			} else {
+    //				cyl = bb.ecx.r.h | ((bb.ecx.r.l & 0xC0) << 2);
+    //			}
+    //			mDriveInfo->params.phys_heads = hds; 
+    //			mDriveInfo->params.phys_spt = sec;
+    //			mDriveInfo->params.phys_cyls = cyl;
+    //		} else {
+    //			ret = -1;
+    //		}
+    //	}
+    /*
+     if (dp->no_emulation) {
+     // Some BIOSes give us erroneous EBIOS support information.
+     // Assume that if you're on a CD, then you can use
+     // EBIOS disk calls.
+     //
+     dp->uses_ebios |= EBIOS_FIXED_DISK_ACCESS;
+     }*/
+    
+	if (ret == 0) {
+		mValid = 1;
+	}
+
+    bcopy(mDriveInfo, actualInfo, sizeof(boot_drive_info_t));
+    mDriveInfo = actualInfo;
+    
+	return ret;
 }
 
