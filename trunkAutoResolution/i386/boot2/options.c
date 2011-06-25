@@ -31,7 +31,8 @@
 #include "pci.h"
 #include "autoresolution.h" //Azi:autoresolution
 
-bool showBootBanner = true; //Azi:autoresolution
+
+bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
 extern int multiboot_timeout;
@@ -875,7 +876,6 @@ int getBootOptions(bool firstRun)
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-//			bool showBootBanner = true; //Azi:autoresolution
  
 			// Check if "Boot Banner"=N switch is present in config file.
 			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
