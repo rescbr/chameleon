@@ -11,7 +11,7 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = klibc uClibcxx Resolution HelloWorld
+SUBDIRS = klibc uClibcxx Resolution HelloWorld BiosDisk FileSystem
 
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
