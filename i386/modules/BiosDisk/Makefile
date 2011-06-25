@@ -8,6 +8,6 @@ MODULE_DEPENDENCIES = uClibcxx
 
 DIR = BiosDisk
 
-MODULE_OBJS = BiosDisk.o
+MODULE_OBJS = Disk.o BiosDisk.o Main.o
 
 include ../MakeInc.dir

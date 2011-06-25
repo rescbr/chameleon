@@ -2,15 +2,39 @@
  * Copyright (c) 2011 Evan Lojewski. All rights reserved.
  *
  */
-#include <cstdlib>
-#include <iostream>
-#include <modules>
+#include <BiosDisk.hpp>
 
-extern "C"
+        
+BiosDisk::BiosDisk(const char* name)
 {
-    void BiosDisk_start();
+    busType = "bios";
+
+    // fixme
+    if(name[0] != 'b' &&
+       name[1] != 'i' &&
+       name[2] != 'o' &&
+       name[3] != 's' &&
+       name[4] != ':') name = NULL;
+    
+    mName = name;
+    
+    // TODO: convert mName to bios disk id
 }
 
-void BiosDisk_start()
+BiosDisk::~BiosDisk()
 {
+
+}
+
+IOReturn BiosDisk::Read(UInt64 sector, UInt64 size, char* buffer)
+{
+    if(!isValid()) return kIOReturnNoDevice;
+    return kIOReturnSuccess;
+}
+
+
+IOReturn BiosDisk::Write(UInt64 sector, UInt64 size, char* buffer)
+{
+    if(!isValid()) return kIOReturnNoDevice;
+    return kIOReturnNotWritable;
 }
