@@ -30,8 +30,7 @@ INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/i386/include
 
 SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 	disk.o sys.o cache.o \
-	stringTable.o allocate.o misc.o \
-	ufs.o ufs_byteorder.o \
+	stringTable.o misc.o \
 	vbe.o nbp.o hfs.o hfs_compare.o \
 	xml.o ntfs.o msdos.o md5c.o \
 	ext2fs.o load.o	\
