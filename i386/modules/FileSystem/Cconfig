@@ -1,0 +1,12 @@
+#
+# Chameleon Modules
+#
+
+config FILESYSTEM_MODULE
+	tristate "FileSystem"
+	default y
+	depends on BIOSDISK_MODULE
+	---help---
+	  Say Y here if you want to enable to use of this module.
+
+source "i386/modules/FileSystem/HFS/Cconfig"

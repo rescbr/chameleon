@@ -168,4 +168,10 @@ void common_boot(int biosdev)
      */
 	// Intialize module system 
 	init_module_system();
+    
+    UInt32 loopCount = 0;
+    while(1)
+    {
+        execute_hook("WorkLoop", (void*)loopCount++, NULL, NULL, NULL);	// Main work loop
+    }
 }
