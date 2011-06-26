@@ -16,6 +16,10 @@ public:
     ~FDiskPartition();
 
 protected:
+    bool                isMBRDisk();
+
+    struct disk_blk0    mLBA0;
+    struct fdisk_part*  mFdiskEntry;
     
 private:
 };
