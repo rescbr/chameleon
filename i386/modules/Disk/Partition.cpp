@@ -34,3 +34,10 @@ bool Partition::probe()
 {
     return (mDisk != NULL) && (mPartitionNumber != INVALID_PARTITION) && mNumSectors;
 }
+
+/*
+Partition::getUUID()
+{
+    return mUUID;
+}
+*/

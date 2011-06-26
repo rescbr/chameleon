@@ -16,8 +16,12 @@ public:
     ~GUIDPartition();
     
 protected:
+    bool        isGPTDisk();
     
 private:
+    UInt8       mLBABUffer[512];    // TODO: don't assume 512
+    gpt_hdr*    mGPTHeader;
+    gpt_ent*    mGPTEntry;
 };
 
 #endif /* GUID_PARTITION_H */

@@ -20,6 +20,8 @@ public:
     virtual IOReturn    Write(UInt64 sector, UInt64 size, UInt8* buffer);
     
     virtual bool        probe();    
+    
+    //virtual uuid_t      getUUID();
 
 protected:
     Disk                *mDisk;
@@ -27,6 +29,7 @@ protected:
     UInt64              mBeginSector;
     SInt8               mPartitionNumber;
     UInt8               mNumPartitions;
+    //uuid_t              mUUID;
 
 private:
     
