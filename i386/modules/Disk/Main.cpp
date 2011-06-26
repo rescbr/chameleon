@@ -9,10 +9,10 @@
 extern "C"
 {
 #include "libsaio.h"
-    void BiosDisk_start();
+    void Disk_start();
 }
 
-void BiosDisk_start()
+void Disk_start()
 {
     UInt8* mbr = (UInt8*)malloc(512);
     

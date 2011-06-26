@@ -2,10 +2,9 @@
 # Chameleon Modules
 #
 
-config BIOSDISK_MODULE
-	tristate "BiosDisk"
+config DISK_MODULE
+	tristate "Disk"
 	default y
 	depends on UCLIBCXX_MODULE
 	---help---
 	  Say Y here if you want to enable to use of this module.
-

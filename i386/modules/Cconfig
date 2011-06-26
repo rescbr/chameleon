@@ -23,7 +23,7 @@ source "i386/modules/ModuleSystem/Cconfig"
 # NOTE BiosDisk, FileSystem should both be enabled as well as at least one file system driver
 source "i386/modules/klibc/Cconfig"
 source "i386/modules/uClibcxx/Cconfig"
-source "i386/modules/BiosDisk/Cconfig"
+source "i386/modules/Disk/Cconfig"
 source "i386/modules/FileSystem/Cconfig"
 
 source "i386/modules/Resolution/Cconfig"
