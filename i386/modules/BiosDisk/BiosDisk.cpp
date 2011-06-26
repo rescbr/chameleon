@@ -96,20 +96,35 @@ BiosDisk::~BiosDisk()
 IOReturn BiosDisk::Read(UInt64 sector, UInt64 size, UInt8* buffer)
 {
     if(!isValid()) return kIOReturnNoDevice;
-    return kIOReturnSuccess;
+    
+    // Assume EBIOS capable for now...
+    if(EBIOSRead(sector, size) == 0)
+    {
+        bcopy((void*)BIOS_ADDR, buffer, size * mBytesPerSector);
+        return kIOReturnSuccess;
+    }
+    else return kIOReturnIOError;
 }
 
 
 IOReturn BiosDisk::Write(UInt64 sector, UInt64 size, UInt8* buffer)
 {
+    
     if(!isValid()) return kIOReturnNoDevice;
-    return kIOReturnNotWritable;
+    
+    bcopy(buffer, (void*)BIOS_ADDR, size * mBytesPerSector);
+    
+    if(EBIOSWrite(sector, size) == 0)
+    {
+        return kIOReturnSuccess;
+    }
+    else return kIOReturnIOError;
 }
 
 
 UInt8 BiosDisk::BIOSRead(UInt16 cylinder, UInt8 head, UInt8 sector, UInt8 count)
 {
-    if(sector == 0) return -1;
+    sector++;   // starts at 1
     
     biosBuf_t bb;
     int i;
