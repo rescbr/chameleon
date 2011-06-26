@@ -10,6 +10,7 @@
 class Disk
 {
 public:
+    Disk();
     Disk(const char* name);
     ~Disk();
         
