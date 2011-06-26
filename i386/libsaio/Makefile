@@ -29,10 +29,8 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc++
 INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/i386/include
 
 SAIO_OBJS = table.o asm.o bios.o biosfn.o \
-	cache.o \
 	misc.o \
-	vbe.o \
-	xml.o md5c.o \
+	xml.o \
 	load.o	\
 	console.o
 

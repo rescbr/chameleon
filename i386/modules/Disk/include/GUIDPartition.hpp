@@ -20,4 +20,4 @@ protected:
 private:
 };
 
-#endif /* FDISK_PARTITION_H */
+#endif /* GUID_PARTITION_H */
