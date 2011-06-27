@@ -279,7 +279,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	{
 		ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
 		
-		msglog("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1);
+		msglog("(%s) Extensions time  +1   = %d\n", __FUNCTION__, time2 + 1); //Azi: mine!
 		
 		if ((ret != 0)
 			|| ((flags & kFileTypeMask) != kFileTypeDirectory)
