@@ -1377,7 +1377,7 @@ processBootOptions()
 	strncpy(&argP[cnt], cp, userCnt);
 	verbose("BootArgs = %s\n", argP); //Azi: checking...
 	argP[cnt+userCnt] = '\0'; // shouldn't this null argP ?? see getOSVersion***
-	verbose("BootArgs check = %s\n", argP); //  ||
+	verbose("Re-check BootArgs = %s\n", argP); //  ||
 	
 	if (!shouldboot)
 	{

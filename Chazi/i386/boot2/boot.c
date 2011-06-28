@@ -590,33 +590,33 @@ void common_boot(int biosdev)
 			
 			// kextcache_main.c: Construct entry from UUID of boot volume...(reminder)
 			// assemble ?string? to generate adler from...
-//			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+//			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile); - OLD
 			const char *ProductName = getStringForKey("SMproductname", &bootInfo->smbiosConfig);
 			sprintf(gCacheNameAdler, ProductName); // well, at least the smbios.plist can be loaded this early...
 			// to set/get "ProductName" this early, booter needs complete rewrite!!
 			// see DHP's Revolution booter rework example!
-			verbose("KC: gCacheNameAdler 1 = %s\n", gCacheNameAdler);
+		//	verbose("KC: gCacheNameAdler 1 = %s\n", gCacheNameAdler);
 			//Azi: check the validity of this, e.g. on Helper Partitions
 			sprintf(gCacheNameAdler + 64, "%s", "\\System\\Library\\CoreServices\\boot.efi");
-			verbose("KC: gCacheNameAdler 2 = %s\n", gCacheNameAdler + 64);
+		//	verbose("KC: gCacheNameAdler 2 = %s\n", gCacheNameAdler + 64);
 			sprintf(gCacheNameAdler + (64 + 38), "%s", bootInfo->bootFile);
-			verbose("KC: gCacheNameAdler 3 = %s\n", gCacheNameAdler + (64 + 38));
+		//	verbose("KC: gCacheNameAdler 3 = %s\n", gCacheNameAdler + (64 + 38));
 
 			// generate adler
 			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-			verbose("KC: Adler32 = %08X\n", adler32);
+		//	verbose("KC: Adler32 = %08X\n", adler32);
 //Azi: no check for OS version here ?? - yes there is :)
 			// append arch and/or adler (checksum) to kc path...
 			if (gMacOSVersion[3] <= '5')
 			{
 				sprintf(gBootKernelCacheFile, "%s.%08lX", kCachePathTigerLeopard, adler32);
-				verbose("KC: adler added to path = %s\n", gBootKernelCacheFile);
+		//		verbose("KC: adler added to path = %s\n", gBootKernelCacheFile);
 			}
 			else
 			{
 				sprintf(gBootKernelCacheFile, "%s_%s.%08X", kCachePathSnowLion,
 						(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", adler32);
-				verbose("KC: arch & adler added to path = %s\n", gBootKernelCacheFile);
+		//		verbose("KC: arch & adler added to path = %s\n", gBootKernelCacheFile);
 			}
         }
 
