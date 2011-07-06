@@ -11,6 +11,7 @@
 #define kFixFSB		        "FixFSB"
 #define MSR_FSB_FREQ		0x000000cd
 #define AMD_10H_11H_CONFIG  0xc0010064
+#define kEnableCPUfreq	"EnableCPUfreqModule"
 
 void CPUfreq_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {	
@@ -34,11 +35,11 @@ void CPUfreq_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, vo
 				uint8_t crlo, crhi = 0;				
 				
 				switch (Platform->CPU.Model) {
-					case CPU_MODEL_YONAH:		// Core Duo/Solo, Pentium M DC
-					case CPU_MODEL_MEROM:		// Core Xeon, Core 2 DC, 65nm
+					case CPUID_MODEL_YONAH:		// Core Duo/Solo, Pentium M DC
+					case CPUID_MODEL_MEROM:		// Core Xeon, Core 2 DC, 65nm
 					case 0x16:					// Celeron, Core 2 SC, 65nm
-					case CPU_MODEL_PENRYN:		// Core 2 Duo/Extreme, Xeon, 45nm
-					case CPU_MODEL_ATOM:		// Atom :)
+					case CPUID_MODEL_PENRYN:		// Core 2 Duo/Extreme, Xeon, 45nm
+					case CPUID_MODEL_ATOM:		// Atom :)
 					case 0x27:					// Atom Lincroft, 45nm                                           
 						
 						getBoolForKey(kFixFSB, &fix_fsb, &bootInfo->bootConfig);                                                              
@@ -146,9 +147,9 @@ out:
 		    {
 			        verbose("CPU: ");
 			        // valv: mobility check			       
-			        if (strstr(Platform->CPU.BrandString, "obile") == 0)
+			        if ((strstr(Platform->CPU.BrandString, "obile") == 0) || (strstr(Platform->CPU.BrandString, "Atom") == 0))
 					{
-						          Platform->CPU.Features |= CPU_FEATURE_MOBILE;
+						          Platform->CPU.isMobile = true;
 					}
 					
 			        verbose("%s\n", Platform->CPU.BrandString);
@@ -202,9 +203,14 @@ out:
 
 void CPUfreq_start()
 {	
-	if (Platform->CPU.Features & CPU_FEATURE_MSR) {
-		register_hook_callback("PreBoot", &CPUfreq_hook);		
-	} else {
-		verbose ("Unsupported CPU: CPUfreq disabled !!!\n");		
-	}	
+	bool enable = true;
+	getBoolForKey(kEnableCPUfreq, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		if (Platform->CPU.Features & CPUID_FEATURE_MSR) {
+			register_hook_callback("PreBoot", &CPUfreq_hook);		
+		} else {
+			verbose ("Unsupported CPU: CPUfreq disabled !!!\n");		
+		}	
+	}
 }

@@ -6,10 +6,20 @@
 #include "libsaio.h"
 #include "915resolution.h"
 #include "modules.h"
+#include "bootstruct.h"
+
+#define kEnableResolution			"EnableResolutionModule"
+
 
 void Resolution_start()
 {
-	register_hook_callback("getResolution_hook", &getResolutionHook);
-	patchVideoBios();
+	bool enable = true;
+	getBoolForKey(kEnableResolution, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		register_hook_callback("getResolution_hook", &getResolutionHook);
+		patchVideoBios();
+	}
+	
 }
 

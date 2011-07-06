@@ -42,7 +42,7 @@
 #include "bootstruct.h"
 #include "libsaio.h"
 
-#define MAX_DRIVES 8
+//#define MAX_DRIVES 8
 
 static biosBuf_t bb;
 

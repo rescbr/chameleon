@@ -39,9 +39,9 @@
 #define DBG(x...)
 #endif
 
-#define MAX_NUM_DCB_ENTRIES 16
+//#define MAX_NUM_DCB_ENTRIES 16
 
-#define TYPE_GROUPED 0xff
+//#define TYPE_GROUPED 0xff
 
 const char *ati_compatible_0[]			= { "@0,compatible", "ATY,%s" };
 const char *ati_compatible_1[]			= { "@1,compatible", "ATY,%s" };
@@ -386,7 +386,7 @@ static uint32_t load_ati_bios_file(const char *filename, uint8_t *buf, int bufsi
 	int	fd;
 	int	size;
 	
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename)) < 0) {
 		return 0;
 	}
 	size = file_size(fd);
@@ -401,7 +401,7 @@ static uint32_t load_ati_bios_file(const char *filename, uint8_t *buf, int bufsi
 
 static char *get_ati_model(uint32_t id)
 {
-	int	i;
+	unsigned int	i;
 	
 	for (i=0; i< (sizeof(ATIKnownChipsets) / sizeof(ATIKnownChipsets[0])); i++) {
 		if (ATIKnownChipsets[i].device == id) {
@@ -413,7 +413,7 @@ static char *get_ati_model(uint32_t id)
 
 static char *get_ati_fb(uint32_t id)
 {
-	int	i;
+	unsigned int	i;
 	
 	for (i=0; i< (sizeof(ATIKnownFramebuffers) / sizeof(ATIKnownFramebuffers[0])); i++) {
 		if (ATIKnownFramebuffers[i].device == id) {
@@ -729,7 +729,14 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		} else {
 			// readAtomBios result in bug on some cards (100% fan speed and black screen),
 			// not using it for posted card, rading from legacy space instead
-			bios = readAtomBIOS(ati_dev);
+			
+			/*
+			 * This code doesn't work on for 5000+ ati cards and need to be skipped for them, otherwise it results in system freeze and fan spinning at 100%. 
+			 * All credit goes to Netkas
+			 */
+			bios = NULL;
+            if (ati_dev->device_id > 0x9400)
+                bios = readAtomBIOS(ati_dev);
 		}
 	} else {
 		bios = rom;	//going custom rom way

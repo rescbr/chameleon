@@ -1,3 +1,25 @@
+- Applied some fix from the trunk
+- Applied many under the hood fix
+- Added Andy Vandijck Server spoof
+- Added a Patch from Andy Vandijck in SMBiosPatcher and SMBiosGetters
+- Added a Patch from Netkas in GraphicEnabler (ati.c)
+- Fixed an issue where the GUI module couldn't find the themes directory
+- Fixed an issue where the GUI module failed to display the GUI
+- Added AcpiCodec module
+- Re-wrote ACPI code in fake_efi.c
+- Fixed a bug with AcpiPatcher when built with xcode4
+- Optimized AcpiPatcher code
+- Minor change of SMBIOS code in fake_efi.c
+- Applied some changes to the CPU detection
+- Fixed Pict-FailedBoot allocation
+- Board-id fix is now handled by the smbios modules
+
+- Added boot-args in the device tree
+- Added BootCLUT and Pict-FailedBoot
+- Added Board-id spoof
+- Fixed kernelcache loading with 10.5, 10.6 and 10.7
+- Added Lion Compatibility
+
 - Re-enabled Ignore Boot File Flag option , now  "-B"
 - Fixed a bug in get_PM_Profile(), where the function return the profile 0 = 'Unspecified' when the facp is incorrect or not found, and so, override the
   PM type set by the cpu features

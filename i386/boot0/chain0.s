@@ -473,7 +473,7 @@ read_chs:
     ;   es:bx = pointer where to place sectors read from disk
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   AL    = burst error length if ah=0x11 (ECC corrected)
     ;   carry = 0 success
     ;           1 error
@@ -545,7 +545,7 @@ read_lba:
     ;   DS:SI = pointer to Disk Address Packet
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   carry = 0 success
     ;           1 error
     ;

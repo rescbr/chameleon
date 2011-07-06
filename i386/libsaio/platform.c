@@ -29,6 +29,12 @@ inline bool platformCPUFeature(uint32_t feature)
 	return (Platform->CPU.Features & feature);
 }
 
+/** Return if a CPU Extended feature specified by feature is activated (true) or not (false)  */
+inline bool platformCPUExtFeature(uint32_t feature)
+{
+	return (Platform->CPU.ExtFeatures & feature);
+}
+
 /** 
     Scan platform hardware information, called by the main entry point (common_boot() ) 
     _before_ bootConfig xml parsing settings are loaded

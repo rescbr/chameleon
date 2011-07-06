@@ -19,8 +19,9 @@
 #else
 #define DBG(x...)
 #endif
-
+#define kEnableWifi			"EnableWifi"	
 #define kEthernetBuiltIn	"EthernetBuiltIn"	
+#define kEnableNetworking	"EnableNetworkModule"
 
 void set_eth_builtin(pci_dt_t *eth_dev);
 void set_wifi_airport(pci_dt_t *wlan_dev);
@@ -48,6 +49,10 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 	else if(current->class_id == PCI_CLASS_NETWORK_OTHER)
 	{
 		// WIFI
+		bool do_wifi_devprop = true;	
+		getBoolForKey(kEnableWifi, &do_wifi_devprop, &bootInfo->bootConfig);
+		
+		if (do_wifi_devprop)		
 		set_wifi_airport(current);
 		
 	}
@@ -56,7 +61,12 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 
 void Networking_start()
 {
-	register_hook_callback("PCIDevice", &Networking_hook);
+	bool enable = true;
+	getBoolForKey(kEnableNetworking, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		register_hook_callback("PCIDevice", &Networking_hook);
+	}
 }
 
 /* a fine place for this code */
@@ -148,7 +158,7 @@ void set_wifi_airport(pci_dt_t *wlan_dev)
 		devprop_add_value(device, "device_type", (uint8_t *) tmp, strlen(tmp) + 1);
 
 		
-		int i = 0;
+		unsigned int i = 0;
 		for( ; i < sizeof(known_wifi_cards) / sizeof(known_wifi_cards[0]); i++)
 		{
 			if(wlan_dev->vendor_id == known_wifi_cards[i].vendor_id &&

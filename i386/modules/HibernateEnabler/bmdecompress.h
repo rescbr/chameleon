@@ -21,11 +21,10 @@
  */
 
 
-#include "libsa.h"
-
 #ifndef __BMDECOMPRESS_RESUME_H
 #define __BMDECOMPRESS_RESUME_H
 
+#include "libsa.h"
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
 #endif /* !__BMDECOMPRESS_RESUME_H */

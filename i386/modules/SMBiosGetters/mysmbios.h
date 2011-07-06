@@ -44,33 +44,6 @@ typedef struct SMBAnchor
 	bzero(x, sizeof(typedef struct SMBAnchor));
 
 //
-// SMBIOS structure types.
-//
-
-enum {
-    kSMBTypeBIOSInformation             =  0,
-    kSMBTypeSystemInformation           =  1,
-    kSMBTypeBaseBoard					=  2,
-    kSMBTypeSystemEnclosure             =  3,
-    kSMBTypeProcessorInformation        =  4,
-    kSMBTypeMemoryModule                =  6,
-    kSMBTypeCacheInformation            =  7,
-    kSMBTypeSystemSlot                  =  9,
-    kSMBTypePhysicalMemoryArray         = 16,
-    kSMBTypeMemoryDevice                = 17,
-    kSMBType32BitMemoryErrorInfo        = 18,
-    kSMBType64BitMemoryErrorInfo        = 33,
-
-    kSMBTypeEndOfTable                  = 127,
-
-    /* Apple Specific Structures */
-    kSMBTypeFirmwareVolume              = 128,
-    kSMBTypeMemorySPD                   = 130,
-    kSMBTypeOemProcessorType            = 131,
-    kSMBTypeOemProcessorBusSpeed        = 132
-};
-
-//
 // BIOS Information (Type 0)
 //
 typedef struct SMBBIOSInformation {
@@ -83,10 +56,10 @@ typedef struct SMBBIOSInformation {
     SMBQWord   characteristics;     // supported BIOS functions
 } __attribute__((packed)) SMBBIOSInformation;
 
+#if  UNUSED
 //
 // Base Board (Type 2)
 //
-
 typedef struct SMBBaseBoard {
     SMB_STRUCT_HEADER               // Type 2
     SMBString	manufacturer;
@@ -104,6 +77,7 @@ typedef struct SMBBaseBoard {
 	// times sizeof(SMBWord) when computing the actual record size,
 	// if you need it.
 } __attribute__((packed)) SMBBaseBoard;
+#endif
 
 // Values for boardType in Type 2 records
 enum {
@@ -382,9 +356,11 @@ typedef struct SMBOemProcessorBusSpeed {
 } __attribute__((packed)) SMBOemProcessorBusSpeed;
 
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
-extern void setupSMBIOSTable(void);
-extern void *getSmbiosPatched();
+extern SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps);
+//extern void *getSmbiosPatched();
 extern void decodeSMBIOSTable(SMBEntryPoint *eps);
-extern char *setDefaultSMBData(void);
+//extern void setDefaultSMBData(void);
+extern char *getDefaultSMBproductName(void);
+extern char *getDefaultSMBBoardProduct(void);
 
 #endif /* !__LIBSAIO_MYSMBIOS_H */

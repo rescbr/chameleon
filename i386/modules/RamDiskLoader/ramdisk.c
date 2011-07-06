@@ -43,22 +43,22 @@ void md0Ramdisk()
 	{
 		// Use user specified md0 file
 		sprintf(filename, "%s", override_filename);
-		fh = open(filename, 0);
+		fh = open(filename);
 		
 		if(fh < 0)
 		{
 			sprintf(filename, "bt(0,0)/Extra/%s", override_filename);
-			fh = open(filename, 0);
+			fh = open(filename);
 			
 			if(fh < 0)
 			{
 				sprintf(filename, "rd(0,0)/Extra/%s", override_filename);
-				fh = open(filename, 0);
+				fh = open(filename);
 
 				if(fh < 0)
 				{
 					sprintf(filename, "/Extra/%s", override_filename);
-					fh = open(filename, 0);
+					fh = open(filename);
 				}
 			}
 		}
@@ -67,17 +67,17 @@ void md0Ramdisk()
 	if(fh < 0)
 	{
 		sprintf(filename, "bt(0,0)/Extra/Postboot.img");
-		fh = open(filename, 0);
+		fh = open(filename);
 		
 		if(fh < 0)
 		{
 			sprintf(filename, "rd(0,0)/Extra/Postboot.img");
-			fh = open(filename, 0);
+			fh = open(filename);
 
 			if(fh < 0)
 			{
 				sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
-				fh = open(filename, 0);
+				fh = open(filename);
 			}
 		}
 	}
@@ -93,8 +93,12 @@ void md0Ramdisk()
 		{
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
-			{
-				AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);
+			{				
+#if UNUSED
+                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);   
+#else
+                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
+#endif
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{
@@ -156,10 +160,10 @@ int mountRAMDisk(const char * param)
 	int error = 0;
 
 	// Get file handle for ramdisk file.
-	fh = open(param, 0);
+	fh = open(param);
 	if (fh != -1)
 	{
-		verbose("\nreading ramdisk image: %s\n", param);
+		printf("\nreading ramdisk image: %s\n", param);
 
 		ramDiskSize = file_size(fh);
 		if (ramDiskSize > 0)
@@ -226,7 +230,7 @@ int mountRAMDisk(const char * param)
 					verbose("\nno ramdisk config...\n");
 				}
 
-				verbose("\nmounting: done");
+				printf("\nmounting: done");
 			}
 		}
 	}

@@ -182,8 +182,9 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
     const char       *filePath;
     FSReadFile readFile;
     BVRef      bvr;
-    unsigned long    length, length2;
-  
+    unsigned long    length/*, length2*/;    
+	long length2;
+	
     // Resolve the boot volume from the file spec.
 
     if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
@@ -212,8 +213,10 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
             } else {
                 // Not a fat binary; read the rest of the file
                 length2 = readFile(bvr, (char *)filePath, (void *)(kLoadAddr + length), length, 0);
-                if (length2 == -1) return -1;
-                length += length2;
+                //if (length2 == -1) return -1;
+				if (length2 < 0) return -1;
+
+                length += (unsigned long)length2;
             }
         }
     } else {
@@ -378,8 +381,11 @@ static struct iob * iob_from_fdesc(int fdesc)
 
 //==========================================================================
 // open() - Open the file specified by 'path' for reading.
-
+#if UNUSED
 static int open_bvr(BVRef bvr, const char *filePath, int flags)
+#else
+static int open_bvr(BVRef bvr, const char *filePath)
+#endif
 {
 	struct iob	*io;
 	int		fdesc;
@@ -415,19 +421,31 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 	return fdesc;
 }
 
+#if UNUSED
 int open(const char *path, int flags)
+#else
+int open(const char *path)
+#endif
 {
 	const char	*filepath;
 	BVRef		bvr;
 
 	// Resolve the boot volume from the file spec.
 	if ((bvr = getBootVolumeRef(path, &filepath)) != NULL) {
+#if UNUSED
 		return open_bvr(bvr, filepath, flags);
+#else
+        return open_bvr(bvr, filepath);
+#endif
 	}
 	return -1;
 }
 
+#if UNUSED
 int open_bvdev(const char *bvd, const char *path, int flags)
+#else
+int open_bvdev(const char *bvd, const char *path)
+#endif
 {
         const struct devsw	*dp;
 	const char		*cp;
@@ -437,7 +455,7 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 	int			unit;
 	int			partition;
 
-	if ((i = open(path, flags)) >= 0) {
+	if ((i = open(path)) >= 0) {
 		return i;
 	}
 
@@ -466,7 +484,11 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 				}
 			}
 			bvr = newBootVolumeRef(dp->biosdev + unit, partition);
-			return open_bvr(bvr, path, flags);
+#if UNUSED
+            return open_bvr(bvr, path, flags);
+#else
+            return open_bvr(bvr, path);
+#endif
 		}
         }
 	return -1;
@@ -785,8 +807,11 @@ void scanBootVolumes( int biosdev, int * count )
 }
 
 //==========================================================================
-
+#if UNUSED
 void scanDisks(int biosdev, int *count)
+#else
+void scanDisks(void)
+#endif
 {
   #define MAX_HDD_COUNT 32
   int bvCount;

@@ -1,4 +1,8 @@
 /* File added by David F. Elliott <dfe@cox.net> on 2007/06/27 */
+
+#ifndef __BOOT2_MBOOT_H
+#define __BOOT2_MBOOT_H
+
 #include "multiboot.h"
 
 /*
@@ -19,3 +23,5 @@ bit 16 set: This is not ELF, use the multiboot_header fields.
 #ifndef __ASSEMBLER__
 /* Put any desired prototypes or other C stuff here. */
 #endif
+
+#endif /* !__BOOT2_MBOOT_H */

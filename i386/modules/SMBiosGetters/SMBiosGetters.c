@@ -9,27 +9,26 @@
 #include "efi.h"
 #include "mysmbios.h"
 
+#define kEnableSMBIOSGetters			"EnableSMBIOSGetters"
+
+
 void getSmbiosPatched_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {	
-	struct SMBEntryPoint *patched_smb = NULL;
-	
+    readSMBIOSInfo(getSmbiosOriginal());
+    
 	execute_hook("ScanMemory", NULL, NULL, NULL, NULL, NULL, NULL);
-	setupSMBIOSTable();
-	smbios_p = (EFI_PTR32)getSmbiosPatched();
-	
-	patched_smb = getSmbiosPatched();
-	
-	if (patched_smb)
-		smbios_p = (EFI_PTR32)patched_smb; 
+	SMBEntryPoint *patched_smb = setupSMBIOSTable(getSmbiosOriginal());
+        	
+	if (patched_smb != NULL)
+		smbios_p = ((uint64_t)((uint32_t)patched_smb));
 	else
+    {
 		verbose("Error: Could not get patched SMBIOS, fallback to original SMBIOS !!\n");
-	 
-}
-
-void smbios_helper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
-{	
-	struct SMBEntryPoint *smbios_o = (struct SMBEntryPoint *)arg1;		
-	readSMBIOSInfo(smbios_o);	
+        
+        struct SMBEntryPoint *smbios_o = getSmbiosOriginal();	
+        smbios_p = ((uint64_t)((uint32_t)smbios_o)); 
+    }    
+    
 }
 
 void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -41,15 +40,38 @@ void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* a
 	if (getValueForKey("SMproductname", &val, &len, &bootInfo->smbiosConfig)) {
 		gPlatformName = (char *)val;
 	} else {
-		gPlatformName = setDefaultSMBData();
+		gPlatformName = getDefaultSMBproductName();
 	}	
 		
 }
 
+void getboardproduct_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
+{	
+	setupSmbiosConfigFile("SMBIOS.plist");
+	int len = 0;
+	const char *val = 0;
+	
+	if (getValueForKey("SMboardproduct", &val, &len, &bootInfo->smbiosConfig)) {
+		gboardproduct = (char *)val;
+	} else {
+		gboardproduct = getDefaultSMBBoardProduct();
+	}	
+	
+}
+
+void is_SMB_Getters_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
+
 void SMBiosGetters_start()
 {	
+	bool enable = true;
+	getBoolForKey(kEnableSMBIOSGetters, &enable, &bootInfo->bootConfig) ;
 	
-	register_hook_callback("getSmbiosPatched", &getSmbiosPatched_hook);		
-	register_hook_callback("smbios_helper", &smbios_helper_hook);
-	register_hook_callback("getProductNamePatched", &getProductName_hook);
+	enable = (execute_hook("isSMBIOSRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
+
+	if (enable) {
+		register_hook_callback("getSmbiosPatched", &getSmbiosPatched_hook);		
+		register_hook_callback("getProductNamePatched", &getProductName_hook);
+		register_hook_callback("getboardproductPatched", &getboardproduct_hook);
+		register_hook_callback("isSMBIOSRegistred", &is_SMB_Getters_Registred_Hook);
+	}
 }

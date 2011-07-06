@@ -35,6 +35,7 @@
 #ifndef __LIBSAIO_IO_INLINE_H
 #define __LIBSAIO_IO_INLINE_H
 
+
 /*
  *############################################################################
  *
@@ -79,5 +80,27 @@ __OUT(b, char)   /* outb() */
 __OUT(w, short)  /* outw() */
 __OUT(l, long)   /* outl() */
 
+
+static inline void cmos_write_byte (int loc, int val)
+{
+	outb (0x70, loc);
+	outb (0x71, val);
+}
+
+static inline unsigned cmos_read_byte (int loc)
+{
+	outb (0x70, loc);
+	return inb (0x71);
+}
+
+#define CMOS_WRITE_BYTE(x, y)	cmos_write_byte(x, y)
+#define CMOS_READ_BYTE(x)	cmos_read_byte(x)
+
+static inline void cli() {
+	asm("cli");
+}
+static inline void sti() {
+	asm("sti");
+}
 
 #endif /* !__LIBSAIO_IO_INLINE_H */

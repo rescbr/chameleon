@@ -118,8 +118,10 @@ typedef struct gpt_ent gpt_ent;
 #define IORound(value,multiple) \
 ((((value) + (multiple) - 1) / (multiple)) * (multiple))
 
+/*
 #define IOTrunc(value,multiple) \
 (((value) / (multiple)) * (multiple));
+*/
 
 /*
  * trackbuf points to the start of the track cache. Biosread()
@@ -159,7 +161,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
     // Real BIOS devices are 8-bit, so anything above that is for internal use.
     // Don't cache ramdisk drive info since it doesn't require several BIOS
     // calls and is thus not worth it.
-    if(biosdev >= 0x100 && is_module_loaded("RamDiskLoader"))
+    if(biosdev >= 0x100 && execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)
     {
 		int ret = 0;
 		execute_hook("p_get_ramdisk_info", &biosdev, (void *)dip, &ret, NULL, NULL, NULL);
@@ -370,7 +372,7 @@ static int readBytes( int biosdev, unsigned long long blkno,
     // ramdisks require completely different code for reading.
     
 	
-	if(biosdev >= 0x100 && is_module_loaded("RamDiskLoader")){
+	if(biosdev >= 0x100 && (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)){
 	
 		int ret = -1;
 		execute_hook("p_ramdiskReadBytes", &biosdev, &blkno, &byteoff, &byteCount, buffer, &ret);
@@ -1158,7 +1160,7 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 #ifndef NO_WIN_SUPPORT
 	else if (NTFSProbe(probeBuffer))
 		result = FDISK_NTFS;
-	else if (fatbits=MSDOSProbe(probeBuffer))
+	else if ((fatbits=MSDOSProbe(probeBuffer)))
 	{
 		switch (fatbits)
 		{
@@ -1197,13 +1199,13 @@ static bool isPartitionUsed(gpt_ent * partition)
 
 static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 {
-	if (biosdev >= 0x100 && (is_module_loaded("RamDiskLoader") == 0)) 
+	if (biosdev >= 0x100 && (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) 
 		return NULL;
 	
     struct DiskBVMap *        map = NULL;
     void *buffer = malloc(BPS);
     int error;	
-    if ( error = readBytes( biosdev, /*secno*/0, 0, BPS, buffer ) != 0) {
+    if ( (error = readBytes( biosdev, /*secno*/0, 0, BPS, buffer )) != 0) {
         DBG("Failed to read boot sector from BIOS device %02xh. Error=%d\n", biosdev, error);
         goto scanErr;
     }
@@ -1232,7 +1234,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     }
 	
     if ( fdiskID == 0 )  goto scanErr;
-    verbose("Attempting to read GPT\n");
+    DBG("Attempting to read GPT\n");
 	
     if(readBytes(biosdev, 1, 0, BPS, buffer) != 0)
         goto scanErr;
@@ -1301,7 +1303,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     if(readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
         goto scanErr;
 	
-    verbose("Read GPT\n");
+    DBG("Read GPT\n");
 	
     // Allocate a new map for this BIOS device and insert it into the chain
     map = malloc(sizeof(*map));
@@ -1407,8 +1409,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 											  0, kBIOSDevTypeHardDrive, kBVFlagEFISystem);
 						}
 						break;
-#ifndef NO_WIN_SUPPORT
-						
+#ifndef NO_WIN_SUPPORT						
 					case FDISK_FAT32:
 						if (testFAT32EFIBootSector( biosdev, gptMap->ent_lba_start, (void *)0x7e00 ) == 0)
 						{
@@ -1425,9 +1426,10 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 						}
 						break;
 #endif
-						
+					default:						
 						if (biosdev == gBIOSDev)
 							gBIOSBootVolume = bvr;
+						break;
 				}
             }            
 			
@@ -1487,7 +1489,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
-				fh = open(strcat(dirSpec, fileSpec), 0);
+				fh = open(strcat(dirSpec, fileSpec));
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{

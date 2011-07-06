@@ -145,14 +145,14 @@ extern int slvprintf(char * buffer, int len, const char * fmt, va_list arg);
 extern void   free(void * start);
 extern void * realloc(void * ptr, size_t size);
 
-//#ifdef SAFE_MALLOC
-#define malloc(size) safe_malloc(size, __FILE__, __LINE__)
-extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
-extern void * safe_malloc(size_t size, const char *file, int line);
-extern size_t zalloced_size;
+//#if SAFE_MALLOC
+//#define malloc(size) safe_malloc(size, __FILE__, __LINE__)
+//extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
+//extern void * safe_malloc(size_t size, const char *file, int line);
+//extern size_t zalloced_size;
 //#else
-//extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
-//extern void * malloc(size_t size);
+extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
+extern void * malloc(size_t size);
 //#endif
 
 /*

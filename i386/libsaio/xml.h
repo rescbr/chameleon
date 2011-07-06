@@ -71,18 +71,9 @@ extern string_ref* ref_strings;
 #define kPropIOKitPersonalities ("IOKitPersonalities")
 #define kPropIONameMatch        ("IONameMatch")
 
-/*
-struct Tag {
-  long       type;
-  char       *string;
-  struct Tag *tag;
-  struct Tag *tagNext;
-};
-typedef struct Tag Tag, *TagPtr;
- */
 
-extern long  gImageFirstBootXAddr;
-extern long  gImageLastKernelAddr;
+//extern long  gImageFirstBootXAddr;
+//extern long  gImageLastKernelAddr;
 
 TagPtr XMLGetProperty( TagPtr dict, const char * key );
 TagPtr XMLGetElement( TagPtr dict, int id );

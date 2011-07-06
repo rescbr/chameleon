@@ -41,27 +41,30 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D:					// ?
-					case CPU_MODEL_YONAH:		// Yonah		0x0E
-					case CPU_MODEL_MEROM:		// Merom		0x0F
-					case CPU_MODEL_PENRYN:		// Penryn		0x17
-					case CPU_MODEL_ATOM:		// Atom 45nm	0x1C
+                    case CPUID_MODEL_BANIAS:	// Banias		0x09
+                    case CPUID_MODEL_DOTHAN:	// Dothan		0x0D
+					case CPUID_MODEL_YONAH:		// Yonah		0x0E
+					case CPUID_MODEL_MEROM:		// Merom		0x0F
+					case CPUID_MODEL_PENRYN:		// Penryn		0x17
+					case CPUID_MODEL_ATOM:		// Atom 45nm	0x1C
 						return false;
 
 					case 0x19:					// Intel Core i5 650 @3.20 Ghz
-					case CPU_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
-					case CPU_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
-					case CPU_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm)
-					case CPU_MODEL_WESTMERE:	// Intel Core i7 LGA1366 (32nm) 6 Core
-					case CPU_MODEL_NEHALEM_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
-					case CPU_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPUID_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
+					case CPUID_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
+					case CPUID_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
+					case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm)
+					case CPUID_MODEL_WESTMERE:	// Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPUID_MODEL_NEHALEM_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPUID_MODEL_WESTMERE_EX:	// Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPUID_MODEL_SANDYBRIDGE:
+					case CPUID_MODEL_JAKETOWN:
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
 						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 						unsigned long did, vid;
-						int i;
+						unsigned int i;
 						
 						// Nehalem supports Scrubbing
 						// First, locate the PCI bus where the MCH is located
@@ -87,8 +90,12 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						value->word = qpibusspeed;
 						return true;
 					}
+					default:
+						break; //Unsupported CPU type
 				}
 			}
+			default:
+				break; 
 		}
 	}
 	return false;
@@ -100,12 +107,12 @@ uint16_t simpleGetSMBOemProcessorType(void)
 	{
 		return 0x0501;	// Quad-Core Xeon
 	}
-	else if (Platform->CPU.NoCores == 1) 
+	if (((Platform->CPU.NoCores == 1) || (Platform->CPU.NoCores == 2)) && !(platformCPUExtFeature(CPUID_EXTFEATURE_EM64T))) 
 	{
-		return 0x0201;	// Core Solo
+		return 0x0201;	// Core Solo / Duo
 	};
 	
-	return 0x0301;		// Core 2 Duo
+	return 0x0301;		// Core 2 Solo / Duo
 }
 
 bool getSMBOemProcessorType(returnType *value)
@@ -128,52 +135,59 @@ bool getSMBOemProcessorType(returnType *value)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D:							// ?
-					case CPU_MODEL_YONAH:				// Yonah
-					case CPU_MODEL_MEROM:				// Merom
-					case CPU_MODEL_PENRYN:				// Penryn
-					case CPU_MODEL_ATOM:				// Intel Atom (45nm)
+                    case CPUID_MODEL_BANIAS:	// Banias		
+                    case CPUID_MODEL_DOTHAN:	// Dothan		
+					case CPUID_MODEL_YONAH:				// Yonah
+					case CPUID_MODEL_MEROM:				// Merom
+					case CPUID_MODEL_PENRYN:				// Penryn
+					case CPUID_MODEL_ATOM:				// Intel Atom (45nm)
 						return true;
 
-					case CPU_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
+					case CPUID_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
 						value->word = 0x0701;			// Core i7
 						return true;
 
-					case CPU_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper
+					case CPUID_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x701;		// Core i7
 						return true;
 
-					case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+					case CPUID_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x0701;		// Core i7
 						return true;
 
-					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+					case CPUID_MODEL_SANDYBRIDGE:
+					case CPUID_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i3"))
 								value->word = 0x901;	// Core i3
 						else if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 								value->word = 0x601;	// Core i5
 						else if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
 								value->word = 0x0701;	// Core i7
-						else 
-								value->word = simpleGetSMBOemProcessorType();
+						/*else 
+								value->word = simpleGetSMBOemProcessorType();*/
 						return true;
 
-					case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
-					case CPU_MODEL_WESTMERE_EX:			// Intel Core i7 LGA1366 (45nm) 6 Core ???
-						value->word = 0x0701;			// Core i7
+                    case CPUID_MODEL_JAKETOWN:
+					case CPUID_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
+					case CPUID_MODEL_WESTMERE_EX:			// Intel Core i7 LGA1366 (45nm) 6 Core ???
+						value->word = 0x0501;			// Core i7
 						return true;
 
 					case 0x19:							// Intel Core i5 650 @3.20 Ghz
 						value->word = 0x601;			// Core i5
 						return true;
+					default:
+						break; //Unsupported CPU type
 				}
 			}
+			default:
+				break; 
 		}
 	}
 	
@@ -183,22 +197,21 @@ bool getSMBOemProcessorType(returnType *value)
 bool getSMBMemoryDeviceMemoryType(returnType *value)
 {
 	static int idx = -1;
-	if (is_module_loaded("Memory")) {
-	int	map;
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+		int	map;
 
-	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
-		map = Platform->DMI.DIMM[idx];
-		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0)
+		idx++;
+		if (idx < MAX_RAM_SLOTS)
 		{
-			DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
-			value->byte = Platform->RAM.DIMM[map].Type;
-			return true;
+			map = Platform->DMI.DIMM[idx];
+			if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0)
+			{
+				DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
+				value->byte = Platform->RAM.DIMM[map].Type;
+				return true;
+			}
 		}
 	}
-}
-	//return false;
 	value->byte = SMB_MEM_TYPE_DDR2;
 	return true;
 }
@@ -206,22 +219,21 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 {
 	static int idx = -1;
-	if (is_module_loaded("Memory")) {
-	int	map;
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+		int	map;
 
-	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
-		map = Platform->DMI.DIMM[idx];
-		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0)
+		idx++;
+		if (idx < MAX_RAM_SLOTS)
 		{
-			DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
-			value->dword = Platform->RAM.DIMM[map].Frequency;
-			return true;
+			map = Platform->DMI.DIMM[idx];
+			if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0)
+			{
+				DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
+				value->dword = Platform->RAM.DIMM[map].Frequency;
+				return true;
+			}
 		}
 	}
-}
-	//return false;
 	value->dword = 800;
 	return true;
 }
@@ -229,22 +241,21 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 bool getSMBMemoryDeviceManufacturer(returnType *value)
 {
 	static int idx = -1;
-	if (is_module_loaded("Memory")) {
-	int	map;
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+		int	map;
 
-	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
-		map = Platform->DMI.DIMM[idx];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].Vendor) > 0)
+		idx++;
+		if (idx < MAX_RAM_SLOTS)
 		{
-			DBG("RAM Detected Vendor[%d]='%s'\n", idx, Platform->RAM.DIMM[map].Vendor);
-			value->string = Platform->RAM.DIMM[map].Vendor;
-			return true;
+			map = Platform->DMI.DIMM[idx];
+			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].Vendor) > 0)
+			{
+				DBG("RAM Detected Vendor[%d]='%s'\n", idx, Platform->RAM.DIMM[map].Vendor);
+				value->string = Platform->RAM.DIMM[map].Vendor;
+				return true;
+			}
 		}
 	}
-}
-	//return false;
 	value->string = "N/A";
 	return true;
 }
@@ -252,23 +263,22 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
 {
 	static int idx = -1;
-	if (is_module_loaded("Memory")) {
-	int	map;
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+		int	map;
 
-	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
-		map = Platform->DMI.DIMM[idx];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].SerialNo) > 0)
+		idx++;
+		if (idx < MAX_RAM_SLOTS)
 		{
-			DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
+			map = Platform->DMI.DIMM[idx];
+			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].SerialNo) > 0)
+			{
+				DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
 				map, idx, Platform->RAM.DIMM[map].SerialNo);
-			value->string = Platform->RAM.DIMM[map].SerialNo;
-			return true;
+				value->string = Platform->RAM.DIMM[map].SerialNo;
+				return true;
+			}
 		}
 	}
-}
-	//return false;
 	value->string = "N/A";
 	return true;
 }
@@ -276,22 +286,21 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 bool getSMBMemoryDevicePartNumber(returnType *value)
 {
 	static int idx = -1;
-	if (is_module_loaded("Memory")) {
-	int	map;
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+		int	map;
 
-	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
-		map = Platform->DMI.DIMM[idx];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].PartNo) > 0)
+		idx++;
+		if (idx < MAX_RAM_SLOTS)
 		{
-			DBG("Ram Detected PartNo[%d]='%s'\n", idx, Platform->RAM.DIMM[map].PartNo);
-			value->string = Platform->RAM.DIMM[map].PartNo;
-			return true;
+			map = Platform->DMI.DIMM[idx];
+			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].PartNo) > 0)
+			{
+				DBG("Ram Detected PartNo[%d]='%s'\n", idx, Platform->RAM.DIMM[map].PartNo);
+				value->string = Platform->RAM.DIMM[map].PartNo;
+				return true;
+			}
 		}
 	}
-	}
-	//return false;
 	value->string = "N/A";
 	return true;
 }

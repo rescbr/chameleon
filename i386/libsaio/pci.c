@@ -107,6 +107,8 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 						scan_pci_bus(new, secondary_bus);
 					}
 					break;
+				default:
+					break;
 			}
 			*current = new;
 			current = &new->next;

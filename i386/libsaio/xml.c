@@ -86,8 +86,8 @@ struct DriverInfo {
 };
 typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
 
-#define kDriverPackageSignature1 'MKXT'
-#define kDriverPackageSignature2 'MOSX'
+//#define kDriverPackageSignature1 'MKXT'
+//#define kDriverPackageSignature2 'MOSX'
 
 struct DriversPackage {
   unsigned long signature1;
@@ -231,7 +231,7 @@ XMLDecode(const char* src)
             int i;
             
             s++;
-            for ( i = 0; i < sizeof(ents); i++)
+            for ( i = 0; (unsigned)i < sizeof(ents); i++)
             {
                 if ( strncmp(s, ents[i].name, ents[i].nameLen) == 0 )
                 {
@@ -1084,7 +1084,7 @@ FindSymbol( char * string, SymbolPtr * prevSymbol )
 bool XMLIsType(TagPtr dict, enum xmltype type)
 {
 	if(!dict) return (type == kTagTypeNone);
-	return (dict->type == type);
+	return (dict->type == (long)type);
 }
 
 

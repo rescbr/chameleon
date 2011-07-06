@@ -118,7 +118,6 @@ extern int    freeFilteredBVChain(const BVRef chain);
 extern int    rawDiskRead(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);
 extern int    rawDiskWrite(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);
 extern int    readBootSector(int biosdev, unsigned int secno, void *buffer);
-extern void   turnOffFloppy(void);
 extern int	  testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer );
 
 /* hfs_compare.c */
@@ -136,12 +135,17 @@ extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );
-long AllocateMemoryRange(char * rangeName, long start, long length, long type);
-
+#if UNUSED
+long
+AllocateMemoryRange(char * rangeName, long start, long length, long type);
+#else
+long
+AllocateMemoryRange(char * rangeName, long start, long length);
+#endif
 /* misc.c */
 extern void   enableA20(void);
-extern int    checkForSupportedHardware();
-extern int	  isLaptop();
+extern void   turnOffFloppy(void);
+
 extern void   getPlatformName(char *nameBuf);
 
 #ifdef NBP_SUPPORT
@@ -188,8 +192,16 @@ extern long   GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
 extern long   GetFSUUID(char *spec, char *uuidStr);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
 extern int    openmem(char *buf, int len);
-extern int    open(const char *str, int how);
+#if UNUSED
+extern int    open(const char *path, int flags);
+#else
+extern int    open(const char *path);
+#endif
+#if UNUSED
 extern int    open_bvdev(const char *bvd, const char *path, int flags);
+#else
+extern int    open_bvdev(const char *bvd, const char *path);
+#endif
 extern int    close(int fdesc);
 extern int    file_size(int fdesc);
 extern int    read(int fdesc, char *buf, int count);
@@ -207,7 +219,11 @@ extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * fla
                           long * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
-extern void   scanDisks(int biosdev, int *count);
+#if UNUSED
+extern void scanDisks(int biosdev, int *count);
+#else
+extern void scanDisks(void);
+#endif
 extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);
 extern void   setRootVolume(BVRef volume);
@@ -219,52 +235,8 @@ extern int    gBootFileType;
 extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;
 
-extern void turnOffFloppy(void);
-#if UNUSED
-extern void ichwd_init(void);
-extern void ichwd_event(int sec);
-extern void ichwd_free(void);
+/* smp.c */
+extern void * getMPSTable();
 
-/*
- *  Exported globals here.
- */
 
-/*
- *  "imps_enabled" is non-zero if the probe sequence found IMPS
- *  information and was successful.
- */
-extern int imps_enabled;
-
-/*
- *  This contains the local APIC hardware address.
- */
-extern unsigned imps_lapic_addr;
-
-/*
- *  This represents the number of CPUs found.
- */
-extern int imps_num_cpus;
-
-/*
- *  This is the primary function for probing for Intel MPS 1.1/1.4
- *  compatible hardware and BIOS information.  While probing the CPUs
- *  information returned from the BIOS, this also starts up each CPU
- *  and gets it ready for use.
- *
- *  Call this during the early stages of OS startup, before memory can
- *  be messed up.
- *
- *  Returns N if IMPS information was found (for number of CPUs started)
- *  and is valid, else 0.
- */
-
-extern int imps_probe(void);
-
-/*
- *  This one is used as a "force" function.  Give it the number of CPUs
- *  to start, and it will assume a certain number and try it.
- */
-
-extern int imps_force(int ncpus);
-#endif
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

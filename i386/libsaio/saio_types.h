@@ -34,7 +34,6 @@
 #else
 #include <IOKit/IOTypes.h>
 #endif
-//#include <pexpert/i386/boot.h>
 #include "bootLion.h"
 
 #if DEBUG

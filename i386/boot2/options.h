@@ -22,13 +22,14 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include "boot.h"
-#include "bootstruct.h"
-#include "graphics.h"
+
 
 #ifndef __BOOT2_OPTIONS_H
 #define __BOOT2_OPTIONS_H
 
+#include "boot.h"
+#include "bootstruct.h"
+#include "graphics.h"
 
 typedef struct {
     int x;

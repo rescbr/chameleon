@@ -27,8 +27,8 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
-    -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common
+    -mpreferred-stack-boundary=2 -fno-align-functions \
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common -fno-stack-protector #-lc_kext -libcc_kext -fstack-protector-all
 
 DEFINES=
 CONFIG = hd
@@ -81,6 +81,7 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
+	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/libcc_kext.a" \
 	$(OBJROOT)/rand.o \
 	$(OBJROOT)/GUI_module.o \
 	$(OBJROOT)/gui.o \
@@ -89,21 +90,21 @@ dylib:
 	 -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 GUI_module.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
+	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
 
 gui.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
+	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
 
 
 picopng.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
+	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
 
 graphic_utils.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
+	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
 	
 rand.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "rand.c" $(INC) -o "$(OBJROOT)/rand.o"
-
+	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "rand.c" $(INC) -o "$(OBJROOT)/rand.o"
+	
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\
 		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \

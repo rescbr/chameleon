@@ -516,6 +516,8 @@ static long GetCatalogEntryInfo(void * entry, long * flags, long * time,
             *flags = kFileTypeUnknown;
             tmpTime = 0;
             break;
+		default:
+			break;
     }
 
     if (time != 0) {
@@ -788,6 +790,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
             case kHFSPlusFileRecord         : entrySize = 248; break;
             case kHFSPlusFolderThreadRecord : entrySize = 264; break;
             case kHFSPlusFileThreadRecord   : entrySize = 264; break;
+			default							:				   break;
         }
     } else {
         if (gIsHFSPlus) entrySize = sizeof(HFSPlusExtentRecord);
@@ -892,7 +895,7 @@ static long ReadExtent(char * extent, uint64_t extentSize,
     
 		// MacWen: fix overflow in multiplication by forcing 64bit multiplication
         readSize = (long long)GetExtentSize(currentExtent, 0) * gBlockSize - readOffset;
-        if (readSize > (size - sizeRead)) readSize = size - sizeRead;
+        if (readSize > (long long)(size - sizeRead)) readSize = size - sizeRead;
 
         readOffset += (long long)GetExtentStart(currentExtent, 0) * gBlockSize;
     

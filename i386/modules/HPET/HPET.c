@@ -31,16 +31,16 @@ void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 	if(current->class_id != PCI_CLASS_BRIDGE_ISA) return;
 	
 	
-	bool do_enable_hpet = true;
-	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
-
-	if (do_enable_hpet)
-		force_enable_hpet(current);
+	force_enable_hpet(current);
 }
 
 void HPET_start()
 {
-	register_hook_callback("PCIDevice", &HPET_hook);
+	bool enable = true;
+	getBoolForKey(EnableHPETModule, &enable, &bootInfo->bootConfig);
+	
+	if (enable)	
+		register_hook_callback("PCIDevice", &HPET_hook);
 }
 
 /*
@@ -104,6 +104,8 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 		case 0x1106:
 			force_enable_hpet_via(lpc_dev);
 			break;
+		default:
+			break;
 	}
 	
 	
@@ -116,7 +118,7 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 void force_enable_hpet_via(pci_dt_t *lpc_dev)
 {
 	uint32_t	val, hpet_address = 0xFED00000;
-	int i;
+	unsigned int i;
 	
 	for(i = 1; i < sizeof(lpc_controllers_via) / sizeof(lpc_controllers_via[0]); i++)
 	{
@@ -154,7 +156,7 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 {
 	uint32_t	val, hpet_address = 0xFED00000;
-	int i;
+	unsigned int i;
 	void		*rcba;
 	
 	/* LPC on Intel ICH is always (?) at 00:1f.0 */
@@ -170,7 +172,7 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 				lpc_controllers_intel[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
 			
 			if (rcba == 0)
-				printf(" RCBA disabled; cannot force enable HPET\n");
+				DBG(" RCBA disabled; cannot force enable HPET\n");
 			else
 			{
 				val = REG32(rcba, 0x3404);
@@ -192,8 +194,20 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 				
 				// verify if the job is done
 				val = REG32(rcba, 0x3404);
+#if DEBUG_HPET	
 				if (!(val & 0x80))
 					printf(" Failed to force enable HPET\n");
+#endif
+/*
+#define HPET_CONFIG             0x10    // General configuration register 
+#define HPET_CNF_LEG_RT         0x00000002
+#define HPET_CNF_ENABLE         0x00000001
+                
+                val = REG32(hpet_address, HPET_CONFIG);
+                val &= ~HPET_CNF_LEG_RT;
+                val |= HPET_CNF_ENABLE;
+                REG32(hpet_address, HPET_CONFIG) = val;
+*/
 			}
 			break;
 			

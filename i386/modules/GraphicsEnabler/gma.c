@@ -64,7 +64,9 @@ static struct gma_gpu_t KnownGPUS[] = {
 };
 
 char *get_gma_model(uint32_t id) {
-	int i=0;
+	
+	unsigned int i = 0;
+	
 	for(i = 0; i <  (sizeof(KnownGPUS) / sizeof(KnownGPUS[0])); i++) {
 		if(KnownGPUS[i].device == id)
 			return KnownGPUS[i].name;

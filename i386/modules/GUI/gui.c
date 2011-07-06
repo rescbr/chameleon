@@ -27,13 +27,17 @@ font_t font_console;
 
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
-const char* theme_name = THEME_NAME_DEFAULT;	
+const char* theme_name = THEME_NAME_DEFAULT;
+
+char dirsrc[22];
 
 #ifdef EMBED_THEME
 #include "art.h"
 #endif
 
-#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
+static int loadThemeImage(char *src, const char *image, int alt_image);
+
+#define LOADPNG(src, img, alt_img) if (loadThemeImage(src, #img, alt_img) != 0) { return 1; }
 
 #ifndef MIN
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -196,7 +200,7 @@ unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 3
 int getImageIndexByName(const char *name)
 {
     int i;
-	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	for (i = 0; (unsigned)i < sizeof(images) / sizeof(images[0]); i++)
 	{
 	    if (strcmp(name, images[i].name) == 0)
 	        return i; // found the name
@@ -246,7 +250,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 }
 #endif
 
-static int loadThemeImage(const char *image, int alt_image)
+static int loadThemeImage(char* src, const char *image, int alt_image)
 {
 	char		dirspec[256];
 	int 		i;
@@ -256,7 +260,7 @@ static int loadThemeImage(const char *image, int alt_image)
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
-	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
+	if ((unsigned)(strlen(image) + strlen(theme_name) + 30 ) > sizeof(dirspec)) {
 		return 1;
 	}
 	
@@ -265,7 +269,7 @@ static int loadThemeImage(const char *image, int alt_image)
         if (images[i].image == NULL) {
             images[i].image = malloc(sizeof(pixmap_t));
         }
-        sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+        sprintf(dirspec, "%s/%s/%s.png", src, theme_name, image);
 
         width = 0;
         height = 0;
@@ -320,59 +324,59 @@ static int loadThemeImage(const char *image, int alt_image)
 	return 1;
 }
 
-static int loadGraphics(void)
+static int loadGraphics(char *src)
 {
-	LOADPNG(background,                     IMG_REQUIRED);
+	LOADPNG(src, background,                     IMG_REQUIRED);
 
-	LOADPNG(logo,                           IMG_REQUIRED);
+	LOADPNG(src, logo,                           IMG_REQUIRED);
 	
-	LOADPNG(device_generic,                 IMG_REQUIRED);
-	LOADPNG(device_generic_o,               iDeviceGeneric);
-	LOADPNG(device_hfsplus,                 iDeviceGeneric);
-	LOADPNG(device_hfsplus_o,               iDeviceHFS);
-	LOADPNG(device_hfsraid,                 iDeviceGeneric);
-	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
-	LOADPNG(device_ext3,                    iDeviceGeneric);
-	LOADPNG(device_ext3_o,                  iDeviceEXT3);
-	LOADPNG(device_freebsd,                 iDeviceGeneric);
-	LOADPNG(device_freebsd_o,               iDeviceFreeBSD);
-	LOADPNG(device_openbsd,                 iDeviceGeneric);
-	LOADPNG(device_openbsd_o,               iDeviceOpenBSD);
-	LOADPNG(device_fat,                     iDeviceGeneric);
-	LOADPNG(device_fat_o,                   iDeviceFAT);
-	LOADPNG(device_fat16,                   iDeviceFAT);
-	LOADPNG(device_fat16_o,                 iDeviceFAT_o);
-	LOADPNG(device_fat32,                   iDeviceFAT);
-	LOADPNG(device_fat32_o,                 iDeviceFAT_o);
-	LOADPNG(device_ntfs,                    iDeviceGeneric);
-	LOADPNG(device_ntfs_o,                  iDeviceNTFS);
-	LOADPNG(device_cdrom,                   iDeviceGeneric);
-	LOADPNG(device_cdrom_o,                 iDeviceCDROM);
+	LOADPNG(src, device_generic,                 IMG_REQUIRED);
+	LOADPNG(src, device_generic_o,               iDeviceGeneric);
+	LOADPNG(src, device_hfsplus,                 iDeviceGeneric);
+	LOADPNG(src, device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(src, device_hfsraid,                 iDeviceGeneric);
+	LOADPNG(src, device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(src, device_ext3,                    iDeviceGeneric);
+	LOADPNG(src, device_ext3_o,                  iDeviceEXT3);
+	LOADPNG(src, device_freebsd,                 iDeviceGeneric);
+	LOADPNG(src, device_freebsd_o,               iDeviceFreeBSD);
+	LOADPNG(src, device_openbsd,                 iDeviceGeneric);
+	LOADPNG(src, device_openbsd_o,               iDeviceOpenBSD);
+	LOADPNG(src, device_fat,                     iDeviceGeneric);
+	LOADPNG(src, device_fat_o,                   iDeviceFAT);
+	LOADPNG(src, device_fat16,                   iDeviceFAT);
+	LOADPNG(src, device_fat16_o,                 iDeviceFAT_o);
+	LOADPNG(src, device_fat32,                   iDeviceFAT);
+	LOADPNG(src, device_fat32_o,                 iDeviceFAT_o);
+	LOADPNG(src, device_ntfs,                    iDeviceGeneric);
+	LOADPNG(src, device_ntfs_o,                  iDeviceNTFS);
+	LOADPNG(src, device_cdrom,                   iDeviceGeneric);
+	LOADPNG(src, device_cdrom_o,                 iDeviceCDROM);
 	
-	LOADPNG(device_selection,               IMG_REQUIRED);
-	LOADPNG(device_scroll_prev,             IMG_REQUIRED);
-	LOADPNG(device_scroll_next,             IMG_REQUIRED);
+	LOADPNG(src, device_selection,               IMG_REQUIRED);
+	LOADPNG(src, device_scroll_prev,             IMG_REQUIRED);
+	LOADPNG(src, device_scroll_next,             IMG_REQUIRED);
 	
-	LOADPNG(menu_boot,                      IMG_REQUIRED);
-	LOADPNG(menu_verbose,                   IMG_REQUIRED);
-	LOADPNG(menu_ignore_caches,             IMG_REQUIRED);
-	LOADPNG(menu_single_user,               IMG_REQUIRED);
-	LOADPNG(menu_memory_info,               IMG_REQUIRED);
-	LOADPNG(menu_video_info,                IMG_REQUIRED);
-	LOADPNG(menu_help,                      IMG_REQUIRED);
-	LOADPNG(menu_verbose_disabled,          IMG_REQUIRED);
-	LOADPNG(menu_ignore_caches_disabled,    IMG_REQUIRED);
-	LOADPNG(menu_single_user_disabled,      IMG_REQUIRED);
-	LOADPNG(menu_selection,                 IMG_REQUIRED);
+	LOADPNG(src, menu_boot,                      IMG_REQUIRED);
+	LOADPNG(src, menu_verbose,                   IMG_REQUIRED);
+	LOADPNG(src, menu_ignore_caches,             IMG_REQUIRED);
+	LOADPNG(src, menu_single_user,               IMG_REQUIRED);
+	LOADPNG(src, menu_memory_info,               IMG_REQUIRED);
+	LOADPNG(src, menu_video_info,                IMG_REQUIRED);
+	LOADPNG(src, menu_help,                      IMG_REQUIRED);
+	LOADPNG(src, menu_verbose_disabled,          IMG_REQUIRED);
+	LOADPNG(src, menu_ignore_caches_disabled,    IMG_REQUIRED);
+	LOADPNG(src, menu_single_user_disabled,      IMG_REQUIRED);
+	LOADPNG(src, menu_selection,                 IMG_REQUIRED);
 	
-	LOADPNG(progress_bar,                   IMG_REQUIRED);
-	LOADPNG(progress_bar_background,        IMG_REQUIRED);
+	LOADPNG(src, progress_bar,                   IMG_REQUIRED);
+	LOADPNG(src, progress_bar_background,        IMG_REQUIRED);
 	
-	LOADPNG(text_scroll_prev,               IMG_REQUIRED);
-	LOADPNG(text_scroll_next,               IMG_REQUIRED);
+	LOADPNG(src, text_scroll_prev,               IMG_REQUIRED);
+	LOADPNG(src, text_scroll_next,               IMG_REQUIRED);
 	
-	LOADPNG(font_console,                   IMG_REQUIRED);
-	LOADPNG(font_small,                     IMG_REQUIRED);
+	LOADPNG(src, font_console,                   IMG_REQUIRED);
+	LOADPNG(src, font_small,                     IMG_REQUIRED);
 	
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
@@ -617,11 +621,11 @@ void loadThemeValues(config_file_t *theme)
 	/*
 	 * Parse infobox parameters
 	 */
-	if(getIntForKey("infobox_width", &val, theme))
-		gui.infobox.width = MIN( screen_width , val );
+	if(getIntForKey("infobox_width", &val, theme) && val >= 0)
+		gui.infobox.width =  MIN( screen_width ,(unsigned) val );
 	
-	if(getIntForKey("infobox_height", &val, theme))
-		gui.infobox.height = MIN( screen_height , val );
+	if(getIntForKey("infobox_height", &val, theme) && val >= 0)
+		gui.infobox.height = MIN( screen_height , (unsigned)val );
 	
 	if(getDimensionForKey("infobox_pos_x", &pixel, theme, screen_width , gui.infobox.width ) )
 		gui.infobox.pos.x = pixel;
@@ -678,8 +682,8 @@ void loadThemeValues(config_file_t *theme)
 	if(getDimensionForKey("bootprompt_width", &pixel, theme, screen_width , 0 ) )
 		gui.bootprompt.width = pixel;
 	
-	if(getIntForKey("bootprompt_height", &val, theme))
-		gui.bootprompt.height = MIN( screen_height , val );
+	if(getIntForKey("bootprompt_height", &val, theme) && val >= 0)
+		gui.bootprompt.height = MIN( screen_height , (unsigned)val );
 	
 	if(getDimensionForKey("bootprompt_pos_x", &pixel, theme, screen_width , gui.bootprompt.width ) )
 		gui.bootprompt.pos.x = pixel;
@@ -687,11 +691,11 @@ void loadThemeValues(config_file_t *theme)
 	if(getDimensionForKey("bootprompt_pos_y", &pixel, theme, screen_height , gui.bootprompt.height ) )
 		gui.bootprompt.pos.y = pixel;
 	
-	if(getIntForKey("bootprompt_textmargin_h", &val, theme))
-		gui.bootprompt.hborder = MIN( gui.bootprompt.width , val );
+	if(getIntForKey("bootprompt_textmargin_h", &val, theme) && val >= 0)
+		gui.bootprompt.hborder = MIN( gui.bootprompt.width , (unsigned)val );
 	
-	if(getIntForKey("bootprompt_textmargin_v", &val, theme))
-		gui.bootprompt.vborder = MIN( gui.bootprompt.height , val );
+	if(getIntForKey("bootprompt_textmargin_v", &val, theme) && val >= 0)
+		gui.bootprompt.vborder = MIN( gui.bootprompt.height , (unsigned)val );
 	
 	if(getColorForKey("bootprompt_bgcolor", &color, theme))
 		gui.bootprompt.bgcolor = (color & 0x00FFFFFF);
@@ -708,11 +712,8 @@ void loadThemeValues(config_file_t *theme)
 
 #define  MAX_tHEME 255
 
-int randomTheme(const char **theme) {
-	
-	char		dirspec[256];
-	sprintf(dirspec, "/Extra/Themes");	
-	
+int randomTheme(char *dirspec, const char **theme) {
+		
 	long         ret, flags, time;
 	long long	 index;
 	
@@ -733,7 +734,7 @@ int randomTheme(const char **theme) {
 		// Make sure this is a directory.
 		if ((flags & kFileTypeMask) != kFileTypeDirectory) continue;
 		
-		if ((strlen(name) + 27) > sizeof(dirspec)) continue;
+		if ((unsigned)(strlen(name) + 34) > 256) continue;
 		
 		if ((list[i] = (char *)malloc(strlen(name))) == NULL) continue;						
 		
@@ -777,6 +778,27 @@ int initGUI(void)
 		return 1;
 	}
 	
+	{
+		long flags;
+		long time;
+		long ret = -1;
+		
+		ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+			sprintf(dirsrc, "/Extra/Themes");
+			
+		} else {
+			ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
+			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+				sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+				
+			} else {
+				return 1;
+			}
+ 
+		}		
+	}
+	
 	int    len;		
 	bool theme_ran= false;
 	getBoolForKey("RandomTheme", &theme_ran, &bootInfo->bootConfig);
@@ -784,7 +806,7 @@ int initGUI(void)
 	
 	if (theme_ran) {
 						
-		ret = randomTheme(&theme_name); 		
+		ret = randomTheme(dirsrc, &theme_name); 		
 		
 	} 
 
@@ -814,27 +836,31 @@ int startGUI(void)
 {
 	int        val;	
 	char    dirspec[256];
-			
-	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
-		return 1;
-	}
 	
-	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
-	
-	if (strlen(theme_name) == 0 || loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
-#ifdef EMBED_THEME
-		config_file_t    *config;
 		
-		config = &bootInfo->themeConfig;
-		if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-			return 1;
-		}
-#else
+	if ((unsigned)(strlen(theme_name) + 34) > sizeof(dirspec)) {
 		return 1;
-#endif
 	}
+		
+	sprintf(dirspec, "%s/%s/theme.plist", dirsrc ,theme_name);
 	
-	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) == 0)		
+	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
+				
+#ifdef EMBED_THEME
+			if (strlen(theme_name) == 0) {
+				config_file_t    *config;
+				
+				config = &bootInfo->themeConfig;
+				if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
+					return 1;
+				}
+			}			
+#else
+			return 1;
+#endif		
+    }
+	
+	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) != EFI_SUCCESS)		
 	{		
 		// parse display size parameters
 		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
@@ -857,7 +883,7 @@ int startGUI(void)
 	gui.screen.height = screen_params[1];
 	
 	// load graphics otherwise fail and return
-	if (loadGraphics() == 0) {
+	if (loadGraphics(dirsrc) == 0) {
 		loadThemeValues(&bootInfo->themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
@@ -878,7 +904,11 @@ int startGUI(void)
 							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
-								setVideoMode( GRAPHICS_MODE, 0 );								
+#if UNUSED
+								setVideoMode( GRAPHICS_MODE, 0 );
+#else
+								setVideoMode( GRAPHICS_MODE );
+#endif
 								gui.initialised = true;								
 								return 0;
 							}
@@ -1119,15 +1149,20 @@ void updateGraphicBootPrompt(int key)
 	return;
 }
 
+#if UNUSED
 inline
 void vramwrite (void *data, int width, int height)
+#else
+inline
+void vramwrite (void *data, int width)
+#endif
 {
-	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4)
+	if (VIDEO (depth) == 0x20 /*32*/ && VIDEO (rowBytes) == (unsigned long)gui.backbuffer->width * 4)
 		memcpy((uint8_t *)vram, gui.backbuffer->pixels, VIDEO (rowBytes)*VIDEO (height));
 	else
 	{
 		uint32_t r, g, b;
-		int i, j;
+		uint32_t i, j;
 		for (i = 0; i < VIDEO (height); i++)
 			for (j = 0; j < VIDEO (width); j++)
 			{
@@ -1149,7 +1184,9 @@ void vramwrite (void *data, int width, int height)
 						//						break;							
 					case 15:
 						*(uint16_t *)(((uint8_t *)vram)+i*VIDEO (rowBytes) + j*2) = ((b&0xf8)>>3) | ((g&0xf8)<<2) | ((r&0xf8)<<7);
-						break;														
+						break;	
+					default:
+						break;
 				}
 			}
 	}
@@ -1171,9 +1208,11 @@ void updateVRAM()
 		if (gui.infobox.draw)
 			blend( gui.infobox.pixmap, gui.backbuffer, gui.infobox.pos );
 	}
-	
+#if UNUSED
 	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width, gui.backbuffer->height );
-	
+#else
+	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width );
+#endif
 	if (gui.redraw)
 	{
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -1538,7 +1577,7 @@ int initFont(font_t *font, image_t *data)
 					// we skip the first line because there are just the red pixels for the char width
 					for( y = 1; y< (font->height); y++)
 					{
-						for( x2 = start, x3 = 0; x2 < end; x2++, x3++)
+						for( x2 = (unsigned)start, x3 = 0; x2 < (unsigned)end; x2++, x3++)
 						{
 							pixel( font->chars[count], x3, y ) = pixel( data->image, x2, y );
 						}	
@@ -1754,7 +1793,7 @@ void animateProgressBar()
 {
 	int y;
 	
-	if( time18() > lasttime)
+	if( time18() > (unsigned) lasttime)
 	{
 		lasttime = time18();
 		
@@ -1944,6 +1983,8 @@ int updateInfoMenu(int key)
 				return buff;
 			}
 			break;
+		default:
+			break;
 	}
 	return DO_NOT_BOOT;
 }
@@ -1955,7 +1996,7 @@ static bool usePngImage = false;
 
 //==========================================================================
 // loadBootGraphics
-void loadBootGraphics(void)
+void loadBootGraphics(char *src)
 {
 	if (bootImageData != NULL) {
 		return;
@@ -1963,11 +2004,11 @@ void loadBootGraphics(void)
 	
 	char dirspec[256];
 	
-	if ((strlen(theme_name) + 24) > sizeof(dirspec)) {
+	if ((unsigned)(strlen(theme_name) + 34) > sizeof(dirspec)) {
 		usePngImage = false; 
 		return;
 	}
-	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
+	sprintf(dirspec, "%s/%s/boot.png", src, theme_name);
 	if (strlen(theme_name) == 0 || loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
 #ifdef EMBED_THEME
 		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
@@ -1991,12 +2032,12 @@ void drawBootGraphics(void)
 		usePngImage = true;
 		
 		if (bootImageData == NULL)
-			loadBootGraphics();
+			loadBootGraphics(dirsrc);
 		
 	}		
 	
 	
-	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) == 0)		
+	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) != EFI_SUCCESS)		
 	{		
 		// parse screen size parameters
 		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
@@ -2023,9 +2064,13 @@ void drawBootGraphics(void)
 	
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE
-		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+		|| (screen_params[0] != (uint32_t)oldScreenWidth && screen_params[1] != (uint32_t)oldScreenHeight) )
 	{
+#if UNUSED
 		setVideoMode(GRAPHICS_MODE, 0);
+#else
+		setVideoMode(GRAPHICS_MODE);
+#endif
 	}
 	
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
@@ -2090,7 +2135,11 @@ int GUI_initGraphicsMode ()
 	if ( params[2] == 555 ) params[2] = 16;
 	if ( params[2] == 888 ) params[2] = 32;
 	
-	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
+#if UNUSED
+	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );
+#else
+	return setVESAGraphicsMode( params[0], params[1], params[2] );
+#endif
 }
 
 
@@ -2128,13 +2177,13 @@ int GUI_countdown( const char * msg, int row, int timeout )
 	
     for ( time = time18(), timeout++; timeout > 0; )
     {
-		if( time18() > lasttime)
+		if( time18() > (unsigned)lasttime)
 		{
 			multi--; 
 			lasttime=time18();
 		}		
 		
-        if (ch = readKeyboardStatus())
+        if ((ch = readKeyboardStatus()))
             break;
 		
         // Count can be interrupted by holding down shift,

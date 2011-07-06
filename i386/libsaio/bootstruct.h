@@ -25,12 +25,10 @@
 #ifndef __BOOTSTRUCT_H
 #define __BOOTSTRUCT_H
 
-//#include <pexpert/i386/boot.h>
 #include "bootLion.h"
 #include "saio_types.h"
 #include "bios.h"
 #include "device_tree.h"
-#include "efi.h"
 /*!
     Kernel boot args global also used by booter for its own data.
  */
@@ -136,7 +134,6 @@ typedef struct PrivateBootInfo {
 	unsigned long    adler32;
 	
 	char uuidStr[64+1];										//boot device  uuid
-	EFI_CHAR8	sysid[16];
 } PrivateBootInfo_t;
 
 extern PrivateBootInfo_t *bootInfo; 

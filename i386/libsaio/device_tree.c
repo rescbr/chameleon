@@ -80,7 +80,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
         allocedProperties = prop;
         prop->value = buf;
         prop++;
-        for (i=1; i<(kAllocSize / sizeof(Property)); i++) {
+        for (i=1; (unsigned)i<(kAllocSize / sizeof(Property)); i++) {
             prop->next = freeProperties;
             freeProperties = prop;
             prop++;
@@ -129,7 +129,7 @@ DT__AddChild(Node *parent, const char *name)
         allocedNodes = node;
         node->children = (Node *)buf;
         node++;
-        for (i=1; i<(kAllocSize / sizeof(Node)); i++) {
+        for (i=1; (unsigned)i<(kAllocSize / sizeof(Node)); i++) {
             node->next = freeNodes;
             freeNodes = node;
             node++;

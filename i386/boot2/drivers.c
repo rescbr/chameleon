@@ -334,7 +334,7 @@ LoadDriverMKext( char * fileSpec )
 	
     // Load the MKext.
     length = LoadThinFatFile(fileSpec, (void **)&package);
-    if (length < sizeof (DriversPackage)) return -1;
+    if (!length || (unsigned)length < sizeof (DriversPackage)) return -1;
 	
 	// call hook to notify modules that the mkext has been loaded
 	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) length, NULL, NULL, NULL);
@@ -359,9 +359,14 @@ LoadDriverMKext( char * fileSpec )
     memcpy((void *)driversAddr, (void *)package, driversLength);
 	
     // Add the MKext to the memory map.
-    sprintf(segName, "DriversPackage-%lx", driversAddr);
+    sprintf(segName, "DriversPackage-%lx", driversAddr);    
+    
+#if UNUSED
     AllocateMemoryRange(segName, driversAddr, driversLength,
                         kBootDriverTypeMKEXT);
+#else
+    AllocateMemoryRange(segName, driversAddr, driversLength);
+#endif
 	
     return 0;
 }
@@ -552,9 +557,14 @@ long LoadMatchedModules( void )
                 strcpy(driver->bundlePathAddr, module->bundlePath);
 				
                 // Add an entry to the memory map.
-                sprintf(segName, "Driver-%lx", (unsigned long)driver);
+                sprintf(segName, "Driver-%lx", (unsigned long)driver);                
+#if UNUSED
                 AllocateMemoryRange(segName, driverAddr, driverLength,
                                     kBootDriverTypeKEXT);
+#else
+                AllocateMemoryRange(segName, driverAddr, driverLength);
+#endif
+                
             }
         }
         module = module->nextModule;

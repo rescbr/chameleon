@@ -1,12 +1,13 @@
 
-#include "libsaio.h"
-#include "mysmbios.h"
-#include "platform.h"
-#include "pci.h"
+
 
 #ifndef __LIBSAIO_SMBIOS_GETTERS_H
 #define __LIBSAIO_SMBIOS_GETTERS_H
 
+#include "libsaio.h"
+#include "mysmbios.h"
+#include "platform.h"
+#include "pci.h"
 
 typedef enum {
 	kSMBString,

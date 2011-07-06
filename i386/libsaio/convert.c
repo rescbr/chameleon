@@ -57,7 +57,7 @@ EFI_CHAR8*  getUUIDFromString(const char *source)
 uint32_t ascii_hex_to_int(char *buff) 
 {
 	uint32_t	value = 0, i, digit;
-	for(i = 0; i < strlen(buff); i++)
+	for(i = 0; i < (uint32_t)strlen(buff); i++)
 	{
 		if (buff[i] >= 48 && buff[i] <= 57)			// '0' through '9'
 			digit = buff[i] - 48;	
@@ -94,9 +94,9 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
       hexNibble = hexStr[hexStrIdx];
       
       // ignore all chars except valid hex numbers
-      if (hexNibble >= '0' && hexNibble <= '9'
-        || hexNibble >= 'A' && hexNibble <= 'F'
-        || hexNibble >= 'a' && hexNibble <= 'f')
+      if ((hexNibble >= '0' && hexNibble <= '9')
+        || (hexNibble >= 'A' && hexNibble <= 'F')
+        || (hexNibble >= 'a' && hexNibble <= 'f'))
       {
         hexByte[hexNibbleIdx++] = hexNibble;
         
@@ -105,7 +105,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
         {
           binChar = 0;
           
-          for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
+          for (hexNibbleIdx = 0; (unsigned)hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
           {
             if (hexNibbleIdx > 0) binChar = binChar << 4;
             

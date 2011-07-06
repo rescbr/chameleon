@@ -11,7 +11,7 @@
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+//#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 int previewTotalSectors = 0;
 uint8_t *previewSaveunder = 0;
@@ -45,7 +45,9 @@ loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int o
 					green=(val>>8)&0xff;
 					blue=(val)&0xff;
 					break;
-				}				
+				}
+				default:
+					break;
 			}
 			char *ptr=(char *)output+x*(op/8)+y*or;
 			switch (op)
@@ -57,6 +59,8 @@ loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int o
 					break;
 				case 32 :
 					*((uint32_t *)ptr) = (red << 16) | (green << 8) | blue;
+					break;
+				default:
 					break;
 			}
 		}
@@ -78,7 +82,11 @@ void drawPreview(void *src, uint8_t * saveunder)
 	
 	if (src && (uncomp=DecompressData(src, &origwidth, &origheight, &origbpx)))
 	{
+#if UNUSED
 		if (!setVESAGraphicsMode(origwidth, origheight, origbpx, 0))
+#else
+		if (!setVESAGraphicsMode(origwidth, origheight, origbpx))
+#endif
 			if (initGraphicsMode () != errSuccess)
 				return;
 		screen = (uint8_t *) VIDEO (baseAddr);

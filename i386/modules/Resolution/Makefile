@@ -28,8 +28,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common
-
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common  
 DEFINES=
 CONFIG = hd
 INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(BOOT2DIR)
@@ -70,6 +69,7 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
+	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/libcc_kext.a" \
 	$(OBJROOT)/edid.o \
 	$(OBJROOT)/915resolution.o \
 	$(OBJROOT)/Resolution.o \

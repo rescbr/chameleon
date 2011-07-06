@@ -12,6 +12,9 @@
 #include "xml.h"
 #include "modules.h"
 
+#define kEnableKeyMap "EnableKeyMapper"
+
+
 // CPARM's AZERTY_switch : A Basic QWERTY to AZERTY switcher
 int AZERTY_switch(int c)
 {		
@@ -191,7 +194,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 		char *kMatchkey = 0; 
 		sprintf(kMatchkey, "%d",c);
 		TagPtr match_key;
-		if (match_key = XMLGetProperty(match_map, (const char*)kMatchkey))
+		if ((match_key = XMLGetProperty(match_map, (const char*)kMatchkey)))
 		{
 			kMatchkey = XMLCastString(match_key);
 			c  = strtoul((const char *)kMatchkey, NULL,10);		
@@ -201,7 +204,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 	
 	if (map_kb_type == NULL){		
 		TagPtr match_type;
-		if (match_type = XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"KeyboardType"))
+		if ((match_type = XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"KeyboardType")))
 			map_kb_type = XMLCastString(match_type);
 		else 
 			map_kb_type =  "NONE"; // Default to QWERTY
@@ -218,5 +221,10 @@ out:
 
 void Keymapper_start()
 {
-	register_hook_callback("Keymapper", &Keymapper_hook);
+	bool enable = true;
+	getBoolForKey(kEnableKeyMap, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		register_hook_callback("Keymapper", &Keymapper_hook);
+	}
 }

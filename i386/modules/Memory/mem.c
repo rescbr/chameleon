@@ -101,43 +101,4 @@ void dumpAllTablesOfType(int i)
 	}
 }
 
-void scan_memory(PlatformInfo_t *p)
-{		 
-    int i=0;
-    struct DMIHeader * dmihdr = NULL;
-    
-    struct DMIMemoryModuleInfo* memInfo[MAX_RAM_SLOTS]; // 6
-    struct DMIPhysicalMemoryArray* physMemArray; // 16
-    struct DMIMemoryDevice* memDev[MAX_RAM_SLOTS]; //17
-
-    /* We mainly don't use obsolete tables 5,6 because most of computers don't handle it anymore */
-     Platform->DMI.MemoryModules = 0;
-    /* Now lets peek info rom table 16,17 as for some bios, table 5 & 6 are not used */
-    physMemArray = (struct DMIPhysicalMemoryArray*) FindFirstDmiTableOfType(16, 4);
-    Platform->DMI.MaxMemorySlots = physMemArray ? physMemArray->numberOfMemoryDevices :  0;
- 
-    i = 0;
-    for(dmihdr = FindFirstDmiTableOfType(17, 4);
-        dmihdr;
-        dmihdr = FindNextDmiTableOfType(17, 4) ) {
-        memDev[i] = (struct DMIMemoryDevice*) dmihdr;
-        if (memDev[i]->size !=0 ) Platform->DMI.MemoryModules++;
-        if (memDev[i]->speed>0) Platform->RAM.DIMM[i].Frequency = memDev[i]->speed; // take it here for now but we'll check spd and dmi table 6 as well
-        i++;
-    }
-    // for table 6, we only have a look at the current speed
-    i = 0;
-    for(dmihdr = FindFirstDmiTableOfType(6, 4);
-        dmihdr;
-        dmihdr = FindNextDmiTableOfType(6, 4) ) {
-        memInfo[i] = (struct DMIMemoryModuleInfo*) dmihdr;
-        if (memInfo[i]->currentSpeed > Platform->RAM.DIMM[i].Frequency) 
-            Platform->RAM.DIMM[i].Frequency = memInfo[i]->currentSpeed; // favor real overclocked speed if any
-        i++;
-    }
-#if 0
-    dumpAllTablesOfType(17);
-    getc();
-#endif
-}
 #endif

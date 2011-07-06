@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 cparm <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright 2011 cparm. All rights reserved.
  */
 #include "boot.h"
 #include "bootstruct.h"
@@ -21,28 +21,32 @@
 #define DBG(x...)	
 #endif
 
+#define kEnableSMBIOSPatcher			"EnableSMBIOSPatcher"
+
+
 void getSmbiosPatched_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {	
-	struct SMBEntryPoint *smbios_o = (struct SMBEntryPoint *)arg1;
 	struct SMBEntryPoint *patched_smb = NULL;
 	
+    getSmbiosTableStructure(getSmbiosOriginal()); // generate tables entry list for fast table finding
+    
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) 
+        scan_memory(Platform);
+    
 	execute_hook("ScanMemory", NULL, NULL, NULL, NULL, NULL, NULL);	
 	
-	patched_smb = getSmbiosPatched(smbios_o);
+	patched_smb = getSmbiosPatched(getSmbiosOriginal());
 	
 	if (patched_smb)
-		smbios_p = (EFI_PTR32)patched_smb; 
+		smbios_p = ((uint64_t)((uint32_t)patched_smb)); 
 	else
+    {
 		verbose("Error: Could not get patched SMBIOS, fallback to original SMBIOS !!\n");
-}
-
-void smbios_helper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
-{	
-	struct SMBEntryPoint *orig = (struct SMBEntryPoint *)arg1;
-	getSmbiosTableStructure(orig); // generate tables entry list for fast table finding
-		
-	if (is_module_loaded("Memory")) 
-	scan_memory(Platform);
+        
+        struct SMBEntryPoint *smbios_o = getSmbiosOriginal();	
+        smbios_p = ((uint64_t)((uint32_t)smbios_o)); 
+    }    
+    
 }
 
 void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -62,9 +66,18 @@ void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* a
 	
 }
 
+void is_SMB_Patcher_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
+
 void SMBiosPatcher_start()
 {	
+    bool enable = true;
+	getBoolForKey(kEnableSMBIOSPatcher, &enable, &bootInfo->bootConfig) ;
+	
+	enable = (execute_hook("isSMBIOSRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
+    
+	if (enable) {
 	register_hook_callback("getSmbiosPatched", &getSmbiosPatched_hook);	
-	register_hook_callback("smbios_helper", &smbios_helper_hook);
 	register_hook_callback("getProductNamePatched", &getProductName_hook);
+    register_hook_callback("isSMBIOSRegistred", &is_SMB_Patcher_Registred_Hook);
+    }
 }

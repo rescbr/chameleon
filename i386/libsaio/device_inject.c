@@ -317,7 +317,7 @@ char *devprop_generate_string(struct DevPropString *string)
 		
 		buffer += 8;
 		uint8_t *dataptr = string->entries[i]->data;
-		for(x = 0; x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
+		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
 		{
 			sprintf(buffer, "%02x", *dataptr++);
 			buffer += 2;

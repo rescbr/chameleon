@@ -17,14 +17,18 @@
 //      misrepresented as being the original software.
 //   3. This notice may not be removed or altered from any source distribution.
 
-#include "libsa.h"
+
+#include "libsaio.h"
 #include "picopng.h"
 
 /* sys.c */
-int open_bvdev(const char *bvd, const char *path, int flags);
-int read(int fdesc, char * buf, int count);
-int close(int fdesc);
-int file_size(int fdesc);
+/*
+extern int    open_bvdev(const char *bvd, const char *path);
+extern int    close(int fdesc);
+extern int    file_size(int fdesc);
+extern int    read(int fdesc, char *buf, int count);
+*/
+
 /*************************************************************************************************/
 
 typedef struct png_alloc_node {
@@ -1159,12 +1163,14 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
 				 uint8_t **imageData)
 {
     uint8_t *pngData = NULL;
-    int pngFile = 0, pngSize;
+    int pngFile = -1/*0*/, pngSize;
     PNG_info_t *info;
     int error = 0;
 	
-    pngFile = open_bvdev("bt(0,0)", filename, 0);
-    if (pngFile == -1) {
+    //pngFile = open_bvdev("bt(0,0)", filename);
+	pngFile = open(filename);
+	//if (pngFile == -1) {
+    if (pngFile < 0) {
         error = -1;
         goto failed;
     }

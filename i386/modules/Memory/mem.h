@@ -9,9 +9,7 @@
 
 #include "platform.h"
 
-#if UNUSED
-extern void scan_memory(PlatformInfo_t *);
-#endif
+
 
 extern void dumpPhysAddr(const char * title, void * a, int len);
 

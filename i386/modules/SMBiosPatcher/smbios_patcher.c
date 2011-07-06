@@ -36,30 +36,30 @@ typedef struct {
 // defaults for a MacBook
 static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MB41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",		"04/01/2008"			},
+	{"SMbiosversion",	"MB41.88Z.00C1.B00.0802091535"	},
+	{"SMbiosdate",		"02/09/2008"			},
 	{"SMmanufacter",	"Apple Inc."			},
 	{"SMproductname",	"MacBook4,1"			},
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"RM83064H0P1"			},
 	{"SMfamily",		"MacBook"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F42D89C8"			},
+	{"SMboardproduct",	"Mac-F22788A9"			},
 	{ "",""	}
 };
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MBP41.88Z.0073.B00.0809221748"	},
-	{"SMbiosdate",		"04/01/2008"			},
+	{"SMbiosversion",	"MBP41.88Z.00C1.B03.0802271651"	},
+	{"SMbiosdate",		"02/27/2008"			},
 	{"SMmanufacter",	"Apple Inc."			},
 	{"SMproductname",	"MacBookPro4,1"			},
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"W88198N6YJX"			},
 	{"SMfamily",		"MacBookPro"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F42D89C8"			},
+	{"SMboardproduct",	"Mac-F42C89C8"			},
 	{ "",""	}
 };
 
@@ -67,11 +67,11 @@ static const SMStrEntryPair const sm_macbookpro_defaults[]={
 static const SMStrEntryPair const sm_macmini_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
 	{"SMbiosversion",	"MM21.88Z.009A.B00.0706281359"	},
-	{"SMbiosdate",		"04/01/2008"			},
+	{"SMbiosdate",		"06/28/2007"			},
 	{"SMmanufacter",	"Apple Inc."			},
 	{"SMproductname",	"Macmini2,1"			},
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"YM8054BYYL2"			},
 	{"SMfamily",		"Napa Mac"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
 	{"SMboardproduct",	"Mac-F4208EAA"			},
@@ -81,44 +81,59 @@ static const SMStrEntryPair const sm_macmini_defaults[]={
 // defaults for an iMac
 static const SMStrEntryPair const sm_imac_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"IM81.88Z.00C1.B00.0802091538"	},
-	{"SMbiosdate",		"04/01/2008"			},
+	{"SMbiosversion",	"IM71.88Z.007A.B03.0803051705"	},
+	{"SMbiosdate",		"03/05/2008"			},
 	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"iMac8,1"			},	
+	{"SMproductname",	"iMac7,1"			},	
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"W87410PWX87"			},
 	{"SMfamily",		"Mac"				},
 	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F227BEC8"			},
+	{"SMboardproduct",	"Mac-F4238CC8"			},
 	{ "",""	}
 };
 
 // defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro_defaults[]={
 	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP31.88Z.006C.B05.0802291410"	},
-	{"SMbiosdate",			"04/01/2008"					},
+	{"SMbiosversion",		"MP31.88Z.006C.B02.0801021250"	},
+	{"SMbiosdate",			"01/02/2008"					},
 	{"SMmanufacter",		"Apple Computer, Inc."			},
 	{"SMproductname",		"MacPro3,1"						},
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"G88014V4XYK"					},
 	{"SMfamily",			"MacPro"						},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F4208DC8"					},
+	{"SMboardproduct",		"Mac-F42C88C8"					},
 	{ "",""	}
 };
 
 // defaults for an iMac11,1 core i3/i5/i7
 static const SMStrEntryPair const sm_imac_core_defaults[]={
 	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"IM111.88Z.0034.B00.0802091538"	},
-	{"SMbiosdate",			"06/01/2009"					},
+	{"SMbiosversion",		"IM111.88Z.0034.B00.0910301727"	},
+	{"SMbiosdate",			"10/30/2009"					},
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"iMac11,1"						},	
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"W89470DZ5RU"					},
 	{"SMfamily",			"iMac"							},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
+	{"SMboardmanufacter",	"Apple Inc."                    },
+	{"SMboardproduct",		"Mac-F2268DAE"					},
+	{ "",""	}
+};
+
+// defaults for an iMac12,1 : todo: populate correctly 
+static const SMStrEntryPair const sm_imac_sandy_defaults[]={
+	{"SMbiosvendor",		"Apple Inc."					},
+	{"SMbiosversion",		"IM121.88Z.0047.B00.1102091756"	},
+	{"SMbiosdate",			"10/30/2011"					},
+	{"SMmanufacter",		"Apple Inc."					},
+	{"SMproductname",		"iMac12,1"						},	
+	{"SMsystemversion",		"1.0"							},
+	{"SMserial",			"W89470DZ5RU"					},
+	{"SMfamily",			"iMac"							},
+	{"SMboardmanufacter",	"Apple Inc."                    },
 	{"SMboardproduct",		"Mac-F2268DAE"					},
 	{ "",""	}
 };
@@ -126,16 +141,31 @@ static const SMStrEntryPair const sm_imac_core_defaults[]={
 // defaults for a Mac Pro 4,1 core i7/Xeon
 static const SMStrEntryPair const sm_macpro_core_defaults[]={
 	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP41.88Z.0081.B04.0903051113"	},
-	{"SMbiosdate",			"11/06/2009"					},
-	{"SMmanufacter",		"Apple Computer, Inc."			},
+	{"SMbiosversion",		"MP41.88Z.0081.B03.0902231259"	},
+	{"SMbiosdate",			"02/23/2009"					},
+	{"SMmanufacter",		"Apple Inc."                    },
 	{"SMproductname",		"MacPro4,1"						},
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"CK91601V8Q0"					},
 	{"SMfamily",			"MacPro"						},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F4208DC8"					},
+	{"SMboardproduct",		"Mac-F221BEC8"					},
 	{ "",""	}
+};
+
+// default for a Xserve
+static const SMStrEntryPair const sm_xserve_defaults[]={
+    {"SMbiosvendor",		"Apple Inc."					},
+    {"SMbiosversion",		"XS21.88Z.006C.B06.0804011317"	},
+    {"SMbiosdate",			"04/01/2008"					},
+    {"SMmanufacter",		"Apple Inc."					},
+    {"SMproductname",		"Xserve2,1"						},
+    {"SMsystemversion",		"1.0"							},
+    {"SMserial",			"CK816033X8S"					},
+    {"SMfamily",			"Xserve"						},
+    {"SMboardmanufacter",	"Apple Inc."					},
+    {"SMboardproduct",		"Mac-F42289C8"					},
+ 	{ "",""	}
 };
 
 /*static */const char* sm_get_defstr(const char * key, int table_num)
@@ -143,7 +173,10 @@ static const SMStrEntryPair const sm_macpro_core_defaults[]={
 	int	i;
 	const SMStrEntryPair*	sm_defaults;
 
-	if (platformCPUFeature(CPU_FEATURE_MOBILE)) {
+	if (Platform->CPU.isServer == true)
+    {
+     		sm_defaults=sm_xserve_defaults;
+    } else if (Platform->CPU.isMobile == true) {
 		if (Platform->CPU.NoCores > 1) {
 			sm_defaults=sm_macbookpro_defaults;
 		} else {
@@ -166,16 +199,22 @@ static const SMStrEntryPair const sm_macpro_core_defaults[]={
 					{
 						switch (Platform->CPU.Model)
 						{
-							case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
-							case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
-							case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+							case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+							case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+							case CPUID_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 							case 0x19: // Intel Core i5 650 @3.20 Ghz 
 								sm_defaults=sm_imac_core_defaults; 
 								break;
-							case CPU_MODEL_NEHALEM: 
-							case CPU_MODEL_NEHALEM_EX:
-							case CPU_MODEL_WESTMERE: 
-							case CPU_MODEL_WESTMERE_EX:
+                                
+                            case CPUID_MODEL_SANDYBRIDGE:
+                            case CPUID_MODEL_JAKETOWN:
+                                sm_defaults=sm_imac_sandy_defaults;
+                                break;
+                                
+							case CPUID_MODEL_NEHALEM: 
+							case CPUID_MODEL_NEHALEM_EX:
+							case CPUID_MODEL_WESTMERE: 
+							case CPUID_MODEL_WESTMERE_EX:
 								sm_defaults=sm_macpro_core_defaults; 
 								break;
 							default:
@@ -225,36 +264,39 @@ static int sm_get_bus_speed (const char *name, int table_num)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D: // ?
-					case CPU_MODEL_YONAH:	// Yonah		0x0E
-					case CPU_MODEL_MEROM:	// Merom		0x0F
-					case CPU_MODEL_PENRYN:	// Penryn		0x17
-					case CPU_MODEL_ATOM:	// Atom 45nm	0x1C
+                    case CPUID_MODEL_BANIAS:	// Banias		0x09
+                    case CPUID_MODEL_DOTHAN:	// Dothan		0x0D
+					case CPUID_MODEL_YONAH:	// Yonah		0x0E
+					case CPUID_MODEL_MEROM:	// Merom		0x0F
+					case CPUID_MODEL_PENRYN:	// Penryn		0x17
+					case CPUID_MODEL_ATOM:	// Atom 45nm	0x1C
 						return 0; // TODO: populate bus speed for these processors
 						
-//					case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+//					case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
 //						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
 //							return 2500; // Core i5
 //						return 4800; // Core i7
 						
-//					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-//					case CPU_MODEL_NEHALEM_EX:
-//					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+//					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+//					case CPUID_MODEL_NEHALEM_EX:
+//					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
 //						return 4800; // GT/s / 1000
 //						
-					case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPUID_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
 						return 0; // TODO: populate bus speed for these processors
 						
 //					case 0x19: // Intel Core i5 650 @3.20 Ghz
 //						return 2500; // why? Intel spec says 2.5GT/s 
 
 					case 0x19: // Intel Core i5 650 @3.20 Ghz
-					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-					case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
-					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
-					case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm)
-					case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
-					case CPU_MODEL_NEHALEM_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+					case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+					case CPUID_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm)
+                    case CPUID_MODEL_SANDYBRIDGE:
+                    case CPUID_MODEL_JAKETOWN:
+					case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPUID_MODEL_NEHALEM_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
 					{ // thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
 						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
@@ -297,12 +339,12 @@ static int sm_get_simplecputype()
 	{
 		return 0x0501;   // Quad-Core Xeon
 	}
-	else if (Platform->CPU.NoCores == 1) 
+	if (((Platform->CPU.NoCores == 1) || (Platform->CPU.NoCores == 2)) && !(platformCPUExtFeature(CPUID_EXTFEATURE_EM64T)))
 	{
-		return 0x0201;   // Core Solo
+		return 0x0201;   // Core Solo / Duo
 	}
 	
-	return 0x0301;   // Core 2 Duo
+	return 0x0301;   // Core 2 Solo / Duo
 }
 
 static int sm_get_cputype (const char *name, int table_num)
@@ -322,27 +364,29 @@ static int sm_get_cputype (const char *name, int table_num)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D: // ?
-					case CPU_MODEL_YONAH: // Yonah
-					case CPU_MODEL_MEROM: // Merom
-					case CPU_MODEL_PENRYN: // Penryn
-					case CPU_MODEL_ATOM: // Intel Atom (45nm)
+                    case CPUID_MODEL_BANIAS: // Banias
+                    case CPUID_MODEL_DOTHAN: // Dothan
+					case CPUID_MODEL_YONAH: // Yonah
+					case CPUID_MODEL_MEROM: // Merom
+					case CPUID_MODEL_PENRYN: // Penryn
+					case CPUID_MODEL_ATOM: // Intel Atom (45nm)
 						return sm_get_simplecputype();
 						
-					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
 						return 0x0701; // Core i7
 						
-					case CPU_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
+					case CPUID_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x701; // Core i7
 						
-					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x0701; // Core i7
 						
-					case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+                    case  CPUID_MODEL_SANDYBRIDGE: // Sandybridge
+					case CPUID_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i3"))
 							return 0x901; // Core i3
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
@@ -351,8 +395,9 @@ static int sm_get_cputype (const char *name, int table_num)
 							return 0x0701; // Core i7 						
 						return sm_get_simplecputype();
 						
-					case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
-					case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+                    case CPUID_MODEL_JAKETOWN:
+					case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
+					case CPUID_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
 						return 0x0701; // Core i7
 						
 					case 0x19: // Intel Core i5 650 @3.20 Ghz
@@ -367,8 +412,7 @@ static int sm_get_cputype (const char *name, int table_num)
 
 static int sm_get_memtype (const char *name, int table_num)
 {
-	if (is_module_loaded("Memory")) {	
-	
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
@@ -385,8 +429,7 @@ static int sm_get_memtype (const char *name, int table_num)
 
 static int sm_get_memspeed (const char *name, int table_num)
 {
-	if (is_module_loaded("Memory")) {
-	
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
@@ -402,8 +445,7 @@ static int sm_get_memspeed (const char *name, int table_num)
 
 static const char *sm_get_memvendor (const char *name, int table_num)
 {
-	if (is_module_loaded("Memory")) {
-	
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
@@ -419,8 +461,7 @@ static const char *sm_get_memvendor (const char *name, int table_num)
 	
 static const char *sm_get_memserial (const char *name, int table_num)
 {
-	if (is_module_loaded("Memory")) {
-	
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
@@ -437,8 +478,7 @@ static const char *sm_get_memserial (const char *name, int table_num)
 
 static const char *sm_get_mempartno (const char *name, int table_num)
 {
-	if (is_module_loaded("Memory")) {
-	
+	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 	int	map;
 
 	if (table_num < MAX_RAM_SLOTS) {
@@ -1076,6 +1116,7 @@ struct SMBEntryPoint *getSmbiosPatched(struct SMBEntryPoint *orig)
    
 }
 
+/*
 char* getSmbiosProductName()
 {
 	struct SMBEntryPoint	*smbios;
@@ -1103,7 +1144,7 @@ char* getSmbiosProductName()
 	verbose("Actual model name is '%s'\n", tempString);
 	return tempString;
 }
-
+*/
 
 void scan_memory(PlatformInfo_t *p)
 {		 

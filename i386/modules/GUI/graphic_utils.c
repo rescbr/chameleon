@@ -277,7 +277,9 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
 							//							break;							
 						case 15:
 							*(uint16_t *)(vram + bpp*pos) = ((db&0xf8)>>3) | ((dg&0xf8)<<2) | ((dr&0xf8)<<7);
-							break;														
+							break;	
+						default:
+							break;
 					}
 					
 				}				
@@ -428,7 +430,7 @@ void flipRB(pixmap_t *p)
 	
 	uint32_t x;
     register uint8_t tempB;
-	for (x = 0; x < (p->height) * (p->width) ; x++) {
+	for (x = 0; x < (unsigned long)(p->height) * (p->width) ; x++) {
 		tempB = (p->pixels[x]).ch.b;
         (p->pixels[x]).ch.b = (p->pixels[x]).ch.r;
         (p->pixels[x]).ch.r = tempB;

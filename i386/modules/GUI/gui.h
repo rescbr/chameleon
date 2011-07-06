@@ -11,6 +11,8 @@
 /*
  * cparm : cleaned
  */
+#ifndef __BOOT2_GUI_H
+#define __BOOT2_GUI_H
 
 #include "boot.h"
 #include "bootstruct.h"
@@ -18,9 +20,6 @@
 #include "graphic_utils.h"
 #include "picopng.h"
 #include "options.h"
-
-#ifndef __BOOT2_GUI_H
-#define __BOOT2_GUI_H
 
 void showTextBuffer(char *buf, int size);
 int GUI_initGraphicsMode ();

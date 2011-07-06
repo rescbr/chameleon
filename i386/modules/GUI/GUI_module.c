@@ -68,7 +68,7 @@ static bool KernelStart = false;
  ** The kernel is about to start, draw the boot graphics if we are not in
  ** verbose mode.
  **/
-void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
+void GUI_ExecKernel_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
 	if(!gVerboseMode)
 	{
@@ -77,7 +77,11 @@ void GUI_ExecKernel_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4, 
 	}
 	else
 	{
-		setVideoMode( GRAPHICS_MODE, 0 );
+#if UNUSED
+		setVideoMode(GRAPHICS_MODE, 0);
+#else
+		setVideoMode(GRAPHICS_MODE);
+#endif
 		
 	}
 	KernelStart = true;
@@ -110,21 +114,18 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 	 
 }
 
-/**
- ** Module startup code. Replace console only print functions as well as
- ** replace various menu functions. Finaly, initialize the gui and hook
- ** into important events.
- **/
-void GUI_start()
+void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
+	// Start and display the gui
+	msglog("* Attempting to Display GUI\n");
 	
-	// Start the gui
-		
 	if (initGUI())
 	{
 		
-			useGUI = false; // initGUI() returned with an error, disabling GUI.		
+		useGUI = false; // initGUI() returned with an error, disabling GUI.		
+		msglog("* GUI failed to Display, or disabled by user (a.k.a you)\n");
 
+		
 	}
 	else
 	{
@@ -138,13 +139,26 @@ void GUI_start()
 		replace_function("_error", &GUI_error);
 		replace_function("_stop", &GUI_stop);
 		replace_function("_showMessage", &GUI_showMessage);
-
-	
+		
+		
 		// Hoot for the boot screen 	
 		register_hook_callback("GUI_ExecKernel", &GUI_ExecKernel_hook);
 		register_hook_callback("GUI_PreBoot", &GUI_PreBoot_hook);
-				
-	}			
+		
+		msglog("* GUI successfully Displayed\n");
+
+		
+	}
+}
+
+/**
+ ** Module startup code. Replace console only print functions as well as
+ ** replace various menu functions. Finaly, initialize the gui and hook
+ ** into important events.
+ **/
+void GUI_start(moduleList_t* module)
+{
+	register_hook_callback("GUI_Display", &GUI_diplay_hook);				
 	
 }
 
@@ -248,6 +262,8 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 						gBootMode = kBootModeNormal;
 						addBootArg(kSingleUserModeFlag);
 						break;
+					default:
+						break;
 				}
 				
 			}
@@ -277,6 +293,8 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 				{
 					draw.f.scrollUp = 1;
 				}
+				break;
+			default:
 				break;
 		}
 	}
@@ -519,7 +537,9 @@ int GUI_getBootOptions(bool firstRun)
 	int     key;
 	int     nextRow;
 	int     timeout;
+#if UNUSED
 	int     bvCount;
+#endif
 	BVRef   bvr;
 	BVRef   menuBVR;
 	bool    showPrompt, newShowPrompt, isCDROM;
@@ -539,7 +559,11 @@ int GUI_getBootOptions(bool firstRun)
 	// ensure we're in graphics mode if gui is setup
 	if (gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
+#if UNUSED
 		setVideoMode(GRAPHICS_MODE, 0);
+#else
+		setVideoMode(GRAPHICS_MODE);
+#endif
 	}
 	
 	// Clear command line boot arguments
@@ -862,7 +886,7 @@ int GUI_getBootOptions(bool firstRun)
 					}
 					else if (strcmp(booterCommand, "rd") == 0)
 					{
-						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) == 0)
+						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 							showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
 					} 
 					else if (strcmp(booterCommand, "norescan") == 0)
@@ -904,7 +928,11 @@ int GUI_getBootOptions(bool firstRun)
 				
 			case kF10Key:
 				gScanSingleDrive = false;
-				scanDisks(gBIOSDev, &bvCount);
+#if UNUSED
+                scanDisks(gBIOSDev, &bvCount);
+#else
+                scanDisks();
+#endif
 				gBootVolume = NULL;
 				clearBootArgs();
 				break;
@@ -917,8 +945,11 @@ int GUI_getBootOptions(bool firstRun)
 				{
 					if (bootArgs->Video.v_display == GRAPHICS_MODE)
 					{
+#if UNUSED
 						setVideoMode(VGA_TEXT_MODE, 0);
-						
+#else
+						setVideoMode(VGA_TEXT_MODE);
+#endif					
 						setCursorPosition(0, 0, 0);
 						clearScreenRows(0, kScreenLastRow);
 						
@@ -946,7 +977,11 @@ int GUI_getBootOptions(bool firstRun)
 					else 
 					{
 						gui.redraw = true;
+#if UNUSED
 						setVideoMode(GRAPHICS_MODE, 0);
+#else
+						setVideoMode(GRAPHICS_MODE);
+#endif
 						updateVRAM();
 					}
 				}

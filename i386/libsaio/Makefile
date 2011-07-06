@@ -16,7 +16,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float   
 
 DEFINES=
 CONFIG = hd
@@ -41,7 +41,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o 
+        convert.o acpi_tools.o smbios.o smp.o
 
 # Options enabled by default:
 #CFLAGS += -DNO_WIN_SUPPORT # -7200 bytes
@@ -92,6 +92,13 @@ all embedtheme: $(DIRS_NEEDED) libsaio.h $(LIBS)
 #	ar q $(SYMROOT)/$@ $(SAIO_OBJS)
 #	ranlib $(SYMROOT)/$@
 
+fake_efi.o: vers.h
+vers.h:
+	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
+	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
+	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
+	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
+	
 libsaio.a: $(SAIO_EXTERN_OBJS) $(SAIO_OBJS)
 	rm -f $(SYMROOT)/$(@F)
 	ar q $(SYMROOT)/$(@F) $^

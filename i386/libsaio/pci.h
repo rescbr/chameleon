@@ -43,6 +43,12 @@ typedef struct pci_dt_t {
 	struct pci_dt_t	*next;
 } pci_dt_t;
 
+struct pciList
+{
+	pci_dt_t* pciDev;
+	struct pciList* next;
+};
+
 #define PCIADDR(bus, dev, func)	(1 << 31) | (bus << 16) | (dev << 11) | (func << 8)
 #define PCI_ADDR_REG		0xcf8
 #define PCI_DATA_REG		0xcfc
@@ -772,6 +778,7 @@ struct pci_rom_bios_t {
 #define PCI_CLASS_STORAGE_RAID		0x0104
 #define PCI_CLASS_STORAGE_ATA		0x0105
 #define PCI_CLASS_STORAGE_SATA		0x0106
+#define PCI_CLASS_STORAGE_SATA_AHCI 0x010601
 #define PCI_CLASS_STORAGE_SAS		0x0107
 #define PCI_CLASS_STORAGE_OTHER		0x0180
 
@@ -805,7 +812,7 @@ struct pci_rom_bios_t {
 #define PCI_CLASS_BRIDGE_HOST		0x0600
 #define PCI_CLASS_BRIDGE_ISA		0x0601
 #define PCI_CLASS_BRIDGE_EISA		0x0602
-#define PCI_CLASS_BRIDGE_MC		0x0603
+#define PCI_CLASS_BRIDGE_MC			0x0603
 #define PCI_CLASS_BRIDGE_PCI		0x0604
 #define PCI_CLASS_BRIDGE_PCMCIA		0x0605
 #define PCI_CLASS_BRIDGE_NUBUS		0x0606
@@ -828,6 +835,7 @@ struct pci_rom_bios_t {
 #define PCI_CLASS_SYSTEM_TIMER		0x0802
 #define PCI_CLASS_SYSTEM_RTC		0x0803
 #define PCI_CLASS_SYSTEM_PCI_HOTPLUG	0x0804
+#define PCI_CLASS_SYSTEM_SDHCI          0x0805
 #define PCI_CLASS_SYSTEM_OTHER			0x0880
 
 #define PCI_BASE_CLASS_INPUT			0x09
@@ -856,6 +864,10 @@ struct pci_rom_bios_t {
 #define PCI_CLASS_SERIAL_ACCESS			0x0c01
 #define PCI_CLASS_SERIAL_SSA			0x0c02
 #define PCI_CLASS_SERIAL_USB			0x0c03
+#define PCI_CLASS_SERIAL_USB_UHCI       0x0c0300
+#define PCI_CLASS_SERIAL_USB_OHCI       0x0c0310
+#define PCI_CLASS_SERIAL_USB_EHCI       0x0c0320
+#define PCI_CLASS_SERIAL_USB_XHCI       0x0c0330
 #define PCI_CLASS_SERIAL_FIBER			0x0c04
 #define PCI_CLASS_SERIAL_SMBUS			0x0c05
 #define PCI_CLASS_SERIAL_INFINIBAND		0x0c06
@@ -864,6 +876,7 @@ struct pci_rom_bios_t {
 #define PCI_CLASS_WIRELESS_IRDA			0x0d00
 #define PCI_CLASS_WIRELESS_CONSUMER_IR	0x0d01
 #define PCI_CLASS_WIRELESS_RF			0x0d10
+#define PCI_CLASS_WIRELESS_WHCI         0x0d1010
 #define PCI_CLASS_WIRELESS_OTHER		0x0d80
 
 #define PCI_BASE_CLASS_INTELLIGENT		0x0e
@@ -891,7 +904,7 @@ struct pci_rom_bios_t {
 /* Several ID's we need in the library */
 
 #define PCI_VENDOR_ID_APPLE				0x106b
-#define PCI_VENDOR_ID_AMD				0x1002
+#define PCI_VENDOR_ID_AMD				0x1022 
 #define PCI_VENDOR_ID_ATI				0x1002
 #define PCI_VENDOR_ID_INTEL				0x8086
 #define PCI_VENDOR_ID_NVIDIA			0x10de

@@ -10,17 +10,14 @@
 
 extern void scan_cpu(PlatformInfo_t *);
 
-#define bit(n)			(1UL << (n))
-#define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
-#define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
-
-#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
-
 #define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199
 #define MSR_IA32_EXT_CONFIG		0x00EE
 #define MSR_FLEX_RATIO			0x194
 #define	MSR_PLATFORM_INFO		0xCE
+#define MSR_TURBO_RATIO_LIMIT	0x1AD
+#define MSR_IA32_BIOS_SIGN_ID   0x08B
+#define MSR_CORE_THREAD_COUNT   0x035
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
 
@@ -57,16 +54,6 @@ static inline void intel_waitforsts(void) {
 	while (rdmsr64(MSR_IA32_PERF_STATUS) & (1 << 21)) { if (!inline_timeout--) break; }
 }
 
-static inline void do_cpuid(uint32_t selector, uint32_t *data)
-{
-	asm volatile ("cpuid"
-				  : "=a" (data[0]),
-				  "=b" (data[1]),
-				  "=c" (data[2]),
-				  "=d" (data[3])
-				  : "a" (selector));
-}
-
 static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *data)
 {
 	asm volatile ("cpuid"
@@ -74,7 +61,9 @@ static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *da
 				  "=b" (data[1]),
 				  "=c" (data[2]),
 				  "=d" (data[3])
-				  : "a" (selector), "c" (selector2));
+				  : "a" (selector), "c" (selector2),
+				  "b" (0),
+				  "d" (0));
 }
 
 // DFE: enable_PIT2 and disable_PIT2 come from older xnu

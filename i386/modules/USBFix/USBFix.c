@@ -6,7 +6,9 @@
 #include "libsaio.h"
 #include "modules.h"
 #include "pci.h"
+#include "bootstruct.h"
 
+#define kEnableUSBMod			"EnableUSBModule"
 extern int usb_loop();
 
 void notify_usb_dev(pci_dt_t *pci_dev);
@@ -25,11 +27,16 @@ void USBFix_start_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg
 	usb_loop();
 }
 
-
 void USBFix_start()
 {
-	register_hook_callback("PCIDevice", &USBFix_pci_hook);
-	register_hook_callback("Kernel Start", &USBFix_start_hook);
+	bool enable = true;
+	getBoolForKey(kEnableUSBMod, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		register_hook_callback("PCIDevice", &USBFix_pci_hook);
+		register_hook_callback("Kernel Start", &USBFix_start_hook);
+	}
+	
 
 }
 

@@ -8,13 +8,17 @@
 #define __LIBSAIO_PLATFORM_H
 
 #include "libsaio.h"
+#include "cpuid.h"
+#include "cpu_data.h"
 
+extern bool platformCPUExtFeature(uint32_t);
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
 
-#define bit(n)			(1UL << (n))
-#define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
+#define bitmask(h,l)		((_Bit(h)|(_Bit(h)-1)) & ~(_Bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
+
+#define quad(hi,lo)         (((uint64_t)(hi)) << 32 | (lo))
 
 
 /* CPUID index into cpuid_raw */
@@ -27,33 +31,10 @@ extern void scan_platform(void);
 #define CPUID_81			6
 #define CPUID_MAX			7
 
-#define CPU_MODEL_YONAH			0x0E
-#define CPU_MODEL_MEROM			0x0F
-#define CPU_MODEL_PENRYN		0x17
-#define CPU_MODEL_NEHALEM		0x1A
-#define CPU_MODEL_ATOM			0x1C
-#define CPU_MODEL_FIELDS		0x1E	/* Lynnfield, Clarksfield, Jasper */
-#define CPU_MODEL_DALES			0x1F	/* Havendale, Auburndale */
-#define CPU_MODEL_DALES_32NM	0x25	/* Clarkdale, Arrandale */
-#define CPU_MODEL_WESTMERE		0x2C	/* Gulftown, Westmere-EP, Westmere-WS */
-#define CPU_MODEL_NEHALEM_EX	0x2E
-#define CPU_MODEL_WESTMERE_EX	0x2F
-
-/* CPU Features */
-// NOTE: Theses are currently mapped to the actual bit in the cpuid value
-#define CPU_FEATURE_MMX			bit(23)		// MMX Instruction Set
-#define CPU_FEATURE_SSE			bit(25)		// SSE Instruction Set
-#define CPU_FEATURE_SSE2		bit(26)		// SSE2 Instruction Set
-#define CPU_FEATURE_SSE3		bit(0)		// SSE3 Instruction Set
-#define CPU_FEATURE_SSE41		bit(19)		// SSE41 Instruction Set
-#define CPU_FEATURE_SSE42		bit(20)		// SSE42 Instruction Set
-#define CPU_FEATURE_EM64T		bit(29)		// 64Bit Support
-#define CPU_FEATURE_HTT			bit(28)		// HyperThreading
-#define CPU_FEATURE_MSR			bit(5)		// MSR Support
-
-// NOTE: Determine correct bit for bellow (28 is already in use)
-#define CPU_FEATURE_MOBILE		bit(1)		// Mobile CPU
-
+/* Additional models supported by Chameleon (NOT SUPPORTED BY THE APPLE'S ORIGINAL KERNEL) */
+#define CPUID_MODEL_BANIAS          0x09
+#define CPUID_MODEL_DOTHAN          0x0D
+#define CPUID_MODEL_ATOM			0x1C
 
 /* SMBIOS Memory Types */ 
 #define SMB_MEM_TYPE_UNDEFINED	0
@@ -111,14 +92,15 @@ typedef struct _RamSlotInfo_t {
 
 typedef struct _PlatformInfo_t {
 	struct CPU {
-		uint32_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
+		uint64_t		Features;		// CPU Features like MMX, SSE2, VT ...
+        uint64_t		ExtFeatures;    // CPU Extended Features like SYSCALL, XD, EM64T, LAHF ...
 		uint32_t		Vendor;			// Vendor
 		uint32_t		Signature;		// Signature
-		uint32_t		Stepping;		// Stepping
-		uint32_t		Model;			// Model
-		uint32_t		ExtModel;		// Extended Model
-		uint32_t		Family;			// Family
-		uint32_t		ExtFamily;		// Extended Family
+		uint8_t         Stepping;		// Stepping
+		uint8_t         Model;			// Model
+		uint8_t         ExtModel;		// Extended Model
+		uint8_t         Family;			// Family
+		uint8_t         ExtFamily;		// Extended Family
 		uint32_t		NoCores;		// No Cores per Package
 		uint32_t		NoThreads;		// Threads per Package
 		uint8_t			MaxCoef;		// Max Multiplier
@@ -129,7 +111,10 @@ typedef struct _PlatformInfo_t {
 		uint64_t		FSBFrequency;		// FSB Frequency Hz
 		uint64_t		CPUFrequency;		// CPU Frequency Hz
 		char			BrandString[48];	// 48 Byte Branding String
-		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
+        uint8_t         Brand; 
+        uint32_t		MicrocodeVersion;   // The microcode version number a.k.a. signature a.k.a. BIOS ID 
+        bool            isMobile;        
+		bool			isServer;			// Unlike isMobile, if this value is set it will disable all kind of detection and enforce "Server" as platform (must be set by user) 
 	} CPU;
 
 	struct RAM {
@@ -151,10 +136,10 @@ typedef struct _PlatformInfo_t {
 		int			MemoryModules;		// number of memory modules installed
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PreferredProfile)
 	uint8_t				*UUID;          // SMBios UUID
-	//char				*Name;			// the Platorm/Product name 
 	uint32_t			hardware_signature;
+	int8_t				sysid[16];
 } PlatformInfo_t;
 
 extern PlatformInfo_t    *Platform;

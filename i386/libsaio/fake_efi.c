@@ -20,7 +20,18 @@
 #include "pci.h"
 #include "sl.h"
 #include "modules.h"
+#include "vers.h"
+#include "smp.h"
 
+#ifndef DEBUG_EFI
+#define DEBUG_EFI 0
+#endif
+
+#if DEBUG_EFI
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
 /*
  * Modern Darwin kernels require some amount of EFI because Apple machines all
  * have EFI.  Modifying the kernel source to not require EFI is of course
@@ -73,8 +84,11 @@ static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'J','a','r','o','d','_','1','.','2', 0};
-static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a;
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0}; 
+
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','t','.','H','o','o','d', 0}; //a.k.a Galak.
+
+static EFI_UINT32 const FIRMWARE_REVISION = 0x00010400; //1.4
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
 /* Default platform system_id (fix by IntVar) */
@@ -90,51 +104,178 @@ EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
+/* From Foundation/Efi/Guid/Smbios/SmBios.h */
+/* Modified to wrap Data4 array init with {} */
+#define EFI_SMBIOS_TABLE_GUID {0xeb9d2d31, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
+
+#define EFI_ACPI_TABLE_GUID \
+{ \
+0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+}
+
+#define EFI_ACPI_20_TABLE_GUID \
+{ \
+0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
+}
+
+#define EFI_MPS_TABLE_GUID \
+{ \
+0xeb9d2d2f,0x2d88,0x11d3,{0x9a,0x16,0x0,0x90,0x27,0x3f,0xc1,0x4d} \
+}
+/* From Foundation/Efi/Guid/Smbios/SmBios.c */
+EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
+
+EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
+EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
+EFI_GUID gEfiMpsTableGuid = EFI_MPS_TABLE_GUID;
+
+EFI_UINT32                    gNumTables32 = 0;
+EFI_UINT64                    gNumTables64 = 0;
+EFI_CONFIGURATION_TABLE_32 gEfiConfigurationTable32[MAX_CONFIGURATION_TABLE_ENTRIES];
+EFI_CONFIGURATION_TABLE_64 gEfiConfigurationTable64[MAX_CONFIGURATION_TABLE_ENTRIES];
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
 	
+    if (pGuid == NULL || table == NULL)
+		return EFI_INVALID_PARAMETER;
+    
 	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
 	if (archCpuType == CPU_TYPE_I386)
 	{
-		i = gST32->NumberOfTableEntries;
+		i = gNumTables32;
 	}
 	else
 	{
-		i = gST64->NumberOfTableEntries;
+		i = (EFI_UINTN)gNumTables64;
 	}
 	
 	// We only do adds, not modifications and deletes like InstallConfigurationTable
-	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
-		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
-	
-	if (pGuid == NULL)
-		return EFI_INVALID_PARAMETER;
-	
-	if (table != NULL)
-	{
-		// FIXME
-		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorGuid = *pGuid;
-		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorTable = (EFI_PTR64)table;
+	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES){
+        
 		
-		//++gST->NumberOfTableEntries;
-		
-		Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
-		
-		// Use the pointer to the GUID we just stuffed into the system table
-		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
-		
-		// The "table" property is the 32-bit (in our implementation) physical address of the table
-		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
-		
-		// Assume the alias pointer is a global or static piece of data
-		if (alias != NULL)
-			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
-		
-		return EFI_SUCCESS;
+        printf("Ran out of space for configuration tables (max = %d). Please, increase the reserved size in the code.\n", (int)MAX_CONFIGURATION_TABLE_ENTRIES);
+        return EFI_ABORTED;
+    }
+    
+    
+    
+    if (archCpuType == CPU_TYPE_I386)
+	{       
+        
+        gEfiConfigurationTable32[i].VendorGuid = *pGuid;
+        gEfiConfigurationTable32[i].VendorTable = (EFI_PTR32)table;
+        
+		gNumTables32++;
 	}
-	return EFI_UNSUPPORTED;
+	else
+	{        
+        gEfiConfigurationTable64[i].VendorGuid = *pGuid;
+        gEfiConfigurationTable64[i].VendorTable = (EFI_PTR32)table;
+		gNumTables64++ ;
+	}    
+    
+    
+    Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
+    
+    // Use the pointer to the GUID we just stuffed into the system table
+    DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
+    
+    // The "table" property is the 32-bit (in our implementation) physical address of the table
+    DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
+    
+    // Assume the alias pointer is a global or static piece of data
+    if (alias != NULL)
+        DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
+    
+    return EFI_SUCCESS;
+	
+}
+
+static VOID EFI_ST_FIX_CRC32(void)
+{
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		gST32->Hdr.CRC32 = 0;
+		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
+	}
+	else
+	{
+		gST64->Hdr.CRC32 = 0;
+		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
+	}
+}
+
+void finalizeEFIConfigTable(void ) {
+    
+    if (archCpuType == CPU_TYPE_I386)
+	{
+		EFI_SYSTEM_TABLE_32 *efiSystemTable = gST32;        
+        
+        efiSystemTable->NumberOfTableEntries = gNumTables32; 
+        efiSystemTable->ConfigurationTable = (EFI_PTR32)gEfiConfigurationTable32;
+        
+	}
+	else
+	{
+		EFI_SYSTEM_TABLE_64 *efiSystemTable = gST64;        
+        
+        efiSystemTable->NumberOfTableEntries = gNumTables64; 
+        efiSystemTable->ConfigurationTable = ptov64((EFI_PTR32)gEfiConfigurationTable64);
+        
+        
+	}
+    EFI_ST_FIX_CRC32();
+    
+#if DEBUG_EFI
+    EFI_UINTN i;
+    EFI_UINTN num = 0;
+    uint32_t table ;
+    EFI_GUID Guid;
+    
+    if (archCpuType == CPU_TYPE_I386)
+	{
+		num = gST32->NumberOfTableEntries;        
+        
+	}
+	else
+	{
+		num = (EFI_UINTN)gST64->NumberOfTableEntries;        
+        
+	}
+     msglog("EFI Configuration table :\n");
+    for (i=0; i<num; i++) {
+        if (archCpuType == CPU_TYPE_I386)
+        {
+            table = gEfiConfigurationTable32[i].VendorTable;
+            Guid =  gEfiConfigurationTable32[i].VendorGuid;
+            
+        }
+        else
+        {
+            table = gEfiConfigurationTable64[i].VendorTable;
+            Guid =  gEfiConfigurationTable64[i].VendorGuid;
+            
+        }
+        char id[4];
+        
+        if (memcmp(&Guid, &gEfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0) {
+            sprintf(id, "%s", "_SM_");
+        } else if (memcmp(&Guid, &gEfiAcpiTableGuid, sizeof(EFI_GUID)) == 0) {
+            sprintf(id, "%s", "RSD1");
+        } else if (memcmp(&Guid, &gEfiAcpi20TableGuid, sizeof(EFI_GUID)) == 0) {
+            sprintf(id, "%s", "RSD2");
+        } else if (memcmp(&Guid, &gEfiMpsTableGuid, sizeof(EFI_GUID)) == 0) {
+            sprintf(id, "%s", "_MP_");
+        } 
+       
+        msglog("table [%d]:%s , 32Bit addr : 0x%x\n",i,id,table);
+        
+    }
+    msglog("\n");
+#endif
+    
 }
 
 /*
@@ -275,449 +416,54 @@ static const char const CPU_Frequency_prop[] = "CPUFrequency";
  * SMBIOS
  */
 
-/* From Foundation/Efi/Guid/Smbios/SmBios.h */
-/* Modified to wrap Data4 array init with {} */
-#define EFI_SMBIOS_TABLE_GUID {0xeb9d2d31, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-
-/* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
-
-#define SMBIOS_RANGE_START		0x000F0000
-#define SMBIOS_RANGE_END		0x000FFFFF
-
-/* '_SM_' in little endian: */
-#define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
-
-#ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
-#endif
-
-#if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
-#else
-#define DBG(x...)
-#endif
-
 uint64_t smbios_p;
-
-// getting smbios addr with fast compare ops, late checksum testing ...
-#define COMPARE_DWORD(a,b) ( *((u_int32_t *) a) == *((u_int32_t *) b) )
-static const char * const SMTAG = "_SM_";
-static const char* const DMITAG= "_DMI_";
-
-static struct SMBEntryPoint *getAddressOfSmbiosTable(void)
-{
-	struct SMBEntryPoint	*smbios;
-	/* 
-	 * The logic is to start at 0xf0000 and end at 0xfffff iterating 16 bytes at a time looking
-	 * for the SMBIOS entry-point structure anchor (literal ASCII "_SM_").
-	 */
-	smbios = (struct SMBEntryPoint*) SMBIOS_RANGE_START;
-	while (smbios <= (struct SMBEntryPoint *)SMBIOS_RANGE_END) {
-		if (COMPARE_DWORD(smbios->anchor, SMTAG)  && 
-			COMPARE_DWORD(smbios->dmi.anchor, DMITAG) &&
-			smbios->dmi.anchor[4]==DMITAG[4] &&
-			checksum8(smbios, sizeof(struct SMBEntryPoint)) == 0)
-	    {			
-			return smbios;
-	    }
-		smbios = (struct SMBEntryPoint*) ( ((char*) smbios) + 16 );
-	}
-	printf("Error: Could not find original SMBIOS !!\n");
-	pause();
-	return NULL;
-}
-
-static struct SMBEntryPoint *orig = NULL; // cached
-
-struct SMBEntryPoint *getSmbiosOriginal()
-{    	
-    if (orig == NULL) {
-		orig = getAddressOfSmbiosTable();		
-		
-		if (orig) {
-			verbose("Found System Management BIOS (SMBIOS) table\n");			
-		}
-        
-    }
-    return orig;    
-}
-
-
-#define theUUID 0
-#define thePlatformName 1
-
-/* get UUID or product Name from original SMBIOS, stripped version of kabyl's readSMBIOSInfo */
-void local_readSMBIOS(int value)
-{			
-	
-	SMBEntryPoint *eps = getSmbiosOriginal();
-	if (eps == NULL) return;
-	
-	uint8_t *structPtr = (uint8_t *)eps->dmi.tableAddress;
-	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
-	
-	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
-	{
-		switch (structHeader->type)
-		{				
-			case 1: //kSMBTypeSystemInformation
-			{
-				switch (value) {
-					case theUUID:
-						Platform->UUID = ((SMBSystemInformation *)structHeader)->uuid;
-						break;
-					case thePlatformName:
-					{
-						uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
-						uint8_t field = ((SMBSystemInformation *)structHeader)->productName;
-						
-						if (!field)
-							return;
-						
-						for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
-							 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
-						
-						DBG("original SMBIOS Product name: %s\n",(char *)stringPtr);
-						gPlatformName = (char *)stringPtr;
-						break;
-					}
-					default:
-						break;
-				}
-								
-				return;
-				
-				break;	
-			}				
-				
-		}
-		
-		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
-		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
-		
-		if (((uint16_t *)structPtr)[0] == 0)
-			structPtr += 2;
-		
-		structHeader = (SMBStructHeader *)structPtr;
-	}	
-}
 
 /*==========================================================================
  * ACPI 
  */
 
-#define EFI_ACPI_TABLE_GUID \
-  { \
-	0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-
-#define EFI_ACPI_20_TABLE_GUID \
-  { \
-	0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-  }
-
-EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
-EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
-
-uint64_t acpi10_p;
-uint64_t acpi20_p;
-
-static uint64_t local_acpi10_p;
-static uint64_t local_acpi20_p;
-
-#define tableSign(table, sgn) (table[0]==sgn[0] && table[1]==sgn[1] && table[2]==sgn[2] && table[3]==sgn[3])
-
-static struct acpi_common_header * get_ACPI_TABLE(const char * table);
-static struct acpi_2_fadt *gFADT = 0;
-
-#define EFI_MPS_TABLE_GUID \
-{ \
-0xeb9d2d2f,0x2d88,0x11d3,{0x9a,0x16,0x0,0x90,0x27,0x3f,0xc1,0x4d} \
-}
-EFI_GUID gEfiMpsTableGuid = EFI_MPS_TABLE_GUID;
-
-#define MP_SIGL 0x5f504d5f
-#define MP_SIGSTR "_MP_"
-struct mp_t {
-	uint8_t sig[4];
-	uint32_t config_ptr;
-	uint8_t len;
-	uint8_t ver;
-	uint8_t checksum;
-	uint8_t f1;
-	uint8_t f2;
-	uint8_t fr[3];
-}__attribute__((packed)) mp_t;
-
-/*
- * THIS FILE USE SOME CODE FROM smp-imps
- *
- *  <Insert copyright here : it must be BSD-like so anyone can use it>
- *
- *  Author:  Erich Boleyn  <erich@uruk.org>   http://www.uruk.org/~erich/
- *
- *  Source file implementing Intel MultiProcessor Specification (MPS)
- *  version 1.1 and 1.4 SMP hardware control for Intel Architecture CPUs,
- *  with hooks for running correctly on a standard PC without the hardware.
- *
- *  This file was created from information in the Intel MPS version 1.4
- *  document, order number 242016-004, which can be ordered from the
- *  Intel literature center.
- *
- *  General limitations of this code:
- *
- *   (1) : This code has never been tested on an MPS-compatible system with
- *           486 CPUs, but is expected to work.
- *   (2) : Presumes "int", "long", and "unsigned" are 32 bits in size, and
- *	     that 32-bit pointers and memory addressing is used uniformly.
- */
-
-/*
- *  MP Configuration Table Header  (cth)
- *
- *  Look at page 4-5 of the MP spec for the starting definitions of
- *  this structure.
- */
-struct imps_cth
-{
-	unsigned sig;
-	unsigned short base_length;
-	unsigned char spec_rev;
-	unsigned char checksum;
-	char oem_id[8];
-	char prod_id[12];
-	unsigned oem_table_ptr;
-	unsigned short oem_table_size;
-	unsigned short entry_count;
-	unsigned lapic_addr;
-	unsigned short extended_length;
-	unsigned char extended_checksum;
-	char reserved[1];
-};
-
-static inline void
-cmos_write_byte (int loc, int val)
-{
-	outb (0x70, loc);
-	outb (0x71, val);
-}
-
-static inline unsigned
-cmos_read_byte (int loc)
-{
-	outb (0x70, loc);
-	return inb (0x71);
-}
-
-#define LAPIC_ID				0x20
-
-static int lapic_dummy = 0;
-unsigned imps_lapic_addr = ((unsigned)(&lapic_dummy)) - LAPIC_ID;
-
-#include "smp.h"
-
-#define CMOS_WRITE_BYTE(x, y)	cmos_write_byte(x, y)
-#define CMOS_READ_BYTE(x)	cmos_read_byte(x)
-
-/*
- *  Defines that are here so as not to be in the global header file.
- */
-#define EBDA_SEG_ADDR			0x40E
-#define EBDA_SEG_LEN			0x400
-#define BIOS_RESET_VECTOR		0x467
-#define LAPIC_ADDR_DEFAULT		0xFEE00000uL
-#define IOAPIC_ADDR_DEFAULT		0xFEC00000uL
-#define CMOS_RESET_CODE			0xF
-#define		CMOS_RESET_JUMP		0xa
-#define CMOS_BASE_MEMORY		0x15
-
-static struct mp_t *
-biosacpi_search_mp(char *base, int length);
-
-struct mp_t* getAddressOfMPSTable()
-{
-	struct mp_t *mp;
-    uint16_t		*addr;
-	
-    /* EBDA is the 1 KB addressed by the 16 bit pointer at 0x40E. */
-    addr = (uint16_t *)ptov(EBDA_SEG_ADDR);
-    if ((mp = biosacpi_search_mp((char *)(*addr << 4), EBDA_SEG_LEN)) != NULL)
-		return (mp);
-	
-	unsigned mem_lower = ((CMOS_READ_BYTE(CMOS_BASE_MEMORY+1) << 8)
-						  | CMOS_READ_BYTE(CMOS_BASE_MEMORY))       << 10;
-	
-	if ((mp = biosacpi_search_mp((char *)mem_lower, EBDA_SEG_LEN)) != NULL)
-		return (mp);
-	
-    if ((mp = biosacpi_search_mp((char *)0x00F0000, ACPI_RANGE_END)) != NULL)
-		return (mp);
-	
-    return (NULL);
-	    
-}
-
-static struct mp_t *
-biosacpi_search_mp(char *base, int length)
-{
-	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
-	struct mp_t *mp;
-    int			ofs;
-	
-    /* search on 16-byte boundaries */
-    for (ofs = 0; ofs < length; ofs += 16) {
-		
-			mp = (struct mp_t*)ptov(base + ofs);
-			
-			/* compare signature, validate checksum */
-			if (!strncmp((char*)mp->sig, MP_SIGSTR, strlen(MP_SIGSTR))) {
-				uint8_t csum = checksum8(mp, sizeof(struct mp_t));
-				if(csum == 0) { 
-					return mp;
-				}
-				
-			}				
-	}	
-    return NULL;
-}
-
-#define ACPI_SIG_RSDP           "RSD PTR "      /* Root System Description Pointer */
-#define RSDP_CHECKSUM_LENGTH 20
-
-/*-
- *	FOR biosacpi_search_rsdp AND biosacpi_find_rsdp
- *
- * Copyright (c) 2001 Michael Smith <msmith@freebsd.org>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * $FreeBSD: src/sys/boot/i386/libi386/biosacpi.c,v 1.7 2003/08/25 23:28:31 obrien Exp $
- * $DragonFly: src/sys/boot/pc32/libi386/biosacpi.c,v 1.5 2007/01/17 17:31:19 y0netan1 Exp $
- */
-
-static struct acpi_2_rsdp *
-biosacpi_search_rsdp(char *base, int length, int rev);
-
-/*
- * Find the RSDP in low memory.  See section 5.2.2 of the ACPI spec.
- */
-static struct acpi_2_rsdp *
-biosacpi_find_rsdp(int rev)
-{
-    struct acpi_2_rsdp *rsdp;
-    uint16_t		*addr;
-	
-    /* EBDA is the 1 KB addressed by the 16 bit pointer at 0x40E. */
-    addr = (uint16_t *)ptov(EBDA_SEG_ADDR);
-    if ((rsdp = biosacpi_search_rsdp((char *)(*addr << 4), EBDA_SEG_LEN, rev)) != NULL)
-		return (rsdp);
-	
-	unsigned mem_lower = ((CMOS_READ_BYTE(CMOS_BASE_MEMORY+1) << 8)
-						  | CMOS_READ_BYTE(CMOS_BASE_MEMORY))       << 10;
-	
-	if ((rsdp = biosacpi_search_rsdp((char *)mem_lower, EBDA_SEG_LEN, rev)) != NULL)
-		return (rsdp);
-	
-	
-    /* Check the upper memory BIOS space, 0xe0000 - 0xfffff. */
-    if ((rsdp = biosacpi_search_rsdp((char *)0xe0000, 0x20000, rev)) != NULL)
-		return (rsdp);
-	
-    return (NULL);
-}
-
-static struct acpi_2_rsdp *
-biosacpi_search_rsdp(char *base, int length, int rev)
-{
-    struct acpi_2_rsdp *rsdp;
-    int			ofs;
-	
-    /* search on 16-byte boundaries */
-    for (ofs = 0; ofs < length; ofs += 16) {
-		rsdp = (struct acpi_2_rsdp*)ptov(base + ofs);
-		
-		/* compare signature, validate checksum */
-		if (!strncmp(rsdp->Signature, ACPI_SIG_RSDP, strlen(ACPI_SIG_RSDP))) {
-			
-			uint8_t csum = checksum8(rsdp, RSDP_CHECKSUM_LENGTH);
-            if(csum == 0)
-            {
-				/* Only assume this is a 2.0 or better table if the revision is greater than 0
-				 * NOTE: ACPI 3.0 spec only seems to say that 1.0 tables have revision 1
-				 * and that the current revision is 2.. I am going to assume that rev > 0 is 2.0.
-				 */
-				
-				if((rsdp->Revision > 0) && rev > 0)
-				{					
-					uint8_t csum2 = checksum8(rsdp, sizeof(struct acpi_2_rsdp));
-					if(csum2 == 0)
-						return(rsdp);
-				}
-				
-                // Only return the table if it is a true version 1.0 table (Revision 0)
-                if((rsdp->Revision == 0) && rev == 0)
-                    return(rsdp);
-            }
-			
-		}
-    }
-    return(NULL);
-}
+static uint64_t local_rsd_p;
+static ACPI_TABLES acpi_tables;
 
 /* Setup ACPI without any patch. */
-static int setupAcpiNoMod()
-{		
-	int ret = 0;
-	if(local_acpi20_p) {
-		addConfigurationTable(&gEfiAcpi20TableGuid, &local_acpi20_p, "ACPI_20");
-		ret = 1;
-	} else if (local_acpi10_p) {
-		addConfigurationTable(&gEfiAcpiTableGuid, &local_acpi10_p, "ACPI");
-		ret = 1;
-	}
+static EFI_STATUS setupAcpiNoMod()
+{	
+    	
+	EFI_STATUS ret = EFI_UNSUPPORTED;
 	
+    ACPI_TABLE_RSDP* rsdp = (ACPI_TABLE_RSDP*)((uint32_t)local_rsd_p);
+    if(rsdp->Revision > 0 && checksum8(rsdp, sizeof(ACPI_TABLE_RSDP))) {
+		ret = addConfigurationTable(&gEfiAcpi20TableGuid, &local_rsd_p, "ACPI_20");		 
+	} else {
+		ret = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");		
+	}
 	
 	return ret;
 }
 
-int setup_acpi (void)
+static EFI_STATUS setup_acpi (void)
 {	
-	int ret = 0;
-	
-	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
-	acpi10_p = local_acpi10_p = (uint32_t)biosacpi_find_rsdp(0);
-	acpi20_p = local_acpi20_p = (uint32_t)biosacpi_find_rsdp(2);
+	EFI_STATUS ret = EFI_UNSUPPORTED;	
 	
 	execute_hook("setupEfiConfigurationTable", &ret, NULL, NULL, NULL, NULL, NULL);
 	
-	if (!ret) {
-		gFADT = (struct acpi_2_fadt *)get_ACPI_TABLE("FACP");
-		uint8_t type = gFADT->PM_Profile;
-		if (type <= MaxSupportedPMProfile) {
-			Platform->Type = type;
-		}
-		ret = setupAcpiNoMod();			
+	if (ret != EFI_SUCCESS) {            
+          
+        
+        if (!FindAcpiTables(&acpi_tables)){
+			printf("Failed to detect ACPI tables.\n");
+			return EFI_NOT_FOUND;
+        }
+        
+        local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+
+        ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
+                    
+        uint8_t type = FacpPointer->PreferredProfile;
+        if (type <= MaxSupportedPMProfile) 
+            Platform->Type = type;
+            
+        ret = setupAcpiNoMod();
 	}
 	
 	return ret;	
@@ -732,6 +478,8 @@ int setup_acpi (void)
 static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
+static const char const FIRMWARE_NAME_PROP[] = "firmware-name";
+static const char const FIRMWARE_DATE_PROP[] = "firmware-date";
 static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char const SYSTEM_ID_PROP[] = "system-id";
@@ -747,7 +495,7 @@ static const char const MODEL_PROP[] = "Model";
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
 	if (!gPlatformName && strcmp(key, "SMproductname") == 0)
-		local_readSMBIOS(thePlatformName);
+		readSMBIOS(thePlatformName);
 	
 	const char	*src = (strcmp(key, "SMproductname") == 0) ? gPlatformName : getStringForKey(key, &bootInfo->smbiosConfig);
 	
@@ -768,14 +516,22 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
  * Get the SystemID from the bios dmi info
  */
 
-static	EFI_CHAR8* getSmbiosUUID()
+static EFI_CHAR8* getSmbiosUUID()
 {
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
 	SMBByte					*p;		
 	
-	local_readSMBIOS(theUUID);		
-	p = (SMBByte*)Platform->UUID;
+    p = (SMBByte*)Platform->UUID;
+    
+    if ( p == NULL ) {
+        DBG("No patched UUID found, fallback to original UUID (if exist) \n");
+    
+        readSMBIOS(theUUID);		
+        p = (SMBByte*)Platform->UUID;
+        
+    }
+    
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
 	{
 		if (p[i] != 0x00) isZero = 0;
@@ -787,7 +543,7 @@ static	EFI_CHAR8* getSmbiosUUID()
 		verbose("No UUID present in SMBIOS System Information Table\n");
 		return 0;
 	} 
-#if DEBUG_SMBIOS
+#if DEBUG_EFI
 	else
 		verbose("Found UUID in SMBIOS System Information Table\n");
 #endif
@@ -801,11 +557,12 @@ static	EFI_CHAR8* getSmbiosUUID()
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 
-static EFI_CHAR8* getSystemID()
+static EFI_STATUS getSystemID()
 {
 	// unable to determine UUID for host. Error: 35 fix
 	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
 	// belong to smbios config only ...
+	EFI_STATUS status = EFI_NOT_FOUND;
 	EFI_CHAR8*	ret = getUUIDFromString(getStringForKey(kSystemID, &bootInfo->bootConfig));
 	
 	if (!ret) // try bios dmi info UUID extraction	
@@ -825,10 +582,12 @@ static EFI_CHAR8* getSystemID()
 		
 	}
 	
-	if (ret) 
-	memcpy(bootInfo->sysid, ret, UUID_LEN);
+	if (ret) {
+		memcpy(Platform->sysid, ret, UUID_LEN);
+		status = EFI_SUCCESS;
+	}
 	
-	return ret;
+	return status;
 }
 
 /*
@@ -836,7 +595,7 @@ static EFI_CHAR8* getSystemID()
  * facp content to reflect in ioregs
  */
 
-void setupSystemType()
+static VOID setupSystemType()
 {
 	Node *node = DT__FindNode("/", false);
 	if (node == 0) stop("Couldn't get root node");
@@ -854,38 +613,52 @@ struct boot_progress_element {
 };
 typedef struct boot_progress_element boot_progress_element;
 
-void setupEfiDeviceTree(void)
+static VOID setupEfiDeviceTree(void)
 {
 	EFI_CHAR16*	 serial = 0, *productname = 0;
 	size_t		 len = 0;
 	Node		*node;
+	long           size;
 	extern char gMacOSVersion[];
 	node = DT__FindNode("/", false);
 	
 	if (node == 0) stop("Couldn't get root node");
 	
 #include "appleClut8.h"
-	long clut = AllocateKernelMemory(sizeof(appleClut8));
-	bcopy(&appleClut8, (void*)clut, sizeof(appleClut8));
-	AllocateMemoryRange( "BootCLUT", clut, sizeof(appleClut8),-1);
-	
-#include "failedboot.h"
-	
-	long bootPict = AllocateKernelMemory(sizeof(boot_progress_element));
+	size = sizeof(appleClut8);
+	long clut = AllocateKernelMemory(size);
+	bcopy(&appleClut8, (void*)clut, size);
+#if UNUSED
+    AllocateMemoryRange( "BootCLUT", clut, size,-1);
+
+#else
+    AllocateMemoryRange( "BootCLUT", clut, size);
+
+#endif
+#include "failedboot.h"	
+	size = 32 + kFailedBootWidth * kFailedBootHeight;
+	long bootPict = AllocateKernelMemory(size);
+#if UNUSED
+    AllocateMemoryRange( "Pict-FailedBoot", bootPict, size,-1);    
+#else
+    AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
+#endif
 	((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
     ((boot_progress_element *)bootPict)->height = kFailedBootHeight;
-    ((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;
+    ((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
+	bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
 	
-	long bootFail = AllocateKernelMemory(sizeof(gFailedBootPict));
-	bcopy(&gFailedBootPict, (void*)bootFail, sizeof(gFailedBootPict));
-    ((boot_progress_element *)bootPict)->data[0]   = (uint8_t)bootFail;// ?? please verify
-	
-	AllocateMemoryRange( "Pict-FailedBoot", bootPict, sizeof(boot_progress_element),-1);
-	
-	//Fix error message with Lion DP2+ installer
-	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);	
-	if (boardid)	
-		DT__AddProperty(node, "board-id", strlen(boardid)+1, (char*)boardid);
+	//Fix error message with Lion DP2+ installer	
+	if (execute_hook("getboardproductPatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS) {
+		
+		gboardproduct = (char *)getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+		
+		if (!gboardproduct) readSMBIOS(theProducBoard);
+		
+	}
+	if (gboardproduct) {
+		DT__AddProperty(node, "board-id", strlen(gboardproduct)+1, gboardproduct);
+	}
 	
 	
 	Node *chosenNode = DT__FindNode("/chosen", true);
@@ -920,14 +693,14 @@ void setupEfiDeviceTree(void)
 	// We could also just do DT__FindNode("/efi/platform", true)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
-	node = DT__AddChild(node, "efi");
+	Node *efiNode  = DT__AddChild(node, "efi");
 	// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
 	// is set up.  That is, name and table properties
-	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
+	Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");
 	
-	Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that
+	Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
 	if (gMacOSVersion[3] == '7'){
-		kernelCompatibilityNode = DT__AddChild(node, "kernel-compatibility");	
+		kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
 		DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
 	}
 	
@@ -939,7 +712,7 @@ void setupEfiDeviceTree(void)
 		// the only thing to use a non-malloc'd pointer for something in the DT
 		
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
 	}
 	else
 	{
@@ -947,17 +720,19 @@ void setupEfiDeviceTree(void)
 			DT__AddProperty(kernelCompatibilityNode, "x86_64", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
 		
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
+		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
 	}
-	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
-	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
+	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
+	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
+	DT__AddProperty(efiNode, FIRMWARE_NAME_PROP, sizeof(FIRMWARE_NAME), (EFI_CHAR16*)FIRMWARE_NAME);
+	DT__AddProperty(efiNode, FIRMWARE_DATE_PROP, strlen(I386BOOT_BUILDDATE)+1, I386BOOT_BUILDDATE);
 	
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
-	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
+	gEfiConfigurationTableNode = DT__AddChild(efiNode, "configuration-table");
 	
 	// Now fill in the /efi/platform Node
-	Node *efiPlatformNode = DT__AddChild(node, "platform");
+	Node *efiPlatformNode = DT__AddChild(efiNode, "platform");
 	
 	DT__AddProperty(efiPlatformNode, "DevicePathsSupported", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
 	
@@ -980,8 +755,8 @@ void setupEfiDeviceTree(void)
 	
 	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
 	
-	if (getSystemID())
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) bootInfo->sysid);
+	if (getSystemID() == EFI_SUCCESS)
+		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) Platform->sysid);
 
 	 // Export SystemSerialNumber if present
 	if ((serial=getSmbiosChar16("SMserial", &len)))
@@ -989,20 +764,20 @@ void setupEfiDeviceTree(void)
 	
 	// Export Model if present
 	if ((productname=getSmbiosChar16("SMproductname", &len)))
-		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, productname);
-
-	// Fill /efi/device-properties node.
-	setupDeviceProperties(node);
+		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, productname);	
+	
+	// Fill /efi/device-properties node.			
+	setupDeviceProperties(efiNode);
 }
 
 /*
  * Load the smbios.plist override config file if any
  */
-static bool readSmbConfigFile = true;
 
 void setupSmbiosConfigFile(const char *filename)
 {	
-	
+	static bool readSmbConfigFile = true;
+
 	if (readSmbConfigFile == true) {
 		
 		char		dirSpecSMBIOS[128] = "";
@@ -1020,7 +795,7 @@ void setupSmbiosConfigFile(const char *filename)
 		{
 			// Check selected volume's Extra.
 			sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
-			if (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig))
+			if ((err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig)))
 			{
 				// Check booter volume/rdbt Extra.
 				sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
@@ -1036,109 +811,46 @@ void setupSmbiosConfigFile(const char *filename)
 	}
 }
 
-static void setup_Smbios()
-{	
-	struct SMBEntryPoint *smbios_o = getSmbiosOriginal();	
-	smbios_p = (EFI_PTR32)smbios_o; 
-	if (smbios_o != NULL) {				
-		execute_hook("smbios_helper", (void *)smbios_o, NULL, NULL, NULL, NULL, NULL);
-		if (execute_hook("getSmbiosPatched",(void *)smbios_o, NULL, NULL, NULL, NULL, NULL) == 0)
-			verbose("Using the original SMBIOS !!\n");		
-	}
-	
+static VOID setup_Smbios()
+{			
+	if (execute_hook("getSmbiosPatched",NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS) {
+		DBG("Using the original SMBIOS !!\n");	
+        struct SMBEntryPoint *smbios_o = getSmbiosOriginal();	
+        smbios_p = ((uint64_t)((uint32_t)smbios_o));                 
+	}	
 }
 
-struct acpi_common_header * get_ACPI_TABLE(const char * table)
-{
-	int version;
-	struct acpi_common_header *header = NULL;
-	for (version=0; version<2; version++) {
-		struct acpi_2_rsdp *rsdp=(struct acpi_2_rsdp *)(version?((struct acpi_2_rsdp *)(uint32_t)local_acpi20_p):((struct acpi_2_rsdp *)(uint32_t)local_acpi10_p));
-		if (!rsdp)
-		{
-			DBG("No ACPI version %d found. Ignoring\n", version+1);			
-			continue;
-		}
-		struct acpi_2_rsdt *rsdt=(struct acpi_2_rsdt *)(rsdp->RsdtAddress);
-		if (rsdt && (uint32_t)rsdt !=0xffffffff && rsdt->Length<0x10000)
-		{
-			int i;
-			int rsdt_entries_num=(rsdt->Length-sizeof(struct acpi_2_rsdt))/4;
-			uint32_t *rsdt_entries=(uint32_t *)(rsdt+1);
-			for (i=0;i<rsdt_entries_num;i++)
-			{
-				header=(struct acpi_common_header *)rsdt_entries[i];				
-				if (!header)
-					continue;
-				if (strcmp(header->Signature, table) == 0)
-				{					
-					if ((uint32_t)header == 0xffffffff )
-					{
-						printf("ACPI TABLE (%s) incorrect.\n", table);
-						header = NULL;
-					}					
-					break;				
-				}
-			}
-		}
-		if (version)
-		{
-			struct acpi_2_xsdt *xsdt ;
-			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
-			if (xsdt && (uint64_t)rsdp->XsdtAddress<0xffffffff && xsdt->Length<0x10000)
-			{
-				int i;
-				int xsdt_entries_num=(xsdt->Length-sizeof(struct acpi_2_xsdt))/8;
-				uint64_t *xsdt_entries=(uint64_t *)(xsdt+1);
-				for (i=0;i<xsdt_entries_num;i++)
-				{
-					header=(struct acpi_common_header *)((uint32_t)(xsdt_entries[i]));
-					if (!header)
-						continue;
-					if (strcmp(header->Signature, table))
-					{					
-						header=(struct acpi_common_header *)(uint32_t)xsdt_entries[i];
-						if (!header || (uint64_t)xsdt_entries[i] >= 0xffffffff)
-						{
-							printf("ACPIv2+ TABLE (%s) incorrect.\n", table);
-							header = NULL;
-						}
-						break;
-					}
-				}
-			}
-		}
-	}
-	return header;
-}
-
-static void setup_machine_signature()
+static VOID setup_machine_signature()
 {
 	Node *chosenNode = DT__FindNode("/chosen", false);
 	if (chosenNode) {
 		if (Platform->hardware_signature == 0xFFFFFFFF)
-		{
-			if (!gFADT) 
-				gFADT = (struct acpi_2_fadt *)get_ACPI_TABLE("FACP");
+		{            
+            if (!local_rsd_p)
+            {                          
+          
+                if (!FindAcpiTables(&acpi_tables)){
+					printf("Failed to detect ACPI tables.\n");
+					goto out;
+				}
+                
+                local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+            }
+            ACPI_TABLE_FACS *FacsPointer;
+            
+			if (acpi_tables.RsdRevision > 0 ) 
+				FacsPointer = (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64;
+            else
+                FacsPointer = (ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
 			
-			struct acpi_2_facs * facs = 0;
-			
-			facs = (struct acpi_2_facs *)(uint32_t)gFADT->X_FIRMWARE_CTRL;
-			
-			if (!facs || strcmp(facs->Signature, "FACS") != 0)
-				facs = (struct acpi_2_facs *)gFADT->FIRMWARE_CTRL;
-			
-			if (!facs || strcmp(facs->Signature, "FACS") != 0)
-				Platform->hardware_signature = 0;
-			else
-				Platform->hardware_signature = facs->hardware_signature;			
+            Platform->hardware_signature = FacsPointer->HardwareSignature;	
 			
 		}
-		
+out:
 		// Verify that we have a valid hardware signature
 		if (Platform->hardware_signature == 0xFFFFFFFF) 
 		{
-			printf("warning hardware_signature is invalid");
+			verbose("Warning: hardware_signature is invalid, defaulting to 0 \n");
 			 Platform->hardware_signature = 0;
 		}
 		
@@ -1151,41 +863,37 @@ static void setup_machine_signature()
  * Installs all the needed configuration table entries
  */
 
-static void setupEfiConfigurationTable()
+static VOID setupEfiConfigurationTable()
 {
-	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-	
-	
-	
-	struct mp_t *mps_p = getAddressOfMPSTable() ;
-	uint64_t mps = (uint32_t)mps_p;	
-	
-	if (mps_p->config_ptr) {
+    if (smbios_p)
+        addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 		
-		struct imps_cth *local_cth_ptr
-		= (struct imps_cth *)ptov(mps_p->config_ptr);
-		
-		imps_lapic_addr = local_cth_ptr->lapic_addr;
-		
-	} else {
-		imps_lapic_addr = LAPIC_ADDR_DEFAULT;
+	
+	void *mps_p = getMPSTable();
+    
+    if (mps_p)
+    {
+        uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
+    
+        addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);	
 	}
-	
-	addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);	
-	
 	
 	//Slice
 	// PM_Model
-	if (platformCPUFeature(CPU_FEATURE_MOBILE)) {	
+	if (Platform->CPU.isServer == true)
+    {
+		Platform->Type = Workstation;
+	}
+	else if (Platform->CPU.isMobile == true) {	
 		Platform->Type = Mobile;
 	} else {
 		Platform->Type = Desktop;
 	}
 
-	// Invalid the platform hardware signature (this needs to be verified with acpica, but i guess that 0xFFFFFFFF is an invalid signature)  	
+	// Invalidate the platform hardware signature (this needs to be verified with acpica, but i guess that 0xFFFFFFFF is an invalid signature)  	
 	Platform->hardware_signature = 0xFFFFFFFF; 
 	
-	// Setup ACPI with DSDT overrides (mackerintel's patch)
+	// Setup ACPI (mackerintel's patch)
 	setup_acpi();
 	
 	setup_machine_signature();
@@ -1193,17 +901,8 @@ static void setupEfiConfigurationTable()
 	// because we need to take care of facp original content, if it is correct.
 	setupSystemType();
 	
-	// We've obviously changed the count.. so fix up the CRC32
-	if (archCpuType == CPU_TYPE_I386)
-	{
-		gST32->Hdr.CRC32 = 0;
-		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
-	}
-	else
-	{
-		gST64->Hdr.CRC32 = 0;
-		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
-	}
+	// We've obviously changed the count.. so fix up the CRC32	
+    EFI_ST_FIX_CRC32();
 }
 
 /*
@@ -1212,7 +911,7 @@ static void setupEfiConfigurationTable()
 
 void setupFakeEfi(void)
 {
-	// Generate efi device strings 
+	// Collect PCI info &| Generate device prop string
 	setup_pci_devs(root_pci_dev);
 
 	// load smbios.plist file if any
@@ -1233,6 +932,7 @@ void setupFakeEfi(void)
 	setupEfiDeviceTree();
 	
 	// Add configuration table entries to both the services table and the device tree
-	setupEfiConfigurationTable();
+	setupEfiConfigurationTable();		
+	
 }
 

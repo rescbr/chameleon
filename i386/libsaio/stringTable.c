@@ -581,12 +581,8 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
 int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
-
-	/*if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
-		return -1;
-	}*/
-	
-	if ((fd = open(configFile, 0)) < 0) {
+		
+	if ((fd = open(configFile)) < 0) {
 		return -1;
 	}
 	
@@ -594,9 +590,8 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 	close(fd);
 	
-	// build xml dictionary
-	ParseXMLFile(config->plist, &config->dictionary);
-	return 0;
+	// build xml dictionary	
+	return ParseXMLFile(config->plist, &config->dictionary);
 }
 
 
@@ -612,12 +607,11 @@ int loadSystemConfig(config_file_t *config)
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 	};
+	int i,fd, count, ret=-1;
 
-	int i, fd, count, ret=-1;
-
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
+		if ((fd = open(dirspec[i])) >= 0)
 		{
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
@@ -657,11 +651,11 @@ int loadOverrideConfig(config_file_t *config)
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 	};
 
-	int i, fd, count, ret=-1;
+	int i,fd, count, ret=-1;
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
+		if ((fd = open(dirspec[i])) >= 0)
 		{
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
@@ -704,10 +698,10 @@ int loadHelperConfig(config_file_t *config)
 	// This is a simple rock - paper scissors algo. R beats S, P beats R, S beats P
 	// If all three, S is used for now. This should be change dto something else (say, timestamp?)
 	
-	pfd = open(dirspec[0], 0);
+	pfd = open(dirspec[0]);
 	if(pfd >= 0)	// com.apple.boot.P exists
 	{
-		sfd = open(dirspec[2], 0); // com.apple.boot.S takes precidence if it also exists
+		sfd = open(dirspec[2]); // com.apple.boot.S takes precidence if it also exists
 		if(sfd >= 0)
 		{
 			// Use sfd
@@ -736,10 +730,10 @@ int loadHelperConfig(config_file_t *config)
 	}
 	else
 	{
-		rfd = open(dirspec[1], 0); // com.apple.boot.R exists
+		rfd = open(dirspec[1]); // com.apple.boot.R exists
 		if(rfd >= 0)
 		{
-			pfd = open(dirspec[2], 0); // com.apple.boot.P takes recidence if it exists
+			pfd = open(dirspec[2]); // com.apple.boot.P takes recidence if it exists
 			if(pfd >= 0)
 			{
 				// use sfd
@@ -769,7 +763,7 @@ int loadHelperConfig(config_file_t *config)
 		}
 		else
 		{
-			sfd = open(dirspec[2], 0); // com.apple.boot.S exists, but nothing else does
+			sfd = open(dirspec[2]); // com.apple.boot.S exists, but nothing else does
 			if(sfd >= 0)
 			{
 				// use sfd

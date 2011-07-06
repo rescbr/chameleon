@@ -106,7 +106,7 @@ static int countdown( const char * msg, int row, int timeout )
 	int multi_buff = 18 * (timeout);
     int multi = ++multi_buff;
 	
-    int lasttime=0;
+    unsigned int lasttime=0;
 	
     for ( time = time18(), timeout++; timeout > 0; )
     {
@@ -116,7 +116,7 @@ static int countdown( const char * msg, int row, int timeout )
 			lasttime=time18();
 		}		
 		
-        if (ch = readKeyboardStatus())
+        if ((ch = readKeyboardStatus()))
             break;
 		
         // Count can be interrupted by holding down shift,
@@ -332,7 +332,7 @@ static int updateMenu( int key, void ** paramPtr )
         unsigned int w;
     } draw = {{0}};
 	
-    if ( gMenuItems == NULL )
+	if ( gMenuItems == NULL )
 		return 0;
 	
 	switch ( key )
@@ -349,6 +349,8 @@ static int updateMenu( int key, void ** paramPtr )
 				draw.f.selectionDown = 1;
 			else if ( gMenuBottom < (gMenuItemCount - 1) ) 
 				draw.f.scrollUp = 1;
+			break;
+		default:
 			break;
 	}
 	
@@ -459,7 +461,7 @@ static const char * extractKernelName( char ** cpp )
 void printMemoryInfo(void)
 {
     int line;
-    int i;
+    unsigned long i;
     MemoryRange *mp = bootInfo->memoryMap;
 	
     // Activate and clear page 1
@@ -492,7 +494,7 @@ void printMemoryInfo(void)
 
 char *getMemoryInfoString()
 {
-    int i;
+    unsigned long i;
     MemoryRange *mp = bootInfo->memoryMap;
 	char *buff = malloc(sizeof(char)*1024);
 	if(!buff) return 0;
@@ -539,7 +541,7 @@ int getBootOptions(bool firstRun)
 	int     key;
 	int     nextRow;
 	int     timeout;
-#ifndef OPTION_ROM
+#if UNUSED
 	int     bvCount;
 #endif
 	BVRef   bvr;
@@ -787,7 +789,7 @@ int getBootOptions(bool firstRun)
 					}
 					else if (strcmp(booterCommand, "rd") == 0) 
 					{
-						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) == 0)
+						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 						showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
 					} 
 					else if (strcmp(booterCommand, "norescan") == 0)
@@ -829,7 +831,11 @@ int getBootOptions(bool firstRun)
 				
 			case kF10Key:
 				gScanSingleDrive = false;
-				scanDisks(gBIOSDev, &bvCount);
+#if UNUSED
+                scanDisks(gBIOSDev, &bvCount);
+#else
+                scanDisks();
+#endif
 				gBootVolume = NULL;
 				clearBootArgs();
 				break;
@@ -1105,11 +1111,11 @@ void showHelp(void)
 	
 		// Check Extra on booting partition
 		sprintf(dirspec,"/Extra/%s",filename);
-		fd=open (dirspec,0);
+		fd=open (dirspec);
 		if (fd<0)
 		{	// Fall back to booter partition
 			sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-			fd=open (dirspec,0);
+			fd=open (dirspec);
 			if (fd<0)
 			{
 				printf("BootHelp not found: %s\n", filename);
@@ -1146,7 +1152,7 @@ void showTextFile(const char * filename)
 	int	fd;
 	int	size;
 	
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename)) < 0) {
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;

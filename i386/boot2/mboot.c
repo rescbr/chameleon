@@ -48,13 +48,7 @@ extern unsigned char chainbootflag;
 
 void chainLoad();
 void waitThenReload();
-/*
-int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
-                      unsigned int byteoff,
-                      unsigned int byteCount, void * buffer );
-int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
-static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
-*/
+
 // Starts off in the multiboot context 1 MB high but eventually gets into low memory
 // and winds up with a bootdevice in eax which is all that boot() wants
 // This lets the stack pointer remain very high.
@@ -136,8 +130,6 @@ void waitThenReload()
 // want to call it under any circumstances.
 extern struct {} boot2_sym asm("boot2");
 
-//char *patch_code_start;
-
 // prototype multiboot and keep its implementation below hi_multiboot to
 // ensure that it doesn't get inlined by the compiler
 static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi);
@@ -173,7 +165,7 @@ void *determine_safe_hi_addr(int multiboot_magic, struct multiboot_info *mi_orig
     if(mi_orig->mi_flags & MULTIBOOT_INFO_HAS_MODS)
     {
         struct multiboot_module *modules = (void*)mi_orig->mi_mods_addr;
-        int i;
+        uint32_t i;
         for(i=0; i < mi_orig->mi_mods_count; ++i)
         {
             // make sure the multiboot_module struct itself won't get clobbered
@@ -264,7 +256,7 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
         mi_copy->mi_mods_addr = (uint32_t)dst_modules;
 
         // Copy all of the module info plus the actual module into high memory
-        int i;
+        uint32_t i;
         for(i=0; i < mi_orig->mi_mods_count; ++i)
         {
             // Assume mod_end is 1 past the actual end (i.e. it is start + size, not really end (i.e. start + size - 1))
@@ -295,10 +287,7 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // contains absolute locations to other things which eventually
     // makes a BIOS call from real mode which of course won't work
     // because we're stuck in extended memory at this point.
-    struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);
-
-	
-	//memcpy(patch_code_start, (char*)&boot2_sym + OFFSET_1MEG, 0x5fe00 /* 383.5k */);
+    struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);	
 	
     // Get us in to low memory so we can run everything
 
@@ -365,9 +354,9 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
 
     // Multiboot puts boot device in high byte
     // Normal booter wants it in low byte
-    int bootdevice = mi->mi_boot_device_drive;
+    uint32_t bootdevice = mi->mi_boot_device_drive;
 
-    bool doSelectDevice = false;
+    //bool doSelectDevice = false;
     if(mi->mi_flags & MULTIBOOT_INFO_HAS_BOOT_DEVICE)
     {
         printf("Boot device 0x%x\n", bootdevice);
@@ -375,7 +364,7 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
     else
     {
         printf("Multiboot info does not include chosen boot device\n");
-        doSelectDevice = true;
+        //doSelectDevice = true;
         bootdevice = BAD_BOOT_DEVICE;
     }
     if(mi->mi_flags & MULTIBOOT_INFO_HAS_CMDLINE)
@@ -391,10 +380,10 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
             {
                 printf("Boot device overridden to %02x with biosdev=%s\n", intVal, val);
                 bootdevice = intVal;
-                doSelectDevice = false;
+                //doSelectDevice = false;
             }
-            else
-                doSelectDevice = true;
+            //else
+            //    doSelectDevice = true;
         }
 #if UNUSED		
         if(getValueForBootKey(mi->mi_cmdline, "timeout", &val, &size))

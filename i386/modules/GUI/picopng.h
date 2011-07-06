@@ -2,7 +2,10 @@
 #define _PICOPNG_H
 
 #include <stdint.h>
-
+#include <mach-o/loader.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdbool.h>
 typedef struct {
 	uint32_t *data;
 	size_t size;

@@ -113,6 +113,8 @@ extern char gMKextName[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
 extern char *gPlatformName;
+extern char *gboardproduct;
+
 //extern char gRootPath[];
 
 extern char *gRootDevice;
@@ -137,7 +139,11 @@ local_adler32( unsigned char * buffer, long length );
  * graphics.c
  */
 extern void printVBEModeInfo();
+#if UNUSED
 extern void setVideoMode(int mode, int drawgraphics);
+#else
+extern void setVideoMode(int mode);
+#endif
 #if TEXT_SPINNER
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
@@ -158,7 +164,7 @@ convertImage( unsigned short width,
               const unsigned char *imageData,
               unsigned char **newImageData );
 extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
-extern void drawBootGraphics(void);
+//extern void drawBootGraphics(void);
 extern void drawPreview(void *src, uint8_t * saveunder);
 extern int getVideoMode(void);
 extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);

@@ -30,12 +30,6 @@
 
 int usb_loop();
 
-struct pciList
-{
-	pci_dt_t* pciDev;
-	struct pciList* next;
-};
-
 struct pciList* usbList = NULL;
 
 int legacy_off (pci_dt_t *pci_dev);
@@ -83,8 +77,8 @@ int usb_loop()
 		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
 		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
 	}
-	
-	msglog("\n");
+				
+	DBG("\n");
 	struct pciList* current = usbList;
 	
 	while(current)
@@ -103,6 +97,8 @@ int usb_loop()
 				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
 
 				break;
+			default:
+				break;
 		}
 		
 		current = current->next;
@@ -116,15 +112,8 @@ int legacy_off (pci_dt_t *pci_dev)
 	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
 	// NOTE2: This should be called after any getc() call. (aka, after the Wait=y keyworkd is used)
 	// AKA: Make this run immediatly before the kernel is called
-	//uint32_t	capaddr, opaddr;  		
-	//uint8_t		eecp;			
-	//uint32_t	usbcmd, usbsts, usbintr;			
-	//uint32_t	usblegsup, usblegctlsts;		
-	
-	//int isOSowned;
-	//int isBIOSowned;
-	
-	verbose("Setting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
+		
+	DBG("Setting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
 			pci_dev->vendor_id, pci_dev->device_id,
 			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
 	
@@ -200,17 +189,14 @@ int legacy_off (pci_dt_t *pci_dev)
 	
 	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
 	
-	verbose("Legacy USB Off Done\n");	
+	DBG("Legacy USB Off Done\n");	
 	return 1;
 }
 
 int ehci_acquire (pci_dt_t *pci_dev)
 {
-	int		j, k;
-	//uint32_t	base;
-	//uint8_t		eecp;
+	int		j, k;	
 	uint8_t		legacy[8];
-	//bool		isOwnershipConflict;	
 	bool		alwaysHardBIOSReset = false;
 		
 	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
@@ -220,7 +206,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	pci_config_write16(pci_dev->dev.addr, 0x04, 0x0002);
 	uint32_t base = pci_config_read32(pci_dev->dev.addr, 0x10);
 
-	verbose("EHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
+	DBG("EHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		base);
@@ -250,7 +236,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	//We try soft reset first - some systems hang on reboot with hard reset
 	// Definitely needed during reboot on 10.4.6
 
-	bool isOwnershipConflict = ((legacy[3] & 1 !=  0) && (legacy[2] & 1 !=  0));
+	bool isOwnershipConflict = (((legacy[3] & 1) !=  0) && ((legacy[2] & 1) !=  0));
 	if (!alwaysHardBIOSReset && isOwnershipConflict) {
 		DBG("EHCI - Ownership conflict - attempting soft reset ...\n");
 		DBG("EHCI - toggle OS Ownership to 0\n");
@@ -334,7 +320,7 @@ int uhci_reset (pci_dt_t *pci_dev)
 	base = pci_config_read32(pci_dev->dev.addr, 0x20);
 	port_base = (base >> 5) & 0x07ff;
 
-	verbose("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
+	DBG("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		port_base, base);

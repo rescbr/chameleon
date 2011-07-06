@@ -541,6 +541,8 @@ static int patch_nvidia_rom(uint8_t *rom)
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
+						default:
+							break;
 							
 					}
 					break;
@@ -581,7 +583,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 }
 
 static char *get_nvidia_model(uint32_t id) {
-	int	i;
+	unsigned int	i;
 
 	for (i=1; i< (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++) {
 		if (NVKnownChipsets[i].device == id) {
@@ -596,7 +598,7 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 	int	fd;
 	int	size;
 
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename)) < 0) {
 		return 0;
 	}
 	size = file_size(fd);
@@ -664,7 +666,11 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	return 0;
 }
 
+#if UNUSED
 unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev)
+#else
+unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType)
+#endif
 {
 	unsigned long long vram_size = 0;
 
@@ -718,7 +724,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
 
 	// Amount of VRAM in kilobytes
+#if UNUSED
 	videoRam = mem_detect(regs, nvCardType, nvda_dev);
+#else
+	videoRam = mem_detect(regs, nvCardType);
+#endif
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
 	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s\n",  
@@ -871,7 +881,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
 	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit) {
-		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
+		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
 
 	stringdata = malloc(sizeof(uint8_t) * string->length);

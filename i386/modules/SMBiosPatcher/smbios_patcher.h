@@ -44,7 +44,7 @@ struct smbios_table_description
 extern void scan_memory(PlatformInfo_t *);
 extern const char* sm_get_defstr(const char * key, int table_num);
 extern struct SMBEntryPoint	*getSmbiosPatched(struct SMBEntryPoint *orig);
-extern char* getSmbiosProductName();
+//extern char* getSmbiosProductName();
 extern struct DMIHeader* FindFirstDmiTableOfType(int type, int minlength);
 extern struct DMIHeader* FindNextDmiTableOfType(int type, int minlen);
 extern const char * smbiosStringAtIndex(DMIHeader*, int index, int *length );

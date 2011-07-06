@@ -27,15 +27,8 @@ moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
-
-
-#define MOD_ERROR 0
-#define MOD_SUCCESS 1
-#define MOD_ALREADY_LOADED 2
-#define MOD_START_ERROR 3
-
 #if DEBUG_MODULES
-void print_hook_list()
+VOID print_hook_list()
 {
 	moduleHook_t* hooks = moduleCallbacks;
 	printf("Hook list: \n");
@@ -47,7 +40,7 @@ void print_hook_list()
 	printf("\n");
 }
 
-void print_symbol_list()
+VOID print_symbol_list()
 {
 	symbolList_t* symbol = moduleSymbols;
 	printf("Symbol list: \n");
@@ -66,21 +59,24 @@ void print_symbol_list()
  * Once loaded, locate the _lookup_symbol function so that internal
  * symbols can be resolved.
  */
-int init_module_system()
+EFI_STATUS init_module_system()
 {
+	msglog("* Attempting to load system module\n");
+	
 	// Intialize module system
-	if(load_module(SYMBOLS_MODULE))
+    EFI_STATUS status = load_module(SYMBOLS_MODULE);
+	if((status == EFI_SUCCESS) || (status == EFI_ALREADY_STARTED)/*should never happen*/ )        
 	{
 		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
-			return MOD_SUCCESS;
+			return status;
 		}
 		
 	}
 	
-	return MOD_ERROR;
+	return EFI_LOAD_ERROR;
 }
 
 
@@ -94,7 +90,7 @@ int init_module_system()
  * reference at least one symbol within the module.
  */
 
-void load_all_modules()
+VOID load_all_modules()
 {
 	char* name;
 	long flags;
@@ -102,60 +98,65 @@ void load_all_modules()
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
+		if ((strcmp(SYMBOLS_MODULE,name)) == 0) continue; // if we found Symbols.dylib, just skip it
+
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
 			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 			
-			DBG("Attempting to load %s\n", tmp);			
-			//load_module(tmp);
-			if(load_module(tmp) != MOD_SUCCESS)
+			msglog("* Attempting to load module: %s\n", tmp);			
+			if(load_module(tmp) != EFI_SUCCESS)
 			{
-				// failed to load
+				// failed to load or already loaded
 				 free(tmp);
 			}
 		}
+#if DEBUG_MODULES
 		else 
 		{
 			DBG("Ignoring %s\n", name);
 		}
+#endif
 
 	}
-	//print_symbol_list();
+#if DEBUG_MODULES
+	print_symbol_list();
+#endif
 }
 
 /*
  * Load a module file in /Extra/modules
  * TODO: verify version number of module
  */
-int load_module(char* module)
+EFI_STATUS load_module(char* module)
 {
 	void (*module_start)(void) = NULL;
 
 	
 	// Check to see if the module has already been loaded
-	if(is_module_loaded(module))
+	if(is_module_loaded(module) == EFI_SUCCESS)
 	{
-		// NOTE: Symbols.dylib tries to load twice, this catches it as well
-		// as when a module links with an already loaded module
-		DBG("Module %s already loaded\n", module);
-		return MOD_ALREADY_LOADED;
+		msglog("Module %s already registred\n", module);
+		return EFI_ALREADY_STARTED;
 	}
 	
 	char modString[128];
 	int fh = -1;
 	sprintf(modString, "/Extra/modules/%s", module);
-	fh = open(modString, 0);
+	fh = open(modString);
 	if(fh < 0)
 	{		
 #if DEBUG_MODULES
-			printf("Unable to locate module %s\n", modString);
-			getc();
+		DBG("Unable to locate module %s\n", modString);
+		getc();
+#else
+		msglog("Unable to locate module %s\n", modString);
 #endif
-			return MOD_ERROR;		
+			return EFI_OUT_OF_RESOURCES;		
 	}
-	int ret = MOD_SUCCESS;
-	unsigned int moduleSize = file_size(fh);
+	EFI_STATUS ret = EFI_SUCCESS;
+	int moduleSize = file_size(fh);
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
@@ -167,15 +168,15 @@ int load_module(char* module)
 
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
-			// Notify the system that it was laoded
 			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
+			// Notify the system that it was laoded
 			(*module_start)();	// Start the module
-			DBG("Module %s Loaded.\n", module);
+			msglog("%s successfully Loaded.\n", module);
 		}
 		else {
 			// The module does not have a valid start function
 			printf("Unable to start %s\n", module);	
-			ret = MOD_START_ERROR;
+			ret = EFI_NOT_STARTED;
 #if DEBUG_MODULES			
 			getc();
 #endif
@@ -187,7 +188,7 @@ int load_module(char* module)
 #if DEBUG_MODULES		
 		getc();
 #endif
-		ret = MOD_ERROR;
+		ret = EFI_LOAD_ERROR;
 	}
 	close(fh);
 	return ret;
@@ -219,7 +220,7 @@ moduleHook_t* get_callback(const char* name)
  *			they will be executed now in the same order that the
  *			hooks were added.
  */
-int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
+EFI_STATUS execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
 	DBG("Attempting to execute hook '%s'\n", name);
 	moduleHook_t* hook = get_callback(name);
@@ -236,16 +237,14 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 			callbacks = callbacks->next;
 		}
 		DBG("Hook '%s' executed.\n", name); 
-		return MOD_SUCCESS;
+		return EFI_SUCCESS;
 	}
 	
 	// Callback for this hook doesn't exist;
 	DBG("No callbacks for '%s' hook.\n", name);
-	return MOD_ERROR;
+	return EFI_NOT_FOUND;
 	
 }
-
-
 
 /*
  *	register_hook_callback(  const char* name,  void(*callback)())
@@ -254,7 +253,7 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
  *			hook is executed. When registering a new callback name, the callback is added sorted.
  *			NOTE: the hooks take four void* arguments.
  */
-void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
+VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
 {	
 	DBG("Adding callback for '%s' hook.\n", name);
 	
@@ -296,14 +295,14 @@ long   vmsize;
 
 /*
  * Parse through a macho module. The module will be rebased and binded
- * as specified in the macho header. If the module is sucessfuly laoded
+ * as specified in the macho header. If the module is successfully loaded
  * the module iinit address will be returned.
  * NOTE; all dependecies will be loaded before this module is started
  * NOTE: If the module is unable to load ot completeion, the modules
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
+void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
 {	
 	char is64 = false;
 	void (*module_start)(void) = NULL;
@@ -377,7 +376,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				{
 					UInt32 sectionIndex;
 					
-#if DEBUG_MODULES_r			
+#if HARD_DEBUG_MODULES			
 					unsigned long fileaddr;
 					long   filesize;					
 					vmaddr = (segCommand->vmaddr & 0x3fffffff);
@@ -420,7 +419,7 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				{
 					UInt32 sectionIndex;
 					
-#if DEBUG_MODULES_r					
+#if HARD_DEBUG_MODULES					
 					
 					unsigned long fileaddr;
 					long   filesize;					
@@ -471,14 +470,14 @@ void* parse_mach(void* binary, int(*dylib_loader)(char*), long long(*symbol_hand
 				// =	dylibCommand->dylib.compatibility_version;
 				char* name = malloc(strlen(module) + strlen(".dylib") + 1);
 				sprintf(name, "%s.dylib", module);				
-				if(dylib_loader)
+				if(dylib_loader == EFI_SUCCESS)
 				{
-					int statue = dylib_loader(name);
+					EFI_STATUS statue = dylib_loader(name);
 					
-					if( statue != MOD_SUCCESS)
+					if( statue != EFI_SUCCESS)
 					{
 						free(name);
-						if (statue == MOD_ERROR) {
+						if (statue != EFI_ALREADY_STARTED) {
 							// Unable to load dependancy
 							return NULL;
 						}
@@ -565,7 +564,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt32 tmp  = 0;
 	UInt32 tmp2  = 0;
 	UInt8 bits = 0;
-	int index = 0;
+	UInt32 index = 0;
 	
 	int done = 0;
 	unsigned int i = 0;
@@ -715,6 +714,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 					segmentAddress += tmp2 + sizeof(void*);
 				}
 				break;
+			default:
+				break;
 		}
 		i++;
 	}
@@ -835,8 +836,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					segCommand = base + sizeof(struct mach_header) +  binIndex;
 					binIndex += segCommand->cmdsize;
 					index++;
-				}
-				while(index <= immediate);
+				}while(index <= immediate);
 				
 				segmentAddress = segCommand->fileoff;
 				
@@ -847,8 +847,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				{
 					tmp |= (bind_stream[++i] & 0x7f) << bits;
 					bits += 7;
-				}
-				while(bind_stream[i] & 0x80);
+				}while(bind_stream[i] & 0x80);
 				
 				segmentAddress += tmp;
 				
@@ -979,6 +978,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 				
 				break;
+			default:
+				break;
 				
 		}
 		i++;
@@ -1021,7 +1022,6 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
 
 }
 
-//unsigned char *dappleClut8 [256];
 /*
  * add_symbol
  * This function adds a symbol from a module to the list of known symbols 
@@ -1031,12 +1031,6 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
  */
 long long add_symbol(char* symbol, long long addr, char is64)
 {
-	/*if (strcmp(symbol,"_appleClut8") == 0) {		
-		//dappleClut8 = (uint8_t *)(UInt32)addr;
-		memcpy(dappleClut8, (uint8_t *)(UInt32)addr, 256);
-		return addr;
-		
-	} else*/ 
 	if(is64) return  0xFFFFFFFF; // Fixme
 	
 	// This only can handle 32bit symbols 
@@ -1059,7 +1053,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 /*
  * print out the information about the loaded module
  */
-void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
+VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
 	if (new_entry) {	
@@ -1073,7 +1067,7 @@ void module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 	}
 }
 
-int is_module_loaded(const char* name)
+EFI_STATUS is_module_loaded(const char* name)
 {
 	moduleList_t* entry = loadedModules;
 	while(entry)
@@ -1084,7 +1078,7 @@ int is_module_loaded(const char* name)
 		if((strcmp(entry->module, name) == 0) || (strcmp(entry->module, fullname) == 0))
 		{
 			DBG("Located module %s\n", name);
-			return MOD_ALREADY_LOADED;
+			return EFI_SUCCESS;
 		}
 		else
 		{
@@ -1094,7 +1088,7 @@ int is_module_loaded(const char* name)
 	}
 	DBG("Module %s not found\n", name);
 
-	return MOD_ERROR;
+	return EFI_NOT_FOUND;
 }
 
 // Look for symbols using the Smbols moduel function.
@@ -1127,7 +1121,7 @@ unsigned int lookup_all_symbols(const char* name)
 		}
 
 	}
-#if DEBUG_MODULES_r
+#if DEBUG_MODULES
 	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
 	{
 		verbose("Unable to locate symbol %s\n", name);
@@ -1165,7 +1159,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 					symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 				}
 				
-#if DEBUG_MODULES	
+#if HARD_DEBUG_MODULES	
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
 				printf("%s %s\n", isTexT ? "__TEXT :" : "__DATA(OR ANY) :", symbolString + symbolEntry->n_un.n_strx);
 				
@@ -1216,7 +1210,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
  * the function to jump directly to the new one
  * example: replace_function("_HelloWorld_start", &replacement_start);
  */
-int replace_function(const char* symbol, void* newAddress)
+EFI_STATUS replace_function(const char* symbol, void* newAddress)
 {
 	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
 	// TODO: look into using the next four bytes of the function instead
@@ -1234,10 +1228,10 @@ int replace_function(const char* symbol, void* newAddress)
 		
 		*jumpPointer = (UInt32)newAddress;
 		
-		return MOD_SUCCESS;
+		return EFI_SUCCESS;
 	}
 	
-	return MOD_ERROR;
+	return EFI_NOT_FOUND;
 
 }
 
@@ -1245,7 +1239,7 @@ int replace_function(const char* symbol, void* newAddress)
 /* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
  * And why it isn't needed when compiled into boot2
  */
-
+/*
 uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
 {
 	uint64_t quotient = 0, qbit = 1;
@@ -1273,5 +1267,6 @@ uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
 	}
 	
 	stop("Divide by 0");
-	return MOD_ERROR;	
+	return 0;	
 }
+*/

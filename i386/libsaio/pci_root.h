@@ -9,6 +9,5 @@
 
 
 extern int getPciRootUID(void);
-unsigned int findpciroot(unsigned char * dsdt,int len);
 
 #endif /* !__LIBSAIO_DSDT_PATCHER_H */

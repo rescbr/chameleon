@@ -62,7 +62,7 @@
 #define	CLUST_RSRVD12	0xff8	/* reserved cluster range */
 
 
-#define false 0
+//#define false 0
 #define true 1
 
 static int msdosressector=0;
@@ -386,14 +386,14 @@ getnextdirent (CICell ih, uint16_t *longname, struct msdosdirstate *st)
 			st->vfatchecksum = 0;
 			st->vfatnumber = 0;
 			st->nument++;
-			if ((!st->root16 &&st->nument * sizeof (struct direntry)>=msdosclustersize)
-				|| (st->root16 &&st->nument * sizeof (struct direntry)>=msdosbps))
+			if (((int)(!st->root16 &&st->nument * sizeof (struct direntry))>=msdosclustersize)
+				|| ((int)(st->root16 &&st->nument * sizeof (struct direntry))>=msdosbps))
 				st->nument = 0;
 			return dirp;
 		}
 		st->nument++;
-		if ((!st->root16 &&st->nument * sizeof (struct direntry)>=msdosclustersize)
-			|| (st->root16 &&st->nument * sizeof (struct direntry)>=msdosbps))
+		if (((int)(!st->root16 &&st->nument * sizeof (struct direntry))>=msdosclustersize)
+			|| ((int)(st->root16 &&st->nument * sizeof (struct direntry))>=msdosbps))
 			st->nument = 0;		
 	}
 }
@@ -743,7 +743,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	int toread, wastoread;
 	char *ptr = (char *)base;
 	struct direntry *dirp;
-	int i;
+	uint64_t i;
   char devStr[12];
 
 	if (MSDOSInitPartition (ih)<0)
@@ -772,7 +772,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	if (length==0 || length>size-offset)
 		toread=size-offset;
 	wastoread=toread;
-	bcopy (buf+(offset%msdosclustersize),ptr,min(msdosclustersize-(offset%msdosclustersize), toread));
+	bcopy (buf+(offset%msdosclustersize),ptr,min((msdosclustersize-(offset%msdosclustersize)),(unsigned)toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
 	toread-=msdosclustersize-(offset%msdosclustersize);
 	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, min(msdosclustersize,toread), &cluster))

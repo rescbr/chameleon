@@ -45,10 +45,14 @@ extern char *    gFileSpec;
 extern char *    gTempSpec;
 extern char *    gFileName;
 
+#define kEnableNBI			"EnableNBIModule"
+
 void NetbookInstaller_start()
 {
-	//else printf("Unable to locate Extra/SystemVersion.LastPatched.plist\n");
+	bool enable = true;
+	getBoolForKey(kEnableNBI, &enable, &bootInfo->bootConfig) ;
 	
+	if (enable) 
 	register_hook_callback("PreBoot", &NBI_PreBoot_hook);		
 	
 }
@@ -123,7 +127,7 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		
 		if(runNetbookInstaller == 1 )
 		{
-			if (is_module_loaded("RamDiskLoader")) {
+			if (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 				replace_function("_md0Ramdisk", &NBI_md0Ramdisk);
 			} else {
 				register_hook_callback("md0Ramdisk", NBI_md0Ramdisk_hook);
@@ -157,7 +161,7 @@ void NBI_md0Ramdisk()
 	// TODO: embed NBI.img in this file
 	// If runNetbookInstaller is true, then the system has changed states, patch it 
 	sprintf(filename, "%s", "Extra/NetbookInstaller.img");;
-	fh = open(filename, 0);
+	fh = open(filename);
 	
 	if (fh >= 0)
 	{
@@ -170,8 +174,12 @@ void NBI_md0Ramdisk()
 		{
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
-			{
-				AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);
+			{				
+#if UNUSED
+                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);   
+#else
+                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
+#endif
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{

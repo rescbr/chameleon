@@ -156,11 +156,17 @@ finalizeBootStruct(void)
     if (memoryMapCount == 0) {
 		
         // XXX could make a two-part map here
-        stop("Unable to convert memory map into proper format\n");
+        stop("No memory map found\n");
     }
+    
+    
 
     // convert memory map to boot_args memory map
     memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
+    if (memoryMap == NULL) {
+		
+        stop("Unable to allocate kernel space for the memory map\n");
+    }
     bootArgs->MemoryMap = (uint32_t)memoryMap;
     bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
     bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
@@ -212,11 +218,19 @@ finalizeBootStruct(void)
 				 */
 		        sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
 				break;
+			default:
+				break;
 				
 		}
     }
     
-	
+	if (sane_size == 0) {
+		
+        // I Guess that if sane_size == 0 we've got a big problem here, 
+        // and it means that the memory map was not converted properly
+        stop("Unable to convert memory map into proper format\n");
+    }
+    
 #define MEG		(1024*1024)
 	
 	/*
@@ -227,10 +241,7 @@ finalizeBootStruct(void)
 	sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
 	bootArgs->PhysicalMemorySize = sane_size;
 	bootArgs->FSBFrequency = Platform->CPU.FSBFrequency;
-	
-	// copy bootFile into device tree
-    // XXX
-
+		
     // add PCI info somehow into device tree
     // XXX
 			
@@ -243,5 +254,6 @@ finalizeBootStruct(void)
     
     DT__FlattenDeviceTree((void **)&addr, &size);
     bootArgs->deviceTreeP = (uint32_t)addr;
-    bootArgs->deviceTreeLength = size;
+    bootArgs->deviceTreeLength = size;    
+    
 }

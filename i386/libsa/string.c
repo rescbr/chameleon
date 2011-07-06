@@ -56,6 +56,11 @@ void bzero(void * dst, size_t len)
     memset(dst, 0, len);
 }
 
+void __bzero(void * dst, size_t len)
+{
+    memset(dst, 0, len);
+}
+
 #else
 void * memcpy(void * dst, const void * src, size_t len)
 {
@@ -101,12 +106,26 @@ void bzero(void * dst, size_t len)
        : "c" (len), "D" (dst)
        : "memory", "%eax" );
 }
+
+void __bzero(void * dst, size_t len)
+{
+    asm volatile ( "xorl %%eax, %%eax    \n\t"
+                  "cld                  \n\t"
+                  "movl %%ecx, %%edx    \n\t"
+                  "shrl $2, %%ecx       \n\t"
+                  "rep; stosl           \n\t"
+                  "movl %%edx, %%ecx    \n\t"
+                  "andl $3, %%ecx       \n\t"
+                  "rep; stosb           \n\t"
+                  : 
+                  : "c" (len), "D" (dst)
+                  : "memory", "%eax" );
+}
 #endif
 
 /* #if DONT_USE_GCC_BUILT_IN_STRLEN */
 
-#define tolower(c)     ((int)((c) & ~0x20))
-#define toupper(c)     ((int)((c) | 0x20))
+
 
 int strlen(const char * s)
 {
@@ -151,7 +170,7 @@ char *
 strcpy(char * s1, const char * s2)
 {
 	register char *ret = s1;
-	while (*s1++ = *s2++)
+	while ((*s1++ = *s2++))
 		continue;
 	return ret;
 }
@@ -247,6 +266,10 @@ char *strdup(const char *s1)
 }
 
 #if STRNCASECMP
+
+#define tolower(c)     ((int)((c) & ~0x20))
+#define toupper(c)     ((int)((c) | 0x20))
+
 int strncasecmp(const char *s1, const char *s2, size_t len)
 {
 	register int n = len;

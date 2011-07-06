@@ -16,6 +16,7 @@
 #include "disk.h"
 
 
+#define kEnableEDL			"EnableRamDiskLoader"
 
 
 enum {
@@ -122,14 +123,23 @@ void p_ramdiskReadBytes_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
         *ret = (*p_ramdiskReadBytes)(biosdev, blkno, byteoff, byteCount, buffer);	
 }
 
+void is_Ram_Disk_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
+
+
 void RamDiskLoader_start()
 {
-	register_hook_callback("loadPrebootRAMDisk", &loadPrebootRAMDisk_hook);
-	register_hook_callback("md0Ramdisk", &md0Ramdisk_hook);
-	register_hook_callback("processRAMDiskCommand", &processRAMDiskCommand_hook);
-	register_hook_callback("ramDiskLoadDrivers", &ramDiskLoadDrivers_hook);	
-	register_hook_callback("newRamDisk_BVR", &newRamDisk_BVR_hook);
-	register_hook_callback("p_get_ramdisk_info", &p_get_ramdisk_info_hook);
-	register_hook_callback("p_ramdiskReadBytes", &p_ramdiskReadBytes_hook);
+	bool enable = true;
+	getBoolForKey(kEnableEDL, &enable, &bootInfo->bootConfig) ;
+	
+	if (enable) {
+		register_hook_callback("loadPrebootRAMDisk", &loadPrebootRAMDisk_hook);
+		register_hook_callback("md0Ramdisk", &md0Ramdisk_hook);
+		register_hook_callback("processRAMDiskCommand", &processRAMDiskCommand_hook);
+		register_hook_callback("ramDiskLoadDrivers", &ramDiskLoadDrivers_hook);	
+		register_hook_callback("newRamDisk_BVR", &newRamDisk_BVR_hook);
+		register_hook_callback("p_get_ramdisk_info", &p_get_ramdisk_info_hook);
+		register_hook_callback("p_ramdiskReadBytes", &p_ramdiskReadBytes_hook);
+        register_hook_callback("isRamDiskRegistred", &is_Ram_Disk_Registred_Hook);
+	}
 
 }

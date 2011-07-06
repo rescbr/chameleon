@@ -15,7 +15,7 @@
 #include "bootstruct.h"
 #include "modules.h"
 
-#define kUseMemDetect		"UseMemDetect"	    
+#define kEnableMemory		"EnableMemoryModule"	    
 
 pci_dt_t * dram_controller_dev = NULL;
 pci_dt_t * smbus_controller_dev = NULL;
@@ -24,12 +24,25 @@ pci_dt_t * smbus_controller_dev = NULL;
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
+void is_Memory_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
 
 void Memory_start()
 {
-	register_hook_callback("PCIDevice", &Memory_PCIDevice_hook);
-	register_hook_callback("ScanMemory", &Memory_hook);
 	
+	bool enable = true;
+	
+	getBoolForKey(kEnableMemory, &enable, &bootInfo->bootConfig);
+
+    if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086) 
+		enable = false;
+	
+	enable = (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
+    	    
+    if (enable) {
+		register_hook_callback("PCIDevice", &Memory_PCIDevice_hook);
+		register_hook_callback("ScanMemory", &Memory_hook);
+		register_hook_callback("isMemoryRegistred", &is_Memory_Registred_Hook);
+	}
 }
 
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -47,21 +60,19 @@ void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 }
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
-{
-	bool useAutodetection = true;
-    getBoolForKey(kUseMemDetect, &useAutodetection, &bootInfo->bootConfig);
+{	
 	
-	
-    if (useAutodetection) {
-		
-		if (dram_controller_dev!=NULL) {
-			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
-		}
-				
-		if(smbus_controller_dev)
-		{
-			scan_spd(Platform, smbus_controller_dev);
-		}
-    }
-	
+	if (dram_controller_dev!=NULL) {
+		scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
+	}
+			
+	if(smbus_controller_dev)
+	{
+#if UNUSED
+		scan_spd(Platform, smbus_controller_dev);
+#else
+		scan_spd(smbus_controller_dev);
+#endif
+	}
+    	
 }

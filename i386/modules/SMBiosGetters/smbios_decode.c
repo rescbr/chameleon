@@ -169,32 +169,63 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 	DBG("\n");
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
 	{
+#if DEBUG_SMBIOS
 		DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
 				structHeader->type, structHeader->length, structHeader->handle);
-
+#endif
 		switch (structHeader->type)
 		{
 			case kSMBTypeBIOSInformation:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeBIOSInformation((SMBBIOSInformation *)structHeader);
 				break;
-
+            }
 			case kSMBTypeSystemInformation:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeSystemInformation((SMBSystemInformation *)structHeader);
 				break;
-
+            }
 			case kSMBTypeBaseBoard:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeBaseBoard((SMBBaseBoard *)structHeader);
 				break;
-
+            }
 			case kSMBTypeSystemEnclosure:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeSystemEnclosure((SMBSystemEnclosure *)structHeader);
 				break;
-
+            }
 			case kSMBTypeProcessorInformation:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeProcessorInformation((SMBProcessorInformation *)structHeader);
 				break;
-
+            }
 			case kSMBTypeMemoryDevice:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeMemoryDevice((SMBMemoryDevice *)structHeader);
 				break;
 
@@ -202,16 +233,26 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 			case kSMBTypeFirmwareVolume:
 			case kSMBTypeMemorySPD:
 				break;
-
+            }
 			case kSMBTypeOemProcessorType:
+            {
+#if !DEBUG_SMBIOS
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				decodeOemProcessorType((SMBOemProcessorType *)structHeader);
 				break;
-
+            }
 			case kSMBTypeOemProcessorBusSpeed:
+            {
+#if !DEBUG_SMBIOS 
+                DBG("Type: %d, Length: %d, Handle: 0x%x\n", 
+                    structHeader->type, structHeader->length, structHeader->handle);
+#endif
 				if (((SMBOemProcessorBusSpeed *)structHeader)->ProcessorBusSpeed)
 				decodeOemProcessorBusSpeed((SMBOemProcessorBusSpeed *)structHeader);
 				break;
-
+            }
 			case kSMBTypeEndOfTable:
 				/* Skip, to be added at the end */
 				break;

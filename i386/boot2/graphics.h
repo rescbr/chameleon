@@ -7,12 +7,13 @@
  *
  */
 
-#include "boot.h"
-#include "bootstruct.h"
-#include "vbe.h"
 
 #ifndef __BOOT_GRAPHICS_H
 #define __BOOT_GRAPHICS_H
+
+#include "boot.h"
+#include "bootstruct.h"
+#include "vbe.h"
 
 #define DEFAULT_SCREEN_WIDTH 1024
 #define DEFAULT_SCREEN_HEIGHT 768
@@ -38,7 +39,11 @@ char *getVBEInfoString();
 char *getVBEModeInfoString();
 void getGraphicModeParams(unsigned long params[]);
 
+#if UNUSED
 int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
+#else
+int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel);
+#endif
 
 int getNumberArrayFromProperty( const char *  propKey,
 						   unsigned long numbers[],

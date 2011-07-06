@@ -8,8 +8,6 @@
  *  Copyright 2009. All rights reserved.
  *
  */
-#ifndef _RESOLUTION_H_
-#define _RESOLUTION_H_
 
 #include "libsaio.h"
 #include "edid.h"
@@ -510,6 +508,8 @@ void unlock_vbios(vbios_map * map)
 			outb(CONFIG_MECH_ONE_DATA + 1, 0x33);
 			outb(CONFIG_MECH_ONE_DATA + 2, 0x33);
 			break;
+		default:
+			break;
 	}
 	
 #if DEBUG
@@ -562,6 +562,8 @@ void relock_vbios(vbios_map * map)
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000090);
 			outb(CONFIG_MECH_ONE_DATA + 1, map->b1);
 			outb(CONFIG_MECH_ONE_DATA + 2, map->b2);
+			break;
+		default:
 			break;
 	}
 	
@@ -853,9 +855,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 		{
 			break;
 		}
+		default:
+			break;
 	}
 	//		}
 	//	}
 }
-
-#endif // _RESOLUTION_H_

@@ -274,8 +274,11 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 
 //==========================================================================
 // setVESAGraphicsMode
-
+#if UNUSED
 int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
+#else
+int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel)
+#endif
 {
     VBEModeInfoBlock  minfo;
     unsigned short    mode;
@@ -294,7 +297,7 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
         {
             break;
         }
-		
+#if UNUSED
 		//
 		// FIXME : generateCRTCTiming() causes crash.
 		//
@@ -331,7 +334,7 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
 		// 
 		//             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 		//         }
-		
+#endif
         // Set the mode with default refresh rate.
 		
         err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
@@ -575,17 +578,24 @@ int initGraphicsMode ()
 	if ( params[2] == 256 ) params[2] = 8;
 	if ( params[2] == 555 ) params[2] = 16;
 	if ( params[2] == 888 ) params[2] = 32;
-	
+#if UNUSED
 	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
+#else
+	return setVESAGraphicsMode( params[0], params[1], params[2] );
+#endif
 }
 
 //==========================================================================
 // setVideoMode
 //
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
-
+#if UNUSED
 void
 setVideoMode( int mode, int drawgraphics)
+#else
+void
+setVideoMode( int mode)
+#endif
 {
     unsigned long params[4];
     int           count;

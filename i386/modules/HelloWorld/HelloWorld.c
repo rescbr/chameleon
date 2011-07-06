@@ -24,6 +24,5 @@ void HelloWorld_start()
 {
 	register_hook_callback("ExecKernel", &helloWorld2);
 	register_hook_callback("PreBoot", &helloWorld);
-
 }
 

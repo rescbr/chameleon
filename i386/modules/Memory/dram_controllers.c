@@ -45,20 +45,21 @@ static void setup_p35(pci_dt_t *dram_dev)
 }
 
 int nhm_bus = 0x3F;
-long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
+
 
 // Setup Nehalem Integrated Memory Controller
 static void setup_nhm(pci_dt_t *dram_dev)
 {
+    static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 	unsigned long did, vid;
 	int i;
 	
 	// Nehalem supports Scrubbing
 	// First, locate the PCI bus where the MCH is located
-	for(i = 0; i < sizeof(possible_nhm_bus); i++)
+	for(i = 0; (unsigned)i < sizeof(possible_nhm_bus); i++)
 	{
-		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
-		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
+		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_VENDOR_ID);
+		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_DEVICE_ID);
 		vid &= 0xFFFF;
 		did &= 0xFF00;
 		
@@ -485,7 +486,7 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 		Platform->RAM.Channels = SMB_MEM_CHANNEL_DUAL;
 }
 
-struct mem_controller_t dram_controllers[] = {
+static struct mem_controller_t dram_controllers[] = {
 
 	// Default unknown chipset
 	{ 0, 0, "",	NULL, NULL, NULL },
@@ -525,7 +526,7 @@ struct mem_controller_t dram_controllers[] = {
 	
 };
 
-const char *memory_channel_types[] =
+static const char *memory_channel_types[] =
 {
 	"Unknown", "Single", "Dual", "Triple"
 };			
@@ -533,7 +534,7 @@ const char *memory_channel_types[] =
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i <  sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
+	for(i = 1; (unsigned)i <  sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
 	if ((dram_controllers[i].vendor == dram_dev->vendor_id) 
 				&& (dram_controllers[i].device == dram_dev->device_id))
 		{
@@ -550,13 +551,17 @@ void scan_dram_controller(pci_dt_t *dram_dev)
 								
 			if (dram_controllers[i].poll_speed != NULL)
 				dram_controllers[i].poll_speed(dram_dev);
-
-			verbose("Frequency detected: %d MHz (%d) %s Channel %d-%d-%d-%d\n", 
-						(uint32_t)Platform->RAM.Frequency / 1000000,
-						(uint32_t)Platform->RAM.Frequency / 500000,
-						memory_channel_types[Platform->RAM.Channels],
-						Platform->RAM.CAS, Platform->RAM.TRC, Platform->RAM.TRP, Platform->RAM.RAS
-				   );
+			            
+            verbose("Frequency detected: %d MHz (%d) %s Channel \n\tCAS:%d tRC:%d tRP:%d RAS:%d (%d-%d-%d-%d)\n", 
+                    (uint32_t)Platform->RAM.Frequency / 1000000,
+                    (uint32_t)Platform->RAM.Frequency / 500000,
+                    memory_channel_types[Platform->RAM.Channels]
+					,Platform->RAM.CAS, Platform->RAM.TRC, Platform->RAM.TRP, Platform->RAM.RAS
+					,Platform->RAM.CAS, Platform->RAM.TRC, Platform->RAM.TRP, Platform->RAM.RAS
+					);
+#if DEBUG_DRAM
+			 getc();
+#endif
 			
 		}	
 }	

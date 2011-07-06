@@ -28,6 +28,53 @@
 #ifndef _LIBSAIO_SMBIOS_H
 #define _LIBSAIO_SMBIOS_H
 
+#include "libsaio.h"
+
+#define kIsServer			"IsServer"	
+extern struct SMBEntryPoint *getSmbiosOriginal();
+
+#define theUUID 0
+#define thePlatformName 1
+#define theProducBoard 2
+extern int readSMBIOS(int value); // value copied into the platform structure
+
+#define SMBIOS_RANGE_START		0x000F0000
+#define SMBIOS_RANGE_END		0x000FFFFF
+
+/* '_SM_' in little endian: */
+//#define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
+
+// getting smbios addr with fast compare ops, late checksum testing ...
+#define COMPARE_DWORD(a,b) ( *((u_int32_t *) a) == *((u_int32_t *) b) )
+
+
+//
+// SMBIOS structure types.
+//
+
+enum {
+    kSMBTypeBIOSInformation             =  0,
+    kSMBTypeSystemInformation           =  1,
+    kSMBTypeBaseBoard					=  2,
+    kSMBTypeSystemEnclosure             =  3,
+    kSMBTypeProcessorInformation        =  4,
+    kSMBTypeMemoryModule                =  6,
+    kSMBTypeCacheInformation            =  7,
+    kSMBTypeSystemSlot                  =  9,
+    kSMBTypePhysicalMemoryArray         = 16,
+    kSMBTypeMemoryDevice                = 17,
+    kSMBType32BitMemoryErrorInfo        = 18,
+    kSMBType64BitMemoryErrorInfo        = 33,
+	
+    kSMBTypeEndOfTable                  = 127,
+	
+    /* Apple Specific Structures */
+    kSMBTypeFirmwareVolume              = 128,
+    kSMBTypeMemorySPD                   = 130,
+    kSMBTypeOemProcessorType            = 131,
+    kSMBTypeOemProcessorBusSpeed        = 132
+};
+
 /*
  * Based on System Management BIOS Reference Specification v2.5
  */
@@ -139,5 +186,26 @@ typedef struct SMBSystemInformation {
     SMBString  skuNumber;
     SMBString  family;
 }__attribute__((packed)) SMBSystemInformation;
+
+//
+// Base Board (Type 2)
+//
+typedef struct SMBBaseBoard {
+    SMB_STRUCT_HEADER               // Type 2
+    SMBString	manufacturer;
+    SMBString	product;
+    SMBString	version;
+    SMBString	serialNumber;
+    SMBString	assetTagNumber;
+    SMBByte		featureFlags;
+    SMBString	locationInChassis;
+    SMBWord		chassisHandle;
+    SMBByte		boardType;
+    SMBByte		numberOfContainedHandles;
+	// 0 - 255 contained handles go here but we do not include
+	// them in our structure. Be careful to use numberOfContainedHandles
+	// times sizeof(SMBWord) when computing the actual record size,
+	// if you need it.
+} __attribute__((packed)) SMBBaseBoard;
 
 #endif /* !_LIBSAIO_SMBIOS_H */

@@ -12,7 +12,7 @@ OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float
+		-march=pentium4 -msse2 -mfpmath=sse -msoft-float  
 
 DEFINES=
 CONFIG = hd
@@ -65,7 +65,7 @@ DATA_OFFSET = $(shell otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  |
 DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot_embeded.sys | grep __data -A 4  | grep __DATA -A 3 | head -n 2 | tail -n 1 | cut -f 8 -d " "`)
 PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
-CFLAGS += -DSAFE_MALLOC 
+#CFLAGS += -DSAFE_MALLOC 
 
 # CFLAGS += -DBOOT_HELPER_SUPPORT # +992 bytes
 
@@ -109,14 +109,6 @@ embed_symbols: machOconv
 	@echo "\t[MACHOCONV] boot_embeded"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot_embeded.sys $(SYMROOT)/boot_embeded
 
-
-prompt.o: vers.h
-vers.h:
-	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
-
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
 
@@ -137,6 +129,7 @@ Symbols.dylib: Symbols.o
 	-compatibility_version 1.0.0 \
 	-final_output Symbols \
 	-exported_symbols_list ${OBJROOT}/Symbols.save \
+	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/libcc_kext.a" \
 	${OBJROOT}/Symbols.o \
 	-o $(SYMROOT)/${SYMBOLS_MODULE} 
 

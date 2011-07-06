@@ -79,6 +79,8 @@ typedef struct platform_info {
 	char rootPath[ROOT_PATH_LEN];
 } PlatformInfo;
 
+
+char *gboardproduct = NULL;
 char *gPlatformName = NULL;
 //char gRootPath[256];
 long gBootMode; /* defaults to 0 == kBootModeNormal */
@@ -241,7 +243,7 @@ static int ExecKernel(void *binary)
 	{
 		wait = true;
 		
-		if (strval && strcmp(strval, "no") == 0) {
+		if (strval && ((strcmp(strval, "no") == 0) || (strcmp(strval, "No") == 0))) {
 			wait = false;
 		} 		
 	}
@@ -250,10 +252,13 @@ static int ExecKernel(void *binary)
 		pause();
 	}
 			
-	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) == 0))
-	//if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) // (bootArgs->Video.v_display == VGA_TEXT_MODE)	
 	{
+#if UNUSED
 		setVideoMode( GRAPHICS_MODE, 0 );
+#else
+		setVideoMode( GRAPHICS_MODE );
+#endif
 		
 #ifndef OPTION_ROM
 		 
@@ -284,26 +289,39 @@ static int ExecKernel(void *binary)
 		}
 #endif
 	}
-
+        
+    finalizeEFIConfigTable();
+    
 	setupBooterLog();
 	
-    finalizeBootStruct();
+    finalizeBootStruct();          
+    
 	
 	if (gMacOSVersion[3] <= '6') 
 		reserveKernLegacyBootStruct();   		
 	
 	
+	//uint8_t Pic1,Pic2;
+	
+	//Pic1 = inb(0x21); /* Save all interrupts Pic1 */
+	//Pic2 = inb(0xa1); /* Save all interrupts Pic2 */
+	
+	
+	
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
-#if UNUSED
+//#if UNUSED
 	turnOffFloppy();
-#endif
-#if BETA
+//#endif
+//#if BETA
 #include "smp.h"
 #include "apic.h"
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
-#endif
+//#endif
 	
 	if (gMacOSVersion[3] <= '6') {
+		
+		//outb(0x21, Pic1);   /* Restore all interrupts Pic1 */
+		//outb(0xa1, Pic2);   /* Restore all interrupts Pic2 */
 		
 		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
 		startprog( kernelEntry, bootArgsLegacy );
@@ -397,6 +415,9 @@ void common_boot(int biosdev)
     // Load boot.plist config file
     status = loadSystemConfig(&bootInfo->bootConfig);
 	
+	Platform->CPU.isServer = false;    
+    getBoolForKey(kIsServer, &Platform->CPU.isServer, &bootInfo->bootConfig); // set this as soon as possible
+	
     if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
         gBootMode |= kBootModeQuiet;
     }
@@ -420,23 +441,27 @@ void common_boot(int biosdev)
 	else 
 #endif
 	{
-		scanDisks(gBIOSDev, &bvCount);
+#if UNUSED
+        scanDisks(gBIOSDev, &bvCount);
+#else
+        scanDisks();
+#endif
     }
 	
 	// Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 	gBootVolume = selectBootVolume(bvChain);
 	
-	
 	// Intialize module system
-	if(init_module_system())
+	EFI_STATUS sysinit = init_module_system();
+	if((sysinit == EFI_SUCCESS) || (sysinit == EFI_ALREADY_STARTED)/*should never happen*/ ) 
 	{
 		load_all_modules();
 	}
-	
+			
     // Loading preboot ramdisk if exists.
-	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);
-	
+	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
+
 #ifndef OPTION_ROM
 
     // Disable rescan option by default
@@ -452,21 +477,19 @@ void common_boot(int biosdev)
     if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
         gEnableCDROMRescan = promptForRescanOption();
     }
-#endif
-	
-
-	
+#endif	
 	
 #if DEBUG
     printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
     printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
     getc();
 #endif
-	
-	
-	
+			
     setBootGlobals(bvChain);
 	
+	// Display the GUI
+	execute_hook("GUI_Display", NULL, NULL, NULL, NULL, NULL, NULL);
+
     // Parse args, load and start kernel.
     while (1) {
         const char *val;
@@ -518,7 +541,8 @@ void common_boot(int biosdev)
 		// Find out which version mac os we're booting.
 		getOSVersion(gMacOSVersion);
 		
-		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
+		//if (platformCPUFeature(CPU_FEATURE_EM64T)) {        
+        if (cpu_mode_is64bit()) {
 			archCpuType = CPU_TYPE_X86_64;
 		} else {
 			archCpuType = CPU_TYPE_I386;
@@ -528,24 +552,20 @@ void common_boot(int biosdev)
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-
-		// Notify moduals that we are attempting to boot
-		execute_hook("PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);  
-		
-		if (execute_hook("getProductNamePatched", NULL, NULL, NULL, NULL, NULL, NULL) == 0)					
-			local_readSMBIOS(1); // read smbios Platform Name
 		
 		getRootDevice();
+
+		// Notify to all modules that we are attempting to boot
+		execute_hook("PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);  
+		
+		if (execute_hook("getProductNamePatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)					
+			readSMBIOS(thePlatformName); // read smbios Platform Name
+		
 		
 		if (!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len)) {		
         		
-			if (getValueForKey(kPrelinkKernelKey, &val, &len, &bootInfo->bootConfig)) {
-				strlcpy(gBootKernelCacheFile, val, len+1);
-				bootInfo->adler32 = 0; //TODO: get the (unsigned long)adler32 value from kernelcache path string
-						
-			} else {
-				if(gMacOSVersion[3] == '7'){
-					sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
+			if(gMacOSVersion[3] == '7'){					
+						sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
 				}
 				else if(gMacOSVersion[3] <= '6')
 				{			 
@@ -561,7 +581,7 @@ void common_boot(int biosdev)
 							if (gRootDevice) {
 								char *rootPath_p = platformInfo->rootPath;
                                 int len = strlen(gRootDevice) + 1;
-                                if (len > sizeof(platformInfo->rootPath)) {
+                                if ((unsigned)len > sizeof(platformInfo->rootPath)) {
                                     len = sizeof(platformInfo->rootPath);
                                 }
 								memcpy(rootPath_p, gRootDevice,len);
@@ -570,7 +590,7 @@ void common_boot(int biosdev)
                                 
                                 len = strlen(bootInfo->bootFile);
                                 
-                                if ((rootPath_p - platformInfo->rootPath + len) >=
+                                if ((unsigned)(rootPath_p - platformInfo->rootPath + len) >=
                                     sizeof(platformInfo->rootPath)) {
                                     
                                     len = sizeof(platformInfo->rootPath) -
@@ -604,9 +624,7 @@ void common_boot(int biosdev)
 						sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
 								
 								
-				}			
-			
-			}		
+				}					
        
 		}
 		
@@ -737,7 +755,11 @@ void common_boot(int biosdev)
     // chainboot
     if (status==1) {
 		if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
+#if UNUSED
 			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
+#else
+			setVideoMode(VGA_TEXT_MODE);	// switch back to text mode
+#endif
 		}
     }
 #ifdef NBP_SUPPORT
@@ -746,7 +768,6 @@ void common_boot(int biosdev)
     }
 #endif
 }
-
 
 // Maximum config table value size
 #define VALUE_SIZE 2048

@@ -178,7 +178,12 @@ void HibernateBoot(char *image_filename)
 		Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
 		and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
 		remove it completely
-		setVideoMode( VGA_TEXT_MODE, 0 );
+#if UNUSED
+		setVideoMode(VGA_TEXT_MODE, 0);
+#else
+		setVideoMode(VGA_TEXT_MODE);
+#endif					
+		
 #endif
 	}
 	else
