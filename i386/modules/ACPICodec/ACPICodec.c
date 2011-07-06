@@ -28,23 +28,7 @@ void ACPICodec_start()
 	bool enable = true;
 	getBoolForKey(kEnableAcpi, &enable, &bootInfo->bootConfig) ;
 	
-	/* 
-	 * This method is not perfect (symbols collisions between two modules with that provide the same service is still possible,
-	 * (as well as two module with a different service but there is more chance of collisions if dthey do the same thing)
-	 * even if one of them have been disabled by this method and have no hook registred), will be deprecated soon.
-	 *
-	 * Possible solutions:
-	 *
-	 * 1 - check the symbols list each time a symbols is loaded to avoid double symbol (slow, may be buggy)
-	 *
-	 * 2 - categorize all symbols by callers (hard to implement)
-	 *
-	 * 3 - ????, will work great at least for modules with the same service
-	 *
-	 * 
-	 *
-	 */	
-    enable = (execute_hook("isACPIRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);  
+	enable = (execute_hook("isACPIRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);  
     
 	if (enable) {		
 		register_hook_callback("setupEfiConfigurationTable", &ACPICodec_setupEfiConfigurationTable_hook);

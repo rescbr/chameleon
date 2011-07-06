@@ -97,8 +97,9 @@ vers.h:
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $(SYMROOT)/vers.h
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat ../../version`\"" >> $(SYMROOT)/vers.h
-	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h
-	
+	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $(SYMROOT)/vers.h            
+	@echo "#define FIRMWARE_PUBLISHER \"`whoami`\"" >> $(SYMROOT)/vers.h
+    
 libsaio.a: $(SAIO_EXTERN_OBJS) $(SAIO_OBJS)
 	rm -f $(SYMROOT)/$(@F)
 	ar q $(SYMROOT)/$(@F) $^

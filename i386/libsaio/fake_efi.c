@@ -83,11 +83,11 @@ static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
  * Fake EFI implementation
  */
 
-/* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0}; 
 
+/* Info About the current Firmware */
+#define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
 static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','t','.','H','o','o','d', 0}; //a.k.a Galak.
-
 static EFI_UINT32 const FIRMWARE_REVISION = 0x00010400; //1.4
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
@@ -480,6 +480,9 @@ static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
 static const char const FIRMWARE_NAME_PROP[] = "firmware-name";
 static const char const FIRMWARE_DATE_PROP[] = "firmware-date";
+static const char const FIRMWARE_DEV_PROP[] = "firmware-maintener";
+static const char const FIRMWARE_PUBLISH_PROP[] = "firmware-publisher";
+
 static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char const SYSTEM_ID_PROP[] = "system-id";
@@ -725,7 +728,9 @@ static VOID setupEfiDeviceTree(void)
 	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 	DT__AddProperty(efiNode, FIRMWARE_NAME_PROP, sizeof(FIRMWARE_NAME), (EFI_CHAR16*)FIRMWARE_NAME);
-	DT__AddProperty(efiNode, FIRMWARE_DATE_PROP, strlen(I386BOOT_BUILDDATE)+1, I386BOOT_BUILDDATE);
+	DT__AddProperty(efiNode, FIRMWARE_DATE_PROP, strlen(I386BOOT_BUILDDATE)+1, I386BOOT_BUILDDATE);	
+	DT__AddProperty(efiNode, FIRMWARE_DEV_PROP, strlen(FIRMWARE_MAINTENER)+1, FIRMWARE_MAINTENER);
+	DT__AddProperty(efiNode, FIRMWARE_PUBLISH_PROP, strlen(FIRMWARE_PUBLISHER)+1, FIRMWARE_PUBLISHER);
 	
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.

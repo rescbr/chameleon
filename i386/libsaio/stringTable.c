@@ -605,6 +605,8 @@ int loadSystemConfig(config_file_t *config)
 	char *dirspec[] = {
 		"/Extra/com.apple.Boot.plist",
 		"bt(0,0)/Extra/com.apple.Boot.plist",
+		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk
+		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 	};
 	int i,fd, count, ret=-1;
