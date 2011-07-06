@@ -26,7 +26,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = Resolution KernelPatcher KextPatcher GUI GraphicsEnabler HPET USBFix Memory Networking ACPICodec ACPIPatcher Bits NetbookInstaller CPUfreq Keymapper OSXInstall RamDiskLoader HibernateEnabler SMBiosPatcher SMBiosGetters HelloWorld
+SUBDIRS = KernelPatcher GUI GraphicsEnabler HPET USBFix Memory Networking ACPICodec ACPIPatcher NetbookInstaller CPUfreq Keymapper RamDiskLoader HibernateEnabler SMBiosPatcher SMBiosGetters HelloWorld
 all embedtheme tags debug install installhdrs:	
 	@rm -rf $(OBJROOT)
 	@mkdir $(OBJROOT)
