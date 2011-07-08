@@ -1239,7 +1239,7 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 /* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
  * And why it isn't needed when compiled into boot2
  */
-/*
+
 uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
 {
 	uint64_t quotient = 0, qbit = 1;
@@ -1269,4 +1269,3 @@ uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
 	stop("Divide by 0");
 	return 0;	
 }
-*/
