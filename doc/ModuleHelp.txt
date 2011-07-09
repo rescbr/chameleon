@@ -94,9 +94,13 @@ CPUfreq module:
 			         bios bus ratio, set this value allow CPUfreq to 
                      fix some cosmetic issues.
 						  			  
-
-Acpipatcher module:
+AcpiCodec module: 
 ------------------
+  IMPORTANT NOTE: 1- with AcpiCodec all aml files must be placed in /Extra/Acpi/, alternate or overridden path is no longer supported
+                  
+                  2- the name of the aml file(s) is not important anymore but it must contain the extention .aml, for example let suppose that you have 3 aml files: dsdt.aml, ssdt-0.aml and ssdt-1.aml
+                     you can rename your dsdt file into blabla.aml, and rename your ssdt files into blablabla.aml and blablablabla.aml, acpicodec will auto-magically detect those files as 2 ssdt and one dsdt
+
   EnableAcpiModule=Yes|No	Fully enable/disable the Acpipatcher module (Enabled by default, if the module is installed)
      
   RestartFix=Yes|No			Enable/Disable internal restart fix patch(Enabled by default, only available for intel platform).
@@ -111,15 +115,7 @@ Acpipatcher module:
   ACPIDropTables=<dict>		drop acpi table(s) method (can drop any unwanted tables), see usage below.
   C-States=<dict>			C-States fine tuning method, see usage below(GenerateCStates=Yes is needed).
   
-  DSDT=<file>   	Use an alternate DSDT.aml file,
-			        (default path: /DSDT.aml Extra/DSDT.aml,
-			        bt(0,0)/Extra/DSDT.aml).
-
-  quickSSDTsearch=Yes|No    If Yes, Acpipatcher will not search ssdt-(x+1).aml 
-			                if ssdt-x.aml do not exist,
-			                (eg. if ssdt-0.aml do not exist,
-                            Acpipather will not search ssdt-1.aml)(Enabled by default).
-							
+  							
   UpdateACPI=Yes|No    Enable/Disable ACPI version update(Disabled by default). 			                
 
   MaxBusRatio=<n>	(was BusRatio) Set the current Bus Ratio to n, 
@@ -153,6 +149,21 @@ Acpipatcher module:
 		<key>Transition Latency</key>
 		<string>10</string>
 		</dict>
+                <key>1</key> // the pss status (must be expressed in Base 10)
+                .
+                .
+                .
+		<dict/>
+		<key>2</key> // the pss status (must be expressed in Base 10)
+                .
+                .
+                .
+		<dict/>
+                <key>X</key> // the pss status (must be expressed in Base 10)
+                .
+                .
+                .
+		<dict/>
 		<key>Base</key>
 		<string>10</string>  // must always be expressed in Base 10 
 		<key>Mode</key>
@@ -198,3 +209,52 @@ Acpipatcher module:
 		<key>YYYY</key>
 		<string>No</string> //do not drop YYYY table (if exist)
 		</dict>
+
+
+Acpipatcher module:
+------------------
+  EnableAcpiModule=Yes|No	Fully enable/disable the Acpipatcher module (Enabled by default, if the module is installed)
+     
+  RestartFix=Yes|No			Enable/Disable internal restart fix patch(Enabled by default, only available for intel platform).
+  
+  EnableSpeedStep=Yes|No	Enable/Disable GenerateCStates & GeneratePStates (Disabled by default).
+  
+  GeneratePStates=Yes|No	Enable/Disable Generate P-states SSDT table (Disabled by default).
+  GenerateCStates=Yes|No	Enable/Disable Generate C-states SSDT table (Disabled by default).
+  EnableC4State=Yes|No		Enable C4 state in C-states SSDT table, GenerateCStates=Yes is needed (Disabled by default).
+  
+  P-States=<dict>			P-States fine tuning method, see usage below(GeneratePStates=Yes is needed).
+  ACPIDropTables=<dict>		drop acpi table(s) method (can drop any unwanted tables), see usage below.
+  C-States=<dict>			C-States fine tuning method, see usage below(GenerateCStates=Yes is needed).
+  
+  DSDT=<file>   	Use an alternate DSDT.aml file,
+			        (default path: /DSDT.aml Extra/DSDT.aml,
+			        bt(0,0)/Extra/DSDT.aml).
+
+  quickSSDTsearch=Yes|No    If Yes, Acpipatcher will not search ssdt-(x+1).aml 
+			                if ssdt-x.aml do not exist,
+			                (eg. if ssdt-0.aml do not exist,
+                            Acpipather will not search ssdt-1.aml)(Enabled by default).
+							
+  UpdateACPI=Yes|No    Enable/Disable ACPI version update(Disabled by default). 			                
+
+  MaxBusRatio=<n>	(was BusRatio) Set the current Bus Ratio to n, 
+			        n must be a multiple of 10,
+					(eg. if you want to set a bus ratio to 8.5, n will be
+			        8.5*10=85), 
+			        if n = 0, MaxBusRatio = Disable,
+			        if set, Acpipatcher will drop every P-states with
+			        a bus ratio higher than n.
+						  
+  MinBusRatio=<n>	Set the Minimum Bus Ratio to n,
+			        n must be a multiple of 10,
+			        (eg. if you want to set the bus ratio to 8.5, n will be
+			        8.5*10=85), if set Acpipatcher will drop every 
+			        P-states with a bus ratio lower than n, 
+			        if n = 0, MinBusRatio = Disable.
+		  
+  P-States usage e.g: same as acpicodec  								 
+
+  C-States usage e.g: same as acpicodec 
+		
+  ACPIDropTables usage e.g: same as acpicodec 
