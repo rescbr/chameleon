@@ -1254,9 +1254,14 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	if ( (value=getStringForKey("SystemType", &bootInfo->bootConfig))!=NULL) {
 		if ((Type = (unsigned char) strtoul(value, NULL, 10) ) <= MaxSupportedPMProfile)
 		{
-			verbose("FADT: changing Preferred_PM_Profile from %d to %d\n", fadt->PreferredProfile, Type);
-			fadt_mod->PreferredProfile = Platform->Type = Type;
-		} else verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform->Type);
+			if (fadt_mod->PreferredProfile != Type) {
+				verbose("FADT: changing Preferred_PM_Profile from %d to %d\n", fadt->PreferredProfile, Type);
+				fadt_mod->PreferredProfile = Platform->Type = Type;
+			} else {
+				DBG("FADT: Preferred_PM_Profile was already set to %d, no need to be changed\n",Type);
+			}
+			
+		} else printf("Error: system-type must be 0..6. Defaulting to %d !\n", Platform->Type);
 	}		
 	
 	getBoolForKey(KIntelFADT, &intelfadtspec, &bootInfo->bootConfig);

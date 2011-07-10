@@ -793,7 +793,14 @@ int initGUI(void)
 				sprintf(dirsrc, "bt(0,0)/Extra/Themes");
 				
 			} else {
-				return 1;
+				ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
+				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+					sprintf(dirsrc, "rd(0,0)/Extra/Themes");
+					
+				} else {
+					printf("Failed to find the /extra/Themes folder\n");
+					return 1;
+				}
 			}
  
 		}		
@@ -806,7 +813,9 @@ int initGUI(void)
 	
 	if (theme_ran) {
 						
-		ret = randomTheme(dirsrc, &theme_name); 		
+		ret = randomTheme(dirsrc, &theme_name);
+ 		
+		if (ret) printf("randomTheme Failed !! \n");
 		
 	} 
 
@@ -816,17 +825,24 @@ int initGUI(void)
 		if (getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig ) == true)
 		{
 			ret = startGUI();
+			
+			if (ret) printf("Failed to load Theme : %s !! \n", theme_name);
 
 		} 
 #ifdef EMBED_THEME	
 		if (ret) {
 			theme_name = "";				
-			ret = startGUI();			
+			ret = startGUI();
+			
+			if (ret) printf("Failed to load Embed Theme !! \n");
+			
 		}		
 #endif		
 		if (ret) {
 			theme_name = THEME_NAME_DEFAULT;
 			ret = startGUI();
+			
+			if (ret) printf("Failed to load Default Theme : %s !! \n", THEME_NAME_DEFAULT);
 		}
 	}
 	return ret;
