@@ -129,7 +129,6 @@ Symbols.dylib: Symbols.o
 	-compatibility_version 1.0.0 \
 	-final_output Symbols \
 	-exported_symbols_list ${OBJROOT}/Symbols.save \
-	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/libcc_kext.a" \
 	${OBJROOT}/Symbols.o \
 	-o $(SYMROOT)/${SYMBOLS_MODULE} 
 

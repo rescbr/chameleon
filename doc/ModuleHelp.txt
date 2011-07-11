@@ -103,17 +103,24 @@ AcpiCodec module:
 
   EnableAcpiModule=Yes|No	Fully enable/disable the Acpipatcher module (Enabled by default, if the module is installed)
      
-  RestartFix=Yes|No			Enable/Disable internal restart fix patch(Enabled by default, only available for intel platform).
-  
+  RestartFix=Yes|No		Enable/Disable internal restart fix patch (Enabled by default, only available for intel platform).
+
+  ResetType=0|1			0 : PCI reset (Default)
+				1 : keyboard reset 
+
   EnableSpeedStep=Yes|No	Enable/Disable GenerateCStates & GeneratePStates (Disabled by default).
   
   GeneratePStates=Yes|No	Enable/Disable Generate P-states SSDT table (Disabled by default).
   GenerateCStates=Yes|No	Enable/Disable Generate C-states SSDT table (Disabled by default).
   EnableC4State=Yes|No		Enable C4 state in C-states SSDT table, GenerateCStates=Yes is needed (Disabled by default).
   
-  P-States=<dict>			P-States fine tuning method, see usage below(GeneratePStates=Yes is needed).
+  IntelFADTSpec=Yes|No		Enable/Disable Intel recommendations for the FADT table (Enabled by default). 
+				Warning : When enabled, this setting disable the C2 and C3 C-states, but be aware that these are the Intel's recommendations for the newest CPU, 
+					  if you really need those c-states please disable IntelFADTSpec.
+
+  P-States=<dict>		P-States fine tuning method, see usage below(GeneratePStates=Yes is needed).
   ACPIDropTables=<dict>		drop acpi table(s) method (can drop any unwanted tables), see usage below.
-  C-States=<dict>			C-States fine tuning method, see usage below(GenerateCStates=Yes is needed).
+  C-States=<dict>		C-States fine tuning method, see usage below(GenerateCStates=Yes is needed).
   
   							
   UpdateACPI=Yes|No    Enable/Disable ACPI version update(Disabled by default). 			                

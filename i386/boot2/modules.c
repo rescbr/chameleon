@@ -339,7 +339,7 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 	}
 	else
 	{
-		printf("Invalid mach magic\n");
+		printf("Modules: Invalid mach magic\n");
 		getc();
 		return NULL;
 	}
@@ -1238,6 +1238,8 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 
 /* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
  * And why it isn't needed when compiled into boot2
+ *
+ * In the next versions, this will be surely replaced by the Apple's libcc_kext or the meklort's klibc
  */
 
 uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)

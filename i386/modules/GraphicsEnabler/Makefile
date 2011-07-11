@@ -70,7 +70,6 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/libcc_kext.a" \
 	$(OBJROOT)/ati.o \
 	$(OBJROOT)/nvidia.o \
 	$(OBJROOT)/gma.o \

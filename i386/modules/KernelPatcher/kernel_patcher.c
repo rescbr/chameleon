@@ -12,6 +12,8 @@ extern PlatformInfo_t*    Platform;
 patchRoutine_t* patches = NULL;
 kernSymbols_t* kernelSymbols = NULL;
 
+void kernel_patcher_ignore_cache(void* arg1, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6){}
+
 
 void KernelPatcher_start()
 {
@@ -46,6 +48,9 @@ void KernelPatcher_start()
 	
 	
 	register_hook_callback("ExecKernel", &patch_kernel); 
+	
+	replace_function("_getKernelCachePath", &kernel_patcher_ignore_cache);
+	
 }
 
 /*

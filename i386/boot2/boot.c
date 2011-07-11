@@ -107,6 +107,7 @@ BVRef   bvChain;
 
 static bool getOSVersion(char *str);
 static void getRootDevice();
+void getKernelCachePath();
 
 #ifdef NBP_SUPPORT
 static bool gUnloadPXEOnExit = false;
@@ -300,28 +301,17 @@ static int ExecKernel(void *binary)
 	if (gMacOSVersion[3] <= '6') 
 		reserveKernLegacyBootStruct();   		
 	
-	
-	//uint8_t Pic1,Pic2;
-	
-	//Pic1 = inb(0x21); /* Save all interrupts Pic1 */
-	//Pic2 = inb(0xa1); /* Save all interrupts Pic2 */
-	
-	
-	
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
-//#if UNUSED
+#if UNUSED
 	turnOffFloppy();
-//#endif
-//#if BETA
+#endif
+#if BETA
 #include "smp.h"
 #include "apic.h"
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
-//#endif
+#endif
 	
-	if (gMacOSVersion[3] <= '6') {
-		
-		//outb(0x21, Pic1);   /* Restore all interrupts Pic1 */
-		//outb(0xa1, Pic2);   /* Restore all interrupts Pic2 */
+	if (gMacOSVersion[3] <= '6') {		
 		
 		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
 		startprog( kernelEntry, bootArgsLegacy );
@@ -564,7 +554,7 @@ void common_boot(int biosdev)
 		
 		if (!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len)) {		
         		
-			if(gMacOSVersion[3] == '7'){					
+			/*if(gMacOSVersion[3] == '7'){					
 						sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
 				}
 				else if(gMacOSVersion[3] <= '6')
@@ -624,7 +614,8 @@ void common_boot(int biosdev)
 						sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
 								
 								
-				}					
+				}*/	
+			getKernelCachePath();
        
 		}
 		
@@ -767,6 +758,74 @@ void common_boot(int biosdev)
 		nbpUnloadBaseCode();
     }
 #endif
+}
+
+void getKernelCachePath()
+{
+	long flags, cachetime;
+	int ret = -1;
+	
+	if(gMacOSVersion[3] == '7'){					
+		sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
+	}
+	else if(gMacOSVersion[3] <= '6')
+	{			 
+		
+		PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
+		if (platformInfo) {
+			
+			bzero(platformInfo, sizeof(PlatformInfo));
+			
+			if (gPlatformName)
+				strlcpy(platformInfo->platformName,gPlatformName, sizeof(platformInfo->platformName)+1);
+			
+			if (gRootDevice) {
+				char *rootPath_p = platformInfo->rootPath;
+				int len = strlen(gRootDevice) + 1;
+				if ((unsigned)len > sizeof(platformInfo->rootPath)) {
+					len = sizeof(platformInfo->rootPath);
+				}
+				memcpy(rootPath_p, gRootDevice,len);
+				
+				rootPath_p += len;
+				
+				len = strlen(bootInfo->bootFile);
+				
+				if ((unsigned)(rootPath_p - platformInfo->rootPath + len) >=
+					sizeof(platformInfo->rootPath)) {
+					
+					len = sizeof(platformInfo->rootPath) -
+					(rootPath_p - platformInfo->rootPath);
+				}                                
+				memcpy(rootPath_p, bootInfo->bootFile, len);							
+				
+			}	
+			
+			if (!platformInfo->platformName[0] || !platformInfo->rootPath[0]) {
+				platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
+			}
+			//memcpy(gRootPath,platformInfo->rootPath, sizeof(platformInfo->rootPath));
+			
+			
+			bootInfo->adler32 = OSSwapHostToBigInt32(local_adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
+			
+			free(platformInfo);	
+		}
+		
+		DBG("Adler32: %08lX\n",bootInfo->adler32);
+		
+		if (gMacOSVersion[3] < '6') {
+			sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",bootInfo->adler32);
+			ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
+			if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+				bootInfo->adler32 = 0;
+				sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache"); 
+			}						
+		} else
+			sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
+		
+		
+	}
 }
 
 // Maximum config table value size

@@ -1,3 +1,4 @@
+- Fixed an issue with kernelPatcher, it seems that kernelPatcher is unable to patch the kernelCache
 - Applied some fix from the trunk
 - Applied many under the hood fix
 - Added Andy Vandijck Server spoof
