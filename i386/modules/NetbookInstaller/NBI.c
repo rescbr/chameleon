@@ -36,7 +36,9 @@ extern long LoadDriverMKext(char *fileSpec);
 extern long LoadDriverPList(char *dirSpec, char *name, long bundleType);
 
 extern long MatchLibraries( void );
+#if UNUSED
 extern long MatchPersonalities( void );
+#endif
 extern long LoadMatchedModules( void );
 extern long InitDriverSupport(void);
 extern char *    gExtensionsSpec;
@@ -270,9 +272,9 @@ long NBI_LoadDrivers( char * dirSpec )
 		{
 			return 0;
 		}
-	
+#if UNUSED
     MatchPersonalities();
-	
+#endif
     MatchLibraries();
 	
     LoadMatchedModules();
