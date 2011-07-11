@@ -14,7 +14,6 @@ kernSymbols_t* kernelSymbols = NULL;
 
 void kernel_patcher_ignore_cache(void* arg1, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6){}
 
-
 void KernelPatcher_start()
 {
 	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_ANY, CPUID_MODEL_UNKNOWN); 
@@ -26,7 +25,6 @@ void KernelPatcher_start()
 	// NOTE: following is currently 32bit only
 	register_kernel_patch(patch_lapic_configure, KERNEL_32, CPUID_MODEL_ANY);
 
-	
 	register_kernel_symbol(KERNEL_ANY, "_panic");
 	register_kernel_symbol(KERNEL_ANY, "_cpuid_set_info");
 	register_kernel_symbol(KERNEL_ANY, "_pmCPUExitHaltToOff");
@@ -37,20 +35,16 @@ void KernelPatcher_start()
 	register_kernel_symbol(KERNEL_ANY, "_lapic_configure");
 	register_kernel_symbol(KERNEL_ANY, "_lapic_start");
 	register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt_base");
-	
+
 	// lapic_interrup symbols
 	//register_kernel_patch(patch_lapic_interrupt, KERNEL_ANY, CPUID_MODEL_ANY);
 	//register_kernel_symbol(KERNEL_ANY, "_lapic_interrupt");
 
-
-	
 	// TODO: register needed symbols
-	
-	
+
 	register_hook_callback("ExecKernel", &patch_kernel); 
 	
 	replace_function("_getKernelCachePath", &kernel_patcher_ignore_cache);
-	
 }
 
 /*
@@ -89,7 +83,6 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 						// CPU not in supported list, so we are going to add
 						// The patch will be applied
 						break;
-						
 				}
 			}
 			else
@@ -97,7 +90,6 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 				// Invalid cpuid for current cpu. Ignoring patch
 				return;
 			}
-
 		}
 	}
 		
@@ -132,7 +124,8 @@ void register_kernel_symbol(int kernelType, const char* name)
 		kernelSymbols->symbol = (char*)name;
 		kernelSymbols->addr = 0;
 	}
-	else {
+	else
+	{
 		kernSymbols_t *symbol = kernelSymbols;
 		while(symbol->next != NULL)
 		{
@@ -165,14 +158,12 @@ kernSymbols_t* lookup_kernel_symbol(const char* name)
 	{
 		return symbol;
 	}
-
 }
 
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6)
 {
 	patchRoutine_t* entry = patches;
 
-	
 	int arch = determineKernelArchitecture(kernelData);
 
 	locate_symbols(kernelData);
@@ -187,7 +178,6 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* ar
 			}
 			entry = entry->next;
 		}
-		
 	}
 }
 
@@ -197,6 +187,7 @@ int determineKernelArchitecture(void* kernelData)
 	{
 		return KERNEL_32;
 	}
+
 	if(((struct mach_header*)kernelData)->magic == MH_MAGIC_64)
 	{
 		return KERNEL_64;
@@ -206,7 +197,6 @@ int determineKernelArchitecture(void* kernelData)
 		return KERNEL_ERR;
 	}
 }
-
 
 /**
  **		This functions located the requested symbols in the mach-o file.
@@ -233,28 +223,43 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
 	return 0xFFFFFFFF; // fixme
 }
 
-
 /**
  ** Locate the fisrt instance of _panic inside of _cpuid_set_info, and either remove it
  ** Or replace it so that the cpuid is set to a valid value.
  **/
 void patch_cpuid_set_info_all(void* kernelData)
 {
+	// AnV: Extra cpuid fix for spoofing Nehalem CPU for i5/i9
+	switch(Platform->CPU.Family)
+	{
+		case 0x1E: /* Intel i5 */
+		case 0x2C: /* Intel i9 */
+			if(determineKernelArchitecture(kernelData) == KERNEL_32)
+			{
+				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
+			}
+			else 
+			{
+				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
+			}
+			
+			break;
+	}
+
 	switch(Platform->CPU.Model)
 	{
 		case CPUID_MODEL_ATOM:
 			if(determineKernelArchitecture(kernelData) == KERNEL_32)
 			{
-				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
+				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN);
 			}
 			else 
 			{
-				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
-
+				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN);
 			}
 
 			break;
-			
+
 		default:
 			if(determineKernelArchitecture(kernelData) == KERNEL_32)
 			{
@@ -268,6 +273,7 @@ void patch_cpuid_set_info_all(void* kernelData)
 			break;
 	}
 }
+
 void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {
 	UInt8* bytes = (UInt8*)kernelData;
@@ -276,17 +282,13 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	
 	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
-	
-	
+
 	//UInt32 jumpLocation = 0;
-	
-	
+
 	if(symbol == 0 || symbol->addr == 0)
 	{
 		verbose("Unable to locate _cpuid_set_info\n");
 		return;
-		
 	}
 	
 	symbol = lookup_kernel_symbol("_panic");
@@ -297,9 +299,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		return;
 	}
 	panicAddr -= (UInt32)kernelData;
-	
-	
-	
+
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
@@ -312,7 +312,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		patchLocation++;
 	}
 	patchLocation--;
-	
+
 	// Remove panic just in ca se
 	// The panic instruction is exactly 5 bytes long.
 	bytes[patchLocation + 0] = 0x90;
@@ -320,13 +320,10 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
-	
-	
-	
+
 	// Check for a 10.2.0+ kernel
 	if(bytes[patchLocation - 19] == 0xC7 && bytes[patchLocation - 18] == 0x05)
 	{
-		
 		UInt32 cpuid_cpufamily_addr =	bytes[patchLocation - 17] << 0  |
 										bytes[patchLocation - 16] << 8  |
 										bytes[patchLocation - 15] << 16 |
@@ -334,12 +331,10 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		
 		// NOTE: may change, determined based on cpuid_info struct
 		UInt32 cpuid_model_addr = cpuid_cpufamily_addr  - 310; 
-		
-		
+
 		//ffffff8000228b3b -> 0x00490e8b
 		//ffffff8000228c28 -> -237 -> 0x490D9E -> -310
-		
-		
+
 		// The mov is 10 bytes
 		/*
 		 bytes[patchLocation - 19] = 0x90;	// c7
@@ -353,8 +348,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		bytes[patchLocation - 12] = (impersonateFamily & 0x0000FF00) >> 8;
 		bytes[patchLocation - 11] = (impersonateFamily & 0x00FF0000) >> 16;	
 		bytes[patchLocation - 10] = (impersonateFamily & 0xFF000000) >> 24;
-		
-		
+
 		// The lea (%rip),%rip is 7 bytes
 		bytes[patchLocation - 9] = 0xC7;
 		bytes[patchLocation - 8] = 0x05;
@@ -363,10 +357,8 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		bytes[patchLocation - 5] = ((cpuid_model_addr -10) & 0x00FF0000) >> 16;
 		bytes[patchLocation - 4] = ((cpuid_model_addr -10) & 0xFF000000) >> 24;
 		bytes[patchLocation - 3] = impersonateModel;	// cpuid_model
-		
-		 
-		 
-		 // The xor eax eax is 2 bytes
+
+		// The xor eax eax is 2 bytes
 		bytes[patchLocation - 2] = 0x01;	// cpuid_extmodel
 		bytes[patchLocation - 1] = 0x00;	// cpuid_extfamily
 		
@@ -385,19 +377,12 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		// Total: 24 bytes
 		printf("Running on a 10.2.0+ kernel\n");
 		getc();
-
 	}
 	else {
 		printf("Running on a 10.0.0 kernel, patch unsupported\n");
 		getc();
 	}
-
-	
 }
-
-
-
-
 
 void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {	
@@ -407,17 +392,13 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 
 	UInt32 patchLocation = symbol ? symbol->addr - textAddress + textSection: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - textAddress + textSection);
 	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
-	
 
-	UInt32 jumpLocation = 0;
-	
-	
+	UInt32 jumpLocation = 0;	
+
 	if(symbol == 0 || symbol->addr == 0)
 	{
 		verbose("Unable to locate _cpuid_set_info\n");
 		return;
-		
 	}
 
 	symbol = lookup_kernel_symbol("_panic");
@@ -429,8 +410,6 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	}
 	panicAddr -= (UInt32)kernelData;
 
-	
-	
 	//TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
@@ -438,7 +417,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 																					bytes[patchLocation + 1] << 8  | 
 																					bytes[patchLocation + 2] << 16 |
 																					bytes[patchLocation + 3] << 24)))
-		  )
+		 )
 	{
 		patchLocation++;
 	}
@@ -450,8 +429,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
-	
-	
+
 	// Locate the jump call, so that 10 bytes can be reclamed.
 	// NOTE: This will *NOT* be located on pre 10.6.2 kernels
 	jumpLocation = patchLocation - 15;
@@ -483,8 +461,7 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		
 		// NOTE: may change, determined based on cpuid_info struct
 		UInt32 cpuid_model_addr = cpuid_cpufamily_addr - 299; 
-		
-		
+
 		// cpufamily
 		bytes[patchLocation - 11] = (impersonateFamily & 0x000000FF) >> 0;
 		bytes[patchLocation - 10] = (impersonateFamily & 0x0000FF00) >> 8;
@@ -511,7 +488,6 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
 		bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
 		bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
-		
 	}
 	else if(impersonateFamily && impersonateModel)
 	{
@@ -557,12 +533,9 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 			bytes[patchLocation + 2] = 0x01;	// cpuid_extmodel
 			bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
 			bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
-			
-			
-			
+
 			patchLocation = jumpLocation;
 			// We now have 14 bytes available for a patch
-			
 		}
 		else 
 		{
@@ -577,7 +550,6 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 		// IntelCPUPM kext may still panic due to the cpu's Model ID not being patched
 	}
 }
-
 
 /**
  ** SleepEnabler.kext replacement (for those that need it)
@@ -597,9 +569,7 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 	}
 	
 	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
-	
-	
+
 	while(bytes[patchLocation - 1]	!= 0xB8 ||
 		  bytes[patchLocation]		!= 0x04 ||	// KERN_INVALID_ARGUMENT (0x00000004)
 		  bytes[patchLocation + 1]	!= 0x00 ||	// KERN_INVALID_ARGUMENT
@@ -614,7 +584,6 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 
 void patch_lapic_init(void* kernelData)
 {
-
 	UInt8 panicIndex = 0;
 	UInt8* bytes = (UInt8*)kernelData;
 	
@@ -624,7 +593,6 @@ void patch_lapic_init(void* kernelData)
 	{
 		printf("Unable to locate %s\n", "_lapic_init");
 		return;
-		
 	}
 	
 	symbol = lookup_kernel_symbol("_panic");
@@ -638,9 +606,6 @@ void patch_lapic_init(void* kernelData)
 	patchLocation -= (UInt32)kernelData;	// Remove offset
 	panicAddr -= (UInt32)kernelData;	// Remove offset
 
-	
-	
-	
 	// Locate the (panicIndex + 1) panic call
 	while(panicIndex < 3)	// Find the third panic call
 	{
@@ -650,7 +615,7 @@ void patch_lapic_init(void* kernelData)
 																						bytes[patchLocation + 1] << 8  | 
 																						bytes[patchLocation + 2] << 16 |
 																						bytes[patchLocation + 3] << 24)))
-			  )
+			 )
 		{
 			patchLocation++;
 		}
@@ -664,10 +629,7 @@ void patch_lapic_init(void* kernelData)
 	bytes[++patchLocation] = 0x90;
 	bytes[++patchLocation] = 0x90;
 	bytes[++patchLocation] = 0x90;
-	
-	
 }
-
 
 void patch_commpage_stuff_routine(void* kernelData)
 {
@@ -683,7 +645,6 @@ void patch_commpage_stuff_routine(void* kernelData)
 	
 	UInt32 patchLocation = symbol->addr - textAddress + textSection; 
 
-	
 	symbol = lookup_kernel_symbol("_panic");
 	if(symbol == 0 || symbol->addr == 0)
 	{
@@ -701,7 +662,7 @@ void patch_commpage_stuff_routine(void* kernelData)
 																					bytes[patchLocation + 1] << 8  | 
 																					bytes[patchLocation + 2] << 16 |
 																					bytes[patchLocation + 3] << 24)))
-		  )
+		 )
 	{
 		patchLocation++;
 	}
@@ -713,26 +674,22 @@ void patch_commpage_stuff_routine(void* kernelData)
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
-	
-	
 }
 
 void patch_lapic_interrupt(void* kernelData)
 {
 	// NOTE: this is a hack untill I finish patch_lapic_configure
 	UInt8* bytes = (UInt8*)kernelData;
-	
+
 	kernSymbols_t *symbol = lookup_kernel_symbol("_lapic_interrupt");
 	if(symbol == 0 || symbol->addr == 0)
 	{
 		printf("Unable to locate %s\n", "_lapic_interrupt");
 		return;
-		
 	}
-	
+
 	UInt32 patchLocation = symbol->addr - textAddress + textSection; 
-	
-	
+
 	symbol = lookup_kernel_symbol("_panic");
 	if(symbol == 0 || symbol->addr == 0)
 	{
@@ -762,10 +719,7 @@ void patch_lapic_interrupt(void* kernelData)
 	bytes[patchLocation + 2] = 0x90;
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
-	
-	
 }
-
 
 void patch_lapic_configure(void* kernelData)
 {
@@ -791,7 +745,6 @@ void patch_lapic_configure(void* kernelData)
 	}
 	lapicStart = symbol->addr; 
 
-
 	symbol = lookup_kernel_symbol("_lapic_interrupt_base");
 	if(symbol == 0 || symbol->addr == 0)
 	{
@@ -802,7 +755,6 @@ void patch_lapic_configure(void* kernelData)
 	patchLocation -= (UInt32)kernelData;
 	lapicStart -= (UInt32)kernelData;
 	lapicInterruptBase -= (UInt32)kernelData;
-	
 	
 	// Looking for the following:
 	//movl   _lapic_start,%e_x
@@ -818,7 +770,7 @@ void patch_lapic_configure(void* kernelData)
 									 bytes[patchLocation + 3] << 24
 									)
 								   )
-		   ) || 
+		  ) || 
 		  (bytes[patchLocation + 4 ] != 0x81) ||
 		  //(bytes[patchLocation + 5 ] != 0Cx2) ||	// register
 		  (bytes[patchLocation + 6 ] != 0x20) ||
@@ -858,7 +810,7 @@ void patch_lapic_configure(void* kernelData)
 	bytes[patchLocation++];// = 0x00;
 	bytes[patchLocation++];// = 0x00;
 	*/
-	 patchLocation += 3;
+	patchLocation += 3;
 
 	// c7 02 00 04 00 00 -> movl		  $0x00000400,(%edx)
 	bytes[patchLocation++] = 0xC7;
@@ -935,7 +887,6 @@ void patch_lapic_configure(void* kernelData)
 	bytes[patchLocation++] = 0x02;
 
 	// Replace remaining with nops
-
 
 	bytes[patchLocation++] = 0x90;
 	bytes[patchLocation++] = 0x90;

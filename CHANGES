@@ -1,6 +1,7 @@
+- Applied Andy Vandijck's Nehalem (i5/i9) spoof to kernelpatcher
 - Fixed an issue with kernelPatcher, it seems that kernelPatcher is unable to patch the kernelCache
-- Applied some fix from the trunk
-- Applied many under the hood fix
+- Applied some fixes from the trunk
+- Applied many under the hood fixes
 - Added Andy Vandijck Server spoof
 - Added a Patch from Andy Vandijck in SMBiosPatcher and SMBiosGetters
 - Added a Patch from Netkas in GraphicEnabler (ati.c)
