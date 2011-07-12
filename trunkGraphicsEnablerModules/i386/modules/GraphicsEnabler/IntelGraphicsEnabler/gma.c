@@ -46,8 +46,8 @@ uint8_t GMAX3100_vals[22][4] = {
 	{ 0x00,0x00,0x00,0x00 }
 };
 
-uint8_t reg_TRUE[]	= { 0x01 ,0x00 ,0x00 ,0x00 };
-uint8_t reg_FALSE[] = { 0x00,0x00,0x00,0x00 };
+uint8_t reg_TRUE[]	= { 0x01, 0x00, 0x00, 0x00 };
+uint8_t reg_FALSE[] = { 0x00, 0x00, 0x00, 0x00 };
 
 static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x00000000, "Unknown"			},
@@ -107,9 +107,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	
 	if (!device)
 	{
-		printf("Failed initializing dev-prop string dev-entry, press any key...\n");
-		
-		getchar();
+		printf("Failed initializing dev-prop string dev-entry.\n");
+		pause();
 		return false;
 	}
 	
@@ -160,8 +159,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{
-		printf("no stringdata press a key...\n");
-		getchar();
+		printf("No stringdata.\n");
+		pause();
 		return false;
 	}
 	

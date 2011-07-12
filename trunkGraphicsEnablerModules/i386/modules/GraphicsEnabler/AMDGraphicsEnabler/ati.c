@@ -212,6 +212,7 @@ typedef struct {
 
 static radeon_card_info_t radeon_cards[] = {
 	//Azi: added devices
+// temporary placement
 	// issue #88
 	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*???*/"AMD Radeon HD 6600M Series",		kNull		},
 	// issue #89
@@ -900,7 +901,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 	char file_name[24];
 	bool do_load = false;
 	
-	getBoolForKey(key, &do_load, &bootInfo->bootConfig);
+	getBoolForKey(key, &do_load, &bootInfo->chameleonConfig);
 	if (!do_load)
 		return false;
 	
@@ -1168,7 +1169,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	get_vram_size();
 	
-	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->bootConfig);
+	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->chameleonConfig);
 	
 	if (add_vbios)
 	{
@@ -1193,7 +1194,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	atN = 0;
 	
-	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->bootConfig);
+	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
 	if (!card->cfg_name)
 	{
 		card->cfg_name = card_configs[card->info->cfg_name].name;

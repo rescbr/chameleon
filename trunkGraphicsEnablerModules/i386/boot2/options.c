@@ -710,7 +710,7 @@ int getBootOptions(bool firstRun)
 	// Allow user to override default timeout.
 	if (multiboot_timeout_set) {
 		timeout = multiboot_timeout;
-	} else if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->bootConfig)) {
+	} else if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->chameleonConfig)) {
 		/*  If there is no timeout key in the file use the default timeout
 		    which is different for CDs vs. hard disks.  However, if not booting
 		    a CD and no config file could be loaded set the timeout
@@ -778,7 +778,7 @@ int getBootOptions(bool firstRun)
 		int cnt;
 		int optionKey;
 
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->chameleonConfig)) {
 			prompt = malloc(cnt + 1);
 			strncat(prompt, val, cnt);
 		} else {
@@ -789,7 +789,7 @@ int getBootOptions(bool firstRun)
 			free(name);
 		}
 
-		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig )) {
+		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->chameleonConfig )) {
 			// The key specified is a special key.
 		} else {
 			// Default to F8.
@@ -876,7 +876,7 @@ int getBootOptions(bool firstRun)
 		if (!(gBootMode & kBootModeQuiet)) {
  
 			// Check if "Boot Banner"=N switch is present in config file.
-			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
+			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->chameleonConfig); 
 			if (showBootBanner) {
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
@@ -1114,7 +1114,7 @@ processBootArgument(
     } else if (getValueForBootKey(kernelFlags, argName, &val, &cnt)) {
         // Don't copy; these values will be copied at the end of argument processing.
         found = true;
-    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->bootConfig)) {
+    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig)) {
         copyArgument(argName, val, cnt, argP, cntRemainingP);
         found = true;
     }
@@ -1183,9 +1183,9 @@ processBootOptions()
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
 
-    loadOverrideConfig(&bootInfo->overrideConfig);
+    loadSystemConfig(&bootInfo->bootConfig);    
+    loadChameleonConfig(&bootInfo->chameleonConfig);
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.
@@ -1240,17 +1240,18 @@ processBootOptions()
             uuidSet = true;
         	}
         }
-
+        
         if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
             verbose("Setting boot-uuid to: %s\n", uuidStr);
             copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
             uuidSet = true;
         }
+         
     }
 
     if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
         cnt = 0;
-        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) {
+        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
             valueBuffer[0] = '*';
             cnt++;
             strlcpy(valueBuffer + 1, val, cnt);
@@ -1310,13 +1311,13 @@ processBootOptions()
 
 	if(!shouldboot)
 	{
-		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
-			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
+			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
-		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
+		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
 
-        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->bootConfig ) ) {
+        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
             gBootMode = kBootModeSafe;
        }
 	}

@@ -114,7 +114,6 @@ static long ParseTagString(char *buffer, TagPtr *tag);
 static long ParseTagInteger(char *buffer, TagPtr *tag);
 static long ParseTagData(char *buffer, TagPtr *tag);
 static long ParseTagDate(char *buffer, TagPtr *tag);
-static long ParseTagBoolean(char *buffer, TagPtr *tag, long type);
 static long GetNextTag(char *buffer, char **tag, long *start);
 static long FixDataMatchingTag(char *buffer, char *tag);
 static TagPtr NewTag(void);
@@ -149,6 +148,40 @@ XMLGetProperty( TagPtr dict, const char * key )
     return 0;
 }
 
+//==========================================================================
+// XMLGetProperty
+
+TagPtr
+XMLGetKey( TagPtr dict, int id )
+{
+    TagPtr tagList, tag;
+    
+    if (dict->type != kTagTypeDict) return 0;
+    
+    tag = 0;
+    int element = 0;
+    tagList = dict->tag;
+    while (tagList && element != id)
+    {
+        tag = tagList;
+        tagList = tag->tagNext;
+        
+        if ((tag->type != kTagTypeKey) || (tag->string == 0)) continue;
+        element++;
+        if(id == element) return tag;
+    }
+    return 0;
+}
+
+TagPtr XMLGetValueForKey(TagPtr key)
+{
+    if (!key ||
+        key->type != kTagTypeKey) return 0;
+    
+    return key->tag;
+}
+
+
 // XMLGetTag(int index)
 
 // XMLTagCount( TagPtr dict )
@@ -169,7 +202,7 @@ int XMLTagCount( TagPtr dict )
 			&& (dict->type != kTagTypeArray)	// If we are an array, any element is valid
 			) continue;
 		
-		if(tag->type == kTagTypeKey) printf("Located key %s\n", tag->string);
+		//if(tag->type == kTagTypeKey) printf("Located key %s\n", tag->string);
 
 		count++;
     }
@@ -266,11 +299,11 @@ XMLParseFile( char * buffer, TagPtr * dict )
     pos = 0;
 	char       *configBuffer;
 	
-	
-	
-    configBuffer = malloc(strlen(buffer)+1);
-    strcpy(configBuffer, buffer);
-	
+    int strlength = strlen(buffer);
+    configBuffer = malloc(strlength+1);
+    bcopy(buffer, configBuffer, strlength);
+    configBuffer[strlength] = 0;
+
 	buffer_start = configBuffer;
 
     while (1)
@@ -819,7 +852,7 @@ ParseTagDate( char * buffer, TagPtr * tag )
 //==========================================================================
 // ParseTagBoolean
 
-static long
+long
 ParseTagBoolean( char * buffer, TagPtr * tag, long type )
 {
     TagPtr tmpTag;
@@ -1064,6 +1097,11 @@ bool XMLIsType(TagPtr dict, enum xmltype type)
 }
 
 /*** Cast functions ***/
+bool XMLIsArray(TagPtr entry)
+{
+    return entry && (entry->type == kTagTypeArray);
+}
+
 TagPtr XMLCastArray(TagPtr dict)
 {
 	if(!dict) return NULL;
@@ -1071,11 +1109,24 @@ TagPtr XMLCastArray(TagPtr dict)
 	else return NULL;
 }
 
+bool XMLIsDict(TagPtr entry)
+{
+    return entry && (entry->type == kTagTypeDict);
+}
+
+
 TagPtr XMLCastDict(TagPtr dict)
 {
 	if(!dict) return NULL;
 	if(dict->type == kTagTypeDict) return dict;
 	else return NULL;
+}
+
+bool XMLIsString(TagPtr entry)
+{
+    return entry && 
+    ((entry->type == kTagTypeString) ||
+     (entry->type == kTagTypeKey));
 }
 
 char* XMLCastString(TagPtr dict)
@@ -1102,6 +1153,13 @@ long XMLCastStringOffset(TagPtr dict)
 	}
 }
 
+bool XMLIsBoolean(TagPtr entry)
+{
+    return entry && 
+            ((entry->type == kTagTypeTrue) ||
+             (entry->type == kTagTypeFalse));
+}
+
 bool XMLCastBoolean(TagPtr dict)
 {
 	if(!dict) return false;
@@ -1109,13 +1167,60 @@ bool XMLCastBoolean(TagPtr dict)
 	return false;
 }
 
+bool XMLIsInteger(TagPtr entry)
+{
+    return entry && (entry->type == kTagTypeInteger);
+}
+
 int XMLCastInteger(TagPtr dict)
 {
 	if(!dict)
 	{
-		printf("XMLCastInteger: null dict\n");
+		//printf("XMLCastInteger: null dict\n");
 		return 0;
 	}
 	if(dict->type == kTagTypeInteger) return (int)(dict->string);
 	return 0;
+}
+
+bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value)
+{
+    if (!dict || dict->type != kTagTypeDict) return false;
+
+    TagPtr tmpTag;
+    char* string;
+
+    tmpTag = NewTag();
+    if (tmpTag == 0)
+    {
+        return false;
+    }
+    
+    string = NewSymbol(key);
+    if (string == 0)
+    {
+        XMLFreeTag(tmpTag);
+        return false;
+    }
+    
+    tmpTag->type = kTagTypeKey;
+    tmpTag->string = string;
+    tmpTag->tag = value;
+	tmpTag->offset = 0;
+    tmpTag->tagNext = 0;
+    
+    TagPtr tagList = dict->tag;
+    if(!tagList)
+    {
+        // First tag
+        dict->tag = tmpTag;
+        return true;
+    }
+    while(tagList && tagList->tagNext) tagList = tagList->tagNext;
+    if(tagList)
+    {
+        tagList->tagNext = tmpTag;
+        return true;
+    }
+    return false;
 }

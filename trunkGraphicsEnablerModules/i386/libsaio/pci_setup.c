@@ -18,8 +18,8 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 	
 	do_eth_devprop = do_enable_hpet = false;
 	
-	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->bootConfig);
-	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
+	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
 	while (current)
 	{
