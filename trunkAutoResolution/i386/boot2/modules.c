@@ -177,7 +177,7 @@ int load_module(char* module)
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
 			// Notify the system that it was laoded
-			module_loaded(module, NULL, NULL, 0, 0 /*moduleName, moduleVersion, moduleCompat*/);
+			module_loaded(module, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module); DBGPAUSE();
 		}
@@ -210,8 +210,6 @@ int load_module(char* module)
  */
 long long add_symbol(char* symbol, long long addr, char is64)
 {
-	if(is64) return  0xFFFFFFFF; // Fixme
-
 	// This only can handle 32bit symbols 
 	symbolList_t* entry;
 	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
@@ -223,7 +221,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 	entry->addr = (UInt32)addr;
 	entry->symbol = symbol;
 	
-	if(strcmp(symbol, "start") == 0)
+	if(!is64 && strcmp(symbol, "start") == 0)
 	{
 		return addr;
 	}
@@ -457,6 +455,7 @@ void* parse_mach(void* binary,
 				
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
+                // Required modules
 				dylibCommand  = binary + binaryIndex;
 				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 				// Possible enhancments: verify version
@@ -477,7 +476,7 @@ void* parse_mach(void* binary,
 				break;
 				
 			case LC_ID_DYLIB:
-				dylibCommand = binary + binaryIndex;
+				//dylibCommand = binary + binaryIndex;
 				/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 				 moduleVersion =	dylibCommand->dylib.current_version;
 				 moduleCompat =	dylibCommand->dylib.compatibility_version;

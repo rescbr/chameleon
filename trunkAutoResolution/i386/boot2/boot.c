@@ -95,12 +95,6 @@ static bool gUnloadPXEOnExit = false;
  */
 #define kBootErrorTimeout 5
 
-/*
- * Default path to kernel cache file
- */
-//Slice - first one for Leopard
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
 //==========================================================================
 // Zero the BSS.
@@ -156,11 +150,14 @@ static int ExecKernel(void *binary)
 	// Notify modules that the kernel has been decoded
 	execute_hook("DecodedKernel", (void*)binary, NULL, NULL, NULL);
 	
+    setupFakeEfi();
+
 	// Load boot drivers from the specifed root path.
-	if (!gHaveKernelCache)
-		LoadDrivers("/");
+    //if (!gHaveKernelCache)
+    LoadDrivers("/");
 	
-	
+    execute_hook("DriversLoaded", (void*)binary, NULL, NULL, NULL);
+
 	clearActivityIndicator();
 	
 	if (gErrors) {
@@ -168,9 +165,7 @@ static int ExecKernel(void *binary)
 		printf("Pausing %d seconds...\n", kBootErrorTimeout);
 		sleep(kBootErrorTimeout);
 	}
-	
-	setupFakeEfi();
-	
+		
 	md0Ramdisk();
 	
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
@@ -186,7 +181,7 @@ static int ExecKernel(void *binary)
 	}
 	
 	bool dummyVal;
-	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->bootConfig) && dummyVal) {
+	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal) {
 		printf("Press any key to continue...");
 		getchar();
 	}
@@ -296,7 +291,7 @@ void common_boot(int biosdev)
     bool     firstRun = true;
     bool     instantMenu;
     bool     rescanPrompt;
-    unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
+    unsigned int allowBVFlags = kBVFlagSystemVolume | kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 
     // Set reminder to unload the PXE base code. Neglect to unload
@@ -331,14 +326,14 @@ void common_boot(int biosdev)
     setBootGlobals(bvChain);
     
     // Load boot.plist config file
-    status = loadSystemConfig(&bootInfo->bootConfig);
+    status = loadChameleonConfig(&bootInfo->chameleonConfig);
 
-    if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
+    if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet) {
         gBootMode |= kBootModeQuiet;
     }
 
     // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-    if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
+    if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->chameleonConfig) && instantMenu) {
         firstRun = false;
     }
 
@@ -349,18 +344,18 @@ void common_boot(int biosdev)
     gEnableCDROMRescan = false;
 
     // Enable it with Rescan=y in system config
-    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan) {
+    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->chameleonConfig) && gEnableCDROMRescan) {
         gEnableCDROMRescan = true;
     }
 
     // Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
     rescanPrompt = false;
-    if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
+    if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
         gEnableCDROMRescan = promptForRescanOption();
     }
 
     // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
+    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->chameleonConfig) && gScanSingleDrive) {
         gScanSingleDrive = true;
     }
 
@@ -387,7 +382,7 @@ void common_boot(int biosdev)
 
 	useGUI = true;
 	// Override useGUI default
-	getBoolForKey(kGUIKey, &useGUI, &bootInfo->bootConfig);
+	getBoolForKey(kGUIKey, &useGUI, &bootInfo->chameleonConfig);
 	
 //autoresolution -  default to false
 	// http://forum.voodooprojects.org/index.php/topic,1227.0.html
@@ -465,7 +460,7 @@ void common_boot(int biosdev)
         bool tryresume;
         bool tryresumedefault;
         bool forceresume;
-		bool usecache;
+		bool usecache = false;//true;
 
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
@@ -525,23 +520,31 @@ void common_boot(int biosdev)
 		} else {
 			archCpuType = CPU_TYPE_I386;
 		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) {
+		if (getValueForKey(karch, &val, &len, &bootInfo->chameleonConfig)) {
+			if (strncmp(val, "i386", 4) == 0) {
+				archCpuType = CPU_TYPE_I386;
+			}
+		}
+        
+        if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
 			if (strncmp(val, "i386", 4) == 0) {
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
 
+        //archCpuType = CPU_TYPE_I386;
+        
 		// Notify moduals that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
 
-		if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
+		if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
 		} else {
 			tryresumedefault = false;
 		}
 
-		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig)) {
+		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig)) {
 			forceresume = false;
 		}
 		
@@ -553,7 +556,7 @@ void common_boot(int biosdev)
 		while (tryresume) {
 			const char *tmp;
 			BVRef bvr;
-			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->bootConfig))
+			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->chameleonConfig))
 				val="/private/var/vm/sleepimage";
 			
 			// Do this first to be sure that root volume is mounted
@@ -577,10 +580,16 @@ void common_boot(int biosdev)
 			HibernateBoot((char *)val);
 			break;
 		}
-		
-		if(getBoolForKey(kUseKernelCache, &usecache, &bootInfo->bootConfig) && usecache) {
+        
+		getBoolForKey(kUseKernelCache, &usecache, &bootInfo->chameleonConfig);
+		if(usecache) {
 			if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig)) {
-				strlcpy(gBootKernelCacheFile, val, len+1);
+                if(val[0] == '\\')
+                {
+                    len--;
+                    val++;
+                }
+                strlcpy(gBootKernelCacheFile, val, len+1);
 			}
 			else {
 				//Lion
@@ -619,7 +628,7 @@ void common_boot(int biosdev)
 					// Reset cache name.
 					bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
 					
-					sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+					sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->chameleonConfig);
 					
 					adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 					
@@ -639,13 +648,13 @@ void common_boot(int biosdev)
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 		
         if (trycache) do {
-      
-            // if we haven't found the kernel yet, don't use the cache
             ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
-            if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+            if(ret != 0) kerneltime = 0;
+            else if ((flags & kFileTypeMask) != kFileTypeFlat) {
                 trycache = 0;
                 break;
             }
+
             ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
             if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
                 || (cachetime < kerneltime)) {
@@ -658,10 +667,10 @@ void common_boot(int biosdev)
                 trycache = 0;
                 break;
             }
-            if (kerneltime > exttime) {
+            if (ret == 0 && kerneltime > exttime) {
                 exttime = kerneltime;
             }
-            if (cachetime != (exttime + 1)) {
+            if (ret == 0 && cachetime != (exttime + 1)) {
                 trycache = 0;
                 break;
             }
@@ -684,7 +693,7 @@ void common_boot(int biosdev)
                 if (ret >= 0)
                     break;
 				
-				verbose("Kernel cache did not loaded %s\n ", bootFile);
+				verbose("Kernel cache did not load %s\n ", bootFile);
             }
 			
             bootFile = bootInfo->bootFile;

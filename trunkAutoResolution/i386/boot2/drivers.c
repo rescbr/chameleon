@@ -88,11 +88,12 @@ long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
 /*static*/ unsigned long Adler32( unsigned char * buffer, long length );
 
-static long FileLoadDrivers(char *dirSpec, long plugin);
-static long NetLoadDrivers(char *dirSpec);
-static long LoadDriverMKext(char *fileSpec);
-static long LoadDriverPList(char *dirSpec, char *name, long bundleType);
-static long LoadMatchedModules(void);
+long FileLoadDrivers(char *dirSpec, long plugin);
+long NetLoadDrivers(char *dirSpec);
+long LoadDriverMKext(char *fileSpec);
+long LoadDriverPList(char *dirSpec, char *name, long bundleType);
+long LoadMatchedModules(void);
+
 static long MatchPersonalities(void);
 static long MatchLibraries(void);
 #ifdef NOTDEF
@@ -102,7 +103,7 @@ static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
 static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
 static long InitDriverSupport(void);
 
-static ModulePtr gModuleHead, gModuleTail;
+ModulePtr gModuleHead, gModuleTail;
 static TagPtr    gPersonalityHead, gPersonalityTail;
 static char *    gExtensionsSpec;
 static char *    gDriverSpec;
@@ -209,36 +210,44 @@ long LoadDrivers( char * dirSpec )
 	            }
 	        }
         }
-
-        // Also try to load Extensions from boot helper partitions.
-        if (gBootVolume->flags & kBVFlagBooter)
+        if(!gHaveKernelCache)
         {
-            strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
-            if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+            // Don't load main driver (from /System/Library/Extentions) if gHaveKernelCache is set.
+            // since these drivers will already be in the kernel cache.
+            // NOTE: when gHaveKernelCache, xnu cannot (by default) load *any* extra kexts from the bootloader.
+            // The /Extra code is not disabled in this case due to a kernel patch that allows for this to happen.
+            
+            // Also try to load Extensions from boot helper partitions.
+            if (gBootVolume->flags & kBVFlagBooter)
             {
-                strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
+                strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
                 if (FileLoadDrivers(dirSpecExtra, 0) != 0)
                 {
-                    strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
-                    FileLoadDrivers(dirSpecExtra, 0);
+                    strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
+                    if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+                    {
+                        strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
+                        FileLoadDrivers(dirSpecExtra, 0);
+                    }
                 }
             }
-        }
-
-        if (gMKextName[0] != '\0')
-        {
-            verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-            if ( LoadDriverMKext(gMKextName) != 0 )
+            
+            if (gMKextName[0] != '\0')
             {
-                error("Could not load %s\n", gMKextName);
-                return -1;
+                verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
+                if ( LoadDriverMKext(gMKextName) != 0 )
+                {
+                    error("Could not load %s\n", gMKextName);
+                    return -1;
+                }
             }
-        }
-        else
-        {
-            strcpy(gExtensionsSpec, dirSpec);
-            strcat(gExtensionsSpec, "System/Library/");
-            FileLoadDrivers(gExtensionsSpec, 0);
+            else
+            {
+                strcpy(gExtensionsSpec, dirSpec);
+                strcat(gExtensionsSpec, "System/Library/");
+                FileLoadDrivers(gExtensionsSpec, 0);
+            }
+
         }
     }
     else
@@ -288,7 +297,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 //==========================================================================
 // FileLoadDrivers
 
-static long
+long
 FileLoadDrivers( char * dirSpec, long plugin )
 {
     long         ret, length, flags, time, bundleType;
@@ -346,10 +355,11 @@ FileLoadDrivers( char * dirSpec, long plugin )
     return result;
 }
 
+
 //==========================================================================
 // 
 
-static long
+long
 NetLoadDrivers( char * dirSpec )
 {
     long tries;
@@ -385,7 +395,7 @@ NetLoadDrivers( char * dirSpec )
 //==========================================================================
 // loadDriverMKext
 
-static long
+long
 LoadDriverMKext( char * fileSpec )
 {
     unsigned long    driversAddr, driversLength;
@@ -431,7 +441,7 @@ LoadDriverMKext( char * fileSpec )
 //==========================================================================
 // LoadDriverPList
 
-static long
+long
 LoadDriverPList( char * dirSpec, char * name, long bundleType )
 {
     long      length, executablePathLength, bundlePathLength;
@@ -445,16 +455,18 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
     do {
         // Save the driver path.
         
-        sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
+        if(name) sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+        else sprintf(gFileSpec, "%s/%s", dirSpec,
+                     (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 
         tmpExecutablePath = malloc(executablePathLength);
         if (tmpExecutablePath == 0) break;
-
         strcpy(tmpExecutablePath, gFileSpec);
   
-        sprintf(gFileSpec, "%s/%s", dirSpec, name);
+        if(name) sprintf(gFileSpec, "%s/%s", dirSpec, name);
+        else sprintf(gFileSpec, "%s", dirSpec);
         bundlePathLength = strlen(gFileSpec) + 1;
 
         tmpBundlePath = malloc(bundlePathLength);
@@ -464,23 +476,22 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 
         // Construct the file spec to the plist, then load it.
 
-        sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
+        if(name) sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/" : "");
+        else sprintf(gFileSpec, "%s/%sInfo.plist", dirSpec,
+                     (bundleType == kCFBundleType2) ? "Contents/" : "");
 
         length = LoadFile(gFileSpec);
         if (length == -1) break;
-
         length = length + 1;
         buffer = malloc(length);
         if (buffer == 0) break;
-
         strlcpy(buffer, (char *)kLoadAddr, length);
 
         // Parse the plist.
 
         ret = ParseXML(buffer, &module, &personalities);
         if (ret != 0) { break; }
-
         // Allocate memory for the driver path and the plist.
 
         module->executablePath = tmpExecutablePath;
@@ -490,7 +501,6 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
   
         if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
             break;
-
         // Save the driver path in the module.
         //strcpy(module->driverPath, tmpDriverPath);
         tmpExecutablePath = 0;
@@ -538,7 +548,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 //==========================================================================
 // LoadMatchedModules
 
-static long
+long
 LoadMatchedModules( void )
 {
 	TagPtr		  prop;
@@ -581,6 +591,9 @@ LoadMatchedModules( void )
 //				}
 
 				// Make make in the image area.
+                
+                execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
+
 				driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
 				driverAddr = AllocateKernelMemory(driverLength);
 
@@ -713,7 +726,7 @@ static long
 ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 {
 	long       length, pos;
-	TagPtr     moduleDict, required;
+	TagPtr     moduleDict;
 	ModulePtr  tmpModule;
   
     pos = 0;
@@ -733,14 +746,14 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
   
     if (length == -1) return -1;
 
-    required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
-    if ( (required == 0) ||
-         (required->type != kTagTypeString) ||
-         !strcmp(required->string, "Safe Boot"))
+#if 0   /** remove this check. **/   
+    if (strcmp(XMLCastString(XMLGetProperty(moduleDict, kPropOSBundleRequired)), "Safe Boot") == 0)
     {
+        // Don't load Safe Boot kexts. NOTE: -x should be check too.
         XMLFreeTag(moduleDict);
         return -2;
     }
+#endif 
 
     tmpModule = malloc(sizeof(Module));
     if (tmpModule == 0)
@@ -817,24 +830,23 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 	}
 	
-	// Notify modules that the kernel has been decompressed and is about to be decoded
-	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
-	
 	ret = ThinFatFile(&binary, &len);
-	
-	if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
-	{
-		archCpuType=CPU_TYPE_I386;
-		ret = ThinFatFile(&binary, &len);
-	}
-	
-	ret = DecodeMachO(binary, rentry, raddr, rsize);
-	
-	if (ret<0 && archCpuType==CPU_TYPE_X86_64)
-	{
-		archCpuType=CPU_TYPE_I386;
-		ret = DecodeMachO(binary, rentry, raddr, rsize);
-	}
-	
-	return ret;
+    if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
+    {
+        archCpuType=CPU_TYPE_I386;
+        ret = ThinFatFile(&binary, &len);
+    }
+    
+    // Notify modules that the kernel has been decompressed and thinned, is about to be decoded
+	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
+    
+    
+    ret = DecodeMachO(binary, rentry, raddr, rsize);
+    if (ret<0 && archCpuType==CPU_TYPE_X86_64)
+    {
+        archCpuType=CPU_TYPE_I386;
+        ret = DecodeMachO(binary, rentry, raddr, rsize);
+    }
+    
+    return ret;
 }

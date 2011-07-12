@@ -78,6 +78,8 @@ static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x1
 
 extern int multiboot_partition;
 extern int multiboot_partition_set;
+extern int multiboot_skip_partition;
+extern int multiboot_skip_partition_set;
 
 struct devsw {
     const char *  name;
@@ -335,6 +337,7 @@ long GetFileInfo(const char * dirSpec, const char * name,
 
         for (idx = len; idx && (name[idx] != '/' && name[idx] != '\\'); idx--) {}
         if (idx == 0) {
+            if(name[idx] == '/' || name[idx] == '\\') ++name;   // todo: ensure other functions handel \ properly
             gMakeDirSpec[0] = '/';
             gMakeDirSpec[1] = '\0';
         } else {
@@ -822,7 +825,7 @@ BVRef selectBootVolume( BVRef chain )
 	 * to override the default selection.
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
-	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
+	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->chameleonConfig));
     if (val) {
         for ( bvr = chain; bvr; bvr = bvr->next ) {
             if (matchVolumeToString(bvr, val, false)) {
@@ -841,6 +844,9 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	for ( bvr = chain; bvr; bvr = bvr->next )
 	{
+        if (multiboot_skip_partition_set) {
+            if (bvr->part_no == multiboot_skip_partition) continue;
+        }
 		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev ) foundPrimary = true;
 		// zhell -- Undo a regression that was introduced from r491 to 492.
 		// if gBIOSBootVolume is set already, no change is required

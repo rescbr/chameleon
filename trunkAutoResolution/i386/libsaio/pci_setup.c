@@ -2,9 +2,9 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
+#include "gma.h"
 #include "nvidia.h"
 #include "modules.h"
-#include "gma.h" //Azi:autoresolution
 
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
@@ -22,9 +22,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 	do_eth_devprop = do_gfx_devprop = do_enable_hpet = false;
 
-	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->bootConfig);
-	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->bootConfig);
-	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->bootConfig);
+	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
 	while (current)
 	{
@@ -50,15 +50,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							setup_ati_devprop(current); 
 							break;
 					
-						case PCI_VENDOR_ID_INTEL: // AutoResolution
-							verbose("Intel Graphics Controller [%04x:%04x] :: %s \n",
-									current->vendor_id, current->device_id, devicepath);
+						case PCI_VENDOR_ID_INTEL:
 							setup_gma_devprop(current);
 							break;
-							//message to be removed once support for these cards is added 
-							//verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-							//		current->vendor_id, current->device_id, devicepath);
-							//break;
 					
 						case PCI_VENDOR_ID_NVIDIA: 
 							setup_nvidia_devprop(current);
