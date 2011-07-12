@@ -1,6 +1,6 @@
 /*
 	Original patch by Nawcom
-	http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
+	http://forum.voodooprojects.org/index.php/topic,1029.0.html
 */
 
 #include "libsa.h"
@@ -56,9 +56,9 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x808627A6, "Mobile GMA950"	},
 	{ 0x8086A011, "Mobile GMA3150"	},
 	{ 0x8086A012, "Mobile GMA3150"	},
-//Azi: i can get QE/CI but no framebuffer... more testing needed.
 	{ 0x80862772, "Desktop GMA950"	},
 	{ 0x80862776, "Desktop GMA950"	},
+//	{ 0x8086A001, "Desktop GMA3150" },
 	{ 0x8086A001, "Mobile GMA3150"	},
 	{ 0x8086A002, "Desktop GMA3150" },
 	{ 0x80862A02, "GMAX3100"		},
@@ -155,7 +155,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,Stretch",					GMAX3100_vals[21], 4);
 		devprop_add_value(device, "class-code",						ClassFix, 4);
 	}
-		
+	
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{

@@ -837,7 +837,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
         ret = ThinFatFile(&binary, &len);
     }
     
-    // Notify modules that the kernel has been decompressed and thinned, is about to be decoded
+    // Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
     
     

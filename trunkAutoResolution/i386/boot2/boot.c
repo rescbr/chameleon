@@ -182,8 +182,8 @@ static int ExecKernel(void *binary)
 	
 	bool dummyVal;
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal) {
-		printf("Press any key to continue...");
-		getchar();
+		printf("(Wait) ");
+		pause();
 	}
 	
 	usb_loop();
