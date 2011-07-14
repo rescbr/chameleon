@@ -552,71 +552,10 @@ void common_boot(int biosdev)
 			readSMBIOS(thePlatformName); // read smbios Platform Name
 		
 		
-		if (!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len)) {		
-        		
-			/*if(gMacOSVersion[3] == '7'){					
-						sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
-				}
-				else if(gMacOSVersion[3] <= '6')
-				{			 
-
-						PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
-						if (platformInfo) {
-							
-							bzero(platformInfo, sizeof(PlatformInfo));
-							
-							if (gPlatformName)
-								strlcpy(platformInfo->platformName,gPlatformName, sizeof(platformInfo->platformName)+1);
-																			
-							if (gRootDevice) {
-								char *rootPath_p = platformInfo->rootPath;
-                                int len = strlen(gRootDevice) + 1;
-                                if ((unsigned)len > sizeof(platformInfo->rootPath)) {
-                                    len = sizeof(platformInfo->rootPath);
-                                }
-								memcpy(rootPath_p, gRootDevice,len);
-                                
-								rootPath_p += len;
-                                
-                                len = strlen(bootInfo->bootFile);
-                                
-                                if ((unsigned)(rootPath_p - platformInfo->rootPath + len) >=
-                                    sizeof(platformInfo->rootPath)) {
-                                    
-                                    len = sizeof(platformInfo->rootPath) -
-                                    (rootPath_p - platformInfo->rootPath);
-                                }                                
-								memcpy(rootPath_p, bootInfo->bootFile, len);							
-								
-							}	
-							
-							if (!platformInfo->platformName[0] || !platformInfo->rootPath[0]) {
-								platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
-							}
-							//memcpy(gRootPath,platformInfo->rootPath, sizeof(platformInfo->rootPath));
-
-							
-							bootInfo->adler32 = OSSwapHostToBigInt32(local_adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
-							
-							free(platformInfo);	
-						}
-
-					DBG("Adler32: %08lX\n",bootInfo->adler32);
+		if (!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len)) {    		
 				
-					if (gMacOSVersion[3] < '6') {
-						sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",bootInfo->adler32);
-						ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
-						if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
-							bootInfo->adler32 = 0;
-							sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache"); 
-						}						
-					} else
-						sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
-								
-								
-				}*/	
-			getKernelCachePath();
-       
+			getKernelCachePath(); 
+			
 		}
 		
 		// Check for cache file.

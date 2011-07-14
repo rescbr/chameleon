@@ -229,23 +229,6 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
  **/
 void patch_cpuid_set_info_all(void* kernelData)
 {
-	// AnV: Extra cpuid fix for spoofing Nehalem CPU for i5/i9
-	switch(Platform->CPU.Family)
-	{
-		case 0x1E: /* Intel i5 */
-		case 0x2C: /* Intel i9 */
-			if(determineKernelArchitecture(kernelData) == KERNEL_32)
-			{
-				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
-			}
-			else 
-			{
-				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
-			}
-			
-			break;
-	}
-
 	switch(Platform->CPU.Model)
 	{
 		case CPUID_MODEL_ATOM:
@@ -261,16 +244,36 @@ void patch_cpuid_set_info_all(void* kernelData)
 			break;
 
 		default:
-			if(determineKernelArchitecture(kernelData) == KERNEL_32)
+		{
+			// AnV: Extra cpuid fix for spoofing Nehalem CPU for i5/i9
+			switch(Platform->CPU.Family)
 			{
-				patch_cpuid_set_info_32(kernelData, 0, 0);
+				case 0x1E: /* Intel i5 */
+				case 0x2C: /* Intel i9 */
+					if(determineKernelArchitecture(kernelData) == KERNEL_32)
+					{
+						patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
+					}
+					else 
+					{
+						patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_NEHALEM, CPUID_MODEL_NEHALEM);
+					}
+					
+					break;
+				
+				default:
+					if(determineKernelArchitecture(kernelData) == KERNEL_32)
+					{
+						patch_cpuid_set_info_32(kernelData, 0, 0);
+					}
+					else
+					{
+						patch_cpuid_set_info_64(kernelData, 0, 0);
+					}					
+					break;
 			}
-			else
-			{
-				patch_cpuid_set_info_64(kernelData, 0, 0);
-			}
-
-			break;
+			break;			
+		}
 	}
 }
 
