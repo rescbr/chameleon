@@ -210,10 +210,10 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
         }
 
         // Tally up the conventional/extended memory sizes.
-
-        if ( range->type == kMemoryRangeUsable ||
-             range->type == kMemoryRangeACPI   ||
-             range->type == kMemoryRangeNVS )
+//kMemoryRangeReserved = 2,  //do not use
+        if ( range->type == kMemoryRangeUsable ||  //1
+             range->type == kMemoryRangeACPI   ||  //3
+             range->type == kMemoryRangeNVS )		//4
         {
             // Tally the conventional memory ranges.
             if ( range->base + range->length <= 0xa0000 ) {

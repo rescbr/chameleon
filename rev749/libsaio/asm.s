@@ -337,8 +337,59 @@ LABEL(_halt)
     call    _bgetc
 #endif
     jmp     _halt
+	
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// disableIRQs()
+//
+// Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
+//
+LABEL(_disableIRQs)
+	// The ACPI specification dictates that the 8259 (PC-AT compatible) vectors 
+	// must be disabled (that is, masked) when enabling the ACPI APIC operation 
+	// but this isn't done (apparently) on all mobo's and thus we do that here.
+
+	push	%eax			// Saving register data
+
+	movb	$0x80, %al		// Block NMI
+	outb	%al, $0x70
+
+	movb	$0xff, %al		// Load mask
+	outb	%al, $0x21		// Disable IRQ's 0-7 on Master PIC
+	outb	%al, $0xa1		// Disable IRQ's 8-15 on Slave PIC
+
+	popl	%eax			// Restore register data
+
+	ret
+	
 
 #ifndef BOOT1
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// startMachKernel(phyaddr, bootargs)
+//
+// Starts the Mach Kernel in protected mode where phyaddr is the entry point.
+// Passes boot arguments in %eax.
+//
+LABEL(_startMachKernel)
+    call    _disableIRQs	// Taking care of a ACPI bug.
+
+	push    %ebp
+    mov     %esp, %ebp
+
+    mov     0xc(%ebp), %eax  // bootargs to mach_kernel
+    mov     0x8(%ebp), %ecx  // entry offset 
+    mov     $0x28, %ebx      // segment
+    push    %ebx
+    push    %ecx
+
+    // set up %ds and %es
+
+    mov     $0x20, %ebx
+    movw    %bx, %ds
+    movw    %bx, %es
+
+    lret
+
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // startprog(phyaddr, arg)
 // Start the program on protected mode where phyaddr is the entry point.

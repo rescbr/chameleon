@@ -171,6 +171,17 @@ enum {
     kBootModeSecure = 2,
     kBootModeQuiet  = 4
 };
+/* 
+ * Note well that we take an easier approice, and this should not be 
+ * confused with /chosen/boot-file-path because this is what we want.
+ */
+#define BOOT_DEVICE_PATH "\\System\\Library\\CoreServices\\boot.efi"
+
+// Taken from kextcache_main.h - kernel cache (Adler32) related.
+
+#define PLATFORM_NAME_LEN 64
+#define ROOT_PATH_LEN 256
+
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
@@ -226,6 +237,9 @@ extern int getBootOptions(bool firstRun);
 extern int processBootOptions();
 extern int selectAlternateBootDevice(int bootdevice);
 extern bool promptForRescanOption(void);
+
+extern void getAndProcessBootArguments(char *configKernelFlags);
+
 
 void showHelp();
 void showTextFile();

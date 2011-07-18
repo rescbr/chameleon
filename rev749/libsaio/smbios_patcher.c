@@ -42,6 +42,21 @@ E3314823-659D-42B6-B42C-147E4E3484D4
 C3D73A74-809A-4804-A747-DDB934A737D0
 */
 // defaults for a MacBook
+static const SMStrEntryPair const sm_macbook11_defaults[]={
+	{"SMbiosvendor",	"Apple Inc."			},
+	{"SMbiosversion",	"MB11.0061.B03.0809221748"	},
+	{"SMbiosdate",		"04/01/2007"			},
+	{"SMmanufacter",	"Apple Inc."			},
+	{"SMproductname",	"MacBook1,1"			},
+	{"SMsystemversion",	"1.0"				},
+	{"SMserial",		"W88033AKY51"			},
+	{"SMfamily",		"MacBook"			},
+	{"SMboardmanufacter",	"Apple Inc."			},
+	{"SMboardproduct",	"Mac-F4208CA9"			},
+	{"SMUUID"	, "19422392-C343-106B-80A3-001F0A6C3E52"},
+	{ "",""	}
+};
+
 static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
 	{"SMbiosversion",	"MB41.88Z.0073.B00.0809221748"	},
@@ -49,27 +64,37 @@ static const SMStrEntryPair const sm_macbook_defaults[]={
 	{"SMmanufacter",	"Apple Inc."			},
 	{"SMproductname",	"MacBook4,1"			},
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"W88033AKY51"			},
 	{"SMfamily",		"MacBook"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
 	{"SMboardproduct",	"Mac-F42D89C8"			},
-	{"SMUUID"	, "19422392-C343-106B-80A3-001F0A6C3E52"},
+	{"SMUUID"	, "26A96EAC-CD73-7A49-8B7C-2DA8F466D971"},
 	{ "",""	}
 };
+/*
+ MacBookAir
+ Board Id: Mac-F42C8CC8
+ Model Id: MacBookAir1,1
+ Boot ROM Version: MBA11.88Z.00BB.B00.0712201139
+ Serial Nr: W881101T12G
+ W88033AKY51
+ SMBIOS Version: 1.0
+ SMC Version: 1.3f4 (SMC 1.0)
+ */
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
 	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MBP41.88Z.0073.B00.0809221748"	},
+	{"SMbiosversion",	"MBP51.88Z.0073.B00.0809221748"	},
 	{"SMbiosdate",		"04/01/2008"			},
 	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"MacBookPro4,1"			},
+	{"SMproductname",	"MacBookPro5,1"			},
 	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMserial",		"W8841NP21G0"			},
 	{"SMfamily",		"MacBookPro"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
 	{"SMboardproduct",	"Mac-F42D89C8"			},
-	{"SMUUID"	, "862F78AF-9B36-106B-807A-00BA8C14A528"},
+	{"SMUUID"	, "DCE37B2F-B608-53C2-A314-C248A24A9D06"},
 	{ "",""	}
 };
 
@@ -79,13 +104,13 @@ static const SMStrEntryPair const sm_macmini_defaults[]={
 	{"SMbiosversion",	"MM21.88Z.009A.B00.0706281359"	},
 	{"SMbiosdate",		"04/01/2008"			},
 	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"Macmini2,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"SOMESRLNMBR"			},
+	{"SMproductname",	"MacMini2,1"			},
+	{"SMsystemversion",	"1.1"				},
+	{"SMserial",		"YM6094QPU36"			},
 	{"SMfamily",		"Napa Mac"			},
 	{"SMboardmanufacter",	"Apple Inc."			},
 	{"SMboardproduct",	"Mac-F4208EAA"			},
-	{"SMUUID"	, "862F78AF-9B36-40AF-B67A-ABBA8C14A528"},
+	{"SMUUID"	, "E3314823-659D-42B6-B42C-147E4E3484D4"},
 	{ "",""	}
 };
 
@@ -113,7 +138,7 @@ static const SMStrEntryPair const sm_macpro_defaults[]={
 	{"SMmanufacter",		"Apple Computer, Inc."			},
 	{"SMproductname",		"MacPro3,1"						},
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"W88033AKY51"					},
 	{"SMfamily",			"MacPro"						},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
 	{"SMboardproduct",		"Mac-F4208DC8"					},
@@ -129,7 +154,7 @@ static const SMStrEntryPair const sm_imac_core_defaults[]={
 	{"SMmanufacter",		"Apple Inc."					},
 	{"SMproductname",		"iMac11,1"						},	
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"W87234JHYA4"					},
 	{"SMfamily",			"iMac"							},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
 	{"SMboardproduct",		"Mac-F2268DAE"					},
@@ -145,10 +170,10 @@ static const SMStrEntryPair const sm_macpro_core_defaults[]={
 	{"SMmanufacter",		"Apple Computer, Inc."			},
 	{"SMproductname",		"MacPro4,1"						},
 	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"SOMESRLNMBR"					},
+	{"SMserial",			"W88033AKY51"					},
 	{"SMfamily",			"MacPro"						},
 	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F4208DC8"					},
+	{"SMboardproduct",		"Mac-F221BEC8"					},
 	{"SMUUID"	, "862F78AF-9B36-40AF-B67A-ABBA8C14A528"},
 	{ "",""	}
 };

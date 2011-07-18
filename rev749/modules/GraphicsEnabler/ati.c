@@ -186,6 +186,7 @@ struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x1002689C,  "ATI Radeon 5870 Series"} ,
 	{ 0x100268D8,  "ATI Radeon 5690 Series"},
 	{ 0x100268D9,  "ATI Radeon 5670 Series"},
+	{ 0x100268C0,  "ATI Radeon 5670 Series"},
 	{ 0x100268DA,  "ATI Radeon 5630 Series"},
 	{ 0x100268F9,  "ATI Radeon 5470 Series"}
 };
@@ -265,6 +266,7 @@ struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x100268D8,  "Baboon"},
 	{ 0x100268D9,  "Baboon"},
 	{ 0x100268DA,  "Baboon"},
+	{ 0x100268C0,  "Galago"},
 	{ 0x100268F9,  "Baboon"}
 };
 
