@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Kernel</key>
+	<string>mach_kernel</string>
+	<key>Kernel Flags</key>
+	<string>arch=i386</string>
+	<key>Legacy Logo</key>
+	<string>yes</string>
+	<key>Timeout</key>
+	<string>5</string>
+	<key>Rescan</key>
+	<string>yes</string>
+	<key>Instant Menu</key>
+	<string>Yes</string>
+</dict>
+</plist>
