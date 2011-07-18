@@ -1,0 +1,64 @@
+TChamMek
+v7
+r0
+t315053388.147778
+cCheck dependencies
+cCompileC build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/main.o /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c normal x86_64 c com.apple.compilers.gcc.4_2
+cLd /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek normal x86_64
+
+N/Developer/SDKs/MacOSX10.6.sdk
+c000000004CAA740B00000000000000EE
+t1286239243
+s238
+
+N/Developer/SDKs/MacOSX10.6.sdk/usr/include/stdio.h
+c000000004BBD2CE90000000000004174
+t1270689001
+s16756
+
+N/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/ChamMek.LinkFileList
+c000000004D171DCB0000000000000087
+t1293360587
+s135
+
+N/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/main.o
+t1293360587
+s2716
+
+N/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek
+t1293360588
+s9016
+
+N/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c
+c000000004D0B49FB00000000000000EB
+t1292585467
+s235
+i<stdio.h>
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies315053387#315053387#0(0"0(0#1#0"3343187568374212096#0"0#
+
+CCompileC build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/main.o /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c normal x86_64 c com.apple.compilers.gcc.4_2
+s315053387.197348
+e315053387.703375
+r1
+xCompileC
+xbuild/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/main.o
+x/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c
+xnormal
+xx86_64
+xc
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@80"Compile /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c315053387#315053387#0(0"0(0#0#72"/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c3401403401131030528#1567"    cd /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c -arch x86_64 -fmessage-length=0 -pipe -std=gnu99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -mmacosx-version-min=10.6 -gdwarf-2 -iquote /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/ChamMek-generated-files.hmap -I/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/ChamMek-own-target-headers.hmap -I/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/ChamMek-all-target-headers.hmap -iquote /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/ChamMek-project-headers.hmap -F/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug -I/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/include -I/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/DerivedSources/x86_64 -I/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/DerivedSources -c /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/main.c -o /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/main.o0#
+
+CLd /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek normal x86_64
+s315053387.703469
+e315053388.147697
+r1
+xLd
+x/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek
+xnormal
+xx86_64
+lSLF07#2@90"Link /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek315053387#315053388#0(0"0(0#0#0"8606939744#633"    cd /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek    setenv MACOSX_DEPLOYMENT_TARGET 10.6    /Developer/usr/bin/gcc-4.2 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -L/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug -F/Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug -filelist /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/ChamMek.build/Debug/ChamMek.build/Objects-normal/x86_64/ChamMek.LinkFileList -mmacosx-version-min=10.6 -o /Users/slice/Projects/Chameleons/chameleon/branches/slice/ChamMek/build/Debug/ChamMek0#
+

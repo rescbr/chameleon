@@ -1,0 +1,6 @@
+#!/bin/bash
+cat bdmesg.log >bdmesg.lo1
+date "+DATE: %Y-%m-%d TIME: %H:%M:%S%n" >> bdmesg.lo1
+bdmesg >>bdmesg.lo1
+tail -n 500 bdmesg.lo1 >bdmesg.log
+rm bdmesg.lo1

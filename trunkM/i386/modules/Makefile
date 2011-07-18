@@ -11,10 +11,11 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = klibc uClibcxx Resolution HelloWorld
+SUBDIRS = klibc uClibcxx Resolution USBFix
+#HelloWorld 
 
 
-CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
+CFLAGS= -Os $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBSAIODIR = $(SRCROOT)/i386/libsaio

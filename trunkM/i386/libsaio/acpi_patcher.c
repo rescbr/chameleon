@@ -136,7 +136,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	if (fd < 0)
 	{
 		// NOT FOUND:
-		verbose("ACPI table not found: %s\n", filename);
+		//verbose("ACPI table not found: %s\n", filename);
 		*dirSpec = '\0';
 	}
 
