@@ -10,7 +10,7 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "efi.h"
-#include "smbios_patcher.h"
+#include "smbios_getters.h"
 #include "xml.h"
 
 #ifndef DEBUG_NVRAM
@@ -43,7 +43,7 @@ EFI_UINT32 const STATIC_ZERO = 0;
 #define kBL_APPLE_VENDOR_NVRAM_GUID "4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14"
 #define UUID_LEN	16
 
-extern EFI_GUID* getSystemID();
+//extern EFI_GUID* getSystemID();
 void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 void NVRAM_start(void);
 
@@ -80,7 +80,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	char*		ffmName;
 	char*		boName;
 	char*		bnName;
-	EFI_GUID*	ret = 0;
+//	EFI_GUID*	ret = 0;
 	uint16_t	bootOptionNumber = 0;
 	int i, j;
 	
@@ -96,7 +96,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 //	TagPtr	dictionary;
 	int cnt;
 	var = malloc(sizeof(variables)+1);
-	ClearNVRAM = getValueForKey(kClearNVRAM, &buff, &cnt, &bootInfo->bootConfig);
+	ClearNVRAM = getValueForKey("-c", &buff, &cnt, &bootInfo->bootConfig);
 	if (!ClearNVRAM) {		
 		readNVRAM(var);
 	}
@@ -118,8 +118,8 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 	Node* optionsNode = DT__FindNode("/options", true);  //"/fakenvram"
 	ffName = malloc(sizeof(PLATFORM_UUID)+1);
 	strcpy(ffName, PLATFORM_UUID);
-	ret = getSystemID();
-	DT__AddProperty(optionsNode, ffName, UUID_LEN, (EFI_UINT32*) ret);		
+//	ret = getSystemID();
+//	DT__AddProperty(optionsNode, ffName, UUID_LEN, (EFI_UINT32*) ret);		
 		
 		// this information can be obtained from DMI Type 0
 		SMBByte* p = (SMBByte*)FindFirstDmiTableOfType(0, 0x18);
@@ -157,7 +157,7 @@ void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 		
 		//can we add here boot-properties?
 		//	optionsNode = DT__FindNode("chosen", true);
-#if 1 //NOTYET
+#if NOTYET
 		int lbC = 0;
 		while(((char*)&bootInfo->bootConfig)[lbC++]);
 		if (lbC > sizeof(bootInfo->bootConfig)) lbC = sizeof(bootInfo->bootConfig);

@@ -89,16 +89,18 @@ all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)
 	    fi;								  \
 	done
 
-image: all
+image:
 	@if [ -e "$(SYMROOT)" ]; then					  \
 	    rm -r -f ${IMGROOT};				  	  \
 	    mkdir -p ${IMGROOT}/usr/standalone/i386;		  	  \
 	    mkdir -p ${IMGROOT}/Extra/modules;				\
+	    mkdir -p ${IMGROOT}/Extra/Themes/Default;				\
 	    if [ -e "$(IMGSKELROOT)" ]; then				  \
 		cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		  \
 	    fi;								  \
 	    cp -f ${SYMROOT}/i386/cdboot ${CDBOOT};		  	  \
 	    cp -f ${SYMROOT}/i386/modules/* ${IMGROOT}/Extra/modules;	\
+	    cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default;	\
 	    cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386; 	  \
 	    cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386;	  \
 	    cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386;  \

@@ -77,7 +77,7 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 			return 0;
 		}
 		
-		devices_number++;
+//		devices_number++;
 		return 1;
 	}
 	else
