@@ -1,0 +1,10 @@
+#
+# Chameleon Modules
+#
+
+config NVRAM_MODULE
+	tristate "NVRAM Module"
+	default m
+	---help---
+	  Say Y here if you want to enable the use of this module.
+

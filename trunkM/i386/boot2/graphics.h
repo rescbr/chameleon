@@ -18,6 +18,7 @@
 #define DEFAULT_SCREEN_WIDTH 1024
 #define DEFAULT_SCREEN_HEIGHT 768
 
+extern int gDualLink;
 int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_t **imageData);
 
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth );

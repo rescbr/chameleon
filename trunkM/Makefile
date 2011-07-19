@@ -19,6 +19,7 @@ REVISION = `cat revision`
 PRODUCT = Chameleon-$(VERSION)-r$(REVISION)
 CDLABEL = ${PRODUCT}
 ISOIMAGE = ${SYMROOT}/${CDLABEL}.iso
+DISTFILE = ${SYMROOT}/${PRODUCT}
 
 EXCLUDE = --exclude=.svn --exclude=.DS_Store --exclude=sym --exclude=obj \
 		--exclude=package --exclude=archive --exclude=User_Guide_src --exclude=*.sh
@@ -89,31 +90,40 @@ all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)
 	    fi;								  \
 	done
 
-image:
-	@if [ -e "$(SYMROOT)" ]; then					  \
-	    rm -r -f ${IMGROOT};				  	  \
-	    mkdir -p ${IMGROOT}/usr/standalone/i386;		  	  \
-	    mkdir -p ${IMGROOT}/Extra/modules;				\
-	    mkdir -p ${IMGROOT}/Extra/Themes/Default;				\
-	    if [ -e "$(IMGSKELROOT)" ]; then				  \
-		cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		  \
-	    fi;								  \
-	    cp -f ${SYMROOT}/i386/cdboot ${CDBOOT};		  	  \
-	    cp -f ${SYMROOT}/i386/modules/* ${IMGROOT}/Extra/modules;	\
-	    cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default;	\
-	    cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386; 	  \
-	    cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386;	  \
-	    cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386;  \
-	    cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386;\
-	    $(shell hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
-	       ${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
-	       "${ISOIMAGE}" ${IMGROOT} -quiet) 		  	  \
+dist image: all
+	@echo "================= Distrib ================="
+	@echo "\t[RM] ${IMGROOT}"
+	@rm -rf ${IMGROOT}	
+	@echo "\t[MKDIR] ${IMGROOT}/usr/standalone/i386"			  	  
+	@mkdir -p ${IMGROOT}/usr/standalone/i386
+	@echo "\t[MKDIR] ${IMGROOT}/Extra/modules"
+	@mkdir -p ${IMGROOT}/Extra/modules				
+	@echo "\t[MKDIR] ${IMGROOT}/Extra/Themes/Default"
+	@mkdir -p ${IMGROOT}/Extra/Themes/Default				
+	@if [ -e "$(IMGSKELROOT)" ]; then				\
+		@echo "\t[CP] ${IMGROOTSKEL} ${IMGROOT}"		\
+		@cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		\
 	fi;
+	@cp -f ${SYMROOT}/i386/cdboot ${CDBOOT}
+	@cp -f ${SYMROOT}/i386/modules/* ${IMGROOT}/Extra/modules
+	@cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default	
+	@cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0md ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386
+	@echo "\t[HDIUTIL] ${ISOIMAGE}"
+	@hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
+		${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
+		"${ISOIMAGE}" ${IMGROOT} -quiet 		  	  
+	@echo "\t[GZ] ${DISTFILE}.tar.gz"
+	@rm -f ${DISTFILE}.tar.gz
+	@tar -cf ${DISTFILE}.tar ${IMGROOT}
+	@gzip --best ${DISTFILE}.tar
 
 pkg installer: all
-	@if [ -e "$(SYMROOT)" ]; then					  \
-	    sudo ${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;		  \
-	fi;
+	@# TODO: remove sudo
+	sudo ${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
 
 $(SYMROOT)/i386/vers.h: version
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $@

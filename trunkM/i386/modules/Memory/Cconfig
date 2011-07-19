@@ -1,0 +1,10 @@
+#
+# Chameleon Modules
+#
+
+config MEMORY_MODULE
+	tristate "Memory Module"
+	default n
+	---help---
+	  Say Y here if you want to enable the use of this module.
+

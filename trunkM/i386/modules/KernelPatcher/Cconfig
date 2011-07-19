@@ -1,0 +1,10 @@
+#
+# Chameleon Modules
+#
+
+config KernelPatcher_MODULE
+	tristate "KernelPatcher Module"
+	default n
+	---help---
+	  Say Y here if you want to enable the use of this module.
+

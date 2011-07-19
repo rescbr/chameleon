@@ -83,17 +83,19 @@ const char *nvidia_name_0[]			=	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]			=	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]		=	{ "AAPL,slot-name", "Slot-1"		 };
 
-static uint8_t display_cfg_0[]= {0x03, 0x01, 0x03, 0x00};
-static uint8_t display_cfg_1[]= {0xff, 0xff, 0x00, 0x01};
-
-
-uint8_t default_NVCAP[]= {
+static uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
 	0x00, 0x00, 0x00, 0x00
 };
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
+
+static uint8_t default_dcfg_0[]= {0x03, 0x01, 0x03, 0x00};
+static uint8_t default_dcfg_1[]= {0xff, 0xff, 0x00, 0x01};
+
+#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
+#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static uint8_t default_NVPM[]= {
 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -103,8 +105,6 @@ static uint8_t default_NVPM[]= {
 };
 
 #define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
-#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
-#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },

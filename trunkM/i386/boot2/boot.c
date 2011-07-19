@@ -59,6 +59,7 @@
 #include "gui.h"
 #include "platform.h"
 #include "modules.h"
+#include "graphics.h"
 
 long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;

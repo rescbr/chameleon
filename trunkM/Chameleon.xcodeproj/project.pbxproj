@@ -17,6 +17,8 @@
 		019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
 		1D145307137073F40050C0CD /* bootargs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
 		1D2A1AF513743A2600787720 /* bootargs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
+		26F2051D13D04B060020D229 /* exfat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exfat.h; sourceTree = "<group>"; };
+		26F2052013D04B130020D229 /* exfat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = exfat.c; sourceTree = "<group>"; };
 		65ED53931204B83200B22507 /* disk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disk.h; sourceTree = "<group>"; };
 		B0056CE711F3868000754B65 /* boot0.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = boot0.s; sourceTree = "<group>"; };
 		B0056CE811F3868000754B65 /* chain0.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = chain0.s; sourceTree = "<group>"; };
@@ -425,6 +427,8 @@
 		B0056D2411F3868000754B65 /* libsaio */ = {
 			isa = PBXGroup;
 			children = (
+				26F2052013D04B130020D229 /* exfat.c */,
+				26F2051D13D04B060020D229 /* exfat.h */,
 				B0056D2511F3868000754B65 /* acpi.h */,
 				B0056D2611F3868000754B65 /* acpi_patcher.c */,
 				B0056D2711F3868000754B65 /* acpi_patcher.h */,
