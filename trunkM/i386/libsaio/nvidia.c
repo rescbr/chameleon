@@ -60,7 +60,7 @@
 #endif
 
 #if DEBUG_NVIDIA
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -83,7 +83,11 @@ const char *nvidia_name_0[]			=	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]			=	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]		=	{ "AAPL,slot-name", "Slot-1"		 };
 
-static uint8_t default_NVCAP[]= {
+static uint8_t display_cfg_0[]= {0x03, 0x01, 0x03, 0x00};
+static uint8_t display_cfg_1[]= {0xff, 0xff, 0x00, 0x01};
+
+
+uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
 	0x00, 0x00, 0x00, 0x00
@@ -91,9 +95,14 @@ static uint8_t default_NVCAP[]= {
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
 
-static uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
-static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
+static uint8_t default_NVPM[]= {
+	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
+};
 
+#define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
 #define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
 #define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
@@ -864,14 +873,13 @@ static uint32_t read32(uint8_t *ptr, uint16_t offset)
 static int patch_nvidia_rom(uint8_t *rom)
 {
 	if (!rom || (rom[0] != 0x55 && rom[1] != 0xaa)) {
-		printf("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
+		verbose("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
 		return PATCH_ROM_FAILED;
 	}
 	
 	uint16_t dcbptr = swap16(read16(rom, 0x36));
-	
-	if (!dcbptr) {
-		printf("no dcb table found\n");
+	if(!dcbptr) {
+		verbose("no dcb table found\n");
 		return PATCH_ROM_FAILED;
 	}
 //	else
@@ -1239,6 +1247,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 	
+	delay(50);
+		
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
 	
@@ -1453,6 +1463,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
+	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
