@@ -694,18 +694,26 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	
 	struct acpi_2_fadt *fadt_mod = NULL;
 	bool fadt_rev2_needed = false;
-	bool fix_restart;
+	bool fix_restart_acpi = false;
 	const char * value;
 	
 	// Restart Fix
-	if (Platform->CPU.Vendor == 0x756E6547) {	/* Intel */
+//	if (Platform->CPU.Vendor == 0x756E6547) {	/* Intel */
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
+		value = getStringForKey(kRestartFix, &bootInfo->chameleonConfig);
+		if (value[0] == 'A') {
+			fix_restart_acpi = true;
+		} else if (value[0] == 'P') {
+			fix_restart_acpi = false;
+		} else {
+			fix_restart = false;
+		}
+/*
 	} else {
 		DBG ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
 	}
-	
+*/	
 	if (fix_restart) fadt_rev2_needed = true;
 	
 	// Allocate new fadt table
@@ -763,14 +771,25 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Patch FADT to fix restart
 	if (fix_restart)
 	{
-		fadt_mod->Flags|= 0x400;
-		fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
-		fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
-		fadt_mod->Reset_BitOffset	= 0x00;   // Offset 0
-		fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
-		fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
-		fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
-		msglog("FADT: Restart Fix applied!\n");
+		if (fix_restart_acpi) {
+			fadt_mod->Flags|= 0x400;
+			fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
+			fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
+			fadt_mod->Reset_BitOffset	= 0x00;   // Offset 0
+			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
+			fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
+			fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
+			msglog("FADT: ACPI Restart Fix applied!\n");			
+		} else {
+			fadt_mod->Flags|= 0x400;
+			fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
+			fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
+			fadt_mod->Reset_BitOffset	= 0x00;   // Offset 0
+			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
+			fadt_mod->Reset_Address		= 0x64; // Address of the register
+			fadt_mod->Reset_Value		= 0xfe;   // Value to write to reset the system
+			msglog("FADT: PS2 Restart Fix applied!\n");			
+		}
 	}
 	
 	// Patch DSDT Address if we have loaded DSDT.aml
