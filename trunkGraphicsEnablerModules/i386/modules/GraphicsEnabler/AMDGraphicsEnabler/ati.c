@@ -46,7 +46,7 @@ typedef enum {
 	CHIP_FAMILY_RS880,
 	/* R700 */
 	CHIP_FAMILY_RV770,
-	CHIP_FAMILY_RV730,
+	CHIP_FAMILY_RV730, // review - rv730 is not an HD chipset - see read_disabled_vbios
 	CHIP_FAMILY_RV710,
 	CHIP_FAMILY_RV740,
 	/* Evergreen */
@@ -55,12 +55,15 @@ typedef enum {
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_CYPRESS,
 	CHIP_FAMILY_HEMLOCK,
-//	CHIP_FAMILY_GRANVILLE, //Azi: improvising ?? a bit here...
+//	CHIP_FAMILY_GRANVILLE, //Azi:---
 	/* Northern Islands */
 	CHIP_FAMILY_BARTS,
 	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
-	CHIP_FAMILY_TURKS,
+	CHIP_FAMILY_TURKS, // just 6758 & 6759 dev ids - review***
+	// mobility
+	CHIP_FAMILY_M96,
+	//---
 	CHIP_FAMILY_LAST
 } chip_family_t;
 
@@ -89,18 +92,20 @@ static const char *chip_family_name[] = {
 	"Juniper",	// RV840
 	"Cypress",	// RV870
 	"Hemlock",
-//	"Granville"	//Azi: improvising ?? a bit here...
+//	"Granville"	//Azi:---
 	/* Northern Islands */
 	"Barts",
 	"Caicos",
 	"Cayman",
 	"Turks",
+	// mobility
+	"M96",
 	""
 };
 
 typedef struct {
-	const char				*name;
-	uint8_t					ports;
+	const char		*name;
+	uint8_t			ports;
 } card_config_t;
 
 static card_config_t card_configs[] = {
@@ -213,14 +218,18 @@ typedef struct {
 static radeon_card_info_t radeon_cards[] = {
 	//Azi: added devices
 // temporary placement
+	// Akbar
+	{ 0x9480,	0x3629103C,	CHIP_FAMILY_M96/*RV730*/,"ATI Radeon HD 4650M",				kShrike		}, // hp OK
 	// issue #88
-	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*???*/"AMD Radeon HD 6600M Series",		kNull		},
+	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*??*/"AMD Radeon HD 6750M",				kNull		}, // - review turks
+	// issue #121
+	{ 0x6741,	0x050E1025,	CHIP_FAMILY_TURKS,/*??*/"AMD Radeon HD 6650M",				kNull		}, // acer - review turks
 	// issue #89
-	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, //Azi: CHIP_FAMILY_GRANVILLE ??
+	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, //Azi: CHIP_FAMILY_GRANVILLE ?? review
 	// issue #90
-	{ 0x68E4,	0x1c921043,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	},
+	{ 0x68E4,	0x1c921043,	CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	}, // asus - confirm model, chipset
 	// issue #91
-	{ 0x68C0,	0x1594103C,	CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		},
+	{ 0x68C0,	0x1594103C,	CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		}, // confirm model, chipset
 	
 	//==================================//================================//============================//
 	
@@ -453,12 +462,14 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x5530174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
+	{ 0x68F9,   0x20091787, CHIP_FAMILY_CEDAR,      "ATI Radeon HD 5450",               kEulemur    }, // issue 119
+	{ 0x68F9,   0x22911787, CHIP_FAMILY_CEDAR,      "ATI Radeon HD 5450",               kEulemur    }, // HIS
 	
 	/* Northen Islands */
 	{ 0x6718,	0x0B001002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 	{ 0x6718,	0x31301682,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 	{ 0x6718,	0x67181002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-
+	
 	{ 0x6738,	0x67381002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	{ 0x6739,	0x67391002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	{ 0x6739,	0x21F81458,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
@@ -534,14 +545,14 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	/* Northen Islands */
 	{ 0x6718,	0x00000000,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kNull		},
-
+	
 	{ 0x6738,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
 	{ 0x6739,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850 Series",		kDuckweed	},
 	{ 0x673E,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6790 Series",		kNull		},
 	
 	{ 0x6758,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",		kNull		},
 	{ 0x6759,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
-
+	
 	{ 0x6770,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
 	{ 0x6779,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kNull		},
 	
@@ -1000,7 +1011,7 @@ bool read_disabled_vbios(void)
 		RegWrite32(AVIVO_D2VGA_CONTROL, (d2vga_control & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE | AVIVO_DVGA_CONTROL_TIMING_SELECT)));
 		RegWrite32(AVIVO_VGA_RENDER_CONTROL, (vga_render_control & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
 		
-		if (chip_family == CHIP_FAMILY_RV730)
+		if (chip_family == CHIP_FAMILY_RV730) // hum... akbar****
 		{
 			cg_spll_func_cntl = RegRead32(R600_CG_SPLL_FUNC_CNTL);
 			

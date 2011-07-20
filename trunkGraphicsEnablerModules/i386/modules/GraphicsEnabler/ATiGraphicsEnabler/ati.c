@@ -22,7 +22,6 @@
 
 #include "libsa.h"
 #include "saio_internal.h"
-
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -164,7 +163,7 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x10029490,  "ATI Radeon 4600 Series"}  ,
 	{ 0x10029498,  "ATI Radeon 4600 Series"}  ,
 	{ 0x1002949E,  "ATI Radeon 4600 Series"}  ,
-	{ 0x10029480,  "ATI Radeon 4600 Series"}  ,
+	{ 0x10029480,  "ATI Radeon HD 4650M"	}, // akbar
 	{ 0x10029488,  "ATI Radeon 4600 Series"}  ,
 	{ 0x10029540,  "ATI Radeon 4500 Series"}  ,
 	{ 0x10029541,  "ATI Radeon 4500 Series"}  ,
@@ -229,7 +228,7 @@ static struct ati_chipsets_t ATIKnownFramebuffers[] = {
     { 0x10029490,  "Peregrine"}  ,
     { 0x10029498,  "Peregrine"}  ,
     { 0x1002949E,  "Peregrine"}  ,
-    { 0x10029480,  "Peregrine"}  ,
+    { 0x10029480,  "Shrike"		}, // akbar
     { 0x10029488,  "Peregrine"}  ,
     { 0x10029540,  "Peregrine"}  ,
     { 0x10029541,  "Peregrine"}  ,
