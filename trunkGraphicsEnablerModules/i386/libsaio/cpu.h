@@ -10,13 +10,13 @@
 
 extern void scan_cpu(PlatformInfo_t *);
 
-#define bit(n)			(1UL << (n))
+#define bit(n)			(1ULL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x198
+#define	MSR_IA32_PERF_STATUS	0x00000198
 #define MSR_IA32_PERF_CONTROL	0x199
 #define MSR_IA32_EXT_CONFIG		0x00EE
 #define MSR_FLEX_RATIO			0x194
@@ -27,6 +27,9 @@ extern void scan_cpu(PlatformInfo_t *);
 
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
+
+#define MSR_AMD_MPERF           0x000000E7
+#define MSR_AMD_APERF           0x000000E8
 
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 
