@@ -367,7 +367,7 @@ void* parse_mach(void* binary,
 	}
 	else
 	{
-		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
+//		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
 		//getchar();
 		return NULL;
 	}

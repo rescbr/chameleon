@@ -18,6 +18,7 @@
 #include "pci.h"
 #include "sl.h"
 
+#define DEBUG 1
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -668,15 +669,7 @@ static void setupSmbiosConfigFile(const char *filename)
     getBoolForKey("GetCPUfromBIOS", &useDMIinfoCPU, &bootInfo->bootConfig);
 	if (useDMIinfoCPU) {
 		scan_cpu_DMI(); //Platform);
-	}
-	// PM_Model
-//	if ((Platform->CPU.Features & CPU_FEATURE_MOBILE)) {
-	if ((Platform->CPU.Mobile)) {
-		Platform->Type = 2;
-	} else {
-		Platform->Type = 1;
-	}
-	
+	}	
 }
 
 /*
@@ -743,7 +736,9 @@ void setupFakeEfi(void)
 		//Slice - remember globals
 	Platform = (PlatformInfo_t *)gPlatform;
 	root_pci_dev = (pci_dt_t*)gRootPCIDev;
-
+#if DEBUG	
+	verbose("2:Platform=%x root_pci=%x\n", Platform, root_pci_dev);
+#endif	
 	setup_pci_devs(root_pci_dev);
 	
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
@@ -768,7 +763,7 @@ void setupFakeEfi(void)
 	
 	saveOriginalSMBIOS();	
 	getSmbiosProductName();
-
+    getSmbiosMacModel();
 	setupAcpi();
 	//execute_hook("setupEfiConfigurationTable", NULL, NULL, NULL, NULL);
 

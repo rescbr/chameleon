@@ -14,5 +14,9 @@
 	<string>yes</string>
 	<key>Instant Menu</key>
 	<string>Yes</string>
+	<key>RestartFix</key>
+	<string>PS2</string>
+	<key>USBFix</key>
+	<string>Yes</string>
 </dict>
 </plist>

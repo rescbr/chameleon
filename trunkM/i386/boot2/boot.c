@@ -449,7 +449,7 @@ void common_boot(int biosdev)
 
         //archCpuType = CPU_TYPE_I386;
         
-		// Notify moduals that we are attempting to boot
+		// Notify modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
 
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig)) {

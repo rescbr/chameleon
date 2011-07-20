@@ -44,7 +44,7 @@ void scan_mem() {
 		bootInfo->memDetect = true;
 	/* manually */
     getBoolForKey(kUseMemDetect, &bootInfo->memDetect, &bootInfo->chameleonConfig);
-
+    
     if (bootInfo->memDetect) {
 		if (dram_controller_dev != NULL) {
 			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
@@ -68,6 +68,7 @@ void scan_platform(void)
 //	gBootOrder = (void*)BootOrder;
 	
 	build_pci_dt();
+	verbose("1:Platform=%x root_pci=%x\n", gPlatform, gRootPCIDev);
 	scan_cpu(Platform);
 	//scan_mem(); Rek: called after pci devs init in fake_efi now ...
 }

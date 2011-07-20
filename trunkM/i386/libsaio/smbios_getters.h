@@ -37,10 +37,11 @@ extern bool getSMBMemoryDeviceMemorySpeed(returnType *value);
 extern bool getSMBMemoryDeviceManufacturer(returnType *value);
 extern bool getSMBMemoryDeviceSerialNumber(returnType *value);
 extern bool getSMBMemoryDevicePartNumber(returnType *value);
-extern bool scanDMI(void);
+//extern bool scanDMI(void);
 extern SMBStructHeader* FindFirstDmiTableOfType(int type, int minlength);
 extern SMBStructHeader* FindNextDmiTableOfType(int type, int minlength);
 extern void getSmbiosProductName();
+extern void getSmbiosMacModel(void);
 
 SMBEntryPoint *getAddressOfSmbiosTable(void);
 const char * smbiosStringAtIndex(SMBStructHeader* smHeader, int index, int* length);

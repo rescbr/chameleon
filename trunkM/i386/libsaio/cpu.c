@@ -295,7 +295,7 @@ void scan_cpu(PlatformInfo_t *p)
 				currcoef = bus_ratio_max;
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
+				DBG("msr(0x%x): ia32_perf_stat 0x%08x\n", __LINE__, msr & 0xffffffff);
 				currcoef = (msr >> 8) & 0x1f;
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = (msr >> 46) & 0x01;
@@ -331,7 +331,7 @@ void scan_cpu(PlatformInfo_t *p)
 //Slice 
 		msr = rdmsr64(MSR_IA32_PLATFORM_ID);
 		DBG("msr(0x%04x): MSR_IA32_PLATFORM_ID 0x%08x\n", MSR_IA32_PLATFORM_ID, msr & 0xffffffff); //__LINE__ - source line number :)
-		if (!scanDMI() && msr) {
+		if (msr) {
 			p->CPU.Mobile = FALSE;
 			switch (p->CPU.Model) {
 				case 0x0D:

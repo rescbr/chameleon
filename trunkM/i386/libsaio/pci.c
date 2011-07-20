@@ -11,11 +11,11 @@
 #include "pci_root.h"
 
 #ifndef DEBUG_PCI
-#define DEBUG_PCI 0
+#define DEBUG_PCI 1
 #endif
 
 #if DEBUG_PCI
-#define DBG(x...)		printf(x)
+#define DBG(x...)		verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -76,8 +76,10 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 	uint8_t		secondary_bus;
 	uint8_t		header_type;
 
-	for (dev = 0; dev < 32; dev++) {
-		for (func = 0; func < 8; func++) {
+	for (dev = 0; dev < 32; dev++)
+	{
+		for (func = 0; func < 8; func++)
+		{
 			pci_addr = PCIADDR(bus, dev, func);
 			id = pci_config_read32(pci_addr, PCI_VENDOR_ID);
 			if (!id || id == 0xffffffff) {
@@ -92,7 +94,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			new->vendor_id				= id & 0xffff;
 			new->device_id				= (id >> 16) & 0xffff;
 			new->subsys_id.subsys_id	= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
-			new->subclass	= pci_config_read8(pci_addr, PCI_CLASS_PROG);
+			new->subclass				= pci_config_read8(pci_addr, PCI_CLASS_PROG);
 			new->class_id				= pci_config_read16(pci_addr, PCI_CLASS_DEVICE);
 			new->parent	= start;
 
@@ -127,7 +129,7 @@ void enable_pci_devs(void)
 	/* make sure we're on Intel chipset */
 	if (id != 0x8086)
 		return;
-	rcba = pci_config_read32(PCIADDR(0, 0x1f, 0), 0xf0) & ~1;
+	rcba = pci_config_read32(PCIADDR(0, 0x1f, 0), 0xf0) & ~1; //this is LPC host
 	fd = (uint32_t *)(rcba + 0x3418);
 	/* set SMBus Disable (SD) to 0 */
 	*fd &= ~0x8;

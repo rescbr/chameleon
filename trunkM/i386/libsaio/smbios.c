@@ -75,17 +75,17 @@
 // defaults for a Mac mini 
 #define kDefaultMacminiFamily						"Macmini"
 #define kDefaultMacmini								"Macmini1,1"
-#define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0903051113"
+#define kDefaultMacminiBIOSVersion					"    MM11.88Z.009A.B00.0903051113"
 
 // defaults for a MacBook
 #define kDefaultMacBookFamily						"MacBook"
 #define kDefaultMacBook								"MacBook4,1"
-#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0903051113"
+#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0809221748"
 
 // defaults for a MacBook Pro
 #define kDefaultMacBookProFamily					"MacBookPro"
-#define kDefaultMacBookPro							"MacBookPro4,1"
-#define kDefaultMacBookProBIOSVersion				"    MBP41.88Z.0073.B00.0903051113"
+#define kDefaultMacBookPro							"MacBookPro5,1"
+#define kDefaultMacBookProBIOSVersion				"    MBP51.88Z.007E.B05.0906151647"
 
 // defaults for an iMac
 #define kDefaultiMacFamily							"iMac"
@@ -93,7 +93,7 @@
 #define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0903051113"
 // defaults for an iMac11,1 core i3/i5/i7
 #define kDefaultiMacNehalem							"iMac11,1"
-#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0903051113"
+#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0802091538"
 // defaults for an iMac12,1
 #define kDefaultiMacSandy							"iMac12,1"
 #define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B00.1102091756"
@@ -296,9 +296,9 @@ void setDefaultSMBData(void)
 	defaultBaseBoard.manufacturer	= kDefaultVendorManufacturer;
 	defaultBaseBoard.product		= kDefaultBoardProduct;
 
-	if (platformCPUFeature(CPU_FEATURE_MOBILE))
+	if (Platform->Type == 2)		//platformCPUFeature(CPU_FEATURE_MOBILE))
 	{
-		if (Platform->CPU.NoCores > 1)
+		if (Platform->CPU.NoCores > 1) //Slice - it is wrong but we have no criteria to choose from
 		{
 			defaultBIOSInfo.version			= kDefaultMacBookProBIOSVersion;
 			defaultSystemInfo.productName	= kDefaultMacBookPro;
@@ -566,7 +566,7 @@ void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
-
+	SMBWord tmp = 0;
 	switch (Platform->CPU.Family) 
 	{
 		case 0x06:
@@ -581,10 +581,15 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 				case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 				case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+				case CPU_MODEL_SANDY:
+				case CPU_MODEL_SANDY_XEON:
+					tmp = p->ProcessorBusSpeed;
 					break;
 
 				default:
-					return;
+					tmp = (Platform->CPU.FSBFrequency * 4) / MEGA;
+					break;
+					//return;
 			}
 		}
 	}
@@ -593,7 +598,8 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 	p->header.length	= sizeof(SMBOemProcessorBusSpeed);
 	p->header.handle	= handle++;
 
-	setSMBValue(structPtr, numOfSetters -1, (returnType *)&(p->ProcessorBusSpeed));
+	if(!setSMBValue(structPtr, numOfSetters -1, (returnType *)&(p->ProcessorBusSpeed)))
+		p->ProcessorBusSpeed = tmp;
 
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
 	tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
@@ -825,6 +831,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 {
 	uint8_t *structPtr = (uint8_t *)eps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
+	SMBByte tmp = 0;
 
 	int dimmnbr = 0;
 	Platform->DMI.MaxMemorySlots	= 0;
@@ -838,7 +845,20 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 			case kSMBTypeSystemInformation:
 				Platform->UUID = ((SMBSystemInformation *)structHeader)->uuid;
 				break;
-
+//Slice - platform mobility should based on Enclosure but not on CPU type
+			case kSMBTypeSystemEnclosure:
+				tmp = ((SMBSystemEnclosure *)structHeader)->type;
+				Platform->Type = (tmp >=8)?2:1;
+				break;
+//Slice - values from DMI/SMBIOS are defined correct if overclocked	
+// do not need in complex MSR calculation				
+			case kSMBTypeProcessorInformation:
+				tmp = ((SMBProcessorInformation *)structHeader)->externalClock;
+				Platform->CPU.FSBFrequency = tmp * MEGA + (tmp & 7) * 110000; //According to Intel
+				tmp = ((SMBProcessorInformation *)structHeader)->currentClock;
+				Platform->CPU.CPUFrequency = tmp * MEGA + (tmp & 7) * 110000;
+				break;
+	
 			case kSMBTypePhysicalMemoryArray:
 				Platform->DMI.MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
 				break;

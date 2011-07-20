@@ -39,6 +39,7 @@ bool getProcessorInformationMaximumClock(returnType *value)
 
 bool getSMBOemProcessorBusSpeed(returnType *value)
 {
+	value->word = 0;
 	if (Platform->CPU.Vendor == 0x756E6547) // Intel
 	{		
 		switch (Platform->CPU.Family) 
@@ -52,7 +53,8 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
 					case CPU_MODEL_PENRYN:		// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
 					case CPU_MODEL_ATOM:		// Intel Atom (45nm)
-						return false;
+						value->word = ((Platform->CPU.FSBFrequency * 4)/1000000); //Slice
+						return true;
 
 					case 0x19:					// ??? Intel Core i5 650 @3.20 GHz 
 					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
@@ -62,6 +64,8 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPU_MODEL_SANDY:
+					case CPU_MODEL_SANDY_XEON:	
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
@@ -453,7 +457,7 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 			continue;
 		}
 		//TODO validate
-#if 1 //NOTYET	
+#if 0 //NOTYET	
 		msglog("Platform CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", Platform->CPU.FSBFrequency/MEGA, Platform->CPU.TSCFrequency/MEGA, Platform->CPU.CPUFrequency/MEGA);
 		
 		if ((cpuInfo->externalClock) && (cpuInfo->externalClock < 400)) {  //<400MHz
@@ -470,7 +474,8 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 			Platform->CPU.CPUFrequency = cpuInfo->currentClock * MEGA;
 		}
 #endif
-		msglog("DMI CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", cpuInfo->externalClock, cpuInfo->maximumClock, cpuInfo->currentClock);
+		maxClock = cpuInfo->maximumClock;
+		msglog("DMI CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", cpuInfo->externalClock, maxClock, cpuInfo->currentClock);
 		msglog("DMI CPU Info 2:\n Family=%x\n Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
 #if 1 //NOTYET
 		if ((cpuInfo->coreCount) && (cpuInfo->coreCount<Platform->CPU.NoCores)) {
@@ -489,6 +494,7 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 	
 	return;
 }
+/*
 //Slice - check other DMI info
 bool scanDMI(void)
 {
@@ -524,3 +530,4 @@ bool scanDMI(void)
 	}
 	return FALSE;	
 }
+*/

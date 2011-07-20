@@ -732,10 +732,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Determine system type / PM_Model
 	if (fadt_mod && Platform->Type) {
 		fadt_mod->PM_Profile = Platform->Type;
-	} else if(fadt)
-		Platform->Type = fadt->PM_Profile;
-	else
-		Platform->Type = 1;
+	} //else do not change anything
 	
 	//User override default value
 	if ( (value=getStringForKey(kSystemType, &bootInfo->chameleonConfig))!=NULL)
@@ -752,7 +749,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			Platform->Type = (unsigned char) strtoul(value, NULL, 10);
 	}
 	// Set PM_Profile from System-type if only user wanted this value to be forced
-	if (fadt_mod->PM_Profile != Platform->Type) 
+/*	if (fadt_mod->PM_Profile != Platform->Type) 
 	{
 	    if (value) 
 		{ // user has overriden the SystemType so take care of it in FACP
@@ -763,7 +760,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	    { // PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
 			Platform->Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
 	    }  
-	}
+	} */
 	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
 	// because we need to take care of facp original content, if it is correct.
 	setupSystemType();
