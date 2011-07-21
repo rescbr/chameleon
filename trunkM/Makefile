@@ -111,7 +111,10 @@ dist image:
 	fi;
 	@cp -f ${SYMROOT}/i386/cdboot ${CDBOOT}
 	@cp -f ${SYMROOT}/i386/modules/* ${IMGROOT}/Extra/modules
-	@cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default	
+	@cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default
+	@cp -f ${SRCROOT}/doc/BootHelp.txt ${IMGROOT}/Extra/
+	@cp -f ${SRCROOT}/GPL_V2_LICENSE ${IMGROOT}/Extra/
+	@cp -f ${SRCROOT}/org.chameleon.Boot.plist ${IMGROOT}/Extra/
 	@cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386
 	@cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386
 #	@cp -f ${SYMROOT}/i386/boot0hfs ${IMGROOT}/usr/standalone/i386

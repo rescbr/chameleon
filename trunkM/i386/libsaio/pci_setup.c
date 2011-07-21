@@ -6,7 +6,7 @@
 #include "nvidia.h"
 #include "modules.h"
 
-#define DEBUG_PCI 1
+#define DEBUG_PCI 0
 
 #if DEBUG_PCI
 #define DBG(x...)  msglog(x)

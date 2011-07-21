@@ -11,7 +11,7 @@
 #include "smbios_getters.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 1
+#define DEBUG_SMBIOS 0
 #endif
 
 #if DEBUG_SMBIOS
@@ -831,6 +831,7 @@ void setupSMBIOSTable(void)
 
 	free(buffer);
 	decodeSMBIOSTable(neweps);
+	DBG("SMBIOS orig=%x new=%x\n", origeps, neweps);
 }
 
 void *getSmbios(int which)

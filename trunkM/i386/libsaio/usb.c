@@ -13,7 +13,7 @@
 #include "pci.h"
 
 #ifndef DEBUG_USB
-#define DEBUG_USB 1
+#define DEBUG_USB 0
 #endif
 
 #if DEBUG_USB

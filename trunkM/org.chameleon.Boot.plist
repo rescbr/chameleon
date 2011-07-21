@@ -18,5 +18,7 @@
 	<string>PS2</string>
 	<key>USBFix</key>
 	<string>Yes</string>
+	<key>GraphicsEnabler</key>
+	<string>Yes</string>
 </dict>
 </plist>

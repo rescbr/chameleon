@@ -18,7 +18,7 @@
 #include "pci.h"
 #include "sl.h"
 
-#define DEBUG 1
+#define DEBUG 0
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -749,6 +749,7 @@ void setupFakeEfi(void)
 	setupSmbiosConfigFile("smbios.plist"); 
 	
 	setupSMBIOSTable();
+	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
 #if DEBUG	
 	verbose("SMBIOS_PATCHED=%x smbios_p=%x\n", getSmbios(SMBIOS_PATCHED), smbios_p);
 	getchar();

@@ -4,7 +4,7 @@
  */
 #ifdef CONFIG_MODULES
 #ifndef CONFIG_MODULE_DEBUG
-#define CONFIG_MODULE_DEBUG 1
+#define CONFIG_MODULE_DEBUG 0
 #endif
 
 #include "boot.h"
