@@ -21,6 +21,8 @@ extern void force_enable_hpet(pci_dt_t *lpc_dev);
 
 extern pci_dt_t *dram_controller_dev;
 
+uint16_t vgaVendor;
+
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
@@ -54,7 +56,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 			case PCI_CLASS_DISPLAY_VGA:
 				DBG("GraphicsEnabler %s enabled\n", do_gfx_devprop?"":"no");
 				if (do_gfx_devprop)
-					switch (current->vendor_id)
+				{
+					vgaVendor = current->vendor_id;
+					switch (vgaVendor)
 					{
 						case PCI_VENDOR_ID_ATI:
 							setup_ati_devprop(current); 
@@ -68,6 +72,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							setup_nvidia_devprop(current);
 							break;
 					}
+				}
 				break;
 
 			case PCI_CLASS_SERIAL_USB:

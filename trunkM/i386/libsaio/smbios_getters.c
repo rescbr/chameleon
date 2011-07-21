@@ -442,7 +442,7 @@ const char * smbiosStringAtIndex(SMBStructHeader* smHeader, int index, int* leng
 }
 
 //Slice
-//#define MEGA 1000000LL  - now in mem.h
+//#define MEGA 1000000LL  - now in platform.h
 void scan_cpu_DMI(void) //PlatformInfo_t *p)
 {
 	//    int i=0;
@@ -494,40 +494,3 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 	
 	return;
 }
-/*
-//Slice - check other DMI info
-bool scanDMI(void)
-{
-	SMBStructHeader * dmihdr = NULL;    
-    SMBSystemEnclosure* encInfo; // Type 3
-	
-	for (dmihdr = FindFirstDmiTableOfType(3, 13); dmihdr; dmihdr = FindNextDmiTableOfType(3, 13)) 
-	{
-		encInfo = (SMBSystemEnclosure*)dmihdr;
-		msglog("DMI Chassis Info:\n Type=%x\n Boot-up State=%x\n Power Supply=%x Thermal State=%x\n", encInfo->type, encInfo->bootupState, encInfo->powerSupplyState, encInfo->thermalState);
-		switch (encInfo->type) {
-			case 1:
-			case 2:
-				return FALSE;
-			case 3:
-			case 4:
-			case 6:
-			case 7:
-				Platform->CPU.Mobile = FALSE;
-				break;
-			case 8:
-			case 9:
-			case 0x0A:
-			case 0x0B:				
-			case 0x0E:
-				Platform->CPU.Mobile = TRUE;
-				break;
-				
-			default:
-				break;
-		}
-		return TRUE;
-	}
-	return FALSE;	
-}
-*/

@@ -14,10 +14,13 @@ extern void scan_platform(void);
 extern void dumpPhysAddr(const char * title, void * a, int len);
 extern void scan_cpu();
 
-#define bit(n)			(1UL << (n))
+#define bit(n)			(1ULL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
+/* CPUID Vendor */
+#define CPUID_VENDOR_INTEL      0x756E6547
+#define CPUID_VENDOR_AMD        0x68747541
 
 /* CPUID index into cpuid_raw */
 #define CPUID_0				0
@@ -25,9 +28,11 @@ extern void scan_cpu();
 #define CPUID_2				2
 #define CPUID_3				3
 #define CPUID_4				4
-#define CPUID_80			5
-#define CPUID_81			6
-#define CPUID_MAX			7
+#define CPUID_6				5
+#define CPUID_80			6
+#define CPUID_81			7
+#define CPUID_88			8
+#define CPUID_MAX			9
 
 #define CPU_MODEL_PENTIUM_M		0x0D
 #define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah

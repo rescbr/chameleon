@@ -740,8 +740,9 @@ void setupFakeEfi(void)
 	verbose("2:Platform=%x root_pci=%x\n", Platform, root_pci_dev);
 #endif	
 	setup_pci_devs(root_pci_dev);
-	
-	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
+	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_ORIGINAL);
+	getSmbiosTableStructure((void*)(EFI_PTR32)smbios_p);
+	readSMBIOSInfo((void*)(EFI_PTR32)smbios_p);
 
 	// load smbios.plist file if any
 	setupSmbiosConfigFile("smbios.plist");

@@ -164,6 +164,7 @@ extern int     bvCount;
 extern void *gRootPCIDev;
 extern void* gPlatform;
 extern void* gBootOrder;
+extern uint16_t vgaVendor;;
 
 /*
  * Boot Modes

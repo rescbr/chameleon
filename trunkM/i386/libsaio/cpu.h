@@ -33,6 +33,10 @@ extern void scan_cpu(PlatformInfo_t *);
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
 
+#define MSR_AMD_MPERF           0x000000E7
+#define MSR_AMD_APERF           0x000000E8
+
+
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 
 // DFE: This constant comes from older xnu:

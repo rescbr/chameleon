@@ -42,6 +42,7 @@ extern SMBStructHeader* FindFirstDmiTableOfType(int type, int minlength);
 extern SMBStructHeader* FindNextDmiTableOfType(int type, int minlength);
 extern void getSmbiosProductName();
 extern void getSmbiosMacModel(void);
+extern void getSmbiosTableStructure(struct SMBEntryPoint *smbios);
 
 SMBEntryPoint *getAddressOfSmbiosTable(void);
 const char * smbiosStringAtIndex(SMBStructHeader* smHeader, int index, int* length);

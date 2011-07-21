@@ -11,13 +11,13 @@
 #include "smbios_getters.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
+#define DEBUG_SMBIOS 1
 #endif
 
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
-#define DBG(x...)	msglog(x)
+#define DBG(x...)
 #endif
 
 #define SMBPlist			&bootInfo->smbiosConfig
@@ -110,7 +110,7 @@
 #define kDefaultMacProWestmereBIOSVersion			"    MP51.88Z.007F.B00.1008031144"
 #define kDefaulMacProWestmereBIOSReleaseDate		"08/03/10"
 //-------------------------------------------------------------------------------------------------------------------------
-#define MAX_DMI_TABLES 96
+#define MAX_DMI_TABLES 255
 typedef struct DmiNumAssocTag {
     SMBStructHeader* dmi;
     uint8_t type;
@@ -122,6 +122,55 @@ static int current_pos=0;
 static bool ftTablePairInit = true; //use twice first run and after
 
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
+
+/** 
+ * Get a table structure entry from a type specification and a smbios address
+ * return NULL if table is not found
+ */
+void getSmbiosTableStructure(struct SMBEntryPoint *smbios)
+{
+    SMBStructHeader* dmihdr=NULL;
+    SMBByte* p;
+    int i;
+	
+    if (ftTablePairInit && smbios!=NULL) {
+        ftTablePairInit = false;
+#if DEBUG_SMBIOS
+        verbose(">>> SMBIOSAddr=0x%08x\n", smbios);
+        verbose(">>> DMI: addr=0x%08x, len=%d, count=%d\n", smbios->dmi.tableAddress, 
+				smbios->dmi.tableLength, smbios->dmi.structureCount);
+#endif
+        p = (SMBByte *) smbios->dmi.tableAddress;
+        for (i=0; 
+             i < smbios->dmi.structureCount && 
+             p + 4 <= (SMBByte *)smbios->dmi.tableAddress + smbios->dmi.tableLength; 
+             i++)   {
+            dmihdr = (SMBStructHeader *) p;
+			
+#if DEBUG_SMBIOS
+            // verbose(">>>>>> DMI(%d): type=0x%02x, len=0x%d\n",i,dmihdr->type,dmihdr->length);
+#endif
+            if (dmihdr->length < 4 || dmihdr->type == 127 /* EOT */) break;
+            if (DmiTablePairCount < MAX_DMI_TABLES) {
+                DmiTablePair[DmiTablePairCount].dmi = dmihdr;
+                DmiTablePair[DmiTablePairCount].type = dmihdr->type;
+                DmiTablePairCount++;
+            }
+            else {
+                verbose("DMI table entries list is full! Next entries won't be stored.\n");
+            }
+#if DEBUG_SMBIOS
+            verbose("DMI header found for table type %d, length = %d\n", dmihdr->type, dmihdr->length);
+#endif
+            p = p + dmihdr->length;
+            while ((p - (SMBByte *)smbios->dmi.tableAddress + 1 < smbios->dmi.tableLength) && (p[0] != 0x00 || p[1] != 0x00))  {
+                p++;
+			}
+            p += 2;
+		}
+        
+    }
+}
 
 typedef struct {
 	SMBStructHeader *orig;
@@ -298,7 +347,7 @@ void setDefaultSMBData(void)
 
 	if (Platform->Type == 2)		//platformCPUFeature(CPU_FEATURE_MOBILE))
 	{
-		if (Platform->CPU.NoCores > 1) //Slice - it is wrong but we have no criteria to choose from
+		if (vgaVendor != PCI_VENDOR_ID_INTEL) //Slice
 		{
 			defaultBIOSInfo.version			= kDefaultMacBookProBIOSVersion;
 			defaultSystemInfo.productName	= kDefaultMacBookPro;
@@ -812,7 +861,7 @@ SMBStructHeader* FindNextDmiTableOfType(int type, int minlength)
 {
     int i;
 	
-    if (ftTablePairInit) getSmbios(SMBIOS_ORIGINAL);
+//    if (ftTablePairInit) getSmbios(SMBIOS_ORIGINAL);
 	
     for (i=current_pos; i < DmiTablePairCount; i++) {
         if (type == DmiTablePair[i].type && 
@@ -822,6 +871,7 @@ SMBStructHeader* FindNextDmiTableOfType(int type, int minlength)
             return DmiTablePair[i].dmi;
         }
     }
+	DBG("SMBIOS table type %d not found\n", type);
     return NULL; // not found
 };
 
@@ -854,7 +904,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 // do not need in complex MSR calculation				
 			case kSMBTypeProcessorInformation:
 				tmp = ((SMBProcessorInformation *)structHeader)->externalClock;
-				Platform->CPU.FSBFrequency = tmp * MEGA + (tmp & 7) * 110000; //According to Intel
+				Platform->CPU.FSBFrequency = tmp * MEGA + (tmp & 7) * 110000; //According to Intel 133->133.33MHz
 				tmp = ((SMBProcessorInformation *)structHeader)->currentClock;
 				Platform->CPU.CPUFrequency = tmp * MEGA + (tmp & 7) * 110000;
 				break;

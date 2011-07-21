@@ -926,6 +926,16 @@ int setupAcpi(void)
 	
 	// Load replacement DSDT
 	new_dsdt = loadACPITable(dirSpec);
+	struct acpi_2_dsdt* dsdt = (struct acpi_2_dsdt*)new_dsdt;
+	if (new_dsdt) {
+		msglog("DSDT.aml loaded from %s\n", dirSpec);
+		strncpy(dsdt->OEMID, "Apple ", 6);
+		strncpy(dsdt->OEMTableId, MacModel, 8);
+		dsdt->OEMRevision = ModelRev;
+		dsdt->Checksum=0;
+		dsdt->Checksum=256-checksum8(new_dsdt,dsdt->Length);
+		
+	}
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
 	 {
@@ -1074,6 +1084,13 @@ int setupAcpi(void)
 					//Now I want to replace DSDT in place
 					// it is only way to patch DSDT on some platform
 					old_dsdt = (char *)fadt->DSDT;
+					//it's impossible because the memory of old_dsdt is read_only?
+/*					strncpy((struct acpi_2_dsdt*)old_dsdt->OEMID, "Apple ", 6);
+					strncpy((struct acpi_2_dsdt*)old_dsdt->OEMTableId, MacModel, 8);
+					(struct acpi_2_dsdt*)old_dsdt->OEMRevision = ModelRev;
+					(struct acpi_2_dsdt*)old_dsdt->Checksum=0;
+					(struct acpi_2_dsdt*)old_dsdt->Checksum = 256-checksum8(old_dsdt,(struct acpi_2_dsdt*)old_dsdt->Length);					
+*/					
 					if(!old_dsdt || !tableSign(old_dsdt, "DSDT")){
 						if(fadt_mod->Length > 140) old_dsdt = (char *)(uint32_t)fadt_mod->X_DSDT;
 						if(!old_dsdt || !tableSign(old_dsdt, "DSDT")) old_dsdt = (char *)new_dsdt;
