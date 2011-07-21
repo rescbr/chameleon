@@ -9,11 +9,11 @@
 #include "bootstruct.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
+#define DEBUG_SMBIOS 1
 #endif
 
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -457,7 +457,7 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 			continue;
 		}
 		//TODO validate
-#if 0 //NOTYET	
+#if DEBUG_SMBIOS	
 		msglog("Platform CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", Platform->CPU.FSBFrequency/MEGA, Platform->CPU.TSCFrequency/MEGA, Platform->CPU.CPUFrequency/MEGA);
 		
 		if ((cpuInfo->externalClock) && (cpuInfo->externalClock < 400)) {  //<400MHz

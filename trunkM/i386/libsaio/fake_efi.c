@@ -736,18 +736,23 @@ void setupFakeEfi(void)
 		//Slice - remember globals
 	Platform = (PlatformInfo_t *)gPlatform;
 	root_pci_dev = (pci_dt_t*)gRootPCIDev;
-#if DEBUG	
-	verbose("2:Platform=%x root_pci=%x\n", Platform, root_pci_dev);
-#endif	
 	setup_pci_devs(root_pci_dev);
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_ORIGINAL);
+#if DEBUG	
+	verbose("SMBIOS_ORIGINAL=%x \n", smbios_p);
+#endif	
+	
 	getSmbiosTableStructure((void*)(EFI_PTR32)smbios_p);
 	readSMBIOSInfo((void*)(EFI_PTR32)smbios_p);
 
 	// load smbios.plist file if any
-	setupSmbiosConfigFile("smbios.plist");
+	setupSmbiosConfigFile("smbios.plist"); 
 	
 	setupSMBIOSTable();
+#if DEBUG	
+	verbose("SMBIOS_PATCHED=%x smbios_p=%x\n", getSmbios(SMBIOS_PATCHED), smbios_p);
+	getchar();
+#endif	
 	
 	// Initialize the base table
 	if (archCpuType == CPU_TYPE_I386)

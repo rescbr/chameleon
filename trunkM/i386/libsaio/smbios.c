@@ -868,10 +868,20 @@ SMBStructHeader* FindNextDmiTableOfType(int type, int minlength)
             DmiTablePair[i].dmi &&
             DmiTablePair[i].dmi->length >= minlength ) {
             current_pos = i+1;
+#if DEBUG_SMBIOS
+			DBG("SMBIOS table type %d found\n", type);
+			printf("Press a key to continue... (DEBUG)\n");
+			getchar();
+#endif
+			
             return DmiTablePair[i].dmi;
         }
     }
 	DBG("SMBIOS table type %d not found\n", type);
+#if DEBUG_ACPI
+	printf("Press a key to continue... (DEBUG)\n");
+	getchar();
+#endif
     return NULL; // not found
 };
 

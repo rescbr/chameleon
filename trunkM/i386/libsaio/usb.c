@@ -13,11 +13,11 @@
 #include "pci.h"
 
 #ifndef DEBUG_USB
-#define DEBUG_USB 0
+#define DEBUG_USB 1
 #endif
 
 #if DEBUG_USB
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif

@@ -90,7 +90,6 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 		execute_hook("PCIDevice", current, NULL, NULL, NULL);
 		DBG("setup_pci_devs current devID=%08x\n", current->device_id);
 		setup_pci_devs(current->children);
-		DBG("setup_pci_devs children devID=%08x\n", current->device_id);		
 		current = current->next;
 	}
 }

@@ -16,7 +16,7 @@
 #include "smbios_getters.h"
 
 #ifndef DEBUG_ACPI
-#define DEBUG_ACPI 0
+#define DEBUG_ACPI 1
 #endif
 
 #if DEBUG_ACPI==2
