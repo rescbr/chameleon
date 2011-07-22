@@ -9,7 +9,7 @@
 #include <Partition.hpp>
 #include <IOKit/storage/IOGUIDPartitionScheme.h>
 
-class GUIDPartition : Partition
+class GUIDPartition : public Partition
 {
 public:
     GUIDPartition(Disk* disk, UInt8 partitionNumber);
