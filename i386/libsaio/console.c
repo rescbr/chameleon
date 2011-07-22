@@ -162,32 +162,6 @@ int getchar()
 	return (c);
 }
 
-int printf(const char * fmt, ...)
-{
-    va_list ap;
-	va_start(ap, fmt);
-
-    prf(fmt, ap, putchar, 0);
-	
-	{
-		// Kabyl: BooterLog
-		struct putc_info pi;
-
-		if (!msgbuf)
-			return 0;
-
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-			return 0;
-		pi.str = cursor;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		cursor +=  strlen((char *)cursor);
-	}
-
-	va_end(ap);
-    return 0;
-}
-
 int verbose(const char * fmt, ...)
 {
     va_list ap;

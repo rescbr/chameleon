@@ -22,5 +22,6 @@ MODULE_OBJS = 	klibc.o \
 		memccpy.o memchr.o memmem.o memmove.o memrchr.o memswap.o  \
 		qsort.o sha1hash.o onexit.o atexit.o exit.o \
 		snprintf.o vsnprintf.o sscanf.o vsscanf.o\
+		fwrite.o fprintf.o vfprintf.o printf.o
 
 include ../MakeInc.dir

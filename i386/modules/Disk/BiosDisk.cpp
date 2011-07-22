@@ -98,7 +98,7 @@ IOReturn BiosDisk::Read(UInt64 sector, UInt64 size, UInt8* buffer)
     if(!isValid()) return kIOReturnNoDevice;
     
     // Assume EBIOS capable for now...
-    if(EBIOSRead(sector, size) == 0)
+    if(EBIOSRead(sector, size) == kIOReturnSuccess)
     {
         bcopy((void*)BIOS_ADDR, buffer, size * mBytesPerSector);
         return kIOReturnSuccess;
