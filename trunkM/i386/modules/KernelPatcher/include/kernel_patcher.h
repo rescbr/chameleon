@@ -12,14 +12,20 @@
 #define CPUID_MODEL_ANY		0x00
 #define CPUID_MODEL_UNKNOWN	0x01
 
-#define CPUID_MODEL_YONAH	14
-#define CPUID_MODEL_MEROM	15
-#define CPUID_MODEL_PENRYN	23
-#define CPUID_MODEL_NEHALEM	26
-#define CPUID_MODEL_ATOM	28
-#define CPUID_MODEL_FIELDS	30	/* Lynnfield, Clarksfield, Jasper */
-#define CPUID_MODEL_DALES	31	/* Havendale, Auburndale */
-#define CPUID_MODEL_NEHALEM_EX	46
+#define CPU_MODEL_PENTIUM_M		0x0D
+#define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
+#define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
+#define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
+#define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
+#define CPU_MODEL_ATOM			0x1C			// Atom
+#define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
+#define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
+#define CPU_MODEL_DALES_32NM	0x25			// Clarkdale, Arrandale
+#define CPU_MODEL_SANDY			0x2A			// Sandy Bridge
+#define CPU_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
+#define CPU_MODEL_SANDY_XEON	0x2D			// Sandy Bridge Xeon
+#define CPU_MODEL_NEHALEM_EX	0x2E			// Beckton
+#define CPU_MODEL_WESTMERE_EX	0x2F
 
 #define KERNEL_ANY	0x00
 #define KERNEL_64	0x01

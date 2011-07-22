@@ -27,13 +27,13 @@ char*	gSMBIOSBoardModel;
 
 bool getProcessorInformationExternalClock(returnType *value)
 {
-	value->word = Platform->CPU.FSBFrequency/1000000;
+	value->word = Platform->CPU.FSBFrequency/MEGA;
 	return true;
 }
 
 bool getProcessorInformationMaximumClock(returnType *value)
 {
-	value->word = Platform->CPU.CPUFrequency/1000000;
+	value->word = Platform->CPU.CPUFrequency/MEGA;
 	return true;
 }
 
@@ -475,6 +475,7 @@ void scan_cpu_DMI(void) //PlatformInfo_t *p)
 		}
 #endif
 		maxClock = cpuInfo->maximumClock;
+		Platform->CPU.CPUFrequency = cpuInfo->currentClock * MEGA;
 		msglog("DMI CPU Info:\n FSB=%d\n MaxSpeed=%d\n CurrentSpeed=%d\n", cpuInfo->externalClock, maxClock, cpuInfo->currentClock);
 		msglog("DMI CPU Info 2:\n Family=%x\n Socket=%x\n Cores=%d Enabled=%d Threads=%d\n", cpuInfo->processorFamily, cpuInfo->processorUpgrade, cpuInfo->coreCount, cpuInfo->coreEnabled, cpuInfo->Threads);
 #if 1 //NOTYET

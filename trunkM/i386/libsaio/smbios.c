@@ -11,7 +11,7 @@
 #include "smbios_getters.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
+#define DEBUG_SMBIOS 1
 #endif
 
 #if DEBUG_SMBIOS
@@ -918,6 +918,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 				Platform->CPU.FSBFrequency = tmp * MEGA + (tmp & 7) * 110000; //According to Intel 133->133.33MHz
 				tmp = ((SMBProcessorInformation *)structHeader)->currentClock;
 				Platform->CPU.CPUFrequency = tmp * MEGA + (tmp & 7) * 110000;
+				DBG("From SMBIOS: FSB=%d CPU=%d\n", Platform->CPU.FSBFrequency, Platform->CPU.CPUFrequency);
 				break;
 	
 			case kSMBTypePhysicalMemoryArray:
