@@ -11,7 +11,7 @@
 #include "smbios_getters.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 1
+#define DEBUG_SMBIOS 0
 #endif
 
 #if DEBUG_SMBIOS
@@ -893,6 +893,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 	uint8_t *structPtr = (uint8_t *)eps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
 	SMBByte tmp = 0;
+	SMBWord tmpW = 0;
 
 	int dimmnbr = 0;
 	Platform->DMI.MaxMemorySlots	= 0;
@@ -914,11 +915,11 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 //Slice - values from DMI/SMBIOS are defined correct if overclocked	
 // do not need in complex MSR calculation				
 			case kSMBTypeProcessorInformation:
-				tmp = ((SMBProcessorInformation *)structHeader)->externalClock;
-				Platform->CPU.FSBFrequency = tmp * MEGA + (tmp & 7) * 110000; //According to Intel 133->133.33MHz
-				tmp = ((SMBProcessorInformation *)structHeader)->currentClock;
-				Platform->CPU.CPUFrequency = tmp * MEGA + (tmp & 7) * 110000;
-				DBG("From SMBIOS: FSB=%d CPU=%d\n", Platform->CPU.FSBFrequency, Platform->CPU.CPUFrequency);
+				tmpW = ((SMBProcessorInformation *)structHeader)->externalClock;
+				Platform->CPU.FSBFrequency = tmpW * MEGA + (tmpW & 7) * 110000; //According to Intel 133->133.33MHz
+				tmpW = ((SMBProcessorInformation *)structHeader)->currentClock;
+				Platform->CPU.CPUFrequency = tmpW * MEGA + (tmpW & 7) * 110000;
+				msglog("From SMBIOS: FSB=%d CPU=%d\n", Platform->CPU.FSBFrequency, Platform->CPU.CPUFrequency);
 				break;
 	
 			case kSMBTypePhysicalMemoryArray:

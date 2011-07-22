@@ -9,7 +9,7 @@
 #include "smbios.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 1
+#define DEBUG_SMBIOS 0
 #endif
 
 #if DEBUG_SMBIOS
@@ -59,7 +59,7 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 
 	if (minorVersion < 4 || structHeader->header.length < 27)
 		return;
-	DBG("\tskuNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->skuNumber));
+//	DBG("\tskuNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->skuNumber));
 	DBG("\tfamily: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->family));
 	DBG("\n");
 }
@@ -72,9 +72,9 @@ void decodeBaseBoard(SMBBaseBoard *structHeader)
 	DBG("BaseBoard:\n");
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
 	DBG("\tproduct: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->product));
-	DBG("\tversion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
+//	DBG("\tversion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
 	DBG("\tserialNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
-	DBG("\tassetTagNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
+//	DBG("\tassetTagNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
 	DBG("\tlocationInChassis: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->locationInChassis));
 	DBG("\tboardType: 0x%X\n", structHeader->boardType);
 	DBG("\n");
@@ -88,7 +88,7 @@ void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
 	DBG("SystemEnclosure:\n");
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
 	DBG("\ttype: %d\n", structHeader->type);
-	DBG("\tversion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
+//	DBG("\tversion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
 	DBG("\tserialNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
 	DBG("\tassetTagNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
 	DBG("\n");
@@ -105,16 +105,16 @@ void decodeProcessorInformation(SMBProcessorInformation *structHeader)
 	DBG("\tprocessorFamily: 0x%X\n", structHeader->processorFamily);
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
 	DBG("\tprocessorID: 0x%llX\n", structHeader->processorID);
-	DBG("\tprocessorVersion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->processorVersion));
+//	DBG("\tprocessorVersion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->processorVersion));
 	DBG("\texternalClock: %dMHz\n", structHeader->externalClock);
 	DBG("\tmaximumClock: %dMHz\n", structHeader->maximumClock);
 	DBG("\tcurrentClock: %dMHz\n", structHeader->currentClock);
 
 	if (minorVersion < 3 || structHeader->header.length < 35)
 		return;
-	DBG("\tserialNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
-	DBG("\tassetTag: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTag));
-	DBG("\tpartNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->partNumber));
+//	DBG("\tserialNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
+//	DBG("\tassetTag: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTag));
+//	DBG("\tpartNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->partNumber));
 	DBG("\n");
 }
 
@@ -125,7 +125,7 @@ void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 {
 	DBG("MemoryDevice:\n");
 	DBG("\tdeviceLocator: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->deviceLocator));
-	DBG("\tbankLocator: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->bankLocator));
+//	DBG("\tbankLocator: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->bankLocator));
 	DBG("\tmemoryType: %s\n", SMBMemoryDeviceTypes[structHeader->memoryType]);
 
 	if (minorVersion < 3 || structHeader->header.length < 27)
