@@ -6,9 +6,10 @@
 #define PARTITION_H
 
 #include <IOKit/IOTypes.h>
-#include <Disk.hpp>
 
 #define INVALID_PARTITION   (-1)
+
+class Disk;
 
 class Partition
 {
@@ -22,6 +23,9 @@ public:
     virtual bool        probe();    
     
     //virtual uuid_t      getUUID();
+    
+    virtual UInt32      getPartitionNumber() { return mPartitionNumber; };
+    virtual UInt8       getNumPartitions() { return mNumPartitions; };
 
 protected:
     Disk                *mDisk;
@@ -33,6 +37,14 @@ protected:
 
 private:
     
+};
+
+
+class PartitionList
+{
+public:
+    Partition       *entry;
+    PartitionList   *next;
 };
 
 

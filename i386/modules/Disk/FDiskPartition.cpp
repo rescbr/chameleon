@@ -3,7 +3,7 @@
  *
  */
 #include <FDiskPartition.hpp>
-
+#include <Disk.hpp>
 
 FDiskPartition::FDiskPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk, partitionNumber)
 {

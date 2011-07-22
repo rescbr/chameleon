@@ -3,7 +3,7 @@
  *
  */
 #include <Partition.hpp>
-       
+#include <Disk.hpp>   
 Partition::Partition(Disk* disk, UInt8 partitionNumber)
 {
     mDisk = disk;

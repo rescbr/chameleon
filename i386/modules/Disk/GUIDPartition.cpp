@@ -3,7 +3,13 @@
  *
  */
 #include <GUIDPartition.hpp>
+#include <Disk.hpp>
 
+extern "C"
+{
+#include "libsaio.h"
+#include "stdio.h"
+}
 
 GUIDPartition::GUIDPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk, partitionNumber)
 {
@@ -33,10 +39,11 @@ GUIDPartition::GUIDPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk
     
     if(mPartitionNumber >= 0 && mPartitionNumber < mNumPartitions)
     {
-        // read in partition entry.
-        mDisk->Read(2 + mPartitionNumber, 1, mLBABUffer);
+        // TODO: Verify partition is valid + offset.
+        mDisk->Read(2 + (mPartitionNumber / 4), 1, mLBABUffer);
         
-        mGPTEntry = (gpt_ent*) mLBABUffer;
+        UInt32 offset = (mPartitionNumber % 4) * mGPTHeader->hdr_entsz;
+        mGPTEntry = (gpt_ent*) mLBABUffer + offset;
         
         mNumSectors = mGPTEntry->ent_lba_end - mGPTEntry->ent_lba_start;
         mBeginSector = mGPTEntry->ent_lba_start;

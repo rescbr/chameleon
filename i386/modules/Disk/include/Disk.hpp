@@ -6,6 +6,7 @@
 #define DISK_H
 
 #include <IOKit/IOTypes.h>
+#include <Partition.hpp>
 
 class Disk
 {
@@ -21,7 +22,11 @@ public:
     virtual bool        isValid()           { return mName != NULL && mBytesPerSector; };
     virtual bool        probe()             { return isValid(); };
     virtual UInt32      bytesPerSector()    { return mBytesPerSector; };
+    
+    virtual void        addPartition(Partition* partition);
+    virtual Partition*  getPartition(UInt32 index);
 protected:
+    PartitionList   *mPartitions;
     const char      *mName;
     const char      *mBusType;
     
