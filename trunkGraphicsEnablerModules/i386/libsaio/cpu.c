@@ -451,7 +451,7 @@ void scan_cpu(PlatformInfo_t *p)
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
 	}
-	else if((p->CPU.Vendor == 0x68747541 /* AMD */) && (p->CPU.Family == 0x0f))
+	else if((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
     {
         switch(p->CPU.ExtFamily)
         {
@@ -463,15 +463,19 @@ void scan_cpu(PlatformInfo_t *p)
                 
             case 0x01: /* K10 */
                 msr = rdmsr64(K10_COFVID_STATUS);
-                //uint64_t mperf = measure_mperf_frequency();
-                uint64_t aperf = measure_aperf_frequency();
+                do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
+                if(bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1)   // EffFreq: effective frequency interface
+                {
+                    //uint64_t mperf = measure_mperf_frequency();
+                    uint64_t aperf = measure_aperf_frequency();
+                    cpuFrequency = aperf;
+                }
                 // NOTE: tsc runs at the maccoeff (non turbo)
                 //          *not* at the turbo frequency.
-                maxcoef  = bitfield(msr, 54, 49) / 2 + 4;  // VRIFY
-                currcoef = bitfield(msr, 5, 0) + 0x10;   // note: this is * 2
+                maxcoef  = bitfield(msr, 54, 49) / 2 + 4;
+                currcoef = bitfield(msr, 5, 0) + 0x10;
                 currdiv = 2 << bitfield(msr, 8, 6);
                 
-                cpuFrequency = aperf;
                 break;
                 
             case 0x05: /* K14 */
@@ -487,8 +491,11 @@ void scan_cpu(PlatformInfo_t *p)
                 break;
         }
         
-        if (maxcoef) {
-            if (currdiv) {
+        if (maxcoef)
+        {
+            if (currdiv)
+            {
+                if(!currcoef) currcoef = maxcoef;
                 if(!cpuFrequency)
                     fsbFrequency = ((tscFrequency * currdiv) / currcoef);
                 else 

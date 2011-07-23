@@ -219,7 +219,7 @@ static radeon_card_info_t radeon_cards[] = {
 	//Azi: added devices
 // temporary placement
 	// Akbar
-	{ 0x9480,	0x3629103C,	CHIP_FAMILY_M96/*RV730*/,"ATI Radeon HD 4650M",				kShrike		}, // hp OK
+	{ 0x9480,	0x3628103C,	CHIP_FAMILY_M96/*RV730*/,"ATI Radeon HD 4650M",				kShrike		}, // hp OK
 	// issue #88
 	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*??*/"AMD Radeon HD 6750M",				kNull		}, // - review turks
 	// issue #121
