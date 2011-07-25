@@ -316,7 +316,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>1CE0B20306471E060097A5F4</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>smbios_decode.c</string>
+								<string>smbios.c</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -324,11 +324,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>1CE0B20406471E060097A5F4</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>smbios_decode.c</string>
+										<string>smbios.c</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>1217E1F813D96F3800800327</string>
+										<string>12D3CA3513D99147002669E3</string>
 										<key>history</key>
 										<array>
 											<string>122A5BCA1375C49300795FF0</string>
@@ -360,8 +360,8 @@
 											<string>12E9C0AA13D95C2F0096128F</string>
 											<string>12E9C0BD13D95F8F0096128F</string>
 											<string>1282533913D96A7000820E2D</string>
-											<string>1282534B13D96C3B00820E2D</string>
-											<string>1282535013D96C7100820E2D</string>
+											<string>12D3CA3313D99147002669E3</string>
+											<string>12D3CA3413D99147002669E3</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -373,14 +373,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {938, 303}}</string>
+								<string>{{0, 0}, {938, 292}}</string>
 								<key>RubberWindowFrame</key>
 								<string>294 219 1146 659 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>303pt</string>
+							<string>292pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -393,14 +393,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 308}, {938, 310}}</string>
+								<string>{{0, 297}, {938, 321}}</string>
 								<key>RubberWindowFrame</key>
 								<string>294 219 1146 659 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>310pt</string>
+							<string>321pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -419,9 +419,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>1217E1F913D96F3800800327</string>
+				<string>12D3CA3613D99147002669E3</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>1217E1FA13D96F3800800327</string>
+				<string>12D3CA3713D99147002669E3</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -559,6 +559,7 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
+		<string>1C530D57069F1CE1000CFCEE</string>
 		<string>122A5BB81375BA4700795FF0</string>
 		<string>/Users/slice/Projects/Chameleons/chameleon/branches/slice/trunkM/Chameleon.xcodeproj</string>
 	</array>
@@ -640,7 +641,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>122A5BB81375BA4700795FF0</string>
-				<string>1217E1FB13D96F3800800327</string>
+				<string>12D3CA2A13D99145002669E3</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -773,14 +774,12 @@
 							<key>Dock</key>
 							<array>
 								<dict>
-									<key>BecomeActive</key>
-									<true/>
 									<key>ContentConfiguration</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
 										<string>1CDD528C0622207200134675</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>device_inject.c</string>
+										<string>smbios_getters.c</string>
 										<key>StatusBarVisibility</key>
 										<true/>
 									</dict>
@@ -801,6 +800,8 @@
 							<string>431pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -836,8 +837,8 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C530D57069F1CE1000CFCEE</string>
-				<string>1282534913D96C3900820E2D</string>
-				<string>1282534A13D96C3900820E2D</string>
+				<string>12D3CA3113D99145002669E3</string>
+				<string>12D3CA3213D99145002669E3</string>
 				<string>1CDD528C0622207200134675</string>
 				<string>1CD0528E0623707200166675</string>
 			</array>

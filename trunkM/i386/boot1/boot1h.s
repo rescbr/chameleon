@@ -42,7 +42,7 @@
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG				EQU		CONFIG_BOOT1_HFS_DEBUG
+DEBUG				EQU		0
 
 ;
 ; Set to 1 to enable unused code.
@@ -52,7 +52,7 @@ UNUSED				EQU		0
 ;
 ; Set to 1 to enable verbose mode.
 ;
-VERBOSE				EQU		CONFIG_BOOT1_HFS_VERBOSE
+VERBOSE				EQU		0
 
 ;
 ; Various constants.
@@ -490,6 +490,9 @@ boot2:
     mov     ah, 0
     int		0x16
 %endif
+	mov     ax, 0x1900
+    mov     es, ax
+	mov     BYTE [es:4], 1
 
     mov     dl, [gBIOSDriveNumber]			; load BIOS drive number
     jmp     kBoot2Segment:kBoot2Address
