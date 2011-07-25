@@ -46,7 +46,7 @@ typedef enum {
 	CHIP_FAMILY_RS880,
 	/* R700 */
 	CHIP_FAMILY_RV770,
-	CHIP_FAMILY_RV730, // review - rv730 is not an HD chipset - see read_disabled_vbios
+	CHIP_FAMILY_RV730, // review - see read_disabled_vbios
 	CHIP_FAMILY_RV710,
 	CHIP_FAMILY_RV740,
 	/* Evergreen */
@@ -55,14 +55,14 @@ typedef enum {
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_CYPRESS,
 	CHIP_FAMILY_HEMLOCK,
-//	CHIP_FAMILY_GRANVILLE, //Azi:---
+//	CHIP_FAMILY_GRANVILLE, //Azi: review
 	/* Northern Islands */
 	CHIP_FAMILY_BARTS,
 	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
-	CHIP_FAMILY_TURKS, // just 6758 & 6759 dev ids - review***
+	CHIP_FAMILY_TURKS, // review - just 6758 & 6759 dev ids
 	// mobility
-	CHIP_FAMILY_M96,
+//	CHIP_FAMILY_M96, // RV730
 	//---
 	CHIP_FAMILY_LAST
 } chip_family_t;
@@ -99,7 +99,8 @@ static const char *chip_family_name[] = {
 	"Cayman",
 	"Turks",
 	// mobility
-	"M96",
+//	"M96",
+	//---
 	""
 };
 
@@ -218,12 +219,16 @@ typedef struct {
 static radeon_card_info_t radeon_cards[] = {
 	//Azi: added devices
 // temporary placement
+	// FredWst
+	{ 0x954F,	0xE990174B,	CHIP_FAMILY_RV710,		"Sapphire Radeon HD4350",			kNull		}, // review model
+	// dickhouse 
+	{ 0x6760,	0x1CB21043,	CHIP_FAMILY_RV730,		"AMD Radeon HD 6470M",				kNull		},
 	// Akbar
-	{ 0x9480,	0x3628103C,	CHIP_FAMILY_M96/*RV730*/,"ATI Radeon HD 4650M",				kShrike		}, // hp OK
+	{ 0x9480,	0x3628103C,	CHIP_FAMILY_RV730,/*M96*/"ATI Radeon HD 4650M",				kShrike		}, // hp OK
 	// issue #88
-	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,/*??*/"AMD Radeon HD 6750M",				kNull		}, // - review turks
+	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		}, // - review turks
 	// issue #121
-	{ 0x6741,	0x050E1025,	CHIP_FAMILY_TURKS,/*??*/"AMD Radeon HD 6650M",				kNull		}, // acer - review turks
+	{ 0x6741,	0x050E1025,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // acer - review turks
 	// issue #89
 	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, //Azi: CHIP_FAMILY_GRANVILLE ?? review
 	// issue #90
@@ -360,6 +365,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9552,	0x3000174B, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9552,	0x30001787, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9552,	0x300017AF, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
+	{ 0x9552,	0x04341028, CHIP_FAMILY_RV710,		"ATI Mobility Radeon 4330",			kShrike		},
 	
 	{ 0x9581,	0x95811002, CHIP_FAMILY_RV630,		"ATI Radeon HD 3600 Series",		kNull		},
 	{ 0x9581,	0x3000148C, CHIP_FAMILY_RV630,		"ATI Radeon HD 3600 Series",		kNull		},
@@ -1011,7 +1017,7 @@ bool read_disabled_vbios(void)
 		RegWrite32(AVIVO_D2VGA_CONTROL, (d2vga_control & ~(AVIVO_DVGA_CONTROL_MODE_ENABLE | AVIVO_DVGA_CONTROL_TIMING_SELECT)));
 		RegWrite32(AVIVO_VGA_RENDER_CONTROL, (vga_render_control & ~AVIVO_VGA_VSTATUS_CNTL_MASK));
 		
-		if (chip_family == CHIP_FAMILY_RV730) // hum... akbar****
+		if (chip_family == CHIP_FAMILY_RV730)
 		{
 			cg_spll_func_cntl = RegRead32(R600_CG_SPLL_FUNC_CNTL);
 			
@@ -1217,6 +1223,11 @@ static bool init_card(pci_dt_t *pci_dev)
 			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
 				card->ports = card_configs[i].ports;
 	}
+	
+	//Azi: http://forum.voodooprojects.org/index.php/topic,1959.msg10402.html#msg10402
+	// get around this...
+	if (pci_dev->device_id == 0x9552 && pci_dev->subsys_id.subsys_id == 0x04341028 )
+		card->ports = 2;
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
