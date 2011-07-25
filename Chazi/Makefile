@@ -4,7 +4,6 @@ OBJROOT = $(SRCROOT)/obj
 SYMROOT = $(SRCROOT)/sym
 DSTROOT = $(SRCROOT)/dst
 DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
 IMGSKELROOT = $(SRCROOT)/imgskel
 CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 
@@ -14,11 +13,16 @@ include Make.rules
 
 THEME = default
 
-VERSION = `cat version`
-REVISION = `cat revision`
+VERSION = `cat ${SRCROOT}/version`
+REVISION = `cat ${SRCROOT}/revision`
 PRODUCT = Chameleon-$(VERSION)-r$(REVISION)
 CDLABEL = ${PRODUCT}
 ISOIMAGE = ${SYMROOT}/${CDLABEL}.iso
+DISTFILE = ${SYMROOT}/${PRODUCT}
+
+IMGROOT = $(SRCROOT)/sym/${PRODUCT}
+DISTROOT= ./${PRODUCT}
+
 
 EXCLUDE = --exclude=.svn --exclude=.DS_Store --exclude=sym --exclude=obj \
 		--exclude=package --exclude=archive --exclude=User_Guide_src --exclude=*.sh
@@ -89,6 +93,47 @@ all: $(SYMROOT) $(OBJROOT) $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)
 	    fi;								  \
 	done
 
+dist image: all
+	@echo "================= Distrib ================="
+	@echo "\t[RM] ${IMGROOT}"
+	@rm -rf ${IMGROOT}	
+	@echo "\t[MKDIR] ${IMGROOT}/usr/standalone/i386"			  	  
+	@mkdir -p ${IMGROOT}/usr/standalone/i386
+	@echo "\t[MKDIR] ${IMGROOT}/Extra/modules"
+	@mkdir -p ${IMGROOT}/Extra/modules				
+	@echo "\t[MKDIR] ${IMGROOT}/Extra/Themes/Default"
+	@mkdir -p ${IMGROOT}/Extra/Themes/Default				
+	@echo "\t[MKDIR] ${IMGROOT}/usr/bin"
+	@mkdir -p ${IMGROOT}/usr/bin
+	@if [ -e "$(IMGSKELROOT)" ]; then				\
+		@echo "\t[CP] ${IMGROOTSKEL} ${IMGROOT}"		\
+		@cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		\
+	fi;								  
+	@cp -f ${SYMROOT}/i386/cdboot ${CDBOOT}
+	@cp -f ${SYMROOT}/i386/modules/* ${IMGROOT}/Extra/modules
+	@cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default
+	@cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0hfs ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0md ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/fdisk440 ${IMGROOT}/usr/bin
+	@cp -f ${SYMROOT}/i386/bdmesg ${IMGROOT}/usr/bin    
+
+	@echo "\t[HDIUTIL] ${ISOIMAGE}"
+	@hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
+		${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
+		"${ISOIMAGE}" ${IMGROOT} -quiet 		  	  
+	@echo "\t[GZ] ${DISTFILE}.tar.gz"
+	@rm -f ${DISTFILE}.tar.gz
+	@cd ${SYMROOT} && tar -cf ${DISTFILE}.tar ${DISTROOT}
+	@gzip --best ${DISTFILE}.tar
+
+pkg installer: all
+	@# TODO: remove sudo
+	sudo ${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
+
 $(SYMROOT)/i386/vers.h: version
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $@
 	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $@
@@ -99,3 +144,6 @@ $(SYMROOT)/i386/vers.h: version
 .PHONY: $(SYMROOT)/i386/vers.h
 .PHONY: config
 .PHONY: clean
+.PHONY: image
+.PHONY: pkg
+.PHONY: installer

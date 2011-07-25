@@ -48,6 +48,12 @@
 ;
 ; Added KillerJK's switchPass2 modifications
 ;
+; dmazar: 10/7/2011 added scanning of all BIOS accessible drives:
+;   - iterates over all drives and searches for HSF bootable partition (with boot1h)
+;     and loads from it
+;   - if not found, itarates over drives again and searches for active partition and
+;     loads from it
+;
 
 ;
 ; Set to 1 to enable obscure debug messages.
@@ -223,7 +229,15 @@ start:
 ;
 start_reloc:
 
-    DebugChar('>')
+	push	dx						; save dl (boot drive) for second pass.
+									; will stay on stack if booter loaded in first pass.
+									; this should not be a problem
+    mov		bh, 1					; BH = 1. two pass scanning (active or hfs partition).
+									; actuall use of it (scanning) is in find_boot
+
+scan_drives:
+
+	DebugChar('>')
 
 %if DEBUG
     mov     al, dl
@@ -235,12 +249,14 @@ start_reloc:
     ; loading the MBR to kMBRBuffer and LBA1 to kGPTBuffer.
     ;
 
+	push	bx						; save BH (scan pass counter)
     xor     eax, eax
     mov     [my_lba], eax			; store LBA sector 0 for read_lba function
     mov     al, 2					; load two sectors: MBR and LBA1
     mov     bx, kMBRBuffer			; MBR load address
     call    load
-    jc      error					; MBR load error
+	pop		bx						; restore BH
+    jc      .mbr_load_error			; MBR load error - normally because we scanned all drives
 
     ;
     ; Look for the booter partition in the MBR partition table,
@@ -248,7 +264,22 @@ start_reloc:
     ;
     mov     si, kMBRPartTable		; pointer to partition table
     call    find_boot				; will not return on success
+	
+	; if returns - booter partition not found
+	; try next drive
+	; if next drive does not exists - will break on above MBR load error
+	inc		dl
+	jmp		scan_drives
+	
 
+.mbr_load_error:
+	; all drives scanned - see if we need to run second pass
+	pop		dx						; restore orig boot drive
+	dec		bh						; decrement scan pass counter
+	jz		scan_drives				; if zero - run seccond pass
+	
+	; we ran two passes - nothing found - error
+	
 error:
     LogString(boot_error_str)
 
@@ -263,6 +294,7 @@ hang:
 ; Arguments:
 ;   DL = drive number (0x80 + unit number)
 ;   SI = pointer to fdisk partition table.
+;   BH = pass counter (1=first pass, 0=second pass)
 ;
 ; Clobber list:
 ;   EAX, BX, EBP
@@ -276,12 +308,8 @@ find_boot:
     cmp     WORD [si + part_size * kPartCount], kBootSignature
     jne	    .exit        	  			; boot signature not found.
 
-    xor	    bx, bx						; BL will be set to 1 later in case of
+    xor	    bl, bl						; BL will be set to 1 later in case of
 										; Protective MBR has been found
-
-    inc     bh							; BH = 1. Giving a chance for a second pass
-										; to boot an inactive but boot1h aware HFS+ partition
-										; by scanning the MBR partition entries again.
 
 .start_scan:							
     mov     cx, kPartCount          	; number of partition entries per table
@@ -315,19 +343,20 @@ find_boot:
     jne	    .Pass2
 
 .Pass1:
-    cmp     BYTE [si + part.bootid], kPartActive	; In pass 1 we are walking on the standard path
-                                                    ; by trying to hop on the active partition.
+    cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 1 we're going to find a HFS+ partition
+    ; equipped with boot1h in its boot record
+    ; regardless if it's active or not.
     jne     .continue
-    xor	  	dh, dh               					; Argument for loadBootSector to skip HFS+ partition
-											        ; signature check.
+    mov		dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
+
     jmp     .tryToBoot
 
 .Pass2:    
-    cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
-                                                    ; equipped with boot1h in its boot record
-                                                    ; regardless if it's active or not.
+    cmp     BYTE [si + part.bootid], kPartActive	; In pass 2 we are walking on the standard path
+    ; by trying to hop on the active partition.
     jne     .continue
-  	mov 	dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
+    xor		dh, dh               					; Argument for loadBootSector to skip HFS+ partition
+    ; signature check.
 
     DebugChar('*')
 
@@ -351,18 +380,9 @@ find_boot:
     ; for a possible GPT Header at LBA 1
     ;    
     dec	    bl
-    jnz     .switchPass2					; didn't find Protective MBR before
+    jnz     .exit							; didn't find Protective MBR before
     call    checkGPT
 
-.switchPass2:
-    ;
-    ; Switching to Pass 2 
-    ; try to find a boot1h aware HFS+ MBR partition
-    ;
-    dec	    bh
-    mov	    si, kMBRPartTable				; set SI to first entry of MBR Partition table
-    jz      .start_scan						; scan again
-    
 .exit:
     ret										; Giving up.
 
@@ -508,7 +528,7 @@ loadBootSector:
 .checkHFSSignature:
 
 %if VERBOSE
-    LogString(test_str)
+    ;LogString(test_str)			; dmazar: removed to get space
 %endif
 
 	;
@@ -767,7 +787,7 @@ boot_error_str   	db  'error', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
-test_str		db  'test', 0
+;test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
 
@@ -782,11 +802,6 @@ done_str		db  'done', 0
 ; According to EFI specification, maximum boot code size is 440 bytes 
 ;
 
-;
-; XXX - compilation errors with debug enabled (see comment above about nasm)
-; Azi: boot0.s:808: error: TIMES value -111 is negative
-;      boot0.s:811: error: TIMES value -41 is negative
-;
 pad_boot:
     times 440-($-$$) db 0
 

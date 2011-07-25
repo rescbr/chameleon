@@ -7,5 +7,5 @@ config RESOLUTION_MODULE
 	default n
 # 'n' doesn't work??
 	---help---
-	  Say Y here if you want to enable to use of this module.
+	  Say Y here if you want to enable the use of this module.
 
