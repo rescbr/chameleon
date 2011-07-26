@@ -24,6 +24,7 @@
 
 #include "boot.h"
 #include "bootstruct.h"
+#include "graphics.h"
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"

@@ -14,6 +14,10 @@
 
 #define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 
+#define kUseAtiROM				"UseAtiROM"
+#define kAtiConfig				"AtiConfig"
+#define kATYbinimage			"ATYbinimage"
+
 #define Reg32(reg)				(*(volatile uint32_t *)(card->mmio + reg))
 #define RegRead32(reg)			(Reg32(reg))
 #define RegWrite32(reg, value)	(Reg32(reg) = value)
@@ -252,6 +256,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x944E,	0x30001787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4730 Series",		kMotmot		},
 	{ 0x944E,	0x30101787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4810 Series",		kMotmot		},
 	{ 0x944E,	0x31001787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4820",				kMotmot		},
+	// Akbar
+	{ 0x9480,	0x3628103C,	CHIP_FAMILY_RV730,/*M96*/"ATI Radeon HD 4650M",				kShrike		}, // hp OK
 	
 	{ 0x9490,	0x30501787, CHIP_FAMILY_RV730,		"ATI Radeon HD 4710",				kNull		},
 	{ 0x9490,	0x4710174B, CHIP_FAMILY_RV730,		"ATI Radeon HD 4710",				kNull		},
@@ -341,11 +347,15 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x954F,	0x31001787, CHIP_FAMILY_RV710,		"ATI Radeon HD 4520",				kNull		},
 	{ 0x954F,	0x4570174B, CHIP_FAMILY_RV710,		"Sapphire Radeon HD4570",			kNull		},
 	{ 0x954F,	0x301017AF, CHIP_FAMILY_RV710,		"ATI Radeon HD 4450",				kNull		},
+	// FredWst
+	{ 0x954F,	0xE990174B,	CHIP_FAMILY_RV710,		"Sapphire Radeon HD4350",			kNull		}, // review model
+	
 	
 	{ 0x9552,	0x3000148C, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9552,	0x3000174B, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9552,	0x30001787, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9552,	0x300017AF, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
+	{ 0x9552,	0x04341028, CHIP_FAMILY_RV710,		"ATI Mobility Radeon 4330",			kShrike		},
 	
 	{ 0x9581,	0x95811002, CHIP_FAMILY_RV630,		"ATI Radeon HD 3600 Series",		kNull		},
 	{ 0x9581,	0x3000148C, CHIP_FAMILY_RV630,		"ATI Radeon HD 3600 Series",		kNull		},
@@ -448,6 +458,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x5530174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
+    { 0x68F9,   0x20091787, CHIP_FAMILY_CEDAR,      "ATI Radeon HD 5450",               kEulemur    },
+    { 0x68F9,   0x22911787, CHIP_FAMILY_CEDAR,      "ATI Radeon HD 5450",               kEulemur    },
 	
 	/* Northen Islands */
 	{ 0x6718,	0x0B001002,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
@@ -459,6 +471,9 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x21F81458,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
 	{ 0x6759,	0xE193174B,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		},
+	// dickhouse 
+	{ 0x6760,	0x1CB21043,	CHIP_FAMILY_RV730,		"AMD Radeon HD 6470M",				kNull		},
+	
 	
 	/* standard/default models */
 	{ 0x9400,	0x00000000, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
@@ -491,6 +506,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9519,	0x00000000, CHIP_FAMILY_RV670,		"AMD FireStream 9170",				kMegalodon	},
 	{ 0x9540,	0x00000000, CHIP_FAMILY_RV710,		"ATI Radeon HD 4550",				kNull		},
 	{ 0x954F,	0x00000000, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
+	{ 0x9552,	0x00000000, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	{ 0x9588,	0x00000000, CHIP_FAMILY_RV630,		"ATI Radeon HD 2600 XT",			kLamna		},
 	{ 0x9589,	0x00000000, CHIP_FAMILY_RV630,		"ATI Radeon HD 2600 PRO",			kLamna		},
 	{ 0x958A,	0x00000000, CHIP_FAMILY_RV630,		"ATI Radeon HD 2600 X2 Series",		kLamna		},
@@ -520,7 +536,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68BE,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5700 Series",		kVervet		},
 	//Azi: from Slice { 0x100268C0,  "ATI Radeon 5670 Series", "Galago"}
 	// http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1695482
-	
+	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670 Series",		kBaboon		},	
+	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670 Series",		kBaboon		},	
 	{ 0x68D8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5600 Series",		kBaboon		},
 	{ 0x68D9,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5500 Series",		kBaboon		},
 	{ 0x68DA,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5500 Series",		kBaboon		},
@@ -536,6 +553,7 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6758,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",		kNull		},
 	{ 0x6759,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
+	{ 0x6760,	0x00000000,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6600 Series",		kNull		},
 	
 	{ 0x6770,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
 	{ 0x6779,	0x00000000,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kNull		},
@@ -1202,6 +1220,11 @@ static bool init_card(pci_dt_t *pci_dev)
 			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
 				card->ports = card_configs[i].ports;
 	}
+	
+	//Azi: http://forum.voodooprojects.org/index.php/topic,1959.msg10402.html#msg10402
+	// get around this...
+	if (pci_dev->device_id == 0x9552 && pci_dev->subsys_id.subsys_id == 0x04341028 )
+		card->ports = 2;
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
