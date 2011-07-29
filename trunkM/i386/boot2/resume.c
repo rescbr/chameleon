@@ -140,13 +140,14 @@ void HibernateBoot(char *image_filename)
 	
 	printf("mem_base %x\n", mem_base);
 	// Rek : hibernate fix 
-	if (!((long long)mem_base+allocSize<1024*bootInfo->extmem+0x100000))
+	//Slice - psholty
+/*	if (!((long long)mem_base+allocSize<1024*bootInfo->extmem+0x100000))
 	{
 		printf ("Not enough space to restore image. Press any key to proceed with normal boot.\n");
 		getchar();
 		return;
 	}
-	
+*/	
 	bcopy(header, (void *) mem_base, sizeof(IOHibernateImageHeader));
 	header = (IOHibernateImageHeader *) mem_base;
 	

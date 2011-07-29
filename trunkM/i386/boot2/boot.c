@@ -164,13 +164,13 @@ static int ExecKernel(void *binary)
     execute_hook("DriversLoaded", (void*)binary, NULL, NULL, NULL);
 
 	clearActivityIndicator();
-	
+/*	
 	if (gErrors) {
 		printf("Errors encountered while starting up the computer.\n");
 		printf("Pausing %d seconds...\n", kBootErrorTimeout);
 		sleep(kBootErrorTimeout);
 	}
-		
+*/		
 	md0Ramdisk();
 	
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
