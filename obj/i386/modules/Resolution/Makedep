@@ -1,0 +1,628 @@
+# Dependencies for File:  \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o:
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/autoconf.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/boot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/graphic_utils.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/graphics.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/gui.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/picopng.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOReturn.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/architecture/byte_order.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/device/device_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/eflags.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach-o/loader.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/clock_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/error.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/exception_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_notify.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/fp_reg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kmod.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/mach_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/memory_object_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/message.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/port.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/std_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/time_value.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_attributes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_behavior.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_inherit.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_prot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_purgable.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_region.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_statistics.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_sync.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdarg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdbool.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stddef.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdint.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/cdefs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/reboot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/syslimits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/libsa.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/memory.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bios.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bootargs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bootstruct.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/device_tree.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/io_inline.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/libsaio.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/nbp_cmd.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_internal.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: 915resolution.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: Resolution.c
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: include/edid.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/Resolution.o: shortatombios.h
+# Dependencies for File:  \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o:
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/autoconf.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/boot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/graphic_utils.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/boot2/graphics.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOReturn.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/architecture/byte_order.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/device/device_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/eflags.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach-o/loader.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/clock_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/error.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/exception_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_notify.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/fp_reg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kmod.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/mach_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/memory_object_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/message.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/port.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/std_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/time_value.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_attributes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_behavior.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_inherit.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_prot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_purgable.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_region.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_statistics.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_sync.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdarg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdbool.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stddef.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdint.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/cdefs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/reboot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/syslimits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/libsa.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/memory.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bios.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bootargs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bootstruct.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/device_tree.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/io_inline.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/libsaio.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/nbp_cmd.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_internal.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/vbe.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: edid.c
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/edid.o: include/edid.h
+# Dependencies for File:  \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o:
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/autoconf.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOReturn.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/IOKit/IOTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/architecture/byte_order.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/device/device_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/eflags.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/i386/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/OSTypes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/libkern/i386/_OSByteOrder.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/limits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach-o/loader.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/clock_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/error.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/exception_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_notify.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/host_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/fp_reg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/i386/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/kmod.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/mach_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/boolean.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/exception.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/kern_return.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_state.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/machine/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/memory_object_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/message.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/port.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/processor_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/std_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/task_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_info.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_policy.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_special_ports.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/thread_status.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/time_value.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_attributes.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_behavior.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_inherit.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_prot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_purgable.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_region.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_statistics.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_sync.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/mach/vm_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/machine/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdarg.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdbool.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stddef.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/stdint.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_endian.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_structs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/cdefs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/param.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/reboot.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/syslimits.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/include/sys/types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/libsa.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsa/memory.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bios.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/bootargs.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/io_inline.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/libsaio.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/nbp_cmd.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_internal.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: /Users/kozel/Documents/Chameleon/trunk/i386/libsaio/saio_types.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: 915resolution.c
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: 915resolution.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: include/edid.h
+ \
+ /Users/kozel/Documents/Chameleon/trunk/obj/i386/modules/Resolution/915resolution.o: shortatombios.h
