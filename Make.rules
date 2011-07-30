@@ -1,0 +1,62 @@
+-include $(SRCROOT)/auto.conf
+
+export USE_APPLE_PB_SUPPORT = all
+	
+ifneq "" "$(wildcard /bin/mkdirs)"
+  MKDIRS = /bin/mkdirs
+else
+  MKDIRS = /bin/mkdir -p
+endif
+
+NATIVE_AS = as
+NATIVE_LD = ld
+NATIVE_CC = cc
+NATIVE_CPP = g++
+PAX = /bin/pax
+
+$(OBJROOT)/%.o: %.c
+	@echo "\t[CC] $<"
+	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.o: %.m
+	@echo "\t[M] $<"
+	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.o: %.cpp
+	@echo "\t[CPP] $<"
+	@$(NATIVE_CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+
+$(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
+	@echo "\t[MKDIR] $@"
+	@$(MKDIRS) $@
+	
+$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/.config:
+	@echo "\t[MAKE] config"
+	@cd $(SRCROOT)/src/config && make rebuild_config
+
+.PHONY: clean
+clean:
+	@echo "\t[RM] $(OBJROOT)"
+	@echo "\t[RM] $(SYMROOT)"
+	@echo "\t[RM] $(DSTROOT)"
+	@echo "\t[RM] $(SRCROOT)/revision"
+	@echo "\t[RM] $(SRCROOT)/i386/modules/module_includes"
+	@echo "\t[RM] $(SRCROOT)/auto.conf"
+	@echo "\t[RM] $(SRCROOT)/autoconf.h"
+	@echo "\t[RM] $(SRCROOT)/autoconf.inc"
+
+	@rm -rf $(OBJROOT) $(SYMROOT) $(DSTROOT) $(SRCROOT)/revision \
+			$(SRCROOT)/i386/modules/module_includes \
+			$(SRCROOT)/auto.conf \
+			$(SRCROOT)/autoconf.h \
+			$(SRCROOT)/autoconf.inc
+
+
+.DEFAULT_GOAL := all
