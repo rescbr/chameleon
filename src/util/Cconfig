@@ -7,7 +7,7 @@ config BDMESG
 	  chameleon boot sequence.
 	  When in doubt, say "Y".
 
-source "i386/util/fdisk/Cconfig"
+source "src/util/fdisk/Cconfig"
 
 config OPENUP
 	bool "openUp utility"
