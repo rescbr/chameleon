@@ -1,0 +1,34 @@
+PPC_AS  = /usr/bin/as -arch ppc
+PPC_LD  = /usr/bin/ld -arch ppc
+PPC_CC  = /usr/bin/gcc-4.2
+PPC_CPP = /usr/bin/g++-4.2
+
+PPC_SDK = /Developer/SDKs/MacOSX10.5.sdk/
+PPC_CFLAGS += -I"$(PPC_SDK)/usr/include"
+PPC_LDFLAGS += -L"$(PPC_SDK)/usr/lib"
+PPC_LDFLAGS += -L"$(PPC_SDK)/usr/lib/system/"
+PPC_LDFLAGS += -F"$(PPC_SDK)/System/Library/Frameworks"
+PPC_LDFLAGS += -F"$(PPC_SDK)/System/Library/PrivateFrameworks"
+
+
+##### PPC Rules #####
+$(OBJROOT)/%.ppco: %.c $(OBJROOT)
+	@echo "\t[CC:PPC] $<"
+	@$(PPC_CC) -arch ppc $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.ppco: %.m $(OBJROOT)
+	@echo "\t[M:PPC] $<"
+	@$(PPC_CC) -arch ppc $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.ppco: %.cpp $(OBJROOT)
+	@echo "\t[CPP:PPC] $<"
+	@$(PPC_CPP) -arch ppc $(PPC_CFLAGS) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	
+ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .ppco, $(addprefix $(OBJROOT)/, $(OBJECTS)))
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .ppco, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))

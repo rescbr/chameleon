@@ -1,29 +1,24 @@
 #	Makefile
+ROOT = $(shell pwd)/../
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj
+SYMROOT = $(ROOT)/sym
+DSTROOT = $(ROOT)/dst
+DOCROOT = $(ROOT)/doc
 
-SRCROOT = $(shell pwd)/../
-OBJROOT = $(SRCROOT)/obj
-SYMROOT = $(SRCROOT)/sym
-DSTROOT = $(SRCROOT)/dst
-DOCROOT = $(SRCROOT)/../doc
+SUBDIRS=util modules i386 ppc arm
 
-include ${SRCROOT}/Make.rules
-
-config rebuild_config:
-	@for i in config; \
-	do \
+all:
+	@echo ================= make $@ BUILT_IN=yes for modules =================
+	@cd modules; ${MAKE} BUILT_IN=yes $@
+	@for i in ${SUBDIRS};										  \
+	do															  \
 		echo ================= make $@ for $$i =================; \
-		( cd $$i; ${MAKE}					  \
-			"OBJROOT=$(OBJROOT)/$$i"			  \
-		  	"SYMROOT=$(SYMROOT)"				  \
-			"DSTROOT=$(DSTROOT)"				  \
-			"SRCROOT=$(SRCROOT)"				  \
-			"RC_ARCHS=$(RC_ARCHS)"				  \
-			"RC_KANJI=$(RC_KANJI)"				  \
-			"JAPANESE=$(JAPANESE)"				  \
-			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
-		) || exit $$?; 						  \
+		( ROOT=$(ROOT);										  	  \
+			cd $$i; ${MAKE}										  \
+			$@ 			  										  \
+		) || exit $$?; 											  \
 	done
+	
 
-
-.PHONY: config
-.PHONY: rebuild_config
+include ${ROOT}/Make.rules

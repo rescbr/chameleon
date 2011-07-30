@@ -1,17 +1,15 @@
-#	Makefile for i386 modules
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/modules/
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
+#	Makefile for modules
+ROOT = $(shell pwd)/../../
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/modules
+SYMROOT = $(ROOT)/sym/modules
+DSTROOT = $(ROOT)/dst/usr/standalone/modules
+DOCROOT = $(ROOT)/doc
 
-include ${SRCROOT}/Make.rules
+include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = ModuleSystem klibc objc uClibcxx HelloWorld Disk FileSystem
+SUBDIRS = ModuleSystem klibc uClibcxx HelloWorld Disk FileSystem
 
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
@@ -23,19 +21,13 @@ INC = -I$(LIBSAIODIR)
 
 ifeq (${CONFIG_MODULESYSTEM_MODULE}, y)
 all: $(SYMROOT) $(OBJROOT) objroot_dirs $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h
-	@for i in ${SUBDIRS}; \
-	do \
+	@for i in ${SUBDIRS};						  \
+	do								  \
 		echo ================= make $@ for $$i =================; \
-		( cd $$i; $(MKDIRS) $(OBJROOT)/$$i; ${MAKE}					  \
-			"OBJROOT=$(OBJROOT)/$$i"			  \
-		  	"SYMROOT=$(SYMROOT)/"				  \
-			"DSTROOT=$(DSTROOT)/"				  \
-			"SRCROOT=$(SRCROOT)"				  \
-			"RC_ARCHS=$(RC_ARCHS)"				  \
-			"RC_KANJI=$(RC_KANJI)"				  \
-			"JAPANESE=$(JAPANESE)"				  \
-			"RC_CFLAGS=$(RC_CFLAGS)" $@ 			  \
-		) || exit $$?; 						  \
+		( ROOT=$(ROOT);						  \
+			cd $$i; ${MAKE}					  \
+			$@						  \
+		) || exit $$?;						  \
 	done
 
 	@# Finish up boot_modules.c

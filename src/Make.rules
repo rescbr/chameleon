@@ -1,0 +1,10 @@
+-include $(SRCROOT)/auto.conf
+
+-include ${SRCROOT}/i386/Make.rules
+-include ${SRCROOT}/ppc/Make.rules
+-include ${SRCROOT}/arm/Make.rules
+
+
+#print transformed OBJECTS
+#$(warning ${ACTUAL_OBJECTS})
+

@@ -1,7 +1,5 @@
--include $(SRCROOT)/auto.conf
+include ${SRCROOT}/Make.rules
 
-export USE_APPLE_PB_SUPPORT = all
-	
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else
@@ -14,19 +12,19 @@ NATIVE_CC = cc
 NATIVE_CPP = g++
 PAX = /bin/pax
 
-$(OBJROOT)/%.o: %.c
+$(OBJROOT)/%.o: %.c $(OBJROOT)
 	@echo "\t[CC] $<"
 	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.o: %.m
+$(OBJROOT)/%.o: %.m $(OBJROOT)
 	@echo "\t[M] $<"
 	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.o: %.cpp
+$(OBJROOT)/%.o: %.cpp $(OBJROOT)
 	@echo "\t[CPP] $<"
 	@$(NATIVE_CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
@@ -36,27 +34,50 @@ $(OBJROOT)/%.o: %.cpp
 $(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
 	@echo "\t[MKDIR] $@"
 	@$(MKDIRS) $@
-	
-$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/.config:
+		
+config: $(DIRS_NEEDED)
 	@echo "\t[MAKE] config"
-	@cd $(SRCROOT)/src/config && make rebuild_config
+	@cd ${SRCROOT}/config/ && make
+	@echo "\t[CCONFIG] config"
+	@cd ${SRCROOT} && $(SYMROOT)/cconfig $(SRCROOT)/Cconfig
 
-.PHONY: clean
+rebuild_config: $(DIRS_NEEDED)
+	@echo "\t[MAKE] config"
+	@cd ${SRCROOT}/config/ && make
+	@echo "\t[CCONFIG] reconfig"
+	@cd ${SRCROOT} && $(SYMROOT)/cconfig $(SRCROOT)/Cconfig rebuild
+
+
+.PHONY: config
+.PHONY: rebuild_config
+.PHONY: $(SRCROOT)/auto.conf
+
+$(SYMROOT)/vers.h:
+	@echo "#define BOOT_VERSION \"5.0.132\"" > $@
+	@echo "#define BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $@
+	@echo "#define BOOT_CHAMELEONVERSION \"$$VERSION\"" >> $@
+	@echo "#define BOOT_CHAMELEONREVISION \"$$REVISION\"" >> $@
+
+
 clean:
 	@echo "\t[RM] $(OBJROOT)"
 	@echo "\t[RM] $(SYMROOT)"
 	@echo "\t[RM] $(DSTROOT)"
-	@echo "\t[RM] $(SRCROOT)/revision"
-	@echo "\t[RM] $(SRCROOT)/i386/modules/module_includes"
 	@echo "\t[RM] $(SRCROOT)/auto.conf"
 	@echo "\t[RM] $(SRCROOT)/autoconf.h"
 	@echo "\t[RM] $(SRCROOT)/autoconf.inc"
 
-	@rm -rf $(OBJROOT) $(SYMROOT) $(DSTROOT) $(SRCROOT)/revision \
-			$(SRCROOT)/i386/modules/module_includes \
+	@rm -rf $(OBJROOT) $(SYMROOT) $(DSTROOT) \
 			$(SRCROOT)/auto.conf \
 			$(SRCROOT)/autoconf.h \
 			$(SRCROOT)/autoconf.inc
+
+$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config: rebuild_cofig
+
+.PHONY: rebuild_config
+.PHONY: config
+.PHONY: clean
+.PHONY: $(SYMROOT)/vers.h
 
 
 .DEFAULT_GOAL := all

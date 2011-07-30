@@ -18,14 +18,14 @@ config MODULE_DEBUG
 
 menu "Modules"
 # NOTE: ModuleSystem should always be compiled in
-source "src/modules/ModuleSystem/Cconfig"
+source "modules/ModuleSystem/Cconfig"
 
 # NOTE BiosDisk, FileSystem should both be enabled as well as at least one file system driver
-source "src/modules/klibc/Cconfig"
-#source "src/modules/objc/Cconfig"
-source "src/modules/uClibcxx/Cconfig"
-source "src/modules/Disk/Cconfig"
-source "src/modules/FileSystem/Cconfig"
+source "modules/klibc/Cconfig"
+#source "modules/objc/Cconfig"
+source "modules/uClibcxx/Cconfig"
+source "modules/Disk/Cconfig"
+source "modules/FileSystem/Cconfig"
 
-source "src/modules/HelloWorld/Cconfig"
+source "modules/HelloWorld/Cconfig"
 endmenu

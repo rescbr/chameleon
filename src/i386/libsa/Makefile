@@ -1,14 +1,12 @@
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/libsa
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
+ROOT = $(shell pwd)/../../
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/i386
+SYMROOT = $(ROOT)/sym/i386
+DSTROOT = $(ROOT)/dst/usr/standalone/i386
+DOCROOT = $(ROOT)/doc
 
 DIR = libsa
-include ${SRCROOT}/Make.rules
+include ${ROOT}/Make.rules
 
 LIBSAIODIR = ../libsaio
 

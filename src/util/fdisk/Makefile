@@ -1,5 +1,5 @@
 SRCROOT = $(shell pwd)/../../../
-OBJROOT = $(SRCROOT)/obj/i386/util/fdisk
+override OBJROOT = $(SRCROOT)/obj/i386/util/fdisk
 SYMROOT = $(SRCROOT)/sym/i386
 DSTROOT = $(SRCROOT)/dst/i386
 DOCROOT = $(SRCROOT)/doc
@@ -7,40 +7,36 @@ IMGROOT = $(SRCROOT)/sym/cache
 IMGSKELROOT = $(SRCROOT)/imgskel
 CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 
-
 DIR = fdisk
-
-include ${SRCROOT}/Make.rules
-
+OBJECTS =  cmd disk fdisk getrawpartition mbr misc opendev part user auto
 
 LDFLAGS := $(LDFALGS) -mmacosx-version-min=10.5
-
-
-OBJS =  cmd.o32 disk.o32 fdisk.o32 getrawpartition.o32 mbr.o32 misc.o32 opendev.o32 part.o32 user.o32 auto.o32 \
-		cmd.o64 disk.o64 fdisk.o64 getrawpartition.o64 mbr.o64 misc.o64 opendev.o64 part.o64 user.o64 auto.o64
-
-
 PROGRAM = fdisk440
 PROGRAM:= $(addprefix $(SYMROOT)/, $(PROGRAM))
 
+
+include ${ROOT}/Make.rules
 
 ifeq ($(CONFIG_FDISK440),y)
 
 all: $(SYMROOT) $(OBJROOT) $(PROGRAM)
 
-$(PROGRAM): $(addprefix $(OBJROOT)/, $(OBJS))
-	@echo "\t[LD32] $@_32"
-	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $@_32 $(filter %.o32,$^)
-	@echo "\t[LD64] $@_64"
-	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $@_64 $(filter %.o64,$^)
-	@echo "\t[LIPO] $@"
-	@lipo -create -arch i386 $@_32 -arch x86_64 $@_64 -output $@
-	@rm $@_32 $@_64
+$(PROGRAM): $(ACTUAL_OBJECTS)
+	@echo "\t[LD:I386] $(@F)"
+	@$(X86_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F).i386 $(OBJROOT)/*.i386o
+	@echo "\t[LD:X86_64] $(@F)"
+	@$(X86_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F).x86_64 $(OBJROOT)/*.x86_64o
+	@echo "\t[LD:PPC] $(@F)"
+	@$(PPC_CC) $(CFLAGS) $(PPC_LDFLAGS) $(LDFLAGS) $(DEFINES) -arch ppc -o $(SYMROOT)/$(@F).ppc $(OBJROOT)/*.ppco
+	@#echo "\t[LD:ARM] $(@F)"
+	@#$(ARM_CC) $(CFLAGS) $(ARM_LDFLAGS) $(LDFLAGS) $(DEFINES) -arch arm -o $(SYMROOT)/$(@F).arm $(OBJROOT)/*.armo
+
+	@echo "\t[LIPO] $(@F)"
+	@lipo -create -arch i386 $(SYMROOT)/$(@F).i386 -arch x86_64 $(SYMROOT)/$(@F).x86_64 -arch ppc $(SYMROOT)/$(@F).ppc -output $(SYMROOT)/$(@F)
+	@$(RM) $(SYMROOT)/$(@F).i386 $(SYMROOT)/$(@F).x86_64 $(SYMROOT)/$(@F).ppc
 
 else
-
 all:
-
 endif
 
 

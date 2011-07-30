@@ -1,0 +1,34 @@
+ARM_AS  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/as -arch arm
+ARM_LD  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ld -arch arm
+ARM_CC  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc-4.2
+ARM_CPP = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/g++-4.2
+
+ARM_SDK=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk/
+AMR_CFLAGS += -I"$(ARM_SDK)/usr/include"
+ARM_LDFLAGS += -L"$(ARM_SDK)/usr/lib"
+ARM_LDFLAGS += -L"$(ARM_SDK)/usr/lib/system/"
+ARM_LDFLAGS += -F"$(ARM_SDK)/System/Library/Frameworks"
+ARM_LDFLAGS += -F"$(ARM_SDK)/System/Library/PrivateFrameworks"
+
+
+##### ARM Rules #####
+$(OBJROOT)/%.armo: %.c $(OBJROOT)
+	@echo "\t[CC:ARM] $<"
+	@$(ARM_CC) -arch arm ${AMR_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.armo: %.m $(OBJROOT)
+	@echo "\t[M:ARM] $<"
+	@$(ARM_CC) -arch arm ${AMR_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.armo: %.cpp $(OBJROOT)
+	@echo "\t[CPP:ARM] $<"
+	@$(ARM_CPP) -arch arm ${AMR_CFLAGS} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	
+ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .armo, $(addprefix $(OBJROOT)/, $(OBJECTS)))
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .armo, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))

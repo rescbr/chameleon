@@ -9,4 +9,4 @@ config FILESYSTEM_MODULE
 	---help---
 	  Say Y here if you want to enable to use of this module.
 
-source "src/modules/FileSystem/HFS/Cconfig"
+source "modules/FileSystem/HFS/Cconfig"

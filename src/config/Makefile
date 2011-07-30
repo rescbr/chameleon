@@ -3,16 +3,16 @@
 # we'll just keep the generated files in this directory
 # and install them directly, rather than generating them again.
 #
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/config
-SYMROOT = $(SRCROOT)/sym/
-DSTROOT = $(SRCROOT)/dst/
-DOCROOT = $(SRCROOT)/../doc
-IMGROOT = $(SRCROOT)/sym/cache
+ROOT = $(shell pwd)/../../
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/config
+SYMROOT = $(ROOT)/sym
+DSTROOT = $(ROOT)/dst
+DOCROOT = $(ROOT)/doc
 
 DIR = config
 
-include ${SRCROOT}/Make.rules
+include ${ROOT}/Make.rules
 
 OBJECTS = cconfig.o zconf.tab.o \
 		  yesno.o textbox.o menubox.o \
@@ -32,15 +32,6 @@ all: $(DIRS_NEEDED) $(SYMPROG)
 $(SYMPROG): $(addprefix $(OBJROOT)/, $(OBJECTS))
 	@echo "\t[LD] $(@F)"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(OBJROOT)/*.o
-
-config: $(DIRS_NEEDED) $(SYMPROG)
-	@cd ${SRCROOT} && $(SYMPROG) $(SRCROOT)/Cconfig
-
-rebuild_config: $(DIRS_NEEDED) $(SYMPROG)
-	@cd ${SRCROOT} && $(SYMPROG) $(SRCROOT)/Cconfig rebuild
-
-
-.PHONY: config
 
 #dependencies
 -include $(OBJROOT)/Makedep

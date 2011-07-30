@@ -1,6 +1,8 @@
 #
 # Chameleon Configuration
 #
-source "src/util/Cconfig"
-source "src/i386/Cconfig"
-source "src/modules/Cconfig"
+mainmenu "Chameleon Configuration"
+
+source "util/Cconfig"
+source "i386/Cconfig"
+source "modules/Cconfig"
