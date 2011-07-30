@@ -33,7 +33,6 @@ typedef function_table_entry   *function_table_t;
 #include <mach/mig.h>
 #include <mach/mach_types.h>
 #include <mach/mach_types.h>
-#include <mach_debug/mach_debug_types.h>
 
 #ifdef __BeforeMigUserHeader
 __BeforeMigUserHeader
@@ -281,6 +280,9 @@ kern_return_t host_swap_exception_ports
 	exception_behavior_array_t old_behaviors,
 	exception_flavor_array_t old_flavors
 );
+
+typedef	char	symtab_name_t[32];
+
 
 /* Routine host_load_symbol_table */
 #ifdef	mig_external

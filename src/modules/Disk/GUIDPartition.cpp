@@ -49,11 +49,12 @@ GUIDPartition::GUIDPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk
         
         mGPTEntry = (GPTEntry*) /*mLBABUffer*/ BIOS_ADDR + offset;
         
-        mNumSectors = mGPTEntry->ent_lba_end - mGPTEntry->ent_lba_start;
+        // TODO: verify partition type != NULL
+        
+        mNumSectors = (mGPTEntry->ent_lba_end - mGPTEntry->ent_lba_start) + 1;
         mBeginSector = mGPTEntry->ent_lba_start;
         //mUUID = mGPTEntry->ent_uuid;
-    }
-    
+    }    
 }
 
 GUIDPartition::~GUIDPartition()

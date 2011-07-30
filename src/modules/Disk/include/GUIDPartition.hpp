@@ -54,7 +54,7 @@ protected:
     bool        isGPTDisk();
     
 private:
-    UInt8       mLBABUffer[512*4];    // TODO: don't assume 512
+    UInt8       mLBABUffer[512*4    ];    // TODO: don't assume 512
     GPTHeader*  mGPTHeader;
     GPTEntry*   mGPTEntry;
 };

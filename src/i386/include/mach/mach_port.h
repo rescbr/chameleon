@@ -32,7 +32,6 @@ typedef function_table_entry   *function_table_t;
 #include <mach/std_types.h>
 #include <mach/mig.h>
 #include <mach/mach_types.h>
-#include <mach_debug/mach_debug_types.h>
 
 #ifdef __BeforeMigUserHeader
 __BeforeMigUserHeader
@@ -344,21 +343,6 @@ kern_return_t mach_port_get_srights
 	mach_port_rights_t *srights
 );
 
-/* Routine mach_port_space_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t mach_port_space_info
-(
-	ipc_space_t task,
-	ipc_info_space_t *space_info,
-	ipc_info_name_array_t *table_info,
-	mach_msg_type_number_t *table_infoCnt,
-	ipc_info_tree_name_array_t *tree_info,
-	mach_msg_type_number_t *tree_infoCnt
-);
 
 /* Routine mach_port_dnrequest_info */
 #ifdef	mig_external
@@ -1198,25 +1182,6 @@ union __RequestUnion__mach_port_subsystem {
 #endif
 	typedef struct {
 		mach_msg_header_t Head;
-		/* start of the kernel processed data */
-		mach_msg_body_t msgh_body;
-		mach_msg_ool_descriptor_t table_info;
-		mach_msg_ool_descriptor_t tree_info;
-		/* end of the kernel processed data */
-		NDR_record_t NDR;
-		ipc_info_space_t space_info;
-		mach_msg_type_number_t table_infoCnt;
-		mach_msg_type_number_t tree_infoCnt;
-	} __Reply__mach_port_space_info_t;
-#ifdef  __MigPackStructs
-#pragma pack()
-#endif
-
-#ifdef  __MigPackStructs
-#pragma pack(4)
-#endif
-	typedef struct {
-		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		kern_return_t RetCode;
 		unsigned dnr_total;
@@ -1304,43 +1269,6 @@ union __RequestUnion__mach_port_subsystem {
 #endif
 #endif /* !__Reply__mach_port_subsystem__defined */
 
-/* union of all replies */
-
-#ifndef __ReplyUnion__mach_port_subsystem__defined
-#define __ReplyUnion__mach_port_subsystem__defined
-union __ReplyUnion__mach_port_subsystem {
-	__Reply__mach_port_names_t Reply_mach_port_names;
-	__Reply__mach_port_type_t Reply_mach_port_type;
-	__Reply__mach_port_rename_t Reply_mach_port_rename;
-	__Reply__mach_port_allocate_name_t Reply_mach_port_allocate_name;
-	__Reply__mach_port_allocate_t Reply_mach_port_allocate;
-	__Reply__mach_port_destroy_t Reply_mach_port_destroy;
-	__Reply__mach_port_deallocate_t Reply_mach_port_deallocate;
-	__Reply__mach_port_get_refs_t Reply_mach_port_get_refs;
-	__Reply__mach_port_mod_refs_t Reply_mach_port_mod_refs;
-	__Reply__mach_port_set_mscount_t Reply_mach_port_set_mscount;
-	__Reply__mach_port_get_set_status_t Reply_mach_port_get_set_status;
-	__Reply__mach_port_move_member_t Reply_mach_port_move_member;
-	__Reply__mach_port_request_notification_t Reply_mach_port_request_notification;
-	__Reply__mach_port_insert_right_t Reply_mach_port_insert_right;
-	__Reply__mach_port_extract_right_t Reply_mach_port_extract_right;
-	__Reply__mach_port_set_seqno_t Reply_mach_port_set_seqno;
-	__Reply__mach_port_get_attributes_t Reply_mach_port_get_attributes;
-	__Reply__mach_port_set_attributes_t Reply_mach_port_set_attributes;
-	__Reply__mach_port_allocate_qos_t Reply_mach_port_allocate_qos;
-	__Reply__mach_port_allocate_full_t Reply_mach_port_allocate_full;
-	__Reply__task_set_port_space_t Reply_task_set_port_space;
-	__Reply__mach_port_get_srights_t Reply_mach_port_get_srights;
-	__Reply__mach_port_space_info_t Reply_mach_port_space_info;
-	__Reply__mach_port_dnrequest_info_t Reply_mach_port_dnrequest_info;
-	__Reply__mach_port_kernel_object_t Reply_mach_port_kernel_object;
-	__Reply__mach_port_insert_member_t Reply_mach_port_insert_member;
-	__Reply__mach_port_extract_member_t Reply_mach_port_extract_member;
-	__Reply__mach_port_get_context_t Reply_mach_port_get_context;
-	__Reply__mach_port_set_context_t Reply_mach_port_set_context;
-	__Reply__mach_port_kobject_t Reply_mach_port_kobject;
-};
-#endif /* !__RequestUnion__mach_port_subsystem__defined */
 
 #ifndef subsystem_to_name_map_mach_port
 #define subsystem_to_name_map_mach_port \

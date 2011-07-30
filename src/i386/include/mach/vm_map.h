@@ -32,7 +32,6 @@ typedef function_table_entry   *function_table_t;
 #include <mach/std_types.h>
 #include <mach/mig.h>
 #include <mach/mach_types.h>
-#include <mach_debug/mach_debug_types.h>
 
 #ifdef __BeforeMigUserHeader
 __BeforeMigUserHeader
@@ -313,33 +312,7 @@ kern_return_t vm_map_page_query
 	integer_t *ref_count
 );
 
-/* Routine mach_vm_region_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t mach_vm_region_info
-(
-	vm_map_t task,
-	vm_address_t address,
-	vm_info_region_t *region,
-	vm_info_object_array_t *objects,
-	mach_msg_type_number_t *objectsCnt
-);
 
-/* Routine vm_mapped_pages_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t vm_mapped_pages_info
-(
-	vm_map_t task,
-	page_address_array_t *pages,
-	mach_msg_type_number_t *pagesCnt
-);
 
 /* Routine vm_region_recurse */
 #ifdef	mig_external
@@ -373,20 +346,7 @@ kern_return_t vm_region_recurse_64
 	mach_msg_type_number_t *infoCnt
 );
 
-/* Routine mach_vm_region_info_64 */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t mach_vm_region_info_64
-(
-	vm_map_t task,
-	vm_address_t address,
-	vm_info_region_64_t *region,
-	vm_info_object_array_t *objects,
-	mach_msg_type_number_t *objectsCnt
-);
+
 
 /* Routine vm_region_64 */
 #ifdef	mig_external
@@ -1159,22 +1119,6 @@ union __RequestUnion__vm_map_subsystem {
 #pragma pack()
 #endif
 
-#ifdef  __MigPackStructs
-#pragma pack(4)
-#endif
-	typedef struct {
-		mach_msg_header_t Head;
-		/* start of the kernel processed data */
-		mach_msg_body_t msgh_body;
-		mach_msg_ool_descriptor_t objects;
-		/* end of the kernel processed data */
-		NDR_record_t NDR;
-		vm_info_region_t region;
-		mach_msg_type_number_t objectsCnt;
-	} __Reply__mach_vm_region_info_t;
-#ifdef  __MigPackStructs
-#pragma pack()
-#endif
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1226,22 +1170,6 @@ union __RequestUnion__vm_map_subsystem {
 #pragma pack()
 #endif
 
-#ifdef  __MigPackStructs
-#pragma pack(4)
-#endif
-	typedef struct {
-		mach_msg_header_t Head;
-		/* start of the kernel processed data */
-		mach_msg_body_t msgh_body;
-		mach_msg_ool_descriptor_t objects;
-		/* end of the kernel processed data */
-		NDR_record_t NDR;
-		vm_info_region_64_t region;
-		mach_msg_type_number_t objectsCnt;
-	} __Reply__mach_vm_region_info_64_t;
-#ifdef  __MigPackStructs
-#pragma pack()
-#endif
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1306,39 +1234,6 @@ union __RequestUnion__vm_map_subsystem {
 #endif /* !__Reply__vm_map_subsystem__defined */
 
 /* union of all replies */
-
-#ifndef __ReplyUnion__vm_map_subsystem__defined
-#define __ReplyUnion__vm_map_subsystem__defined
-union __ReplyUnion__vm_map_subsystem {
-	__Reply__vm_region_t Reply_vm_region;
-	__Reply__vm_allocate_t Reply_vm_allocate;
-	__Reply__vm_deallocate_t Reply_vm_deallocate;
-	__Reply__vm_protect_t Reply_vm_protect;
-	__Reply__vm_inherit_t Reply_vm_inherit;
-	__Reply__vm_read_t Reply_vm_read;
-	__Reply__vm_read_list_t Reply_vm_read_list;
-	__Reply__vm_write_t Reply_vm_write;
-	__Reply__vm_copy_t Reply_vm_copy;
-	__Reply__vm_read_overwrite_t Reply_vm_read_overwrite;
-	__Reply__vm_msync_t Reply_vm_msync;
-	__Reply__vm_behavior_set_t Reply_vm_behavior_set;
-	__Reply__vm_map_t Reply_vm_map;
-	__Reply__vm_machine_attribute_t Reply_vm_machine_attribute;
-	__Reply__vm_remap_t Reply_vm_remap;
-	__Reply__task_wire_t Reply_task_wire;
-	__Reply__mach_make_memory_entry_t Reply_mach_make_memory_entry;
-	__Reply__vm_map_page_query_t Reply_vm_map_page_query;
-	__Reply__mach_vm_region_info_t Reply_mach_vm_region_info;
-	__Reply__vm_mapped_pages_info_t Reply_vm_mapped_pages_info;
-	__Reply__vm_region_recurse_t Reply_vm_region_recurse;
-	__Reply__vm_region_recurse_64_t Reply_vm_region_recurse_64;
-	__Reply__mach_vm_region_info_64_t Reply_mach_vm_region_info_64;
-	__Reply__vm_region_64_t Reply_vm_region_64;
-	__Reply__mach_make_memory_entry_64_t Reply_mach_make_memory_entry_64;
-	__Reply__vm_map_64_t Reply_vm_map_64;
-	__Reply__vm_purgable_control_t Reply_vm_purgable_control;
-};
-#endif /* !__RequestUnion__vm_map_subsystem__defined */
 
 #ifndef subsystem_to_name_map_vm_map
 #define subsystem_to_name_map_vm_map \

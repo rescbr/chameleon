@@ -33,7 +33,6 @@ typedef function_table_entry   *function_table_t;
 #include <mach/mig.h>
 #include <mach/mach_types.h>
 #include <mach/mach_types.h>
-#include <mach_debug/mach_debug_types.h>
 #include <mach/mach_init.h>
 
 #ifdef __BeforeMigUserHeader
@@ -151,47 +150,6 @@ kern_return_t kmod_get_info
 	mach_msg_type_number_t *modulesCnt
 );
 
-/* Routine host_zone_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t host_zone_info
-(
-	host_t host,
-	zone_name_array_t *names,
-	mach_msg_type_number_t *namesCnt,
-	zone_info_array_t *info,
-	mach_msg_type_number_t *infoCnt
-);
-
-/* Routine host_virtual_physical_table_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t host_virtual_physical_table_info
-(
-	host_t host,
-	hash_info_bucket_array_t *info,
-	mach_msg_type_number_t *infoCnt
-);
-
-/* Routine host_ipc_hash_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t host_ipc_hash_info
-(
-	host_t host,
-	hash_info_bucket_array_t *info,
-	mach_msg_type_number_t *infoCnt
-);
-
 /* Routine processor_set_default */
 #ifdef	mig_external
 mig_external
@@ -260,18 +218,6 @@ kern_return_t host_request_notification
 	mach_port_t notify_port
 );
 
-/* Routine host_lockgroup_info */
-#ifdef	mig_external
-mig_external
-#else
-extern
-#endif	/* mig_external */
-kern_return_t host_lockgroup_info
-(
-	host_t host,
-	lockgroup_info_array_t *lockgroup_info,
-	mach_msg_type_number_t *lockgroup_infoCnt
-);
 
 /* Routine host_statistics64 */
 #ifdef	mig_external
