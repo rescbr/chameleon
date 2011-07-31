@@ -132,7 +132,12 @@ dist image: all
 
 pkg installer: all
 	@# TODO: remove sudo
-	sudo ${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
+	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
+
+dmg: all
+	@# TODO: remove sudo
+	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
+	${SRCROOT}/package/builddmg.sh ${SYMROOT}/package;
 
 $(SYMROOT)/i386/vers.h: version
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $@
@@ -147,3 +152,4 @@ $(SYMROOT)/i386/vers.h: version
 .PHONY: image
 .PHONY: pkg
 .PHONY: installer
+.PHONY: dmg

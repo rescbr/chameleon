@@ -9,10 +9,10 @@
 
 typedef struct {
 	uint32_t		:2;
-	uint32_t	reg :6;
-	uint32_t	func:3;
-	uint32_t	dev :5;
-	uint32_t	bus :8;
+	uint32_t	reg	:6;
+	uint32_t	func	:3;
+	uint32_t	dev	:5;
+	uint32_t	bus	:8;
 	uint32_t		:7;
 	uint32_t	eb	:1;
 } pci_addr_t;
@@ -51,21 +51,21 @@ extern pci_dt_t		*root_pci_dev;
 extern uint8_t		pci_config_read8(uint32_t, uint8_t);
 extern uint16_t		pci_config_read16(uint32_t, uint8_t);
 extern uint32_t		pci_config_read32(uint32_t, uint8_t);
-extern void			pci_config_write8(uint32_t, uint8_t, uint8_t);
-extern void			pci_config_write16(uint32_t, uint8_t, uint16_t);
-extern void			pci_config_write32(uint32_t, uint8_t, uint32_t);
-extern char			*get_pci_dev_path(pci_dt_t *);
-extern void			build_pci_dt(void);
-extern void			dump_pci_dt(pci_dt_t *);
+extern void		pci_config_write8(uint32_t, uint8_t, uint8_t);
+extern void		pci_config_write16(uint32_t, uint8_t, uint16_t);
+extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
+extern char		*get_pci_dev_path(pci_dt_t *);
+extern void		build_pci_dt(void);
+extern void		dump_pci_dt(pci_dt_t *);
 
 /* Option ROM header */
 typedef struct {
-	uint16_t		signature;		// 0xAA55
-	uint8_t			rom_size;
-	uint32_t		entry_point;
-	uint8_t			reserved[15];
-	uint16_t		pci_header_offset;
-	uint16_t		expansion_header_offset;
+	uint16_t	signature;		// 0xAA55
+	uint8_t		rom_size;
+	uint32_t	entry_point;
+	uint8_t		reserved[15];
+	uint16_t	pci_header_offset;
+	uint16_t	expansion_header_offset;
 } option_rom_header_t;
 
 /* Option ROM PCI Data Structure */
