@@ -84,6 +84,7 @@ extern void   bcopy(const void * src, void * dst, size_t len);
 
 #ifndef bzero
 extern void   bzero(void * dst, size_t len);
+extern void   __bzero(void * dst, size_t len);
 #endif
 
 extern void * memset(void * dst, int c, size_t n);

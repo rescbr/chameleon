@@ -56,6 +56,11 @@ void bzero(void * dst, size_t len)
     memset(dst, 0, len);
 }
 
+void __bzero(void * dst, size_t len)
+{
+    memset(dst, 0, len);
+}
+
 #else
 void * memcpy(void * dst, const void * src, size_t len)
 {
@@ -101,6 +106,22 @@ void bzero(void * dst, size_t len)
        : "c" (len), "D" (dst)
        : "memory", "%eax" );
 }
+
+void __bzero(void * dst, size_t len)
+{
+    asm volatile ( "xorl %%eax, %%eax    \n\t"
+         "cld                  \n\t"
+         "movl %%ecx, %%edx    \n\t"
+         "shrl $2, %%ecx       \n\t"
+         "rep; stosl           \n\t"
+         "movl %%edx, %%ecx    \n\t"
+         "andl $3, %%ecx       \n\t"
+         "rep; stosb           \n\t"
+       : 
+       : "c" (len), "D" (dst)
+       : "memory", "%eax" );
+}
+
 #endif
 
 /* #if DONT_USE_GCC_BUILT_IN_STRLEN */

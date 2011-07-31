@@ -504,9 +504,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06D9, "Quadro 5000" },
 	{ 0x10DE06DA, "Quadro 5000M" },
 	{ 0x10DE06DC, "Quadro 6000" },
+	{ 0x10DE06DE, "Tesla M2050" },
+	{ 0x10DE06DE, "Tesla M2070" },
 	{ 0x10DE06DD, "Quadro 4000" },
 	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
 	{ 0x10DE06DE, "Tesla M2070" },	// TODO: sub-device id: ?	
+	{ 0x10DE06DF, "Tesla M2070-Q" },
 	// 0x10DE06DE also applies to misc S2050, X2070, M2050, M2070
 	// 06E0 - 06EF	
 	{ 0x10DE06E0, "GeForce 9300 GE" },
@@ -587,7 +590,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0871, "GeForce 9200" },
 	{ 0x10DE0872, "GeForce G102M" },
 	{ 0x10DE0873, "GeForce G102M" },
-	{ 0x10DE0874, "ION 9300M" },	
+	{ 0x10DE0874, "ION 9300M" },
 	{ 0x10DE0876, "ION" },
 	{ 0x10DE087A, "GeForce 9400" },
 	{ 0x10DE087D, "ION 9400M" },
@@ -731,10 +734,14 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DC6, "GeForce GTS 450" },
 	{ 0x10DE0DCA, "GF10x" },
 	// 0DD0 - 0DDF	
+	{ 0x10DE0DCD, "GeForce GT 555M" },
+	{ 0x10DE0DCE, "GeForce GT 555M" },
 	{ 0x10DE0DD1, "GeForce GTX 460M" },
 	{ 0x10DE0DD2, "GeForce GT 445M" },
 	{ 0x10DE0DD3, "GeForce GT 435M" },
+	{ 0x10DE0DD6, "GeForce GT 550M" },
 	{ 0x10DE0DD8, "Quadro 2000" },
+	{ 0x10DE0DDA, "Quadro 2000M" },
 	{ 0x10DE0DDE, "GF106-ES" },
 	{ 0x10DE0DDF, "GF106-INT" },
 	// 0DE0 - 0DEF	
@@ -743,13 +750,20 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DE2, "GeForce GT 420" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
+	{ 0x10DE0DEC, "GeForce GT 525M" },
+	{ 0x10DE0DED, "GeForce GT 520M" },
 	{ 0x10DE0DEE, "GeForce GT 415M" },
 	// 0DF0 - 0DFF	
 	{ 0x10DE0DF0, "GeForce GT 425M" },
 	{ 0x10DE0DF1, "GeForce GT 420M" },
 	{ 0x10DE0DF2, "GeForce GT 435M" },
 	{ 0x10DE0DF3, "GeForce GT 420M" },
+	{ 0x10DE0DF4, "GeForce GT 540M" },
+	{ 0x10DE0DF5, "GeForce GT 525M" },
+	{ 0x10DE0DF6, "GeForce GT 550M" },
+	{ 0x10DE0DF7, "GeForce GT 520M" },
 	{ 0x10DE0DF8, "Quadro 600" },
+	{ 0x10DE0DFA, "Quadro 1000M" },
 	{ 0x10DE0DFE, "GF108 ES" },
 	{ 0x10DE0DFF, "GF108 INT" },
 	// 0E00 - 0E0F
@@ -762,7 +776,10 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0E25, "D12U-50" },
 	// 0E30 - 0E3F	
 	{ 0x10DE0E30, "GeForce GTX 470M" },
+	{ 0x10DE0E31, "GeForce GTX 485M" },
 	{ 0x10DE0E38, "GF104GL" },
+	{ 0x10DE0E3A, "Quadro 3000M" },
+	{ 0x10DE0E3B, "Quadro 4000M" },
 	{ 0x10DE0E3E, "GF104-ES" },
 	{ 0x10DE0E3F, "GF104-INT" },
 	// 0E40 - 0E4F	
@@ -804,14 +821,19 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1060 - 106F
 	// 1070 - 107F
 	// 1080 - 108F
+	{ 0x10DE1054, "GeForce GT 410M" },
+	{ 0x10DE1056, "NVS 4200M" },
+	{ 0x10DE1057, "NVS 4200M" },
+	{ 0x10DE107F, "NVIDIA GF119-ES" },
 	{ 0x10DE1080, "GeForce GTX 580" },
 	{ 0x10DE1081, "GeForce GTX 570" },
 	{ 0x10DE1082, "GeForce GTX 560 Ti" },
 	{ 0x10DE1083, "D13U" },
+	{ 0x10DE1086, "GeForce GTX 570" },
 	{ 0x10DE1088, "GeForce GTX 590" },
 	// 1090 - 109F	
 	{ 0x10DE1098, "D13U" },
-	{ 0x10DE109A, "N12E-Q5" },
+	{ 0x10DE109A, "Quadro 5010M / N12E-Q5" },
 	// 10A0 - 10AF
 	// 10B0 - 10BF
 	// 10C0 - 10CF
@@ -819,7 +841,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
-	{ 0x10DE1245, "GeForce GTS 450" },	
+	{ 0x10DE1245, "GeForce GTS 450" },
+	{ 0x10DE1251, "N12E-GS-A1" },
 };
 
 static uint16_t swap16(uint16_t x)
@@ -830,10 +853,10 @@ static uint16_t swap16(uint16_t x)
 static uint16_t read16(uint8_t *ptr, uint16_t offset)
 {
 	uint8_t ret[2];
-	
+
 	ret[0] = ptr[offset+1];
 	ret[1] = ptr[offset];
-	
+
 	return *((uint16_t*)&ret);
 }
 
@@ -851,12 +874,12 @@ static uint8_t	read8(uint8_t *ptr, uint16_t offset)
 static uint32_t read32(uint8_t *ptr, uint16_t offset)
 {
 	uint8_t ret[4];
-	
+
 	ret[0] = ptr[offset+3];
 	ret[1] = ptr[offset+2];
 	ret[2] = ptr[offset+1];
 	ret[3] = ptr[offset];
-	
+
 	return *((uint32_t*)&ret);
 }
 #endif
@@ -869,7 +892,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	}
 	
 	uint16_t dcbptr = swap16(read16(rom, 0x36));
-	
+
 	if (!dcbptr) {
 		printf("no dcb table found\n");
 		return PATCH_ROM_FAILED;
@@ -892,7 +915,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			headerlength = dcbtable[1];
 			numentries	 = dcbtable[2];
 			recordlength = dcbtable[3];
-			
+
 			sig = *(uint32_t *)&dcbtable[6];
 		}
 		else
@@ -942,7 +965,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	{
 		uint32_t connection;
 		connection = *(uint32_t *)&dcbtable[headerlength + recordlength * i];
-		
+
 		/* Should we allow discontinuous DCBs? Certainly DCB I2C tables can be discontinuous */
 		if ((connection & 0x0000000f) == 0x0000000f) /* end of records */ 
 			continue;
