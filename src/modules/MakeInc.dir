@@ -10,36 +10,37 @@ override SYMROOT = $(ROOT)/obj/modules/
 override OBJROOT = $(ROOT)/obj/boot2_modules/$(DIR)
 endif
 
-include ${ROOT}/Make.rules
-
 ifeq ($(BUILT_IN),yes)
 
-CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
-		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
-		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -g -Wmost -Werror \
+		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
+		-fno-align-functions -fno-stack-protector \
+		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
 	      
-CPPFLAGS := $(CPPFLAGS) -arch i386 -static -nostdinc++ -Wmost -Werror \
-	-fno-builtin -mpreferred-stack-boundary=2 \
-	-fno-align-functions -fno-stack-protector \
-	-march=pentium4 -msse2 -mfpmath=sse -msoft-float \
-	-arch i386 -include $(SRCROOT)/autoconf.h
+CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
+	-fno-builtin -msoft-float \
+	-fno-rtti -fno-exceptions \
+	-include $(SRCROOT)/autoconf.h
 
 else
 
 CFLAGS := $(CLFAGS) -nostdinc -Wmost -Werror \
-	-fno-builtin -mpreferred-stack-boundary=2 \
+	-fno-builtin \
 	-fno-align-functions -fno-stack-protector \
-	-march=pentium4 -msse2 -mfpmath=sse -msoft-float \
-	-arch i386 -include $(SRCROOT)/autoconf.h
+	-msoft-float \
+	-include $(SRCROOT)/autoconf.h
 	
 CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
-	-fno-builtin -mpreferred-stack-boundary=2 \
+	-fno-builtin \
 	-fno-align-functions -fno-stack-protector \
-	-march=pentium4 -msse2 -mfpmath=sse -msoft-float \
-	-arch i386 -include $(SRCROOT)/autoconf.h
+	-msoft-float \
+	-fno-rtti -fno-exceptions \
+	-include $(SRCROOT)/autoconf.h
 
 endif
+
+include ${ROOT}/Make.rules
+
 
 
 UTILDIR = ../../util
@@ -47,10 +48,10 @@ LIBSADIR = ../../libsa
 LIBSAIODIR = ../../libsaio
 BOOT2DIR = ../../boot2
 
-MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/i386/modules/$(x)/include/)
+MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/modules/$(x)/include/)
 
 
-INC = -I$(SRCROOT)/sym/i386/ -I$(SRCROOT)/i386/modules/include/ -Iinclude/ -I$(SRCROOT)/i386/libsaio/ -I$(SRCROOT)/i386/libsa/ -I$(SRCROOT)/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
+INC = -I$(SRCROOT)/include/ -I$(SRCROOT)/sym/ -I$(SRCROOT)/modules/include/ -Iinclude/ -I$(SRCROOT)/i386/libsaio/ -I$(SRCROOT)/i386/libsa/ -I$(SRCROOT)/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
 DEFINES := -D__KLIBC__ $(DEFINES)
 
 MODULE_DEPENDENCIES :=  $(wildcard $(foreach x,$(MODULE_DEPENDENCIES),$(SYMROOT)/$(x).dylib)) \
@@ -61,7 +62,6 @@ MODULE_DEPENDENCIES_CMD := $(foreach x,$(MODULE_DEPENDENCIES), -weak_library $(x
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
 
 MODULE_DEFINITION := $(CONFIG_$(shell echo $(MODULE_NAME) | tr '[:lower:]' '[:upper:]')_MODULE)
-
 
 ifeq  ($(MODULE_DEFINITION),m)
 ifneq ($(BUILT_IN),yes)
@@ -105,23 +105,58 @@ ifeq ($(BUILT_IN),yes)
 
 ###### Build module into the code binary ######
 $(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
-	@echo "\t[LD] $(MODULE_NAME).dylib"
+	@echo "\t[LD:I386] $(MODULE_NAME).dylib"
 	@ld -arch i386 -undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(filter %.o,$^) \
+	$(filter %.i386o,$^) \
 	-macosx_version_min 10.6 \
 	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-o $(SYMROOT)/modules/$(MODULE_NAME).dylib
-
+	-o $(SYMROOT)/$(MODULE_NAME).i386.dylib
+	
+	@echo "\t[LD:PPC] $(MODULE_NAME).dylib"
+	@ld -arch ppc -undefined dynamic_lookup \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(filter %.ppco,$^) \
+	/usr/lib/dylib1.o \
+	-macosx_version_min 10.6 \
+	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
+	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
+	-o $(SYMROOT)/$(MODULE_NAME).ppc.dylib
+	
+	@echo "\t[LD:ARM] $(MODULE_NAME).dylib"
+	@ld -arch arm -undefined dynamic_lookup \
+	-dylib -read_only_relocs suppress \
+	-S -x -Z -dead_strip_dylibs \
+	-no_uuid \
+	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
+	-final_output $(MODULE_NAME) \
+	$(filter %.armo,$^) \
+	/Developer/Platforms/iPhoneOS.platform//Developer/SDKs/iPhoneOS4.3.sdk/usr/lib/dylib1.o \
+	-macosx_version_min 10.6 \
+	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
+	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
+	-o $(SYMROOT)/$(MODULE_NAME).arm.dylib
+	
+	@echo "\t[LIPO] $(@F)"
+	@lipo -create -arch i386 $(SYMROOT)/$(MODULE_NAME).i386.dylib \
+			 	  -arch ppc  $(SYMROOT)/$(MODULE_NAME).ppc.dylib \
+			 	  -arch arm  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
+			 	  -output $(SYMROOT)/$(MODULE_NAME).dylib
+			 	  
+	@rm $(SYMROOT)/$(MODULE_NAME).i386.dylib $(SYMROOT)/$(MODULE_NAME).ppc.dylib $(SYMROOT)/$(MODULE_NAME).arm.dylib
 else
 
 ##### BUild module as a seperate module #####
-$(SYMROOT)/modules/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
+$(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
 	@echo "\t[LD] $(MODULE_NAME).dylib"
 	
 	@ld -arch i386 \

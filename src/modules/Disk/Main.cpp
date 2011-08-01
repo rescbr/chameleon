@@ -8,7 +8,7 @@
 #include <GUIDPartition.hpp>
 #include <FDiskPartition.hpp>
 
-#define MAXBIOSDEV      32
+#define MAXDEV      32
 #define BIOSBUFFER      512 * 8 /* 4Kb */
 extern "C"
 {
@@ -17,7 +17,7 @@ extern "C"
 }
 
 
-BiosDisk*   disks[MAXBIOSDEV];
+Disk*		disks[MAXDEV];
 UInt8       numBiosDisks = 0;
 UInt8*      diskBuffer = NULL;
 
@@ -25,7 +25,7 @@ void DetermineDisks();
 
 void Disk_start()
 {
-    diskBuffer = (UInt8*)malloc(BIOSBUFFER);
+    //diskBuffer = (UInt8*)malloc(BIOSBUFFER);
     /*UInt8* mbr = (UInt8*)malloc(512);
     
         disk->Read(0, 1, mbr);
@@ -55,7 +55,7 @@ void Disk_start()
 
 void DetermineDisks()
 {
-    char diskName[] = "bios:/hd%s/";
+    /*char diskName[] = "bios:/hd%s/";
     
     for(int i = 0; i < MAXBIOSDEV; i++)
     {
@@ -95,4 +95,5 @@ void DetermineDisks()
         }
 
     }
+	 */
 }

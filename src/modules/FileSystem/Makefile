@@ -9,6 +9,6 @@ MODULE_DEPENDENCIES = uClibcxx BiosDisk
 DIR = HelloWorld
 SUBDIRS = HFS
 
-MODULE_OBJS = Main.o FileSystem.o
+MODULE_OBJS = Main FileSystem
 
 include ../MakeInc.dir

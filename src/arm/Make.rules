@@ -30,5 +30,12 @@ $(OBJROOT)/%.armo: %.cpp $(OBJROOT)
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 	
+$(OBJROOT)/%.armo: %.s
+	@echo "\t[AS:I386] $<"
+	@$(ARM_CC) $(CPPFLAGS) -c $(INC) -arch arm -o $@ $< \
+		    -MD -dependency-file $*.d
+	@md -u $(OBJROOT)/Makedep -f -d $*.d
+
+	
 ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .armo, $(addprefix $(OBJROOT)/, $(OBJECTS)))
 MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .armo, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))

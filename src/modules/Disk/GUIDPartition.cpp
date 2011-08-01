@@ -47,7 +47,7 @@ GUIDPartition::GUIDPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk
         
         UInt32 offset = (mPartitionNumber % 4) * entrySize;
         
-        mGPTEntry = (GPTEntry*) /*mLBABUffer*/ BIOS_ADDR + offset;
+        mGPTEntry = (GPTEntry*) mLBABUffer + offset;
         
         // TODO: verify partition type != NULL
         

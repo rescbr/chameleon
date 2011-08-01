@@ -92,7 +92,7 @@ void*			parse_mach(void* binary,
                            long long(*symbol_handler)(char*, long long, char),
                            void (*section_handler)(char* section, char* segment, long long offset, long long address)
                            );
-unsigned int	handle_symtable(UInt32 base,
+void*			handle_symtable(UInt32 base,
                                 struct symtab_command* symtabCommand,
                                 long long(*symbol_handler)(char*, long long, char),
                                 char is64);

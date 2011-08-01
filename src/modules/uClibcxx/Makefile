@@ -7,16 +7,16 @@ MODULE_START = $(MODULE_NAME)_start
 MODULE_DEPENDENCIES = klibc
 
 DIR = uClibc++
-# sstream.o fstream.o
-MODULE_OBJS = uClibc++.o abi.o algorithm.o associative_base.o bitset.o \
-		complex.o del_op.o del_opnt.o del_opv.o del_opvnt.o \
-		deque.o eh_alloc.o eh_globals.o exception.o \
-		func_exception.o iomanip.o  char_traits.o \
-		iterator.o limits.o list.o locale.o \
-		map.o new_handler.o new_op.o new_opnt.o new_opv.o \
-		new_opvnt.o numeric.o queue.o set.o \
-		stack.o stdexcept.o streambuf.o string.o typeinfo.o \
-		utility.o valarray.o vector.o support.o \
-		ios.o iostream.o istream.o ostream.o 
+# sstream fstream
+MODULE_OBJS = uClibc++ abi algorithm associative_base bitset \
+		complex del_op del_opnt del_opv del_opvnt \
+		deque eh_alloc eh_globals exception \
+		func_exception iomanip  char_traits \
+		iterator limits list locale \
+		map new_handler new_op new_opnt new_opv \
+		new_opvnt numeric queue set \
+		stack stdexcept streambuf string typeinfo \
+		utility valarray vector support \
+		ios iostream istream ostream 
 
 include ../MakeInc.dir

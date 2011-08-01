@@ -27,14 +27,14 @@ OBJECTS += openUp
 endif
 
 
-LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5
+LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
 
 SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
 
-include ${SRCROOT}/../Make.rules
+include ${ROOT}/Make.rules
 
 
 

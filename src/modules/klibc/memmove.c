@@ -1,8 +1,7 @@
 /*
  * memmove.c
  */
-
-#include "libsaio.h"
+#include <sys/types.h>
 
 void *memmove(void *dst, const void *src, size_t n)
 {

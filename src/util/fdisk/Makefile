@@ -1,13 +1,11 @@
-SRCROOT = $(shell pwd)/../../../
-override OBJROOT = $(SRCROOT)/obj/i386/util/fdisk
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
-
+ROOT = $(shell pwd)/../../../
 DIR = fdisk
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/util/${DIR}
+SYMROOT = $(ROOT)/sym/util
+DSTROOT = $(ROOT)/dst/usr/bin/
+DOCROOT = $(ROOT)/doc
+
 OBJECTS =  cmd disk fdisk getrawpartition mbr misc opendev part user auto
 
 LDFLAGS := $(LDFALGS) -mmacosx-version-min=10.5

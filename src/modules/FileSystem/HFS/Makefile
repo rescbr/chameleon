@@ -8,6 +8,6 @@ MODULE_DEPENDENCIES = uClibcxx
 
 DIR = HelloWorld
 
-MODULE_OBJS = HelloWorld.o
+MODULE_OBJS = HelloWorld
 
 include ../MakeInc.dir

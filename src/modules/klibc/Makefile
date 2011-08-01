@@ -8,20 +8,21 @@ MODULE_DEPENDENCIES =
 
 DIR = klibc
 
-MODULE_OBJS = 	klibc.o \
-		__ashldi3.o __ashrdi3.o __clzsi2.o __divdi3.o __divsi3.o \
-		__lshrdi3.o __moddi3.o __modsi3.o __udivdi3.o \
-		__udivmoddi4.o __udivmodsi4.o __udivsi3.o \
-		__umoddi3.o __umodsi3.o \
-		strntoumax.o strntoimax.o atol.o atoll.o \
-		strcasecmp.o strncasecmp.o strlcat.o strndup.o strnlen.o \
-		strsep.o strtoimax.o strtok_r.o strtok.o strtol.o strtoll.o strtotimespec.o strtotimeval.o \
-		strtoul.o strtoull.o strtoumax.o strxspn.o strpbrk.o \
-		bsearch.o calloc.o \
-		jrand48.o lrand48.o mrand48.o srand48.o nrand48.o seed48.o \
-		memccpy.o memchr.o memmem.o memmove.o memrchr.o memswap.o  \
-		qsort.o sha1hash.o onexit.o atexit.o exit.o \
-		snprintf.o vsnprintf.o sscanf.o vsscanf.o\
-		fwrite.o fprintf.o vfprintf.o printf.o
+MODULE_OBJS = 	klibc \
+		__ashldi3 __ashrdi3 __clzsi2 __divdi3 __divsi3 \
+		__lshrdi3 __moddi3 __modsi3 __udivdi3 \
+		__udivmoddi4 __udivmodsi4 __udivsi3 \
+		__umoddi3 __umodsi3 \
+		strntoumax strntoimax atol atoll \
+		strcasecmp strncasecmp strlcat strndup strnlen  \
+		strsep strtoimax strtok_r strtok strtol strtoll \
+		strtotimespec strtotimeval \
+		strtoul strtoull strtoumax strxspn strpbrk \
+		bsearch calloc \
+		jrand48 lrand48 mrand48 srand48 nrand48 seed48 \
+		memccpy memchr memmem memmove memrchr memswap  \
+		qsort sha1hash onexit atexit exit \
+		snprintf vsnprintf sscanf vsscanf\
+		fwrite fprintf vfprintf printf
 
 include ../MakeInc.dir

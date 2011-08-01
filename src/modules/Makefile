@@ -9,10 +9,10 @@ DOCROOT = $(ROOT)/doc
 include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = ModuleSystem klibc uClibcxx HelloWorld Disk FileSystem
+SUBDIRS = klibc uClibcxx HelloWorld Disk FileSystem
+# ModuleSystem
 
-
-CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
+CFLAGS= -O3 $(MORECPP) -g -static
 DEFINES=
 CONFIG = hd
 LIBSAIODIR = $(SRCROOT)/i386/libsaio

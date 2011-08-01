@@ -15,7 +15,7 @@ include ${ROOT}/Make.rules
 # The order of building is important.
 SUBDIRS = libsa libsaio boot0 boot1 boot2 cdboot modules
 
-all:
+all: ${OBJROOT} ${SYMROOT}
 	@#cd modules; ${MAKE} BUILT_IN=yes $@
 
 
@@ -27,16 +27,3 @@ all:
 			$@ 			  										  \
 		) || exit $$?; 											  \
 	done
-
-config rebuild_config:
-	@for i in config; 											  \
-	do															  \
-		echo ================= make $@ for $$i =================; \
-		( ROOT=$(ROOT);										  	  \
-			cd $$i; ${MAKE}										  \
-			$@ 			  										  \
-		) || exit $$?; 											  \
-	done
-
-
-.PHONY: config
