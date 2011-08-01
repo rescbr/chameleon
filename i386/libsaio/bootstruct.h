@@ -128,15 +128,15 @@ typedef struct PrivateBootInfo {
 #if 0
     driver_config_t  driverConfig[NDRIVERS];
 #endif
-    char *           configEnd;                    // pointer to end of config files
+    char *           configEnd;			// pointer to end of config files
     char             config[CONFIG_SIZE];
 
-    config_file_t    bootConfig;		           // com.apple.Boot.plist
-    config_file_t    chameleonConfig;              // org.chameleon.Boot.plist which can override bootConfig keys
-    config_file_t    themeConfig;				   // theme.plist
-    config_file_t    smbiosConfig;				   // smbios.plist
-    config_file_t    helperConfig;                 // boot helper partition's boot.plist
-    config_file_t    ramdiskConfig;                // RAMDisk.plist
+    config_file_t    bootConfig;		// com.apple.Boot.plist
+    config_file_t    chameleonConfig;		// org.chameleon.Boot.plist which can override bootConfig keys
+    config_file_t    themeConfig;		// theme.plist
+    config_file_t    smbiosConfig;		// smbios.plist
+    config_file_t    helperConfig;		// boot helper partition's boot.plist
+    config_file_t    ramdiskConfig;		// RAMDisk.plist
 
 	bool             memDetect;
 } PrivateBootInfo_t;

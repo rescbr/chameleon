@@ -537,7 +537,7 @@ void common_boot(int biosdev)
 					// Reset cache name.
 					bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
 					
-					sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->chameleonConfig);
+					sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
 					
 					adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 					
@@ -628,7 +628,7 @@ void common_boot(int biosdev)
                     if (ret == -1)
                     {
                         // No alternate location found, using the original kernel image path.
-                        strcpy(bootFileSpec, bootInfo->bootFile);
+                        strcpy(bootFileSpec, bootFile);
                     }
                 }
             }

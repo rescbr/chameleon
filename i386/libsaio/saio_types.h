@@ -221,7 +221,7 @@ enum {
 	kPartitionTypeEXT3    = 0x83,
 	kPartitionTypeBEFS    = 0xEB,
 	kPartitionTypeFreeBSD = 0xa5,
-	kPartitionTypeOpenBSD = 0xa6,
+	kPartitionTypeOpenBSD = 0xa6
 };
 
 //#define BIOS_DEV_TYPE(d)	((d) & kBIOSDevTypeMask)
