@@ -428,21 +428,20 @@ void common_boot(int biosdev)
 		} else {
 			archCpuType = CPU_TYPE_I386;
 		}
+		
 		if (getValueForKey(karch, &val, &len, &bootInfo->chameleonConfig)) {
 			if (strncmp(val, "i386", 4) == 0) {
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
         
-        if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
+        	if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
 			if (strncmp(val, "i386", 4) == 0) {
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
 
-        //archCpuType = CPU_TYPE_I386;
-        
-		// Notify moduals that we are attempting to boot
+		// Notify modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
 
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig)) {
@@ -481,7 +480,9 @@ void common_boot(int biosdev)
 				break;
 			
 			if (!forceresume && ((sleeptime+3)<bvr->modTime)) {
+#if DEBUG    
 				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",bvr->modTime-sleeptime);
+#endif                
 				break;
 			}
 				

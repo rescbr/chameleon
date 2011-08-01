@@ -106,15 +106,6 @@
 
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
 
-//#define kUseAtiROM		"UseAtiROM"			/* ati.c */
-//#define kAtiConfig		"AtiConfig"			/* ati.c */
-//#define kATYbinimage		"ATYbinimage"		/* ati.c */
-
-//#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-//#define kVBIOS			"VBIOS"				/* nvidia.c */
-//#define kDcfg0			"display_0"			/* nvidia.c */
-//#define kDcfg1			"display_1"			/* nvidia.c */
-
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */

@@ -114,7 +114,9 @@ struct pcir_s {
 // Known cards as of 2008/08/26
 static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x00000000, "Unknown" } ,
-//	{ 0x10027181,  "ATI Radeon 1300 Series"}  ,
+	{ 0x10027181,  "ATI Radeon X1600 Series"},
+	{ 0x10027183,  "ATI Radeon X1550 Series"}, // Beej
+	
 	{ 0x10029589,  "ATI Radeon 2600 Series"}  ,
 	{ 0x10029588,  "ATI Radeon 2600 Series"}  ,
 	{ 0x100294C3,  "ATI Radeon 2400 Series"}  ,
@@ -181,7 +183,9 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 
 static struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x00000000,  "Megalodon" },
-//	{ 0x10027181,  "Caretta" },
+	{ 0x10027181,  "Caretta" },
+	{ 0x10027183,  "Caretta" },
+	
 	{ 0x10029589,  "Lamna"}  ,
 	{ 0x10029588,  "Lamna"}  ,
 	{ 0x100294C3,  "Iago"}  ,
@@ -228,7 +232,7 @@ static struct ati_chipsets_t ATIKnownFramebuffers[] = {
     { 0x10029490,  "Peregrine"}  ,
     { 0x10029498,  "Peregrine"}  ,
     { 0x1002949E,  "Peregrine"}  ,
-    { 0x10029480,  "Shrike"		}, // akbar
+    { 0x10029480,  "Gliff"		}, // Peregrine <= 10.6.7
     { 0x10029488,  "Peregrine"}  ,
     { 0x10029540,  "Peregrine"}  ,
     { 0x10029541,  "Peregrine"}  ,
