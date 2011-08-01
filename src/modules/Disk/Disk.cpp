@@ -4,16 +4,36 @@
  */
 #include <Disk.hpp>
 
+Disk* Disk::gFirstDisk = NULL;
+
         
 Disk::Disk()
 {
+	mNextDisk = NULL;
     mName = NULL;
     mPartitions = NULL;
+
+	// Add disk entry to list
+	
+	Disk* list = gFirstDisk;
+	if(!list) gFirstDisk = this;
+	else {
+		while(list->getNextDisk())
+		{
+			list = list->getNextDisk();
+		}
+		// Last disk found, add use to the end of the list
+		
+		list->setNextDisk(this);
+	}
+
 }
 
 Disk::~Disk()
 {
-
+	// remove disk entry from list
+	if(getPrevDisk() != NULL) getPrevDisk()->setNextDisk(getNextDisk());
+	else gFirstDisk = NULL;
 }
 
 Partition*  Disk::getPartition(UInt32 index)

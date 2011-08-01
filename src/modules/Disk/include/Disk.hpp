@@ -25,14 +25,24 @@ public:
     
     virtual void        addPartition(Partition* partition);
     virtual Partition*  getPartition(UInt32 index);
+	
+	static Disk*		getDiskList() { return gFirstDisk; };
+	virtual Disk*		getNextDisk() { return mNextDisk;  };
+	virtual Disk*		getPrevDisk() { return mPrevDisk;  };
+	
 protected:
-    PartitionList   *mPartitions;
-    const char      *mName;
-    const char      *mBusType;
-    
-    UInt32          mBytesPerSector;
+    PartitionList		*mPartitions;
+    const char			*mName;
+    const char			*mBusType;
+
+    UInt32				mBytesPerSector;
+	
+	virtual void		setNextDisk(Disk* next) { mNextDisk = next; };
+	virtual void		setPrevDisk(Disk* prev) { mPrevDisk = prev; };
 private:
+	Disk*			mPrevDisk;
+	Disk*			mNextDisk;
+	static Disk*	gFirstDisk;
 
 };
-
 #endif /* DISK_H */
