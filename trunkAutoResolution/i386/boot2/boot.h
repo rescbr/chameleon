@@ -80,9 +80,10 @@
 #define kRestartFix			"RestartFix"		/* acpi_patcher.c */
 #define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
 #define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kEnableC2States		"EnableC2State"		/* acpi_patcher.c */
-#define kEnableC3States		"EnableC3State"		/* acpi_patcher.c */
-#define kEnableC4States		"EnableC4State"		/* acpi_patcher.c */
+#define kCSTUsingSystemIO	"CSTUsingSystemIO"	/* acpi_patcher.c */
+#define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
+#define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
+#define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
 
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
@@ -107,6 +108,7 @@
 
 #define kUseAtiROM			"UseAtiROM"			/* ati.c */
 #define kAtiConfig			"AtiConfig"			/* ati.c */
+#define kAtiPorts			"AtiPorts"			/* ati.c */
 #define kATYbinimage		"ATYbinimage"		/* ati.c */
 
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
