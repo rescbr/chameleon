@@ -1,5 +1,6 @@
 -include $(SRCROOT)/auto.conf
 
+
 -include ${SRCROOT}/i386/Make.rules
 #-include ${SRCROOT}/x86_64/Make.rules
 -include ${SRCROOT}/ppc/Make.rules

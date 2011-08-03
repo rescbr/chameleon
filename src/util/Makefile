@@ -14,7 +14,7 @@ DOCROOT = $(ROOT)/doc
 DIR = util
 
 PROGRAMS = machOconv dyldsymboltool
-OBJECTS = dyldsymboltool machOconv
+OBJECTS = machOconv dyldsymboltool
 
 ifeq (${CONFIG_BDMESG}, y)
 PROGRAMS += bdmesg
@@ -33,20 +33,17 @@ SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-
 include ${ROOT}/Make.rules
-
 
 
 all: $(DIRS_NEEDED) $(SYMPROG) fdisk440
 
 
-
 $(SYMPROG): ${ACTUAL_OBJECTS}
 	@echo "\t[LD:I386] $(@F)"
 	@$(X86_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F).i386 $(OBJROOT)/$(@F).i386o
-	@echo "\t[LD:X86_64] $(@F)"
-	@$(X86_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F).x86_64 $(OBJROOT)/$(@F).x86_64o
+	@#echo "\t[LD:X86_64] $(@F)"
+	@#$(X86_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F).x86_64 $(OBJROOT)/$(@F).x86_64o
 	@echo "\t[LD:PPC] $(@F)"
 	@$(PPC_CC) $(CFLAGS) $(PPC_LDFLAGS) $(LDFLAGS) $(DEFINES) -arch ppc -o $(SYMROOT)/$(@F).ppc $(OBJROOT)/$(@F).ppco
 	@#echo "\t[LD:ARM] $(@F)"
@@ -54,8 +51,8 @@ $(SYMPROG): ${ACTUAL_OBJECTS}
 
 
 	@echo "\t[LIPO] $(@F)"
-	@lipo -create -arch i386 $(SYMROOT)/$(@F).i386 -arch x86_64 $(SYMROOT)/$(@F).x86_64 -arch ppc $(SYMROOT)/$(@F).ppc -output $(SYMROOT)/$(@F)
-	@$(RM) $(SYMROOT)/$(@F).i386 $(SYMROOT)/$(@F).x86_64 $(SYMROOT)/$(@F).ppc
+	@lipo -create -arch i386 $(SYMROOT)/$(@F).i386 -arch ppc $(SYMROOT)/$(@F).ppc -output $(SYMROOT)/$(@F)
+	@$(RM) $(SYMROOT)/$(@F).i386 $(SYMROOT)/$(@F).ppc
 
 .PHONY: fdisk440
 fdisk440:

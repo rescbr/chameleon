@@ -133,14 +133,14 @@ $(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJR
 	-o $(SYMROOT)/$(MODULE_NAME).ppc.dylib
 	
 	@echo "\t[LD:ARM] $(MODULE_NAME).dylib"
-	@ld -arch arm -undefined dynamic_lookup \
+	@ld -arch ${ARM_ARCH} -undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(filter %.armo,$^) \
-	/Developer/Platforms/iPhoneOS.platform//Developer/SDKs/iPhoneOS4.3.sdk/usr/lib/dylib1.o \
+	/Developer/Platforms/iPhoneOS.platform//Developer/SDKs/iPhoneOS4.2.sdk/usr/lib/dylib1.o \
 	-macosx_version_min 10.6 \
 	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
@@ -149,7 +149,7 @@ $(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJR
 	@echo "\t[LIPO] $(@F)"
 	@lipo -create -arch i386 $(SYMROOT)/$(MODULE_NAME).i386.dylib \
 			 	  -arch ppc  $(SYMROOT)/$(MODULE_NAME).ppc.dylib \
-			 	  -arch arm  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
+			 	  -arch ${ARM_ARCH}  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
 			 	  -output $(SYMROOT)/$(MODULE_NAME).dylib
 			 	  
 	@rm $(SYMROOT)/$(MODULE_NAME).i386.dylib $(SYMROOT)/$(MODULE_NAME).ppc.dylib $(SYMROOT)/$(MODULE_NAME).arm.dylib

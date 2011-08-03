@@ -8,6 +8,8 @@ DOCROOT = $(ROOT)/doc
 
 include Make.rules
 
+ARCHS="i386 ppc arm"
+
 THEME = default
 
 REVISION = `svnversion -n | tr -d [:alpha:] > revision`
@@ -29,6 +31,7 @@ all install: $(SYMROOT) $(OBJROOT) rebuild_config
 	    if [ -d $$i ]; then						  \
 		echo ================= make $@ for $$i =================; \
 		( ROOT=$(ROOT);						  	  \
+		  ARCHS=$(ARCHS)						  \
  		  cd $$i; ${MAKE}					  	  \
 			$@			  						  \
 		) || exit $$?; 						  	  \
