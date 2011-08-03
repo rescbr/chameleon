@@ -4,30 +4,29 @@ X86_CC  = /usr/bin/gcc-4.2
 X86_CPP = /usr/bin/g++-4.2
 
 ##### i386 Rules #####
-$(OBJROOT)/%.i386o: %.c $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:I386] $<"
 	@$(X86_CC) -arch i386  $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.i386o: %.m $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:I386] $<"
 	@$(X86_CC) -arch i386 $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.i386o: %.cpp $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:I386] $<"
 	@$(X86_CPP)  -arch i386 $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.i386o: %.s
+$(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:I386] $<"
 	@$(X86_CC) $(CPPFLAGS) -c $(INC) -arch i386 -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 
-ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .i386o  , $(addprefix $(OBJROOT)/, $(OBJECTS)))
-
-MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .i386o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))
+ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .${ARCH}o  , $(addprefix $(OBJROOT)/, $(OBJECTS)))
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))

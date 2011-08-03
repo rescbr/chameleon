@@ -1,5 +1,5 @@
-PPC_AS  = /usr/bin/as -arch ppc
-PPC_LD  = /usr/bin/ld -arch ppc
+PPC_AS  = /usr/bin/as -arch ${ARCH}
+PPC_LD  = /usr/bin/ld -arch ${ARCH}
 PPC_CC  = /usr/bin/gcc-4.2
 PPC_CPP = /usr/bin/g++-4.2
 
@@ -12,30 +12,30 @@ PPC_LDFLAGS += -F"$(PPC_SDK)/System/Library/PrivateFrameworks"
 
 
 ##### PPC Rules #####
-$(OBJROOT)/%.ppco: %.c $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:PPC] $<"
-	@$(PPC_CC) -arch ppc $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(PPC_CC) -arch ${ARCH} $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.ppco: %.m $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:PPC] $<"
-	@$(PPC_CC) -arch ppc $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(PPC_CC) -arch ${ARCH} $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
-$(OBJROOT)/%.ppco: %.cpp $(OBJROOT)
+$(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:PPC] $<"
-	@$(PPC_CPP) -arch ppc $(PPC_CFLAGS) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(PPC_CPP) -arch ${ARCH} $(PPC_CFLAGS) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 	
-$(OBJROOT)/%.ppco: %.s
+$(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:PPC] $<"
-	@$(PPC_CC) $(CPPFLAGS) -c $(INC) -arch ppc -o $@ $< \
+	@$(PPC_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -arch ppc -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 
 	
-ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .ppco, $(addprefix $(OBJROOT)/, $(OBJECTS)))
-MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .ppco, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))
+ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))

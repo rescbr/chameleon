@@ -1,7 +1,7 @@
 -include $(SRCROOT)/auto.conf
 
 ifneq ($(ARCH),)
-include ${SRCROOT}/${ARCH}/Make.rules
+include ${SRCROOT}/arch/${ARCH}/Make.rules
 endif
 
 #print transformed OBJECTS
