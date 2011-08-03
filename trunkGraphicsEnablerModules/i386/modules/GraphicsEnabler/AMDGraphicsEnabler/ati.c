@@ -471,7 +471,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x21F81458,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
 	{ 0x6741,	0x050E1025,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // issue 121
-	{ 0x6741,	0x05131025,	CHIP_FAMILY_TURK,		"AMD Radeon HD 6650M",				kNull		}, // Nai22
+	{ 0x6741,	0x05131025,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // Nai22
 	{ 0x6741,	0x1646103C,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		}, // issue 88
 	
 	{ 0x6759,	0xE193174B,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		},
