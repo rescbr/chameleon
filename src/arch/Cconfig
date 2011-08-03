@@ -1,0 +1,5 @@
+#
+# Chameleon architecture
+#
+
+source "arch/i386/Cconfig"

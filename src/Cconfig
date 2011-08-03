@@ -4,5 +4,5 @@
 mainmenu "Chameleon Configuration"
 
 source "util/Cconfig"
-source "i386/Cconfig"
+source "arch/Cconfig"
 source "modules/Cconfig"

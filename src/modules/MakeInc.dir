@@ -39,8 +39,8 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
 
 endif
 
-include ${ROOT}/Make.rules
 
+include ${ROOT}/Make.rules
 
 
 UTILDIR = ../../util
@@ -51,7 +51,7 @@ BOOT2DIR = ../../boot2
 MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/modules/$(x)/include/)
 
 
-INC = -I$(SRCROOT)/include/ -I$(SRCROOT)/sym/ -I$(SRCROOT)/modules/include/ -Iinclude/ -I$(SRCROOT)/i386/libsaio/ -I$(SRCROOT)/i386/libsa/ -I$(SRCROOT)/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
+INC = -I$(SRCROOT)/include/ -I$(SRCROOT)/sym/ -I$(SRCROOT)/modules/include/ -Iinclude/ -I$(SRCROOT)/arch/i386/libsaio/ -I$(SRCROOT)/arch/i386/libsa/ -I$(SRCROOT)/arch/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
 DEFINES := -D__KLIBC__ $(DEFINES)
 
 MODULE_DEPENDENCIES :=  $(wildcard $(foreach x,$(MODULE_DEPENDENCIES),$(SYMROOT)/$(x).dylib)) \
@@ -98,15 +98,15 @@ endif
 
 
 dylib_LINKER: ${OBJROOT} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h dylib 
-dylib: 		  ${OBJROOT} $(SYMROOT)/$(MODULE_NAME).dylib
+dylib: 		  ${OBJROOT} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
 
 ifeq ($(BUILT_IN),yes)
 
 ###### Build module into the code binary ######
-$(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
-	@echo "\t[LD:I386] $(MODULE_NAME).dylib"
-	@ld -arch i386 -undefined dynamic_lookup \
+$(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
+	@echo "\t[LD:${ARCH}] $(MODULE_NAME).${ARCH}.dylib"
+	@ld -arch ${ARCH} -undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
@@ -116,50 +116,23 @@ $(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJR
 	-macosx_version_min 10.6 \
 	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-o $(SYMROOT)/$(MODULE_NAME).i386.dylib
+	-o $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 	
-	@echo "\t[LD:PPC] $(MODULE_NAME).dylib"
-	@ld -arch ppc -undefined dynamic_lookup \
-	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
-	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
-	-final_output $(MODULE_NAME) \
-	$(filter %.ppco,$^) \
-	/usr/lib/dylib1.o \
-	-macosx_version_min 10.6 \
-	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
-	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-o $(SYMROOT)/$(MODULE_NAME).ppc.dylib
 	
-	@echo "\t[LD:ARM] $(MODULE_NAME).dylib"
-	@ld -arch ${ARM_ARCH} -undefined dynamic_lookup \
-	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
-	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
-	-final_output $(MODULE_NAME) \
-	$(filter %.armo,$^) \
-	/Developer/Platforms/iPhoneOS.platform//Developer/SDKs/iPhoneOS4.2.sdk/usr/lib/dylib1.o \
-	-macosx_version_min 10.6 \
-	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
-	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-o $(SYMROOT)/$(MODULE_NAME).arm.dylib
-	
-	@echo "\t[LIPO] $(@F)"
-	@lipo -create -arch i386 $(SYMROOT)/$(MODULE_NAME).i386.dylib \
-			 	  -arch ppc  $(SYMROOT)/$(MODULE_NAME).ppc.dylib \
-			 	  -arch ${ARM_ARCH}  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
-			 	  -output $(SYMROOT)/$(MODULE_NAME).dylib
+	@#@echo "\t[LIPO] $(@F)"
+	@#@lipo -create -arch i386 $(SYMROOT)/$(MODULE_NAME).i386.dylib \
+	@#		 	  -arch ppc  $(SYMROOT)/$(MODULE_NAME).ppc.dylib \
+	@#		 	  -arch ${ARM_ARCH}  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
+	@#		 	  -output $(SYMROOT)/$(MODULE_NAME).dylib
 			 	  
-	@rm $(SYMROOT)/$(MODULE_NAME).i386.dylib $(SYMROOT)/$(MODULE_NAME).ppc.dylib $(SYMROOT)/$(MODULE_NAME).arm.dylib
+	@#@rm $(SYMROOT)/$(MODULE_NAME).i386.dylib $(SYMROOT)/$(MODULE_NAME).ppc.dylib $(SYMROOT)/$(MODULE_NAME).arm.dylib
 else
 
 ##### BUild module as a seperate module #####
-$(SYMROOT)/$(MODULE_NAME).dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
-	@echo "\t[LD] $(MODULE_NAME).dylib"
+$(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
+	@echo "\t[LD:${ARCH}] $(MODULE_NAME).${ARCH}dylib"
 	
-	@ld -arch i386 \
+	@ld -arch ${ARCH} \
 	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \

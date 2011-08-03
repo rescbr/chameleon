@@ -25,7 +25,7 @@ all: $(SYMROOT) $(OBJROOT) objroot_dirs $(SYMROOT)/boot_modules.c $(SYMROOT)/boo
 	do								  \
 		echo ================= make $@ for $$i =================; \
 		( ROOT=$(ROOT);						  \
-			cd $$i; ${MAKE}					  \
+			cd $$i; ${MAKE} ARCH=${ARCH}					  \
 			$@						  \
 		) || exit $$?;						  \
 	done

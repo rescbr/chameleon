@@ -1,38 +1,38 @@
-PPC_AS  = /usr/bin/as -arch ${ARCH}
-PPC_LD  = /usr/bin/ld -arch ${ARCH}
-PPC_CC  = /usr/bin/gcc-4.2
-PPC_CPP = /usr/bin/g++-4.2
+TARGET_AS  = /usr/bin/as -arch ${ARCH}
+TARGET_LD  = /usr/bin/ld -arch ${ARCH}
+TARGET_CC  = /usr/bin/gcc-4.2
+TARGET_CPP = /usr/bin/g++-4.2
 
-PPC_SDK = /Developer/SDKs/MacOSX10.5.sdk/
-PPC_CFLAGS += -I"$(PPC_SDK)/usr/include"
-PPC_LDFLAGS += -L"$(PPC_SDK)/usr/lib"
-PPC_LDFLAGS += -L"$(PPC_SDK)/usr/lib/system/"
-PPC_LDFLAGS += -F"$(PPC_SDK)/System/Library/Frameworks"
-PPC_LDFLAGS += -F"$(PPC_SDK)/System/Library/PrivateFrameworks"
+TARGET_SDK = /Developer/SDKs/MacOSX10.5.sdk/
+TARGET_CFLAGS += -I"$(TARGET_SDK)/usr/include"
+TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib"
+TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib/system/"
+TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/Frameworks"
+TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/PrivateFrameworks"
 
 
 ##### PPC Rules #####
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:PPC] $<"
-	@$(PPC_CC) -arch ${ARCH} $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} $(TARGET_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:PPC] $<"
-	@$(PPC_CC) -arch ${ARCH} $(PPC_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} $(TARGET_CFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:PPC] $<"
-	@$(PPC_CPP) -arch ${ARCH} $(PPC_CFLAGS) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(TARGET_CPP) -arch ${ARCH} $(TARGET_CFLAGS) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 	
 $(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:PPC] $<"
-	@$(PPC_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -arch ppc -o $@ $< \
+	@$(TARGET_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 

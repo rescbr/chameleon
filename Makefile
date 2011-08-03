@@ -6,36 +6,34 @@ SYMROOT = $(ROOT)/sym
 DSTROOT = $(ROOT)/dst
 DOCROOT = $(ROOT)/doc
 
-include Make.rules
+#default architechtures to compile.
+ARCHS=i386 ppc armv5
 
-ARCHS="i386 ppc arm"
+#force a universal binary build
+override ARCHS := ${ARCHS} universal
 
 THEME = default
 
-REVISION = `svnversion -n | tr -d [:alpha:] > revision`
-VERSION = `cat version`
-
 SUBDIRS="src"
 
-GENERIC_SUBDIRS = modules
-
-#
-# Currently builds for i386
-#
 
 all install: $(SYMROOT) $(OBJROOT) rebuild_config
 	@echo ================= make $@ =================
-
-	@for i in ${SUBDIRS}; 						  \
-	do 											  \
-	    if [ -d $$i ]; then						  \
-		echo ================= make $@ for $$i =================; \
-		( ROOT=$(ROOT);						  	  \
-		  ARCHS=$(ARCHS)						  \
- 		  cd $$i; ${MAKE}					  	  \
-			$@			  						  \
-		) || exit $$?; 						  	  \
-	    else							  		  \
-	    	echo "========= nothing to build for $$i =========";	  \
-	    fi;								  		  \
+	@for a in ${ARCHS}; 						  	  \
+	do												  \
+		for i in ${SUBDIRS}; 						  \
+		do 											  \
+	    	if [ -d $$i ]; then						  \
+			echo "================= make $@ for $$i arch $$a================="; \
+			( ROOT=$(ROOT);						  	  \
+ 		  	cd $$i; ${MAKE}	ARCH=$$a		  	  	  \
+				$@			  						  \
+			) || exit $$?; 						  	  \
+	    	else							  		  \
+	    		echo "========= nothing to build for $$i arch $$a=========";	  \
+	    	fi;								  		  \
+		done										  \
 	done
+	
+	
+include Make.rules

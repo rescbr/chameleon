@@ -6,16 +6,16 @@ SYMROOT = $(ROOT)/sym
 DSTROOT = $(ROOT)/dst
 DOCROOT = $(ROOT)/doc
 
-SUBDIRS=util modules i386 ppc arm
+SUBDIRS=util modules arch/${ARCH}
 
 all:
-	@echo ================= make $@ BUILT_IN=yes for modules =================
-	@cd modules; ${MAKE} BUILT_IN=yes $@
+	@echo ================= make $@ BUILT_IN=yes for modules arch $(ARCH) =================
+	@cd modules; ${MAKE} ARCH=${ARCH} BUILT_IN=yes $@
 	@for i in ${SUBDIRS};										  \
 	do															  \
-		echo ================= make $@ for $$i =================; \
+		echo ================= make $@ for $$i arch $(ARCH) =================; \
 		( ROOT=$(ROOT);										  	  \
-			cd $$i; ${MAKE}										  \
+			cd $$i; ${MAKE}	ARCH=${ARCH}							  \
 			$@ 			  										  \
 		) || exit $$?; 											  \
 	done

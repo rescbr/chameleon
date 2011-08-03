@@ -8,12 +8,12 @@ config OPTIMIZATION_LEVEL
 	---help---
 	  Specify the level to compile chameleon with.
 
-source "i386/boot0/Cconfig"
+source "arch/i386/boot0/Cconfig"
 
-source "i386/boot1/Cconfig"
+source "arch/i386/boot1/Cconfig"
 
-source "i386/boot2/Cconfig"
+source "arch/i386/boot2/Cconfig"
 
-source "i386/libsa/Cconfig"
+source "arch/i386/libsa/Cconfig"
 
-source "i386/libsaio/Cconfig"
+source "arch/i386/libsaio/Cconfig"

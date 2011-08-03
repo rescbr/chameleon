@@ -2,8 +2,7 @@
 
 ifneq ($(ARCH),)
 include ${SRCROOT}/arch/${ARCH}/Make.rules
-endif
-
 #print transformed OBJECTS
-#$(warning ${ACTUAL_OBJECTS})
-
+#$(warning ARCH=${ARCH} OBJ: ${ACTUAL_OBJECTS})
+#$(warning ARCH=${ARCH} OBJ: ${MODULE_OBJECTS})
+endif

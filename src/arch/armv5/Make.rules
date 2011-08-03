@@ -1,43 +1,45 @@
 CPU = arm926ej-s
 
-ARM_AS  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/as -arch ${ARCH}
-ARM_LD  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ld -arch ${ARCH}
-ARM_CC  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc-4.2 -mcpu=${CPU}
-ARM_CPP = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/g++-4.2 -mcpu=${CPU}
+TARGET_AS  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/as -arch ${ARCH}
+TARGET_LD  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ld -arch ${ARCH}
+TARGET_CC  = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc-4.2 -mcpu=${CPU}
+TARGET_CPP = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/g++-4.2 -mcpu=${CPU}
 
-ARM_SDK=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk/
-AMR_CFLAGS += -I"$(ARM_SDK)/usr/include"
-ARM_LDFLAGS += -L"$(ARM_SDK)/usr/lib"
-ARM_LDFLAGS += -L"$(ARM_SDK)/usr/lib/system/"
-ARM_LDFLAGS += -F"$(ARM_SDK)/System/Library/Frameworks"
-ARM_LDFLAGS += -F"$(ARM_SDK)/System/Library/PrivateFrameworks"
+
+TARGET_SDK=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk/
+TARGET_CFLAGS += -I"$(TARGET_SDK)/usr/include"
+TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib"
+TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib/system/"
+TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/Frameworks"
+TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/PrivateFrameworks"
 
 
 ##### ARM Rules #####
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:ARM] $<"
-	@$(ARM_CC) -arch ${ARCH} ${AMR_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} ${TARGET_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:ARM] $<"
-	@$(ARM_CC) -arch ${ARCH} ${AMR_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} ${TARGET_CFLAGS} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:ARM] $<"
-	@$(ARM_CPP) -arch ${ARCH} ${AMR_CFLAGS} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(TARGET_CPP) -arch ${ARCH} ${TARGET_CFLAGS} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 	
 $(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:I386] $<"
-	@$(ARM_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
+	@$(TARGET_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 
 	
 ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
 MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))
+

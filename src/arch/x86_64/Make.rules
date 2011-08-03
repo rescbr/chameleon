@@ -1,31 +1,31 @@
-X86_AS  = /usr/bin/as -arch ${ARCH}
-X86_LD  = /usr/bin/ld -arch ${ARCH}
-X86_CC  = /usr/bin/gcc-4.2
-X86_CPP = /usr/bin/g++-4.2
+TARGET_AS  = /usr/bin/as -arch ${ARCH}
+TARGET_LD  = /usr/bin/ld -arch ${ARCH}
+TARGET_CC  = /usr/bin/gcc-4.2
+TARGET_CPP = /usr/bin/g++-4.2
 
 ##### x86_64 Rules #####
 
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:X86_64] $<"
-	@$(X86_CC) -arch ${ARCH}  $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:X86_64] $<"
-	@$(X86_CC) -arch ${ARCH} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) -arch ${ARCH} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:X86_64] $<"
-	@$(X86_CPP) -arch ${ARCH} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(TARGET_CPP) -arch ${ARCH} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 	
 $(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:X86_64] $<"
-	@$(CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -arch x86_64 -o $@ $< \
+	@$(CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 
