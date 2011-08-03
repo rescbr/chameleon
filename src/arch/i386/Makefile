@@ -3,7 +3,7 @@
 #
 # these paths are only valid in subdirectories of this directory
 #
-ROOT = $(shell pwd)/../../
+ROOT = $(shell pwd)/../../../
 SRCROOT = ${ROOT}/src
 OBJROOT = $(ROOT)/obj/i386
 SYMROOT = $(ROOT)/sym/i386

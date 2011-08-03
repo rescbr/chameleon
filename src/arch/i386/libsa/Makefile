@@ -20,9 +20,6 @@ OBJECTS = prf printf zalloc \
 LIBS = libsa.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))
 
-include ${SRCROOT}/i386/Make.rules
-
-
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 

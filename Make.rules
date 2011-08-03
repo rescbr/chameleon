@@ -1,10 +1,6 @@
 include ${SRCROOT}/Make.rules
-
-ifneq "" "$(wildcard /bin/mkdirs)"
-  MKDIRS = /bin/mkdirs
-else
-  MKDIRS = /bin/mkdir -p
-endif
+ 
+MKDIRS = /bin/mkdir -p
 
 NATIVE_AS = as
 NATIVE_LD = ld

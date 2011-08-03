@@ -13,8 +13,8 @@ DOCROOT = $(ROOT)/doc
 
 DIR = util
 
-PROGRAMS = machOconv dyldsymboltool
-OBJECTS = machOconv dyldsymboltool
+PROGRAMS = machOconv macho-to-xcoff dyldsymboltool 
+OBJECTS = machOconv macho-to-xcoff dyldsymboltool
 
 ifeq (${CONFIG_BDMESG}, y)
 PROGRAMS += bdmesg
@@ -29,17 +29,18 @@ endif
 
 LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
 
-SYMPROG = $(addpostfix $(addprefix $(SYMROOT)/, $(PROGRAMS)), ${ARCH})
+SYMPROG = $(addsuffix $(addprefix $(SYMROOT)/, $(PROGRAMS)), .${ARCH})
 
-DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+DIRS_NEEDED = 
 
 include ${ROOT}/Make.rules
 
 
-all: $(DIRS_NEEDED) $(SYMPROG) fdisk440
+all: $(OBJROOT) $(SYMROOT) $(SYMPROG) fdisk440
 
 
-$(SYMPROG).${ARCH}: ${ACTUAL_OBJECTS}
+
+$(SYMPROG): ${ACTUAL_OBJECTS}
 	@echo "\t[LD:${ARCH}] $(@F)"
 	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch ${ARCH} -o $(SYMROOT)/$(@F).${ARCH} $(OBJROOT)/$(@F).${ARCH}o
 

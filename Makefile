@@ -25,8 +25,8 @@ all install: $(SYMROOT) $(OBJROOT) rebuild_config
 		do 											  \
 	    	if [ -d $$i ]; then						  \
 			echo "================= make $@ for $$i arch $$a================="; \
-			( ROOT=$(ROOT);						  	  \
- 		  	cd $$i; ${MAKE}	ARCH=$$a		  	  	  \
+			( 						  	  \
+ 		  	cd $$i; ${MAKE}	ROOT=$(ROOT) ARCH=$$a		  	  	  \
 				$@			  						  \
 			) || exit $$?; 						  	  \
 	    	else							  		  \
