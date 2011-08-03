@@ -1,0 +1,35 @@
+X86_AS  = /usr/bin/as
+X86_LD  = /usr/bin/ld
+X86_CC  = /usr/bin/gcc-4.2
+X86_CPP = /usr/bin/g++-4.2
+
+##### x86_64 Rules #####
+
+$(OBJROOT)/%.x86_64o: %.c $(OBJROOT)
+	@echo "\t[CC:X86_64] $<"
+	@$(X86_CC) -arch x86_64  $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.x86_64o: %.m $(OBJROOT)
+	@echo "\t[M:X86_64] $<"
+	@$(X86_CC) -arch x86_64 $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+$(OBJROOT)/%.x86_64o: %.x86_64 $(OBJROOT)
+	@echo "\t[CPP:X86_64] $<"
+	@$(X86_CPP)  -arch i386 $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+	
+$(OBJROOT)/%.x86_64o: %.s
+	@echo "\t[AS:X86_64] $<"
+	@$(CC) $(CPPFLAGS) -c $(INC) -arch x86_64 -o $@ $< \
+		    -MD -dependency-file $*.d
+	@md -u $(OBJROOT)/Makedep -f -d $*.d
+
+	
+ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .x86_64o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
+
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .x86_64o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))
