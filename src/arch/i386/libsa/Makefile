@@ -1,15 +1,13 @@
-ROOT = $(shell pwd)/../../../
+ROOT = $(shell pwd)/../../../../
 DIR = libsa
 SRCROOT = ${ROOT}/src
 OBJROOT = $(ROOT)/obj/i386/${DIR}
-SYMROOT = $(ROOT)/sym/util
+SYMROOT = $(ROOT)/sym/i386
 DSTROOT = $(ROOT)/dst/usr/standalone/i386/
 DOCROOT = $(ROOT)/doc
 
 LIBSAIODIR = ../libsaio
 
-
-CPPFLAGS := $(CPPFLAGS) -nostdinc++
 
 INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
@@ -21,10 +19,12 @@ LIBS = libsa.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))
 
 
-DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+DIRS_NEEDED = 
 
-all embedtheme: $(DIRS_NEEDED) $(LIBS)
-$(warning $(ACTUAL_OBJECTS))
+include ${ROOT}/Make.rules
+
+
+all: $(OBJROOT) $(SYMROOT) $(LIBS)
 
 $(LIBS): ${ACTUAL_OBJECTS}
 	@echo "\t[RM] $@"
@@ -33,11 +33,6 @@ $(LIBS): ${ACTUAL_OBJECTS}
 	@ar q $@ $^ &> /dev/null
 	@echo "\t[RANLIB] $(@F)"
 	@ranlib $@
-
-$(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
-	@echo "\t[MKDIR] $@"
-	@$(MKDIRS) $@
-
 
 # dependencies
 -include $(OBJROOT)/Makedep

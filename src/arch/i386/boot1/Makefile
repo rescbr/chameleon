@@ -1,22 +1,14 @@
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/boot1
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
-
-include ${SRCROOT}/Make.rules
-
+ROOT = $(shell pwd)/../../../../
 DIR = boot1
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/i386/${DIR}
+SYMROOT = $(ROOT)/sym/i386
+DSTROOT = $(ROOT)/dst/usr/standalone/i386/
+DOCROOT = $(ROOT)/doc
 
-DIRS_NEEDED = $(SYMROOT)
+include ${ROOT}/Make.rules
 
-VERS = `vers_string -f 5.0 | tr - .`
-NEW_VERS = Darwin boot1h v$(VERS)
-
-
+DIRS_NEEDED =
 
 PROGRAMS  =  boot1hp boot1f32
 
@@ -31,13 +23,9 @@ endif
 
 PROGRAMS := $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
-all: $(DIRS_NEEDED) $(PROGRAMS)
+all:  $(SYMROOT) $(PROGRAMS)
 
 
-$(PROGRAMS): $(SRCROOT)/autoconf.inc
+$(PROGRAMS):
 	@echo "\t[NASM] $(@F)" 
 	@$(NASM) $(@F).s -o $@
-
-install_i386:: all $(INSTALLDIR)
-	cp $(SYMROOT)/boot1h $(INSTALLDIR)/
-	cd $(INSTALLDIR); chmod u+w $(VERSIONED_FILES) 

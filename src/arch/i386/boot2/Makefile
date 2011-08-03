@@ -1,38 +1,18 @@
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/boot2
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
-
-VPATH = $(SYMROOT)
-
-#	Makefile for i386 boot program
-#	define FLOPPY and SMALL using DEFINES macro as necessary
-
-PNGCRUSH = `which pngcrush`
-PNGOPTIONS = -rem cHRM -rem gAMA -rem iCCP -rem sRGB
-
+ROOT = $(shell pwd)/../../../../
 DIR = boot2
-include ${SRCROOT}/Make.rules
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/i386/${DIR}
+SYMROOT = $(ROOT)/sym/i386
+DSTROOT = $(ROOT)/dst/usr/standalone/i386/
+DOCROOT = $(ROOT)/doc
 
-OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
-		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
-		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+include ${ROOT}/Make.rules
 
-CPPFLAGS := $(CPPFLAGS) -nostdinc++ -include $(SRCROOT)/autoconf.h
+OPTIM =  -Oz
 
-DEFINES=
-CONFIG = hd
-SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
-THEME = $(CONFIG_EMBEDED_THEME)
-THEMEDIR = ../../artwork/themes/$(THEME)
+
 INC = -I. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
 
 LIBS= -L$(SYMDIR) -lsaio -lsa
@@ -40,10 +20,7 @@ LIBDEP= libsaio.a libsa.a
 
 OTHER_FILES =
 
-# The ordering is important;
-# boot2.o must be first.
-OBJS = boot2.o boot.o mboot.o boot_modules.o
-# button.o browser.o scrollbar.o == NOTYET bmdecompress.o graphic_utils.o prompt.o options.o lzss.o	
+OBJECTS = boot2 boot mboot boot_modules
 
 UTILDIR = ../util
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
@@ -64,16 +41,9 @@ PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 all: $(DIRS_NEEDED) boot 
 
-ifeq (${CONFIG_EMBED_THEME}, y)
 
-boot: $(SYMROOT)/art.h $(SYMROOT)/vers.h $(SYMROOT)/embedded.h $(addprefix $(OBJROOT)/, $(OBJS)) $(addprefix $(SYMROOT)/, $(LIBDEP))
+boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP))
 
-else
-
-boot: $(SYMROOT)/vers.h $(SYMROOT)/embedded.h $(addprefix $(OBJROOT)/, $(OBJS)) $(addprefix $(SYMROOT)/, $(LIBDEP))
-
-
-endif
 
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/
 	@echo "\t[LD] boot.sys"
@@ -151,37 +121,10 @@ endif
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
-$(SYMROOT)/art.h:
-	@if [ "$(PNGCRUSH)" ]; then	\
-		echo "optimizing art files ...\n$(PNGCRUSH) $(PNGOPTIONS) artwork/$(THEME)"; \
-		cd $(THEMEDIR) && find . -name '*.png' -exec $(PNGCRUSH) -q $(PNGOPTIONS) -d $(SYMROOT)/embed {} \;; \
-		cp theme.plist $(SYMROOT)/embed; \
-	else \
-		cp -R $(THEMEDIR) $(SYMROOT)/embed; \
-	fi;
-	@echo "#ifndef __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@echo "#define __BOOT2_ART_H" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name 'theme.plist' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-	@cd $(SYMROOT)/embed && find . -name '*.png' -exec xxd -i >> $(SYMROOT)/art.h {} \;
-
-	@echo "typedef struct {" >> $(SYMROOT)/art.h
-	@echo "	char			name[32];" >> $(SYMROOT)/art.h
-	@echo "	unsigned char	*pngdata;" >> $(SYMROOT)/art.h
-	@echo "	unsigned int	*length;" >> $(SYMROOT)/art.h
-	@echo "} embeddedpng_t;" >> $(SYMROOT)/art.h
-	@echo "" >> $(SYMROOT)/art.h
-	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
-	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
-		awk '{ printf "\t{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
-	@echo "};" >> $(SYMROOT)/art.h
-
-	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
 
 $(SYMROOT)/embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
 
-
-.PHONY: $(SYMROOT)/vers.h
 
 #dependencies
 -include $(OBJROOT)/Makedep

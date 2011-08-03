@@ -1,24 +1,22 @@
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/boot0
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
-
+ROOT = $(shell pwd)/../../../../
 DIR = boot0
-include ${SRCROOT}/Make.rules
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/i386/${DIR}
+SYMROOT = $(ROOT)/sym/i386
+DSTROOT = $(ROOT)/dst/usr/standalone/i386/
+DOCROOT = $(ROOT)/doc
 
-DIRS_NEEDED = $(SYMROOT)
+include ${ROOT}/Make.rules
+
+DIRS_NEEDED = 
 
 
-OBJECTS  = boot0 boot0hfs boot0md chain0
-OBJECTS := $(addprefix $(SYMROOT)/, $(OBJECTS))
+BOOT0_OBJS  = boot0 boot0hfs boot0md chain0
+BOOT0_OBJS := $(addprefix $(SYMROOT)/, $(BOOT0_OBJS))
 
-all: $(DIRS_NEEDED) $(OBJECTS)
+all: $(SYMROOT) $(BOOT0_OBJS)
 
-$(OBJECTS): $(SRCROOT)/autoconf.inc
+$(BOOT0_OBJS):
 	@echo "\t[NASM] $(@F)"
 	@$(NASM) $(@F).s -o $@
 
