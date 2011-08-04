@@ -1,19 +1,16 @@
-SRCROOT = $(shell pwd)/../../
-OBJROOT = $(SRCROOT)/obj/i386/cdboot
-SYMROOT = $(SRCROOT)/sym/i386
-DSTROOT = $(SRCROOT)/dst/i386
-DOCROOT = $(SRCROOT)/doc
-IMGROOT = $(SRCROOT)/sym/cache
-IMGSKELROOT = $(SRCROOT)/imgskel
-CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
-
+ROOT = $(shell pwd)/../../../../
 DIR = cdboot
-include ${SRCROOT}/Make.rules
+SRCROOT = ${ROOT}/src
+OBJROOT = $(ROOT)/obj/i386/${DIR}
+SYMROOT = $(ROOT)/sym/i386
+DSTROOT = $(ROOT)/dst/usr/standalone/i386/
+DOCROOT = $(ROOT)/doc
 
-INSTALLDIR = $(DSTROOT)/usr/standalone/i386
+include ${ROOT}/Make.rules
+
 DIRS_NEEDED = $(SYMROOT)
 
-all embedtheme optionrom: $(DIRS_NEEDED) $(SYMROOT)/cdboot
+all: $(DIRS_NEEDED) $(SYMROOT)/cdboot
 
 $(SYMROOT)/cdboot:
 	@echo "\t[NASM] cdboot.s"	

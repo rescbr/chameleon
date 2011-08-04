@@ -13,7 +13,7 @@ DOCROOT = $(ROOT)/doc
 include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = libsa libsaio boot0 boot1 boot2 cdboot modules
+SUBDIRS = libsa libsaio boot0 boot1 boot2 cdboot
 
 all: ${OBJROOT} ${SYMROOT}
 	@#cd modules; ${MAKE} BUILT_IN=yes $@
