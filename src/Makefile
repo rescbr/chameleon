@@ -6,7 +6,7 @@ SYMROOT = $(ROOT)/sym
 DSTROOT = $(ROOT)/dst
 DOCROOT = $(ROOT)/doc
 
-SUBDIRS=util modules arch
+SUBDIRS=util arch modules
 
 all:
 	@echo ================= make $@ BUILT_IN=yes for modules arch $(ARCH) =================

@@ -4,7 +4,7 @@ TARGET_CC  = /usr/bin/gcc-4.2
 TARGET_CPP = /usr/bin/g++-4.2
 
 TARGET_SDK = /Developer/SDKs/MacOSX10.5.sdk/
-TARGET_CFLAGS += -I"$(TARGET_SDK)/usr/include"
+#TARGET_CFLAGS += -I"$(TARGET_SDK)/usr/include"
 TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib"
 TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib/system/"
 TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/Frameworks"

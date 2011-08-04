@@ -76,11 +76,11 @@ ifeq ($(MODULE_DEFINITION),y)
 ifeq ($(BUILT_IN),yes)
 
 ####### Make this *BUILT IN* ######
-all: ${OBJROOT} dylib_LINKER
+all: ${OBJROOT} ${MODULE_OBJECTS}
 
 else
 ####### Don't build in module ######
-all:
+all: ${OBJROOT} dylib_LINKER
 
 endif
 else
@@ -92,16 +92,15 @@ endif
 endif
 
 
-dylib_LINKER: ${OBJROOT} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h dylib 
+dylib_LINKER: ${OBJROOT} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib 
 dylib: 		  ${OBJROOT} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
 
-ifeq ($(BUILT_IN),yes)
 
 ###### Build module into the code binary ######
-$(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
-	@echo "\t[LD:${ARCH}] $(MODULE_NAME).${ARCH}.dylib"
-	ld -arch ${ARCH} -undefined dynamic_lookup \
+$(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
+	@ld -arch ${ARCH} \
+	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
@@ -109,20 +108,12 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS
 	-final_output $(MODULE_NAME) \
 	$(filter %.${ARCH}o,$^) \
 	${DYLIB_O} \
-	-macosx_version_min 10.5 \
+	-weak_library $(ROOT)/obj/${ARCH}/boot2/Symbols_LINKER_ONLY.dylib \
+	$(MODULE_DEPENDENCIES_CMD) \
 	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-o $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
-	
-	
-	@#@echo "\t[LIPO] $(@F)"
-	@#@lipo -create -arch i386 $(SYMROOT)/$(MODULE_NAME).i386.dylib \
-	@#		 	  -arch ppc  $(SYMROOT)/$(MODULE_NAME).ppc.dylib \
-	@#		 	  -arch ${ARM_ARCH}  $(SYMROOT)/$(MODULE_NAME).arm.dylib \
-	@#		 	  -output $(SYMROOT)/$(MODULE_NAME).dylib
-			 	  
-	@#@rm $(SYMROOT)/$(MODULE_NAME).i386.dylib $(SYMROOT)/$(MODULE_NAME).ppc.dylib $(SYMROOT)/$(MODULE_NAME).arm.dylib
-else
+	-macosx_version_min 10.6 \
+	-o $@
 
 ##### BUild module as a seperate module #####
 $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
@@ -137,14 +128,12 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS
 	-final_output $(MODULE_NAME) \
 	$(filter %.${ARCH}o,$^) \
 	${DYLIB_O} \
-	-weak_library $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib \
+	-weak_library $(ROOT)/obj/${ARCH}/boot2/Symbols_LINKER_ONLY.dylib \
 	$(MODULE_DEPENDENCIES_CMD) \
 	-sectcreate __INFO __author $(OBJROOT)/$(MODULE_NAME).author \
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
-	-macosx_version_min 10.5 \
+	-macosx_version_min 10.6 \
 	-o $@
-	
-endif
 
 
 #clean:

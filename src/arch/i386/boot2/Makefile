@@ -67,13 +67,12 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 			-nostdlib -arch ${ARCH} -static \
 			-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o`  $(LIBS)
 
-ifeq (${CONFIG_MODULES}, y)
 
 	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
 
 	@# Generate the Symbols.dylib file
 	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	@$(SYMROOT)/../util/dyldsymboltool.${ARCH} $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@echo "\t[LD] boot.sys"
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
@@ -86,7 +85,7 @@ ifeq (${CONFIG_MODULES}, y)
 
 	@# Generate the Symbols.dylib file
 	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	@$(SYMROOT)/../util/dyldsymboltool.${ARCH} $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@${RM} $(SYMROOT)/boot.sys
 	@echo "\t[LD] boot.sys"
@@ -107,8 +106,6 @@ ifeq (${CONFIG_MODULES}, y)
 	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
-endif
-
 	@# this is done in a sub process after boot.sys exists so the strings are populated correctly
 	@make embed_symbols
 
@@ -126,14 +123,13 @@ endif
 	  fi)
 
 embed_symbols:
-ifeq (${CONFIG_MODULES}, y)
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
 	@${MACHOCONV} $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
 
 	@echo "\t******* Patching at $(PATCH_ADDR) ******"
 	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot.sys bs=1 count=4 seek=$(PATCH_ADDR) &> /dev/null
-endif
+
 	@echo "\t[MACHOCONV] boot"
 	@${MACHOCONV} $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
