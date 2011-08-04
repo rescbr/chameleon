@@ -10,6 +10,8 @@ TARGET_LDFLAGS += -L"$(TARGET_SDK)/usr/lib/system/"
 TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/Frameworks"
 TARGET_LDFLAGS += -F"$(TARGET_SDK)/System/Library/PrivateFrameworks"
 
+DYLIB_O = ${TARGET_SDK}/usr/lib/dylib1.o
+
 
 ##### PPC Rules #####
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)

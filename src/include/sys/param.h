@@ -76,6 +76,8 @@
 #define NeXTBSD	1995064		/* NeXTBSD version (year, month, release) */
 #define NeXTBSD4_0 0		/* NeXTBSD 4.0 */
 
+#include <sys/_types.h>
+
 #ifndef NULL
 #define	NULL	__DARWIN_NULL
 #endif /* ! NULL */
@@ -105,10 +107,13 @@
 #define MAXDOMNAMELEN	256		/* maximum domain name length */
 
 /* Machine type dependent parameters. */
-#include <i386/param.h>
+#include <machine/param.h>
 
 /* More types and definitions used throughout the kernel. */
 #include <limits.h>
+
+/* Signals. */
+#include <sys/signal.h>
 
 /*
  * Priorities.  Note that with 32 run queues, differences less than 4 are

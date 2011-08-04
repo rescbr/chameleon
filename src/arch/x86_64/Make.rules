@@ -3,6 +3,8 @@ TARGET_LD  = /usr/bin/ld -arch ${ARCH}
 TARGET_CC  = /usr/bin/gcc-4.2
 TARGET_CPP = /usr/bin/g++-4.2
 
+DYLIB_O = /Developer/SDKs/MacOSX10.6.sdk/usr/lib/dylib1.o
+
 ##### x86_64 Rules #####
 
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)

@@ -35,7 +35,7 @@ OTHER_FILES =
 OBJECTS = boot2 boot 
 #boot_modules
 
-DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+DIRS_NEEDED = 
 
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
@@ -55,7 +55,7 @@ PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 include ${ROOT}/Make.rules
 
 
-all: $(DIRS_NEEDED) boot 
+all: $(DIRS_NEEDED) $(OBJROOT) $(SYMROOT) boot 
 
 
 boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP))

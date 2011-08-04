@@ -65,11 +65,6 @@ clean:
 			$(SRCROOT)/autoconf.h \
 			$(SRCROOT)/autoconf.inc
 
-
-$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config: rebuild_cofig
-
-.PHONY: $(SRCROOT)/autoconf.h
-.PHONY: rebuild_config
 .PHONY: config
 .PHONY: clean
 .PHONY: $(SYMROOT)/vers.h
