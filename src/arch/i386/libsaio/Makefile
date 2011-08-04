@@ -10,9 +10,20 @@ UTILDIR = ../util
 LIBSADIR = ../libsa
 BOOT2DIR = ../boot2
 
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -static -g -Wmost -Werror \
+		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
+		-fno-align-functions -fno-stack-protector \
+		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+	      
+CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
+	-fno-builtin -msoft-float \
+	-fno-rtti -fno-exceptions \
+	-include $(SRCROOT)/autoconf.h
+
+
 DEFINES = -DNOTHING
 
-INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/i386/include
+INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/include
 
 OBJECTS = table asm bios biosfn \
 			misc xml load console

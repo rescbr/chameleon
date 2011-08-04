@@ -44,9 +44,6 @@ rebuild_config: $(DIRS_NEEDED)
 	@cd ${SRCROOT} && $(SYMROOT)/cconfig $(SRCROOT)/Cconfig rebuild
 
 
-.PHONY: config
-.PHONY: rebuild_config
-.PHONY: $(SRCROOT)/auto.conf
 
 $(SYMROOT)/vers.h:
 	@echo "#define BOOT_VERSION \"5.0.132\"" > $@
@@ -68,8 +65,10 @@ clean:
 			$(SRCROOT)/autoconf.h \
 			$(SRCROOT)/autoconf.inc
 
+
 $(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config: rebuild_cofig
 
+.PHONY: $(SRCROOT)/autoconf.h
 .PHONY: rebuild_config
 .PHONY: config
 .PHONY: clean

@@ -16,11 +16,11 @@ include ${ROOT}/Make.rules
 SUBDIRS = ${ARCH}
 
 all: ${OBJROOT} ${SYMROOT}
-	@for i in ${SUBDIRS};										  \
-	do															  \
+	@for i in ${SUBDIRS};						  \
+	do								  \
 		echo ================= make $@ for $$i =================; \
-		( ROOT=$(ROOT);										  	  \
-			cd $$i; ${MAKE}										  \
-			$@ 			  										  \
-		) || exit $$?; 											  \
+		(							  \
+			cd $$i; ${MAKE}					  \
+			$@						  \
+		) || exit $$?;						  \
 	done

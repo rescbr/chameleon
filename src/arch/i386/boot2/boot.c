@@ -51,42 +51,15 @@
 
 
 #include "boot.h"
-#include "sl.h"
-#include "libsa.h"
 
 extern void init_module_system();
 extern int execute_hook(const char* name, void*, void*, void*, void*);
 
-
-long gBootMode; /* defaults to 0 == kBootModeNormal */
-bool gOverrideKernel;
-char *gPlatformName;
-char gRootDevice[512];
-char gMKextName[512];
-char gMacOSVersion[8];
-bool gEnableCDROMRescan;
-bool gScanSingleDrive;
-
-int     bvCount = 0;
-int     gDeviceCount = 0; 
-
-BVRef   bvr;
-BVRef   menuBVR;
-BVRef   bvChain;
-bool    useGUI;
-
-/*
- * How long to wait (in seconds) to load the
- * kernel after displaying the "boot:" prompt.
- */
-#define kBootErrorTimeout 5
-
-/*
- * Default path to kernel cache file
- */
-//Slice - first one for Leopard
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+extern void   bzero(void * dst, size_t len);
+extern void   stop(const char *format, ...);
+extern void   enableA20(void);
+extern void   video_mode(int mode);
+extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
 
 //==========================================================================
 // Zero the BSS.
@@ -118,9 +91,7 @@ void initialize_runtime(void)
 }
 
 //==========================================================================
-// This is the entrypoint from real-mode which functions exactly as it did
-// before. Multiboot does its own runtime initialization, does some of its
-// own things, and then calls common_boot.
+// This is the entrypoint from real.
 void boot(int biosdev)
 {
 	initialize_runtime();
@@ -136,10 +107,6 @@ void boot(int biosdev)
 // arguments:
 //   biosdev - Value passed from boot1/NBP to specify the device
 //             that the booter was loaded from.
-//
-// If biosdev is kBIOSDevNetwork, then this function will return if
-// booting was unsuccessful. This allows the PXE firmware to try the
-// next boot device on its list.
 void common_boot(int biosdev)
 {
     video_mode( 2 );  // 80x25 mono text mode.
@@ -150,6 +117,6 @@ void common_boot(int biosdev)
     int loopCount = 0;
     while(1)
     {
-        execute_hook("WorkLoop", (void*)loopCount++, NULL, NULL, NULL);	// Main work loop
+        execute_hook("WorkLoop", (void*)loopCount++, 0, 0, 0);	// Main work loop
     }
 }

@@ -32,7 +32,7 @@ $(OBJROOT)/%.${ARCH}o: %.s
 	
 $(OBJROOT)/boot2.${ARCH}o:
 	@echo "\t[AS:I386] boot2.s"
-	@$(TARGET_CC) -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s \
+	@$(TARGET_CC) -Wa,-n $(CFLAGS) $(INC) -arch ${ARCH} -o $(OBJROOT)/$(@F) -c boot2.s \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 

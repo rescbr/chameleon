@@ -8,6 +8,16 @@ DOCROOT = $(ROOT)/doc
 
 LIBSAIODIR = ../libsaio
 
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -static -g -Wmost -Werror \
+		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
+		-fno-align-functions -fno-stack-protector \
+		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+	      
+CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
+	-fno-builtin -msoft-float \
+	-fno-rtti -fno-exceptions \
+	-include $(SRCROOT)/autoconf.h
+
 
 INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/include
 

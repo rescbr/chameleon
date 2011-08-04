@@ -6,24 +6,37 @@ SYMROOT = $(ROOT)/sym/i386
 DSTROOT = $(ROOT)/dst/usr/standalone/i386/
 DOCROOT = $(ROOT)/doc
 
-include ${ROOT}/Make.rules
-
 OPTIM =  -Oz
+
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -g -Wmost -Werror \
+		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
+		-fno-align-functions -fno-stack-protector \
+		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
+	      
+CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
+	-fno-builtin -msoft-float \
+	-fno-rtti -fno-exceptions \
+	-include $(SRCROOT)/autoconf.h
+
+
+#todo: ensur ecorrect arch
+MACHOCONV = ${SYMROOT}/../util/machOconv.${ARCH}
 
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
 
-INC = -I. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
+INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
-LIBS= -L$(SYMDIR) -lsaio -lsa
+LIBS= -L$(SYMROOT) -lsaio -lsa
 LIBDEP= libsaio.a libsa.a
 
 OTHER_FILES =
 
-OBJECTS = boot2 boot mboot boot_modules
+OBJECTS = boot2 boot 
+#boot_modules
 
-UTILDIR = ../util
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
@@ -39,6 +52,9 @@ DATA_ADDR   = $(shell printf "%d" `otool -l $(SYMROOT)/boot.sys | grep __data -A
 PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 
+include ${ROOT}/Make.rules
+
+
 all: $(DIRS_NEEDED) boot 
 
 
@@ -48,8 +64,8 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/
 	@echo "\t[LD] boot.sys"
 	@$(CC) -Wl,-segaddr,__INIT,$(BOOT2ADDR) -Wl,-segalign,20 -Wl,-preload \
-			-nostdlib -arch i386 -static \
-			-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o`  $(LIBS) -lcc_kext
+			-nostdlib -arch ${ARCH} -static \
+			-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o`  $(LIBS)
 
 ifeq (${CONFIG_MODULES}, y)
 
@@ -61,9 +77,9 @@ ifeq (${CONFIG_MODULES}, y)
 
 	@echo "\t[LD] boot.sys"
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
-	        -nostdlib -arch i386 -Wl,-segalign,20 \
+	        -nostdlib -arch ${ARCH} -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o` $(LIBS)  -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS) 
 
 	@# Second pass, fixup global var locations
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
@@ -75,18 +91,18 @@ ifeq (${CONFIG_MODULES}, y)
 	@${RM} $(SYMROOT)/boot.sys
 	@echo "\t[LD] boot.sys"
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
-	        -nostdlib -arch i386 -Wl,-segalign,20 \
+	        -nostdlib -arch ${ARCH} -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../boot2_modules/ -name \*.o` $(LIBS)  -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS)  -lcc_kext
 
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@$(LD) -arch i386 \
+	@$(LD) -arch ${ARCH} \
 	-undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	$(filter %.o,$^) $(LIBS) \
+	$(filter %.${ARCH}o,$^) $(LIBS) \
 	-final_output Symbols \
 	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
@@ -113,13 +129,13 @@ embed_symbols:
 ifeq (${CONFIG_MODULES}, y)
 	@echo ================= Embedding Symbols.dylib =================
 	@echo "\t[MACHOCONV] boot"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
+	@${MACHOCONV} $(SYMROOT)/boot2.sys $(SYMROOT)/boot &> /dev/null
 
 	@echo "\t******* Patching at $(PATCH_ADDR) ******"
 	@stat -f%z $(SYMROOT)/boot | perl -ane "print pack('V',@F[0]);" | dd conv=notrunc of=${SYMROOT}/boot.sys bs=1 count=4 seek=$(PATCH_ADDR) &> /dev/null
 endif
 	@echo "\t[MACHOCONV] boot"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot
+	@${MACHOCONV} $(SYMROOT)/boot.sys $(SYMROOT)/boot
 
 
 $(SYMROOT)/embedded.h:

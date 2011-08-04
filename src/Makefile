@@ -14,8 +14,8 @@ all:
 	@for i in ${SUBDIRS};										  \
 	do															  \
 		echo ================= make $@ for $$i arch $(ARCH) =================; \
-		( ROOT=$(ROOT);										  	  \
-			cd $$i; ${MAKE}	ARCH=${ARCH}							  \
+		( 													  	  \
+			cd $$i; ${MAKE}	ARCH=${ARCH}						  \
 			$@ 			  										  \
 		) || exit $$?; 											  \
 	done

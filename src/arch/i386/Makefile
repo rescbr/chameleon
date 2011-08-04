@@ -19,11 +19,11 @@ all: ${OBJROOT} ${SYMROOT}
 	@#cd modules; ${MAKE} BUILT_IN=yes $@
 
 
-	@for i in ${SUBDIRS};										  \
-	do															  \
+	@for i in ${SUBDIRS};						  \
+	do								  \
 		echo ================= make $@ for $$i =================; \
-		( ROOT=$(ROOT);										  	  \
-			cd $$i; ${MAKE}										  \
-			$@ 			  										  \
-		) || exit $$?; 											  \
+		( 							  \
+			cd $$i; ${MAKE}					  \
+			$@						  \
+		) || exit $$?;						  \
 	done

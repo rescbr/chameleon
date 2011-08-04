@@ -12,12 +12,12 @@ endif
 
 ifeq ($(BUILT_IN),yes)
 
-CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -g -Wmost -Werror \
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -static -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
 		-fno-align-functions -fno-stack-protector \
 		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
 	      
-CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
+CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
 	-fno-builtin -msoft-float \
 	-fno-rtti -fno-exceptions \
 	-include $(SRCROOT)/autoconf.h
@@ -59,9 +59,8 @@ MODULE_DEPENDENCIES :=  $(wildcard $(foreach x,$(MODULE_DEPENDENCIES),$(SYMROOT)
 
 MODULE_DEPENDENCIES_CMD := $(foreach x,$(MODULE_DEPENDENCIES), -weak_library $(x))
 
-INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
-
 MODULE_DEFINITION := $(CONFIG_$(shell echo $(MODULE_NAME) | tr '[:lower:]' '[:upper:]')_MODULE)
+
 
 ifeq  ($(MODULE_DEFINITION),m)
 ifneq ($(BUILT_IN),yes)

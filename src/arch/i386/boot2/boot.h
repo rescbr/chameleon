@@ -29,7 +29,7 @@
 #ifndef __BOOT2_BOOT_H
 #define __BOOT2_BOOT_H
 
-#include "libsaio.h"
+#include <sys/types.h>
 
 /*
  * Keys used in system Boot.plist
@@ -128,123 +128,8 @@
 #define kBootTimeout         -1
 #define kCDBootTimeout       8
 
-/*
- * A global set by boot() to record the device that the booter
- * was loaded from.
- */
-extern int  gBIOSDev;
-extern long gBootMode;
-extern bool sysConfigValid;
-extern char bootBanner[];
-extern char bootPrompt[];
-extern bool gOverrideKernel;
-extern char *gPlatformName;
-extern char gMKextName[];
-extern char gRootDevice[];
-extern bool gEnableCDROMRescan;
-extern bool gScanSingleDrive;
-extern bool useGUI;
-
-/*
- * Boot Modes
- */
-enum {
-    kBootModeNormal = 0,
-    kBootModeSafe   = 1,
-    kBootModeSecure = 2,
-    kBootModeQuiet  = 4
-};
-
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
 
-/*
- * usb.c
- */
-extern int usb_loop();
-
-/*
- * graphics.c
- */
-extern void printVBEModeInfo();
-extern void setVideoMode(int mode, int drawgraphics);
-extern int  getVideoMode();
-extern void spinActivityIndicator();
-extern void clearActivityIndicator();
-extern void drawColorRectangle( unsigned short x,
-                                unsigned short y,
-                                unsigned short width,
-                                unsigned short height,
-                                unsigned char  colorIndex );
-extern void drawDataRectangle( unsigned short  x,
-                               unsigned short  y,
-                               unsigned short  width,
-                               unsigned short  height,
-                               unsigned char * data );
-extern int
-convertImage( unsigned short width,
-              unsigned short height,
-              const unsigned char *imageData,
-              unsigned char **newImageData );
-extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
-extern void drawBootGraphics(void);
-extern void drawPreview(void *src, uint8_t * saveunder);
-extern int getVideoMode(void);
-extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
-
-/*
- * drivers.c
- */
-extern long LoadExtraDrivers(char * dirSpec);
-extern long LoadDrivers(char * dirSpec);
-extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
-
-typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
-/*!
-    Hookable function pointer called during the driver loading phase that
-    allows other code to cause additional drivers to be loaded.
- */
-extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
-
-/*
- * options.c
- */
-extern int getBootOptions(bool firstRun);
-extern int processBootOptions();
-extern int selectAlternateBootDevice(int bootdevice);
-extern bool promptForRescanOption(void);
-
-void showHelp();
-void showTextFile();
-char *getMemoryInfoString();
-
-typedef struct {
-    char   name[80];
-    void * param;
-} MenuItem;
-
-/*
- * lzss.c
- */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
-
-struct compressed_kernel_header {
-  u_int32_t signature;
-  u_int32_t compress_type;
-  u_int32_t adler32;
-  u_int32_t uncompressed_size;
-  u_int32_t compressed_size;
-  u_int32_t reserved[11];
-  char      platform_name[64];
-  char      root_path[256];
-  u_int8_t  data[0];
-};
-typedef struct compressed_kernel_header compressed_kernel_header;
-
-/* resume.c */
-void HibernateBoot(char *boot_device);
-
-/* bmdecompress.c */
-void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
 #endif /* !__BOOT2_BOOT_H */
