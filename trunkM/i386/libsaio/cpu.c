@@ -241,6 +241,7 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
 		}
 	}
+		getchar();
 #endif
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
@@ -251,6 +252,10 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 	
     p->CPU.Model += (p->CPU.ExtModel << 4);
+#if DEBUG_CPU
+	printf("Enter cpuid_info\n");
+	getchar();
+#endif
     
     if (p->CPU.Vendor == CPUID_VENDOR_INTEL && 
         p->CPU.Family == 0x06 && 
@@ -272,6 +277,10 @@ void scan_cpu(PlatformInfo_t *p)
         p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);		// Use previous method for Cores and Threads
         p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
+#if DEBUG_CPU
+	printf("...OK\n");
+	getchar();
+#endif
 	
 	/* get brand string (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
@@ -302,6 +311,18 @@ void scan_cpu(PlatformInfo_t *p)
 			 p->CPU.BrandString[0] = '\0';
 		 }
 	}
+#if DEBUG_CPU
+	{
+		int		i;
+		DBG("CPUID Raw Values:\n");
+		for (i=0; i<CPUID_MAX; i++) {
+			DBG("%02d: %08x-%08x-%08x-%08x\n", i,
+				p->CPU.CPUID[i][0], p->CPU.CPUID[i][1],
+				p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
+		}
+	}
+	getchar();
+#endif
 	
 	/* setup features */
 	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
@@ -338,7 +359,7 @@ void scan_cpu(PlatformInfo_t *p)
 	cpuFrequency = 0;
 
 	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
-		int intelCPU = p->CPU.Model;
+//		int intelCPU = p->CPU.Model;
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
 			/* Nehalem CPU model */
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM || 
@@ -384,11 +405,12 @@ void scan_cpu(PlatformInfo_t *p)
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
 				//valv: Turbo Ratio Limit
-				if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
+	/*			if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
 					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
-				} else {
+				} else */
+				{
 					cpuFrequency = tscFrequency;
 				}
 				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
@@ -451,6 +473,11 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		/* Mobile CPU ? */
 //Slice 
+#if DEBUG_CPU
+	pause();
+#endif
+	
+
 		msr = rdmsr64(MSR_IA32_PLATFORM_ID);
 		DBG("msr(0x%04x): MSR_IA32_PLATFORM_ID 0x%08x\n", MSR_IA32_PLATFORM_ID, msr & 0xffffffff); //__LINE__ - source line number :)
 		if (msr) {
@@ -569,6 +596,6 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("CPU: NoCores/NoThreads:        %d/%d\n",			p->CPU.NoCores, p->CPU.NoThreads);
 	DBG("CPU: Features:                 0x%08x\n",			p->CPU.Features);
 #if DEBUG_CPU
-	pause();
+	getchar();
 #endif
 }

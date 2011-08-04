@@ -11,8 +11,8 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = klibc uClibcxx Resolution KernelPatcher
-#HelloWorld Memory NetbookInstaller KextPatcher Networking  NVRAM HPET USBFix RamDiskLoader
+SUBDIRS = klibc uClibcxx Resolution KernelPatcher  NVRAM 
+#HelloWorld Memory NetbookInstaller KextPatcher Networking HPET USBFix RamDiskLoader
 
 
 CFLAGS= -Os $(MORECPP) -arch i386 -g -static
