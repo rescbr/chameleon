@@ -416,7 +416,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x689C,	0x039E1043, CHIP_FAMILY_HEMLOCK,	"ASUS EAH5870 Series",				kUakari		},
 	{ 0x689C,	0x30201682, CHIP_FAMILY_HEMLOCK,	"ATI Radeon HD 5970",				kUakari		},
 	
-	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, // issue #89
+	{ 0x68A8,	0x050E1025,	CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, // issue #89, Suxx
 	
 	{ 0x68B8,	0xE147174B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x21D71458, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},

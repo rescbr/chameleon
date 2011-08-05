@@ -118,6 +118,7 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x10027183,  "ATI Radeon X1550 Series"	},
 	{ 0x10027183,  "ATI Radeon X1300 Series"	},
 	{ 0x100271C5,  "ATI Mobility Radeon X1600"	},
+	{ 0x100271D4,  "ATI Mobility FireGL V5250"	},
 	
 	{ 0x10029589,  "ATI Radeon 2600 Series"}  ,
 	{ 0x10029588,  "ATI Radeon 2600 Series"}  ,
@@ -189,6 +190,7 @@ static struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x10027183,  "Caretta"	},
 	{ 0x10027187,  "Caretta"	},
 	{ 0x100271C5,  "Wormy"		},
+	{ 0x100271D4,  "Wormy"		},
 	
 	{ 0x10029589,  "Lamna"}  ,
 	{ 0x10029588,  "Lamna"}  ,
