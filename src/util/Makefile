@@ -27,7 +27,7 @@ OBJECTS += openUp
 endif
 
 
-LDFLAGS = $(TARGET_LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
+LDFLAGS := $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
 
 SYMPROG = $(addsuffix $(addprefix $(SYMROOT)/, $(PROGRAMS)), .${ARCH})
 
@@ -42,7 +42,7 @@ all: $(OBJROOT) $(SYMROOT) $(SYMPROG) fdisk440
 
 $(SYMPROG): ${NATIVE_OBJECTS}
 	@echo "\t[LD:${ARCH}] $(@F)"
-	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(OBJROOT)/$(@F).o
+	@$(NATIVE_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(OBJROOT)/$(@F).o
 
 .PHONY: fdisk440
 fdisk440:

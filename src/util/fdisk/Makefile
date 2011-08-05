@@ -21,7 +21,7 @@ all: $(SYMROOT) $(OBJROOT) $(PROGRAM)
 
 $(PROGRAM): $(NATIVE_OBJECTS)
 	@echo "\t[LD:${ARCH}] $(@F)"
-	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(NATIVE_OBJECTS)
+	@$(NATIVE_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(NATIVE_OBJECTS)
 
 else
 all:
