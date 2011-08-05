@@ -69,6 +69,8 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 #endif
 }
 
+
+
 // define the block of memory that the allocator will use
 void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *, size_t, const char *, int))
 {
@@ -86,6 +88,12 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 }
 
 #define BEST_FIT 1
+
+#undef malloc
+void *malloc(size_t size)
+{
+	return safe_malloc(size, __FILE__, __LINE__);
+}
 
 void * safe_malloc(size_t size, const char *file, int line)
 {

@@ -8,6 +8,7 @@ MODULE_DEPENDENCIES =
 
 DIR = ModuleSystem
 
-MODULE_OBJS = macho modules_support modules
+MODULE_OBJS = modules_support linker
+#macho modules
 
 include ../MakeInc.dir

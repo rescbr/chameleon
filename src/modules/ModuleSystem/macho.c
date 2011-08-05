@@ -7,7 +7,7 @@
 #endif
 
 
-#include "boot.h"
+#include <stdlib.h>
 #include "modules.h"
 
 extern void start_built_in_modules();

@@ -8,12 +8,12 @@ DOCROOT = $(ROOT)/doc
 
 OPTIM =  -Oz
 
-CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -g -Wmost -Werror \
+CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -g -Wmost -Werror -static \
 		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
 		-fno-align-functions -fno-stack-protector \
 		-msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
 	      
-CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror \
+CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror -static \
 	-fno-builtin -msoft-float \
 	-fno-rtti -fno-exceptions \
 	-include $(SRCROOT)/autoconf.h
@@ -65,7 +65,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(CC) -Wl,-segaddr,__INIT,$(BOOT2ADDR) -Wl,-segalign,20 -Wl,-preload \
 			-nostdlib -arch ${ARCH} -static \
-			-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o`  $(LIBS)
+			-o $(SYMROOT)/boot.sys $(filter %.${ARCH}o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o`  $(LIBS)
 
 
 	@cp  $(SYMROOT)/boot.sys  $(SYMROOT)/boot2.sys
@@ -78,7 +78,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch ${ARCH} -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS) 
+		-o $(SYMROOT)/boot.sys $(filter %.${ARCH}o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS) 
 
 	@# Second pass, fixup global var locations
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
@@ -92,7 +92,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch ${ARCH} -Wl,-segalign,20 \
 		-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS)  -lcc_kext
+		-o $(SYMROOT)/boot.sys $(filter %.${ARCH}o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS)  -lcc_kext
 
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
@@ -101,7 +101,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
 	-no_uuid \
-	$(filter %.${ARCH}o,$^) $(LIBS) \
+	$(filter %.${ARCH}o,$^) `find $(OBJROOT)/../../boot2_modules/ -name \*.${ARCH}o` $(LIBS) \
 	-final_output Symbols \
 	-macosx_version_min 10.6 \
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
