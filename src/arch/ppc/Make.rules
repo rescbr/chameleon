@@ -41,3 +41,4 @@ $(OBJROOT)/%.${ARCH}o: %.s
 	
 ACTUAL_OBJECTS := ${ACTUAL_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
 MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(MODULE_OBJS)))
+MODULE_OBJECTS := ${MODULE_OBJECTS} $(addsuffix .${ARCH}o, $(addprefix $(OBJROOT)/, $(PPC_OBJS)))

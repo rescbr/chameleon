@@ -8,7 +8,7 @@ MODULE_DEPENDENCIES =
 
 DIR = ModuleSystem
 
-MODULE_OBJS = modules_support linker
-#macho modules
+MODULE_OBJS = linker
+I386_OBJS = modules_support
 
 include ../MakeInc.dir

@@ -44,6 +44,8 @@ LIBSADIR = ../../libsa
 LIBSAIODIR = ../../libsaio
 BOOT2DIR = ../../boot2
 
+VPATH = ${ARCH}
+
 MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/modules/$(x)/include/)
 
 
@@ -92,8 +94,8 @@ endif
 endif
 
 
-dylib_LINKER: ${OBJROOT} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib 
-dylib: 		  ${OBJROOT} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
+dylib_LINKER: ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib 
+dylib: 		  ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
 
 

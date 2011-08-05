@@ -154,7 +154,6 @@ moduleHook_t* hook_exists(const char* name)
 /********************************************************************************/
 /*	dyld / Linker Interface														*/
 /********************************************************************************/
-void dyld_stub_binder() __attribute__((alias("dyld_stub_binder")));
 void dyld_stub_binder() 
 {
 	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
