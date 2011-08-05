@@ -311,18 +311,6 @@ void scan_cpu(PlatformInfo_t *p)
 			 p->CPU.BrandString[0] = '\0';
 		 }
 	}
-#if DEBUG_CPU
-	{
-		int		i;
-		DBG("CPUID Raw Values:\n");
-		for (i=0; i<CPUID_MAX; i++) {
-			DBG("%02d: %08x-%08x-%08x-%08x\n", i,
-				p->CPU.CPUID[i][0], p->CPU.CPUID[i][1],
-				p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
-		}
-	}
-	getchar();
-#endif
 	
 	/* setup features */
 	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
@@ -376,7 +364,8 @@ void scan_cpu(PlatformInfo_t *p)
 				(msr >> 32) & 0xffffffff, msr & 0xffffffff);
 				bus_ratio_max = bitfield(msr, 14, 8);
                 bus_ratio_min = bitfield(msr, 46, 40); //valv: not sure about this one (Remarq.1)
-				msr = rdmsr64(MSR_FLEX_RATIO);
+			//	msr = rdmsr64(MSR_FLEX_RATIO);
+			    msr = 0;
 				DBG("msr(0x%04x): flex_ratio %08x\n", MSR_FLEX_RATIO, msr & 0xffffffff);
 				if ((msr >> 16) & 0x01) {
 					flex_ratio = bitfield(msr, 14, 8);
@@ -472,10 +461,10 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 		}
 		/* Mobile CPU ? */
-//Slice 
-#if DEBUG_CPU
+//Slice -  no more needed
+#if 0 // DEBUG_CPU
 	pause();
-#endif
+
 	
 
 		msr = rdmsr64(MSR_IA32_PLATFORM_ID);
@@ -578,6 +567,7 @@ void scan_cpu(PlatformInfo_t *p)
         }
         if(!cpuFrequency) cpuFrequency = tscFrequency;
     }
+#endif    
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;

@@ -488,7 +488,9 @@ void common_boot(int biosdev)
 				break;
 			
 			if (!forceresume && ((sleeptime+3)<bvr->modTime)) {
+#if DEBUG    
 				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",bvr->modTime-sleeptime);
+#endif                
 				break;
 			}
 				
@@ -614,15 +616,15 @@ void common_boot(int biosdev)
             bootFile = bootInfo->bootFile;
 
             // Try to load kernel image from alternate locations on boot helper partitions.
-            sprintf(bootFileSpec, "com.apple.boot.P/%s", bootFile);
+            sprintf(bootFileSpec, "com.apple.boot.P%s", bootFile);
             ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
   	  	    if (ret == -1)
   	  	    {
-              sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
+                sprintf(bootFileSpec, "com.apple.boot.R%s", bootFile);
               ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
               if (ret == -1)
               {
-                sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
+                    sprintf(bootFileSpec, "com.apple.boot.S%s", bootFile);
                 ret = GetFileInfo(NULL, bootFileSpec, &flags, &time); 
                 if (ret == -1)
                 {

@@ -219,9 +219,10 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 
 bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 {
-	static int idx = -1;
+//Slice - do not use SPD value for memory speed. DMI has real value.
+return false;
+/*	static int idx = -1;
 	int	map;
-
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
 	{
@@ -234,7 +235,7 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 		}
 	}
 
-	return false;
+	return false; */
 //	value->dword = 800;
 //	return true;
 }

@@ -68,7 +68,7 @@ void scan_platform(void)
 //	gBootOrder = (void*)BootOrder;
 	
 	build_pci_dt();
-	verbose("1:Platform=%x root_pci=%x\n", gPlatform, gRootPCIDev);
+	//verbose("1:Platform=%x root_pci=%x\n", gPlatform, gRootPCIDev);
 	scan_cpu(Platform);
 	//scan_mem(); Rek: called after pci devs init in fake_efi now ...
 }

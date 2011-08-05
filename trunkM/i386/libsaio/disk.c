@@ -1648,9 +1648,9 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 #if DEBUG //Azi: warning - too big for boot-log.. far too big.. i mean HUGE!! :P
   for (bvr = chain; bvr; bvr = bvr->next)
   {
-    printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
+    verbose(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
   }
-  printf("count: %d\n", bvCount);
+  verbose("count: %d\n", bvCount);
 //  getchar();
 #endif
 
