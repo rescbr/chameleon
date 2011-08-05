@@ -32,7 +32,10 @@ LIBDEP= libsaio.a libsa.a
 
 OTHER_FILES =
 
-OBJECTS = boot2 boot 
+# enable boot2 to find boot_modules.c
+VPATH = $(ROOT)/sym/modules/
+
+OBJECTS = boot2 boot boot_modules
 #boot_modules
 
 DIRS_NEEDED = 
