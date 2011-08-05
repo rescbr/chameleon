@@ -19,13 +19,9 @@ ifeq ($(CONFIG_FDISK440),y)
 
 all: $(SYMROOT) $(OBJROOT) $(PROGRAM)
 
-$(PROGRAM): $(ACTUAL_OBJECTS)
+$(PROGRAM): $(NATIVE_OBJECTS)
 	@echo "\t[LD:${ARCH}] $(@F)"
-	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch ${ARCH} -o $(SYMROOT)/$(@F).${ARCH} $(ACTUAL_OBJECTS)
-
-	@#echo "\t[LIPO] $(@F)"
-	@#lipo -create -arch i386 $(SYMROOT)/$(@F).i386 -arch ppc $(SYMROOT)/$(@F).ppc -output $(SYMROOT)/$(@F)
-	@#$(RM) $(SYMROOT)/$(@F).i386 $(SYMROOT)/$(@F).x86_64 $(SYMROOT)/$(@F).ppc
+	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(NATIVE_OBJECTS)
 
 else
 all:

@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 					, 1, outfile);
 	
 	char* symtab = malloc(dylib.symtab.stroff + dylib.symtab.strsize - sizeof(dylib) + 1); // Add extra 1 for last symbol
-	bzero(symtab, dylib.symtab.nsyms * sizeof(struct nlist) + dylib.symtab.strsize + 1);
+	memset(symtab, 0, dylib.symtab.nsyms * sizeof(struct nlist) + dylib.symtab.strsize + 1);
 	char* orig = symtab;
 	
 	//symtab += offset;

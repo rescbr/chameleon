@@ -27,7 +27,7 @@ OBJECTS += openUp
 endif
 
 
-LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
+LDFLAGS = $(TARGET_LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.4
 
 SYMPROG = $(addsuffix $(addprefix $(SYMROOT)/, $(PROGRAMS)), .${ARCH})
 
@@ -40,13 +40,9 @@ all: $(OBJROOT) $(SYMROOT) $(SYMPROG) fdisk440
 
 
 
-$(SYMPROG): ${ACTUAL_OBJECTS}
+$(SYMPROG): ${NATIVE_OBJECTS}
 	@echo "\t[LD:${ARCH}] $(@F)"
-	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch ${ARCH} -o $(SYMROOT)/$(@F).${ARCH} $(OBJROOT)/$(@F).${ARCH}o
-
-	@#echo "\t[LIPO] $(@F)"
-	@#lipo -create -arch i386 $(SYMROOT)/$(@F).i386 -arch ppc $(SYMROOT)/$(@F).ppc -output $(SYMROOT)/$(@F)
-	@#$(RM) $(SYMROOT)/$(@F).i386 $(SYMROOT)/$(@F).ppc
+	@$(TARGET_CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -o $(SYMROOT)/$(@F) $(OBJROOT)/$(@F).o
 
 .PHONY: fdisk440
 fdisk440:

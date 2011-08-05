@@ -26,6 +26,8 @@ $(OBJROOT)/%.o: %.cpp $(OBJROOT)
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
+NATIVE_OBJECTS = $(addsuffix .o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
+
 
 $(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
 	@echo "\t[MKDIR] $@"

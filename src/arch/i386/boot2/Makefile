@@ -20,7 +20,7 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc++ -Wmost -Werror -static \
 
 
 #todo: ensur ecorrect arch
-MACHOCONV = ${SYMROOT}/../util/machOconv.${ARCH}
+MACHOCONV = ${SYMROOT}/../util/machOconv
 
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
@@ -75,7 +75,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 
 	@# Generate the Symbols.dylib file
 	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/../util/dyldsymboltool.${ARCH} $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	@$(SYMROOT)/../util/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@echo "\t[LD] boot.sys"
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
@@ -88,7 +88,7 @@ boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP)
 
 	@# Generate the Symbols.dylib file
 	@echo "\t[dyldsymboltool] Symbols.dylib"
-	@$(SYMROOT)/../util/dyldsymboltool.${ARCH} $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
+	@$(SYMROOT)/../util/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@${RM} $(SYMROOT)/boot.sys
 	@echo "\t[LD] boot.sys"
