@@ -384,8 +384,8 @@ void scan_cpu(PlatformInfo_t *p)
 					if (flex_ratio == 0) {
 						/* Clear bit 16 (evidently the
 						   presence bit) */
-						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
-						msr = rdmsr64(MSR_FLEX_RATIO);
+						//wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
+						//msr = rdmsr64(MSR_FLEX_RATIO);
                         verbose("Unusable flex ratio detected.  Patched MSR now %08x\n", bitfield(msr, 31, 0));
 					} else {
 						if (bus_ratio_max > flex_ratio) {
@@ -394,9 +394,9 @@ void scan_cpu(PlatformInfo_t *p)
 					}
 				}
 
-				if (bus_ratio_max) {
+/*				if (bus_ratio_max) {
 					fsbFrequency = (tscFrequency / bus_ratio_max);
-				}
+				} */
 				//valv: Turbo Ratio Limit
 	/*			if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
 					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
