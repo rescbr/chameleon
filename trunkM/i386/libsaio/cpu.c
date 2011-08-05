@@ -12,7 +12,7 @@
 #include "boot.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 0
+#define DEBUG_CPU 1
 #endif
 
 #if DEBUG_CPU
@@ -346,9 +346,12 @@ void scan_cpu(PlatformInfo_t *p)
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
-	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06)
+											|| (p->CPU.Family == 0x0f)))
+	{
 //		int intelCPU = p->CPU.Model;
-		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
+		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))
+		{
 			/* Nehalem CPU model */
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM || 
                                           p->CPU.Model == CPU_MODEL_FIELDS || 
@@ -358,7 +361,8 @@ void scan_cpu(PlatformInfo_t *p)
                                           p->CPU.Model == CPU_MODEL_NEHALEM_EX ||
                                           p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
                                           p->CPU.Model == CPU_MODEL_SANDY ||
-                                          p->CPU.Model == CPU_MODEL_SANDY_XEON)) {
+                                          p->CPU.Model == CPU_MODEL_SANDY_XEON))
+			{
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(0x%04x): platform_info %08x-%08x\n", MSR_PLATFORM_INFO,
 				(msr >> 32) & 0xffffffff, msr & 0xffffffff);
@@ -399,9 +403,9 @@ void scan_cpu(PlatformInfo_t *p)
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
 				} else */
-				{
+		//		{
 					cpuFrequency = tscFrequency;
-				}
+		//		}
 				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
@@ -493,7 +497,7 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 	}
 		DBG("CPU is %s\n", p->CPU.Mobile?"Mobile":"Desktop");
-			
+#endif		
 	}
 	else if((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
     {
@@ -567,7 +571,7 @@ void scan_cpu(PlatformInfo_t *p)
         }
         if(!cpuFrequency) cpuFrequency = tscFrequency;
     }
-#endif    
+    
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;
