@@ -101,6 +101,7 @@ dylib: 		  ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
 ###### Build module into the code binary ######
 $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
+	@echo "\t[LD:${ARCH}] (LINKER) $(MODULE_NAME).${ARCH}dylib"
 	@ld -arch ${ARCH} \
 	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
