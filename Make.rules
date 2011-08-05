@@ -10,19 +10,19 @@ PAX = /bin/pax
 
 $(OBJROOT)/%.o: %.c $(OBJROOT)
 	@echo "\t[CC] $<"
-	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(NATIVE_CC) ${CONFIG_OPTIMIZATION_LEVEL} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o: %.m $(OBJROOT)
 	@echo "\t[M] $<"
-	@$(NATIVE_CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(NATIVE_CC) ${CONFIG_OPTIMIZATION_LEVEL} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o: %.cpp $(OBJROOT)
 	@echo "\t[CPP] $<"
-	@$(NATIVE_CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(NATIVE_CPP) ${CONFIG_OPTIMIZATION_LEVEL} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 

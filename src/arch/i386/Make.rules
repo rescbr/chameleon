@@ -11,25 +11,25 @@ NASM = $(shell which nasm) -p $(SRCROOT)/autoconf.inc
 ##### i386 Rules #####
 $(OBJROOT)/%.${ARCH}o: %.c $(OBJROOT)
 	@echo "\t[CC:I386] $<"
-	@$(TARGET_CC) -arch ${ARCH}  $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) ${CONFIG_OPTIMIZATION_LEVEL} -arch ${ARCH}  $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.m $(OBJROOT)
 	@echo "\t[M:I386] $<"
-	@$(TARGET_CC) -arch ${ARCH} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	@$(TARGET_CC) ${CONFIG_OPTIMIZATION_LEVEL}  -arch ${ARCH} $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.cpp $(OBJROOT)
 	@echo "\t[CPP:I386] $<"
-	@$(TARGET_CPP) -arch ${ARCH} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	@$(TARGET_CPP) ${CONFIG_OPTIMIZATION_LEVEL} -arch ${ARCH} $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	@md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.${ARCH}o: %.s
 	@echo "\t[AS:I386] $<"
-	@$(TARGET_CC) -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
+	@$(TARGET_CC) ${CONFIG_OPTIMIZATION_LEVEL} -arch ${ARCH} $(CPPFLAGS) -c $(INC) -o $@ $< \
 		    -MD -dependency-file $*.d
 	@md -u $(OBJROOT)/Makedep -f -d $*.d
 	
