@@ -5,9 +5,9 @@
 #
 ROOT = $(shell pwd)/../../../
 SRCROOT = ${ROOT}/src
-OBJROOT = $(ROOT)/obj/i386
-SYMROOT = $(ROOT)/sym/i386
-DSTROOT = $(ROOT)/dst/usr/standalone/i386
+OBJROOT = $(ROOT)/obj/${ARCH}
+SYMROOT = $(ROOT)/sym/${ARCH}
+DSTROOT = $(ROOT)/dst/usr/standalone/${ARCH}
 DOCROOT = $(ROOT)/doc
 
 include ${ROOT}/Make.rules

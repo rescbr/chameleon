@@ -1,9 +1,9 @@
 ROOT = $(shell pwd)/../../../../
 DIR = boot2
 SRCROOT = ${ROOT}/src
-OBJROOT = $(ROOT)/obj/i386/${DIR}
-SYMROOT = $(ROOT)/sym/i386
-DSTROOT = $(ROOT)/dst/usr/standalone/i386/
+OBJROOT = $(ROOT)/obj/${ARCH}/${DIR}
+SYMROOT = $(ROOT)/sym/${ARCH}
+DSTROOT = $(ROOT)/dst/usr/standalone/${ARCH}/
 DOCROOT = $(ROOT)/doc
 
 OPTIM =  -Oz

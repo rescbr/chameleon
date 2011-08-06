@@ -1,14 +1,12 @@
 ROOT = $(shell pwd)/../../../../
-DIR = libsaio
+DIR = ci
 SRCROOT = ${ROOT}/src
 OBJROOT = $(ROOT)/obj/${ARCH}/${DIR}
 SYMROOT = $(ROOT)/sym/${ARCH}
 DSTROOT = $(ROOT)/dst/usr/standalone/${ARCH}/
 DOCROOT = $(ROOT)/doc
 
-UTILDIR = ../util
-LIBSADIR = ../libsa
-BOOT2DIR = ../boot2
+INCLUDESDIR = ../include
 
 CFLAGS	:= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -static -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER $(OMIT_FRAME_POINTER_CFLAG) \
@@ -23,12 +21,11 @@ CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
 
 DEFINES = -DNOTHING
 
-INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/include
+INC = -I. -I$(SYMROOT) -I$(INCLUDESDIR) -I${SRCROOT}/include
 
-OBJECTS = table asm bios biosfn \
-			misc console
+OBJECTS = ci_io ci Control2 MAC-PARTS sl_words
 
-LIBS  = libsaio.a
+LIBS  = libci.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))
 
 DIRS_NEEDED = 

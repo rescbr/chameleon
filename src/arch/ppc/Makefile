@@ -5,15 +5,15 @@
 #
 ROOT = $(shell pwd)/../../../
 SRCROOT = ${ROOT}/src
-OBJROOT = $(ROOT)/obj/i386
-SYMROOT = $(ROOT)/sym/i386
+OBJROOT = $(ROOT)/obj/${ARCH}
+SYMROOT = $(ROOT)/sym/${ARCH}
 DSTROOT = $(ROOT)/dst/usr/standalone/${ARCH}
 DOCROOT = $(ROOT)/doc
 
 include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS =
+SUBDIRS = libclite ci
 
 all: ${OBJROOT} ${SYMROOT}
 	@for i in ${SUBDIRS};						  \
