@@ -22,8 +22,8 @@ CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
 INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
 OBJECTS = prf printf \
-	string strtol error \
-	setjmp qsort efi_tables
+	string error \
+	setjmp efi_tables
 
 LIBS = libsa.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))

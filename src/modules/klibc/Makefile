@@ -15,13 +15,13 @@ MODULE_OBJS = 	klibc zalloc\
 		__umoddi3 __umodsi3 \
 		strntoumax strntoimax atoi atol atoll \
 		strcasecmp strncasecmp strlcat strndup strnlen  \
-		strsep strtoimax strtok_r strtok strtol strtoll \
+		strsep strtoimax strtok_r strtok strtoll \
 		strtotimespec strtotimeval \
 		strtoul strtoull strtoumax strxspn strpbrk \
 		bsearch calloc \
 		jrand48 lrand48 mrand48 srand48 nrand48 seed48 \
 		memccpy memcpy memset bzero memchr memmem memmove memrchr memswap memcmp \
-		strcmp strncmp strcpy strncpy strlcpy strstr strncat strcat strdup strncasecmp strchr strlen \
+		strcmp strncmp strcpy strncpy strlcpy strstr strncat strcat strdup strncasecmp strchr strlen strtoul strtol \
 		qsort sha1hash onexit atexit exit \
 		snprintf vsnprintf sscanf vsscanf\
 		fwrite fprintf vfprintf printf
