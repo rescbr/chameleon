@@ -895,7 +895,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 	SMBByte tmp = 0;
 	SMBWord tmpW = 0;
 
-	int dimmnbr = 0;
+//	int dimmnbr = 0;
 	Platform->DMI.MaxMemorySlots	= 0;
 	Platform->DMI.CntMemorySlots	= 0;
 	Platform->DMI.MemoryModules	= 0;
@@ -916,9 +916,9 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 // do not need in complex MSR calculation				
 			case kSMBTypeProcessorInformation:
 				tmpW = ((SMBProcessorInformation *)structHeader)->externalClock;
-				Platform->CPU.FSBFrequency = tmpW * MEGA + (tmpW & 7) * 110000; //According to Intel 133->133.33MHz
+				Platform->CPU.FSBFrequency = (uint64_t)tmpW * MEGA + (uint64_t)(tmpW % 10) * 110000; //According to Intel 133->133.33MHz
 				tmpW = ((SMBProcessorInformation *)structHeader)->currentClock;
-				Platform->CPU.CPUFrequency = tmpW * MEGA + (tmpW & 7) * 110000;
+				Platform->CPU.CPUFrequency = (uint64_t)tmpW * MEGA + (uint64_t)(tmpW % 10) * 110000;
 				msglog("From SMBIOS: FSB=%d CPU=%d\n", Platform->CPU.FSBFrequency, Platform->CPU.CPUFrequency);
 				break;
 	
@@ -926,7 +926,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 				Platform->DMI.MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
 				break;
 
-			case kSMBTypeMemoryDevice:
+/*			case kSMBTypeMemoryDevice:
 				Platform->DMI.CntMemorySlots++;
 				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
 					Platform->DMI.MemoryModules++;
@@ -934,6 +934,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 					Platform->RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
 				dimmnbr++;
 				break;
+ */
 		}
 
 		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);

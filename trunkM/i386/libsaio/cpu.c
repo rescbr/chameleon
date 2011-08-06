@@ -12,7 +12,7 @@
 #include "boot.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 1
+#define DEBUG_CPU 0
 #endif
 
 #if DEBUG_CPU
@@ -142,6 +142,7 @@ static uint64_t measure_mperf_frequency(void)
 /*
  * Measures the Actual Performance Frequency in Hz (64-bit)
  */
+#if 0
 static uint64_t measure_aperf_frequency(void)
 {
     uint64_t aperfStart;
@@ -191,7 +192,7 @@ static uint64_t measure_aperf_frequency(void)
     disable_PIT2();
     return retval;
 }
-
+#endif
 
 /*
  * Calculates the FSB and CPU frequencies using specific MSRs for each CPU
@@ -205,10 +206,11 @@ static uint64_t measure_aperf_frequency(void)
 void scan_cpu(PlatformInfo_t *p)
 {
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
-	uint64_t	msr, flex_ratio;
+	uint64_t	msr;
+	//, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, bus_ratio_max, currdiv;
-	const char *newratio;
-	int len, myfsb;
+//	const char *newratio;
+	int /*len,*/ myfsb;
 	uint8_t bus_ratio_min;
 	uint32_t max_ratio, min_ratio;
 
@@ -344,8 +346,17 @@ void scan_cpu(PlatformInfo_t *p)
 
 	tscFrequency = measure_tsc_frequency();
 	fsbFrequency = 0;
-	cpuFrequency = 0;
-
+	cpuFrequency = tscFrequency;
+	msr = rdmsr64(MSR_IA32_PERF_STATUS);
+	DBG("msr(0x%x): ia32_perf_stat 0x%08x\n", MSR_IA32_PERF_STATUS, bitfield(msr, 31, 0));
+	currcoef = bitfield(msr, 7, 0);
+//	if (currcoef) {
+//		fsbFrequency = cpuFrequency / currcoef;
+//	} else {
+		fsbFrequency = 133 * 1000000;
+//	}
+	
+#if 0
 	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06)
 											|| (p->CPU.Family == 0x0f)))
 	{
@@ -366,6 +377,20 @@ void scan_cpu(PlatformInfo_t *p)
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(0x%04x): platform_info %08x-%08x\n", MSR_PLATFORM_INFO,
 				(msr >> 32) & 0xffffffff, msr & 0xffffffff);
+				msr = rdmsr64(MSR_IA32_PERF_STATUS);
+				DBG("msr(0x%x): ia32_perf_stat 0x%08x\n", MSR_IA32_PERF_STATUS, bitfield(msr, 31, 0));
+				currcoef = bitfield(msr, 7, 0);
+				if (currcoef) {
+					fsbFrequency = cpuFrequency / currcoef;
+				} else {
+					fsbFrequency = 133 * 1000000;
+				}
+				DBG("initial values: FSB=%d CPU=%d\n", fsbFrequency, cpuFrequency);
+#if DEBUG_CPU
+				getchar();
+#endif
+				
+#if 0				
 				bus_ratio_max = bitfield(msr, 14, 8);
                 bus_ratio_min = bitfield(msr, 46, 40); //valv: not sure about this one (Remarq.1)
 			//	msr = rdmsr64(MSR_FLEX_RATIO);
@@ -386,7 +411,7 @@ void scan_cpu(PlatformInfo_t *p)
 						   presence bit) */
 						//wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 						//msr = rdmsr64(MSR_FLEX_RATIO);
-                        verbose("Unusable flex ratio detected.  Patched MSR now %08x\n", bitfield(msr, 31, 0));
+                        DBG("Unusable flex ratio detected.  Patched MSR now %08x\n", bitfield(msr, 31, 0));
 					} else {
 						if (bus_ratio_max > flex_ratio) {
 							bus_ratio_max = flex_ratio;
@@ -406,7 +431,8 @@ void scan_cpu(PlatformInfo_t *p)
 		//		{
 					cpuFrequency = tscFrequency;
 		//		}
-				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
+#endif				
+/*				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
 					if (len >= 3) max_ratio = (max_ratio + 5);
@@ -421,18 +447,27 @@ void scan_cpu(PlatformInfo_t *p)
 					} else {
 						max_ratio = (bus_ratio_max * 10);
 					}
+				} else {
+					max_ratio = currcoef;
 				}
+*/
+				max_ratio = currcoef;
+				min_ratio = currcoef;
 				//valv: to be uncommented if Remarq.1 didn't stick
 				/*if(bus_ratio_max > 0) bus_ratio = flex_ratio;*/
 				p->CPU.MaxRatio = max_ratio;
 				p->CPU.MinRatio = min_ratio;
 
-				myfsb = fsbFrequency / 1000000;
-				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio);
-				currcoef = bus_ratio_max;
+//				myfsb = fsbFrequency / 1000000;
+				DBG("Sticking with [BCLK: %dhz, Bus-Ratio: %d]\n", fsbFrequency, max_ratio);
+				currcoef = max_ratio;
+#if DEBUG_CPU
+				getchar();
+#endif
+				
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(0x%x): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
+				DBG("msr(0x%x): ia32_perf_stat 0x%08x\n", MSR_IA32_PERF_STATUS, bitfield(msr, 31, 0));
 				currcoef = bitfield(msr, 12, 8);
 				/* Non-integer bus ratio for the max-multi*/
                 maxdiv = bitfield(msr, 46, 46);
@@ -466,7 +501,7 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		/* Mobile CPU ? */
 //Slice -  no more needed
-#if 0 // DEBUG_CPU
+/* // DEBUG_CPU
 	pause();
 
 	
@@ -495,9 +530,10 @@ void scan_cpu(PlatformInfo_t *p)
 			if (p->CPU.Mobile) {
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
-	}
+*/				
+//	}
 		DBG("CPU is %s\n", p->CPU.Mobile?"Mobile":"Desktop");
-#endif		
+	
 	}
 	else if((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
     {
@@ -571,6 +607,12 @@ void scan_cpu(PlatformInfo_t *p)
         }
         if(!cpuFrequency) cpuFrequency = tscFrequency;
     }
+#endif	
+#if DEBUG_CPU
+	DBG("ready to finish...\n");
+	getchar();
+#endif
+	
     
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;

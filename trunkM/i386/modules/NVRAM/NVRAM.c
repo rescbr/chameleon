@@ -44,7 +44,6 @@ EFI_UINT32 const STATIC_ZERO = 0;
 #define UUID_LEN	16
 
 //extern EFI_GUID* getSystemID();
-void NVRAM_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 void NVRAM_start(void);
 
 typedef struct {

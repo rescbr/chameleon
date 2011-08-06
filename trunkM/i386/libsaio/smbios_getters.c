@@ -48,7 +48,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D:					// ???
+					case CPU_MODEL_PENTIUM_M:					// Dotah
 					case CPU_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
 					case CPU_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
 					case CPU_MODEL_PENRYN:		// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
@@ -60,7 +60,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm) Clarkdale
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
@@ -138,7 +138,7 @@ bool getSMBOemProcessorType(returnType *value)
 			{
 				switch (Platform->CPU.Model)
 				{
-					case 0x0D:							// ???
+					case CPU_MODEL_PENTIUM_M:							// Dothan
 					case CPU_MODEL_YONAH:				// Intel Mobile Core Solo, Duo
 					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
 					case CPU_MODEL_PENRYN:				// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
@@ -206,7 +206,7 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 		map = Platform->DMI.DIMM[idx];
 		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0)
 		{
-			DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
+			msglog("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
 			value->byte = Platform->RAM.DIMM[map].Type;
 			return true;
 		}
@@ -220,8 +220,8 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 {
 //Slice - do not use SPD value for memory speed. DMI has real value.
-return false;
-/*	static int idx = -1;
+//return false;
+	static int idx = -1;
 	int	map;
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
@@ -229,13 +229,13 @@ return false;
 		map = Platform->DMI.DIMM[idx];
 		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0)
 		{
-			DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
+			msglog("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
 			value->dword = Platform->RAM.DIMM[map].Frequency;
 			return true;
 		}
 	}
 
-	return false; */
+	return false; 
 //	value->dword = 800;
 //	return true;
 }

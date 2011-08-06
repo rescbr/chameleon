@@ -14,4 +14,6 @@ source "i386/modules/HPET/Cconfig"
 source "i386/modules/Memory/Cconfig"
 source "i386/modules/Networking/Cconfig"
 source "i386/modules/USBFix/Cconfig"
+source "i386/modules/RamDiskLoader/Cconfig"
+source "i386/modules/HelloWorld/Cconfig"
 endmenu

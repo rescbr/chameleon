@@ -1,14 +1,14 @@
 MODULE_NAME = KextPatcher
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
-MODULE_START = _$(MODULE_NAME)_start
+MODULE_START = $(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
 DIR = KextPatcher
 
 MODULE_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
 
-OPTIM = -Os -Oz
+OPTIM = -Oz
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_HELLO_WORLD=1
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
