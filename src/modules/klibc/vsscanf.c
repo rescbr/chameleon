@@ -4,11 +4,12 @@
  * vsscanf(), from which the rest of the scanf()
  * family is built
  */
-
-//#include "libsaio.h"
-//Azi: "UCHAR_MAX" & "UINT_MAX" redefined error - limits.h is also present in i386/include.
-#include "libsa.h"
-#include "limits.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <limits.h>
+#include <ctype.h>
+#include <stdint.h>
 
 extern uintmax_t strntoumax(const char *nptr, char **endptr, int base, size_t n);
 

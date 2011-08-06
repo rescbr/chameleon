@@ -3,7 +3,9 @@
  *
  * The strntoumax() function and associated
  */
-#include "libsaio.h"
+#include <stdlib.h>
+#include <stdint.h>
+#include <ctype.h>
 
 static inline int digitval(int ch)
 {

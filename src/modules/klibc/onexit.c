@@ -2,7 +2,7 @@
  * onexit.c
  */
 
-#include "libsaio.h"
+#include <stdlib.h>
 #include "atexit.h"
 
 int on_exit(void (*fctn) (int, void *), void *arg)

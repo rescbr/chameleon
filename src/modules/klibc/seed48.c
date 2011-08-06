@@ -2,7 +2,7 @@
  * seed48.c
  */
 
-#include "libsaio.h"
+#include <string.h>
 
 unsigned short __rand48_seed[3];
 

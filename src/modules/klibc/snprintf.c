@@ -2,7 +2,9 @@
  * snprintf.c
  */
 
-#include "libsaio.h"
+#include <stdio.h>
+#include <stdarg.h>
+
 extern int vsnprintf(char *buffer, size_t n, const char *format, va_list ap);
 
 int snprintf(char *buffer, size_t n, const char *format, ...)

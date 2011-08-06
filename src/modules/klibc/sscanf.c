@@ -2,8 +2,9 @@
  * sscanf()
  */
 
-#include "libsaio.h"
-extern int vsscanf(const char *buffer, const char *format, va_list ap);
+#include <stdio.h>
+#include <stdarg.h>
+
 int sscanf(const char *str, const char *format, ...)
 {
 	va_list ap;
