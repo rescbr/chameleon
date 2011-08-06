@@ -258,8 +258,12 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),		NULL,	NULL,	NULL},
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),	NULL,	NULL,	NULL},
-
-
+	//-------------------------------------------------------------------------------------------------------------------------
+	// SystemEnclosure
+	//-------------------------------------------------------------------------------------------------------------------------
+	{kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, manufacturer),
+		kSMBBaseBoardManufacturerKey,	NULL,	&defaultBaseBoard.manufacturer	},
+	
 	//-------------------------------------------------------------------------------------------------------------------------
 	// ProcessorInformation
 	//-------------------------------------------------------------------------------------------------------------------------

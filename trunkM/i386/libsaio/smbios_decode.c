@@ -90,7 +90,7 @@ void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
 	DBG("\ttype: %d\n", structHeader->type);
 //	DBG("\tversion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
 	DBG("\tserialNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
-	DBG("\tassetTagNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
+//	DBG("\tassetTagNumber: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
 	DBG("\n");
 }
 
