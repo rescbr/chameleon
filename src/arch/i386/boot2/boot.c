@@ -50,13 +50,14 @@
  */
 
 
+#include <stdio.h>
+
 #include "boot.h"
 
 extern void init_module_system();
 extern int execute_hook(const char* name, void*, void*, void*, void*);
 
 extern void   bzero(void * dst, size_t len);
-extern void   stop(const char *format, ...);
 extern void   enableA20(void);
 extern void   video_mode(int mode);
 extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
@@ -78,7 +79,8 @@ static void zeroBSS(void)
 
 static void malloc_error(char *addr, size_t size, const char *file, int line)
 {
-	stop("\nMemory allocation error! Addr=0x%x, Size=0x%x, File=%s, Line=%d\n", (unsigned)addr, (unsigned)size, file, line);
+	printf("\nMemory allocation error! Addr=0x%x, Size=0x%x, File=%s, Line=%d\n", (unsigned)addr, (unsigned)size, file, line);
+	while(1);
 }
 
 //==========================================================================

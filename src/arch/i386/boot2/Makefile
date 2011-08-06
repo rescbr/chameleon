@@ -27,9 +27,10 @@ LIBSAIODIR = ../libsaio
 
 INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
-LIBS= -L$(SYMROOT) -lsaio -lsa
-LIBDEP= libsaio.a libsa.a
-
+LIBS= -L$(SYMROOT)  -lsaio
+#-lsaio
+LIBDEP=  libsaio.a
+#libsaio.a
 OTHER_FILES =
 
 # enable boot2 to find boot_modules.c

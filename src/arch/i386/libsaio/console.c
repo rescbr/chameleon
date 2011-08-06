@@ -49,71 +49,6 @@
 bool gVerboseMode;
 bool gErrors;
 
-/*
- *  Azi: Doubled available log size; this seems to fix some hangs and instant reboots caused by
- *  booting with -f (ignore caches). 96kb are enough to hold full log, booting with -f; even so,
- *  this depends on how much we "play" at the boot prompt and with what patches we're playing,
- *  depending on how much they print to the log.
- *	
- *  Kabyl: BooterLog
- */
-#define BOOTER_LOG_SIZE	(128 * 1024)
-#define SAFE_LOG_SIZE	134
-
-char *msgbuf = 0;
-char *cursor = 0;
-
-struct putc_info //Azi: exists on gui.c & printf.c
-{
-    char * str;
-    char * last_str;
-};
-
-static int
-sputc(int c, struct putc_info * pi) //Azi: same as above
-{
-	if (pi->last_str)
-	if (pi->str == pi->last_str)
-	{
-		*(pi->str) = '\0';
-		return 0;
-	}
-	*(pi->str)++ = c;
-    return c;
-}
-
-void initBooterLog(void)
-{
-	msgbuf = malloc(BOOTER_LOG_SIZE);
-	bzero(msgbuf, BOOTER_LOG_SIZE);
-	cursor = msgbuf;
-}
-
-void msglog(const char * fmt, ...)
-{
-	va_list ap;
-	struct putc_info pi;
-
-	if (!msgbuf)
-		return;
-
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-		return;
-
-	va_start(ap, fmt);
-	pi.str = cursor;
-	pi.last_str = 0;
-	prf(fmt, ap, sputc, &pi);
-	va_end(ap);
-	cursor += strlen((char *)cursor);
-}
-
-void setupBooterLog(void)
-{
-	if (!msgbuf)
-		return;
-}
-/* Kabyl: !BooterLog */
 
 /*
  * write one character to console
@@ -158,58 +93,6 @@ int getchar()
 //	if ( c >= ' ' && c < 0x7f) putchar(c);
 	
 	return (c);
-}
-
-int verbose(const char * fmt, ...)
-{
-    va_list ap;
-
-	va_start(ap, fmt);
-    if (gVerboseMode)
-    {
-        prf(fmt, ap, putchar, 0);
-    }
-
-	{
-		// Kabyl: BooterLog
-		struct putc_info pi;
-
-		if (!msgbuf)
-			return 0;
-
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-			return 0;
-		pi.str = cursor;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		cursor +=  strlen((char *)cursor);
-	}
-
-    va_end(ap);
-    return(0);
-}
-
-int error(const char * fmt, ...)
-{
-    va_list ap;
-    gErrors = true;
-    va_start(ap, fmt);
-    prf(fmt, ap, putchar, 0);
-	va_end(ap);
-    return(0);
-}
-
-void stop(const char * fmt, ...)
-{
-	va_list ap;
-
-	printf("\n");
-	va_start(ap, fmt);
-    prf(fmt, ap, putchar, 0);
-	va_end(ap);
-	printf("\nThis is a non recoverable error! System HALTED!!!");
-	halt();
-	while (1);
 }
 
 /** Print a "Press a key to continue..." message and wait for a key press. */
