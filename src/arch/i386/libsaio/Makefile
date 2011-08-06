@@ -26,7 +26,7 @@ DEFINES = -DNOTHING
 INC = -I. -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/include
 
 OBJECTS = table asm bios biosfn \
-			misc xml load console
+			misc console
 
 LIBS  = libsaio.a
 LIBS := $(addprefix $(SYMROOT)/, $(LIBS))

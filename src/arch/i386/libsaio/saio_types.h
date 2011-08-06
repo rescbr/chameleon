@@ -30,7 +30,6 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include "bios.h"
-#include "bootargs.h"
 
 #if DEBUG
 #define DEBUG_DISK(x)    printf x
