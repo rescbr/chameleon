@@ -22,8 +22,10 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "libsaio.h"
-#include "sl.h"
 #include "xml.h"
 
 string_ref *ref_strings = NULL;

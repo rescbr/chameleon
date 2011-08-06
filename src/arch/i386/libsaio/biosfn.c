@@ -39,7 +39,7 @@
     2007-12-29 dfe
     - Added ebiosEjectMedia
  */
-
+#include <string.h>
 #include "libsaio.h"
 
 
@@ -246,7 +246,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 #endif
 
     // Copy out data
-    bcopy((char *)BIOS_ADDR, rangeArray, ((char *)range - (char *)BIOS_ADDR));
+    memcpy((char *)BIOS_ADDR, rangeArray, ((char *)range - (char *)BIOS_ADDR));
 
 #if DEBUG
     {
@@ -488,7 +488,7 @@ int is_no_emulation(int drive)
 	} __attribute__((packed));
 	static struct packet pkt;
 	
-	bzero(&pkt, sizeof(pkt));
+	memset(&pkt, 0, sizeof(pkt));
 	pkt.packet_size = 0x13;
 	
 	bb.intno		= 0x13;
@@ -721,7 +721,7 @@ APMConnect32(void)
 #endif /* APM_SUPPORT */
 
 #ifdef EISA_SUPPORT
-bool eisa_present(void)
+char eisa_present(void)
 {
     static bool checked = false;
     static bool isEISA;

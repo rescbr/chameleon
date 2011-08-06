@@ -30,9 +30,7 @@
 #include <mach-o/loader.h>
 #include <mach/machine/thread_status.h>
 
-#include <sl.h>
 
-bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
 cpu_type_t archCpuType=CPU_TYPE_I386;
 
 // Public Functions

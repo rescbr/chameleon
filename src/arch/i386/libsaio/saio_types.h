@@ -62,11 +62,6 @@ struct Tag {
 };
 typedef struct Tag Tag, *TagPtr;
 
-typedef struct {
-	char	plist[4096];	// buffer for plist
-	TagPtr	dictionary;		// buffer for xml dictionary
-	bool	canOverride;	// flag to mark a dictionary can be overriden
-} config_file_t;
 
 typedef struct FinderInfo {
 	unsigned char data[16];
@@ -111,33 +106,6 @@ struct dirstuff {
 };
 
 #define BVSTRLEN 32
-
-struct BootVolume {
-	BVRef			 next;			  /* list linkage pointer */
-	int				 biosdev;		  /* BIOS device number */
-	int				 type;			  /* device type (floppy, hd, network) */
-	unsigned int	 flags;			  /* attribute flags */
-	BVGetDescription description;	  /* BVGetDescription function */
-	int				 part_no;		  /* partition number (1 based) */
-	unsigned int	 part_boff;		  /* partition block offset */
-	unsigned int	 part_type;		  /* partition type */
-	unsigned int	 fs_boff;		  /* 1st block # of next read */
-	unsigned int	 fs_byteoff;	  /* Byte offset for read within block */
-	FSLoadFile		 fs_loadfile;	  /* FSLoadFile function */
-	FSReadFile		 fs_readfile;	  /* FSReadFile function */
-	FSGetDirEntry	 fs_getdirentry;  /* FSGetDirEntry function */
-	FSGetFileBlock	 fs_getfileblock; /* FSGetFileBlock function */
-	FSGetUUID		 fs_getuuid;	  /* FSGetUUID function */
-	unsigned int	 bps;			  /* bytes per sector for this device */
-	char			 name[BVSTRLEN];  /* (name of partition) */
-	char			 type_name[BVSTRLEN]; /* (type of partition, eg. Apple_HFS) */
-	BVFree			 bv_free;		  /* BVFree function */
-	uint32_t		 modTime;
-	char			 label[BVSTRLEN]; /* partition volume label */
-	char			 altlabel[BVSTRLEN]; /* partition volume label */
-	bool			 filtered;		  /* newFilteredBVChain() will set to TRUE */
-	bool			 visible;		  /* will shown in the device list */
-};
 
 enum {
 	kBVFlagPrimary			= 0x01,

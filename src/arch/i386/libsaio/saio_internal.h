@@ -39,7 +39,7 @@ extern void   bios(biosBuf_t *bb);
 
 /* biosfn.c */
 #ifdef EISA_SUPPORT
-extern bool   eisa_present(void);
+extern char   eisa_present(void);
 #endif
 extern int    bgetc(void);
 extern int    biosread(int dev, int cyl, int head, int sec, int num);
@@ -71,15 +71,7 @@ extern unsigned long getExtendedMemorySize();
 extern unsigned long getConventionalMemorySize();
 extern void   sleep(int n);
 
-/* cache.c */
-extern void   CacheReset();
-extern void   CacheInit(CICell ih, long blockSize);
-extern long   CacheRead(CICell ih, char *buffer, long long offset,
-                        long length, long cache);
-
 /* console.c */
-extern bool   gVerboseMode;
-extern bool   gErrors;
 extern void   initBooterLog(void);
 extern void   msglog(const char * format, ...);
 extern void   setupBooterLog(void);
@@ -92,69 +84,13 @@ extern void   stop(const char *format, ...);
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
 
-/* disk.c */
-extern void   rescanBIOSDevice(int biosdev);
-extern struct DiskBVMap* diskResetBootVolumes(int biosdev);
-extern void   diskFreeMap(struct DiskBVMap *map);
-extern int    testBiosread( int biosdev, unsigned long long secno );
-extern BVRef  diskScanBootVolumes(int biosdev, int *count);
-extern void   diskSeek(BVRef bvr, long long position);
-extern int    diskRead(BVRef bvr, long addr, long length);
-extern int    diskIsCDROM(BVRef bvr);
-extern int    biosDevIsCDROM(int biosdev);
-extern BVRef  getBVChainForBIOSDev(int biosdev);
-extern BVRef  newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count);
-extern int    freeFilteredBVChain(const BVRef chain);
-extern int    rawDiskRead(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);
-extern int    rawDiskWrite(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);
-extern int    readBootSector(int biosdev, unsigned int secno, void *buffer);
-extern void   turnOffFloppy(void);
-extern int	  testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer );
-
-/* hfs_compare.c */
-extern int32_t FastUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1,
-							   u_int16_t *uniStr2, u_int32_t len2, int byte_order);
-extern void utf_encodestr( const u_int16_t * ucsp, int ucslen,
-                u_int8_t * utf8p, u_int32_t bufsize, int byte_order );
-extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp,
-                u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
-
 /* load.c */
-extern bool gHaveKernelCache;
 extern long ThinFatFile(void **binary, unsigned long *length);
 extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize);
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );
 long AllocateMemoryRange(char * rangeName, long start, long length, long type);
-
-/* misc.c */
-extern void   enableA20(void);
-extern int    checkForSupportedHardware();
-extern int	  isLaptop();
-extern void   getPlatformName(char *nameBuf);
-
-/* stringTable.c */
-extern char * newStringFromList(char **list, int *size);
-extern int    stringLength(const char *table, int compress);
-extern bool   getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size);
-extern bool   removeKeyFromTable(const char *key, char *table);
-extern char * newStringForStringTableKey(config_file_t *config, char *key);
-extern char * newStringForKey(char *key, config_file_t *configBuff);
-extern bool   getValueForBootKey(const char *line, const char *match, const char **matchval, int *len);
-extern bool   getValueForKey(const char *key, const char **val, int *size, config_file_t *configBuff);
-extern const char * getStringForKey(const char * key,  config_file_t *config);
-extern bool   getBoolForKey(const char *key, bool *val, config_file_t *configBuff);
-extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff);
-extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
-extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
-extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
-extern int    loadSystemConfig(config_file_t *configBuff);
-extern int    loadHelperConfig(config_file_t *configBuff);
-extern int    loadOverrideConfig(config_file_t *configBuff);
-extern char * newString(const char *oldString);
-extern char * getNextArg(char ** ptr, char * val);
-extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
 
 /* sys.c */
 extern BVRef  getBootVolumeRef( const char * path, const char ** outPath );
@@ -191,7 +127,6 @@ extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
 extern void   scanDisks(int biosdev, int *count);
 extern BVRef  selectBootVolume(BVRef chain);
-extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);
 extern void   setRootVolume(BVRef volume);
 extern void   setBootGlobals(BVRef chain);
 extern int    getDeviceDescription(BVRef volume, char *str);

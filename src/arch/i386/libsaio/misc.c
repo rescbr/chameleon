@@ -43,7 +43,7 @@
  * Copyright 1993 NeXT, Inc.
  * All rights reserved.
  */
-
+#include <string.h>
 #include "libsaio.h"
 
 /*

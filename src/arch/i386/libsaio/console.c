@@ -46,9 +46,6 @@
 
 #include "libsaio.h"
 
-bool gVerboseMode;
-bool gErrors;
-
 
 /*
  * write one character to console

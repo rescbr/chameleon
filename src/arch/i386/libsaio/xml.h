@@ -25,6 +25,10 @@
 #ifndef __LIBSAIO_XML_H
 #define __LIBSAIO_XML_H
 
+typedef char bool;
+#define false 0
+#define true 1
+
 enum xmltype {
   kTagTypeNone = 0,
   kTagTypeDict,

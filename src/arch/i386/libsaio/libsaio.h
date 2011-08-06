@@ -26,7 +26,7 @@
 #ifndef __LIBSAIO_LIBSAIO_H
 #define __LIBSAIO_LIBSAIO_H
 
-#include "libsa.h"
+#include <stdint.h>
 #include "memory.h"
 #include "io_inline.h"
 #include "saio_types.h"
