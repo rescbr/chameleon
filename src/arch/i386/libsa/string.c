@@ -25,54 +25,6 @@
 
 #include "libsa.h"
 
-void * memset(void * dst, int val, size_t len)
-{
-    asm volatile ( "rep; stosb"
-       : "=c" (len), "=D" (dst)
-       : "0" (len), "1" (dst), "a" (val)
-       : "memory" );
-
-    return dst;
-}
-
-#if 0
-void * memcpy(void * dst, const void * src, size_t len)
-{
-    asm volatile ( "rep; movsb"
-       : "=c" (len), "=D" (dst), "=S" (src)
-       : "0" (len), "1" (dst), "2" (src)
-       : "memory" );
-
-    return dst;
-}
-
-void bcopy(const void * src, void * dst, size_t len)
-{
-	memcpy(dst, src, len);
-}
-
-void bzero(void * dst, size_t len)
-{
-    memset(dst, 0, len);
-}
-
-#else
-void * memcpy(void * dst, const void * src, size_t len)
-{
-    asm volatile ( "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; movsl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; movsb           \n\t"
-       : "=D" (dst)
-       : "c" (len), "D" (dst), "S" (src)
-       : "memory", "%edx" );
-
-    return dst;
-}
-
 void bcopy(const void * src, void * dst, size_t len)
 {
     asm volatile ( "cld                  \n\t"
@@ -87,116 +39,13 @@ void bcopy(const void * src, void * dst, size_t len)
        : "memory", "%edx" );
 }
 
-void bzero(void * dst, size_t len)
-{
-    asm volatile ( "xorl %%eax, %%eax    \n\t"
-         "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; stosl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; stosb           \n\t"
-       : 
-       : "c" (len), "D" (dst)
-       : "memory", "%eax" );
-}
-#endif
-
 /* #if DONT_USE_GCC_BUILT_IN_STRLEN */
 
 #define tolower(c)     ((int)((c) & ~0x20))
 #define toupper(c)     ((int)((c) | 0x20))
 
-size_t strlen(const char * s)
-{
-	int n = 0;
-	while (*s++) n++;
-	return(n);
-}
-
 /*#endif*/
 
-/* NOTE: Moved from ntfs.c */
-int
-memcmp(const void *p1, const void *p2, size_t len)
-{
-    while (len--) {
-        if (*(const char*)(p1++) != *(const char*)(p2++))
-            return -1;
-    }
-    return 0;
-}
-
-int
-strcmp(const char * s1, const char * s2)
-{
-	while (*s1 && (*s1 == *s2)) {
-		s1++;
-		s2++;
-	}
-	return (*s1 - *s2);
-}
-
-int strncmp(const char * s1, const char * s2, size_t len)
-{
-	register int n = len;
-	while (--n >= 0 && *s1 == *s2++)
-		if (*s1++ == '\0')
-			return(0);
-	return(n<0 ? 0 : *s1 - *--s2);
-}
-
-char *
-strcpy(char * s1, const char * s2)
-{
-	register char *ret = s1;
-	while (*s1++ = *s2++)
-		continue;
-	return ret;
-}
-
-char *
-strncpy(char * s1, const char * s2, size_t n)
-{
-	register char *ret = s1;
-	while (n && (*s1++ = *s2++))
-		n--;
-	return ret;
-}
-
-size_t
-strlcpy(char * s1, const char * s2, size_t n)
-{
-	while (n && (*s1++ = *s2++))
-		n--;
-	if (!n) *--s1=0;
-	return strlen(s2);
-}
-
-char *
-strstr(const char *in, const char *str)
-{
-    char c;
-    size_t len;
-
-    c = *str++;
-    if (!c)
-        return (char *) in;	// Trivial empty string case
-
-    len = strlen(str);
-    do {
-        char sc;
-
-        do {
-            sc = *in++;
-            if (!sc)
-                return (char *) 0;
-        } while (sc != c);
-    } while (strncmp(in, str, len) != 0);
-
-    return (char *) (in - 1);
-}
 
 int
 ptol(const char *str)
@@ -210,63 +59,7 @@ ptol(const char *str)
 	else c = 0;
 	return c;
 }
-
-int
-atoi(const char *str)
-{
-	register int sum = 0;
-	while (*str == ' ' || *str == '\t')
-		str++;
-	while (*str >= '0' && *str <= '9') {
-		sum *= 10;
-		sum += *str++ - '0';
-	}
-	return sum;
-}
-
-char *strncat(char *s1, const char *s2, size_t n)
-{
-	register char *ret = s1;
-	while (*s1)
-		s1++;
-	while (n-- && *s2)
-		*s1++ = *s2++;
-	*s1 = '\0';
-	return ret;
-}
-
-char *strcat(char *s1, const char *s2)
-{
-	return(strncat(s1, s2, strlen(s2)));
-}
-
-char *strdup(const char *s1)
-{
-	return strcpy(malloc(strlen(s1) + 1), s1);
-}
-
-#if STRNCASECMP
-int strncasecmp(const char *s1, const char *s2, size_t len)
-{
-	register int n = len;
-	while (--n >= 0 && tolower(*s1) == tolower(*s2++))
-		if (*s1++ == '\0')
-			return(0);
-	return(n<0 ? 0 : tolower(*s1) - tolower(*--s2));
-}
-#endif
-
-char* strchr(const char *str, int c)
-{
-    do
-    {
-        if(*str == c)
-            return (char*)str;
-    }
-    while(*(str++));
-    
-    return 0;
-}        
+   
         
 char* strbreak(const char *str, char **next, long *len)
 {

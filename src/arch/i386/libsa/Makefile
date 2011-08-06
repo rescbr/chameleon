@@ -21,7 +21,7 @@ CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
 
 INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
-OBJECTS = prf printf zalloc \
+OBJECTS = prf printf \
 	string strtol error \
 	setjmp qsort efi_tables
 

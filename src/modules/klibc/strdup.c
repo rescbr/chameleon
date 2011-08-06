@@ -2,7 +2,8 @@
  * strdup.c
  */
 
-#include "libsaio.h"
+#include <string.h>
+#include <stdlib.h>
 
 char *strdup(const char *s)
 {

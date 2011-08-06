@@ -8,19 +8,20 @@ MODULE_DEPENDENCIES =
 
 DIR = klibc
 
-MODULE_OBJS = 	klibc \
+MODULE_OBJS = 	klibc zalloc\
 		__ashldi3 __ashrdi3 __clzsi2 __divdi3 __divsi3 \
 		__lshrdi3 __moddi3 __modsi3 __udivdi3 \
 		__udivmoddi4 __udivmodsi4 __udivsi3 \
 		__umoddi3 __umodsi3 \
-		strntoumax strntoimax atol atoll \
+		strntoumax strntoimax atoi atol atoll \
 		strcasecmp strncasecmp strlcat strndup strnlen  \
 		strsep strtoimax strtok_r strtok strtol strtoll \
 		strtotimespec strtotimeval \
 		strtoul strtoull strtoumax strxspn strpbrk \
 		bsearch calloc \
 		jrand48 lrand48 mrand48 srand48 nrand48 seed48 \
-		memccpy memchr memmem memmove memrchr memswap  \
+		memccpy memcpy memset bzero memchr memmem memmove memrchr memswap memcmp \
+		strcmp strncmp strcpy strncpy strlcpy strstr strncat strcat strdup strncasecmp strchr strlen \
 		qsort sha1hash onexit atexit exit \
 		snprintf vsnprintf sscanf vsscanf\
 		fwrite fprintf vfprintf printf

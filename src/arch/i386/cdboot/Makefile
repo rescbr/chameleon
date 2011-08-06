@@ -18,7 +18,7 @@ $(SYMROOT)/cdboot:
 	@dd if=$(SYMROOT)/boot of=$(SYMROOT)/cdboot conv=sync bs=2k seek=1 &> /dev/null
 
 	@# Update cdboot with boot file size info
-	@stat -f%z $(SYMROOT)/boot \
+	@stat -f %z $(SYMROOT)/boot \
 		| perl -ane "print pack('V',@F[0]);" \
 		| dd of=$(SYMROOT)/cdboot bs=1 count=4 seek=2044 conv=notrunc &> /dev/null
 
