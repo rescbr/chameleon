@@ -21,8 +21,8 @@ CPPFLAGS := $(CPPFLAGS) -static -nostdinc++ -Wmost -Werror \
 
 INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/include
 
-OBJECTS = prf printf \
-	string error \
+OBJECTS = prf \
+	error \
 	setjmp efi_tables
 
 LIBS = libsa.a

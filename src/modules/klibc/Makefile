@@ -20,10 +20,10 @@ MODULE_OBJS = 	klibc zalloc\
 		strtoul strtoull strtoumax strxspn strpbrk \
 		bsearch calloc \
 		jrand48 lrand48 mrand48 srand48 nrand48 seed48 \
-		memccpy memcpy memset bzero memchr memmem memmove memrchr memswap memcmp \
+		memccpy memcpy memset bzero bcopy memchr memmem memmove memrchr memswap memcmp \
 		strcmp strncmp strcpy strncpy strlcpy strstr strncat strcat strdup strncasecmp strchr strlen strtoul strtol \
 		qsort sha1hash onexit atexit exit \
-		snprintf vsnprintf sscanf vsscanf\
+		snprintf vsnprintf sscanf vsscanf sprintf \
 		fwrite fprintf vfprintf printf
 
 include ../MakeInc.dir
