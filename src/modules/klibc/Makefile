@@ -24,6 +24,7 @@ MODULE_OBJS = 	klibc zalloc\
 		strcmp strncmp strcpy strncpy strlcpy strstr strncat strcat strdup strncasecmp strchr strlen strtoul strtol \
 		qsort sha1hash onexit atexit exit \
 		snprintf vsnprintf sscanf vsscanf sprintf \
-		fwrite fprintf vfprintf printf
+		fwrite fprintf vfprintf printf\
+		fread2 fputc fputs fopen fread
 
 include ../MakeInc.dir

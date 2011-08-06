@@ -9,7 +9,7 @@ DOCROOT = $(ROOT)/doc
 include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = klibc uClibcxx ModuleSystem Disk FileSystem
+SUBDIRS = klibc uClibcxx ModuleSystem Disk FileSystem TinyXML
 # ModuleSystem
 
 CFLAGS= -O3 $(MORECPP) -g -static

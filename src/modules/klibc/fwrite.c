@@ -13,6 +13,7 @@ size_t _fwrite(const void *buf, size_t count, FILE *f)
 
 	while (count) {
 		rv = 1;
+		// TODO: use FILE*
         putchar(*p);
 
 		p += rv;

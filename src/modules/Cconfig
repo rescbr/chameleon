@@ -27,5 +27,8 @@ source "modules/uClibcxx/Cconfig"
 source "modules/Disk/Cconfig"
 source "modules/FileSystem/Cconfig"
 
+source "modules/TinyXML/Cconfig"
+
+
 source "modules/HelloWorld/Cconfig"
 endmenu

@@ -97,7 +97,7 @@ endif
 dylib_LINKER: ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib 
 dylib: 		  ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
-
+#todo use -dot to generate symbol deps graph
 
 ###### Build module into the code binary ######
 $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
@@ -106,7 +106,7 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_
 	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
+	-no_uuid -no_eh_labels \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(filter %.${ARCH}o,$^) \
@@ -126,7 +126,7 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS
 	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
 	-S -x -Z -dead_strip_dylibs \
-	-no_uuid \
+	-no_uuid -no_eh_labels \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	$(filter %.${ARCH}o,$^) \
