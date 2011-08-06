@@ -1276,7 +1276,10 @@ int TiXmlAttribute::IntValue() const
 
 double  TiXmlAttribute::DoubleValue() const
 {
-	return atof (value.c_str ());
+	double val = 0;
+	sscanf(value.c_str (), "%f", &val);
+	return val;
+	//return atof (value.c_str ());
 }
 
 

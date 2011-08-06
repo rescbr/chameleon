@@ -382,6 +382,7 @@ protected:
 	static int IsAlphaNum( unsigned char anyByte, TiXmlEncoding encoding );
 	inline static int ToLower( int v, TiXmlEncoding encoding )
 	{
+		#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
 		if ( encoding == TIXML_ENCODING_UTF8 )
 		{
 			if ( v < 128 ) return tolower( v );
