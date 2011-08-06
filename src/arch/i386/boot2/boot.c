@@ -53,6 +53,7 @@
 #include <stdio.h>
 
 #include "boot.h"
+#include "memory.h"
 
 extern void init_module_system();
 extern int execute_hook(const char* name, void*, void*, void*, void*);
@@ -89,7 +90,7 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 void initialize_runtime(void)
 {
 	zeroBSS();
-	malloc_init(ZALLOC_ADDR, ZALLOC_LEN, 16384, malloc_error);
+	malloc_init((void*)ZALLOC_ADDR, ZALLOC_LEN, 16384, malloc_error);
 }
 
 //==========================================================================
