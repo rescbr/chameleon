@@ -89,7 +89,7 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 void initialize_runtime(void)
 {
 	zeroBSS();
-	malloc_init(0, 0, 0, malloc_error);
+	malloc_init(ZALLOC_ADDR, ZALLOC_LEN, 16384, malloc_error);
 }
 
 //==========================================================================
