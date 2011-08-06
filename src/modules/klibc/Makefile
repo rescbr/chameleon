@@ -25,6 +25,7 @@ MODULE_OBJS = 	klibc zalloc\
 		qsort sha1hash onexit atexit exit \
 		snprintf vsnprintf sscanf vsscanf sprintf \
 		fwrite fprintf vfprintf printf\
-		fread2 fputc fputs fopen fread
+		fread2 fputc fputs fopen fread ftell fseek fclose ferror \
+		assert
 
 include ../MakeInc.dir
