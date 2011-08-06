@@ -1,4 +1,4 @@
-#include "libsaio.h"
+#include <stdio.h>
 
 void uClibcxx_start()
 {
@@ -6,7 +6,8 @@ void uClibcxx_start()
 
 void abort()
 {
-	stop("uClibc+: abort()\n");
+	printf("uClibc+: abort()\n");
+	while(1);
 }
 
 

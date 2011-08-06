@@ -20,9 +20,6 @@
 #include <cstdlib>
 #include <func_exception>
 
-extern "C" {
-#include "libsaio.h"
-};
 
 _UCXXEXPORT void* operator new(std::size_t numBytes) throw(std::bad_alloc){
 	//C++ stardard 5.3.4.8 requires that a valid pointer be returned for

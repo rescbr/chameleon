@@ -21,9 +21,7 @@
 #include <new>
 #include <cstdlib>
 #include <func_exception>
-extern "C" {
-#include "libsaio.h"
-};
+
 #ifndef NO_NOTHROW
 _UCXXEXPORT void* operator new(std::size_t numBytes, const std::nothrow_t& ) throw(){
 	return malloc(numBytes);

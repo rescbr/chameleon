@@ -2,6 +2,7 @@
  * Copyright (c) 2011 Evan Lojewski. All rights reserved.
  *
  */
+#include <stdio.h>
 
 #include <IOKit/IOTypes.h>
 #include <BiosDisk.hpp>
@@ -12,7 +13,6 @@
 #define BIOSBUFFER      512 * 8 /* 4Kb */
 extern "C"
 {
-#include "libsaio.h"
     void Disk_start();
 }
 
@@ -50,7 +50,7 @@ void Disk_start()
     
     
 
-    halt();
+    while (1);
 }
 
 void DetermineDisks()

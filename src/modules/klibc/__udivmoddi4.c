@@ -1,4 +1,4 @@
-#include "libsaio.h"
+#include <stdint.h>
 
 extern void __divide_error();
 

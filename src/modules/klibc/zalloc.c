@@ -29,15 +29,8 @@
  *
  */
 
-#include "libsa.h"
-//#include "saio_internal.h" - Azi: needed for ZDEBUG (printf)
-#include "memory.h"
-
-#define ZDEBUG 0 //Azi: booter doesn't load with this enabled; instant reboot at "boot1: ..."
-
-#if ZDEBUG
-int zout;
-#endif
+#include <stdio.h>
+#include <string.h>
 
 typedef struct {
 	char * start;
@@ -56,10 +49,6 @@ static void   zinsert(zmem * zp, int ndx);
 static void   zdelete(zmem * zp, int ndx);
 static void   zcoalesce(void);
 
-#if ZDEBUG
-size_t zalloced_size;
-#endif
-
 #define ZALLOC_NODES	16384
 
 static void malloc_error(char *addr, size_t size, const char *file, int line)
@@ -74,7 +63,7 @@ static void malloc_error(char *addr, size_t size, const char *file, int line)
 // define the block of memory that the allocator will use
 void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *, size_t, const char *, int))
 {
-	zalloc_base         = start ? start : (char *)ZALLOC_ADDR;
+/*	zalloc_base         = start ? start : (char *)ZALLOC_ADDR;
 	totalNodes          = nodes ? nodes : ZALLOC_NODES;
 	zalloced            = (zmem *) zalloc_base;
 	zavailable          = (zmem *) zalloc_base + sizeof(zmem) * totalNodes;
@@ -85,11 +74,25 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 	availableNodes      = 1;
 	allocedNodes        = 0;
         zerror              = malloc_err_fn ? malloc_err_fn : malloc_error;
+ */
+	
+	zalloc_base         = start;
+	totalNodes          = nodes;
+	zalloced            = (zmem *) zalloc_base;
+	zavailable          = (zmem *) zalloc_base + sizeof(zmem) * totalNodes;
+	zavailable[0].start = (char *)zavailable + sizeof(zmem) * totalNodes;
+	zavailable[0].size  = size - (zavailable[0].start - zalloc_base);
+	zalloc_end          = zalloc_base + size;
+	availableNodes      = 1;
+	allocedNodes        = 0;
+	zerror              = malloc_err_fn ? malloc_err_fn : malloc_error;
+	
 }
 
 #define BEST_FIT 1
 
 #undef malloc
+void * safe_malloc(size_t size, const char *file, int line);
 void *malloc(size_t size)
 {
 	return safe_malloc(size, __FILE__, __LINE__);
@@ -106,8 +109,8 @@ void * safe_malloc(size_t size, const char *file, int line)
 
 	if ( !zalloc_base )
 	{
-		// this used to follow the bss but some bios' corrupted it...
-		malloc_init((char *)ZALLOC_ADDR, ZALLOC_LEN, ZALLOC_NODES, malloc_error);
+		printf("malloc_init not called.\n");
+		while(1);
 	}
 
 	size = ((size + 0xf) & ~0xf);
@@ -168,11 +171,8 @@ done:
     }
 	if (ret != 0)
     {
-		bzero(ret, size);
+		memset(ret, 0, size);
     }
-#if ZDEBUG
-        zalloced_size += size;
-#endif
 	return (void *) ret;
 }
 
@@ -200,15 +200,8 @@ void free(void * pointer)
 		if ( zalloced[i].start == start )
 		{
 			tsize = zalloced[i].size;
-#if ZDEBUG
-			zout -= tsize;
-			printf("    zz out %d\n",zout);
-#endif
 			zdelete(zalloced, i); allocedNodes--;
 			found = 1;
-#if ZDEBUG
-                        memset(pointer, 0x5A, tsize);
-#endif
 			break;
 		}
 	}
@@ -216,9 +209,6 @@ void free(void * pointer)
             if (zerror) (*zerror)(pointer, rp, "free", 0);
             else return;
         }
-#if ZDEBUG
-        zalloced_size -= tsize;
-#endif
 
 	for (i = 0; i < availableNodes; i++)
 	{
@@ -262,10 +252,6 @@ void free(void * pointer)
 static void
 zallocate(char * start,int size)
 {
-#if ZDEBUG
-	zout += size;
-	printf("    alloc %d, total 0x%x\n",size,zout);
-#endif
 	zalloced[allocedNodes].start = start;
 	zalloced[allocedNodes].size  = size;
 	if (++allocedNodes > totalNodes) {
@@ -325,7 +311,7 @@ zcoalesce(void)
 void * realloc(void * start, size_t newsize)
 {
     void * newstart = safe_malloc(newsize, __FILE__, __LINE__);
-    bcopy(start, newstart, newsize);
+    memcpy(start, newstart, newsize);
     free(start);
     return newstart;
 }

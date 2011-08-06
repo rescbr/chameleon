@@ -9,6 +9,6 @@ MODULE_DEPENDENCIES = uClibcxx
 DIR = Disk
 
 MODULE_OBJS = Disk Partition FDiskPartition GUIDPartition Main
-I386_OBJS = BiosDisk
+#I386_OBJS = BiosDisk
 
 include ../MakeInc.dir

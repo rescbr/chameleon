@@ -49,7 +49,7 @@ VPATH = ${ARCH}
 MODULE_INCLUDES :=  $(foreach x,ModuleSystem $(MODULE_DEPENDENCIES),-I$(SRCROOT)/modules/$(x)/include/)
 
 
-INC = -I$(SRCROOT)/include/ -I$(SRCROOT)/sym/ -I$(SRCROOT)/modules/include/ -Iinclude/ -I$(SRCROOT)/arch/i386/libsaio/ -I$(SRCROOT)/arch/i386/libsa/ -I$(SRCROOT)/arch/i386/include/ -I$(SRCROOT)/i386/boot2/ $(MODULE_INCLUDES)
+INC = -I$(SRCROOT)/include/ -I$(SRCROOT)/sym/ -I$(SRCROOT)/modules/include/ -Iinclude/ $(MODULE_INCLUDES)
 DEFINES := -D__KLIBC__ $(DEFINES)
 
 MODULE_DEPENDENCIES :=  $(wildcard $(foreach x,$(MODULE_DEPENDENCIES),$(SYMROOT)/$(x).dylib)) \

@@ -5,11 +5,6 @@
 #include <GUIDPartition.hpp>
 #include <Disk.hpp>
 
-extern "C"
-{
-#include "libsaio.h"
-#include "stdio.h"
-}
 
 GUIDPartition::GUIDPartition(Disk* disk, UInt8 partitionNumber) : Partition(disk, partitionNumber)
 {

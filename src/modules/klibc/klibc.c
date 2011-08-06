@@ -4,7 +4,7 @@
  * glue + initialization
  */
 
-#include "libsaio.h"
+#include <stdio.h>
 
 int _DefaultRuneLocale;	// todo: fixme
 
@@ -14,8 +14,8 @@ void klibc_start()
 
 void _exit(int status)
 {
-    stop("exit() called\n");
-    while(1) halt(); // this is never reached
+    printf("exit() called\n");
+    while(1);
 }
 
 char __toupper(char c)
@@ -25,7 +25,8 @@ char __toupper(char c)
 
 void __divide_error()
 {
-	stop("Divide by 0\n");
+	printf("Divide by 0\n");
+    while(1);
 }
 
 // hack

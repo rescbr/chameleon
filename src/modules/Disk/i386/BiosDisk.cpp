@@ -45,14 +45,8 @@
  *  - Converted to c++
  *  - Converted to UInt* style variable types
  */
-
+#include <stdio.h>
 #include <BiosDisk.hpp>
-
-extern "C"
-{
-#include "libsaio.h"
-#include "stdio.h"
-}
         
 BiosDisk::BiosDisk(const char* name)
 {
