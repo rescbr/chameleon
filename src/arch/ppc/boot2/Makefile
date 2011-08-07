@@ -69,9 +69,9 @@ ${SYMROOT}/boot: ${ACTUAL_OBJECTS}
 
 install: ${DSTROOT} $(SYMROOT)/boot
 	@echo "\t[CP] bootx.bootinfo"
-	@install -c -m 444 $(SYMROOT)/bootx.bootinfo ${DSTROOT}
+	@cp $(SYMROOT)/bootx.bootinfo ${DSTROOT}
 	@echo "\t[CP] bootx.xcoff"
-	@install -c -m 444 $(SYMROOT)/bootx.xcoff ${DSTROOT}
+	@cp $(SYMROOT)/bootx.xcoff ${DSTROOT}
 
 	@# TODO: copy Symbols (linker) so that other can extend w/o having the source
 
