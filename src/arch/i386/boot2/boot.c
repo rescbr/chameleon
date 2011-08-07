@@ -94,16 +94,6 @@ void initialize_runtime(void)
 }
 
 //==========================================================================
-// This is the entrypoint from real.
-void boot(int biosdev)
-{
-	initialize_runtime();
-	// Enable A20 gate before accessing memory above 1Mb.
-	enableA20();
-	common_boot(biosdev);
-}
-
-//==========================================================================
 // The 'main' function for the booter. Called by boot0 when booting
 // from a block device, or by the network booter.
 //
@@ -122,4 +112,14 @@ void common_boot(int biosdev)
     {
         execute_hook("WorkLoop", (void*)loopCount++, 0, 0, 0);	// Main work loop
     }
+}
+
+//==========================================================================
+// This is the entrypoint from real.
+void boot(int biosdev)
+{
+	initialize_runtime();
+	// Enable A20 gate before accessing memory above 1Mb.
+	enableA20();
+	common_boot(biosdev);
 }

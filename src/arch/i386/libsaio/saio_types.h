@@ -52,36 +52,6 @@ struct driveParameters {
 	int totalDrives;
 };
 
-struct Tag {
-	long		type;
-	char	   *string;
-	long		offset;
-	struct Tag *tag;
-	struct Tag *tagNext;
-};
-typedef struct Tag Tag, *TagPtr;
-
-
-typedef struct FinderInfo {
-	unsigned char data[16];
-} FinderInfo;
-
-struct		   BootVolume;
-typedef struct BootVolume * BVRef;
-typedef struct BootVolume * CICell;
-
-typedef long (*FSInit)(CICell ih);
-typedef long (*FSLoadFile)(CICell ih, char * filePath);
-typedef long (*FSReadFile)(CICell ih, char *filePath, void *base, uint64_t offset, uint64_t length);
-typedef long (*FSGetFileBlock)(CICell ih, char *filePath, unsigned long long *firstBlock);
-typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long * dirIndex,
-							  char ** name, long * flags, long * time,
-							  FinderInfo * finderInfo, long * infoValid);
-typedef long (*FSGetUUID)(CICell ih, char *uuidStr);
-typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
-// Can be just pointed to free or a special free function
-typedef void (*BVFree)(CICell ih);
-
 struct iob {
 	unsigned int   i_flgs;			/* see F_* below */
 	unsigned int   i_offset;		/* seek byte offset in file */
@@ -97,12 +67,6 @@ struct iob {
 #define F_NBSF	   0x10				/* no bad sector forwarding */
 #define F_SSI	   0x40				/* set skip sector inhibit */
 #define F_MEM	   0x80				/* memory instead of file or device */
-
-struct dirstuff {
-	char *		   dir_path;		/* directory path */
-	long long	   dir_index;		/* directory entry index */
-	BVRef		   dir_bvr;			/* volume reference */
-};
 
 #define BVSTRLEN 32
 

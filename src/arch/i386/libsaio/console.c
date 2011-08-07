@@ -45,7 +45,7 @@
  */
 
 #include "libsaio.h"
-
+#include <stdio.h>
 
 /*
  * write one character to console
@@ -68,33 +68,22 @@ int putchar(int c)
     return c;
 }
 
-int getc()
+// Read and echo a character from console.  This doesn't echo backspace
+// since that screws up higher level handling
+
+int getchar()
 {
     int c = bgetc();
-
+	
     if ((c & 0xff) == 0)
         return c;
     else
         return (c & 0xff);
 }
 
-// Read and echo a character from console.  This doesn't echo backspace
-// since that screws up higher level handling
-
-int getchar()
-{
-	register int c = getc();
-
-//	if ( c == '\r' ) c = '\n';
-
-//	if ( c >= ' ' && c < 0x7f) putchar(c);
-	
-	return (c);
-}
-
 /** Print a "Press a key to continue..." message and wait for a key press. */
 void pause() 
 {
     printf("Press a key to continue...\n");
-	getchar(); // replace getchar() by pause() ?? were useful...?
+	getchar();
 }
