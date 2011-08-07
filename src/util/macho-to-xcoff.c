@@ -46,7 +46,7 @@ typedef unsigned char UInt8;
 typedef unsigned short UInt16;
 typedef unsigned long UInt32;
 
-#ifdef __i386__
+#if defined(__i386__) || defined(__x86_64__)
 #define SWAPL(value) (   (((value) >> 24) & 0xff) | \
 			 (((value) >> 8) & 0xff00) | \
 			 (((value) << 8) & 0xff0000) | \
