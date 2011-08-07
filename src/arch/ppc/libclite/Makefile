@@ -34,6 +34,8 @@ include ${ROOT}/Make.rules
 
 all: $(OBJROOT) $(SYMROOT) $(LIBS)
 
+install:
+
 $(LIBS): ${ACTUAL_OBJECTS}
 	@echo "\t[RM] $@"
 	@rm -f $@
