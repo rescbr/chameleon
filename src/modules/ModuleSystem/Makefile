@@ -10,5 +10,6 @@ DIR = ModuleSystem
 
 MODULE_OBJS = linker
 I386_OBJS = modules_support
+PPC_OBJS = modules_support
 
 include ../MakeInc.dir

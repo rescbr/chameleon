@@ -33,7 +33,7 @@ LIBDEP=  libclite.a
 # enable boot2 to find boot_modules.c
 VPATH = $(ROOT)/sym/modules/
 
-OBJECTS = main ci_io ci Control2 MAC-PARTS sl_words boot_modules
+OBJECTS = main boot ci_io ci Control2 MAC-PARTS sl_words boot_modules
 
 
 DIRS_NEEDED = 
