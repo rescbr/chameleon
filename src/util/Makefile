@@ -36,7 +36,7 @@ DIRS_NEEDED =
 include ${ROOT}/Make.rules
 
 
-all: $(OBJROOT) $(SYMROOT) $(SYMPROG) fdisk440
+all: $(OBJROOT) $(SYMROOT) $(SYMPROG) fdisk440 ${SYMROOT}/doxygen
 
 
 
@@ -51,6 +51,13 @@ fdisk440:
 
 
 install:
+
+${SYMROOT}/doxygen:
+	@echo ================= make all for doxygen =================;
+	@cd doxygen && ./configure && $(MAKE)
+	@cp doxygen/bin/doxygen ${SYMROOT}
+	@cp doxygen/bin/doxytag ${SYMROOT}
+
 
 #dependencies
 -include $(OBJROOT)/Makedep
