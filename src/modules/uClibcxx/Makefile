@@ -8,7 +8,7 @@ MODULE_START = $(MODULE_NAME)_start
 DIR = uClibc++
 # sstream fstream
 MODULE_OBJS = uClibc++ abi algorithm associative_base bitset \
-		complex del_op del_opnt del_opv del_opvnt \
+		del_op del_opnt del_opv del_opvnt \
 		deque eh_alloc eh_globals exception \
 		func_exception iomanip  char_traits \
 		iterator limits list locale \
@@ -17,5 +17,7 @@ MODULE_OBJS = uClibc++ abi algorithm associative_base bitset \
 		stack stdexcept streambuf string typeinfo \
 		utility valarray vector support \
 		ios iostream istream ostream 
+#temporarily disabled for ppc 
+I386_OBJS = complex
 
 include ../MakeInc.dir

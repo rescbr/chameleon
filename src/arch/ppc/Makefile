@@ -13,7 +13,7 @@ DOCROOT = $(ROOT)/doc
 include ${ROOT}/Make.rules
 
 # The order of building is important.
-SUBDIRS = libclite ci
+SUBDIRS = libclite boot2
 
 all install: ${OBJROOT} ${SYMROOT}
 	@for i in ${SUBDIRS};						  \

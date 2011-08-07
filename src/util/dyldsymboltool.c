@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
 	dylib.header.sizeofcmds = sizeof(dylib) - sizeof(struct mach_header);// +  dylib.symtab.nsyms * sizeof(struct nlist) + dylib.symtab.strsize;
 	
 	dylib.header.magic = MH_MAGIC;
+	// TODO: make configurable *or* read from orig file
 	dylib.header.cputype = CPU_TYPE_X86;
 	dylib.header.cpusubtype = /*CPUSUBTYPE_I386*/ 3;
 	dylib.header.filetype = MH_DYLIB;

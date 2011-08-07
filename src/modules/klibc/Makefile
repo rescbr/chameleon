@@ -8,7 +8,7 @@ MODULE_DEPENDENCIES =
 
 DIR = klibc
 
-MODULE_OBJS = 	klibc zalloc\
+MODULE_OBJS = 	klibc zalloc __extendsfdf2\
 		__ashldi3 __ashrdi3 __clzsi2 __divdi3 __divsi3 \
 		__lshrdi3 __moddi3 __modsi3 __udivdi3 \
 		__udivmoddi4 __udivmodsi4 __udivsi3 \

@@ -31,6 +31,8 @@
 #include <sl_words.h>
 #include <libclite.h>
 
+#include <stdio.h>
+
 int putchar(int ch)
 {
   if ((ch == '\r') || (ch == '\n')) CallMethod(0, 0, SLWordsIH, "slw_cr");
@@ -47,4 +49,10 @@ int puts(const char *str)
   putchar('\n');
   
   return 0;
+}
+
+int getchar()
+{
+	printf("ERROR: getchar not implimented.\n");
+	while(1);
 }

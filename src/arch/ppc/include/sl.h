@@ -158,30 +158,6 @@ enum {
 #include <ci.h>
 #include <sl_words.h>
 #include <libclite.h>
-#include <fs.h>
-#include <boot_args.h>
-
-// types for plist.c
-typedef enum {
-  kTagTypeNone = 0,
-  kTagTypeDict,
-  kTagTypeKey,
-  kTagTypeString,
-  kTagTypeInteger,
-  kTagTypeData,
-  kTagTypeDate,
-  kTagTypeFalse,
-  kTagTypeTrue,
-  kTagTypeArray
-} TagType;
-
-struct Tag {
-  TagType     type;
-  char       *string;
-  struct Tag *tag;
-  struct Tag *tagNext;
-};
-typedef struct Tag Tag, *TagPtr;
 
 // Externs for main.c
 extern char *gVectorSaveAddr;
@@ -199,7 +175,6 @@ extern long gBootFileType;
 extern char gHaveKernelCache;
 extern char gBootDevice[256];
 extern char gBootFile[256];
-extern TagPtr gBootDict;
 
 extern char gTempStr[4096];
 
@@ -222,74 +197,5 @@ extern CICell gMMUIH;
 extern CICell gMemoryIH;
 extern CICell gStdOutIH;
 extern CICell gKeyboardIH;
-
-// useful to activate debug logs near when a problem happens
-//extern int gDebugCount;
-
-extern long ThinFatBinary(void **binary, unsigned long *length);
-extern long GetDeviceType(char *devSpec);
-extern long ConvertFileSpec(char *fileSpec, char *devSpec, char **filePath);
-extern long MatchThis(CICell phandle, char *string);
-extern void *AllocateBootXMemory(long size);
-extern long AllocateKernelMemory(long size);
-extern long AllocateMemoryRange(char *rangeName, long start, long length);
-extern unsigned long Adler32(unsigned char *buffer, long length);
-
-// Externs for macho.c
-extern long ThinFatBinaryMachO(void **binary, unsigned long *length);
-extern long DecodeMachO(void *binary);
-
-// Externs for elf.c
-extern long ThinFatBinaryElf(void **binary, unsigned long *length);
-extern long DecodeElf(void *binary);
-
-// Externs for device_tree.c
-extern long FlattenDeviceTree(void);
-extern CICell SearchForNode(CICell ph, long top, char *prop, char *value);
-extern CICell SearchForNodeMatching(CICell ph, long top, char *value);
-
-// Externs for display.c
-extern long InitDisplays(int fill);
-extern long DrawSplashScreen(long stage);
-extern long DrawFailedBootPicture(void);
-extern void GetMainScreenPH(Boot_Video_Ptr video, int setProperties);
-void SplashPreview(void *src, u_int8_t * saveunder, u_int32_t savelen);
-void SplashProgress(u_int8_t * saveunder, int32_t firstBlob, int32_t select);
-
-// Externs for bmdecompress.c
-extern int DecompressData(void *srcbase, void *dstbase,
-		    int dw, int dh, int bytesPerPixel, int rowbytes);
-
-// Externs for drivers.c
-extern long LoadDrivers(char *dirPath);
-
-// Externs for config.c
-extern long InitConfig(void);
-extern long ParseConfigFile(char *addr);
-
-// Externs for lzss.c
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
-
-
-// Externs for plist.c
-extern TagPtr GetProperty(TagPtr dict, char *key);
-extern long ParseXML(char *buffer, TagPtr *dict);
-extern void FreeTag(TagPtr tag);
-#if PLIST_DEBUG
-extern void DumpTag(TagPtr tag, long depth);
-#endif
-
-
-// Externs/types for raid.c
-typedef struct RAIDMember *RAIDDevicePtr;
-
-extern int isRAIDPath(char *devSpec);
-extern int isRAIDDevice(void *ih);
-extern long LookForRAID(TagPtr bootDict);
-extern RAIDDevicePtr RAIDOpen(char *devSpec);
-extern void RAIDClose(RAIDDevicePtr raid);
-extern long RAIDRead(RAIDDevicePtr raid, long a, long n, long long offset);
-extern long RAIDSeek(RAIDDevicePtr raid, long long position);
-
 
 #endif /* ! _BOOTX_SL_H_ */
