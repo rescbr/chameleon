@@ -39,7 +39,9 @@
 #include <stdio.h>
 #include <string.h>
 
-extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
+extern void	malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
+extern void init_module_system();
+extern int	execute_hook(const char* name, void*, void*, void*, void*);
 
 static void Start(void *unused1, void *unused2, ClientInterfacePtr ciPtr);
 static void Main(ClientInterfacePtr ciPtr);
@@ -92,10 +94,21 @@ static void Start(void *unused1, void *unused2, ClientInterfacePtr ciPtr)
 
 static void Main(ClientInterfacePtr ciPtr)
 {
+	int loopCount = 0;
 	long ret;
 	
 	ret = InitEverything(ciPtr);
 	if (ret != 0) Exit();
+	
+	// Intialize module system 
+	init_module_system();
+    
+	execute_hook("Initialize", (void*)loopCount++, (void*)ciPtr, 0, 0);	// Main work loop
+
+	while(1)
+    {
+        execute_hook("WorkLoop", (void*)loopCount++, (void*)ciPtr, 0, 0);	// Main work loop
+    }	
 	
 }
 static long InitEverything(ClientInterfacePtr ciPtr)

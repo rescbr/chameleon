@@ -102,16 +102,19 @@ void initialize_runtime(void)
 //             that the booter was loaded from.
 void common_boot(int biosdev)
 {
+	int loopCount = 0;
+
     video_mode( 2 );  // 80x25 mono text mode.
 
 	// Intialize module system 
 	init_module_system();
     
-    int loopCount = 0;
+	execute_hook("Initialize", (void*)loopCount++, (void*)biosdev, 0, 0);	// Main work loop
+	
     while(1)
     {
-        execute_hook("WorkLoop", (void*)loopCount++, 0, 0, 0);	// Main work loop
-    }
+        execute_hook("WorkLoop", (void*)loopCount++, (void*)biosdev, 0, 0);	// Main work loop
+    }	
 }
 
 //==========================================================================
