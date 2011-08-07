@@ -116,7 +116,7 @@ static struct ati_chipsets_t ATIKnownChipsets[] = {
 	{ 0x00000000,  "Unknown"					},
 	{ 0x10027181,  "ATI Radeon X1600 Series"	},
 	{ 0x10027183,  "ATI Radeon X1550 Series"	},
-	{ 0x10027183,  "ATI Radeon X1300 Series"	},
+	{ 0x10027187,  "ATI Radeon X1300 Series"	},
 	{ 0x100271C5,  "ATI Mobility Radeon X1600"	},
 	{ 0x100271D4,  "ATI Mobility FireGL V5250"	},
 	
