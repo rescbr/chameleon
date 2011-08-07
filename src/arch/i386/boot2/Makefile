@@ -56,11 +56,16 @@ PATCH_ADDR  = $(shell echo ${SYMBOL_ADDR}-${DATA_ADDR}+${DATA_OFFSET} | bc)
 
 include ${ROOT}/Make.rules
 
+install: ${DSTROOT} $(SYMROOT)/boot
+	@echo "\t[CP] boot"
+	@cp $(SYMROOT)/boot ${DSTROOT}
+	@# TODO: copy Symbols (linker) so that other can extend w/o having the source
 
-all: $(DIRS_NEEDED) $(OBJROOT) $(SYMROOT) boot 
+
+all: $(DIRS_NEEDED) $(OBJROOT) $(SYMROOT) $(SYMROOT)/boot 
 
 
-boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP))
+$(SYMROOT)/boot: $(SYMROOT)/embedded.h $(ACTUAL_OBJECTS) $(addprefix $(SYMROOT)/, $(LIBDEP))
 
 
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/

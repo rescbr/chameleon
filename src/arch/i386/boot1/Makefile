@@ -25,6 +25,10 @@ PROGRAMS := $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
 all:  $(SYMROOT) $(PROGRAMS)
 
+install: ${DSTROOT} ${PROGRAMS}
+	@echo "\t[CP] boot1*"
+	@cp ${PROGRAMS} ${DSTROOT}
+
 
 $(PROGRAMS):
 	@echo "\t[NASM] $(@F)" 

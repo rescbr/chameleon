@@ -12,6 +12,11 @@ DIRS_NEEDED = $(SYMROOT)
 
 all: $(DIRS_NEEDED) $(SYMROOT)/cdboot
 
+install: ${DSTROOT} $(SYMROOT)/cdboot
+	@echo "\t[CP] cdboot"
+	@cp $(SYMROOT)/cdboot ${DSTROOT}
+
+
 $(SYMROOT)/cdboot:
 	@echo "\t[NASM] cdboot.s"	
 	@$(NASM) cdboot.s -o $(SYMROOT)/cdboot

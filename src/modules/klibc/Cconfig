@@ -3,8 +3,8 @@
 #
 
 config KLIBC_MODULE
-	tristate "klibc Module"
-	default m
+	bool "klibc Module"
+	default y
 	---help---
 	  Say Y here if you want to enable the use of this module.
 

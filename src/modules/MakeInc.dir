@@ -101,7 +101,7 @@ dylib: 		  ${OBJROOT} ${MODULE_OBJECTS} $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib
 
 ###### Build module into the code binary ######
 $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author Makefile
-	@echo "\t[LD:${ARCH}] (LINKER) $(MODULE_NAME).${ARCH}dylib"
+	@echo "\t[LD:${ARCH}] (LINKER) $(MODULE_NAME).${ARCH}.dylib"
 	@ld -arch ${ARCH} \
 	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
@@ -119,8 +119,8 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.linker.dylib: $(MODULE_DEPENDENCIES) ${MODULE_
 	-o $@
 
 ##### BUild module as a seperate module #####
-$(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(SRCROOT)/obj/i386/boot2/Symbols_LINKER_ONLY.dylib Makefile
-	@echo "\t[LD:${ARCH}] $(MODULE_NAME).${ARCH}dylib"
+$(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS} $(OBJROOT)/$(MODULE_NAME).desc $(OBJROOT)/$(MODULE_NAME).author $(ROOT)/obj/${ARCH}/boot2/Symbols_LINKER_ONLY.dylib Makefile
+	@echo "\t[LD:${ARCH}] $(MODULE_NAME).${ARCH}.dylib"
 	
 	@ld -arch ${ARCH} \
 	-alias _$(MODULE_START) start \
@@ -137,7 +137,30 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS
 	-sectcreate __INFO __description $(OBJROOT)/$(MODULE_NAME).desc \
 	-macosx_version_min 10.6 \
 	-o $@
+	
 
+$(SYMROOT)/$(MODULE_NAME).dylib:
+	@# Create Universal Binary
+	@echo "\t[LIPO] $(MODULE_NAME).dylib"
+	@lipo -create $(SYMROOT)/$(MODULE_NAME).*.dylib -output $(SYMROOT)/$(MODULE_NAME).dylib
+
+ifeq  ($(MODULE_DEFINITION),m)
+ifeq ($(BUILT_IN),yes)
+
+install:
+
+else
+
+install: ${DSTROOT} $(SYMROOT)/$(MODULE_NAME).dylib
+	@echo "\t[CP] $(MODULE_NAME).dylib"
+	@cp $(SYMROOT)/$(MODULE_NAME).dylib ${DSTROOT}
+endif
+
+else
+
+install:
+
+endif
 
 #clean:
 #	@echo "\t[RM] $(SYMROOT)/modules/$(MODULE_NAME).dylib"
@@ -149,7 +172,6 @@ $(SYMROOT)/$(MODULE_NAME).${ARCH}.dylib: $(MODULE_DEPENDENCIES) ${MODULE_OBJECTS
 #	@rm -rf $(OBJROOT) $(DSTROOT) $(SRCROOT)/revision $(SRCROOT)/i386/modules/module_includes
 
 	
-
 .PHONY: $(SYMROOT)/boot_modules.h
 .PHONY: $(SYMROOT)/boot_modules.c
 
@@ -164,6 +186,7 @@ $(OBJROOT)/$(MODULE_NAME).author: Makefile
 	
 $(OBJROOT)/$(MODULE_NAME).desc: Makefile
 	@echo "$(MODULE_DESCRIPTION)" > $@
+
 
 #dependencies
 -include $(OBJROOT)/Makedep

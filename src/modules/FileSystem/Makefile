@@ -6,7 +6,7 @@ MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = $(MODULE_NAME)_start
 MODULE_DEPENDENCIES = uClibcxx BiosDisk
 
-DIR = HelloWorld
+DIR = FileSystem
 SUBDIRS = HFS
 
 MODULE_OBJS = Main FileSystem

@@ -15,15 +15,12 @@ include ${ROOT}/Make.rules
 # The order of building is important.
 SUBDIRS = libsaio boot0 boot1 boot2 cdboot
 
-all: ${OBJROOT} ${SYMROOT}
-	@#cd modules; ${MAKE} BUILT_IN=yes $@
-
-
+all install: ${OBJROOT} ${SYMROOT}
 	@for i in ${SUBDIRS};						  \
 	do								  \
 		echo ================= make $@ for $$i =================; \
 		( 							  \
-			cd $$i; ${MAKE}					  \
+			cd $$i; ${MAKE}	ARCHS="${ARCHS}" ARCH=${ARCH}	  \
 			$@						  \
 		) || exit $$?;						  \
 	done

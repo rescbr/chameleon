@@ -3,9 +3,8 @@
 #
 
 config UCLIBCXX_MODULE
-	tristate "uClibc++ Module"
-	default m
-	depends on KLIBC_MODULE
+	bool "uClibc++ Module"
+	default y
 	---help---
 	  Say Y here if you want to enable to use of this module.
 

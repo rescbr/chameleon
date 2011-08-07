@@ -35,6 +35,8 @@ DIRS_NEEDED =
 
 include ${ROOT}/Make.rules
 
+install:
+
 all: $(OBJROOT) $(SYMROOT) $(LIBS)
 
 $(LIBS): ${ACTUAL_OBJECTS}

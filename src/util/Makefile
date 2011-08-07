@@ -50,6 +50,8 @@ fdisk440:
 	@$(MAKE) ARCH=${ARCH} -C fdisk
 
 
+install:
+
 #dependencies
 -include $(OBJROOT)/Makedep
 

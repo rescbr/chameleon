@@ -29,7 +29,7 @@ $(OBJROOT)/%.o: %.cpp $(OBJROOT)
 NATIVE_OBJECTS = $(addsuffix .o, $(addprefix $(OBJROOT)/, $(OBJECTS)))
 
 
-$(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
+$(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT) $(DSTROOT):
 	@echo "\t[MKDIR] $@"
 	@$(MKDIRS) $@
 		

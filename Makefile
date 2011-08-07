@@ -9,9 +9,6 @@ DOCROOT = $(ROOT)/doc
 #default architechtures to compile.
 ARCHS=i386 ppc armv5
 
-#force a universal binary build
-override ARCHS := ${ARCHS} universal
-
 THEME = default
 
 SUBDIRS="src"
@@ -26,7 +23,7 @@ all install: $(SYMROOT) $(OBJROOT) rebuild_config
 	    	if [ -d $$i ]; then						  \
 			echo "================= make $@ for $$i arch $$a================="; \
 			( 						  	  \
- 		  	cd $$i; ${MAKE}	ROOT=$(ROOT) ARCH=$$a		  	  	  \
+ 		  	cd $$i; ${MAKE}	ROOT=$(ROOT) ARCHS="${ARCHS}" ARCH=$$a		  	  	  \
 				$@			  						  \
 			) || exit $$?; 						  	  \
 	    	else							  		  \

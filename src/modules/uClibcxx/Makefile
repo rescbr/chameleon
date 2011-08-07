@@ -4,7 +4,6 @@ MODULE_AUTHOR =
 MODULE_VERSION = "0.2.2"
 MODULE_COMPAT_VERSION = "0.2.2"
 MODULE_START = $(MODULE_NAME)_start
-MODULE_DEPENDENCIES = klibc
 
 DIR = uClibc++
 # sstream fstream

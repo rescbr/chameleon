@@ -8,14 +8,14 @@ DOCROOT = $(ROOT)/doc
 
 SUBDIRS=util arch modules
 
-all:
+all install:
 	@echo ================= make $@ BUILT_IN=yes for modules arch $(ARCH) =================
 	@cd modules; ${MAKE} ARCH=${ARCH} BUILT_IN=yes $@
 	@for i in ${SUBDIRS};										  \
 	do															  \
 		echo ================= make $@ for $$i arch $(ARCH) =================; \
 		( 													  	  \
-			cd $$i; ${MAKE}	ARCH=${ARCH}						  \
+			cd $$i; ${MAKE}	ARCHS="${ARCHS}" ARCH=${ARCH}						  \
 			$@ 			  										  \
 		) || exit $$?; 											  \
 	done

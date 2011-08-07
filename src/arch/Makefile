@@ -15,12 +15,12 @@ include ${ROOT}/Make.rules
 # The order of building is important.
 SUBDIRS = ${ARCH}
 
-all: ${OBJROOT} ${SYMROOT}
+all install: ${OBJROOT} ${SYMROOT}
 	@for i in ${SUBDIRS};						  \
 	do								  \
 		echo ================= make $@ for $$i =================; \
 		(							  \
-			cd $$i; ${MAKE}					  \
+			cd $$i; ${MAKE}	ARCHS="${ARCHS}" ARCH=${ARCH}	  \
 			$@						  \
 		) || exit $$?;						  \
 	done
