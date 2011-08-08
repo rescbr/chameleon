@@ -540,8 +540,8 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	/* Northen Islands */
 	{ 0x6718,	0x00000000,	CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",		kNull		},
-	
-	{ 0x6738,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
+	{ 0x6719,   0x00000000, CHIP_FAMILY_CAYMAN,     "AMD Radeon HD 6950 Series",        kNull       },
+	{ 0x6738,   0x00000000, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870 Series",		kDuckweed	},
 	{ 0x6739,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850 Series",		kDuckweed	},
 	{ 0x673E,	0x00000000,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6790 Series",		kNull		},
 	
@@ -1215,8 +1215,10 @@ static bool init_card(pci_dt_t *pci_dev)
 	}
 	
 	getIntForKey(kAtiPorts, &n_ports, &bootInfo->bootConfig);
-	if (n_ports > 0)
+	if (n_ports > 0){
 		card->ports = n_ports;
+         verbose("AtiPorts set to %d\n",n_ports); //AniV
+    }
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
