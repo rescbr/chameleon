@@ -44,7 +44,7 @@ all: $(OBJROOT) $(SYMROOT) ${SYMROOT}/boot
 
 ${SYMROOT}/boot: ${ACTUAL_OBJECTS}
 	@echo "\t[LD] boot.sys"
-	@$(CC)  -nostdlib -arch ${ARCH} -static \
+	@$(CC)  -nostdlib -arch ${ARCH} -static -nostdlib -e _StartTVector -seg1addr 06600000 \
 			-o $(SYMROOT)/boot.sys $(filter %.${ARCH}o,$^) `find $(ROOT)/obj/boot2_modules/ -name \*.${ARCH}o` $(LIBS)
 
 	@# TODO: embed Symbols.dylib
