@@ -7,11 +7,15 @@
 #ifndef __LIBSAIO_PLATFORM_H
 #define __LIBSAIO_PLATFORM_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
 
 extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
 extern void dumpPhysAddr(const char * title, void * a, int len);
+
+/* CPUID Vendor */
+#define CPUID_VENDOR_INTEL      0x756E6547
+#define CPUID_VENDOR_AMD        0x68747541
 
 /* CPUID index into cpuid_raw */
 #define CPUID_0				0
@@ -19,10 +23,13 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_2				2
 #define CPUID_3				3
 #define CPUID_4				4
-#define CPUID_80			5
-#define CPUID_81			6
-#define CPUID_MAX			7
+#define CPUID_6				5
+#define CPUID_80			6
+#define CPUID_81			7
+#define CPUID_88			8
+#define CPUID_MAX			9
 
+#define CPU_MODEL_DOTHAN		0x0D			// Dothan
 #define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
 #define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
 #define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
@@ -30,7 +37,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_ATOM			0x1C			// Atom
 #define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
 #define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
-#define CPU_MODEL_DALES_32NM	0x25			// Clarkdale, Arrandale: Dual core
+#define CPU_MODEL_DALES_32NM	0x25			// Clarkdale, Arrandale
 #define CPU_MODEL_SANDY			0x2A			// Sandy Bridge
 #define CPU_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
 #define CPU_MODEL_SANDY_XEON	0x2D			// Sandy Bridge Xeon
@@ -71,7 +78,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define SMB_MEM_TYPE_DDR		18
 #define SMB_MEM_TYPE_DDR2		19
 #define SMB_MEM_TYPE_FBDIMM		20
-#define SMB_MEM_TYPE_DDR3		24			// Supported in 10.5.6+ AppleSMBIOS
+#define SMB_MEM_TYPE_DDR3		24				// Supported in 10.5.6+ AppleSMBIOS
 
 /* Memory Configuration Types */ 
 #define SMB_MEM_CHANNEL_UNKNOWN		0
@@ -90,44 +97,43 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define UUID_LEN			16
 
 typedef struct _RamSlotInfo_t {
-    uint32_t		ModuleSize;						// Size of Module in MB
-    uint32_t		Frequency; // in Mhz
+    uint32_t		ModuleSize;					// Size of Module in MB
+    uint32_t		Frequency;					// in Mhz
     const char*		Vendor;
     const char*		PartNo;
     const char*		SerialNo;
-    char*			spd;							// SPD Dump
+    char*			spd;						// SPD Dump
     bool			InUse;
     uint8_t			Type;
-    uint8_t			BankConnections; // table type 6, see (3.3.7)
+    uint8_t			BankConnections;			// table type 6, see (3.3.7)
     uint8_t			BankConnCnt;
-
 } RamSlotInfo_t;
 
 typedef struct _PlatformInfo_t {
 	struct CPU {
-		uint32_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
-		uint32_t		Vendor;			// Vendor
-		uint32_t		Signature;		// Signature
-		uint32_t		Stepping;		// Stepping
-		uint32_t		Model;			// Model
-		uint32_t		ExtModel;		// Extended Model
-		uint32_t		Family;			// Family
-		uint32_t		ExtFamily;		// Extended Family
-		uint32_t		NoCores;		// No Cores per Package
-		uint32_t		NoThreads;		// Threads per Package
-		uint8_t			MaxCoef;		// Max Multiplier
+		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
+		uint32_t		Vendor;					// Vendor
+		uint32_t		Signature;				// Signature
+		uint32_t		Stepping;				// Stepping
+		uint32_t		Model;					// Model
+		uint32_t		ExtModel;				// Extended Model
+		uint32_t		Family;					// Family
+		uint32_t		ExtFamily;				// Extended Family
+		uint32_t		NoCores;				// No Cores per Package
+		uint32_t		NoThreads;				// Threads per Package
+		uint8_t			MaxCoef;				// Max Multiplier
 		uint8_t			MaxDiv;
-		uint8_t			CurrCoef;		// Current Multiplier
+		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;		// TSC Frequency Hz
-		uint64_t		FSBFrequency;		// FSB Frequency Hz
-		uint64_t		CPUFrequency;		// CPU Frequency Hz
+		uint64_t		TSCFrequency;			// TSC Frequency Hz
+		uint64_t		FSBFrequency;			// FSB Frequency Hz
+		uint64_t		CPUFrequency;			// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
-		char			BrandString[48];	// 48 Byte Branding String
+		char			BrandString[48];		// 48 Byte Branding String
 		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 	} CPU;
-
+	
 	struct RAM {
 		uint64_t		Frequency;				// Ram Frequency
 		uint32_t		Divider;				// Memory divider
@@ -140,14 +146,15 @@ typedef struct _PlatformInfo_t {
 		uint8_t			Type;					// Standard SMBIOS v2.5 Memory Type
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];	// Information about each slot
 	} RAM;
-
+	
 	struct DMI {
-		int			MaxMemorySlots;		// number of memory slots polulated by SMBIOS
-		int			CntMemorySlots;		// number of memory slots counted
-		int			MemoryModules;		// number of memory modules installed
-		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
+		int			MaxMemorySlots;				// number of memory slots populated by SMBIOS
+		int			CntMemorySlots;				// number of memory slots counted
+		int			MemoryModules;				// number of memory modules installed
+		int			DIMM[MAX_RAM_SLOTS];		// Information and SPD mapping for each slot
 	} DMI;
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	
+	uint8_t				Type; // System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;
 } PlatformInfo_t;
 

@@ -6,6 +6,7 @@
  */
 
 #include "smbios_getters.h"
+#include "bootstruct.h"
 
 #ifndef DEBUG_SMBIOS
 #define DEBUG_SMBIOS 0
@@ -40,25 +41,20 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case CPU_MODEL_YONAH:			// Intel Mobile Core Solo, Duo
-					case CPU_MODEL_MEROM:			// Intel Mobile Core 2 Solo, Duo
-					case CPU_MODEL_PENRYN:			// Intel Core 2 Solo, Duo, Quad, Extreme
-					case CPU_MODEL_ATOM:			// Intel Atom (45nm)
+					case CPU_MODEL_DOTHAN:		// Intel Pentium M
+					case CPU_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
+					case CPU_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPU_MODEL_PENRYN:		// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+					case CPU_MODEL_ATOM:		// Intel Atom (45nm)
 						return false;
 
-					case CPU_MODEL_FIELDS:			// Intel Core i5, i7 LGA1156 (45nm)
+					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
-						value->word = 4800;				// Temp fix to return a sane value like Apple does
-						return true;					// Since there is no QPI on this CPU family, only DMI
-					case CPU_MODEL_SANDY:			// Intel Core i3, i5, i7 LGA1155 (32nm)
-                    case CPU_MODEL_SANDY_XEON:
-						value->word = 5000;				// Temp fix to return a sane value 
-						return true;					// Since there is no QPI on this CPU family, only DMI
-					case CPU_MODEL_NEHALEM:			// Intel Core i7 LGA1366 (45nm)
-					case CPU_MODEL_WESTMERE:		// Intel Core i7 LGA1366 (32nm) 6 Core
-					case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X7500
-					case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
+					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
@@ -131,54 +127,49 @@ bool getSMBOemProcessorType(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
+					case CPU_MODEL_DOTHAN:				// Intel Pentium M
 					case CPU_MODEL_YONAH:				// Intel Mobile Core Solo, Duo
-					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo
-					case CPU_MODEL_PENRYN:				// Intel Core 2 Solo, Duo, Quad, Extreme
+					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPU_MODEL_PENRYN:				// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
 					case CPU_MODEL_ATOM:				// Intel Atom (45nm)
 						return true;
 
 					case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;		// Xeon 
+							value->word = 0x0501;			// Xeon 
 						else
-							value->word = 0x0701;		// Core i7
+							value->word = 0x0701;			// Core i7
 						return true;
 
 					case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;		// Xeon 
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-							value->word = 0x0601;		// Core i5
+							value->word = 0x0601;			// Core i5
 						else
-							value->word = 0x0701;		// Core i7
+							value->word = 0x0701;			// Core i7
 						return true;
 
-					case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+					case CPU_MODEL_DALES:
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-							value->word = 0x0601;		// Core i5
+							value->word = 0x0601;			// Core i5
 						else
-							value->word = 0x0701;		// Core i7
+							value->word = 0x0701;			// Core i7
 						return true;
 
 					case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 (32nm)
-					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+                    case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
+					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
-							value->word = 0x0901;		// Core i3
+							value->word = 0x0901;			// Core i3
 						else
 							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x0601;	// Core i5
+								value->word = 0x0601;		// Core i5
 							else
-								value->word = 0x0701;	// Core i7
+								value->word = 0x0701;		// Core i7
 						return true;
 
-					case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;		// Xeon 					
-						return true;
-						
-					case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
-						value->word = 0x0501;			// Xeon
+						value->word = 0x0501;				// Core i7
 						return true;
 				}
 			}
@@ -249,9 +240,10 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 		}
 	}
 
-	return false;
-//	value->string = NOT_AVAILABLE;
-//	return true;
+	if (!bootInfo->memDetect)
+		return false;
+	value->string = NOT_AVAILABLE;
+	return true;
 }
 	
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
@@ -260,6 +252,9 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 	int	map;
 
 	idx++;
+
+    DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
+
 	if (idx < MAX_RAM_SLOTS)
 	{
 		map = Platform.DMI.DIMM[idx];
@@ -271,9 +266,10 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 		}
 	}
 
-	return false;
-//	value->string = NOT_AVAILABLE;
-//	return true;
+	if (!bootInfo->memDetect)
+		return false;
+	value->string = NOT_AVAILABLE;
+	return true;
 }
 
 bool getSMBMemoryDevicePartNumber(returnType *value)
@@ -293,9 +289,10 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 		}
 	}
 
-	return false;
-//	value->string = NOT_AVAILABLE;
-//	return true;
+	if (!bootInfo->memDetect)
+		return false;
+	value->string = NOT_AVAILABLE;
+	return true;
 }
 
 

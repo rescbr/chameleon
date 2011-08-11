@@ -74,7 +74,7 @@
 
 // defaults for a Mac mini 
 #define kDefaultMacminiFamily						"Macmini"
-#define kDefaultMacmini								"Macmini2,1"
+#define kDefaultMacmini								"Macmini1,1"
 #define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0903051113"
 
 // defaults for a MacBook
@@ -325,30 +325,29 @@ void setDefaultSMBData(void)
 					{
 						switch (Platform.CPU.Model)
 						{
-							case CPU_MODEL_FIELDS:				// Intel Core i5, i7 LGA1156 (45nm)
-							case CPU_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-							case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+							case CPU_MODEL_FIELDS:			// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+							case CPU_MODEL_DALES:
+							case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
 
-							case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 (32nm)
-                            case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
+							case CPU_MODEL_SANDY:			// Intel Core i3, i5, i7 LGA1155 (32nm)
+							case CPU_MODEL_SANDY_XEON:		// Intel Xeon E3
 								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
-								
-							case CPU_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
-							case CPU_MODEL_NEHALEM_EX:			// Intel Xeon X7500
+							case CPU_MODEL_NEHALEM:			// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+							case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 								defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultMacProNehalem;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;
 
-							case CPU_MODEL_WESTMERE:			// Intel Core i7 LGA13766 (32nm) 6 Core
-							case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
+							case CPU_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
 								defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;
@@ -448,6 +447,8 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 {
 	const char *string = 0;
 	int len;
+	bool parsed;
+	int val;
 
 	if (numOfSetters <= idx)
 		return false;
@@ -481,13 +482,29 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 		//case kSMBQWord:
 			if (SMBSetters[idx].keyString)
 			{
-				if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), SMBPlist))
-					return true;
-				else
+				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
+				if (!parsed)
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
-						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, value))
-							return true;
+						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
+				if (parsed)
+				{
+					switch (SMBSetters[idx].valueType)
+					{
+						case kSMBByte:
+							value->byte = (uint8_t)val;
+							break;
+						case kSMBWord:
+							value->word = (uint16_t)val;
+							break;
+						case kSMBDWord:
+						default:
+							value->dword = (uint32_t)val;
+							break;
+					}
+					return true;
+				}
 			}
+
 			if (SMBSetters[idx].getSMBValue)
 				if (SMBSetters[idx].getSMBValue(value))
 					return true;
@@ -550,7 +567,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPU_MODEL_DALES:
 				case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
 				case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-				case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
+				case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 				case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 				case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
 					break;
@@ -704,7 +721,7 @@ void setupSMBIOSTable(void)
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
 
-	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->bootConfig);
+	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);
 	if (setSMB)
 		setDefaultSMBData();
 

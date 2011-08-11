@@ -43,7 +43,7 @@
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG                EQU  0
+DEBUG                EQU  CONFIG_BOOT0_DEBUG
 
 ;
 ; Set to 1 to support loading the partition booter (boot1) from a
@@ -697,4 +697,4 @@ pad_table_and_sig:
     times 510-($-$$) db 0
     dw    kBootSignature
 
-;END
+; END

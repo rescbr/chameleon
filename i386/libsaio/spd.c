@@ -38,24 +38,24 @@ static const char *spd_memory_types[] =
 	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
 	"",				/* 09h  Undefined */
 	"",				/* 0Ah  Undefined */
-	"DDR3 SDRAM"   /* 0Bh  SDRAM DDR 3 */
+	"DDR3 SDRAM"	/* 0Bh  SDRAM DDR 3 */
 };
 
 #define UNKNOWN_MEM_TYPE 2
 static uint8_t spd_mem_to_smbios[] =
 {
-	UNKNOWN_MEM_TYPE,          /* 00h  Undefined */
-	UNKNOWN_MEM_TYPE,          /* 01h  FPM */
-	UNKNOWN_MEM_TYPE,          /* 02h  EDO */
-	UNKNOWN_MEM_TYPE,	   /* 03h  PIPELINE NIBBLE */
-	SMB_MEM_TYPE_SDRAM,        /* 04h  SDRAM */
-	SMB_MEM_TYPE_ROM,	   /* 05h  MULTIPLEXED ROM */
-	SMB_MEM_TYPE_SGRAM,        /* 06h  SGRAM DDR */
-	SMB_MEM_TYPE_DDR,          /* 07h  SDRAM DDR */
-	SMB_MEM_TYPE_DDR2,         /* 08h  SDRAM DDR 2 */
-	UNKNOWN_MEM_TYPE,  	   /* 09h  Undefined */
-	UNKNOWN_MEM_TYPE,	   /* 0Ah  Undefined */
-	SMB_MEM_TYPE_DDR3          /* 0Bh  SDRAM DDR 3 */
+	UNKNOWN_MEM_TYPE,		/* 00h  Undefined */
+	UNKNOWN_MEM_TYPE,		/* 01h  FPM */
+	UNKNOWN_MEM_TYPE,		/* 02h  EDO */
+	UNKNOWN_MEM_TYPE,		/* 03h  PIPELINE NIBBLE */
+	SMB_MEM_TYPE_SDRAM,		/* 04h  SDRAM */
+	SMB_MEM_TYPE_ROM,		/* 05h  MULTIPLEXED ROM */
+	SMB_MEM_TYPE_SGRAM,		/* 06h  SGRAM DDR */
+	SMB_MEM_TYPE_DDR,		/* 07h  SDRAM DDR */
+	SMB_MEM_TYPE_DDR2,		/* 08h  SDRAM DDR 2 */
+	UNKNOWN_MEM_TYPE,		/* 09h  Undefined */
+	UNKNOWN_MEM_TYPE,		/* 0Ah  Undefined */
+	SMB_MEM_TYPE_DDR3		/* 0Bh  SDRAM DDR 3 */
 };
 #define SPD_TO_SMBIOS_SIZE (sizeof(spd_mem_to_smbios)/sizeof(uint8_t))
 
@@ -255,7 +255,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     int        i, speed;
     uint8_t    spd_size, spd_type;
     uint32_t   base, mmio, hostc;
-    bool       dump = false;
+//  bool       dump = false;
     RamSlotInfo_t*  slot;
 
 	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
@@ -268,7 +268,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
 		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 
-    getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
+//Azi: no use for this!
+//  getBoolForKey("DumpSPD", &dump, &bootInfo->chameleonConfig);
 	// needed at least for laptops
     bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
@@ -342,17 +343,16 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
+            
 
-#if DEBUG_SPD
-                  dumpPhysAddr("spd content: ", slot->spd, spd_size);
-                    getc();
-#endif
         }
 
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
         Platform.DMI.DIMM[i]= 
-            i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
-            mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
+        i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
+        mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
+        
+
         
 		slot->spd = NULL;
 

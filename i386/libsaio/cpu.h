@@ -6,17 +6,17 @@
 #ifndef __LIBSAIO_CPU_H
 #define __LIBSAIO_CPU_H
 
-#include "libsaio.h"
+//#include "libsaio.h"
 
 extern void scan_cpu(PlatformInfo_t *);
 
-#define bit(n)			(1UL << (n))
+#define bit(n)			(1ULL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
-#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
+#define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x198
+#define	MSR_IA32_PERF_STATUS	0x00000198
 #define MSR_IA32_PERF_CONTROL	0x199
 #define MSR_IA32_EXT_CONFIG		0x00EE
 #define MSR_FLEX_RATIO			0x194
@@ -28,6 +28,9 @@ extern void scan_cpu(PlatformInfo_t *);
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
 
+#define MSR_AMD_MPERF           0x000000E7
+#define MSR_AMD_APERF           0x000000E8
+
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 
 // DFE: This constant comes from older xnu:
@@ -36,6 +39,21 @@ extern void scan_cpu(PlatformInfo_t *);
 // DFE: These two constants come from Linux except CLOCK_TICK_RATE replaced with CLKNUM
 #define CALIBRATE_TIME_MSEC	30		/* 30 msecs */
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
+
+// CPUID Values
+#define CPUID_MODEL_YONAH		14	// Intel Mobile Core Solo, Duo
+#define CPUID_MODEL_MEROM		15	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+#define CPUID_MODEL_PENRYN		23	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+#define CPUID_MODEL_NEHALEM		26	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+#define CPUID_MODEL_ATOM		28	// Intel Atom (45nm)
+#define CPUID_MODEL_FIELDS		30	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+#define CPUID_MODEL_DALES		31	// Havendale, Auburndale
+#define CPUID_MODEL_DALES_32NM	37	// Intel Core i3, i5 LGA1156 (32nm)
+#define CPUID_MODEL_SANDY		42	// Intel Core i3, i5, i7 LGA1155 (32nm)
+#define CPUID_MODEL_WESTMERE	44	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+#define CPUID_MODEL_NEHALEM_EX	46	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+#define CPUID_MODEL_WESTMERE_EX	47	// Intel Xeon E7
+
 
 static inline uint64_t rdtsc64(void)
 {

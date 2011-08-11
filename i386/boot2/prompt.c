@@ -26,9 +26,9 @@
  * All rights reserved.
  */
 
-#include "vers.h"
+#include <vers.h>
 
-char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chimera v" I386BOOT_CHAMELEONVERSION " r" I386BOOT_CHAMELEONREVISION "\n"
+char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION " r" I386BOOT_CHAMELEONREVISION "\n"
                     "Build date: " I386BOOT_BUILDDATE "\n"
                     "%dMB memory\n";
 

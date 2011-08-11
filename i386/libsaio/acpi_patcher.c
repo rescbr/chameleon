@@ -152,6 +152,7 @@ void *loadACPITable (const char * filename)
 
 uint8_t	acpi_cpu_count = 0;
 char* acpi_cpu_name[32];
+uint32_t acpi_cpu_p_blk = 0;
 
 void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 {
@@ -184,6 +185,9 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				acpi_cpu_name[acpi_cpu_count] = malloc(4);
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
+                
+                if (acpi_cpu_count == 0)
+                    acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
 				
 				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
 				
@@ -204,12 +208,19 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x31, 0x03, 0x10, 0x20 							/* 1.._		*/
 	};
 	
-	char cstate_resource_template[] = 
+	char resource_template_register_fixedhw[] = 
 	{
 		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F, 
-		0x01, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 
-		0x00, 0x00, 0x00, 0x79, 0x00
+		0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+		0x00, 0x00, 0x01, 0x79, 0x00
 	};
+    
+    char resource_template_register_systemio[] = 
+	{
+		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x01,
+        0x08, 0x00, 0x00, 0x15, 0x04, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x79, 0x00, 	
+    };
 
 	if (Platform.CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
@@ -236,10 +247,12 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c2_enabled = false;
 		bool c3_enabled = false;
 		bool c4_enabled = false;
+        bool cst_using_sustemio = false;
 		
-		getBoolForKey(kEnableC2States, &c2_enabled, &bootInfo->bootConfig);
-		getBoolForKey(kEnableC3States, &c3_enabled, &bootInfo->bootConfig);
-		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC2State, &c2_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC3State, &c3_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC4State, &c4_enabled, &bootInfo->chameleonConfig);
+        getBoolForKey(kCSTUsingSystemIO, &cst_using_sustemio, &bootInfo->chameleonConfig);
 		
 		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);
 		c3_enabled = c3_enabled | (fadt->C3_Latency < 1000);
@@ -254,44 +267,102 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 						aml_add_byte(pack, cstates_count);
 		
 						struct aml_chunk* tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x00; // C1
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x01); // C1
-							aml_add_byte(tmpl, 0x01); // Latency
-							aml_add_word(tmpl, 0x03e8); // Power
+                            if (cst_using_sustemio) 
+                            {   
+                                // C1
+                                resource_template_register_fixedhw[8] = 0x00; 
+                                resource_template_register_fixedhw[9] = 0x00; 
+                                resource_template_register_fixedhw[18] = 0x00; 
+                                aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+                                aml_add_byte(tmpl, 0x01); // C1
+                                aml_add_word(tmpl, 0x0001); // Latency
+                                aml_add_dword(tmpl, 0x000003e8); // Power
+                                
+                                uint8_t p_blk_lo, p_blk_hi;
+                                
+                                if (c2_enabled) // C2
+                                {    
+                                    p_blk_lo = acpi_cpu_p_blk + 4;
+                                    p_blk_hi = (acpi_cpu_p_blk + 4) >> 8;
+                                    
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_systemio[11] = p_blk_lo; // C2
+                                    resource_template_register_systemio[12] = p_blk_hi; // C2
+                                    aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+                                    aml_add_byte(tmpl, 0x02); // C2
+                                    aml_add_word(tmpl, 0x0040); // Latency
+                                    aml_add_dword(tmpl, 0x000001f4); // Power
+                                }
+                                                                
+                                if (c4_enabled) // C4
+                                {
+                                    p_blk_lo = acpi_cpu_p_blk + 5;
+                                    p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+                                    
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_systemio[11] = p_blk_lo; // C4
+                                    resource_template_register_systemio[12] = p_blk_hi; // C4
+                                    aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+                                    aml_add_byte(tmpl, 0x04); // C4
+                                    aml_add_word(tmpl, 0x0080); // Latency
+                                    aml_add_dword(tmpl, 0x000000C8); // Power
+                                }
+                                else if (c3_enabled) // C3
+                                {
+                                    p_blk_lo = acpi_cpu_p_blk + 5;
+                                    p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+                                    
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_systemio[11] = p_blk_lo; // C3
+                                    resource_template_register_systemio[12] = p_blk_hi; // C3
+                                    aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+                                    aml_add_byte(tmpl, 0x03);           // C3
+                                    aml_add_word(tmpl, 0x0060);         // Latency
+                                    aml_add_dword(tmpl, 0x0000015e);    // Power
+                                }
 
-						// C2
-						if (c2_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-								cstate_resource_template[11] = 0x10; // C2
-								aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-								aml_add_byte(tmpl, 0x02); // C2
-								aml_add_byte(tmpl, fadt->C2_Latency);
-								aml_add_word(tmpl, 0x01f4); // Power
-						}
-						// C4
-						if (c4_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x30; // C4
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x04); // C4
-							aml_add_word(tmpl, fadt->C3_Latency / 2); // TODO: right latency for C4
-							aml_add_byte(tmpl, 0xfa); // Power
-						}
-						else
-						// C3
-						if (c3_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x20; // C3
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x03); // C3
-							aml_add_word(tmpl, fadt->C3_Latency);
-							aml_add_word(tmpl, 0x015e); // Power
-						}
-						
+                            }
+                            else 
+                            {
+                                // C1
+                                resource_template_register_fixedhw[11] = 0x00; // C1
+                                aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+                                aml_add_byte(tmpl, 0x01);           // C1
+                                aml_add_word(tmpl, 0x0001);         // Latency
+                                aml_add_dword(tmpl, 0x000003e8);    // Power
+                                
+                                resource_template_register_fixedhw[18] = 0x03;
+                                
+                                if (c2_enabled) // C2
+                                {
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_fixedhw[11] = 0x10; // C2
+                                    aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+                                    aml_add_byte(tmpl, 0x02);           // C2
+                                    aml_add_word(tmpl, 0x0040);         // Latency
+                                    aml_add_dword(tmpl, 0x000001f4);    // Power
+                                }
+                                
+                                if (c4_enabled) // C4
+                                {
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_fixedhw[11] = 0x30; // C4
+                                    aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+                                    aml_add_byte(tmpl, 0x04);           // C4
+                                    aml_add_word(tmpl, 0x0080);         // Latency
+                                    aml_add_dword(tmpl, 0x000000C8);    // Power
+                                }
+                                else if (c3_enabled) 
+                                {
+                                    tmpl = aml_add_package(pack);
+                                    resource_template_register_fixedhw[11] = 0x20; // C3
+                                    aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+                                    aml_add_byte(tmpl, 0x03);           // C3
+                                    aml_add_word(tmpl, 0x0060);         // Latency
+                                    aml_add_dword(tmpl, 0x0000015e);    // Power
+                                }
+                            }
+													
 			
 			// Aliaces
 			int i;
@@ -365,7 +436,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			{
 				switch (Platform.CPU.Model) 
 				{
-					case CPU_MODEL_YONAH:	// Intel Mobile Core Solo, Duo 
+					case CPU_MODEL_DOTHAN:	// Intel Pentium M
+					case CPU_MODEL_YONAH:	// Intel Mobile Core Solo, Duo
 					case CPU_MODEL_MEROM:	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
 					case CPU_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
 					case CPU_MODEL_ATOM:	// Intel Atom (45nm)
@@ -486,15 +558,15 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						
 						break;
 					} 
-					case CPU_MODEL_FIELDS:			// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
-					case CPU_MODEL_NEHALEM:			// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
-					case CPU_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
-                    case CPU_MODEL_SANDY:			// Intel Core i3, i5, i7, Xeon E3 LGA1155 (32nm)
-                    case CPU_MODEL_SANDY_XEON:		// Intel Xeon E3
+					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPU_MODEL_DALES:		
+					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
+					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+                    case CPU_MODEL_SANDY:		// Intel Core i3, i5, i7 LGA1155 (32nm)
+                    case CPU_MODEL_SANDY_XEON:	// Intel Xeon E3
 					{
 						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
 						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
@@ -602,7 +674,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Restart Fix
 	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
 	} else {
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
@@ -624,7 +696,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 	// Determine system type / PM_Model
-	if ( (value=getStringForKey(kSystemType, &bootInfo->bootConfig))!=NULL)
+	if ( (value=getStringForKey(kSystemType, &bootInfo->chameleonConfig))!=NULL)
 	{
 		if (Platform.Type > 6)  
 		{
@@ -712,7 +784,7 @@ int setupAcpi(void)
 	int len = 0;
 
 	// Try using the file specified with the DSDT option
-	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
 	{
 		sprintf(dirSpec, filename);
 	}
@@ -736,9 +808,9 @@ int setupAcpi(void)
 	// SSDT Options
 	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false; 
 	
-	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->bootConfig);
-	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->bootConfig);
-	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->bootConfig);
+	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
+	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
+	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
 	
 	{
 		int i;
@@ -1057,7 +1129,7 @@ int setupAcpi(void)
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
-	getc();
+	getchar();
 #endif
 	return 1;
 }

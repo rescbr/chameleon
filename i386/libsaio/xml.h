@@ -38,7 +38,6 @@ enum xmltype {
   kTagTypeArray
 };
 
-
 struct string_ref
 {
 	char* string;
@@ -63,7 +62,6 @@ extern string_ref* ref_strings;
 #define kXMLStringID	"ID="
 #define kXMLStringIDRef "IDREF="
 
-
 #define kPropCFBundleIdentifier ("CFBundleIdentifier")
 #define kPropCFBundleExecutable ("CFBundleExecutable")
 #define kPropOSBundleRequired   ("OSBundleRequired")
@@ -86,6 +84,9 @@ extern long  gImageLastKernelAddr;
 
 TagPtr XMLGetProperty( TagPtr dict, const char * key );
 TagPtr XMLGetElement( TagPtr dict, int id );
+TagPtr XMLGetKey( TagPtr dict, int id );
+TagPtr XMLGetValueForKey(TagPtr key);
+
 int XMLTagCount( TagPtr dict );
 
 bool XMLIsType(TagPtr dict, enum xmltype type);
@@ -97,6 +98,15 @@ int XMLCastInteger ( TagPtr dict );
 TagPtr XMLCastDict ( TagPtr dict );
 TagPtr XMLCastArray( TagPtr dict );
 
+bool XMLIsBoolean(TagPtr entry);
+bool XMLIsString (TagPtr entry);
+bool XMLIsInteger(TagPtr entry);
+bool XMLIsDict   (TagPtr entry);
+bool XMLIsArray  (TagPtr entry);
+
+
+bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value);
+
 long XMLParseNextTag(char *buffer, TagPtr *tag);
 void XMLFreeTag(TagPtr tag);
 char* XMLDecode(const char *in);
@@ -107,5 +117,10 @@ char* XMLDecode(const char *in);
 // tag pointer and returns 0, or returns -1 if not found.
 //
 long XMLParseFile( char * buffer, TagPtr * dict );
+
+//==========================================================================
+// ParseTag*
+long    ParseTagBoolean( char * buffer, TagPtr * tag, long type );
+
 
 #endif /* __LIBSAIO_XML_H */

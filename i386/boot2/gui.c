@@ -16,22 +16,17 @@
 #define THEME_NAME_DEFAULT	"Default"
 static const char *theme_name = THEME_NAME_DEFAULT;	
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 #include "art.h"
 #endif
 
 #define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
 #define vram VIDEO(baseAddr)
 
 int lasttime = 0; // we need this for animating maybe
-
-extern int gDeviceCount;
 
 
 /*
@@ -142,9 +137,8 @@ extern int	selectIndex;
 
 extern MenuItem *menuItems;
 
-char prompt[BOOT_STRING_LEN];
-
-int prompt_pos=0;
+//char prompt[BOOT_STRING_LEN];
+extern char   gBootArgs[BOOT_STRING_LEN];
 
 char prompt_text[] = "boot: ";
  
@@ -168,7 +162,8 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
+// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};
 
 static int getImageIndexByName(const char *name)
 {
@@ -181,7 +176,7 @@ static int getImageIndexByName(const char *name)
 	return -1;
 }
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 static int getEmbeddedImageIndexByName(const char *name)
 {
 	int upperLimit = sizeof(embeddedImages) / sizeof(embeddedImages[0]) - 1;
@@ -189,14 +184,14 @@ static int getEmbeddedImageIndexByName(const char *name)
 	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
 	int result;
 	
-	// NOTE: This algorithm assumes that the embeddedImages is sorted.
-	// This is currently done using the make file. If the array is every 
-	// manualy generated, this *will* fail to work properly.
+	// NOTE: This algorithm assumes that the embedded images are sorted.
+	// This is currently done using the make file. If the array is
+	// generated manualy, this *will* fail to work properly.
 	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
-		if(result > 0)	// We need to search a HIGHER index
+		if (result > 0)	// We need to search a HIGHER index
 		{
-			if(compareIndex != lowerLimit)
+			if (compareIndex != lowerLimit)
 			{
 				lowerLimit = compareIndex;
 			}
@@ -208,7 +203,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 		}
 		else  // We Need to search a LOWER index
 		{
-			if(compareIndex != upperLimit)
+			if (compareIndex != upperLimit)
 			{
 				upperLimit = compareIndex;
 			}
@@ -227,7 +222,7 @@ static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[256];
 	int 		i;
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 	int 		e;
 #endif
 	uint16_t	width;
@@ -255,7 +250,7 @@ static int loadThemeImage(const char *image, int alt_image)
             flipRB(images[i].image);
             return 0;
         }
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
         else if ((e = getEmbeddedImageIndexByName(image)) >= 0)
         {
             unsigned char *embed_data;
@@ -286,7 +281,7 @@ static int loadThemeImage(const char *image, int alt_image)
         }
         else
         {
-#ifndef EMBED_THEME
+#ifndef CONFIG_EMBED_THEME
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
 			sleep(2);
 #endif
@@ -683,13 +678,13 @@ int initGUI(void)
 	int	len;
 	char	dirspec[256];
 
-	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
+	getValueForKey( "Theme", &theme_name, &len, &bootInfo->chameleonConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
     config_file_t	*config;
     
     config = &bootInfo->themeConfig;
@@ -805,8 +800,10 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 
 void drawDeviceList (int start, int end, int selection)
 {
-	int i;
-	position_t p, p_prev, p_next;
+	int			i;
+	bool		shoWinfo = true; //Azi:showinfo
+	extern bool showBootBanner; //
+	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
 		
@@ -862,23 +859,29 @@ void drawDeviceList (int start, int end, int selection)
 			 
 			if(gui.menu.draw)
 				drawInfoMenuItems();
-			 
-#if DEBUG
-            gui.debug.cursor = pos( 10, 100);
-            dprintf( &gui.screen, "label     %s\n",   param->label );
-            dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-            dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-            dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
-            dprintf( &gui.screen, "type      0x%x\n", param->type );
-            dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-            dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-            dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-            dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-            dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-            dprintf( &gui.screen, "name      %s\n",   param->name );
-            dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-            dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
-#endif
+			
+			//Azi: make this info more accessible.
+			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->chameleonConfig);
+			
+			if (shoWinfo && showBootBanner) // no boot banner, no showinfo.
+			{
+				gui.debug.cursor = pos( 10, 100);
+				dprintf( &gui.screen, "label:     %s\n",   param->label );
+				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
+				dprintf( &gui.screen, "type:      0x%x\n", param->type );
+				dprintf( &gui.screen, "flags:     0x%x\n", param->flags );
+				dprintf( &gui.screen, "part_no:   %d\n",   param->part_no );
+				dprintf( &gui.screen, "part_boff: 0x%x\n", param->part_boff );
+				dprintf( &gui.screen, "part_type: 0x%x\n", param->part_type );
+				dprintf( &gui.screen, "bps:       0x%x\n", param->bps );
+				dprintf( &gui.screen, "name:      %s\n",   param->name );
+				dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
+				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
+				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
+//				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr ); //Azi: reminder
+//				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
+			}
 		}
 		
 		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
@@ -910,8 +913,8 @@ void drawDeviceList (int start, int end, int selection)
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
-	prompt[0] = '\0';
-	prompt_pos=0;
+	//prompt[0] = '\0';
+	//prompt_pos=0;
 
 	
 	if(	gui.bootprompt.draw == true )
@@ -925,17 +928,8 @@ void clearGraphicBootPrompt()
 	return;
 }
 
-void updateGraphicBootPrompt(int key)
+void updateGraphicBootPrompt()
 {
-	if ( key == kBackspaceKey )
-		prompt[--prompt_pos] = '\0';
-	else 
-	{
-		prompt[prompt_pos] = key;
-		prompt_pos++;
-		prompt[prompt_pos] = '\0';
-	}
-
 	fillPixmapWithColor( gui.bootprompt.pixmap, gui.bootprompt.bgcolor);
 
 	makeRoundedCorners( gui.bootprompt.pixmap);
@@ -947,14 +941,8 @@ void updateGraphicBootPrompt(int key)
 	
 	// get the position of the end of the boot prompt text to display user input
 	position_t p_prompt = pos( p_text.x + ( ( strlen(prompt_text) ) * font_console.chars[0]->width ), p_text.y );
-
-	// calculate the position of the cursor
-	int	offset = (  prompt_pos - ( ( gui.bootprompt.width / font_console.chars[0]->width ) - strlen(prompt_text) - 2 ) );	
-
-	if ( offset < 0)
-		offset = 0;
 	
-	drawStr( prompt+offset, &font_console, gui.bootprompt.pixmap, p_prompt);
+	drawStr( gBootArgs, &font_console, gui.bootprompt.pixmap, p_prompt);
 
 	gui.menu.draw = false;
 	gui.bootprompt.draw = true;
@@ -1027,20 +1015,22 @@ void updateVRAM()
 	}
 }
 
-struct putc_info {
+struct putc_info //Azi: exists on console.c & printf.c
+{
     char * str;
     char * last_str;
 };
 
-static void
-sputc(int c, struct putc_info * pi)
+static int
+sputc(int c, struct putc_info * pi) //Azi: same as above
 {
     if (pi->last_str)
         if (pi->str == pi->last_str) {
             *(pi->str) = '\0';
-            return;
+            return 0;
         }
     *(pi->str)++ = c;
+    return c;
 }
 
 int gprintf( window_t * window, const char * fmt, ...)
@@ -1576,7 +1566,7 @@ void showInfoBox(char *title, char *text)
 		
 		updateVRAM();
 		
-		key = getc();
+		key = getchar();
 			
 		if( key == kUpArrowkey )
 			if( currentline > 0 )
@@ -1804,7 +1794,7 @@ static void loadBootGraphics(void)
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
   	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
 		usePngImage = false; 
@@ -1822,7 +1812,7 @@ void drawBootGraphics(void)
 	bool legacy_logo;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
+	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig) && legacy_logo) {
 		usePngImage = false; 
 	} else if (bootImageData == NULL) {
 		loadBootGraphics();
@@ -1857,7 +1847,7 @@ void drawBootGraphics(void)
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
 
-	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
+	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig)) {
 		drawCheckerBoard();
 	} else {
 		// Fill the background to 75% grey (same as BootX). 

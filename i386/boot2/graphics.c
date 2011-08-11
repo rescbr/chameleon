@@ -42,8 +42,6 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
  
 //==========================================================================
 // getVBEInfoString
@@ -1038,7 +1036,7 @@ getNumberArrayFromProperty( const char *  propKey,
     char * propStr;
     unsigned long    count = 0;
 
-    propStr = newStringForKey( (char *) propKey , &bootInfo->bootConfig );
+    propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
     if ( propStr )
     {
         char * delimiter = propStr;
@@ -1209,8 +1207,8 @@ spinActivityIndicator(int sectors)
 		{
 			currentIndicator = 0;
 		}
-		putc(indicator[currentIndicator++]);
-		putc('\b');
+		putchar(indicator[currentIndicator++]);
+		putchar('\b');
 	}
 }
 
@@ -1219,8 +1217,8 @@ clearActivityIndicator( void )
 {
     if ( getVideoMode() == VGA_TEXT_MODE )
     {
-		putc(' ');
-		putc('\b');
+		putchar(' ');
+		putchar('\b');
     }
 }
 

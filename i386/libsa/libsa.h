@@ -70,7 +70,6 @@ static inline int isxdigit(int c)
     return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
 }
 
-//Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
 static inline int ispunct(int c)
 {
     return (c == '.' || c == '-');
@@ -94,11 +93,11 @@ extern int    strcmp(const char * s1, const char * s2);
 extern int    strncmp(const char * s1, const char * s2, size_t n);
 extern char * strcpy(char * s1, const char * s2);
 extern char * strncpy(char * s1, const char * s2, size_t n);
-extern char * strlcpy(char * s1, const char * s2, size_t n);
+extern size_t strlcpy(char * s1, const char * s2, size_t n);
 extern char * strstr(const char *in, const char *str);
 extern int    atoi(const char * str);
 extern int    ptol(const char * str);
-extern int    strlen(const char * str);
+extern size_t    strlen(const char * str);
 extern char * strcat(char * s1, const char * s2);
 extern char * strncat(char * s1, const char * s2, size_t n);
 extern char * strdup(const char *s1);
@@ -128,7 +127,7 @@ extern unsigned long long strtouq(const char *nptr, char ** endptr, int base);
 /*
  * prf.c
  */
-extern void prf(const char * fmt, va_list ap, void (*putfn_p)(),
+extern void prf(const char * fmt, va_list ap, int (*putfn_p)(),
                 void * putfn_arg);
 
 /*

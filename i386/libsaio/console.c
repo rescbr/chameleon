@@ -46,40 +46,44 @@
 
 #include "libsaio.h"
 #include "bootstruct.h"
+#include <vers.h>
 
 extern int	vprf(const char * fmt, va_list ap);
 
 bool gVerboseMode;
 bool gErrors;
 
-/* Kabyl: BooterLog */
-//Azi: Doubled log available size.
-// 64kb are not enough to hold the full log while booting with -f argument (ignore caches).
-// It also seems to fix some reported problems while booting with the mentioned argument.
-// Note: 96kb are enough to hold full log, booting with -f; even so, this depends on how much
-// we "play" at the boot prompt, with what patches we're playing and how much they print to the log,
-// kexts loaded, etc...
-// Please remove this comment when this gets checked by a "true" dev.
+/*
+ *  Azi: Doubled available log size; this seems to fix some hangs and instant reboots caused by
+ *  booting with -f (ignore caches). 96kb are enough to hold full log, booting with -f; even so,
+ *  this depends on how much we "play" at the boot prompt and with what patches we're playing,
+ *  depending on how much they print to the log.
+ *	
+ *  Kabyl: BooterLog
+ */
 #define BOOTER_LOG_SIZE	(128 * 1024)
 #define SAFE_LOG_SIZE	134
 
 char *msgbuf = 0;
 char *cursor = 0;
 
-struct putc_info {
+struct putc_info //Azi: exists on gui.c & printf.c
+{
     char * str;
     char * last_str;
 };
 
-static void sputc(int c, struct putc_info * pi)
+static int
+sputc(int c, struct putc_info * pi) //Azi: same as above
 {
 	if (pi->last_str)
 	if (pi->str == pi->last_str)
 	{
 		*(pi->str) = '\0';
-		return;
+		return 0;
 	}
 	*(pi->str)++ = c;
+    return c;
 }
 
 void initBooterLog(void)
@@ -87,6 +91,7 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
+	msglog("%s\n", "Chameleon " I386BOOT_CHAMELEONVERSION " (svn-r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
 }
 
 void msglog(const char * fmt, ...)
@@ -119,24 +124,25 @@ void setupBooterLog(void)
 }
 /* Kabyl: !BooterLog */
 
-
 /*
  * write one character to console
  */
-void putchar(int c)
+int putchar(int c)
 {
 	if ( c == '\t' )
 	{
-		for (c = 0; c < 8; c++) putc(' ');
-		return;
+		for (c = 0; c < 8; c++) bios_putchar(' ');
+		return c;
 	}
 
 	if ( c == '\n' )
     {
-		putc('\r');
+		bios_putchar('\r');
     }
 
-	putc(c);
+	bios_putchar(c);
+    
+    return c;
 }
 
 int getc()
@@ -156,9 +162,9 @@ int getchar()
 {
 	register int c = getc();
 
-	if ( c == '\r' ) c = '\n';
+//	if ( c == '\r' ) c = '\n';
 
-	if ( c >= ' ' && c < 0x7f) putchar(c);
+//	if ( c >= ' ' && c < 0x7f) putchar(c);
 	
 	return (c);
 }
@@ -173,7 +179,7 @@ int printf(const char * fmt, ...)
 		vprf(fmt, ap);
 
 	{
-	/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf)
@@ -194,7 +200,7 @@ int printf(const char * fmt, ...)
 int verbose(const char * fmt, ...)
 {
     va_list ap;
-    
+
 	va_start(ap, fmt);
     if (gVerboseMode)
     {
@@ -205,7 +211,7 @@ int verbose(const char * fmt, ...)
     }
 
 	{
-	/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf)
@@ -256,6 +262,6 @@ void stop(const char * fmt, ...)
 /** Print a "Press a key to continue..." message and wait for a key press. */
 void pause() 
 {
-    printf("Press a key to continue...");
-    getc();
+    printf("Press a key to continue...\n");
+	getchar(); // replace getchar() by pause() were useful.
 }

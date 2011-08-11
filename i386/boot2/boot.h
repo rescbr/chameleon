@@ -30,6 +30,17 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
+/*
+ * Paths used by chameleon
+ */
+
+//kernel cache
+#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+
+// Lion installer
+#define kLionInstallerDataFolder      "/Mac OS X Install Data/"
+#define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
 
 /*
  * Keys used in system Boot.plist
@@ -38,9 +49,13 @@
 #define kTextModeKey		"Text Mode"
 #define kQuietBootKey		"Quiet Boot"
 #define kKernelFlagsKey		"Kernel Flags"
+#define kKernelArchKey      "Kernel Architecture"
+#define karch				"arch"				/* boot.c */
+#define kProductVersion		"ProductVersion"	/* boot.c */
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
 #define kKernelCacheKey		"Kernel Cache"
+#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 #define kBootDeviceKey		"Boot Device"
 #define kTimeoutKey			"Timeout"
 #define kRootDeviceKey		"rd"
@@ -57,6 +72,7 @@
 #define kDefaultKernel		"mach_kernel"
 #define kGUIKey				"GUI"
 #define kBootBannerKey		"Boot Banner"
+#define kShowInfoKey		"ShowInfo"			// gui.c
 #define kWaitForKeypressKey	"Wait"
 
 #define kDSDT				"DSDT"				/* acpi_patcher.c */
@@ -64,20 +80,14 @@
 #define kRestartFix			"RestartFix"		/* acpi_patcher.c */
 #define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
 #define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kEnableC2States		"EnableC2State"		/* acpi_patcher.c */
-#define kEnableC3States		"EnableC3State"		/* acpi_patcher.c */
-#define kEnableC4States		"EnableC4State"		/* acpi_patcher.c */
-
-#define kUseAtiROM			"UseAtiROM"			/* ati.c */
-#define kAtiConfig			"AtiConfig"			/* ati.c */
-#define kATYbinimage		"ATYbinimage"		/* ati.c */
+#define kCSTUsingSystemIO	"CSTUsingSystemIO"	/* acpi_patcher.c */
+#define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
+#define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
+#define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
 
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch				"arch"				/* boot.c */
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 
 #define kbusratio			"busratio"			/* cpu.c */
 
@@ -85,27 +95,32 @@
 
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
+#define kDefaultPartition	"Default Partition"	/* sys.c */
 
 #define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
+#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
 
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS				"VBIOS"				/* nvidia.c */
+#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
 
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
+
+#define kUseAtiROM			"UseAtiROM"			/* ati.c */
+#define kAtiConfig			"AtiConfig"			/* ati.c */
+#define kAtiPorts			"AtiPorts"			/* ati.c */
+#define kATYbinimage		"ATYbinimage"		/* ati.c */
+
+#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
+#define kVBIOS				"VBIOS"				/* nvidia.c */
+#define kDcfg0				"display_0"			/* nvidia.c */
+#define kDcfg1				"display_1"			/* nvidia.c */
 
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */
 
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-
 #define kMD0Image			"md0"				/* ramdisk.h */
-
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-
-#define kDefaultPartition	"Default Partition"	/* sys.c */
 
 #define kUSBBusFix			"USBBusFix"			/* usb.c */
 #define kEHCIacquire		"EHCIacquire"		/* usb.c */
@@ -172,14 +187,14 @@ extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
 extern void drawColorRectangle( unsigned short x,
-                         unsigned short y,
-                         unsigned short width,
-                         unsigned short height,
-                         unsigned char  colorIndex );
+                                unsigned short y,
+                                unsigned short width,
+                                unsigned short height,
+                                unsigned char  colorIndex );
 extern void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
+                               unsigned short  y,
+                               unsigned short  width,
+                               unsigned short  height,
                                unsigned char * data );
 extern int
 convertImage( unsigned short width,

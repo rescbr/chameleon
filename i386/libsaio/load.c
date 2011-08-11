@@ -135,7 +135,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   printf("ncmds:      %x\n", (unsigned)mH->ncmds);
   printf("sizeofcmds: %x\n", (unsigned)mH->sizeofcmds);
   printf("flags:      %x\n", (unsigned)mH->flags);
-  getc();
+  getchar();
 #endif
   
   ncmds = mH->ncmds;
@@ -151,8 +151,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
     case LC_SEGMENT:
       ret = DecodeSegment(cmdBase, &load_addr, &load_size);
       if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR) {
-          vmaddr = min(vmaddr, load_addr);
-          vmend = max(vmend, load_addr + load_size);
+          vmaddr = MIN(vmaddr, load_addr);
+          vmend = MAX(vmend, load_addr + load_size);
       }
       break;
       
@@ -213,7 +213,14 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  fileaddr = (gBinaryAddress + segCmd->fileoff);
 	  filesize = segCmd->filesize;
 
-	  segname=segCmd->segname;	  
+	  segname=segCmd->segname;
+
+#ifdef DEBUG
+  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+  getchar();
+#endif	  
   }
   else
   {
@@ -226,7 +233,14 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	  fileaddr = (gBinaryAddress + segCmd->fileoff);
 	  filesize = segCmd->filesize;
 	  
-	  segname=segCmd->segname;	  
+	  segname=segCmd->segname;
+
+#ifdef DEBUG
+  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+  getchar();
+#endif	  
   }
 
   if (vmsize == 0 || filesize == 0) {
@@ -234,13 +248,6 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
       *load_size = 0;
       return 0;
   }
-  
-#if DEBUG
-  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getc();
-#endif
   
   if (! ((vmaddr >= KERNEL_ADDR &&
           (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
@@ -277,11 +284,7 @@ static long DecodeUnixThread(long cmdBase, unsigned int *entry)
 			i386ThreadState = (i386_thread_state_t *)
 				(cmdBase + sizeof(struct thread_command) + 8);
   
-		#if defined(__DARWIN_UNIX03) && __DARWIN_UNIX03
-			*entry = i386ThreadState->__eip;
-		#else
 			*entry = i386ThreadState->eip;
-		#endif
 			return 0;
 		}
 			
@@ -292,11 +295,7 @@ static long DecodeUnixThread(long cmdBase, unsigned int *entry)
 			x86_64ThreadState = (x86_thread_state64_t *)
 			(cmdBase + sizeof(struct thread_command) + 8);
 			
-		#if defined(__DARWIN_UNIX03) && __DARWIN_UNIX03
-			*entry = x86_64ThreadState->__rip;
-		#else
 			*entry = x86_64ThreadState->rip;
-		#endif
 			return 0;
 		}
 			
@@ -318,7 +317,7 @@ static long DecodeSymbolTable(long cmdBase)
 #if DEBUG
   printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n",
 	 symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
-	getc ();
+  getchar();
 #endif
   
   symsSize = symTab->stroff - symTab->symoff;
