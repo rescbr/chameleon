@@ -197,6 +197,8 @@ static struct ati_chipsets_t ATIChipsets[] = {
 	{ 0x10027187,	"ATI Radeon X1300 Series"			}, // Mckibble
 	{ 0x100271C5,	"ATI Mobility Radeon X1600"			}, // Darles, Derc - looks like it's a no go ??
 	{ 0x100271D4,	"ATI Mobility FireGL V5250"			}, // Downlord - ??
+	
+	{ 0x10027244,	"ATI RADEON X1950 Series"			}, // tlfrance
 // =====================================================
 	{ 0x10029589,	"ATI Radeon 2600 Series"			},
 	{ 0x10029588,	"ATI Radeon 2600 Series"			},
@@ -270,7 +272,9 @@ static struct ati_chipsets_t ATIFramebuffers_pre[] = {
 /*	{ 0x10027183,	"Caretta"	},
 	{ 0x10027187,	"Caretta"	},
 	{ 0x100271C5,	"Wormy"		}, // ??
-	{ 0x100271D4,	"Wormy"		}, // ??*/
+	{ 0x100271D4,	"Wormy"		}, // ??
+	
+	{ 0x10027244,	"Alopias"	},*/
 // =============================
 	{ 0x10029589,	"Lamna"		},
 	{ 0x10029588,	"Lamna"		},
@@ -343,6 +347,8 @@ static struct ati_chipsets_t ATIFramebuffers_post[] = {
 	{ 0x10027187,	"Caretta"	},
 	{ 0x100271C5,	"Wormy"		}, // ??
 	{ 0x100271D4,	"Wormy"		}, // ??
+	
+	{ 0x10027244,	"Alopias"	},
 // =============================
 /*	{ 0x10029589,	"Lamna"		},
 	{ 0x10029588,	"Lamna"		},
