@@ -64,13 +64,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	mkdir -p ${1}/Core/Root/usr/sbin
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
-#    if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
-#        echo "Modules found."
-#        mkdir -p ${1}/Core/Root/usr/standalone/i386/modules
-#        cp -R ${1%/*}/i386/modules ${1}/Core/Root/usr/standalone/i386
-#    else
-#        echo "No found modules into dir module"
-#    fi
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0 ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0md ${1}/Core/Root/usr/standalone/i386
@@ -120,6 +113,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build Modules package
         echo "================= Modules ================="
                 ###############################
+                # Supported Modules           #
+                ###############################
                 # AMDGraphicsEnabler.dylib    #
                 # ATiGraphicsEnabler.dylib    #
                 # IntelGraphicsEnabler.dylib  #
@@ -133,7 +128,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
             outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">"
             choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
             ((xmlindent++))
-            packagesidentity="org.chameleon.module"
+            packagesidentity="org.chameleon.modules"
 # -
             if [ -e ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ]; then
             {
@@ -167,7 +162,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/klibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
                 echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/klibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -195,7 +190,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
                 echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/uClibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
             ((xmlindent--))
@@ -216,13 +211,13 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Extras\">"
 	choices[$((choicescount++))]="<choice\n\tid=\"Extras\"\n\ttitle=\"Extras_title\"\n\tdescription=\"Extras_description\"\n>\n</choice>\n"
 	((xmlindent++))
-	packagesidentity="org.chameleon.extras.com"
+	packagesidentity="org.chameleon.extras"
 
 	# build utility package
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Utility\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Utility\"\n\ttitle=\"Utility_title\"\n\tdescription=\"Utility_description\"\n>\n</choice>\n"
 		((xmlindent++))
-		packagesidentity="org.chameleon.utility.com"
+		packagesidentity="org.chameleon.utilities"
 
 		# build package for Chameleon PrefPanel
 			mkdir -p "${1}/PrefPanel/Root"
@@ -258,7 +253,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		((xmlindent++))
 
 		# build base options packages
-		packagesidentity="org.chameleon.options.com"
+		packagesidentity="org.chameleon.options"
 		
 		options=($( find "${pkgroot}/Scripts/BaseOptions" -type d -depth 1 -not -name '.svn' ))
 		for (( i = 0 ; i < ${#options[@]} ; i++ )) 
@@ -276,7 +271,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Resolution\">"
 			choices[$((choicescount++))]="<choice\n\tid=\"Resolution\"\n\ttitle=\"Resolution_title\"\n\tdescription=\"Resolution_description\"\n>\n</choice>\n"
 			((xmlindent++))
-			packagesidentity="org.chameleon.resolution"
+			packagesidentity="org.chameleon.options.resolution"
 			resolutions=($( find "${pkgroot}/Scripts/Resolutions" -type d -depth 1 -not -name '.svn' ))
 			for (( i = 0 ; i < ${#resolutions[@]} ; i++ )) 
 			do
@@ -297,7 +292,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			choices[$((choicescount++))]="<choice\n\tid=\"Advanced\"\n\ttitle=\"Advanced_title\"\n\tdescription=\"Advanced_description\"\n>\n</choice>\n"
 			((xmlindent++))
 
-			packagesidentity="org.chameleon.advanced.options.pkg"
+			packagesidentity="org.chameleon.options.advanced"
 			optionsadv=($( find "${pkgroot}/Scripts/Advanced" -type d -depth 1 -not -name '.svn' ))
 			for (( i = 0 ; i < ${#optionsadv[@]} ; i++ )) 
 			do
@@ -322,7 +317,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Themes\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Themes\"\n\ttitle=\"Themes_title\"\n\tdescription=\"Themes_description\"\n>\n</choice>\n"
 		((xmlindent++))
-		packagesidentity="org.chameleon.theme.pkg"
+		packagesidentity="org.chameleon.themes"
 		artwork="${1%/*}"
 		themes=($( find "${artwork%/*}/artwork/themes" -type d -depth 1 -not -name '.svn' ))
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
