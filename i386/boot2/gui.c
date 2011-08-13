@@ -45,9 +45,9 @@ enum {
     iDeviceEXT3,
     iDeviceEXT3_o,
     iDeviceFreeBSD,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceFreeBSD_o,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceFreeBSD_o,	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
     iDeviceOpenBSD,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceOpenBSD_o,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceOpenBSD_o,	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
     iDeviceBEFS,		/* Haiku detection and Icon credits to scorpius  */
     iDeviceBEFS_o,		/* Haiku detection and Icon credits to scorpius  */
     iDeviceFAT,
