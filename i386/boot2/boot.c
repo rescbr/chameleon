@@ -211,9 +211,6 @@ static int ExecKernel(void *binary)
     if (checkOSVersion("10.7")) {
 		
 		// Masking out so that Lion doesn't doublefault
-		// outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
-		// outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
-
 		// Jump to kernel's entry point. There's no going back now.
 
 		startprog( kernelEntry, bootArgs );
@@ -605,12 +602,10 @@ void common_boot(int biosdev)
 				verbose("Kernel cache did not load %s\n ", bootFile);
             }
             
-            if (checkOSVersion("10.7"))
-            {
+            if (checkOSVersion("10.7")) {
                 bootFile = gBootKernelCacheFile;
             }
-            else
-            {
+            else {
                 sprintf(bootFile, "\%s", bootInfo->bootFile);
             }
             
@@ -628,7 +623,7 @@ void common_boot(int biosdev)
                     if (ret == -1)
                     {
                         // No alternate location found, using the original kernel image path.
-                        strcpy(bootFileSpec, bootFile);
+                        strcpy(bootFileSpec, bootInfo->bootFile);
                     }
                 }
             }
