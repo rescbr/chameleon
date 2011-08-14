@@ -125,18 +125,19 @@ dist image: all
 	@hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
 		${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
 		"${ISOIMAGE}" ${IMGROOT} -quiet 		  	  
-	@echo "\t[GZ] ${DISTFILE}.tar.gz"
+	@echo "\t[GZ] ${DISTFILE}.tgz"
 	@rm -f ${DISTFILE}.tar.gz
 	@cd ${SYMROOT} && tar -cf ${DISTFILE}.tar ${DISTROOT}
 	@gzip --best ${DISTFILE}.tar
 	@mv ${DISTFILE}.tar.gz ${DISTFILE}.tgz
 
+
 pkg installer: all
-	@# TODO: remove sudo
 	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
+	@echo "\t[GZ] ${DISTFILE}.pkg"
+	@gzip --best ${DISTFILE}.pkg
 
 dmg: all
-	@# TODO: remove sudo
 	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
 	${SRCROOT}/package/builddmg.sh ${SYMROOT}/package;
 
