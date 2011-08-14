@@ -1310,32 +1310,55 @@ static bool init_card(pci_dt_t *pci_dev)
 		}
 	}
 	
-//	atN = 0;
-	
-	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
-	if (!card->cfg_name)
-	{
-		card->cfg_name = card_configs[card->info->cfg_name].name;
-		card->ports = card_configs[card->info->cfg_name].ports;
-	}
-	else
-	{
-		for (i = 0; i < kCfgEnd; i++)
-			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
-				card->ports = card_configs[i].ports;
-	}
+//	card->ports = 2; // default - Azi: default is card_configs
 	
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
 		card->flags |= EVERGREEN;
-		card->ports = 3; //Azi: not sure of the usefulness ??
+//		card->ports = 3; //Azi: use the AtiPorts key if needed
 	}
 	
-	getIntForKey(kAtiPorts, &n_ports, &bootInfo->bootConfig);
-	if (n_ports > 0){
-		card->ports = n_ports;
-         verbose("AtiPorts set to %d\n",n_ports); //AniV
+//	atN = 0;
+	
+	// Check AtiConfig key for a framebuffer name,
+	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
+	// if none,
+	if (!card->cfg_name)
+	{
+		// use the device fb key on radeon_cards, to retrive the default name from card_configs.
+		card->cfg_name = card_configs[card->info->cfg_name].name;
+		// and leave ports alone!
+//		card->ports = card_configs[card->info->cfg_name].ports;
+		
+		// which means one of the fb's or kNull
+		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
+	}
+	else
+	{
+		// else, use the fb name returned by AtiConfig.
+		verbose("(AtiConfig) Framebuffer set to: %s\n", card->cfg_name);
+	}
+	
+	// Check AtiPorts key for nr of ports,
+	card->ports = getIntForKey(kAtiPorts, &n_ports, &bootInfo->chameleonConfig);
+	// if a value bigger than 0 ?? is found, (do we need >= 0 ?? that's null FB on card_configs)
+	if (n_ports > 0)
+	{
+		card->ports = n_ports; // use it.
+		verbose("(AtiPorts) Nr of ports set to: %d\n", card->ports);
     }
+	else// if (card->cfg_name > 0) // do we want 0 ports if fb is kNull or mistyped ?
+	{
+		// else, match fb name with card_configs list and retrive default nr of ports.
+		for (i = 0; i < kCfgEnd; i++)
+			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
+				card->ports = card_configs[i].ports; // default
+		
+		verbose("Nr of ports set to framebuffer's default: %d\n", card->ports);
+	}
+//	else
+//		card->ports = 2/1 ?; // set a min if 0 ports ?
+//		verbose("Nr of ports set to min: %d\n", card->ports);
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;

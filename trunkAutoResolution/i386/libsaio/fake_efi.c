@@ -690,29 +690,29 @@ void saveOriginalSMBIOS(void)
 	Node *node;
 	SMBEntryPoint *origeps;
 	void *tableAddress;
-
+	
 	node = DT__FindNode("/efi/platform", false);
 	if (!node)
 	{
 		verbose("/efi/platform node not found\n");
 		return;
 	}
-
+	
 	origeps = getSmbios(SMBIOS_ORIGINAL);
 	if (!origeps)
 	{
 		return;
 	}
-
+	
 	tableAddress = (void *)AllocateKernelMemory(origeps->dmi.tableLength);
 	if (!tableAddress)
 	{
 		return;
 	}
-
+	
 	memcpy(tableAddress, (void *)origeps->dmi.tableAddress, origeps->dmi.tableLength);
 	DT__AddProperty(node, "SMBIOS", origeps->dmi.tableLength, tableAddress);
-}		
+}
 
 /*
  * Entrypoint from boot.c
@@ -723,7 +723,7 @@ void setupFakeEfi(void)
 	setup_pci_devs(root_pci_dev);
 	
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
-
+	
 	// load smbios.plist file if any
 	setupSmbiosConfigFile("smbios.plist");
 	
@@ -742,9 +742,8 @@ void setupFakeEfi(void)
 	// Initialize the device tree
 	setupEfiDeviceTree();
 	
-	saveOriginalSMBIOS();	
-
+	saveOriginalSMBIOS();
+	
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
 }
-
