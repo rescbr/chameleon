@@ -213,12 +213,11 @@ enum {
 };
 
 enum {
-
-	kPartitionTypeHFS     = 0xAF,
-	kPartitionTypeHPFS    = 0x07,
-	kPartitionTypeFAT16   = 0x06,
-	kPartitionTypeFAT32   = 0x0c,
-	kPartitionTypeEXT3    = 0x83,
+	kPartitionTypeHFS		= 0xAF,
+	kPartitionTypeHPFS		= 0x07,
+	kPartitionTypeFAT16		= 0x06,
+	kPartitionTypeFAT32		= 0x0c,
+	kPartitionTypeEXT3		= 0x83,
 	kPartitionTypeBEFS    = 0xEB,
 	kPartitionTypeFreeBSD = 0xa5,
 	kPartitionTypeOpenBSD = 0xa6

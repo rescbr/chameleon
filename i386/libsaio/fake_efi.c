@@ -742,9 +742,8 @@ void setupFakeEfi(void)
 	// Initialize the device tree
 	setupEfiDeviceTree();
 
-	saveOriginalSMBIOS();	
+	saveOriginalSMBIOS();
 
 	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
 }
-
