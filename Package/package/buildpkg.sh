@@ -328,7 +328,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+#	rm -R -f "${1}" Azipkg: uncoment when done
 
 }
 
