@@ -1305,7 +1305,7 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 		if( ch[i] == '\t' )
 			x+=(font->chars[0]->width*5);
 		
-		if(font->chars[cha])
+		if(font->chars[cha] && ((x + font->chars[cha]->width) < blendInto->width))
 			blend(font->chars[cha], blendInto, pos(p.x+x, p.y+y));
 		
 		x += font->chars[cha]->width;
@@ -1474,16 +1474,22 @@ void makeRoundedCorners(pixmap_t *p)
 	}
 }
 
-void showInfoBox(char *title, char *text)
+void showInfoBox(char *title, char *text_orig)
 {
+	char* text;
 	int i, key, lines, visiblelines;
 
 	int currentline=0;
 	int cnt=0;
 	int offset=0;
 	
-	if( !title || !text )
+	if( !title || !text_orig )
 		return;
+	
+	// Create a copy so that we don't mangle the original
+	text = malloc(strlen(text_orig) + 1);
+	strcpy(text, text_orig);
+	
 	
 	position_t pos_title = pos ( gui.infobox.vborder, gui.infobox.vborder );
 
@@ -1582,6 +1588,15 @@ void showInfoBox(char *title, char *text)
 			gui.redraw = true;
 			updateVRAM();
 			break;
+		}
+		
+		if(key == ' ') // spacebar = next page
+		{
+			if( lines > ( currentline + visiblelines ) ) 
+				currentline += visiblelines;
+			
+			if(lines < (currentline + visiblelines))
+				currentline = lines - visiblelines;
 		}
 	}
 }

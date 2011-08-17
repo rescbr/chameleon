@@ -726,7 +726,7 @@ static long
 ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 {
 	long       length, pos;
-	TagPtr     moduleDict;
+	TagPtr     moduleDict, required;
 	ModulePtr  tmpModule;
   
     pos = 0;
@@ -746,15 +746,14 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
   
     if (length == -1) return -1;
 
-    
-    if (!(gBootMode & kBootModeSafe) &&
-        XMLGetProperty(moduleDict, kPropOSBundleRequired) && 
-        strcmp(XMLCastString(XMLGetProperty(moduleDict, kPropOSBundleRequired)), "Safe Boot") == 0)
-    {
-        // Don't load Safe Boot kexts if -x not specified.
-        XMLFreeTag(moduleDict);
-        return -2;
-    }
+	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
+	if ( (required == 0) ||
+		(required->type != kTagTypeString) ||
+		!strcmp(required->string, "Safe Boot"))
+	{
+		XMLFreeTag(moduleDict);
+		return -2;
+	}
 
     tmpModule = malloc(sizeof(Module));
     if (tmpModule == 0)

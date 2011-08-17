@@ -88,6 +88,10 @@ static bool				getOSVersion();
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
+/** options.c **/
+extern char* msgbuf;
+void showTextBuffer(char *buf, int size);
+
 
 //==========================================================================
 // Zero the BSS.
@@ -176,8 +180,7 @@ static int ExecKernel(void *binary)
 	
 	bool dummyVal;
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal) {
-		printf("(Wait) ");
-		pause();
+		showTextBuffer(msgbuf, strlen(msgbuf));
 	}
 	
 	usb_loop();
