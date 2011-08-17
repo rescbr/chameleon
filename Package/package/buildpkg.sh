@@ -61,7 +61,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	echo "================= Core ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon.core"
-	mkdir -p ${1}/Core/Root/usr/sbin
+#	mkdir -p ${1}/Core/Root/usr/sbin #Azipkg
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
 #    if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
@@ -82,8 +82,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	ditto --noextattr --noqtn ${1%/*}/i386/cdboot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/chain0 ${1}/Core/Root/usr/standalone/i386
 # fixperms "${1}/Core/Root/"
-	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/sbin
-	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/sbin
+	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/local/bin #Azipkg
+	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/local/bin #Azipkg
 	local coresize=$( du -hkc "${1}/Core/Root" | tail -n1 | awk {'print $1'} )
 	echo "	[BUILD] i386 "
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
@@ -328,7 +328,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-#	rm -R -f "${1}" Azipkg: uncoment when done
+#	rm -R -f "${1}" #Azipkg: uncoment when done
 
 }
 
