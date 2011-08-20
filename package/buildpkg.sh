@@ -58,7 +58,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	echo "================= Core ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon.core"
-	mkdir -p ${1}/Core/Root/usr/sbin
+#	mkdir -p ${1}/Core/Root/usr/sbin
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
