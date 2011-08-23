@@ -838,6 +838,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE10C3, "GeForce 8400 GS" },
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
+	{ 0x10DE1201, "GeForce GTX 560" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
 	{ 0x10DE1245, "GeForce GTS 450" },
 	{ 0x10DE1251, "N12E-GS-A1" },

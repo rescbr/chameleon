@@ -58,7 +58,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	echo "================= Core ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon.core"
-#	mkdir -p ${1}/Core/Root/usr/sbin
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
@@ -204,43 +203,43 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 # End build Chameleon package
 
 # build Extras package
-	echo "================= Extras ================="
-	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Extras\">"
-	choices[$((choicescount++))]="<choice\n\tid=\"Extras\"\n\ttitle=\"Extras_title\"\n\tdescription=\"Extras_description\"\n>\n</choice>\n"
-	((xmlindent++))
-	packagesidentity="org.chameleon.extras"
+	#echo "================= Extras ================="
+	#outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Extras\">"
+	#choices[$((choicescount++))]="<choice\n\tid=\"Extras\"\n\ttitle=\"Extras_title\"\n\tdescription=\"Extras_description\"\n>\n</choice>\n"
+	#((xmlindent++))
+	#packagesidentity="org.chameleon.extras"
 
 	# build utility package
-		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Utility\">"
-		choices[$((choicescount++))]="<choice\n\tid=\"Utility\"\n\ttitle=\"Utility_title\"\n\tdescription=\"Utility_description\"\n>\n</choice>\n"
-		((xmlindent++))
-		packagesidentity="org.chameleon.utilities"
+	#	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Utility\">"
+	#	choices[$((choicescount++))]="<choice\n\tid=\"Utility\"\n\ttitle=\"Utility_title\"\n\tdescription=\"Utility_description\"\n>\n</choice>\n"
+	#	((xmlindent++))
+	#	packagesidentity="org.chameleon.utilities"
 
-		# build package for Chameleon PrefPanel
-			mkdir -p "${1}/PrefPanel/Root"
-			ditto --noextattr --noqtn "${pkgroot}/Configuration/PrefPanel/Chameleon.prefPane" "${1}/PrefPanel/Root"
-			echo "	[BUILD] Chameleon Preference Panel "
-			buildpackage "${1}/PrefPanel" "/Library/PreferencePanes/Chameleon.prefPane" "" "start_selected=\"false\"" >/dev/null 2>&1
-		# End build package for Chameleon PrefPanel
+	#	# build package for Chameleon PrefPanel
+	#		mkdir -p "${1}/PrefPanel/Root"
+	#		ditto --noextattr --noqtn "${pkgroot}/Configuration/PrefPanel/Chameleon.prefPane" "${1}/PrefPanel/Root"
+	#		echo "	[BUILD] Chameleon Preference Panel "
+	#		buildpackage "${1}/PrefPanel" "/Library/PreferencePanes/Chameleon.prefPane" "" "start_selected=\"false\"" >/dev/null 2>&1
+	#	# End build package for Chameleon PrefPanel
 		
-		# build package for SMBIOSDefault
-			mkdir -p "${1}/SMBIOSDefault/Root"
-			ditto --noextattr --noqtn "${pkgroot}/Configuration/SMBIOSDefault/smbios.plist" "${1}/SMBIOSDefault/Root"
-			echo "	[BUILD] SMBIOSDefault "
-			buildpackage "${1}/SMBIOSDefault" "/Extra/Example" "" "start_selected=\"false\"" >/dev/null 2>&1
-		# End build package for SMBIOSDefault
+	#	# build package for SMBIOSDefault
+	#		mkdir -p "${1}/SMBIOSDefault/Root"
+	#		ditto --noextattr --noqtn "${pkgroot}/Configuration/SMBIOSDefault/smbios.plist" "${1}/SMBIOSDefault/Root"
+	#		echo "	[BUILD] SMBIOSDefault "
+	#		buildpackage "${1}/SMBIOSDefault" "/Extra/Example" "" "start_selected=\"false\"" >/dev/null 2>&1
+	#	# End build package for SMBIOSDefault
 		
-		# build package for Documentation
-			mkdir -p "${1}/Documentation/Root"
-			cp -f ${pkgroot}/../doc/BootHelp.txt ${1}/Documentation/Root
-			cp -f ${pkgroot}/../doc/README ${1}/Documentation/Root
-			cp -f ${pkgroot}/../doc/Users_Guide0.5.pdf ${1}/Documentation/Root
-			echo "	[BUILD] Documentation "
-			buildpackage "${1}/Documentation" "/Library/Documentation/Chameleon2" "" "start_selected=\"false\"" >/dev/null 2>&1
-		# End build package for Documentation
+	#	# build package for Documentation
+	#		mkdir -p "${1}/Documentation/Root"
+	#		cp -f ${pkgroot}/../doc/BootHelp.txt ${1}/Documentation/Root
+	#		cp -f ${pkgroot}/../doc/README ${1}/Documentation/Root
+	#		cp -f ${pkgroot}/../doc/Users_Guide0.5.pdf ${1}/Documentation/Root
+	#		echo "	[BUILD] Documentation "
+	#		buildpackage "${1}/Documentation" "/Library/Documentation/Chameleon2" "" "start_selected=\"false\"" >/dev/null 2>&1
+	#	# End build package for Documentation
 
-		((xmlindent--))
-		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+	#	((xmlindent--))
+	#	outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 	# End utility package
 		
 	# build options packages
@@ -336,8 +335,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 	# End build theme packages
 
-	((xmlindent--))
-	outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+	#((xmlindent--))
+	#outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 # End build Extras package
 
 # build post install package
@@ -486,12 +485,12 @@ makedistribution ()
 #   command use to generate the file:
 #   ditto -c -k --sequesterRsrc --keepParent Icon.icns Icon.zip
 # ----
-#    ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
-#    DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
-#    Rez -append tempicns.rsrc -o "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
-#    SetFile -a C "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
-#    rm -f tempicns.rsrc
-#    rm -rf "${pkgroot}/Icons/Icons"
+    ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
+    DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
+    Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
+    SetFile -a C "${1%/*}/$packagename-${version}-r$revision.pkg"
+    rm -f tempicns.rsrc
+    rm -rf "${pkgroot}/Icons/Icons"
 # End
 
 	md5=$( md5 "${1%/*}/${packagename// /}-${version}-r${revision}.pkg" | awk {'print $4'} )
