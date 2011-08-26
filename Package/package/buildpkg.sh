@@ -294,8 +294,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
 		do
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
-			mkdir -p "${1}/${themes[$i]##*/}/Root/"
-            rsync -r --exclude=.svn "${themes[$i]}" "${1}/${themes[$i]##*/}/Root/${theme}"
+			mkdir -p "${1}/${theme}/Root/" #Azipkg: ????
+            rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${themes[$i]##*/}/Root/${theme}"
             # #### Comment out thx meklort
             # ditto --noextattr --noqtn "${themes[$i]}" "${1}/${themes[$i]##*/}/Root/${theme}" 
             # ####
@@ -406,7 +406,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	rm -R -f "${1}"
+#	rm -R -f "${1}" #Azipkg: uncoment when done
 fi
 }
 
