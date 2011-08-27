@@ -1,32 +1,30 @@
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
+#include "gma.h"
+#include "nvidia.h"
+#include "modules.h"
 
-extern void set_eth_builtin(pci_dt_t *eth_dev);
-extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
+
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
-extern int ehci_acquire(pci_dt_t *pci_dev);
-extern int uhci_reset(pci_dt_t *pci_dev);
+extern void set_eth_builtin(pci_dt_t *eth_dev);
+extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
+
+extern pci_dt_t *dram_controller_dev;
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
-	bool do_eth_devprop, do_gfx_devprop, fix_ehci, fix_uhci, fix_usb, do_enable_hpet;
+	bool do_eth_devprop, do_gfx_devprop, do_enable_hpet;
 	pci_dt_t *current = pci_dt;
 
-	do_eth_devprop = do_gfx_devprop = fix_ehci = fix_uhci = fix_usb = do_enable_hpet = false;
+	do_eth_devprop = do_gfx_devprop = do_enable_hpet = false;
 
-	getBoolForKey("EthernetBuiltIn", &do_eth_devprop, &bootInfo->bootConfig);
-	getBoolForKey("GraphicsEnabler", &do_gfx_devprop, &bootInfo->bootConfig);
-	if (getBoolForKey("USBBusFix", &fix_usb, &bootInfo->bootConfig) && fix_usb)
-		fix_ehci = fix_uhci = true;
-	else
-	{
-		getBoolForKey("EHCIacquire", &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey("UHCIreset", &fix_uhci, &bootInfo->bootConfig);
-	}
-	getBoolForKey("ForceHPET", &do_enable_hpet, &bootInfo->bootConfig);
+	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
 	while (current)
 	{
@@ -34,6 +32,11 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 		switch (current->class_id)
 		{
+			case PCI_CLASS_BRIDGE_HOST:
+					if (current->dev.addr == PCIADDR(0, 0, 0))
+						dram_controller_dev = current;
+				break;
+				
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				if (do_eth_devprop)
 					set_eth_builtin(current);
@@ -44,15 +47,11 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					switch (current->vendor_id)
 					{
 						case PCI_VENDOR_ID_ATI:
-							verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-							current->vendor_id, current->device_id, devicepath);
 							setup_ati_devprop(current); 
 							break;
 					
-						case PCI_VENDOR_ID_INTEL: 
-							/* message to be removed once support for these cards is added */
-							verbose("Intel VGA Controller [%04x:%04x] :: %s (currently NOT SUPPORTED)\n", 
-								current->vendor_id, current->device_id, devicepath);
+						case PCI_VENDOR_ID_INTEL:
+							setup_gma_devprop(current);
 							break;
 					
 						case PCI_VENDOR_ID_NVIDIA: 
@@ -62,20 +61,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				break;
 
 			case PCI_CLASS_SERIAL_USB:
-				switch (pci_config_read8(current->dev.addr, PCI_CLASS_PROG))
-				{
-					/* EHCI */
-					case 0x20:
-				    	if (fix_ehci)
-							ehci_acquire(current);
-						break;
-
-					/* UHCI */
-					case 0x00:
-				    	if (fix_uhci)
-							uhci_reset(current);
-						break;
-				}
+				notify_usb_dev(current);
 				break;
 
 			case PCI_CLASS_BRIDGE_ISA:
@@ -83,6 +69,8 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					force_enable_hpet(current);
 				break;
 		}
+		
+		execute_hook("PCIDevice", current, NULL, NULL, NULL);
 		
 		setup_pci_devs(current->children);
 		current = current->next;

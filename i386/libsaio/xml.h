@@ -25,7 +25,7 @@
 #ifndef __LIBSAIO_XML_H
 #define __LIBSAIO_XML_H
 
-enum {
+enum xmltype {
   kTagTypeNone = 0,
   kTagTypeDict,
   kTagTypeKey,
@@ -38,6 +38,16 @@ enum {
   kTagTypeArray
 };
 
+struct string_ref
+{
+	char* string;
+	int id;
+	struct string_ref* next;
+};
+typedef struct string_ref string_ref;
+
+extern string_ref* ref_strings;
+
 #define kXMLTagPList   "plist "
 #define kXMLTagDict    "dict"
 #define kXMLTagKey     "key"
@@ -49,6 +59,8 @@ enum {
 #define kXMLTagTrue    "true/"
 #define kXMLTagArray   "array"
 
+#define kXMLStringID	"ID="
+#define kXMLStringIDRef "IDREF="
 
 #define kPropCFBundleIdentifier ("CFBundleIdentifier")
 #define kPropCFBundleExecutable ("CFBundleExecutable")
@@ -71,8 +83,33 @@ extern long  gImageFirstBootXAddr;
 extern long  gImageLastKernelAddr;
 
 TagPtr XMLGetProperty( TagPtr dict, const char * key );
+TagPtr XMLGetElement( TagPtr dict, int id );
+TagPtr XMLGetKey( TagPtr dict, int id );
+TagPtr XMLGetValueForKey(TagPtr key);
+
+int XMLTagCount( TagPtr dict );
+
+bool XMLIsType(TagPtr dict, enum xmltype type);
+
+bool XMLCastBoolean( TagPtr dict );
+char* XMLCastString( TagPtr dict );
+long XMLCastStringOffset(TagPtr dict);
+int XMLCastInteger ( TagPtr dict );
+TagPtr XMLCastDict ( TagPtr dict );
+TagPtr XMLCastArray( TagPtr dict );
+
+bool XMLIsBoolean(TagPtr entry);
+bool XMLIsString (TagPtr entry);
+bool XMLIsInteger(TagPtr entry);
+bool XMLIsDict   (TagPtr entry);
+bool XMLIsArray  (TagPtr entry);
+
+
+bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value);
+
 long XMLParseNextTag(char *buffer, TagPtr *tag);
 void XMLFreeTag(TagPtr tag);
+char* XMLDecode(const char *in);
 //==========================================================================
 // XMLParseFile
 // Expects to see one dictionary in the XML file.
@@ -80,5 +117,10 @@ void XMLFreeTag(TagPtr tag);
 // tag pointer and returns 0, or returns -1 if not found.
 //
 long XMLParseFile( char * buffer, TagPtr * dict );
+
+//==========================================================================
+// ParseTag*
+long    ParseTagBoolean( char * buffer, TagPtr * tag, long type );
+
 
 #endif /* __LIBSAIO_XML_H */

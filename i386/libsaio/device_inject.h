@@ -15,7 +15,7 @@
 extern struct DevPropString *string;
 extern uint8_t *stringdata;
 extern uint32_t stringlength;
-extern void *convertHexStr2Binary(const char *hexStr, int *outLength);
+
 extern void setupDeviceProperties(Node *node);
 
 struct ACPIDevPath {
@@ -63,12 +63,12 @@ struct DevPropString {
 	struct DevPropDevice **entries;
 };
 
-char					*efi_inject_get_devprop_string(uint32_t *len);
-int						 devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
+char			*efi_inject_get_devprop_string(uint32_t *len);
+int			devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
 struct DevPropString	*devprop_create_string(void);
 struct DevPropDevice	*devprop_add_device(struct DevPropString *string, char *path);
-int						 devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);
-char					*devprop_generate_string(struct DevPropString *string);
-void					 devprop_free_string(struct DevPropString *string);
+int			devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);
+char			*devprop_generate_string(struct DevPropString *string);
+void			devprop_free_string(struct DevPropString *string);
 
 #endif /* !__LIBSAIO_DEVICE_INJECT_H */

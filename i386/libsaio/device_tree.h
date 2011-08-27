@@ -9,9 +9,9 @@
 #include <stdint.h>
 
 typedef struct _Property {
-    const char *  name;
-    uint32_t      length;
-    void *        value;
+    const char *             name;
+    uint32_t           length;
+    void *             value;
 
     struct _Property * next;
 } Property;
@@ -27,13 +27,13 @@ typedef struct _Node {
 
 
 extern Property *
-DT__AddProperty(Node *node, const char *name, uint32_t length, const void *value);
+DT__AddProperty(Node *node, const char *name, uint32_t length, void *value);
 
 extern Node *
-DT__AddChild(Node *parent, char *name);
+DT__AddChild(Node *parent, const char *name);
 
 Node *
-DT__FindNode(char *path, bool createIfMissing);
+DT__FindNode(const char *path, bool createIfMissing);
 
 extern void
 DT__FreeProperty(Property *prop);

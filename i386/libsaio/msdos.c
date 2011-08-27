@@ -46,24 +46,20 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
 #include "libsaio.h"
 #include "sl.h"
-
 #include "msdos_private.h"
 #include "msdos.h"
 
 #define LABEL_LENGTH		11
-#define MAX_DOS_BLOCKSIZE	2048
+#define MSDOS_CACHE_BLOCKSIZE BPS
 
 #define	CLUST_FIRST		2/* reserved cluster range */
 #define	CLUST_RSRVD32	0x0ffffff8	/* reserved cluster range */
 #define	CLUST_RSRVD16	0xfff8	/* reserved cluster range */
 #define	CLUST_RSRVD12	0xff8	/* reserved cluster range */
 
-
-#define false 0
-#define true 1
+#define tolower(c)     (((c)>='A' && c<='Z')?((c) | 0x20):(c))
 
 static int msdosressector=0;
 static int msdosnfats = 0;
@@ -100,8 +96,7 @@ void MSDOSFree(CICell ih)
     free(ih);
 }
 
-int 
-MSDOSProbe(const void * buffer)
+int MSDOSProbe(const void * buffer)
 {
     union bootsector    *bsp;
     struct bpb33        *b33;
@@ -118,12 +113,12 @@ MSDOSProbe(const void * buffer)
     /* We only work with 512, 1024, and 2048 byte sectors */
     bps = OSSwapLittleToHostInt16(b33->bpbBytesPerSec);
     if ((bps < 0x200) || (bps & (bps - 1)) || (bps > 0x800)) 
-        return FALSE;
+        return 0;
     
 	/* Check to make sure valid sectors per cluster */
     spc = b33->bpbSecPerClust;
     if ((spc == 0 ) || (spc & (spc - 1))) 
-        return FALSE;	
+        return 0;	
 	
 	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0) { /* It's FAT32 */
 		if (!memcmp(((struct extboot *)bsp->bs710.bsExt)->exFileSysType, "FAT32   ", 8))
@@ -136,7 +131,7 @@ MSDOSProbe(const void * buffer)
 			return 12;
 	}	
 		
-	return FALSE;
+	return 0;
 }
 
 
@@ -152,7 +147,7 @@ MSDOSInitPartition (CICell ih)
 	
 	if (msdoscurrent == ih)
 	{
-		CacheInit(ih, msdosclustersize);
+		CacheInit(ih, MSDOS_CACHE_BLOCKSIZE);
 		return 0;
 	}
 	
@@ -221,10 +216,34 @@ MSDOSInitPartition (CICell ih)
 	}
 	
 	msdosclustersize = msdosbps * spc;
-
 	msdoscurrent = ih;
-	CacheInit(ih, msdosclustersize);
+
+	CacheInit(ih, MSDOS_CACHE_BLOCKSIZE);
 	free (buf);
+	return 0;
+}
+
+static int
+readSector(CICell ih, off_t readOffset, char *buf, int size)
+{
+    // Caching only FAT entries (4 bytes) by utlizing the cache with sector aligned read requests.
+	if (size < BPS)
+	{
+		long long sectorOffset = (uint64_t)readOffset / BPS * BPS;
+		long relOffset = readOffset % BPS;
+		char *cacheBuffer;
+	
+		cacheBuffer = malloc(MSDOS_CACHE_BLOCKSIZE);
+		CacheRead(ih, cacheBuffer, sectorOffset, MSDOS_CACHE_BLOCKSIZE, true);
+		bcopy(cacheBuffer + relOffset, buf, size);
+		free(cacheBuffer);
+	}
+	else
+	{
+		Seek(ih, readOffset);
+		Read(ih, (long)buf, size);
+	}
+
 	return 0;
 }
 
@@ -267,15 +286,15 @@ msdosreadcluster (CICell ih, uint8_t *buf, int size, off_t *cluster)
 		Seek(ih, readOffset);
 		Read(ih, (long)buf, size);
 	}
-	
+
 	/* Find first sector of FAT */
-	readOffset = msdosressector*msdosbps;
+	readOffset = msdosressector * msdosbps;
+
 	/* Find sector containing "cluster" entry in FAT */
-	readOffset += ((uint64_t)*cluster * (uint64_t)msdosfatbits)/8;
+	readOffset += ((uint64_t)*cluster * (uint64_t)msdosfatbits) / 8;
 	
 	/* Read one sector of the FAT */
-	Seek(ih, readOffset);
-	Read(ih, (long)tmpbuf, 4);
+	readSector(ih, readOffset, tmpbuf, 4);
 	
 	switch (msdosfatbits) {
 		case 32:
@@ -616,7 +635,7 @@ getdirpfrompath (CICell ih, char *dirspec, uint8_t *buf)
 	return 0;
 }
 
-long MSDOSGetDirEntry(CICell ih, char * dirPath, long * dirIndex,
+long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 					  char ** name, long * flags, long * time,
 					  FinderInfo * finderInfo, long * infoValid)
 {
@@ -627,7 +646,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long * dirIndex,
 		return -1;
 	if (dirPath[0] == '/')
 		dirPath++;
-	st =  (struct msdosdirstate *)*dirIndex;
+	st =  (struct msdosdirstate *)(long) *dirIndex;
 	if (!st)
 	{
 		st=malloc (sizeof (*st));
@@ -652,7 +671,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long * dirIndex,
 		}
 		else
 			initRoot (st);
-		*dirIndex = (long)st;
+		*dirIndex = (long long) (long) st;
 	}
 	while((dirp = getnextdirent (ih, vfatname, st))&& (dirp->deAttributes & ATTR_VOLUME));
 	if (!dirp)
@@ -721,6 +740,8 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	char *ptr = (char *)base;
 	struct direntry *dirp;
 	int i;
+  char devStr[12];
+
 	if (MSDOSInitPartition (ih)<0)
 		return -1;
 	if (filePath[0] == '/')
@@ -747,16 +768,18 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	if (length==0 || length>size-offset)
 		toread=size-offset;
 	wastoread=toread;
-	bcopy (buf+(offset%msdosclustersize),ptr,min(msdosclustersize-(offset%msdosclustersize), toread));
+	bcopy (buf+(offset%msdosclustersize),ptr,MIN(msdosclustersize-(offset%msdosclustersize), toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
 	toread-=msdosclustersize-(offset%msdosclustersize);
-	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, min(msdosclustersize,toread), &cluster))
+	while (toread>0 && msdosreadcluster (ih, (uint8_t *)ptr, MIN(msdosclustersize,toread), &cluster))
 	{
 		ptr+=msdosclustersize;
 		toread-=msdosclustersize;
 	}
-	verbose("Loaded FAT%d file: [%s] %d bytes from %x.\n",
-            msdosfatbits, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread, ih);
+	
+  getDeviceDescription(ih, devStr);
+	verbose("Read FAT%d file: [%s/%s] %d bytes.\n",
+            msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
 	free (buf);
 	if (toread<0)
 		return wastoread;

@@ -28,23 +28,26 @@
 
 #include "libsa.h"
 
-struct putc_info {
+struct putc_info //Azi: exists on console.c & gui.c
+{
     char * str;
     char * last_str;
 };
 
-static void
-sputc(int c, struct putc_info * pi)
+static int
+sputc(int c, struct putc_info * pi) //Azi: same as above
 {
     if (pi->last_str)
         if (pi->str == pi->last_str) {
             *(pi->str) = '\0';
-            return;
+            return 0;
         }
     *(pi->str)++ = c;
+    return c;
 }
 
 /*VARARGS1*/
+/* now slprintf() return the length of the string as in man sprintf()*/
 int sprintf(char * str, const char * fmt, ...)
 {
     va_list ap;
@@ -56,7 +59,7 @@ int sprintf(char * str, const char * fmt, ...)
     prf(fmt, ap, sputc, &pi);
     *pi.str = '\0';
     va_end(ap);
-    return 0;
+    return (pi.str - str);
 }
 
 /*VARARGS1*/

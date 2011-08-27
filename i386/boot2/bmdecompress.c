@@ -19,12 +19,8 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-#include "boot.h"
 
-typedef uint8_t  UInt8;
-typedef uint16_t UInt16;
-typedef int8_t   SInt8;
-typedef int16_t  SInt16;
+#include "libsa.h"
 
 static void 
 PreviewDecompress16(uint32_t * compressBuffer, 

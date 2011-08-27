@@ -1,37 +1,40 @@
-#!/bin/bash
+#!/bin/sh
+#
+# $1: the full path to the installation package; for example:
+# /Volumes/Projects/Testing/Simple_Carbon_App.pkg
+#
+# $2: the full path to the installation destination; for example:
+# /Applications
+#
+# $3: the mountpoint of the destination volume; for example:
+# / or /Volumes/External_Drive
+# 
+# $4: the root directory for the current System folder:
+# /
 
-temp="/tmp/Chameleon"
+echo "preinstall: Path to installer....... $1"
+echo "preinstall: Path to destination..... $2"
+echo "preinstall: Path to dest volume..... $3"
+echo "preinstall: Root of system folder... $4"
 
-# source com.apple.boot.plist
-if ! [ -f "${2}/.Chameleon/Extra/com.apple.Boot.plist" ]; then
-	if [ -f "${2}/Library/Preferences/SystemConfiguration/com.apple.Boot.plist" ]; then
-		cp -f "${2}/Library/Preferences/SystemConfiguration/com.apple.Boot.plist" "${2}/.Chameleon/Extra"
-	fi
+set -x
+
+if [ ! -e "$3" ]
+then
+    echo "destination volume does not exist!"
+    exit 1
 fi
 
-# fix kext permissions
-find "${2}/.Chameleon/Extra/Extensions" -type f -exec chmod 644 {} \;
-find "${2}/.Chameleon/Extra/Extensions" -type d -exec chmod 755 {} \;
-chown -R 0:0 "${2}/.Chameleon/Extra/Extensions"
+# clean up what would otherwise turn into "//" paths
+if [ "$3" == "/" ]
+then
+    dest_vol=""
+else
+    dest_vol="$3"
+fi    
 
-# build mkext for extras
-[ -d "${temp}" ] && rm -R -f "${temp}"
-mkdir -p "${temp}/Extensions"
-ditto --noextattr --noqtn --arch i386 "${2}/.Chameleon/Extra/Extensions" "${temp}/Extensions"
-find "${temp}" -type f -exec chmod 644 {} \;
-find "${temp}" -type d -exec chmod 755 {} \;
-chown -R 0:0 "${temp}"
-kextcache -m "${temp}/Extensions.mkext" "${temp}/Extensions"
-cp -f "${temp}/Extensions.mkext" "${2}/.Chameleon/Extra"
-rm -R -f "${temp}"
+# delee the temporary Chameleon folder
 
-# remove link for extras install
-unlink "${2}/.Chameleon"
+rm -rf "$dest_vol/tmpcham"
 
-# umount efi partition
-if [ -d /Volumes/EFI ]; then
-	umount -f /Volumes/EFI
-	rm -R -f /Volumes/EFI
-fi
-
-exit 0
+echo "Done..."

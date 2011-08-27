@@ -1,6 +1,7 @@
 /*
  *  platform.c
  *
+ * AsereBLN: cleanup
  */
 
 #include "libsaio.h"
@@ -9,8 +10,8 @@
 #include "pci.h"
 #include "platform.h"
 #include "cpu.h"
-#include "mem.h"
 #include "spd.h"
+#include "dram_controllers.h"
 
 #ifndef DEBUG_PLATFORM
 #define DEBUG_PLATFORM 0
@@ -23,7 +24,9 @@
 #endif
 
 PlatformInfo_t    Platform;
+pci_dt_t * dram_controller_dev = NULL;
 
+/** Return if a CPU feature specified by feature is activated (true) or not (false)  */
 bool platformCPUFeature(uint32_t feature)
 {
 	if (Platform.CPU.Features & feature) {
@@ -33,23 +36,36 @@ bool platformCPUFeature(uint32_t feature)
 	}
 }
 
+/** scan mem for memory autodection purpose */
+void scan_mem() {
+    static bool done = false;
+    if (done) return;
+
+	/* our code only works on Intel chipsets so make sure here */
+	if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086)
+		bootInfo->memDetect = false;
+    else
+		bootInfo->memDetect = true;
+	/* manually */
+    getBoolForKey(kUseMemDetect, &bootInfo->memDetect, &bootInfo->chameleonConfig);
+
+    if (bootInfo->memDetect) {
+		if (dram_controller_dev != NULL) {
+			scan_dram_controller(dram_controller_dev); // Rek: pci dev ram controller direct and fully informative scan ...
+		}
+        scan_spd(&Platform);
+    }
+    done = true;
+}
+
+/** 
+    Scan platform hardware information, called by the main entry point (common_boot() ) 
+    _before_ bootConfig xml parsing settings are loaded
+*/
 void scan_platform(void)
 {
-	const char	*value;
-	int len;
-
 	memset(&Platform, 0, sizeof(Platform));
 	build_pci_dt();
 	scan_cpu(&Platform);
-	scan_memory(&Platform);
-	scan_spd(&Platform);
-
-	Platform.Type = 1;    /* Desktop */
-	if (getValueForKey(kSystemType, &value, &len, &bootInfo->bootConfig) && value != NULL) {
-		Platform.Type = (unsigned char) strtoul(value, NULL, 10);
-		if (Platform.Type > 6) {
-			verbose("Error: system-type must be between 0 to 6. Defaulting to 1 !\n");
-			Platform.Type = 1;
-		}
-	}
+	//scan_mem(); Rek: called after pci devs init in fake_efi now ...
 }

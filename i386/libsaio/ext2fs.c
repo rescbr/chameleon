@@ -17,6 +17,7 @@ bool EX2Probe (const void *buf)
 {
 	return (OSReadLittleInt16(buf+0x438,0)==0xEF53);
 }
+
 void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 {
 	char * buf=malloc (EX2ProbeSize);
@@ -36,6 +37,6 @@ void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 		return;
 	}
 	str[strMaxLen]=0;
-	strncpy (str, buf+0x478, min (strMaxLen, 16));
+	strncpy (str, buf+0x478, MIN(strMaxLen, 16));
 	free (buf);
 }

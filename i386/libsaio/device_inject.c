@@ -6,8 +6,10 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
+#include "pci_root.h"
 #include "device_inject.h"
 #include "convert.h"
 
@@ -29,12 +31,11 @@ uint32_t stringlength = 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
-	if(string)
-	{
+	if(string) {
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
-	printf("efi_inject_get_devprop_string NULL trying stringdata\n");
+	verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
 	return NULL;
 }
 
@@ -54,7 +55,7 @@ void setupDeviceProperties(Node *node)
   /* Use the static "device-properties" boot config key contents if available,
    * otheriwse use the generated one.
    */  
-  if (!getValueForKey(DEVICE_PROPERTIES_PROP, &val, &cnt, &bootInfo->bootConfig) && string)
+  if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->chameleonConfig) && string)
   {
     val = (const char*)string;
     cnt = strlength * 2;
@@ -82,41 +83,29 @@ struct DevPropString *devprop_create_string(void)
  
 struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
 {
-	uint32_t PciRootID = 0;
-	const char *val;
-	int len;
+	struct DevPropDevice	*device;
+	const char		pciroot_string[] = "PciRoot(0x";
+	const char		pci_device_string[] = "Pci(0x";
 
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
-	if(!device || !string || !path) {
-		if(device)
-			free(device);
+	if (string == NULL || path == NULL) {
 		return NULL;
 	}
+	device = malloc(sizeof(struct DevPropDevice));
 
-	const char pciroot_string[]		= "PciRoot(0x";
-	const char pci_device_string[]	= "Pci(0x";
-
-	if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig))
-	  PciRootID = atoi(val);
-	
-	if(strncmp(path, pciroot_string, strlen(pciroot_string)))
-	{
+	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
-	
+
 	memset(device, 0, sizeof(struct DevPropDevice));
-	
-	device->acpi_dev_path._UID = PciRootID;
-	
+	device->acpi_dev_path._UID = getPciRootUID();
+
 	int numpaths = 0;
 	int		x, curr = 0;
 	char	buff[] = "00";
 
-	for(x = 0; x < strlen(path); x++)
-	{
-		if(!strncmp(&path[x], pci_device_string, strlen(pci_device_string)))
-		{
+	for (x = 0; x < strlen(path); x++) {
+		if (!strncmp(&path[x], pci_device_string, strlen(pci_device_string))) {
 			x+=strlen(pci_device_string);
 			curr=x;
 			while(path[++x] != ',');
@@ -130,7 +119,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].device = strtoul(buff, NULL, 16);
+			device->pci_dev_path[numpaths].device =	ascii_hex_to_int(buff);
 			
 			x += 3; // 0x
 			curr = x;
@@ -145,7 +134,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].function = strtoul(buff, NULL, 16);
+			device->pci_dev_path[numpaths].function = ascii_hex_to_int(buff); // TODO: find dev from char *path
 			
 			numpaths++;
 		}
