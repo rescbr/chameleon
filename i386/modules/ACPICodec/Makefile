@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-ACPI_CODEC_OBJS = ACPICodec.o acpicode.o acpidecode.o aml_generator.o  acpi_codec.o 
+ACPI_CODEC_OBJS = ACPICodec.o acpicode.o acpidecode.o acpi_codec.o 
 
 
 SFILES =
@@ -70,10 +70,10 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
+	-macosx_version_min 10.6 \
 	$(OBJROOT)/acpicode.o \
 	$(OBJROOT)/acpidecode.o \
 	$(OBJROOT)/ACPICodec.o \
-	$(OBJROOT)/aml_generator.o \
 	$(OBJROOT)/acpi_codec.o \
     -o $(SYMROOT)/$(MODULE_NAME).dylib
 

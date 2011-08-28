@@ -74,11 +74,37 @@ static int msdosrootDirSectors = 0;
 static CICell msdoscurrent = 0;
 static int msdosrootcluster = 0;
 static int msdosfatbits = 0;
+struct msdosdirstate
+{
+	struct direntry *buf;
+	uint8_t vfatchecksum;
+	int root16;
+	off_t cluster;
+	int nument;
+	int vfatnumber;
+};
+
+static int
+readSector(CICell ih, off_t readOffset, char *buf, int size);
+static int
+msdosreadcluster (CICell ih, uint8_t *buf, int size, off_t *cluster);
+static struct direntry *
+getnextdirent (CICell ih, uint16_t *longname, struct msdosdirstate *st);
+static void
+initRoot (struct msdosdirstate *st);
+static int
+checkname (uint16_t *ucsname, int ucslen, struct direntry *dirp, uint16_t *vfatname);
+static struct direntry *
+getdirpfrompath (CICell ih, char *dirspec, uint8_t *buf);
+static void
+fixLabel(uint8_t *label, char *str, long strMaxLen);
 
 #if UNUSED
 /*
  * Check a volume label.
  */
+static int
+oklabel(const char *src);
 static int
 oklabel(const char *src)
 {
@@ -316,16 +342,6 @@ msdosreadcluster (CICell ih, uint8_t *buf, int size, off_t *cluster)
 			return 0;
 	}
 }
-
-struct msdosdirstate
-{
-	struct direntry *buf;
-	uint8_t vfatchecksum;
-	int root16;
-	off_t cluster;
-	int nument;
-	int vfatnumber;
-};
 
 static struct direntry *
 getnextdirent (CICell ih, uint16_t *longname, struct msdosdirstate *st)

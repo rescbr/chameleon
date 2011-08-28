@@ -52,19 +52,40 @@ void setRsdpXchecksum(ACPI_TABLE_RSDP *rsdp)
     rsdp->ExtendedChecksum = 0 - GetChecksum(rsdp, rsdp->Length);
 }
 
-void update_rsdp_with_xsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_XSDT *xsdt)
+U32 update_rsdp_with_xsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_XSDT *xsdt)
 {
-    rsdp->XsdtPhysicalAddress = ((U64)((U32)xsdt));
-    
-    setRsdpXchecksum(rsdp);
+	// 1. Update the XSDT pointer in the RSDP
+	// 2. Update the Xchecksum of the RSDP
+	
+	{
+		// 1. Update the XSDT pointer in the RSDP
+		rsdp->XsdtPhysicalAddress = ((U64)((U32)xsdt));
+    }
+	
+	{
+		// 2. Update the Xchecksum of the RSDP
+		setRsdpXchecksum(rsdp);
+	}
+	
+	return (1);
 }
 
-void update_rsdp_with_rsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_RSDT *rsdt)
+U32 update_rsdp_with_rsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_RSDT *rsdt)
 {
-    rsdp->RsdtPhysicalAddress = (U32)rsdt;    
-    
-    setRsdpchecksum(rsdp);
-    
+	// 1. Update the RSDT pointer in the RSDP
+	// 2. Update the checksum of the RSDP
+	
+	{
+		// 1. Update the RSDT pointer in the RSDP
+		rsdp->RsdtPhysicalAddress = (U32)rsdt;    
+    }
+	
+	{
+		// 2. Update the checksum of the RSDP
+		setRsdpchecksum(rsdp);
+    }
+	
+	return (1);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,11 +104,14 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info)
     current = madt + 1;
     end = (U8 *) madt + madt->Header.Length;
 
-    while (current < end) {
+    while (current < end)
+	{
         ACPI_SUBTABLE_HEADER *subtable = current;
 
-        switch (subtable->Type) {
-        case ACPI_MADT_TYPE_LOCAL_APIC:
+        switch (subtable->Type)
+		{
+        
+			case ACPI_MADT_TYPE_LOCAL_APIC:
             {
                 // Process sub-tables with Type as 0: Processor Local APIC
                 ACPI_MADT_LOCAL_APIC *lapic = current;
@@ -112,7 +136,8 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info)
 
                 break;
             }
-        case ACPI_MADT_TYPE_X2APIC:
+        
+			case ACPI_MADT_TYPE_X2APIC:
             {
                 // Process sub-tables with Type as 9: Processor X2APIC
                 ACPI_MADT_X2APIC *x2apic = current;
@@ -137,7 +162,8 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info)
 
                 break;
             }
-        default:
+       
+			default:
             {
                 // Process all other sub-tables
                 current = (U8 *) subtable + subtable->Length;

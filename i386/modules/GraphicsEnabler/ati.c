@@ -238,6 +238,16 @@ struct ati_chipsets_t ATIKnownFramebuffers[] = {
 	{ 0x10026898,  "Motmot"},
 	{ 0x10026899,  "Motmot"}
 };
+static uint32_t accessROM(pci_dt_t *ati_dev, unsigned int mode);
+static uint8_t *readAtomBIOS(pci_dt_t *ati_dev);
+static uint32_t getvramsizekb(pci_dt_t *ati_dev);
+static bool radeon_card_posted(pci_dt_t *ati_dev);
+static uint32_t load_ati_bios_file(const char *filename, uint8_t *buf, int bufsize);
+static char *get_ati_model(uint32_t id);
+static char *get_ati_fb(uint32_t id);
+static int devprop_add_iopciconfigspace(struct DevPropDevice *device, pci_dt_t *ati_dev);
+static int devprop_add_ati_template_4xxx(struct DevPropDevice *device);
+static int devprop_add_ati_template(struct DevPropDevice *device);
 
 static uint32_t accessROM(pci_dt_t *ati_dev, unsigned int mode)
 {
@@ -323,7 +333,7 @@ static uint8_t *readAtomBIOS(pci_dt_t *ati_dev)
 #define R5XX_CONFIG_MEMSIZE	0x00F8
 #define R6XX_CONFIG_MEMSIZE	0x5428
 
-uint32_t getvramsizekb(pci_dt_t *ati_dev)
+static uint32_t getvramsizekb(pci_dt_t *ati_dev)
 {
 	uint32_t		bar[7];
 	uint32_t		size;

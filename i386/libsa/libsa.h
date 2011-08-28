@@ -112,6 +112,8 @@ extern char * strbreak(const char *str, char **next, long *len);
 
 extern uint8_t checksum8( void * start, unsigned int length );
 
+extern unsigned long
+adler32( unsigned char * buffer, long length );
 /*
  * error.c
  */

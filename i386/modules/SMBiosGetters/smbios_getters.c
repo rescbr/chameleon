@@ -17,6 +17,7 @@
 #else
 #define DBG(x...)
 #endif
+static uint16_t simpleGetSMBOemProcessorType(void);
 
 
 bool getProcessorInformationExternalClock(returnType *value)
@@ -101,7 +102,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 	return false;
 }
 
-uint16_t simpleGetSMBOemProcessorType(void)
+static uint16_t simpleGetSMBOemProcessorType(void)
 {
 	if (Platform->CPU.NoCores >= 4) 
 	{

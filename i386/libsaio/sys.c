@@ -120,8 +120,14 @@ void * gFSLoadAddress = 0;
 BVRef gBIOSBootVolume = NULL;
 BVRef gBootVolume;
 
-//static BVRef getBootVolumeRef( const char * path, const char ** outPath );
 static BVRef newBootVolumeRef( int biosdev, int partno );
+static int GetFreeFd(void);
+static struct iob * iob_from_fdesc(int fdesc);
+#if UNUSED
+static int open_bvr(BVRef bvr, const char *filePath, int flags);
+#else
+static int open_bvr(BVRef bvr, const char *filePath);
+#endif
 
 //==========================================================================
 // LoadVolumeFile - LOW-LEVEL FILESYSTEM FUNCTION.

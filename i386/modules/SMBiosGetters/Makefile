@@ -74,6 +74,7 @@ dylib:
 	$(OBJROOT)/mysmbios.o \
 	$(OBJROOT)/smbios_getters.o \
 	$(OBJROOT)/smbios_decode.o \
+	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

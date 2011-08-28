@@ -30,7 +30,8 @@ void ACPICodec_start()
 	
 	enable = (execute_hook("isACPIRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);  
     
-	if (enable) {		
+	if (enable)
+	{		
 		register_hook_callback("setupEfiConfigurationTable", &ACPICodec_setupEfiConfigurationTable_hook);
         register_hook_callback("isACPIRegistred", &is_ACPI_Codec_Registred_Hook);
 

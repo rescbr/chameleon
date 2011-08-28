@@ -23,12 +23,11 @@
 #define kEthernetBuiltIn	"EthernetBuiltIn"	
 #define kEnableNetworking	"EnableNetworkModule"
 
-void set_eth_builtin(pci_dt_t *eth_dev);
-void set_wifi_airport(pci_dt_t *wlan_dev);
+static void set_eth_builtin(pci_dt_t *eth_dev);
+static void set_wifi_airport(pci_dt_t *wlan_dev);
+static int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
 
 uint32_t builtin_set = 0;
-
-
 
 void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
@@ -71,7 +70,7 @@ void Networking_start()
 
 /* a fine place for this code */
 
-int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
+static int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
 {
 	uint8_t builtin = 0x0;
 	
@@ -99,10 +98,10 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 	
 }
 
-void set_eth_builtin(pci_dt_t *eth_dev)
+static void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
 	
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 	
@@ -138,12 +137,12 @@ struct wifi_cards known_wifi_cards[] =
 	{0x168C, 0x002B, "Atheros 9285 8802.11 b/g/n Wireless Network Adapter"},
 };
 
-void set_wifi_airport(pci_dt_t *wlan_dev)
+static void set_wifi_airport(pci_dt_t *wlan_dev)
 {
 	char tmp[16];
 	
 	char *devicepath = get_pci_dev_path(wlan_dev);
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
 	
 	verbose("Wifi Controller [%04x:%04x] :: %s\n", wlan_dev->vendor_id, wlan_dev->device_id, devicepath);
 	
@@ -183,8 +182,6 @@ void set_wifi_airport(pci_dt_t *wlan_dev)
 				return;
 				
 			}
-		}
-		
-		
+		}		
 	}
 }

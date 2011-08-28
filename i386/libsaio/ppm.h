@@ -97,16 +97,20 @@ typedef struct acpi_tables {
     ACPI_TABLE_RSDP *RsdPointer; // Root System Description Pointer Structure (RSDP)
     ACPI_TABLE_RSDT *RsdtPointer; // Root System Description Table            (RSDP->RSDT)
     ACPI_TABLE_MADT *MadtPointer; // Multiple APIC Description Table          (RSDP->RSDT->APIC)
+	ACPI_TABLE_MADT *MadtPointer64; // Multiple APIC Description Table        (RSDP->XSDT->APIC)
     ACPI_TABLE_SSDT *SsdtPointer; // Secondary System Description Table       (RSDP->RSDT->SSDT)
     ACPI_TABLE_XSDT *XsdtPointer; // Extended Root System Description Table   (RSDP->XSDT)
     ACPI_TABLE_FADT *FacpPointer64; // Fixed ACPI Description Table           (RSDP->XSDT->FACP)    
-    U8  RsdRevision; // Must be (0) for ACPI 1.0 or (2) for ACPI 2.0+    
 } ACPI_TABLES;
 
 typedef struct pstate {
     U32 frequency;
     U32 power;
     U32 ratio;
+	U32 translatency;
+    U32 bmlatency;
+	U32 control;
+    U32 status;
 } PSTATE;
 
 typedef struct pkg_pstates {
@@ -136,6 +140,7 @@ typedef enum cpu_cstate {
     CPU_C1 = 1,
     CPU_C3_ACPI_C2 = 3,
     CPU_C3_ACPI_C3 = 4,
+	CPU_C3_ACPI_C4 = 5,
     CPU_C6 = 6,
     CPU_C7 = 7,
 } CPU_CSTATE;

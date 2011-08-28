@@ -74,6 +74,7 @@ dylib:
 	$(OBJROOT)/nvidia.o \
 	$(OBJROOT)/gma.o \
 	$(OBJROOT)/GraphicsEnabler.o \
+	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

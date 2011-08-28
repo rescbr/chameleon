@@ -1,3 +1,17 @@
+- Sync'd nvidia.c and gma.c (see GraphicEnabler module) to the trunk
+- Improved compatibility with xcode4
+- Applied JrCs's path for more protection against buffer overflow in some case (trunk v1449)
+- Added a mechanism to detect extra mkexts/kexts before loading the kernelCache
+- Moved smp code to Erich Boleyn's smp-imps (not fully implemented yet)
+- Added the UseKernelCache option only for compatibility with the trunk ("Yes" have no effect, since it's the default),
+  the Flag "-F" which do the same things is still valid
+- Re-worked SSDT generation, and merged with the Intel's code
+- Removed aml_generator from AcpiCodec, now use acpicode.c to generate aml file
+- Added YellowIconFixer module
+- Merged fsb detection with Intel's code in cpu.c (slightly faster)
+- Fixed a bug related to ACPI in AcpiCodec (thanck to StephN666 for testing)
+- Fixed a bug related to ACPI and the machine with a rsd table revision > 0 (acpi_tools.c) (thanck to StephN666 for testing)
+ 
 - Applied Andy Vandijck's Nehalem (i5/i9) spoof to kernelpatcher
 - Fixed an issue with kernelPatcher, it seems that kernelPatcher is unable to patch the kernelCache
 - Applied some fixes from the trunk
@@ -36,7 +50,7 @@
   with or without modules
 - Boot helper support (raid) is now an option (992 bytes saved)
 - Fixed an issue where the prelinked kernel can't be found (the bootloader should now be fully compatible with the kextcache command line tool).
-  (Also merged both adler32 function previously located in drivers.c and boot.c into one (local_adler32) located in boot.c)
+  (Also merged both adler32 function previously located in drivers.c and boot.c into one (adler32) located in boot.c)
 - returned to malloc by default, instead of safe_malloc, safe_malloc(+1280 bytes) is now an option (as in revolution 616+)
 - APM support is now optional (704 bytes saved)
 - Fixed add_symbol function 

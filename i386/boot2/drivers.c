@@ -42,20 +42,6 @@
 
 extern char gMacOSVersion[];
 extern char gBootKernelCacheFile[];
-long FileLoadDrivers(char *dirSpec, long plugin);
-#ifdef NBP_SUPPORT
-long NetLoadDrivers(char *dirSpec);
-#endif
-long LoadDriverMKext(char *fileSpec);
-long LoadDriverPList(char *dirSpec, char *name, long bundleType);
-long LoadMatchedModules(void);
-#if UNUSED
-long MatchPersonalities(void);
-#endif
-long MatchLibraries(void);
-
-static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
-long InitDriverSupport(void);
 
 static ModulePtr gModuleHead, gModuleTail;
 static TagPtr    gPersonalityHead, gPersonalityTail;
@@ -64,6 +50,25 @@ char *    gDriverSpec;
 char *    gFileSpec;
 char *    gTempSpec;
 char *    gFileName;
+
+long InitDriverSupport(void);
+long FileLoadDrivers(char *dirSpec, long plugin);
+long LoadDriverMKext(char *fileSpec);
+long LoadDriverPList(char *dirSpec, char *name, long bundleType);
+long LoadMatchedModules(void);
+long MatchLibraries(void);
+#if UNUSED
+long MatchPersonalities(void);
+#endif
+#ifdef NBP_SUPPORT
+long NetLoadDrivers(char *dirSpec);
+#endif
+
+static long FileLoadMKext( const char * dirSpec, const char * extDirSpec );
+static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
+#if UNUSED
+static ModulePtr FindModule( char * name );
+#endif
 
 //==========================================================================
 // InitDriverSupport
@@ -345,7 +350,7 @@ LoadDriverMKext( char * fileSpec )
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
         ( GetPackageElement(alder32)    !=
-		 local_adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+		 adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
@@ -719,10 +724,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
     long ret;
     compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
-    u_int32_t uncompressed_size, size;
-    void *buffer;
-	unsigned long len;
-	
+    		
 #if 0
     printf("kernel header:\n");
     printf("signature: 0x%x\n", kernel_header->signature);
@@ -732,45 +734,54 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
     printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
     getc();
 #endif
-	
-	
-    if (kernel_header->signature == OSSwapBigToHostConstInt32('comp')) {
-        if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) {
+		
+    if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
+	{
+        if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+		{
             error("kernel compression is bad\n");
             return -1;
         }
+		
+		u_int32_t uncompressed_size, size;
+		void *buffer;
 		
         uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
         binary = buffer = malloc(uncompressed_size);
 		
         size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
                                OSSwapBigToHostInt32(kernel_header->compressed_size));
-        if (uncompressed_size != size) {
+        if (uncompressed_size != size)
+		{
             error("size mismatch from lzss: %x\n", size);
             return -1;
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            local_adler32(binary, uncompressed_size)) {
+            adler32(binary, uncompressed_size))
+		{
             printf("adler mismatch\n");
             return -1;
         }
 		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gMacOSVersion[3] == '7') 
 			bootInfo->adler32 = kernel_header->adler32;
     }
-
-	ret = ThinFatFile(&binary, &len);
-	if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
+	
 	{
-		archCpuType=CPU_TYPE_I386;
+		unsigned long len;
 		ret = ThinFatFile(&binary, &len);
-	}
-	
-	ret = DecodeMachO(binary, rentry, raddr, rsize);
-	
-	if (ret<0 && archCpuType==CPU_TYPE_X86_64)
-	{
-		archCpuType=CPU_TYPE_I386;
+		if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
+		{
+			archCpuType=CPU_TYPE_I386;
+			ret = ThinFatFile(&binary, &len);
+		}
+		
 		ret = DecodeMachO(binary, rentry, raddr, rsize);
+		
+		if (ret<0 && archCpuType==CPU_TYPE_X86_64)
+		{
+			archCpuType=CPU_TYPE_I386;
+			ret = DecodeMachO(binary, rentry, raddr, rsize);
+		}
 	}
 	
 	return ret;

@@ -17,6 +17,71 @@
 #define DBG(x...)		msglog(x)
 #endif
 
+#if OLD_STYLE
+static uint64_t measure_tsc_frequency(void);
+
+// DFE: enable_PIT2 and disable_PIT2 come from older xnu
+
+/*
+ * Enable or disable timer 2.
+ * Port 0x61 controls timer 2:
+ *   bit 0 gates the clock,
+ *   bit 1 gates output to speaker.
+ */
+static inline void enable_PIT2(void)
+{
+    /* Enable gate, disable speaker */
+    __asm__ volatile(
+					 " inb   $0x61,%%al      \n\t"
+					 " and   $0xFC,%%al       \n\t"  /* & ~0x03 */
+					 " or    $1,%%al         \n\t"
+					 " outb  %%al,$0x61      \n\t"
+					 : : : "%al" );
+}
+
+static inline void disable_PIT2(void)
+{
+    /* Disable gate and output to speaker */
+    __asm__ volatile(
+					 " inb   $0x61,%%al      \n\t"
+					 " and   $0xFC,%%al      \n\t"	/* & ~0x03 */
+					 " outb  %%al,$0x61      \n\t"
+					 : : : "%al" );
+}
+
+// DFE: set_PIT2_mode0, poll_PIT2_gate, and measure_tsc_frequency are
+// roughly based on Linux code
+
+/* Set the 8254 channel 2 to mode 0 with the specified value.
+ In mode 0, the counter will initially set its gate low when the
+ timer expires.  For this to be useful, you ought to set it high
+ before calling this function.  The enable_PIT2 function does this.
+ */
+static inline void set_PIT2_mode0(uint16_t value)
+{
+    __asm__ volatile(
+					 " movb  $0xB0,%%al      \n\t"
+					 " outb	%%al,$0x43	\n\t"
+					 " movb	%%dl,%%al	\n\t"
+					 " outb	%%al,$0x42	\n\t"
+					 " movb	%%dh,%%al	\n\t"
+					 " outb	%%al,$0x42"
+					 : : "d"(value) /*: no clobber */ );
+}
+
+/* Returns the number of times the loop ran before the PIT2 signaled */
+static inline unsigned long poll_PIT2_gate(void)
+{
+    unsigned long count = 0;
+    unsigned char nmi_sc_val;
+    do {
+        ++count;
+        __asm__ volatile(
+						 "inb	$0x61,%0"
+						 : "=q"(nmi_sc_val) /*:*/ /* no input */ /*:*/ /* no clobber */);
+    } while( (nmi_sc_val & 0x20) == 0);
+    return count;
+}
 /*
  * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
  */
@@ -28,7 +93,7 @@ static uint64_t measure_tsc_frequency(void)
     unsigned long pollCount;
     uint64_t retval = 0;
     int i;
-
+	
     /* Time how many TSC ticks elapse in 30 msec using the 8254 PIT
      * counter 2.  We run this loop 3 times to make sure the cache
      * is hot and we take the minimum delta from all of the runs.
@@ -65,7 +130,7 @@ static uint64_t measure_tsc_frequency(void)
      * Hz so we need to convert our milliseconds to seconds.  Since we're
      * dividing by the milliseconds, we simply multiply by 1000.
      */
-
+	
     /* Unlike linux, we're not limited to 32-bit, but we do need to take care
      * that we're going to multiply by 1000 first so we do need at least some
      * arithmetic headroom.  For now, 32-bit should be enough.
@@ -81,6 +146,184 @@ static uint64_t measure_tsc_frequency(void)
     return retval;
 }
 
+#else
+/*
+ License for x2apic_enabled, get_apicbase, compute_bclk.
+ 
+ Copyright (c) 2010, Intel Corporation
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+ this list of conditions and the following disclaimer in the documentation
+ and/or other materials provided with the distribution.
+ * Neither the name of Intel Corporation nor the names of its contributors
+ may be used to endorse or promote products derived from this software
+ without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+static inline __attribute__((always_inline)) void rdmsr32(uint32_t msr, uint32_t * lo_data_addr, uint32_t * hi_data_addr);
+static inline __attribute__((always_inline)) void wrmsr32(uint32_t msr, uint32_t lo_data, uint32_t hi_data);
+static uint32_t x2apic_enabled(void);
+static uint32_t get_apicbase(void);
+static uint32_t compute_bclk(void);
+static inline __attribute__((always_inline)) void rdmsr32(uint32_t msr, uint32_t * lo_data_addr, uint32_t * hi_data_addr)
+{    
+    __asm__ volatile(
+        "rdmsr"
+        : "=a" (*lo_data_addr), "=d" (*hi_data_addr)
+        : "c" (msr)
+        );    
+}	
+static inline __attribute__((always_inline)) void wrmsr32(uint32_t msr, uint32_t lo_data, uint32_t hi_data)
+{
+    __asm__ __volatile__ (
+        "wrmsr"
+        : /* No outputs */
+        : "c" (msr), "a" (lo_data), "d" (hi_data)
+        );
+}
+#define MSR_APIC_BASE 0x1B
+#define APIC_TMR_INITIAL_CNT 0x380
+#define APIC_TMR_CURRENT_CNT 0x390
+#define APIC_TMR_DIVIDE_CFG 0x3E0
+#define MSR_APIC_TMR_INITIAL_CNT 0x838
+#define MSR_APIC_TMR_CURRENT_CNT 0x839
+#define MSR_APIC_TMR_DIVIDE_CFG 0x83E
+static uint32_t x2apic_enabled(void)
+{
+    uint64_t temp64;
+	
+    temp64 = rdmsr64(MSR_APIC_BASE);
+	
+    return (uint32_t) (temp64 & (1 << 10)) ? 1 : 0;
+}
+static uint32_t get_apicbase(void)
+{
+    uint64_t temp64;
+	
+    temp64 = rdmsr64(MSR_APIC_BASE);
+	
+    return (uint32_t) (temp64 & 0xfffff000);
+}
+static uint32_t compute_bclk(void)
+{
+    uint32_t dummy;
+    uint32_t start, stop;
+    uint8_t temp8;
+    uint16_t delay_count;
+    uint32_t bclk;
+	
+#define DELAY_IN_US 1000
+	
+    // Compute fixed delay as time
+    // delay count = desired time * PIT frequency
+    // PIT frequency = 1.193182 MHz
+    delay_count = 1193182 / DELAY_IN_US;
+	
+    // PIT channel 2 gate is controlled by IO port 0x61, bit 0
+#define PIT_CH2_LATCH_REG 0x61
+#define CH2_SPEAKER (1 << 1) // bit 1 -- 1 = speaker enabled 0 = speaker disabled
+#define CH2_GATE_IN (1 << 0) // bit 0 -- 1 = gate enabled, 0 = gate disabled
+#define CH2_GATE_OUT (1 << 5) // bit 5 -- 1 = gate latched, 0 = gate not latched
+	
+    // PIT Command register
+#define PIT_MODE_COMMAND_REG 0x43
+#define SELECT_CH2 (2 << 6)
+#define ACCESS_MODE_LOBYTE_HIBYTE (3 << 4)
+#define MODE0_INTERRUPT_ON_TERMINAL_COUNT 0 // Despite name, no interrupts on CH2
+	
+    // PIT Channel 2 data port
+#define PIT_CH2_DATA 0x42
+	
+    // Disable the PIT channel 2 speaker and gate
+    temp8 = inb(PIT_CH2_LATCH_REG);
+    temp8 &= ~(CH2_SPEAKER | CH2_GATE_IN);
+    outb(PIT_CH2_LATCH_REG, temp8);
+	
+    // Setup command and mode
+    outb(PIT_MODE_COMMAND_REG, SELECT_CH2 | ACCESS_MODE_LOBYTE_HIBYTE | MODE0_INTERRUPT_ON_TERMINAL_COUNT);
+	
+    // Set time for fixed delay
+    outb(PIT_CH2_DATA, (uint8_t) (delay_count));
+    outb(PIT_CH2_DATA, (uint8_t) (delay_count >> 8));
+	
+    // Prepare to enable channel 2 gate but leave the speaker disabled
+    temp8 = inb(PIT_CH2_LATCH_REG);
+    temp8 &= ~CH2_SPEAKER;
+    temp8 |= CH2_GATE_IN;
+	
+    if (x2apic_enabled())
+	{
+        // Set APIC Timer Divide Value as 2
+        wrmsr32(MSR_APIC_TMR_DIVIDE_CFG, 0, 0);
+		
+        // start APIC timer with a known value
+        start = ~0UL;
+        wrmsr32(MSR_APIC_TMR_INITIAL_CNT, start, 0);
+    }
+    else
+	{
+        // Set APIC Timer Divide Value as 2
+        *(volatile uint32_t *)(uint32_t) (get_apicbase() + APIC_TMR_DIVIDE_CFG) = 0UL;
+		
+        // start APIC timer with a known value
+        start = ~0UL;
+        *(volatile uint32_t *)(uint32_t) (get_apicbase() + APIC_TMR_INITIAL_CNT) = start;
+    }
+	
+    // Actually start the PIT channel 2
+    outb(PIT_CH2_LATCH_REG, temp8);
+	
+    // Wait for the fixed delay
+    while (!(inb(PIT_CH2_LATCH_REG) & CH2_GATE_OUT));
+	
+    if (x2apic_enabled())
+	{
+        // read the APIC timer to determine the change that occurred over this fixed delay
+        rdmsr32(MSR_APIC_TMR_CURRENT_CNT, &stop, &dummy);
+		
+        // stop APIC timer
+        wrmsr32(MSR_APIC_TMR_INITIAL_CNT, 0, 0);
+		
+    }
+    else
+	{
+        // read the APIC timer to determine the change that occurred over this fixed delay
+        stop = *(volatile uint32_t *)(uint32_t) (get_apicbase() + APIC_TMR_CURRENT_CNT);
+		
+        // stop APIC timer
+        *(volatile uint32_t *)(uint32_t) (get_apicbase() + APIC_TMR_INITIAL_CNT) = 0UL;
+    }
+	
+    // Disable channel 2 speaker and gate input
+    temp8 = inb(PIT_CH2_LATCH_REG);
+    temp8 &= ~(CH2_SPEAKER | CH2_GATE_IN);
+    outb(PIT_CH2_LATCH_REG, temp8);
+	
+    bclk = (start - stop) * 2 / DELAY_IN_US;
+	
+    // Round bclk to the nearest 100/12 integer value
+    bclk = ((((bclk * 24) + 100) / 200) * 200) / 24;
+    DBG("\nCompute bclk: %dMHz\n", bclk);
+    return bclk;
+}
+#endif
+
 /*
  * Calculates the FSB and CPU frequencies using specific MSRs for each CPU
  * - multi. is read from a specific MSR. In the case of Intel, there is:
@@ -94,26 +337,28 @@ void scan_cpu(PlatformInfo_t *p)
 {
 	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
 	uint64_t	msr;
-	uint8_t		maxcoef, maxdiv, currcoef, currdiv;
+	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
     uint32_t	reg[4];
-    uint32_t	CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
     uint32_t        cores_per_package;
-    uint32_t        logical_per_package;
-	maxcoef = maxdiv = currcoef = currdiv = 0;
-	    
-	do_cpuid(0, CPUID[0]);
-    p->CPU.Vendor		= CPUID[CPUID_0][1];
+    uint32_t        logical_per_package;    
     
-    do_cpuid2(0x00000004, 0, CPUID[CPUID_4]);
-    cores_per_package		= bitfield(CPUID[CPUID_4][0], 31, 26) + 1;
+	do_cpuid(0, reg);
+    p->CPU.Vendor		= reg[ebx];
+    p->CPU.cpuid_max_basic     = reg[eax];
+    
+    do_cpuid2(0x00000004, 0, reg);
+    cores_per_package		= bitfield(reg[eax], 31, 26) + 1;
     
     /* get extended cpuid results */
 	do_cpuid(0x80000000, reg);
 	uint32_t cpuid_max_ext = reg[eax];
     
-    /* get brand string (if supported) */
-	/* Copyright: from Apple's XNU cpuid.c */
-	if (cpuid_max_ext > 0x80000004) {		
+    
+	/* Begin of Copyright: from Apple's XNU cpuid.c */
+	
+	/* get brand string (if supported) */
+	if (cpuid_max_ext > 0x80000004)
+	{		
         char        str[128], *s;
 		/*
 		 * The brand string 48 bytes (max), guaranteed to
@@ -125,13 +370,15 @@ void scan_cpu(PlatformInfo_t *p)
 		bcopy((char *)reg, &str[16], 16);
 		do_cpuid(0x80000004, reg);
 		bcopy((char *)reg, &str[32], 16);
-		for (s = str; *s != '\0'; s++) {
+		for (s = str; *s != '\0'; s++)
+		{
 			if (*s != ' ') break;
 		}
 		
 		strlcpy(p->CPU.BrandString,	s, sizeof(p->CPU.BrandString));
 		
-		if (!strncmp(p->CPU.BrandString, CPUID_STRING_UNKNOWN, min(sizeof(p->CPU.BrandString), (unsigned)strlen(CPUID_STRING_UNKNOWN) + 1))) {
+		if (!strncmp(p->CPU.BrandString, CPUID_STRING_UNKNOWN, min(sizeof(p->CPU.BrandString), (unsigned)strlen(CPUID_STRING_UNKNOWN) + 1)))
+		{
             /*
              * This string means we have a firmware-programmable brand string,
              * and the firmware couldn't figure out what sort of CPU we have.
@@ -140,8 +387,16 @@ void scan_cpu(PlatformInfo_t *p)
         }
 	}  
        
-    /* get processor signature and decode */
+    /*
+	 * Get processor signature and decode
+	 * and bracket this with the approved procedure for reading the
+	 * the microcode version number a.k.a. signature a.k.a. BIOS ID
+	 */
+	wrmsr64(MSR_IA32_BIOS_SIGN_ID, 0);
 	do_cpuid(1, reg);
+    p->CPU.MicrocodeVersion =
+    (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);
+	
 	p->CPU.Signature        = reg[eax];
 	p->CPU.Stepping         = bitfield(reg[eax],  3,  0);
 	p->CPU.Model            = bitfield(reg[eax],  7,  4);
@@ -150,7 +405,6 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtFamily        = bitfield(reg[eax], 27, 20);
 	p->CPU.Brand            = bitfield(reg[ebx],  7,  0);
 	p->CPU.Features         = quad(reg[ecx], reg[edx]);
-    //p->CPU.Type           = bitfield(reg[eax], 13, 12);
     
     /* Fold extensions into family/model */
 	if (p->CPU.Family == 0x0f)
@@ -164,7 +418,8 @@ void scan_cpu(PlatformInfo_t *p)
 	else
 		logical_per_package = 1;
     
-	if (cpuid_max_ext >= 0x80000001) {
+	if (cpuid_max_ext >= 0x80000001)
+	{
 		do_cpuid(0x80000001, reg);
 		p->CPU.ExtFeatures =
         quad(reg[ecx], reg[edx]);
@@ -172,28 +427,43 @@ void scan_cpu(PlatformInfo_t *p)
 	}
     
 	/* Fold in the Invariant TSC feature bit, if present */
-	if (cpuid_max_ext >= 0x80000007) {
+	if (cpuid_max_ext >= 0x80000007)
+	{
 		do_cpuid(0x80000007, reg);  
 		p->CPU.ExtFeatures |=
         reg[edx] & (uint32_t)CPUID_EXTFEATURE_TSCI;
+	}    
+    
+    if (p->CPU.cpuid_max_basic >= 0x5) {        
+		/*
+		 * Extract the Monitor/Mwait Leaf info:
+		 */
+		do_cpuid(5, reg);        
+        p->CPU.sub_Cstates  = reg[edx];
+        p->CPU.extensions   = reg[ecx];	
 	}
     
-    /* Find the microcode version number a.k.a. signature a.k.a. BIOS ID */
-    p->CPU.MicrocodeVersion =
-    (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);
+    if (p->CPU.cpuid_max_basic >= 0x6)
+    {        
+		/*
+		 * The thermal and Power Leaf:
+		 */
+		do_cpuid(6, reg);
+		p->CPU.dynamic_acceleration = bitfield(reg[eax], 1, 1); // "Dynamic Acceleration Technology (Turbo Mode)"
+		p->CPU.invariant_APIC_timer = bitfield(reg[eax], 2, 2); //  "Invariant APIC Timer"
+        p->CPU.fine_grain_clock_mod = bitfield(reg[eax], 4, 4);
+	}
     
     if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
-		(p->CPU.Family == 0x06)) {
+		(p->CPU.Family == 0x06))
+	{
             /*
              * Find the number of enabled cores and threads
              * (which determines whether SMT/Hyperthreading is active).
              */
-            switch (p->CPU.Model) {
-                    /*
-                     * This should be the same as Nehalem but an A0 silicon bug returns
-                     * invalid data in the top 12 bits. Hence, we use only bits [19..16]
-                     * rather than [31..16] for core count - which actually can't exceed 8. 
-                     */
+            switch (p->CPU.Model)
+		{
+                    
                 case CPUID_MODEL_DALES_32NM:
                 case CPUID_MODEL_WESTMERE:
                 case CPUID_MODEL_WESTMERE_EX:
@@ -219,14 +489,21 @@ void scan_cpu(PlatformInfo_t *p)
             }
     }
         
-    if (p->CPU.NoCores == 0) {
+    if (p->CPU.NoCores == 0)
+	{
 		p->CPU.NoThreads    = cores_per_package;
 		p->CPU.NoCores      = logical_per_package;
 	}
+	
+	/* End of Copyright: from Apple's XNU cpuid.c */
     
-	    
+#if OLD_STYLE
 	tscFrequency = measure_tsc_frequency();
 	fsbFrequency = 0;
+#else
+	tscFrequency = 0;
+	fsbFrequency = (uint64_t)(compute_bclk() * 1000000);
+#endif
 	cpuFrequency = 0;
 	
 		
@@ -261,7 +538,8 @@ void scan_cpu(PlatformInfo_t *p)
 #if DEBUG_CPU
 				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
 #endif
-				if ((msr >> 16) & 0x01) {
+				if ((msr >> 16) & 0x01)
+				{
 					flex_ratio = (msr >> 8) & 0xff;
 					/* bcc9: at least on the gigabyte h67ma-ud2h,
 					 where the cpu multipler can't be changed to
@@ -271,7 +549,8 @@ void scan_cpu(PlatformInfo_t *p)
 					 causing the system to crash since tscGranularity
 					 is inadvertently set to 0.
 					 */
-					if (flex_ratio == 0) {
+					if (flex_ratio == 0)
+					{
 						/* Clear bit 16 (evidently the
 						 presence bit) */
 						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
@@ -279,23 +558,35 @@ void scan_cpu(PlatformInfo_t *p)
 #if DEBUG_CPU
 						DBG("Unusable flex ratio detected.  MSR Patched to %08x\n", msr & 0xffffffff);
 #endif
-					} else {
-						if (bus_ratio_max > flex_ratio) {
+					}
+					else
+					{
+						if (bus_ratio_max > flex_ratio)
+						{
 							bus_ratio_max = flex_ratio;
 						}
 					}
 				}
-				
-				if (bus_ratio_max) {
+#if OLD_STYLE
+				if (bus_ratio_max)
+				{
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
+#endif
 				//valv: Turbo Ratio Limit
-				if ((p->CPU.Model != 0x2e) && (p->CPU.Model != 0x2f)) {
-					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
+				if ((p->CPU.Model != 0x2e) && (p->CPU.Model != 0x2f))
+				{
+					//msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
-				} else {
+				}
+				else
+				{
+#if OLD_STYLE
 					cpuFrequency = tscFrequency;
+#else
+					cpuFrequency = bus_ratio_max * fsbFrequency;
+#endif
 				}								
 #if DEBUG_CPU
 				DBG("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", fsbFrequency / 1000000, max_ratio);
@@ -326,7 +617,7 @@ void scan_cpu(PlatformInfo_t *p)
 					/* XXX */
 					maxcoef = currcoef;
 				}
-
+#if OLD_STYLE
 				if (maxcoef) 
 				{
 					if (maxdiv)
@@ -350,12 +641,40 @@ void scan_cpu(PlatformInfo_t *p)
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 #endif
 				}
+#else
+				if (currdiv) 
+				{
+					cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+				}
+				else 
+				{
+					cpuFrequency = (fsbFrequency * currcoef);
+				}
+				
+				if (maxcoef) 
+				{
+					if (maxdiv)
+					{
+						tscFrequency  = (fsbFrequency * ((maxcoef * 2) + 1)) / 2;
+					}
+					else 
+					{
+						tscFrequency = fsbFrequency * maxcoef;
+					}
+				}
+#if DEBUG_CPU
+				DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
+#endif
+
+#endif // OLD_STYLE
+				
 			}
 		}
         /* Mobile CPU ? */ 
 		//Slice 
 	    p->CPU.isMobile = false;
-		switch (p->CPU.Model) {
+		switch (p->CPU.Model)
+		{
 			case 0x0D:
 				p->CPU.isMobile = true; 
 				break;			
@@ -378,13 +697,13 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.CurrCoef = currcoef;
 	p->CPU.CurrDiv = currdiv;
     
-	p->CPU.TSCFrequency = (tscFrequency / 1000000) * 1000000;
-	p->CPU.FSBFrequency = (fsbFrequency / 1000000) * 1000000;
-	p->CPU.CPUFrequency = (cpuFrequency / 1000000) * 1000000;
+	//p->CPU.TSCFrequency = (tscFrequency / 1000000) * 1000000;
+	//p->CPU.FSBFrequency = (fsbFrequency / 1000000) * 1000000;
+	//p->CPU.CPUFrequency = (cpuFrequency / 1000000) * 1000000;
     
-    //p->CPU.TSCFrequency = tscFrequency ;
-	//p->CPU.FSBFrequency = fsbFrequency ;
-	//p->CPU.CPUFrequency = cpuFrequency ;
+    p->CPU.TSCFrequency = tscFrequency ;
+	p->CPU.FSBFrequency = fsbFrequency ;
+	p->CPU.CPUFrequency = cpuFrequency ;
     
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
@@ -399,7 +718,7 @@ void scan_cpu(PlatformInfo_t *p)
 	
 	DBG("CPU: NoCores/NoThreads:     %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
 	DBG("CPU: Features:              0x%08x\n", p->CPU.Features);
-    DBG("CPU: ExtFeatures:           0x%08x\n", p->CPU.ExtFeatures); // where is SYSCALL ??
+    DBG("CPU: ExtFeatures:           0x%08x\n", p->CPU.ExtFeatures); 
     DBG("CPU: MicrocodeVersion:      %d\n", p->CPU.MicrocodeVersion);
 #if DEBUG_CPU
 		pause();

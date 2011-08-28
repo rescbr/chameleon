@@ -43,7 +43,18 @@
 //#define FSUR_RECOGNIZED 0
 
 #define ERROR -1
-
+static int
+ntfs_fixup(
+		   char *buf,
+		   size_t len,
+		   u_int32_t magic,
+		   u_int32_t bytesPerSector);
+static int
+ntfs_find_attr(
+			   char *buf,
+			   u_int32_t attrType,
+			   void **attrData,
+			   size_t *attrSize);
 /*
  * Process per-sector "fixups" that NTFS uses to detect corruption of
  * multi-sector data structures, like MFT records.

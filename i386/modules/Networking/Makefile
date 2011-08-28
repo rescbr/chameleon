@@ -70,6 +70,7 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
+	-macosx_version_min 10.6 \
 	$(OBJROOT)/Networking.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

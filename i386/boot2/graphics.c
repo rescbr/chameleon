@@ -48,6 +48,12 @@ uint8_t *previewSaveunder = 0;
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
+static void setupPalette( VBEPalette * p, const unsigned char * g );
+static int
+setVESATextMode( unsigned short cols,
+				unsigned short rows,
+				unsigned char  bitsPerPixel );
+
 #ifndef OPTION_ROM
 int
 convertImage( unsigned short width,
@@ -134,11 +140,14 @@ getVESAModeWithProperties( unsigned short     width,
 	
     // Clear output mode info.
 	
-    bzero( outModeInfo, sizeof(*outModeInfo) );
-	
+    //bzero( outModeInfo, sizeof(*outModeInfo) );
+	bzero( outModeInfo, sizeof(VBEModeInfoBlock) );
+
     // Get VBE controller info containing the list of supported modes.
 	
-    bzero( &vbeInfo, sizeof(vbeInfo) );
+    //bzero( &vbeInfo, sizeof(vbeInfo) );
+    bzero( &vbeInfo, sizeof(VBEInfoBlock) );
+    
     strcpy( (char*)&vbeInfo, "VBE2" );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
@@ -157,7 +166,9 @@ getVESAModeWithProperties( unsigned short     width,
     {
         // Get mode information.
 		
-        bzero( &modeInfo, sizeof(modeInfo) );
+        //bzero( &modeInfo, sizeof(modeInfo) );
+        bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
+
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -228,7 +239,9 @@ getVESAModeWithProperties( unsigned short     width,
 			( modeBitsPerPixel     == bitsPerPixel ) )
         {
             matchedMode = *modePtr;
-            bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+            //bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );            
+            bcopy( &modeInfo, outModeInfo, sizeof(VBEModeInfoBlock) );
+
             break;
         }
 		
@@ -248,7 +261,9 @@ getVESAModeWithProperties( unsigned short     width,
         }
 		
         matchedMode = *modePtr;
-        bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+        //bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+        bcopy( &modeInfo, outModeInfo, sizeof(VBEModeInfoBlock) );
+
     }
 	
     return matchedMode;

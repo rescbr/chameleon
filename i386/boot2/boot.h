@@ -40,7 +40,8 @@
 #define kKernelFlagsKey		"Kernel Flags"
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
-#define kPrelinkKernelKey	"Prelinked Kernel"
+#define kKernelCacheKey     "Kernel Cache"
+#define kUseKernelCache     "UseKernelCache"    
 #define kBootDeviceKey		"Boot Device"
 #define kTimeoutKey			"Timeout"
 #define kRootDeviceKey		"rd"
@@ -131,9 +132,6 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-extern unsigned long
-local_adler32( unsigned char * buffer, long length );
-
 
 /*
  * graphics.c
@@ -164,7 +162,6 @@ convertImage( unsigned short width,
               const unsigned char *imageData,
               unsigned char **newImageData );
 extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
-//extern void drawBootGraphics(void);
 extern void drawPreview(void *src, uint8_t * saveunder);
 extern int getVideoMode(void);
 extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);

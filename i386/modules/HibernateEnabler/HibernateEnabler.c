@@ -22,18 +22,23 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 {
 	bool tryresume,tryresumedefault, forceresume;
 	
-	if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig)) {
+	if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig))
+	{
 		tryresume = true;
 		tryresumedefault = true;
-	} else {
+	}
+	else
+	{
 		tryresumedefault = false;
 	}
 	
-	if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig)) {
+	if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig))
+	{
 		forceresume = false;
 	}
 	
-	if (forceresume) {
+	if (forceresume)
+	{
 		tryresume = true;
 		tryresumedefault = false;
 	}
@@ -59,7 +64,8 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 		if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			break;
 		
-		if (!forceresume && ((sleeptime+3)<bvr->modTime)) {
+		if (!forceresume && ((sleeptime+3)<bvr->modTime))
+		{
 			printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",bvr->modTime-sleeptime);
 			break;
 		}
@@ -75,7 +81,8 @@ void HibernateEnabler_start()
 	bool enable = true;
 	getBoolForKey(kEnableHibernate, &enable, &bootInfo->bootConfig) ;
 	
-	if (enable) {
+	if (enable)
+	{
 		register_hook_callback("PreBoot", &HibernateEnabler_hook);
 		register_hook_callback("spinActivity_hook", &spinActivityIndicator_hook);
 	}

@@ -9,6 +9,7 @@
 #include "pci.h"
 #include "pci_root.h"
 #include "modules.h"
+#include "device_inject.h"
 
 #ifndef DEBUG_PCI
 #define DEBUG_PCI 0
@@ -192,10 +193,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	pci_dt_t *current = pci_dt;
 	
-	
 	while (current)
-	{
-		execute_hook("PCIDevice", current, NULL, NULL, NULL, NULL, NULL);
+	{		
+		execute_hook("PCIDevice", current, NULL/* &ret*/, NULL, NULL, NULL, NULL);
 		
 		setup_pci_devs(current->children);
 		current = current->next;

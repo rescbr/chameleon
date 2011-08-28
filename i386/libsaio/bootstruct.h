@@ -38,19 +38,18 @@ extern boot_args_legacy  *bootArgsLegacy;
 
 #define VGA_TEXT_MODE 0
 
+#if 0
 /*
  * Maximum number of boot drivers that can be loaded.
  */
 #define NDRIVERS  500
 
 #define CONFIG_SIZE (40 * 4096)
-
-/*
- * Max size fo config data array, in bytes.
- */
-#define IO_CONFIG_DATA_SIZE		163840
+#endif
 
 #define kMemoryMapCountMax 40
+
+#if UNUSED
 
 /*
  * PCI bus information.
@@ -77,6 +76,7 @@ typedef struct {
     unsigned long size;     // number of bytes
     unsigned long type;     // driver type
 } driver_config_t;
+#endif
 
 /*
  * INT15, E820h - Query System Address Map.
@@ -115,14 +115,13 @@ typedef struct PrivateBootInfo {
 
     unsigned long    memoryMapCount;
     MemoryRange      memoryMap[kMemoryMapCountMax];
-
-    PCI_bus_info_t   pciInfo;
-
+    
 #if 0
+    PCI_bus_info_t   pciInfo;
     driver_config_t  driverConfig[NDRIVERS];
-#endif
     char *           configEnd;                    // pointer to end of config files
     char             config[CONFIG_SIZE];	
+#endif
 	
     config_file_t    bootConfig;		               // boot.plist
     config_file_t    overrideConfig;               // additional boot.plist which can override bootConfig keys
@@ -134,6 +133,7 @@ typedef struct PrivateBootInfo {
 	unsigned long    adler32;
 	
 	char uuidStr[64+1];										//boot device  uuid
+    
 } PrivateBootInfo_t;
 
 extern PrivateBootInfo_t *bootInfo; 

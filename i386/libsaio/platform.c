@@ -41,8 +41,8 @@ inline bool platformCPUExtFeature(uint32_t feature)
 */
 void scan_platform(void)
 {	
-	Platform = malloc(sizeof(Platform));
-	memset(Platform, 0, sizeof(Platform));
+	Platform = malloc(sizeof(PlatformInfo_t)); 
+	memset(Platform, 0, sizeof(PlatformInfo_t));
 	build_pci_dt();
 	scan_cpu(Platform);
 }

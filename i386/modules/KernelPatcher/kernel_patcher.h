@@ -33,28 +33,5 @@ typedef struct kernSymbols_t
 	struct kernSymbols_t* next;
 } kernSymbols_t;
 
-kernSymbols_t* lookup_kernel_symbol(const char* name);
-void register_kernel_symbol(int kernelType, const char* name);
-
-long long symbol_handler(char* symbolName, long long addr, char is64);
-void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6);
-void register_kernel_patch(void* patch, int arch, int cpus);
-
-int locate_symbols(void* kernelData);
-
-int determineKernelArchitecture(void* kernelData);
-
-/*
- * Internal patches provided by this module.
- */
-void patch_cpuid_set_info_all(void* kernelData);
-void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel);
-void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel);
-
-void patch_pmCPUExitHaltToOff(void* kernelData);
-void patch_lapic_init(void* kernelData);
-void patch_commpage_stuff_routine(void* kernelData);
-void patch_lapic_configure(void* kernelData);
-void patch_lapic_interrupt(void* kernelData);
 
 #endif /* !__BOOT2_KERNEL_PATCHER_H */

@@ -29,12 +29,13 @@
 #define kEHCIhard			"EHCIhard"			
 
 int usb_loop();
+void notify_usb_dev(pci_dt_t *pci_dev);
 
 struct pciList* usbList = NULL;
 
-int legacy_off (pci_dt_t *pci_dev);
-int ehci_acquire (pci_dt_t *pci_dev);
-int uhci_reset (pci_dt_t *pci_dev);
+static int legacy_off (pci_dt_t *pci_dev);
+static int ehci_acquire (pci_dt_t *pci_dev);
+static int uhci_reset (pci_dt_t *pci_dev);
 
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
@@ -106,7 +107,7 @@ int usb_loop()
 	return retVal;
 }
 
-int legacy_off (pci_dt_t *pci_dev)
+static int legacy_off (pci_dt_t *pci_dev)
 {
 	// Set usb legacy off modification by Signal64
 	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
@@ -193,7 +194,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	return 1;
 }
 
-int ehci_acquire (pci_dt_t *pci_dev)
+static int ehci_acquire (pci_dt_t *pci_dev)
 {
 	int		j, k;	
 	uint8_t		legacy[8];
@@ -313,7 +314,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	return 1;
 }
 
-int uhci_reset (pci_dt_t *pci_dev)
+static int uhci_reset (pci_dt_t *pci_dev)
 {
 	uint32_t base, port_base;
 	

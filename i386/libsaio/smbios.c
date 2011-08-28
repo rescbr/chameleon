@@ -6,6 +6,7 @@
 
 static const char * const SMTAG = "_SM_";
 static const char* const DMITAG= "_DMI_";
+static struct SMBEntryPoint *getAddressOfSmbiosTable(void);
 
 static struct SMBEntryPoint *getAddressOfSmbiosTable(void)
 {
@@ -15,7 +16,8 @@ static struct SMBEntryPoint *getAddressOfSmbiosTable(void)
 	 * for the SMBIOS entry-point structure anchor (literal ASCII "_SM_").
 	 */
 	smbios = (struct SMBEntryPoint*) SMBIOS_RANGE_START;
-	while (smbios <= (struct SMBEntryPoint *)SMBIOS_RANGE_END) {
+	while (smbios <= (struct SMBEntryPoint *)SMBIOS_RANGE_END)
+	{
 		if (COMPARE_DWORD(smbios->anchor, SMTAG)  && 
 			COMPARE_DWORD(smbios->dmi.anchor, DMITAG) &&
 			smbios->dmi.anchor[4]==DMITAG[4] &&
@@ -34,10 +36,12 @@ struct SMBEntryPoint *getSmbiosOriginal()
 {    	
     static struct SMBEntryPoint *orig = NULL; // cached
     
-    if (orig == NULL) {
+    if (orig == NULL)
+	{
 		orig = getAddressOfSmbiosTable();		
 		
-		if (orig) {
+		if (orig)
+		{
 			verbose("Found System Management BIOS (SMBIOS) table\n");			
 		}
         

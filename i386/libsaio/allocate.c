@@ -63,14 +63,16 @@ AllocateKernelMemory( long inSize )
 {
     long addr;
 
-    if (gImageLastKernelAddr == 0) {
+    if (gImageLastKernelAddr == 0)
+	{
         gImageLastKernelAddr = RoundPage( bootArgs->kaddr +
                                           bootArgs->ksize );
     }
     addr = gImageLastKernelAddr;
     gImageLastKernelAddr += RoundPage(inSize);
 
-    if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) ) {
+    if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) )
+	{
         stop ("AllocateKernelMemory error");
     }
         

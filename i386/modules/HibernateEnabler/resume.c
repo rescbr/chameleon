@@ -20,6 +20,9 @@
 extern int previewTotalSectors;
 extern int previewLoadedSectors;
 extern uint8_t *previewSaveunder;
+static unsigned long
+getmemorylimit(void);
+static void WakeKernel(IOHibernateImageHeader * header);
 
 static unsigned long
 getmemorylimit(void)
@@ -71,7 +74,8 @@ static void WakeKernel(IOHibernateImageHeader * header)
 		lowHalf = 1;
 		highHalf = 0;
 		
-		for (cnt = 0; cnt < compressedSize; cnt += 0x20) {
+		for (cnt = 0; cnt < compressedSize; cnt += 0x20)
+		{
 			dst[0] = src[0];
 			dst[1] = src[1];
 			dst[2] = src[2];
@@ -80,7 +84,8 @@ static void WakeKernel(IOHibernateImageHeader * header)
 			dst[5] = src[5];
 			dst[6] = src[6];
 			dst[7] = src[7];
-			for (byteCnt = 0; byteCnt < 0x20; byteCnt++) {
+			for (byteCnt = 0; byteCnt < 0x20; byteCnt++)
+			{
 				lowHalf += ((u_int8_t *) dst)[byteCnt];
 				highHalf += lowHalf;
 			}
@@ -191,7 +196,8 @@ void HibernateBoot(char *image_filename)
 	
 // Depends on NVRAM
 #if 0
-	if (header->encryptStart) {
+	if (header->encryptStart)
+	{
 		// decryption data
 		static const unsigned char first_iv[AES_BLOCK_SIZE]
 		= {  0xa3, 0x63, 0x65, 0xa9, 0x0b, 0x71, 0x7b, 0x1c,

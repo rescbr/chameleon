@@ -131,7 +131,8 @@ void RamDiskLoader_start()
 	bool enable = true;
 	getBoolForKey(kEnableEDL, &enable, &bootInfo->bootConfig) ;
 	
-	if (enable) {
+	if (enable)
+	{
 		register_hook_callback("loadPrebootRAMDisk", &loadPrebootRAMDisk_hook);
 		register_hook_callback("md0Ramdisk", &md0Ramdisk_hook);
 		register_hook_callback("processRAMDiskCommand", &processRAMDiskCommand_hook);

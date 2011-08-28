@@ -156,39 +156,43 @@ EFI_STATUS load_module(char* module)
 			return EFI_OUT_OF_RESOURCES;		
 	}
 	EFI_STATUS ret = EFI_SUCCESS;
-	int moduleSize = file_size(fh);
-	char* module_base = (char*) malloc(moduleSize);
-	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
+	
 	{
-
-		DBG("Module %s read in.\n", modString);
-
-		// Module loaded into memory, parse it
-		module_start = parse_mach(module_base, &load_module, &add_symbol);
-
-		if(module_start && module_start != (void*)0xFFFFFFFF)
+		int moduleSize = file_size(fh);
+		char* module_base = (char*) malloc(moduleSize);
+		if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 		{
-			module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
-			// Notify the system that it was laoded
-			(*module_start)();	// Start the module
-			msglog("%s successfully Loaded.\n", module);
-		}
-		else {
-			// The module does not have a valid start function
-			printf("Unable to start %s\n", module);	
-			ret = EFI_NOT_STARTED;
+			
+			DBG("Module %s read in.\n", modString);
+			
+			// Module loaded into memory, parse it
+			module_start = parse_mach(module_base, &load_module, &add_symbol);
+			
+			if(module_start && module_start != (void*)0xFFFFFFFF)
+			{
+				module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
+				// Notify the system that it was laoded
+				(*module_start)();	// Start the module
+				msglog("%s successfully Loaded.\n", module);
+			}
+			else
+			{
+				// The module does not have a valid start function
+				printf("Unable to start %s\n", module);	
+				ret = EFI_NOT_STARTED;
 #if DEBUG_MODULES			
+				getc();
+#endif
+			}		
+		}
+		else
+		{
+			printf("Unable to read in module %s\n.", module);
+#if DEBUG_MODULES		
 			getc();
 #endif
-		}		
-	}
-	else
-	{
-		printf("Unable to read in module %s\n.", module);
-#if DEBUG_MODULES		
-		getc();
-#endif
-		ret = EFI_LOAD_ERROR;
+			ret = EFI_LOAD_ERROR;
+		}
 	}
 	close(fh);
 	return ret;
@@ -312,210 +316,215 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 	UInt32 moduleVersion = 0;
 	UInt32 moduleCompat = 0;
 	*/
-	// TODO convert all of the structs to a union
-	struct load_command *loadCommand = NULL;
-	struct dylib_command* dylibCommand = NULL;
-	struct dyld_info_command* dyldInfoCommand = NULL;
 	
-	struct symtab_command* symtabCommand = NULL;
-	struct segment_command *segCommand = NULL;
-	struct segment_command_64 *segCommand64 = NULL;
+	// TODO convert all of the structs to a union	
+	struct dyld_info_command* dyldInfoCommand = NULL;	
+	struct symtab_command* symtabCommand = NULL;	
 
-	//struct dysymtab_command* dysymtabCommand = NULL;
-	UInt32 binaryIndex = 0;
-	UInt16 cmd = 0;
-
-	// Parse through the load commands
-	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
-		is64 = false;
-		binaryIndex += sizeof(struct mach_header);
-	}
-	else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
-	{
-		// NOTE: modules cannot be 64bit...
-		is64 = true;
-		binaryIndex += sizeof(struct mach_header_64);
-	}
-	else
-	{
-		printf("Modules: Invalid mach magic\n");
-		getc();
-		return NULL;
-	}
-
-
-	
-	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
-	{
-		printf("Module is not a dylib. Unable to load.\n");
-		getc();
-		return NULL; // Module is in the incorrect format
-	}*/
-	
-	while(cmd < ((struct mach_header*)binary)->ncmds)
-	{
-		cmd++;
+		struct segment_command *segCommand = NULL;
+		struct segment_command_64 *segCommand64 = NULL;
+		struct dylib_command* dylibCommand = NULL;
+		struct load_command *loadCommand = NULL;
+		UInt32 binaryIndex = 0;
+		UInt16 cmd = 0;
 		
-		loadCommand = binary + binaryIndex;
-		UInt32 cmdSize = loadCommand->cmdsize;
-
-		
-		switch ((loadCommand->cmd & 0x7FFFFFFF))
+		// Parse through the load commands
+		if(((struct mach_header*)binary)->magic == MH_MAGIC)
 		{
-			case LC_SYMTAB:
-				symtabCommand = binary + binaryIndex;
-				break;
-				
-			case LC_SEGMENT: // 32bit macho
-				segCommand = binary + binaryIndex;
-				
-				//printf("Segment name is %s\n", segCommand->segname);
-				
-				if(strcmp("__TEXT", segCommand->segname) == 0)
-				{
-					UInt32 sectionIndex;
-					
-#if HARD_DEBUG_MODULES			
-					unsigned long fileaddr;
-					long   filesize;					
-					vmaddr = (segCommand->vmaddr & 0x3fffffff);
-					vmsize = segCommand->vmsize;	  
-					fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand->fileoff);
-					filesize = segCommand->filesize;
-					
-					printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-						   segCommand->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-						   (unsigned) segCommand->nsects, (unsigned)segCommand->flags);
-					getc();
-#endif
-					sectionIndex = sizeof(struct segment_command);
-					
-					struct section *sect;
-					
-					while(sectionIndex < segCommand->cmdsize)
-					{
-						sect = binary + binaryIndex + sectionIndex;
-						
-						sectionIndex += sizeof(struct section);
-						
-						
-						if(strcmp("__text", sect->sectname) == 0)
-						{
-							// __TEXT,__text found, save the offset and address for when looking for the calls.
-							textSection = sect->offset;
-							textAddress = sect->addr;
-							break;
-						}					
-					}
-				}
-				break;
-			case LC_SEGMENT_64:	// 64bit macho's
-				segCommand64 = binary + binaryIndex;
-				
-				//printf("Segment name is %s\n", segCommand->segname);
-				
-				if(strcmp("__TEXT", segCommand64->segname) == 0)
-				{
-					UInt32 sectionIndex;
-					
-#if HARD_DEBUG_MODULES					
-					
-					unsigned long fileaddr;
-					long   filesize;					
-					vmaddr = (segCommand64->vmaddr & 0x3fffffff);
-					vmsize = segCommand64->vmsize;	  
-					fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand64->fileoff);
-					filesize = segCommand64->filesize;
-					
-					printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-						   segCommand64->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-						   (unsigned) segCommand64->nsects, (unsigned)segCommand64->flags);
-					getc();
-#endif
-					
-					sectionIndex = sizeof(struct segment_command_64);
-					
-					struct section_64 *sect;
-					
-					while(sectionIndex < segCommand64->cmdsize)
-					{
-						sect = binary + binaryIndex + sectionIndex;
-						
-						sectionIndex += sizeof(struct section_64);
-						
-						
-						if(strcmp("__text", sect->sectname) == 0)
-						{
-							// __TEXT,__text found, save the offset and address for when looking for the calls.
-							textSection = sect->offset;
-							textAddress = sect->addr;
-							
-							break;
-						}					
-					}
-				}
-				
-				break;
-				
-			case LC_DYSYMTAB:
-				break;
-				
-			case LC_LOAD_DYLIB:
-			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
-				dylibCommand  = binary + binaryIndex;
-				char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-				// TODO: verify version
-				// =	dylibCommand->dylib.current_version;
-				// =	dylibCommand->dylib.compatibility_version;
-				char* name = malloc(strlen(module) + strlen(".dylib") + 1);
-				sprintf(name, "%s.dylib", module);				
-				if(dylib_loader == EFI_SUCCESS)
-				{
-					EFI_STATUS statue = dylib_loader(name);
-					
-					if( statue != EFI_SUCCESS)
-					{
-						free(name);
-						if (statue != EFI_ALREADY_STARTED) {
-							// Unable to load dependancy
-							return NULL;
-						}
-						
-					} 
-
-				}
-				break;
-				
-			case LC_ID_DYLIB:
-				dylibCommand = binary + binaryIndex;
-				/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-				moduleVersion =	dylibCommand->dylib.current_version;
-				moduleCompat =	dylibCommand->dylib.compatibility_version;
-				 */
-				break;
-
-			case LC_DYLD_INFO:
-				// Bind and rebase info is stored here
-				dyldInfoCommand = binary + binaryIndex;
-				break;
-				
-			case LC_UUID:
-				break;
-				
-			case LC_UNIXTHREAD:
-				break;
-				
-			default:
-				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
-				break;
-		
+			is64 = false;
+			binaryIndex += sizeof(struct mach_header);
 		}
-
-		binaryIndex += cmdSize;
-	}
-	//if(!moduleName) return NULL;
+		else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
+		{
+			// NOTE: modules cannot be 64bit...
+			is64 = true;
+			binaryIndex += sizeof(struct mach_header_64);
+		}
+		else
+		{
+			printf("Modules: Invalid mach magic\n");
+			getc();
+			return NULL;
+		}
 		
+		
+		
+		/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
+		 {
+		 printf("Module is not a dylib. Unable to load.\n");
+		 getc();
+		 return NULL; // Module is in the incorrect format
+		 }*/
+		
+		while(cmd < ((struct mach_header*)binary)->ncmds)
+		{
+			cmd++;
+			
+			loadCommand = binary + binaryIndex;
+			UInt32 cmdSize = loadCommand->cmdsize;
+			
+			
+			switch ((loadCommand->cmd & 0x7FFFFFFF))
+			{
+				case LC_SYMTAB:
+					symtabCommand = binary + binaryIndex;
+					break;
+					
+				case LC_SEGMENT: // 32bit macho
+				{
+					segCommand = binary + binaryIndex;
+					
+					//printf("Segment name is %s\n", segCommand->segname);
+					
+					if(strcmp("__TEXT", segCommand->segname) == 0)
+					{
+						UInt32 sectionIndex;
+						
+#if HARD_DEBUG_MODULES			
+						unsigned long fileaddr;
+						long   filesize;					
+						vmaddr = (segCommand->vmaddr & 0x3fffffff);
+						vmsize = segCommand->vmsize;	  
+						fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand->fileoff);
+						filesize = segCommand->filesize;
+						
+						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+							   segCommand->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+							   (unsigned) segCommand->nsects, (unsigned)segCommand->flags);
+						getc();
+#endif
+						sectionIndex = sizeof(struct segment_command);
+						
+						struct section *sect;
+						
+						while(sectionIndex < segCommand->cmdsize)
+						{
+							sect = binary + binaryIndex + sectionIndex;
+							
+							sectionIndex += sizeof(struct section);
+							
+							
+							if(strcmp("__text", sect->sectname) == 0)
+							{
+								// __TEXT,__text found, save the offset and address for when looking for the calls.
+								textSection = sect->offset;
+								textAddress = sect->addr;
+								break;
+							}					
+						}
+					}
+					break;
+				}				
+				case LC_SEGMENT_64:	// 64bit macho's
+				{
+					segCommand64 = binary + binaryIndex;
+					
+					//printf("Segment name is %s\n", segCommand->segname);
+					
+					if(strcmp("__TEXT", segCommand64->segname) == 0)
+					{
+						UInt32 sectionIndex;
+						
+#if HARD_DEBUG_MODULES					
+						
+						unsigned long fileaddr;
+						long   filesize;					
+						vmaddr = (segCommand64->vmaddr & 0x3fffffff);
+						vmsize = segCommand64->vmsize;	  
+						fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand64->fileoff);
+						filesize = segCommand64->filesize;
+						
+						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+							   segCommand64->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+							   (unsigned) segCommand64->nsects, (unsigned)segCommand64->flags);
+						getc();
+#endif
+						
+						sectionIndex = sizeof(struct segment_command_64);
+						
+						struct section_64 *sect;
+						
+						while(sectionIndex < segCommand64->cmdsize)
+						{
+							sect = binary + binaryIndex + sectionIndex;
+							
+							sectionIndex += sizeof(struct section_64);
+							
+							
+							if(strcmp("__text", sect->sectname) == 0)
+							{
+								// __TEXT,__text found, save the offset and address for when looking for the calls.
+								textSection = sect->offset;
+								textAddress = sect->addr;
+								
+								break;
+							}					
+						}
+					}
+					
+					break;
+				}				
+				case LC_DYSYMTAB:
+					break;
+					
+				case LC_LOAD_DYLIB:
+				case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
+				{
+					dylibCommand  = binary + binaryIndex;
+					char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+					// TODO: verify version
+					// =	dylibCommand->dylib.current_version;
+					// =	dylibCommand->dylib.compatibility_version;
+					char* name = malloc(strlen(module) + strlen(".dylib") + 1);
+					sprintf(name, "%s.dylib", module);				
+					if(dylib_loader == EFI_SUCCESS)
+					{
+						EFI_STATUS statue = dylib_loader(name);
+						
+						if( statue != EFI_SUCCESS)
+						{
+							free(name);
+							if (statue != EFI_ALREADY_STARTED)
+							{
+								// Unable to load dependancy
+								return NULL;
+							}
+							
+						} 
+						
+					}
+					break;
+				}				
+				case LC_ID_DYLIB:
+					dylibCommand = binary + binaryIndex;
+					/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+					 moduleVersion =	dylibCommand->dylib.current_version;
+					 moduleCompat =	dylibCommand->dylib.compatibility_version;
+					 */
+					break;
+					
+				case LC_DYLD_INFO:
+					// Bind and rebase info is stored here
+					dyldInfoCommand = binary + binaryIndex;
+					break;
+					
+				case LC_UUID:
+					break;
+					
+				case LC_UNIXTHREAD:
+					break;
+					
+				default:
+					DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
+					break;
+					
+			}
+			
+			binaryIndex += cmdSize;
+		}
+		//if(!moduleName) return NULL;
+	}		
 
 	// bind_macho uses the symbols.
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
@@ -591,24 +600,26 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				
 			case REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+			{
 				// Locate address to begin rebasing
 				segmentAddress = 0;
-
+				
 				struct segment_command* segCommand = NULL; // NOTE: 32bit only
 				
-				unsigned int binIndex = 0;
-				index = 0;
-				do
 				{
-					segCommand = base + sizeof(struct mach_header) +  binIndex;
-					
-					
-					binIndex += segCommand->cmdsize;
-					index++;
-				}
-				while(index <= immediate);
-
-
+					unsigned int binIndex = 0;
+					index = 0;
+					do
+					{
+						segCommand = base + sizeof(struct mach_header) +  binIndex;
+						
+						
+						binIndex += segCommand->cmdsize;
+						index++;
+					}
+					while(index <= immediate);
+				}				
+				
 				segmentAddress = segCommand->fileoff;
 				
 				tmp = 0;
@@ -622,8 +633,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				segmentAddress += tmp;
 				break;
-				
-				
+			}				
 			case REBASE_OPCODE_ADD_ADDR_ULEB:
 				// Add value to rebase address
 				tmp = 0;
@@ -646,7 +656,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 			case REBASE_OPCODE_DO_REBASE_IMM_TIMES:
 				index = 0;
-				for (index = 0; index < immediate; ++index) {
+				for (index = 0; index < immediate; ++index)
+				{
 					rebase_location(base + segmentAddress, (char*)base, type);
 					segmentAddress += sizeof(void*);
 				}
@@ -664,7 +675,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				while(rebase_stream[i] & 0x80);
 				
 				index = 0;
-				for (index = 0; index < tmp; ++index) {
+				for (index = 0; index < tmp; ++index)
+				{
 					//DBG("\tRebasing 0x%X\n", segmentAddress);
 					rebase_location(base + segmentAddress, (char*)base, type);					
 					segmentAddress += sizeof(void*);
@@ -707,7 +719,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				while(rebase_stream[i] & 0x80);
 				
 				index = 0;
-				for (index = 0; index < tmp; ++index) {
+				for (index = 0; index < tmp; ++index)
+				{
 
 					rebase_location(base + segmentAddress, (char*)base, type);
 					
@@ -824,19 +837,23 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+			{
 				segmentAddress = 0;
-
+				
 				// Locate address
 				struct segment_command* segCommand = NULL;	// NOTE: 32bit only
 				
-				unsigned int binIndex = 0;
-				index = 0;
-				do
 				{
-					segCommand = base + sizeof(struct mach_header) +  binIndex;
-					binIndex += segCommand->cmdsize;
-					index++;
-				}while(index <= immediate);
+					unsigned int binIndex = 0;
+					index = 0;
+					do
+					{
+						segCommand = base + sizeof(struct mach_header) +  binIndex;
+						binIndex += segCommand->cmdsize;
+						index++;
+					}while(index <= immediate);
+				}
+				
 				
 				segmentAddress = segCommand->fileoff;
 				
@@ -853,7 +870,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 				//DBG("BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB: 0x%X\n", segmentAddress);
 				break;
-				
+			}				
 			case BIND_OPCODE_ADD_ADDR_ULEB:
 				// Read in offset
 				tmp  = 0;
@@ -1036,7 +1053,8 @@ long long add_symbol(char* symbol, long long addr, char is64)
 	// This only can handle 32bit symbols 
 	symbolList_t* new_entry= malloc(sizeof(symbolList_t));
 	DBG("Adding symbol %s at 0x%X\n", symbol, addr);
-	if (new_entry) {	
+	if (new_entry)
+	{	
 		new_entry->next = moduleSymbols;
 		
 		moduleSymbols = new_entry;
@@ -1056,7 +1074,8 @@ long long add_symbol(char* symbol, long long addr, char is64)
 VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 {
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
-	if (new_entry) {	
+	if (new_entry)
+	{	
 		new_entry->next = loadedModules;
 	
 		loadedModules = new_entry;
@@ -1095,32 +1114,36 @@ EFI_STATUS is_module_loaded(const char* name)
 // If non are found, look through the list of module symbols
 unsigned int lookup_all_symbols(const char* name)
 {
-	unsigned int addr = 0xFFFFFFFF;
-	if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
 	{
-		addr = lookup_symbol(name);
-		if(addr != 0xFFFFFFFF)
+		unsigned int addr = 0xFFFFFFFF;
+		if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
-			DBG("Internal symbol %s located at 0x%X\n", name, addr);
-			return addr;
+			addr = lookup_symbol(name);
+			if(addr != 0xFFFFFFFF)
+			{
+				DBG("Internal symbol %s located at 0x%X\n", name, addr);
+				return addr;
+			}
+		}
+	}	
+
+	{
+		symbolList_t* entry = moduleSymbols;
+		while(entry)
+		{
+			if(strcmp(entry->symbol, name) == 0)
+			{
+				DBG("External symbol %s located at 0x%X\n", name, entry->addr);
+				return entry->addr;
+			}
+			else
+			{
+				entry = entry->next;
+			}
+			
 		}
 	}
-
 	
-	symbolList_t* entry = moduleSymbols;
-	while(entry)
-	{
-		if(strcmp(entry->symbol, name) == 0)
-		{
-			DBG("External symbol %s located at 0x%X\n", name, entry->addr);
-			return entry->addr;
-		}
-		else
-		{
-			entry = entry->next;
-		}
-
-	}
 #if DEBUG_MODULES
 	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
 	{
@@ -1151,11 +1174,14 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		{						
 			if(symbolEntry->n_value)
 			{				
-				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0) {
+				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
+				{
 					// Module start located. 'start' is an alias so don't register it				
 					module_start = base + symbolEntry->n_value;
 					DBG("n_value %x module_start %x\n", (unsigned)symbolEntry->n_value, (unsigned)module_start);
-				} else {
+				}
+				else
+				{
 					symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 				}
 				
@@ -1163,7 +1189,8 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
 				printf("%s %s\n", isTexT ? "__TEXT :" : "__DATA(OR ANY) :", symbolString + symbolEntry->n_un.n_strx);
 				
-				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "_BootHelp_txt") == 0) {
+				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "_BootHelp_txt") == 0)
+				{
 					long long addr = (long long)base + symbolEntry->n_value;
 					unsigned char *BootHelp = NULL;
 					BootHelp  = (unsigned char*)(UInt32)addr;					
@@ -1188,10 +1215,13 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		while(symbolIndex < symtabCommand->nsyms)
 		{	
 			
-			if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0) {
+			if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
+			{
 				// Module start located. 'start' is an alias so don't register it				
 				module_start = base + symbolEntry->n_value;
-			} else {
+			}
+			else
+			{
 				symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 			}
 			
@@ -1211,8 +1241,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
  * example: replace_function("_HelloWorld_start", &replacement_start);
  */
 EFI_STATUS replace_function(const char* symbol, void* newAddress)
-{
-	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
+{		 
 	// TODO: look into using the next four bytes of the function instead
 	// Most functions should support this, as they probably will be at 
 	// least 10 bytes long, but you never know, this is sligtly safer as
@@ -1222,6 +1251,8 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
 	{
+		UInt32* jumpPointer = malloc(sizeof(UInt32*));
+		
 		*binary++ = 0xFF;	// Jump
 		*binary++ = 0x25;	// Long Jump
 		*((UInt32*)binary) = (UInt32)jumpPointer;

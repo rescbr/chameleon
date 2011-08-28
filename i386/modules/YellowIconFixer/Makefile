@@ -1,11 +1,11 @@
 
-MODULE_NAME = Resolution
+MODULE_NAME = YellowIconFixer
 MODULE_VERSION = "1.0.0"
 MODULE_COMPAT_VERSION = "1.0.0"
 MODULE_START = _$(MODULE_NAME)_start
 MODULE_DEPENDENCIES = 
 
-DIR = Resolution
+DIR = YellowIconFixer
 
 include ../../MakePaths.dir
 
@@ -29,6 +29,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common  
+
 DEFINES=
 CONFIG = hd
 INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(BOOT2DIR)
@@ -44,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-RESOLUTION_OBJS = Resolution.o edid.o 915resolution.o
+SATA_OBJS = YellowIconFixer.o
 
 
 SFILES =
@@ -57,7 +58,7 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-all embedtheme: ${RESOLUTION_OBJS} dylib
+all embedtheme: ${SATA_OBJS} dylib
 
 
 dylib: 
@@ -70,22 +71,12 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/edid.o \
-	$(OBJROOT)/915resolution.o \
-	$(OBJROOT)/Resolution.o \
-	-o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/YellowIconFixer.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
 
-Resolution.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Resolution.c" $(INC) -o "$(OBJROOT)/Resolution.o"
-
-915resolution.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "915resolution.c" $(INC) -o "$(OBJROOT)/915resolution.o"
-
-edid.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "edid.c" $(INC) -o "$(OBJROOT)/edid.o"
-
+YellowIconFixer.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "YellowIconFixer.c" $(INC) -o "$(OBJROOT)/YellowIconFixer.o"
 
 include ../../MakeInc.dir
 

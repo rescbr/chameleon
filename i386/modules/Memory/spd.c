@@ -69,8 +69,17 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 #define SMBHSTDAT 5
 //#define SBMBLKDAT 7
 
+static unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd);
+static void init_spd(char * spd, uint32_t base, int slot);
+static const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num);
+static int getDDRspeedMhz(const char * spd);
+static const char *getDDRSerial(const char* spd);
+static const char * getDDRPartNum(char* spd, uint32_t base, int slot);
+static void read_smb_intel(pci_dt_t *smbus_dev);
+
+
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
-unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
+static unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
     int l1, h1, l2, h2;
     unsigned long long t;
@@ -130,7 +139,7 @@ static void init_spd(char * spd, uint32_t base, int slot)
 
 /** Get Vendor Name from spd, 2 cases handled DDR3 and DDR2, 
  have different formats, always return a valid ptr.*/
-const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
+static const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 {
     uint8_t bank = 0;
     uint8_t code = 0;
@@ -167,7 +176,7 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 }
 
 /** Get Default Memory Module Speed (no overclocking handled) */
-int getDDRspeedMhz(const char * spd)
+static int getDDRspeedMhz(const char * spd)
 {
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) { 
         switch(spd[12])  {
@@ -203,7 +212,7 @@ int getDDRspeedMhz(const char * spd)
 
 /** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
 //char asciiSerial[16];
-const char *getDDRSerial(const char* spd)
+static const char *getDDRSerial(const char* spd)
 {
     static char asciiSerial[16];
 	
@@ -221,7 +230,7 @@ const char *getDDRSerial(const char* spd)
 
 /** Get DDR3 or DDR2 Part Number, always return a valid ptr */
 //char asciiPartNo[32];
-const char * getDDRPartNum(char* spd, uint32_t base, int slot)
+static const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 {
 	static char asciiPartNo[32];
 	int i, start=0, index = 0;

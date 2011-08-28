@@ -73,6 +73,7 @@ dylib:
 	$(OBJROOT)/graphic_utils.o \
 	$(OBJROOT)/resume.o \
 	$(OBJROOT)/HibernateEnabler.o \
+	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

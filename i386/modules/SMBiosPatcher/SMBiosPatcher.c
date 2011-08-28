@@ -66,6 +66,21 @@ void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* a
 	
 }
 
+void getboardproduct_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
+{	
+	setupSmbiosConfigFile("SMBIOS.plist");
+	int len = 0;
+	const char *val = 0;
+	
+	if (getValueForKey("SMboardproduct", &val, &len, &bootInfo->smbiosConfig)) {
+		gboardproduct = (char *)val;
+	} else {
+        const char *productBoard = sm_get_defstr("SMboardproduct", 0);	
+		gboardproduct =  (char *)productBoard;
+	}	
+	
+}
+
 void is_SMB_Patcher_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
 
 void SMBiosPatcher_start()
@@ -78,6 +93,7 @@ void SMBiosPatcher_start()
 	if (enable) {
 	register_hook_callback("getSmbiosPatched", &getSmbiosPatched_hook);	
 	register_hook_callback("getProductNamePatched", &getProductName_hook);
+    register_hook_callback("getboardproductPatched", &getboardproduct_hook);
     register_hook_callback("isSMBIOSRegistred", &is_SMB_Patcher_Registred_Hook);
     }
 }

@@ -20,8 +20,9 @@
 #define DBG(x...)
 #endif
 
-void force_enable_hpet_intel(pci_dt_t *lpc_dev);
-void force_enable_hpet_via(pci_dt_t *lpc_dev);
+static void force_enable_hpet_intel(pci_dt_t *lpc_dev);
+static void force_enable_hpet_via(pci_dt_t *lpc_dev);
+static void force_enable_hpet(pci_dt_t *lpc_dev);
 
 
 void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -93,7 +94,7 @@ static struct lpc_controller_t lpc_controllers_via[] = {
 };
 
 
-void force_enable_hpet(pci_dt_t *lpc_dev)
+static void force_enable_hpet(pci_dt_t *lpc_dev)
 {
 	switch(lpc_dev->vendor_id)
 	{
@@ -115,7 +116,7 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 #endif
 }
 
-void force_enable_hpet_via(pci_dt_t *lpc_dev)
+static void force_enable_hpet_via(pci_dt_t *lpc_dev)
 {
 	uint32_t	val, hpet_address = 0xFED00000;
 	unsigned int i;
@@ -130,7 +131,8 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 			DBG("VIA %s LPC Interface [%04x:%04x], MMIO\n", 
 				lpc_controllers_via[i].name, lpc_dev->vendor_id, lpc_dev->device_id);
 			
-			if (val & 0x80) {
+			if (val & 0x80)
+			{
 				hpet_address = (val & ~0x3ff);
 				DBG("HPET at 0x%lx\n", hpet_address);
 			}
@@ -139,11 +141,13 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 				val = 0xfed00000 | 0x80;
 				pci_config_write32(lpc_dev->dev.addr, 0x68, val);
 				val = pci_config_read32(lpc_dev->dev.addr, 0x68);
-				if (val & 0x80) {
+				if (val & 0x80)
+				{
 					hpet_address = (val & ~0x3ff);
 					DBG("Force enabled HPET at 0x%lx\n", hpet_address);
 				}
-				else {
+				else
+				{
 					DBG("Unable to enable HPET");
 				}
 			}
@@ -153,7 +157,7 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 
 
 
-void force_enable_hpet_intel(pci_dt_t *lpc_dev)
+static void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 {
 	uint32_t	val, hpet_address = 0xFED00000;
 	unsigned int i;

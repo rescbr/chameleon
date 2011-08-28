@@ -5,7 +5,7 @@
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
-
+#include "interrupt_handler.h"
 #include "mboot.h"
 
 #define OFFSET_1MEG 0x100000
@@ -234,9 +234,9 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
     void *hi_addr = determine_safe_hi_addr(multiboot_magic, mi_orig);
     if(hi_addr == NULL)
         return NULL;
-
-    struct multiboot_info *mi_copy = hi_malloc(sizeof(*mi_copy));
-    memcpy(mi_copy, mi_orig, sizeof(*mi_copy));
+        
+    struct multiboot_info *mi_copy = hi_malloc(sizeof(struct multiboot_info));
+    memcpy(mi_copy, mi_orig, sizeof(struct multiboot_info));
     
     // Copy the command line
     if(mi_orig->mi_flags & MULTIBOOT_INFO_HAS_CMDLINE)
@@ -250,8 +250,9 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
     }
     // Copy the module info
     if(mi_orig->mi_flags & MULTIBOOT_INFO_HAS_MODS)
-    {
-        struct multiboot_module *dst_modules = hi_malloc(sizeof(*dst_modules)*mi_orig->mi_mods_count);
+    {        
+        struct multiboot_module *dst_modules = hi_malloc(sizeof(struct multiboot_module) * mi_orig->mi_mods_count);
+
         struct multiboot_module *src_modules = (void*)mi_orig->mi_mods_addr;
         mi_copy->mi_mods_addr = (uint32_t)dst_modules;
 
@@ -301,13 +302,16 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // address nor does it fix the return address of our caller.
     continue_at_low_address();
 
-    // Now fix our return address.
+	// Now fix our return address.	
     FIX_RETURN_ADDRESS_USING_FIRST_ARG(multiboot_magic);
-
+	
     // We can now do just about anything, including return to our caller correctly.
     // However, our caller must fix his return address if he wishes to return to
     // his caller and so on and so forth.
 
+	//initPIC(0x20, 0x28);
+	//initIDT();
+	
     /*  Zero the BSS and initialize malloc */
     initialize_runtime();
 

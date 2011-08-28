@@ -9,9 +9,30 @@
 #include "modules.h"
 extern PlatformInfo_t*    Platform;
 
+long long symbol_handler(char* symbolName, long long addr, char is64);
+
 patchRoutine_t* patches = NULL;
 kernSymbols_t* kernelSymbols = NULL;
+static void register_kernel_patch(void* patch, int arch, int cpus);
+static void register_kernel_symbol(int kernelType, const char* name);
+static kernSymbols_t* lookup_kernel_symbol(const char* name);
+static int determineKernelArchitecture(void* kernelData);
+static int locate_symbols(void* kernelData);
 
+/*
+ * Internal patches provided by this module.
+ */
+static void patch_cpuid_set_info_all(void* kernelData);
+static void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel);
+static void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel);
+
+//static void patch_pmCPUExitHaltToOff(void* kernelData);
+static void patch_lapic_init(void* kernelData);
+static void patch_commpage_stuff_routine(void* kernelData);
+static void patch_lapic_configure(void* kernelData);
+//static void patch_lapic_interrupt(void* kernelData);
+
+void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6);
 void kernel_patcher_ignore_cache(void* arg1, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6){}
 
 void KernelPatcher_start()
@@ -48,9 +69,9 @@ void KernelPatcher_start()
 }
 
 /*
- * Register a kerenl patch
+ * Register a kernel patch
  */
-void register_kernel_patch(void* patch, int arch, int cpus)
+static void register_kernel_patch(void* patch, int arch, int cpus)
 {
 	// TODO: only insert valid patches based on current cpuid and architecture
 	// AKA, don't at 64bit patches if it's a 32bit only machine
@@ -115,7 +136,7 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 	entry->validCpu = cpus;
 }
 
-void register_kernel_symbol(int kernelType, const char* name)
+static void register_kernel_symbol(int kernelType, const char* name)
 {
 	if(kernelSymbols == NULL)
 	{
@@ -141,7 +162,7 @@ void register_kernel_symbol(int kernelType, const char* name)
 	}
 }
 
-kernSymbols_t* lookup_kernel_symbol(const char* name)
+static kernSymbols_t* lookup_kernel_symbol(const char* name)
 {
 	kernSymbols_t *symbol = kernelSymbols;
 
@@ -181,7 +202,7 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* ar
 	}
 }
 
-int determineKernelArchitecture(void* kernelData)
+static int determineKernelArchitecture(void* kernelData)
 {	
 	if(((struct mach_header*)kernelData)->magic == MH_MAGIC)
 	{
@@ -202,7 +223,7 @@ int determineKernelArchitecture(void* kernelData)
  **		This functions located the requested symbols in the mach-o file.
  **			as well as determines the start of the __TEXT segment and __TEXT,__text sections
  **/
-int locate_symbols(void* kernelData)
+static int locate_symbols(void* kernelData)
 {
 	char is64 = 1;
 	parse_mach(kernelData, NULL, symbol_handler);
@@ -227,7 +248,7 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
  ** Locate the fisrt instance of _panic inside of _cpuid_set_info, and either remove it
  ** Or replace it so that the cpuid is set to a valid value.
  **/
-void patch_cpuid_set_info_all(void* kernelData)
+static void patch_cpuid_set_info_all(void* kernelData)
 {
 	switch(Platform->CPU.Model)
 	{
@@ -277,7 +298,7 @@ void patch_cpuid_set_info_all(void* kernelData)
 	}
 }
 
-void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
+static void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {
 	UInt8* bytes = (UInt8*)kernelData;
 	
@@ -387,7 +408,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	}
 }
 
-void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
+static void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 impersonateModel)
 {	
 	UInt8* bytes = (UInt8*)kernelData;
 	
@@ -558,7 +579,8 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
  ** SleepEnabler.kext replacement (for those that need it)
  ** Located the KERN_INVALID_ARGUMENT return and replace it with KERN_SUCCESS
  **/
-void patch_pmCPUExitHaltToOff(void* kernelData)
+#if 0
+static void patch_pmCPUExitHaltToOff(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
 
@@ -584,8 +606,9 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 	}
 	bytes[patchLocation] = 0x00;	// KERN_SUCCESS;
 }
+#endif
 
-void patch_lapic_init(void* kernelData)
+static void patch_lapic_init(void* kernelData)
 {
 	UInt8 panicIndex = 0;
 	UInt8* bytes = (UInt8*)kernelData;
@@ -634,7 +657,7 @@ void patch_lapic_init(void* kernelData)
 	bytes[++patchLocation] = 0x90;
 }
 
-void patch_commpage_stuff_routine(void* kernelData)
+static void patch_commpage_stuff_routine(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
 
@@ -678,8 +701,8 @@ void patch_commpage_stuff_routine(void* kernelData)
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
 }
-
-void patch_lapic_interrupt(void* kernelData)
+#if 0
+static void patch_lapic_interrupt(void* kernelData)
 {
 	// NOTE: this is a hack untill I finish patch_lapic_configure
 	UInt8* bytes = (UInt8*)kernelData;
@@ -723,8 +746,8 @@ void patch_lapic_interrupt(void* kernelData)
 	bytes[patchLocation + 3] = 0x90;
 	bytes[patchLocation + 4] = 0x90;
 }
-
-void patch_lapic_configure(void* kernelData)
+#endif
+static void patch_lapic_configure(void* kernelData)
 {
 	UInt8* bytes = (UInt8*)kernelData;
 	

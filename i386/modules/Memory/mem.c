@@ -64,6 +64,7 @@ void dumpPhysAddr(const char * title, void * a, int len)
     printf("%s\n",buffer);
 }
 
+#if UNUSED
 const char * getDMIString(struct DMIHeader * dmihdr, uint8_t strNum)
 {
     const char * ret =NULL;
@@ -87,7 +88,6 @@ const char * getDMIString(struct DMIHeader * dmihdr, uint8_t strNum)
 
     return ret;
 }
-#if UNUSED
 
 void dumpAllTablesOfType(int i)
 {

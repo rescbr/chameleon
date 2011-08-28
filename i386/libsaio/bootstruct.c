@@ -42,9 +42,7 @@ Node              *gMemoryMapNode;
 static char platformName[64];
 
 void initKernBootStruct( void )
-{
-    Node *node;
-    int nameLen;
+{        
     static int init_done = 0;
 
     if ( !init_done )
@@ -78,20 +76,28 @@ void initKernBootStruct( void )
             bootInfo->extmem  = getExtendedMemorySize();			
 			
         }
-						
+#if 0		
         bootInfo->configEnd    = bootInfo->config;
+#endif
         bootArgs->Video.v_display = VGA_TEXT_MODE;
         
         DT__Initialize();
 
-        node = DT__FindNode("/", true);
-        if (node == 0) {
-            stop("Couldn't create root node");
-        }
-        getPlatformName(platformName);
-        nameLen = strlen(platformName) + 1;
-        DT__AddProperty(node, "compatible", nameLen, platformName);
-        DT__AddProperty(node, "model", nameLen, platformName);
+		{
+			Node *node;
+			node = DT__FindNode("/", true);
+			if (node == 0) {
+				stop("Couldn't create root node");
+			}
+			getPlatformName(platformName);
+			
+			{
+				int nameLen;
+				nameLen = strlen(platformName) + 1;
+				DT__AddProperty(node, "compatible", nameLen, platformName);
+				DT__AddProperty(node, "model", nameLen, platformName);
+			}  
+		}		      
 
         gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
         
@@ -143,117 +149,124 @@ reserveKernLegacyBootStruct(void)
 
 void
 finalizeBootStruct(void)
-{
-    uint32_t size;
-    void *addr;
-    int i;
-    EfiMemoryRange *memoryMap;
-    MemoryRange *range;
-	uint64_t	sane_size = 0;  /* Memory size to use for defaults calculations */
-	
-    int memoryMapCount = bootInfo->memoryMapCount;
-
-    if (memoryMapCount == 0) {
+{    
+	{
+		int i;
+		EfiMemoryRange *memoryMap;
+		MemoryRange *range;
+		uint64_t	sane_size = 0;  /* Memory size to use for defaults calculations */
 		
-        // XXX could make a two-part map here
-        stop("No memory map found\n");
-    }
-    
-    
-
-    // convert memory map to boot_args memory map
-    memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
-    if (memoryMap == NULL) {
+		int memoryMapCount = bootInfo->memoryMapCount;
 		
-        stop("Unable to allocate kernel space for the memory map\n");
-    }
-    bootArgs->MemoryMap = (uint32_t)memoryMap;
-    bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
-    bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
-    bootArgs->MemoryMapDescriptorVersion = 0;
-
-    for (i=0; i<memoryMapCount; i++, memoryMap++) {
-        range = &bootInfo->memoryMap[i];
-        switch(range->type) {
-			case kMemoryRangeACPI:
-				memoryMap->Type = kEfiACPIReclaimMemory;
-				break;
-			case kMemoryRangeNVS:
-				memoryMap->Type = kEfiACPIMemoryNVS;
-				break;
-			case kMemoryRangeUsable:
-				memoryMap->Type = kEfiConventionalMemory;
-				break;
-			case kMemoryRangeReserved:
-			default:
-				memoryMap->Type = kEfiReservedMemoryType;
-				break;
-        }
-        memoryMap->PhysicalStart = range->base;
-        memoryMap->VirtualStart = range->base;
-        memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
-        memoryMap->Attribute = 0;
-		
-		switch (memoryMap->Type) {
-			case kEfiLoaderCode:
-			case kEfiLoaderData:
-			case kEfiBootServicesCode:
-			case kEfiBootServicesData:
-			case kEfiConventionalMemory:
-		        /*
-				 * Consolidate usable memory types into one.
-				 */
-		        sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
-				break;
-				
-			case kEfiRuntimeServicesCode:
-			case kEfiRuntimeServicesData:
-			case kEfiACPIReclaimMemory:
-			case kEfiACPIMemoryNVS:
-			case kEfiPalCode:
-				/*
-				 * sane_size should reflect the total amount of physical ram
-				 * in the system, not just the amount that is available for
-				 * the OS to use
-				 */
-		        sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
-				break;
-			default:
-				break;
-				
+		if (memoryMapCount == 0) {
+			
+			// XXX could make a two-part map here
+			stop("No memory map found\n");
 		}
-    }
-    
-	if (sane_size == 0) {
 		
-        // I Guess that if sane_size == 0 we've got a big problem here, 
-        // and it means that the memory map was not converted properly
-        stop("Unable to convert memory map into proper format\n");
-    }
-    
+		
+		
+		// convert memory map to boot_args memory map
+		memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
+		if (memoryMap == NULL) {
+			
+			stop("Unable to allocate kernel space for the memory map\n");
+		}
+		bootArgs->MemoryMap = (uint32_t)memoryMap;
+		bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
+		bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
+		bootArgs->MemoryMapDescriptorVersion = 0;
+		
+		for (i=0; i<memoryMapCount; i++, memoryMap++) {
+			range = &bootInfo->memoryMap[i];
+			switch(range->type) {
+				case kMemoryRangeACPI:
+					memoryMap->Type = kEfiACPIReclaimMemory;
+					break;
+				case kMemoryRangeNVS:
+					memoryMap->Type = kEfiACPIMemoryNVS;
+					break;
+				case kMemoryRangeUsable:
+					memoryMap->Type = kEfiConventionalMemory;
+					break;
+				case kMemoryRangeReserved:
+				default:
+					memoryMap->Type = kEfiReservedMemoryType;
+					break;
+			}
+			memoryMap->PhysicalStart = range->base;
+			memoryMap->VirtualStart = range->base;
+			memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
+			memoryMap->Attribute = 0;
+			
+			switch (memoryMap->Type) {
+				case kEfiLoaderCode:
+				case kEfiLoaderData:
+				case kEfiBootServicesCode:
+				case kEfiBootServicesData:
+				case kEfiConventionalMemory:
+					/*
+					 * Consolidate usable memory types into one.
+					 */
+					sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+					break;
+					
+				case kEfiRuntimeServicesCode:
+				case kEfiRuntimeServicesData:
+				case kEfiACPIReclaimMemory:
+				case kEfiACPIMemoryNVS:
+				case kEfiPalCode:
+					/*
+					 * sane_size should reflect the total amount of physical ram
+					 * in the system, not just the amount that is available for
+					 * the OS to use
+					 */
+					sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+					break;
+				default:
+					break;
+					
+			}
+		}
+		
+		if (sane_size == 0) {
+			
+			// I Guess that if sane_size == 0 we've got a big problem here, 
+			// and it means that the memory map was not converted properly
+			stop("Unable to convert memory map into proper format\n");
+		}
+		
 #define MEG		(1024*1024)
-	
-	/*
-	 * For user visible memory size, round up to 128 Mb - accounting for the various stolen memory
-	 * not reported by EFI.
-	 */
-	
-	sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
-	bootArgs->PhysicalMemorySize = sane_size;
-	bootArgs->FSBFrequency = Platform->CPU.FSBFrequency;
 		
+		/*
+		 * For user visible memory size, round up to 128 Mb - accounting for the various stolen memory
+		 * not reported by EFI.
+		 */
+		
+		sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
+		bootArgs->PhysicalMemorySize = sane_size;
+		bootArgs->FSBFrequency = Platform->CPU.FSBFrequency;
+	
+	}
+	
     // add PCI info somehow into device tree
     // XXX
-			
-    // Flatten device tree
-    DT__FlattenDeviceTree(0, &size);
-    addr = (void *)AllocateKernelMemory(size);
-    if (addr == 0) {
-        stop("Couldn't allocate device tree\n");
-    }
+		
+	{
+		uint32_t size;
+		void *addr;
+		// Flatten device tree
+		DT__FlattenDeviceTree(0, &size);
+		addr = (void *)AllocateKernelMemory(size);
+		if (addr == 0) {
+			stop("Couldn't allocate device tree\n");
+		}
+		
+		DT__FlattenDeviceTree((void **)&addr, &size);
+		bootArgs->deviceTreeP = (uint32_t)addr;
+		bootArgs->deviceTreeLength = size;
+	}
     
-    DT__FlattenDeviceTree((void **)&addr, &size);
-    bootArgs->deviceTreeP = (uint32_t)addr;
-    bootArgs->deviceTreeLength = size;    
+        
     
 }

@@ -69,7 +69,8 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/*.o \
+	$(OBJROOT)/kernel_patcher.o \
+	-macosx_version_min 10.6 \
 	-weak_library $(SYMROOT)/Symbols.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 

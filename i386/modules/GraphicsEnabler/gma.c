@@ -53,17 +53,18 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x8086A012, "Mobile GMA3150" },
 	{ 0x80862772, "Desktop GMA950" },
 	{ 0x80862776, "Desktop GMA950" },
-	{ 0x8086A001, "Desktop GMA3150" },
+	{ 0x8086A001, "Mobile GMA3150" },
 	{ 0x8086A002, "Desktop GMA3150" },
 	{ 0x80862A02, "GMAX3100" },
 	{ 0x80862A03, "GMAX3100" },
 	{ 0x80862A12, "GMAX3100" },
 	{ 0x80862A13, "GMAX3100" },
 	{ 0x80862A42, "GMAX3100" },
-	{ 0x80862A43, "GMAX3100" },
+	{ 0x80862A43, "GMAX3100" }
 };
+static char *get_gma_model(uint32_t id);
 
-char *get_gma_model(uint32_t id) {
+static char *get_gma_model(uint32_t id) {
 	
 	unsigned int i = 0;
 	
@@ -154,7 +155,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{
-		printf("no stringdata press a key...\n");
+		printf("No stringdata press a key...\n");
 		getc();
 		return false;
 	}

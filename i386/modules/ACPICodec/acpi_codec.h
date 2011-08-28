@@ -13,32 +13,44 @@
 #include "libsaio.h"
 #include "efi.h"
 
+#define OEMOPT_TEMPLATE		"oemXXXX"
+#define OEMOPT_SIZE			sizeof(OEMOPT_TEMPLATE)
+
 #define kOEMDSDT			"oemDSDT"			/* acpi_codec.c */
 #define kOEMFADT			"oemFADT"			/* acpi_codec.c */
+#define kOEMAPIC			"oemAPIC"			/* acpi_codec.c */
+
+#define KIntelFADT			"IntelFADTSpec"		/* acpi_codec.c */
 
 #define kRestartFix			"RestartFix"        /* acpi_codec.c */
+#define KResetType			"ResetType"			/* acpi_codec.c */ 
+#define PCI_RESET_TYPE			0	// (default)
+#define KEYBOARD_RESET_TYPE		1
+
 #define kGeneratePStates	"GeneratePStates"	/* acpi_codec.c */
 #define kGenerateCStates	"GenerateCStates"	/* acpi_codec.c */
+#define kGenerateTStates	"GenerateTStates"	/* acpi_codec.c */
+
 #define kMaxRatio			"MaxBusRatio"		/* acpi_codec.c */
 #define kMinRatio			"MinBusRatio"		/* acpi_codec.c */
 #define	kSpeedstep			"EnableSpeedStep"	/* acpi_codec.c */
+#define kEnableC2State      "EnableC2State"     /* acpi_codec.c */
+#define kEnableC3State      "EnableC3State"     /* acpi_codec.c */
 #define kEnableC4State		"EnableC4State"		/* acpi_codec.c */
+#define kEnableC6State      "EnableC6State"     /* acpi_codec.c */
+#define kEnableC7State      "EnableC7State"     /* acpi_codec.c */
+#define KEnableMwait		"EnableMwait"       /* acpi_codec.c */
+#define KForceSSDT			"ForceGenSSDT"      /* acpi_codec.c */
+#define KAcpiCoordType		"PstateCoordination" /* acpi_codec.c */
+#define kCoreTurbo			"EnableTurbo"		/* acpi_codec.c */
 
 #define kUpdateACPI			"UpdateACPI"	    /* acpi_codec.c */
+#define kUnsafeACPI			"UnsafeACPI"		/* acpi_codec.c */ //desactive some safe checks that may stop the boot process on some configurations( temporary option )  
 
 #if UNUSED
 #define kGenerateFACS		"GenerateFACS"		/* acpi_codec.c */
 #define kOEMFACS			"oemFACS"			/* acpi_codec.c */
 #endif
-
-#define KIntelFADT			"IntelFADTSpec"			/* acpi_codec.c */
-
-#define KResetType			"ResetType"			/* acpi_codec.c */ 
-
-#define PCI_RESET_TYPE			0	// (default)
-#define KEYBOARD_RESET_TYPE		1
-
-#define OEMOPT_SIZE			sizeof("oemXXXX")			
 
 extern EFI_STATUS setupAcpi();
 

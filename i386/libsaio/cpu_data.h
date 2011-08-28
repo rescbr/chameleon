@@ -36,6 +36,12 @@
 #include <mach/i386/thread_status.h>
 #include <mach/i386/vm_param.h>
 
+/* Extracted from pal_routine */
+struct pal_cpu_data; /* Defined per-platform */
+
+struct pal_cpu_data {
+	
+};
 
 /*
  * Data structures referenced (anonymously) from per-cpu data:
@@ -119,22 +125,23 @@ typedef struct {
  */
 typedef struct cpu_data
 {
+	struct pal_cpu_data	cpu_pal_data;		/* PAL-specific data */
+#define				cpu_pd cpu_pal_data	/* convenience alias */
 	struct cpu_data		*cpu_this;		/* pointer to myself */
 	thread_t		cpu_active_thread;
+	int			cpu_preemption_level;
+	int			cpu_number;		/* Logical CPU */
 	void			*cpu_int_state;		/* interrupt state */
 	vm_offset_t		cpu_active_stack;	/* kernel stack base */
 	vm_offset_t		cpu_kernel_stack;	/* kernel stack top */
 	vm_offset_t		cpu_int_stack_top;
-	int			cpu_preemption_level;
-	int			cpu_simple_lock_count;
 	int			cpu_interrupt_level;
-	int			cpu_number;		/* Logical CPU */
 	int			cpu_phys_number;	/* Physical CPU */
 	uint32_t		cpu_id;			/* Platform Expert */
 	int			cpu_signals;		/* IPI events */
 	int			cpu_prior_signals;	/* Last set of events,
-							 * debugging
-							 */
+									 * debugging
+									 */
 	int			cpu_mcount_off;		/* mcount recursion */
 	uint32_t			cpu_pending_ast;
 	int			cpu_type;
@@ -143,9 +150,16 @@ typedef struct cpu_data
 	int			cpu_running;
 	uint32_t		rtclock_timer;
 	boolean_t		cpu_is64bit;
-	task_map_t		cpu_task_map;
+	volatile addr64_t	cpu_active_cr3 __attribute((aligned(64)));
+	union {
+		volatile uint32_t cpu_tlb_invalid;
+		struct {
+			volatile uint16_t cpu_tlb_invalid_local;
+			volatile uint16_t cpu_tlb_invalid_global;
+		};
+	};
+	volatile task_map_t	cpu_task_map;
 	volatile addr64_t	cpu_task_cr3;
-	volatile addr64_t	cpu_active_cr3;
 	addr64_t		cpu_kernel_cr3;
 	cpu_uber_t		cpu_uber;
 	void			*cpu_chud;
@@ -171,20 +185,17 @@ typedef struct cpu_data
 	boolean_t		cpu_iflag;
 	boolean_t		cpu_boot_complete;
 	int			cpu_hibernate;
-
 #if NCOPY_WINDOWS > 0
 	vm_offset_t		cpu_copywindow_base;
 	uint64_t		*cpu_copywindow_pdp;
-
+	
 	vm_offset_t		cpu_physwindow_base;
 	uint64_t		*cpu_physwindow_ptep;
-	void 			*cpu_hi_iss;
 #endif
-
-
-
-	volatile boolean_t	cpu_tlb_invalid;
-	uint32_t		cpu_hwIntCnt[256];	/* Interrupt counts */
+	void 			*cpu_hi_iss;
+	
+#define HWINTCNT_SIZE 256
+	uint32_t		cpu_hwIntCnt[HWINTCNT_SIZE];	/* Interrupt counts */
 	uint64_t		cpu_dr7; /* debug control register */
 	uint64_t		cpu_int_event_time;	/* intr entry/exit time */
 #if CONFIG_VMX
@@ -194,19 +205,34 @@ typedef struct cpu_data
 	struct mca_state	*cpu_mca_state;		/* State at MC fault */
 #endif
 	uint64_t		cpu_uber_arg_store;	/* Double mapped address
-							 * of current thread's
-							 * uu_arg array.
-							 */
+										 * of current thread's
+										 * uu_arg array.
+										 */
 	uint64_t		cpu_uber_arg_store_valid; /* Double mapped
-							   * address of pcb
-							   * arg store
-							   * validity flag.
-							   */
-	void		*cpu_nanotime;		/* Nanotime info */
+											   * address of pcb
+											   * arg store
+											   * validity flag.
+											   */
+	void	*cpu_nanotime;		/* Nanotime info */
 	thread_t		csw_old_thread;
 	thread_t		csw_new_thread;
-	uint64_t		cpu_max_observed_int_latency;
-	int			cpu_max_observed_int_latency_vector;
+#if	defined(__x86_64__)
+	uint32_t		cpu_pmap_pcid_enabled;
+	pcid_t			cpu_active_pcid;
+	pcid_t			cpu_last_pcid;
+	volatile pcid_ref_t	*cpu_pmap_pcid_coherentp;
+	volatile pcid_ref_t	*cpu_pmap_pcid_coherentp_kernel;
+#define	PMAP_PCID_MAX_PCID      (0x1000)
+	pcid_t			cpu_pcid_free_hint;
+	pcid_ref_t		cpu_pcid_refcounts[PMAP_PCID_MAX_PCID];
+	pmap_t			cpu_pcid_last_pmap_dispatched[PMAP_PCID_MAX_PCID];
+#ifdef	PCID_STATS
+	uint64_t		cpu_pmap_pcid_flushes;
+	uint64_t		cpu_pmap_pcid_preserves;
+#endif
+#endif /* x86_64 */
+	uint64_t                cpu_max_observed_int_latency;
+	int                     cpu_max_observed_int_latency_vector;
 	uint64_t		debugger_entry_time;
 	volatile boolean_t	cpu_NMI_acknowledged;
 	/* A separate nested interrupt stack flag, to account
@@ -216,6 +242,8 @@ typedef struct cpu_data
 	 */
 	uint32_t		cpu_nested_istack;
 	uint32_t		cpu_nested_istack_events;
+	void	*cpu_fatal_trap_state;
+	void	*cpu_post_fatal_trap_state;
 } cpu_data_t;
 
 /* Macro to generate inline bodies to retrieve per-cpu data fields. */
@@ -257,11 +285,6 @@ static inline int
 get_preemption_level(void)
 {
 	CPU_DATA_GET(cpu_preemption_level,int)
-}
-static inline int
-get_simple_lock_count(void)
-{
-	CPU_DATA_GET(cpu_simple_lock_count,int)
 }
 static inline int
 get_interrupt_level(void)

@@ -21,7 +21,7 @@ int		runNetbookInstaller = 0;
 long NBI_LoadDrivers( char * dirSpec );
 void NBI_md0Ramdisk();
 void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
-void NBI_loadBootGraphics(void);
+//void NBI_loadBootGraphics(void);
 void NBI_md0Ramdisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 #ifdef NBP_SUPPORT
@@ -129,9 +129,12 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		
 		if(runNetbookInstaller == 1 )
 		{
-			if (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
+			if (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)
+			{
 				replace_function("_md0Ramdisk", &NBI_md0Ramdisk);
-			} else {
+			} 
+			else
+			{
 				register_hook_callback("md0Ramdisk", NBI_md0Ramdisk_hook);
 			}
 
@@ -221,7 +224,8 @@ long NBI_LoadDrivers( char * dirSpec )
 #ifdef NBP_SUPPORT	
     if ( gBootFileType == kNetworkDeviceType )
     {
-        if (NetLoadDrivers(dirSpec) != 0) {
+        if (NetLoadDrivers(dirSpec) != 0)
+		{
             error("Could not load drivers from the network\n");
             return -1;
         }

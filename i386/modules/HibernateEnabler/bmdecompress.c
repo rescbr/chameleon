@@ -25,6 +25,14 @@ typedef uint8_t  UInt8;
 typedef uint16_t UInt16;
 typedef int8_t   SInt8;
 typedef int16_t  SInt16;
+static void 
+PreviewDecompress16(uint32_t * compressBuffer, 
+					uint32_t width, uint32_t height, uint32_t row, 
+					uint16_t * output);
+static void 
+PreviewDecompress32(uint32_t * compressBuffer, 
+					uint32_t width, uint32_t height, uint32_t row, 
+					uint32_t * output);
 
 static void 
 PreviewDecompress16(uint32_t * compressBuffer, 

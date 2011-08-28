@@ -101,6 +101,7 @@ unsigned int time18(void)
 }
 
 #if 0
+static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
 {
 	int i, still_changing, newcount = count;
@@ -921,6 +922,8 @@ ReadEISAFuncInfo(EISA_func_info_t *ep, int slot, int function)
 }
 #endif /* EISA_SUPPORT */
 
+
+#if UNUSED
 #define PCI_SIGNATURE 0x20494350  /* "PCI " */
 
 int
@@ -940,6 +943,7 @@ ReadPCIBusInfo(PCI_bus_info_t *pp)
     }
     return -1;
 }
+#endif
 
 void sleep(int n)
 {

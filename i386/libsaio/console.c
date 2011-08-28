@@ -48,7 +48,7 @@
 #include "bootstruct.h"
 #include "modules.h"
 
-extern int	vprf(const char * fmt, va_list ap);
+//extern int	vprf(const char * fmt, va_list ap);
 
 bool gVerboseMode;
 bool gErrors;

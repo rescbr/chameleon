@@ -18,7 +18,6 @@
 #include "cpu.h"
 #include "aml_generator.h"
 #include "xml.h"
-#include "smp.h"
 
 uint64_t acpi10_p;
 uint64_t acpi20_p;
@@ -34,6 +33,10 @@ uint64_t acpi20_p;
 #else
 #define DBG(x...)
 #endif
+
+#define EBDA_SEG_ADDR			0x40E
+#define EBDA_SEG_LEN			0x400
+#define CMOS_BASE_MEMORY		0x15
 
 extern EFI_STATUS addConfigurationTable();
 

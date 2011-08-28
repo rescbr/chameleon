@@ -21,12 +21,20 @@
 
 static SMBWord minorVersion;
 
-extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
+//extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
+static void decodeBIOSInformation(SMBBIOSInformation *structHeader);
+static void decodeSystemInformation(SMBSystemInformation *structHeader);
+static void decodeBaseBoard(SMBBaseBoard *structHeader);
+static void decodeSystemEnclosure(SMBSystemEnclosure *structHeader);
+static void decodeProcessorInformation(SMBProcessorInformation *structHeader);
+static void decodeMemoryDevice(SMBMemoryDevice *structHeader);
+static void decodeOemProcessorType(SMBOemProcessorType *structHeader);
+static void decodeOemProcessorBusSpeed(SMBOemProcessorBusSpeed *structHeader);
 
 //-------------------------------------------------------------------------------------------------------------------------
 // BIOSInformation
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeBIOSInformation(SMBBIOSInformation *structHeader)
+static void decodeBIOSInformation(SMBBIOSInformation *structHeader)
 {
 	DBG("BIOSInformation:\n");
 	DBG("\tvendor: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->vendor));
@@ -38,7 +46,7 @@ void decodeBIOSInformation(SMBBIOSInformation *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // SystemInformation
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeSystemInformation(SMBSystemInformation *structHeader)
+static void decodeSystemInformation(SMBSystemInformation *structHeader)
 {
 	DBG("SystemInformation:\n");
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
@@ -67,7 +75,7 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // BaseBoard
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeBaseBoard(SMBBaseBoard *structHeader)
+static void decodeBaseBoard(SMBBaseBoard *structHeader)
 {
 	DBG("BaseBoard:\n");
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
@@ -83,7 +91,7 @@ void decodeBaseBoard(SMBBaseBoard *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // SystemEnclosure
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
+static void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
 {
 	DBG("SystemEnclosure:\n");
 	DBG("\tmanufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
@@ -97,7 +105,7 @@ void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // ProcessorInformation
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeProcessorInformation(SMBProcessorInformation *structHeader)
+static void decodeProcessorInformation(SMBProcessorInformation *structHeader)
 {
 	DBG("ProcessorInformation:\n");
 	DBG("\tsocketDesignation: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->socketDesignation));
@@ -121,7 +129,7 @@ void decodeProcessorInformation(SMBProcessorInformation *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // MemoryDevice
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeMemoryDevice(SMBMemoryDevice *structHeader)
+static void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 {
 	DBG("MemoryDevice:\n");
 	DBG("\tdeviceLocator: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->deviceLocator));
@@ -141,14 +149,14 @@ void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // Apple Specific
 //-------------------------------------------------------------------------------------------------------------------------
-void decodeOemProcessorType(SMBOemProcessorType *structHeader)
+static void decodeOemProcessorType(SMBOemProcessorType *structHeader)
 {
 	DBG("AppleProcessorType:\n");
 	DBG("\tProcessorType: 0x%x\n", ((SMBOemProcessorType *)structHeader)->ProcessorType);
 	DBG("\n");
 }
 
-void decodeOemProcessorBusSpeed(SMBOemProcessorBusSpeed *structHeader)
+static void decodeOemProcessorBusSpeed(SMBOemProcessorBusSpeed *structHeader)
 {
 	DBG("AppleProcessorBusSpeed:\n");
 	DBG("\tProcessorBusSpeed (QPI): %d.%dGT/s\n", 

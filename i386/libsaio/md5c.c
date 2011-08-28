@@ -52,7 +52,9 @@
 #define Encode memcpy
 #define Decode memcpy
 #else /* __i386__ */
-
+static void Encode (output, input, len);
+static void Decode (output, input, len);
+static void MD5Transform (state, block);
 /*
  * Encodes input (u_int32_t) into output (unsigned char). Assumes len is
  * a multiple of 4.

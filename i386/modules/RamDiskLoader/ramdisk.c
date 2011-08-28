@@ -29,7 +29,7 @@ int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
 static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
 
 
-// Notify OS X that a ramdisk has been setup. XNU with attach this to /dev/md0
+// Notify OS X that a ramdisk has been setup. XNU with attach this to /dev/md0 (WARNING : md0Ramdisk MUST BE EXTERN FOR NBI COMPTATIBILITY)
 void md0Ramdisk()
 {
 	RAMDiskParam ramdiskPtr;

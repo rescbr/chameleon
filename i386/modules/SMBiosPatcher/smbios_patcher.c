@@ -168,7 +168,7 @@ static const SMStrEntryPair const sm_xserve_defaults[]={
  	{ "",""	}
 };
 
-/*static */const char* sm_get_defstr(const char * key, int table_num)
+const char* sm_get_defstr(const char * key, int table_num)
 {
 	int	i;
 	const SMStrEntryPair*	sm_defaults;

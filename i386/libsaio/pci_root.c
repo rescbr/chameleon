@@ -28,7 +28,8 @@ int getPciRootUID(void)
 	if (rootuid < 10) return rootuid;
 	rootuid = 0;	/* default uid = 0 */
 
-	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->bootConfig)) {
+	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->bootConfig))
+	{
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		
 		if ( (rootuid >= 0) && (rootuid < 10) ) 
@@ -38,10 +39,12 @@ int getPciRootUID(void)
 	}	
 	
 	/* PCEFI compatibility */
-	if (getValueForKey("-pci0", &val, &len, &bootInfo->bootConfig)) {
+	if (getValueForKey("-pci0", &val, &len, &bootInfo->bootConfig))
+	{
 		rootuid = 0;
 	}
-	else if (getValueForKey("-pci1", &val, &len, &bootInfo->bootConfig)) {
+	else if (getValueForKey("-pci1", &val, &len, &bootInfo->bootConfig))
+	{
 		rootuid = 1;
 	}
 out:

@@ -54,6 +54,15 @@ extern int		gDeviceCount;
 int			selectIndex = 0;
 MenuItem *  menuItems = NULL;
 
+static int countdown( const char * msg, int row, int timeout );
+static void showBootPrompt(int row, bool visible);
+static void updateBootArgs( int key );
+static void showMenu( const MenuItem * items, int count,
+					 int selection, int row, int height );
+static int updateMenu( int key, void ** paramPtr );
+static void skipblanks( const char ** cpp );
+static const char * extractKernelName( char ** cpp );
+
 //==========================================================================
 
 void changeCursor( int col, int row, int type, CursorState * cs )
@@ -954,8 +963,8 @@ processBootOptions()
     // to be used.
 	
     gOverrideKernel = false;
-    if (( kernel = extractKernelName((char **)&cp) )) {
-        strcpy( bootInfo->bootFile, kernel );
+    if (( kernel = extractKernelName((char **)&cp) )) {        
+		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
         gOverrideKernel = true;
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
@@ -964,7 +973,7 @@ processBootOptions()
                 gOverrideKernel = true;
             }
         } else {
-            strcpy( bootInfo->bootFile, kDefaultKernel );
+			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
         }
     }
 	

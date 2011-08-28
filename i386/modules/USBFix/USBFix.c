@@ -9,9 +9,9 @@
 #include "bootstruct.h"
 
 #define kEnableUSBMod			"EnableUSBModule"
-extern int usb_loop();
 
-void notify_usb_dev(pci_dt_t *pci_dev);
+extern int usb_loop();
+extern void notify_usb_dev(pci_dt_t *pci_dev);
 
 void USBFix_pci_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {

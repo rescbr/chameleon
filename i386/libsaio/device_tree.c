@@ -60,6 +60,16 @@ static Node *rootNode;
 
 static Node *freeNodes, *allocedNodes;
 static Property *freeProperties, *allocedProperties;
+
+static void *
+FlattenNodes(Node *node, void *buffer);
+#if DEBUG
+static void
+_PrintTree(Node *node, int level);
+static void
+_PrintFlattenedTree(DTEntry entry, int level);
+#endif
+
 Property *
 DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
@@ -396,6 +406,7 @@ DT__PrintTree(Node *node)
     _PrintTree(node, 0);
 }
 
+#if UNUSED
 void
 DT__PrintFlattenedNode(DTEntry entry, int level)
 {
@@ -423,6 +434,7 @@ DT__PrintFlattenedNode(DTEntry entry, int level)
 
     printf("%s==========\n", spaces);
 }
+#endif
 
 static void
 _PrintFlattenedTree(DTEntry entry, int level)
@@ -442,13 +454,13 @@ _PrintFlattenedTree(DTEntry entry, int level)
     DTDisposeEntryIterator(entryIter);
 }
 
+#if UNUSED
 void
 DT__PrintFlattenedTree(DTEntry entry)
 {
     _PrintFlattenedTree(entry, 0);
 }
 
-#if UNUSED
 int
 main(int argc, char **argv)
 {

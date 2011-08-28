@@ -58,6 +58,11 @@ static void   zallocate(char * start,int size);
 static void   zinsert(zmem * zp, int ndx);
 static void   zdelete(zmem * zp, int ndx);
 static void   zcoalesce(void);
+#ifdef SAFE_MALLOC
+static void malloc_error(char *addr, size_t size, const char *file, int line);
+#else
+static void malloc_error(char *addr, size_t size);
+#endif
 
 #if ZDEBUG
 size_t zalloced_size;

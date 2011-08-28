@@ -28,6 +28,15 @@
 #else
 #define DBG(x...)
 #endif
+static void setup_p35(pci_dt_t *dram_dev);
+static void setup_nhm(pci_dt_t *dram_dev);
+static void get_fsb_i965(pci_dt_t *dram_dev);
+static void get_fsb_im965(pci_dt_t *dram_dev);
+static void get_fsb_nhm(pci_dt_t *dram_dev);
+static void get_timings_i965(pci_dt_t *dram_dev);
+static void get_timings_im965(pci_dt_t *dram_dev);
+static void get_timings_p35(pci_dt_t *dram_dev);
+static void get_timings_nhm(pci_dt_t *dram_dev);
 
 /*
  * Initialise memory controller functions

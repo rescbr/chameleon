@@ -74,6 +74,7 @@ dylib:
 	$(OBJROOT)/mem.o \
 	$(OBJROOT)/spd.o \
 	$(OBJROOT)/Memory.o \
+	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

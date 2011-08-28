@@ -89,7 +89,9 @@ printVBEModeInfo()
     int              err;
     int              line;
 	
-  	bzero( &vbeInfo, sizeof(vbeInfo) );
+  	//bzero( &vbeInfo, sizeof(vbeInfo) );
+    bzero( &vbeInfo, sizeof(VBEInfoBlock) );
+
     strcpy( (char*)&vbeInfo, "VBE2" );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
@@ -111,7 +113,9 @@ printVBEModeInfo()
     {
         // Get mode information.
 		
-        bzero( &modeInfo, sizeof(modeInfo) );
+        //bzero( &modeInfo, sizeof(modeInfo) );
+        bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
+        
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -145,7 +149,9 @@ char *getVBEModeInfoString()
     VBEModeInfoBlock modeInfo;
     int              err;
 	
-  	bzero( &vbeInfo, sizeof(vbeInfo) );
+  	//bzero( &vbeInfo, sizeof(vbeInfo) );
+    bzero( &vbeInfo, sizeof(VBEInfoBlock) );
+
     strcpy( (char*)&vbeInfo, "VBE2" );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
@@ -160,7 +166,9 @@ char *getVBEModeInfoString()
     {
         // Get mode information.
 		
-        bzero( &modeInfo, sizeof(modeInfo) );
+        //bzero( &modeInfo, sizeof(modeInfo) );
+        bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
+
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -340,7 +348,9 @@ char *getVBEInfoString()
 	char *buff = malloc(sizeof(char)*256);
 	if(!buff) return 0;
 	
-	bzero( &vbeInfo, sizeof(vbeInfo) );
+	//bzero( &vbeInfo, sizeof(vbeInfo) );
+    bzero( &vbeInfo, sizeof(VBEInfoBlock) );
+
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)

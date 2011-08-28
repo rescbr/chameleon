@@ -42,6 +42,11 @@
 #define DEBUG_DISK(x)
 #endif
 
+/*
+ * Max size fo config data array, in bytes.
+ */
+#define IO_CONFIG_DATA_SIZE		4096 // was 163840
+
 typedef unsigned long entry_t;
 
 typedef struct {
@@ -67,7 +72,7 @@ struct Tag {
 typedef struct Tag Tag, *TagPtr;
 
 typedef struct {
-	char	plist[4096];	// buffer for plist
+	char	plist[IO_CONFIG_DATA_SIZE];	// buffer for plist
 	TagPtr	dictionary;		// buffer for xml dictionary
 	bool  canOverride;  // flag to mark a dictionary can be overriden
 } config_file_t;

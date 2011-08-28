@@ -21,7 +21,7 @@
 #include "sl.h"
 #include "modules.h"
 #include "vers.h"
-#include "smp.h"
+#include "smp-imps.h"
 
 #ifndef DEBUG_EFI
 #define DEBUG_EFI 0
@@ -61,6 +61,18 @@
  * the code can be executed by the processor and the machine contains the
  * necessary hardware.
  */
+static inline char * mallocStringForGuid(EFI_GUID const *pGuid);
+static VOID EFI_ST_FIX_CRC32(void);
+static EFI_STATUS setupAcpiNoMod();
+static EFI_STATUS setup_acpi (void);
+static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len);
+static EFI_CHAR8* getSmbiosUUID();
+static EFI_STATUS getSystemID();
+static VOID setupSystemType();
+static VOID setupEfiDeviceTree(void);
+static VOID setup_Smbios();
+static VOID setup_machine_signature();
+static VOID setupEfiConfigurationTable();
 
 /*==========================================================================
  * Utility function to make a device tree string from an EFI_GUID
@@ -87,8 +99,8 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0};
 
 /* Info About the current Firmware */
 #define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
-static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','t','.','H','o','o','d', 0}; //a.k.a Galak.
-static EFI_UINT32 const FIRMWARE_REVISION = 0x00010400; //1.4
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'S','a','d','D','a','r','w','i','n', 0}; // hummm, damn, Unfortunately, that day has come, ..... One more thing ??? 
+static EFI_UINT32 const FIRMWARE_REVISION = 0x00010500; //1.5
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
 /* Default platform system_id (fix by IntVar) */
@@ -152,7 +164,8 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	}
 	
 	// We only do adds, not modifications and deletes like InstallConfigurationTable
-	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES){
+	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
+	{
         
 		
         printf("Ran out of space for configuration tables (max = %d). Please, increase the reserved size in the code.\n", (int)MAX_CONFIGURATION_TABLE_ENTRIES);
@@ -207,7 +220,8 @@ static VOID EFI_ST_FIX_CRC32(void)
 	}
 }
 
-void finalizeEFIConfigTable(void ) {
+void finalizeEFIConfigTable(void )
+{
     
     if (archCpuType == CPU_TYPE_I386)
 	{
@@ -245,7 +259,8 @@ void finalizeEFIConfigTable(void ) {
         
 	}
      msglog("EFI Configuration table :\n");
-    for (i=0; i<num; i++) {
+    for (i=0; i<num; i++)
+	{
         if (archCpuType == CPU_TYPE_I386)
         {
             table = gEfiConfigurationTable32[i].VendorTable;
@@ -260,13 +275,20 @@ void finalizeEFIConfigTable(void ) {
         }
         char id[4];
         
-        if (memcmp(&Guid, &gEfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0) {
+        if (memcmp(&Guid, &gEfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
+		{
             sprintf(id, "%s", "_SM_");
-        } else if (memcmp(&Guid, &gEfiAcpiTableGuid, sizeof(EFI_GUID)) == 0) {
+        }
+		else if (memcmp(&Guid, &gEfiAcpiTableGuid, sizeof(EFI_GUID)) == 0)
+		{
             sprintf(id, "%s", "RSD1");
-        } else if (memcmp(&Guid, &gEfiAcpi20TableGuid, sizeof(EFI_GUID)) == 0) {
+        }
+		else if (memcmp(&Guid, &gEfiAcpi20TableGuid, sizeof(EFI_GUID)) == 0)
+		{
             sprintf(id, "%s", "RSD2");
-        } else if (memcmp(&Guid, &gEfiMpsTableGuid, sizeof(EFI_GUID)) == 0) {
+        }
+		else if (memcmp(&Guid, &gEfiMpsTableGuid, sizeof(EFI_GUID)) == 0)
+		{
             sprintf(id, "%s", "_MP_");
         } 
        
@@ -286,8 +308,8 @@ void finalizeEFIConfigTable(void ) {
  * also take care to set efiMode = 32.
  */
 
-#define pto(mode, addr) (mode == 64) ? ptov64((EFI_PTR32)addr) : (EFI_PTR32)addr
 
+#define pto(mode, addr) (mode == 64) ? ptov64((EFI_PTR32)addr) : (EFI_PTR32)addr
 
 #define setupEfiTables(mode)                           \
 { \
@@ -395,7 +417,6 @@ void finalizeEFIConfigTable(void ) {
 	*/\
 }
 
-
 /*
  * In addition to the EFI tables there is also the EFI device tree node.
  * In particular, we need /efi/platform to have an FSBFrequency key. Without it,
@@ -432,9 +453,12 @@ static EFI_STATUS setupAcpiNoMod()
 	EFI_STATUS ret = EFI_UNSUPPORTED;
 	
     ACPI_TABLE_RSDP* rsdp = (ACPI_TABLE_RSDP*)((uint32_t)local_rsd_p);
-    if(rsdp->Revision > 0 && checksum8(rsdp, sizeof(ACPI_TABLE_RSDP))) {
+    if(rsdp->Revision > 0 && (GetChecksum(rsdp, sizeof(ACPI_TABLE_RSDP)) == 0))
+	{
 		ret = addConfigurationTable(&gEfiAcpi20TableGuid, &local_rsd_p, "ACPI_20");		 
-	} else {
+	}
+	else
+	{
 		ret = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");		
 	}
 	
@@ -447,21 +471,23 @@ static EFI_STATUS setup_acpi (void)
 	
 	execute_hook("setupEfiConfigurationTable", &ret, NULL, NULL, NULL, NULL, NULL);
 	
-	if (ret != EFI_SUCCESS) {            
-          
-        
-        if (!FindAcpiTables(&acpi_tables)){
+	if (ret != EFI_SUCCESS)
+	{        
+        if (!FindAcpiTables(&acpi_tables))
+		{
 			printf("Failed to detect ACPI tables.\n");
 			return EFI_NOT_FOUND;
         }
         
         local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
 
-        ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
-                    
-        uint8_t type = FacpPointer->PreferredProfile;
-        if (type <= MaxSupportedPMProfile) 
-            Platform->Type = type;
+		{
+			ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
+			
+			uint8_t type = FacpPointer->PreferredProfile;
+			if (type <= MaxSupportedPMProfile) 
+				Platform->Type = type;
+		}        
             
         ret = setupAcpiNoMod();
 	}
@@ -502,14 +528,16 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 	
 	const char	*src = (strcmp(key, "SMproductname") == 0) ? gPlatformName : getStringForKey(key, &bootInfo->smbiosConfig);
 	
-	EFI_CHAR16*	 dst = 0;
-	size_t		 i = 0;
+	EFI_CHAR16*	 dst = 0;	
 	
 	if (!key || !(*key) || !src) return 0;
 	
 	*len = strlen(src);
 	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
-	for (; i < (*len); i++)	 dst[i] = src[i];
+	{
+		size_t		 i = 0;
+		for (; i < (*len); i++)	 dst[i] = src[i];
+	}
 	dst[(*len)] = '\0';
 	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
 	return dst;
@@ -527,9 +555,10 @@ static EFI_CHAR8* getSmbiosUUID()
 	
     p = (SMBByte*)Platform->UUID;
     
-    if ( p == NULL ) {
+    if ( p == NULL )
+	{
         DBG("No patched UUID found, fallback to original UUID (if exist) \n");
-    
+		
         readSMBIOS(theUUID);		
         p = (SMBByte*)Platform->UUID;
         
@@ -550,7 +579,7 @@ static EFI_CHAR8* getSmbiosUUID()
 	else
 		verbose("Found UUID in SMBIOS System Information Table\n");
 #endif
-		
+	
 	memcpy(uuid, p, UUID_LEN);
 	return uuid;
 }
@@ -572,7 +601,8 @@ static EFI_STATUS getSystemID()
 		ret = getSmbiosUUID();		 
 
 	
-	if (!ret) {
+	if (!ret)
+	{
 		// no bios dmi UUID available, set a fixed value for system-id
 		ret=getUUIDFromString((const char*) SYSTEM_ID);
 		verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
@@ -585,7 +615,8 @@ static EFI_STATUS getSystemID()
 		
 	}
 	
-	if (ret) {
+	if (ret)
+	{
 		memcpy(Platform->sysid, ret, UUID_LEN);
 		status = EFI_SUCCESS;
 	}
@@ -617,114 +648,133 @@ struct boot_progress_element {
 typedef struct boot_progress_element boot_progress_element;
 
 static VOID setupEfiDeviceTree(void)
-{
-	EFI_CHAR16*	 serial = 0, *productname = 0;
-	size_t		 len = 0;
+{	
 	Node		*node;
-	long           size;
-	extern char gMacOSVersion[];
+	
 	node = DT__FindNode("/", false);
 	
 	if (node == 0) stop("Couldn't get root node");
 	
+	{
+		long           size;
+		{
 #include "appleClut8.h"
-	size = sizeof(appleClut8);
-	long clut = AllocateKernelMemory(size);
-	bcopy(&appleClut8, (void*)clut, size);
+			size = sizeof(appleClut8);
+			long clut = AllocateKernelMemory(size);
+			bcopy(&appleClut8, (void*)clut, size);
 #if UNUSED
-    AllocateMemoryRange( "BootCLUT", clut, size,-1);
-
+			AllocateMemoryRange( "BootCLUT", clut, size,-1);
+			
 #else
-    AllocateMemoryRange( "BootCLUT", clut, size);
-
+			AllocateMemoryRange( "BootCLUT", clut, size);
+			
 #endif
+		}
+		
+		{
 #include "failedboot.h"	
-	size = 32 + kFailedBootWidth * kFailedBootHeight;
-	long bootPict = AllocateKernelMemory(size);
+			size = 32 + kFailedBootWidth * kFailedBootHeight;
+			long bootPict = AllocateKernelMemory(size);
 #if UNUSED
-    AllocateMemoryRange( "Pict-FailedBoot", bootPict, size,-1);    
+			AllocateMemoryRange( "Pict-FailedBoot", bootPict, size,-1);    
 #else
-    AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
+			AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
 #endif
-	((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
-    ((boot_progress_element *)bootPict)->height = kFailedBootHeight;
-    ((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
-	bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
+			((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
+			((boot_progress_element *)bootPict)->height = kFailedBootHeight;
+			((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
+			bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
+		}
+	}
 	
-	//Fix error message with Lion DP2+ installer	
-	if (execute_hook("getboardproductPatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS) {
+	//Fix an error with the Lion's (DP2+) installer	
+	if (execute_hook("getboardproductPatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
+	{
 		
 		gboardproduct = (char *)getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 		
 		if (!gboardproduct) readSMBIOS(theProducBoard);
 		
 	}
-	if (gboardproduct) {
+	if (gboardproduct)
+	{
 		DT__AddProperty(node, "board-id", strlen(gboardproduct)+1, gboardproduct);
 	}
 	
-	
-	Node *chosenNode = DT__FindNode("/chosen", true);
-	if (chosenNode) {
-				
-		DT__AddProperty(chosenNode, "boot-args", strlen(bootArgs->CommandLine)+1, (EFI_CHAR16*)bootArgs->CommandLine);
-		
-		if (uuidSet &&bootInfo->uuidStr[0]) 			
+	{
+		Node *chosenNode = DT__FindNode("/chosen", true);
+		if (chosenNode)
+		{
+			
+			DT__AddProperty(chosenNode, "boot-args", strlen(bootArgs->CommandLine)+1, (EFI_CHAR16*)bootArgs->CommandLine);
+			
+			if (uuidSet &&bootInfo->uuidStr[0]) 			
 				DT__AddProperty(chosenNode, kBootUUIDKey, strlen(bootInfo->uuidStr)+1, bootInfo->uuidStr);
-		
-		/*if (gRootPath[0]) {
 			
-			DT__AddProperty(chosenNode, "rootpath", 256, gRootPath);			
+			/*if (gRootPath[0])
+			 {
+			 
+			 DT__AddProperty(chosenNode, "rootpath", 256, gRootPath);			
+			 
+			 } 
+			 else */if (gRootDevice)
+			 {
+				 
+				 DT__AddProperty(chosenNode, "boot-device-path", strlen(gRootDevice)+1, gRootDevice);			
+				 
+			 }			
 			
-		} else */if (gRootDevice) {
 			
-			DT__AddProperty(chosenNode, "boot-device-path", strlen(gRootDevice)+1, gRootDevice);			
+			// "boot-file" is not used by kextcache if there is no "boot-device-path" or if there is a valid "rootpath" ,
+			// but i let it by default since it may be used by another service
+			DT__AddProperty(chosenNode, "boot-file", strlen(bootInfo->bootFile)+1, (EFI_CHAR16*)bootInfo->bootFile);
 			
-		}			
 			
-				
-		// "boot-file" is not used by kextcache if there is no "boot-device-path" or if there is a valid "rootpath" ,
-		// but i let it by default since it may be used by another service
-		DT__AddProperty(chosenNode, "boot-file", strlen(bootInfo->bootFile)+1, (EFI_CHAR16*)bootInfo->bootFile);
-				
-	
-		if (bootInfo->adler32) 
-		DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &bootInfo->adler32);
-
-	}
+			if (bootInfo->adler32) 
+				DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &bootInfo->adler32);
+			
+		}
+	}	
 
 	// We could also just do DT__FindNode("/efi/platform", true)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
 	Node *efiNode  = DT__AddChild(node, "efi");
-	// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
-	// is set up.  That is, name and table properties
-	Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");
 	
-	Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
-	if (gMacOSVersion[3] == '7'){
-		kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
-		DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
+	{
+		extern char gMacOSVersion[];
+
+		// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
+		// is set up.  That is, name and table properties
+		Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");		
+		Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
+		
+		if (gMacOSVersion[3] == '7')
+		{
+			kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
+			DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
+		}
+		
+		if (archCpuType == CPU_TYPE_I386)
+		{
+			// The value of the table property is the 32-bit physical address for the RuntimeServices table.
+			// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
+			// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
+			// the only thing to use a non-malloc'd pointer for something in the DT
+			
+			DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
+			DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+		}
+		else
+		{
+			if (kernelCompatibilityNode) 
+				DT__AddProperty(kernelCompatibilityNode, "x86_64", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
+			
+			DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
+			DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
+		}
 	}
 	
-	if (archCpuType == CPU_TYPE_I386)
-	{
-		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
-		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
-		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
-		// the only thing to use a non-malloc'd pointer for something in the DT
-		
-		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
-		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
-	}
-	else
-	{
-		if (kernelCompatibilityNode) 
-			DT__AddProperty(kernelCompatibilityNode, "x86_64", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
-		
-		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
-		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
-	}
 	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 	DT__AddProperty(efiNode, FIRMWARE_NAME_PROP, sizeof(FIRMWARE_NAME), (EFI_CHAR16*)FIRMWARE_NAME);
@@ -736,40 +786,45 @@ static VOID setupEfiDeviceTree(void)
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(efiNode, "configuration-table");
 	
-	// Now fill in the /efi/platform Node
-	Node *efiPlatformNode = DT__AddChild(efiNode, "platform");
-	
-	DT__AddProperty(efiPlatformNode, "DevicePathsSupported", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
-	
-	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
-	// the value in the fsbFrequency global and not an malloc'd pointer
-	// because the DT_AddProperty function does not copy its args.
-	
-	if (Platform->CPU.FSBFrequency != 0)
-		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);
-
-	
+	{
+		EFI_CHAR16   *serial = 0, *productname = 0;
+		size_t		 len = 0;
+		
+		// Now fill in the /efi/platform Node
+		Node *efiPlatformNode = DT__AddChild(efiNode, "platform");
+		
+		DT__AddProperty(efiPlatformNode, "DevicePathsSupported", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
+		
+		// NOTE WELL: If you do add FSB Frequency detection, make sure to store
+		// the value in the fsbFrequency global and not an malloc'd pointer
+		// because the DT_AddProperty function does not copy its args.
+		
+		if (Platform->CPU.FSBFrequency != 0)
+			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);
+		
+		
 #if UNUSED
-	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform->CPU.TSCFrequency != 0)
-		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform->CPU.TSCFrequency);
-	
-	if (Platform->CPU.CPUFrequency != 0)
-		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform->CPU.CPUFrequency);
+		// Export TSC and CPU frequencies for use by the kernel or KEXTs
+		if (Platform->CPU.TSCFrequency != 0)
+			DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform->CPU.TSCFrequency);
+		
+		if (Platform->CPU.CPUFrequency != 0)
+			DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform->CPU.CPUFrequency);
 #endif
-	
-	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	
-	if (getSystemID() == EFI_SUCCESS)
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) Platform->sysid);
-
-	 // Export SystemSerialNumber if present
-	if ((serial=getSmbiosChar16("SMserial", &len)))
-		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, serial);
-	
-	// Export Model if present
-	if ((productname=getSmbiosChar16("SMproductname", &len)))
-		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, productname);	
+		
+		// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
+		
+		if (getSystemID() == EFI_SUCCESS)
+			DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) Platform->sysid);
+		
+		// Export SystemSerialNumber if present
+		if ((serial=getSmbiosChar16("SMserial", &len)))
+			DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, serial);
+		
+		// Export Model if present
+		if ((productname=getSmbiosChar16("SMproductname", &len)))
+			DT__AddProperty(efiPlatformNode, MODEL_PROP, len, productname);
+	}		
 	
 	// Fill /efi/device-properties node.			
 	setupDeviceProperties(efiNode);
@@ -783,7 +838,8 @@ void setupSmbiosConfigFile(const char *filename)
 {	
 	static bool readSmbConfigFile = true;
 
-	if (readSmbConfigFile == true) {
+	if (readSmbConfigFile == true)
+	{
 		
 		char		dirSpecSMBIOS[128] = "";
 		const char *override_pathname = NULL;
@@ -818,7 +874,8 @@ void setupSmbiosConfigFile(const char *filename)
 
 static VOID setup_Smbios()
 {			
-	if (execute_hook("getSmbiosPatched",NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS) {
+	if (execute_hook("getSmbiosPatched",NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
+	{
 		DBG("Using the original SMBIOS !!\n");	
         struct SMBEntryPoint *smbios_o = getSmbiosOriginal();	
         smbios_p = ((uint64_t)((uint32_t)smbios_o));                 
@@ -828,7 +885,8 @@ static VOID setup_Smbios()
 static VOID setup_machine_signature()
 {
 	Node *chosenNode = DT__FindNode("/chosen", false);
-	if (chosenNode) {
+	if (chosenNode)
+	{
 		if (Platform->hardware_signature == 0xFFFFFFFF)
 		{            
             if (!local_rsd_p)
@@ -841,12 +899,9 @@ static VOID setup_machine_signature()
                 
                 local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
             }
-            ACPI_TABLE_FACS *FacsPointer;
+			
+			ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
             
-			if (acpi_tables.RsdRevision > 0 ) 
-				FacsPointer = (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64;
-            else
-                FacsPointer = (ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
 			
             Platform->hardware_signature = FacsPointer->HardwareSignature;	
 			
@@ -873,25 +928,38 @@ static VOID setupEfiConfigurationTable()
     if (smbios_p)
         addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 		
+	{
+		int num_cpus;
+		
+		void *mps_p = imps_probe(&num_cpus);
+		
+		if (mps_p)
+		{
+			uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
+			
+			addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);
+		}
+                
+ #if DEBUG_ACPI
+        if (num_cpus != Platform->CPU.NoCores)
+        {
+            DBG("Warning: SMP nb of core mismatch with the value found in cpu.c \n");                
+        }        
+ #endif               
+	}	
 	
-	void *mps_p = getMPSTable();
-    
-    if (mps_p)
-    {
-        uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
-    
-        addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);	
-	}
 	
-	//Slice
 	// PM_Model
 	if (Platform->CPU.isServer == true)
     {
 		Platform->Type = Workstation;
 	}
-	else if (Platform->CPU.isMobile == true) {	
+	else if (Platform->CPU.isMobile == true)//Slice
+	{	
 		Platform->Type = Mobile;
-	} else {
+	} 
+	else
+	{
 		Platform->Type = Desktop;
 	}
 

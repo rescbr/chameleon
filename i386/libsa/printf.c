@@ -34,6 +34,8 @@ struct putc_info {
 };
 
 static void
+sputc(int c, struct putc_info * pi);
+static void
 sputc(int c, struct putc_info * pi)
 {
     if (pi->last_str)

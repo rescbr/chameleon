@@ -128,6 +128,7 @@ Symbols.dylib: Symbols.o
 	-current_version 1.0.0 \
 	-compatibility_version 1.0.0 \
 	-final_output Symbols \
+	-macosx_version_min 10.6 \
 	-exported_symbols_list ${OBJROOT}/Symbols.save \
 	${OBJROOT}/Symbols.o \
 	-o $(SYMROOT)/${SYMBOLS_MODULE} 

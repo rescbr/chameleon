@@ -130,25 +130,25 @@ extern gui_t gui;					// gui structure
 
 
 int  initGUI();
-int  startGUI();
+//int  startGUI();
 void drawBootGraphics(void);
 void drawBackground();
 void drawLogo();
 
-void setupDeviceList(config_file_t *theme);
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
+//void setupDeviceList(config_file_t *theme);
+//void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
 void drawDeviceList(int start, int end, int selection);
-void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
+//void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
 
 void showInfoBox(char *title, char *text);
 
-int  dprintf( window_t * window, const char * fmt, ...);
+//int  dprintf( window_t * window, const char * fmt, ...);
 int  gprintf( window_t * window, const char * fmt, ...);
 int	 vprf(const char * fmt, va_list ap);
 
 int  drawInfoMenu();
 int  updateInfoMenu(int key);
-void drawInfoMenuItems();
+//void drawInfoMenuItems();
 
 void showGraphicBootPrompt();
 void clearGraphicBootPrompt();
@@ -156,7 +156,7 @@ void updateGraphicBootPrompt(int key);
 
 void updateVRAM();
 
-void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
-void drawStrCenteredAt(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
+//void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
+//void drawStrCenteredAt(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 
 #endif /* !__BOOT2_GUI_H */

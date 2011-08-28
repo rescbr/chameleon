@@ -44,11 +44,16 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature);
 //   by scanning and checking ACPI tables.  This function will
 //   get and store the following ACPI Table Pointers:
 //   1) RSD Pointer in RsdPointer Variable
-//   2) RSDT Pointer in RsdtPointer Variable   (RSDP->RSDT)
-//   3) FACP Pointer in FacpPointer Variable   (RSDP->RSDT->FACP)
-//   4) DSDT Pointer in DsdtPointer Variable   (RSDP->RSDT->FACP->DSDT)
-//   5) FACS Pointer in FacsPointer Variable   (RSDP->RSDT->FACP->FACS)
-//   6) FACP Pointer in Facp64Pointer Variable (RSDP->XSDT->FACP)
+//   2) RSDT Pointer in RsdtPointer Variable			(RSDP->RSDT)
+//   3) XSDT Pointer in XsdtPointer Variable			(RSDP->XSDT)
+//   4) FACP Pointer in FacpPointer Variable			(RSDP->RSDT->FACP)
+//   5) FACP(64) Pointer in FacpPointer64 Variable		(RSDP->XSDT->FACP)
+//   6) DSDT Pointer in DsdtPointer Variable			(RSDP->RSDT->FACP->DSDT)
+//   7) DSDT(64) Pointer in DsdtPointer64 Variable		(RSDP->RSDT->FACP->XDSDT)
+//   8) FACS Pointer in FacsPointer Variable			(RSDP->RSDT->FACP->FACS)
+//   9) FACS(64) Pointer in FacsPointer64 Variable		(RSDP->XSDT->FACP->XFACS)
+//   A) MADT Pointer in FacsPointer Variable			(RSDP->RSDT->FACP->APIC)
+//   B) MADT(64) Pointer in MadtPointer64 Variable		(RSDP->XSDT->APIC)
 //
 //-------------------------------------------------------------------------------
 U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
@@ -66,10 +71,10 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
         acpi_tables->RsdPointer = null;
         acpi_tables->RsdtPointer = null;
         acpi_tables->MadtPointer = null;
+		acpi_tables->MadtPointer64 = null;
         acpi_tables->SsdtPointer = null;
         acpi_tables->XsdtPointer = null;
         acpi_tables->FacpPointer64 = null;
-        acpi_tables->RsdRevision = 0;
     }
     
     // Find the RSDT pointer by scanning EBDA/E000/F000 segments.
@@ -106,27 +111,34 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
         (GetChecksum(acpi_tables->DsdtPointer, acpi_tables->DsdtPointer->Header.Length) != 0))
         return (0ul);
     
-    // Find the XDSDT which is included in the FACP(64) table
-    ACPI_TABLE_DSDT *DsdtPointer64 = (ACPI_TABLE_DSDT *)((U32)acpi_tables->FacpPointer64->XDsdt);
-    if ((*(U32*) (DsdtPointer64->Header.Signature) == NAMESEG("DSDT")) &&
-        (GetChecksum(DsdtPointer64, DsdtPointer64->Header.Length) == 0))
-    acpi_tables->DsdtPointer64 = (ACPI_TABLE_DSDT *) DsdtPointer64;
+	{
+		// Find the XDSDT which is included in the FACP(64) table
+		ACPI_TABLE_DSDT *DsdtPointer64 = (ACPI_TABLE_DSDT *)((U32)acpi_tables->FacpPointer64->XDsdt);
+		if ((*(U32*) (DsdtPointer64->Header.Signature) == NAMESEG("DSDT")) &&
+			(GetChecksum(DsdtPointer64, DsdtPointer64->Header.Length) == 0))
+			acpi_tables->DsdtPointer64 = (ACPI_TABLE_DSDT *) DsdtPointer64;
+	}    
     
     // Find the FACS which is included in the FACP table
     acpi_tables->FacsPointer = (ACPI_TABLE_FACS *) acpi_tables->FacpPointer->Facs;
     if (*(U32 *) (acpi_tables->FacsPointer->Signature) != NAMESEG("FACS"))
         return (0ul);
     
-    // Find the XFACS which is included in the FACP(64) table
-    ACPI_TABLE_FACS *FacsPointer64 = (ACPI_TABLE_FACS *)((U32)acpi_tables->FacpPointer64->XFacs);
-    if (*(U32*) (FacsPointer64->Signature) == NAMESEG("FACS"))
-        acpi_tables->FacsPointer64 = (ACPI_TABLE_FACS *) FacsPointer64;
+	{
+		// Find the XFACS which is included in the FACP(64) table
+		ACPI_TABLE_FACS *FacsPointer64 = (ACPI_TABLE_FACS *)((U32)acpi_tables->FacpPointer64->XFacs);
+		if (*(U32*) (FacsPointer64->Signature) == NAMESEG("FACS"))
+			acpi_tables->FacsPointer64 = (ACPI_TABLE_FACS *) FacsPointer64;
+	}    
      
     // Find the MADT table which is one of the table pointers in the RSDT
     acpi_tables->MadtPointer = (ACPI_TABLE_MADT *) GetTablePtr(acpi_tables->RsdtPointer, NAMESEG("APIC"));
     if (acpi_tables->MadtPointer == 0ul)
         return (0ul);
-    
+	
+	// Find the MADT(64) table which is one of the table pointers in the XSDT
+    acpi_tables->MadtPointer64 = (ACPI_TABLE_MADT *) GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("APIC"));
+        
     return (1ul);
 }
 
@@ -154,7 +166,7 @@ U32 get_num_tables64(ACPI_TABLE_XSDT * xsdt)
 
 //-------------------------------------------------------------------------------
 //
-// Procedure:    GetTablePtr - Find ACPI table with input signature.
+// Procedure:    GetTablePtr - Find ACPI table in RSDT with input signature.
 //
 //-------------------------------------------------------------------------------
 static ACPI_TABLE_HEADER *GetTablePtr(ACPI_TABLE_RSDT * rsdt, U32 signature)
@@ -177,28 +189,29 @@ static ACPI_TABLE_HEADER *GetTablePtr(ACPI_TABLE_RSDT * rsdt, U32 signature)
 
 //-------------------------------------------------------------------------------
 //
-// Procedure:    GetTablePtr - Find ACPI table with input signature.
+// Procedure:    GetTablePtr64 - Find ACPI table in XSDT with input signature.
 //
 //-------------------------------------------------------------------------------
 static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 {
     U32 index;
     U32 num_tables;
-    ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;
     
     // Compute number of table pointers included in XSDT
     num_tables = get_num_tables64(xsdt);
     
     for (index = 0; index < num_tables; index++) {
-        if (((U32) (table->Signature) == signature) &&
-            (GetChecksum(table, table->Length) == 0)) {
-            return (table);
-        }
-        // Move array pointer to next 64-bit pointer
-        table = (ACPI_TABLE_HEADER *) ((U32) table + sizeof(U64));
+		U64 ptr = xsdt->TableOffsetEntry[index];
+		
+        if ((*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == signature) &&
+            (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) == 0)) {
+            return (((ACPI_TABLE_HEADER *) (unsigned long)ptr));
+        }        
     }
     return (0);
 }
+
+
 
 //-------------------------------------------------------------------------------
 //
@@ -244,7 +257,6 @@ static U32 GetRsdtPointer(void *mem_addr, U32 mem_size, ACPI_TABLES * acpi_table
         if (*(volatile U64 *)current == NAMESEG64("RSD PTR ")) {
             if (GetChecksum(current, ACPI_RSDP_REV0_SIZE) == 0) {
                 // RSD pointer structure checksum okay, lookup the RSDT pointer.                
-                acpi_tables->RsdRevision = ((ACPI_TABLE_RSDP *)current)->Revision;                
                 acpi_tables->RsdPointer = (ACPI_TABLE_RSDP *)current;
                 acpi_tables->RsdtPointer = (ACPI_TABLE_RSDT *) acpi_tables->RsdPointer->RsdtPhysicalAddress;
                 if ((acpi_tables->RsdPointer != 0) && (acpi_tables->RsdtPointer != 0))

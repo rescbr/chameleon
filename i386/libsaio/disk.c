@@ -151,6 +151,40 @@ static struct disk_blk0 * gBootSector = NULL;
 extern void spinActivityIndicator(int sectors);
 #endif
 
+struct NamedValue {
+    unsigned char value;
+    const char *  name;
+};
+
+static int getDriveInfo( int biosdev,  struct driveInfo *dip );
+static const char * getNameForValue( const struct NamedValue * nameTable,
+									unsigned char value );
+static int Biosread( int biosdev, unsigned long long secno );
+static int readBytes( int biosdev, unsigned long long blkno,
+					 unsigned int byteoff,
+					 unsigned int byteCount, void * buffer );
+static int isExtendedFDiskPartition( const struct fdisk_part * part );
+static int getNextFDiskPartition( int biosdev, int * partno,
+								 const struct fdisk_part ** outPart );
+static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
+						   const struct fdisk_part * part,
+						   FSInit initFunc, FSLoadFile loadFunc,
+						   FSReadFile readFunc,
+						   FSGetDirEntry getdirFunc,
+						   FSGetFileBlock getBlockFunc,
+						   FSGetUUID getUUIDFunc,
+						   BVGetDescription getDescriptionFunc,
+						   BVFree bvFreeFunc,
+						   int probe, int type, unsigned int bvrFlags );
+static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr );
+static int probeFileSystem(int biosdev, unsigned int blkoff);
+static bool isPartitionUsed(gpt_ent * partition);
+static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr );
+static void scanFSLevelBVRSettings(BVRef chain);
+#ifdef APPLE_PARTITION_MAP_SUPPORT
+static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr );
+#endif
+
 //==========================================================================
 
 static int getDriveInfo( int biosdev,  struct driveInfo *dip )
@@ -186,11 +220,6 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 
 //==========================================================================
 // Maps (E)BIOS return codes to message strings.
-
-struct NamedValue {
-    unsigned char value;
-    const char *  name;
-};
 
 static const char * getNameForValue( const struct NamedValue * nameTable,
 									unsigned char value )

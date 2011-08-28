@@ -103,15 +103,23 @@ BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;
 
-//static void selectBiosDevice(void);
-
+static void zeroBSS(void);
+#ifdef SAFE_MALLOC
+static inline void malloc_error(char *addr, size_t size, const char *file, int line);
+#else
+static inline void malloc_error(char *addr, size_t size);
+#endif
+static int ExecKernel(void *binary);
 static bool getOSVersion(char *str);
 static void getRootDevice();
-void getKernelCachePath();
-
 #ifdef NBP_SUPPORT
 static bool gUnloadPXEOnExit = false;
 #endif
+static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size);
+static bool found_extra_kext(void);
+
+void getKernelCachePath();
+
 
 /*
  * How long to wait (in seconds) to load the
@@ -204,7 +212,8 @@ static int ExecKernel(void *binary)
 	
     // Load boot drivers from the specifed root path.
 	
-    if (!gHaveKernelCache) {
+    if (!gHaveKernelCache)
+	{
 		LoadDrivers("/");
     }
 	
@@ -212,10 +221,13 @@ static int ExecKernel(void *binary)
 	clearActivityIndicator();
 #endif
 	
-    if (gErrors) {
+    if (gErrors)
+	{
         printf("Errors encountered while starting up the computer.\n");
+#if DEBUG_BOOT
         printf("Pausing %d seconds...\n", kBootErrorTimeout);
         sleep(kBootErrorTimeout);
+#endif
     }
 	
 	execute_hook("md0Ramdisk", NULL, NULL, NULL, NULL, NULL, NULL);
@@ -226,7 +238,8 @@ static int ExecKernel(void *binary)
 #ifdef NBP_SUPPORT
     // Cleanup the PXE base code.
 	
-    if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
+    if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit )
+	{
 		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
         {
         	printf("nbpUnloadBaseCode error %d\n", (int) ret);
@@ -234,24 +247,28 @@ static int ExecKernel(void *binary)
         }
     }
 #endif 
-    bool wait = false;
-	const char *strval = 0;
-	int dummysize /*= 0*/;	
-	
-	getBoolForKey(kWaitForKeypressKey, &wait, &bootInfo->bootConfig);
-	
-	if (getValueForBootKey(bootArgs->CommandLine, "-wait", &strval, &dummysize))
 	{
-		wait = true;
+		bool wait = false;
+		const char *strval = 0;
+		int dummysize /*= 0*/;	
 		
-		if (strval && ((strcmp(strval, "no") == 0) || (strcmp(strval, "No") == 0))) {
-			wait = false;
-		} 		
-	}
+		getBoolForKey(kWaitForKeypressKey, &wait, &bootInfo->bootConfig);
 		
-	if (wait == true) {
-		pause();
-	}
+		if (getValueForBootKey(bootArgs->CommandLine, "-wait", &strval, &dummysize))
+		{
+			wait = true;
+			
+			if (strval && ((strcmp(strval, "no") == 0) || (strcmp(strval, "No") == 0)))
+			{
+				wait = false;
+			} 		
+		}
+		
+		if (wait == true)
+		{
+			pause();
+		}
+	}    
 			
 	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) // (bootArgs->Video.v_display == VGA_TEXT_MODE)	
 	{
@@ -276,9 +293,11 @@ static int ExecKernel(void *binary)
 			unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 			// Prepare the data for the default Apple boot image. 
 			appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
-			if (appleBootPict) { 
+			if (appleBootPict)
+			{ 
 				convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
-				if (bootImageData) {	
+				if (bootImageData)
+				{	
 					x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
 					y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
 					drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
@@ -306,13 +325,13 @@ static int ExecKernel(void *binary)
 	turnOffFloppy();
 #endif
 #if BETA
-#include "smp.h"
+#include "smp-imps.h"
 #include "apic.h"
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
 	
-	if (gMacOSVersion[3] <= '6') {		
-		
+	if (gMacOSVersion[3] <= '6')
+	{		
 		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
 		startprog( kernelEntry, bootArgsLegacy );
 	}	
@@ -353,14 +372,9 @@ void boot(int biosdev)
 // next boot device on its list.
 void common_boot(int biosdev)
 {
-    int      status;
-    char     *bootFile;
-    bool     quiet;
-    bool     firstRun = true;
-    bool     instantMenu;
-#ifndef OPTION_ROM
-    bool     rescanPrompt;
-#endif
+    int      status;        
+    bool     firstRun = true;    
+
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 	
@@ -408,18 +422,27 @@ void common_boot(int biosdev)
 	Platform->CPU.isServer = false;    
     getBoolForKey(kIsServer, &Platform->CPU.isServer, &bootInfo->bootConfig); // set this as soon as possible
 	
-    if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet) {
-        gBootMode |= kBootModeQuiet;
-    }
+	{
+		bool     quiet = false;
+		if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet)
+		{
+			gBootMode |= kBootModeQuiet;
+		}
+	}	
 	
-    // Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-    if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu) {
-        firstRun = false;
-    }
+	{
+		bool     instantMenu = false;
+		// Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
+		if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu)
+		{
+			firstRun = false;
+		}
+	}	
 	
 #ifndef OPTION_ROM
 	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive) {
+    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive)
+	{
         gScanSingleDrive = true;
     }
 	
@@ -442,12 +465,14 @@ void common_boot(int biosdev)
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 	gBootVolume = selectBootVolume(bvChain);
 	
-	// Intialize module system
-	EFI_STATUS sysinit = init_module_system();
-	if((sysinit == EFI_SUCCESS) || (sysinit == EFI_ALREADY_STARTED)/*should never happen*/ ) 
 	{
-		load_all_modules();
-	}
+		// Intialize module system
+		EFI_STATUS sysinit = init_module_system();
+		if((sysinit == EFI_SUCCESS) || (sysinit == EFI_ALREADY_STARTED) /*should never happen*/ ) 
+		{
+			load_all_modules();
+		}
+	}	
 			
     // Loading preboot ramdisk if exists.
 	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
@@ -458,15 +483,20 @@ void common_boot(int biosdev)
     gEnableCDROMRescan = false;
 	
     // Enable it with Rescan=y in system config
-    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan) {
+    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan)
+	{
         gEnableCDROMRescan = true;
     }
 	
-    // Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
-    rescanPrompt = false;
-    if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev)) {
-        gEnableCDROMRescan = promptForRescanOption();
-    }
+	{
+		bool     rescanPrompt = false;
+		// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
+		if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev))
+		{
+			gEnableCDROMRescan = promptForRescanOption();
+		}
+	}
+    
 #endif	
 	
 #if DEBUG
@@ -484,8 +514,10 @@ void common_boot(int biosdev)
     while (1) {
         const char *val;
         int len;
-        int trycache = 0;
-        long flags, cachetime, kerneltime, exttime;
+		char     *bootFile;
+		bool trycache = true; // Always try to catch the kernelcache first
+		
+        long flags;
 #ifdef BOOT_HELPER_SUPPORT		
 		long time;
 #endif
@@ -532,13 +564,18 @@ void common_boot(int biosdev)
 		getOSVersion(gMacOSVersion);
 		
 		//if (platformCPUFeature(CPU_FEATURE_EM64T)) {        
-        if (cpu_mode_is64bit()) {
+        if (cpu_mode_is64bit())
+		{
 			archCpuType = CPU_TYPE_X86_64;
-		} else {
+		}
+		else
+		{
 			archCpuType = CPU_TYPE_I386;
 		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig)) {
-			if (strncmp(val, "i386", 4) == 0) {
+		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig))
+		{
+			if (strncmp(val, "i386", 4) == 0)
+			{
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
@@ -552,71 +589,93 @@ void common_boot(int biosdev)
 			readSMBIOS(thePlatformName); // read smbios Platform Name
 		
 		
-		if (!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len)) {    		
+		if (((gBootMode & kBootModeSafe) == 0) &&
+			!gOverrideKernel &&
+			(gBootFileType == kBlockDeviceType) &&
+			(gMKextName[0] == '\0') && 
+			!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len))
+		{    		
+			getBoolForKey(kUseKernelCache, &trycache, &bootInfo->bootConfig);
+			if (trycache == true)
+			{
+				// try to find the cache and fill the gBootKernelCacheFile string
+				getKernelCachePath();
 				
-			getKernelCachePath(); 
+				// Check for cache file
+				trycache = (gBootKernelCacheFile[0] != '\0') ? true : false; // if gBootKernelCacheFile is filled et bla bla bla.... :-)
+			}
 			
 		}
-		
-		// Check for cache file.
-		trycache = (((gBootMode & kBootModeSafe) == 0) &&
-					!gOverrideKernel &&
-					(gBootFileType == kBlockDeviceType) &&
-					(gMKextName[0] == '\0') &&
-					(gBootKernelCacheFile[0] != '\0'));
-		
+		else 
+		{
+			trycache = false;
+		}
+						
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 		
-        if (trycache ) do {
-			
-            // if we haven't found the kernel yet, don't use the cache
-            ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
-            if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
-                trycache = 0;
-				bootInfo->adler32  = 0;
-                break;
-            }
-            ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
-            if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
-                || (cachetime < kerneltime)) {
-				trycache = 0;
-				bootInfo->adler32  = 0;
-				break;				                
-            } 
-            ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
-            if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
-                && (cachetime < exttime)) {
-                trycache = 0;
-				bootInfo->adler32  = 0;
-                break;
-            }
-            if (kerneltime > exttime) {
-                exttime = kerneltime;
-            }
-            if (cachetime != (exttime + 1)) {
-                trycache = 0;
-				bootInfo->adler32  = 0;
-                break;
-            }
-        } while (0);
+		{
+			long cachetime, kerneltime, exttime;
+			if (trycache ) do {
+				
+				// if we haven't found the kernel yet, don't use the cache
+				ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
+				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
+				{
+					trycache = 0;
+					bootInfo->adler32  = 0;
+					break;
+				}
+				ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
+				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
+					|| (cachetime < kerneltime))
+				{
+					trycache = 0;
+					bootInfo->adler32  = 0;
+					break;				                
+				} 
+				ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
+					&& (cachetime < exttime))
+				{
+					trycache = 0;
+					bootInfo->adler32  = 0;
+					break;
+				}
+				if (kerneltime > exttime)
+				{
+					exttime = kerneltime;
+				}
+				if (cachetime != (exttime + 1))
+				{
+					trycache = 0;
+					bootInfo->adler32  = 0;
+					break;
+				}
+			} while (0);
+		}		
 		
         do {
-            if (trycache) {
+            if (trycache)
+			{
                 bootFile = gBootKernelCacheFile;
                 verbose("Loading kernel cache %s\n", bootFile);
-				if (gMacOSVersion[3] == '7') {					
+				if (gMacOSVersion[3] == '7')
+				{					
 					ret = LoadThinFatFile(bootFile, &binary);
 					if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
 					{
 						archCpuType = CPU_TYPE_I386;
 						ret = LoadThinFatFile(bootFile, &binary);				
 					}
-				} else {
+				}
+				else
+				{
 					ret = LoadFile(bootFile);
 					binary = (void *)kLoadAddr;
 				}
 				
-                if (ret >= 0) {
+                if (ret >= 0)
+				{
                     break;
                 }
 				
@@ -639,12 +698,12 @@ void common_boot(int biosdev)
 					if (ret == -1)
 					{
 						// Not found any alternate locations, using the original kernel image path.
-						strcpy(bootFileSpec, bootFile);
+						strcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
 					}
 				}
             }
 #else
-			strcpy(bootFileSpec, bootFile);
+			strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
 #endif
 			
             verbose("Loading kernel %s\n", bootFileSpec);
@@ -665,26 +724,32 @@ void common_boot(int biosdev)
         sleep(8);
 #endif
 		
-        if (ret <= 0) {
+        if (ret <= 0)
+		{
 			printf("Can't find %s\n", bootFile);
 			
 			sleep(1);
 #ifdef NBP_SUPPORT
-            if (gBootFileType == kNetworkDeviceType) {
+            if (gBootFileType == kNetworkDeviceType)
+			{
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
                 break;
             }
 #endif
-        } else {
+        }
+		else
+		{
             /* Won't return if successful. */
             ret = ExecKernel(binary);
         }
     }
     
     // chainboot
-    if (status==1) {
-		if (getVideoMode() == GRAPHICS_MODE) {	// if we are already in graphics-mode,
+    if (status==1)
+	{
+		if (getVideoMode() == GRAPHICS_MODE)
+		{	// if we are already in graphics-mode,
 #if UNUSED
 			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
 #else
@@ -693,7 +758,8 @@ void common_boot(int biosdev)
 		}
     }
 #ifdef NBP_SUPPORT
-    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit) {
+    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit)
+	{
 		nbpUnloadBaseCode();
     }
 #endif
@@ -701,95 +767,145 @@ void common_boot(int biosdev)
 
 void getKernelCachePath()
 {
-	long flags, cachetime;
-	int ret = -1;
-	
-	if(gMacOSVersion[3] == '7'){					
-		sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
+	{
+		// If there is an extra kext/mkext, we return immediatly and we skip the kernelCache 
+		// since kexts/mkexts are not loaded properly when the kernelCache is used.
+		// Another method would be to re-build the kernelCache one the fly
+		if (found_extra_kext() == true) return; 
 	}
-	else if(gMacOSVersion[3] <= '6')
-	{			 
+	
+	{
+		const char    *val;
+		int            len;
 		
-		PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
-		if (platformInfo) {
-			
-			bzero(platformInfo, sizeof(PlatformInfo));
-			
-			if (gPlatformName)
-				strlcpy(platformInfo->platformName,gPlatformName, sizeof(platformInfo->platformName)+1);
-			
-			if (gRootDevice) {
-				char *rootPath_p = platformInfo->rootPath;
-				int len = strlen(gRootDevice) + 1;
-				if ((unsigned)len > sizeof(platformInfo->rootPath)) {
-					len = sizeof(platformInfo->rootPath);
-				}
-				memcpy(rootPath_p, gRootDevice,len);
+		if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
+		{
+            char * buffer = newString(val);
+
+			if (val[0] == '\\')
+			{
+				// Flip the back slash's to slash's .
+                len = 0;
+                while (buffer[len] != '\0') {
+                    if (buffer[len] == '\\')
+                    {
+                         buffer[len] = '/';                        
+                    }
+                    len++;
+                }
+			}            
+			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile));
+		}
+		else
+		{
+			if(gMacOSVersion[3] == '7')
+			{					
+				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
+			}
+			else if(gMacOSVersion[3] <= '6')
+			{			 
 				
-				rootPath_p += len;
-				
-				len = strlen(bootInfo->bootFile);
-				
-				if ((unsigned)(rootPath_p - platformInfo->rootPath + len) >=
-					sizeof(platformInfo->rootPath)) {
+				PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
+				if (platformInfo)
+				{
 					
-					len = sizeof(platformInfo->rootPath) -
-					(rootPath_p - platformInfo->rootPath);
-				}                                
-				memcpy(rootPath_p, bootInfo->bootFile, len);							
+					bzero(platformInfo, sizeof(PlatformInfo));
+					
+					if (gPlatformName)
+						strlcpy(platformInfo->platformName,gPlatformName, sizeof(platformInfo->platformName)+1);
+					
+					if (gRootDevice)
+					{
+						char *rootPath_p = platformInfo->rootPath;
+						len = strlen(gRootDevice) + 1;
+						if ((unsigned)len > sizeof(platformInfo->rootPath))
+						{
+							len = sizeof(platformInfo->rootPath);
+						}
+						memcpy(rootPath_p, gRootDevice,len);
+						
+						rootPath_p += len;
+						
+						len = strlen(bootInfo->bootFile);
+						
+						if ((unsigned)(rootPath_p - platformInfo->rootPath + len) >=
+							sizeof(platformInfo->rootPath))
+						{
+							
+							len = sizeof(platformInfo->rootPath) -
+							(rootPath_p - platformInfo->rootPath);
+						}                                
+						memcpy(rootPath_p, bootInfo->bootFile, len);							
+						
+					}	
+					
+					if (!platformInfo->platformName[0] || !platformInfo->rootPath[0])
+					{
+						platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
+					}
+					//memcpy(gRootPath,platformInfo->rootPath, sizeof(platformInfo->rootPath));
+					
+					
+					bootInfo->adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
+					
+					free(platformInfo);	
+				}
+				
+				DBG("Adler32: %08lX\n",bootInfo->adler32);
+				
+				if (gMacOSVersion[3] < '6')
+				{
+					long flags, cachetime;
+					int ret = -1;
+					sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",bootInfo->adler32);
+					ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
+					if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
+					{
+						bootInfo->adler32 = 0;
+						sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache"); 
+					}
+					
+				} else
+					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
 				
 			}	
-			
-			if (!platformInfo->platformName[0] || !platformInfo->rootPath[0]) {
-				platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
-			}
-			//memcpy(gRootPath,platformInfo->rootPath, sizeof(platformInfo->rootPath));
-			
-			
-			bootInfo->adler32 = OSSwapHostToBigInt32(local_adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
-			
-			free(platformInfo);	
 		}
-		
-		DBG("Adler32: %08lX\n",bootInfo->adler32);
-		
-		if (gMacOSVersion[3] < '6') {
-			sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",bootInfo->adler32);
-			ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
-			if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
-				bootInfo->adler32 = 0;
-				sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache"); 
-			}						
-		} else
-			sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
-		
-		
-	}
+	}	
 }
 
-// Maximum config table value size
-#define VALUE_SIZE 2048
+
 static void getRootDevice()
 {
+	// Maximum config table value size
+#define VALUE_SIZE 2048
+	
 	const char *val = 0;
     int cnt = 0;
 	
 	if (getValueForKey(kBootUUIDKey, &val, &cnt, &bootInfo->bootConfig)){
 		uuidSet = true;		
 		
-    } else  {
-		if (getValueForBootKey(bootArgs->CommandLine, kRootDeviceKey, &val, &cnt)) {
-			if (*val == '*' && *(val + 1) != '/' && *(val + 1) != 'u') { 
+    }
+	else
+	{
+		if (getValueForBootKey(bootArgs->CommandLine, kRootDeviceKey, &val, &cnt))
+		{
+			if (*val == '*' && *(val + 1) != '/' && *(val + 1) != 'u')
+			{ 
 				val += 1; //skip the *
 				uuidSet = true;				
 				
-			} else if (*val == '*' && *(val + 1) == 'u') {
+			}
+			else if (*val == '*' && *(val + 1) == 'u')
+			{
 				
 				if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) 
 					uuidSet = true;				
 				
 			} 			
-		} else {
+		}
+		else
+		{
 #ifdef BOOT_HELPER_SUPPORT
 			//
 			// Try an alternate method for getting the root UUID on boot helper partitions.
@@ -804,9 +920,9 @@ static void getRootDevice()
 					goto out;
 				}
 			}
-#endif
-			
-			if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) {
+#endif			
+			if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig))
+			{
 				extern int ArgCntRemaining;
 				uuidSet = false;
 				char *           valueBuffer;
@@ -826,7 +942,8 @@ static void getRootDevice()
 				goto out;
 			}
 			
-			if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, bootInfo->uuidStr) == 0) {
+			if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, bootInfo->uuidStr) == 0)
+			{
 				verbose("Setting boot-uuid to: %s\n", bootInfo->uuidStr);
 				uuidSet = true;
 				gRootDevice = bootInfo->uuidStr;
@@ -843,10 +960,8 @@ out:
 
 static bool getOSVersion(char *str)
 {
-	bool valid = false;
+	bool valid = false;	
 	config_file_t systemVersion;
-	const char *val;
-	int len;
 	
 	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
 	{
@@ -858,7 +973,10 @@ static bool getOSVersion(char *str)
 	}
 	
 	if (valid)
-	{
+	{		
+		const char *val;
+		int len;
+		
 		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
@@ -873,31 +991,138 @@ static bool getOSVersion(char *str)
 	return valid;
 }
 
-unsigned long
-local_adler32( unsigned char * buffer, long length )
+static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size)
 {
-    long          cnt;
-    unsigned long result, lowHalf, highHalf;
-    
-    lowHalf  = 1;
-    highHalf = 0;
+	char* name;
+	long flags;
+	long time;
+	struct dirstuff* moduleDir = opendir(dir);
+	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
+	{		
+		if(strcmp(&name[strlen(name) - ext_size], ext) == 0)
+		{	
+			if (name_compare)
+			{
+				if (strcmp(name, name_compare) == 0)
+				{
+					DBG("found : %s\n", name);	
+					return true;
+				}
+			}
+			else
+			{
+				DBG("found : %s\n", name);	
+				return true;
+			}			
+		}
+#if DEBUG_BOOT
+		else 
+		{
+			DBG("Ignoring %s\n", name);
+		}
+#endif		
+	}
 	
-	for ( cnt = 0; cnt < length; cnt++ )
-    {
-        if ((cnt % 5000) == 0)
-        {
-            lowHalf  %= 65521L;
-            highHalf %= 65521L;
-        }
-		
-        lowHalf  += buffer[cnt];
-        highHalf += lowHalf;
-    }
-	
-	lowHalf  %= 65521L;
-	highHalf %= 65521L;
-	
-	result = (highHalf << 16) | lowHalf;
-	
-	return result;
+	return false;
 }
+
+// If a kext is found in /Extra/Extentions return true
+// If a mkext is found in /Extra return true
+// Otherwise return false
+// Tips (if you still use extra kext(s)/mkext(s) ): With Lion it's recommended to create a system mkext (see the kextcache commandline) to decrease boot time,
+//                                                  otherwise it will act like a -f each time a extra kext/kext is detected
+static bool found_extra_kext(void) 
+{	
+#define EXTENSIONS "Extensions"
+#define MKEXT_EXT  ".mkext"	
+#define MKEXT_EXT_SIZE sizeof("mkext")
+#define KEXT_EXT  ".kext"	
+#define KEXT_EXT_SIZE sizeof("kext")
+	
+	long flags;
+	long exttime;
+	int ret = -1;
+	
+	ret = GetFileInfo("rd(0,0)/Extra/", EXTENSIONS, &flags, &exttime);
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
+	{			
+		if (((flags & kFileTypeMask) == kFileTypeFlat))
+		{
+			if (find_file_with_ext("rd(0,0)/Extra/", MKEXT_EXT, EXTENSIONS, MKEXT_EXT_SIZE))
+			{
+				return true;				
+			}
+		} 
+		else if (((flags & kFileTypeMask) == kFileTypeDirectory)) 
+		{
+			if (find_file_with_ext("rd(0,0)/Extra/Extensions/", KEXT_EXT, NULL, KEXT_EXT_SIZE))
+			{
+				return true;
+			}             
+		}
+	}
+	ret = GetFileInfo("/Extra/", EXTENSIONS, &flags, &exttime);
+	if (ret == 0) 
+	{
+		if (((flags & kFileTypeMask) == kFileTypeFlat))
+		{
+			if (find_file_with_ext("/Extra/", MKEXT_EXT, EXTENSIONS, MKEXT_EXT_SIZE))
+			{
+				return true;				
+			}
+		} 
+		else if (((flags & kFileTypeMask) == kFileTypeDirectory)) 
+		{
+			if (find_file_with_ext("/Extra/Extensions/", KEXT_EXT, NULL, KEXT_EXT_SIZE))
+			{
+				return true;				
+			}            
+		}			
+	}
+	ret = GetFileInfo("bt(0,0)/Extra/", EXTENSIONS, &flags, &exttime);
+	if (ret == 0)
+	{
+		if (((flags & kFileTypeMask) == kFileTypeFlat))
+		{
+			if (find_file_with_ext("bt(0,0)/Extra/", MKEXT_EXT, EXTENSIONS, MKEXT_EXT_SIZE))
+			{
+				return true;				
+			}
+		}
+		else if (((flags & kFileTypeMask) == kFileTypeDirectory)) 
+		{
+			if (find_file_with_ext("bt(0,0)/Extra/Extensions/", KEXT_EXT, NULL, KEXT_EXT_SIZE))
+			{
+				return true;
+			}
+		}
+	}
+	DBG("NO Extra Mkext/Kext found\n");		
+	
+	// nothing found
+	return false;
+}
+
+#if 0
+static char *FIXED_BOOTFILE_PATH(char * str)
+{
+	char bootfile[128];
+	
+	bool bootFileWithDevice = false;
+	// Check if bootFile start with a device ex: bt(0,0)/Extra/mach_kernel
+	if (strncmp(str,"bt(",3) == 0 ||
+		strncmp(str,"hd(",3) == 0 ||
+		strncmp(str,"rd(",3) == 0)
+	{
+		bootFileWithDevice = true;
+	}
+		
+	// bootFile must start with a / if it not start with a device name
+	if (!bootFileWithDevice && (str)[0] != '/')
+		sprintf(bootFile, "/%s", str); // append a leading /
+	else
+		strcpy(bootFile, bootInfo->bootFile);
+	
+	return bootfile;
+}
+#endif

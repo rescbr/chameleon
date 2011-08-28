@@ -278,7 +278,17 @@ static SMBWord handle			= 0;
 static SMBWord maxStructSize	= 0;
 static SMBWord structureCount	= 0;
 
-void setDefaultSMBData(void);
+static void setDefaultSMBData(void);
+static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, const char **string, returnType *value);
+static void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uint8_t *field);
+static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value);
+static void addSMBFirmwareVolume(SMBStructPtrs *structPtr);
+static void addSMBMemorySPD(SMBStructPtrs *structPtr);
+static void addSMBOemProcessorType(SMBStructPtrs *structPtr);
+static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr);
+static void addSMBEndOfTable(SMBStructPtrs *structPtr);
+static void setSMBStruct(SMBStructPtrs *structPtr);
+static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr);
 
 
 char *getDefaultSMBproductName(void)
@@ -294,7 +304,7 @@ char *getDefaultSMBBoardProduct(void)
 }
 
 /* Rewrite this function */
-void setDefaultSMBData(void)
+static void setDefaultSMBData(void)
 {
 	static bool setDefSMB = true;
 	
@@ -416,7 +426,7 @@ void setDefaultSMBData(void)
 }
 
 /* Used for SM*_N smbios.plist keys */
-bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, const char **string, returnType *value)
+static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, const char **string, returnType *value)
 {
 	static int idx = -1;
 	static int current = -1;
@@ -461,7 +471,7 @@ char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 	return (char *)stringPtr;
 }
 
-void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uint8_t *field)
+static void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uint8_t *field)
 {
 	int strSize;
 
@@ -497,7 +507,7 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	stringsSize += strSize + 1;
 }
 
-bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
+static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 {
 	const char *string = 0;
 	int len;
@@ -588,18 +598,18 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 //-------------------------------------------------------------------------------------------------------------------------
 // Apple Specific
 //-------------------------------------------------------------------------------------------------------------------------
-void addSMBFirmwareVolume(SMBStructPtrs *structPtr)
+static void addSMBFirmwareVolume(SMBStructPtrs *structPtr)
 {
 	return;
 }
 
-void addSMBMemorySPD(SMBStructPtrs *structPtr)
+static void addSMBMemorySPD(SMBStructPtrs *structPtr)
 {
 	/* SPD data from Platform->RAM.spd */
 	return;
 }
 
-void addSMBOemProcessorType(SMBStructPtrs *structPtr)
+static void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorType *p = (SMBOemProcessorType *)structPtr->new;
 	
@@ -614,7 +624,7 @@ void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 	structureCount++;
 }
 
-void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
+static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
 
@@ -656,7 +666,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 //-------------------------------------------------------------------------------------------------------------------------
 // EndOfTable
 //-------------------------------------------------------------------------------------------------------------------------
-void addSMBEndOfTable(SMBStructPtrs *structPtr)
+static void addSMBEndOfTable(SMBStructPtrs *structPtr)
 {
 	structPtr->new->type	= kSMBTypeEndOfTable;
 	structPtr->new->length	= sizeof(SMBStructHeader);
@@ -667,7 +677,7 @@ void addSMBEndOfTable(SMBStructPtrs *structPtr)
 	structureCount++;
 }
 
-void setSMBStruct(SMBStructPtrs *structPtr)
+static void setSMBStruct(SMBStructPtrs *structPtr)
 {
 	bool setterFound = false;
 
@@ -727,7 +737,7 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 
 }
 
-void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
+static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 {
 	uint8_t *ptr = (uint8_t *)eps->dmi.tableAddress;
 	structPtr->orig = (SMBStructHeader *)ptr;
@@ -780,7 +790,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 {
 	SMBStructPtrs *structPtr;
-	uint8_t *buffer;
+	//uint8_t *buffer;
 	bool setSMB = true;
 
 	if (!origeps)
@@ -789,10 +799,11 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	structPtr = (SMBStructPtrs *)malloc(sizeof(SMBStructPtrs));
 	if (!structPtr)
 		return NULL;
-	
+	/*
 	buffer = malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
-		return NULL;
+		return NULL;*/
+	uint8_t buffer[SMB_ALLOC_SIZE]; // put the buffer in the stack fix some problem with xcode4, but all data seems to be corrupted
 
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
@@ -839,7 +850,7 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	neweps->checksum			= 0;
 	neweps->checksum			= 0x100 - checksum8(neweps, sizeof(SMBEntryPoint));
 
-	free(buffer);
+	//free(buffer);
 	decodeSMBIOSTable(neweps);
     
     return neweps;

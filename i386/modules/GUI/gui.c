@@ -35,7 +35,46 @@ char dirsrc[22];
 #include "art.h"
 #endif
 
+struct putc_info {
+    char * str;
+    char * last_str;
+};
+
 static int loadThemeImage(char *src, const char *image, int alt_image);
+static void loadBootGraphics(char *src);
+static void drawInfoMenuItems();
+static void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
+static void animateProgressBar();
+static void makeRoundedCorners(pixmap_t *p);
+static void colorFont(font_t *font, uint32_t color);
+static int initFont(font_t *font, image_t *data);
+static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p);
+static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
+#if DEBUG
+static int dprintf( window_t * window, const char * fmt, ...);
+#endif
+static void sputc(int c, struct putc_info * pi);
+#if UNUSED
+static inline
+void vramwrite (void *data, int width, int height);
+#else
+static inline
+void vramwrite (void *data, int width);
+#endif
+static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
+static int startGUI(void);
+static int randomTheme(char *dirspec, const char **theme);
+static void loadThemeValues(config_file_t *theme);
+static void setupDeviceList(config_file_t *theme);
+static void fillPixmapWithColor(pixmap_t *pm, uint32_t color);
+static int freeWindowBuffer( window_t *window );
+static int createWindowBuffer( window_t *window );
+static int createBackBuffer( window_t *window );
+static int loadGraphics(char *src);
+#ifdef EMBED_THEME
+static int getEmbeddedImageIndexByName(const char *name);
+#endif
+static int getImageIndexByName(const char *name);
 
 #define LOADPNG(src, img, alt_img) if (loadThemeImage(src, #img, alt_img) != 0) { return 1; }
 
@@ -186,10 +225,6 @@ menuitem_t infoMenuItems[] =
 	{ .text = "Help" }
 };
 
-int  initFont(font_t *font, image_t *image);
-void colorFont(font_t *font, uint32_t color);
-void makeRoundedCorners(pixmap_t *p);
-
 int infoMenuSelection = 0;
 int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
@@ -197,7 +232,7 @@ bool infoMenuNativeBoot = false;
 
 unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 
-int getImageIndexByName(const char *name)
+static int getImageIndexByName(const char *name)
 {
     int i;
 	for (i = 0; (unsigned)i < sizeof(images) / sizeof(images[0]); i++)
@@ -383,7 +418,7 @@ static int loadGraphics(char *src)
 	
 	return 0;
 }
-
+#if UNUSED
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
 	
@@ -409,8 +444,9 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 	}
 	return cropped;
 }
+#endif
 
-int createBackBuffer( window_t *window )
+static int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
@@ -430,7 +466,7 @@ int createBackBuffer( window_t *window )
 	return 0;
 }
 
-int createWindowBuffer( window_t *window )
+static int createWindowBuffer( window_t *window )
 {
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
@@ -450,7 +486,7 @@ int createWindowBuffer( window_t *window )
 	return 0;
 }
 
-int freeWindowBuffer( window_t *window )
+static int freeWindowBuffer( window_t *window )
 {
 	if (window->pixmap && window->pixmap->pixels)
     {
@@ -462,7 +498,7 @@ int freeWindowBuffer( window_t *window )
 	return 1;
 }
 
-void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
+static void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 {
 	int x,y;
 	
@@ -492,7 +528,7 @@ void drawBackground()
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
 
-void setupDeviceList(config_file_t *theme)
+static void setupDeviceList(config_file_t *theme)
 {
 	unsigned int pixel;
 	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
@@ -556,7 +592,7 @@ void setupDeviceList(config_file_t *theme)
     }
 }
 
-void loadThemeValues(config_file_t *theme)
+static void loadThemeValues(config_file_t *theme)
 {
 	unsigned int screen_width  = gui.screen.width;
 	unsigned int screen_height = gui.screen.height;
@@ -712,7 +748,7 @@ void loadThemeValues(config_file_t *theme)
 
 #define  MAX_tHEME 255
 
-int randomTheme(char *dirspec, const char **theme) {
+static int randomTheme(char *dirspec, const char **theme) {
 		
 	long         ret, flags, time;
 	long long	 index;
@@ -783,19 +819,19 @@ int initGUI(void)
 		long time;
 		long ret = -1;
 		
-		ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
+		ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
 		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-			sprintf(dirsrc, "/Extra/Themes");
+			sprintf(dirsrc, "rd(0,0)/Extra/Themes");
 			
 		} else {
-			ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
+			ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-				sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+				sprintf(dirsrc, "/Extra/Themes");
 				
 			} else {
-				ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
+				ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-					sprintf(dirsrc, "rd(0,0)/Extra/Themes");
+					sprintf(dirsrc, "bt(0,0)/Extra/Themes");
 					
 				} else {
 					printf("Failed to find the /extra/Themes folder\n");
@@ -848,7 +884,7 @@ int initGUI(void)
 	return ret;
 }
 
-int startGUI(void)
+static int startGUI(void)
 {
 	int        val;	
 	char    dirspec[256];
@@ -937,7 +973,7 @@ int startGUI(void)
 	return 1;
 }
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
+static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
 	
@@ -1166,11 +1202,11 @@ void updateGraphicBootPrompt(int key)
 }
 
 #if UNUSED
-inline
+static inline
 void vramwrite (void *data, int width, int height)
 #else
-inline
-void vramwrite (void *data, int width)
+static inline
+ void vramwrite (void *data, int width)
 #endif
 {
 	if (VIDEO (depth) == 0x20 /*32*/ && VIDEO (rowBytes) == (unsigned long)gui.backbuffer->width * 4)
@@ -1235,11 +1271,6 @@ void updateVRAM()
 		gui.redraw = false;
 	}
 }
-
-struct putc_info {
-    char * str;
-    char * last_str;
-};
 
 static void
 sputc(int c, struct putc_info * pi)
@@ -1334,8 +1365,8 @@ int gprintf( window_t * window, const char * fmt, ...)
 	}
 	return 1;
 }
-
-int dprintf( window_t * window, const char * fmt, ...)
+#if DEBUG
+static int dprintf( window_t * window, const char * fmt, ...)
 {
 	char *formattedtext;
 	
@@ -1419,7 +1450,7 @@ int dprintf( window_t * window, const char * fmt, ...)
 	}
 	return 1;
 }
-
+#endif
 int vprf(const char * fmt, va_list ap)
 {
 	int i;
@@ -1500,7 +1531,7 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
-void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
+static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
 	int i=0;
 	int y=0; // we need this to support multilines '\n'
@@ -1531,7 +1562,7 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 	}
 }
 
-void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p)
+static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p)
 {
 	int i = 0;
 	int width = 0;
@@ -1563,7 +1594,7 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 	
 }
 
-int initFont(font_t *font, image_t *data)
+static int initFont(font_t *font, image_t *data)
 {
 	unsigned int x = 0, y = 0, x2 = 0, x3 = 0;
 	
@@ -1617,7 +1648,7 @@ int initFont(font_t *font, image_t *data)
 	return 0;
 }
 
-void colorFont(font_t *font, uint32_t color)
+static void colorFont(font_t *font, uint32_t color)
 {
 	if( !color )
 		return;
@@ -1646,7 +1677,7 @@ void colorFont(font_t *font, uint32_t color)
 	}
 }
 
-void makeRoundedCorners(pixmap_t *p)
+static void makeRoundedCorners(pixmap_t *p)
 {
 	int x,y;
 	int width=p->width-1;
@@ -1805,7 +1836,7 @@ void showInfoBox(char *title, char *text)
 	}
 }
 
-void animateProgressBar()
+static void animateProgressBar()
 {
 	int y;
 	
@@ -1826,7 +1857,7 @@ void animateProgressBar()
 	}
 }
 
-void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress)
+static void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress)
 {
 	if(progress>100)
 		return;
@@ -1879,7 +1910,7 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 	free(progressbar.pixels);
 }
 
-void drawInfoMenuItems()
+static void drawInfoMenuItems()
 {
 	int i,n;
 	
@@ -2012,7 +2043,7 @@ static bool usePngImage = false;
 
 //==========================================================================
 // loadBootGraphics
-void loadBootGraphics(char *src)
+static void loadBootGraphics(char *src)
 {
 	if (bootImageData != NULL) {
 		return;

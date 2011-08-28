@@ -357,10 +357,9 @@ typedef struct SMBOemProcessorBusSpeed {
 
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
 extern SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps);
-//extern void *getSmbiosPatched();
 extern void decodeSMBIOSTable(SMBEntryPoint *eps);
-//extern void setDefaultSMBData(void);
 extern char *getDefaultSMBproductName(void);
 extern char *getDefaultSMBBoardProduct(void);
+extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
 
 #endif /* !__LIBSAIO_MYSMBIOS_H */

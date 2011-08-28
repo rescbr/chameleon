@@ -594,7 +594,6 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	return ParseXMLFile(config->plist, &config->dictionary);
 }
 
-
 /* loadSystemConfig
  *
  * Returns 0 - successful.
@@ -602,12 +601,14 @@ int loadConfigFile (const char *configFile, config_file_t *config)
  */
 int loadSystemConfig(config_file_t *config)
 {
-	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
-		"bt(0,0)/Extra/com.apple.Boot.plist",
-		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk
-		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+	char *dirspec[] = {							       
+		"rd(0,0)/Extra/com.apple.Boot.plist",   
+		"/Extra/com.apple.Boot.plist",          
+		"bt(0,0)/Extra/com.apple.Boot.plist",  
+		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
+		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
+		"bt(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 	int i,fd, count, ret=-1;
 
@@ -648,9 +649,13 @@ int loadSystemConfig(config_file_t *config)
 int loadOverrideConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",
-		"/Extra/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+		"rd(0,0)/Extra/com.apple.Boot.plist",   
+		"/Extra/com.apple.Boot.plist",          
+		"bt(0,0)/Extra/com.apple.Boot.plist",  
+		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
+		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
+		"bt(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 	
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 
 	int i,fd, count, ret=-1;
