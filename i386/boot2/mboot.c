@@ -5,7 +5,6 @@
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
-#include "interrupt_handler.h"
 #include "mboot.h"
 
 #define OFFSET_1MEG 0x100000
