@@ -1,5 +1,5 @@
 - Sync'd nvidia.c and gma.c (see GraphicEnabler module) to the trunk
-- Improved compatibility with xcode4
+- Improved compatibility with xcode4 (afaik only the modules gui and smbiosgetters will not work with xcode4, even if they are built without any errors)
 - Applied JrCs's path for more protection against buffer overflow in some case (trunk v1449)
 - Added a mechanism to detect extra mkexts/kexts before loading the kernelCache
 - Moved smp code to Erich Boleyn's smp-imps (not fully implemented yet)
