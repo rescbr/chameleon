@@ -294,20 +294,14 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
 		do
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
-			echo "theme = ${theme}"
-#			mkdir -p "${1}/${themes[$i]##*/}/Root/" # theme
-			mkdir -p "${1}/${theme}/Root"			# Theme
-			echo "mkdir: ${1}/${theme}/Root"
-			echo "rsync from: ${themes[$i]}/"
-            rsync -rv --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
-            # #### Comment out thx meklort
-            # ditto --noextattr --noqtn "${themes[$i]}" "${1}/${themes[$i]##*/}/Root/${theme}" 
-            # ####
+			mkdir -p "${1}/${theme}/Root"
+            rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
+			# clean .../sym/package/Theme, not .../artwork/themes/theme
             find "${1}/${theme}" -name '.DS_Store' -or -name '.svn' -exec rm -R {} \+
 			find "${1}/${theme}" -type f -exec chmod 644 {} \+	# chmod ?
-			echo "[BUILD] ${1}/${theme}" # = .../sym/package/Theme
+			echo "	[BUILD] ${theme}"
 			buildpackage "${1}/${theme}" "/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
-#			rm -R -f "${1}/${i##*/}" # = .../sym/package/0, .../1, .../2, etc...
+#			rm -R -f "${1}/${i##*/}" # = .../sym/package/0, .../1, etc... not needed anyway
 		done
 
 		((xmlindent--))
