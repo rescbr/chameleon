@@ -1356,14 +1356,19 @@ static bool init_card(pci_dt_t *pci_dev)
 		card->ports = card->info->custom_ports;
 		// if custom value is 0
 		if (card->ports == 0)
+		{
 			// match cfg_name with card_configs list and retrive default nr of ports.
 			for (i = 0; i < kCfgEnd; i++)
+			{
 				if (strcmp(card->cfg_name, card_configs[i].name) == 0)
 					card->ports = card_configs[i].ports; // default
-			
+			}
 			verbose("Nr of ports set to framebuffer's default: %d\n", card->ports);
+		}
 		else
+		{
 			verbose("Nr of ports set to card's custom ??: %d\n", card->ports);
+		}
 	}
 //	else
 //		card->ports = 2/1 ?; // set a min if 0 ports ?
