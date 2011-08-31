@@ -209,7 +209,7 @@ typedef struct {
 	chip_family_t			chip_family;
 	const char				*model_name;
 	config_name_t			cfg_name;
-	uint8_t					custom_ports; // max_ports ??
+	uint8_t					max_ports;
 } radeon_card_info_t;
 
 static radeon_card_info_t radeon_cards[] = {
@@ -262,7 +262,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x944E,	0x30101787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4810 Series",		kMotmot		, 0 },
 	{ 0x944E,	0x31001787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4820",				kMotmot		, 0 },
 	
-	{ 0x9480,	0x3628103C, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",				kGliff		, 0 },
+	{ 0x9480,	0x3628103C, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",				kGliff		, 2 },
 	
 	{ 0x9480,	0x9035104D, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",				kGliff		, 0 },
 	
@@ -380,7 +380,7 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x954F,	0x301017AF, CHIP_FAMILY_RV710,		"ATI Radeon HD 4450",				kNull		, 0 },
 	
-	{ 0x9552,	0x04341028, CHIP_FAMILY_RV710,		"ATI Mobility Radeon 4330",			kShrike		, 0 },
+	{ 0x9552,	0x04341028, CHIP_FAMILY_RV710,		"ATI Mobility Radeon 4330",			kShrike		, 2 },
 	
 	{ 0x9552,	0x308B103C, CHIP_FAMILY_RV710,		"ATI Mobility Radeon HD 4300 Series", kShrike	, 0 },
 	
@@ -1352,10 +1352,10 @@ static bool init_card(pci_dt_t *pci_dev)
     }
 	else// if (card->cfg_name > 0) // do we want 0 ports if fb is kNull or mistyped ?
 	{
-		// use custom_ports value on radeon_cards
-		card->ports = card->info->custom_ports;
-		// if custom value is 0
-		if (card->ports == 0)
+		// use max_ports value on radeon_cards
+		card->ports = card->info->max_ports;
+		// if max_ports value is 0
+		if (card->ports <= 0)
 		{
 			// match cfg_name with card_configs list and retrive default nr of ports.
 			for (i = 0; i < kCfgEnd; i++)
@@ -1367,7 +1367,7 @@ static bool init_card(pci_dt_t *pci_dev)
 		}
 		else
 		{
-			verbose("Nr of ports set to card's custom ??: %d\n", card->ports);
+			verbose("Nr of ports set to card's ?? max: %d\n", card->ports);
 		}
 	}
 //	else
