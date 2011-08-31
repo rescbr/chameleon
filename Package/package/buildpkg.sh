@@ -296,8 +296,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
 			mkdir -p "${1}/${theme}/Root/"
             rsync -r --exclude=.* "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
-			# chmod ?
-			find "${1}/${theme}" -type f -exec chmod 644 {} \+
+			# i see no need for this ??
+#			find "${1}/${theme}" -type f -exec chmod 644 {} \+
 			echo "	[BUILD] ${theme}"
 			buildpackage "${1}/${theme}" "/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
 #			rm -R -f "${1}/${i##*/}" # = .../sym/package/0, .../1, etc... not needed anyway
@@ -326,7 +326,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-#	rm -R -f "${1}" #Azipkg: uncoment when done
+#	rm -R -f "${1}" #Azipkg: don't delete sym/package - uncoment when done
 
 }
 
@@ -403,7 +403,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-#	rm -R -f "${1}" #Azipkg: uncoment when done
+#	rm -R -f "${1}" #Azipkg: don't delete e.g. sym/package/Core - uncoment when done
 fi
 }
 

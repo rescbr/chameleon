@@ -10,11 +10,40 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 
 include ${SRCROOT}/Make.rules
 
-# The order of building is important.
-SUBDIRS = klibc uClibcxx Resolution HelloWorld \
-		  GraphicsEnabler/ATiGraphicsEnabler GraphicsEnabler/AMDGraphicsEnabler \
-		  GraphicsEnabler/NVIDIAGraphicsEnabler GraphicsEnabler/IntelGraphicsEnabler
+# The order of building modules is important.
+SUBDIRS =
 
+ifdef CONFIG_KLIBC_MODULE
+SUBDIRS += klibc
+endif
+
+ifdef CONFIG_UCLIBCXX_MODULE
+SUBDIRS += uClibcxx
+endif
+
+ifdef CONFIG_RESOLUTION_MODULE
+SUBDIRS += Resolution
+endif
+
+ifdef CONFIG_HELLOWORLD_MODULE
+SUBDIRS += HelloWorld
+endif
+
+ifdef CONFIG_ATIGRAPHICSENABLER_MODULE
+SUBDIRS += GraphicsEnabler/ATiGraphicsEnabler
+endif
+
+ifdef CONFIG_AMDGRAPHICSENABLER_MODULE
+SUBDIRS += GraphicsEnabler/AMDGraphicsEnabler
+endif
+
+ifdef CONFIG_NVIDIAGRAPHICSENABLER_MODULE
+SUBDIRS += GraphicsEnabler/NVIDIAGraphicsEnabler
+endif
+
+ifdef CONFIG_INTELGRAPHICSENABLER_MODULE
+SUBDIRS += GraphicsEnabler/IntelGraphicsEnabler
+endif
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
 DEFINES=
