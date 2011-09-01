@@ -38,7 +38,6 @@ int uhci_reset (pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	
 	struct pciList* current = usbList;
 	if(!usbList)
 	{
@@ -68,15 +67,15 @@ int usb_loop()
 	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
 	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
-	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->chameleonConfig))
 	{
 		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
-		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->chameleonConfig);
+		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->chameleonConfig);
+		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->chameleonConfig);
 	}
 	
 	struct pciList* current = usbList;
@@ -108,7 +107,7 @@ int legacy_off (pci_dt_t *pci_dev)
 {
 	// Set usb legacy off modification by Signal64
 	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
-	// NOTE2: This should be called after any getc() call. (aka, after the Wait=y keyworkd is used)
+	// NOTE2: This should be called after any getc()/getchar() call. (aka, after the Wait=y keyworkd is used)
 	// AKA: Make this run immediatly before the kernel is called
 	uint32_t	capaddr, opaddr;  		
 	uint8_t		eecp;			
@@ -208,7 +207,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	bool		alwaysHardBIOSReset;
 
 	alwaysHardBIOSReset = false;	
-	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
+	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->chameleonConfig)) {
 		alwaysHardBIOSReset = true;
 	}
 

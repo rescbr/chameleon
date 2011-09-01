@@ -28,20 +28,22 @@
 
 #include "libsa.h"
 
-struct putc_info {
+struct putc_info //Azi: exists on console.c & gui.c
+{
     char * str;
     char * last_str;
 };
 
-static void
-sputc(int c, struct putc_info * pi)
+static int
+sputc(int c, struct putc_info * pi) //Azi: same as above
 {
     if (pi->last_str)
         if (pi->str == pi->last_str) {
             *(pi->str) = '\0';
-            return;
+            return 0;
         }
     *(pi->str)++ = c;
+    return c;
 }
 
 /*VARARGS1*/

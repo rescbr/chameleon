@@ -30,6 +30,7 @@
 #include "embedded.h"
 #include "pci.h"
 
+bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
 extern int multiboot_timeout;
@@ -111,7 +112,7 @@ static int countdown( const char * msg, int row, int timeout )
 		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
 	
 		char dummy[80];
-		getBootVolumeDescription( gBootVolume, dummy, 80, true );
+		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
 		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
 		
@@ -156,7 +157,7 @@ static int countdown( const char * msg, int row, int timeout )
 			}
         }
 	
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
+		if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 		{
 			drawProgressBar( gui.screen.pixmap, 100, gui.progressbar.pos , ( multi * 100 / multi_buff ) );
 			gui.redraw = true;
@@ -172,7 +173,7 @@ static int countdown( const char * msg, int row, int timeout )
 
 //==========================================================================
 
-static char   gBootArgs[BOOT_STRING_LEN];
+char   gBootArgs[BOOT_STRING_LEN];
 static char * gBootArgsPtr = gBootArgs;
 static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
 static char   booterCommand[BOOT_STRING_LEN];
@@ -182,9 +183,19 @@ static void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
-	
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 		clearGraphicBootPrompt();
+	}
+}
+
+static void addBootArg(const char * argStr)
+{
+	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
+	{
+		*gBootArgsPtr++ = ' ';
+		strcat(gBootArgs, argStr);
+		gBootArgsPtr += strlen(argStr);
 	}
 }
 
@@ -200,7 +211,7 @@ static void showBootPrompt(int row, bool visible)
 		clearScreenRows( row, kScreenLastRow );
 	}
 
-	clearBootArgs();
+	//clearBootArgs();
 
 	if (visible) {
 		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
@@ -208,11 +219,12 @@ static void showBootPrompt(int row, bool visible)
 				printf( bootRescanPrompt );
 			} else {
 				printf( bootPrompt );
+                printf( gBootArgs );
 			}
 		}
 	} else {
-		if (bootArgs->Video.v_display == GRAPHICS_MODE) {
-			clearGraphicBootPrompt();
+		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+//			clearGraphicBootPrompt();
 		} else {
 			printf("Press Enter to start up the foreign OS. ");
 		}
@@ -230,34 +242,35 @@ static void updateBootArgs( int key )
         case kBackspaceKey:
             if ( gBootArgsPtr > gBootArgs )
             {
+                *--gBootArgsPtr = '\0';
+
                 int x, y, t;
                 getCursorPositionAndType( &x, &y, &t );
                 if ( x == 0 && y )
                 {
                     x = 80; y--;
                 }
-                if (x)
-					x--;
+                if (x) x--;
+                
 				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 				{
 					setCursorPosition( x, y, 0 );
 					putca(' ', 0x07, 1);
-				} else
-					updateGraphicBootPrompt(kBackspaceKey);
-			
-				*gBootArgsPtr-- = '\0';
-			}
-            
+				}
+                else
+                {
+                    updateGraphicBootPrompt();
+                }
+            }            
 			break;
 
         default:
             if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
             {
-				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
-					putchar(key);  // echo to screen
-				else
-					updateGraphicBootPrompt(key);
-			*gBootArgsPtr++ = key;
+                *gBootArgsPtr++ = key;
+                
+                if( bootArgs->Video.v_display != VGA_TEXT_MODE ) updateGraphicBootPrompt();
+                else if ( key >= ' ' && key < 0x7f) putchar(key);
 			}
             
 			break;
@@ -310,11 +323,11 @@ static void showMenu( const MenuItem * items, int count,
     gMenuHeight		= height;
     gMenuItemCount	= count;
     gMenuTop		= 0;
-    gMenuBottom		= min( count, height ) - 1;
+    gMenuBottom		= MIN( count, height ) - 1;
     gMenuSelection	= selection;
 
     gMenuStart		= 0;
-    gMenuEnd	    = min( count, gui.maxdevices ) - 1;
+    gMenuEnd	    = MIN( count, gui.maxdevices ) - 1;
 	
 	// If the selected item is not visible, shift the list down.
 
@@ -332,7 +345,7 @@ static void showMenu( const MenuItem * items, int count,
 	
 	// Draw the visible items.
 
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 	
 		drawDeviceList(gMenuStart, gMenuEnd, gMenuSelection);
 
@@ -369,7 +382,7 @@ static int updateMenu( int key, void ** paramPtr )
     if ( gMenuItems == NULL )
 		return 0;
 
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 	{
 		int res;
 		
@@ -434,22 +447,19 @@ static int updateMenu( int key, void ** paramPtr )
 					case BOOT_VERBOSE:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'v';
+						addBootArg(kVerboseModeFlag);
 						break;
 						
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 'x';
+						addBootArg(kIgnoreCachesFlag);
 						break;
 						
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
-						*gBootArgsPtr++ = '-';
-						*gBootArgsPtr++ = 's';
+						addBootArg(kSingleUserModeFlag);
 						break;
 				}
 				
@@ -689,16 +699,18 @@ int getBootOptions(bool firstRun)
 	}
 
 	// ensure we're in graphics mode if gui is setup
-	if (gui.initialised) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			setVideoMode(GRAPHICS_MODE, 0);
-		}
+	if (firstRun && gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
+		setVideoMode(GRAPHICS_MODE, 0);
 	}
+
+	// Clear command line boot arguments
+	clearBootArgs();
 
 	// Allow user to override default timeout.
 	if (multiboot_timeout_set) {
 		timeout = multiboot_timeout;
-	} else if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->bootConfig)) {
+	} else if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->chameleonConfig)) {
 		/*  If there is no timeout key in the file use the default timeout
 		    which is different for CDs vs. hard disks.  However, if not booting
 		    a CD and no config file could be loaded set the timeout
@@ -724,32 +736,27 @@ int getBootOptions(bool firstRun)
 		gBootMode |= kBootModeSafe;
 	}
 
-	// If user typed F8, abort quiet mode, and display the menu.
-	{
-		bool f8press = false, spress = false, vpress = false;
-		int key;
-		while (readKeyboardStatus()) {
-			key = bgetc ();
-			if (key == 0x4200) f8press = true;
-			if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
-			if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
-		}
-		if (f8press) {
-			gBootMode &= ~kBootModeQuiet;
-			timeout = 0;
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && vpress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 'v';
-		}
-		if ((gBootMode & kBootModeQuiet) && firstRun && spress && (gBootArgsPtr + 3 < gBootArgsEnd)) {
-			*(gBootArgsPtr++) = ' ';
-			*(gBootArgsPtr++) = '-';
-			*(gBootArgsPtr++) = 's';
-		}	
+	// Checking user pressed keys
+	bool f8press = false, spress = false, vpress = false;
+	while (readKeyboardStatus()) {
+		key = bgetc ();
+		if (key == 0x4200) f8press = true;
+		if ((key & 0xff) == 's' || (key & 0xff) == 'S') spress = true;
+		if ((key & 0xff) == 'v' || (key & 0xff) == 'V') vpress = true;
 	}
-	clearBootArgs();
+	// If user typed F8, abort quiet mode, and display the menu.
+	if (f8press) {
+		gBootMode &= ~kBootModeQuiet;
+		timeout = 0;
+	}
+	// If user typed 'v' or 'V', boot in verbose mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && vpress) {
+		addBootArg(kVerboseModeFlag);
+	}
+	// If user typed 's' or 'S', boot in single user mode.
+	if ((gBootMode & kBootModeQuiet) && firstRun && spress) {
+		addBootArg(kSingleUserModeFlag);
+	}
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setCursorPosition(0, 0, 0);
@@ -766,28 +773,24 @@ int getBootOptions(bool firstRun)
 	// When booting from CD, default to hard drive boot when possible. 
 	if (isCDROM && firstRun) {
 		const char *val;
-		char *prompt;
-		char *name;
+		char *prompt = NULL;
+		char *name = NULL;
 		int cnt;
 		int optionKey;
 
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig)) {
-			cnt += 1;
-			prompt = malloc(cnt);
-			strlcpy(prompt, val, cnt);
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->chameleonConfig)) {
+			prompt = malloc(cnt + 1);
+			strncat(prompt, val, cnt);
 		} else {
 			name = malloc(80);
-			getBootVolumeDescription(gBootVolume, name, 80, false);
+			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
 			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
 			free(name);
-			cnt = 0;
 		}
 
-		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig )) {
+		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->chameleonConfig )) {
 			// The key specified is a special key.
-		} else if (getValueForKey( kCDROMOptionKey, &val, &cnt, &bootInfo->bootConfig ) && cnt >= 1) {
-			optionKey = val[0];
 		} else {
 			// Default to F8.
 			optionKey = 0x4200;
@@ -802,7 +805,7 @@ int getBootOptions(bool firstRun)
 			key = optionKey;
 		}
 
-		if (cnt) {
+		if (prompt != NULL) {
 			free(prompt);
 		}
 
@@ -854,7 +857,7 @@ int getBootOptions(bool firstRun)
 		// Associate a menu item for each BVRef.
 		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next) {
 			if (bvr->visible) {
-				getBootVolumeDescription(bvr, menuItems[i].name, 80, true);
+				getBootVolumeDescription(bvr, menuItems[i].name, sizeof(menuItems[i].name) - 1, true);
 				menuItems[i].param = (void *) bvr;
 				if (bvr == menuBVR) {
 					selectIndex = i;
@@ -864,17 +867,16 @@ int getBootOptions(bool firstRun)
 		}
 	}
 
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 		// redraw the background buffer
 		gui.logo.draw = true;
 		drawBackground();
 		gui.devicelist.draw = true;
 		gui.redraw = true;
 		if (!(gBootMode & kBootModeQuiet)) {
-			bool showBootBanner = true;
  
 			// Check if "Boot Banner"=N switch is present in config file.
-			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
+			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->chameleonConfig); 
 			if (showBootBanner) {
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
@@ -897,7 +899,7 @@ int getBootOptions(bool firstRun)
 			printf("Use \30\31 keys to select the startup volume.");
 		}
 		showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-		nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+		nextRow += MIN( gDeviceCount, kMenuMaxItems ) + 3;
 	}
 
 	// Show the boot prompt.
@@ -905,13 +907,13 @@ int getBootOptions(bool firstRun)
 	showBootPrompt( nextRow, showPrompt );
 	
 	do {
-		if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 			// redraw background
 			memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 			// reset cursor co-ords
 			gui.debug.cursor = pos( gui.screen.width - 160 , 10 );
 		}
-		key = getc();
+		key = getchar();
 		updateMenu( key, (void **) &menuBVR );
 		newShowPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 
@@ -942,13 +944,13 @@ int getBootOptions(bool firstRun)
 				* TODO: this needs to be refactored.
 				*/
 				if (strcmp( booterCommand, "video" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+					if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 						showInfoBox(getVBEInfoString(), getVBEModeInfoString());
 					} else {
 						printVBEModeInfo();
 					}
 				} else if ( strcmp( booterCommand, "memory" ) == 0) {
-					if (bootArgs->Video.v_display == GRAPHICS_MODE ) {
+					if (bootArgs->Video.v_display != VGA_TEXT_MODE ) {
 						showInfoBox("Memory Map", getMemoryInfoString());
 					} else {
 						printMemoryInfo();
@@ -1003,7 +1005,7 @@ int getBootOptions(bool firstRun)
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
 			if (useGUI) {
-				if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+				if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1022,7 +1024,7 @@ int getBootOptions(bool firstRun)
 					if (gDeviceCount) {
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
-						nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
+						nextRow += MIN(gDeviceCount, kMenuMaxItems) + 3;
 					}
 
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
@@ -1032,6 +1034,7 @@ int getBootOptions(bool firstRun)
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
 					updateVRAM();
+                    updateGraphicBootPrompt();
 				}
 			}
 			key = 0;
@@ -1111,7 +1114,7 @@ processBootArgument(
     } else if (getValueForBootKey(kernelFlags, argName, &val, &cnt)) {
         // Don't copy; these values will be copied at the end of argument processing.
         found = true;
-    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->bootConfig)) {
+    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig)) {
         copyArgument(argName, val, cnt, argP, cntRemainingP);
         found = true;
     }
@@ -1180,9 +1183,9 @@ processBootOptions()
 
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
-    // This is not a mandatory opeartion anymore.
 
-    loadOverrideConfig(&bootInfo->overrideConfig);
+    loadSystemConfig(&bootInfo->bootConfig);    
+    loadChameleonConfig(&bootInfo->chameleonConfig);
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.
@@ -1193,18 +1196,17 @@ processBootOptions()
 
     gOverrideKernel = false;
     if (( kernel = extractKernelName((char **)&cp) )) {
-        strcpy( bootInfo->bootFile, kernel );
-        gOverrideKernel = true;
+        strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
             strlcpy( bootInfo->bootFile, val, cnt+1 );
-            if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
-                gOverrideKernel = true;
-            }
         } else {
-            strcpy( bootInfo->bootFile, kDefaultKernel );
+            strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
         }
     }
+	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
+		gOverrideKernel = true;
+	}
 
     cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
     argP = bootArgs->CommandLine;
@@ -1237,17 +1239,18 @@ processBootOptions()
             uuidSet = true;
         	}
         }
-
+        
         if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
             verbose("Setting boot-uuid to: %s\n", uuidStr);
             copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
             uuidSet = true;
         }
+         
     }
 
     if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
         cnt = 0;
-        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) {
+        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
             valueBuffer[0] = '*';
             cnt++;
             strlcpy(valueBuffer + 1, val, cnt);
@@ -1307,17 +1310,21 @@ processBootOptions()
 
 	if(!shouldboot)
 	{
-		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->bootConfig ) ||
-			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->bootConfig );
+		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
+			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
-		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->bootConfig ) ) ?
+		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
+
+        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
+            gBootMode = kBootModeSafe;
+       }
 	}
 
 	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
-	{
 		strlcpy(gMKextName, val, cnt + 1);
-	}
+	else
+		gMKextName[0]=0;
 
     free(configKernelFlags);
     free(valueBuffer);
@@ -1329,17 +1336,23 @@ processBootOptions()
 //==========================================================================
 // Load the help file and display the file contents on the screen.
 
-static void showTextBuffer(char *buf, int size)
+void showTextBuffer(char *buf_orig, int size)
 {
 	char	*bp;
+	char* buf;
 	int	line;
 	int	line_offset;
 	int	c;
 
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
-		showInfoBox( "Press q to quit\n",buf );
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+		showInfoBox( "Press q to continue, space for next page.\n",buf_orig );
 		return;
 	}
+	
+		// Create a copy so that we don't mangle the original
+		buf = malloc(size + 1);
+		memcpy(buf, buf_orig, size);
+	
 
         bp = buf;
         while (size-- > 0) {
@@ -1379,7 +1392,7 @@ static void showTextBuffer(char *buf, int size)
 			printf("[Type %s%sq to quit viewer]", (line_offset > 0) ? "p for previous page, " : "", (*bp != '\1') ? "space for next page, " : "");
 		}
 
-		c = getc();
+		c = getchar();
 		if (c == 'q' || c == 'Q') {
 			break;
 		}
@@ -1399,7 +1412,7 @@ static void showTextBuffer(char *buf, int size)
 
 void showHelp(void)
 {
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
 	} else {
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
@@ -1446,7 +1459,7 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Typical boot devices are 80 (First HD), 81 (Second HD)\n");
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
-		key = getc();
+		key = getchar();
 		switch (key & kASCIIKeyMask) {
 		case kBackspaceKey:
 			if (digitsI > 0) {
@@ -1482,7 +1495,7 @@ int selectAlternateBootDevice(int bootdevice)
 
 		default:
 			if (isxdigit(key & kASCIIKeyMask) && digitsI < 2) {
-				putc(key & kASCIIKeyMask);
+				putchar(key & kASCIIKeyMask);
 				digits[digitsI++] = key & kASCIIKeyMask;
 			} else {
 				// TODO: Beep or something
@@ -1497,7 +1510,7 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getc() == kReturnKey) {
+	if (getchar() == kReturnKey) {
 		return true;
 	} else {
 		return false;

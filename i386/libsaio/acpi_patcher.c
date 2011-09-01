@@ -89,71 +89,35 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 /** The folowing ACPI Table search algo. should be reused anywhere needed:*/
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
-	int fd=0;
-	const char * overriden_pathname=NULL;
-	static char dirspec[512]="";
-	static bool first_time =true; 
-	int len=0;
+	int fd = 0;
+	char dirSpec[512] = "";
 	
-	/// Take in accound user overriding if it's DSDT only
-	if (strstr(filename, "DSDT") && 
-		getValueForKey(kDSDT, &overriden_pathname, &len,  
-					   &bootInfo->bootConfig))
-    {
-		sprintf(dirspec, "%s", overriden_pathname);
-		fd=open (dirspec,0);
-		if (fd>=0) goto success_fd;
-    }
-	// Check that dirspec is not already assigned with a path
-	if (!first_time && *dirspec) 
-	{ // it is so start searching this cached patch first
-		//extract path
-		for (len=strlen(dirspec)-1; len; len--)
-			if (dirspec[len]=='/' || len==0)
-			{
-				dirspec[len]='\0';
-				break;
-			}
-		// now concat with the filename
-		strncat(dirspec, "/", sizeof(dirspec));
-		strncat(dirspec, filename, sizeof(dirspec));
-		// and test to see if we don't have our big boy here:
-		fd=open (dirspec,0);
-		if (fd>=0) 
+	// Try finding 'filename' in the usual places
+	// Start searching any potential location for ACPI Table
+	sprintf(dirSpec, "%s", filename); 
+	fd = open(dirSpec, 0);
+	if (fd < 0)
+	{	
+		sprintf(dirSpec, "/Extra/%s", filename); 
+		fd = open(dirSpec, 0);
+		if (fd < 0)
 		{
-			// printf("ACPI file search cache hit: file found at %s\n", dirspec);
-			goto success_fd;
+			sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
+			fd = open(dirSpec, 0);
 		}
 	}
-	// Start searching any potential location for ACPI Table
-	// search the Extra folders first
-	sprintf(dirspec,"/Extra/%s",filename); 
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
-	
-	sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
-	
-	sprintf(dirspec, "%s", filename); // search current dir
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
-	
-	sprintf(dirspec, "/%s", filename); // search root
-	fd=open (dirspec,0);
-	if (fd>=0) goto success_fd;
-	
-	// NOT FOUND:
-	//verbose("ACPI Table not found: %s\n", filename);
-	if (outDirspec) *outDirspec = "";
-	first_time = false;
-	return -1;
-	// FOUND
-success_fd:
-	first_time = false;
-	if (outDirspec) *outDirspec = dirspec; 
+
+	if (fd < 0)
+	{
+		// NOT FOUND:
+		verbose("ACPI table not found: %s\n", filename);
+		*dirSpec = '\0';
+	}
+
+	if (outDirspec) *outDirspec = dirSpec; 
 	return fd;
 }
+
 
 void *loadACPITable (const char * filename)
 {
@@ -188,6 +152,7 @@ void *loadACPITable (const char * filename)
 
 uint8_t	acpi_cpu_count = 0;
 char* acpi_cpu_name[32];
+uint32_t acpi_cpu_p_blk = 0;
 
 void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 {
@@ -220,6 +185,9 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				acpi_cpu_name[acpi_cpu_count] = malloc(4);
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
+                
+                if (acpi_cpu_count == 0)
+                    acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
 				
 				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
 				
@@ -237,16 +205,23 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
 		0x43, 0x70, 0x75, 0x43, 0x73, 0x74, 0x00, 0x00, /* CpuCst.. */
 		0x00, 0x10, 0x00, 0x00, 0x49, 0x4E, 0x54, 0x4C, /* ....INTL */
-		0x31, 0x03, 0x10, 0x20 							/* 1.._		*/
+		0x31, 0x03, 0x10, 0x20							/* 1.._		*/
 	};
 	
-	char cstate_resource_template[] = 
+	char resource_template_register_fixedhw[] =
 	{
-		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F, 
-		0x01, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 
-		0x00, 0x00, 0x00, 0x79, 0x00
+		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F,
+		0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x01, 0x79, 0x00
 	};
-
+	
+	char resource_template_register_systemio[] =
+	{
+		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x01,
+		0x08, 0x00, 0x00, 0x15, 0x04, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x79, 0x00,
+	};
+	
 	if (Platform.CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
@@ -264,81 +239,144 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		return NULL;
 	}
 	
-	if (acpi_cpu_count == 0) 
+	if (acpi_cpu_count == 0)
 		get_acpi_cpu_names((void*)dsdt, dsdt->Length);
 	
-	if (acpi_cpu_count > 0) 
+	if (acpi_cpu_count > 0)
 	{
-		bool c2_enabled = fadt->C2_Latency < 100;
-		bool c3_enabled = fadt->C3_Latency < 1000;
+		bool c2_enabled = false;
+		bool c3_enabled = false;
 		bool c4_enabled = false;
+		bool cst_using_systemio = false;
 		
-		getBoolForKey(kEnableC4States, &c4_enabled, &bootInfo->bootConfig);
-
+		getBoolForKey(kEnableC2State, &c2_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC3State, &c3_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC4State, &c4_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kCSTUsingSystemIO, &cst_using_systemio, &bootInfo->chameleonConfig);
+		
+		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);
+		c3_enabled = c3_enabled | (fadt->C3_Latency < 1000);
+		
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
 		
 		struct aml_chunk* root = aml_create_node(NULL);
-			aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
-			struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
-				struct aml_chunk* name = aml_add_name(scop, "CST_");
-					struct aml_chunk* pack = aml_add_package(name);
-						aml_add_byte(pack, cstates_count);
+		aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
+		struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
+		struct aml_chunk* name = aml_add_name(scop, "CST_");
+		struct aml_chunk* pack = aml_add_package(name);
+		aml_add_byte(pack, cstates_count);
 		
-						struct aml_chunk* tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x00; // C1
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x01); // C1
-							aml_add_byte(tmpl, 0x01); // Latency
-							aml_add_word(tmpl, 0x03e8); // Power
-
-						// C2
-						if (c2_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-								cstate_resource_template[11] = 0x10; // C2
-								aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-								aml_add_byte(tmpl, 0x02); // C2
-								aml_add_byte(tmpl, fadt->C2_Latency);
-								aml_add_word(tmpl, 0x01f4); // Power
-						}
-						// C4
-						if (c4_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x30; // C4
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x04); // C4
-							aml_add_word(tmpl, fadt->C3_Latency / 2); // TODO: right latency for C4
-							aml_add_byte(tmpl, 0xfa); // Power
-						}
-						else
-						// C3
-						if (c3_enabled) 
-						{
-							tmpl = aml_add_package(pack);
-							cstate_resource_template[11] = 0x20; // C3
-							aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-							aml_add_byte(tmpl, 0x03); // C3
-							aml_add_word(tmpl, fadt->C3_Latency);
-							aml_add_word(tmpl, 0x015e); // Power
-						}
-						
+		struct aml_chunk* tmpl = aml_add_package(pack);
+		if (cst_using_systemio)
+		{
+			// C1
+			resource_template_register_fixedhw[8] = 0x00;
+			resource_template_register_fixedhw[9] = 0x00;
+			resource_template_register_fixedhw[18] = 0x00;
+			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+			aml_add_byte(tmpl, 0x01); // C1
+			aml_add_word(tmpl, 0x0001); // Latency
+			aml_add_dword(tmpl, 0x000003e8); // Power
 			
-			// Aliaces
-			int i;
-			for (i = 0; i < acpi_cpu_count; i++) 
+			uint8_t p_blk_lo, p_blk_hi;
+			
+			if (c2_enabled) // C2
 			{
-				char name[9];
-				sprintf(name, "_PR_%c%c%c%c", acpi_cpu_name[i][0], acpi_cpu_name[i][1], acpi_cpu_name[i][2], acpi_cpu_name[i][3]);
+				p_blk_lo = acpi_cpu_p_blk + 4;
+				p_blk_hi = (acpi_cpu_p_blk + 4) >> 8;
 				
-				scop = aml_add_scope(root, name);
-					aml_add_alias(scop, "CST_", "_CST");
+				tmpl = aml_add_package(pack);
+				resource_template_register_systemio[11] = p_blk_lo; // C2
+				resource_template_register_systemio[12] = p_blk_hi; // C2
+				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+				aml_add_byte(tmpl, 0x02); // C2
+				aml_add_word(tmpl, 0x0040); // Latency
+				aml_add_dword(tmpl, 0x000001f4); // Power
 			}
+			
+			if (c4_enabled) // C4
+			{
+				p_blk_lo = acpi_cpu_p_blk + 5;
+				p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+				
+				tmpl = aml_add_package(pack);
+				resource_template_register_systemio[11] = p_blk_lo; // C4
+				resource_template_register_systemio[12] = p_blk_hi; // C4
+				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+				aml_add_byte(tmpl, 0x04); // C4
+				aml_add_word(tmpl, 0x0080); // Latency
+				aml_add_dword(tmpl, 0x000000C8); // Power
+			}
+			else if (c3_enabled) // C3
+			{
+				p_blk_lo = acpi_cpu_p_blk + 5;
+				p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+				
+				tmpl = aml_add_package(pack);
+				resource_template_register_systemio[11] = p_blk_lo; // C3
+				resource_template_register_systemio[12] = p_blk_hi; // C3
+				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+				aml_add_byte(tmpl, 0x03);			// C3
+				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_dword(tmpl, 0x0000015e);	// Power
+			}
+		}
+		else
+		{
+			// C1
+			resource_template_register_fixedhw[11] = 0x00; // C1
+			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+			aml_add_byte(tmpl, 0x01);			// C1
+			aml_add_word(tmpl, 0x0001);			// Latency
+			aml_add_dword(tmpl, 0x000003e8);	// Power
+			
+			resource_template_register_fixedhw[18] = 0x03;
+			
+			if (c2_enabled) // C2
+			{
+				tmpl = aml_add_package(pack);
+				resource_template_register_fixedhw[11] = 0x10; // C2
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x02);			// C2
+				aml_add_word(tmpl, 0x0040);			// Latency
+				aml_add_dword(tmpl, 0x000001f4);	// Power
+			}
+			
+			if (c4_enabled) // C4
+			{
+				tmpl = aml_add_package(pack);
+				resource_template_register_fixedhw[11] = 0x30; // C4
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x04);			// C4
+				aml_add_word(tmpl, 0x0080);			// Latency
+				aml_add_dword(tmpl, 0x000000C8);	// Power
+			}
+			else if (c3_enabled)
+			{
+				tmpl = aml_add_package(pack);
+				resource_template_register_fixedhw[11] = 0x20; // C3
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x03);			// C3
+				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_dword(tmpl, 0x0000015e);	// Power
+			}
+		}
+		
+		// Aliaces
+		int i;
+		for (i = 0; i < acpi_cpu_count; i++) 
+		{
+			char name[9];
+			sprintf(name, "_PR_%c%c%c%c", acpi_cpu_name[i][0], acpi_cpu_name[i][1], acpi_cpu_name[i][2], acpi_cpu_name[i][3]);
+			
+			scop = aml_add_scope(root, name);
+				aml_add_alias(scop, "CST_", "_CST");
+		}
 		
 		aml_calculate_size(root);
 		
 		struct acpi_2_ssdt *ssdt = (struct acpi_2_ssdt *)AllocateKernelMemory(root->Size);
-	
+		
 		aml_write_node(root, (void*)ssdt, 0);
 		
 		ssdt->Length = root->Size;
@@ -348,16 +386,16 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		aml_destroy_node(root);
 		
 		//dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt->Length);
-				
+		
 		verbose ("SSDT with CPU C-States generated successfully\n");
 		
 		return ssdt;
 	}
-	else 
+	else
 	{
 		verbose ("ACPI CPUs not found: C-States not generated !!!\n");
 	}
-
+	
 	return NULL;
 }
 
@@ -396,11 +434,11 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			{
 				switch (Platform.CPU.Model) 
 				{
-					case 0x0D: // ?
-					case CPU_MODEL_YONAH: // Yonah
-					case CPU_MODEL_MEROM: // Merom
-					case CPU_MODEL_PENRYN: // Penryn
-					case CPU_MODEL_ATOM: // Intel Atom (45nm)
+					case CPU_MODEL_DOTHAN:	// Intel Pentium M
+					case CPU_MODEL_YONAH:	// Intel Mobile Core Solo, Duo
+					case CPU_MODEL_MEROM:	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPU_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+					case CPU_MODEL_ATOM:	// Intel Atom (45nm)
 					{
 						bool cpu_dynamic_fsb = false;
 						
@@ -465,7 +503,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						if (maximum.CID < minimum.CID) 
 						{
 							DBG("Insane FID values!");
-							p_states_count = 1;
+							p_states_count = 0;
 						}
 						else
 						{
@@ -515,14 +553,46 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 							
 							p_states_count -= invalid;
 						}
-					} break;
-					case CPU_MODEL_FIELDS:
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:
-					case CPU_MODEL_NEHALEM: 
-					case CPU_MODEL_NEHALEM_EX:
-					case CPU_MODEL_WESTMERE:
-					case CPU_MODEL_WESTMERE_EX:
+						
+						break;
+					} 
+					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPU_MODEL_DALES:		
+					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
+					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPU_MODEL_SANDY:		// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_SANDY_XEON:	// Intel Xeon E3
+					{
+						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
+						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+						
+						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
+						
+						// Sanity check
+						if (maximum.Control < minimum.Control) 
+						{
+							DBG("Insane control values!");
+							p_states_count = 0;
+						}
+						else
+						{
+							uint8_t i;
+							p_states_count = 0;
+							
+							for (i = maximum.Control; i >= minimum.Control; i--) 
+							{
+								p_states[p_states_count].Control = i;
+								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
+								p_states[p_states_count].Frequency = (Platform.CPU.FSBFrequency / 1000000) * i;
+								p_states_count++;
+							}
+						}
+						
+						break;
+					}	
 					default:
 						verbose ("Unsupported CPU: P-States not generated !!!\n");
 						break;
@@ -602,7 +672,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Restart Fix
 	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
 	} else {
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
@@ -624,7 +694,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 	// Determine system type / PM_Model
-	if ( (value=getStringForKey(kSystemType, &bootInfo->bootConfig))!=NULL)
+	if ( (value=getStringForKey(kSystemType, &bootInfo->chameleonConfig))!=NULL)
 	{
 		if (Platform.Type > 6)  
 		{
@@ -706,9 +776,23 @@ int setupAcpi(void)
 {
 	int version;
 	void *new_dsdt;
+
+	const char *filename;
+	char dirSpec[128];
+	int len = 0;
+
+	// Try using the file specified with the DSDT option
+	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
+	{
+		sprintf(dirSpec, filename);
+	}
+	else
+	{
+		sprintf(dirSpec, "DSDT.aml");
+	}
 	
 	// Load replacement DSDT
-	new_dsdt=loadACPITable("DSDT.aml");
+	new_dsdt = loadACPITable(dirSpec);
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
 	 {
@@ -722,9 +806,9 @@ int setupAcpi(void)
 	// SSDT Options
 	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false; 
 	
-	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->bootConfig);
-	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->bootConfig);
-	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->bootConfig);
+	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
+	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
+	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
 	
 	{
 		int i;
@@ -1043,7 +1127,7 @@ int setupAcpi(void)
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
-	getc();
+	getchar();
 #endif
 	return 1;
 }

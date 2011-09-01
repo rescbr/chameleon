@@ -45,6 +45,8 @@ static unsigned int findpciroot(unsigned char * dsdt,int len)
 
 int getPciRootUID(void)
 {
+	char dsdt_dirSpec[128];
+
 	void *new_dsdt;
 	const char *val;
 	int len,fsize;
@@ -54,26 +56,37 @@ int getPciRootUID(void)
 	if (rootuid < 10) return rootuid;
 	rootuid = 0;	/* default uid = 0 */
 
-	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->bootConfig)) {
+	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->chameleonConfig)) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
 	/* Chameleon compatibility */
-	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->bootConfig)) {
+	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->chameleonConfig)) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
 	/* PCEFI compatibility */
-	else if (getValueForKey("-pci0", &val, &len, &bootInfo->bootConfig)) {
+	else if (getValueForKey("-pci0", &val, &len, &bootInfo->chameleonConfig)) {
 		rootuid = 0;
 		goto out;
 	}
-	else if (getValueForKey("-pci1", &val, &len, &bootInfo->bootConfig)) {
+	else if (getValueForKey("-pci1", &val, &len, &bootInfo->chameleonConfig)) {
 		rootuid = 1;
 		goto out;
 	}
 
-	int fd = search_and_get_acpi_fd("DSDT.aml", &dsdt_filename);
+	
+	// Try using the file specified with the DSDT option
+	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
+	{
+		sprintf(dsdt_dirSpec, dsdt_filename);
+	}
+	else
+	{
+		sprintf(dsdt_dirSpec, "DSDT.aml");
+	}
+	
+	int fd = search_and_get_acpi_fd(dsdt_dirSpec, &dsdt_filename);
 
 	// Check booting partition
 	if (fd<0)

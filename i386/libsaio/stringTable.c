@@ -28,6 +28,7 @@
 
 #include "bootstruct.h"
 #include "libsaio.h"
+#include "boot.h"
 #include "xml.h"
 
 extern char *Language;
@@ -322,12 +323,19 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
 	}
 	if ((strlen(match) == key_len)
 	    && strncmp(match, key, key_len) == 0) {
-	    *matchval = value;
+		// create a new string
+		char* newstr = malloc(value_len + 1);
+		strncpy(newstr, value, value_len);
+		newstr[value_len] = 0;
+		
+	    *matchval = newstr;
 	    *len = value_len;
 	    retval = true;
             /* Continue to look for this key; last one wins. */
 	}
     }
+	
+
     return retval;
 }
 
@@ -496,14 +504,16 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 
   if (config->canOverride)
   {
-    if (getValueForConfigTableKey(&bootInfo->overrideConfig, key, &overrideVal, &overrideSize))
+    if (getValueForConfigTableKey(&bootInfo->chameleonConfig, key, &overrideVal, &overrideSize))
     {
       override = true;
 
-      if (ret && (strcmp(key, "Kernel") == 0) && (strcmp(overrideVal, "mach_kernel") == 0))
+      // NOTE: Values are defined by apple as being in com.apple.Boot.plist
+      //        kHelperRootUUIDKey, kKernelArchKey, kMKextCacheKey, kKernelCacheKey, kKernelNameKey, kKernelFlagsKey
+      if (ret && (strcmp(key, kKernelNameKey) == 0) && (overrideSize == 0))
         override = false;
 
-      if (ret && (strcmp(key, "Kernel Flags") == 0) && (overrideSize == 0))
+      if (ret && (strcmp(key, kKernelFlagsKey) == 0) && (overrideSize == 0))
         override = false;
 
       if (override)
@@ -607,12 +617,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"/Extra/com.apple.Boot.plist",
-		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 
 	int i, fd, count, ret=-1;
@@ -636,23 +641,25 @@ int loadSystemConfig(config_file_t *config)
 			break;
 		}
 	}
+	if(ret == -1) ret = loadHelperConfig(config);
 	return ret;
 }
 
-/* loadOverrideConfig
+/* loadChameleonConfig
  *
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadOverrideConfig(config_file_t *config)
+int loadChameleonConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",
-		"/Extra/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+		"rd(0,0)/Extra/org.chameleon.Boot.plist",
+		"/Extra/org.chameleon.Boot.plist",
+		"bt(0,0)/Extra/org.chameleon.Boot.plist",
+		
+		"rd(0,0)/Extra/com.apple.Boot.plist",   /* DEPRECIATED */
+		"/Extra/com.apple.Boot.plist",           /* DEPRECIATED */
+		"bt(0,0)/Extra/com.apple.Boot.plist",   /* DEPRECIATED */
 	};
 
 	int i, fd, count, ret=-1;
@@ -661,6 +668,14 @@ int loadOverrideConfig(config_file_t *config)
 	{
 		if ((fd = open(dirspec[i], 0)) >= 0)
 		{
+            // Check for depreciated file names and annoy the user about it.
+            if(strstr(dirspec[i], "com.apple.Boot.plist"))
+            {
+                printf("%s is depreciated.\n", dirspec[i]);
+                dirspec[i][strlen(dirspec[i]) - strlen("com.apple.Boot.plist")] = 0;
+                printf("Please use the file %sorg.chameleon.Boot.plist instead.\n", dirspec[i]);
+                pause();
+            }
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 			close(fd);

@@ -58,27 +58,28 @@
     "Preboot" ramdisk support added by David Elliott
  */
 
-#include <AvailabilityMacros.h>
 
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
+#include "disk.h"
 #include "ramdisk.h"
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-# include <Kernel/libkern/crypto/md5.h>
-#else
-# include <sys/md5.h>
-#endif
-#include <uuid/uuid.h>
+#include "xml.h"
+
+#include <libkern/crypto/md5.h>
+//#include <uuid/uuid.h>
+
 #if 0 /* No OS X release has ever included this. */
 #include <Kernel/uuid/namespace.h>
 #else
-/* copied from uuid/namespace.h, just like BootX's fs.c does. */
-UUID_DEFINE( kFSUUIDNamespaceSHA1, 0xB3, 0xE2, 0x0F, 0x39, 0xF2, 0x92, 0x11, 0xD6, 0x97, 0xA4, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC );
+// from our uuid/namespace.h (UFS and HFS uuids can live in the same space?)
+static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC};
 #endif
 
 extern int multiboot_partition;
 extern int multiboot_partition_set;
+extern int multiboot_skip_partition;
+extern int multiboot_skip_partition_set;
 
 struct devsw {
     const char *  name;
@@ -336,6 +337,7 @@ long GetFileInfo(const char * dirSpec, const char * name,
 
         for (idx = len; idx && (name[idx] != '/' && name[idx] != '\\'); idx--) {}
         if (idx == 0) {
+            if(name[idx] == '/' || name[idx] == '\\') ++name;   // todo: ensure other functions handel \ properly
             gMakeDirSpec[0] = '/';
             gMakeDirSpec[1] = '\0';
         } else {
@@ -452,7 +454,7 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 		if ((iob[i].i_flgs != F_ALLOC) || (i == fdesc)) {
 			continue;
 		}
-		io->i_buf = max(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
+		io->i_buf = MAX(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
 	}
 
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
@@ -479,13 +481,13 @@ int open(const char *path, int flags)
 
 int open_bvdev(const char *bvd, const char *path, int flags)
 {
-        const struct devsw	*dp;
-	const char		*cp;
-	BVRef			bvr;
-	int			i;
-	int			len;
-	int			unit;
-	int			partition;
+    const struct devsw	*dp;
+	const char			*cp;
+	BVRef				bvr;
+	int					i;
+	int					len;
+	int					unit;
+	int					partition;
 
 	if ((i = open(path, flags)) >= 0) {
 		return i;
@@ -518,7 +520,7 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 			bvr = newBootVolumeRef(dp->biosdev + unit, partition);
 			return open_bvr(bvr, path, flags);
 		}
-        }
+    }
 	return -1;
 }
 
@@ -819,32 +821,20 @@ BVRef selectBootVolume( BVRef chain )
 				return bvr;
 	
 	/*
-	 * Checking "Default Partition" key in system configuration - use format: hd(x,y) or the volume UUID -
+	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
-	const char * val;
-	char testStr[64];
-	int cnt;
-	
-	if (getValueForKey(kDefaultPartition, &val, &cnt, &bootInfo->bootConfig) && cnt >= 7 && filteredChain)
-	{
-		for ( bvr = chain; bvr; bvr = bvr->next )
-		{
-			if ( bvr->biosdev >= 0x80 && bvr->biosdev < 0x100
-				&& ( bvr->flags & ( kBVFlagSystemVolume|kBVFlagForeignBoot ) ) )
-			{
-				// Trying to match hd(x,y) format.
-				sprintf(testStr, "hd(%d,%d)", bvr->biosdev - 0x80, bvr->part_no);
-				if (strcmp(testStr, val) == 0)
-					return bvr;
-				
-				// Trying to match volume UUID.
-				if (bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0 && strcmp(testStr, val) == 0)
-					return bvr;
-			}
-		}
-	}
+	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->chameleonConfig));
+    if (val) {
+        for ( bvr = chain; bvr; bvr = bvr->next ) {
+            if (matchVolumeToString(bvr, val, false)) {
+                free(val);
+                return bvr;
+            }
+        }
+        free(val);
+    }
 	
 	/*
 	 * Scannig the volume chain backwards and trying to find 
@@ -854,6 +844,9 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	for ( bvr = chain; bvr; bvr = bvr->next )
 	{
+        if (multiboot_skip_partition_set) {
+            if (bvr->part_no == multiboot_skip_partition) continue;
+        }
 		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev ) foundPrimary = true;
 		// zhell -- Undo a regression that was introduced from r491 to 492.
 		// if gBIOSBootVolume is set already, no change is required
@@ -1075,20 +1068,24 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 //==========================================================================
 // getDeviceDescription() - Extracts unit number and partition number
 // from bvr structure into "dw(u,p)" format.
+// Returns length of the out string
 int getDeviceDescription(BVRef bvr, char *str)
 {
-	const struct devsw *dp;
-	
+    if(!str)
+        return 0;
+    
 	*str = '\0';
 
 	if (bvr)
 	{
-		for (dp = devsw; dp->name && bvr->biosdev >= dp->biosdev; dp++);
+        const struct devsw *dp = devsw;
+		while(dp->name && bvr->biosdev >= dp->biosdev)
+            dp++;
+        
 		dp--;
-		if (dp->name) sprintf(str, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
-		
-		return true;
+		if (dp->name)
+            return sprintf(str, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
 	}
 	
-	return false;
+	return 0;
 }
