@@ -289,13 +289,18 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		choices[$((choicescount++))]="<choice\n\tid=\"Themes\"\n\ttitle=\"Themes_title\"\n\tdescription=\"Themes_description\"\n>\n</choice>\n"
 		((xmlindent++))
 		packagesidentity="org.chameleon.themes"
-		artwork="${1%/*}"
-		themes=($( find "${artwork%/*}/artwork/themes" -type d -depth 1 -not -name '.svn' ))
+#		echo "work: $1" # e.g. .../trunk/sym/package
+		# replace "/sym/package" by "/artwork/themes" on "work" and save path in "artwork"
+		artwork="${1%/sym/package}/artwork/themes"
+#		echo "artwork: ${artwork}"
+		themes=($( find "${artwork}" -type d -depth 1 -not -name '.svn' ))
+#		echo "themes: ${themes[@]}"
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
 		do
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
 			mkdir -p "${1}/${theme}/Root/"
-            rsync -r --exclude=.* "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
+			# there's already a DS_store cleaner on buildpackage()
+            rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
 			# i see no need for this ??
 #			find "${1}/${theme}" -type f -exec chmod 644 {} \+
 			echo "	[BUILD] ${theme}"
@@ -349,7 +354,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	local packagename="${1##*/}"
 	local identifier=$( echo ${packagesidentity}.${packagename//_/.} | tr [:upper:] [:lower:] )
-	find "${1}" -name '.DS_Store' -delete
+	find "${1}" -name '.DS_Store' -delete #Azipkg: DS_store cleaner
 	local filecount=$( find "${1}/Root" | wc -l )
 	if [ "${3}" ]; then
 		local installedsize="${3}"
