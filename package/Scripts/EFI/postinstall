@@ -63,6 +63,7 @@ echo "-----------------------------------------------"
 echo ""
 echo ""
 
+
 bootvolume="/Volumes/$bootervolumename"
 bootdev=${bootdev%s*}s1
 bootrdev=${bootdev/disk/rdisk}
@@ -244,7 +245,7 @@ echo ""
 }
 
 
-} #Azipkg: ???
+}
 
 
 start ${3}
@@ -271,7 +272,7 @@ if [ "$( fstyp ${bootdev} | grep hfs )" ]; then
 	efiformat="hfs"
 fi
 if [ "$( fstyp ${bootdev} | grep msdos )" ]; then
-	echo "${bootdev} is currently formatted as msdos" #Azipkg: hum... it's not really msdos, but ok...
+	echo "${bootdev} is currently formatted as msdos"
 	efiformat="msdos"
 fi 
 echo "-----------------------------------------------"
@@ -372,7 +373,6 @@ echo "*****************************************************"
 #	MAKEACTIVE
 #fi
 
-#Azipkg: works for EFI, but does it work for other GPT partitions?... check, was under the impression that NO??!
 if [ ${disksignature} == "00000000" ]; then
 	# echo "Windows is not installed so let's change the active partition"
 
@@ -407,7 +407,7 @@ echo ""
 #checkpartitionbootcode check
 #checkpartitionactive
 
-#Azipkg: this forces the user to unmount the EFI part via terminal --> sudo umount /volumes/efi...?!
+
 echo "==============================================="
 echo "Mount EFI partition:"
 echo "********************"
@@ -432,7 +432,6 @@ echo "********************"
 echo "Executing command: cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" ${bootvolume}/boot"
 cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" "${bootvolume}/boot"
 echo "boot written"
-#Azipkg: we're still missing copy Extra folder into EFI, else no themes & modules...???
 
 echo "-----------------------------------------------"
 echo ""

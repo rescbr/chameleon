@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 diskloader="boot0"
 diskloaderdualboot="boot0md"
 partitionloaderhfs="boot1h"
@@ -234,7 +235,7 @@ if [ "$( fstyp ${bootdev} | grep hfs )" ]; then
 	efiformat="hfs"
 fi
 if [ "$( fstyp ${bootdev} | grep msdos )" ]; then
-	echo "${bootdev} is currently formatted as msdos" #Azipkg: hum... it's not really msdos, but ok...
+	echo "${bootdev} is currently formatted as msdos"
 	efiformat="msdos"
 fi 
 echo "-----------------------------------------------"
@@ -291,13 +292,13 @@ if ${diskupdate}; then
 
 	if [ ${disksignature} == "00000000" ]; then
 		echo "Executing command: fdisk440 -u -f /usr/standalone/i386/${diskloader} -y ${bootdisk}"
-		fdisk440 -u -f "${bootvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
+		"${bootresources}/Tools/fdisk440" -u -f "${bootvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
 	else
 		#---------------------------------------------------------------------
 		# If it exists then Windows is also installed on the HDD and we need to write boot0hfs
 		#---------------------------------------------------------------------
 		echo "Executing command: fdisk440 -u -f /usr/standalone/i386/${diskloaderdualboot} -y ${bootdisk}"
-		fdisk440 -u -f "${bootvolume}/usr/standalone/i386/${diskloaderdualboot}" -y ${bootdisk}
+		"${bootresources}/Tools/fdisk440" -u -f "${bootvolume}/usr/standalone/i386/${diskloaderdualboot}" -y ${bootdisk}
 	fi
 else
 echo "Diskupdate is false, so no stage 0 file was written"
@@ -310,18 +311,14 @@ fi
 
 if [ ${efiformat} = "msdos" ]; then
 	echo "Executing command: dd if=/usr/standalone/i386/${partitionloaderfat} of=${bootrdev}"
-	#Azipkg: just like this??... no preparation???
 	dd if="${bootvolume}/usr/standalone/i386/${partitionloaderfat}" of=${bootrdev}
 fi
 
 echo "Executing command: cp /usr/standalone/i386/${filesystemloader} ${bootvolume}"
 cp "${bootvolume}/usr/standalone/i386/${filesystemloader}" "${bootvolume}"
 
-#Azipkg: at this point, we don't know if the user has setfile installed...
-# and it looks like it's not found on "booteresources" ???
-# do we really want to hide "boot"?... i never do...! IS THIS DONE HERE ??? SEE AT THE END OF THE FILE...
-#echo "Executing command: ${bootresources}/Tools/SetFile -a V ${bootvolume}/${filesystemloader}"
-#"${bootresources}/Tools/SetFile" -a V "${bootvolume}/${filesystemloader}"
+echo "Executing command: ${bootresources}/Tools/SetFile -a V ${bootvolume}/${filesystemloader}"
+"${bootresources}/Tools/SetFile" -a V "${bootvolume}/${filesystemloader}"
 
 echo "-----------------------------------------------"
 echo ""
@@ -332,11 +329,10 @@ echo "==============================================="
 echo "Set Active Partition ONLY if Windows is not installed"
 echo "*****************************************************"
 
-#Azipkg: works for EFI, but does it work for other GPT partitions?... check, was under the impression that NO??!
 if [ ${disksignature} == "00000000" ]; then
 	# echo "Windows is not installed so let's change the active partition"
 
-	partitionactive=$( fdisk440 -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
+	partitionactive=$( "${bootresources}/Tools/fdisk440" -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
 	echo "Current Active Partition: ${partitionactive}"
 
 	if [ "${partitionactive}" = "${bootslice}" ]; then
@@ -346,7 +342,7 @@ if [ ${disksignature} == "00000000" ]; then
 		# BadAxe requires EFI partition to be flagged active.
 		# but it doesn't' hurt to do it for any non-windows partition.
 		
-		fdisk440 -e ${bootrdisk} <<-MAKEACTIVE
+		"${bootresources}/Tools/fdisk440" -e ${bootrdisk} <<-MAKEACTIVE
 		print
 		flag ${bootslice}
 		write
@@ -362,7 +358,6 @@ echo ""
 echo ""
 
 # hide boot file
-#Azipkg: do we really want to hide "boot"?... i never do...
 chflags hidden "${3}/boot"
 echo "boot file hidden ${3}/boot"
 
