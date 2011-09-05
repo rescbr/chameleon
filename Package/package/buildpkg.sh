@@ -18,11 +18,11 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
+#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
 stage=${version##*-}
-revision=$( grep I386BOOT_CHAMELEONREVISION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
-builddate=$( grep I386BOOT_BUILDDATE sym/i386/vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
+revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
+builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
 
 # =================
@@ -47,9 +47,9 @@ main ()
 
 rm -R -f "${1}"
 echo ""	
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
-echo -e $COL_BLACK"	Building $packagename Install Package"$COL_RESET
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
+echo -e $COL_RED"	----------------------------------"$COL_RESET
+echo -e $COL_RED"	Building $packagename Install Package"$COL_RESET
+echo -e $COL_RED"	----------------------------------"$COL_RESET
 echo ""
 
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
@@ -61,13 +61,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 #	mkdir -p ${1}/Core/Root/usr/sbin #Azipkg
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
-#    if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
-#        echo "Modules found."
-#        mkdir -p ${1}/Core/Root/usr/standalone/i386/modules
-#        cp -R ${1%/*}/i386/modules ${1}/Core/Root/usr/standalone/i386
-#    else
-#        echo "No found modules into dir module"
-#    fi
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0 ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0md ${1}/Core/Root/usr/standalone/i386
@@ -81,10 +74,9 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 # fixperms "${1}/Core/Root/"
 	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/local/bin #Azipkg
 	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/local/bin #Azipkg
+	# ditto --arch i386 `which SetFile` ${1}/Core/Root/usr/local/bin/SetFile
 	local coresize=$( du -hkc "${1}/Core/Root" | tail -n1 | awk {'print $1'} )
 	echo "	[BUILD] i386 "
-#Azipkg: relocatable=\"false\"  were to place it ??? needed ???
-#  $1 Path to package to build containing Root and or Scripts  $2 Install Location  $3 Size  $4 Options
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
 
 # build Chameleon package
@@ -96,7 +88,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
-		# ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
+#		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
 		echo "	[BUILD] Standard "
 		buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
@@ -105,7 +97,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
-		# ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
+#		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
 		echo "	[BUILD] EFI "
 		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
@@ -121,21 +113,16 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ###############################
                 # Supported Modules           #
                 ###############################
-                # AMDGraphicsEnabler.dylib    #
-                # ATiGraphicsEnabler.dylib    #
-                # IntelGraphicsEnabler.dylib  #
                 # klibc.dylib                 #
-                # NVIDIAGraphicsEnabler.dylib #
                 # Resolution.dylib            #
                 # uClibcxx.dylib              #
                 ###############################
         if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
         {
-            outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">"
+            outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">" #Azi module or modules ?
             choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
             ((xmlindent++))
             packagesidentity="org.chameleon.modules"
-            
 # -
             if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
             {
@@ -331,10 +318,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-#	rm -R -f "${1}" #Azipkg: don't delete sym/package - uncoment when done
+#	rm -R -f "${1}" #Azi: don't delete sym/package - uncoment when done
 
 }
 
+#Azi: not used
 fixperms ()
 {
 	# $1 path
@@ -354,7 +342,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	local packagename="${1##*/}"
 	local identifier=$( echo ${packagesidentity}.${packagename//_/.} | tr [:upper:] [:lower:] )
-	find "${1}" -name '.DS_Store' -delete #Azipkg: DS_store cleaner
+	find "${1}" -name '.DS_Store' -delete #Azi: .DS_store cleaner
 	local filecount=$( find "${1}/Root" | wc -l )
 	if [ "${3}" ]; then
 		local installedsize="${3}"
@@ -408,7 +396,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-#	rm -R -f "${1}" #Azipkg: don't delete e.g. sym/package/Core - uncoment when done
+#	rm -R -f "${1}" #Azi: don't delete e.g. sym/package/Core - uncoment when done
 fi
 }
 
@@ -453,7 +441,7 @@ makedistribution ()
 	stage=${stage/FINAL/2.0 Final}
 	perl -i -p -e "s/%CHAMELEONSTAGE%/${stage}/g" `find "${1}/${packagename}/Resources" -type f`
 
-	find "${1}/${packagename}" -name '.DS_Store' -delete
+	find "${1}/${packagename}" -name '.DS_Store' -delete #Azi: another .DS_store cleaner
 	pushd "${1}/${packagename}" >/dev/null
 	xar -c -f "${1%/*}/${packagename// /}-${version}-r${revision}.pkg" --compression none .
 	popd >/dev/null
@@ -464,8 +452,8 @@ makedistribution ()
 # ----
 #    ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
 #    DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
-#    Rez -append tempicns.rsrc -o "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
-#    SetFile -a C "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
+#    Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
+#    SetFile -a C "${1%/*}/$packagename-${version}-r$revision.pkg"
 #    rm -f tempicns.rsrc
 #    rm -rf "${pkgroot}/Icons/Icons"
 # End
@@ -474,17 +462,17 @@ makedistribution ()
 	echo "MD5 (${packagename// /}-${version}-r${revision}.pkg) = ${md5}" > "${1%/*}/${packagename// /}-${version}-r${revision}.pkg.md5"
 	echo ""	
 
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
-	echo -e $COL_BLACK"	Building process complete!"$COL_RESET
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
+	echo -e $COL_RED"	--------------------------"$COL_RESET
+	echo -e $COL_RED"	Building process complete!"$COL_RESET
+	echo -e $COL_RED"	--------------------------"$COL_RESET
 	echo ""	
-	echo -e $COL_BLACK"	Build info."
-	echo -e $COL_BLACK"	==========="
-	echo -e $COL_BLUE"	Package name:	"$COL_BLACK"$packagename-${version}-r$revision.pkg"$COL_RESET
-	echo -e $COL_BLUE"	MD5:		"$COL_BLACK"$md5"$COL_RESET
-	echo -e $COL_BLUE"	Version:	"$COL_BLACK"$version"$COL_RESET
-	echo -e $COL_BLUE"	Stage:		"$COL_BLACK"$stage"$COL_RESET
-	echo -e $COL_BLUE"	Date/Time:	"$COL_BLACK"$builddate"$COL_RESET
+	echo -e $COL_RED"	Build info."
+	echo -e $COL_RED"	==========="
+	echo -e $COL_BLUE"	Package name:	"$COL_GREEN"$packagename-${version}-r$revision.pkg"$COL_RESET
+	echo -e $COL_BLUE"	MD5:		"$COL_GREEN"$md5"$COL_RESET
+	echo -e $COL_BLUE"	Version:	"$COL_GREEN"$version"$COL_RESET
+	echo -e $COL_BLUE"	Stage:		"$COL_GREEN"$stage"$COL_RESET
+	echo -e $COL_BLUE"	Date/Time:	"$COL_GREEN"$builddate"$COL_RESET
 	echo ""
 
 }

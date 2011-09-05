@@ -7,8 +7,6 @@ filesystemloader="boot"
 bootervolumename="EFI"
 booterextensions="Extra/Extensions"
 
-bootresources="${0%/*}"
-
 diskmicrocodetype[1]="GRUB,47525542"
 diskmicrocodetype[2]="LILO,4c494c4f"
 
@@ -63,12 +61,15 @@ echo "-----------------------------------------------"
 echo ""
 echo ""
 
+
 bootvolume="/Volumes/$bootervolumename"
 bootdev=${bootdev%s*}s1
 bootrdev=${bootdev/disk/rdisk}
 bootdisk=${bootdev%s*}
 bootrdisk=${bootdisk/disk/rdisk}
 bootslice=${bootdev#*disk*s}
+
+bootresources="${osxvolume}/usr/local/bin/"
 
 echo "==============================================="
 echo "Installer Variables Part 2:"
@@ -83,6 +84,7 @@ echo "Disk loader dual boot is also ${diskloader}"
 echo "Partition loader HFS is ${partitionloaderhfs}"
 echo "Partition loader FAT is ${partitionloaderfat}"
 echo "Filesystem loader is ${filesystemloader}"
+echo "bootresources: Boot Resources is ${bootresources}"
 echo "-----------------------------------------------"
 echo ""
 echo ""
@@ -244,7 +246,7 @@ echo ""
 }
 
 
-} #Azipkg: ???
+} #Azi: ???
 
 
 start ${3}
@@ -271,7 +273,7 @@ if [ "$( fstyp ${bootdev} | grep hfs )" ]; then
 	efiformat="hfs"
 fi
 if [ "$( fstyp ${bootdev} | grep msdos )" ]; then
-	echo "${bootdev} is currently formatted as msdos" #Azipkg: hum... it's not really msdos, but ok...
+	echo "${bootdev} is currently formatted as msdos" #Azi: hum... it's not really msdos, but ok...
 	efiformat="msdos"
 fi 
 echo "-----------------------------------------------"
@@ -301,16 +303,16 @@ if ${diskupdate}; then
 	#---------------------------------------------------------------------
 
 	if [ ${disksignature} == "00000000" ]; then
-		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk} #Azipkg
+		echo "Executing command: ${bootresources}fdisk440 -u -f ${osxvolume}/usr/standalone/i386/${diskloader} -y ${bootrdisk}"
+		"${bootresources}fdisk440" -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootrdisk} #Azipkg
 	else
 		#---------------------------------------------------------------------
 		# If it exists then Windows is also installed on the HDD and we need to write boot0hfs
 		#---------------------------------------------------------------------
 
-		#Azipkg: diskloader=boot0 ??? boot0hfs/boot0md - remenber this is for GPT!!
-		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk} #Azipkg
+		#Azi: diskloader=boot0 ??? boot0hfs/boot0md - remenber this is for GPT!!
+		echo "Executing command: ${bootresources}fdisk440 -u -f ${osxvolume}/usr/standalone/i386/${diskloader} -y ${bootrdisk}"
+		"${bootresources}fdisk440" -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootrdisk} #Azipkg
 	fi
 else
 	echo "Diskupdate is false, so no stage 0 file was written"
@@ -319,16 +321,16 @@ fi
 #echo "Executing command: dd if=${partitionloader} of=${bootrdev}"
 #dd if="${osxvolume}/${partitionloader}" of=${bootrdev}
 
-# if we have an original EFI ("FAT"), copy boot1f32 to newbs
+# if we have an original EFI ("FAT")
 if [ ${efiformat} = "msdos" ]; then
 	
 	echo "Prepare Stage 1 loader"
 	# copy partition boot sector to origbs
 	echo "Executing command: dd if=${bootrdev} count=1 bs=512 of=/tmp/origbs"
-	dd if=${bootrdev} count=1 bs=512 of=/tmp/origbs
+	dd if=${bootrdev} count=1 bs=512 of=/tmp/origbs #Azi: dd rdisk or disk ?*****
 	
 	# copy boot1f32 to newbs
-	echo "Executing command: cp "${osxvolume}/usr/standalone/i386/${partitionloaderfat}" /tmp/newbs"
+	echo "Executing command: cp ${osxvolume}/usr/standalone/i386/${partitionloaderfat} /tmp/newbs"
 	cp "${osxvolume}/usr/standalone/i386/${partitionloaderfat}" /tmp/newbs
 	
 	# "merge" origbs into newbs
@@ -341,13 +343,13 @@ if [ ${efiformat} = "msdos" ]; then
 	echo "Executing command: dd if=/tmp/newbs of=${bootrdev}"
 	dd if=/tmp/newbs of=${bootrdev}
 else
-	#Azipkg: this is was failing for me, hanged at boot0: done. Got fine when i removed "bs=512 count=1" ??
+	#Azi: this is was failing for me, hanged at boot0: done. Got fine when i removed "bs=512 count=1" ??
 	# makes no sense but... anyway, i'd remove this!.. no need to change EFI fs if boot1f32 works fine.
 	# In fact, i'm not a fan of EFI installs so, i'd remove it all!! :)
 	echo "Write Stage 1 loader"
 	
 	# just write boot1h to the partition boot sector
-	echo "Executing command: dd if="${osxvolume}/usr/standalone/i386/${partitionloaderhfs}" of=${bootrdev}"
+	echo "Executing command: dd if=${osxvolume}/usr/standalone/i386/${partitionloaderhfs} of=${bootrdev}"
 	dd if="${osxvolume}/usr/standalone/i386/${partitionloaderhfs}" of=${bootrdev}
 fi
 
@@ -355,15 +357,16 @@ echo "-----------------------------------------------"
 echo ""
 echo ""
 
-
+#Azi: this is useless on GPT, the only thing to make active is the pMBR
 echo "==============================================="
 echo "Set Active Partition ONLY if Windows is not installed:"
 echo "*****************************************************"
 
+#Azi: seems to me this should be on the Standard script ??
 # If table is MBR make the correct slice active. If table is GPT make the first partition active (BadAxe compatibility).
 #[ "${partitiontable}" = "GUID_partition_scheme" ] && bootslice=1
 #if [[ "${partitiontable}" = "FDisk_partition_scheme" ||  "${partitiontable}" = "GUID_partition_scheme" ]]; then
-#	fdisk -e ${bootdisk} <<-MAKEACTIVE
+#	"${bootresources}fdisk440" -e ${bootdisk} <<-MAKEACTIVE
 #	print
 #	flag ${bootslice}
 #	write
@@ -372,21 +375,20 @@ echo "*****************************************************"
 #	MAKEACTIVE
 #fi
 
-#Azipkg: works for EFI, but does it work for other GPT partitions?... check, was under the impression that NO??!
 if [ ${disksignature} == "00000000" ]; then
 	# echo "Windows is not installed so let's change the active partition"
 
-	partitionactive=$( fdisk -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
+	partitionactive=$( "${bootresources}fdisk440" -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
 	echo "Current Active Partition: ${partitionactive}"
 
 	if [ "${partitionactive}" = "${bootslice}" ]; then
 		echo "${bootvolume} is already flagged as active"
 	else
 		echo "${bootvolume} is not flagged as active, so let's do it."
-		# BadAxe requires EFI partition to be flagged active.
+		# BadAxe requires EFI partition to be flagged active. #Azi: ????
 		# but it doesn't' hurt to do it for any non-windows partition.
 		
-		fdisk -e ${bootrdisk} <<-MAKEACTIVE
+		"${bootresources}fdisk440" -e ${bootrdisk} <<-MAKEACTIVE
 		print
 		flag ${bootslice}
 		write
@@ -407,33 +409,41 @@ echo ""
 #checkpartitionbootcode check
 #checkpartitionactive
 
-#Azipkg: this forces the user to unmount the EFI part via terminal --> sudo umount /volumes/efi...?!
 echo "==============================================="
 echo "Mount EFI partition:"
 echo "********************"
 if [ ${efiformat} = "hfs" ]; then
 	[ -d "${bootvolume}" ] || mkdir -p "${bootvolume}"
 	echo "Executing command: mount_hfs -u 0 -g 0 ${bootdev} ${bootvolume}"
-	mount_hfs -u 0 -g 0 "${bootdev}" "${bootvolume}"
+	mount_hfs -u 0 -g 0 ${bootdev} ${bootvolume}
 else
 	[ -d "${bootvolume}" ] || mkdir -p "${bootvolume}"
 	echo "Executing command: mount_msdos -u 0 -g 0 ${bootdev} ${bootvolume}"
-	mount_msdos -u 0 -g 0 "${bootdev}" "${bootvolume}"
+	mount_msdos -u 0 -g 0 ${bootdev} ${bootvolume}
 fi
 echo "-----------------------------------------------"
 echo ""
 echo ""
 
-
+#Azi: this needs a rule for noboot pkg***
 echo "==============================================="
-echo "Write Stage 2 loader"
+echo "Write files to EFI partition:"
 echo "********************"
        
-echo "Executing command: cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" ${bootvolume}/boot"
+echo "Executing command: cp ${osxvolume}/usr/standalone/i386/${filesystemloader} ${bootvolume}/boot"
 cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" "${bootvolume}/boot"
 echo "boot written"
-#Azipkg: we're still missing copy Extra folder into EFI, else no themes & modules...???
 
+#Azi: hidding boot file makes no sense since EFI is always hidden;.. reminder
+
+#Azi: just getting the feel...
+echo "Executing command: rsync ${osxvolume}/Extra/ ${bootvolume}/Extra"
+#rsync -r -u
+rsync -r "${osxvolume}/Extra/" "${bootvolume}/Extra"
+rm -rf "${osxvolume}/Extra" # !?
+echo "/Extra moved to ${bootvolume}"
+
+#Azi: umount /volumes/efi...?
 echo "-----------------------------------------------"
 echo ""
 echo ""

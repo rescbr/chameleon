@@ -13,8 +13,8 @@
 # /
 
 echo "preinstall: Path to installer....... $1"
-echo "preinstall: Path to destination..... $2"
-echo "preinstall: Path to dest volume..... $3"
+echo "preinstall: Path to destination..... $2" # same ??
+echo "preinstall: Path to dest volume..... $3" #  ||
 echo "preinstall: Root of system folder... $4"
 
 set -x
@@ -35,6 +35,6 @@ fi
 
 # delete the temporary Chameleon folder
 
-rm -rf "$dest_vol/tmpcham" #Azipkg: were's this? sandbox???
+rm -rf "$dest_vol/tmpcham" #Azipkg: ok, noboot & resolutions pkgs
 
 echo "Done..."
