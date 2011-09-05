@@ -506,7 +506,7 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x68C0,	0x1594103C, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		, 0 }, // issue #91
 	
-	{ 0x68C0,	0x392717AA, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5730",		kBaboon		, 0 }, // BB
+	{ 0x68C0,	0x392717AA, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5730",		kNull		, 0 }, // BB
 	//Azi: from Slice { 0x100268C0,	 "ATI Radeon 5670 Series", "Galago"}
 	// http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1695482
 	{ 0x68C1,	0x033E1025, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",		kNull		, 0 },
@@ -572,6 +572,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		, 0 }, // Nai22
 	
 	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		, 0 }, // issue 88
+	
+	{ 0x6741,	0x9080104D,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M",				kNull,      , 0 },
 	
 	{ 0x6759,	0xE193174B, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		, 0 },
 	
@@ -665,7 +667,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x673E,	0x00000000, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6790 Series",		kNull		, 0 },
 	
 	{ 0x6740,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6700M Series",		kNull		, 0 },
-	{ 0x6741,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6600M/6700M Series", kNull		, 0 },
+	{ 0x6741,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6600/6700M Series",	kNull		, 0 },
 	
 	{ 0x6758,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",		kNull		, 0 },
 	{ 0x6759,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		, 0 },
