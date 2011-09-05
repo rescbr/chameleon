@@ -18,11 +18,11 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
+#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
 stage=${version##*-}
-revision=$( grep I386BOOT_CHAMELEONREVISION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
-builddate=$( grep I386BOOT_BUILDDATE sym/i386/vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
+revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
+builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
 
 # =================
@@ -61,13 +61,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	mkdir -p ${1}/Core/Root/usr/sbin
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
-#    if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
-#        echo "Modules found."
-#        mkdir -p ${1}/Core/Root/usr/standalone/i386/modules
-#        cp -R ${1%/*}/i386/modules ${1}/Core/Root/usr/standalone/i386
-#    else
-#        echo "No found modules into dir module"
-#    fi
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0 ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0md ${1}/Core/Root/usr/standalone/i386
@@ -94,7 +87,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
-		# ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
+		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
+		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
 		echo "	[BUILD] Standard "
 		buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
@@ -103,7 +97,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
-		# ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
+		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
+		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
 		echo "	[BUILD] EFI "
 		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
@@ -119,11 +114,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ###############################
                 # Supported Modules           #
                 ###############################
-                # AMDGraphicsEnabler.dylib    #
-                # ATiGraphicsEnabler.dylib    #
-                # IntelGraphicsEnabler.dylib  #
                 # klibc.dylib                 #
-                # NVIDIAGraphicsEnabler.dylib #
                 # Resolution.dylib            #
                 # uClibcxx.dylib              #
                 ###############################
@@ -133,7 +124,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
             choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
             ((xmlindent++))
             packagesidentity="org.chameleon.modules"
-            
 # -
             if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
             {
@@ -460,8 +450,8 @@ makedistribution ()
 # ----
 #    ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
 #    DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
-#    Rez -append tempicns.rsrc -o "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
-#    SetFile -a C "${1%/*}/${packagename// /}-${version}-r${revision}.pkg"
+#    Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
+#    SetFile -a C "${1%/*}/$packagename-${version}-r$revision.pkg"
 #    rm -f tempicns.rsrc
 #    rm -rf "${pkgroot}/Icons/Icons"
 # End
