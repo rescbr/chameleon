@@ -30,19 +30,19 @@ SUBDIRS += HelloWorld
 endif
 
 ifdef CONFIG_ATIGRAPHICSENABLER_MODULE
-SUBDIRS += GraphicsEnabler/ATiGraphicsEnabler
+SUBDIRS += ATiGraphicsEnabler
 endif
 
 ifdef CONFIG_AMDGRAPHICSENABLER_MODULE
-SUBDIRS += GraphicsEnabler/AMDGraphicsEnabler
+SUBDIRS += AMDGraphicsEnabler
 endif
 
 ifdef CONFIG_NVIDIAGRAPHICSENABLER_MODULE
-SUBDIRS += GraphicsEnabler/NVIDIAGraphicsEnabler
+SUBDIRS += NVIDIAGraphicsEnabler
 endif
 
 ifdef CONFIG_INTELGRAPHICSENABLER_MODULE
-SUBDIRS += GraphicsEnabler/IntelGraphicsEnabler
+SUBDIRS += IntelGraphicsEnabler
 endif
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static

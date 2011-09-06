@@ -1,0 +1,22 @@
+This is a port of the graphics enabler code into modules,
+based on Meklort's previous port; for all purposes, this is
+his work; i'm just trying to help ease the work load and
+learn something while doing it.
+
+Though the modules are in a working state and considered by me
+as fit for testing (and use), this is still work in progress.
+Please feedback directly to me by pm at:
+http://forum.voodooprojects.org/
+
+
+NOTICE: as of now, i'm considering this work as "LOW PRIORITY".
+The folder will be kept synced with the trunk.
+Work on the code will be done on a "free time" basis.
+Any dev that wants to work directly on the folder is welcome;
+i will take care of the "syncing with trunk" part.
+
+The main reason for this is:
+there are more important things to fix on the booter.
+
+
+Azi
