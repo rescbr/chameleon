@@ -18,11 +18,11 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
+#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
 stage=${version##*-}
-revision=$( grep I386BOOT_CHAMELEONREVISION sym/i386/vers.h | awk '{ print $3 }' | tr -d '\"' )
-builddate=$( grep I386BOOT_BUILDDATE sym/i386/vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
+revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
+builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
 
 # =================
@@ -47,9 +47,9 @@ main ()
 
 rm -R -f "${1}"
 echo ""	
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
-echo -e $COL_BLACK"	Building $packagename Install Package"$COL_RESET
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
+echo -e $COL_CYAN"	----------------------------------"$COL_RESET
+echo -e $COL_CYAN"	Building $packagename Install Package"$COL_RESET
+echo -e $COL_CYAN"	----------------------------------"$COL_RESET
 echo ""
 
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
@@ -499,17 +499,17 @@ makedistribution ()
 	echo "MD5 (${packagename// /}-${version}-r${revision}.pkg) = ${md5}" > "${1%/*}/${packagename// /}-${version}-r${revision}.pkg.md5"
 	echo ""	
 
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
-	echo -e $COL_BLACK"	Building process complete!"$COL_RESET
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
+	echo -e $COL_GREEN"	--------------------------"$COL_RESET
+	echo -e $COL_GREEN"	Building process complete!"$COL_RESET
+	echo -e $COL_GREEN"	--------------------------"$COL_RESET
 	echo ""	
-	echo -e $COL_BLACK"	Build info."
-	echo -e $COL_BLACK"	==========="
-	echo -e $COL_BLUE"	Package name:	"$COL_BLACK"$packagename-${version}-r$revision.pkg"$COL_RESET
-	echo -e $COL_BLUE"	MD5:		"$COL_BLACK"$md5"$COL_RESET
-	echo -e $COL_BLUE"	Version:	"$COL_BLACK"$version"$COL_RESET
-	echo -e $COL_BLUE"	Stage:		"$COL_BLACK"$stage"$COL_RESET
-	echo -e $COL_BLUE"	Date/Time:	"$COL_BLACK"$builddate"$COL_RESET
+	echo -e $COL_GREEN"	Build info."
+	echo -e $COL_GREEN"	==========="
+	echo -e $COL_BLUE"	Package name:	"$COL_RESET"$packagename-${version}-r$revision.pkg"
+	echo -e $COL_BLUE"	MD5:		"$COL_RESET"$md5"
+	echo -e $COL_BLUE"	Version:	"$COL_RESET"$version"
+	echo -e $COL_BLUE"	Stage:		"$COL_RESET"$stage"
+	echo -e $COL_BLUE"	Date/Time:	"$COL_RESET"$builddate"
 	echo ""
 
 }

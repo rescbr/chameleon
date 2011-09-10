@@ -44,12 +44,12 @@ enum {
     iDeviceHFSRAID_o,
     iDeviceEXT3,
     iDeviceEXT3_o,
-    iDeviceFreeBSD,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceFreeBSD_o,	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceOpenBSD,		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceOpenBSD_o,	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    iDeviceBEFS,		/* Haiku detection and Icon credits to scorpius  */
-    iDeviceBEFS_o,		/* Haiku detection and Icon credits to scorpius  */
+    iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceFreeBSD_o,   /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceOpenBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceOpenBSD_o,   /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceBEFS,        /* Haiku detection and Icon credits to scorpius  */
+    iDeviceBEFS_o,      /* Haiku detection and Icon credits to scorpius  */
     iDeviceFAT,
     iDeviceFAT_o,
     iDeviceFAT16,
@@ -99,12 +99,12 @@ image_t images[] = {
     {.name = "device_hfsraid_o",            .image = NULL},
     {.name = "device_ext3",                 .image = NULL},
     {.name = "device_ext3_o",               .image = NULL},
-    {.name = "device_freebsd",              .image = NULL},	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    {.name = "device_freebsd_o",            .image = NULL},	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    {.name = "device_openbsd",              .image = NULL},	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    {.name = "device_openbsd_o",            .image = NULL},	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-    {.name = "device_befs",                 .image = NULL},	/* Haiku detection and Icon credits to scorpius  */
-    {.name = "device_befs_o",               .image = NULL},	/* Haiku detection and Icon credits to scorpius  */
+    {.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_freebsd_o",            .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_openbsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_openbsd_o",            .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_befs",                 .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
+    {.name = "device_befs_o",               .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
     {.name = "device_fat",                  .image = NULL},
     {.name = "device_fat_o",                .image = NULL},
     {.name = "device_fat16",                .image = NULL},
@@ -316,12 +316,12 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
 	LOADPNG(device_ext3,                    iDeviceGeneric);
 	LOADPNG(device_ext3_o,                  iDeviceEXT3);
-	LOADPNG(device_freebsd,                 iDeviceGeneric);	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-	LOADPNG(device_freebsd_o,               iDeviceFreeBSD);	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-	LOADPNG(device_openbsd,                 iDeviceGeneric);	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-	LOADPNG(device_openbsd_o,               iDeviceOpenBSD);	/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-	LOADPNG(device_befs,                    iDeviceGeneric);	/* Haiku detection and Icon credits to scorpius  */
-	LOADPNG(device_befs_o,                  iDeviceBEFS);		/* Haiku detection and Icon credits to scorpius  */
+	LOADPNG(device_freebsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_freebsd_o,               iDeviceFreeBSD);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_openbsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_openbsd_o,               iDeviceOpenBSD);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_befs,                    iDeviceGeneric);        /* Haiku detection and Icon credits to scorpius  */
+	LOADPNG(device_befs_o,                  iDeviceBEFS);           /* Haiku detection and Icon credits to scorpius  */
 	LOADPNG(device_fat,                     iDeviceGeneric);
 	LOADPNG(device_fat_o,                   iDeviceFAT);
 	LOADPNG(device_fat16,                   iDeviceFAT);
@@ -778,31 +778,31 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 				break;
 
 			case kPartitionTypeHPFS:
-				devicetype = iDeviceNTFS;	// Use HPFS / NTFS icon
+				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
 				break;
 
-			case kPartitionTypeBEFS:		/* Haiku detection and Icon credits to scorpius  */
-				devicetype = iDeviceBEFS;	// Use BEFS / Haiku icon
+			case kPartitionTypeBEFS:                        /* Haiku detection and Icon credits to scorpius  */
+				devicetype = iDeviceBEFS;		// Use BEFS / Haiku icon
 				break;
 
-			case kPartitionTypeFreeBSD:		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-				devicetype = iDeviceFreeBSD;	// Use FreeBSD icon
+			case kPartitionTypeFreeBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+				devicetype = iDeviceFreeBSD;            // Use FreeBSD icon
 				break;
 				
-			case kPartitionTypeOpenBSD:		/* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-				devicetype = iDeviceOpenBSD;	// Use OpenBSD icon
+			case kPartitionTypeOpenBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+				devicetype = iDeviceOpenBSD;            // Use OpenBSD icon
 				break;
 				
 			case kPartitionTypeFAT16:
-				devicetype = iDeviceFAT16;	// Use FAT16 icon
+				devicetype = iDeviceFAT16;		// Use FAT16 icon
 				break;
 
 			case kPartitionTypeFAT32:
-				devicetype = iDeviceFAT32;	// Use FAT32 icon
+				devicetype = iDeviceFAT32;		// Use FAT32 icon
 				break;
 
 			case kPartitionTypeEXT3:
-				devicetype = iDeviceEXT3;	// Use EXT2/3 icon
+				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
 				break;
 
 			default:
@@ -831,8 +831,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
-	bool		shoWinfo = true; //Azi:showinfo
-	extern bool showBootBanner; //
+	bool		shoWinfo = false;
+	extern bool showBootBanner;
 	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
@@ -892,9 +892,8 @@ void drawDeviceList (int start, int end, int selection)
 			
 			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->chameleonConfig);
 			
-			if (shoWinfo && showBootBanner) // no boot banner, no showinfo.
+			if (shoWinfo && showBootBanner)
 			{
-				// keep formatted with spaces instead of tabs
 				gui.debug.cursor = pos( 10, 100);
 				dprintf( &gui.screen, "label:     %s\n",   param->label );
 				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
@@ -907,6 +906,7 @@ void drawDeviceList (int start, int end, int selection)
 				dprintf( &gui.screen, "name:      %s\n",   param->name );
 				dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
 				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+//				// res
 				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
 				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
 //				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr ); //Azi: reminder
