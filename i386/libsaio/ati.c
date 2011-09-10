@@ -375,6 +375,8 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x9552,	0x04341028, CHIP_FAMILY_RV710,		"ATI Mobility Radeon 4330",			kShrike		},
 	
+	{ 0x9552,	0x308B103C, CHIP_FAMILY_RV710,		"ATI Mobility Radeon HD 4300 Series", kShrike	},
+	
 	{ 0x9552,	0x3000148C, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
 	
 	{ 0x9552,	0x3000174B, CHIP_FAMILY_RV710,		"ATI Radeon HD 4300/4500 Series",	kNull		},
@@ -406,7 +408,6 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x9591,	0x2303148C, CHIP_FAMILY_RV635,		"ATI Radeon HD 3600 Series",		kNull		},
 	
-	//Azi: most of the 9598 are rv630, according to http://developer.amd.com/gpu_assets/ATI_Device_IDs_xxx_xx.txt
 	{ 0x9598,	0xB3831002, CHIP_FAMILY_RV635,		"ATI All-in-Wonder HD",				kNull		},
 	
 	{ 0x9598,	0x30001043, CHIP_FAMILY_RV635,		"HD3730",							kNull		},
@@ -479,7 +480,9 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x689C,	0x30201682, CHIP_FAMILY_HEMLOCK,	"ATI Radeon HD 5970",				kUakari		},
 	
-	{ 0x68A8,	0x050E1025, CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		}, // issue #89
+	{ 0x68A1,	0x144D103C,	CHIP_FAMILY_CYPRESS,	"ATI Mobility Radeon HD 5800",		kNomascus	},
+	
+	{ 0x68A8,	0x050E1025, CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		},
 	
 	{ 0x68B8,	0x00CF106B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kHoolock	},
 	
@@ -494,11 +497,11 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68B8,	0x200B1787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	
-	{ 0x68C0,	0x1594103C, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		}, // issue #91
-	//Azi: from Slice { 0x100268C0,	 "ATI Radeon 5670 Series", "Galago"}
-	// http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1695482
+	{ 0x68C0,	0x1594103C, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		},
 	
 	{ 0x68C1,	0x033E1025, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",		kNull		},
+	
+	{ 0x68C8,	0x2306103C, CHIP_FAMILY_REDWOOD,	"ATI FirePro V4800 (FireGL)",		kNull		},
 	
 	{ 0x68D8,	0x03561043, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
 
@@ -553,12 +556,12 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6739,	0x21F81458, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
-	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		}, // bebegoat
+	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	
-	{ 0x6741,	0x050E1025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // issue 121
-	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // Nai22
+	{ 0x6741,	0x050E1025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
+	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
 	
-	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		}, // issue 88
+	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		},
 	
 	{ 0x6759,	0xE193174B, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570",				kNull		},
 	
@@ -1300,32 +1303,55 @@ static bool init_card(pci_dt_t *pci_dev)
 		}
 	}
 	
-//	atN = 0;
-	
-	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
-	if (!card->cfg_name)
-	{
-		card->cfg_name = card_configs[card->info->cfg_name].name;
-		card->ports = card_configs[card->info->cfg_name].ports;
-	}
-	else
-	{
-		for (i = 0; i < kCfgEnd; i++)
-			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
-				card->ports = card_configs[i].ports;
-	}
+//	card->ports = 2; // default - Azi: default is card_configs
 	
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
 		card->flags |= EVERGREEN;
-		card->ports = 3; //Azi: not sure of the usefulness ??
+//		card->ports = 3; //Azi: use the AtiPorts key if needed
 	}
 	
-	getIntForKey(kAtiPorts, &n_ports, &bootInfo->bootConfig);
-	if (n_ports > 0){
-		card->ports = n_ports;
-         verbose("AtiPorts set to %d\n",n_ports); //AniV
+//	atN = 0;
+	
+	// Check AtiConfig key for a framebuffer name,
+	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
+	// if none,
+	if (!card->cfg_name)
+	{
+		// use the device fb key on radeon_cards, to retrive the default name from card_configs.
+		card->cfg_name = card_configs[card->info->cfg_name].name;
+		// and leave ports alone!
+//		card->ports = card_configs[card->info->cfg_name].ports;
+		
+		// which means one of the fb's or kNull
+		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
+	}
+	else
+	{
+		// else, use the fb name returned by AtiConfig.
+		verbose("(AtiConfig) Framebuffer set to: %s\n", card->cfg_name);
+	}
+	
+	// Check AtiPorts key for nr of ports,
+	card->ports = getIntForKey(kAtiPorts, &n_ports, &bootInfo->chameleonConfig);
+	// if a value bigger than 0 ?? is found, (do we need >= 0 ?? that's null FB on card_configs)
+	if (n_ports > 0)
+	{
+		card->ports = n_ports; // use it.
+		verbose("(AtiPorts) Nr of ports set to: %d\n", card->ports);
     }
+	else// if (card->cfg_name > 0) // do we want 0 ports if fb is kNull or mistyped ?
+	{
+		// else, match fb name with card_configs list and retrive default nr of ports.
+		for (i = 0; i < kCfgEnd; i++)
+			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
+				card->ports = card_configs[i].ports; // default
+		
+		verbose("Nr of ports set to framebuffer's default: %d\n", card->ports);
+	}
+//	else
+//		card->ports = 2/1 ?; // set a min if 0 ports ?
+//		verbose("Nr of ports set to min: %d\n", card->ports);
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
