@@ -101,6 +101,7 @@
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
+#define kSkipFTFix			"SkipFTFix"			/* fake_efi.c */ //For Work around to bypass olegpronin's Facetime fix
 
 #define kUseMemDetect		"UseMemDetect"	    /* platform.c */
 

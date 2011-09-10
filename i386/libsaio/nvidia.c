@@ -808,6 +808,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1081, "GeForce GTX 570" },
 	{ 0x10DE1082, "GeForce GTX 560 Ti" },
 	{ 0x10DE1083, "D13U" },
+	{ 0x10DE1086, "GeForce GTX 570" },
 	{ 0x10DE1088, "GeForce GTX 590" },
 	// 1090 - 109F	
 	{ 0x10DE1098, "D13U" },
