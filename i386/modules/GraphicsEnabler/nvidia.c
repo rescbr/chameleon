@@ -194,7 +194,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE01D0, "GeForce 7350 LE" },
 	{ 0x10DE01D1, "GeForce 7300 LE" },
 	{ 0x10DE01D2, "GeForce 7550 LE" },
-	{ 0x10DE01D3, "GeForce 7300 SE/7200 GS" },
+	{ 0x10DE01D3, "GeForce 7300 SE / 7200 GS" },
 	{ 0x10DE01D6, "GeForce Go 7200" },
 	{ 0x10DE01D7, "GeForce Go 7300" },
 	{ 0x10DE01D8, "GeForce Go 7400" },
@@ -230,7 +230,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0280 - 028F		
 	// 0290 - 029F	
 	{ 0x10DE0290, "GeForce 7900 GTX" },
-	{ 0x10DE0291, "GeForce 7900 GT/GTO" },
+	{ 0x10DE0291, "GeForce 7900 GT / GTO" },
 	{ 0x10DE0292, "GeForce 7900 GS" },
 	{ 0x10DE0293, "GeForce 7950 GX2" },
 	{ 0x10DE0294, "GeForce 7950 GX2" },
@@ -270,9 +270,9 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0324, "GeForce FX Go5200" },
 	{ 0x10DE0325, "GeForce FX Go5250" },
 	{ 0x10DE0326, "GeForce FX 5500" },
-	{ 0x10DE0328, "GeForce FX Go5200 32M/64M" },
+	{ 0x10DE0328, "GeForce FX Go5200 32M / 64M" },
 	{ 0x10DE032A, "Quadro NVS 55/280 PCI" },
-	{ 0x10DE032B, "Quadro FX 500/600 PCI" },
+	{ 0x10DE032B, "Quadro FX 500 / 600 PCI" },
 	{ 0x10DE032C, "GeForce FX Go53xx Series" },
 	{ 0x10DE032D, "GeForce FX Go5100" },
 	// 0330 - 033F
@@ -394,6 +394,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05E2, "GeForce GTX 260" },
 	{ 0x10DE05E3, "GeForce GTX 285" },
 	{ 0x10DE05E6, "GeForce GTX 275" },
+	{ 0x10DE05E7, "Tesla C1060" },
 	{ 0x10DE05EA, "GeForce GTX 260" },
 	{ 0x10DE05EB, "GeForce GTX 295" },
 	{ 0x10DE05ED, "Quadroplex 2200 D2" },
@@ -491,16 +492,14 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06CA, "GeForce GTX 480M" },
 	{ 0x10DE06CD, "GeForce GTX 470" },
 	// 06D0 - 06DF
-	{ 0x10DE06D1, "Tesla C2050" },	// TODO: sub-device id: 0x0771
-	{ 0x10DE06D1, "Tesla C2070" },	// TODO: sub-device id: 0x0772
+	{ 0x10DE06D1, "Tesla C2050 / C2070" },	// TODO: sub-device id for the C2050: 0x0771, sub-device id for the C2070: 0x0772
 	{ 0x10DE06D2, "Tesla M2070" },
 	{ 0x10DE06D8, "Quadro 6000" },
 	{ 0x10DE06D9, "Quadro 5000" },
 	{ 0x10DE06DA, "Quadro 5000M" },
 	{ 0x10DE06DC, "Quadro 6000" },
 	{ 0x10DE06DD, "Quadro 4000" },
-	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
-	{ 0x10DE06DE, "Tesla M2070" },	// TODO: sub-device id: ?	
+	{ 0x10DE06DE, "Tesla M2050 / M2070" },	// TODO: sub-device id for the M2050: 0x0846
 	// 0x10DE06DE also applies to misc S2050, X2070, M2050, M2070
 	// 06E0 - 06EF	
 	{ 0x10DE06E0, "GeForce 9300 GE" },
@@ -557,7 +556,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0849, "GeForce 8200" },
 	{ 0x10DE084A, "nForce 730a" },
 	{ 0x10DE084B, "GeForce 9200" },
-	{ 0x10DE084C, "nForce 980a/780a SLI" },
+	{ 0x10DE084C, "nForce 980a / 780a SLI" },
 	{ 0x10DE084D, "nForce 750a SLI" },
 	{ 0x10DE084F, "GeForce 8100 / nForce 720a" },
 	// 0850 - 085F
@@ -810,6 +809,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 10B0 - 10BF
 	// 10C0 - 10CF
 	{ 0x10DE10C3, "GeForce 8400 GS" },
+	{ 0x10DE10C5, "GeForce 405" },
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
@@ -1351,8 +1351,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		{
 			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
 			
-			verbose("Using user supplied @0,display-cfg\n");
-			printf("@0,display-cfg: %02x%02x%02x%02x\n",
+			verbose("@0,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3]);
 		}
 	}
@@ -1365,8 +1364,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		{
 			memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
 			
-			verbose("Using user supplied @1,display-cfg\n");
-			printf("@1,display-cfg: %02x%02x%02x%02x\n",
+			verbose("@1,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_1[0], default_dcfg_1[1], default_dcfg_1[2], default_dcfg_1[3]);
 		}
 	}

@@ -429,9 +429,11 @@ void finalizeEFIConfigTable(void )
  */
 
 /* These should be const but DT__AddProperty takes char* */
+#if UNUSED
 static const char const TSC_Frequency_prop[] = "TSCFrequency";
-static const char const FSB_Frequency_prop[] = "FSBFrequency";
 static const char const CPU_Frequency_prop[] = "CPUFrequency";
+#endif
+static const char const FSB_Frequency_prop[] = "FSBFrequency";
 
 /*==========================================================================
  * SMBIOS
@@ -469,7 +471,7 @@ static EFI_STATUS setup_acpi (void)
 {	
 	EFI_STATUS ret = EFI_UNSUPPORTED;	
 	
-	execute_hook("setupEfiConfigurationTable", &ret, NULL, NULL, NULL, NULL, NULL);
+	execute_hook("setupAcpiEfi", &ret, NULL, NULL, NULL, NULL, NULL);
 	
 	if (ret != EFI_SUCCESS)
 	{        
@@ -708,16 +710,20 @@ static VOID setupEfiDeviceTree(void)
 			
 			DT__AddProperty(chosenNode, "boot-args", strlen(bootArgs->CommandLine)+1, (EFI_CHAR16*)bootArgs->CommandLine);
 			
-			if (uuidSet &&bootInfo->uuidStr[0]) 			
+			// "boot-uuid" MAIN GOAL IS SYMPLY TO BOOT FROM THE UUID SET IN THE DT AND DECREASE BOOT TIME, SEE IOKitBSDInit.cpp
+			// additionally this value can be used by third-party apps or osx components (ex: pre-10.7 kextcache, ...)
+			if (bootInfo->uuidStr[0]) 			
 				DT__AddProperty(chosenNode, kBootUUIDKey, strlen(bootInfo->uuidStr)+1, bootInfo->uuidStr);
-			
-			/*if (gRootPath[0])
+#if 0
+			if (gRootPath[0])
 			 {
 			 
-			 DT__AddProperty(chosenNode, "rootpath", 256, gRootPath);			
+			 DT__AddProperty(chosenNode, "rootpath" or try "root-matching", strlen(gRootPath)+1, gRootPath);			
 			 
 			 } 
-			 else */if (gRootDevice)
+			 else 
+#endif
+				 if (gRootDevice)
 			 {
 				 
 				 DT__AddProperty(chosenNode, "boot-device-path", strlen(gRootDevice)+1, gRootDevice);			
@@ -928,6 +934,7 @@ static VOID setupEfiConfigurationTable()
     if (smbios_p)
         addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 		
+	if (Platform->CPU.Vendor == 0x756E6547 /* Intel */)
 	{
 		int num_cpus;
 		
@@ -939,16 +946,15 @@ static VOID setupEfiConfigurationTable()
 			
 			addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);
 		}
-                
- #if DEBUG_ACPI
+		
+#if DEBUG_EFI
         if (num_cpus != Platform->CPU.NoCores)
         {
-            DBG("Warning: SMP nb of core mismatch with the value found in cpu.c \n");                
+            printf("Warning: SMP nb of core (%d) mismatch with the value found in cpu.c (%d) \n",num_cpus,Platform->CPU.NoCores);                
         }        
- #endif               
+#endif               
 	}	
-	
-	
+		
 	// PM_Model
 	if (Platform->CPU.isServer == true)
     {
@@ -970,7 +976,8 @@ static VOID setupEfiConfigurationTable()
 	setup_acpi();
 	
 	setup_machine_signature();
-	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
+	
+	// We now have to write the system-type in ioregs: we cannot do it before in setupDeviceTree()
 	// because we need to take care of facp original content, if it is correct.
 	setupSystemType();
 	

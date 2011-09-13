@@ -137,7 +137,7 @@ int getc()
 {	
     int c = bgetc();		
 	
-	execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
+	//execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
 	
     if ((c & 0xff) == 0) 		
         return c;

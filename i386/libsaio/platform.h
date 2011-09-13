@@ -131,6 +131,7 @@ typedef struct _PlatformInfo_t {
         boolean_t	fine_grain_clock_mod;
 
         uint32_t    cpuid_max_basic;
+		uint32_t    cpuid_max_ext;
         uint32_t	sub_Cstates;
         uint32_t    extensions;
         

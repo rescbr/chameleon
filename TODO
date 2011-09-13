@@ -1,6 +1,8 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
+- Implement a Host like in bits to avoid some return issues
+
 - Implement snprintf to avoid buffer overflow in some case
 
 - It seems that nvram variables must be set thru efiRuntimeServices->SetVariable(...),

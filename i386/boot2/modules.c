@@ -100,18 +100,29 @@ VOID load_all_modules()
 	{
 		if ((strcmp(SYMBOLS_MODULE,name)) == 0) continue; // if we found Symbols.dylib, just skip it
 
-		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
+		int len =  strlen(name);
+		int ext_size = sizeof("dylib");
+		
+		if (len >= ext_size)
 		{
-			char* tmp = malloc(strlen(name) + 1);
-			strcpy(tmp, name);
-			
-			msglog("* Attempting to load module: %s\n", tmp);			
-			if(load_module(tmp) != EFI_SUCCESS)
+			if(strcmp(&name[len - ext_size], ".dylib") == 0)
 			{
-				// failed to load or already loaded
-				 free(tmp);
+				char* tmp = malloc(len /*+ 1*/);
+				strlcpy(tmp, name, len + 1);
+				msglog("* Attempting to load module: %s\n", tmp);			
+				if(load_module(tmp) != EFI_SUCCESS)
+				{
+					// failed to load or already loaded
+					free(tmp);
+				}
 			}
-		}
+#if DEBUG_MODULES
+			else 
+			{
+				DBG("Ignoring %s\n", name);
+			}
+#endif
+		}		
 #if DEBUG_MODULES
 		else 
 		{

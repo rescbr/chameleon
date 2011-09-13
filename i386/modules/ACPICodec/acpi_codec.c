@@ -96,8 +96,8 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt);
 static void *loadACPITable(char *dirspec, char *filename );
 static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer);
 static ACPI_GENERIC_ADDRESS FillGASStruct(U32 Address, U8 Length);
-static void process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list);
-static void process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list);
+static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list);
+static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list);
 static ACPI_TABLE_FADT * patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT);
 
 #if OLD_SSDT
@@ -145,6 +145,9 @@ static bool is_sandybridge(void);
 static bool is_jaketown(void);
 static U32 encode_pstate(U32 ratio);
 static void collect_cpu_info(CPU_DETAILS * cpu);
+#ifndef BETA
+static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu);
+#endif
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase);
 static U32 BuildPstateInfo(CPU_DETAILS * cpu);
 static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_cstates, bool enable_pstates, bool enable_tstates );
@@ -176,6 +179,11 @@ static U32 compute_pstate_power(CPU_DETAILS * cpu, U32 ratio, U32 TDP);
 static U64 divU64byU64(U64 n, U64 d, U64 * rem);
 static U32 compute_tdp(CPU_DETAILS * cpu);
 #endif
+static bool is_sandybridge(void);
+static bool is_jaketown(void);
+static U32 get_bclk(void);
+static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate);
+static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit);
 
 #endif // OLD_SSDT
 
@@ -291,6 +299,14 @@ static void move_table_list_to_kmem(U32 *new_table_list )
 			{
 				
 				void *tableAddr=(void*)AllocateKernelMemory(table_array[index]->Length);
+				if (!tableAddr) {
+					printf("Unable to allocate kernel memory for aml file ");
+					
+					void *buf = (void*)new_table_list[index];
+					free(buf);
+					new_table_list[index] = 0ul ;
+					continue;
+				}
 				bcopy(table_array[index], tableAddr, table_array[index]->Length);
 				new_table_list[index] = 0ul ;
 				new_table_list[index] = (U32)tableAddr ;
@@ -311,18 +327,21 @@ static ACPI_TABLE_RSDP * gen_alloc_rsdp_v2_from_v1(ACPI_TABLE_RSDP *rsdp )
 {
 	
 	ACPI_TABLE_RSDP * rsdp_conv = (ACPI_TABLE_RSDP *)AllocateKernelMemory(sizeof(ACPI_TABLE_RSDP));
-	bzero(rsdp_conv, sizeof(ACPI_TABLE_RSDP));
-    memcpy(rsdp_conv, rsdp, ACPI_RSDP_REV0_SIZE);
+	
+	if (rsdp_conv) {
+		bzero(rsdp_conv, sizeof(ACPI_TABLE_RSDP));
+		memcpy(rsdp_conv, rsdp, ACPI_RSDP_REV0_SIZE);
+		
+		/* Add/change fields */
+		rsdp_conv->Revision = 2; /* ACPI version 3 */
+		rsdp_conv->Length = sizeof(ACPI_TABLE_RSDP);
+		
+		/* Correct checksums */    
+		setRsdpchecksum(rsdp_conv);
+		setRsdpXchecksum(rsdp_conv);
+	}	    
     
-    /* Add/change fields */
-    rsdp_conv->Revision = 2; /* ACPI version 3 */
-    rsdp_conv->Length = sizeof(ACPI_TABLE_RSDP);
-    
-    /* Correct checksums */    
-    setRsdpchecksum(rsdp_conv);
-    setRsdpXchecksum(rsdp_conv);    
-    
-    return rsdp_conv;
+    return (rsdp_conv) ? rsdp_conv : (void*)0ul ;
 }
 
 static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
@@ -335,6 +354,13 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
     num_tables= get_num_tables64(xsdt);
     
     ACPI_TABLE_RSDT * rsdt_conv=(ACPI_TABLE_RSDT *)AllocateKernelMemory(sizeof(ACPI_TABLE_HEADER)+(num_tables * 4));
+	if (!rsdt_conv)
+	{
+		printf("Unable to allocate kernel memory for rsdt conv\n");
+		return (void*)0ul;
+	}
+	
+	
 	bzero(rsdt_conv, sizeof(ACPI_TABLE_HEADER)+(num_tables * 4));
     memcpy(&rsdt_conv->Header, &xsdt->Header, sizeof(ACPI_TABLE_HEADER));
     
@@ -442,6 +468,12 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
     num_tables= get_num_tables(rsdt);
     
     ACPI_TABLE_XSDT * xsdt_conv=(ACPI_TABLE_XSDT *)AllocateKernelMemory(sizeof(ACPI_TABLE_HEADER)+(num_tables * 8));
+	
+	if (!xsdt_conv) {
+		printf("Unable to allocate kernel memory for xsdt conv\n");
+		return (void*)0ul;
+	}
+	
 	bzero(xsdt_conv, sizeof(ACPI_TABLE_HEADER)+(num_tables * 8));
     memcpy(&xsdt_conv->Header, &rsdt->Header, sizeof(ACPI_TABLE_HEADER));
     
@@ -994,7 +1026,7 @@ static ACPI_TABLE_SSDT *generate_pss_ssdt(ACPI_TABLE_DSDT* dsdt)
 						
 						bool cpu_noninteger_bus_ratio = (rdmsr64(MSR_IA32_PERF_STATUS) & (1ULL << 46));
 						
-						//initial.Control = rdmsr64(MSR_IA32_PERF_STATUS);
+						initial.Control = rdmsr64(MSR_IA32_PERF_STATUS);
 						
 						maximum.Control = ((rdmsr64(MSR_IA32_PERF_STATUS) >> 32) & 0x1F3F) | (0x4000 * cpu_noninteger_bus_ratio);
 						maximum.CID = ((maximum.FID & 0x1F) << 1) | cpu_noninteger_bus_ratio;
@@ -1364,6 +1396,32 @@ static bool is_jaketown(void)
     return Platform->CPU.Model == CPUID_MODEL_JAKETOWN;
 }
 
+static U32 get_bclk(void)
+{
+	return (is_jaketown() || is_sandybridge()) ? 100 : 133;
+}
+
+//-----------------------------------------------------------------------------
+static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate)
+{
+	U32 ratiorange = max-min;
+	U32 numGaps = numStates-1-turboEnabled;
+	U32 adjPstate = pstate-turboEnabled;
+	return (pstate == 0)     ? (max + turboEnabled) :
+	(ratiorange == 0) ? max                  :
+	max-(((adjPstate*ratiorange)+(numGaps/2))/numGaps);
+}
+//-----------------------------------------------------------------------------
+static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit)
+{
+	U32 ratiorange, maxStates, numStates;
+	
+	ratiorange = max - min + 1;
+	maxStates = ratiorange + (turboEnabled ? 1 : 0);
+	numStates = (pssLimit < maxStates) ? pssLimit : maxStates;
+	return (numStates < 2) ? 0 : numStates;
+}
+
 #if BUILD_ACPI_TSS || pstate_power_support
 static U64 divU64byU64(U64 n, U64 d, U64 * rem)
 {
@@ -1386,13 +1444,7 @@ static U64 divU64byU64(U64 n, U64 d, U64 * rem)
 }
 
 static U32 compute_tdp(CPU_DETAILS * cpu)
-{
-    {
-        int tdp;
-        if (getIntForKey("TDP", &tdp, &bootInfo->bootConfig)) {
-            return (U32)tdp;
-        }
-    }
+{ 
     
     {
         if (is_jaketown() || is_sandybridge())
@@ -1463,8 +1515,7 @@ static U32 compute_pstate_power(CPU_DETAILS * cpu, U32 ratio, U32 TDP)
 		// pstate_power[ratio] = (ratio/P1_ratio)^3 * Core_TDP + Uncore_TDP
 		
 		// Core_TDP = (TURBO_POWER_CURRENT_LIMIT MSR 1ACh bit [30:16] / 8) Watts
-		//U32 Core_TDP = cpu->tdc_limit / 8;
-        U32 Core_TDP = compute_tdp(cpu);
+		U32 Core_TDP = cpu->tdc_limit / 8;
 		
 		// Uncore_TDP = TDP - Core_TDP
 		U32 Uncore_TDP = TDP - Core_TDP;
@@ -1489,64 +1540,220 @@ static U32 encode_pstate(U32 ratio)
 }
 
 //-----------------------------------------------------------------------------
-static void collect_cpu_info(CPU_DETAILS * cpu)
-{  
-    U32 temp32;
-	U64 temp64;
-    
-    if (Platform->CPU.MaxCoef) 
-    {
-        if (Platform->CPU.MaxDiv) 
+void GetMaxRatio(U32 * max_non_turbo_ratio)
+{
+	U32 index;
+	U32 max_ratio=0;
+	U32 frequency=0;
+    U32 multiplier = 0;
+	// Verify CPUID brand string function is supported
+	if (Platform->CPU.cpuid_max_ext < 80000004)
+	{
+		*max_non_turbo_ratio = max_ratio;
+		return;
+	}	
+	
+    // -2 to prevent buffer overrun because looking for y in yHz, so z is +2 from y
+    for (index=0; index<48-2; index++) {
+        // format is either “x.xxyHz” or “xxxxyHz”, where y=M,G,T and x is digits
+        // Search brand string for “yHz” where y is M, G, or T
+        // Set multiplier so frequency is in MHz
+        if ( Platform->CPU.BrandString[index+1] == 'H' && Platform->CPU.BrandString[index+2] == 'z')
         {
-            cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (Platform->CPU.MaxCoef * 10) + 5;
+            if (Platform->CPU.BrandString[index] == 'M')
+                multiplier = 1;
+            else if (Platform->CPU.BrandString[index] == 'G')
+                multiplier = 1000;
+            else if (Platform->CPU.BrandString[index] == 'T')
+                multiplier = 1000000;
         }
-        else 
+        if (multiplier > 0 && index >= 4 /* who can i call that, buffer underflow :-) ??*/)
         {
-            cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) Platform->CPU.MaxCoef * 10;
+            // Copy 7 characters (length of “x.xxyHz”)
+            // index is at position of y in “x.xxyHz”
+            
+            // Compute frequency (in MHz) from brand string
+            if (Platform->CPU.BrandString[index-3] == '.')
+            { // If format is “x.xx”
+                if (isdigit(Platform->CPU.BrandString[index-4]) && isdigit(Platform->CPU.BrandString[index-2]) &&
+                    isdigit(Platform->CPU.BrandString[index-1]))
+                {
+                    frequency  = (U32)(Platform->CPU.BrandString[index-4] - '0') * multiplier;
+                    frequency += (U32)(Platform->CPU.BrandString[index-2] - '0') * (multiplier / 10);
+                    frequency += (U32)(Platform->CPU.BrandString[index-1] - '0') * (multiplier / 100);
+                }                
+            }
+            else
+            { // If format is xxxx
+                if (isdigit(Platform->CPU.BrandString[index-4]) && isdigit(Platform->CPU.BrandString[index-3]) && 
+                    isdigit(Platform->CPU.BrandString[index-2]) && isdigit(Platform->CPU.BrandString[index-1]))
+                {
+                    frequency  = (U32)(Platform->CPU.BrandString[index-4] - '0') * 1000;
+                    frequency += (U32)(Platform->CPU.BrandString[index-3] - '0') * 100;
+                    frequency += (U32)(Platform->CPU.BrandString[index-2] - '0') * 10;
+                    frequency += (U32)(Platform->CPU.BrandString[index-1] - '0');
+                    frequency *= multiplier;
+                }
+                
+            }
+            
+            max_ratio = frequency / get_bclk();
+            break; 
         }
     }
+	
+	// Return non-zero Max Non-Turbo Ratio obtained from CPUID brand string
+	// or return 0 indicating Max Non-Turbo Ratio not available
+	*max_non_turbo_ratio = max_ratio;
+}
+
+//-----------------------------------------------------------------------------
+static void collect_cpu_info(CPU_DETAILS * cpu)
+{  
+    	
 #if BUILD_ACPI_TSS || pstate_power_support
     cpu->turbo_available = Platform->CPU.dynamic_acceleration;
-
-    if (!is_sandybridge() && !is_jaketown())
+	
 	{
-		if (turbo_enabled && cpu->turbo_available)
+		U32 temp32 = 0;
+		U64 temp64=  0;
+		int tdp;
+		if (getIntForKey("TDP", &tdp, &bootInfo->bootConfig))
 		{
-			temp64 = rdmsr64(MSR_TURBO_POWER_CURRENT_LIMIT);
-			temp32 = (U32)temp64;
-		} 
-		else 
-		{
-            // Unfortunately, Intel don't provide a better method for non turbo processors
-            // and it will give a TDP of 95w (for ex. mine is 65w) , to fix this issue,
-            // you can set this value by simply adding the option TDP = XX (XX is an integer)
-            // in your boot.plist (see compute_tdp)
-			temp32 = (U32)0x02a802f8;
+			temp32 = (U32) (tdp*8) ; 
+			
+			int tdc;
+			if (getIntForKey("TDC", &tdc, &bootInfo->bootConfig))
+			{
+				temp32 = (U32) (temp32) | tdc<<16 ; 
+				
+			}
+			else if (tdp)
+			{
+				temp32 = (U32) (temp32) | ((tdp)*8)<<16 ;
+			}
+			
 		}
-		cpu->tdp_limit = ( temp32 & 0x7fff );
-		cpu->tdc_limit = ( (temp32 >> 16) & 0x7fff );
-	}
-    if (is_sandybridge() || is_jaketown())
+		else if (!is_sandybridge() && !is_jaketown())
+		{
+			if (turbo_enabled && cpu->turbo_available)
+			{
+				temp64 = rdmsr64(MSR_TURBO_POWER_CURRENT_LIMIT);
+				temp32 = (U32)temp64;
+			} 
+			else 
+			{
+				// Unfortunately, Intel don't provide a better method for non turbo processors
+				// and it will give a TDP of 95w (for ex. mine is 65w) , to fix this issue,
+				// you can set this value by simply adding the option TDP = XX (XX is an integer)
+				// in your boot.plist 
+				temp32 = (U32)0x02a802f8;
+			}
+			
+		}
+		if (temp32) {
+			cpu->tdp_limit = ( temp32 & 0x7fff );
+			cpu->tdc_limit = ( (temp32 >> 16) & 0x7fff );
+		}
+	}    
+    
+#endif
+    
+	switch (Platform->CPU.Family)
 	{
-		cpu->package_power_limit = rdmsr64(MSR_PKG_RAPL_POWER_LIMIT);
-		cpu->package_power_sku_unit = rdmsr64(MSR_RAPL_POWER_UNIT);
-	}
-#endif
-    
+		case 0x06: 
+		{
+			switch (Platform->CPU.Model) 
+			{
+				case CPUID_MODEL_DOTHAN: 
+				case CPUID_MODEL_YONAH: // Yonah
+				case CPUID_MODEL_MEROM: // Merom
+				case CPUID_MODEL_PENRYN: // Penryn
+				case CPUID_MODEL_ATOM: // Intel Atom (45nm)
+				{
+					
+					cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
+					cpu->core_c4_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;
+					
+					if (Platform->CPU.Model == CPUID_MODEL_ATOM)
+					{
+						cpu->core_c2_supported = cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
+						cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
+
+					} 
+					else
+					{
+						cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
+						cpu->core_c2_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
+						cpu->core_c6_supported = 0;
+
+					}
+
+					cpu->core_c7_supported = 0;
+										
 #if BETA
-    U64 msr = rdmsr64(MSR_IA32_PERF_STATUS);
-    U16 idlo = (msr >> 48) & 0xffff;
-    cpu->min_ratio        = (U32)(idlo  >> 8) & 0xff;   
-    
-    //U64 platform_info = rdmsr64(MSR_PLATFORM_INFO); 
-	//cpu->min_ratio        = (U32) ((platform_info >> 40) & 0xff); // This method don't work for me
+					GetMaxRatio(&cpu->max_ratio_as_mfg);
+					U64 msr = rdmsr64(MSR_IA32_PERF_STATUS);
+					U16 idlo = (msr >> 48) & 0xffff;
+					U16 idhi = (msr >> 32) & 0xffff;
+					cpu->min_ratio        = (U32) (idlo  >> 8) & 0xff;
+					cpu->max_ratio_as_cfg = (U32) (idhi  >> 8) & 0xff;
+					
+#else
+					if (Platform->CPU.MaxCoef) 
+					{
+						if (Platform->CPU.MaxDiv) 
+						{
+							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (Platform->CPU.MaxCoef * 10) + 5;
+						}
+						else 
+						{
+							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) Platform->CPU.MaxCoef * 10;
+						}
+					}
 #endif
-     // note: on c2d c6 & c7 cstates are not supported but it give me 1 with my e8500, i guess this mean that it can enter to c4       
-    cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
-	cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
-	cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
-	cpu->core_c7_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;    
-     
+					
+					break;
+				} 
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_DALES_32NM:
+				case CPUID_MODEL_NEHALEM: 
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_WESTMERE_EX:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_JAKETOWN:
+				{		
+					
+					cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
+					cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
+					cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
+					cpu->core_c7_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;
+					cpu->core_c2_supported = 0;
+					cpu->core_c4_supported = 0;
+					
+					GetMaxRatio(&cpu->max_ratio_as_mfg);
+                    U64 platform_info = rdmsr64(MSR_PLATFORM_INFO);                    
+                    cpu->max_ratio_as_cfg = (U32) ((U32)platform_info >> 8) & 0xff; 
+					cpu->min_ratio        = (U32) ((platform_info >> 40) & 0xff);
+					
+					if (is_sandybridge() || is_jaketown())
+					{
+						cpu->package_power_limit = rdmsr64(MSR_PKG_RAPL_POWER_LIMIT);
+						cpu->package_power_sku_unit = rdmsr64(MSR_RAPL_POWER_UNIT);
+					}
+					break;
+				}
+				default:
+					verbose ("Unsupported CPU\n");
+					return /*(0)*/;
+					break;
+			}
+		}
+		default:			
+			break;
+	}
 
 	cpu->mwait_supported = (Platform->CPU.extensions & (1UL << 0)) ? 1 : 0;	
     
@@ -1586,33 +1793,6 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 }
 
 #if BETA
-
-static U32 get_bclk(void)
-{
-	return (is_jaketown() || is_sandybridge()) ? 100 : 133;
-}
-
-//-----------------------------------------------------------------------------
-static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate)
-{
-	U32 ratiorange = max-min;
-	U32 numGaps = numStates-1-turboEnabled;
-	U32 adjPstate = pstate-turboEnabled;
-	return (pstate == 0)     ? (max + turboEnabled) :
-	(ratiorange == 0) ? max                  :
-	max-(((adjPstate*ratiorange)+(numGaps/2))/numGaps);
-}
-//-----------------------------------------------------------------------------
-static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit)
-{
-	U32 ratiorange, maxStates, numStates;
-	
-	ratiorange = max - min + 1;
-	maxStates = ratiorange + (turboEnabled ? 1 : 0);
-	numStates = (pssLimit < maxStates) ? pssLimit : maxStates;
-	return (numStates < 2) ? 0 : numStates;
-}
-
 //-----------------------------------------------------------------------------
 static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {
@@ -1661,6 +1841,61 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 	return (1);
 }
 #else
+
+//-----------------------------------------------------------------------------
+static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu)
+{
+	// Build P-state table info based on verified options
+    
+	// Compute the number of p-states based on the ratio range
+	cpu->pkg_pstates.num_pstates = computeNumPstates(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, MAX_PSTATES);
+	
+	if (!cpu->pkg_pstates.num_pstates)
+	{
+		return (0);
+	}
+	
+	// Compute pstate data
+	{
+#ifdef pstate_power_support
+		U32 TDP = compute_tdp(cpu);								
+#endif
+		
+		U32 index;
+		for (index=0; index < cpu->pkg_pstates.num_pstates; index ++)
+		{
+			PSTATE * pstate = &cpu->pkg_pstates.pstate[index];
+			
+			// Set ratio
+			pstate->ratio = computePstateRatio(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, cpu->pkg_pstates.num_pstates, index);
+			
+			// Compute frequency based on ratio
+			if ((index != 0) || (cpu->turbo_available == 0))
+				pstate->frequency = pstate->ratio * get_bclk();
+			else
+				pstate->frequency = ((pstate->ratio - 1) * get_bclk()) + 1;
+			
+#ifdef pstate_power_support
+			// Compute power based on ratio and other data
+			if (pstate->ratio >= cpu->max_ratio_as_mfg)
+				// Use max power in mW
+				pstate->power = TDP * 1000;
+			else
+			{
+				pstate->power = compute_pstate_power(cpu, pstate->ratio, TDP);
+				
+				// Convert to mW
+				pstate->power*= 1000;
+			}
+#else
+			pstate->power = 0;
+#endif	
+		}
+	}		
+    
+	return (1);
+}
+
 //-----------------------------------------------------------------------------
 static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {	
@@ -1696,7 +1931,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						
 						bool cpu_noninteger_bus_ratio = (rdmsr64(MSR_IA32_PERF_STATUS) & (1ULL << 46));
 #if UNUSED
-						initial.Control = rdmsr64(MSR_IA32_PERF_STATUS);
+						//initial.Control = rdmsr64(MSR_IA32_PERF_STATUS);
 #endif			
 						maximum.Control = ((rdmsr64(MSR_IA32_PERF_STATUS) >> 32) & 0x1F3F) | (0x4000 * cpu_noninteger_bus_ratio);
 						maximum.CID = ((maximum.FID & 0x1F) << 1) | cpu_noninteger_bus_ratio;
@@ -1722,7 +1957,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
 							intel_waitforsts();
 						}
-						
+
 						if (minimum.VID == maximum.VID) 
 						{	
 							U64 msr;
@@ -1741,7 +1976,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
 							intel_waitforsts();
 						}
-						
+
 						minimum.CID = ((minimum.FID & 0x1F) << 1) >> cpu_dynamic_fsb;
 						
 						// Sanity check
@@ -1810,36 +2045,51 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					case CPUID_MODEL_SANDYBRIDGE:
 					case CPUID_MODEL_JAKETOWN:
 					{		
-						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
-						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+						/*
+						 maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
+						 minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+						 
+						 verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
+						 
+						 // Sanity check
+						 if (maximum.Control < minimum.Control) 
+						 {
+						 DBG("Insane control values!");
+						 p_states_count = 0;
+						 }
+						 else
+						 {
+						 U8 i;
+						 p_states_count = 0;
+						 
+						 for (i = maximum.Control; i >= minimum.Control; i--) 
+						 {
+						 p_states[p_states_count].Control = i;
+						 p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
+						 p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
+						 p_states_count++;
+						 if (p_states_count >= MAX_PSTATES) { // was 32
+						 
+						 if (p_states_count > MAX_PSTATES) // was 32
+						 p_states_count = MAX_PSTATES; // was 32
+						 
+						 break;
+						 }
+						 }
+						 }
+						 */
 						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
-						
-						// Sanity check
-						if (maximum.Control < minimum.Control) 
+						bool sta = BuildCoreIPstateInfo(cpu);
+						if (sta) 
 						{
-							DBG("Insane control values!");
-							p_states_count = 0;
+							DBG("_PSS PGK generated successfully\n");
+							return (1);
+							
 						}
 						else
 						{
-							U8 i;
-							p_states_count = 0;
-							
-							for (i = maximum.Control; i >= minimum.Control; i--) 
-							{
-								p_states[p_states_count].Control = i;
-								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
-								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
-								p_states_count++;
-								if (p_states_count >= MAX_PSTATES) { // was 32
-									
-									if (p_states_count > MAX_PSTATES) // was 32
-										p_states_count = MAX_PSTATES; // was 32
-									
-									break;
-								}
-							}
+							verbose("CoreI _PSS Generation failed !!\n");
+							return (0);
 						}
 						
 						break;
@@ -1850,7 +2100,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						break;
 				}
 			}
-			default:
+			default:				
 				break;
 		}
 	}
@@ -2171,27 +2421,27 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 		
 		static const ACPI_GENERIC_ADDRESS io_gas[] = {
 			{GAS_TYPE_FFH,      0,0,0,0x00},   // processor C1
-			{GAS_TYPE_SYSTEM_IO,8,0,0,0x14},   // processor C3 as ACPI C2
+			{GAS_TYPE_SYSTEM_IO,8,0,0,0x14},   // processor C3 as ACPI C2 or processor C2
 			{GAS_TYPE_SYSTEM_IO,8,0,0,0x14},   // processor C3 as ACPI C3
-			{GAS_TYPE_SYSTEM_IO,8,0,0,0x15},   // processor C3 as ACPI C4
+			{GAS_TYPE_SYSTEM_IO,8,0,0,0x15},   // processor C4 as ACPI C4
 			{GAS_TYPE_SYSTEM_IO,8,0,0,0x15},   // processor C6
 			{GAS_TYPE_SYSTEM_IO,8,0,0,0x16},   // processor C7
 		};
 		
 		static const CSTATE mwait_cstate [] = {
 			{1,0x01,0x3e8},      // processor C1
-			{2,0x40,0x1f4},      // processor C3 as ACPI C2
+			{2,0x40,0x1f4},      // processor C3 as ACPI C2 or processor C2
 			{3,0x40,0x1f4},      // processor C3 as ACPI C3
-			{4,0x40,0x1f4},      // processor C3 as ACPI C4
+			{4,0x40,0x1f4},      // processor C4 
 			{6/*was 3*/,0x60,0x15e},      // processor C6
 			{7/*was 3*/,0x60,0x0c8},      // processor C7
 		};
 		
 		static const CSTATE io_cstate [] = {
 			{1,0x01,0x3e8},      // processor C1
-			{2,0x40,0x1f4},      // processor C3 as ACPI C2
+			{2,0x40,0x1f4},      // processor C3 as ACPI C2 or processor C2
 			{3,0x40,0x1f4},      // processor C3 as ACPI C3
-			{4,0x40,0x1f4},      // processor C3 as ACPI C4
+			{4,0x40,0x1f4},      // processor C4 
 			{6/*was 3*/,0x60,0x15e},      // processor C6
 			{7/*was 3*/,0x60,0x0c8},      // processor C7
 		};
@@ -2204,7 +2454,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 		// ACPI C2 state.
 		// 1= processor core C3 can be used as an ACPI C2 state
 		// 0= processor core C3 cannot be used as an ACPI C2 state
-		int c2_enabled = 1;
+		int c2_enabled = 0;
 		
 		// Desired state for the processor core C3 state included in the _CST
 		// 0= processor core C3 cannot be used as an ACPI C state
@@ -2215,7 +2465,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 		// 5= processor core C3 can be used as an ACPI C2 state
 		//    if Invariant APIC Timer detected, else APIC C3 state
 		// 6= processor core C3 can be used as an ACPI C4 state
-		int c3_enabled = 2;
+		int c3_enabled = 3;
 		
 		// Desired state for the processor core C3 state included in the _CST as an
 		// ACPI C4 state.
@@ -2267,21 +2517,20 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				cpu->pkg_mwait_cstates.gas[cpu->pkg_mwait_cstates.num_cstates] = mwait_gas[cstate_2_index[CPU_C1]];
 				cpu->pkg_mwait_cstates.num_cstates++;
 			}
-			if (cpu->core_c3_supported && c2_enabled && (c2_enabled || (c3_enabled == 2) ||
+			if (((cpu->core_c3_supported || cpu->core_c2_supported) && (c2_enabled)) && ((c3_enabled == 2) ||
 										   ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
 			{
 				cpu->pkg_mwait_cstates.cstate[cpu->pkg_mwait_cstates.num_cstates] = mwait_cstate[cstate_2_index[CPU_C3_ACPI_C2]];
 				cpu->pkg_mwait_cstates.gas[cpu->pkg_mwait_cstates.num_cstates] = mwait_gas[cstate_2_index[CPU_C3_ACPI_C2]];
 				cpu->pkg_mwait_cstates.num_cstates++;
 			}
-			if (c4_enabled)
+			if (cpu->core_c4_supported && c4_enabled)
 			{
-				if (cpu->core_c3_supported)
-				{
-					cpu->pkg_mwait_cstates.cstate[cpu->pkg_mwait_cstates.num_cstates] = mwait_cstate[cstate_2_index[CPU_C3_ACPI_C4]];
-					cpu->pkg_mwait_cstates.gas[cpu->pkg_mwait_cstates.num_cstates] = mwait_gas[cstate_2_index[CPU_C3_ACPI_C4]];
-					cpu->pkg_mwait_cstates.num_cstates++;
-				}
+				
+				cpu->pkg_mwait_cstates.cstate[cpu->pkg_mwait_cstates.num_cstates] = mwait_cstate[cstate_2_index[CPU_C4]];
+				cpu->pkg_mwait_cstates.gas[cpu->pkg_mwait_cstates.num_cstates] = mwait_gas[cstate_2_index[CPU_C4]];
+				cpu->pkg_mwait_cstates.num_cstates++;
+				
 			}
 			else
 			{
@@ -2317,7 +2566,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates] = io_gas[cstate_2_index[CPU_C1]];
 				cpu->pkg_io_cstates.num_cstates++;
 			}
-			if (cpu->core_c3_supported && c2_enabled && (c2_enabled || (c3_enabled == 2) ||
+			if ((cpu->core_c3_supported || cpu->core_c2_supported) && (c2_enabled || (c3_enabled == 2) ||
 										   ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
 			{
 				cpu->pkg_io_cstates.cstate[cpu->pkg_io_cstates.num_cstates] = io_cstate[cstate_2_index[CPU_C3_ACPI_C2]];
@@ -2325,15 +2574,14 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates].Address += pmbase;
 				cpu->pkg_io_cstates.num_cstates++;
 			}
-			if (c4_enabled)
+			if (cpu->core_c4_supported && c4_enabled)
 			{
-				if (cpu->core_c3_supported)
-				{
-					cpu->pkg_io_cstates.cstate[cpu->pkg_io_cstates.num_cstates] = io_cstate[cstate_2_index[CPU_C3_ACPI_C4]];
-					cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates] = io_gas[cstate_2_index[CPU_C3_ACPI_C4]];
-					cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates].Address += pmbase;
-					cpu->pkg_io_cstates.num_cstates++;
-				}
+				
+				cpu->pkg_io_cstates.cstate[cpu->pkg_io_cstates.num_cstates] = io_cstate[cstate_2_index[CPU_C4]];
+				cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates] = io_gas[cstate_2_index[CPU_C4]];
+				cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates].Address += pmbase;
+				cpu->pkg_io_cstates.num_cstates++;	
+				
 			}
 			else 
 			{
@@ -2453,12 +2701,17 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 	
 	if (Platform->CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: SSDT will not be generated !!!\n");
-		return(1);
+		return(0);
 	}
 	
 	if (!(Platform->CPU.Features & CPUID_FEATURE_MSR)) {
 		verbose ("Unsupported CPU: SSDT will not be generated !!!\n");
-		return(1);
+		return(0);
+	}
+	
+	if (dsdt == (void *)0ul) {
+		verbose ("DSDT not found: SSDT will not be generated !!!\n");
+		return (0);
 	}
 			
 	{		
@@ -2474,7 +2727,7 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 	{		
 		printf("Error: not enought reserved space in the new acpi list for the SSDT table,\n ");
 		printf("       please increase the RESERVED_AERA\n");
-		return(1);
+		return(0);
 	}
 	
 	if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
@@ -2482,7 +2735,7 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 		if (oem_apic == false) 
 		{
 			MadtPointer = (ACPI_TABLE_MADT *)madt_file;		
-			new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list // note: for now we don't patch this table
+			//new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list // note: for now we don't patch this table
 		}
 		
 	} else
@@ -2506,6 +2759,11 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 		// Reserved kernel memory for the ssdt table
 		ACPI_TABLE_SSDT *new_ssdt = (ACPI_TABLE_SSDT *)AllocateKernelMemory(old_ssdt->Header.Length);
 		
+		if (!new_ssdt) 
+		{
+			printf("Unable to allocate kernel memory for SSDT ");
+			return (0);
+		}
 		// Move the old stack buffer to kernel memory
 		memcpy(new_ssdt, old_ssdt, old_ssdt->Header.Length);
 		
@@ -3588,13 +3846,7 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 		// (1) Setup pointers to SSDT memory location
 		void * current = buffer;
 		void * end = (U8 *)buffer + bufferSize;		
-		
-		// Check that we have a valid cpu_map (if it's not already done, it will try to generate it)
-		if (generate_cpu_map_from_acpi(dsdt) != 0)
-		{
-			return(0);
-		}
-		
+						
 		// Confirm a valid SSDT buffer was provided
 		if (!buffer)
 		{
@@ -3608,6 +3860,22 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 			printf("Error: Invalid Buffer Length for SSDT\n");
 			return(0);
 		}		
+		
+		if (madt == (void*) 0ul)
+		{
+			return(0);
+		}
+		
+		if (dsdt == (void*) 0ul)
+		{
+			return(0);
+		}
+		
+		// Check that we have a valid cpu_map (if it's not already done, it will try to generate it)
+		if (generate_cpu_map_from_acpi(dsdt) != 0)
+		{
+			return(0);
+		}
 		
 		collect_cpu_info(&cpu);
 		ProcessMadt(madt, &madt_info);
@@ -3879,6 +4147,11 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 static ACPI_TABLE_FACS* generate_facs(bool updatefacs )
 {
     ACPI_TABLE_FACS* facs_mod=(ACPI_TABLE_FACS *)AllocateKernelMemory(sizeof(ACPI_TABLE_FACS));
+	if (!facs_mod) 
+	{
+		printf("Unable to allocate kernel memory for facs mod\n");
+		return (void*)0ul;
+	}
     bzero(facs_mod, sizeof(ACPI_TABLE_FACS));
 	
 	ACPI_TABLE_FACS * FacsPointer =(acpi_tables.FacsPointer64 != (void *)0ul) ? 
@@ -3961,14 +4234,25 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	{      
        if (fadt->Header.Length < 0xF4)
 	   {
-			fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0xF4);
-		    bzero(fadt_mod, 0xF4);
-			memcpy(fadt_mod, fadt, fadt->Header.Length);
-			fadt_mod->Header.Length = 0xF4;
+		   fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0xF4);
+		   if (!fadt_mod) 
+		   {
+			   printf("Unable to allocate kernel memory for fadt mod\n");
+			   return (void*)0ul;
+		   }
+		   bzero(fadt_mod, 0xF4);
+		   memcpy(fadt_mod, fadt, fadt->Header.Length);
+		   fadt_mod->Header.Length = 0xF4;
+		 
 		}
 		else
 		{			
-			fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(fadt->Header.Length);	
+			fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(fadt->Header.Length);
+			if (!fadt_mod) 
+			{
+				printf("Unable to allocate kernel memory for fadt mod\n");
+				return (void*)0ul;
+			}
 			memcpy(fadt_mod, fadt, fadt->Header.Length);
 		}		   
 				
@@ -4003,6 +4287,11 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 			if (fadt->Header.Length < 0x84 )
 			{
 				fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0x84);
+				if (!fadt_mod) 
+				{
+					printf("Unable to allocate kernel memory for fadt mod\n");
+					return (void*)0ul;
+				}
 				bzero(fadt_mod, 0x84);
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 				fadt_mod->Header.Length   = 0x84;
@@ -4010,6 +4299,11 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 			else
 			{
 				fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(fadt->Header.Length);
+				if (!fadt_mod) 
+				{
+					printf("Unable to allocate kernel memory for fadt mod\n");
+					return (void*)0ul;
+				}
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 			}			
 			
@@ -4024,6 +4318,11 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 			if (fadt->Header.Length < 0x74 )
 			{
 				fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0x74);
+				if (!fadt_mod) 
+				{
+					printf("Unable to allocate kernel memory for fadt mod\n");
+					return (void*)0ul;
+				}
 				bzero(fadt_mod, 0x74);
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 				fadt_mod->Header.Length   = 0x74;
@@ -4035,6 +4334,11 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 			else
 			{
 				fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(fadt->Header.Length);
+				if (!fadt_mod) 
+				{
+					printf("Unable to allocate kernel memory for fadt mod\n");
+					return (void*)0ul;
+				}
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 			}
 		}		 		
@@ -4178,7 +4482,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	return fadt_mod;
 }
 
-static void process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
+static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 {
 	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"ACPIDropTables"));
 	U32 new_table = 0ul;
@@ -4200,7 +4504,12 @@ static void process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 		U32 dropoffset=0, index;
 		table_added = 0;
 		
-		xsdt_mod=(ACPI_TABLE_XSDT *)AllocateKernelMemory(xsdt->Header.Length); 
+		xsdt_mod=(ACPI_TABLE_XSDT *)AllocateKernelMemory(xsdt->Header.Length);
+		if (!xsdt_mod) 
+		{
+			printf("Unable to allocate kernel memory for xsdt mod\n");
+			return (0);
+		}
 		bzero(xsdt_mod, xsdt->Header.Length);
 		memcpy(&xsdt_mod->Header, &xsdt->Header, sizeof(ACPI_TABLE_HEADER));
 		
@@ -4322,17 +4631,19 @@ static void process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 		
 		rsdt_conv = (ACPI_TABLE_RSDT *)gen_alloc_rsdt_from_xsdt(xsdt_mod);
 		
-#if DEBUG_ACPI
-		DBG("Attempting to update RSDP with RSDT \n");
+		if (rsdt_conv != (void*)0ul)
 		{
-			U32 ret = update_rsdp_with_rsdt(rsdp_mod, rsdt_conv);
-			if (ret)
-				DBG("RSDP update with RSDT successfully !!! \n");
-		}
+#if DEBUG_ACPI
+			DBG("Attempting to update RSDP with RSDT \n");
+			{
+				U32 ret = update_rsdp_with_rsdt(rsdp_mod, rsdt_conv);
+				if (ret)
+					DBG("RSDP update with RSDT successfully !!! \n");
+			}
 #else
-		update_rsdp_with_rsdt(rsdp_mod, rsdt_conv);
+			update_rsdp_with_rsdt(rsdp_mod, rsdt_conv);
 #endif
-		
+		}		
 		
 	}
 	else
@@ -4346,10 +4657,11 @@ static void process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 		rsdp_mod->XsdtPhysicalAddress=0xffffffffffffffffLL;
 		verbose("XSDT not found or XSDT incorrect\n");
 	}
+	return (1);
 
 }
 
-static void process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list)
+static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list)
 {			
 	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"ACPIDropTables"));
 	U32 new_table = 0ul;
@@ -4361,6 +4673,13 @@ static void process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tab
 	rsdt=(ACPI_TABLE_RSDT *)acpi_tables.RsdtPointer;
 
 	rsdt_mod=(ACPI_TABLE_RSDT *)AllocateKernelMemory(rsdt->Header.Length);
+	
+	if (!rsdt_mod) 
+	{
+		printf("Unable to allocate kernel memory for rsdt mod\n");
+		return (0);
+	}
+	
 	bzero(rsdt_mod, rsdt->Header.Length);
 	memcpy (&rsdt_mod->Header, &rsdt->Header, sizeof(ACPI_TABLE_HEADER));
 	
@@ -4486,20 +4805,23 @@ static void process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tab
 		verbose("* Creating new XSDT from RSDT table\n");
 		xsdt_conv = (ACPI_TABLE_XSDT *)gen_alloc_xsdt_from_rsdt(rsdt_mod);
 		
-		update_rsdp_with_xsdt(rsdp_mod, xsdt_conv); 		
-		
-#if DEBUG_ACPI
-		DBG("Attempting to update RSDP with XSDT \n");
+		if (xsdt_conv != (void *)0ul )
 		{
-			U32 ret = update_rsdp_with_xsdt(rsdp_mod, xsdt_conv);
-			if (ret)
-				DBG("RSDP update with XSDT successfully !!! \n");
-		}
+#if DEBUG_ACPI
+			DBG("Attempting to update RSDP with XSDT \n");
+			{
+				U32 ret = update_rsdp_with_xsdt(rsdp_mod, xsdt_conv);
+				if (ret)
+					DBG("RSDP update with XSDT successfully !!! \n");
+			}
 #else
-		update_rsdp_with_xsdt(rsdp_mod, xsdt_conv);
+			update_rsdp_with_xsdt(rsdp_mod, xsdt_conv);
 #endif
 		
+		}
+		
 	}	
+	return (1);
 }
 
 EFI_STATUS setupAcpi(void)
@@ -4630,9 +4952,6 @@ EFI_STATUS setupAcpi(void)
 						continue;
 					}					
 															
-					//char* tmp = malloc(strlen(name) + 1);
-					//strcpy(tmp, name);
-					
 					DBG("* Attempting to load acpi table: %s\n", name);			
 					if ( (new_table_list[i]=(U32)loadACPITable(dirspec,name)))
 					{
@@ -4644,11 +4963,7 @@ EFI_STATUS setupAcpi(void)
 						{
 							break;
 						}						
-					} 
-					//else
-					//{
-					//	free(tmp);
-					//}
+					} 					
 
 				}
 #if DEBUG_ACPI
@@ -4673,11 +4988,7 @@ EFI_STATUS setupAcpi(void)
 		}
 		
 	}			
-
-	// TODO : Add an option for that
-    //cpuNamespace = CPU_NAMESPACE_PR; //Default
-    
-    
+	    
 	if (speed_step)
 	{
 		gen_psta= true;
@@ -4710,12 +5021,7 @@ EFI_STATUS setupAcpi(void)
 	rsdplength=(Revision == 2)?rsdp->Length:ACPI_RSDP_REV0_SIZE;
 	
 	DBG("RSDP Revision %d found @%x. Length=%d\n",Revision,rsdp,rsdplength);
-	
-	/* FIXME: no check that memory allocation succeeded 
-	 * Copy and patch RSDP,RSDT, XSDT and FADT
-	 * For more info see ACPI Specification pages 110 and following
-	 */
-	
+			
 	if (gen_xsdt)
 	{
 		rsdp_mod=rsdp_conv;
@@ -4723,6 +5029,9 @@ EFI_STATUS setupAcpi(void)
 	else
 	{
 		rsdp_mod=(ACPI_TABLE_RSDP *) AllocateKernelMemory(rsdplength);
+		
+		if (!rsdp_mod) return EFI_OUT_OF_RESOURCES; 
+		
 		memcpy(rsdp_mod, rsdp, rsdplength);
 	}	
 	
@@ -4763,12 +5072,10 @@ EFI_STATUS setupAcpi(void)
 	{
 		
 		fadt_mod = patch_fadt(FacpPointer, (oem_dsdt == false) ? new_dsdt : (void*)0ul , (acpi_tables.FacpPointer64 != (void *)0ul ));	
-		
-		
-		DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt):(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
-		
+						
 		if (fadt_mod != (void*)0ul)
 		{
+			DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt):(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
 			
 			U8 empty = get_0ul_index_in_list(new_table_list,true);
 			if (empty != ACPI_TABLE_LIST_FULL)
@@ -4787,6 +5094,8 @@ EFI_STATUS setupAcpi(void)
 			printf("Error: Failed to patch the FADT Table, trying fallback to the FADT original pointer\n");
 			fadt_mod = (acpi_tables.FacpPointer64 != (void *)0ul) ? 
 			(ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
+			
+			DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt):(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
 			
 			U8 empty = get_0ul_index_in_list(new_table_list,true);
 			if (empty != ACPI_TABLE_LIST_FULL)

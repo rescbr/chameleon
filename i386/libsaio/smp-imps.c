@@ -244,9 +244,9 @@ boot_cpu(imps_processor *proc)
 	 * under the 1MB boundary.
 	 */
 
-	//extern char patch_code_end[];
-	//bootaddr = (512-64)*1024;
-	//memcpy((char *)bootaddr, patch_code_start, 0x5fe00);
+	//extern char ???[];
+	//bootaddr = (512-64)*1024; ???
+	//memcpy((char *)bootaddr, ,??? );
 
 	/*
 	 *  Generic CPU startup sequence starts here.

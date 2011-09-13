@@ -18,6 +18,11 @@ Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029
 #define DBG(x...)
 #endif
 
+uint8_t HD3000_os_info[20] = {
+    0x30,0x49,0x01,0x11,0x11,0x11,0x08,0x00,0x00,0x01,
+    0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
+};
+
 uint8_t GMAX3100_vals[22][4] = {
 	{ 0x01,0x00,0x00,0x00 },
 	{ 0x01,0x00,0x00,0x00 }, 
@@ -60,7 +65,14 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x80862A12, "GMAX3100" },
 	{ 0x80862A13, "GMAX3100" },
 	{ 0x80862A42, "GMAX3100" },
-	{ 0x80862A43, "GMAX3100" }
+	{ 0x80862A43, "GMAX3100" },
+    { 0x80860102, "Intel HD Graphics 3000" },
+    { 0x80860106, "Intel HD Graphics 3000" },
+    { 0x8086010A, "Intel HD Graphics 3000" },
+    { 0x80860112, "Intel HD Graphics 3000" },
+    { 0x80860116, "Intel HD Graphics 3000" },
+    { 0x80860122, "Intel HD Graphics 3000" },
+    { 0x80860126, "Intel HD Graphics 3000" }
 };
 static char *get_gma_model(uint32_t id);
 
@@ -151,6 +163,11 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[21], 4);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
+    else if (model == (char *)"Intel HD Graphics 3000")
+    {
+        devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
+    }
+    
 
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)

@@ -19,8 +19,8 @@ endif
 
 all embedtheme: $(DIRS_NEEDED) $(VERSIONED_FILES)
 
-boot1h: boot1.s Makefile
-	$(NASM) boot1.s -o $(SYMROOT)/boot1h
+boot1h: boot1h.s Makefile
+	$(NASM) boot1h.s -o $(SYMROOT)/boot1h
 	$(NASM) boot1hp.s -o $(SYMROOT)/boot1hp
 	$(NASM) boot1he.s -o $(SYMROOT)/boot1he
 	$(NASM) boot1f32.s -o $(SYMROOT)/boot1f32

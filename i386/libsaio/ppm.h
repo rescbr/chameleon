@@ -138,9 +138,10 @@ typedef enum cstate_encoding {
 
 typedef enum cpu_cstate {
     CPU_C1 = 1,
+	//CPU_C2 = 2,
     CPU_C3_ACPI_C2 = 3,
     CPU_C3_ACPI_C3 = 4,
-	CPU_C3_ACPI_C4 = 5,
+	CPU_C4 = 5,
     CPU_C6 = 6,
     CPU_C7 = 7,
 } CPU_CSTATE;
@@ -196,7 +197,9 @@ typedef struct cpu_details {
 
     U32 package_cstate_limit;
     U32 core_c1_supported;
+	U32 core_c2_supported;
     U32 core_c3_supported;
+	U32 core_c4_supported;
     U32 core_c6_supported;
     U32 core_c7_supported;
     U32 mwait_supported;

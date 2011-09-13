@@ -2224,6 +2224,7 @@ int GUI_countdown( const char * msg, int row, int timeout )
 	
     for ( time = time18(), timeout++; timeout > 0; )
     {
+		
 		if( time18() > (unsigned)lasttime)
 		{
 			multi--; 

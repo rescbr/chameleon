@@ -32,7 +32,7 @@ void ACPICodec_start()
     
 	if (enable)
 	{		
-		register_hook_callback("setupEfiConfigurationTable", &ACPICodec_setupEfiConfigurationTable_hook);
+		register_hook_callback("setupAcpiEfi", &ACPICodec_setupEfiConfigurationTable_hook);
         register_hook_callback("isACPIRegistred", &is_ACPI_Codec_Registred_Hook);
 
 	}

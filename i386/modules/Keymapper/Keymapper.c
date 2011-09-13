@@ -14,7 +14,21 @@
 
 #define kEnableKeyMap "EnableKeyMapper"
 static int AZERTY_switch(int c);
+void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+int Keymapper_getc();
 
+int Keymapper_getc()
+{	
+    int c = bgetc();		
+	
+	//execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
+	Keymapper_hook(&c, NULL, NULL, NULL, NULL, NULL);
+	
+    if ((c & 0xff) == 0) 		
+        return c;
+    else 	
+		return (c & 0xff); 
+}
 
 // CPARM's AZERTY_switch : A Basic QWERTY to AZERTY switcher
 static int AZERTY_switch(int c)
@@ -228,6 +242,7 @@ void Keymapper_start()
 	
 	if (enable)
 	{
-		register_hook_callback("Keymapper", &Keymapper_hook);
+		//register_hook_callback("Keymapper", &Keymapper_hook);
+		replace_function("_getc", &Keymapper_getc);
 	}
 }

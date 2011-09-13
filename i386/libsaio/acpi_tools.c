@@ -89,7 +89,7 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
     // Init memory address as F000 segment and scan 64KB region
     if (!success)
         success = GetRsdtPointer((void *)0x0F0000, 0x10000, acpi_tables);
-    
+
     if (!success)
         return (0ul);
     
@@ -192,6 +192,27 @@ static ACPI_TABLE_HEADER *GetTablePtr(ACPI_TABLE_RSDT * rsdt, U32 signature)
 // Procedure:    GetTablePtr64 - Find ACPI table in XSDT with input signature.
 //
 //-------------------------------------------------------------------------------
+#if 0
+static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
+{
+    U32 index;
+    U32 num_tables;
+    ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;
+	
+    // Compute number of table pointers included in XSDT
+    num_tables = get_num_tables64(xsdt);
+	
+    for (index = 0; index < num_tables; index++) {
+        if (((U32) (table->Signature) == signature) &&
+            (GetChecksum(table, table->Length) == 0)) {
+            return (table);
+        }
+        // Move array pointer to next 64-bit pointer
+        table = (ACPI_TABLE_HEADER *) ((U32) table + sizeof(U64));
+    }
+    return (0);
+}
+#else
 static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 {
     U32 index;
@@ -210,7 +231,7 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
     }
     return (0);
 }
-
+#endif
 
 
 //-------------------------------------------------------------------------------
@@ -259,7 +280,7 @@ static U32 GetRsdtPointer(void *mem_addr, U32 mem_size, ACPI_TABLES * acpi_table
                 // RSD pointer structure checksum okay, lookup the RSDT pointer.                
                 acpi_tables->RsdPointer = (ACPI_TABLE_RSDP *)current;
                 acpi_tables->RsdtPointer = (ACPI_TABLE_RSDT *) acpi_tables->RsdPointer->RsdtPhysicalAddress;
-                if ((acpi_tables->RsdPointer != 0) && (acpi_tables->RsdtPointer != 0))
+                if ((acpi_tables->RsdPointer != (void*)0ul) && (acpi_tables->RsdtPointer != (void*)0ul))
                     return (1ul);
                 else
                     return (0ul);

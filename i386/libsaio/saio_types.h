@@ -236,17 +236,6 @@ enum {
 //#define BIOS_DEV_TYPE(d)  ((d) & kBIOSDevTypeMask)
 #define BIOS_DEV_UNIT(bvr)  ((bvr)->biosdev - (bvr)->type)
 
-/*
- * KernBootStruct device types.
- */
-/*
-enum {
-    DEV_SD = 0,
-    DEV_HD = 1,
-    DEV_FD = 2,
-    DEV_EN = 3
-};
-*/
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #endif

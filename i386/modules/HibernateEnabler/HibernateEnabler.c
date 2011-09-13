@@ -2,9 +2,7 @@
  *  HibernateEnabler.c
  *  Chameleon
  *
- *  Created by cparm. <armelcadetpetit@gmail.com>
- *  Copyright 2010. All rights reserved.
- *
+ *  Created by cparm.
  */
 
 #include "bootstruct.h"

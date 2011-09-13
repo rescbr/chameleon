@@ -111,20 +111,21 @@ static int countdown( const char * msg, int row, int timeout )
 	
 	moveCursor( 0, row );
 	printf(msg);
-	
+	/*
 	int multi_buff = 18 * (timeout);
     int multi = ++multi_buff;
-	
-    unsigned int lasttime=0;
+	*/
+    //unsigned int lasttime=0;
 	
     for ( time = time18(), timeout++; timeout > 0; )
     {
+		/*
 		if( time18() > lasttime)
 		{
 			multi--; 
 			lasttime=time18();
 		}		
-		
+		*/
         if ((ch = readKeyboardStatus()))
             break;
 		
@@ -964,7 +965,7 @@ processBootOptions()
 	
     gOverrideKernel = false;
     if (( kernel = extractKernelName((char **)&cp) )) {        
-		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
+		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile)+1 );
         gOverrideKernel = true;
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
@@ -973,7 +974,7 @@ processBootOptions()
                 gOverrideKernel = true;
             }
         } else {
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile)+1 );
         }
     }
 	

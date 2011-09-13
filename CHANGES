@@ -1,3 +1,13 @@
+- Updated keymapper ...
+- Applied scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s , disabled by default,
+  see - http://forum.voodooprojects.org/index.php/topic,2158.msg10345/boardseen.html#new - for more info.
+- Applied Vladimir Zidar's hibernate patch on hibernateEnabler
+- Applied "Intel HD Graphics 3000" patch to gma.c (credit: ???) , 
+  found at - http://www.darwinx86.net/forum/61-section-francaise-/1880-espace-de-discussion-anval?limit=10&start=60#6247 -
+- Added AMD support (most of the code is derived from the trunk, MUST BE ENABLED BY HAND IN CPU.C) see - http://forge.voodooprojects.org/p/chameleon/issues/163/ - 
+- Improved Core Ix support in AcpiCodec
+- Improved c-states support in AcpiCodec
+
 - Sync'd nvidia.c and gma.c (see GraphicEnabler module) to the trunk
 - Improved compatibility with xcode4 (afaik only the modules gui and smbiosgetters will not work with xcode4, even if they are built without any errors)
 - Applied JrCs's path for more protection against buffer overflow in some case (trunk v1449)
@@ -5,10 +15,10 @@
 - Moved smp code to Erich Boleyn's smp-imps (not fully implemented yet)
 - Added the UseKernelCache option only for compatibility with the trunk ("Yes" have no effect, since it's the default),
   the Flag "-F" which do the same things is still valid
-- Re-worked SSDT generation, and merged with the Intel's code
+- Re-worked SSDT generation, and merged with the Bits's code
 - Removed aml_generator from AcpiCodec, now use acpicode.c to generate aml file
 - Added YellowIconFixer module
-- Merged fsb detection with Intel's code in cpu.c (slightly faster)
+- Merged fsb detection with Bits's code in cpu.c (slightly faster)
 - Fixed a bug related to ACPI in AcpiCodec (thanck to StephN666 for testing)
 - Fixed a bug related to ACPI and the machine with a rsd table revision > 0 (acpi_tools.c) (thanck to StephN666 for testing)
  
@@ -16,7 +26,7 @@
 - Fixed an issue with kernelPatcher, it seems that kernelPatcher is unable to patch the kernelCache
 - Applied some fixes from the trunk
 - Applied many under the hood fixes
-- Added Andy Vandijck Server spoof
+- Added Andy Vandijck's Server spoof
 - Added a Patch from Andy Vandijck in SMBiosPatcher and SMBiosGetters
 - Added a Patch from Netkas in GraphicEnabler (ati.c)
 - Fixed an issue where the GUI module couldn't find the themes directory

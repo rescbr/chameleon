@@ -95,6 +95,70 @@ struct IOHibernateImageHeader
 };
 typedef struct IOHibernateImageHeader IOHibernateImageHeader;
 
+struct IOHibernateImageHeader107
+{
+    uint64_t	imageSize;
+    uint64_t	image1Size;
+        
+    uint32_t	restore1CodePhysPage;
+    uint32_t    reserved1;
+    uint64_t	restore1CodeVirt;
+    uint32_t	restore1PageCount;
+    uint32_t	restore1CodeOffset;
+    uint32_t	restore1StackOffset;
+       
+    uint32_t	pageCount;
+    uint32_t	bitmapSize;
+        
+    uint32_t	restore1Sum;
+    uint32_t	image1Sum;
+    uint32_t	image2Sum;
+    
+    uint32_t	actualRestore1Sum;
+    uint32_t	actualImage1Sum;
+    uint32_t	actualImage2Sum;
+    
+    uint32_t	actualUncompressedPages;
+    uint32_t	conflictCount;
+    uint32_t	nextFree;
+    
+    uint32_t	signature;
+    uint32_t	processorFlags;
+    
+    uint32_t    runtimePages;
+    uint32_t    runtimePageCount;
+    uint64_t    runtimeVirtualPages __attribute__ ((packed));
+    
+    uint32_t    performanceDataStart;
+    uint32_t    performanceDataSize;
+        
+    uint64_t	encryptStart __attribute__ ((packed));
+    uint64_t	machineSignature __attribute__ ((packed));
+    
+    uint32_t    previewSize;
+    uint32_t    previewPageListSize;
+    
+    uint32_t	diag[4];
+    
+    uint32_t    handoffPages;
+    uint32_t    handoffPageCount;
+    
+    uint32_t    systemTableOffset;
+    
+    uint32_t	debugFlags;
+    uint32_t	options;
+    
+    uint32_t	reserved[70];		// make sizeof == 512
+    
+    uint64_t	encryptEnd __attribute__ ((packed));
+    uint64_t	deviceBase __attribute__ ((packed));
+    
+    uint32_t		fileExtentMapSize;
+    IOPolledFileExtent	fileExtentMap[2];
+};
+
+
+typedef struct IOHibernateImageHeader107 IOHibernateImageHeader107;
 
 struct hibernate_bitmap_t
 {

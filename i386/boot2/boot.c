@@ -89,7 +89,7 @@ char gBootKernelCacheFile[512];
 char gMKextName[512];
 char gMacOSVersion[8];
 char *gRootDevice = NULL;
-bool uuidSet = false;
+
 #ifndef OPTION_ROM
 bool gEnableCDROMRescan;
 bool gScanSingleDrive;
@@ -117,6 +117,7 @@ static bool gUnloadPXEOnExit = false;
 #endif
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size);
 static bool found_extra_kext(void);
+static void determineCpuArch(void);
 
 void getKernelCachePath();
 
@@ -563,23 +564,26 @@ void common_boot(int biosdev)
 		// Find out which version mac os we're booting.
 		getOSVersion(gMacOSVersion);
 		
-		//if (platformCPUFeature(CPU_FEATURE_EM64T)) {        
-        if (cpu_mode_is64bit())
+		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig) && val)
 		{
-			archCpuType = CPU_TYPE_X86_64;
-		}
-		else
-		{
-			archCpuType = CPU_TYPE_I386;
-		}
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig))
-		{
-			if (strncmp(val, "i386", 4) == 0)
+			if (strncmp(val, "x86_64", 4) == 0)
+			{
+				archCpuType = CPU_TYPE_X86_64;
+			} 
+			else if (strncmp(val, "i386", 4) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;
 			}
+			else 
+			{
+				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n")
+				determineCpuArch();
+			}
+
 		}
-		
+		else determineCpuArch();
+
+
 		getRootDevice();
 
 		// Notify to all modules that we are attempting to boot
@@ -612,7 +616,6 @@ void common_boot(int biosdev)
 		}
 						
 		verbose("Loading Darwin %s\n", gMacOSVersion);
-		
 		{
 			long cachetime, kerneltime, exttime;
 			if (trycache ) do {
@@ -623,6 +626,7 @@ void common_boot(int biosdev)
 				{
 					trycache = 0;
 					bootInfo->adler32  = 0;
+					DBG("No kernel found, kernelcache disabled !!!\n");
 					break;
 				}
 				ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
@@ -631,6 +635,8 @@ void common_boot(int biosdev)
 				{
 					trycache = 0;
 					bootInfo->adler32  = 0;
+					DBG("Warning: kernelcache too old, timestamp of the kernel > timestamp of the cache, kernelcache disabled !!!\n");
+
 					break;				                
 				} 
 				ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
@@ -639,6 +645,8 @@ void common_boot(int biosdev)
 				{
 					trycache = 0;
 					bootInfo->adler32  = 0;
+					DBG("Warning: kernelcache too old, timestamp of S/L/E > timestamp of the cache, kernelcache disabled !!! \n");
+
 					break;
 				}
 				if (kerneltime > exttime)
@@ -649,11 +657,13 @@ void common_boot(int biosdev)
 				{
 					trycache = 0;
 					bootInfo->adler32  = 0;
+					DBG("Warning: invalid timestamp, kernelcache disabled !!!\n");
+
 					break;
 				}
 			} while (0);
 		}		
-		
+
         do {
             if (trycache)
 			{
@@ -698,12 +708,12 @@ void common_boot(int biosdev)
 					if (ret == -1)
 					{
 						// Not found any alternate locations, using the original kernel image path.
-						strcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
+						strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec)+1);
 					}
 				}
             }
 #else
-			strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
+			strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec)+1);
 #endif
 			
             verbose("Loading kernel %s\n", bootFileSpec);
@@ -765,6 +775,18 @@ void common_boot(int biosdev)
 #endif
 }
 
+static void determineCpuArch(void)
+{
+	if (cpu_mode_is64bit())
+	{
+		archCpuType = CPU_TYPE_X86_64;
+	}
+	else
+	{
+		archCpuType = CPU_TYPE_I386;
+	}
+}
+
 void getKernelCachePath()
 {
 	{
@@ -794,7 +816,7 @@ void getKernelCachePath()
                     len++;
                 }
 			}            
-			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile));
+			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile)+1);
 		}
 		else
 		{
@@ -843,7 +865,7 @@ void getKernelCachePath()
 					{
 						platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
 					}
-					//memcpy(gRootPath,platformInfo->rootPath, sizeof(platformInfo->rootPath));
+					//memcpy(gRootPath,platformInfo->rootPath, sizeof(gRootPath));
 					
 					
 					bootInfo->adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
@@ -878,14 +900,14 @@ static void getRootDevice()
 {
 	// Maximum config table value size
 #define VALUE_SIZE 2048
-	
+	bool uuidSet = false;
 	const char *val = 0;
     int cnt = 0;
 	
-	if (getValueForKey(kBootUUIDKey, &val, &cnt, &bootInfo->bootConfig)){
+	if (getValueForKey(kBootUUIDKey, &val, &cnt, &bootInfo->bootConfig))
+	{
 		uuidSet = true;		
-		
-    }
+	}
 	else
 	{
 		if (getValueForBootKey(bootArgs->CommandLine, kRootDeviceKey, &val, &cnt))
@@ -929,6 +951,10 @@ static void getRootDevice()
 				valueBuffer = malloc(VALUE_SIZE);
 				char *           argP = bootArgs->CommandLine;
 				valueBuffer[0] = '*';
+				if (cnt > VALUE_SIZE)
+				{
+					cnt = VALUE_SIZE;
+				}
 				cnt++;
 				strlcpy(valueBuffer + 1, val, cnt);				
 				if (!copyArgument( kRootDeviceKey, valueBuffer, cnt, &argP, &ArgCntRemaining))
@@ -999,22 +1025,33 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
 	struct dirstuff* moduleDir = opendir(dir);
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{		
-		if(strcmp(&name[strlen(name) - ext_size], ext) == 0)
-		{	
-			if (name_compare)
-			{
-				if (strcmp(name, name_compare) == 0)
+		int len = strlen(name);
+		
+		if (len >= ext_size)
+		{
+			if(strcmp(&name[len - ext_size], ext) == 0)
+			{	
+				if (name_compare)
+				{
+					if (strcmp(name, name_compare) == 0)
+					{
+						DBG("found : %s\n", name);	
+						return true;
+					}
+				}
+				else
 				{
 					DBG("found : %s\n", name);	
 					return true;
-				}
+				}			
 			}
-			else
+#if DEBUG_BOOT
+			else 
 			{
-				DBG("found : %s\n", name);	
-				return true;
-			}			
-		}
+				DBG("Ignoring %s\n", name);
+			}
+#endif
+		}		
 #if DEBUG_BOOT
 		else 
 		{
@@ -1121,7 +1158,7 @@ static char *FIXED_BOOTFILE_PATH(char * str)
 	if (!bootFileWithDevice && (str)[0] != '/')
 		sprintf(bootFile, "/%s", str); // append a leading /
 	else
-		strcpy(bootFile, bootInfo->bootFile);
+		strlcpy(bootFile, bootInfo->bootFile, sizeof(bootInfo->bootFile)+1);
 	
 	return bootfile;
 }

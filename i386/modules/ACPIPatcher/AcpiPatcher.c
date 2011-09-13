@@ -37,7 +37,7 @@ void AcpiPatcher_start()
     enable = (execute_hook("isACPIRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
     
 	if (enable) {		
-		register_hook_callback("setupEfiConfigurationTable", &AcpiPatcher_setupEfiConfigurationTable_hook);
+		register_hook_callback("setupAcpiEfi", &AcpiPatcher_setupEfiConfigurationTable_hook);
         register_hook_callback("isACPIRegistred", &is_ACPI_Patcher_Registred_Hook);
 
 	}

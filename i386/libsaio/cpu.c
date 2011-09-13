@@ -17,7 +17,33 @@
 #define DBG(x...)		msglog(x)
 #endif
 
-#if OLD_STYLE
+//#define AMD_SUPPORT 
+
+#ifndef INTEL_SUPPORT
+#define INTEL_SUPPORT 0 //Default (0: nolegacy, 1 : legacy)
+#endif
+
+#ifdef AMD_SUPPORT
+#ifdef LEGACY_CPU
+#undef LEGACY_CPU
+#endif
+#ifdef INTEL_SUPPORT
+#undef INTEL_SUPPORT
+#endif
+#define LEGACY_CPU 1
+#endif
+
+#ifdef INTEL_SUPPORT 
+#ifdef LEGACY_CPU
+#undef LEGACY_CPU
+#endif
+#define LEGACY_CPU INTEL_SUPPORT
+#endif
+// (?) : if AMD_SUPPORT then LEGACY_CPU = 1, INTEL_SUPPORT = disabled
+//		   else LEGACY_CPU = INTEL_SUPPORT
+
+
+#if LEGACY_CPU
 static uint64_t measure_tsc_frequency(void);
 
 // DFE: enable_PIT2 and disable_PIT2 come from older xnu
@@ -146,7 +172,68 @@ static uint64_t measure_tsc_frequency(void)
     return retval;
 }
 
-#else
+#ifdef AMD_SUPPORT
+#define MSR_AMD_APERF           0x000000E8
+/*
+ * Original comment/code:
+ *  "DFE: Measures the Max Performance Frequency in Hz (64-bit)"
+ *
+ * Measures the Actual Performance Frequency in Hz (64-bit)
+ *  (just a naming change, mperf --> aperf )
+ */
+static uint64_t measure_aperf_frequency(void)
+{
+	uint64_t aperfStart;
+	uint64_t aperfEnd;
+	uint64_t aperfDelta = 0xffffffffffffffffULL;
+	unsigned long pollCount;
+	uint64_t retval = 0;
+	int i;
+	
+	/* Time how many APERF ticks elapse in 30 msec using the 8254 PIT
+	 * counter 2. We run this loop 3 times to make sure the cache
+	 * is hot and we take the minimum delta from all of the runs.
+	 * That is to say that we're biased towards measuring the minimum
+	 * number of APERF ticks that occur while waiting for the timer to
+	 * expire.
+	 */
+	for(i = 0; i < 10; ++i)
+	{
+		enable_PIT2();
+		set_PIT2_mode0(CALIBRATE_LATCH);
+		aperfStart = rdmsr64(MSR_AMD_APERF);
+		pollCount = poll_PIT2_gate();
+		aperfEnd = rdmsr64(MSR_AMD_APERF);
+		/* The poll loop must have run at least a few times for accuracy */
+		if (pollCount <= 1)
+			continue;
+		/* The TSC must increment at LEAST once every millisecond.
+		 * We should have waited exactly 30 msec so the APERF delta should
+		 * be >= 30. Anything less and the processor is way too slow.
+		 */
+		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
+			continue;
+		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
+		if ( (aperfEnd - aperfStart) < aperfDelta )
+			aperfDelta = aperfEnd - aperfStart;
+	}
+	/* mperfDelta is now the least number of MPERF ticks the processor made in
+	 * a timespan of 0.03 s (e.g. 30 milliseconds)
+	 */
+	
+	if (aperfDelta > (1ULL<<32))
+		retval = 0;
+	else
+	{
+		retval = aperfDelta * 1000 / 30;
+	}
+	disable_PIT2();
+	return retval;
+}
+#endif
+
+#endif
+
 /*
  License for x2apic_enabled, get_apicbase, compute_bclk.
  
@@ -184,18 +271,18 @@ static uint32_t compute_bclk(void);
 static inline __attribute__((always_inline)) void rdmsr32(uint32_t msr, uint32_t * lo_data_addr, uint32_t * hi_data_addr)
 {    
     __asm__ volatile(
-        "rdmsr"
-        : "=a" (*lo_data_addr), "=d" (*hi_data_addr)
-        : "c" (msr)
-        );    
+					 "rdmsr"
+					 : "=a" (*lo_data_addr), "=d" (*hi_data_addr)
+					 : "c" (msr)
+					 );    
 }	
 static inline __attribute__((always_inline)) void wrmsr32(uint32_t msr, uint32_t lo_data, uint32_t hi_data)
 {
     __asm__ __volatile__ (
-        "wrmsr"
-        : /* No outputs */
-        : "c" (msr), "a" (lo_data), "d" (hi_data)
-        );
+						  "wrmsr"
+						  : /* No outputs */
+						  : "c" (msr), "a" (lo_data), "d" (hi_data)
+						  );
 }
 #define MSR_APIC_BASE 0x1B
 #define APIC_TMR_INITIAL_CNT 0x380
@@ -319,10 +406,10 @@ static uint32_t compute_bclk(void)
 	
     // Round bclk to the nearest 100/12 integer value
     bclk = ((((bclk * 24) + 100) / 200) * 200) / 24;
-    DBG("\nCompute bclk: %dMHz\n", bclk);
+	
     return bclk;
 }
-#endif
+
 
 /*
  * Calculates the FSB and CPU frequencies using specific MSRs for each CPU
@@ -335,7 +422,7 @@ static uint32_t compute_bclk(void)
 
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
+	uint64_t	tscFrequency = 0, fsbFrequency = 0, cpuFrequency = 0;
 	uint64_t	msr;
 	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
     uint32_t	reg[4];
@@ -351,13 +438,13 @@ void scan_cpu(PlatformInfo_t *p)
     
     /* get extended cpuid results */
 	do_cpuid(0x80000000, reg);
-	uint32_t cpuid_max_ext = reg[eax];
+	p->CPU.cpuid_max_ext = reg[eax];
     
     
 	/* Begin of Copyright: from Apple's XNU cpuid.c */
 	
 	/* get brand string (if supported) */
-	if (cpuid_max_ext > 0x80000004)
+	if (p->CPU.cpuid_max_ext > 0x80000004)
 	{		
         char        str[128], *s;
 		/*
@@ -386,17 +473,20 @@ void scan_cpu(PlatformInfo_t *p)
             p->CPU.BrandString[0] = '\0';
         }
 	}  
-       
+	
     /*
 	 * Get processor signature and decode
 	 * and bracket this with the approved procedure for reading the
 	 * the microcode version number a.k.a. signature a.k.a. BIOS ID
 	 */
+#ifndef AMD_SUPPORT
 	wrmsr64(MSR_IA32_BIOS_SIGN_ID, 0);
 	do_cpuid(1, reg);
     p->CPU.MicrocodeVersion =
-    (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);
-	
+    (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);	
+#else
+	do_cpuid(1, reg);
+#endif	
 	p->CPU.Signature        = reg[eax];
 	p->CPU.Stepping         = bitfield(reg[eax],  3,  0);
 	p->CPU.Model            = bitfield(reg[eax],  7,  4);
@@ -406,6 +496,14 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.Brand            = bitfield(reg[ebx],  7,  0);
 	p->CPU.Features         = quad(reg[ecx], reg[edx]);
     
+	if (p->CPU.cpuid_max_ext >= 0x80000001)
+	{
+		do_cpuid(0x80000001, reg);
+		p->CPU.ExtFeatures =
+        quad(reg[ecx], reg[edx]);
+		
+	}
+	
     /* Fold extensions into family/model */
 	if (p->CPU.Family == 0x0f)
 		p->CPU.Family += p->CPU.ExtFamily;
@@ -416,33 +514,39 @@ void scan_cpu(PlatformInfo_t *p)
 		logical_per_package =
         bitfield(reg[ebx], 23, 16);
 	else
-		logical_per_package = 1;
+		logical_per_package = 1;	
     
-	if (cpuid_max_ext >= 0x80000001)
-	{
-		do_cpuid(0x80000001, reg);
-		p->CPU.ExtFeatures =
-        quad(reg[ecx], reg[edx]);
-                
-	}
-    
-	/* Fold in the Invariant TSC feature bit, if present */
-	if (cpuid_max_ext >= 0x80000007)
+	if (p->CPU.cpuid_max_ext >= 0x80000007)
 	{
 		do_cpuid(0x80000007, reg);  
+		
+		/* Fold in the Invariant TSC feature bit, if present */
 		p->CPU.ExtFeatures |=
         reg[edx] & (uint32_t)CPUID_EXTFEATURE_TSCI;
+		
+#ifdef AMD_SUPPORT
+		/* Fold in the Hardware P-State control feature bit, if present */
+		p->CPU.ExtFeatures |=
+        reg[edx] & (uint32_t)_Bit(7);
+		
+		/* Fold in the read-only effective frequency interface feature bit, if present */
+		p->CPU.ExtFeatures |=
+        reg[edx] & (uint32_t)_Bit(10);
+#endif
 	}    
-    
+	
     if (p->CPU.cpuid_max_basic >= 0x5) {        
 		/*
 		 * Extract the Monitor/Mwait Leaf info:
 		 */
-		do_cpuid(5, reg);        
+		do_cpuid(5, reg);
+#ifndef AMD_SUPPORT
         p->CPU.sub_Cstates  = reg[edx];
+#endif
         p->CPU.extensions   = reg[ecx];	
 	}
-    
+	
+#ifndef AMD_SUPPORT    
     if (p->CPU.cpuid_max_basic >= 0x6)
     {        
 		/*
@@ -453,61 +557,146 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.invariant_APIC_timer = bitfield(reg[eax], 2, 2); //  "Invariant APIC Timer"
         p->CPU.fine_grain_clock_mod = bitfield(reg[eax], 4, 4);
 	}
-    
+	
     if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
 		(p->CPU.Family == 0x06))
 	{
-            /*
-             * Find the number of enabled cores and threads
-             * (which determines whether SMT/Hyperthreading is active).
-             */
-            switch (p->CPU.Model)
+		/*
+		 * Find the number of enabled cores and threads
+		 * (which determines whether SMT/Hyperthreading is active).
+		 */
+		switch (p->CPU.Model)
 		{
-                    
-                case CPUID_MODEL_DALES_32NM:
-                case CPUID_MODEL_WESTMERE:
-                case CPUID_MODEL_WESTMERE_EX:
-                {
-                    msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-                    p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
-                    p->CPU.NoCores   = bitfield((uint32_t)msr, 19, 16);            
-                    break;
-                }
-                    
-                case CPUID_MODEL_NEHALEM:
-                case CPUID_MODEL_FIELDS:
-                case CPUID_MODEL_DALES:
-                case CPUID_MODEL_NEHALEM_EX:
-				case CPUID_MODEL_SANDYBRIDGE:
-				case CPUID_MODEL_JAKETOWN:
-                {
-                    msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-                    p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
-                    p->CPU.NoCores   = bitfield((uint32_t)msr, 31, 16);            
-                    break;
-                }        
-            }
+				
+			case CPUID_MODEL_DALES_32NM:
+			case CPUID_MODEL_WESTMERE:
+			case CPUID_MODEL_WESTMERE_EX:
+			{
+				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+				p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
+				p->CPU.NoCores   = bitfield((uint32_t)msr, 19, 16);            
+				break;
+			}
+				
+			case CPUID_MODEL_NEHALEM:
+			case CPUID_MODEL_FIELDS:
+			case CPUID_MODEL_DALES:
+			case CPUID_MODEL_NEHALEM_EX:
+			case CPUID_MODEL_SANDYBRIDGE:
+			case CPUID_MODEL_JAKETOWN:
+			{
+				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+				p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
+				p->CPU.NoCores   = bitfield((uint32_t)msr, 31, 16);            
+				break;
+			}        
+		}
     }
-        
+#endif
     if (p->CPU.NoCores == 0)
 	{
-		p->CPU.NoThreads    = cores_per_package;
-		p->CPU.NoCores      = logical_per_package;
+		p->CPU.NoThreads    = logical_per_package;
+		p->CPU.NoCores      = cores_per_package ? cores_per_package : 1 ;
 	}
 	
 	/* End of Copyright: from Apple's XNU cpuid.c */
     
-#if OLD_STYLE
-	tscFrequency = measure_tsc_frequency();
-	fsbFrequency = 0;
-#else
-	tscFrequency = 0;
 	fsbFrequency = (uint64_t)(compute_bclk() * 1000000);
-#endif
-	cpuFrequency = 0;
+
+#if LEGACY_CPU
+	tscFrequency = measure_tsc_frequency();
+#endif	
 	
+#ifdef AMD_SUPPORT
+#define K8_FIDVID_STATUS		0xC0010042
+#define K10_COFVID_STATUS		0xC0010071
+	if (p->CPU.ExtFeatures & _Bit(10))
+	{		
+		cpuFrequency = measure_aperf_frequency();
+	}
+	
+    if ((p->CPU.Vendor == 0x68747541 /* AMD */) && (p->CPU.Family == 0x0f))
+	{
+		switch(p->CPU.ExtFamily)
+		{
+			case 0x00: /* K8 */
+				msr = rdmsr64(K8_FIDVID_STATUS);
+				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
+				currcoef = bitfield(msr, 5, 0) / 2 + 4;
+				break;
+				
+			case 0x01: /* K10 */
+            {
+                //uint32_t reg[4];
+				msr = rdmsr64(K10_COFVID_STATUS);
+				/*
+				do_cpuid2(0x00000006, 0, reg);
+				 EffFreq: effective frequency interface
+				if (bitfield(reg[ecx], 0, 0) == 1)
+				{
+					uint64_t aperf = measure_aperf_frequency();
+					cpuFrequency = aperf;
+				}
+				*/				 
+				// NOTE: tsc runs at the maccoeff (non turbo)
+				//			*not* at the turbo frequency.
+				maxcoef	 = bitfield(msr, 54, 49) / 2 + 4;
+				currcoef = bitfield(msr, 5, 0) + 0x10;
+				currdiv = 2 << bitfield(msr, 8, 6);
+				
+				break;
+			}	
+			case 0x05: /* K14 */
+				msr = rdmsr64(K10_COFVID_STATUS);
+				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
+				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
+				currdiv += bitfield(msr, 3, 0);
+				
+				break;
+				
+			case 0x02: /* K11 */
+				DBG("K11 detected, but not supported !!!\n");
+				// not implimented
+				break;
+		}
 		
-	if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
+		if (!fsbFrequency)
+		{
+			if (maxcoef)
+			{
+				if (currdiv)
+				{
+					if (!currcoef) currcoef = maxcoef;
+					if (!cpuFrequency)
+						fsbFrequency = ((tscFrequency * currdiv) / currcoef);
+					else
+						fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
+					
+					DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
+				} else {
+					if (!cpuFrequency)
+						fsbFrequency = (tscFrequency / maxcoef);
+					else 
+						fsbFrequency = (cpuFrequency / maxcoef);
+					DBG("%d\n", currcoef);
+				}
+			}
+			else if (currcoef)
+			{
+				if (currdiv)
+				{
+					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
+					DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
+				} else {
+					fsbFrequency = (tscFrequency / currcoef);
+					DBG("%d\n", currcoef);
+				}
+			}
+		}
+		
+	}	
+#else
+    if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
 		((p->CPU.Family == 0x06) || 
 		 (p->CPU.Family == 0x0f)))
 	{
@@ -533,7 +722,7 @@ void scan_cpu(PlatformInfo_t *p)
 				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
 #endif
 				bus_ratio_max = (msr >> 8) & 0xff;
-				bus_ratio_min = (msr >> 40) & 0xff; //valv: not sure about this one (Remarq.1)
+				bus_ratio_min = (msr >> 40) & 0xff; 
 				msr = rdmsr64(MSR_FLEX_RATIO);
 #if DEBUG_CPU
 				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
@@ -567,7 +756,7 @@ void scan_cpu(PlatformInfo_t *p)
 						}
 					}
 				}
-#if OLD_STYLE
+#if LEGACY_CPU
 				if (bus_ratio_max)
 				{
 					fsbFrequency = (tscFrequency / bus_ratio_max);
@@ -582,7 +771,7 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 				else
 				{
-#if OLD_STYLE
+#if LEGACY_CPU
 					cpuFrequency = tscFrequency;
 #else
 					cpuFrequency = bus_ratio_max * fsbFrequency;
@@ -604,7 +793,7 @@ void scan_cpu(PlatformInfo_t *p)
 				maxdiv = (msr >> 46) & 0x01;
 				/* Non-integer bus ratio for the current-multi (undocumented)*/
 				currdiv = (msr >> 14) & 0x01;
-
+                
 				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || 
 					(p->CPU.Family == 0x0f)) // This will always be model >= 3
 				{
@@ -617,9 +806,11 @@ void scan_cpu(PlatformInfo_t *p)
 					/* XXX */
 					maxcoef = currcoef;
 				}
-#if OLD_STYLE
+				if (!currcoef) currcoef = maxcoef;
+#if LEGACY_CPU
 				if (maxcoef) 
-				{
+				{					
+					
 					if (maxdiv)
 					{
 						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
@@ -642,6 +833,8 @@ void scan_cpu(PlatformInfo_t *p)
 #endif
 				}
 #else
+				
+				
 				if (currdiv) 
 				{
 					cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
@@ -661,12 +854,12 @@ void scan_cpu(PlatformInfo_t *p)
 					{
 						tscFrequency = fsbFrequency * maxcoef;
 					}
-				}
+				}								
 #if DEBUG_CPU
 				DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 #endif
-
-#endif // OLD_STYLE
+                
+#endif // LEGACY_CPU
 				
 			}
 		}
@@ -688,40 +881,47 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.isMobile = (rdmsr64(0x17) & (1 << 28));
 				break;
 		}
-        
+        // TODO: this part of code seems to work very well for the intel platforms, need to find the equivalent for AMD
 		DBG("%s platform found.\n", p->CPU.isMobile?"Mobile":"Desktop");
 	}
-	
+#endif
+	if (!cpuFrequency) cpuFrequency = tscFrequency;
+
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;
 	p->CPU.CurrDiv = currdiv;
-    
-	//p->CPU.TSCFrequency = (tscFrequency / 1000000) * 1000000;
-	//p->CPU.FSBFrequency = (fsbFrequency / 1000000) * 1000000;
-	//p->CPU.CPUFrequency = (cpuFrequency / 1000000) * 1000000;
-    
+	
     p->CPU.TSCFrequency = tscFrequency ;
 	p->CPU.FSBFrequency = fsbFrequency ;
 	p->CPU.CPUFrequency = cpuFrequency ;
-    
+#ifdef AMD_SUPPORT
+    msglog("AMD CPU Detection Enabled\n");
+#endif
 	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
-	DBG("CPU: TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);	
-	if(p->CPU.Vendor == 0x756E6547 /* Intel */)
-	{		
-		DBG("CPU: FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
-		DBG("CPU: CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
-		DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
-		DBG("CPU: MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);		
-	}
+#ifdef AMD_SUPPORT
+	DBG("CPU (AMD): TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
+	DBG("CPU (AMD): FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
+	DBG("CPU (AMD): CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
+	DBG("CPU (AMD): MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
+	DBG("CPU (AMD): MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);
+#else
+	DBG("CPU: TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
+	DBG("CPU: FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
+	DBG("CPU: CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
+	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
+	DBG("CPU: MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);		
+#endif
 	
 	DBG("CPU: NoCores/NoThreads:     %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
 	DBG("CPU: Features:              0x%08x\n", p->CPU.Features);
-    DBG("CPU: ExtFeatures:           0x%08x\n", p->CPU.ExtFeatures); 
+    DBG("CPU: ExtFeatures:           0x%08x\n", p->CPU.ExtFeatures);
+#ifndef AMD_SUPPORT
     DBG("CPU: MicrocodeVersion:      %d\n", p->CPU.MicrocodeVersion);
+#endif
 #if DEBUG_CPU
-		pause();
+	pause();
 #endif
 	
 }

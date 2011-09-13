@@ -308,8 +308,6 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // However, our caller must fix his return address if he wishes to return to
     // his caller and so on and so forth.
 
-	//initPIC(0x20, 0x28);
-	//initIDT();
 	
     /*  Zero the BSS and initialize malloc */
     initialize_runtime();

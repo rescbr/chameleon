@@ -19,7 +19,7 @@ PAX = /bin/pax
 OBJROOT = `pwd`/obj
 SYMROOT = `pwd`/sym
 DSTROOT = `pwd`/dst
-SRCROOT = /tmp
+SRCROOT = `pwd`
 DOCROOT = `pwd`/doc
 IMGROOT = `pwd`/sym/cache
 IMGSKELROOT = `pwd`/imgskel
@@ -86,21 +86,38 @@ all embedtheme tags debug install installhdrs modules: $(SYMROOT) $(OBJROOT)
 	done
 
 image:
-	@if [ -e "$(SYMROOT)" ]; then					  \
-	    rm -r -f ${IMGROOT};				  	  \
-	    mkdir -p ${IMGROOT}/usr/standalone/i386;		  	  \
-	    if [ -e "$(IMGSKELROOT)" ]; then				  \
-		cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		  \
-	    fi;								  \
-	    cp -f ${SYMROOT}/i386/cdboot ${CDBOOT};		  	  \
-	    cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386; 	  \
-	    cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386;	  \
-	    cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386;  \
-	    cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386;\
-	    $(shell hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
-	       ${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
-	       "${ISOIMAGE}" ${IMGROOT} -quiet) 		  	  \
-	fi;
+	@rm -rf ${IMGROOT}	
+	@mkdir -p ${IMGROOT}/usr/standalone/i386
+	@mkdir -p ${IMGROOT}/Extra/modules				
+	@mkdir -p ${IMGROOT}/Extra/Themes/Default				
+	@mkdir -p ${IMGROOT}/usr/bin
+	@if [ -e "$(IMGSKELROOT)" ]; then				\
+		@echo "\t[CP] ${IMGROOTSKEL} ${IMGROOT}"		\
+		@cp -R -f "${IMGSKELROOT}"/* "${IMGROOT}";		\
+	fi;								  
+	@cp -f ${SYMROOT}/i386/cdboot ${CDBOOT}
+	
+	@#cp -f ${SYMROOT}/i386/Symbols.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/AcpiCodec.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/SmbiosGetters.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/Memory.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/keymapper.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/Usbfix.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/GraphicsEnabler.dylib ${IMGROOT}/Extra/modules
+	@#cp -f ${SYMROOT}/i386/GUI.dylib ${IMGROOT}/Extra/modules
+	
+	@#cp -f ${SRCROOT}/artwork/themes/default/* ${IMGROOT}/Extra/Themes/Default
+
+	@cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0 ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot0hfs ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386
+
+	@hdiutil makehybrid -iso -joliet -hfs -hfs-volume-name \
+		${CDLABEL} -eltorito-boot ${CDBOOT} -no-emul-boot -ov -o   \
+		"${ISOIMAGE}" ${IMGROOT} -quiet
 
 pkg installer: embedtheme
 	@if [ -e "$(SYMROOT)" ]; then					  \

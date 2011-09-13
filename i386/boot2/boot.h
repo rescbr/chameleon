@@ -119,7 +119,7 @@ extern char *gboardproduct;
 //extern char gRootPath[];
 
 extern char *gRootDevice;
-extern bool uuidSet;
+
 /*
  * Boot Modes
  */
