@@ -495,15 +495,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtFamily        = bitfield(reg[eax], 27, 20);
 	p->CPU.Brand            = bitfield(reg[ebx],  7,  0);
 	p->CPU.Features         = quad(reg[ecx], reg[edx]);
-    
-	if (p->CPU.cpuid_max_ext >= 0x80000001)
-	{
-		do_cpuid(0x80000001, reg);
-		p->CPU.ExtFeatures =
-        quad(reg[ecx], reg[edx]);
-		
-	}
-	
+    		
     /* Fold extensions into family/model */
 	if (p->CPU.Family == 0x0f)
 		p->CPU.Family += p->CPU.ExtFamily;
@@ -515,6 +507,14 @@ void scan_cpu(PlatformInfo_t *p)
         bitfield(reg[ebx], 23, 16);
 	else
 		logical_per_package = 1;	
+    
+    if (p->CPU.cpuid_max_ext >= 0x80000001)
+	{
+		do_cpuid(0x80000001, reg);
+		p->CPU.ExtFeatures =
+        quad(reg[ecx], reg[edx]);
+		
+	}
     
 	if (p->CPU.cpuid_max_ext >= 0x80000007)
 	{
