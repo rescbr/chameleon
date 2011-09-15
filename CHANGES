@@ -1,3 +1,4 @@
+- Improved detection of nb of core(s) and thread(s) for AMD processors
 - Updated keymapper ...
 - Applied scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s , disabled by default,
   see - http://forum.voodooprojects.org/index.php/topic,2158.msg10345/boardseen.html#new - for more info.
@@ -71,7 +72,7 @@
 - Added Slice's smbios_patcher fix
 - Increased Booter Log size according to the chameleon trunck (thanck to Azimutz)
 
-- Added BSD support (Credits to: nawcom, valv)
+- Added BSD (OpenBSD and FreeBSD) support (Credits to: nawcom, valv)
 - moved hibernation and ramdisk into modules
 - Added a keyboard mapper module
 - Added CPUFreq module (Credits to: valv, cparm)

@@ -107,7 +107,7 @@ void enableA20()
     /* wait until done */
     flushKeyboardInputBuffer();
 }
-
+#if UNUSED
 void turnOffFloppy(void)
 {
 	/*
@@ -118,7 +118,7 @@ void turnOffFloppy(void)
 	 */
 	outb(0x3F2, 0x00);
 }
-
+#endif
 
 //==========================================================================
 // Return the platform name for this hardware.

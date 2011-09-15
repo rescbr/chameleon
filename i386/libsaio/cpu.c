@@ -426,20 +426,21 @@ void scan_cpu(PlatformInfo_t *p)
 	uint64_t	msr;
 	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
     uint32_t	reg[4];
-    uint32_t        cores_per_package;
-    uint32_t        logical_per_package;    
+    uint32_t        cores_per_package = 0;
+    uint32_t        logical_per_package = 0;    
     
 	do_cpuid(0, reg);
     p->CPU.Vendor		= reg[ebx];
     p->CPU.cpuid_max_basic     = reg[eax];
-    
+	
+#ifndef AMD_SUPPORT
     do_cpuid2(0x00000004, 0, reg);
     cores_per_package		= bitfield(reg[eax], 31, 26) + 1;
-    
+#endif
+	
     /* get extended cpuid results */
 	do_cpuid(0x80000000, reg);
-	p->CPU.cpuid_max_ext = reg[eax];
-    
+	p->CPU.cpuid_max_ext = reg[eax];    
     
 	/* Begin of Copyright: from Apple's XNU cpuid.c */
 	
@@ -506,16 +507,16 @@ void scan_cpu(PlatformInfo_t *p)
 		logical_per_package =
         bitfield(reg[ebx], 23, 16);
 	else
-		logical_per_package = 1;	
-    
-    if (p->CPU.cpuid_max_ext >= 0x80000001)
+		logical_per_package = 1;
+	
+	if (p->CPU.cpuid_max_ext >= 0x80000001)
 	{
 		do_cpuid(0x80000001, reg);
 		p->CPU.ExtFeatures =
         quad(reg[ecx], reg[edx]);
 		
 	}
-    
+	
 	if (p->CPU.cpuid_max_ext >= 0x80000007)
 	{
 		do_cpuid(0x80000007, reg);  
@@ -534,6 +535,17 @@ void scan_cpu(PlatformInfo_t *p)
         reg[edx] & (uint32_t)_Bit(10);
 #endif
 	}    
+	
+#ifdef AMD_SUPPORT
+	if (p->CPU.cpuid_max_ext >= 0x80000008)
+	{
+		if (p->CPU.Features & CPUID_FEATURE_HTT) 
+		{
+			do_cpuid(0x80000008, reg);
+			cores_per_package		= bitfield(reg[ecx], 7 , 0) + 1; // NC + 1
+		}
+	}		
+#endif
 	
     if (p->CPU.cpuid_max_basic >= 0x5) {        
 		/*
@@ -595,6 +607,15 @@ void scan_cpu(PlatformInfo_t *p)
 #endif
     if (p->CPU.NoCores == 0)
 	{
+#ifdef AMD_SUPPORT		
+		if (!cores_per_package) {
+			//legacy method
+			if ((p->CPU.ExtFeatures & _HBit(1)/* CmpLegacy */) && ( p->CPU.Features & CPUID_FEATURE_HTT) )
+				cores_per_package = logical_per_package; 
+			else 
+				cores_per_package = 1;
+		}		
+#endif
 		p->CPU.NoThreads    = logical_per_package;
 		p->CPU.NoCores      = cores_per_package ? cores_per_package : 1 ;
 	}
@@ -694,7 +715,18 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 		}
 		
-	}	
+	}
+	
+	// NOTE: This is not the approved method,
+	// the method provided by AMD is: 
+	// if ((PowerNow == enabled (p->CPU.cpuid_max_ext >= 0x80000007)) && (StartupFID(??) != MaxFID(??))) then "mobile processor present"
+	
+	if (strstr(p->CPU.BrandString, "obile")) 
+		p->CPU.isMobile = true;
+	else 
+		p->CPU.isMobile = false;
+	
+	DBG("%s platform detected.\n", p->CPU.isMobile?"Mobile":"Desktop");
 #else
     if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
 		((p->CPU.Family == 0x06) || 
@@ -881,8 +913,8 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.isMobile = (rdmsr64(0x17) & (1 << 28));
 				break;
 		}
-        // TODO: this part of code seems to work very well for the intel platforms, need to find the equivalent for AMD
-		DBG("%s platform found.\n", p->CPU.isMobile?"Mobile":"Desktop");
+
+		DBG("%s platform detected.\n", p->CPU.isMobile?"Mobile":"Desktop");
 	}
 #endif
 	if (!cpuFrequency) cpuFrequency = tscFrequency;
