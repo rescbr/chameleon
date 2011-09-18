@@ -12,7 +12,7 @@ config BOOT0_DEBUG
 
 config BOOT0_VERBOSE
 	bool "boot0 verbose support"
-	default n
+	default y
 	help
 	  Say Y here if you want to enable boot0 verbose messages.
 	  boot0 will print out status updates as it executes to
@@ -21,7 +21,7 @@ config BOOT0_VERBOSE
 
 config BOOT0_UNSTRETCH
 	bool "boot0 unstretch support"
-	default y
+	default n
 	help
 	  Say Y here if you want your Chameleon Boot Screen to be 
 	  unstretched. Requires a nVidia card, and a digital LCD

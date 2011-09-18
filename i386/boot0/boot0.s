@@ -628,7 +628,7 @@ read_lba:
     ;   DS:SI = pointer to Disk Address Packet
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   carry = 0 success
     ;           1 error
     ;
@@ -780,7 +780,6 @@ disable_scaler:
     LogString(nv_scaler_str)
     ret
 %endif
-
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;

@@ -303,7 +303,7 @@ if ${diskupdate}; then
 
 	if [ ${disksignature} == "00000000" ]; then
 		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk} #Azipkg
+		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
 	else
 		#---------------------------------------------------------------------
 		# If it exists then Windows is also installed on the HDD and we need to write boot0hfs
@@ -311,7 +311,7 @@ if ${diskupdate}; then
 
 		#Azipkg: diskloader=boot0 ??? boot0hfs/boot0md - remenber this is for GPT!!
 		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk} #Azipkg
+		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
 	fi
 else
 	echo "Diskupdate is false, so no stage 0 file was written"

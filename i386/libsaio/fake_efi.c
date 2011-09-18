@@ -438,6 +438,7 @@ static const char const BOARDID_PROP[] = "board-id";
 // Breaks booting from RAID
 static const char const BOOT_UUID_PROP[] = "boot-uuid";
 static char uuidStr[64];
+//Facetime fix end
 
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string

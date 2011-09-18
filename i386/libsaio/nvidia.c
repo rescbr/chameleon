@@ -835,8 +835,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 10A0 - 10AF
 	// 10B0 - 10BF
 	// 10C0 - 10CF
-	{ 0x10DE10C5, "GeForce 405" },
 	{ 0x10DE10C3, "GeForce 8400 GS" },
+	{ 0x10DE10C5, "GeForce 405" },
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1201, "GeForce GTX 560" },
