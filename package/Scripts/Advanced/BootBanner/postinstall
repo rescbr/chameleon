@@ -20,7 +20,7 @@ body = ""
 for line in infile:
     # if we finish the tags and haven't written BootBanner Yet
     if "</dict>" in line and BootBannerCheck == False:
-        line = "        <key>BootBanner</key>\n"
+        line = "        <key>Boot Banner</key>\n"
         line += "        <string>No</string>\n"
         line += "</dict>\n"
         BootBannerCheck = True

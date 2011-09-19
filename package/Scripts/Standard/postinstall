@@ -231,7 +231,7 @@ echo "Check the format of the selected partition"
 echo "*************************************"
 
 if [ "$( fstyp ${bootdev} | grep hfs )" ]; then
-	echo "${bootdev} is a currently formatted as HFS"
+	echo "${bootdev} is currently formatted as HFS"
 	efiformat="hfs"
 fi
 if [ "$( fstyp ${bootdev} | grep msdos )" ]; then
@@ -287,7 +287,7 @@ if ${diskupdate}; then
 	echo "Diskupdate = true, so yes"
 	#---------------------------------------------------------------------
 	# Check bytes 438-446 of the GPTdiskProtectiveMBR for a Windows Disk Signature
-	# If there’s no Windows disk signature then we can write boot0
+	# If there's no Windows disk signature then we can write boot0
 	#---------------------------------------------------------------------
 
 	if [ ${disksignature} == "00000000" ]; then
