@@ -87,6 +87,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
+                cp -f ${pkgroot}/Scripts/Install/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
 		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
 		echo "	[BUILD] Standard "
@@ -97,6 +98,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Tools
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
+                cp -f ${pkgroot}/Scripts/Install/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
 		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
 		echo "	[BUILD] EFI "
