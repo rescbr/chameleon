@@ -33,8 +33,22 @@ else
     dest_vol="$3"
 fi    
 
+# check to see if EFI system partition install option was chosen.
+# if so, unmount /Volumes/EFI
+
+if [ -f "$dest_vol"/.ChameleonEFI ]; then
+    attempts=1
+    while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
+	    echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	    umount -f $( df | grep EFI | awk '{print $1}' )
+	    attempts=$(( ${attempts} + 1 ))
+    done
+fi
+
+
 # delete the temporary Chameleon folder
 
 rm -rf "$dest_vol/tmpcham"
+
 
 echo "Done..."
