@@ -23,7 +23,7 @@ else
 fi
 
 
-partitionBootSector=$( dd if="$targetDeviceRaw" count=1 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
+partitionBootSector=$( dd 2>/dev/null if="$targetDeviceRaw" count=1 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
 if [ "${partitionBootSector:36:2}" == "00" ] && [ "${partitionBootSector:42:2}" == "f8" ] && [ "${partitionBootSector:48:2}" == "3f" ]; then
 	echo "Found a FAT32 device formatted by Windows Explorer"
 	echo "-----------------------------------------------"
