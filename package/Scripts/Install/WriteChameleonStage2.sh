@@ -4,22 +4,29 @@ echo "==============================================="
 echo "Write Chameleon Stage 2 Loader:"
 echo "*******************************"
 
-# Receives passed values for É..
-# for example: 
-# espformat code is 1 for HFS, 2 for MSDOS, 0 for unknown
+# Writes Chameleon stage 2 loader.
+
+# Receives espformat: 1 for HFS, 2 for MSDOS, 0 for unknown
+# Receives stage2Loader: Name of file - boot
+# Receives selectedDestination: for example, /Volumes/USB
+# Receives targetDevice: for example, /dev/disk3s1
+# Receives targetVolume: for example, /Volumes/USB
+# Receives scriptDir: The location of the main script dir.
 
 
-if [ "$#" -eq 5 ]; then
+if [ "$#" -eq 6 ]; then
 	espformat="$1"
 	stage2Loader="$2"
 	selectedDestination="$3"
 	targetDevice="$4"
 	targetVolume="$5"
+	scriptDir="$6"
 	echo "DEBUG: passed argument for espformat = $espformat"
 	echo "DEBUG: passed argument for stage2Loader = $stage2Loader"
 	echo "DEBUG: passed argument for selectedDestination = $selectedDestination"
 	echo "DEBUG: passed argument for targetDevice = $targetDevice"
 	echo "DEBUG: passed argument for targetVolume = $targetVolume"
+	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed"
 	exit 9
@@ -29,7 +36,6 @@ fi
 # if chosen, the package installer will add a file named 'nullESP'
 # in to the temporary directory /.Chameleon
 
-#if [ -f "${selectedDestination}"/.Chameleon/nullESP ]; then
 if [ "${targetVolume}" = "/Volumes/EFI" ]; then
 	echo "DEBUG: EFI install chosen"
 
@@ -61,6 +67,7 @@ else
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${targetVolume}"
 fi
 
+"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
 
 #ÊCheck to see if the user wants to hide the boot file
 

@@ -36,11 +36,11 @@ stage1LoaderHFS="boot1h"
 stage1LoaderFAT="boot1f32"
 stage2Loader="boot"
 
-targetVolumeTemp=$3
-targetDeviceTemp=$( df "${targetVolumeTemp}" | sed -n '2p' | awk '{print $1}' )
+targetVolumeChosenByUser=$3
+targetDeviceChosenByUser=$( df "${targetVolumeChosenByUser}" | sed -n '2p' | awk '{print $1}' )
 
 targetVolume="/Volumes/EFI"
-targetDevice=${targetDeviceTemp%s*}s1
+targetDevice=${targetDeviceChosenByUser%s*}s1
 targetDeviceRaw=${targetDevice/disk/rdisk}
 targetDisk=${targetDevice%s*}
 targetDiskRaw=${targetDisk/disk/rdisk}
@@ -57,8 +57,8 @@ echo "DEBUG: stage0LoaderDualBoot: Disk loader is ${stage0LoaderDualBoot}"
 echo "DEBUG: stage1LoaderHFS: Partition loader is ${stage1LoaderHFS}"
 echo "DEBUG: stage1LoaderFat: Partition loader is ${stage1LoaderFAT}"
 echo "DEBUG: stage2Loader: Filesystem loader is ${stage2Loader}"
-echo "DEBUG: targetVolumeTemp: Volume is ${targetVolumeTemp}"
-echo "DEBUG: targetDeviceTemp: Volume device is ${targetDeviceTemp}"
+echo "DEBUG: targetVolumeChosenByUser: Volume is ${targetVolumeChosenByUser}"
+echo "DEBUG: targetDeviceChosenByUser: Volume device is ${targetDeviceChosenByUser}"
 echo "DEBUG: targetVolume: Volume is ${targetVolume}"
 echo "DEBUG: targetDevice: Volume device is ${targetDevice}"
 echo "DEBUG: targetDeviceRaw: Volume raw device is ${targetDeviceRaw}"
@@ -71,15 +71,15 @@ echo ""
 
 # Check to see if the selected disk uses a GPT
 
-bootuuid=$( diskutil info "$targetDeviceTemp" | grep Volume\ UUID | awk {'print $3'} )
-partitiontable=$( diskutil list ${targetDeviceTemp%s*} | sed -n '3p' | awk '{print $2}' )
+bootuuid=$( diskutil info "$targetDeviceChosenByUser" | grep Volume\ UUID | awk {'print $3'} )
+partitiontable=$( diskutil list ${targetDeviceChosenByUser%s*} | sed -n '3p' | awk '{print $2}' )
 
 if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 	echo "Confirm this is a GPT partitioned disk."
 
-	# Double check we can see the selected partition and it's of the right type
+	# Double check we can see the selected partition, it's of the right type and /Volumes/EFI exists.
 
-        "$scriptDir"CheckProceed.sh "${targetVolumeTemp}" "${targetVolume}" "${targetDeviceTemp}" "${scriptDir}"
+        "$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
 	returnValue=$?
 	if [ ${returnValue} = 0 ]; then
 		# OK to proceed
@@ -88,7 +88,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 		# Does a GRUB or Linux loader already exist in the disk's MBR?
 		# The script returns 1 if yes, 0 if no.
 
-		"$scriptDir"CheckGRUBLinuxLoader.sh "${targetDisk}" "${targetVolumeTemp}" "${scriptDir}"
+		"$scriptDir"CheckGRUBLinuxLoader.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
 		returnValue=$?
 		if [ ${returnValue} = 0 ]; then
 			# OK to proceed
@@ -106,7 +106,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			# the following script returns 0 if we can proceed
 			# with writing the boot files, and 1 for not.
 
-			"$scriptDir"CheckDiskMicrocode.sh "${targetDisk}" "${diskSigCheck}" 
+			"$scriptDir"CheckDiskMicrocode.sh "${targetDisk}" "${diskSigCheck}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			diskupdate=$?
 
 
@@ -129,26 +129,29 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			# the following script returns 0 if it succeeds
 			# the following script returns 1 if it fails to un-mount any EFI volume
 
-			"$scriptDir"UnMountEFIvolumes.sh  "${targetVolumeTemp}" "${scriptDir}"
+			"$scriptDir"UnMountEFIvolumes.sh  "${targetVolumeChosenByUser}" "${scriptDir}"
 			returnValue=$?
 			if [ ${returnValue} = 0 ]; then
 				# OK to proceed
 
+				if [ ${diskupdate} = "0" ]; then
+					echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
 
-				# If diskupdate is flagged as 0 then the stage 0 loader can be written to the MBR
-				if [ ${diskupdate} = 0 ]; then
-					"$scriptDir"WriteChameleonStage0.sh "${diskupdate}" "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetVolumeTemp}" "${scriptDir}"
+					# Write the stage 0 loader to the MBR
+					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+				else
+					echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
+					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
 				fi
 
 				# Write the stage 1 loader to the partition boot sector
-				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeTemp}" "${targetDeviceRaw}" "${targetVolume}"
+				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
 
 				# Write the stage 2 loader to the root of the selected partition
-				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolumeTemp}" "${targetDevice}" "${targetVolume}"
+				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolumeChosenByUser}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
 				# Set the active partition ONLY if Windows is not installed
-				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeTemp}" "${scriptDir}"
-			
+				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			fi
 		fi
 	fi
@@ -172,7 +175,7 @@ fi
 
 # Create temporary file on target volume to notify
 # boot option scripts than EFI (ESP) option was chosen
-echo "EFI" >"${targetVolumeTemp}"/.ChameleonEFI 
+echo "EFI" >"${targetVolumeChosenByUser}"/.ChameleonEFI 
 
 echo "==============================================="
 echo "END - Main EFI System Partition Post-Install Script"

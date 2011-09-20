@@ -4,21 +4,28 @@ echo "==============================================="
 echo "CheckDiskMicrocode: Any existing bootloaders?"
 echo "*********************************************"
 
-# This script is passed the targetDisk and diskSigCheck.
-#
-# it then reads the GPTdiskProtectiveMBR and searches for an existing
+# Reads the GPTdiskProtectiveMBR and searches for an existing
 # Windows bootloader and also for an existing Chameleon stage 0 loader
 # which might be better changed depending on whether or not a Windows
 # signature is found or not.
-#
 # The script then exits with the value 0 to indicate that Chameleon stage0
 # loader can be written, or 1 to indicate not to write the stage0 loader.
 
-if [ "$#" -eq 2 ]; then
+# Receives targetDisk: for example, /dev/disk2.
+# Receives diskSigCheck: 0 = Windows not installed / 1 = Windows installed.
+# Receives targetVolume: Volume to install to.
+# Receives scriptDir: The location of the main script dir.
+
+
+if [ "$#" -eq 4 ]; then
 	targetDisk="$1"
 	diskSigCheck="$2"
+	targetVolume="$3"
+	scriptDir="$4"
 	echo "DEBUG: passed argument for targetDisk = $targetDisk"
 	echo "DEBUG: passed argument for diskSigCheck = $diskSigCheck"
+	echo "DEBUG: passed argument for targetVolume = $targetVolume"
+	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed - Exiting"
 	exit 9
@@ -47,17 +54,18 @@ else
 	# See if a Chameleon stage0 boot file already exists
 
 	# Note: The checks for Boot0 and Boot0hfs assume the code stays the same.
-	# if the code changes then the hex values 0b807c and 0a803c used for matching
+	# if the code changes then the hex values 0b807c, 0a803c and ee7505 used for matching
 	# need to be checked to see if they are the same or not.
 
 	stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
-	echo ${stage0type}
+	#echo ${stage0type}
 	if [ "${stage0type}" == "0b807c" ]; then
 		echo "Found existing Chameleon stage 0 loader - Boot0hfs"
 
 		# Script CheckDiskSignature.sh returned 0 if a Windows installation was NOT found
 		if [ "$diskSigCheck" == "0" ]; then
 			echo "Found no existing Windows installation so will replace stage 0 loader with Boot0"
+			exit 0
 		fi
 	fi
 
@@ -67,15 +75,23 @@ else
 		# Script CheckDiskSignature.sh returned 1 if a Windows installation was found
 		if [ "$diskSigCheck" = "1" ]; then
 			echo "Found existing Windows installation so will replace stage 0 loader with Boot0hfs"
+			exit 0
 		fi
 	fi
 
-	if [ "${stage0type}" != "0b807c" ] && [ "${stage0type}" != "0a803c" ] && [ "${windowsloader}" != "33c08ed0" ]  ; then
+	if [ "${stage0type}" == "ee7505" ]; then
+		echo "Found existing Chameleon stage 0 loader - Boot0md"
+		echo "And will leave boot0md installed."
+		exit 1
+	fi
+
+	if [ "${stage0type}" != "0b807c" ] && [ "${stage0type}" != "0a803c" ] && [ "${stage0type}" != "ee7505" ] && [ "${windowsloader}" != "33c08ed0" ]  ; then
 		echo "Something other than Chameleon or a Windows bootloader was found"
 		test=$(echo "${mbr437}" | awk -F0 '{print NF-1}' )
 		echo "Disk microcode found: ${test} - Preserving."
 		echo "diskupdate is set to false"
 		echo "-----------------------------------------------"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "NOTE: Found existing unknown bootcode in the MBR"
 		echo ""
 		exit 1
 	fi
