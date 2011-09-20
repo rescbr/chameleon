@@ -43,6 +43,10 @@ if [ -f "$dest_vol"/.ChameleonEFI ]; then
 	    umount -f $( df | grep EFI | awk '{print $1}' )
 	    attempts=$(( ${attempts} + 1 ))
     done
+
+# Remove /.ChameleonEFI file
+rm "$dest_vol"/.ChameleonEFI
+
 fi
 
 
