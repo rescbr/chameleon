@@ -69,6 +69,12 @@ echo "-----------------------------------------------"
 echo ""
 
 
+# Write some information to the Install Log
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script
+Target volume Selected by user = ${targetVolumeChosenByUser}
+Target volume = ${targetVolume}"
+
+
 # Check to see if the selected disk uses a GPT
 
 bootuuid=$( diskutil info "$targetDeviceChosenByUser" | grep Volume\ UUID | awk {'print $3'} )

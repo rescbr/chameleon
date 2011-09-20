@@ -26,10 +26,29 @@ fi
 logName="Chameleon_Installer_Log.txt"
 logFile="${logLocation}"/$logName
 
-if [ -f "${logFile}" ]; then
+# On first run, create a file named .ChameleonLogFlag at
+# the root of the target volume. Then check for this file
+# on subsequent runs to know the initialisation sequence
+# has been done.
+
+if [ ! -f "${logLocation}"/.ChameleonLogFlag ]; then
+	# This is the first run, so setup 
+	# Chameleon_Installer_Log.txt file
+	# by writing header.
+
+	echo "Chameleon installer log - "$( date ) >"${logFile}"
+	echo "------------------------------------------------------" >>"${logFile}"
+	diskutil list >>"${logFile}"
+	echo "------------------------------------------------------" >>"${logFile}"
+
+	# Write first message that this script was called with.
 	echo "${verboseText}" >> "${logFile}"
+
+	# Create /.ChameleonLogFlag file.
+	echo "Log" >"${logLocation}"/.ChameleonLogFlag
 else
-	echo "${verboseText}" > "${logFile}"
+	# Append messages to the log as passed by other scripts.
+	echo "${verboseText}" >> "${logFile}"
 fi
 
 exit 0

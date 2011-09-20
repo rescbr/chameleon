@@ -44,11 +44,14 @@ if [ -f "$dest_vol"/.ChameleonEFI ]; then
 	    attempts=$(( ${attempts} + 1 ))
     done
 
-# Remove /.ChameleonEFI file
-rm "$dest_vol"/.ChameleonEFI
-
+    # Remove /.ChameleonEFI file
+    rm "$dest_vol"/.ChameleonEFI
 fi
 
+# Remove /.ChameleonLogFlag file
+if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
+    rm "$dest_vol"/.ChameleonLogFlag
+fi
 
 # delete the temporary Chameleon folder
 
