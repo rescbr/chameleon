@@ -47,9 +47,9 @@ main ()
 
 rm -R -f "${1}"
 echo ""	
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
-echo -e $COL_BLACK"	Building $packagename Install Package"$COL_RESET
-echo -e $COL_BLACK"	----------------------------------"$COL_RESET
+echo -e $COL_CYAN"	----------------------------------"$COL_RESET
+echo -e $COL_CYAN"	Building $packagename Install Package"$COL_RESET
+echo -e $COL_CYAN"	----------------------------------"$COL_RESET
 echo ""
 
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
@@ -117,6 +117,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 # klibc.dylib                 #
                 # Resolution.dylib            #
                 # uClibcxx.dylib              #
+                # Keylayout.dylib             #
                 ###############################
         if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
         {
@@ -140,6 +141,27 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
                 echo "	[BUILD] Resolution "
                 buildpackage "${1}/AutoReso" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+            }
+            fi
+# -
+            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
+            {
+				mkdir -p ${1}/Keylayout/Root/Extra/{modules,Keymaps}
+				mkdir -p ${1}/Keylayout/Root/usr/bin
+				layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
+				if [ -d "$layout_src_dir" ];then
+					# Create a tar.gz from layout sources
+					(cd "$layout_src_dir"; \
+					 tar czf "${1}/Keylayout/Root/Extra/Keymaps/layouts-src.tar.gz" README *.slt)
+				fi
+				# Adding module
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/Extra/modules
+				# Adding Keymaps
+				ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/Extra/Keymaps
+				# Adding tools
+				ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
+                echo "	[BUILD] Keylayout "
+                buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -225,6 +247,26 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		done
 		# End build base options packages
 
+		# build KeyLayout option packages
+			echo "================= Keymaps Options ================="
+			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"KeyLayout\">"
+			choices[$((choicescount++))]="<choice\n\tid=\"KeyLayout\"\n\ttitle=\"KeyLayout_title\"\n\tdescription=\"KeyLayout_description\"\n>\n</choice>\n"
+			((xmlindent++))
+			packagesidentity="org.chameleon.options.keylayout"
+			keymaps=($( find "${1%/sym/*}/Keymaps" -type f -depth 1 -name '*.lyt' | sed 's|.*/||;s|\.lyt||' ))
+			for (( i = 0 ; i < ${#keymaps[@]} ; i++ ))
+			do
+				mkdir -p "${1}/${keymaps[$i]}/Root/"
+				mkdir -p "${1}/${keymaps[$i]}/Scripts/"
+				sed "s/@@KEYMAP@@/${keymaps[$i]}/g" "${pkgroot}/Scripts/Keymaps/postinstall.in" > "${1}/${keymaps[$i]}/Scripts/postinstall" && \
+					chmod +rx "${1}/${keymaps[$i]}/Scripts/postinstall"
+				echo "	[BUILD] ${keymaps[$i]} "
+				buildpackage "${1}/${keymaps[$i]}" "/tmpcham" "" "start_selected=\"false\"" >/dev/null 2>&1
+			done
+			((xmlindent--))
+			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+		# End build KeyLayout option packages
+
 		# build resolution packages
 			echo "================= Res. Options ================="
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Resolution\">"
@@ -244,7 +286,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 		# End build resolution packages
-	
+
 		# build Advanced packages
 			echo "================= Adv. Options ================="
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Advanced\">"
@@ -270,7 +312,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 
 	# End build options packages
-	
+
 	# build theme packages
 		echo "================= Themes ================="
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Themes\">"
@@ -460,17 +502,17 @@ makedistribution ()
 	echo "MD5 (${packagename// /}-${version}-r${revision}.pkg) = ${md5}" > "${1%/*}/${packagename// /}-${version}-r${revision}.pkg.md5"
 	echo ""	
 
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
-	echo -e $COL_BLACK"	Building process complete!"$COL_RESET
-	echo -e $COL_BLACK"	--------------------------"$COL_RESET
+	echo -e $COL_GREEN"	--------------------------"$COL_RESET
+	echo -e $COL_GREEN"	Building process complete!"$COL_RESET
+	echo -e $COL_GREEN"	--------------------------"$COL_RESET
 	echo ""	
-	echo -e $COL_BLACK"	Build info."
-	echo -e $COL_BLACK"	==========="
-	echo -e $COL_BLUE"	Package name:	"$COL_BLACK"$packagename-${version}-r$revision.pkg"$COL_RESET
-	echo -e $COL_BLUE"	MD5:		"$COL_BLACK"$md5"$COL_RESET
-	echo -e $COL_BLUE"	Version:	"$COL_BLACK"$version"$COL_RESET
-	echo -e $COL_BLUE"	Stage:		"$COL_BLACK"$stage"$COL_RESET
-	echo -e $COL_BLUE"	Date/Time:	"$COL_BLACK"$builddate"$COL_RESET
+	echo -e $COL_GREEN"	Build info."
+	echo -e $COL_GREEN"	==========="
+	echo -e $COL_BLUE"	Package name:	"$COL_RESET"$packagename-${version}-r$revision.pkg"
+	echo -e $COL_BLUE"	MD5:		"$COL_RESET"$md5"
+	echo -e $COL_BLUE"	Version:	"$COL_RESET"$version"
+	echo -e $COL_BLUE"	Stage:		"$COL_RESET"$stage"
+	echo -e $COL_BLUE"	Date/Time:	"$COL_RESET"$builddate"
 	echo ""
 
 }

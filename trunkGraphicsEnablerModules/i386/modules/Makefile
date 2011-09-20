@@ -29,6 +29,10 @@ ifdef CONFIG_HELLOWORLD_MODULE
 SUBDIRS += HelloWorld
 endif
 
+ifdef CONFIG_KEYLAYOUT_MODULE
+SUBDIRS += Keylayout
+endif
+
 ifdef CONFIG_ATIGRAPHICSENABLER_MODULE
 SUBDIRS += ATiGraphicsEnabler
 endif

@@ -27,6 +27,7 @@
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"
+#include "term.h"
 #include "embedded.h"
 #include "pci.h"
 #include "autoresolution.h" //Azi:autoresolution
@@ -237,11 +238,11 @@ static void showBootPrompt(int row, bool visible)
 
 static void updateBootArgs( int key )
 {
-    key &= kASCIIKeyMask;
+    key = ASCII_KEY(key);
 
     switch ( key )
     {
-        case kBackspaceKey:
+        case KEY_BKSP:
             if ( gBootArgsPtr > gBootArgs )
             {
                 *--gBootArgsPtr = '\0';
@@ -929,7 +930,7 @@ int getBootOptions(bool firstRun)
 		}
 
 		switch (key) {
-		case kReturnKey:
+		case KEY_ENTER:
 			if (gui.menu.draw) { 
 				key=0;
 				break;
@@ -980,13 +981,13 @@ int getBootOptions(bool firstRun)
 			gBIOSDev = menuBVR->biosdev;
 			break;
 
-		case kEscapeKey:
+		case KEY_ESC:
 			clearBootArgs();
 			break;
 
 		//Azi:autoresolution - Reapply the patch if Graphics Mode was incorrect
 		// or EDID Info was insane.
-		case kF2Key:
+		case KEY_F2:
 		
 			if ((gAutoResolution == true) && useGUI && map )
 			{
@@ -1070,7 +1071,7 @@ int getBootOptions(bool firstRun)
 			}
 			break;
 
-		case kF5Key:
+		case KEY_F5:
 			// New behavior:
 			// Clear gBootVolume to restart the loop
 			// if the user enabled rescanning the optical drive.
@@ -1081,14 +1082,14 @@ int getBootOptions(bool firstRun)
 			}
 			break;
 
-		case kF10Key:
+		case KEY_F10:
 			gScanSingleDrive = false;
 			scanDisks(gBIOSDev, &bvCount);
 			gBootVolume = NULL;
 			clearBootArgs();
 			break;
 
-		case kTabKey:
+		case KEY_TAB:
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
@@ -1562,8 +1563,8 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (key & kASCIIKeyMask) {
-		case kBackspaceKey:
+		switch (ASCII_KEY(key)) {
+		case KEY_BKSP:
 			if (digitsI > 0) {
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
@@ -1578,7 +1579,7 @@ int selectAlternateBootDevice(int bootdevice)
 			}
 			break;
 
-		case kReturnKey:
+		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
 			if (end == digits && *end == '\0') {
@@ -1596,9 +1597,9 @@ int selectAlternateBootDevice(int bootdevice)
 			break;
 
 		default:
-			if (isxdigit(key & kASCIIKeyMask) && digitsI < 2) {
-				putchar(key & kASCIIKeyMask);
-				digits[digitsI++] = key & kASCIIKeyMask;
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+				putchar(ASCII_KEY(key));
+				digits[digitsI++] = ASCII_KEY(key);
 			} else {
 				// TODO: Beep or something
 			}
@@ -1612,7 +1613,7 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == kReturnKey) {
+	if (getchar() == KEY_ENTER) {
 		return true;
 	} else {
 		return false;
