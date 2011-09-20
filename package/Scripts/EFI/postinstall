@@ -79,7 +79,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 
 	# Double check we can see the selected partition and it's of the right type
 
-	"$scriptDir"CheckProceed.sh "${targetVolumeTemp}" "${targetDeviceTemp}"
+        "$scriptDir"CheckProceed.sh "${targetVolumeTemp}" "${targetVolume}" "${targetDeviceTemp}" "${scriptDir}"
 	returnValue=$?
 	if [ ${returnValue} = 0 ]; then
 		# OK to proceed
@@ -88,7 +88,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 		# Does a GRUB or Linux loader already exist in the disk's MBR?
 		# The script returns 1 if yes, 0 if no.
 
-		"$scriptDir"CheckGRUBLinuxLoader.sh "${targetDisk}"
+		"$scriptDir"CheckGRUBLinuxLoader.sh "${targetDisk}" "${targetVolumeTemp}" "${scriptDir}"
 		returnValue=$?
 		if [ ${returnValue} = 0 ]; then
 			# OK to proceed
@@ -129,7 +129,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			# the following script returns 0 if it succeeds
 			# the following script returns 1 if it fails to un-mount any EFI volume
 
-			"$scriptDir"UnMountEFIvolumes.sh
+			"$scriptDir"UnMountEFIvolumes.sh  "${targetVolumeTemp}" "${scriptDir}"
 			returnValue=$?
 			if [ ${returnValue} = 0 ]; then
 				# OK to proceed
