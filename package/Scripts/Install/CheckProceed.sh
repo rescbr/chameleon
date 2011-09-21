@@ -45,10 +45,14 @@ fi
 # 1GB USB flash drive which won't have an EFI System Partition.
 
 if [ "$targetVolume" = "/Volumes/EFI" ]; then
-	existESP=$( df | grep $targetDevice | awk {'print $6'} )
-	if [ ! "$existESP" = "/Volumes/EFI" ]; then
+	# Take target device and check slice 1 matches partition named "EFI"
+	stripped=$( echo ${targetDevice#/dev/} )
+	if [ ! $(echo ${stripped#*disk*s}) = 1 ]; then
+		stripped=$( echo ${stripped%s*})"s1"
+	fi
+	if [ ! $( diskutil list | grep ${stripped} | awk {'print $2'} ) = "EFI" ]; then
 		echo "*** The selected volume doesn't have an EFI System Partition. Exiting."
-		"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: Target disk doesn't have an EFI System Partition."
+		"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: Selected disk does not have an EFI System Partition."
 		exit 1
 	fi
 fi
