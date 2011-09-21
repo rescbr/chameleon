@@ -36,7 +36,7 @@ while [ ${diskmicrocodetypecounter} -lt ${#diskmicrocodetype[@]} ]; do
         diskmicrocodetypeid=${diskmicrocodetype[${diskmicrocodetypecounter}]#*,}
         if [ ! "${diskmicrocode}" = "${diskmicrocode/${diskmicrocodetypeid}/}" ]; then
                 echo "${diskmicrocodetype[${diskmicrocodetypecounter}]%,*} found."
-		"$scriptDir"InstallLog.sh "${targetVolume}" "FAIL: Found an exisitng GRUB/LILO bootloader."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "FAIL: Found an exisitng GRUB/LILO bootloader in the MBR."
 		exit 1
 	else
 		echo "Didn't find a match for ${diskmicrocodetype[${diskmicrocodetypecounter}]%,*}"
@@ -44,5 +44,7 @@ while [ ${diskmicrocodetypecounter} -lt ${#diskmicrocodetype[@]} ]; do
 done
 echo "-----------------------------------------------"
 echo ""
+
+"$scriptDir"InstallLog.sh "${targetVolume}" "GRUB/LILO: PASS"
 
 exit 0

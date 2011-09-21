@@ -8,11 +8,16 @@ echo "************************************************"
 # if one is found then it exits with 1, otherwise it exits with 0
 
 # Receives targetdisk: for example, /dev/disk0
+# Receives targetVolume: Volume to install to.
+# Receives scriptDir: The location of the main script dir.
 
-
-if [ "$#" -eq 1 ]; then
+if [ "$#" -eq 3 ]; then
 	targetDisk="$1"
+	targetVolume="$2"
+	scriptDir="$3"
 	echo "DEBUG: passed argument for targetDisk = $targetDisk"
+	echo "DEBUG: passed argument for targetVolume = $targetVolume"
+	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed - Exiting"
 	exit 9
@@ -26,11 +31,13 @@ if [ "${disksignature}" = "00000000" ]; then
 	echo "No Windows installation detected."
 	echo "-----------------------------------------------"
 	echo ""
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is not installed on this volume."
 	exit 0
 else
 	echo "Detected an existing Windows installation"
 	echo "-----------------------------------------------"
 	echo ""
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Detected a Windows installation on this volume."
 	exit 1
 fi
 

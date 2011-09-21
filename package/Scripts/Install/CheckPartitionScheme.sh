@@ -4,19 +4,25 @@ echo "==============================================="
 echo "Check the Partition Scheme: GPT, GPT/MBR or MBR?"
 echo "************************************************"
 
-# Receives passed value for the Target Disk
-# for example: /dev/disk0s2
-# Then looks for the following:
-# First 8 bytes of the GPTdiskGPTHeader to identify a GUID partition table.
+# Looks for the first 8 bytes of the GPTdiskGPTHeader to identify a GUID partition table.
 # Byte number 450 of the GPTdiskProtectiveMBR to identify ID of 'EE' to identify a GPT partition.
 # Byte numbers 466, 482 & 498 of the GPTdiskProtectiveMBR to identify further partitions.
 #
 # Exit with value 1 for GPT, 2 for GPT/MBR and 3 for MBR. 
 # Exit with value 0 if nothing is found - this shouldn't happen.?
 
-if [ "$#" -eq 1 ]; then
+# Receives targetDisk: for example, /dev/disk0s2
+# Receives targetVolume: Volume to install to.
+# Receives scriptDir: The location of the main script dir.
+
+
+if [ "$#" -eq 3 ]; then
 	targetDisk="$1"
+	targetVolume="$2"
+	scriptDir="$3"
 	echo "DEBUG: passed argument = $targetDisk"
+	echo "DEBUG: passed argument for targetVolume = $targetVolume"
+	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed"
 	exit 9
@@ -34,12 +40,14 @@ if [ "${partitiontable:0:16}" == "4546492050415254" ]; then
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using a GPT."
 			exit 1
 	 	else
 			partitiontable="GPT/MBR"
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using a GPT/MBR."
 			exit 2
 		fi
 	fi
@@ -48,10 +56,14 @@ else
 	echo "${partitiontable} found."
 	echo "-----------------------------------------------"
 	echo ""
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using MBR."
 	exit 3
 fi
 
 echo "No partition table found."
 echo "-----------------------------------------------"
 echo ""
+
+"$scriptDir"InstallLog.sh "${targetVolume}" "NOTE: No partition table found."
+
 exit 0

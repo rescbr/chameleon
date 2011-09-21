@@ -48,7 +48,7 @@ if [ "$targetVolume" = "/Volumes/EFI" ]; then
 	existESP=$( df | grep $targetDevice | awk {'print $6'} )
 	if [ ! "$existESP" = "/Volumes/EFI" ]; then
 		echo "*** The selected volume doesn't have an EFI System Partition. Exiting."
-		"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: $installerVolume doesn't have an EFI System Partition."
+		"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: Target disk doesn't have an EFI System Partition."
 		exit 1
 	fi
 fi

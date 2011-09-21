@@ -41,6 +41,7 @@ mbr437=$( dd 2>/dev/null if="$targetDisk" count=1 | dd 2>/dev/null count=1 bs=43
 
 if [ $( echo "${mbr437}" | awk -F0 '{print NF-1}' ) = 874 ]; then
 	echo "The first 437 bytes of the MBR Disk Sector is blank - Updating"
+	"$scriptDir"InstallLog.sh "${targetVolume}" "First 437 bytes of the MBR are currently blank. Will update."
 else
 	# There is already something on the MBR 
 
@@ -49,6 +50,7 @@ else
 	windowsloader=$( dd 2>/dev/null if="$targetDisk" count=4 bs=1 | xxd | awk '{print $2$3}' )
 	if [ "${windowsloader}" == "33c08ed0" ]  ; then
 		echo "Found existing Windows Boot Loader so will replace with Chameleon Boot0hfs"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Windows boot loader - Will replace with boot0hfs"
 	fi
 
 	# See if a Chameleon stage0 boot file already exists
@@ -61,20 +63,24 @@ else
 	#echo ${stage0type}
 	if [ "${stage0type}" == "0b807c" ]; then
 		echo "Found existing Chameleon stage 0 loader - Boot0hfs"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Chameleon stage 0 loader - boot0hfs"
 
 		# Script CheckDiskSignature.sh returned 0 if a Windows installation was NOT found
 		if [ "$diskSigCheck" == "0" ]; then
 			echo "Found no existing Windows installation so will replace stage 0 loader with Boot0"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is not installed - Replace boot0hfs with boot0"
 			exit 0
 		fi
 	fi
 
 	if [ "${stage0type}" == "0a803c" ]; then
 		echo "Found existing Chameleon stage 0 loader - Boot0"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Chameleon stage 0 loader - boot0"
 
 		# Script CheckDiskSignature.sh returned 1 if a Windows installation was found
 		if [ "$diskSigCheck" = "1" ]; then
 			echo "Found existing Windows installation so will replace stage 0 loader with Boot0hfs"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "As Windows is installed - Replace boot0 with boot0hfs"
 			exit 0
 		fi
 	fi
@@ -82,6 +88,7 @@ else
 	if [ "${stage0type}" == "ee7505" ]; then
 		echo "Found existing Chameleon stage 0 loader - Boot0md"
 		echo "And will leave boot0md installed."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Chameleon stage 0 loader - boot0md. Leaving as is."
 		exit 1
 	fi
 
@@ -91,7 +98,7 @@ else
 		echo "Disk microcode found: ${test} - Preserving."
 		echo "diskupdate is set to false"
 		echo "-----------------------------------------------"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "NOTE: Found existing unknown bootcode in the MBR"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "NOTE: Found existing unknown bootcode in the MBR. Leaving as is."
 		echo ""
 		exit 1
 	fi

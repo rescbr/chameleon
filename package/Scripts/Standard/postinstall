@@ -92,7 +92,7 @@ if [ ${returnValue}=0 ]; then
 		# check for a 4-byte Windows disk signature in the disk's MBR.
 		# the following script returns 1 if a Windows disk signature exists, and 0 if not.
 
-		"$scriptDir"CheckWindowsDiskSignature.sh "${targetDisk}"
+		"$scriptDir"CheckWindowsDiskSignature.sh "${targetDisk}" "${targetVolume}" "${scriptDir}"
 		diskSigCheck=$?
 
 
@@ -110,7 +110,7 @@ if [ ${returnValue}=0 ]; then
 		# the following script returns 2 if MSDOS
 		# the following script returns 0 if nothing
 
-		"$scriptDir"CheckFormat.sh "${targetDevice}"
+		"$scriptDir"CheckFormat.sh "${targetDevice}" "${targetVolume}" "${scriptDir}"
 		espformat=$?
 
 
@@ -120,7 +120,7 @@ if [ ${returnValue}=0 ]; then
 		# the following script returns 3 if MBR
 		# the following script returns 0 if nothing
 
-		"$scriptDir"CheckPartitionScheme.sh "${targetDisk}"
+		"$scriptDir"CheckPartitionScheme.sh "${targetDisk}" "${targetVolume}" "${scriptDir}"
 		partitionTable=$?
 		if [ ${partitionTable} = 3 ]; then
 			# If MBR partition scheme then check for FAT16 or FAT32
@@ -129,7 +129,7 @@ if [ ${returnValue}=0 ]; then
 			# the following script returns 2 if FAT32
 			# the following script returns 0 if nothing
 
-			"$scriptDir"CheckFatType.sh "${targetDeviceRaw}"
+			"$scriptDir"CheckFatType.sh "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
 			fatType=$?
 		fi
 
