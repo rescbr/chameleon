@@ -339,7 +339,7 @@ LABEL(_halt)
     jmp     _halt
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// disableIRQs() - Azi: DHP
+// disableIRQs()
 // http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
 //
 // Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
