@@ -151,10 +151,10 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 				fi
 
 				# Write the stage 1 loader to the partition boot sector
-				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
+				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
 				# Write the stage 2 loader to the root of the selected partition
-				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolumeChosenByUser}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
 				# Set the active partition ONLY if Windows is not installed
 				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"

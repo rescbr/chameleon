@@ -36,11 +36,11 @@ fi
 # if chosen, the package installer will add a file named 'nullESP'
 # in to the temporary directory /.Chameleon
 
-if [ "${targetVolume}" = "/Volumes/EFI" ]; then
+if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 	echo "DEBUG: EFI install chosen"
 
-	if [ ! -d "${targetVolume}" ]; then
-		echo "Executing Command: mkdir -p ${targetVolume}"
+	if [ ! -d "${selectedDestination}" ]; then
+		echo "Executing Command: mkdir -p ${selectedDestination}"
 		mkdir -p "${targetVolume}"
 	else
 		echo "DEBUG: folder /Volumes/EFI already exists"
@@ -55,19 +55,21 @@ if [ "${targetVolume}" = "/Volumes/EFI" ]; then
 		mount_hfs "${targetDevice}" "${targetVolume}"
 	fi
 	if [ ${espformat} = 2 ]; then
-		[ -d "${targetVolume}" ] || mkdir -p "${targetVolume}"
-		echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${targetVolume}"
-		mount_msdos -u 0 -g 0 "${targetDevice}" "${targetVolume}"
+		[ -d "${selectedDestination}" ] || mkdir -p "${selectedDestination}"
+		echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${selectedDestination}"
+		mount_msdos -u 0 -g 0 "${targetDevice}" "${selectedDestination}"
 	fi
 
-	echo "Executing command: cp "${selectedDestination}"/usr/standalone/i386/${stage2Loader} ${targetVolume}"
-	cp "${selectedDestination}"/usr/standalone/i386/"${stage2Loader}" "${targetVolume}"
+	echo "Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${selectedDestination}"
+	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${selectedDestination}"
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${selectedDestination}."
 else
 	echo "Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${targetVolume}"
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${targetVolume}"
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
 fi
 
-"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
+
 
 #ÊCheck to see if the user wants to hide the boot file
 
