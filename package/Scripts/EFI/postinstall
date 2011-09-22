@@ -71,7 +71,7 @@ echo ""
 
 # Write some information to the Install Log
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script
-Target volume Selected by user = ${targetVolumeChosenByUser}
+Target volume selected by user = ${targetVolumeChosenByUser}
 Target volume = ${targetVolume}"
 
 
@@ -141,12 +141,12 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 				# OK to proceed
 
 				if [ ${diskupdate} = "0" ]; then
-					echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
+					#echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
 
 					# Write the stage 0 loader to the MBR
 					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
 				else
-					echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
+					#echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
 					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
 				fi
 
@@ -162,7 +162,8 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 		fi
 	fi
 else
-	echo "ERROR Volume is not on a GPT partitioned disc."
+	#echo "ERROR Volume is not on a GPT partitioned disc."
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "ERROR Volume is not on a GPT partitioned disc."
 fi
 
 

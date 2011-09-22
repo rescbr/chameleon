@@ -60,6 +60,6 @@ fi
 echo "-----------------------------------------------"
 echo ""
 
-"$scriptDir"InstallLog.sh "${installerVolume}" "CheckProceed: PASS"
+#"$scriptDir"InstallLog.sh "${installerVolume}" "CheckProceed: PASS"
 
 exit 0

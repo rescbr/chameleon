@@ -33,9 +33,6 @@ else
 fi
 
 # check to see if install to EFI system partition was selected
-# if chosen, the package installer will add a file named 'nullESP'
-# in to the temporary directory /.Chameleon
-
 if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 	echo "DEBUG: EFI install chosen"
 
@@ -69,12 +66,8 @@ else
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
 fi
 
-
-
 #ÊCheck to see if the user wants to hide the boot file
-
 #if [ -f "${selectedDestination}"/.Chameleon/nullhideboot ]; then
-#
 #	echo "Executing command: SetFile -a V ${targetVolume}/${stage2Loader}"
 #	"${selectedDestination}"/.Chameleon//Tools/SetFile -a V "${targetVolume}"/"${stage2Loader}"
 #fi

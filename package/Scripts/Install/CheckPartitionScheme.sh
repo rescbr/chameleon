@@ -40,14 +40,14 @@ if [ "${partitiontable:0:16}" == "4546492050415254" ]; then
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
-			"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using a GPT."
+			"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT."
 			exit 1
 	 	else
 			partitiontable="GPT/MBR"
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
-			"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using a GPT/MBR."
+			"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT/MBR."
 			exit 2
 		fi
 	fi
@@ -56,7 +56,7 @@ else
 	echo "${partitiontable} found."
 	echo "-----------------------------------------------"
 	echo ""
-	"$scriptDir"InstallLog.sh "${targetVolume}" "Identified ${targetDisk} is on a volume using MBR."
+	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using MBR."
 	exit 3
 fi
 

@@ -45,6 +45,6 @@ done
 echo "-----------------------------------------------"
 echo ""
 
-"$scriptDir"InstallLog.sh "${targetVolume}" "GRUB/LILO: PASS"
+#"$scriptDir"InstallLog.sh "${targetVolume}" "GRUB/LILO: PASS"
 
 exit 0
