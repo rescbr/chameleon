@@ -49,8 +49,8 @@ else
 	# Check bytes 440-443 of the GPTdiskProtectiveMBR for a Windows Disk Signature
 	windowsloader=$( dd 2>/dev/null if="$targetDisk" count=4 bs=1 | xxd | awk '{print $2$3}' )
 	if [ "${windowsloader}" == "33c08ed0" ]  ; then
-		echo "Found existing Windows Boot Loader so will replace with Chameleon Boot0hfs"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Windows boot loader - Will replace with boot0hfs"
+		echo "Found existing Windows Boot Loader so will replace with Chameleon boot0md"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Found existing Windows boot loader - Will replace with boot0md"
 	fi
 
 	# See if a Chameleon stage0 boot file already exists
@@ -79,8 +79,8 @@ else
 
 		# Script CheckDiskSignature.sh returned 1 if a Windows installation was found
 		if [ "$diskSigCheck" = "1" ]; then
-			echo "Found existing Windows installation so will replace stage 0 loader with Boot0hfs"
-			"$scriptDir"InstallLog.sh "${targetVolume}" "As Windows is installed - Replace boot0 with boot0hfs"
+			echo "Found existing Windows installation so will replace stage 0 loader with boot0md"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "As Windows is installed - Replace boot0 with boot0md"
 			exit 0
 		fi
 	fi

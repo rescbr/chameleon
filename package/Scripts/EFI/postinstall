@@ -31,7 +31,7 @@ scriptDir=$MYLOCATION
 # Initialise Script Globals
 
 stage0Loader="boot0"
-stage0LoaderDualBoot="boot0hfs"
+stage0LoaderDualBoot="boot0md"
 stage1LoaderHFS="boot1h"
 stage1LoaderFAT="boot1f32"
 stage2Loader="boot"
