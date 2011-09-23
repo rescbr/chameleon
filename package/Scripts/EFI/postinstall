@@ -71,6 +71,9 @@ echo ""
 
 
 # Write some information to the Install Log
+versionNumber=`cat "${scriptDir}"/Resources/version`
+revisionNumber=`cat "${scriptDir}"/Resources/revision`
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Chameleon installer version: ${versionNumber} ${revisionNumber}"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script
 Target volume selected by user = ${targetVolumeChosenByUser}
 Target volume = ${targetVolume}"

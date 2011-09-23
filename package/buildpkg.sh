@@ -82,22 +82,24 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
-		mkdir -p ${1}/Standard/Scripts/Tools
+		mkdir -p ${1}/Standard/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
                 cp -f ${pkgroot}/Scripts/Install/* ${1}/Standard/Scripts
-		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
-		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
+		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
+		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
+		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
 		buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
-		mkdir -p ${1}/EFI/Scripts/Tools
+		mkdir -p ${1}/EFI/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
                 cp -f ${pkgroot}/Scripts/Install/* ${1}/EFI/Scripts
-		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
-		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
+		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
+		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
+		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] EFI "
 		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package

@@ -69,7 +69,7 @@ fi
 #ÊCheck to see if the user wants to hide the boot file
 #if [ -f "${selectedDestination}"/.Chameleon/nullhideboot ]; then
 #	echo "Executing command: SetFile -a V ${targetVolume}/${stage2Loader}"
-#	"${selectedDestination}"/.Chameleon//Tools/SetFile -a V "${targetVolume}"/"${stage2Loader}"
+#	"${selectedDestination}"/.Chameleon/Resources/SetFile -a V "${targetVolume}"/"${stage2Loader}"
 #fi
 
 echo "-----------------------------------------------"

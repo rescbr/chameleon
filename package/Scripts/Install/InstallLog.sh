@@ -36,13 +36,16 @@ if [ ! -f "${logLocation}"/.ChameleonLogFlag ]; then
 	# Chameleon_Installer_Log.txt file
 	# by writing header.
 
-	echo "Chameleon installer log - "$( date ) >"${logFile}"
-	echo "------------------------------------------------------" >>"${logFile}"
+	# Also include the first message that this script
+	# would be called with which will be version/revision
+	# of Chameleon package.
+
+	echo "Chameleon installer log - $( date )
+------------------------------------------------------
+${verboseText}
+------------------------------------------------------" >"${logFile}"
 	diskutil list >>"${logFile}"
 	echo "------------------------------------------------------" >>"${logFile}"
-
-	# Write first message that this script was called with.
-	echo "${verboseText}" >> "${logFile}"
 
 	# Create /.ChameleonLogFlag file.
 	echo "Log" >"${logLocation}"/.ChameleonLogFlag
