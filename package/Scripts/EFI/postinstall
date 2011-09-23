@@ -46,7 +46,7 @@ targetDisk=${targetDevice%s*}
 targetDiskRaw=${targetDisk/disk/rdisk}
 targetSlice=${targetDevice#*disk*s}
 
-
+targetResources="${targetVolumeChosenByUser}/usr/local/bin/"
 
 echo "==============================================="
 echo "DEBUG: display script variables"
@@ -65,6 +65,7 @@ echo "DEBUG: targetDeviceRaw: Volume raw device is ${targetDeviceRaw}"
 echo "DEBUG: targetDisk: Disk device is ${targetDisk}"
 echo "DEBUG: targetDiskRaw: Disk raw device is ${targetDiskRaw}"
 echo "DEBUG: targetSlice: Volume slice is ${targetSlice}"
+echo "DEBUG: targetResources: Boot Resources is ${targetResources}" 
 echo "-----------------------------------------------"
 echo ""
 
@@ -144,7 +145,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 					#echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
 
 					# Write the stage 0 loader to the MBR
-					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolumeChosenByUser}" "${scriptDir}"
 				else
 					#echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
 					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."

@@ -58,22 +58,19 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	echo "================= Core ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon.core"
-	mkdir -p ${1}/Core/Root/usr/sbin
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0 ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot0md ${1}/Core/Root/usr/standalone/i386
-#	ditto --noextattr --noqtn ${1%/*}/i386/boot0hf ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot1f32 ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot1h ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot1he ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot1hp ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/cdboot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/chain0 ${1}/Core/Root/usr/standalone/i386
-# fixperms "${1}/Core/Root/"
-	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/sbin
-	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/sbin
+	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/local/bin
+	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/local/bin
 	local coresize=$( du -hkc "${1}/Core/Root" | tail -n1 | awk {'print $1'} )
 	echo "	[BUILD] i386 "
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
@@ -320,22 +317,18 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Themes\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Themes\"\n\ttitle=\"Themes_title\"\n\tdescription=\"Themes_description\"\n>\n</choice>\n"
 		((xmlindent++))
+
+		# Using themes section from Azi's/package branch.
 		packagesidentity="org.chameleon.themes"
-		artwork="${1%/*}"
-		themes=($( find "${artwork%/*}/artwork/themes" -type d -depth 1 -not -name '.svn' ))
+		artwork="${1%/sym/package}/artwork/themes"
+		themes=($( find "${artwork}" -type d -depth 1 -not -name '.svn' ))
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
 		do
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
-			mkdir -p "${1}/${themes[$i]##*/}/Root/"
-            rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${themes[$i]##*/}/Root/${theme}"
-            # #### Comment out thx meklort
-            # ditto --noextattr --noqtn "${themes[$i]}" "${1}/${themes[$i]##*/}/Root/${theme}" 
-            # ####
-            find "${1}/${themes[$i]##*/}" -name '.DS_Store' -or -name '.svn' -exec rm -R {} \+
-			find "${1}/${themes[$i]##*/}" -type f -exec chmod 644 {} \+
-			echo "	[BUILD] ${themes[$i]##*/} "
+			mkdir -p "${1}/${theme}/Root/"
+			rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
+			echo "	[BUILD] ${theme}"
 			buildpackage "${1}/${theme}" "/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
-			rm -R -f "${1}/${i##*/}"
 		done
 
 		((xmlindent--))
