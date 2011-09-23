@@ -32,22 +32,24 @@ fi
 partitiontable=$( dd 2>/dev/null if="$targetDisk" count=1 skip=1 | dd 2>/dev/null count=8 bs=1 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
 if [ "${partitiontable:0:16}" == "4546492050415254" ]; then	
 	partitiontable=$( dd 2>/dev/null if="$targetDisk" count=1 | dd 2>/dev/null count=64 bs=1 skip=446 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
+
 	if [ "${partitiontable:8:2}" == "ee" ]; then
 		echo "Found System ID 'EE' to identify GPT Partition"
+
 		if [ "${partitiontable:40:2}" == "00" ] && [ "${partitiontable:72:2}" == "00" ] && [ "${partitiontable:104:2}" == "00" ]; then
 			echo "Found System ID '00' for each remaining possible partition"
 			partitiontable="GPT"
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
-			"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT."
+			#"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT."
 			exit 1
 	 	else
 			partitiontable="GPT/MBR"
 			echo "${partitiontable} found."
 			echo "-----------------------------------------------"
 			echo ""
-			"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT/MBR."
+			#"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using a GPT/MBR."
 			exit 2
 		fi
 	fi
@@ -56,7 +58,7 @@ else
 	echo "${partitiontable} found."
 	echo "-----------------------------------------------"
 	echo ""
-	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using MBR."
+	#"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDisk} is using MBR."
 	exit 3
 fi
 

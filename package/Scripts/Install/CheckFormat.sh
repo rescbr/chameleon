@@ -29,7 +29,7 @@ if [ "$( fstyp "$targetDevice" | grep hfs )" ]; then
 	echo "${targetDevice} is currently formatted as HFS"
 	echo "-----------------------------------------------"
 	echo ""
-	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDevice} is currently formatted as HFS"
+	#"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDevice} is currently formatted as HFS"
 	exit 1
 
 fi
@@ -37,7 +37,7 @@ if [ "$( fstyp "$targetDevice" | grep msdos )" ]; then
 	echo "${targetDevice} is currently formatted as msdos"
 	echo "-----------------------------------------------"
 	echo ""
-	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDevice} is currently formatted as msdos"
+	#"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDevice} is currently formatted as msdos"
 	exit 2
 fi 
 

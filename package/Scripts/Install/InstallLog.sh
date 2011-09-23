@@ -41,17 +41,33 @@ if [ ! -f "${logLocation}"/.ChameleonLogFlag ]; then
 	# of Chameleon package.
 
 	echo "Chameleon installer log - $( date )
-------------------------------------------------------
 ${verboseText}
-------------------------------------------------------" >"${logFile}"
+======================================================
+" >"${logFile}"
 	diskutil list >>"${logFile}"
-	echo "------------------------------------------------------" >>"${logFile}"
+	echo "
+======================================================
+" >>"${logFile}"
 
 	# Create /.ChameleonLogFlag file.
 	echo "Log" >"${logLocation}"/.ChameleonLogFlag
 else
 	# Append messages to the log as passed by other scripts.
-	echo "${verboseText}" >> "${logFile}"
+	if [ "${verboseText}" = "Line Break" ]; then
+		echo "
+======================================================
+" >>"${logFile}"
+	fi
+
+	if [[ "${verboseText}" == *fdisk* ]]; then
+		targetDiskRaw="${verboseText#fdisk *}"
+		fdisk $targetDiskRaw >>"${logFile}"
+		echo " " >>"${logFile}"
+	fi
+
+	if [ "${verboseText}" != "Line Break" ] && [[ "${verboseText}" != *fdisk* ]]; then
+		echo "${verboseText}" >> "${logFile}"
+	fi
 fi
 
 exit 0

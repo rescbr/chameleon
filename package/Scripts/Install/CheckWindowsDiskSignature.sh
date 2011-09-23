@@ -31,7 +31,6 @@ if [ "${disksignature}" = "00000000" ]; then
 	echo "No Windows installation detected."
 	echo "-----------------------------------------------"
 	echo ""
-	"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is not installed on this volume."
 	exit 0
 else
 	echo "Detected an existing Windows installation"

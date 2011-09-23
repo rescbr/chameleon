@@ -32,22 +32,20 @@ else
 	exit 9
 fi
 
-partitionactive=$( fdisk -d ${targetDiskRaw} | grep -n "*" | awk -F: '{print $1}')
-"$scriptDir"InstallLog.sh "${targetVolume}" "Current active partition on ${targetDiskRaw#/dev/r}: ${partitionactive}"
+# Append fdisk output to the installer log
+"$scriptDir"InstallLog.sh "${targetVolume}" "fdisk ${targetDiskRaw}"
 
 if [ ${diskSigCheck} == "0" ]; then
-	#echo "DEBUG: Windows is not installed so let's change the active partition"
-	"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is not installed so let's change the active partition"
+	#Windows is not installed so let's change the active partition"
 
-	if [ "${partitionactive}" = "${targetSlice}" ]; then
-		#echo "${targetVolume} is already flagged as active"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "${targetVolume} is already flagged as active"
+	partitionactive=$( fdisk -d ${targetDiskRaw} | grep -n "*" | awk -F: '{print $1}')
+	if [ "${partitionactive}" ] && [ "${partitionactive}" = "${targetSlice}" ]; then
+		"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDiskRaw#/dev/r}, slice "${targetSlice}" is already set active. No need to change it."
 	else
-		#echo "${targetVolume} is not flagged as active, so let's do it."
-		"$scriptDir"InstallLog.sh "${targetVolume}" "${targetVolume} is not flagged as active, so let's do it."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Setting ${targetVolume} partition active."
 		# BadAxe requires EFI partition to be flagged active.
 		# but it doesn't' hurt to do it for any non-windows partition.
-		
+
 		fdisk -e ${targetDiskRaw} <<-MAKEACTIVE
 		print
 		flag ${targetSlice}
@@ -57,6 +55,9 @@ if [ ${diskSigCheck} == "0" ]; then
 		MAKEACTIVE
 	fi
 else
+	# TO DO
+	# Add check to make sure that the active partition is actually the Windows partition
+	# before printing next statement.
 	#echo "Windows is installed so we let that remain the active partition"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is installed so that can remain the active partition"
 fi

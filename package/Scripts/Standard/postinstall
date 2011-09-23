@@ -70,7 +70,7 @@ echo ""
 # Write some information to the Install Log
 versionNumber=`cat "${scriptDir}"/Resources/version`
 revisionNumber=`cat "${scriptDir}"/Resources/revision`
-"$scriptDir"InstallLog.sh "${targetVolume}" "Chameleon installer version: ${versionNumber} ${revisionNumber}"
+"$scriptDir"InstallLog.sh "${targetVolume}" "Installer version: ${versionNumber} ${revisionNumber}"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Running Standard postinstall script
 Target volume = ${targetVolume}"
 
@@ -144,13 +144,14 @@ if [ ${returnValue}=0 ]; then
 		else
 			# Continue if the selected device is not a FAT16 format device
 
-			if [ ${diskupdate} = "0" ]; then
-				echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
+			# Append a link break to the installer log
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
 
+			if [ ${diskupdate} = "0" ]; then
 				# Write the stage 0 loader to the MBR
 				"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolume}" "${scriptDir}"
 			else
-				echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
+				#echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
 				"$scriptDir"InstallLog.sh "${targetVolume}" "Stage 0 loader not written to ${targetDisk}."
 			fi
 
@@ -160,11 +161,17 @@ if [ ${returnValue}=0 ]; then
 			# Write the stage 2 loader to the root of the selected partition
 			"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
+			# Append a link break to the installer log
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
+
 			# Set the active partition ONLY if Windows is not installed
 			"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
 		fi
 	fi
 fi
+
+"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
+"$scriptDir"InstallLog.sh "${targetVolume}" "Standard script complete"
 
 echo "==============================================="
 echo "END - Standard Post-Install Script"

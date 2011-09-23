@@ -188,6 +188,9 @@ fi
 # boot option scripts than EFI (ESP) option was chosen
 echo "EFI" >"${targetVolumeChosenByUser}"/.ChameleonEFI 
 
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "EFI script complete"
+
 echo "==============================================="
 echo "END - Main EFI System Partition Post-Install Script"
 echo "*********************************************"
