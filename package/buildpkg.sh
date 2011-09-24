@@ -70,9 +70,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	ditto --noextattr --noqtn ${1%/*}/i386/boot1hp ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/cdboot ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/chain0 ${1}/Core/Root/usr/standalone/i386
-# fixperms "${1}/Core/Root/"
-	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/sbin
-	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/sbin
+	ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Core/Root/usr/local/bin
+	ditto --noextattr --noqtn ${1%/*}/i386/bdmesg ${1}/Core/Root/usr/local/bin
 	local coresize=$( du -hkc "${1}/Core/Root" | tail -n1 | awk {'print $1'} )
 	echo "	[BUILD] i386 "
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
@@ -84,20 +83,24 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
-		mkdir -p ${1}/Standard/Scripts/Tools
+		mkdir -p ${1}/Standard/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
-		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Tools/SetFile
-		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
+                cp -f ${pkgroot}/Scripts/Install/* ${1}/Standard/Scripts
+		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
+		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
+		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
 		buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
-		mkdir -p ${1}/EFI/Scripts/Tools
+		mkdir -p ${1}/EFI/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
-		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Tools/SetFile
-		ditto --noextattr --noqtn ${1%/*}/i386/fdisk440 ${1}/Standard/Scripts/Tools
+                cp -f ${pkgroot}/Scripts/Install/* ${1}/EFI/Scripts
+		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
+		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
+		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
 		echo "	[BUILD] EFI "
 		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
@@ -129,6 +132,55 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
             ((xmlindent++))
             packagesidentity="org.chameleon.modules"
 # -
+            if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
+            {
+                mkdir -p ${1}/klibc/Root
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
+                echo "	[BUILD] klibc "
+                buildpackage "${1}/klibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+            }
+            fi
+# -
+            if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
+            {
+                mkdir -p ${1}/uClibc/Root
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
+                echo "	[BUILD] uClibc++ "
+                buildpackage "${1}/uClibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+            }
+            fi
+# -
+            if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
+            {
+                mkdir -p ${1}/AutoReso/Root
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
+                echo "	[BUILD] Resolution "
+                buildpackage "${1}/AutoReso" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+            }
+            fi
+# -
+            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
+            {
+                mkdir -p ${1}/Keylayout/Root/tmpcham/Extra/{modules,Keymaps} #blackosx = add tmpcham to path
+                mkdir -p ${1}/Keylayout/Root/usr/bin
+                layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
+                if [ -d "$layout_src_dir" ];then
+                    # Create a tar.gz from layout sources
+                    (cd "$layout_src_dir"; \
+                    tar czf "${1}/Keylayout/Root/tmpcham/Extra/Keymaps/layouts-src.tar.gz" README *.slt) #blackosx = add tmpcham to path
+                fi
+                # Adding module
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/tmpcham/Extra/modules #blackosx = add tmpcham to path
+                # Adding Keymaps
+                ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/tmpcham/Extra/Keymaps #blackosx = add tmpcham to path
+                # Adding tools
+                ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
+                echo "	[BUILD] Keylayout "
+                buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
+            }
+            fi
+# -
             if [ -e ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ]; then
             {
                 mkdir -p ${1}/AMDGraphicsEnabler/Root
@@ -156,61 +208,12 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
             }
             fi
 # -
-            if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
-            {
-                mkdir -p ${1}/klibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
-                echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
-            }
-            fi
-# -
             if [ -e ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ]; then
             {
                 mkdir -p ${1}/NVIDIAGraphicsEnabler/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ${1}/NVIDIAGraphicsEnabler/Root
                 echo "	[BUILD] NVIDIAGraphicsEnabler "
                 buildpackage "${1}/NVIDIAGraphicsEnabler" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
-# -
-            if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
-            {
-                mkdir -p ${1}/AutoReso/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
-                echo "	[BUILD] Resolution "
-                buildpackage "${1}/AutoReso" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
-# -
-            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
-            {
-				mkdir -p ${1}/Keylayout/Root/Extra/{modules,Keymaps}
-				mkdir -p ${1}/Keylayout/Root/usr/bin
-				layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
-				if [ -d "$layout_src_dir" ];then
-					# Create a tar.gz from layout sources
-					(cd "$layout_src_dir"; \
-					 tar czf "${1}/Keylayout/Root/Extra/Keymaps/layouts-src.tar.gz" README *.slt)
-				fi
-				# Adding module
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/Extra/modules
-				# Adding Keymaps
-				ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/Extra/Keymaps
-				# Adding tools
-				ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
-                echo "	[BUILD] Keylayout "
-                buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
-            }
-            fi
-# -
-            if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
-            {
-                mkdir -p ${1}/uClibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
-                echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
             ((xmlindent--))
@@ -300,7 +303,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				sed "s/@@KEYMAP@@/${keymaps[$i]}/g" "${pkgroot}/Scripts/Keymaps/postinstall" > "${1}/${keymaps[$i]}/Scripts/postinstall" && \
 					chmod +rx "${1}/${keymaps[$i]}/Scripts/postinstall"
 				echo "	[BUILD] ${keymaps[$i]} "
-				buildpackage "${1}/${keymaps[$i]}" "/tmpcham" "" "start_selected=\"false\"" >/dev/null 2>&1
+#blackosx = why use install location /tmpcham for this ? changing to root
+				buildpackage "${1}/${keymaps[$i]}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
@@ -319,7 +323,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
 				ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
 				echo "	[BUILD] ${resolutions[$i]##*/} "
-				buildpackage "${1}/${resolutions[$i]##*/}" "/tmpcham" "" "start_selected=\"false\"" >/dev/null 2>&1
+#blackosx = why use install location /tmpcham for this ? changing to root
+				buildpackage "${1}/${resolutions[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 
 			((xmlindent--))
@@ -357,22 +362,19 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Themes\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Themes\"\n\ttitle=\"Themes_title\"\n\tdescription=\"Themes_description\"\n>\n</choice>\n"
 		((xmlindent++))
+
+		# Using themes section from Azi's/package branch.
 		packagesidentity="org.chameleon.themes"
-		artwork="${1%/*}"
-		themes=($( find "${artwork%/*}/artwork/themes" -type d -depth 1 -not -name '.svn' ))
+		artwork="${1%/sym/package}/artwork/themes"
+		themes=($( find "${artwork}" -type d -depth 1 -not -name '.svn' ))
 		for (( i = 0 ; i < ${#themes[@]} ; i++ )) 
 		do
 			theme=$( echo ${themes[$i]##*/} | awk 'BEGIN{OFS=FS=""}{$1=toupper($1);print}' )
-			mkdir -p "${1}/${themes[$i]##*/}/Root/"
-            rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${themes[$i]##*/}/Root/${theme}"
-            # #### Comment out thx meklort
-            # ditto --noextattr --noqtn "${themes[$i]}" "${1}/${themes[$i]##*/}/Root/${theme}" 
-            # ####
-            find "${1}/${themes[$i]##*/}" -name '.DS_Store' -or -name '.svn' -exec rm -R {} \+
-			find "${1}/${themes[$i]##*/}" -type f -exec chmod 644 {} \+
-			echo "	[BUILD] ${themes[$i]##*/} "
-			buildpackage "${1}/${theme}" "/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
-			rm -R -f "${1}/${i##*/}"
+			mkdir -p "${1}/${theme}/Root/"
+			rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
+			echo "	[BUILD] ${theme}"
+#blackosx = maybe use install location /tmpcham for this, then move at the end depending on standard to efi install? going to try it
+			buildpackage "${1}/${theme}" "/tmpcham/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
 		done
 
 		((xmlindent--))
@@ -458,6 +460,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 
 	header+="</pkg-info>"
+	echo -e "${header}" >> ~/Desktop/header
 	echo -e "${header}" > "${1}/Temp/PackageInfo"
 	pushd "${1}/Root" >/dev/null
 	find . -print | cpio -o -z -H cpio > "../Temp/Payload"

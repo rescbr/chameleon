@@ -1,20 +1,20 @@
 /*
- *  NVidia injector
+ *	NVidia injector
  *
- *  Copyright (C) 2009  Jasmin Fazlic, iNDi
+ *	Copyright (C) 2009	Jasmin Fazlic, iNDi
  *
- *  NVidia injector is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ *	NVidia injector is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
  *
- *  NVidia driver and injector is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *	NVidia driver and injector is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with NVidia injector.  If not, see <http://www.gnu.org/licenses/>.
+ *	You should have received a copy of the GNU General Public License
+ *	along with NVidia injector.	 If not, see <http://www.gnu.org/licenses/>.
  */
  /*
  * Alternatively you can choose to comply with APSL
@@ -77,59 +77,59 @@ struct bios {
 #define NVC0_MEM_CTRLR_COUNT					0x00121c74
 #define NVC0_MEM_CTRLR_RAM_AMOUNT				0x0010f20c
 
-#define NV_PBUS_PCI_NV_20	0x00001850
+#define NV_PBUS_PCI_NV_20						0x00001850
 #define NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED	(0 << 0)
 #define NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED	(1 << 0)
 
-#define REG8(reg)  ((volatile uint8_t *)regs)[(reg)]
-#define REG16(reg)  ((volatile uint16_t *)regs)[(reg) >> 1]
-#define REG32(reg)  ((volatile uint32_t *)regs)[(reg) >> 2]
+#define REG8(reg)	((volatile uint8_t *)regs)[(reg)]
+#define REG16(reg)	((volatile uint16_t *)regs)[(reg) >> 1]
+#define REG32(reg)	((volatile uint32_t *)regs)[(reg) >> 2]
 
-#define NV_ARCH_03  0x03
-#define NV_ARCH_04  0x04
-#define NV_ARCH_10  0x10
-#define NV_ARCH_20  0x20
-#define NV_ARCH_30  0x30
-#define NV_ARCH_40  0x40
-#define NV_ARCH_50  0x50
-#define NV_ARCH_C0  0xC0
+#define NV_ARCH_03				0x03
+#define NV_ARCH_04				0x04
+#define NV_ARCH_10				0x10
+#define NV_ARCH_20				0x20
+#define NV_ARCH_30				0x30
+#define NV_ARCH_40				0x40
+#define NV_ARCH_50				0x50
+#define NV_ARCH_C0				0xC0
 
-#define CHIPSET_NV03     0x0010
-#define CHIPSET_NV04     0x0020
-#define CHIPSET_NV10     0x0100
-#define CHIPSET_NV11     0x0110
-#define CHIPSET_NV15     0x0150
-#define CHIPSET_NV17     0x0170
-#define CHIPSET_NV18     0x0180
-#define CHIPSET_NFORCE   0x01A0
-#define CHIPSET_NFORCE2  0x01F0
-#define CHIPSET_NV20     0x0200
-#define CHIPSET_NV25     0x0250
-#define CHIPSET_NV28     0x0280
-#define CHIPSET_NV30     0x0300
-#define CHIPSET_NV31     0x0310
-#define CHIPSET_NV34     0x0320
-#define CHIPSET_NV35     0x0330
-#define CHIPSET_NV36     0x0340
-#define CHIPSET_NV40     0x0040
-#define CHIPSET_NV41     0x00C0
-#define CHIPSET_NV43     0x0140
-#define CHIPSET_NV44     0x0160
-#define CHIPSET_NV44A    0x0220
-#define CHIPSET_NV45     0x0210
-#define CHIPSET_NV50     0x0190
-#define CHIPSET_NV84     0x0400
-#define CHIPSET_MISC_BRIDGED  0x00F0
-#define CHIPSET_G70      0x0090
-#define CHIPSET_G71      0x0290
-#define CHIPSET_G72      0x01D0
-#define CHIPSET_G73      0x0390
+#define CHIPSET_NV03			0x0010
+#define CHIPSET_NV04			0x0020
+#define CHIPSET_NV10			0x0100
+#define CHIPSET_NV11			0x0110
+#define CHIPSET_NV15			0x0150
+#define CHIPSET_NV17			0x0170
+#define CHIPSET_NV18			0x0180
+#define CHIPSET_NFORCE			0x01A0
+#define CHIPSET_NFORCE2			0x01F0
+#define CHIPSET_NV20			0x0200
+#define CHIPSET_NV25			0x0250
+#define CHIPSET_NV28			0x0280
+#define CHIPSET_NV30			0x0300
+#define CHIPSET_NV31			0x0310
+#define CHIPSET_NV34			0x0320
+#define CHIPSET_NV35			0x0330
+#define CHIPSET_NV36			0x0340
+#define CHIPSET_NV40			0x0040
+#define CHIPSET_NV41			0x00C0
+#define CHIPSET_NV43			0x0140
+#define CHIPSET_NV44			0x0160
+#define CHIPSET_NV44A			0x0220
+#define CHIPSET_NV45			0x0210
+#define CHIPSET_NV50			0x0190
+#define CHIPSET_NV84			0x0400
+#define CHIPSET_MISC_BRIDGED	0x00F0
+#define CHIPSET_G70				0x0090
+#define CHIPSET_G71				0x0290
+#define CHIPSET_G72				0x01D0
+#define CHIPSET_G73				0x0390
 
 // integrated GeForces (6100, 6150)
-#define CHIPSET_C51      0x0240
+#define CHIPSET_C51				0x0240
 
 // variant of C51, seems based on a G70 design
-#define CHIPSET_C512     0x03D0
-#define CHIPSET_G73_BRIDGED 0x02E0
+#define CHIPSET_C512			0x03D0
+#define CHIPSET_G73_BRIDGED		0x02E0
 
 #endif /* !__LIBSAIO_NVIDIA_H */
