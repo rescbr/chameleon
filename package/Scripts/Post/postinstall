@@ -17,11 +17,11 @@ echo "preinstall: Path to destination..... $2"
 echo "preinstall: Path to dest volume..... $3"
 echo "preinstall: Root of system folder... $4"
 
-set -x
+#set -x # Useful for echoing everything the script does to the installer log!!
 
 if [ ! -e "$3" ]
 then
-    echo "destination volume does not exist!"
+    echo "$3 volume does not exist!"
     exit 1
 fi
 
@@ -33,28 +33,36 @@ else
     dest_vol="$3"
 fi    
 
-# check to see if EFI system partition install option was chosen.
-# if so, unmount /Volumes/EFI
+# Extra folder now resides in /tmpcham.
+# Copy /tmpcham/Extra to correct location.
+if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
+	echo "Copying $dest_vol/tmpcham/Extra/* $dest_vol/Extra"
+	cp -R "$dest_vol"/tmpcham/Extra/* "$dest_vol"/Extra
+else
+	echo "Copying $dest_vol/tmpcham/Extra/* $dest_vol/Volumes/EFI/Extra"
+	cp -R "$dest_vol"/tmpcham/Extra/* /Volumes/EFI/Extra
 
-if [ -f "$dest_vol"/.ChameleonEFI ]; then
-    attempts=1
-    while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
-	    echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-	    umount -f $( df | grep EFI | awk '{print $1}' )
-	    attempts=$(( ${attempts} + 1 ))
-    done
+	# unmount /Volumes/EFI
+   	attempts=1
+    	while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
+	    	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	   	 umount -f $( df | grep EFI | awk '{print $1}' )
+	   	 attempts=$(( ${attempts} + 1 ))
+   	 done
 
-    # Remove /.ChameleonEFI file
-    rm "$dest_vol"/.ChameleonEFI
+   	# Remove /.ChameleonEFI file
+   	echo "Removing /.ChameleonEFI file"
+    	rm "$dest_vol"/.ChameleonEFI
 fi
 
 # Remove /.ChameleonLogFlag file
 if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
+    echo "Removing /.ChameleonLogFlag file"
     rm "$dest_vol"/.ChameleonLogFlag
 fi
 
 # delete the temporary Chameleon folder
-
+echo "Removing $dest_vol/tmpcham file"
 rm -rf "$dest_vol/tmpcham"
 
 

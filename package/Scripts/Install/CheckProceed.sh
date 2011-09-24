@@ -6,7 +6,7 @@ echo "***************************************"
 
 # Checks the selected volume is present and the disk is partitioned.
 
-# Receives targetVolume: Volume to install to (Will be '/Volumes/EFI' if EFI install)
+# Receives targetVolume: Volume to install to (will be '/Volumes/EFI' if EFI install)
 # Receives targetDevice: Stores device number, for example /dev/disk2s1.
 # Receives installerVolume: Volume to write the installer log to.
 # Receives scriptDir: The location of the main script dir.

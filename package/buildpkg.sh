@@ -98,8 +98,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
                 cp -f ${pkgroot}/Scripts/Install/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
-		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
-		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
+		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
+		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
 		echo "	[BUILD] EFI "
 		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
@@ -132,7 +132,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/klibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
                 echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+                buildpackage "${1}/klibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
             }
             fi
 # -
@@ -141,26 +141,26 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/AutoReso/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
                 echo "	[BUILD] Resolution "
-                buildpackage "${1}/AutoReso" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/AutoReso" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
             }
             fi
 # -
             if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
             {
-				mkdir -p ${1}/Keylayout/Root/Extra/{modules,Keymaps}
-				mkdir -p ${1}/Keylayout/Root/usr/bin
-				layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
-				if [ -d "$layout_src_dir" ];then
-					# Create a tar.gz from layout sources
-					(cd "$layout_src_dir"; \
-					 tar czf "${1}/Keylayout/Root/Extra/Keymaps/layouts-src.tar.gz" README *.slt)
-				fi
-				# Adding module
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/Extra/modules
-				# Adding Keymaps
-				ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/Extra/Keymaps
-				# Adding tools
-				ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
+                mkdir -p ${1}/Keylayout/Root/tmpcham/Extra/{modules,Keymaps} #blackosx = add tmpcham to path
+                mkdir -p ${1}/Keylayout/Root/usr/bin
+                layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
+                if [ -d "$layout_src_dir" ];then
+                    # Create a tar.gz from layout sources
+                    (cd "$layout_src_dir"; \
+                    tar czf "${1}/Keylayout/Root/tmpcham/Extra/Keymaps/layouts-src.tar.gz" README *.slt) #blackosx = add tmpcham to path
+                fi
+                # Adding module
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/tmpcham/Extra/modules #blackosx = add tmpcham to path
+                # Adding Keymaps
+                ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/tmpcham/Extra/Keymaps #blackosx = add tmpcham to path
+                # Adding tools
+                ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
                 echo "	[BUILD] Keylayout "
                 buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
@@ -172,7 +172,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
                 echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+                buildpackage "${1}/uClibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
             }
             fi
             ((xmlindent--))
@@ -189,45 +189,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 # End build Chameleon package
 
 # build Extras package
-	#echo "================= Extras ================="
-	#outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Extras\">"
-	#choices[$((choicescount++))]="<choice\n\tid=\"Extras\"\n\ttitle=\"Extras_title\"\n\tdescription=\"Extras_description\"\n>\n</choice>\n"
-	#((xmlindent++))
-	#packagesidentity="org.chameleon.extras"
-
-	# build utility package
-	#	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Utility\">"
-	#	choices[$((choicescount++))]="<choice\n\tid=\"Utility\"\n\ttitle=\"Utility_title\"\n\tdescription=\"Utility_description\"\n>\n</choice>\n"
-	#	((xmlindent++))
-	#	packagesidentity="org.chameleon.utilities"
-
-	#	# build package for Chameleon PrefPanel
-	#		mkdir -p "${1}/PrefPanel/Root"
-	#		ditto --noextattr --noqtn "${pkgroot}/Configuration/PrefPanel/Chameleon.prefPane" "${1}/PrefPanel/Root"
-	#		echo "	[BUILD] Chameleon Preference Panel "
-	#		buildpackage "${1}/PrefPanel" "/Library/PreferencePanes/Chameleon.prefPane" "" "start_selected=\"false\"" >/dev/null 2>&1
-	#	# End build package for Chameleon PrefPanel
-		
-	#	# build package for SMBIOSDefault
-	#		mkdir -p "${1}/SMBIOSDefault/Root"
-	#		ditto --noextattr --noqtn "${pkgroot}/Configuration/SMBIOSDefault/smbios.plist" "${1}/SMBIOSDefault/Root"
-	#		echo "	[BUILD] SMBIOSDefault "
-	#		buildpackage "${1}/SMBIOSDefault" "/Extra/Example" "" "start_selected=\"false\"" >/dev/null 2>&1
-	#	# End build package for SMBIOSDefault
-		
-	#	# build package for Documentation
-	#		mkdir -p "${1}/Documentation/Root"
-	#		cp -f ${pkgroot}/../doc/BootHelp.txt ${1}/Documentation/Root
-	#		cp -f ${pkgroot}/../doc/README ${1}/Documentation/Root
-	#		cp -f ${pkgroot}/../doc/Users_Guide0.5.pdf ${1}/Documentation/Root
-	#		echo "	[BUILD] Documentation "
-	#		buildpackage "${1}/Documentation" "/Library/Documentation/Chameleon2" "" "start_selected=\"false\"" >/dev/null 2>&1
-	#	# End build package for Documentation
-
-	#	((xmlindent--))
-	#	outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-	# End utility package
-		
 	# build options packages
 	echo "================= Options ================="
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Options\">"
@@ -262,7 +223,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				sed "s/@@KEYMAP@@/${keymaps[$i]}/g" "${pkgroot}/Scripts/Keymaps/postinstall" > "${1}/${keymaps[$i]}/Scripts/postinstall" && \
 					chmod +rx "${1}/${keymaps[$i]}/Scripts/postinstall"
 				echo "	[BUILD] ${keymaps[$i]} "
-				buildpackage "${1}/${keymaps[$i]}" "/tmpcham" "" "start_selected=\"false\"" >/dev/null 2>&1
+#blackosx = why use install location /tmpcham for this ? changing to root
+				buildpackage "${1}/${keymaps[$i]}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
@@ -281,7 +243,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
 				ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
 				echo "	[BUILD] ${resolutions[$i]##*/} "
-				buildpackage "${1}/${resolutions[$i]##*/}" "/tmpcham" "" "start_selected=\"false\"" >/dev/null 2>&1
+#blackosx = why use install location /tmpcham for this ? changing to root
+				buildpackage "${1}/${resolutions[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 
 			((xmlindent--))
@@ -311,7 +274,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 		((xmlindent--))
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-
 	# End build options packages
 
 	# build theme packages
@@ -330,7 +292,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			mkdir -p "${1}/${theme}/Root/"
 			rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
 			echo "	[BUILD] ${theme}"
-			buildpackage "${1}/${theme}" "/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
+#blackosx = maybe use install location /tmpcham for this, then move at the end depending on standard to efi install? going to try it
+			buildpackage "${1}/${theme}" "/tmpcham/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
 		done
 
 		((xmlindent--))
@@ -356,7 +319,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -397,7 +360,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -416,6 +379,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 
 	header+="</pkg-info>"
+	echo -e "${header}" >> ~/Desktop/header
 	echo -e "${header}" > "${1}/Temp/PackageInfo"
 	pushd "${1}/Root" >/dev/null
 	find . -print | cpio -o -z -H cpio > "../Temp/Payload"
@@ -433,7 +397,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 

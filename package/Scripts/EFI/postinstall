@@ -73,7 +73,7 @@ echo ""
 # Write some information to the Install Log
 versionNumber=`cat "${scriptDir}"/Resources/version`
 revisionNumber=`cat "${scriptDir}"/Resources/revision`
-"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Chameleon installer version: ${versionNumber} ${revisionNumber}"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Installer version: ${versionNumber} ${revisionNumber}"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script
 Target volume selected by user = ${targetVolumeChosenByUser}
 Target volume = ${targetVolume}"
@@ -87,7 +87,7 @@ partitiontable=$( diskutil list ${targetDeviceChosenByUser%s*} | sed -n '3p' | a
 if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 	echo "Confirm this is a GPT partitioned disk."
 
-	# Double check we can see the selected partition, it's of the right type and /Volumes/EFI exists.
+	# Double check we can see the selected partition, it's of the right type and /Volumes/TempChamESP exists.
 
         "$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
 	returnValue=$?
@@ -144,6 +144,9 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			if [ ${returnValue} = 0 ]; then
 				# OK to proceed
 
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+
 				if [ ${diskupdate} = "0" ]; then
 					#echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
 
@@ -159,6 +162,9 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 
 				# Write the stage 2 loader to the root of the selected partition
 				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
 
 				# Set the active partition ONLY if Windows is not installed
 				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"

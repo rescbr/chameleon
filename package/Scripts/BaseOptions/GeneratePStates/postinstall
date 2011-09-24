@@ -17,6 +17,10 @@ if os.path.exists(espvol):
 
     plist = "/Volumes/EFI/Extra/org.chameleon.Boot.plist"
 else:
+    extrafolder = vol + "/Extra"
+    if not os.path.exists(extrafolder):
+        os.makedirs(extrafolder)
+
     boot = "/Extra/org.chameleon.Boot.plist"
     plist = vol + boot
 

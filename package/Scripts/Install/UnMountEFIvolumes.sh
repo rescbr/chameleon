@@ -4,7 +4,7 @@ echo "==============================================="
 echo "Unmount all volumes named EFI"
 echo "*****************************"
 
-# loop through and un-mount ALL mounted EFI system partitions - Thanks kizwan
+# loop through and un-mount ALL mounted 'EFI' system partitions - Thanks kizwan
 
 # Receives scriptDir: The location of the main script dir.
 # Receives targetVolumeTemp: Stores original target if EFI install selected.
@@ -27,9 +27,9 @@ while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
 	attempts=$(( ${attempts} + 1 ))
 done
 if [ ${attempts} = 5 ]; then
-	echo "failed to unmount EFI System Partition."
+	echo "failed to unmount 'EFI' System Partition."
 	echo "-----------------------------------------------"
-	"$scriptDir"InstallLog.sh "${targetVolumeTemp}" "Failed to unmount EFI System Partition."
+	"$scriptDir"InstallLog.sh "${targetVolumeTemp}" "Failed to unmount 'EFI' System Partition."
 	echo ""
 	echo ""
 	echo ""

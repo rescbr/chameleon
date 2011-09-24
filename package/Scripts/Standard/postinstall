@@ -144,7 +144,7 @@ if [ ${returnValue}=0 ]; then
 		else
 			# Continue if the selected device is not a FAT16 format device
 
-			# Append a link break to the installer log
+			# Append a line break to the installer log
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
 
 			if [ ${diskupdate} = "0" ]; then
@@ -161,7 +161,7 @@ if [ ${returnValue}=0 ]; then
 			# Write the stage 2 loader to the root of the selected partition
 			"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
-			# Append a link break to the installer log
+			# Append a line break to the installer log
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
 
 			# Set the active partition ONLY if Windows is not installed
