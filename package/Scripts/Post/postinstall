@@ -37,9 +37,15 @@ fi
 # Copy /tmpcham/Extra to correct location.
 if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
 	echo "Copying $dest_vol/tmpcham/Extra/* $dest_vol/Extra"
+	if [ ! -f "$dest_vol"/Extra ]; then
+		mkdir "$dest_vol"/Extra
+	fi
 	cp -R "$dest_vol"/tmpcham/Extra/* "$dest_vol"/Extra
 else
-	echo "Copying $dest_vol/tmpcham/Extra/* $dest_vol/Volumes/EFI/Extra"
+	echo "Copying $dest_vol/tmpcham/Extra/* $/Volumes/EFI/Extra"
+	if [ ! -f "/Volumes/EFI/Extra" ]; then
+		mkdir "/Volumes/EFI/Extra"
+	fi
 	cp -R "$dest_vol"/tmpcham/Extra/* /Volumes/EFI/Extra
 
 	# unmount /Volumes/EFI

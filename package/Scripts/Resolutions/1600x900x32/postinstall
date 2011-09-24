@@ -6,23 +6,12 @@ import os
 import shutil
 
 vol = str(sys.argv[3])
+extrafolder = vol + "/tmpcham/Extra"
+if not os.path.exists(extrafolder):
+    os.makedirs(extrafolder)
 
-# Check for .ChameleonEFI file at root of target volume
-# to indicate user wants to install to EFI system partition.
-espfile = "/.ChameleonEFI"
-espvol = vol + espfile
-if os.path.exists(espvol):
-    if not os.path.exists('/Volumes/EFI/Extra'):
-        os.makedirs('/Volumes/EFI/Extra')
-
-    plist = "/Volumes/EFI/Extra/org.chameleon.Boot.plist"
-else:
-    extrafolder = vol + "/Extra"
-    if not os.path.exists(extrafolder):
-        os.makedirs(extrafolder)
-
-    boot = "/Extra/org.chameleon.Boot.plist"
-    plist = vol + boot
+boot = "/tmpcham/Extra/org.chameleon.Boot.plist"
+plist = vol + boot
 
 if not os.path.exists(plist):
     shutil.copy('/Library/Preferences/SystemConfiguration/com.apple.Boot.plist', plist)
