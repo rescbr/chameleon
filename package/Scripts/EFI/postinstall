@@ -1,445 +1,206 @@
 #!/bin/bash
 
-diskloader="boot0"
-partitionloaderhfs="boot1h"
-partitionloaderfat="boot1f32"
-filesystemloader="boot"
-bootervolumename="EFI"
-booterextensions="Extra/Extensions"
-
-bootresources="${0%/*}"
-
-diskmicrocodetype[1]="GRUB,47525542"
-diskmicrocodetype[2]="LILO,4c494c4f"
-
-start ()
-{
-# $1 volume
-
-osxvolume="${@}"
-
-if [ -z "${osxvolume}" ]; then
-	echo
-	echo "Cannot find the volume. Exiting."
-	exit
-fi
-
-bootdev=$( df "${osxvolume}" | sed -n '2p' | awk '{print $1}' )
-
-if [ "${bootdev}" = "${bootdev#*disk*s}" ]; then
-	echo
-	echo "ERROR Volume does not use slices."
-	echo "Volume may be stored on a RAID array."
-	echo
-	exit
-fi
-
-bootuuid=$( diskutil info "$bootdev" | grep Volume\ UUID | awk {'print $3'} )
-partitiontable=$( diskutil list ${bootdev%s*} | sed -n '3p' | awk '{print $2}' )
-
-if [ ${partitiontable} != "GUID_partition_scheme" ]; then
-	echo
-	echo "ERROR Volume is not on a GPT partitioned disc."
-	echo
-	exit
-fi
-
 echo "==============================================="
-echo "Partition Type Identified:"
-echo "**************************"
-echo "GPT found."
+echo "Main EFI System Partition Post-Install Script"
+echo "*********************************************"
 echo "-----------------------------------------------"
 echo ""
-echo ""
 
+# Find location of this script in the package installer
+# so we know where all the other scripts are located.
+
+MYLOCATION="${PWD}/${BASH_ARGV[0]}"
+export MYLOCATION="${MYLOCATION%/*}"
+scriptDir=$MYLOCATION
+
+
+#echo "==============================================="
+#echo "Apple Installer Package Variables"
+#echo "*********************************"
+#echo "DEBUG: $ 1 = Full path to the installation package the installer app is processing: " $1
+#echo "DEBUG: $ 2 = Full path to the installation destination: " $2
+#echo "DEBUG: $ 3 = Installation volume (mountpoint) to receive the payload: " $3
+#echo "DEBUG: $ 4 = Root directory for the system: " $4
+#echo "DEBUG: Script Name: " $SCRIPT_NAME
+#echo "DEBUG: Package Path: " $PACKAGE_PATH
+#echo "DEBUG: Installer Temp: " $INSTALLER_TEMP
+#echo "DEBUG: Full path to the temp directory containing the operation executable: " $RECEIPT_PATH
+#echo "-----------------------------------------------"
+#echo ""
+
+# Initialise Script Globals
+
+stage0Loader="boot0"
+stage0LoaderDualBoot="boot0md"
+stage1LoaderHFS="boot1h"
+stage1LoaderFAT="boot1f32"
+stage2Loader="boot"
+
+targetVolumeChosenByUser=$3
+targetDeviceChosenByUser=$( df "${targetVolumeChosenByUser}" | sed -n '2p' | awk '{print $1}' )
+
+targetVolume="/Volumes/EFI"
+targetDevice=${targetDeviceChosenByUser%s*}s1
+targetDeviceRaw=${targetDevice/disk/rdisk}
+targetDisk=${targetDevice%s*}
+targetDiskRaw=${targetDisk/disk/rdisk}
+targetSlice=${targetDevice#*disk*s}
+
+targetResources="${targetVolumeChosenByUser}/usr/local/bin/"
 
 echo "==============================================="
-echo "Installer Variables Part 1:"
+echo "DEBUG: display script variables"
 echo "***************************"
-echo "OS X Volume is ${osxvolume}"
-echo "OX X Volume device is ${bootdev}"
-echo "OS X Volume UUID is ${bootuuid}"
+
+echo "DEBUG: stage0Loader: Disk loader is ${stage0Loader}"
+echo "DEBUG: stage0LoaderDualBoot: Disk loader is ${stage0LoaderDualBoot}"
+echo "DEBUG: stage1LoaderHFS: Partition loader is ${stage1LoaderHFS}"
+echo "DEBUG: stage1LoaderFat: Partition loader is ${stage1LoaderFAT}"
+echo "DEBUG: stage2Loader: Filesystem loader is ${stage2Loader}"
+echo "DEBUG: targetVolumeChosenByUser: Volume is ${targetVolumeChosenByUser}"
+echo "DEBUG: targetDeviceChosenByUser: Volume device is ${targetDeviceChosenByUser}"
+echo "DEBUG: targetVolume: Volume is ${targetVolume}"
+echo "DEBUG: targetDevice: Volume device is ${targetDevice}"
+echo "DEBUG: targetDeviceRaw: Volume raw device is ${targetDeviceRaw}"
+echo "DEBUG: targetDisk: Disk device is ${targetDisk}"
+echo "DEBUG: targetDiskRaw: Disk raw device is ${targetDiskRaw}"
+echo "DEBUG: targetSlice: Volume slice is ${targetSlice}"
+echo "DEBUG: targetResources: Boot Resources is ${targetResources}" 
 echo "-----------------------------------------------"
 echo ""
-echo ""
 
 
-bootvolume="/Volumes/$bootervolumename"
-bootdev=${bootdev%s*}s1
-bootrdev=${bootdev/disk/rdisk}
-bootdisk=${bootdev%s*}
-bootrdisk=${bootdisk/disk/rdisk}
-bootslice=${bootdev#*disk*s}
-
-echo "==============================================="
-echo "Installer Variables Part 2:"
-echo "***************************"
-echo "EFI Volume device is ${bootdev}"
-echo "EFI Volume raw device is ${bootrdev}"
-echo "EFI Volume slice is ${bootslice}"
-echo "Disk device is ${bootdisk}"
-echo "Disk raw device is ${bootrdisk}"
-echo "Disk loader normal is ${diskloader}"
-echo "Disk loader dual boot is also ${diskloader}"
-echo "Partition loader HFS is ${partitionloaderhfs}"
-echo "Partition loader FAT is ${partitionloaderfat}"
-echo "Filesystem loader is ${filesystemloader}"
-echo "-----------------------------------------------"
-echo ""
-echo ""
+# Write some information to the Install Log
+versionNumber=`cat "${scriptDir}"/Resources/version`
+revisionNumber=`cat "${scriptDir}"/Resources/revision`
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Installer version: ${versionNumber} ${revisionNumber}"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script
+Target volume selected by user = ${targetVolumeChosenByUser}
+Target volume = ${targetVolume}"
 
 
-checkdiskmicrocodetype ()
-{
-echo "==============================================="
-echo "Diskmicrocodetype:"
-echo "******************"
+# Check to see if the selected disk uses a GPT
 
-diskmicrocode=$( dd 2>/dev/null if=${bootdisk} count=1 | dd 2>/dev/null count=1 bs=437 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
+bootuuid=$( diskutil info "$targetDeviceChosenByUser" | grep Volume\ UUID | awk {'print $3'} )
+partitiontable=$( diskutil list ${targetDeviceChosenByUser%s*} | sed -n '3p' | awk '{print $2}' )
 
-diskmicrocodetypecounter=0
-while [ ${diskmicrocodetypecounter} -lt ${#diskmicrocodetype[@]} ]; do
-        diskmicrocodetypecounter=$(( ${diskmicrocodetypecounter} + 1 ))
-        diskmicrocodetypeid=${diskmicrocodetype[${diskmicrocodetypecounter}]#*,}
-        if [ ! "${diskmicrocode}" = "${diskmicrocode/${diskmicrocodetypeid}/}" ]; then
-                echo "${diskmicrocodetype[${diskmicrocodetypecounter}]%,*} found."
-	else
-		echo "Didn't find a match for ${diskmicrocodetype[${diskmicrocodetypecounter}]%,*}"
-        fi
-done
-echo "-----------------------------------------------"
-echo ""
-echo ""
-}
+if [ ${partitiontable} = "GUID_partition_scheme" ]; then
+	echo "Confirm this is a GPT partitioned disk."
+
+	# Double check we can see the selected partition, it's of the right type and /Volumes/TempChamESP exists.
+
+        "$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
+	returnValue=$?
+	if [ ${returnValue} = 0 ]; then
+		# OK to proceed
 
 
-checkdiskmicrocode ()
-{
-echo "==============================================="
-echo "Diskmicrocode:"
-echo "*************"
+		# Does a GRUB or Linux loader already exist in the disk's MBR?
+		# The script returns 1 if yes, 0 if no.
 
-# Note: The checks for Boot0 and Boot0hfs assume the code doesn't change!!
+		"$scriptDir"CheckGRUBLinuxLoader.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+		returnValue=$?
+		if [ ${returnValue} = 0 ]; then
+			# OK to proceed
 
-# 1 action ( check or set )
 
-diskmicrocode=$( dd 2>/dev/null if=${bootdisk} count=1 | dd 2>/dev/null count=1 bs=437 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
-diskmicrocodemd5=$( dd 2>/dev/null if=${bootdisk} count=1 | dd 2>/dev/null count=1 bs=437 | md5 )
+			# check for a 4-byte Windows disk signature in the disk's MBR.
+			# the following script returns 1 if a Windows disk signature exists, and 0 if not.
 
-if [ $( echo "${diskmicrocode}" | awk -F0 '{print NF-1}' ) = 874 ]; then
-	echo "Diskmicrocode = 874 (Which means the first 437 bytes of the MBR Disk Sector is blank)"
-	if [ "${1}" = "set" ]; then
-		echo "No disk microcode found. Updating."
-		diskupdate=true
-		echo "diskupdate is now set to true."
-	else
-		echo "No disk microcode found."
-	fi
-else
-	# There is already something on the MBR 
-	if [ ${1} = set ]; then
+			"$scriptDir"CheckWindowsDiskSignature.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			diskSigCheck=$?
 
-		# See if a Windows bootloader already exists
-		windowsloader=$( dd 2>/dev/null if=${bootdisk} count=4 bs=1 | xxd | awk '{print $2$3}' )
-		if [ "${windowsloader}" == "33c08ed0" ]  ; then
-			echo "Found existing Windows Boot Loader"
-			echo "Will replace loader with Boot0hfs"
-			diskupdate=true
-			echo "diskupdate is now set to true."
-		fi
 
-		# See if a Chameleon stage0 boot file already exists
-		stage0type=$( dd 2>/dev/null if=${bootdisk} count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
-		if [ "${stage0type}" == "0b807c" ] || [ "${stage0type}" == "0a803c" ] ; then
+			# check for existing bootloaders in the disk's MBR
+			# and find out if we can write the Chameleon boot files.
+			# the following script returns 0 if we can proceed
+			# with writing the boot files, and 1 for not.
 
-			echo "Found existing Chameleon Stage 0 Loader"
-			# if found Boot0HFS without a Windows installation set diskupdate to true
-			if [ "${stage0type}" == "0b807c" ] && [ "${disksignature}" == "00000000" ]; then
-				echo "Found existing Chameleon Boot0HFS without a Windows installation"
-				echo "Will replace loader with Boot0"
-				diskupdate=true
-				echo "diskupdate is now set to true."
+			"$scriptDir"CheckDiskMicrocode.sh "${targetDisk}" "${diskSigCheck}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			diskupdate=$?
+
+
+			# check the format of the selected partition.
+			# the following script returns 1 if HFS
+			# the following script returns 2 if MSDOS
+			# the following script returns 0 if nothing - **** the script shouldn't continue here??? as the partition is not formatted as either HFS or msdos??? ****
+
+			"$scriptDir"CheckFormat.sh "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			espformat=$?
+
+
+			# Determine the partition scheme of the selected disk
+			# is it GPT or a hybrid GPT/MBR
+
+			"$scriptDir"CheckPartitionScheme.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+
+
+			# Unmount ALL mounted volumes named EFI
+			# the following script returns 0 if it succeeds
+			# the following script returns 1 if it fails to un-mount any EFI volume
+
+			"$scriptDir"UnMountEFIvolumes.sh  "${targetVolumeChosenByUser}" "${scriptDir}"
+			returnValue=$?
+			if [ ${returnValue} = 0 ]; then
+				# OK to proceed
+
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+
+				if [ ${diskupdate} = "0" ]; then
+					#echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
+
+					# Write the stage 0 loader to the MBR
+					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolumeChosenByUser}" "${scriptDir}"
+				else
+					#echo "Diskupdate = false, so didn't write the stage 0 loader to the MBR."
+					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
+				fi
+
+				# Write the stage 1 loader to the partition boot sector
+				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
+
+				# Write the stage 2 loader to the root of the selected partition
+				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+
+				# Set the active partition ONLY if Windows is not installed
+				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			fi
-
-			# if found Boot0 with a Windows installation set diskupdate to true
-			if [ "${stage0type}" == "0a803c" ] && [ "${disksignature}" != "00000000" ]; then
-				echo "Found existing Chameleon Boot0 with a Windows installation"
-				echo "Will replace loader with Boot0hfs"
-				diskupdate=true
-				echo "diskupdate is now set to true."
-			fi
 		fi
-	
-		# If neither a Windows or Chameleon Boot Loader exists
-		if [ "${stage0type}" != "0b807c" ] && [ "${stage0type}" != "0a803c" ] && [ "${windowsloader}" != "33c08ed0" ]  ; then
-			test=$(echo "${diskmicrocode}" | awk -F0 '{print NF-1}' )
-			echo "Disk microcode found: ${test} - Preserving."
-			echo "diskupdate is left at false"
-		fi
-	else
-		test=$(echo "${diskmicrocode}" | awk -F0 '{print NF-1}' )
-		echo "Disk microcode found: ${test}"
-	fi
-fi
-echo "-----------------------------------------------"
-echo ""
-echo ""
-}
-
-
-checkdisksignature ()
-{
-echo "==============================================="
-echo "Find Disk Signature:"
-echo "*************"
-disksignature=$( dd 2>/dev/null if=${bootdisk} count=1 | dd 2>/dev/null count=4 bs=1 skip=440 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
-
-echo "${disksignature}"
-
-if [ $disksignature = "00000000" ]; then
-	echo "Just Zero's found meaning Windows isn't installed."
-else
-	echo "Non Zero means we've found a Windows installation"
-fi
-echo "-----------------------------------------------"
-echo ""
-echo ""
-}
-
-
-checkpartitionbootcode ()
-{
-echo "==============================================="
-echo "Find Partition Bootcode:"
-echo "************************"
-
-# 1 action ( check or set )
-
-partitionbootcode=$( dd if=${bootrdev} count=1 2>/dev/null | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
-partitionbootcodeextended=$( dd if=${bootrdev} count=1 skip=1 2>/dev/null | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
-
-if [ $( echo "${partitionbootcode}" | awk -F0 '{print NF-1}' ) = 1024 ]; then
-	echo "partitionbootcode = 1024 (Which means the whole 512 bytes of the MBR Disk Sector is blank)"
-	if [ "${1}" = "set" ]; then
-		echo "No partition bootcode found. Updating."
-	else
-		echo "No partition bootcode found."
 	fi
 else
-	if [ "${1}" = "set" ]; then
-		echo "Partition bootcode found. Overwriting."
-	else
-		echo "Partition bootcode found."
-	fi
-	if [ $( echo "${partitionbootcodeextended}" | awk -F0 '{print NF-1}' ) = 1024 ]; then
-		partitionbootcodemd5=$( dd 2>/dev/null if=${bootrdev} count=1 | md5 )
-	else
-		partitionbootcodemd5=$( dd 2>/dev/null if=${bootrdev} count=2 | md5 )
-		echo "Partition bootcode is dual sector."
-	fi
-	echo "Partition bootcode MD5 is ${partitionbootcodemd5}"
+	#echo "ERROR Volume is not on a GPT partitioned disc."
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "ERROR Volume is not on a GPT partitioned disc."
 fi
-echo "-----------------------------------------------"
-echo ""
-echo ""
-}
 
 
-}
+# remove the temporary boot sector files if they exist
+if [ -d /tmp/newbs ]; then
+	echo "Executing command: rm /tmp/newbs"
+	rm /tmp/newbs
+fi
+if [ -d /tmp/origbs ]; then
+	echo "Executing command: rm /tmp/origbs"
+	rm /tmp/origbs
+fi
 
+# Check for mounted volumes named EFI and if found, unmount
+#"$scriptDir"UnMountEFIvolumes.sh - ***** commented out to allow the boot option scripts to function ****
 
-start ${3}
+# Create temporary file on target volume to notify
+# boot option scripts than EFI (ESP) option was chosen
+echo "EFI" >"${targetVolumeChosenByUser}"/.ChameleonEFI 
 
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "EFI script complete"
 
 echo "==============================================="
-echo "Unmount all EFI partitions and Check their format"
-echo "*************************************"
-
-# loop through and un-mount all mounted EFI partitions - Thanks kizwan
-attempts=1
-while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
-	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-	umount -f $( df | grep EFI | awk '{print $1}' )
-	attempts=$(( ${attempts} + 1 ))
-done
-if [ ${attempts} = 5 ]; then
-	echo "failed to unmount EFI partitions."
-	exit
-fi
-
-if [ "$( fstyp ${bootdev} | grep hfs )" ]; then
-	echo "${bootdev} is currently formatted as HFS"
-	efiformat="hfs"
-fi
-if [ "$( fstyp ${bootdev} | grep msdos )" ]; then
-	echo "${bootdev} is currently formatted as msdos"
-	efiformat="msdos"
-fi 
+echo "END - Main EFI System Partition Post-Install Script"
+echo "*********************************************"
 echo "-----------------------------------------------"
 echo ""
-echo ""
 
-
-diskupdate=false
-
-
-checkdisksignature
-checkdiskmicrocodetype
-checkdiskmicrocode set
-checkpartitionbootcode set
-#checkpartitionactive
-
-
-echo "==============================================="
-echo "Can we install the Chameleon bootloader files?:"
-echo "**********************************************"
-
-if ${diskupdate}; then
-	echo "Diskupdate = true, so yes"
-	#---------------------------------------------------------------------
-	# Check bytes 438-446 of the GPTdiskProtectiveMBR for a Windows Disk Signature
-	# If there's no Windows disk signature then we can write boot0
-	#---------------------------------------------------------------------
-
-	if [ ${disksignature} == "00000000" ]; then
-		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
-	else
-		#---------------------------------------------------------------------
-		# If it exists then Windows is also installed on the HDD and we need to write boot0hfs
-		#---------------------------------------------------------------------
-
-		#Azipkg: diskloader=boot0 ??? boot0hfs/boot0md - remenber this is for GPT!!
-		echo "Executing command: fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}"
-		fdisk -u -f "${osxvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
-	fi
-else
-	echo "Diskupdate is false, so no stage 0 file was written"
-fi
-
-#echo "Executing command: dd if=${partitionloader} of=${bootrdev}"
-#dd if="${osxvolume}/${partitionloader}" of=${bootrdev}
-
-# if we have an original EFI ("FAT"), copy boot1f32 to newbs
-if [ ${efiformat} = "msdos" ]; then
-	
-	echo "Prepare Stage 1 loader"
-	# copy partition boot sector to origbs
-	echo "Executing command: dd if=${bootrdev} count=1 bs=512 of=/tmp/origbs"
-	dd if=${bootrdev} count=1 bs=512 of=/tmp/origbs
-	
-	# copy boot1f32 to newbs
-	echo "Executing command: cp "${osxvolume}/usr/standalone/i386/${partitionloaderfat}" /tmp/newbs"
-	cp "${osxvolume}/usr/standalone/i386/${partitionloaderfat}" /tmp/newbs
-	
-	# "merge" origbs into newbs
-	echo "Executing command: dd if=/tmp/origbs of=/tmp/newbs skip=3 seek=3 bs=1 count=87 conv=notrunc"
-	dd if=/tmp/origbs of=/tmp/newbs skip=3 seek=3 bs=1 count=87 conv=notrunc
-	
-	echo "Write Stage 1 loader"
-	
-	# write newbs to the partition boot sector
-	echo "Executing command: dd if=/tmp/newbs of=${bootrdev}"
-	dd if=/tmp/newbs of=${bootrdev}
-else
-	#Azipkg: this is was failing for me, hanged at boot0: done. Got fine when i removed "bs=512 count=1" ??
-	# makes no sense but... anyway, i'd remove this!.. no need to change EFI fs if boot1f32 works fine.
-	# In fact, i'm not a fan of EFI installs so, i'd remove it all!! :)
-	echo "Write Stage 1 loader"
-	
-	# just write boot1h to the partition boot sector
-	echo "Executing command: dd if="${osxvolume}/usr/standalone/i386/${partitionloaderhfs}" of=${bootrdev}"
-	dd if="${osxvolume}/usr/standalone/i386/${partitionloaderhfs}" of=${bootrdev}
-fi
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
-
-
-echo "==============================================="
-echo "Set Active Partition ONLY if Windows is not installed:"
-echo "*****************************************************"
-
-# If table is MBR make the correct slice active. If table is GPT make the first partition active (BadAxe compatibility).
-#[ "${partitiontable}" = "GUID_partition_scheme" ] && bootslice=1
-#if [[ "${partitiontable}" = "FDisk_partition_scheme" ||  "${partitiontable}" = "GUID_partition_scheme" ]]; then
-#	fdisk -e ${bootdisk} <<-MAKEACTIVE
-#	print
-#	flag ${bootslice}
-#	write
-#	y
-#	quit
-#	MAKEACTIVE
-#fi
-
-if [ ${disksignature} == "00000000" ]; then
-	# echo "Windows is not installed so let's change the active partition"
-
-	partitionactive=$( fdisk -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
-	echo "Current Active Partition: ${partitionactive}"
-
-	if [ "${partitionactive}" = "${bootslice}" ]; then
-		echo "${bootvolume} is already flagged as active"
-	else
-		echo "${bootvolume} is not flagged as active, so let's do it."
-		# BadAxe requires EFI partition to be flagged active.
-		# but it doesn't' hurt to do it for any non-windows partition.
-		
-		fdisk -e ${bootrdisk} <<-MAKEACTIVE
-		print
-		flag ${bootslice}
-		write
-		y
-		quit
-		MAKEACTIVE
-	fi
-else
-	echo "Windows is installed so we let that remain the active partition"
-fi
-echo "-----------------------------------------------"
-echo ""
-echo ""
-
-
-#checkdiskmicrocode check
-#checkdisksignature
-#checkpartitionbootcode check
-#checkpartitionactive
-
-
-echo "==============================================="
-echo "Mount EFI partition:"
-echo "********************"
-if [ ${efiformat} = "hfs" ]; then
-	[ -d "${bootvolume}" ] || mkdir -p "${bootvolume}"
-	echo "Executing command: mount_hfs -u 0 -g 0 ${bootdev} ${bootvolume}"
-	mount_hfs -u 0 -g 0 "${bootdev}" "${bootvolume}"
-else
-	[ -d "${bootvolume}" ] || mkdir -p "${bootvolume}"
-	echo "Executing command: mount_msdos -u 0 -g 0 ${bootdev} ${bootvolume}"
-	mount_msdos -u 0 -g 0 "${bootdev}" "${bootvolume}"
-fi
-echo "-----------------------------------------------"
-echo ""
-echo ""
-
-
-echo "==============================================="
-echo "Write Stage 2 loader"
-echo "********************"
-       
-echo "Executing command: cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" ${bootvolume}/boot"
-cp "${osxvolume}/usr/standalone/i386/${filesystemloader}" "${bootvolume}/boot"
-echo "boot written"
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
-
-# setup link for extras
-#echo "Executing command: ln -s /Volumes/${bootervolumename} ${2}/.Chameleon"
-#ln -s "/Volumes/${bootervolumename}" "${2}/.Chameleon" 
-# setup link for extras
-
-exit
+exit 0
