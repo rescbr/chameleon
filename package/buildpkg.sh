@@ -186,7 +186,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/AMDGraphicsEnabler/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ${1}/AMDGraphicsEnabler/Root
                 echo "	[BUILD] AMDGraphicsEnabler "
-                buildpackage "${1}/AMDGraphicsEnabler" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/AMDGraphicsEnabler" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -195,7 +195,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/ATiGraphicsEnabler/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/ATiGraphicsEnabler.dylib ${1}/ATiGraphicsEnabler/Root
                 echo "	[BUILD] ATiGraphicsEnabler "
-                buildpackage "${1}/ATiGraphicsEnabler" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/ATiGraphicsEnabler" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -204,7 +204,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/IntelGraphicsEnabler/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/IntelGraphicsEnabler.dylib ${1}/IntelGraphicsEnabler/Root
                 echo "	[BUILD] IntelGraphicsEnabler "
-                buildpackage "${1}/IntelGraphicsEnabler" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/IntelGraphicsEnabler" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -213,7 +213,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/NVIDIAGraphicsEnabler/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ${1}/NVIDIAGraphicsEnabler/Root
                 echo "	[BUILD] NVIDIAGraphicsEnabler "
-                buildpackage "${1}/NVIDIAGraphicsEnabler" "/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+                buildpackage "${1}/NVIDIAGraphicsEnabler" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
             ((xmlindent--))
