@@ -206,10 +206,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		for (( i = 0 ; i < ${#options[@]} ; i++ )) 
 		do
 			mkdir -p "${1}/${options[$i]##*/}/Root"
-			mkdir -p "${1}/${options[$i]##*/}/Scripts"
-			ditto --noextattr --noqtn "${options[$i]}/postinstall" "${1}/${options[$i]##*/}/Scripts/postinstall"
+			#mkdir -p "${1}/${options[$i]##*/}/Scripts"
+			#ditto --noextattr --noqtn "${options[$i]}/postinstall" "${1}/${options[$i]##*/}/Scripts/postinstall"
+			cp "${options[$i]}"/* "${1}/${options[$i]##*/}/Root"
 			echo "	[BUILD] ${options[$i]##*/} "
-			buildpackage "${1}/${options[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
+			buildpackage "${1}/${options[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 		done
 		# End build base options packages
 
@@ -243,10 +244,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			for (( i = 0 ; i < ${#resolutions[@]} ; i++ )) 
 			do
 				mkdir -p "${1}/${resolutions[$i]##*/}/Root/"
-				mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
-				ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
+				#mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
+				#ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
+				cp "${resolutions[$i]}"/* "${1}/${resolutions[$i]##*/}/Root"
 				echo "	[BUILD] ${resolutions[$i]##*/} "
-				buildpackage "${1}/${resolutions[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
+				buildpackage "${1}/${resolutions[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 
 			((xmlindent--))
@@ -264,10 +266,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			for (( i = 0 ; i < ${#optionsadv[@]} ; i++ )) 
 			do
 				mkdir -p "${1}/${optionsadv[$i]##*/}/Root"
-				mkdir -p "${1}/${optionsadv[$i]##*/}/Scripts"
-				ditto --noextattr --noqtn "${optionsadv[$i]}/postinstall" "${1}/${optionsadv[$i]##*/}/Scripts/postinstall"
+				#mkdir -p "${1}/${optionsadv[$i]##*/}/Scripts"
+				#ditto --noextattr --noqtn "${optionsadv[$i]}/postinstall" "${1}/${optionsadv[$i]##*/}/Scripts/postinstall"
+				cp "${optionsadv[$i]}"/* "${1}/${optionsadv[$i]##*/}/Root"
 				echo "	[BUILD] ${optionsadv[$i]##*/} "
-				buildpackage "${1}/${optionsadv[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
+				buildpackage "${1}/${optionsadv[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 		
 			((xmlindent--))
@@ -320,7 +323,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -361,7 +364,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -398,7 +401,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 

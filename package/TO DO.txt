@@ -1,0 +1,8 @@
+TO DO
+
+* Fix - Keylayouts to match new style for building org.chameleon.boot.plist.
+* Check if boot options already exist before adding with plistbuddy.
+* Check also kernel flags before adding with plistbuddy
+* Add theme to org.chameleon.boot.plist? (Do what when more than one installed?)
+* Install log is so far ONLY generated when selecting to install Chameleon.
+* Include Boot options/kernel flags/keylayouts/themes to install log.

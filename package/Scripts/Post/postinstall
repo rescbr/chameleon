@@ -33,22 +33,77 @@ else
     dest_vol="$3"
 fi    
 
-chamTemp="usr/local/chamTemp" #blackosx added
+# set temporary directory
+chamTemp="$dest_vol/usr/local/chamTemp" #blackosx added
 
-# Extra folder now resides in /$chamTemp.
-# Copy /$chamTemp/Extra to correct location.
+# Check for temporary directory/Extra folder.
+if [ ! -d "$chamTemp"/Extra ]; then
+	mkdir "$chamTemp"/Extra
+fi
+
+
+# ---------------------------------------------
+# Blackosx - Build boot options / Kernel Flags.
+# NEEDS MORE WORK!!!!!!!!!!!!
+# ---------------------------------------------
+# All options selected are now dummy files with
+# the filename of the option and value residing
+# in /usr/local/chamTemp/options/
+# for example. Boot Banner=Yes
+
+# Create template for org.chameleon.Boot.plist"
+tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
+cp "$dest_vol"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
+
+# Read list of all boot options the user added.
+arrayCount=0
+find ${chamTemp}/options | while read FILE
+do
+	options[arrayCount]="${FILE##*/}"
+	keyRead="${options[$arrayCount]%=*}"
+
+	value="${options[$arrayCount]#*=}"
+
+	# Check keyRead for 'KF' at beginning to
+	# indicate that should be a kernel flag
+	if [ ${keyRead:0:2} = "KF" ];then
+		kernelflag=${keyRead#*F }=$value
+
+		# write value to org.chameleon.Boot.plist
+		# but skip first one as that will be 'options'
+		if [ $arrayCount -gt 0 ]; then
+			sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
+		fi
+	else
+		# escape any spaces
+		keyToUse=$( echo $keyRead | sed 's/ /\\ /g' )
+
+		# write value to org.chameleon.Boot.plist
+		# but skip first one as that will be 'options'
+		if [ $arrayCount -gt 0 ]; then
+			sudo /usr/libexec/plistbuddy -c "Add :$keyToUse string $value" "$tempOCBP"
+		fi
+	fi
+
+        arrayCount=$(( ${arrayCount} + 1 ))
+done
+
+
+# ---------------------------------------------
+# Copy temp Extra folder to target destination
+# ---------------------------------------------
+# Extra folder now resides in /usr/local/chamTemp/
+# Copy /usr/local/chamTemp/Extra to correct location.
 if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
-	echo "Copying $dest_vol/$chamTemp/Extra/* $dest_vol/Extra"
 	if [ ! -f "$dest_vol"/Extra ]; then
 		mkdir "$dest_vol"/Extra
 	fi
-	cp -R "$dest_vol"/$chamTemp/Extra/* "$dest_vol"/Extra
+	cp -R "$chamTemp"/Extra/* "$dest_vol"/Extra
 else
-	echo "Copying $dest_vol/$chamTemp/Extra/* $/Volumes/EFI/Extra"
 	if [ ! -f "/Volumes/EFI/Extra" ]; then
 		mkdir "/Volumes/EFI/Extra"
 	fi
-	cp -R "$dest_vol"/$chamTemp/Extra/* /Volumes/EFI/Extra
+	cp -R "$chamTemp"/Extra/* /Volumes/EFI/Extra
 
 	# unmount /Volumes/EFI
    	attempts=1
@@ -57,8 +112,14 @@ else
 	   	 umount -f $( df | grep EFI | awk '{print $1}' )
 	   	 attempts=$(( ${attempts} + 1 ))
    	 done
+fi
 
-   	# Remove /.ChameleonEFI file
+
+# ---------------------------------------------
+# Cleanup
+# ---------------------------------------------
+# Remove /.ChameleonEFI file
+if [ -f "$dest_vol"/.ChameleonEFI ]; then
    	echo "Removing /.ChameleonEFI file"
     	rm "$dest_vol"/.ChameleonEFI
 fi
@@ -70,8 +131,8 @@ if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
 fi
 
 # delete the temporary Chameleon folder
-echo "Removing $dest_vol/$chamTemp file"
-rm -rf "$dest_vol/$chamTemp"
+echo "Removing $chamTemp file"
+rm -rf "$chamTemp"
 
 
 echo "Done..."
