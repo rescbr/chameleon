@@ -6,11 +6,11 @@ import os
 import shutil
 
 vol = str(sys.argv[3])
-extrafolder = vol + "/tmpcham/Extra"
+extrafolder = vol + "/usr/local/chamTemp/Extra"
 if not os.path.exists(extrafolder):
     os.makedirs(extrafolder)
 
-boot = "/tmpcham/Extra/org.chameleon.Boot.plist"
+boot = "/usr/local/chamTemp/Extra/org.chameleon.Boot.plist"
 plist = vol + boot
 
 if not os.path.exists(plist):

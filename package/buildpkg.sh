@@ -8,6 +8,10 @@ packagename="Chameleon"
 
 pkgroot="${0%/*}"
 
+# blackosx to use /usr/local as a place for temporary files
+# taken from http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard#cite_note-27
+chamTemp="usr/local/chamTemp"
+
 COL_BLACK="\x1b[30;01m"
 COL_RED="\x1b[31;01m"
 COL_GREEN="\x1b[32;01m"
@@ -107,7 +111,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build reset choice package 
 		mkdir -p ${1}/noboot/Root
 		echo "	[BUILD] Reset choice "
-		buildpackage "${1}/noboot" "/tmpcham" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
+		buildpackage "${1}/noboot" "/$chamTemp" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
 	# End build reset choice package 
 
 	# build Modules package
@@ -132,7 +136,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/klibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
                 echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+                buildpackage "${1}/klibc" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -141,24 +145,24 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/AutoReso/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
                 echo "	[BUILD] Resolution "
-                buildpackage "${1}/AutoReso" "/tmpcham/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+                buildpackage "${1}/AutoReso" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
             if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
             {
-                mkdir -p ${1}/Keylayout/Root/tmpcham/Extra/{modules,Keymaps} #blackosx = add tmpcham to path
+                mkdir -p ${1}/Keylayout/Root/$chamTemp/Extra/{modules,Keymaps}
                 mkdir -p ${1}/Keylayout/Root/usr/bin
                 layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
                 if [ -d "$layout_src_dir" ];then
                     # Create a tar.gz from layout sources
                     (cd "$layout_src_dir"; \
-                    tar czf "${1}/Keylayout/Root/tmpcham/Extra/Keymaps/layouts-src.tar.gz" README *.slt) #blackosx = add tmpcham to path
+                    tar czf "${1}/Keylayout/Root/$chamTemp/Extra/Keymaps/layouts-src.tar.gz" README *.slt)
                 fi
                 # Adding module
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/tmpcham/Extra/modules #blackosx = add tmpcham to path
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/$chamTemp/Extra/modules
                 # Adding Keymaps
-                ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/tmpcham/Extra/Keymaps #blackosx = add tmpcham to path
+                ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/$chamTemp/Extra/Keymaps
                 # Adding tools
                 ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
                 echo "	[BUILD] Keylayout "
@@ -172,7 +176,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
                 echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/tmpcham/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1 #blackosx = add tmpcham to path
+                buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
             ((xmlindent--))
@@ -223,7 +227,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				sed "s/@@KEYMAP@@/${keymaps[$i]}/g" "${pkgroot}/Scripts/Keymaps/postinstall" > "${1}/${keymaps[$i]}/Scripts/postinstall" && \
 					chmod +rx "${1}/${keymaps[$i]}/Scripts/postinstall"
 				echo "	[BUILD] ${keymaps[$i]} "
-#blackosx = why use install location /tmpcham for this ? changing to root
 				buildpackage "${1}/${keymaps[$i]}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 			((xmlindent--))
@@ -243,7 +246,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
 				ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
 				echo "	[BUILD] ${resolutions[$i]##*/} "
-#blackosx = why use install location /tmpcham for this ? changing to root
 				buildpackage "${1}/${resolutions[$i]##*/}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 
@@ -292,8 +294,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			mkdir -p "${1}/${theme}/Root/"
 			rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
 			echo "	[BUILD] ${theme}"
-#blackosx = maybe use install location /tmpcham for this, then move at the end depending on standard to efi install? going to try it
-			buildpackage "${1}/${theme}" "/tmpcham/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
+			buildpackage "${1}/${theme}" "/$chamTemp/Extra/Themes" "" "start_selected=\"false\"" >/dev/null 2>&1
 		done
 
 		((xmlindent--))
