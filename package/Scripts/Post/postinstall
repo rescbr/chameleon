@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # $1: the full path to the installation package; for example:
 # /Volumes/Projects/Testing/Simple_Carbon_App.pkg

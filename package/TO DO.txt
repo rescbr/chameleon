@@ -1,6 +1,6 @@
 TO DO
 
-* Fix - Keylayouts to match new style for building org.chameleon.boot.plist.
+* Fix - Keylayouts to match new style for building org.chameleon.boot.plist. = DONE
 * Check if boot options already exist before adding with plistbuddy.
 * Check also kernel flags before adding with plistbuddy
 * Add theme to org.chameleon.boot.plist? (Do what when more than one installed?)

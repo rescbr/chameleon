@@ -149,27 +149,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
             }
             fi
 # -
-            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
-            {
-                mkdir -p ${1}/Keylayout/Root/$chamTemp/Extra/{modules,Keymaps}
-                mkdir -p ${1}/Keylayout/Root/usr/bin
-                layout_src_dir="${1%/sym/*}/i386/modules/Keylayout/layouts/layouts-src"
-                if [ -d "$layout_src_dir" ];then
-                    # Create a tar.gz from layout sources
-                    (cd "$layout_src_dir"; \
-                    tar czf "${1}/Keylayout/Root/$chamTemp/Extra/Keymaps/layouts-src.tar.gz" README *.slt)
-                fi
-                # Adding module
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root/$chamTemp/Extra/modules
-                # Adding Keymaps
-                ditto --noextattr --noqtn ${1%/sym/*}/Keymaps ${1}/Keylayout/Root/$chamTemp/Extra/Keymaps
-                # Adding tools
-                ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/bin
-                echo "	[BUILD] Keylayout "
-                buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
-            }
-            fi
-# -
             if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
             {
                 mkdir -p ${1}/uClibc/Root
@@ -179,6 +158,16 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
             }
             fi
+# -
+            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
+            {
+                mkdir -p ${1}/Keylayout/Root
+                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root
+                echo "	[BUILD] Keylayout "
+                buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+            }
+            fi
+
             ((xmlindent--))
             outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
         }
@@ -194,27 +183,24 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # build Extras package
 	# build options packages
-	echo "================= Options ================="
+        echo "================= Options ================="
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Options\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Options\"\n\ttitle=\"Options_title\"\n\tdescription=\"Options_description\"\n>\n</choice>\n"
 		((xmlindent++))
 
 		# build base options packages
-		packagesidentity="org.chameleon.options"
-		
-		options=($( find "${pkgroot}/Scripts/BaseOptions" -type d -depth 1 -not -name '.svn' ))
-		for (( i = 0 ; i < ${#options[@]} ; i++ )) 
-		do
-			mkdir -p "${1}/${options[$i]##*/}/Root"
-			#mkdir -p "${1}/${options[$i]##*/}/Scripts"
-			#ditto --noextattr --noqtn "${options[$i]}/postinstall" "${1}/${options[$i]##*/}/Scripts/postinstall"
-			cp "${options[$i]}"/* "${1}/${options[$i]##*/}/Root"
-			echo "	[BUILD] ${options[$i]##*/} "
-			buildpackage "${1}/${options[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-		done
+			packagesidentity="org.chameleon.options"
+			options=($( find "${pkgroot}/Scripts/BaseOptions" -type d -depth 1 -not -name '.svn' ))
+			for (( i = 0 ; i < ${#options[@]} ; i++ )) 
+			do
+				mkdir -p "${1}/${options[$i]##*/}/Root"
+				cp "${options[$i]}"/* "${1}/${options[$i]##*/}/Root"
+				echo "	[BUILD] ${options[$i]##*/} "
+				buildpackage "${1}/${options[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
+			done
 		# End build base options packages
 
-		# build KeyLayout option packages
+		# build KeyLayout options packages
 			echo "================= Keymaps Options ================="
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"KeyLayout\">"
 			choices[$((choicescount++))]="<choice\n\tid=\"KeyLayout\"\n\ttitle=\"KeyLayout_title\"\n\tdescription=\"KeyLayout_description\"\n>\n</choice>\n"
@@ -223,16 +209,14 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			keymaps=($( find "${1%/sym/*}/Keymaps" -type f -depth 1 -name '*.lyt' | sed 's|.*/||;s|\.lyt||' ))
 			for (( i = 0 ; i < ${#keymaps[@]} ; i++ ))
 			do
-				mkdir -p "${1}/${keymaps[$i]}/Root/"
-				mkdir -p "${1}/${keymaps[$i]}/Scripts/"
-				sed "s/@@KEYMAP@@/${keymaps[$i]}/g" "${pkgroot}/Scripts/Keymaps/postinstall" > "${1}/${keymaps[$i]}/Scripts/postinstall" && \
-					chmod +rx "${1}/${keymaps[$i]}/Scripts/postinstall"
-				echo "	[BUILD] ${keymaps[$i]} "
-				buildpackage "${1}/${keymaps[$i]}" "/" "" "start_selected=\"false\"" >/dev/null 2>&1
+				mkdir -p "${1}/${keymaps[$i]##*/}/Root/"
+				echo "dummy file" >"${1}/${keymaps[$i]##*/}/Root/KeyLayout=${keymaps[$i]##*/}"
+				echo "	[BUILD] ${keymaps[$i]##*/} "
+				buildpackage "${1}/${keymaps[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-		# End build KeyLayout option packages
+		# End build base options packages
 
 		# build resolution packages
 			echo "================= Res. Options ================="
@@ -244,13 +228,10 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			for (( i = 0 ; i < ${#resolutions[@]} ; i++ )) 
 			do
 				mkdir -p "${1}/${resolutions[$i]##*/}/Root/"
-				#mkdir -p "${1}/${resolutions[$i]##*/}/Scripts/"
-				#ditto --noextattr --noqtn "${resolutions[$i]}/postinstall" "${1}/${resolutions[$i]##*/}/Scripts/postinstall"
 				cp "${resolutions[$i]}"/* "${1}/${resolutions[$i]##*/}/Root"
 				echo "	[BUILD] ${resolutions[$i]##*/} "
 				buildpackage "${1}/${resolutions[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 			done
-
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 		# End build resolution packages
@@ -266,13 +247,10 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			for (( i = 0 ; i < ${#optionsadv[@]} ; i++ )) 
 			do
 				mkdir -p "${1}/${optionsadv[$i]##*/}/Root"
-				#mkdir -p "${1}/${optionsadv[$i]##*/}/Scripts"
-				#ditto --noextattr --noqtn "${optionsadv[$i]}/postinstall" "${1}/${optionsadv[$i]##*/}/Scripts/postinstall"
 				cp "${optionsadv[$i]}"/* "${1}/${optionsadv[$i]##*/}/Root"
 				echo "	[BUILD] ${optionsadv[$i]##*/} "
 				buildpackage "${1}/${optionsadv[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-			done
-		
+			done		
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 		# End build Advanced packages
@@ -303,9 +281,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		((xmlindent--))
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 	# End build theme packages
-
-	#((xmlindent--))
-	#outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 # End build Extras package
 
 # build post install package
@@ -323,7 +298,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 
 }
 
@@ -364,7 +339,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	#rm -R -f "${1}/Temp"
+	rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -401,7 +376,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 fi
 }
 
