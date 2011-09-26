@@ -87,8 +87,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Standard/* ${1}/Standard/Scripts
-                cp -f ${pkgroot}/Scripts/Install/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
+                cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
@@ -99,8 +99,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/EFI/* ${1}/EFI/Scripts
-                cp -f ${pkgroot}/Scripts/Install/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
+                cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
@@ -286,7 +286,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	echo "================= Post ================="
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
-	cp -f ${pkgroot}/Scripts/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
 	echo "	[BUILD] Post "
 	buildpackage "${1}/Post" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
 	outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
