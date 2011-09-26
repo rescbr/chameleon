@@ -1,0 +1,7 @@
+CSTUsingSystemIO:CSTUsingSystemIO=Yes
+DropSSDT:DropSSDT=Yes
+EnableC2State:EnableC2State=Yes
+EnableC3State:EnableC3State=Yes
+EnableC4State:EnableC4State=Yes
+GenerateCStates:GenerateCStates=Yes
+GeneratePStates:GeneratePStates=Yes

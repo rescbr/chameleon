@@ -183,22 +183,56 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # build Extras package
 	# build options packages
-        echo "================= Options ================="
+
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Options\">"
 		choices[$((choicescount++))]="<choice\n\tid=\"Options\"\n\ttitle=\"Options_title\"\n\tdescription=\"Options_description\"\n>\n</choice>\n"
 		((xmlindent++))
 
-		# build base options packages
-			packagesidentity="org.chameleon.options"
-			options=($( find "${pkgroot}/Scripts/BaseOptions" -type d -depth 1 -not -name '.svn' ))
-			for (( i = 0 ; i < ${#options[@]} ; i++ )) 
+		# ------------------------------------------------------
+		# parse BootOptions folder to find files of boot options.
+		# ------------------------------------------------------
+		bootOptionsFolder="${pkgroot}/BootOptions"
+		bootOptionFiles=($( find "${bootOptionsFolder}" -depth 1 -not -name '.svn' ))
+
+		for (( i = 0 ; i < ${#bootOptionFiles[@]} ; i++ ))
+		do
+
+			# Take filename and Strip .txt from end and path from front
+			builtOptionsFolderName=$( echo ${bootOptionFiles[$i]%.txt} )
+			builtOptionsFolderName=$( echo ${builtOptionsFolderName##*/} )
+			echo "================= $builtOptionsFolderName ================="
+
+			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"${builtOptionsFolderName}\">"
+			choices[$((choicescount++))]="<choice\n\tid=\"${builtOptionsFolderName}\"\n\ttitle=\"${builtOptionsFolderName}_title\"\n\tdescription=\"${builtOptionsFolderName}_description\"\n>\n</choice>\n"
+			((xmlindent++))
+			packagesidentity="org.chameleon.options.$builtOptionsFolderName"
+
+			# ------------------------------------------------------
+			# Read boot option file. for example, Resolutions.txt.
+			# Each line in the file is a boot option to add.
+			# Structure of boot option in file is name:key=value
+			# ------------------------------------------------------
+			while read textLine
 			do
-				mkdir -p "${1}/${options[$i]##*/}/Root"
-				cp "${options[$i]}"/* "${1}/${options[$i]##*/}/Root"
-				echo "	[BUILD] ${options[$i]##*/} "
-				buildpackage "${1}/${options[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-			done
-		# End build base options packages
+				# split line - taking all before ':' as option name
+				# and all after ':' as key/value
+				optionName=${textLine%:*}
+				keyValue=${textLine##*:}
+
+				# create folders required for each boot option
+				mkdir -p "${1}/$optionName/Root/"
+
+				# create dummy file with name of key/value
+				echo "" > "${1}/$optionName/Root/${keyValue}"
+
+				echo "	[BUILD] ${optionName} "
+				buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
+
+			done < ${bootOptionFiles[$i]}
+
+			((xmlindent--))
+			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+		done
 
 		# build KeyLayout options packages
 			echo "================= Keymaps Options ================="
@@ -216,47 +250,12 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			done
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-		# End build base options packages
 
-		# build resolution packages
-			echo "================= Res. Options ================="
-			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Resolution\">"
-			choices[$((choicescount++))]="<choice\n\tid=\"Resolution\"\n\ttitle=\"Resolution_title\"\n\tdescription=\"Resolution_description\"\n>\n</choice>\n"
-			((xmlindent++))
-			packagesidentity="org.chameleon.options.resolution"
-			resolutions=($( find "${pkgroot}/Scripts/Resolutions" -type d -depth 1 -not -name '.svn' ))
-			for (( i = 0 ; i < ${#resolutions[@]} ; i++ )) 
-			do
-				mkdir -p "${1}/${resolutions[$i]##*/}/Root/"
-				cp "${resolutions[$i]}"/* "${1}/${resolutions[$i]##*/}/Root"
-				echo "	[BUILD] ${resolutions[$i]##*/} "
-				buildpackage "${1}/${resolutions[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-			done
-			((xmlindent--))
-			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-		# End build resolution packages
-
-		# build Advanced packages
-			echo "================= Adv. Options ================="
-			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Advanced\">"
-			choices[$((choicescount++))]="<choice\n\tid=\"Advanced\"\n\ttitle=\"Advanced_title\"\n\tdescription=\"Advanced_description\"\n>\n</choice>\n"
-			((xmlindent++))
-
-			packagesidentity="org.chameleon.options.advanced"
-			optionsadv=($( find "${pkgroot}/Scripts/Advanced" -type d -depth 1 -not -name '.svn' ))
-			for (( i = 0 ; i < ${#optionsadv[@]} ; i++ )) 
-			do
-				mkdir -p "${1}/${optionsadv[$i]##*/}/Root"
-				cp "${optionsadv[$i]}"/* "${1}/${optionsadv[$i]##*/}/Root"
-				echo "	[BUILD] ${optionsadv[$i]##*/} "
-				buildpackage "${1}/${optionsadv[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-			done		
-			((xmlindent--))
-			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-		# End build Advanced packages
+		# End build KeyLayout options packages
 
 		((xmlindent--))
 		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+
 	# End build options packages
 
 	# build theme packages
@@ -298,7 +297,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -339,7 +338,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -376,7 +375,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 

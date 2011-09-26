@@ -1,0 +1,4 @@
+GraphicsEnabler:GraphicsEnabler=Yes
+UseAtiROM:UseAtiROM=Yes
+UseNvidiaROM:UseNvidiaROM=Yes
+VBIOS:VBIOS=Yes
