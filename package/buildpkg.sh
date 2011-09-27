@@ -88,21 +88,19 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
-                cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
+        cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
         buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
-#       hh="selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\""
-#       buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" ${hh}" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
-                cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
+        cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
@@ -210,12 +208,25 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			packagesidentity="org.chameleon.options.$builtOptionsFolderName"
 
 			# ------------------------------------------------------
-			# Read boot option file. for example, Resolutions.txt.
-			# Each line in the file is a boot option to add.
-			# Structure of boot option in file is name:key=value
+            # Read boot option file in to an array.
+            # Structure of boot option in file is name:key=value
+            # Note: This requires the boot option file to have
+            # a carriage return at the end of the last line.
 			# ------------------------------------------------------
-			while read textLine
+            count=0
+            availableOptions=()
+            while read textLine
+            do
+                availableOptions[count]=$textLine
+                ((count++))
+			done < ${bootOptionFiles[$i]}
+
+			# ------------------------------------------------------
+			# Loop through options in array and process each in turn
+			# ------------------------------------------------------
+			for (( c = 0 ; c < ${#availableOptions[@]} ; c++ ))
 			do
+                textLine=${availableOptions[c]}
 				# split line - taking all before ':' as option name
 				# and all after ':' as key/value
 				optionName=${textLine%:*}
@@ -231,52 +242,44 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 				# ------------------------------------------------------
 				# Before calling buildpackage, see if any bootOptionFiles
-                # have requested being set to exclusive.
+				# have requested being set to exclusive.
 				# Manually set for now to 'Resolutions'.
-                # It can eventually be non-specifc by adding a dedicated
-                # field at the top of each bootOptionFiles to indicate
-                # if the set should be exclusive or not.
-                # ------------------------------------------------------
-                # Note: This currently fails to achieve the desired effect?
-                # I'll improve the code etc. once (if) I can get it working!
+				# It can eventually be non-specifc by adding a dedicated
+				# field at the top of each bootOptionFiles to indicate
+				# if the set should be exclusive or not.
 				# ------------------------------------------------------
 				if [ $builtOptionsFolderName = "Resolution" ]; then
-					# build a list of all resolutions but exclude current resolution.
-					arrayCount=0
-					while read textLineTemp
-					do
-						optionNameTemp=${textLineTemp%:*}
-						if [ $optionNameTemp != $optionName ]; then
-							resolutionArray[arrayCount]=$optionNameTemp
-							((arrayCount++))
-						fi
-					done < ${bootOptionFiles[$i]}
 
-					# Build exclusive string
+					# Prepare individual string parts
 					stringStart="selected=\""
                     stringBefore="exclusive(choices['"
 					stringAfter="']) &amp;&amp; "
 					stringEnd="'])\""
                     x=${stringStart}${stringBefore}
 
-                    totalItems="${#resolutionArray[@]}"
+                    # build string for sending to buildpackage
+                    totalItems="${#availableOptions[@]}"
                     lastItem=$((totalItems-1))
 
-					for (( r = 0 ; r < ${#resolutionArray[@]} ; r++ ))
+					for (( r = 0 ; r < ${totalItems} ; r++ ))
 					do
-                        x="${x}${resolutionArray[r]}"
-                        # Only add these to end of string up to the one before the last item
-                        if [ $r -lt $lastItem ]; then
-                            x="${x}${stringAfter}${stringBefore}"
+                        textLineTemp=${availableOptions[r]}
+                        optionNameTemp=${textLineTemp%:*}
+                        if [ "${optionNameTemp}" != "${optionName}" ]; then
+                            x="${x}${optionNameTemp}"
+                            # Only add these to end of string up to the one before the last item
+                            if [ $r -lt $lastItem ]; then
+                                x="${x}${stringAfter}${stringBefore}"
+                            fi
                         fi
 					done
                     x="${x}${stringEnd}"
-                    buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" ${x} >/dev/null 2>&1
+                    buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\" ${x}" >/dev/null 2>&1
 				else
 					buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 				fi
 
-			done < ${bootOptionFiles[$i]}
+			done
 
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"

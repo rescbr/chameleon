@@ -1,3 +1,4 @@
+none:DONT=ADD
 1024x600x32:Graphics Mode=1024x600x32
 1024x768x32:Graphics Mode=1024x768x32
 1280x768x32:Graphics Mode=1280x768x32
