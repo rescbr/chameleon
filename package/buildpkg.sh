@@ -88,7 +88,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
-        cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
@@ -100,7 +100,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
 		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
-        cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
@@ -198,89 +198,37 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		do
 
 			# Take filename and Strip .txt from end and path from front
-			builtOptionsFolderName=$( echo ${bootOptionFiles[$i]%.txt} )
-			builtOptionsFolderName=$( echo ${builtOptionsFolderName##*/} )
-			echo "================= $builtOptionsFolderName ================="
-
-			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"${builtOptionsFolderName}\">"
-			choices[$((choicescount++))]="<choice\n\tid=\"${builtOptionsFolderName}\"\n\ttitle=\"${builtOptionsFolderName}_title\"\n\tdescription=\"${builtOptionsFolderName}_description\"\n>\n</choice>\n"
+			builtOptionsList=$( echo ${bootOptionFiles[$i]%.txt} )
+			builtOptionsList=$( echo ${builtOptionsList##*/} )
+			echo "================= $builtOptionsList ================="
+			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"${builtOptionsList}\">"
+			choices[$((choicescount++))]="<choice\n\tid=\"${builtOptionsList}\"\n\ttitle=\"${builtOptionsList}_title\"\n\tdescription=\"${builtOptionsList}_description\"\n>\n</choice>\n"
 			((xmlindent++))
-			packagesidentity="org.chameleon.options.$builtOptionsFolderName"
+			packagesidentity="org.chameleon.options.$builtOptionsList"
 
 			# ------------------------------------------------------
-            # Read boot option file in to an array.
-            # Structure of boot option in file is name:key=value
-            # Note: This requires the boot option file to have
-            # a carriage return at the end of the last line.
-			# ------------------------------------------------------
-            count=0
-            availableOptions=()
-            while read textLine
-            do
-                availableOptions[count]=$textLine
-                ((count++))
-			done < ${bootOptionFiles[$i]}
-
-			# ------------------------------------------------------
-			# Loop through options in array and process each in turn
-			# ------------------------------------------------------
-			for (( c = 0 ; c < ${#availableOptions[@]} ; c++ ))
+			# Read boot option file in to an array.
+			# ------------------------------------------------------ 
+			availableOptions=() # array to hold the list of boot options, per 'section'.
+			exclusiveFlag=0 # used to indicate list has exclusive options.
+			exclusiveName="" # will be appended to exclusive 'none' option name.
+			count=0 # used as index for stepping through array.
+			while read textLine
 			do
-                textLine=${availableOptions[c]}
-				# split line - taking all before ':' as option name
-				# and all after ':' as key/value
-				optionName=${textLine%:*}
-				keyValue=${textLine##*:}
-
-				# create folders required for each boot option
-				mkdir -p "${1}/$optionName/Root/"
-
-				# create dummy file with name of key/value
-				echo "" > "${1}/$optionName/Root/${keyValue}"
-
-				echo "	[BUILD] ${optionName} "
-
-				# ------------------------------------------------------
-				# Before calling buildpackage, see if any bootOptionFiles
-				# have requested being set to exclusive.
-				# Manually set for now to 'Resolutions'.
-				# It can eventually be non-specifc by adding a dedicated
-				# field at the top of each bootOptionFiles to indicate
-				# if the set should be exclusive or not.
-				# ------------------------------------------------------
-				if [ $builtOptionsFolderName = "Resolution" ]; then
-
-					# Prepare individual string parts
-					stringStart="selected=\""
-                    stringBefore="exclusive(choices['"
-					stringAfter="']) &amp;&amp; "
-					stringEnd="'])\""
-                    x=${stringStart}${stringBefore}
-
-                    # build string for sending to buildpackage
-                    totalItems="${#availableOptions[@]}"
-                    lastItem=$((totalItems-1))
-
-					for (( r = 0 ; r < ${totalItems} ; r++ ))
-					do
-                        textLineTemp=${availableOptions[r]}
-                        optionNameTemp=${textLineTemp%:*}
-                        if [ "${optionNameTemp}" != "${optionName}" ]; then
-                            x="${x}${optionNameTemp}"
-                            # Only add these to end of string up to the one before the last item
-                            if [ $r -lt $lastItem ]; then
-                                x="${x}${stringAfter}${stringBefore}"
-                            fi
-                        fi
-					done
-                    x="${x}${stringEnd}"
-                    buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\" ${x}" >/dev/null 2>&1
-				else
-					buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
+				# ignore lines in the file beginning with a # and Exclusive=False
+				if [[ ${textLine} != \#* ]] && [[ ${textLine} != "Exclusive=False" ]];then
+					# check for 'Exclusive=True' option in file
+					if [[ ${textLine} == "Exclusive=True" ]];then
+						exclusiveFlag=1
+						exclusiveName=$builtOptionsList
+					else
+						availableOptions[count]=$textLine
+						((count++))
+					fi
 				fi
-
-			done
-
+			done < ${bootOptionFiles[$i]}
+			buildbootoptions "$1" "${exclusiveFlag}" "${exclusiveName}"
+			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 		done
@@ -291,14 +239,16 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			choices[$((choicescount++))]="<choice\n\tid=\"KeyLayout\"\n\ttitle=\"KeyLayout_title\"\n\tdescription=\"KeyLayout_description\"\n>\n</choice>\n"
 			((xmlindent++))
 			packagesidentity="org.chameleon.options.keylayout"
-			keymaps=($( find "${1%/sym/*}/Keymaps" -type f -depth 1 -name '*.lyt' | sed 's|.*/||;s|\.lyt||' ))
-			for (( i = 0 ; i < ${#keymaps[@]} ; i++ ))
-			do
-				mkdir -p "${1}/${keymaps[$i]##*/}/Root/"
-				echo "dummy file" >"${1}/${keymaps[$i]##*/}/Root/KeyLayout=${keymaps[$i]##*/}"
-				echo "	[BUILD] ${keymaps[$i]##*/} "
-				buildpackage "${1}/${keymaps[$i]##*/}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
-			done
+			
+			# ------------------------------------------------------
+			# Available Keylayout boot options are discovered by
+			# reading contents of /Keymaps folder after compilation
+			# ------------------------------------------------------
+			availableOptions=()
+			availableOptions=($( find "${1%/sym/*}/Keymaps" -type f -depth 1 -name '*.lyt' | sed 's|.*/||;s|\.lyt||' ))
+			# call buildbootoptions with 1 to indicate exclusive option wanted.
+			buildbootoptions "$1" "1" "keylayout"
+			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 
@@ -348,7 +298,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 
 }
 
@@ -358,6 +308,85 @@ fixperms ()
 	find "${1}" -type f -exec chmod 644 {} \;
 	find "${1}" -type d -exec chmod 755 {} \;
 	chown -R 0:0 "${1}"
+}
+
+buildbootoptions()
+{
+	# $1 Path to package to build containing Root and or Scripts
+	# $2 = exclusiveFlag
+	# S3 = exclusiveName 
+	
+	# ------------------------------------------------------
+	# if exclusiveFlag=1 then re-build array
+	# adding extra boot option at beginning to give
+	#Êuser a chance to choose none of them.
+	# ------------------------------------------------------
+	if [ ${2} = "1" ]; then
+		tempArray=("${availableOptions[@]}")
+		availableOptions=()
+		availableOptions[0]="ChooseNone-"$3":DONT=ADD"
+		position=0
+		totalItems="${#tempArray[@]}"	
+		for (( position = 0 ; position < $totalItems ; position++ ))
+		do
+			availableOptions[$position+1]=${tempArray[${position}]}
+		done
+	fi
+	
+	# ------------------------------------------------------
+	# Loop through options in array and process each in turn
+	# ------------------------------------------------------
+	for (( c = 0 ; c < ${#availableOptions[@]} ; c++ ))
+	do
+		textLine=${availableOptions[c]}
+		# split line - taking all before ':' as option name
+		# and all after ':' as key/value
+		optionName=${textLine%:*}
+		keyValue=${textLine##*:}
+
+		# create folders required for each boot option
+		mkdir -p "${1}/$optionName/Root/"
+
+		# create dummy file with name of key/value
+		echo "" > "${1}/$optionName/Root/${keyValue}"
+
+		echo "	[BUILD] ${optionName} "
+
+		# ------------------------------------------------------
+		# Before calling buildpackage, add exclusive options
+		# to buildpackage call if requested.
+		# ------------------------------------------------------
+		if [ $2 = "1" ]; then
+
+			# Prepare individual string parts
+			stringStart="selected=\""
+			stringBefore="exclusive(choices['"
+			stringAfter="']) &amp;&amp; "
+			stringEnd="'])\""
+			x=${stringStart}${stringBefore}
+
+			# build string for sending to buildpackage
+			totalItems="${#availableOptions[@]}"
+			lastItem=$((totalItems-1))
+
+			for (( r = 0 ; r < ${totalItems} ; r++ ))
+			do
+				textLineTemp=${availableOptions[r]}
+				optionNameTemp=${textLineTemp%:*}
+				if [ "${optionNameTemp}" != "${optionName}" ]; then
+					 x="${x}${optionNameTemp}"
+					 # Only add these to end of string up to the one before the last item
+					if [ $r -lt $lastItem ]; then
+						x="${x}${stringAfter}${stringBefore}"
+					fi
+				fi
+			done
+			x="${x}${stringEnd}"
+			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\" ${x}" >/dev/null 2>&1
+		else
+			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
+		fi
+	done
 }
 
 buildpackage ()
@@ -389,7 +418,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	#rm -R -f "${1}/Temp"
+	rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -426,7 +455,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 fi
 }
 

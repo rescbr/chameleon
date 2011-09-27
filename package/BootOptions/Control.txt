@@ -1,3 +1,10 @@
+# ---------------------------------------------
+# Chameleon boot options list. 
+# Structure is name:key=value
+# Note: There must be a carriage return at end of last line
+# ---------------------------------------------
+Exclusive=False
+# ---------------------------------------------
 BootBanner:Boot Banner=No
 GUI:GUI=No
 LegacyLogo:Legacy Logo=Yes

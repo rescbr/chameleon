@@ -1,4 +1,10 @@
-none:DONT=ADD
+# ---------------------------------------------
+# Chameleon boot options list. 
+#ÊStructure is name:key=value
+# Note: There must be a carriage return at end of last line
+# ---------------------------------------------
+Exclusive=True
+# ---------------------------------------------
 1024x600x32:Graphics Mode=1024x600x32
 1024x768x32:Graphics Mode=1024x768x32
 1280x768x32:Graphics Mode=1280x768x32

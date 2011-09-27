@@ -1,1 +1,8 @@
+# ---------------------------------------------
+# Chameleon boot options list. 
+# Structure is name:key=value
+# Note: There must be a carriage return at end of last line
+# ---------------------------------------------
+Exclusive=False
+# ---------------------------------------------
 Npci:KF npci=0x2000
