@@ -48,7 +48,7 @@ chamTemp="$dest_vol/usr/local/chamTemp"
 "$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
 
 
-Check for temporary directory/Extra folder.
+# Check for temporary directory/Extra folder.
 if [ ! -d "$chamTemp"/Extra ]; then
 	mkdir "$chamTemp"/Extra
 fi
@@ -93,9 +93,7 @@ do
 	options[arrayCount]="${FILE##*/}"
 	keyRead="${options[$arrayCount]%=*}"
 	value="${options[$arrayCount]#*=}"
-	
-	echo "DEBUG: options: ${options[arrayCount]}"
-	
+		
 	# Check keyRead for 'KF' at beginning to
 	# indicate that should be a kernel flag
 	if [ ${keyRead:0:2} = "KF" ];then
@@ -111,9 +109,9 @@ do
 	else
 		# escape any spaces
 		keyToUse=$( echo $keyRead | sed 's/ /\\ /g' )
-		if [ ${keyToUse} != "DONT" ] && [ ${value} != "USE" ]; then
+		if [ "${keyToUse}" != "DONT" ] && [ "${value}" != "USE" ]; then
 			sudo /usr/libexec/plistbuddy -c "Add :${keyToUse} string ${value}" "$tempOCBP"
-			"$scriptDir"InstallLog.sh "${dest_vol}" "Add boot option: ${keyToUse}=${value}"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Add boot option: ${keyRead}=${value}"
 		fi
 	fi	
 	(( arrayCount++ ))
@@ -128,26 +126,31 @@ done
 # Copy /usr/local/chamTemp/Extra to correct location.
 
 if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
+	# The Standard install option chosen
 	if [ ! -e "$dest_vol"/Extra ]; then
 		mkdir "$dest_vol"/Extra
 	else
 		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
 		mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
 	fi
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: $dest_vol/Extra"
 	cp -R "$chamTemp"/Extra "$dest_vol"
 else
+	# The EFI system partition install option was chosen
 	if [ ! -e "/Volumes/EFI/Extra" ]; then
 		mkdir "/Volumes/EFI/Extra"
 	else
 		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
 		mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
 	fi
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: /Volumes/EFI/Extra"
 	cp -R "$chamTemp"/Extra "/Volumes/EFI"
 
 	# unmount /Volumes/EFI
    	attempts=1
 	while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
 		echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
 	   	umount -f $( df | grep EFI | awk '{print $1}' )
 		attempts=$(( ${attempts} + 1 ))
 	done

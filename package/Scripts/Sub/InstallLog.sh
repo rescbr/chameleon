@@ -16,8 +16,8 @@ echo "**********************************************"
 if [ "$#" -eq 2 ]; then
 	logLocation="$1"
 	verboseText="$2"
-	echo "DEBUG: passed argument = $logLocation"
-	echo "DEBUG: passed argument = $verboseText"
+	echo "DEBUG: passed argument = ${logLocation}"
+	echo "DEBUG: passed argument = ${verboseText}"
 else
 	echo "Error - wrong number of values passed"
 	exit 9
