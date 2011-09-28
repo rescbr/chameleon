@@ -153,6 +153,8 @@ else
 	done
 fi
 
+"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
+"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
 
 # ---------------------------------------------
 # Cleanup
@@ -173,7 +175,5 @@ fi
 echo "Removing $chamTemp file"
 rm -rf "$chamTemp"
 
-"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
-"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
 
 echo "Done..."

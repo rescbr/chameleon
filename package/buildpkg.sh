@@ -246,6 +246,12 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			# ------------------------------------------------------
 			availableOptions=()
 			availableOptions=($( find "${1%/sym/*}/Keymaps" -type f -depth 1 -name '*.lyt' | sed 's|.*/||;s|\.lyt||' ))
+			# add "KeyLayout=" infront of each string
+			for (( i = 0 ; i < ${#availableOptions[@]} ; i++ )) 
+			do
+				availableOptions[i]=${availableOptions[i]}":KeyLayout="${availableOptions[i]}
+			done
+			
 			# call buildbootoptions with 1 to indicate exclusive option wanted.
 			buildbootoptions "$1" "1" "keylayout"
 			
