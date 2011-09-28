@@ -33,14 +33,6 @@ else
     dest_vol="$3"
 fi    
 
-# set temporary directory
-chamTemp="$dest_vol/usr/local/chamTemp" #blackosx added
-
-# Check for temporary directory/Extra folder.
-if [ ! -d "$chamTemp"/Extra ]; then
-	mkdir "$chamTemp"/Extra
-fi
-
 # ---------------------------------------------
 # Get location of this script so we know where
 # to find the Install Log script.
@@ -49,59 +41,81 @@ MYLOCATION="${PWD}/${BASH_ARGV[0]}"
 export MYLOCATION="${MYLOCATION%/*}"
 scriptDir=$MYLOCATION
 
+# set temporary directory
+chamTemp="$dest_vol/usr/local/chamTemp"
+
+# Write script information to the Install Log
+"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
+
+
+Check for temporary directory/Extra folder.
+if [ ! -d "$chamTemp"/Extra ]; then
+	mkdir "$chamTemp"/Extra
+fi
+
 # ---------------------------------------------
-# Build boot options / Kernel Flags.
-# NEEDS MORE WORK!!!!!!!!!!!!
+# Add any installed modules to the Install Log
+# ---------------------------------------------
+if [ -e "${chamTemp}"/Extra/modules ]; then
+	ls "${chamTemp}"/Extra/modules | while read FILE
+	do
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Installed module:$FILE"
+	done
+fi
+			
+# ---------------------------------------------
+# Add any installed themes to the Install Log
+# ---------------------------------------------
+if [ -e "${chamTemp}"/Extra/Themes ]; then
+	ls "${chamTemp}"/Extra/Themes | while read FILE
+	do
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Installed Theme:$FILE"
+	done
+fi
+
+
+# ---------------------------------------------
+# Build org.chameleon.Boot.plist
 # ---------------------------------------------
 # All options selected are now dummy files with
 # the filename of the option and value residing
 # in /usr/local/chamTemp/options/
 # for example. Boot Banner=Yes
 
-# Write some information to the Install Log
-"$scriptDir"InstallLog.sh "${3}" "Running Post postinstall script"
-
 # Create template for org.chameleon.Boot.plist"
 tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
-cp "$dest_vol"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
+cp "$4"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
 
 # Read list of all boot options the user added.
 arrayCount=0
-find ${chamTemp}/options | while read FILE
+ls "${chamTemp}"/options | while read FILE
 do
 	options[arrayCount]="${FILE##*/}"
 	keyRead="${options[$arrayCount]%=*}"
 	value="${options[$arrayCount]#*=}"
-
+	
+	echo "DEBUG: options: ${options[arrayCount]}"
+	
 	# Check keyRead for 'KF' at beginning to
 	# indicate that should be a kernel flag
 	if [ ${keyRead:0:2} = "KF" ];then
 		kernelflag=${keyRead#*F }=$value
-
-		# write value to org.chameleon.Boot.plist
-		# but skip first one as that will be 'options'
-		if [ $arrayCount -gt 0 ]; then
+		sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Add kernel flag: ${kernelflag}"
+		returnValue=$?
+		if [ ${returnValue}=1 ]; then
+			# Delete it for now, but need to append as more kernel flags could be added in future!!
+			sudo /usr/libexec/plistbuddy -c "Delete :Kernel\ Flags" "$tempOCBP"
 			sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
-			"$scriptDir"InstallLog.sh "${3}" "Add kernel flag: ${kernelflag}"
-			returnValue=$?
-			if [ ${returnValue}=1 ]; then
-				# Delete it for now, but need to append as more kernel flags could be added in future!!
-				sudo /usr/libexec/plistbuddy -c "Delete :Kernel\ Flags" "$tempOCBP"
-				sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
-			fi
 		fi
 	else
 		# escape any spaces
 		keyToUse=$( echo $keyRead | sed 's/ /\\ /g' )
-		# write value to org.chameleon.Boot.plist
-		# but skip first one as that will be 'options'
-		if [ $arrayCount -gt 0 ]; then
-		echo "Add :${keyToUse} string ${value}"
+		if [ ${keyToUse} != "DONT" ] && [ ${value} != "USE" ]; then
 			sudo /usr/libexec/plistbuddy -c "Add :${keyToUse} string ${value}" "$tempOCBP"
-			"$scriptDir"InstallLog.sh "${3}" "Add boot option: ${keyToUse}=${value}"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Add boot option: ${keyToUse}=${value}"
 		fi
-	fi
-	
+	fi	
 	(( arrayCount++ ))
 done
 
@@ -117,7 +131,7 @@ if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
 	if [ ! -e "$dest_vol"/Extra ]; then
 		mkdir "$dest_vol"/Extra
 	else
-		"$scriptDir"InstallLog.sh "${3}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
 		mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
 	fi
 	cp -R "$chamTemp"/Extra "$dest_vol"
@@ -125,18 +139,18 @@ else
 	if [ ! -e "/Volumes/EFI/Extra" ]; then
 		mkdir "/Volumes/EFI/Extra"
 	else
-		"$scriptDir"InstallLog.sh "${3}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
 		mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
 	fi
 	cp -R "$chamTemp"/Extra "/Volumes/EFI"
 
 	# unmount /Volumes/EFI
    	attempts=1
-    	while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
-	    	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-	   	 umount -f $( df | grep EFI | awk '{print $1}' )
-	   	 attempts=$(( ${attempts} + 1 ))
-   	 done
+	while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
+		echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	   	umount -f $( df | grep EFI | awk '{print $1}' )
+		attempts=$(( ${attempts} + 1 ))
+	done
 fi
 
 
@@ -157,7 +171,9 @@ fi
 
 # delete the temporary Chameleon folder
 echo "Removing $chamTemp file"
-#rm -rf "$chamTemp"
+rm -rf "$chamTemp"
 
+"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
+"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
 
 echo "Done..."

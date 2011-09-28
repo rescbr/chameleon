@@ -54,9 +54,7 @@ ${verboseText}
 else
 	# Append messages to the log as passed by other scripts.
 	if [ "${verboseText}" = "LineBreak" ]; then
-		echo "
-======================================================
-" >>"${logFile}"
+		echo "======================================================" >>"${logFile}"
 	fi
 
 	if [[ "${verboseText}" == *fdisk* ]]; then

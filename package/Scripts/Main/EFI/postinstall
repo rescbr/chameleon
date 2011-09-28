@@ -144,8 +144,8 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			if [ ${returnValue} = 0 ]; then
 				# OK to proceed
 
-				# Append a line break to the installer log
-				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+				# Append a LineBreak to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
 
 				if [ ${diskupdate} = "0" ]; then
 					#echo "Diskupdate = true, so the stage 0 loader can be written to the MBR"
@@ -163,8 +163,8 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 				# Write the stage 2 loader to the root of the selected partition
 				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
-				# Append a line break to the installer log
-				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+				# Append a LineBreak to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
 
 				# Set the active partition ONLY if Windows is not installed
 				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
@@ -194,7 +194,7 @@ fi
 # boot option scripts than EFI (ESP) option was chosen
 echo "EFI" >"${targetVolumeChosenByUser}"/.ChameleonEFI 
 
-"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Line Break"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "EFI script complete"
 
 echo "==============================================="
