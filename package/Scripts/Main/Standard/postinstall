@@ -145,7 +145,7 @@ if [ ${returnValue}=0 ]; then
 			# Continue if the selected device is not a FAT16 format device
 
 			# Append a line break to the installer log
-			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 
 			if [ ${diskupdate} = "0" ]; then
 				# Write the stage 0 loader to the MBR
@@ -162,7 +162,7 @@ if [ ${returnValue}=0 ]; then
 			"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
 			# Append a line break to the installer log
-			"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 
 			# Set the active partition ONLY if Windows is not installed
 			"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
@@ -170,7 +170,7 @@ if [ ${returnValue}=0 ]; then
 	fi
 fi
 
-"$scriptDir"InstallLog.sh "${targetVolume}" "Line Break"
+"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Standard script complete"
 
 echo "==============================================="

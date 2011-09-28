@@ -53,7 +53,7 @@ ${verboseText}
 	echo "Log" >"${logLocation}"/.ChameleonLogFlag
 else
 	# Append messages to the log as passed by other scripts.
-	if [ "${verboseText}" = "Line Break" ]; then
+	if [ "${verboseText}" = "LineBreak" ]; then
 		echo "
 ======================================================
 " >>"${logFile}"
@@ -65,7 +65,7 @@ else
 		echo " " >>"${logFile}"
 	fi
 
-	if [ "${verboseText}" != "Line Break" ] && [[ "${verboseText}" != *fdisk* ]]; then
+	if [ "${verboseText}" != "LineBreak" ] && [[ "${verboseText}" != *fdisk* ]]; then
 		echo "${verboseText}" >> "${logFile}"
 	fi
 fi

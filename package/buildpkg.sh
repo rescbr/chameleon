@@ -288,6 +288,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
 	echo "	[BUILD] Post "
 	buildpackage "${1}/Post" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
 	outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
@@ -298,7 +299,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -418,7 +419,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -455,7 +456,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 
