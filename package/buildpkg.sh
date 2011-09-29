@@ -189,16 +189,16 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		((xmlindent++))
 
 		# ------------------------------------------------------
-		# parse BootOptions folder to find files of boot options.
+		# parse OptionalSettings folder to find files of boot options.
 		# ------------------------------------------------------
-		bootOptionsFolder="${pkgroot}/BootOptions"
-		bootOptionFiles=($( find "${bootOptionsFolder}" -depth 1 -not -name '.svn' ))
+		OptionalSettingsFolder="${pkgroot}/OptionalSettings"
+		OptionalSettingsFiles=($( find "${OptionalSettingsFolder}" -depth 1 -not -name '.svn' ))
 
-		for (( i = 0 ; i < ${#bootOptionFiles[@]} ; i++ ))
+		for (( i = 0 ; i < ${#OptionalSettingsFiles[@]} ; i++ ))
 		do
 
 			# Take filename and Strip .txt from end and path from front
-			builtOptionsList=$( echo ${bootOptionFiles[$i]%.txt} )
+			builtOptionsList=$( echo ${OptionalSettingsFiles[$i]%.txt} )
 			builtOptionsList=$( echo ${builtOptionsList##*/} )
 			echo "================= $builtOptionsList ================="
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"${builtOptionsList}\">"
@@ -226,8 +226,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 						((count++))
 					fi
 				fi
-			done < ${bootOptionFiles[$i]}
-			buildbootoptions "$1" "${exclusiveFlag}" "${exclusiveName}"
+			done < ${OptionalSettingsFiles[$i]}
+			buildoptionalsettings "$1" "${exclusiveFlag}" "${exclusiveName}"
 			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
@@ -254,7 +254,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			done
 			
 			# call buildbootoptions with 1 to indicate exclusive option wanted.
-			buildbootoptions "$1" "1" "keylayout"
+			buildoptionalsettings "$1" "1" "keylayout"
 			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
@@ -320,7 +320,7 @@ fixperms ()
 	chown -R 0:0 "${1}"
 }
 
-buildbootoptions()
+buildoptionalsettings()
 {
 	# $1 Path to package to build containing Root and or Scripts
 	# $2 = exclusiveFlag

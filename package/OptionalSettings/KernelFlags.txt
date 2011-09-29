@@ -1,0 +1,22 @@
+# ---------------------------------------------
+# Chameleon Optional Settings List.
+# Add boot options or kernel flags in to these files.
+#ÊUse one file or many files - it's flexible.
+# The filename is used as the sub menu heading.
+# ---------------------------------------------
+# To add boot option: Structure is name:key=value
+# example1: InstantMenu:Instant Menu=Yes
+# example2: DropSSDT:DropSSDT=Yes
+# ---------------------------------------------
+# To add kernel flag: Structure is name:KFflag=kernelflag
+# example1: Npci:KFflag=npci=0x2000
+# example2: Verbose:KFflag=-v
+# ---------------------------------------------
+# Note: There must be a carriage return at end of last line
+# ---------------------------------------------
+Exclusive=False
+# ---------------------------------------------
+Verbose:KFflag=-v
+Singleusermode:KFflag=-s
+Ignorecaches:KFflag=-f
+Npci:KFflag=npci=0x2000
