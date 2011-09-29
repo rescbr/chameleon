@@ -1,6 +1,6 @@
 # ---------------------------------------------
 # Chameleon boot options list. 
-#ÊStructure is name:key=value
+# Structure is name:key=value
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
 Exclusive=True

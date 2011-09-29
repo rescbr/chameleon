@@ -1,8 +1,12 @@
 # ---------------------------------------------
 # Chameleon boot options list. 
 # Structure is name:key=value
+# To Add kernel flag: format is name:KFflag=kernelflag
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
 Exclusive=False
 # ---------------------------------------------
-Npci:KF npci=0x2000
+Verbose:KFflag=-v
+Singleusermode:KFflag=-s
+Ignorecaches:KFflag=-f
+Npci:KFflag=npci=0x2000

@@ -33,20 +33,25 @@ else
     dest_vol="$3"
 fi    
 
-# ---------------------------------------------
-# Get location of this script so we know where
-# to find the Install Log script.
-# ---------------------------------------------
+# Where are we, so to find the Install Log script.
 MYLOCATION="${PWD}/${BASH_ARGV[0]}"
 export MYLOCATION="${MYLOCATION%/*}"
 scriptDir=$MYLOCATION
 
+# Has install log already been generated?
+if [ ! -f "${dest_vol}"/.ChameleonLogFlag ]; then
+	# Write some information to the Install Log
+	versionNumber=`cat "${scriptDir}"/Resources/version`
+	revisionNumber=`cat "${scriptDir}"/Resources/revision`
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Installer version: ${versionNumber} ${revisionNumber}"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Target volume = ${dest_vol}"
+else
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
+fi
+
 # set temporary directory
 chamTemp="$dest_vol/usr/local/chamTemp"
-
-# Write script information to the Install Log
-"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
-
 
 # Check for temporary directory/Extra folder.
 if [ ! -d "$chamTemp"/Extra ]; then
@@ -91,15 +96,13 @@ arrayCount=0
 ls "${chamTemp}"/options | while read FILE
 do
 	options[arrayCount]="${FILE##*/}"
-	keyRead="${options[$arrayCount]%=*}"
-	value="${options[$arrayCount]#*=}"
-		
+
 	# Check keyRead for 'KF' at beginning to
 	# indicate that should be a kernel flag
-	if [ ${keyRead:0:2} = "KF" ];then
-		kernelflag=${keyRead#*F }=$value
+	if [ ${options[arrayCount]:0:2} = "KF" ];then
+		kernelflag=${options[arrayCount]##*flag=}
 		sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
-		"$scriptDir"InstallLog.sh "${dest_vol}" "Add kernel flag: ${kernelflag}"
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Added kernel flag: ${kernelflag}"
 		returnValue=$?
 		if [ ${returnValue}=1 ]; then
 			# Delete it for now, but need to append as more kernel flags could be added in future!!
@@ -107,11 +110,13 @@ do
 			sudo /usr/libexec/plistbuddy -c "Add :Kernel\ Flags string $kernelflag" "$tempOCBP"
 		fi
 	else
+		keyRead="${options[$arrayCount]%=*}"
+		value="${options[$arrayCount]#*=}"
 		# escape any spaces
 		keyToUse=$( echo $keyRead | sed 's/ /\\ /g' )
 		if [ "${keyToUse}" != "DONT" ] && [ "${value}" != "USE" ]; then
 			sudo /usr/libexec/plistbuddy -c "Add :${keyToUse} string ${value}" "$tempOCBP"
-			"$scriptDir"InstallLog.sh "${dest_vol}" "Add boot option: ${keyRead}=${value}"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Added boot option: ${keyRead}=${value}"
 		fi
 	fi	
 	(( arrayCount++ ))

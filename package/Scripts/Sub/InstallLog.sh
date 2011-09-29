@@ -42,17 +42,17 @@ if [ ! -f "${logLocation}"/.ChameleonLogFlag ]; then
 
 	echo "Chameleon installer log - $( date )
 ${verboseText}
-======================================================
-" >"${logFile}"
-	diskutil list >>"${logFile}"
-	echo "
-======================================================
-" >>"${logFile}"
-
+======================================================" >"${logFile}"
+	
 	# Create /.ChameleonLogFlag file.
 	echo "Log" >"${logLocation}"/.ChameleonLogFlag
 else
 	# Append messages to the log as passed by other scripts.
+	if [ "${verboseText}" = "Diskutil" ]; then
+		diskutil list >>"${logFile}"
+	echo "======================================================" >>"${logFile}"
+	fi
+
 	if [ "${verboseText}" = "LineBreak" ]; then
 		echo "======================================================" >>"${logFile}"
 	fi
@@ -63,7 +63,7 @@ else
 		echo " " >>"${logFile}"
 	fi
 
-	if [ "${verboseText}" != "LineBreak" ] && [[ "${verboseText}" != *fdisk* ]]; then
+	if [ "${verboseText}" != "LineBreak" ] && [[ "${verboseText}" != *fdisk* ]] && [[ "${verboseText}" != "Diskutil" ]]; then
 		echo "${verboseText}" >> "${logFile}"
 	fi
 fi
