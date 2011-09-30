@@ -24,7 +24,7 @@ COL_RESET="\x1b[39;49;00m"
 
 #version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
-stage=${version##*-}
+stage=${version##*-}" (blackosx branch)"
 revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
 builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
@@ -114,7 +114,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		buildpackage "${1}/noboot" "/$chamTemp" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
 	# End build reset choice package 
 
-	# build Modules package
+    ((xmlindent--))
+    outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+# End build Chameleon package
+
+# build Modules package
         echo "================= Modules ================="
                 ###############################
                 # Supported Modules           #
@@ -136,7 +140,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/klibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
                 echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+                buildpackage "${1}/klibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -155,7 +159,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
                 echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+                buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 # -
@@ -164,7 +168,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
                 mkdir -p ${1}/Keylayout/Root
                 ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root
                 echo "	[BUILD] Keylayout "
-                buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"true\"" >/dev/null 2>&1
+                buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
             }
             fi
 
@@ -177,9 +181,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
         }
         fi
 	# End build Modules packages
-    ((xmlindent--))
-    outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-# End build Chameleon package
+
 
 # build Extras package
 	# build options packages
@@ -192,7 +194,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		# parse OptionalSettings folder to find files of boot options.
 		# ------------------------------------------------------
 		OptionalSettingsFolder="${pkgroot}/OptionalSettings"
-		OptionalSettingsFiles=($( find "${OptionalSettingsFolder}" -depth 1 -not -name '.svn' ))
+		OptionalSettingsFiles=($( find "${OptionalSettingsFolder}" -depth 1 ! -name '.svn' ! -name '.DS_Store' ))
 
 		for (( i = 0 ; i < ${#OptionalSettingsFiles[@]} ; i++ ))
 		do
