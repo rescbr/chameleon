@@ -31,7 +31,6 @@ EthernetBuiltIn:EthernetBuiltIn=Yes
 ForceHPET:ForceHPET=Yes
 ForceWake:ForceWake=Yes
 RestartFix:RestartFix=No
-SMBIOSdefault:SMBIOSdefault=Yes
 UHCIreset:UHCIreset=Yes
 UseMemDetect:UseMemDetect=No
 UseKernelCache:UseKernelCache=Yes
