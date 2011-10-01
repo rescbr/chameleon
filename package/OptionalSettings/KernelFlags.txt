@@ -29,3 +29,4 @@ Verbose:KFflag=-v
 Singleusermode:KFflag=-s
 Ignorecaches:KFflag=-f
 Npci:KFflag=npci=0x2000
+Darkwake:KFflag=darkwake=0
