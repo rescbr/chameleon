@@ -34,6 +34,7 @@ timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
 develop=$(awk "NR==6{print;exit}" ${pkgroot}/../CREDITS)
 credits=$(awk "NR==10{print;exit}" ${pkgroot}/../CREDITS)
 pkgdev=$(awk "NR==14{print;exit}" ${pkgroot}/../CREDITS)
+
 # =================
 
 distributioncount=0
@@ -119,68 +120,68 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 # End build Chameleon package
 
 # build Modules package
-        echo "================= Modules ================="
-                ###############################
-                # Supported Modules           #
-                ###############################
-                # klibc.dylib                 #
-                # Resolution.dylib            #
-                # uClibcxx.dylib              #
-                # Keylayout.dylib             #
-                ###############################
-        if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
-        {
-            outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">"
-            choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
-            ((xmlindent++))
-            packagesidentity="org.chameleon.modules"
+	echo "================= Modules ================="
+	###############################
+	# Supported Modules           #
+	###############################
+	# klibc.dylib                 #
+	# Resolution.dylib            #
+	# uClibcxx.dylib              #
+	# Keylayout.dylib             #
+	###############################
+	if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
+	{
+		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">"
+		choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
+		((xmlindent++))
+		packagesidentity="org.chameleon.modules"
 # -
-            if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
-            {
-                mkdir -p ${1}/klibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
-                echo "	[BUILD] klibc "
-                buildpackage "${1}/klibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
+		if [ -e ${1%/*}/i386/modules/klibc.dylib ]; then
+		{
+			mkdir -p ${1}/klibc/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/klibc/Root
+			echo "	[BUILD] klibc "
+			buildpackage "${1}/klibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+		}
+		fi
 # -
-            if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
-            {
-                mkdir -p ${1}/AutoReso/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
-                echo "	[BUILD] Resolution "
-                buildpackage "${1}/AutoReso" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
+		if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
+		{
+			mkdir -p ${1}/AutoReso/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
+			echo "	[BUILD] Resolution "
+			buildpackage "${1}/AutoReso" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+		}
+		fi
 # -
-            if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
-            {
-                mkdir -p ${1}/uClibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
-                echo "	[BUILD] uClibc++ "
-                buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
+		if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
+		{
+			mkdir -p ${1}/uClibc/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/uClibc/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
+			echo "	[BUILD] uClibc++ "
+			buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+		}
+		fi
 # -
-            if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
-            {
-                mkdir -p ${1}/Keylayout/Root
-                ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root
-                echo "	[BUILD] Keylayout "
-                buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-            }
-            fi
+		if [ -e ${1%/*}/i386/modules/Keylayout.dylib ]; then
+		{
+			mkdir -p ${1}/Keylayout/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root
+			echo "	[BUILD] Keylayout "
+			buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+		}
+		fi
 
-            ((xmlindent--))
-            outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
-        }
-        else
-        {
-            echo "      -= no modules to include =-"
-        }
-        fi
-	# End build Modules packages
+		((xmlindent--))
+		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+	}
+	else
+	{
+		echo "      -= no modules to include =-"
+	}
+	fi
+# End build Modules packages
 
 
 # build Extras package
@@ -449,7 +450,6 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	fi
 
 	header+="</pkg-info>"
-	echo -e "${header}" >> ~/Desktop/header
 	echo -e "${header}" > "${1}/Temp/PackageInfo"
 	pushd "${1}/Root" >/dev/null
 	find . -print | cpio -o -z -H cpio > "../Temp/Payload"
