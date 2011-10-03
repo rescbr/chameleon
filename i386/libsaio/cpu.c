@@ -813,6 +813,8 @@ void scan_cpu(PlatformInfo_t *p)
 				DBG("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", fsbFrequency / 1000000, max_ratio);
 #endif
 				currcoef = bus_ratio_max;
+                
+                tscFrequency = cpuFrequency;
 			} 
 			else
 			{
@@ -918,7 +920,8 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 #endif
 	if (!cpuFrequency) cpuFrequency = tscFrequency;
-
+    if (!tscFrequency) tscFrequency = cpuFrequency;
+    
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;

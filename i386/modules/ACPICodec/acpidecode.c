@@ -92,20 +92,22 @@ static void parsePackageLength(U8 * current, U32 * length, U32 * lengthEncoding)
     DBG("Package length=0x%02x\n", *length);
 }
 
+#if UNUSED
 static bool ns_match(struct acpi_namespace *ns1, struct acpi_namespace *ns2)
 {
     U32 i;
     if (ns1->depth != ns2->depth)
         return false;
-
+    
     for (i = 0; i < ns1->depth; i++)
         if (ns1->nameseg[i] != ns2->nameseg[i])
             return false;
-
+    
     return true;
 }
 
 U32 acpi_ns_found;
+#endif
 
 static U8 *parse_acpi_namestring(const struct acpi_namespace *ns_context, struct acpi_namespace *ns, U8 * current, U8 * end)
 {
@@ -183,15 +185,17 @@ static U8 *parse_acpi_namestring(const struct acpi_namespace *ns_context, struct
 		UIDPointer = current;
 	}
 	
+#if UNUSED	
     if (!acpi_ns_found) {
         U32 index;
-
+        
         for (index = 0; index < acpi_processor_count; index++)
             if (ns_match(ns, &acpi_processors[index].ns)) {
                 acpi_ns_found = 1;
                 break;
             }
     }
+#endif
     return current;
 }
 

@@ -27,6 +27,7 @@ typedef union {
 
 extern bool getProcessorInformationExternalClock(returnType *value);
 extern bool getProcessorInformationMaximumClock(returnType *value);
+extern bool getProcessorInformationCurrentClock(returnType *value);
 extern bool getSMBOemProcessorBusSpeed(returnType *value);
 extern bool getSMBOemProcessorType(returnType *value);
 extern bool getSMBMemoryDeviceMemoryType(returnType *value);

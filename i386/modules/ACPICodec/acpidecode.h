@@ -59,8 +59,10 @@ struct acpi_processor {
 extern U32 acpi_processor_count;
 extern struct acpi_processor acpi_processors[CPU_MAP_LIMIT];
 
+#if UNUSED
 /* If 0, look for a processor namespace and set to 1 if found. */
 extern U32 acpi_ns_found;
+#endif
 
 extern U8* UIDPointer;
 

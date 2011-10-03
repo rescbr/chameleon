@@ -955,7 +955,14 @@ processBootOptions()
     // This is not a mandatory opeartion anymore.
 	
     loadOverrideConfig(&bootInfo->overrideConfig);
-	
+    
+    // Load System com.apple.boot.plist config file
+	loadSystemConfig(&bootInfo->SystemConfig);
+    
+#if virtualM || PCI_FIX // we can simply make an option for this fix
+    addBootArg("npci=0x2000");
+#endif
+    
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.
     // Specifying a kernel name on the command line, or specifying

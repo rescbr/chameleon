@@ -49,6 +49,7 @@
 /* Processor Information */
 #define kSMBProcessorInformationExternalClockKey	"SMexternalclock"
 #define kSMBProcessorInformationMaximumClockKey		"SMmaximalclock"
+#define kSMBProcessorInformationCurrentClockKey		"SMcurrentclock"
 
 /* Memory Device */
 #define kSMBMemoryDeviceDeviceLocatorKey			"SMmemdevloc"
@@ -222,6 +223,9 @@ SMBValueSetter SMBSetters[] =
 
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, maximumClock),		kSMBProcessorInformationMaximumClockKey,	
 		getProcessorInformationMaximumClock,	NULL},
+	
+	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, currentClock),		kSMBProcessorInformationCurrentClockKey,	
+		getProcessorInformationCurrentClock,	NULL},
 
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, serialNumber),		NULL,	NULL,	NULL},
 

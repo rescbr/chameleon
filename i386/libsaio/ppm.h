@@ -98,7 +98,6 @@ typedef struct acpi_tables {
     ACPI_TABLE_RSDT *RsdtPointer; // Root System Description Table            (RSDP->RSDT)
     ACPI_TABLE_MADT *MadtPointer; // Multiple APIC Description Table          (RSDP->RSDT->APIC)
 	ACPI_TABLE_MADT *MadtPointer64; // Multiple APIC Description Table        (RSDP->XSDT->APIC)
-    ACPI_TABLE_SSDT *SsdtPointer; // Secondary System Description Table       (RSDP->RSDT->SSDT)
     ACPI_TABLE_XSDT *XsdtPointer; // Extended Root System Description Table   (RSDP->XSDT)
     ACPI_TABLE_FADT *FacpPointer64; // Fixed ACPI Description Table           (RSDP->XSDT->FACP)    
 } ACPI_TABLES;

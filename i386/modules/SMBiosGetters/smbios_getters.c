@@ -28,6 +28,17 @@ bool getProcessorInformationExternalClock(returnType *value)
 
 bool getProcessorInformationMaximumClock(returnType *value)
 {
+	// Note: it seems that AppleSMBIOS use the maximum clock to set the cpu clock
+	// that is showed in "About this mac" or in the System Information. 
+	// in my opinion the current clock should be used for this.
+	// value->word = Platform->CPU.TSCFrequency/1000000;
+	
+	value->word = Platform->CPU.CPUFrequency/1000000;
+	return true;
+}
+
+bool getProcessorInformationCurrentClock(returnType *value)
+{
 	value->word = Platform->CPU.CPUFrequency/1000000;
 	return true;
 }

@@ -1,3 +1,5 @@
+- Added JrCs's Keylayout support in Keymapper
+- Fixed an issue in AcpiCodec where the highest cpu frequency may not be added in the pstate package on some configurations 
 - Improved detection of nb of core(s) and thread(s) for AMD processors
 - Updated keymapper ...
 - Applied scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s , disabled by default,

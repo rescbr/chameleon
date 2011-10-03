@@ -11,6 +11,7 @@
 #include "bootstruct.h"
 #include "xml.h"
 #include "modules.h"
+#include "Keylayout.h"
 
 #define kEnableKeyMap "EnableKeyMapper"
 static int AZERTY_switch(int c);
@@ -21,7 +22,6 @@ int Keymapper_getc()
 {	
     int c = bgetc();		
 	
-	//execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
 	Keymapper_hook(&c, NULL, NULL, NULL, NULL, NULL);
 	
     if ((c & 0xff) == 0) 		
@@ -195,12 +195,13 @@ static int AZERTY_switch(int c)
 static char *map_kb_type = NULL;	
 static TagPtr match_map = NULL;
 
+// Faster method and no need to (re-)compile the map, everything is done with xml (i have a keymap maker made in cocoa and with a gui that i have don't released yet)
 void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
 	int *ret = (int *)arg1;
 	int c = *(int *)ret;
 	
-	
+	// Check for xml map in the config file
 	if (match_map == NULL)				
 		match_map = XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"KeyboardMap");
 	
@@ -217,6 +218,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 		}
 	}
 	
+	// Check for built-in map
 	if (map_kb_type == NULL)
 	{		
 		TagPtr match_type;
@@ -237,12 +239,34 @@ out:
 
 void Keymapper_start()
 {
+#ifdef TRUNK
+#define Config chameleonConfig
+#else
+#define Config bootConfig
+#endif
+	
 	bool enable = true;
-	getBoolForKey(kEnableKeyMap, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableKeyMap, &enable, &bootInfo->Config) ;
 	
 	if (enable)
 	{
-		//register_hook_callback("Keymapper", &Keymapper_hook);
-		replace_function("_getc", &Keymapper_getc);
+		if (Keylayout_real_start()) 
+		{
+			return;
+		} 
+
+#ifdef TRUNK	
+		if (!replace_function("_getchar", &Keymapper_getc)) 
+		{
+			printf("no function getchar() to replace. Keymapper will not be used ! \n");
+						
+		}		
+#else
+		if (replace_function("_getc", &Keymapper_getc) != EFI_SUCCESS) 
+		{
+			printf("no function getc() to replace. Keymapper will not be used ! \n");
+		}
+#endif
+		
 	}
 }

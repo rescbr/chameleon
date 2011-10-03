@@ -49,10 +49,10 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature);
 //   4) FACP Pointer in FacpPointer Variable			(RSDP->RSDT->FACP)
 //   5) FACP(64) Pointer in FacpPointer64 Variable		(RSDP->XSDT->FACP)
 //   6) DSDT Pointer in DsdtPointer Variable			(RSDP->RSDT->FACP->DSDT)
-//   7) DSDT(64) Pointer in DsdtPointer64 Variable		(RSDP->RSDT->FACP->XDSDT)
+//   7) DSDT(64) Pointer in DsdtPointer64 Variable		(RSDP->XSDT->FACP->XDSDT)
 //   8) FACS Pointer in FacsPointer Variable			(RSDP->RSDT->FACP->FACS)
 //   9) FACS(64) Pointer in FacsPointer64 Variable		(RSDP->XSDT->FACP->XFACS)
-//   A) MADT Pointer in FacsPointer Variable			(RSDP->RSDT->FACP->APIC)
+//   A) MADT Pointer in FacsPointer Variable			(RSDP->RSDT->APIC)
 //   B) MADT(64) Pointer in MadtPointer64 Variable		(RSDP->XSDT->APIC)
 //
 //-------------------------------------------------------------------------------
@@ -72,7 +72,6 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
         acpi_tables->RsdtPointer = null;
         acpi_tables->MadtPointer = null;
 		acpi_tables->MadtPointer64 = null;
-        acpi_tables->SsdtPointer = null;
         acpi_tables->XsdtPointer = null;
         acpi_tables->FacpPointer64 = null;
     }

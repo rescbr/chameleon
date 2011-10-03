@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-KEY_MAPPER_OBJS = Keymapper.o
+KEY_MAPPER_OBJS = Keymapper.o Keylayout.o
 
 SFILES =
 CFILES = 
@@ -71,6 +71,7 @@ dylib:
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
 	$(OBJROOT)/Keymapper.o \
+	$(OBJROOT)/Keylayout.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 

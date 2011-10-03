@@ -169,6 +169,7 @@ extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff)
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
+extern int    loadBooterConfig(config_file_t *configBuff);
 extern int    loadSystemConfig(config_file_t *configBuff);
 #ifdef BOOT_HELPER_SUPPORT
 extern int    loadHelperConfig(config_file_t *configBuff);

@@ -429,7 +429,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 				ACPI_TABLE_FADT *fadt_mod = patch_fadt(fadt_conv, ((ACPI_TABLE_DSDT*)((U32)fadt->XDsdt)), false); 
 				if (fadt_mod == (void*)0ul)
 				{
-					printf("Error: Failed to patch FADT Table, fallback to fadt original pointer\n");
+					printf("Error: Failed to patch FADT Table, trying wiht the original fadt pointer\n");
 					fadt_mod = fadt;
 				}
 				
@@ -713,46 +713,46 @@ static U32 get_needed_symbols (void)
 {	
 	/* aml_generator symbols */
 	aml_create_node = (void*)lookup_all_symbols("_aml_create_node");
-	if (aml_create_node == NULL) goto Failed;
+	if (aml_create_node == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_buffer = (void*)lookup_all_symbols("_aml_add_buffer");
-	if (aml_add_buffer == NULL) goto Failed;
+	if (aml_add_buffer == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_byte = (void*)lookup_all_symbols("_aml_add_byte");
-	if (aml_add_byte == NULL) goto Failed;
+	if (aml_add_byte == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_word = (void*)lookup_all_symbols("_aml_add_word");
-	if (aml_add_word == NULL) goto Failed;
+	if (aml_add_word == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_dword = (void*)lookup_all_symbols("_aml_add_dword");
-	if (aml_add_dword == NULL) goto Failed;
+	if (aml_add_dword == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_qword = (void*)lookup_all_symbols("_aml_add_qword");
-	if (aml_add_qword == NULL) goto Failed;
+	if (aml_add_qword == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_scope = (void*)lookup_all_symbols("_aml_add_scope");
-	if (aml_add_scope == NULL) goto Failed;
+	if (aml_add_scope == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_name = (void*)lookup_all_symbols("_aml_add_name");
-	if (aml_add_name == NULL) goto Failed;
+	if (aml_add_name == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_package = (void*)lookup_all_symbols("_aml_add_package");
-	if (aml_add_package == NULL) goto Failed;
+	if (aml_add_package == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_alias = (void*)lookup_all_symbols("_aml_add_alias");
-	if (aml_add_alias == NULL) goto Failed;
+	if (aml_add_alias == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_destroy_node = (void*)lookup_all_symbols("_aml_destroy_node");
-	if (aml_destroy_node == NULL) goto Failed;
+	if (aml_destroy_node == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_calculate_size = (void*)lookup_all_symbols("_aml_calculate_size");	
-	if (aml_calculate_size == NULL) goto Failed;
+	if (aml_calculate_size == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_write_node = (void*)lookup_all_symbols("_aml_write_node");
-	if (aml_write_node == NULL) goto Failed;
+	if (aml_write_node == (void*)0xFFFFFFFF) goto Failed;
 	
 	aml_add_to_parent = (void*)lookup_all_symbols("_aml_add_to_parent");
-	if (aml_add_to_parent == NULL) goto Failed;
+	if (aml_add_to_parent == (void*)0xFFFFFFFF) goto Failed;
 	
 	DBG("struct aml_chunk* _aml_create_node: 0x%x\n",(UInt32)aml_create_node);
 	DBG("struct aml_chunk* _aml_add_buffer: 0x%x\n",(UInt32)aml_add_buffer);
@@ -1764,17 +1764,17 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 #if BETA    
 	printf("min_ratio : %d\n", cpu->min_ratio);
 #endif
+	printf("max_ratio_as_cfg : %d\n", cpu->max_ratio_as_cfg);
+	printf("max_ratio_as_mfg : %d\n", cpu->max_ratio_as_mfg);
+    
 	printf("turbo_available : %d\n",cpu->turbo_available);
-		
+    
 	printf("core_c1_supported : %d\n",cpu->core_c1_supported);
+	printf("core_c2_supported : %d\n",cpu->core_c1_supported);
 	printf("core_c3_supported : %d\n",cpu->core_c3_supported);
 	printf("core_c6_supported : %d\n",cpu->core_c6_supported);
 	printf("core_c7_supported : %d\n",cpu->core_c7_supported);
 	printf("mwait_supported : %d\n",cpu->mwait_supported);
-    
-    printf("turbo_available : %d\n",cpu->turbo_available);
-    
-	printf("core_c1_supported : %d\n",cpu->core_c1_supported);
 
 #if BUILD_ACPI_TSS || pstate_power_support
 	if (is_sandybridge() || is_jaketown())
@@ -2239,6 +2239,25 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					if (!Frequency || Frequency > p_states[0].Frequency ) continue;
 					
 					U8 curr_ratio = (Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
+                    
+                    
+                    {
+						U8 fixed_ratio = (Frequency / (Platform->CPU.FSBFrequency / 1000000 ))*10;
+						U8 diff = curr_ratio - fixed_ratio ;
+						
+						if (diff)
+						{
+							if (diff < 5)
+							{
+								curr_ratio = fixed_ratio;
+							} 
+							else
+							{
+								curr_ratio = fixed_ratio + 5;
+							}
+						}						
+                        
+					}
 					
 					if (curr_ratio > maxPSratio || minPSratio > curr_ratio)
 						goto dropPstate;
@@ -3312,18 +3331,36 @@ static void * buildPSD(void * current, U32 domain, U32 cpusInDomain, U32 pstate_
 }
 
 //-----------------------------------------------------------------------------
-static void * buildPPC(void * current)
+static void * buildPPC(void * current/*, U8 valueToReturn*/)
 {
 	ACPI_SMALL_METHOD * ppc = current;
 	current = buildSmallMethod(current, NAMESEG("_PPC"), 0);
 	
 	current = buildReturnZero(current);
 	
+	//current = buildReturnOpcode(current, valueToReturn);
+    
 	// Update package length in PPC object
 	ppc->packageLength = (U8) ( (U8 *)current - (U8 *)&ppc->packageLength );
 	
 	return(current);
 }
+
+#if UNUSED
+//-----------------------------------------------------------------------------
+static void * buildPDL(void * current, U8 valueToReturn)
+{
+	ACPI_SMALL_METHOD * pdl = current;
+	current = buildSmallMethod(current, NAMESEG("_PDL"), 0);
+	
+	current = buildReturnOpcode(current, valueToReturn);
+	
+	// Update package length in PDL object
+	pdl->packageLength = (U8) ( (U8 *)current - (U8 *)&pdl->packageLength );
+	
+	return(current);
+}
+#endif
 
 //-----------------------------------------------------------------------------
 static void * buildPCT(void * current)
@@ -4988,7 +5025,51 @@ EFI_STATUS setupAcpi(void)
 		}
 		
 	}			
-	    
+#if HARDCODED_DSDT
+  do {
+#include "dsdt_PRLSACPI.h"
+
+        U8 index = 0;
+        
+        if ((get_new_table_in_list(new_table_list, NAMESEG("DSDT"), &new_table_index)) != (void*)0ul )
+        {
+            index = new_table_index;
+        } 
+        else
+        {
+            U8 empty = get_0ul_index_in_list(new_table_list, false);
+            if (empty != ACPI_TABLE_LIST_FULL_NON_RESERVED)
+            {
+                   index = empty;             
+            } 
+            else
+            {
+                printf("Error: not enought reserved space in the new acpi list for the Harcoded DSDT table,\n ");
+                printf("       please increase the RESERVED_AERA\n");
+                
+                break;
+            }
+        }
+        
+		if (index)
+		{
+			
+			ACPI_TABLE_DSDT *tmp = (ACPI_TABLE_DSDT *)DsdtAmlCode;			
+			ACPI_TABLE_DSDT *hardcoded_dsdt	 = (void *)0ul;	
+			
+			hardcoded_dsdt = (ACPI_TABLE_DSDT *)AllocateKernelMemory(tmp->Header.Length);	
+			memcpy(hardcoded_dsdt, tmp, tmp->Header.Length);
+			new_table_list[index] = (U32)hardcoded_dsdt; // add the patched table to the list
+		} 
+		else
+		{
+			printf("Error: not enought reserved space in the new acpi list for the Harcoded DSDT table,\n ");
+			printf("       please increase the RESERVED_AERA\n");
+			
+			break;
+		}    
+    } while (0);
+#endif
 	if (speed_step)
 	{
 		gen_psta= true;

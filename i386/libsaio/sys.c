@@ -657,6 +657,7 @@ int openmem(char * buf, int len)
     return fdesc;
 }
 
+#endif
 //==========================================================================
 // lseek() - Reposition the byte offset of the file descriptor from the
 //           beginning of the file. Returns the relocated offset.
@@ -672,7 +673,7 @@ int b_lseek(int fdesc, int offset, int ptr)
 	
     return offset;
 }
-
+#if UNUSED
 //==========================================================================
 // tell() - Returns the byte offset of the file descriptor.
 

@@ -102,6 +102,7 @@ int     gDeviceCount = 0;
 BVRef   bvr;
 BVRef   menuBVR;
 BVRef   bvChain;
+static bool forcecache = false;
 
 static void zeroBSS(void);
 #ifdef SAFE_MALLOC
@@ -417,8 +418,8 @@ void common_boot(int biosdev)
     bvChain = getBVChainForBIOSDev(gBIOSDev);
     setBootGlobals(bvChain);
 	
-    // Load boot.plist config file
-    status = loadSystemConfig(&bootInfo->bootConfig);
+    // Load Booter boot.plist config file
+    status = loadBooterConfig(&bootInfo->bootConfig);
 	
 	Platform->CPU.isServer = false;    
     getBoolForKey(kIsServer, &Platform->CPU.isServer, &bootInfo->bootConfig); // set this as soon as possible
@@ -576,7 +577,7 @@ void common_boot(int biosdev)
 			}
 			else 
 			{
-				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n")
+				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n");
 				determineCpuArch();
 			}
 
@@ -618,7 +619,7 @@ void common_boot(int biosdev)
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 		{
 			long cachetime, kerneltime, exttime;
-			if (trycache ) do {
+			if (trycache && !forcecache) do {
 				
 				// if we haven't found the kernel yet, don't use the cache
 				ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
@@ -635,7 +636,7 @@ void common_boot(int biosdev)
 				{
 					trycache = 0;
 					bootInfo->adler32  = 0;
-					DBG("Warning: kernelcache too old, timestamp of the kernel > timestamp of the cache, kernelcache disabled !!!\n");
+					DBG("Warning: No kernelcache found or kernelcache too old (timestamp of the kernel > timestamp of the cache), kernelcache disabled !!!\n");
 
 					break;				                
 				} 
@@ -817,6 +818,7 @@ void getKernelCachePath()
                 }
 			}            
 			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile)+1);
+            forcecache = true;
 		}
 		else
 		{
@@ -955,8 +957,8 @@ static void getRootDevice()
 				{
 					cnt = VALUE_SIZE;
 				}
-				cnt++;
-				strlcpy(valueBuffer + 1, val, cnt);				
+				//cnt++;
+				strlcpy(valueBuffer + 1, val, cnt+1);				
 				if (!copyArgument( kRootDeviceKey, valueBuffer, cnt, &argP, &ArgCntRemaining))
 				{
 					free(valueBuffer);

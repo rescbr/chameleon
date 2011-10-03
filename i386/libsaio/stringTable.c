@@ -477,41 +477,36 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
 
 bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
 {
-  const char *overrideVal;
-  int overrideSize;
-  bool override, ret;
-  
-  if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
-    return true;
-
-  ret = getValueForConfigTableKey(config, key, val, size);
-
-  // Try to find alternate keys in bootInfo->overrideConfig
-  // and prefer its values with the exceptions for
-  // "Kernel"="mach_kernel" and "Kernel Flags"="".
-
-  if (config->canOverride)
-  {
-    if (getValueForConfigTableKey(&bootInfo->overrideConfig, key, &overrideVal, &overrideSize))
-    {
-      override = true;
-
-      if (ret && (strcmp(key, "Kernel") == 0) && (strcmp(overrideVal, "mach_kernel") == 0))
-        override = false;
-
-      if (ret && (strcmp(key, "Kernel Flags") == 0) && (overrideSize == 0))
-        override = false;
-
-      if (override)
-      {
-        *val = overrideVal;
-        *size = overrideSize;
+    const char *overrideVal;
+    int overrideSize;
+    bool ret;
+    
+    if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
         return true;
-      }
+    
+    ret = getValueForConfigTableKey(config, key, val, size);
+    
+    // Try to find alternate keys in bootInfo->overrideConfig
+    // and prefer its values with the exceptions for
+    // "Kernel"="mach_kernel" and "Kernel Flags"="".
+    
+    if (config->canOverride)
+    {
+        if (getValueForConfigTableKey(&bootInfo->overrideConfig, key, &overrideVal, &overrideSize) && overrideSize)
+        {
+            *val = overrideVal;
+            *size = overrideSize;
+            return true;		
+        }
+        else if (getValueForConfigTableKey(&bootInfo->SystemConfig, key, &overrideVal, &overrideSize) && overrideSize)
+        {
+            *val = overrideVal;
+            *size = overrideSize;
+            return true;		
+        }
     }
-  }
-
-  return ret;
+    
+    return ret;
 }
 
 
@@ -581,7 +576,7 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
 int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
-		
+    
 	if ((fd = open(configFile)) < 0) {
 		return -1;
 	}
@@ -594,12 +589,12 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	return ParseXMLFile(config->plist, &config->dictionary);
 }
 
-/* loadSystemConfig
+/* loadBooterConfig
  *
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadSystemConfig(config_file_t *config)
+int loadBooterConfig(config_file_t *config)
 {
 	char *dirspec[] = {							       
 		"rd(0,0)/Extra/com.apple.Boot.plist",   
@@ -607,11 +602,11 @@ int loadSystemConfig(config_file_t *config)
 		"bt(0,0)/Extra/com.apple.Boot.plist",  
 		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
 		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"bt(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk 
+        
 	};
 	int i,fd, count, ret=-1;
-
+    
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
 		if ((fd = open(dirspec[i])) >= 0)
@@ -627,7 +622,7 @@ int loadSystemConfig(config_file_t *config)
 			
 			// enable canOverride flag
 			config->canOverride = true;
-
+            
 			break;
 		}
 	}
@@ -649,17 +644,12 @@ int loadSystemConfig(config_file_t *config)
 int loadOverrideConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"rd(0,0)/Extra/com.apple.Boot.plist",   
 		"/Extra/com.apple.Boot.plist",          
-		"bt(0,0)/Extra/com.apple.Boot.plist",  
-		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"bt(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 	
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
+		"/Extra/org.chameleon.Boot.plist" 
 	};
-
+    
 	int i,fd, count, ret=-1;
-
+    
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
 		if ((fd = open(dirspec[i])) >= 0)
@@ -681,7 +671,43 @@ int loadOverrideConfig(config_file_t *config)
 		ret = loadHelperConfig(config);
 	}
 #endif
+    
+	return ret;
+}
 
+/* loadSystemConfig
+ *
+ * Returns 0 - successful.
+ *		  -1 - unsuccesful.
+ */
+int loadSystemConfig(config_file_t *config)
+{
+	char *dirspec[] = {
+        "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",   
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",          
+		"bt(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+        "rd(0,0)/Mac OS X Install Data/com.apple.Boot.plist",   
+		"/Mac OS X Install Data/com.apple.Boot.plist",          
+		"bt(0,0)/Mac OS X Install Data/com.apple.Boot.plist"
+	};
+	int i,fd, count, ret=-1;
+	
+	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	{
+		if ((fd = open(dirspec[i])) >= 0)
+		{
+			// read file
+			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+			close(fd);
+			
+			// build xml dictionary
+			ParseXMLFile(config->plist, &config->dictionary);
+			sysConfigValid = true;	
+			ret=0;			
+			break;
+		}
+	}
+	
 	return ret;
 }
 
