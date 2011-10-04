@@ -1,3 +1,5 @@
+- Added a simple mechanism to embed a module into the core of the bootloader (useful for virtual machines 
+  or for modules not yet compatible with xcode4), see internal_modules.h for more info.
 - Added JrCs's Keylayout support in Keymapper
 - Fixed an issue in AcpiCodec where the highest cpu frequency may not be added in the pstate package on some configurations 
 - Improved detection of nb of core(s) and thread(s) for AMD processors

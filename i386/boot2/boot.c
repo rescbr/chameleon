@@ -475,7 +475,9 @@ void common_boot(int biosdev)
 			load_all_modules();
 		}
 	}	
-			
+	
+    load_all_internal_modules();
+    
     // Loading preboot ramdisk if exists.
 	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
 

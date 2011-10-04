@@ -13,7 +13,7 @@
  */
 
 #include "gui.h"
-#include "appleboot.h"
+#include "GUI_appleboot.h"
 #include "vers.h"
 #include "modules.h"
 #include "rand.h"

@@ -43,6 +43,15 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 		device_inject.o pci_root.o \
         convert.o acpi_tools.o smbios.o smp-imps.o
 
+# example for acpicodec
+#CFLAGS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
+
+# example for SMBiosGetters
+#CFLAGS += mysmbios.o smbios_decode.o smbios_getters.o SMBiosGetters.o
+
+# example for GUI
+#CFLAGS += graphic_utils.o gui.o rand.o picopng.o GUI_module.o
+
 # Options enabled by default:
 #CFLAGS += -DNO_WIN_SUPPORT # -7200 bytes
 SAIO_OBJS += ntfs.o msdos.o
