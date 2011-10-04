@@ -76,6 +76,7 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Installer version: ${versionNumber} ${revisionNumber}"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Diskutil"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Running EFI postinstall script"
+"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Target selected by user = ${targetDeviceChosenByUser}"
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Target volume = ${targetVolume}"
 
 

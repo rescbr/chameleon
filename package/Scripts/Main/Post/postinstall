@@ -54,9 +54,9 @@ fi
 chamTemp="$dest_vol/usr/local/chamTemp"
 
 # Check for temporary directory/Extra folder.
-if [ ! -d "$chamTemp"/Extra ]; then
-	mkdir "$chamTemp"/Extra
-fi
+#if [ ! -d "$chamTemp"/Extra ]; then
+#	mkdir "$chamTemp"/Extra
+#fi
 
 # ---------------------------------------------
 # Add any installed modules to the Install Log
@@ -78,7 +78,6 @@ if [ -e "${chamTemp}"/Extra/Themes ]; then
 	done
 fi
 
-
 # ---------------------------------------------
 # Build org.chameleon.Boot.plist
 # ---------------------------------------------
@@ -89,6 +88,11 @@ fi
 
 # Are there any options to build?
 if [ "$(ls -A ${chamTemp}/options )" ]; then
+
+	# Check for temporary directory/Extra folder.
+	if [ ! -d "$chamTemp"/Extra ]; then
+		mkdir "$chamTemp"/Extra
+	fi
 
 	# Create template for org.chameleon.Boot.plist"
 	tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
@@ -105,8 +109,8 @@ if [ "$(ls -A ${chamTemp}/options )" ]; then
 		# indicate that should be a kernel flag
 		if [ ${options[arrayCount]:0:2} = "KF" ];then
 			# plistbuddy only add's if the key doesn't already exist.
-			#ÊSo let's store any kernelflags and add them all at
-			# once we reach the end of the options list.	
+			#ÊSo let's store any kernelflags and add them all at the
+			# same time once when we reach the end of the options list.	
 			kernelflag[kernelFlagCount]="${options[arrayCount]##*flag=}"
 			"$scriptDir"InstallLog.sh "${dest_vol}" "Added kernel flag: ${kernelflag[kernelFlagCount]}"
 			(( kernelFlagCount++ ))	
@@ -141,62 +145,75 @@ fi
 # ---------------------------------------------
 # Copy temp Extra folder to target destination
 # ---------------------------------------------
-# If an existing /Extra folder is found, then back it up.
+# If we've made a temporary Extra folder to use then
+# check for an existing /Extra folder. If found, back it up
+# before copying the temporary Extra folder to destination.
 # Extra folder now resides in /usr/local/chamTemp/
 # Copy /usr/local/chamTemp/Extra to correct location.
 
-if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
-	# The Standard install option chosen
-	if [ ! -e "$dest_vol"/Extra ]; then
-		mkdir "$dest_vol"/Extra
-	else
-		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
-		mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
-	fi
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: $dest_vol/Extra"
-	cp -R "$chamTemp"/Extra "$dest_vol"
-else
-	# The EFI system partition install option was chosen
-	if [ ! -e "/Volumes/EFI/Extra" ]; then
-		mkdir "/Volumes/EFI/Extra"
-	else
-		"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
-		mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
-	fi
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: /Volumes/EFI/Extra"
-	cp -R "$chamTemp"/Extra "/Volumes/EFI"
+if [ -d "$chamTemp"/Extra ]; then
 
-	# unmount /Volumes/EFI
-   	attempts=1
-	while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
-		echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-		"$scriptDir"InstallLog.sh "${dest_vol}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
-	   	umount -f $( df | grep EFI | awk '{print $1}' )
-		attempts=$(( ${attempts} + 1 ))
-	done
+	if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
+		# The Standard install option chosen
+
+		# Does and /Extra folder already exist?
+		if [ -e "$dest_vol"/Extra ]; then
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
+			mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
+		fi
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: $dest_vol/Extra"
+		cp -R "$chamTemp"/Extra "$dest_vol"
+	else
+		# The EFI system partition install option was chosen
+
+		# Does a /Volumes/Extra folder already exist?
+		if [ -e "/Volumes/EFI/Extra" ]; then
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
+			mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
+		fi
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: /Volumes/EFI/Extra"
+		cp -R "$chamTemp"/Extra "/Volumes/EFI"
+
+		# unmount /Volumes/EFI
+   		attempts=1
+		while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
+			echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	   		umount -f $( df | grep EFI | awk '{print $1}' )
+			attempts=$(( ${attempts} + 1 ))
+		done
+	fi
 fi
-
-"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
-"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
 
 # ---------------------------------------------
 # Cleanup
 # ---------------------------------------------
+
+# delete the temporary Chameleon folder
+if [ -e "$chamTemp" ]; then
+	echo "Removing $chamTemp directory"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 1"
+	rm -rf "$chamTemp"
+fi
+
 # Remove /.ChameleonEFI file
 if [ -f "$dest_vol"/.ChameleonEFI ]; then
    	echo "Removing /.ChameleonEFI file"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 2"
     	rm "$dest_vol"/.ChameleonEFI
 fi
 
 # Remove /.ChameleonLogFlag file
 if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
-    echo "Removing /.ChameleonLogFlag file"
-    rm "$dest_vol"/.ChameleonLogFlag
+	echo "Removing /.ChameleonLogFlag file"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 3"
+
+	# we have to add the final install log messages before
+	# deleting /.ChameleonLogFlag.
+	"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
+
+	rm "$dest_vol"/.ChameleonLogFlag
 fi
-
-# delete the temporary Chameleon folder
-echo "Removing $chamTemp file"
-rm -rf "$chamTemp"
-
 
 echo "Done..."

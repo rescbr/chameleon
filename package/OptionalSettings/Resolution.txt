@@ -21,7 +21,7 @@
 # B) User can select only one of the options from the list.
 # Set Exclusive=False for A, or Exclusive=True for B.
 #
-Exclusive=True
+Exclusive=False
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------

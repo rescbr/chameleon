@@ -256,8 +256,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 				availableOptions[i]=${availableOptions[i]}":KeyLayout="${availableOptions[i]}
 			done
 			
-			# call buildoptionalsettings with 1 to indicate exclusive option wanted.
-			buildoptionalsettings "$1" "1" "keylayout"
+			# to indicate exclusive option, call buildoptionalsettings with the 2nd parameter set to 1 .
+			buildoptionalsettings "$1" "0" "keylayout"
 			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
