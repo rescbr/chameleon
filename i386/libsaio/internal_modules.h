@@ -9,7 +9,7 @@ static inline void load_all_internal_modules()
 {
   // HOW TO: the procedure is quite simple but not automatic yet,
     
-  // to embed a module just drag/copy the content your module folder (*.c,*.h, etc...)
+  // to embed a module just drag/copy the content your module folder (*.c,*.h, etc...), but DO NOT COPY THE MAKEFILE.
   // into libsaio folder, edit the libsaio makefile to build the files that you just added,
   // and add here some code to start the module,
     

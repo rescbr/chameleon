@@ -1,3 +1,9 @@
+- Chameleon (or at least this branch) can now boot OSX on Parallels Desktop 7, with full acpi and smbios support 
+  (note: you will need to embed at least acpicodec and smbiosgetters since virtual machines don't like our module system),
+  see this vid ;-) : http://www.youtube.com/watch?v=kvSgwIE6D4o&feature=channel_video_title
+- Added a mechanism to boot the real Lion installer partition (with baseSystem.dmg as root device), you will just need to edit the kernelcache
+  for you platform, step 2 of the installation process (booting from the kernelcache in the "Mac OS X Install Data" folder) is still in progress
+
 - Added a simple mechanism to embed a module into the core of the bootloader (useful for virtual machines 
   or for modules not yet compatible with xcode4), see internal_modules.h for more info.
 - Added JrCs's Keylayout support in Keymapper
