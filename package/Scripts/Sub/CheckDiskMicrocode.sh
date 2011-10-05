@@ -70,6 +70,7 @@ else
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0hfs with boot0 as Windows is not on target disk."
 			exit 0
 		fi
+		exit 1
 	fi
 
 	if [ "${stage0type}" == "0a803c" ]; then
@@ -82,6 +83,7 @@ else
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0 with boot0md as Windows is on target disk."
 			exit 0
 		fi
+		exit 1
 	fi
 
 	if [ "${stage0type}" == "ee7505" ]; then
