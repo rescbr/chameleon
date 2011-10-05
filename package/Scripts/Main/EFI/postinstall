@@ -88,9 +88,11 @@ partitiontable=$( diskutil list ${targetDeviceChosenByUser%s*} | sed -n '3p' | a
 if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 	echo "Confirm this is a GPT partitioned disk."
 
-	# Double check we can see the selected partition, it's of the right type and /Volumes/TempChamESP exists.
+	# Double check we can see the selected partition and it's of the right type.
+	# Now also check for another existing Chameleon installation on the same disk.
+	# If the following script finds anything, it returns 1 to indicate failure.
 
-        "$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
+        "$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
 	returnValue=$?
 	if [ ${returnValue} = 0 ]; then
 		# OK to proceed

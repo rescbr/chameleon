@@ -76,10 +76,11 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 "$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume}"
 
 
-# Double check we can see the selected partition and it's of the right type
-# if not the following script returns to indicate failure.
+# Double check we can see the selected partition and it's of the right type.
+# Now also check for another existing Chameleon installation on the same disk.
+# If the following script finds anything, it returns 1 to indicate failure.
 
-"$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+"$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 returnValue=$?
 if [ ${returnValue}=0 ]; then
 	# OK to proceed
