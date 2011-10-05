@@ -82,7 +82,7 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 
 "$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 returnValue=$?
-if [ ${returnValue}=0 ]; then
+if [ ${returnValue} = 0 ]; then
 	# OK to proceed
 
 

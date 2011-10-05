@@ -115,7 +115,7 @@ if [ $numSlices -gt 1 ]; then
 		
 		if [ $stageExistence == 3 ] && [ $i -ne $sliceNumber ]; then
 			echo "STOP: Not recommended you install to $targetDeviceRaw as there is already an existing Chameleon installation on $targetDiskRaw"
-			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP:  Not recommended you install to $targetDeviceRaw as there is already an existing Chameleon installation on $targetDiskRaw."
+			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: Not recommended you install to $targetDeviceRaw as there is already an existing Chameleon installation on $targetDiskRaw."
 			echo "================================"
 			echo "End"
 			echo "--------------------------------"
