@@ -170,6 +170,8 @@ if [ ${returnValue} = 0 ]; then
 			"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
 		fi
 	fi
+else
+    echo "Stop" >"${targetVolume}"/.ChameleonExists 
 fi
 
 "$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"

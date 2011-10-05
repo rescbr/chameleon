@@ -92,7 +92,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 	# Now also check for another existing Chameleon installation on the same disk.
 	# If the following script finds anything, it returns 1 to indicate failure.
 
-        "$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
+    "$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
 	returnValue=$?
 	if [ ${returnValue} = 0 ]; then
 		# OK to proceed
@@ -173,6 +173,8 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			fi
 		fi
+    else
+        echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
 	fi
 else
 	#echo "ERROR Volume is not on a GPT partitioned disc."
