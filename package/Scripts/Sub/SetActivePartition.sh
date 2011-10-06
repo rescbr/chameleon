@@ -58,12 +58,8 @@ else
 	# TO DO
 	# Add check to make sure that the active partition is actually the Windows partition
 	# before printing next statement.
-	#echo "Windows is installed so we let that remain the active partition"
+	#echo "DEBUG: Windows is installed so we let that remain the active partition"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Windows is installed so that can remain the active partition"
 fi
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
 
 exit 0

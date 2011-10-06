@@ -37,7 +37,7 @@ if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 	#echo "DEBUG: EFI install chosen"
 
 	if [ ! -d "${selectedDestination}" ]; then
-		echo "Executing Command: mkdir -p ${selectedDestination}"
+		#echo "DEBUG: Executing Command: mkdir -p ${selectedDestination}"
 		mkdir -p "${targetVolume}"
 	#else
 		#echo "DEBUG: folder /Volumes/EFI already exists"
@@ -59,11 +59,11 @@ if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 		mount_msdos -u 0 -g 0 "${targetDevice}" "${selectedDestination}"
 	fi
 
-	echo "Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${selectedDestination}"
+	#echo "DEBUG: Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${selectedDestination}"
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${selectedDestination}"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${selectedDestination}."
 else
-	echo "Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${targetVolume}"
+	#echo "DEBUG: Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${targetVolume}"
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${targetVolume}"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
 fi
@@ -73,9 +73,5 @@ fi
 #	echo "Executing command: SetFile -a V ${targetVolume}/${stage2Loader}"
 #	"${selectedDestination}"/.Chameleon/Resources/SetFile -a V "${targetVolume}"/"${stage2Loader}"
 #fi
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
 
 exit 0

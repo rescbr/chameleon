@@ -49,7 +49,7 @@ else
 	# Check bytes 440-443 of the GPTdiskProtectiveMBR for a Windows Disk Signature
 	windowsloader=$( dd 2>/dev/null if="$targetDisk" count=4 bs=1 | xxd | awk '{print $2$3}' )
 	if [ "${windowsloader}" == "33c08ed0" ]  ; then
-		echo "Found existing Windows Boot Loader so will replace with Chameleon boot0md"
+		#echo "DEBUG: Found existing Windows Boot Loader so will replace with Chameleon boot0md"
 		"$scriptDir"InstallLog.sh "${targetVolume}" "Target has existing Windows boot loader - Will replace with boot0md"
 	fi
 
@@ -61,12 +61,12 @@ else
 
 	stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
 	if [ "${stage0type}" == "0b807c" ]; then
-		echo "Target has existing Chameleon stage 0 loader - Boot0hfs"
+		#echo "DEBUG: Target has existing Chameleon stage 0 loader - Boot0hfs"
 		"$scriptDir"InstallLog.sh "${targetVolume}" "Target has existing Chameleon stage 0 loader - boot0hfs"
 
 		# Script CheckDiskSignature.sh returned 0 if a Windows installation was NOT found
 		if [ "$diskSigCheck" == "0" ]; then
-			echo "Found no existing Windows installation so will replace stage 0 loader with Boot0"
+			#echo "DEBUG: Found no existing Windows installation so will replace stage 0 loader with Boot0"
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0hfs with boot0 as Windows is not on target disk."
 			exit 0
 		fi
@@ -74,12 +74,12 @@ else
 	fi
 
 	if [ "${stage0type}" == "0a803c" ]; then
-		echo "Found existing Chameleon stage 0 loader - Boot0"
+		#echo "DEBUG: Found existing Chameleon stage 0 loader - Boot0"
 		"$scriptDir"InstallLog.sh "${targetVolume}" "Target has existing Chameleon stage 0 loader - boot0"
 
 		# Script CheckDiskSignature.sh returned 1 if a Windows installation was found
 		if [ "$diskSigCheck" = "1" ]; then
-			echo "Found existing Windows installation so will replace stage 0 loader with boot0md"
+			#echo "DEBUG: Found existing Windows installation so will replace stage 0 loader with boot0md"
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0 with boot0md as Windows is on target disk."
 			exit 0
 		fi
@@ -87,20 +87,19 @@ else
 	fi
 
 	if [ "${stage0type}" == "ee7505" ]; then
-		echo "Found existing Chameleon stage 0 loader - Boot0md"
-		echo "And will leave boot0md installed."
+		#echo "DEBUG: Found existing Chameleon stage 0 loader - Boot0md"
+		#echo "DEBUG: And will leave boot0md installed."
 		"$scriptDir"InstallLog.sh "${targetVolume}" "Target has existing Chameleon stage 0 loader - boot0md. Leaving as is."
 		exit 1
 	fi
 
 	if [ "${stage0type}" != "0b807c" ] && [ "${stage0type}" != "0a803c" ] && [ "${stage0type}" != "ee7505" ] && [ "${windowsloader}" != "33c08ed0" ]  ; then
-		echo "Something other than Chameleon or a Windows bootloader was found"
+		#echo "DEBUG: Something other than Chameleon or a Windows bootloader was found"
 		test=$(echo "${mbr437}" | awk -F0 '{print NF-1}' )
-		echo "Disk microcode found: ${test} - Preserving."
-		echo "diskupdate is set to false"
-		echo "-----------------------------------------------"
+		#echo "DEBUG: Disk microcode found: ${test} - Preserving."
+		#echo "DEBUG: diskupdate is set to false"
+		#echo "DEBUG: -----------------------------------------------"
 		"$scriptDir"InstallLog.sh "${targetVolume}" "NOTE: Target has existing unrecognised bootcode in the MBR. Leaving as is."
-		echo ""
 		exit 1
 	fi
 fi

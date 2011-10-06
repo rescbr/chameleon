@@ -32,47 +32,34 @@ fi
 
 partitionBootSector=$( dd 2>/dev/null if="$targetDeviceRaw" count=1 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
 if [ "${partitionBootSector:36:2}" == "00" ] && [ "${partitionBootSector:42:2}" == "f8" ] && [ "${partitionBootSector:48:2}" == "3f" ]; then
-	echo "Found a FAT32 device formatted by Windows Explorer"
-	echo "--------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT32 device formatted by Windows Explorer"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT32 volume formatted by Windows Explorer"
 	exit 2
 fi
 if [ "${partitionBootSector:36:2}" == "02" ] && [ "${partitionBootSector:42:2}" == "f8" ] && [ "${partitionBootSector:48:2}" == "3f" ]; then
-	echo "Found a FAT16 device formatted by Windows Explorer"
-	echo "--------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT16 device formatted by Windows Explorer"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT16 volume formatted by Windows Explorer"
 	exit 1
 fi
 if [ "${partitionBootSector:36:2}" == "00" ] && [ "${partitionBootSector:42:2}" == "f0" ] && [ "${partitionBootSector:48:2}" == "20" ]; then
-	echo "Found a FAT32 device formatted by OS X Snow Leopard Disk Utility"
-	echo "----------------------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT32 device formatted by OS X Snow Leopard Disk Utility"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT32 volume formatted by OS X Snow Leopard Disk Utility"
 	exit 2
 fi
 if [ "${partitionBootSector:36:2}" == "02" ] && [ "${partitionBootSector:42:2}" == "f0" ] && [ "${partitionBootSector:48:2}" == "20" ]; then
-	echo "Found a FAT16 device formatted by OS X Snow Leopard Disk Utility"
-	echo "----------------------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT16 device formatted by OS X Snow Leopard Disk Utility"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT16 volume formatted by OS X Snow Leopard Disk Utility"
 	exit 1
 fi
 if [ "${partitionBootSector:36:2}" == "00" ] && [ "${partitionBootSector:42:2}" == "f8" ] && [ "${partitionBootSector:48:2}" == "20" ]; then
-	echo "Found a FAT32 device formatted by OS X Lion Disk Utility"
-	echo "--------------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT32 device formatted by OS X Lion Disk Utility"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT32 volume formatted by OS X Lion Disk Utility"
 	exit 2
 fi
 if [ "${partitionBootSector:36:2}" == "02" ] && [ "${partitionBootSector:42:2}" == "f8" ] && [ "${partitionBootSector:48:2}" == "20" ]; then
-	echo "Found a FAT16 device formatted by OS X Lion Disk Utility"
-	echo "--------------------------------------------------------"
-	echo ""
+	#echo "DEBUG: Found a FAT16 device formatted by OS X Lion Disk Utility"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "${targetDeviceRaw} is on a FAT16 volume formatted by OS X Lion Disk Utility"
 	exit 1
 fi
-echo "-----------------------------------------------"
-echo ""
+
 exit 0

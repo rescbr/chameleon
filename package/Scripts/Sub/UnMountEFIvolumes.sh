@@ -23,26 +23,17 @@ fi
 # be unmounted in which case the loop would run forever.
 attempts=1
 while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
-	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	#echo "DEBUG: Unmounting $( df | grep EFI | awk '{print $1}' )"
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Find and unmount any volume named 'EFI':"
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "$( df | grep EFI | awk '{print $1}' )"
 	umount -f $( df | grep EFI | awk '{print $1}' )
 	(( attempts++ ))
 done
 if [ $attempts = 5 ]; then
-	echo "failed to unmount 'EFI' System Partition."
-	echo "-----------------------------------------------"
+	#echo "DEBUG: failed to unmount 'EFI' System Partition."
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Failed to unmount 'EFI' System Partition."
-	echo ""
-	echo ""
-	echo ""
 	exit 1
 fi
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
-echo ""
 
 exit 0
 

@@ -25,22 +25,15 @@ fi
 
 disksignature=$( dd 2>/dev/null if="$targetDisk" count=1 | dd 2>/dev/null count=4 bs=1 skip=440 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
 
-#echo "${disksignature}"
+#echo "DEBUG: ${disksignature}"
 
 if [ "${disksignature}" = "00000000" ]; then
-	echo "No Windows installation detected."
-	echo "-----------------------------------------------"
-	echo ""
+	#echo "DEBUG: No Windows installation detected."
 	exit 0
 else
-	echo "Detected an existing Windows installation"
-	echo "-----------------------------------------------"
-	echo ""
+	#echo "DEBUG: Detected an existing Windows installation"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Detected a Windows installation on this volume."
 	exit 1
 fi
-
-echo "-----------------------------------------------"
-echo ""
 
 exit 0

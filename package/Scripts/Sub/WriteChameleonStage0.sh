@@ -39,20 +39,15 @@ fi
 if [ ${disksignature} = "0" ]; then
 	# There’s no Windows disk signature so we can write boot0
 		
-	echo "Executing command: ${targetResources}fdisk440 -u -f /usr/standalone/i386/${stage0Loader} -y ${targetDisk}"
+	#echo "DEBUG: Executing command: ${targetResources}fdisk440 -u -f /usr/standalone/i386/${stage0Loader} -y ${targetDisk}"
 	"${targetResources}"fdisk440 -u -f "${targetVolume}"/usr/standalone/i386/${stage0Loader} -y ${targetDisk}
     "$scriptDir"InstallLog.sh "${targetVolume}" "Written ${stage0Loader} to ${targetDisk}."
 else
 	# Windows is also installed on the HDD so we need to write boot0md
 		
-	echo "Executing command: ${targetResources}fdisk440 -u -f /usr/standalone/i386/${stage0Loaderdualboot} -y ${targetDisk}"
+	#echo "DEBUG: Executing command: ${targetResources}fdisk440 -u -f /usr/standalone/i386/${stage0Loaderdualboot} -y ${targetDisk}"
 	"${targetResources}"fdisk440 -u -f "${targetVolume}"/usr/standalone/i386/${stage0Loaderdualboot} -y ${targetDisk}
     "$scriptDir"InstallLog.sh "${targetVolume}" "Written ${stage0Loaderdualboot} to ${targetDisk}."
 fi
-
-
-echo "-----------------------------------------------"
-echo ""
-echo ""
 
 exit 0

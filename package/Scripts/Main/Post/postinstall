@@ -113,7 +113,12 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
                 keyToUse=$( echo $keyRead | sed 's/ /\\ /g' )
                 if [ "${keyToUse}" != "DONT" ] && [ "${value}" != "USE" ]; then
                     sudo /usr/libexec/plistbuddy -c "Add :${keyToUse} string ${value}" "$tempOCBP"
-                    "$scriptDir"InstallLog.sh "${dest_vol}" "Added boot option: ${keyRead}=${value}"
+                    returnValue=$?
+					if [ ${returnValue} -ne 1 ]; then
+						"$scriptDir"InstallLog.sh "${dest_vol}" "Added boot option: ${keyRead}=${value}"
+					else
+						"$scriptDir"InstallLog.sh "${dest_vol}" "Can't add ${keyRead}=${value} as an option already exists for: ${keyRead}"
+					fi
                 fi
             fi	
             (( arrayCount++ ))

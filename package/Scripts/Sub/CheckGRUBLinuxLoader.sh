@@ -28,7 +28,7 @@ diskmicrocodetype[1]="GRUB,47525542"
 diskmicrocodetype[2]="LILO,4c494c4f"
 
 diskmicrocode=$( dd 2>/dev/null if="$targetDisk" count=1 | dd 2>/dev/null count=1 bs=437 | perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
-#echo "${diskmicrocode}"
+#echo "DEBUG: ${diskmicrocode}"
 diskmicrocodetypecounter=0
 
 while [ ${diskmicrocodetypecounter} -lt ${#diskmicrocodetype[@]} ]; do
@@ -38,13 +38,9 @@ while [ ${diskmicrocodetypecounter} -lt ${#diskmicrocodetype[@]} ]; do
                 echo "${diskmicrocodetype[${diskmicrocodetypecounter}]%,*} found."
 		"$scriptDir"InstallLog.sh "${targetVolume}" "FAIL: Found an exisitng GRUB/LILO bootloader in the MBR."
 		exit 1
-	else
-		echo "Didn't find a match for ${diskmicrocodetype[${diskmicrocodetypecounter}]%,*}"
+	#else
+		#echo "DEBUG: Didn't find a match for ${diskmicrocodetype[${diskmicrocodetypecounter}]%,*}"
         fi
 done
-echo "-----------------------------------------------"
-echo ""
-
-#"$scriptDir"InstallLog.sh "${targetVolume}" "GRUB/LILO: PASS"
 
 exit 0

@@ -37,7 +37,7 @@ fi
 if [ ${espformat} = "1" ]; then
 	# the selected partition is HFS formatted
 
-	echo "Executing command: dd if=${selectedDestination}/usr/standalone/i386/${stage1LoaderHFS} of=${targetDeviceRaw}"
+	#echo "DEBUG: Executing command: dd if=${selectedDestination}/usr/standalone/i386/${stage1LoaderHFS} of=${targetDeviceRaw}"
 	dd if="${selectedDestination}"/usr/standalone/i386/${stage1LoaderHFS} of=${targetDeviceRaw}
 
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written ${stage1LoaderHFS} to ${targetDeviceRaw}."
@@ -46,22 +46,19 @@ fi
 if [ ${espformat} = "2" ]; then
 	# the selected partition FAT formatted
 
-	echo "Executing command: dd if=${targetDeviceRaw} count=1 bs=512 of=/tmp/origbs"
+	#echo "DEBUG: Executing command: dd if=${targetDeviceRaw} count=1 bs=512 of=/tmp/origbs"
 	dd if=${targetDeviceRaw} count=1 bs=512 of=/tmp/origbs
 
-	echo "Executing command: cp "${selectedDestination}"/usr/standalone/i386/${stage1LoaderFAT} /tmp/newbs"
+	#echo "DEBUG: Executing command: cp "${selectedDestination}"/usr/standalone/i386/${stage1LoaderFAT} /tmp/newbs"
 	cp "${selectedDestination}"/usr/standalone/i386/${stage1LoaderFAT} /tmp/newbs
 
-	echo "Executing command: dd if=/tmp/origbs of=/tmp/newbs skip=3 seek=3 bs=1 count=87 conv=notrunc"
+	#echo "DEBUG: Executing command: dd if=/tmp/origbs of=/tmp/newbs skip=3 seek=3 bs=1 count=87 conv=notrunc"
 	dd if=/tmp/origbs of=/tmp/newbs skip=3 seek=3 bs=1 count=87 conv=notrunc
 
-	echo "Executing command: dd of=${targetDeviceRaw} count=1 bs=512 if=/tmp/newbs"
+	#echo "DEBUG: Executing command: dd of=${targetDeviceRaw} count=1 bs=512 if=/tmp/newbs"
 	dd if=/tmp/newbs of="${targetDeviceRaw}" count=1 bs=512
 
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written ${stage1LoaderFAT} to ${targetDeviceRaw}."
 fi
-
-echo "-----------------------------------------------"
-echo ""
 
 exit 0
