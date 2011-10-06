@@ -325,16 +325,16 @@ makedistribution ()
 
 	find "${1}/${packagename}" -name '.DS_Store' -delete
 	pushd "${1}/${packagename}" >/dev/null
-	xar -c -f "${1%/*}/$packagename.pkg" --compression none .
+	xar -c -f "${1%/*}/${packagename// /}-${version}-r${revision}.pkg" --compression none .
 	popd >/dev/null
 
 #   Here is the place for assign a Icon to the pkg
-ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
-DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
-Rez -append tempicns.rsrc -o "${1%/*}/$packagename.pkg"
-SetFile -a C "${1%/*}/$packagename.pkg"
-rm -f tempicns.rsrc
-rm -rf "${pkgroot}/Icons/Icons"
+	ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
+	DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
+	Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
+	SetFile -a C "${1%/*}/$packagename-${version}-r$revision.pkg"
+	rm -f tempicns.rsrc
+	rm -rf "${pkgroot}/Icons/Icons"
 # End
 
 	echo ""	
