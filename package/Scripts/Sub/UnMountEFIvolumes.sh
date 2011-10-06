@@ -6,30 +6,33 @@ echo "*****************************"
 
 # loop through and un-mount ALL mounted 'EFI' system partitions - Thanks kizwan
 
+# Receives targetVolumeChosenByUser: Stores original target if EFI install selected.
 # Receives scriptDir: The location of the main script dir.
-# Receives targetVolumeTemp: Stores original target if EFI install selected.
 
 if [ "$#" -eq 2 ]; then
-	targetVolumeTemp="$1"
+	targetVolumeChosenByUser="$1"
 	scriptDir="$2"
-	echo "DEBUG: passed argument for targetVolumeTemp = $targetVolumeTemp"
+	echo "DEBUG: passed argument for targetVolumeChosenByUser = $targetVolumeChosenByUser"
 	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed"
 	exit 9
 fi
 
-
+# Count of 5 exists incase for some reason /Volumes/EFI fails
+# be unmounted in which case the loop would run forever.
 attempts=1
-while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
+while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
 	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Find and unmount any volume named 'EFI':"
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "$( df | grep EFI | awk '{print $1}' )"
 	umount -f $( df | grep EFI | awk '{print $1}' )
-	attempts=$(( ${attempts} + 1 ))
+	(( attempts++ ))
 done
-if [ ${attempts} = 5 ]; then
+if [ $attempts = 5 ]; then
 	echo "failed to unmount 'EFI' System Partition."
 	echo "-----------------------------------------------"
-	"$scriptDir"InstallLog.sh "${targetVolumeTemp}" "Failed to unmount 'EFI' System Partition."
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Failed to unmount 'EFI' System Partition."
 	echo ""
 	echo ""
 	echo ""

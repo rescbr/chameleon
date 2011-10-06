@@ -1,24 +1,17 @@
 #!/bin/bash
-#
-# $1: the full path to the installation package; for example:
-# /Volumes/Projects/Testing/Simple_Carbon_App.pkg
-#
-# $2: the full path to the installation destination; for example:
-# /Applications
-#
-# $3: the mountpoint of the destination volume; for example:
-# / or /Volumes/External_Drive
-# 
-# $4: the root directory for the current System folder:
-# /
 
-echo "preinstall: Path to installer....... $1"
-echo "preinstall: Path to destination..... $2"
-echo "preinstall: Path to dest volume..... $3"
-echo "preinstall: Root of system folder... $4"
+echo "==============================================="
+echo "Post Post-Install Script"
+echo "*********************************"
+echo "-----------------------------------------------"
+echo ""
 
-#set -x # Useful for echoing everything the script does to the installer log!!
+#echo "DEBUG: $ 1 = Full path to the installation package the installer app is processing: " $1
+#echo "DEBUG: $ 2 = Full path to the installation destination: " $2
+#echo "DEBUG: $ 3 = Installation volume (mountpoint) to receive the payload: " $3
+#echo "DEBUG: $ 4 = Root directory for the system: " $4
 
+# Check target exists
 if [ ! -e "$3" ]
 then
     echo "$3 volume does not exist!"
@@ -33,7 +26,7 @@ else
     dest_vol="$3"
 fi    
 
-# Where are we, so to find the Install Log script.
+# Find script location so to find the Install Log script.
 MYLOCATION="${PWD}/${BASH_ARGV[0]}"
 export MYLOCATION="${MYLOCATION%/*}"
 scriptDir=$MYLOCATION
@@ -151,11 +144,10 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     # Copy /usr/local/chamTemp/Extra to correct location.
 
     if [ -d "$chamTemp"/Extra ]; then
-
         if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
             # The Standard install option chosen
 
-            # Does and /Extra folder already exist?
+            # Does an /Extra folder already exist?
             if [ -e "$dest_vol"/Extra ]; then
                 "$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
                 mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
@@ -164,7 +156,6 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             cp -R "$chamTemp"/Extra "$dest_vol"
         else
             # The EFI system partition install option was chosen
-
             # Does a /Volumes/Extra folder already exist?
             if [ -e "/Volumes/EFI/Extra" ]; then
                 "$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
@@ -172,16 +163,21 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             fi
             "$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: /Volumes/EFI/Extra"
             cp -R "$chamTemp"/Extra "/Volumes/EFI"
-
-            # unmount /Volumes/EFI
-            attempts=1
-            while [ "$( df | grep EFI )" ] && [ "${attempts}" -lt 5 ]; do
-                echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-                "$scriptDir"InstallLog.sh "${dest_vol}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
-                umount -f $( df | grep EFI | awk '{print $1}' )
-                attempts=$(( ${attempts} + 1 ))
-            done
         fi
+    fi
+    
+    if [ -f "$dest_vol"/.ChameleonEFI ]; then
+		# unmount /Volumes/EFI
+		# Count of 5 exists incase for some reason /Volumes/EFI fails
+		# be unmounted in which case the loop would run forever.
+		attempts=1
+		while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
+			echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Find and unmount any volume named 'EFI':"
+			"$scriptDir"InstallLog.sh "${dest_vol}" "$( df | grep EFI | awk '{print $1}' )"
+			umount -f $( df | grep EFI | awk '{print $1}' )
+			(( attempts++ ))	
+		done
     fi
 else
     echo "Removing /.ChameleonExists file"
@@ -220,4 +216,8 @@ if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
 	rm "$dest_vol"/.ChameleonLogFlag
 fi
 
-echo "Done..."
+echo "==============================================="
+echo "END - Post Post-Install Script"
+echo "*********************************"
+echo "-----------------------------------------------"
+echo ""

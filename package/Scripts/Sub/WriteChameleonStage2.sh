@@ -8,9 +8,9 @@ echo "*******************************"
 
 # Receives espformat: 1 for HFS, 2 for MSDOS, 0 for unknown
 # Receives stage2Loader: Name of file - boot
-# Receives selectedDestination: for example, /Volumes/USB
+# Receives selectedDestination: for example, /Volumes/ChameleonBootUSB (or /Volumes/EFI if ESP install).
 # Receives targetDevice: for example, /dev/disk3s1
-# Receives targetVolume: for example, /Volumes/USB
+# Receives targetVolume: for example, /Volumes/ChameleonBootUSB
 # Receives scriptDir: The location of the main script dir.
 
 
@@ -34,13 +34,13 @@ fi
 
 # check to see if install to EFI system partition was selected
 if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
-	echo "DEBUG: EFI install chosen"
+	#echo "DEBUG: EFI install chosen"
 
 	if [ ! -d "${selectedDestination}" ]; then
 		echo "Executing Command: mkdir -p ${selectedDestination}"
 		mkdir -p "${targetVolume}"
-	else
-		echo "DEBUG: folder /Volumes/EFI already exists"
+	#else
+		#echo "DEBUG: folder /Volumes/EFI already exists"
 	fi
 
 	#if the EFI system partition was selected then
@@ -48,12 +48,14 @@ if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 
 	if [ ${espformat} = 1 ]; then
 
-		echo "Executing command: mount_hfs ${targetDevice} ${targetVolume}"
-		mount_hfs "${targetDevice}" "${targetVolume}"
+		#echo "Executing command: mount_hfs ${targetDevice} ${targetVolume}"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Mounting ${targetDevice} as ${selectedDestination}"
+		mount_hfs "${targetDevice}" "${selectedDestination}"
 	fi
 	if [ ${espformat} = 2 ]; then
 		[ -d "${selectedDestination}" ] || mkdir -p "${selectedDestination}"
-		echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${selectedDestination}"
+		#echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${selectedDestination}"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Mounting ${targetDevice} as ${selectedDestination}"
 		mount_msdos -u 0 -g 0 "${targetDevice}" "${selectedDestination}"
 	fi
 
