@@ -116,9 +116,11 @@ if [ $numSlices -gt 1 ]; then
 		if [ $stageExistence == 3 ] && [ $i -ne $sliceNumber ]; then
 			#echo "DEBUG: STOP: There is already an existing Chameleon installation on $targetDiskRaw"
 			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: There is already an existing Chameleon installation on $targetDiskRaw."
-			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: You could continue to install to $targetDeviceRaw, but you will have to"
-			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: control which partition is loaded by flagging the required partition active."
-			"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: For now, please proceed by installing Chameleon manually."
+			"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: This is allowed and does work as long as you aren't dual booting Windows"
+			"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: from the same disk and are happy to control which partition is used by"
+			"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: flagging the required partition active. General use doesn't require two"
+			"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: Chameleon installs on the same disk, though might be done by advanced users."
+			"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: If you still want to do this then proceed by installing Chameleon manually."
 			exit 1
 		fi
 	done

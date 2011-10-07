@@ -65,7 +65,7 @@ if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 else
 	#echo "DEBUG: Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${targetVolume}"
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${targetVolume}"
-	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume}."
+	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${targetVolume} on ${targetDevice}."
 fi
 
 #ÊCheck to see if the user wants to hide the boot file

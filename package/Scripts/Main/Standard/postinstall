@@ -29,7 +29,6 @@ scriptDir=$MYLOCATION
 #echo ""
 
 
-
 # Initialise Script Globals
 
 stage0Loader="boot0"
@@ -73,7 +72,7 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 "$scriptDir"InstallLog.sh "${targetVolume}" "Installer version: ${versionNumber} ${revisionNumber}"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Diskutil"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Running Standard postinstall script"
-"$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume}"
+"$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume} on ${targetDevice}"
 
 
 # Double check we can see the selected partition and it's of the right type.
