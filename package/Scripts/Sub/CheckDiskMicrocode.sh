@@ -75,7 +75,7 @@ if [ $( echo "${mbr437}" | awk -F0 '{print NF-1}' ) != 874 ]; then
 		# Script CheckDiskSignature.sh returned 1 if a Windows installation was found
 		if [ "$diskSigCheck" = "1" ]; then
 			#echo "DEBUG: Found existing Windows installation so will replace stage 0 loader with boot0md"
-			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0 with boot0md as Windows is on target disk."
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Will replace boot0 with boot0md (boot0workV2) as Windows is on target disk."
 			exit 0
 		fi
 		exit 1
