@@ -54,67 +54,16 @@
 ;   - if not found, itarates over drives again and searches for active partition and
 ;     loads from it
 ;
-; dmazar: 19/7/2011
-; Searching for bootable partition works in 3 passes now:
-;
-; - Pass1:
-;     - for the boot drive only:
-;         - searches MBR partition table for an active HSF+ bootable partition and boots it
-;         - if not found and disk is actually GPT, then searches for the first HFS+ bootable
-;           partition (or EFI with boot1f32) in the GPT array and boots it
-;         - if still not found, then continues with Pass2
-;
-; - Pass2:
-;     - iterates over all drives and for each drive:
-;         - searches MBR partition table for the first HSF+ bootable partition and boots it
-;         - if not found and disk is actually GPT, then searches for the first HFS+ bootable
-;           partition (or EFI with boot1f32) in the GPT array and boots it
-;         - if still not found, then continues with the next drive
-;     - if all drives are searched and nothing found, then continues with Pass3
-
-; - Pass3:
-;     - iterates over all drives and for each drive:
-;         - searches MBR partition table for the first active bootable partition and boots it
-;         - if not found and disk is actually GPT, then searches for the first HFS+ bootable
-;           partition (or EFI with boot1f32) in the GPT and boots it
-;         - if still not found, then continues with the next drive
-;     - if all drives are searched and nothing found, finishes with "boot0: error"
-;
-; Bootable partition above means a partition with the boot sector signature (0xAA55)
-; at the end of the partition boot sector.
-; Booting partition means loading partition boot sector and passing control to partition
-; boot loader (for example boot1h).
-; Drives are searched in the order defined in the BIOS. Drive which is selected as the boot drive
-; is searched first.
-;
-; If compiled with DEBUG=1 gives debug output:
-;     P - starting new pass
-;     D - starting disk scanning: MBR and then GPT
-;     p - checking MBR partition entry
-;     t - testing MBR partition
-;     l - MBR or GPT partition satisfies conditions - loading partition boot sector
-;     G - found GPT
-;     + - stage 1 booter loaded, press a key to continue
-;     E - error
-;
 
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-;DEBUG				EQU  CONFIG_BOOT0_DEBUG
-DEBUG				EQU  0
-NOT_USED			EQU  0				; exclude print_hex - no space for it 
+DEBUG				EQU  CONFIG_BOOT0_DEBUG
 
 ;
-; Verbose - write boot0 messages
-; No space for verbose and debug in the same time
+; Set to 1 to enable verbose mode
 ;
-;VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
-%if DEBUG
-VERBOSE				EQU  0
-%else
-VERBOSE				EQU  1
-%endif
+VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
 
 ;
 ; Various constants.
@@ -166,10 +115,6 @@ kDriveNumber		EQU  0x00
 %else
 kDriveNumber		EQU  0x80
 %endif
-
-kPass1				EQU  3				; Pass1 
-kPass2				EQU  2				; Pass2 
-kPass3				EQU  1				; Pass3 
 
 ;
 ; Format of fdisk partition entry.
@@ -230,27 +175,15 @@ kPass3				EQU  1				; Pass3
     call  print_char
 %endmacro
 
-%macro DebugPauseMacro 0
-    call  getc
-%endmacro
-
-%macro LogStringMacro 1
+%macro LogString 1
     mov   di, %1
     call  log_string
 %endmacro
 
 %if DEBUG
 %define DebugChar(x)  DebugCharMacro x
-%define DebugPause  DebugPauseMacro
 %else
 %define DebugChar(x)
-%define DebugPause
-%endif
-
-%if VERBOSE
-%define LogString(x)  LogStringMacro x
-%else
-%define LogString(x)
 %endif
 
 ;--------------------------------------------------------------------------
@@ -296,19 +229,20 @@ start:
 ;
 start_reloc:
 
-	;
-	; BH is pass counter
-	; Pass1 BH=3, Pass2 BH=2, Pass3 BH=1
-	;
-    mov		bh, kPass1				; BH = 3. Pass1
+	push	dx						; save dl (boot drive) for second pass.
+									; will stay on stack if booter loaded in first pass.
+									; this should not be a problem
+    mov		bh, 1					; BH = 1. two pass scanning (active or hfs partition).
+									; actuall use of it (scanning) is in find_boot
 
-pass_loop:
+scan_drives:
 
-	DebugChar('P')					; starting new pass
-	push	dx						; save dl (boot drive) for next pass
-	
-	
-.scan_drive:
+	DebugChar('>')
+
+%if DEBUG
+    mov     al, dl
+    call    print_hex
+%endif
 
     ;
     ; Since this code may not always reside in the MBR, always start by
@@ -322,10 +256,8 @@ pass_loop:
     mov     bx, kMBRBuffer			; MBR load address
     call    load
 	pop		bx						; restore BH
-    jc      .next_pass				; MBR load error - normally because we scanned all drives
+    jc      .mbr_load_error			; MBR load error - normally because we scanned all drives
 
-	DebugChar('D')					; starting disk scanning
-	
     ;
     ; Look for the booter partition in the MBR partition table,
     ; which is at offset kMBRPartTable.
@@ -333,34 +265,27 @@ pass_loop:
     mov     si, kMBRPartTable		; pointer to partition table
     call    find_boot				; will not return on success
 	
-	; if returns - booter partition is not found
-	
-	; skip scanning of all drives in Pass1
-	cmp		bh, kPass1
-	je		.next_pass
-	
+	; if returns - booter partition not found
 	; try next drive
-	; if next drive does not exists - will break on the MBR load error above
+	; if next drive does not exists - will break on above MBR load error
 	inc		dl
-	jmp		short .scan_drive
+	jmp		scan_drives
 	
 
-.next_pass:
-	; all drives scanned - move to next pass
+.mbr_load_error:
+	; all drives scanned - see if we need to run second pass
 	pop		dx						; restore orig boot drive
 	dec		bh						; decrement scan pass counter
-	jnz		pass_loop				; if not zero - exec next pass
+	jz		scan_drives				; if zero - run seccond pass
 	
-	; we ran all passes - nothing found - error
+	; we ran two passes - nothing found - error
 	
 error:
-    DebugChar('E')
-    DebugPause
     LogString(boot_error_str)
 
 hang:
     hlt
-    jmp     short hang
+    jmp     hang
 
 
 ;--------------------------------------------------------------------------
@@ -369,7 +294,7 @@ hang:
 ; Arguments:
 ;   DL = drive number (0x80 + unit number)
 ;   SI = pointer to fdisk partition table.
-;   BH = pass counter
+;   BH = pass counter (1=first pass, 0=second pass)
 ;
 ; Clobber list:
 ;   EAX, BX, EBP
@@ -391,7 +316,15 @@ find_boot:
 
 .loop:
 
-	DebugChar('p')									; checking partition entry
+    ;
+    ; First scan through the partition table looking for the active
+    ; partition.
+    ;
+%if DEBUG
+    mov     al, [si + part.type] 	   ; print partition type
+    call    print_hex
+%endif
+
     mov	    eax, [si + part.lba]					; save starting LBA of current 
     mov	    [my_lba], eax							; MBR partition entry for read_lba function
     cmp     BYTE [si + part.type], 0				; unused partition?
@@ -405,42 +338,27 @@ find_boot:
     mov	    bl, 1									; Assume we can deal with GPT but try to scan
 					    							; later if not found any other bootable partitions.
 
-	;
-	; The following code between .testPass and .tryToBoot performs checking for 3 passes: 
-	; Pass1 (BH=3) if (partition is HFS+ and active) then { DH=1; call loadBootSector} 
-	; Pass2 (BH=2) if (partition is HFS+) then { DH=1; call loadBootSector}
-	; Pass3 (BH=1) if (partition is active) then { DH=0; call loadBootSector}
-	;
-	; BH is Pass counter
-	; DH is argument to loadBootSector
-	;  = 0 - skip HFS+ partition signature check
-	;  = 1 - check for HFS+ partition signature
-	; 
-	; Code may be harder to read because I tried to optimized it for minimum size.
-	;
-													
 .testPass:
-	DebugChar('t')									; testing partition
-    xor		dh, dh               					; DH=0 This will be used in Pass3 (partition is active, not HFS+).
-    												
-    cmp	    bh, kPass3								; If this is Pass3 (BH=1)
-    je	    .checkActive							; check for active flag only.
+    cmp	    bh, 1
+    jne	    .Pass2
 
-.checkHFS:
-													; We are in Pass1 (BH=3) or Pass2 (BH=2).
-  	inc		dh	                					; DH=1
-    cmp	    BYTE [si + part.type], kPartTypeHFS		; Check for a HFS+ partition.
+.Pass1:
+    cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 1 we're going to find a HFS+ partition
+    ; equipped with boot1h in its boot record
+    ; regardless if it's active or not.
     jne     .continue
+    mov		dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
 
-    cmp	    bh, kPass2								; It's HFS+. That's enough checking for Pass2,
-    je	    .tryToBoot								; so try to boot (with DH=1)
-    												; Pass1 needs active flag check also ...
+    jmp     .tryToBoot
 
-.checkActive:
-													; We are in Pass1 or Pass3
-    cmp     BYTE [si + part.bootid], kPartActive	; Check if partition is Active
+.Pass2:    
+    cmp     BYTE [si + part.bootid], kPartActive	; In pass 2 we are walking on the standard path
+    ; by trying to hop on the active partition.
     jne     .continue
+    xor		dh, dh               					; Argument for loadBootSector to skip HFS+ partition
+    ; signature check.
 
+    DebugChar('*')
 
     ;
     ; Found boot partition, read boot sector to memory.
@@ -475,10 +393,11 @@ find_boot:
     ;
 initBootLoader:    
 
-    DebugChar('+')
-    DebugPause
+DebugChar('J')
 
+%if VERBOSE
     LogString(done_str)
+%endif
 
     jmp     kBoot0LoadAddr
 
@@ -496,10 +415,8 @@ checkGPT:
     jne	    .exit								; not found. Giving up.
     cmp	    DWORD [di + 4], kGPTSignatureHigh   ; looking for 'PART'
     jne	    .exit								; not found. Giving up indeed.
-
-    DebugChar('G')								; found GPT
     mov	    si, di
-    
+
     ;
     ; Loading GUID Partition Table Array
     ;
@@ -530,8 +447,7 @@ checkGPT:
     call    load					; read GPT Array
     pop	    si						; SI = address of GPT Array
     pop	    bx						; BX = size of GUID Partition Array entry
-    ;jc	    error
-    jc      .exit
+    jc	    error
 
     ;
     ; Walk through GUID Partition Table Array
@@ -541,7 +457,9 @@ checkGPT:
     ; otherwise skip to next partition.
     ;
 
+%if VERBOSE
     LogString(gpt_str)
+%endif
 
 .gpt_loop:
 
@@ -599,21 +517,19 @@ checkGPT:
 loadBootSector:
     pusha
     
-    DebugChar('l')									; loading partition boot sector
-
     mov     al, 3
     mov     bx, kBoot0LoadAddr
     call    load
-    ;jc      error
-    or      dl, dl ; to set flag Z=0
-    jc      .exit
+    jc      error
 
 	or		dh, dh
 	jz		.checkBootSignature
 	
 .checkHFSSignature:
 
+%if VERBOSE
     ;LogString(test_str)			; dmazar: removed to get space
+%endif
 
 	;
 	; Looking for HFSPlus ('H+') or HFSPlus case-sensitive ('HX') signature.
@@ -672,6 +588,7 @@ load:
     pop     cx
     ret
 
+
 ;--------------------------------------------------------------------------
 ; read_lba - Read sectors from a partition using LBA addressing.
 ;
@@ -707,6 +624,12 @@ read_lba:
     ; It pushes 2 bytes with a smaller opcode than if WORD was used
     push    BYTE 16                 ; offset 0-1, packet size
 
+    DebugChar('<')
+%if DEBUG
+    mov  eax, ecx
+    call print_hex
+%endif
+        
     ;
     ; INT13 Func 42 - Extended Read Sectors
     ;
@@ -729,6 +652,8 @@ read_lba:
 
     jnc     .exit
 
+    DebugChar('R')                  ; indicate INT13/F42 error
+
     ;
     ; Issue a disk reset on error.
     ; Should this be changed to Func 0xD to skip the diskette controller
@@ -743,9 +668,7 @@ read_lba:
     popad
     ret
 
-
-%if VERBOSE
-
+    
 ;--------------------------------------------------------------------------
 ; Write a string with 'boot0: ' prefix to the console.
 ;
@@ -792,8 +715,6 @@ print_string:
 .exit:
     ret
 
-%endif ;VERBOSE
-
 
 %if DEBUG
 
@@ -811,15 +732,6 @@ print_char:
     popa
     ret
 
-getc:
-    pusha
-    mov    ah, 0
-    int    0x16
-    popa
-    ret
-%endif ;DEBUG
-	
-%if NOT_USED
 
 ;--------------------------------------------------------------------------
 ; Write the 4-byte value to the console in hex.
@@ -858,22 +770,25 @@ print_nibble:
     call    print_char
     ret
 
-%endif ; NOT_USED
-
-
-
-%if VERBOSE
+getc:
+    pusha
+    mov    ah, 0
+    int    0x16
+    popa
+    ret
+%endif ;DEBUG
+	
 
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
-log_title_str		db  10, 13, 'boot0:', 0
+log_title_str		db  10, 13, 'boot0: ', 0
 boot_error_str   	db  'error', 0
 
+%if VERBOSE
 gpt_str			db  'GPT', 0
 ;test_str		db  'test', 0
 done_str		db  'done', 0
-
 %endif
 
 ;--------------------------------------------------------------------------
