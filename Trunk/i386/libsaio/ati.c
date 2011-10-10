@@ -540,11 +540,11 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x30011787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
 	{ 0x68F9,	0x30021787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
-	
+
 	{ 0x68F9,	0x301117AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x301217AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x301317AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
-	
+
 	/* Northen Islands */
 	{ 0x6718,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
@@ -593,7 +593,7 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6760,	0x04CC1028,	CHIP_FAMILY_RV730,		"AMD Radeon HD 6490M",				kNull		},
 	{ 0x6760,	0x1CB21043, CHIP_FAMILY_RV730,		"AMD Radeon HD 6470M",				kNull		},
-
+	{ 0x6760,	0x167D103C, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6470M",				kNull		}, // ErmaC no tested
 	{ 0x6760,	0x1656103C, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6490M",				kNull		}, // ErmaC no tested
 
 	{ 0x6779,	0x64501092,	CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
