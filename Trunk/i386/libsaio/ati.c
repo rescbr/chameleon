@@ -44,7 +44,9 @@ typedef enum {
 	CHIP_FAMILY_RV710,
 	CHIP_FAMILY_RV730,
 	CHIP_FAMILY_RV740,
+	CHIP_FAMILY_RV772,
 	CHIP_FAMILY_RV770,
+	CHIP_FAMILY_RV790,
 	/* Evergreen */
 	CHIP_FAMILY_CEDAR,
 	CHIP_FAMILY_CYPRESS,
@@ -78,7 +80,9 @@ static const char *chip_family_name[] = {
 	"RV710",
 	"RV730",
 	"RV740",
+	"RV772",
 	"RV770",
+	"RV790",
 	/* Evergreen */
 	"Cedar",
 	"Cypress",
@@ -550,6 +554,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 	
 	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+
+	{ 0x6720,	0x04BA1028, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970m",				kElodea		}, // ErmaC no tested
 	
 	{ 0x6738,	0x00D01002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	{ 0x6738,	0x21FA1002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
@@ -574,7 +580,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0xE177174B, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
 	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
-	
+
+	{ 0x6741,	0x04891025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		}, // ErmaC no tested
 	{ 0x6741,	0x050E1025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
 	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
 	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		},

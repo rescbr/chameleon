@@ -92,7 +92,7 @@ if [ $numSlices -gt 1 ]; then
 
 		# Check for existing stage 0 boot file from CheckDiskMicrocode.sh script
 		stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
-		if [ "${stage0type}" == "0b807c" ] || [ "${stage0type}" == "0a803c" ] || [ "${stage0type}" == "ee7505" ]; then
+		if [ "${stage0type}" == "0b807c" ] || [ "${stage0type}" == "0a803c" ] || [ "${stage0type}" == "ee7505" ] || [ "${stage0type}" == "742b80" ]; then
 			#echo "DEBUG: boot0 found on $targetDisk"
 			(( stageExistence++ ))
 		fi

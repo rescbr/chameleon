@@ -33,7 +33,7 @@
 
 	function volCheckScript()
 	{	
-		system.log('volCheckScript: Passed.');
+		system.log('volCheckScript: Failed.');
 		return true;
 	}
 

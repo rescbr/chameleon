@@ -122,11 +122,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	###############################
 	# Supported Modules           #
 	###############################
-	# AMDGraphicsEnabler.dylib    #
-	# ATiGraphicsEnabler.dylib    #
-	# IntelGraphicsEnabler.dylib  #
 	# klibc.dylib                 #
-	# NVIDIAGraphicsEnabler.dylib #
 	# Resolution.dylib            #
 	# uClibcxx.dylib              #
 	# Keylayout.dylib             #
@@ -172,42 +168,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			ditto --noextattr --noqtn ${1%/*}/i386/modules/Keylayout.dylib ${1}/Keylayout/Root
 			echo "	[BUILD] Keylayout "
 			buildpackage "${1}/Keylayout" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-		}
-		fi
-# -
-		if [ -e ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ]; then
-		{
-			mkdir -p ${1}/AMDGraphicsEnabler/Root
-			ditto --noextattr --noqtn ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ${1}/AMDGraphicsEnabler/Root
-			echo "	[BUILD] AMDGraphicsEnabler "
-			buildpackage "${1}/AMDGraphicsEnabler" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-		}
-		fi
-# -
-		if [ -e ${1%/*}/i386/modules/ATiGraphicsEnabler.dylib ]; then
-		{
-			mkdir -p ${1}/ATiGraphicsEnabler/Root
-			ditto --noextattr --noqtn ${1%/*}/i386/modules/ATiGraphicsEnabler.dylib ${1}/ATiGraphicsEnabler/Root
-			echo "	[BUILD] ATiGraphicsEnabler "
-			buildpackage "${1}/ATiGraphicsEnabler" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-		}
-		fi
-# -
-		if [ -e ${1%/*}/i386/modules/IntelGraphicsEnabler.dylib ]; then
-		{
-			mkdir -p ${1}/IntelGraphicsEnabler/Root
-			ditto --noextattr --noqtn ${1%/*}/i386/modules/IntelGraphicsEnabler.dylib ${1}/IntelGraphicsEnabler/Root
-			echo "	[BUILD] IntelGraphicsEnabler "
-			buildpackage "${1}/IntelGraphicsEnabler" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-		}
-		fi
-# -
-		if [ -e ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ]; then
-		{
-			mkdir -p ${1}/NVIDIAGraphicsEnabler/Root
-			ditto --noextattr --noqtn ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ${1}/NVIDIAGraphicsEnabler/Root
-			echo "	[BUILD] NVIDIAGraphicsEnabler "
-			buildpackage "${1}/NVIDIAGraphicsEnabler" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
 		}
 		fi
 
