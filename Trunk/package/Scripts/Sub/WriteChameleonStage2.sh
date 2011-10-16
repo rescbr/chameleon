@@ -36,13 +36,13 @@ fi
 if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 	#echo "DEBUG: EFI install chosen"
 
-	if [ ! -d "${selectedDestination}" ]; then
+	if [ ! -e "${selectedDestination}" ]; then
 		#echo "DEBUG: Executing Command: mkdir -p ${selectedDestination}"
-		mkdir -p "${targetVolume}"
+		mkdir -p "${selectedDestination}"
 	#else
 		#echo "DEBUG: folder /Volumes/EFI already exists"
 	fi
-
+	
 	#if the EFI system partition was selected then
 	# mount '/Volumes/EFI' with the correct format type
 

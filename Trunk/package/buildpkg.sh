@@ -186,7 +186,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		fi
 
 		((xmlindent--))
-		outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
+		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
 	}
 	else
 	{
@@ -194,6 +194,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	}
 	fi
 # End build Modules packages
+
 
 # build Extras package
 	# build options packages

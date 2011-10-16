@@ -50,8 +50,8 @@ if [ $( echo "${mbr437}" | awk -F0 '{print NF-1}' ) != 874 ]; then
 
 	# See if a Chameleon stage0 boot file already exists
 
-	# Note: The checks for Boot0 and Boot0hfs assume the code stays the same.
-	# if the code changes then the hex values 0b807c, 0a803c and ee7505 used for matching
+	# Note: The checks for Boot0, Boot0hfs, Boot0md and Boot0md (dmazar's Boot0workV2) assume the code stays the same.
+	# if the code changes then the hex values 0b807c, 0a803c, ee7505 and 742b80 used for matching
 	# need to be checked to see if they are the same or not.
 
 	stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )

@@ -76,10 +76,9 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 
 
 # Double check we can see the selected partition and it's of the right type.
-# Now also check for another existing Chameleon installation on the same disk.
 # If the following script finds anything, it returns 1 to indicate failure.
 
-"$scriptDir"CheckProceed.sh "${targetDisk}" "${targetDeviceRaw}" "${targetVolume}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+"$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 returnValue=$?
 if [ ${returnValue} = 0 ]; then
 	# OK to proceed
@@ -156,21 +155,29 @@ if [ ${returnValue} = 0 ]; then
 				"$scriptDir"InstallLog.sh "${targetVolume}" "Stage 0 loader not written to ${targetDisk}."
 			fi
 
-			# Write the stage 1 loader to the partition boot sector
-			"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${3}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
+			# Now also check for another existing Chameleon installation on the same disk.
+			# If the following script finds anything, it returns 1 to indicate failure.
+			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+			returnValue=$?
+			if [ ${returnValue} = 0 ]; then
+				# OK to proceed
 
-			# Write the stage 2 loader to the root of the selected partition
-			"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+				# Write the stage 1 loader to the partition boot sector
+				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${3}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
 
-			# Append a line break to the installer log
-			"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+				# Write the stage 2 loader to the root of the selected partition
+				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
-			# Set the active partition ONLY if Windows is not installed
-			"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+
+				# Set the active partition ONLY if Windows is not installed
+				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
+			else
+        			echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
+			fi
 		fi
 	fi
-else
-    echo "Stop" >"${targetVolume}"/.ChameleonExists 
 fi
 
 "$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
