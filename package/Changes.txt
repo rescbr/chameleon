@@ -1,3 +1,7 @@
+- Add code to detect and make necessary changes to avoid possibility of a b1f:error or boot1:error should the user decide to install a secondary boot partition.
+
+- Fix bug installing to /Volumes/EFI
+
 - Add crazybirdy's Chinese translation to zh-CN and zh-TW resources.
 
 - Add dmaazar's boot0workV2 changes to ../i386/boot0/boot0md.s.

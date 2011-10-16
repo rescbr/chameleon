@@ -42,7 +42,7 @@ if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
 	#else
 		#echo "DEBUG: folder /Volumes/EFI already exists"
 	fi
-
+	
 	#if the EFI system partition was selected then
 	# mount '/Volumes/EFI' with the correct format type
 
