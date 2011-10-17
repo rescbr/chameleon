@@ -1,3 +1,5 @@
+- Set exclusive 'None' option to default choice.
+
 - Add code to detect and make necessary changes to avoid possibility of a b1f:error or boot1:error should the user decide to install a secondary boot partition.
 
 - Fix bug installing to /Volumes/EFI

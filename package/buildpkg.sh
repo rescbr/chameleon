@@ -108,7 +108,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
-        buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+        buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
@@ -120,13 +120,13 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
 		echo "	[BUILD] EFI "
-		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
 
 	# build reset choice package 
 		mkdir -p ${1}/noboot/Root
 		echo "	[BUILD] Reset choice "
-		buildpackage "${1}/noboot" "/$chamTemp" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
+		buildpackage "${1}/noboot" "/$chamTemp" "" "selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
 	# End build reset choice package 
 
     ((xmlindent--))
@@ -270,7 +270,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			done
 			
 			# to indicate exclusive option, call buildoptionalsettings with the 2nd parameter set to 1 .
-			buildoptionalsettings "$1" "0" "keylayout"
+			buildoptionalsettings "$1" "1" "keylayout"
 			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
@@ -412,7 +412,15 @@ buildoptionalsettings()
 				fi
 			done
 			x="${x}${stringEnd}"
-			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\" ${x}" >/dev/null 2>&1
+
+			# First exclusive option is the 'no choice' option, so let's make that selected by default.
+			if [ $c = 0 ]; then
+				initialChoice="true"
+			else
+				initialChoice="false"
+			fi
+
+			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"${initialChoice}\" ${x}" >/dev/null 2>&1
 		else
 			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 		fi
