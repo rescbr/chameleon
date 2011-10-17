@@ -123,9 +123,8 @@ distclean-local:
 
 pkg installer: all
 	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
-#	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
 	@echo "\t[ZIP] ${DISTFILE}.pkg"
-	@ditto -c -k --sequesterRsrc ${DISTFILE}.pkg ${DISTFILE}.pkg.zip
+	@ditto -c -k --sequesterRsrc ${DISTFILE}.pkg ${DISTFILE}.zip
 	@rm -r ${DISTFILE}.pkg
 
 .PHONY: config
