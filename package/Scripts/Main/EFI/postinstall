@@ -123,27 +123,24 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 
 
 			# check the format of the selected partition.
-			# the following script returns 1 if HFS
-			# the following script returns 2 if MSDOS
-			# the following script returns 0 if nothing - **** the script shouldn't continue here??? as the partition is not formatted as either HFS or msdos??? ****
+			# result should be either hfs or msdos
+			# Should really check to make sure!
 
-			"$scriptDir"CheckFormat.sh "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
-			espformat=$?
-
+			targetFormat=$( fstyp "$targetDevice" )
+			
 
 			# Determine the partition scheme of the selected disk
 			# is it GPT or a hybrid GPT/MBR
 
 			"$scriptDir"CheckPartitionScheme.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
-
-			# Unmount ALL mounted volumes named EFI
-			# the following script returns 0 if it succeeds
-			# the following script returns 1 if it fails to un-mount any EFI volume
-
-			"$scriptDir"UnMountEFIvolumes.sh  "${targetVolumeChosenByUser}" "${scriptDir}"
+			# Now also check for another existing Chameleon installation on the same disk.
+			# This also unmounts all volumes named EFI and then mounts the EFI system partition.
+			# If the following script finds anything, it returns 1 to indicate failure.
+			# It returns 2 to indicate failure to unmount any Volumes named "EFI"
+			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolumeChosenByUser}" "${partitiontable}" "${scriptDir}"
 			returnValue=$?
-			if [ ${returnValue} = 0 ]; then
+			if [ ${returnValue} = 0 ] && [ ${returnValue} -ne 2 ]; then
 				# OK to proceed
 
 				# Append a LineBreak to the installer log
@@ -157,27 +154,19 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
 				fi
 
-				# Now also check for another existing Chameleon installation on the same disk.
-				# If the following script finds anything, it returns 1 to indicate failure.
-				"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
-				returnValue=$?
-				if [ ${returnValue} = 0 ]; then
-					# OK to proceed
+				# Write the stage 1 loader to the partition boot sector
+				"$scriptDir"WriteChameleonStage1.sh "${targetFormat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
-					# Write the stage 1 loader to the partition boot sector
-					"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
+				# Write the stage 2 loader to the root of the selected partition
+				"$scriptDir"WriteChameleonStage2.sh "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
-					# Write the stage 2 loader to the root of the selected partition
-					"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+				# Append a LineBreak to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
 
-					# Append a LineBreak to the installer log
-					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
-
-					# Set the active partition ONLY if Windows is not installed
-					"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
-				else
-        			echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
-				fi
+				# Set the active partition ONLY if Windows is not installed
+				"$scriptDir"SetActivePartition.sh "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			else
+        		echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
 			fi
 		fi
 	fi
@@ -186,22 +175,8 @@ else
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "ERROR Volume is not on a GPT partitioned disc."
 fi
 
-
-# remove the temporary boot sector files if they exist
-if [ -d /tmp/newbs ]; then
-	echo "Executing command: rm /tmp/newbs"
-	rm /tmp/newbs
-fi
-if [ -d /tmp/origbs ]; then
-	echo "Executing command: rm /tmp/origbs"
-	rm /tmp/origbs
-fi
-
-# Check for mounted volumes named EFI and if found, unmount
-#"$scriptDir"UnMountEFIvolumes.sh - ***** commented out to allow the boot option scripts to function ****
-
-# Create temporary file on target volume to notify
-# boot option scripts than EFI (ESP) option was chosen
+# Create temporary file on target volume to notify Postinstall
+# script, boot option code, that EFI (ESP) option was chosen
 echo "EFI" >"${targetVolumeChosenByUser}"/.ChameleonEFI 
 
 "$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"

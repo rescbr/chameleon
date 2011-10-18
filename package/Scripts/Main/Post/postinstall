@@ -183,22 +183,10 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         fi
     fi
     
-    if [ -f "$dest_vol"/.ChameleonEFI ]; then
-		# unmount /Volumes/EFI
-		# Count of 5 exists incase for some reason /Volumes/EFI fails
-		# be unmounted in which case the loop would run forever.
-		attempts=1
-		while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
-			echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
-			"$scriptDir"InstallLog.sh "${dest_vol}" "Find and unmount any volume named 'EFI':"
-			"$scriptDir"InstallLog.sh "${dest_vol}" "$( df | grep EFI | awk '{print $1}' )"
-			umount -f $( df | grep EFI | awk '{print $1}' )
-			(( attempts++ ))	
-		done
-    fi
+	# Unmount ALL mounted volumes named EFI
+	"$scriptDir"UnMountEFIvolumes.sh "${dest_vol}" "${scriptDir}"
 else
-    #echo "Removing /.ChameleonExists file"
-    "$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 4"
+    cleanUp="${cleanUp},0"
     rm "$dest_vol"/.ChameleonExists
 fi
 
@@ -206,25 +194,42 @@ fi
 # Cleanup
 # ---------------------------------------------
 
+# remove any temporary boot sector files if they exist
+if [ -d /tmp/newbs ]; then
+	cleanUp="${cleanUp},1a"
+	rm /tmp/newbs
+fi
+if [ -d /tmp/origbs ]; then
+	cleanUp="${cleanUp},1b"
+	rm /tmp/origbs
+fi
+if [ -d /tmp/newBootSector ]; then
+	cleanUp="${cleanUp},1c"
+	rm /tmp/newbs
+fi
+if [ -d /tmp/originalBootSector ]; then
+	cleanUp="${cleanUp},1d"
+	rm /tmp/origbs
+fi
+
 # delete the temporary Chameleon folder
 if [ -e "$chamTemp" ]; then
-	#echo "Removing $chamTemp directory"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 1"
+	cleanUp="${cleanUp},2"
 	rm -rf "$chamTemp"
 fi
 
 # Remove /.ChameleonEFI file
 if [ -f "$dest_vol"/.ChameleonEFI ]; then
-   	#echo "Removing /.ChameleonEFI file"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 2"
-    	rm "$dest_vol"/.ChameleonEFI
+	cleanUp="${cleanUp},3"
+   	rm "$dest_vol"/.ChameleonEFI
 fi
 
 # Remove /.ChameleonLogFlag file
 if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
-	#echo "Removing /.ChameleonLogFlag file"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup 3"
+	cleanUp="${cleanUp},4"
 
+	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup: ${cleanUp}"
+	
 	# we have to add the final install log messages before
 	# deleting /.ChameleonLogFlag.
 	"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"

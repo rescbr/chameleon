@@ -4,25 +4,29 @@ echo "==============================================="
 echo "Check Previous Chameleon: Will there be problems?"
 echo "***********************************************"
 
-# Checks the selected volume is present and the disk is partitioned
-# Now also check for another existing Chameleon installation on the same disk.
+# Checks for another existing Chameleon installation on the same disk
+# and tries to make sure the user doesn't end up with an un-bootable
+# system due to having installed Chameleon previously elsewhere.
 
 # Receives targetDisk: for example, /dev/disk3.
 # Receives targetDeviceRaw: for example, /dev/rdisk3s1.
 # Receives targetDevice: Stores device number, for example /dev/disk2s1.
 # Receives installerVolume: Volume to write the installer log to.
+# Receives partitiontable: for example, GUID_partition_scheme
 # Receives scriptDir: The location of the main script dir.
 
-if [ "$#" -eq 5 ]; then
+if [ "$#" -eq 6 ]; then
 	targetDisk="$1"
 	targetDeviceRaw="$2"
 	targetDevice="$3"
 	installerVolume="$4"
-	scriptDir="$5"
+	partitiontable="$5"
+	scriptDir="$6"
 	echo "DEBUG: passed argument for targetDisk = $targetDisk"
 	echo "DEBUG: passed argument for targetDeviceRaw = $targetDeviceRaw"
 	echo "DEBUG: passed argument for targetDevice = $targetDevice"
 	echo "DEBUG: passed argument for installerVolume = $installerVolume"
+	echo "DEBUG: passed argument for partitiontable = $partitiontable"
 	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed"
@@ -44,7 +48,45 @@ numSlices=$(( $( diskutil list | grep $( echo ${targetDisk#/dev/} ) | sed -n '$=
 
 # Only check the disk for Chameleon installations if there is more than one partition.
 if [ $numSlices -gt 1 ]; then 
-		
+
+	# If a GPT is used then we are going to have the check the EFI system partition
+	# for the stage 2 'boot' file. As this script is called from the Main EFI
+	# postinstall script, so lets mount the EFI system partition here instead.
+
+	if [ "${partitiontable}" = "GUID_partition_scheme" ]; then
+
+		# Unmount ALL mounted volumes named EFI
+		# the following script returns 0 if it succeeds
+		# the following script returns 1 if it fails to un-mount any EFI volume
+		"$scriptDir"UnMountEFIvolumes.sh "${installerVolume}" "${scriptDir}"
+		returnValue=$?
+		if [ ${returnValue} = 0 ]; then
+			# OK to proceed
+
+			if [ ! -e "/Volumes/EFI" ]; then
+				#echo "DEBUG: Executing Command: mkdir -p ${/Volumes/EFI}"
+				mkdir -p "/Volumes/EFI"
+			#else
+				#echo "DEBUG: folder /Volumes/EFI already exists"
+			fi
+
+			# Mount '/Volumes/EFI' using the correct format type
+			if [ "$( fstyp "${targetDisk}"s1 | grep hfs )" ]; then
+				#echo "Executing command: mount_hfs ${targetDevice} ${targetVolume}"
+				"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI"
+				mount_hfs "${targetDisk}"s1 "/Volumes/EFI"
+			fi
+			if [ "$( fstyp "${targetDisk}"s1 | grep msdos )" ]; then
+				#echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${/Volumes/EFI}"
+				"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI"
+				mount_msdos -u 0 -g 0 "${targetDisk}"s1 "/Volumes/EFI"
+			fi
+		else
+			# quit out and notify EFI post script not to write Chameleon files.
+			exit 2
+		fi
+	fi
+
 	#Scan all partitions for Chameleon code
 	for (( i=1; i <= $numSlices; i++ ));
 	do
@@ -56,7 +98,7 @@ if [ $numSlices -gt 1 ]; then
 		# Check for existing stage 0 boot file (same code as CheckDiskMicrocode.sh script)
 		stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
 		if [ "${stage0type}" == "0b807c" ] || [ "${stage0type}" == "0a803c" ] || [ "${stage0type}" == "ee7505" ] || [ "${stage0type}" == "742b80" ]; then
-			#echo "DEBUG: boot0 found on $targetDisk"
+			#echo "DEBUG: stage 0 loader found on $targetDisk"
 			(( stageExistence++ ))
 			
 			# While here, check just for either existing boot0hfs, boot0md or boot0md (dmazar's boot0workV2)
@@ -77,65 +119,61 @@ if [ $numSlices -gt 1 ]; then
 			previousExistence="boot1f32"
 		fi
 		
-		# Check for existing stage 2 boot file also
-		# NOTE: This will fail to find /boot on /Volumes/EFI as it won't be mounted!
+		# Check for existing stage 2 boot file.
+		# Include checking the EFI system partition if it exists and is mounted.
 		if [ -e "$( df | grep ${targetDisk}s${i} | awk '{ print $6 }' )"/boot ]; then
 			#echo "DEBUG: boot found on $targetDiskRaw"
 			(( stageExistence++ ))
 		fi
-		
-		#if [ $stageExistence == 3 ] && [ $i -ne $sliceNumber ]; then
-			#echo "DEBUG: STOP: There is already an existing Chameleon installation on $targetDiskRaw"
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "STOP: There is already an existing Chameleon installation on $targetDiskRaw."
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: This is allowed and does work as long as you aren't dual booting Windows"
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: from the same disk and are happy to control which partition is used by"
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: flagging the required partition active. General use doesn't require two"
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: Chameleon installs on the same disk, though might be done by advanced users."
-			#"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: If you still want to do this then proceed by installing Chameleon manually."
-			#exit 1
-		#fi
-			
+					
 		if [ $stageExistence -ge 2 ] && [ "$previousExistence" != "NONE" ] && [ $i -ne $sliceNumber ]; then
 			# There is previous Chameleon stage 1 code on a partition boot sector,
 			# and either a complete or incomplete installation (ie. boot0 or boot are missing).
-			if [ $stageExistence == 3 ]; then
-				"$scriptDir"InstallLog.sh "${installerVolume}" "WARN: There is already an existing Chameleon installation on $targetDiskRaw."
-			else
-				"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: $previousExistence already exists at ${targetDisk}s${i}"
-			fi
 			
-			# This could prove problematic and result in either a b1f:error or boot0:error 
-			# if the following conditions are true:
-			# A) Boot0hfs, Boot0md or Boot0md (dmazar's Boot0workV2) is being used.
-			# B) The previous stage 1 code is on a lower partiton than the one being installed to now.
-						
-			# stage0FirstBootable=1 is used to know if 'A' is true.
-			if [ $stage0FirstBootable == 1 ]; then
-				# i = current slice we're checking, slicenumber = slice trying to install to.
+			if [ $stageExistence == 3 ]; then
+				"$scriptDir"InstallLog.sh "${installerVolume}" "INFO: There is already an existing Chameleon installation on $targetDiskRaw."
 				if [ $i -lt $sliceNumber ]; then
-					"$scriptDir"InstallLog.sh "${installerVolume}" "WARN: Conditions point to you receiving a boot failure"
-					# Fix by making previous paritionboot sector un-bootable
-					# Change Byte 01FExh to 00 (510 decimal)
-					"$scriptDir"InstallLog.sh "${installerVolume}" "---"
-					"$scriptDir"InstallLog.sh "${installerVolume}" "FIX: Make ${targetDisk}s${i} boot sector un-bootable by changing byte 1FEh to 00."
-					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: Any Extra folder you had there will still be there. If you want to use"
-					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: ${targetDisk}s${i} again as your boot partition then re-run this installer"
-					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: selecting it as the target, ONLY choosing the 'Chameleon Bootloader' option"
-					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: and NONE of the other options."
-					"$scriptDir"InstallLog.sh "${installerVolume}" "---"
-					dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
-					cp /tmp/originalBootSector /tmp/newBootSector
-					dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
-					dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
+					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: And that installation will still be used as it's on an earlier partition."
 				else
-					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: but won't interfere as you're installing to an earlier partition."
+					"$scriptDir"InstallLog.sh "${installerVolume}" "INFO: but won't interfere as you're installing to an earlier partition."
 				fi
 			else
-				"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: so select to boot that partition (if used) with active flag."
+				"$scriptDir"InstallLog.sh "${installerVolume}" "INFO: $previousExistence already exists at ${targetDisk}s${i}"
+				
+				# A b1f:error or boot0:error could result if the following conditions are true:
+				# A) Boot0hfs, Boot0md or Boot0md (dmazar's Boot0workV2) is being used.
+				# B) The previous stage 1 code is on a lower partiton than the one being installed to now.
+				# C) boot is missing from that partition.
+						
+				# stage0FirstBootable=1 is used to know if 'A' is true.
+				if [ $stage0FirstBootable == 1 ]; then
+					# i = current slice we're checking, slicenumber = slice trying to install to.
+					if [ $i -lt $sliceNumber ]; then
+						"$scriptDir"InstallLog.sh "${installerVolume}" "WARN: Conditions point to the possibility of a boot failure"
+
+						# Fix by making previous paritionboot sector un-bootable
+						# Change Byte 01FExh to 00 (510 decimal)
+						mesaageToPost="---
+FIX: Make ${targetDisk}s${i} boot sector un-bootable by changing byte 1FEh to 00.
+NOTE: Any Extra folder you had there will still be there. If you want to use
+NOTE: ${targetDisk}s${i} again as your boot partition then re-run this installer
+NOTE: selecting it as the target, ONLY choosing the 'Chameleon Bootloader' option
+NOTE: and NONE of the other options.
+---"
+						"$scriptDir"InstallLog.sh "${installerVolume}" "${mesaageToPost}"
+						dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
+						cp /tmp/originalBootSector /tmp/newBootSector
+						dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
+						dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
+					else
+						"$scriptDir"InstallLog.sh "${installerVolume}" "INFO: but won't interfere as you're installing to an earlier partition."
+					fi
+				else
+					"$scriptDir"InstallLog.sh "${installerVolume}" "NOTE: so select to boot that partition (if used) with active flag."
+				fi
 			fi
 		fi
 	done
-
 #else
 	#echo "DEBUG: Just one slice"
 fi

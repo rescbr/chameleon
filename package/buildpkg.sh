@@ -313,6 +313,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	mkdir -p ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/UnMountEFIvolumes.sh ${1}/Post/Scripts
 	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Post/Scripts/Resources/revision
 	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Post/Scripts/Resources/version
 	echo "	[BUILD] Post "

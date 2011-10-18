@@ -74,6 +74,8 @@ revisionNumber=`cat "${scriptDir}"/Resources/revision`
 "$scriptDir"InstallLog.sh "${targetVolume}" "Running Standard postinstall script"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume} on ${targetDevice}"
 
+# Added from EFI post script as this is now sent to CheckPreviousChameleon.sh
+partitiontable=$( diskutil list ${targetDevice%s*} | sed -n '3p' | awk '{print $2}' )
 
 # Double check we can see the selected partition and it's of the right type.
 # If the following script finds anything, it returns 1 to indicate failure.
@@ -110,13 +112,11 @@ if [ ${returnValue} = 0 ]; then
 
 
 		# check the format of the selected partition.
-		# the following script returns 1 if HFS
-		# the following script returns 2 if MSDOS
-		# the following script returns 0 if nothing
+		# result should be either hfs or msdos
+		# Should really check to make sure!
 
-		"$scriptDir"CheckFormat.sh "${targetDevice}" "${targetVolume}" "${scriptDir}"
-		espformat=$?
-
+		targetFormat=$( fstyp "$targetDevice" )
+		
 
 		# check the partition scheme used for the selected disk.
 		# the following script returns 1 if GPT
@@ -144,35 +144,37 @@ if [ ${returnValue} = 0 ]; then
 		else
 			# Continue if the selected device is not a FAT16 format device
 
-			# Append a line break to the installer log
-			"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
-
-			if [ ${diskupdate} = "0" ]; then
-			
-				# Write the stage 0 loader to the MBR
-				"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolume}" "${scriptDir}"
-			else
-				"$scriptDir"InstallLog.sh "${targetVolume}" "Stage 0 loader not written to ${targetDisk}."
-			fi
-
 			# Now also check for another existing Chameleon installation on the same disk.
 			# If the following script finds anything, it returns 1 to indicate failure.
-			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+			# It returns 2 to indicate failure to unmount any Volumes named "EFI"
+
+			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolume}" "${partitiontable}" "${scriptDir}"
 			returnValue=$?
-			if [ ${returnValue} = 0 ]; then
+			if [ ${returnValue} = 0 ] || [ ${returnValue} = 2 ]; then
 				# OK to proceed
 
+				# Append a line break to the installer log
+				"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+
+				if [ ${diskupdate} = "0" ]; then
+			
+					# Write the stage 0 loader to the MBR
+					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolume}" "${scriptDir}"
+				else
+					"$scriptDir"InstallLog.sh "${targetVolume}" "Stage 0 loader not written to ${targetDisk}."
+				fi
+
 				# Write the stage 1 loader to the partition boot sector
-				"$scriptDir"WriteChameleonStage1.sh "${espformat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${3}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
+				"$scriptDir"WriteChameleonStage1.sh "${targetFormat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${3}" "${targetDeviceRaw}" "${targetVolume}" "${scriptDir}"
 
 				# Write the stage 2 loader to the root of the selected partition
-				"$scriptDir"WriteChameleonStage2.sh "${espformat}" "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
+				"$scriptDir"WriteChameleonStage2.sh "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
 				# Append a line break to the installer log
 				"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 
 				# Set the active partition ONLY if Windows is not installed
-				"$scriptDir"SetActivePartition.sh "${espformat}" "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
+				"$scriptDir"SetActivePartition.sh "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolume}" "${scriptDir}"	
 			else
         			echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
 			fi

@@ -4,9 +4,6 @@ echo "==============================================="
 echo "Write Chameleon Stage 2 Loader:"
 echo "*******************************"
 
-# Writes Chameleon stage 2 loader.
-
-# Receives espformat: 1 for HFS, 2 for MSDOS, 0 for unknown
 # Receives stage2Loader: Name of file - boot
 # Receives selectedDestination: for example, /Volumes/ChameleonBootUSB (or /Volumes/EFI if ESP install).
 # Receives targetDevice: for example, /dev/disk3s1
@@ -14,14 +11,12 @@ echo "*******************************"
 # Receives scriptDir: The location of the main script dir.
 
 
-if [ "$#" -eq 6 ]; then
-	espformat="$1"
-	stage2Loader="$2"
-	selectedDestination="$3"
-	targetDevice="$4"
-	targetVolume="$5"
-	scriptDir="$6"
-	echo "DEBUG: passed argument for espformat = $espformat"
+if [ "$#" -eq 5 ]; then
+	stage2Loader="$1"
+	selectedDestination="$2"
+	targetDevice="$3"
+	targetVolume="$4"
+	scriptDir="$5"
 	echo "DEBUG: passed argument for stage2Loader = $stage2Loader"
 	echo "DEBUG: passed argument for selectedDestination = $selectedDestination"
 	echo "DEBUG: passed argument for targetDevice = $targetDevice"
@@ -34,31 +29,6 @@ fi
 
 # check to see if install to EFI system partition was selected
 if [ "${selectedDestination}" = "/Volumes/EFI" ]; then
-	#echo "DEBUG: EFI install chosen"
-
-	if [ ! -e "${selectedDestination}" ]; then
-		#echo "DEBUG: Executing Command: mkdir -p ${selectedDestination}"
-		mkdir -p "${selectedDestination}"
-	#else
-		#echo "DEBUG: folder /Volumes/EFI already exists"
-	fi
-	
-	#if the EFI system partition was selected then
-	# mount '/Volumes/EFI' with the correct format type
-
-	if [ ${espformat} = 1 ]; then
-
-		#echo "Executing command: mount_hfs ${targetDevice} ${targetVolume}"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Mounting ${targetDevice} as ${selectedDestination}"
-		mount_hfs "${targetDevice}" "${selectedDestination}"
-	fi
-	if [ ${espformat} = 2 ]; then
-		[ -d "${selectedDestination}" ] || mkdir -p "${selectedDestination}"
-		#echo "Executing command: mount_msdos -u 0 -g 0 ${targetDevice} ${selectedDestination}"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Mounting ${targetDevice} as ${selectedDestination}"
-		mount_msdos -u 0 -g 0 "${targetDevice}" "${selectedDestination}"
-	fi
-
 	#echo "DEBUG: Executing command: cp "${targetVolume}"/usr/standalone/i386/${stage2Loader} ${selectedDestination}"
 	cp "${targetVolume}"/usr/standalone/i386/"${stage2Loader}" "${selectedDestination}"
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written boot to ${selectedDestination}."

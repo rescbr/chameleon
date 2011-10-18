@@ -6,7 +6,7 @@ echo "*******************************"
 
 # Writes Chameleon stage 1 loader.
 
-# Receives espformat: 1 for HFS, 2 for MSDOS, 0 for unknown
+# Receives targetFormat: either hfs or msdos
 # Receives stage1LoaderHFS: Name of file - boot1h
 # Receives stage1LoaderFAT: Name of file - boot1f32
 # Receives selectedDestination: for example, /Volumes/USB
@@ -15,14 +15,14 @@ echo "*******************************"
 # Receives scriptDir: The location of the main script dir.
 
 if [ "$#" -eq 7 ]; then
-	espformat="$1"
+	targetFormat="$1"
 	stage1LoaderHFS="$2"
 	stage1LoaderFAT="$3"
 	selectedDestination="$4"
 	targetDeviceRaw="$5"
 	targetVolume="$6"
 	scriptDir="$7"
-	echo "DEBUG: passed argument for espformat = $espformat"
+	echo "DEBUG: passed argument for targetFormat = $targetFormat"
 	echo "DEBUG: passed argument for stage1LoaderHFS = $stage1LoaderHFS"
 	echo "DEBUG: passed argument for stage1LoaderFAT = $stage1LoaderFAT"
 	echo "DEBUG: passed argument for selectedDestination = $selectedDestination"
@@ -34,8 +34,7 @@ else
 	exit 9
 fi
 
-if [ ${espformat} = "1" ]; then
-	# the selected partition is HFS formatted
+if [ ${targetFormat} = "hfs" ]; then
 
 	#echo "DEBUG: Executing command: dd if=${selectedDestination}/usr/standalone/i386/${stage1LoaderHFS} of=${targetDeviceRaw}"
 	dd if="${selectedDestination}"/usr/standalone/i386/${stage1LoaderHFS} of=${targetDeviceRaw}
@@ -43,8 +42,7 @@ if [ ${espformat} = "1" ]; then
 	"$scriptDir"InstallLog.sh "${targetVolume}" "Written ${stage1LoaderHFS} to ${targetDeviceRaw}."
 fi
 
-if [ ${espformat} = "2" ]; then
-	# the selected partition FAT formatted
+if [ ${targetFormat} = "msdos" ]; then
 
 	#echo "DEBUG: Executing command: dd if=${targetDeviceRaw} count=1 bs=512 of=/tmp/origbs"
 	dd if=${targetDeviceRaw} count=1 bs=512 of=/tmp/origbs
