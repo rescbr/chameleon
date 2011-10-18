@@ -1,5 +1,0 @@
-TO DO
-
-* Add theme to org.chameleon.boot.plist? (Do what when more than one installed?)
-* How to control which option is default when using the exclusive setting? I would prefer the 'None' option set as default.
-* Finalise English Localizable.strings, then somehow update all the other languages??
