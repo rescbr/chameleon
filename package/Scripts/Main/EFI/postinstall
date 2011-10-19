@@ -91,6 +91,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 	# Double check we can see the selected partition and it's of the right type.
 	# If the following script finds anything, it returns 1 to indicate failure.
 
+
 	"$scriptDir"CheckProceed.sh "${targetVolume}" "${targetDeviceChosenByUser}" "${targetVolumeChosenByUser}" "${scriptDir}"
 	returnValue=$?
 	if [ ${returnValue} = 0 ]; then
@@ -129,45 +130,45 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 			targetFormat=$( fstyp "$targetDevice" )
 			
 
-			# Determine the partition scheme of the selected disk
-			# is it GPT or a hybrid GPT/MBR
+			# Append a LineBreak to the installer log
+			"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
 
-			"$scriptDir"CheckPartitionScheme.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
-
-			# Now also check for another existing Chameleon installation on the same disk.
-			# This also unmounts all volumes named EFI and then mounts the EFI system partition.
-			# If the following script finds anything, it returns 1 to indicate failure.
-			# It returns 2 to indicate failure to unmount any Volumes named "EFI"
-			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolumeChosenByUser}" "${partitiontable}" "${scriptDir}"
-			returnValue=$?
-			if [ ${returnValue} = 0 ] && [ ${returnValue} -ne 2 ]; then
-				# OK to proceed
-
-				# Append a LineBreak to the installer log
-				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
-
-				if [ ${diskupdate} = "0" ]; then
+			if [ ${diskupdate} = "0" ]; then
 				
-					# Write the stage 0 loader to the MBR
-					"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolumeChosenByUser}" "${scriptDir}"
-				else
-					"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
-				fi
+				# Write the stage 0 loader to the MBR
+				"$scriptDir"WriteChameleonStage0.sh "${diskSigCheck}" "${stage0Loader}" "${stage0LoaderDualBoot}" "${targetDisk}" "${targetResources}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			else
+				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Stage 0 loader not written to ${targetDisk}."
+			fi
 
-				# Write the stage 1 loader to the partition boot sector
-				"$scriptDir"WriteChameleonStage1.sh "${targetFormat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			# Write the stage 1 loader to the partition boot sector
+			"$scriptDir"WriteChameleonStage1.sh "${targetFormat}" "${stage1LoaderHFS}" "${stage1LoaderFAT}" "${targetVolumeChosenByUser}" "${targetDeviceRaw}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
+
+			# Unmount ALL mounted volumes named EFI.
+			# Returns 0=success, 1=fail
+			
+			"$scriptDir"UnMountEFIvolumes.sh "${targetVolumeChosenByUser}" "${scriptDir}"
+			returnValue=$?
+			if [ ${returnValue} = 0 ]; then
+				# OK to proceed
+				
+				# Mount the EFI system partition
+				"$scriptDir"MountESP.sh "${targetDisk}" "${targetVolumeChosenByUser}" "${scriptDir}"
+	
 				# Write the stage 2 loader to the root of the selected partition
 				"$scriptDir"WriteChameleonStage2.sh "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
-				# Append a LineBreak to the installer log
-				"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
+				# Check for another existing Chameleon installation on the same disk
+				"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+			fi	
 
-				# Set the active partition ONLY if Windows is not installed
-				"$scriptDir"SetActivePartition.sh "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
-			else
-        		echo "Stop" >"${targetVolumeChosenByUser}"/.ChameleonExists 
-			fi
+			# Append a LineBreak to the installer log
+			"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "LineBreak"
+
+			# Set the active partition ONLY if Windows is not installed
+			"$scriptDir"SetActivePartition.sh "${diskSigCheck}" "${targetDiskRaw}" "${targetSlice}" "${targetVolumeChosenByUser}" "${scriptDir}"
+
 		fi
 	fi
 else

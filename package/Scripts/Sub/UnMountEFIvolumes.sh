@@ -6,7 +6,7 @@ echo "*****************************"
 
 # loop through and un-mount ALL mounted 'EFI' system partitions - Thanks kizwan
 
-# Receives targetVolumeChosenByUser: Stores original target if EFI install selected.
+# Receives targetVolumeChosenByUser: To write install log to.
 # Receives scriptDir: The location of the main script dir.
 
 if [ "$#" -eq 2 ]; then
@@ -23,14 +23,12 @@ fi
 # be unmounted in which case the loop would run forever.
 attempts=1
 while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
-	#echo "DEBUG: Unmounting $( df | grep EFI | awk '{print $1}' )"
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Volume named 'EFI' is mounted..."
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
 	umount -f $( df | grep EFI | awk '{print $1}' )
 	(( attempts++ ))
 done
 if [ $attempts = 5 ]; then
-	#echo "DEBUG: failed to unmount 'EFI' System Partition."
 	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Failed to unmount 'EFI' System Partition."
 	exit 1
 fi
