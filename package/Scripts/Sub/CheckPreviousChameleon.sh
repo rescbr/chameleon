@@ -55,24 +55,22 @@ if [ $numSlices -gt 1 ]; then
 	"$scriptDir"InstallLog.sh "${installerVolume}" "LineBreak"
 	"$scriptDir"InstallLog.sh "${installerVolume}" "Checking for previous chameleon installations on ${targetDisk#/dev/}"
 
-	# If a GPT is used then we are going to have the check the EFI system partition
-	# for the stage 2 'boot' file so lets mount the EFI system partition.
-	mountESP
-	
 	# Check the disk's MBR for existing stage 0 boot code (code from CheckDiskMicrocode.sh script)
 	stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
 	if [ "${stage0type}" == "0a803c" ] || [ "${stage0type}" == "ee7505" ] || [ "${stage0type}" == "742b80" ]; then
-		(( stagesFound++ ))
 		stage0type=2
 	elif [ "${stage0type}" == "0b807c" ]; then
-		(( stagesFound++ ))
 		stage0type=1
 	fi
 	
 	#Scan all partitions for Chameleon code
 	for (( i=1; i <= $numSlices; i++ ));
 	do
-		stagesFound=0
+		if [ $stage0type == 1 ] || [ $stage0type == 2 ]; then
+			stagesFound=1
+		else
+			stagesFound=0
+		fi
 		stage1Existence="NONE"
 		stage2Existence=0
 		targetDiskRaw=$targetDiskRawNoSlice$i
@@ -147,25 +145,31 @@ NOTE: and NONE of the other options.
 						# /Volumes/EFI needs unmounting before changing partition boot sector
 						if [ $i == 1 ]; then
 							umount /Volumes/EFI
+						else
+							diskutil unmount "${targetDisk}"s${i}
+						fi
 												
-							if [ "$( fstyp "${targetDisk}"s1 | grep hfs )" ]; then
-								#echo "DEBUG: HFS - changing byte 1FEh to 00"
-								dd if=${targetDisk}s${i} count=2 bs=512 of=originalBootSector
-								cp originalBootSector newBootSector
-								dd if="patch" of=newBootSector bs=1 count=1 seek=510 conv=notrunc
-								dd if=newBootSector of=${targetDisk}s${i} count=2 bs=510
-							fi
-							if [ "$( fstyp "${targetDisk}"s1 | grep msdos )" ]; then
-								#echo "DEBUG: MSDOS - changing byte 1FEh to 00"
-								dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
-								cp /tmp/originalBootSector /tmp/newBootSector
-								dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
-								dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
-							fi
+						if [ "$( fstyp "${targetDisk}"s${i} | grep hfs )" ]; then
+							#echo "DEBUG: HFS - changing byte 1FEh to 00"
+							dd if=${targetDisk}s${i} count=2 bs=512 of=originalBootSector
+							cp originalBootSector newBootSector
+							dd if="patch" of=newBootSector bs=1 count=1 seek=510 conv=notrunc
+							dd if=newBootSector of=${targetDisk}s${i} count=2 bs=510
+						fi
+						if [ "$( fstyp "${targetDisk}"s${i} | grep msdos )" ]; then
+							#echo "DEBUG: MSDOS - changing byte 1FEh to 00"
+							dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
+							cp /tmp/originalBootSector /tmp/newBootSector
+							dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
+							dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
+						fi
 						
-							# /Volumes/EFI needs re-mounting so EFI/postinstall script can use it.
-							# Don't check for a GPT as wouldn't have got here if it wasn't
+						# /Volumes/EFI needs re-mounting so EFI/postinstall script can use it.
+						# Don't check for a GPT as wouldn't have got here if it wasn't
+						if [ $i == 1 ]; then
 							"$scriptDir"MountESP.sh "${targetDisk}" "${installerVolume}" "${scriptDir}"
+						else
+							diskutil mount "${targetDisk}"s${i}
 						fi
 						
 					else
