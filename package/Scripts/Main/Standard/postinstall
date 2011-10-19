@@ -162,6 +162,12 @@ if [ ${returnValue} = 0 ]; then
 			# But as it will check /Volumes/EFI for the stage 2 loader,
 			# we need to make sure it's mounted.
 			
+			# Tell the user what's going on.
+			"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "About to check your disk for previous installations"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "which involves checking the EFI system partition if"
+			"$scriptDir"InstallLog.sh "${targetVolume}" "appropriate for this disk."
+			
 			# Unmount ALL mounted volumes named EFI.
 			# Returns 0=success, 1=fail
 			
