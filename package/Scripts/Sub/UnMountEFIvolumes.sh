@@ -24,8 +24,8 @@ fi
 attempts=1
 while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
 	#echo "DEBUG: Unmounting $( df | grep EFI | awk '{print $1}' )"
-	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Find and unmount any volume named 'EFI':"
-	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "$( df | grep EFI | awk '{print $1}' )"
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Volume named 'EFI' is mounted..."
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
 	umount -f $( df | grep EFI | awk '{print $1}' )
 	(( attempts++ ))
 done
