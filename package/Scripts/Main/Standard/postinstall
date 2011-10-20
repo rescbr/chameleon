@@ -67,10 +67,6 @@ echo ""
 
 
 # Write some information to the Install Log
-versionNumber=`cat "${scriptDir}"/Resources/version`
-revisionNumber=`cat "${scriptDir}"/Resources/revision`
-"$scriptDir"InstallLog.sh "${targetVolume}" "Installer version: ${versionNumber} ${revisionNumber}"
-"$scriptDir"InstallLog.sh "${targetVolume}" "Diskutil"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Running Standard postinstall script"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume} on ${targetDevice}"
 

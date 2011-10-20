@@ -224,19 +224,9 @@ if [ -f "$dest_vol"/.ChameleonEFI ]; then
    	rm "$dest_vol"/.ChameleonEFI
 fi
 
-# Remove /.ChameleonLogFlag file
-if [ -f "$dest_vol"/.ChameleonLogFlag ]; then
-	cleanUp="${cleanUp},4"
-
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup: ${cleanUp}"
-	
-	# we have to add the final install log messages before
-	# deleting /.ChameleonLogFlag.
-	"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
-
-	rm "$dest_vol"/.ChameleonLogFlag
-fi
+"$scriptDir"InstallLog.sh "${dest_vol}" "Cleanup: ${cleanUp}"
+"$scriptDir"InstallLog.sh "${dest_vol}" "LineBreak"
+"$scriptDir"InstallLog.sh "${dest_vol}" "Post script complete"
 
 echo "==============================================="
 echo "END - Post Post-Install Script"
