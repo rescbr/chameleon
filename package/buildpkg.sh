@@ -3,13 +3,8 @@
 # $1 Path to store built package
 
 packagesidentity="org.chameleon"
-
 packagename="Chameleon"
-
 pkgroot="${0%/*}"
-
-# blackosx to use /usr/local as a place for temporary files
-# taken from http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard#cite_note-27
 chamTemp="usr/local/chamTemp"
 
 COL_BLACK="\x1b[30;01m"
@@ -22,7 +17,6 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
 stage=${version##*-}
 revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
@@ -491,8 +485,6 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	if [ "${4}" ]; then
 		local choiceoptions="\t\t${4}"
 	fi
-	#choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
-	
 	choices[$((choicescount++))]="\t<choice\n\t\tid=\"${packagename// /}\"\n\t\ttitle=\"${packagename}_title\"\n\t\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' >#${packagename// /}.pkg</pkg-ref>\n\t</choice>\n"	
 	rm -R -f "${1}"
 fi
@@ -575,5 +567,5 @@ makedistribution ()
 
 }
 
-main "${1}" "${2}" "${3}" "${4}" "${5}"
+main "${1}" "${2}" "${3}" "${4}" #"${5}"
 
