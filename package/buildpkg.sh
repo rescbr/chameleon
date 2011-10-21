@@ -99,7 +99,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Main/Standardpostinstall ${1}/Standard/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		echo "	[BUILD] Standard "
@@ -109,7 +109,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Main/ESPpostinstall ${1}/EFI/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		echo "	[BUILD] EFI "
@@ -296,15 +296,14 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 		((xmlindent--))
 		outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
-	# End build theme packages
-# End build Extras package
+	# End build theme packages# End build Extras package
 
 # build post install package
 	echo "================= Post ================="
 	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
-	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Main/postinstall ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/UnMountEFIvolumes.sh ${1}/Post/Scripts
 	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Post/Scripts/Resources/revision
@@ -322,7 +321,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -450,7 +449,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -485,7 +484,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 		local choiceoptions="\t\t${4}"
 	fi
 	choices[$((choicescount++))]="\t<choice\n\t\tid=\"${packagename// /}\"\n\t\ttitle=\"${packagename}_title\"\n\t\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' >#${packagename// /}.pkg</pkg-ref>\n\t</choice>\n"	
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 

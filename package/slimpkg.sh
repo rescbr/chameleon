@@ -83,7 +83,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Main/Standardpostinstall ${1}/Standard/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
@@ -95,7 +95,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Main/ESPpostinstall ${1}/EFI/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
@@ -183,7 +183,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
-	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Main/postinstall ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/UnMountEFIvolumes.sh ${1}/Post/Scripts
 	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Post/Scripts/Resources/revision
