@@ -54,8 +54,6 @@ echo ""
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # build pre install package
-# This is run before any other package - so this could
-# be a good place to initialise the install log???
 	echo "================= Preinstall ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon"

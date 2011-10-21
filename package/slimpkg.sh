@@ -53,6 +53,20 @@ echo ""
 
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
+# build pre install package
+	echo "================= Preinstall ================="
+	((xmlindent++))
+	packagesidentity="org.chameleon"
+	mkdir -p ${1}/Pre/Root
+	mkdir -p ${1}/Pre/Scripts
+	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Pre/Scripts/Resources/revision
+	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Pre/Scripts/Resources/version
+	cp -f ${pkgroot}/Scripts/Main/preinstall ${1}/Pre/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Pre/Scripts
+	echo "	[BUILD] Pre "
+	buildpackage "${1}/Pre" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
+# End build pre install package
+
 # build core package
 	echo "================= Core ================="
 	packagesidentity="org.chameleon"
