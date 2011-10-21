@@ -127,9 +127,15 @@ pkg installer: all
 	@echo "\t[ZIP] ${DISTFILE}.pkg"
 	@ditto -c -k --sequesterRsrc ${DISTFILE}.pkg ${DISTFILE}.zip
 	@rm -r ${DISTFILE}.pkg
+	
+dmg: all
+	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
+	${SRCROOT}/package/builddmg.sh ${SYMROOT}/package;
 
 .PHONY: config
 .PHONY: clean
 .PHONY: image
 .PHONY: pkg
 .PHONY: installer
+.PHONY: dmg
+
