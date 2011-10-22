@@ -85,7 +85,23 @@ echo ""
 	cp -r ${pkgroot}/Configuration/PrefPanel/* ${SRC_FOLDER}/PrefPanel/
 	cp -r ${SYM_ROOT}/i386/* ${SRC_FOLDER}/i386/
 	cp -r ${SYM_ROOT%/*}/artwork/themes/* ${SRC_FOLDER}/Themes/
-	rm -rf ${SRC_FOLDER}`find . -type d -name .svn`
+	#rm -rf ${SRC_FOLDER}`find . -type d -name .svn`
+	
+	# The above line caused problems with svn reporting changes to all
+	# directories in the Chameleon source folder that exist before compiling
+	# svn status would show the following:
+	# ~       Chameleon.xcodeproj
+	# ~       artwork
+	# ~       i386
+	# ~       package
+	# ~       doc
+	# I've changed the code to this for now to get round the problem.
+	# Hopefully someone else can find out why it was happenening.
+	svnFilesToRemove=($( find "${SRC_FOLDER}" -type d -name '.svn'))
+	for (( i = 0 ; i < ${#svnFilesToRemove[@]} ; i++ ))
+	do
+		rm -rf ${svnFilesToRemove[$i]}
+	done
 
 # =======================================
 # 4) Find the size of the folder contents
@@ -215,4 +231,5 @@ fi
 	echo "	===================="
 	echo ""
 #-----
+
 exit 0
