@@ -3,11 +3,8 @@
 # $1 Path to store built package
 
 packagesidentity="org.chameleon"
-
 packagename="Chameleon"
-
 pkgroot="${0%/*}"
-
 chamTemp="usr/local/chamTemp"
 
 COL_BLACK="\x1b[30;01m"
@@ -20,7 +17,6 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
 stage=${version##*-}
 revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
@@ -58,14 +54,15 @@ echo ""
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # build pre install package
-# This is run before any other package - so this could
-# be a good place to initialise the install log???
 	echo "================= Preinstall ================="
 	((xmlindent++))
 	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Pre/Root
 	mkdir -p ${1}/Pre/Scripts
+	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Pre/Scripts/Resources/revision
+	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Pre/Scripts/Resources/version
 	cp -f ${pkgroot}/Scripts/Main/preinstall ${1}/Pre/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Pre/Scripts
 	echo "	[BUILD] Pre "
 	buildpackage "${1}/Pre" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
 # End build pre install package
@@ -100,31 +97,27 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Main/Standardpostinstall ${1}/Standard/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
-		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
-		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
-        buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+        buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Main/ESPpostinstall ${1}/EFI/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
-		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
-		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
 		echo "	[BUILD] EFI "
-		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
 
 	# build reset choice package 
 		mkdir -p ${1}/noboot/Root
 		echo "	[BUILD] Reset choice "
-		buildpackage "${1}/noboot" "/$chamTemp" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
+		buildpackage "${1}/noboot" "/$chamTemp" "" "selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
 	# End build reset choice package 
 
     ((xmlindent--))
@@ -226,7 +219,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		fi
 
 		((xmlindent--))
-		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+		outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
 	}
 	else
 	{
@@ -234,7 +227,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	}
 	fi
 # End build Modules packages
-
 
 # build Extras package
 	# build options packages
@@ -260,7 +252,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			choices[$((choicescount++))]="\t<choice\n\t\tid=\"${builtOptionsList}\"\n\t\ttitle=\"${builtOptionsList}_title\"\n\t\tdescription=\"${builtOptionsList}_description\">\n\t</choice>\n"
 			((xmlindent++))
 			packagesidentity="org.chameleon.options.$builtOptionsList"
-
+			
 			# ------------------------------------------------------
 			# Read boot option file in to an array.
 			# ------------------------------------------------------ 
@@ -309,7 +301,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			done
 			
 			# to indicate exclusive option, call buildoptionalsettings with the 2nd parameter set to 1 .
-			buildoptionalsettings "$1" "0" "keylayout"
+			buildoptionalsettings "$1" "1" "keylayout"
 			
 			((xmlindent--))
 			outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
@@ -342,16 +334,16 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 		((xmlindent--))
 		outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
-	# End build theme packages
-# End build Extras package
+	# End build theme packages# End build Extras package
 
 # build post install package
 	echo "================= Post ================="
 	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
-	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Main/postinstall ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/UnMountEFIvolumes.sh ${1}/Post/Scripts
 	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Post/Scripts/Resources/revision
 	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Post/Scripts/Resources/version
 	echo "	[BUILD] Post "
@@ -367,7 +359,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
 
 # clean up 
 
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 
 }
 
@@ -451,7 +443,15 @@ buildoptionalsettings()
 				fi
 			done
 			x="${x}${stringEnd}"
-			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\" ${x}" >/dev/null 2>&1
+
+			# First exclusive option is the 'no choice' option, so let's make that selected by default.
+			if [ $c = 0 ]; then
+				initialChoice="true"
+			else
+				initialChoice="false"
+			fi
+
+			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"${initialChoice}\" ${x}" >/dev/null 2>&1
 		else
 			buildpackage "${1}/${optionName}" "/$chamTemp/options" "" "start_selected=\"false\"" >/dev/null 2>&1
 		fi
@@ -487,7 +487,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	rm -R -f "${1}/Temp"
+	#rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -521,10 +521,8 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 	if [ "${4}" ]; then
 		local choiceoptions="\t\t${4}"
 	fi
-	#choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
-	
 	choices[$((choicescount++))]="\t<choice\n\t\tid=\"${packagename// /}\"\n\t\ttitle=\"${packagename}_title\"\n\t\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' >#${packagename// /}.pkg</pkg-ref>\n\t</choice>\n"	
-	rm -R -f "${1}"
+	#rm -R -f "${1}"
 fi
 }
 
@@ -605,5 +603,5 @@ makedistribution ()
 
 }
 
-main "${1}" "${2}" "${3}" "${4}" "${5}"
+main "${1}" "${2}" "${3}" "${4}" #"${5}"
 

@@ -30,5 +30,5 @@ GUI:GUI=No
 LegacyLogo:Legacy Logo=Yes
 InstantMenu:Instant Menu=Yes
 QuietBoot:QuietBoot=Yes
-ShowInfo:ShowInfo=No
+ShowInfo:ShowInfo=Yes
 Wait:Wait=Yes

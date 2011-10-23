@@ -6,22 +6,19 @@ echo "*****************************************************"
 
 # Sets partition active if Windows is not installed.
 
-# Receives efiformat: code is 1 for HFS, 2 for MSDOS, 0 for unknown
 # Receives diskSigCheck: code is 1 for a Windows install, 0 for no Windows install
 # Receives targetDiskRaw: for example, /dev/rdisk1
 # Receives targetSlice: for example, 1
 # Receives targetVolume: Volume to install to.
 # Receives scriptDir: The location of the main script dir.
 
-if [ "$#" -eq 6 ]; then
-	efiformat="$1"
-	diskSigCheck="$2"
-	targetDiskRaw="$3"
-	targetSlice="$4"
-	targetVolume="$5"
-	scriptDir="$6"
+if [ "$#" -eq 5 ]; then
+	diskSigCheck="$1"
+	targetDiskRaw="$2"
+	targetSlice="$3"
+	targetVolume="$4"
+	scriptDir="$5"
 
-	echo "DEBUG: passed argument for efiformat = $efiformat"
 	echo "DEBUG: passed argument for diskSigCheck = $diskSigCheck"
 	echo "DEBUG: passed argument for targetDiskRaw = $targetDiskRaw"
 	echo "DEBUG: passed argument for targetSlice = $targetSlice"

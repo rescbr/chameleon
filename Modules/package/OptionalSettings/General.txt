@@ -35,4 +35,3 @@ UHCIreset:UHCIreset=Yes
 UseMemDetect:UseMemDetect=No
 UseKernelCache:UseKernelCache=Yes
 Wake:Wake=Yes
-SkipFTFix:SkipFTFix=Yes

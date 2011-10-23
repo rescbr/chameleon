@@ -101,7 +101,6 @@
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
-#define kSkipFTFix			"SkipFTFix"			/* fake_efi.c */ //For Work around to bypass olegpronin's Facetime fix
 
 #define kUseMemDetect		"UseMemDetect"	    /* platform.c */
 
@@ -148,6 +147,7 @@
  * A global set by boot() to record the device that the booter
  * was loaded from.
  */
+#define ROOT_DEVICE_SIZE 512
 extern int  gBIOSDev;
 extern long gBootMode;
 extern bool sysConfigValid;
@@ -225,9 +225,11 @@ extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 /*
  * options.c
  */
-extern int getBootOptions(bool firstRun);
-extern int processBootOptions();
-extern int selectAlternateBootDevice(int bootdevice);
+extern char gBootUUIDString[];
+
+extern int  getBootOptions(bool firstRun);
+extern int  processBootOptions();
+extern int  selectAlternateBootDevice(int bootdevice);
 extern bool promptForRescanOption(void);
 
 void showHelp();

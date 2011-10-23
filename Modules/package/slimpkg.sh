@@ -3,11 +3,8 @@
 # $1 Path to store built package
 
 packagesidentity="org.chameleon"
-
 packagename="Chameleon"
-
 pkgroot="${0%/*}"
-
 chamTemp="usr/local/chamTemp"
 
 COL_BLACK="\x1b[30;01m"
@@ -20,9 +17,8 @@ COL_WHITE="\x1b[37;01m"
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
-#version=$( grep I386BOOT_CHAMELEONVERSION vers.h | awk '{ print $3 }' | tr -d '\"' )
 version=$( cat version )
-stage=${version##*-}" (.: ErmaC :. branch)"
+stage=${version##*-}
 revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
 builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )
@@ -57,10 +53,23 @@ echo ""
 
 outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
+# build pre install package
+	echo "================= Preinstall ================="
+	((xmlindent++))
+	packagesidentity="org.chameleon"
+	mkdir -p ${1}/Pre/Root
+	mkdir -p ${1}/Pre/Scripts
+	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Pre/Scripts/Resources/revision
+	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Pre/Scripts/Resources/version
+	cp -f ${pkgroot}/Scripts/Main/preinstall ${1}/Pre/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Pre/Scripts
+	echo "	[BUILD] Pre "
+	buildpackage "${1}/Pre" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
+# End build pre install package
+
 # build core package
 	echo "================= Core ================="
-	((xmlindent++))
-	packagesidentity="org.chameleon.core"
+	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Core/Root/usr/local/bin
 	mkdir -p ${1}/Core/Root/usr/standalone/i386
 	ditto --noextattr --noqtn ${1%/*}/i386/boot ${1}/Core/Root/usr/standalone/i386
@@ -77,44 +86,46 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	local coresize=$( du -hkc "${1}/Core/Root" | tail -n1 | awk {'print $1'} )
 	echo "	[BUILD] i386 "
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
+# End build core package
 
 # build Chameleon package
 	echo "================= Chameleon ================="
-	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Chameleon\">"
-	choices[$((choicescount++))]="<choice\n\tid=\"Chameleon\"\n\ttitle=\"Chameleon_title\"\n\tdescription=\"Chameleon_description\"\n>\n</choice>\n"
-
+	outline[$((outlinecount++))]="${indent[$xmlindent]}<line choice=\"Chameleon\">"
+	choices[$((choicescount++))]="\t<choice\n\t\tid=\"Chameleon\"\n\t\ttitle=\"Chameleon_title\"\n\t\tdescription=\"Chameleon_description\">\n\t</choice>\n"
+	((xmlindent++))
+	
 	# build standard package 
 		mkdir -p ${1}/Standard/Root
 		mkdir -p ${1}/Standard/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/Standard/* ${1}/Standard/Scripts
+		cp -f ${pkgroot}/Scripts/Main/Standardpostinstall ${1}/Standard/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/Standard/Scripts
 		ditto --arch i386 `which SetFile` ${1}/Standard/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Standard/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Standard/Scripts/Resources/version
 		echo "	[BUILD] Standard "
-		buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" start_selected=\"upgrade_allowed()\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+        buildpackage "${1}/Standard" "/" "${coresize}" "start_enabled=\"true\" selected=\"exclusive(choices['EFI']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build standard package 
 
 	# build efi package 
 		mkdir -p ${1}/EFI/Root
 		mkdir -p ${1}/EFI/Scripts/Resources
-		cp -f ${pkgroot}/Scripts/Main/EFI/* ${1}/EFI/Scripts
+		cp -f ${pkgroot}/Scripts/Main/ESPpostinstall ${1}/EFI/Scripts/postinstall
 		cp -f ${pkgroot}/Scripts/Sub/* ${1}/EFI/Scripts
 		ditto --arch i386 `which SetFile` ${1}/EFI/Scripts/Resources/SetFile
 		ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/EFI/Scripts/Resources/revision
 		ditto --noextattr --noqtn ${1%/*/*}/version ${1}/EFI/Scripts/Resources/version
 		echo "	[BUILD] EFI "
-		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
+		buildpackage "${1}/EFI" "/" "${coresize}" "start_visible=\"systemHasGPT()\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['noboot'])\"" >/dev/null 2>&1
 	# End build efi package
 
 	# build reset choice package 
 		mkdir -p ${1}/noboot/Root
 		echo "	[BUILD] Reset choice "
-		buildpackage "${1}/noboot" "/$chamTemp" "" "start_visible=\"true\" start_selected=\"false\" selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
+		buildpackage "${1}/noboot" "/$chamTemp" "" "selected=\"exclusive(choices['Standard']) &amp;&amp; exclusive(choices['EFI'])\"" >/dev/null 2>&1
 	# End build reset choice package 
-	
-	((xmlindent--))
-	outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+
+    ((xmlindent--))
+    outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
 # End build Chameleon package
 
 # build Modules package
@@ -133,8 +144,8 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	###############################
 	if [ "$(ls -A "${1%/*}/i386/modules")" ]; then
 	{
-		outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"Module\">"
-		choices[$((choicescount++))]="<choice\n\tid=\"Module\"\n\ttitle=\"Module_title\"\n\tdescription=\"Module_description\"\n>\n</choice>\n"
+		outline[$((outlinecount++))]="${indent[$xmlindent]}<line choice=\"Module\">"
+		choices[$((choicescount++))]="\t<choice\n\t\tid=\"Module\"\n\t\ttitle=\"Module_title\"\n\t\tdescription=\"Module_description\">\n\t</choice>\n"
 		((xmlindent++))
 		packagesidentity="org.chameleon.modules"
 # -
@@ -212,7 +223,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		fi
 
 		((xmlindent--))
-		outline[$((outlinecount++))]="${indent[$xmlindent]}\t</line>"
+		outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
 	}
 	else
 	{
@@ -223,19 +234,24 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 
 # build post install package
 	echo "================= Post ================="
+	packagesidentity="org.chameleon"
 	mkdir -p ${1}/Post/Root
 	mkdir -p ${1}/Post/Scripts
-	cp -f ${pkgroot}/Scripts/Main/Post/* ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Main/postinstall ${1}/Post/Scripts
 	cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/Post/Scripts
+	cp -f ${pkgroot}/Scripts/Sub/UnMountEFIvolumes.sh ${1}/Post/Scripts
 	ditto --noextattr --noqtn ${1%/*/*}/revision ${1}/Post/Scripts/Resources/revision
 	ditto --noextattr --noqtn ${1%/*/*}/version ${1}/Post/Scripts/Resources/version
 	echo "	[BUILD] Post "
 	buildpackage "${1}/Post" "/" "" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
-	outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
+# End build post install package
+
+#((xmlindent--))
+outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
 
 # build meta package
 
-	makedistribution "${1}" "${2}" "${3}" "${4}" "${5}"
+	makedistribution "${1}" "${2}" "${3}" "${4}" #"${5}"
 
 # clean up 
 
@@ -309,13 +325,12 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	popd >/dev/null
 
-	outline[$((outlinecount++))]="${indent[$xmlindent]}\t<line choice=\"${packagename// /}\"/>"
+	outline[$((outlinecount++))]="${indent[$xmlindent]}<line choice=\"${packagename// /}\"/>"
 
 	if [ "${4}" ]; then
-		local choiceoptions="${indent[$xmlindent]}${4}\n"	
+		local choiceoptions="\t\t${4}"
 	fi
-	choices[$((choicescount++))]="<choice\n\tid=\"${packagename// /}\"\n\ttitle=\"${packagename}_title\"\n\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' auth='root'>#${packagename// /}.pkg</pkg-ref>\n</choice>\n"
-
+	choices[$((choicescount++))]="\t<choice\n\t\tid=\"${packagename// /}\"\n\t\ttitle=\"${packagename}_title\"\n\t\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' >#${packagename// /}.pkg</pkg-ref>\n\t</choice>\n"	
 	rm -R -f "${1}"
 fi
 }
@@ -363,7 +378,7 @@ makedistribution ()
 
 	find "${1}/${packagename}" -name '.DS_Store' -delete
 	pushd "${1}/${packagename}" >/dev/null
-	xar -c -f "${1%/*}/$packagename.pkg" --compression none .
+	xar -c -f "${1%/*}/${packagename// /}-${version}-r${revision}.pkg" --compression none .
 	popd >/dev/null
 
 #   Here is the place for assign a Icon to the pkg
@@ -372,8 +387,8 @@ makedistribution ()
 # ----
     ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
     DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
-    Rez -append tempicns.rsrc -o "${1%/*}/$packagename.pkg"
-    SetFile -a C "${1%/*}/$packagename.pkg"
+    Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
+    SetFile -a C "${1%/*}/$packagename-${version}-r$revision.pkg"
     rm -f tempicns.rsrc
     rm -rf "${pkgroot}/Icons/Icons"
 # End
@@ -395,5 +410,5 @@ makedistribution ()
 
 }
 
-main "${1}" "${2}" "${3}" "${4}" "${5}"
+main "${1}" "${2}" "${3}" "${4}" #"${5}"
 

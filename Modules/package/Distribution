@@ -27,7 +27,7 @@
 			my.result.type = 'Fatal';
 			return false;
 		}
-		system.log('installCheckScript: Passed.');
+		system.log('installCheckScript: Failed.');
 		return false;
 	}
 
@@ -35,18 +35,6 @@
 	{	
 		system.log('volCheckScript: Failed.');
 		return true;
-	}
-
-	function upgrade_allowed(){
-		var upgradable = true;
-		var upgradeAction = my.choice.packageUpgradeAction;
-		
-		if((upgradeAction == "downgrade") || (upgradeAction == "mixed")){
-			my.choice.tooltip = system.localizedString('Newer_Package_Installed_message');
-			upgradable = false;
-		}
-		
-		return upgradable;
 	}
 
 	function systemHasGPT(){
