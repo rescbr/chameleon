@@ -55,12 +55,12 @@ void bzero(void * dst, size_t len)
 {
     memset(dst, 0, len);
 }
-
+/*
 void __bzero(void * dst, size_t len)
 {
     memset(dst, 0, len);
 }
-
+*/
 #else
 void * memcpy(void * dst, const void * src, size_t len)
 {
@@ -106,7 +106,7 @@ void bzero(void * dst, size_t len)
        : "c" (len), "D" (dst)
        : "memory", "%eax" );
 }
-
+/*
 void __bzero(void * dst, size_t len)
 {
     asm volatile ( "xorl %%eax, %%eax    \n\t"
@@ -120,7 +120,7 @@ void __bzero(void * dst, size_t len)
                   : 
                   : "c" (len), "D" (dst)
                   : "memory", "%eax" );
-}
+}*/
 #endif
 
 /* #if DONT_USE_GCC_BUILT_IN_STRLEN */
@@ -371,3 +371,16 @@ adler32( unsigned char * buffer, long length )
 	return result;
 }
 
+static long holdrand = 1L;
+#define	RAND_MAX	0x7fffffff
+
+void srand (unsigned int seed)
+{
+	holdrand = (long)seed;
+}
+
+int rand (void)
+{	
+	holdrand = holdrand * 214013L + 2531011L;
+	return ((holdrand >> 16) & RAND_MAX);
+}

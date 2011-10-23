@@ -47,6 +47,14 @@
  */
 #define IO_CONFIG_DATA_SIZE		4096 // was 163840
 
+#define rand_tab_len 100
+
+struct ran_obj {
+	int tab[rand_tab_len];
+	int rmin;	
+	int n;
+};
+
 typedef unsigned long entry_t;
 
 typedef struct {

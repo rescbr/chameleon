@@ -439,6 +439,9 @@ void common_boot(int biosdev)
 		{
 			firstRun = false;
 		}
+#if virtualM
+        firstRun = false;
+#endif
 	}	
 	
 #ifndef OPTION_ROM

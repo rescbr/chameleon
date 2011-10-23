@@ -16,7 +16,6 @@
 #include "GUI_appleboot.h"
 #include "vers.h"
 #include "modules.h"
-#include "rand.h"
 #include "sl.h"
 
 

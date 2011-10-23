@@ -28,6 +28,10 @@
 
 char* gSMBIOSBoardModel;
 
+static char fake_serial[11];
+
+static char const sn_gen_pn_str[36] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
+
 typedef struct {
     const char* key;
     const char* value;
@@ -35,147 +39,356 @@ typedef struct {
 
 // defaults for a MacBook
 static const SMStrEntryPair const sm_macbook_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MB41.88Z.00C1.B00.0802091535"	},
-	{"SMbiosdate",		"02/09/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"MacBook4,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"RM83064H0P1"			},
-	{"SMfamily",		"MacBook"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F22788A9"			},
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MB41.88Z.00C1.B00.0802091535"	},
+	{"SMbiosdate",              "02/09/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacBook4,1"                    },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "RM83064H0P1"                   },
+    {"SMserialProductCountry",	"RM"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "30"                            },
+	{"SMserialProductNumber",	"64H"                           },
+	{"SMserialModel",			"0P1"                           },
+	{"SMfamily",                "MacBook"                       },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F22788A9"                  },
 	{ "",""	}
 };
 
 // defaults for a MacBook Pro
 static const SMStrEntryPair const sm_macbookpro_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MBP41.88Z.00C1.B03.0802271651"	},
-	{"SMbiosdate",		"02/27/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"MacBookPro4,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"W88198N6YJX"			},
-	{"SMfamily",		"MacBookPro"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F42C89C8"			},
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MBP41.88Z.00C1.B03.0802271651"	},
+	{"SMbiosdate",              "02/27/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacBookPro4,1"                 },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "W88198N6YJX"                   },
+    {"SMserialProductCountry",	"W8"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "19"                            },
+	{"SMserialProductNumber",	"8N6"                           },
+	{"SMserialModel",			"YJX"                           },
+	{"SMfamily",                "MacBookPro"                    },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F42C89C8"                  },
 	{ "",""	}
 };
 
 // defaults for a Mac mini 
 static const SMStrEntryPair const sm_macmini_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"MM21.88Z.009A.B00.0706281359"	},
-	{"SMbiosdate",		"06/28/2007"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"Macmini2,1"			},
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"YM8054BYYL2"			},
-	{"SMfamily",		"Napa Mac"			},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F4208EAA"			},
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MM21.88Z.009A.B00.0706281359"	},
+	{"SMbiosdate",              "06/28/2007"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "Macmini2,1"                    },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "YM8054BYYL2"                   },
+    {"SMserialProductCountry",	"YM"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "05"                            },
+	{"SMserialProductNumber",	"4BY"                           },
+	{"SMserialModel",			"YL2"                           },
+	{"SMfamily",                "Napa Mac"                      },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F4208EAA"                  },
 	{ "",""	}
 };
 
 // defaults for an iMac
 static const SMStrEntryPair const sm_imac_defaults[]={
-	{"SMbiosvendor",	"Apple Inc."			},
-	{"SMbiosversion",	"IM71.88Z.007A.B03.0803051705"	},
-	{"SMbiosdate",		"03/05/2008"			},
-	{"SMmanufacter",	"Apple Inc."			},
-	{"SMproductname",	"iMac7,1"			},	
-	{"SMsystemversion",	"1.0"				},
-	{"SMserial",		"W87410PWX87"			},
-	{"SMfamily",		"Mac"				},
-	{"SMboardmanufacter",	"Apple Inc."			},
-	{"SMboardproduct",	"Mac-F4238CC8"			},
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "IM71.88Z.007A.B03.0803051705"	},
+	{"SMbiosdate",              "03/05/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "iMac7,1"                       },	
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "W87410PWX87"                   },
+    {"SMserialProductCountry",	"W8"                            },
+    {"SMserialYear",            "7"                             },
+	{"SMserialWeek",            "41"                            },
+	{"SMserialProductNumber",	"0PW"                           },
+	{"SMserialModel",			"X87"                           },
+	{"SMfamily",                "Mac"                           },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F4238CC8"                  },
 	{ "",""	}
 };
 
 // defaults for a Mac Pro
 static const SMStrEntryPair const sm_macpro_defaults[]={
-	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP31.88Z.006C.B02.0801021250"	},
-	{"SMbiosdate",			"01/02/2008"					},
-	{"SMmanufacter",		"Apple Computer, Inc."			},
-	{"SMproductname",		"MacPro3,1"						},
-	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"G88014V4XYK"					},
-	{"SMfamily",			"MacPro"						},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F42C88C8"					},
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP31.88Z.006C.B02.0801021250"	},
+	{"SMbiosdate",              "01/02/2008"					},
+	{"SMmanufacter",            "Apple Computer, Inc."			},
+	{"SMproductname",           "MacPro3,1"						},
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "G88014V4XYK"					},
+    {"SMserialProductCountry",	"G8"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "01"                            },
+	{"SMserialProductNumber",	"4V4"                           },
+	{"SMserialModel",			"XYK"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F42C88C8"					},
 	{ "",""	}
 };
 
 // defaults for an iMac11,1 core i3/i5/i7
 static const SMStrEntryPair const sm_imac_core_defaults[]={
-	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"IM111.88Z.0034.B00.0910301727"	},
-	{"SMbiosdate",			"10/30/2009"					},
-	{"SMmanufacter",		"Apple Inc."					},
-	{"SMproductname",		"iMac11,1"						},	
-	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"W89470DZ5RU"					},
-	{"SMfamily",			"iMac"							},
-	{"SMboardmanufacter",	"Apple Inc."                    },
-	{"SMboardproduct",		"Mac-F2268DAE"					},
+	{"SMbiosvendor",            "Apple Inc."					},
+	{"SMbiosversion",           "IM111.88Z.0034.B00.0910301727"	},
+	{"SMbiosdate",              "10/30/2009"					},
+	{"SMmanufacter",            "Apple Inc."					},
+	{"SMproductname",           "iMac11,1"						},	
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "W89470DZ5RU"					},
+    {"SMserialProductCountry",	 "W8"                           },
+    {"SMserialYear",             "9"                            },
+	{"SMserialWeek",             "47"                           },
+	{"SMserialProductNumber",	 "0DZ"                          },
+	{"SMserialModel",            "5RU"                          },
+	{"SMfamily",                "iMac"							},
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F2268DAE"					},
 	{ "",""	}
 };
 
 // defaults for an iMac12,1 : todo: populate correctly 
 static const SMStrEntryPair const sm_imac_sandy_defaults[]={
-	{"SMbiosvendor",		"Apple Inc."					},
-	{"SMbiosversion",		"IM121.88Z.0047.B00.1102091756"	},
-	{"SMbiosdate",			"10/30/2011"					},
-	{"SMmanufacter",		"Apple Inc."					},
-	{"SMproductname",		"iMac12,1"						},	
-	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"W89470DZ5RU"					},
-	{"SMfamily",			"iMac"							},
-	{"SMboardmanufacter",	"Apple Inc."                    },
-	{"SMboardproduct",		"Mac-F2268DAE"					},
+	{"SMbiosvendor",             "Apple Inc."					},
+	{"SMbiosversion",            "IM121.88Z.0047.B00.1102091756"},
+	{"SMbiosdate",               "10/30/2011"					},
+	{"SMmanufacter",             "Apple Inc."					},
+	{"SMproductname",            "iMac12,1"						},	
+	{"SMsystemversion",          "1.0"							},
+	{"SMserial",                 "W89470DZ5RU"					},
+    {"SMserialProductCountry",	 "W8"                           },
+    {"SMserialYear",             "9"                            },
+	{"SMserialWeek",             "47"                           },
+	{"SMserialProductNumber",	 "0DZ"                          },
+	{"SMserialModel",            "5RU"                          },
+	{"SMfamily",                 "iMac"							},
+	{"SMboardmanufacter",        "Apple Inc."                   },
+	{"SMboardproduct",           "Mac-F2268DAE"					},
 	{ "",""	}
 };
 
 // defaults for a Mac Pro 4,1 core i7/Xeon
 static const SMStrEntryPair const sm_macpro_core_defaults[]={
-	{"SMbiosvendor",		"Apple Computer, Inc."			},
-	{"SMbiosversion",		"MP41.88Z.0081.B03.0902231259"	},
-	{"SMbiosdate",			"02/23/2009"					},
-	{"SMmanufacter",		"Apple Inc."                    },
-	{"SMproductname",		"MacPro4,1"						},
-	{"SMsystemversion",		"1.0"							},
-	{"SMserial",			"CK91601V8Q0"					},
-	{"SMfamily",			"MacPro"						},
-	{"SMboardmanufacter",	"Apple Computer, Inc."			},
-	{"SMboardproduct",		"Mac-F221BEC8"					},
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP41.88Z.0081.B03.0902231259"	},
+	{"SMbiosdate",              "02/23/2009"					},
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacPro4,1"						},
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "CK91601V8Q0"					},
+    {"SMserialProductCountry",	"CK"                            },
+    {"SMserialYear",            "9"                             },
+	{"SMserialWeek",            "16"                            },
+	{"SMserialProductNumber",	"01V"                           },
+	{"SMserialModel",			"8Q0"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F221BEC8"					},
 	{ "",""	}
 };
 
 // default for a Xserve
 static const SMStrEntryPair const sm_xserve_defaults[]={
-    {"SMbiosvendor",		"Apple Inc."					},
-    {"SMbiosversion",		"XS21.88Z.006C.B06.0804011317"	},
-    {"SMbiosdate",			"04/01/2008"					},
-    {"SMmanufacter",		"Apple Inc."					},
-    {"SMproductname",		"Xserve2,1"						},
-    {"SMsystemversion",		"1.0"							},
-    {"SMserial",			"CK816033X8S"					},
-    {"SMfamily",			"Xserve"						},
-    {"SMboardmanufacter",	"Apple Inc."					},
-    {"SMboardproduct",		"Mac-F42289C8"					},
+    {"SMbiosvendor",            "Apple Inc."					},
+    {"SMbiosversion",           "XS21.88Z.006C.B06.0804011317"	},
+    {"SMbiosdate",              "04/01/2008"					},
+    {"SMmanufacter",            "Apple Inc."					},
+    {"SMproductname",           "Xserve2,1"						},
+    {"SMsystemversion",         "1.0"							},
+    {"SMserial",                "CK816033X8S"					},
+    {"SMserialProductCountry",	"CK"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "16"                            },
+	{"SMserialProductNumber",	"033"                           },
+	{"SMserialModel",			"X8S"                           },
+    {"SMfamily",                "Xserve"						},
+    {"SMboardmanufacter",       "Apple Inc."					},
+    {"SMboardproduct",          "Mac-F42289C8"					},
  	{ "",""	}
 };
 
+typedef struct {
+    const char* code;
+    const char* info;
+} SMProductCountry;
+
+static const SMProductCountry const sm_country_list[]={
+    {"1C",		"China"                                 },
+    {"2Z",		"Refurbished"                           },
+    {"4H",		"China"                                 },
+    {"5K",		"China"                                 },
+    {"8H",		"China"                                 },
+    {"5D",		"China"                                 },
+    {"7J",		"China "                                },
+    {"CK",		"Cork "                                 },
+    /*{"E",		"Singapur"                              },*/
+    {"EE",		"Taiwan"                                },
+    /*{"F",		"Fremont "                              },*/
+    {"FC",		"Fountain "                             },
+    {"G8",		"USA"                                   },
+    {"GQ",		"Refurbished"                           },
+    {"PT",		"Korea"                                 },
+    {"CY",		"Korea"                                 },
+    {"QT",		"Taiwan"                                },
+    {"QP",		"China"                                 },
+    {"RN",		"Mexico"                                },
+    {"RM",		"Refurbished/Remanufactured"			},
+    {"SG",		"Singapore"                             },
+    {"UV",		"Taiwan"                                },
+    {"U2",		"Taiwan"                                },
+    {"V7",		"Taiwan"                                },
+    {"VM",		"China"                                 },
+    {"W8",		"Shanghai"                              },
+    {"WQ",		"China"                                 },
+    {"XA",		"Elk Grove Sacramento"					},
+    {"XB",		"Elk Grove Sacramento"					},
+    {"YM",		"China /Konfiguriert"					}
+};
+
+
+const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
+{
+    int i;
+
+    for (i=0; sm_defaults[i].key[0]; i++) {
+		if (!strcmp (sm_defaults[i].key, key)) {
+			return sm_defaults[i].value;
+		}
+	}
+    
+    // Shouldn't happen
+    printf ("Error: no default for %s known\n", key);
+    sleep (2);
+    return "";
+}
+
+const char* sm_get_random_productNumber()
+{
+    static char str[4] = {0x00,0x00,0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_sn1 ;
+        int rand_sn2 ;
+        int rand_sn3 ;
+        struct ran_obj* random_serial_obj = random_init(0,35);
+        rand_sn1 = random(random_serial_obj);
+        rand_sn2 = random(random_serial_obj);
+        rand_sn3 = random(random_serial_obj);
+        random_free(random_serial_obj); 
+        
+        // Append all charaters to the string 
+        char tmp[2];
+        bzero(tmp,sizeof(tmp));
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn1]);
+        strcpy (str, tmp);
+        
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn2]);
+        strcat (str, tmp);
+        
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn3]);
+        strcat (str, tmp);
+        
+        DBG ("fake_productNumber: %s\n",str);
+
+    }
+    return str;
+}
+
+const char* sm_get_random_week()
+{
+    static char str[4] = {0x00,0x00,0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_week ;
+        struct ran_obj* random_week_obj = random_init(0,47)/* random_init(1,48) */;
+        rand_week = random(random_week_obj);        
+        random_free(random_week_obj); 
+        
+        // Append all charaters to the string 
+        char tmp[3];
+        bzero(tmp,sizeof(tmp));
+        
+        if (rand_week < 10) {
+            sprintf(tmp,"0%d",rand_week);
+            strcpy (str, tmp);
+        } else if (rand_week < 100) { // avoid overflow in case random return a number >= 100
+            sprintf(tmp,"%d",rand_week);
+            strcpy (str, tmp);
+        }      
+
+        DBG ("fake_week: %s\n",str);
+        
+    }
+    return str;
+}
+
+const char* sm_get_random_year()
+{
+    static char str[2] = {0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_year ;
+        struct ran_obj* random_year_obj = random_init(0,9);
+        rand_year = random(random_year_obj);        
+        random_free(random_year_obj);
+        
+        // Append all charaters to the string 
+        char tmp[2];
+        bzero(tmp,sizeof(tmp));
+        
+        if (rand_year < 10) {
+            sprintf(tmp,"%d",rand_year);
+            strcpy (str, tmp);              
+        }
+        
+        DBG ("fake_year: %s\n",str);
+        
+    }
+    return str;
+}
+
+const char* sm_get_random_country()
+{
+    static char str[3] = {0x00,0x00,0x00};
+    if(str[0] == 0)
+    {      
+        
+        // Get randomized characters
+        int rand_country ;
+        struct ran_obj* random_country_obj = random_init(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
+        rand_country = random(random_country_obj);        
+        random_free(random_country_obj);       
+       
+        strcpy (str, sm_country_list[rand_country].code);              
+                
+        DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);
+        
+    }
+    return str;
+}
+
 const char* sm_get_defstr(const char * key, int table_num)
 {
-	int	i;
 	const SMStrEntryPair*	sm_defaults;
-
+    const SMStrEntryPair*	sm_chosen;
+    static bool serial_done = false;
+        
 	if (Platform->CPU.isServer == true)
     {
-     		sm_defaults=sm_xserve_defaults;
+        sm_defaults=sm_xserve_defaults;
     } else if (Platform->CPU.isMobile == true) {
 		if (Platform->CPU.NoCores > 1) {
 			sm_defaults=sm_macbookpro_defaults;
@@ -199,10 +412,10 @@ const char* sm_get_defstr(const char * key, int table_num)
 					{
 						switch (Platform->CPU.Model)
 						{
-							case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
-							case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
-							case CPUID_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-							case 0x19: // Intel Core i5 650 @3.20 Ghz 
+							case CPUID_MODEL_FIELDS:        // Intel Core i5, i7 LGA1156 (45nm)
+							case CPUID_MODEL_DALES:         // Intel Core i5, i7 LGA1156 (45nm) ???
+							case CPUID_MODEL_DALES_32NM:    // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+							case 0x19:                      // Intel Core i5 650 @3.20 Ghz 
 								sm_defaults=sm_imac_core_defaults; 
 								break;
                                 
@@ -231,17 +444,102 @@ const char* sm_get_defstr(const char * key, int table_num)
 			}
 		}
 	}
+    
+    {
+        const char	*str;
+        int		size;
+        
+        if (getValueForKey("SMproductname", &str, &size, &bootInfo->smbiosConfig))
+        {              
+            if (strstr (str, "MacPro4"))
+            {
+                sm_chosen = sm_macpro_core_defaults ;
+            }
+            else if (strstr (str, "MacPro"))
+            {
+                sm_chosen = sm_macpro_defaults ;
+            }
+            else if (strstr (str,"MacBookPro"))
+            {
+                sm_chosen = sm_macbookpro_defaults ;
+            }
+            else if (strstr (str, "MacBook"))
+            {
+                sm_chosen = sm_macbook_defaults ;
+            }
+            else if (!strcmp ("iMac12,1", str))
+            {
+                sm_chosen = sm_imac_sandy_defaults ;
+            }
+            else if (!strcmp ("iMac11,1", str))
+            {
+                sm_chosen = sm_imac_core_defaults ;
+            }
+            else if (strstr (str, "iMac"))
+            {
+                sm_chosen = sm_imac_defaults ;
+            }
+            else if (strstr (str, "Macmini"))
+            {
+                sm_chosen = sm_macmini_defaults ;
+            }
+            else if (strstr (str, "Xserve"))
+            {
+                sm_chosen = sm_xserve_defaults ;
+            }
+            else 
+            {
+                sm_chosen = sm_defaults ;
+            }    
+        } 
+        else 
+            sm_chosen = sm_defaults;     
+    }             
+    
 	
-	for (i=0; sm_defaults[i].key[0]; i++) {
-		if (!strcmp (sm_defaults[i].key, key)) {
-			return sm_defaults[i].value;
-		}
-	}
+    if (!strcmp ("SMserial", key)) {
+        
+        if (!serial_done) {
+            bzero  (fake_serial,sizeof(fake_serial));      
+           
+            bool randomSerial = false;
+            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig) ;
+            
+            if ( randomSerial ) // useless
+                strcat (fake_serial,sm_get_random_country());
+            else
+                strcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"));
+            
+            if ( randomSerial ) // useless
+                strcat (fake_serial,sm_get_random_year());
+            else
+                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialYear"));
+            
+            if ( randomSerial ) // useless
+                strcat (fake_serial,sm_get_random_week());
+            else
+                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialWeek"));            
+            
+            if ( randomSerial )
+                strcat (fake_serial,sm_get_random_productNumber());
+            else
+                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialProductNumber"));
+            
+            strcat (fake_serial,sm_search_str(sm_chosen, "SMserialModel"));
+            
+            serial_done = true;
+            
+            if ( randomSerial )
+            msglog ("fake_serial: %s\n",fake_serial);
 
-	// Shouldn't happen
-	printf ("Error: no default for '%s' known\n", key);
-	sleep (2);
-	return "";
+        }
+        
+        return fake_serial;
+
+	}                
+	
+    return sm_search_str(sm_chosen, key);
+	
 }
 
 static int sm_get_fsb(const char *name, int table_num)
@@ -583,9 +881,12 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 	ret->dmi.bcdRevision = 0x21;
 	tablesptr = smbiostables;
 
+    bool randomSerial = false;                 
+    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
+    
         // add stringlen of overrides to original stringlen, update maxStructure size adequately, 
         // update structure count and tablepresent[type] with count of type. 
-	if (smbiostables) {
+	if (smbiostables) {        
 		for (i=0; i<origsmbiosnum; i++) {
 			struct smbios_table_header	*cur = (struct smbios_table_header *)tablesptr;
 			char				*stringsptr;
@@ -604,8 +905,14 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				int		size;
 				char		altname[40];
 
-				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);				
-				if (smbios_properties[j].table_type == cur->type &&
+				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);	
+                if (smbios_properties[j].table_type == cur->type &&
+                    smbios_properties[j].value_type == SMSTRING &&
+                    smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
+                    
+                    stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[cur->type])) + 1;
+                    
+                } else if (smbios_properties[j].table_type == cur->type &&
 				    smbios_properties[j].value_type == SMSTRING &&
 				    (getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig) ||
 				     getValueForKey(altname,&str, &size, &bootInfo->smbiosConfig)))
@@ -651,7 +958,13 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				char		altname[40];
 
 				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type] + 1);
-				if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
+                if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
+                    smbios_properties[j].value_type==SMSTRING &&
+                    smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
+                    
+                    stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type])) + 1;
+                    
+                } else if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
 				    smbios_properties[j].value_type == SMSTRING &&
 				    (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
 				     getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig)))
@@ -697,6 +1010,9 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	
     static bool done = false; // IMPROVEME: called twice via getSmbios(), but only the second call can get all necessary info !
 
+    bool randomSerial = false;                 
+    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
+    
 	bzero(tablespresent, sizeof(tablespresent));
 	bzero(handles, sizeof(handles));
 
@@ -761,7 +1077,16 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
 					case SMSTRING:
-						if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
+                        if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                        {
+                            str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+							size = strlen(str);
+							memcpy(newtablesptr, str, size);
+							newtablesptr[size] = 0;
+							newtablesptr += size + 1;
+							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                            
+                        } else if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
 						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
 						{
 							memcpy(newtablesptr, str, size);
@@ -878,7 +1203,16 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
 					case SMSTRING:
-						if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
+                        if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                        {
+                            str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+							size = strlen(str);
+							memcpy(newtablesptr, str, size);
+							newtablesptr[size] = 0;
+							newtablesptr += size + 1;
+							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                                
+                        } else if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
 						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
 						{
 							memcpy(newtablesptr, str, size);

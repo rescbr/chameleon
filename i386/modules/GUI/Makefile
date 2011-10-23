@@ -49,7 +49,7 @@ THEMEDIR = ../../../artwork/themes/$(THEME)
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GUI_OBJS = rand.o GUI_module.o gui.o picopng.o graphic_utils.o
+GUI_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
 
 
 SFILES =
@@ -82,7 +82,6 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/rand.o \
 	$(OBJROOT)/GUI_module.o \
 	$(OBJROOT)/gui.o \
 	$(OBJROOT)/picopng.o \
@@ -101,9 +100,6 @@ picopng.o:
 
 graphic_utils.o: 	
 	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
-	
-rand.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "rand.c" $(INC) -o "$(OBJROOT)/rand.o"
 	
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\

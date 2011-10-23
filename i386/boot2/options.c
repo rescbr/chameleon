@@ -111,22 +111,10 @@ static int countdown( const char * msg, int row, int timeout )
 	
 	moveCursor( 0, row );
 	printf(msg);
-	/*
-	int multi_buff = 18 * (timeout);
-    int multi = ++multi_buff;
-	*/
-    //unsigned int lasttime=0;
-	
+		
     for ( time = time18(), timeout++; timeout > 0; )
     {
-		/*
-		if( time18() > lasttime)
-		{
-			multi--; 
-			lasttime=time18();
-		}		
-		*/
-        if ((ch = readKeyboardStatus()))
+		if ((ch = readKeyboardStatus()))
             break;
 		
         // Count can be interrupted by holding down shift,

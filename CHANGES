@@ -1,3 +1,12 @@
+- Implemented a serial number randomizer in smbiospatcher 
+(can be useful for icloud registration problems, especially when the serial number is already used by another machine, 
+DISCLAIMER: Please read the iCloud License (http://www.apple.com/legal/icloud/ww/) carefully before using this option.
+By using this option, you are agreeing to be bound by
+the terms of the iCloud License (http://www.apple.com/legal/icloud/ww/). If you do not or cannot agree to the terms
+of the icloud License (http://www.apple.com/legal/icloud/ww/), please do not use this option.
+
+THE CHAMELEON ( OR VOODOO ) TEAM CAN NOT BE HELD RESPONSIBLE FOR ANY ABUSE.)
+
 - Chameleon (or at least this branch) can now boot OSX on Parallels Desktop 7, with full acpi and smbios support 
   (note: you will need to embed at least acpicodec and smbiosgetters since virtual machines don't like our module system),
   see this vid ;-) : http://www.youtube.com/watch?v=kvSgwIE6D4o&feature=channel_video_title

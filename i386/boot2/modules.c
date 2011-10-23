@@ -908,6 +908,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
 					printf("Unable to bind symbol %s\n", symbolName);
+                    getc();
 				}
 				
 				segmentAddress += sizeof(void*);

@@ -120,6 +120,134 @@ void turnOffFloppy(void)
 }
 #endif
 
+static bool fix_random=true;
+
+struct ran_obj* random_init (int rmin, int rmax)
+{
+	if (rmin > rmax) 
+		return false;
+	
+    int n = (rmax+1) - rmin;
+	
+	int tab[rand_tab_len];
+	
+	struct ran_obj * self = (struct ran_obj * )malloc(sizeof(struct ran_obj));	
+	
+    bzero(self,sizeof(struct ran_obj));
+    
+	self->rmin= rmin;
+	
+	self->n= n;
+	
+	int i;
+	srand(time18());
+	int limit1= 0, limit2= 0, gate1 = 0, gate2 = 0;
+	
+	if (fix_random) {
+		limit1 = (rand() % 20) ;		
+		limit2 =  (rand() % 20)  ;
+	}
+	
+	for (i = 0; i < rand_tab_len; i++){
+		
+		tab[i] = (rand() % n) + rmin;
+		
+		if (fix_random) {			
+			
+			if (i > 1 && gate1 < limit1 && tab[i]==tab[i-2]) {
+				i--;
+				gate1++;
+				
+				continue;
+			}
+			
+			if (i > 7 && gate2 < limit2 && tab[i]==tab[i-((rand() % 4)+5)]) {
+				i--;
+				gate2++;
+				
+				continue;
+			}
+			
+		}
+		self->tab[i]= tab[i];		
+	}
+	
+	
+	return self;
+}
+
+int random (struct ran_obj* self)
+{
+	
+	//struct ran_opt * ret = (struct ran_opt * )malloc(sizeof(struct ran_opt));
+	//ret = rt ;
+	
+    struct ran_obj * ret = self ;
+    
+	static int wheel = 0;
+	int gate3 = 0;
+	int limit3 = 0;	
+	static int retlst[rand_tab_len];
+	
+	
+	int index;
+	int rn;	
+	
+    if (!ret) {
+		return -1;	// TODO: fix this	
+	}
+    
+	if (fix_random) {
+		gate3 = rand() % 2;		
+	}
+	
+	
+retry:	
+	index = rand() % rand_tab_len;	
+	rn = ret->tab[index];	
+	ret->tab[index] = (rand() % ret->n) + ret->rmin;
+	
+	
+	if (fix_random) {	
+		if ((gate3 && limit3 < 5) && (ret->tab[index] == rn)) {
+			limit3++;
+			goto retry;
+		}	
+		retlst[wheel] = rn;
+		
+		if (wheel > 0 && limit3 < 5) {	
+			
+			if (gate3 && (rn == retlst[wheel-1])) {			
+				limit3++;
+				goto retry;
+			}
+			
+			if (gate3 && (wheel > 3 && rn==retlst[wheel-((rand() % 3)+1)]) && (limit3 < 5)) {			
+				limit3++;
+				goto retry;
+			}
+		}
+		
+		wheel++;
+	}
+	
+	self = ret;	
+	return rn;	
+}
+
+void random_free (struct ran_obj* self)
+{
+    if (self /* && self->sgn == random_obj_sgn */) {
+        free(self);
+    }    
+    
+}
+
+void usefixedrandom (bool opt)
+{
+	fix_random = opt;
+}
+
 //==========================================================================
 // Return the platform name for this hardware.
 //

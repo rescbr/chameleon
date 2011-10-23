@@ -146,6 +146,11 @@ AllocateMemoryRange(char * rangeName, long start, long length);
 extern void   enableA20(void);
 extern void   turnOffFloppy(void);
 
+extern void     random_free (struct ran_obj* self);
+extern int      random (struct ran_obj* self);
+extern struct   ran_obj* random_init (int rmin, int rmax);
+extern void     usefixedrandom (bool opt);
+
 extern void   getPlatformName(char *nameBuf);
 
 #ifdef NBP_SUPPORT
@@ -153,6 +158,9 @@ extern void   getPlatformName(char *nameBuf);
 extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 #endif
+
+
+
 
 /* stringTable.c */
 extern char * newStringFromList(char **list, int *size);

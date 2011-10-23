@@ -1,10 +1,9 @@
 /*
- * Cadet-petit Armel <armelcadetpetit@gmail.com>
  *
- *	rand & srand implementation
+ *  rand & srand implementation for chameleon by Cadet-petit Armel <armelcadetpetit@gmail.com>
  */
 
-#include "rand.h"
+#include "libsa.h"
 
 static long holdrand = 1L;
 #define	RAND_MAX	0x7fffffff

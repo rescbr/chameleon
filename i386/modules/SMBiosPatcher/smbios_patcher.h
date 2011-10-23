@@ -14,6 +14,8 @@
 
 #define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
 
+#define kSMBIOSRandomSerial	"randomSerial"
+
 extern uint64_t smbios_p;
 
 struct smbios_table_header 

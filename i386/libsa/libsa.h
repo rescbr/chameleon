@@ -148,19 +148,28 @@ extern void   free(void * start);
 extern void * realloc(void * ptr, size_t size);
 
 //#if SAFE_MALLOC
-//#define malloc(size) safe_malloc(size, __FILE__, __LINE__)
-//extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t, const char *, int));
-//extern void * safe_malloc(size_t size, const char *file, int line);
 //extern size_t zalloced_size;
-//#else
+//#endif
+
 extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
 extern void * malloc(size_t size);
-//#endif
+
+/*
+ *  rand.c
+ *
+ *  rand & srand implementation for chameleon by Cadet-petit Armel <armelcadetpetit@gmail.com>
+ */
+
+
+extern int      rand (void);
+extern void     srand (unsigned int seed);
+
+
 
 /*
  * getsegbyname.c
  */
-extern struct segment_command *
-       getsegbynamefromheader(struct mach_header * mhp, char * segname);
+//extern struct segment_command *
+//       getsegbynamefromheader(struct mach_header * mhp, char * segname);
 
 #endif /* !__BOOT_LIBSA_H */

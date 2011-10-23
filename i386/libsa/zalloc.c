@@ -64,6 +64,12 @@ static void malloc_error(char *addr, size_t size, const char *file, int line);
 static void malloc_error(char *addr, size_t size);
 #endif
 
+#ifdef SAFE_MALLOC
+static void * Safe_Malloc(size_t size, const char *file, int line);
+#else
+static void * Malloc(size_t size);
+#endif
+
 #if ZDEBUG
 size_t zalloced_size;
 #endif
@@ -104,9 +110,9 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 #define BEST_FIT 1
 
 #ifdef SAFE_MALLOC
-void * safe_malloc(size_t size, const char *file, int line)
+static void * Safe_Malloc(size_t size, const char *file, int line)
 #else
-void * malloc(size_t size)
+static void * Malloc(size_t size)
 #endif
 {
 	int    i;
@@ -180,24 +186,35 @@ void * malloc(size_t size)
         }
 #endif
 
-done:
-	if ((ret == 0) || (ret + size >= zalloc_end))
-    {
-		if (zerror) 
-#ifdef SAFE_MALLOC
-           (*zerror)(ret, size, file, line);
-#else
-		   (*zerror)(ret, size);
-#endif
-    }
-	if (ret != 0)
-    {
-		bzero(ret, size);
-    }
+done:	
 #if ZDEBUG
         zalloced_size += size;
 #endif
 	return (void *) ret;
+}
+
+void *
+malloc (size_t size)
+{
+#ifdef SAFE_MALLOC
+    register void *ret = Safe_Malloc( size, __FILE__, __LINE__);
+#else
+    register void *ret = Malloc (size);
+#endif
+    if (ret == 0 || ((char *)ret + size >= zalloc_end))
+    {
+        if (zerror)
+#ifdef SAFE_MALLOC
+        (*zerror)(ret, size, __FILE__, __LINE__);
+#else
+        (*zerror)(ret, size);
+#endif       
+    }
+    else if (ret != 0)
+    {
+		bzero(ret, size);
+    }
+    return ret;
 }
 
 void free(void * pointer)
