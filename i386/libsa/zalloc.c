@@ -210,7 +210,7 @@ malloc (size_t size)
         (*zerror)(ret, size);
 #endif       
     }
-    else if (ret != 0)
+    if (ret != 0)
     {
 		bzero(ret, size);
     }
