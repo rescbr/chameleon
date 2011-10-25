@@ -21,7 +21,6 @@
 
 static SMBWord minorVersion;
 
-//extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
 static void decodeBIOSInformation(SMBBIOSInformation *structHeader);
 static void decodeSystemInformation(SMBSystemInformation *structHeader);
 static void decodeBaseBoard(SMBBaseBoard *structHeader);

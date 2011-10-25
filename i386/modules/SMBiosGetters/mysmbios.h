@@ -28,6 +28,8 @@
 
 #define kSMBIOSdefaults		"SMBIOSdefaults"	
 
+#define kSMBIOSRandomSerial	"randomSerial"
+
 extern uint64_t smbios_p;
 
 typedef struct SMBAnchor
@@ -358,8 +360,8 @@ typedef struct SMBOemProcessorBusSpeed {
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
 extern SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps);
 extern void decodeSMBIOSTable(SMBEntryPoint *eps);
-extern char *getDefaultSMBproductName(void);
-extern char *getDefaultSMBBoardProduct(void);
-extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
+extern const char *getDefaultSMBproductName(void);
+extern const char *getDefaultSMBBoardProduct(void);
+extern const char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
 
 #endif /* !__LIBSAIO_MYSMBIOS_H */

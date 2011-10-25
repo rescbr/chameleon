@@ -40,7 +40,7 @@ void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* a
 	if (getValueForKey("SMproductname", &val, &len, &bootInfo->smbiosConfig)) {
 		gPlatformName = (char *)val;
 	} else {
-		gPlatformName = getDefaultSMBproductName();
+		gPlatformName = (char *)getDefaultSMBproductName();
 	}	
 		
 }
@@ -54,7 +54,7 @@ void getboardproduct_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* 
 	if (getValueForKey("SMboardproduct", &val, &len, &bootInfo->smbiosConfig)) {
 		gboardproduct = (char *)val;
 	} else {
-		gboardproduct = getDefaultSMBBoardProduct();
+		gboardproduct = (char *)getDefaultSMBBoardProduct();
 	}	
 	
 }

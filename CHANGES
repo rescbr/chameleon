@@ -1,5 +1,9 @@
+- Ported the serial number randomizer to smbiosgetters,
+ Warning: smbiosgetters (and also the Gui module) still don't work when built with Xcode4.
+
 - Implemented a serial number randomizer in smbiospatcher 
 (can be useful for icloud registration problems, especially when the serial number is already used by another machine, 
+
 DISCLAIMER: Please read the iCloud License (http://www.apple.com/legal/icloud/ww/) carefully before using this option.
 By using this option, you are agreeing to be bound by
 the terms of the iCloud License (http://www.apple.com/legal/icloud/ww/). If you do not or cannot agree to the terms

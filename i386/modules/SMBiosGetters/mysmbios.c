@@ -67,57 +67,252 @@
 //-------------------------------------------------------------------------------------------------------------------------
 // Default SMBIOS Data
 //-------------------------------------------------------------------------------------------------------------------------
-/* Rewrite: use a struct */
+static char fake_serial[11];
 
-#define kDefaultVendorManufacturer					"Apple Inc."
-#define kDefaultBIOSReleaseDate						"11/06/2009"
-#define kDefaultSerialNumber						"SOMESRLNMBR"
-#define kDefaultBoardProduct						"Mac-F4208DC8"
-#define kDefaultSystemVersion						"1.0"
+static char const sn_gen_pn_str[36] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
 
-// defaults for a Mac mini 
-#define kDefaultMacminiFamily						"Macmini"
-#define kDefaultMacmini								"Macmini2,1"
-#define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0903051113"
+typedef struct {
+    const char* key;
+    const char* value;
+} SMStrEntryPair;
 
 // defaults for a MacBook
-#define kDefaultMacBookFamily						"MacBook"
-#define kDefaultMacBook								"MacBook4,1"
-#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0903051113"
+static const SMStrEntryPair const sm_macbook_defaults[]={
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MB41.88Z.00C1.B00.0802091535"	},
+	{"SMbiosdate",              "02/09/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacBook4,1"                    },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "RM83064H0P1"                   },
+    {"SMserialProductCountry",	"RM"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "30"                            },
+	{"SMserialProductNumber",	"64H"                           },
+	{"SMserialModel",			"0P1"                           },
+	{"SMfamily",                "MacBook"                       },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F22788A9"                  },
+	{ "",""	}
+};
 
 // defaults for a MacBook Pro
-#define kDefaultMacBookProFamily					"MacBookPro"
-#define kDefaultMacBookPro							"MacBookPro4,1"
-#define kDefaultMacBookProBIOSVersion				"    MBP41.88Z.0073.B00.0903051113"
+static const SMStrEntryPair const sm_macbookpro_defaults[]={
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MBP41.88Z.00C1.B03.0802271651"	},
+	{"SMbiosdate",              "02/27/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacBookPro4,1"                 },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "W88198N6YJX"                   },
+    {"SMserialProductCountry",	"W8"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "19"                            },
+	{"SMserialProductNumber",	"8N6"                           },
+	{"SMserialModel",			"YJX"                           },
+	{"SMfamily",                "MacBookPro"                    },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F42C89C8"                  },
+	{ "",""	}
+};
+
+// defaults for a Mac mini 
+static const SMStrEntryPair const sm_macmini_defaults[]={
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "MM21.88Z.009A.B00.0706281359"	},
+	{"SMbiosdate",              "06/28/2007"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "Macmini2,1"                    },
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "YM8054BYYL2"                   },
+    {"SMserialProductCountry",	"YM"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "05"                            },
+	{"SMserialProductNumber",	"4BY"                           },
+	{"SMserialModel",			"YL2"                           },
+	{"SMfamily",                "Napa Mac"                      },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F4208EAA"                  },
+	{ "",""	}
+};
 
 // defaults for an iMac
-#define kDefaultiMacFamily							"iMac"
-#define kDefaultiMac								"iMac8,1"
-#define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0903051113"
-// defaults for an iMac11,1 core i3/i5/i7
-#define kDefaultiMacNehalem							"iMac11,1"
-#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0903051113"
-// defaults for an iMac12,1
-#define kDefaultiMacSandy							"iMac12,1"
-#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B00.1102091756"
-// defaults for a Mac Pro
-#define kDefaultMacProFamily						"MacPro"
-#define kDefaultMacPro								"MacPro3,1"
-#define kDefaultMacProBIOSVersion					"    MP31.88Z.006C.B05.0903051113"
-// defaults for a Mac Pro 4,1 core i7/Xeon
-#define kDefaultMacProNehalem						"MacPro4,1"
-#define kDefaultMacProNehalemBIOSVersion			"    MP41.88Z.0081.B04.0903051113"
-// defaults for a Mac Pro 5,1 core i7/Xeon
-#define kDefaultMacProWestmere						"MacPro5,1"
-#define kDefaultMacProWestmereBIOSVersion			"    MP51.88Z.007F.B00.1008031144"
-#define kDefaulMacProWestmereBIOSReleaseDate		"08/03/10"
-// defaults for a Xserve
-#define kDefaultXserve								"Xserve2,1"
-#define kDefaultXserveBIOSVersion					"    XS21.88Z.006C.B06.0804011317"
-#define kDefaulXserveBIOSReleaseDate				"04/01/2008"
-#define kDefaultXserveFamily						"Xserve"
-//-------------------------------------------------------------------------------------------------------------------------
+static const SMStrEntryPair const sm_imac_defaults[]={
+	{"SMbiosvendor",            "Apple Inc."                    },
+	{"SMbiosversion",           "IM71.88Z.007A.B03.0803051705"	},
+	{"SMbiosdate",              "03/05/2008"                    },
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "iMac7,1"                       },	
+	{"SMsystemversion",         "1.0"                           },
+	{"SMserial",                "W87410PWX87"                   },
+    {"SMserialProductCountry",	"W8"                            },
+    {"SMserialYear",            "7"                             },
+	{"SMserialWeek",            "41"                            },
+	{"SMserialProductNumber",	"0PW"                           },
+	{"SMserialModel",			"X87"                           },
+	{"SMfamily",                "Mac"                           },
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F4238CC8"                  },
+	{ "",""	}
+};
 
+// defaults for a Mac Pro
+static const SMStrEntryPair const sm_macpro_defaults[]={
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP31.88Z.006C.B02.0801021250"	},
+	{"SMbiosdate",              "01/02/2008"					},
+	{"SMmanufacter",            "Apple Computer, Inc."			},
+	{"SMproductname",           "MacPro3,1"						},
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "G88014V4XYK"					},
+    {"SMserialProductCountry",	"G8"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "01"                            },
+	{"SMserialProductNumber",	"4V4"                           },
+	{"SMserialModel",			"XYK"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F42C88C8"					},
+	{ "",""	}
+};
+
+// defaults for an iMac11,1 core i3/i5/i7
+static const SMStrEntryPair const sm_imac_core_defaults[]={
+	{"SMbiosvendor",            "Apple Inc."					},
+	{"SMbiosversion",           "IM111.88Z.0034.B00.0910301727"	},
+	{"SMbiosdate",              "10/30/2009"					},
+	{"SMmanufacter",            "Apple Inc."					},
+	{"SMproductname",           "iMac11,1"						},	
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "W89470DZ5RU"					},
+    {"SMserialProductCountry",	 "W8"                           },
+    {"SMserialYear",             "9"                            },
+	{"SMserialWeek",             "47"                           },
+	{"SMserialProductNumber",	 "0DZ"                          },
+	{"SMserialModel",            "5RU"                          },
+	{"SMfamily",                "iMac"							},
+	{"SMboardmanufacter",       "Apple Inc."                    },
+	{"SMboardproduct",          "Mac-F2268DAE"					},
+	{ "",""	}
+};
+
+// defaults for an iMac12,1 : todo: populate correctly 
+static const SMStrEntryPair const sm_imac_sandy_defaults[]={
+	{"SMbiosvendor",             "Apple Inc."					},
+	{"SMbiosversion",            "IM121.88Z.0047.B00.1102091756"},
+	{"SMbiosdate",               "10/30/2011"					},
+	{"SMmanufacter",             "Apple Inc."					},
+	{"SMproductname",            "iMac12,1"						},	
+	{"SMsystemversion",          "1.0"							},
+	{"SMserial",                 "W89470DZ5RU"					},
+    {"SMserialProductCountry",	 "W8"                           },
+    {"SMserialYear",             "9"                            },
+	{"SMserialWeek",             "47"                           },
+	{"SMserialProductNumber",	 "0DZ"                          },
+	{"SMserialModel",            "5RU"                          },
+	{"SMfamily",                 "iMac"							},
+	{"SMboardmanufacter",        "Apple Inc."                   },
+	{"SMboardproduct",           "Mac-F2268DAE"					},
+	{ "",""	}
+};
+
+// defaults for a Mac Pro 4,1 core i7/Xeon
+static const SMStrEntryPair const sm_macpro_core_defaults[]={
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP41.88Z.0081.B03.0902231259"	},
+	{"SMbiosdate",              "02/23/2009"					},
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacPro4,1"						},
+	{"SMsystemversion",         "1.0"							},
+	{"SMserial",                "CK91601V8Q0"					},
+    {"SMserialProductCountry",	"CK"                            },
+    {"SMserialYear",            "9"                             },
+	{"SMserialWeek",            "16"                            },
+	{"SMserialProductNumber",	"01V"                           },
+	{"SMserialModel",			"8Q0"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F221BEC8"					},
+	{ "",""	}
+};
+
+// defaults for a Mac Pro 5,1 Westmere
+static const SMStrEntryPair const sm_macpro_westmere_defaults[]={
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP51.88Z.007F.B00.1008031144"	},
+	{"SMbiosdate",              "08/03/2010"					},
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacPro5,1"						},
+	{"SMsystemversion",         "0.0"							},
+	{"SMserial",                "YM0330U7EUH"					},
+    {"SMserialProductCountry",	"YM"                            },
+    {"SMserialYear",            "0"                             },
+	{"SMserialWeek",            "33"                            },
+	{"SMserialProductNumber",	"0U7"                           },
+	{"SMserialModel",			"EUH"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F221BEC8"					},
+	{ "",""	}
+};
+
+// default for a Xserve
+static const SMStrEntryPair const sm_xserve_defaults[]={
+    {"SMbiosvendor",            "Apple Inc."					},
+    {"SMbiosversion",           "XS21.88Z.006C.B06.0804011317"	},
+    {"SMbiosdate",              "04/01/2008"					},
+    {"SMmanufacter",            "Apple Inc."					},
+    {"SMproductname",           "Xserve2,1"						},
+    {"SMsystemversion",         "1.0"							},
+    {"SMserial",                "CK816033X8S"					},
+    {"SMserialProductCountry",	"CK"                            },
+    {"SMserialYear",            "8"                             },
+	{"SMserialWeek",            "16"                            },
+	{"SMserialProductNumber",	"033"                           },
+	{"SMserialModel",			"X8S"                           },
+    {"SMfamily",                "Xserve"						},
+    {"SMboardmanufacter",       "Apple Inc."					},
+    {"SMboardproduct",          "Mac-F42289C8"					},
+ 	{ "",""	}
+};
+
+typedef struct {
+    const char* code;
+    const char* info;
+} SMProductCountry;
+
+static const SMProductCountry const sm_country_list[]={
+    {"1C",		"China"                                 },
+    {"2Z",		"Refurbished"                           },
+    {"4H",		"China"                                 },
+    {"5K",		"China"                                 },
+    {"8H",		"China"                                 },
+    {"5D",		"China"                                 },
+    {"7J",		"China "                                },
+    {"CK",		"Cork "                                 },
+    /*{"E",		"Singapur"                              },*/
+    {"EE",		"Taiwan"                                },
+    /*{"F",		"Fremont "                              },*/
+    {"FC",		"Fountain "                             },
+    {"G8",		"USA"                                   },
+    {"GQ",		"Refurbished"                           },
+    {"PT",		"Korea"                                 },
+    {"CY",		"Korea"                                 },
+    {"QT",		"Taiwan"                                },
+    {"QP",		"China"                                 },
+    {"RN",		"Mexico"                                },
+    {"RM",		"Refurbished/Remanufactured"			},
+    {"SG",		"Singapore"                             },
+    {"UV",		"Taiwan"                                },
+    {"U2",		"Taiwan"                                },
+    {"V7",		"Taiwan"                                },
+    {"VM",		"China"                                 },
+    {"W8",		"Shanghai"                              },
+    {"WQ",		"China"                                 },
+    {"XA",		"Elk Grove Sacramento"					},
+    {"XB",		"Elk Grove Sacramento"					},
+    {"YM",		"China /Konfiguriert"					}
+};
 
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
 
@@ -127,22 +322,22 @@ typedef struct {
 } SMBStructPtrs;
 
 struct {
-	char *vendor;
-	char *version;
-	char *releaseDate;
+	const char *vendor;
+	const char *version;
+	const char *releaseDate;
 } defaultBIOSInfo;
 
 struct {
-	char *manufacturer;
-	char *productName;
-	char *version;
-	char *serialNumber;
-	char *family;
+	const char *manufacturer;
+	const char *productName;
+	const char *version;
+	const char *serialNumber;
+	const char *family;
 } defaultSystemInfo;
 
 struct {
-	char *manufacturer;
-	char *product;
+	const char *manufacturer;
+	const char *product;
 } defaultBaseBoard;
 
 
@@ -152,7 +347,7 @@ typedef struct {
 	uint8_t			fieldOffset;
 	char			*keyString;
 	bool			(*getSMBValue)(returnType *);
-	char			**defaultValue;
+	const char			**defaultValue;
 } SMBValueSetter;
 
 SMBValueSetter SMBSetters[] =                           
@@ -162,110 +357,110 @@ SMBValueSetter SMBSetters[] =
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeBIOSInformation,	kSMBString,	getFieldOffset(SMBBIOSInformation, vendor),			kSMBBIOSInformationVendorKey,		
 		NULL,	&defaultBIOSInfo.vendor			},
-
+    
 	{kSMBTypeBIOSInformation,	kSMBString,	getFieldOffset(SMBBIOSInformation, version),		kSMBBIOSInformationVersionKey,		
 		NULL,	&defaultBIOSInfo.version		},
-
+    
 	{kSMBTypeBIOSInformation,	kSMBString,	getFieldOffset(SMBBIOSInformation, releaseDate),	kSMBBIOSInformationReleaseDateKey,	
 		NULL,	&defaultBIOSInfo.releaseDate	},
-
+    
 	//-------------------------------------------------------------------------------------------------------------------------
 	// SystemInformation
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, manufacturer),	kSMBSystemInformationManufacturerKey,	
 		NULL,	&defaultSystemInfo.manufacturer	},
-
+    
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, productName),	kSMBSystemInformationProductNameKey,	
 		NULL,	&defaultSystemInfo.productName	},
-
+    
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, version),		kSMBSystemInformationVersionKey,		
 		NULL,	&defaultSystemInfo.version		},
-
+    
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, serialNumber),	kSMBSystemInformationSerialNumberKey,	
 		NULL,	&defaultSystemInfo.serialNumber	},
-
+    
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, skuNumber),	NULL,									
 		NULL,	NULL							},
-
+    
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, family),		kSMBSystemInformationFamilyKey,			
 		NULL,	&defaultSystemInfo.family		},
-
-
+    
+    
 	//-------------------------------------------------------------------------------------------------------------------------
 	// BaseBoard
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, manufacturer),			kSMBBaseBoardManufacturerKey,	
 		NULL,	&defaultBaseBoard.manufacturer	},
-
+    
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, product),				kSMBBaseBoardProductKey,		
 		NULL,	&defaultBaseBoard.product		},
-
+    
     {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, version),				NULL,	NULL,	NULL},
-
+    
     {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, serialNumber),			NULL,	NULL,	NULL},
-
+    
     {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),		NULL,	NULL,	NULL},
-
+    
     {kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),	NULL,	NULL,	NULL},
-
-
+    
+    
 	//-------------------------------------------------------------------------------------------------------------------------
 	// ProcessorInformation
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, socketDesignation),	NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, manufacturer),		NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, processorVersion),	NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, externalClock),		kSMBProcessorInformationExternalClockKey,	
 		getProcessorInformationExternalClock,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, maximumClock),		kSMBProcessorInformationMaximumClockKey,	
 		getProcessorInformationMaximumClock,	NULL},
 	
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, currentClock),		kSMBProcessorInformationCurrentClockKey,	
 		getProcessorInformationCurrentClock,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, serialNumber),		NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, assetTag),			NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, partNumber),		NULL,	NULL,	NULL},
-
+    
 	//-------------------------------------------------------------------------------------------------------------------------
 	// Memory Device
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, deviceLocator),	kSMBMemoryDeviceDeviceLocatorKey,	
 		NULL,							NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, bankLocator),	kSMBMemoryDeviceBankLocatorKey,		
 		NULL,							NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBByte,	getFieldOffset(SMBMemoryDevice, memoryType),	kSMBMemoryDeviceMemoryTypeKey,		
 		getSMBMemoryDeviceMemoryType,	NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBWord,	getFieldOffset(SMBMemoryDevice, memorySpeed),	kSMBMemoryDeviceMemorySpeedKey,		
 		getSMBMemoryDeviceMemorySpeed,	NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, manufacturer),	kSMBMemoryDeviceManufacturerKey,	
 		getSMBMemoryDeviceManufacturer,	NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, serialNumber),	kSMBMemoryDeviceSerialNumberKey,	
 		getSMBMemoryDeviceSerialNumber,	NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, assetTag),		NULL,	NULL,	NULL},
-
+    
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, partNumber),	kSMBMemoryDevicePartNumberKey,		
 		getSMBMemoryDevicePartNumber,	NULL},
-
-
+    
+    
 	//-------------------------------------------------------------------------------------------------------------------------
 	// Apple Specific
 	//-------------------------------------------------------------------------------------------------------------------------
 	{kSMBTypeOemProcessorType,		kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),			kSMBOemProcessorTypeKey,		
 		getSMBOemProcessorType,			NULL},
-
+    
 	{kSMBTypeOemProcessorBusSpeed,	kSMBWord,	getFieldOffset(SMBOemProcessorBusSpeed, ProcessorBusSpeed),	kSMBOemProcessorBusSpeedKey,	
 		getSMBOemProcessorBusSpeed,		NULL}
 };
@@ -295,136 +490,312 @@ static void setSMBStruct(SMBStructPtrs *structPtr);
 static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr);
 
 
-char *getDefaultSMBproductName(void)
+const char *getDefaultSMBproductName(void)
 {
 	setDefaultSMBData();
 	return defaultSystemInfo.productName;
 }
 
-char *getDefaultSMBBoardProduct(void)
+const char *getDefaultSMBBoardProduct(void)
 {
 	setDefaultSMBData();
 	return defaultBaseBoard.product;
 }
 
-/* Rewrite this function */
+const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
+{
+    int i;
+    
+    for (i=0; sm_defaults[i].key[0]; i++) {
+		if (!strcmp (sm_defaults[i].key, key)) {
+			return sm_defaults[i].value;
+		}
+	}
+    
+    // Shouldn't happen
+    printf ("Error: no default for %s known\n", key);
+    sleep (2);
+    return "";
+}
+
+const char* sm_get_random_productNumber()
+{
+    static char str[4] = {0x00,0x00,0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_sn1 ;
+        int rand_sn2 ;
+        int rand_sn3 ;
+        struct ran_obj* random_serial_obj = random_init(0,35);
+        rand_sn1 = random(random_serial_obj);
+        rand_sn2 = random(random_serial_obj);
+        rand_sn3 = random(random_serial_obj);
+        random_free(random_serial_obj); 
+        
+        // Append all charaters to the string 
+        char tmp[2];
+        bzero(tmp,sizeof(tmp));
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn1]);
+        strcpy (str, tmp);
+        
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn2]);
+        strcat (str, tmp);
+        
+        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn3]);
+        strcat (str, tmp);
+        
+        DBG ("fake_productNumber: %s\n",str);
+        
+    }
+    return str;
+}
+
+const char* sm_get_random_week()
+{
+    static char str[4] = {0x00,0x00,0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_week ;
+        struct ran_obj* random_week_obj = random_init(0,47)/* random_init(1,48) */;
+        rand_week = random(random_week_obj);        
+        random_free(random_week_obj); 
+        
+        // Append all charaters to the string 
+        char tmp[3];
+        bzero(tmp,sizeof(tmp));
+        
+        if (rand_week < 10) {
+            sprintf(tmp,"0%d",rand_week);
+            strcpy (str, tmp);
+        } else if (rand_week < 100) { // avoid overflow in case random return a number >= 100
+            sprintf(tmp,"%d",rand_week);
+            strcpy (str, tmp);
+        }      
+        
+        DBG ("fake_week: %s\n",str);
+        
+    }
+    return str;
+}
+
+const char* sm_get_random_year()
+{
+    static char str[2] = {0x00,0x00};
+    if(str[0]  == 0)
+    {           
+        // Get randomized characters
+        int rand_year ;
+        struct ran_obj* random_year_obj = random_init(0,9);
+        rand_year = random(random_year_obj);        
+        random_free(random_year_obj);
+        
+        // Append all charaters to the string 
+        char tmp[2];
+        bzero(tmp,sizeof(tmp));
+        
+        if (rand_year < 10) {
+            sprintf(tmp,"%d",rand_year);
+            strcpy (str, tmp);              
+        }
+        
+        DBG ("fake_year: %s\n",str);
+        
+    }
+    return str;
+}
+
+const char* sm_get_random_country()
+{
+    static char str[3] = {0x00,0x00,0x00};
+    if(str[0] == 0)
+    {      
+        
+        // Get randomized characters
+        int rand_country ;
+        struct ran_obj* random_country_obj = random_init(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
+        rand_country = random(random_country_obj);        
+        random_free(random_country_obj);       
+        
+        strcpy (str, sm_country_list[rand_country].code);              
+        
+        DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);
+        
+    }
+    return str;
+}
+
 static void setDefaultSMBData(void)
 {
 	static bool setDefSMB = true;
 	
 	if (setDefSMB) {		
 		
-		if (Platform->CPU.isServer == true) {
-			defaultBIOSInfo.version			= kDefaultXserveBIOSVersion;
-			defaultSystemInfo.productName	= kDefaultXserve;			
-			defaultBIOSInfo.releaseDate		= kDefaulXserveBIOSReleaseDate;
-			defaultSystemInfo.family		= kDefaultXserveFamily;
-		}
-		else if (Platform->CPU.isMobile == true)
-		{
-			if (Platform->CPU.NoCores > 1)
-			{
-				defaultBIOSInfo.version			= kDefaultMacBookProBIOSVersion;
-				defaultSystemInfo.productName	= kDefaultMacBookPro;
-				defaultSystemInfo.family		= kDefaultMacBookProFamily;
-			}
-			else
-			{
-				defaultBIOSInfo.version			= kDefaultMacBookBIOSVersion;
-				defaultSystemInfo.productName	= kDefaultMacBook;
-				defaultSystemInfo.family		= kDefaultMacBookFamily;
-			}
-		}
-		else
-		{
-			switch (Platform->CPU.NoCores) 
-			{
-				case 1: 
-					defaultBIOSInfo.version			= kDefaultMacminiBIOSVersion;
-					defaultSystemInfo.productName	= kDefaultMacmini;
-					defaultSystemInfo.family		= kDefaultMacminiFamily;
-					break;
-					
-				case 2:
-					defaultBIOSInfo.version			= kDefaultiMacBIOSVersion;
-					defaultSystemInfo.productName	= kDefaultiMac;
-					defaultSystemInfo.family		= kDefaultiMacFamily;
-					break;
-				default:
-				{
-					switch (Platform->CPU.Family) 
-					{
-						case 0x06:
-						{
-							switch (Platform->CPU.Model)
-							{
-								case CPUID_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
-								case CPUID_MODEL_DALES:		// Intel Core i5, i7 LGA1156 (45nm) ???
-								case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-								case 0x19:					// Intel Core i5 650 @3.20 Ghz 
-									defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
-									defaultSystemInfo.productName	= kDefaultiMacNehalem;
-									defaultSystemInfo.family		= kDefaultiMacFamily;
-									break;
-									
-								case CPUID_MODEL_SANDYBRIDGE:
-								case CPUID_MODEL_JAKETOWN:  // Until Apple release a MacPro6,1 ??
-									defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
-									defaultSystemInfo.productName	= kDefaultiMacSandy;
-									defaultSystemInfo.family		= kDefaultiMacFamily;
-									break;
-									
-								case CPUID_MODEL_NEHALEM: 
-								case CPUID_MODEL_NEHALEM_EX:
-									defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
-									defaultSystemInfo.productName	= kDefaultMacProNehalem;
-									defaultSystemInfo.family		= kDefaultMacProFamily;
-									break;
-									
-								case CPUID_MODEL_WESTMERE: 
-								case CPUID_MODEL_WESTMERE_EX:
-									defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
-									defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate;
-									defaultSystemInfo.productName	= kDefaultMacProWestmere;
-									defaultSystemInfo.family		= kDefaultMacProFamily;
-									break;
-									
-								default:
-									defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
-									defaultSystemInfo.productName	= kDefaultMacPro;
-									defaultSystemInfo.family		= kDefaultMacProFamily;
-									break;
-							}
-							break;
-						}
-						default:
-							defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
-							defaultSystemInfo.productName	= kDefaultMacPro;
-							defaultSystemInfo.family		= kDefaultMacProFamily;
-							break;
-					}
-					break;
-				}
-			}
-		}
+        const SMStrEntryPair*	sm_defaults;
+        const SMStrEntryPair*	sm_chosen;
+        
+        if (Platform->CPU.isServer == true)
+        {
+            sm_defaults=sm_xserve_defaults;
+        } else if (Platform->CPU.isMobile == true) {
+            if (Platform->CPU.NoCores > 1) {
+                sm_defaults=sm_macbookpro_defaults;
+            } else {
+                sm_defaults=sm_macbook_defaults;
+            }
+        } else {
+            switch (Platform->CPU.NoCores) 
+            {
+                case 1: 
+                    sm_defaults=sm_macmini_defaults; 
+                    break;
+                case 2:
+                    sm_defaults=sm_imac_defaults;
+                    break;
+                default:
+                {
+                    switch (Platform->CPU.Family) 
+                    {
+                        case 0x06:
+                        {
+                            switch (Platform->CPU.Model)
+                            {
+                                case CPUID_MODEL_FIELDS:        // Intel Core i5, i7 LGA1156 (45nm)
+                                case CPUID_MODEL_DALES:         // Intel Core i5, i7 LGA1156 (45nm) ???
+                                case CPUID_MODEL_DALES_32NM:    // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+                                case 0x19:                      // Intel Core i5 650 @3.20 Ghz 
+                                    sm_defaults=sm_imac_core_defaults; 
+                                    break;
+                                    
+                                case CPUID_MODEL_SANDYBRIDGE:
+                                case CPUID_MODEL_JAKETOWN:
+                                    sm_defaults=sm_imac_sandy_defaults;
+                                    break;
+                                    
+                                case CPUID_MODEL_NEHALEM: 
+                                case CPUID_MODEL_NEHALEM_EX:
+                                    sm_defaults=sm_macpro_core_defaults; 
+                                    break;
+                                    
+                                case CPUID_MODEL_WESTMERE: 
+                                case CPUID_MODEL_WESTMERE_EX:
+                                    sm_defaults=sm_macpro_westmere_defaults; 
+                                    break;
+                                    
+                                default:
+                                    sm_defaults=sm_macpro_defaults; 
+                                    break;
+                            }
+                            break;
+                        }
+                        default:
+                            sm_defaults=sm_macpro_defaults; 
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        {
+            const char	*str;
+            int		size;
+            
+            if (getValueForKey("SMproductname", &str, &size, &bootInfo->smbiosConfig))
+            {              
+                if (strstr (str, "MacPro5"))
+                {
+                    sm_chosen = sm_macpro_westmere_defaults ;
+                }
+                else if (strstr (str, "MacPro4"))
+                {
+                    sm_chosen = sm_macpro_core_defaults ;
+                }
+                else if (strstr (str, "MacPro"))
+                {
+                    sm_chosen = sm_macpro_defaults ;
+                }
+                else if (strstr (str,"MacBookPro"))
+                {
+                    sm_chosen = sm_macbookpro_defaults ;
+                }
+                else if (strstr (str, "MacBook"))
+                {
+                    sm_chosen = sm_macbook_defaults ;
+                }
+                else if (!strcmp ("iMac12,1", str))
+                {
+                    sm_chosen = sm_imac_sandy_defaults ;
+                }
+                else if (!strcmp ("iMac11,1", str))
+                {
+                    sm_chosen = sm_imac_core_defaults ;
+                }
+                else if (strstr (str, "iMac"))
+                {
+                    sm_chosen = sm_imac_defaults ;
+                }
+                else if (strstr (str, "Macmini"))
+                {
+                    sm_chosen = sm_macmini_defaults ;
+                }
+                else if (strstr (str, "Xserve"))
+                {
+                    sm_chosen = sm_xserve_defaults ;
+                }
+                else 
+                {
+                    sm_chosen = sm_defaults ;
+                }    
+            } 
+            else 
+                sm_chosen = sm_defaults;     
+        }             
+        
+        bzero  (fake_serial,sizeof(fake_serial));      
+        
+        bool randomSerial = false;
+        getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig) ;
+        
+        if ( randomSerial ) // useless
+            strcat (fake_serial,sm_get_random_country());
+        else
+            strcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"));
+        
+        if ( randomSerial ) // useless
+            strcat (fake_serial,sm_get_random_year());
+        else
+            strcat (fake_serial,sm_search_str(sm_chosen, "SMserialYear"));
+        
+        if ( randomSerial ) // useless
+            strcat (fake_serial,sm_get_random_week());
+        else
+            strcat (fake_serial,sm_search_str(sm_chosen, "SMserialWeek"));            
+        
+        if ( randomSerial )
+            strcat (fake_serial,sm_get_random_productNumber());
+        else
+            strcat (fake_serial,sm_search_str(sm_chosen, "SMserialProductNumber"));
+        
+        strcat (fake_serial,sm_search_str(sm_chosen, "SMserialModel"));
+        
+        if ( randomSerial )
+            msglog ("fake_serial: %s\n",fake_serial);           
+        
+        defaultBIOSInfo.version			= sm_search_str(sm_chosen, "SMbiosversion");
+        defaultBIOSInfo.releaseDate		= sm_search_str(sm_chosen, "SMbiosdate");        
+        defaultBIOSInfo.vendor			= sm_search_str(sm_chosen, "SMbiosvendor");
 		
-		if (!defaultBIOSInfo.vendor) 
-		defaultBIOSInfo.vendor			= kDefaultVendorManufacturer;
-		if (!defaultBIOSInfo.releaseDate) 
-		defaultBIOSInfo.releaseDate		= kDefaultBIOSReleaseDate;
+        defaultSystemInfo.productName	= sm_search_str(sm_chosen, "SMproductname");
+        defaultSystemInfo.family		= sm_search_str(sm_chosen, "SMfamily");
+        defaultSystemInfo.manufacturer	= sm_search_str(sm_chosen, "SMboardmanufacter");
+        defaultSystemInfo.version		= sm_search_str(sm_chosen, "SMsystemversion");
+        defaultSystemInfo.serialNumber	= fake_serial;
 		
-		if (!defaultSystemInfo.manufacturer) 
-		defaultSystemInfo.manufacturer	= kDefaultVendorManufacturer;
-		if (!defaultSystemInfo.version) 
-		defaultSystemInfo.version		= kDefaultSystemVersion;
-		if (!defaultSystemInfo.serialNumber) 
-		defaultSystemInfo.serialNumber	= kDefaultSerialNumber;
-		
-		if (!defaultBaseBoard.manufacturer) 
-		defaultBaseBoard.manufacturer	= kDefaultVendorManufacturer;
-		if (!defaultBaseBoard.product) 
-		defaultBaseBoard.product		= kDefaultBoardProduct;
-		
+        defaultBaseBoard.manufacturer	= sm_search_str(sm_chosen, "SMboardmanufacter");
+        defaultBaseBoard.product		= sm_search_str(sm_chosen, "SMboardproduct");
+        
 		setDefSMB = false;
 	}	
 }
@@ -436,15 +807,15 @@ static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyStri
 	static int current = -1;
 	int len;
 	char key[24];
-
+    
 	if (current != structHeader->handle)
 	{
 		idx++;
 		current = structHeader->handle;
 	}
-
+    
 	sprintf(key, "%s%d", keyString, idx);
-
+    
 	if (value)
 	{
 		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
@@ -459,29 +830,29 @@ static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyStri
 	return false;
 }
 
-char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
+const char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 {
 	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
-
+    
 	if (!field)
     {
 		//return (char *)0;
         return NULL;
     }
-
+    
 	for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
-		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
-
+         field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
+    
 	return (char *)stringPtr;
 }
 
 static void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uint8_t *field)
 {
 	int strSize;
-
+    
 	if (!field)
     {
-
+        
 		return;
     }
 	if (!string)
@@ -496,7 +867,7 @@ static void setSMBStringForField(SMBStructHeader *structHeader, const char *stri
     while ((strSize != 0) && (string[strSize - 1] == ' '))
 		strSize--;
 	
-        
+    
 	if (strSize == 0)
 	{
 		*field = 0;
@@ -504,7 +875,7 @@ static void setSMBStringForField(SMBStructHeader *structHeader, const char *stri
 	}
 	
 	memcpy((uint8_t *)structHeader + structHeader->length + stringsSize, string, strSize);
-
+    
 	*field = stringIndex;
 	
 	stringIndex++;
@@ -524,9 +895,18 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	switch (SMBSetters[idx].valueType)
 	{
 		case kSMBString:
+        {
+            bool randomSerial = false;                 
+            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
+            
 			if (SMBSetters[idx].keyString)
 			{
-				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
+                if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue) && randomSerial && (!strcmp ("SMserial", SMBSetters[idx].keyString)))
+                {
+                    string = *(SMBSetters[idx].defaultValue);
+                    break;
+                }
+                else if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
 					break;
 				else
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
@@ -543,7 +923,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			}
 			string = getSMBStringForField(structPtr->orig, *(uint8_t *)value);
 			break;
-			
+		}	
 		case kSMBByte:
 		case kSMBWord:
 		case kSMBDWord:
@@ -596,7 +976,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	
 	if (SMBSetters[idx].valueType == kSMBString && string)
 		setSMBStringForField(structPtr->new, string, &value->byte);
-
+    
 	return true;
 }
 //-------------------------------------------------------------------------------------------------------------------------
@@ -620,9 +1000,9 @@ static void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 	p->header.type		= kSMBTypeOemProcessorType;
 	p->header.length	= sizeof(SMBOemProcessorType);
 	p->header.handle	= handle++;
-
+    
 	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->ProcessorType));
-
+    
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorType) + 2);
 	tableLength += sizeof(SMBOemProcessorType) + 2;
 	structureCount++;
@@ -631,7 +1011,7 @@ static void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
-
+    
 	switch (Platform->CPU.Family) 
 	{
 		case 0x06:
@@ -659,9 +1039,9 @@ static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 	p->header.type		= kSMBTypeOemProcessorBusSpeed;
 	p->header.length	= sizeof(SMBOemProcessorBusSpeed);
 	p->header.handle	= handle++;
-
+    
 	setSMBValue(structPtr, numOfSetters -1, (returnType *)&(p->ProcessorBusSpeed));
-
+    
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
 	tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
 	structureCount++;
@@ -675,7 +1055,7 @@ static void addSMBEndOfTable(SMBStructPtrs *structPtr)
 	structPtr->new->type	= kSMBTypeEndOfTable;
 	structPtr->new->length	= sizeof(SMBStructHeader);
 	structPtr->new->handle	= handle++;
-
+    
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBStructHeader) + 2);
 	tableLength += sizeof(SMBStructHeader) + 2;
 	structureCount++;
@@ -684,73 +1064,73 @@ static void addSMBEndOfTable(SMBStructPtrs *structPtr)
 static void setSMBStruct(SMBStructPtrs *structPtr)
 {
 	bool setterFound = false;
-
+    
 	uint8_t *ptr;
 	SMBWord structSize;
 	int i;
-		
+    
 	stringIndex = 1;
 	stringsSize = 0;
-
+    
 	if (handle < structPtr->orig->handle)
 		handle = structPtr->orig->handle;
-
+    
 	memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
-
+    
 	for (i = 0; i < numOfSetters; i++)
-		/*if (structPtr->orig->type == SMBSetters[i].type)
-		{
-			if (SMBSetters[i].fieldOffset > structPtr->orig->length)
-				continue;*/
+    /*if (structPtr->orig->type == SMBSetters[i].type)
+     {
+     if (SMBSetters[i].fieldOffset > structPtr->orig->length)
+     continue;*/
         if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length))
         {
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
-
+    
 	if (setterFound)
 	{
 		ptr = (uint8_t *)structPtr->new + structPtr->orig->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
-
+        
 		if (((uint16_t *)ptr)[0] == 0)
 			ptr += 2;
-
+        
 		structSize = ptr - (uint8_t *)structPtr->new;
 	}
 	else
 	{
 		ptr = (uint8_t *)structPtr->orig + structPtr->orig->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
-
+        
 		if (((uint16_t *)ptr)[0] == 0)
 			ptr += 2;
 		
 		structSize = ptr - (uint8_t *)structPtr->orig;
 		memcpy((void *)structPtr->new, structPtr->orig, structSize);
 	}
-
+    
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + structSize);
-
+    
 	tableLength += structSize;
-
+    
 	if (structSize >  maxStructSize)
 		maxStructSize = structSize;
-
+    
 	structureCount++;
-
+    
 }
 
 static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 {
 	uint8_t *ptr = (uint8_t *)eps->dmi.tableAddress;
 	structPtr->orig = (SMBStructHeader *)ptr;
-
+    
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structPtr->orig + sizeof(SMBStructHeader)));)
 	{
 		switch (structPtr->orig->type)
 		{
-			/* Skip all Apple Specific Structures */
+                /* Skip all Apple Specific Structures */
 			case kSMBTypeFirmwareVolume:
 			case kSMBTypeMemorySPD:
 			case kSMBTypeOemProcessorType:
@@ -758,7 +1138,7 @@ static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 				/* And this one too, to be added at the end */
 			case kSMBTypeEndOfTable:
 				break;
-
+                
 			default:
             {
 				/* Add */
@@ -766,63 +1146,62 @@ static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 				break;
             }
 		}
-
+        
 		ptr = (uint8_t *)((uint32_t)structPtr->orig + structPtr->orig->length);
         
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
-
+        
 		if (((uint16_t *)ptr)[0] == 0)
 			ptr += 2;
-
+        
 		structPtr->orig = (SMBStructHeader *)ptr;
 	}
     
     
 	addSMBFirmwareVolume(structPtr);
-
+    
 	addSMBMemorySPD(structPtr);
-
+    
 	addSMBOemProcessorType(structPtr);
-
+    
 	addSMBOemProcessorBusSpeed(structPtr);
-
+    
 	addSMBEndOfTable(structPtr);
     
-
+    
 }
 
 SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 {
 	SMBStructPtrs *structPtr;
-	//uint8_t *buffer;
+	uint8_t *buffer;
 	bool setSMB = true;
-
+    
 	if (!origeps)
 		return NULL;
-
+    
 	structPtr = (SMBStructPtrs *)malloc(sizeof(SMBStructPtrs));
 	if (!structPtr)
 		return NULL;
-	/*
+	
 	buffer = malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
-		return NULL;*/
-	uint8_t buffer[SMB_ALLOC_SIZE]; // put the buffer in the stack fix some problem with xcode4, but all data seems to be corrupted
-
+		return NULL;
+	
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
-
+    
 	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->bootConfig);
 	if (setSMB)
 		setDefaultSMBData();
-
+    
 	setupNewSMBIOSTable(origeps, structPtr);
 	
 	SMBEntryPoint *neweps = (SMBEntryPoint *)AllocateKernelMemory(sizeof(SMBEntryPoint));
 	if (!neweps)
 		return NULL;
 	bzero(neweps, sizeof(SMBEntryPoint));
-
+    
 	neweps->anchor[0]			= '_';
 	neweps->anchor[1]			= 'S';
 	neweps->anchor[2]			= 'M';
@@ -832,7 +1211,7 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	neweps->minorVersion		= 4;
 	neweps->maxStructureSize	= maxStructSize;
 	neweps->entryPointRevision	= 0;
-
+    
 	neweps->dmi.anchor[0]		= '_';
 	neweps->dmi.anchor[1]		= 'D';
 	neweps->dmi.anchor[2]		= 'M';
@@ -842,18 +1221,18 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	neweps->dmi.tableAddress	= AllocateKernelMemory(tableLength);
 	neweps->dmi.structureCount	= structureCount;
 	neweps->dmi.bcdRevision		= 0x24;
-
+    
 	if (!neweps->dmi.tableAddress)
 		return NULL;
-
+    
 	memcpy((void *)neweps->dmi.tableAddress, buffer, tableLength);
-
+    
 	neweps->dmi.checksum		= 0;
 	neweps->dmi.checksum		= 0x100 - checksum8(&neweps->dmi, sizeof(DMIEntryPoint));
-
+    
 	neweps->checksum			= 0;
 	neweps->checksum			= 0x100 - checksum8(neweps, sizeof(SMBEntryPoint));
-
+    
 	//free(buffer);
 	decodeSMBIOSTable(neweps);
     
@@ -865,12 +1244,12 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 {
 	uint8_t *structPtr = (uint8_t *)eps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
-
+    
 	int dimmnbr = 0;
 	Platform->DMI.MaxMemorySlots	= 0;
 	Platform->DMI.CntMemorySlots	= 0;
 	Platform->DMI.MemoryModules	= 0;
-
+    
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
 	{
 		switch (structHeader->type)
@@ -878,11 +1257,11 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 			case kSMBTypeSystemInformation:
 				Platform->UUID = ((SMBSystemInformation *)structHeader)->uuid;
 				break;
-
+                
 			case kSMBTypePhysicalMemoryArray:
 				Platform->DMI.MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
 				break;
-
+                
 			case kSMBTypeMemoryDevice:
 				Platform->DMI.CntMemorySlots++;
         		if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
@@ -894,13 +1273,13 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 			default:
 				break;
 		}
-
+        
 		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
-
+        
 		if (((uint16_t *)structPtr)[0] == 0)
 			structPtr += 2;
-
+        
 		structHeader = (SMBStructHeader *)structPtr;
 	}
 }

@@ -197,6 +197,26 @@ static const SMStrEntryPair const sm_macpro_core_defaults[]={
 	{ "",""	}
 };
 
+// defaults for a Mac Pro 5,1 Westmere
+static const SMStrEntryPair const sm_macpro_westmere_defaults[]={
+	{"SMbiosvendor",            "Apple Computer, Inc."			},
+	{"SMbiosversion",           "MP51.88Z.007F.B00.1008031144"	},
+	{"SMbiosdate",              "08/03/2010"					},
+	{"SMmanufacter",            "Apple Inc."                    },
+	{"SMproductname",           "MacPro5,1"						},
+	{"SMsystemversion",         "0.0"							},
+	{"SMserial",                "YM0330U7EUH"					},
+    {"SMserialProductCountry",	"YM"                            },
+    {"SMserialYear",            "0"                             },
+	{"SMserialWeek",            "33"                            },
+	{"SMserialProductNumber",	"0U7"                           },
+	{"SMserialModel",			"EUH"                           },
+	{"SMfamily",                "MacPro"						},
+	{"SMboardmanufacter",       "Apple Computer, Inc."			},
+	{"SMboardproduct",          "Mac-F221BEC8"					},
+	{ "",""	}
+};
+
 // default for a Xserve
 static const SMStrEntryPair const sm_xserve_defaults[]={
     {"SMbiosvendor",            "Apple Inc."					},
@@ -425,11 +445,14 @@ const char* sm_get_defstr(const char * key, int table_num)
                                 break;
                                 
 							case CPUID_MODEL_NEHALEM: 
-							case CPUID_MODEL_NEHALEM_EX:
-							case CPUID_MODEL_WESTMERE: 
-							case CPUID_MODEL_WESTMERE_EX:
-								sm_defaults=sm_macpro_core_defaults; 
-								break;
+                            case CPUID_MODEL_NEHALEM_EX:
+                                sm_defaults=sm_macpro_core_defaults; 
+                                break;
+                                
+                            case CPUID_MODEL_WESTMERE: 
+                            case CPUID_MODEL_WESTMERE_EX:
+                                sm_defaults=sm_macpro_westmere_defaults; 
+                                break;
 							default:
 								sm_defaults=sm_macpro_defaults; 
 								break;
@@ -451,7 +474,11 @@ const char* sm_get_defstr(const char * key, int table_num)
         
         if (getValueForKey("SMproductname", &str, &size, &bootInfo->smbiosConfig))
         {              
-            if (strstr (str, "MacPro4"))
+            if (strstr (str, "MacPro5"))
+            {
+                sm_chosen = sm_macpro_westmere_defaults ;
+            }
+            else if (strstr (str, "MacPro4"))
             {
                 sm_chosen = sm_macpro_core_defaults ;
             }
