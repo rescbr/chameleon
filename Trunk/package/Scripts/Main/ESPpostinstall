@@ -36,7 +36,15 @@ stage1LoaderHFS="boot1h"
 stage1LoaderFAT="boot1f32"
 stage2Loader="boot"
 
-targetVolumeChosenByUser=$3
+# If target volume root of current system then replace
+# / with volume name.
+if [ "$3" == "/" ]
+then
+	targetVolumeChosenByUser="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
+else
+    targetVolumeChosenByUser="$3"
+fi
+
 targetDeviceChosenByUser=$( df "${targetVolumeChosenByUser}" | sed -n '2p' | awk '{print $1}' )
 
 targetVolume="/Volumes/EFI"
