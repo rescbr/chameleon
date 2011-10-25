@@ -48,7 +48,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     if [ -e "${chamTemp}"/Extra/modules ]; then
         ls "${chamTemp}"/Extra/modules | while read FILE
         do
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Installed module:$FILE"
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Added module: $FILE"
         done
     fi
 			
@@ -58,7 +58,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     if [ -e "${chamTemp}"/Extra/Themes ]; then
         ls "${chamTemp}"/Extra/Themes | while read FILE
         do
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Installed Theme:$FILE"
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Added Theme: $FILE"
         done
     fi
 
@@ -151,6 +151,8 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     # Does the user want to upgrade an existing /Extra folder?
 	# If so, then merge their existing one in to the temp one
 	if [ -e "$chamTemp/install_type_upgrade" ]; then
+		"$scriptDir"InstallLog.sh "${dest_vol}" "User selected to do an upgrade install."
+	
 		# first move the new org.chameleon.Boot.plist out of tmp
 		# Extra folder so we can merge that separately.
 		mv "$tempOCBP" "$chamTemp/holding.plist"
@@ -159,10 +161,12 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 		# and merge existing /Extra with temp one.
 			if [ -e "$dest_vol"/.ChameleonEFI ]; then
 				if [ -e "/Volumes/EFI/Extra" ]; then
+					"$scriptDir"InstallLog.sh "${dest_vol}" "Merging existing /Volumes/EFI/Extra folder."
 					ditto --noextattr --noqtn /Volumes/EFI/Extra "$chamTemp"/Extra
 				fi
 			else
 				if [ -e "$dest_vol/Extra" ]; then
+					"$scriptDir"InstallLog.sh "${dest_vol}" "Merging existing ${dest_vol}/Extra folder."
 					ditto --noextattr --noqtn "${dest_vol}"/Extra "$chamTemp"/Extra
 				fi
 			fi
@@ -170,12 +174,27 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 		# Check existing plist name for old naming convention
 		# and change to new convention.
 		if [ -e "$chamTemp"/Extra/com.apple.Boot.plist ]; then
+			"$scriptDir"InstallLog.sh "${dest_vol}" "Renaming existing com.apple.Boot.plist to org.chameleon.Boot.plist."
 			mv "$chamTemp"/Extra/com.apple.Boot.plist "$tempOCBP"
 		fi
 		
+		# Before merging org.chameleon.Boot.plist, copy any
+		# existing kernel flags.
+		
+		
 		# Merge new org.chameleon.Boot.plist (holding.plist)
 		# with their currently existing one.
+		"$scriptDir"InstallLog.sh "${dest_vol}" "Merging new options into org.chameleon.Boot.plist.
+NOTE: Please check the new merged org.chameleon.Boot.plist as
+NOTE: any existing keys will NOT have been updated.
+NOTE: For example: If you already had Wait=No as a boot option
+NOTE: and chose Wait=Yes from the list, this will NOT be changed."
 		sudo /usr/libexec/plistbuddy -c "Merge $chamTemp/holding.plist" "$tempOCBP"
+			
+		# TO DO - kernel flags! - maybe read existing, delete them, re-add existing and new?
+		
+	elif [ -e "$chamTemp/install_type_new" ]; then
+		"$scriptDir"InstallLog.sh "${dest_vol}" "User selected to make a new install."
 	fi
 	
     # ---------------------------------------------
@@ -193,21 +212,33 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 
             # Does an /Extra folder already exist?
             if [ -e "$dest_vol"/Extra ]; then
-                "$scriptDir"InstallLog.sh "${dest_vol}" "Found existing $dest_vol/Extra folder. Renaming it $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
+                "$scriptDir"InstallLog.sh "${dest_vol}" "Moving $dest_vol/Extra folder to $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
                 mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
             fi
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: $dest_vol/Extra"
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Writing new Extra folder to: $dest_vol/"
             echo "Copying $chamTemp/Extra TO $dest_vol"
             cp -R "$chamTemp"/Extra "$dest_vol"
         else
             # The EFI system partition install option was chosen
             # Does a /Volumes/Extra folder already exist?
             if [ -e "/Volumes/EFI/Extra" ]; then
-                "$scriptDir"InstallLog.sh "${dest_vol}" "Found existing /Volumes/EFI/Extra folder. Renaming it Extra-OLD-$( date "+%H-%M-%S" )"
+                "$scriptDir"InstallLog.sh "${dest_vol}" "Moving /Volumes/EFI/Extra folder to /Volumes/EFI/Extra-OLD-$( date "+%H-%M-%S" )"
                 mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
             fi
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: /Volumes/EFI/Extra"
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Writing new Extra folder to: /Volumes/EFI/"
             cp -R "$chamTemp"/Extra "/Volumes/EFI"
+        fi
+    else
+        if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
+            if [ -e "$dest_vol"/Extra ]; then
+				"$scriptDir"InstallLog.sh "${dest_vol}" "No elements selected for adding to an Extra folder,
+so leaving existing $dest_vol/Extra folder untouched."
+            fi
+        else
+            if [ -e "/Volumes/EFI/Extra" ]; then
+                "$scriptDir"InstallLog.sh "${dest_vol}" "No elements selected for adding to an Extra folder,
+so leaving existing /Volumes/EFI/Extra folder untouched."
+            fi
         fi
     fi
     
