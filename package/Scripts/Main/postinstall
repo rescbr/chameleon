@@ -3,8 +3,6 @@
 echo "==============================================="
 echo "Post Post-Install Script"
 echo "*********************************"
-echo "-----------------------------------------------"
-echo ""
 
 #echo "DEBUG: $ 1 = Full path to the installation package the installer app is processing: " $1
 #echo "DEBUG: $ 2 = Full path to the installation destination: " $2
@@ -41,6 +39,7 @@ chamTemp="$dest_vol/usr/local/chamTemp"
 
 # Check for stopped installation due to Chameleon
 # already existing on the same disk.
+# TO DO - This check can be removed as it's no longer used!!
 if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 
     # ---------------------------------------------
@@ -80,31 +79,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         fi
 
 		tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
-		
-	#	# Does the user want to upgrade an existing /Extra folder?
-	#	# If so, then make a copy of their Boot.plist.
-	#	if [ -e "$chamTemp/install_type_upgrade" ]; then
-	#		# Check for an existing /Extra folder
-	#		if [ -e "$dest_vol"/.ChameleonEFI ]; then
-	#			if [ -e "/Volumes/EFI/Extra/org.chameleon.Boot.plist" ]; then
-	#				cp /Volumes/EFI/Extra/org.chameleon.Boot.plist "$tempOCBP"
-	#			fi
-	#			if [ -e "/Volumes/EFI/Extra/com.apple.Boot.plist" ]; then
-	#				cp /Volumes/EFI/Extra/com.apple.Boot.plist "$tempOCBP"
-	#			fi
-	#		else
-	#			if [ -e "$dest_vol/Extra/org.chameleon.Boot.plist" ]; then
-	#				cp "${dest_vol}/Extra/org.chameleon.Boot.plist" "$tempOCBP"
-	#			fi
-	#			if [ -e "$dest_vol/Extra/com.apple.Boot.plist" ]; then
-	#				cp "${dest_vol}/Extra/com.apple.Boot.plist" "$tempOCBP"
-	#			fi
-	#		fi
-	#	elif [ -e "$chamTemp/install_type_new" ]; then
-	#		# Create template for org.chameleon.Boot.plist"
-	#		cp "$4"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
-	#	fi
-		
+			
 		# Create template for org.chameleon.Boot.plist"
         tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
         cp "$4"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
@@ -169,7 +144,40 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             fi
         fi	
     fi
-
+    
+    # ---------------------------------------------
+    # Merge /Extra folders?
+    # ---------------------------------------------
+    # Does the user want to upgrade an existing /Extra folder?
+	# If so, then merge their existing one in to the temp one
+	if [ -e "$chamTemp/install_type_upgrade" ]; then
+		# first move the new org.chameleon.Boot.plist out of tmp
+		# Extra folder so we can merge that separately.
+		mv "$tempOCBP" "$chamTemp/holding.plist"
+			
+		# Check for an existing /Extra folder
+		# and merge existing /Extra with temp one.
+			if [ -e "$dest_vol"/.ChameleonEFI ]; then
+				if [ -e "/Volumes/EFI/Extra" ]; then
+					ditto --noextattr --noqtn /Volumes/EFI/Extra "$chamTemp"/Extra
+				fi
+			else
+				if [ -e "$dest_vol/Extra" ]; then
+					ditto --noextattr --noqtn "${dest_vol}"/Extra "$chamTemp"/Extra
+				fi
+			fi
+		
+		# Check existing plist name for old naming convention
+		# and change to new convention.
+		if [ -e "$chamTemp"/Extra/com.apple.Boot.plist ]; then
+			mv "$chamTemp"/Extra/com.apple.Boot.plist "$tempOCBP"
+		fi
+		
+		# Merge new org.chameleon.Boot.plist (holding.plist)
+		# with their currently existing one.
+		sudo /usr/libexec/plistbuddy -c "Merge $chamTemp/holding.plist" "$tempOCBP"
+	fi
+	
     # ---------------------------------------------
     # Copy temp Extra folder to target destination
     # ---------------------------------------------

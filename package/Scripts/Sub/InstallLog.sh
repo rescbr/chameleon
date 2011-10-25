@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "==============================================="
-echo "InstallLog: Create/Append installation log"
-echo "**********************************************"
+#echo "==============================================="
+#echo "InstallLog: Create/Append installation log"
+#echo "**********************************************"
 
 # Writes to the Chameleon_Installer_Log.txt file created
 # by the preinstall script at the start of installation.
@@ -14,10 +14,10 @@ echo "**********************************************"
 if [ "$#" -eq 2 ]; then
 	logLocation="$1"
 	verboseText="$2"
-	echo "DEBUG: passed argument = ${logLocation}"
-	echo "DEBUG: passed argument = ${verboseText}"
+	#echo "DEBUG: passed argument = ${logLocation}"
+	#echo "DEBUG: passed argument = ${verboseText}"
 else
-	echo "Error - wrong number of values passed"
+	echo "InstallLog: Error - wrong number of values passed"
 	exit 9
 fi
 
