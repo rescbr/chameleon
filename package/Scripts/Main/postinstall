@@ -18,10 +18,11 @@ then
     exit 1
 fi
 
-# clean up what would otherwise turn into "//" paths
+# If target volume root of current system then replace
+# / with volume name.
 if [ "$3" == "/" ]
 then
-    dest_vol=""
+	dest_vol="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
 else
     dest_vol="$3"
 fi    
@@ -31,17 +32,9 @@ MYLOCATION="${PWD}/${BASH_ARGV[0]}"
 export MYLOCATION="${MYLOCATION%/*}"
 scriptDir=$MYLOCATION
 
-# Has install log already been generated?
-if [ ! -f "${dest_vol}"/.ChameleonLogFlag ]; then
-	# Write some information to the Install Log
-	versionNumber=`cat "${scriptDir}"/Resources/version`
-	revisionNumber=`cat "${scriptDir}"/Resources/revision`
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Installer version: ${versionNumber} ${revisionNumber}"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Target volume = ${dest_vol}"
-else
-	"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
-fi
+# Write some information to the Install Log
+"$scriptDir"InstallLog.sh "${dest_vol}" "Running Post postinstall script"
+"$scriptDir"InstallLog.sh "${dest_vol}" "Target volume = ${dest_vol}"
 
 # set temporary directory
 chamTemp="$dest_vol/usr/local/chamTemp"
@@ -86,10 +79,36 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             mkdir "$chamTemp"/Extra
         fi
 
-        # Create template for org.chameleon.Boot.plist"
+		tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
+		
+	#	# Does the user want to upgrade an existing /Extra folder?
+	#	# If so, then make a copy of their Boot.plist.
+	#	if [ -e "$chamTemp/install_type_upgrade" ]; then
+	#		# Check for an existing /Extra folder
+	#		if [ -e "$dest_vol"/.ChameleonEFI ]; then
+	#			if [ -e "/Volumes/EFI/Extra/org.chameleon.Boot.plist" ]; then
+	#				cp /Volumes/EFI/Extra/org.chameleon.Boot.plist "$tempOCBP"
+	#			fi
+	#			if [ -e "/Volumes/EFI/Extra/com.apple.Boot.plist" ]; then
+	#				cp /Volumes/EFI/Extra/com.apple.Boot.plist "$tempOCBP"
+	#			fi
+	#		else
+	#			if [ -e "$dest_vol/Extra/org.chameleon.Boot.plist" ]; then
+	#				cp "${dest_vol}/Extra/org.chameleon.Boot.plist" "$tempOCBP"
+	#			fi
+	#			if [ -e "$dest_vol/Extra/com.apple.Boot.plist" ]; then
+	#				cp "${dest_vol}/Extra/com.apple.Boot.plist" "$tempOCBP"
+	#			fi
+	#		fi
+	#	elif [ -e "$chamTemp/install_type_new" ]; then
+	#		# Create template for org.chameleon.Boot.plist"
+	#		cp "$4"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
+	#	fi
+		
+		# Create template for org.chameleon.Boot.plist"
         tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
         cp "$4"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist "$tempOCBP"
-
+		
         # Read list of all boot options the user added.
         arrayCount=0
         kernelFlagCount=0
@@ -170,6 +189,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
                 mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
             fi
             "$scriptDir"InstallLog.sh "${dest_vol}" "Writing folder: $dest_vol/Extra"
+            echo "Copying $chamTemp/Extra TO $dest_vol"
             cp -R "$chamTemp"/Extra "$dest_vol"
         else
             # The EFI system partition install option was chosen

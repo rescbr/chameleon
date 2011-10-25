@@ -37,7 +37,16 @@ stage1LoaderHFS="boot1h"
 stage1LoaderFAT="boot1f32"
 stage2Loader="boot"
 
-targetVolume=$3
+# If target volume root of current system then replace
+# / with volume name.
+if [ "$3" == "/" ]
+then
+	targetVolume="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
+else
+    targetVolume="$3"
+fi
+
+
 targetDevice=$( df "${targetVolume}" | sed -n '2p' | awk '{print $1}' )
 targetDeviceRaw=${targetDevice/disk/rdisk}
 targetDisk=${targetDevice%s*}
@@ -192,6 +201,7 @@ fi
 
 "$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Standard script complete"
+"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 
 echo "==============================================="
 echo "END - Standard Post-Install Script"

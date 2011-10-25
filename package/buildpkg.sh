@@ -88,6 +88,31 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 	buildpackage "${1}/Core" "/" "0" "start_visible=\"false\" start_selected=\"true\"" >/dev/null 2>&1
 # End build core package
 	
+# build install type
+#	echo "================= Chameleon ================="
+#	outline[$((outlinecount++))]="${indent[$xmlindent]}<line choice=\"InstallType\">"
+#	choices[$((choicescount++))]="\t<choice\n\t\tid=\"InstallType\"\n\t\ttitle=\"InstallType_title\"\n\t\tdescription=\"InstallType_description\">\n\t</choice>\n"
+#	((xmlindent++))
+#	packagesidentity="org.chameleon.type"
+#	
+#	# build new install package 
+#		mkdir -p ${1}/New/Root
+#		echo "" > "${1}/New/Root/install_type_new"
+#		echo "	[BUILD] New "
+#       buildpackage "${1}/New" "/$chamTemp" "" "start_enabled=\"true\" selected=\"exclusive(choices['Upgrade'])\"" >/dev/null 2>&1
+#	# End build new install package 
+#
+#	# build upgrade package 
+#		mkdir -p ${1}/Upgrade/Root
+#		echo "" > "${1}/Upgrade/Root/install_type_upgrade"
+#		echo "	[BUILD] Upgrade "
+#		buildpackage "${1}/Upgrade" "/$chamTemp" "" "start_selected=\"false\" selected=\"exclusive(choices['New'])\"" >/dev/null 2>&1
+#	# End build upgrade package
+
+#   ((xmlindent--))
+#   outline[$((outlinecount++))]="${indent[$xmlindent]}</line>"
+# End build install type	
+
 # build Chameleon package
 	echo "================= Chameleon ================="
 	outline[$((outlinecount++))]="${indent[$xmlindent]}<line choice=\"Chameleon\">"

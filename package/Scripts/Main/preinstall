@@ -20,7 +20,15 @@ MYLOCATION="${PWD}/${BASH_ARGV[0]}"
 export MYLOCATION="${MYLOCATION%/*}"
 scriptDir=$MYLOCATION
 
-targetVolume=$3
+
+# If target volume root of current system then replace
+# / with volume name.
+if [ "$3" == "/" ]
+then
+	targetVolume="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
+else
+    targetVolume="$3"
+fi
 
 logName="Chameleon_Installer_Log.txt"
 logFile="${targetVolume}"/$logName
