@@ -559,7 +559,7 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 
-	{ 0x6720,	0x04BA1028, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970m",				kElodea		}, // ErmaC no tested
+	{ 0x6720,	0x04BA1028, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6970m",				kElodea		}, // ErmaC no tested
 
 	{ 0x6738,	0x00D01002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	{ 0x6738,	0x21FA1002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
