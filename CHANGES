@@ -1,3 +1,5 @@
+- Small security fix
+- Added a mechanism to strip the madt table
 - Ported the serial number randomizer to smbiosgetters,
  Warning: smbiosgetters (and also the Gui module) still don't work when built with Xcode4.
 

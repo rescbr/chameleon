@@ -39,7 +39,7 @@ U32 update_rsdp_with_xsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_XSDT *xsdt);
 U32 update_rsdp_with_rsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_RSDT *rsdt);
 
 void SetChecksum(struct acpi_table_header *header);
-U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info);
+U32 ProcessMadtInfo(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info);
 void MoveRsdtInsertSsdt(ACPI_TABLE_RSDP * RsdPointer, ACPI_TABLE_RSDT * OldRsdtPointer, ACPI_TABLE_RSDT * NewRsdtPointer, ACPI_TABLE_SSDT * SsdtPointer);
 void InsertSsdt(ACPI_TABLE_RSDT * RsdtPointer, ACPI_TABLE_SSDT * SsdtPointer);
 void InsertSsdt64(ACPI_TABLE_XSDT * XsdtPointer, ACPI_TABLE_SSDT * SsdtPointer);

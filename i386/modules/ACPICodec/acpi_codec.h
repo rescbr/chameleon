@@ -22,6 +22,8 @@
 
 #define KIntelFADT			"IntelFADTSpec"		/* acpi_codec.c */
 
+#define kSTRIPAPIC          "StripAPICTable"    /* acpi_codec.c */
+
 #define kRestartFix			"RestartFix"        /* acpi_codec.c */
 #define KResetType			"ResetType"			/* acpi_codec.c */ 
 #define PCI_RESET_TYPE			0	// (default)

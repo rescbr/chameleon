@@ -311,7 +311,7 @@ const char* sm_get_random_productNumber()
         char tmp[2];
         bzero(tmp,sizeof(tmp));
         sprintf(tmp,"%c",sn_gen_pn_str[rand_sn1]);
-        strcpy (str, tmp);
+        strlcpy (str, tmp, sizeof(tmp)+1);
         
         sprintf(tmp,"%c",sn_gen_pn_str[rand_sn2]);
         strcat (str, tmp);
@@ -342,10 +342,10 @@ const char* sm_get_random_week()
         
         if (rand_week < 10) {
             sprintf(tmp,"0%d",rand_week);
-            strcpy (str, tmp);
+            strlcpy (str, tmp, sizeof(tmp)+1);
         } else if (rand_week < 100) { // avoid overflow in case random return a number >= 100
             sprintf(tmp,"%d",rand_week);
-            strcpy (str, tmp);
+            strlcpy (str, tmp, sizeof(tmp)+1);
         }      
 
         DBG ("fake_week: %s\n",str);
@@ -371,7 +371,7 @@ const char* sm_get_random_year()
         
         if (rand_year < 10) {
             sprintf(tmp,"%d",rand_year);
-            strcpy (str, tmp);              
+            strlcpy (str, tmp, sizeof(tmp)+1);
         }
         
         DBG ("fake_year: %s\n",str);
@@ -392,7 +392,7 @@ const char* sm_get_random_country()
         rand_country = random(random_country_obj);        
         random_free(random_country_obj);       
        
-        strcpy (str, sm_country_list[rand_country].code);              
+        strlcpy (str, sm_country_list[rand_country].code,strlen(sm_country_list[rand_country].code)+1);
                 
         DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);
         
@@ -533,9 +533,9 @@ const char* sm_get_defstr(const char * key, int table_num)
             getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig) ;
             
             if ( randomSerial ) // useless
-                strcat (fake_serial,sm_get_random_country());
+                strlcpy (fake_serial,sm_get_random_country(), strlen(sm_get_random_country())+1);
             else
-                strcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"));
+                strlcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"), strlen(sm_search_str(sm_chosen, "SMserialProductCountry"))+1);
             
             if ( randomSerial ) // useless
                 strcat (fake_serial,sm_get_random_year());

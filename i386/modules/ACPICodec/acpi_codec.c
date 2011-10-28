@@ -140,7 +140,9 @@ bool (*aml_add_to_parent)(struct aml_chunk*, struct aml_chunk*) = NULL;
 #define MSR_RAPL_POWER_UNIT 0x606
 #define MSR_PKG_RAPL_POWER_LIMIT 0x610
 static U32 turbo_enabled = 0;
-static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffer, U32 bufferSize, bool enable_cstates, bool enable_pstates, bool enable_tstates);
+static U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U32 bufferSize, U32 NB_CPU);
+static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * madt_info);
+static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer, U32 bufferSize, bool enable_cstates, bool enable_pstates,  bool enable_tstates);
 static bool is_sandybridge(void);
 static bool is_jaketown(void);
 static U32 encode_pstate(U32 ratio);
@@ -150,7 +152,7 @@ static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu);
 #endif
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase);
 static U32 BuildPstateInfo(CPU_DETAILS * cpu);
-static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_cstates, bool enable_pstates, bool enable_tstates );
+static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * madt_info, bool enable_cstates, bool enable_pstates, bool enable_tstates );
 static void * buildCpuScope (void * current, U32 cpu_namespace, PROCESSOR_NUMBER_TO_NAMESEG * aslCpuNamePath);
 static void * buildPDC(void * current);
 static void * buildOSC(void * current);
@@ -195,13 +197,13 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 #define MAX_SSDT_TABLE 15 // 15 additional SSDT tables  
 #define MAX_ACPI_TABLE MAX_NON_SSDT_TABLE + MAX_SSDT_TABLE
 
-// Security space for SSDT & FACP generation,
+// Security space for SSDT , FACP & MADT table generation,
 // the size can be increased 
 // note: the table will not placed in the reserved space if the 'normal' space is not full
 #if OLD_SSDT
-#define RESERVED_AERA 3
+#define RESERVED_AERA 4
 #else
-#define RESERVED_AERA 2
+#define RESERVED_AERA 3
 #endif
 
 #define ACPI_TABLE_LIST_FULL MAX_ACPI_TABLE + RESERVED_AERA + 1
@@ -2709,15 +2711,375 @@ static U32 BuildTstateInfo(CPU_DETAILS * cpu)
 }
 #endif
 
-static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_cstates, bool enable_pstates, bool enable_tstates )
+//-----------------------------------------------------------------------------
+U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U32 bufferSize, U32 nb_cpu)
 {
-	DBG("Processing SSDT\n");
+    void *current;
+    void *currentOut;
+    void *end;
+    void * endOut;
+    
+    U32 LOCAL_APIC_NMI_CNT = 0, LOCAL_SAPIC_CNT = 0, INT_SRC_CNT = 0,  Length = 0;
+    
+    // Quick sanity check for a valid MADT
+    if (madt == 0ul || !nb_cpu)
+        return (0);
+    
+    // Confirm a valid MADT buffer was provided
+    if (!buffer)
+    {
+        printf("Error: Invalid Buffer Address for MADT\n");
+        return(0);
+    }
+    
+    // Confirm a valid MADT buffer length was provided
+    if (!bufferSize)
+    {
+        printf("Error: Invalid Buffer Length for MADT\n");
+        return(0);
+    }    
+    
+    madt_info->lapic_count = 0;           
+    
+    memcpy(buffer, madt, sizeof(ACPI_TABLE_MADT));       
+    
+    // Search MADT for Sub-tables with needed data
+    current = madt + 1;
+    currentOut = buffer + sizeof(ACPI_TABLE_MADT) ;    
+    
+    end = (U8 *) madt + madt->Header.Length;
+    endOut = (U8 *)buffer + bufferSize; 
+    
+    // Check to confirm no MADT buffer overflow
+    if ( (U8 *)currentOut > (U8 *)endOut )
+    {
+        printf("Error: MADT Buffer Length exceeded available space \n");
+        return(0);
+    }
+    
+    Length += sizeof(ACPI_TABLE_MADT);    
+    
+    while (current < end)
+	{
+        ACPI_SUBTABLE_HEADER *subtable = current;
+        ACPI_SUBTABLE_HEADER *subtableOut = currentOut;
+        
+        
+        switch (subtable->Type)
+		{
+                
+			case ACPI_MADT_TYPE_LOCAL_APIC:
+            {
+                
+                // Process sub-tables with Type as 0: Processor Local APIC
+                ACPI_MADT_LOCAL_APIC *lapic = current;
+                current = lapic + 1;                                
+                
+                if (!(lapic->LapicFlags & ACPI_MADT_ENABLED))
+                    continue;
+                
+                if (madt_info->lapic_count >= nb_cpu)
+                    continue;
+                
+                // copy subtable
+                {                           
+                    
+                    memcpy(currentOut, lapic, lapic->Header.Length);
+                    
+                    currentOut = currentOut + lapic->Header.Length;
+                    
+                    // Check to confirm no MADT buffer overflow
+                    if ( (U8 *)currentOut > (U8 *)endOut )
+                    {
+                        printf("Error: MADT Buffer Length exceeded available space \n");
+                        return(0);
+                    }
+                }
+                
+                {
+                    LAPIC_INFO *lapic_info = &madt_info->lapic[madt_info->lapic_count];
+                    
+                    lapic_info->processorId = lapic->ProcessorId;
+                    lapic_info->apicId = lapic->Id;
+                    lapic_info->madt_type = ACPI_MADT_TYPE_LOCAL_APIC;
+                }
+                
+                madt_info->lapic_count++;
+                
+                Length += lapic->Header.Length;
+                
+                // Sanity check to verify compile time limit for max logical CPU is not exceeded
+                if (madt_info->lapic_count > MAX_LOGICAL_CPU)
+                    return (0);
+                
+                break;
+            }
+                
+			case ACPI_MADT_TYPE_X2APIC:
+            {
+                
+                // Process sub-tables with Type as 9: Processor X2APIC
+                ACPI_MADT_X2APIC *x2apic = current;
+                current = x2apic + 1;                 
+                
+                if (!(x2apic->x2apicFlags & ACPI_MADT_ENABLED))
+                    continue;
+                
+                if (madt_info->lapic_count >= nb_cpu)
+                    continue;
+                
+                // copy subtable
+                { 
+                    memcpy(currentOut, x2apic, x2apic->Header.Length);
+                    
+                    currentOut = currentOut + x2apic->Header.Length;
+                    
+                    // Check to confirm no MADT buffer overflow
+                    if ( (U8 *)currentOut > (U8 *)endOut )
+                    {
+                        printf("Error: MADT Buffer Length exceeded available space \n");
+                        return(0);
+                    }
+                    
+                }
+                
+                {
+                    LAPIC_INFO *lapic_info = &madt_info->lapic[madt_info->lapic_count];
+                    
+                    lapic_info->uid = x2apic->UID;
+                    lapic_info->apicId = x2apic->x2apicId;
+                    lapic_info->madt_type = ACPI_MADT_TYPE_X2APIC;
+                }
+                
+                madt_info->lapic_count++;
+                
+                Length += x2apic->Header.Length;
+                
+                // Sanity check to verify compile time limit for max logical CPU is not exceeded
+                if (madt_info->lapic_count > MAX_LOGICAL_CPU)
+                    return (0);
+                
+                break;
+            }
+                
+            case ACPI_MADT_TYPE_LOCAL_APIC_NMI:
+            {
+                // Process sub-tables with Type as 4: Local APIC NMI
+                ACPI_MADT_LOCAL_APIC_NMI *nmi = current;
+                current = nmi + 1;               
+                
+                if (LOCAL_APIC_NMI_CNT >= nb_cpu)
+                    continue;                
+                
+                memcpy(currentOut, nmi, nmi->Header.Length);   
+                
+                currentOut = currentOut + nmi->Header.Length;
+                
+                // Check to confirm no MADT buffer overflow
+                if ( (U8 *)currentOut > (U8 *)endOut )
+                {
+                    printf("Error: MADT Buffer Length exceeded available space \n");
+                    return(0);
+                }
+                
+                
+                LOCAL_APIC_NMI_CNT++;
+                
+                Length += nmi->Header.Length;
+                
+                // Sanity check to verify compile time limit for max logical CPU is not exceeded
+                if (LOCAL_APIC_NMI_CNT > MAX_LOGICAL_CPU)
+                    return (0);
+                
+                break;
+            }
+                
+            case ACPI_MADT_TYPE_LOCAL_SAPIC:
+            {
+                // Process sub-tables with Type as 7: Local Sapic
+                ACPI_MADT_LOCAL_SAPIC *sapic = current;
+                current = sapic + 1;               
+                
+                if (LOCAL_SAPIC_CNT >= nb_cpu)
+                    continue;                
+                
+                memcpy(currentOut, sapic, sapic->Header.Length);   
+                
+                currentOut = currentOut + sapic->Header.Length;
+                
+                // Check to confirm no MADT buffer overflow
+                if ( (U8 *)currentOut > (U8 *)endOut )
+                {
+                    printf("Error: MADT Buffer Length exceeded available space \n");
+                    return(0);
+                }
+                
+                
+                LOCAL_SAPIC_CNT++;
+                
+                Length += sapic->Header.Length;
+                
+                // Sanity check to verify compile time limit for max logical CPU is not exceeded
+                if (LOCAL_SAPIC_CNT > MAX_LOGICAL_CPU)
+                    return (0);
+                
+                break;
+            }
+                
+            case ACPI_MADT_TYPE_INTERRUPT_SOURCE:
+            {
+                // Process sub-tables with Type as 8: Platform Interrupt Source
+                ACPI_MADT_INTERRUPT_SOURCE *intsrc = current;
+                current = intsrc + 1;               
+                
+                if (INT_SRC_CNT >= nb_cpu)
+                    continue;                
+                
+                memcpy(currentOut, intsrc, intsrc->Header.Length);   
+                
+                currentOut = currentOut + intsrc->Header.Length;
+                
+                // Check to confirm no MADT buffer overflow
+                if ( (U8 *)currentOut > (U8 *)endOut )
+                {
+                    printf("Error: MADT Buffer Length exceeded available space \n");
+                    return(0);
+                }
+                
+                
+                INT_SRC_CNT++;
+                
+                Length += intsrc->Header.Length;
+                
+                // Sanity check to verify compile time limit for max logical CPU is not exceeded
+                if (INT_SRC_CNT > MAX_LOGICAL_CPU)
+                    return (0);
+                
+                break;
+            }
+                
+			default:
+            {
+                
+                // Process all other sub-tables
+                current = (U8 *) subtable + subtable->Length;
+                currentOut = (U8 *) subtableOut + subtable->Length;
+                
+                memcpy(subtableOut, subtable, subtable->Length);
+                
+                // Check to confirm no MADT buffer overflow
+                if ( (U8 *)currentOut > (U8 *)endOut )
+                {
+                    printf("Error: MADT Buffer Length exceeded available space \n");
+                    return(0);
+                }                       
+                
+                Length += subtable->Length;
+                
+                break;
+            }
+        } // switch
+        
+    } // while  
+    
+    {
+        ACPI_TABLE_MADT * new_madt = (ACPI_TABLE_MADT * )buffer;       
+        
+        // Update the Lenght of the new MADT table
+        new_madt->Header.Length = Length;       
+        
+        // Update the checksum of the new MADT table
+		SetChecksum(&new_madt->Header);       
+    }
+    
+    return (1);
+}
+
+static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * madt_info)
+{
+    DBG("Build MADT\n");
 	
 	ACPI_TABLE_MADT * madt_file = (void*)0ul;
 	ACPI_TABLE_MADT * MadtPointer = (void*)0ul;
-	U8 new_table_index = 0;
-	bool oem_apic=false;
+    bool oem_apic=false;
+    U8 new_table_index = 0;
+    
+    // Check that we have a valid cpu_map (if it's not already done, it will try to generate it)
+    if (generate_cpu_map_from_acpi(dsdt) != 0)
+    {
+        return(0);
+    }
+    
+    {		
+		bool tmpval;		
+		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;		
+	}
+    
+    if (oem_apic == true) 
+    {
+        return(0);
+    }
+    
+    if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
+	{				
+        MadtPointer = (ACPI_TABLE_MADT *)madt_file;
+        
+        new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list // note: for now we don't patch this table			
+	} 
+    else
+    {
+        MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
+        
+        new_table_index = get_0ul_index_in_list(new_table_list, true);
+        
+        // Check to confirm space is available
+        if (new_table_index == ACPI_TABLE_LIST_FULL)
+        {		
+            printf("Error: not enought reserved space in the new acpi list for the MADT table,\n ");
+            printf("       please increase the RESERVED_AERA\n");
+            return(0);
+        }
+    }    
+        
+    // Create buffer for MADT
+    U8 memory_for_madt[2 * 1024];
+    
+    
+    // Build the new MADT
+    if ( (ProcessMadt(MadtPointer, madt_info, memory_for_madt, sizeof(memory_for_madt), cpu_map_count))== 0)    
+	{
+		printf("Error: Failed to build MADT table\n");
+		return (0);
+	}
 	
+	// insert MADT in the new_table_list
+	{
+		// Create pointer to MADT just built in the stack buffer
+		ACPI_TABLE_MADT * old_madt = (ACPI_TABLE_MADT *)memory_for_madt;		
+		
+		// Reserved kernel memory for the madt table
+		ACPI_TABLE_MADT *new_madt = (ACPI_TABLE_MADT *)AllocateKernelMemory(old_madt->Header.Length);
+		
+		if (!new_madt) 
+		{
+			printf("Unable to allocate kernel memory for MADT ");
+			return (0);
+		}
+		// Move the old stack buffer to kernel memory
+		memcpy(new_madt, old_madt, old_madt->Header.Length);
+		
+		// Add the new madt into an empty space of the new_table_list
+		new_table_list[new_table_index] = (U32)new_madt;				
+	}
+    
+    verbose ("MADT table successfully patched\n");
+	return(1);
+}
+
+static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * madt_info, bool enable_cstates, bool enable_pstates, bool enable_tstates )
+{
+	DBG("Processing SSDT\n");	
+		
 	if (Platform->CPU.Vendor != 0x756E6547) {
 		verbose ("Not an Intel platform: SSDT will not be generated !!!\n");
 		return(0);
@@ -2732,11 +3094,6 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 		verbose ("DSDT not found: SSDT will not be generated !!!\n");
 		return (0);
 	}
-			
-	{		
-		bool tmpval;		
-		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;		
-	} 
 	
 	// Get an empty space in the new_talbe_list (true = allow reserved space)
 	U8 empty = get_0ul_index_in_list(new_table_list, true);
@@ -2748,23 +3105,12 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, bool enable_
 		printf("       please increase the RESERVED_AERA\n");
 		return(0);
 	}
-	
-	if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
-	{		
-		if (oem_apic == false) 
-		{
-			MadtPointer = (ACPI_TABLE_MADT *)madt_file;		
-			//new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list // note: for now we don't patch this table
-		}
-		
-	} else
-		MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
-	
+        
 	// Create buffer for SSDT
 	U8 memory_for_ssdt[20 * 1024];		
 	
 	// Build the SSDT
-	if ( (BuildSsdt(MadtPointer, dsdt, memory_for_ssdt, sizeof(memory_for_ssdt), enable_cstates, enable_pstates, enable_tstates)) == 0)
+	if ( (BuildSsdt(madt_info, dsdt, memory_for_ssdt, sizeof(memory_for_ssdt), enable_cstates, enable_pstates, enable_tstates)) == 0)
 	{
 		printf("Error: Failed to build SSDT table\n");
 		return (0);
@@ -3838,7 +4184,7 @@ static void * buildTSD(void * current, U32 domain, U32 cpusInDomain)
 #endif
 
 //-----------------------------------------------------------------------------
-static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffer, U32 bufferSize, bool enable_cstates, bool enable_pstates,  bool enable_tstates)
+static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer, U32 bufferSize, bool enable_cstates, bool enable_pstates,  bool enable_tstates)
 {
 	// Build SSDT
 	{
@@ -3870,7 +4216,6 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 		U32 pstates_enabled = 0;
 		U32 cstates_enabled = 0;
 		CPU_DETAILS cpu;
-		MADT_INFO madt_info;
 		U8 ACPI_COORD_TYPE = ACPI_COORD_TYPE_SW_ANY; // default
 		ACPI_TABLE_SSDT *SsdtPointer = (void*)0ul;
 		
@@ -3898,7 +4243,7 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 			return(0);
 		}		
 		
-		if (madt == (void*) 0ul)
+		if (madt_info == (void*) 0ul)
 		{
 			return(0);
 		}
@@ -3915,7 +4260,6 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 		}
 		
 		collect_cpu_info(&cpu);
-		ProcessMadt(madt, &madt_info);
 		
 		if (enable_cstates && pmbase)
 		{
@@ -3968,10 +4312,7 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 		
 		// (3) For each logical processor CPUn 
 		// We will use the dsdt datas in place of madt,for the cpu(s) detection.
-		// Most users use the dsdt table to change the numbers of cpu(s) that the OS and the bootloader should use,
-		// (MADT patch to sync the nb of cpu(s) with DSDT is still in progress, 
-		// in an ideal world we should sync the dsdt and madt tables with the with the cpu options found into the boot.plist in first,
-		// then the number of core cpu detected by cpu.c, then the dsdt )
+		// 'Cause most users use the dsdt table to change the numbers of cpu(s) that the OS and the bootloader should use,		
 		// Note also that due to chameleon limit we use the same package per each cpu(s) for all objects and methods
 		// (package detection for each cpu(s) is still in progress)  
 		{			
@@ -4075,7 +4416,7 @@ static U32 BuildSsdt(ACPI_TABLE_MADT * madt, ACPI_TABLE_DSDT *dsdt, void * buffe
 					// (3.4.4) Create PSD with hardware coordination
 					{
 						DBG("Building _PSD Method\n");
-						U32 domain = madt_info.lapic[lapic_index].pkg_index;
+						U32 domain = madt_info->lapic[lapic_index].pkg_index;
                         
                         // In this (bad?) implementation we use the nb of cpu found in the dsdt
 						U32 cpusInDomain = cpu_map_count;							
@@ -4881,8 +5222,7 @@ EFI_STATUS setupAcpi(void)
 	ACPI_TABLE_FADT *fadt_file	 = (void *)0ul; // a Pointer to the (non-patched) fadt file 
 	ACPI_TABLE_FADT *FacpPointer = (void *)0ul; // a Pointer to the non-patched FACP table, it can be a file or the FACP table found in the RSDT/XSDT
 	ACPI_TABLE_RSDP *rsdp_mod	 = (void *)0ul, *rsdp_conv	= (void *)0ul;
-	
-	
+	    
 	U32 rsdplength;
 	
 	bool update_acpi=false, gen_xsdt=false;
@@ -4913,8 +5253,7 @@ EFI_STATUS setupAcpi(void)
 		
 		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
 		oem_fadt=getBoolForKey(kOEMFADT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-
-		
+				
 		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 #if !OLD_SSDT
@@ -5263,10 +5602,43 @@ EFI_STATUS setupAcpi(void)
 		}
 	}	
 #else
-	if (gen_ssdt || gen_csta || gen_psta || gen_tsta) 
-	{
-		ProcessSsdt(new_table_list, DsdtPtr, gen_csta, gen_psta, gen_tsta );		
-	}
+    {
+        MADT_INFO madt_info;
+        bool strip_madt = true;
+        
+        getBoolForKey(kSTRIPAPIC, &strip_madt, &bootInfo->bootConfig);
+        
+        if ((strip_madt == false) || (!buildMADT(new_table_list, DsdtPtr, &madt_info ))) 
+        {
+            
+            ACPI_TABLE_MADT * madt_file = (void*)0ul;
+            ACPI_TABLE_MADT * MadtPointer = (void*)0ul;
+            bool oem_apic=false;
+            
+            {		
+                bool tmpval;		
+                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;		
+            } 
+            
+            if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
+            {		
+                if (oem_apic == false) 
+                {
+                    MadtPointer = (ACPI_TABLE_MADT *)madt_file;	                    
+                }
+                
+            } else
+                MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
+            
+            ProcessMadtInfo(MadtPointer, &madt_info);        
+
+        }
+        
+        if (gen_ssdt || gen_csta || gen_psta || gen_tsta) 
+        {
+            ProcessSsdt(new_table_list, DsdtPtr, &madt_info, gen_csta, gen_psta, gen_tsta );		
+        }
+    }    
 #endif
 	
 	if ((rsdp_mod != (void *)0ul) && (rsdp_mod->Length >= ACPI_RSDP_REV0_SIZE) ) 

@@ -88,8 +88,9 @@ U32 update_rsdp_with_rsdt(ACPI_TABLE_RSDP *rsdp, ACPI_TABLE_RSDT *rsdt)
 	return (1);
 }
 
+
 //-----------------------------------------------------------------------------
-U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info)
+U32 ProcessMadtInfo(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info)
 {
     void *current;
     void *end;
