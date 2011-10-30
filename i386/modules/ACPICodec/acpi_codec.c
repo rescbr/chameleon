@@ -210,7 +210,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 
 #define ACPI_TABLE_LIST_FULL_NON_RESERVED MAX_ACPI_TABLE + 1
 
-#define ULONG_MAX_32 4294967295UL
+//#define ULONG_MAX_32 4294967295UL
 
 #define __RES(s, u)												\
 inline unsigned u										\
@@ -377,7 +377,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 		U64 ptr = xsdt->TableOffsetEntry[index];
 		
 		{				
-			if (ptr > ULONG_MAX_32)
+			if (ptr > ULONG_MAX)
 			{
 #if DEBUG_ACPI						
 				printf("Warning xsdt->TableOffsetEntry[%d]: Beyond addressable memory in this CPU mode, ignored !!!\n",index);
@@ -2866,7 +2866,10 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
             {
                 // Process sub-tables with Type as 4: Local APIC NMI
                 ACPI_MADT_LOCAL_APIC_NMI *nmi = current;
-                current = nmi + 1;               
+                current = nmi + 1;  
+                
+                if (!(nmi->IntiFlags & ACPI_MADT_ENABLED))
+                    continue;
                 
                 if (LOCAL_APIC_NMI_CNT >= nb_cpu)
                     continue;                
@@ -2900,6 +2903,9 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 ACPI_MADT_LOCAL_SAPIC *sapic = current;
                 current = sapic + 1;               
                 
+                if (!(sapic->LapicFlags & ACPI_MADT_ENABLED))
+                    continue;
+                
                 if (LOCAL_SAPIC_CNT >= nb_cpu)
                     continue;                
                 
@@ -2931,6 +2937,9 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 // Process sub-tables with Type as 8: Platform Interrupt Source
                 ACPI_MADT_INTERRUPT_SOURCE *intsrc = current;
                 current = intsrc + 1;               
+                
+                if (!(intsrc->IntiFlags & ACPI_MADT_ENABLED))
+                    continue;
                 
                 if (INT_SRC_CNT >= nb_cpu)
                     continue;                
@@ -3024,7 +3033,7 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
 	{				
         MadtPointer = (ACPI_TABLE_MADT *)madt_file;
         
-        new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list // note: for now we don't patch this table			
+        new_table_list[new_table_index] = 0ul; // This way, the non-patched table will not be added in our new rsdt/xsdt table list 			
 	} 
     else
     {
@@ -4899,7 +4908,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 			U64 ptr = xsdt->TableOffsetEntry[index];
 			
 			{				
-				if (ptr > ULONG_MAX_32)
+				if (ptr > ULONG_MAX)
 				{
 #if DEBUG_ACPI						
 					printf("Warning xsdt->TableOffsetEntry[%d]: Beyond addressable memory in this CPU mode, ignored !!!\n",index);

@@ -65,6 +65,9 @@ SMBIOS modules:
                               if smbios.plist doesn't exist, factory
                               values are kept(Disabled by default).
 
+  randomSerial=Yes|No         Generate a machine serial number randomly, can be useful 
+			      for iCloud registration(Disabled by default).
+
 RamDiskLoader module:
 -------------------- 
   EnableRamDiskLoader=Yes|No	Fully enable/disable the RamDiskLoader module (Enabled by default, if the module is installed)
@@ -114,6 +117,8 @@ AcpiCodec module:
   GenerateCStates=Yes|No	Enable/Disable Generate C-states SSDT table (Disabled by default).
   EnableC4State=Yes|No		Enable C4 state in C-states SSDT table, GenerateCStates=Yes is needed (Disabled by default).
   
+  StripAPICTable=Yes|No		Enable/Disable Generate a stripped MADT (APIC) table (Enabled by default).
+
   IntelFADTSpec=Yes|No		Enable/Disable Intel recommendations for the FADT table (Enabled by default). 
 				Warning : When enabled, this setting disable the C2 and C3 C-states, but be aware that these are the Intel's recommendations for the newest CPU, 
 					  if you really need those c-states please disable IntelFADTSpec.
