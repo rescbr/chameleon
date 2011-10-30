@@ -344,7 +344,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}</choices-outline>"
 
 # clean up 
 
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 
 }
 
@@ -472,7 +472,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 
 	header+="auth=\"root\">\n"
 	header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-	#rm -R -f "${1}/Temp"
+	rm -R -f "${1}/Temp"
 
 	[ -d "${1}/Temp" ] || mkdir -m 777 "${1}/Temp"
 	[ -d "${1}/Root" ] && mkbom "${1}/Root" "${1}/Temp/Bom"
@@ -507,7 +507,7 @@ if [ -d "${1}/Root" ] && [ "${1}/Scripts" ]; then
 		local choiceoptions="\t\t${4}"
 	fi
 	choices[$((choicescount++))]="\t<choice\n\t\tid=\"${packagename// /}\"\n\t\ttitle=\"${packagename}_title\"\n\t\tdescription=\"${packagename}_description\"\n${choiceoptions}>\n\t\t<pkg-ref id=\"${identifier}\" installKBytes='${installedsize}' version='${version}.0.0.${timestamp}' >#${packagename// /}.pkg</pkg-ref>\n\t</choice>\n"	
-	#rm -R -f "${1}"
+	rm -R -f "${1}"
 fi
 }
 
