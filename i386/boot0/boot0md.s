@@ -530,8 +530,8 @@ checkGPT:
     call    load					; read GPT Array
     pop	    si						; SI = address of GPT Array
     pop	    bx						; BX = size of GUID Partition Array entry
-    ;jc	    error
-    jc      .exit
+    ;jc       error
+	jc       .exit					; dmazar's change to continue disk scanning if encountering invalid LBA.
 
     ;
     ; Walk through GUID Partition Table Array
@@ -605,8 +605,8 @@ loadBootSector:
     mov     bx, kBoot0LoadAddr
     call    load
     ;jc      error
-    or      dl, dl ; to set flag Z=0
-    jc      .exit
+    or   dl, dl ; to set flag Z=0	; dmazar's change to continue disk scanning if encountering invalid LBA.
+    jc      .exit					; dmazar's change to continue disk scanning if encountering invalid LBA.
 
 	or		dh, dh
 	jz		.checkBootSignature

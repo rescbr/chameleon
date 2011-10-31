@@ -18,7 +18,7 @@ COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 
 version=$( cat version )
-stage=${version##*-}" (blackosx branch)"
+stage=${version##*-}
 revision=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
 builddate=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print $3,$4 }' | tr -d '\"' )
 timestamp=$( date -j -f "%Y-%m-%d %H:%M:%S" "${builddate}" "+%s" )

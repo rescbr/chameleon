@@ -365,7 +365,7 @@ buildoptionalsettings()
 	# ------------------------------------------------------
 	# if exclusiveFlag=1 then re-build array
 	# adding extra boot option at beginning to give
-	#Êuser a chance to choose none of them.
+	#Â user a chance to choose none of them.
 	# ------------------------------------------------------
 	if [ ${2} = "1" ]; then
 		tempArray=("${availableOptions[@]}")
