@@ -2867,10 +2867,10 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 // Process sub-tables with Type as 4: Local APIC NMI
                 ACPI_MADT_LOCAL_APIC_NMI *nmi = current;
                 current = nmi + 1;  
-                
+                /*
                 if (!(nmi->IntiFlags & ACPI_MADT_ENABLED))
                     continue;
-                
+                */
                 if (LOCAL_APIC_NMI_CNT >= nb_cpu)
                     continue;                
                 
@@ -2902,10 +2902,10 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 // Process sub-tables with Type as 7: Local Sapic
                 ACPI_MADT_LOCAL_SAPIC *sapic = current;
                 current = sapic + 1;               
-                
+                /*
                 if (!(sapic->LapicFlags & ACPI_MADT_ENABLED))
                     continue;
-                
+                */
                 if (LOCAL_SAPIC_CNT >= nb_cpu)
                     continue;                
                 
@@ -2937,10 +2937,10 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 // Process sub-tables with Type as 8: Platform Interrupt Source
                 ACPI_MADT_INTERRUPT_SOURCE *intsrc = current;
                 current = intsrc + 1;               
-                
+                /*
                 if (!(intsrc->IntiFlags & ACPI_MADT_ENABLED))
                     continue;
-                
+                */
                 if (INT_SRC_CNT >= nb_cpu)
                     continue;                
                 
