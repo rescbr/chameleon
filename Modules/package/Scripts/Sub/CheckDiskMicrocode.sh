@@ -45,7 +45,7 @@ if [ $( echo "${mbr437}" | awk -F0 '{print NF-1}' ) != 874 ]; then
 	windowsloader=$( dd 2>/dev/null if="$targetDisk" count=4 bs=1 | xxd | awk '{print $2$3}' )
 	if [ "${windowsloader}" == "33c08ed0" ]  ; then
 		#echo "DEBUG: Found existing Windows Boot Loader so will replace with Chameleon boot0md"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk has existing Windows boot loader - Will replace with boot0md"
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk has existing Windows boot loader - Will replace with boot0md (boot0workV2)."
 	fi
 
 	# See if a Chameleon stage0 boot file already exists
@@ -84,14 +84,14 @@ if [ $( echo "${mbr437}" | awk -F0 '{print NF-1}' ) != 874 ]; then
 	if [ "${stage0type}" == "ee7505" ]; then
 		#echo "DEBUG: Found existing Chameleon stage 0 loader - Boot0md"
 		#echo "DEBUG: And will leave boot0md installed."
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk already has existing Chameleon stage 0 loader - boot0md."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk already has existing Chameleon stage 0 loader - boot0md (v1)."
 		exit 1
 	fi
 	
 	if [ "${stage0type}" == "742b80" ]; then
 		#echo "DEBUG: Found existing Chameleon stage 0 loader - Boot0workV2"
 		#echo "DEBUG: And will leave Boot0workV2 installed."
-		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk already has existing Chameleon stage 0 loader - Boot0workV2."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Target disk already has existing Chameleon stage 0 loader - boot0md (boot0workV2)."
 		exit 1
 	fi
 
