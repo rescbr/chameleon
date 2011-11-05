@@ -434,10 +434,6 @@ static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
 static const char const BOARDID_PROP[] = "board-id";
-// Facetime fix from olegpronin @ insanelymac
-// Breaks booting from RAID
-static const char const BOOT_UUID_PROP[] = "boot-uuid";
-static char uuidStr[64];
 
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
@@ -529,6 +525,7 @@ void setupEfiDeviceTree(void)
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
+
 	
 	node = DT__FindNode("/", false);
 	
@@ -606,21 +603,6 @@ void setupEfiDeviceTree(void)
 	
 	// Fill /efi/device-properties node.
 	setupDeviceProperties(node);
-	
-	// Facetime fix from olegpronin @ insanelymac
-	// Thanks to Lnx2Mac for the idea of using the key SkipFTFix=Yes as a temporary work around for this breaking RAID booting
-	bool skipFTFix=false;
-	getBoolForKey(kSkipFTFix, &skipFTFix, &bootInfo->chameleonConfig);
-	if (!skipFTFix) {
-		//Facetime temp fix start
-		Node *ChoosenNode;
-		if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0)
-		{    
-			ChoosenNode = DT__FindNode("/chosen", false);
-			DT__AddProperty(ChoosenNode,  BOOT_UUID_PROP, 64, uuidStr);
-		}
-		//Facetime fix end
-	}
 }
 
 /*
@@ -637,6 +619,21 @@ void setupBoardId()
 	if (boardid)
 		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
 }		
+
+/*
+ * Populate the chosen node
+ */
+void setupChosenNode()
+{
+	Node *chosenNode;
+	chosenNode = DT__FindNode("/chosen", false);
+	if (chosenNode == 0)
+		stop("Couldn't get chosen node");
+	
+	int bootUUIDLength = strlen(gBootUUIDString);
+	if (bootUUIDLength)
+		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
+}
 
 /*
  * Load the smbios.plist override config file if any
@@ -702,6 +699,9 @@ static void setupEfiConfigurationTable()
 		gST64->Hdr.CRC32 = 0;
 		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
 	}
+	
+	// Setup the chosen node
+	setupChosenNode();	
 }
 
 void saveOriginalSMBIOS(void)
