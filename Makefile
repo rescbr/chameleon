@@ -142,8 +142,8 @@ $(SYMROOT)/i386/vers.h: version
 	@echo "#define I386BOOT_VERSION \"5.0.132\"" > $@
 	@echo "#define I386BOOT_BUILDDATE \"`date \"+%Y-%m-%d %H:%M:%S\"`\"" >> $@
 	@echo "#define I386BOOT_CHAMELEONVERSION \"`cat version`\"" >> $@
-	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $@
-
+##	@echo "#define I386BOOT_CHAMELEONREVISION \"`svnversion -n | tr -d [:alpha:]`\"" >> $@
+	@echo "#define I386BOOT_CHAMELEONREVISION \"1394\"" >> $@
 
 .PHONY: $(SYMROOT)/i386/vers.h
 .PHONY: config
