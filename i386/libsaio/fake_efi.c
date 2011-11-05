@@ -73,7 +73,7 @@ static uint64_t ptov64(uint32_t addr)
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','i','m','e','r','a','_','1','.','5', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','0', 0};
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
@@ -525,7 +525,6 @@ void setupEfiDeviceTree(void)
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
-
 	
 	node = DT__FindNode("/", false);
 	
@@ -621,21 +620,6 @@ void setupBoardId()
 }		
 
 /*
- * Populate the chosen node
- */
-void setupChosenNode()
-{
-	Node *chosenNode;
-	chosenNode = DT__FindNode("/chosen", false);
-	if (chosenNode == 0)
-		stop("Couldn't get chosen node");
-	
-	int bootUUIDLength = strlen(gBootUUIDString);
-	if (bootUUIDLength)
-		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
-}
-
-/*
  * Load the smbios.plist override config file if any
  */
 static void setupSmbiosConfigFile(const char *filename)
@@ -699,9 +683,6 @@ static void setupEfiConfigurationTable()
 		gST64->Hdr.CRC32 = 0;
 		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
 	}
-	
-	// Setup the chosen node
-	setupChosenNode();	
 }
 
 void saveOriginalSMBIOS(void)
