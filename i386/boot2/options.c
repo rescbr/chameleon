@@ -1062,6 +1062,7 @@ done:
 
 //==========================================================================
 
+char gBootUUIDString[32+4+1] = ""; // UUID of the boot volume e.g. 5EB1869F-C4FA-3502-BDEB-3B8ED5D87292
 extern unsigned char chainbootdev;
 extern unsigned char chainbootflag;
 
@@ -1070,6 +1071,9 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
     int argLen = argName ? strlen(argName) : 0;
     int len = argLen + cnt + 1;  // +1 to account for space
 
+	if (argName)
+		len++; // +1 to account for '='
+		
     if (len > *cntRemainingP) {
         error("Warning: boot arguments too long, truncating\n");
         return false;
@@ -1080,8 +1084,8 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
         *argP += argLen;
         *argP[0] = '=';
         (*argP)++;
-        len++; // +1 to account for '='
     }
+	
     strncpy( *argP, val, cnt );
     *argP += cnt;
     *argP[0] = ' ';
@@ -1099,9 +1103,10 @@ processBootArgument(
                     const char *userString,   // Typed-in boot arguments
                     const char *kernelFlags,  // Kernel flags from config table
                     const char *configTable,
-                    char **argP,                // Output value
-                    int *cntRemainingP,         // Output count
-                    char *foundVal              // found value
+                    char **argP,              // Output value
+                    int *cntRemainingP,       // Output count
+                    char *foundVal,           // found value
+					int  foundValSize         // max found value size
                     )
 {
     const char *val;
@@ -1118,10 +1123,9 @@ processBootArgument(
         copyArgument(argName, val, cnt, argP, cntRemainingP);
         found = true;
     }
-    if (found && foundVal) {
-        strlcpy(foundVal, val, cnt+1);
-    }
-    return found;
+    if (found && foundVal) 
+		strlcpy(foundVal, val, foundValSize);
+	return found;
 }
 
 // Maximum config table value size
@@ -1130,17 +1134,15 @@ processBootArgument(
 int
 processBootOptions()
 {
-    const char *     cp  = gBootArgs;
-    const char *     val = 0;
-    const char *     kernel;
-    int              cnt;
-    int		     userCnt;
-    int              cntRemaining;
-    char *           argP;
-    char             uuidStr[64];
-    bool             uuidSet = false;
-    char *           configKernelFlags;
-    char *           valueBuffer;
+    const char	*cp  = gBootArgs;
+    const char	*val = 0;
+    const char	*kernel;
+    int			cnt;
+    int			userCnt;
+    int			cntRemaining;
+    char		*argP;
+    char		*configKernelFlags;
+    char		*valueBuffer;
 
     valueBuffer = malloc(VALUE_SIZE);
     
@@ -1196,16 +1198,12 @@ processBootOptions()
 
     gOverrideKernel = false;
     if (( kernel = extractKernelName((char **)&cp) )) {
-        strcpy( bootInfo->bootFile, kernel );
-        gOverrideKernel = true;
+        strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
             strlcpy( bootInfo->bootFile, val, cnt+1 );
-            if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
-                gOverrideKernel = true;
-            }
         } else {
-            strcpy( bootInfo->bootFile, kDefaultKernel );
+            strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
         }
     }
 
@@ -1221,35 +1219,34 @@ processBootOptions()
     configKernelFlags = malloc(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
-    if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
-        // boot-uuid was set either on the command-line
-        // or in the config file.
-        uuidSet = true;
-    } else {
-
+	// boot-uuid can be set either on the command-line or in the config file
+	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
+							 &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
         //
         // Try an alternate method for getting the root UUID on boot helper partitions.
         //
         if (gBootVolume->flags & kBVFlagBooter)
         {
-        	if((loadHelperConfig(&bootInfo->helperConfig) == 0)
-        	    && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
+			// Load the configuration store in the boot helper partition
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
         	{
-          	getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
-            copyArgument(kBootUUIDKey, val, cnt, &argP, &cntRemaining);
-            uuidSet = true;
+				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
+				if (val != NULL)
+					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
         	}
         }
         
-        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
-            verbose("Setting boot-uuid to: %s\n", uuidStr);
-            copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
-            uuidSet = true;
-        }
-         
+        // Try to get the volume uuid string
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
+		
+		// If we have the volume uuid add it to the commandline arguments
+		if (strlen(gBootUUIDString))
+			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);         
     }
 
-    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
+    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
+                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
         cnt = 0;
         if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
             valueBuffer[0] = '*';
@@ -1257,7 +1254,7 @@ processBootOptions()
             strlcpy(valueBuffer + 1, val, cnt);
             val = valueBuffer;
         } else {
-            if (uuidSet) {
+            if (strlen(gBootUUIDString)) {
                 val = "*uuid";
                 cnt = 5;
             } else {
@@ -1276,10 +1273,11 @@ processBootOptions()
     /*
      * Removed. We don't need this anymore.
      *
-    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gPlatformName)) {
-        getPlatformName(gPlatformName);
-        copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
-    }
+	 if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
+							&argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
+		getPlatformName(gPlatformName);
+		copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
+	 }
     */
 
     if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
@@ -1323,9 +1321,9 @@ processBootOptions()
 	}
 
 	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
-	{
 		strlcpy(gMKextName, val, cnt + 1);
-	}
+	else
+		gMKextName[0]=0;
 
     free(configKernelFlags);
     free(valueBuffer);
@@ -1337,18 +1335,24 @@ processBootOptions()
 //==========================================================================
 // Load the help file and display the file contents on the screen.
 
-static void showTextBuffer(char *buf, int size)
+static void showTextBuffer(char *buf_orig, int size)
 {
 	char	*bp;
-	int	line;
-	int	line_offset;
-	int	c;
+	char	* buf;
+	int		line;
+	int		line_offset;
+	int		c;
 
 	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
-		showInfoBox( "Press q to quit\n",buf );
+		showInfoBox( "Press q to continue, space for next page.\n",buf_orig );
 		return;
 	}
 
+		// Create a copy so that we don't mangle the original
+		buf = malloc(size + 1);
+		memcpy(buf, buf_orig, size);
+	
+	
         bp = buf;
         while (size-- > 0) {
 		if (*bp == '\n') {

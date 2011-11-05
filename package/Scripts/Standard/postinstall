@@ -50,6 +50,7 @@ echo "bootslice: Volume slice is ${bootslice}"
 echo "bootdisk: Disk device is ${bootdisk}"
 echo "bootrdisk: Disk raw device is ${bootrdisk}"
 echo "diskloader: Disk loader is ${diskloader}"
+echo "diskloaderdualboot: Disk loader is ${diskloaderdualboot}"
 echo "partitionloaderhfs: Partition loader is ${partitionloaderhfs}"
 echo "partitionloaderfat: Partition loader is ${partitionloaderfat}"
 echo "filesystemloader: Filesystem loader is ${filesystemloader}"
@@ -291,14 +292,14 @@ if ${diskupdate}; then
 	#---------------------------------------------------------------------
 
 	if [ ${disksignature} == "00000000" ]; then
-		echo "Executing command: fdisk440 -u -f /usr/standalone/i386/${diskloader} -y ${bootdisk}"
-		fdisk440 -u -f "${bootvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
+		echo "Executing command: ${bootvolume}/usr/sbin/fdisk440 -u -f ${bootvolume}/usr/standalone/i386/${diskloader} -y ${bootdisk}"
+		"${bootvolume}/usr/sbin/fdisk440" -u -f "${bootvolume}/usr/standalone/i386/${diskloader}" -y ${bootdisk}
 	else
 		#---------------------------------------------------------------------
-		# If it exists then Windows is also installed on the HDD and we need to write boot0hfs
+		# If it exists then Windows is also installed on the HDD and we need to write $diskloaderdualboot
 		#---------------------------------------------------------------------
-		echo "Executing command: fdisk440 -u -f /usr/standalone/i386/${diskloaderdualboot} -y ${bootdisk}"
-		fdisk440 -u -f "${bootvolume}/usr/standalone/i386/${diskloaderdualboot}" -y ${bootdisk}
+		echo "Executing command: ${bootvolume}/usr/sbin/fdisk440 -u -f {bootvolume}/usr/standalone/i386/${diskloaderdualboot} -y ${bootdisk}"
+		"${bootvolume}/usr/sbin/fdisk440" -u -f "${bootvolume}/usr/standalone/i386/${diskloaderdualboot}" -y ${bootdisk}
 	fi
 else
 echo "Diskupdate is false, so no stage 0 file was written"
@@ -317,8 +318,8 @@ fi
 echo "Executing command: cp /usr/standalone/i386/${filesystemloader} ${bootvolume}"
 cp "${bootvolume}/usr/standalone/i386/${filesystemloader}" "${bootvolume}"
 
-echo "Executing command: ${bootresources}/Tools/SetFile -a V ${bootvolume}/${filesystemloader}"
-"${bootresources}/Tools/SetFile" -a V "${bootvolume}/${filesystemloader}"
+echo "Executing command: "${bootvolume}/usr/bin/chflags" hidden ${bootvolume}/${filesystemloader}"
+"${bootvolume}/usr/bin/chflags" hidden "${bootvolume}/${filesystemloader}"
 
 echo "-----------------------------------------------"
 echo ""
@@ -332,7 +333,7 @@ echo "*****************************************************"
 if [ ${disksignature} == "00000000" ]; then
 	# echo "Windows is not installed so let's change the active partition"
 
-	partitionactive=$( fdisk440 -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
+	partitionactive=$( "${bootvolume}/usr/sbin/fdisk440" -d ${bootrdisk} | grep -n "*" | awk -F: '{print $1}')
 	echo "Current Active Partition: ${partitionactive}"
 
 	if [ "${partitionactive}" = "${bootslice}" ]; then
@@ -342,7 +343,7 @@ if [ ${disksignature} == "00000000" ]; then
 		# BadAxe requires EFI partition to be flagged active.
 		# but it doesn't' hurt to do it for any non-windows partition.
 		
-		fdisk440 -e ${bootrdisk} <<-MAKEACTIVE
+		"${bootvolume}/usr/sbin/fdisk440" -e ${bootrdisk} <<-MAKEACTIVE
 		print
 		flag ${bootslice}
 		write
@@ -356,9 +357,5 @@ fi
 echo "-----------------------------------------------"
 echo ""
 echo ""
-
-# hide boot file
-chflags hidden "${3}/boot"
-echo "boot file hidden ${3}/boot"
 
 exit
