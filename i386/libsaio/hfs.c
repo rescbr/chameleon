@@ -80,16 +80,16 @@ static long ReadFile(void *file, uint64_t *length, void *base, uint64_t offset);
 static long GetCatalogEntryInfo(void *entry, long *flags, long *time,
                                 FinderInfo *finderInfo, long *infoValid);
 static long ResolvePathToCatalogEntry(char *filePath, long *flags,
-                void *entry, long dirID, long *dirIndex);
+                void *entry, long dirID, long long *dirIndex);
 
-static long GetCatalogEntry(long *dirIndex, char **name,
+static long GetCatalogEntry(long long *dirIndex, char **name,
                             long *flags, long *time,
                             FinderInfo *finderInfo, long *infoValid);
 static long ReadCatalogEntry(char *fileName, long dirID, void *entry,
-                long *dirIndex);
+                long long *dirIndex);
 static long ReadExtentsEntry(long fileID, long startBlock, void *entry);
 
-static long ReadBTreeEntry(long btree, void *key, char *entry, long *dirIndex);
+static long ReadBTreeEntry(long btree, void *key, char *entry, long long *dirIndex);
 static void GetBTreeRecord(long index, char *nodeBuffer, long nodeSize,
                 char **key, char **data);
 
@@ -264,10 +264,11 @@ long HFSLoadFile(CICell ih, char * filePath)
 long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint64_t length)
 {
     char entry[512];
+    char devStr[12];
     long dirID, result, flags;
 
     if (HFSInitPartition(ih) == -1) return -1;
-
+    
     dirID = kHFSRootFolderID;
     // Skip a lead '\'.  Start in the system folder if there are two.
     if (filePath[0] == '/') {
@@ -298,13 +299,14 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 	return -1;
     }
 
-    verbose("Loaded HFS%s file: [%s] %d bytes from %x.\n",
-            (gIsHFSPlus ? "+" : ""), filePath, (uint32_t)length, ih);
+    getDeviceDescription(ih, devStr);
+    verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
+            (gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
 	
     return length;
 }
 
-long HFSGetDirEntry(CICell ih, char * dirPath, long * dirIndex, char ** name,
+long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** name,
                     long * flags, long * time,
                     FinderInfo * finderInfo, long * infoValid)
 {
@@ -346,7 +348,7 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
 
     UInt16 nodeSize;
     UInt32 firstLeafNode;
-    long dirIndex;
+    long long dirIndex;
     char *name;
     long flags, time;
 
@@ -360,7 +362,7 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
     nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
     firstLeafNode = SWAP_BE32(gBTHeaders[kBTreeCatalog]->firstLeafNode);
 
-    dirIndex = firstLeafNode * nodeSize;
+    dirIndex = (long long) firstLeafNode * nodeSize;
 
     GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0);
 
@@ -526,10 +528,11 @@ static long GetCatalogEntryInfo(void * entry, long * flags, long * time,
 }
 
 static long ResolvePathToCatalogEntry(char * filePath, long * flags,
-                                      void * entry, long dirID, long * dirIndex)
+                                      void * entry, long dirID, long long * dirIndex)
 {
     char                 *restPath;
-    long                 result, cnt, subFolderID = 0, tmpDirIndex;
+    long                 result, cnt, subFolderID = 0;
+    long long tmpDirIndex;
     HFSPlusCatalogFile   *hfsPlusFile;
 
     // Copy the file name to gTempStr
@@ -576,7 +579,7 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags,
     return result;
 }
 
-static long GetCatalogEntry(long * dirIndex, char ** name,
+static long GetCatalogEntry(long long * dirIndex, char ** name,
                             long * flags, long * time,
                             FinderInfo * finderInfo, long * infoValid)
 {
@@ -597,12 +600,12 @@ static long GetCatalogEntry(long * dirIndex, char ** name,
     nodeBuf  = (char *)malloc(nodeSize);
     node     = (BTNodeDescriptor *)nodeBuf;
 
-    index   = *dirIndex % nodeSize;
-    curNode = *dirIndex / nodeSize;
+    index   = (long) (*dirIndex % nodeSize);
+    curNode = (long) (*dirIndex / nodeSize);
 
     // Read the BTree node and get the record for index.
     ReadExtent(extent, extentSize, kHFSCatalogFileID,
-               curNode * nodeSize, nodeSize, nodeBuf, 1);
+               (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
     GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &entry);
 
     GetCatalogEntryInfo(entry, flags, time, finderInfo, infoValid);
@@ -626,7 +629,7 @@ static long GetCatalogEntry(long * dirIndex, char ** name,
         index = 0;
         curNode = SWAP_BE32(node->fLink);
     }
-    *dirIndex = curNode * nodeSize + index;
+    *dirIndex = (long long) curNode * nodeSize + index;
 
     free(nodeBuf);
 
@@ -634,7 +637,7 @@ static long GetCatalogEntry(long * dirIndex, char ** name,
 }
 
 static long ReadCatalogEntry(char * fileName, long dirID,
-                             void * entry,    long * dirIndex)
+                             void * entry,    long long * dirIndex)
 {
     long              length;
     char              key[sizeof(HFSPlusCatalogKey)];
@@ -680,7 +683,7 @@ static long ReadExtentsEntry(long fileID, long startBlock, void * entry)
     return ReadBTreeEntry(kBTreeExtents, &key, entry, 0);
 }
 
-static long ReadBTreeEntry(long btree, void * key, char * entry, long * dirIndex)
+static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dirIndex)
 {
     long             extentSize;
     void             *extent;
@@ -732,7 +735,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long * dirIndex
     while (1) {
         // Read the current node.
         ReadExtent(extent, extentSize, extentFile,
-                   curNode * nodeSize, nodeSize, nodeBuf, 1);
+                   (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
     
         // Find the matching key.
         lowerBound = 0;
@@ -800,7 +803,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long * dirIndex
             index = 0;
             curNode = SWAP_BE32(node->fLink);
         }
-        *dirIndex = curNode * nodeSize + index;
+        *dirIndex = (long long) curNode * nodeSize + index;
     }
   
     free(nodeBuf);
@@ -887,7 +890,8 @@ static long ReadExtent(char * extent, uint64_t extentSize,
         readOffset = ((blockNumber - countedBlocks) * gBlockSize) +
                      (offset % gBlockSize);
     
-        readSize = GetExtentSize(currentExtent, 0) * gBlockSize - readOffset;
+		// MacWen: fix overflow in multiplication by forcing 64bit multiplication
+        readSize = (long long)GetExtentSize(currentExtent, 0) * gBlockSize - readOffset;
         if (readSize > (size - sizeRead)) readSize = size - sizeRead;
 
         readOffset += (long long)GetExtentStart(currentExtent, 0) * gBlockSize;

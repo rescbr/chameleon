@@ -42,8 +42,6 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
-
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
  
 //==========================================================================
 // getVBEInfoString
@@ -124,16 +122,14 @@ printVBEModeInfo()
                modeInfo.ModeAttributes);
 
         if (line++ >= 20) {
-            printf("(Press a key to continue...)");
-            getc();
+            pause();
             line = 0;
             clearScreenRows(0, 24);
             setCursorPosition( 0, 0, 1 );
         }
     }    
     if (line != 0) {
-        printf("(Press a key to continue...)");
-        getc();
+        pause();
     }
     setActiveDisplayPage(0);
 }
@@ -1040,7 +1036,7 @@ getNumberArrayFromProperty( const char *  propKey,
     char * propStr;
     unsigned long    count = 0;
 
-    propStr = newStringForKey( (char *) propKey , &bootInfo->bootConfig );
+    propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
     if ( propStr )
     {
         char * delimiter = propStr;
@@ -1129,7 +1125,7 @@ setVideoMode( int mode, int drawgraphics)
             params[1] = 25;
         }
 
-        setVESATextMode( params[0], params[1], 4 );
+		setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
 
@@ -1195,21 +1191,25 @@ spinActivityIndicator(int sectors)
 		return;
 	}
  
-	if (gVerboseMode) {
-            currentTickTime = time18(); // late binding
-            if (currentTickTime < lastTickTime + MIN_TICKS) {
-                return;
-            } else {
-                lastTickTime = currentTickTime;
-            }
-            
-            if (getVideoMode() == VGA_TEXT_MODE) {
-                if (currentIndicator >= sizeof(indicator)) {
-                    currentIndicator = 0;
-                }
-                printf("%c\b", indicator[currentIndicator++]);
-            }
-        }
+	currentTickTime = time18(); // late binding
+	if (currentTickTime < lastTickTime + MIN_TICKS)
+	{
+		return;
+	}
+	else
+	{
+		lastTickTime = currentTickTime;
+	}
+	
+	if (getVideoMode() == VGA_TEXT_MODE)
+	{
+		if (currentIndicator >= sizeof(indicator))
+		{
+			currentIndicator = 0;
+		}
+		putchar(indicator[currentIndicator++]);
+		putchar('\b');
+	}
 }
 
 void
@@ -1217,7 +1217,8 @@ clearActivityIndicator( void )
 {
     if ( getVideoMode() == VGA_TEXT_MODE )
     {
-        printf(" \b");
+		putchar(' ');
+		putchar('\b');
     }
 }
 

@@ -8,46 +8,34 @@
  *
  */
 
+#ifndef __BOOT2_GUI_H
+#define __BOOT2_GUI_H
+
 #include "boot.h"
 #include "bootstruct.h"
 #include "graphics.h"
 #include "graphic_utils.h"
 #include "picopng.h"
 
-#ifndef __BOOT2_GUI_H
-#define __BOOT2_GUI_H
-
 #define CHARACTERS_COUNT	223
 
-#define BOOT_NORMAL		0
+#define BOOT_NORMAL			0
 #define BOOT_VERBOSE		1
 #define BOOT_IGNORECACHE	2
 #define BOOT_SINGLEUSER		3
-#define DO_NOT_BOOT		4
+#define DO_NOT_BOOT			4
 #define CLOSE_INFO_MENU		5
 
-#define INFOMENU_NATIVEBOOT_START 1
-#define INFOMENU_NATIVEBOOT_END	3
+#define INFOMENU_NATIVEBOOT_START	1
+#define INFOMENU_NATIVEBOOT_END		3
 
-#define MENU_SHOW_MEMORY_INFO	4
-#define MENU_SHOW_VIDEO_INFO	5
-#define MENU_SHOW_HELP		6
+#define MENU_SHOW_MEMORY_INFO		4
+#define MENU_SHOW_VIDEO_INFO		5
+#define MENU_SHOW_HELP				6
 
 enum {
 	HorizontalLayout	= 0,
-	VerticalLayout		= 1,
-};
-
-enum {
-	kBackspaceKey		= 0x08,
-	kTabKey			= 0x09,
-	kReturnKey		= 0x0d,
-	kEscapeKey		= 0x1b,
-	kUpArrowkey		= 0x4800, 
-	kDownArrowkey		= 0x5000,
-	kASCIIKeyMask		= 0x7f,
-	kF5Key			= 0x3f00,
-	kF10Key			= 0x4400
+	VerticalLayout		= 1
 };
 
 /*
@@ -134,7 +122,8 @@ font_t font_console;
 int  initGUI();
 void drawBackground();
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p);
+void setupDeviceList(config_file_t *theme);
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
 void drawDeviceList(int start, int end, int selection);
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
 
@@ -150,7 +139,7 @@ void drawInfoMenuItems();
 
 void showGraphicBootPrompt();
 void clearGraphicBootPrompt();
-void updateGraphicBootPrompt(int key);
+void updateGraphicBootPrompt();
 
 void updateVRAM();
 

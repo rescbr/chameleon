@@ -30,6 +30,17 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
+/*
+ * Paths used by chameleon
+ */
+
+//kernel cache
+#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+
+// Lion installer
+#define kLionInstallerDataFolder      "/Mac OS X Install Data/"
+#define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
 
 /*
  * Keys used in system Boot.plist
@@ -38,66 +49,93 @@
 #define kTextModeKey		"Text Mode"
 #define kQuietBootKey		"Quiet Boot"
 #define kKernelFlagsKey		"Kernel Flags"
+#define kKernelArchKey      "Kernel Architecture"
+#define karch				"arch"				/* boot.c */
+#define kProductVersion		"ProductVersion"	/* boot.c */
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
 #define kKernelCacheKey		"Kernel Cache"
+#define kUseKernelCache		"UseKernelCache"	/* boot.c */
 #define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey		"Timeout"
+#define kTimeoutKey			"Timeout"
 #define kRootDeviceKey		"rd"
 #define kBootUUIDKey		"boot-uuid"
 #define kHelperRootUUIDKey	"Root UUID"
 #define kPlatformKey		"platform"
-#define kACPIKey		"acpi"
+#define kACPIKey			"acpi"
 #define kCDROMPromptKey		"CD-ROM Prompt"
 #define kCDROMOptionKey		"CD-ROM Option Key"
 #define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		"Rescan"
+#define kRescanKey		    "Rescan"
 #define kScanSingleDriveKey	"Scan Single Drive"
-#define kInsantMenuKey		"Instant Menu"
+#define kInstantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
-#define kGUIKey			"GUI"
+#define kGUIKey				"GUI"
 #define kBootBannerKey		"Boot Banner"
+#define kShowInfoKey		"ShowInfo"			// gui.c
 #define kWaitForKeypressKey	"Wait"
-/* AsereBLN: added the other keys */
-#define kUseAtiROM		"UseAtiROM"		/* ati.c */
-#define kWake			"Wake"			/* boot.c */
-#define kForceWake		"ForceWake"		/* boot.c */
-#define kWakeImage		"WakeImage"		/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch			"arch"			/* boot.c */
-#define kDSDT			"DSDT"			/* dsdt_patcher.c */
-#define kDropSSDT		"DropSSDT"		/* dsdt_patcher.c */
-#define kRestartFix		"RestartFix"		/* dsdt_patcher.c */
-#define kSMBIOS			"SMBIOS"		/* fake_efi.c */
-#define kSystemID		"SystemId"		/* fake_efi.c */
-#define kSystemType		"SystemType"		/* fake_efi.c */
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS			"VBIOS"			/* nvidia.c */
-#define kPCIRootUID		"PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
-#define kUSBBusFix		"USBBusFix"		/* pci_setup.c */
-#define kEHCIacquire		"EHCIacquire"		/* pci_setup.c */
-#define kUHCIreset		"UHCIreset"		/* pci_setup.c */
-#define kForceHPET		"ForceHPET"		/* pci_setup.c */
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-#define kEHCIhard		"EHCIhard"		/* usb.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
+
+#define kDSDT				"DSDT"				/* acpi_patcher.c */
+#define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
+#define kRestartFix			"RestartFix"		/* acpi_patcher.c */
+#define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
+#define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
+#define kCSTUsingSystemIO	"CSTUsingSystemIO"	/* acpi_patcher.c */
+#define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
+#define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
+#define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
+
+#define kWake				"Wake"				/* boot.c */
+#define kForceWake			"ForceWake"			/* boot.c */
+#define kWakeImage			"WakeImage"			/* boot.c */
+
+#define kbusratio			"busratio"			/* cpu.c */
+
 #define kDeviceProperties	"device-properties"	/* device_inject.c */
+
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kUseMemDetect	        "UseMemDetect"	        /* platform.c */
-#define kRestartFix             "RestartFix"        /* dsdt_patcher.c */
+#define kDefaultPartition	"Default Partition"	/* sys.c */
+
+#define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
+#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
+#define kSystemID			"SystemId"			/* fake_efi.c */
+#define kSystemType			"SystemType"		/* fake_efi.c */
+
+#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
+
+#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
+
+#define kUseAtiROM			"UseAtiROM"			/* ati.c */
+#define kAtiConfig			"AtiConfig"			/* ati.c */
+#define kAtiPorts			"AtiPorts"			/* ati.c */
+#define kATYbinimage		"ATYbinimage"		/* ati.c */
+
+#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
+#define kVBIOS				"VBIOS"				/* nvidia.c */
+#define kDcfg0				"display_0"			/* nvidia.c */
+#define kDcfg1				"display_1"			/* nvidia.c */
+
+#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
+#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
+#define kForceHPET			"ForceHPET"			/* pci_setup.c */
+
+#define kMD0Image			"md0"				/* ramdisk.h */
+
+#define kUSBBusFix			"USBBusFix"			/* usb.c */
+#define kEHCIacquire		"EHCIacquire"		/* usb.c */
+#define kUHCIreset			"UHCIreset"			/* usb.c */
+#define kLegacyOff			"USBLegacyOff"		/* usb.c */
+#define kEHCIhard			"EHCIhard"			/* usb.c */
 
 /*
  * Flags to the booter or kernel
  */
 #define kVerboseModeFlag	"-v"
 #define kSafeModeFlag		"-x"
-#define kOldSafeModeFlag	"-f"
+#define kIgnoreCachesFlag	"-f"
 #define kIgnoreBootFileFlag	"-F"
 #define kSingleUserModeFlag	"-s"
-#define k32BitModeFlag		"-x32"
 
 /*
  * Booter behavior control
@@ -109,6 +147,7 @@
  * A global set by boot() to record the device that the booter
  * was loaded from.
  */
+#define ROOT_DEVICE_SIZE 512
 extern int  gBIOSDev;
 extern long gBootMode;
 extern bool sysConfigValid;
@@ -136,6 +175,11 @@ extern void initialize_runtime();
 extern void common_boot(int biosdev);
 
 /*
+ * usb.c
+ */
+extern int usb_loop();
+
+/*
  * graphics.c
  */
 extern void printVBEModeInfo();
@@ -144,14 +188,14 @@ extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
 extern void drawColorRectangle( unsigned short x,
-                         unsigned short y,
-                         unsigned short width,
-                         unsigned short height,
-                         unsigned char  colorIndex );
+                                unsigned short y,
+                                unsigned short width,
+                                unsigned short height,
+                                unsigned char  colorIndex );
 extern void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
+                               unsigned short  y,
+                               unsigned short  width,
+                               unsigned short  height,
                                unsigned char * data );
 extern int
 convertImage( unsigned short width,
@@ -163,9 +207,11 @@ extern void drawBootGraphics(void);
 extern void drawPreview(void *src, uint8_t * saveunder);
 extern int getVideoMode(void);
 extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
+
 /*
  * drivers.c
  */
+extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 
@@ -179,9 +225,11 @@ extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 /*
  * options.c
  */
-extern int getBootOptions(bool firstRun);
-extern int processBootOptions();
-extern int selectAlternateBootDevice(int bootdevice);
+extern char gBootUUIDString[];
+
+extern int  getBootOptions(bool firstRun);
+extern int  processBootOptions();
+extern int  selectAlternateBootDevice(int bootdevice);
 extern bool promptForRescanOption(void);
 
 void showHelp();

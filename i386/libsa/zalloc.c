@@ -30,9 +30,10 @@
  */
 
 #include "libsa.h"
+//#include "saio_internal.h" - Azi: needed for ZDEBUG (printf)
 #include "memory.h"
 
-#define ZDEBUG 0
+#define ZDEBUG 0 //Azi: booter doesn't load with this enabled; instant reboot at "boot1: ..."
 
 #if ZDEBUG
 int zout;
@@ -59,7 +60,7 @@ static void   zcoalesce(void);
 size_t zalloced_size;
 #endif
 
-#define ZALLOC_NODES	16384
+#define ZALLOC_NODES	32767 /* was 16384 */
 
 static void malloc_error(char *addr, size_t size, const char *file, int line)
 {

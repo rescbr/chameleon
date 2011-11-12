@@ -9,109 +9,138 @@
  */
 
 #include "gui.h"
+#include "term.h"
 #include "appleboot.h"
 #include "vers.h"
 
+#define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
 static const char *theme_name = THEME_NAME_DEFAULT;	
 
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
 #include "art.h"
-#define LOADPNG(img) \
-if (loadThemeImage(#img) != 0) \
-    if (loadEmbeddedThemeImage(#img, __## img ##_png, __## img ##_png_len) != 0) \
-        return 1;
-#else
-#define LOADPNG(img)	if (loadThemeImage(#img) != 0) { return 1; }
 #endif
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define LOADPNG(img, alt_img) if (loadThemeImage(#img, alt_img) != 0) { return 1; }
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
 #define vram VIDEO(baseAddr)
 
-int lasttime=0; // we need this for animating maybe
-
-extern int gDeviceCount;
+int lasttime = 0; // we need this for animating maybe
 
 
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
  */
 enum {
-	iBackground = 0,
-	iLogo,
+    iBackground = 0,
+    iLogo,
 
-	iDeviceGeneric,
-	iDeviceHFS,
-	iDeviceEXT3,
-	iDeviceFAT16,
-	iDeviceFAT32,
-	iDeviceNTFS,
-	iDeviceCDROM,
-	iSelection,
-	iDeviceScrollPrev,
-	iDeviceScrollNext,
+    iDeviceGeneric,
+    iDeviceGeneric_o,
+    iDeviceHFS,
+    iDeviceHFS_o,
+    iDeviceHFSRAID,
+    iDeviceHFSRAID_o,
+    iDeviceEXT3,
+    iDeviceEXT3_o,
+    iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceFreeBSD_o,   /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceOpenBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceOpenBSD_o,   /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    iDeviceBEFS,        /* Haiku detection and Icon credits to scorpius  */
+    iDeviceBEFS_o,      /* Haiku detection and Icon credits to scorpius  */
+    iDeviceFAT,
+    iDeviceFAT_o,
+    iDeviceFAT16,
+    iDeviceFAT16_o,
+    iDeviceFAT32,
+    iDeviceFAT32_o,
+    iDeviceNTFS,
+    iDeviceNTFS_o,
+    iDeviceCDROM,
+    iDeviceCDROM_o,
 
-	iMenuBoot,
-	iMenuVerbose,
-	iMenuIgnoreCaches,
-	iMenuSingleUser,
-	iMenuMemoryInfo,
-	iMenuVideoInfo,
-	iMenuHelp,
-	iMenuVerboseDisabled,
-	iMenuIgnoreCachesDisabled,
-	iMenuSingleUserDisabled,
-	iMenuSelection,
+    iSelection,
+    iDeviceScrollPrev,
+    iDeviceScrollNext,
 
-	iProgressBar,
-	iProgressBarBackground,
+    iMenuBoot,
+    iMenuVerbose,
+    iMenuIgnoreCaches,
+    iMenuSingleUser,
+    iMenuMemoryInfo,
+    iMenuVideoInfo,
+    iMenuHelp,
+    iMenuVerboseDisabled,
+    iMenuIgnoreCachesDisabled,
+    iMenuSingleUserDisabled,
+    iMenuSelection,
 
-	iTextScrollPrev,
-	iTextScrollNext,
+    iProgressBar,
+    iProgressBarBackground,
 
-	iFontConsole,
-	iFontSmall,
+    iTextScrollPrev,
+    iTextScrollNext,
+
+    iFontConsole,
+    iFontSmall,
 };
 
 image_t images[] = {
-	{.name = "background",				.image = NULL},
-	{.name = "logo",				.image = NULL},
+    {.name = "background",                  .image = NULL},
+    {.name = "logo",                        .image = NULL},
+    
+    {.name = "device_generic",              .image = NULL},
+    {.name = "device_generic_o",            .image = NULL},
+    {.name = "device_hfsplus",              .image = NULL},
+    {.name = "device_hfsplus_o",            .image = NULL},
+    {.name = "device_hfsraid",              .image = NULL},
+    {.name = "device_hfsraid_o",            .image = NULL},
+    {.name = "device_ext3",                 .image = NULL},
+    {.name = "device_ext3_o",               .image = NULL},
+    {.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_freebsd_o",            .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_openbsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_openbsd_o",            .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+    {.name = "device_befs",                 .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
+    {.name = "device_befs_o",               .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
+    {.name = "device_fat",                  .image = NULL},
+    {.name = "device_fat_o",                .image = NULL},
+    {.name = "device_fat16",                .image = NULL},
+    {.name = "device_fat16_o",              .image = NULL},
+    {.name = "device_fat32",                .image = NULL},
+    {.name = "device_fat32_o",              .image = NULL},
+    {.name = "device_ntfs",                 .image = NULL},
+    {.name = "device_ntfs_o",               .image = NULL},
+    {.name = "device_cdrom",                .image = NULL},
+    {.name = "device_cdrom_o",              .image = NULL},
 
-	{.name = "device_generic",			.image = NULL},
-	{.name = "device_hfsplus",			.image = NULL},
-	{.name = "device_ext3",				.image = NULL},
-	{.name = "device_fat16",			.image = NULL},
-	{.name = "device_fat32",			.image = NULL},
-	{.name = "device_ntfs",				.image = NULL},
-	{.name = "device_cdrom",			.image = NULL},
-	{.name = "device_selection",			.image = NULL},
-	{.name = "device_scroll_prev",			.image = NULL},
-	{.name = "device_scroll_next",			.image = NULL},
-
-	{.name = "menu_boot",				.image = NULL},
-	{.name = "menu_verbose",			.image = NULL},
-	{.name = "menu_ignore_caches",			.image = NULL},
-	{.name = "menu_single_user",			.image = NULL},
-	{.name = "menu_memory_info",			.image = NULL},
-	{.name = "menu_video_info",			.image = NULL},
-	{.name = "menu_help",				.image = NULL},
-	{.name = "menu_verbose_disabled",		.image = NULL},
-	{.name = "menu_ignore_caches_disabled",		.image = NULL},
-	{.name = "menu_single_user_disabled",		.image = NULL},
-	{.name = "menu_selection",			.image = NULL},
-
-	{.name = "progress_bar",			.image = NULL},
-	{.name = "progress_bar_background",		.image = NULL},
-
-	{.name = "text_scroll_prev",			.image = NULL},
-	{.name = "text_scroll_next",			.image = NULL},
-
-	{.name = "font_console",			.image = NULL},
-	{.name = "font_small",				.image = NULL},
+    {.name = "device_selection",            .image = NULL},
+    {.name = "device_scroll_prev",          .image = NULL},
+    {.name = "device_scroll_next",          .image = NULL},
+    
+    {.name = "menu_boot",                   .image = NULL},
+    {.name = "menu_verbose",                .image = NULL},
+    {.name = "menu_ignore_caches",          .image = NULL},
+    {.name = "menu_single_user",            .image = NULL},
+    {.name = "menu_memory_info",            .image = NULL},
+    {.name = "menu_video_info",             .image = NULL},
+    {.name = "menu_help",                   .image = NULL},
+    {.name = "menu_verbose_disabled",       .image = NULL},
+    {.name = "menu_ignore_caches_disabled", .image = NULL},
+    {.name = "menu_single_user_disabled",   .image = NULL},
+    {.name = "menu_selection",              .image = NULL},
+    
+    {.name = "progress_bar",                .image = NULL},
+    {.name = "progress_bar_background",     .image = NULL},
+    
+    {.name = "text_scroll_prev",            .image = NULL},
+    {.name = "text_scroll_next",            .image = NULL},
+    
+    {.name = "font_console",                .image = NULL},
+    {.name = "font_small",                  .image = NULL},
 };
 
 int imageCnt = 0;
@@ -121,9 +150,8 @@ extern int	selectIndex;
 
 extern MenuItem *menuItems;
 
-char prompt[BOOT_STRING_LEN];
-
-int prompt_pos=0;
+//char prompt[BOOT_STRING_LEN];
+extern char   gBootArgs[BOOT_STRING_LEN];
 
 char prompt_text[] = "boot: ";
  
@@ -147,41 +175,69 @@ static int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 
 static bool infoMenuNativeBoot = false;
 
-static unsigned long screen_params[4] = {0, 0, 0, 0};	// here we store the used screen resolution
+// here we store the used screen resolution
+static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};
 
-#ifdef EMBED_THEME
-static int loadEmbeddedThemeImage(const char *image, unsigned char *image_data, unsigned int image_size)
+static int getImageIndexByName(const char *name)
 {
-	int		i;
-	uint16_t	width;
-	uint16_t	height;
-	uint8_t		*imagedata;
+    int i;
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	{
+	    if (strcmp(name, images[i].name) == 0)
+	        return i; // found the name
+	}
+	return -1;
+}
 
-	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(image, images[i].name) == 0) {
-			if (images[i].image == NULL) {
-				images[i].image = malloc(sizeof(pixmap_t));
+#ifdef CONFIG_EMBED_THEME
+static int getEmbeddedImageIndexByName(const char *name)
+{
+	int upperLimit = sizeof(embeddedImages) / sizeof(embeddedImages[0]) - 1;
+	int lowerLimit = 0;
+	int compareIndex = (upperLimit - lowerLimit) >> 1; // Midpoint
+	int result;
+	
+	// NOTE: This algorithm assumes that the embedded images are sorted.
+	// This is currently done using the make file. If the array is
+	// generated manualy, this *will* fail to work properly.
+	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
+	{
+		if (result > 0)	// We need to search a HIGHER index
+		{
+			if (compareIndex != lowerLimit)
+			{
+				lowerLimit = compareIndex;
 			}
-			width = 0;
-			height = 0;
-			imagedata = NULL;
-			if ((loadEmbeddedPngImage(image_data, image_size, &width, &height, &imagedata)) != 0) {
-				return 1;
+			else
+			{
+				return -1;
 			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
+			compareIndex = (upperLimit + lowerLimit + 1) >> 1;	// Midpoint, round up
+		}
+		else  // We Need to search a LOWER index
+		{
+			if (compareIndex != upperLimit)
+			{
+				upperLimit = compareIndex;
+			}
+			else
+			{
+				return -1;
+			}
+			compareIndex = (upperLimit + lowerLimit) >> 1;	// Midpoint, round down
 		}
 	}
-	return 1;
+	return compareIndex;
 }
 #endif
-static int loadThemeImage(const char *image)
+
+static int loadThemeImage(const char *image, int alt_image)
 {
 	char		dirspec[256];
-	int		i;
+	int 		i;
+#ifdef CONFIG_EMBED_THEME
+	int 		e;
+#endif
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
@@ -189,69 +245,119 @@ static int loadThemeImage(const char *image)
 	if ((strlen(image) + strlen(theme_name) + 20 ) > sizeof(dirspec)) {
 		return 1;
 	}
-	for (i=0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(image, images[i].name) == 0) {
-			if (images[i].image == NULL) {
-				images[i].image = malloc(sizeof(pixmap_t));
-			}
-			sprintf(dirspec,"/Extra/Themes/%s/%s.png", theme_name, image);
-			width = 0;
-			height = 0;
-			imagedata = NULL;
-			if ((loadPngImage(dirspec, &width, &height, &imagedata)) != 0) {
-#ifndef EMBED_THEME
-        printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
-        sleep(2);
+
+    if ((i = getImageIndexByName(image)) >= 0)
+    {
+        if (images[i].image == NULL) {
+            images[i].image = malloc(sizeof(pixmap_t));
+        }
+        sprintf(dirspec, "/Extra/Themes/%s/%s.png", theme_name, image);
+        width = 0;
+        height = 0;
+        imagedata = NULL;
+        if ((loadPngImage(dirspec, &width, &height, &imagedata)) == 0)
+        {
+            images[i].image->width = width;
+            images[i].image->height = height;
+            images[i].image->pixels = (pixel_t *)imagedata;
+            flipRB(images[i].image);
+            return 0;
+        }
+#ifdef CONFIG_EMBED_THEME
+        else if ((e = getEmbeddedImageIndexByName(image)) >= 0)
+        {
+            unsigned char *embed_data;
+            unsigned int embed_size;
+            embed_data = embeddedImages[e].pngdata;
+            embed_size = *embeddedImages[e].length;
+       
+            if (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata) == 0)
+            {
+                images[i].image->width = width;
+                images[i].image->height = height;
+                images[i].image->pixels = (pixel_t *)imagedata;
+                flipRB(images[i].image);
+                return 0;
+            }
+
+            return 0;
+        }
 #endif
-				return 1;
-			}
-			images[i].image->width = width;
-			images[i].image->height = height;
-			images[i].image->pixels = (pixel_t *)imagedata;
-			flipRB(images[i].image);
-			return 0;
-		}
-	}
+        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
+        {
+            // Using the passed alternate image for non-mandatory images.
+            // We don't clone the already existing pixmap, but using its properties instead!
+            images[i].image->width = images[alt_image].image->width;
+            images[i].image->height = images[alt_image].image->height;
+            images[i].image->pixels = images[alt_image].image->pixels;
+            return 0;
+        }
+        else
+        {
+#ifndef CONFIG_EMBED_THEME
+            printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
+			sleep(2);
+#endif
+            return 1;
+        }
+    }
 	return 1;
 }
 
-
 static int loadGraphics(void)
 {
-	LOADPNG(background);
-	LOADPNG(logo);
+	LOADPNG(background,                     IMG_REQUIRED);
+	LOADPNG(logo,                           IMG_REQUIRED);
 
-	LOADPNG(device_generic);
-	LOADPNG(device_hfsplus);
-	LOADPNG(device_ext3);
-	LOADPNG(device_fat16);
-	LOADPNG(device_fat32);
-	LOADPNG(device_ntfs);
-	LOADPNG(device_cdrom);
-	LOADPNG(device_selection);
-	LOADPNG(device_scroll_prev);
-	LOADPNG(device_scroll_next);
+	LOADPNG(device_generic,                 IMG_REQUIRED);
+	LOADPNG(device_generic_o,               iDeviceGeneric);
+	LOADPNG(device_hfsplus,                 iDeviceGeneric);
+	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(device_hfsraid,                 iDeviceGeneric);
+	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(device_ext3,                    iDeviceGeneric);
+	LOADPNG(device_ext3_o,                  iDeviceEXT3);
+	LOADPNG(device_freebsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_freebsd_o,               iDeviceFreeBSD);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_openbsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_openbsd_o,               iDeviceOpenBSD);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+	LOADPNG(device_befs,                    iDeviceGeneric);        /* Haiku detection and Icon credits to scorpius  */
+	LOADPNG(device_befs_o,                  iDeviceBEFS);           /* Haiku detection and Icon credits to scorpius  */
+	LOADPNG(device_fat,                     iDeviceGeneric);
+	LOADPNG(device_fat_o,                   iDeviceFAT);
+	LOADPNG(device_fat16,                   iDeviceFAT);
+	LOADPNG(device_fat16_o,                 iDeviceFAT_o);
+	LOADPNG(device_fat32,                   iDeviceFAT);
+	LOADPNG(device_fat32_o,                 iDeviceFAT_o);
+	LOADPNG(device_ntfs,                    iDeviceGeneric);
+	LOADPNG(device_ntfs_o,                  iDeviceNTFS);
+	LOADPNG(device_cdrom,                   iDeviceGeneric);
+	LOADPNG(device_cdrom_o,                 iDeviceCDROM);
 
-	LOADPNG(menu_boot);
-	LOADPNG(menu_verbose);
-	LOADPNG(menu_ignore_caches);
-	LOADPNG(menu_single_user);
-	LOADPNG(menu_memory_info);
-	LOADPNG(menu_video_info);
-	LOADPNG(menu_help);
-	LOADPNG(menu_verbose_disabled);
-	LOADPNG(menu_ignore_caches_disabled);
-	LOADPNG(menu_single_user_disabled);
-	LOADPNG(menu_selection);
+	LOADPNG(device_selection,               IMG_REQUIRED);
+	LOADPNG(device_scroll_prev,             IMG_REQUIRED);
+	LOADPNG(device_scroll_next,             IMG_REQUIRED);
 
-	LOADPNG(progress_bar);
-	LOADPNG(progress_bar_background);
+	LOADPNG(menu_boot,                      IMG_REQUIRED);
+	LOADPNG(menu_verbose,                   IMG_REQUIRED);
+	LOADPNG(menu_ignore_caches,             IMG_REQUIRED);
+	LOADPNG(menu_single_user,               IMG_REQUIRED);
+	LOADPNG(menu_memory_info,               IMG_REQUIRED);
+	LOADPNG(menu_video_info,                IMG_REQUIRED);
+	LOADPNG(menu_help,                      IMG_REQUIRED);
+	LOADPNG(menu_verbose_disabled,          IMG_REQUIRED);
+	LOADPNG(menu_ignore_caches_disabled,    IMG_REQUIRED);
+	LOADPNG(menu_single_user_disabled,      IMG_REQUIRED);
+	LOADPNG(menu_selection,                 IMG_REQUIRED);
 
-	LOADPNG(text_scroll_prev);
-	LOADPNG(text_scroll_next);
+	LOADPNG(progress_bar,                   IMG_REQUIRED);
+	LOADPNG(progress_bar_background,        IMG_REQUIRED);
 
-	LOADPNG(font_console);
-	LOADPNG(font_small);
+	LOADPNG(text_scroll_prev,               IMG_REQUIRED);
+	LOADPNG(text_scroll_next,               IMG_REQUIRED);
+
+	LOADPNG(font_console,                   IMG_REQUIRED);
+	LOADPNG(font_small,                     IMG_REQUIRED);
 
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
@@ -325,6 +431,18 @@ int createWindowBuffer( window_t *window )
 	return 0;
 }
 
+int freeWindowBuffer( window_t *window )
+{
+	if (window->pixmap && window->pixmap->pixels)
+    {
+		free(window->pixmap->pixels);
+		free(window->pixmap);
+		return 0;
+	}
+		
+	return 1;
+}
+
 void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 {
 	int x,y;
@@ -347,20 +465,86 @@ void drawBackground()
 	blend( images[iBackground].image, gui.screen.pixmap, gui.background.pos );
 	
 	// draw logo.png into background buffer
-	blend( images[iLogo].image, gui.screen.pixmap, gui.logo.pos);
+	if (gui.logo.draw)
+	{
+    	blend( images[iLogo].image, gui.screen.pixmap, gui.logo.pos);
+	}
 	
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
 
-void loadThemeValues(config_file_t *theme, bool overide)
+void setupDeviceList(config_file_t *theme)
+{
+	unsigned int pixel;
+	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
+	uint32_t color;			// color value formatted RRGGBB
+	int val, len;
+	const char *string;	
+
+	if(getIntForKey("devices_max_visible", &val, theme ))
+		gui.maxdevices = MIN( val, gDeviceCount );
+
+	if(getIntForKey("devices_iconspacing", &val, theme ))
+		gui.devicelist.iconspacing = val;
+
+	// check layout for horizontal or vertical
+	gui.layout = HorizontalLayout;
+	if(getValueForKey( "devices_layout", &string, &len, theme)) {
+		if (!strcmp (string, "vertical")) {
+			gui.layout = VerticalLayout;
+		}
+	}
+
+	switch (gui.layout) {
+	case VerticalLayout:
+		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
+		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
+
+		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
+			gui.devicelist.pos.x = pixel;
+
+		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
+			gui.devicelist.pos.y = pixel;
+		break;
+		
+	case HorizontalLayout:
+	default:
+		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
+		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
+
+		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
+			gui.devicelist.pos.x = pixel;
+		else
+			gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
+		
+		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
+			gui.devicelist.pos.y = pixel;
+		else
+			gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
+		break;
+	}
+
+	if(getColorForKey("devices_bgcolor", &color, theme))
+		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
+
+	if(getIntForKey("devices_transparency", &alpha, theme))
+		gui.devicelist.bgcolor = gui.devicelist.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
+
+	if (gui.devicelist.pixmap)
+	{
+	    freeWindowBuffer(&gui.devicelist);
+        createWindowBuffer(&gui.devicelist);
+    }
+}
+
+void loadThemeValues(config_file_t *theme)
 {
 	unsigned int screen_width  = gui.screen.width;
 	unsigned int screen_height = gui.screen.height;
 	unsigned int pixel;
 	int	alpha;				// transparency level 0 (obligue) - 255 (transparent)
 	uint32_t color;			// color value formatted RRGGBB
-	int val, len;
-	const char *string;	
+	int val;
 
 	/*
 	 * Parse screen parameters
@@ -410,57 +594,10 @@ void loadThemeValues(config_file_t *theme, bool overide)
 	if(getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.countdown.pos.y = pixel;
 
-	/*
+    /*
 	 * Parse devicelist parameters
 	 */
-	if(getIntForKey("devices_max_visible", &val, theme ))
-		gui.maxdevices = MIN( val, gDeviceCount );
-
-	if(getIntForKey("devices_iconspacing", &val, theme ))
-		gui.devicelist.iconspacing = val;
-
-	// check layout for horizontal or vertical
-	gui.layout = HorizontalLayout;
-	if(getValueForKey( "devices_layout", &string, &len, theme)) {
-		if (!strcmp (string, "vertical")) {
-			gui.layout = VerticalLayout;
-		}
-	}
-
-	switch (gui.layout) {
-	case VerticalLayout:
-		gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
-		gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
-			gui.devicelist.pos.x = pixel;
-
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
-			gui.devicelist.pos.y = pixel;
-		break;
-		
-	case HorizontalLayout:
-	default:
-		gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
-		gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
-
-		if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
-			gui.devicelist.pos.x = pixel;
-		else
-			gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
-		
-		if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
-			gui.devicelist.pos.y = pixel;
-		else
-			gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
-		break;
-	}
-
-	if(getColorForKey("devices_bgcolor", &color, theme))
-		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
-
-	if(getIntForKey("devices_transparency", &alpha, theme))
-		gui.devicelist.bgcolor = gui.devicelist.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
+	setupDeviceList(theme);
 
 	/*
 	 * Parse infobox parameters
@@ -557,34 +694,33 @@ void loadThemeValues(config_file_t *theme, bool overide)
 int initGUI(void)
 {
 	int		val;
-#ifdef EMBED_THEME
-	config_file_t	*config;
-	
-	config = &bootInfo->themeConfig;
-	if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-		return 1;
-	}
-#else
 	int	len;
 	char	dirspec[256];
 
-	getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
+	getValueForKey( "Theme", &theme_name, &len, &bootInfo->chameleonConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
 		return 1;
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/theme.plist", theme_name);
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
+#ifdef CONFIG_EMBED_THEME
+    config_file_t	*config;
+    
+    config = &bootInfo->themeConfig;
+    if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
+      return 1;
+    }
+#else
 		return 1;
-	}
 #endif
+	}
 	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig)) {
+	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
 		screen_params[0] = val;
 	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig)) {
+	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
 		screen_params[1] = val;
 	}
-	screen_params[2] = 32;
 
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
@@ -598,7 +734,7 @@ int initGUI(void)
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
-		loadThemeValues(&bootInfo->themeConfig, true);
+		loadThemeValues(&bootInfo->themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
 
@@ -608,7 +744,8 @@ int initGUI(void)
 				if (createWindowBuffer(&gui.devicelist) == 0) {
 					if (createWindowBuffer(&gui.bootprompt) == 0) {
 						if (createWindowBuffer(&gui.infobox) == 0) {
-							if (createWindowBuffer(&gui.menu) == 0) {							
+							if (createWindowBuffer(&gui.menu) == 0) {
+							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -625,10 +762,10 @@ int initGUI(void)
 	return 1;
 }
 
-void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
+void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
-	
+
 	if( diskIsCDROM(device) )
 		devicetype = iDeviceCDROM;				// Use CDROM icon
 	else
@@ -637,33 +774,51 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
 		{
 			case kPartitionTypeHFS:
 
-				// TODO: add apple raid icon choices
-				
-				devicetype = iDeviceHFS;		// Use HFS icon
+				// Use HFS or HFSRAID icon depending on bvr flags.
+				devicetype = (device->flags & kBVFlagBooter) ? iDeviceHFSRAID : iDeviceHFS;
 				break;
-				
+
 			case kPartitionTypeHPFS:
 				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
+				break;
+
+			case kPartitionTypeBEFS:                        /* Haiku detection and Icon credits to scorpius  */
+				devicetype = iDeviceBEFS;		// Use BEFS / Haiku icon
+				break;
+
+			case kPartitionTypeFreeBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+				devicetype = iDeviceFreeBSD;            // Use FreeBSD icon
+				break;
+				
+			case kPartitionTypeOpenBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
+				devicetype = iDeviceOpenBSD;            // Use OpenBSD icon
 				break;
 				
 			case kPartitionTypeFAT16:
 				devicetype = iDeviceFAT16;		// Use FAT16 icon
 				break;
-				
+
 			case kPartitionTypeFAT32:
 				devicetype = iDeviceFAT32;		// Use FAT32 icon
 				break;
-				
+
 			case kPartitionTypeEXT3:
 				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
 				break;
-				
+
 			default:
 				devicetype = iDeviceGeneric;	// Use Generic icon
 				break;
 		}
 	}
 	
+	// Draw the selection image and use the next (device_*_o) image for the selected item.
+    if (isSelected)
+	{
+		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
+		devicetype++;
+	}
+
 	// draw icon
 	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
 	
@@ -676,8 +831,10 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p)
 
 void drawDeviceList (int start, int end, int selection)
 {
-	int i;
-	position_t p, p_prev, p_next;
+	int			i;
+	bool		shoWinfo = false;
+	extern bool showBootBanner;
+	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
 		
@@ -713,45 +870,52 @@ void drawDeviceList (int start, int end, int selection)
 	}
 	
 	// draw visible device icons
-	for ( i=0; i < gui.maxdevices; i++ )
+	for (i = 0; i < gui.maxdevices; i++)
 	{
-		BVRef param = menuItems[start+i].param;
+		BVRef param = menuItems[start + i].param;
 
-		if((start+i) == selection)
+        bool isSelected = ((start + i) == selection) ? true : false;
+		if (isSelected)
 		{
-			 if(param->flags & kBVFlagNativeBoot)
-				infoMenuNativeBoot = true;
-			 else
-			 {
-				infoMenuNativeBoot = false;
-				if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
-				infoMenuSelection = 0;
-			 }
+            if (param->flags & kBVFlagNativeBoot)
+            {
+                infoMenuNativeBoot = true;
+            }
+            else
+            {
+                infoMenuNativeBoot = false;
+                if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
+                infoMenuSelection = 0;
+            }
 			 
-			if(gui.menu.draw)
+			if (gui.menu.draw)
 				drawInfoMenuItems();
-			 
-			blend( images[iSelection].image, gui.devicelist.pixmap, centeredAt( images[iSelection].image, p ) );
 			
-#if DEBUG
-			gui.debug.cursor = pos( 10, 100);
-			dprintf( &gui.screen, "label     %s\n",   param->label );
-			dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
-                        dprintf(&gui.screen,  "width     %d\n",  gui.screen.width);
-                        dprintf(&gui.screen,  "height    %d\n",  gui.screen.height);
-			dprintf( &gui.screen, "type      0x%x\n", param->type );
-			dprintf( &gui.screen, "flags     0x%x\n", param->flags );
-			dprintf( &gui.screen, "part_no   %d\n",   param->part_no );
-			dprintf( &gui.screen, "part_boff 0x%x\n", param->part_boff );
-			dprintf( &gui.screen, "part_type 0x%x\n", param->part_type );
-			dprintf( &gui.screen, "bps       0x%x\n", param->bps );
-			dprintf( &gui.screen, "name      %s\n",   param->name );
-			dprintf( &gui.screen, "type_name %s\n",   param->type_name );
-			dprintf( &gui.screen, "modtime   %d\n",   param->modTime );
-#endif
+			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->chameleonConfig);
+			
+			if (shoWinfo && showBootBanner)
+			{
+				gui.debug.cursor = pos( 10, 100);
+				dprintf( &gui.screen, "label:     %s\n",   param->label );
+				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
+				dprintf( &gui.screen, "type:      0x%x\n", param->type );
+				dprintf( &gui.screen, "flags:     0x%x\n", param->flags );
+				dprintf( &gui.screen, "part_no:   %d\n",   param->part_no );
+				dprintf( &gui.screen, "part_boff: 0x%x\n", param->part_boff );
+				dprintf( &gui.screen, "part_type: 0x%x\n", param->part_type );
+				dprintf( &gui.screen, "bps:       0x%x\n", param->bps );
+				dprintf( &gui.screen, "name:      %s\n",   param->name );
+				dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
+				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+//				// res
+				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
+				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
+//				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr ); //Azi: reminder
+//				dprintf( &gui.screen, "mm:        %d\n",   gui.screen.mm );
+			}
 		}
 		
-		drawDeviceIcon( param, gui.devicelist.pixmap, p );
+		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
 		
 		if (gui.layout == HorizontalLayout)
 		{
@@ -764,11 +928,11 @@ void drawDeviceList (int start, int end, int selection)
 	}
 
 	// draw prev indicator
-	if(start)
+	if (start)
 		blend( images[iDeviceScrollPrev].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollPrev].image, p_prev ) );
 
 	// draw next indicator
-	if( end < gDeviceCount - 1 )
+	if ( end < gDeviceCount - 1 )
 		blend( images[iDeviceScrollNext].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollNext].image, p_next ) );
 
 	gui.redraw = true;
@@ -780,8 +944,8 @@ void drawDeviceList (int start, int end, int selection)
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
-	prompt[0] = '\0';
-	prompt_pos=0;
+	//prompt[0] = '\0';
+	//prompt_pos=0;
 
 	
 	if(	gui.bootprompt.draw == true )
@@ -795,17 +959,8 @@ void clearGraphicBootPrompt()
 	return;
 }
 
-void updateGraphicBootPrompt(int key)
+void updateGraphicBootPrompt()
 {
-	if ( key == kBackspaceKey )
-		prompt[--prompt_pos] = '\0';
-	else 
-	{
-		prompt[prompt_pos] = key;
-		prompt_pos++;
-		prompt[prompt_pos] = '\0';
-	}
-
 	fillPixmapWithColor( gui.bootprompt.pixmap, gui.bootprompt.bgcolor);
 
 	makeRoundedCorners( gui.bootprompt.pixmap);
@@ -817,14 +972,8 @@ void updateGraphicBootPrompt(int key)
 	
 	// get the position of the end of the boot prompt text to display user input
 	position_t p_prompt = pos( p_text.x + ( ( strlen(prompt_text) ) * font_console.chars[0]->width ), p_text.y );
-
-	// calculate the position of the cursor
-	int	offset = (  prompt_pos - ( ( gui.bootprompt.width / font_console.chars[0]->width ) - strlen(prompt_text) - 2 ) );	
-
-	if ( offset < 0)
-		offset = 0;
 	
-	drawStr( prompt+offset, &font_console, gui.bootprompt.pixmap, p_prompt);
+	drawStr( gBootArgs, &font_console, gui.bootprompt.pixmap, p_prompt);
 
 	gui.menu.draw = false;
 	gui.bootprompt.draw = true;
@@ -897,20 +1046,22 @@ void updateVRAM()
 	}
 }
 
-struct putc_info {
+struct putc_info //Azi: exists on console.c & printf.c
+{
     char * str;
     char * last_str;
 };
 
-static void
-sputc(int c, struct putc_info * pi)
+static int
+sputc(int c, struct putc_info * pi) //Azi: same as above
 {
     if (pi->last_str)
         if (pi->str == pi->last_str) {
             *(pi->str) = '\0';
-            return;
+            return 0;
         }
     *(pi->str)++ = c;
+    return c;
 }
 
 int gprintf( window_t * window, const char * fmt, ...)
@@ -1185,7 +1336,7 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 		if( ch[i] == '\t' )
 			x+=(font->chars[0]->width*5);
 		
-		if(font->chars[cha])
+		if(font->chars[cha] && ((x + font->chars[cha]->width) < blendInto->width))
 			blend(font->chars[cha], blendInto, pos(p.x+x, p.y+y));
 		
 		x += font->chars[cha]->width;
@@ -1354,16 +1505,22 @@ void makeRoundedCorners(pixmap_t *p)
 	}
 }
 
-void showInfoBox(char *title, char *text)
+void showInfoBox(char *title, char *text_orig)
 {
+	char* text;
 	int i, key, lines, visiblelines;
 
 	int currentline=0;
 	int cnt=0;
 	int offset=0;
 	
-	if( !title || !text )
+	if( !title || !text_orig )
 		return;
+	
+	// Create a copy so that we don't mangle the original
+	text = malloc(strlen(text_orig) + 1);
+	strcpy(text, text_orig);
+	
 	
 	position_t pos_title = pos ( gui.infobox.vborder, gui.infobox.vborder );
 
@@ -1446,22 +1603,31 @@ void showInfoBox(char *title, char *text)
 		
 		updateVRAM();
 		
-		key = getc();
+		key = getchar();
 			
-		if( key == kUpArrowkey )
+		if( key == KEY_UP )
 			if( currentline > 0 )
 				currentline--;
 
-		if( key == kDownArrowkey )
+		if( key == KEY_DOWN )
 			if( lines > ( currentline + visiblelines ) )
 				currentline++;
 
-		if( key == kEscapeKey || key == 'q' || key == 'Q')
+		if( key == KEY_ESC || key == 'q' || key == 'Q')
 		{
 			gui.infobox.draw = false;
 			gui.redraw = true;
 			updateVRAM();
 			break;
+		}
+		
+		if(key == ' ') // spacebar = next page
+		{
+			if( lines > ( currentline + visiblelines ) ) 
+				currentline += visiblelines;
+			
+			if(lines < (currentline + visiblelines))
+				currentline = lines - visiblelines;
 		}
 	}
 }
@@ -1597,7 +1763,7 @@ int updateInfoMenu(int key)
 	switch (key)
 	{
 
-		case kUpArrowkey:	// up arrow
+		case KEY_UP:	// up arrow
 				if (infoMenuSelection > 0)
 				{
 					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
@@ -1619,7 +1785,7 @@ int updateInfoMenu(int key)
 				}
 				break;
 
-		case kDownArrowkey:	// down arrow
+		case KEY_DOWN:	// down arrow
 				if (infoMenuSelection < infoMenuItemsCount - 1)
 				{
 					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
@@ -1631,7 +1797,7 @@ int updateInfoMenu(int key)
 				}
 				break;
 
-		case kReturnKey:
+		case KEY_ENTER:
 				key = 0;
 				if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
 					showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
@@ -1674,7 +1840,7 @@ static void loadBootGraphics(void)
 	}
 	sprintf(dirspec, "/Extra/Themes/%s/boot.png", theme_name);
 	if (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
-#ifdef EMBED_THEME
+#ifdef CONFIG_EMBED_THEME
   	if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
 #endif
 		usePngImage = false; 
@@ -1688,27 +1854,31 @@ void drawBootGraphics(void)
 	int pos;
 	int length;
 	const char *dummyVal;
+	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig) && legacy_logo) {
+	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig) && legacy_logo) {
 		usePngImage = false; 
 	} else if (bootImageData == NULL) {
 		loadBootGraphics();
 	}
 
 	// parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig)) {
+	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
 		screen_params[0] = pos;
 	} else {
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
 	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig)) {
+	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
 		screen_params[1] = pos;
 	} else {
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
-	screen_params[2] = 32;
+
+    // Save current screen resolution.
+	oldScreenWidth = gui.screen.width;
+	oldScreenHeight = gui.screen.height;
 
 	gui.screen.width = screen_params[0];
 	gui.screen.height = screen_params[1];
@@ -1716,9 +1886,14 @@ void drawBootGraphics(void)
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
 
-	setVideoMode(GRAPHICS_MODE, 0);
+    // Set graphics mode if the booter was in text mode or the screen resolution has changed.
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE
+		|| (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	{
+		setVideoMode(GRAPHICS_MODE, 0);
+	}
 
-	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
+	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig)) {
 		drawCheckerBoard();
 	} else {
 		// Fill the background to 75% grey (same as BootX). 

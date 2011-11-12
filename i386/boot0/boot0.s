@@ -46,16 +46,18 @@
 ;
 ; Turbo added EFI System Partition boot support
 ;
+; Added KillerJK's switchPass2 modifications
+;
 
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG				EQU  0
+DEBUG				EQU  CONFIG_BOOT0_DEBUG
 
 ;
 ; Set to 1 to enable verbose mode
 ;
-VERBOSE				EQU  0
+VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
 
 ;
 ; Various constants.
@@ -313,36 +315,19 @@ find_boot:
     jne	    .Pass2
 
 .Pass1:
-%ifdef HFSFIRST
-    cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 1 we're going to find a HFS+ partition
-                                                  ; equipped with boot1h in its boot record
-                                                  ; regardless if it's active or not.
-    jne     .continue
-  	mov		  dh, 1                									; Argument for loadBootSector to check HFS+ partition signature.
-%else
     cmp     BYTE [si + part.bootid], kPartActive	; In pass 1 we are walking on the standard path
-                                                  ; by trying to hop on the active partition.
+                                                    ; by trying to hop on the active partition.
     jne     .continue
-    xor	  	dh, dh               									; Argument for loadBootSector to skip HFS+ partition
-											                        		; signature check.
-%endif
-
-    jmp    .tryToBoot
+    xor	  	dh, dh               					; Argument for loadBootSector to skip HFS+ partition
+											        ; signature check.
+    jmp     .tryToBoot
 
 .Pass2:    
-%ifdef HFSFIRST
-    cmp     BYTE [si + part.bootid], kPartActive	; In pass 2 we are walking on the standard path
-                                                  ; by trying to hop on the active partition.
-    jne     .continue
-    xor		  dh, dh               									; Argument for loadBootSector to skip HFS+ partition
-											                        		; signature check.
-%else
     cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
-                                                  ; equipped with boot1h in its boot record
-                                                  ; regardless if it's active or not.
+                                                    ; equipped with boot1h in its boot record
+                                                    ; regardless if it's active or not.
     jne     .continue
-  	mov 		dh, 1                									; Argument for loadBootSector to check HFS+ partition signature.
-%endif
+  	mov 	dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
 
     DebugChar('*')
 
@@ -354,10 +339,10 @@ find_boot:
 
     call    loadBootSector
     jne     .continue
-    jmp	    initBootLoader
+    jmp	    SHORT initBootLoader
 
 .continue:
-    add     si, part_size          			; advance SI to next partition entry
+    add     si, BYTE part_size     			; advance SI to next partition entry
     loop    .loop                 		 	; loop through all partition entries
 
     ;
@@ -366,8 +351,10 @@ find_boot:
     ; for a possible GPT Header at LBA 1
     ;    
     dec	    bl
-    jz	    checkGPT						; found Protective MBR before
+    jnz     .switchPass2					; didn't find Protective MBR before
+    call    checkGPT
 
+.switchPass2:
     ;
     ; Switching to Pass 2 
     ; try to find a boot1h aware HFS+ MBR partition
@@ -378,6 +365,22 @@ find_boot:
     
 .exit:
     ret										; Giving up.
+
+
+    ;
+    ; Jump to partition booter. The drive number is already in register DL.
+    ; SI is pointing to the modified partition entry.
+    ;
+initBootLoader:    
+
+DebugChar('J')
+
+%if VERBOSE
+    LogString(done_str)
+%endif
+
+    jmp     kBoot0LoadAddr
+
     
     ; 
     ; Found Protective MBR Partition Type: 0xEE
@@ -385,6 +388,7 @@ find_boot:
     ; of LBA1 for possible GPT Table Header
     ;
 checkGPT:
+    push    bx
 
     mov	    di, kLBA1Buffer						; address of GUID Partition Table Header
     cmp	    DWORD [di], kGPTSignatureLow		; looking for 'EFI '
@@ -473,20 +477,8 @@ checkGPT:
     loop    .gpt_loop								; loop through all partition entries	
 
 .exit:
+    pop     bx
     ret												; no more GUID partitions. Giving up.
-
-    DebugChar('J')
-    ;
-    ; Jump to partition booter. The drive number is already in register DL.
-    ; SI is pointing to the modified partition entry.
-    ;
-initBootLoader:    
-
-%if VERBOSE
-    LogString(done_str)
-%endif
-
-    jmp     kBoot0LoadAddr
 
 
 ;--------------------------------------------------------------------------
@@ -507,7 +499,7 @@ loadBootSector:
     
     mov     al, 3
     mov     bx, kBoot0LoadAddr
-    call    load                    ; will not return on success
+    call    load
     jc      error
 
 	or		dh, dh
@@ -609,7 +601,8 @@ read_lba:
     xor     ah, ah                  ; offset 3, must be 0
     push    ax                      ; offset 2, number of sectors
 
-    push    WORD 16                 ; offset 0-1, packet size
+    ; It pushes 2 bytes with a smaller opcode than if WORD was used
+    push    BYTE 16                 ; offset 0-1, packet size
 
     DebugChar('<')
 %if DEBUG
@@ -789,6 +782,11 @@ done_str		db  'done', 0
 ; According to EFI specification, maximum boot code size is 440 bytes 
 ;
 
+;
+; XXX - compilation errors with debug enabled (see comment above about nasm)
+; Azi: boot0.s:808: error: TIMES value -111 is negative
+;      boot0.s:811: error: TIMES value -41 is negative
+;
 pad_boot:
     times 440-($-$$) db 0
 
