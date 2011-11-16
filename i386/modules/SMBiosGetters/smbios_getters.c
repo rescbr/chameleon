@@ -156,7 +156,8 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 					case CPUID_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
-						value->word = 0x0701;			// Core i7
+						if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
+                            value->word = 0x0701;	// Core i7                        
 						return true;
 
 					case CPUID_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper

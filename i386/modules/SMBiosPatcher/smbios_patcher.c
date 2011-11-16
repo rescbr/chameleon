@@ -698,7 +698,10 @@ static int sm_get_cputype (const char *name, int table_num)
 						return sm_get_simplecputype();
 						
 					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-						return 0x0701; // Core i7
+                        if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
+                            return 0x0701; // Core i7
+                        return sm_get_simplecputype();
+
 						
 					case CPUID_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
 						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))

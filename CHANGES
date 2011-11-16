@@ -1,3 +1,6 @@
+- Improved smbios support for some Intel Xeon models
+- BETA : Sync'd ati engine with the trunk
+
 - Small security fix
 - Added a mechanism to strip the madt table
 - Ported the serial number randomizer to smbiosgetters,

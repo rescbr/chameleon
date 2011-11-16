@@ -103,8 +103,8 @@ struct pci_rom_pnp_header_t {
 struct pci_rom_bios_t {
 	uint16_t	signature;			// 0x55AA
 	uint8_t		size;				// Multiples of 512
-	
-	uint8_t		checksum;			// 0x00
+	uint32_t	entry_point;
+	uint8_t		reserved[15];
 	uint16_t	pci_header;
 	uint16_t	pnp_header;
 };
