@@ -10,7 +10,7 @@
 /** Transform a 16 bytes hexadecimal value UUID to a string */
 const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 {
-  static char msg[UUID_LEN*2 + 8] = "";
+  static char msg[UUID_STR_LEN] = "";
   if (!eUUID) return "";
   const unsigned char * uuid = (unsigned char*) eUUID;
   sprintf(msg, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",

@@ -26,7 +26,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SA_OBJS = prf.o printf.o zalloc.o \
+SA_OBJS = prf.o printf.o zalloc.o\
 	string.o strtol.o error.o \
 	setjmp.o qsort.o efi_tables.o
 	

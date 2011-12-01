@@ -49,9 +49,12 @@
 #include "xml.h"
 #include "pci_root.h"
 #include "sl.h"
+#include "convert.h"
 
 U64 rsd_p;
 ACPI_TABLES acpi_tables;
+U32 uuid32;
+bool checkOem = false;
 
 #ifndef DEBUG_ACPI
 #define DEBUG_ACPI 0
@@ -93,6 +96,7 @@ static void move_table_list_to_kmem(U32 *new_table_list );
 static ACPI_TABLE_RSDP * gen_alloc_rsdp_v2_from_v1(ACPI_TABLE_RSDP *rsdp );
 static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt);
 static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt);
+static void MakeUuidAdler32(void);
 static void *loadACPITable(char *dirspec, char *filename );
 static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer);
 static ACPI_GENERIC_ADDRESS FillGASStruct(U32 Address, U8 Length);
@@ -536,6 +540,19 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
     return xsdt_conv;
 }
 
+static void MakeUuidAdler32(void)
+{
+	uuid32 = 0;
+
+	const char *uuidStr = getStringFromUUID(Platform->sysid);
+	
+	if (strlen(uuidStr)) 
+	{
+		uuid32 = OSSwapHostToBigInt32(adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
+	}
+
+}
+
 static void *loadACPITable(char *dirspec, char *filename )
 {	
 	int fd = -1;
@@ -568,7 +585,14 @@ static void *loadACPITable(char *dirspec, char *filename )
 		
 		close (fd);
 		
-		ACPI_TABLE_HEADER * header = (ACPI_TABLE_HEADER *)tableAddr;
+		ACPI_TABLE_HEADER * header = (ACPI_TABLE_HEADER *)tableAddr;		
+		
+		if ((checkOem == true) && (header->OemRevision != uuid32) )
+		{
+			DBG("Bad signature aka Oem Revision (0x%08lx) for Aml file (%s), it should be 0x%08lx, file skipped !!\n", header->OemRevision, acpi_file, uuid32);
+			free(tableAddr);
+			return (void*)0ul;
+		} 
 		
 		if (GetChecksum(header, header->Length) == 0)
 		{
@@ -5277,6 +5301,7 @@ EFI_STATUS setupAcpi(void)
 #if BUILD_ACPI_TSS 
 		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 #endif
+		checkOem=getBoolForKey(kOnlySignedAml, &tmpval, &bootInfo->bootConfig)&&tmpval;
 	} 
 		
 	{
@@ -5319,10 +5344,15 @@ EFI_STATUS setupAcpi(void)
 
 		if (acpidir_found == true)
 		{
+			if (checkOem == true)
+			{
+				MakeUuidAdler32();
+			}
+
 			struct dirstuff* moduleDir = opendir(dirspec);
 			while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 			{		
-				if((strcmp(&name[strlen(name) - sizeof("aml")], ".aml") == 0) && ((strlen(dirspec)+strlen(name)) < 512))
+				if((strstr(name, ".aml")) && ((strlen(dirspec)+strlen(name)) < 512))
 				{					
 					// Some simple verifications to save time in case of those tables simply named as follow:
 					if ((strncmp(name, "RSDT", 4) == 0) || (strncmp(name, "rsdt", 4) == 0) ||
@@ -5346,6 +5376,7 @@ EFI_STATUS setupAcpi(void)
 						} 
 						else
 						{
+							DBG("Max nb of allowed aml files reached, exiting .");
 							break;
 						}						
 					} 					
@@ -5354,7 +5385,8 @@ EFI_STATUS setupAcpi(void)
 #if DEBUG_ACPI
 				else 
 				{
-					DBG("Ignoring %s\n", name);
+
+					printf("Ignoring %s\n", name);
 				}
 #endif
 				

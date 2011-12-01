@@ -31,6 +31,9 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdbool.h>
+#if 0
+#include "C_Exception.h"
+#endif
 
 /*
  * ctype stuff (aserebln)
@@ -165,6 +168,11 @@ extern int      rand (void);
 extern void     srand (unsigned int seed);
 
 
+/*
+ *  C_Exception.c
+ *
+ */
+extern void		exception_init (void (*exception_err_fn)(char *, int));
 
 /*
  * getsegbyname.c

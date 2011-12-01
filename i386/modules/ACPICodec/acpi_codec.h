@@ -49,6 +49,8 @@
 #define kUpdateACPI			"UpdateACPI"	    /* acpi_codec.c */
 #define kUnsafeACPI			"UnsafeACPI"		/* acpi_codec.c */ //desactive some safe checks that may stop the boot process on some configurations( temporary option )  
 
+#define kOnlySignedAml		"LoadSignedAmlOnly"	    /* acpi_codec.c */
+
 #if UNUSED
 #define kGenerateFACS		"GenerateFACS"		/* acpi_codec.c */
 #define kOEMFACS			"oemFACS"			/* acpi_codec.c */

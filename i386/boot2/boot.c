@@ -162,6 +162,14 @@ static inline void malloc_error(char *addr, size_t size)
 }
 #endif
 
+#if 0
+static inline void exception_error(char *msg, int nb)
+{
+    printf("\r\nException number = %d\r\nmessage = %s\r\n\r\n", nb, msg);
+    asm volatile ("hlt");
+}
+#endif
+
 //==========================================================================
 //Initializes the runtime.  Right now this means zeroing the BSS and initializing malloc.
 //
@@ -169,6 +177,9 @@ void initialize_runtime(void)
 {
 	zeroBSS();
 	malloc_init(0, 0, 0, malloc_error);
+#if 0
+	exception_init(exception_error);
+#endif
 }
 
 //==========================================================================
@@ -178,7 +189,7 @@ static int ExecKernel(void *binary)
 {
     entry_t                   kernelEntry;
     int                       ret;
-	
+				
     bootArgs->kaddr = bootArgs->ksize = 0;
 	
 	if(gMacOSVersion[3] <= '6')
