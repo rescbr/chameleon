@@ -219,7 +219,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9400,	0x25521002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
 	{ 0x9400,	0x30001002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 PRO",			kNull		},
 
-	{ 0x9440,	0x114A174B, CHIP_FAMILY_RV770,		"Sapphire Radeon HD4870 Vapor-X",	kCardinal	}, // ErmaC
+	{ 0x9440,	0x114A174B, CHIP_FAMILY_RV770,		"Sapphire Radeon HD4870 Vapor-X",		kCardinal	}, // ErmaC
 	{ 0x9440,	0x24401682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		},
 	{ 0x9440,	0x24411682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		},
 	{ 0x9440,	0x24441682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		},
@@ -499,7 +499,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68B8,	0xE147174B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	
 	{ 0x68B8,	0x21D71458, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
-	
+
+	{ 0x68B8,	0x200A1787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x200B1787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 
@@ -557,6 +558,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x301217AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x301317AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 
+	{ 0x68F9,	0xE153174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},   
 	{ 0x68F9,	0xE145174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 
 	/* Northen Islands */
@@ -723,7 +725,7 @@ static radeon_card_info_t radeon_cards[] = {
 		
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kBulrushes	},
-	
+
 	{ 0x0000,	0x00000000, CHIP_FAMILY_UNKNOW,		NULL,								kNull		}
 };
 
