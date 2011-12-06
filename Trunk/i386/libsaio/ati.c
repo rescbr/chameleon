@@ -14,8 +14,8 @@
 
 #define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 
-#define Reg32(reg)				(*(volatile uint32_t *)(card->mmio + reg))
-#define RegRead32(reg)			(Reg32(reg))
+#define Reg32(reg)		(*(volatile uint32_t *)(card->mmio + reg))
+#define RegRead32(reg)		(Reg32(reg))
 #define RegWrite32(reg, value)	(Reg32(reg) = value)
 
 typedef enum {
@@ -44,7 +44,6 @@ typedef enum {
 	CHIP_FAMILY_RV710,
 	CHIP_FAMILY_RV730,
 	CHIP_FAMILY_RV740,
-	CHIP_FAMILY_RV772,
 	CHIP_FAMILY_RV770,
 	CHIP_FAMILY_RV790,
 	/* Evergreen */
@@ -58,6 +57,11 @@ typedef enum {
 	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
 	CHIP_FAMILY_TURKS,
+	/* Southern Islands */
+//	"TAITI"
+//	"THAMES"
+//	"LOMBOK"
+//	"NEW_ZEALAND"
 	CHIP_FAMILY_LAST
 } chip_family_t;
 
@@ -94,6 +98,11 @@ static const char *chip_family_name[] = {
 	"Caicos",
 	"Cayman",
 	"Turks",
+	/* Southern Islands */
+//	"Tahiti"
+//	"Thames"
+//	"Lombok"
+//	"New_Zealand"
 	""
 };
 
@@ -105,9 +114,9 @@ typedef struct {
 static card_config_t card_configs[] = {
 	{NULL,			0},
 	{"Alopias",		2},
-	{"Alouatta",	4},
+	{"Alouatta",		4},
 	{"Baboon",		3},
-	{"Cardinal",	2},
+	{"Cardinal",		2},
 	{"Caretta",		1},
 	{"Colobus",		2},
 	{"Douc",		2},
@@ -116,17 +125,17 @@ static card_config_t card_configs[] = {
 	{"Galago",		2},
 	{"Gliff",		3},
 	{"Hoolock",		3},
-	{"Hypoprion",	2},
+	{"Hypoprion",		2},
 	{"Iago",		2},
 	{"Kakapo",		3},
 	{"Kipunji",		4},
 	{"Lamna",		2},
 	{"Langur",		3},
-	{"Megalodon",	3},
+	{"Megalodon",		3},
 	{"Motmot",		2},
-	{"Nomascus",	5},
-	{"Orangutan",	2},
-	{"Peregrine",	2},
+	{"Nomascus",		5},
+	{"Orangutan",		2},
+	{"Peregrine",		2},
 	{"Quail",		3},
 	{"Raven",		3},
 	{"Shrike",		3},
@@ -135,19 +144,19 @@ static card_config_t card_configs[] = {
 	{"Uakari",		4},
 	{"Vervet",		4},
 	{"Zonalis",		6},
-	{"Pithecia",	3},
-	{"Bulrushes",	6},
+	{"Pithecia",		3},
+	{"Bulrushes",		6},
 	{"Cattail",		4},
-	{"Hydrilla",	5},
-	{"Duckweed",	4},
+	{"Hydrilla",		5},
+	{"Duckweed",		4},
 	{"Fanwort",		4},
 	{"Elodea",		5},
 	{"Kudzu",		2},
 	{"Gibba",		5},
 	{"Lotus",		3},
 	{"Ipomoea",		3},
-	{"Mangabey",	2},
-	{"Muskgrass",	4},
+	{"Mangabey",		2},
+	{"Muskgrass",		4},
 	{"Juncus",		4}
 };
 
@@ -202,10 +211,10 @@ typedef enum {
 } config_name_t;
 
 typedef struct {
-	uint16_t				device_id;
-	uint32_t				subsys_id;
+	uint16_t			device_id;
+	uint32_t			subsys_id;
 	chip_family_t			chip_family;
-	const char				*model_name;
+	const char			*model_name;
 	config_name_t			cfg_name;
 } radeon_card_info_t;
 
@@ -491,6 +500,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x68B8,	0x00CF106B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kHoolock	},
 
+	{ 0x68B8,	0x145821f6, CHIP_FAMILY_JUNIPER,	"GigaByte HD5770 R577SL-1GD",			kVervet		}, // ErmaC
+
 	{ 0x68B8,	0x29901682, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 	{ 0x68B8,	0x29911682, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 
@@ -542,6 +553,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E0,	0x1433103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	},
 
 	{ 0x68E1,	0x1426103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
+
+	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ASUS EAH5450",					kNull		}, // ErmaC
 
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
@@ -724,6 +737,8 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",			kNull		},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",			kBulrushes	},
+
+	/* Southen Islands */
 
 	{ 0x0000,	0x00000000, CHIP_FAMILY_UNKNOW,		NULL,						kNull		}
 };
