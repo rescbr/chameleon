@@ -511,12 +511,14 @@ static const char const FIRMWARE_DATE_PROP[] = "firmware-date";
 static const char const FIRMWARE_DEV_PROP[] = "firmware-maintener";
 static const char const FIRMWARE_PUBLISH_PROP[] = "firmware-publisher";
 
+
 static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char const SYSTEM_ID_PROP[] = "system-id";
 static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char const SYSTEM_TYPE_PROP[] = "system-type";
 static const char const MODEL_PROP[] = "Model";
+static const char const MOTHERBOARD_NAME_PROP[] = "motherboard-name";
 
 
 /*
@@ -788,6 +790,16 @@ static VOID setupEfiDeviceTree(void)
 	DT__AddProperty(efiNode, FIRMWARE_DEV_PROP, strlen(FIRMWARE_MAINTENER)+1, FIRMWARE_MAINTENER);
 	DT__AddProperty(efiNode, FIRMWARE_PUBLISH_PROP, strlen(FIRMWARE_PUBLISHER)+1, FIRMWARE_PUBLISHER);
 	
+	{
+		// Export it for later use
+		char * DefaultPlatform = readDefaultPlatformName();
+		if (DefaultPlatform)
+		{
+			DT__AddProperty(efiNode, MOTHERBOARD_NAME_PROP, strlen(DefaultPlatform)+1, DefaultPlatform);
+		}
+
+	}
+
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(efiNode, "configuration-table");

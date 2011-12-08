@@ -1,3 +1,4 @@
+- Added an option to the check Oem revision of aml files (by adler32 of unique machine id or adler32 of motherboard model), can be useful with multiple machines (a command line tool able to patch the aml files will be available soon)
 - Improved smbios support for some Intel Xeon models
 - BETA : Sync'd ati engine with the trunk
 

@@ -43,14 +43,20 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 		device_inject.o pci_root.o \
         convert.o acpi_tools.o smbios.o smp-imps.o
 
-# example for acpicodec
-#CFLAGS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
+# example for AcpiCodec
+#SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
+
+# example for AcpiPatcher
+#SAIO_OBJS += aml_generator.o acpi_patcher.o AcpiPatcher.o 
+
+# example for GE
+#SAIO_OBJS += nvidia.o ati.o gma.o GraphicsEnabler.o
 
 # example for SMBiosGetters
-#CFLAGS += mysmbios.o smbios_decode.o smbios_getters.o SMBiosGetters.o
+#SAIO_OBJS += mysmbios.o smbios_decode.o smbios_getters.o SMBiosGetters.o
 
 # example for GUI
-#CFLAGS += graphic_utils.o gui.o rand.o picopng.o GUI_module.o
+#SAIO_OBJS += graphic_utils.o gui.o picopng.o GUI_module.o
 
 # Options enabled by default:
 #CFLAGS += -DNO_WIN_SUPPORT # -7200 bytes
@@ -94,7 +100,7 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
 #SIG = $(SYMROOT)/sig
 
-all embedtheme: $(DIRS_NEEDED) libsaio.h $(LIBS)
+all embedtheme: $(DIRS_NEEDED) libsaio.h embedded.h $(LIBS)
 
 #libsaio_static.a: $(SAIO_OBJS)
 #	rm -f $(SYMROOT)/$@
@@ -114,6 +120,9 @@ libsaio.a: $(SAIO_EXTERN_OBJS) $(SAIO_OBJS)
 	ar q $(SYMROOT)/$(@F) $^
 	ranlib $(SYMROOT)/$(@F)
 
+embedded.h:
+	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
+	
 #saio_internal.h: saio_external.h
 #saio_table.c: saio_external.h
 #saio_defs.h: saio_external.h

@@ -76,6 +76,9 @@ static long long               gVolID;
 
 #endif /* !__i386__ */
 
+unsigned long               HFSLoadVerbose = 1;
+
+
 static long ReadFile(void *file, uint64_t *length, void *base, uint64_t offset);
 static long GetCatalogEntryInfo(void *entry, long *flags, long *time,
                                 FinderInfo *finderInfo, long *infoValid);
@@ -300,9 +303,14 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
     }
 
     getDeviceDescription(ih, devStr);
-    verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
-            (gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
 	
+	if (HFSLoadVerbose) {
+		verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
+				(gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
+	} else if (HFSLoadVerbose == 0) {		
+		HFSLoadVerbose = 1;
+	}
+    
     return length;
 }
 

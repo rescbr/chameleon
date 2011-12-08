@@ -62,6 +62,7 @@ enum {
 
 extern void * gFSLoadAddress;
 extern cpu_type_t archCpuType;
+extern unsigned long               HFSLoadVerbose;
 cpu_type_t detectCpuType ();
 
 #endif /* !__LIBSAIO_SL_H */

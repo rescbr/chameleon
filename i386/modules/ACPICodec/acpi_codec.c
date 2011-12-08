@@ -54,6 +54,7 @@
 U64 rsd_p;
 ACPI_TABLES acpi_tables;
 U32 uuid32;
+U32 Model32;
 bool checkOem = false;
 
 #ifndef DEBUG_ACPI
@@ -90,14 +91,15 @@ static void print_nameseg(U32 i);
 #endif
 
 static ACPI_TABLE_HEADER * get_new_table_in_list(U32 *new_table_list, U32 Signature, U8 *retIndex );
+static U8 get_number_of_tables_in_list(U32 *new_table_list, U32 Signature );
 static U8 get_0ul_index_in_list(U32 *new_table_list, bool reserved );
 static void sanitize_new_table_list(U32 *new_table_list );
 static void move_table_list_to_kmem(U32 *new_table_list );
 static ACPI_TABLE_RSDP * gen_alloc_rsdp_v2_from_v1(ACPI_TABLE_RSDP *rsdp );
 static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt);
 static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt);
-static void MakeUuidAdler32(void);
-static void *loadACPITable(char *dirspec, char *filename );
+static void MakeAcpiSgn(void);
+static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename );
 static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer);
 static ACPI_GENERIC_ADDRESS FillGASStruct(U32 Address, U8 Length);
 static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list);
@@ -246,6 +248,22 @@ static ACPI_TABLE_HEADER * get_new_table_in_list(U32 *new_table_list, U32 Signat
 		}
 	}
 	return (void*)0ul;
+}
+
+static U8 get_number_of_tables_in_list(U32 *new_table_list, U32 Signature )
+{
+	ACPI_TABLE_HEADER **table_array = (ACPI_TABLE_HEADER **) new_table_list;
+	U8 index ;
+	U8 InstalledTables = 0;
+	
+	for (index = 0; index < (MAX_ACPI_TABLE + RESERVED_AERA); index++)
+	{
+		if (*(U32 *) (table_array[index]->Signature) == Signature)
+		{
+			InstalledTables++ ;
+		}
+	}
+	return InstalledTables;
 }
 
 static U8 get_0ul_index_in_list(U32 *new_table_list, bool reserved )
@@ -540,8 +558,17 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
     return xsdt_conv;
 }
 
-static void MakeUuidAdler32(void)
+static void MakeAcpiSgn(void)
 {
+
+	char * DefaultplatformName = NULL;
+	Model32 = 0;
+	
+	if (DefaultplatformName = readDefaultPlatformName())
+	{
+		Model32 = OSSwapHostToBigInt32(adler32( (unsigned char *) DefaultplatformName, strlen(DefaultplatformName)));
+	}
+	
 	uuid32 = 0;
 
 	const char *uuidStr = getStringFromUUID(Platform->sysid);
@@ -553,7 +580,7 @@ static void MakeUuidAdler32(void)
 
 }
 
-static void *loadACPITable(char *dirspec, char *filename )
+static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
 {	
 	int fd = -1;
 	char acpi_file[512];
@@ -563,6 +590,7 @@ static void *loadACPITable(char *dirspec, char *filename )
     	
 	sprintf(acpi_file, "%s%s",dirspec, filename); 
 	
+	HFSLoadVerbose = 0;
 	fd=open(acpi_file);
 	
 	if (fd<0)
@@ -587,18 +615,57 @@ static void *loadACPITable(char *dirspec, char *filename )
 		
 		ACPI_TABLE_HEADER * header = (ACPI_TABLE_HEADER *)tableAddr;		
 		
-		if ((checkOem == true) && (header->OemRevision != uuid32) )
+		if (*(U32*)(header->Signature) != NAMESEG("SSDT"))
 		{
-			DBG("Bad signature aka Oem Revision (0x%08lx) for Aml file (%s), it should be 0x%08lx, file skipped !!\n", header->OemRevision, acpi_file, uuid32);
-			free(tableAddr);
-			return (void*)0ul;
+			U8 dummy = 0;
+			if (get_new_table_in_list(new_table_list, *(U32*)(header->Signature), &dummy))
+			{
+#if DEBUG_ACPI
+				printf("Warning: A ");
+				print_nameseg(*(U32*) (header->Signature));
+				printf(" Aml file is already loaded and registred, file skipped !!\n");
+#endif
+				free(tableAddr);
+				return (void*)0ul;
+			} 
 		} 
+		else
+		{
+			if (get_number_of_tables_in_list(new_table_list, NAMESEG("SSDT")) >= MAX_SSDT_TABLE)
+			{
+				DBG("Warning: Max number of SSDT aml files reached, file skipped !!\n");
+				free(tableAddr);
+				return (void*)0ul;
+			}
+		}
+
+		
+		if (checkOem == true)
+		{			
+			if (header->OemRevision == Model32)
+			{
+				goto continue_loading;
+			}
+			
+			if (header->OemRevision == uuid32)
+			{
+				goto continue_loading;
+			}
+			
+			DBG("Bad signature aka Oem Revision (0x%08lx) for Aml file (%s), file skipped !!\n", header->OemRevision, acpi_file);
+			DBG("uuid32 (0x%08lx) , model32 (0x%08lx)\n", uuid32, Model32);
+			
+			free(tableAddr);
+			return (void*)0ul;			
+		} 
+		
+continue_loading:
 		
 		if (GetChecksum(header, header->Length) == 0)
 		{
-			DBG("Found valid AML file : %s", filename);
-			DBG(" ( %s ) read and stored at: %x", acpi_file, tableAddr);
-			DBG("\n");
+			DBG("Found valid AML file : %s ", filename);
+			printf("[ %s ] read and stored at: %x", acpi_file, tableAddr);
+			printf("\n");
 			return tableAddr;
 		} 
 		else
@@ -609,9 +676,11 @@ static void *loadACPITable(char *dirspec, char *filename )
 			return (void*)0ul;
 		}		
 	}
-	
-	printf("Couldn't allocate memory for table %s\n", acpi_file);
-	close (fd);
+	else 
+	{
+		printf("Couldn't allocate memory for table %s\n", acpi_file);
+		close (fd);
+	}	
 	
 	return (void *)0ul ;
 }
@@ -2105,7 +2174,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						 }
 						 */
 						
-						bool sta = BuildCoreIPstateInfo(cpu);
+						U32 sta = BuildCoreIPstateInfo(cpu);
 						if (sta) 
 						{
 							DBG("_PSS PGK generated successfully\n");
@@ -2892,9 +2961,9 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 ACPI_MADT_LOCAL_APIC_NMI *nmi = current;
                 current = nmi + 1;  
                 /*
-                if (!(nmi->IntiFlags & ACPI_MADT_ENABLED))
-                    continue;
-                */
+				 if (!(nmi->IntiFlags & ACPI_MADT_ENABLED))
+				 continue;
+				 */
                 if (LOCAL_APIC_NMI_CNT >= nb_cpu)
                     continue;                
                 
@@ -2927,9 +2996,9 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 ACPI_MADT_LOCAL_SAPIC *sapic = current;
                 current = sapic + 1;               
                 /*
-                if (!(sapic->LapicFlags & ACPI_MADT_ENABLED))
-                    continue;
-                */
+				 if (!(sapic->LapicFlags & ACPI_MADT_ENABLED))
+				 continue;
+				 */
                 if (LOCAL_SAPIC_CNT >= nb_cpu)
                     continue;                
                 
@@ -2962,9 +3031,9 @@ U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U3
                 ACPI_MADT_INTERRUPT_SOURCE *intsrc = current;
                 current = intsrc + 1;               
                 /*
-                if (!(intsrc->IntiFlags & ACPI_MADT_ENABLED))
-                    continue;
-                */
+				 if (!(intsrc->IntiFlags & ACPI_MADT_ENABLED))
+				 continue;
+				 */
                 if (INT_SRC_CNT >= nb_cpu)
                     continue;                
                 
@@ -5346,7 +5415,7 @@ EFI_STATUS setupAcpi(void)
 		{
 			if (checkOem == true)
 			{
-				MakeUuidAdler32();
+				MakeAcpiSgn();
 			}
 
 			struct dirstuff* moduleDir = opendir(dirspec);
@@ -5368,7 +5437,7 @@ EFI_STATUS setupAcpi(void)
 					}					
 															
 					DBG("* Attempting to load acpi table: %s\n", name);			
-					if ( (new_table_list[i]=(U32)loadACPITable(dirspec,name)))
+					if ( (new_table_list[i]=(U32)loadACPITable(new_table_list,dirspec,name)))
 					{
 						if (i < MAX_ACPI_TABLE)
 						{

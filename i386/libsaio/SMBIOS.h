@@ -37,6 +37,7 @@ extern struct SMBEntryPoint *getSmbiosOriginal();
 #define thePlatformName 1
 #define theProducBoard 2
 extern int readSMBIOS(int value); // value copied into the platform structure
+extern char* readDefaultPlatformName(void);
 
 #define SMBIOS_RANGE_START		0x000F0000
 #define SMBIOS_RANGE_END		0x000FFFFF

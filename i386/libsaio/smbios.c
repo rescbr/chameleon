@@ -49,6 +49,55 @@ struct SMBEntryPoint *getSmbiosOriginal()
     return orig;    
 }
 
+/* get product Name from original SMBIOS */
+char* readDefaultPlatformName(void)
+{			
+	
+	SMBEntryPoint *eps = getSmbiosOriginal();
+	if (eps == NULL) return NULL;
+	
+	uint8_t *structPtr = (uint8_t *)eps->dmi.tableAddress;
+	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
+	
+	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
+	{
+		switch (structHeader->type)
+		{				
+			case kSMBTypeSystemInformation: 
+			{
+				uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
+				uint8_t field = ((SMBSystemInformation *)structHeader)->productName;
+				
+				if (!field)
+					return NULL;
+				
+				for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
+					 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
+				
+				//DBG("original SMBIOS Product name: %s\n",(char *)stringPtr);
+				if (stringPtr)
+					return (char *)stringPtr;
+				else 
+					return NULL;			
+				
+				break;	
+			}			
+			default:
+				break;
+				
+		}
+		
+		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
+		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
+		
+		if (((uint16_t *)structPtr)[0] == 0)
+			structPtr += 2;
+		
+		structHeader = (SMBStructHeader *)structPtr;
+	}	
+	return NULL;
+}
+
 /* get UUID or product Name from original SMBIOS, stripped version of kabyl's readSMBIOSInfo */
 int readSMBIOS(int value)
 {			
