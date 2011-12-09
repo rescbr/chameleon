@@ -60,15 +60,16 @@ typedef enum {
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_REDWOOD,
 	/* Northern Islands */
+	CHIP_FAMILY_ANTILLES,
 	CHIP_FAMILY_BARTS,
 	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
 	CHIP_FAMILY_TURKS,
 	/* Southern Islands */
-//	"TAITI"
-//	"THAMES"
-//	"LOMBOK"
-//	"NEW_ZEALAND"
+//	CHIP_FAMILY_TAITI
+//	CHIP_FAMILY_THAMES
+//	CHIP_FAMILY_LOMBOK
+//	CHIP_FAMILY_NEW_ZEALAND
 	CHIP_FAMILY_LAST
 } chip_family_t;
 
@@ -101,6 +102,7 @@ static const char *chip_family_name[] = {
 	"Juniper",
 	"Redwood",
 	/* Northern Islands */
+	"Antilles",
 	"Barts",
 	"Caicos",
 	"Cayman",
@@ -236,6 +238,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9400,	0x25521002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		, 0 },
 	{ 0x9400,	0x30001002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 PRO",			kNull		, 0 },
 
+	{ 0x9440,	0x0851174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		, 0 }, // ErmaC
 	{ 0x9440,	0x114A174B, CHIP_FAMILY_RV770,		"Sapphire Radeon HD4870 Vapor-X",		kCardinal	, 0 }, // ErmaC
 	{ 0x9440,	0x24401682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		, 0 },
 	{ 0x9440,	0x24411682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",				kMotmot		, 0 },
@@ -506,6 +509,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x68A8,	0x050E1025, CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		, 0 },
 
+	{ 0x68BA,	0x174B1482, CHIP_FAMILY_JUNIPER,	"ATI Sapphire Radeon HD 6770",			kVervet		, 0 }, // ErmaC
+
 	{ 0x68B8,	0x00CF106B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kHoolock	, 0 },
 
 	{ 0x68B8,	0x145821f6, CHIP_FAMILY_JUNIPER,	"GigaByte HD5770 R577SL-1GD",			kVervet		, 0 }, // ErmaC
@@ -588,6 +593,11 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		, 0 },
 
 	{ 0x6719,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6950",				kNull		, 0 }, // ErmaC
+	{ 0x6719,	0x186B174B, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6950",				kNull		, 0 }, // ErmaC
+
+	{ 0x671D,	0x10020B2A, CHIP_FAMILY_ANTILLES,	"AMD Radeon HD 6990",				kNull		, 0 }, // ErmaC
+	{ 0x671D,	0x10021B2A, CHIP_FAMILY_ANTILLES,	"AMD Radeon HD 6990",				kNull		, 0 }, // ErmaC
+	{ 0x671D,	0x16823160, CHIP_FAMILY_ANTILLES,	"AMD Radeon HD 6990",				kNull		, 0 }, // ErmaC
 
 	{ 0x6720,	0x04BA1028, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6970m",				kElodea		, 0 },
 
@@ -727,6 +737,9 @@ static radeon_card_info_t radeon_cards[] = {
 	/* Northen Islands */
 	{ 0x6718,	0x00000000, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970 Series",			kNull		, 0 },
 	{ 0x6719,	0x00000000, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6950 Series",			kNull		, 0 },
+
+	{ 0x671D,	0x00000000, CHIP_FAMILY_ANTILLES,	"AMD Radeon HD 6900 Series",			kNull		, 0 },
+	{ 0x671F,	0x00000000, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6900 Series",			kNull		, 0 },
 
 	{ 0x6720,	0x00000000, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6900M Series",			kNull		, 0 },
 
