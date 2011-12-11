@@ -830,7 +830,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1020 - 102F
 	// 1030 - 103F
 	// 1040 - 104F
-	{ 0x10DE1040, "GeForce GT 520" },	
+	{ 0x10DE1040, "GeForce GT 520" },
 	// 1050 - 105F
 	{ 0x10DE1050, "GeForce GT 520M" },
 	// 1060 - 106F
