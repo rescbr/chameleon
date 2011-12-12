@@ -34,8 +34,11 @@
  * Initialize the structure of parameters passed to
  * the kernel by the booter.
  */
-boot_args_legacy  *bootArgsLegacy;
-boot_args         *bootArgs;
+boot_args_Legacy  *bootArgsLegacy;
+boot_args_common  *bootArgs;
+boot_args_107     *bootArgs107;
+/* ... */
+
 PrivateBootInfo_t *bootInfo;
 Node              *gMemoryMapNode;
 
@@ -47,12 +50,12 @@ void initKernBootStruct( void )
 
     if ( !init_done )
     {			
-        bootArgs = (boot_args *)malloc(sizeof(boot_args));
+        bootArgs = (boot_args_common *)malloc(sizeof(boot_args_common));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
         if (bootArgs == 0 || bootInfo == 0)
             stop("Couldn't allocate boot info\n");
 
-        bzero(bootArgs, sizeof(boot_args));
+        bzero(bootArgs, sizeof(boot_args_common));
         bzero(bootInfo, sizeof(PrivateBootInfo_t));
 
         // Get system memory map. Also update the size of the
@@ -106,26 +109,96 @@ void initKernBootStruct( void )
 
 }
 
+#define AllocateKernelMemoryForBootArgs(Ver)                           \
+{ \
+	bootArgs##Ver = (boot_args_##Ver *)AllocateKernelMemory(sizeof(boot_args_##Ver));\
+}
+
+#define CopyCommonBootArgsHeader(Ver)                           \
+{ \
+	bootArgs##Ver->Revision = bootArgs->Header.Revision ;\
+	bootArgs##Ver->Version = bootArgs->Header.Version   ;\
+}
+
+// For 10.6, 10.5 and 10.4 please use :Legacy:, for 10.7 use :107:
+#define CopyCommonBootArgs(Ver)                           \
+{ \
+	bcopy(bootArgs->CommandLine, bootArgs##Ver->CommandLine, BOOT_LINE_LENGTH);\
+	bootArgs##Ver->MemoryMap = bootArgs->MemoryMap ;\
+	bootArgs##Ver->MemoryMapSize = bootArgs->MemoryMapSize ;\
+	bootArgs##Ver->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;\
+	bootArgs##Ver->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;\
+	bootArgs##Ver->Video = bootArgs->Video ;\
+	bootArgs##Ver->deviceTreeP = bootArgs->deviceTreeP ;\
+	bootArgs##Ver->deviceTreeLength = bootArgs->deviceTreeLength ;\
+	bootArgs##Ver->kaddr = bootArgs->kaddr ;\
+	bootArgs##Ver->ksize = bootArgs->ksize ;\
+	bootArgs##Ver->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;\
+	bootArgs##Ver->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;\
+	bootArgs##Ver->efiSystemTable = bootArgs->efiSystemTable ;\
+	bootArgs##Ver->efiMode = bootArgs->efiMode ;\
+	bootArgs##Ver->performanceDataStart = bootArgs->performanceDataStart ;\
+	bootArgs##Ver->performanceDataSize = bootArgs->performanceDataSize ;\
+	bootArgs##Ver->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;\
+}
+
+#define init_boot_args(Ver)                           \
+{ \
+	AllocateKernelMemoryForBootArgs(Ver);\
+	CopyCommonBootArgsHeader(Ver);\
+	CopyCommonBootArgs(Ver);\
+}
 
 /* Copy boot args after kernel and record address. */
 
 void
-reserveKernBootStruct(void)
+reserveKern107BootStruct(void)
 {
-    void *oldAddr = bootArgs;	
+    //bootArgs107 = (boot_args_107 *)AllocateKernelMemory(sizeof(boot_args_107));
 	
-    bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
-    bcopy(oldAddr, bootArgs, sizeof(boot_args));
-		
+	/* Common Darwin boot arguments */
+	/*
+	bootArgs107->Revision = bootArgs->Header.Revision ;
+	bootArgs107->Version = bootArgs->Header.Version   ;
+	bcopy(bootArgs->CommandLine, bootArgs107->CommandLine, BOOT_LINE_LENGTH);
+	bootArgs107->MemoryMap = bootArgs->MemoryMap ;
+	bootArgs107->MemoryMapSize = bootArgs->MemoryMapSize ;
+	bootArgs107->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;
+	bootArgs107->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;
+	bootArgs107->Video = bootArgs->Video ;
+	bootArgs107->deviceTreeP = bootArgs->deviceTreeP ;
+	bootArgs107->deviceTreeLength = bootArgs->deviceTreeLength ;
+	bootArgs107->kaddr = bootArgs->kaddr ;
+	bootArgs107->ksize = bootArgs->ksize ;
+	bootArgs107->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;
+	bootArgs107->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;
+	bootArgs107->efiSystemTable = bootArgs->efiSystemTable ;
+	bootArgs107->efiMode = bootArgs->efiMode ;
+	bootArgs107->performanceDataStart = bootArgs->performanceDataStart ;
+	bootArgs107->performanceDataSize = bootArgs->performanceDataSize ;
+	bootArgs107->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;
+	*/
+	
+	init_boot_args(107);
+	
+	/* Darwin 10.7 specific boot arguments */
+	bootArgs107->keyStoreDataStart = bootArgs->keyStoreDataStart ;
+	bootArgs107->keyStoreDataSize = bootArgs->keyStoreDataSize ;
+	bootArgs107->bootMemStart = bootArgs->bootMemStart ;
+	bootArgs107->bootMemSize = bootArgs->bootMemSize ;
+	bootArgs107->PhysicalMemorySize = bootArgs->PhysicalMemorySize ;
+	bootArgs107->FSBFrequency = bootArgs->FSBFrequency ;	
+	bootArgs107->debugMode = bootArgs->debugMode; 
+
 }
 
 void
 reserveKernLegacyBootStruct(void)
 {    
-    bootArgsLegacy = (boot_args_legacy *)AllocateKernelMemory(sizeof(boot_args_legacy));
-    
-	bootArgsLegacy->Revision = bootArgs->Revision ;
-	bootArgsLegacy->Version = bootArgs->Version   ;
+    //bootArgsLegacy = (boot_args_legacy *)AllocateKernelMemory(sizeof(boot_args_legacy));
+  /*  
+	bootArgsLegacy->Revision = bootArgs->Header.Revision ;
+	bootArgsLegacy->Version = bootArgs->Header.Version   ;
 	bcopy(bootArgs->CommandLine, bootArgsLegacy->CommandLine, BOOT_LINE_LENGTH);
 	bootArgsLegacy->MemoryMap = bootArgs->MemoryMap ;
 	bootArgsLegacy->MemoryMapSize = bootArgs->MemoryMapSize ;
@@ -143,8 +216,9 @@ reserveKernLegacyBootStruct(void)
 	bootArgsLegacy->performanceDataStart = bootArgs->performanceDataStart ;
 	bootArgsLegacy->performanceDataSize = bootArgs->performanceDataSize ;
 	bootArgsLegacy->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;
-
+*/	
 	
+	init_boot_args(Legacy);
 }
 
 void
@@ -265,8 +339,6 @@ finalizeBootStruct(void)
 		DT__FlattenDeviceTree((void **)&addr, &size);
 		bootArgs->deviceTreeP = (uint32_t)addr;
 		bootArgs->deviceTreeLength = size;
-	}
-    
-        
+	}        
     
 }

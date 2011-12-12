@@ -25,6 +25,12 @@
 #include "libsaio.h"
 #include "sl.h"
 
+/*
+ * dmazar, 14/7/2011 - support for EXFAT volume label reading
+ */
+
+#include "exfat.h"
+
 //#define BYTE_ORDER_MARK	0xFEFF
 
 #include "ntfs_private.h"
@@ -201,7 +207,14 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
      */
     if (memcmp((const char *)boot->bf_sysid, "NTFS    ", 8) != 0)
     {
-        goto error;
+        /*
+		 * Check for EXFAT. Finish by jumping to error to free buf,
+		 * although if it is EXFAT then it's no an error.
+		 */
+		
+		EXFATGetDescription(ih, str, strMaxLen);
+		
+		goto error;
     }
 
     /*
@@ -326,8 +339,10 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	boot = (struct bootfile *) buf;
 
 	// Check for NTFS signature
-	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 )
-		return -1;
+	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 ) {
+		// If not NTFS, maybe it is EXFAT
+		return EXFATGetUUID(ih, uuidStr);
+	}
 
 	// Check for non-null volume serial number
 	if( !boot->bf_volsn )
@@ -349,6 +364,10 @@ bool NTFSProbe(const void * buffer)
 	// Looking for NTFS signature.
 	if (strncmp((const char *)part_bootfile->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) == 0)
 		result = true;
+	
+	// If not NTFS, maybe it is EXFAT
+	if (!result == false)
+		result = EXFATProbe(buffer);
 	
 	return result;
 }

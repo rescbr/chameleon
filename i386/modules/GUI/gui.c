@@ -12,6 +12,10 @@
  * cparm : cleaned
  */
 
+/*
+ * cparm : add volume version detection
+ */
+
 #include "gui.h"
 #include "GUI_appleboot.h"
 #include "vers.h"
@@ -48,6 +52,7 @@ static void makeRoundedCorners(pixmap_t *p);
 static void colorFont(font_t *font, uint32_t color);
 static int initFont(font_t *font, image_t *data);
 static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p);
+static position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p);
 static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 #if DEBUG
 static int dprintf( window_t * window, const char * fmt, ...);
@@ -89,6 +94,8 @@ static int getImageIndexByName(const char *name);
 
 #define vram VIDEO(baseAddr)
 
+#define TAB_PIXELS_WIDTH (font->chars[0]->width * 4) // tab = 4 spaces
+
 int lasttime = 0; // we need this for animating maybe
 
 extern int gDeviceCount;
@@ -104,14 +111,32 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+	iDeviceHFS_Lion,
+    iDeviceHFS_Lion_o,
+	iDeviceHFS_SL,
+    iDeviceHFS_SL_o,
+	iDeviceHFS_Leo,
+    iDeviceHFS_Leo_o,
+	iDeviceHFS_Tiger,
+    iDeviceHFS_Tiger_o,
     iDeviceHFSRAID,
     iDeviceHFSRAID_o,
+	iDeviceHFSRAID_Lion,
+    iDeviceHFSRAID_Lion_o,
+	iDeviceHFSRAID_SL,
+    iDeviceHFSRAID_SL_o,
+	iDeviceHFSRAID_Leo,
+    iDeviceHFSRAID_Leo_o,
+	iDeviceHFSRAID_Tiger,
+    iDeviceHFSRAID_Tiger_o,
     iDeviceEXT3,
-    iDeviceEXT3_o,
+    iDeviceEXT3_o,	
 	iDeviceFreeBSD,
     iDeviceFreeBSD_o,
     iDeviceOpenBSD,
     iDeviceOpenBSD_o,
+	iDeviceBEFS,        /* Haiku detection and Icon credits to scorpius  */
+	iDeviceBEFS_o,      /* Haiku detection and Icon credits to scorpius  */
     iDeviceFAT,
     iDeviceFAT_o,
     iDeviceFAT16,
@@ -155,16 +180,37 @@ image_t images[] = {
     
     {.name = "device_generic",              .image = NULL},
     {.name = "device_generic_o",            .image = NULL},
-    {.name = "device_hfsplus",              .image = NULL},
-    {.name = "device_hfsplus_o",            .image = NULL},
+    
+	{.name = "device_hfsplus",              .image = NULL},
+    {.name = "device_hfsplus_o",            .image = NULL},	
+	{.name = "device_hfsplus_lion",              .image = NULL},
+    {.name = "device_hfsplus_lion_o",            .image = NULL},
+	{.name = "device_hfsplus_sl",              .image = NULL},
+    {.name = "device_hfsplus_sl_o",            .image = NULL},
+	{.name = "device_hfsplus_leo",              .image = NULL},
+    {.name = "device_hfsplus_leo_o",            .image = NULL},
+	{.name = "device_hfsplus_tiger",              .image = NULL},
+    {.name = "device_hfsplus_tiger_o",            .image = NULL},
+	
     {.name = "device_hfsraid",              .image = NULL},
     {.name = "device_hfsraid_o",            .image = NULL},
+	{.name = "device_hfsplus_raid_lion",              .image = NULL},
+    {.name = "device_hfsplus_raid_lion_o",            .image = NULL},
+	{.name = "device_hfsplus_raid_sl",              .image = NULL},
+    {.name = "device_hfsplus_raid_sl_o",            .image = NULL},
+	{.name = "device_hfsplus_raid_leo",              .image = NULL},
+    {.name = "device_hfsplus_raid_leo_o",            .image = NULL},
+	{.name = "device_hfsplus_raid_tiger",              .image = NULL},
+    {.name = "device_hfsplus_raid_tiger_o",            .image = NULL},
+	
     {.name = "device_ext3",                 .image = NULL},
     {.name = "device_ext3_o",               .image = NULL},
 	{.name = "device_freebsd",              .image = NULL},
     {.name = "device_freebsd_o",            .image = NULL},
     {.name = "device_openbsd",              .image = NULL},
     {.name = "device_openbsd_o",            .image = NULL},
+	{.name = "device_befs",                 .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
+	{.name = "device_befs_o",               .image = NULL},     /* Haiku detection and Icon credits to scorpius  */
     {.name = "device_fat",                  .image = NULL},
     {.name = "device_fat_o",                .image = NULL},
     {.name = "device_fat16",                .image = NULL},
@@ -299,10 +345,13 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 	}
 	
     if ((i = getImageIndexByName(image)) >= 0)
-    {
-        if (images[i].image == NULL) {
-            images[i].image = malloc(sizeof(pixmap_t));
-        }
+    { 
+		if (images[i].image == NULL) {
+			images[i].image = malloc(sizeof(pixmap_t));
+			if (images[i].image == NULL) {
+				return 1;
+			}
+		}
         sprintf(dirspec, "%s/%s/%s.png", src, theme_name, image);
 
         width = 0;
@@ -336,13 +385,20 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             return 0;
         }
 #endif
-        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
+        else if (alt_image != IMG_REQUIRED)
         {
-            // Using the passed alternate image for non-mandatory images.
-            // We don't clone the already existing pixmap, but using its properties instead!
-            images[i].image->width = images[alt_image].image->width;
-            images[i].image->height = images[alt_image].image->height;
-            images[i].image->pixels = images[alt_image].image->pixels;
+			if (images[alt_image].image->pixels != NULL) {
+				
+				// Using the passed alternate image for non-mandatory images.
+				// We don't clone the already existing pixmap, but using its properties instead!
+				images[i].image->width = images[alt_image].image->width;
+				images[i].image->height = images[alt_image].image->height;
+				images[i].image->pixels = images[alt_image].image->pixels;
+			} else {
+				free(images[i].image);
+				images[i].image = NULL;
+			} 
+			
             return 0;
         }
         else
@@ -351,10 +407,13 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
 			sleep(2);
 #endif
-            return 1;
-        }
-    }
+			free(images[i].image);
+			images[i].image = NULL;
+			return 1;
 
+        }
+		
+    }	
 	return 1;
 }
 
@@ -366,16 +425,37 @@ static int loadGraphics(char *src)
 	
 	LOADPNG(src, device_generic,                 IMG_REQUIRED);
 	LOADPNG(src, device_generic_o,               iDeviceGeneric);
+	
 	LOADPNG(src, device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(src, device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(src, device_hfsplus_lion,            iDeviceHFS_Lion);
+	LOADPNG(src, device_hfsplus_lion_o,          iDeviceHFS_Lion_o);
+	LOADPNG(src, device_hfsplus_sl,              iDeviceHFS_SL);
+	LOADPNG(src, device_hfsplus_sl_o,            iDeviceHFS_SL_o);
+	LOADPNG(src, device_hfsplus_leo,             iDeviceHFS_Leo);
+	LOADPNG(src, device_hfsplus_leo_o,           iDeviceHFS_Leo_o);
+	LOADPNG(src, device_hfsplus_tiger,           iDeviceHFS_Tiger);
+	LOADPNG(src, device_hfsplus_tiger_o,         iDeviceHFS_Tiger_o);
+	
 	LOADPNG(src, device_hfsraid,                 iDeviceGeneric);
 	LOADPNG(src, device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(src, device_hfsplus_raid_lion,       iDeviceHFSRAID_Lion);
+	LOADPNG(src, device_hfsplus_raid_lion_o,     iDeviceHFSRAID_Lion_o);
+	LOADPNG(src, device_hfsplus_raid_sl,         iDeviceHFSRAID_SL);
+	LOADPNG(src, device_hfsplus_raid_sl_o,       iDeviceHFSRAID_SL_o);
+	LOADPNG(src, device_hfsplus_raid_leo,        iDeviceHFSRAID_Leo);
+	LOADPNG(src, device_hfsplus_raid_leo_o,      iDeviceHFSRAID_Leo_o);
+	LOADPNG(src, device_hfsplus_raid_tiger,      iDeviceHFSRAID_Tiger);
+	LOADPNG(src, device_hfsplus_raid_tiger_o,    iDeviceHFSRAID_Tiger_o);
+	
 	LOADPNG(src, device_ext3,                    iDeviceGeneric);
 	LOADPNG(src, device_ext3_o,                  iDeviceEXT3);
 	LOADPNG(src, device_freebsd,                 iDeviceGeneric);
 	LOADPNG(src, device_freebsd_o,               iDeviceFreeBSD);
 	LOADPNG(src, device_openbsd,                 iDeviceGeneric);
 	LOADPNG(src, device_openbsd_o,               iDeviceOpenBSD);
+	LOADPNG(src, device_befs,					 iDeviceGeneric);        /* Haiku detection and Icon credits to scorpius  */
+	LOADPNG(src, device_befs_o,					 iDeviceBEFS);           /* Haiku detection and Icon credits to scorpius  */
 	LOADPNG(src, device_fat,                     iDeviceGeneric);
 	LOADPNG(src, device_fat_o,                   iDeviceFAT);
 	LOADPNG(src, device_fat16,                   iDeviceFAT);
@@ -972,6 +1052,100 @@ static int startGUI(void)
 	return 1;
 }
 
+/*************************************************
+ *
+ * Volume Versioning Management 
+ */
+
+volume_t* volumeList = NULL;
+
+
+bool add_volume(char* Version, BVRef bvr)
+{	
+	volume_t* new_volume= malloc(sizeof(volume_t));
+
+	if (new_volume)
+	{	
+		new_volume->next = volumeList;
+		
+		volumeList = new_volume;
+		
+		strlcpy(new_volume->version,Version,sizeof(new_volume->version)+1);
+		new_volume->bvr = bvr;
+		return true;
+	}	
+	
+	return false;
+	
+}
+
+bool get_volume_version(char *str,BVRef bvr)
+{
+	volume_t* volume = volumeList;
+	while(volume)
+	{
+		if (volume->bvr == bvr) {
+			strlcpy(str,volume->version,sizeof(volume->version)+1);
+			return true;
+		}
+		volume = volume->next;
+	}
+	return false;
+}
+
+static bool getOSVersionForVolume(char *str, BVRef bvr)
+{
+	bool valid = false;	
+	
+	if (get_volume_version(str,bvr) == false)
+	{
+		char dirSpec[128];
+		char dirSpec2[128];
+		config_file_t systemVersion;
+		
+		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		sprintf(dirSpec2, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+				
+		if (!loadConfigFile(dirSpec, &systemVersion))
+		{
+			valid = true;
+		}
+		else if (!loadConfigFile(dirSpec2, &systemVersion))
+		{
+			valid = true;
+		}
+		
+		if (valid)
+		{		
+			const char *val;
+			int len;
+			
+			if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+			{
+				// getValueForKey uses const char for val
+				// so copy it and trim
+				*str = '\0';
+				strncat(str, val, MIN(len, 4));
+				add_volume(str, bvr);
+			}
+			else
+				valid = false;
+		}
+	} 
+	else 
+	{
+		valid = true;
+	}
+	
+	return valid;
+}
+
+static bool is_image_loaded(int i)
+{	
+	return (images[i].image != NULL) ? true : false;
+}
+
+/*************************************************/
 static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
@@ -983,36 +1157,88 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 		switch (device->part_type)
 		{
 			case kPartitionTypeHFS:
+			{
+				char VolumeMacOSVersion[8];
+				
 #ifdef BOOT_HELPER_SUPPORT	
 				// Use HFS or HFSRAID icon depending on bvr flags.
-				devicetype = (device->flags & kBVFlagBooter) ? iDeviceHFSRAID : iDeviceHFS;
-#else
-				devicetype = iDeviceHFS;
+				if (device->flags & kBVFlagBooter) {
+					
+					getOSVersionForRaidVolume(VolumeMacOSVersion,device);
+										
+					switch (VolumeMacOSVersion[3]) {
+						case '7':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Lion) ? iDeviceHFSRAID_Lion : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '6':
+							devicetype = is_image_loaded(iDeviceHFSRAID_SL) ? iDeviceHFSRAID_SL : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '5':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Leo) ? iDeviceHFSRAID_Leo : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '4':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Tiger) ? iDeviceHFSRAID_Tiger : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						default:
+							devicetype = is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+					}
+					
+				} else				
 #endif
+				{		
+					
+					getOSVersionForVolume(VolumeMacOSVersion,device);					
+					
+					switch (VolumeMacOSVersion[3]) {
+						case '7':
+							devicetype = is_image_loaded(iDeviceHFS_Lion) ? iDeviceHFS_Lion : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '6':
+							devicetype = is_image_loaded(iDeviceHFS_SL) ? iDeviceHFS_SL : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '5':
+							devicetype = is_image_loaded(iDeviceHFS_Leo) ? iDeviceHFS_Leo : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '4':
+							devicetype = is_image_loaded(iDeviceHFS_Tiger) ? iDeviceHFS_Tiger : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						default:
+							devicetype = is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+					}						
+					
+				}
+				
 				break;
 				
+			}				
 			case kPartitionTypeHPFS:
-				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
+				devicetype = is_image_loaded(iDeviceNTFS) ? iDeviceNTFS : iDeviceGeneric;		// Use HPFS / NTFS icon
 				break;
 				
 			case kPartitionTypeFAT16:
-				devicetype = iDeviceFAT16;		// Use FAT16 icon
+				devicetype = is_image_loaded(iDeviceFAT16) ? iDeviceFAT16 : iDeviceGeneric;		// Use FAT16 icon
 				break;
 				
 			case kPartitionTypeFAT32:
-				devicetype = iDeviceFAT32;		// Use FAT32 icon
+				devicetype = is_image_loaded(iDeviceFAT32) ? iDeviceFAT32 : iDeviceGeneric;		// Use FAT32 icon
 				break;
 				
 			case kPartitionTypeEXT3:
-				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
+				devicetype = is_image_loaded(iDeviceEXT3) ? iDeviceEXT3 : iDeviceGeneric;		// Use EXT2/3 icon
 				break;
-			
+				
 			case kPartitionTypeFreeBSD:
-				devicetype = iDeviceFreeBSD;		// Use FreeBSD icon
+				devicetype = is_image_loaded(iDeviceFreeBSD) ? iDeviceFreeBSD : iDeviceGeneric;		// Use FreeBSD icon
 				break;
 				
 			case kPartitionTypeOpenBSD:
-				devicetype = iDeviceOpenBSD;		// Use OpenBSD icon
+				devicetype = is_image_loaded(iDeviceOpenBSD) ? iDeviceOpenBSD : iDeviceGeneric;		// Use OpenBSD icon
+				break;
+				
+			case kPartitionTypeBEFS:               /* Haiku detection and Icon credits to scorpius  */
+				devicetype = is_image_loaded(iDeviceBEFS) ? iDeviceBEFS : iDeviceGeneric;// Use BEFS / Haiku icon
 				break;
 				
 			default:
@@ -1038,6 +1264,192 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 	
 }
 
+#if 0
+static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
+{
+	int devicetype;
+	
+	if( diskIsCDROM(device) )
+		devicetype = iDeviceCDROM;				// Use CDROM icon
+	else
+	{	
+		switch (device->part_type)
+		{
+			case kPartitionTypeHFS:
+			{
+				bool hfs_img_replacement_found = false;
+				char VolumeMacOSVersion[8];
+				
+#ifdef BOOT_HELPER_SUPPORT	
+				// Use HFS or HFSRAID icon depending on bvr flags.
+				if (device->flags & kBVFlagBooter) {
+					
+					if (getOSVersionForRaidVolume(VolumeMacOSVersion,device))
+					{
+						int i ;				
+						if (VolumeMacOSVersion[3] == '7') {
+							if ((i = getImageIndexByName("device_hfsplus_raid_lion")) >= 0)
+							{
+								if (images[i].image != NULL) {
+									hfs_img_replacement_found = true;
+								}
+							}
+						} else if (VolumeMacOSVersion[3] == '6') {
+							if ((i = getImageIndexByName("device_hfsplus_raid_sl")) >= 0)
+							{
+								if (images[i].image != NULL) {
+									hfs_img_replacement_found = true;
+								}
+							}
+						} else if (VolumeMacOSVersion[3] == '5') {
+							if ((i = getImageIndexByName("device_hfsplus_raid_leo")) >= 0)
+							{
+								if (images[i].image != NULL) {
+									hfs_img_replacement_found = true;
+								}
+							}
+						} else if (VolumeMacOSVersion[3] == '4') {
+							if ((i = getImageIndexByName("device_hfsplus_raid_tiger")) >= 0)
+							{
+								if (images[i].image != NULL) {
+									hfs_img_replacement_found = true;
+								}
+							}
+						}
+					}
+					
+					switch (VolumeMacOSVersion[3]) {
+						case '7':
+							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Lion : iDeviceHFSRAID;
+							break;
+						case '6':
+							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_SL : iDeviceHFSRAID;
+							break;
+						case '5':
+							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Leo : iDeviceHFSRAID;
+							break;
+						case '4':
+							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Tiger : iDeviceHFSRAID;
+							break;
+						default:
+							devicetype = iDeviceHFSRAID;
+							break;
+					}
+					
+				} else				
+#endif
+					{		
+						
+						if (getOSVersionForVolume(VolumeMacOSVersion,device))
+						{
+							
+							int i ;				
+							if (VolumeMacOSVersion[3] == '7') {
+								if ((i = getImageIndexByName("device_hfsplus_lion")) >= 0)
+								{
+									if (images[i].image != NULL) {
+										hfs_img_replacement_found = true;
+									}
+								}
+							} else if (VolumeMacOSVersion[3] == '6') {
+								if ((i = getImageIndexByName("device_hfsplus_sl")) >= 0)
+								{
+									if (images[i].image != NULL) {
+										hfs_img_replacement_found = true;
+									}
+								}
+							} else if (VolumeMacOSVersion[3] == '5') {
+								if ((i = getImageIndexByName("device_hfsplus_leo")) >= 0)
+								{
+									if (images[i].image != NULL) {
+										hfs_img_replacement_found = true;
+									}
+								}
+							} else if (VolumeMacOSVersion[3] == '4') {
+								if ((i = getImageIndexByName("device_hfsplus_tiger")) >= 0)
+								{
+									if (images[i].image != NULL) {
+										hfs_img_replacement_found = true;
+									}
+								}
+							}					
+							
+						}
+						
+						switch (VolumeMacOSVersion[3]) {
+							case '7':
+								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Lion : iDeviceHFS;
+								break;
+							case '6':
+								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_SL : iDeviceHFS;
+								break;
+							case '5':
+								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Leo : iDeviceHFS;
+								break;
+							case '4':
+								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Tiger : iDeviceHFS;
+								break;
+							default:
+								devicetype = iDeviceHFS;
+								break;
+						}						
+						
+					}
+					
+					break;
+
+			}				
+			case kPartitionTypeHPFS:
+				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
+				break;
+				
+			case kPartitionTypeFAT16:
+				devicetype = iDeviceFAT16;		// Use FAT16 icon
+				break;
+				
+			case kPartitionTypeFAT32:
+				devicetype = iDeviceFAT32;		// Use FAT32 icon
+				break;
+				
+			case kPartitionTypeEXT3:
+				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
+				break;
+			
+			case kPartitionTypeFreeBSD:
+				devicetype = iDeviceFreeBSD;		// Use FreeBSD icon
+				break;
+				
+			case kPartitionTypeOpenBSD:
+				devicetype = iDeviceOpenBSD;		// Use OpenBSD icon
+				break;
+				
+			case kPartitionTypeBEFS:               /* Haiku detection and Icon credits to scorpius  */
+				devicetype = iDeviceBEFS;// Use BEFS / Haiku icon
+				break;
+				
+			default:
+				devicetype = iDeviceGeneric;	// Use Generic icon
+				break;
+		}
+	}
+	
+	// Draw the selection image and use the next (device_*_o) image for the selected item.
+    if (isSelected)
+	{
+		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
+		devicetype++; // selec override image 
+	}
+	
+	// draw icon
+	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
+	
+	p.y += (images[iSelection].image->height / 2) + font_console.chars[0]->height;
+	
+	// draw volume label 
+	drawStrCenteredAt( device->label, &font_small, buffer, p);	
+	
+}
+#endif
 void drawDeviceList (int start, int end, int selection)
 {
 	int i;
@@ -1530,34 +1942,52 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
+pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
+	unsigned int cha = (unsigned int)ch - 32;
+	if (cha >= font->count)
+		// return ? if the font for the char doesn't exists
+		cha = '?' - 32;
+	return font->chars[cha] ? font->chars[cha] : NULL;
+}
+
+static position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
+	pixmap_t* pm = charToPixmap(ch, font);
+	if (pm && ((p.x + pm->width) < blendInto->width))
+	{
+		blend(pm, blendInto, p);
+		return pos(p.x + pm->width, p.y);
+	}
+	else
+		return p;
+}
+
 static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
 	int i=0;
-	int y=0; // we need this to support multilines '\n'
-	int x=0;
+	position_t current_pos = pos(p.x, p.y);
 	
-	for(i=0;i<strlen(ch);i++)
+	for (i=0; i < strlen(ch); i++)
 	{
 		int cha=(int)ch[i];
 		
 		cha-=32;
 		
 		// newline ?
-		if( ch[i] == '\n' )
+		if ( ch[i] == '\n' )
 		{
-			x = 0;
-			y += font->height;
+			current_pos.x = p.x;
+			current_pos.y += font->height;
 			continue;
 		}
 		
 		// tab ?
-		if( ch[i] == '\t' )
-			x+=(font->chars[0]->width*5);
+		if ( ch[i] == '\t' )
+		{
+			current_pos.x += TAB_PIXELS_WIDTH;
+			continue;
+		}			
 		
-		if(font->chars[cha])
-			blend(font->chars[cha], blendInto, pos(p.x+x, p.y+y));
-		
-		x += font->chars[cha]->width;
+		current_pos = drawChar(ch[i], font, blendInto, current_pos);
 	}
 }
 
@@ -1565,32 +1995,32 @@ static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, pos
 {
 	int i = 0;
 	int width = 0;
-	
+	int max_width = 0;
+	int height = font->height;
+
 	// calculate the width in pixels
-	for(i=0;i<strlen(text);i++)
-		width += font->chars[text[i]-32]->width;
-	
-	p.x = ( p.x - ( width / 2 ) );
-	p.y = ( p.y - ( font->height / 2 ) ); 
-	
-	if ( p.x == -6 )
-	{
-		p.x = 0;
-	}
-	
-	for(i=0;i<strlen(text);i++)
-	{
-		int cha=(int)text[i];
-		
-		cha-=32;
-		
-		if(font->chars[cha])
+	for (i=0; i < strlen(text); i++) {
+		if (text[i] == '\n')
 		{
-			blend(font->chars[cha], blendInto, p);
-			p.x += font->chars[cha]->width;
+			width = 0;
+			height += font->height;
 		}
+		else if (text[i] == '\t')
+			width += TAB_PIXELS_WIDTH;
+		else
+		{
+			pixmap_t* pm = charToPixmap(text[i], font);
+			if (pm)
+				width += pm->width;
+		}
+		if (width > max_width)
+			max_width = width;
 	}
 	
+	p.x = ( p.x - ( max_width / 2 ) );
+	p.y = ( p.y - ( height / 2 ) );
+	
+	drawStr(text, font, blendInto, p);	
 }
 
 static int initFont(font_t *font, image_t *data)
@@ -1603,7 +2033,7 @@ static int initFont(font_t *font, image_t *data)
 	
 	font->height = data->image->height;	
 	
-	for( x = 0; x < data->image->width; x++)
+	for( x = 0; x < data->image->width && count < CHARACTERS_COUNT; x++)
 	{
 		start = end;
 		
@@ -1641,8 +2071,13 @@ static int initFont(font_t *font, image_t *data)
 		}
 	}
 	
+	for (x = count; x < CHARACTERS_COUNT; x++)
+		font->chars[x] = NULL;
+	
 	if(monospaced)
 		font->width = 0;
+	
+	font->count = count;
 	
 	return 0;
 }

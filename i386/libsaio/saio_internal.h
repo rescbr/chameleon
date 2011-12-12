@@ -78,10 +78,10 @@ extern void   sleep(int n);
 
 /* bootstruct.c */
 extern void   initKernBootStruct(void);
-extern void   reserveKernBootStruct(void);
 extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 extern void   reserveKernLegacyBootStruct(void);
+extern void   reserveKern107BootStruct(void);
 
 /* cache.c */
 extern void CacheReset();

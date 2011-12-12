@@ -110,7 +110,7 @@ typedef struct Boot_Video	Boot_Video;
 #define kBootArgsEfiMode32              32
 #define kBootArgsEfiMode64              64
 
-typedef struct boot_args_legacy {
+typedef struct boot_args_Legacy {
     uint16_t    Revision;	/* Revision of boot_args structure */
     uint16_t    Version;	/* Version of boot_args structure */
 
@@ -141,7 +141,7 @@ typedef struct boot_args_legacy {
     uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
     uint32_t    __reserved3[2];
 
-} boot_args_legacy;
+} boot_args_Legacy;
 
 typedef struct boot_args {
     uint16_t    Revision;	/* Revision of boot_args structure */
@@ -184,9 +184,57 @@ typedef struct boot_args {
     uint64_t    FSBFrequency;
 	uint32_t    __reserved4[734];
 
-} boot_args;
+} boot_args_107;
 
-extern char assert_boot_args_size_is_4096[sizeof(boot_args) == 4096 ? 1 : -1];
+typedef struct boot_args_header {
+	uint16_t    Revision;	/* Revision of boot_args structure */
+    uint16_t    Version;	/* Version of boot_args structure */
+} boot_args_header;
+
+typedef struct boot_args_10x {
+    boot_args_header Header;	
+    
+	Boot_Video	Video;		/* Video Information */
+
+    uint32_t    MemoryMap;  /* Physical address of memory map */
+    uint32_t    MemoryMapSize;
+    uint32_t    MemoryMapDescriptorSize;
+    uint32_t    MemoryMapDescriptorVersion;
+	
+	uint8_t     debugMode;  /* Bit field with behavior changes */
+	uint8_t     efiMode;    /* 32 = 32-bit, 64 = 64-bit */
+	
+	
+    uint32_t    deviceTreeP;	  /* Physical address of flattened device tree */
+    uint32_t    deviceTreeLength; /* Length of flattened tree */
+	
+	char        CommandLine[BOOT_LINE_LENGTH];	/* Passed in command line */
+
+    
+	uint32_t    keyStoreDataStart; /* physical address of key store data */
+    uint32_t    keyStoreDataSize;
+    uint32_t    efiRuntimeServicesPageStart; /* physical address of defragmented runtime pages */
+    uint32_t    efiRuntimeServicesPageCount;
+    uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
+	
+    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
+	uint64_t    FSBFrequency;
+
+    uint32_t    performanceDataSize;
+	uint32_t    performanceDataStart; /* physical address of log */
+
+    uint32_t    kaddr;            /* Physical address of beginning of kernel text */
+    uint32_t    ksize;            /* Size of combined kernel text+data+efi */
+    
+	uint64_t	bootMemStart;
+    uint64_t	bootMemSize;
+    uint64_t    PhysicalMemorySize;
+	
+} boot_args_10x;
+
+typedef struct boot_args_10x boot_args_common;
+
+extern char assert_boot_args_107_size_is_4096[sizeof(boot_args_107) == 4096 ? 1 : -1];
 
 #endif /* _PEXPERT_I386_BOOT_H */
 

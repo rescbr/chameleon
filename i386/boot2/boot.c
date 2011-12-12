@@ -119,6 +119,7 @@ static bool gUnloadPXEOnExit = false;
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size);
 static bool found_extra_kext(void);
 static void determineCpuArch(void);
+static void init_pic(void);
 
 void getKernelCachePath();
 
@@ -182,6 +183,12 @@ void initialize_runtime(void)
 #endif
 }
 
+static void init_pic(void)
+{
+	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
+	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
+}
+
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
 
@@ -194,18 +201,21 @@ static int ExecKernel(void *binary)
 	
 	if(gMacOSVersion[3] <= '6')
 	{
-		bootArgs->Version  = kBootArgsVersion1;		
-		bootArgs->Revision = gMacOSVersion[3];	
+		bootArgs->Header.Version  = kBootArgsVersion1;		
+		bootArgs->Header.Revision = gMacOSVersion[3];	
 	}
 	else 
 	{		
 #if kBootArgsVersion > 1
 		
-		bootArgs->Version  = kBootArgsVersion;		
-		bootArgs->Revision = kBootArgsRevision;
+		bootArgs->Header.Version  = kBootArgsVersion;		
+		bootArgs->Header.Revision = kBootArgsRevision;
 #else
-		bootArgs->Version  = 2;
-        bootArgs->Revision = 0;
+		if(gMacOSVersion[3] == '7')
+		{
+			bootArgs->Header.Version  = 2;
+			bootArgs->Header.Revision = 0;
+		}
 #endif
 	}
 	
@@ -217,11 +227,7 @@ static int ExecKernel(void *binary)
                        (int *)&bootArgs->ksize );
 
     if ( ret != 0 )
-        return ret;
-	
-    // Reserve space for boot args for 10.7 only (for 10.6 and earlier, we will convert (to legacy) the structure and reserve kernel memory for it later.)
-	if(gMacOSVersion[3] == '7')
-    reserveKernBootStruct();
+        return ret;    
 	
     // Load boot drivers from the specifed root path.
 	
@@ -329,11 +335,13 @@ static int ExecKernel(void *binary)
 	
     finalizeBootStruct();          
     
-	
-	if (gMacOSVersion[3] <= '6') 
-		reserveKernLegacyBootStruct();   		
-	
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
+	
+	 if (gMacOSVersion[3] <= '6') 
+		reserveKernLegacyBootStruct();
+	 else if (gMacOSVersion[3] == '7')
+		 reserveKern107BootStruct();	
+	
 #if UNUSED
 	turnOffFloppy();
 #endif
@@ -342,20 +350,27 @@ static int ExecKernel(void *binary)
 #include "apic.h"
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
-	
-	if (gMacOSVersion[3] <= '6')
-	{		
-		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
-		startprog( kernelEntry, bootArgsLegacy );
+
+	switch (gMacOSVersion[3]) {
+		case '4':
+		case '5':
+		case '6':
+			// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
+			startprog( kernelEntry, bootArgsLegacy );
+			break;		
+		case '7':
+			init_pic();
+			// Jump to kernel's entry point. There's no going back now.  XXX LION XXX
+			startprog( kernelEntry, bootArgs107 );
+		default:
+#if DEBUG_BOOT
+			printf("Error: Unsupported Darwin version\n");
+			getc();
+#endif
+			break;
 	}	
-			
-	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
-	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
-		
-	// Jump to kernel's entry point. There's no going back now. XXX LION XXX
-    startprog( kernelEntry, bootArgs );
-	
-    // Not reached
+
+    // Should not be reached
 	
     return 0;
 }
@@ -686,7 +701,7 @@ void common_boot(int biosdev)
 			{
                 bootFile = gBootKernelCacheFile;
                 verbose("Loading kernel cache %s\n", bootFile);
-				if (gMacOSVersion[3] == '7')
+				if (gMacOSVersion[3] > '6')
 				{					
 					ret = LoadThinFatFile(bootFile, &binary);
 					if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
@@ -838,7 +853,7 @@ void getKernelCachePath()
 		}
 		else
 		{
-			if(gMacOSVersion[3] == '7')
+			if(gMacOSVersion[3] > '6')
 			{					
 				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
 			}

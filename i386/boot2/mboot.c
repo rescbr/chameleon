@@ -322,8 +322,8 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
         This is the same assumption that initKernBootStruct makes.
         We could check the multiboot info I guess, but why bother?
      */
-    boot_args temporaryBootArgsData;
-    bzero(&temporaryBootArgsData, sizeof(boot_args));
+    boot_args_common temporaryBootArgsData;
+    bzero(&temporaryBootArgsData, sizeof(boot_args_common));
     bootArgs = &temporaryBootArgsData;
     bootArgs->Video.v_display = VGA_TEXT_MODE;
 

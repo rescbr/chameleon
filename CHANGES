@@ -1,8 +1,14 @@
-- Added an option to the check Oem revision of aml files (by adler32 of unique machine id or adler32 of motherboard model), can be useful with multiple machines (a command line tool able to patch the aml files will be available soon)
+- Added Haiku support (credit to scorpius)
+- Added EXFAT (FAT64) support (credit to dmazar) 
+- Added JrCs fixes (see trunk v1716 v1719)
+- Gui can now detect the darwin version of each volumes
+- Applied some underthehood fixes and enhancements 
+
+- Added an option to the check Oem revision of aml files, can be useful with multiple machines (a command line tool able to patch the aml files will be available soon)
 - Improved smbios support for some Intel Xeon models
 - BETA : Sync'd ati engine with the trunk
 
-- Small security fix
+- Small security fixes
 - Added a mechanism to strip the madt table
 - Ported the serial number randomizer to smbiosgetters,
  Warning: smbiosgetters (and also the Gui module) still don't work when built with Xcode4.

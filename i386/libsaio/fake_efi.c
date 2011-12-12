@@ -170,9 +170,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		
         printf("Ran out of space for configuration tables (max = %d). Please, increase the reserved size in the code.\n", (int)MAX_CONFIGURATION_TABLE_ENTRIES);
         return EFI_ABORTED;
-    }
-    
-    
+    }    
     
     if (archCpuType == CPU_TYPE_I386)
 	{       
@@ -188,8 +186,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
         gEfiConfigurationTable64[i].VendorTable = (EFI_PTR32)table;
 		gNumTables64++ ;
 	}    
-    
-    
+        
     Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
     
     // Use the pointer to the GUID we just stuffed into the system table
@@ -221,8 +218,7 @@ static VOID EFI_ST_FIX_CRC32(void)
 }
 
 void finalizeEFIConfigTable(void )
-{
-    
+{    
     if (archCpuType == CPU_TYPE_I386)
 	{
 		EFI_SYSTEM_TABLE_32 *efiSystemTable = gST32;        
@@ -236,8 +232,7 @@ void finalizeEFIConfigTable(void )
 		EFI_SYSTEM_TABLE_64 *efiSystemTable = gST64;        
         
         efiSystemTable->NumberOfTableEntries = gNumTables64; 
-        efiSystemTable->ConfigurationTable = ptov64((EFI_PTR32)gEfiConfigurationTable64);
-        
+        efiSystemTable->ConfigurationTable = ptov64((EFI_PTR32)gEfiConfigurationTable64);        
         
 	}
     EFI_ST_FIX_CRC32();
@@ -450,8 +445,7 @@ static ACPI_TABLES acpi_tables;
 
 /* Setup ACPI without any patch. */
 static EFI_STATUS setupAcpiNoMod()
-{	
-    	
+{    	
 	EFI_STATUS ret = EFI_UNSUPPORTED;
 	
     ACPI_TABLE_RSDP* rsdp = (ACPI_TABLE_RSDP*)((uint32_t)local_rsd_p);
@@ -473,26 +467,29 @@ static EFI_STATUS setup_acpi (void)
 	
 	execute_hook("setupAcpiEfi", &ret, NULL, NULL, NULL, NULL, NULL);
 	
-	if (ret != EFI_SUCCESS)
-	{        
-        if (!FindAcpiTables(&acpi_tables))
-		{
-			printf("Failed to detect ACPI tables.\n");
-			return EFI_NOT_FOUND;
-        }
-        
-        local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
-
-		{
-			ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
+	do {
+		if (ret != EFI_SUCCESS)
+		{        
+			if (!FindAcpiTables(&acpi_tables))
+			{
+				printf("Failed to detect ACPI tables.\n");
+				ret = EFI_NOT_FOUND;
+				break;
+			}
 			
-			uint8_t type = FacpPointer->PreferredProfile;
-			if (type <= MaxSupportedPMProfile) 
-				Platform->Type = type;
-		}        
+			local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+			
+			{
+				ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
+				
+				uint8_t type = FacpPointer->PreferredProfile;
+				if (type <= MaxSupportedPMProfile) 
+					Platform->Type = type;
+			}        
             
-        ret = setupAcpiNoMod();
-	}
+			ret = setupAcpiNoMod();
+		}
+	} while (0);	
 	
 	return ret;	
 	
@@ -602,8 +599,7 @@ static EFI_STATUS getSystemID()
 	EFI_CHAR8*	ret = getUUIDFromString(getStringForKey(kSystemID, &bootInfo->bootConfig));
 	
 	if (!ret) // try bios dmi info UUID extraction	
-		ret = getSmbiosUUID();		 
-
+		ret = getSmbiosUUID();
 	
 	if (!ret)
 	{
@@ -708,8 +704,7 @@ static VOID setupEfiDeviceTree(void)
 	{
 		Node *chosenNode = DT__FindNode("/chosen", true);
 		if (chosenNode)
-		{
-			
+		{			
 			DT__AddProperty(chosenNode, "boot-args", strlen(bootArgs->CommandLine)+1, (EFI_CHAR16*)bootArgs->CommandLine);
 			
 			// "boot-uuid" MAIN GOAL IS SYMPLY TO BOOT FROM THE UUID SET IN THE DT AND DECREASE BOOT TIME, SEE IOKitBSDInit.cpp
@@ -732,12 +727,10 @@ static VOID setupEfiDeviceTree(void)
 				 
 			 }			
 			
-			
 			// "boot-file" is not used by kextcache if there is no "boot-device-path" or if there is a valid "rootpath" ,
 			// but i let it by default since it may be used by another service
 			DT__AddProperty(chosenNode, "boot-file", strlen(bootInfo->bootFile)+1, (EFI_CHAR16*)bootInfo->bootFile);
-			
-			
+						
 			if (bootInfo->adler32) 
 				DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &bootInfo->adler32);
 			
@@ -757,7 +750,7 @@ static VOID setupEfiDeviceTree(void)
 		Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");		
 		Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
 		
-		if (gMacOSVersion[3] == '7')
+		if (gMacOSVersion[3] > '6')
 		{
 			kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
 			DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
@@ -818,8 +811,7 @@ static VOID setupEfiDeviceTree(void)
 		// because the DT_AddProperty function does not copy its args.
 		
 		if (Platform->CPU.FSBFrequency != 0)
-			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);
-		
+			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);		
 		
 #if UNUSED
 		// Export TSC and CPU frequencies for use by the kernel or KEXTs
@@ -830,8 +822,7 @@ static VOID setupEfiDeviceTree(void)
 			DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform->CPU.CPUFrequency);
 #endif
 		
-		// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-		
+		// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist		
 		if (getSystemID() == EFI_SUCCESS)
 			DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) Platform->sysid);
 		
@@ -854,11 +845,12 @@ static VOID setupEfiDeviceTree(void)
 
 void setupSmbiosConfigFile(const char *filename)
 {	
-	static bool readSmbConfigFile = true;
+	//static bool readSmbConfigFile = true;
 
-	if (readSmbConfigFile == true)
+	if (&bootInfo->bootConfig == 0)
+	//if (readSmbConfigFile == true)
 	{
-		
+		verbose("loading smbios plist\n");
 		char		dirSpecSMBIOS[128] = "";
 		const char *override_pathname = NULL;
 		int			len = 0, err = 0;
@@ -886,7 +878,7 @@ void setupSmbiosConfigFile(const char *filename)
 		{
 			verbose("No SMBIOS config file found.\n");
 		}
-		readSmbConfigFile = false;
+		//readSmbConfigFile = false;
 	}
 }
 
@@ -906,30 +898,30 @@ static VOID setup_machine_signature()
 	if (chosenNode)
 	{
 		if (Platform->hardware_signature == 0xFFFFFFFF)
-		{            
-            if (!local_rsd_p)
-            {                          
-          
-                if (!FindAcpiTables(&acpi_tables)){
-					printf("Failed to detect ACPI tables.\n");
-					goto out;
+		{			
+			do {
+				if (!local_rsd_p)
+				{			
+					if (!FindAcpiTables(&acpi_tables)){
+						printf("Failed to detect ACPI tables.\n");
+						break;
+					}
+					
+					local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
 				}
-                
-                local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
-            }
+				
+				ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
+								
+				Platform->hardware_signature = FacsPointer->HardwareSignature;
+				
+			} while (0);            	
 			
-			ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
-            
-			
-            Platform->hardware_signature = FacsPointer->HardwareSignature;	
-			
-		}
-out:
-		// Verify that we have a valid hardware signature
-		if (Platform->hardware_signature == 0xFFFFFFFF) 
-		{
-			verbose("Warning: hardware_signature is invalid, defaulting to 0 \n");
-			 Platform->hardware_signature = 0;
+			// Verify that we have a valid hardware signature
+			if (Platform->hardware_signature == 0xFFFFFFFF) 
+			{
+				verbose("Warning: hardware_signature is invalid, defaulting to 0 \n");
+				Platform->hardware_signature = 0;
+			}
 		}
 		
 		DT__AddProperty(chosenNode, "machine-signature", sizeof(uint32_t), &Platform->hardware_signature);

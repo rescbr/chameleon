@@ -41,7 +41,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o acpi_tools.o smbios.o smp-imps.o
+        convert.o acpi_tools.o smbios.o smp-imps.o 
 
 # example for AcpiCodec
 #SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
@@ -59,14 +59,17 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o \
 #SAIO_OBJS += graphic_utils.o gui.o picopng.o GUI_module.o
 
 # Options enabled by default:
-#CFLAGS += -DNO_WIN_SUPPORT # -7200 bytes
-SAIO_OBJS += ntfs.o msdos.o
+#CFLAGS += -DNO_WIN_SUPPORT # -7744 bytes
+SAIO_OBJS += ntfs.o msdos.o exfat.o
 
 #CFLAGS += -DNO_LINUX_SUPPORT # -256 bytes
 SAIO_OBJS += ext2fs.o
 
 #CFLAGS += -DNO_OTHERS_BSD_SUPPORT # -512 bytes
 SAIO_OBJS += freebsd.o openbsd.o
+
+#CFLAGS += -DNO_HAIKU_SUPPORT # -256 bytes
+SAIO_OBJS += befs.o
 
 # Options disabled by default:
 

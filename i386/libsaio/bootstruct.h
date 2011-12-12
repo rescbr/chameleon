@@ -32,9 +32,15 @@
 /*!
     Kernel boot args global also used by booter for its own data.
  */
-extern boot_args *bootArgs;
+extern boot_args_common *bootArgs;
+
+/*!
+    Boot args passed to the kernel.
+ */
+extern boot_args_Legacy  *bootArgsLegacy;
+extern boot_args_107	 *bootArgs107;
+
 extern Node *gMemoryMapNode;
-extern boot_args_legacy  *bootArgsLegacy;
 
 #define VGA_TEXT_MODE 0
 

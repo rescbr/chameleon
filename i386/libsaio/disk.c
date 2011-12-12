@@ -71,6 +71,10 @@
 #include "freebsd.h"
 #include "openbsd.h"
 #endif
+#ifndef NO_HAIKU_SUPPORT
+#include "befs.h"
+#endif
+
 #include "xml.h"
 #include "disk.h"
 #include "modules.h"
@@ -951,6 +955,18 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 											0, kBIOSDevTypeHardDrive, 0);
 						break;
 #endif
+#ifndef NO_HAIKU_SUPPORT						
+					case FDISK_BEFS:
+						bvr = newFDiskBVRef(
+											biosdev, partno,
+											part->relsect,
+											part,
+											0, 0, 0, 0, 0, 0,
+											BeFSGetDescription,
+											(BVFree)free,
+											0, kBIOSDevTypeHardDrive, 0);
+						break;
+#endif
 #ifndef NO_OTHERS_BSD_SUPPORT
 					case FDISK_FREEBSD:
 						bvr = newFDiskBVRef(
@@ -1185,6 +1201,10 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 		result = FDISK_FREEBSD;
 	else if (OpenBSDProbe(probeBuffer))
 		result = FDISK_OPENBSD;
+#endif
+#ifndef NO_HAIKU_SUPPORT
+	else if (BeFSProbe(probeBuffer))
+		result = FDISK_BEFS;
 #endif
 #ifndef NO_WIN_SUPPORT
 	else if (NTFSProbe(probeBuffer))
@@ -1814,6 +1834,9 @@ static const struct NamedValue fdiskTypes[] =
 #endif
     { FDISK_HFS,    "Apple HFS"      },
     { FDISK_BOOTER, "Apple Boot/UFS" },
+#ifndef NO_HAIKU_SUPPORT
+	{ FDISK_BEFS,   "Haiku"          },
+#endif
     { 0xCD,         "CD-ROM"         },
     { 0x00,         0                }  /* must be last */
 };

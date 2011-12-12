@@ -762,7 +762,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             printf("adler mismatch\n");
             return -1;
         }
-		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gMacOSVersion[3] == '7') 
+		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gMacOSVersion[3] > '6') 
 			bootInfo->adler32 = kernel_header->adler32;
     }
 	
