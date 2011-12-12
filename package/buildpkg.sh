@@ -212,7 +212,11 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			# Adding tools
 			ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/Keylayout/Root/usr/local/bin
 			echo "	[BUILD] Keylayout "
-			buildpackage "${1}/Keylayout" "/" "" "start_selected=\"true\"" >/dev/null 2>&1
+			# We will build this package so it's selected and hidden. This will be installed
+			# automatically to the temporary /Extra folder without giving the user an option.
+			# Then, in Scripts/Main/postinstall we will check to see if the user selected a
+			# keymap - if they did then we'll copy these files otherwise we'll ignore them.
+			buildpackage "${1}/Keylayout" "/$chamTemp" "" "start_visible=\"false\"" "start_selected=\"true\"" >/dev/null 2>&1
 		}
 		fi
 

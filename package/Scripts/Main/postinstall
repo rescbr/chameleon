@@ -43,26 +43,6 @@ chamTemp="$dest_vol/usr/local/chamTemp"
 if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 
     # ---------------------------------------------
-    # Add any installed modules to the Install Log
-    # ---------------------------------------------
-    if [ -e "${chamTemp}"/Extra/modules ]; then
-        ls "${chamTemp}"/Extra/modules | while read FILE
-        do
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Added module: $FILE"
-        done
-    fi
-			
-    # ---------------------------------------------
-    # Add any installed themes to the Install Log
-    # ---------------------------------------------
-    if [ -e "${chamTemp}"/Extra/Themes ]; then
-        ls "${chamTemp}"/Extra/Themes | while read FILE
-        do
-            "$scriptDir"InstallLog.sh "${dest_vol}" "Added Theme: $FILE"
-        done
-    fi
-
-    # ---------------------------------------------
     # Build org.chameleon.Boot.plist
     # ---------------------------------------------
     # All options selected are now dummy files with
@@ -87,6 +67,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         # Read list of all boot options the user added.
         arrayCount=0
         kernelFlagCount=0
+        keyLayoutOption=0
         while read FILE
         do
             options[arrayCount]="${FILE##*/}"
@@ -110,6 +91,10 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
                     returnValue=$?
 					if [ ${returnValue} -ne 1 ]; then
 						"$scriptDir"InstallLog.sh "${dest_vol}" "Added boot option: ${keyRead}=${value}"
+						# Check for KeyLayout option. If used then remember.
+						if [ "${keyToUse}" == "KeyLayout" ]; then
+							keyLayoutOption=1
+						fi
 					else
 						"$scriptDir"InstallLog.sh "${dest_vol}" "Can't add ${keyRead}=${value} as an option already exists for: ${keyRead}"
 					fi
@@ -117,6 +102,19 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             fi	
             (( arrayCount++ ))
         done < <(ls "${chamTemp}"/options )
+        
+        # Check to see if the user added a KeyLayout or not. If they didn't then we
+        # need to delete the Keylayout module and Keymaps that were automatically
+        # installed to the temporary /Extra folder (controlled by the call to 
+        # buildpackage for keylayouts in buildpkg.sh). 
+        if [ $keyLayoutOption == 0 ]; then
+        	rm -r "$chamTemp"/Extra/Keymaps/
+        	rm -r "$chamTemp"/Extra/modules/Keylayout.dylib
+        	# Check for empty modules folder - if found then delete it.
+        	if [ ! "$(ls -A $chamTemp/Extra/modules/)" ]; then
+        		rmdir "$chamTemp"/Extra/modules
+        	fi
+        fi
     
   		# If exclusive options were used and the 'None' option was chosen,
   		# then a dummy file named DONT=ADD would be in /$chamTemp/Extra/options.
@@ -138,6 +136,36 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
             done
             # We add the final string in the next section.
         fi	
+    fi
+    
+    # ---------------------------------------------
+    # Add any installed modules to the Install Log
+    # ---------------------------------------------
+    if [ -e "${chamTemp}"/Extra/modules ]; then
+        ls "${chamTemp}"/Extra/modules | while read FILE
+        do
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Added module: $FILE"
+        done
+    fi
+    
+   	# ---------------------------------------------
+   	# Add any installed keymaps to the Install Log
+   	# ---------------------------------------------
+   	if [ -e "${chamTemp}"/Extra/Keymaps ]; then
+    	ls "${chamTemp}"/Extra/Keymaps | while read FILE
+    	do
+    		"$scriptDir"InstallLog.sh "${dest_vol}" "Added Keymaps: $FILE"
+       	done
+   	fi
+   	
+    # ---------------------------------------------
+    # Add any installed themes to the Install Log
+    # ---------------------------------------------
+    if [ -e "${chamTemp}"/Extra/Themes ]; then
+        ls "${chamTemp}"/Extra/Themes | while read FILE
+        do
+            "$scriptDir"InstallLog.sh "${dest_vol}" "Added Theme: $FILE"
+        done
     fi
     
     # ---------------------------------------------
