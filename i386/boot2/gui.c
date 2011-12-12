@@ -27,8 +27,6 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 #define vram VIDEO(baseAddr)
 
-#define TAB_PIXELS_WIDTH (font->chars[0]->width * 4) // tab = 4 spaces
-
 int lasttime = 0; // we need this for animating maybe
 
 
@@ -1314,49 +1312,34 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
-pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
-	unsigned int cha = (unsigned int)ch - 32;
-	if (cha >= font->count)
-		// return ? if the font for the char doesn't exists
-		cha = '?' - 32;
-
-	return font->chars[cha] ? font->chars[cha] : NULL;
-}
-
-position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
-	pixmap_t* pm = charToPixmap(ch, font);
-	if (pm && ((p.x + pm->width) < blendInto->width))
-	{
-		blend(pm, blendInto, p);
-		return pos(p.x + pm->width, p.y);
-	}
-	else
-		return p;
-}
-
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
 	int i=0;
-	position_t current_pos = pos(p.x, p.y);
+	int y=0; // we need this to support multilines '\n'
+	int x=0;
 	
-	for (i=0; i < strlen(ch); i++)
+	for(i=0;i<strlen(ch);i++)
 	{
+		int cha=(int)ch[i];
+		
+		cha-=32;
+		
 		// newline ?
-		if ( ch[i] == '\n' )
+		if( ch[i] == '\n' )
 		{
-			current_pos.x = p.x;
-			current_pos.y += font->height;
+			x = 0;
+			y += font->height;
 			continue;
 		}
 		
 		// tab ?
-		if ( ch[i] == '\t' )
-		{
-			current_pos.x += TAB_PIXELS_WIDTH;
-			continue;
-		}
+		if( ch[i] == '\t' )
+			x+=(font->chars[0]->width*5);
 		
-		current_pos = drawChar(ch[i], font, blendInto, current_pos);
+		if(font->chars[cha] && ((x + font->chars[cha]->width) < blendInto->width))
+			blend(font->chars[cha], blendInto, pos(p.x+x, p.y+y));
+		
+		x += font->chars[cha]->width;
 	}
 }
 
@@ -1364,32 +1347,32 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 {
 	int i = 0;
 	int width = 0;
-	int max_width = 0;
-	int height = font->height;
 
 	// calculate the width in pixels
-	for (i=0; i < strlen(text); i++) {
-		if (text[i] == '\n')
-		{
-			width = 0;
-			height += font->height;
-		}
-		else if (text[i] == '\t')
-			width += TAB_PIXELS_WIDTH;
-		else
-		{
-			pixmap_t* pm = charToPixmap(text[i], font);
-			if (pm)
-				width += pm->width;
-		}
-		if (width > max_width)
-			max_width = width;
-	}
+	for(i=0;i<strlen(text);i++)
+		width += font->chars[text[i]-32]->width;
 
-	p.x = ( p.x - ( max_width / 2 ) );
-	p.y = ( p.y - ( height / 2 ) );
+	p.x = ( p.x - ( width / 2 ) );
+	p.y = ( p.y - ( font->height / 2 ) ); 
 	
-	drawStr(text, font, blendInto, p);
+	if ( p.x == -6 )
+	{
+		p.x = 0;
+	}
+	
+	for(i=0;i<strlen(text);i++)
+	{
+		int cha=(int)text[i];
+		
+		cha-=32;
+ 
+		if(font->chars[cha])
+		{
+			blend(font->chars[cha], blendInto, p);
+			p.x += font->chars[cha]->width;
+		}
+	}
+	
 }
 
 int initFont(font_t *font, image_t *data)
@@ -1400,9 +1383,9 @@ int initFont(font_t *font, image_t *data)
 	
 	bool monospaced = false;
 	
-	font->height = data->image->height;
+	font->height = data->image->height;	
 
-	for( x = 0; x < data->image->width && count < CHARACTERS_COUNT; x++)
+	for( x = 0; x < data->image->width; x++)
 	{
 		start = end;
 				
@@ -1440,13 +1423,8 @@ int initFont(font_t *font, image_t *data)
 		}
 	}
 
-	for (x = count; x < CHARACTERS_COUNT; x++)
-		font->chars[x] = NULL;
-
 	if(monospaced)
 		font->width = 0;
-
-	font->count = count;
 
 	return 0;
 }

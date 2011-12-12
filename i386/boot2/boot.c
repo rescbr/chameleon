@@ -164,8 +164,7 @@ static int ExecKernel(void *binary)
 	md0Ramdisk();
 	
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
-	verbose("Boot Args: %s\n", bootArgs->CommandLine);
-
+	
 	// Cleanup the PXE base code.
 	
 	if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
@@ -182,7 +181,17 @@ static int ExecKernel(void *binary)
 	}
 	
 	usb_loop();
-
+	
+	// Notify modules that the kernel is about to be started
+	if (checkOSVersion("10.7"))
+	{
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+	}
+	else
+	{
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
+	}
+	
 	// If we were in text mode, switch to graphics mode.
 	// This will draw the boot graphics unless we are in
 	// verbose mode.
@@ -198,9 +207,6 @@ static int ExecKernel(void *binary)
 	// Jump to kernel's entry point. There's no going back now.
 	if (checkOSVersion("10.7")) {
 		
-		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
-
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
@@ -208,9 +214,6 @@ static int ExecKernel(void *binary)
 		startprog( kernelEntry, bootArgs );
 	}
 	else {
-		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
-
 		startprog( kernelEntry, bootArgsPreLion );
 	}
 	
