@@ -99,9 +99,6 @@ static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
 
 static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
-// temporary placement
-	{ 0x10DE0DF4, "GeForce GT 450M" }, //Azi + issue #99
-	{ 0x10DE1251, "GeForce GTX 560M" }, // Asus G74SX
 //========================================
 	// 0040 - 004F	
 	{ 0x10DE0040, "GeForce 6800 Ultra" },
@@ -507,6 +504,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06DD, "Quadro 4000" },
 	{ 0x10DE06DE, "Tesla M2050" },	// TODO: sub-device id: 0x0846
 	{ 0x10DE06DE, "Tesla M2070" },	// TODO: sub-device id: ?	
+	{ 0x10DE06DF, "Tesla M2070-Q" },
 	// 0x10DE06DE also applies to misc S2050, X2070, M2050, M2070
 	// 06E0 - 06EF	
 	{ 0x10DE06E0, "GeForce 9300 GE" },
@@ -730,11 +728,15 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DC5, "GeForce GTS 450" },
 	{ 0x10DE0DC6, "GeForce GTS 450" },
 	{ 0x10DE0DCA, "GF10x" },
+	{ 0x10DE0DCD, "GeForce GT 555M" },
+	{ 0x10DE0DCE, "GeForce GT 555M" },
 	// 0DD0 - 0DDF	
 	{ 0x10DE0DD1, "GeForce GTX 460M" },
 	{ 0x10DE0DD2, "GeForce GT 445M" },
 	{ 0x10DE0DD3, "GeForce GT 435M" },
+	{ 0x10DE0DD6, "GeForce GT 550M" },
 	{ 0x10DE0DD8, "Quadro 2000" },
+	{ 0x10DE0DDA, "Quadro 2000M" },
 	{ 0x10DE0DDE, "GF106-ES" },
 	{ 0x10DE0DDF, "GF106-INT" },
 	// 0DE0 - 0DEF	
@@ -743,13 +745,20 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DE2, "GeForce GT 420" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
+	{ 0x10DE0DEC, "GeForce GT 525M" },
+	{ 0x10DE0DED, "GeForce GT 520M" },
 	{ 0x10DE0DEE, "GeForce GT 415M" },
 	// 0DF0 - 0DFF	
 	{ 0x10DE0DF0, "GeForce GT 425M" },
 	{ 0x10DE0DF1, "GeForce GT 420M" },
 	{ 0x10DE0DF2, "GeForce GT 435M" },
 	{ 0x10DE0DF3, "GeForce GT 420M" },
+	{ 0x10DE0DF4, "GeForce GT 450M" }, 
+	{ 0x10DE0DF5, "GeForce GT 525M" },
+	{ 0x10DE0DF6, "GeForce GT 550M" },
+	{ 0x10DE0DF7, "GeForce GT 520M" },	
 	{ 0x10DE0DF8, "Quadro 600" },
+	{ 0x10DE0DFA, "Quadro 1000M" },
 	{ 0x10DE0DFE, "GF108 ES" },
 	{ 0x10DE0DFF, "GF108 INT" },
 	// 0E00 - 0E0F
@@ -762,7 +771,10 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0E25, "D12U-50" },
 	// 0E30 - 0E3F	
 	{ 0x10DE0E30, "GeForce GTX 470M" },
+	{ 0x10DE0E31, "GeForce GTX 485M" },
 	{ 0x10DE0E38, "GF104GL" },
+	{ 0x10DE0E3A, "Quadro 3000M" },
+	{ 0x10DE0E3B, "Quadro 4000M" },
 	{ 0x10DE0E3E, "GF104-ES" },
 	{ 0x10DE0E3F, "GF104-INT" },
 	// 0E40 - 0E4F	
@@ -801,9 +813,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1040, "GeForce GT 520" },	
 	// 1050 - 105F
 	{ 0x10DE1050, "GeForce GT 520M" },
+	{ 0x10DE1054, "GeForce GT 410M" },
 	{ 0x10DE1056, "Quadro NVS 4200M" },
+	{ 0x10DE1057, "Quadro NVS 4200M" },
 	// 1060 - 106F
 	// 1070 - 107F
+	{ 0x10DE107F, "NVIDIA GF119-ES" },
 	// 1080 - 108F
 	{ 0x10DE1080, "GeForce GTX 580" },
 	{ 0x10DE1081, "GeForce GTX 570" },
@@ -818,10 +833,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 10B0 - 10BF
 	// 10C0 - 10CF
 	{ 0x10DE10C3, "GeForce 8400 GS" },
+	{ 0x10DE10C5, "GeForce 405" },
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
+	{ 0x10DE1201, "GeForce GTX 560" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
-	{ 0x10DE1245, "GeForce GTS 450" },	
+	{ 0x10DE1245, "GeForce GTS 450" },
+	{ 0x10DE1251, "GeForce GTX 560M" },
 };
 
 static uint16_t swap16(uint16_t x)
@@ -1203,12 +1221,14 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 	}
 	
-	// Workaround for GT 420/430 & 9600M GT
+	// Workaround for 9600M GT, GT 420/430/440 & GT 525M
 	switch (nvda_dev->device_id)
 	{
+		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
+		case 0x0DE0: vram_size = 1024*1024*1024; break; // GT 440
 		case 0x0DE1: vram_size = 1024*1024*1024; break; // GT 430
 		case 0x0DE2: vram_size = 1024*1024*1024; break; // GT 420
-		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
+		case 0x0DEC: vram_size = 1024*1024*1024; break; // GT 525M
 		default: break;
 	}
 	
