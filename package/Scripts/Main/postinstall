@@ -10,7 +10,7 @@ echo "*********************************"
 #echo "DEBUG: $ 4 = Root directory for the system: " $4
 
 # Check target exists
-if [ ! -e "$3" ]
+if [ ! -d "$3" ]
 then
     echo "$3 volume does not exist!"
     exit 1
@@ -57,8 +57,6 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         if [ ! -d "$chamTemp"/Extra ]; then
             mkdir "$chamTemp"/Extra
         fi
-
-		tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
 			
 		# Create template for org.chameleon.Boot.plist"
         tempOCBP="$chamTemp"/Extra/org.chameleon.Boot.plist
@@ -108,12 +106,8 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         # installed to the temporary /Extra folder (controlled by the call to 
         # buildpackage for keylayouts in buildpkg.sh). 
         if [ $keyLayoutOption == 0 ]; then
-        	rm -r "$chamTemp"/Extra/Keymaps/
-        	rm -r "$chamTemp"/Extra/modules/Keylayout.dylib
-        	# Check for empty modules folder - if found then delete it.
-        	if [ ! "$(ls -A $chamTemp/Extra/modules/)" ]; then
-        		rmdir "$chamTemp"/Extra/modules
-        	fi
+        	rm -rf "$chamTemp"/Extra/Keymaps/
+        	rm -f "$chamTemp"/Extra/modules/Keylayout.dylib
         fi
     
   		# If exclusive options were used and the 'None' option was chosen,
@@ -123,9 +117,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 		# In this case we don't need it and should discard it otherwise the folder
 		# will be copied to the users / directory when it's not wanted.
 		if [ ${arrayCount} == 1 ] && [ "${keyToUse}" == "DONT" ] && [ "${value}" == "ADD" ]; then
-			if [ -e "${chamTemp}"/Extra ] && [ ! -e "${chamTemp}"/Extra/Themes ] && [ ! -e "${chamTemp}"/Extra/Modules ]; then
-				rm -r -f "$chamTemp"/Extra
-			fi
+			rm -f "$chamTemp"/Extra/*.Boot.plist
 		fi
 	
         if [ $kernelFlagCount -gt 0 ]; then
@@ -139,9 +131,14 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     fi
     
     # ---------------------------------------------
+    # Remove empty directories
+    # ---------------------------------------------
+    find "${chamTemp}" -type d -depth -print0 | xargs -0 rmdir 2>/dev/null
+    
+    # ---------------------------------------------
     # Add any installed modules to the Install Log
     # ---------------------------------------------
-    if [ -e "${chamTemp}"/Extra/modules ]; then
+    if [ -d "${chamTemp}"/Extra/modules ]; then
         ls "${chamTemp}"/Extra/modules | while read FILE
         do
             "$scriptDir"InstallLog.sh "${dest_vol}" "Added module: $FILE"
@@ -151,7 +148,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
    	# ---------------------------------------------
    	# Add any installed keymaps to the Install Log
    	# ---------------------------------------------
-   	if [ -e "${chamTemp}"/Extra/Keymaps ]; then
+   	if [ -d "${chamTemp}"/Extra/Keymaps ]; then
     	ls "${chamTemp}"/Extra/Keymaps | while read FILE
     	do
     		"$scriptDir"InstallLog.sh "${dest_vol}" "Added Keymaps: $FILE"
@@ -161,7 +158,7 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
     # ---------------------------------------------
     # Add any installed themes to the Install Log
     # ---------------------------------------------
-    if [ -e "${chamTemp}"/Extra/Themes ]; then
+    if [ -d "${chamTemp}"/Extra/Themes ]; then
         ls "${chamTemp}"/Extra/Themes | while read FILE
         do
             "$scriptDir"InstallLog.sh "${dest_vol}" "Added Theme: $FILE"
@@ -183,12 +180,12 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
 		# Check for an existing /Extra folder
 		# and merge existing /Extra with temp one.
 			if [ -e "$dest_vol"/.ChameleonEFI ]; then
-				if [ -e "/Volumes/EFI/Extra" ]; then
+				if [ -d "/Volumes/EFI/Extra" ]; then
 					"$scriptDir"InstallLog.sh "${dest_vol}" "Merging existing /Volumes/EFI/Extra folder."
 					ditto --noextattr --noqtn /Volumes/EFI/Extra "$chamTemp"/Extra
 				fi
 			else
-				if [ -e "$dest_vol/Extra" ]; then
+				if [ -d "$dest_vol/Extra" ]; then
 					"$scriptDir"InstallLog.sh "${dest_vol}" "Merging existing ${dest_vol}/Extra folder."
 					ditto --noextattr --noqtn "${dest_vol}"/Extra "$chamTemp"/Extra
 				fi
@@ -250,7 +247,7 @@ NOTE: and chose Wait=Yes from the list, this will NOT be changed."
             # The Standard install option chosen
 
             # Does an /Extra folder already exist?
-            if [ -e "$dest_vol"/Extra ]; then
+            if [ -d "$dest_vol"/Extra ]; then
                 "$scriptDir"InstallLog.sh "${dest_vol}" "Moving $dest_vol/Extra folder to $dest_vol/Extra-OLD-$( date "+%H-%M-%S" )"
                 mv "$dest_vol/Extra" "$dest_vol/Extra_OLD-"$( date "+%H-%M-%S" )
             fi
@@ -260,7 +257,7 @@ NOTE: and chose Wait=Yes from the list, this will NOT be changed."
         else
             # The EFI system partition install option was chosen
             # Does a /Volumes/Extra folder already exist?
-            if [ -e "/Volumes/EFI/Extra" ]; then
+            if [ -d "/Volumes/EFI/Extra" ]; then
                 "$scriptDir"InstallLog.sh "${dest_vol}" "Moving /Volumes/EFI/Extra folder to /Volumes/EFI/Extra-OLD-$( date "+%H-%M-%S" )"
                 mv "/Volumes/EFI/Extra" "/Volumes/EFI/Extra_OLD-"$( date "+%H-%M-%S" )
             fi
@@ -269,12 +266,12 @@ NOTE: and chose Wait=Yes from the list, this will NOT be changed."
         fi
     else
         if [ ! -f "$dest_vol"/.ChameleonEFI ]; then
-            if [ -e "$dest_vol"/Extra ]; then
+            if [ -d "$dest_vol"/Extra ]; then
 				"$scriptDir"InstallLog.sh "${dest_vol}" "No elements selected for adding to an Extra folder,
 so leaving existing $dest_vol/Extra folder untouched."
             fi
         else
-            if [ -e "/Volumes/EFI/Extra" ]; then
+            if [ -d "/Volumes/EFI/Extra" ]; then
                 "$scriptDir"InstallLog.sh "${dest_vol}" "No elements selected for adding to an Extra folder,
 so leaving existing /Volumes/EFI/Extra folder untouched."
             fi
@@ -311,7 +308,7 @@ if [ -d /tmp/originalBootSector ]; then
 fi
 
 # delete the temporary Chameleon folder
-if [ -e "$chamTemp" ]; then
+if [ -d "$chamTemp" ]; then
 	cleanUp="${cleanUp},2"
 	rm -rf "$chamTemp"
 fi
