@@ -105,10 +105,13 @@ if [ ! -f "$dest_vol"/.ChameleonExists ]; then
         # need to delete the Keylayout module and Keymaps that were automatically
         # installed to the temporary /Extra folder (controlled by the call to 
         # buildpackage for keylayouts in buildpkg.sh). 
-        if [ $keyLayoutOption == 0 ]; then
-        	rm -rf "$chamTemp"/Extra/Keymaps/
-        	rm -f "$chamTemp"/Extra/modules/Keylayout.dylib
-        fi
+        
+        # UPDATE - After discussion with JrCs, it was decided to leave
+        # these in by default so this has been commented out.
+        # if [ $keyLayoutOption == 0 ]; then
+        	#rm -rf "$chamTemp"/Extra/Keymaps/
+        	#rm -f "$chamTemp"/Extra/modules/Keylayout.dylib
+        # fi
     
   		# If exclusive options were used and the 'None' option was chosen,
   		# then a dummy file named DONT=ADD would be in /$chamTemp/Extra/options.

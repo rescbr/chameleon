@@ -216,7 +216,7 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			# automatically to the temporary /Extra folder without giving the user an option.
 			# Then, in Scripts/Main/postinstall we will check to see if the user selected a
 			# keymap - if they did then we'll copy these files otherwise we'll ignore them.
-			buildpackage "${1}/Keylayout" "/$chamTemp" "" "start_visible=\"false\"" "start_selected=\"true\"" >/dev/null 2>&1
+			buildpackage "${1}/Keylayout" "/$chamTemp" "" "start_enabled=\"false\"" "start_selected=\"true\"" >/dev/null 2>&1
 		}
 		fi
 
