@@ -6,6 +6,9 @@ echo "***********************************************"
 
 # Checks the selected volume is present and the disk is partitioned
 # Now also check for another existing Chameleon installation on the same disk.
+# Exit with 0 to indicate okay to proceed, no problems.
+# Exit with 1 to indicate okay to proceed, but note target doesn't have EFI system partition.
+# Exit with 2 to indicate not to proceed.
 
 # Receives targetVolume: Volume to install to (will be '/Volumes/EFI' if EFI install)
 # Receives targetDevice: Stores device number, for example /dev/disk2s1.
@@ -31,7 +34,7 @@ fi
 if [ -z "$targetVolume" ]; then
 	echo "*** Cannot find the volume. Exiting."
 	"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: Cannot file the volume: $targetVolume."
-	exit 1
+	exit 2
 #else
 	#echo "DEBUG: Confirming target volume exists"
 fi
@@ -41,7 +44,7 @@ fi
 if [ "$targetDevice" = "$targetDevice#*disk*s" ]; then
 	echo "*** ERROR Volume does not use slices. Exiting."
 	"$scriptDir"InstallLog.sh "${installerVolume}" "FAIL: $targetVolume doesn't use slices."
-	exit 1		
+	exit 2		
 #else
 	#echo "DEBUG: Confirming target device uses slices"
 fi
