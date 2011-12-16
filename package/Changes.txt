@@ -1,3 +1,5 @@
+- Keylayout / Keymaps fixed and made a mandatory install.
+
 - Add option to upgrade an existing install - or more exactly, merge newly selected options with an existing /Extra folder. Also, rename an existing /Extra/com.apple.Boot.plist to /Extra/org.chameleon.Boot.plist.
 
 - Change the layout/wording displayed in the installer (English only) and give it a facelift. Adjust background image to scale to fit in the window.
