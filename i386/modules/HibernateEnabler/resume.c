@@ -17,8 +17,6 @@
 #include "resume.h"
 #include "graphic_utils.h"
 
-extern char gMacOSVersion[];
-
 extern int previewTotalSectors;
 extern int previewLoadedSectors;
 extern uint8_t *previewSaveunder;
@@ -283,7 +281,7 @@ void HibernateBoot(char *image_filename)
 	IOHibernateImageHeader * header = &_header;
 	long buffer;
 	
-    if(gMacOSVersion[3] == '7')
+    if(gBootVolume->OSVersion[3] == '7')
     {
         HibernateBoot107(image_filename);
         return;

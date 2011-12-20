@@ -207,6 +207,7 @@ struct BootVolume {
     char			       altlabel[BVSTRLEN]; /* partition volume label */
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
+    char			 OSVersion[8];
 };
 
 enum {

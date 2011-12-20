@@ -29,9 +29,6 @@ extern long NetLoadDrivers(char *dirSpec);
 #endif
 extern long FileLoadDrivers(char *dirSpec, long plugin);
 
-extern char gMacOSVersion;
-
-
 extern long LoadDriverMKext(char *fileSpec);
 extern long LoadDriverPList(char *dirSpec, char *name, long bundleType);
 

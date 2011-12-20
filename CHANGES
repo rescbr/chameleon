@@ -1,3 +1,13 @@
+- Chameleon can now boot the Lion Auto-Installer partition (additionally, on a GPT disk this enable the option "Localize my Mac" of iCloud)
+- Added a first version of amlsgn (NOTE: This tool can can sign an aml file for your machine (with the UUID) or for your machine model, this can be useful 
+  with multiple machines w/o an identical model, combined with acpicodec and the option "LoadSignedAmlOnly", you can make sure that Chameleon will load the good 
+  aml files (even if you have about 50 dsdt files named differently in your Acpi directory and each one for a different machine) )
+- Applied Guerrero's patch on gui.c (http://forge.voodooprojects.org/p/chameleon/issues/view/attachment/152/gui.diff)
+- Added a theme compatible with the OS detection/Volume feature (credit to Enzo for LoginToLion, see http://forum.voodooprojects.org/index.php?topic=2125.0 for more.)
+- Fixed a mistake with the smbios.plist loading process
+- Reworked the OS detection/Volume (NOTE: now embedded into the core and executed much earlier )
+
+
 - Added Haiku support (credit to scorpius)
 - Added EXFAT (FAT64) support (credit to dmazar) 
 - Added JrCs fixes (see trunk v1716 v1719)
@@ -37,7 +47,7 @@ THE CHAMELEON ( OR VOODOO ) TEAM CAN NOT BE HELD RESPONSIBLE FOR ANY ABUSE.)
 - Updated keymapper ...
 - Applied scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s , disabled by default,
   see - http://forum.voodooprojects.org/index.php/topic,2158.msg10345/boardseen.html#new - for more info.
-- Applied Vladimir Zidar's hibernate patch on hibernateEnabler
+- Applied Vladimir Zidar's hibernate patch on hibernateEnabler.
 - Applied "Intel HD Graphics 3000" patch to gma.c (credit: ???) , 
   found at - http://www.darwinx86.net/forum/61-section-francaise-/1880-espace-de-discussion-anval?limit=10&start=60#6247 -
 - Added AMD support (most of the code is derived from the trunk, MUST BE ENABLED BY HAND IN CPU.C) see - http://forge.voodooprojects.org/p/chameleon/issues/163/ - 

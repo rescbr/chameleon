@@ -153,32 +153,7 @@ void initKernBootStruct( void )
 
 void
 reserveKern107BootStruct(void)
-{
-    //bootArgs107 = (boot_args_107 *)AllocateKernelMemory(sizeof(boot_args_107));
-	
-	/* Common Darwin boot arguments */
-	/*
-	bootArgs107->Revision = bootArgs->Header.Revision ;
-	bootArgs107->Version = bootArgs->Header.Version   ;
-	bcopy(bootArgs->CommandLine, bootArgs107->CommandLine, BOOT_LINE_LENGTH);
-	bootArgs107->MemoryMap = bootArgs->MemoryMap ;
-	bootArgs107->MemoryMapSize = bootArgs->MemoryMapSize ;
-	bootArgs107->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;
-	bootArgs107->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;
-	bootArgs107->Video = bootArgs->Video ;
-	bootArgs107->deviceTreeP = bootArgs->deviceTreeP ;
-	bootArgs107->deviceTreeLength = bootArgs->deviceTreeLength ;
-	bootArgs107->kaddr = bootArgs->kaddr ;
-	bootArgs107->ksize = bootArgs->ksize ;
-	bootArgs107->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;
-	bootArgs107->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;
-	bootArgs107->efiSystemTable = bootArgs->efiSystemTable ;
-	bootArgs107->efiMode = bootArgs->efiMode ;
-	bootArgs107->performanceDataStart = bootArgs->performanceDataStart ;
-	bootArgs107->performanceDataSize = bootArgs->performanceDataSize ;
-	bootArgs107->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;
-	*/
-	
+{	
 	init_boot_args(107);
 	
 	/* Darwin 10.7 specific boot arguments */
@@ -194,30 +169,7 @@ reserveKern107BootStruct(void)
 
 void
 reserveKernLegacyBootStruct(void)
-{    
-    //bootArgsLegacy = (boot_args_legacy *)AllocateKernelMemory(sizeof(boot_args_legacy));
-  /*  
-	bootArgsLegacy->Revision = bootArgs->Header.Revision ;
-	bootArgsLegacy->Version = bootArgs->Header.Version   ;
-	bcopy(bootArgs->CommandLine, bootArgsLegacy->CommandLine, BOOT_LINE_LENGTH);
-	bootArgsLegacy->MemoryMap = bootArgs->MemoryMap ;
-	bootArgsLegacy->MemoryMapSize = bootArgs->MemoryMapSize ;
-	bootArgsLegacy->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;
-	bootArgsLegacy->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;
-	bootArgsLegacy->Video = bootArgs->Video ;
-	bootArgsLegacy->deviceTreeP = bootArgs->deviceTreeP ;
-	bootArgsLegacy->deviceTreeLength = bootArgs->deviceTreeLength ;
-	bootArgsLegacy->kaddr = bootArgs->kaddr ;
-	bootArgsLegacy->ksize = bootArgs->ksize ;
-	bootArgsLegacy->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;
-	bootArgsLegacy->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;
-	bootArgsLegacy->efiSystemTable = bootArgs->efiSystemTable ;
-	bootArgsLegacy->efiMode = bootArgs->efiMode ;
-	bootArgsLegacy->performanceDataStart = bootArgs->performanceDataStart ;
-	bootArgsLegacy->performanceDataSize = bootArgs->performanceDataSize ;
-	bootArgsLegacy->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;
-*/	
-	
+{
 	init_boot_args(Legacy);
 }
 

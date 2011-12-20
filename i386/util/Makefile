@@ -32,6 +32,11 @@ machOconv: machOconv.o
 bdmesg: bdmesg.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5 -o $(SYMROOT)/$(@F) bdmesg.o
 
+amlsgn: 
+	$(CC) -arch i386 -framework IOKit -framework Foundation -mmacosx-version-min=10.5 amlsgn.m -o $(SYMROOT)/amlsgn
+
+
+
 include ../MakeInc.dir
 
 #dependencies

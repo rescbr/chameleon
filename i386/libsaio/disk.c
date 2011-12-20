@@ -91,6 +91,14 @@
 #define DBG(x...)
 #endif
 
+#ifndef MIN
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#endif
+
+#ifndef MAX
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#endif
+
 #ifdef APPLE_PARTITION_MAP_SUPPORT
 #define	UINT_MAX	0xffffffff	/* max value for an unsigned int, defined in <limits.h>. */
 #include <IOKit/storage/IOApplePartitionScheme.h>
@@ -188,6 +196,7 @@ static void scanFSLevelBVRSettings(BVRef chain);
 #ifdef APPLE_PARTITION_MAP_SUPPORT
 static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr );
 #endif
+static bool getOSVersion(BVRef bvr, char *str);
 
 //==========================================================================
 
@@ -1510,14 +1519,67 @@ scanErr:
     }
 }
 
+static bool getOSVersion(BVRef bvr, char *str)
+{
+	bool valid = false;	
+	config_file_t systemVersion;
+	char  dirSpec[512];	
+	long  flags, time;
+	
+	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	
+	if (!loadConfigFile(dirSpec, &systemVersion))
+	{
+		valid = true;
+	}
+	else 
+	{
+		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		
+		if (!loadConfigFile(dirSpec, &systemVersion))
+		{
+			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			
+			valid = true;
+		}
+		else 
+		{
+			sprintf(dirSpec, "hd(%d,%d)/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			
+			if (GetFileInfo(dirSpec, "Mac OS X Install Data", &flags, &time) == 0)
+			{						
+				*str = '\0';
+				strncat(str, "10.7", 4);
+				return true;
+			}
+		}
+	}
+	
+	if (valid)
+	{		
+		const char *val;
+		int len;
+		
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		{
+			// getValueForKey uses const char for val
+			// so copy it and trim
+			*str = '\0';
+			strncat(str, val, MIN(len, 4));
+		}
+		else
+			valid = false;
+	}
+	
+	return valid;
+}
+
 //==========================================================================
 
 static void scanFSLevelBVRSettings(BVRef chain)
 {
 	BVRef bvr;
-	char  dirSpec[512], fileSpec[512];	
 	int   ret;
-	long  flags, time;
 #ifdef BOOT_HELPER_SUPPORT
 	char  label[BVSTRLEN];
 	int   fh, fileSize, error;
@@ -1564,18 +1626,10 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		//
 		if (bvr->flags & kBVFlagNativeBoot)
 		{
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			strcpy(fileSpec, "SystemVersion.plist");
-			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
-			
-			if (ret == -1)
+			if (getOSVersion(bvr,bvr->OSVersion) == true)
 			{
-				strcpy(fileSpec, "ServerVersion.plist");
-				ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
-			}
-			
-			if (!ret)
 				bvr->flags |= kBVFlagSystemVolume;
+			}
 		}
 		
 	}

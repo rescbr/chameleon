@@ -70,15 +70,6 @@ typedef struct {
 } image_t;
 
 /*
- * Volume structure.
- */
-typedef struct volume_t {
-	char	version[8];
-	BVRef		bvr;
-	struct volume_t* next;
-} volume_t;
-
-/*
  * Font structure.
  */
 typedef struct {

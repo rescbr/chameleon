@@ -87,7 +87,6 @@ long gBootMode; /* defaults to 0 == kBootModeNormal */
 bool gOverrideKernel;
 char gBootKernelCacheFile[512];
 char gMKextName[512];
-char gMacOSVersion[8];
 char *gRootDevice = NULL;
 
 #ifndef OPTION_ROM
@@ -111,7 +110,6 @@ static inline void malloc_error(char *addr, size_t size, const char *file, int l
 static inline void malloc_error(char *addr, size_t size);
 #endif
 static int ExecKernel(void *binary);
-static bool getOSVersion(char *str);
 static void getRootDevice();
 #ifdef NBP_SUPPORT
 static bool gUnloadPXEOnExit = false;
@@ -199,10 +197,10 @@ static int ExecKernel(void *binary)
 				
     bootArgs->kaddr = bootArgs->ksize = 0;
 	
-	if(gMacOSVersion[3] <= '6')
+	if(gBootVolume->OSVersion[3] <= '6')
 	{
 		bootArgs->Header.Version  = kBootArgsVersion1;		
-		bootArgs->Header.Revision = gMacOSVersion[3];	
+		bootArgs->Header.Revision = gBootVolume->OSVersion[3];	
 	}
 	else 
 	{		
@@ -211,7 +209,7 @@ static int ExecKernel(void *binary)
 		bootArgs->Header.Version  = kBootArgsVersion;		
 		bootArgs->Header.Revision = kBootArgsRevision;
 #else
-		if(gMacOSVersion[3] == '7')
+		if(gBootVolume->OSVersion[3] == '7')
 		{
 			bootArgs->Header.Version  = 2;
 			bootArgs->Header.Revision = 0;
@@ -337,9 +335,9 @@ static int ExecKernel(void *binary)
     
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
-	 if (gMacOSVersion[3] <= '6') 
+	 if (gBootVolume->OSVersion[3] <= '6') 
 		reserveKernLegacyBootStruct();
-	 else if (gMacOSVersion[3] == '7')
+	 else if (gBootVolume->OSVersion[3] == '7')
 		 reserveKern107BootStruct();	
 	
 #if UNUSED
@@ -351,7 +349,7 @@ static int ExecKernel(void *binary)
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
 
-	switch (gMacOSVersion[3]) {
+	switch (gBootVolume->OSVersion[3]) {
 		case '4':
 		case '5':
 		case '6':
@@ -592,10 +590,7 @@ void common_boot(int biosdev)
 						
         // Other status (e.g. 0) means that we should proceed with boot.
 		execute_hook("GUI_PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);
-		
-		// Find out which version mac os we're booting.
-		getOSVersion(gMacOSVersion);
-		
+				
 		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig) && val)
 		{
 			if (strncmp(val, "x86_64", 4) == 0)
@@ -647,7 +642,7 @@ void common_boot(int biosdev)
 			trycache = false;
 		}
 						
-		verbose("Loading Darwin %s\n", gMacOSVersion);
+		verbose("Loading Darwin %s\n", gBootVolume->OSVersion);
 		{
 			long cachetime, kerneltime, exttime;
 			if (trycache && !forcecache) do {
@@ -701,7 +696,7 @@ void common_boot(int biosdev)
 			{
                 bootFile = gBootKernelCacheFile;
                 verbose("Loading kernel cache %s\n", bootFile);
-				if (gMacOSVersion[3] > '6')
+				if (gBootVolume->OSVersion[3] > '6')
 				{					
 					ret = LoadThinFatFile(bootFile, &binary);
 					if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
@@ -853,11 +848,11 @@ void getKernelCachePath()
 		}
 		else
 		{
-			if(gMacOSVersion[3] > '6')
+			if(gBootVolume->OSVersion[3] > '6')
 			{					
 				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
 			}
-			else if(gMacOSVersion[3] <= '6')
+			else if(gBootVolume->OSVersion[3] <= '6')
 			{			 
 				
 				PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
@@ -908,7 +903,7 @@ void getKernelCachePath()
 				
 				DBG("Adler32: %08lX\n",bootInfo->adler32);
 				
-				if (gMacOSVersion[3] < '6')
+				if (gBootVolume->OSVersion[3] < '6')
 				{
 					long flags, cachetime;
 					int ret = -1;
@@ -1015,39 +1010,6 @@ static void getRootDevice()
 out:	
 	verbose("Setting %s to: %s\n", uuidSet ? kBootUUIDKey : "root device", (char* )val);  
 	gRootDevice = (char* )val;
-}
-
-static bool getOSVersion(char *str)
-{
-	bool valid = false;	
-	config_file_t systemVersion;
-	
-	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	else if (!loadConfigFile("System/Library/CoreServices/ServerVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	
-	if (valid)
-	{		
-		const char *val;
-		int len;
-		
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
-		{
-			// getValueForKey uses const char for val
-			// so copy it and trim
-			*str = '\0';
-			strncat(str, val, MIN(len, 4));
-		}
-		else
-			valid = false;
-	}
-	
-	return valid;
 }
 
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size)

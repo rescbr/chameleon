@@ -743,14 +743,12 @@ static VOID setupEfiDeviceTree(void)
 	Node *efiNode  = DT__AddChild(node, "efi");
 	
 	{
-		extern char gMacOSVersion[];
-
 		// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
 		// is set up.  That is, name and table properties
 		Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");		
 		Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
 		
-		if (gMacOSVersion[3] > '6')
+		if (gBootVolume->OSVersion[3] > '6')
 		{
 			kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
 			DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
@@ -845,12 +843,10 @@ static VOID setupEfiDeviceTree(void)
 
 void setupSmbiosConfigFile(const char *filename)
 {	
-	//static bool readSmbConfigFile = true;
+	static bool readSmbConfigFile = true;
 
-	if (&bootInfo->bootConfig == 0)
-	//if (readSmbConfigFile == true)
+	if (readSmbConfigFile == true)
 	{
-		verbose("loading smbios plist\n");
 		char		dirSpecSMBIOS[128] = "";
 		const char *override_pathname = NULL;
 		int			len = 0, err = 0;
@@ -878,7 +874,7 @@ void setupSmbiosConfigFile(const char *filename)
 		{
 			verbose("No SMBIOS config file found.\n");
 		}
-		//readSmbConfigFile = false;
+		readSmbConfigFile = false;
 	}
 }
 

@@ -80,6 +80,11 @@ static int getEmbeddedImageIndexByName(const char *name);
 #endif
 static int getImageIndexByName(const char *name);
 
+static int destroyFont(font_t *font);
+static int unloadGraphics(void);
+static int freeBackBuffer( window_t *window );
+static bool is_image_loaded(int i);
+
 #define LOADPNG(src, img, alt_img) if (loadThemeImage(src, #img, alt_img) != 0) { return 1; }
 
 #ifndef MIN
@@ -497,6 +502,38 @@ static int loadGraphics(char *src)
 	
 	return 0;
 }
+
+static int unloadGraphics(void)
+{
+    int i;
+	
+    destroyFont(&font_console);
+    destroyFont(&font_small);
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	{
+	    if (images[i].image)
+	    {
+	    	if (images[i].image->pixels) free(images[i].image->pixels);
+	    	free (images[i].image);
+	    	images[i].image = 0;
+	    }
+	}
+	return 0;
+}
+
+static int freeBackBuffer( window_t *window )
+{
+	if (gui.backbuffer && gui.backbuffer->pixels)
+    {
+		free(gui.backbuffer->pixels);
+		free(gui.backbuffer);
+		gui.backbuffer = 0;
+		return 0;
+	}
+    
+	return 1;
+}
+
 #if UNUSED
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
@@ -959,7 +996,7 @@ int initGUI(void)
 			
 			if (ret) printf("Failed to load Default Theme : %s !! \n", THEME_NAME_DEFAULT);
 		}
-	}
+	}    
 	return ret;
 }
 
@@ -1049,95 +1086,17 @@ static int startGUI(void)
 			}
 		}
 	}
+    
+	// Loading error occurred, freeing resources
+    freeWindowBuffer(&gui.menu);
+    freeWindowBuffer(&gui.infobox);
+    freeWindowBuffer(&gui.bootprompt);
+    freeWindowBuffer(&gui.devicelist);
+    freeWindowBuffer(&gui.screen);
+    freeBackBuffer(&gui.screen);
+    unloadGraphics();	
+	
 	return 1;
-}
-
-/*************************************************
- *
- * Volume Versioning Management 
- */
-
-volume_t* volumeList = NULL;
-
-
-bool add_volume(char* Version, BVRef bvr)
-{	
-	volume_t* new_volume= malloc(sizeof(volume_t));
-
-	if (new_volume)
-	{	
-		new_volume->next = volumeList;
-		
-		volumeList = new_volume;
-		
-		strlcpy(new_volume->version,Version,sizeof(new_volume->version)+1);
-		new_volume->bvr = bvr;
-		return true;
-	}	
-	
-	return false;
-	
-}
-
-bool get_volume_version(char *str,BVRef bvr)
-{
-	volume_t* volume = volumeList;
-	while(volume)
-	{
-		if (volume->bvr == bvr) {
-			strlcpy(str,volume->version,sizeof(volume->version)+1);
-			return true;
-		}
-		volume = volume->next;
-	}
-	return false;
-}
-
-static bool getOSVersionForVolume(char *str, BVRef bvr)
-{
-	bool valid = false;	
-	
-	if (get_volume_version(str,bvr) == false)
-	{
-		char dirSpec[128];
-		char dirSpec2[128];
-		config_file_t systemVersion;
-		
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
-		sprintf(dirSpec2, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
-				
-		if (!loadConfigFile(dirSpec, &systemVersion))
-		{
-			valid = true;
-		}
-		else if (!loadConfigFile(dirSpec2, &systemVersion))
-		{
-			valid = true;
-		}
-		
-		if (valid)
-		{		
-			const char *val;
-			int len;
-			
-			if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
-			{
-				// getValueForKey uses const char for val
-				// so copy it and trim
-				*str = '\0';
-				strncat(str, val, MIN(len, 4));
-				add_volume(str, bvr);
-			}
-			else
-				valid = false;
-		}
-	} 
-	else 
-	{
-		valid = true;
-	}
-	
-	return valid;
 }
 
 static bool is_image_loaded(int i)
@@ -1145,7 +1104,6 @@ static bool is_image_loaded(int i)
 	return (images[i].image != NULL) ? true : false;
 }
 
-/*************************************************/
 static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
@@ -1157,16 +1115,12 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 		switch (device->part_type)
 		{
 			case kPartitionTypeHFS:
-			{
-				char VolumeMacOSVersion[8];
-				
+			{				
 #ifdef BOOT_HELPER_SUPPORT	
 				// Use HFS or HFSRAID icon depending on bvr flags.
 				if (device->flags & kBVFlagBooter) {
-					
-					getOSVersionForRaidVolume(VolumeMacOSVersion,device);
-										
-					switch (VolumeMacOSVersion[3]) {
+                    
+					switch (device->OSVersion[3]) {
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFSRAID_Lion) ? iDeviceHFSRAID_Lion : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
 							break;
@@ -1186,11 +1140,9 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 					
 				} else				
 #endif
-				{		
+				{					
 					
-					getOSVersionForVolume(VolumeMacOSVersion,device);					
-					
-					switch (VolumeMacOSVersion[3]) {
+					switch (device->OSVersion[3]) {
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFS_Lion) ? iDeviceHFS_Lion : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
 							break;
@@ -1264,192 +1216,6 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 	
 }
 
-#if 0
-static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
-{
-	int devicetype;
-	
-	if( diskIsCDROM(device) )
-		devicetype = iDeviceCDROM;				// Use CDROM icon
-	else
-	{	
-		switch (device->part_type)
-		{
-			case kPartitionTypeHFS:
-			{
-				bool hfs_img_replacement_found = false;
-				char VolumeMacOSVersion[8];
-				
-#ifdef BOOT_HELPER_SUPPORT	
-				// Use HFS or HFSRAID icon depending on bvr flags.
-				if (device->flags & kBVFlagBooter) {
-					
-					if (getOSVersionForRaidVolume(VolumeMacOSVersion,device))
-					{
-						int i ;				
-						if (VolumeMacOSVersion[3] == '7') {
-							if ((i = getImageIndexByName("device_hfsplus_raid_lion")) >= 0)
-							{
-								if (images[i].image != NULL) {
-									hfs_img_replacement_found = true;
-								}
-							}
-						} else if (VolumeMacOSVersion[3] == '6') {
-							if ((i = getImageIndexByName("device_hfsplus_raid_sl")) >= 0)
-							{
-								if (images[i].image != NULL) {
-									hfs_img_replacement_found = true;
-								}
-							}
-						} else if (VolumeMacOSVersion[3] == '5') {
-							if ((i = getImageIndexByName("device_hfsplus_raid_leo")) >= 0)
-							{
-								if (images[i].image != NULL) {
-									hfs_img_replacement_found = true;
-								}
-							}
-						} else if (VolumeMacOSVersion[3] == '4') {
-							if ((i = getImageIndexByName("device_hfsplus_raid_tiger")) >= 0)
-							{
-								if (images[i].image != NULL) {
-									hfs_img_replacement_found = true;
-								}
-							}
-						}
-					}
-					
-					switch (VolumeMacOSVersion[3]) {
-						case '7':
-							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Lion : iDeviceHFSRAID;
-							break;
-						case '6':
-							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_SL : iDeviceHFSRAID;
-							break;
-						case '5':
-							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Leo : iDeviceHFSRAID;
-							break;
-						case '4':
-							devicetype = (hfs_img_replacement_found) ? iDeviceHFSRAID_Tiger : iDeviceHFSRAID;
-							break;
-						default:
-							devicetype = iDeviceHFSRAID;
-							break;
-					}
-					
-				} else				
-#endif
-					{		
-						
-						if (getOSVersionForVolume(VolumeMacOSVersion,device))
-						{
-							
-							int i ;				
-							if (VolumeMacOSVersion[3] == '7') {
-								if ((i = getImageIndexByName("device_hfsplus_lion")) >= 0)
-								{
-									if (images[i].image != NULL) {
-										hfs_img_replacement_found = true;
-									}
-								}
-							} else if (VolumeMacOSVersion[3] == '6') {
-								if ((i = getImageIndexByName("device_hfsplus_sl")) >= 0)
-								{
-									if (images[i].image != NULL) {
-										hfs_img_replacement_found = true;
-									}
-								}
-							} else if (VolumeMacOSVersion[3] == '5') {
-								if ((i = getImageIndexByName("device_hfsplus_leo")) >= 0)
-								{
-									if (images[i].image != NULL) {
-										hfs_img_replacement_found = true;
-									}
-								}
-							} else if (VolumeMacOSVersion[3] == '4') {
-								if ((i = getImageIndexByName("device_hfsplus_tiger")) >= 0)
-								{
-									if (images[i].image != NULL) {
-										hfs_img_replacement_found = true;
-									}
-								}
-							}					
-							
-						}
-						
-						switch (VolumeMacOSVersion[3]) {
-							case '7':
-								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Lion : iDeviceHFS;
-								break;
-							case '6':
-								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_SL : iDeviceHFS;
-								break;
-							case '5':
-								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Leo : iDeviceHFS;
-								break;
-							case '4':
-								devicetype = (hfs_img_replacement_found) ? iDeviceHFS_Tiger : iDeviceHFS;
-								break;
-							default:
-								devicetype = iDeviceHFS;
-								break;
-						}						
-						
-					}
-					
-					break;
-
-			}				
-			case kPartitionTypeHPFS:
-				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
-				break;
-				
-			case kPartitionTypeFAT16:
-				devicetype = iDeviceFAT16;		// Use FAT16 icon
-				break;
-				
-			case kPartitionTypeFAT32:
-				devicetype = iDeviceFAT32;		// Use FAT32 icon
-				break;
-				
-			case kPartitionTypeEXT3:
-				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
-				break;
-			
-			case kPartitionTypeFreeBSD:
-				devicetype = iDeviceFreeBSD;		// Use FreeBSD icon
-				break;
-				
-			case kPartitionTypeOpenBSD:
-				devicetype = iDeviceOpenBSD;		// Use OpenBSD icon
-				break;
-				
-			case kPartitionTypeBEFS:               /* Haiku detection and Icon credits to scorpius  */
-				devicetype = iDeviceBEFS;// Use BEFS / Haiku icon
-				break;
-				
-			default:
-				devicetype = iDeviceGeneric;	// Use Generic icon
-				break;
-		}
-	}
-	
-	// Draw the selection image and use the next (device_*_o) image for the selected item.
-    if (isSelected)
-	{
-		blend(images[iSelection].image, buffer, centeredAt(images[iSelection].image, p));
-		devicetype++; // selec override image 
-	}
-	
-	// draw icon
-	blend( images[devicetype].image, buffer, centeredAt( images[devicetype].image, p ));
-	
-	p.y += (images[iSelection].image->height / 2) + font_console.chars[0]->height;
-	
-	// draw volume label 
-	drawStrCenteredAt( device->label, &font_small, buffer, p);	
-	
-}
-#endif
 void drawDeviceList (int start, int end, int selection)
 {
 	int i;
@@ -2021,6 +1787,21 @@ static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, pos
 	p.y = ( p.y - ( height / 2 ) );
 	
 	drawStr(text, font, blendInto, p);	
+}
+
+static int destroyFont(font_t *font)
+{
+	int i;
+    for (i = 0; i < CHARACTERS_COUNT; i++)
+    {
+		if (font->chars[i])
+		{
+			if (font->chars[i]->pixels) free (font->chars[i]->pixels);
+			free (font->chars[i]);
+			font->chars[i] = 0;
+		}
+    }
+    return 0;
 }
 
 static int initFont(font_t *font, image_t *data)

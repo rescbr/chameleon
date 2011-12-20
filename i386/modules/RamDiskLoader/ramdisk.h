@@ -35,7 +35,6 @@ extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
 extern BVRef gRAMDiskVolume;
 extern bool gRAMDiskBTAliased;
 
-extern char gMacOSVersion;
 extern long FileLoadDrivers(char *dirSpec, long plugin);
 
 extern void setRAMDiskBTHook(bool mode);

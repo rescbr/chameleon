@@ -40,7 +40,6 @@
 #include "drivers.h"
 #include "modules.h"
 
-extern char gMacOSVersion[];
 extern char gBootKernelCacheFile[];
 
 static ModulePtr gModuleHead, gModuleTail;
@@ -126,7 +125,7 @@ long LoadDrivers( char * dirSpec )
 #endif
 			
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "/Extra/%s/", &gMacOSVersion);
+			sprintf(dirSpecExtra, "/Extra/%s/", &gBootVolume->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next try to load Extra extensions from the selected root partition.
@@ -138,7 +137,7 @@ long LoadDrivers( char * dirSpec )
 					if (!(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no))
 					{
 						// First try a specfic OS version folder ie 10.5
-						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gBootVolume->OSVersion);
 						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 						{	
 							// Next we'll try the base
@@ -762,7 +761,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             printf("adler mismatch\n");
             return -1;
         }
-		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gMacOSVersion[3] > '6') 
+		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gBootVolume->OSVersion[3] > '6') 
 			bootInfo->adler32 = kernel_header->adler32;
     }
 	
