@@ -8,3 +8,5 @@ TODO List for Chameleon Boot Loader
 - It seems that nvram variables must be set thru efiRuntimeServices->SetVariable(...),
   then, the /options node is filled by kernel depending on the Runtime Services.
   If true, this requires a more complete EFI implementation (perhaps in a module, or a kext).
+
+- Make an OS X server icon for LoginToLion

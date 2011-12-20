@@ -1,7 +1,7 @@
 - Chameleon can now boot the Lion Auto-Installer partition (additionally, on a GPT disk this enable the option "Localize my Mac" of iCloud)
 - Added a first version of amlsgn (NOTE: This tool can can sign an aml file for your machine (with the UUID) or for your machine model, this can be useful 
-  with multiple machines w/o an identical model, combined with acpicodec and the option "LoadSignedAmlOnly", you can make sure that Chameleon will load the good 
-  aml files (even if you have about 50 dsdt files named differently in your Acpi directory and each one for a different machine) )
+  with multiple machines w/o an identical model, combined with acpicodec and the option "LoadSignedAmlOnly", you can make sure that Chameleon will load the 
+  good aml files for your machine (even if you have for example about 50 dsdt files named differently in your Acpi directory and each one for a different machine) )
 - Applied Guerrero's patch on gui.c (http://forge.voodooprojects.org/p/chameleon/issues/view/attachment/152/gui.diff)
 - Added a theme compatible with the OS detection/Volume feature (credit to Enzo for LoginToLion, see http://forum.voodooprojects.org/index.php?topic=2125.0 for more.)
 - Fixed a mistake with the smbios.plist loading process

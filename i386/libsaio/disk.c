@@ -1534,12 +1534,11 @@ static bool getOSVersion(BVRef bvr, char *str)
 	}
 	else 
 	{
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		
 		if (!loadConfigFile(dirSpec, &systemVersion))
-		{
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			
+		{	
+            bvr->OSisServer = true;
 			valid = true;
 		}
 		else 

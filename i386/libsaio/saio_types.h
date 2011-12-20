@@ -208,6 +208,7 @@ struct BootVolume {
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
     char			 OSVersion[8];
+    bool             OSisServer;        /* Basically mean that OS X server is installed on this partition, not to be confused with Platform->CPU.isServer which means it tries to emulate an xserve in the smbios */
 };
 
 enum {
