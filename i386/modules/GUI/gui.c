@@ -22,6 +22,17 @@
 #include "modules.h"
 #include "sl.h"
 
+#ifndef DEBUG_GUI
+#define DEBUG_GUI 0
+#endif
+
+#if DEBUG_GUI==2
+#define DBG(x...)	printf(x);sleep(2)
+#elif DEBUG_GUI==1
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
 
 gui_t gui;					// gui structure
 font_t font_small;
@@ -54,7 +65,7 @@ static int initFont(font_t *font, image_t *data);
 static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p);
 static position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p);
 static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
-#if DEBUG
+#if DEBUG_GUI
 static int dprintf( window_t * window, const char * fmt, ...);
 #endif
 static void sputc(int c, struct putc_info * pi);
@@ -345,7 +356,10 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 	uint16_t	width;
 	uint16_t	height;
 	uint8_t		*imagedata;
-	if ((unsigned)(strlen(image) + strlen(theme_name) + 30 ) > sizeof(dirspec)) {
+	if ((unsigned)(strlen(image) + strlen(theme_name) + strlen(src) + (6+1) ) > sizeof(dirspec)) {
+		
+		DBG("Path of %s/%s/%s.png to long\n", src, theme_name, image);
+		
 		return 1;
 	}
 	
@@ -354,6 +368,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 		if (images[i].image == NULL) {
 			images[i].image = malloc(sizeof(pixmap_t));
 			if (images[i].image == NULL) {
+
+				DBG("Unable to allocate memory for %s.png\n", image);
+
 				return 1;
 			}
 		}
@@ -368,6 +385,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             images[i].image->height = height;
             images[i].image->pixels = (pixel_t *)imagedata;
             flipRB(images[i].image);
+
+			DBG("[ %s ] succesfully loaded and registred !!\n", dirspec);
+
             return 0;
         }
 #ifdef EMBED_THEME
@@ -399,7 +419,11 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 				images[i].image->width = images[alt_image].image->width;
 				images[i].image->height = images[alt_image].image->height;
 				images[i].image->pixels = images[alt_image].image->pixels;
+				
 			} else {
+
+				DBG("Unable to load %s, this image not vital anyway, reseting and returning success !!\n", dirspec);
+
 				free(images[i].image);
 				images[i].image = NULL;
 			} 
@@ -408,9 +432,14 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
         }
         else
         {
-#ifndef EMBED_THEME
+#if DEBUG_GUI
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
 			sleep(2);
+#else
+#ifndef CONFIG_EMBED_THEME
+            printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
+			sleep(2);
+#endif
 #endif
 			free(images[i].image);
 			images[i].image = NULL;
@@ -418,12 +447,19 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 
         }
 		
-    }	
+    }
+	
+#if DEBUG_GUI
+	printf("[ %s/%s/%s.png ] not used in this version, skipped !!\n",src, theme_name, image);
+	sleep(2);
+#endif
 	return 1;
 }
 
 static int loadGraphics(char *src)
 {
+	DBG("Loading image into memory....\n",theme_name);
+
 	LOADPNG(src, background,                     IMG_REQUIRED);
 
 	LOADPNG(src, logo,                           IMG_REQUIRED);
@@ -496,9 +532,13 @@ static int loadGraphics(char *src)
 	
 	LOADPNG(src, font_console,                   IMG_REQUIRED);
 	LOADPNG(src, font_small,                     IMG_REQUIRED);
-	
+
+	DBG("Initializing font....\n",theme_name);
+
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
+
+	DBG("Graphic objects successfully loaded !!\n",theme_name);
 	
 	return 0;
 }
@@ -566,13 +606,17 @@ static int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
+	{
+		DBG("Unable to allocate memory for gui.backbuffer");
 		return 1;
+	}
 	
 	gui.backbuffer->pixels = malloc( window->width * window->height * 4 );
 	if(!gui.backbuffer->pixels)
 	{
 		free(gui.backbuffer);
 		gui.backbuffer = 0;
+		DBG("Unable to allocate memory for gui.backbuffer->pixels");
 		return 1;
 	}
 	
@@ -586,13 +630,17 @@ static int createWindowBuffer( window_t *window )
 {
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
+	{
+		DBG("Unable to allocate memory for window->pixmap");
 		return 1;
+	}
 	
 	window->pixmap->pixels = malloc( window->width * window->height * 4 );
 	if(!window->pixmap->pixels)
 	{
 		free(window->pixmap);
 		window->pixmap = 0;
+		DBG("Unable to allocate memory for window->pixmap->pixels");
 		return 1;
 	}
 	
@@ -925,56 +973,89 @@ static int randomTheme(char *dirspec, const char **theme) {
 int initGUI(void)
 {	
 	bool dummybool = true;
+	int ret = 1;	
+	bool theme_ran= false;
+	bool theme_name_set= false;
+	
 	getBoolForKey(kGUIKey, &dummybool, &bootInfo->bootConfig);
 	if (!dummybool) {
 		return 1;
 	}
+		
 	
+	getBoolForKey("RandomTheme", &theme_ran, &bootInfo->bootConfig);
+				
 	{
 		long flags;
 		long time;
 		long ret = -1;
+		int    len;
 		
-		ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
-		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-			sprintf(dirsrc, "rd(0,0)/Extra/Themes");
-			
-		} else {
-			ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
+		theme_name_set = getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
+		
+		if (theme_ran) 
+		{		
+retry:
+			ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-				sprintf(dirsrc, "/Extra/Themes");
+				sprintf(dirsrc, "rd(0,0)/Extra/Themes");
 				
 			} else {
-				ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
+				ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-					sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+					sprintf(dirsrc, "/Extra/Themes");
 					
 				} else {
-					printf("Failed to find the /extra/Themes folder\n");
-					return 1;
+					ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
+					if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+						sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+						
+					} else {
+						printf("Failed to find the /extra/Themes folder\n");
+						return 1;
+					}
 				}
+				
+			}		
+		} 
+		else if (theme_name_set)
+		{		
+			ret = GetFileInfo("rd(0,0)/Extra/Themes/", theme_name, &flags, &time);
+			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+				sprintf(dirsrc, "rd(0,0)/Extra/Themes");
+				
+			} else {
+				ret = GetFileInfo("/Extra/Themes/", theme_name, &flags, &time);
+				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+					sprintf(dirsrc, "/Extra/Themes");
+					
+				} else {
+					ret = GetFileInfo("bt(0,0)/Extra/Themes/", theme_name, &flags, &time);
+					if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
+						sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+						
+					} else {
+						printf("Failed to find the /extra/Themes/%s folder\n",theme_name);
+						theme_name_set = false;
+						goto retry;
+					}
+				}
+				
 			}
- 
-		}		
-	}
+		}	
+	}	
 	
-	int    len;		
-	bool theme_ran= false;
-	getBoolForKey("RandomTheme", &theme_ran, &bootInfo->bootConfig);
-	int ret = 1;
-	
-	if (theme_ran) {
+	if (theme_ran)
+	{
 						
 		ret = randomTheme(dirsrc, &theme_name);
  		
-		if (ret) printf("randomTheme Failed !! \n");
-		
+		if (ret) printf("randomTheme Failed !! \n");		
 	} 
-
 	
 	if (ret)
 	{			
-		if (getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig ) == true)
+		if (theme_name_set == true)
 		{
 			ret = startGUI();
 			
@@ -990,7 +1071,7 @@ int initGUI(void)
 			
 		}		
 #endif		
-		if (ret) {
+		if (ret && (strcmp(theme_name, THEME_NAME_DEFAULT) != 0)) {
 			theme_name = THEME_NAME_DEFAULT;
 			ret = startGUI();
 			
@@ -1006,12 +1087,14 @@ static int startGUI(void)
 	char    dirspec[256];
 	
 		
-	if ((unsigned)(strlen(theme_name) + 34) > sizeof(dirspec)) {
+	if ((unsigned)(strlen(theme_name) + strlen(dirsrc) + strlen("theme.plist") + 2 ) > sizeof(dirspec)) {
+		
+		DBG("Path of %s/%s/theme.plist to long\n", dirsrc, theme_name);		
 		return 1;
 	}
 		
 	sprintf(dirspec, "%s/%s/theme.plist", dirsrc ,theme_name);
-	
+			
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
 				
 #ifdef EMBED_THEME
@@ -1020,11 +1103,18 @@ static int startGUI(void)
 				
 				config = &bootInfo->themeConfig;
 				if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
+
+					DBG("Unable to load embed theme plist datas.\n");
+
 					return 1;
 				}
 			}			
 #else
-			return 1;
+
+		DBG("Unable to load %s theme plist.\n",theme_name);
+
+		return 1;
+
 #endif		
     }
 	
@@ -1038,6 +1128,13 @@ static int startGUI(void)
 			screen_params[1] = val;
 		}		
 	}
+#if DEBUG_GUI
+	else
+	{
+		printf("No getResolution function hook installed, using default resolution.\n",theme_name);
+
+	}
+#endif
 	
 	
 	// Initalizing GUI strucutre.
@@ -1086,7 +1183,9 @@ static int startGUI(void)
 			}
 		}
 	}
-    
+	
+	DBG("Loading error occurred, reseting...\n",theme_name);		
+	
 	// Loading error occurred, freeing resources
     freeWindowBuffer(&gui.menu);
     freeWindowBuffer(&gui.infobox);
@@ -1276,7 +1375,7 @@ void drawDeviceList (int start, int end, int selection)
 			if(gui.menu.draw)
 				drawInfoMenuItems();
 			
-#if DEBUG
+#if DEBUG_GUI
             gui.debug.cursor = pos( 10, 100);
             dprintf( &gui.screen, "label     %s\n",   param->label );
             dprintf( &gui.screen, "biosdev   0x%x\n", param->biosdev );
@@ -1542,7 +1641,7 @@ int gprintf( window_t * window, const char * fmt, ...)
 	}
 	return 1;
 }
-#if DEBUG
+#if DEBUG_GUI
 static int dprintf( window_t * window, const char * fmt, ...)
 {
 	char *formattedtext;

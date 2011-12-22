@@ -597,12 +597,13 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 int loadBooterConfig(config_file_t *config)
 {
 	char *dirspec[] = {							       
-		"rd(0,0)/Extra/com.apple.Boot.plist",   
-		"/Extra/com.apple.Boot.plist",          
-		"bt(0,0)/Extra/com.apple.Boot.plist",  
+		"rd(0,0)/Extra/com.apple.Boot.plist",  
+		"/Extra/com.apple.Boot.plist",
+		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
 		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk 
+		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk
+
         
 	};
 	int i,fd, count, ret=-1;
@@ -683,11 +684,11 @@ int loadOverrideConfig(config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-        "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",   
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",          
+        "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"bt(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-        "rd(0,0)/Mac OS X Install Data/com.apple.Boot.plist",   
-		"/Mac OS X Install Data/com.apple.Boot.plist",          
+        "rd(0,0)/Mac OS X Install Data/com.apple.Boot.plist",
+		"/Mac OS X Install Data/com.apple.Boot.plist",
 		"bt(0,0)/Mac OS X Install Data/com.apple.Boot.plist"
 	};
 	int i,fd, count, ret=-1;

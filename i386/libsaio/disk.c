@@ -1546,7 +1546,8 @@ static bool getOSVersion(BVRef bvr, char *str)
 			sprintf(dirSpec, "hd(%d,%d)/", BIOS_DEV_UNIT(bvr), bvr->part_no);
 			
 			if (GetFileInfo(dirSpec, "Mac OS X Install Data", &flags, &time) == 0)
-			{						
+			{	
+				/*** DIRTY HACK (would be better to have a plist) ***/
 				*str = '\0';
 				strncat(str, "10.7", 4);
 				return true;

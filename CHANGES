@@ -1,3 +1,6 @@
+- Updated the default theme to v 1.1 (credit to blackosx)
+- Updated LogintoLion with he haiku device logo (credit to blackosx)
+- Updated for the gui 
 - Chameleon can now boot the Lion Auto-Installer partition (additionally, on a GPT disk this enable the option "Localize my Mac" of iCloud)
 - Added a first version of amlsgn (NOTE: This tool can can sign an aml file for your machine (with the UUID) or for your machine model, this can be useful 
   with multiple machines w/o an identical model, combined with acpicodec and the option "LoadSignedAmlOnly", you can make sure that Chameleon will load the 

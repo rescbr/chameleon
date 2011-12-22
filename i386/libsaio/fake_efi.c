@@ -99,8 +99,8 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0};
 
 /* Info About the current Firmware */
 #define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
-static EFI_CHAR16 const FIRMWARE_NAME[] = {'S','a','d','D','a','r','w','i','n', 0}; // hummm, damn, Unfortunately, that day has come, ..... One more thing ??? 
-static EFI_UINT32 const FIRMWARE_REVISION = 0x00010500; //1.5
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'S','a','v','a','n','n','a', 0};  
+static EFI_UINT32 const FIRMWARE_REVISION = 0x00010700; //1.7
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
 /* Default platform system_id (fix by IntVar) */
