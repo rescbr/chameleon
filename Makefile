@@ -99,7 +99,7 @@ endif
 	@gzip --best ${DISTFILE}.tar
 	@mv ${DISTFILE}.tar.gz ${DISTFILE}.tgz
 
-clean-local:
+clean-local: clean-pkg-local
 	@if [ -f "$(HEADER_VERSION)" ];then echo "\t[RM] $(HEADER_VERSION)"; fi
 	@if [ -f "$(SRCROOT)/revision" ];then echo "\t[RM] $(SRCROOT)/revision"; fi
 	@rm -f $(HEADER_VERSION) $(SRCROOT)/revision
@@ -122,20 +122,14 @@ distclean-local:
             $(SRCROOT)/autoconf.inc
 
 pkg installer: all
-	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
-	#${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
-	@echo "\t[ZIP] ${DISTFILE}.pkg"
-	@ditto -c -k --sequesterRsrc ${DISTFILE}.pkg ${DISTFILE}.pkg.zip
-	@rm -r ${DISTFILE}.pkg
-	
-dmg: all
-	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
-	${SRCROOT}/package/builddmg.sh ${SYMROOT}/package;
+	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package
+
+clean-pkg-local:
+	@if [ -d "$(SYMROOT)/package" ];then echo "\t[RMDIR] $(SYMROOT)/package"; fi
+	@rm -rf "$(SYMROOT)/package"
 
 .PHONY: config
 .PHONY: clean
 .PHONY: image
 .PHONY: pkg
 .PHONY: installer
-.PHONY: dmg
-
