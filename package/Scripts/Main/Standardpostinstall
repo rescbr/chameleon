@@ -170,7 +170,7 @@ if [ ${returnValue} -ne 2 ]; then
 
 		# Next we look to check for existing Chameleon installations.
 		"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "About to check target disk for previous installations."
+		"$scriptDir"InstallLog.sh "${targetVolume}" "Preparing to check target disk for previous installations."
 		if [ ${efiPartitionExist} -ne 0 ]; then # volume has an EFI system partition
 			"$scriptDir"InstallLog.sh "${targetVolume}" "Going to check the EFI system partition also."
 			# Unmount ALL mounted volumes named EFI. Returns 0=success, 1=fail

@@ -170,7 +170,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 
 				# Check for another existing Chameleon installation on the same disk
 				"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
-				"$scriptDir"InstallLog.sh "${targetVolume}" "About to check target disk for previous installations."
+				"$scriptDir"InstallLog.sh "${targetVolume}" "Preparing to check target disk for previous installations."
 				"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			fi	
 

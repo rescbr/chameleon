@@ -37,11 +37,11 @@ if [ ${efiPartitionExist} = 1 ]; then
 
 	# Mount '/Volumes/EFI' using the correct format type
 	if [ "$( fstyp "${targetDisk}"s1 | grep hfs )" ]; then
-		"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI"
+		"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI."
 		mount_hfs "${targetDisk}"s1 "/Volumes/EFI"
 	fi
 	if [ "$( fstyp "${targetDisk}"s1 | grep msdos )" ]; then
-		"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI"
+		"$scriptDir"InstallLog.sh "${installerVolume}" "Mounting ${targetDisk}s1 as /Volumes/EFI."
 		mount_msdos -u 0 -g 0 "${targetDisk}"s1 "/Volumes/EFI"
 	fi
 else
