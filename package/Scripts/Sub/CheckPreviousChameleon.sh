@@ -176,8 +176,8 @@ NOTE: and NONE of the other options.
 		fi
 		
 	done
-#else
-	#echo "DEBUG: Just one slice"
+else
+	"$scriptDir"InstallLog.sh "${installerVolume}" "Nothing to check as there's only one partition."
 fi
 
 exit 0

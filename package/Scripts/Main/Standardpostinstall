@@ -91,7 +91,7 @@ if [ ${returnValue} -ne 2 ]; then
 	# OK to proceed
 	
 	# Remember if the target volume has an EFI system partition.
-	if [ ${returnValue} -ne 0 ]; then
+	if [ ${returnValue} -ne 1 ]; then
 		efiPartitionExist=1
 	fi
 
@@ -168,32 +168,21 @@ if [ ${returnValue} -ne 2 ]; then
 		# Write the stage 2 loader to the root of the selected partition
 		"$scriptDir"WriteChameleonStage2.sh "${stage2Loader}" "${3}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
-
 		# Next we look to check for existing Chameleon installations.
-		# But as it will check /Volumes/EFI for the stage 2 loader,
-		# we need to make sure it's mounted.
-
-		# Tell the user what's going on.
 		"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "About to check your disk for previous installations"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "which involves checking the EFI system partition if"
-		"$scriptDir"InstallLog.sh "${targetVolume}" "appropriate for this disk."
-
-		# Unmount ALL mounted volumes named EFI.
-		# Returns 0=success, 1=fail
-		"$scriptDir"UnMountEFIvolumes.sh "${targetVolume}" "${scriptDir}"
-		returnValue=$?
-		if [ ${returnValue} = 0 ]; then
-			# OK to proceed
-
-			if [ ${partitionScheme} = 1 ] || [ ${partitionScheme} = 2 ]; then
+		"$scriptDir"InstallLog.sh "${targetVolume}" "About to check target disk for previous installations."
+		if [ ${efiPartitionExist} -ne 0 ]; then # volume has an EFI system partition
+			"$scriptDir"InstallLog.sh "${targetVolume}" "Going to check the EFI system partition also."
+			# Unmount ALL mounted volumes named EFI. Returns 0=success, 1=fail
+			"$scriptDir"UnMountEFIvolumes.sh "${targetVolume}" "${scriptDir}"
+			returnValue=$?
+			if [ ${returnValue} = 0 ]; then
 				# Mount the EFI system partition
 				"$scriptDir"MountESP.sh "${targetDisk}" "${targetVolume}" "${efiPartitionExist}" "${scriptDir}"
 			fi
-
-			# Check for another existing Chameleon installation on the same disk
-			"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 		fi
+		# Check for another existing Chameleon installation on the same disk
+		"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolume}" "${scriptDir}"
 
 		# Append a line break to the installer log
 		"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"

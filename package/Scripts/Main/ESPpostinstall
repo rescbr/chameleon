@@ -103,7 +103,7 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 		# OK to proceed
 
 		# Remember if the target volume has an EFI system partition.
-		if [ ${returnValue} -ne 0 ]; then
+		if [ ${returnValue} -ne 1 ]; then
 			efiPartitionExist=1
 		fi
 
@@ -169,6 +169,8 @@ if [ ${partitiontable} = "GUID_partition_scheme" ]; then
 				"$scriptDir"WriteChameleonStage2.sh "${stage2Loader}" "${targetVolume}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 
 				# Check for another existing Chameleon installation on the same disk
+				"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+				"$scriptDir"InstallLog.sh "${targetVolume}" "About to check target disk for previous installations."
 				"$scriptDir"CheckPreviousChameleon.sh "${targetDisk}" "${targetDeviceRaw}" "${targetDevice}" "${targetVolumeChosenByUser}" "${scriptDir}"
 			fi	
 

@@ -19,7 +19,7 @@ if [ "$#" -eq 4 ]; then
 	scriptDir="$4"
 	echo "DEBUG: passed argument for targetDisk = $targetDisk"
 	echo "DEBUG: passed argument for installerVolume = $installerVolume"
-	echo "DEBUG: passed argument for installerVolume = $efiPartitionExist"
+	echo "DEBUG: passed argument for efiPartitionExist = $efiPartitionExist"
 	echo "DEBUG: passed argument for scriptDir = $scriptDir"
 else
 	echo "Error - wrong number of values passed"
