@@ -52,8 +52,7 @@ numSlices=$(( $( diskutil list | grep $( echo ${targetDisk#/dev/} ) | sed -n '$=
 # if there is more than one partition on the disk.
 # ===============================================
 if [ $numSlices -gt 1 ]; then 
-	"$scriptDir"InstallLog.sh "${installerVolume}" "LineBreak"
-	"$scriptDir"InstallLog.sh "${installerVolume}" "Checking for previous chameleon installations on ${targetDisk#/dev/}"
+	"$scriptDir"InstallLog.sh "${installerVolume}" "Checking ${targetDisk#/dev/}."
 
 	# Check the disk's MBR for existing stage 0 boot code (code from CheckDiskMicrocode.sh script)
 	stage0type=$( dd 2>/dev/null if="$targetDisk" count=3 bs=1 skip=105 | xxd | awk '{print $2$3}' )
@@ -64,6 +63,7 @@ if [ $numSlices -gt 1 ]; then
 	fi
 	
 	#Scan all partitions for Chameleon code
+	cleanRun=1
 	for (( i=1; i <= $numSlices; i++ ));
 	do
 		if [ $stage0type == 1 ] || [ $stage0type == 2 ]; then
@@ -108,7 +108,7 @@ if [ $numSlices -gt 1 ]; then
 				"$scriptDir"InstallLog.sh "${installerVolume}" "${message}"
 			fi
 			if [ $stagesFound == 3 ] && [ $i -gt $sliceNumber ]; then
-				# Exisitng installation found which will no longer be default.
+				# Existing installation found which will no longer be default.
 				message="NOTE: There is an existing Chameleon installation on $targetDiskRaw
 NOTE: but this installation on $targetDevice will be the default loader
 NOTE: because you're installing to an earlier partition on the disk."
@@ -131,8 +131,7 @@ NOTE: because you're installing to an earlier partition on the disk."
 					if [ $i -lt $sliceNumber ]; then
 						"$scriptDir"InstallLog.sh "${installerVolume}" "WARN: Conditions point to the possibility of a boot failure"
 
-						# Fix by making previous paritionboot sector un-bootable
-						# Change Byte 01FExh to 00 (510 decimal)		
+						# Fix by making previous parition bootsector un-bootable	
 						message="---
 FIX: Make ${targetDisk}s${i} boot sector un-bootable by changing byte 1FEh to 00.
 NOTE: Any Extra folder you had there will still be there. If you want to use
@@ -149,20 +148,12 @@ NOTE: and NONE of the other options.
 							diskutil unmount "${targetDisk}"s${i}
 						fi
 												
-						if [ "$( fstyp "${targetDisk}"s${i} | grep hfs )" ]; then
-							#echo "DEBUG: HFS - changing byte 1FEh to 00"
-							dd if=${targetDisk}s${i} count=2 bs=512 of=originalBootSector
-							cp originalBootSector newBootSector
-							dd if="patch" of=newBootSector bs=1 count=1 seek=510 conv=notrunc
-							dd if=newBootSector of=${targetDisk}s${i} count=2 bs=510
-						fi
-						if [ "$( fstyp "${targetDisk}"s${i} | grep msdos )" ]; then
-							#echo "DEBUG: MSDOS - changing byte 1FEh to 00"
-							dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
-							cp /tmp/originalBootSector /tmp/newBootSector
-							dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
-							dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
-						fi
+						# Change Byte 01FExh to 00 (510 decimal)
+						# Same code can be used for HFS or FAT32
+						dd if=${targetDisk}s${i} count=1 bs=512 of=/tmp/originalBootSector
+						cp /tmp/originalBootSector /tmp/newBootSector
+						dd if="$scriptDir/patch" of=/tmp/newBootSector bs=1 count=1 seek=510 conv=notrunc
+						dd if=/tmp/newBootSector of=${targetDisk}s${i} count=1 bs=512
 						
 						# /Volumes/EFI needs re-mounting so EFI/postinstall script can use it.
 						# Don't check for a GPT as wouldn't have got here if it wasn't
@@ -182,11 +173,15 @@ NOTE: and NONE of the other options.
 					#echo "DEBUG: Boot0 not found"
 				fi
 			fi
+		else
+			(( cleanRun++ ))
 		fi
-		
 	done
-#else
-	#echo "DEBUG: Just one slice"
+	if [[ $cleanRun == $i ]]; then
+		"$scriptDir"InstallLog.sh "${installerVolume}" "Nothing found that could cause any problems."
+	fi
+else
+	"$scriptDir"InstallLog.sh "${installerVolume}" "Nothing to check as there's only one partition."
 fi
 
 exit 0

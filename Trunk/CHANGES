@@ -1,3 +1,10 @@
+- Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/
+- Added Guerrero's patch on gui.c: http://forge.voodooprojects.org/p/chameleon/issues/178/
+- cparm : Ported the OS detection to the trunk, updated the default theme to v 1.1 (credit to blackosx) 
+- Added scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s,
+  disabled by default: http://forum.voodooprojects.org/index.php/topic,2158.0.html
+- Added exFAT volume label support (FAT64) support (credit to dmazar):
+  http://forum.voodooprojects.org/index.php/topic,2095.0.html
 - Added AtiPorts option to GraphicsEnabler, so users can override the default number of ports. It proved
   to be useful when used to limit the number of ports that a framebuffer registers, which seems to be a
   requirement on laptops that can only use 2 ports at the same time.

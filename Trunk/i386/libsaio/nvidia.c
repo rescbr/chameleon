@@ -748,9 +748,9 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DC5, "GeForce GTS 450" },
 	{ 0x10DE0DC6, "GeForce GTS 450" },
 	{ 0x10DE0DCA, "GF10x" },
-	// 0DD0 - 0DDF	
 	{ 0x10DE0DCD, "GeForce GT 555M" }, // ErmaC
 	{ 0x10DE0DCE, "GeForce GT 555M" }, // ErmaC
+	// 0DD0 - 0DDF	
 	{ 0x10DE0DD1, "GeForce GTX 460M" },
 	{ 0x10DE0DD2, "GeForce GT 445M" },
 	{ 0x10DE0DD3, "GeForce GT 435M" },
@@ -838,8 +838,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1057, "NVS 4200M" }, // ErmaC
 	// 1060 - 106F
 	// 1070 - 107F
-	// 1080 - 108F
 	{ 0x10DE107F, "NVIDIA GF119-ES" }, // ErmaC
+	// 1080 - 108F
 	{ 0x10DE1080, "GeForce GTX 580" },
 	{ 0x10DE1081, "GeForce GTX 570" },
 	{ 0x10DE1082, "GeForce GTX 560 Ti" },
@@ -1055,7 +1055,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							channel1 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
 							
-							if ((entries[i-1].type == 0x0))
+							if ( entries[i-1].type == 0x0 )
 							{
 								channel1 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
@@ -1074,7 +1074,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							channel2 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
 							
-							if ((entries[i - 1].type == 0x0))
+							if ( entries[i - 1].type == 0x0 )
 							{
 								channel2 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
@@ -1252,12 +1252,14 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 	}
 	
-	// Workaround for GT 420/430 & 9600M GT
+	// Workaround for 9600M GT, GT 420/430/440 & GT 525M
 	switch (nvda_dev->device_id)
 	{
+		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
+		case 0x0DE0: vram_size = 1024*1024*1024; break; // GT 440
 		case 0x0DE1: vram_size = 1024*1024*1024; break; // GT 430
 		case 0x0DE2: vram_size = 1024*1024*1024; break; // GT 420
-		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
+		case 0x0DEC: vram_size = 1024*1024*1024; break; // GT 525M
 		default: break;
 	}
 	

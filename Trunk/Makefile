@@ -100,9 +100,13 @@ endif
 	@mv ${DISTFILE}.tar.gz ${DISTFILE}.tgz
 
 clean-local:
+	@if [ -d "$(SYMROOT)/package" ];then echo "\t[RMDIR] $(SYMROOT)/package"; fi
 	@if [ -f "$(HEADER_VERSION)" ];then echo "\t[RM] $(HEADER_VERSION)"; fi
 	@if [ -f "$(SRCROOT)/revision" ];then echo "\t[RM] $(SRCROOT)/revision"; fi
-	@rm -f $(HEADER_VERSION) $(SRCROOT)/revision
+	@rm -rf "$(SYMROOT)/package" $(HEADER_VERSION) $(SRCROOT)/revision
+
+AUTOCONF_FILES = $(SRCROOT)/auto.conf    $(SRCROOT)/autoconf.h \
+				 $(SRCROOT)/autoconf.inc $(SRCROOT)/.config $(SRCROOT)/.config.old
 
 distclean-local:
 	@if [ -d "$(OBJROOT)" ];then echo "\t[RMDIR] $(OBJROOT)"; fi
@@ -111,25 +115,33 @@ distclean-local:
 	@if [ -d "$(SRCROOT)/i386/modules/module_includes" ];then \
 		echo "\t[RMDIR] $(SRCROOT)/i386/modules/module_includes"; \
 	 fi
-	@if [ -f "$(SRCROOT)/auto.conf" ];then echo "\t[RM] $(SRCROOT)/auto.conf"; fi
-	@if [ -f "$(SRCROOT)/autoconf.h" ];then echo "\t[RM] $(SRCROOT)/autoconf.h"; fi
-	@if [ -f "$(SRCROOT)/autoconf.inc" ];then echo "\t[RM] $(SRCROOT)/autoconf.inc"; fi
-
+	@for cfg in $(AUTOCONF_FILES); do if [ -f "$${cfg}" ];then echo "\t[RM] $${cfg}"; fi; done
 	@rm -rf $(OBJROOT) $(SYMROOT) $(DSTROOT)        \
             $(SRCROOT)/i386/modules/module_includes \
-            $(SRCROOT)/auto.conf                    \
-            $(SRCROOT)/autoconf.h                   \
-            $(SRCROOT)/autoconf.inc
+            $(AUTOCONF_FILES)
 
 pkg installer: all
-	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package;
-	@echo "\t[ZIP] ${DISTFILE}.pkg"
-	@ditto -c -k --sequesterRsrc ${DISTFILE}.pkg ${DISTFILE}.pkg.zip
-	@rm -r ${DISTFILE}.pkg
+	${SRCROOT}/package/buildpkg.sh ${SYMROOT}/package
 
 dmg: all
 	${SRCROOT}/package/slimpkg.sh ${SYMROOT}/package;
 	${SRCROOT}/package/builddmg.sh ${SYMROOT}/package;
+
+help:
+	@echo   'Configuration target:'
+	@echo   '  config    - Show configuration menu'
+	@echo
+	@echo   'Build targets:'
+	@echo   '  all       - Build all targets [DEFAULT]'
+	@echo   '  dist      - Build distribution tarball'
+	@echo   '  pkg       - Build installer package'
+	@echo
+	@echo   'Cleaning targets:'
+	@echo   '  clean     - Remove most generated files'
+	@echo   '  distclean - Remove all generated files + config'
+#@echo
+# @echo   'Build options:'
+# @echo   'make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
 
 .PHONY: config
 .PHONY: clean
@@ -137,3 +149,4 @@ dmg: all
 .PHONY: pkg
 .PHONY: installer
 .PHONY: dmg
+.PHONY: help

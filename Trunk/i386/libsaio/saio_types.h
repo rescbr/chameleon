@@ -191,6 +191,8 @@ struct BootVolume {
 	char			 altlabel[BVSTRLEN]; /* partition volume label */
 	bool			 filtered;		  /* newFilteredBVChain() will set to TRUE */
 	bool			 visible;		  /* will shown in the device list */
+	char			 OSVersion[8];
+	bool			 OSisServer;        /* 1 = OS X server , 0 = OS X client */
 };
 
 enum {
@@ -218,9 +220,9 @@ enum {
 	kPartitionTypeFAT16		= 0x06,
 	kPartitionTypeFAT32		= 0x0c,
 	kPartitionTypeEXT3		= 0x83,
-	kPartitionTypeBEFS    = 0xEB,
-	kPartitionTypeFreeBSD = 0xa5,
-	kPartitionTypeOpenBSD = 0xa6
+	kPartitionTypeBEFS		= 0xEB,
+	kPartitionTypeFreeBSD		= 0xa5,
+	kPartitionTypeOpenBSD		= 0xa6
 };
 
 //#define BIOS_DEV_TYPE(d)	((d) & kBIOSDevTypeMask)

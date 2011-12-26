@@ -172,7 +172,7 @@ char *
 strcpy(char * s1, const char * s2)
 {
 	register char *ret = s1;
-	while (*s1++ = *s2++)
+	while ((*s1++ = *s2++))
 		continue;
 	return ret;
 }
@@ -184,15 +184,6 @@ strncpy(char * s1, const char * s2, size_t n)
 	while (n && (*s1++ = *s2++))
 		n--;
 	return ret;
-}
-
-size_t
-strlcpy(char * s1, const char * s2, size_t n)
-{
-	while (n && (*s1++ = *s2++))
-		n--;
-	if (!n) *--s1=0;
-	return strlen(s2);
 }
 
 char *
