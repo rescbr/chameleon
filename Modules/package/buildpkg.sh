@@ -117,7 +117,7 @@ main ()
     cp -f ${pkgroot}/Scripts/Sub/InstallLog.sh ${1}/${choiceId}/Scripts
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     addChoice "${choiceId}"  "start_visible=\"false\" start_selected=\"true\""  "$packageRefId"
 # End build pre install package
 
@@ -140,7 +140,7 @@ main ()
     ditto --noextattr --noqtn ${1%/*}/i386/bdmesg   ${1}/${choiceId}/Root/usr/local/bin
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     addChoice "${choiceId}"  "start_visible=\"false\" start_selected=\"true\""  "$packageRefId"
 # End build core package
 
@@ -158,7 +158,7 @@ main ()
     echo "" > "${1}/${choiceId}/Root/install_type_new"
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" # >/dev/null 2>&1
     exclusiveChoice=$(exclusive_one_choice "$choiceId" "$allChoices")
     addChoice "${choiceId}"  "start_selected=\"!choices['Upgrade'].selected\" selected=\"${exclusiveChoice}\""  "$packageRefId"
     # End build new install package
@@ -169,7 +169,7 @@ main ()
     echo "" > "${1}/${choiceId}/Root/install_type_upgrade"
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" # >/dev/null 2>&1
     exclusiveChoice=$(exclusive_one_choice "$choiceId" "$allChoices")
     addChoice "${choiceId}"  "start_selected=\"chameleon_boot_plist_exists()\" selected=\"${exclusiveChoice}\""  "$packageRefId"
     # End build upgrade package
@@ -195,7 +195,7 @@ main ()
     ditto --arch i386 `which SetFile` ${1}/${choiceId}/Scripts/Resources/SetFile
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     exclusiveChoice=$(exclusive_one_choice "$choiceId" "$allChoices")
     addChoice "${choiceId}"  "start_selected=\"true\" selected=\"${exclusiveChoice}\""  "$packageRefId"
     # End build standard package
@@ -209,7 +209,7 @@ main ()
     ditto --arch i386 `which SetFile` ${1}/${choiceId}/Scripts/Resources/SetFile
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     exclusiveChoice=$(exclusive_one_choice "$choiceId" "$allChoices")
     addChoice "${choiceId}"  "start_visible=\"systemHasGPT()\" start_selected=\"false\" selected=\"${exclusiveChoice}\""  "$packageRefId"
     # End build efi package
@@ -219,7 +219,7 @@ main ()
     mkdir -p ${1}/${choiceId}/Root
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     exclusiveChoice=$(exclusive_one_choice "$choiceId" "$allChoices")
     addChoice "${choiceId}"  "start_selected=\"false\" selected=\"${exclusiveChoice}\""  "$packageRefId"
     # End build no bootloader choice package
@@ -257,7 +257,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/${choiceId}.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build klibc package module
         }
@@ -272,7 +272,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/uClibcxx.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             # Add the klibc package because the uClibc module is dependent of klibc module
             addChoice "${choiceId}"  "start_selected=\"false\""  \
              "$packageRefId" $(getPackageRefId "${modules_packages_identity}" "klibc")
@@ -289,7 +289,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build Resolution package module
         }
@@ -317,7 +317,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/cham-mklayout ${1}/${choiceId}/Root/usr/local/bin
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp" # >/dev/null 2>&1
 
             # Don't add a choice for Keylayout module
             # addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
@@ -335,7 +335,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/AMDGraphicsEnabler.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build AMDGraphicsEnabler package module
         }
@@ -351,7 +351,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/ATiGraphicsEnabler.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build ATiGraphicsEnabler package module
         }
@@ -367,7 +367,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/IntelGraphicsEnabler.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build IntelGraphicsEnabler package module
         }
@@ -383,7 +383,7 @@ main ()
             ditto --noextattr --noqtn ${1%/*}/i386/modules/NVIDIAGraphicsEnabler.dylib ${1}/${choiceId}/Root
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/Extra/modules" # >/dev/null 2>&1
             addChoice "${choiceId}"  "start_selected=\"false\""  "$packageRefId"
             # End build NVIDIAGraphicsEnabler package module
         }
@@ -461,7 +461,7 @@ main ()
 
 			echo -e "\t[BUILD] ${optionName} "
 			packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
-			buildpackage "$packageRefId" "${optionName}" "${1}/${optionName}" "/$chamTemp/options" >/dev/null 2>&1
+			buildpackage "$packageRefId" "${optionName}" "${1}/${optionName}" "/$chamTemp/options" # >/dev/null 2>&1
 			exclusiveSelect=""
 			if [[ ${exclusiveFlag} -eq 1 ]];then
 				exclusiveSelect="selected=\"$(exclusive_zero_or_one_choice "$optionName" "$allChoices")\""
@@ -500,7 +500,7 @@ main ()
 
 		echo -e "\t[BUILD] ${choiceId} "
 		packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-		buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/options" >/dev/null 2>&1
+		buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/$chamTemp/options" # >/dev/null 2>&1
 		exclusiveChoice=$(exclusive_zero_or_one_choice "$choiceId" "$allChoices")
 		# Add the Keylayout package because the Keylayout module is needed
 		addChoice "${choiceId}"  "start_selected=\"false\" selected=\"${exclusiveChoice}\""  \
@@ -533,7 +533,7 @@ main ()
 		rsync -r --exclude=.svn "${themes[$i]}/" "${1}/${theme}/Root/${theme}"
 		echo -e "\t[BUILD] ${theme}"
 		packageRefId=$(getPackageRefId "${packagesidentity}" "${theme}")
-		buildpackage "$packageRefId" "${theme}" "${1}/${theme}" "/$chamTemp/Extra/Themes" >/dev/null 2>&1
+		buildpackage "$packageRefId" "${theme}" "${1}/${theme}" "/$chamTemp/Extra/Themes" # >/dev/null 2>&1
 		addChoice "${theme}"  "start_selected=\"false\""  "$packageRefId"
 	done
 
@@ -554,7 +554,7 @@ main ()
     ditto --noextattr --noqtn ${1%/*/*}/version ${1}/${choiceId}/Scripts/Resources/version
     echo -e "\t[BUILD] ${choiceId} "
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${1}/${choiceId}" "/" # >/dev/null 2>&1
     addChoice "${choiceId}"  "start_visible=\"false\" start_selected=\"true\""  "$packageRefId"
 # End build post install package
 

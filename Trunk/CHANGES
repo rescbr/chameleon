@@ -5,6 +5,11 @@
   disabled by default: http://forum.voodooprojects.org/index.php/topic,2158.0.html
 - Added exFAT volume label support (FAT64) support (credit to dmazar):
   http://forum.voodooprojects.org/index.php/topic,2095.0.html
+- disableIRQs() http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
+  Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
+  The ACPI specification dictates that the 8259 (PC-AT compatible) vectors
+  must be disabled (that is, masked) when enabling the ACPI APIC operation
+  but this isn't done (apparently) on all mobo's and thus we do that here.
 - Added AtiPorts option to GraphicsEnabler, so users can override the default number of ports. It proved
   to be useful when used to limit the number of ports that a framebuffer registers, which seems to be a
   requirement on laptops that can only use 2 ports at the same time.
