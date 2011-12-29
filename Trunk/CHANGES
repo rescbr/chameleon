@@ -1,3 +1,4 @@
+- cparm : Fixed naming convention for raid hfs devices in gui
 - Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/
 - Added Guerrero's patch on gui.c: http://forge.voodooprojects.org/p/chameleon/issues/178/
 - cparm : Ported the OS detection to the trunk, updated the default theme to v 1.1 (credit to blackosx) 

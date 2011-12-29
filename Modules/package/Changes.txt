@@ -1,3 +1,9 @@
+- JrCs - Make selection of keymaps a specific menu to avoid polluting chameleon and kernel options menu
+- JrCs - Use configuration to know which modules to add to the generated meta-package
+- JrCs - Declare some variables read-only
+- JrCs - Make the script more robust against errors
+- JrCs - Replace misleading variables
+
 - Change Localizable.strings to match the recent changes to the install process.
 
 - Improve messages written to the installation log.
