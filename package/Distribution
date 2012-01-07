@@ -15,6 +15,16 @@
 
     <script>
 
+    var bootPlist = null;
+    if (my.target) {
+        var boot_plist_filenames = new Array( 'org.chameleon.Boot.plist', 'com.apple.Boot.plist' );
+        for ( var i = 0; i &lt; boot_plist_filenames.length; i++ ) {
+            bootPlist = system.files.plistAtPath( my.target.mountpoint + '/Extra/' + boot_plist_filenames[i] );
+            if (bootPlist)
+                break;
+        }
+    }
+
     function installCheckScript() {
         var obj = system.ioregistry.matchingClass("AppleSMC");
         if (obj) {
@@ -39,22 +49,8 @@
         return false;
     }
 
-    function get_chameleon_boot_plist() {
-        if (my.target) {
-            var boot_plist_filenames = new Array( 'org.chameleon.Boot.plist', 'com.apple.Boot.plist' );
-            for ( var i = 0; i &lt; boot_plist_filenames.length; i++ ) {
-                var plist = system.files.plistAtPath( my.target.mountpoint + '/Extra/' + boot_plist_filenames[i] );
-                if (plist)
-                   return plist;
-            }
-        }
-        return null;
-    }
-
     function chameleon_boot_plist_exists() {
-        if (get_chameleon_boot_plist() != null)
-            return true;
-        return false;
+        return bootPlist ? true : false;
     }
 
     function check_chameleon_kernel_option(kernelFlags, value) {
@@ -67,25 +63,17 @@
     }
 
     function check_chameleon_option(key, value) {
-        var bootPlist = get_chameleon_boot_plist();
-        if (bootPlist) {
-            if (key == "KFflag")
-                key = "Kernel Flags";
+        if ( bootPlist &amp;&amp; bootPlist[ key ] ) {
+            if ( key == "Kernel Flags" )
+                return check_chameleon_kernel_option( bootPlist[ key ], value );
 
-            if (bootPlist[ key ]) {
-                if ( key == "Kernel Flags" )
-                    return check_chameleon_kernel_option( bootPlist[ key ], value );
-
-                // Check if value is a boolean
-                var pattern=/^(Y(es)?|No?)$/i;
-                var result = value.match(pattern); // Check if the value is a boolean
-                if ( result &amp;&amp; bootPlist[ key ].charAt(0).toLowerCase() == value.charAt(0).toLowerCase() )
-                    return true;
-                else
-                    return bootPlist[ key ] == value; // check if the strings are equal
-            }
+            // Check if value is a boolean
+            var pattern=/^(Y(es)?|No?)$/i;
+            var result = value.match(pattern); // Check if the value is a boolean
+            if ( result &amp;&amp; bootPlist[ key ].charAt(0).toLowerCase() == value.charAt(0).toLowerCase() )
+                return true;
             else
-                return false;
+                return bootPlist[ key ] == value; // check if the strings are equal
         }
         return false;
     }
