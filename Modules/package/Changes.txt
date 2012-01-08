@@ -1,8 +1,12 @@
-- JrCs - Make selection of keymaps a specific menu to avoid polluting chameleon and kernel options menu
-- JrCs - Use configuration to know which modules to add to the generated meta-package
-- JrCs - Declare some variables read-only
-- JrCs - Make the script more robust against errors
-- JrCs - Replace misleading variables
+- JrCs - Look for a com.apple.Boot.plist file for users upgrading from legacy installations
+
+- Only create Chameleon.Backups and write to the install log, if required.
+
+- JrCs - Improved backup of chameleon files
+
+- JrCs - Automaticaly select previous options
+
+- JrCs - Improved buildpkg script - Simplify the construction of options menu - Add a lot of checks to avoid the construction of a bad XML file
 
 - Change Localizable.strings to match the recent changes to the install process.
 

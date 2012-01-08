@@ -499,7 +499,7 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6899,	0xE140174B, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		, 0 },
 
-	{ 0x6899,	0xE174174B, CHIP_FAMILY_CYPRESS,	"ATI Sapphire Radeon HD 5850",				kUakari		, 0 },
+	{ 0x6899,	0xE174174B, CHIP_FAMILY_CYPRESS,	"ATI Sapphire Radeon HD 5850",			kUakari		, 0 },
 
 	{ 0x6899,	0x200A1787, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		, 0 },
 	{ 0x6899,	0x22901787, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		, 0 },
@@ -534,7 +534,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68B8,	0x200B1787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		, 0 },
 	{ 0x68B8,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		, 0 },
 
-	{ 0x68BE,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5750",			kVervet		, 0 }, // ErmaC
+	{ 0x68BE,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5750",				kVervet		, 0 }, // ErmaC
 
 	{ 0x68BF,	0x220E1458, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750",				kVervet		, 0 },
 
@@ -592,9 +592,9 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x68E1,	0x1426103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	, 0 },
 
-	{ 0x68F9,	0x010E1002, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur		, 0 }, // ErmaC
+	{ 0x68F9,	0x010E1002, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	, 0 }, // ErmaC
 
-	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ASUS EAH5450",                     kEulemur		, 0 }, // ErmaC
+	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ASUS EAH5450",                     		kEulemur	, 0 }, // ErmaC
 
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		, 0 },
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		, 0 },
@@ -664,6 +664,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		, 0 },
 
+	{ 0x6741,	0x358D103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M/6650M/6750M",		kNull		, 0 }, // ErmaC
+
 	{ 0x6741,	0x9080104D, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M",				kNull		, 0 },
 
 	{ 0x6758,	0x67581002, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",				kBulrushes	, 0 },
@@ -681,6 +683,7 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6760,	0x04CC1028, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6490M",				kNull		, 0 },
 
+	{ 0x6760,	0x11790003, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450M",				kNull		, 0 }, // ErmaC
 	{ 0x6760,	0x165A103C, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6470M",				kNull		, 0 },
 	{ 0x6760,	0x167D103C, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6470M",				kNull		, 0 }, // ErmaC
 
@@ -760,8 +763,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x689E,	0x00000000, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5800 Series",			kUakari		, 0 },
 
 	{ 0x68A0,	0x00000000, CHIP_FAMILY_BROADWAY,	"ATI Mobility Radeon HD 5800 Series",	kNomascus		, 0 }, // ErmaC
-	{ 0x68A1,	0x00000000, CHIP_FAMILY_BROADWAY,	"ATI Mobility Radeon HD 5800 Series",	kNull		, 0 }, // ErmaC
-	{ 0x68B0,	0x00000000, CHIP_FAMILY_BROADWAY,	"ATI Mobility Radeon HD 5800 Series",	kNull		, 0 }, // ErmaC
+	{ 0x68A1,	0x00000000, CHIP_FAMILY_BROADWAY,	"ATI Mobility Radeon HD 5800 Series",	kNull			, 0 }, // ErmaC
+	{ 0x68B0,	0x00000000, CHIP_FAMILY_BROADWAY,	"ATI Mobility Radeon HD 5800 Series",	kNull			, 0 }, // ErmaC
 
 	{ 0x68B8,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5700 Series",			kVervet		, 0 },
 	{ 0x68B9,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5600 Series",			kVervet		, 0 },
@@ -771,6 +774,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68D8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5600 Series",			kBaboon		, 0 },
 	{ 0x68D9,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5500 Series",			kBaboon		, 0 },
 	{ 0x68DA,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5500 Series",			kBaboon		, 0 },
+
+	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6370M Series",			kNull		, 0 },
 
 	{ 0x68F9,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5400 Series",			kNull		, 0 },
 
