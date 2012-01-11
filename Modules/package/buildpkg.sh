@@ -170,11 +170,9 @@ $chameleonSubsts
 $ownSubst"
 
     for file in "$@";do
-        if [[ ! $file == *.svn* ]]; then
-            cp -pf "$file" "${file}.in"
-            sed "$allSubst" "${file}.in" > "${file}"
-            rm -f "${file}.in"
-        fi
+        cp -pf "$file" "${file}.in"
+        sed "$allSubst" "${file}.in" > "${file}"
+        rm -f "${file}.in"
     done
 }
 
@@ -407,7 +405,7 @@ main ()
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" ${choiceId}
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
 # End build pre install package
 
@@ -430,7 +428,7 @@ main ()
     ditto --noextattr --noqtn ${SYMROOT}/i386/bdmesg   ${PKG_BUILD_DIR}/${choiceId}/Root/usr/local/bin
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice --start-visible="false" --start-selected="true" --pkg-refs="$packageRefId" "${choiceId}"
 # End build core package
 
@@ -445,7 +443,7 @@ main ()
     echo "" > "${PKG_BUILD_DIR}/${choiceId}/Root/install_type_new"
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp"
     addChoice  --group="InstallType"  --start-selected="!choices['Upgrade'].selected"  --pkg-refs="$packageRefId" "${choiceId}"
     # End build new install package
 
@@ -455,7 +453,7 @@ main ()
     echo "" > "${PKG_BUILD_DIR}/${choiceId}/Root/install_type_upgrade"
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp"
     addChoice --group="InstallType"  --start-selected="chameleon_boot_plist_exists()"  --pkg-refs="$packageRefId" "${choiceId}"
     # End build upgrade package
 
@@ -475,7 +473,7 @@ main ()
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice --group="Chameleon"  --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
     # End build standard package
 
@@ -489,7 +487,7 @@ main ()
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice --group="Chameleon"  --start-visible="systemHasGPT()" --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
     # End build efi package
 
@@ -498,7 +496,7 @@ main ()
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice --group="Chameleon"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
     # End build no bootloader choice package
 
@@ -532,7 +530,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/${choiceId}.dylib" ${PKG_BUILD_DIR}/${choiceId}/Root
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build klibc package module
         }
@@ -552,7 +550,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/uClibcxx.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             # Add the klibc package because the uClibc module is dependent of klibc module
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId $klibcPackageRefId" "${choiceId}"
             # End build uClibc package module
@@ -568,7 +566,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/Resolution.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build Resolution package module
         }
@@ -596,7 +594,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn ${SYMROOT}/i386/cham-mklayout ${PKG_BUILD_DIR}/${choiceId}/Root/usr/local/bin
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp"
 
             # Don't add a choice for Keylayout module
             # addChoice "${choiceId}" "Module" --start-selected="false"  "$packageRefId"
@@ -614,7 +612,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/AMDGraphicsEnabler.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build AMDGraphicsEnabler package module
         }
@@ -625,12 +623,12 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
         if [[ "${CONFIG_ATIGRAPHICSENABLER_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/ATiGraphicsEnabler.dylib" ]]; then
         {
             # Start build ATiGraphicsEnabler package module
-            choiceId="AMDGraphicsEnabler"
+            choiceId="ATiGraphicsEnabler"
             mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/ATiGraphicsEnabler.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build ATiGraphicsEnabler package module
         }
@@ -646,7 +644,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/IntelGraphicsEnabler.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build IntelGraphicsEnabler package module
         }
@@ -662,7 +660,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             ditto --noextattr --noqtn "${SYMROOT}/i386/modules/NVIDIAGraphicsEnabler.dylib" "${PKG_BUILD_DIR}/${choiceId}/Root"
             echo -e "\t[BUILD] ${choiceId} "
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/Extra/modules"
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
             # End build NVIDIAGraphicsEnabler package module
         }
@@ -735,7 +733,7 @@ fi
             echo "" > "${PKG_BUILD_DIR}/$optionName/Root/${keyValue}"
 
             packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
-            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/$chamTemp/options" >/dev/null 2>&1
+            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/$chamTemp/options"
             addChoice --group="${builtOptionsList}"  \
                 --start-selected="check_chameleon_option('$key','$value')" \
                 --pkg-refs="$packageRefId" "${optionName}"
@@ -772,7 +770,7 @@ if [[ -n "${CONFIG_KEYLAYOUT_MODULE}" ]];then
         echo "" > "${PKG_BUILD_DIR}/${choiceId}/Root/${chameleon_keylayout_key}=${availableOptions[i]}"
 
         packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-        buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/options" >/dev/null 2>&1
+        buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/$chamTemp/options"
         # Add the Keylayout package because the Keylayout module is needed
         addChoice --group="KeyLayout"  \
             --start-selected="check_chameleon_option('${chameleon_keylayout_key}','${choiceId}')" \
@@ -796,7 +794,7 @@ fi
         rsync -r --exclude=.svn --exclude="*~" "${themes[$i]}/" "${PKG_BUILD_DIR}/${theme}/Root/${theme}"
 
         packageRefId=$(getPackageRefId "${packagesidentity}" "${theme}")
-        buildpackage "$packageRefId" "${theme}" "${PKG_BUILD_DIR}/${theme}" "/$chamTemp/Extra/Themes" >/dev/null 2>&1
+        buildpackage "$packageRefId" "${theme}" "${PKG_BUILD_DIR}/${theme}" "/$chamTemp/Extra/Themes"
         addChoice --group="Themes"  --start-selected="false"  --pkg-refs="$packageRefId" "${theme}"
     done
 # End build theme packages# End build Extras package
@@ -810,7 +808,7 @@ fi
     cp -f ${PKGROOT}/Scripts/Sub/UnMountEFIvolumes.sh ${PKG_BUILD_DIR}/${choiceId}/Scripts
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
-    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/" >/dev/null 2>&1
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice  --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
 # End build post install package
 
