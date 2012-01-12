@@ -1,3 +1,7 @@
+- ErmaC - Update Language for whobuild resources.
+
+- JrCs - Improved Installer - Start using template scripts
+
 - JrCs - Look for a com.apple.Boot.plist file for users upgrading from legacy installations
 
 - Only create Chameleon.Backups and write to the install log, if required.
