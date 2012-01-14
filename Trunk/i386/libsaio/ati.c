@@ -530,6 +530,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68BE,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5750",			kVervet		}, // ErmaC
 
 	{ 0x68BF,	0x220E1458, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750",				kVervet		},
+	{ 0x68BF,	0x31401682, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750",				kVervet		}, // ErmaC
 
 	{ 0x68C0,	0x1594103C, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M",				kNull		},
 
