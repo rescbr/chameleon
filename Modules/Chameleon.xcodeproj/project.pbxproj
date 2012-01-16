@@ -994,15 +994,15 @@
 		A360AA7D14136C1A00084D3F /* Make.rules */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Make.rules; sourceTree = "<group>"; };
 		A37D7D4A141B7C6F0069C38B /* background.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = background.tiff; sourceTree = "<group>"; };
 		A37D7D4C141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = de; path = de.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
-		A37D7D4E141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/Description.html; sourceTree = "<group>"; };
-		A37D7D50141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = de; path = de.lproj/License.rtf; sourceTree = "<group>"; };
+		A37D7D4E141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = en; path = en.lproj/Description.html; sourceTree = "<group>"; };
+		A37D7D50141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/License.rtf; sourceTree = "<group>"; };
 		A37D7D52141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A37D7D54141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = de; path = de.lproj/Welcome.rtfd; sourceTree = "<group>"; };
+		A37D7D54141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = en; path = en.lproj/Welcome.rtfd; sourceTree = "<group>"; };
 		A37D7D55141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = en; path = en.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
-		A37D7D56141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = en; path = en.lproj/Description.html; sourceTree = "<group>"; };
-		A37D7D57141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/License.rtf; sourceTree = "<group>"; };
+		A37D7D56141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/Description.html; sourceTree = "<group>"; };
+		A37D7D57141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = de; path = de.lproj/License.rtf; sourceTree = "<group>"; };
 		A37D7D58141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A37D7D59141B7C6F0069C38B /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = en; path = en.lproj/Welcome.rtfd; sourceTree = "<group>"; };
+		A37D7D59141B7C6F0069C38B /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = de; path = de.lproj/Welcome.rtfd; sourceTree = "<group>"; };
 		A37D7D5A141B7C6F0069C38B /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = es; path = es.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
 		A37D7D5B141B7C6F0069C38B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = es; path = es.lproj/Description.html; sourceTree = "<group>"; };
 		A37D7D5C141B7C6F0069C38B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = es; path = es.lproj/License.rtf; sourceTree = "<group>"; };
@@ -1244,7 +1244,7 @@
 		B40054E714C0ED3800B6D4CC /* tr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = tr; path = tr.lproj/Welcome.rtfd; sourceTree = "<group>"; };
 		B40054E814C0ED3800B6D4CC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = tr; path = tr.lproj/Description.html; sourceTree = "<group>"; };
 		B40054E914C0ED3800B6D4CC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		B40054EA14C0ED3800B6D4CC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = tr; path =tr.lproj/License.rtf; sourceTree = "<group>"; };
+		B40054EA14C0ED3800B6D4CC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = tr; path = tr.lproj/License.rtf; sourceTree = "<group>"; };
 		B40054EC14C0ED4600B6D4CC /* sk */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = sk; path = sk.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
 		B40054ED14C0ED4600B6D4CC /* sk */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = sk; path = sk.lproj/Welcome.rtfd; sourceTree = "<group>"; };
 		B40054EE14C0ED4600B6D4CC /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = sk; path = sk.lproj/Description.html; sourceTree = "<group>"; };
@@ -1323,7 +1323,7 @@
 		B4189A5114BFC2F700ED5B0B /* nvidia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nvidia.h; path = NVIDIAGraphicsEnabler/nvidia.h; sourceTree = "<group>"; };
 		B4189A5214BFC2F700ED5B0B /* NVIDIAGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = NVIDIAGraphicsEnabler.c; path = NVIDIAGraphicsEnabler/NVIDIAGraphicsEnabler.c; sourceTree = "<group>"; };
 		B4189A5314BFC2F700ED5B0B /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Readme.txt; path = NVIDIAGraphicsEnabler/Readme.txt; sourceTree = "<group>"; };
-		B4189A5714BFC39700ED5B0B /* GraphicsEnablerModules.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GraphicsEnablerModules.txt; path = GraphicsEnablerModules.txt; sourceTree = "<group>"; };
+		B4189A5714BFC39700ED5B0B /* GraphicsEnablerModules.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GraphicsEnablerModules.txt; sourceTree = "<group>"; };
 		B442B8C514BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ar; path = ar.lproj/License.rtf; sourceTree = "<group>"; };
 		B442B8C614BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = ar; path = ar.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
 		B442B8C714BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/Description.html; sourceTree = "<group>"; };
@@ -1439,6 +1439,10 @@
 		B45C10A214BE7413006AA075 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = hr; path = hr.lproj/License.rtf; sourceTree = "<group>"; };
 		B45C10A314BE7413006AA075 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B45C10A414BE7413006AA075 /* hr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = hr; path = hr.lproj/Welcome.rtfd; sourceTree = "<group>"; };
+		B4AABE5914C3B8B90055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
+		B4AABE5B14C3B8C70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
+		B4AABE5D14C3B8D70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
+		B4AABE5E14C3B8EF0055ECD1 /* clean_bootplist.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = clean_bootplist.pl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1492,7 +1496,10 @@
 		364E0DDF14BCFB6600F55E58 /* Scripts.templates */ = {
 			isa = PBXGroup;
 			children = (
+				B4AABE5814C3B8B90055ECD1 /* AddOption */,
 				364E0DE114BCFB7A00F55E58 /* InstallerLog */,
+				B4AABE5A14C3B8C70055ECD1 /* InstallModule */,
+				B4AABE5C14C3B8D70055ECD1 /* InstallTheme */,
 				364E0DE314BCFB7A00F55E58 /* Post */,
 				364E0DE514BCFB7A00F55E58 /* Pre */,
 			);
@@ -1520,6 +1527,7 @@
 		364E0DE514BCFB7A00F55E58 /* Pre */ = {
 			isa = PBXGroup;
 			children = (
+				B4AABE5E14C3B8EF0055ECD1 /* clean_bootplist.pl */,
 				36AB75E414BD092D005B8045 /* preinstall */,
 			);
 			name = Pre;
@@ -3577,6 +3585,33 @@
 			name = lxdialog;
 			sourceTree = "<group>";
 		};
+		B4AABE5814C3B8B90055ECD1 /* AddOption */ = {
+			isa = PBXGroup;
+			children = (
+				B4AABE5914C3B8B90055ECD1 /* postinstall */,
+			);
+			name = AddOption;
+			path = Scripts.templates/AddOption;
+			sourceTree = "<group>";
+		};
+		B4AABE5A14C3B8C70055ECD1 /* InstallModule */ = {
+			isa = PBXGroup;
+			children = (
+				B4AABE5B14C3B8C70055ECD1 /* postinstall */,
+			);
+			name = InstallModule;
+			path = Scripts.templates/InstallModule;
+			sourceTree = "<group>";
+		};
+		B4AABE5C14C3B8D70055ECD1 /* InstallTheme */ = {
+			isa = PBXGroup;
+			children = (
+				B4AABE5D14C3B8D70055ECD1 /* postinstall */,
+			);
+			name = InstallTheme;
+			path = Scripts.templates/InstallTheme;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
@@ -3702,8 +3737,8 @@
 		A37D7D4D141B7C6F0069C38B /* Description.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A37D7D4E141B7C6F0069C38B /* de */,
-				A37D7D56141B7C6F0069C38B /* en */,
+				A37D7D4E141B7C6F0069C38B /* en */,
+				A37D7D56141B7C6F0069C38B /* de */,
 				A37D7D5B141B7C6F0069C38B /* es */,
 				A37D7D60141B7C6F0069C38B /* fr */,
 				A37D7D6A141B7C6F0069C38B /* id */,
@@ -3746,8 +3781,8 @@
 		A37D7D4F141B7C6F0069C38B /* License.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A37D7D50141B7C6F0069C38B /* de */,
-				A37D7D57141B7C6F0069C38B /* en */,
+				A37D7D50141B7C6F0069C38B /* en */,
+				A37D7D57141B7C6F0069C38B /* de */,
 				A37D7D5C141B7C6F0069C38B /* es */,
 				A37D7D61141B7C6F0069C38B /* fr */,
 				A37D7D6B141B7C6F0069C38B /* id */,
@@ -3834,8 +3869,8 @@
 		A37D7D53141B7C6F0069C38B /* Welcome.rtfd */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A37D7D54141B7C6F0069C38B /* de */,
-				A37D7D59141B7C6F0069C38B /* en */,
+				A37D7D54141B7C6F0069C38B /* en */,
+				A37D7D59141B7C6F0069C38B /* de */,
 				A37D7D5E141B7C6F0069C38B /* es */,
 				A37D7D63141B7C6F0069C38B /* fr */,
 				A37D7D6D141B7C6F0069C38B /* id */,

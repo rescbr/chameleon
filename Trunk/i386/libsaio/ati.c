@@ -658,6 +658,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		},
 
+	{ 0x6741,	0x1688103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 7690M",				kNull		}, // ErmaC
+
 	{ 0x6741,	0x358D103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M/6650M/6750M",	kNull		}, // ErmaC
 
     { 0x6741,	0x9080104D, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M",				kNull		},
