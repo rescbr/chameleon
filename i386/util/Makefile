@@ -18,7 +18,7 @@ LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
 
-PROGRAMS = machOconv bdmesg
+PROGRAMS = machOconv bdmesg amlsgn
 
 OUTFILES = $(PROGRAMS)
 

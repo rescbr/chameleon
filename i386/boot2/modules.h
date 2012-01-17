@@ -91,11 +91,11 @@ unsigned int handle_symtable(UInt32 base,
 							 struct symtab_command* symtabCommand,
 							 long long(*symbol_handler)(char*, long long, char),
 							 char is64);
-							 
+
 unsigned int lookup_all_symbols(const char* name);
 
 EFI_STATUS replace_function(const char* symbol, void* newAddress);
 
-extern unsigned int (*lookup_symbol)(const char*);
+extern unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*));
 
 #endif /* __BOOT_MODULES_H */

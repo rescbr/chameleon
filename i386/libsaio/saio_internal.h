@@ -27,6 +27,10 @@
 
 #include "saio_types.h"
 
+/* arc4random.c */
+extern void   arc4rand(void *ptr, u_int len, int reseed);
+extern uint32_t  arc4random(void);
+
 /* asm.s */
 extern void   real_to_prot(void);
 extern void   prot_to_real(void);
@@ -101,6 +105,7 @@ extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
 extern int    verbose(const char *format, ...);
 extern void   stop(const char *format, ...);
+extern char * newStringWithFormat(const char * fmt, ...);
 
 /* disk.c */
 extern void rescanBIOSDevice(int biosdev);
@@ -122,11 +127,11 @@ extern int	  testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buf
 
 /* hfs_compare.c */
 extern int32_t FastUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1,
-							   u_int16_t *uniStr2, u_int32_t len2, int byte_order);
+								  u_int16_t *uniStr2, u_int32_t len2, int byte_order);
 extern void utf_encodestr( const u_int16_t * ucsp, int ucslen,
-                u_int8_t * utf8p, u_int32_t bufsize, int byte_order );
+						  u_int8_t * utf8p, u_int32_t bufsize, int byte_order );
 extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp,
-                u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
+						  u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
 
 /* load.c */
 extern bool   gHaveKernelCache;
@@ -184,6 +189,9 @@ extern int    loadHelperConfig(config_file_t *configBuff);
 #endif
 extern int    loadOverrideConfig(config_file_t *configBuff);
 extern char * newString(const char *oldString);
+extern char * newEmptyStringWithLength(int len);
+extern char * newStringWithLength(const char * oldString, int len);
+
 extern char * getNextArg(char ** ptr, char * val);
 extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
 

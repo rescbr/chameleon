@@ -68,11 +68,11 @@ struct putc_info {
 void sputc(int c, struct putc_info * pi)
 {
 	if (pi->last_str)
-	if (pi->str == pi->last_str)
-	{
-		*(pi->str) = '\0';
-		return;
-	}
+		if (pi->str == pi->last_str)
+		{
+			*(pi->str) = '\0';
+			return;
+		}
 	*(pi->str)++ = c;
 }
 
@@ -87,13 +87,13 @@ void msglog(const char * fmt, ...)
 {
 	va_list ap;
 	struct putc_info pi;
-
+	
 	if (!msgbuf)
 		return;
-
+	
 	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 		return;
-
+	
 	va_start(ap, fmt);
 	pi.str = cursor;
 	pi.last_str = 0;
@@ -106,7 +106,7 @@ void setupBooterLog(void)
 {
 	if (!msgbuf)
 		return;
-
+	
 	Node *node = DT__FindNode("/", false);
 	if (node)
 		DT__AddProperty(node, "boot-log", strlen((char *)msgbuf) + 1, msgbuf);
@@ -124,20 +124,18 @@ void putchar(int c)
 		for (c = 0; c < 8; c++) putc(' ');
 		return;
 	}
-
+	
 	if ( c == '\n' )
     {
 		putc('\r');
     }
-
+	
 	putc(c);
 }
 
 int getc()
 {	
-    int c = bgetc();		
-	
-	//execute_hook("Keymapper", &c, NULL, NULL, NULL, NULL, NULL);	
+    int c = bgetc();	
 	
     if ((c & 0xff) == 0) 		
         return c;
@@ -151,9 +149,9 @@ int getc()
 int getchar()
 {
 	register int c = getc();
-
+	
 	if ( c == '\r' ) c = '\n';
-
+	
 	if ( c >= ' ' && c < 0x7f) putchar(c);
 	
 	return (c);
@@ -163,16 +161,16 @@ int printf(const char * fmt, ...)
 {
     va_list ap;
 	va_start(ap, fmt);
-
+	
 	prf(fmt, ap, putchar, 0);
 	
 	{
-	/* Kabyl: BooterLog */
+		/* Kabyl: BooterLog */
 		struct putc_info pi;
-
+		
 		if (!msgbuf)
 			return 0;
-
+		
 		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 			return 0;
 		pi.str = cursor;
@@ -180,7 +178,7 @@ int printf(const char * fmt, ...)
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
-
+	
 	va_end(ap);
     return 0;
 }
@@ -194,14 +192,14 @@ int verbose(const char * fmt, ...)
     {
 		prf(fmt, ap, putchar, 0);
     }
-
+	
 	{
-	/* Kabyl: BooterLog */
+		/* Kabyl: BooterLog */
 		struct putc_info pi;
-
+		
 		if (!msgbuf)
 			return 0;
-
+		
 		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 			return 0;
 		pi.str = cursor;
@@ -209,7 +207,7 @@ int verbose(const char * fmt, ...)
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
-
+	
     va_end(ap);
     return(0);
 }
@@ -219,7 +217,7 @@ int error(const char * fmt, ...)
     va_list ap;
     gErrors = true;
     va_start(ap, fmt);
-
+	
 	prf(fmt, ap, putchar, 0);
     
 	va_end(ap);
@@ -229,10 +227,10 @@ int error(const char * fmt, ...)
 void stop(const char * fmt, ...)
 {
 	va_list ap;
-
+	
 	printf("\n");
 	va_start(ap, fmt);
-
+	
 	prf(fmt, ap, putchar, 0);
 	
 	va_end(ap);
@@ -246,4 +244,29 @@ void pause()
 {
     printf("Press a key to continue...");
     getc();
+}
+
+char * newStringWithFormat(const char * fmt, ...)
+{
+    va_list ap;
+    struct putc_info pi;
+	int len;
+	char *str = NULL;
+	
+    va_start(ap, fmt);
+    pi.last_str = 0;
+	len = prf_fmt_str_len(fmt, ap);
+	if (len > 0)
+	{
+		str = malloc(len+1);
+		if (!str) return NULL;
+	}	
+	pi.str = str;
+	
+    prf(fmt, ap, sputc, &pi);
+    *pi.str = '\0';
+    va_end(ap);	
+	
+	return str;
+	
 }

@@ -142,7 +142,7 @@ getVESAModeWithProperties( unsigned short     width,
 	
     //bzero( outModeInfo, sizeof(*outModeInfo) );
 	bzero( outModeInfo, sizeof(VBEModeInfoBlock) );
-
+	
     // Get VBE controller info containing the list of supported modes.
 	
     //bzero( &vbeInfo, sizeof(vbeInfo) );
@@ -168,7 +168,7 @@ getVESAModeWithProperties( unsigned short     width,
 		
         //bzero( &modeInfo, sizeof(modeInfo) );
         bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
-
+		
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -241,7 +241,7 @@ getVESAModeWithProperties( unsigned short     width,
             matchedMode = *modePtr;
             //bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );            
             bcopy( &modeInfo, outModeInfo, sizeof(VBEModeInfoBlock) );
-
+			
             break;
         }
 		
@@ -263,7 +263,7 @@ getVESAModeWithProperties( unsigned short     width,
         matchedMode = *modePtr;
         //bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
         bcopy( &modeInfo, outModeInfo, sizeof(VBEModeInfoBlock) );
-
+		
     }
 	
     return matchedMode;
@@ -615,7 +615,7 @@ setVideoMode( int mode)
     unsigned long params[4];
     int           count;
     int           err = errSuccess;
-
+	
     if ( mode == GRAPHICS_MODE )
     {
   		if ( (err=initGraphicsMode ()) == errSuccess ) {
@@ -669,11 +669,11 @@ void
 spinActivityIndicator(int sectors)
 {
     static unsigned long lastTickTime = 0, currentTickTime;
-
+	
 	bool doreturn = false;
 	execute_hook("spinActivity_hook", &sectors, &doreturn, NULL, NULL, NULL, NULL);
 	if (doreturn == true) return;
-
+	
 	currentTickTime = time18(); // late binding
 	if (currentTickTime < lastTickTime + MIN_TICKS)
 	{

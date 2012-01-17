@@ -25,7 +25,7 @@ unsigned long long textSection = 0;
 moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
-unsigned int (*lookup_symbol)(const char*) = NULL;
+unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*)) = NULL;
 
 #if DEBUG_MODULES
 VOID print_hook_list()
@@ -71,7 +71,7 @@ EFI_STATUS init_module_system()
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
-			return status;
+			return EFI_SUCCESS;
 		}
 		
 	}
@@ -99,16 +99,18 @@ VOID load_all_modules()
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
 		if ((strcmp(SYMBOLS_MODULE,name)) == 0) continue; // if we found Symbols.dylib, just skip it
-
+		
 		int len =  strlen(name);
 		int ext_size = sizeof("dylib");
 		
 		if (len >= ext_size)
 		{
 			if(strcmp(&name[len - ext_size], ".dylib") == 0)
-			{
-				char* tmp = malloc(len /*+ 1*/);
-				strlcpy(tmp, name, len + 1);
+			{				
+				char *tmp = newString(name);								
+				if (!tmp) {
+					continue;
+				}
 				msglog("* Attempting to load module: %s\n", tmp);			
 				if(load_module(tmp) != EFI_SUCCESS)
 				{
@@ -129,8 +131,15 @@ VOID load_all_modules()
 			DBG("Ignoring %s\n", name);
 		}
 #endif
-
+		
 	}
+	
+	if (moduleDir)
+	{
+		closedir(moduleDir);
+		
+	}
+	
 #if DEBUG_MODULES
 	print_symbol_list();
 #endif
@@ -143,7 +152,7 @@ VOID load_all_modules()
 EFI_STATUS load_module(char* module)
 {
 	void (*module_start)(void) = NULL;
-
+	
 	
 	// Check to see if the module has already been loaded
 	if(is_module_loaded(module) == EFI_SUCCESS)
@@ -152,9 +161,13 @@ EFI_STATUS load_module(char* module)
 		return EFI_ALREADY_STARTED;
 	}
 	
-	char modString[128];
 	int fh = -1;
-	sprintf(modString, "/Extra/modules/%s", module);
+	char *modString=NULL;
+	modString = newStringWithFormat( "/Extra/modules/%s", module);
+	if (!modString) {
+		printf("Unable to allocate module name : /Extra/modules/%s\n", module);
+		return EFI_OUT_OF_RESOURCES;
+	}
 	fh = open(modString);
 	if(fh < 0)
 	{		
@@ -164,14 +177,22 @@ EFI_STATUS load_module(char* module)
 #else
 		msglog("Unable to locate module %s\n", modString);
 #endif
-			return EFI_OUT_OF_RESOURCES;		
+		free(modString);
+		return EFI_OUT_OF_RESOURCES;		
 	}
 	EFI_STATUS ret = EFI_SUCCESS;
 	
 	{
 		int moduleSize = file_size(fh);
-		char* module_base = (char*) malloc(moduleSize);
-		if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
+		
+		char* module_base = NULL;
+		
+		if (moduleSize > 0)
+		{
+			module_base = (char*) malloc(moduleSize);
+		}		
+		
+		if (module_base && read(fh, module_base, moduleSize) == moduleSize)
 		{
 			
 			DBG("Module %s read in.\n", modString);
@@ -179,7 +200,7 @@ EFI_STATUS load_module(char* module)
 			// Module loaded into memory, parse it
 			module_start = parse_mach(module_base, &load_module, &add_symbol);
 			
-			if(module_start && module_start != (void*)0xFFFFFFFF)
+			if(module_start && (module_start != (void*)0xFFFFFFFF))
 			{
 				module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
 				// Notify the system that it was laoded
@@ -206,6 +227,7 @@ EFI_STATUS load_module(char* module)
 		}
 	}
 	close(fh);
+	free(modString);
 	return ret;
 }
 
@@ -270,7 +292,7 @@ EFI_STATUS execute_hook(const char* name, void* arg1, void* arg2, void* arg3, vo
  */
 VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
 {	
-	DBG("Adding callback for '%s' hook.\n", name);
+	DBG("Adding callback for hook '%s'.\n", name);
 	
 	moduleHook_t* hook = get_callback(name);
 	
@@ -278,6 +300,10 @@ VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	{
 		// append
 		callbackList_t* newCallback = malloc(sizeof(callbackList_t));
+		if (!newCallback) {
+			DBG("Unable to allocate memory for callback \n");
+			return;
+		}
 		newCallback->next = hook->callbacks;
 		hook->callbacks = newCallback;
 		newCallback->callback = callback;
@@ -285,9 +311,18 @@ VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	else
 	{
 		// create new hook
-		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));		
+		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));
+		if (!newHook) {
+			DBG("Unable to allocate memory for hook '%s'.\n", name);
+			return;
+		}
 		newHook->name = name;
 		newHook->callbacks = malloc(sizeof(callbackList_t));
+		if (!newHook->callbacks) {
+			DBG("Unable to allocate memory for callback \n");
+			free(newHook);
+			return;
+		}
 		newHook->callbacks->callback = callback;
 		newHook->callbacks->next = NULL;
 		
@@ -324,14 +359,14 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 	
 	// Module info
 	/*char* moduleName = NULL;
-	UInt32 moduleVersion = 0;
-	UInt32 moduleCompat = 0;
-	*/
+	 UInt32 moduleVersion = 0;
+	 UInt32 moduleCompat = 0;
+	 */
 	
 	// TODO convert all of the structs to a union	
 	struct dyld_info_command* dyldInfoCommand = NULL;	
 	struct symtab_command* symtabCommand = NULL;	
-
+	
 	{
 		struct segment_command *segCommand = NULL;
 		struct segment_command_64 *segCommand64 = NULL;
@@ -392,7 +427,7 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 					{
 						UInt32 sectionIndex;
 						
-#if HARD_DEBUG_MODULES			
+#if DEBUG_MODULES
 						unsigned long fileaddr;
 						long   filesize;					
 						vmaddr = (segCommand->vmaddr & 0x3fffffff);
@@ -403,8 +438,12 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 							   segCommand->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
 							   (unsigned) segCommand->nsects, (unsigned)segCommand->flags);
+#if DEBUG_MODULES==2
+						
 						getc();
 #endif
+#endif
+						
 						sectionIndex = sizeof(struct segment_command);
 						
 						struct section *sect;
@@ -437,8 +476,7 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 					{
 						UInt32 sectionIndex;
 						
-#if HARD_DEBUG_MODULES					
-						
+#if DEBUG_MODULES						
 						unsigned long fileaddr;
 						long   filesize;					
 						vmaddr = (segCommand64->vmaddr & 0x3fffffff);
@@ -449,7 +487,10 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 							   segCommand64->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
 							   (unsigned) segCommand64->nsects, (unsigned)segCommand64->flags);
+#if DEBUG_MODULES==2
+						
 						getc();
+#endif
 #endif
 						
 						sectionIndex = sizeof(struct segment_command_64);
@@ -487,24 +528,31 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 					// TODO: verify version
 					// =	dylibCommand->dylib.current_version;
 					// =	dylibCommand->dylib.compatibility_version;
-					char* name = malloc(strlen(module) + strlen(".dylib") + 1);
-					sprintf(name, "%s.dylib", module);				
-					if(dylib_loader == EFI_SUCCESS)
+					
+					char *name=NULL;
+					name = newStringWithFormat( "%s.dylib", module);
+					if (!name) {
+						printf("Unable to allocate module name : %s\n", module);
+						return NULL;
+					}
+					if(dylib_loader)
 					{
 						EFI_STATUS statue = dylib_loader(name);
 						
 						if( statue != EFI_SUCCESS)
 						{
-							free(name);
 							if (statue != EFI_ALREADY_STARTED)
 							{
 								// Unable to load dependancy
+								free(name);
 								return NULL;
 							}
 							
 						} 
 						
 					}
+					free(name);
+					
 					break;
 				}				
 				case LC_ID_DYLIB:
@@ -536,10 +584,10 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 		}
 		//if(!moduleName) return NULL;
 	}		
-
+	
 	// bind_macho uses the symbols.
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
-
+	
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
@@ -563,7 +611,7 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 		// This should be changed to bind when a symbol is referened at runtime instead.
 		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
-
+	
 	return module_start;
 	
 }
@@ -593,7 +641,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	{
 		immediate = rebase_stream[i] & REBASE_IMMEDIATE_MASK;
 		opcode = rebase_stream[i] & REBASE_OPCODE_MASK;
-
+		
 		
 		switch(opcode)
 		{
@@ -673,7 +721,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 					segmentAddress += sizeof(void*);
 				}
 				break;
-			
+				
 				
 			case REBASE_OPCODE_DO_REBASE_ULEB_TIMES:
 				tmp = 0;
@@ -732,7 +780,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				index = 0;
 				for (index = 0; index < tmp; ++index)
 				{
-
+					
 					rebase_location(base + segmentAddress, (char*)base, type);
 					
 					segmentAddress += tmp2 + sizeof(void*);
@@ -763,7 +811,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	
 	SInt32 addend = 0;			// TODO: handle this
 	SInt32 libraryOrdinal = 0;
-
+	
 	const char* symbolName = NULL;
 	UInt8 symboFlags = 0;
 	UInt32 symbolAddr = 0xFFFFFFFF;
@@ -805,14 +853,14 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
-
+				
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
 				// NOTE: this is wrong, fortunately we don't use it
 				libraryOrdinal = -immediate;
 				//DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
-
+				
 				break;
 				
 			case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
@@ -820,16 +868,16 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				symbolName = (char*)&bind_stream[++i];
 				i += strlen((char*)&bind_stream[i]);
 				//DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
-
+				
 				symbolAddr = lookup_all_symbols(symbolName);
-
+				
 				break;
 				
 			case BIND_OPCODE_SET_TYPE_IMM:
 				// Set bind type (pointer, absolute32, pcrel32)
 				type = immediate;
 				//DBG("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
-
+				
 				break;
 				
 			case BIND_OPCODE_SET_ADDEND_SLEB:
@@ -902,7 +950,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-
+					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
@@ -933,7 +981,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-
+					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
@@ -941,7 +989,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					printf("Unable to bind symbol %s\n", symbolName);
 				}
 				segmentAddress += tmp + sizeof(void*);
-
+				
 				
 				break;
 				
@@ -951,7 +999,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-
+					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
@@ -959,12 +1007,12 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					printf("Unable to bind symbol %s\n", symbolName);
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
-
+				
 				
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-
+				
 				tmp  = 0;
 				bits = 0;
 				do
@@ -973,7 +1021,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					bits += 7;
 				}
 				while(bind_stream[i] & 0x80);
-
+				
 				
 				tmp2  = 0;
 				bits = 0;
@@ -986,7 +1034,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				
 				
 				//DBG("BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB 0x%X 0x%X\n", tmp, tmp2);
-
+				
 				
 				if(symbolAddr != 0xFFFFFFFF)
 				{
@@ -994,7 +1042,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 					{
 						
 						address = segmentAddress + (UInt32)base;
-
+						
 						bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 						
 						segmentAddress += tmp2 + sizeof(void*);
@@ -1033,22 +1081,22 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
 {	
 	// do actual update
 	char* newValue = value + addend;
-
+	
 	switch (type) {
 		case BIND_TYPE_POINTER:
 		case BIND_TYPE_TEXT_ABSOLUTE32:
 			break;
-
+			
 		case BIND_TYPE_TEXT_PCREL32:
 			newValue -=  ((UInt32)location + 4);
-
+			
 			break;
 		default:
 			return;
 	}
 	*location = (UInt32)newValue;
 	
-
+	
 }
 
 /*
@@ -1089,9 +1137,9 @@ VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 	if (new_entry)
 	{	
 		new_entry->next = loadedModules;
-	
+		
 		loadedModules = new_entry;
-	
+		
 		new_entry->module = (char*)name;
 		//	new_entry->version = version;
 		//	new_entry->compat = compat;
@@ -1104,10 +1152,10 @@ EFI_STATUS is_module_loaded(const char* name)
 	while(entry)
 	{
 		DBG("Comparing %s with %s\n", name, entry->module);
-		char fullname[128];
-		sprintf(fullname, "%s.dylib",name);
-		if((strcmp(entry->module, name) == 0) || (strcmp(entry->module, fullname) == 0))
+		char *fullname = newStringWithFormat("%s.dylib",name);
+		if(fullname && ((strcmp(entry->module, name) == 0) || (strcmp(entry->module, fullname) == 0)))
 		{
+			free(fullname);
 			DBG("Located module %s\n", name);
 			return EFI_SUCCESS;
 		}
@@ -1115,10 +1163,10 @@ EFI_STATUS is_module_loaded(const char* name)
 		{
 			entry = entry->next;
 		}
-
+		
 	}
 	DBG("Module %s not found\n", name);
-
+	
 	return EFI_NOT_FOUND;
 }
 
@@ -1130,7 +1178,7 @@ unsigned int lookup_all_symbols(const char* name)
 		unsigned int addr = 0xFFFFFFFF;
 		if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
-			addr = lookup_symbol(name);
+			addr = lookup_symbol(name, &strcmp);
 			if(addr != 0xFFFFFFFF)
 			{
 				DBG("Internal symbol %s located at 0x%X\n", name, addr);
@@ -1138,7 +1186,7 @@ unsigned int lookup_all_symbols(const char* name)
 			}
 		}
 	}	
-
+	
 	{
 		symbolList_t* entry = moduleSymbols;
 		while(entry)
@@ -1171,7 +1219,7 @@ unsigned int lookup_all_symbols(const char* name)
  * parse the symbol table
  * Lookup any undefined symbols
  */
- 
+
 unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, long long, char), char is64)
 {		
 	unsigned int module_start = 0xFFFFFFFF;
@@ -1186,9 +1234,8 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		{						
 			if(symbolEntry->n_value)
 			{				
-				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
+				if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0))
 				{
-					// Module start located. 'start' is an alias so don't register it				
 					module_start = base + symbolEntry->n_value;
 					DBG("n_value %x module_start %x\n", (unsigned)symbolEntry->n_value, (unsigned)module_start);
 				}
@@ -1196,10 +1243,10 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				{
 					symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 				}
-				
-#if HARD_DEBUG_MODULES	
+#if DEBUG_MODULES
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
 				printf("%s %s\n", isTexT ? "__TEXT :" : "__DATA(OR ANY) :", symbolString + symbolEntry->n_un.n_strx);
+#if DEBUG_MODULES==2	
 				
 				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "_BootHelp_txt") == 0)
 				{
@@ -1214,6 +1261,8 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 					printf("method 2:  __DATA : BootHelp_txt[0] %x\n", BootHelp2[0]);
 				}
 #endif
+#endif
+				
 			}
 			
 			symbolEntry++;
@@ -1227,9 +1276,8 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		while(symbolIndex < symtabCommand->nsyms)
 		{	
 			
-			if(strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0)
+			if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0))
 			{
-				// Module start located. 'start' is an alias so don't register it				
 				module_start = base + symbolEntry->n_value;
 			}
 			else
@@ -1241,7 +1289,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			symbolIndex++;	// TODO remove
 		}
 	}
-		
+	
 	return module_start;
 	
 }
@@ -1264,6 +1312,9 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 	if(addr != 0xFFFFFFFF)
 	{
 		UInt32* jumpPointer = malloc(sizeof(UInt32*));
+		if (!jumpPointer) {
+			return EFI_OUT_OF_RESOURCES;
+		}
 		
 		*binary++ = 0xFF;	// Jump
 		*binary++ = 0x25;	// Long Jump
@@ -1275,42 +1326,5 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 	}
 	
 	return EFI_NOT_FOUND;
-
-}
-
-
-/* Nedded to divide 64bit numbers correctly. TODO: look into why modules need this
- * And why it isn't needed when compiled into boot2
- *
- * In the next versions, this will be surely replaced by the Apple's libcc_kext or the meklort's klibc
- */
-
-uint64_t __udivdi3(uint64_t numerator, uint64_t denominator)
-{
-	uint64_t quotient = 0, qbit = 1;
 	
-	if (denominator)
-	{
-		while ((int64_t) denominator >= 0)
-		{
-			denominator <<= 1;
-			qbit <<= 1;
-		}
-		
-		while (denominator)
-		{
-			if (denominator <= numerator)
-			{
-				numerator -= denominator;
-				quotient += qbit;
-			}
-			denominator >>= 1;
-			qbit >>= 1;
-		}
-		
-		return quotient;
-	}
-	
-	stop("Divide by 0");
-	return 0;	
 }

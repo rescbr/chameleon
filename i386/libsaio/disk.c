@@ -196,6 +196,7 @@ static void scanFSLevelBVRSettings(BVRef chain);
 #ifdef APPLE_PARTITION_MAP_SUPPORT
 static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr );
 #endif
+static TagPtr XMLGetElementWithID( TagPtr dict, const char* id );
 static bool getOSVersion(BVRef bvr, char *str);
 
 //==========================================================================
@@ -333,8 +334,8 @@ static int Biosread( int biosdev, unsigned long long secno )
                 rc = 0;
                 break;
             }
-            error("  EBIOS read error: %s\n", bios_error(rc), rc);
-            error("    Block 0x%x Sectors %d\n", secno, xnsecs);
+            printf("  EBIOS read error: %s\n", bios_error(rc), rc);
+            printf("    Block 0x%x Sectors %d\n", secno, xnsecs);
             sleep(1);
         }
     }
@@ -375,8 +376,8 @@ static int Biosread( int biosdev, unsigned long long secno )
                 rc = 0;
                 break;
             }
-            error("  BIOS read error: %s\n", bios_error(rc), rc);
-            error("    Block %d, Cyl %d Head %d Sector %d\n",
+            printf("  BIOS read error: %s\n", bios_error(rc), rc);
+            printf("    Block %d, Cyl %d Head %d Sector %d\n",
                   secno, cyl, head, sec);
             sleep(1);
         }
@@ -417,7 +418,7 @@ static int readBytes( int biosdev, unsigned long long blkno,
 	if(biosdev >= 0x100 && (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)){
 	
 		int ret = -1;
-		execute_hook("p_ramdiskReadBytes", &biosdev, &blkno, &byteoff, &byteCount, buffer, &ret);
+		execute_hook("p_ramdiskReadBytes", &biosdev,  (void*)(unsigned long)&blkno,  &byteoff,  &byteCount, buffer, &ret);
 		return ret;
 	}
 #endif			
@@ -1049,17 +1050,19 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 		
 		/* Let's try assuming we are on a hybrid HFS/ISO9660 CD. */
 		bvr = newFDiskBVRef(
-							biosdev, 0,
-							0,
-							&cdpart,
-							HFSInitPartition,
-							HFSLoadFile,
+                            biosdev, 0,
+                            0,
+                            &cdpart,
+                            HFSInitPartition,
+                            HFSLoadFile,
                             HFSReadFile,
-							HFSGetDirEntry,
+                            HFSGetDirEntry,
                             HFSGetFileBlock,
                             HFSGetUUID,
-							0,
-							kBIOSDevTypeHardDrive);
+                            HFSGetDescription,
+                            HFSFree,
+                            0,
+                            kBIOSDevTypeHardDrive, 0);
 		bvr->next = map->bvr;
 		map->bvr = bvr;
 		map->bvrcnt++;
@@ -1519,12 +1522,36 @@ scanErr:
     }
 }
 
+static TagPtr XMLGetElementWithID( TagPtr dict, const char* id )
+{
+	if(dict->type != kTagTypeArray) return 0;
+	
+	int element = 0;
+	TagPtr tmp = dict->tag;
+	int entry_count = XMLTagCount(dict);
+	
+	while(element < entry_count)
+	{
+		char *Identifier = NULL;
+		Identifier   = XMLCastString(XMLGetProperty(tmp, (const char*)"Identifier"));
+		
+		if (Identifier && (strcmp(Identifier, id) == 0))
+		{			
+			return tmp;
+		}
+		
+		element++;
+		tmp = tmp->tagNext;
+	}
+	
+	return tmp;
+}
+
 static bool getOSVersion(BVRef bvr, char *str)
 {
 	bool valid = false;	
 	config_file_t systemVersion;
 	char  dirSpec[512];	
-	long  flags, time;
 	
 	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	
@@ -1543,15 +1570,32 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else 
 		{
-			sprintf(dirSpec, "hd(%d,%d)/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			/* Much clean */
+			sprintf(dirSpec, "hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no);
 			
-			if (GetFileInfo(dirSpec, "Mac OS X Install Data", &flags, &time) == 0)
-			{	
-				/*** DIRTY HACK (would be better to have a plist) ***/
-				*str = '\0';
-				strncat(str, "10.7", 4);
-				return true;
-			}
+			if (!loadConfigFile(dirSpec, &systemVersion))
+			{
+				TagPtr pkg_p = XMLCastArray(XMLGetProperty(systemVersion.dictionary, (const char*)"Packages"));
+				
+				if (pkg_p)
+				{
+					
+					char *version = NULL;
+					
+					version = XMLCastString(XMLGetProperty(
+														   XMLGetElementWithID(pkg_p, 
+																			   "com.apple.mpkg.OSInstall"), 
+														   (const char*)"Version"));
+					
+					if (version && strlen(version) >= 4) 
+					{
+						*str = '\0';
+						strncat(str, version, 4);
+						return true;
+						
+					}						
+				}					
+			}	
 		}
 	}
 	
@@ -2127,7 +2171,7 @@ int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
     int rc;
 	
     if ((len & (BPS-1)) != 0) {
-        error("raw disk read not sector aligned");
+        printf("raw disk read not sector aligned");
         return -1;
     }
     secno += bvr->part_boff;
@@ -2143,8 +2187,8 @@ int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
         if ((rc = ebiosread(bvr->biosdev, secno, secs)) != 0) {
             /* Ignore corrected ECC errors */
             if (rc != ECC_CORRECTED_ERR) {
-                error("  EBIOS read error: %s\n", bios_error(rc), rc);
-                error("    Block %d Sectors %d\n", secno, secs);
+                printf("  EBIOS read error: %s\n", bios_error(rc), rc);
+                printf("    Block %d Sectors %d\n", secno, secs);
                 return rc;
             }
         }
@@ -2168,7 +2212,7 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
     int rc;
 	
     if ((len & (BPS-1)) != 0) {
-        error("raw disk write not sector aligned");
+        printf("raw disk write not sector aligned");
         return -1;
     }
     secno += bvr->part_boff;
@@ -2183,8 +2227,8 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
         bcopy( cbuf, trackbuf, copy_len );
         //printf("rdr: ebioswrite(%d, %d, %d)\n", bvr->biosdev, secno, secs);
         if ((rc = ebioswrite(bvr->biosdev, secno, secs)) != 0) {
-            error("  EBIOS write error: %s\n", bios_error(rc), rc);
-            error("    Block %d Sectors %d\n", secno, secs);
+            printf("  EBIOS write error: %s\n", bios_error(rc), rc);
+            printf("    Block %d Sectors %d\n", secno, secs);
             return rc;
         }
         len -= copy_len;

@@ -106,39 +106,6 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list);
 static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list);
 static ACPI_TABLE_FADT * patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT);
 
-#if OLD_SSDT
-#include "modules.h"
-struct aml_chunk 
-{
-	unsigned char		Type;
-	unsigned int		Length;
-	char*				Buffer;
-	
-	unsigned int		Size;
-	
-	struct aml_chunk*	Next;
-	struct aml_chunk*	First;
-	struct aml_chunk*	Last;
-};
-static U32 get_needed_symbols (void);
-static ACPI_TABLE_SSDT *generate_cst_ssdt(ACPI_TABLE_FADT* fadt);
-static ACPI_TABLE_SSDT *generate_pss_ssdt(ACPI_TABLE_DSDT* dsdt);
-struct aml_chunk* (*aml_create_node)(struct aml_chunk*) = NULL;			
-struct aml_chunk* (*aml_add_buffer)(struct aml_chunk*,const char*, unsigned int) = NULL;			
-struct aml_chunk* (*aml_add_byte)(struct aml_chunk*, unsigned char) = NULL;			
-struct aml_chunk* (*aml_add_word)(struct aml_chunk*, unsigned int) = NULL;
-struct aml_chunk* (*aml_add_dword)(struct aml_chunk*, unsigned long) = NULL;			
-struct aml_chunk* (*aml_add_qword)(struct aml_chunk*, unsigned long long) = NULL;			
-struct aml_chunk* (*aml_add_scope)(struct aml_chunk*, const char*) = NULL;
-struct aml_chunk* (*aml_add_name)(struct aml_chunk*, const char*) = NULL;			
-struct aml_chunk* (*aml_add_package)(struct aml_chunk*) = NULL;			
-struct aml_chunk* (*aml_add_alias)(struct aml_chunk*, const char*, const char*) = NULL;			
-void (*aml_destroy_node)(struct aml_chunk*) = NULL;
-unsigned int (*aml_calculate_size)(struct aml_chunk*) = NULL;
-unsigned int (*aml_write_node)(struct aml_chunk*, char*, unsigned int) = NULL;
-bool (*aml_add_to_parent)(struct aml_chunk*, struct aml_chunk*) = NULL;
-
-#else
 
 #define IA32_MISC_ENABLES 0x01A0
 #define MSR_TURBO_POWER_CURRENT_LIMIT 0x1AC
@@ -154,7 +121,7 @@ static bool is_jaketown(void);
 static U32 encode_pstate(U32 ratio);
 static void collect_cpu_info(CPU_DETAILS * cpu);
 #ifndef BETA
-static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu);
+//static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu);
 #endif
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase);
 static U32 BuildPstateInfo(CPU_DETAILS * cpu);
@@ -190,10 +157,8 @@ static U32 compute_tdp(CPU_DETAILS * cpu);
 static bool is_sandybridge(void);
 static bool is_jaketown(void);
 static U32 get_bclk(void);
-static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate);
-static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit);
-
-#endif // OLD_SSDT
+//static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate);
+//static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit);
 
 #if UNUSED
 static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
@@ -206,11 +171,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 // Security space for SSDT , FACP & MADT table generation,
 // the size can be increased 
 // note: the table will not placed in the reserved space if the 'normal' space is not full
-#if OLD_SSDT
-#define RESERVED_AERA 4
-#else
 #define RESERVED_AERA 3
-#endif
 
 #define ACPI_TABLE_LIST_FULL MAX_ACPI_TABLE + RESERVED_AERA + 1
 
@@ -802,685 +763,6 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
     return (cpu_map_error = 0);
 }
 
-#if OLD_SSDT
-
-static U32 get_needed_symbols (void)
-{	
-	/* aml_generator symbols */
-	aml_create_node = (void*)lookup_all_symbols("_aml_create_node");
-	if (aml_create_node == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_buffer = (void*)lookup_all_symbols("_aml_add_buffer");
-	if (aml_add_buffer == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_byte = (void*)lookup_all_symbols("_aml_add_byte");
-	if (aml_add_byte == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_word = (void*)lookup_all_symbols("_aml_add_word");
-	if (aml_add_word == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_dword = (void*)lookup_all_symbols("_aml_add_dword");
-	if (aml_add_dword == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_qword = (void*)lookup_all_symbols("_aml_add_qword");
-	if (aml_add_qword == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_scope = (void*)lookup_all_symbols("_aml_add_scope");
-	if (aml_add_scope == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_name = (void*)lookup_all_symbols("_aml_add_name");
-	if (aml_add_name == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_package = (void*)lookup_all_symbols("_aml_add_package");
-	if (aml_add_package == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_alias = (void*)lookup_all_symbols("_aml_add_alias");
-	if (aml_add_alias == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_destroy_node = (void*)lookup_all_symbols("_aml_destroy_node");
-	if (aml_destroy_node == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_calculate_size = (void*)lookup_all_symbols("_aml_calculate_size");	
-	if (aml_calculate_size == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_write_node = (void*)lookup_all_symbols("_aml_write_node");
-	if (aml_write_node == (void*)0xFFFFFFFF) goto Failed;
-	
-	aml_add_to_parent = (void*)lookup_all_symbols("_aml_add_to_parent");
-	if (aml_add_to_parent == (void*)0xFFFFFFFF) goto Failed;
-	
-	DBG("struct aml_chunk* _aml_create_node: 0x%x\n",(UInt32)aml_create_node);
-	DBG("struct aml_chunk* _aml_add_buffer: 0x%x\n",(UInt32)aml_add_buffer);
-	DBG("struct aml_chunk* _aml_add_byte: 0x%x\n",(UInt32)aml_add_byte);
-	DBG("struct aml_chunk* _aml_add_word: 0x%x\n",(UInt32)aml_add_word);
-	DBG("struct aml_chunk* _aml_add_dword: 0x%x\n",(UInt32)aml_add_dword);
-	DBG("struct aml_chunk* _aml_add_qword: 0x%x\n",(UInt32)aml_add_qword);
-	DBG("struct aml_chunk* _aml_add_scope: 0x%x\n",(UInt32)aml_add_scope);
-	DBG("struct aml_chunk* _aml_add_name: 0x%x\n",(UInt32)aml_add_name);
-	DBG("struct aml_chunk* _aml_add_package: 0x%x\n",(UInt32)aml_add_package);
-	DBG("struct aml_chunk* _aml_add_alias: 0x%x\n",(UInt32)aml_add_alias);
-	DBG("void _aml_destroy_node: 0x%x\n",(UInt32)aml_destroy_node);
-	DBG("unsigned int _aml_calculate_size: 0x%x\n",(UInt32)aml_calculate_size);
-	DBG("unsigned int _aml_write_node: 0x%x\n",(UInt32)aml_write_node);
-	DBG("bool _aml_add_to_parent: 0x%x\n",(UInt32)aml_add_to_parent);	
-	return (1);
-Failed:
-	printf("Failed to find aml_generator symbols, SSDT will not be generated !!!");
-	return (0);
-}
-
-static ACPI_TABLE_SSDT *generate_cst_ssdt(ACPI_TABLE_FADT* fadt)
-{	
-	char ssdt_header[] =
-	{
-		0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00, /* SSDT.... */
-		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
-		0x43, 0x70, 0x75, 0x43, 0x73, 0x74, 0x00, 0x00, /* CpuCst.. */
-		0x00, 0x10, 0x00, 0x00, 0x49, 0x4E, 0x54, 0x4C, /* ....INTL */
-		0x31, 0x03, 0x10, 0x20 							/* 1.._		*/
-	};
-	
-	char cstate_resource_template[] = 
-	{
-		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F, 
-		0x01, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 
-		0x00, 0x00, 0x00, 0x79, 0x00
-	};
-	
-	if (Platform->CPU.Vendor != 0x756E6547) {
-		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-	
-	if (fadt == (void *)0ul) {
-		verbose ("FACP not exists: C-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-    
-	ACPI_TABLE_DSDT* dsdt = ((fadt->Header.Revision >= 3) && (fadt->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt->XDsdt):(ACPI_TABLE_DSDT*)fadt->Dsdt;
-	if (dsdt == (void *)0ul) {
-		verbose ("DSDT not found: C-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-		
-	if (generate_cpu_map_from_acpi(dsdt) == 0) 
-	{
-		bool c2_enabled = fadt->C2Latency < 100;
-		bool c3_enabled = fadt->C3Latency < 1000;
-		bool c4_enabled = false;
-		
-		getBoolForKey(kEnableC4State, &c4_enabled, &bootInfo->bootConfig);
-        
-		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + ((c3_enabled || c4_enabled) ? 1 : 0);
-		char *Lat = NULL, *Pw = NULL, *tmpstr =NULL;
-		int base = 16;
-		TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"C-States"));
-		
-		if ((tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Base")))) {
-			
-			int mybase = strtol(tmpstr, NULL, 10);	
-			
-			if (mybase == 8 || mybase == 10 || mybase == 16 ) 
-				base = mybase;									
-		}
-		
-		struct aml_chunk* root = aml_create_node(NULL);
-        aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
-        struct aml_chunk* scop;
-		if (cpuNamespace == CPU_NAMESPACE_PR) 
-			scop = aml_add_scope(root, "\\_PR_");
-		else if (cpuNamespace == CPU_NAMESPACE_SB) 
-			scop = aml_add_scope(root, "\\_SB_");
-		else 
-		{
-			aml_destroy_node(root);	
-			goto out;
-		}
-        struct aml_chunk* name = aml_add_name(scop, "CST_");
-        struct aml_chunk* pack = aml_add_package(name);
-        aml_add_byte(pack, cstates_count);
-		
-        struct aml_chunk* tmpl = aml_add_package(pack);
-        TagPtr match_Status = XMLGetProperty(personality, (const char*)"C1");
-        if (match_Status) {	
-            Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
-            Lat  = XMLCastString(XMLGetProperty(match_Status, (const char*)"Latency"));
-        }
-        cstate_resource_template[11] = 0x00; // C1
-        aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-        aml_add_byte(tmpl, 0x01); // C1
-        aml_add_byte(tmpl, (unsigned char)resolve_cst(0x01, Lat, base));  // Latency
-        aml_add_word(tmpl, resolve_cst(0x03e8, Pw, base)); // Power
-		// C2
-		if (c2_enabled) 
-		{
-			tmpl = aml_add_package(pack);
-			Lat = NULL; 
-			Pw = NULL;
-			match_Status = XMLGetProperty(personality, (const char*)"C2");
-			if (match_Status) {	
-				Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
-				Lat  = XMLCastString(XMLGetProperty(match_Status, (const char*)"Latency"));
-			}
-			
-			cstate_resource_template[11] = 0x10; // C2
-			aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-			aml_add_byte(tmpl, 0x02); // C2				
-			aml_add_word(tmpl, resolve_cst(fadt->C2Latency, Lat, base));  // Latency
-			aml_add_word(tmpl, resolve_cst(0x01f4, Pw, base)); // Power
-		}
-		
-		// C4
-		if (c4_enabled) 
-		{
-			tmpl = aml_add_package(pack);
-			Lat = NULL; 
-			Pw = NULL;
-			match_Status = XMLGetProperty(personality, (const char*)"C4"); 
-			if (match_Status) {	
-				Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
-				Lat  = XMLCastString(XMLGetProperty(match_Status, (const char*)"Latency"));
-			}
-			cstate_resource_template[11] = 0x30; // C4
-			aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-			aml_add_byte(tmpl, 0x04); // C4	
-			aml_add_word(tmpl, resolve_cst(fadt->C3Latency / 2, Lat, base));  // TODO: right latency for C4
-			aml_add_word(tmpl, resolve_cst(0xfa, Pw, base)); // Power
-			
-			// you can check if the C4 state is correctly activated or not with the following command Lines (you will need the 'lspci for mac' package): 
-			
-			// according to the intel ich10 dataheet ( Power Management PCI Configuration Registers (PM—D31:F0) ):
-			// setpci -s 0:1f.0 0xa0.w (must return an hex where bit 12 is 0 and bit 7 is 1, usually 06a0h )
-			// setpci -s 0:1f.0 0xa6.b (must return an hex where bit 7 is 1, usually 80h )
-			
-			
-		}		
-		// C3
-		else if (c3_enabled) 
-		{
-			tmpl = aml_add_package(pack);
-			Lat = NULL; 
-			Pw = NULL;
-			match_Status = XMLGetProperty(personality, (const char*)"C3"); 
-			if (match_Status) {	
-				Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
-				Lat  = XMLCastString(XMLGetProperty(match_Status, (const char*)"Latency"));
-			}
-			cstate_resource_template[11] = 0x20; // C3
-			aml_add_buffer(tmpl, cstate_resource_template, sizeof(cstate_resource_template));
-			aml_add_byte(tmpl, 0x03); // C3				
-			aml_add_word(tmpl, resolve_cst(fadt->C3Latency , Lat, base));  
-			aml_add_word(tmpl, resolve_cst(0x015e, Pw, base)); // Power
-			
-		}
-		        
-        // Aliaces
-        unsigned int i;
-        for (i = 0; i < cpu_map_count; i++) 
-        {
-            char name[9];
-            U32 nseg = *(U32*)cpu_map[i].nameseg;
-            if (cpuNamespace == CPU_NAMESPACE_PR) {
-                sprintf(name, "_PR_%c%c%c%c",
-                        (int)(nseg & 0x000000ff),
-                        (int)((nseg & 0x0000ff00) >> 8),
-                        (int)((nseg & 0x00ff0000) >> 16),
-                        (int)(nseg >> 24));
-            } else if (cpuNamespace == CPU_NAMESPACE_SB) {
-                sprintf(name, "_SB_%c%c%c%c",
-                        (int)(nseg & 0x000000ff),
-                        (int)((nseg & 0x0000ff00) >> 8),
-                        (int)((nseg & 0x00ff0000) >> 16),
-                        (int)(nseg >> 24));
-            } else {
-                aml_destroy_node(root);	
-                goto out;
-            }
-            
-            scop = aml_add_scope(root, name);
-            aml_add_alias(scop, "CST_", "_CST");
-        }
-		
-		aml_calculate_size(root);
-		
-		ACPI_TABLE_SSDT *ssdt = (ACPI_TABLE_SSDT *)AllocateKernelMemory(root->Size);
-        
-		aml_write_node(root, (void*)ssdt, 0);
-		
-		ssdt->Header.Length = root->Size;        
-		
-		SetChecksum(&ssdt->Header);
-        
-		aml_destroy_node(root);		
-        
-		verbose ("SSDT with CPU C-States generated successfully\n");
-		
-		return ssdt;
-	}
-	else 
-	{
-out:
-		verbose ("ACPI CPUs not found: C-States will not be generated !!!\n");
-	}
-    
-	return (void *)0ul;
-}
-
-static ACPI_TABLE_SSDT *generate_pss_ssdt(ACPI_TABLE_DSDT* dsdt)
-{		
-	
-	char ssdt_header[] =
-	{
-		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
-		0x01, 0x6A, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x00, /* ..PmRef. */
-		0x43, 0x70, 0x75, 0x50, 0x6D, 0x00, 0x00, 0x00, /* CpuPm... */
-		0x00, 0x30, 0x00, 0x00, 0x49, 0x4E, 0x54, 0x4C, /* .0..INTL */
-		0x31, 0x03, 0x10, 0x20,							/* 1.._		*/
-	};
-    
-	if (Platform->CPU.Vendor != 0x756E6547) {
-		verbose ("Not an Intel platform: P-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-	
-	if (!(Platform->CPU.Features & CPUID_FEATURE_MSR)) {
-		verbose ("Unsupported CPU: P-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-	
-	if (dsdt == (void *)0ul) {
-		verbose ("DSDT not found: P-States will not be generated !!!\n");
-		return (void *)0ul;
-	}
-		   
-	if (generate_cpu_map_from_acpi(dsdt) == 0 ) 
-	{
-		struct p_state /*initial,*/ maximum, minimum, p_states[32];
-		U8 p_states_count = 0;		
-		
-		// Retrieving P-States, ported from code by superhai (c)
-		switch (Platform->CPU.Family) {
-			case 0x06: 
-			{
-				switch (Platform->CPU.Model) 
-				{
-					case CPUID_MODEL_DOTHAN: 
-					case CPUID_MODEL_YONAH: // Yonah
-					case CPUID_MODEL_MEROM: // Merom
-					case CPUID_MODEL_PENRYN: // Penryn
-					case CPUID_MODEL_ATOM: // Intel Atom (45nm)
-					{
-						bool cpu_dynamic_fsb = false;
-						
-						if (rdmsr64(MSR_IA32_EXT_CONFIG) & (1 << 27)) 
-						{
-							wrmsr64(MSR_IA32_EXT_CONFIG, (rdmsr64(MSR_IA32_EXT_CONFIG) | (1 << 28))); 
-							delay(1);
-							cpu_dynamic_fsb = rdmsr64(MSR_IA32_EXT_CONFIG) & (1 << 28);
-						}
-						
-						bool cpu_noninteger_bus_ratio = (rdmsr64(MSR_IA32_PERF_STATUS) & (1ULL << 46));
-						
-						initial.Control = rdmsr64(MSR_IA32_PERF_STATUS);
-						
-						maximum.Control = ((rdmsr64(MSR_IA32_PERF_STATUS) >> 32) & 0x1F3F) | (0x4000 * cpu_noninteger_bus_ratio);
-						maximum.CID = ((maximum.FID & 0x1F) << 1) | cpu_noninteger_bus_ratio;
-						
-						minimum.FID = ((rdmsr64(MSR_IA32_PERF_STATUS) >> 24) & 0x1F) | (0x80 * cpu_dynamic_fsb);
-						minimum.VID = ((rdmsr64(MSR_IA32_PERF_STATUS) >> 48) & 0x3F);
-						
-						if (minimum.FID == 0) 
-						{
-							U64 msr;
-							U8 i;
-							// Probe for lowest fid
-							for (i = maximum.FID; i >= 0x6; i--) 
-							{
-								msr = rdmsr64(MSR_IA32_PERF_CONTROL);
-								wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (i << 8) | minimum.VID);
-								intel_waitforsts();
-								minimum.FID = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0x1F; 
-								delay(1);
-							}
-							
-							msr = rdmsr64(MSR_IA32_PERF_CONTROL);
-							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
-							intel_waitforsts();
-						}
-						
-						if (minimum.VID == maximum.VID) 
-						{	
-							U64 msr;
-							U8 i;
-							// Probe for lowest vid
-							for (i = maximum.VID; i > 0xA; i--) 
-							{
-								msr = rdmsr64(MSR_IA32_PERF_CONTROL);
-								wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (minimum.FID << 8) | i);
-								intel_waitforsts();
-								minimum.VID = rdmsr64(MSR_IA32_PERF_STATUS) & 0x3F; 
-								delay(1);
-							}
-							
-							msr = rdmsr64(MSR_IA32_PERF_CONTROL);
-							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
-							intel_waitforsts();
-						}
-						
-						minimum.CID = ((minimum.FID & 0x1F) << 1) >> cpu_dynamic_fsb;
-						
-						// Sanity check
-						if (maximum.CID < minimum.CID) 
-						{
-							DBG("Insane FID values!");
-							p_states_count = 0;
-						}
-						else
-						{
-							// Finalize P-States
-							// Find how many P-States machine supports
-							p_states_count = maximum.CID - minimum.CID + 1;
-							
-							if (p_states_count > 32) // MAX_PSTATES ??
-								p_states_count = 32; // MAX_PSTATES ??
-							
-							U8 vidstep;
-							U8 i = 0, u, invalid = 0;
-							
-							vidstep = ((maximum.VID << 2) - (minimum.VID << 2)) / (p_states_count - 1);
-							
-							for (u = 0; u < p_states_count; u++) 
-							{
-								i = u - invalid;
-								
-								p_states[i].CID = maximum.CID - u;
-								p_states[i].FID = (p_states[i].CID >> 1);
-								
-								if (p_states[i].FID < 0x6) 
-								{
-									if (cpu_dynamic_fsb) 
-										p_states[i].FID = (p_states[i].FID << 1) | 0x80;
-								} 
-								else if (cpu_noninteger_bus_ratio) 
-								{
-									p_states[i].FID = p_states[i].FID | (0x40 * (p_states[i].CID & 0x1));
-								}
-								
-								if (i && p_states[i].FID == p_states[i-1].FID)
-									invalid++;
-								
-								p_states[i].VID = ((maximum.VID << 2) - (vidstep * u)) >> 2;
-								
-								U32 multiplier = p_states[i].FID & 0x1f;		// = 0x08
-								bool half = p_states[i].FID & 0x40;					// = 0x01
-								bool dfsb = p_states[i].FID & 0x80;					// = 0x00
-								U32 fsb = Platform->CPU.FSBFrequency / 1000000; // = 400
-								U32 halffsb = (fsb + 1) >> 1;					// = 200
-								U32 frequency = (multiplier * fsb);			// = 3200
-								
-								p_states[i].Frequency = (frequency + (half * halffsb)) >> dfsb;	// = 3200 + 200 = 3400
-							}
-							
-							p_states_count -= invalid;
-						}
-						break;
-					} 
-					case CPUID_MODEL_FIELDS:
-					case CPUID_MODEL_DALES:
-					case CPUID_MODEL_DALES_32NM:
-					case CPUID_MODEL_NEHALEM: 
-					case CPUID_MODEL_NEHALEM_EX:
-					case CPUID_MODEL_WESTMERE:
-					case CPUID_MODEL_WESTMERE_EX:
-					case CPUID_MODEL_SANDYBRIDGE:
-                    case CPUID_MODEL_JAKETOWN:
-					{		
-						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
-						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
-						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
-						
-						// Sanity check
-						if (maximum.Control < minimum.Control) 
-						{
-							DBG("Insane control values!");
-							p_states_count = 0;
-						}
-						else
-						{
-							U8 i;
-							p_states_count = 0;
-							
-							for (i = maximum.Control; i >= minimum.Control; i--) 
-							{
-								p_states[p_states_count].Control = i;
-								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
-								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
-								p_states_count++;
-								if (p_states_count >= 32) {
-									
-									if (p_states_count > 32) // MAX_PSTATES ??
-										p_states_count = 32; // MAX_PSTATES ??
-									
-									break;
-								}
-							}
-						}
-						
-						break;
-					}
-					default:
-						verbose ("Unsupported CPU: P-States will not be generated !!!\n");
-						break;
-				}
-			}
-			default:
-				break;
-		}
-		
-		// Generating SSDT
-		if (p_states_count) 
-		{	
-			unsigned int i;
-			
-			struct aml_chunk* root = aml_create_node(NULL);
-            aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
-			struct aml_chunk* scop;
-			if (cpuNamespace == CPU_NAMESPACE_PR) 
-					scop = aml_add_scope(root, "\\_PR_");
-			else if (cpuNamespace == CPU_NAMESPACE_SB) 
-					scop = aml_add_scope(root, "\\_SB_");
-            else 
-			{
-                    aml_destroy_node(root);	
-                    goto out;
-            }				
-            struct aml_chunk* name = aml_add_name(scop, "PSS_");
-            struct aml_chunk* pack = aml_add_package(name);
-			
-            U8 minPSratio = (p_states[p_states_count-1].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
-            U8 maxPSratio = (p_states[0].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
-            
-            U8 cpu_div = Platform->CPU.CurrDiv;
-            U8 cpu_ratio = 0;
-			
-            if (cpu_div) 								
-                cpu_ratio = (Platform->CPU.CurrCoef * 10) + 5;								
-            else 								
-                cpu_ratio = Platform->CPU.CurrCoef * 10;
-            
-			
-            int user_max_ratio = 0;
-            getIntForKey(kMaxRatio, &user_max_ratio, &bootInfo->bootConfig);
-            if (user_max_ratio >= minPSratio && maxPSratio >= user_max_ratio) {									
-				
-                U8 maxcurrdiv = 0, maxcurrcoef = (int)(user_max_ratio / 10);									
-				
-                U8 maxdiv = user_max_ratio - (maxcurrcoef * 10);
-                if (maxdiv > 0)
-                    maxcurrdiv = 1;
-				
-                if (maxcurrdiv) 									
-                    cpu_ratio = (maxcurrcoef * 10) + 5;									
-                else 									
-                    cpu_ratio = maxcurrcoef * 10;																
-            }
-			
-            int user_min_ratio = 0;
-            getIntForKey(kMinRatio, &user_min_ratio, &bootInfo->bootConfig);
-            if (user_min_ratio >= minPSratio && cpu_ratio >= user_min_ratio) {
-				
-                U8 mincurrdiv = 0, mincurrcoef = (int)(user_min_ratio / 10);									
-				
-                U8 mindiv = user_min_ratio - (mincurrcoef * 10);
-				
-                if (mindiv > 0)
-                    mincurrdiv = 1;									
-				
-                if (mincurrdiv) 									
-                    minPSratio = (mincurrcoef * 10) + 5;									
-                else 									
-                    minPSratio = mincurrcoef * 10;																		
-				
-            }
-			
-            if (maxPSratio >= cpu_ratio && cpu_ratio >= minPSratio)	maxPSratio = cpu_ratio;													
-			
-            TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"P-States"));
-            char* MatchStat = 0;
-            int dropPSS = 0, Pstatus = 0, base = 16;								
-            int expert = 0;/* Default: 0 , mean mixed mode | expert mode : 1 , mean add only p-states found in boot.plist*/
-            char *tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Mode"));
-            
-            if (strcmp(tmpstr,"Expert") == 0) {
-                p_states_count = XMLTagCount(personality) - 1 ; // - 1 = - ("Mode" tag) 										
-                expert = 1;
-            }
-			
-            
-            if ((tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Base")))) {
-                
-                if (expert) p_states_count--; // -=  ("Base" tag) 
-                
-                int mybase = strtol(tmpstr, NULL, 10);	
-                
-                if (mybase == 8 || mybase == 10 || mybase == 16 )
-                    base = mybase;									
-            }
-			
-            for (i = 0; i < p_states_count; i++) 
-            {									
-                sprintf(MatchStat, "%d",i);
-                TagPtr match_Status = XMLGetProperty(personality, (const char*)MatchStat); 								   
-                
-                char *Lat1 = NULL, *clk = NULL, *Pw = NULL, *Lat2 = NULL, *Ctrl = NULL ;
-                
-                if (match_Status) {												
-                    
-                    clk  = XMLCastString(XMLGetProperty(match_Status, (const char*)"CoreFreq"));
-                    Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
-                    Lat1 = XMLCastString(XMLGetProperty(match_Status, (const char*)"Transition Latency"));
-                    Lat2 = XMLCastString(XMLGetProperty(match_Status, (const char*)"Bus Master Latency"));
-                    Ctrl = XMLCastString(XMLGetProperty(match_Status, (const char*)"Control"));
-                    
-                    
-                } else if (expert) 
-                    continue;
-                
-                
-                unsigned long Frequency  = 0x00000000;
-                
-                if (!expert) Frequency  = p_states[i].Frequency;
-                
-                if (clk) 
-                    Frequency  = strtoul((const char *)clk, NULL,base);
-                
-                if (!Frequency || Frequency > p_states[0].Frequency ) continue;
-                
-                U8 curr_ratio = (Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
-                
-                if (curr_ratio > maxPSratio || minPSratio > curr_ratio)
-                    goto dropPstate;
-                
-                struct aml_chunk* pstt = aml_add_package(pack);																											
-                aml_add_dword(pstt, Frequency); // CoreFreq (in MHz).																		
-                aml_add_dword(pstt, resolve_pss(0x00000000, Pw, base)); // Power (in milliWatts)									
-                aml_add_dword(pstt, resolve_pss(0x0000000A, Lat1, base)); // Transition Latency (in microseconds).									
-                aml_add_dword(pstt, resolve_pss(0x0000000A, Lat2, base)); // Bus Master Latency (in microseconds).									
-                unsigned long Control  = 0x00000000;
-                if (!expert) Control = p_states[i].Control;									
-                aml_add_dword(pstt, resolve_pss(Control, Ctrl, base)); // Control									
-                Pstatus++;
-                aml_add_dword(pstt, Pstatus); // Status									
-                continue;															
-            dropPstate:
-                
-                DBG("state with cpu frequency :%d and ratio :%d will be dropped\n",p_states[i].Frequency,curr_ratio);		
-                
-                dropPSS++;
-                
-                
-            }			
-			
-                        
-			// Add aliaces
-			for (i = 0; i < cpu_map_count; i++) 
-			{
-				char name[9];
-                U32 nseg = *(U32*)cpu_map[i].nameseg;
-                if (cpuNamespace == CPU_NAMESPACE_PR) {
-                    sprintf(name, "_PR_%c%c%c%c",
-                            (int)(nseg & 0x000000ff),
-                            (int)((nseg & 0x0000ff00) >> 8),
-                            (int)((nseg & 0x00ff0000) >> 16),
-                            (int)(nseg >> 24));
-                } else if (cpuNamespace == CPU_NAMESPACE_SB) {
-                    sprintf(name, "_SB_%c%c%c%c",
-                            (int)(nseg & 0x000000ff),
-                            (int)((nseg & 0x0000ff00) >> 8),
-                            (int)((nseg & 0x00ff0000) >> 16),
-                            (int)(nseg >> 24));
-                } else {
-                    aml_destroy_node(root);	
-                    goto out;
-                }
-                
-				scop = aml_add_scope(root, name);
-				aml_add_alias(scop, "PSS_", "_PSS");
-			}
-			
-			aml_calculate_size(root);
-			
-			ACPI_TABLE_SSDT *ssdt = (ACPI_TABLE_SSDT *)AllocateKernelMemory(root->Size);
-			
-			aml_write_node(root, (void*)ssdt, 0);
-			
-			ssdt->Header.Length = root->Size;
-			
-            SetChecksum(&ssdt->Header);
-			
-			aml_destroy_node(root);			
-			
-			verbose ("SSDT with CPU P-States generated successfully");
-			
-			if (dropPSS)
-                verbose(", %d P-state(s) dropped",dropPSS);
-			
-			verbose("\n");
-			
-			return ssdt;
-		}
-	}
-	else 
-	{
-out:
-		verbose("ACPI CPUs not found: P-States will not be generated !!!\n");
-	}
-	
-	return (void *)0ul;
-}
-#else
-
 static bool is_sandybridge(void)
 {
     return Platform->CPU.Model == CPUID_MODEL_SANDYBRIDGE;
@@ -1495,7 +777,7 @@ static U32 get_bclk(void)
 {
 	return (is_jaketown() || is_sandybridge()) ? 100 : 133;
 }
-
+/*
 //-----------------------------------------------------------------------------
 static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate)
 {
@@ -1516,7 +798,7 @@ static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnable
 	numStates = (pssLimit < maxStates) ? pssLimit : maxStates;
 	return (numStates < 2) ? 0 : numStates;
 }
-
+*/
 #if BUILD_ACPI_TSS || pstate_power_support
 static U64 divU64byU64(U64 n, U64 d, U64 * rem)
 {
@@ -1557,7 +839,7 @@ static U32 compute_tdp(CPU_DETAILS * cpu)
     }
 	
 }
-#endif
+#endif // BUILD_ACPI_TSS || pstate_power_support
 
 #if pstate_power_support
 static U64 mulU64byU64(U64 a, U64 b, U64 * high)
@@ -1625,7 +907,7 @@ static U32 compute_pstate_power(CPU_DETAILS * cpu, U32 ratio, U32 TDP)
 		return ((ratio_factor * ratio_factor * ratio_factor * Core_TDP) / PRECISION_FACTOR_CUBED) + Uncore_TDP;
 	}
 }
-#endif
+#endif // pstate_power_support
 
 static U32 encode_pstate(U32 ratio)
 {
@@ -1936,7 +1218,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 	return (1);
 }
 #else
-
+/*
 //-----------------------------------------------------------------------------
 static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu)
 {
@@ -1990,7 +1272,7 @@ static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu)
     
 	return (1);
 }
-
+*/
 //-----------------------------------------------------------------------------
 static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {	
@@ -2140,40 +1422,40 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					case CPUID_MODEL_SANDYBRIDGE:
 					case CPUID_MODEL_JAKETOWN:
 					{		
-						/*
-						 maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
-						 minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
-						 
-						 verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
-						 
-						 // Sanity check
-						 if (maximum.Control < minimum.Control) 
-						 {
-						 DBG("Insane control values!");
-						 p_states_count = 0;
-						 }
-						 else
-						 {
-						 U8 i;
-						 p_states_count = 0;
-						 
-						 for (i = maximum.Control; i >= minimum.Control; i--) 
-						 {
-						 p_states[p_states_count].Control = i;
-						 p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
-						 p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
-						 p_states_count++;
-						 if (p_states_count >= MAX_PSTATES) { // was 32
-						 
-						 if (p_states_count > MAX_PSTATES) // was 32
-						 p_states_count = MAX_PSTATES; // was 32
-						 
-						 break;
-						 }
-						 }
-						 }
-						 */
 						
+						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
+						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+						
+						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
+						
+						// Sanity check
+						if (maximum.Control < minimum.Control) 
+						{
+							DBG("Insane control values!");
+							p_states_count = 0;
+						}
+						else
+						{
+							U8 i;
+							p_states_count = 0;
+							
+							for (i = maximum.Control; i >= minimum.Control; i--) 
+							{
+								p_states[p_states_count].Control = i;
+								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
+								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
+								p_states_count++;
+								if (p_states_count >= MAX_PSTATES) { // was 32
+									
+									if (p_states_count > MAX_PSTATES) // was 32
+										p_states_count = MAX_PSTATES; // was 32
+									
+									break;
+								}
+							}
+						}
+						 
+						/*
 						U32 sta = BuildCoreIPstateInfo(cpu);
 						if (sta) 
 						{
@@ -2186,7 +1468,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							verbose("CoreI _PSS Generation failed !!\n");
 							return (0);
 						}
-						
+						*/
 						break;
 					}
 					default:
@@ -2423,7 +1705,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 	DBG("_PSS PGK generated successfully\n");
 	return (1);
 }
-#endif
+#endif // BETA
 
 //-----------------------------------------------------------------------------
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
@@ -2802,7 +2084,7 @@ static U32 BuildTstateInfo(CPU_DETAILS * cpu)
     }
     return (1);
 }
-#endif
+#endif // BUILD_ACPI_TSS
 
 //-----------------------------------------------------------------------------
 U32 ProcessMadt(ACPI_TABLE_MADT * madt, MADT_INFO * madt_info, void * buffer, U32 bufferSize, U32 nb_cpu)
@@ -4070,7 +3352,7 @@ static void * buildCSD(void * current, U32 domain, U32 cpusInDomain, PKG_CSTATES
     
     return(current);
 }
-#endif
+#endif // BUILD_ACPI_CSD
 
 #if BUILD_ACPI_TSS
 //-----------------------------------------------------------------------------
@@ -4283,7 +3565,7 @@ static void * buildTSD(void * current, U32 domain, U32 cpusInDomain)
     
     return(current);
 }
-#endif
+#endif // BUILD_ACPI_TSS
 
 //-----------------------------------------------------------------------------
 static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer, U32 bufferSize, bool enable_cstates, bool enable_pstates,  bool enable_tstates)
@@ -4621,7 +3903,6 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 	
 	return(1);
 }
-#endif
 
 #if UNUSED
 static ACPI_TABLE_FACS* generate_facs(bool updatefacs )
@@ -5330,10 +4611,8 @@ EFI_STATUS setupAcpi(void)
 	bool update_acpi=false, gen_xsdt=false;
 	
 	bool gen_csta=false, gen_psta=false, speed_step=false;
-#if !OLD_SSDT
 	bool gen_ssdt=false; // will force to generate ssdt even if gen_csta and gen_psta = false
     bool gen_tsta=false;
-#endif
 	bool oem_dsdt=false, oem_fadt=false;
 	
 	// Find original rsdp        
@@ -5358,15 +4637,11 @@ EFI_STATUS setupAcpi(void)
 				
 		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
-#if !OLD_SSDT
 		gen_ssdt=getBoolForKey(KForceSSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-#endif
 		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, &bootInfo->bootConfig)&&tmpval;
 		
 		speed_step=getBoolForKey(kSpeedstep, &tmpval, &bootInfo->bootConfig)&&tmpval;
-#if !OLD_SSDT 
 		turbo_enabled=(U32)getBoolForKey(kCoreTurbo, &tmpval, &bootInfo->bootConfig)&&tmpval;
-#endif
 #if BUILD_ACPI_TSS 
 		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
 #endif
@@ -5668,50 +4943,7 @@ EFI_STATUS setupAcpi(void)
 		DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt)
 																										:(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
 	}
-#if OLD_SSDT
-	if (get_needed_symbols())
-	{
-		if (speed_step || gen_csta || gen_psta) 
-		{
-			U8 empty = get_0ul_index_in_list(new_table_list, true);
-			
-			// Generate _CST SSDT
-			if ( speed_step || gen_csta)
-			{
-				if (empty != ACPI_TABLE_LIST_FULL) 
-				{
-					if (new_table_list[empty] =(U32)generate_cst_ssdt(fadt_mod))
-					{
-						if (speed_step || gen_psta)
-							empty = get_0ul_index_in_list(new_table_list,true);
-					}
-				} 
-				else
-				{
-					printf("Error: not enought reserved space in the new acpi list for the _CST SSDT table,\n ");
-					printf("       please increase the RESERVED_AERA\n");
-				}
-			}
-			
-			
-			// Generating _PSS SSDT
-			if (speed_step || gen_psta)
-			{
-				if (empty != ACPI_TABLE_LIST_FULL)
-				{
-					
-					new_table_list[empty] =(U32)generate_pss_ssdt(DsdtPtr);
-					
-				}
-				else
-				{
-					printf("Error: not enought reserved space in the new acpi list for the _PSS SSDT table,\n ");
-					printf("       please increase the RESERVED_AERA\n");
-				}
-			}
-		}
-	}	
-#else
+
     {
         MADT_INFO madt_info;
         bool strip_madt = true;
@@ -5749,7 +4981,6 @@ EFI_STATUS setupAcpi(void)
             ProcessSsdt(new_table_list, DsdtPtr, &madt_info, gen_csta, gen_psta, gen_tsta );		
         }
     }    
-#endif
 	
 	if ((rsdp_mod != (void *)0ul) && (rsdp_mod->Length >= ACPI_RSDP_REV0_SIZE) ) 
 	{

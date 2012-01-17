@@ -178,10 +178,7 @@ struct ran_obj* random_init (int rmin, int rmax)
 
 int random (struct ran_obj* self)
 {
-	
-	//struct ran_opt * ret = (struct ran_opt * )malloc(sizeof(struct ran_opt));
-	//ret = rt ;
-	
+		
     struct ran_obj * ret = self ;
     
 	static int wheel = 0;

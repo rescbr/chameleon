@@ -98,7 +98,7 @@ long LoadDrivers( char * dirSpec )
         return 0;
 	
 	
-
+	
     // Load extra drivers if a hook has been installed.
     
 	int step = 0;
@@ -121,7 +121,7 @@ long LoadDrivers( char * dirSpec )
 			
 			step = 1;
 			execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
-
+			
 #endif
 			
 			// First try a specfic OS version folder ie 10.5
@@ -341,7 +341,7 @@ LoadDriverMKext( char * fileSpec )
     if (!length || (unsigned)length < sizeof (DriversPackage)) return -1;
 	
 	// call hook to notify modules that the mkext has been loaded
-	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) length, NULL, NULL, NULL);
+	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, &length, NULL, NULL, NULL);
 	
 	
     // Verify the MKext.
@@ -723,7 +723,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
     long ret;
     compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
-    		
+	
 #if 0
     printf("kernel header:\n");
     printf("signature: 0x%x\n", kernel_header->signature);
@@ -733,7 +733,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
     printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
     getc();
 #endif
-		
+	
     if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
         if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
@@ -743,10 +743,13 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
         }
 		
 		u_int32_t uncompressed_size, size;
-		void *buffer;
 		
         uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
-        binary = buffer = malloc(uncompressed_size);
+        binary = malloc(uncompressed_size);
+		if (!binary) {
+			printf("Unable to allocate memory for uncompressed kernel\n");
+            return -1;
+		}
 		
         size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
                                OSSwapBigToHostInt32(kernel_header->compressed_size));

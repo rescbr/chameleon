@@ -9,9 +9,9 @@ DIR = boot2
 include ../MakePaths.dir
 
 OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fstack-protector-all \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
-		-mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
+		-mpreferred-stack-boundary=2 -fno-align-functions \
 		-march=pentium4 -msse2 -mfpmath=sse -msoft-float  
 
 DEFINES=
@@ -77,7 +77,7 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -lcc_kext 		
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) 		
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
 	

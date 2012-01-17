@@ -66,7 +66,7 @@
  *      Added support for "0b101..." binary constants.
  *      Commented out references to errno.
  */
- 
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)strtol.c	5.4 (Berkeley) 2/23/91";
 #endif /* LIBC_SCCS and not lint */
@@ -81,17 +81,14 @@ static char sccsid[] = "@(#)strtol.c	5.4 (Berkeley) 2/23/91";
  * alphabets and digits are each contiguous.
  */
 long
-strtol(nptr, endptr, base)
-	const char *nptr;
-	char **endptr;
-	register int base;
+strtol(const char *nptr, char **endptr, int base)
 {
 	register const char *s = nptr;
 	register unsigned long acc;
 	register int c;
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
-
+	
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
 	 * If base is 0, allow 0x for hex and 0 for octal, else
@@ -111,14 +108,14 @@ strtol(nptr, endptr, base)
 		s += 2;
 		base = 16;
 	} else if ((base == 0 || base == 2) &&
-	    c == '0' && (*s == 'b' || *s == 'B')) {
+			   c == '0' && (*s == 'b' || *s == 'B')) {
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
 	if (base == 0)
 		base = c == '0' ? 8 : 10;
-
+	
 	/*
 	 * Compute the cutoff value between legal numbers and illegal
 	 * numbers.  That is the largest legal value, divided by the
@@ -148,7 +145,7 @@ strtol(nptr, endptr, base)
 			break;
 		if (c >= base)
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim) )
 			any = -1;
 		else {
 			any = 1;
@@ -158,11 +155,20 @@ strtol(nptr, endptr, base)
 	}
 	if (any < 0) {
 		acc = neg ? LONG_MIN : LONG_MAX;
-//		errno = ERANGE;
+		//		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
-		*endptr = (char *)(any ? s - 1 : nptr);
+	{
+		if(any)
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(s - 1, const, char *);
+		}
+		else
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(nptr, const, char *);
+		}
+	}
 	return (acc);
 }
 
@@ -174,17 +180,14 @@ strtol(nptr, endptr, base)
  * alphabets and digits are each contiguous.
  */
 unsigned long
-strtoul(nptr, endptr, base)
-	const char *nptr;
-	char **endptr;
-	register int base;
+strtoul(const char *nptr, char **endptr, int base)
 {
 	register const char *s = nptr;
 	register unsigned long acc;
 	register int c;
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
-
+	
 	/*
 	 * See strtol for comments as to the logic used.
 	 */
@@ -202,7 +205,7 @@ strtoul(nptr, endptr, base)
 		s += 2;
 		base = 16;
 	} else if ((base == 0 || base == 2) &&
-	    c == '0' && (*s == 'b' || *s == 'B')) {
+			   c == '0' && (*s == 'b' || *s == 'B')) {
 		c = s[1];
 		s += 2;
 		base = 2;
@@ -220,7 +223,7 @@ strtoul(nptr, endptr, base)
 			break;
 		if (c >= base)
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim) )
 			any = -1;
 		else {
 			any = 1;
@@ -230,11 +233,21 @@ strtoul(nptr, endptr, base)
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-//		errno = ERANGE;
+		//		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
-		*endptr = (char *)(any ? s - 1 : nptr);
+	{
+		if(any)
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(s - 1, const, char *);
+		}
+		else
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(nptr, const, char *);
+		}
+	}
+	
 	return (acc);
 }
 
@@ -245,17 +258,16 @@ strtoul(nptr, endptr, base)
  * alphabets and digits are each contiguous.
  */
 unsigned long long
-strtouq(nptr, endptr, base)
-	const char *nptr;
-	char **endptr;
-	register int base;
+strtouq(const char *nptr,
+		char **endptr,
+		register int base)
 {
 	register const char *s = nptr;
 	register unsigned long long acc;
 	register int c;
 	register unsigned long long qbase, cutoff;
 	register int neg, any, cutlim;
-
+	
 	/*
 	 * See strtoq for comments as to the logic used.
 	 */
@@ -301,10 +313,20 @@ strtouq(nptr, endptr, base)
 	}
 	if (any < 0) {
 		acc = UQUAD_MAX;
-//		errno = ERANGE;
+		//		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
-		*endptr = (char *)(any ? s - 1 : nptr);
+	{
+		if(any)
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(s - 1, const, char *);
+		}
+		else
+		{
+			*endptr = __CAST_AWAY_QUALIFIER(nptr, const, char *);
+		}
+	}
+	
 	return (acc);
 }

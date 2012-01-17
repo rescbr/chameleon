@@ -1,3 +1,9 @@
+- Added cpu_intel_amd.c (not by default, you need to edit the makefile in the libsaio directory to compile it)
+- Implemented a stack_protector (seems to work)
+- Sync'd libsa with Xnu
+- Removed lcc_kext dependency from the make file
+- Fixed some bugs
+
 - Updated the default theme to v 1.1 (credit to blackosx)
 - Updated LogintoLion with he haiku device logo (credit to blackosx)
 - Updated for the gui 

@@ -111,7 +111,7 @@ static int countdown( const char * msg, int row, int timeout )
 	
 	moveCursor( 0, row );
 	printf(msg);
-		
+	
     for ( time = time18(), timeout++; timeout > 0; )
     {
 		if ((ch = readKeyboardStatus()))
@@ -142,11 +142,11 @@ static int countdown( const char * msg, int row, int timeout )
 
 //==========================================================================
 
- char   gBootArgs[BOOT_STRING_LEN];
- char * gBootArgsPtr = gBootArgs;
- char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
- char   booterCommand[BOOT_STRING_LEN];
- char   booterParam[BOOT_STRING_LEN];
+char   gBootArgs[BOOT_STRING_LEN];
+char * gBootArgsPtr = gBootArgs;
+char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
+char   booterCommand[BOOT_STRING_LEN];
+char   booterParam[BOOT_STRING_LEN];
 
 void clearBootArgs(void)
 {
@@ -237,17 +237,17 @@ static void updateBootArgs( int key )
 
 //==========================================================================
 
- const MenuItem * gMenuItems = NULL;
+const MenuItem * gMenuItems = NULL;
 
- int   gMenuItemCount;
- int   gMenuRow;
- int   gMenuHeight;
- int   gMenuTop;
- int   gMenuBottom;
- int   gMenuSelection;
+int   gMenuItemCount;
+int   gMenuRow;
+int   gMenuHeight;
+int   gMenuTop;
+int   gMenuBottom;
+int   gMenuSelection;
 
- int	 gMenuStart;
- int	 gMenuEnd;
+int	 gMenuStart;
+int	 gMenuEnd;
 
 void printMenuItem( const MenuItem * item, int highlight )
 {
@@ -564,22 +564,22 @@ int getBootOptions(bool firstRun)
 		timeout = multiboot_timeout;
 	} else 
 #endif
-	if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->bootConfig)) {
-		/*  If there is no timeout key in the file use the default timeout
-		 which is different for CDs vs. hard disks.  However, if not booting
-		 a CD and no config file could be loaded set the timeout
-		 to zero which causes the menu to display immediately.
-		 This way, if no partitions can be found, that is the disk is unpartitioned
-		 or simply cannot be read) then an empty menu is displayed.
-		 If some partitions are found, for example a Windows partition, then
-		 these will be displayed in the menu as foreign partitions.
-		 */
-		if (isCDROM) {
-			timeout = kCDBootTimeout;
-		} else {
-			timeout = sysConfigValid ? kBootTimeout : 0;
+		if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->bootConfig)) {
+			/*  If there is no timeout key in the file use the default timeout
+			 which is different for CDs vs. hard disks.  However, if not booting
+			 a CD and no config file could be loaded set the timeout
+			 to zero which causes the menu to display immediately.
+			 This way, if no partitions can be found, that is the disk is unpartitioned
+			 or simply cannot be read) then an empty menu is displayed.
+			 If some partitions are found, for example a Windows partition, then
+			 these will be displayed in the menu as foreign partitions.
+			 */
+			if (isCDROM) {
+				timeout = kCDBootTimeout;
+			} else {
+				timeout = sysConfigValid ? kBootTimeout : 0;
+			}
 		}
-	}
 	
 	if (timeout < 0) {
 		gBootMode |= kBootModeQuiet;
@@ -773,35 +773,35 @@ int getBootOptions(bool firstRun)
 					}
 					else
 #endif
-					if ( strcmp( booterCommand, "memory" ) == 0) 
-					{
-						printMemoryInfo();
-					}
-					else if (strcmp(booterCommand, "lspci") == 0) 
-					{
-						lspci();
-					} 
-					else if (strcmp(booterCommand, "more") == 0) 
-					{
-						showTextFile(booterParam);
-					}
-					else if (strcmp(booterCommand, "rd") == 0) 
-					{
-						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
-						showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
-					} 
-					else if (strcmp(booterCommand, "norescan") == 0)
-					{
-						if (gEnableCDROMRescan)
+						if ( strcmp( booterCommand, "memory" ) == 0) 
 						{
-							gEnableCDROMRescan = false;
-							break;
+							printMemoryInfo();
 						}
-					}
-					else
-					{
-						showHelp();
-					}
+						else if (strcmp(booterCommand, "lspci") == 0) 
+						{
+							lspci();
+						} 
+						else if (strcmp(booterCommand, "more") == 0) 
+						{
+							showTextFile(booterParam);
+						}
+						else if (strcmp(booterCommand, "rd") == 0) 
+						{
+							if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
+								showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
+						} 
+						else if (strcmp(booterCommand, "norescan") == 0)
+						{
+							if (gEnableCDROMRescan)
+							{
+								gEnableCDROMRescan = false;
+								break;
+							}
+						}
+						else
+						{
+							showHelp();
+						}
 #endif
 					key = 0;
 					showBootPrompt(nextRow, showPrompt);
@@ -900,7 +900,7 @@ processBootOptions()
     int		     userCnt;
     char *           argP;
     char *           configKernelFlags;
-        
+	
     skipblanks( &cp );
 	
     // Update the unit and partition number.
@@ -983,32 +983,40 @@ processBootOptions()
         cnt = 0;
     }
 	
-    configKernelFlags = malloc(cnt + 1);
-    strlcpy(configKernelFlags, val, cnt + 1);
+    configKernelFlags = newString(val);
 	
-    	
-    if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-        if (gBootMode & kBootModeSafe) {
-            copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &ArgCntRemaining);
-        }
-    }
+	{
+		bool isSafeMode = false;
+		if (configKernelFlags) {
+			isSafeMode = getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt);
+		}
+		
+		if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
+			(isSafeMode == false)) {
+			if (gBootMode & kBootModeSafe) {
+				copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &ArgCntRemaining);
+			}
+		}
+	}
 	
-    // Store the merged kernel flags and boot args.
+	if (configKernelFlags) {
+		// Store the merged kernel flags and boot args.
+		
+		cnt = strlen(configKernelFlags);
+		if (cnt) {
+			if (cnt > ArgCntRemaining) {
+				printf("Warning: boot arguments too long, truncating\n");
+				cnt = ArgCntRemaining;
+			}
+			strncpy(argP, configKernelFlags, cnt);
+			argP[cnt++] = ' ';
+			ArgCntRemaining -= cnt;
+		}
+	}	
 	
-    cnt = strlen(configKernelFlags);
-    if (cnt) {
-        if (cnt > ArgCntRemaining) {
-            error("Warning: boot arguments too long, truncating\n");
-            cnt = ArgCntRemaining;
-        }
-        strncpy(argP, configKernelFlags, cnt);
-        argP[cnt++] = ' ';
-        ArgCntRemaining -= cnt;
-    }
     userCnt = strlen(cp);
     if (userCnt > ArgCntRemaining) {
-		error("Warning: boot arguments too long, truncating\n");
+		printf("Warning: boot arguments too long, truncating\n");
 		userCnt = ArgCntRemaining;
     }
     strncpy(&argP[cnt], cp, userCnt);
@@ -1032,7 +1040,10 @@ processBootOptions()
 		strlcpy(gMKextName, val, cnt + 1);
 	}
 	
-    free(configKernelFlags);
+	if (configKernelFlags) 
+	{
+		free(configKernelFlags);
+	}
 	
     return 0;
 }
@@ -1114,19 +1125,19 @@ void showHelp(void)
 	char filename[512];
 	sprintf(filename, "BootHelp.txt");
 	
-		// Check Extra on booting partition
-		sprintf(dirspec,"/Extra/%s",filename);
+	// Check Extra on booting partition
+	sprintf(dirspec,"/Extra/%s",filename);
+	fd=open (dirspec);
+	if (fd<0)
+	{	// Fall back to booter partition
+		sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
 		fd=open (dirspec);
 		if (fd<0)
-		{	// Fall back to booter partition
-			sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-			fd=open (dirspec);
-			if (fd<0)
-			{
-				printf("BootHelp not found: %s\n", filename);
-				return;
-			}
+		{
+			printf("BootHelp not found: %s\n", filename);
+			return;
 		}
+	}
 	int BootHelp_txt_len = file_size (fd);
 	void *BootHelp_txt=malloc(BootHelp_txt_len);
 	if (BootHelp_txt)
@@ -1138,7 +1149,7 @@ void showHelp(void)
 			close (fd);
 			return;
 		}
-				
+		
 		close (fd);		
 	}
 #endif

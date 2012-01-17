@@ -159,7 +159,7 @@ void build_pci_dt(void)
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	char* buffer = malloc(sizeof(char) * 256);
-
+	
 	pci_dt_t	*current;
 	pci_dt_t	*end;
 	char		tmp[64];
@@ -195,7 +195,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 	
 	while (current)
 	{		
-		execute_hook("PCIDevice", current, NULL/* &ret*/, NULL, NULL, NULL, NULL);
+		execute_hook("PCIDevice", (void*)current, NULL, NULL, NULL, NULL, NULL);
 		
 		setup_pci_devs(current->children);
 		current = current->next;

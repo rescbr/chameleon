@@ -34,96 +34,76 @@
 #if 0
 #include "C_Exception.h"
 #endif
+#include "quad.h"
 
+/* 
+ * This macro casts away the qualifier from the variable
+ *
+ * Note: use at your own risk, removing qualifiers can result in
+ * catastrophic run-time failures.
+ */
+#ifndef __CAST_AWAY_QUALIFIER
+#define __CAST_AWAY_QUALIFIER(variable, qualifier, type)  (type) (long)(variable)
+#endif
 /*
  * ctype stuff (aserebln)
  */
-static inline int isupper(char c)
-{
-    return (c >= 'A' && c <= 'Z');
-}
-
-static inline int islower(char c)
-{
-    return (c >= 'a' && c <= 'z');
-}
-
-static inline int isalpha(char c)
-{
-    return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
-}
-
-static inline int isascii(char c)
-{
-    return ( (c >= 0x20) && (c < 0x7f) );
-}
-
-static inline int isspace(char c)
-{
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\12');
-}
-
-static inline int isdigit(char c)
-{
-    return (c >= '0' && c <= '9');
-}
-
-static inline int isxdigit(char c)
-{
-    return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
-}
-
-//Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
-static inline int ispunct(char c)
-{
-    return (c == '.' || c == '-');
-}
+#define isupper(c)  (c >= 'A' && c <= 'Z')
+#define islower(c)  (c >= 'a' && c <= 'z')
+#define isalpha(c)  ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+#define isascii(c)  ((c >= 0x20) && (c < 0x7f))
+#define isspace(c)  (c == ' ' || c == '\t' || c == '\n' || c == '\12')
+#define isdigit(c)  (c >= '0' && c <= '9')
+#define isxdigit(c) ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
+#define ispunct(c)  (c == '.' || c == '-') //Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
 
 /*
  * string.c
  */
-#ifndef bcopy
-extern void   bcopy(const void * src, void * dst, size_t len);
-#endif
 
-#ifndef bzero
-extern void   bzero(void * dst, size_t len);
-#endif
-
-extern void * memset(void * dst, int c, size_t n);
-extern void * memcpy(void * dst, const void * src, size_t len);
-extern int    memcmp(const void * p1, const void * p2, int len);
-extern int    strcmp(const char * s1, const char * s2);
-extern int    strncmp(const char * s1, const char * s2, size_t n);
-extern char * strcpy(char * s1, const char * s2);
-extern char * strncpy(char * s1, const char * s2, size_t n);
-extern char * strlcpy(char * s1, const char * s2, size_t n);
-extern char * strstr(const char *in, const char *str);
-extern int    atoi(const char * str);
+extern char * strbreak(const char *str, char **next, long *len);
 extern int    ptol(const char * str);
-extern int    strlen(const char * str);
-extern char * strcat(char * s1, const char * s2);
+
+extern void	bcopy(const void *, void *, size_t);
+extern void	bzero(void *, size_t);
+
+extern void	*memcpy(void *, const void *, size_t);
+extern int	memcmp(const void *, const void *, size_t);
+extern void	*memmove(void *, const void *, size_t);
+extern void	*memset(void *, int, size_t);
+
+extern size_t	strlen(const char *);
+extern size_t	strnlen(const char *, size_t);
+
+/* strcpy() is being deprecated. Please use strlcpy() instead. */
+extern char	*strcpy(char *, const char *);
+extern char	*strncpy(char *, const char *, size_t);
+
+extern size_t	strlcat(char *, const char *, size_t);
+extern size_t	strlcpy(char *, const char *, size_t);
+
+/* strcat() is being deprecated. Please use strlcat() instead. */
+extern char	*strcat(char *, const char *);
 extern char * strncat(char * s1, const char * s2, size_t n);
-extern char * strdup(const char *s1);
+
+/* strcmp() is being deprecated. Please use strncmp() instead. */
+extern int	strcmp(const char *, const char *);
+extern int	strncmp(const char *,const char *, size_t);
 
 #if STRNCASECMP
-extern int    strncasecmp(const char * s1, const char * s2, size_t n);
+extern int	strcasecmp(const char *s1, const char *s2);
+extern int	strncasecmp(const char *s1, const char *s2, size_t n);
 #endif
-
-extern char * strchr(const char *str, int c);
-extern char * strbreak(const char *str, char **next, long *len);
+extern char	*strdup(const char *);
+extern char	*strchr(const char *s, int c);
+extern int atoi(const char *);
+extern char *itoa(int	,char	*);
+extern const char *strstr(const char *, const char *);
 
 extern uint8_t checksum8( void * start, unsigned int length );
-
 extern unsigned long
 adler32( unsigned char * buffer, long length );
-/*
- * error.c
- */
-extern int    errno;
-#if UNUSED
-extern char * strerror(int errnum);
-#endif 
+
 /*
  * strtol.c
  */
@@ -136,6 +116,7 @@ extern unsigned long long strtouq(const char *nptr, char ** endptr, int base);
  */
 extern void prf(const char * fmt, va_list ap, void (*putfn_p)(),
                 void * putfn_arg);
+extern int prf_fmt_str_len(const char * fmt, va_list ap);
 
 /*
  * printf.c

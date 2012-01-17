@@ -45,7 +45,7 @@
 /*
  * Max size fo config data array, in bytes.
  */
-#define IO_CONFIG_DATA_SIZE		4096 // was 163840
+#define IO_CONFIG_DATA_SIZE		40960 // was 4096 // was 163840
 
 #define rand_tab_len 100
 

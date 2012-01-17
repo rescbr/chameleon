@@ -12,13 +12,11 @@
 
 #include "Symbols.h"
 
-static int strcmp(const char * s1, const char * s2);
-
 void Symbols_start()
 {
 }
 
-unsigned int lookup_symbol(const char* symbol)
+unsigned int lookup_symbol(const char* symbol, int(*strcmp)(const char*, const char*))
 {
 	int upperLimit = sizeof(symbolList) / sizeof(symbolList[0]) - 1;		
 	int lowerLimit = 0;
@@ -55,17 +53,26 @@ unsigned int lookup_symbol(const char* symbol)
 	return symbolList[compareIndex].addr;
 }
 
-/*
- * strcmp - Copied from libsa/string.c due to symbols not able to be resolved at this point
- */
-static int strcmp(const char * s1, const char * s2)
-{
-	while (*s1 && (*s1 == *s2)) {
-		s1++;
-		s2++;
-	}
-	return (*s1 - *s2);
+
+#define __arraycount(__x)       (sizeof(__x) / sizeof(__x[0]))
+
+long __stack_chk_guard[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+static void __guard_setup(void) __attribute__((constructor));
+void __stack_chk_fail(void);
+
+static void
+__guard_setup(void)
+{	
+	/* Here the protector switches the guard
+     to the "terminator canary", and cannot report failure */
+	((char*)__stack_chk_guard)[0] = 0; ((char*)__stack_chk_guard)[1] = 0;
+	((char*)__stack_chk_guard)[2] = '\n'; ((char*)__stack_chk_guard)[3] = 255;	
+  
 }
 
-
-
+void
+__stack_chk_fail()
+{
+  for(;;);
+}

@@ -24,35 +24,27 @@
 
 #include <architecture/i386/asm_help.h>
 
-#define	O_EDI	0
-#define	O_ESI	4
-#define	O_EBX	8
-#define	O_EBP	12
-#define	O_ESP	16
-#define O_EIP	20
+LABEL(_setjmp)
+	movl	4(%esp),%ecx		# fetch buffer
+	movl	%ebx,0(%ecx)
+	movl	%esi,4(%ecx)
+	movl	%edi,8(%ecx)
+	movl	%ebp,12(%ecx)		# save frame pointer of caller
+	popl	%edx
+	movl	%esp,16(%ecx)		# save stack pointer of caller
+	movl	%edx,20(%ecx)		# save pc of caller
+	xorl	%eax,%eax
+    jmp     *%edx
 
-LEAF(_setjmp, 0)
-X_LEAF(_set_label, _setjmp)
-	movl	4(%esp), %edx       // address of save area
-	movl	%edi, O_EDI(%edx)
-	movl	%esi, O_ESI(%edx)
-	movl	%ebx, O_EBX(%edx)
-	movl	%ebp, O_EBP(%edx)
-	movl	%esp, O_ESP(%edx)
-	movl	(%esp), %ecx        // %eip (return address)
-	movl	%ecx, O_EIP(%edx)
-	subl	%eax, %eax          // retval <- 0
-	ret
-
-LEAF(_longjmp, 0)
-X_LEAF(_jump_label, _longjmp)
-	movl	4(%esp), %edx       // address of save area
-	movl	O_EDI(%edx), %edi
-	movl	O_ESI(%edx), %esi
-	movl	O_EBX(%edx), %ebx
-	movl	O_EBP(%edx), %ebp
-	movl	O_ESP(%edx), %esp
-	movl	O_EIP(%edx), %eax   // %eip (return address)
-	movl	%eax, 0(%esp)
-	popl	%eax                // ret addr != 0
-	jmp	    *%eax               // indirect
+LABEL(_longjmp)
+	movl	8(%esp),%eax		# return(v)
+	movl	4(%esp),%ecx		# fetch buffer
+	movl	0(%ecx),%ebx
+	movl	4(%ecx),%esi
+	movl	8(%ecx),%edi
+	movl	12(%ecx),%ebp
+	movl	16(%ecx),%esp
+	orl	%eax,%eax
+	jnz	0f
+	incl	%eax
+0:	jmp	*20(%ecx)		# done, return....

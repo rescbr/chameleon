@@ -25,204 +25,186 @@
 
 #include "libsa.h"
 
-void * memset(void * dst, int val, size_t len)
-{
-    asm volatile ( "rep; stosb"
-       : "=c" (len), "=D" (dst)
-       : "0" (len), "1" (dst), "a" (val)
-       : "memory" );
+static int _mach_strlen(const char *str);
+static char *STRDUP(const char *string);
 
-    return dst;
-}
-
-#if 0
-void * memcpy(void * dst, const void * src, size_t len)
-{
-    asm volatile ( "rep; movsb"
-       : "=c" (len), "=D" (dst), "=S" (src)
-       : "0" (len), "1" (dst), "2" (src)
-       : "memory" );
-
-    return dst;
-}
-
-void bcopy(const void * src, void * dst, size_t len)
-{
-	memcpy(dst, src, len);
-}
-
-void bzero(void * dst, size_t len)
-{
-    memset(dst, 0, len);
-}
 /*
-void __bzero(void * dst, size_t len)
-{
-    memset(dst, 0, len);
-}
-*/
-#else
-void * memcpy(void * dst, const void * src, size_t len)
-{
-    asm volatile ( "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; movsl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; movsb           \n\t"
-       : "=D" (dst)
-       : "c" (len), "D" (dst), "S" (src)
-       : "memory", "%edx" );
-
-    return dst;
-}
-
-void bcopy(const void * src, void * dst, size_t len)
-{
-    asm volatile ( "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; movsl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; movsb           \n\t"
-       :
-       : "c" (len), "D" (dst), "S" (src)
-       : "memory", "%edx" );
-}
-
-void bzero(void * dst, size_t len)
-{
-    asm volatile ( "xorl %%eax, %%eax    \n\t"
-         "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; stosl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; stosb           \n\t"
-       : 
-       : "c" (len), "D" (dst)
-       : "memory", "%eax" );
-}
-/*
-void __bzero(void * dst, size_t len)
-{
-    asm volatile ( "xorl %%eax, %%eax    \n\t"
-                  "cld                  \n\t"
-                  "movl %%ecx, %%edx    \n\t"
-                  "shrl $2, %%ecx       \n\t"
-                  "rep; stosl           \n\t"
-                  "movl %%edx, %%ecx    \n\t"
-                  "andl $3, %%ecx       \n\t"
-                  "rep; stosb           \n\t"
-                  : 
-                  : "c" (len), "D" (dst)
-                  : "memory", "%eax" );
-}*/
-#endif
-
-/* #if DONT_USE_GCC_BUILT_IN_STRLEN */
-
-
-
-int strlen(const char * s)
-{
-	int n = 0;
-	while (*s++) n++;
-	return(n);
-}
-
-/*#endif*/
-
-/* NOTE: Moved from ntfs.c */
-int
-memcmp(const void *p1, const void *p2, int len)
-{
-    while (len--) {
-        if (*(const char*)(p1++) != *(const char*)(p2++))
-            return -1;
-    }
-    return 0;
-}
+ * Abstract:
+ *      strcmp (s1, s2) compares the strings "s1" and "s2".
+ *      It returns 0 if the strings are identical. It returns
+ *      > 0 if the first character that differs in the two strings
+ *      is larger in s1 than in s2 or if s1 is longer than s2 and
+ *      the contents are identical up to the length of s2.
+ *      It returns < 0 if the first differing character is smaller
+ *      in s1 than in s2 or if s1 is shorter than s2 and the
+ *      contents are identical upto the length of s1.
+ * Deprecation Warning:
+ *	strcmp() is being deprecated. Please use strncmp() instead.
+ */
 
 int
-strcmp(const char * s1, const char * s2)
+strcmp(
+	   const char *s1,
+	   const char *s2)
 {
-	while (*s1 && (*s1 == *s2)) {
-		s1++;
-		s2++;
+	unsigned int a, b;
+	
+	do {
+		a = *s1++;
+		b = *s2++;
+		if (a != b)
+			return a-b;     /* includes case when
+							 'a' is zero and 'b' is not zero
+							 or vice versa */
+	} while (a != '\0');
+	
+	return 0;       /* both are zero */
+}
+
+/*
+ * Abstract:
+ *      strncmp (s1, s2, n) compares the strings "s1" and "s2"
+ *      in exactly the same way as strcmp does.  Except the
+ *      comparison runs for at most "n" characters.
+ */
+
+int
+strncmp(
+        const char *s1,
+        const char *s2,
+        size_t n)
+{
+	unsigned int a, b;
+	
+	while (n != 0) {
+		a = *s1++;
+		b = *s2++;
+		if (a != b)
+			return a-b;     /* includes case when
+							 'a' is zero and 'b' is not zero
+							 or vice versa */
+		if (a == '\0')
+			return 0;       /* both are zero */
+		n--;
 	}
-	return (*s1 - *s2);
+	
+	return 0;
 }
 
-int strncmp(const char * s1, const char * s2, size_t len)
-{
-	register int n = len;
-	while (--n >= 0 && *s1 == *s2++)
-		if (*s1++ == '\0')
-			return(0);
-	return(n<0 ? 0 : *s1 - *--s2);
-}
 
+/*
+ * Abstract:
+ *      strcpy copies the contents of the string "from" including
+ *      the null terminator to the string "to". A pointer to "to"
+ *      is returned.
+ * Deprecation Warning: 
+ *	strcpy() is being deprecated. Please use strlcpy() instead.
+ */
 char *
-strcpy(char * s1, const char * s2)
+strcpy(
+	   char *to,
+	   const char *from)
 {
-	register char *ret = s1;
-	while ((*s1++ = *s2++))
+	char *ret = to;
+	
+	while ((*to++ = *from++) != '\0')
 		continue;
+	
 	return ret;
 }
 
+/*
+ * Abstract:
+ *      strncpy copies "count" characters from the "from" string to
+ *      the "to" string. If "from" contains less than "count" characters
+ *      "to" will be padded with null characters until exactly "count"
+ *      characters have been written. The return value is a pointer
+ *      to the "to" string.
+ */
+
 char *
-strncpy(char * s1, const char * s2, size_t n)
+strncpy(
+		char *s1, 
+		const char *s2,
+		size_t n)
 {
-	register char *ret = s1;
-	while (n && (*s1++ = *s2++))
-		n--;
-	return ret;
+	char *os1 = s1;
+	unsigned long i;
+	
+	for (i = 0; i < n;)
+		if ((*s1++ = *s2++) == '\0')
+			for (i++; i < n; i++)
+				*s1++ = '\0';
+		else
+			i++;
+	return (os1);
 }
 
-char *
-strlcpy(char * s1, const char * s2, size_t n)
+/*
+ * Copy src to string dst of size siz.  At most siz-1 characters
+ * will be copied.  Always NUL terminates (unless siz == 0).
+ * Returns strlen(src); if retval >= siz, truncation occurred.
+ */
+size_t
+strlcpy(char *dst, const char *src, size_t siz)
 {
-	register char *ret = s1;
-	while (n && (*s1++ = *s2++))
-		n--;
-	if (!n) *--s1=0;
-	return ret;
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz;
+	
+	/* Copy as many bytes as will fit */
+	if (n != 0 && --n != 0) {
+		do {
+			if ((*d++ = *s++) == 0)
+				break;
+		} while (--n != 0);
+	}
+	
+	/* Not enough room in dst, add NUL and traverse rest of src */
+	if (n == 0) {
+		if (siz != 0)
+			*d = '\0';		/* NUL-terminate dst */
+		while (*s++)
+			;
+	}
+	
+	return(s - src - 1);	/* count does not include NUL */
 }
 
-char *
+/*
+ * History:
+ *  2002-01-24 	gvdl	Initial implementation of strstr
+ */
+
+const char *
 strstr(const char *in, const char *str)
 {
     char c;
     size_t len;
-
+	
     c = *str++;
     if (!c)
-        return (char *) in;	// Trivial empty string case
-
+        return (const char *) in;	// Trivial empty string case
+	
     len = strlen(str);
     do {
         char sc;
-
+		
         do {
             sc = *in++;
             if (!sc)
                 return (char *) 0;
         } while (sc != c);
     } while (strncmp(in, str, len) != 0);
-
-    return (char *) (in - 1);
+	
+    return (const char *) (in - 1);
 }
 
 int
 ptol(const char *str)
 {
 	register int c = *str;
-
+	
 	if (c <= '7' && c >= '0')
 		c -= '0';
 	else if (c <= 'h' && c >= 'a')
@@ -231,67 +213,271 @@ ptol(const char *str)
 	return c;
 }
 
+/*
+ * atoi:
+ *
+ *      This function converts an ascii string into an integer.
+ *
+ * input        : string
+ * output       : a number
+ */
+
 int
-atoi(const char *str)
+atoi(const char *cp)
 {
-	register int sum = 0;
-	while (*str == ' ' || *str == '\t')
-		str++;
-	while (*str >= '0' && *str <= '9') {
-		sum *= 10;
-		sum += *str++ - '0';
+	int     number;
+	
+	for (number = 0; ('0' <= *cp) && (*cp <= '9'); cp++)
+		number = (number * 10) + (*cp - '0');
+	
+	return( number );
+}
+
+/*
+ * convert an integer to an ASCII string.
+ * inputs:
+ *	num	integer to be converted
+ *	str	string pointer.
+ *
+ * outputs:
+ *	pointer to string start.
+ */
+
+char *
+itoa(
+	 int	num,
+	 char	*str)
+{
+	char    digits[11];
+	char *dp;
+	char *cp = str;
+	
+	if (num == 0) {
+		*cp++ = '0';
 	}
-	return sum;
+	else {
+		dp = digits;
+		while (num) {
+			*dp++ = '0' + num % 10;
+			num /= 10;
+		}
+		while (dp != digits) {
+			*cp++ = *--dp;
+		}
+	}
+	*cp++ = '\0';
+	
+	return str;
 }
 
-char *strncat(char *s1, const char *s2, size_t n)
+/*
+ * Appends src to string dst of size siz (unlike strncat, siz is the
+ * full size of dst, not space left).  At most siz-1 characters
+ * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
+ * Returns strlen(src) + MIN(siz, strlen(initial dst)).
+ * If retval >= siz, truncation occurred.
+ */
+size_t
+strlcat(char *dst, const char *src, size_t siz)
 {
-	register char *ret = s1;
-	while (*s1)
-		s1++;
-	while (n-- && *s2)
-		*s1++ = *s2++;
-	*s1 = '\0';
-	return ret;
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz;
+	size_t dlen;
+	
+	/* Find the end of dst and adjust bytes left but don't go past end */
+	while (n-- != 0 && *d != '\0')
+		d++;
+	dlen = d - dst;
+	n = siz - dlen;
+	
+	if (n == 0)
+		return(dlen + strlen(s));
+	while (*s != '\0') {
+		if (n != 1) {
+			*d++ = *s;
+			n--;
+		}
+		s++;
+	}
+	*d = '\0';
+	
+	return(dlen + (s - src));       /* count does not include NUL */
 }
 
-char *strcat(char *s1, const char *s2)
+/*
+ *
+ */
+
+char *
+strncat(char *s1, const char *s2, unsigned long n)
 {
-	return(strncat(s1, s2, strlen(s2)));
+	char *os1;
+	int i = n;
+	
+	os1 = s1;
+	while (*s1++)
+		;
+	--s1;
+	while ((*s1++ = *s2++))
+		if (--i < 0) {
+			*--s1 = '\0';
+			break;
+		}
+	return(os1);
 }
 
-char *strdup(const char *s1)
+static int
+_mach_strlen(const char *str)
 {
-	return strcpy(malloc(strlen(s1) + 1), s1);
+	const char *p;
+	for (p = str; p; p++) {
+		if (*p == '\0') {
+			return (p - str);
+		}
+	}
+	/* NOTREACHED */
+	return 0;
+}
+
+size_t strlen(const char * str)
+{	
+	return (size_t)_mach_strlen(str);
+}
+
+/*
+ * Does the same thing as strlen, except only looks up
+ * to max chars inside the buffer. 
+ * Taken from archive/kern-stuff/sbf_machine.c in 
+ * seatbelt. 
+ * inputs:
+ * 	s	string whose length is to be measured
+ *	max	maximum length of string to search for null
+ * outputs:
+ *	length of s or max; whichever is smaller
+ */
+size_t 
+strnlen(const char *s, size_t max) {
+	const char *es = s + max, *p = s;
+	while(*p && p != es) 
+		p++;
+	
+	return p - s;
+}
+
+/* 
+ * Deprecation Warning:
+ *	strcat() is being deprecated. Please use strlcat() instead.
+ */
+char *
+strcat(
+	   char *dest,
+	   const char *src)
+{
+	char *old = dest;
+	
+	while (*dest)
+		++dest;
+	while ((*dest++ = *src++))
+		;
+	return (old);
+}
+
+/*
+ * STRDUP
+ *
+ * Description: The STRDUP function allocates sufficient memory for a copy
+ *              of the string "string", does the copy, and returns a pointer
+ *              it. The pointer may subsequently be used as an argument to
+ *              the macro FREE().
+ *
+ * Parameters:  string		String to be duplicated
+ *
+ * Returns:     char *          A pointer to the newly allocated string with
+ *                              duplicated contents in it.
+ *
+ *              NULL		If MALLOC() fails.
+ * 
+ */
+static char *
+STRDUP(const char *string)
+{
+	size_t len;
+	char *copy;   
+	
+	len = strlen(string) + 1;
+	copy = malloc(len);
+	if (copy == NULL)
+		return (NULL);
+	bcopy(string, copy, len);
+	return (copy); 
+}
+
+char *strdup(const char *string)
+{
+	if (string) {
+		return STRDUP(string);
+	}
+	return (NULL);
 }
 
 #if STRNCASECMP
 
-#define tolower(c)     ((int)((c) & ~0x20))
-#define toupper(c)     ((int)((c) | 0x20))
-
-int strncasecmp(const char *s1, const char *s2, size_t len)
+//
+// Lame implementation just for use by strcasecmp/strncasecmp
+//
+static int
+tolower(unsigned char ch)
 {
-	register int n = len;
-	while (--n >= 0 && tolower(*s1) == tolower(*s2++))
-		if (*s1++ == '\0')
-			return(0);
-	return(n<0 ? 0 : tolower(*s1) - tolower(*--s2));
+    if (ch >= 'A' && ch <= 'Z')
+		ch = 'a' + (ch - 'A');
+	
+    return ch;
+}
+
+int
+strcasecmp(const char *s1, const char *s2)
+{
+    const unsigned char *us1 = (const u_char *)s1,
+	*us2 = (const u_char *)s2;
+	
+    while (tolower(*us1) == tolower(*us2++))
+		if (*us1++ == '\0')
+			return (0);
+    return (tolower(*us1) - tolower(*--us2));
+}
+
+int
+strncasecmp(const char *s1, const char *s2, size_t n)
+{
+    if (n != 0) {
+		const unsigned char *us1 = (const u_char *)s1,
+		*us2 = (const u_char *)s2;
+		
+		do {
+			if (tolower(*us1) != tolower(*us2++))
+				return (tolower(*us1) - tolower(*--us2));
+			if (*us1++ == '\0')
+				break;
+		} while (--n != 0);
+    }
+    return (0);
 }
 #endif
 
-char* strchr(const char *str, int c)
+/*
+ *
+ */
+
+char *strchr(const char *str, int ch)
 {
-    do
-    {
-        if(*str == c)
-            return (char*)str;
-    }
-    while(*(str++));
-    
-    return 0;
-}        
-        
+    do {
+		if (*str == ch)
+			return(__CAST_AWAY_QUALIFIER(str, const, char *));
+    } while (*str++);
+    return ((char *) 0);
+}      
+
 char* strbreak(const char *str, char **next, long *len)
 {
     char *start = (char*)str, *end;
@@ -335,10 +521,10 @@ uint8_t checksum8( void * start, unsigned int length )
     uint8_t   csum = 0;
     uint8_t * cp = (uint8_t *) start;
     unsigned int i;
-
+	
     for ( i = 0; i < length; i++)
         csum += *cp++;
-
+	
     return csum;
 }
 
@@ -383,4 +569,54 @@ int rand (void)
 {	
 	holdrand = holdrand * 214013L + 2531011L;
 	return ((holdrand >> 16) & RAND_MAX);
+}
+
+/*-
+ * For memcmp.
+ * Copyright (c) 1990, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Chris Torek.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*
+ * Compare memory regions.
+ */
+int
+memcmp(const void *s1, const void *s2, size_t n)
+{
+	if (n != 0) {
+		const unsigned char *p1 = s1, *p2 = s2;
+		
+		do {
+			if (*p1++ != *p2++)
+				return (*--p1 - *--p2);
+		} while (--n != 0);
+	}
+	return (0);
 }

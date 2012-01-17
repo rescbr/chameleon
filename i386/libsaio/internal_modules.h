@@ -26,7 +26,6 @@ static inline void load_all_internal_modules()
 
    // Done !!!
     
-   // ps: i swear the next version will be more simple 
 }
 
 #endif /* __INTERNAL_MODULES_H */

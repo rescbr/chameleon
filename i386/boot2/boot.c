@@ -1030,13 +1030,15 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
 				{
 					if (strcmp(name, name_compare) == 0)
 					{
-						DBG("found : %s\n", name);	
+						DBG("found : %s\n", name);
+						closedir(moduleDir);
 						return true;
 					}
 				}
 				else
 				{
-					DBG("found : %s\n", name);	
+					DBG("found : %s\n", name);
+					closedir(moduleDir);
 					return true;
 				}			
 			}
@@ -1055,6 +1057,10 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
 #endif		
 	}
 	
+	if (moduleDir) {
+		closedir(moduleDir);
+		
+	}
 	return false;
 }
 

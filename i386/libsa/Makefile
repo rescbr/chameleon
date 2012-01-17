@@ -8,9 +8,9 @@ INSTALL_SA_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/
 INSTALL_MD_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/machdep/i386
 
 OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fstack-protector-all \
 	      -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-	      -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
+	      -mpreferred-stack-boundary=2 -fno-align-functions \
 	      -march=pentium4 -msse2 -mfpmath=sse -msoft-float  
 
 INC = -I. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSAIODIR)
@@ -26,13 +26,12 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SA_OBJS = prf.o printf.o zalloc.o\
-	string.o strtol.o error.o \
+SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o bzero.o bcopy.o prf.o printf.o zalloc.o\
+	string.o strtol.o \
 	setjmp.o qsort.o efi_tables.o
 	
-
-SFILES = setjmp.s
-CFILES = prf.c printf.c zalloc.c \
+SFILES = setjmp.s bzero.s bcopy.s
+CFILES = qdivrem.c umoddi3.c udivdi3.c divdi3.c moddi3.c prf.c printf.c zalloc.c \
 	string.c strtol.c error.c \
 	qsort.c efi_tables.c
 

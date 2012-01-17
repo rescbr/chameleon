@@ -11,11 +11,11 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_CPU=1 -DDEBUG_MEM=1 -DDEBUG_SPD=1 -DDEBUG_PCI=1 -DDEBUG_SMBIOS=1
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fstack-protector-all \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-    -mpreferred-stack-boundary=2 -fno-align-functions -fno-stack-protector \
+    -mpreferred-stack-boundary=2 -fno-align-functions \
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float  
 
 DEFINES=
@@ -33,7 +33,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SAIO_OBJS = table.o asm.o bios.o biosfn.o \
+SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o stack_protector.o \
         disk.o sys.o cache.o bootstruct.o \
         stringTable.o load.o pci.o allocate.o misc.o \
 		vbe.o hfs.o hfs_compare.o \

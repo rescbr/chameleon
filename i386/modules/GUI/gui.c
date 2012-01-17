@@ -368,14 +368,14 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 		if (images[i].image == NULL) {
 			images[i].image = malloc(sizeof(pixmap_t));
 			if (images[i].image == NULL) {
-
+				
 				DBG("Unable to allocate memory for %s.png\n", image);
-
+				
 				return 1;
 			}
 		}
         sprintf(dirspec, "%s/%s/%s.png", src, theme_name, image);
-
+		
         width = 0;
         height = 0;
         imagedata = NULL;
@@ -385,9 +385,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             images[i].image->height = height;
             images[i].image->pixels = (pixel_t *)imagedata;
             flipRB(images[i].image);
-
+			
 			DBG("[ %s ] succesfully loaded and registred !!\n", dirspec);
-
+			
             return 0;
         }
 #ifdef EMBED_THEME
@@ -421,9 +421,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 				images[i].image->pixels = images[alt_image].image->pixels;
 				
 			} else {
-
+				
 				DBG("Unable to load %s, this image not vital anyway, reseting and returning success !!\n", dirspec);
-
+				
 				free(images[i].image);
 				images[i].image = NULL;
 			} 
@@ -444,7 +444,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 			free(images[i].image);
 			images[i].image = NULL;
 			return 1;
-
+			
         }
 		
     }
@@ -459,9 +459,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 static int loadGraphics(char *src)
 {
 	DBG("Loading image into memory....\n",theme_name);
-
+	
 	LOADPNG(src, background,                     IMG_REQUIRED);
-
+	
 	LOADPNG(src, logo,                           IMG_REQUIRED);
 	
 	LOADPNG(src, device_generic,                 IMG_REQUIRED);
@@ -532,12 +532,12 @@ static int loadGraphics(char *src)
 	
 	LOADPNG(src, font_console,                   IMG_REQUIRED);
 	LOADPNG(src, font_small,                     IMG_REQUIRED);
-
+	
 	DBG("Initializing font....\n",theme_name);
-
+	
 	initFont( &font_console, &images[iFontConsole]);
 	initFont( &font_small, &images[iFontSmall]);
-
+	
 	DBG("Graphic objects successfully loaded !!\n",theme_name);
 	
 	return 0;
@@ -913,18 +913,18 @@ static void loadThemeValues(config_file_t *theme)
 #define  MAX_tHEME 255
 
 static int randomTheme(char *dirspec, const char **theme) {
-		
+	
 	long         ret, flags, time;
 	long long	 index;
 	
 	const char  * name;		 
 	index = 0;		 
 	uint8_t i=0;
-			
+	
 	char *list[MAX_tHEME];
 #ifdef EMBED_THEME
-			list[i] = "";
-			i++;
+	list[i] = "";
+	i++;
 #endif
 	
 	while (i < MAX_tHEME) {
@@ -945,14 +945,14 @@ static int randomTheme(char *dirspec, const char **theme) {
 	}
 	
 	if (i) {			
-				
+		
 		srand (time18());		
 		
 		*theme = list[(rand() % i)];			
 		
-				
+		
 		int ret = startGUI();
-
+		
 		uint8_t l=0;
 #ifdef EMBED_THEME
 		l++;
@@ -981,10 +981,10 @@ int initGUI(void)
 	if (!dummybool) {
 		return 1;
 	}
-		
+	
 	
 	getBoolForKey("RandomTheme", &theme_ran, &bootInfo->bootConfig);
-				
+	
 	{
 		long flags;
 		long time;
@@ -995,7 +995,7 @@ int initGUI(void)
 		
 		if (theme_ran) 
 		{		
-retry:
+		retry:
 			ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
 				sprintf(dirsrc, "rd(0,0)/Extra/Themes");
@@ -1047,7 +1047,7 @@ retry:
 	
 	if (theme_ran)
 	{
-						
+		
 		ret = randomTheme(dirsrc, &theme_name);
  		
 		if (ret) printf("randomTheme Failed !! \n");		
@@ -1060,7 +1060,7 @@ retry:
 			ret = startGUI();
 			
 			if (ret) printf("Failed to load Theme : %s !! \n", theme_name);
-
+			
 		} 
 #ifdef EMBED_THEME	
 		if (ret) {
@@ -1086,35 +1086,35 @@ static int startGUI(void)
 	int        val;	
 	char    dirspec[256];
 	
-		
+	
 	if ((unsigned)(strlen(theme_name) + strlen(dirsrc) + strlen("theme.plist") + 2 ) > sizeof(dirspec)) {
 		
 		DBG("Path of %s/%s/theme.plist to long\n", dirsrc, theme_name);		
 		return 1;
 	}
-		
+	
 	sprintf(dirspec, "%s/%s/theme.plist", dirsrc ,theme_name);
-			
+	
 	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
-				
+		
 #ifdef EMBED_THEME
-			if (strlen(theme_name) == 0) {
-				config_file_t    *config;
+		if (strlen(theme_name) == 0) {
+			config_file_t    *config;
+			
+			config = &bootInfo->themeConfig;
+			if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
 				
-				config = &bootInfo->themeConfig;
-				if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-
-					DBG("Unable to load embed theme plist datas.\n");
-
-					return 1;
-				}
-			}			
+				DBG("Unable to load embed theme plist datas.\n");
+				
+				return 1;
+			}
+		}			
 #else
-
+		
 		DBG("Unable to load %s theme plist.\n",theme_name);
-
+		
 		return 1;
-
+		
 #endif		
     }
 	
@@ -1132,7 +1132,7 @@ static int startGUI(void)
 	else
 	{
 		printf("No getResolution function hook installed, using default resolution.\n",theme_name);
-
+		
 	}
 #endif
 	
@@ -1482,7 +1482,7 @@ static inline
 void vramwrite (void *data, int width, int height)
 #else
 static inline
- void vramwrite (void *data, int width)
+void vramwrite (void *data, int width)
 #endif
 {
 	if (VIDEO (depth) == 0x20 /*32*/ && VIDEO (rowBytes) == (unsigned long)gui.backbuffer->width * 4)
@@ -1862,7 +1862,7 @@ static void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, pos
 	int width = 0;
 	int max_width = 0;
 	int height = font->height;
-
+	
 	// calculate the width in pixels
 	for (i=0; i < strlen(text); i++) {
 		if (text[i] == '\n')
@@ -2581,4 +2581,3 @@ int GUI_countdown( const char * msg, int row, int timeout )
 	
     return ch;
 }
-

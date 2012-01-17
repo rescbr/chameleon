@@ -30,8 +30,8 @@
 #include "libsaio.h"
 #include "xml.h"
 
-extern char *Language;
-extern char *LoadableFamilies;
+static char * AllocInitStringWithLength(const char * oldString, int len);
+static char * AllocInitZeroEndedStringWithLength(const char * oldString, int len);
 
 bool sysConfigValid;
 #if UNUSED
@@ -43,28 +43,28 @@ keyncmp(const char *str, const char *key, int n)
 {
     int c;
     while (n--) {
-	c = *key++;
-	if (c == '\\') {
-	    switch(c = *key++) {
-	    case 'n':
-		c = '\n';
-		break;
-	    case 'r':
-		c = '\r';
-		break;
-	    case 't':
-		c = '\t';
-		break;
-	    default:
-		break;
-	    }
-	} else if (c == '\"') {
-	    /* Premature end of key */
-	    return 1;
-	}
-	if (c != *str++) {
-	    return 1;
-	}
+		c = *key++;
+		if (c == '\\') {
+			switch(c = *key++) {
+				case 'n':
+					c = '\n';
+					break;
+				case 'r':
+					c = '\r';
+					break;
+				case 't':
+					c = '\t';
+					break;
+				default:
+					break;
+			}
+		} else if (c == '\"') {
+			/* Premature end of key */
+			return 1;
+		}
+		if (c != *str++) {
+			return 1;
+		}
     }
     return 0;
 }
@@ -73,7 +73,7 @@ static void eatThru(char val, const char **table_p)
 {
 	register const char *table = *table_p;
 	register bool found = false;
-
+	
 	while (*table && !found)
 	{
 		if (*table == '\\') table += 2;
@@ -94,18 +94,18 @@ removeKeyFromTable(const char *key, char *table)
     register int len;
     register char *tab;
     char *buf;
-
+	
     len = strlen(key);
     tab = (char *)table;
     buf = (char *)malloc(len + 3);
-
+	
     sprintf(buf, "\"%s\"", key);
     len = strlen(buf);
-
+	
     while(*tab) {
         if(strncmp(buf, tab, len) == 0) {
             char c;
-
+			
             while((c = *(tab + len)) != ';') {
                 if(c == 0) {
                     len = -1;
@@ -122,21 +122,21 @@ removeKeyFromTable(const char *key, char *table)
     len = -1;
 out:
     free(buf);
-
+	
     if(len == -1) return false;
-
+	
     while((*tab = *(tab + len))) {
         tab++;
     }
-
+	
     return true;
 }
 
 char *
 newStringFromList(
-    char **list,
-    int *size
-)
+				  char **list,
+				  int *size
+				  )
 {
     char *begin = *list, *end;
     char *newstr;
@@ -144,16 +144,16 @@ newStringFromList(
     int bufsize;
     
     while (*begin && newsize && isspace(*begin)) {
-	begin++;
-	newsize--;
+		begin++;
+		newsize--;
     }
     end = begin;
     while (*end && newsize && !isspace(*end)) {
-	end++;
-	newsize--;
+		end++;
+		newsize--;
     }
     if (begin == end)
-	return 0;
+		return 0;
     bufsize = end - begin + 1;
     newstr = malloc(bufsize);
     strlcpy(newstr, begin, bufsize);
@@ -168,7 +168,7 @@ newStringFromList(
 int stringLength(const char *table, int compress)
 {
 	int ret = 0;
-
+	
 	while (*table)
 	{
 		if (*table == '\\')
@@ -204,11 +204,11 @@ bool getValueForConfigTableKey(config_file_t *config, const char *key, const cha
 			return true;
 		}
 	} else {
-	
+		
 		// Legacy plist-style table
-
+		
 	}
-
+	
 	return false;
 }
 
@@ -220,40 +220,40 @@ bool getValueForConfigTableKey(config_file_t *config, const char *key, const cha
  * \n escapes in the string.
  */
 char *newStringForStringTableKey(
-	char *table,
-	char *key,
-	config_file_t *config
-)
+								 char *table,
+								 char *key,
+								 config_file_t *config
+								 )
 {
     const char *val;
     char *newstr, *p;
     int size;
     
     if (getValueForConfigTableKey(config, key, &val, &size)) {
-	newstr = (char *)malloc(size+1);
-	for (p = newstr; size; size--, p++, val++) {
-	    if ((*p = *val) == '\\') {
-		switch (*++val) {
-		case 'r':
-		    *p = '\r';
-		    break;
-		case 'n':
-		    *p = '\n';
-		    break;
-		case 't':
-		    *p = '\t';
-		    break;
-		default:
-		    *p = *val;
-		    break;
+		newstr = (char *)malloc(size+1);
+		for (p = newstr; size; size--, p++, val++) {
+			if ((*p = *val) == '\\') {
+				switch (*++val) {
+					case 'r':
+						*p = '\r';
+						break;
+					case 'n':
+						*p = '\n';
+						break;
+					case 't':
+						*p = '\t';
+						break;
+					default:
+						*p = *val;
+						break;
+				}
+				size--;
+			}
 		}
-		size--;
-	    }
-	}
-	*p = '\0';
-	return newstr;
+		*p = '\0';
+		return newstr;
     } else {
-	return 0;
+		return 0;
     }
 }
 
@@ -267,11 +267,11 @@ newStringForKey(char *key, config_file_t *config)
     int size;
     
     if (getValueForKey(key, &val, &size, config) && size) {
-	newstr = (char *)malloc(size + 1);
-	strlcpy(newstr, val, size + 1);
-	return newstr;
+		newstr = (char *)malloc(size + 1);
+		strlcpy(newstr, val, size + 1);
+		return newstr;
     } else {
-	return 0;
+		return 0;
     }
 }
 
@@ -284,15 +284,15 @@ newStringForKey(char *key, config_file_t *config)
 static const char *getToken(const char *line, const char **begin, int *len)
 {
     if (*line == '\"') {
-	*begin = ++line;
-	while (*line && *line != '\"')
-	    line++;
-	*len = line++ - *begin;
+		*begin = ++line;
+		while (*line && *line != '\"')
+			line++;
+		*len = line++ - *begin;
     } else {
-	*begin = line;
-	while (*line && !isspace(*line) && *line != '=')
-	    line++;
-	*len = line - *begin;
+		*begin = line;
+		while (*line && !isspace(*line) && *line != '=')
+			line++;
+		*len = line - *begin;
     }
     return line;
 }
@@ -304,25 +304,25 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
     bool retval = false;
     
     while (*line) {
-	/* look for keyword or argument */
-	while (isspace(*line)) line++;
-
-	/* now look for '=' or whitespace */
-	line = getToken(line, &key, &key_len);
-	/* line now points to '=' or space */
-	if (*line && !isspace(*line)) {
-	    line = getToken(++line, &value, &value_len);
-	} else {
-	    value = line;
-	    value_len = 0;
-	}
-	if ((strlen(match) == key_len)
-	    && strncmp(match, key, key_len) == 0) {
-	    *matchval = value;
-	    *len = value_len;
-	    retval = true;
+		/* look for keyword or argument */
+		while (isspace(*line)) line++;
+		
+		/* now look for '=' or whitespace */
+		line = getToken(line, &key, &key_len);
+		/* line now points to '=' or space */
+		if (*line && !isspace(*line)) {
+			line = getToken(++line, &value, &value_len);
+		} else {
+			value = line;
+			value_len = 0;
+		}
+		if ((strlen(match) == key_len)
+			&& strncmp(match, key, key_len) == 0) {
+			*matchval = value;
+			*len = value_len;
+			retval = true;
             /* Continue to look for this key; last one wins. */
-	}
+		}
     }
     return retval;
 }
@@ -330,10 +330,10 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
 /* Return NULL if no option has been successfully retrieved, or the string otherwise */
 const char * getStringForKey(const char * key,  config_file_t *config)
 {
-  static const char* value =0;
-  int len=0;
-  if(!getValueForKey(key, &value, &len, config)) value = 0;
-  return value;
+	static const char* value =0;
+	int len=0;
+	if(!getValueForKey(key, &value, &len, config)) value = 0;
+	return value;
 }
 
 
@@ -515,15 +515,15 @@ void
 printSystemConfig(char *p1)
 {
     char *p2 = p1, tmp;
-
+	
     while (*p1 != '\0') {
-	while (*p2 != '\0' && *p2 != '\n') p2++;
-	tmp = *p2;
-	*p2 = '\0';
-	printf("%s\n", p1);
-	*p2 = tmp;
-	if (tmp == '\0') break;
-	p1 = ++p2;
+		while (*p2 != '\0' && *p2 != '\n') p2++;
+		tmp = *p2;
+		*p2 = '\0';
+		printf("%s\n", p1);
+		*p2 = tmp;
+		if (tmp == '\0') break;
+		p1 = ++p2;
     }
 }
 #endif
@@ -543,20 +543,20 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
     TagPtr     tag;
     pos = 0;
     char       *configBuffer;
-  
+	
     configBuffer = malloc(strlen(buffer)+1);
     strcpy(configBuffer, buffer);
-
+	
     while (1)
     {
         length = XMLParseNextTag(configBuffer + pos, &tag);
         if (length == -1) break;
-    
+		
         pos += length;
-    
+		
         if (tag == 0) continue;
         if (tag->type == kTagTypeDict) break;
-    
+		
         XMLFreeTag(tag);
     }
     free(configBuffer);
@@ -603,7 +603,7 @@ int loadBooterConfig(config_file_t *config)
 		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
 		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
 		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk
-
+		
         
 	};
 	int i,fd, count, ret=-1;
@@ -722,7 +722,7 @@ int loadSystemConfig(config_file_t *config)
 int loadHelperConfig(config_file_t *config)
 {
 	int rfd, pfd, sfd, count, ret=-1;
-
+	
 	char *dirspec[] = {
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
@@ -760,7 +760,7 @@ int loadHelperConfig(config_file_t *config)
 			sysConfigValid = true;	
 			ret=0;
 		}
-
+		
 	}
 	else
 	{
@@ -774,7 +774,7 @@ int loadHelperConfig(config_file_t *config)
 				count = read(pfd, config->plist, IO_CONFIG_DATA_SIZE);
 				close(pfd);
 				close(rfd);
-
+				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
 				sysConfigValid = true;	
@@ -793,7 +793,7 @@ int loadHelperConfig(config_file_t *config)
 				ret=0;
 				
 			}
-
+			
 		}
 		else
 		{
@@ -811,19 +811,64 @@ int loadHelperConfig(config_file_t *config)
 				
 			}
 		}
-
+		
 	}
-
+	
 	return ret;
 }
 #endif
 
-char * newString(const char * oldString)
+static char * AllocInitStringWithLength(const char * oldString, int len)
 {
+	char *Buf = NULL;
+	Buf = malloc(len);
+	if (Buf == NULL) return NULL;
+	
+	if (oldString != NULL)
+		strlcpy(Buf, oldString,len);
+	
+	return Buf;
+}
+
+static char * AllocInitZeroEndedStringWithLength(const char * oldString, int len)
+{	
+	if (len > 0)
+	{
+		return AllocInitStringWithLength( oldString, len + 1);
+	}
+	return NULL;
+}
+
+char * newString(const char * oldString)
+{	
     if ( oldString )
-        return strcpy(malloc(strlen(oldString)+1), oldString);
-    else
-        return NULL;
+	{
+		int len = strlen(oldString);
+		
+		if (len > 0) 
+		{
+			return AllocInitZeroEndedStringWithLength(oldString, len);
+		}	
+	}	
+    return NULL;
+}
+
+char * newStringWithLength(const char * oldString, int len)
+{	
+	if (len > 0) 
+	{
+		return AllocInitZeroEndedStringWithLength(oldString, len);
+	}		
+    return NULL;
+}
+
+char * newEmptyStringWithLength(int len)
+{	
+	if (len > 0) 
+	{
+		return AllocInitZeroEndedStringWithLength(NULL, len);
+	}		
+    return NULL;
 }
 
 /*
@@ -831,52 +876,52 @@ char * newString(const char * oldString)
  */
 char * getNextArg(char ** argPtr, char * val)
 {
-  char * ptr = *argPtr;
-  const char * strStart;
-  int len = 0;
-  bool isQuoted = false;
-
-  *val = '\0';
-
-  // Scan for the next non-whitespace character.
-  while ( *ptr && (*ptr == ' ' || *ptr == '=') )
-  {
-    ptr++;
-  }
-  
-  strStart = ptr;
-
-  // Skip the leading double quote character.
-  if (*ptr == '\"')
-  {
-    isQuoted = true;
-    ptr++;
-    strStart++;
-  }
-
-  // Scan for the argument terminator character.
-  // This can be either a NULL character - in case we reach the end of the string,
-  // a double quote in case of quoted argument,
-  // or a whitespace character (' ' or '=') for non-quoted argument.
-  while (*ptr && !( (isQuoted && (*ptr == '\"')) ||
-                    (!isQuoted && (*ptr == ' ' || *ptr == '=')) )
-        )
-  {
-    ptr++;
-  }
-
-  len = ptr - strStart;
-
-  // Skip the closing double quote character and adjust
-  // the starting pointer for the next getNextArg call.
-  if (*ptr && isQuoted && *ptr == '\"')
-    ptr++;
-
-  // Copy the extracted argument to val.
-  strncat(val, strStart, len);
-
-  // Set command line pointer.
-  *argPtr = ptr;
-
-  return ptr;
+	char * ptr = *argPtr;
+	const char * strStart;
+	int len = 0;
+	bool isQuoted = false;
+	
+	*val = '\0';
+	
+	// Scan for the next non-whitespace character.
+	while ( *ptr && (*ptr == ' ' || *ptr == '=') )
+	{
+		ptr++;
+	}
+	
+	strStart = ptr;
+	
+	// Skip the leading double quote character.
+	if (*ptr == '\"')
+	{
+		isQuoted = true;
+		ptr++;
+		strStart++;
+	}
+	
+	// Scan for the argument terminator character.
+	// This can be either a NULL character - in case we reach the end of the string,
+	// a double quote in case of quoted argument,
+	// or a whitespace character (' ' or '=') for non-quoted argument.
+	while (*ptr && !( (isQuoted && (*ptr == '\"')) ||
+					 (!isQuoted && (*ptr == ' ' || *ptr == '=')) )
+		   )
+	{
+		ptr++;
+	}
+	
+	len = ptr - strStart;
+	
+	// Skip the closing double quote character and adjust
+	// the starting pointer for the next getNextArg call.
+	if (*ptr && isQuoted && *ptr == '\"')
+		ptr++;
+	
+	// Copy the extracted argument to val.
+	strncat(val, strStart, len);
+	
+	// Set command line pointer.
+	*argPtr = ptr;
+	
+	return ptr;
 }

@@ -130,7 +130,7 @@ Mkext_Alder32( unsigned char * buffer, long length )
 void KextPatcher_start()
 {		
 	// Hooks into the following:
-	//	execute_hook("LoadDriverMKext", (void*)package, (void*) length, NULL, NULL, NULL, NULL);
+	//	execute_hook("LoadDriverMKext", (void*)package, &length, NULL, NULL, NULL, NULL);
 	//  execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL, NULL, NULL);
 #if UNUSED
 	register_hook_callback("PCIDevice", &KextPatcher_hook);
