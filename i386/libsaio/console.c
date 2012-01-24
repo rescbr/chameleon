@@ -254,17 +254,21 @@ char * newStringWithFormat(const char * fmt, ...)
 	char *str = NULL;
 	
     va_start(ap, fmt);
-    pi.last_str = 0;
-	len = prf_fmt_str_len(fmt, ap);
+	len = prf(fmt, ap, NULL, NULL);
 	if (len > 0)
 	{
-		str = malloc(len+1);
-		if (!str) return NULL;
+		str = newEmptyStringWithLength(len);
+		if (str != NULL) 
+		{
+			pi.last_str = 0;
+			
+			pi.str = str;
+			
+			prf(fmt, ap, sputc, &pi);
+			*pi.str = '\0';
+		}
+		
 	}	
-	pi.str = str;
-	
-    prf(fmt, ap, sputc, &pi);
-    *pi.str = '\0';
     va_end(ap);	
 	
 	return str;

@@ -90,90 +90,13 @@ void *putfn_arg;
 	while (cp > prbuf);
 }
 
-void prf(
-		 char *fmt,
-		 unsigned int *adx,
-		 void (*putfn_p)(),
-		 void *putfn_arg
-		 )
+int prf(
+		char *fmt,
+		unsigned int *adx,
+		void (*putfn_p)(),
+		void *putfn_arg
+		)
 {
-	int b, c;
-	char *s;
-	int flag = 0, width = 0;
-	int minwidth;
-	
-loop:
-	while ((c = *fmt++) != '%') {
-		if(c == '\0')
-			return;
-		(*putfn_p)(c, putfn_arg);
-	}
-	minwidth = 0;
-again:
-	c = *fmt++;
-	switch (c) {
-		case 'l':
-			goto again;
-		case ' ':
-			flag |= SPACE;
-			goto again;
-		case '0':
-			if (minwidth == 0) {
-				/* this is a flag */
-				flag |= ZERO;
-				goto again;
-			} /* fall through */
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			minwidth *= 10;
-			minwidth += c - '0';
-			goto again;
-        case 'X':
-			flag |= UCASE;
-			/* fall through */
-		case 'x':
-			b = 16;
-			goto number;
-		case 'd':
-			b = 10;
-			goto number;
-		case 'o': case 'O':
-			b = 8;
-		number:
-			printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
-			break;
-		case 's':
-			s = (char *)*adx;
-			while ((c = *s++)) {
-				(*putfn_p)(c, putfn_arg);
-				width++;
-			}
-			while (width++ < minwidth)
-				(*putfn_p)(' ', putfn_arg);
-			break;
-		case 'c':
-			(*putfn_p)((char)*adx, putfn_arg);
-			break;
-		default:
-			break;
-	}
-	adx++;
-	goto loop;
-}
-
-int prf_fmt_str_len(
-					char *fmt,
-					unsigned int *adx
-					)
-{
-	
 	int b, c, len =0;
 	char *s;
 	int flag = 0, width = 0;
@@ -183,6 +106,9 @@ loop:
 	while ((c = *fmt++) != '%') {
 		if(c == '\0')
 			return len;
+		if (putfn_p && putfn_arg) {
+			(*putfn_p)(c, putfn_arg);
+		}
 		len++;
 	}
 	minwidth = 0;
@@ -224,18 +150,31 @@ again:
 		case 'o': case 'O':
 			b = 8;
 		number:
+			if (putfn_p && putfn_arg) {
+				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
+			}
 			len++;
 			break;
 		case 's':
 			s = (char *)*adx;
 			while ((c = *s++)) {
+				if (putfn_p && putfn_arg) {
+					(*putfn_p)(c, putfn_arg);
+				}
 				len++;
 				width++;
 			}
-			while (width++ < minwidth)
+			while (width++ < minwidth) {
+				if (putfn_p && putfn_arg) {
+					(*putfn_p)(' ', putfn_arg);
+				}
 				len++;
+			}
 			break;
 		case 'c':
+			if (putfn_p && putfn_arg) {
+				(*putfn_p)((char)*adx, putfn_arg);
+			}
 			len++;
 			break;
 		default:
