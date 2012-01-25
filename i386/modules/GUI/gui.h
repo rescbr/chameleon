@@ -49,6 +49,12 @@ enum {
 	VerticalLayout		= 1,
 };
 
+typedef struct themeList_t
+{
+	char* theme;
+	unsigned char nb;
+	struct themeList_t* next;
+} themeList_t;
 
 /*
  * Menu item structure.

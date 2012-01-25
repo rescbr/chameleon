@@ -34,6 +34,9 @@
 #define DBG(x...)
 #endif
 
+themeList_t* themeList = NULL;
+
+
 gui_t gui;					// gui structure
 font_t font_small;
 font_t font_console;
@@ -78,6 +81,8 @@ void vramwrite (void *data, int width);
 #endif
 static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
 static int startGUI(void);
+static void free_theme_list();
+static void add_theme(const char* theme, uint8_t nb);
 static int randomTheme(char *dirspec, const char **theme);
 static void loadThemeValues(config_file_t *theme);
 static void setupDeviceList(config_file_t *theme);
@@ -910,62 +915,136 @@ static void loadThemeValues(config_file_t *theme)
 		gui.screen.font_console_color = (color & 0x00FFFFFF);
 }
 
-#define  MAX_tHEME 255
+#define  MAX_THEMES 255
+
+static void add_theme(const char* theme, uint8_t nb)
+{
+	
+	themeList_t* new_theme = malloc(sizeof(themeList_t));
+	if (new_theme)
+	{	
+		new_theme->next = themeList;
+		
+		themeList = new_theme;
+		
+		new_theme->nb = nb;
+		new_theme->theme = newString(theme);
+	}	
+}
+
+static void free_theme_list()
+{
+	themeList_t* entry = themeList;
+	while(entry)
+	{
+#if DEBUG_GUI
+		printf("freeing  %s (nb = %d)\n", entry->theme, entry->nb);		
+#endif
+		
+		char *theme = entry->theme;
+		themeList_t* tmp = NULL;
+		
+		tmp = entry;
+		entry = entry->next;		
+		
+		free(theme);		
+		free(tmp);
+		
+	}
+}
+
 
 static int randomTheme(char *dirspec, const char **theme) {
 	
 	long         ret, flags, time;
 	long long	 index;
-	
+	int sta = 1;
 	const char  * name;		 
 	index = 0;		 
 	uint8_t i=0;
 	
-	char *list[MAX_tHEME];
 #ifdef EMBED_THEME
-	list[i] = "";
+	add_theme("", i);
 	i++;
 #endif
 	
-	while (i < MAX_tHEME) {
+	while (i < MAX_THEMES) {
 		ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
 		if (ret == -1) break;
 		
 		// Make sure this is a directory.
 		if ((flags & kFileTypeMask) != kFileTypeDirectory) continue;
 		
-		if ((unsigned)(strlen(name) + 34) > 256) continue;
-		
-		if ((list[i] = (char *)malloc(strlen(name))) == NULL) continue;						
-		
-		strcpy(list[i], name);
+		add_theme(name, i);			
 		
 		i++;
 		
-	}
-	
+	}	
+#if DEBUG_GUI
+	themeList_t* debugentry = themeList;
+	printf("theme list: \n");
+	while(debugentry)
+	{
+		printf("*  %s (nb = %d)\n", debugentry->theme, debugentry->nb);		
+		debugentry = debugentry->next;
+	}	
+	printf("\n");
+#endif
+
 	if (i) {			
 		
 		srand (time18());		
 		
-		*theme = list[(rand() % i)];			
-		
-		
-		int ret = startGUI();
-		
-		uint8_t l=0;
-#ifdef EMBED_THEME
-		l++;
-#endif		
-		while (l<i) {
-			free(list[l]);
-			l++;
+		uint8_t choosen = rand() % i;
+						
+		themeList_t* entry = themeList;
+
+		while(entry)
+		{
+
+			if (entry->nb == choosen) break;
+			
+			entry = entry->next;
 		}
 		
-		return ret;
-	}  
+		if (entry) {
+#if DEBUG_GUI
+
+			printf("choosen theme  %s (nb = %d)\n", entry->theme, entry->nb);
+			sleep(1);
+#endif
+			*theme = entry->theme;			
+			
+			sta = startGUI();
+			
+
+		}	 
+#if DEBUG_GUI
+		else {
+			goto out;
+		}
+#endif
 	
-	return 1;				
+		
+		free_theme_list();
+		
+	}  
+#if DEBUG_GUI
+	else {
+		printf("No theme found !!\n");
+		
+		sleep(1);
+	}	
+#endif
+	return sta;	
+	
+#if DEBUG_GUI
+out:
+		printf("random theme failed !!\n");
+		
+		sleep(1);		
+#endif
+	return sta;	
 	
 	
 }

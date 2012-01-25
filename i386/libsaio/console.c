@@ -254,7 +254,7 @@ char * newStringWithFormat(const char * fmt, ...)
 	char *str = NULL;
 	
     va_start(ap, fmt);
-	len = prf(fmt, ap, NULL, NULL);
+	len = prf(fmt, ap, 0, 0);
 	if (len > 0)
 	{
 		str = newEmptyStringWithLength(len);
