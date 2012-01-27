@@ -32,7 +32,6 @@ CONFIG_KEYLAYOUT_MODULE=""
 source "${SRCROOT}/auto.conf"
 
 # ====== COLORS ======
-
 declare -r COL_BLACK="\x1b[30;01m"
 declare -r COL_RED="\x1b[31;01m"
 declare -r COL_GREEN="\x1b[32;01m"
@@ -44,7 +43,6 @@ declare -r COL_BLUE="\x1b[34;01m"
 declare -r COL_RESET="\x1b[39;49;00m"
 
 # ====== REVISION/VERSION ======
-
 declare -r CHAMELEON_VERSION=$( cat version )
 
 # stage
@@ -58,7 +56,6 @@ declare -r CHAMELEON_BUILDDATE=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print 
 declare -r CHAMELEON_TIMESTAMP=$( date -j -f "%Y-%m-%d %H:%M:%S" "${CHAMELEON_BUILDDATE}" "+%s" )
 
 # ====== CREDITS ======
-
 declare -r CHAMELEON_DEVELOP=$(awk "NR==6{print;exit}"  ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_CREDITS=$(awk "NR==10{print;exit}" ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_PKGDEV=$(awk "NR==14{print;exit}"  ${PKGROOT}/../CREDITS)
@@ -98,7 +95,6 @@ declare -r chameleon_package_identity="org.chameleon"
 declare -r modules_packages_identity="${chameleon_package_identity}.modules"
 
 # ====== FUNCTIONS ======
-
 trim () {
     local result="${1#"${1%%[![:space:]]*}"}"   # remove leading whitespace characters
     echo "${result%"${result##*[![:space:]]}"}" # remove trailing whitespace characters
@@ -107,7 +103,7 @@ trim () {
 function makeSubstitutions () {
     # Substition is like: Key=Value
     #
-    # Optionnal arguments:
+    # Optional arguments:
     #    --subst=<substition> : add a new substitution
     #
     # Last argument(s) is/are file(s) where substitutions must be made
@@ -172,7 +168,7 @@ addTemplateScripts () {
     # Arguments:
     #    --pkg-rootdir=<pkg_rootdir> : path of the pkg root dir
     #
-    # Optionnal arguments:
+    # Optional arguments:
     #    --subst=<substition> : add a new substitution
     #
     # Substition is like: Key=Value
@@ -239,7 +235,7 @@ getChoiceIndex () {
 
 # Add a new choice
 addChoice () {
-    # Optionnal arguments:
+    # Optional arguments:
     #    --group=<group> : Group Choice Id
     #    --start-selected=<javascript code> : Specifies whether this choice is initially selected or unselected
     #    --start-enabled=<javascript code>  : Specifies the initial enabled state of this choice
@@ -313,7 +309,7 @@ addChoice () {
 
 # Add a group choice
 addGroupChoices() {
-    # Optionnal arguments:
+    # Optional arguments:
     #    --parent=<parent> : parent group choice id
     #    --exclusive_zero_or_one_choice : only zero or one choice can be selected in the group
     #    --exclusive_one_choice : only one choice can be selected in the group
@@ -442,7 +438,7 @@ main ()
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     addChoice --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
 
-    # Package will be build at the end
+    # Package will be built at the end
 # End pre install choice
 
 # build core package
@@ -477,6 +473,7 @@ main ()
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
     cp -f ${PKGROOT}/Scripts/Main/${choiceId}postinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
     cp -f ${PKGROOT}/Scripts/Sub/* ${PKG_BUILD_DIR}/${choiceId}/Scripts
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
@@ -652,7 +649,7 @@ fi
 
     while IFS= read -r -d '' OptionsFile; do
 
-        # Take filename and Strip .txt from end and path from front
+        # Take filename and strip .txt from end and path from front
         builtOptionsList=${OptionsFile%.txt}
         builtOptionsList=${builtOptionsList##*/}
         packagesidentity="${chameleon_package_identity}.options.$builtOptionsList"
@@ -807,8 +804,8 @@ fi
     choiceId="Post"
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" ${choiceId}
-    cp -f ${PKGROOT}/Scripts/Sub/UnMountEFIvolumes.sh ${PKG_BUILD_DIR}/${choiceId}/Scripts
-
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice  --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
@@ -852,7 +849,7 @@ buildpackage ()
 
         header+="auth=\"root\">\n"
         header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-        rm -R -f "${packagePath}/Temp"
+        #rm -R -f "${packagePath}/Temp" //blackosx commented out for now
 
         [ -d "${packagePath}/Temp" ] || mkdir -m 777 "${packagePath}/Temp"
         [ -d "${packagePath}/Root" ] && mkbom "${packagePath}/Root" "${packagePath}/Temp/Bom"
@@ -865,7 +862,7 @@ buildpackage ()
             header+="\t</scripts>\n"
             # Create the Script archive file (cpio format)
             (cd "${packagePath}/Scripts" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
-                grep -vE '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+                grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
         fi
 
         header+="</pkg-info>"
@@ -873,7 +870,7 @@ buildpackage ()
 
         # Create the Payload file (cpio format)
         (cd "${packagePath}/Root" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
-            grep -vE '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+            grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
 
         # Create the package
         (cd "${packagePath}/Temp" && xar -c -f "${packagePath}/../${packageName}.pkg" --compression none .)
@@ -881,7 +878,7 @@ buildpackage ()
         # Add the package to the list of build packages
         pkgrefs[${#pkgrefs[*]}]="\t<pkg-ref id=\"${packageRefId}\" installKBytes='${installedsize}' version='${CHAMELEON_VERSION}.0.0.${CHAMELEON_TIMESTAMP}'>#${packageName}.pkg</pkg-ref>"
 
-        rm -rf "${packagePath}"
+        #rm -rf "${packagePath}" //blackosx commented out for now
     fi
 }
 
@@ -955,7 +952,7 @@ makedistribution ()
     declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
 
-    rm -f "${distributionDestDir}/${packagename// /}"*.pkg
+    #rm -f "${distributionDestDir}/${packagename// /}"*.pkg  //blackosx commented out for now
 
     mkdir -p "${PKG_BUILD_DIR}/${packagename}"
 
@@ -965,7 +962,7 @@ makedistribution ()
         pkgdir="${PKG_BUILD_DIR}/${packagename}/${pkg}"
         # expand individual packages
         pkgutil --expand "${PKG_BUILD_DIR}/${pkg}" "$pkgdir"
-        rm -f "${PKG_BUILD_DIR}/${pkg}"
+        #rm -f "${PKG_BUILD_DIR}/${pkg}"  //blackosx commented out for now
     done
 
 #   Create the Distribution file
@@ -990,19 +987,22 @@ makedistribution ()
     ditto --noextattr --noqtn "${PKGROOT}/Resources" "${PKG_BUILD_DIR}/${packagename}/Resources"
 
 #   CleanUp the directory
+    # this next line should work but it doesn't - not sure why.
     #find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -exec rm -rf {} \;
+    
+    # instead, doing it this way works.
     find "${PKG_BUILD_DIR}/${packagename}/Resources" -name ".svn" -type d -o -name ".DS_Store" -type f | while read component
     do
 		rm -rf "${component}"
     done    
 
-    # Make substitutions like version, revision, stage, developers, credits, etc..
+    # Make substitutions for version, revision, stage, developers, credits, etc..
     makeSubstitutions $( find "${PKG_BUILD_DIR}/${packagename}/Resources" -type f )
 
 #   Create the final package
     pkgutil --flatten "${PKG_BUILD_DIR}/${packagename}" "${distributionFilePath}"
 
-#   Here is the place for assign a Icon to the pkg
+#   Here is the place to assign an icon to the pkg
     ditto -xk "${PKGROOT}/Icons/pkg.zip" "${PKG_BUILD_DIR}/Icons/"
     DeRez -only icns "${PKG_BUILD_DIR}/Icons/Icons/pkg.icns" > "${PKG_BUILD_DIR}/Icons/tempicns.rsrc"
     Rez -append "${PKG_BUILD_DIR}/Icons/tempicns.rsrc" -o "${distributionFilePath}"
@@ -1021,12 +1021,12 @@ makedistribution ()
     echo ""
     echo -e $COL_GREEN" Build info."
     echo -e $COL_GREEN" ==========="
-    echo -e $COL_BLUE"  Package name: "$COL_RESET"${distributionFilename}"
-    echo -e $COL_BLUE"  MD5:          "$COL_RESET"$md5"
-    echo -e $COL_BLUE"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
-    echo -e $COL_BLUE"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
-    echo -e $COL_BLUE"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
-    echo -e $COL_BLUE"  Builded by:   "$COL_RESET"$CHAMELEON_WHOBUILD"
+    echo -e $COL_CYAN"  Package name: "$COL_RESET"${distributionFilename}"
+    echo -e $COL_CYAN"  MD5:          "$COL_RESET"$md5"
+    echo -e $COL_CYAN"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
+    echo -e $COL_CYAN"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
+    echo -e $COL_CYAN"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
+    echo -e $COL_CYAN"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
     echo ""
 
 }
