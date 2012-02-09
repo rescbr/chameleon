@@ -765,12 +765,12 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
 
 static bool is_sandybridge(void)
 {
-    return Platform->CPU.Model == CPUID_MODEL_SANDYBRIDGE;
+    return getCPUModel() == CPUID_MODEL_SANDYBRIDGE;
 }
 
 static bool is_jaketown(void)
 {
-    return Platform->CPU.Model == CPUID_MODEL_JAKETOWN;
+    return getCPUModel() == CPUID_MODEL_JAKETOWN;
 }
 
 static U32 get_bclk(void)
@@ -1036,11 +1036,11 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
     
 #endif
     
-	switch (Platform->CPU.Family)
+	switch (getCPUFamily())
 	{
 		case 0x06: 
 		{
-			switch (Platform->CPU.Model) 
+			switch (getCPUModel()) 
 			{
 				case CPUID_MODEL_DOTHAN: 
 				case CPUID_MODEL_YONAH: // Yonah
@@ -1052,7 +1052,7 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 					cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
 					cpu->core_c4_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;
 					
-					if (Platform->CPU.Model == CPUID_MODEL_ATOM)
+					if (getCPUModel() == CPUID_MODEL_ATOM)
 					{
 						cpu->core_c2_supported = cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
 						cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
@@ -2426,11 +2426,11 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
     }    
         
     // Create buffer for MADT
-    U8 memory_for_madt[2 * 1024];
-    
+    //U8 memory_for_madt[2 * 1024]; // seems to bug with xcode4, need to found out what is going on (not enough memory in the stack ?)
+    U8 *memory_for_madt = (U8*)AllocateKernelMemory(2 * 1024);
     
     // Build the new MADT
-    if ( (ProcessMadt(MadtPointer, madt_info, memory_for_madt, sizeof(memory_for_madt), cpu_map_count))== 0)    
+    if ( (ProcessMadt(MadtPointer, madt_info, memory_for_madt, 2 * 1024, cpu_map_count))== 0)    
 	{
 		printf("Error: Failed to build MADT table\n");
 		return (0);
@@ -2491,10 +2491,11 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * 
 	}
         
 	// Create buffer for SSDT
-	U8 memory_for_ssdt[20 * 1024];		
+	//U8 memory_for_ssdt[20 * 1024];	// seems to bug with xcode4, need to found out what is going on (not enough memory in the stack ?)	
+	U8 *memory_for_ssdt =(U8*)AllocateKernelMemory(20 * 1024);
 	
 	// Build the SSDT
-	if ( (BuildSsdt(madt_info, dsdt, memory_for_ssdt, sizeof(memory_for_ssdt), enable_cstates, enable_pstates, enable_tstates)) == 0)
+	if ( (BuildSsdt(madt_info, dsdt, memory_for_ssdt, 20 * 1024 /*sizeof(memory_for_ssdt)*/, enable_cstates, enable_pstates, enable_tstates)) == 0)
 	{
 		printf("Error: Failed to build SSDT table\n");
 		return (0);
@@ -3978,7 +3979,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	const char * value;	
 
 	// Restart Fix
-	if (Platform->CPU.Vendor == 0x756E6547) /* Intel */
+	if (platformIsIntel()) /* Intel */
 	{	
 		fix_restart = true;
 		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
@@ -4124,7 +4125,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 		bool val = false;  
 		getBoolForKey("PreferInternalProfileDetect", &val, &bootInfo->bootConfig); // if true Give prior to the profile resolved trought the CPU model
 		
-		val = Platform->CPU.isServer ;
+		val = platformIsServer() ;
 		
 		if (fadt_mod->PreferredProfile <= MaxSupportedPMProfile && !val)
 		{

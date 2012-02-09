@@ -164,7 +164,17 @@ extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 #endif
 
-
+/* platform.h */
+extern bool platformCPUExtFeature(uint32_t);
+extern bool platformCPUFeature(uint32_t);
+extern void scan_platform(void);
+extern bool platformIsIntel(void);
+extern uint8_t getCPUModel(void);
+extern uint8_t getCPUFamily(void);
+extern uint32_t getCPUnCores(void);
+extern uint32_t getCPUnThread(void);
+extern bool platformIsMobile(void);
+extern bool platformIsServer(void);
 
 
 /* stringTable.c */

@@ -635,17 +635,17 @@ static void setDefaultSMBData(void)
         const SMStrEntryPair*	sm_defaults;
         const SMStrEntryPair*	sm_chosen;
         
-        if (Platform->CPU.isServer == true)
+        if (platformIsServer() == true)
         {
             sm_defaults=sm_xserve_defaults;
-        } else if (Platform->CPU.isMobile == true) {
-            if (Platform->CPU.NoCores > 1) {
+        } else if (platformIsMobile() == true) {
+            if (getCPUnCores() > 1) {
                 sm_defaults=sm_macbookpro_defaults;
             } else {
                 sm_defaults=sm_macbook_defaults;
             }
         } else {
-            switch (Platform->CPU.NoCores) 
+            switch (getCPUnCores()) 
             {
                 case 1: 
                     sm_defaults=sm_macmini_defaults; 
@@ -655,11 +655,11 @@ static void setDefaultSMBData(void)
                     break;
                 default:
                 {
-                    switch (Platform->CPU.Family) 
+                    switch (getCPUFamily()) 
                     {
                         case 0x06:
                         {
-                            switch (Platform->CPU.Model)
+                            switch (getCPUModel())
                             {
                                 case CPUID_MODEL_FIELDS:        // Intel Core i5, i7 LGA1156 (45nm)
                                 case CPUID_MODEL_DALES:         // Intel Core i5, i7 LGA1156 (45nm) ???
@@ -1012,11 +1012,11 @@ static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
     
-	switch (Platform->CPU.Family) 
+	switch (getCPUFamily()) 
 	{
 		case 0x06:
 		{
-			switch (Platform->CPU.Model)
+			switch (getCPUModel())
 			{
 				case 0x19:					// Intel Core i5 650 @3.20 Ghz
 				case CPUID_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)

@@ -11,31 +11,10 @@
 #include "cpuid.h"
 #include "cpu_data.h"
 
-extern bool platformCPUExtFeature(uint32_t);
-extern bool platformCPUFeature(uint32_t);
-extern void scan_platform(void);
-
 #define bitmask(h,l)		((_Bit(h)|(_Bit(h)-1)) & ~(_Bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
 #define quad(hi,lo)         (((uint64_t)(hi)) << 32 | (lo))
-
-
-/* CPUID index into cpuid_raw */
-/*
-#define CPUID_0				0
-#define CPUID_1				1
-#define CPUID_2				2
-#define CPUID_3				3
-#define CPUID_4				4
-#define CPUID_5				5
-#define CPUID_6				6
-#define CPUID_80			7
-#define CPUID_81			8
-#define CPUID_B0			9
-#define CPUID_B1			10
-#define CPUID_MAX			11
-*/
 
 /* Additional models supported by Chameleon (NOT SUPPORTED BY THE APPLE'S ORIGINAL KERNEL) */
 #define CPUID_MODEL_BANIAS          0x09

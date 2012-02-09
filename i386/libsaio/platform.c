@@ -24,15 +24,50 @@
 PlatformInfo_t    *Platform;
 
 /** Return if a CPU feature specified by feature is activated (true) or not (false)  */
-inline bool platformCPUFeature(uint32_t feature)
+bool platformCPUFeature(uint32_t feature)
 {
-	return (Platform->CPU.Features & feature);
+	return (Platform->CPU.Features & feature) ? true : false;
 }
 
 /** Return if a CPU Extended feature specified by feature is activated (true) or not (false)  */
-inline bool platformCPUExtFeature(uint32_t feature)
+bool platformCPUExtFeature(uint32_t feature)
 {
-	return (Platform->CPU.ExtFeatures & feature);
+	return (Platform->CPU.ExtFeatures & feature) ? true : false;
+}
+
+bool platformIsIntel(void)
+{
+	return (Platform->CPU.Vendor == 0x756E6547) ? true : false;
+}
+
+uint32_t getCPUnCores(void)
+{
+	return Platform->CPU.NoCores;
+}
+
+uint32_t getCPUnThreads(void)
+{
+	return Platform->CPU.NoThreads;
+}
+
+uint8_t getCPUModel(void)
+{
+	return Platform->CPU.Model;
+}
+
+uint8_t getCPUFamily(void)
+{
+	return Platform->CPU.Family;
+}
+
+bool platformIsServer(void)
+{
+	return (Platform->CPU.isServer) ? true : false;
+}
+
+bool platformIsMobile(void)
+{
+	return (Platform->CPU.isMobile) ? true : false;
 }
 
 /** 
