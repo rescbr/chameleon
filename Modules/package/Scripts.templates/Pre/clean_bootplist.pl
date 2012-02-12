@@ -5,6 +5,7 @@ use YAML::Syck;
 
 our $target_volume;
 our $boot_plist_filepath;
+our $logfile;
 
 our $yaml_file="@YAML_FILE@";
 
@@ -12,6 +13,7 @@ if ($#ARGV < 0) {
    print stderr "A target volume is needed\n";
 } else {
    $target_volume=$ARGV[0];
+   $logfile=$ARGV[1];
 }
 
 $boot_plist_filepath = "${target_volume}/Extra/org.chameleon.Boot.plist";
@@ -22,15 +24,13 @@ if ( -f "$boot_plist_filepath" ) {
 sub _do_cmd {
     my ($cmd, $key, $value) = @_;
     my $out;
-
     $key   =~ s/([\s])/\\$1/g;  # Escape characters in key
     $value =~ s/([\s"])/\\$1/g; # Escape characters in value (space & ")
     my $plistbuddy_command="$cmd :$key $value";
-
     open ( OUTPUT, "-|", '/usr/libexec/plistbuddy', "-c", "$plistbuddy_command", "$boot_plist_filepath" );
     my $exit_code = $?;
     chomp($out = <OUTPUT>);
-    close OUTPUT;
+    close OUTPUT; 
     return $out;
 }
 
@@ -40,8 +40,13 @@ sub get_boot_plist_option {
 }
 
 sub delete_boot_plist_option {
-    my ($option) = @_;
-    return _do_cmd( "Delete", "$option");
+    my ($option) = @_;  
+    my $current_value = get_boot_plist_option "$option";
+    if ( $current_value ne "") {
+        print LOG "$option\n";
+        return _do_cmd( "Delete", "$option");
+    }
+    return "";
 }
 
 sub delete_boot_plist_text_option {
@@ -50,6 +55,7 @@ sub delete_boot_plist_text_option {
     if ( $current_value ne "") {
         foreach my $recognized_value (@{$values}) {
             if ($recognized_value eq $current_value) {
+                print LOG "$option $current_value\n";
                 return _do_cmd( "Delete", "$option");
             }
         }
@@ -67,6 +73,7 @@ sub delete_boot_plist_list_option {
             $count{$value} = 1;
         }
         foreach my $value (split(/\s+/,$current_value)) {
+            print LOG "$option $value\n";
             if ( not exists $count{$value} ) {
                 push @new_list, $value;
             }
@@ -77,9 +84,10 @@ sub delete_boot_plist_list_option {
 }
 
 sub main() {
-    # Remove all options that installer can managed
+    # Remove all options that installer can manage
+    open (LOG,">>$logfile");
     my ($yaml_file) = @_;
-    my $hash_ref = LoadFile($yaml_file) or die "Can't open yaml file\n";
+    my $hash_ref = LoadFile($yaml_file) or die "Can't open yaml file\n";  
     foreach my $option ( keys %{$hash_ref} ) {
         my $type = $hash_ref->{$option}->{type};
         if ( $type =~ /^bool$/i ) {
@@ -92,4 +100,5 @@ sub main() {
                                            $hash_ref->{$option}->{values} );
         }
     }
+    close(LOG);
 }

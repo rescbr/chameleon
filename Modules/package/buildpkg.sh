@@ -36,7 +36,6 @@ CONFIG_KEYLAYOUT_MODULE=""
 source "${SRCROOT}/auto.conf"
 
 # ====== COLORS ======
-
 declare -r COL_BLACK="\x1b[30;01m"
 declare -r COL_RED="\x1b[31;01m"
 declare -r COL_GREEN="\x1b[32;01m"
@@ -48,7 +47,6 @@ declare -r COL_BLUE="\x1b[34;01m"
 declare -r COL_RESET="\x1b[39;49;00m"
 
 # ====== REVISION/VERSION ======
-
 declare -r CHAMELEON_VERSION=$( cat version )
 
 # stage
@@ -62,11 +60,15 @@ declare -r CHAMELEON_BUILDDATE=$( grep I386BOOT_BUILDDATE vers.h | awk '{ print 
 declare -r CHAMELEON_TIMESTAMP=$( date -j -f "%Y-%m-%d %H:%M:%S" "${CHAMELEON_BUILDDATE}" "+%s" )
 
 # ====== CREDITS ======
-
 declare -r CHAMELEON_DEVELOP=$(awk "NR==6{print;exit}"  ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_CREDITS=$(awk "NR==10{print;exit}" ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_PKGDEV=$(awk "NR==14{print;exit}"  ${PKGROOT}/../CREDITS)
-declare -r CHAMELEON_WHOBUILD=$(whoami | awk '{print $1}' | cut -d ":" -f3)
+declare -r CHAMELEON_CPRYEAR=$(awk "NR==18{print;exit}"  ${PKGROOT}/../CREDITS)
+if [[ $(whoami | awk '{print $1}' | cut -d ":" -f3) == "cmorton" ]];then
+    declare -r CHAMELEON_WHOBUILD="VoodooLabs BuildBot"
+else
+    declare -r CHAMELEON_WHOBUILD=$(whoami | awk '{print $1}' | cut -d ":" -f3)
+fi
 
 # ====== GLOBAL VARIABLES ======
 declare -r LOG_FILENAME="Chameleon_Installer_Log.txt"
@@ -98,7 +100,6 @@ declare -r chameleon_package_identity="org.chameleon"
 declare -r modules_packages_identity="${chameleon_package_identity}.modules"
 
 # ====== FUNCTIONS ======
-
 trim () {
     local result="${1#"${1%%[![:space:]]*}"}"   # remove leading whitespace characters
     echo "${result%"${result##*[![:space:]]}"}" # remove trailing whitespace characters
@@ -107,7 +108,7 @@ trim () {
 function makeSubstitutions () {
     # Substition is like: Key=Value
     #
-    # Optionnal arguments:
+    # Optional arguments:
     #    --subst=<substition> : add a new substitution
     #
     # Last argument(s) is/are file(s) where substitutions must be made
@@ -152,6 +153,7 @@ s&%CHAMELEONSTAGE%&${CHAMELEON_STAGE}&g
 s&%DEVELOP%&${CHAMELEON_DEVELOP}&g
 s&%CREDITS%&${CHAMELEON_CREDITS}&g
 s&%PKGDEV%&${CHAMELEON_PKGDEV}&g
+s&%CPRYEAR%&${CHAMELEON_CPRYEAR}&g
 s&%WHOBUILD%&${CHAMELEON_WHOBUILD}&g
 :t
 /@[a-zA-Z_][a-zA-Z_0-9]*@/!b
@@ -172,7 +174,7 @@ addTemplateScripts () {
     # Arguments:
     #    --pkg-rootdir=<pkg_rootdir> : path of the pkg root dir
     #
-    # Optionnal arguments:
+    # Optional arguments:
     #    --subst=<substition> : add a new substitution
     #
     # Substition is like: Key=Value
@@ -239,7 +241,7 @@ getChoiceIndex () {
 
 # Add a new choice
 addChoice () {
-    # Optionnal arguments:
+    # Optional arguments:
     #    --group=<group> : Group Choice Id
     #    --start-selected=<javascript code> : Specifies whether this choice is initially selected or unselected
     #    --start-enabled=<javascript code>  : Specifies the initial enabled state of this choice
@@ -313,7 +315,7 @@ addChoice () {
 
 # Add a group choice
 addGroupChoices() {
-    # Optionnal arguments:
+    # Optional arguments:
     #    --parent=<parent> : parent group choice id
     #    --exclusive_zero_or_one_choice : only zero or one choice can be selected in the group
     #    --exclusive_one_choice : only one choice can be selected in the group
@@ -442,7 +444,7 @@ main ()
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     addChoice --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
 
-    # Package will be build at the end
+    # Package will be built at the end
 # End pre install choice
 
 # build core package
@@ -477,6 +479,7 @@ main ()
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
     cp -f ${PKGROOT}/Scripts/Main/${choiceId}postinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
     cp -f ${PKGROOT}/Scripts/Sub/* ${PKG_BUILD_DIR}/${choiceId}/Scripts
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
@@ -740,7 +743,7 @@ fi
 
     while IFS= read -r -d '' OptionsFile; do
 
-        # Take filename and Strip .txt from end and path from front
+        # Take filename and strip .txt from end and path from front
         builtOptionsList=${OptionsFile%.txt}
         builtOptionsList=${builtOptionsList##*/}
         packagesidentity="${chameleon_package_identity}.options.$builtOptionsList"
@@ -1080,15 +1083,15 @@ makedistribution ()
 #   CleanUp the directory
     find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -exec rm -rf {} \;
 
-    # Make substitutions like version, revision, stage, developers, credits, etc..
+    # Make substitutions for version, revision, stage, developers, credits, etc..
     makeSubstitutions $( find "${PKG_BUILD_DIR}/${packagename}/Resources" -type f )
 
 #   Create the final package
     pkgutil --flatten "${PKG_BUILD_DIR}/${packagename}" "${distributionFilePath}"
 
 ##################################################################
-#   Here is the place for assign a Icon to the pkg               #
-#   command use to generate the file:                            #
+#   Here is the place to assign an icon to the pkg               #
+#   command used to generate the file:                           #
 #   ditto -c -k --sequesterRsrc --keepParent Icon.icns Icon.zip  #
 ##################################################################
     ditto -xk "${PKGROOT}/Icons/pkg.zip" "${PKG_BUILD_DIR}/Icons/"
@@ -1109,12 +1112,13 @@ makedistribution ()
     echo ""
     echo -e $COL_GREEN" Build info."
     echo -e $COL_GREEN" ==========="
-    echo -e $COL_BLUE"  Package name: "$COL_RESET"${distributionFilename}"
-    echo -e $COL_BLUE"  MD5:          "$COL_RESET"$md5"
-    echo -e $COL_BLUE"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
-    echo -e $COL_BLUE"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
-    echo -e $COL_BLUE"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
-    echo -e $COL_BLUE"  Builded by:   "$COL_RESET"$CHAMELEON_WHOBUILD"
+    echo -e $COL_CYAN"  Package name: "$COL_RESET"${distributionFilename}"
+    echo -e $COL_CYAN"  MD5:          "$COL_RESET"$md5"
+    echo -e $COL_CYAN"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
+    echo -e $COL_CYAN"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
+    echo -e $COL_CYAN"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
+    echo -e $COL_CYAN"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
+    echo -e $COL_CYAN"  Copyright $CHAMELEON_CPRYEAR ""$COL_RESET"
     echo ""
 
 }

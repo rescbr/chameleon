@@ -179,7 +179,7 @@ int printf(const char * fmt, ...)
 		vprf(fmt, ap);
 
 	{
-		// Kabyl: BooterLog
+		/* Kabyl: BooterLog */
 		struct putc_info pi;
 
 		if (!msgbuf)
@@ -211,7 +211,7 @@ int verbose(const char * fmt, ...)
     }
 
 	{
-		// Kabyl: BooterLog
+		/* Kabyl: BooterLog */
 		struct putc_info pi;
 
 		if (!msgbuf)

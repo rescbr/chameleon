@@ -11,7 +11,7 @@ if [ ! -d "$3" ]; then
     exit 1
 fi
 
-# If target volume root of current system then replace
+# If target volume is root of current system then replace
 # / with volume name.
 if [ "$3" == "/" ]; then
     dest_vol="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
@@ -31,8 +31,8 @@ scriptDir=$MYLOCATION
 
 # Write some information to the Install Log
 echo "======================================================"
-echo "Running Post postinstall script"
-echo "Target volume = ${dest_vol}"
+echo "//Post"
+echo "Updating permissions."
 
 # ---------------------------------------------
 # Update Rights
@@ -54,4 +54,4 @@ rm -f /tmp/newbs /tmp/origbs /tmp/originalBootSector /tmp/newBootSector
 rm -f "${dest_vol}/.ChameleonEFI"
 
 echo "======================================================"
-echo "Post postinstall script complete"
+echo "//Complete"

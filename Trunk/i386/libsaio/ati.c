@@ -652,6 +652,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6740,	0x1D121043, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6730M",				kNull		}, // ErmaC
 	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	{ 0x6740,	0x165A103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
+	{ 0x6740,	0x3388103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		}, // ErmaC
 
 	{ 0x6741,	0x050E1025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
 	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
@@ -1409,7 +1410,8 @@ static bool init_card(pci_dt_t *pci_dev)
 		}
 	}
 	
-	if (!card->info->device_id || !card->info->cfg_name)
+    //	if (!card->info->device_id || !card->info->cfg_name)
+	if (!card->info->device_id)
 	{
 		verbose("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%08x] \n", 
 				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id);

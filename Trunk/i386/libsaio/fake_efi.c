@@ -498,10 +498,10 @@ static EFI_CHAR8* getSystemID()
 		ret = getSmbiosUUID();
 		sysId = 0;
 	}
-	
+
 	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
 		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
-	
+
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
 	return ret;
 }
@@ -527,14 +527,14 @@ void setupEfiDeviceTree(void)
 	Node		*node;
 	
 	node = DT__FindNode("/", false);
-	
+
 	if (node == 0) stop("Couldn't get root node");
-	
+
 	// We could also just do DT__FindNode("/efi/platform", true)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
-	
+
 	if (archCpuType == CPU_TYPE_I386)
 	{
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
@@ -546,13 +546,13 @@ void setupEfiDeviceTree(void)
 	
 	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
-	
+
 	// TODO: Fill in other efi properties if necessary
-	
+
 	// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
-	
+
 	if (archCpuType == CPU_TYPE_I386)
 	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
@@ -570,24 +570,24 @@ void setupEfiDeviceTree(void)
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
-	
+
 	// Now fill in the /efi/platform Node
 	Node *efiPlatformNode = DT__AddChild(node, "platform");
-	
+
 	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
-	
+
 	if (Platform.CPU.FSBFrequency != 0)
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
 	
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
 	if (Platform.CPU.TSCFrequency != 0)
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
-	
+
 	if (Platform.CPU.CPUFrequency != 0)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
-	
+
 	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
 	if ((ret=getSystemID()))
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
@@ -595,11 +595,11 @@ void setupEfiDeviceTree(void)
 	// Export SystemSerialNumber if present
 	if ((ret16=getSmbiosChar16("SMserial", &len)))
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
-	
+
 	// Export Model if present
 	if ((ret16=getSmbiosChar16("SMproductname", &len)))
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
-	
+
 	// Fill /efi/device-properties node.
 	setupDeviceProperties(node);
 }
@@ -681,12 +681,12 @@ static void setupEfiConfigurationTable()
 {
 	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
 	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-	
+
 	setupBoardId(); //need to be called after getSmbios
 
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();
-	
+
 	// We've obviously changed the count.. so fix up the CRC32
 	if (archCpuType == CPU_TYPE_I386)
 	{
@@ -756,7 +756,7 @@ void setupFakeEfi(void)
 	{
 		setupEfiTables64();
 	}
-	
+
 	// Initialize the device tree
 	setupEfiDeviceTree();
 

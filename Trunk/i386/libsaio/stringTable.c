@@ -411,13 +411,13 @@ bool getIntForKey( const char *key, int *value, config_file_t *config )
 bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
 {
 	const char *val;
-	
+
     int size = 0;
 	int sum = 0;
-    
+
 	bool negative = false;
 	bool percentage = false;
-	
+
     if (getValueForKey(key, &val, &size, config))
 	{
 		if ( size )
@@ -428,13 +428,13 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 				val++;
 				size--;
 			}
-			
+
 			if (val[size-1] == '%')
 			{
 				percentage = true;
 				size--;
 			}
-			
+
 			// convert string to integer
 			for (sum = 0; size > 0; size--)
 			{
@@ -443,25 +443,25 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 				
 				sum = (sum * 10) + (*val++ - '0');
 			}
-			
+
 			if (percentage)
 				sum = ( dimension_max * sum ) / 100;
 			
 			// calculate offset from opposite origin
 			if (negative)
 				sum =  ( ( dimension_max - object_size ) - sum );
-			
+
 		} else {
 			
 			// null value calculate center
 			sum = ( dimension_max - object_size ) / 2;
 			
 		}
-		
+
 		*value = (uint16_t) sum;
 		return true;
 	}
-	
+
 	// key not found
     return false;
 }
@@ -474,7 +474,7 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
 {
     const char *val;
     int size;
-    
+
     if (getValueForKey(key, &val, &size, config))
 	{
 		if (*val == '#')
@@ -492,7 +492,7 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
   const char *overrideVal;
   int overrideSize;
   bool override, ret;
-  
+
   if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
     return true;
 
@@ -570,12 +570,12 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
     {
         length = XMLParseNextTag(configBuffer + pos, &tag);
         if (length == -1) break;
-    
+
         pos += length;
-    
+
         if (tag == 0) continue;
         if (tag->type == kTagTypeDict) break;
-    
+
         XMLFreeTag(tag);
     }
     free(configBuffer);
@@ -602,7 +602,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	// read file
 	count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 	close(fd);
-	
+
 	// build xml dictionary
 	ParseXMLFile(config->plist, &config->dictionary);
 	return 0;
@@ -629,12 +629,12 @@ int loadSystemConfig(config_file_t *config)
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 			close(fd);
-			
+
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
 			sysConfigValid = true;	
 			ret=0;
-			
+
 			break;
 		}
 	}

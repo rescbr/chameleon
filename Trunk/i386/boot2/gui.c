@@ -330,9 +330,9 @@ static int loadThemeImage(const char *image, int alt_image)
 				images[i].image->pixels = images[alt_image].image->pixels;
 				
 			} else {
-                
+
 				// Unable to load or to find the image, this image not vital anyway, reseting and returning success !!
-                
+
 				free(images[i].image);
 				images[i].image = NULL;
 			} 
@@ -348,9 +348,9 @@ static int loadThemeImage(const char *image, int alt_image)
 			free(images[i].image);
 			images[i].image = NULL;
 			return 1;
-            
+
         }      
-        
+
     }
 	return 1;
 }
