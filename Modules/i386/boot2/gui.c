@@ -43,6 +43,8 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+    iDeviceHFS_ML,
+    iDeviceHFS_ML_o,
     iDeviceHFS_Lion,
     iDeviceHFS_Lion_o,
     iDeviceHFS_SL,
@@ -53,6 +55,8 @@ enum {
     iDeviceHFS_Tiger_o,
     iDeviceHFSRAID,
     iDeviceHFSRAID_o,
+    iDeviceHFSRAID_ML,
+    iDeviceHFSRAID_ML_o,
     iDeviceHFSRAID_Lion,
     iDeviceHFSRAID_Lion_o,
     iDeviceHFSRAID_SL,
@@ -116,6 +120,8 @@ image_t images[] = {
     {.name = "device_hfsplus_o",            .image = NULL},
     {.name = "device_hfsplus_lion",         .image = NULL},
     {.name = "device_hfsplus_lion_o",       .image = NULL},
+    {.name = "device_hfsplus_ml",           .image = NULL},
+    {.name = "device_hfsplus_ml_o",         .image = NULL},
     {.name = "device_hfsplus_sl",           .image = NULL},
     {.name = "device_hfsplus_sl_o",         .image = NULL},
     {.name = "device_hfsplus_leo",          .image = NULL},
@@ -127,6 +133,8 @@ image_t images[] = {
     {.name = "device_hfsraid_o",            .image = NULL},
     {.name = "device_hfsraid_lion",         .image = NULL},
     {.name = "device_hfsraid_lion_o",       .image = NULL},
+    {.name = "device_hfsraid_ml",           .image = NULL},
+    {.name = "device_hfsraid_ml_o",         .image = NULL},
     {.name = "device_hfsraid_sl",           .image = NULL},
     {.name = "device_hfsraid_sl_o",         .image = NULL},
     {.name = "device_hfsraid_leo",          .image = NULL},
@@ -330,9 +338,9 @@ static int loadThemeImage(const char *image, int alt_image)
 				images[i].image->pixels = images[alt_image].image->pixels;
 				
 			} else {
-                
+
 				// Unable to load or to find the image, this image not vital anyway, reseting and returning success !!
-                
+
 				free(images[i].image);
 				images[i].image = NULL;
 			} 
@@ -348,9 +356,9 @@ static int loadThemeImage(const char *image, int alt_image)
 			free(images[i].image);
 			images[i].image = NULL;
 			return 1;
-            
+
         }      
-        
+
     }
 	return 1;
 }
@@ -366,6 +374,8 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
 	LOADPNG(device_hfsplus_lion,            iDeviceHFS_Lion);
 	LOADPNG(device_hfsplus_lion_o,          iDeviceHFS_Lion_o);
+	LOADPNG(device_hfsplus_ml,              iDeviceHFS_ML);
+	LOADPNG(device_hfsplus_ml_o,            iDeviceHFS_ML_o);
 	LOADPNG(device_hfsplus_sl,              iDeviceHFS_SL);
 	LOADPNG(device_hfsplus_sl_o,            iDeviceHFS_SL_o);
 	LOADPNG(device_hfsplus_leo,             iDeviceHFS_Leo);
@@ -377,6 +387,8 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_lion,            iDeviceHFSRAID_Lion);
 	LOADPNG(device_hfsraid_lion_o,          iDeviceHFSRAID_Lion_o);
+	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID_ML);
+	LOADPNG(device_hfsraid_ml_o,            iDeviceHFSRAID_ML_o);
 	LOADPNG(device_hfsraid_sl,              iDeviceHFSRAID_SL);
 	LOADPNG(device_hfsraid_sl_o,            iDeviceHFSRAID_SL_o);
 	LOADPNG(device_hfsraid_leo,             iDeviceHFSRAID_Leo);
@@ -893,6 +905,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 				if (device->flags & kBVFlagBooter) {
                     
 					switch (device->OSVersion[3]) {
+						case '8':
+							devicetype = is_image_loaded(iDeviceHFSRAID_ML) ? iDeviceHFSRAID_ML : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFSRAID_Lion) ? iDeviceHFSRAID_Lion : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
 							break;
@@ -915,6 +930,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 				{					
 					
 					switch (device->OSVersion[3]) {
+						case '8':
+							devicetype = is_image_loaded(iDeviceHFS_ML) ? iDeviceHFS_ML : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFS_Lion) ? iDeviceHFS_Lion : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
 							break;
