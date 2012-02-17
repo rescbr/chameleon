@@ -196,7 +196,7 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 	
 	// Jump to kernel's entry point. There's no going back now.
-	if (checkOSVersion("10.7")) {
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
@@ -230,10 +230,10 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 	if (cacheFile[0] != 0)
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
 	else {
-		// Lion prelink kernel cache file
-		if (checkOSVersion("10.7")) {
+		// Mountain Lion and Lion prelink kernel cache file
+		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
-		}
+        }
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
 			sprintf(kernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386)
@@ -330,7 +330,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 	// Since the kernel cache file exists and is the most recent try to load it
 	verbose("Loading kernel cache %s\n", kernelCachePath);
 
-	if (checkOSVersion("10.7")) {
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 		ret = LoadThinFatFile(kernelCachePath, binary);
 	} else {
 		ret = LoadFile(kernelCachePath);
@@ -605,9 +605,9 @@ void common_boot(int biosdev)
 		
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 
-		// If boot from boot helper partitions and OS is Lion use prelink kernel.
+		// If boot from boot helper partitions and OS is Mountain Lion or Lion use prelink kernel.
 		// We need to find a solution to load extra mkext with a prelink kernel.
-		if (gBootVolume->flags & kBVFlagBooter && checkOSVersion("10.7"))
+		if (gBootVolume->flags & kBVFlagBooter && ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))))
 			useKernelCache = true;
 		else
 			useKernelCache = false; // by default don't use prelink kernel cache
