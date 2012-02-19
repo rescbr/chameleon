@@ -1,3 +1,4 @@
+- Added boot support for Mountain Lion 10.8 (credits to ErmaC) & updated the default theme (credits to blackosx)
 - cparm : Fixed naming convention for raid hfs devices in gui
 - Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/
 - Added Guerrero's patch on gui.c: http://forge.voodooprojects.org/p/chameleon/issues/178/
