@@ -2,6 +2,9 @@
  *  platform.c
  *
  * AsereBLN: cleanup
+ *
+ *	ALL functions and struct. here will be DEPRECATED soon, i prefer Hash. (hmm, i mean hashable structures ... of course)
+ *
  */
 
 #include "libsaio.h"

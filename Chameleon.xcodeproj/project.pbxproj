@@ -292,6 +292,7 @@
 		AB43B3F814C384040018D529 /* stack_protector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack_protector.c; sourceTree = "<group>"; };
 		AB43B42A14C3A8080018D529 /* arc4random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = arc4random.c; sourceTree = "<group>"; };
 		AB79217514F38CF200F5EB39 /* bootXnu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootXnu.h; sourceTree = "<group>"; };
+		AB79219214F3919E00F5EB39 /* ModuleHelp.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModuleHelp.txt; sourceTree = "<group>"; };
 		B0056CD611F3868000754B65 /* boot */ = {isa = PBXFileReference; lastKnownFileType = text; path = boot; sourceTree = "<group>"; };
 		B0056CD711F3868000754B65 /* boot.sys */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.preload"; path = boot.sys; sourceTree = "<group>"; };
 		B0056CD811F3868000754B65 /* boot0 */ = {isa = PBXFileReference; lastKnownFileType = text; path = boot0; sourceTree = "<group>"; };
@@ -1301,6 +1302,7 @@
 			children = (
 				B0056E0711F3868000754B65 /* archive */,
 				B0056E0B11F3868000754B65 /* BootHelp.txt */,
+				AB79219214F3919E00F5EB39 /* ModuleHelp.txt */,
 				B0056E0C11F3868000754B65 /* README */,
 				B0056E0D11F3868000754B65 /* themeinfo.png */,
 				B0056E0E11F3868000754B65 /* User_Guide_src */,

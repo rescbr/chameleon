@@ -1,6 +1,9 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
+- Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 
+  will be done simply by destroying the pool
+
 - (re-)Implement a watchdog library set (clear the watchdog , can avoid infinite loop made for unknow reasons by the compiler or cpu reset) 
 
 - Implement a Host like in bits to avoid some return issues
