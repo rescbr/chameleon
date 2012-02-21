@@ -1063,7 +1063,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 	}
 }
 
-inline void rebase_location(UInt32* location, char* base, int type)
+void rebase_location(UInt32* location, char* base, int type)
 {	
 	switch(type)
 	{
@@ -1077,7 +1077,7 @@ inline void rebase_location(UInt32* location, char* base, int type)
 	}
 }
 
-inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
+void bind_location(UInt32* location, char* value, UInt32 addend, int type)
 {	
 	// do actual update
 	char* newValue = value + addend;

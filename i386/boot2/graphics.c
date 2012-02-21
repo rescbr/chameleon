@@ -649,7 +649,7 @@ setVideoMode( int mode)
 //==========================================================================
 // Return the current video mode, VGA_TEXT_MODE or GRAPHICS_MODE.
 
-inline int getVideoMode(void)
+int getVideoMode(void)
 {
     return bootArgs->Video.v_display;
 }

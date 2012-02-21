@@ -34,7 +34,7 @@
 #else
 #include <IOKit/IOTypes.h>
 #endif
-#include "bootLion.h"
+#include "bootXnu.h"
 
 #if DEBUG
 #define DEBUG_DISK(x)    printf x

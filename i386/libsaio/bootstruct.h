@@ -25,7 +25,7 @@
 #ifndef __BOOTSTRUCT_H
 #define __BOOTSTRUCT_H
 
-#include "bootLion.h"
+#include "bootXnu.h"
 #include "saio_types.h"
 #include "bios.h"
 #include "device_tree.h"

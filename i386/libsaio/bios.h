@@ -29,7 +29,7 @@
 #ifndef __LIBSAIO_BIOS_H
 #define __LIBSAIO_BIOS_H
 
-#include "bootLion.h"
+#include "bootXnu.h"
 
 typedef union {
     unsigned int      rx;

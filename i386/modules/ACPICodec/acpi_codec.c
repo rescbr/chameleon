@@ -180,7 +180,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 //#define ULONG_MAX_32 4294967295UL
 
 #define __RES(s, u)												\
-inline unsigned u										\
+static inline unsigned u										\
 resolve_##s(unsigned u defaultentry, char *str, int base)       \
 {																\
 unsigned u entry  = defaultentry;							\

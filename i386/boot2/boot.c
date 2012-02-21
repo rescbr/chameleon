@@ -1067,8 +1067,9 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
 // If a kext is found in /Extra/Extentions return true
 // If a mkext is found in /Extra return true
 // Otherwise return false
-// Tips (if you still use extra kext(s)/mkext(s) ): With Lion it's recommended to create a system mkext (see the kextcache commandline) to decrease boot time,
-//                                                  otherwise it will act like a -f each time a extra kext/kext is detected
+// Tips (if you still want to use extra kext(s)/mkext(s) ): 
+// With Lion and earlier, the default boot cache is a kernelcache, no mkext is created anymore by kextd automaticaly (kextd still update the existing mkexts), 
+// so it's recommended to create a system mkext by yourself to decrease boot time (see the kextcache commandline)
 static bool found_extra_kext(void) 
 {	
 #define EXTENSIONS "Extensions"

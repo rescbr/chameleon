@@ -32,7 +32,7 @@ SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o bzero.o bcopy.o prf.o 
 	
 SFILES = setjmp.s bzero.s bcopy.s
 CFILES = qdivrem.c umoddi3.c udivdi3.c divdi3.c moddi3.c prf.c printf.c zalloc.c \
-	string.c strtol.c error.c \
+	string.c strtol.c \
 	qsort.c efi_tables.c
 
 HFILES = memory.h

@@ -71,8 +71,8 @@ VOID load_all_modules();
 EFI_STATUS execute_hook(const char* name, void*, void*, void*, void*, void*, void*);
 VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*));
 
-inline void rebase_location(UInt32* location, char* base, int type);
-inline void bind_location(UInt32* location, char* value, UInt32 addend, int type);
+void rebase_location(UInt32* location, char* base, int type);
+void bind_location(UInt32* location, char* value, UInt32 addend, int type);
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void bind_macho(void* base, char* bind_stream, UInt32 size);
 
