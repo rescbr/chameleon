@@ -1299,10 +1299,10 @@
 		B4189A2214BFBF5600ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B4189A2314BFBF7200ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B4189A2414BFBFD100ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
-		B43E407614EE869700CD79F9 /* device_hfsplus_mountain_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_mountain_o.png; sourceTree = "<group>"; };
-		B43E407714EE869800CD79F9 /* device_hfsplus_mountain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_mountain.png; sourceTree = "<group>"; };
-		B43E407814EE869A00CD79F9 /* device_hfsraid_mountain_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_mountain_o.png; sourceTree = "<group>"; };
-		B43E407914EE869C00CD79F9 /* device_hfsraid_mountain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_mountain.png; sourceTree = "<group>"; };
+		B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml_o.png; sourceTree = "<group>"; };
+		B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
+		B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
+		B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
 		B4189A3414BFC26400ED5B0B /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ati.c; path = ATiGraphicsEnabler/ati.c; sourceTree = "<group>"; };
 		B4189A3514BFC26400ED5B0B /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ati.h; path = ATiGraphicsEnabler/ati.h; sourceTree = "<group>"; };
 		B4189A3614BFC26400ED5B0B /* ATiGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ATiGraphicsEnabler.c; path = ATiGraphicsEnabler/ATiGraphicsEnabler.c; sourceTree = "<group>"; };
@@ -3377,8 +3377,8 @@
 				36AB75B014BD0866005B8045 /* device_hfsplus_leo.png */,
 				36AB75B114BD0866005B8045 /* device_hfsplus_lion_o.png */,
 				36AB75B214BD0866005B8045 /* device_hfsplus_lion.png */,
-				B43E407614EE869700CD79F9 /* device_hfsplus_mountain_o.png */,
-				B43E407714EE869800CD79F9 /* device_hfsplus_mountain.png */,
+				B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */,
+				B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */,
 				36AB75B314BD0866005B8045 /* device_hfsplus_o.png */,
 				36AB75B414BD0866005B8045 /* device_hfsplus_sl_o.png */,
 				36AB75B514BD0866005B8045 /* device_hfsplus_sl.png */,
@@ -3389,8 +3389,8 @@
 				36AB75BA14BD0866005B8045 /* device_hfsraid_leo.png */,
 				36AB75BB14BD0866005B8045 /* device_hfsraid_lion_o.png */,
 				36AB75BC14BD0866005B8045 /* device_hfsraid_lion.png */,
-				B43E407814EE869A00CD79F9 /* device_hfsraid_mountain_o.png */,
-				B43E407914EE869C00CD79F9 /* device_hfsraid_mountain.png */,
+				B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */,
+				B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */,
 				36AB75BD14BD0866005B8045 /* device_hfsraid_o.png */,
 				36AB75BE14BD0866005B8045 /* device_hfsraid_sl_o.png */,
 				36AB75BF14BD0866005B8045 /* device_hfsraid_sl.png */,

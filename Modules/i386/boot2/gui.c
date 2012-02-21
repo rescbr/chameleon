@@ -118,8 +118,8 @@ image_t images[] = {
     {.name = "device_generic_o",            .image = NULL},
     {.name = "device_hfsplus",              .image = NULL},
     {.name = "device_hfsplus_o",            .image = NULL},
-    {.name = "device_hfsplus_mountain",     .image = NULL},
-    {.name = "device_hfsplus_mountain_o",   .image = NULL},
+    {.name = "device_hfsplus_ml",           .image = NULL},
+    {.name = "device_hfsplus_ml_o",         .image = NULL},
     {.name = "device_hfsplus_lion",         .image = NULL},
     {.name = "device_hfsplus_lion_o",       .image = NULL},
     {.name = "device_hfsplus_sl",           .image = NULL},
@@ -131,8 +131,8 @@ image_t images[] = {
 
     {.name = "device_hfsraid",              .image = NULL},
     {.name = "device_hfsraid_o",            .image = NULL},
-    {.name = "device_hfsraid_mountain",     .image = NULL},
-    {.name = "device_hfsraid_mountain_o",   .image = NULL},
+    {.name = "device_hfsraid_ml",           .image = NULL},
+    {.name = "device_hfsraid_ml_o",         .image = NULL},
     {.name = "device_hfsraid_lion",         .image = NULL},
     {.name = "device_hfsraid_lion_o",       .image = NULL},
     {.name = "device_hfsraid_sl",           .image = NULL},
@@ -372,8 +372,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
-	LOADPNG(device_hfsplus_mountain,        iDeviceHFS_Mountain);
-	LOADPNG(device_hfsplus_mountain_o,      iDeviceHFS_Mountain_o);
+	LOADPNG(device_hfsplus_ml,              iDeviceHFS_Mountain);
+	LOADPNG(device_hfsplus_ml_o,            iDeviceHFS_Mountain_o);
 	LOADPNG(device_hfsplus_lion,            iDeviceHFS_Lion);
 	LOADPNG(device_hfsplus_lion_o,          iDeviceHFS_Lion_o);
 	LOADPNG(device_hfsplus_sl,              iDeviceHFS_SL);
@@ -385,8 +385,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceGeneric);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
-	LOADPNG(device_hfsraid_mountain,        iDeviceHFSRAID_Mountain);
-	LOADPNG(device_hfsraid_mountain_o,      iDeviceHFSRAID_Mountain_o);
+	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID_Mountain);
+	LOADPNG(device_hfsraid_ml_o,            iDeviceHFSRAID_Mountain_o);
 	LOADPNG(device_hfsraid_lion,            iDeviceHFSRAID_Lion);
 	LOADPNG(device_hfsraid_lion_o,          iDeviceHFSRAID_Lion_o);
 	LOADPNG(device_hfsraid_sl,              iDeviceHFSRAID_SL);
