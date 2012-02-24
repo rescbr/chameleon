@@ -59,6 +59,7 @@ declare -r CHAMELEON_TIMESTAMP=$( date -j -f "%Y-%m-%d %H:%M:%S" "${CHAMELEON_BU
 declare -r CHAMELEON_DEVELOP=$(awk "NR==6{print;exit}"  ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_CREDITS=$(awk "NR==10{print;exit}" ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_PKGDEV=$(awk "NR==14{print;exit}"  ${PKGROOT}/../CREDITS)
+declare -r CHAMELEON_CPRYEAR=$(awk "NR==18{print;exit}"  ${PKGROOT}/../CREDITS)
 if [[ $(whoami | awk '{print $1}' | cut -d ":" -f3) == "cmorton" ]];then
     declare -r CHAMELEON_WHOBUILD="VoodooLabs BuildBot"
 else
@@ -148,6 +149,7 @@ s&%CHAMELEONSTAGE%&${CHAMELEON_STAGE}&g
 s&%DEVELOP%&${CHAMELEON_DEVELOP}&g
 s&%CREDITS%&${CHAMELEON_CREDITS}&g
 s&%PKGDEV%&${CHAMELEON_PKGDEV}&g
+s&%CPRYEAR%&${CHAMELEON_CPRYEAR}&g
 s&%WHOBUILD%&${CHAMELEON_WHOBUILD}&g
 :t
 /@[a-zA-Z_][a-zA-Z_0-9]*@/!b
@@ -173,7 +175,7 @@ addTemplateScripts () {
     #
     # Substition is like: Key=Value
     #
-    # $n : Name of template(s) (templates are in package/Scripts.templates
+    # $n : Name of template(s) - templates are in package/Scripts.templates
 
     local pkgRootDir=""
     declare -a allSubst
@@ -849,7 +851,7 @@ buildpackage ()
 
         header+="auth=\"root\">\n"
         header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-        #rm -R -f "${packagePath}/Temp" //blackosx commented out for now
+        rm -R -f "${packagePath}/Temp"
 
         [ -d "${packagePath}/Temp" ] || mkdir -m 777 "${packagePath}/Temp"
         [ -d "${packagePath}/Root" ] && mkbom "${packagePath}/Root" "${packagePath}/Temp/Bom"
@@ -862,7 +864,7 @@ buildpackage ()
             header+="\t</scripts>\n"
             # Create the Script archive file (cpio format)
             (cd "${packagePath}/Scripts" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
-                grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+                grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages #blackosx removed -v from -vE
         fi
 
         header+="</pkg-info>"
@@ -870,7 +872,7 @@ buildpackage ()
 
         # Create the Payload file (cpio format)
         (cd "${packagePath}/Root" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
-            grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+            grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages #blackosx removed -v from -vE
 
         # Create the package
         (cd "${packagePath}/Temp" && xar -c -f "${packagePath}/../${packageName}.pkg" --compression none .)
@@ -878,7 +880,7 @@ buildpackage ()
         # Add the package to the list of build packages
         pkgrefs[${#pkgrefs[*]}]="\t<pkg-ref id=\"${packageRefId}\" installKBytes='${installedsize}' version='${CHAMELEON_VERSION}.0.0.${CHAMELEON_TIMESTAMP}'>#${packageName}.pkg</pkg-ref>"
 
-        #rm -rf "${packagePath}" //blackosx commented out for now
+        rm -rf "${packagePath}"
     fi
 }
 
@@ -952,7 +954,7 @@ makedistribution ()
     declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
 
-    #rm -f "${distributionDestDir}/${packagename// /}"*.pkg  //blackosx commented out for now
+    rm -f "${distributionDestDir}/${packagename// /}"*.pkg
 
     mkdir -p "${PKG_BUILD_DIR}/${packagename}"
 
@@ -962,7 +964,7 @@ makedistribution ()
         pkgdir="${PKG_BUILD_DIR}/${packagename}/${pkg}"
         # expand individual packages
         pkgutil --expand "${PKG_BUILD_DIR}/${pkg}" "$pkgdir"
-        #rm -f "${PKG_BUILD_DIR}/${pkg}"  //blackosx commented out for now
+        rm -f "${PKG_BUILD_DIR}/${pkg}"
     done
 
 #   Create the Distribution file
@@ -986,7 +988,7 @@ makedistribution ()
 #   Create the Resources directory
     ditto --noextattr --noqtn "${PKGROOT}/Resources" "${PKG_BUILD_DIR}/${packagename}/Resources"
 
-#   CleanUp the directory
+#    CleanUp the directory
     # this next line should work but it doesn't - not sure why.
     #find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -exec rm -rf {} \;
     
@@ -994,7 +996,7 @@ makedistribution ()
     find "${PKG_BUILD_DIR}/${packagename}/Resources" -name ".svn" -type d -o -name ".DS_Store" -type f | while read component
     do
 		rm -rf "${component}"
-    done    
+    done
 
     # Make substitutions for version, revision, stage, developers, credits, etc..
     makeSubstitutions $( find "${PKG_BUILD_DIR}/${packagename}/Resources" -type f )
@@ -1027,6 +1029,7 @@ makedistribution ()
     echo -e $COL_CYAN"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
     echo -e $COL_CYAN"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
     echo -e $COL_CYAN"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
+    echo -e $COL_CYAN"  Copyright $CHAMELEON_CPRYEAR ""$COL_RESET"
     echo ""
 
 }
