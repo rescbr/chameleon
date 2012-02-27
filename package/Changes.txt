@@ -1,3 +1,5 @@
+- Add initial infrastructure for using a single master Resources file. This is a work in progress as a few things need fixing yet before initial trials.
+
 - ErmaC - Update Language for whobuild resources.
 
 - JrCs - Improved Installer - Start using template scripts

@@ -178,6 +178,7 @@ addTemplateScripts () {
     # $n : Name of template(s) - templates are in package/Scripts.templates
 
     local pkgRootDir=""
+    local pkgTemplateType=""
     declare -a allSubst
 
     # Check the arguments.
@@ -186,6 +187,7 @@ addTemplateScripts () {
         case "$option" in
             --pkg-rootdir=*)   shift; pkgRootDir="${option#*=}" ;;
             --subst=*) shift; allSubst[${#allSubst[*]}]="${option}" ;;
+            --type=*) shift; pkgTemplateType=$pkgRootDir"/${option#*=}" ;;
             -*)
                 echo "Unrecognized addTemplateScripts option '$option'" >&2
                 exit 1
@@ -206,10 +208,10 @@ addTemplateScripts () {
             echo "Error addTemplateScripts: template '$templateName' doesn't exists" >&2; exit 1; }
 
         # Copy files to destination
-        rsync -pr --exclude=.svn --exclude="*~" "$templateRootDir/" "$pkgRootDir/Scripts/"
+        rsync -pr --exclude=.svn --exclude="*~" "$templateRootDir/" "$pkgTemplateType"
     done
 
-    files=$( find "$pkgRootDir/Scripts/" -type f )
+    files=$( find "$pkgTemplateType" -type f )
     if [[ ${#allSubst[*]} -gt 0 ]];then
         makeSubstitutions "${allSubst[@]}" $files
     else
@@ -474,8 +476,8 @@ main ()
     choiceId="Standard"
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" --type="Scripts" InstallerLog
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" --type="Scripts" UnMount
     cp -f ${PKGROOT}/Scripts/Main/${choiceId}postinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
     cp -f ${PKGROOT}/Scripts/Sub/* ${PKG_BUILD_DIR}/${choiceId}/Scripts
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
@@ -540,6 +542,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
                                --subst="moduleName=$choiceId"               \
                                --subst="moduleFile=$moduleFile"             \
+                               --type="Scripts"                             \
                                InstallModule
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
@@ -560,6 +563,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
                                --subst="moduleName=$choiceId"               \
                                --subst="moduleFile=$moduleFile"             \
+                               --type="Scripts"                             \
                                InstallModule
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
@@ -585,6 +589,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
                                --subst="moduleName=$choiceId"               \
                                --subst="moduleFile=$moduleFile"             \
+                               --type="Scripts"                             \
                                InstallModule
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
@@ -620,6 +625,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
                                --subst="moduleName=$choiceId"               \
                                --subst="moduleFile=$moduleFile"             \
+                               --type="Scripts"                             \
                                InstallModule
 
             packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
@@ -709,6 +715,7 @@ fi
                                --subst="optionType=$type"                   \
                                --subst="optionKey=$key"                     \
                                --subst="optionValue=$value"                 \
+                               --type="Scripts"                             \
                                AddOption
             packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
             buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
@@ -749,6 +756,7 @@ if [[ -n "${CONFIG_KEYLAYOUT_MODULE}" ]];then
                            --subst="optionType=text"                    \
                            --subst="optionKey=$chameleon_keylayout_key" \
                            --subst="optionValue=$choiceId"              \
+                           --type="Scripts"                             \
                            AddOption
         packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
         buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
@@ -777,6 +785,7 @@ fi
         addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${themeName}" \
                            --subst="themeName=$themeName"                \
                            --subst="themeDir=$themeDir"                  \
+                           --type="Scripts"                              \
                            InstallTheme
 
         packageRefId=$(getPackageRefId "${packagesidentity}" "${themeName}")
@@ -795,6 +804,7 @@ fi
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources
     local yamlFile="Resources/chameleon_options.yaml"
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                       --type="Scripts"                             \
                        --subst="YAML_FILE=${yamlFile}" ${choiceId}
     generate_options_yaml_file "${PKG_BUILD_DIR}/${choiceId}/Scripts/$yamlFile"
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
@@ -805,9 +815,9 @@ fi
     packagesidentity="${chameleon_package_identity}"
     choiceId="Post"
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" ${choiceId}
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" --type="Scripts" ${choiceId}
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" --type="Scripts" InstallerLog
+    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" --type="Scripts" UnMount
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice  --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
@@ -815,8 +825,7 @@ fi
 
 }
 
-buildpackage ()
-{
+buildpackage () {
     #  $1 Package Reference Id (ie: org.chameleon.themes.default)
     #  $2 Package Name (ie: Default)
     #  $3 Path to package to build containing Root and/or Scripts
@@ -863,7 +872,8 @@ buildpackage ()
             done
             header+="\t</scripts>\n"
             # Create the Script archive file (cpio format)
-            (cd "${packagePath}/Scripts" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
+            # Note: Use root:wheel instead of 0:0 otherwise it errors on Snow Leopard.
+            (cd "${packagePath}/Scripts" && find . -print | cpio -o -z -R root:wheel --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
                 grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages #blackosx removed -v from -vE
         fi
 
@@ -871,7 +881,8 @@ buildpackage ()
         echo -e "${header}" > "${packagePath}/Temp/PackageInfo"
 
         # Create the Payload file (cpio format)
-        (cd "${packagePath}/Root" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
+        # Note: Use root:wheel instead of 0:0 otherwise it errors on Snow Leopard.
+        (cd "${packagePath}/Root" && find . -print | cpio -o -z -R root:wheel --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
             grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages #blackosx removed -v from -vE
 
         # Create the package
@@ -948,8 +959,125 @@ generateChoices() {
     done
 }
 
-makedistribution ()
-{
+resetVars() {
+    foundCode=""
+    foundMessageName=""
+    foundObjectName=""
+    foundObjectTitle=""
+    foundDescription=""
+
+    resourceToUse=""
+
+    buildCodes=()
+    templateStrings=()
+}
+
+buildresources() {
+    ResourcesSourceFolder="${PKGROOT}/Resources.source"
+    ResourcesSourceFile="ResourcesSourceFile.txt"
+
+    # Check for ResourcesSourceFile.txt.
+    # If it doesn't exist then run perl script to make another one from
+    # the UTF-8 .tsv file saved from the master Google docs spreadsheet.
+    if [ -f ${ResourcesSourceFile} ]; then
+        "${ResourcesSourceFolder}/ConvertResourcesTextFile.pl" "${ResourcesSourceFolder}/${ResourcesSourceFile}"
+    fi
+    ResourcesLanguageFile=$ResourcesSourceFolder/$ResourcesSourceFile
+
+
+    #Initialise Variables
+    foundLanguage=""
+    resetVars
+
+    # begin
+    while read -r line
+    do
+        case "${line%%:*}" in
+
+            "language" )       
+                foundLanguage="${line#*: }"
+                if [ ! -d "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" ]; then
+                    echo -e "\tCreating Language Resource Folder: $foundLanguage"
+                    mkdir -p "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
+                fi
+            
+                ## Add License.rtf file to Language folder
+                if [ ! -f "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/License.rtf" ]; then
+                    echo -e "\t\tAdding License.rtf file"
+                    ditto --noextattr --noqtn "${ResourcesSourceFolder}/License.rtf" "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
+                fi
+            
+                resetVars
+                ;;
+            
+            "file" )
+                # Have we already built an array of codes for the Welcome, Conclusion or Description Resource files?
+                if [ ${#buildCodes[@]} -ne 0 ]; then
+                    for (( n=0; n<${#buildCodes[@]}; n++ ))
+                    do
+                        templateStrings[${#templateStrings[*]}]="--subst=${buildCodes[$n]}"
+                    done
+                    # Send the pre-built arrays to addTemplateResources() for completing template.
+                    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" \
+                                   "${templateStrings[@]}"                \
+                                   --type=""                              \
+                                   "$resourceToUse"
+                fi
+            
+                resourceToUse="${line#*: }"
+                echo -e "\t\tComposing $resourceToUse File" 
+                ;;
+               
+             "codeID" )      foundCode="${line#*: }" ;;
+             "messageName" ) foundMessageName="${line#*: }" ;;
+             "objectName" )  foundObjectName="${line#*: }"; foundObjectName="${foundObjectName%%_title*}" ;;
+             "objectTitle" ) foundObjectTitle="${line#*: }" ;;
+             "description" ) foundDescription="${line#*: }" ;;
+        esac
+    
+        if [[ "$foundLanguage" != "" ]]; then
+            # Build an array for each the Welcome, Conclusion and Description Resource files per language.
+            if [[ "$foundCode" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                if [[ "$resourceToUse" == "Welcome" ]] || [[ "$resourceToUse" == "Conclusion" ]]; then 
+                    # Convert description from UFT8 to raw unicode markup
+                    convertedFoundDescription=$( echo $foundDescription | textutil -convert rtf -encoding UTF-8 -stdin -stdout )
+                    # Strip away unicode text up to and including '\f0\fs24 \cf0' - take what's after.
+                    strippedConvertedFoundDescription="${convertedFoundDescription#*\\f0\\fs24 \\cf0 }"
+                    # Remove last character from string and replace all backslashes with a double backslash.
+                    fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%?}" | sed -e 's/\\/\\\\/g' ) 
+                    #echo "$fixStrippedConvertedFoundDescription"
+                    buildCodes[${#buildCodes[*]}]="$foundCode=$fixStrippedConvertedFoundDescription"
+                fi
+                if [[ "$resourceToUse" == "Description" ]]; then
+                    # No need to convert the text for the Description file as it's not RTF.
+                    buildCodes[${#buildCodes[*]}]="$foundCode=$foundDescription"
+                fi
+                foundCode=""; foundDescription=""
+            fi
+        
+            # No need for an array for Localizable.strings. These can be written straight to file.
+            if [[ "$resourceToUse" == "LocalizableStrings" ]]; then
+                if  [[ "$foundMessageName" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                    echo "\"${foundMessageName}\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                    echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                    foundMessageName=""; foundDescription=""
+                fi
+                if  [[ "$foundObjectName" != "" ]] && [[ "$foundObjectTitle" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                    echo "\"${foundObjectName}_title\" = \"${foundObjectTitle}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                    echo "\"${foundObjectName}_description\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"            
+                    echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                    foundObjectName=""; foundObjectTitle=""; foundDescription=""
+                fi
+            fi
+        fi
+    done < $ResourcesLanguageFile
+    
+    echo -e "\tAdding background.tiff file"
+    ditto --noextattr --noqtn "${ResourcesSourceFolder}/background.tiff" "${PKG_BUILD_DIR}/${packagename}/Resources"
+    echo -e "\tBuild Resources Completed."
+}
+
+makedistribution () {
     declare -r distributionDestDir="${SYMROOT}"
     declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
@@ -957,7 +1085,6 @@ makedistribution ()
     rm -f "${distributionDestDir}/${packagename// /}"*.pkg
 
     mkdir -p "${PKG_BUILD_DIR}/${packagename}"
-
     find "${PKG_BUILD_DIR}" -type f -name '*.pkg' -depth 1 | while read component
     do
         pkg="${component##*/}" # ie: EFI.pkg
@@ -986,7 +1113,7 @@ makedistribution ()
     echo -e "\n</installer-gui-script>"  >> "${PKG_BUILD_DIR}/${packagename}/Distribution"
 
 #   Create the Resources directory
-    ditto --noextattr --noqtn "${PKGROOT}/Resources" "${PKG_BUILD_DIR}/${packagename}/Resources"
+    buildresources
 
 #    CleanUp the directory
     # this next line should work but it doesn't - not sure why.
