@@ -7,19 +7,23 @@
 #
 # The human readable file is hosted on Google Docs at:
 # www.......
-# The file should be saved from Google Docs by using:
-# File -> Download As -> Text (current sheet)
+# The spreadsheet is a published file and will be 
+# automatically downloaded as a UTF-8, tabbed delimited
+# text file which will be savedd in the same folder as
+# this script.
 #
-# This saves a UTF-8, tabbed delimited text file which
-# should be placed in the same folder as this script.
+# Call this script with:
+#      ./ConvertResourcesTextFile.pl ResourcesSourceFile.txt
+#
 #
 
 use LWP::Simple;
 
-if ($#ARGV < 0) {
-   print stderr "A destination file is needed\n";
+if ($#ARGV < 1) {
+   print stderr "A destination path and filename is needed\n";
 } else {
-   $destination_file=$ARGV[0];
+   $destination_dir=$ARGV[0];
+   $destination_file=$ARGV[1];
 }
 
 sub set_indent { 
@@ -59,11 +63,11 @@ sub calculateIndent {
 #--------------------------------------------------------------------------
 $googlePublishedDoc = 'https://docs.google.com/spreadsheet/pub?key=0Aj0jJ2rdmK_sdFdNbm45NlpNYU1PcjRmOHVXX0FNa3c&single=true&gid=0&output=txt';
 $sourceFileToRead="PackageInstallerResourceText.tsv";
-getstore ($googlePublishedDoc, $sourceFileToRead) or die "Couldn't get master file";
+getstore ($googlePublishedDoc, $destination_dir."/".$sourceFileToRead) or die "Couldn't get master file";
 #--------------------------------------------------------------------------
 
-open (FILE, "$sourceFileToRead");
-open (OUTFILE, ">$destination_file");
+open (FILE, "$destination_dir"."/"."$sourceFileToRead");
+open (OUTFILE, ">$destination_dir"."/"."$destination_file");
 
 print OUTFILE "\n";                                                                     # Output blank line. 
                                                                                         # This is needed so after converting to rtf using textutil in later bash script
@@ -71,11 +75,13 @@ print OUTFILE "\n";                                                             
 while (<FILE>) {
     $indent = "    ";
     chomp;
+    s/&amp;/and/g;                                                                      # Handle '&amp;' for now by converting to 'and'.
+    s/&/and/g;                                                                          # Handle '&' for now by converting to 'and'.
     @fieldsReadIn = split("\t");
-    $startFirstField=substr($fieldsReadIn[0],0,1);                                      # First charatcer of first field
-	$startSecondField=substr($fieldsReadIn[1],0,1);                                     # First charatcer of second field
+    $startFirstField=substr($fieldsReadIn[0],0,1);                                      # First character of first field.
+	$startSecondField=substr($fieldsReadIn[1],0,1);                                     # First character of second field.
 
-    if ($startFirstField ne "#" ) {                                                     # Ignore lines beginning with a hash
+    if ($startFirstField ne "#" ) {                                                     # Ignore lines beginning with a hash.
         if ($startFirstField ne "") {                                                   # Check first field for language identifier.
             print OUTFILE "language: $fieldsReadIn[0]\n";                               # Output first field - LANGUAGE.
         }
@@ -97,7 +103,7 @@ while (<FILE>) {
 	                $headedFieldCount++;
                     $indent=calculateIndent;
                     print OUTFILE $indent."$fieldsWithoutLanguage[$loop]: $fieldsReadIn[$loop]\n";
-                    $fieldsWithHeadersSet[$headedFieldCount]=1;                          # Set value in this array to mark that we've written to it.
+                    $fieldsWithHeadersSet[$headedFieldCount]=1;                         # Set value in this array to mark that we've written to it.
                 }
             }    
         }
@@ -105,4 +111,5 @@ while (<FILE>) {
 }
 close (FILE);
 close (OUTFILE);
+unlink("$destination_dir"."/"."$sourceFileToRead");                                     # Remove downloaded Google Doc file.
 exit;

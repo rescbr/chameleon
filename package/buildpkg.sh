@@ -975,13 +975,12 @@ resetVars() {
 buildresources() {
     ResourcesSourceFolder="${PKGROOT}/Resources.source"
     ResourcesSourceFile="ResourcesSourceFile.txt"
-
-    ResourcesLanguageFile="${ResourcesSourceFolder}/${ResourcesSourceFile}"
+    
     # Check for ResourcesSourceFile.txt.
-    # If it doesn't exist then run perl script to make another one from
-    # the UTF-8 .tsv file saved from the master Google docs spreadsheet.
-    if [ -f "${ResourcesLanguageFile}" ]; then
-        "${ResourcesSourceFolder}/ConvertResourcesTextFile.pl" "${ResourcesLanguageFile}"
+    # It now won't exist, so call perl script to download the published
+    # Google docs spreadsheet as UTF-8 .tsv file and make another one.
+    if [ ! -f "${PKG_BUILD_DIR}/${ResourcesSourceFile}" ]; then
+        "${ResourcesSourceFolder}/ConvertResourcesTextFile.pl" "${PKG_BUILD_DIR}" "${ResourcesSourceFile}"
     fi
 
     #Initialise Variables
@@ -989,87 +988,93 @@ buildresources() {
     resetVars
 
     # begin
-    while read -r line
-    do
-        case "${line%%:*}" in
+    if [ -f "${PKG_BUILD_DIR}/${ResourcesSourceFile}" ]; then
+        while read -r line
+        do
+            case "${line%%:*}" in
 
-            "language" )       
-                foundLanguage="${line#*: }"
-                if [ ! -d "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" ]; then
-                    echo -e "\tCreating Language Resource Folder: $foundLanguage"
-                    mkdir -p "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
-                fi
+                "language" )       
+                    foundLanguage="${line#*: }"
+                    if [ ! -d "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" ]; then
+                        echo -e "\tCreating Language Resource Folder: $foundLanguage"
+                        mkdir -p "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
+                    fi
             
-                ## Add License.rtf file to Language folder
-                if [ ! -f "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/License.rtf" ]; then
-                    echo -e "\t\tAdding License.rtf file"
-                    ditto --noextattr --noqtn "${ResourcesSourceFolder}/License.rtf" "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
-                fi
+                    ## Add License.rtf file to Language folder
+                    if [ ! -f "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/License.rtf" ]; then
+                        echo -e "\t\tAdding License.rtf file"
+                        ditto --noextattr --noqtn "${ResourcesSourceFolder}/License.rtf" "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage"
+                    fi
             
-                resetVars
-                ;;
+                    resetVars
+                    ;;
             
-            "file" )
-                # Have we already built an array of codes for the Welcome, Conclusion or Description Resource files?
-                if [ ${#buildCodes[@]} -ne 0 ]; then
-                    for (( n=0; n<${#buildCodes[@]}; n++ ))
-                    do
-                        templateStrings[${#templateStrings[*]}]="--subst=${buildCodes[$n]}"
-                    done
-                    # Send the pre-built arrays to addTemplateResources() for completing template.
-                    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" \
-                                   "${templateStrings[@]}"                \
-                                   --type=""                              \
-                                   "$resourceToUse"
-                fi
+                "file" )
+                    # Have we already built an array of codes for the Welcome, Conclusion or Description Resource files?
+                    if [ ${#buildCodes[@]} -ne 0 ]; then
+                        for (( n=0; n<${#buildCodes[@]}; n++ ))
+                        do
+                            templateStrings[${#templateStrings[*]}]="--subst=${buildCodes[$n]}"
+                        done
+                        # Send the pre-built arrays to addTemplateResources() for completing template.
+                        addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage" \
+                                       "${templateStrings[@]}"                \
+                                       --type=""                              \
+                                       "$resourceToUse"
+                    fi
             
-                resourceToUse="${line#*: }"
-                echo -e "\t\tComposing $resourceToUse File" 
-                ;;
+                    resourceToUse="${line#*: }"
+                    echo -e "\t\tComposing $resourceToUse File" 
+                    ;;
                
-             "codeID" )      foundCode="${line#*: }" ;;
-             "messageName" ) foundMessageName="${line#*: }" ;;
-             "objectName" )  foundObjectName="${line#*: }"; foundObjectName="${foundObjectName%%_title*}" ;;
-             "objectTitle" ) foundObjectTitle="${line#*: }" ;;
-             "description" ) foundDescription="${line#*: }" ;;
-        esac
+                 "codeID" )      foundCode="${line#*: }" ;;
+                 "messageName" ) foundMessageName="${line#*: }" ;;
+                 "objectName" )  foundObjectName="${line#*: }"; foundObjectName="${foundObjectName%%_title*}" ;;
+                 "objectTitle" ) foundObjectTitle="${line#*: }" ;;
+                 "description" ) foundDescription="${line#*: }" ;;
+            esac
     
-        if [[ "$foundLanguage" != "" ]]; then
-            # Build an array for each the Welcome, Conclusion and Description Resource files per language.
-            if [[ "$foundCode" != "" ]] && [[ "$foundDescription" != "" ]]; then
-                if [[ "$resourceToUse" == "Welcome" ]] || [[ "$resourceToUse" == "Conclusion" ]]; then 
-                    # Convert description from UFT8 to raw unicode markup
-                    convertedFoundDescription=$( echo $foundDescription | textutil -convert rtf -encoding UTF-8 -stdin -stdout )
-                    # Strip away unicode text up to and including '\f0\fs24 \cf0' - take what's after.
-                    strippedConvertedFoundDescription="${convertedFoundDescription#*\\f0\\fs24 \\cf0 }"
-                    # Remove last character from string and replace all backslashes with a double backslash.
-                    fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%?}" | sed -e 's/\\/\\\\/g' ) 
-                    #echo "$fixStrippedConvertedFoundDescription"
-                    buildCodes[${#buildCodes[*]}]="$foundCode=$fixStrippedConvertedFoundDescription"
+            if [[ "$foundLanguage" != "" ]]; then
+                # Build an array for each the Welcome, Conclusion and Description Resource files per language.
+                if [[ "$foundCode" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                    if [[ "$resourceToUse" == "Welcome" ]] || [[ "$resourceToUse" == "Conclusion" ]]; then 
+                        # Convert description from UFT8 to raw unicode markup
+                        convertedFoundDescription=$( echo $foundDescription | textutil -convert rtf -encoding UTF-8 -stdin -stdout )
+                        # Strip away unicode text up to and including '\f0\fs24 \cf0' - take what's after.
+                        strippedConvertedFoundDescription="${convertedFoundDescription#*\\f0\\fs24 \\cf0 }"
+                        # Remove last character from string and replace all backslashes with a double backslash.
+                        fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%?}" | sed -e 's/\\/\\\\/g' ) 
+                        #echo "$fixStrippedConvertedFoundDescription"
+                        buildCodes[${#buildCodes[*]}]="$foundCode=$fixStrippedConvertedFoundDescription"
+                    fi
+                    if [[ "$resourceToUse" == "Description" ]]; then
+                        # No need to convert the text for the Description file as it's not RTF.
+                        buildCodes[${#buildCodes[*]}]="$foundCode=$foundDescription"
+                    fi
+                    foundCode=""; foundDescription=""
                 fi
-                if [[ "$resourceToUse" == "Description" ]]; then
-                    # No need to convert the text for the Description file as it's not RTF.
-                    buildCodes[${#buildCodes[*]}]="$foundCode=$foundDescription"
-                fi
-                foundCode=""; foundDescription=""
-            fi
         
-            # No need for an array for Localizable.strings. These can be written straight to file.
-            if [[ "$resourceToUse" == "LocalizableStrings" ]]; then
-                if  [[ "$foundMessageName" != "" ]] && [[ "$foundDescription" != "" ]]; then
-                    echo "\"${foundMessageName}\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
-                    echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
-                    foundMessageName=""; foundDescription=""
-                fi
-                if  [[ "$foundObjectName" != "" ]] && [[ "$foundObjectTitle" != "" ]] && [[ "$foundDescription" != "" ]]; then
-                    echo "\"${foundObjectName}_title\" = \"${foundObjectTitle}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
-                    echo "\"${foundObjectName}_description\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"            
-                    echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
-                    foundObjectName=""; foundObjectTitle=""; foundDescription=""
+                # No need for an array for Localizable.strings. These can be written straight to file.
+                if [[ "$resourceToUse" == "LocalizableStrings" ]]; then
+                    if  [[ "$foundMessageName" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                        echo "\"${foundMessageName}\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                        echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                        foundMessageName=""; foundDescription=""
+                    fi
+                    if  [[ "$foundObjectName" != "" ]] && [[ "$foundObjectTitle" != "" ]] && [[ "$foundDescription" != "" ]]; then
+                        echo "\"${foundObjectName}_title\" = \"${foundObjectTitle}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                        echo "\"${foundObjectName}_description\" = \"${foundDescription}\";" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"            
+                        echo "" >> "${PKG_BUILD_DIR}/${packagename}/Resources/$foundLanguage/Localizable.strings"
+                        foundObjectName=""; foundObjectTitle=""; foundDescription=""
+                    fi
                 fi
             fi
-        fi
-    done < $ResourcesLanguageFile
+        done < "${PKG_BUILD_DIR}/${ResourcesSourceFile}"
+        rm "${PKG_BUILD_DIR}/${ResourcesSourceFile}"
+    else
+        echo -e "\tError. ${ResourcesLanguageFile} not created."
+        exit 1
+    fi
     
     echo -e "\tAdding background.tiff file"
     ditto --noextattr --noqtn "${ResourcesSourceFolder}/background.tiff" "${PKG_BUILD_DIR}/${packagename}/Resources"
