@@ -14,6 +14,8 @@
 # should be placed in the same folder as this script.
 #
 
+use LWP::Simple;
+
 if ($#ARGV < 0) {
    print stderr "A destination file is needed\n";
 } else {
@@ -55,7 +57,9 @@ sub calculateIndent {
 }
 
 #--------------------------------------------------------------------------
-$sourceFileToRead="Package%20Installer%20Resource%20Text%20-%20Sheet1.tsv";
+$googlePublishedDoc = 'https://docs.google.com/spreadsheet/pub?key=0Aj0jJ2rdmK_sdFdNbm45NlpNYU1PcjRmOHVXX0FNa3c&single=true&gid=0&output=txt';
+$sourceFileToRead="PackageInstallerResourceText.tsv";
+getstore ($googlePublishedDoc, $sourceFileToRead) or die "Couldn't get master file";
 #--------------------------------------------------------------------------
 
 open (FILE, "$sourceFileToRead");

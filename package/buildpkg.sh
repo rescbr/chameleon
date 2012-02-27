@@ -976,14 +976,13 @@ buildresources() {
     ResourcesSourceFolder="${PKGROOT}/Resources.source"
     ResourcesSourceFile="ResourcesSourceFile.txt"
 
+    ResourcesLanguageFile="${ResourcesSourceFolder}/${ResourcesSourceFile}"
     # Check for ResourcesSourceFile.txt.
     # If it doesn't exist then run perl script to make another one from
     # the UTF-8 .tsv file saved from the master Google docs spreadsheet.
-    if [ -f ${ResourcesSourceFile} ]; then
-        "${ResourcesSourceFolder}/ConvertResourcesTextFile.pl" "${ResourcesSourceFolder}/${ResourcesSourceFile}"
+    if [ -f "${ResourcesLanguageFile}" ]; then
+        "${ResourcesSourceFolder}/ConvertResourcesTextFile.pl" "${ResourcesLanguageFile}"
     fi
-    ResourcesLanguageFile=$ResourcesSourceFolder/$ResourcesSourceFile
-
 
     #Initialise Variables
     foundLanguage=""
