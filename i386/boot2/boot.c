@@ -182,7 +182,7 @@ static int ExecKernel(void *binary)
 	usb_loop();
 	
 	// Notify modules that the kernel is about to be started
-	if (checkOSVersion("10.7"))
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")))
 	{
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 	}
@@ -204,7 +204,7 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 	
 	// Jump to kernel's entry point. There's no going back now.
-	if (checkOSVersion("10.7")) {
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 		
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
@@ -496,8 +496,8 @@ void common_boot(int biosdev)
 				strlcpy(gBootKernelCacheFile, val, len + 1);
 			}
 			else {
-				//Lion
-				if (checkOSVersion("10.7")) {
+				// Lion and Mountain Lion prelink kernel cache file␊
+				if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 					sprintf(gBootKernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
 				}
 				// Snow Leopard
@@ -582,7 +582,7 @@ void common_boot(int biosdev)
 				
 				verbose("Loading kernel cache %s\n", bootFile);
 				
-				if (checkOSVersion("10.7")) {
+				if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 					ret = LoadThinFatFile(bootFile, &binary);
 				}
 				else {
@@ -596,7 +596,7 @@ void common_boot(int biosdev)
 				verbose("Kernel cache did not load %s\n ", bootFile);
 			}
 			
-			if (checkOSVersion("10.7")) {
+			if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 				bootFile = gBootKernelCacheFile;
 			}
 			else {
@@ -622,7 +622,7 @@ void common_boot(int biosdev)
 				}
 			}
 			
-			if (checkOSVersion("10.7"))
+			if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")))
 			{
 				//Lion, dont load kernel if haz cache
 				if (!trycache) 

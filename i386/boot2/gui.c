@@ -801,7 +801,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
-	bool		shoWinfo = true; //Azi:showinfo
+	bool		shoWinfo = false; //MacMan:showinfo
 	extern bool showBootBanner; //
 	position_t	p, p_prev, p_next;
 
