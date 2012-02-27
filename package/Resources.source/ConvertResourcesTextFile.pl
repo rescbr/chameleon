@@ -7,15 +7,18 @@
 #
 # The human readable file is hosted on Google Docs at:
 # www.......
+#
 # The spreadsheet is a published file and will be 
 # automatically downloaded as a UTF-8, tabbed delimited
-# text file which will be savedd in the same folder as
-# this script.
+# text file which will be saved in the folder indicated
+# by the two arguments passed when calling this.
 #
 # Call this script with:
-#      ./ConvertResourcesTextFile.pl ResourcesSourceFile.txt
+# ./ConvertResourcesTextFile.pl path filename
 #
-#
+# buildpkg.sh calls this with the following defaults:
+# path: ${PKG_BUILD_DIR}
+# filename: ResourcesSourceFile.txt 
 
 use LWP::Simple;
 
