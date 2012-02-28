@@ -1042,8 +1042,8 @@ buildresources() {
                         convertedFoundDescription=$( echo $foundDescription | textutil -convert rtf -encoding UTF-8 -stdin -stdout )
                         # Strip away unicode text up to and including '\f0\fs24 \cf0' - take what's after.
                         strippedConvertedFoundDescription="${convertedFoundDescription#*\\f0\\fs24 \\cf0 }"
-                        # Remove last character from string and replace all backslashes with a double backslash.
-                        fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%?}" | sed -e 's/\\/\\\\/g' ) 
+                        # Remove last three characters from string and replace all backslashes with a double backslash.
+                        fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%???}" | sed -e 's/\\/\\\\/g' ) 
                         #echo "$fixStrippedConvertedFoundDescription"
                         buildCodes[${#buildCodes[*]}]="$foundCode=$fixStrippedConvertedFoundDescription"
                     fi
