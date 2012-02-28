@@ -744,7 +744,7 @@
 		A354B634149514DE00D81AA5 /* MountESP.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = MountESP.sh; sourceTree = "<group>"; };
 		A354B635149514DE00D81AA5 /* patch */ = {isa = PBXFileReference; lastKnownFileType = file; path = patch; sourceTree = "<group>"; };
 		A354B636149514DE00D81AA5 /* SetActivePartition.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SetActivePartition.sh; sourceTree = "<group>"; };
-		A354B637149514DE00D81AA5 /* UnMountEFIvolumes.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = UnMountEFIvolumes.sh; sourceTree = "<group>"; };
+		A354B637149514DE00D81AA5 /* UnMountEFIvolumes.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Scripts.templates/UnMount/UnMountEFIvolumes.sh; sourceTree = "<group>"; };
 		A354B638149514DE00D81AA5 /* WriteChameleonStage0.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WriteChameleonStage0.sh; sourceTree = "<group>"; };
 		A354B639149514DE00D81AA5 /* WriteChameleonStage1.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WriteChameleonStage1.sh; sourceTree = "<group>"; };
 		A354B63A149514DE00D81AA5 /* WriteChameleonStage2.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WriteChameleonStage2.sh; sourceTree = "<group>"; };
@@ -1299,10 +1299,6 @@
 		B4189A2214BFBF5600ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B4189A2314BFBF7200ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B4189A2414BFBFD100ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
-		B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml_o.png; sourceTree = "<group>"; };
-		B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
-		B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
-		B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
 		B4189A3414BFC26400ED5B0B /* ati.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ati.c; path = ATiGraphicsEnabler/ati.c; sourceTree = "<group>"; };
 		B4189A3514BFC26400ED5B0B /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ati.h; path = ATiGraphicsEnabler/ati.h; sourceTree = "<group>"; };
 		B4189A3614BFC26400ED5B0B /* ATiGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ATiGraphicsEnabler.c; path = ATiGraphicsEnabler/ATiGraphicsEnabler.c; sourceTree = "<group>"; };
@@ -1328,6 +1324,10 @@
 		B4189A5214BFC2F700ED5B0B /* NVIDIAGraphicsEnabler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = NVIDIAGraphicsEnabler.c; path = NVIDIAGraphicsEnabler/NVIDIAGraphicsEnabler.c; sourceTree = "<group>"; };
 		B4189A5314BFC2F700ED5B0B /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Readme.txt; path = NVIDIAGraphicsEnabler/Readme.txt; sourceTree = "<group>"; };
 		B4189A5714BFC39700ED5B0B /* GraphicsEnablerModules.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GraphicsEnablerModules.txt; sourceTree = "<group>"; };
+		B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml_o.png; sourceTree = "<group>"; };
+		B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
+		B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
+		B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
 		B442B8C514BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ar; path = ar.lproj/License.rtf; sourceTree = "<group>"; };
 		B442B8C614BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = ar; path = ar.lproj/Conclusion.rtfd; sourceTree = "<group>"; };
 		B442B8C714BE6C7A00EEF9D4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/Description.html; sourceTree = "<group>"; };
@@ -1506,6 +1506,7 @@
 				B4AABE5C14C3B8D70055ECD1 /* InstallTheme */,
 				364E0DE314BCFB7A00F55E58 /* Post */,
 				364E0DE514BCFB7A00F55E58 /* Pre */,
+				B49B8D2614FC6E87000327FF /* UnMount */,
 			);
 			name = Scripts.templates;
 			sourceTree = "<group>";
@@ -2672,7 +2673,6 @@
 				A354B634149514DE00D81AA5 /* MountESP.sh */,
 				A354B635149514DE00D81AA5 /* patch */,
 				A354B636149514DE00D81AA5 /* SetActivePartition.sh */,
-				A354B637149514DE00D81AA5 /* UnMountEFIvolumes.sh */,
 				A354B638149514DE00D81AA5 /* WriteChameleonStage0.sh */,
 				A354B639149514DE00D81AA5 /* WriteChameleonStage1.sh */,
 				A354B63A149514DE00D81AA5 /* WriteChameleonStage2.sh */,
@@ -3591,6 +3591,14 @@
 				B4189A0D14BFBF0A00ED5B0B /* yesno.c */,
 			);
 			name = lxdialog;
+			sourceTree = "<group>";
+		};
+		B49B8D2614FC6E87000327FF /* UnMount */ = {
+			isa = PBXGroup;
+			children = (
+				A354B637149514DE00D81AA5 /* UnMountEFIvolumes.sh */,
+			);
+			name = UnMount;
 			sourceTree = "<group>";
 		};
 		B4AABE5814C3B8B90055ECD1 /* AddOption */ = {
