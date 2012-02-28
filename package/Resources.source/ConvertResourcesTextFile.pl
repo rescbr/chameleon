@@ -1,24 +1,24 @@
 #!/usr/bin/perl
 
-# This script converts a human readable file for all the
-# language 'Resources' for the Chameleon package installer
-# in to a simple format ready for merging with pre-defined
-# templates during compilation.
+# This script converts a human readable file for all the language 'Resources'
+# for the Chameleon package installer in to a simple format ready for merging
+# with pre-defined templates during compilation.
 #
-# The human readable file is hosted on Google Docs at:
-# www.......
+# The human readable file is a hosted on Google Docs Spreadsheet.
+# To view the readonly spreadsheet, go here:
+# https://docs.google.com/spreadsheet/ccc?key=0Aj0jJ2rdmK_sdFdNbm45NlpNYU1PcjRmOHVXX0FNa3c
 #
-# The spreadsheet is a published file and will be 
-# automatically downloaded as a UTF-8, tabbed delimited
-# text file which will be saved in the folder indicated
-# by the two arguments passed when calling this.
-#
-# Call this script with:
-# ./ConvertResourcesTextFile.pl path filename
+# The spreadsheet is a published file and will be automatically downloaded by this
+# script as a UTF-8, tabbed delimited text file which will be saved in the folder
+# indicated by the two arguments passed.
 #
 # buildpkg.sh calls this with the following defaults:
 # path: ${PKG_BUILD_DIR}
 # filename: ResourcesSourceFile.txt 
+#
+# This script can be called manually by using:
+#            ./ConvertResourcesTextFile.pl path filename
+#
 
 use LWP::Simple;
 

@@ -1038,13 +1038,19 @@ buildresources() {
                 # Build an array for each the Welcome, Conclusion and Description Resource files per language.
                 if [[ "$foundCode" != "" ]] && [[ "$foundDescription" != "" ]]; then
                     if [[ "$resourceToUse" == "Welcome" ]] || [[ "$resourceToUse" == "Conclusion" ]]; then 
+                    
                         # Convert description from UFT8 to raw unicode markup
+                        # ************************************************************
+                        # FIX ME:
+                        #       This ony works on Lion. 
+                        #       The command on Snow Leopard yields different results??
+                        # ************************************************************
                         convertedFoundDescription=$( echo $foundDescription | textutil -convert rtf -encoding UTF-8 -stdin -stdout )
+                        
                         # Strip away unicode text up to and including '\f0\fs24 \cf0' - take what's after.
                         strippedConvertedFoundDescription="${convertedFoundDescription#*\\f0\\fs24 \\cf0 }"
                         # Remove last three characters from string and replace all backslashes with a double backslash.
-                        fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%???}" | sed -e 's/\\/\\\\/g' ) 
-                        #echo "$fixStrippedConvertedFoundDescription"
+                        fixStrippedConvertedFoundDescription=$( echo "${strippedConvertedFoundDescription%???}" | sed -e 's/\\/\\\\/g' )  
                         buildCodes[${#buildCodes[*]}]="$foundCode=$fixStrippedConvertedFoundDescription"
                     fi
                     if [[ "$resourceToUse" == "Description" ]]; then
