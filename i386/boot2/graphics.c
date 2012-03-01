@@ -33,12 +33,6 @@
 #include "bootstruct.h"
 #include "modules.h"
 
-/*
- * for spinning disk
- */
-#if TEXT_SPINNER
-static int currentIndicator = 0;
-#endif
 
 int previewTotalSectors = 0;
 int previewLoadedSectors = 0;
@@ -54,12 +48,17 @@ setVESATextMode( unsigned short cols,
 				unsigned short rows,
 				unsigned char  bitsPerPixel );
 
+static int initGraphicsMode ();
+
+static unsigned long lookUpCLUTIndex( unsigned char index,
+                                     unsigned char depth );
+
 #ifndef OPTION_ROM
 int
-convertImage( unsigned short width,
-			 unsigned short height,
-			 const unsigned char *imageData,
-			 unsigned char **newImageData )
+__convertImage( unsigned short width,
+               unsigned short height,
+               const unsigned char *imageData,
+               unsigned char **newImageData )
 {
     int cnt;
     unsigned char *img = 0;
@@ -95,11 +94,11 @@ convertImage( unsigned short width,
 //==========================================================================
 // drawDataRectangle
 
-void drawDataRectangle( unsigned short  x,
-					   unsigned short  y,
-					   unsigned short  width,
-					   unsigned short  height,
-					   unsigned char * data )
+void __drawDataRectangle( unsigned short  x,
+                         unsigned short  y,
+                         unsigned short  width,
+                         unsigned short  height,
+                         unsigned char * data )
 {
     unsigned short drawWidth;
     long   pixelBytes = VIDEO(depth) / 8;
@@ -123,13 +122,13 @@ void drawDataRectangle( unsigned short  x,
 // If a mode is not found, then return the "best" available mode.
 
 unsigned short
-getVESAModeWithProperties( unsigned short     width,
-						  unsigned short     height,
-						  unsigned char      bitsPerPixel,
-						  unsigned short     attributesSet,
-						  unsigned short     attributesClear,
-						  VBEModeInfoBlock * outModeInfo,
-						  unsigned short *   vesaVersion )
+__getVESAModeWithProperties( unsigned short     width,
+                            unsigned short     height,
+                            unsigned char      bitsPerPixel,
+                            unsigned short     attributesSet,
+                            unsigned short     attributesClear,
+                            VBEModeInfoBlock * outModeInfo,
+                            unsigned short *   vesaVersion )
 {
     VBEInfoBlock     vbeInfo;
     unsigned short * modePtr;
@@ -290,9 +289,9 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 //==========================================================================
 // setVESAGraphicsMode
 #if UNUSED
-int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
+int __setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
 #else
-int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel)
+int __setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel)
 #endif
 {
     VBEModeInfoBlock  minfo;
@@ -301,13 +300,13 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
     int               err = errFuncNotSupported;
 	
     do {
-        mode = getVESAModeWithProperties( width, height, bitsPerPixel,
-										 maColorModeBit             |
-										 maModeIsSupportedBit       |
-										 maGraphicsModeBit          |
-										 maLinearFrameBufferAvailBit,
-										 0,
-										 &minfo, &vesaVersion );
+        mode = __getVESAModeWithProperties( width, height, bitsPerPixel,
+                                           maColorModeBit             |
+                                           maModeIsSupportedBit       |
+                                           maGraphicsModeBit          |
+                                           maLinearFrameBufferAvailBit,
+                                           0,
+                                           &minfo, &vesaVersion );
         if ( mode == modeEndOfList )
         {
             break;
@@ -318,7 +317,7 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
 		//
 		
 		//         if ( (vesaVersion >> 8) >= 3 && refreshRate >= 60 &&
-		//              (gBootMode & kBootModeSafe) == 0 )
+		//              (get_env(envgBootMode) & kBootModeSafe) == 0 )
 		//         {
 		//             VBECRTCInfoBlock timing;
 		//     
@@ -395,12 +394,10 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
 }
 
 
-#ifndef OPTION_ROM
-
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
-char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
+char * __decodeRLE( const void * rleData, int rleBlocks, int outBytes )
 {
     char *out, *cp;
 	
@@ -425,8 +422,8 @@ char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
 //==========================================================================
 // LookUpCLUTIndex
 
-unsigned long lookUpCLUTIndex( unsigned char index,
-							  unsigned char depth )
+static unsigned long lookUpCLUTIndex( unsigned char index,
+                                     unsigned char depth )
 {
     long result, red, green, blue;
 	
@@ -458,7 +455,7 @@ unsigned long lookUpCLUTIndex( unsigned char index,
 //==========================================================================
 // drawColorRectangle
 
-void * stosl(void * dst, long val, long len)
+static void * stosl(void * dst, long val, long len)
 {
     asm volatile ( "rep; stosl"
 				  : "=c" (len), "=D" (dst)
@@ -468,11 +465,11 @@ void * stosl(void * dst, long val, long len)
     return dst;
 }
 
-void drawColorRectangle( unsigned short x,
-						unsigned short y,
-						unsigned short width,
-						unsigned short height,
-						unsigned char  colorIndex )
+void __drawColorRectangle( unsigned short x,
+                          unsigned short y,
+                          unsigned short width,
+                          unsigned short height,
+                          unsigned char  colorIndex )
 {
     long   pixelBytes;
     long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
@@ -494,9 +491,6 @@ void drawColorRectangle( unsigned short x,
     }
 }
 
-#endif
-
-
 //==========================================================================
 // setVESATextMode
 
@@ -510,11 +504,11 @@ setVESATextMode( unsigned short cols,
 	
     if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
     {
-        mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
-										 maColorModeBit |
-										 maModeIsSupportedBit,
-										 maGraphicsModeBit,
-										 &minfo, NULL );
+        mode = __getVESAModeWithProperties( cols, rows, bitsPerPixel,
+                                           maColorModeBit |
+                                           maModeIsSupportedBit,
+                                           maGraphicsModeBit,
+                                           &minfo, NULL );
     }
 	
     if ( ( mode == modeEndOfList ) || ( setVBEMode(mode, NULL) != errSuccess ) )
@@ -541,14 +535,14 @@ setVESATextMode( unsigned short cols,
 // getNumberArrayFromProperty
 
 int
-getNumberArrayFromProperty( const char *  propKey,
-						   unsigned long numbers[],
-						   unsigned long maxArrayCount )
+__getNumberArrayFromProperty( const char *  propKey,
+                             unsigned long numbers[],
+                             unsigned long maxArrayCount )
 {
     char * propStr;
     unsigned long    count = 0;
 	
-    propStr = newStringForKey( (char *) propKey , &bootInfo->bootConfig );
+    propStr = newStringForKey( (char *) propKey , DEFAULT_BOOT_CONFIG );
     if ( propStr )
     {
         char * delimiter = propStr;
@@ -572,13 +566,13 @@ getNumberArrayFromProperty( const char *  propKey,
     return count;
 }
 
-int initGraphicsMode ()
+static int initGraphicsMode ()
 {
 	unsigned long params[4];
 	int           count;
 	
 	params[3] = 0;
-	count = getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
+	count = __getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
 	
 	// Try to find a resolution if "Graphics Mode" setting is not available.
 	if ( count < 3 )
@@ -594,9 +588,9 @@ int initGraphicsMode ()
 	if ( params[2] == 555 ) params[2] = 16;
 	if ( params[2] == 888 ) params[2] = 32;
 #if UNUSED
-	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
+	return __setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
 #else
-	return setVESAGraphicsMode( params[0], params[1], params[2] );
+	return __setVESAGraphicsMode( params[0], params[1], params[2] );
 #endif
 }
 
@@ -606,10 +600,10 @@ int initGraphicsMode ()
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
 #if UNUSED
 void
-setVideoMode( int mode, int drawgraphics)
+__setVideoMode( int mode, int drawgraphics)
 #else
 void
-setVideoMode( int mode)
+__setVideoMode( int mode)
 #endif
 {
     unsigned long params[4];
@@ -630,7 +624,7 @@ setVideoMode( int mode)
 	
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
     {
-        count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+        count = __getNumberArrayFromProperty( kTextModeKey, params, 2 );
         if ( count < 2 )
         {
             params[0] = 80;  // Default text mode is 80x25.
@@ -640,69 +634,12 @@ setVideoMode( int mode)
 		setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
-	
-#if TEXT_SPINNER
-    currentIndicator = 0;
-#endif
 }
 
 //==========================================================================
 // Return the current video mode, VGA_TEXT_MODE or GRAPHICS_MODE.
 
-int getVideoMode(void)
+inline int __getVideoMode(void)
 {
     return bootArgs->Video.v_display;
 }
-#if TEXT_SPINNER
-
-//==========================================================================
-// Display and clear the activity indicator.
-
-static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
-//static char indicator[] = {'_', ' ','\0'};
-
-// To prevent a ridiculously fast-spinning indicator,
-// ensure a minimum of 1/9 sec between animation frames.
-#define MIN_TICKS 2
-
-void
-spinActivityIndicator(int sectors)
-{
-    static unsigned long lastTickTime = 0, currentTickTime;
-	
-	bool doreturn = false;
-	execute_hook("spinActivity_hook", &sectors, &doreturn, NULL, NULL, NULL, NULL);
-	if (doreturn == true) return;
-	
-	currentTickTime = time18(); // late binding
-	if (currentTickTime < lastTickTime + MIN_TICKS)
-	{
-		return;
-	}
-	else
-	{
-		lastTickTime = currentTickTime;
-	}
-	
-	if (getVideoMode() == VGA_TEXT_MODE)
-	{
-		if (currentIndicator >= sizeof(indicator))
-		{
-			currentIndicator = 0;
-		}
-		putc(indicator[currentIndicator++]);
-		putc('\b');
-	}
-}
-
-void
-clearActivityIndicator( void )
-{
-    if ( getVideoMode() == VGA_TEXT_MODE )
-    {
-		putc(' ');
-		putc('\b');
-    }
-}
-
-#endif

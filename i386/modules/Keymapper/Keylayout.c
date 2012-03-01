@@ -26,8 +26,9 @@
 #define kKeyboardLayout "KeyboardLayout"
 
 struct keyboard_layout *current_layout = NULL;
+int getchar_replacement(void);
 
-int getchar_replacement() {
+int getchar_replacement(void) {
 	int code   = bgetc();
 	int status = readKeyboardShiftFlags();
 	uint8_t  scancode = code >> 8;
@@ -121,19 +122,13 @@ static uint32_t load_keyboard_layout_file(const char *filename) {
 	return 0;
 }
 
-uint32_t Keylayout_real_start()
+uint32_t Keylayout_real_start(void)
 {
 	char  layoutPath[512];
 	const char	*val;
 	int			len;
 	
-#ifdef TRUNK
-#define Config chameleonConfig
-#else
-#define Config bootConfig
-#endif
-
-	if (getValueForKey("KeyLayout", &val, &len, &bootInfo->Config))
+	if (getValueForKey("KeyLayout", &val, &len, DEFAULT_BOOT_CONFIG))
 	{
 		sprintf(layoutPath, "/Extra/Keymaps/%s", val);
 		// Add the extension if needed
@@ -147,21 +142,12 @@ uint32_t Keylayout_real_start()
 			return 0;
 		} 
 		
-#ifdef TRUNK	
-		if (!replace_function("_getchar", &getchar_replacement)) 
-		{
-			printf("no function getchar() to replace. Keylayout will not be used ! \n");
-			
-			return 0;
-		}	
-			
-#else
-		if (replace_function("_getc", &getchar_replacement) != EFI_SUCCESS ) 
+
+		if (replace_system_function("_getc", &getchar_replacement) != EFI_SUCCESS ) 
 		{
 			printf("no function getc() to replace. Keylayout will not be used ! \n");
 			return 0;
 		}
-#endif		 
 		
 		return 1;
 		
@@ -169,8 +155,8 @@ uint32_t Keylayout_real_start()
 	return 0;
 }
 
-
-void Keylayout_start()
+void Keylayout_start(void);
+void Keylayout_start(void)
 {
 	Keylayout_real_start();
 }

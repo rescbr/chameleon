@@ -8,7 +8,7 @@ INSTALL_SA_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/
 INSTALL_MD_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/machdep/i386
 
 OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fstack-protector-all \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 	      -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
 	      -mpreferred-stack-boundary=2 -fno-align-functions \
 	      -march=pentium4 -msse2 -mfpmath=sse -msoft-float  
@@ -28,12 +28,12 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o bzero.o bcopy.o prf.o printf.o zalloc.o\
 	string.o strtol.o \
-	setjmp.o qsort.o efi_tables.o
+	setjmp.o qsort.o efi_tables.o lzss.o
 	
 SFILES = setjmp.s bzero.s bcopy.s
 CFILES = qdivrem.c umoddi3.c udivdi3.c divdi3.c moddi3.c prf.c printf.c zalloc.c \
 	string.c strtol.c \
-	qsort.c efi_tables.c
+	qsort.c efi_tables.c lzss.c
 
 HFILES = memory.h
 EXPORTED_HFILES = libsa.h memory.h

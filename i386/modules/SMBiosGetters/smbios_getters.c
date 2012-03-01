@@ -22,7 +22,7 @@ static uint16_t simpleGetSMBOemProcessorType(void);
 
 bool getProcessorInformationExternalClock(returnType *value)
 {
-	value->word = Platform->CPU.FSBFrequency/1000000;
+	value->word = (uint16_t)(get_env(envFSBFreq)/1000000);
 	return true;
 }
 
@@ -31,27 +31,27 @@ bool getProcessorInformationMaximumClock(returnType *value)
 	// Note: it seems that AppleSMBIOS use the maximum clock to set the cpu clock
 	// that is showed in "About this mac" or in the System Information. 
 	// in my opinion the current clock should be used for this.
-	// value->word = Platform->CPU.TSCFrequency/1000000;
+	// value->word = get_env(envTSCFreq)/1000000;
 	
-	value->word = Platform->CPU.CPUFrequency/1000000;
+	value->word = (uint16_t)(get_env(envCPUFreq)/1000000);
 	return true;
 }
 
 bool getProcessorInformationCurrentClock(returnType *value)
 {
-	value->word = Platform->CPU.CPUFrequency/1000000;
+	value->word = (uint16_t)(get_env(envCPUFreq)/1000000);
 	return true;
 }
 
 bool getSMBOemProcessorBusSpeed(returnType *value)
 {
-	if (Platform->CPU.Vendor == 0x756E6547) // Intel
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL) 
 	{		
-		switch (Platform->CPU.Family) 
+		switch (get_env(envFamily)) 
 		{
 			case 0x06:
 			{
-				switch (Platform->CPU.Model)
+				switch (get_env(envModel))
 				{
                     case CPUID_MODEL_BANIAS:	// Banias		0x09
                     case CPUID_MODEL_DOTHAN:	// Dothan		0x0D
@@ -60,7 +60,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPUID_MODEL_PENRYN:		// Penryn		0x17
 					case CPUID_MODEL_ATOM:		// Atom 45nm	0x1C
 						return false;
-
+                        
 					case 0x19:					// Intel Core i5 650 @3.20 Ghz
 					case CPUID_MODEL_NEHALEM:		// Intel Core i7 LGA1366 (45nm)
 					case CPUID_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
@@ -95,7 +95,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
 						qpimult &= 0x7F;
 						DBG("qpimult %d\n", qpimult);
-						qpibusspeed = (qpimult * 2 * (Platform->CPU.FSBFrequency/1000000));
+						qpibusspeed = (qpimult * 2 * (get_env(envFSBFreq)/1000000));
 						// Rek: rounding decimals to match original mac profile info
 						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
 						DBG("qpibusspeed %d\n", qpibusspeed);
@@ -115,11 +115,12 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 
 static uint16_t simpleGetSMBOemProcessorType(void)
 {
-	if (Platform->CPU.NoCores >= 4) 
+    uint8_t ncores = (uint8_t)get_env(envNoCores);
+	if (ncores >= 4) 
 	{
 		return 0x0501;	// Quad-Core Xeon
 	}
-	if (((Platform->CPU.NoCores == 1) || (Platform->CPU.NoCores == 2)) && !(platformCPUExtFeature(CPUID_EXTFEATURE_EM64T))) 
+	if (((ncores == 1) || (ncores == 2)) && !(get_env(envExtFeatures)& CPUID_EXTFEATURE_EM64T)) 
 	{
 		return 0x0201;	// Core Solo / Duo
 	};
@@ -130,22 +131,24 @@ static uint16_t simpleGetSMBOemProcessorType(void)
 bool getSMBOemProcessorType(returnType *value)
 {
 	static bool done = false;		
-		
+    
 	value->word = simpleGetSMBOemProcessorType();
-
-	if (Platform->CPU.Vendor == 0x756E6547) // Intel
+    
+    char * BrandString = (char*)get_env_ptr(envBrandString);
+    
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL) 
 	{
 		if (!done)
 		{
-			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform->CPU.BrandString, Platform->CPU.Family, Platform->CPU.Model);
+			verbose("CPU is %s, family 0x%x, model 0x%x\n", BrandString, (uint32_t)get_env(envFamily), (uint32_t)get_env(envModel));
 			done = true;
 		}
 		
-		switch (Platform->CPU.Family) 
+		switch (get_env(envFamily)) 
 		{
 			case 0x06:
 			{
-				switch (Platform->CPU.Model)
+				switch (get_env(envModel))
 				{
                     case CPUID_MODEL_BANIAS:	// Banias		
                     case CPUID_MODEL_DOTHAN:	// Dothan		
@@ -154,44 +157,44 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPUID_MODEL_PENRYN:				// Penryn
 					case CPUID_MODEL_ATOM:				// Intel Atom (45nm)
 						return true;
-
+                        
 					case CPUID_MODEL_NEHALEM:				// Intel Core i7 LGA1366 (45nm)
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
+						if (strstr(BrandString, "Core(TM) i7"))
                             value->word = 0x0701;	// Core i7                        
 						return true;
-
+                        
 					case CPUID_MODEL_FIELDS:				// Lynnfield, Clarksfield, Jasper
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
+						if (strstr(BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x701;		// Core i7
 						return true;
-
+                        
 					case CPUID_MODEL_DALES:				// Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
+						if (strstr(BrandString, "Core(TM) i5"))
 							value->word = 0x601;		// Core i5
 						else
 							value->word = 0x0701;		// Core i7
 						return true;
-
+                        
 					case CPUID_MODEL_SANDYBRIDGE:
 					case CPUID_MODEL_DALES_32NM:			// Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i3"))
-								value->word = 0x901;	// Core i3
-						else if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x601;	// Core i5
-						else if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
-								value->word = 0x0701;	// Core i7
+						if (strstr(BrandString, "Core(TM) i3"))
+                            value->word = 0x901;	// Core i3
+						else if (strstr(BrandString, "Core(TM) i5"))
+                            value->word = 0x601;	// Core i5
+						else if (strstr(BrandString, "Core(TM) i7"))
+                            value->word = 0x0701;	// Core i7
 						/*else 
-								value->word = simpleGetSMBOemProcessorType();*/
+                         value->word = simpleGetSMBOemProcessorType();*/
 						return true;
-
+                        
                     case CPUID_MODEL_JAKETOWN:
 					case CPUID_MODEL_WESTMERE:			// Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
 					case CPUID_MODEL_WESTMERE_EX:			// Intel Core i7 LGA1366 (45nm) 6 Core ???
 						value->word = 0x0501;			// Core i7
 						return true;
-
+                        
 					case 0x19:							// Intel Core i5 650 @3.20 Ghz
 						value->word = 0x601;			// Core i5
 						return true;
@@ -212,15 +215,18 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 	static int idx = -1;
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 		int	map;
-
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
 		idx++;
 		if (idx < MAX_RAM_SLOTS)
 		{
-			map = Platform->DMI.DIMM[idx];
-			if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0)
+			map = DmiDimm[idx];
+			if (RamDimm[map].InUse && RamDimm[map].Type != 0)
 			{
-				DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
-				value->byte = Platform->RAM.DIMM[map].Type;
+				DBG("RAM Detected Type = %d\n", RamDimm[map].Type);
+				value->byte = RamDimm[map].Type;
 				return true;
 			}
 		}
@@ -234,15 +240,18 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 	static int idx = -1;
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 		int	map;
-
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
 		idx++;
 		if (idx < MAX_RAM_SLOTS)
 		{
-			map = Platform->DMI.DIMM[idx];
-			if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0)
+			map = DmiDimm[idx];
+			if (RamDimm[map].InUse && RamDimm[map].Frequency != 0)
 			{
-				DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
-				value->dword = Platform->RAM.DIMM[map].Frequency;
+				DBG("RAM Detected Freq = %d Mhz\n", RamDimm[map].Frequency);
+				value->dword = RamDimm[map].Frequency;
 				return true;
 			}
 		}
@@ -256,15 +265,18 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	static int idx = -1;
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 		int	map;
-
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
 		idx++;
 		if (idx < MAX_RAM_SLOTS)
 		{
-			map = Platform->DMI.DIMM[idx];
-			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].Vendor) > 0)
+			map = DmiDimm[idx];
+			if (RamDimm[map].InUse && strlen(RamDimm[map].Vendor) > 0)
 			{
-				DBG("RAM Detected Vendor[%d]='%s'\n", idx, Platform->RAM.DIMM[map].Vendor);
-				value->string = Platform->RAM.DIMM[map].Vendor;
+				DBG("RAM Detected Vendor[%d]='%s'\n", idx, RamDimm[map].Vendor);
+				value->string = RamDimm[map].Vendor;
 				return true;
 			}
 		}
@@ -272,22 +284,25 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	value->string = "N/A";
 	return true;
 }
-	
+
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
 {
 	static int idx = -1;
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 		int	map;
-
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
 		idx++;
 		if (idx < MAX_RAM_SLOTS)
 		{
-			map = Platform->DMI.DIMM[idx];
-			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].SerialNo) > 0)
+			map = DmiDimm[idx];
+			if (RamDimm[map].InUse && strlen(RamDimm[map].SerialNo) > 0)
 			{
 				DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
-				map, idx, Platform->RAM.DIMM[map].SerialNo);
-				value->string = Platform->RAM.DIMM[map].SerialNo;
+                    map, idx, RamDimm[map].SerialNo);
+				value->string = RamDimm[map].SerialNo;
 				return true;
 			}
 		}
@@ -301,15 +316,18 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	static int idx = -1;
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
 		int	map;
-
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
 		idx++;
 		if (idx < MAX_RAM_SLOTS)
 		{
-			map = Platform->DMI.DIMM[idx];
-			if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].PartNo) > 0)
+			map = DmiDimm[idx];
+			if (RamDimm[map].InUse && strlen(RamDimm[map].PartNo) > 0)
 			{
-				DBG("Ram Detected PartNo[%d]='%s'\n", idx, Platform->RAM.DIMM[map].PartNo);
-				value->string = Platform->RAM.DIMM[map].PartNo;
+				DBG("Ram Detected PartNo[%d]='%s'\n", idx, RamDimm[map].PartNo);
+				value->string = RamDimm[map].PartNo;
 				return true;
 			}
 		}

@@ -8,7 +8,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 
@@ -63,20 +62,21 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 }
 
 // Loop through the list and call the apropriate patch function
-int usb_loop()
+int usb_loop(void);
+int usb_loop(void)
 {
 	int retVal = 1;
 	bool fix_ehci = true, fix_uhci = true, fix_usb = true, fix_legacy = true;
 	
-	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->bootConfig))
+	if (getBoolForKey(kUSBBusFix, &fix_usb, DEFAULT_BOOT_CONFIG))
 	{
 		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
-		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->bootConfig);
-		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->bootConfig);
-		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->bootConfig);
+		getBoolForKey(kEHCIacquire, &fix_ehci, DEFAULT_BOOT_CONFIG);
+		getBoolForKey(kUHCIreset, &fix_uhci, DEFAULT_BOOT_CONFIG);
+		getBoolForKey(kLegacyOff, &fix_legacy, DEFAULT_BOOT_CONFIG);
 	}
 				
 	DBG("\n");
@@ -200,7 +200,7 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 	uint8_t		legacy[8];
 	bool		alwaysHardBIOSReset = false;
 		
-	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, &bootInfo->bootConfig)) {
+	if (!getBoolForKey(kEHCIhard, &alwaysHardBIOSReset, DEFAULT_BOOT_CONFIG)) {
 		alwaysHardBIOSReset = true;
 	}
 

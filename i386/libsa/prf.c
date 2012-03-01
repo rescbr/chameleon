@@ -95,6 +95,12 @@ int prf(
 		unsigned int *adx,
 		void (*putfn_p)(),
 		void *putfn_arg
+		);
+int prf(
+		char *fmt,
+		unsigned int *adx,
+		void (*putfn_p)(),
+		void *putfn_arg
 		)
 {
 	int b, c, len =0;

@@ -52,8 +52,10 @@
 
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
+#include "platform.h"
+#include "sl.h"
+
 #include "fdisk.h"
 #ifdef UFS_SUPPORT
 #include "ufs.h"
@@ -131,9 +133,9 @@ typedef struct gpt_ent gpt_ent;
 ((((value) + (multiple) - 1) / (multiple)) * (multiple))
 
 /*
-#define IOTrunc(value,multiple) \
-(((value) / (multiple)) * (multiple));
-*/
+ #define IOTrunc(value,multiple) \
+ (((value) / (multiple)) * (multiple));
+ */
 
 /*
  * trackbuf points to the start of the track cache. Biosread()
@@ -198,6 +200,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr );
 #endif
 static TagPtr XMLGetElementWithID( TagPtr dict, const char* id );
 static bool getOSVersion(BVRef bvr, char *str);
+static bool CheckDarwin(BVRef bvr);
 
 //==========================================================================
 
@@ -378,7 +381,7 @@ static int Biosread( int biosdev, unsigned long long secno )
             }
             printf("  BIOS read error: %s\n", bios_error(rc), rc);
             printf("    Block %d, Cyl %d Head %d Sector %d\n",
-                  secno, cyl, head, sec);
+                   secno, cyl, head, sec);
             sleep(1);
         }
     }
@@ -416,7 +419,7 @@ static int readBytes( int biosdev, unsigned long long blkno,
     
 	
 	if(biosdev >= 0x100 && (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)){
-	
+        
 		int ret = -1;
 		execute_hook("p_ramdiskReadBytes", &biosdev,  (void*)(unsigned long)&blkno,  &byteoff,  &byteCount, buffer, &ret);
 		return ret;
@@ -899,8 +902,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 #ifndef UFS_SUPPORT						
                         break;
 #else						
-
-                    //case FDISK_BOOTER:
+                        
+                        //case FDISK_BOOTER:
                         booterUFS = newFDiskBVRef(
 												  biosdev, partno,
 												  ((part->relsect + spc - 1) / spc) * spc,
@@ -951,7 +954,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 											0, kBIOSDevTypeHardDrive, 0);
 						break;
 #endif
-
+                        
 #ifndef NO_LINUX_SUPPORT
 						
                     case FDISK_LINUX:
@@ -1191,7 +1194,7 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 #ifndef NO_WIN_SUPPORT
 	int fatbits;
 #endif
-
+    
 	// Allocating buffer for 4 sectors.
 	const void * probeBuffer = malloc(PROBEFS_SIZE);
 	if (probeBuffer == NULL)
@@ -1407,7 +1410,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 					continue;
 				else 
 					bvrFlags = 0;
-
+                
 #endif
                 bvr = newGPTBVRef(biosdev,
 								  gptID,
@@ -1433,7 +1436,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 				switch (fsType)
 				{
 #ifndef NO_WIN_SUPPORT
-
+                        
 					case FDISK_NTFS:
 						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
 										  0, 0, 0, 0, 0, 0, NTFSGetDescription,
@@ -1488,7 +1491,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 						break;
 #endif
 					default:						
-						if (biosdev == gBIOSDev)
+						if (biosdev == (int)get_env(envgBIOSDev))
 							gBIOSBootVolume = bvr;
 						break;
 				}
@@ -1618,6 +1621,48 @@ static bool getOSVersion(BVRef bvr, char *str)
 	return valid;
 }
 
+static bool CheckDarwin(BVRef bvr)
+{
+    long flags, time, ret = -1;    
+    
+    char dirspec[128];
+    
+    char *kdirspec[] = {
+		"hd(%d,%d)/mach_kernel",
+#if UNUSED
+		"hd(%d,%d)/System/Library/CoreServices/mach_kernel" 
+#endif
+	};
+    
+    bvr->kernelfound = true;
+    
+    sprintf(dirspec,kdirspec[0],BIOS_DEV_UNIT(bvr), bvr->part_no);
+    
+    ret = GetFileInfo(NULL, dirspec, &flags, &time);
+    
+    if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+#if UNUSED
+        
+        sprintf(dirspec,kdirspec[1],BIOS_DEV_UNIT(bvr), bvr->part_no);
+        
+        ret = GetFileInfo(NULL, dirspec, &flags, &time); 
+        
+        if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) 
+#endif
+        {
+            bvr->kernelfound = false; // Non fatal, let the booter determine the directory       
+        }
+        
+    }     
+    
+    if (bvr->kernelfound == true) {
+        DBG("Kernel found !!, path  : %s\n",dirspec);
+    }
+    
+    
+    return getOSVersion(bvr,bvr->OSVersion);
+}
+
 //==========================================================================
 
 static void scanFSLevelBVRSettings(BVRef chain)
@@ -1633,7 +1678,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		ret = -1;
 #ifdef BOOT_HELPER_SUPPORT
 		error = 0;
-
+        
 		//
 		// Check for alternate volume label on boot helper partitions.
 		//
@@ -1670,7 +1715,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		//
 		if (bvr->flags & kBVFlagNativeBoot)
 		{
-			if (getOSVersion(bvr,bvr->OSVersion) == true)
+			if (CheckDarwin(bvr) == true)
 			{
 				bvr->flags |= kBVFlagSystemVolume;
 			}
@@ -1796,7 +1841,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 	char* val = 0;
 	int len;
     
-	getValueForKey(kHidePartition, &raw, &len, &bootInfo->bootConfig);
+	getValueForKey(kHidePartition, &raw, &len, DEFAULT_BOOT_CONFIG);
 	if(raw)
 	{
 		val = XMLDecode(raw);  
@@ -1986,7 +2031,7 @@ bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
     if ( !str || strMaxLen <= 0)
         return false;
     
-    aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->bootConfig));
+    aliasList = XMLDecode(getStringForKey(kRenamePartition, DEFAULT_BOOT_CONFIG));
     if ( !aliasList )
         return false;
     

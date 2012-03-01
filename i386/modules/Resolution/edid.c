@@ -12,7 +12,6 @@
 #include "edid.h"
 #include "vbe.h"
 #include "graphics.h"
-#include "boot.h"
 
 void getResolutionHook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
@@ -24,12 +23,12 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 	int val;
 	static UInt32 xResolution, yResolution, bpResolution;
 
-	if(getIntForKey(kScreenWidth, &val, &bootInfo->bootConfig))
+	if(getIntForKey(kScreenWidth, &val, DEFAULT_BOOT_CONFIG))
 	{
 		xResolution = val;
 	}
 	
-	if(getIntForKey(kScreenHeight, &val, &bootInfo->bootConfig))
+	if(getIntForKey(kScreenHeight, &val, DEFAULT_BOOT_CONFIG))
 	{
 		yResolution = val;
 	}
@@ -64,7 +63,7 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 
 }
 
-char* readEDID()
+char* readEDID(void)
 {
 	SInt16 last_reported = -1;
 	UInt8 edidInfo[EDID_BLOCK_SIZE];

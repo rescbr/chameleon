@@ -32,7 +32,8 @@
 
 long __stack_chk_guard[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-void __guard_setup(void) __attribute__ ((visibility ("hidden")));
+//__private_extern__ void __guard_setup(void) /*__attribute__ ((visibility ("hidden")))*/;
+static void __guard_setup(void) __attribute__((constructor));
 
 void __stack_chk_fail(void);
 

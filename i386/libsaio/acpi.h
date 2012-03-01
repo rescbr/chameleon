@@ -14,8 +14,9 @@
 #define EnterpriseServer    4
 #define SOHOServer          5
 #define AppliancePC         6
+#define PerformanceServer   7
 
-#define MaxSupportedPMProfile     AppliancePC // currently max profile supported 
+#define MaxSupportedPMProfile     PerformanceServer // currently max profile supported 
 #define PMProfileError            MaxSupportedPMProfile + 1
 
 #endif /* !__LIBSAIO_ACPI_H */

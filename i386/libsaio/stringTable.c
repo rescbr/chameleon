@@ -26,14 +26,26 @@
  * All rights reserved.
  */
 
-#include "bootstruct.h"
 #include "libsaio.h"
+#include "bootstruct.h"
+#include "platform.h"
 #include "xml.h"
 
 static char * AllocInitStringWithLength(const char * oldString, int len);
 static char * AllocInitZeroEndedStringWithLength(const char * oldString, int len);
 
-bool sysConfigValid;
+#define ASSERT_CONFIG                       \
+if (config == DEFAULT_BOOT_CONFIG)          \
+config = &bootInfo->bootConfig  ;           \
+else if (config == DEFAULT_SYSTEM_CONFIG)   \
+config = &bootInfo->SystemConfig  ;         \
+else if (config == DEFAULT_OVERRIDE_CONFIG) \
+config = &bootInfo->overrideConfig  ;       \
+else if (config == DEFAULT_SMBIOS_CONFIG)   \
+config = &bootInfo->smbiosConfig  ;         \
+else if (config == DEFAULT_HELPER_CONFIG)   \
+config = &bootInfo->helperConfig  ;       
+
 #if UNUSED
 /*
  * Compare a string to a key with quoted characters
@@ -189,6 +201,8 @@ int stringLength(const char *table, int compress)
 
 bool getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size)
 {
+    ASSERT_CONFIG
+    
 	if (config->dictionary != 0 ) {
 		// Look up key in XML dictionary
 		TagPtr value;
@@ -229,6 +243,8 @@ char *newStringForStringTableKey(
     char *newstr, *p;
     int size;
     
+    ASSERT_CONFIG
+    
     if (getValueForConfigTableKey(config, key, &val, &size)) {
 		newstr = (char *)malloc(size+1);
 		for (p = newstr; size; size--, p++, val++) {
@@ -265,6 +281,8 @@ newStringForKey(char *key, config_file_t *config)
     const char *val;
     char *newstr;
     int size;
+    
+    ASSERT_CONFIG
     
     if (getValueForKey(key, &val, &size, config) && size) {
 		newstr = (char *)malloc(size + 1);
@@ -332,6 +350,9 @@ const char * getStringForKey(const char * key,  config_file_t *config)
 {
 	static const char* value =0;
 	int len=0;
+    
+    ASSERT_CONFIG
+    
 	if(!getValueForKey(key, &value, &len, config)) value = 0;
 	return value;
 }
@@ -345,6 +366,8 @@ bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
 {
     const char *key_val;
     int size;
+    
+    ASSERT_CONFIG
     
     if (getValueForKey(key, &key_val, &size, config)) {
         if ( (size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y') ) {
@@ -362,6 +385,8 @@ bool getIntForKey( const char *key, int *value, config_file_t *config )
     const char *val;
     int size, sum;
     bool negative = false;
+    
+    ASSERT_CONFIG
     
     if (getValueForKey(key, &val, &size, config))
 	{
@@ -405,6 +430,8 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
     
 	bool negative = false;
 	bool percentage = false;
+    
+    ASSERT_CONFIG
 	
     if (getValueForKey(key, &val, &size, config))
 	{
@@ -452,7 +479,7 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 	
 	// key not found
     return false;
-}
+}         
 
 /*
  *	get color value from plist format #RRGGBB
@@ -462,6 +489,8 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
 {
     const char *val;
     int size;
+    
+    ASSERT_CONFIG
     
     if (getValueForKey(key, &val, &size, config))
 	{
@@ -479,10 +508,12 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 {
     const char *overrideVal;
     int overrideSize;
-    bool ret;
+    bool ret;       
     
     if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
         return true;
+    
+    ASSERT_CONFIG
     
     ret = getValueForConfigTableKey(config, key, val, size);
     
@@ -577,6 +608,8 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
     
+    ASSERT_CONFIG
+    
 	if ((fd = open(configFile)) < 0) {
 		return -1;
 	}
@@ -594,7 +627,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadBooterConfig(config_file_t *config)
+int loadBooterConfig(void)
 {
 	char *dirspec[] = {							       
 		"rd(0,0)/Extra/com.apple.Boot.plist",  
@@ -606,6 +639,9 @@ int loadBooterConfig(config_file_t *config)
 		
         
 	};
+    
+    config_file_t *config = &bootInfo->bootConfig;
+    
 	int i,fd, count, ret=-1;
     
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
@@ -618,7 +654,7 @@ int loadBooterConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+            safe_set_env(envSysConfigValid,true);
 			ret=0;
 			
 			// enable canOverride flag
@@ -630,7 +666,7 @@ int loadBooterConfig(config_file_t *config)
 #ifdef BOOT_HELPER_SUPPORT
 	if(ret == -1)
 	{
-		ret = loadHelperConfig(config);
+		ret = loadHelperConfig();
 	}
 #endif
 	
@@ -642,12 +678,15 @@ int loadBooterConfig(config_file_t *config)
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadOverrideConfig(config_file_t *config)
+int loadOverrideConfig(void)
 {
 	char *dirspec[] = {
 		"/Extra/com.apple.Boot.plist",          
 		"/Extra/org.chameleon.Boot.plist" 
 	};
+    
+    config_file_t *config = &bootInfo->overrideConfig;
+
     
 	int i,fd, count, ret=-1;
     
@@ -661,7 +700,7 @@ int loadOverrideConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+            safe_set_env(envSysConfigValid,true);
 			ret=0;
 			break;
 		}
@@ -669,7 +708,7 @@ int loadOverrideConfig(config_file_t *config)
 #ifdef BOOT_HELPER_SUPPORT	
 	if(ret == -1)
 	{
-		ret = loadHelperConfig(config);
+		ret = loadHelperConfig();
 	}
 #endif
     
@@ -681,7 +720,7 @@ int loadOverrideConfig(config_file_t *config)
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadSystemConfig(config_file_t *config)
+int loadSystemConfig(void)
 {
 	char *dirspec[] = {
         "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
@@ -691,6 +730,10 @@ int loadSystemConfig(config_file_t *config)
 		"/Mac OS X Install Data/com.apple.Boot.plist",
 		"bt(0,0)/Mac OS X Install Data/com.apple.Boot.plist"
 	};
+    
+    config_file_t *config = &bootInfo->SystemConfig;
+
+    
 	int i,fd, count, ret=-1;
 	
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
@@ -703,7 +746,7 @@ int loadSystemConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+            safe_set_env(envSysConfigValid,true);
 			ret=0;			
 			break;
 		}
@@ -719,7 +762,7 @@ int loadSystemConfig(config_file_t *config)
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadHelperConfig(config_file_t *config)
+int loadHelperConfig(void)
 {
 	int rfd, pfd, sfd, count, ret=-1;
 	
@@ -729,6 +772,9 @@ int loadHelperConfig(config_file_t *config)
 		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 	
+    config_file_t *config = &bootInfo->helperConfig;
+    
+    
 	// This is a simple rock - paper scissors algo. R beats S, P beats R, S beats P
 	// If all three, S is used for now. This should be change dto something else (say, timestamp?)
 	
@@ -745,7 +791,7 @@ int loadHelperConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+            safe_set_env(envSysConfigValid,true);
 			ret=0;
 			
 		}
@@ -757,7 +803,7 @@ int loadHelperConfig(config_file_t *config)
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+            safe_set_env(envSysConfigValid,true);
 			ret=0;
 		}
 		
@@ -777,7 +823,7 @@ int loadHelperConfig(config_file_t *config)
 				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
-				sysConfigValid = true;	
+                safe_set_env(envSysConfigValid,true);
 				ret=0;
 				
 			}
@@ -789,7 +835,7 @@ int loadHelperConfig(config_file_t *config)
 				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
-				sysConfigValid = true;	
+                safe_set_env(envSysConfigValid,true);
 				ret=0;
 				
 			}
@@ -806,7 +852,7 @@ int loadHelperConfig(config_file_t *config)
 				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
-				sysConfigValid = true;	
+                safe_set_env(envSysConfigValid,true);
 				ret=0;
 				
 			}

@@ -7,7 +7,6 @@
  *
  */
 
-#include "boot.h"
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "modules.h"
@@ -17,6 +16,14 @@
 
 
 #define kEnableEDL			"EnableRamDiskLoader"
+void loadPrebootRAMDisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void md0Ramdisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void processRAMDiskCommand_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void newRamDisk_BVR_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void p_get_ramdisk_info_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void p_ramdiskReadBytes_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void is_Ram_Disk_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 
 enum {
@@ -54,7 +61,7 @@ void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 			break;
 		case 1:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", &gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next we'll try the base
@@ -64,7 +71,7 @@ void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 			break;
 		case 2:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next we'll try the base
@@ -125,11 +132,11 @@ void p_ramdiskReadBytes_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 
 void is_Ram_Disk_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
 
-
-void RamDiskLoader_start()
+void RamDiskLoader_start(void);
+void RamDiskLoader_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableEDL, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableEDL, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable)
 	{

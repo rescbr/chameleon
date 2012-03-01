@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-KEY_MAPPER_OBJS = Keymapper.o Keylayout.o
+KEY_MAPPER_OBJS = Keymapper.o Keylayout.o stack_protector.o
 
 SFILES =
 CFILES = 
@@ -70,7 +70,8 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/Keymapper.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/Keymapper.o \
 	$(OBJROOT)/Keylayout.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
@@ -79,7 +80,11 @@ dylib:
 Keymapper.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Keymapper.c" $(INC) -o "$(OBJROOT)/Keymapper.o"
 	
-			
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+            
+Keylayout.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Keylayout.c" $(INC) -o "$(OBJROOT)/Keylayout.o"
 	
 include ../../MakeInc.dir
 

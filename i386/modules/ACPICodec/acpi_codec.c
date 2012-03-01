@@ -36,7 +36,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "acpi.h"
 #include "acpidecode.h"
@@ -80,11 +79,6 @@ bool checkOem = false;
 #endif
 #define pstate_power_support 1
 #endif
-
-extern EFI_STATUS addConfigurationTable();
-
-extern EFI_GUID gEfiAcpiTableGuid;
-extern EFI_GUID gEfiAcpi20TableGuid;
 
 #if DEBUG_ACPI
 static void print_nameseg(U32 i);
@@ -157,6 +151,7 @@ static U32 compute_tdp(CPU_DETAILS * cpu);
 static bool is_sandybridge(void);
 static bool is_jaketown(void);
 static U32 get_bclk(void);
+static void GetMaxRatio(U32 * max_non_turbo_ratio);
 //static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate);
 //static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit);
 
@@ -180,7 +175,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 //#define ULONG_MAX_32 4294967295UL
 
 #define __RES(s, u)												\
-static inline unsigned u										\
+inline unsigned u										\
 resolve_##s(unsigned u defaultentry, char *str, int base)       \
 {																\
 unsigned u entry  = defaultentry;							\
@@ -275,7 +270,7 @@ static void move_table_list_to_kmem(U32 *new_table_list )
 	{
 		if (new_table_list[index] != 0ul)
 		{
-
+            
 			U32 current_sig = *(U32 *) (table_array[index]->Signature);
 			if ((current_sig != NAMESEG(ACPI_SIG_FACS) /* not supported */ ) 
 				&& (current_sig != NAMESEG(ACPI_SIG_XSDT)) 
@@ -333,7 +328,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 {
     U32 index;
     U32 num_tables;
-			
+    
 	DBG("Attempting to generate RSDT from XSDT \n");
 	
     num_tables= get_num_tables64(xsdt);
@@ -373,7 +368,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			printf("\n");			
 #endif					
 			bool unsafe = false;
-			getBoolForKey(kUnsafeACPI, &unsafe, &bootInfo->bootConfig);
+			getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
 			
 			if (!unsafe)
 			{
@@ -388,9 +383,9 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			}			
 			
 		}			
-
+        
 		{
-			if ((*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == NAMESEG(ACPI_SIG_FADT)))
+			if (*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == NAMESEG(ACPI_SIG_FADT))
 			{
 				ACPI_TABLE_FADT *fadt=(ACPI_TABLE_FADT *)((U32)ptr);
 				
@@ -426,7 +421,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 				continue;
 			}
 		}
-			
+        
 		{
 			rsdt_conv->TableOffsetEntry[index] = (U32)ptr;
 #if DEBUG_ACPI			
@@ -434,7 +429,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			printf(" table converted and added succesfully\n");	
 #endif					
 		}
-        		
+        
     }
     DBG("RSDT_CONV : Original checksum %d\n", rsdt_conv->Header.Checksum);
     SetChecksum(&rsdt_conv->Header);
@@ -447,7 +442,7 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
 {	
 	U32 index;
     U32 num_tables;	
-			
+    
 	DBG("Attempting to generate XSDT from RSDT \n");
 	
     num_tables= get_num_tables(rsdt);
@@ -472,45 +467,45 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
 	
     for (index=0;index<num_tables;index++)
     {
-			{				
+        {				
 #if DEBUG_ACPI	
-				printf("* Processing : ");
-				print_nameseg(*(U32*) (table_array[index]->Signature));
-				printf("\n");			
+            printf("* Processing : ");
+            print_nameseg(*(U32*) (table_array[index]->Signature));
+            printf("\n");			
 #endif			
-				bool unsafe = false;
-				getBoolForKey(kUnsafeACPI, &unsafe, &bootInfo->bootConfig);
-				
-				if (!unsafe) 
-				{
-					if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
-					{
+            bool unsafe = false;
+            getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
+            
+            if (!unsafe) 
+            {
+                if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
+                {
 #if DEBUG_ACPI						
-						printf("Warning : Invalide checksum, ignored !!!\n",index);
+                    printf("Warning : Invalide checksum, ignored !!!\n",index);
 #endif
-						continue;
-					}
-				}
-				
-			}
-					
-			{
-				if ((*(U32 *) (table_array[index]->Signature) == NAMESEG(ACPI_SIG_FADT)))
-				{
-					ACPI_TABLE_FADT *FacpPointer = ((ACPI_TABLE_FADT*)table_array[index]);
-					ACPI_TABLE_FADT *fadt_mod = (ACPI_TABLE_FADT *)patch_fadt(FacpPointer,((ACPI_TABLE_DSDT*)FacpPointer->Dsdt),true);
-					if (fadt_mod == (void*)0ul) 
-					{
-						printf("Error: Failed to patch (& update) FADT Table, fallback to original fadt pointer\n");
-						fadt_mod = FacpPointer;
-					}
-					xsdt_conv->TableOffsetEntry[index] = ((U64)((U32)fadt_mod));
-					
-					continue;
-				}
-			}
-			
-			xsdt_conv->TableOffsetEntry[index] = ((U64)((U32)table_array[index])); 
+                    continue;
+                }
+            }
+            
+        }
+        
+        {
+            if (*(U32 *) (table_array[index]->Signature) == NAMESEG(ACPI_SIG_FADT))
+            {
+                ACPI_TABLE_FADT *FacpPointer = ((ACPI_TABLE_FADT*)table_array[index]);
+                ACPI_TABLE_FADT *fadt_mod = (ACPI_TABLE_FADT *)patch_fadt(FacpPointer,((ACPI_TABLE_DSDT*)FacpPointer->Dsdt),true);
+                if (fadt_mod == (void*)0ul) 
+                {
+                    printf("Error: Failed to patch (& update) FADT Table, fallback to original fadt pointer\n");
+                    fadt_mod = FacpPointer;
+                }
+                xsdt_conv->TableOffsetEntry[index] = ((U64)((U32)fadt_mod));
+                
+                continue;
+            }
+        }
+        
+        xsdt_conv->TableOffsetEntry[index] = ((U64)((U32)table_array[index])); 
     }
     DBG("XSDT_CONV : Original checksum %d\n", xsdt_conv->Header.Checksum);
     SetChecksum(&xsdt_conv->Header);
@@ -521,24 +516,24 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
 
 static void MakeAcpiSgn(void)
 {
-
+    
 	char * DefaultplatformName = NULL;
 	Model32 = 0;
 	
-	if (DefaultplatformName = readDefaultPlatformName())
+	if ((DefaultplatformName = readDefaultPlatformName()))
 	{
 		Model32 = OSSwapHostToBigInt32(adler32( (unsigned char *) DefaultplatformName, strlen(DefaultplatformName)));
 	}
 	
-	uuid32 = 0;
-
-	const char *uuidStr = getStringFromUUID(Platform->sysid);
+	uuid32 = 0;    
+	
+	const char *uuidStr = getStringFromUUID((int8_t*)(uint32_t)get_env(envSysId));
 	
 	if (strlen(uuidStr)) 
 	{
 		uuid32 = OSSwapHostToBigInt32(adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
 	}
-
+    
 }
 
 static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
@@ -548,7 +543,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
     
 	DBG("Searching for %s file ...\n", filename);
 	// Check booting partition	
-    	
+    
 	sprintf(acpi_file, "%s%s",dirspec, filename); 
 	
 	HFSLoadVerbose = 0;
@@ -561,7 +556,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
 	}		
 	
 	void *tableAddr=(void*)malloc(file_size (fd));
-
+    
 	if (tableAddr)
 	{
 		if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
@@ -599,7 +594,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
 				return (void*)0ul;
 			}
 		}
-
+        
 		
 		if (checkOem == true)
 		{			
@@ -620,12 +615,12 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
 			return (void*)0ul;			
 		} 
 		
-continue_loading:
+    continue_loading:
 		
 		if (GetChecksum(header, header->Length) == 0)
 		{
 			DBG("Found valid AML file : %s ", filename);
-			printf("[ %s ] read and stored at: %x", acpi_file, tableAddr);
+			verbose("[ %s ] read and stored at: %x", acpi_file, tableAddr);
 			printf("\n");
 			return tableAddr;
 		} 
@@ -671,7 +666,7 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
     U8 *current, *end;
     ACPI_TABLE_HEADER *header;
     struct acpi_namespace ns;
-		
+    
 	if ((cpu_map_error == 1) || (DsdtPointer == (void*)0ul)) 
 		return 1;
 	else if (cpu_map_count > 0) 
@@ -765,12 +760,12 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
 
 static bool is_sandybridge(void)
 {
-    return getCPUModel() == CPUID_MODEL_SANDYBRIDGE;
+    return get_env(envModel) == CPUID_MODEL_SANDYBRIDGE;
 }
 
 static bool is_jaketown(void)
 {
-    return getCPUModel() == CPUID_MODEL_JAKETOWN;
+    return get_env(envModel) == CPUID_MODEL_JAKETOWN;
 }
 
 static U32 get_bclk(void)
@@ -778,27 +773,27 @@ static U32 get_bclk(void)
 	return (is_jaketown() || is_sandybridge()) ? 100 : 133;
 }
 /*
-//-----------------------------------------------------------------------------
-static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate)
-{
-	U32 ratiorange = max-min;
-	U32 numGaps = numStates-1-turboEnabled;
-	U32 adjPstate = pstate-turboEnabled;
-	return (pstate == 0)     ? (max + turboEnabled) :
-	(ratiorange == 0) ? max                  :
-	max-(((adjPstate*ratiorange)+(numGaps/2))/numGaps);
-}
-//-----------------------------------------------------------------------------
-static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit)
-{
-	U32 ratiorange, maxStates, numStates;
-	
-	ratiorange = max - min + 1;
-	maxStates = ratiorange + (turboEnabled ? 1 : 0);
-	numStates = (pssLimit < maxStates) ? pssLimit : maxStates;
-	return (numStates < 2) ? 0 : numStates;
-}
-*/
+ //-----------------------------------------------------------------------------
+ static U32 computePstateRatio(const U32 max, const U32 min, const U32 turboEnabled, const U32 numStates, const U32 pstate)
+ {
+ U32 ratiorange = max-min;
+ U32 numGaps = numStates-1-turboEnabled;
+ U32 adjPstate = pstate-turboEnabled;
+ return (pstate == 0)     ? (max + turboEnabled) :
+ (ratiorange == 0) ? max                  :
+ max-(((adjPstate*ratiorange)+(numGaps/2))/numGaps);
+ }
+ //-----------------------------------------------------------------------------
+ static U32 computeNumPstates(const U32 max, const U32 min, const U32 turboEnabled, const U32 pssLimit)
+ {
+ U32 ratiorange, maxStates, numStates;
+ 
+ ratiorange = max - min + 1;
+ maxStates = ratiorange + (turboEnabled ? 1 : 0);
+ numStates = (pssLimit < maxStates) ? pssLimit : maxStates;
+ return (numStates < 2) ? 0 : numStates;
+ }
+ */
 #if BUILD_ACPI_TSS || pstate_power_support
 static U64 divU64byU64(U64 n, U64 d, U64 * rem)
 {
@@ -917,31 +912,32 @@ static U32 encode_pstate(U32 ratio)
 }
 
 //-----------------------------------------------------------------------------
-void GetMaxRatio(U32 * max_non_turbo_ratio)
+static void GetMaxRatio(U32 * max_non_turbo_ratio)
 {
 	U32 index;
 	U32 max_ratio=0;
 	U32 frequency=0;
     U32 multiplier = 0;
+    char			*BrandString;
 	// Verify CPUID brand string function is supported
-	if (Platform->CPU.cpuid_max_ext < 80000004)
+	if (get_env(envCPUIDMaxExt) < 80000004)
 	{
 		*max_non_turbo_ratio = max_ratio;
 		return;
 	}	
-	
+	BrandString = (char *)(U32)get_env_ptr(envBrandString);
     // -2 to prevent buffer overrun because looking for y in yHz, so z is +2 from y
     for (index=0; index<48-2; index++) {
         // format is either “x.xxyHz” or “xxxxyHz”, where y=M,G,T and x is digits
         // Search brand string for “yHz” where y is M, G, or T
         // Set multiplier so frequency is in MHz
-        if ( Platform->CPU.BrandString[index+1] == 'H' && Platform->CPU.BrandString[index+2] == 'z')
+        if ( BrandString[index+1] == 'H' && BrandString[index+2] == 'z')
         {
-            if (Platform->CPU.BrandString[index] == 'M')
+            if (BrandString[index] == 'M')
                 multiplier = 1;
-            else if (Platform->CPU.BrandString[index] == 'G')
+            else if (BrandString[index] == 'G')
                 multiplier = 1000;
-            else if (Platform->CPU.BrandString[index] == 'T')
+            else if (BrandString[index] == 'T')
                 multiplier = 1000000;
         }
         if (multiplier > 0 && index >= 4 /* who can i call that, buffer underflow :-) ??*/)
@@ -950,25 +946,25 @@ void GetMaxRatio(U32 * max_non_turbo_ratio)
             // index is at position of y in “x.xxyHz”
             
             // Compute frequency (in MHz) from brand string
-            if (Platform->CPU.BrandString[index-3] == '.')
+            if (BrandString[index-3] == '.')
             { // If format is “x.xx”
-                if (isdigit(Platform->CPU.BrandString[index-4]) && isdigit(Platform->CPU.BrandString[index-2]) &&
-                    isdigit(Platform->CPU.BrandString[index-1]))
+                if (isdigit(BrandString[index-4]) && isdigit(BrandString[index-2]) &&
+                    isdigit(BrandString[index-1]))
                 {
-                    frequency  = (U32)(Platform->CPU.BrandString[index-4] - '0') * multiplier;
-                    frequency += (U32)(Platform->CPU.BrandString[index-2] - '0') * (multiplier / 10);
-                    frequency += (U32)(Platform->CPU.BrandString[index-1] - '0') * (multiplier / 100);
+                    frequency  = (U32)(BrandString[index-4] - '0') * multiplier;
+                    frequency += (U32)(BrandString[index-2] - '0') * (multiplier / 10);
+                    frequency += (U32)(BrandString[index-1] - '0') * (multiplier / 100);
                 }                
             }
             else
             { // If format is xxxx
-                if (isdigit(Platform->CPU.BrandString[index-4]) && isdigit(Platform->CPU.BrandString[index-3]) && 
-                    isdigit(Platform->CPU.BrandString[index-2]) && isdigit(Platform->CPU.BrandString[index-1]))
+                if (isdigit(BrandString[index-4]) && isdigit(BrandString[index-3]) && 
+                    isdigit(BrandString[index-2]) && isdigit(BrandString[index-1]))
                 {
-                    frequency  = (U32)(Platform->CPU.BrandString[index-4] - '0') * 1000;
-                    frequency += (U32)(Platform->CPU.BrandString[index-3] - '0') * 100;
-                    frequency += (U32)(Platform->CPU.BrandString[index-2] - '0') * 10;
-                    frequency += (U32)(Platform->CPU.BrandString[index-1] - '0');
+                    frequency  = (U32)(BrandString[index-4] - '0') * 1000;
+                    frequency += (U32)(BrandString[index-3] - '0') * 100;
+                    frequency += (U32)(BrandString[index-2] - '0') * 10;
+                    frequency += (U32)(BrandString[index-1] - '0');
                     frequency *= multiplier;
                 }
                 
@@ -987,20 +983,20 @@ void GetMaxRatio(U32 * max_non_turbo_ratio)
 //-----------------------------------------------------------------------------
 static void collect_cpu_info(CPU_DETAILS * cpu)
 {  
-    	
+    
 #if BUILD_ACPI_TSS || pstate_power_support
-    cpu->turbo_available = Platform->CPU.dynamic_acceleration;
+    cpu->turbo_available = (U32)get_env(envDynamicAcceleration);
 	
 	{
 		U32 temp32 = 0;
 		U64 temp64=  0;
 		int tdp;
-		if (getIntForKey("TDP", &tdp, &bootInfo->bootConfig))
+		if (getIntForKey("TDP", &tdp, DEFAULT_BOOT_CONFIG))
 		{
 			temp32 = (U32) (tdp*8) ; 
 			
 			int tdc;
-			if (getIntForKey("TDC", &tdc, &bootInfo->bootConfig))
+			if (getIntForKey("TDC", &tdc, DEFAULT_BOOT_CONFIG))
 			{
 				temp32 = (U32) (temp32) | tdc<<16 ; 
 				
@@ -1036,11 +1032,11 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
     
 #endif
     
-	switch (getCPUFamily())
+	switch (get_env(envFamily))
 	{
 		case 0x06: 
 		{
-			switch (getCPUModel()) 
+			switch (get_env(envModel)) 
 			{
 				case CPUID_MODEL_DOTHAN: 
 				case CPUID_MODEL_YONAH: // Yonah
@@ -1049,25 +1045,25 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 				case CPUID_MODEL_ATOM: // Intel Atom (45nm)
 				{
 					
-					cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
-					cpu->core_c4_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;
+					cpu->core_c1_supported = ((get_env(envSubCstates) >> 4) & 0xf) ? 1 : 0;
+					cpu->core_c4_supported = ((get_env(envSubCstates) >> 16) & 0xf) ? 1 : 0;
 					
-					if (getCPUModel() == CPUID_MODEL_ATOM)
+					if (get_env(envModel) == CPUID_MODEL_ATOM)
 					{
-						cpu->core_c2_supported = cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
-						cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
-
+						cpu->core_c2_supported = cpu->core_c3_supported = ((get_env(envSubCstates) >> 8) & 0xf) ? 1 : 0;
+						cpu->core_c6_supported = ((get_env(envSubCstates) >> 12) & 0xf) ? 1 : 0;
+                        
 					} 
 					else
 					{
-						cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
-						cpu->core_c2_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
+						cpu->core_c3_supported = ((get_env(envSubCstates) >> 12) & 0xf) ? 1 : 0;
+						cpu->core_c2_supported = ((get_env(envSubCstates) >> 8) & 0xf) ? 1 : 0;
 						cpu->core_c6_supported = 0;
-
+                        
 					}
-
+                    
 					cpu->core_c7_supported = 0;
-										
+                    
 #if BETA
 					GetMaxRatio(&cpu->max_ratio_as_mfg);
 					U64 msr = rdmsr64(MSR_IA32_PERF_STATUS);
@@ -1077,15 +1073,15 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 					cpu->max_ratio_as_cfg = (U32) (idhi  >> 8) & 0xff;
 					
 #else
-					if (Platform->CPU.MaxCoef) 
+					if (get_env(envMaxCoef)) 
 					{
-						if (Platform->CPU.MaxDiv) 
+						if (get_env(envMaxDiv)) 
 						{
-							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (Platform->CPU.MaxCoef * 10) + 5;
+							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (get_env(envMaxCoef) * 10) + 5;
 						}
 						else 
 						{
-							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) Platform->CPU.MaxCoef * 10;
+							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) get_env(envMaxCoef) * 10;
 						}
 					}
 #endif
@@ -1103,10 +1099,10 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 				case CPUID_MODEL_JAKETOWN:
 				{		
 					
-					cpu->core_c1_supported = ((Platform->CPU.sub_Cstates >> 4) & 0xf) ? 1 : 0;
-					cpu->core_c3_supported = ((Platform->CPU.sub_Cstates >> 8) & 0xf) ? 1 : 0;
-					cpu->core_c6_supported = ((Platform->CPU.sub_Cstates >> 12) & 0xf) ? 1 : 0;
-					cpu->core_c7_supported = ((Platform->CPU.sub_Cstates >> 16) & 0xf) ? 1 : 0;
+					cpu->core_c1_supported = ((get_env(envSubCstates) >> 4) & 0xf) ? 1 : 0;
+					cpu->core_c3_supported = ((get_env(envSubCstates) >> 8) & 0xf) ? 1 : 0;
+					cpu->core_c6_supported = ((get_env(envSubCstates) >> 12) & 0xf) ? 1 : 0;
+					cpu->core_c7_supported = ((get_env(envSubCstates) >> 16) & 0xf) ? 1 : 0;
 					cpu->core_c2_supported = 0;
 					cpu->core_c4_supported = 0;
 					
@@ -1131,11 +1127,11 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 		default:			
 			break;
 	}
-
-	cpu->mwait_supported = (Platform->CPU.extensions & (1UL << 0)) ? 1 : 0;	
     
-    cpu->invariant_apic_timer_flag = Platform->CPU.invariant_APIC_timer;
-       
+	cpu->mwait_supported = (get_env(envExtensions) & (1UL << 0)) ? 1 : 0;	
+    
+    cpu->invariant_apic_timer_flag = (U32)get_env(envInvariantAPICTimer);
+    
 #if DEBUG_ACPI
 	printf("CPU INFO : \n");
 #if BETA    
@@ -1152,20 +1148,20 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 	printf("core_c6_supported : %d\n",cpu->core_c6_supported);
 	printf("core_c7_supported : %d\n",cpu->core_c7_supported);
 	printf("mwait_supported : %d\n",cpu->mwait_supported);
-
+    
 #if BUILD_ACPI_TSS || pstate_power_support
 	if (is_sandybridge() || is_jaketown())
 	{
-
+        
 		printf("package_power_limit : %d\n",cpu->package_power_limit);
 		printf("package_power_sku_unit : %d\n",cpu->package_power_sku_unit); 
-
+        
 	}
 #endif
 	
 	DBG("invariant_apic_timer_flag : %d\n",cpu->invariant_apic_timer_flag);
 	
-	    
+    
 #endif
 }
 
@@ -1219,64 +1215,64 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 }
 #else
 /*
-//-----------------------------------------------------------------------------
-static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu)
-{
-	// Build P-state table info based on verified options
-    
-	// Compute the number of p-states based on the ratio range
-	cpu->pkg_pstates.num_pstates = computeNumPstates(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, MAX_PSTATES);
-	
-	if (!cpu->pkg_pstates.num_pstates)
-	{
-		return (0);
-	}
-	
-	// Compute pstate data
-	{
-#ifdef pstate_power_support
-		U32 TDP = compute_tdp(cpu);								
-#endif
-		
-		U32 index;
-		for (index=0; index < cpu->pkg_pstates.num_pstates; index ++)
-		{
-			PSTATE * pstate = &cpu->pkg_pstates.pstate[index];
-			
-			// Set ratio
-			pstate->ratio = computePstateRatio(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, cpu->pkg_pstates.num_pstates, index);
-			
-			// Compute frequency based on ratio
-			if ((index != 0) || (cpu->turbo_available == 0))
-				pstate->frequency = pstate->ratio * get_bclk();
-			else
-				pstate->frequency = ((pstate->ratio - 1) * get_bclk()) + 1;
-			
-#ifdef pstate_power_support
-			// Compute power based on ratio and other data
-			if (pstate->ratio >= cpu->max_ratio_as_mfg)
-				// Use max power in mW
-				pstate->power = TDP * 1000;
-			else
-			{
-				pstate->power = compute_pstate_power(cpu, pstate->ratio, TDP);
-				
-				// Convert to mW
-				pstate->power*= 1000;
-			}
-#else
-			pstate->power = 0;
-#endif	
-		}
-	}		
-    
-	return (1);
-}
-*/
+ //-----------------------------------------------------------------------------
+ static U32 BuildCoreIPstateInfo(CPU_DETAILS * cpu)
+ {
+ // Build P-state table info based on verified options
+ 
+ // Compute the number of p-states based on the ratio range
+ cpu->pkg_pstates.num_pstates = computeNumPstates(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, MAX_PSTATES);
+ 
+ if (!cpu->pkg_pstates.num_pstates)
+ {
+ return (0);
+ }
+ 
+ // Compute pstate data
+ {
+ #ifdef pstate_power_support
+ U32 TDP = compute_tdp(cpu);								
+ #endif
+ 
+ U32 index;
+ for (index=0; index < cpu->pkg_pstates.num_pstates; index ++)
+ {
+ PSTATE * pstate = &cpu->pkg_pstates.pstate[index];
+ 
+ // Set ratio
+ pstate->ratio = computePstateRatio(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, cpu->pkg_pstates.num_pstates, index);
+ 
+ // Compute frequency based on ratio
+ if ((index != 0) || (cpu->turbo_available == 0))
+ pstate->frequency = pstate->ratio * get_bclk();
+ else
+ pstate->frequency = ((pstate->ratio - 1) * get_bclk()) + 1;
+ 
+ #ifdef pstate_power_support
+ // Compute power based on ratio and other data
+ if (pstate->ratio >= cpu->max_ratio_as_mfg)
+ // Use max power in mW
+ pstate->power = TDP * 1000;
+ else
+ {
+ pstate->power = compute_pstate_power(cpu, pstate->ratio, TDP);
+ 
+ // Convert to mW
+ pstate->power*= 1000;
+ }
+ #else
+ pstate->power = 0;
+ #endif	
+ }
+ }		
+ 
+ return (1);
+ }
+ */
 //-----------------------------------------------------------------------------
 static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {	
-
+    
 	struct p_state p_states[32];
 	U8 p_states_count = 0;		
 	{
@@ -1285,11 +1281,11 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 #endif	
 		struct p_state maximum, minimum;
 		// Retrieving P-States, ported from code by superhai (c)
-		switch (Platform->CPU.Family)
+		switch (get_env(envFamily))
 		{
 			case 0x06: 
 			{
-				switch (Platform->CPU.Model) 
+				switch (get_env(envModel)) 
 				{
 					case CPUID_MODEL_DOTHAN: 
 					case CPUID_MODEL_YONAH: // Yonah
@@ -1334,7 +1330,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
 							intel_waitforsts();
 						}
-
+                        
 						if (minimum.VID == maximum.VID) 
 						{	
 							U64 msr;
@@ -1353,7 +1349,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							wrmsr64(MSR_IA32_PERF_CONTROL, (msr & 0xFFFFFFFFFFFF0000ULL) | (maximum.FID << 8) | maximum.VID);
 							intel_waitforsts();
 						}
-
+                        
 						minimum.CID = ((minimum.FID & 0x1F) << 1) >> cpu_dynamic_fsb;
 						
 						// Sanity check
@@ -1376,6 +1372,8 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 							
 							vidstep = ((maximum.VID << 2) - (minimum.VID << 2)) / (p_states_count - 1);
 							
+                            U32 fsb = (U32)get_env(envFSBFreq) / 1000000; 
+                            
 							for (u = 0; u < p_states_count; u++) 
 							{
 								i = u - invalid;
@@ -1401,7 +1399,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 								U32 multiplier = p_states[i].FID & 0x1f;		// = 0x08
 								bool half = p_states[i].FID & 0x40;					// = 0x01
 								bool dfsb = p_states[i].FID & 0x80;					// = 0x00
-								U32 fsb = Platform->CPU.FSBFrequency / 1000000; // = 400
+								//U32 fsb = (U32)get_env(envFSBFreq) / 1000000; // = 400
 								U32 halffsb = (fsb + 1) >> 1;					// = 200
 								U32 frequency = (multiplier * fsb);			// = 3200
 								
@@ -1438,12 +1436,12 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						{
 							U8 i;
 							p_states_count = 0;
-							
+							U32 fsb = (U32)(get_env(envFSBFreq) / 1000000) ;
 							for (i = maximum.Control; i >= minimum.Control; i--) 
 							{
 								p_states[p_states_count].Control = i;
 								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
-								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
+								p_states[p_states_count].Frequency = (U32)fsb * i;
 								p_states_count++;
 								if (p_states_count >= MAX_PSTATES) { // was 32
 									
@@ -1454,21 +1452,21 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 								}
 							}
 						}
-						 
+                        
 						/*
-						U32 sta = BuildCoreIPstateInfo(cpu);
-						if (sta) 
-						{
-							DBG("_PSS PGK generated successfully\n");
-							return (1);
-							
-						}
-						else
-						{
-							verbose("CoreI _PSS Generation failed !!\n");
-							return (0);
-						}
-						*/
+                         U32 sta = BuildCoreIPstateInfo(cpu);
+                         if (sta) 
+                         {
+                         DBG("_PSS PGK generated successfully\n");
+                         return (1);
+                         
+                         }
+                         else
+                         {
+                         verbose("CoreI _PSS Generation failed !!\n");
+                         return (0);
+                         }
+                         */
 						break;
 					}
 					default:
@@ -1485,23 +1483,25 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 	// Generating Pstate PKG
 	if (p_states_count) 
 	{									
-		U8 minPSratio = (p_states[p_states_count-1].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
-		U8 maxPSratio = (p_states[0].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
+        U32 fsb = (U32)get_env(envFSBFreq);
+		U8 minPSratio = (p_states[p_states_count-1].Frequency / (fsb / 10000000 ));
+		U8 maxPSratio = (p_states[0].Frequency / (fsb / 10000000 ));
 		U8 cpu_ratio = 0;
 		
 		{
-			U8 cpu_div = Platform->CPU.CurrDiv;
-			
+			U8 cpu_div = (U8)get_env(envCurrDiv);
+			U8 cpu_coef = (U8)get_env(envCurrCoef);
+            
 			if (cpu_div) 								
-				cpu_ratio = (Platform->CPU.CurrCoef * 10) + 5;								
+				cpu_ratio = (cpu_coef * 10) + 5;								
 			else 								
-				cpu_ratio = Platform->CPU.CurrCoef * 10;
+				cpu_ratio = cpu_coef * 10;
 		}
 		
 		
 		{
 			int user_max_ratio = 0;
-			getIntForKey(kMaxRatio, &user_max_ratio, &bootInfo->bootConfig);
+			getIntForKey(kMaxRatio, &user_max_ratio, DEFAULT_BOOT_CONFIG);
 			if (user_max_ratio >= minPSratio && maxPSratio >= user_max_ratio)
 			{									
 				
@@ -1520,7 +1520,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		
 		{
 			int user_min_ratio = 0;
-			getIntForKey(kMinRatio, &user_min_ratio, &bootInfo->bootConfig);
+			getIntForKey(kMinRatio, &user_min_ratio, DEFAULT_BOOT_CONFIG);
 			if (user_min_ratio >= minPSratio && cpu_ratio >= user_min_ratio)
 			{
 				
@@ -1543,7 +1543,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		if (maxPSratio >= cpu_ratio && cpu_ratio >= minPSratio)	maxPSratio = cpu_ratio;													
 		
 		{
-			TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"P-States"));
+			TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"P-States")); // TODO: fix me
 			int  base = 16;								
 			U8 expert = 0; /* Default: 0 , mean mixed mode 
 						    * expert mode : 1 , mean add only p-states found in boot.plist
@@ -1582,7 +1582,8 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 #ifdef pstate_power_support
 				U32 TDP = compute_tdp(cpu);								
 #endif
-				U32 i;				
+				U32 i;	
+                U32 fsb = (U32)get_env(envFSBFreq);
 				for (i = 0; i < p_states_count; i++) 
 				{			
 					char *Lat1 = NULL, *clk = NULL, *Pw = NULL, *Lat2 = NULL, *Ctrl = NULL ;
@@ -1605,7 +1606,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						} else if (expert) 
 							continue;
 					}
-										
+                    
 					unsigned long Frequency  = 0x00000000;
 					
 					if (!expert || !personality) Frequency  = p_states[i].Frequency;
@@ -1615,11 +1616,11 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					
 					if (!Frequency || Frequency > p_states[0].Frequency ) continue;
 					
-					U8 curr_ratio = (Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
+					U8 curr_ratio = (Frequency / (fsb / 10000000 ));
                     
                     
                     {
-						U8 fixed_ratio = (Frequency / (Platform->CPU.FSBFrequency / 1000000 ))*10;
+						U8 fixed_ratio = (Frequency / (fsb / 1000000 ))*10;
 						U8 diff = curr_ratio - fixed_ratio ;
 						
 						if (diff)
@@ -1638,7 +1639,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					
 					if (curr_ratio > maxPSratio || minPSratio > curr_ratio)
 						goto dropPstate;
-						
+                    
 					{
 						PSTATE * pstate = &cpu->pkg_pstates.pstate[Pstatus];
 						
@@ -1673,13 +1674,13 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						pstate->status = Pstatus+1; // Status
 						
 						DBG("state :: frequency :%d power: %d translatency: %d bmlatency: %d control: %d status: %d ratio :%d :: registred !! \n",pstate->frequency,pstate->power,
-											pstate->translatency,pstate->bmlatency,pstate->control,pstate->status,pstate->ratio );
+                            pstate->translatency,pstate->bmlatency,pstate->control,pstate->status,pstate->ratio );
 					}
 					
 					
 					Pstatus++;
 					continue;															
-
+                    
 				dropPstate:					
 					DBG("state with cpu frequency :%d and ratio :%d will be dropped\n",p_states[i].Frequency,curr_ratio);					
 					dropPSS++;
@@ -1711,7 +1712,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 {
 	{
-		TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"C-States"));
+		TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"C-States")); // TODO :fix me
 		
 		if (personality)
 		{
@@ -1804,7 +1805,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 			}
 		}	
 	}
-
+    
 	{
 		static const ACPI_GENERIC_ADDRESS mwait_gas[] = {
 			{GAS_TYPE_FFH,1,2,1,0x00},   // processor C1
@@ -1885,14 +1886,14 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 			bool tmpval;
 			
 			
-			if (getBoolForKey(kEnableC2State, &tmpval, &bootInfo->bootConfig))
+			if (getBoolForKey(kEnableC2State, &tmpval, DEFAULT_BOOT_CONFIG))
 			{
 				c2_enabled = tmpval;
 			}
-				
-			if (!getIntForKey("C3StateOption", &c3_enabled, &bootInfo->bootConfig))
+            
+			if (!getIntForKey("C3StateOption", &c3_enabled, DEFAULT_BOOT_CONFIG))
 			{
-				c3_enabled = (getBoolForKey(kEnableC3State, &tmpval, &bootInfo->bootConfig)&&tmpval) ? 3 : 0;
+				c3_enabled = (getBoolForKey(kEnableC3State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 3 : 0;
 			}		
 			if (c3_enabled == 6)
 			{
@@ -1900,10 +1901,10 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 			}
 			else 
 			{
-				c4_enabled = (getBoolForKey(kEnableC4State, &tmpval, &bootInfo->bootConfig)&&tmpval) ? 1 : 0;
+				c4_enabled = (getBoolForKey(kEnableC4State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;
 			}
-			c6_enabled = (getBoolForKey(kEnableC6State, &tmpval, &bootInfo->bootConfig)&&tmpval) ? 1 : 0;
-			c7_enabled = (getBoolForKey(kEnableC7State, &tmpval, &bootInfo->bootConfig)&&tmpval) ? 1 : 0;		
+			c6_enabled = (getBoolForKey(kEnableC6State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;
+			c7_enabled = (getBoolForKey(kEnableC7State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;		
 		}
 		
 		cpu->pkg_mwait_cstates.num_cstates = 0;
@@ -1914,7 +1915,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				cpu->pkg_mwait_cstates.num_cstates++;
 			}
 			if (((cpu->core_c3_supported || cpu->core_c2_supported) && (c2_enabled)) && ((c3_enabled == 2) ||
-										   ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
+                                                                                         ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
 			{
 				cpu->pkg_mwait_cstates.cstate[cpu->pkg_mwait_cstates.num_cstates] = mwait_cstate[cstate_2_index[CPU_C3_ACPI_C2]];
 				cpu->pkg_mwait_cstates.gas[cpu->pkg_mwait_cstates.num_cstates] = mwait_gas[cstate_2_index[CPU_C3_ACPI_C2]];
@@ -1963,7 +1964,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				cpu->pkg_io_cstates.num_cstates++;
 			}
 			if ((cpu->core_c3_supported || cpu->core_c2_supported) && (c2_enabled || (c3_enabled == 2) ||
-										   ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
+                                                                       ((c3_enabled == 4) && cpu->invariant_apic_timer_flag)))
 			{
 				cpu->pkg_io_cstates.cstate[cpu->pkg_io_cstates.num_cstates] = io_cstate[cstate_2_index[CPU_C3_ACPI_C2]];
 				cpu->pkg_io_cstates.gas[cpu->pkg_io_cstates.num_cstates] = io_gas[cstate_2_index[CPU_C3_ACPI_C2]];
@@ -2057,7 +2058,7 @@ static U32 BuildTstateInfo(CPU_DETAILS * cpu)
     for (num_cpu = 0; num_cpu < cpu_map_count; num_cpu ++)
     {        
         // Check if fine or coarse grained clock modulation is available
-        if (Platform->CPU.fine_grain_clock_mod)
+        if (get_env(envFineGrainClockMod))
         {
             // Fine grain thermal throttling is available
             num_tstates = 15;
@@ -2079,7 +2080,7 @@ static U32 BuildTstateInfo(CPU_DETAILS * cpu)
                 cpu->pkg_tstates.tstate[index].power = 1000 * (compute_tdp(cpu) * (num_tstates - index)) / num_tstates;
             }
         } 
-           
+        
         
     }
     return (1);
@@ -2396,7 +2397,7 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
     
     {		
 		bool tmpval;		
-		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;		
+		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;		
 	}
     
     if (oem_apic == true) 
@@ -2424,7 +2425,7 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
             return(0);
         }
     }    
-        
+    
     // Create buffer for MADT
     //U8 memory_for_madt[2 * 1024]; // seems to bug with xcode4, need to found out what is going on (not enough memory in the stack ?)
     U8 *memory_for_madt = (U8*)AllocateKernelMemory(2 * 1024);
@@ -2463,13 +2464,15 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
 static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * madt_info, bool enable_cstates, bool enable_pstates, bool enable_tstates )
 {
 	DBG("Processing SSDT\n");	
-		
-	if (Platform->CPU.Vendor != 0x756E6547) {
+    
+	// Check we are on an intel platform
+	if (get_env(envVendor) != CPUID_VENDOR_INTEL) {
 		verbose ("Not an Intel platform: SSDT will not be generated !!!\n");
 		return(0);
 	}
 	
-	if (!(Platform->CPU.Features & CPUID_FEATURE_MSR)) {
+	// Check for the msr feature flag
+	if (!(get_env(envFeatures) & CPUID_FEATURE_MSR)) {
 		verbose ("Unsupported CPU: SSDT will not be generated !!!\n");
 		return(0);
 	}
@@ -2489,7 +2492,7 @@ static U32 ProcessSsdt(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * 
 		printf("       please increase the RESERVED_AERA\n");
 		return(0);
 	}
-        
+    
 	// Create buffer for SSDT
 	//U8 memory_for_ssdt[20 * 1024];	// seems to bug with xcode4, need to found out what is going on (not enough memory in the stack ?)	
 	U8 *memory_for_ssdt =(U8*)AllocateKernelMemory(20 * 1024);
@@ -3597,7 +3600,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 		//    (3.7) Update length in CPUn Scope
 		// (4) Update length and checksum in SSDT Definition Block
 		DBG("Attempting to build SSDT\n");
-
+        
 		U32 pstates_enabled = 0;
 		U32 cstates_enabled = 0;
 		CPU_DETAILS cpu;
@@ -3613,7 +3616,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 		// (1) Setup pointers to SSDT memory location
 		void * current = buffer;
 		void * end = (U8 *)buffer + bufferSize;		
-						
+        
 		// Confirm a valid SSDT buffer was provided
 		if (!buffer)
 		{
@@ -3649,22 +3652,22 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 		if (enable_cstates && pmbase)
 		{
 			DBG("Building Cstate Info\n");
-
+            
 			cstates_enabled = BuildCstateInfo(&cpu, pmbase);
 			if (cstates_enabled)
 			{
-				getBoolForKey(KEnableMwait, &enable_mwait, &bootInfo->bootConfig);
+				getBoolForKey(KEnableMwait, &enable_mwait, DEFAULT_BOOT_CONFIG);
 			}
 		}
 		
 		if (enable_pstates)
 		{
 			DBG("Building Pstate Info\n");
-
+            
 			pstates_enabled = BuildPstateInfo(&cpu);
 			if (pstates_enabled)
 			{
-				const char *str = getStringForKey(KAcpiCoordType, &bootInfo->bootConfig);
+				const char *str = getStringForKey(KAcpiCoordType, DEFAULT_BOOT_CONFIG);
 				U8 tmp  = (U8)strtoul(str, NULL,16);
 				if ((tmp == ACPI_COORD_TYPE_SW_ALL) || (tmp == ACPI_COORD_TYPE_SW_ANY) || (tmp == ACPI_COORD_TYPE_HW_ALL) )
 				{
@@ -3733,7 +3736,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 				
 				// Build MWOS variable used to store state of MWAIT OS setup option
 				current = buildNamedDword(current, NAMESEG("MWOS"), (U32)(enable_mwait&&cpu.mwait_supported));
-								
+                
 				// (3.3) Create _OSC and/or _PDC Methods
 				{
 					// Build _PDC method
@@ -3815,7 +3818,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 						return(0);
 					}
 				}
-
+                
 				// (3.5) Create C-state related structures
 				if (cstates_enabled == 1)
 				{
@@ -3867,7 +3870,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
                     // (3.6.4) Create _TSD Method
                     {
                         LAPIC_INFO * lapic = &madt_info.lapic[lapic_index];
-                       
+                        
                         // Use core_apic_id as domain
                         U32 domain = lapic->core_apic_id;
                         
@@ -3886,7 +3889,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 			// (4) Update length and checksum in SSDT Definition Block
 			{
 				DBG("Updating length and checksum in SSDT Definition Block\n");
-
+                
 				SsdtPointer->Header.Length = (U8 *)current - (U8 *)SsdtPointer;				
 				SetChecksum(&SsdtPointer->Header);
 			}
@@ -3921,7 +3924,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs )
 	
     memcpy(facs_mod, FacsPointer , FacsPointer->Length);
     facs_mod->Length = sizeof(ACPI_TABLE_FACS);
-		    
+    
 	if (FacsPointer->Length < sizeof(ACPI_TABLE_FACS))
 	{
 		facs_mod->FirmwareWakingVector = 0;
@@ -3939,15 +3942,15 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs )
 		{
 			facs_mod->XFirmwareWakingVector = (U64)facs_mod->FirmwareWakingVector;
 		}
-
+        
 		facs_mod->Version = 2; /* ACPI 1.0: 0, ACPI 2.0/3.0: 1, ACPI 4.0: 2 */
 		
 	}
-
+    
     return facs_mod;
 }
 #endif
-  
+
 static ACPI_GENERIC_ADDRESS FillGASStruct(U32 Address, U8 Length)
 {
 	ACPI_GENERIC_ADDRESS TmpGAS;
@@ -3977,12 +3980,12 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	bool fadt_rev2_needed = false;
 	bool fix_restart = false;	
 	const char * value;	
-
+    
 	// Restart Fix
-	if (platformIsIntel()) /* Intel */
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL) 
 	{	
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFix, &fix_restart, DEFAULT_BOOT_CONFIG);
 		
 	} else {
 		verbose ("Not an Intel platform: Restart Fix disabled !!!\n");
@@ -3990,22 +3993,22 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	
 	if (fix_restart)
 		fadt_rev2_needed = true;
-			
+    
 	// Allocate new fadt table
 	if (UpdateFADT)        
 	{      
-       if (fadt->Header.Length < 0xF4)
-	   {
-		   fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0xF4);
-		   if (!fadt_mod) 
-		   {
-			   printf("Unable to allocate kernel memory for fadt mod\n");
-			   return (void*)0ul;
-		   }
-		   bzero(fadt_mod, 0xF4);
-		   memcpy(fadt_mod, fadt, fadt->Header.Length);
-		   fadt_mod->Header.Length = 0xF4;
-		 
+        if (fadt->Header.Length < 0xF4)
+        {
+            fadt_mod=(ACPI_TABLE_FADT *)AllocateKernelMemory(0xF4);
+            if (!fadt_mod) 
+            {
+                printf("Unable to allocate kernel memory for fadt mod\n");
+                return (void*)0ul;
+            }
+            bzero(fadt_mod, 0xF4);
+            memcpy(fadt_mod, fadt, fadt->Header.Length);
+            fadt_mod->Header.Length = 0xF4;
+            
 		}
 		else
 		{			
@@ -4017,7 +4020,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 			}
 			memcpy(fadt_mod, fadt, fadt->Header.Length);
 		}		   
-				
+        
         
 		//fadt_mod->Header.Revision = 0x04; // FADT rev 4
 		fadt_mod->ResetRegister = FillGASStruct(0, 0);
@@ -4038,7 +4041,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 		{					
 			fadt_mod->Header.Revision = 0x04; // FADT rev 4
 			verbose("Converted ACPI V%d FADT to ACPI V4 FADT\n", fadt->Header.Revision);
-
+            
 		}
 	}
 	else
@@ -4091,7 +4094,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 				fadt_mod->Header.Revision = 0x01; 
 				verbose("Warning: ACPI FADT length was < 0x74 which is the minimum for the ACPI FADT V1 specification, \n", fadt->Header.Revision );
 				verbose("         trying to convert it to Version 1. \n");				
-
+                
 			} 
 			else
 			{
@@ -4110,53 +4113,54 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	// Determine system type / PM_Model
 	
 	// Fix System-type if needed (should never happen)
-	if (Platform->Type > MaxSupportedPMProfile)  
+	if (get_env(envType) > MaxSupportedPMProfile)  
 	{
 		if(fadt_mod->PreferredProfile <= MaxSupportedPMProfile)
-			Platform->Type = fadt_mod->PreferredProfile; // get the fadt if correct
+            safe_set_env(envType,fadt_mod->PreferredProfile);// get the fadt if correct
 		else 
-			Platform->Type = 1;		/* Set a fixed value (Desktop) */
+			safe_set_env(envType,1);		/* Set a fixed value (Desktop) */
 	}
 	
 	// If needed, set System-type from PM_Profile (if valid) else set PM_Profile with a fixed the System-type  
 	// Give prior to the FADT pm profile, allow to also control this value with a patched FADT table
-	if (fadt_mod->PreferredProfile != Platform->Type) 
+	if (fadt_mod->PreferredProfile != get_env(envType)) 
 	{
 		bool val = false;  
-		getBoolForKey("PreferInternalProfileDetect", &val, &bootInfo->bootConfig); // if true Give prior to the profile resolved trought the CPU model
+		getBoolForKey("PreferInternalProfileDetect", &val, DEFAULT_BOOT_CONFIG); // if true Give prior to the profile resolved trought the CPU model
 		
-		val = platformIsServer() ;
+		val = get_env(envIsServer) ;
 		
 		if (fadt_mod->PreferredProfile <= MaxSupportedPMProfile && !val)
 		{
-			Platform->Type = fadt_mod->PreferredProfile;
+			safe_set_env(envType,fadt_mod->PreferredProfile);
 		} 
 		else
 		{
-			fadt_mod->PreferredProfile = Platform->Type;
+			fadt_mod->PreferredProfile = (U8)get_env(envType);
 		}		
 		
 	}
 	
 	// Set PM_Profile and System-type if user wanted this value to be forced
-	if ( (value=getStringForKey("SystemType", &bootInfo->bootConfig))!=NULL)
+	if ( (value=getStringForKey("SystemType", DEFAULT_BOOT_CONFIG))!=NULL)
 	{
 		if ((Type = (unsigned char) strtoul(value, NULL, 10) ) <= MaxSupportedPMProfile)
 		{
 			if (fadt_mod->PreferredProfile != Type)
 			{
 				verbose("FADT: changing Preferred_PM_Profile from %d to %d\n", fadt->PreferredProfile, Type);
-				fadt_mod->PreferredProfile = Platform->Type = Type;
+				
+				safe_set_env(envType,(fadt_mod->PreferredProfile = Type));
 			} 
 			else
 			{
 				DBG("FADT: Preferred_PM_Profile was already set to %d, no need to be changed\n",Type);
 			}
 			
-		} else printf("Error: system-type must be 0..6. Defaulting to %d !\n", Platform->Type);
+		} else printf("Error: system-type must be 0..6. Defaulting to %d !\n", (U8)get_env(envType));
 	}		
 	
-	getBoolForKey(KIntelFADT, &intelfadtspec, &bootInfo->bootConfig);
+	getBoolForKey(KIntelFADT, &intelfadtspec, DEFAULT_BOOT_CONFIG);
 	if ((pmbase == 0) && (cpu_map_error == 0) && (intelfadtspec == true)) 
 	{
 		ACPI_TABLE_DSDT *DsdtPointer ;
@@ -4183,7 +4187,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
         fadt_mod->Flags|= 0x400;		
 		
 		int type = PCI_RESET_TYPE;
-		getIntForKey(KResetType, &type, &bootInfo->bootConfig);
+		getIntForKey(KResetType, &type, DEFAULT_BOOT_CONFIG);
 		if (type == KEYBOARD_RESET_TYPE)
 		{
 			//Azi: keyboard reset; http://forum.voodooprojects.org/index.php/topic,1056.msg9802.html#msg9802
@@ -4197,7 +4201,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 		}
 		verbose("FADT: Restart Fix applied (Type : %s) !\n", (type == 0) ? "PCI": "KEYBOARD");
 	}
-	    
+    
     if (fadt_mod->Header.Revision >= 3)
 	{                
         
@@ -4207,34 +4211,35 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
             
 			//fadt_mod->XFacs= (U64)((U32)generate_facs(true));
             fadt_mod->XFacs=(U64)fadt->Facs;             
-        
+            
         } 
 		else
 		{
 			fadt_mod->XFacs=(U64)fadt->XFacs;
 		}
-
+        
         
         if(new_dsdt != (void*)0ul)
-                fadt_mod->XDsdt=((U64)(U32)new_dsdt);
+            fadt_mod->XDsdt=((U64)(U32)new_dsdt);
 		else if (UpdateFADT)
-				fadt_mod->XDsdt=(U64)fadt_mod->Dsdt;
+            fadt_mod->XDsdt=(U64)fadt_mod->Dsdt;
         
         
-        Platform->hardware_signature = ((ACPI_TABLE_FACS *)((U32)fadt_mod->XFacs))->HardwareSignature;
-                
+		safe_set_env(envHardwareSignature,((ACPI_TABLE_FACS *)((U32)fadt_mod->XFacs))->HardwareSignature);
+        
+        
     }
 	else
 	{
         
-        Platform->hardware_signature = 	((ACPI_TABLE_FACS *)fadt_mod->Facs)->HardwareSignature;
-    
+		safe_set_env(envHardwareSignature,((ACPI_TABLE_FACS *)fadt_mod->Facs)->HardwareSignature);
+        
     }        
 	
-
-	DBG("setting hardware_signature to %x \n",Platform->hardware_signature);    
-			
-		
+    
+	DBG("setting hardware_signature to %x \n",(U32)get_env(envHardwareSignature));    
+    
+    
     
 	if (pmbase && (intelfadtspec == true))
 		ProcessFadt(fadt_mod, pmbase); // The checksum correction will be done by ProcessFadt
@@ -4246,7 +4251,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 
 static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 {
-	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"ACPIDropTables"));
+	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")); // TODO: fix me
 	U32 new_table = 0ul;
 	U8 new_table_index = 0, table_added = 0;
 	ACPI_TABLE_XSDT *xsdt = (void*)0ul, *xsdt_mod = (void*)0ul;
@@ -4292,7 +4297,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				}
 				
 				bool unsafe = false;
-				getBoolForKey(kUnsafeACPI, &unsafe, &bootInfo->bootConfig);
+				getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
 				
 				if (!unsafe) 
 				{
@@ -4305,15 +4310,13 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 						continue;
 					}
 				}
-								
+                
 			}
 			
 			xsdt_mod->TableOffsetEntry[index-dropoffset]=ptr;
-			
-			char tableSig[4];			
-			
-			strlcpy(tableSig, (char*)((U32)ptr), sizeof(tableSig)+1);
-			
+								
+            char * tableSig = newStringWithLength((char*)((U32)ptr), 4);
+            
 			DBG("** Processing %s,", tableSig );
 			
 			DBG(" @%x, Length=%d\n", (U32)ptr,
@@ -4323,7 +4326,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				bool oem = false;
 				char oemOption[OEMOPT_SIZE];
 				sprintf(oemOption, "oem%s",tableSig );
-				if (getBoolForKey(oemOption, &oem, &bootInfo->bootConfig) && oem) // This method don't work for DSDT and FACS
+				if (getBoolForKey(oemOption, &oem, DEFAULT_BOOT_CONFIG) && oem) // This method don't work for DSDT and FACS
 				{ 
 					
 					DBG("   %s required\n", oemOption);
@@ -4358,7 +4361,8 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 					continue;
 				}
 			}							
-						
+            
+            free(tableSig);
 		}                
 		
 		
@@ -4420,12 +4424,12 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 		verbose("XSDT not found or XSDT incorrect\n");
 	}
 	return (1);
-
+    
 }
 
 static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list)
 {			
-	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"ACPIDropTables"));
+	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")); // TODO: fix me
 	U32 new_table = 0ul;
 	U8 new_table_index = 0, table_added = 0;
 	U32 dropoffset=0, index;
@@ -4433,7 +4437,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	ACPI_TABLE_XSDT *xsdt_conv	 = (void *)0ul;
 	
 	rsdt=(ACPI_TABLE_RSDT *)acpi_tables.RsdtPointer;
-
+    
 	rsdt_mod=(ACPI_TABLE_RSDT *)AllocateKernelMemory(rsdt->Header.Length);
 	
 	if (!rsdt_mod) 
@@ -4458,11 +4462,11 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	
 	for (index = 0; index < num_tables; index++)
 	{
-				
+        
 		{		
 			
 			bool unsafe = false;
-			getBoolForKey(kUnsafeACPI, &unsafe, &bootInfo->bootConfig);
+			getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
 			
 			if (!unsafe)
 			{
@@ -4479,9 +4483,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 		
 		rsdt_mod->TableOffsetEntry[index-dropoffset]=rsdt->TableOffsetEntry[index];
 		
-		char tableSig[4];		
-		
-		strlcpy(tableSig, (char*)(rsdt->TableOffsetEntry[index]), sizeof(tableSig)+1);
+		char * tableSig = newStringWithLength((char*)(rsdt->TableOffsetEntry[index]), 4);
 		
 		DBG("** Processing %s,", tableSig );
 		
@@ -4492,7 +4494,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 			bool oem = false;
 			char oemOption[OEMOPT_SIZE];
 			sprintf(oemOption, "oem%s",tableSig );
-			if (getBoolForKey(oemOption, &oem, &bootInfo->bootConfig) && oem) // This method don't work for DSDT and FACS
+			if (getBoolForKey(oemOption, &oem, DEFAULT_BOOT_CONFIG) && oem) // This method don't work for DSDT and FACS
 			{ 
 				DBG("   %s required\n", oemOption);
 				
@@ -4502,7 +4504,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 				continue;
 			}
 		}
-			
+        
 		{
 			TagPtr match_drop = XMLGetProperty(DropTables_p, (const char*)tableSig);
 			if ( match_drop )
@@ -4527,7 +4529,8 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 				continue;
 			}
 		}			
-		//}
+		
+        free(tableSig);
 	}			
 	DBG("\n");
 	
@@ -4579,7 +4582,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 #else
 			update_rsdp_with_xsdt(rsdp_mod, xsdt_conv);
 #endif
-		
+            
 		}
 		
 	}	
@@ -4606,7 +4609,7 @@ EFI_STATUS setupAcpi(void)
 	ACPI_TABLE_FADT *fadt_file	 = (void *)0ul; // a Pointer to the (non-patched) fadt file 
 	ACPI_TABLE_FADT *FacpPointer = (void *)0ul; // a Pointer to the non-patched FACP table, it can be a file or the FACP table found in the RSDT/XSDT
 	ACPI_TABLE_RSDP *rsdp_mod	 = (void *)0ul, *rsdp_conv	= (void *)0ul;
-	    
+    
 	U32 rsdplength;
 	
 	bool update_acpi=false, gen_xsdt=false;
@@ -4615,7 +4618,7 @@ EFI_STATUS setupAcpi(void)
 	bool gen_ssdt=false; // will force to generate ssdt even if gen_csta and gen_psta = false
     bool gen_tsta=false;
 	bool oem_dsdt=false, oem_fadt=false;
-	
+	    		
 	// Find original rsdp        
 	if (!FindAcpiTables(&acpi_tables))
 	{
@@ -4633,22 +4636,22 @@ EFI_STATUS setupAcpi(void)
 		}
 		bool tmpval;
 		
-		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_fadt=getBoolForKey(kOEMFADT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-				
-		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		gen_ssdt=getBoolForKey(KForceSSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_fadt=getBoolForKey(kOEMFADT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+        
+		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		gen_ssdt=getBoolForKey(KForceSSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		
-		speed_step=getBoolForKey(kSpeedstep, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		turbo_enabled=(U32)getBoolForKey(kCoreTurbo, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		speed_step=getBoolForKey(kSpeedstep, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		turbo_enabled=(U32)getBoolForKey(kCoreTurbo, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 #if BUILD_ACPI_TSS 
-		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 #endif
-		checkOem=getBoolForKey(kOnlySignedAml, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		checkOem=getBoolForKey(kOnlySignedAml, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 	} 
-		
+    
 	{
 		char* name;
 		long flags;
@@ -4686,14 +4689,14 @@ EFI_STATUS setupAcpi(void)
                 } 
             }
         }
-
+        
 		if (acpidir_found == true)
 		{
 			if (checkOem == true)
 			{
 				MakeAcpiSgn();
 			}
-
+            
 			struct dirstuff* moduleDir = opendir(dirspec);
 			while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 			{		
@@ -4711,7 +4714,7 @@ EFI_STATUS setupAcpi(void)
 					{ 
 						continue;
 					}					
-															
+                    
 					DBG("* Attempting to load acpi table: %s\n", name);			
 					if ( (new_table_list[i]=(U32)loadACPITable(new_table_list,dirspec,name)))
 					{
@@ -4725,12 +4728,12 @@ EFI_STATUS setupAcpi(void)
 							break;
 						}						
 					} 					
-
+                    
 				}
 #if DEBUG_ACPI
 				else 
 				{
-
+                    
 					printf("Ignoring %s\n", name);
 				}
 #endif
@@ -4751,9 +4754,9 @@ EFI_STATUS setupAcpi(void)
 		
 	}			
 #if HARDCODED_DSDT
-  do {
+    do {
 #include "dsdt_PRLSACPI.h"
-
+        
         U8 index = 0;
         
         if ((get_new_table_in_list(new_table_list, NAMESEG("DSDT"), &new_table_index)) != (void*)0ul )
@@ -4765,7 +4768,7 @@ EFI_STATUS setupAcpi(void)
             U8 empty = get_0ul_index_in_list(new_table_list, false);
             if (empty != ACPI_TABLE_LIST_FULL_NON_RESERVED)
             {
-                   index = empty;             
+                index = empty;             
             } 
             else
             {
@@ -4800,7 +4803,7 @@ EFI_STATUS setupAcpi(void)
 		gen_psta= true;
 		gen_csta= true;
 	} 		
-	    
+    
 	
 	ACPI_TABLE_RSDP *rsdp=(ACPI_TABLE_RSDP *)acpi_tables.RsdPointer;
 	
@@ -4827,7 +4830,7 @@ EFI_STATUS setupAcpi(void)
 	rsdplength=(Revision == 2)?rsdp->Length:ACPI_RSDP_REV0_SIZE;
 	
 	DBG("RSDP Revision %d found @%x. Length=%d\n",Revision,rsdp,rsdplength);
-			
+    
 	if (gen_xsdt)
 	{
 		rsdp_mod=rsdp_conv;
@@ -4841,7 +4844,7 @@ EFI_STATUS setupAcpi(void)
 		memcpy(rsdp_mod, rsdp, rsdplength);
 	}	
 	
-		
+    
 	if ((fadt_file = (ACPI_TABLE_FADT *)get_new_table_in_list(new_table_list, NAMESEG("FACP"), &new_table_index)) != (void *)0ul)
 	{
 		
@@ -4878,7 +4881,7 @@ EFI_STATUS setupAcpi(void)
 	{
 		
 		fadt_mod = patch_fadt(FacpPointer, (oem_dsdt == false) ? new_dsdt : (void*)0ul , (acpi_tables.FacpPointer64 != (void *)0ul ));	
-						
+        
 		if (fadt_mod != (void*)0ul)
 		{
 			DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt):(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
@@ -4931,7 +4934,7 @@ EFI_STATUS setupAcpi(void)
 			}
 		}
 		
-		 
+        
 	} 
 	else 
 	{
@@ -4942,14 +4945,14 @@ EFI_STATUS setupAcpi(void)
 		(ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
 		
 		DsdtPtr = ((fadt_mod->Header.Revision >= 3) && (fadt_mod->XDsdt != 0)) ? (ACPI_TABLE_DSDT*)((U32)fadt_mod->XDsdt)
-																										:(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
+        :(ACPI_TABLE_DSDT*)fadt_mod->Dsdt;
 	}
-
+    
     {
         MADT_INFO madt_info;
         bool strip_madt = true;
         
-        getBoolForKey(kSTRIPAPIC, &strip_madt, &bootInfo->bootConfig);
+        getBoolForKey(kSTRIPAPIC, &strip_madt, DEFAULT_BOOT_CONFIG);
         
         if ((strip_madt == false) || (!buildMADT(new_table_list, DsdtPtr, &madt_info ))) 
         {
@@ -4960,7 +4963,7 @@ EFI_STATUS setupAcpi(void)
             
             {		
                 bool tmpval;		
-                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;		
+                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;		
             } 
             
             if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
@@ -4974,7 +4977,7 @@ EFI_STATUS setupAcpi(void)
                 MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
             
             ProcessMadtInfo(MadtPointer, &madt_info);        
-
+            
         }
         
         if (gen_ssdt || gen_csta || gen_psta || gen_tsta) 
@@ -4997,13 +5000,13 @@ EFI_STATUS setupAcpi(void)
 		printf("Error: Incorect ACPI RSD PTR or not found \n");
 		return EFI_UNSUPPORTED;
 	}
-
+    
 	if ((GetChecksum(rsdp_mod, sizeof(ACPI_TABLE_RSDP)) == 0) &&
 		(Revision == 2) &&
 		(rsdplength == sizeof(ACPI_TABLE_RSDP)))
 	{
 		process_xsdt(rsdp_mod, new_table_list);
-
+        
 	} 
 	else 
 	{
@@ -5012,7 +5015,7 @@ EFI_STATUS setupAcpi(void)
 		if ((rsdp_mod != (void *)0ul) && (rsdp_mod->Length >= ACPI_RSDP_REV0_SIZE) ) 
 		{			
 			process_rsdt(rsdp_mod, false, new_table_list);
-						
+            
 		} 
 		else 
 		{
@@ -5020,7 +5023,7 @@ EFI_STATUS setupAcpi(void)
 			return EFI_UNSUPPORTED;
 		}
 	}
-
+    
 out:
 	// Correct the checksum of RSDP      
 	
@@ -5042,20 +5045,8 @@ out:
 	
 	verbose("ACPI Revision %d successfully patched\n", Revision);
 	
-	if (Revision == 2)
-	{
-		rsd_p = ((U64)((U32)rsdp_mod));
-		if (rsd_p)
-			Status = addConfigurationTable(&gEfiAcpi20TableGuid, &rsd_p, "ACPI_20");
-	}
-	else
-	{
-		rsd_p = ((U64)((U32)rsdp_mod));
-		if (rsd_p)
-			Status = addConfigurationTable(&gEfiAcpiTableGuid, &rsd_p, "ACPI");		
-
-	}
-	
+	Status = Register_Acpi_Efi(rsdp_mod, Revision);
+    
 #if DEBUG_ACPI==2
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
 	getc();

@@ -61,5 +61,13 @@ struct aml_chunk* aml_add_package_with_value(struct aml_chunk* parent, uint64_t 
 void   aml_add_multiple_value(struct aml_chunk* parent, uint64_t *lst, int num);
 void   aml_add_ressource_t_fxhw(struct aml_chunk* parent, uint64_t *lst);
 void   aml_add_value(struct aml_chunk* parent, uint64_t val);
-
+unsigned int aml_fill_simple_name(char* buffer, const char* name);
+unsigned int aml_fill_name(struct aml_chunk* node, const char* name);
+unsigned char aml_get_size_length(unsigned int size);
+unsigned int aml_write_byte(unsigned char value, char* buffer, unsigned int offset);
+unsigned int aml_write_word(unsigned int value, char* buffer, unsigned int offset);
+unsigned int aml_write_dword(unsigned long value, char* buffer, unsigned int offset);
+unsigned int aml_write_qword(unsigned long long value, char* buffer, unsigned int offset);
+unsigned int aml_write_buffer(const char* value, unsigned int size, char* buffer, unsigned int offset);
+unsigned int aml_write_size(unsigned int size, char* buffer, unsigned int offset);
 #endif /* !__LIBSAIO_AML_GENERATOR_H */

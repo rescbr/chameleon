@@ -46,7 +46,7 @@
 
 #include "libsaio.h"
 #include "bootstruct.h"
-#include "modules.h"
+#include "platform.h"
 
 //extern int	vprf(const char * fmt, va_list ap);
 
@@ -80,8 +80,27 @@ void initBooterLog(void)
 {
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
-	cursor = msgbuf;
+	cursor = msgbuf;    
+
 }
+
+char *getConsoleMsg(void)
+{
+    return msgbuf;
+}
+char *getConsoleCursor(void)
+{
+    return cursor;
+}
+void setConsoleMsg(char *p)
+{
+    msgbuf = p;
+}
+void setConsoleCursor(char *p)
+{
+    cursor = p;
+}
+
 
 void msglog(const char * fmt, ...)
 {
@@ -105,8 +124,8 @@ void msglog(const char * fmt, ...)
 void setupBooterLog(void)
 {
 	if (!msgbuf)
-		return;
-	
+		return;	
+    
 	Node *node = DT__FindNode("/", false);
 	if (node)
 		DT__AddProperty(node, "boot-log", strlen((char *)msgbuf) + 1, msgbuf);
@@ -179,7 +198,8 @@ int printf(const char * fmt, ...)
 		cursor +=  strlen((char *)cursor);
 	}
 	
-	va_end(ap);
+	va_end(ap);    
+    
     return 0;
 }
 
@@ -208,7 +228,8 @@ int verbose(const char * fmt, ...)
 		cursor +=  strlen((char *)cursor);
 	}
 	
-    va_end(ap);
+    va_end(ap);    
+    
     return(0);
 }
 
@@ -240,7 +261,7 @@ void stop(const char * fmt, ...)
 }
 
 /** Print a "Press a key to continue..." message and wait for a key press. */
-void pause() 
+void pause(void) 
 {
     printf("Press a key to continue...");
     getc();

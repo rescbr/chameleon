@@ -225,5 +225,13 @@ void close_vbios (vbios_map*);
 void unlock_vbios(vbios_map*);
 void relock_vbios(vbios_map*);
 void set_mode(vbios_map*, UInt32, UInt32, UInt32, UInt32, UInt32);
+int getMode(edid_mode *mode);
+char detect_ati_bios_type(vbios_map * map);
+char detect_bios_type(vbios_map * map, char modeline, int entry_size);
+vbios_resolution_type3 * map_type3_resolution(vbios_map * map, UInt16 res);
+vbios_resolution_type2 * map_type2_resolution(vbios_map * map, UInt16 res);
+vbios_resolution_type1 * map_type1_resolution(vbios_map * map, UInt16 res);
+chipset_type get_chipset(UInt32 id);
+UInt32 get_chipset_id(void);
 
 #endif //__RESOLUTION_H

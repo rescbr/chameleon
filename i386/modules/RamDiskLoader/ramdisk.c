@@ -4,12 +4,14 @@
  *
  */
 
-#include "boot.h"
+#include "libsaio.h"
 #include "bootstruct.h"
 #include "multiboot.h"
 #include "ramdisk.h"
 
 struct multiboot_info * gRAMDiskMI = NULL;
+
+config_file_t    ramdiskConfig;		               
 
 // gRAMDiskVolume holds the bvr for the mounted ramdisk image.
 BVRef gRAMDiskVolume = NULL;
@@ -39,7 +41,7 @@ void md0Ramdisk()
 	int len;
 	
 	if(getValueForKey(kMD0Image, &override_filename, &len,  
-				   &bootInfo->bootConfig))
+				   DEFAULT_BOOT_CONFIG))
 	{
 		// Use user specified md0 file
 		sprintf(filename, "%s", override_filename);
@@ -124,7 +126,7 @@ void md0Ramdisk()
 	}
 }
 
-void umountRAMDisk()
+void umountRAMDisk(void)
 {
 	if (gRAMDiskMI != NULL)
 	{
@@ -221,9 +223,9 @@ int mountRAMDisk(const char * param)
 				// Reading ramdisk configuration.
 				strcpy(dirSpec, RAMDISKCONFIG_FILENAME);
 
-				if (loadConfigFile(dirSpec, &bootInfo->ramdiskConfig) == 0)
+				if (loadConfigFile(dirSpec, &ramdiskConfig) == 0)
 				{
-					getBoolForKey("BTAlias", &gRAMDiskBTAliased, &bootInfo->ramdiskConfig);
+					getBoolForKey("BTAlias", &gRAMDiskBTAliased, &ramdiskConfig);
 				}
 				else
 				{
@@ -264,7 +266,7 @@ void showInfoRAMDisk(void)
 		printf("\nalias: %s", gRAMDiskBTAliased ? "enabled" : "disabled");
 
 		// Display ramdisk information if available.
-		if (getValueForKey("Info", &val, &len, &bootInfo->ramdiskConfig))
+		if (getValueForKey("Info", &val, &len, &ramdiskConfig))
 		{
 			printf("\ninfo: %s", val);
 		}
@@ -279,7 +281,7 @@ void showInfoRAMDisk(void)
 	}
 }
 
-int loadPrebootRAMDisk()
+int loadPrebootRAMDisk(void)
 {
 	mountRAMDisk("bt(0,0)/Extra/Preboot.dmg");
 	if (gRAMDiskMI != NULL)

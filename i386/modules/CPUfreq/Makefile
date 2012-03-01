@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-CPUfreq_OBJS = CPUfreq.o
+CPUfreq_OBJS = CPUfreq.o stack_protector.o
 
 
 SFILES =
@@ -71,10 +71,12 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/CPUfreq.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/stack_protector.o $(OBJROOT)/CPUfreq.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
-
-
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 CPUfreq.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "CPUfreq.c" $(INC) -o "$(OBJROOT)/CPUfreq.o"
 

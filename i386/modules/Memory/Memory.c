@@ -11,7 +11,6 @@
 #include "dram_controllers.h"
 #include "spd.h"
 #include "mem.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "modules.h"
 
@@ -23,15 +22,17 @@ pci_dt_t * smbus_controller_dev = NULL;
 
 void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void is_Memory_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 void is_Memory_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
 
-void Memory_start()
+void Memory_start(void);
+void Memory_start(void)
 {
 	
 	bool enable = true;
 	
-	getBoolForKey(kEnableMemory, &enable, &bootInfo->bootConfig);
+	getBoolForKey(kEnableMemory, &enable, DEFAULT_BOOT_CONFIG);
 
     if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086) 
 		enable = false;

@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SMBiosPatcher_OBJS = SMBiosPatcher.o smbios_patcher.o
+SMBiosPatcher_OBJS = SMBiosPatcher.o smbios_patcher.o stack_protector.o
 
 
 SFILES =
@@ -71,11 +71,16 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/SMBiosPatcher.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/SMBiosPatcher.o \
 	$(OBJROOT)/smbios_patcher.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 SMBiosPatcher.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "SMBiosPatcher.c" $(INC) -o "$(OBJROOT)/SMBiosPatcher.o"

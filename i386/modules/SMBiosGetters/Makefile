@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SMBiosGetters_OBJS = SMBiosGetters.o mysmbios.o smbios_decode.o smbios_getters.o
+SMBiosGetters_OBJS = SMBiosGetters.o mysmbios.o smbios_decode.o smbios_getters.o stack_protector.o
 
 
 SFILES =
@@ -70,7 +70,8 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/SMBiosGetters.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/SMBiosGetters.o \
 	$(OBJROOT)/mysmbios.o \
 	$(OBJROOT)/smbios_getters.o \
 	$(OBJROOT)/smbios_decode.o \
@@ -78,6 +79,10 @@ dylib:
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 SMBiosGetters.o: 	
 	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "SMBiosGetters.c" $(INC) -o "$(OBJROOT)/SMBiosGetters.o"

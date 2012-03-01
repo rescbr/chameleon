@@ -18,7 +18,7 @@
 
 #include "libsaio.h"
 
-void scan_dram_controller();
+void scan_dram_controller(pci_dt_t *dram_dev);
 
 struct mem_controller_t {
 	uint16_t vendor;

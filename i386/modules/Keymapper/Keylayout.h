@@ -26,6 +26,6 @@ struct keyboard_layout
 	uint16_t keyboard_map_shift_alt[KEYBOARD_MAP_SIZE];
 };
 
-extern uint32_t Keylayout_real_start();
+extern uint32_t Keylayout_real_start(void);
 
 #endif

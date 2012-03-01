@@ -49,7 +49,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -977,7 +976,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							//printf("group channel 1\n");
 							channel1 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
-							if((entries[i-1].type == 0x0)) {
+							if(entries[i-1].type == 0x0) {
 								channel1 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
 							}
@@ -992,7 +991,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							//printf("group channel 2 : %d\n", i);
 							channel2 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
-							if((entries[i-1].type == 0x0)) {
+							if(entries[i-1].type == 0x0) {
 								channel2 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
 							}
@@ -1166,6 +1165,13 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 	return vram_size;
 }
 
+typedef struct _dcfg_t {
+    uint8_t val0;
+    uint8_t val1;
+    uint8_t val2;
+    uint8_t val3;
+} dcfg_t;
+
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
 	struct DevPropDevice		*device;
@@ -1187,13 +1193,17 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	char				*model;
 	const char			*value;
 	bool				doit;
+    
+	static const dcfg_t default_dcfg [] = {
+		{0xff,0xff,0xff,0xff},
+	};
+#define DCFG_LEN sizeof(default_dcfg)
+    
+	dcfg_t default_dcfg_0;
+	dcfg_t default_dcfg_1;
+	bool dcfg0_set = false;
+	bool dcfg1_set = false;
 
-    uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
-    uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
-    
-#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
-#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
-    
 	devicepath = get_pci_dev_path(nvda_dev);
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
@@ -1216,7 +1226,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
-	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->bootConfig) && doit) {
+	if (getBoolForKey(kUseNvidiaROM, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
 		if (nvBiosOveride > 0) {
@@ -1272,6 +1282,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		printf("ERROR: nVidia ROM Patching Failed!\n");
 		return false;
 	}
+	DBG("nvidia rom successfully patched\n");
 
 	rom_pci_header = (struct pci_rom_pci_header_t*)(rom + *(uint16_t *)&rom[24]);
 
@@ -1284,6 +1295,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
 		}
 	}
+	DBG("nvidia model : %s\n",model);
+
 
 	if (!string) {
 		string = devprop_create_string();
@@ -1334,7 +1347,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
 
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
-	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->bootConfig) && len == NVCAP_LEN * 2) {
+	if (getValueForKey(kNVCAP, &value, &len, DEFAULT_BOOT_CONFIG) && len == NVCAP_LEN * 2) {
 		uint8_t	new_NVCAP[NVCAP_LEN];
  
 		if (hex2bin(value, new_NVCAP, NVCAP_LEN) == 0) {
@@ -1343,30 +1356,33 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
     
-    if (getValueForKey(kDcfg0, &value, &len, &bootInfo->bootConfig) && len == DCFG0_LEN * 2)
-	{
-		uint8_t new_dcfg0[DCFG0_LEN];
-		
-		if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0)
-		{
-			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
-			
+    if (getValueForKey(kDcfg0, &value, &len, DEFAULT_BOOT_CONFIG) && len == DCFG_LEN * 2)
+	{		
+		if (hex2bin(value, (uint8_t*)&default_dcfg_0, DCFG_LEN) == 0)
+		{			
+			dcfg0_set = true;
 			verbose("@0,display-cfg: %02x%02x%02x%02x\n",
-				   default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3]);
+				   default_dcfg_0.val0, default_dcfg_0.val1, default_dcfg_0.val2, default_dcfg_0.val3);
 		}
 	}
 	
-	if (getValueForKey(kDcfg1, &value, &len, &bootInfo->bootConfig) && len == DCFG1_LEN * 2)
-	{
-		uint8_t new_dcfg1[DCFG1_LEN];
-		
-		if (hex2bin(value, new_dcfg1, DCFG1_LEN) == 0)
-		{
-			memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
-			
+	if (getValueForKey(kDcfg1, &value, &len, DEFAULT_BOOT_CONFIG) && len == DCFG_LEN * 2)
+	{		
+		if (hex2bin(value, (uint8_t*)&default_dcfg_1, DCFG_LEN) == 0)
+		{			
+			dcfg1_set = true;
 			verbose("@1,display-cfg: %02x%02x%02x%02x\n",
-				   default_dcfg_1[0], default_dcfg_1[1], default_dcfg_1[2], default_dcfg_1[3]);
+				   default_dcfg_1.val0, default_dcfg_1.val1, default_dcfg_1.val2, default_dcfg_1.val3);
 		}
+	}
+	
+	if (dcfg0_set == false)
+	{
+		memcpy(&default_dcfg_0, default_dcfg,DCFG_LEN );
+	}
+	if (dcfg1_set == false)
+	{
+		memcpy(&default_dcfg_1, default_dcfg,DCFG_LEN );
 	}
 
  #if DEBUG_NVCAP
@@ -1377,16 +1393,15 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		default_NVCAP[12], default_NVCAP[13], default_NVCAP[14], default_NVCAP[15],
 		default_NVCAP[16], default_NVCAP[17], default_NVCAP[18], default_NVCAP[19]);
 #endif
- 
 	
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
-    devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
-	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
-	if (getBoolForKey(kVBIOS, &doit, &bootInfo->bootConfig) && doit) {
+    devprop_add_value(device, "@0,display-cfg", (uint8_t*)&default_dcfg_0, DCFG_LEN);
+	devprop_add_value(device, "@1,display-cfg", (uint8_t*)&default_dcfg_1, DCFG_LEN);
+	if (getBoolForKey(kVBIOS, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
 

@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-ACPI_PATCHER_OBJS = AcpiPatcher.o aml_generator.o  acpi_patcher.o 
+ACPI_PATCHER_OBJS = AcpiPatcher.o aml_generator.o  acpi_patcher.o stack_protector.o
 
 
 SFILES =
@@ -71,7 +71,8 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/AcpiPatcher.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/AcpiPatcher.o \
 	$(OBJROOT)/aml_generator.o \
 	$(OBJROOT)/acpi_patcher.o \
     -o $(SYMROOT)/$(MODULE_NAME).dylib
@@ -85,6 +86,10 @@ aml_generator.o:
 acpi_patcher.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "acpi_patcher.c" $(INC) -o "$(OBJROOT)/acpi_patcher.o"
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 include ../../MakeInc.dir
 

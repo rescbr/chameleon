@@ -39,7 +39,7 @@
 #endif
 #define LEGACY_CPU INTEL_SUPPORT
 #endif
-// (?) : if AMD_SUPPORT then LEGACY_CPU = 1, INTEL_SUPPORT = disabled
+// (?) : if AMD_SUPPORT then (LEGACY_CPU = 1 && INTEL_SUPPORT = disabled)
 //		   else LEGACY_CPU = INTEL_SUPPORT
 
 
@@ -420,19 +420,52 @@ static uint32_t compute_bclk(void)
  * - cpuFrequency = fsbFrequency * multi
  */
 
-void scan_cpu(PlatformInfo_t *p)
-{
-	uint64_t	tscFrequency = 0, fsbFrequency = 0, cpuFrequency = 0;
-	uint64_t	msr;
-	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
-    uint32_t	reg[4];
-    uint32_t        cores_per_package = 0;
-    uint32_t        logical_per_package = 0;    
+void scan_cpu(void)
+{	
+	uint64_t	msr = 0;        
     
-	do_cpuid(0, reg);
-    p->CPU.Vendor		= reg[ebx];
-    p->CPU.cpuid_max_basic     = reg[eax];
+    
+    uint64_t	Features = 0;		// CPU Features like MMX, SSE2, VT ...
+	uint64_t	ExtFeatures = 0;    // CPU Extended Features like SYSCALL, XD, EM64T, LAHF ...
+    uint64_t	TSCFreq = 0 ;
+    uint64_t    FSBFreq = 0 ;    
+    uint64_t    CPUFreq = 0;
+    
+    uint32_t	reg[4];
+    uint32_t    cores_per_package = 0;
+    uint32_t    logical_per_package = 0;
+    
+    uint32_t	Vendor = 0;			// Vendor
+	uint32_t	Signature = 0;		// Signature
+	uint8_t     Stepping = 0;		// Stepping
+	uint8_t     Model = 0;			// Model
+	uint8_t     ExtModel = 0;		// Extended Model
+	uint8_t     Family = 0;			// Family
+	uint8_t     ExtFamily = 0;		// Extended Family
+	uint32_t	NoCores = 0;		// No Cores per Package
+	uint32_t	NoThreads = 0;		// Threads per Package
+	uint8_t     Brand = 0; 
+	uint32_t	MicrocodeVersion = 0;   // The microcode version number a.k.a. signature a.k.a. BIOS ID 
+    
+	uint8_t     isMobile = 0;        
 	
+	boolean_t	dynamic_acceleration = 0;
+	boolean_t	invariant_APIC_timer = 0;
+	boolean_t	fine_grain_clock_mod = 0;
+	
+	uint32_t    cpuid_max_basic = 0;
+	uint32_t    cpuid_max_ext = 0;
+	uint32_t	sub_Cstates = 0;
+	uint32_t    extensions = 0;    
+    
+	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
+    char		CpuBrandString[48];	// 48 Byte Branding String
+    
+	
+	do_cpuid(0, reg);
+	Vendor = reg[ebx];
+	cpuid_max_basic = reg[eax];
+    
 #ifndef AMD_SUPPORT
     do_cpuid2(0x00000004, 0, reg);
     cores_per_package		= bitfield(reg[eax], 31, 26) + 1;
@@ -440,12 +473,12 @@ void scan_cpu(PlatformInfo_t *p)
 	
     /* get extended cpuid results */
 	do_cpuid(0x80000000, reg);
-	p->CPU.cpuid_max_ext = reg[eax];    
+	cpuid_max_ext = reg[eax];
     
 	/* Begin of Copyright: from Apple's XNU cpuid.c */
 	
 	/* get brand string (if supported) */
-	if (p->CPU.cpuid_max_ext > 0x80000004)
+	if (cpuid_max_ext > 0x80000004)
 	{		
         char        str[128], *s;
 		/*
@@ -463,15 +496,15 @@ void scan_cpu(PlatformInfo_t *p)
 			if (*s != ' ') break;
 		}
 		
-		strlcpy(p->CPU.BrandString,	s, sizeof(p->CPU.BrandString));
+		strlcpy(CpuBrandString,	s, sizeof(CpuBrandString));
 		
-		if (!strncmp(p->CPU.BrandString, CPUID_STRING_UNKNOWN, min(sizeof(p->CPU.BrandString), (unsigned)strlen(CPUID_STRING_UNKNOWN) + 1)))
+		if (!strncmp(CpuBrandString, CPUID_STRING_UNKNOWN, min(sizeof(CpuBrandString), (unsigned)strlen(CPUID_STRING_UNKNOWN) + 1)))
 		{
             /*
              * This string means we have a firmware-programmable brand string,
              * and the firmware couldn't figure out what sort of CPU we have.
              */
-            p->CPU.BrandString[0] = '\0';
+            CpuBrandString[0] = '\0';
         }
 	}  
 	
@@ -483,63 +516,63 @@ void scan_cpu(PlatformInfo_t *p)
 #ifndef AMD_SUPPORT
 	wrmsr64(MSR_IA32_BIOS_SIGN_ID, 0);
 	do_cpuid(1, reg);
-    p->CPU.MicrocodeVersion =
-    (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);	
+	MicrocodeVersion =  (uint32_t) (rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);    
 #else
 	do_cpuid(1, reg);
 #endif	
-	p->CPU.Signature        = reg[eax];
-	p->CPU.Stepping         = bitfield(reg[eax],  3,  0);
-	p->CPU.Model            = bitfield(reg[eax],  7,  4);
-	p->CPU.Family           = bitfield(reg[eax], 11,  8);
-	p->CPU.ExtModel         = bitfield(reg[eax], 19, 16);
-	p->CPU.ExtFamily        = bitfield(reg[eax], 27, 20);
-	p->CPU.Brand            = bitfield(reg[ebx],  7,  0);
-	p->CPU.Features         = quad(reg[ecx], reg[edx]);
-    		
-    /* Fold extensions into family/model */
-	if (p->CPU.Family == 0x0f)
-		p->CPU.Family += p->CPU.ExtFamily;
-	if (p->CPU.Family == 0x0f || p->CPU.Family == 0x06)
-		p->CPU.Model += (p->CPU.ExtModel << 4);
+	Signature        = reg[eax];
+	Stepping         = bitfield(reg[eax],  3,  0);
+	Model            = bitfield(reg[eax],  7,  4);
+	Family           = bitfield(reg[eax], 11,  8);
+	ExtModel         = bitfield(reg[eax], 19, 16);
+	ExtFamily        = bitfield(reg[eax], 27, 20);
+	Brand            = bitfield(reg[ebx],  7,  0);
+	Features         = quad(reg[ecx], reg[edx]);
     
-    if (p->CPU.Features & CPUID_FEATURE_HTT)
+    /* Fold extensions into family/model */
+	if (Family == 0x0f)
+		Family += ExtFamily;
+	if (Family == 0x0f || Family == 0x06)
+		Model += (ExtModel << 4);
+    
+    if (Features & CPUID_FEATURE_HTT)
 		logical_per_package =
         bitfield(reg[ebx], 23, 16);
 	else
-		logical_per_package = 1;
+		logical_per_package = 1;	    
 	
-	if (p->CPU.cpuid_max_ext >= 0x80000001)
+	
+	if (cpuid_max_ext >= 0x80000001)
 	{
 		do_cpuid(0x80000001, reg);
-		p->CPU.ExtFeatures =
+		ExtFeatures =
         quad(reg[ecx], reg[edx]);
 		
 	}
 	
-	if (p->CPU.cpuid_max_ext >= 0x80000007)
+	if (cpuid_max_ext >= 0x80000007)
 	{
 		do_cpuid(0x80000007, reg);  
 		
 		/* Fold in the Invariant TSC feature bit, if present */
-		p->CPU.ExtFeatures |=
+		ExtFeatures |=
         reg[edx] & (uint32_t)CPUID_EXTFEATURE_TSCI;
 		
 #ifdef AMD_SUPPORT
 		/* Fold in the Hardware P-State control feature bit, if present */
-		p->CPU.ExtFeatures |=
+		ExtFeatures |=
         reg[edx] & (uint32_t)_Bit(7);
 		
 		/* Fold in the read-only effective frequency interface feature bit, if present */
-		p->CPU.ExtFeatures |=
+		ExtFeatures |=
         reg[edx] & (uint32_t)_Bit(10);
 #endif
 	}    
 	
 #ifdef AMD_SUPPORT
-	if (p->CPU.cpuid_max_ext >= 0x80000008)
+	if (cpuid_max_ext >= 0x80000008)
 	{
-		if (p->CPU.Features & CPUID_FEATURE_HTT) 
+		if (Features & CPUID_FEATURE_HTT) 
 		{
 			do_cpuid(0x80000008, reg);
 			cores_per_package		= bitfield(reg[ecx], 7 , 0) + 1; // NC + 1
@@ -547,37 +580,37 @@ void scan_cpu(PlatformInfo_t *p)
 	}		
 #endif
 	
-    if (p->CPU.cpuid_max_basic >= 0x5) {        
+    if (cpuid_max_basic >= 0x5) {        
 		/*
 		 * Extract the Monitor/Mwait Leaf info:
 		 */
 		do_cpuid(5, reg);
 #ifndef AMD_SUPPORT
-        p->CPU.sub_Cstates  = reg[edx];
+        sub_Cstates  = reg[edx];
 #endif
-        p->CPU.extensions   = reg[ecx];	
+        extensions   = reg[ecx];	
 	}
 	
 #ifndef AMD_SUPPORT    
-    if (p->CPU.cpuid_max_basic >= 0x6)
+    if (cpuid_max_basic >= 0x6)
     {        
 		/*
 		 * The thermal and Power Leaf:
 		 */
 		do_cpuid(6, reg);
-		p->CPU.dynamic_acceleration = bitfield(reg[eax], 1, 1); // "Dynamic Acceleration Technology (Turbo Mode)"
-		p->CPU.invariant_APIC_timer = bitfield(reg[eax], 2, 2); //  "Invariant APIC Timer"
-        p->CPU.fine_grain_clock_mod = bitfield(reg[eax], 4, 4);
+		dynamic_acceleration = bitfield(reg[eax], 1, 1); // "Dynamic Acceleration Technology (Turbo Mode)"
+		invariant_APIC_timer = bitfield(reg[eax], 2, 2); //  "Invariant APIC Timer"
+        fine_grain_clock_mod = bitfield(reg[eax], 4, 4);
 	}
 	
-    if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
-		(p->CPU.Family == 0x06))
+    if ((Vendor == CPUID_VENDOR_INTEL) && 
+		(Family == 0x06))
 	{
 		/*
 		 * Find the number of enabled cores and threads
 		 * (which determines whether SMT/Hyperthreading is active).
 		 */
-		switch (p->CPU.Model)
+		switch (Model)
 		{
 				
 			case CPUID_MODEL_DALES_32NM:
@@ -585,8 +618,8 @@ void scan_cpu(PlatformInfo_t *p)
 			case CPUID_MODEL_WESTMERE_EX:
 			{
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-				p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
-				p->CPU.NoCores   = bitfield((uint32_t)msr, 19, 16);            
+				NoThreads = bitfield((uint32_t)msr, 15,  0);
+				NoCores   = bitfield((uint32_t)msr, 19, 16);            
 				break;
 			}
 				
@@ -598,47 +631,47 @@ void scan_cpu(PlatformInfo_t *p)
 			case CPUID_MODEL_JAKETOWN:
 			{
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-				p->CPU.NoThreads = bitfield((uint32_t)msr, 15,  0);
-				p->CPU.NoCores   = bitfield((uint32_t)msr, 31, 16);            
+				NoThreads = bitfield((uint32_t)msr, 15,  0);
+				NoCores   = bitfield((uint32_t)msr, 31, 16);            
 				break;
 			}        
 		}
     }
 #endif
-    if (p->CPU.NoCores == 0)
+    if (NoCores == 0)
 	{
 #ifdef AMD_SUPPORT		
 		if (!cores_per_package) {
 			//legacy method
-			if ((p->CPU.ExtFeatures & _HBit(1)/* CmpLegacy */) && ( p->CPU.Features & CPUID_FEATURE_HTT) )
+			if ((ExtFeatures & _HBit(1)/* CmpLegacy */) && ( Features & CPUID_FEATURE_HTT) )
 				cores_per_package = logical_per_package; 
 			else 
 				cores_per_package = 1;
 		}		
 #endif
-		p->CPU.NoThreads    = logical_per_package;
-		p->CPU.NoCores      = cores_per_package ? cores_per_package : 1 ;
+		NoThreads    = logical_per_package;
+		NoCores      = cores_per_package ? cores_per_package : 1 ;
 	}
 	
 	/* End of Copyright: from Apple's XNU cpuid.c */
     
-	fsbFrequency = (uint64_t)(compute_bclk() * 1000000);
-
+	FSBFreq = (uint64_t)(compute_bclk() * 1000000);
+    
 #if LEGACY_CPU
-	tscFrequency = measure_tsc_frequency();
+	TSCFreq = measure_tsc_frequency();
 #endif	
 	
 #ifdef AMD_SUPPORT
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
-	if (p->CPU.ExtFeatures & _Bit(10))
+	if (ExtFeatures & _Bit(10))
 	{		
-		cpuFrequency = measure_aperf_frequency();
+		CPUFreq = measure_aperf_frequency();
 	}
 	
-    if ((p->CPU.Vendor == 0x68747541 /* AMD */) && (p->CPU.Family == 0x0f))
+    if ((Vendor == CPUID_VENDOR_AMD) && (Family == 0x0f))
 	{
-		switch(p->CPU.ExtFamily)
+		switch(ExtFamily)
 		{
 			case 0x00: /* K8 */
 				msr = rdmsr64(K8_FIDVID_STATUS);
@@ -651,14 +684,14 @@ void scan_cpu(PlatformInfo_t *p)
                 //uint32_t reg[4];
 				msr = rdmsr64(K10_COFVID_STATUS);
 				/*
-				do_cpuid2(0x00000006, 0, reg);
+                 do_cpuid2(0x00000006, 0, reg);
 				 EffFreq: effective frequency interface
-				if (bitfield(reg[ecx], 0, 0) == 1)
-				{
-					uint64_t aperf = measure_aperf_frequency();
-					cpuFrequency = aperf;
-				}
-				*/				 
+                 if (bitfield(reg[ecx], 0, 0) == 1)
+                 {
+                 uint64_t aperf = measure_aperf_frequency();
+                 CPUFreq = aperf;
+                 }
+                 */				 
 				// NOTE: tsc runs at the maccoeff (non turbo)
 				//			*not* at the turbo frequency.
 				maxcoef	 = bitfield(msr, 54, 49) / 2 + 4;
@@ -681,24 +714,24 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 		}
 		
-		if (!fsbFrequency)
+		if (!FSBFreq)
 		{
 			if (maxcoef)
 			{
 				if (currdiv)
 				{
 					if (!currcoef) currcoef = maxcoef;
-					if (!cpuFrequency)
-						fsbFrequency = ((tscFrequency * currdiv) / currcoef);
+					if (!CPUFreq)
+						FSBFreq = ((TSCFreq * currdiv) / currcoef);
 					else
-						fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
+						FSBFreq = ((CPUFreq * currdiv) / currcoef);
 					
 					DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 				} else {
-					if (!cpuFrequency)
-						fsbFrequency = (tscFrequency / maxcoef);
+					if (!CPUFreq)
+						FSBFreq = (TSCFreq / maxcoef);
 					else 
-						fsbFrequency = (cpuFrequency / maxcoef);
+						FSBFreq = (CPUFreq / maxcoef);
 					DBG("%d\n", currcoef);
 				}
 			}
@@ -706,10 +739,10 @@ void scan_cpu(PlatformInfo_t *p)
 			{
 				if (currdiv)
 				{
-					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
+					FSBFreq = ((TSCFreq * currdiv) / currcoef);
 					DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 				} else {
-					fsbFrequency = (tscFrequency / currcoef);
+					FSBFreq = (TSCFreq / currcoef);
 					DBG("%d\n", currcoef);
 				}
 			}
@@ -719,32 +752,32 @@ void scan_cpu(PlatformInfo_t *p)
 	
 	// NOTE: This is not the approved method,
 	// the method provided by AMD is: 
-	// if ((PowerNow == enabled (p->CPU.cpuid_max_ext >= 0x80000007)) && (StartupFID(??) != MaxFID(??))) then "mobile processor present"
+	// if ((PowerNow == enabled (p->cpu->cpuid_max_ext >= 0x80000007)) && (StartupFID(??) != MaxFID(??))) then "mobile processor present"
 	
-	if (strstr(p->CPU.BrandString, "obile")) 
-		p->CPU.isMobile = true;
+	if (strstr(CpuBrandString, "obile")) 
+		isMobile = 1;
 	else 
-		p->CPU.isMobile = false;
+		isMobile = 0;
 	
-	DBG("%s platform detected.\n", p->CPU.isMobile?"Mobile":"Desktop");
+	DBG("%s platform detected.\n", isMobile?"Mobile":"Desktop");
 #else
-    if ((p->CPU.Vendor == 0x756E6547 /* Intel */) && 
-		((p->CPU.Family == 0x06) || 
-		 (p->CPU.Family == 0x0f)))
+    if ((Vendor == CPUID_VENDOR_INTEL) && 
+		((Family == 0x06) || 
+		 (Family == 0x0f)))
 	{
-		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || 
-			(p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))
+		if ((Family == 0x06 && Model >= 0x0c) || 
+			(Family == 0x0f && Model >= 0x03))
 		{
 			/* Nehalem CPU model */
-			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPUID_MODEL_NEHALEM || 
-                                          p->CPU.Model == CPUID_MODEL_FIELDS || 
-                                          p->CPU.Model == CPUID_MODEL_DALES || 
-                                          p->CPU.Model == CPUID_MODEL_DALES_32NM || 
-                                          p->CPU.Model == CPUID_MODEL_WESTMERE ||
-                                          p->CPU.Model == CPUID_MODEL_NEHALEM_EX ||
-                                          p->CPU.Model == CPUID_MODEL_WESTMERE_EX ||
-                                          p->CPU.Model == CPUID_MODEL_SANDYBRIDGE ||
-                                          p->CPU.Model == CPUID_MODEL_JAKETOWN)) 
+			if (Family == 0x06 && (Model == CPUID_MODEL_NEHALEM || 
+                                   Model == CPUID_MODEL_FIELDS || 
+                                   Model == CPUID_MODEL_DALES || 
+                                   Model == CPUID_MODEL_DALES_32NM || 
+                                   Model == CPUID_MODEL_WESTMERE ||
+                                   Model == CPUID_MODEL_NEHALEM_EX ||
+                                   Model == CPUID_MODEL_WESTMERE_EX ||
+                                   Model == CPUID_MODEL_SANDYBRIDGE ||
+                                   Model == CPUID_MODEL_JAKETOWN)) 
 			{
 				uint8_t		bus_ratio_max = 0, bus_ratio_min = 0;
 				uint32_t	max_ratio = 0;
@@ -791,30 +824,30 @@ void scan_cpu(PlatformInfo_t *p)
 #if LEGACY_CPU
 				if (bus_ratio_max)
 				{
-					fsbFrequency = (tscFrequency / bus_ratio_max);
+					FSBFreq = (TSCFreq / bus_ratio_max);
 				}
 #endif
 				//valv: Turbo Ratio Limit
-				if ((p->CPU.Model != 0x2e) && (p->CPU.Model != 0x2f))
+				if ((Model != 0x2e) && (Model != 0x2f))
 				{
 					//msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
-					cpuFrequency = bus_ratio_max * fsbFrequency;
+					CPUFreq = bus_ratio_max * FSBFreq;
 					max_ratio = bus_ratio_max * 10;
 				}
 				else
 				{
 #if LEGACY_CPU
-					cpuFrequency = tscFrequency;
+					CPUFreq = TSCFreq;
 #else
-					cpuFrequency = bus_ratio_max * fsbFrequency;
+					CPUFreq = bus_ratio_max * FSBFreq;
 #endif
 				}								
 #if DEBUG_CPU
-				DBG("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", fsbFrequency / 1000000, max_ratio);
+				DBG("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", FSBFreq / 1000000, max_ratio);
 #endif
 				currcoef = bus_ratio_max;
                 
-                tscFrequency = cpuFrequency;
+                TSCFreq = CPUFreq;
 			} 
 			else
 			{
@@ -828,8 +861,8 @@ void scan_cpu(PlatformInfo_t *p)
 				/* Non-integer bus ratio for the current-multi (undocumented)*/
 				currdiv = (msr >> 14) & 0x01;
                 
-				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || 
-					(p->CPU.Family == 0x0f)) // This will always be model >= 3
+				if ((Family == 0x06 && Model >= 0x0e) || 
+					(Family == 0x0f)) // This will always be model >= 3
 				{
 					/* On these models, maxcoef defines TSC freq */
 					maxcoef = (msr >> 40) & 0x1f;
@@ -847,20 +880,20 @@ void scan_cpu(PlatformInfo_t *p)
 					
 					if (maxdiv)
 					{
-						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+						FSBFreq = ((TSCFreq * 2) / ((maxcoef * 2) + 1));
 					}
 					else 
 					{
-						fsbFrequency = (tscFrequency / maxcoef);
+						FSBFreq = (TSCFreq / maxcoef);
 					}
 					
 					if (currdiv) 
 					{
-						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+						CPUFreq = (FSBFreq * ((currcoef * 2) + 1) / 2);
 					}
 					else 
 					{
-						cpuFrequency = (fsbFrequency * currcoef);
+						CPUFreq = (FSBFreq * currcoef);
 					}
 #if DEBUG_CPU
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
@@ -871,22 +904,22 @@ void scan_cpu(PlatformInfo_t *p)
 				
 				if (currdiv) 
 				{
-					cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+					CPUFreq = (FSBFreq * ((currcoef * 2) + 1) / 2);
 				}
 				else 
 				{
-					cpuFrequency = (fsbFrequency * currcoef);
+					CPUFreq = (FSBFreq * currcoef);
 				}
 				
 				if (maxcoef) 
 				{
 					if (maxdiv)
 					{
-						tscFrequency  = (fsbFrequency * ((maxcoef * 2) + 1)) / 2;
+						TSCFreq  = (FSBFreq * ((maxcoef * 2) + 1)) / 2;
 					}
 					else 
 					{
-						tscFrequency = fsbFrequency * maxcoef;
+						TSCFreq = FSBFreq * maxcoef;
 					}
 				}								
 #if DEBUG_CPU
@@ -899,64 +932,70 @@ void scan_cpu(PlatformInfo_t *p)
 		}
         /* Mobile CPU ? */ 
 		//Slice 
-	    p->CPU.isMobile = false;
-		switch (p->CPU.Model)
+	    isMobile = 0;
+		switch (Model)
 		{
 			case 0x0D:
-				p->CPU.isMobile = true; 
+				isMobile = 1; 
 				break;			
 			case 0x02:
 			case 0x03:
 			case 0x04:
 			case 0x06:	
-				p->CPU.isMobile = (rdmsr64(0x2C) & (1 << 21));
+				isMobile = (rdmsr64(0x2C) & (1 << 21))? 1 : 0;
 				break;
 			default:
-				p->CPU.isMobile = (rdmsr64(0x17) & (1 << 28));
+				isMobile = (rdmsr64(0x17) & (1 << 28)) ? 1 : 0;
 				break;
 		}
-
-		DBG("%s platform detected.\n", p->CPU.isMobile?"Mobile":"Desktop");
+        
+		DBG("%s platform detected.\n", isMobile?"Mobile":"Desktop");
 	}
 #endif
-	if (!cpuFrequency) cpuFrequency = tscFrequency;
-    if (!tscFrequency) tscFrequency = cpuFrequency;
+	if (!CPUFreq) CPUFreq = TSCFreq;
+    if (!TSCFreq) TSCFreq = CPUFreq;
     
-	p->CPU.MaxCoef = maxcoef;
-	p->CPU.MaxDiv = maxdiv;
-	p->CPU.CurrCoef = currcoef;
-	p->CPU.CurrDiv = currdiv;
+	set_env(envVendor,          Vendor);
+    set_env(envModel,           Model);    
+    set_env(envExtModel,        ExtModel);    
+    
+	set_env(envCPUIDMaxBasic, cpuid_max_basic);
+	set_env(envCPUIDMaxBasic, cpuid_max_ext);
+#ifndef AMD_SUPPORT
+	set_env(envMicrocodeVersion, MicrocodeVersion);    
+#endif
+    set_env_copy(envBrandString, CpuBrandString, sizeof(CpuBrandString));
+	set_env(envSignature, Signature);    
+	set_env(envStepping,  Stepping);    
+	set_env(envFamily,	 Family);    
+	set_env(envExtModel,  ExtModel);    
+	set_env(envExtFamily, ExtFamily);    
+	set_env(envBrand,	 Brand);    
+	set_env(envFeatures,  Features);
+    set_env(envExtFeatures,  ExtFeatures);
+#ifndef AMD_SUPPORT
+	set_env(envSubCstates,  sub_Cstates); 
+#endif
+	set_env(envExtensions,   extensions); 
+#ifndef AMD_SUPPORT 
+	set_env(envDynamicAcceleration,  dynamic_acceleration);    
+	set_env(envInvariantAPICTimer,	 invariant_APIC_timer);    
+	set_env(envFineGrainClockMod,  fine_grain_clock_mod);
+#endif
+	set_env(envNoThreads,	 NoThreads);    
+	set_env(envNoCores,		 NoCores);
+	set_env(envIsMobile,		 isMobile);
 	
-    p->CPU.TSCFrequency = tscFrequency ;
-	p->CPU.FSBFrequency = fsbFrequency ;
-	p->CPU.CPUFrequency = cpuFrequency ;
+	set_env(envMaxCoef,		 maxcoef);    
+	set_env(envMaxDiv,		 maxdiv);
+	set_env(envCurrCoef,		 currcoef);
+	set_env(envCurrDiv,	     currdiv);    
+	set_env(envTSCFreq,	 TSCFreq);
+	set_env(envFSBFreq,	 FSBFreq);
+	set_env(envCPUFreq,	 CPUFreq);
+	
 #ifdef AMD_SUPPORT
     msglog("AMD CPU Detection Enabled\n");
-#endif
-	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", p->CPU.Vendor, p->CPU.Model, p->CPU.ExtModel);
-	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", p->CPU.Family, p->CPU.ExtFamily);
-#ifdef AMD_SUPPORT
-	DBG("CPU (AMD): TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
-	DBG("CPU (AMD): FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
-	DBG("CPU (AMD): CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
-	DBG("CPU (AMD): MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
-	DBG("CPU (AMD): MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);
-#else
-	DBG("CPU: TSCFreq:               %dMHz\n", p->CPU.TSCFrequency / 1000000);
-	DBG("CPU: FSBFreq:               %dMHz\n", p->CPU.FSBFrequency / 1000000);
-	DBG("CPU: CPUFreq:               %dMHz\n", p->CPU.CPUFrequency / 1000000);
-	DBG("CPU: MaxCoef/CurrCoef:      0x%x/0x%x\n", p->CPU.MaxCoef, p->CPU.CurrCoef);
-	DBG("CPU: MaxDiv/CurrDiv:        0x%x/0x%x\n", p->CPU.MaxDiv, p->CPU.CurrDiv);		
-#endif
-	
-	DBG("CPU: NoCores/NoThreads:     %d/%d\n", p->CPU.NoCores, p->CPU.NoThreads);
-	DBG("CPU: Features:              0x%08x\n", p->CPU.Features);
-    DBG("CPU: ExtFeatures:           0x%08x\n", p->CPU.ExtFeatures);
-#ifndef AMD_SUPPORT
-    DBG("CPU: MicrocodeVersion:      %d\n", p->CPU.MicrocodeVersion);
-#endif
-#if DEBUG_CPU
-	pause();
 #endif
 	
 }

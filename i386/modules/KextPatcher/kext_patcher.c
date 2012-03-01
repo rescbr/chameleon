@@ -11,7 +11,6 @@
 #include "libsaio.h"
 #include "zlib.h"
 #include "kext_patcher.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "drivers.h"
@@ -170,7 +169,7 @@ void mkext_loaded(void* filespec, void* packagetmp, void* lengthtmp, void* arg4,
 	const char* hda_codec;
 	int len = 0;
 	
-	if (getValueForKey(kHDACodec, &hda_codec, &len, &bootInfo->bootConfig))
+	if (getValueForKey(kHDACodec, &hda_codec, &len, DEFAULT_BOOT_CONFIG))
 	{
 		int index = 0;
 		while(len)

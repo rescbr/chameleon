@@ -8,10 +8,11 @@
 #include <mach/machine.h>
 
 #include "libsaio.h"
+#include "boot.h"
 
 #include "sl.h"
-#include "boot.h"
 #include "bootstruct.h"
+#include "platform.h"
 #include "xml.h"
 #include "drivers.h"
 #include "modules.h"
@@ -38,18 +39,15 @@ extern long MatchPersonalities( void );
 #endif
 extern long LoadMatchedModules( void );
 extern long InitDriverSupport(void);
-extern char *    gExtensionsSpec;
-extern char *    gDriverSpec;
-extern char *    gFileSpec;
-extern char *    gTempSpec;
-extern char *    gFileName;
+extern long GetDriverGbl(void);
 
 #define kEnableNBI			"EnableNBIModule"
 
-void NetbookInstaller_start()
+void NetbookInstaller_start(void);
+void NetbookInstaller_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableNBI, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableNBI, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable) 
 	register_hook_callback("PreBoot", &NBI_PreBoot_hook);		
@@ -114,7 +112,7 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 	
 	
 	
-	if (!runNetbookInstaller && getBoolForKey("recovery", &dummyVal, &bootInfo->bootConfig) && dummyVal)
+	if (!runNetbookInstaller && getBoolForKey("recovery", &dummyVal, DEFAULT_BOOT_CONFIG) && dummyVal)
 	{
 		if(dummyVal) runNetbookInstaller = 2;
 	}
@@ -122,13 +120,13 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 	if(runNetbookInstaller)
 	{
 		
-		replace_function("_LoadDrivers", &NBI_LoadDrivers);
+		replace_system_function("_LoadDrivers", &NBI_LoadDrivers);
 		
 		if(runNetbookInstaller == 1 )
 		{
 			if (execute_hook("isRamDiskRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS)
 			{
-				replace_function("_md0Ramdisk", &NBI_md0Ramdisk);
+				replace_function_any("_md0Ramdisk", &NBI_md0Ramdisk);
 			} 
 			else
 			{
@@ -252,21 +250,24 @@ long NBI_LoadDrivers( char * dirSpec )
 				}
 			}
 #endif
-			
-			if (gMKextName[0] != '\0')
+            char * MKextName = (char*)(uint32_t)get_env(envMKextName);
+
+			if (MKextName[0] != '\0')
 			{
-				verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-				if ( LoadDriverMKext(gMKextName) != 0 )
+				verbose("LoadDrivers: Loading from [%s]\n", MKextName);
+				if ( LoadDriverMKext(MKextName) != 0 )
 				{
-					error("Could not load %s\n", gMKextName);
+					error("Could not load %s\n", MKextName);
 					return -1;
 				}
 			}
 			else
 			{
-				strcpy(gExtensionsSpec, dirSpec);
-				strcat(gExtensionsSpec, "System/Library/");
-				FileLoadDrivers(gExtensionsSpec, 0);
+               char * ExtensionsSpec = (char*)(uint32_t)get_env(envDriverExtSpec);
+
+				strcpy(ExtensionsSpec, dirSpec);
+				strcat(ExtensionsSpec, "System/Library/");
+				FileLoadDrivers(ExtensionsSpec, 0);
 			}
 		}
 		else

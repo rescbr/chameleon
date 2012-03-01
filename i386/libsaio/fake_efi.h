@@ -14,6 +14,8 @@
 extern void
 setupFakeEfi(void);
 
+extern EFI_STATUS setup_acpi (void);
+
 extern EFI_STATUS addConfigurationTable();
 
 extern struct SMBEntryPoint	*getSmbiosOriginal();
@@ -21,5 +23,9 @@ extern struct SMBEntryPoint	*getSmbiosOriginal();
 extern void setupSmbiosConfigFile(const char *filename);
 
 extern void finalizeEFIConfigTable(void );
+
+extern EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev );
+
+extern void Register_Smbios_Efi(void* smbios);
 
 #endif /* !__LIBSAIO_FAKE_EFI_H */

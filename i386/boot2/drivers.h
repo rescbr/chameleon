@@ -36,52 +36,9 @@
 #include <mach/machine.h>
 
 #include "sl.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "xml.h"
 #include "modules.h"
-
-struct Module {  
-	struct Module *nextModule;
-	long          willLoad;
-	TagPtr        dict;
-	char          *plistAddr;
-	long          plistLength;
-	char          *executablePath;
-	char          *bundlePath;
-	long          bundlePathLength;
-};
-typedef struct Module Module, *ModulePtr;
-
-struct DriverInfo {
-	char *plistAddr;
-	long plistLength;
-	void *executableAddr;
-	long executableLength;
-	void *bundlePathAddr;
-	long bundlePathLength;
-};
-typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
-
-#define kDriverPackageSignature1 'MKXT'
-#define kDriverPackageSignature2 'MOSX'
-
-struct DriversPackage {
-	unsigned long signature1;
-	unsigned long signature2;
-	unsigned long length;
-	unsigned long alder32;
-	unsigned long version;
-	unsigned long numDrivers;
-	unsigned long reserved1;
-	unsigned long reserved2;
-};
-typedef struct DriversPackage DriversPackage;
-
-enum {
-	kCFBundleType2,
-	kCFBundleType3
-};
 
 long LoadDrivers( char * dirSpec );
 long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);

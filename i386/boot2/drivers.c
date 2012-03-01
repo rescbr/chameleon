@@ -36,19 +36,60 @@
 #include "sl.h"
 #include "boot.h"
 #include "bootstruct.h"
+#include "platform.h"
 #include "xml.h"
 #include "drivers.h"
 #include "modules.h"
 
-extern char gBootKernelCacheFile[];
+struct Module {  
+	struct Module *nextModule;
+	long          willLoad;
+	TagPtr        dict;
+	char          *plistAddr;
+	long          plistLength;
+	char          *executablePath;
+	char          *bundlePath;
+	long          bundlePathLength;
+};
+typedef struct Module Module, *ModulePtr;
+
+struct DriverInfo {
+	char *plistAddr;
+	long plistLength;
+	void *executableAddr;
+	long executableLength;
+	void *bundlePathAddr;
+	long bundlePathLength;
+};
+typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
+
+#define kDriverPackageSignature1 'MKXT'
+#define kDriverPackageSignature2 'MOSX'
+
+struct DriversPackage {
+	unsigned long signature1;
+	unsigned long signature2;
+	unsigned long length;
+	unsigned long alder32;
+	unsigned long version;
+	unsigned long numDrivers;
+	unsigned long reserved1;
+	unsigned long reserved2;
+};
+typedef struct DriversPackage DriversPackage;
+
+enum {
+	kCFBundleType2,
+	kCFBundleType3
+};
 
 static ModulePtr gModuleHead, gModuleTail;
 static TagPtr    gPersonalityHead, gPersonalityTail;
-char *    gExtensionsSpec;
-char *    gDriverSpec;
-char *    gFileSpec;
-char *    gTempSpec;
-char *    gFileName;
+static char *    gExtensionsSpec;
+static char *    gDriverSpec;
+static char *    gFileSpec;
+static char *    gTempSpec;
+static char *    gFileName;
 
 long InitDriverSupport(void);
 long FileLoadDrivers(char *dirSpec, long plugin);
@@ -75,15 +116,26 @@ static ModulePtr FindModule( char * name );
 long
 InitDriverSupport( void )
 {
+    static bool DriverSet = false;
+    
+    if (DriverSet == true)  return 0;    
+    
     gExtensionsSpec = malloc( 4096 );
     gDriverSpec     = malloc( 4096 );
     gFileSpec       = malloc( 4096 );
     gTempSpec       = malloc( 4096 );
-    gFileName       = malloc( 4096 );
-	
+    gFileName       = malloc( 4096 );	
+       
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         stop("InitDriverSupport error");
-	
+    
+    DriverSet = true;
+    set_env(envDriverExtSpec,(uint32_t)gExtensionsSpec);
+    set_env(envDriverSpec,(uint32_t)gDriverSpec);
+    set_env(envDriverFileSpec,(uint32_t)gFileSpec);
+    set_env(envDriverTempSpec,(uint32_t)gTempSpec);
+    set_env(envDriverFileName,(uint32_t)gFileName);
+
     return 0;
 }
 
@@ -125,7 +177,7 @@ long LoadDrivers( char * dirSpec )
 #endif
 			
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "/Extra/%s/", &gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "/Extra/%s/", (char*)gBootVolume->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next try to load Extra extensions from the selected root partition.
@@ -137,7 +189,7 @@ long LoadDrivers( char * dirSpec )
 					if (!(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no))
 					{
 						// First try a specfic OS version folder ie 10.5
-						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gBootVolume->OSVersion);
+						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
 						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 						{	
 							// Next we'll try the base
@@ -169,13 +221,13 @@ long LoadDrivers( char * dirSpec )
 				}
 			}
 #endif
-			
-			if (gMKextName[0] != '\0')
+			char * MKextName = (char*)(uint32_t)get_env(envMKextName);
+			if (MKextName[0] != '\0')
 			{
-				verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-				if ( LoadDriverMKext(gMKextName) != 0 )
+				verbose("LoadDrivers: Loading from [%s]\n", MKextName);
+				if ( LoadDriverMKext(MKextName) != 0 )
 				{
-					error("Could not load %s\n", gMKextName);
+					error("Could not load %s\n", MKextName);
 					return -1;
 				}
 			}
@@ -216,7 +268,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	{
 		ret = GetFileInfo(dirSpec, "Extensions", &flags, &time2);
 		if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeDirectory) ||
-			(((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
+			(((get_env(envgBootMode) & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
 			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
 			verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
@@ -764,7 +816,8 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             printf("adler mismatch\n");
             return -1;
         }
-		if (((gBootMode & kBootModeSafe) == 0) && (gBootKernelCacheFile[0] != '\0') && gBootVolume->OSVersion[3] > '6') 
+        char* BootKernelCacheFile = (char*)(uint32_t)get_env(envkCache);
+		if (((get_env(envgBootMode) & kBootModeSafe) == 0) && (BootKernelCacheFile[0] != '\0') && gBootVolume->OSVersion[3] > '6') 
 			bootInfo->adler32 = kernel_header->adler32;
     }
 	

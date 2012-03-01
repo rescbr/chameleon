@@ -9,7 +9,7 @@
 
 
 #include "libsaio.h"
-#include "options.h"
+#include "platform.h"
 #include "graphic_utils.h"
 #include "embedded.h"
 
@@ -18,11 +18,66 @@
 
 #include "modules.h"
 
+enum {
+    kMenuTopRow    = 5,
+    kMenuMaxItems  = 10,
+    kScreenLastRow = 24
+};
+
+enum {
+	kBackspaceKey	= 0x08,
+	kTabKey			= 0x09,
+	kReturnKey		= 0x0d,
+	kEscapeKey		= 0x1b,
+	kUpArrowkey		= 0x4800, 
+	kDownArrowkey	= 0x5000,
+	kASCIIKeyMask	= 0x7f,
+	kF5Key			= 0x3f00,
+	kF10Key			= 0x4400
+};
+/*
+ * Flags to the booter or kernel
+ */
+#define kVerboseModeFlag	"-v"
+#define kSafeModeFlag		"-x"
+#define kIgnoreCachesFlag	"-f"
+#define kSingleUserModeFlag	"-s"
+#define kIgnorePrelinkKern  "-F"
+#define kIgnoreBootFileFlag	"-B"
+
+/*
+ * Booter behavior control
+ */
+#define kBootTimeout         -1
+#define kCDBootTimeout       8
+
+/*
+ * A global set by boot() to record the device that the booter
+ * was loaded from.
+ */
+#define Cache_len_name 512
+
+/*
+ * Boot Modes
+ */
+enum {
+    kBootModeNormal = 0,
+    kBootModeSafe   = 1,
+    kBootModeSecure = 2,
+    kBootModeQuiet  = 4
+};
+typedef struct {
+    int x;
+    int y;
+    int type;
+} CursorState;
+
 /* Kabyl: BooterLog */
 #define BOOTER_LOG_SIZE    (128 * 1024)
 #define SAFE_LOG_SIZE    134
 
-bool useGUI = true;
+static bool useGUI = true;
+static int			selectIndex = 0;
 
 void GUI_Kernel_Start_hook(void* kernelEntry, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
@@ -31,6 +86,8 @@ int GUI_getBootOptions(bool firstRun);
 
 static void GUI_updateBootArgs( int key );
 void GUI_clearBootArgs(void);
+void GUI_addBootArg(const char * argStr);
+
 static void GUI_showBootPrompt(int row, bool visible);
 static void GUI_showMenu( const MenuItem * items, int count, int selection, int row, int height );
 static int GUI_updateMenu( int key, void ** paramPtr );
@@ -52,8 +109,54 @@ void sputc(int c, struct putc_info * pi);
 extern char *msgbuf;
 extern char *cursor;
 
+static void (*showTextBuffer)(char *, int ) = NULL;
+static char *(*getMemoryInfoString)(void) = NULL;
+static BVRef (*getBvChain)(void) = NULL;
+static void (*lspci)(void) = NULL;
+static void (*printMemoryInfo)(void) = NULL;
+static void (*showHelp)(void) = NULL;
+static void (*showTextFile)(const char * ) = NULL;
+static void (*showMessage)(char * ) = NULL;
 
+static const MenuItem * gMenuItems = NULL;
+static MenuItem *  menuItems = NULL;
 
+static char   gBootArgs[BOOT_STRING_LEN];
+static char * gBootArgsPtr = gBootArgs;
+static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
+static char   booterCommand[BOOT_STRING_LEN];
+static char   booterParam[BOOT_STRING_LEN];
+
+static void printMenuItem( const MenuItem * item, int highlight )
+{
+    printf("  ");
+	
+    if ( highlight )
+        putca(' ', 0x70, strlen(item->name) + 4);
+    else
+        putca(' ', 0x07, 40);
+	
+    printf("  %40s\n", item->name);
+}
+//==========================================================================
+
+static void changeCursor( int col, int row, int type, CursorState * cs )
+{
+    if (cs) getCursorPositionAndType( &cs->x, &cs->y, &cs->type );
+    setCursorType( type );
+    setCursorPosition( col, row, 0 );
+}
+
+static void moveCursor( int col, int row )
+{
+    setCursorPosition( col, row, 0 );
+}
+
+static void restoreCursor( const CursorState * cs )
+{
+    setCursorPosition( cs->x, cs->y, 0 );
+    setCursorType( cs->type );
+}
 
 char GUI_bootRescanPrompt[] =
 "Press Enter to start up Darwin/x86 with no options, or you can:\n"
@@ -106,7 +209,7 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		if(!gVerboseMode)
 		{
 			// Disable outputs, they will still show in the boot log.
-			replace_function("_printf", &GUI_verbose);
+			replace_system_function("_printf", &GUI_verbose);
 			//drawBootGraphics();
 		}
 		
@@ -118,7 +221,7 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 {
 	// Start and display the gui
 	msglog("* Attempting to Display GUI\n");
-	
+
 	if (initGUI())
 	{
 		
@@ -129,24 +232,37 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 	}
 	else
 	{
-		replace_function("_initGraphicsMode", &GUI_initGraphicsMode);
-		replace_function("_getBootOptions", &GUI_getBootOptions);
-		replace_function("_clearBootArgs", &GUI_clearBootArgs);
-		replace_function("_showHelp", &GUI_showHelp);
+		//replace_system_function("_initGraphicsMode", &GUI_initGraphicsMode);
+		replace_system_function("_getBootOptions", &GUI_getBootOptions);
+		replace_system_function("_clearBootArgs", &GUI_clearBootArgs);
+        replace_system_function("_addBootArg", &GUI_addBootArg);  
+
+        replace_system_function("_showHelp", &GUI_showHelp);
 		
-		replace_function("_printf", &GUI_printf);
-		replace_function("_verbose", &GUI_verbose);
-		replace_function("_error", &GUI_error);
-		replace_function("_stop", &GUI_stop);
-		replace_function("_showMessage", &GUI_showMessage);
+		replace_system_function("_printf", &GUI_printf);
+		replace_system_function("_verbose", &GUI_verbose);
+		replace_system_function("_error", &GUI_error);
+		replace_system_function("_stop", &GUI_stop);
+		replace_system_function("_showMessage", &GUI_showMessage);
+        
 		
-		
-		// Hoot for the boot screen 	
+		// Hook for the boot screen 	
 		register_hook_callback("GUI_ExecKernel", &GUI_ExecKernel_hook);
 		register_hook_callback("GUI_PreBoot", &GUI_PreBoot_hook);
 		
-		msglog("* GUI successfully Displayed\n");
+        
+        getBvChain = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getBvChain");
+        getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getMemoryInfoString");
+        
+        printMemoryInfo = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_printMemoryInfo");
+        lspci = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_lspci");        
+        showHelp = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showHelp");
+        showTextFile = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showTextFile");
+        showMessage = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showMessage");        
+        showTextBuffer = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showTextBuffer");
+		safe_set_env(envgBootArgs,(uint32_t)gBootArgs);
 
+		msglog("* GUI successfully Displayed\n");
 		
 	}
 }
@@ -168,6 +284,14 @@ void GUI_start(moduleList_t* module)
 static int GUI_updateMenu( int key, void ** paramPtr )
 {
     int moved = 0;
+    
+    int MenuTop = (int)get_env(envgMenuTop);
+    int MenuSelection = (int)get_env(envgMenuSelection);
+    int MenuRow = (int)get_env(envgMenuRow);
+    int MenuHeight = (int)get_env(envgMenuHeight);
+    int MenuBottom = (int)get_env(envgMenuBottom);
+    int MenuStart = (int)get_env(envgMenuStart);
+    int MenuEnd = (int)get_env(envgMenuEnd);
 	
     union {
         struct {
@@ -202,18 +326,18 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 		
 		if ( key == previous )
 		{
-			if ( gMenuSelection > gMenuTop )
+			if ( MenuSelection > MenuTop )
 				draw.f.selectionUp = 1;
-			else if ( gMenuTop > 0 )
+			else if ( MenuTop > 0 )
 				draw.f.scrollDown = 1;
 			
 		}
 		
 		else if ( key ==  subsequent )
 		{
-			if ( gMenuSelection != gMenuBottom)
+			if ( MenuSelection != MenuBottom)
 				draw.f.selectionDown = 1;
-			else if ( gMenuBottom < ( gMenuItemCount - 1 ) )
+			else if ( MenuBottom < ( get_env(envgMenuItemCount) - 1 ) )
 				draw.f.scrollUp = 1;
 		}
 		
@@ -233,8 +357,9 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 				gui.menu.draw = false;
 			else
 			{
-				shouldboot = ( res != DO_NOT_BOOT );
-				
+				bool shouldboot = ( res != DO_NOT_BOOT );
+                safe_set_env(envShouldboot, shouldboot);
+
 				if ( shouldboot )
 					gui.menu.draw = false;
 				
@@ -242,25 +367,26 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 				{
 					case BOOT_NORMAL:
 						gVerboseMode = false;
-						gBootMode = kBootModeNormal;
+                        safe_set_env(envgBootMode, kBootModeNormal);
+
 						break;
 						
 					case BOOT_VERBOSE:
 						gVerboseMode = true;
-						gBootMode = kBootModeNormal;
-						addBootArg(kVerboseModeFlag);
+                        safe_set_env(envgBootMode, kBootModeNormal);
+						GUI_addBootArg(kVerboseModeFlag);
 						break;
 						
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
-						gBootMode = kBootModeNormal;
-						addBootArg(kIgnoreCachesFlag);
+                        safe_set_env(envgBootMode, kBootModeNormal);
+						GUI_addBootArg(kIgnoreCachesFlag);
 						break;
 						
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
-						gBootMode = kBootModeNormal;
-						addBootArg(kSingleUserModeFlag);
+                        safe_set_env(envgBootMode, kBootModeNormal);
+						GUI_addBootArg(kSingleUserModeFlag);
 						break;
 					default:
 						break;
@@ -274,22 +400,22 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 		switch ( key )
 		{
         	case 0x4800:  // Up Arrow
-				if ( gMenuSelection != gMenuTop )
+				if ( MenuSelection != MenuTop )
 				{
 					draw.f.selectionUp = 1;
 				}
-				else if ( gMenuTop > 0 )
+				else if ( MenuTop > 0 )
 				{
 					draw.f.scrollDown = 1;
 				}
 				break;
 				
 			case 0x5000:  // Down Arrow
-				if ( gMenuSelection != gMenuBottom )
+				if ( MenuSelection != MenuBottom )
 				{
 					draw.f.selectionDown = 1;
 				}
-				else if ( gMenuBottom < (gMenuItemCount - 1) ) 
+				else if ( MenuBottom < (get_env(envgMenuItemCount) - 1) ) 
 				{
 					draw.f.scrollUp = 1;
 				}
@@ -303,17 +429,17 @@ static int GUI_updateMenu( int key, void ** paramPtr )
     {
         if ( draw.f.scrollUp )
         {
-            scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, 1);
-            gMenuTop++; gMenuBottom++;
-			gMenuStart++; gMenuEnd++;
+            scollPage(0, MenuRow, 40, MenuRow + MenuHeight - 1, 0x07, 1, 1);
+            MenuTop++; MenuBottom++;
+			MenuStart++; MenuEnd++;
             draw.f.selectionDown = 1;
         }
 		
         if ( draw.f.scrollDown )
         {
-            scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, -1);
-            gMenuTop--; gMenuBottom--;
-            gMenuStart--; gMenuEnd--;
+            scollPage(0, MenuRow, 40, MenuRow + MenuHeight - 1, 0x07, 1, -1);
+            MenuTop--; MenuBottom--;
+            MenuStart--; MenuEnd--;
             draw.f.selectionUp = 1;
         }
 		
@@ -326,46 +452,54 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 			
 			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 			{
-				changeCursor( 0, (gMenuRow + gMenuSelection - gMenuTop), kCursorTypeHidden, &cursorState );
-				printMenuItem( &gMenuItems[gMenuSelection], 0 );
+				changeCursor( 0, (MenuRow + MenuSelection - MenuTop), kCursorTypeHidden, &cursorState );
+				printMenuItem( &gMenuItems[MenuSelection], 0 );
 			}
 			
 			if ( draw.f.selectionUp )
 			{
-				gMenuSelection--;
-				if(( gMenuSelection - gMenuStart) == -1 )
+				MenuSelection--;
+				if(( MenuSelection - MenuStart) == -1 )
 				{
-					gMenuStart--;
-					gMenuEnd--;
+					MenuStart--;
+					MenuEnd--;
 				}
 				
 			} else {
-				gMenuSelection++;
-				if(( gMenuSelection - ( gui.maxdevices - 1) - gMenuStart) > 0 )
+				MenuSelection++;
+				if(( MenuSelection - ( gui.maxdevices - 1) - MenuStart) > 0 )
 				{
-					gMenuStart++;
-					gMenuEnd++;
+					MenuStart++;
+					MenuEnd++;
 				}
 			}
 			
 			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 			{
-				moveCursor( 0, gMenuRow + gMenuSelection - gMenuTop );
-				printMenuItem( &gMenuItems[gMenuSelection], 1 );
+				moveCursor( 0, MenuRow + MenuSelection - MenuTop );
+				printMenuItem( &gMenuItems[MenuSelection], 1 );
 				restoreCursor( &cursorState );
 				
 			}
 			else
 			{
-				drawDeviceList (gMenuStart, gMenuEnd, gMenuSelection);
+				drawDeviceList (MenuStart, MenuEnd, MenuSelection, menuItems);
 			}
 			
 		}
 		
-        *paramPtr = gMenuItems[gMenuSelection].param;        
+        *paramPtr = gMenuItems[MenuSelection].param;        
         moved = 1;
     }
-	
+    
+	safe_set_env(envgMenuSelection,MenuSelection);
+    safe_set_env(envgMenuTop,MenuTop );
+    safe_set_env(envgMenuRow,MenuRow);
+    safe_set_env(envgMenuHeight,MenuHeight);
+    safe_set_env(envgMenuBottom,MenuBottom);
+    safe_set_env(envgMenuStart,MenuStart);
+    safe_set_env(envgMenuEnd,MenuEnd);
+    
 	return moved;
 }
 
@@ -384,48 +518,53 @@ static void GUI_showMenu( const MenuItem * items, int count,
     // in the menu window.
 	
     gMenuItems		= items;
-    gMenuRow		= row;
-    gMenuHeight		= height;
-    gMenuItemCount	= count;
-    gMenuTop		= 0;
-    gMenuBottom		= min( count, height ) - 1;
-    gMenuSelection	= selection;
-	
-    gMenuStart		= 0;
-    gMenuEnd	    = min( count, gui.maxdevices ) - 1;
+    int MenuTop		= 0;
+    int MenuBottom		= min( count, height ) - 1;
+    int MenuSelection	= selection;	
+    int MenuStart		= 0;
+    int MenuEnd	    = count; //min( count, gui.maxdevices ) - 1;
 	
 	// If the selected item is not visible, shift the list down.
 	
-    if ( gMenuSelection > gMenuBottom )
+    if ( MenuSelection > MenuBottom )
     {
-        gMenuTop += ( gMenuSelection - gMenuBottom );
-        gMenuBottom = gMenuSelection;
+        MenuTop += ( MenuSelection - MenuBottom );
+        MenuBottom = MenuSelection;
     }
 	
-	if ( gMenuSelection > gMenuEnd )
+	if ( MenuSelection > MenuEnd )
     {
-		gMenuStart += ( gMenuSelection - gMenuEnd );
-        gMenuEnd = gMenuSelection;
+		MenuStart += ( MenuSelection - MenuEnd );
+        MenuEnd = MenuSelection;
     }
 	
 	// Draw the visible items.
 	
 	if( bootArgs->Video.v_display == GRAPHICS_MODE )
 	{
-		drawDeviceList(gMenuStart, gMenuEnd, gMenuSelection);
+		drawDeviceList(MenuStart, MenuEnd, MenuSelection, menuItems);
 	}
 	else 
 	{
 		
 		changeCursor( 0, row, kCursorTypeHidden, &cursorState );
 		
-		for ( i = gMenuTop; i <= gMenuBottom; i++ )
+		for ( i = MenuTop; i <= MenuBottom; i++ )
 		{
-			printMenuItem( &items[i], (i == gMenuSelection) );
+			printMenuItem( &items[i], (i == MenuSelection) );
 		}
 		
 		restoreCursor( &cursorState );
     }
+    
+    safe_set_env(envgMenuRow,row);
+    safe_set_env(envgMenuHeight,height);
+    safe_set_env(envgMenuItemCount,count);
+    safe_set_env(envgMenuTop,MenuTop);
+    safe_set_env(envgMenuBottom,MenuBottom);
+    safe_set_env(envgMenuSelection,MenuSelection);
+    safe_set_env(envgMenuStart,MenuStart);
+    safe_set_env(envgMenuEnd,MenuEnd);
 }
 
 
@@ -481,7 +620,7 @@ static void GUI_updateBootArgs( int key )
 
 static void GUI_showBootPrompt(int row, bool visible)
 {
-	extern char bootPrompt[];
+	char * bootPrompt = (char*)(uint32_t)get_env(envBootPrompt);
 	
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
@@ -489,13 +628,13 @@ static void GUI_showBootPrompt(int row, bool visible)
 		clearScreenRows( row, kScreenLastRow );
 	}
 	
-	clearBootArgs();
+	GUI_clearBootArgs();
 	
 	if (visible)
 	{
 		if (bootArgs->Video.v_display == VGA_TEXT_MODE) 
 		{
-			if (gEnableCDROMRescan)
+			if (get_env(envgEnableCDROMRescan))
 			{
 				printf( GUI_bootRescanPrompt );
 			} 
@@ -518,7 +657,6 @@ static void GUI_showBootPrompt(int row, bool visible)
 	}
 }
 
-
 void GUI_clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
@@ -530,6 +668,15 @@ void GUI_clearBootArgs(void)
 	}
 }
 
+void GUI_addBootArg(const char * argStr)
+{
+	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
+	{
+		*gBootArgsPtr++ = ' ';
+		strcat(gBootArgs, argStr);
+		gBootArgsPtr += strlen(argStr);
+	}
+}
 
 int GUI_getBootOptions(bool firstRun)
 {
@@ -543,11 +690,13 @@ int GUI_getBootOptions(bool firstRun)
 	BVRef   bvr;
 	BVRef   menuBVR;
 	bool    showPrompt, newShowPrompt, isCDROM;
-	
+    int     optionKey;
+    int devcnt = (int)get_env(envgDeviceCount);
+
 	// Initialize default menu selection entry.
-	gBootVolume = menuBVR = selectBootVolume(bvChain);
+	gBootVolume = menuBVR = selectBootVolume(getBvChain());
 	
-	if (biosDevIsCDROM(gBIOSDev))
+	if (biosDevIsCDROM((int)get_env(envgBIOSDev)))
 	{
 		isCDROM = true;
 	} 
@@ -555,7 +704,7 @@ int GUI_getBootOptions(bool firstRun)
 	{
 		isCDROM = false;
 	}
-	
+	    
 	// ensure we're in graphics mode if gui is setup
 	if (gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
@@ -567,10 +716,10 @@ int GUI_getBootOptions(bool firstRun)
 	}
 	
 	// Clear command line boot arguments
-	clearBootArgs();
+	GUI_clearBootArgs();
 	
 	// Allow user to override default timeout.
-	if (!getIntForKey(kTimeoutKey, &timeout, &bootInfo->bootConfig))
+	if (!getIntForKey(kTimeoutKey, &timeout, DEFAULT_BOOT_CONFIG))
 	{
 		/*  If there is no timeout key in the file use the default timeout
 		 which is different for CDs vs. hard disks.  However, if not booting
@@ -587,20 +736,26 @@ int GUI_getBootOptions(bool firstRun)
 		}
 		else 
 		{
-			timeout = sysConfigValid ? kBootTimeout : 0;
+			timeout = get_env(envSysConfigValid) ? kBootTimeout : 0;
 		}
 	}
-	
+    
+	long gBootMode = get_env(envgBootMode);
+    
 	if (timeout < 0) 
 	{
 		gBootMode |= kBootModeQuiet;
+        safe_set_env(envgBootMode,gBootMode);
+
 	}
 	
 	// If the user is holding down a modifier key, enter safe mode.
 	if ((readKeyboardShiftFlags() & 0x0F) != 0) 
 	{
 		
-		//gBootMode |= kBootModeSafe;
+		gBootMode |= kBootModeSafe;
+        safe_set_env(envgBootMode,gBootMode);
+
 	}
 	
 	// Checking user pressed keys
@@ -616,17 +771,19 @@ int GUI_getBootOptions(bool firstRun)
 	if (f8press)
 	{
 		gBootMode &= ~kBootModeQuiet;
+        safe_set_env(envgBootMode,gBootMode);
+
 		timeout = 0;
 	}
 	// If user typed 'v' or 'V', boot in verbose mode.
 	if ((gBootMode & kBootModeQuiet) && firstRun && vpress)
 	{
-		addBootArg(kVerboseModeFlag);
+		GUI_addBootArg(kVerboseModeFlag);
 	}
 	// If user typed 's' or 'S', boot in single user mode.
 	if ((gBootMode & kBootModeQuiet) && firstRun && spress)
 	{
-		addBootArg(kSingleUserModeFlag);
+		GUI_addBootArg(kSingleUserModeFlag);
 	}
 	
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
@@ -635,12 +792,13 @@ int GUI_getBootOptions(bool firstRun)
 		clearScreenRows(0, kScreenLastRow);
 		if (!(gBootMode & kBootModeQuiet)) 
 		{
+            char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
 			// Display banner and show hardware info.
 			printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
-		verbose("Scanning device %x...", gBIOSDev);
+		msglog("Scanning device %x...", (uint32_t)get_env(envgBIOSDev));
 	}
 	
 	// When booting from CD, default to hard drive boot when possible. 
@@ -650,9 +808,8 @@ int GUI_getBootOptions(bool firstRun)
 		char *prompt = NULL;
 		char *name = NULL;
 		int cnt;
-		int optionKey;
 		
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, &bootInfo->bootConfig))
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG))
 		{
 			prompt = malloc(cnt + 1);
 			strncat(prompt, val, cnt);
@@ -662,11 +819,11 @@ int GUI_getBootOptions(bool firstRun)
 			name = malloc(80);
 			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);
-			sprintf(prompt, "Press any key to start up from %s, or press F8 to enter startup options.", name);
+			sprintf(prompt, "Press ENTER to start up from %s, or press any key to enter startup options.", name);
 			free(name);
 		}
 		
-		if (getIntForKey( kCDROMOptionKey, &optionKey, &bootInfo->bootConfig ))
+		if (getIntForKey( kCDROMOptionKey, &optionKey, DEFAULT_BOOT_CONFIG ))
 		{
 			// The key specified is a special key.
 		}
@@ -680,7 +837,7 @@ int GUI_getBootOptions(bool firstRun)
 		// early catch of F8 which means the user wants to set boot options
 		// which we ought to interpret as meaning he wants to boot the CD.
 		if (timeout != 0) {
-			key = GUI_countdown(prompt, kMenuTopRow, timeout);
+			key = GUI_countdown(prompt, kMenuTopRow, timeout, &optionKey);
 		} 
 		else 
 		{
@@ -694,32 +851,35 @@ int GUI_getBootOptions(bool firstRun)
 		
 		clearScreenRows( kMenuTopRow, kMenuTopRow + 2 );
 		
-		// Hit the option key ?
-		if (key == optionKey) 
-		{
-			gBootMode &= ~kBootModeQuiet;
-			timeout = 0;
-		} 
-		else 
-		{
-			key = key & 0xFF;
-			
-			// Try booting hard disk if user pressed 'h'
-			if (biosDevIsCDROM(gBIOSDev) && key == 'h')
-			{
-				BVRef bvr;
-				
-				// Look at partitions hosting OS X other than the CD-ROM
-				for (bvr = bvChain; bvr; bvr=bvr->next)
-				{
-					if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != gBIOSDev)
-					{
-						gBootVolume = bvr;
-					}
-				}
-			}
-			goto done;
-		}
+		do {
+            // Hit the option key ?
+            if (key == optionKey) {
+                
+                if (key != 0x1C0D) {
+                    gBootMode &= ~kBootModeQuiet;
+                    safe_set_env(envgBootMode,gBootMode);
+                    timeout = 0;
+                    break;
+                }
+                
+            } 
+            
+            key = key & 0xFF;
+            
+            // Try booting hard disk if user pressed 'h'
+            if (biosDevIsCDROM((int)get_env(envgBIOSDev)) && key == 'h') {
+                BVRef bvr;
+                
+                // Look at partitions hosting OS X other than the CD-ROM
+                for (bvr = getBvChain(); bvr; bvr=bvr->next) {
+                    if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != (int)get_env(envgBIOSDev)) {
+                        gBootVolume = bvr;
+                    }
+                }
+            }
+            goto done;
+            
+        } while (0);
 	}
 	
 	if (gBootMode & kBootModeQuiet)
@@ -728,28 +888,38 @@ int GUI_getBootOptions(bool firstRun)
 		goto done;
 	}
 	
-	if (firstRun && timeout > 0 && GUI_countdown("Press any key to enter startup options.", kMenuTopRow, timeout) == 0)
-	{
-		// If the user is holding down a modifier key,
-		// enter safe mode.
-		if ((readKeyboardShiftFlags() & 0x0F) != 0)
-		{
-			gBootMode |= kBootModeSafe;
-		}
-		goto done;
+	if (firstRun && timeout > 0 ) {
+        
+        key = GUI_countdown("Press ENTER to start up, or press any key to enter startup options.", kMenuTopRow, timeout, &optionKey);
+        
+        if (key == 0x1C0D) {
+            goto done;
+            
+        } 
+        else if (key == 0)
+        {
+            // If the user is holding down a modifier key,
+            // enter safe mode.     
+            
+            if ((readKeyboardShiftFlags() & 0x0F) != 0) {
+                gBootMode |= kBootModeSafe;
+                safe_set_env(envgBootMode,gBootMode);
+            }
+            goto done;
+        }
 	}
-	
-	if (gDeviceCount)
+
+	if (devcnt)
 	{
 		// Allocate memory for an array of menu items.
-		menuItems = malloc(sizeof(MenuItem) * gDeviceCount);
+		menuItems = malloc(sizeof(MenuItem) * devcnt);
 		if (menuItems == NULL) 
 		{
 			goto done;
 		}
 		
 		// Associate a menu item for each BVRef.
-		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next)
+		for (bvr=getBvChain(), i=devcnt-1, selectIndex=0; bvr; bvr=bvr->next)
 		{
 			if (bvr->visible)
 			{
@@ -758,6 +928,7 @@ int GUI_getBootOptions(bool firstRun)
 				if (bvr == menuBVR)
 				{
 					selectIndex = i;
+                    safe_set_env(envSelectIndex, selectIndex);
 				}
 				i--;
 			}
@@ -776,9 +947,11 @@ int GUI_getBootOptions(bool firstRun)
 			bool showBootBanner = true;
 			
 			// Check if "Boot Banner"=N switch is present in config file.
-			getBoolForKey(kBootBannerKey, &showBootBanner, &bootInfo->bootConfig); 
+			getBoolForKey(kBootBannerKey, &showBootBanner, DEFAULT_BOOT_CONFIG); 
 			if (showBootBanner)
 			{
+                char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
+                
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
 			}
@@ -797,18 +970,18 @@ int GUI_getBootOptions(bool firstRun)
 	nextRow = kMenuTopRow;
 	showPrompt = true;
 	
-	if (gDeviceCount)
+	if (devcnt)
 	{
 		if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 		{
 			printf("Use \30\31 keys to select the startup volume.");
 		}
-		GUI_showMenu( menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
-		nextRow += min( gDeviceCount, kMenuMaxItems ) + 3;
+		GUI_showMenu( menuItems, devcnt, selectIndex, kMenuTopRow + 2, kMenuMaxItems );
+		nextRow += min( devcnt, kMenuMaxItems ) + 3;
 	}
 	
 	// Show the boot prompt.
-	showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+	showPrompt = (devcnt == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 	GUI_showBootPrompt( nextRow, showPrompt );
 	
 	do {
@@ -821,7 +994,7 @@ int GUI_getBootOptions(bool firstRun)
 		}
 		key = getc();
 		GUI_updateMenu( key, (void **) &menuBVR );
-		newShowPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+		newShowPrompt = (devcnt == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 		
 		if (newShowPrompt != showPrompt)
 		{
@@ -891,11 +1064,11 @@ int GUI_getBootOptions(bool firstRun)
 					} 
 					else if (strcmp(booterCommand, "norescan") == 0)
 					{
-						if (gEnableCDROMRescan)
-						{
-							gEnableCDROMRescan = false;
-							break;
-						}
+						if (get_env(envgEnableCDROMRescan))
+                        {
+                            safe_set_env(envgEnableCDROMRescan,false);
+                            break;
+                        }
 					} 
 					else
 					{
@@ -907,11 +1080,11 @@ int GUI_getBootOptions(bool firstRun)
 				}
 				gBootVolume = menuBVR;
 				setRootVolume(menuBVR);
-				gBIOSDev = menuBVR->biosdev;
+                safe_set_env(envgBIOSDev,menuBVR->biosdev);
 				break;
 				
 			case kEscapeKey:
-				clearBootArgs();
+				GUI_clearBootArgs();
 				break;
 				
 			case kF5Key:
@@ -919,22 +1092,21 @@ int GUI_getBootOptions(bool firstRun)
 				// Clear gBootVolume to restart the loop
 				// if the user enabled rescanning the optical drive.
 				// Otherwise boot the default boot volume.
-				if (gEnableCDROMRescan)
-				{
+				if (get_env(envgEnableCDROMRescan)) {
 					gBootVolume = NULL;
-					clearBootArgs();
+					GUI_clearBootArgs();
 				}
 				break;
 				
 			case kF10Key:
-				gScanSingleDrive = false;
+                safe_set_env(envgScanSingleDrive, false);
 #if UNUSED
-                scanDisks(gBIOSDev, &bvCount);
+                scanDisks((int)get_env(envgBIOSDev), &bvCount);
 #else
                 scanDisks();
 #endif
 				gBootVolume = NULL;
-				clearBootArgs();
+				GUI_clearBootArgs();
 				break;
 				
 			case kTabKey:
@@ -952,7 +1124,9 @@ int GUI_getBootOptions(bool firstRun)
 #endif					
 						setCursorPosition(0, 0, 0);
 						clearScreenRows(0, kScreenLastRow);
-						
+                        
+						char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
+                        
 						// Display banner and show hardware info.
 						printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
 						printf(getVBEInfoString());
@@ -963,14 +1137,14 @@ int GUI_getBootOptions(bool firstRun)
 						nextRow = kMenuTopRow;
 						showPrompt = true;
 						
-						if (gDeviceCount)
+						if (devcnt)
 						{
 							printf("Use \30\31 keys to select the startup volume.");
-							GUI_showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
-							nextRow += min(gDeviceCount, kMenuMaxItems) + 3;
+							GUI_showMenu(menuItems, devcnt, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
+							nextRow += min(devcnt, kMenuMaxItems) + 3;
 						}
 						
-						showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
+						showPrompt = (devcnt == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 						GUI_showBootPrompt(nextRow, showPrompt);
 						//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
 					} 
@@ -1000,7 +1174,7 @@ done:
 		clearScreenRows(kMenuTopRow, kScreenLastRow);
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
 	}
-	shouldboot = false;
+    safe_set_env(envShouldboot, false);
 	gui.menu.draw = false;
 	if (menuItems)
 	{

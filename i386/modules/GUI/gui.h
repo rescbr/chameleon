@@ -14,19 +14,18 @@
 #ifndef __BOOT2_GUI_H
 #define __BOOT2_GUI_H
 
-#include "boot.h"
+#include "libsaio.h"
 #include "bootstruct.h"
-#include "graphics.h"
 #include "graphic_utils.h"
 #include "picopng.h"
-#include "options.h"
+//#include "options.h"
 
-void showTextBuffer(char *buf, int size);
-int GUI_initGraphicsMode ();
-int GUI_countdown( const char * msg, int row, int timeout );
+int GUI_initGraphicsMode (void);
+int GUI_countdown( const char * msg, int row, int timeout , int *optionKey);
 
 #define kGUIKey				"GUI"
 #define kBootBannerKey		"Boot Banner"
+#define envSelectIndex      "GUISelIdx"
 
 #define CHARACTERS_COUNT	223
 
@@ -43,6 +42,12 @@ int GUI_countdown( const char * msg, int row, int timeout );
 #define MENU_SHOW_MEMORY_INFO	4
 #define MENU_SHOW_VIDEO_INFO	5
 #define MENU_SHOW_HELP		6
+
+typedef struct {
+    char   name[80];
+    void * param;
+} MenuItem;
+
 
 enum {
 	HorizontalLayout	= 0,
@@ -142,7 +147,7 @@ void drawBackground();
 void drawLogo();
 
 
-void drawDeviceList(int start, int end, int selection);
+void drawDeviceList (int start, int end, int selection, MenuItem *  menuItems);
 
 void showInfoBox(char *title, char *text);
 

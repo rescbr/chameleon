@@ -2,10 +2,8 @@
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
  */
-
-#include "boot.h"
+#include "libsaio.h"
 #include "bootstruct.h"
-#include "multiboot.h"
 #include "modules.h"
 
 #ifndef DEBUG_MODULES
@@ -26,6 +24,7 @@ moduleHook_t* moduleCallbacks = NULL;
 moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*)) = NULL;
+moduleHook_t* get_callback(const char* name);
 
 #if DEBUG_MODULES
 VOID print_hook_list()
@@ -46,7 +45,7 @@ VOID print_symbol_list()
 	printf("Symbol list: \n");
 	while(symbol)
 	{
-		printf("*  %s\n", symbol->symbol);
+		printf("*  %s : %s\n", symbol->module, symbol->symbol);
 		symbol = symbol->next;
 	}
 	printf("\n");
@@ -59,7 +58,7 @@ VOID print_symbol_list()
  * Once loaded, locate the _lookup_symbol function so that internal
  * symbols can be resolved.
  */
-EFI_STATUS init_module_system()
+EFI_STATUS init_module_system(void)
 {
 	msglog("* Attempting to load system module\n");
 	
@@ -67,7 +66,7 @@ EFI_STATUS init_module_system()
     EFI_STATUS status = load_module(SYMBOLS_MODULE);
 	if((status == EFI_SUCCESS) || (status == EFI_ALREADY_STARTED)/*should never happen*/ )        
 	{
-		lookup_symbol = (void*)lookup_all_symbols(SYMBOL_LOOKUP_SYMBOL);
+		lookup_symbol = (void*)lookup_all_symbols(SYMBOLS_MODULE,SYMBOL_LOOKUP_SYMBOL);
 		
 		if((UInt32)lookup_symbol != 0xFFFFFFFF)
 		{
@@ -90,7 +89,7 @@ EFI_STATUS init_module_system()
  * reference at least one symbol within the module.
  */
 
-VOID load_all_modules()
+VOID load_all_modules(void)
 {
 	char* name;
 	long flags;
@@ -115,7 +114,7 @@ VOID load_all_modules()
 				if(load_module(tmp) != EFI_SUCCESS)
 				{
 					// failed to load or already loaded
-					free(tmp);
+					//free(tmp);
 				}
 			}
 #if DEBUG_MODULES
@@ -198,11 +197,11 @@ EFI_STATUS load_module(char* module)
 			DBG("Module %s read in.\n", modString);
 			
 			// Module loaded into memory, parse it
-			module_start = parse_mach(module_base, &load_module, &add_symbol);
+			module_start = parse_mach(module, module_base, &load_module, &add_symbol);
 			
 			if(module_start && (module_start != (void*)0xFFFFFFFF))
 			{
-				module_loaded(module/*moduleName, moduleVersion, moduleCompat*/);
+				module_loaded(module);
 				// Notify the system that it was laoded
 				(*module_start)();	// Start the module
 				msglog("%s successfully Loaded.\n", module);
@@ -352,17 +351,12 @@ long   vmsize;
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, long long, char))	// TODO: add param to specify valid archs
+void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
 {	
 	char is64 = false;
 	void (*module_start)(void) = NULL;
-	
-	// Module info
-	/*char* moduleName = NULL;
-	 UInt32 moduleVersion = 0;
-	 UInt32 moduleCompat = 0;
-	 */
-	
+	EFI_STATUS bind_status = EFI_SUCCESS;
+    		
 	// TODO convert all of the structs to a union	
 	struct dyld_info_command* dyldInfoCommand = NULL;	
 	struct symtab_command* symtabCommand = NULL;	
@@ -524,34 +518,34 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 				case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
 				{
 					dylibCommand  = binary + binaryIndex;
-					char* module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+					char* weak_module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 					// TODO: verify version
 					// =	dylibCommand->dylib.current_version;
 					// =	dylibCommand->dylib.compatibility_version;
 					
 					char *name=NULL;
-					name = newStringWithFormat( "%s.dylib", module);
+					name = newStringWithFormat( "%s.dylib", weak_module);
 					if (!name) {
-						printf("Unable to allocate module name : %s\n", module);
+						printf("Unable to allocate module name : %s\n", weak_module);
 						return NULL;
 					}
 					if(dylib_loader)
 					{
-						EFI_STATUS statue = dylib_loader(name);
+						EFI_STATUS statue = dylib_loader(weak_module);
 						
 						if( statue != EFI_SUCCESS)
 						{
 							if (statue != EFI_ALREADY_STARTED)
 							{
 								// Unable to load dependancy
-								free(name);
+								//free(weak_module);
 								return NULL;
 							}
 							
 						} 
 						
 					}
-					free(name);
+					//free(weak_module);
 					
 					break;
 				}				
@@ -586,8 +580,8 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 	}		
 	
 	// bind_macho uses the symbols.
-	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
-	
+	module_start = (void*)handle_symtable(module, (UInt32)binary, symtabCommand, symbol_handler, is64);
+    
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
@@ -596,23 +590,27 @@ void* parse_mach(void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symb
 	
 	if(dyldInfoCommand && dyldInfoCommand->bind_off)
 	{
-		bind_macho(binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
 	}
 	
-	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off)
+	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off && (bind_status == EFI_SUCCESS))
 	{
 		// NOTE: this currently should never happen.
-		bind_macho(binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
 	}
 	
-	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off)
+	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off && (bind_status == EFI_SUCCESS))
 	{
 		// NOTE: we are binding the lazy pointers as a module is laoded,
 		// This should be changed to bind when a symbol is referened at runtime instead.
-		bind_macho(binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
 	}
 	
-	return module_start;
+    if (bind_status != EFI_SUCCESS) {
+        module_start = (void*)0xFFFFFFFF;
+    }
+    
+	return  module_start;
 	
 }
 
@@ -797,7 +795,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 // NOTE: this uses 32bit values, and not 64bit values. 
 // There is apossibility that this could cause issues,
 // however the macho file is 32 bit, so it shouldn't matter too much
-void bind_macho(void* base, char* bind_stream, UInt32 size)
+EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 {	
 	bind_stream += (UInt32)base;
 	
@@ -869,7 +867,7 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				i += strlen((char*)&bind_stream[i]);
 				//DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
 				
-				symbolAddr = lookup_all_symbols(symbolName);
+				symbolAddr = lookup_all_symbols(NULL ,symbolName);
 				
 				break;
 				
@@ -955,8 +953,9 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
-                    getc();
+					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    goto error;
+                    
 				}
 				
 				segmentAddress += sizeof(void*);
@@ -986,7 +985,10 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    goto error;
+                    
+                    
 				}
 				segmentAddress += tmp + sizeof(void*);
 				
@@ -1004,7 +1006,8 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    goto error;
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 				
@@ -1050,7 +1053,9 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 				}
 				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    goto error;
+                    
 				}
 				
 				
@@ -1061,6 +1066,10 @@ void bind_macho(void* base, char* bind_stream, UInt32 size)
 		}
 		i++;
 	}
+    return EFI_SUCCESS;
+error:
+    getc();
+    return EFI_NOT_FOUND;
 }
 
 void rebase_location(UInt32* location, char* base, int type)
@@ -1106,7 +1115,7 @@ void bind_location(UInt32* location, char* value, UInt32 addend, int type)
  * adjust it's internal symbol list (sort) to optimize locating new symbols
  * NOTE: returns the address if the symbol is "start", else returns 0xFFFFFFFF
  */
-long long add_symbol(char* symbol, long long addr, char is64)
+long long add_symbol(char* module,char* symbol, long long addr, char is64)
 {
 	if(is64) return  0xFFFFFFFF; // Fixme
 	
@@ -1120,6 +1129,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 		moduleSymbols = new_entry;
 		
 		new_entry->addr = (UInt32)addr;
+        new_entry->module = module;
 		new_entry->symbol = symbol;
 		return addr;
 	}	
@@ -1131,7 +1141,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 /*
  * print out the information about the loaded module
  */
-VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
+VOID module_loaded(const char* name)
 {
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
 	if (new_entry)
@@ -1140,9 +1150,7 @@ VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/)
 		
 		loadedModules = new_entry;
 		
-		new_entry->module = (char*)name;
-		//	new_entry->version = version;
-		//	new_entry->compat = compat;
+		new_entry->module = (char*)name;		
 	}
 }
 
@@ -1172,35 +1180,50 @@ EFI_STATUS is_module_loaded(const char* name)
 
 // Look for symbols using the Smbols moduel function.
 // If non are found, look through the list of module symbols
-unsigned int lookup_all_symbols(const char* name)
+unsigned int lookup_all_symbols(const char* module, const char* name)
 {
-	{
-		unsigned int addr = 0xFFFFFFFF;
-		if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
-		{
-			addr = lookup_symbol(name, &strcmp);
-			if(addr != 0xFFFFFFFF)
-			{
-				DBG("Internal symbol %s located at 0x%X\n", name, addr);
-				return addr;
-			}
-		}
-	}	
-	
+    
+    unsigned int addr = 0xFFFFFFFF;
+
+    do {
+        
+        if ((module != NULL) && (strcmp(module,SYMBOLS_MODULE) != 0))
+            break;        
+        
+        if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
+        {
+            addr = lookup_symbol(name, &strcmp);
+            if(addr != 0xFFFFFFFF)
+            {
+                DBG("Internal symbol %s located at 0x%X\n", name, addr);
+                goto out;
+            }
+        } 
+        
+    } while (0);
+            
+		
 	{
 		symbolList_t* entry = moduleSymbols;
 		while(entry)
 		{
-			if(strcmp(entry->symbol, name) == 0)
-			{
-				DBG("External symbol %s located at 0x%X\n", name, entry->addr);
-				return entry->addr;
-			}
-			else
-			{
-				entry = entry->next;
-			}
-			
+            if ((module != NULL) && (strcmp(entry->module,module) != 0))
+            {
+                entry = entry->next;
+                continue; 
+            }
+            
+            if(strcmp(entry->symbol, name) == 0)
+            {
+                DBG("External symbol %s located at 0x%X\n", name, entry->addr);
+                addr = entry->addr;
+                goto out;
+            }
+            else
+            {
+                entry = entry->next;
+            }             
+            			
 		}
 	}
 	
@@ -1211,7 +1234,9 @@ unsigned int lookup_all_symbols(const char* name)
 		getc();
 	}
 #endif
-	return 0xFFFFFFFF;
+out:
+    return addr;
+
 }
 
 
@@ -1220,7 +1245,7 @@ unsigned int lookup_all_symbols(const char* name)
  * Lookup any undefined symbols
  */
 
-unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, long long, char), char is64)
+unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long, char), char is64)
 {		
 	unsigned int module_start = 0xFFFFFFFF;
 	
@@ -1241,7 +1266,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				}
 				else
 				{
-					symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
+					symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 				}
 #if DEBUG_MODULES
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
@@ -1278,11 +1303,11 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 			
 			if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0))
 			{
-				module_start = base + symbolEntry->n_value;
+				module_start = (unsigned int)(base + symbolEntry->n_value);
 			}
 			else
 			{
-				symbol_handler(symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
+				symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
 			}
 			
 			symbolEntry++;
@@ -1298,15 +1323,17 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 /*
  * Locate the symbol for an already loaded function and modify the beginning of
  * the function to jump directly to the new one
- * example: replace_function("_HelloWorld_start", &replacement_start);
+ * example: replace_system_function("_getc", &replacement);
+ *          replace_function(module_name,"_getc", &replacement);
+ *          replace_function_any("_getc", &replacement);
  */
-EFI_STATUS replace_function(const char* symbol, void* newAddress)
+EFI_STATUS replace_function(const char* module, const char* symbol, void* newAddress)
 {		 
 	// TODO: look into using the next four bytes of the function instead
 	// Most functions should support this, as they probably will be at 
 	// least 10 bytes long, but you never know, this is sligtly safer as
 	// function can be as small as 6 bytes.
-	UInt32 addr = lookup_all_symbols(symbol);
+	UInt32 addr = lookup_all_symbols(module, symbol);
 	
 	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
@@ -1326,5 +1353,19 @@ EFI_STATUS replace_function(const char* symbol, void* newAddress)
 	}
 	
 	return EFI_NOT_FOUND;
+	
+}
+
+EFI_STATUS replace_system_function(const char* symbol, void* newAddress)
+{		 
+	
+	return replace_function(SYMBOLS_MODULE,symbol,newAddress);
+	
+}
+
+EFI_STATUS replace_function_any(const char* symbol, void* newAddress)
+{		 
+	
+	return replace_function(NULL,symbol,newAddress);
 	
 }

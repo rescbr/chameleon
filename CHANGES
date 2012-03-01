@@ -1,3 +1,9 @@
+- Many security and bug fixes and improvements
+- Added a workaround for some machines that was unable to enter to the startup options during the countdown
+- Implemented a new environment platform
+- Added mountain lion support
+- Improved Xcode4 support (GUI still work only with Xcode3)
+
 - Added mountain lion icons for the default themes and LogintoLion (credit to Blackosx)
 - Added cpu_intel_amd.c (not by default, you need to edit the makefile in the libsaio directory to compile it)
 - Implemented a stack_protector (seems to work)

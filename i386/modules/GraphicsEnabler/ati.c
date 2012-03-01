@@ -5,7 +5,7 @@
  *
  */
 
-#include "boot.h"
+#include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
@@ -18,6 +18,7 @@
 #define Reg32(reg)				(*(volatile uint32_t *)(card->mmio + reg))
 #define RegRead32(reg)			(Reg32(reg))
 #define RegWrite32(reg, value)	(Reg32(reg) = value)
+
 
 typedef enum {
 	kNul,
@@ -818,6 +819,14 @@ dev_prop_t ati_devprop_list[] = {
 	
 	{FLAGTRUE,	false,	NULL,						NULL,					NULVAL							}
 };
+bool radeon_card_posted(void);
+bool read_disabled_vbios(void);
+bool read_vbios(bool from_pci);
+void get_vram_size(void);
+bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, uint32_t subsys_id);
+void free_val(value_t *val);
+
+void devprop_add_list(dev_prop_t devprop_list[]);
 
 bool get_bootdisplay_val(value_t *val)
 {
@@ -1071,7 +1080,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 	char file_name[24];
 	bool do_load = false;
 	
-	getBoolForKey(key, &do_load, &bootInfo->bootConfig);
+	getBoolForKey(key, &do_load, DEFAULT_BOOT_CONFIG);
 	if (!do_load)
 		return false;
 	
@@ -1345,7 +1354,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	get_vram_size();
 	
-	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->bootConfig);
+	getBoolForKey(kATYbinimage, &add_vbios, DEFAULT_BOOT_CONFIG);
 	
 	if (add_vbios)
 	{
@@ -1371,7 +1380,7 @@ static bool init_card(pci_dt_t *pci_dev)
 //	atN = 0;
 	
 	// Check AtiConfig key for a framebuffer name,
-	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->bootConfig);
+	card->cfg_name = getStringForKey(kAtiConfig, DEFAULT_BOOT_CONFIG);
 	// if none,
 	if (!card->cfg_name)
 	{
@@ -1390,7 +1399,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	}
 	
 	// Check AtiPorts key for nr of ports,
-	card->ports = getIntForKey(kAtiPorts, &n_ports, &bootInfo->bootConfig);
+	card->ports = getIntForKey(kAtiPorts, &n_ports, DEFAULT_BOOT_CONFIG);
 	// if a value bigger than 0 ?? is found, (do we need >= 0 ?? that's null FB on card_configs)
 	if (n_ports > 0)
 	{

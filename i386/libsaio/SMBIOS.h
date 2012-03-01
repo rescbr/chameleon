@@ -31,7 +31,7 @@
 #include "libsaio.h"
 
 #define kIsServer			"IsServer"	
-extern struct SMBEntryPoint *getSmbiosOriginal();
+extern struct SMBEntryPoint *getSmbiosOriginal(void);
 
 #define theUUID 0
 #define thePlatformName 1

@@ -1,8 +1,8 @@
 
 
+#include "libsaio.h"
 #include "SMBIOS.h"
 #include "Platform.h"
-#include "boot.h"
 
 static const char * const SMTAG = "_SM_";
 static const char* const DMITAG= "_DMI_";
@@ -116,7 +116,7 @@ int readSMBIOS(int value)
 			{
 				switch (value) {
 					case theUUID:
-						Platform->UUID = ((SMBSystemInformation *)structHeader)->uuid;
+                        safe_set_env(envUUID,(uint32_t)((SMBSystemInformation *)structHeader)->uuid);					
 						return 1;
 						break;
 					case thePlatformName:
@@ -131,8 +131,8 @@ int readSMBIOS(int value)
 							 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
 						
 						//DBG("original SMBIOS Product name: %s\n",(char *)stringPtr);
-						gPlatformName = (char *)stringPtr;
-						if (gPlatformName) return 1;
+                        SetgPlatformName((char *)stringPtr);
+						if (GetgPlatformName()) return 1;
 						break;
 					}
 					default:
@@ -155,8 +155,8 @@ int readSMBIOS(int value)
 						for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
 							 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
 						
-						gboardproduct = (char *)stringPtr;
-						if (gboardproduct) return 1;
+						Setgboardproduct((char *)stringPtr);
+						if (Getgboardproduct()) return 1;
 						break;
 					}
 					default:

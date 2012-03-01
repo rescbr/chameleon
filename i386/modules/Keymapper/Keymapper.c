@@ -16,9 +16,9 @@
 #define kEnableKeyMap "EnableKeyMapper"
 static int AZERTY_switch(int c);
 void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
-int Keymapper_getc();
+int Keymapper_getc(void);
 
-int Keymapper_getc()
+int Keymapper_getc(void)
 {	
     int c = bgetc();		
 	
@@ -203,7 +203,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 	
 	// Check for xml map in the config file
 	if (match_map == NULL)				
-		match_map = XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"KeyboardMap");
+		match_map = XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"KeyboardMap");
 	
 	if (match_map)
 	{
@@ -222,7 +222,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 	if (map_kb_type == NULL)
 	{		
 		TagPtr match_type;
-		if ((match_type = XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"KeyboardType")))
+		if ((match_type = XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"KeyboardType")))
 			map_kb_type = XMLCastString(match_type);
 		else 
 			map_kb_type =  "NONE"; // Default to QWERTY
@@ -237,16 +237,12 @@ out:
 	
 }
 
-void Keymapper_start()
+void Keymapper_start(void);
+void Keymapper_start(void)
 {
-#ifdef TRUNK
-#define Config chameleonConfig
-#else
-#define Config bootConfig
-#endif
 	
 	bool enable = true;
-	getBoolForKey(kEnableKeyMap, &enable, &bootInfo->Config) ;
+	getBoolForKey(kEnableKeyMap, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable)
 	{
@@ -256,13 +252,13 @@ void Keymapper_start()
 		} 
 
 #ifdef TRUNK	
-		if (!replace_function("_getchar", &Keymapper_getc)) 
+		if (!replace_system_function("_getchar", &Keymapper_getc)) 
 		{
 			printf("no function getchar() to replace. Keymapper will not be used ! \n");
 						
 		}		
 #else
-		if (replace_function("_getc", &Keymapper_getc) != EFI_SUCCESS) 
+		if (replace_system_function("_getc", &Keymapper_getc) != EFI_SUCCESS) 
 		{
 			printf("no function getc() to replace. Keymapper will not be used ! \n");
 		}

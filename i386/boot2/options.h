@@ -27,75 +27,34 @@
 #ifndef __BOOT2_OPTIONS_H
 #define __BOOT2_OPTIONS_H
 
-#include "boot.h"
 #include "bootstruct.h"
 #include "graphics.h"
 
-typedef struct {
-    int x;
-    int y;
-    int type;
-} CursorState;
+/*
+ * options.c
+ */
+extern int getBootOptions(bool firstRun);
+extern int processBootOptions(void);
+extern bool promptForRescanOption(void);
+extern bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP);
 
-extern MenuItem *  menuItems;
-extern const MenuItem * gMenuItems;
 
+void showHelp(void);
+void showTextFile(const char * filename);
+char *getMemoryInfoString(void);
+void showMessage(char * message);
+void showTextBuffer(char *buf, int size);
 
 void clearBootArgs(void);
 void addBootArg(const char * argStr);
-void changeCursor( int col, int row, int type, CursorState * cs );
-void moveCursor( int col, int row );
-void restoreCursor( const CursorState * cs );
 void printMemoryInfo(void);
 void lspci(void);
-void printMenuItem( const MenuItem * item, int highlight );
-bool flushKeyboardBuffer(void);
-
-
-extern  bool shouldboot;
+char *getMemoryInfoString(void);
 
 #ifdef UNUSED
 extern int multiboot_timeout;
 extern int multiboot_timeout_set;
 #endif
-
-extern BVRef    bvChain;
-//extern int		menucount;
-
-extern int		gDeviceCount;
-
-extern int			selectIndex;
-
-enum {
-    kMenuTopRow    = 5,
-    kMenuMaxItems  = 10,
-    kScreenLastRow = 24
-};
-
-
-//==========================================================================
-
-extern  char   gBootArgs[BOOT_STRING_LEN];
-extern  char * gBootArgsPtr;
-extern  char * gBootArgsEnd;
-extern  char   booterCommand[BOOT_STRING_LEN];
-extern  char   booterParam[BOOT_STRING_LEN];
-
-
-//==========================================================================
-
-extern  int   gMenuItemCount;
-extern  int   gMenuRow;
-extern  int   gMenuHeight;
-extern  int   gMenuTop;
-extern  int   gMenuBottom;
-extern  int   gMenuSelection;
-
-extern  int	 gMenuStart;
-extern  int	 gMenuEnd;
-
-extern unsigned char chainbootdev;
-extern unsigned char chainbootflag;
 
 
 // Maximum config table value size

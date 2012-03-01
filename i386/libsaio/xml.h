@@ -26,16 +26,16 @@
 #define __LIBSAIO_XML_H
 
 enum xmltype {
-  kTagTypeNone = 0,
-  kTagTypeDict,
-  kTagTypeKey,
-  kTagTypeString,
-  kTagTypeInteger,
-  kTagTypeData,
-  kTagTypeDate,
-  kTagTypeFalse,
-  kTagTypeTrue,
-  kTagTypeArray
+    kTagTypeNone = 0,
+    kTagTypeDict,
+    kTagTypeKey,
+    kTagTypeString,
+    kTagTypeInteger,
+    kTagTypeData,
+    kTagTypeDate,
+    kTagTypeFalse,
+    kTagTypeTrue,
+    kTagTypeArray
 };
 
 
@@ -72,12 +72,15 @@ extern string_ref* ref_strings;
 #define kPropIONameMatch        ("IONameMatch")
 
 
-//extern long  gImageFirstBootXAddr;
-//extern long  gImageLastKernelAddr;
-
+#define DEFAULT_BOOT_CONFIG_DICT      (TagPtr)0
+#define DEFAULT_SYSTEM_CONFIG_DICT    (TagPtr)1
+#define DEFAULT_OVERRIDE_CONFIG_DICT  (TagPtr)2
+#define DEFAULT_SMBIOS_CONFIG_DICT    (TagPtr)3
+#define DEFAULT_HELPER_CONFIG_DICT    (TagPtr)4
 TagPtr XMLGetProperty( TagPtr dict, const char * key );
 TagPtr XMLGetElement( TagPtr dict, int id );
 int XMLTagCount( TagPtr dict );
+
 
 bool XMLIsType(TagPtr dict, enum xmltype type);
 

@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "datatype.h"
 
-//U32 ppm_init(void);
-
 #define CURRENT_PPM_RCM_INTERFACE_SPECIFICATION 11
 
 #ifndef nameseg_defined
@@ -369,10 +367,5 @@ typedef struct ppm_setup_options {
     // performance_per_watt = 0 means "Traditional or Max Performance"
     U32 performance_per_watt;
 } PPM_SETUP_OPTIONS;
-
-#ifndef RCMSTART_TYPEDEF
-#define RCMSTART_TYPEDEF
-typedef U32 (*RCMSTART)(struct ppm_setup_options *);
-#endif
 
 #endif // ppmsetup_h

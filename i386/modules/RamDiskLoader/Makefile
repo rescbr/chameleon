@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-RDL_OBJS = ramdisk.o RamDiskLoader.o
+RDL_OBJS = ramdisk.o RamDiskLoader.o stack_protector.o
 
 SFILES =
 CFILES = 
@@ -70,11 +70,16 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/ramdisk.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/ramdisk.o \
 	$(OBJROOT)/RamDiskLoader.o \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 RamDiskLoader.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "RamDiskLoader.c" $(INC) -o "$(OBJROOT)/RamDiskLoader.o"

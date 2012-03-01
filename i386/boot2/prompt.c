@@ -27,12 +27,14 @@
  */
 
 #include "vers.h"
+#include "boot.h"
+#include "platform.h"
 
-char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION /*" r" I386BOOT_CHAMELEONREVISION*/ "\n"
+static char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION /*" r" I386BOOT_CHAMELEONREVISION*/ "\n"
                     "Build date: " I386BOOT_BUILDDATE "\n"
                     "%dMB memory\n";
 
-char bootPrompt[] =
+static char bootPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"
     "  Type -v and press Enter to start up with diagnostic messages\n"
 #ifndef OPTION_ROM
@@ -41,10 +43,17 @@ char bootPrompt[] =
     "boot: ";
 
 #ifndef OPTION_ROM
-char bootRescanPrompt[] =
+static char bootRescanPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"
     "  Press F5 after you swapped the media. The drive will be rescanned.\n"
     "  Type -v and press Enter to start up with diagnostic messages\n"
     "  Type ? and press Enter to learn about advanced startup options\n\n"
     "boot: ";
 #endif
+
+void InitBootPrompt(void)
+{
+    safe_set_env(envBootBanner,(uint32_t)bootBanner);
+    safe_set_env(envBootPrompt,(uint32_t)bootPrompt);
+    safe_set_env(envBootRescanPrompt,(uint32_t)bootRescanPrompt);
+}

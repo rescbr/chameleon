@@ -11,7 +11,7 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 OPTIM = -Os -Oz
 DEBUG = -DNOTHING
 #DEBUG = -DDEBUG_CPU=1 -DDEBUG_MEM=1 -DDEBUG_SPD=1 -DDEBUG_PCI=1 -DDEBUG_SMBIOS=1
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fstack-protector-all \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fno-stack-protector \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
     -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
@@ -33,15 +33,15 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o stack_protector.o \
+SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
         disk.o sys.o cache.o bootstruct.o \
         stringTable.o load.o pci.o allocate.o misc.o \
 		vbe.o hfs.o hfs_compare.o \
-        xml.o md5c.o device_tree.o \
+        xml.o md5c.o device_tree.o modules.o \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o acpi_tools.o smbios.o smp-imps.o 
+        convert.o acpi_tools.o smbios.o smp-imps.o uterror.o
 
 # example for AcpiCodec
 #SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o

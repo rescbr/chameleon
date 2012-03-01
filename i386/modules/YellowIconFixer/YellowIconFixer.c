@@ -5,7 +5,6 @@
 
 #include "libsaio.h"
 #include "modules.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "device_inject.h"
@@ -21,6 +20,7 @@
 #endif
 	
 #define kEnableSATA	"EnableSATAModule"
+void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 uint8_t default_SATA_ID[]= {
 	0x81, 0x26, 0x00, 0x00
@@ -59,10 +59,11 @@ void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 	
 }
 
-void YellowIconFixer_start()
+void YellowIconFixer_start(void);
+void YellowIconFixer_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableSATA, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableSATA, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable)
 	{

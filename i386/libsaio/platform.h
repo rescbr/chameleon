@@ -21,6 +21,10 @@
 #define CPUID_MODEL_DOTHAN          0x0D
 #define CPUID_MODEL_ATOM			0x1C
 
+/* CPUID Vendor */
+#define CPUID_VENDOR_INTEL      0x756E6547
+#define CPUID_VENDOR_AMD        0x68747541
+
 /* SMBIOS Memory Types */ 
 #define SMB_MEM_TYPE_UNDEFINED	0
 #define SMB_MEM_TYPE_OTHER		1
@@ -75,8 +79,110 @@ typedef struct _RamSlotInfo_t {
     
 } RamSlotInfo_t;
 
+#define envVendor           "Vendor"
+#define envCPUIDMaxBasic    "max_basic"
+#define envCPUIDMaxExt      "max_ext"   
+#define envMicrocodeVersion "Microcode"   
+#define envSignature        "Signature"   
+#define envStepping         "Stepping"   
+#define envModel            "Model" 
+
+#define envFamily           "Family"   
+#define envExtModel         "ExtModel"   
+#define envExtFamily        "ExtFamily"   
+#define envBrand            "Brand"   
+#define envFeatures         "Feat"
+#define envExtFeatures      "ExtFeat"
+#define envSubCstates       "sub_Csta"   
+#define envExtensions       "CPUIDext"   
+#define envBrandString      "BrandStr"   
+
+#define envDynamicAcceleration  "dynAcc"
+#define envInvariantAPICTimer   "invAPIC"
+#define envFineGrainClockMod    "fineGrain"   
+#define envNoThreads            "NoThreads"   
+#define envNoCores              "NoCores"   
+#define envIsMobile             "isMobile"   
+#define envMaxCoef              "MaxCoef"   
+#define envMaxDiv               "MaxDiv"   
+#define envCurrCoef             "CurrCoef"   
+#define envCurrDiv              "CurrDiv"   
+#define envTSCFreq              "TSCFreq"   
+#define envFSBFreq              "FSBFreq"   
+#define envCPUFreq              "CPUFreq"
+#define envIsServer             "isServer"
 
 
+#define envCurrCoef             "CurrCoef"   
+#define envCurrDiv              "CurrDiv"   
+#define envTSCFreq              "TSCFreq"   
+#define envFSBFreq              "FSBFreq"   
+#define envCPUFreq              "CPUFreq"
+
+#define envHardwareSignature    "HdwSign"
+#define envType                 "Type"
+#define envUUID                 "UUID"
+#define envSysId                "SysId"
+
+#define envgBootMode            "gBootMode"
+#define envgBIOSDev             "gBIOSDev"
+#define envSysConfigValid       "IsSysConf"
+#define envgOverrideKernel      "IsKover"
+#define envgEnableCDROMRescan   "CDRescan"
+#define envgScanSingleDrive     "1Drive"
+#define envgDeviceCount         "DevCnt"
+#define envShouldboot           "shldboot"
+
+
+#define envDriverExtSpec        "DrvXSpec"
+#define envDriverSpec           "DrvSpec"
+#define envDriverFileSpec       "DrvFSpes"
+#define envDriverTempSpec       "DrvTSpes"
+#define envDriverFileName       "DrvFName"
+
+#define envkCache               "kCache"
+#define envMKextName            "MCache"
+
+#define envBootBanner            "Banner"
+#define envBootPrompt            "Prompt"
+#define envBootRescanPrompt      "PromptBis"
+
+#define envgMenuRow              "MenuRow"
+#define envgMenuHeight           "MenuH"
+#define envgMenuItemCount        "MenuCnt"
+#define envgMenuTop              "MenuTop"
+#define envgMenuBottom           "MenuB"
+#define envgMenuSelection        "MenuSel"
+#define envgMenuStart            "MenuStart"
+#define envgMenuEnd              "MenuEnd"
+#define envArgCntRemaining       "ArgCntRem"
+
+#define envgBootArgs				"gBootArgs"
+
+#define envConvMem                  "ConvMem"
+#define envExtMem                   "ExtMem"
+#define envMemoryMap                "MemoryMap"
+#define envMemoryMapCnt             "MemMapCnt"
+
+
+#define envRamFrequency         "RamFreq"
+#define envRamCas               "tCAS"
+#define envRamTrc               "tRCD"
+#define envRamRas               "tRAS"
+#define envRamTrp               "tRP"
+#define envRamChannels          "RamChans"
+#define envRamType              "RamType"
+#define envRamCas               "tCAS"
+#define envRamCas               "tCAS"
+#define envRamCas               "tCAS"
+#define envRamCas               "tCAS"
+#define envDMIMemModules        "DmiMemMod"
+#define envDMIMaxMemorySlots    "DmiMaxSlt"
+#define envDMICntMemorySlots    "DmiCntSlt"
+#define envRamDimm              "RamDimm"
+#define envDmiDimm              "DmiDimm"
+
+#if UNUSED
 typedef struct _PlatformInfo_t {
 	
     struct CPU_t {
@@ -142,6 +248,12 @@ typedef struct _PlatformInfo_t {
 	int8_t				sysid[16];
     
 } PlatformInfo_t;
+#endif
 
-extern PlatformInfo_t    *Platform;
+#ifdef ShowCurrentDate
+#include "efi.h"
+extern char * Date(void);
+extern void rtc_time(EFI_TIME *time);
+#endif
+
 #endif /* !__LIBSAIO_PLATFORM_H */

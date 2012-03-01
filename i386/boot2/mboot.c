@@ -41,12 +41,18 @@ void dochainload();
 #define FIX_RETURN_ADDRESS_USING_FIRST_ARG(arg) \
     RETURN_ADDRESS_USING_FIRST_ARG(arg) -= OFFSET_1MEG
 
-extern void jump_to_chainbooter();
+extern void jump_to_chainbooter(void);
 extern unsigned char chainbootdev;
 extern unsigned char chainbootflag;
 
-void chainLoad();
-void waitThenReload();
+void chainLoad(void);
+void waitThenReload(void);
+void multiboot_to_boot(int multiboot_magic, struct multiboot_info *mi_orig);
+void *determine_safe_hi_addr(int multiboot_magic, struct multiboot_info *mi_orig);
+void * _hi_malloc(void **hi_addr, size_t size);
+char * _hi_strdup(void **hi_addr, char *src);
+struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_info *mi_orig);
+static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi);
 
 // Starts off in the multiboot context 1 MB high but eventually gets into low memory
 // and winds up with a bootdevice in eax which is all that boot() wants
@@ -80,7 +86,7 @@ void multiboot_to_boot(int multiboot_magic, struct multiboot_info *mi_orig)
     // particularly when the remaining code merely halts the processor.
 }
 
-void chainLoad()
+void chainLoad(void)
 {
     /*  TODO: We ought to load the appropriate partition table, for example
         the MBR if booting a primary partition or the particular extended
@@ -108,7 +114,7 @@ void chainLoad()
     }
 }
 
-void waitThenReload()
+void waitThenReload(void)
 {
     /* FIXME: Ctrl+Alt+Del does not work under Boot Camp */
 	uint8_t i = 5;

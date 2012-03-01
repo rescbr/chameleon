@@ -7,8 +7,8 @@
 #ifndef __BOOT_RAMDISK_H
 #define __BOOT_RAMDISK_H
 
-#include "drivers.h"
 #include "boot.h"
+#include "drivers.h"
 //#include "mboot.h"
 
 #define RAMDISKCONFIG_FILENAME "rd(0,0)/RAMDisk.plist"
@@ -40,6 +40,7 @@ extern long FileLoadDrivers(char *dirSpec, long plugin);
 extern void setRAMDiskBTHook(bool mode);
 extern int mountRAMDisk(const char * param);
 extern void processRAMDiskCommand(char ** argPtr, const char * cmd);
-extern int loadPrebootRAMDisk();
-
+extern int loadPrebootRAMDisk(void);
+extern void showInfoRAMDisk(void);
+extern void umountRAMDisk(void);
 #endif /* !__BOOT_RAMDISK_H */

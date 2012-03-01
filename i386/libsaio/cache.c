@@ -27,8 +27,7 @@
  *  DRI: Josh de Cesare
  */
 
-#include <sl.h>
-// #include <fs.h>
+#include "sl.h"
 
 struct CacheEntry {
   CICell    ih;

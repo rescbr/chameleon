@@ -15,7 +15,7 @@
 /*
  * cparm : add volume version detection
  */
-
+#include "platform.h"
 #include "gui.h"
 #include "GUI_appleboot.h"
 #include "vers.h"
@@ -34,7 +34,24 @@
 #define DBG(x...)
 #endif
 
+enum {
+	kBackspaceKey	= 0x08,
+	kTabKey			= 0x09,
+	kReturnKey		= 0x0d,
+	kEscapeKey		= 0x1b,
+	kUpArrowkey		= 0x4800, 
+	kDownArrowkey	= 0x5000,
+	kASCIIKeyMask	= 0x7f,
+	kF5Key			= 0x3f00,
+	kF10Key			= 0x4400
+};
+
+static config_file_t    themeConfig;				           // theme.plist
+
 themeList_t* themeList = NULL;
+
+static void (*showHelp)(void) = NULL;
+static char *(*getMemoryInfoString)(void) = NULL;
 
 
 gui_t gui;					// gui structure
@@ -119,8 +136,6 @@ static bool is_image_loaded(int i);
 
 int lasttime = 0; // we need this for animating maybe
 
-extern int gDeviceCount;
-
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
  */
@@ -132,6 +147,8 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+    iDeviceHFS_ML,
+    iDeviceHFS_ML_o,
 	iDeviceHFS_Lion,
     iDeviceHFS_Lion_o,
 	iDeviceHFS_SL,
@@ -142,6 +159,8 @@ enum {
     iDeviceHFS_Tiger_o,
     iDeviceHFSRAID,
     iDeviceHFSRAID_o,
+    iDeviceHFSRAID_ML,
+    iDeviceHFSRAID_ML_o,
 	iDeviceHFSRAID_Lion,
     iDeviceHFSRAID_Lion_o,
 	iDeviceHFSRAID_SL,
@@ -203,7 +222,9 @@ image_t images[] = {
     {.name = "device_generic_o",            .image = NULL},
     
 	{.name = "device_hfsplus",              .image = NULL},
-    {.name = "device_hfsplus_o",            .image = NULL},	
+    {.name = "device_hfsplus_o",            .image = NULL},
+	{.name = "device_hfsplus_ml",           .image = NULL},
+    {.name = "device_hfsplus_ml_o",         .image = NULL},
 	{.name = "device_hfsplus_lion",              .image = NULL},
     {.name = "device_hfsplus_lion_o",            .image = NULL},
 	{.name = "device_hfsplus_sl",              .image = NULL},
@@ -215,6 +236,8 @@ image_t images[] = {
 	
     {.name = "device_hfsraid",              .image = NULL},
     {.name = "device_hfsraid_o",            .image = NULL},
+    {.name = "device_hfsraid_ml",           .image = NULL},
+    {.name = "device_hfsraid_ml_o",         .image = NULL},
 	{.name = "device_hfsraid_lion",              .image = NULL},
     {.name = "device_hfsraid_lion_o",            .image = NULL},
 	{.name = "device_hfsraid_sl",              .image = NULL},
@@ -269,10 +292,7 @@ image_t images[] = {
     {.name = "font_small",                  .image = NULL},
 };
 
-int imageCnt = 0;
-
-extern int	gDeviceCount;
-extern int	selectIndex;
+//int imageCnt = 0;
 
 char prompt[BOOT_STRING_LEN];
 
@@ -297,6 +317,26 @@ int infoMenuItemsCount = sizeof(infoMenuItems)/sizeof(infoMenuItems[0]);
 bool infoMenuNativeBoot = false;
 
 unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
+
+static void moveCursor( int col, int row )
+{
+    setCursorPosition( col, row, 0 );
+}
+//==========================================================================
+
+/* Flush keyboard buffer; returns TRUE if any of the flushed
+ * characters was F8.
+ */
+
+static bool flushKeyboardBuffer(void)
+{
+    bool status = false;
+	
+    while ( readKeyboardStatus() ) {
+        if (bgetc() == 0x4200) status = true;
+    }
+    return status;
+}
 
 static int getImageIndexByName(const char *name)
 {
@@ -474,6 +514,8 @@ static int loadGraphics(char *src)
 	
 	LOADPNG(src, device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(src, device_hfsplus_o,               iDeviceHFS);
+    LOADPNG(src, device_hfsplus_ml,              iDeviceHFS_ML);
+    LOADPNG(src, device_hfsplus_ml_o,            iDeviceHFS_ML_o);
 	LOADPNG(src, device_hfsplus_lion,            iDeviceHFS_Lion);
 	LOADPNG(src, device_hfsplus_lion_o,          iDeviceHFS_Lion_o);
 	LOADPNG(src, device_hfsplus_sl,              iDeviceHFS_SL);
@@ -485,6 +527,8 @@ static int loadGraphics(char *src)
 	
 	LOADPNG(src, device_hfsraid,                 iDeviceGeneric);
 	LOADPNG(src, device_hfsraid_o,               iDeviceHFSRAID);
+    LOADPNG(src, device_hfsraid_ml,              iDeviceHFSRAID_ML);
+    LOADPNG(src, device_hfsraid_ml_o,            iDeviceHFSRAID_ML_o);
 	LOADPNG(src, device_hfsraid_lion,       iDeviceHFSRAID_Lion);
 	LOADPNG(src, device_hfsraid_lion_o,     iDeviceHFSRAID_Lion_o);
 	LOADPNG(src, device_hfsraid_sl,         iDeviceHFSRAID_SL);
@@ -704,9 +748,10 @@ static void setupDeviceList(config_file_t *theme)
 	uint32_t color;			// color value formatted RRGGBB
 	int val, len;
 	const char *string;	
-	
+    int devcnt = (int)get_env(envgDeviceCount);
+
 	if(getIntForKey("devices_max_visible", &val, theme ))
-		gui.maxdevices = MIN( val, gDeviceCount );
+		gui.maxdevices = MIN( val, devcnt );
 	
 	if(getIntForKey("devices_iconspacing", &val, theme ))
 		gui.devicelist.iconspacing = val;
@@ -721,7 +766,7 @@ static void setupDeviceList(config_file_t *theme)
 	
 	switch (gui.layout) {
 		case VerticalLayout:
-			gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
+			gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, devcnt) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
 			gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
 			
 			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
@@ -733,7 +778,7 @@ static void setupDeviceList(config_file_t *theme)
 			
 		case HorizontalLayout:
 		default:
-			gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, gDeviceCount) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
+			gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, devcnt) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
 			gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
 			
 			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
@@ -1056,13 +1101,15 @@ int initGUI(void)
 	bool theme_ran= false;
 	bool theme_name_set= false;
 	
-	getBoolForKey(kGUIKey, &dummybool, &bootInfo->bootConfig);
+	getBoolForKey(kGUIKey, &dummybool, DEFAULT_BOOT_CONFIG);
 	if (!dummybool) {
 		return 1;
 	}
+    getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getMemoryInfoString");
+    showHelp = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showHelp");
+
 	
-	
-	getBoolForKey("RandomTheme", &theme_ran, &bootInfo->bootConfig);
+	getBoolForKey("RandomTheme", &theme_ran, DEFAULT_BOOT_CONFIG);
 	
 	{
 		long flags;
@@ -1070,7 +1117,7 @@ int initGUI(void)
 		long ret = -1;
 		int    len;
 		
-		theme_name_set = getValueForKey( "Theme", &theme_name, &len, &bootInfo->bootConfig );
+		theme_name_set = getValueForKey( "Theme", &theme_name, &len, DEFAULT_BOOT_CONFIG );
 		
 		if (theme_ran) 
 		{		
@@ -1129,7 +1176,13 @@ int initGUI(void)
 		
 		ret = randomTheme(dirsrc, &theme_name);
  		
-		if (ret) printf("randomTheme Failed !! \n");		
+		if (ret) printf("randomTheme Failed !! \n");
+#if DEBUG_GUI
+		else
+        {
+            DBG("Theme successfuly Choosen randomly !! \n"); 
+        }
+#endif
 	} 
 	
 	if (ret)
@@ -1174,13 +1227,13 @@ static int startGUI(void)
 	
 	sprintf(dirspec, "%s/%s/theme.plist", dirsrc ,theme_name);
 	
-	if (loadConfigFile(dirspec, &bootInfo->themeConfig) != 0) {
+	if (loadConfigFile(dirspec, &themeConfig) != 0) {
 		
 #ifdef EMBED_THEME
 		if (strlen(theme_name) == 0) {
 			config_file_t    *config;
 			
-			config = &bootInfo->themeConfig;
+			config = &themeConfig;
 			if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
 				
 				DBG("Unable to load embed theme plist datas.\n");
@@ -1200,10 +1253,10 @@ static int startGUI(void)
 	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) != EFI_SUCCESS)		
 	{		
 		// parse display size parameters
-		if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+		if (getIntForKey("screen_width", &val, &themeConfig) && val > 0) {
 			screen_params[0] = val;
 		}
-		if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+		if (getIntForKey("screen_height", &val, &themeConfig) && val > 0) {
 			screen_params[1] = val;
 		}		
 	}
@@ -1228,7 +1281,7 @@ static int startGUI(void)
 	
 	// load graphics otherwise fail and return
 	if (loadGraphics(dirsrc) == 0) {
-		loadThemeValues(&bootInfo->themeConfig);
+		loadThemeValues(&themeConfig);
 		colorFont(&font_small, gui.screen.font_small_color);
 		colorFont(&font_console, gui.screen.font_console_color);
 		
@@ -1248,6 +1301,8 @@ static int startGUI(void)
 							    gui.logo.draw = true;
 								drawBackground();
 								// lets copy the screen into the back buffer
+                                memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
+
 #if UNUSED
 								setVideoMode( GRAPHICS_MODE, 0 );
 #else
@@ -1299,6 +1354,9 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 				if (device->flags & kBVFlagBooter) {
                     
 					switch (device->OSVersion[3]) {
+                        case '8':
+                            devicetype = is_image_loaded(iDeviceHFSRAID_ML) ? iDeviceHFSRAID_ML : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+                            break;
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFSRAID_Lion) ? iDeviceHFSRAID_Lion : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
 							break;
@@ -1321,6 +1379,9 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 				{					
 					
 					switch (device->OSVersion[3]) {
+                        case '8':
+                            devicetype = is_image_loaded(iDeviceHFS_ML) ? iDeviceHFS_ML : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+                            break;
 						case '7':
 							devicetype = is_image_loaded(iDeviceHFS_Lion) ? iDeviceHFS_Lion : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
 							break;
@@ -1394,7 +1455,7 @@ static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool is
 	
 }
 
-void drawDeviceList (int start, int end, int selection)
+void drawDeviceList (int start, int end, int selection, MenuItem *  menuItems)
 {
 	int i;
 	position_t p, p_prev, p_next;
@@ -1404,7 +1465,9 @@ void drawDeviceList (int start, int end, int selection)
 	fillPixmapWithColor( gui.devicelist.pixmap, gui.devicelist.bgcolor);
 	
 	makeRoundedCorners( gui.devicelist.pixmap);
-	
+    
+    int devcnt = (int)get_env(envgDeviceCount);
+
 	switch (gui.layout)
 	{
 			
@@ -1489,7 +1552,7 @@ void drawDeviceList (int start, int end, int selection)
 		blend( images[iDeviceScrollPrev].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollPrev].image, p_prev ) );
 	
 	// draw next indicator
-	if( end < gDeviceCount - 1 )
+	if( end < devcnt - 1 )
 		blend( images[iDeviceScrollNext].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollNext].image, p_next ) );
 	
 	gui.redraw = true;
@@ -2467,7 +2530,7 @@ void drawBootGraphics(void)
 	int oldScreenWidth, oldScreenHeight;
 	uint16_t x, y; 
 	bool legacy_logo = false;
-	getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->bootConfig);	
+	getBoolForKey("Legacy Logo", &legacy_logo, DEFAULT_BOOT_CONFIG);	
 	if (legacy_logo == false) {
 		usePngImage = true;
 		
@@ -2480,12 +2543,12 @@ void drawBootGraphics(void)
 	if (execute_hook("getResolution_hook", &screen_params[0], &screen_params[1], &screen_params[2], NULL, NULL, NULL) != EFI_SUCCESS)		
 	{		
 		// parse screen size parameters
-		if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
+		if (getIntForKey("boot_width", &pos, &themeConfig) && pos > 0) {
 			screen_params[0] = pos;
 		} else {
 			screen_params[0] = DEFAULT_SCREEN_WIDTH;
 		}
-		if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+		if (getIntForKey("boot_height", &pos, &themeConfig) && pos > 0) {
 			screen_params[1] = pos;
 		} else {
 			screen_params[1] = DEFAULT_SCREEN_HEIGHT;
@@ -2513,7 +2576,7 @@ void drawBootGraphics(void)
 #endif
 	}
 	
-	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->bootConfig)) {
+	if (getValueForKey("-checkers", &dummyVal, &length, DEFAULT_BOOT_CONFIG)) {
 		drawCheckerBoard();
 	} else {
 		// Fill the background to 75% grey (same as BootX). 
@@ -2546,7 +2609,7 @@ void drawBootGraphics(void)
 	} 
 }
 
-int GUI_initGraphicsMode ()
+int GUI_initGraphicsMode (void)
 {
 	unsigned long params[4];
 	int           count;
@@ -2583,7 +2646,7 @@ int GUI_initGraphicsMode ()
 }
 
 
-int GUI_countdown( const char * msg, int row, int timeout )
+int GUI_countdown( const char * msg, int row, int timeout , int *optionKey)
 {
     unsigned long time;
     register int ch  = 0;
@@ -2624,8 +2687,10 @@ int GUI_countdown( const char * msg, int row, int timeout )
 			lasttime=time18();
 		}		
 		
-        if ((ch = readKeyboardStatus()))
+        if ((ch = readKeyboardStatus())){
+            *optionKey = ch;            
             break;
+		}
 		
         // Count can be interrupted by holding down shift,
         // control or alt key
@@ -2660,3 +2725,5 @@ int GUI_countdown( const char * msg, int row, int timeout )
 	
     return ch;
 }
+
+

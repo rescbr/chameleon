@@ -8,7 +8,7 @@
 
 #include "libsaio.h"
 
-extern void scan_cpu(PlatformInfo_t *);
+extern void scan_cpu(void);
 
 #define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199

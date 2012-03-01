@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-USB_OBJS = USBFix.o usb.o
+USB_OBJS = USBFix.o usb.o stack_protector.o
 
 
 SFILES =
@@ -70,12 +70,17 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/USBFix.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/USBFix.o \
 	$(OBJROOT)/usb.o \
 	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 USBFix.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "USBFix.c" $(INC) -o "$(OBJROOT)/USBFix.o"

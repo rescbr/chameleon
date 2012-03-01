@@ -7,9 +7,8 @@
 #include "kernel_patcher.h"
 #include "platform.h"
 #include "modules.h"
-extern PlatformInfo_t*    Platform;
 
-long long symbol_handler(char* symbolName, long long addr, char is64);
+long long symbol_handler(char* module, char* symbolName, long long addr, char is64);
 
 patchRoutine_t* patches = NULL;
 kernSymbols_t* kernelSymbols = NULL;
@@ -33,9 +32,11 @@ static void patch_lapic_configure(void* kernelData);
 //static void patch_lapic_interrupt(void* kernelData);
 
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6);
+void kernel_patcher_ignore_cache(void* arg1, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6);
 void kernel_patcher_ignore_cache(void* arg1, void* arg2, void* arg3, void *arg4, void* arg5, void* arg6){}
 
-void KernelPatcher_start()
+void KernelPatcher_start(void);
+void KernelPatcher_start(void)
 {
 	register_kernel_patch(patch_cpuid_set_info_all, KERNEL_ANY, CPUID_MODEL_UNKNOWN); 
 
@@ -65,7 +66,7 @@ void KernelPatcher_start()
 
 	register_hook_callback("ExecKernel", &patch_kernel); 
 	
-	replace_function("_getKernelCachePath", &kernel_patcher_ignore_cache);
+	replace_system_function("_getKernelCachePath", &kernel_patcher_ignore_cache);
 }
 
 /*
@@ -77,16 +78,15 @@ static void register_kernel_patch(void* patch, int arch, int cpus)
 	// AKA, don't at 64bit patches if it's a 32bit only machine
 	patchRoutine_t* entry;
 	
-	// TODO: verify Platform->CPU.Model is populated this early in bootup
 	// Check to ensure that the patch is valid on this machine
 	// If it is not, exit early form this function
-	if(cpus != Platform->CPU.Model)
+	if(cpus != get_env(envModel))
 	{
 		if(cpus != CPUID_MODEL_ANY)
 		{
 			if(cpus == CPUID_MODEL_UNKNOWN)
 			{
-				switch(Platform->CPU.Model)
+				switch(get_env(envModel))
 				{
 					case 13:
 					case CPUID_MODEL_YONAH:
@@ -226,12 +226,12 @@ static int determineKernelArchitecture(void* kernelData)
 static int locate_symbols(void* kernelData)
 {
 	char is64 = 1;
-	parse_mach(kernelData, NULL, symbol_handler);
+	parse_mach("VirtualXnuSyms",kernelData, NULL, symbol_handler);
 	//handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
 	return 1 << is64;
 }
 
-long long symbol_handler(char* symbolName, long long addr, char is64)
+long long symbol_handler(char* module, char* symbolName, long long addr, char is64)
 {
 	// Locate the symbol in the list, if it exists, update it's address
 	kernSymbols_t *symbol = lookup_kernel_symbol(symbolName);
@@ -250,7 +250,7 @@ long long symbol_handler(char* symbolName, long long addr, char is64)
  **/
 static void patch_cpuid_set_info_all(void* kernelData)
 {
-	switch(Platform->CPU.Model)
+	switch(get_env(envModel))
 	{
 		case CPUID_MODEL_ATOM:
 			if(determineKernelArchitecture(kernelData) == KERNEL_32)
@@ -267,7 +267,7 @@ static void patch_cpuid_set_info_all(void* kernelData)
 		default:
 		{
 			// AnV: Extra cpuid fix for spoofing Nehalem CPU for i5/i9
-			switch(Platform->CPU.Family)
+			switch(get_env(envFamily))
 			{
 				case 0x1E: /* Intel i5 */
 				case 0x2C: /* Intel i9 */

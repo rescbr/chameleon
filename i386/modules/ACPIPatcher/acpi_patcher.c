@@ -8,7 +8,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "acpi.h"
 #include "efi_tables.h"
@@ -42,6 +41,14 @@ extern EFI_STATUS addConfigurationTable();
 
 extern EFI_GUID gEfiAcpiTableGuid;
 extern EFI_GUID gEfiAcpi20TableGuid;
+struct acpi_2_fadt *
+patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFADT);
+struct acpi_2_gas FillGASStruct(uint32_t Address, uint8_t Length);
+struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt);
+struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt);
+void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length);
+void *loadACPITable(char *key);
+void *loadSSDTTable(int ssdt_number);
 
 #define tableSign(table, sgn) (table[0]==sgn[0] && table[1]==sgn[1] && table[2]==sgn[2] && table[3]==sgn[3])
 
@@ -255,7 +262,7 @@ void *loadSSDTTable(int ssdt_number)
 	
 	// Rek: if user specified a full path name then take it in consideration
 	if (getValueForKey(kSSDT, &overriden_pathname, &len,  
-					   &bootInfo->bootConfig))
+					   DEFAULT_BOOT_CONFIG))
 	{
 		sprintf(filename, "%s-%d.aml", overriden_pathname, ssdt_number); // start searching root		
 	}
@@ -318,7 +325,7 @@ void *loadACPITable(char *key)
     
 	// Rek: if user specified a full path name then take it in consideration
 	if (getValueForKey(key, &overriden_pathname, &len,  
-					   &bootInfo->bootConfig))
+					   DEFAULT_BOOT_CONFIG))
 	{		
 		sprintf(filename, "%s", overriden_pathname);		
 	}
@@ -433,7 +440,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x00, 0x00, 0x00, 0x79, 0x00
 	};
 	
-	if (Platform->CPU.Vendor != 0x756E6547) {
+	if (get_env(envVendor) != CPUID_VENDOR_INTEL) {
 		verbose ("Not an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
 	}
@@ -459,12 +466,12 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		bool c3_enabled = fadt->C3_Latency < 1000;
 		bool c4_enabled = false;
 		
-		getBoolForKey(kEnableC4State, &c4_enabled, &bootInfo->bootConfig);
+		getBoolForKey(kEnableC4State, &c4_enabled, DEFAULT_BOOT_CONFIG);
         
 		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + ((c3_enabled || c4_enabled) ? 1 : 0);
 		char *Lat = NULL, *Pw = NULL, *tmpstr =NULL;
 		int base = 16;
-		TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"C-States"));
+		TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"C-States"));
 		
 		if ((tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Base")))) {
 			
@@ -596,12 +603,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		0x31, 0x03, 0x10, 0x20,							/* 1.._		*/
 	};
     
-	if (Platform->CPU.Vendor != 0x756E6547) {
+	if (get_env(envVendor) != CPUID_VENDOR_INTEL) {
 		verbose ("Not an Intel platform: P-States will not be generated !!!\n");
 		return NULL;
 	}
 	
-	if (!(Platform->CPU.Features & CPUID_FEATURE_MSR)) {
+	if (!(get_env(envFeatures) & CPUID_FEATURE_MSR)) {
 		verbose ("Unsupported CPU: P-States will not be generated !!!\n");
 		return NULL;
 	}
@@ -615,10 +622,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		uint8_t p_states_count = 0;		
 		
 		// Retrieving P-States, ported from code by superhai (c)
-		switch (Platform->CPU.Family) {
+		switch (get_env(envFamily)) {
 			case 0x06: 
 			{
-				switch (Platform->CPU.Model) 
+				switch (get_env(envModel)) 
 				{
 					case CPUID_MODEL_DOTHAN: // ?
 					case CPUID_MODEL_YONAH: // Yonah
@@ -705,6 +712,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 							
 							vidstep = ((maximum.VID << 2) - (minimum.VID << 2)) / (p_states_count - 1);
 							
+                            uint32_t fsb = (uint32_t)get_env(envFSBFreq) / 1000000;
+                            
 							for (u = 0; u < p_states_count; u++) 
 							{
 								i = u - invalid;
@@ -730,7 +739,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 								uint32_t multiplier = p_states[i].FID & 0x1f;		// = 0x08
 								bool half = p_states[i].FID & 0x40;					// = 0x01
 								bool dfsb = p_states[i].FID & 0x80;					// = 0x00
-								uint32_t fsb = Platform->CPU.FSBFrequency / 1000000; // = 400
+								//uint32_t fsb = Platform->CPU.FSBFrequency / 1000000; // = 400
 								uint32_t halffsb = (fsb + 1) >> 1;					// = 200
 								uint32_t frequency = (multiplier * fsb);			// = 3200
 								
@@ -766,12 +775,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						{
 							uint8_t i;
 							p_states_count = 0;
-							
+							uint64_t fsb = (get_env(envFSBFreq) / 1000000);
 							for (i = maximum.Control; i >= minimum.Control; i--) 
 							{
 								p_states[p_states_count].Control = i;
 								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
-								p_states[p_states_count].Frequency = (Platform->CPU.FSBFrequency / 1000000) * i;
+								p_states[p_states_count].Frequency = (uint32_t) fsb * i;
 								p_states_count++;
 							}
 						}
@@ -798,20 +807,24 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
             struct aml_chunk* name = aml_add_name(scop, "PSS_");
             struct aml_chunk* pack = aml_add_package(name);
 			
-            uint8_t minPSratio = (p_states[p_states_count-1].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
-            uint8_t maxPSratio = (p_states[0].Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
+            uint64_t FSBFreq = get_env(envFSBFreq);
             
-            uint8_t cpu_div = Platform->CPU.CurrDiv;
+            uint8_t minPSratio = (p_states[p_states_count-1].Frequency / (FSBFreq / 10000000 ));
+            uint8_t maxPSratio = (p_states[0].Frequency / (FSBFreq / 10000000 ));
+            
+            uint8_t cpu_div = (uint8_t)get_env(envCurrDiv);
+            uint8_t cpu_coef = (uint8_t)get_env(envCurrCoef);
+
             uint8_t cpu_ratio = 0;
 			
             if (cpu_div) 								
-                cpu_ratio = (Platform->CPU.CurrCoef * 10) + 5;								
+                cpu_ratio = (cpu_coef * 10) + 5;								
             else 								
-                cpu_ratio = Platform->CPU.CurrCoef * 10;
+                cpu_ratio = cpu_coef * 10;
             
 			
             int user_max_ratio = 0;
-            getIntForKey(kMaxRatio, &user_max_ratio, &bootInfo->bootConfig);
+            getIntForKey(kMaxRatio, &user_max_ratio, DEFAULT_BOOT_CONFIG);
             if (user_max_ratio >= minPSratio && maxPSratio >= user_max_ratio) {									
 				
                 uint8_t maxcurrdiv = 0, maxcurrcoef = (int)(user_max_ratio / 10);									
@@ -827,7 +840,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
             }
 			
             int user_min_ratio = 0;
-            getIntForKey(kMinRatio, &user_min_ratio, &bootInfo->bootConfig);
+            getIntForKey(kMinRatio, &user_min_ratio, DEFAULT_BOOT_CONFIG);
             if (user_min_ratio >= minPSratio && cpu_ratio >= user_min_ratio) {
 				
                 uint8_t mincurrdiv = 0, mincurrcoef = (int)(user_min_ratio / 10);									
@@ -846,7 +859,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			
             if (maxPSratio >= cpu_ratio && cpu_ratio >= minPSratio)	maxPSratio = cpu_ratio;													
 			
-            TagPtr personality = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"P-States"));
+            TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"P-States"));
             char* MatchStat = 0;
             int dropPSS = 0, Pstatus = 0, base = 16;								
             int expert = 0;/* Default: 0 , mean mixed mode | expert mode : 1 , mean add only p-states found in boot.plist*/
@@ -868,6 +881,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
                     base = mybase;									
             }
 			
+            uint64_t fsb = (get_env(envFSBFreq) / 10000000 );
+            
             for (i = 0; i < p_states_count; i++) 
             {									
                 sprintf(MatchStat, "%d",i);
@@ -897,7 +912,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
                 
                 if (!Frequency || Frequency > p_states[0].Frequency ) continue;
                 
-                uint8_t curr_ratio = (Frequency / (Platform->CPU.FSBFrequency / 10000000 ));
+                uint8_t curr_ratio = (uint8_t)(Frequency / fsb);
                 
                 if (curr_ratio > maxPSratio || minPSratio > curr_ratio)
                     goto dropPstate;
@@ -996,9 +1011,9 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 	bool msiOff = true;
 
 	// Restart Fix
-	if (Platform->CPU.Vendor == 0x756E6547) {	/* Intel */
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL) {	/* Intel */
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, &bootInfo->bootConfig);
+		getBoolForKey(kRestartFix, &fix_restart, DEFAULT_BOOT_CONFIG);
 		
 	} else {
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
@@ -1011,8 +1026,8 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 	if ((UpdateFADT) && (((fadt_file) && (fadt_file->Length < sizeof(struct acpi_2_fadt))) ||
 						 ((!fadt_file) && (fadt->Length < sizeof(struct acpi_2_fadt)))))        
 	{
-        getBoolForKey(kDisableMSI, &msiOff, &bootInfo->bootConfig) ;
-        getBoolForKey(kDisableASPM, &aspmOff, &bootInfo->bootConfig);
+        getBoolForKey(kDisableMSI, &msiOff, DEFAULT_BOOT_CONFIG) ;
+        getBoolForKey(kDisableASPM, &aspmOff, DEFAULT_BOOT_CONFIG);
         
 		if (fadt_file)
 		{
@@ -1096,38 +1111,38 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 	// Determine system type / PM_Model
 	
 	// Fix System-type if needed (should never happen)
-	if (Platform->Type > MaxSupportedPMProfile)  
+	if (get_env(envType) > MaxSupportedPMProfile)  
 	{
 		if(fadt_mod->PM_Profile <= MaxSupportedPMProfile)
-			Platform->Type = fadt_mod->PM_Profile; // get the fadt if correct
+			safe_set_env(envType,fadt_mod->PM_Profile); // get the fadt if correct
 		else 
-			Platform->Type = 1;		/* Set a fixed value (Desktop) */
+			safe_set_env(envType, 1);		/* Set a fixed value (Desktop) */
 	}
 	
 	// If needed, set System-type from PM_Profile (if valid) else set PM_Profile with a fixed the System-type  
 	// Give prior to the FADT pm profile, allow to also control this value with a patched FADT table
-	if (fadt_mod->PM_Profile != Platform->Type) 
+	if (fadt_mod->PM_Profile != get_env(envType)) 
 	{
 		bool val = false;  
-		getBoolForKey("PreferInternalProfileDetect", &val, &bootInfo->bootConfig); // if true Give prior to the profile resolved trought the CPU model
+		getBoolForKey("PreferInternalProfileDetect", &val, DEFAULT_BOOT_CONFIG); // if true Give prior to the profile resolved trought the CPU model
 		
-		val = Platform->CPU.isServer ;
+		val = get_env(envIsServer) ;
 		
 		if (fadt_mod->PM_Profile <= MaxSupportedPMProfile && !val) {
-			Platform->Type = fadt_mod->PM_Profile;
+			safe_set_env(envType, fadt_mod->PM_Profile);
 		} else {
-			fadt_mod->PM_Profile = Platform->Type;
+			fadt_mod->PM_Profile = (uint8_t)get_env(envType);
 		}		
 		
 	}
 	
 	// Set PM_Profile and System-type if user wanted this value to be forced
-	if ( (value=getStringForKey("SystemType", &bootInfo->bootConfig))!=NULL) {
+	if ( (value=getStringForKey("SystemType", DEFAULT_BOOT_CONFIG))!=NULL) {
 		if ((Type = (unsigned char) strtoul(value, NULL, 10) ) <= MaxSupportedPMProfile)
 		{
-			verbose("FADT: changing Preferred_PM_Profile from 0x%02x to 0x%02x\n", fadt->PM_Profile, Type);
-			fadt_mod->PM_Profile = Platform->Type = Type;
-		} else verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform->Type);
+			verbose("FADT: changing Preferred_PM_Profile from 0x%02x to 0x%02x\n", fadt->PM_Profile, Type);			
+            safe_set_env(envType,(fadt_mod->PM_Profile = Type));
+		} else verbose("Error: system-type must be 0..6. Defaulting to %d !\n", (uint8_t)get_env(envType));
 	}
     
 	// Patch FADT to fix restart
@@ -1158,12 +1173,11 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 		if ((uint32_t)(&(fadt_mod->X_FIRMWARE_CTRL))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
 			fadt_mod->X_FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
         
-		Platform->hardware_signature = 	((struct acpi_2_facs *)fadt->FIRMWARE_CTRL)->hardware_signature;
-
-	DBG("setting hardware_signature to %x \n",Platform->hardware_signature);
     
-	
-	
+    safe_set_env(envHardwareSignature,((struct acpi_2_facs *)fadt->FIRMWARE_CTRL)->hardware_signature);
+
+	DBG("setting hardware_signature to %x \n",(uint32_t)get_env(envHardwareSignature));
+    	
 	// Patch DSDT Address if we have loaded a DSDT table
 	if(new_dsdt)
 	{		
@@ -1208,24 +1222,24 @@ EFI_STATUS setupAcpi(void)
 	{
 		bool tmpval;
 		
-		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_ssdt=getBoolForKey(kOEMSSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_hpet=getBoolForKey(kOEMHPET, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_sbst=getBoolForKey(kOEMSBST, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_ecdt=getBoolForKey(kOEMECDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_asft=getBoolForKey(kOEMASFT, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_dmar=getBoolForKey(kOEMDMAR, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		oem_mcfg=getBoolForKey(kOEMMCFG, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_ssdt=getBoolForKey(kOEMSSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_hpet=getBoolForKey(kOEMHPET, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_sbst=getBoolForKey(kOEMSBST, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_ecdt=getBoolForKey(kOEMECDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_asft=getBoolForKey(kOEMASFT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_dmar=getBoolForKey(kOEMDMAR, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_mcfg=getBoolForKey(kOEMMCFG, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 
-		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
-		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
         
-		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		
-		quick_ssdt=getBoolForKey(kQSSDT, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		quick_ssdt=getBoolForKey(kQSSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		
-		speed_step=getBoolForKey(kSpeedstep, &tmpval, &bootInfo->bootConfig)&&tmpval;
+		speed_step=getBoolForKey(kSpeedstep, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		
 	} 	
     
@@ -1286,7 +1300,7 @@ EFI_STATUS setupAcpi(void)
 	}
 
 	DBG("New ACPI tables Loaded in memory\n");
-	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->bootConfig.dictionary, (const char*)"ACPIDropTables"));
+	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables"));
 	// Do the same procedure for both versions of ACPI
 	for (version=0; version<2; version++) {
 		struct acpi_2_rsdp *rsdp_mod, *rsdp_conv=(struct acpi_2_rsdp *)0;
@@ -1371,8 +1385,8 @@ EFI_STATUS setupAcpi(void)
 				
 				rsdt_entries[i-dropoffset]=rsdt_entries[i];
 				
-				char table4[4];
-				strlcpy(table4, table, sizeof(table4)+1);
+				char table4[5];
+				strlcpy(table4, table, sizeof(table4));
 				TagPtr match_drop = XMLGetProperty(DropTables_p, (const char*)table4);
 				if ( match_drop ) {
 					char *tmpstr = XMLCastString(match_drop);
@@ -1688,8 +1702,8 @@ EFI_STATUS setupAcpi(void)
 					                                        
 					xsdt_entries[i-dropoffset]=xsdt_entries[i];
 					
-					char table4[4];
-					strlcpy(table4, table, sizeof(table4)+1);
+					char table4[5];
+					strlcpy(table4, table, sizeof(table4));
 					TagPtr match_drop = XMLGetProperty(DropTables_p, (const char*)table4);                    
 					if ( match_drop ) {
 						char *tmpstr = XMLCastString(match_drop);
@@ -1996,26 +2010,14 @@ EFI_STATUS setupAcpi(void)
 		
 		verbose("Patched ACPI version %d\n", version+1);
 		
-		if (version)
-		{
-			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
-			acpi20_p = (uint32_t)rsdp_mod;
-            if (acpi20_p)
-			Status = addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
-		}
-		else
-		{
-			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
-			acpi10_p = (uint32_t)rsdp_mod;
-            if (acpi10_p)
-			Status = addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
-		}
+		
+        Status = Register_Acpi_Efi(rsdp_mod, version+1);
+
 	}
 
 #if DEBUG_DSDT
 	printf("Press a key to continue... (DEBUG_DSDT)\n");
 	getc();
 #endif
-	//return (Status == EFI_SUCCESS) ? 1 : 0;
 	return Status ;
 }

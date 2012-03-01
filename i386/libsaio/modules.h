@@ -21,6 +21,7 @@ extern unsigned long long textSection;
 
 typedef struct symbolList_t
 {
+    char* module;
 	char* symbol;
 	unsigned int addr;
 	struct symbolList_t* next;
@@ -55,8 +56,8 @@ typedef struct moduleHook_t
 #define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
 #define SECT_SYMBOL_STUBS			"__symbol_stub"
 
-EFI_STATUS init_module_system();
-VOID load_all_modules();
+EFI_STATUS init_module_system(void);
+VOID load_all_modules(void);
 
 /*
  * Modules Interface
@@ -74,27 +75,29 @@ VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void
 void rebase_location(UInt32* location, char* base, int type);
 void bind_location(UInt32* location, char* value, UInt32 addend, int type);
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
-void bind_macho(void* base, char* bind_stream, UInt32 size);
+EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size);
 
 EFI_STATUS load_module(char* module);
+EFI_STATUS load_bundle(const char* bundle);
+VOID load_all_bundles(void);
+
 EFI_STATUS is_module_loaded(const char* name);
 VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/);
 
-long long add_symbol(char* symbol, long long addr, char is64);
+long long add_symbol(char* module,char* symbol, long long addr, char is64);
 
-VOID* parse_mach(void* binary, 
-				 EFI_STATUS(*dylib_loader)(char*),
-				 long long(*symbol_handler)(char*, long long, char)
-				 );
+void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, char*, long long, char));
 
-unsigned int handle_symtable(UInt32 base,
+unsigned int handle_symtable(char *module, UInt32 base,
 							 struct symtab_command* symtabCommand,
-							 long long(*symbol_handler)(char*, long long, char),
+							 long long(*symbol_handler)(char*, char*, long long, char),
 							 char is64);
 
-unsigned int lookup_all_symbols(const char* name);
+unsigned int lookup_all_symbols(const char* module, const char* name);
 
-EFI_STATUS replace_function(const char* symbol, void* newAddress);
+EFI_STATUS replace_function(const char* module, const char* symbol, void* newAddress);
+EFI_STATUS replace_system_function(const char* symbol, void* newAddress);
+EFI_STATUS replace_function_any(const char* symbol, void* newAddress);
 
 extern unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*));
 

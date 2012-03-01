@@ -203,7 +203,7 @@ arc4_randomstir (void)
 /*
  * Initialize our S-box to its beginning defaults.
  */
-static void
+void
 arc4_init(void)
 {
 	int n;

@@ -15,12 +15,14 @@
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */
 #define kEnableHibernate	"EnableHibernateModule"
+void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void HibernateEnabler_start(void);
 
 void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
 	bool tryresume,tryresumedefault, forceresume;
 	
-	if (!getBoolForKey (kWake, &tryresume, &bootInfo->bootConfig))
+	if (!getBoolForKey (kWake, &tryresume, DEFAULT_BOOT_CONFIG))
 	{
 		tryresume = true;
 		tryresumedefault = true;
@@ -30,7 +32,7 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 		tryresumedefault = false;
 	}
 	
-	if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->bootConfig))
+	if (!getBoolForKey (kForceWake, &forceresume, DEFAULT_BOOT_CONFIG))
 	{
 		forceresume = false;
 	}
@@ -46,7 +48,7 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 		int len, ret = -1;
 		long flags, sleeptime;
 		BVRef bvr;
-		if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->bootConfig))
+		if (!getValueForKey(kWakeImage, &val, &len, DEFAULT_BOOT_CONFIG))
 			val="/private/var/vm/sleepimage";
 		
 		// Do this first to be sure that root volume is mounted
@@ -74,10 +76,10 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 	
 }
 
-void HibernateEnabler_start()
+void HibernateEnabler_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableHibernate, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableHibernate, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable)
 	{

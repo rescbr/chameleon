@@ -31,43 +31,7 @@
 
 #include "libsaio.h"
 
-/*
- * Keys used in system Boot.plist
- */
-#define kGraphicsModeKey	"Graphics Mode"
-#define kTextModeKey		"Text Mode"
-#define kQuietBootKey		"Quiet Boot"
-#define kKernelFlagsKey		"Kernel Flags"
-#define kMKextCacheKey		"MKext Cache"
-#define kKernelNameKey		"Kernel"
-#define kKernelCacheKey     "Kernel Cache"
-#define kUseKernelCache     "UseKernelCache"    
-#define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey			"Timeout"
-#define kRootDeviceKey		"rd"
-#define kBootUUIDKey		"boot-uuid"
-#define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
-#define kCDROMPromptKey		"CD-ROM Prompt"
-#define kCDROMOptionKey		"CD-ROM Option Key"
-#define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		    "Rescan"
-#define kScanSingleDriveKey	"Scan Single Drive"
-#define kInsantMenuKey		"Instant Menu"
-#define kDefaultKernel		"mach_kernel"
-#define kWaitForKeypressKey	"Wait"
-/* AsereBLN: added the other keys */
-
-#define kProductVersion		"ProductVersion"	/* boot.c */
-#define karch				"arch"				/* boot.c */
-#define kDeviceProperties	"device-properties"	/* device_inject.c */
-#define kHidePartition		"Hide Partition"	/* disk.c */
-#define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
-#define kSystemID			"SystemId"			/* fake_efi.c */
-#define kSystemType			"SystemType"		/* fake_efi.c */
-#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
+void boot(int biosdev);
 
 enum {
 	kBackspaceKey	= 0x08,
@@ -81,8 +45,7 @@ enum {
 	kF10Key			= 0x4400
 };
 
-#define PLATFORM_NAME_LEN 64
-#define ROOT_PATH_LEN 256
+
 
 /*
  * Flags to the booter or kernel
@@ -104,21 +67,7 @@ enum {
  * A global set by boot() to record the device that the booter
  * was loaded from.
  */
-extern int  gBIOSDev;
-extern long gBootMode;
-extern bool sysConfigValid;
-extern char bootBanner[];
-extern char bootPrompt[];
-extern bool gOverrideKernel;
-extern char gMKextName[];
-extern bool gEnableCDROMRescan;
-extern bool gScanSingleDrive;
-extern char *gPlatformName;
-extern char *gboardproduct;
-
-//extern char gRootPath[];
-
-extern char *gRootDevice;
+#define Cache_len_name 512
 
 /*
  * Boot Modes
@@ -130,41 +79,9 @@ enum {
     kBootModeQuiet  = 4
 };
 
-extern void initialize_runtime();
+extern void initialize_runtime(void);
 extern void common_boot(int biosdev);
-
-/*
- * graphics.c
- */
-extern void printVBEModeInfo();
-#if UNUSED
-extern void setVideoMode(int mode, int drawgraphics);
-#else
-extern void setVideoMode(int mode);
-#endif
-#if TEXT_SPINNER
-extern void spinActivityIndicator();
-extern void clearActivityIndicator();
-#endif
-extern void drawColorRectangle( unsigned short x,
-                         unsigned short y,
-                         unsigned short width,
-                         unsigned short height,
-                         unsigned char  colorIndex );
-extern void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
-                               unsigned char * data );
-extern int
-convertImage( unsigned short width,
-              unsigned short height,
-              const unsigned char *imageData,
-              unsigned char **newImageData );
-extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
-extern void drawPreview(void *src, uint8_t * saveunder);
-extern int getVideoMode(void);
-extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
+extern BVRef getBvChain(void);
 
 /*
  * drivers.c
@@ -174,45 +91,28 @@ extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize
 
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
 /*!
-    Hookable function pointer called during the driver loading phase that
-    allows other code to cause additional drivers to be loaded.
+ Hookable function pointer called during the driver loading phase that
+ allows other code to cause additional drivers to be loaded.
  */
 extern struct multiboot_info *gMI;
-/*
- * options.c
- */
-extern int getBootOptions(bool firstRun);
-extern int processBootOptions();
-extern bool promptForRescanOption(void);
-extern bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP);
 
-
-void showHelp();
-void showTextFile();
-char *getMemoryInfoString();
-void showMessage(char * message);
-
-typedef struct {
-    char   name[80];
-    void * param;
-} MenuItem;
-
-/*
- * lzss.c
- */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
 struct compressed_kernel_header {
-  u_int32_t signature;
-  u_int32_t compress_type;
-  u_int32_t adler32;
-  u_int32_t uncompressed_size;
-  u_int32_t compressed_size;
-  u_int32_t reserved[11];
-  char      platform_name[PLATFORM_NAME_LEN];
-  char      root_path[ROOT_PATH_LEN];
-  u_int8_t  data[0];
+    u_int32_t signature;
+    u_int32_t compress_type;
+    u_int32_t adler32;
+    u_int32_t uncompressed_size;
+    u_int32_t compressed_size;
+    u_int32_t reserved[11];
+    char      platform_name[PLATFORM_NAME_LEN];
+    char      root_path[ROOT_PATH_LEN];
+    u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
+
+/*
+ * prompt.c
+ */
+extern void InitBootPrompt(void);
 
 #endif /* !__BOOT2_BOOT_H */

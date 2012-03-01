@@ -16,4 +16,15 @@ void drawPreview(void *src, uint8_t * saveunder);
 void
 spinActivityIndicator_hook(void *arg1, void *arg2, void *arg3, void *arg4, void* arg5, void* arg6);
 
+void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select);
+
+void
+loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
+#if UNUSED
+void
+setVideoMode( int mode, int drawgraphics);
+#else
+void
+setVideoMode( int mode);
+#endif
 #endif//H_GRAPHIC_UTILS_H

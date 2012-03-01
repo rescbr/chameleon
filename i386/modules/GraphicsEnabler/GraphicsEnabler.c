@@ -17,11 +17,12 @@
 #define kGraphicsEnabler	"EnableGFXModule"
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+void GraphicsEnabler_start(void);
 
-void GraphicsEnabler_start()
+void GraphicsEnabler_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kGraphicsEnabler, &enable, &bootInfo->bootConfig);
+	getBoolForKey(kGraphicsEnabler, &enable, DEFAULT_BOOT_CONFIG);
 	
 	
 	if (enable)

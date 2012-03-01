@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-HPET_OBJS = HPET.o
+HPET_OBJS = HPET.o stack_protector.o
 
 
 SFILES =
@@ -71,9 +71,13 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/HPET.o -o $(SYMROOT)/$(MODULE_NAME).dylib
+	$(OBJROOT)/stack_protector.o $(OBJROOT)/HPET.o -o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 HPET.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "HPET.c" $(INC) -o "$(OBJROOT)/HPET.o"

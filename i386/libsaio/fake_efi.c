@@ -8,7 +8,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "efi.h"
 #include "acpi.h"
@@ -64,10 +63,9 @@
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid);
 static VOID EFI_ST_FIX_CRC32(void);
 static EFI_STATUS setupAcpiNoMod();
-static EFI_STATUS setup_acpi (void);
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len);
 static EFI_CHAR8* getSmbiosUUID();
-static EFI_STATUS getSystemID();
+static int8_t *getSystemID();
 static VOID setupSystemType();
 static VOID setupEfiDeviceTree(void);
 static VOID setup_Smbios();
@@ -99,8 +97,8 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0};
 
 /* Info About the current Firmware */
 #define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
-static EFI_CHAR16 const FIRMWARE_NAME[] = {'S','a','v','a','n','n','a', 0};  
-static EFI_UINT32 const FIRMWARE_REVISION = 0x00010700; //1.7
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'C','u','p','e','r','t','i','n','o', 0};  
+static EFI_UINT32 const FIRMWARE_REVISION = 0x00010800; //1.8
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
 /* Default platform system_id (fix by IntVar) */
@@ -268,8 +266,8 @@ void finalizeEFIConfigTable(void )
             Guid =  gEfiConfigurationTable64[i].VendorGuid;
             
         }
-        char id[4];
-        
+        char id[5];
+        bzero(id,sizeof(id));        
         if (memcmp(&Guid, &gEfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
 		{
             sprintf(id, "%s", "_SM_");
@@ -434,14 +432,41 @@ static const char const FSB_Frequency_prop[] = "FSBFrequency";
  * SMBIOS
  */
 
-uint64_t smbios_p;
+static              uint64_t smbios_p;
+
+void Register_Smbios_Efi(void* smbios)
+{
+    smbios_p = ((uint64_t)((uint32_t)smbios));	
+}
 
 /*==========================================================================
  * ACPI 
  */
 
-static uint64_t local_rsd_p;
-static ACPI_TABLES acpi_tables;
+static uint64_t     local_rsd_p;
+static ACPI_TABLES  acpi_tables;
+static uint64_t     kFSBFrequency;
+static uint32_t		kHardware_signature;
+static uint8_t		kType;
+
+EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev )
+{
+	EFI_STATUS Status = EFI_UNSUPPORTED;
+	local_rsd_p = ((U64)((U32)rsd_p));
+    
+	if (local_rsd_p) {
+		if (rev == 2)
+		{
+			Status = addConfigurationTable(&gEfiAcpi20TableGuid, &local_rsd_p, "ACPI_20");
+		}
+		else
+		{
+			Status = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");			
+		}
+	}		
+	
+	return Status;	
+}
 
 /* Setup ACPI without any patch. */
 static EFI_STATUS setupAcpiNoMod()
@@ -461,34 +486,30 @@ static EFI_STATUS setupAcpiNoMod()
 	return ret;
 }
 
-static EFI_STATUS setup_acpi (void)
+EFI_STATUS setup_acpi (void)
 {	
 	EFI_STATUS ret = EFI_UNSUPPORTED;	
 	
-	execute_hook("setupAcpiEfi", &ret, NULL, NULL, NULL, NULL, NULL);
-	
 	do {
-		if (ret != EFI_SUCCESS)
-		{        
-			if (!FindAcpiTables(&acpi_tables))
-			{
-				printf("Failed to detect ACPI tables.\n");
-				ret = EFI_NOT_FOUND;
-				break;
-			}
-			
-			local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
-			
-			{
-				ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
-				
-				uint8_t type = FacpPointer->PreferredProfile;
-				if (type <= MaxSupportedPMProfile) 
-					Platform->Type = type;
-			}        
+        if (!FindAcpiTables(&acpi_tables))
+        {
+            printf("Failed to detect ACPI tables.\n");
+            ret = EFI_NOT_FOUND;
+            break;
+        }
+        
+        local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+        
+        {
+            ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
             
-			ret = setupAcpiNoMod();
-		}
+            uint8_t type = FacpPointer->PreferredProfile;
+            if (type <= MaxSupportedPMProfile) 
+                safe_set_env(envType,type);
+        }        
+        
+        ret = setupAcpiNoMod();
+			
 	} while (0);	
 	
 	return ret;	
@@ -524,10 +545,12 @@ static const char const MOTHERBOARD_NAME_PROP[] = "motherboard-name";
 
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
-	if (!gPlatformName && strcmp(key, "SMproductname") == 0)
+	if (!GetgPlatformName() && strcmp(key, "SMproductname") == 0)
 		readSMBIOS(thePlatformName);
-	
-	const char	*src = (strcmp(key, "SMproductname") == 0) ? gPlatformName : getStringForKey(key, &bootInfo->smbiosConfig);
+                
+	const char	*PlatformName =  GetgPlatformName() ;
+        
+	const char	*src = (strcmp(key, "SMproductname") == 0) ? PlatformName : getStringForKey(key, DEFAULT_SMBIOS_CONFIG);
 	
 	EFI_CHAR16*	 dst = 0;	
 	
@@ -553,15 +576,15 @@ static EFI_CHAR8* getSmbiosUUID()
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
 	SMBByte					*p;		
-	
-    p = (SMBByte*)Platform->UUID;
+
+    p = (SMBByte*)(uint32_t)get_env(envUUID);
     
     if ( p == NULL )
 	{
         DBG("No patched UUID found, fallback to original UUID (if exist) \n");
 		
         readSMBIOS(theUUID);		
-        p = (SMBByte*)Platform->UUID;
+        p = (SMBByte*)(uint32_t)get_env(envUUID);
         
     }
     
@@ -590,13 +613,13 @@ static EFI_CHAR8* getSmbiosUUID()
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 
-static EFI_STATUS getSystemID()
+static int8_t *getSystemID()
 {
+    static int8_t				sysid[16];
 	// unable to determine UUID for host. Error: 35 fix
 	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
 	// belong to smbios config only ...
-	EFI_STATUS status = EFI_NOT_FOUND;
-	EFI_CHAR8*	ret = getUUIDFromString(getStringForKey(kSystemID, &bootInfo->bootConfig));
+	EFI_CHAR8*	ret = getUUIDFromString(getStringForKey(kSystemID, DEFAULT_BOOT_CONFIG));
 	
 	if (!ret) // try bios dmi info UUID extraction	
 		ret = getSmbiosUUID();
@@ -616,12 +639,12 @@ static EFI_STATUS getSystemID()
 	}
 	
 	if (ret)
-	{
-		memcpy(Platform->sysid, ret, UUID_LEN);
-		status = EFI_SUCCESS;
+	{        
+		memcpy(sysid, ret, UUID_LEN);
+        set_env_copy(envSysId, sysid, sizeof(sysid));
 	}
 	
-	return status;
+	return sysid;
 }
 
 /*
@@ -635,7 +658,8 @@ static VOID setupSystemType()
 	if (node == 0) stop("Couldn't get root node");
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
-	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform->Type), &Platform->Type);
+    kType = get_env(envType);
+	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(uint8_t), &kType);
 }
 
 struct boot_progress_element {
@@ -683,6 +707,10 @@ static VOID setupEfiDeviceTree(void)
 			((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
 			((boot_progress_element *)bootPict)->height = kFailedBootHeight;
 			((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
+			if (gBootVolume->OSVersion[3] == '8') 
+            {
+                ((boot_progress_element *)bootPict)->res[0] = size - 32; 
+            }
 			bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
 		}
 	}
@@ -690,15 +718,14 @@ static VOID setupEfiDeviceTree(void)
 	//Fix an error with the Lion's (DP2+) installer	
 	if (execute_hook("getboardproductPatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 	{
+		Setgboardproduct(getStringForKey("SMboardproduct", DEFAULT_SMBIOS_CONFIG));
 		
-		gboardproduct = (char *)getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
-		
-		if (!gboardproduct) readSMBIOS(theProducBoard);
+		if (!Getgboardproduct()) readSMBIOS(theProducBoard);
 		
 	}
-	if (gboardproduct)
+	if (Getgboardproduct())
 	{
-		DT__AddProperty(node, "board-id", strlen(gboardproduct)+1, gboardproduct);
+		DT__AddProperty(node, "board-id", strlen(Getgboardproduct())+1, Getgboardproduct());
 	}
 	
 	{
@@ -711,21 +738,23 @@ static VOID setupEfiDeviceTree(void)
 			// additionally this value can be used by third-party apps or osx components (ex: pre-10.7 kextcache, ...)
 			if (bootInfo->uuidStr[0]) 			
 				DT__AddProperty(chosenNode, kBootUUIDKey, strlen(bootInfo->uuidStr)+1, bootInfo->uuidStr);
-#if 0
-			if (gRootPath[0])
-			{
-				
-				DT__AddProperty(chosenNode, "rootpath" or try "root-matching", strlen(gRootPath)+1, gRootPath);			
-				
-			} 
-			else 
-#endif
-				if (gRootDevice)
+
+				if (GetgRootDevice())
 				{
 					
-					DT__AddProperty(chosenNode, "boot-device-path", strlen(gRootDevice)+1, gRootDevice);			
+					DT__AddProperty(chosenNode, "boot-device-path", strlen(GetgRootDevice())+1, GetgRootDevice());			
 					
 				}			
+#ifdef rootpath
+                else
+                    if (gRootPath[0])
+                    {
+                        
+                        DT__AddProperty(chosenNode, "rootpath", strlen(gRootPath)+1, gRootPath);			
+                        
+                    } 
+            
+#endif
 			
 			// "boot-file" is not used by kextcache if there is no "boot-device-path" or if there is a valid "rootpath" ,
 			// but i let it by default since it may be used by another service
@@ -782,7 +811,7 @@ static VOID setupEfiDeviceTree(void)
 	DT__AddProperty(efiNode, FIRMWARE_PUBLISH_PROP, strlen(FIRMWARE_PUBLISHER)+1, FIRMWARE_PUBLISHER);
 	
 	{
-		// Export it for later use
+		// Export it for amlsgn support
 		char * DefaultPlatform = readDefaultPlatformName();
 		if (DefaultPlatform)
 		{
@@ -797,6 +826,7 @@ static VOID setupEfiDeviceTree(void)
 	
 	{
 		EFI_CHAR16   *serial = 0, *productname = 0;
+        int8_t				*sysid = 0;
 		size_t		 len = 0;
 		
 		// Now fill in the /efi/platform Node
@@ -807,22 +837,25 @@ static VOID setupEfiDeviceTree(void)
 		// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 		// the value in the fsbFrequency global and not an malloc'd pointer
 		// because the DT_AddProperty function does not copy its args.
-		
-		if (Platform->CPU.FSBFrequency != 0)
-			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform->CPU.FSBFrequency);		
+		     
+        kFSBFrequency = get_env(envFSBFreq);
+		if (kFSBFrequency != 0)
+			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &kFSBFrequency);		
 		
 #if UNUSED
 		// Export TSC and CPU frequencies for use by the kernel or KEXTs
-		if (Platform->CPU.TSCFrequency != 0)
-			DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform->CPU.TSCFrequency);
+		Platform.CPU.TSCFrequency = get_env(envTSCFreq);
+        if (Platform.CPU.TSCFrequency != 0)
+			DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 		
-		if (Platform->CPU.CPUFrequency != 0)
-			DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform->CPU.CPUFrequency);
+        Platform.CPU.CPUFrequency = get_env(envCPUFreq);
+		if (Platform.CPU.CPUFrequency != 0)
+			DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 #endif
 		
 		// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist		
-		if (getSystemID() == EFI_SUCCESS)
-			DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) Platform->sysid);
+		if ((sysid = getSystemID()))
+			DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) sysid);
 		
 		// Export SystemSerialNumber if present
 		if ((serial=getSmbiosChar16("SMserial", &len)))
@@ -852,21 +885,21 @@ void setupSmbiosConfigFile(const char *filename)
 		int			len = 0, err = 0;
 		
 		// Take in account user overriding
-		if (getValueForKey("SMBIOS", &override_pathname, &len, &bootInfo->bootConfig) && len > 0)
+		if (getValueForKey("SMBIOS", &override_pathname, &len, DEFAULT_BOOT_CONFIG) && len > 0)
 		{
 			// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
 			sprintf(dirSpecSMBIOS, override_pathname);
-			err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+			err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG);
 		}
 		else
 		{
 			// Check selected volume's Extra.
 			sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
-			if ((err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig)))
+			if ((err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG)))
 			{
 				// Check booter volume/rdbt Extra.
 				sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
-				err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+				err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG);
 			}
 		}
 		
@@ -893,7 +926,7 @@ static VOID setup_machine_signature()
 	Node *chosenNode = DT__FindNode("/chosen", false);
 	if (chosenNode)
 	{
-		if (Platform->hardware_signature == 0xFFFFFFFF)
+		if (get_env(envHardwareSignature) == 0xFFFFFFFF)
 		{			
 			do {
 				if (!local_rsd_p)
@@ -906,21 +939,22 @@ static VOID setup_machine_signature()
 					local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
 				}
 				
-				ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;
-				
-				Platform->hardware_signature = FacsPointer->HardwareSignature;
+				ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;				
+                
+                safe_set_env(envHardwareSignature , FacsPointer->HardwareSignature);
 				
 			} while (0);            	
 			
 			// Verify that we have a valid hardware signature
-			if (Platform->hardware_signature == 0xFFFFFFFF) 
+			if (get_env(envHardwareSignature) == 0xFFFFFFFF) 
 			{
-				verbose("Warning: hardware_signature is invalid, defaulting to 0 \n");
-				Platform->hardware_signature = 0;
+				verbose("Warning: hardware_signature is invalid, defaulting to 0 \n");                
+                safe_set_env(envHardwareSignature , 0);
 			}
 		}
 		
-		DT__AddProperty(chosenNode, "machine-signature", sizeof(uint32_t), &Platform->hardware_signature);
+        kHardware_signature = get_env(envHardwareSignature);        
+		DT__AddProperty(chosenNode, "machine-signature", sizeof(uint32_t), &kHardware_signature);
 	}
 	
 }
@@ -934,7 +968,7 @@ static VOID setupEfiConfigurationTable()
     if (smbios_p)
         addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
 	
-	if (Platform->CPU.Vendor == 0x756E6547 /* Intel */)
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL )
 	{
 		int num_cpus;
 		
@@ -948,32 +982,32 @@ static VOID setupEfiConfigurationTable()
 		}
 		
 #if DEBUG_EFI
-        if (num_cpus != Platform->CPU.NoCores)
+        if (num_cpus != get_env(envNoCores))
         {
-            printf("Warning: SMP nb of core (%d) mismatch with the value found in cpu.c (%d) \n",num_cpus,Platform->CPU.NoCores);                
+            printf("Warning: SMP nb of core (%d) mismatch with the value found in cpu.c (%d) \n",num_cpus,get_env(envNoCores));                
         }        
 #endif               
 	}	
 	
 	// PM_Model
-	if (Platform->CPU.isServer == true)
+	if (get_env(envIsServer))
     {
-		Platform->Type = Workstation;
+        safe_set_env(envType , Workstation);
 	}
-	else if (Platform->CPU.isMobile == true)//Slice
+	else if (get_env(envIsMobile))//Slice
 	{	
-		Platform->Type = Mobile;
+        safe_set_env(envType , Mobile);
 	} 
 	else
 	{
-		Platform->Type = Desktop;
+        safe_set_env(envType , Desktop);
 	}
 	
 	// Invalidate the platform hardware signature (this needs to be verified with acpica, but i guess that 0xFFFFFFFF is an invalid signature)  	
-	Platform->hardware_signature = 0xFFFFFFFF; 
+    safe_set_env(envHardwareSignature , 0xFFFFFFFF);
 	
-	// Setup ACPI (mackerintel's patch)
-	setup_acpi();
+	// Setup ACPI (based on the mackerintel's patch)
+	(VOID)setup_acpi();
 	
 	setup_machine_signature();
 	

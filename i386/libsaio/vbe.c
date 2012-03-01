@@ -93,18 +93,19 @@ int getEDID( void * edidBlock, UInt8 block)
 
 
 
+#if UNUSED
 /*
  * Default GTF parameter values.
  */
-//#define kCellGranularity  8.0    // character cell granularity
-//#define kMinVSyncPlusBP   550.0  // min VSync + BP interval (us)
-//#define kMinFrontPorch    1.0    // minimum front porch in lines(V)/cells(H)
-//#define kVSyncLines       3.0    // width of VSync in lines
-//#define kHSyncWidth       8.0    // HSync as a percent of total line width
-//#define kC                30.0   // C = (C'-J) * (K/256) + J
-//#define kM                300.0  // M = K/256 * M'
+#define kCellGranularity  8.0    // character cell granularity
+#define kMinVSyncPlusBP   550.0  // min VSync + BP interval (us)
+#define kMinFrontPorch    1.0    // minimum front porch in lines(V)/cells(H)
+#define kVSyncLines       3.0    // width of VSync in lines
+#define kHSyncWidth       8.0    // HSync as a percent of total line width
+#define kC                30.0   // C = (C'-J) * (K/256) + J
+#define kM                300.0  // M = K/256 * M'
 
-int Round(double f)
+static int Round(double f)
 {
 	return (int)(f + 0.5);
 }
@@ -112,7 +113,6 @@ int Round(double f)
 /*
  * from http://www.azillionmonkeys.com/qed/sqroot.html
  */
-#if UNUSED
 double Sqrt( double y )
 {
 	double x, z, tempf;

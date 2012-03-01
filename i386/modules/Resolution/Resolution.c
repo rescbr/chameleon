@@ -10,11 +10,11 @@
 
 #define kEnableResolution			"EnableResolutionModule"
 
-
-void Resolution_start()
+void Resolution_start(void);
+void Resolution_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableResolution, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableResolution, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable) {
 		register_hook_callback("getResolution_hook", &getResolutionHook);

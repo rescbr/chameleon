@@ -66,8 +66,7 @@ FlattenNodes(Node *node, void *buffer);
 #if DEBUG
 static void
 _PrintTree(Node *node, int level);
-static void
-_PrintFlattenedTree(DTEntry entry, int level);
+
 #endif
 
 Property *
@@ -364,7 +363,7 @@ DT__FindNode(const char *path, bool createIfMissing)
 
 #if DEBUG
 
-void
+static void
 DT__PrintNode(Node *node, int level)
 {
     char spaces[10], *cp = spaces;
@@ -405,148 +404,6 @@ DT__PrintTree(Node *node)
     if (node == 0) node = rootNode;
     _PrintTree(node, 0);
 }
-
-#if UNUSED
-void
-DT__PrintFlattenedNode(DTEntry entry, int level)
-{
-    char spaces[10], *cp = spaces;
-    DTPropertyIterator	                propIter;
-    char *name;
-    void *prop;
-    int propSize;
-
-    if (level > 9) level = 9;
-    while (level--) *cp++ = ' ';
-    *cp = '\0';
-
-    printf("%s===Entry %p===\n", spaces, entry);
-    if (kSuccess != DTCreatePropertyIterator(entry, &propIter)) {
-        printf("Couldn't create property iterator\n");
-        return;
-    }
-    while( kSuccess == DTIterateProperties( propIter, &name)) {
-        if(  kSuccess != DTGetProperty( entry, name, &prop, &propSize ))
-            continue;
-        printf("%s Property %s = %s\n", spaces, name, prop);
-    }
-    DTDisposePropertyIterator(propIter);
-
-    printf("%s==========\n", spaces);
-}
-#endif
-
-static void
-_PrintFlattenedTree(DTEntry entry, int level)
-{
-    DTEntryIterator entryIter;
-
-    PrintFlattenedNode(entry, level);
-
-    if (kSuccess != DTCreateEntryIterator(entry, &entryIter)) {
-            printf("Couldn't create entry iterator\n");
-            return;
-    }
-    level++;
-    while (kSuccess == DTIterateEntries( entryIter, &entry )) {
-        _PrintFlattenedTree(entry, level);
-    }
-    DTDisposeEntryIterator(entryIter);
-}
-
-#if UNUSED
-void
-DT__PrintFlattenedTree(DTEntry entry)
-{
-    _PrintFlattenedTree(entry, 0);
-}
-
-int
-main(int argc, char **argv)
-{
-    DTEntry                             dtEntry;
-    DTPropertyIterator	                propIter;
-    DTEntryIterator                     entryIter;
-    void				*prop;
-    int					propSize;
-    char				*name;
-    void *flatTree;
-    uint32_t flatSize;
-
-    Node *node;
-
-    node = AddChild(NULL, "device-tree");
-    AddProperty(node, "potato", 4, "foo");
-    AddProperty(node, "chemistry", 4, "bar");
-    AddProperty(node, "physics", 4, "baz");
-
-    node = AddChild(node, "dev");
-    AddProperty(node, "one", 4, "one");
-    AddProperty(node, "two", 4, "two");
-    AddProperty(node, "three", 6, "three");
-
-    node = AddChild(rootNode, "foo");
-    AddProperty(node, "aaa", 4, "aab");
-    AddProperty(node, "bbb", 4, "bbc");
-    AddProperty(node, "cccc", 6, "ccccd");
-
-    node = FindNode("/this/is/a/test", 1);
-    AddProperty(node, "dddd", 12, "abcdefghijk");
-
-    printf("In-memory tree:\n\n");
-
-    PrintTree(rootNode);
-
-    FlattenDeviceTree(&flatTree, &flatSize);
-
-    printf("Flat tree = %p, size %d\n", flatTree, flatSize);
-
-    dtEntry = (DTEntry)flatTree;
-
-    printf("\n\nPrinting flat tree\n\n");
-
-    DTInit(dtEntry);
-
-    PrintFlattenedTree((DTEntry)flatTree);
-#if 0
-        printf("=== Entry %p ===\n", dtEntry);
-        if (kSuccess != DTCreatePropertyIterator(dtEntry, &propIter)) {
-            printf("Couldn't create property iterator\n");
-            return 1;
-        }
-        while( kSuccess == DTIterateProperties( propIter, &name)) {
-            if(  kSuccess != DTGetProperty( dtEntry, name, &prop, &propSize ))
-                continue;
-            printf(" Property %s = %s\n", name, prop);
-        }
-        DTDisposePropertyIterator(propIter);
-        printf("========\n");
-
-    if (kSuccess != DTCreateEntryIterator(dtEntry, &entryIter)) {
-            printf("Couldn't create entry iterator\n");
-            return 1;
-    }
-    while (kSuccess == DTIterateEntries( entryIter, &dtEntry )) {
-        printf("=== Entry %p ===\n", dtEntry);
-
-        if (kSuccess != DTCreatePropertyIterator(dtEntry, &propIter)) {
-            printf("Couldn't create property iterator\n");
-            return 1;
-        }
-        while( kSuccess == DTIterateProperties( propIter, &name)) {
-            if(  kSuccess != DTGetProperty( dtEntry, name, &prop, &propSize ))
-                continue;
-            printf(" Property %s = %s\n", name, prop);
-        }
-        DTDisposePropertyIterator(propIter);
-        printf("========\n");
-    }
-    DTDisposeEntryIterator(entryIter);
-#endif
-
-    return 0;
-}
-#endif
 
 #endif
 

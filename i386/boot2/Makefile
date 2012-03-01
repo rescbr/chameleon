@@ -9,7 +9,7 @@ DIR = boot2
 include ../MakePaths.dir
 
 OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fstack-protector-all \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions \
 		-march=pentium4 -msse2 -mfpmath=sse -msoft-float  
@@ -39,8 +39,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	modules.o
+OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o mboot.o 	
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util

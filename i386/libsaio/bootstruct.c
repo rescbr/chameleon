@@ -30,13 +30,16 @@
 #include "bootstruct.h"
 #include "platform.h"
 
+boot_args_common  *bootArgs;
+
+
 /*==========================================================================
- * Initialize the structure of parameters passed to
+ * structure of parameters passed to
  * the kernel by the booter.
  */
 boot_args_Legacy  *bootArgsLegacy;
-boot_args_common  *bootArgs;
 boot_args_107     *bootArgs107;
+boot_args_108     *bootArgs108;
 /* ... */
 
 PrivateBootInfo_t *bootInfo;
@@ -47,34 +50,34 @@ static char platformName[64];
 void initKernBootStruct( void )
 {        
     static int init_done = 0;
-
+    
     if ( !init_done )
     {			
         bootArgs = (boot_args_common *)malloc(sizeof(boot_args_common));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
         if (bootArgs == 0 || bootInfo == 0)
             stop("Couldn't allocate boot info\n");
-
+        
         bzero(bootArgs, sizeof(boot_args_common));
         bzero(bootInfo, sizeof(PrivateBootInfo_t));
-
+        
         // Get system memory map. Also update the size of the
         // conventional/extended memory for backwards compatibility.
 		
-			
+        
         bootInfo->memoryMapCount =
-            getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
-                          (unsigned long *) &bootInfo->convmem,
-                          (unsigned long *) &bootInfo->extmem );
+        getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
+                     (unsigned long *) &bootInfo->convmem,
+                     (unsigned long *) &bootInfo->extmem );
 		
 		
-
+        
         if ( bootInfo->memoryMapCount == 0 )
         {
             // BIOS did not provide a memory map, systems with
             // discontiguous memory or unusual memory hole locations
             // may have problems.
-
+            
             bootInfo->convmem = getConventionalMemorySize();
             bootInfo->extmem  = getExtendedMemorySize();			
 			
@@ -85,7 +88,7 @@ void initKernBootStruct( void )
         bootArgs->Video.v_display = VGA_TEXT_MODE;
         
         DT__Initialize();
-
+        
 		{
 			Node *node;
 			node = DT__FindNode("/", true);
@@ -101,53 +104,77 @@ void initKernBootStruct( void )
 				DT__AddProperty(node, "model", nameLen, platformName);
 			}  
 		}		      
-
+        
         gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
+        
+        safe_set_env(envConvMem, bootInfo->convmem);
+        safe_set_env(envExtMem, bootInfo->convmem);
+        safe_set_env(envMemoryMap, (uint32_t)bootInfo->memoryMap);
+        safe_set_env(envMemoryMapCnt, bootInfo->memoryMapCount);
+
         
         init_done = 1;
     }
-
+    
 }
 
 #define AllocateKernelMemoryForBootArgs(Ver)                           \
 { \
-	bootArgs##Ver = (boot_args_##Ver *)AllocateKernelMemory(sizeof(boot_args_##Ver));\
+bootArgs##Ver = (boot_args_##Ver *)AllocateKernelMemory(sizeof(boot_args_##Ver));\
 }
 
 #define CopyCommonBootArgsHeader(Ver)                           \
 { \
-	bootArgs##Ver->Revision = bootArgs->Header.Revision ;\
-	bootArgs##Ver->Version = bootArgs->Header.Version   ;\
+bootArgs##Ver->Revision = bootArgs->Header.Revision ;\
+bootArgs##Ver->Version = bootArgs->Header.Version   ;\
 }
 
-// For 10.6, 10.5 and 10.4 please use :Legacy:, for 10.7 use :107:
+// For 10.6, 10.5 and 10.4 please use :Legacy:, for 10.7 use :107:, for 10.8 use :108:
 #define CopyCommonBootArgs(Ver)                           \
 { \
-	bcopy(bootArgs->CommandLine, bootArgs##Ver->CommandLine, BOOT_LINE_LENGTH);\
-	bootArgs##Ver->MemoryMap = bootArgs->MemoryMap ;\
-	bootArgs##Ver->MemoryMapSize = bootArgs->MemoryMapSize ;\
-	bootArgs##Ver->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;\
-	bootArgs##Ver->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;\
-	bootArgs##Ver->Video = bootArgs->Video ;\
-	bootArgs##Ver->deviceTreeP = bootArgs->deviceTreeP ;\
-	bootArgs##Ver->deviceTreeLength = bootArgs->deviceTreeLength ;\
-	bootArgs##Ver->kaddr = bootArgs->kaddr ;\
-	bootArgs##Ver->ksize = bootArgs->ksize ;\
-	bootArgs##Ver->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;\
-	bootArgs##Ver->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;\
-	bootArgs##Ver->efiSystemTable = bootArgs->efiSystemTable ;\
-	bootArgs##Ver->efiMode = bootArgs->efiMode ;\
-	bootArgs##Ver->performanceDataStart = bootArgs->performanceDataStart ;\
-	bootArgs##Ver->performanceDataSize = bootArgs->performanceDataSize ;\
-	bootArgs##Ver->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;\
+bcopy(bootArgs->CommandLine, bootArgs##Ver->CommandLine, BOOT_LINE_LENGTH);\
+bootArgs##Ver->MemoryMap = bootArgs->MemoryMap ;\
+bootArgs##Ver->MemoryMapSize = bootArgs->MemoryMapSize ;\
+bootArgs##Ver->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;\
+bootArgs##Ver->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;\
+bootArgs##Ver->Video = bootArgs->Video ;\
+bootArgs##Ver->deviceTreeP = bootArgs->deviceTreeP ;\
+bootArgs##Ver->deviceTreeLength = bootArgs->deviceTreeLength ;\
+bootArgs##Ver->kaddr = bootArgs->kaddr ;\
+bootArgs##Ver->ksize = bootArgs->ksize ;\
+bootArgs##Ver->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;\
+bootArgs##Ver->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;\
+bootArgs##Ver->efiSystemTable = bootArgs->efiSystemTable ;\
+bootArgs##Ver->efiMode = bootArgs->efiMode ;\
+bootArgs##Ver->performanceDataStart = bootArgs->performanceDataStart ;\
+bootArgs##Ver->performanceDataSize = bootArgs->performanceDataSize ;\
+bootArgs##Ver->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;\
+}
+
+/* 
+ * Darwin 10.7+ specific boot arguments 
+ *
+ * for 10.7 use :107:, for 10.8 use :108:
+ */
+#define Copy107plusBootArgs(Ver)                           \
+{ \
+bootArgs##Ver->keyStoreDataStart = bootArgs->keyStoreDataStart ;\
+bootArgs##Ver->keyStoreDataSize = bootArgs->keyStoreDataSize ;\
+bootArgs##Ver->bootMemStart = bootArgs->bootMemStart ;\
+bootArgs##Ver->bootMemSize = bootArgs->bootMemSize ;\
+bootArgs##Ver->PhysicalMemorySize = bootArgs->PhysicalMemorySize ;\
+bootArgs##Ver->FSBFrequency = bootArgs->FSBFrequency ;\
+bootArgs##Ver->debugMode = bootArgs->debugMode ;\
 }
 
 #define init_boot_args(Ver)                           \
 { \
-	AllocateKernelMemoryForBootArgs(Ver);\
-	CopyCommonBootArgsHeader(Ver);\
-	CopyCommonBootArgs(Ver);\
+AllocateKernelMemoryForBootArgs(Ver);\
+CopyCommonBootArgsHeader(Ver);\
+CopyCommonBootArgs(Ver);\
 }
+
+/* Copy boot args after kernel and record address. */
 
 /* Copy boot args after kernel and record address. */
 
@@ -155,22 +182,47 @@ void
 reserveKern107BootStruct(void)
 {	
 	init_boot_args(107);
-	
-	/* Darwin 10.7 specific boot arguments */
-	bootArgs107->keyStoreDataStart = bootArgs->keyStoreDataStart ;
-	bootArgs107->keyStoreDataSize = bootArgs->keyStoreDataSize ;
-	bootArgs107->bootMemStart = bootArgs->bootMemStart ;
-	bootArgs107->bootMemSize = bootArgs->bootMemSize ;
-	bootArgs107->PhysicalMemorySize = bootArgs->PhysicalMemorySize ;
-	bootArgs107->FSBFrequency = bootArgs->FSBFrequency ;	
-	bootArgs107->debugMode = bootArgs->debugMode; 
+	Copy107plusBootArgs(107);
+}
 
+void
+reserveKern108BootStruct(void)
+{	
+	init_boot_args(108);	
+	Copy107plusBootArgs(108);
+	
+	/* Darwin 10.8 specific boot arguments */		
 }
 
 void
 reserveKernLegacyBootStruct(void)
 {
 	init_boot_args(Legacy);
+}
+
+void setBootArgsVideoMode(int mode)
+{
+    bootArgs->Video.v_display = mode;
+}
+uint32_t getVideoMode(void)
+{
+    return bootArgs->Video.v_display;
+}
+uint32_t getBootArgsVideoPtrAtOffset(uint32_t offset)
+{
+    char *vid = (char *)&bootArgs->Video ;
+    return (uint32_t)vid[offset];
+}
+
+void setBootArgsVideoStruct(Boot_Video	*Video)
+{
+    bootArgs->Video.v_display  = Video->v_display;
+    bootArgs->Video.v_width    = Video->v_width;
+    bootArgs->Video.v_height   = Video->v_height;
+    bootArgs->Video.v_depth    = Video->v_depth;
+    bootArgs->Video.v_rowBytes = Video->v_rowBytes;
+    bootArgs->Video.v_baseAddr = Video->v_baseAddr;
+    return;
 }
 
 void
@@ -271,13 +323,11 @@ finalizeBootStruct(void)
 		
 		sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
 		bootArgs->PhysicalMemorySize = sane_size;
-		bootArgs->FSBFrequency = Platform->CPU.FSBFrequency;
-	
-	}
-	
-    // add PCI info somehow into device tree
-    // XXX
-		
+		bootArgs->FSBFrequency = get_env(envFSBFreq);
+        
+	}	
+    
+    
 	{
 		uint32_t size;
 		void *addr;

@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-NBI_OBJS = NBI.o
+NBI_OBJS = NBI.o stack_protector.o
 
 
 SFILES =
@@ -76,6 +76,10 @@ dylib:
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 NBI.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "NBI.c" $(INC) -o "$(OBJROOT)/NBI.o"

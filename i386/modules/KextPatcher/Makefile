@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-KEXT_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o
+KEXT_OBJS = kext_patcher.o inflate.o deflate.o zutil.o inftrees.o inffast.o adler32.o hex_editor.o trees.o stack_protector.o
 
 
 SFILES =
@@ -75,6 +75,10 @@ dylib:
 	-weak_library $(SYMROOT)/Symbols.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 kext_patcher.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kext_patcher.c" $(INC) -o "$(OBJROOT)/kext_patcher.o"

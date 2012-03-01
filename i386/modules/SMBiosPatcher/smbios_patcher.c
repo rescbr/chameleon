@@ -3,7 +3,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "acpi.h"
 #include "efi_tables.h"
@@ -275,11 +274,16 @@ static const SMProductCountry const sm_country_list[]={
     {"YM",		"China /Konfiguriert"					}
 };
 
+const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key);
+const char* sm_get_random_productNumber(void);
+const char* sm_get_random_week(void);
+const char* sm_get_random_year(void);
+const char* sm_get_random_country(void);
 
 const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
 {
     int i;
-
+    
     for (i=0; sm_defaults[i].key[0]; i++) {
 		if (!strcmp (sm_defaults[i].key, key)) {
 			return sm_defaults[i].value;
@@ -292,7 +296,7 @@ const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
     return "";
 }
 
-const char* sm_get_random_productNumber()
+const char* sm_get_random_productNumber(void)
 {
     static char str[4] = {0x00,0x00,0x00,0x00};
     if(str[0]  == 0)
@@ -320,12 +324,12 @@ const char* sm_get_random_productNumber()
         strcat (str, tmp);
         
         DBG ("fake_productNumber: %s\n",str);
-
+        
     }
     return str;
 }
 
-const char* sm_get_random_week()
+const char* sm_get_random_week(void)
 {
     static char str[4] = {0x00,0x00,0x00,0x00};
     if(str[0]  == 0)
@@ -347,14 +351,14 @@ const char* sm_get_random_week()
             sprintf(tmp,"%d",rand_week);
             strlcpy (str, tmp, sizeof(tmp)+1);
         }      
-
+        
         DBG ("fake_week: %s\n",str);
         
     }
     return str;
 }
 
-const char* sm_get_random_year()
+const char* sm_get_random_year(void)
 {
     static char str[2] = {0x00,0x00};
     if(str[0]  == 0)
@@ -380,7 +384,7 @@ const char* sm_get_random_year()
     return str;
 }
 
-const char* sm_get_random_country()
+const char* sm_get_random_country(void)
 {
     static char str[3] = {0x00,0x00,0x00};
     if(str[0] == 0)
@@ -391,9 +395,9 @@ const char* sm_get_random_country()
         struct ran_obj* random_country_obj = random_init(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
         rand_country = random(random_country_obj);        
         random_free(random_country_obj);       
-       
+        
         strlcpy (str, sm_country_list[rand_country].code,strlen(sm_country_list[rand_country].code)+1);
-                
+        
         DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);
         
     }
@@ -405,18 +409,18 @@ const char* sm_get_defstr(const char * key, int table_num)
 	const SMStrEntryPair*	sm_defaults;
     const SMStrEntryPair*	sm_chosen;
     static bool serial_done = false;
-        
-	if (Platform->CPU.isServer == true)
+    
+	if (get_env(envIsServer))
     {
         sm_defaults=sm_xserve_defaults;
-    } else if (Platform->CPU.isMobile == true) {
-		if (Platform->CPU.NoCores > 1) {
+    } else if (get_env(envIsMobile)) {
+		if (get_env(envNoCores) > 1) {
 			sm_defaults=sm_macbookpro_defaults;
 		} else {
 			sm_defaults=sm_macbook_defaults;
 		}
 	} else {
-		switch (Platform->CPU.NoCores) 
+		switch (get_env(envNoCores)) 
 		{
 			case 1: 
 				sm_defaults=sm_macmini_defaults; 
@@ -426,11 +430,11 @@ const char* sm_get_defstr(const char * key, int table_num)
 				break;
 			default:
 			{
-				switch (Platform->CPU.Family) 
+				switch (get_env(envFamily)) 
 				{
 					case 0x06:
 					{
-						switch (Platform->CPU.Model)
+						switch (get_env(envModel))
 						{
 							case CPUID_MODEL_FIELDS:        // Intel Core i5, i7 LGA1156 (45nm)
 							case CPUID_MODEL_DALES:         // Intel Core i5, i7 LGA1156 (45nm) ???
@@ -472,7 +476,7 @@ const char* sm_get_defstr(const char * key, int table_num)
         const char	*str;
         int		size;
         
-        if (getValueForKey("SMproductname", &str, &size, &bootInfo->smbiosConfig))
+        if (getValueForKey("SMproductname", &str, &size, DEFAULT_SMBIOS_CONFIG))
         {              
             if (strstr (str, "MacPro5"))
             {
@@ -528,9 +532,9 @@ const char* sm_get_defstr(const char * key, int table_num)
         
         if (!serial_done) {
             bzero  (fake_serial,sizeof(fake_serial));      
-           
+            
             bool randomSerial = false;
-            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig) ;
+            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG) ;
             
             if ( randomSerial ) // useless
                 strlcpy (fake_serial,sm_get_random_country(), strlen(sm_get_random_country())+1);
@@ -557,12 +561,12 @@ const char* sm_get_defstr(const char * key, int table_num)
             serial_done = true;
             
             if ( randomSerial )
-            msglog ("fake_serial: %s\n",fake_serial);
-
+                msglog ("fake_serial: %s\n",fake_serial);
+            
         }
         
         return fake_serial;
-
+        
 	}                
 	
     return sm_search_str(sm_chosen, key);
@@ -571,23 +575,23 @@ const char* sm_get_defstr(const char * key, int table_num)
 
 static int sm_get_fsb(const char *name, int table_num)
 {
-	return Platform->CPU.FSBFrequency/1000000;
+	return (int)(get_env(envFSBFreq) /1000000);
 }
 
 static int sm_get_cpu (const char *name, int table_num)
 {
-	return Platform->CPU.CPUFrequency/1000000;
+	return (int)(get_env(envCPUFreq) /1000000);
 }
 
 static int sm_get_bus_speed (const char *name, int table_num)
 {
-	if (Platform->CPU.Vendor == 0x756E6547) // Intel
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL)
 	{		
-		switch (Platform->CPU.Family) 
+		switch (get_env(envFamily)) 
 		{
 			case 0x06:
 			{
-				switch (Platform->CPU.Model)
+				switch (get_env(envModel))
 				{
                     case CPUID_MODEL_BANIAS:	// Banias		0x09
                     case CPUID_MODEL_DOTHAN:	// Dothan		0x0D
@@ -597,22 +601,22 @@ static int sm_get_bus_speed (const char *name, int table_num)
 					case CPUID_MODEL_ATOM:	// Atom 45nm	0x1C
 						return 0; // TODO: populate bus speed for these processors
 						
-//					case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
-//						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-//							return 2500; // Core i5
-//						return 4800; // Core i7
+                        //					case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+                        //						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+                        //							return 2500; // Core i5
+                        //						return 4800; // Core i7
 						
-//					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-//					case CPUID_MODEL_NEHALEM_EX:
-//					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
-//						return 4800; // GT/s / 1000
-//						
+                        //					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+                        //					case CPUID_MODEL_NEHALEM_EX:
+                        //					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) ???
+                        //						return 4800; // GT/s / 1000
+                        //						
 					case CPUID_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
 						return 0; // TODO: populate bus speed for these processors
 						
-//					case 0x19: // Intel Core i5 650 @3.20 Ghz
-//						return 2500; // why? Intel spec says 2.5GT/s 
-
+                        //					case 0x19: // Intel Core i5 650 @3.20 Ghz
+                        //						return 2500; // why? Intel spec says 2.5GT/s 
+                        
 					case 0x19: // Intel Core i5 650 @3.20 Ghz
 					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
 					case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
@@ -645,7 +649,7 @@ static int sm_get_bus_speed (const char *name, int table_num)
 						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
 						qpimult &= 0x7F;
 						DBG("qpimult %d\n", qpimult);
-						qpibusspeed = (qpimult * 2 * (Platform->CPU.FSBFrequency/1000000));
+						qpibusspeed = (qpimult * 2 * (get_env(envFSBFreq) /1000000));
 						// Rek: rounding decimals to match original mac profile info
 						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
 						DBG("qpibusspeed %d\n", qpibusspeed);
@@ -660,11 +664,12 @@ static int sm_get_bus_speed (const char *name, int table_num)
 
 static int sm_get_simplecputype()
 {
-	if (Platform->CPU.NoCores >= 4) 
+    uint8_t ncores = get_env(envNoCores);
+	if (ncores >= 4) 
 	{
 		return 0x0501;   // Quad-Core Xeon
 	}
-	if (((Platform->CPU.NoCores == 1) || (Platform->CPU.NoCores == 2)) && !(platformCPUExtFeature(CPUID_EXTFEATURE_EM64T)))
+	if (((ncores == 1) || (ncores == 2)) && !(get_env(envExtFeatures) & CPUID_EXTFEATURE_EM64T))
 	{
 		return 0x0201;   // Core Solo / Duo
 	}
@@ -675,19 +680,20 @@ static int sm_get_simplecputype()
 static int sm_get_cputype (const char *name, int table_num)
 {
 	static bool done = false;		
-		
-	if (Platform->CPU.Vendor == 0x756E6547) // Intel
+    
+    char * BrandString= (char*)get_env_ptr(envBrandString);
+	if (get_env(envVendor) == CPUID_VENDOR_INTEL) // Intel
 	{
 		if (!done) {
-			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform->CPU.BrandString, Platform->CPU.Family, Platform->CPU.Model);
+			verbose("CPU is %s, family 0x%x, model 0x%x\n", BrandString, (uint32_t)get_env(envFamily), (uint32_t)get_env(envModel));
 			done = true;
 		}
 		
-		switch (Platform->CPU.Family) 
+		switch (get_env(envFamily)) 
 		{
 			case 0x06:
 			{
-				switch (Platform->CPU.Model)
+				switch (get_env(envModel))
 				{
                     case CPUID_MODEL_BANIAS: // Banias
                     case CPUID_MODEL_DOTHAN: // Dothan
@@ -698,28 +704,28 @@ static int sm_get_cputype (const char *name, int table_num)
 						return sm_get_simplecputype();
 						
 					case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-                        if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))
+                        if (strstr(BrandString, "Core(TM) i7"))
                             return 0x0701; // Core i7
                         return sm_get_simplecputype();
-
+                        
 						
 					case CPUID_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
+						if (strstr(BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x701; // Core i7
 						
 					case CPUID_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
+						if (strstr(BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
 						return 0x0701; // Core i7
 						
                     case  CPUID_MODEL_SANDYBRIDGE: // Sandybridge
 					case CPUID_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i3"))
+						if (strstr(BrandString, "Core(TM) i3"))
 							return 0x901; // Core i3
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i5"))
+						if (strstr(BrandString, "Core(TM) i5"))
 							return 0x601; // Core i5
-						if (strstr(Platform->CPU.BrandString, "Core(TM) i7"))							
+						if (strstr(BrandString, "Core(TM) i7"))							
 							return 0x0701; // Core i7 						
 						return sm_get_simplecputype();
 						
@@ -741,15 +747,19 @@ static int sm_get_cputype (const char *name, int table_num)
 static int sm_get_memtype (const char *name, int table_num)
 {
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
-	int	map;
-
-	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform->DMI.DIMM[table_num];
-		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Type != 0) {
-                    DBG("RAM Detected Type = %d\n", Platform->RAM.DIMM[map].Type);
-                    return Platform->RAM.DIMM[map].Type;
-		}
-	}
+        int	map;
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
+        
+        if (table_num < MAX_RAM_SLOTS) {
+            map = DmiDimm[table_num];
+            if (RamDimm[map].InUse && RamDimm[map].Type != 0) {
+                DBG("RAM Detected Type = %d\n", RamDimm[map].Type);
+                return RamDimm[map].Type;
+            }
+        }
 	}
 	
 	return SMB_MEM_TYPE_DDR2;
@@ -758,15 +768,18 @@ static int sm_get_memtype (const char *name, int table_num)
 static int sm_get_memspeed (const char *name, int table_num)
 {
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
-	int	map;
-
-	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform->DMI.DIMM[table_num];
-		if (Platform->RAM.DIMM[map].InUse && Platform->RAM.DIMM[map].Frequency != 0) {
-                    DBG("RAM Detected Freq = %d Mhz\n", Platform->RAM.DIMM[map].Frequency);
-                    return Platform->RAM.DIMM[map].Frequency;
-		}
-	}
+        int	map;
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
+        if (table_num < MAX_RAM_SLOTS) {
+            map = DmiDimm[table_num];
+            if (RamDimm[map].InUse && RamDimm[map].Frequency != 0) {
+                DBG("RAM Detected Freq = %d Mhz\n", RamDimm[map].Frequency);
+                return RamDimm[map].Frequency;
+            }
+        }
 	}
 	return 800;
 }
@@ -774,32 +787,38 @@ static int sm_get_memspeed (const char *name, int table_num)
 static const char *sm_get_memvendor (const char *name, int table_num)
 {
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
-	int	map;
-
-	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform->DMI.DIMM[table_num];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].Vendor) > 0) {
-			DBG("RAM Detected Vendor[%d]='%s'\n", table_num, Platform->RAM.DIMM[map].Vendor);
-			return Platform->RAM.DIMM[map].Vendor;
-		}
-	}
+        int	map;
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
+        if (table_num < MAX_RAM_SLOTS) {
+            map = DmiDimm[table_num];
+            if (RamDimm[map].InUse && strlen(RamDimm[map].Vendor) > 0) {
+                DBG("RAM Detected Vendor[%d]='%s'\n", table_num, RamDimm[map].Vendor);
+                return RamDimm[map].Vendor;
+            }
+        }
 	}
 	return "N/A";
 }
-	
+
 static const char *sm_get_memserial (const char *name, int table_num)
 {
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
-	int	map;
-
-	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform->DMI.DIMM[table_num];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].SerialNo) > 0) {
-                   DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
-                        map, table_num, Platform->RAM.DIMM[map].SerialNo);			
-                    return Platform->RAM.DIMM[map].SerialNo;
-		}
-	}
+        int	map;
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
+        if (table_num < MAX_RAM_SLOTS) {
+            map = DmiDimm[table_num];
+            if (RamDimm[map].InUse && strlen(RamDimm[map].SerialNo) > 0) {
+                DBG("name = %s, map=%d,  RAM Detected SerialNo[%d]='%s'\n", name ? name : "", 
+                    map, table_num, RamDimm[map].SerialNo);			
+                return RamDimm[map].SerialNo;
+            }
+        }
     }
 	return "N/A";
 }
@@ -807,15 +826,18 @@ static const char *sm_get_memserial (const char *name, int table_num)
 static const char *sm_get_mempartno (const char *name, int table_num)
 {
 	if (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) == EFI_SUCCESS) {
-	int	map;
-
-	if (table_num < MAX_RAM_SLOTS) {
-		map = Platform->DMI.DIMM[table_num];
-		if (Platform->RAM.DIMM[map].InUse && strlen(Platform->RAM.DIMM[map].PartNo) > 0) {
-			DBG("Ram Detected PartNo[%d]='%s'\n", table_num, Platform->RAM.DIMM[map].PartNo);
-			return Platform->RAM.DIMM[map].PartNo;
-		}
-	}
+        int	map;
+        
+        int * DmiDimm = (int*)get_env_ptr(envDmiDimm);
+        RamSlotInfo_t * RamDimm = (RamSlotInfo_t*)get_env_ptr(envRamDimm);
+        
+        if (table_num < MAX_RAM_SLOTS) {
+            map = DmiDimm[table_num];
+            if (RamDimm[map].InUse && strlen(RamDimm[map].PartNo) > 0) {
+                DBG("Ram Detected PartNo[%d]='%s'\n", table_num, RamDimm[map].PartNo);
+                return RamDimm[map].PartNo;
+            }
+        }
 	}
 	return "N/A";
 }
@@ -872,11 +894,11 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 	int			i, j;
 	int			tablespresent[256];
 	bool			do_auto=true;
-
+    
 	bzero(tablespresent, sizeof(tablespresent));
-
-	getBoolForKey(kSMBIOSdefaults, &do_auto, &bootInfo->bootConfig);
-
+    
+	getBoolForKey(kSMBIOSdefaults, &do_auto, DEFAULT_BOOT_CONFIG);
+    
 	ret = (struct SMBEntryPoint *)AllocateKernelMemory(sizeof(struct SMBEntryPoint));
 	if (origsmbios) {
 		smbiostables = (char *)origsmbios->dmi.tableAddress;
@@ -885,7 +907,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 		smbiostables = NULL;
 		origsmbiosnum = 0;
 	}
-
+    
 	// _SM_
 	ret->anchor[0] = 0x5f;
 	ret->anchor[1] = 0x53;
@@ -910,18 +932,18 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 	ret->dmi.structureCount = 0; // will be calculated later in this function
 	ret->dmi.bcdRevision = 0x21;
 	tablesptr = smbiostables;
-
-    bool randomSerial = false;                 
-    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
     
-        // add stringlen of overrides to original stringlen, update maxStructure size adequately, 
-        // update structure count and tablepresent[type] with count of type. 
+    bool randomSerial = false;                 
+    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG);
+    
+    // add stringlen of overrides to original stringlen, update maxStructure size adequately, 
+    // update structure count and tablepresent[type] with count of type. 
 	if (smbiostables) {        
 		for (i=0; i<origsmbiosnum; i++) {
 			struct smbios_table_header	*cur = (struct smbios_table_header *)tablesptr;
 			char				*stringsptr;
 			int				stringlen;
-
+            
 			tablesptr += cur->length;
 			stringsptr = tablesptr;
 			for (; tablesptr[0]!=0 || tablesptr[1]!=0; tablesptr++);
@@ -934,7 +956,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				const char	*str;
 				int		size;
 				char		altname[40];
-
+                
 				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);	
                 if (smbios_properties[j].table_type == cur->type &&
                     smbios_properties[j].value_type == SMSTRING &&
@@ -943,9 +965,9 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
                     stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[cur->type])) + 1;
                     
                 } else if (smbios_properties[j].table_type == cur->type &&
-				    smbios_properties[j].value_type == SMSTRING &&
-				    (getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig) ||
-				     getValueForKey(altname,&str, &size, &bootInfo->smbiosConfig)))
+                           smbios_properties[j].value_type == SMSTRING &&
+                           (getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                            getValueForKey(altname,&str, &size, DEFAULT_SMBIOS_CONFIG)))
 				{
 					stringlen += size + 1;
 				} else if (smbios_properties[j].table_type == cur->type &&
@@ -967,14 +989,14 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 			tablespresent[cur->type]++;
 		}
 	}
-        // Add eventually table types whose detected count would be < required count, and update ret header with:
-        // new stringlen addons, structure count, and tablepresent[type] count adequately
+    // Add eventually table types whose detected count would be < required count, and update ret header with:
+    // new stringlen addons, structure count, and tablepresent[type] count adequately
 	for (i=0; i<sizeof(smbios_table_descriptions)/sizeof(smbios_table_descriptions[0]); i++) {
 		int	numnec=-1;
 		char	buffer[40];
-
+        
 		sprintf(buffer, "SMtable%d", i);
-		if (!getIntForKey(buffer, &numnec, &bootInfo->smbiosConfig)) {
+		if (!getIntForKey(buffer, &numnec, DEFAULT_SMBIOS_CONFIG)) {
 			numnec = -1;
 		}
 		if (numnec==-1 && do_auto && smbios_table_descriptions[i].numfunc) {
@@ -986,7 +1008,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				const char	*str;
 				int		size;
 				char		altname[40];
-
+                
 				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type] + 1);
                 if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
                     smbios_properties[j].value_type==SMSTRING &&
@@ -995,9 +1017,9 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
                     stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type])) + 1;
                     
                 } else if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
-				    smbios_properties[j].value_type == SMSTRING &&
-				    (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
-				     getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig)))
+                           smbios_properties[j].value_type == SMSTRING &&
+                           (getValueForKey(altname, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                            getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG)))
 				{
 					stringlen += size + 1;
 				} else if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
@@ -1039,14 +1061,14 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	bool do_auto=true;
 	
     static bool done = false; // IMPROVEME: called twice via getSmbios(), but only the second call can get all necessary info !
-
+    
     bool randomSerial = false;                 
-    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
+    getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG);
     
 	bzero(tablespresent, sizeof(tablespresent));
 	bzero(handles, sizeof(handles));
-
-	getBoolForKey(kSMBIOSdefaults, &do_auto, &bootInfo->bootConfig);
+    
+	getBoolForKey(kSMBIOSdefaults, &do_auto, DEFAULT_BOOT_CONFIG);
 	
 	newsmbios->dmi.tableAddress = (uint32_t)AllocateKernelMemory(newsmbios->dmi.tableLength);
 	if (origsmbios) {
@@ -1058,25 +1080,25 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	}
 	tablesptr = smbiostables;
 	newtablesptr = (char *)newsmbios->dmi.tableAddress;
-
-        // if old smbios exists then update new smbios  with old smbios original content first
+    
+    // if old smbios exists then update new smbios  with old smbios original content first
 	if (smbiostables) {
 		for (i=0; i<origsmbiosnum; i++) {
 			struct smbios_table_header	*oldcur = (struct smbios_table_header *) tablesptr;
 			struct smbios_table_header	*newcur = (struct smbios_table_header *) newtablesptr;
 			char				*stringsptr;
 			int				nstrings = 0;
-
+            
 			handles[(oldcur->handle) / 8] |= 1 << ((oldcur->handle) % 8);
-
-                        // copy table length from old table to new table but not the old strings
+            
+            // copy table length from old table to new table but not the old strings
 			memcpy(newcur,oldcur, oldcur->length);
-
+            
 			tablesptr += oldcur->length;
 			stringsptr = tablesptr;
 			newtablesptr += oldcur->length;
-
-                        // calculate the number of strings in the old content
+            
+            // calculate the number of strings in the old content
 			for (;tablesptr[0]!=0 || tablesptr[1]!=0; tablesptr++) {
 				if (tablesptr[0] == 0) {
 					nstrings++;
@@ -1086,105 +1108,105 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				nstrings++;
 			}
 			tablesptr += 2;
-
-                        // copy the old strings to new table
+            
+            // copy the old strings to new table
 			memcpy(newtablesptr, stringsptr, tablesptr-stringsptr);
-
+            
  			// point to next possible space for a string (deducting the second 0 char at the end)
 			newtablesptr += tablesptr - stringsptr - 1;
-                            if (nstrings == 0) { // if no string was found rewind to the first 0 char of the 0,0 terminator
+            if (nstrings == 0) { // if no string was found rewind to the first 0 char of the 0,0 terminator
 				newtablesptr--;
 			}
-
-                        // now for each property in the table update the overrides if any (auto or user)
+            
+            // now for each property in the table update the overrides if any (auto or user)
 			for (j=0; j<sizeof(smbios_properties)/sizeof(smbios_properties[0]); j++) {
 				const char	*str;
 				int		size;
 				int		num;
 				char		altname[40];
-
+                
 				sprintf(altname, "%s_%d", smbios_properties[j].name, tablespresent[newcur->type] + 1);
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
-					case SMSTRING:
-                        if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
-                        {
-                            str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
-							size = strlen(str);
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                        case SMSTRING:
+                            if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                            {
+                                str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+                                size = strlen(str);
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                                
+                            } else if (getValueForKey(altname, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                                       getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                            } else if (do_auto && smbios_properties[j].auto_str) {
+                                str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+                                size = strlen(str);
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                            }
+                            break;
                             
-                        } else if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
-						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
-						{
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
-						} else if (do_auto && smbios_properties[j].auto_str) {
-							str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
-							size = strlen(str);
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
-						}
-						break;
-
-					case SMOWORD:
-						if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
-						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
-						{
-							int		k=0, t=0, kk=0;
-							const char	*ptr = str;
-							memset(((char*)newcur) + smbios_properties[j].offset, 0, 16);
-							while (ptr-str<size && *ptr && (*ptr==' ' || *ptr=='\t' || *ptr=='\n')) {
-								ptr++;
-							}
-							if (size-(ptr-str)>=2 && ptr[0]=='0' && (ptr[1]=='x' || ptr[1]=='X')) {
-								ptr += 2;
-							}
-							for (;ptr-str<size && *ptr && k<16;ptr++) {
-								if (*ptr>='0' && *ptr<='9') {
-									(t=(t<<4)|(*ptr-'0')),kk++;
-								}
-								if (*ptr>='a' && *ptr<='f') {
-									(t=(t<<4)|(*ptr-'a'+10)),kk++;
-								}
-								if (*ptr>='A' && *ptr<='F') {
-									(t=(t<<4)|(*ptr-'A'+10)),kk++;
-								}
-								if (kk == 2) {
-									*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset + k)) = t;
-									k++;
-									kk = 0;
-									t = 0;
-								}
-							}
-						}
-						break;
-
-					case SMBYTE:
-						if (getIntForKey(altname, &num, &bootInfo->smbiosConfig) ||
-						    getIntForKey(smbios_properties[j].name, &num, &bootInfo->smbiosConfig))
-						{
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
-						} else if (do_auto && smbios_properties[j].auto_int) {
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);							
-						}
-						break;
-
-					case SMWORD:
-						if (getIntForKey(altname, &num, &bootInfo->smbiosConfig) ||
-						    getIntForKey(smbios_properties[j].name, &num, &bootInfo->smbiosConfig))
-						{
-							*((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
-						} else if (do_auto && smbios_properties[j].auto_int) {
-							*((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
-						}
-						break;
+                        case SMOWORD:
+                            if (getValueForKey(altname, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                                getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                int		k=0, t=0, kk=0;
+                                const char	*ptr = str;
+                                memset(((char*)newcur) + smbios_properties[j].offset, 0, 16);
+                                while (ptr-str<size && *ptr && (*ptr==' ' || *ptr=='\t' || *ptr=='\n')) {
+                                    ptr++;
+                                }
+                                if (size-(ptr-str)>=2 && ptr[0]=='0' && (ptr[1]=='x' || ptr[1]=='X')) {
+                                    ptr += 2;
+                                }
+                                for (;ptr-str<size && *ptr && k<16;ptr++) {
+                                    if (*ptr>='0' && *ptr<='9') {
+                                        (t=(t<<4)|(*ptr-'0')),kk++;
+                                    }
+                                    if (*ptr>='a' && *ptr<='f') {
+                                        (t=(t<<4)|(*ptr-'a'+10)),kk++;
+                                    }
+                                    if (*ptr>='A' && *ptr<='F') {
+                                        (t=(t<<4)|(*ptr-'A'+10)),kk++;
+                                    }
+                                    if (kk == 2) {
+                                        *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset + k)) = t;
+                                        k++;
+                                        kk = 0;
+                                        t = 0;
+                                    }
+                                }
+                            }
+                            break;
+                            
+                        case SMBYTE:
+                            if (getIntForKey(altname, &num, DEFAULT_SMBIOS_CONFIG) ||
+                                getIntForKey(smbios_properties[j].name, &num, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
+                            } else if (do_auto && smbios_properties[j].auto_int) {
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);							
+                            }
+                            break;
+                            
+                        case SMWORD:
+                            if (getIntForKey(altname, &num, DEFAULT_SMBIOS_CONFIG) ||
+                                getIntForKey(smbios_properties[j].name, &num, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                *((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
+                            } else if (do_auto && smbios_properties[j].auto_int) {
+                                *((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
+                            }
+                            break;
 					}
 				}
 			}
@@ -1197,14 +1219,14 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 			tablespresent[newcur->type]++;
 		}
 	}
-
-        // for each eventual complementary table not present in the original smbios, do the overrides
+    
+    // for each eventual complementary table not present in the original smbios, do the overrides
 	for (i=0; i<sizeof(smbios_table_descriptions)/sizeof(smbios_table_descriptions[0]); i++) {
 		int	numnec = -1;
 		char	buffer[40];
-
+        
 		sprintf(buffer, "SMtable%d", i);
-		if (!getIntForKey(buffer, &numnec, &bootInfo->smbiosConfig)) {
+		if (!getIntForKey(buffer, &numnec, DEFAULT_SMBIOS_CONFIG)) {
 			numnec = -1;
 		}
 		if (numnec == -1 && do_auto && smbios_table_descriptions[i].numfunc) {
@@ -1213,7 +1235,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 		while (tablespresent[smbios_table_descriptions[i].type] < numnec) {
 			struct smbios_table_header	*newcur = (struct smbios_table_header *) newtablesptr;
 			int				nstrings = 0;
-
+            
 			memset(newcur,0, smbios_table_descriptions[i].len);
 			while (handles[(nexthandle)/8] & (1 << ((nexthandle) % 8))) {
 				nexthandle++;
@@ -1228,90 +1250,90 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				int		size;
 				int		num;
 				char		altname[40];
-
+                
 				sprintf(altname, "%s_%d", smbios_properties[j].name, tablespresent[newcur->type] + 1);
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
-					case SMSTRING:
-                        if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
-                        {
-                            str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
-							size = strlen(str);
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                        case SMSTRING:
+                            if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                            {
+                                str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+                                size = strlen(str);
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
                                 
-                        } else if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
-						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
-						{
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
-						} else if (do_auto && smbios_properties[j].auto_str) {
-							str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
-							size = strlen(str);
-							memcpy(newtablesptr, str, size);
-							newtablesptr[size] = 0;
-							newtablesptr += size + 1;
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
-						}
-						break;
-
-					case SMOWORD:
-						if (getValueForKey(altname, &str, &size, &bootInfo->smbiosConfig) ||
-						    getValueForKey(smbios_properties[j].name, &str, &size, &bootInfo->smbiosConfig))
-						{
-							int		k=0, t=0, kk=0;
-							const char	*ptr = str;
-
-							memset(((char*)newcur) + smbios_properties[j].offset, 0, 16);
-							while (ptr-str<size && *ptr && (*ptr==' ' || *ptr=='\t' || *ptr=='\n')) {
-								ptr++;
-							}
-							if (size-(ptr-str)>=2 && ptr[0]=='0' && (ptr[1]=='x' || ptr[1]=='X')) {
-								ptr += 2;
-							}
-							for (;ptr-str<size && *ptr && k<16;ptr++) {
-								if (*ptr>='0' && *ptr<='9') {
-									(t=(t<<4)|(*ptr-'0')),kk++;
-								}
-								if (*ptr>='a' && *ptr<='f') {
-									(t=(t<<4)|(*ptr-'a'+10)),kk++;
-								}
-								if (*ptr>='A' && *ptr<='F') {
-									(t=(t<<4)|(*ptr-'A'+10)),kk++;
-								}
-								if (kk == 2) {
-									*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset + k)) = t;
-									k++;
-									kk = 0;
-									t = 0;
-								}
-							}
-						}
-						break;
-						
-					case SMBYTE:
-						if (getIntForKey(altname, &num, &bootInfo->smbiosConfig) ||
-						    getIntForKey(smbios_properties[j].name, &num, &bootInfo->smbiosConfig))
-						{
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
-						} else if (do_auto && smbios_properties[j].auto_int) {
-							*((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
-						}
-						break;
-						
-					case SMWORD:
-						if (getIntForKey(altname, &num, &bootInfo->smbiosConfig) ||
-						    getIntForKey(smbios_properties[j].name, &num, &bootInfo->smbiosConfig))
-						{
-							*((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
-						} else if (do_auto && smbios_properties[j].auto_int) {
-							*((uint16_t*)(((char*)newcur)+smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
-						}
-						break;
+                            } else if (getValueForKey(altname, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                                       getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                            } else if (do_auto && smbios_properties[j].auto_str) {
+                                str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
+                                size = strlen(str);
+                                memcpy(newtablesptr, str, size);
+                                newtablesptr[size] = 0;
+                                newtablesptr += size + 1;
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = ++nstrings;
+                            }
+                            break;
+                            
+                        case SMOWORD:
+                            if (getValueForKey(altname, &str, &size, DEFAULT_SMBIOS_CONFIG) ||
+                                getValueForKey(smbios_properties[j].name, &str, &size, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                int		k=0, t=0, kk=0;
+                                const char	*ptr = str;
+                                
+                                memset(((char*)newcur) + smbios_properties[j].offset, 0, 16);
+                                while (ptr-str<size && *ptr && (*ptr==' ' || *ptr=='\t' || *ptr=='\n')) {
+                                    ptr++;
+                                }
+                                if (size-(ptr-str)>=2 && ptr[0]=='0' && (ptr[1]=='x' || ptr[1]=='X')) {
+                                    ptr += 2;
+                                }
+                                for (;ptr-str<size && *ptr && k<16;ptr++) {
+                                    if (*ptr>='0' && *ptr<='9') {
+                                        (t=(t<<4)|(*ptr-'0')),kk++;
+                                    }
+                                    if (*ptr>='a' && *ptr<='f') {
+                                        (t=(t<<4)|(*ptr-'a'+10)),kk++;
+                                    }
+                                    if (*ptr>='A' && *ptr<='F') {
+                                        (t=(t<<4)|(*ptr-'A'+10)),kk++;
+                                    }
+                                    if (kk == 2) {
+                                        *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset + k)) = t;
+                                        k++;
+                                        kk = 0;
+                                        t = 0;
+                                    }
+                                }
+                            }
+                            break;
+                            
+                        case SMBYTE:
+                            if (getIntForKey(altname, &num, DEFAULT_SMBIOS_CONFIG) ||
+                                getIntForKey(smbios_properties[j].name, &num, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
+                            } else if (do_auto && smbios_properties[j].auto_int) {
+                                *((uint8_t*)(((char*)newcur) + smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
+                            }
+                            break;
+                            
+                        case SMWORD:
+                            if (getIntForKey(altname, &num, DEFAULT_SMBIOS_CONFIG) ||
+                                getIntForKey(smbios_properties[j].name, &num, DEFAULT_SMBIOS_CONFIG))
+                            {
+                                *((uint16_t*)(((char*)newcur) + smbios_properties[j].offset)) = num;
+                            } else if (do_auto && smbios_properties[j].auto_int) {
+                                *((uint16_t*)(((char*)newcur)+smbios_properties[j].offset)) = smbios_properties[j].auto_int(smbios_properties[j].name, tablespresent[newcur->type]);
+                            }
+                            break;
 					}
 				}
 			}
@@ -1324,8 +1346,8 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 			tablespresent[smbios_table_descriptions[i].type]++;
 		}
 	}
-
-        // calculate new checksums
+    
+    // calculate new checksums
 	newsmbios->dmi.checksum = 0;
 	newsmbios->dmi.checksum = 256 - checksum8(&newsmbios->dmi, sizeof(newsmbios->dmi));
 	newsmbios->checksum = 0;
@@ -1465,52 +1487,52 @@ const char * smbiosStringAtIndex(DMIHeader* smHeader, int index, int* length )
 struct SMBEntryPoint *getSmbiosPatched(struct SMBEntryPoint *orig)
 {       
    	struct SMBEntryPoint *patched = NULL; // cached
-            
+    
 	patched = smbios_dry_run(orig);
-            if(patched==NULL) {
-                printf("Could not create new SMBIOS !!\n");
-                pause();
-            }
-            else {
-                smbios_real_run(orig, patched);
-            }
-        
-
-       return patched;
-   
+    if(patched==NULL) {
+        printf("Could not create new SMBIOS !!\n");
+        pause();
+    }
+    else {
+        smbios_real_run(orig, patched);
+    }
+    
+    
+    return patched;
+    
 }
 
 /*
-char* getSmbiosProductName()
-{
-	struct SMBEntryPoint	*smbios;
-	SMBSystemInformation	*p;
-	char*					tempString;
-	int						tmpLen;
-	
-	smbios = getSmbiosOriginal();
-	if (smbios==NULL) return NULL; 
-	
-	p = (SMBSystemInformation*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
-	if (p==NULL) return NULL;
-	
-	
-	tempString = (char*)smbiosStringAtIndex((DMIHeader*)p, p->productName, &tmpLen);
-	tempString[tmpLen] = 0;
-	
-	gSMBIOSBoardModel = malloc(tmpLen + 1);
-	if(gSMBIOSBoardModel)
-	{
-		strncpy(gSMBIOSBoardModel, tempString, tmpLen);
-		Node* node = DT__FindNode("/", false);
-		DT__AddProperty(node, "orig-model", tmpLen, gSMBIOSBoardModel);
-	}
-	verbose("Actual model name is '%s'\n", tempString);
-	return tempString;
-}
-*/
+ char* getSmbiosProductName()
+ {
+ struct SMBEntryPoint	*smbios;
+ SMBSystemInformation	*p;
+ char*					tempString;
+ int						tmpLen;
+ 
+ smbios = getSmbiosOriginal();
+ if (smbios==NULL) return NULL; 
+ 
+ p = (SMBSystemInformation*) FindFirstDmiTableOfType(1, 0x19); // Type 1: (3.3.2) System Information
+ if (p==NULL) return NULL;
+ 
+ 
+ tempString = (char*)smbiosStringAtIndex((DMIHeader*)p, p->productName, &tmpLen);
+ tempString[tmpLen] = 0;
+ 
+ gSMBIOSBoardModel = malloc(tmpLen + 1);
+ if(gSMBIOSBoardModel)
+ {
+ strncpy(gSMBIOSBoardModel, tempString, tmpLen);
+ Node* node = DT__FindNode("/", false);
+ DT__AddProperty(node, "orig-model", tmpLen, gSMBIOSBoardModel);
+ }
+ verbose("Actual model name is '%s'\n", tempString);
+ return tempString;
+ }
+ */
 
-void scan_memory(PlatformInfo_t *p)
+void scan_memory(void)
 {		 
     int i=0;
     struct DMIHeader * dmihdr = NULL;
@@ -1519,19 +1541,25 @@ void scan_memory(PlatformInfo_t *p)
     struct DMIPhysicalMemoryArray* physMemArray; // 16
     struct DMIMemoryDevice* memDev[MAX_RAM_SLOTS]; //17
 	
+    int			MaxMemorySlots = 0;		// number of memory slots polulated by SMBIOS
+    
     /* We mainly don't use obsolete tables 5,6 because most of computers don't handle it anymore */
-	Platform->DMI.MemoryModules = 0;
+    int			MemoryModules = 0;
+    
     /* Now lets peek info rom table 16,17 as for some bios, table 5 & 6 are not used */
     physMemArray = (struct DMIPhysicalMemoryArray*) FindFirstDmiTableOfType(16, 4);
-    Platform->DMI.MaxMemorySlots = physMemArray ? physMemArray->numberOfMemoryDevices :  0;
-	
+    
+    MaxMemorySlots = physMemArray ? physMemArray->numberOfMemoryDevices :  0;
+    
     i = 0;
+    static RamSlotInfo_t	RamDimm[MAX_RAM_SLOTS];	// Information about each slot
+    
     for(dmihdr = FindFirstDmiTableOfType(17, 4);
         dmihdr;
         dmihdr = FindNextDmiTableOfType(17, 4) ) {
         memDev[i] = (struct DMIMemoryDevice*) dmihdr;
-        if (memDev[i]->size !=0 ) Platform->DMI.MemoryModules++;
-        if (memDev[i]->speed>0) Platform->RAM.DIMM[i].Frequency = memDev[i]->speed; // take it here for now but we'll check spd and dmi table 6 as well
+        if (memDev[i]->size !=0 ) MemoryModules++;
+        if (memDev[i]->speed>0) RamDimm[i].Frequency = memDev[i]->speed; // take it here for now but we'll check spd and dmi table 6 as well
         i++;
     }
     // for table 6, we only have a look at the current speed
@@ -1540,10 +1568,15 @@ void scan_memory(PlatformInfo_t *p)
         dmihdr;
         dmihdr = FindNextDmiTableOfType(6, 4) ) {
         memInfo[i] = (struct DMIMemoryModuleInfo*) dmihdr;
-        if (memInfo[i]->currentSpeed > Platform->RAM.DIMM[i].Frequency) 
-            Platform->RAM.DIMM[i].Frequency = memInfo[i]->currentSpeed; // favor real overclocked speed if any
+        if (memInfo[i]->currentSpeed > RamDimm[i].Frequency) 
+            RamDimm[i].Frequency = memInfo[i]->currentSpeed; // favor real overclocked speed if any
         i++;
     }
+    
+    safe_set_env(envDMIMaxMemorySlots, MaxMemorySlots);
+    safe_set_env(envDMIMemModules, MemoryModules);
+    safe_set_env_copy(envRamDimm, RamDimm, sizeof(RamDimm));
+    
 #if 0
     dumpAllTablesOfType(17);
     getc();

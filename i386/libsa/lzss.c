@@ -40,7 +40,7 @@
  *  DRI: Josh de Cesare
  */
 
-#include <sl.h>
+#include "sl.h"
 
 #define N         4096  /* size of ring buffer - must be power of 2 */
 #define F         18    /* upper limit for match_length */

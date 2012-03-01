@@ -56,7 +56,7 @@
 #define kOEMFACS			"oemFACS"			/* acpi_codec.c */
 #endif
 
-extern EFI_STATUS setupAcpi();
+extern EFI_STATUS setupAcpi(void);
 
 struct p_state 
 {

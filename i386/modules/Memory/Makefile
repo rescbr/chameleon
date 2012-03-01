@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-MEMORY_OBJS = dram_controllers.o mem.o spd.o Memory.o
+MEMORY_OBJS = dram_controllers.o mem.o spd.o Memory.o stack_protector.o
 
 
 SFILES =
@@ -70,7 +70,8 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/dram_controllers.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/dram_controllers.o \
 	$(OBJROOT)/mem.o \
 	$(OBJROOT)/spd.o \
 	$(OBJROOT)/Memory.o \
@@ -78,6 +79,10 @@ dylib:
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
 
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 dram_controllers.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "dram_controllers.c" $(INC) -o "$(OBJROOT)/dram_controllers.o"

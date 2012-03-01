@@ -9,11 +9,11 @@
 #ifndef GRAPHIC_UTILS_H
 #define GRAPHIC_UTILS_H
 
-#include "boot.h"
+#include "libsaio.h"
 
 
-char *getVBEInfoString();
-extern void printVBEModeInfo();
+char *getVBEInfoString(void);
+void printVBEModeInfo(void);
 
 typedef union {
     struct {
@@ -63,6 +63,50 @@ position_t pos(const uint16_t x, const uint16_t y);
 
 // Flips the R and B components of all pixels in the given pixmap
 void flipRB(pixmap_t *p);
+
+int getNumberArrayFromProperty( const char *  propKey,
+                                 unsigned long numbers[],
+                                 unsigned long maxArrayCount );
+
+#if UNUSED
+int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
+#else
+int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel);
+#endif
+
+void getGraphicModeParams(unsigned long params[]);
+char *getVBEModeInfoString(void);
+
+void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data);
+
+void drawCheckerBoard(void);
+
+int
+convertImage( unsigned short width,
+               unsigned short height,
+               const unsigned char *imageData,
+               unsigned char **newImageData );
+
+void drawDataRectangle( unsigned short  x,
+                         unsigned short  y,
+                         unsigned short  width,
+                         unsigned short  height,
+                         unsigned char * data );
+
+void drawColorRectangle( unsigned short x,
+                        unsigned short y,
+                        unsigned short width,
+                        unsigned short height,
+                        unsigned char  colorIndex );
+
+#if UNUSED
+void setVideoMode(int mode, int drawgraphics);
+#else
+void setVideoMode(int mode);
+#endif
+char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
+
+
 
 // Utility function to get pixel at (x,y) in a pixmap
 #define pixel(p,x,y) ((p)->pixels[(x) + (y) * (p)->width])

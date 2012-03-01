@@ -30,15 +30,16 @@
 #include "bios.h"
 #include "device_tree.h"
 /*!
-    Kernel boot args global also used by booter for its own data.
+ Kernel boot args global also used by booter for its own data.
  */
 extern boot_args_common *bootArgs;
 
 /*!
-    Boot args passed to the kernel.
+ Boot args passed to the kernel.
  */
 extern boot_args_Legacy  *bootArgsLegacy;
 extern boot_args_107	 *bootArgs107;
+extern boot_args_108	 *bootArgs108;
 
 extern Node *gMemoryMapNode;
 
@@ -99,17 +100,17 @@ enum {
     kMemoryRangeReserved = 2,    // Reserved. (Do not use)
     kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.
     kMemoryRangeNVS      = 4,    // ACPI NVS memory. (Do not use)
-
+    
     /* Undefined types should be treated as kMemoryRangeReserved */
 };
 
 /*!
-    PrivateBootInfo has fields used by the booter that used to be part of
-    KernelBootArgs_t *bootArgs.  When the switch was made to EFI the structure
-    completely changed to boot_args *bootArgs.  This (new to boot-132) structure
-    contains the fields the kernel no longer cares about but the booter still
-    uses internally.  Some fields (e.g. the video information) remain interesting
-    to the kernel and are thus located in bootArgs although with different field names.
+ PrivateBootInfo has fields used by the booter that used to be part of
+ KernelBootArgs_t *bootArgs.  When the switch was made to EFI the structure
+ completely changed to boot_args *bootArgs.  This (new to boot-132) structure
+ contains the fields the kernel no longer cares about but the booter still
+ uses internally.  Some fields (e.g. the video information) remain interesting
+ to the kernel and are thus located in bootArgs although with different field names.
  */
 typedef struct PrivateBootInfo {
     int              convmem;                      // conventional memory
@@ -118,7 +119,7 @@ typedef struct PrivateBootInfo {
     int              numBootDrivers;               // number of drivers loaded
 #endif
     char             bootFile[128];                // kernel file name		
-
+    
     unsigned long    memoryMapCount;
     MemoryRange      memoryMap[kMemoryMapCountMax];
     
@@ -134,17 +135,21 @@ typedef struct PrivateBootInfo {
 	
 	config_file_t    SystemConfig;               // system confing found in /Library/Preferences/SystemConfiguration/com.apple.Boot.plist
     
-
-    config_file_t    themeConfig;				           // theme.plist
+    
     config_file_t    smbiosConfig;				         // smbios.plist
     config_file_t    helperConfig;                 // boot helper partition's boot.plist
-    config_file_t    ramdiskConfig;                // RAMDisk.plist
 	
 	unsigned long    adler32;
 	
 	char uuidStr[64+1];										//boot device  uuid
     
 } PrivateBootInfo_t;
+
+#define DEFAULT_BOOT_CONFIG      (config_file_t*)0
+#define DEFAULT_SYSTEM_CONFIG    (config_file_t*)1
+#define DEFAULT_OVERRIDE_CONFIG  (config_file_t*)2
+#define DEFAULT_SMBIOS_CONFIG    (config_file_t*)3
+#define DEFAULT_HELPER_CONFIG    (config_file_t*)4
 
 extern PrivateBootInfo_t *bootInfo; 
 

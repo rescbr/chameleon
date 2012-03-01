@@ -29,7 +29,7 @@ typedef struct {
 } PNG_info_t;
 
 PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size);
-void png_alloc_free_all();
+void png_alloc_free_all(void);
 
 extern int PNG_error;
 

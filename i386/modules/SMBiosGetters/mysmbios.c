@@ -6,7 +6,7 @@
  */
 
 
-#include "boot.h"
+#include "libsaio.h"
 #include "bootstruct.h"
 #include "smbios_getters.h"
 
@@ -22,7 +22,6 @@
 #define DBG(x...)	
 #endif
 
-#define SMBPlist			&bootInfo->smbiosConfig
 /* ASSUMPTION: 16KB should be enough for the whole thing */
 #define SMB_ALLOC_SIZE	16384
 
@@ -321,25 +320,30 @@ typedef struct {
 	SMBStructHeader *new;
 } SMBStructPtrs;
 
-struct {
+typedef struct {
 	const char *vendor;
 	const char *version;
 	const char *releaseDate;
-} defaultBIOSInfo;
+} defaultBIOSInfo_t;
 
-struct {
+defaultBIOSInfo_t defaultBIOSInfo;
+
+typedef struct {
 	const char *manufacturer;
 	const char *productName;
 	const char *version;
 	const char *serialNumber;
 	const char *family;
-} defaultSystemInfo;
+} defaultSystemInfo_t;
 
-struct {
+defaultSystemInfo_t defaultSystemInfo;
+
+typedef struct {
 	const char *manufacturer;
 	const char *product;
-} defaultBaseBoard;
+} defaultBaseBoard_t;
 
+defaultBaseBoard_t defaultBaseBoard;
 
 typedef struct {
 	uint8_t			type;
@@ -488,7 +492,11 @@ static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr);
 static void addSMBEndOfTable(SMBStructPtrs *structPtr);
 static void setSMBStruct(SMBStructPtrs *structPtr);
 static void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr);
-
+const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key);
+const char* sm_get_random_productNumber(void);
+const char* sm_get_random_week(void);
+const char* sm_get_random_year(void);
+const char* sm_get_random_country(void);
 
 const char *getDefaultSMBproductName(void)
 {
@@ -518,7 +526,7 @@ const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
     return "";
 }
 
-const char* sm_get_random_productNumber()
+const char* sm_get_random_productNumber(void)
 {
     static char str[4] = {0x00,0x00,0x00,0x00};
     if(str[0]  == 0)
@@ -551,7 +559,7 @@ const char* sm_get_random_productNumber()
     return str;
 }
 
-const char* sm_get_random_week()
+const char* sm_get_random_week(void)
 {
     static char str[4] = {0x00,0x00,0x00,0x00};
     if(str[0]  == 0)
@@ -580,7 +588,7 @@ const char* sm_get_random_week()
     return str;
 }
 
-const char* sm_get_random_year()
+const char* sm_get_random_year(void)
 {
     static char str[2] = {0x00,0x00};
     if(str[0]  == 0)
@@ -606,7 +614,7 @@ const char* sm_get_random_year()
     return str;
 }
 
-const char* sm_get_random_country()
+const char* sm_get_random_country(void)
 {
     static char str[3] = {0x00,0x00,0x00};
     if(str[0] == 0)
@@ -635,17 +643,17 @@ static void setDefaultSMBData(void)
         const SMStrEntryPair*	sm_defaults;
         const SMStrEntryPair*	sm_chosen;
         
-        if (platformIsServer() == true)
+        if (get_env(envIsServer))
         {
             sm_defaults=sm_xserve_defaults;
-        } else if (platformIsMobile() == true) {
-            if (getCPUnCores() > 1) {
+        } else if (get_env(envIsMobile)) {
+            if (get_env(envNoCores) > 1) {
                 sm_defaults=sm_macbookpro_defaults;
             } else {
                 sm_defaults=sm_macbook_defaults;
             }
         } else {
-            switch (getCPUnCores()) 
+            switch (get_env(envNoCores)) 
             {
                 case 1: 
                     sm_defaults=sm_macmini_defaults; 
@@ -655,11 +663,11 @@ static void setDefaultSMBData(void)
                     break;
                 default:
                 {
-                    switch (getCPUFamily()) 
+                    switch (get_env(envFamily)) 
                     {
                         case 0x06:
                         {
-                            switch (getCPUModel())
+                            switch (get_env(envModel))
                             {
                                 case CPUID_MODEL_FIELDS:        // Intel Core i5, i7 LGA1156 (45nm)
                                 case CPUID_MODEL_DALES:         // Intel Core i5, i7 LGA1156 (45nm) ???
@@ -702,7 +710,7 @@ static void setDefaultSMBData(void)
             const char	*str;
             int		size;
             
-            if (getValueForKey("SMproductname", &str, &size, &bootInfo->smbiosConfig))
+            if (getValueForKey("SMproductname", &str, &size, DEFAULT_SMBIOS_CONFIG))
             {              
                 if (strstr (str, "MacPro5"))
                 {
@@ -756,7 +764,7 @@ static void setDefaultSMBData(void)
         bzero  (fake_serial,sizeof(fake_serial));      
         
         bool randomSerial = false;
-        getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig) ;
+        getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG) ;
         
         if ( randomSerial ) // useless
             strlcpy (fake_serial,sm_get_random_country(), strlen(sm_get_random_country())+1);
@@ -818,12 +826,12 @@ static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyStri
     
 	if (value)
 	{
-		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
+		if (getIntForKey(key, (int *)&(value->dword), DEFAULT_SMBIOS_CONFIG))
 			return true;
 	}
 	else
 	{
-		if (getValueForKey(key, string, &len, SMBPlist))
+		if (getValueForKey(key, string, &len, DEFAULT_SMBIOS_CONFIG))
 			return true;
 	}
 	
@@ -897,7 +905,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 		case kSMBString:
         {
             bool randomSerial = false;                 
-            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, &bootInfo->bootConfig);
+            getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG);
             
 			if (SMBSetters[idx].keyString)
 			{
@@ -906,7 +914,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
                     string = *(SMBSetters[idx].defaultValue);
                     break;
                 }
-                else if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
+                else if (getValueForKey(SMBSetters[idx].keyString, &string, &len, DEFAULT_SMBIOS_CONFIG))
 					break;
 				else
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
@@ -930,7 +938,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			//case kSMBQWord:
 			/*if (SMBSetters[idx].keyString)
              {
-             if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), SMBPlist))
+             if (getIntForKey(SMBSetters[idx].keyString, (int *)&(value->dword), DEFAULT_SMBIOS_CONFIG))
              return true;
              else
              if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
@@ -939,7 +947,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
              }*/
             if (SMBSetters[idx].keyString)
 			{
-				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
+				parsed = getIntForKey(SMBSetters[idx].keyString, &val, DEFAULT_SMBIOS_CONFIG);
 				if (!parsed)
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
 						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
@@ -1012,11 +1020,11 @@ static void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
     
-	switch (getCPUFamily()) 
+	switch (get_env(envFamily)) 
 	{
 		case 0x06:
 		{
-			switch (getCPUModel())
+			switch (get_env(envModel))
 			{
 				case 0x19:					// Intel Core i5 650 @3.20 Ghz
 				case CPUID_MODEL_FIELDS:		// Intel Core i5, i7 LGA1156 (45nm)
@@ -1184,14 +1192,14 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	if (!structPtr)
 		return NULL;
 	
-	buffer = malloc(SMB_ALLOC_SIZE);
+	buffer = (uint8_t *)malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
 		return NULL;
 	
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
     
-	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->bootConfig);
+	getBoolForKey(kSMBIOSdefaults, &setSMB, DEFAULT_BOOT_CONFIG);
 	if (setSMB)
 		setDefaultSMBData();
     
@@ -1246,28 +1254,32 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 	SMBStructHeader *structHeader = (SMBStructHeader *)structPtr;
     
 	int dimmnbr = 0;
-	Platform->DMI.MaxMemorySlots	= 0;
-	Platform->DMI.CntMemorySlots	= 0;
-	Platform->DMI.MemoryModules	= 0;
+    int			MaxMemorySlots = 0;		// number of memory slots polulated by SMBIOS
+    int			CntMemorySlots = 0;		// number of memory slots counted
+    int			MemoryModules = 0;
+    
+    
+    static RamSlotInfo_t RamDimm[MAX_RAM_SLOTS];
     
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
 	{
 		switch (structHeader->type)
 		{
 			case kSMBTypeSystemInformation:
-				Platform->UUID = ((SMBSystemInformation *)structHeader)->uuid;
+                safe_set_env(envUUID,(uint32_t)((SMBSystemInformation *)structHeader)->uuid);
 				break;
                 
 			case kSMBTypePhysicalMemoryArray:
-				Platform->DMI.MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
+				MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
 				break;
                 
 			case kSMBTypeMemoryDevice:
-				Platform->DMI.CntMemorySlots++;
+				CntMemorySlots++;
         		if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
-					Platform->DMI.MemoryModules++;
+					MemoryModules++;
         		if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
-					Platform->RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
+                    
+					RamDimm[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
 				dimmnbr++;
 				break;
 			default:
@@ -1282,5 +1294,11 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
         
 		structHeader = (SMBStructHeader *)structPtr;
 	}
+    safe_set_env(envDMIMaxMemorySlots, MaxMemorySlots);
+    safe_set_env(envDMICntMemorySlots, CntMemorySlots);
+    safe_set_env(envDMIMemModules, MemoryModules);
+    safe_set_env_copy(envRamDimm, RamDimm, sizeof(RamDimm));
+    
+    
 }
 

@@ -88,10 +88,13 @@ static unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd
     outb(base + SMBHSTDAT, 0xff);
 	
     rdtsc(l1, h1);
+    
+    uint64_t tsc = get_env(envTSCFreq);
+    
     while ( inb(base + SMBHSTSTS) & 0x01)    // wait until read
     {  
 		rdtsc(l2, h2);
-		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform->CPU.TSCFrequency / 100);
+		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (tsc / 100);
 		if (t > 5)
 			return 0xFF;                  // break
     }
@@ -105,7 +108,7 @@ static unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd
  	while (!( inb(base + SMBHSTSTS) & 0x02))		// wait til command finished
 	{	
 		rdtsc(l2, h2);
-		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform->CPU.TSCFrequency / 100);
+		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (tsc / 100);
 		if (t > 5)
 			break;									// break after 5ms
     }
@@ -279,15 +282,26 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     DBG("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
 			smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 	
-    getBoolForKey("DumpSPD", &dump, &bootInfo->bootConfig);
-    bool fullBanks =  // needed at least for laptops
-	Platform->DMI.MemoryModules ==  Platform->DMI.MaxMemorySlots;
-	// Search MAX_RAM_SLOTS slots
+    getBoolForKey("DumpSPD", &dump, DEFAULT_BOOT_CONFIG);
+    bool fullBanks ;  // needed at least for laptops
+    
+    int DMIMaxMemorySlots = (int)get_env(envDMIMaxMemorySlots);
+    int DMIMemModules = (int)get_env(envDMIMemModules);
+
+    fullBanks = (bool)(DMIMemModules == DMIMaxMemorySlots) ;
+    
+    // Search MAX_RAM_SLOTS slots
 	char spdbuf[MAX_SPD_SIZE];
 	
+    RamSlotInfo_t *RamDIMM = get_env_ptr(envRamDimm);
+
+    static int	DmiDIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
+
+    uint64_t		RamFrequency = get_env(envRamFrequency);
+    
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
 		DBG("Scanning slot %d\n", i);
-        slot = &Platform->RAM.DIMM[i];
+        slot = &RamDIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
         // Check spd is present
         if (spd_size && (spd_size != 0xff) ) {
@@ -331,8 +345,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
             if (slot->Frequency<(uint32_t)speed) slot->Frequency = speed;
 			
 			// pci memory controller if available, is more reliable
-			if (Platform->RAM.Frequency > 0) {
-				uint32_t freq = (uint32_t)Platform->RAM.Frequency / 500000;
+			if ( RamFrequency > 0) {
+				uint32_t freq = (uint32_t)(RamFrequency / 500000);
 				// now round off special cases
 				uint32_t fmod100 = freq %100;
 				switch(fmod100) {
@@ -360,13 +374,16 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 #endif           
         }
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
-        Platform->DMI.DIMM[i]= 
-		i>0 && Platform->RAM.DIMM[1].InUse==false && fullBanks && Platform->DMI.MaxMemorySlots==2 ? 
+        DmiDIMM[i]= 
+		i>0 && RamDIMM[1].InUse==false && fullBanks && (DMIMaxMemorySlots==2) ? 
 		mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
         
 		slot->spd = NULL;
 		
     } // for
+    
+    safe_set_env_copy(envDmiDimm, DmiDIMM, sizeof(DmiDIMM));
+
 }
 
 static struct smbus_controllers_t smbus_controllers[] = {

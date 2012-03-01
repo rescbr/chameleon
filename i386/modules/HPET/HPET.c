@@ -5,7 +5,6 @@
 
 #include "libsaio.h"
 #include "modules.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "hpet.h"
@@ -23,7 +22,7 @@
 static void force_enable_hpet_intel(pci_dt_t *lpc_dev);
 static void force_enable_hpet_via(pci_dt_t *lpc_dev);
 static void force_enable_hpet(pci_dt_t *lpc_dev);
-
+void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
@@ -35,10 +34,11 @@ void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 	force_enable_hpet(current);
 }
 
-void HPET_start()
+void HPET_start(void);
+void HPET_start(void)
 {
 	bool enable = true;
-	getBoolForKey(EnableHPETModule, &enable, &bootInfo->bootConfig);
+	getBoolForKey(EnableHPETModule, &enable, DEFAULT_BOOT_CONFIG);
 	
 	if (enable)	
 		register_hook_callback("PCIDevice", &HPET_hook);

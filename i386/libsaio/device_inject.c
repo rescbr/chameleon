@@ -6,7 +6,6 @@
  */
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "pci_root.h"
@@ -55,7 +54,7 @@ void setupDeviceProperties(Node *node)
 	/* Use the static "device-properties" boot config key contents if available,
 	 * otheriwse use the generated one.
 	 */  
-	if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->bootConfig) && string)
+	if (!getValueForKey(kDeviceProperties, &val, &cnt, DEFAULT_BOOT_CONFIG) && string)
 	{
 		val = (const char*)string;
 		cnt = strlength * 2;

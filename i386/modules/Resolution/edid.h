@@ -14,6 +14,6 @@
 #define kScreenWidth		"ScreenWidth"		
 #define kScreenHeight		"ScreenHeight"		
 
-char* readEDID();
+char* readEDID(void);
 void getResolution(UInt32* x, UInt32* y, UInt32* bp);
 void getResolutionHook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);

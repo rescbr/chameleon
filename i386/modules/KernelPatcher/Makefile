@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-KERN_OBJS = kernel_patcher.o
+KERN_OBJS = kernel_patcher.o stack_protector.o
 
 
 SFILES =
@@ -69,11 +69,17 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
-	$(OBJROOT)/kernel_patcher.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/kernel_patcher.o \
 	-macosx_version_min 10.6 \
 	-weak_library $(SYMROOT)/Symbols.dylib \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
+
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 
 kernel_patcher.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "kernel_patcher.c" $(INC) -o "$(OBJROOT)/kernel_patcher.o"

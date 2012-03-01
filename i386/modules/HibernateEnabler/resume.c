@@ -7,12 +7,12 @@
  *
  */
 
-#include "saio_internal.h"
 #include "libsa.h"
+#include "saio_internal.h"
 #include "IOHibernatePrivate.h"
 #include "memory.h"
 #include "bootstruct.h"
-#include "boot.h" 
+#include "platform.h"
 #include "pci.h"
 #include "resume.h"
 #include "graphic_utils.h"
@@ -24,24 +24,28 @@ static unsigned long
 getmemorylimit(void);
 static void WakeKernel(IOHibernateImageHeader * header);
 
+
 static unsigned long
 getmemorylimit(void)
 {
-  int line;
-  int i;
-  MemoryRange *mp = bootInfo->memoryMap;
-  
-  // Activate and clear page 1
-  line = 1;
-  for (i = 0; i < bootInfo->memoryMapCount; i++)
-  {
-    if((mp->type == 1) && ((unsigned long)mp->base == 0x100000))
+    int line;
+    int i;
+    
+    MemoryRange *mp = (MemoryRange*)(uint32_t)get_env(envMemoryMap);
+    int MemMapCnt = (int)get_env(envMemoryMapCnt);
+
+    // Activate and clear page 1
+    line = 1;
+    
+    for (i = 0; i < MemMapCnt; i++)
     {
-      return (unsigned long)(mp->base + mp->length);
+        if((mp->type == 1) && ((unsigned long)mp->base == 0x100000))
+        {
+            return (unsigned long)(mp->base + mp->length);
+        }
+        mp++;
     }
-    mp++;
-  }
-  return 0x10000000;
+    return 0x10000000;
 }
 
 static void WakeKernel(IOHibernateImageHeader * header)
@@ -123,37 +127,37 @@ static void WakeKernel107(IOHibernateImageHeader107 * header)
     newSP = header->restore1StackOffset + (header->restore1CodePhysPage << 12);
     
     src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 
-                                  						  + header->fileExtentMapSize);
+                              + header->fileExtentMapSize);
     sum  = 0;
     
     for (page = 0; page < count; page++)
-        {
-            	compressedSize = 4096;
-            	
-            	lowHalf = 1;
-            	highHalf = 0;
-            	
-            	for (cnt = 0; cnt < compressedSize; cnt += 0x20) {
-                		dst[0] = src[0];
-                		dst[1] = src[1];
-                		dst[2] = src[2];
-                		dst[3] = src[3];
-                		dst[4] = src[4];
-                		dst[5] = src[5];
-                		dst[6] = src[6];
-                		dst[7] = src[7];
-                		for (byteCnt = 0; byteCnt < 0x20; byteCnt++) {
-                    			lowHalf += ((u_int8_t *) dst)[byteCnt];
-                    			highHalf += lowHalf;
-                    		}
-                		src += 8;
-                		dst += 8;
-                	}
-            	
-            	lowHalf  %= 65521L;
-            	highHalf %= 65521L;
-            	sum += (highHalf << 16) | lowHalf;
+    {
+        compressedSize = 4096;
+        
+        lowHalf = 1;
+        highHalf = 0;
+        
+        for (cnt = 0; cnt < compressedSize; cnt += 0x20) {
+            dst[0] = src[0];
+            dst[1] = src[1];
+            dst[2] = src[2];
+            dst[3] = src[3];
+            dst[4] = src[4];
+            dst[5] = src[5];
+            dst[6] = src[6];
+            dst[7] = src[7];
+            for (byteCnt = 0; byteCnt < 0x20; byteCnt++) {
+                lowHalf += ((u_int8_t *) dst)[byteCnt];
+                highHalf += lowHalf;
             }
+            src += 8;
+            dst += 8;
+        }
+        
+        lowHalf  %= 65521L;
+        highHalf %= 65521L;
+        sum += (highHalf << 16) | lowHalf;
+    }
     header->actualRestore1Sum = sum;
     startprog (proc, header);
     
@@ -174,34 +178,34 @@ static void HibernateBoot107(char *image_filename)
     imageSize = header->image1Size;
     codeSize  = header->restore1PageCount << 12;
     if (kIOHibernateHeaderSignature != header->signature)
-        {
-            	printf ("Incorrect image signature, expected version 10.7\n");
-            	getchar();
-            	return;
-            }
+    {
+        printf ("Incorrect image signature, expected version 10.7\n");
+        getchar();
+        return;
+    }
     if (header->encryptStart)
-        {
-            	printf ("Resuming from Encrypted image is unsupported.\n"
-                            			"Uncheck \"Use secure virtual memory\" in \"Security\" pane on system preferences.\n"
-                            			"Press any key to proceed with normal boot.\n");
-            	getchar();
-            	return;
-            }
+    {
+        printf ("Resuming from Encrypted image is unsupported.\n"
+                "Uncheck \"Use secure virtual memory\" in \"Security\" pane on system preferences.\n"
+                "Press any key to proceed with normal boot.\n");
+        getchar();
+        return;
+    }
     // depends on NVRAM
 #if 0
-        {
-            	uint32_t machineSignature;
-            	size = GetProp(gChosenPH, kIOHibernateMachineSignatureKey,
-                                   				   (char *)&machineSignature, sizeof(machineSignature));
-            	if (size != sizeof(machineSignature)) machineSignature = 0;
-            	if (machineSignature != header->machineSignature)
-                		break;
-            }
+    {
+        uint32_t machineSignature;
+        size = GetProp(gChosenPH, kIOHibernateMachineSignatureKey,
+                       (char *)&machineSignature, sizeof(machineSignature));
+        if (size != sizeof(machineSignature)) machineSignature = 0;
+        if (machineSignature != header->machineSignature)
+            break;
+    }
 #endif
     
     allocSize = imageSize + ((4095 + sizeof(hibernate_graphics_t)) & ~4095);
     
-    mem_base = getmemorylimit() - allocSize;//TODO: lower this
+    mem_base = (long)(getmemorylimit() - allocSize);//TODO: lower this
     
     printf("mem_base %x\n", mem_base);
     
@@ -212,62 +216,62 @@ static void HibernateBoot107(char *image_filename)
     buffer = (long)(header + 1);
     
     if (header->previewSize)
-        {
-            	uint64_t preview_offset = header->fileExtentMapSize - sizeof(header->fileExtentMap) + codeSize;
-            	uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
-            	
-            	ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader107), preview_offset+header->previewSize);
-            	drawPreview ((void *)(long)(buffer+preview_offset + header->previewPageListSize), &(progressSaveUnder[0][0]));
-            	previewTotalSectors = (imageSize-(preview_offset+header->previewSize))/512;
-            	previewLoadedSectors = 0;
-            	previewSaveunder = &(progressSaveUnder[0][0]);
-            	if (preview_offset+header->previewSize<imageSize)
-                		ReadFileAtOffset (image_filename, (char *)(long)(buffer+preview_offset+header->previewSize),
-                                              						  sizeof(IOHibernateImageHeader107)+preview_offset+header->previewSize,
-                                              						  imageSize-(preview_offset+header->previewSize));
-            	previewTotalSectors = 0;
-            	previewLoadedSectors = 0;
-            	previewSaveunder = 0;
-#if 0
-                	/* AsereBLN:
-                         	check_vga_nvidia() didn't work as expected (recursion level > 0 & return value).
-                         	Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
-                         	and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
-                         	remove it completely */
-                	setVideoMode( VGA_TEXT_MODE, 0 );
-#endif
-            }
-    else
-        	ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader107), imageSize);
+    {
+        uint64_t preview_offset = header->fileExtentMapSize - sizeof(header->fileExtentMap) + codeSize;
+        uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
         
-        // Depends on NVRAM
+        ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader107), preview_offset+header->previewSize);
+        drawPreview ((void *)(long)(buffer+preview_offset + header->previewPageListSize), &(progressSaveUnder[0][0]));
+        previewTotalSectors = (int)(imageSize-(preview_offset+header->previewSize))/512;
+        previewLoadedSectors = 0;
+        previewSaveunder = &(progressSaveUnder[0][0]);
+        if (preview_offset+header->previewSize<imageSize)
+            ReadFileAtOffset (image_filename, (char *)(long)(buffer+preview_offset+header->previewSize),
+                              sizeof(IOHibernateImageHeader107)+preview_offset+header->previewSize,
+                              imageSize-(preview_offset+header->previewSize));
+        previewTotalSectors = 0;
+        previewLoadedSectors = 0;
+        previewSaveunder = 0;
 #if 0
-            if (header->encryptStart) {
-                	// decryption data
-                	static const unsigned char first_iv[AES_BLOCK_SIZE]
-                	= {  0xa3, 0x63, 0x65, 0xa9, 0x0b, 0x71, 0x7b, 0x1c,
-                    	0xdf, 0x9e, 0x5f, 0x32, 0xd7, 0x61, 0x63, 0xda };
-                	hibernate_cryptvars_t       _cryptvars;
-                	hibernate_cryptvars_t *     cryptvars = &_cryptvars;
-                	
-                	aes_decrypt_key(&decryptkey,
-                                        					decryptkeysize,
-                                        					&cryptvars->ctx.decrypt);
-                		
-                	// set the vector for the following decryptions
-                	bcopy(((uint8_t *) header) + header->image1Size - AES_BLOCK_SIZE,
-                              			&cryptvars->aes_iv[0], AES_BLOCK_SIZE);
-                	
-                	// decrypt the buffer
-                	uint32_t len = (uint32_t)(header->image1Size - header->encryptStart);
-                	aes_decrypt_cbc(((uint8_t *) header) + header->encryptStart,
-                                        					&first_iv[0],
-                                        					len >> 4,
-                                        					((uint8_t *) header) + header->encryptStart,
-                                        					&cryptvars->ctx.decrypt);
-                	bzero(&cryptvars->aes_iv[0], sizeof(cryptvars));
-                	bzero(&decryptkey, sizeof(decryptkey));
-                }
+        /* AsereBLN:
+         check_vga_nvidia() didn't work as expected (recursion level > 0 & return value).
+         Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
+         and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
+         remove it completely */
+        setVideoMode( VGA_TEXT_MODE, 0 );
+#endif
+    }
+    else
+        ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader107), imageSize);
+    
+    // Depends on NVRAM
+#if 0
+    if (header->encryptStart) {
+        // decryption data
+        static const unsigned char first_iv[AES_BLOCK_SIZE]
+        = {  0xa3, 0x63, 0x65, 0xa9, 0x0b, 0x71, 0x7b, 0x1c,
+            0xdf, 0x9e, 0x5f, 0x32, 0xd7, 0x61, 0x63, 0xda };
+        hibernate_cryptvars_t       _cryptvars;
+        hibernate_cryptvars_t *     cryptvars = &_cryptvars;
+        
+        aes_decrypt_key(&decryptkey,
+                        decryptkeysize,
+                        &cryptvars->ctx.decrypt);
+        
+        // set the vector for the following decryptions
+        bcopy(((uint8_t *) header) + header->image1Size - AES_BLOCK_SIZE,
+              &cryptvars->aes_iv[0], AES_BLOCK_SIZE);
+        
+        // decrypt the buffer
+        uint32_t len = (uint32_t)(header->image1Size - header->encryptStart);
+        aes_decrypt_cbc(((uint8_t *) header) + header->encryptStart,
+                        &first_iv[0],
+                        len >> 4,
+                        ((uint8_t *) header) + header->encryptStart,
+                        &cryptvars->ctx.decrypt);
+        bzero(&cryptvars->aes_iv[0], sizeof(cryptvars));
+        bzero(&decryptkey, sizeof(decryptkey));
+    }
 #endif
     
     WakeKernel107(header);
@@ -281,7 +285,7 @@ void HibernateBoot(char *image_filename)
 	IOHibernateImageHeader * header = &_header;
 	long buffer;
 	
-    if(gBootVolume->OSVersion[3] == '7')
+    if(gBootVolume->OSVersion[3] >= '7') // TODO: unlocked, but please check the compatibility with the 10.8
     {
         HibernateBoot107(image_filename);
         return;
@@ -289,7 +293,7 @@ void HibernateBoot(char *image_filename)
     
 	size = ReadFileAtOffset (image_filename, header, 0, sizeof(IOHibernateImageHeader));
 	printf("header read size %x\n", size);
-		
+    
 	imageSize = header->image1Size;
 	codeSize  = header->restore1PageCount << 12;
 	if (kIOHibernateHeaderSignature != header->signature)
@@ -305,7 +309,7 @@ void HibernateBoot(char *image_filename)
 		getc ();
 		return;
 	}
-// depends on NVRAM
+    // depends on NVRAM
 #if 0
 	{
 		uint32_t machineSignature;
@@ -316,16 +320,16 @@ void HibernateBoot(char *image_filename)
 			break;
 	}
 #endif
-		
+    
 	allocSize = imageSize + ((4095 + sizeof(hibernate_graphics_t)) & ~4095);
-
-	mem_base = getmemorylimit() - allocSize;//TODO: lower this
-		
-	printf("mem_base %x\n", mem_base);
-			
+    
+	mem_base = (long)(getmemorylimit() - allocSize);//TODO: lower this
+    
+	printf("mem_base %ld\n", mem_base);
+    
 	bcopy(header, (void *) mem_base, sizeof(IOHibernateImageHeader));
 	header = (IOHibernateImageHeader *) mem_base;
-		
+    
 	imageSize -= sizeof(IOHibernateImageHeader);
 	buffer = (long)(header + 1);
 	
@@ -333,7 +337,7 @@ void HibernateBoot(char *image_filename)
 	{
 		uint64_t preview_offset = header->fileExtentMapSize - sizeof(header->fileExtentMap) + codeSize;
 		uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
-			
+        
 		ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader), preview_offset+header->previewSize);
 		drawPreview ((void *)(long)(buffer+preview_offset + header->previewPageListSize), &(progressSaveUnder[0][0]));
 		previewTotalSectors = (imageSize-(preview_offset+header->previewSize))/512;
@@ -348,10 +352,10 @@ void HibernateBoot(char *image_filename)
 		previewSaveunder = 0;		
 #if 0
 		/*AsereBLN:
-		check_vga_nvidia() didn''t work as expected (recursion level > 0 & return value).
-		Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
-		and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
-		remove it completely*/
+         check_vga_nvidia() didn''t work as expected (recursion level > 0 & return value).
+         Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
+         and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
+         remove it completely*/
 #if UNUSED
 		setVideoMode(VGA_TEXT_MODE, 0);
 #else
@@ -363,25 +367,25 @@ void HibernateBoot(char *image_filename)
 	else
 		ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader), imageSize);
 	
-// Depends on NVRAM
+    // Depends on NVRAM
 #if 0
 	if (header->encryptStart)
 	{
 		// decryption data
 		static const unsigned char first_iv[AES_BLOCK_SIZE]
 		= {  0xa3, 0x63, 0x65, 0xa9, 0x0b, 0x71, 0x7b, 0x1c,
-		0xdf, 0x9e, 0x5f, 0x32, 0xd7, 0x61, 0x63, 0xda };
+            0xdf, 0x9e, 0x5f, 0x32, 0xd7, 0x61, 0x63, 0xda };
 		hibernate_cryptvars_t       _cryptvars;
 		hibernate_cryptvars_t *     cryptvars = &_cryptvars;
 		
 		aes_decrypt_key(&decryptkey,
 						decryptkeysize,
 						&cryptvars->ctx.decrypt);
-			
+        
 		// set the vector for the following decryptions
 		bcopy(((uint8_t *) header) + header->image1Size - AES_BLOCK_SIZE, 
-				&cryptvars->aes_iv[0], AES_BLOCK_SIZE);
-			
+              &cryptvars->aes_iv[0], AES_BLOCK_SIZE);
+        
 		// decrypt the buffer
 		uint32_t len = (uint32_t)(header->image1Size - header->encryptStart);
 		aes_decrypt_cbc(((uint8_t *) header) + header->encryptStart,

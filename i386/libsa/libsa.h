@@ -31,11 +31,9 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdbool.h>
-#if 0
-#include "C_Exception.h"
-#endif
-#include "quad.h"
+#include <setjmp.h>
 
+#include "quad.h"
 /* 
  * This macro casts away the qualifier from the variable
  *
@@ -56,6 +54,11 @@
 #define isdigit(c)  (c >= '0' && c <= '9')
 #define isxdigit(c) ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
 #define ispunct(c)  (c == '.' || c == '-') //Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
+
+/*
+ * lzss.c
+ */
+extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
 /*
  * string.c
@@ -103,7 +106,9 @@ extern const char *strstr(const char *, const char *);
 extern uint8_t checksum8( void * start, unsigned int length );
 extern unsigned long
 adler32( unsigned char * buffer, long length );
-
+extern void * bsearch(register const void *key,const void *base0,size_t nmemb,register size_t size,register int (*compar)(const void *, const void *));
+extern int      rand (void);
+extern void     srand (unsigned int seed);
 /*
  * strtol.c
  */
@@ -136,28 +141,5 @@ extern void * realloc(void * ptr, size_t size);
 
 extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
 extern void * malloc(size_t size);
-
-/*
- *  rand.c
- *
- *  rand & srand implementation for chameleon by Cadet-petit Armel <armelcadetpetit@gmail.com>
- */
-
-
-extern int      rand (void);
-extern void     srand (unsigned int seed);
-
-
-/*
- *  C_Exception.c
- *
- */
-extern void		exception_init (void (*exception_err_fn)(char *, int));
-
-/*
- * getsegbyname.c
- */
-//extern struct segment_command *
-//       getsegbynamefromheader(struct mach_header * mhp, char * segname);
 
 #endif /* !__BOOT_LIBSA_H */

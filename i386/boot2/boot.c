@@ -62,6 +62,7 @@
 #endif
 #include "modules.h"
 #include "xml.h"
+#include "options.h"
 
 #ifndef DEBUG_BOOT
 #define DEBUG_BOOT 0
@@ -79,28 +80,10 @@ typedef struct platform_info {
 	char rootPath[ROOT_PATH_LEN];
 } PlatformInfo;
 
+static char gBootKernelCacheFile[Cache_len_name];
+static char gMKextName[Cache_len_name];
 
-char *gboardproduct = NULL;
-char *gPlatformName = NULL;
-//char gRootPath[256];
-long gBootMode; /* defaults to 0 == kBootModeNormal */
-bool gOverrideKernel;
-char gBootKernelCacheFile[512];
-char gMKextName[512];
-char *gRootDevice = NULL;
-
-#ifndef OPTION_ROM
-bool gEnableCDROMRescan;
-bool gScanSingleDrive;
-#endif
-
-int     bvCount = 0;
-//int	menucount = 0;
-int     gDeviceCount = 0; 
-
-BVRef   bvr;
-BVRef   menuBVR;
-BVRef   bvChain;
+static BVRef   bvChain;
 static bool forcecache = false;
 
 static void zeroBSS(void);
@@ -118,8 +101,7 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
 static bool found_extra_kext(void);
 static void determineCpuArch(void);
 static void init_pic(void);
-
-void getKernelCachePath();
+void getKernelCachePath(void);
 
 
 /*
@@ -169,6 +151,12 @@ static inline void exception_error(char *msg, int nb)
 }
 #endif
 
+BVRef getBvChain(void)
+{	
+	return bvChain;	
+}
+
+
 //==========================================================================
 //Initializes the runtime.  Right now this means zeroing the BSS and initializing malloc.
 //
@@ -183,6 +171,18 @@ void initialize_runtime(void)
 
 static void init_pic(void)
 {
+    /* Remap IRQ's */
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    
+    outb(0x70,0x80); /* Disable NMI */
+    
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
 	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
 }
@@ -209,7 +209,7 @@ static int ExecKernel(void *binary)
 		bootArgs->Header.Version  = kBootArgsVersion;		
 		bootArgs->Header.Revision = kBootArgsRevision;
 #else
-		if(gBootVolume->OSVersion[3] == '7')
+		if(gBootVolume->OSVersion[3] >= '7')
 		{
 			bootArgs->Header.Version  = 2;
 			bootArgs->Header.Revision = 0;
@@ -233,11 +233,7 @@ static int ExecKernel(void *binary)
 	{
 		LoadDrivers("/");
     }
-	
-#if TEXT_SPINNER
-	clearActivityIndicator();
-#endif
-	
+
     if (gErrors)
 	{
         printf("Errors encountered while starting up the computer.\n");
@@ -269,7 +265,7 @@ static int ExecKernel(void *binary)
 		const char *strval = 0;
 		int dummysize /*= 0*/;	
 		
-		getBoolForKey(kWaitForKeypressKey, &wait, &bootInfo->bootConfig);
+		getBoolForKey(kWaitForKeypressKey, &wait, DEFAULT_BOOT_CONFIG);
 		
 		if (getValueForBootKey(bootArgs->CommandLine, "-wait", &strval, &dummysize))
 		{
@@ -286,21 +282,23 @@ static int ExecKernel(void *binary)
 			pause();
 		}
 	}    
+    
+    //debug_platform_env();
 			
 	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) // (bootArgs->Video.v_display == VGA_TEXT_MODE)	
 	{
 #if UNUSED
-		setVideoMode( GRAPHICS_MODE, 0 );
+		__setVideoMode( GRAPHICS_MODE, 0 );
 #else
-		setVideoMode( GRAPHICS_MODE );
+		__setVideoMode( GRAPHICS_MODE );
 #endif
 		
 #ifndef OPTION_ROM
-		 
+        
 		if(!gVerboseMode)
 		{			
-			drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
-		
+			__drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
+            
 			uint8_t *appleBootPict; 
 			uint16_t bootImageWidth = kAppleBootWidth; 
 			uint16_t bootImageHeight = kAppleBootHeight; 
@@ -309,36 +307,47 @@ static int ExecKernel(void *binary)
 			
 			unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 32, 0};	// here we store the used screen resolution
 			// Prepare the data for the default Apple boot image. 
-			appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
+			appleBootPict = (uint8_t *) __decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
 			if (appleBootPict)
 			{ 
-				convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
+				__convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
 				if (bootImageData)
 				{	
 					x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
 					y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
-					drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
+					__drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
 					free(bootImageData);
 				}
 				free(appleBootPict); 
 			}
-		
+            
 		}
 #endif
 	}
-        
+
     finalizeEFIConfigTable();
     
 	setupBooterLog();
 	
-    finalizeBootStruct();          
+    finalizeBootStruct(); 
     
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
-	 if (gBootVolume->OSVersion[3] <= '6') 
-		reserveKernLegacyBootStruct();
-	 else if (gBootVolume->OSVersion[3] == '7')
-		 reserveKern107BootStruct();	
+    switch (gBootVolume->OSVersion[3]) {
+		case '4':
+		case '5':
+		case '6':
+			reserveKernLegacyBootStruct();
+			break;		
+		case '7':
+			reserveKern107BootStruct();
+			break;
+		case '8':
+			reserveKern108BootStruct();
+			break;
+		default:
+			break;
+	}	
 	
 #if UNUSED
 	turnOffFloppy();
@@ -350,7 +359,7 @@ static int ExecKernel(void *binary)
 #endif
 
 	switch (gBootVolume->OSVersion[3]) {
-		case '4':
+		case '4':						
 		case '5':
 		case '6':
 			// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
@@ -360,11 +369,15 @@ static int ExecKernel(void *binary)
 			init_pic();
 			// Jump to kernel's entry point. There's no going back now.  XXX LION XXX
 			startprog( kernelEntry, bootArgs107 );
+			break;
+		case '8':
+			init_pic();
+			// Jump to kernel's entry point. There's no going back now.  XXX MOUNTAIN LION XXX
+			startprog( kernelEntry, bootArgs108 );
+			break;
 		default:
-#if DEBUG_BOOT
 			printf("Error: Unsupported Darwin version\n");
 			getc();
-#endif
 			break;
 	}	
 
@@ -397,10 +410,13 @@ void boot(int biosdev)
 // booting was unsuccessful. This allows the PXE firmware to try the
 // next boot device on its list.
 void common_boot(int biosdev)
-{
+{    
     int      status;        
     bool     firstRun = true;    
+    int      devcnt = 0;
+    int      bvCount = 0;
 
+    
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
 	
@@ -410,8 +426,7 @@ void common_boot(int biosdev)
     gUnloadPXEOnExit = true;
 #endif
     // Record the device that the booter was loaded from.
-    gBIOSDev = biosdev & kBIOSDevMask;
-	
+    safe_set_env(envgBIOSDev,biosdev & kBIOSDevMask);
 	
 	
     // Setup VGA text mode.
@@ -424,12 +439,14 @@ void common_boot(int biosdev)
 #if DEBUG
     printf("after video_mode\n");
 #endif
-#if !TEXT_SPINNER
 	printf("Starting Chameleon ...\n");
-#endif
-	
-	initBooterLog();
-	
+    
+	init_ut_fnc();
+    
+    arc4_init();
+
+	initBooterLog();    
+    
 	// Initialize boot info structure.
     initKernBootStruct();
 	
@@ -437,61 +454,77 @@ void common_boot(int biosdev)
     // Scan and record the system's hardware information.
     scan_platform();
 	
+    safe_set_env(envgBootMode, kBootModeNormal); /* defaults to 0 == kBootModeNormal */
+    safe_set_env(envShouldboot, false);
+    safe_set_env(envkCache, (uint32_t)gBootKernelCacheFile);
+    safe_set_env(envMKextName, (uint32_t)gMKextName);
+    InitBootPrompt();
+    
     // First get info for boot volume.
-    scanBootVolumes(gBIOSDev, 0);
-    bvChain = getBVChainForBIOSDev(gBIOSDev);
+    scanBootVolumes((int)get_env(envgBIOSDev), 0);
+    bvChain = getBVChainForBIOSDev((int)get_env(envgBIOSDev));
     setBootGlobals(bvChain);
 	
     // Load Booter boot.plist config file
-    status = loadBooterConfig(&bootInfo->bootConfig);
+    status = loadBooterConfig();
 	
-	Platform->CPU.isServer = false;    
-    getBoolForKey(kIsServer, &Platform->CPU.isServer, &bootInfo->bootConfig); // set this as soon as possible
+    {
+        bool isServer = get_env(envIsServer);    
+        getBoolForKey(kIsServer, &isServer, DEFAULT_BOOT_CONFIG); // set this as soon as possible    
+        safe_set_env(envIsServer , isServer);
+    }
 	
+
 	{
 		bool     quiet = false;
-		if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->bootConfig) && quiet)
+		if (getBoolForKey(kQuietBootKey, &quiet, DEFAULT_BOOT_CONFIG) && quiet)
 		{
+            long gBootMode = kBootModeNormal;
 			gBootMode |= kBootModeQuiet;
+            safe_set_env(envgBootMode, gBootMode);
 		}
 	}	
 	
 	{
 		bool     instantMenu = false;
 		// Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-		if (getBoolForKey(kInsantMenuKey, &instantMenu, &bootInfo->bootConfig) && instantMenu)
+		if (getBoolForKey(kInsantMenuKey, &instantMenu, DEFAULT_BOOT_CONFIG) && instantMenu)
 		{
 			firstRun = false;
 		}
-#if virtualM
-        firstRun = false;
-#endif
 	}	
-	
+
+    {	
 #ifndef OPTION_ROM
-	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-    if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->bootConfig) && gScanSingleDrive)
-	{
-        gScanSingleDrive = true;
-    }
-	
-	// Create a list of partitions on device(s).
-    if (gScanSingleDrive)
-	{
-		scanBootVolumes(gBIOSDev, &bvCount);
-    } 
-	else 
+        bool ScanSingleDrive = false;
+        // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
+        if (getBoolForKey(kScanSingleDriveKey, &ScanSingleDrive, DEFAULT_BOOT_CONFIG) && ScanSingleDrive)
+        {
+            ScanSingleDrive = true;
+        }
+        safe_set_env(envgScanSingleDrive, ScanSingleDrive);
+        // Create a list of partitions on device(s).
+        if (ScanSingleDrive)
+        {
+            scanBootVolumes((int)get_env(envgBIOSDev), &bvCount);
+        } 
+        else 
 #endif
-	{
+        {
 #if UNUSED
-        scanDisks(gBIOSDev, &bvCount);
+            scanDisks((int)get_env(envgBIOSDev), &bvCount);
 #else
-        scanDisks();
+            scanDisks();
 #endif
-    }
-	
-	// Create a separated bvr chain using the specified filters.
-    bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+        }    
+    
+	}
+    
+    // Create a separated bvr chain using the specified filters.
+    bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
+    safe_set_env(envgDeviceCount,devcnt);
+       
+    
 	gBootVolume = selectBootVolume(bvChain);
 	
 	{
@@ -510,21 +543,29 @@ void common_boot(int biosdev)
 
 #ifndef OPTION_ROM
 
-    // Disable rescan option by default
-    gEnableCDROMRescan = false;
+    
 	
-    // Enable it with Rescan=y in system config
-    if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->bootConfig) && gEnableCDROMRescan)
-	{
-        gEnableCDROMRescan = true;
+    {
+        // Disable rescan option by default
+        bool CDROMRescan = false;
+        
+        // Enable it with Rescan=y in system config
+        if (getBoolForKey(kRescanKey, &CDROMRescan, DEFAULT_BOOT_CONFIG) && CDROMRescan)
+        {
+            CDROMRescan = true;
+            
+        }
+        safe_set_env(envgEnableCDROMRescan, CDROMRescan);
+
     }
+    
 	
 	{
 		bool     rescanPrompt = false;
 		// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
-		if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->bootConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev))
+		if (getBoolForKey(kRescanPromptKey, &rescanPrompt , DEFAULT_BOOT_CONFIG) && rescanPrompt && biosDevIsCDROM((int)get_env(envgBIOSDev)))
 		{
-			gEnableCDROMRescan = promptForRescanOption();
+            safe_set_env(envgEnableCDROMRescan, promptForRescanOption());
 		}
 	}
     
@@ -558,9 +599,8 @@ void common_boot(int biosdev)
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
 		
-        // Initialize globals.
-		
-        sysConfigValid = false;
+        // Initialize globals.		
+        safe_set_env(envSysConfigValid, false);
         gErrors        = false;
 		
         status = getBootOptions(firstRun);
@@ -578,20 +618,22 @@ void common_boot(int biosdev)
 			{
 				freeFilteredBVChain(bvChain);
 #ifndef OPTION_ROM
-				if (gEnableCDROMRescan)
-					rescanBIOSDevice(gBIOSDev);
+				if (get_env(envgEnableCDROMRescan))
+					rescanBIOSDevice((int)get_env(envgBIOSDev));
 #endif
 				
-				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
+                safe_set_env(envgDeviceCount,devcnt);
+
 				setBootGlobals(bvChain);
 			}
 			continue;
-        }
-						
+        }		
+        
         // Other status (e.g. 0) means that we should proceed with boot.
 		execute_hook("GUI_PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);
 				
-		if (getValueForKey(karch, &val, &len, &bootInfo->bootConfig) && val)
+		if (getValueForKey(karch, &val, &len, DEFAULT_BOOT_CONFIG) && val)
 		{
 			if (strncmp(val, "x86_64", 4) == 0)
 			{
@@ -620,13 +662,13 @@ void common_boot(int biosdev)
 			readSMBIOS(thePlatformName); // read smbios Platform Name
 		
 		
-		if (((gBootMode & kBootModeSafe) == 0) &&
-			!gOverrideKernel &&
+		if (((get_env(envgBootMode) & kBootModeSafe) == 0) &&
+			!get_env(envgOverrideKernel) &&
 			(gBootFileType == kBlockDeviceType) &&
 			(gMKextName[0] == '\0') && 
 			!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len))
 		{    		
-			getBoolForKey(kUseKernelCache, &trycache, &bootInfo->bootConfig);
+			getBoolForKey(kUseKernelCache, &trycache, DEFAULT_BOOT_CONFIG);
 			if (trycache == true)
 			{
 				// try to find the cache and fill the gBootKernelCacheFile string
@@ -647,15 +689,23 @@ void common_boot(int biosdev)
 			long cachetime, kerneltime, exttime;
 			if (trycache && !forcecache) do {
 				
-				// if we haven't found the kernel yet, don't use the cache
-				ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
-				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
-				{
-					trycache = 0;
-					bootInfo->adler32  = 0;
-					DBG("No kernel found, kernelcache disabled !!!\n");
-					break;
-				}
+                if (strcmp(bootInfo->bootFile, kDefaultKernel) != 0) {
+                    // if we haven't found the kernel yet, don't use the cache
+                    ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
+                    if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
+                    {
+                        trycache = 0;
+                        bootInfo->adler32  = 0;
+                        DBG("No kernel found, kernelcache disabled !!!\n");
+                        break;
+                    }
+                }
+                else if (gBootVolume->kernelfound != true) // Should never happen.
+                {
+                    bootFile = kDefaultKernel;
+                    goto out;
+                } 
+                    
 				ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
 				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
 					|| (cachetime < kerneltime))
@@ -735,12 +785,12 @@ void common_boot(int biosdev)
 					if (ret == -1)
 					{
 						// Not found any alternate locations, using the original kernel image path.
-						strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec)+1);
+						strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
 					}
 				}
             }
 #else
-			strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec)+1);
+			strlcpy(bootFileSpec, bootFile,sizeof(bootFileSpec));
 #endif
 			
             verbose("Loading kernel %s\n", bootFileSpec);
@@ -752,9 +802,6 @@ void common_boot(int biosdev)
             }
 			
         } while (0);
-#if TEXT_SPINNER
-        clearActivityIndicator();
-#endif
 		
 #if DEBUG
         printf("Pausing...");
@@ -763,6 +810,7 @@ void common_boot(int biosdev)
 		
         if (ret <= 0)
 		{
+out:
 			printf("Can't find %s\n", bootFile);
 			
 			sleep(1);
@@ -785,12 +833,12 @@ void common_boot(int biosdev)
     // chainboot
     if (status==1)
 	{
-		if (getVideoMode() == GRAPHICS_MODE)
+		if (__getVideoMode() == GRAPHICS_MODE)
 		{	// if we are already in graphics-mode,
 #if UNUSED
-			setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
+			__setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
 #else
-			setVideoMode(VGA_TEXT_MODE);	// switch back to text mode
+			__setVideoMode(VGA_TEXT_MODE);	// switch back to text mode
 #endif
 		}
     }
@@ -814,7 +862,7 @@ static void determineCpuArch(void)
 	}
 }
 
-void getKernelCachePath()
+void getKernelCachePath(void)
 {
 	{
 		// If there is an extra kext/mkext, we return immediatly and we skip the kernelCache 
@@ -827,7 +875,7 @@ void getKernelCachePath()
 		const char    *val;
 		int            len;
 		
-		if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
+		if (getValueForKey(kKernelCacheKey, &val, &len, DEFAULT_BOOT_CONFIG))
 		{
             char * buffer = newString(val);
 
@@ -843,7 +891,7 @@ void getKernelCachePath()
                     len++;
                 }
 			}            
-			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile)+1);
+			strlcpy(gBootKernelCacheFile, buffer, sizeof(gBootKernelCacheFile));
             forcecache = true;
 		}
 		else
@@ -861,18 +909,18 @@ void getKernelCachePath()
 					
 					bzero(platformInfo, sizeof(PlatformInfo));
 					
-					if (gPlatformName)
-						strlcpy(platformInfo->platformName,gPlatformName, sizeof(platformInfo->platformName)+1);
+					if (GetgPlatformName())
+						strlcpy(platformInfo->platformName,GetgPlatformName(), sizeof(platformInfo->platformName)+1);
 					
-					if (gRootDevice)
+					if (GetgRootDevice())
 					{
 						char *rootPath_p = platformInfo->rootPath;
-						len = strlen(gRootDevice) + 1;
+						len = strlen(GetgRootDevice()) + 1;
 						if ((unsigned)len > sizeof(platformInfo->rootPath))
 						{
 							len = sizeof(platformInfo->rootPath);
 						}
-						memcpy(rootPath_p, gRootDevice,len);
+						memcpy(rootPath_p, GetgRootDevice(),len);
 						
 						rootPath_p += len;
 						
@@ -893,8 +941,9 @@ void getKernelCachePath()
 					{
 						platformInfo->platformName[0] = platformInfo->rootPath[0] = 0;
 					}
-					//memcpy(gRootPath,platformInfo->rootPath, sizeof(gRootPath));
-					
+#ifdef rootpath					
+                    SetgRootPath(platformInfo->rootPath);
+#endif
 					
 					bootInfo->adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
 					
@@ -923,7 +972,6 @@ void getKernelCachePath()
 	}	
 }
 
-
 static void getRootDevice()
 {
 	// Maximum config table value size
@@ -932,7 +980,7 @@ static void getRootDevice()
 	const char *val = 0;
     int cnt = 0;
 	
-	if (getValueForKey(kBootUUIDKey, &val, &cnt, &bootInfo->bootConfig))
+	if (getValueForKey(kBootUUIDKey, &val, &cnt, DEFAULT_BOOT_CONFIG))
 	{
 		uuidSet = true;		
 	}
@@ -949,7 +997,7 @@ static void getRootDevice()
 			else if (*val == '*' && *(val + 1) == 'u')
 			{
 				
-				if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig)) 
+				if ( getValueForKey( kBootDeviceKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) 
 					uuidSet = true;				
 				
 			} 			
@@ -962,7 +1010,7 @@ static void getRootDevice()
 			//
 			if (gBootVolume->flags & kBVFlagBooter)
 			{
-				if((loadHelperConfig(&bootInfo->helperConfig) == 0)
+				if((loadHelperConfig() == 0)
 				   && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
 				{
 					getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
@@ -971,9 +1019,9 @@ static void getRootDevice()
 				}
 			}
 #endif			
-			if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->bootConfig))
+			if ( getValueForKey( kBootDeviceKey, &val, &cnt, DEFAULT_BOOT_CONFIG))
 			{
-				extern int ArgCntRemaining;
+				int ArgCntRemaining = (int)get_env(envArgCntRemaining);
 				uuidSet = false;
 				char *           valueBuffer;
 				valueBuffer = malloc(VALUE_SIZE);
@@ -983,7 +1031,6 @@ static void getRootDevice()
 				{
 					cnt = VALUE_SIZE;
 				}
-				//cnt++;
 				strlcpy(valueBuffer + 1, val, cnt+1);				
 				if (!copyArgument( kRootDeviceKey, valueBuffer, cnt, &argP, &ArgCntRemaining))
 				{
@@ -992,6 +1039,7 @@ static void getRootDevice()
 					getc();
 					return;
 				}
+                safe_set_env(envArgCntRemaining,ArgCntRemaining);
 				free(valueBuffer);
 				goto out;
 			}
@@ -999,8 +1047,8 @@ static void getRootDevice()
 			if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, bootInfo->uuidStr) == 0)
 			{
 				verbose("Setting boot-uuid to: %s\n", bootInfo->uuidStr);
-				uuidSet = true;
-				gRootDevice = bootInfo->uuidStr;
+				uuidSet = true;                
+				SetgRootDevice(bootInfo->uuidStr);
 				return;
 			}
 		
@@ -1008,8 +1056,8 @@ static void getRootDevice()
 	}
 		
 out:	
-	verbose("Setting %s to: %s\n", uuidSet ? kBootUUIDKey : "root device", (char* )val);  
-	gRootDevice = (char* )val;
+	verbose("Setting %s to: %s\n", uuidSet ? kBootUUIDKey : "root device", (char* )val); 
+    SetgRootDevice(val);
 }
 
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size)
@@ -1160,7 +1208,7 @@ static char *FIXED_BOOTFILE_PATH(char * str)
 	if (!bootFileWithDevice && (str)[0] != '/')
 		sprintf(bootFile, "/%s", str); // append a leading /
 	else
-		strlcpy(bootFile, bootInfo->bootFile, sizeof(bootInfo->bootFile)+1);
+		strlcpy(bootFile, bootInfo->bootFile, sizeof(bootInfo->bootFile));
 	
 	return bootfile;
 }

@@ -39,12 +39,25 @@
     2007-12-29 dfe
     - Added ebiosEjectMedia
  */
-#include "bootstruct.h"
+
 #include "libsaio.h"
+#include "bootstruct.h"
 
 //#define MAX_DRIVES 8
+#ifndef DEBUG_BIOS
+#define DEBUG_BIOS 0
+#endif
+
+#if DEBUG_BIOS
+#define DBG(x...)		printf(x)
+#else
+#define DBG(x...)		
+#endif
 
 static biosBuf_t bb;
+#if DEBUG_BIOS
+static void print_drive_info(boot_drive_info_t *dp);
+#endif
 
 int bgetc(void)
 {
@@ -99,6 +112,45 @@ unsigned int time18(void)
     time.s.high = bb.ecx.rr;
     return time.i;
 }
+
+#if UNUSED
+static inline
+int bin2bcd (int x)
+{
+    return (x%10) | ((x/10) << 4);
+}
+
+
+static inline
+int bcd2bin (int x)
+{
+    return (x >> 4) * 10 + (x & 0x0f);
+}
+
+time_t time(time_t *t)
+{
+    static time_t       lasttime, now;
+    int                 hr, minute, sec;
+    
+    bb.intno = 0x1a;
+    bb.eax.r.h = 0x02;
+    bios(&bb);
+        
+    hr = bcd2bin((bb.ecx.rr & 0xff00) >> 8);      /* hour in %ch */
+    minute = bcd2bin(bb.ecx.rr & 0xff);           /* minute in %cl */
+    sec = bcd2bin((bb.edx.rr & 0xff00) >> 8);     /* second in %dh */
+    
+    now = hr * 3600 + minute * 60 + sec;
+    if (now < lasttime)
+              now += 24 * 3600;
+    lasttime = now;
+
+    if (t != NULL)
+            *t = now;
+    return(now);
+    
+}
+#endif
 
 #if 0
 static unsigned long rerangeMemoryMap(unsigned long count);
@@ -249,7 +301,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
     // Copy out data
     bcopy((char *)BIOS_ADDR, rangeArray, ((char *)range - (char *)BIOS_ADDR));
 	
-#if DEBUG
+#if DEBUG_BIOS
     {
         int i;
         printf("%d total ranges\n", count);getc();
@@ -264,7 +316,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
     return count;
 }
 
-unsigned long getExtendedMemorySize()
+unsigned long getExtendedMemorySize(void)
 {
     // Get extended memory size for large configurations. Not used unless
     // the INT15, E820H call (Get System Address Map) failed.
@@ -315,7 +367,7 @@ unsigned long getExtendedMemorySize()
     return bb.flags.cf ? 0 : bb.eax.rr;
 }
 
-unsigned long getConventionalMemorySize()
+unsigned long getConventionalMemorySize(void)
 {
     bb.intno = 0x12;
     bios(&bb);
@@ -501,7 +553,7 @@ int is_no_emulation(int drive)
     bb.ds     = NORMALIZED_SEGMENT((unsigned)&pkt);
 
     bios(&bb);
-#if DEBUG
+#if DEBUG_BIOS
     printf("el_torito info drive %x\n", drive);
 
     printf("--> cf %x, eax %x\n", bb.flags.cf, bb.eax.rr);
@@ -525,11 +577,11 @@ int is_no_emulation(int drive)
     return 0;
 }
 
-#if DEBUG
+#if DEBUG_BIOS
 /*
  * BIOS drive information.
  */
-void print_drive_info(boot_drive_info_t *dp)
+static void print_drive_info(boot_drive_info_t *dp)
 {
     //    printf("buf_size = %x\n", dp->params.buf_size);
     printf("info_flags = %x\n", dp->params.info_flags);
@@ -671,7 +723,7 @@ int get_drive_info(int drive, struct driveInfo *dp)
 	 */
         dp->uses_ebios |= EBIOS_FIXED_DISK_ACCESS;
     }
-#if DEBUG
+#if DEBUG_BIOS
     print_drive_info(di);
     printf("uses_ebios = 0x%x\n", dp->uses_ebios);
     printf("result %d\n", ret);
@@ -748,9 +800,9 @@ void setActiveDisplayPage( int page )
     bios(&bb);
 }
 
-#if DEBUG
+#if DEBUG_BIOS
 
-int terminateDiskEmulation()
+static int terminateDiskEmulation(void)
 {
     static char cd_spec[0x13];
 
@@ -763,7 +815,7 @@ int terminateDiskEmulation()
     return bb.eax.r.h;
 }
 
-int readDriveParameters(int drive, struct driveParameters *dp)
+static int readDriveParameters(int drive, struct driveParameters *dp)
 {
     bb.intno = 0x13;
     bb.edx.r.l = drive;

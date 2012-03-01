@@ -28,6 +28,7 @@
 #include "saio_types.h"
 
 /* arc4random.c */
+extern void arc4_init(void);
 extern void   arc4rand(void *ptr, u_int len, int reseed);
 extern uint32_t  arc4random(void);
 
@@ -76,9 +77,11 @@ extern void   clearScreenRows(int y1, int y2);
 extern void   setActiveDisplayPage( int page );
 extern unsigned long getMemoryMap(struct MemoryRange * rangeArray, unsigned long maxRangeCount,
                                   unsigned long * conMemSizePtr, unsigned long * extMemSizePtr);
-extern unsigned long getExtendedMemorySize();
-extern unsigned long getConventionalMemorySize();
+extern unsigned long getExtendedMemorySize(void);
+extern unsigned long getConventionalMemorySize(void);
 extern void   sleep(int n);
+extern time_t time(time_t *t);
+extern int is_no_emulation(int drive);
 
 /* bootstruct.c */
 extern void   initKernBootStruct(void);
@@ -86,6 +89,12 @@ extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 extern void   reserveKernLegacyBootStruct(void);
 extern void   reserveKern107BootStruct(void);
+extern void   reserveKern108BootStruct(void);
+extern void   setBootArgsVideoMode(int mode);
+extern void         setBootArgsVideoStruct(Boot_Video	*Video);
+extern uint32_t     getBootArgsVideoPtrAtOffset(uint32_t offset);
+extern uint32_t     getVideoMode(void);
+
 
 /* cache.c */
 extern void CacheReset();
@@ -106,6 +115,11 @@ extern int    error(const char *format, ...);
 extern int    verbose(const char *format, ...);
 extern void   stop(const char *format, ...);
 extern char * newStringWithFormat(const char * fmt, ...);
+extern char *getConsoleMsg(void);
+extern char *getConsoleCursor(void);
+extern void setConsoleMsg(char *p);
+extern void setConsoleCursor(char *p);
+extern void pause(void); 
 
 /* disk.c */
 extern void rescanBIOSDevice(int biosdev);
@@ -156,7 +170,7 @@ extern int      random (struct ran_obj* self);
 extern struct   ran_obj* random_init (int rmin, int rmax);
 extern void     usefixedrandom (bool opt);
 
-extern void   getPlatformName(char *nameBuf);
+extern void     getPlatformName(char *nameBuf);
 
 #ifdef NBP_SUPPORT
 /* nbp.c */
@@ -165,16 +179,32 @@ extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 #endif
 
 /* platform.h */
-extern bool platformCPUExtFeature(uint32_t);
-extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
-extern bool platformIsIntel(void);
-extern uint8_t getCPUModel(void);
-extern uint8_t getCPUFamily(void);
-extern uint32_t getCPUnCores(void);
-extern uint32_t getCPUnThread(void);
-extern bool platformIsMobile(void);
-extern bool platformIsServer(void);
+extern void SetgRootDevice(const char * str);
+extern void Setgboardproduct(const char * str);
+extern void SetgPlatformName(const char * str);
+extern char * GetgPlatformName(void);
+extern char * Getgboardproduct(void);
+extern char * GetgRootDevice(void);
+
+#ifdef rootpath
+extern void SetgRootPath(const char * str);
+extern char * GetgRootPath(void);
+#endif
+
+extern void re_set_env_copy(const char *name , void* ptr,size_t size);
+extern void set_env(const char *name, unsigned long long value );
+extern void set_env_copy(const char *name, void * ptr, size_t size );
+extern unsigned long long get_env_var(const char *name);
+extern unsigned long long get_env(const char *name);
+extern void * get_env_ptr(const char *name);
+extern void safe_set_env_copy(const char *name , void * ptr, size_t size );
+extern void safe_set_env(const char *name , unsigned long long value);
+extern void re_set_env(const char *name , unsigned long long value) ;
+extern void unset_env(const char *name);
+extern void free_platform_env(void);
+
+void debug_platform_env(void);
 
 
 /* stringTable.c */
@@ -192,12 +222,12 @@ extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff)
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
-extern int    loadBooterConfig(config_file_t *configBuff);
-extern int    loadSystemConfig(config_file_t *configBuff);
+extern int    loadBooterConfig(void);
+extern int    loadSystemConfig(void);
 #ifdef BOOT_HELPER_SUPPORT
-extern int    loadHelperConfig(config_file_t *configBuff);
+extern int    loadHelperConfig(void);
 #endif
-extern int    loadOverrideConfig(config_file_t *configBuff);
+extern int    loadOverrideConfig(void);
 extern char * newString(const char *oldString);
 extern char * newEmptyStringWithLength(int len);
 extern char * newStringWithLength(const char * oldString, int len);
@@ -257,7 +287,6 @@ extern void   setRootVolume(BVRef volume);
 extern void   setBootGlobals(BVRef chain);
 extern int    getDeviceDescription(BVRef volume, char *str);
 
-extern int    gBIOSDev;
 extern int    gBootFileType;
 extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;
@@ -265,5 +294,8 @@ extern BVRef  gBIOSBootVolume;
 /* smp.c */
 extern void * getMPSTable();
 
+/* uterror.c  */
+extern jmp_buf h_buf_error;
+extern void init_ut_fnc(void);
 
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

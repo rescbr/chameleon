@@ -45,7 +45,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o
+GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o stack_protector.o
 
 
 SFILES =
@@ -70,15 +70,18 @@ dylib:
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/nvidia.o \
 	$(OBJROOT)/ati.o \
-	$(OBJROOT)/nvidia.o \
 	$(OBJROOT)/gma.o \
 	$(OBJROOT)/GraphicsEnabler.o \
 	-macosx_version_min 10.6 \
 	-o $(SYMROOT)/$(MODULE_NAME).dylib
 
-
-
+	
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+        
 GraphicsEnabler.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GraphicsEnabler.c" $(INC) -o "$(OBJROOT)/GraphicsEnabler.o"
 

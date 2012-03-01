@@ -43,6 +43,50 @@
 #endif
 
 /*
+ * Keys used in system Boot.plist
+ */
+#define kGraphicsModeKey	"Graphics Mode"
+#define kTextModeKey		"Text Mode"
+#define kQuietBootKey		"Quiet Boot"
+#define kKernelFlagsKey		"Kernel Flags"
+#define kMKextCacheKey		"MKext Cache"
+#define kKernelNameKey		"Kernel"
+#define kKernelCacheKey     "Kernel Cache"
+#define kUseKernelCache     "UseKernelCache"    
+#define kBootDeviceKey		"Boot Device"
+#define kTimeoutKey			"Timeout"
+#define kRootDeviceKey		"rd"
+#define kBootUUIDKey		"boot-uuid"
+#define kHelperRootUUIDKey	"Root UUID"
+#define kPlatformKey		"platform"
+#define kCDROMPromptKey		"CD-ROM Prompt"
+#define kCDROMOptionKey		"CD-ROM Option Key"
+#define kRescanPromptKey	"Rescan Prompt"
+#define kRescanKey		    "Rescan"
+#define kScanSingleDriveKey	"Scan Single Drive"
+#define kInsantMenuKey		"Instant Menu"
+#define kDefaultKernel		"mach_kernel"
+#define kWaitForKeypressKey	"Wait"
+/* AsereBLN: added the other keys */
+
+#define kProductVersion		"ProductVersion"	/* boot.c */
+#define karch				"arch"				/* boot.c */
+#define kDeviceProperties	"device-properties"	/* device_inject.c */
+#define kHidePartition		"Hide Partition"	/* disk.c */
+#define kRenamePartition	"Rename Partition"	/* disk.c */
+#define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
+#define kSystemID			"SystemId"			/* fake_efi.c */
+#define kSystemType			"SystemType"		/* fake_efi.c */
+#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
+#define kDefaultPartition	"Default Partition"	/* sys.c */
+
+#define PLATFORM_NAME_LEN 64
+#define ROOT_PATH_LEN 256
+
+#define DEFAULT_SCREEN_WIDTH 1024
+#define DEFAULT_SCREEN_HEIGHT 768
+
+/*
  * Max size fo config data array, in bytes.
  */
 #define IO_CONFIG_DATA_SIZE		40960 // was 4096 // was 163840
@@ -54,6 +98,17 @@ struct ran_obj {
 	int rmin;	
 	int n;
 };
+
+typedef struct tm_t
+{
+    int tm_sec  ;    /* seconds after minute [0-61] (61 allows for 2 leap-seconds)*/
+    int tm_min  ;    /* minutes after hour [0-59] */
+    int tm_hour ;    /* hours after midnight [0-23] */
+    int tm_mday ;    /* day of the month [1-31] */
+    int tm_mon  ;    /* month of year [0-11] */
+    int tm_year ;    /* current year-1900 */
+    
+}tm_t;
 
 typedef unsigned long entry_t;
 
@@ -208,6 +263,7 @@ struct BootVolume {
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
     char			 OSVersion[8];
+    bool			 kernelfound;       /* mach_kernel found in default location, currently only /mach_kernel is supported */
     bool             OSisServer;        /* 1 = OS X server , 0 = OS X client, not to be confused with Platform->CPU.isServer which means it tries to emulate an xserve in the smbios */
 };
 

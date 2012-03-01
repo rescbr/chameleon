@@ -61,8 +61,8 @@
 #include <AvailabilityMacros.h>
 
 #include "libsaio.h"
-#include "boot.h"
 #include "bootstruct.h"
+#include "platform.h"
 #include "disk.h"
 #include "modules.h"
 #include "xml.h"
@@ -686,7 +686,7 @@ int tell(int fdesc)
 	
     return io->i_offset;
 }
-
+#endif
 //==========================================================================
 // write() - Write up to 'count' bytes of data to the file descriptor
 //          from the buffer pointed to by buf.
@@ -710,6 +710,7 @@ int write(int fdesc, const char * buf, int count)
 	
     return count;
 }
+#if UNUSED
 
 int writebyte(int fdesc, char value)
 {
@@ -831,7 +832,7 @@ void scanDisks(void)
 		scanBootVolumes(0x80 + hd, &bvCount);
 		hd++;
 	}
-	
+	int gBIOSDev = (int)get_env(envgBIOSDev);
 	// Also scanning CD/DVD drive.
 	if (biosDevIsCDROM(gBIOSDev))
 	{
@@ -850,6 +851,8 @@ BVRef selectBootVolume( BVRef chain )
 	
 	if (chain->filtered) filteredChain = true;
 	
+    int gBIOSDev = (int)get_env(envgBIOSDev);
+    
 #if UNUSED
 	if (multiboot_partition_set)
 		for ( bvr = chain; bvr; bvr = bvr->next )
@@ -861,7 +864,7 @@ BVRef selectBootVolume( BVRef chain )
 	 * to override the default selection.
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
-	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->bootConfig));
+	char *val = XMLDecode(getStringForKey(kDefaultPartition, DEFAULT_BOOT_CONFIG));
     if (val) {
         for ( bvr = chain; bvr; bvr = bvr->next ) {
             if (matchVolumeToString(bvr, val, false)) {
@@ -919,7 +922,6 @@ BVRef selectBootVolume( BVRef chain )
 
 #define LP '('
 #define RP ')'
-int gBIOSDev;
 
 /*!
  This is like boot2's gBootVolume except it is for the internal use of
@@ -960,7 +962,7 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 {
     const char * cp;
     BVRef bvr = gRootVolume;
-    int          biosdev = gBIOSDev;
+    int          biosdev = (int)get_env(envgBIOSDev);
 	
     // Search for left parenthesis in the path specification.
 	

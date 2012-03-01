@@ -81,3 +81,9 @@ Most of the time inlining a function is much better than the use of macros
 
 15. Don't optimize your code blindly, always favor readability when in doubt.
 Very often, optimization is not necessary where you think it is, think about the bubble sort algorithm, where people would code it in assembly, where a heap or quick sort algorithm would be much more efficient (n log(n) instead of quadratic complexity), as an example when values count to be sorted get high.
+
+16. To avoid duplicate symbols, set your variable as static and implement a setter/getter
+
+17. LIBSA SHOULDN'T CALL FUNCTION (OR INCLUDE HEADERS) OF LIBSAIO, AS WELL AS LIBSAIO SHOULDN'T CALL FUNCTIONS (OR INCLUDE HEADERS) OF BOOT2 
+
+18. Always declare your functions (static , implicit-extern or explicit-extern)

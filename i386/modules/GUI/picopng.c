@@ -39,6 +39,31 @@ typedef struct png_alloc_node {
 
 png_alloc_node_t *png_alloc_head = NULL;
 png_alloc_node_t *png_alloc_tail = NULL;
+png_alloc_node_t *png_alloc_find_node(void *addr);
+void png_alloc_add_node(void *addr, size_t size);
+void png_alloc_remove_node(png_alloc_node_t *node);
+void *png_alloc_malloc(size_t size);
+void *png_alloc_realloc(void *addr, size_t size);
+void png_alloc_free(void *addr);
+__unused void vector32_cleanup(vector32_t *p);
+uint32_t vector32_resize(vector32_t *p, size_t size);
+uint32_t vector32_resizev(vector32_t *p, size_t size, uint32_t value);
+void vector32_init(vector32_t *p);
+vector32_t *vector32_new(size_t size, uint32_t value);
+__unused void vector8_cleanup(vector8_t *p);
+uint32_t vector8_resize(vector8_t *p, size_t size);
+uint32_t vector8_resizev(vector8_t *p, size_t size, uint8_t value);
+void vector8_init(vector8_t *p);
+vector8_t *vector8_new(size_t size, uint8_t value);
+vector8_t *vector8_copy(vector8_t *p);
+
+
+
+
+
+
+
+
 
 png_alloc_node_t *png_alloc_find_node(void *addr)
 {
@@ -111,7 +136,7 @@ void png_alloc_free(void *addr)
 	free(addr);
 }
 
-void png_alloc_free_all()
+void png_alloc_free_all(void)
 {
 	while (png_alloc_tail) {
 		void *addr = png_alloc_tail->addr;
@@ -255,7 +280,25 @@ typedef struct {
 	vector32_t *tree2d;
 } HuffmanTree;
 
-HuffmanTree *HuffmanTree_new()
+HuffmanTree *HuffmanTree_new(void);
+int HuffmanTree_makeFromLengths(HuffmanTree *tree, const vector32_t *bitlen, uint32_t maxbitlen);
+int HuffmanTree_decode(const HuffmanTree *tree, bool *decoded, uint32_t *result, size_t *treepos,
+                       uint32_t bit);
+uint32_t Zlib_readBitFromStream(size_t *bitp, const uint8_t *bits);
+uint32_t Zlib_readBitsFromStream(size_t *bitp, const uint8_t *bits, size_t nbits);
+void Inflator_generateFixedTrees(HuffmanTree *tree, HuffmanTree *treeD);
+uint32_t Inflator_huffmanDecodeSymbol(const uint8_t *in, size_t *bp, const HuffmanTree *codetree,
+                                      size_t inlength);
+void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const uint8_t *in,
+                                    size_t *bp, size_t inlength);
+void Inflator_inflateHuffmanBlock(vector8_t *out, const uint8_t *in, size_t *bp, size_t *pos,
+                                  size_t inlength, uint32_t btype);
+void Inflator_inflateNoCompression(vector8_t *out, const uint8_t *in, size_t *bp, size_t *pos,
+                                   size_t inlength);
+void Inflator_inflate(vector8_t *out, const vector8_t *in, size_t inpos);
+int Zlib_decompress(vector8_t *out, const vector8_t *in);
+
+HuffmanTree *HuffmanTree_new(void)
 {
 	HuffmanTree *tree = png_alloc_malloc(sizeof (HuffmanTree));
 	tree->tree2d = NULL;
@@ -614,6 +657,22 @@ int Zlib_decompress(vector8_t *out, const vector8_t *in) // returns error value
 
 int PNG_error;
 
+uint32_t PNG_readBitFromReversedStream(size_t *bitp, const uint8_t *bits);
+uint32_t PNG_readBitsFromReversedStream(size_t *bitp, const uint8_t *bits, uint32_t nbits);
+void PNG_setBitOfReversedStream(size_t *bitp, uint8_t *bits, uint32_t bit);
+uint32_t PNG_read32bitInt(const uint8_t *buffer);
+int PNG_checkColorValidity(uint32_t colorType, uint32_t bd);
+uint32_t PNG_getBpp(const PNG_info_t *info);
+void PNG_readPngHeader(PNG_info_t *info, const uint8_t *in, size_t inlength);
+int PNG_paethPredictor(int a, int b, int c);
+void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
+                          size_t bytewidth, uint32_t filterType, size_t length);
+void PNG_adam7Pass(uint8_t *out, uint8_t *linen, uint8_t *lineo, const uint8_t *in, uint32_t w,
+                   size_t passleft, size_t passtop, size_t spacex, size_t spacey, size_t passw, size_t passh,
+                   uint32_t bpp);
+int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in);
+PNG_info_t *PNG_info_new(void);
+
 uint32_t PNG_readBitFromReversedStream(size_t *bitp, const uint8_t *bits)
 {
 	uint32_t result = (bits[*bitp >> 3] >> (7 - (*bitp & 0x7))) & 1;
@@ -892,7 +951,7 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 	return 0;
 }
 
-PNG_info_t *PNG_info_new()
+PNG_info_t *PNG_info_new(void)
 {
 	PNG_info_t *info = png_alloc_malloc(sizeof (PNG_info_t));
 	uint32_t i;

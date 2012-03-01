@@ -5,7 +5,6 @@
 
 #include "libsaio.h"
 #include "modules.h"
-#include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "device_inject.h"
@@ -27,6 +26,9 @@ static void set_eth_builtin(pci_dt_t *eth_dev);
 static void set_wifi_airport(pci_dt_t *wlan_dev);
 static int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
 
+
+void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
+
 uint32_t builtin_set = 0;
 
 void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -38,7 +40,7 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 		// LAN
 		
 		bool do_eth_devprop = true;	
-		getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->bootConfig);
+		getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, DEFAULT_BOOT_CONFIG);
 		
 		if (do_eth_devprop)
 		{
@@ -49,7 +51,7 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 	{
 		// WIFI
 		bool do_wifi_devprop = true;	
-		getBoolForKey(kEnableWifi, &do_wifi_devprop, &bootInfo->bootConfig);
+		getBoolForKey(kEnableWifi, &do_wifi_devprop, DEFAULT_BOOT_CONFIG);
 		
 		if (do_wifi_devprop)		
 		set_wifi_airport(current);
@@ -58,10 +60,11 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 	
 }
 
-void Networking_start()
+void Networking_start(void);
+void Networking_start(void)
 {
 	bool enable = true;
-	getBoolForKey(kEnableNetworking, &enable, &bootInfo->bootConfig) ;
+	getBoolForKey(kEnableNetworking, &enable, DEFAULT_BOOT_CONFIG) ;
 	
 	if (enable) {
 		register_hook_callback("PCIDevice", &Networking_hook);
