@@ -38,18 +38,6 @@ enum {
 	VerticalLayout		= 1
 };
 
-enum {
-	kBackspaceKey		= 0x08,
-	kTabKey				= 0x09,
-	kReturnKey			= '\r',
-	kEscapeKey			= 0x1b,
-	kUpArrowkey			= 0x4800,
-	kDownArrowkey		= 0x5000,
-	kASCIIKeyMask		= 0x7f,
-	kF5Key				= 0x3f00,
-	kF10Key				= 0x4400
-};
-
 /*
  * Menu item structure.
  */
@@ -76,6 +64,7 @@ typedef struct {
 	uint16_t	height;			// Font Height 
 	uint16_t	width;			// Font Width for monospace font only
 	pixmap_t	*chars[CHARACTERS_COUNT];
+	uint16_t    count;          // Number of chars in font
 } font_t;
 
 /*
@@ -135,6 +124,7 @@ int  initGUI();
 void drawBackground();
 
 void setupDeviceList(config_file_t *theme);
+bool is_image_loaded(int i);
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
 void drawDeviceList(int start, int end, int selection);
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress);
@@ -155,6 +145,7 @@ void updateGraphicBootPrompt();
 
 void updateVRAM();
 
+position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p);
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 void drawStrCenteredAt(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 

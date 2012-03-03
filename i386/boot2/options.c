@@ -27,6 +27,7 @@
 #include "fdisk.h"
 #include "ramdisk.h"
 #include "gui.h"
+#include "term.h"
 #include "embedded.h"
 #include "pci.h"
 
@@ -134,7 +135,7 @@ static int countdown( const char * msg, int row, int timeout )
 			lasttime=time18();
 		}		
   
-        if (ch = readKeyboardStatus())
+        if ( (ch = readKeyboardStatus()) )
             break;
 
         // Count can be interrupted by holding down shift,
@@ -235,11 +236,11 @@ static void showBootPrompt(int row, bool visible)
 
 static void updateBootArgs( int key )
 {
-    key &= kASCIIKeyMask;
+    key = ASCII_KEY(key);
 
     switch ( key )
     {
-        case kBackspaceKey:
+        case KEY_BKSP:
             if ( gBootArgsPtr > gBootArgs )
             {
                 *--gBootArgsPtr = '\0';
@@ -927,7 +928,7 @@ int getBootOptions(bool firstRun)
 		}
 
 		switch (key) {
-		case kReturnKey:
+		case KEY_ENTER:
 			if (gui.menu.draw) { 
 				key=0;
 				break;
@@ -978,11 +979,11 @@ int getBootOptions(bool firstRun)
 			gBIOSDev = menuBVR->biosdev;
 			break;
 
-		case kEscapeKey:
+		case KEY_ESC:
 			clearBootArgs();
 			break;
 
-		case kF5Key:
+		case KEY_F5:
 			// New behavior:
 			// Clear gBootVolume to restart the loop
 			// if the user enabled rescanning the optical drive.
@@ -993,14 +994,14 @@ int getBootOptions(bool firstRun)
 			}
 			break;
 
-		case kF10Key:
+		case KEY_F10:
 			gScanSingleDrive = false;
 			scanDisks(gBIOSDev, &bvCount);
 			gBootVolume = NULL;
 			clearBootArgs();
 			break;
 
-		case kTabKey:
+		case KEY_TAB:
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
@@ -1062,6 +1063,7 @@ done:
 
 //==========================================================================
 
+char gBootUUIDString[32+4+1] = ""; // UUID of the boot volume e.g. 5EB1869F-C4FA-3502-BDEB-3B8ED5D87292
 extern unsigned char chainbootdev;
 extern unsigned char chainbootflag;
 
@@ -1069,6 +1071,9 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 {
     int argLen = argName ? strlen(argName) : 0;
     int len = argLen + cnt + 1;  // +1 to account for space
+
+	if (argName)
+		len++; // +1 to account for '='
 
     if (len > *cntRemainingP) {
         error("Warning: boot arguments too long, truncating\n");
@@ -1080,8 +1085,8 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
         *argP += argLen;
         *argP[0] = '=';
         (*argP)++;
-        len++; // +1 to account for '='
     }
+
     strncpy( *argP, val, cnt );
     *argP += cnt;
     *argP[0] = ' ';
@@ -1101,7 +1106,8 @@ processBootArgument(
                     const char *configTable,
                     char **argP,                // Output value
                     int *cntRemainingP,         // Output count
-                    char *foundVal              // found value
+                    char *foundVal,             // found value
+                    int  foundValSize           // max found value size
                     )
 {
     const char *val;
@@ -1118,9 +1124,8 @@ processBootArgument(
         copyArgument(argName, val, cnt, argP, cntRemainingP);
         found = true;
     }
-    if (found && foundVal) {
-        strlcpy(foundVal, val, cnt+1);
-    }
+    if (found && foundVal)
+        strlcpy(foundVal, val, foundValSize);
     return found;
 }
 
@@ -1130,17 +1135,15 @@ processBootArgument(
 int
 processBootOptions()
 {
-    const char *     cp  = gBootArgs;
-    const char *     val = 0;
-    const char *     kernel;
-    int              cnt;
-    int		     userCnt;
-    int              cntRemaining;
-    char *           argP;
-    char             uuidStr[64];
-    bool             uuidSet = false;
-    char *           configKernelFlags;
-    char *           valueBuffer;
+    const char *cp  = gBootArgs;
+    const char *val = 0;
+    const char *kernel;
+    int         cnt;
+    int         userCnt;
+    int         cntRemaining;
+    char       *argP;
+    char       *configKernelFlags;
+    char       *valueBuffer;
 
     valueBuffer = malloc(VALUE_SIZE);
     
@@ -1211,7 +1214,7 @@ processBootOptions()
     cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
     argP = bootArgs->CommandLine;
 
-    // Get config table kernel flags, if not ignored.
+	// Get config kernel flags, if not ignored.
     if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
             !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
         val = "";
@@ -1220,35 +1223,34 @@ processBootOptions()
     configKernelFlags = malloc(cnt + 1);
     strlcpy(configKernelFlags, val, cnt + 1);
 
-    if (processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, 0)) {
-        // boot-uuid was set either on the command-line
-        // or in the config file.
-        uuidSet = true;
-    } else {
-
+    // boot-uuid can be set either on the command-line or in the config file
+	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
+                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
         //
         // Try an alternate method for getting the root UUID on boot helper partitions.
         //
         if (gBootVolume->flags & kBVFlagBooter)
-        {
-        	if((loadHelperConfig(&bootInfo->helperConfig) == 0)
-        	    && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
+		{
+			// Load the configuration store in the boot helper partition
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
         	{
-          	getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig);
-            copyArgument(kBootUUIDKey, val, cnt, &argP, &cntRemaining);
-            uuidSet = true;
-        	}
+				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
+				if (val != NULL)
+					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
+			}
         }
         
-        if (!uuidSet && gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, uuidStr) == 0) {
-            verbose("Setting boot-uuid to: %s\n", uuidStr);
-            copyArgument(kBootUUIDKey, uuidStr, strlen(uuidStr), &argP, &cntRemaining);
-            uuidSet = true;
-        }
+        // Try to get the volume uuid string
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
          
-    }
+		// If we have the volume uuid add it to the commandline arguments
+		if (strlen(gBootUUIDString))
+			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
+	}
 
-    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gRootDevice)) {
+    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
+                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
         cnt = 0;
         if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
             valueBuffer[0] = '*';
@@ -1256,7 +1258,7 @@ processBootOptions()
             strlcpy(valueBuffer + 1, val, cnt);
             val = valueBuffer;
         } else {
-            if (uuidSet) {
+            if (strlen(gBootUUIDString)) {
                 val = "*uuid";
                 cnt = 5;
             } else {
@@ -1275,7 +1277,8 @@ processBootOptions()
     /*
      * Removed. We don't need this anymore.
      *
-    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config, &argP, &cntRemaining, gPlatformName)) {
+    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
+							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
         getPlatformName(gPlatformName);
         copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
     }
@@ -1460,8 +1463,8 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (key & kASCIIKeyMask) {
-		case kBackspaceKey:
+		switch (ASCII_KEY(key)) {
+		case KEY_BKSP:
 			if (digitsI > 0) {
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
@@ -1476,7 +1479,7 @@ int selectAlternateBootDevice(int bootdevice)
 			}
 			break;
 
-		case kReturnKey:
+		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
 			if (end == digits && *end == '\0') {
@@ -1494,9 +1497,9 @@ int selectAlternateBootDevice(int bootdevice)
 			break;
 
 		default:
-			if (isxdigit(key & kASCIIKeyMask) && digitsI < 2) {
-				putchar(key & kASCIIKeyMask);
-				digits[digitsI++] = key & kASCIIKeyMask;
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+				putchar(ASCII_KEY(key));
+				digits[digitsI++] = ASCII_KEY(key);
 			} else {
 				// TODO: Beep or something
 			}
@@ -1510,7 +1513,7 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == kReturnKey) {
+	if (getchar() == KEY_ENTER) {
 		return true;
 	} else {
 		return false;

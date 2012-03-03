@@ -9,6 +9,7 @@
  */
 
 #include "gui.h"
+#include "term.h"
 #include "appleboot.h"
 #include "vers.h"
 
@@ -26,6 +27,8 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 #define vram VIDEO(baseAddr)
 
+#define TAB_PIXELS_WIDTH (font->chars[0]->width * 4) // tab = 4 spaces
+
 int lasttime = 0; // we need this for animating maybe
 
 
@@ -40,8 +43,24 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+	iDeviceHFS_Lion,
+    iDeviceHFS_Lion_o,
+	iDeviceHFS_SL,
+    iDeviceHFS_SL_o,
+	iDeviceHFS_Leo,
+    iDeviceHFS_Leo_o,
+	iDeviceHFS_Tiger,
+    iDeviceHFS_Tiger_o,
     iDeviceHFSRAID,
     iDeviceHFSRAID_o,
+	iDeviceHFSRAID_Lion,
+    iDeviceHFSRAID_Lion_o,
+	iDeviceHFSRAID_SL,
+    iDeviceHFSRAID_SL_o,
+	iDeviceHFSRAID_Leo,
+    iDeviceHFSRAID_Leo_o,
+	iDeviceHFSRAID_Tiger,
+    iDeviceHFSRAID_Tiger_o,
     iDeviceEXT3,
     iDeviceEXT3_o,
     iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -94,9 +113,26 @@ image_t images[] = {
     {.name = "device_generic",              .image = NULL},
     {.name = "device_generic_o",            .image = NULL},
     {.name = "device_hfsplus",              .image = NULL},
-    {.name = "device_hfsplus_o",            .image = NULL},
+    {.name = "device_hfsplus_o",            .image = NULL},	
+	{.name = "device_hfsplus_lion",              .image = NULL},
+    {.name = "device_hfsplus_lion_o",            .image = NULL},
+	{.name = "device_hfsplus_sl",              .image = NULL},
+    {.name = "device_hfsplus_sl_o",            .image = NULL},
+	{.name = "device_hfsplus_leo",              .image = NULL},
+    {.name = "device_hfsplus_leo_o",            .image = NULL},
+	{.name = "device_hfsplus_tiger",              .image = NULL},
+    {.name = "device_hfsplus_tiger_o",            .image = NULL},
+	
     {.name = "device_hfsraid",              .image = NULL},
     {.name = "device_hfsraid_o",            .image = NULL},
+	{.name = "device_hfsraid_lion",              .image = NULL},
+    {.name = "device_hfsraid_lion_o",            .image = NULL},
+	{.name = "device_hfsraid_sl",              .image = NULL},
+    {.name = "device_hfsraid_sl_o",            .image = NULL},
+	{.name = "device_hfsraid_leo",              .image = NULL},
+    {.name = "device_hfsraid_leo_o",            .image = NULL},
+	{.name = "device_hfsraid_tiger",              .image = NULL},
+    {.name = "device_hfsraid_tiger_o",            .image = NULL},
     {.name = "device_ext3",                 .image = NULL},
     {.name = "device_ext3_o",               .image = NULL},
     {.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -282,13 +318,24 @@ static int loadThemeImage(const char *image, int alt_image)
             return 0;
         }
 #endif
-        else if (alt_image != IMG_REQUIRED && images[alt_image].image->pixels != NULL)
+        else if (alt_image != IMG_REQUIRED)
         {
-            // Using the passed alternate image for non-mandatory images.
-            // We don't clone the already existing pixmap, but using its properties instead!
-            images[i].image->width = images[alt_image].image->width;
-            images[i].image->height = images[alt_image].image->height;
-            images[i].image->pixels = images[alt_image].image->pixels;
+			if (images[alt_image].image->pixels != NULL) {
+				
+				// Using the passed alternate image for non-mandatory images.
+				// We don't clone the already existing pixmap, but using its properties instead!
+				images[i].image->width = images[alt_image].image->width;
+				images[i].image->height = images[alt_image].image->height;
+				images[i].image->pixels = images[alt_image].image->pixels;
+				
+			} else {
+                
+				// Unable to load or to find the image, this image not vital anyway, reseting and returning success !!
+                
+				free(images[i].image);
+				images[i].image = NULL;
+			} 
+			
             return 0;
         }
         else
@@ -297,8 +344,12 @@ static int loadThemeImage(const char *image, int alt_image)
             printf("ERROR: GUI: could not open '%s/%s.png'!\n", theme_name, image);
 			sleep(2);
 #endif
-            return 1;
-        }
+			free(images[i].image);
+			images[i].image = NULL;
+			return 1;
+            
+        }      
+        
     }
 	return 1;
 }
@@ -312,8 +363,25 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(device_hfsplus_lion,            iDeviceHFS_Lion);
+	LOADPNG(device_hfsplus_lion_o,          iDeviceHFS_Lion_o);
+	LOADPNG(device_hfsplus_sl,              iDeviceHFS_SL);
+	LOADPNG(device_hfsplus_sl_o,            iDeviceHFS_SL_o);
+	LOADPNG(device_hfsplus_leo,             iDeviceHFS_Leo);
+	LOADPNG(device_hfsplus_leo_o,           iDeviceHFS_Leo_o);
+	LOADPNG(device_hfsplus_tiger,           iDeviceHFS_Tiger);
+	LOADPNG(device_hfsplus_tiger_o,         iDeviceHFS_Tiger_o);
+	
 	LOADPNG(device_hfsraid,                 iDeviceGeneric);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_lion,       iDeviceHFSRAID_Lion);
+	LOADPNG(device_hfsraid_lion_o,     iDeviceHFSRAID_Lion_o);
+	LOADPNG(device_hfsraid_sl,         iDeviceHFSRAID_SL);
+	LOADPNG(device_hfsraid_sl_o,       iDeviceHFSRAID_SL_o);
+	LOADPNG(device_hfsraid_leo,        iDeviceHFSRAID_Leo);
+	LOADPNG(device_hfsraid_leo_o,      iDeviceHFSRAID_Leo_o);
+	LOADPNG(device_hfsraid_tiger,      iDeviceHFSRAID_Tiger);
+	LOADPNG(device_hfsraid_tiger_o,    iDeviceHFSRAID_Tiger_o);
 	LOADPNG(device_ext3,                    iDeviceGeneric);
 	LOADPNG(device_ext3_o,                  iDeviceEXT3);
 	LOADPNG(device_freebsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -761,6 +829,11 @@ int initGUI(void)
 	return 1;
 }
 
+bool is_image_loaded(int i)
+{	
+	return (images[i].image != NULL) ? true : false;
+}
+
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
 	int devicetype;
@@ -772,39 +845,84 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		switch (device->part_type)
 		{
 			case kPartitionTypeHFS:
+			{				
 
 				// Use HFS or HFSRAID icon depending on bvr flags.
-				devicetype = (device->flags & kBVFlagBooter) ? iDeviceHFSRAID : iDeviceHFS;
-				break;
-
-			case kPartitionTypeHPFS:
-				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
-				break;
-
-			case kPartitionTypeBEFS:                        /* Haiku detection and Icon credits to scorpius  */
-				devicetype = iDeviceBEFS;		// Use BEFS / Haiku icon
-				break;
-
-			case kPartitionTypeFreeBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-				devicetype = iDeviceFreeBSD;            // Use FreeBSD icon
+				if (device->flags & kBVFlagBooter) {
+                    
+					switch (device->OSVersion[3]) {
+						case '7':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Lion) ? iDeviceHFSRAID_Lion : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '6':
+							devicetype = is_image_loaded(iDeviceHFSRAID_SL) ? iDeviceHFSRAID_SL : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '5':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Leo) ? iDeviceHFSRAID_Leo : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						case '4':
+							devicetype = is_image_loaded(iDeviceHFSRAID_Tiger) ? iDeviceHFSRAID_Tiger : is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+						default:
+							devicetype = is_image_loaded(iDeviceHFSRAID) ? iDeviceHFSRAID  : iDeviceGeneric;
+							break;
+					}
+					
+				} 
+                else
+				{					
+					
+					switch (device->OSVersion[3]) {
+						case '7':
+							devicetype = is_image_loaded(iDeviceHFS_Lion) ? iDeviceHFS_Lion : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '6':
+							devicetype = is_image_loaded(iDeviceHFS_SL) ? iDeviceHFS_SL : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '5':
+							devicetype = is_image_loaded(iDeviceHFS_Leo) ? iDeviceHFS_Leo : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						case '4':
+							devicetype = is_image_loaded(iDeviceHFS_Tiger) ? iDeviceHFS_Tiger : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+						default:
+							devicetype = is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
+							break;
+					}						
+					
+				}
+				
 				break;
 				
-			case kPartitionTypeOpenBSD:                     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
-				devicetype = iDeviceOpenBSD;            // Use OpenBSD icon
+			}				
+			case kPartitionTypeHPFS:
+				devicetype = is_image_loaded(iDeviceNTFS) ? iDeviceNTFS : iDeviceGeneric;		// Use HPFS / NTFS icon
 				break;
 				
 			case kPartitionTypeFAT16:
-				devicetype = iDeviceFAT16;		// Use FAT16 icon
+				devicetype = is_image_loaded(iDeviceFAT16) ? iDeviceFAT16 : iDeviceGeneric;		// Use FAT16 icon
 				break;
-
+				
 			case kPartitionTypeFAT32:
-				devicetype = iDeviceFAT32;		// Use FAT32 icon
+				devicetype = is_image_loaded(iDeviceFAT32) ? iDeviceFAT32 : iDeviceGeneric;		// Use FAT32 icon
 				break;
-
+				
 			case kPartitionTypeEXT3:
-				devicetype = iDeviceEXT3;		// Use EXT2/3 icon
+				devicetype = is_image_loaded(iDeviceEXT3) ? iDeviceEXT3 : iDeviceGeneric;		// Use EXT2/3 icon
 				break;
-
+				
+			case kPartitionTypeFreeBSD:
+				devicetype = is_image_loaded(iDeviceFreeBSD) ? iDeviceFreeBSD : iDeviceGeneric;		// Use FreeBSD icon
+				break;
+				
+			case kPartitionTypeOpenBSD:
+				devicetype = is_image_loaded(iDeviceOpenBSD) ? iDeviceOpenBSD : iDeviceGeneric;		// Use OpenBSD icon
+				break;
+				
+			case kPartitionTypeBEFS:               /* Haiku detection and Icon credits to scorpius  */
+				devicetype = is_image_loaded(iDeviceBEFS) ? iDeviceBEFS : iDeviceGeneric;// Use BEFS / Haiku icon
+				break;
+				
 			default:
 				devicetype = iDeviceGeneric;	// Use Generic icon
 				break;
@@ -831,8 +949,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 void drawDeviceList (int start, int end, int selection)
 {
 	int			i;
-	bool		shoWinfo = true; //Azi:showinfo
-	extern bool showBootBanner; //
+	bool		shoWinfo = false;
+	extern bool showBootBanner;
 	position_t	p, p_prev, p_next;
 
 	//uint8_t	maxDevices = MIN( gui.maxdevices, menucount );
@@ -892,9 +1010,8 @@ void drawDeviceList (int start, int end, int selection)
 			
 			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->chameleonConfig);
 			
-			if (shoWinfo && showBootBanner) // no boot banner, no showinfo.
+			if (shoWinfo && showBootBanner)
 			{
-				// keep formatted with spaces instead of tabs
 				gui.debug.cursor = pos( 10, 100);
 				dprintf( &gui.screen, "label:     %s\n",   param->label );
 				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
@@ -907,6 +1024,7 @@ void drawDeviceList (int start, int end, int selection)
 				dprintf( &gui.screen, "name:      %s\n",   param->name );
 				dprintf( &gui.screen, "type_name: %s\n",   param->type_name );
 				dprintf( &gui.screen, "modtime:   %d\n",   param->modTime );
+//				// res
 				dprintf( &gui.screen, "width:     %d\n",   gui.screen.width );
 				dprintf( &gui.screen, "height:    %d\n",   gui.screen.height );
 //				dprintf( &gui.screen, "attr:      0x%x\n", gui.screen.attr ); //Azi: reminder
@@ -1311,34 +1429,49 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
+pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
+	unsigned int cha = (unsigned int)ch - 32;
+	if (cha >= font->count)
+		// return ? if the font for the char doesn't exists
+		cha = '?' - 32;
+
+	return font->chars[cha] ? font->chars[cha] : NULL;
+}
+
+position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
+	pixmap_t* pm = charToPixmap(ch, font);
+	if (pm && ((p.x + pm->width) < blendInto->width))
+	{
+		blend(pm, blendInto, p);
+		return pos(p.x + pm->width, p.y);
+	}
+	else
+		return p;
+}
+
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
 	int i=0;
-	int y=0; // we need this to support multilines '\n'
-	int x=0;
+	position_t current_pos = pos(p.x, p.y);
 	
-	for(i=0;i<strlen(ch);i++)
+	for (i=0; i < strlen(ch); i++)
 	{
-		int cha=(int)ch[i];
-		
-		cha-=32;
-		
 		// newline ?
-		if( ch[i] == '\n' )
+		if ( ch[i] == '\n' )
 		{
-			x = 0;
-			y += font->height;
+			current_pos.x = p.x;
+			current_pos.y += font->height;
 			continue;
 		}
 		
 		// tab ?
-		if( ch[i] == '\t' )
-			x+=(font->chars[0]->width*5);
+		if ( ch[i] == '\t' )
+		{
+			current_pos.x += TAB_PIXELS_WIDTH;
+			continue;
+		}
 		
-		if(font->chars[cha] && ((x + font->chars[cha]->width) < blendInto->width))
-			blend(font->chars[cha], blendInto, pos(p.x+x, p.y+y));
-		
-		x += font->chars[cha]->width;
+		current_pos = drawChar(ch[i], font, blendInto, current_pos);
 	}
 }
 
@@ -1346,32 +1479,32 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 {
 	int i = 0;
 	int width = 0;
+	int max_width = 0;
+	int height = font->height;
 
 	// calculate the width in pixels
-	for(i=0;i<strlen(text);i++)
-		width += font->chars[text[i]-32]->width;
-
-	p.x = ( p.x - ( width / 2 ) );
-	p.y = ( p.y - ( font->height / 2 ) ); 
-	
-	if ( p.x == -6 )
-	{
-		p.x = 0;
-	}
-	
-	for(i=0;i<strlen(text);i++)
-	{
-		int cha=(int)text[i];
-		
-		cha-=32;
- 
-		if(font->chars[cha])
+	for (i=0; i < strlen(text); i++) {
+		if (text[i] == '\n')
 		{
-			blend(font->chars[cha], blendInto, p);
-			p.x += font->chars[cha]->width;
+			width = 0;
+			height += font->height;
 		}
+		else if (text[i] == '\t')
+			width += TAB_PIXELS_WIDTH;
+		else
+		{
+			pixmap_t* pm = charToPixmap(text[i], font);
+			if (pm)
+				width += pm->width;
+		}
+		if (width > max_width)
+			max_width = width;
 	}
+
+	p.x = ( p.x - ( max_width / 2 ) );
+	p.y = ( p.y - ( height / 2 ) );
 	
+	drawStr(text, font, blendInto, p);
 }
 
 int initFont(font_t *font, image_t *data)
@@ -1382,9 +1515,9 @@ int initFont(font_t *font, image_t *data)
 	
 	bool monospaced = false;
 	
-	font->height = data->image->height;	
+	font->height = data->image->height;
 
-	for( x = 0; x < data->image->width; x++)
+	for( x = 0; x < data->image->width && count < CHARACTERS_COUNT; x++)
 	{
 		start = end;
 				
@@ -1422,8 +1555,13 @@ int initFont(font_t *font, image_t *data)
 		}
 	}
 
+	for (x = count; x < CHARACTERS_COUNT; x++)
+		font->chars[x] = NULL;
+
 	if(monospaced)
 		font->width = 0;
+
+	font->count = count;
 
 	return 0;
 }
@@ -1604,15 +1742,15 @@ void showInfoBox(char *title, char *text_orig)
 		
 		key = getchar();
 			
-		if( key == kUpArrowkey )
+		if( key == KEY_UP )
 			if( currentline > 0 )
 				currentline--;
 
-		if( key == kDownArrowkey )
+		if( key == KEY_DOWN )
 			if( lines > ( currentline + visiblelines ) )
 				currentline++;
 
-		if( key == kEscapeKey || key == 'q' || key == 'Q')
+		if( key == KEY_ESC || key == 'q' || key == 'Q')
 		{
 			gui.infobox.draw = false;
 			gui.redraw = true;
@@ -1762,7 +1900,7 @@ int updateInfoMenu(int key)
 	switch (key)
 	{
 
-		case kUpArrowkey:	// up arrow
+		case KEY_UP:	// up arrow
 				if (infoMenuSelection > 0)
 				{
 					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
@@ -1784,7 +1922,7 @@ int updateInfoMenu(int key)
 				}
 				break;
 
-		case kDownArrowkey:	// down arrow
+		case KEY_DOWN:	// down arrow
 				if (infoMenuSelection < infoMenuItemsCount - 1)
 				{
 					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
@@ -1796,7 +1934,7 @@ int updateInfoMenu(int key)
 				}
 				break;
 
-		case kReturnKey:
+		case KEY_ENTER:
 				key = 0;
 				if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
 					showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());

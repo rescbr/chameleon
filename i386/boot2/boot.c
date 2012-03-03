@@ -72,7 +72,7 @@ static bool	gUnloadPXEOnExit = false;
 static char	gCacheNameAdler[64 + 256];
 char		*gPlatformName = gCacheNameAdler;
 
-char		gRootDevice[512];
+char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
 char		gMacOSVersion[8];
 int			bvCount = 0, gDeviceCount = 0;
@@ -81,7 +81,7 @@ long		gBootMode; /* defaults to 0 == kBootModeNormal */
 BVRef		bvr, menuBVR, bvChain;
 
 static bool				checkOSVersion(const char * version);
-static bool				getOSVersion();
+static void				getOSVersion();
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
@@ -164,7 +164,8 @@ static int ExecKernel(void *binary)
 	md0Ramdisk();
 	
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
-	
+	verbose("Boot Args: %s\n", bootArgs->CommandLine);
+
 	// Cleanup the PXE base code.
 	
 	if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
@@ -181,17 +182,7 @@ static int ExecKernel(void *binary)
 	}
 	
 	usb_loop();
-	
-	// Notify modules that the kernel is about to be started
-	if (checkOSVersion("10.7"))
-	{
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
-	}
-	else
-	{
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
-	}
-	
+
 	// If we were in text mode, switch to graphics mode.
 	// This will draw the boot graphics unless we are in
 	// verbose mode.
@@ -207,6 +198,9 @@ static int ExecKernel(void *binary)
 	// Jump to kernel's entry point. There's no going back now.
 	if (checkOSVersion("10.7")) {
 		
+		// Notify modules that the kernel is about to be started
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
@@ -214,6 +208,9 @@ static int ExecKernel(void *binary)
 		startprog( kernelEntry, bootArgs );
 	}
 	else {
+		// Notify modules that the kernel is about to be started
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
+
 		startprog( kernelEntry, bootArgsPreLion );
 	}
 	
@@ -764,36 +761,9 @@ bool checkOSVersion(const char * version)
 			&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 }
 
-bool getOSVersion()
+static void getOSVersion()
 {
-	bool			valid = false;
-	const char		*val;
-	int				len;
-	config_file_t	systemVersion;
-	
-	if (!loadConfigFile("System/Library/CoreServices/SystemVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	else if (!loadConfigFile("System/Library/CoreServices/ServerVersion.plist", &systemVersion))
-	{
-		valid = true;
-	}
-	
-	if (valid)
-	{
-		if	(getValueForKey(kProductVersion, &val, &len, &systemVersion))
-		{
-			// getValueForKey uses const char for val
-			// so copy it and trim
-			*gMacOSVersion = '\0';
-			strncat(gMacOSVersion, val, MIN(len, 4));
-		}
-		else
-			valid = false;
-	}
-	
-	return valid;
+	strlcpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

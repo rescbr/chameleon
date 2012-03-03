@@ -620,6 +620,21 @@ void setupBoardId()
 }		
 
 /*
+ * Populate the chosen node
+ */
+void setupChosenNode()
+{
+	Node *chosenNode;
+	chosenNode = DT__FindNode("/chosen", false);
+	if (chosenNode == 0)
+		stop("Couldn't get chosen node");
+
+	int bootUUIDLength = strlen(gBootUUIDString);
+	if (bootUUIDLength)
+		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
+}
+
+/*
  * Load the smbios.plist override config file if any
  */
 static void setupSmbiosConfigFile(const char *filename)
@@ -640,7 +655,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	{
 		// Check selected volume's Extra.
 		sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
-		if (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig))
+		if ( (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig)) )
 		{
 			// Check booter volume/rdbt Extra.
 			sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
@@ -683,6 +698,9 @@ static void setupEfiConfigurationTable()
 		gST64->Hdr.CRC32 = 0;
 		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
 	}
+
+	// Setup the chosen node
+	setupChosenNode();
 }
 
 void saveOriginalSMBIOS(void)
