@@ -5,7 +5,7 @@
     <options hostArchitectures='i386' allow-external-scripts="no"/>
     <domains enable_anywhere="true"/>
 
-    <welcome file='Welcome.rtfd'/>
+    <welcome file='Welcome.html'/>
     <license file="License.rtf" sla="EA0401"/>
     <readme  file='Description.html'/>
     <conclusion file="Conclusion.rtfd"/>
