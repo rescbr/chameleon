@@ -8,13 +8,14 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-04 10:37+0100\n"
-"PO-Revision-Date: \n"
-"Last-Translator: JrCs\n"
+"PO-Revision-Date: 2012-03-04 20:52+0200\n"
+"Last-Translator: JrCs <mail@example.com>\n"
 "Language-Team: fr <fr@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Pootle 2.1.6\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -373,8 +374,10 @@ msgid ""
 "Source: http://cxx.uclibc.org/\n"
 "Dependencies: klibc"
 msgstr ""
-"Ce module fournit une simple bibliothèque d'éxecution C++ pour une utilisation dans d'autres modules.  \n"
-"Cela ne procure aucune fonctionnalité concrète. Ce module est utilisé pour permettre l'usage du langage C++ dans d'autres modules.\n"
+"Ce module fournit une simple bibliothèque d'éxecution C++ pour une "
+"utilisation dans d'autres modules.\n"
+"Cela ne procure aucune fonctionnalité concrète. Ce module est utilisé pour "
+"permettre l'usage du langage C++ dans d'autres modules.\n"
 "Veuillez noter que RTTI et Exceptions ont été désactivés.\n"
 "Source: http://cxx.uclibc.org/\n"
 "Dépendances : klibc"
@@ -773,7 +776,7 @@ msgstr "1600x900x32"
 #: Resources/templates/Localizable.strings:161
 #, no-wrap
 msgid "Set Graphics Mode to 1600x900x32"
-msgstr "Règle la résolution graphique à 600x900x32"
+msgstr "Règle la résolution graphique à 1600x900x32"
 
 #. type: "1680x1050x32_title"
 #: Resources/templates/Localizable.strings:163
