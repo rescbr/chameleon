@@ -1,4 +1,9 @@
 ﻿// ============================================================================
+// Package
+// ----------------------------------------------------------------------------
+"Chameleon_Package_Title" = "Chameleon Bootloader Package";
+
+// ============================================================================
 // Error strings
 // ----------------------------------------------------------------------------
 "ERROR_BOOTVOL" = "This software must be installed on the startup volume.";
@@ -6,19 +11,6 @@
 
 "Newer_Package_Installed_message" = "A newer version of Chameleon is already installed";
 "Intel_Mac_message" = "This software cannot be installed on this computer.";
-
-
-// ============================================================================
-// Install Type
-// ----------------------------------------------------------------------------
-"InstallType_title" = "Install Type";
-"InstallType_description" = "Choose to perform a new installation or upgrade an existing installation.";
-
-"New_title" = "New Installation";
-"New_description" = "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader.";
-
-"Upgrade_title" = "Upgrade";
-"Upgrade_description" = "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up.";
 
 
 // ============================================================================
@@ -32,9 +24,6 @@ boot2 (On the partition's root directory) for loading kernel etc.";
 
 "Standard_title" = "Standard";
 "Standard_description" = "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one.";
-
-"EFI_title" = "EFI";
-"EFI_description" = "Install Chameleon's files to the normally hidden EFI system partition using either boot0 or boot0md depending on your system and without destroying any existing Windows installation if you have one.";
 
 "noboot_title" = "Don't install the Bootloader";
 "noboot_description" = "Useful if you only want to install the extra's.";
@@ -62,32 +51,10 @@ Additionally, the module will patch the vesa modes available in pre intel hd gra
 Source: http://cxx.uclibc.org/
 Dependencies: klibc";
 
-"Keylayout_title" = "Keylayout";
-"Keylayout_description" = "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default.";
-
-
-// ============================================================================
-// Utility
-// These are currently unused!!!
-// ----------------------------------------------------------------------------
-"Utility_title" = "Utilities";
-"Utility_description" = "Optional files to help setup";
-
-"PrefPanel_title" = "Preference Panel";
-"PrefPanel_description" = "Installs Preference Panel for Chameleon.";
-
-"SMBIOS_title" = "SMBIOS.plist";
-"SMBIOS_description" = "Copies an example smbios.plist in /Extra/Configuration.";
-
-"Documentation_title" = "Documentation";
-"Documentation_description" = "Documentation for Chameleon manual install and use";
-
-
 // ============================================================================
 // Boot Options - The follow options are split to match the layout OptionalSettings text files.
 // but they can be changed to suit however anyone wants to do it.
 // ----------------------------------------------------------------------------
-
 "Options_title" = "Settings";
 "Options_description" = "Create an /Extra/org.chameleon.Boot.plist by selecting any of these boot options and kernel flags.";
 
@@ -146,7 +113,7 @@ Dependencies: klibc";
 
 // ----------------------------------------------------------------------------
 
-"CSTUsingSystemIO_title" = "Generate C-States=Yes";
+"CSTUsingSystemIO_title" = "CSTUsingSystemIO=Yes";
 "CSTUsingSystemIO_description" = "New C-State _CST generation method using SystemIO registers instead of FixedHW.";
 
 "DropSSDT_title" = "DropSSDT=Yes";
@@ -161,10 +128,10 @@ Dependencies: klibc";
 "EnableC4State_title" = "EnableC4State=Yes";
 "EnableC4State_description" = "Enable specific Processor power state, C4.";
 
-"GenerateCStates_title" = "Generate C-States=Yes";
+"GenerateCStates_title" = "GenerateCStates=Yes";
 "GenerateCStates_description" = "Enable auto generation of processor idle sleep states (C-States).";
 
-"GeneratePStates_title" = "Generate P-States=Yes";
+"GeneratePStates_title" = "GeneratePStates=Yes";
 "GeneratePStates_description" = "Enable auto generation of processor power performance states (P-States).";
 
 // ----------------------------------------------------------------------------
@@ -219,7 +186,6 @@ Dependencies: klibc";
 // ----------------------------------------------------------------------------
 // Boot options - KERNEL FLAGS
 // ----------------------------------------------------------------------------
-
 "Verbose_title" = "Verbose Mode";
 "Verbose_description" = "Turns on verbose logging and allows you to see messages from both Chameleon and the OS X kernel at boot time. Essential for troubleshooting.";
 
@@ -242,7 +208,6 @@ Dependencies: klibc";
 // ----------------------------------------------------------------------------
 // Boot options - KEYMAPS
 // ----------------------------------------------------------------------------
-
 "mac-de_title" = "German Mac Keyboard";
 "mac-de_description" = "Use the keyboard layout for a German Mac keyboard";
 
@@ -258,31 +223,13 @@ Dependencies: klibc";
 "mac-se_title" = "Swedish Mac Keyboard";
 "mac-se_description" = "Use the keyboard layout for a Swedish Mac keyboard";
 
-"mac-pt_title" = "Portuguese Mac Keyboard";
-"mac-pt_description" = "Use the keyboard layout for a Portuguese Mac keyboard";
-
-"pc-de_title" = "German PC Keyboard";
-"pc-de_description" = "Use the keyboard layout for a German PC keyboard";
-
-"pc-es_title" = "Spanish PC Keyboard";
-"pc-es_description" = "Use the keyboard layout for a Spanish PC keyboard";
-
 "pc-fr_title" = "French PC Keyboard";
 "pc-fr_description" = "Use the keyboard layout for a French PC keyboard";
 
-"pc-it_title" = "Italian PC Keyboard";
-"pc-it_description" = "Use the keyboard layout for a Italian PC keyboard";
-
-"pc-se_title" = "Swedish PC Keyboard";
-"pc-se_description" = "Use the keyboard layout for a Swedish PC keyboard";
-
-"pc-pt_title" = "Portuguese PC Keyboard";
-"pc-pt_description" = "Use the keyboard layout for a Portuguese PC keyboard";
 
 // ----------------------------------------------------------------------------
 // Boot options - THEMES
 // ----------------------------------------------------------------------------
-
 "Embed_title" = "Embed";
 "Embed_description" = "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme.";
 
@@ -301,7 +248,6 @@ Dependencies: klibc";
 // These sub menu headings need titles and descriptions.
 // ----------------------------------------------------------------------------
 // Control
-
 "Control_title" = "Control Options";
 "Control_description" = "Settings to control how Chameleon works.";
 

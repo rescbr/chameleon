@@ -990,13 +990,13 @@ makedistribution ()
 #   Make the translation
     echo ""
     echo "========= Translating Resources ========"
-    (cd "${PKGROOT}" &&  PERLLIB=${PKGROOT}/bin/po4a/lib          \
-        bin/po4a/po4a                                             \
-        --msgid-bugs-address po4a-devel@lists.alioth.debian.org   \
-        --package-name chameleon                                  \
-        --package-version 1.2.3                                   \
-        --variable PODIR="po"                                     \
-        --variable TEMPLATES_DIR="Resources/templates"            \
+    (cd "${PKGROOT}" &&  PERLLIB=${PKGROOT}/bin/po4a/lib                  \
+        bin/po4a/po4a                                                     \
+        --package-name 'Chameleon'                                        \
+        --package-version "${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}"   \
+        --msgmerge-opt '--lang=$lang'                                     \
+        --variable PODIR="po"                                             \
+        --variable TEMPLATES_DIR="Resources/templates"                    \
         --variable OUTPUT_DIR="${PKG_BUILD_DIR}/${packagename}/Resources" \
         ${PKGROOT}/po4a-chameleon.cfg)
     
