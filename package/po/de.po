@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-04 10:37+0100\n"
-"PO-Revision-Date: 2012-03-05 01:37+0200\n"
+"PO-Revision-Date: 2012-03-05 02:11+0200\n"
 "Last-Translator: JrCs <d2t56xxptp@snkmail.com>\n"
 "Language-Team: de <de@li.org>\n"
 "Language: de\n"
@@ -686,7 +686,7 @@ msgstr "Generiert automatisch die P-States des Prozessors."
 #: Resources/templates/Localizable.strings:139
 #, no-wrap
 msgid "1024x600x32"
-msgstr ""
+msgstr "1024x600x32"
 
 #. type: "1024x600x32_description"
 #: Resources/templates/Localizable.strings:140
@@ -698,7 +698,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1024x600x32"
 #: Resources/templates/Localizable.strings:142
 #, no-wrap
 msgid "1024x768x32"
-msgstr ""
+msgstr "1024x768x32"
 
 #. type: "1024x768x32_description"
 #: Resources/templates/Localizable.strings:143
@@ -710,7 +710,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1024x768x32"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "1280x768x32"
-msgstr ""
+msgstr "1280x768x32"
 
 #. type: "1280x768x32_description"
 #: Resources/templates/Localizable.strings:146
@@ -722,7 +722,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1280x768x32"
 #: Resources/templates/Localizable.strings:148
 #, no-wrap
 msgid "1280x800x32"
-msgstr ""
+msgstr "1280x800x32"
 
 #. type: "1280x800x32_description"
 #: Resources/templates/Localizable.strings:149
@@ -734,7 +734,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1280x800x32"
 #: Resources/templates/Localizable.strings:151
 #, no-wrap
 msgid "1280x1024x32"
-msgstr ""
+msgstr "1280x1024x32"
 
 #. type: "1280x1024x32_description"
 #: Resources/templates/Localizable.strings:152
@@ -746,7 +746,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1280x1024x32"
 #: Resources/templates/Localizable.strings:154
 #, no-wrap
 msgid "1280x960x32"
-msgstr ""
+msgstr "1280x960x32"
 
 #. type: "1280x960x32_description"
 #: Resources/templates/Localizable.strings:155
@@ -758,7 +758,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1280x960x32"
 #: Resources/templates/Localizable.strings:157
 #, no-wrap
 msgid "1440x900x32"
-msgstr ""
+msgstr "1440x900x32"
 
 #. type: "1440x900x32_description"
 #: Resources/templates/Localizable.strings:158
@@ -770,7 +770,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1440x900x32"
 #: Resources/templates/Localizable.strings:160
 #, no-wrap
 msgid "1600x900x32"
-msgstr ""
+msgstr "1600x900x32"
 
 #. type: "1600x900x32_description"
 #: Resources/templates/Localizable.strings:161
@@ -782,7 +782,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1600x900x32"
 #: Resources/templates/Localizable.strings:163
 #, no-wrap
 msgid "1680x1050x32"
-msgstr ""
+msgstr "1680x1050x32"
 
 #. type: "1680x1050x32_description"
 #: Resources/templates/Localizable.strings:164
@@ -794,7 +794,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1680x1050x32"
 #: Resources/templates/Localizable.strings:166
 #, no-wrap
 msgid "1920x1080x32"
-msgstr ""
+msgstr "1920x1080x32"
 
 #. type: "1920x1080x32_description"
 #: Resources/templates/Localizable.strings:167
@@ -806,7 +806,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1920x1080x32"
 #: Resources/templates/Localizable.strings:169
 #, no-wrap
 msgid "1920x1200x32"
-msgstr ""
+msgstr "1920x1200x32"
 
 #. type: "1920x1200x32_description"
 #: Resources/templates/Localizable.strings:170
@@ -920,7 +920,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:202
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
-msgstr "Behebt manchmal den Fehler 'PCI Configuration Failed' "
+msgstr "Behebt manchmal den Fehler 'PCI Configuration Failed'"
 
 #. type: "Darkwake_title"
 #: Resources/templates/Localizable.strings:204
