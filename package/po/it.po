@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-04 10:37+0100\n"
-"PO-Revision-Date: 2012-03-05 00:14+0200\n"
+"PO-Revision-Date: 2012-03-05 01:26+0200\n"
 "Last-Translator: JrCs <d2t56xxptp@snkmail.com>\n"
 "Language-Team: it <it@li.org>\n"
 "Language: it\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: Resources/templates/Welcome.html:22
 #, no-wrap
 msgid "Chameleon"
-msgstr ""
+msgstr "Chameleon"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:23
@@ -234,9 +234,9 @@ msgstr ""
 # 80%
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
-#, fuzzy, no-wrap
+#, no-wrap
 msgid "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
-msgstr "v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
+msgstr "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 
 #. type: "Chameleon_Package_Title"
 #: Resources/templates/Localizable.strings:4
@@ -489,7 +489,7 @@ msgstr "Carica immediatamente il disco predefinito"
 #: Resources/templates/Localizable.strings:76
 #, no-wrap
 msgid "ShowInfo=Yes"
-msgstr ""
+msgstr "ShowInfo=Yes"
 
 #. type: "ShowInfo_description"
 #: Resources/templates/Localizable.strings:77
