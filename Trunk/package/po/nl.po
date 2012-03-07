@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-06 22:38+0000\n"
-"PO-Revision-Date: 2012-03-07 01:46-0000\n"
+"PO-Revision-Date: 2012-03-07 19:05-0000\n"
 "Last-Translator: ErmaC\n"
 "Language-Team: nl <nl@li.org>\n"
 "Language: nl\n"
@@ -63,26 +63,21 @@ msgid "%PKGDEV%"
 msgstr "%PKGDEV%"
 
 #. type: Content of: <html><body><div><p>
-#: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
+#: Resources/templates/Welcome.html:36
+#: Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr ""
-"Package built by: %WHOBUILD%, language Vertaald door: yeehaw123 & Badeendje"
+msgstr "Package built by: %WHOBUILD%, language Vertaald door: yeehaw123 & Badeendje"
 
 #. type: Content of: <html><body><div><p>
-#: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
+#: Resources/templates/Welcome.html:37
+#: Resources/templates/Conclusion.html:31
 msgid "Copyright © %CPRYEAR%"
 msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid ""
-"Chameleon is a boot loader built using a combination of components which "
-"evolved from the development of David Elliott's fake EFI implementation "
-"added to Apple's boot-132 project."
-msgstr ""
-"Chameleon is een combinatie van verschillende boot loader componenten. Het "
-"is gebaseerd op de fake EFI implementatie van David Elliott die toegevoegd "
-"is aan Apple's boot-132 project."
+msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
+msgstr "Chameleon is een combinatie van verschillende boot loader componenten. Het is gebaseerd op de fake EFI implementatie van David Elliott die toegevoegd is aan Apple's boot-132 project."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
@@ -92,43 +87,32 @@ msgstr "Nieuwe functies in Chameleon 2.0:"
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr ""
-"- Volledig aanpasbare GUI, zodat de Darwin Bootloader een mooier uiterlijk "
-"krijgt."
+msgstr "- Volledig aanpasbare GUI, zodat de Darwin Bootloader een mooier uiterlijk krijgt."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid ""
-"- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr ""
-"- Het booten van retail DVD's door direct een ramdisk image te laden zonder "
-"hulp van extra programma's."
+msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr "- Het booten van retail DVD's door direct een ramdisk image te laden zonder hulp van extra programma's."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
-msgstr ""
-"- Slaapstand. Geniet van het hervatten van Mac OS X met een preview image."
+msgstr "- Slaapstand. Geniet van het hervatten van Mac OS X met een preview image."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
 msgid "- SMBIOS override to modify the factory SMBIOS values."
-msgstr ""
-"- Het negeren van het SMBIOS zodat de standaard SMBIOS waarden aangepast "
-"kunnen worden."
+msgstr "- Het negeren van het SMBIOS zodat de standaard SMBIOS waarden aangepast kunnen worden."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid ""
-"- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr ""
-"- Het negeren van de DSDT zodat er een aangepaste verbeterde DSDT kan worden "
-"gebruikt om bepaalde problemen op te lossen."
+msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr "- Het negeren van de DSDT zodat er een aangepaste verbeterde DSDT kan worden gebruikt om bepaalde problemen op te lossen."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
 msgid "- Device Property Injection via device-properties string."
-msgstr "- Device Property Injectie via device-properties string."
+msgstr "- Device Property Injectie via device-eigenschappen string."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
@@ -162,10 +146,8 @@ msgstr "- Geheugen detectie overgenomen van memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid ""
-"- Automatic P-State &amp; C-State generation for native power management."
-msgstr ""
-"- Automatisch P-State's & C-State's aangemaakt voor automatisch stroombeheer."
+msgid "- Automatic P-State &amp; C-State generation for native power management."
+msgstr "- Automatisch P-State's & C-State's aangemaakt voor automatisch stroombeheer."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:35
@@ -200,7 +182,7 @@ msgstr "&nbsp;is geschreven naar de root van de door u gekozen partitie."
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:25
 msgid "Please&nbsp;"
-msgstr "Alstublieft"
+msgstr "Alstublieft&nbsp;"
 
 #. type: Content of: <html><body><div><p><span>
 #: Resources/templates/Conclusion.html:25
@@ -209,12 +191,8 @@ msgstr "lees het document "
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid ""
-"&nbsp;to find out if the installation was successful and keep it for a "
-"record of what was done."
-msgstr ""
-"&nbsp;om te zien of de installatie goed verlopen is en bewaar het als "
-"registratie."
+msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
+msgstr "&nbsp;om te zien of de installatie goed verlopen is en bewaar het als registratie."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
@@ -225,7 +203,7 @@ msgstr "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 #: Resources/templates/Localizable.strings:4
 #, no-wrap
 msgid "Chameleon Bootloader Package"
-msgstr "Chameleon"
+msgstr "Chameleon Bootloader Package"
 
 #. type: "ERROR_BOOTVOL"
 #: Resources/templates/Localizable.strings:9
@@ -394,16 +372,13 @@ msgstr "Verbergt Chameleon's boot banner in de GUI."
 #: Resources/templates/Localizable.strings:64
 #, no-wrap
 msgid "GUI=No"
-msgstr "GUI"
+msgstr "GUI=No"
 
 #. type: "GUI_description"
 #: Resources/templates/Localizable.strings:65
 #, no-wrap
 msgid "Disables the default enabled graphic user interface."
-msgstr ""
-"Om de grafische interface uit te zetten, moet er GUI=NO aan com.apple.Boot.plist toegevoegd worden.\"\n"
-"\n"
-"\"LegacyLogo_title\" = \"LegacyLogo=Yes"
+msgstr "Om de grafische interface uit te zetten, moet er GUI=NO aan com.apple.Boot.plist toegevoegd worden."
 
 #. type: "LegacyLogo_title"
 #: Resources/templates/Localizable.strings:67
@@ -481,13 +456,13 @@ msgstr "Boot de kernel in 32bit mode in plaats van de standaard 64bit mode."
 #: Resources/templates/Localizable.strings:87
 #, no-wrap
 msgid "EHCIacquire=Yes"
-msgstr "EHCIacquire"
+msgstr "EHCIacquire=Yes"
 
 #. type: "EHCIacquire_description"
 #: Resources/templates/Localizable.strings:88
 #, no-wrap
 msgid "Enables the option to fix any EHCI ownership issues due to bad bioses."
-msgstr "Voeg EHCIacquire=y toe aan com.apple.Boot.plist, Deze optie repareert alle EHCI ownership problemen die worden veroorzaakt door slechte biossen."
+msgstr "Voeg EHCIacquire=Yes toe aan org.chameleon.Boot.plist, Deze optie repareert alle EHCI ownership problemen die worden veroorzaakt door slechte biossen."
 
 #. type: "EthernetBuiltIn_title"
 #: Resources/templates/Localizable.strings:90
@@ -499,31 +474,31 @@ msgstr "EthernetBuiltIn=Yes"
 #: Resources/templates/Localizable.strings:91
 #, no-wrap
 msgid "Enables the option of adding 'built-in' to your ethernet devices."
-msgstr "Enables the option of adding 'built-in' to your ethernet devices."
+msgstr "Hiermee schakelt u de optie van het toevoegen van 'ingebouwde' om uw Ethernet-apparaten."
 
 #. type: "ForceHPET_title"
 #: Resources/templates/Localizable.strings:93
 #, no-wrap
 msgid "ForceHPET=Yes"
-msgstr "ForceHPET"
+msgstr "ForceHPET=Yes"
 
 #. type: "ForceHPET_description"
 #: Resources/templates/Localizable.strings:94
 #, no-wrap
 msgid "Enables HPET on intel chipsets, for bioses that dont include the option."
-msgstr "Voeg ForceHPET=y toe aan com.apple.Boot.plist, Deze optie zorgt ervoor dat HPET aangezet wordt op intel chipsets en is voor biossen die die optie niet ondersteunen."
+msgstr "Voeg ForceHPET=Yes toe aan org.chameleon.Boot.plist, Deze optie zorgt ervoor dat HPET aangezet wordt op intel chipsets en is voor biossen die die optie niet ondersteunen."
 
 #. type: "ForceWake_title"
 #: Resources/templates/Localizable.strings:96
 #, no-wrap
 msgid "ForceWake=Yes"
-msgstr "ForceWake"
+msgstr "ForceWake=Yes"
 
 #. type: "ForceWake_description"
 #: Resources/templates/Localizable.strings:97
 #, no-wrap
 msgid "This option enables you to bypass bad sleep images."
-msgstr "Voeg ForceWake=y toe aan com.apple.Boot.plist, deze optie zorgt ervoor dat je corrupte sleep images kan voorbijgaan."
+msgstr "Voeg ForceWake=Yes toe aan org.chameleon.Boot.plist, deze optie zorgt ervoor dat je corrupte sleep images kan voorbijgaan."
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:99
@@ -541,13 +516,13 @@ msgstr "Schakelt de automatisch ingeschakelde restart fix uit."
 #: Resources/templates/Localizable.strings:102
 #, no-wrap
 msgid "UHCIreset=Yes"
-msgstr "UHCIreset"
+msgstr "UHCIreset=Yes"
 
 #. type: "UHCIreset_description"
 #: Resources/templates/Localizable.strings:103
 #, no-wrap
 msgid "Enables the option to reset UHCI controllers before starting OS X."
-msgstr "Voeg UHCIreset=y toe aan com.apple.Boot.plist, Deze optie zal UHCI controllers resetten voor dat OS X gestart wordt."
+msgstr "Voeg UHCIreset=Yes toe aan org.chameleon.Boot.plist, Deze optie zal UHCI controllers resetten voor dat OS X gestart wordt."
 
 #. type: "UseMemDetect_title"
 #: Resources/templates/Localizable.strings:105
