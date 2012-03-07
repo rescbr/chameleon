@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo "==============================================="
+echo "Pre-Install Script"
+echo "*********************************"
+echo "-----------------------------------------------"
+echo ""
+
 # Creates text file named '@LOG_FILENAME@'
 # at the root of the target volume. This is to give the user
 # a record of the installation process and also to show why
@@ -40,7 +46,9 @@ mkdir -p "$backupDir"
 
 [[ -f "$logFile" ]] && mv "$logFile" "${backupDir}/${logName}" # Backup old log file
 
-# Setup Chameleon Log file by writing header and diskutil list
+# Setup Chameleon Log file
+# by writing header and diskutil list
+
 echo "Chameleon installer log - $( date )
 Installer version: %CHAMELEONVERSION% %CHAMELEONREVISION%
 ======================================================" >"${logFile}"
@@ -51,13 +59,10 @@ echo "======================================================" >>"${logFile}"
 # ---------------------------------------------
 # Backup Chameleon files
 # ---------------------------------------------
-echo "//Preinstall
-Search for and back up any existing Chameleon files..." >>"${logFile}"
+echo "Backup Chameleon files" >>"${logFile}"
 # Backup stage2
 if [[ -f "${targetVolume}/boot" ]];then
-    bootVersion=$( strings "${targetVolume}/boot" | sed -nE 's!^Darwin/x86 boot.+(Chameleon.+)!\1!p' ) # zhell's command.
-    echo "Found stage2 'boot' file for $bootVersion on ${targetVolume}." >>"${logFile}"
-    echo "Backing up ${targetVolume}/boot to ${backupDir}/boot." >>"${logFile}"
+    echo "Backup stage2 file ${targetVolume}/boot to ${backupDir}/boot" >>"${logFile}"
     cp -p "${targetVolume}/boot" "${backupDir}/boot"
 fi
 # Backup /Extra directory
@@ -67,7 +72,9 @@ if [[ -d "${targetVolume}/Extra" ]];then
 fi
 
 chflags -R nohidden "$backupDir" # Remove the invisible flag of files in the backups
+
 find "${backupRootDir}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
+
 echo "======================================================" >>"${logFile}"
 
 # Check existing plist name for old naming convention and change to new convention.
@@ -77,23 +84,16 @@ if [[ -f "${targetVolume}/Extra/com.apple.Boot.plist" ]]; then
 fi
 
 # ---------------------------------------------
-# The installer now enables options found in an
-# existing org.chameleon.Boot.plist. The user can
-# then de-select these pre-selected options from
-# the installer if desired.
-#
-# To deal with this, we clear all options that this
-# installer can manage, then later on, re-add the
-# options the user leaves checked.
-#
-# Other possible options that this installer can't
-# manage are left in the org.chameleon.Boot.plist,
-# for example: Rename Partition, SystemId.
+# Clearing options that Chameleon can managed
 # ---------------------------------------------
-if [[ -f "${targetVolume}/Extra/org.chameleon.Boot.plist" ]]; then
-	echo "Clearing de-selectable options from existing org.chameleon.Boot.plist..." >>"${logFile}"
-	"${PWD}/clean_bootplist.pl" "${targetVolume}" "${logFile}" 2>&1 | grep -v 'Does Not Exist' >>"${logFile}"
-	echo "======================================================" >>"${logFile}"
-fi
+echo "Clearing options..." >>"${logFile}"
+"${PWD}/clean_bootplist.pl" "${targetVolume}" 2>&1 | grep -v 'Does Not Exist' >>"${logFile}"
+echo "======================================================" >>"${logFile}"
+
+echo "==============================================="
+echo "END - Pre-Install Script"
+echo "*********************************"
+echo "-----------------------------------------------"
+echo ""
 
 exit 0

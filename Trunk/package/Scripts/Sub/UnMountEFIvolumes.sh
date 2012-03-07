@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "==============================================="
+echo "Unmount all volumes named EFI"
+
 # loop through and un-mount ALL mounted 'EFI' system partitions - Thanks kizwan
 
 # Receives targetVolumeChosenByUser: To write install log to.
@@ -15,21 +18,12 @@ else
 	exit 9
 fi
 
-logName="@LOG_FILENAME@"
-logFile="${targetVolumeChosenByUser}/$logName"
-
-exec >>"${logFile}" 2>&1
-
-echo "Check for and unmount all volumes named EFI..."
-
 # Count of 5 exists incase for some reason /Volumes/EFI fails
-# to be unmounted in which case the loop would run forever.
+# be unmounted in which case the loop would run forever.
 attempts=1
 while [ "$( df | grep EFI )" ] && [ $attempts -lt 5 ]; do
-	#"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Volume named 'EFI' is mounted..."
-	#"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
-	echo "Volume named 'EFI' is mounted."
-	echo "Unmounting $( df | grep EFI | awk '{print $1}' )"
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Volume named 'EFI' is mounted..."
+	"$scriptDir"InstallLog.sh "${targetVolumeChosenByUser}" "Unmounting $( df | grep EFI | awk '{print $1}' )"
 	umount -f $( df | grep EFI | awk '{print $1}' )
 	(( attempts++ ))
 done

@@ -203,7 +203,7 @@ addenda, one by line.  Each addendum may be preceded by modifiers.
 
 =item B<!>
 
-I<addendum_path> is discarded, it is not loaded and will not be loaded by 
+I<addendum_path> is discarded, it is not loaded and will not be loaded by
 any further addendum specification.
 
 =back
@@ -480,7 +480,7 @@ F<man/po4a/add_$lang/>) below the current directory. In our example
 the F<man/po4a/po/> directory would include F<de.po>, F<pt.po> and F<sv.po>,
 and the F<man/po4a/add_de/> directory would include F<de.add>.
 
-Note the use of the modifier B<?> as only the German translation (F<de.po>) is 
+Note the use of the modifier B<?> as only the German translation (F<de.po>) is
 accompanied by an addendum.
 
 To actually build the translated man pages you would then (once!) add the
@@ -488,10 +488,10 @@ following line in the B<build> target of the appropriate F<Makefile>:
 
         po4a po4a.cfg
 
-Once this is set up you don't need to touch the F<Makefile> when a new 
+Once this is set up you don't need to touch the F<Makefile> when a new
 translation arrives, i.e. if the French team sends you F<fr.po> and F<fr.add>
 then you simply drop them respectively in F<man/po4a/po/> and
-F<man/po4a/add_fr/> and the next time the programm is build the 
+F<man/po4a/add_fr/> and the next time the programm is build the
 French translation is automatically build as well in F<man/translated/fr/>.
 
 Note that you still need an appropriate target to install localized manual
@@ -1091,7 +1091,7 @@ if ($pot_filename =~ m/\$master/) {
             next unless length $master;
             delete $document{$master} unless exists $partial{'master'}{$master};
         }
-        # Do not read PO files if no file is processed for this language 
+        # Do not read PO files if no file is processed for this language
         foreach my $lang (keys %po_filename) {
             delete $po_filename{$lang} unless exists $partial{'lang'}{$lang};
         }

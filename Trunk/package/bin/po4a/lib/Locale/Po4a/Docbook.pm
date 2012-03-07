@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 # aptitude: cmdsynopsis => missing removal of leading spaces
 
-# Po4a::Docbook.pm 
-# 
+# Po4a::Docbook.pm
+#
 # extract and translate translatable strings from DocBook XML documents.
-# 
+#
 # This code extracts plain text from tags and attributes on DocBook XML
 # documents.
 #
@@ -40,11 +40,11 @@ The po4a (PO for anything) project goal is to ease translations (and more
 interestingly, the maintenance of translations) using gettext tools on
 areas where they were not expected like documentation.
 
-Locale::Po4a::Docbook is a module to help the translation of DocBook XML 
+Locale::Po4a::Docbook is a module to help the translation of DocBook XML
 documents into other [human] languages.
 
-Please note that this module is still under heavy development, and not 
-distributed in official po4a release since we don't feel it to be mature 
+Please note that this module is still under heavy development, and not
+distributed in official po4a release since we don't feel it to be mature
 enough. If you insist on trying, check the CVS out.
 
 =head1 STATUS OF THIS MODULE
@@ -897,11 +897,11 @@ sub initialize {
 	$self->{options}{'_default_untranslated'} .= " <indexinfo>";
 	$self->{options}{'_default_placeholder'} .= " <indexinfo>";
 
-	# indexterm; does not contain text; 
+	# indexterm; does not contain text;
 	$self->{options}{'_default_untranslated'} .= " <indexterm>";
 	$self->{options}{'_default_placeholder'} .= " <indexterm>";
 
-	# info; does not contain text; 
+	# info; does not contain text;
 	$self->{options}{'_default_untranslated'} .= " <info>";
 	$self->{options}{'_default_placeholder'} .= " <info>";
 
@@ -1438,7 +1438,7 @@ sub initialize {
 	$self->{options}{'_default_untranslated'} .= " <referenceinfo>";
 	$self->{options}{'_default_placeholder'} .= " <referenceinfo>";
 
-	# refmeta; does not contains text; 
+	# refmeta; does not contains text;
 	# NOTE: could be in the inline class
 	$self->{options}{'_default_untranslated'} .= " <refmeta>";
 	$self->{options}{'_default_break'} .= " <refmeta>";
@@ -1571,7 +1571,7 @@ sub initialize {
 	$self->{options}{'_default_untranslated'} .= " <screenshot>";
 	$self->{options}{'_default_placeholder'} .= " <screenshot>";
 
-	# secondary; contains text; 
+	# secondary; contains text;
 	$self->{options}{'_default_translated'} .= " <secondary>";
 	$self->{options}{'_default_break'} .= " <secondary>";
 
@@ -1627,11 +1627,11 @@ sub initialize {
 	$self->{options}{'_default_untranslated'} .= " <sectioninfo>";
 	$self->{options}{'_default_placeholder'} .= " <sectioninfo>";
 
-	# see; contains text; 
+	# see; contains text;
 	$self->{options}{'_default_translated'} .= " <see>";
 	$self->{options}{'_default_break'} .= " <see>";
 
-	# seealso; contains text; 
+	# seealso; contains text;
 	$self->{options}{'_default_translated'} .= " <seealso>";
 	$self->{options}{'_default_break'} .= " <seealso>";
 

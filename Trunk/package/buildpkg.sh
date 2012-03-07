@@ -475,7 +475,6 @@ main ()
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
     cp -f ${PKGROOT}/Scripts/Main/${choiceId}postinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
     cp -f ${PKGROOT}/Scripts/Sub/* ${PKG_BUILD_DIR}/${choiceId}/Scripts
     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
@@ -806,8 +805,8 @@ fi
     choiceId="Post"
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" ${choiceId}
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" InstallerLog
-    addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" UnMount
+    cp -f ${PKGROOT}/Scripts/Sub/UnMountEFIvolumes.sh ${PKG_BUILD_DIR}/${choiceId}/Scripts
+
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
     addChoice  --start-visible="false" --start-selected="true"  --pkg-refs="$packageRefId" "${choiceId}"
@@ -851,7 +850,7 @@ buildpackage ()
 
         header+="auth=\"root\">\n"
         header+="\t<payload installKBytes=\"${installedsize##* }\" numberOfFiles=\"${filecount##* }\"/>\n"
-        #rm -R -f "${packagePath}/Temp" //blackosx commented out for now
+        rm -R -f "${packagePath}/Temp"
 
         [ -d "${packagePath}/Temp" ] || mkdir -m 777 "${packagePath}/Temp"
         [ -d "${packagePath}/Root" ] && mkbom "${packagePath}/Root" "${packagePath}/Temp/Bom"
@@ -863,16 +862,18 @@ buildpackage ()
             done
             header+="\t</scripts>\n"
             # Create the Script archive file (cpio format)
-            (cd "${packagePath}/Scripts" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
-                grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+            (cd "${packagePath}/Scripts" && find . -print |                                    \
+                cpio -o -z -R root:wheel --format cpio > "${packagePath}/Temp/Scripts") 2>&1 | \
+                grep -vE '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
         fi
 
         header+="</pkg-info>"
         echo -e "${header}" > "${packagePath}/Temp/PackageInfo"
 
         # Create the Payload file (cpio format)
-        (cd "${packagePath}/Root" && find . -print | cpio -o -z -R 0:0 --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
-            grep -E '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
+        (cd "${packagePath}/Root" && find . -print |                                       \
+            cpio -o -z -R root:wheel --format cpio > "${packagePath}/Temp/Payload") 2>&1 | \
+            grep -vE '^[0-9]+\s+blocks?$' # to remove cpio stderr messages
 
         # Create the package
         (cd "${packagePath}/Temp" && xar -c -f "${packagePath}/../${packageName}.pkg" --compression none .)
@@ -880,7 +881,7 @@ buildpackage ()
         # Add the package to the list of build packages
         pkgrefs[${#pkgrefs[*]}]="\t<pkg-ref id=\"${packageRefId}\" installKBytes='${installedsize}' version='${CHAMELEON_VERSION}.0.0.${CHAMELEON_TIMESTAMP}'>#${packageName}.pkg</pkg-ref>"
 
-        #rm -rf "${packagePath}" //blackosx commented out for now
+        rm -rf "${packagePath}"
     fi
 }
 
@@ -954,7 +955,7 @@ makedistribution ()
     declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
 
-    #rm -f "${distributionDestDir}/${packagename// /}"*.pkg  //blackosx commented out for now
+    rm -f "${distributionDestDir}/${packagename// /}"*.pkg
 
     mkdir -p "${PKG_BUILD_DIR}/${packagename}"
 
@@ -964,7 +965,7 @@ makedistribution ()
         pkgdir="${PKG_BUILD_DIR}/${packagename}/${pkg}"
         # expand individual packages
         pkgutil --expand "${PKG_BUILD_DIR}/${pkg}" "$pkgdir"
-        #rm -f "${PKG_BUILD_DIR}/${pkg}"  //blackosx commented out for now
+        rm -f "${PKG_BUILD_DIR}/${pkg}"
     done
 
 #   Create the Distribution file
@@ -991,21 +992,21 @@ makedistribution ()
 #   Make the translation
     echo ""
     echo "========= Translating Resources ========"
-    (cd "${PKGROOT}" &&  PERLLIB=${PKGROOT}/bin/po4a/lib          \
-        bin/po4a/po4a                                             \
-        --msgid-bugs-address po4a-devel@lists.alioth.debian.org   \
-        --package-name chameleon                                  \
-        --package-version 1.2.3                                   \
-        --variable PODIR="po"                                     \
-        --variable TEMPLATES_DIR="Resources/templates"            \
+    (cd "${PKGROOT}" &&  PERLLIB=${PKGROOT}/bin/po4a/lib                  \
+        bin/po4a/po4a                                                     \
+        --package-name 'Chameleon'                                        \
+        --package-version "${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}"   \
+        --msgmerge-opt '--lang=$lang'                                     \
+        --variable PODIR="po"                                             \
+        --variable TEMPLATES_DIR="Resources/templates"                    \
         --variable OUTPUT_DIR="${PKG_BUILD_DIR}/${packagename}/Resources" \
         ${PKGROOT}/po4a-chameleon.cfg)
-    
+
     # Copy common files in english localisation directory
     ditto --noextattr --noqtn "${PKGROOT}/Resources/common" "${PKG_BUILD_DIR}/${packagename}/Resources/en.lproj"
-    
+
     # CleanUp the directory
-    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -exec rm -rf {} \;
+    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -depth -exec rm -rf {} \;
     find "${PKG_BUILD_DIR}/${packagename}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
 
     # Make substitutions for version, revision, stage, developers, credits, etc..

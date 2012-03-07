@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-# Po4a::Guide.pm 
-# 
+# Po4a::Guide.pm
+#
 # extract and translate translatable strings from Guide XML documents.
-# 
+#
 # This code extracts plain text from tags and attributes on Guide XML
 # documents.
 #

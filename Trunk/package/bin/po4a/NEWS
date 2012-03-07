@@ -23,7 +23,7 @@ Text:
  * Remove trailing newline in titles from PO files
 
 Packaging:
- * Remove Makefile, all processing is performed by Build.PL 
+ * Remove Makefile, all processing is performed by Build.PL
 
 =======================================================================
 

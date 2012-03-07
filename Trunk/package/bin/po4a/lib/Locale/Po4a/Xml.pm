@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-# Po4a::Xml.pm 
-# 
+# Po4a::Xml.pm
+#
 # extract and translate translatable strings from XML documents.
-# 
+#
 # This code extracts plain text from tags and attributes from generic
 # XML documents, and it can be used as a base to build modules for
 # XML-based documents.
@@ -376,7 +376,7 @@ Space-separated list of tags which should break the sequence.
 By default, all tags break the sequence.
 
 The tags must be in the form <aaa>, but you can join some
-(<bbb><aaa>), if a tag (<aaa>) should only be considered 
+(<bbb><aaa>), if a tag (<aaa>) should only be considered
 when it's into another tag (<bbb>).
 
 =item B<inline>
@@ -385,7 +385,7 @@ Space-separated list of tags which should be treated as inline.
 By default, all tags break the sequence.
 
 The tags must be in the form <aaa>, but you can join some
-(<bbb><aaa>), if a tag (<aaa>) should only be considered 
+(<bbb><aaa>), if a tag (<aaa>) should only be considered
 when it's into another tag (<bbb>).
 
 =item B<placeholder>
@@ -400,7 +400,7 @@ similar to:
   <placeholder type=\"footnote\" id=\"0\"/>
 
 The tags must be in the form <aaa>, but you can join some
-(<bbb><aaa>), if a tag (<aaa>) should only be considered 
+(<bbb><aaa>), if a tag (<aaa>) should only be considered
 when it's into another tag (<bbb>).
 
 =item B<nodefault>
@@ -425,7 +425,7 @@ Note: the preprocessor directives must only appear between tags
 Space-separated list of tags you want to translate.
 
 The tags must be in the form <aaa>, but you can join some
-(<bbb><aaa>), if a tag (<aaa>) should only be considered 
+(<bbb><aaa>), if a tag (<aaa>) should only be considered
 when it's into another tag (<bbb>).
 
 You can also specify some tag options putting some characters in front of
@@ -439,7 +439,7 @@ Example: WE<lt>chapterE<gt>E<lt>titleE<gt>
 Space-separated list of tags you do not want to translate.
 
 The tags must be in the form <aaa>, but you can join some
-(<bbb><aaa>), if a tag (<aaa>) should only be considered 
+(<bbb><aaa>), if a tag (<aaa>) should only be considered
 when it's into another tag (<bbb>).
 
 =item B<defaulttranslateoption>
@@ -594,7 +594,7 @@ It receives the extracted text, the reference on where it was, and a hash
 that contains extra information to control what strings to translate, how
 to translate them and to generate the comment.
 
-The content of these options depends on the kind of string it is (specified in an 
+The content of these options depends on the kind of string it is (specified in an
 entry of this hash):
 
 =over
@@ -707,9 +707,9 @@ single string.
 
 =cut
 
-##### Generic XML tag types #####' 
+##### Generic XML tag types #####'
 
-our @tag_types = ( 
+our @tag_types = (
 	{	beginning	=> "!--#",
 		end		=> "--",
 		breaking	=> 0,
@@ -1161,7 +1161,7 @@ sub tag_in_list ($$$) {
 		}
 		last unless ($path =~ m/</);
 		$path =~ s/^<.*?>//;
-	} 
+	}
 
 	return 0;
 }
@@ -1245,7 +1245,7 @@ sub treat_attributes {
 					}
 				}
 			}
-          
+
 			unless ($complete) {
 				my $ontagerror = $self->{options}{'ontagerror'};
 				if ($ontagerror eq "warn") {

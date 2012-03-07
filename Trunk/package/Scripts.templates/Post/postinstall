@@ -31,8 +31,8 @@ scriptDir=$MYLOCATION
 
 # Write some information to the Install Log
 echo "======================================================"
-echo "//Post"
-echo "Updating permissions."
+echo "Running Post postinstall script"
+echo "Target volume = ${dest_vol}"
 
 # ---------------------------------------------
 # Update Rights
@@ -54,4 +54,4 @@ rm -f /tmp/newbs /tmp/origbs /tmp/originalBootSector /tmp/newBootSector
 rm -f "${dest_vol}/.ChameleonEFI"
 
 echo "======================================================"
-echo "//Complete"
+echo "Post postinstall script complete"

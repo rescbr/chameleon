@@ -13,7 +13,7 @@ use subs qw(makespace);
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION="0.41.1";
 @ISA = qw(DynaLoader);
-@EXPORT = qw(new process translate 
+@EXPORT = qw(new process translate
              read write readpo writepo
              getpoout setpoout get_out_charset);
 
@@ -132,11 +132,11 @@ of each paragraph.
        my ($line,$lref)=$self->shiftline();
        while (defined($line)) {
 	   if ($line =~ m/<p>/ && !$first--; ) {
-	       # Not the first time we see <p>. 
+	       # Not the first time we see <p>.
 	       # Reput the current line in input,
 	       #  and put the built paragraph to output
 	       $self->unshiftline($line,$lref);
-	      
+
 	       # Now that the document is formed, translate it:
 	       #   - Remove the leading tag
 	       $paragraph =~ s/^<p>//s;
@@ -147,7 +147,7 @@ of each paragraph.
                                . $document->translate($paragraph,$pararef)
                                );
 
- 	       next PARAGRAPH;
+	       next PARAGRAPH;
 	   } else {
 	       # Append to the paragraph
 	       $paragraph .= $line;
@@ -160,7 +160,7 @@ of each paragraph.
        # Did not get a defined line? End of input file.
        return;
    }
- } 
+ }
 
 Once you've implemented the parse function, you can use your document
 class, using the public interface presented in the next section.
@@ -271,7 +271,7 @@ sub process {
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object.
     my %params = @_;
-    
+
     # Build the args for new()
     my %newparams = ();
     foreach (keys %params) {
@@ -317,7 +317,7 @@ sub process {
     chdir $params{'destdir'}
 	if (defined $params{'destdir'});
     if (defined $params{'file_out_name'}) {
-	print STDERR "write(".$params{'file_out_name'}.")... " 
+	print STDERR "write(".$params{'file_out_name'}.")... "
 	    if $self->debug();
 	$self->write($params{'file_out_name'});
 	print STDERR "done.\n" if $self->debug();
@@ -343,7 +343,7 @@ sub new {
     my %options=@_;
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
-    
+
     ## initialize the plugin
     # prevent the plugin from croaking on the options intended for Po.pm
     $self->{options}{'porefs'} = '';
@@ -361,9 +361,9 @@ sub new {
     $po_options{'msgid-bugs-address'} = $options{'msgid-bugs-address'};
     $po_options{'package-name'} = $options{'package-name'};
     $po_options{'package-version'} = $options{'package-version'};
-    
+
     # private data
-    $self->{TT}=(); 
+    $self->{TT}=();
     $self->{TT}{po_in}=Locale::Po4a::Po->new(\%po_options);
     $self->{TT}{po_out}=Locale::Po4a::Po->new(\%po_options);
     # Warning, this is an array of array:
@@ -383,7 +383,7 @@ sub new {
     # document isn't in ascii)
     $self->{TT}{utf_mode}=0;
 
-    
+
     return $self;
 }
 
@@ -396,10 +396,10 @@ sub new {
 =item read($)
 
 Add another input document at the end of the existing one. The argument is
-the filename to read. 
+the filename to read.
 
 Please note that it does not parse anything. You should use the parse()
-function when you're done with packing input files into the document. 
+function when you're done with packing input files into the document.
 
 =cut
 
@@ -410,7 +410,7 @@ sub read() {
 	or croak wrap_msg(dgettext("po4a", "Can't read from file without having a filename"));
     my $linenum=0;
 
-    open INPUT,"<$filename" 
+    open INPUT,"<$filename"
 	or croak wrap_msg(dgettext("po4a", "Can't read from %s: %s"), $filename, $!);
     while (defined (my $textline = <INPUT>)) {
 	$linenum++;
@@ -432,7 +432,7 @@ sub read() {
 	    }
 	}
     }
-    close INPUT 
+    close INPUT
 	or croak wrap_msg(dgettext("po4a", "Can't close %s after reading: %s"), $filename, $!);
 
 }
@@ -456,14 +456,14 @@ sub write {
 	my $dir = $filename;
 	if ($dir =~ m|/|) {
 	    $dir =~ s|/[^/]*$||;
-	
+
 	    File::Path::mkpath($dir, 0, 0755) # Croaks on error
 	      if (length ($dir) && ! -e $dir);
 	}
 	open $fh,">$filename"
 	    or croak wrap_msg(dgettext("po4a", "Can't write to %s: %s"), $filename, $!);
     }
-    
+
     map { print $fh $_ } $self->docheader();
     map { print $fh $_ } @{$self->{TT}{doc_out}};
 
@@ -477,7 +477,7 @@ sub write {
 
 =head2 Manipulating PO files
 
-=over 4 
+=over 4
 
 =item readpo($)
 
@@ -512,14 +512,14 @@ sub getpoout {
 sub setpoout {
     $_[0]->{TT}{po_out} = $_[1];
 }
-sub readpo  { 
-    $_[0]->{TT}{po_in}->read($_[1]);        
+sub readpo  {
+    $_[0]->{TT}{po_in}->read($_[1]);
 }
-sub writepo { 
-    $_[0]->{TT}{po_out}->write( $_[1] );    
+sub writepo {
+    $_[0]->{TT}{po_out}->write( $_[1] );
 }
-sub stats   { 
-    return $_[0]->{TT}{po_in}->stats_get(); 
+sub stats   {
+    return $_[0]->{TT}{po_in}->stats_get();
 }
 
 =head2 Manipulating addenda
@@ -546,7 +546,7 @@ sub addendum_parse {
     unless (open (INS, "<$filename")) {
 	warn wrap_msg(dgettext("po4a", "Can't read from %s: %s"), $filename, $!);
 	goto END_PARSE_ADDFILE;
-    } 
+    }
 
     unless (defined ($header=<INS>) && $header)  {
 	warn wrap_msg(dgettext("po4a", "Can't read po4a header from %s."), $filename);
@@ -564,15 +564,15 @@ sub addendum_parse {
 	}
 	my ($key,$value)=($1,$2);
 	$key=lc($key);
-  	     if ($key eq 'mode')     {  $mode=lc($value);
+	     if ($key eq 'mode')     {  $mode=lc($value);
 	} elsif ($key eq 'position') {  $position=$value;
-	} elsif ($key eq 'endboundary') {  
+	} elsif ($key eq 'endboundary') {
 	    $boundary=$value;
 	    $bmode='after';
-	} elsif ($key eq 'beginboundary') {  
+	} elsif ($key eq 'beginboundary') {
 	    $boundary=$value;
 	    $bmode='before';
-	} else { 
+	} else {
 	    warn wrap_msg(dgettext("po4a", "Invalid argument in the po4a header of %s: %s"), $filename, $key);
 	    goto END_PARSE_ADDFILE;
 	}
@@ -592,7 +592,7 @@ sub addendum_parse {
 	goto END_PARSE_ADDFILE;
     }
     unless ($mode eq "before" || length($boundary)) {
-    	warn wrap_msg(dgettext("po4a", "No ending boundary given in the po4a header, but mode=after."));
+	warn wrap_msg(dgettext("po4a", "No ending boundary given in the po4a header, but mode=after."));
 	goto END_PARSE_ADDFILE;
     }
 
@@ -602,7 +602,7 @@ sub addendum_parse {
     close INS;
 
     $errcode=0;
-  END_PARSE_ADDFILE: 
+  END_PARSE_ADDFILE:
       return ($errcode,$mode,$position,$boundary,$bmode,$content);
 }
 
@@ -623,14 +623,14 @@ sub addendum {
     }
     die wrap_msg(dgettext("po4a", "Addendum %s does not exist."), $filename)
       unless -e $filename;
-  
+
     my ($errcode,$mode,$position,$boundary,$bmode,$content)=
 	addendum_parse($filename);
     return 0 if ($errcode);
 
     print STDERR "mode=$mode;pos=$position;bound=$boundary;bmode=$bmode;ctn=$content\n"
       if $self->debug();
-    
+
     # We only recode the addendum if an origin charset is specified, else we
     # suppose it's already in the output document's charset
     if (defined($self->{TT}{'addendum_charset'}) &&
@@ -654,9 +654,9 @@ sub addendum {
     if ($mode eq "before") {
 	if ($self->verbose() > 1 || $self->debug() ) {
 	    map { print STDERR wrap_msg(dgettext("po4a", "Addendum '%s' applied before this line: %s"), $filename, $_) if (/$position/);
- 	        } @{$self->{TT}{doc_out}};
+	        } @{$self->{TT}{doc_out}};
 	}
-	@{$self->{TT}{doc_out}} = map { /$position/ ? ($content,$_) : $_ 
+	@{$self->{TT}{doc_out}} = map { /$position/ ? ($content,$_) : $_
                                         }  @{$self->{TT}{doc_out}};
     } else {
 	my @newres=();
@@ -667,7 +667,7 @@ sub addendum {
 	    push @newres,$line;
 	    my $outline=mychomp($line);
 	    $outline =~ s/^[ \t]*//;
-	      
+
 	    if ($line =~ m/$position/) {
 		while ($line=shift @{$self->{TT}{doc_out}}) {
 		    last if ($line=~/$boundary/);
@@ -723,7 +723,7 @@ reference (packed as an array).
 
 =item unshiftline($$)
 
-Unshifts a line of the input document and its reference. 
+Unshifts a line of the input document and its reference.
 
 =item pushline($)
 
@@ -737,9 +737,9 @@ Pop the last pushed line from the doc_out.
 
 =cut
 
-sub shiftline   {  
+sub shiftline   {
     my ($line,$ref)=(shift @{$_[0]->{TT}{doc_in}},
-		     shift @{$_[0]->{TT}{doc_in}}); 
+		     shift @{$_[0]->{TT}{doc_in}});
     return ($line,$ref);
 }
 sub unshiftline {
@@ -752,7 +752,7 @@ sub popline     {  return pop @{$_[0]->{TT}{doc_out}};            }
 
 =head2 Marking strings as translatable
 
-One function is provided to handle the text which should be translated. 
+One function is provided to handle the text which should be translated.
 
 =over 4
 
@@ -885,7 +885,7 @@ sub translate {
     # do with the current string
     unless ($self->{TT}{ascii_input}) {
         my $out_charset = $self->{TT}{po_out}->get_charset;
-	# We set the output po charset 
+	# We set the output po charset
         if ($out_charset eq "CHARSET") {
 	    if ($self->{TT}{utf_mode}) {
 		$out_charset="UTF-8";
@@ -1104,7 +1104,7 @@ make a pushline_all function, which would make pushline of its content for
 all language, using a map-like syntax:
 
     $self->pushline_all({ "Description[".$langcode."]=".
-			  $self->translate($line,$ref,$langcode) 
+			  $self->translate($line,$ref,$langcode)
 		        });
 
 =back

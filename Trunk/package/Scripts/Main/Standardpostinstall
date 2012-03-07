@@ -79,7 +79,7 @@ echo ""
 
 
 # Write some information to the Install Log
-"$scriptDir"InstallLog.sh "${targetVolume}" "//Standard"
+"$scriptDir"InstallLog.sh "${targetVolume}" "Running Standard postinstall script"
 "$scriptDir"InstallLog.sh "${targetVolume}" "Target volume = ${targetVolume} on ${targetDevice}"
 
 # Double check we can see the selected partition and it's of the right type.
@@ -192,7 +192,8 @@ if [ ${returnValue} -ne 2 ]; then
 	fi
 fi
 
-"$scriptDir"InstallLog.sh "${targetVolume}" "//End Standard"
+"$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
+"$scriptDir"InstallLog.sh "${targetVolume}" "Standard script complete"
 "$scriptDir"InstallLog.sh "${targetVolume}" "LineBreak"
 
 echo "==============================================="

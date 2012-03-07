@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # Po4a::NewsDebian.pm
-# 
+#
 # extract and translate translatable strings from a NEWS.Debian documents
 #
 # This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ NONE.
 
 =head1 STATUS OF THIS MODULE
 
-Not tested. 
+Not tested.
 
 A finer split of the entries may be preferable (search for /^ */, for
 example), but this version is more robust and NEWS.Debian entries are not

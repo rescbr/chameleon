@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-# Po4a::Dia.pm 
-# 
+# Po4a::Dia.pm
+#
 # extract and translate translatable strings from Dia diagrams.
-# 
+#
 # This code extracts plain text from string tags on uncompressed Dia
 # diagrams.
 #

@@ -197,7 +197,7 @@ GetOptions('help|h'      => \$help,
 	   'msgid-bugs-address=s'=> \$msgid_bugs_address,
 	   'package-name=s'      => \$package_name,
 	   'package-version=s'   => \$package_version,
-    
+
 	   'verbose|v'   => \$verbose,
 	   'debug|d'     => \$debug,
 	   'version|V'   => \&show_version)
