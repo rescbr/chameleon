@@ -659,7 +659,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
 			{
 				// Locate address to begin rebasing
-				segmentAddress = 0;
+				//segmentAddress = 0;
 				
 				struct segment_command* segCommand = NULL; // NOTE: 32bit only
 				

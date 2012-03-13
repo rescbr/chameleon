@@ -181,8 +181,8 @@ static void init_pic(void)
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     
-    outb(0x70,0x80); /* Disable NMI */
-    
+	outb(0x70, inb(0x70)|0x80); /* Disable NMI */  
+	
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
 	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
 }
@@ -415,7 +415,8 @@ void common_boot(int biosdev)
     bool     firstRun = true;    
     int      devcnt = 0;
     int      bvCount = 0;
-
+	int      BIOSDev = 0;
+    long     gBootMode = kBootModeNormal; /* defaults to 0 == kBootModeNormal */
     
     unsigned int allowBVFlags = kBVFlagSystemVolume|kBVFlagForeignBoot;
     unsigned int denyBVFlags = kBVFlagEFISystem;
@@ -425,13 +426,10 @@ void common_boot(int biosdev)
     // the base code will result in a hang or kernel panic.
     gUnloadPXEOnExit = true;
 #endif
-    // Record the device that the booter was loaded from.
-    safe_set_env(envgBIOSDev,biosdev & kBIOSDevMask);
-	
-	
+    	
     // Setup VGA text mode.
-    // Not sure if it is safe to call setVideoMode() before the
-    // config table has been loaded. Call video_mode() instead.
+    // It's unsafe to call setVideoMode() before the
+    // bootargs is initialized, we call video_mode() instead.
 #if DEBUG
     printf("before video_mode\n");
 #endif
@@ -454,24 +452,25 @@ void common_boot(int biosdev)
     // Scan and record the system's hardware information.
     scan_platform();
 	
-    safe_set_env(envgBootMode, kBootModeNormal); /* defaults to 0 == kBootModeNormal */
-    safe_set_env(envShouldboot, false);
-    safe_set_env(envkCache, (uint32_t)gBootKernelCacheFile);
-    safe_set_env(envMKextName, (uint32_t)gMKextName);
+    set_env(envgBIOSDev, (BIOSDev = biosdev & kBIOSDevMask));    
+    set_env(envShouldboot, false);
+    set_env(envkCache, (uint32_t)gBootKernelCacheFile);
+    set_env(envMKextName, (uint32_t)gMKextName);
+	
     InitBootPrompt();
     
     // First get info for boot volume.
-    scanBootVolumes((int)get_env(envgBIOSDev), 0);
-    bvChain = getBVChainForBIOSDev((int)get_env(envgBIOSDev));
+    scanBootVolumes(BIOSDev, 0);
+    bvChain = getBVChainForBIOSDev(BIOSDev);
     setBootGlobals(bvChain);
 	
     // Load Booter boot.plist config file
     status = loadBooterConfig();
 	
     {
-        bool isServer = get_env(envIsServer);    
+        bool isServer = false;    
         getBoolForKey(kIsServer, &isServer, DEFAULT_BOOT_CONFIG); // set this as soon as possible    
-        safe_set_env(envIsServer , isServer);
+        set_env(envIsServer , isServer);
     }
 	
 
@@ -481,9 +480,10 @@ void common_boot(int biosdev)
 		{
             long gBootMode = kBootModeNormal;
 			gBootMode |= kBootModeQuiet;
-            safe_set_env(envgBootMode, gBootMode);
 		}
 	}	
+    
+    set_env(envgBootMode, gBootMode);	
 	
 	{
 		bool     instantMenu = false;
@@ -506,13 +506,13 @@ void common_boot(int biosdev)
         // Create a list of partitions on device(s).
         if (ScanSingleDrive)
         {
-            scanBootVolumes((int)get_env(envgBIOSDev), &bvCount);
+            scanBootVolumes(BIOSDev, &bvCount);
         } 
         else 
 #endif
         {
 #if UNUSED
-            scanDisks((int)get_env(envgBIOSDev), &bvCount);
+            scanDisks(BIOSDev, &bvCount);
 #else
             scanDisks();
 #endif
@@ -826,7 +826,11 @@ out:
 		else
 		{
             /* Won't return if successful. */
-            ret = ExecKernel(binary);
+            if ( ExecKernel(binary)) 
+            {
+                firstRun = true;
+                continue;
+            }
         }
     }
     

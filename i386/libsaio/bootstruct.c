@@ -30,20 +30,20 @@
 #include "bootstruct.h"
 #include "platform.h"
 
-boot_args_common  *bootArgs;
+boot_args_common  *bootArgs = NULL;
 
 
 /*==========================================================================
  * structure of parameters passed to
  * the kernel by the booter.
  */
-boot_args_Legacy  *bootArgsLegacy;
-boot_args_107     *bootArgs107;
-boot_args_108     *bootArgs108;
+boot_args_Legacy  *bootArgsLegacy  = NULL;
+boot_args_107     *bootArgs107  = NULL;
+boot_args_108     *bootArgs108  = NULL;
 /* ... */
 
-PrivateBootInfo_t *bootInfo;
-Node              *gMemoryMapNode;
+PrivateBootInfo_t *bootInfo  = NULL;
+Node              *gMemoryMapNode  = NULL;
 
 static char platformName[64];
 
@@ -55,67 +55,96 @@ void initKernBootStruct( void )
     {			
         bootArgs = (boot_args_common *)malloc(sizeof(boot_args_common));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
-        if (bootArgs == 0 || bootInfo == 0)
+        if (bootArgs == NULL || bootInfo == NULL)
             stop("Couldn't allocate boot info\n");
-        
-        bzero(bootArgs, sizeof(boot_args_common));
-        bzero(bootInfo, sizeof(PrivateBootInfo_t));
-        
-        // Get system memory map. Also update the size of the
-        // conventional/extended memory for backwards compatibility.
-		
-        
-        bootInfo->memoryMapCount =
-        getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
-                     (unsigned long *) &bootInfo->convmem,
-                     (unsigned long *) &bootInfo->extmem );
-		
-		
-        
-        if ( bootInfo->memoryMapCount == 0 )
+        else
         {
-            // BIOS did not provide a memory map, systems with
-            // discontiguous memory or unusual memory hole locations
-            // may have problems.
+            bzero(bootArgs, sizeof(boot_args_common));
+            bzero(bootInfo, sizeof(PrivateBootInfo_t));
             
-            bootInfo->convmem = getConventionalMemorySize();
-            bootInfo->extmem  = getExtendedMemorySize();			
-			
-        }
+            // Get system memory map. Also update the size of the
+            // conventional/extended memory for backwards compatibility.
+            
+            
+            bootInfo->memoryMapCount =
+            getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
+                         (unsigned long *) &bootInfo->convmem,
+                         (unsigned long *) &bootInfo->extmem );
+            
+            
+            
+            if ( bootInfo->memoryMapCount == 0 )
+            {
+                // BIOS did not provide a memory map, systems with
+                // discontiguous memory or unusual memory hole locations
+                // may have problems.
+                
+                bootInfo->convmem = getConventionalMemorySize();
+                bootInfo->extmem  = getExtendedMemorySize();			
+                
+            }
 #if 0		
-        bootInfo->configEnd    = bootInfo->config;
+            bootInfo->configEnd    = bootInfo->config;
 #endif
-        bootArgs->Video.v_display = VGA_TEXT_MODE;
+            bootArgs->Video.v_display = VGA_TEXT_MODE;
+            
+            DT__Initialize();
+            
+            {
+                Node *node;
+                node = DT__FindNode("/", true);
+                if (node == 0) {
+                    stop("Couldn't create root node");
+                }
+                getPlatformName(platformName);
+                
+                {
+                    int nameLen;
+                    nameLen = strlen(platformName) + 1;
+                    DT__AddProperty(node, "compatible", nameLen, platformName);
+                    DT__AddProperty(node, "model", nameLen, platformName);
+                }  
+            }		      
+            
+            gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
+            
+            safe_set_env(envConvMem, bootInfo->convmem);
+            safe_set_env(envExtMem, bootInfo->convmem);
+            safe_set_env(envMemoryMap, (uint32_t)bootInfo->memoryMap);
+            safe_set_env(envMemoryMapCnt, bootInfo->memoryMapCount);
+            
+            
+            init_done = 1;
+        }
         
-        DT__Initialize();
-        
-		{
-			Node *node;
-			node = DT__FindNode("/", true);
-			if (node == 0) {
-				stop("Couldn't create root node");
-			}
-			getPlatformName(platformName);
-			
-			{
-				int nameLen;
-				nameLen = strlen(platformName) + 1;
-				DT__AddProperty(node, "compatible", nameLen, platformName);
-				DT__AddProperty(node, "model", nameLen, platformName);
-			}  
-		}		      
-        
-        gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
-        
-        safe_set_env(envConvMem, bootInfo->convmem);
-        safe_set_env(envExtMem, bootInfo->convmem);
-        safe_set_env(envMemoryMap, (uint32_t)bootInfo->memoryMap);
-        safe_set_env(envMemoryMapCnt, bootInfo->memoryMapCount);
-
-        
-        init_done = 1;
     }
     
+}
+
+/* boot args getters/setters. */
+
+void setBootArgsVideoMode(int mode)
+{
+    bootArgs->Video.v_display = mode;
+}
+uint32_t getVideoMode(void)
+{
+    return bootArgs->Video.v_display;
+}
+uint32_t getBootArgsVideoPtrAtOffset(uint32_t offset)
+{
+    char *vid = (char *)&bootArgs->Video ;
+    return (uint32_t)vid[offset];
+}
+void setBootArgsVideoStruct(Boot_Video	*Video)
+{
+    bootArgs->Video.v_display  = Video->v_display;
+    bootArgs->Video.v_width    = Video->v_width;
+    bootArgs->Video.v_height   = Video->v_height;
+    bootArgs->Video.v_depth    = Video->v_depth;
+    bootArgs->Video.v_rowBytes = Video->v_rowBytes;
+    bootArgs->Video.v_baseAddr = Video->v_baseAddr;
+    return;
 }
 
 #define AllocateKernelMemoryForBootArgs(Ver)                           \
@@ -176,8 +205,6 @@ CopyCommonBootArgs(Ver);\
 
 /* Copy boot args after kernel and record address. */
 
-/* Copy boot args after kernel and record address. */
-
 void
 reserveKern107BootStruct(void)
 {	
@@ -200,38 +227,13 @@ reserveKernLegacyBootStruct(void)
 	init_boot_args(Legacy);
 }
 
-void setBootArgsVideoMode(int mode)
-{
-    bootArgs->Video.v_display = mode;
-}
-uint32_t getVideoMode(void)
-{
-    return bootArgs->Video.v_display;
-}
-uint32_t getBootArgsVideoPtrAtOffset(uint32_t offset)
-{
-    char *vid = (char *)&bootArgs->Video ;
-    return (uint32_t)vid[offset];
-}
-
-void setBootArgsVideoStruct(Boot_Video	*Video)
-{
-    bootArgs->Video.v_display  = Video->v_display;
-    bootArgs->Video.v_width    = Video->v_width;
-    bootArgs->Video.v_height   = Video->v_height;
-    bootArgs->Video.v_depth    = Video->v_depth;
-    bootArgs->Video.v_rowBytes = Video->v_rowBytes;
-    bootArgs->Video.v_baseAddr = Video->v_baseAddr;
-    return;
-}
-
 void
 finalizeBootStruct(void)
 {    
 	{
 		int i;
-		EfiMemoryRange *memoryMap;
-		MemoryRange *range;
+		EfiMemoryRange *memoryMap = NULL;
+		MemoryRange *range = NULL;
 		uint64_t	sane_size = 0;  /* Memory size to use for defaults calculations */
 		
 		int memoryMapCount = bootInfo->memoryMapCount;
@@ -249,6 +251,7 @@ finalizeBootStruct(void)
 		if (memoryMap == NULL) {
 			
 			stop("Unable to allocate kernel space for the memory map\n");
+            return;
 		}
 		bootArgs->MemoryMap = (uint32_t)memoryMap;
 		bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
@@ -257,6 +260,10 @@ finalizeBootStruct(void)
 		
 		for (i=0; i<memoryMapCount; i++, memoryMap++) {
 			range = &bootInfo->memoryMap[i];
+            if (!range || !memoryMap) {
+                stop("Error while computing kernel memory map\n");
+                return;
+            }
 			switch(range->type) {
 				case kMemoryRangeACPI:
 					memoryMap->Type = kEfiACPIReclaimMemory;

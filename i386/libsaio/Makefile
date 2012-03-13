@@ -41,7 +41,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o acpi_tools.o smbios.o smp-imps.o uterror.o
+        convert.o acpi_tools.o smbios.o smp-imps.o uterror.o lzss.o
 
 # example for AcpiCodec
 #SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o

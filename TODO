@@ -1,8 +1,6 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
-- Update cpu_intel_amd.c
-
 - Implement the bundles
 
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 

@@ -152,6 +152,11 @@ extern bool   gHaveKernelCache;
 extern long ThinFatFile(void **binary, unsigned long *length);
 extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize);
 
+/*
+ * lzss.c
+ */
+extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+
 /* memory.c */
 long AllocateKernelMemory( long inSize );
 #if UNUSED
@@ -178,7 +183,7 @@ extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 #endif
 
-/* platform.h */
+/* platform.c */
 extern void scan_platform(void);
 extern void SetgRootDevice(const char * str);
 extern void Setgboardproduct(const char * str);

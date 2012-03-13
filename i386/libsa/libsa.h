@@ -56,11 +56,6 @@
 #define ispunct(c)  (c == '.' || c == '-') //Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
 
 /*
- * lzss.c
- */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
-
-/*
  * string.c
  */
 

@@ -53,7 +53,7 @@ static char bootRescanPrompt[] =
 
 void InitBootPrompt(void)
 {
-    safe_set_env(envBootBanner,(uint32_t)bootBanner);
-    safe_set_env(envBootPrompt,(uint32_t)bootPrompt);
-    safe_set_env(envBootRescanPrompt,(uint32_t)bootRescanPrompt);
+    set_env(envBootBanner,(uint32_t)bootBanner);
+    set_env(envBootPrompt,(uint32_t)bootPrompt);
+    set_env(envBootRescanPrompt,(uint32_t)bootRescanPrompt);
 }

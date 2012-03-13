@@ -1,7 +1,7 @@
 /*
  *  platform_env.c
  * 
- * Copyright 2010,2011 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright 2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
  */
 
 #include "libsaio.h"
@@ -404,6 +404,17 @@ void scan_platform(void)
 #ifdef ShowCurrentDate
 
 // shamefully ripped to http://wiki.osdev.org/CMOS
+
+/*
+ * http://wiki.osdev.org/OSDev_Wiki:General_disclaimer
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 #define CURRENT_YEAR        2012                            // Change this each year!
 
