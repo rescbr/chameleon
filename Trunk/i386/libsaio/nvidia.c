@@ -1274,7 +1274,8 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 	// Workaround for 9600M GT, GT 210/420/430/440 & GT 525M
 	switch (nvda_dev->device_id)
 	{
-		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
+		case 0x0647: vram_size = 512*1024*1024; break;	// 9600M GT 0647
+		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT 0649
 		case 0x0A65: vram_size = 1024*1024*1024; break; // GT 210
 		case 0x0DE0: vram_size = 1024*1024*1024; break; // GT 440
 		case 0x0DE1: vram_size = 1024*1024*1024; break; // GT 430

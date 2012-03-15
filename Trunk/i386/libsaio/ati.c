@@ -119,9 +119,9 @@ typedef struct {
 static card_config_t card_configs[] = {
 	{NULL,			0},
 	{"Alopias",		2},
-	{"Alouatta",	4},
+	{"Alouatta",		4},
 	{"Baboon",		3},
-	{"Cardinal",	2},
+	{"Cardinal",		2},
 	{"Caretta",		1},
 	{"Colobus",		2},
 	{"Douc",		2},
@@ -130,17 +130,17 @@ static card_config_t card_configs[] = {
 	{"Galago",		2},
 	{"Gliff",		3},
 	{"Hoolock",		3},
-	{"Hypoprion",	2},
+	{"Hypoprion",		2},
 	{"Iago",		2},
 	{"Kakapo",		3},
 	{"Kipunji",		4},
 	{"Lamna",		2},
 	{"Langur",		3},
-	{"Megalodon",	3},
+	{"Megalodon",		3},
 	{"Motmot",		2},
-	{"Nomascus",	5},
-	{"Orangutan",	2},
-	{"Peregrine",	2},
+	{"Nomascus",		5},
+	{"Orangutan",		2},
+	{"Peregrine",		2},
 	{"Quail",		3},
 	{"Raven",		3},
 	{"Shrike",		3},
@@ -149,19 +149,19 @@ static card_config_t card_configs[] = {
 	{"Uakari",		4},
 	{"Vervet",		4},
 	{"Zonalis",		6},
-	{"Pithecia",	3},
-	{"Bulrushes",	6},
+	{"Pithecia",		3},
+	{"Bulrushes",		6},
 	{"Cattail",		4},
-	{"Hydrilla",	5},
-	{"Duckweed",	4},
+	{"Hydrilla",		5},
+	{"Duckweed",		4},
 	{"Fanwort",		4},
 	{"Elodea",		5},
 	{"Kudzu",		2},
 	{"Gibba",		5},
 	{"Lotus",		3},
 	{"Ipomoea",		3},
-	{"Mangabey",	2},
-	{"Muskgrass",	4},
+	{"Mangabey",		2},
+	{"Muskgrass",		4},
 	{"Juncus",		4}
 };
 
@@ -563,14 +563,14 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x67391002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	{ 0x6739,	0xE177174B, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 
-	{ 0x6740,	0x04A31028, CHIP_FAMILY_TURKS,		"Dell HD 6770M",                    kNull		}, // ??
+	{ 0x6740,	0x04A31028, CHIP_FAMILY_TURKS,		"Dell HD 6770M",                    		kNull		}, // ??
 	{ 0x6740,	0x1D121043, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6730M",				kNull		},
 	{ 0x6740,	0x1631103C, CHIP_FAMILY_TURKS,		"AMD FirePro M5950",				kNull		},
 	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	{ 0x6740,	0x165A103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	{ 0x6740,	0x3388103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
-	{ 0x6740,	0x3389103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull       }, // ?? kHydrilla ??
-	{ 0x6740,	0x6740106B, CHIP_FAMILY_TURKS,		"Apple HD 6770M",                   kNull		}, // ??
+	{ 0x6740,	0x3389103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		}, // ?? kHydrilla ??
+	{ 0x6740,	0x6740106B, CHIP_FAMILY_TURKS,		"Apple HD 6770M",				kNull		}, // ??
 
 	{ 0x6741,	0x050E1025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
 	{ 0x6741,	0x05131025, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6650M",				kNull		},
