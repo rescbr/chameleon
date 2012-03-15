@@ -115,9 +115,6 @@ static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
 
 static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
-// temporary placement
-	// { 0x10DE0DF4, "GeForce GT 450M" }, //Azi + issue #99
-	// { 0x10DE1251, "GeForce GTX 560M" }, // Asus G74SX
 //========================================
 	// 0040 - 004F	
 	{ 0x10DE0040, "GeForce 6800 Ultra" },
@@ -293,6 +290,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0325, "GeForce FX Go5250" },
 	{ 0x10DE0326, "GeForce FX 5500" },
 	{ 0x10DE0328, "GeForce FX Go5200 32M/64M" },
+	{ 0x10DE0329, "GeForce FX Go5200" }, //
 	{ 0x10DE032A, "Quadro NVS 55/280 PCI" },
 	{ 0x10DE032B, "Quadro FX 500/600 PCI" },
 	{ 0x10DE032C, "GeForce FX Go53xx Series" },
@@ -593,12 +591,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE084F, "GeForce 8100 / nForce 720a" },
 	// 0850 - 085F
 	// 0860 - 086F	
-	{ 0x10DE0860, "GeForce 9400" },
+	{ 0x10DE0860, "GeForce 9300" }, //
 	{ 0x10DE0861, "GeForce 9400" },
 	{ 0x10DE0862, "GeForce 9400M G" },
 	{ 0x10DE0863, "GeForce 9400M" },
 	{ 0x10DE0864, "GeForce 9300" },
-	{ 0x10DE0865, "ION" },
+	{ 0x10DE0865, "GeForce 9300" }, //
 	{ 0x10DE0866, "GeForce 9400M G" },
 	{ 0x10DE0867, "GeForce 9400" },
 	{ 0x10DE0868, "nForce 760i SLI" },
@@ -614,7 +612,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0872, "GeForce G102M" },
 	{ 0x10DE0873, "GeForce G102M" },
 	{ 0x10DE0874, "ION 9300M" },	
-	{ 0x10DE0876, "ION" },
+	{ 0x10DE0876, "GeForce 9400M" }, //
 	{ 0x10DE087A, "GeForce 9400" },
 	{ 0x10DE087D, "ION 9400M" },
 	{ 0x10DE087E, "ION LE" },
@@ -648,7 +646,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0A00 - 0A0F
 	// 0A10 - 0A1F
 	// 0A20 - 0A2F
-	{ 0x10DE0A20, "GeForce GT220" },
+	{ 0x10DE0A20, "GeForce GT 220" }, // subsystem 10de:0a20:1043:8311
 	{ 0x10DE0A22, "GeForce 315" },
 	{ 0x10DE0A23, "GeForce 210" },
 	{ 0x10DE0A26, "GeForce 405" },
@@ -671,13 +669,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A62, "GeForce 205" },
 	{ 0x10DE0A63, "GeForce 310" },
 	{ 0x10DE0A64, "ION" },
-	{ 0x10DE0A65, "GeForce 210" },
+	{ 0x10DE0A65, "GeForce 210" }, // subsystem 10de:0a65:1043:8334
 	{ 0x10DE0A66, "GeForce 310" },
 	{ 0x10DE0A67, "GeForce 315" },
 	{ 0x10DE0A68, "GeForce G105M" },
 	{ 0x10DE0A69, "GeForce G105M" },
 	{ 0x10DE0A6A, "NVS 2100M" },
-	{ 0x10DE0A6C, "NVS 3100M" },
+	{ 0x10DE0A6C, "NVS 3100M" }, // subsystem 10de:0a6c:1028:040b & 10de:0a6c:17aa:2142
 	{ 0x10DE0A6E, "GeForce 305M" },
 	{ 0x10DE0A6F, "ION" },	
 	// 0A70 - 0A7F
@@ -767,7 +765,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DCD, "GeForce GT 555M" },
 	{ 0x10DE0DCE, "GeForce GT 555M" },
 	// 0DD0 - 0DDF	
-	{ 0x10DE0DD1, "GeForce GTX 460M" },
+	{ 0x10DE0DD1, "GeForce GTX 460M" }, // subsystem 10de:0dd1:1558:8687
 	{ 0x10DE0DD2, "GeForce GT 445M" },
 	{ 0x10DE0DD3, "GeForce GT 435M" },
 	{ 0x10DE0DD6, "GeForce GT 550M" },
@@ -777,9 +775,10 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DDF, "GF106-INT" },
 	// 0DE0 - 0DEF	
 	{ 0x10DE0DE0, "GeForce GT 440" },
-	{ 0x10DE0DE1, "GeForce GT 430" },
+	{ 0x10DE0DE1, "GeForce GT 430" }, // subsystem 10de:0de1:3842:1430
 	{ 0x10DE0DE2, "GeForce GT 420" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
+	{ 0x10DE0DE9, "GeForce GT 600M" }, //
 	{ 0x10DE0DEB, "GeForce GT 555M" },
 	{ 0x10DE0DEC, "GeForce GT 525M" },
 	{ 0x10DE0DED, "GeForce GT 520M" },
@@ -801,7 +800,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0E10 - 0E1F
 	// 0E20 - 0E2F
 	{ 0x10DE0E21, "D12U-25" },
-	{ 0x10DE0E22, "GeForce GTX 460" },
+	{ 0x10DE0E22, "GeForce GTX 460" }, // subsystem 10de:0e22:1462:2322
 	{ 0x10DE0E23, "GeForce GTX 460 SE" },
 	{ 0x10DE0E24, "GeForce GTX 460" },
 	{ 0x10DE0E25, "D12U-50" },
@@ -858,7 +857,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE107F, "NVIDIA GF119-ES" },
 	// 1080 - 108F
 	{ 0x10DE1080, "GeForce GTX 580" },
-	{ 0x10DE1081, "GeForce GTX 570" },
+	{ 0x10DE1081, "GeForce GTX 570" }, // subsystem 10de:1081:10de:087e
 	{ 0x10DE1082, "GeForce GTX 560 Ti" },
 	{ 0x10DE1083, "D13U" },
 	{ 0x10DE1084, "GeForce GTX 560" },
@@ -869,6 +868,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE108B, "GeForce GTX 590" },
 	// 1090 - 109F	
 	{ 0x10DE1091, "Tesla M2090" },
+	{ 0x10DE1094, "Tesla M2075 Dual-Slot Computing Processor Module" }, // 
+	{ 0x10DE1096, "Tesla C2075" }, //
 	{ 0x10DE1098, "D13U" },
 	{ 0x10DE109A, "Quadro 5010M" },
 	{ 0x10DE109B, "Quadro 7000" },
@@ -883,6 +884,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1201, "GeForce GTX 560" },
+	{ 0x10DE1205, "GeForce GTX 460 v2" }, // GF114
 	{ 0x10DE1241, "GeForce GT 545" },
 	{ 0x10DE1243, "GeForce GT 545" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
