@@ -838,6 +838,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0FB0 - 0FBF
 	// 0FC0 - 0FCF
 	// 0FD0 - 0FDF
+	{ 0x10DE0FD2, "GeForce GT 640M" },
 	// 0FE0 - 0FEF
 	// 0FF0 - 0FFF
 	// 1000 - 100F
