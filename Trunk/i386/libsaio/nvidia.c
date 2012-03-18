@@ -886,6 +886,11 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1201, "GeForce GTX 560" },
 	{ 0x10DE1205, "GeForce GTX 460 v2" }, // GF114
+	{ 0x10DE1208, "GeForce GTX 560 SE" }, //
+	{ 0x10DE1210, "GeForce GTX 570M" }, //
+	{ 0x10DE1211, "GeForce GTX 580M" }, //
+	{ 0x10DE1212, "GeForce GTX 675M" }, //
+	{ 0x10DE1213, "GeForce GTX 670M" }, //
 	{ 0x10DE1241, "GeForce GT 545" },
 	{ 0x10DE1243, "GeForce GT 545" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },

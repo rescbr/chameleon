@@ -62,9 +62,11 @@ typedef enum {
 	CHIP_FAMILY_TURKS,
 	/* Southern Islands */
 	CHIP_FAMILY_TAHITI,
-//	CHIP_FAMILY_THAMES
-//	CHIP_FAMILY_LOMBOK
-//	CHIP_FAMILY_NEW_ZEALAND
+    CHIP_FAMILY_PITCAIRN,
+    CHIP_FAMILY_CAPEVERDE,
+//	CHIP_FAMILY_THAMES,
+//	CHIP_FAMILY_LOMBOK,
+//	CHIP_FAMILY_NEWZEALAND,
 	CHIP_FAMILY_LAST
 } chip_family_t;
 
@@ -105,9 +107,11 @@ static const char *chip_family_name[] = {
 	"Turks",
 	/* Southern Islands */
 	"Tahiti",
-//	"Thames"
-//	"Lombok"
-//	"New_Zealand"
+    "Pitcairn",
+    "CapeVerde",
+//	"Thames",
+//	"Lombok",
+//	"NewZealand",
 	""
 };
 
@@ -533,13 +537,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0xE153174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 
 	/* Northen Islands */
-	{ 0x6718,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-	{ 0x6718,	0x20101458, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		}, //
-	{ 0x6718,	0x22001458, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		}, //
-	{ 0x6718,	0x23061787, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		}, //
-	{ 0x6718,	0x23701462, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		}, //
-	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
+	{ 0x6718,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		},
+	{ 0x6718,	0x20101458, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		}, //
+	{ 0x6718,	0x22001458, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		}, //
+	{ 0x6718,	0x23061787, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		}, //
+	{ 0x6718,	0x23701462, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		}, //
+	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		},
+	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kGibba		},
 
 	{ 0x6719,	0x03D41043, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6950",				kNull		}, //
 	{ 0x6719,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6950",				kGibba		},
@@ -649,6 +653,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6798,	0x32111682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",               kNull		}, //
 	{ 0x6798,	0x32121682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",               kNull		}, //
 	{ 0x6798,	0x32131682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",               kNull		}, //
+
+	{ 0x679A,	0x0B001002, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
+	{ 0x679A,	0x23161787, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
+	{ 0x679A,	0x254C1458, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
+	{ 0x679A,	0x27601462, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
+	{ 0x679A,	0x32211682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
+	{ 0x679A,	0xE207174B, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",               kNull		}, //
 
 	/* standard/default models */
 	{ 0x9400,	0x00000000, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",			kNull		},
@@ -782,6 +793,8 @@ static radeon_card_info_t radeon_cards[] = {
 	/* Southen Islands */
 
 	{ 0x6798,	0x00000000, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970 Series",			kNull		},
+
+	{ 0x679A,	0x00000000, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950 Series",            kNull		}, //
 
 	{ 0x0000,	0x00000000, CHIP_FAMILY_UNKNOW,		NULL,						kNull		}
 };
