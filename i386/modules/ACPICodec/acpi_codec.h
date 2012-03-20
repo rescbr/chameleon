@@ -47,7 +47,7 @@
 #define kCoreTurbo			"EnableTurbo"		/* acpi_codec.c */
 
 #define kUpdateACPI			"UpdateACPI"	    /* acpi_codec.c */
-#define kUnsafeACPI			"UnsafeACPI"		/* acpi_codec.c */ //desactive some safe checks that may stop the boot process on some configurations( temporary option )  
+//#define kUnsafeACPI			"UnsafeACPI"		/* acpi_codec.c */ // DEPRECATED, replaced by nacpi=0x2000  
 
 #define kOnlySignedAml		"LoadSignedAmlOnly"	    /* acpi_codec.c */
 

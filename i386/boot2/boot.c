@@ -695,7 +695,7 @@ void common_boot(int biosdev)
                     if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
                     {
                         trycache = 0;
-                        bootInfo->adler32  = 0;
+                        safe_set_env(envAdler32, 0);
                         DBG("No kernel found, kernelcache disabled !!!\n");
                         break;
                     }
@@ -711,7 +711,7 @@ void common_boot(int biosdev)
 					|| (cachetime < kerneltime))
 				{
 					trycache = 0;
-					bootInfo->adler32  = 0;
+					safe_set_env(envAdler32, 0);
 					DBG("Warning: No kernelcache found or kernelcache too old (timestamp of the kernel > timestamp of the cache), kernelcache disabled !!!\n");
 
 					break;				                
@@ -721,7 +721,7 @@ void common_boot(int biosdev)
 					&& (cachetime < exttime))
 				{
 					trycache = 0;
-					bootInfo->adler32  = 0;
+					safe_set_env(envAdler32, 0);
 					DBG("Warning: kernelcache too old, timestamp of S/L/E > timestamp of the cache, kernelcache disabled !!! \n");
 
 					break;
@@ -733,7 +733,7 @@ void common_boot(int biosdev)
 				if (cachetime != (exttime + 1))
 				{
 					trycache = 0;
-					bootInfo->adler32  = 0;
+					safe_set_env(envAdler32, 0);
 					DBG("Warning: invalid timestamp, kernelcache disabled !!!\n");
 
 					break;
@@ -767,7 +767,7 @@ void common_boot(int biosdev)
                 }
 				
             }
-			bootInfo->adler32  = 0;
+			safe_set_env(envAdler32, 0);
             bootFile = bootInfo->bootFile;
 #ifdef BOOT_HELPER_SUPPORT
 			
@@ -878,6 +878,7 @@ void getKernelCachePath(void)
 	{
 		const char    *val;
 		int            len;
+		unsigned long    Adler32 = 0;
 		
 		if (getValueForKey(kKernelCacheKey, &val, &len, DEFAULT_BOOT_CONFIG))
 		{
@@ -949,7 +950,8 @@ void getKernelCachePath(void)
                     SetgRootPath(platformInfo->rootPath);
 #endif
 					
-					bootInfo->adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
+					Adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
+					safe_set_env(envAdler32, Adler32);
 					
 					free(platformInfo);	
 				}
@@ -960,16 +962,20 @@ void getKernelCachePath(void)
 				{
 					long flags, cachetime;
 					int ret = -1;
-					sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",bootInfo->adler32);
-					ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
+					
+					if (Adler32) {
+						sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",Adler32);
+						ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
+					}
+					
 					if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
 					{
-						bootInfo->adler32 = 0;
+						safe_set_env(envAdler32, 0);
 						sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache"); 
 					}
 					
-				} else
-					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", bootInfo->adler32); //Snow Leopard
+				} else if (Adler32)
+					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", Adler32); //Snow Leopard
 				
 			}	
 		}

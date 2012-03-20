@@ -138,7 +138,7 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 
 int main (int argc, const char * argv[]) {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
+    
     mach_port_t                  masterPort;
 	
 	io_registry_entry_t         entry,entry2;
@@ -151,19 +151,13 @@ int main (int argc, const char * argv[]) {
 	
 	const UInt8*                  rawdata = NULL;
 	
-	UInt32 uuid32 = 0;
-	UInt32 Model32 = 0;
-	const char *cfilename ;
+	unsigned long uuid32 = 0,Model32 = 0 ;
 	NSString *filename, *fullfilename ;
 	NSArray *namechunks;
 	NSMutableArray *chunks;	
-	char * input, *output, dirspec[512];
 	NSString *outStr, *inStr;
-
-	if (argc > 3 || argc < 2) {
-		printf("Usage: amlsgn input(as a file) output(as a directory)\n");
-		return 1;
-    } else if (argc == 2) {	
+    
+	if (argc == 2) {	
 		
 		/* Creating output string */
 		inStr = [NSString stringWithUTF8String:argv[1]];
@@ -173,40 +167,48 @@ int main (int argc, const char * argv[]) {
 		fullfilename = [chunks lastObject];
 		namechunks = [fullfilename componentsSeparatedByString: @"."];
 		filename = [namechunks objectAtIndex:0];
-		cfilename = [filename UTF8String];
 		
 		[chunks removeLastObject];
 		outStr = [chunks componentsJoinedByString: @"/"];
-
-	} else {
+        
+	} else if (argc == 3 ){
 		inStr = [NSString stringWithUTF8String:argv[1]];
 		BOOL isDirectory= FALSE;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:outStr isDirectory:&isDirectory]) {
-			
-			if (isDirectory == FALSE) {
-				chunks = [[NSMutableArray alloc] init];
-				[chunks addObjectsFromArray:[inStr componentsSeparatedByString: @"/"]];
-				
-				[chunks removeLastObject];
-				outStr = [chunks componentsJoinedByString: @"/"];
-			} else {
-				outStr = [NSString stringWithUTF8String:argv[2]];
-
-			}			
+        
+        chunks = [[NSMutableArray alloc] init];
+        [chunks addObjectsFromArray:[inStr componentsSeparatedByString: @"/"]];
+        fullfilename = [chunks lastObject];
+        namechunks = [fullfilename componentsSeparatedByString: @"."];
+        filename = [namechunks objectAtIndex:0];
+        
+		if ([[NSFileManager defaultManager] fileExistsAtPath:[NSString stringWithUTF8String:argv[2]] isDirectory:&isDirectory] && isDirectory) {            
+            
+            outStr = [NSString stringWithUTF8String:argv[2]];	
+            
 		} 
-
+        else 
+        {            
+            [chunks removeLastObject];
+            outStr = [chunks componentsJoinedByString: @"/"];            
+        }
+        
 	}
+    else
+    {
+		printf("Usage: amlsgn input(as a file) output(as a directory)\n");
+		goto out;
+    } 
 	
 	do {
 		BOOL isDirectory= FALSE;
 		if ([[NSFileManager defaultManager] fileExistsAtPath:outStr isDirectory:&isDirectory] && isDirectory) {
-		
+            
 			if ([[NSFileManager defaultManager] isWritableFileAtPath:outStr])
 				break;
 		}
 		
 		outStr = [NSHomeDirectory() stringByAppendingPathComponent:  @"Desktop"];
-
+        
 	} while (0);
 	
 	
@@ -215,7 +217,7 @@ int main (int argc, const char * argv[]) {
 	if (err == KERN_SUCCESS){		
 		
 		entry2=IORegistryEntryFromPath(masterPort, [@"IODeviceTree:/efi" UTF8String]);
-
+        
 		if (entry2!=MACH_PORT_NULL) {			
 			
 			data = IORegistryEntrySearchCFProperty( entry2, kIOServicePlane, CFSTR("motherboard-name"), allocator, kIORegistryIterateRecursively);
@@ -231,62 +233,39 @@ int main (int argc, const char * argv[]) {
 				{
 					Model32 = OSSwapHostToBigInt32(adler32( (unsigned char *) ModelStr, len ));
 					
-					printf("uuid32 0x%lu uuidStr %s\n",(unsigned long)Model32,ModelStr);
+					printf("Model32 0x%lx ModelStr %s\n",Model32,ModelStr);
 					
-					UInt8 mem[1024*1024];
-					
-					bzero(mem, sizeof(mem));					
-					
-					int fdIn = open([inStr UTF8String], O_RDONLY, 0666);
-					
-					if (-1 == fdIn) {
-						printf("Error while opening the file \n");
-						return 1;
-					}
-					
-					size_t nbRead = read(fdIn, (void*)mem, sizeof(mem));
-					if (nbRead <= 0) {
-						printf("Error: Unable to read the file\n");		
-						close(fdIn);
-						return 1;        
-					}
-					
-					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)mem;
-					
-					close(fdIn);
+                    NSMutableData * mem = [[NSMutableData alloc] initWithContentsOfFile : inStr  ];
+					if (!mem) {
+                        NSLog(@"Error while opening the file : %@ \n",inStr);
+                        goto out;
+                    }
+					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)[mem mutableBytes];
 					
 					head->OemRevision = Model32;
 					
 					SetChecksum(head);
 					
-					{		
-						char dir[1024];
-						
-						sprintf(dir,"%s/%s.%s.aml",[outStr UTF8String],cfilename,ModelStr);
-
-						int fdOut = open(dir, O_WRONLY | O_CREAT, 0666);
-						
-						if (-1 == fdOut) {
-							printf("Error: Can't save the file\n");
-							return 1;
-						}
-						write(fdOut, mem, head->Length);
-						
-						close(fdOut);
-					}
+                    if ([mem writeToFile : [NSString stringWithFormat:@"%@/%@.%@.aml",
+                                            outStr, filename, [NSString stringWithUTF8String:ModelStr]] atomically: YES] == NO) {
+                        
+                        NSLog(@"Error: Can't save the file to %@\n",[NSString stringWithFormat:@"%@/%@.%@.aml",
+                                                                     outStr, filename, [NSString stringWithUTF8String:ModelStr]]);                        
+                        
+                    }
+                    
+                    [mem release];					
 				}				
-				
-				IOObjectRelease(entry2);
 				
 				goto out;
 			}			
 			
 		} 		
 		
-		printf("No Model entry \n");
-			
+		NSLog(@"No Model entry \n");
+        
 		entry=IORegistryEntryFromPath(masterPort, [@"IODeviceTree:/efi/platform" UTF8String]);
-
+        
 		if (entry!=MACH_PORT_NULL){		
 			
 			
@@ -302,62 +281,48 @@ int main (int argc, const char * argv[]) {
 				{
 					uuid32 = OSSwapHostToBigInt32(adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
 					
-					printf("uuid32  : 0x%lu\n",(unsigned long)uuid32);
+					printf("uuid32  : 0x%lx\n",uuid32);
 					printf("uuidStr : %s\n",uuidStr);
-
-					UInt8 mem[1024*1024];
-					
-					bzero(mem, sizeof(mem));
-					
-					int fdIn = open([inStr UTF8String], O_RDONLY, 0666);
-					
-					if (-1 == fdIn) {
-						printf("Error while opening the file \n");
-						return 1;
-					}
-					
-					size_t nbRead = read(fdIn, (void*)mem, sizeof(mem));
-					if (nbRead <= 0) {
-						printf("Error: Unable to read the file\n");		
-						close(fdIn);
-						return 1;        
-					}
-					
-					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)mem;
-					
-					close(fdIn);
-					
+                    
+					NSMutableData * mem = [[NSMutableData alloc] initWithContentsOfFile : inStr  ];
+					if (!mem) {
+                        NSLog(@"Error while opening the file : %@\n",inStr);
+                        goto out;
+                    }
+					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)[mem mutableBytes];
+                    
 					head->OemRevision = uuid32;
 					
 					SetChecksum(head);
 					
-					{		
-						char dir[1024];
-						
-						sprintf(dir,"%s/%s.%lu.aml",[outStr UTF8String],cfilename,(unsigned long)uuid32);
-						
-						int fdOut = open(dir, O_WRONLY | O_CREAT, 0666);
-						
-						if (-1 == fdOut) {
-							printf("Error: Can't save the file\n");
-							return 1;
-						}
-						write(fdOut, mem, head->Length);
-						
-						close(fdOut);
-					}
-				}
-				
-				IOObjectRelease(entry);
+                    if ([mem writeToFile : [NSString stringWithFormat:@"%@/%@.%@.aml",outStr,filename,[NSNumber numberWithUnsignedLong:uuid32]] atomically: YES] == NO) {
+                        
+                        NSLog(@"Error: Can't save the file to %@ \n", [NSString stringWithFormat:@"%@/%@.%@.aml",outStr,filename,[NSNumber numberWithUnsignedLong:uuid32]]);                        
+                        
+                    }
+                    [mem release]; 				
+				}				
 				
 				goto out;
-
+                
 			}			
 		}
-		printf("No UUID entry\n");
-
+		NSLog(@"No UUID entry\n");
+        
 	}
-out:
+	out:
+    if (chunks != NULL) {
+        [chunks release];
+    }
+    if (data != NULL) {
+        CFRelease(data);
+    }
+    if (entry != MACH_PORT_NULL) {
+        IOObjectRelease(entry);
+    }
+    if (entry2 != MACH_PORT_NULL) {
+        IOObjectRelease(entry2);
+    }
     [pool drain];
     return 0;
 }

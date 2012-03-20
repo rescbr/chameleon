@@ -25,7 +25,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+#include "libsaio.h"
+#include "bootstruct.h"
 #include "datatype.h"
 #include "intel_acpi.h"
 #include "ppm.h"
@@ -88,7 +89,7 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
     // Init memory address as F000 segment and scan 64KB region
     if (!success)
         success = GetRsdtPointer((void *)0x0F0000, 0x10000, acpi_tables);
-
+	
     if (!success)
         return (0ul);
     
@@ -129,7 +130,7 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
 		if (*(U32*) (FacsPointer64->Signature) == NAMESEG("FACS"))
 			acpi_tables->FacsPointer64 = (ACPI_TABLE_FACS *) FacsPointer64;
 	}    
-     
+	
     // Find the MADT table which is one of the table pointers in the RSDT
     acpi_tables->MadtPointer = (ACPI_TABLE_MADT *) GetTablePtr(acpi_tables->RsdtPointer, NAMESEG("APIC"));
     if (acpi_tables->MadtPointer == 0ul)
@@ -137,7 +138,7 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
 	
 	// Find the MADT(64) table which is one of the table pointers in the XSDT
     acpi_tables->MadtPointer64 = (ACPI_TABLE_MADT *) GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("APIC"));
-        
+	
     return (1ul);
 }
 
@@ -191,47 +192,49 @@ static ACPI_TABLE_HEADER *GetTablePtr(ACPI_TABLE_RSDT * rsdt, U32 signature)
 // Procedure:    GetTablePtr64 - Find ACPI table in XSDT with input signature.
 //
 //-------------------------------------------------------------------------------
-#if 0
 static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 {
     U32 index;
     U32 num_tables;
-    ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;
 	
-    // Compute number of table pointers included in XSDT
+	int method;
+	
+	// Compute number of table pointers included in XSDT
     num_tables = get_num_tables64(xsdt);
 	
-    for (index = 0; index < num_tables; index++) {
-        if (((U32) (table->Signature) == signature) &&
-            (GetChecksum(table, table->Length) == 0)) {
-            return (table);
-        }
-        // Move array pointer to next 64-bit pointer
-        table = (ACPI_TABLE_HEADER *) ((U32) table + sizeof(U64));
-    }
+	getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+	switch (method) {
+		case 0x2000:
+		{
+			for (index = 0; index < num_tables; index++) {
+				U64 ptr = xsdt->TableOffsetEntry[index];
+				
+				if ((*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == signature) &&
+					(GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) == 0)) {
+					return (((ACPI_TABLE_HEADER *) (unsigned long)ptr));
+				}        
+			}
+			break;
+		}
+		case 0x1000:			
+		default:
+		{
+			ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;		
+			
+			for (index = 0; index < num_tables; index++) {
+				if (((U32) (table->Signature) == signature) &&
+					(GetChecksum(table, table->Length) == 0)) {
+					return (table);
+				}
+				// Move array pointer to next 64-bit pointer
+				table = (ACPI_TABLE_HEADER *) ((U32) table + sizeof(U64));
+			}
+			break;
+		}
+	}		
+    
     return (0);
 }
-#else
-static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
-{
-    U32 index;
-    U32 num_tables;
-    
-    // Compute number of table pointers included in XSDT
-    num_tables = get_num_tables64(xsdt);
-    
-    for (index = 0; index < num_tables; index++) {
-		U64 ptr = xsdt->TableOffsetEntry[index];
-		
-        if ((*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == signature) &&
-            (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) == 0)) {
-            return (((ACPI_TABLE_HEADER *) (unsigned long)ptr));
-        }        
-    }
-    return (0);
-}
-#endif
-
 
 //-------------------------------------------------------------------------------
 //

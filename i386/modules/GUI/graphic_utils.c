@@ -10,7 +10,7 @@
 #include "vbe.h"
 #include "gui.h"
 
-#define VIDEO(x) (bootArgs->Video.v_ ## x)
+#define VIDEO(x) (((boot_args_common*)getBootArgs())->Video.v_ ## x)
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 static unsigned long lookUpCLUTIndex( unsigned char index,
@@ -640,12 +640,17 @@ setVESATextMode( unsigned short cols,
     // Update KernBootStruct using info provided by the selected
     // VESA mode.
 	
-    bootArgs->Video.v_display  = VGA_TEXT_MODE;
-    bootArgs->Video.v_baseAddr = 0xb8000;
-    bootArgs->Video.v_width    = minfo.XResolution;
-    bootArgs->Video.v_height   = minfo.YResolution;
-    bootArgs->Video.v_depth    = 8;
-    bootArgs->Video.v_rowBytes = 0x8000;
+    Boot_Video	Video;		/* Video Information */
+    
+    
+    Video.v_display  = VGA_TEXT_MODE;
+    Video.v_width    = 0xb8000;
+    Video.v_height   = minfo.XResolution;
+    Video.v_depth    = minfo.YResolution;
+    Video.v_rowBytes = 8;
+    Video.v_baseAddr = 0x8000;    
+    
+    setBootArgsVideoStruct(&Video); 
 	
     return errSuccess;  // always return success
 }
@@ -808,13 +813,18 @@ int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned c
         // Update KernBootStruct using info provided by the selected
         // VESA mode.
 		
-        setBootArgsVideoMode(GRAPHICS_MODE);
+        Boot_Video	Video;		/* Video Information */
+		
         
-        bootArgs->Video.v_width    = minfo.XResolution;
-        bootArgs->Video.v_height   = minfo.YResolution;
-        bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-        bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-        bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+        Video.v_display  = GRAPHICS_MODE;
+        Video.v_width    = minfo.XResolution;
+        Video.v_height   = minfo.YResolution;
+        Video.v_depth    = minfo.BitsPerPixel;
+        Video.v_rowBytes = minfo.BytesPerScanline;
+        Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+        
+        
+		setBootArgsVideoStruct(&Video);
 		
     }
     while ( 0 );

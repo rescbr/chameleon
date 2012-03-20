@@ -128,7 +128,7 @@ static bool is_image_loaded(int i);
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif
 
-#define VIDEO(x) (bootArgs->Video.v_ ## x)
+#define VIDEO(x) (((boot_args_common*)getBootArgs())->Video.v_ ## x)
 
 #define vram VIDEO(baseAddr)
 
@@ -2566,7 +2566,7 @@ void drawBootGraphics(void)
 	getGraphicModeParams(screen_params);
 	
     // Set graphics mode if the booter was in text mode or the screen resolution has changed.
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE
+	if (getVideoMode() == VGA_TEXT_MODE
 		|| (screen_params[0] != (uint32_t)oldScreenWidth && screen_params[1] != (uint32_t)oldScreenHeight) )
 	{
 #if UNUSED
@@ -2654,7 +2654,7 @@ int GUI_countdown( const char * msg, int row, int timeout , int *optionKey)
 	
     flushKeyboardBuffer();
 	
-	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+	if( getVideoMode() == VGA_TEXT_MODE )
 	{
 		moveCursor( 0, row );
 		printf(msg);
@@ -2705,14 +2705,14 @@ int GUI_countdown( const char * msg, int row, int timeout , int *optionKey)
             time += 18;
             timeout--;
 			
-			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+			if( getVideoMode() == VGA_TEXT_MODE )
 			{
 				moveCursor( col, row );
 				printf("(%d) ", timeout);
 			}
         }
 		
-		if( bootArgs->Video.v_display == GRAPHICS_MODE )
+		if( getVideoMode() == GRAPHICS_MODE )
 		{
 			drawProgressBar( gui.screen.pixmap, 100, gui.progressbar.pos , ( multi * 100 / multi_buff ) );
 			gui.redraw = true;

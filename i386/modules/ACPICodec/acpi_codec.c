@@ -367,10 +367,11 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			print_nameseg(*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature);
 			printf("\n");			
 #endif					
-			bool unsafe = false;
-			getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
+			int method = 0;
+			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 			
-			if (!unsafe)
+			
+			if (method != 0x2000)
 			{
 				if (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), 
 								((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) != 0)
@@ -473,10 +474,11 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
             print_nameseg(*(U32*) (table_array[index]->Signature));
             printf("\n");			
 #endif			
-            bool unsafe = false;
-            getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
-            
-            if (!unsafe) 
+            int method = 0;
+			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+			
+			
+			if (method != 0x2000)
             {
                 if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
                 {
@@ -1424,7 +1426,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
 						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
+						DBG("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
 						
 						// Sanity check
 						if (maximum.Control < minimum.Control) 
@@ -4296,10 +4298,11 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 					continue;	
 				}
 				
-				bool unsafe = false;
-				getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
+				int method = 0;
+				getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 				
-				if (!unsafe) 
+				
+				if (method != 0x2000)
 				{
 					if (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), 
 									((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) != 0)
@@ -4314,7 +4317,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 			}
 			
 			xsdt_mod->TableOffsetEntry[index-dropoffset]=ptr;
-								
+			
             char * tableSig = newStringWithLength((char*)((U32)ptr), 4);
             
 			DBG("** Processing %s,", tableSig );
@@ -4463,12 +4466,13 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	for (index = 0; index < num_tables; index++)
 	{
         
-		{		
+		{			
 			
-			bool unsafe = false;
-			getBoolForKey(kUnsafeACPI, &unsafe, DEFAULT_BOOT_CONFIG);
+			int method = 0;
+			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 			
-			if (!unsafe)
+			
+			if (method != 0x2000)
 			{
 				if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
 				{
@@ -4618,7 +4622,7 @@ EFI_STATUS setupAcpi(void)
 	bool gen_ssdt=false; // will force to generate ssdt even if gen_csta and gen_psta = false
     bool gen_tsta=false;
 	bool oem_dsdt=false, oem_fadt=false;
-	    		
+	
 	// Find original rsdp        
 	if (!FindAcpiTables(&acpi_tables))
 	{

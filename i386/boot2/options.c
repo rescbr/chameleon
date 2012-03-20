@@ -127,11 +127,11 @@ static int countdown( const char * msg, int row, int timeout, int *optionKey )
 	
 	moveCursor( 0, row );
 	printf("%s",msg);
-
+	
     for ( time = time18(), timeout++; timeout > 0; )
     {
 		if ((ch = readKeyboardStatus())){
-                *optionKey = ch;            
+			*optionKey = ch;            
             break;
 		}
         // Count can be interrupted by holding down shift,
@@ -139,7 +139,7 @@ static int countdown( const char * msg, int row, int timeout, int *optionKey )
         if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
 		{
             ch = 1;
-
+			
             break;
         }
 		
@@ -155,7 +155,7 @@ static int countdown( const char * msg, int row, int timeout, int *optionKey )
 #endif
         }
     }
-   
+	
     flushKeyboardBuffer();
     
     return ch;
@@ -173,7 +173,7 @@ void clearBootArgs(void)
 {
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);    
-
+	
 }
 
 void addBootArg(const char * argStr)
@@ -192,7 +192,7 @@ static void showBootPrompt(int row, bool visible)
 {	
     char * bootPrompt = (char*)(uint32_t)get_env(envBootPrompt);
     char * bootRescanPrompt = (char*)(uint32_t)get_env(envBootRescanPrompt);
-
+	
 	changeCursor( 0, row, kCursorTypeUnderline, 0 );    
 	clearScreenRows( row, kScreenLastRow );
 	
@@ -343,7 +343,7 @@ static int updateMenu( int key, void ** paramPtr )
     int MenuBottom = (int)get_env(envgMenuBottom);
     int MenuStart = (int)get_env(envgMenuStart);
     int MenuEnd = (int)get_env(envgMenuEnd);
-
+	
     union {
         struct {
             unsigned int
@@ -397,12 +397,12 @@ static int updateMenu( int key, void ** paramPtr )
             MenuStart--; MenuEnd--;
             draw.f.selectionUp = 1;
         }        
-
+		
         if ( draw.f.selectionUp || draw.f.selectionDown )
         {
 			
 			CursorState cursorState;
-
+			
 			// Set cursor at current position, and clear inverse video.
 			changeCursor( 0, MenuRow + MenuSelection - MenuTop, kCursorTypeHidden, &cursorState );
 			printMenuItem( &gMenuItems[MenuSelection], 0 );
@@ -434,7 +434,7 @@ static int updateMenu( int key, void ** paramPtr )
         *paramPtr = gMenuItems[MenuSelection].param;        
         moved = 1;
     }
-        
+	
     safe_set_env(envgMenuSelection,MenuSelection);
     safe_set_env(envgMenuTop,MenuTop );
     safe_set_env(envgMenuRow,MenuRow);
@@ -442,7 +442,7 @@ static int updateMenu( int key, void ** paramPtr )
     safe_set_env(envgMenuBottom,MenuBottom);
     safe_set_env(envgMenuStart,MenuStart);
     safe_set_env(envgMenuEnd,MenuEnd);
-
+	
 	return moved;
 }
 
@@ -496,7 +496,7 @@ void printMemoryInfo(void)
 {
     int line;
     unsigned long i;
-    MemoryRange *mp = bootInfo->memoryMap;
+    MemoryRange *mp = (MemoryRange*)(uint32_t)get_env(envMemoryMap);
 	
     // Activate and clear page 1
     setActiveDisplayPage(1);
@@ -505,7 +505,9 @@ void printMemoryInfo(void)
 	
     printf("BIOS reported memory ranges:\n");
     line = 1;
-    for (i=0; i<bootInfo->memoryMapCount; i++) {
+	
+	int memoryMapCount = (int)get_env(envMemoryMapCnt);
+    for (i=0; i<memoryMapCount; i++) {
         printf("Base 0x%08x%08x, ",
                (unsigned long)(mp->base >> 32),
                (unsigned long)(mp->base));
@@ -529,13 +531,15 @@ void printMemoryInfo(void)
 char *getMemoryInfoString(void)
 {
     unsigned long i;
-    MemoryRange *mp = bootInfo->memoryMap;
+    MemoryRange *mp = (MemoryRange*)(uint32_t)get_env(envMemoryMap);
 	char *buff = malloc(sizeof(char)*1024);
 	if(!buff) return 0;
 	
 	char info[] = "BIOS reported memory ranges:\n";
 	sprintf(buff, "%s", info);
-    for (i=0; i<bootInfo->memoryMapCount; i++) {
+	int memoryMapCount = (int)get_env(envMemoryMapCnt);
+	
+    for (i=0; i<memoryMapCount; i++) {
         sprintf( buff+strlen(buff), "Base 0x%08x%08x, ",
 				(unsigned long)(mp->base >> 32),
 				(unsigned long)(mp->base));
@@ -582,7 +586,7 @@ int getBootOptions(bool firstRun)
 	BVRef   menuBVR;
 	bool    showPrompt, newShowPrompt, isCDROM;
     int     optionKey;
-
+	
 	// Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(getBvChain());
 	
@@ -623,7 +627,7 @@ int getBootOptions(bool firstRun)
 	if (timeout < 0) {
 		gBootMode |= kBootModeQuiet;
         safe_set_env(envgBootMode,gBootMode);
-
+		
 	}
 	
 	// If the user is holding down a modifier key, enter safe mode.
@@ -631,7 +635,7 @@ int getBootOptions(bool firstRun)
 		
 		gBootMode |= kBootModeSafe;
         safe_set_env(envgBootMode,gBootMode);
-
+		
 	}
 	
 	// Checking user pressed keys
@@ -646,7 +650,7 @@ int getBootOptions(bool firstRun)
 	if (f8press) {
 		gBootMode &= ~kBootModeQuiet;
         safe_set_env(envgBootMode,gBootMode);
-
+		
 		timeout = 0;
 	}
 	// If user typed 'v' or 'V', boot in verbose mode.
@@ -664,7 +668,7 @@ int getBootOptions(bool firstRun)
 		// Display banner and show hardware info.
         char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
         
-		printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);       
+		printf(bootBanner, (int)(get_env(envConvMem) + get_env(envExtMem)) / 1024);       
 	}
 	changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
 	msglog("Scanning device %x...", (uint32_t)get_env(envgBIOSDev));
@@ -713,7 +717,7 @@ int getBootOptions(bool firstRun)
         do {
             // Hit the option key ?
             if (key == optionKey) {
-
+				
                 if (key != 0x1C0D) {
                     gBootMode &= ~kBootModeQuiet;
                     safe_set_env(envgBootMode,gBootMode);
@@ -753,7 +757,7 @@ int getBootOptions(bool firstRun)
         
         if (key == 0x1C0D) {
             goto done;
-
+			
         } 
         else if (key == 0)
         {
@@ -921,7 +925,7 @@ done:
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
 	}
     safe_set_env(envShouldboot, false);
-
+	
 	if (menuItems) {
 		free(menuItems);
 		menuItems = NULL;
@@ -969,7 +973,7 @@ processBootOptions(void)
 		bzero(gBootArgs,sizeof(gBootArgs));
 		strlcpy(gBootArgs, cp_cache,sizeof(gBootArgs));
 	}
-
+	
     const char *     cp  = gBootArgs;
     const char *     val = 0;
     const char *     kernel;
@@ -978,7 +982,7 @@ processBootOptions(void)
     char *           argP;
     char *           configKernelFlags;
 	int              ArgCntRemaining;
-
+	
     skipblanks( &cp );
 	
     // Update the unit and partition number.
@@ -1044,7 +1048,7 @@ processBootOptions(void)
     if (( kernel = extractKernelName((char **)&cp) )) {        
 		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
         safe_set_env(envgOverrideKernel,true);
-
+		
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, DEFAULT_BOOT_CONFIG ) ) {
             strlcpy( bootInfo->bootFile, val, sizeof(bootInfo->bootFile) );
@@ -1118,12 +1122,12 @@ processBootOptions(void)
 		long gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, DEFAULT_BOOT_CONFIG ) ) ?
 		kBootModeSafe : kBootModeNormal;
         safe_set_env(envgBootMode,gBootMode);
-
+		
         
         if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, DEFAULT_BOOT_CONFIG ) ) {
             gBootMode = kBootModeSafe;
             safe_set_env(envgBootMode,gBootMode);
-
+			
 		}
 	}
 	

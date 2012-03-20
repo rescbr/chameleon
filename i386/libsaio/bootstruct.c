@@ -46,6 +46,7 @@ PrivateBootInfo_t *bootInfo  = NULL;
 Node              *gMemoryMapNode  = NULL;
 
 static char platformName[64];
+static MemoryRange memoryMap[kMemoryMapCountMax];
 
 void initKernBootStruct( void )
 {        
@@ -53,6 +54,11 @@ void initKernBootStruct( void )
     
     if ( !init_done )
     {			
+		int              convmem;                      // conventional memory
+		int              extmem;                       // extended memory
+		
+		unsigned long    memoryMapCount = 0;
+		
         bootArgs = (boot_args_common *)malloc(sizeof(boot_args_common));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
         if (bootArgs == NULL || bootInfo == NULL)
@@ -66,26 +72,24 @@ void initKernBootStruct( void )
             // conventional/extended memory for backwards compatibility.
             
             
-            bootInfo->memoryMapCount =
-            getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
-                         (unsigned long *) &bootInfo->convmem,
-                         (unsigned long *) &bootInfo->extmem );
+            memoryMapCount =
+            getMemoryMap( memoryMap, kMemoryMapCountMax,
+                         (unsigned long *) &convmem,
+                         (unsigned long *) &extmem );
             
             
             
-            if ( bootInfo->memoryMapCount == 0 )
+            if ( memoryMapCount == 0 )
             {
                 // BIOS did not provide a memory map, systems with
                 // discontiguous memory or unusual memory hole locations
                 // may have problems.
                 
-                bootInfo->convmem = getConventionalMemorySize();
-                bootInfo->extmem  = getExtendedMemorySize();			
+                convmem = getConventionalMemorySize();
+                extmem  = getExtendedMemorySize();			
                 
             }
-#if 0		
-            bootInfo->configEnd    = bootInfo->config;
-#endif
+			
             bootArgs->Video.v_display = VGA_TEXT_MODE;
             
             DT__Initialize();
@@ -108,10 +112,10 @@ void initKernBootStruct( void )
             
             gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
             
-            safe_set_env(envConvMem, bootInfo->convmem);
-            safe_set_env(envExtMem, bootInfo->convmem);
-            safe_set_env(envMemoryMap, (uint32_t)bootInfo->memoryMap);
-            safe_set_env(envMemoryMapCnt, bootInfo->memoryMapCount);
+            set_env(envConvMem, convmem);
+            set_env(envExtMem,  extmem);
+            set_env(envMemoryMap, (uint32_t)memoryMap);
+            set_env(envMemoryMapCnt, memoryMapCount);
             
             
             init_done = 1;
@@ -131,11 +135,6 @@ uint32_t getVideoMode(void)
 {
     return bootArgs->Video.v_display;
 }
-uint32_t getBootArgsVideoPtrAtOffset(uint32_t offset)
-{
-    char *vid = (char *)&bootArgs->Video ;
-    return (uint32_t)vid[offset];
-}
 void setBootArgsVideoStruct(Boot_Video	*Video)
 {
     bootArgs->Video.v_display  = Video->v_display;
@@ -145,6 +144,10 @@ void setBootArgsVideoStruct(Boot_Video	*Video)
     bootArgs->Video.v_rowBytes = Video->v_rowBytes;
     bootArgs->Video.v_baseAddr = Video->v_baseAddr;
     return;
+}
+boot_args_common * getBootArgs(void)
+{
+    return bootArgs;
 }
 
 #define AllocateKernelMemoryForBootArgs(Ver)                           \
@@ -232,11 +235,12 @@ finalizeBootStruct(void)
 {    
 	{
 		int i;
-		EfiMemoryRange *memoryMap = NULL;
+		EfiMemoryRange *kMemoryMap = NULL;
 		MemoryRange *range = NULL;
+		
 		uint64_t	sane_size = 0;  /* Memory size to use for defaults calculations */
 		
-		int memoryMapCount = bootInfo->memoryMapCount;
+		int memoryMapCount = (int)get_env(envMemoryMapCnt);
 		
 		if (memoryMapCount == 0) {
 			
@@ -247,44 +251,44 @@ finalizeBootStruct(void)
 		
 		
 		// convert memory map to boot_args memory map
-		memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
-		if (memoryMap == NULL) {
+		kMemoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
+		if (kMemoryMap == NULL) {
 			
 			stop("Unable to allocate kernel space for the memory map\n");
             return;
 		}
-		bootArgs->MemoryMap = (uint32_t)memoryMap;
+		bootArgs->MemoryMap = (uint32_t)kMemoryMap;
 		bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
 		bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
 		bootArgs->MemoryMapDescriptorVersion = 0;
 		
-		for (i=0; i<memoryMapCount; i++, memoryMap++) {
-			range = &bootInfo->memoryMap[i];
-            if (!range || !memoryMap) {
+		for (i=0; i<memoryMapCount; i++, kMemoryMap++) {
+			range = &memoryMap[i];
+            if (!range || !kMemoryMap) {
                 stop("Error while computing kernel memory map\n");
                 return;
             }
 			switch(range->type) {
 				case kMemoryRangeACPI:
-					memoryMap->Type = kEfiACPIReclaimMemory;
+					kMemoryMap->Type = kEfiACPIReclaimMemory;
 					break;
 				case kMemoryRangeNVS:
-					memoryMap->Type = kEfiACPIMemoryNVS;
+					kMemoryMap->Type = kEfiACPIMemoryNVS;
 					break;
 				case kMemoryRangeUsable:
-					memoryMap->Type = kEfiConventionalMemory;
+					kMemoryMap->Type = kEfiConventionalMemory;
 					break;
 				case kMemoryRangeReserved:
 				default:
-					memoryMap->Type = kEfiReservedMemoryType;
+					kMemoryMap->Type = kEfiReservedMemoryType;
 					break;
 			}
-			memoryMap->PhysicalStart = range->base;
-			memoryMap->VirtualStart = range->base;
-			memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
-			memoryMap->Attribute = 0;
+			kMemoryMap->PhysicalStart = range->base;
+			kMemoryMap->VirtualStart = range->base;
+			kMemoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
+			kMemoryMap->Attribute = 0;
 			
-			switch (memoryMap->Type) {
+			switch (kMemoryMap->Type) {
 				case kEfiLoaderCode:
 				case kEfiLoaderData:
 				case kEfiBootServicesCode:
@@ -293,7 +297,7 @@ finalizeBootStruct(void)
 					/*
 					 * Consolidate usable memory types into one.
 					 */
-					sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+					sane_size += (uint64_t)(kMemoryMap->NumberOfPages << I386_PGSHIFT);
 					break;
 					
 				case kEfiRuntimeServicesCode:
@@ -306,7 +310,7 @@ finalizeBootStruct(void)
 					 * in the system, not just the amount that is available for
 					 * the OS to use
 					 */
-					sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+					sane_size += (uint64_t)(kMemoryMap->NumberOfPages << I386_PGSHIFT);
 					break;
 				default:
 					break;

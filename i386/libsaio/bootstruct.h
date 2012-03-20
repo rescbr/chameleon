@@ -113,22 +113,8 @@ enum {
  to the kernel and are thus located in bootArgs although with different field names.
  */
 typedef struct PrivateBootInfo {
-    int              convmem;                      // conventional memory
-    int              extmem;                       // extended memory
-#if 0
-    int              numBootDrivers;               // number of drivers loaded
-#endif
-    char             bootFile[128];                // kernel file name		
-    
-    unsigned long    memoryMapCount;
-    MemoryRange      memoryMap[kMemoryMapCountMax];
-    
-#if 0
-    PCI_bus_info_t   pciInfo;
-    driver_config_t  driverConfig[NDRIVERS];
-    char *           configEnd;                    // pointer to end of config files
-    char             config[CONFIG_SIZE];	
-#endif
+	
+    char             bootFile[128];                // kernel file name            
 	
     config_file_t    bootConfig;		               // the booter boot.plist
     config_file_t    overrideConfig;               // additional boot.plist which can override bootConfig keys
@@ -137,9 +123,7 @@ typedef struct PrivateBootInfo {
     
     
     config_file_t    smbiosConfig;				         // smbios.plist
-    config_file_t    helperConfig;                 // boot helper partition's boot.plist
-	
-	unsigned long    adler32;
+    config_file_t    helperConfig;                 // boot helper partition's boot.plist	
 	
 	char uuidStr[64+1];										//boot device  uuid
     

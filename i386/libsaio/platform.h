@@ -112,6 +112,7 @@ typedef struct _RamSlotInfo_t {
 #define envCPUFreq              "CPUFreq"
 #define envIsServer             "isServer"
 
+#define envAdler32				"adler32"
 
 #define envCurrCoef             "CurrCoef"   
 #define envCurrDiv              "CurrDiv"   

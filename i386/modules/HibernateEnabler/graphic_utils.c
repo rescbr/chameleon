@@ -17,7 +17,7 @@
 ((size_t) ( (char *)&((st *)(0))->m - (char *)0 ))
 #endif
 
-#define VIDEO(x) (getBootArgsVideoPtrAtOffset(offsetof(Boot_Video,v_##x)))
+#define VIDEO(x) (((boot_args_common*)getBootArgs())->Video.v_ ## x)
 
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))

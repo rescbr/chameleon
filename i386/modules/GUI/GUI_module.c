@@ -196,7 +196,7 @@ void GUI_ExecKernel_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* a
 void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {		
 	// Turn off any GUI elements
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( getVideoMode() == GRAPHICS_MODE )
 	{
 		gui.devicelist.draw = false;
 		gui.bootprompt.draw = false;
@@ -307,7 +307,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
     if ( gMenuItems == NULL )
 		return 0;
 	
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( getVideoMode() == GRAPHICS_MODE )
 	{
 		int res;
 		
@@ -450,7 +450,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 			
 			// Set cursor at current position, and clear inverse video.
 			
-			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+			if( getVideoMode() == VGA_TEXT_MODE )
 			{
 				changeCursor( 0, (MenuRow + MenuSelection - MenuTop), kCursorTypeHidden, &cursorState );
 				printMenuItem( &gMenuItems[MenuSelection], 0 );
@@ -474,7 +474,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 				}
 			}
 			
-			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+			if( getVideoMode() == VGA_TEXT_MODE )
 			{
 				moveCursor( 0, MenuRow + MenuSelection - MenuTop );
 				printMenuItem( &gMenuItems[MenuSelection], 1 );
@@ -540,7 +540,7 @@ static void GUI_showMenu( const MenuItem * items, int count,
 	
 	// Draw the visible items.
 	
-	if( bootArgs->Video.v_display == GRAPHICS_MODE )
+	if( getVideoMode() == GRAPHICS_MODE )
 	{
 		drawDeviceList(MenuStart, MenuEnd, MenuSelection, menuItems);
 	}
@@ -585,7 +585,7 @@ static void GUI_updateBootArgs( int key )
                 }
                 if (x)
 					x--;
-				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+				if( getVideoMode() == VGA_TEXT_MODE )
 				{
 					setCursorPosition( x, y, 0 );
 					putca(' ', 0x07, 1);
@@ -602,7 +602,7 @@ static void GUI_updateBootArgs( int key )
         default:
             if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
             {
-				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+				if( getVideoMode() == VGA_TEXT_MODE )
 				{
 					putchar(key);  // echo to screen
 				}
@@ -622,7 +622,7 @@ static void GUI_showBootPrompt(int row, bool visible)
 {
 	char * bootPrompt = (char*)(uint32_t)get_env(envBootPrompt);
 	
-	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+	if( getVideoMode() == VGA_TEXT_MODE )
 	{
 		changeCursor( 0, row, kCursorTypeUnderline, 0 );    
 		clearScreenRows( row, kScreenLastRow );
@@ -632,7 +632,7 @@ static void GUI_showBootPrompt(int row, bool visible)
 	
 	if (visible)
 	{
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) 
+		if (getVideoMode() == VGA_TEXT_MODE) 
 		{
 			if (get_env(envgEnableCDROMRescan))
 			{
@@ -646,7 +646,7 @@ static void GUI_showBootPrompt(int row, bool visible)
 	} 
 	else
 	{
-		if (bootArgs->Video.v_display == GRAPHICS_MODE)
+		if (getVideoMode() == GRAPHICS_MODE)
 		{
 			clearGraphicBootPrompt();
 		} 
@@ -662,7 +662,7 @@ void GUI_clearBootArgs(void)
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
 	
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) 
+	if (getVideoMode() == GRAPHICS_MODE) 
 	{
 		clearGraphicBootPrompt();
 	}
@@ -706,7 +706,7 @@ int GUI_getBootOptions(bool firstRun)
 	}
 	    
 	// ensure we're in graphics mode if gui is setup
-	if (gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (gui.initialised && (getVideoMode() == VGA_TEXT_MODE))
 	{
 #if UNUSED
 		setVideoMode(GRAPHICS_MODE, 0);
@@ -786,7 +786,7 @@ int GUI_getBootOptions(bool firstRun)
 		GUI_addBootArg(kSingleUserModeFlag);
 	}
 	
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		setCursorPosition(0, 0, 0);
 		clearScreenRows(0, kScreenLastRow);
@@ -794,7 +794,7 @@ int GUI_getBootOptions(bool firstRun)
 		{
             char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
 			// Display banner and show hardware info.
-			printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
+			printf(bootBanner, (int)(get_env(envConvMem) + get_env(envExtMem)) / 1024);
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
@@ -935,7 +935,7 @@ int GUI_getBootOptions(bool firstRun)
 		}
 	}
 	
-	if (bootArgs->Video.v_display == GRAPHICS_MODE)
+	if (getVideoMode() == GRAPHICS_MODE)
 	{
 		// redraw the background buffer
 		gui.logo.draw = true;
@@ -953,7 +953,8 @@ int GUI_getBootOptions(bool firstRun)
                 char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
                 
 				// Display banner and show hardware info.
-				gprintf(&gui.screen, bootBanner + 1, (bootInfo->convmem + bootInfo->extmem) / 1024);
+				gprintf(&gui.screen, bootBanner + 1, (int)(get_env(envConvMem) + get_env(envExtMem)) / 1024);
+
 			}
 			
 			// redraw background
@@ -972,7 +973,7 @@ int GUI_getBootOptions(bool firstRun)
 	
 	if (devcnt)
 	{
-		if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+		if( getVideoMode() == VGA_TEXT_MODE )
 		{
 			printf("Use \30\31 keys to select the startup volume.");
 		}
@@ -985,7 +986,7 @@ int GUI_getBootOptions(bool firstRun)
 	GUI_showBootPrompt( nextRow, showPrompt );
 	
 	do {
-		if (bootArgs->Video.v_display == GRAPHICS_MODE)
+		if (getVideoMode() == GRAPHICS_MODE)
 		{
 			// redraw background
 			memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -1029,7 +1030,7 @@ int GUI_getBootOptions(bool firstRun)
 					 */
 					if (strcmp( booterCommand, "video" ) == 0)
 					{
-						if (bootArgs->Video.v_display == GRAPHICS_MODE)
+						if (getVideoMode() == GRAPHICS_MODE)
 						{
 							showInfoBox(getVBEInfoString(), getVBEModeInfoString());
 						}
@@ -1040,7 +1041,7 @@ int GUI_getBootOptions(bool firstRun)
 					}
 					else if ( strcmp( booterCommand, "memory" ) == 0)
 					{
-						if (bootArgs->Video.v_display == GRAPHICS_MODE ) 
+						if (getVideoMode() == GRAPHICS_MODE ) 
 						{
 							showInfoBox("Memory Map", getMemoryInfoString());
 						}
@@ -1115,7 +1116,7 @@ int GUI_getBootOptions(bool firstRun)
 				// Only Permitted if started in graphics interface
 				if (useGUI)
 				{
-					if (bootArgs->Video.v_display == GRAPHICS_MODE)
+					if (getVideoMode() == GRAPHICS_MODE)
 					{
 #if UNUSED
 						setVideoMode(VGA_TEXT_MODE, 0);
@@ -1128,7 +1129,7 @@ int GUI_getBootOptions(bool firstRun)
 						char * bootBanner = (char*)(uint32_t)get_env(envBootBanner);
                         
 						// Display banner and show hardware info.
-						printf(bootBanner, (bootInfo->convmem + bootInfo->extmem) / 1024);
+						printf(bootBanner, (int)(get_env(envConvMem) + get_env(envExtMem)) / 1024);
 						printf(getVBEInfoString());
 						
 						clearScreenRows(kMenuTopRow, kMenuTopRow + 2);
@@ -1169,7 +1170,7 @@ int GUI_getBootOptions(bool firstRun)
 	} while (0 == key);
 	
 done:
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		clearScreenRows(kMenuTopRow, kScreenLastRow);
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
@@ -1192,7 +1193,7 @@ int GUI_error(const char * fmt, ...)
     gErrors = true;
     va_start(ap, fmt);
 	
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		prf(fmt, ap, putchar, 0);
     }
@@ -1213,7 +1214,7 @@ int GUI_verbose(const char * fmt, ...)
 	
     if (gVerboseMode && (KernelStart == false))
     {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		if (getVideoMode() == VGA_TEXT_MODE)
 		{
 			prf(fmt, ap, putchar, 0);
 		}
@@ -1248,7 +1249,7 @@ int GUI_printf(const char * fmt, ...)
 	
 	if (KernelStart == false) {
 		
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		if (getVideoMode() == VGA_TEXT_MODE)
 		{
 			prf(fmt, ap, putchar, 0);
 		}
@@ -1281,7 +1282,7 @@ void GUI_stop(const char * fmt, ...)
 	printf("\n");
 	va_start(ap, fmt);
 	
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		prf(fmt, ap, putchar, 0);
 	} 
@@ -1298,7 +1299,7 @@ void GUI_stop(const char * fmt, ...)
 
 void GUI_showHelp(void)
 {
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+	if (getVideoMode() == GRAPHICS_MODE) {
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
 	} else {
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
@@ -1307,7 +1308,7 @@ void GUI_showHelp(void)
 
 void GUI_showMessage(char *message)
 {
-	if (bootArgs->Video.v_display == GRAPHICS_MODE) {
+	if (getVideoMode() == GRAPHICS_MODE) {
 		showInfoBox("Help. Press q to quit.\n", message);
 	} else {
 		showTextBuffer(message, strlen(message));

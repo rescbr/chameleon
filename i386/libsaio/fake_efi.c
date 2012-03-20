@@ -448,6 +448,7 @@ static ACPI_TABLES  acpi_tables;
 static uint64_t     kFSBFrequency;
 static uint32_t		kHardware_signature;
 static uint8_t		kType;
+static uint32_t		kAdler32;
 
 EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev )
 {
@@ -509,7 +510,7 @@ EFI_STATUS setup_acpi (void)
         }        
         
         ret = setupAcpiNoMod();
-			
+		
 	} while (0);	
 	
 	return ret;	
@@ -547,9 +548,9 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
 	if (!GetgPlatformName() && strcmp(key, "SMproductname") == 0)
 		readSMBIOS(thePlatformName);
-                
+	
 	const char	*PlatformName =  GetgPlatformName() ;
-        
+	
 	const char	*src = (strcmp(key, "SMproductname") == 0) ? PlatformName : getStringForKey(key, DEFAULT_SMBIOS_CONFIG);
 	
 	EFI_CHAR16*	 dst = 0;	
@@ -576,7 +577,7 @@ static EFI_CHAR8* getSmbiosUUID()
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
 	SMBByte					*p;		
-
+	
     p = (SMBByte*)(uint32_t)get_env(envUUID);
     
     if ( p == NULL )
@@ -738,30 +739,30 @@ static VOID setupEfiDeviceTree(void)
 			// additionally this value can be used by third-party apps or osx components (ex: pre-10.7 kextcache, ...)
 			if (bootInfo->uuidStr[0]) 			
 				DT__AddProperty(chosenNode, kBootUUIDKey, strlen(bootInfo->uuidStr)+1, bootInfo->uuidStr);
-
-				if (GetgRootDevice())
+			
+			if (GetgRootDevice())
+			{
+				
+				DT__AddProperty(chosenNode, "boot-device-path", strlen(GetgRootDevice())+1, GetgRootDevice());			
+				
+			}			
+#ifdef rootpath
+			else
+				if (gRootPath[0])
 				{
 					
-					DT__AddProperty(chosenNode, "boot-device-path", strlen(GetgRootDevice())+1, GetgRootDevice());			
+					DT__AddProperty(chosenNode, "rootpath", strlen(gRootPath)+1, gRootPath);			
 					
-				}			
-#ifdef rootpath
-                else
-                    if (gRootPath[0])
-                    {
-                        
-                        DT__AddProperty(chosenNode, "rootpath", strlen(gRootPath)+1, gRootPath);			
-                        
-                    } 
+				} 
             
 #endif
 			
 			// "boot-file" is not used by kextcache if there is no "boot-device-path" or if there is a valid "rootpath" ,
 			// but i let it by default since it may be used by another service
-			DT__AddProperty(chosenNode, "boot-file", strlen(bootInfo->bootFile)+1, (EFI_CHAR16*)bootInfo->bootFile);
+			DT__AddProperty(chosenNode, "boot-file", strlen(bootInfo->bootFile)+1, (EFI_CHAR16*)bootInfo->bootFile);			
 			
-			if (bootInfo->adler32) 
-				DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &bootInfo->adler32);
+			if ((kAdler32 = (uint32_t)get_env(envAdler32))) 
+				DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &kAdler32);
 			
 		}
 	}	
@@ -837,7 +838,7 @@ static VOID setupEfiDeviceTree(void)
 		// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 		// the value in the fsbFrequency global and not an malloc'd pointer
 		// because the DT_AddProperty function does not copy its args.
-		     
+		
         kFSBFrequency = get_env(envFSBFreq);
 		if (kFSBFrequency != 0)
 			DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &kFSBFrequency);		
@@ -1049,4 +1050,3 @@ void setupFakeEfi(void)
 	setupEfiConfigurationTable();		
 	
 }
-

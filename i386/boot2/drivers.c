@@ -818,7 +818,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
         }
         char* BootKernelCacheFile = (char*)(uint32_t)get_env(envkCache);
 		if (((get_env(envgBootMode) & kBootModeSafe) == 0) && (BootKernelCacheFile[0] != '\0') && gBootVolume->OSVersion[3] > '6') 
-			bootInfo->adler32 = kernel_header->adler32;
+			safe_set_env(envAdler32, kernel_header->adler32);
     }
 	
 	{
