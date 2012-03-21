@@ -111,6 +111,8 @@ uint8_t reg_FALSE[] = { 0x00, 0x00, 0x00, 0x00 };
 
 static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x00000000, "Unknown"			},
+	{ 0x80860042, "Desktop GMA HD" },
+	{ 0x80860046, "Mobile GMA HD" },
 	{ 0x808627A2, "Mobile GMA950"	},
 	{ 0x808627AE, "Mobile GMA950"	},
 	{ 0x808627A6, "Mobile GMA950"	},
@@ -121,6 +123,7 @@ static struct gma_gpu_t KnownGPUS[] = {
 //	{ 0x8086A001, "Desktop GMA3150" },
 	{ 0x8086A001, "Mobile GMA3150"	},
 	{ 0x8086A002, "Desktop GMA3150" },
+
 	{ 0x80862A02, "GMAX3100"		},
 	{ 0x80862A03, "GMAX3100"		},
 	{ 0x80862A12, "GMAX3100"		},

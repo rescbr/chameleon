@@ -628,6 +628,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0890 - 089F
 	// 08A0 - 08AF
 	{ 0x10DE08A0, "GeForce 320M" },
+	{ 0x10DE08A3, "GeForce 320M" },
 	{ 0x10DE08A4, "GeForce 320M" },
 	// 08B0 - 08BF
 	// 08C0 - 08CF
@@ -786,6 +787,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DE2, "GeForce GT 420" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
 	{ 0x10DE0DE9, "GeForce GT 600M" }, //
+	{ 0x10DE0DEA, "GeForce GT 610M" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
 	{ 0x10DE0DEC, "GeForce GT 525M" },
 	{ 0x10DE0DED, "GeForce GT 520M" },
@@ -858,8 +860,9 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1050, "GeForce GT 520M" },
 	{ 0x10DE1051, "GeForce GT 520MX" },
 	{ 0x10DE1054, "GeForce GT 410M" },
-	{ 0x10DE1056, "NVS 4200M" },
-	{ 0x10DE1057, "NVS 4200M" },
+	{ 0x10DE1055, "GeForce 410M" },
+	{ 0x10DE1056, "Quadro NVS 4200M" },
+	{ 0x10DE1057, "Quadro NVS 4200M" },
 	// 1060 - 106F
 	// 1070 - 107F
 	{ 0x10DE107F, "NVIDIA GF119-ES" },
@@ -876,8 +879,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE108B, "GeForce GTX 590" },
 	// 1090 - 109F	
 	{ 0x10DE1091, "Tesla M2090" },
-	{ 0x10DE1094, "Tesla M2075 Dual-Slot Computing Processor Module" }, // 
-	{ 0x10DE1096, "Tesla C2075" }, //
+	{ 0x10DE1094, "Tesla M2075 Dual-Slot Computing Processor Module" },
+	{ 0x10DE1096, "Tesla C2075" },
 	{ 0x10DE1098, "D13U" },
 	{ 0x10DE109A, "Quadro 5010M" },
 	{ 0x10DE109B, "Quadro 7000" },
@@ -892,11 +895,20 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1200 - 
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1201, "GeForce GTX 560" },
-	{ 0x10DE1205, "GeForce GTX 460 v2" }, // GF114
+	{ 0x10DE1205, "GeForce GTX 460 v2" },
+	{ 0x10DE1208, "GeForce GTX 560 SE" },
+	{ 0x10DE1210, "GeForce GTX 570M" },
+	{ 0x10DE1211, "GeForce GTX 580M" },
+	{ 0x10DE1212, "GeForce GTX 675M" },
+	{ 0x10DE1213, "GeForce GTX 670M" },
 	{ 0x10DE1241, "GeForce GT 545" },
 	{ 0x10DE1243, "GeForce GT 545" },
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
 	{ 0x10DE1245, "GeForce GTS 450" },
+	{ 0x10DE1246, "GeForce GTX 550M" },
+	{ 0x10DE1247, "GeForce GTX 555M" },
+	{ 0x10DE1248, "GeForce GTX 555M" },
+	{ 0x10DE124D, "GeForce GTX 555M" },
 	{ 0x10DE1251, "GeForce GTX 560M" },
 };
 
