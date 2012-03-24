@@ -559,6 +559,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68C1,	0xFDD01179, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
 
 	{ 0x68C8,	0x2306103C, CHIP_FAMILY_REDWOOD,	"ATI FirePro V4800 (FireGL)",			kNull		},
+	{ 0x68C8,	0x240A1002, CHIP_FAMILY_REDWOOD,	"ATI FirePro V4800 (FireGL)",			kNull		},
+	{ 0x68C8,	0x240A1028, CHIP_FAMILY_REDWOOD,	"ATI FirePro V4800 (FireGL)",			kNull		},
 
 	{ 0x68D8,	0x03561043, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
 	{ 0x68D8,	0x21D91458, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
@@ -764,7 +766,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6779,	0x32001682, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
 	{ 0x6779,	0x64501092, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
 	{ 0x6779,	0x909D1B0A, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
-	{ 0x6779,	0xE164174B, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
+	{ 0x6779,	0xE164174B, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kIpomoea	},
 	{ 0x6779,	0xE180174B, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kPithecia	},
 	{ 0x6779,	0xE190174B, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
 	{ 0x6779,	0xE199174B, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450",				kBulrushes	},
