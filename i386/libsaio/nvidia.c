@@ -74,14 +74,15 @@
 
 extern uint32_t devices_number;
 
-const char *nvidia_compatible_0[]	=	{ "@0,compatible",	"NVDA,NVMac"	 };
-const char *nvidia_compatible_1[]	=	{ "@1,compatible",	"NVDA,NVMac"	 };
-const char *nvidia_device_type_0[]	=	{ "@0,device_type", "display"		 };
-const char *nvidia_device_type_1[]	=	{ "@1,device_type", "display"		 };
-const char *nvidia_device_type[]	=	{ "device_type",	"NVDA,Parent"	 };
-const char *nvidia_name_0[]			=	{ "@0,name",		"NVDA,Display-A" };
-const char *nvidia_name_1[]			=	{ "@1,name",		"NVDA,Display-B" };
-const char *nvidia_slot_name[]		=	{ "AAPL,slot-name", "Slot-1"		 };
+const char *nvidia_compatible_0[]		=	{ "@0,compatible",	"NVDA,NVMac"	 };
+const char *nvidia_compatible_1[]		=	{ "@1,compatible",	"NVDA,NVMac"	 };
+const char *nvidia_device_type_0[]		=	{ "@0,device_type", "display"		 };
+const char *nvidia_device_type_1[]		=	{ "@1,device_type", "display"		 };
+const char *nvidia_device_type[]		=	{ "device_type",	"NVDA,Parent"	 };
+const char *nvidia_device_type_child[]	=	{ "device_type",	"NVDA,Child"	 };
+const char *nvidia_name_0[]				=	{ "@0,name",		"NVDA,Display-A" };
+const char *nvidia_name_1[]				=	{ "@1,name",		"NVDA,Display-B" };
+const char *nvidia_slot_name[]			=	{ "AAPL,slot-name", "Slot-1"		 };
 
 static uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
@@ -604,7 +605,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0890 - 089F
 	// 08A0 - 08AF
     { 0x10DE08A0, "GeForce 320M" }, 
-	{ 0x10DE08A4, "GeForce 320M" }, 
+	{ 0x10DE08A4, "GeForce 320M" },
+	{ 0x10DE08A5, "GeForce 320M" }, 
 	// 08B0 - 08BF
 	// 08C0 - 08CF
 	// 08D0 - 08DF	
@@ -760,7 +762,9 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DE0, "GeForce GT 440" },
 	{ 0x10DE0DE1, "GeForce GT 430" },
 	{ 0x10DE0DE2, "GeForce GT 420" },
+	{ 0x10DE0DE4, "GeForce GT 520" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
+	{ 0x10DE0DE9, "GeForce GT 630M" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
 	{ 0x10DE0DEC, "GeForce GT 525M" },
 	{ 0x10DE0DED, "GeForce GT 520M" },
@@ -776,6 +780,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DF7, "GeForce GT 520M" },	
 	{ 0x10DE0DF8, "Quadro 600" },
 	{ 0x10DE0DFA, "Quadro 1000M" },
+	{ 0x10DE0DFC, "NVS 5200M" },
 	{ 0x10DE0DFE, "GF108 ES" },
 	{ 0x10DE0DFF, "GF108 INT" },
 	// 0E00 - 0E0F
@@ -827,11 +832,14 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1020 - 102F
 	// 1030 - 103F
 	// 1040 - 104F
-	{ 0x10DE1040, "GeForce GT 520" },	
+	{ 0x10DE1040, "GeForce GT 520" },
+	{ 0x10DE1042, "GeForce 510" },
+	{ 0x10DE1049, "GeForce GT 620" },
 	// 1050 - 105F
 	{ 0x10DE1050, "GeForce GT 520M" },
     { 0x10DE1051, "GeForce GT 520MX" },
 	{ 0x10DE1054, "GeForce GT 410M" },
+	{ 0x10DE1055, "GeForce 410M" },
 	{ 0x10DE1056, "Quadro NVS 4200M" },
 	{ 0x10DE1057, "Quadro NVS 4200M" },
 	// 1060 - 106F
@@ -850,6 +858,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE108B, "GeForce GTX 590" }, 
 	// 1090 - 109F	
     { 0x10DE1091, "Tesla M2090" },
+	{ 0x10DE1094, "Tesla M2075" },
+	{ 0x10DE1096, "Tesla C2075" },
 	{ 0x10DE1098, "D13U" },
 	{ 0x10DE109A, "Quadro 5010M" }, 
 	{ 0x10DE109B, "Quadro 7000" }, 
@@ -861,14 +871,52 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE10C5, "GeForce 405" },
     // 10D0 - 10DF
     { 0x10DE10D8, "NVS 300" },
-	// 1200 - 
+	// 10E0 - 10EF
+	// 10F0 - 10FF
+	// 1100 - 110F
+	// 1110 - 111F
+	// 1120 - 112F
+	// 1130 - 113F
+	// 1140 - 114F
+	// 1150 - 115F
+	// 1160 - 116F
+	// 1170 - 117F
+	// 1180 - 118F
+	{ 0x10DE1180, "GeForce GTX 680" },
+	// 1190 - 119F
+	// 11A0 - 11AF
+	// 11B0 - 11BF
+	// 11C0 - 11CF
+	// 11D0 - 11DF
+	// 11E0 - 11EF
+	// 11F0 - 11FF
+	// 1200 - 120F
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
 	{ 0x10DE1201, "GeForce GTX 560" },
+	{ 0x10DE1203, "GeForce GTX 460 SE v2" },
+	// 1210 - 121F
+	{ 0x10DE1210, "GeForce GTX 570M" },
+	{ 0x10DE1211, "GeForce GTX 580M" },
+	// 1220 - 122F
+	// 1230 - 123F
+	// 1240 - 124F
     { 0x10DE1241, "GeForce GT 545" }, 
 	{ 0x10DE1243, "GeForce GT 545" }, 
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
 	{ 0x10DE1245, "GeForce GTS 450" },
+	{ 0x10DE1247, "GeForce GT 555M" },
+	// 1250 - 125F
 	{ 0x10DE1251, "GeForce GTX 560M" },
+	// 1260 - 126F
+	// 1270 - 127F
+	// 1280 - 128F
+	// 1290 - 129F
+	// 12A0 - 12AF
+	// 12B0 - 12BF
+	// 12C0 - 12CF
+	// 12D0 - 12DF
+	// 12E0 - 12EF
+	// 12F0 - 12FF
 };
 
 static uint16_t swap16(uint16_t x)
@@ -1190,8 +1238,16 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 		return 0;
 	if (!DP_ADD_TEMP_VAL(device, nvidia_name_1))
 		return 0;
-	if (!DP_ADD_TEMP_VAL(device, nvidia_device_type))
-		return 0;
+	if (devices_number == 1)
+	{
+		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type))
+			return 0;
+	}
+	else
+	{
+		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_child))
+			return 0;
+	}
 	
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
@@ -1250,7 +1306,7 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 	}
 	
-	// Workaround for 9600M GT, GT 420/430/440 & GT 525M
+	// Workaround for 9600M GT, GT 420/430/440 & GT 525M/540M
 	switch (nvda_dev->device_id)
 	{
 		case 0x0649: vram_size = 512*1024*1024; break;	// 9600M GT
@@ -1258,6 +1314,7 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		case 0x0DE1: vram_size = 1024*1024*1024; break; // GT 430
 		case 0x0DE2: vram_size = 1024*1024*1024; break; // GT 420
 		case 0x0DEC: vram_size = 1024*1024*1024; break; // GT 525M
+		case 0x0DF4: vram_size = 1024*1024*1024; break; // GT 540M
         case 0x0DF5: vram_size = 1024*1024*1024; break; // GT 525M
 		default: break;
 	}
@@ -1403,7 +1460,10 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	/* FIXME: for primary graphics card only */
 	boot_display = 1;
-	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
+	if (devices_number == 1)
+	{
+		devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
+	}
 	
 	if (nvPatch == PATCH_ROM_SUCCESS_HAS_LVDS) {
 		uint8_t built_in = 0x01;

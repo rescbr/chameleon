@@ -155,8 +155,8 @@ bool getSMBOemProcessorType(returnType *value)
 							value->word = 0x0701;			// Core i7
 						return true;
 
-					case CPU_MODEL_SANDY:				// Intel Core i3, i5, i7 LGA1155 (32nm)
-                    case CPU_MODEL_SANDY_XEON:			// Intel Xeon E3
+					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
 							value->word = 0x0901;			// Core i3
@@ -169,6 +169,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
+                    case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5 LGA2011 (32nm)
 						value->word = 0x0501;				// Core i7
 						return true;
 				}
