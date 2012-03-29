@@ -873,25 +873,40 @@ typedef struct {
 
 #define PCI_BASE_CLASS_CRYPT					0x10
 #define PCI_CLASS_CRYPT_NETWORK					0x1000
-#define PCI_CLASS_CRYPT_ENTERTAINMENT				0x1010
+#define PCI_CLASS_CRYPT_ENTERTAINMENT			0x1010
 #define PCI_CLASS_CRYPT_OTHER					0x1080
 
 #define PCI_BASE_CLASS_SIGNAL					0x11
 #define PCI_CLASS_SIGNAL_DPIO					0x1100
 #define PCI_CLASS_SIGNAL_PERF_CTR				0x1101
-#define PCI_CLASS_SIGNAL_SYNCHRONIZER				0x1110
+#define PCI_CLASS_SIGNAL_SYNCHRONIZER			0x1110
 #define PCI_CLASS_SIGNAL_OTHER					0x1180
 
-#define PCI_CLASS_OTHERS					0xff
+#define PCI_CLASS_OTHERS                        0xff
 
 /* Several ID's we need in the library */
-#define PCI_VENDOR_ID_APPLE					0x106b
-#define PCI_VENDOR_ID_AMD					0x1022
-#define PCI_VENDOR_ID_ATI					0x1002
-#define PCI_VENDOR_ID_INTEL					0x8086
-#define PCI_VENDOR_ID_NVIDIA					0x10de
-#define PCI_VENDOR_ID_REALTEK					0x10ec
-#define PCI_VENDOR_ID_TEXAS_INSTRUMENTS				0x104c
-#define PCI_VENDOR_ID_VIA					0x1106
+#define PCI_VENDOR_ID_LOGITECH                  0x046d
+#define PCI_VENDOR_ID_WACOM                     0x056a
+#define PCI_VENDOR_ID_ATI                       0x1002
+#define PCI_VENDOR_ID_NSC                       0x100b /* National Semiconductor Corporation */
+#define PCI_VENDOR_ID_CIRRUS                    0x1013
+#define PCI_VENDOR_ID_IBM                       0x1014 /* International Business Machines Corporation */
+#define PCI_VENDOR_ID_AMD                       0x1022
+#define PCI_VENDOR_ID_DELL                      0x1028 /* Dell Computer Corporation */
+#define PCI_VENDOR_ID_NEC                       0x1033
+#define PCI_VENDOR_ID_SIS                       0x1039 /* Silicon Integrated Systems */
+#define PCI_VENDOR_ID_ASUS                      0x1043 /* Asustek Computer Inc */
+#define PCI_VENDOR_ID_TEXAS_INSTRUMENTS         0x104c
+#define PCI_VENDOR_ID_SONY                      0x104d /* Sony Corporatio */
+#define PCI_VENDOR_ID_HITACHI                   0x1054
+#define PCI_VENDOR_ID_MOTOROLA                  0x1057
+#define PCI_VENDOR_ID_APPLE                     0x106b
+#define PCI_VENDOR_ID_NVIDIA                    0x10de
+#define PCI_VENDOR_ID_REALTEK                   0x10ec
+#define PCI_VENDOR_ID_VIA                       0x1106
+#define PCI_VENDOR_ID_D_LINK                    0x1186 /* D-Link System Inc */
+#define PCI_VENDOR_ID_MARVELL                   0x11ab /* Marvell Semiconductor Germany GmbH */
+#define PCI_VENDOR_ID_RALINK                    0x1814
+#define PCI_VENDOR_ID_INTEL                     0x8086
 
 #endif /* !__LIBSAIO_PCI_H */
