@@ -125,7 +125,7 @@ InitDriverSupport( void )
     gFileSpec       = malloc( 4096 );
     gTempSpec       = malloc( 4096 );
     gFileName       = malloc( 4096 );	
-       
+    
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         stop("InitDriverSupport error");
     
@@ -135,7 +135,7 @@ InitDriverSupport( void )
     set_env(envDriverFileSpec,(uint32_t)gFileSpec);
     set_env(envDriverTempSpec,(uint32_t)gTempSpec);
     set_env(envDriverFileName,(uint32_t)gFileName);
-
+    
     return 0;
 }
 
@@ -488,7 +488,10 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         module->plistAddr = malloc(length);
 		
         if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
+        {
+            if ( module->plistAddr ) free(module->plistAddr);
             break;
+        }
 		
         // Save the driver path in the module.
         //strcpy(module->driverPath, tmpDriverPath);
@@ -566,11 +569,12 @@ long LoadMatchedModules( void )
 					executableAddr = (void *)kLoadAddr;
 				}
                 //printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getc();
+                
             }
             else
                 length = 0;
 			
-            if (length != -1)
+            if ((length != -1) && executableAddr)
             {
 				//driverModuleAddr = (void *)kLoadAddr;
                 //if (length != 0)
@@ -827,7 +831,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
 		{
 			archCpuType=CPU_TYPE_I386;
-			ret = ThinFatFile(&binary, &len);
+			/*ret =*/ ThinFatFile(&binary, &len);
 		}
 		
 		ret = DecodeMachO(binary, rentry, raddr, rsize);

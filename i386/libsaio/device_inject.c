@@ -92,8 +92,11 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 		return NULL;
 	}
 	device = malloc(sizeof(struct DevPropDevice));
-	
+	if (!device) {
+        return NULL;
+    }
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
+        free(device);
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
@@ -153,6 +156,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	if(!numpaths)
 	{
+        free(device);
 		return NULL;
 	}
 	
@@ -187,7 +191,8 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	{
 		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
 		{
-			return 0;
+            free(device);
+			return NULL;
 		}
 	}
 	

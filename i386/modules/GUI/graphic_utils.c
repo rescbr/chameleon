@@ -839,11 +839,11 @@ void getGraphicModeParams(unsigned long params[]) {
 	VBEModeInfoBlock  minfo;
 	
     unsigned short    vesaVersion;
-    unsigned short    mode = modeEndOfList;
+    //unsigned short    mode = modeEndOfList;
 	
 	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
 	
-	mode = getVESAModeWithProperties( params[0], params[1], params[2],
+	/* mode = */getVESAModeWithProperties( params[0], params[1], params[2],
 									 maColorModeBit             |
 									 maModeIsSupportedBit       |
 									 maGraphicsModeBit          |
@@ -873,10 +873,10 @@ char *getVBEInfoString(void)
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)
-		return 0;
+		goto error;
 	
 	if ( strncmp( (char *)vbeInfo.VESASignature, "VESA", 4 ) )
-		return 0;
+		goto error;
 	
 	small = (vbeInfo.TotalMemory < 16);
 	
@@ -888,6 +888,9 @@ char *getVBEInfoString(void)
 			VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
 	
 	return buff;
+error:
+    free(buff);
+    return 0;
 }
 
 void blend( const pixmap_t *blendThis,            // Source image

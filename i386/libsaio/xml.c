@@ -987,9 +987,10 @@ NewSymbol( char * string )
 #else
         symbol = (SymbolPtr)AllocateBootXMemory(sizeof(Symbol) + 1 + strlen(string));
 #endif
-        if (symbol == 0) //return 0;
-            stop("NULL symbol!");
-        
+        if (symbol == 0) {            
+            stop("NULL symbol!");        
+            return 0;
+        }
         // Set the symbol's data.
         symbol->refCount = 0;
         strcpy(symbol->string, string);

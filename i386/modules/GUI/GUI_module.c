@@ -152,10 +152,16 @@ static void moveCursor( int col, int row )
     setCursorPosition( col, row, 0 );
 }
 
-static void restoreCursor( const CursorState * cs )
+static int restoreCursor( const CursorState * cs )
 {
+    if (!cs) {
+        return 0;
+    }
+    
     setCursorPosition( cs->x, cs->y, 0 );
     setCursorType( cs->type );
+    
+    return 1;
 }
 
 char GUI_bootRescanPrompt[] =
@@ -478,7 +484,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 			{
 				moveCursor( 0, MenuRow + MenuSelection - MenuTop );
 				printMenuItem( &gMenuItems[MenuSelection], 1 );
-				restoreCursor( &cursorState );
+				moved = restoreCursor( &cursorState );
 				
 			}
 			else
@@ -554,7 +560,7 @@ static void GUI_showMenu( const MenuItem * items, int count,
 			printMenuItem( &items[i], (i == MenuSelection) );
 		}
 		
-		restoreCursor( &cursorState );
+		restoreCursor( &cursorState ); // FIXME : handle the return error
     }
     
     safe_set_env(envgMenuRow,row);
@@ -969,7 +975,6 @@ int GUI_getBootOptions(bool firstRun)
 	}
 	
 	nextRow = kMenuTopRow;
-	showPrompt = true;
 	
 	if (devcnt)
 	{
@@ -1136,7 +1141,6 @@ int GUI_getBootOptions(bool firstRun)
 						changeCursor(0, kMenuTopRow, kCursorTypeHidden, 0);
 						
 						nextRow = kMenuTopRow;
-						showPrompt = true;
 						
 						if (devcnt)
 						{

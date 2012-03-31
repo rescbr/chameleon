@@ -204,7 +204,7 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 	
 	getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 	switch (method) {
-		case 0x2000:
+		case 0x2:
 		{
 			for (index = 0; index < num_tables; index++) {
 				U64 ptr = xsdt->TableOffsetEntry[index];
@@ -216,7 +216,7 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 			}
 			break;
 		}
-		case 0x1000:			
+		case 0x1:			
 		default:
 		{
 			ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;		

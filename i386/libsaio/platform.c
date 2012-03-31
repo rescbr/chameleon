@@ -540,6 +540,6 @@ char * Date(void)
     rtc_time(&rtctime);
     
     return newStringWithFormat("%02d/%02d/%04d %02d:%02d:%02d",rtctime.Month,rtctime.Day,rtctime.Year,
-                               rtctime.Hour,rtctime.Minute,rtctime.Second));
+                               rtctime.Hour,rtctime.Minute,rtctime.Second);
 }
 #endif

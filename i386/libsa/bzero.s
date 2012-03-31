@@ -89,6 +89,7 @@ LABEL(_memset)
 /*
  * void bzero(char * addr, size_t length)
  */
+LABEL(___bzero) /* only for a compatibility issue */
 LABEL(_bzero)
 	pushl	%edi
 	movl	4+ 4(%esp),%edi		/* addr */

@@ -194,7 +194,7 @@ static int ExecKernel(void *binary)
 {
     entry_t                   kernelEntry;
     int                       ret;
-				
+    
     bootArgs->kaddr = bootArgs->ksize = 0;
 	
 	if(gBootVolume->OSVersion[3] <= '6')
@@ -218,12 +218,12 @@ static int ExecKernel(void *binary)
 	}
 	
 	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL, NULL, NULL);
-
+    
     ret = DecodeKernel(binary,
                        &kernelEntry,
                        (char **) &bootArgs->kaddr,
                        (int *)&bootArgs->ksize );
-
+    
     if ( ret != 0 )
         return ret;    
 	
@@ -233,7 +233,7 @@ static int ExecKernel(void *binary)
 	{
 		LoadDrivers("/");
     }
-
+    
     if (gErrors)
 	{
         printf("Errors encountered while starting up the computer.\n");
@@ -244,9 +244,9 @@ static int ExecKernel(void *binary)
     }
 	
 	execute_hook("md0Ramdisk", NULL, NULL, NULL, NULL, NULL, NULL);
-
+    
     setupFakeEfi();
-		
+    
     verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 #ifdef NBP_SUPPORT
     // Cleanup the PXE base code.
@@ -284,7 +284,7 @@ static int ExecKernel(void *binary)
 	}    
     
     //debug_platform_env();
-			
+    
 	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) // (bootArgs->Video.v_display == VGA_TEXT_MODE)	
 	{
 #if UNUSED
@@ -324,7 +324,7 @@ static int ExecKernel(void *binary)
 		}
 #endif
 	}
-
+    
     finalizeEFIConfigTable();
     
 	setupBooterLog();
@@ -357,7 +357,7 @@ static int ExecKernel(void *binary)
 #include "apic.h"
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
-
+    
 	switch (gBootVolume->OSVersion[3]) {
 		case '4':						
 		case '5':
@@ -380,7 +380,7 @@ static int ExecKernel(void *binary)
 			getc();
 			break;
 	}	
-
+    
     // Should not be reached
 	
     return 0;
@@ -426,7 +426,7 @@ void common_boot(int biosdev)
     // the base code will result in a hang or kernel panic.
     gUnloadPXEOnExit = true;
 #endif
-    	
+    
     // Setup VGA text mode.
     // It's unsafe to call setVideoMode() before the
     // bootargs is initialized, we call video_mode() instead.
@@ -442,12 +442,11 @@ void common_boot(int biosdev)
 	init_ut_fnc();
     
     arc4_init();
-
+    
 	initBooterLog();    
     
 	// Initialize boot info structure.
     initKernBootStruct();
-	
 	
     // Scan and record the system's hardware information.
     scan_platform();
@@ -456,16 +455,19 @@ void common_boot(int biosdev)
     set_env(envShouldboot, false);
     set_env(envkCache, (uint32_t)gBootKernelCacheFile);
     set_env(envMKextName, (uint32_t)gMKextName);
-	
+    
     InitBootPrompt();
+    
     
     // First get info for boot volume.
     scanBootVolumes(BIOSDev, 0);
+    
     bvChain = getBVChainForBIOSDev(BIOSDev);
+    
     setBootGlobals(bvChain);
-	
+    
     // Load Booter boot.plist config file
-    status = loadBooterConfig();
+    /*status =*/ loadBooterConfig();
 	
     {
         bool isServer = false;    
@@ -473,12 +475,11 @@ void common_boot(int biosdev)
         set_env(envIsServer , isServer);
     }
 	
-
+    
 	{
 		bool     quiet = false;
 		if (getBoolForKey(kQuietBootKey, &quiet, DEFAULT_BOOT_CONFIG) && quiet)
 		{
-            long gBootMode = kBootModeNormal;
 			gBootMode |= kBootModeQuiet;
 		}
 	}	
@@ -493,7 +494,7 @@ void common_boot(int biosdev)
 			firstRun = false;
 		}
 	}	
-
+    
     {	
 #ifndef OPTION_ROM
         bool ScanSingleDrive = false;
@@ -517,13 +518,13 @@ void common_boot(int biosdev)
             scanDisks();
 #endif
         }    
-    
+        
 	}
     
     // Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
     safe_set_env(envgDeviceCount,devcnt);
-       
+    
     
 	gBootVolume = selectBootVolume(bvChain);
 	
@@ -540,9 +541,9 @@ void common_boot(int biosdev)
     
     // Loading preboot ramdisk if exists.
 	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
-
+    
 #ifndef OPTION_ROM
-
+    
     
 	
     {
@@ -556,7 +557,7 @@ void common_boot(int biosdev)
             
         }
         safe_set_env(envgEnableCDROMRescan, CDROMRescan);
-
+        
     }
     
 	
@@ -576,12 +577,12 @@ void common_boot(int biosdev)
     printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
     getc();
 #endif
-			
+    
     setBootGlobals(bvChain);
 	
 	// Display the GUI
 	execute_hook("GUI_Display", NULL, NULL, NULL, NULL, NULL, NULL);
-
+    
     // Parse args, load and start kernel.
     while (1) {
         const char *val;
@@ -595,7 +596,7 @@ void common_boot(int biosdev)
 #endif
         int ret = -1;
         void *binary = (void *)kLoadAddr;
-       		
+        
         // additional variable for testing alternate kernel image locations on boot helper partitions.
         char     bootFileSpec[512];
 		
@@ -624,7 +625,7 @@ void common_boot(int biosdev)
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
                 safe_set_env(envgDeviceCount,devcnt);
-
+                
 				setBootGlobals(bvChain);
 			}
 			continue;
@@ -632,7 +633,7 @@ void common_boot(int biosdev)
         
         // Other status (e.g. 0) means that we should proceed with boot.
 		execute_hook("GUI_PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);
-				
+        
 		if (getValueForKey(karch, &val, &len, DEFAULT_BOOT_CONFIG) && val)
 		{
 			if (strncmp(val, "x86_64", 4) == 0)
@@ -648,13 +649,13 @@ void common_boot(int biosdev)
 				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n");
 				determineCpuArch();
 			}
-
+            
 		}
 		else determineCpuArch();
-
-
+        
+        
 		getRootDevice();
-
+        
 		// Notify to all modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL, NULL, NULL);  
 		
@@ -683,10 +684,10 @@ void common_boot(int biosdev)
 		{
 			trycache = false;
 		}
-						
+        
 		verbose("Loading Darwin %s\n", gBootVolume->OSVersion);
 		{
-			long cachetime, kerneltime, exttime;
+			long cachetime, kerneltime = 0, exttime;
 			if (trycache && !forcecache) do {
 				
                 if (strcmp(bootInfo->bootFile, kDefaultKernel) != 0) {
@@ -705,7 +706,7 @@ void common_boot(int biosdev)
                     bootFile = kDefaultKernel;
                     goto out;
                 } 
-                    
+                
 				ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
 				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)
 					|| (cachetime < kerneltime))
@@ -713,7 +714,7 @@ void common_boot(int biosdev)
 					trycache = 0;
 					safe_set_env(envAdler32, 0);
 					DBG("Warning: No kernelcache found or kernelcache too old (timestamp of the kernel > timestamp of the cache), kernelcache disabled !!!\n");
-
+                    
 					break;				                
 				} 
 				ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
@@ -723,7 +724,7 @@ void common_boot(int biosdev)
 					trycache = 0;
 					safe_set_env(envAdler32, 0);
 					DBG("Warning: kernelcache too old, timestamp of S/L/E > timestamp of the cache, kernelcache disabled !!! \n");
-
+                    
 					break;
 				}
 				if (kerneltime > exttime)
@@ -735,12 +736,12 @@ void common_boot(int biosdev)
 					trycache = 0;
 					safe_set_env(envAdler32, 0);
 					DBG("Warning: invalid timestamp, kernelcache disabled !!!\n");
-
+                    
 					break;
 				}
 			} while (0);
 		}		
-
+        
         do {
             if (trycache)
 			{
@@ -810,7 +811,7 @@ void common_boot(int biosdev)
 		
         if (ret <= 0)
 		{
-out:
+        out:
 			printf("Can't find %s\n", bootFile);
 			
 			sleep(1);
@@ -837,7 +838,7 @@ out:
     // chainboot
     if (status==1)
 	{
-		if (__getVideoMode() == GRAPHICS_MODE)
+		if (getVideoMode() == GRAPHICS_MODE)
 		{	// if we are already in graphics-mode,
 #if UNUSED
 			__setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
@@ -883,7 +884,7 @@ void getKernelCachePath(void)
 		if (getValueForKey(kKernelCacheKey, &val, &len, DEFAULT_BOOT_CONFIG))
 		{
             char * buffer = newString(val);
-
+            
 			if (val[0] == '\\')
 			{
 				// Flip the back slash's to slash's .
@@ -891,7 +892,7 @@ void getKernelCachePath(void)
                 while (buffer[len] != '\0') {
                     if (buffer[len] == '\\')
                     {
-                         buffer[len] = '/';                        
+                        buffer[len] = '/';                        
                     }
                     len++;
                 }
@@ -1057,14 +1058,14 @@ static void getRootDevice()
 			if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, bootInfo->uuidStr) == 0)
 			{
 				verbose("Setting boot-uuid to: %s\n", bootInfo->uuidStr);
-				uuidSet = true;                
+				//uuidSet = true;                
 				SetgRootDevice(bootInfo->uuidStr);
 				return;
 			}
-		
+            
 		}	
 	}
-		
+    
 out:	
 	verbose("Setting %s to: %s\n", uuidSet ? kBootUUIDKey : "root device", (char* )val); 
     SetgRootDevice(val);
@@ -1213,7 +1214,7 @@ static char *FIXED_BOOTFILE_PATH(char * str)
 	{
 		bootFileWithDevice = true;
 	}
-		
+    
 	// bootFile must start with a / if it not start with a device name
 	if (!bootFileWithDevice && (str)[0] != '/')
 		sprintf(bootFile, "/%s", str); // append a leading /

@@ -779,15 +779,16 @@ void scan_cpu(void)
                                    Model == CPUID_MODEL_SANDYBRIDGE ||
                                    Model == CPUID_MODEL_JAKETOWN)) 
 			{
-				uint8_t		bus_ratio_max = 0, bus_ratio_min = 0;
-				uint32_t	max_ratio = 0;
+				uint8_t		bus_ratio_max = 0;
 				uint64_t	flex_ratio = 0;
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 #if DEBUG_CPU
+                uint32_t	max_ratio = 0, bus_ratio_min = 0;
+                
 				DBG("msr(%d): platform_info %08x\n", __LINE__, msr & 0xffffffff);
 #endif
 				bus_ratio_max = (msr >> 8) & 0xff;
-				bus_ratio_min = (msr >> 40) & 0xff; 
+				//bus_ratio_min = (msr >> 40) & 0xff; 
 				msr = rdmsr64(MSR_FLEX_RATIO);
 #if DEBUG_CPU
 				DBG("msr(%d): flex_ratio %08x\n", __LINE__, msr & 0xffffffff);
@@ -808,8 +809,9 @@ void scan_cpu(void)
 						/* Clear bit 16 (evidently the
 						 presence bit) */
 						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
-						msr = rdmsr64(MSR_FLEX_RATIO);
 #if DEBUG_CPU
+                        msr = rdmsr64(MSR_FLEX_RATIO);
+                        
 						DBG("Unusable flex ratio detected.  MSR Patched to %08x\n", msr & 0xffffffff);
 #endif
 					}
@@ -832,7 +834,7 @@ void scan_cpu(void)
 				{
 					//msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 					CPUFreq = bus_ratio_max * FSBFreq;
-					max_ratio = bus_ratio_max * 10;
+					//max_ratio = bus_ratio_max * 10;
 				}
 				else
 				{
@@ -932,7 +934,7 @@ void scan_cpu(void)
 		}
         /* Mobile CPU ? */ 
 		//Slice 
-	    isMobile = 0;
+	    //isMobile = 0;
 		switch (Model)
 		{
 			case 0x0D:

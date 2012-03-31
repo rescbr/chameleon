@@ -49,7 +49,7 @@ THEMEDIR = ../../../artwork/themes/$(THEME)
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GUI_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o
+GUI_OBJS = GUI_module.o gui.o picopng.o graphic_utils.o stack_protector.o
 
 
 SFILES =
@@ -82,24 +82,28 @@ dylib:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/GUI_module.o \
+    $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/GUI_module.o \
 	$(OBJROOT)/gui.o \
 	$(OBJROOT)/picopng.o \
 	$(OBJROOT)/graphic_utils.o \
 	 -o $(SYMROOT)/$(MODULE_NAME).dylib
 
+stack_protector.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+
 GUI_module.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
 
 gui.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
 
 
 picopng.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
 
 graphic_utils.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
 	
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\

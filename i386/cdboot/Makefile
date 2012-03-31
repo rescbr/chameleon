@@ -2,7 +2,7 @@
 DIR = cdboot
 include ../MakePaths.dir
 
-NASM = /Developer/usr/bin/nasm
+NASM = /usr/bin/nasm
 INSTALLDIR = $(DSTROOT)/usr/standalone/i386
 DIRS_NEEDED = $(SYMROOT)
 

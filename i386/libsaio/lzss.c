@@ -59,7 +59,6 @@ decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen)
     unsigned int flags;
     
     dst = dststart;
-    srcend = src + srclen;
     for (i = 0; i < N - F; i++)
         text_buf[i] = ' ';
     r = N - F;

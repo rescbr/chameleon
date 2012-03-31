@@ -798,7 +798,7 @@ int getBootOptions(bool firstRun)
 	changeCursor(0, kMenuTopRow, kCursorTypeHidden, 0);
 	
 	nextRow = kMenuTopRow;
-	showPrompt = true;
+	/*showPrompt = true;*/
 	
 	if (devcnt) {
 		printf("Use \30\31 keys to select the startup volume.");
@@ -1158,7 +1158,8 @@ void showTextBuffer(char *buf, int size)
 	int	c;
 	
 	
-	bp = buf;
+	if(!(bp = buf)) return;
+    
 	while (size-- > 0) {
 		if (*bp == '\n') {
 			*bp = '\0';

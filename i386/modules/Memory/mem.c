@@ -54,12 +54,12 @@ void dumpPhysAddr(const char * title, void * a, int len)
             sprintf(str, " %02x", ad[i+j]);
         else
             strcpy(str, "   " );  
-        strncat(buffer, str, sizeof(buffer));
+        strlcat(buffer, str, sizeof(buffer));
     }
-    strncat(buffer,"  ", sizeof(buffer));
+    strlcat(buffer,"  ", sizeof(buffer));
     for (j=0; j < (len%STEP); j++)  {
         sprintf(str, "%c", DC(ad[i+j]));  
-        strncat(buffer, str, sizeof(buffer));
+        strlcat(buffer, str, sizeof(buffer));
     }
     printf("%s\n",buffer);
 }

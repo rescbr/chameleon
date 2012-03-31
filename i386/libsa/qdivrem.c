@@ -94,10 +94,17 @@ u_quad_t uq, vq, *arq;
 	 * Take care of special cases: divide by zero, and u < v.
 	 */
 	if (vq == 0) {
+#if 0 // ugly divide by zero reported by CSA, not sure that it's critical, and not sure that the solution provided is good, but it seems to work
+        
 		/* divide by zero. */
 		static volatile const unsigned int zero = 0;
         
-		tmp.ul[Hi] = tmp.ul[Lo] = 1 / zero;
+		tmp.ul[Hi] = tmp.ul[Lo] = 1 / zero;        
+#else
+            
+        tmp.ul[Hi] = tmp.ul[Lo] = ~0; // http://mail-index.netbsd.org/tech-kern/2000/10/12/0001.html
+#endif
+            
 		if (arq)
 			*arq = uq;
 		return (tmp.q);

@@ -34,6 +34,10 @@
 static char * AllocInitStringWithLength(const char * oldString, int len);
 static char * AllocInitZeroEndedStringWithLength(const char * oldString, int len);
 
+#ifndef MIN
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#endif
+
 #define ASSERT_CONFIG                       \
 if (config == DEFAULT_BOOT_CONFIG)          \
 config = &bootInfo->bootConfig  ;           \
@@ -576,6 +580,10 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
     char       *configBuffer;
 	
     configBuffer = malloc(strlen(buffer)+1);
+    if (!configBuffer) {
+        return -1;
+    }   
+    
     strcpy(configBuffer, buffer);
 	
     while (1)
@@ -606,7 +614,7 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
  */
 int loadConfigFile (const char *configFile, config_file_t *config)
 {
-	int fd, count;
+	int fd, count, fixedsize;
     
     ASSERT_CONFIG
     
@@ -614,10 +622,13 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 		return -1;
 	}
 	
+    fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);
+    
 	// read file
-	count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+	count = read(fd, config->plist, fixedsize);
 	close(fd);
-	
+    if (count != fixedsize) return -1;
+
 	// build xml dictionary	
 	return ParseXMLFile(config->plist, &config->dictionary);
 }
@@ -635,23 +646,24 @@ int loadBooterConfig(void)
 		"bt(0,0)/Extra/com.apple.Boot.plist",
 		"rd(0,0)/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
 		"/Extra/org.chameleon.Boot.plist", // Add compatibility with the trunk 
-		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk
-		
+		"bt(0,0)/Extra/org.chameleon.Boot.plist" // Add compatibility with the trunk		
         
 	};
     
     config_file_t *config = &bootInfo->bootConfig;
     
-	int i,fd, count, ret=-1;
+	int i, fd, count, ret=-1, fixedsize;
     
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
 		if ((fd = open(dirspec[i])) >= 0)
 		{
 			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+            fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);
+			count = read(fd, config->plist, fixedsize);
 			close(fd);
-			
+            if (count != fixedsize) continue;
+
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
@@ -688,15 +700,17 @@ int loadOverrideConfig(void)
     config_file_t *config = &bootInfo->overrideConfig;
 
     
-	int i,fd, count, ret=-1;
+	int i, fd, count, ret=-1, fixedsize;
     
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
 		if ((fd = open(dirspec[i])) >= 0)
 		{
 			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
+			count = read(fd, config->plist, fixedsize);
 			close(fd);
+            if (count != fixedsize) continue;
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
@@ -734,15 +748,17 @@ int loadSystemConfig(void)
     config_file_t *config = &bootInfo->SystemConfig;
 
     
-	int i,fd, count, ret=-1;
+	int i, fd, count, ret=-1, fixedsize;
 	
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
 		if ((fd = open(dirspec[i])) >= 0)
 		{
 			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
+			count = read(fd, config->plist, fixedsize);
 			close(fd);
+            if (count != fixedsize) continue;
 			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
@@ -764,7 +780,7 @@ int loadSystemConfig(void)
  */
 int loadHelperConfig(void)
 {
-	int rfd, pfd, sfd, count, ret=-1;
+	int rfd, pfd, sfd, count, ret=-1, fixedsize;
 	
 	char *dirspec[] = {
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
@@ -785,10 +801,12 @@ int loadHelperConfig(void)
 		if(sfd >= 0)
 		{
 			// Use sfd
-			count = read(sfd, config->plist, IO_CONFIG_DATA_SIZE);
+            fixedsize = MIN(file_size(sfd),IO_CONFIG_DATA_SIZE);
+			count = read(sfd, config->plist, fixedsize);
 			close(sfd);
-			close(pfd);
-			
+			close(pfd);            
+            if (count != fixedsize) return -1;
+            
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
@@ -798,9 +816,11 @@ int loadHelperConfig(void)
 		else
 		{
 			// used pfd
-			count = read(pfd, config->plist, IO_CONFIG_DATA_SIZE);
+            fixedsize = MIN(file_size(pfd),IO_CONFIG_DATA_SIZE);
+			count = read(pfd, config->plist, fixedsize);
 			close(pfd);
-			
+            if (count != fixedsize) return -1;
+
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
@@ -817,10 +837,12 @@ int loadHelperConfig(void)
 			if(pfd >= 0)
 			{
 				// use sfd
-				count = read(pfd, config->plist, IO_CONFIG_DATA_SIZE);
+                fixedsize = MIN(file_size(pfd),IO_CONFIG_DATA_SIZE);
+				count = read(pfd, config->plist, fixedsize);
 				close(pfd);
 				close(rfd);
-				
+                if (count != fixedsize) return -1;
+
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);
@@ -830,9 +852,11 @@ int loadHelperConfig(void)
 			else
 			{
 				// use rfd
-				count = read(rfd, config->plist, IO_CONFIG_DATA_SIZE);
+                fixedsize = MIN(file_size(rfd),IO_CONFIG_DATA_SIZE);
+				count = read(rfd, config->plist, fixedsize);
 				close(rfd);
-				
+                if (count != fixedsize) return -1;
+
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);
@@ -847,9 +871,11 @@ int loadHelperConfig(void)
 			if(sfd >= 0)
 			{
 				// use sfd
-				count = read(sfd, config->plist, IO_CONFIG_DATA_SIZE);
+                fixedsize = MIN(file_size(sfd),IO_CONFIG_DATA_SIZE);
+				count = read(sfd, config->plist, fixedsize);
 				close(sfd);
-				
+                if (count != fixedsize) return -1;
+
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);

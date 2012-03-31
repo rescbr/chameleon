@@ -175,7 +175,7 @@ static ACPI_TABLE_FACS* generate_facs(bool updatefacs );
 //#define ULONG_MAX_32 4294967295UL
 
 #define __RES(s, u)												\
-inline unsigned u										\
+static inline unsigned u										\
 resolve_##s(unsigned u defaultentry, char *str, int base)       \
 {																\
 unsigned u entry  = defaultentry;							\
@@ -371,7 +371,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 			
 			
-			if (method != 0x2000)
+			if (method != 0x2)
 			{
 				if (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), 
 								((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) != 0)
@@ -478,7 +478,7 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
 			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 			
 			
-			if (method != 0x2000)
+			if (method != 0x2)
             {
                 if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
                 {
@@ -819,7 +819,6 @@ static U64 divU64byU64(U64 n, U64 d, U64 * rem)
 
 static U32 compute_tdp(CPU_DETAILS * cpu)
 { 
-    
     {
         if (is_jaketown() || is_sandybridge())
         {
@@ -834,7 +833,7 @@ static U32 compute_tdp(CPU_DETAILS * cpu)
             return cpu->tdp_limit / 8;
         }
     }
-	
+	return (0);
 }
 #endif // BUILD_ACPI_TSS || pstate_power_support
 
@@ -903,6 +902,7 @@ static U32 compute_pstate_power(CPU_DETAILS * cpu, U32 ratio, U32 TDP)
 		U32 ratio_factor = (ratio * PRECISION_FACTOR)/P1_Ratio;
 		return ((ratio_factor * ratio_factor * ratio_factor * Core_TDP) / PRECISION_FACTOR_CUBED) + Uncore_TDP;
 	}
+    return (0);
 }
 #endif // pstate_power_support
 
@@ -1276,7 +1276,13 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {	
     
 	struct p_state p_states[32];
-	U8 p_states_count = 0;		
+	U8 p_states_count = 0;	
+	
+    if (!cpu)
+    {
+        return (0);
+    }
+    
 	{
 #if UNUSED
 		struct p_state initial;
@@ -4302,7 +4308,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 				
 				
-				if (method != 0x2000)
+				if (method != 0x2)
 				{
 					if (GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), 
 									((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) != 0)
@@ -4452,6 +4458,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	bzero(rsdt_mod, rsdt->Header.Length);
 	memcpy (&rsdt_mod->Header, &rsdt->Header, sizeof(ACPI_TABLE_HEADER));
 	
+    // Compute number of table pointers included in RSDT
 	U32 num_tables = get_num_tables(rsdt);                        
 	
 	verbose("* Processing RSDT: \n");
@@ -4459,9 +4466,6 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	DBG("  RSDT @%x, Length %d\n",rsdt, rsdt->Header.Length);
 	
 	ACPI_TABLE_HEADER **table_array = (ACPI_TABLE_HEADER **) rsdt->TableOffsetEntry;
-	
-	// Compute number of table pointers included in RSDT
-	num_tables = get_num_tables(rsdt);
 	
 	for (index = 0; index < num_tables; index++)
 	{
@@ -4472,7 +4476,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
 			
 			
-			if (method != 0x2000)
+			if (method != 0x2)
 			{
 				if (GetChecksum(table_array[index], table_array[index]->Length) != 0)
 				{

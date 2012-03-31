@@ -141,7 +141,6 @@ void umountRAMDisk(void)
 
 		// Reset multiboot structures.
 		gRAMDiskMI = NULL;
-		gMI = gRAMDiskMI;
 		
 		*gRAMDiskFile = '\0';
 
@@ -187,9 +186,8 @@ int mountRAMDisk(const char * param)
 		// Save filename in gRAMDiskFile to display information.
 		strcpy(gRAMDiskFile, param);
 
-		// Set gMI as well for the multiboot ramdisk driver hook.
+		// Set gRAMDiskMI as well for the multiboot ramdisk driver hook.
 		gRAMDiskMI = malloc(sizeof(multiboot_info));
-		gMI = gRAMDiskMI;
 		
 		struct multiboot_module * ramdisk_module = malloc(sizeof(multiboot_module));
 
@@ -214,6 +212,8 @@ int mountRAMDisk(const char * param)
 				umountRAMDisk();
 				printf("\nRamdisk contains no partitions.\n");
 				pause();
+                
+               // error = -1; // ??
 
 			}
 			else
@@ -235,7 +235,16 @@ int mountRAMDisk(const char * param)
 				printf("\nmounting: done");
 			}
 		}
-	}
+        else error = -1;
+        
+        if (error == -1) {
+            if (ramdisk_module)
+                free(ramdisk_module);
+            else if (gRAMDiskMI)
+                free(gRAMDiskMI);
+        } 
+	}        
+    
 	return error;
 }
 
@@ -353,8 +362,8 @@ int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
 							  unsigned int byteoff,
 							  unsigned int byteCount, void * buffer )
 {
-    int module_count = gMI->mi_mods_count;
-    struct multiboot_module *modules = (void*)gMI->mi_mods_addr;
+    int module_count = gRAMDiskMI->mi_mods_count;
+    struct multiboot_module *modules = (void*)gRAMDiskMI->mi_mods_addr;
     if(biosdev < 0x100)
         return -1;
     if(biosdev >= (0x100 + module_count))
@@ -368,8 +377,8 @@ int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
 
 int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip)
 {
-    int module_count = gMI->mi_mods_count;
-    struct multiboot_module *modules = (void*)gMI->mi_mods_addr;
+    int module_count = gRAMDiskMI->mi_mods_count;
+    struct multiboot_module *modules = (void*)gRAMDiskMI->mi_mods_addr;
     if(biosdev < 0x100)
         return -1;
     if(biosdev >= (0x100 + module_count))
@@ -386,7 +395,7 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
 {
     char extensionsSpec[1024];
     int ramdiskUnit;
-    for(ramdiskUnit = 0; ramdiskUnit < gMI->mi_mods_count; ++ramdiskUnit)
+    for(ramdiskUnit = 0; ramdiskUnit < gRAMDiskMI->mi_mods_count; ++ramdiskUnit)
     {
         int partCount; // unused
         BVRef ramdiskChain = diskScanBootVolumes(0x100 + ramdiskUnit, &partCount);

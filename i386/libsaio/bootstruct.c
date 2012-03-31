@@ -131,6 +131,8 @@ void setBootArgsVideoMode(int mode)
 {
     bootArgs->Video.v_display = mode;
 }
+//==========================================================================
+// Return the current video mode.
 uint32_t getVideoMode(void)
 {
     return bootArgs->Video.v_display;

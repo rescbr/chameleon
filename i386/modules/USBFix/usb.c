@@ -130,13 +130,14 @@ static int legacy_off (pci_dt_t *pci_dev)
 	
 	DBG("capaddr=%x opaddr=%x eecp=%x\n", capaddr, opaddr, eecp);
 	
-	uint32_t usbcmd = *((unsigned int*)(opaddr));			// Command Register
+	
+#if DEBUG_USB
+    uint32_t usbcmd = *((unsigned int*)(opaddr));			// Command Register
 	uint32_t usbsts = *((unsigned int*)(opaddr + 4));		// Status Register
 	uint32_t usbintr = *((unsigned int*)(opaddr + 8));		// Interrupt Enable Register
-	
 	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
-	
-	// read PCI Config 32bit USBLEGSUP (eecp+0) 
+    
+    // read PCI Config 32bit USBLEGSUP (eecp+0) 
 	uint32_t usblegsup = pci_config_read32(pci_dev->dev.addr, eecp);
 	
 	// informational only
@@ -147,6 +148,10 @@ static int legacy_off (pci_dt_t *pci_dev)
 	uint32_t usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
 	
 	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+#else
+    uint32_t usbcmd;
+#endif	
+	
 	
 	// Reset registers to Legacy OFF
 	DBG("Clearing USBLEGCTLSTS\n");
@@ -157,11 +162,13 @@ static int legacy_off (pci_dt_t *pci_dev)
 	delay(100);
 	
 	usbcmd = *((unsigned int*)(opaddr));
+#if DEBUG_USB
+
 	usbsts = *((unsigned int*)(opaddr + 4));
 	usbintr = *((unsigned int*)(opaddr + 8));
 	
 	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
-	
+#endif
 	DBG("Clearing Registers\n");
 	
 	// clear registers to default
@@ -171,14 +178,16 @@ static int legacy_off (pci_dt_t *pci_dev)
 	*((unsigned int*)(opaddr + 4)) = 0x1000;			//usbsts - clear status registers 	
 	pci_config_write32(pci_dev->dev.addr, eecp, 1);		//usblegsup
 	
-	// get the results
+	
+#if DEBUG_USB
+    // get the results
 	usbcmd = *((unsigned int*)(opaddr));
 	usbsts = *((unsigned int*)(opaddr + 4));
 	usbintr = *((unsigned int*)(opaddr + 8));
 	
 	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
-	
-	// read 32bit USBLEGSUP (eecp+0) 
+    
+    // read 32bit USBLEGSUP (eecp+0) 
 	usblegsup = pci_config_read32(pci_dev->dev.addr, eecp);
 	
 	// informational only
@@ -189,6 +198,7 @@ static int legacy_off (pci_dt_t *pci_dev)
 	usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
 	
 	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+#endif	
 	
 	DBG("Legacy USB Off Done\n");	
 	return 1;

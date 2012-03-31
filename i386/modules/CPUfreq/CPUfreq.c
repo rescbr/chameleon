@@ -40,8 +40,6 @@ void CPUfreq_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, vo
 				
 				bus_ratio = 0; 								  
 				msr = rdmsr64(MSR_FSB_FREQ); 
-				fsbFrequency = 0;
-				cpuFrequency = 0; 
 				minfsb = 183000000; 
 				maxfsb = 185000000;
 				

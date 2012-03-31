@@ -48,7 +48,7 @@ AllocateMemoryRange(char * rangeName, long start, long length)
     strcpy(nameBuf, rangeName);
     
     buffer = malloc(2 * sizeof(uint32_t));
-    if (buffer == 0) return -1;
+    if (buffer == 0) {free(nameBuf);return -1;}
     
     buffer[0] = start;
     buffer[1] = length;

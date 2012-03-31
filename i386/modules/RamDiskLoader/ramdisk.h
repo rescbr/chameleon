@@ -23,9 +23,6 @@ typedef struct RAMDiskParam
 	unsigned int size;
 } RAMDiskParam;
 
-/* mboot.c */
-extern struct multiboot_info *gMI;
-
 //
 extern int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip);
 extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);

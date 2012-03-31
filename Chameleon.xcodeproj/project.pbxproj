@@ -454,6 +454,7 @@
 		AB43B42A14C3A8080018D529 /* arc4random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = arc4random.c; sourceTree = "<group>"; };
 		AB79217514F38CF200F5EB39 /* bootXnu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootXnu.h; sourceTree = "<group>"; };
 		AB79219214F3919E00F5EB39 /* ModuleHelp.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModuleHelp.txt; sourceTree = "<group>"; };
+		ABB4CE7D151E39740053B64E /* lzss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzss.c; sourceTree = "<group>"; };
 		ABD521F114F9197900B62550 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
 		ABD521F214F9197900B62550 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
 		ABD521F314F9197900B62550 /* uterror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uterror.c; sourceTree = "<group>"; };
@@ -964,6 +965,7 @@
 		AB43B2ED14C37E520018D529 /* libsaio */ = {
 			isa = PBXGroup;
 			children = (
+				ABB4CE7D151E39740053B64E /* lzss.c */,
 				AB43B2EE14C37E520018D529 /* acpi.h */,
 				AB43B2EF14C37E520018D529 /* acpi_tools.c */,
 				AB43B2F014C37E520018D529 /* acpi_tools.h */,
@@ -1728,7 +1730,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
 			compatibilityVersion = "Xcode 3.2";

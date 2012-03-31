@@ -1194,7 +1194,10 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	
 	buffer = (uint8_t *)malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
+    {
+        free(structPtr);
 		return NULL;
+    }
 	
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
@@ -1207,7 +1210,11 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	
 	SMBEntryPoint *neweps = (SMBEntryPoint *)AllocateKernelMemory(sizeof(SMBEntryPoint));
 	if (!neweps)
+    {
+        free(buffer);
+        free(structPtr);
 		return NULL;
+    }
 	bzero(neweps, sizeof(SMBEntryPoint));
     
 	neweps->anchor[0]			= '_';
@@ -1231,8 +1238,11 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	neweps->dmi.bcdRevision		= 0x24;
     
 	if (!neweps->dmi.tableAddress)
+    {
+        free(buffer);
+        free(structPtr);
 		return NULL;
-    
+    }    
 	memcpy((void *)neweps->dmi.tableAddress, buffer, tableLength);
     
 	neweps->dmi.checksum		= 0;
@@ -1241,7 +1251,9 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	neweps->checksum			= 0;
 	neweps->checksum			= 0x100 - checksum8(neweps, sizeof(SMBEntryPoint));
     
-	//free(buffer);
+	free(buffer);
+    free(structPtr);
+
 	decodeSMBIOSTable(neweps);
     
     return neweps;

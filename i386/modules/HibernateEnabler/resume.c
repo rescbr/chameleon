@@ -28,14 +28,18 @@ static void WakeKernel(IOHibernateImageHeader * header);
 static unsigned long
 getmemorylimit(void)
 {
+#if UNUSED
     int line;
+#endif
     int i;
     
     MemoryRange *mp = (MemoryRange*)(uint32_t)get_env(envMemoryMap);
     int MemMapCnt = (int)get_env(envMemoryMapCnt);
 
+#if UNUSED
     // Activate and clear page 1
     line = 1;
+#endif
     
     for (i = 0; i < MemMapCnt; i++)
     {
@@ -51,7 +55,10 @@ getmemorylimit(void)
 static void WakeKernel(IOHibernateImageHeader * header)
 {
 	uint32_t proc;
-	unsigned long cnt, newSP;
+    unsigned long cnt;
+#if UNUSED
+    unsigned long newSP;
+#endif 
 	unsigned long *src, *dst;
 	unsigned int 	count;
 	unsigned int 	page;
@@ -65,8 +72,9 @@ static void WakeKernel(IOHibernateImageHeader * header)
 	dst   = (unsigned long *) (header->restore1CodePage << 12);
 	count = header->restore1PageCount;
 	proc  = (header->restore1CodeOffset + ((uint32_t) dst));
+#if UNUSED
 	newSP = header->restore1StackOffset + (header->restore1CodePage << 12);
-	
+#endif
 	src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 
 							  + header->fileExtentMapSize);
 	sum  = 0;
@@ -110,7 +118,10 @@ static void WakeKernel(IOHibernateImageHeader * header)
 static void WakeKernel107(IOHibernateImageHeader107 * header)
 {
     uint32_t proc;
-    unsigned long cnt, newSP;
+    unsigned long cnt;
+#if UNUSED
+    unsigned long newSP;
+#endif    
     unsigned long *src, *dst;
     unsigned int 	count;
     unsigned int 	page;
@@ -124,8 +135,9 @@ static void WakeKernel107(IOHibernateImageHeader107 * header)
     dst   = (unsigned long *) (header->restore1CodePhysPage << 12);
     count = header->restore1PageCount;
     proc  = (header->restore1CodeOffset + ((uint32_t) dst));
+#if UNUSED
     newSP = header->restore1StackOffset + (header->restore1CodePhysPage << 12);
-    
+#endif
     src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 
                               + header->fileExtentMapSize);
     sum  = 0;

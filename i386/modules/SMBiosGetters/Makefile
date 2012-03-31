@@ -85,16 +85,16 @@ stack_protector.o:
         
 
 SMBiosGetters.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "SMBiosGetters.c" $(INC) -o "$(OBJROOT)/SMBiosGetters.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "SMBiosGetters.c" $(INC) -o "$(OBJROOT)/SMBiosGetters.o"
 	
 mysmbios.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "mysmbios.c" $(INC) -o "$(OBJROOT)/mysmbios.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "mysmbios.c" $(INC) -o "$(OBJROOT)/mysmbios.o"
 	
 smbios_decode.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "smbios_decode.c" $(INC) -o "$(OBJROOT)/smbios_decode.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "smbios_decode.c" $(INC) -o "$(OBJROOT)/smbios_decode.o"
 	
 smbios_getters.o: 	
-	gcc-4.2 $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "smbios_getters.c" $(INC) -o "$(OBJROOT)/smbios_getters.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "smbios_getters.c" $(INC) -o "$(OBJROOT)/smbios_getters.o"
 
 include ../../MakeInc.dir
 

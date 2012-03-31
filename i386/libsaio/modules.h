@@ -82,7 +82,7 @@ EFI_STATUS load_bundle(const char* bundle);
 VOID load_all_bundles(void);
 
 EFI_STATUS is_module_loaded(const char* name);
-VOID module_loaded(const char* name/*, UInt32 version, UInt32 compat*/);
+VOID module_loaded(const char* name);
 
 long long add_symbol(char* module,char* symbol, long long addr, char is64);
 

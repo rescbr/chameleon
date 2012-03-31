@@ -921,7 +921,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 		uint8_t type;
 		uint8_t index;
 		uint8_t *heads;
-	} entries[numentries];
+	};
+    
+    struct dcbentry entries[MAX_NUM_DCB_ENTRIES];
 	
 	for (i = 0; i < numentries; i++) {
 		uint32_t connection;
@@ -1266,6 +1268,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 				// Valid Signature ?
 				if (rom[0] != 0x55 && rom[1] != 0xaa) {
 					printf("ERROR: Unable to locate nVidia Video BIOS\n");
+                    free(rom);
 					return false;
 				} else {
 					DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
@@ -1280,6 +1283,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
 		printf("ERROR: nVidia ROM Patching Failed!\n");
+        free(rom);
 		return false;
 	}
 	DBG("nvidia rom successfully patched\n");
@@ -1293,6 +1297,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			model = get_nvidia_model((rom_pci_header->vendor << 16) | rom_pci_header->device);
 		} else {
 			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
+            // ??
+            //free(rom);
+            //return false;
 		}
 	}
 	DBG("nvidia model : %s\n",model);

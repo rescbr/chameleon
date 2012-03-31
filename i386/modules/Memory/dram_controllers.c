@@ -271,8 +271,10 @@ static void get_timings_i965(pci_dt_t *dram_dev)
 { 
 	// Thanks for CDH optis
 	uint32_t dev0, c0ckectrl, c1ckectrl, offset;
-	uint32_t ODT_Control_Register, Precharge_Register, ACT_Register, Read_Register, Misc_Register;
-
+	uint32_t ODT_Control_Register, Precharge_Register, ACT_Register, Read_Register;
+#if UNUSED
+    unsigned long Misc_Register;    
+#endif
 	long *ptr;
 	
 	// Read MMR Base Address
@@ -299,10 +301,10 @@ static void get_timings_i965(pci_dt_t *dram_dev)
 	
 	ptr = (long*)(dev0 + offset + 0x258);
 	Read_Register = *ptr & 0xFFFFFFFF;
-	
+#if UNUSED
 	ptr = (long*)(dev0 + offset + 0x244);
 	Misc_Register = *ptr & 0xFFFFFFFF;
-	
+#endif
 	// 965 Series only support DDR2
     safe_set_env(envRamType,SMB_MEM_TYPE_DDR2);
 	
@@ -376,7 +378,10 @@ static void get_timings_p35(pci_dt_t *dram_dev)
 { 
 	// Thanks for CDH optis
 	unsigned long dev0, Memory_Check, c0ckectrl, c1ckectrl, offset;
-	unsigned long ODT_Control_Register, Precharge_Register, ACT_Register, Read_Register, Misc_Register;
+	unsigned long ODT_Control_Register, Precharge_Register, ACT_Register, Read_Register;    
+#if UNUSED
+    unsigned long Misc_Register;
+#endif
 	long *ptr;
 	
 	//Device_ID = pci_config_read16(dram_dev->dev.addr, 0x02);
@@ -406,13 +411,10 @@ static void get_timings_p35(pci_dt_t *dram_dev)
 	
 	ptr = (long*)(dev0 + offset + 0x258);
 	Read_Register = *ptr & 0xFFFFFFFF;
-	
+#if UNUSED
 	ptr = (long*)(dev0 + offset + 0x244);
 	Misc_Register = *ptr & 0xFFFFFFFF;
-	
-	ptr = (long*)(dev0 + offset + 0x1E8);
-	Memory_Check = *ptr & 0xFFFFFFFF;	
-	
+#endif
 	// On P45, check 1A8
 	if(dram_dev->device_id > 0x2E00) {
 		ptr = (long*)(dev0 + offset + 0x1A8);

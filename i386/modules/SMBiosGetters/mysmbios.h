@@ -306,6 +306,7 @@ typedef struct SMBMemorySPD {
 	SMBWord           Data[];
 } __attribute__((packed)) SMBMemorySPD;
 
+#if 0
 static const char *
 SMBMemoryDeviceTypes[] =
 {
@@ -339,6 +340,7 @@ SMBMemoryDeviceTypes[] =
 static const int
 kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes)   /
                             sizeof(SMBMemoryDeviceTypes[0]);
+#endif
 
 //
 // OEM Processor Type (Apple Specific - Type 131)

@@ -79,7 +79,7 @@
 #define kSystemType			"SystemType"		/* fake_efi.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
-#define kAcpiMethod			"nacpi"				// 0x2000 (= method 2) for some machines that may hang on acpi 2 (aka acpi 64 bit) detection (replace the old kUnsafeACPI "UnsafeACPI") 	
+#define kAcpiMethod			"Acpi2Method"				// 2 (= method 2) for some machines that may hang on acpi 2 (aka acpi 64 bit) detection (replace the old kUnsafeACPI "UnsafeACPI") 	
 
 #define PLATFORM_NAME_LEN 64
 #define ROOT_PATH_LEN 256

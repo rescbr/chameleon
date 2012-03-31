@@ -649,7 +649,7 @@ static long GetCatalogEntry(long long * dirIndex, char ** name,
 static long ReadCatalogEntry(char * fileName, long dirID,
                              void * entry,    long long * dirIndex)
 {
-    long              length;
+    //long              length;
     char              key[sizeof(HFSPlusCatalogKey)];
     HFSCatalogKey     *hfsKey     = (HFSCatalogKey *)key;
     HFSPlusCatalogKey *hfsPlusKey = (HFSPlusCatalogKey *)key;
@@ -658,13 +658,13 @@ static long ReadCatalogEntry(char * fileName, long dirID,
     if ( gIsHFSPlus )
     {
         hfsPlusKey->parentID = SWAP_BE32(dirID);
-        length = strlen(fileName);
-        if (length > 255) length = 255;
+        //length = strlen(fileName);
+        //if (length > 255) length = 255;
         utf_decodestr((u_int8_t *)fileName, hfsPlusKey->nodeName.unicode,
                       &(hfsPlusKey->nodeName.length), 512, OSBigEndian);
     } else {
         hfsKey->parentID = SWAP_BE32(dirID);
-        length = strlen(fileName);
+        long length = strlen(fileName);
         if (length > 31) length = 31;
         hfsKey->nodeName[0] = length;
         strncpy((char *)(hfsKey->nodeName + 1), fileName, length);
@@ -702,7 +702,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
     BTNodeDescriptor *node;
     long             nodeSize, result = 0, entrySize = 0;
     long             curNode, index = 0, lowerBound, upperBound;
-    char             *testKey, *recordData;
+    char             *testKey, *recordData = 0;
 
     // Figure out which tree is being looked at.
     if (btree == kBTreeCatalog) {
@@ -778,7 +778,9 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
             index = upperBound;
             GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &recordData);
         }
-    
+        
+        if (!recordData) { free(nodeBuf); return -1; }
+
         // Found the closest key... Recurse on it if this is an index node.
         if (node->kind == kBTIndexNode) {
             curNode = SWAP_BE32( *((long *)recordData) );
@@ -786,7 +788,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
     }
   
     // Return error if the file was not found.
-    if (result != 0) { free(nodeBuf); return -1; }
+    if (result != 0 || !recordData) { free(nodeBuf); return -1; }
 
     if (btree == kBTreeCatalog) {
         switch (SWAP_BE16(*(short *)recordData)) {

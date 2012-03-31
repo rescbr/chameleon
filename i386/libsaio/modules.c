@@ -364,7 +364,6 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 	{
 		struct segment_command *segCommand = NULL;
 		struct segment_command_64 *segCommand64 = NULL;
-		struct dylib_command* dylibCommand = NULL;
 		struct load_command *loadCommand = NULL;
 		UInt32 binaryIndex = 0;
 		UInt16 cmd = 0;
@@ -517,12 +516,9 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 				case LC_LOAD_DYLIB:
 				case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
 				{
-					dylibCommand  = binary + binaryIndex;
+					struct dylib_command* dylibCommand = binary + binaryIndex;
 					char* weak_module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-					// TODO: verify version
-					// =	dylibCommand->dylib.current_version;
-					// =	dylibCommand->dylib.compatibility_version;
-					
+										
 					char *name=NULL;
 					name = newStringWithFormat( "%s.dylib", weak_module);
 					if (!name) {
@@ -550,11 +546,13 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 					break;
 				}				
 				case LC_ID_DYLIB:
-					dylibCommand = binary + binaryIndex;
-					/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
+                {
+                    /*struct dylib_command* dylibCommand = binary + binaryIndex;
+					 moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
 					 moduleVersion =	dylibCommand->dylib.current_version;
 					 moduleCompat =	dylibCommand->dylib.compatibility_version;
 					 */
+                }
 					break;
 					
 				case LC_DYLD_INFO:
@@ -632,7 +630,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt8 bits = 0;
 	UInt32 index = 0;
 	
-	int done = 0;
+	//int done = 0;
 	unsigned int i = 0;
 	
 	while(/*!done &&*/ i < size)
@@ -645,7 +643,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 		{
 			case REBASE_OPCODE_DONE:
 				// Rebase complete.
-				done = 1;
+				//done = 1;
 				break;
 				
 				
@@ -712,14 +710,12 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				
 			case REBASE_OPCODE_DO_REBASE_IMM_TIMES:
-				index = 0;
 				for (index = 0; index < immediate; ++index)
 				{
 					rebase_location(base + segmentAddress, (char*)base, type);
 					segmentAddress += sizeof(void*);
 				}
-				break;
-				
+				break;				
 				
 			case REBASE_OPCODE_DO_REBASE_ULEB_TIMES:
 				tmp = 0;
@@ -731,7 +727,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				index = 0;
 				for (index = 0; index < tmp; ++index)
 				{
 					//DBG("\tRebasing 0x%X\n", segmentAddress);
@@ -775,7 +770,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				while(rebase_stream[i] & 0x80);
 				
-				index = 0;
 				for (index = 0; index < tmp; ++index)
 				{
 					
@@ -801,17 +795,14 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 	
 	UInt8 immediate = 0;
 	UInt8 opcode = 0;
-	UInt8 type = 0;
 	
 	UInt32 segmentAddress = 0;
 	
 	UInt32 address = 0;
 	
 	SInt32 addend = 0;			// TODO: handle this
-	SInt32 libraryOrdinal = 0;
 	
 	const char* symbolName = NULL;
-	UInt8 symboFlags = 0;
 	UInt32 symbolAddr = 0xFFFFFFFF;
 	
 	// Temperary variables
@@ -820,10 +811,9 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 	UInt32 tmp2 = 0;
 	
 	UInt32 index = 0;
-	int done = 0;
 	unsigned int i = 0;
 	
-	while(/*!done &&*/ i < size)
+	while(i < size)
 	{
 		immediate = bind_stream[i] & BIND_IMMEDIATE_MASK;
 		opcode = bind_stream[i] & BIND_OPCODE_MASK;
@@ -832,17 +822,21 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 		switch(opcode)
 		{
 			case BIND_OPCODE_DONE:
-				done = 1; 
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
-				libraryOrdinal = immediate;
-				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
+            {
+#if DEBUG_MODULES==2
+				SInt32 libraryOrdinal = immediate;
+				DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: %d\n", libraryOrdinal);
+#endif
 				break;
-				
+            }
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
-				libraryOrdinal = 0;
-				bits = 0;
+            {
+#if DEBUG_MODULES==2
+				SInt32 libraryOrdinal = 0;
+				UInt8 bits = 0;
 				do
 				{
 					libraryOrdinal |= (bind_stream[++i] & 0x7f) << bits;
@@ -850,34 +844,46 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				//DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
-				
+				DBG("BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: %d\n", libraryOrdinal);
+#else
+                do
+				{
+					i++;
+				}
+				while(bind_stream[i] & 0x80);
+#endif
 				break;
-				
+			}	
 			case BIND_OPCODE_SET_DYLIB_SPECIAL_IMM:
-				// NOTE: this is wrong, fortunately we don't use it
-				libraryOrdinal = -immediate;
-				//DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
-				
+            {
+#if DEBUG_MODULES==2
+                // NOTE: this is wrong, fortunately we don't use it
+				SInt32 libraryOrdinal = -immediate;
+				DBG("BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: %d\n", libraryOrdinal);
+#endif		
 				break;
-				
+			}	
 			case BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM:
-				symboFlags = immediate;
+            {
 				symbolName = (char*)&bind_stream[++i];
 				i += strlen((char*)&bind_stream[i]);
-				//DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symboFlags);
-				
+#if DEBUG_MODULES==2
+				UInt8 symbolFlags = immediate;
+                DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symbolFlags);
+#endif				
 				symbolAddr = lookup_all_symbols(NULL ,symbolName);
 				
 				break;
-				
+            }
 			case BIND_OPCODE_SET_TYPE_IMM:
+            {
 				// Set bind type (pointer, absolute32, pcrel32)
-				type = immediate;
-				//DBG("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
-				
+#if DEBUG_MODULES==2
+                UInt8 type = immediate;
+				DBG("BIND_OPCODE_SET_TYPE_IMM: %d\n", type);
+#endif
 				break;
-				
+            }
 			case BIND_OPCODE_SET_ADDEND_SLEB:
 				addend = 0;
 				bits = 0;
@@ -889,14 +895,14 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				if(!(bind_stream[i-1] & 0x40)) addend *= -1;
-				
-				//DBG("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
+#endif
+
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
-			{
-				segmentAddress = 0;
-				
+			{				
 				// Locate address
 				struct segment_command* segCommand = NULL;	// NOTE: 32bit only
 				
@@ -924,8 +930,9 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				}while(bind_stream[i] & 0x80);
 				
 				segmentAddress += tmp;
-				
-				//DBG("BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB: 0x%X\n", segmentAddress);
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB: 0x%X\n", segmentAddress);
+#endif
 				break;
 			}				
 			case BIND_OPCODE_ADD_ADDR_ULEB:
@@ -940,20 +947,27 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				while(bind_stream[i] & 0x80);
 				
 				segmentAddress += tmp;
-				//DBG("BIND_OPCODE_ADD_ADDR_ULEB: 0x%X\n", segmentAddress);
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_ADD_ADDR_ULEB: 0x%X\n", segmentAddress);
+#endif
+
 				break;
 				
 			case BIND_OPCODE_DO_BIND:
-				//DBG("BIND_OPCODE_DO_BIND\n");
-				if(symbolAddr != 0xFFFFFFFF)
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_DO_BIND\n");
+#endif                
+                
+                if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    getc();
                     goto error;
                     
 				}
@@ -962,8 +976,9 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
-				//DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB\n");
-				
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB\n");
+#endif		
 				
 				// Read in offset
 				tmp  = 0;
@@ -975,42 +990,45 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				
-				
-				if(symbolAddr != 0xFFFFFFFF)
+				                
+                if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
-                    goto error;
-                    
+                    getc();
+                    goto error;                    
                     
 				}
+
 				segmentAddress += tmp + sizeof(void*);
 				
 				
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED:
-				//DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED\n");
-				
-				if(symbolAddr != 0xFFFFFFFF)
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_DO_BIND_ADD_ADDR_IMM_SCALED\n");
+#endif						
+                
+                if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
-                    goto error;
+                    getc();
+                    goto error;                    
+                    
 				}
-				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
-				
+				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);				
 				
 				break;
 				
@@ -1035,11 +1053,11 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				
-				//DBG("BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB 0x%X 0x%X\n", tmp, tmp2);
-				
-				
-				if(symbolAddr != 0xFFFFFFFF)
+#if DEBUG_MODULES==2
+				DBG("BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB 0x%X 0x%X\n", tmp, tmp2);
+#endif				
+                
+                if(symbolAddr != 0xFFFFFFFF)
 				{
 					for(index = 0; index < tmp; index++)
 					{
@@ -1051,13 +1069,13 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 						segmentAddress += tmp2 + sizeof(void*);
 					}
 				}
-				else if(strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0)
+				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
-                    goto error;
+                    getc();
+                    goto error;                    
                     
-				}
-				
+				}				
 				
 				break;
 			default:
@@ -1068,7 +1086,6 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 	}
     return EFI_SUCCESS;
 error:
-    getc();
     return EFI_NOT_FOUND;
 }
 
@@ -1250,6 +1267,9 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
 	unsigned int module_start = 0xFFFFFFFF;
 	
 	UInt32 symbolIndex = 0;
+    if (!symtabCommand) {
+        return 0xFFFFFFFF;
+    }
 	char* symbolString = base + (char*)symtabCommand->stroff;
 	//char* symbolTable = base + symtabCommand->symoff;
 	if(!is64)

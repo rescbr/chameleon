@@ -10,7 +10,7 @@
 #define OFFSET_1MEG 0x100000
 #define BAD_BOOT_DEVICE 0xffffffff
 
-struct multiboot_info *gMI;
+//struct multiboot_info *gMI;
 
 #if UNUSED
 int multiboot_timeout=0;
@@ -283,6 +283,7 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
     return mi_copy;
 }
 
+
 // When we enter, we're actually 1 MB high.
 // Fortunately, memcpy is position independent, and it's all we need
 uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
@@ -294,12 +295,20 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // makes a BIOS call from real mode which of course won't work
     // because we're stuck in extended memory at this point.
     struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);	
-	
-    // Get us in to low memory so we can run everything
 
+#if 0	
+    /*
+     * cparm: I'm not an asm guru but i don't see what's the use of this part of code, moreover some 
+     * compilers seems to don't like this at all and crash during compilation, if it's really 
+     * necesary maybe we should consider to do it in some other way
+     */
+    
+    // Get us in to low memory so we can run everything
+    
     // We cannot possibly be more than 383.5k and copying extra won't really hurt anything
     // We use the address of the assembly entrypoint to get our starting location.
     memcpy(&boot2_sym, (char*)&boot2_sym + OFFSET_1MEG, 0x5fe00 /* 383.5k */);	
+#endif
 	
     // This is a little assembler routine that returns to us in the correct selector
     // instead of the kernel selector we're running in now and at the correct
@@ -314,11 +323,12 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // However, our caller must fix his return address if he wishes to return to
     // his caller and so on and so forth.
 
+
 	
     /*  Zero the BSS and initialize malloc */
     initialize_runtime();
 
-    gMI = mi_p;
+    //gMI = mi_p;
 
     /*  Set up a temporary bootArgs so we can call console output routines
         like printf that check the v_display.  Note that we purposefully
@@ -333,12 +343,12 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     bootArgs = &temporaryBootArgsData;
     bootArgs->Video.v_display = VGA_TEXT_MODE;
 
-
     // Since we call multiboot ourselves, its return address will be correct.
     // That is unless it's inlined in which case it does not matter.
     uint32_t bootdevice = multiboot(multiboot_magic, mi_p);
     // We're about to exit and temporaryBootArgs will no longer be valid
     bootArgs = NULL;
+    
     return bootdevice;
 }
 

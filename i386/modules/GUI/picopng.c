@@ -45,12 +45,12 @@ void png_alloc_remove_node(png_alloc_node_t *node);
 void *png_alloc_malloc(size_t size);
 void *png_alloc_realloc(void *addr, size_t size);
 void png_alloc_free(void *addr);
-__unused void vector32_cleanup(vector32_t *p);
+void vector32_cleanup(vector32_t *p);
 uint32_t vector32_resize(vector32_t *p, size_t size);
 uint32_t vector32_resizev(vector32_t *p, size_t size, uint32_t value);
 void vector32_init(vector32_t *p);
 vector32_t *vector32_new(size_t size, uint32_t value);
-__unused void vector8_cleanup(vector8_t *p);
+void vector8_cleanup(vector8_t *p);
 uint32_t vector8_resize(vector8_t *p, size_t size);
 uint32_t vector8_resizev(vector8_t *p, size_t size, uint8_t value);
 void vector8_init(vector8_t *p);
@@ -93,6 +93,9 @@ void png_alloc_add_node(void *addr, size_t size)
 
 void png_alloc_remove_node(png_alloc_node_t *node)
 {
+    if (!node) {
+        return;
+    }
 	if (node->prev)
 		node->prev->next = node->next;
 	if (node->next)
@@ -118,7 +121,7 @@ void *png_alloc_realloc(void *addr, size_t size)
 	if (!addr)
 		return png_alloc_malloc(size);
 	new_addr = realloc(addr, size);
-	if (new_addr != addr) {
+	if (new_addr && (new_addr != addr)) {
 		png_alloc_node_t *old_node;
 		old_node = png_alloc_find_node(addr);
 		png_alloc_remove_node(old_node);
@@ -147,7 +150,7 @@ void png_alloc_free_all(void)
 
 /*************************************************************************************************/
 
-__unused void vector32_cleanup(vector32_t *p)
+void vector32_cleanup(vector32_t *p)
 {
 	p->size = p->allocsize = 0;
 	if (p->data)
@@ -190,15 +193,22 @@ void vector32_init(vector32_t *p)
 vector32_t *vector32_new(size_t size, uint32_t value)
 {
 	vector32_t *p = png_alloc_malloc(sizeof (vector32_t));
+    if (!p) {
+        return NULL;
+    }
 	vector32_init(p);
 	if (size && !vector32_resizev(p, size, value))
+    {
+        vector32_cleanup(p);
+        png_alloc_free(p);
 		return NULL;
+    }
 	return p;
 }
 
 /*************************************************************************************************/
 
-__unused void vector8_cleanup(vector8_t *p)
+void vector8_cleanup(vector8_t *p)
 {
 	p->size = p->allocsize = 0;
 	if (p->data)
@@ -244,20 +254,32 @@ void vector8_init(vector8_t *p)
 vector8_t *vector8_new(size_t size, uint8_t value)
 {
 	vector8_t *p = png_alloc_malloc(sizeof (vector8_t));
+    if(!p)
+    {
+        return NULL;
+    }
 	vector8_init(p);
 	if (size && !vector8_resizev(p, size, value))
-		return NULL;
+    {
+        vector8_cleanup(p);
+        png_alloc_free(p);
+        return NULL;
+    }    
 	return p;
 }
-
+#if 1
 vector8_t *vector8_copy(vector8_t *p)
 {
 	vector8_t *q = vector8_new(p->size, 0);
 	uint32_t n;
+    if (!q) {
+        return NULL;
+    }
 	for (n = 0; n < q->size; n++)
 		q->data[n] = p->data[n];
 	return q;
 }
+#endif
 
 /*************************************************************************************************/
 
@@ -301,6 +323,9 @@ int Zlib_decompress(vector8_t *out, const vector8_t *in);
 HuffmanTree *HuffmanTree_new(void)
 {
 	HuffmanTree *tree = png_alloc_malloc(sizeof (HuffmanTree));
+    if (!tree) {
+        return NULL;
+    }
 	tree->tree2d = NULL;
 	return tree;
 }
@@ -313,6 +338,9 @@ int HuffmanTree_makeFromLengths(HuffmanTree *tree, const vector32_t *bitlen, uin
 	tree1d = vector32_new(numcodes, 0);
 	blcount = vector32_new(maxbitlen + 1, 0);
 	nextcode = vector32_new(maxbitlen + 1, 0);
+    if (!tree1d || !blcount || !nextcode || !nextcode->data) {
+        return 1; // FIXME
+    }
 	for (bits = 0; bits < numcodes; bits++)
 		blcount->data[bitlen->data[bits]]++; // count number of instances of each code length
 	for (bits = 1; bits <= maxbitlen; bits++)
@@ -346,6 +374,10 @@ int HuffmanTree_decode(const HuffmanTree *tree, bool *decoded, uint32_t *result,
 		uint32_t bit)
 {	// Decodes a symbol from the tree
 	const vector32_t *tree2d = tree->tree2d;
+    if (!tree2d) {
+        return 1; // FIXME
+
+    }
 	uint32_t numcodes = (uint32_t) tree2d->size / 2;
 	if (*treepos >= numcodes)
 		return 11; // error: you appeared outside the codetree
@@ -380,12 +412,23 @@ void Inflator_generateFixedTrees(HuffmanTree *tree, HuffmanTree *treeD)
 	vector32_t *bitlen, *bitlenD;
 	bitlen = vector32_new(288, 8);
 	bitlenD = vector32_new(32, 5);
+    
+    if (!bitlen || !bitlenD) {
+        Inflator_error = 1; // FIXME: find the appropriate error return
+        return;
+    }    
 	for (i = 144; i <= 255; i++)
 		bitlen->data[i] = 9;
 	for (i = 256; i <= 279; i++)
 		bitlen->data[i] = 7;
-	HuffmanTree_makeFromLengths(tree, bitlen, 15);
-	HuffmanTree_makeFromLengths(treeD, bitlenD, 15);
+	Inflator_error = HuffmanTree_makeFromLengths(tree, bitlen, 15);
+    if (Inflator_error) {
+        return;
+    }
+	Inflator_error = HuffmanTree_makeFromLengths(treeD, bitlenD, 15);
+    if (Inflator_error) {
+        return;
+    }
 }
 
 uint32_t Inflator_huffmanDecodeSymbol(const uint8_t *in, size_t *bp, const HuffmanTree *codetree,
@@ -414,6 +457,10 @@ void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const
 	// compressed with a known tree
 	size_t i, n;
 	HuffmanTree *codelengthcodetree = HuffmanTree_new(); // the code tree for code length codes
+    if (!codelengthcodetree) {
+        Inflator_error = 1; // FIXME
+		return;
+    }
 	vector32_t *bitlen, *bitlenD;
 	bitlen = vector32_new(288, 0);
 	bitlenD = vector32_new(32, 0);
@@ -517,9 +564,20 @@ void Inflator_inflateHuffmanBlock(vector8_t *out, const uint8_t *in, size_t *bp,
 {
 	HuffmanTree *codetree, *codetreeD; // the code tree for Huffman codes, dist codes
 	codetree = HuffmanTree_new();
+    if (!codetree) {
+        Inflator_error = 1; // FIXME
+		return;
+    }
 	codetreeD = HuffmanTree_new();
-	if (btype == 1)
+    if (!codetreeD) {
+        Inflator_error = 1; // FIXME
+		return;
+    }
+	if (btype == 1) {
 		Inflator_generateFixedTrees(codetree, codetreeD);
+        if (Inflator_error)
+			return;
+    }
 	else if (btype == 2) {
 		Inflator_getTreeInflateDynamic(codetree, codetreeD, in, bp, inlength);
 		if (Inflator_error)
@@ -783,6 +841,10 @@ void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t
 		size_t bytewidth, uint32_t filterType, size_t length)
 {
 	size_t i;
+    if (!recon) {
+        PNG_error = 1; // FIXME : find the appropiate error return
+        return;
+    }
 	switch (filterType) {
 	case 0:
 		for (i = 0; i < length; i++)
@@ -815,19 +877,19 @@ void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t
 				recon[i] = scanline[i] + recon[i - bytewidth] / 2;
 		}
 		break;
-	case 4:
-		if (precon) {
-			for (i = 0; i < bytewidth; i++)
-				recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(0, precon[i], 0));
-			for (i = bytewidth; i < length; i++)
-				recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(recon[i - bytewidth],
-						precon[i], precon[i - bytewidth]));
-		} else {
-			for (i = 0; i < bytewidth; i++)
-				recon[i] = scanline[i];
-			for (i = bytewidth; i < length; i++)
-				recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(recon[i - bytewidth], 0, 0));
-		}
+	case 4:             
+            if (precon) {
+                for (i = 0; i < bytewidth; i++)
+                    recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(0, precon[i], 0));
+                for (i = bytewidth; i < length; i++)
+                    recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(recon[i - bytewidth],
+                                                                           precon[i], precon[i - bytewidth]));
+            } else {
+                for (i = 0; i < bytewidth; i++)
+                    recon[i] = scanline[i];
+                for (i = bytewidth; i < length; i++)
+                    recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(recon[i - bytewidth], 0, 0));
+            }
 		break;
 	default:
 		PNG_error = 36; // error: nonexistent filter type given
@@ -879,7 +941,11 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 	colorType = info->colorType;
 	size_t numpixels = info->width * info->height, bp = 0;
 	vector8_resize(out, numpixels * 4);
-	uint8_t *out_data = out->size ? out->data : 0;
+    if (!out->size) {
+        return 1; // FIXME : find the appropiate error return
+    }
+    uint8_t *out_data = out->data ;
+
 	if (bitDepth == 8 && colorType == 0) // greyscale
 		for (i = 0; i < numpixels; i++) {
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[i];
@@ -954,6 +1020,10 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 PNG_info_t *PNG_info_new(void)
 {
 	PNG_info_t *info = png_alloc_malloc(sizeof (PNG_info_t));
+    if (!info)
+    {
+        return NULL;
+    } 
 	uint32_t i;
 	for (i = 0; i < sizeof (PNG_info_t); i++)
 		((uint8_t *) info)[i] = 0;
@@ -971,12 +1041,16 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 		return NULL;
 	}
 	info = PNG_info_new();
+    if (!info) {
+        PNG_error = 1; // FIXME
+        return NULL;
+    }
 	PNG_readPngHeader(info, in, size);
 	if (PNG_error)
 		return NULL;
 	size_t pos = 33; // first byte of the first chunk after the header
 	vector8_t *idat = NULL; // the data from idat chunks
-	bool IEND = false, known_type = true;
+	bool IEND = false;
 	info->key_defined = false;
 	// loop through the chunks, ignoring unknown chunks and stopping at IEND chunk. IDAT data is
 	// put at the start of the in buffer
@@ -1062,7 +1136,6 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				return NULL;
 			}
 			pos += (chunkLength + 4); // skip 4 letters and uninterpreted data of unimplemented chunk
-			known_type = false;
 		}
 		pos += 4; // step over CRC (which is ignored)
 	}
@@ -1134,8 +1207,16 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 					passw[i], passh[i], bpp);
 	}
 	if (info->colorType != 6 || info->bitDepth != 8) { // conversion needed
+#if 1
 		vector8_t *copy = vector8_copy(info->image); // xxx: is this copy necessary?
+        if (!copy) {
+            return NULL;
+        }
+#endif
 		PNG_error = PNG_convert(info, info->image, copy->data);
+        if (PNG_error) {
+            return NULL;
+        }
 	}
 	return info;
 }

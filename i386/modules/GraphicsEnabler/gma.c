@@ -91,7 +91,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 {
 	//int	len;
 	char *devicepath;
+#if UNUSED
 	volatile uint8_t *regs;
+#endif
 	uint32_t bar[7];
 	char *model;
 	uint8_t BuiltIn = 0x00;
@@ -100,8 +102,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	devicepath = get_pci_dev_path(gma_dev);
 
 	bar[0] = pci_config_read32(gma_dev->dev.addr, 0x10);
+#if UNUSED
 	regs = (uint8_t *) (bar[0] & ~0x0f);
-
+#endif
 	model = get_gma_model((gma_dev->vendor_id << 16) | gma_dev->device_id);
 
 	verbose("Intel %s [%04x:%04x] :: %s\n",
@@ -109,8 +112,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	
 	if (!string)
 		string = devprop_create_string();
-	struct DevPropDevice *device = malloc(sizeof(struct DevPropDevice));
-	device = devprop_add_device(string, devicepath);
+	struct DevPropDevice *device = devprop_add_device(string, devicepath);
 	
 	if(!device)
 	{

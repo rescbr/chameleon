@@ -33,11 +33,6 @@
 #include "bootstruct.h"
 #include "modules.h"
 
-
-int previewTotalSectors = 0;
-int previewLoadedSectors = 0;
-uint8_t *previewSaveunder = 0;
-
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -48,12 +43,13 @@ setVESATextMode( unsigned short cols,
 				unsigned short rows,
 				unsigned char  bitsPerPixel );
 
-static int initGraphicsMode ();
+static int initGraphicsMode (void);
 
 static unsigned long lookUpCLUTIndex( unsigned char index,
                                      unsigned char depth );
 
-#ifndef OPTION_ROM
+static void * stosl(void * dst, long val, long len);
+
 int
 __convertImage( unsigned short width,
                unsigned short height,
@@ -113,7 +109,6 @@ void __drawDataRectangle( unsigned short  x,
         data += width * pixelBytes;
     }
 }
-#endif
 
 //==========================================================================
 // getVESAModeWithProperties
@@ -378,14 +373,18 @@ int __setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned
 									  minfo.BitsPerPixel ) >> 3;
 		
         // Update KernBootStruct using info provided by the selected
-        // VESA mode.
-		
-        bootArgs->Video.v_display  = GRAPHICS_MODE;
-        bootArgs->Video.v_width    = minfo.XResolution;
-        bootArgs->Video.v_height   = minfo.YResolution;
-        bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-        bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-        bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+        // VESA mode.        
+        
+        Boot_Video	Video;		/* Video Information */		
+        
+        Video.v_display  = GRAPHICS_MODE;
+        Video.v_width    = minfo.XResolution;
+        Video.v_height   = minfo.YResolution;
+        Video.v_depth    = minfo.BitsPerPixel;
+        Video.v_rowBytes = minfo.BytesPerScanline;
+        Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);        
+        
+		setBootArgsVideoStruct(&Video);
 		
     }
     while ( 0 );
@@ -519,15 +518,19 @@ setVESATextMode( unsigned short cols,
     }
 	
     // Update KernBootStruct using info provided by the selected
-    // VESA mode.
+    // VESA mode.    
 	
-    bootArgs->Video.v_display  = VGA_TEXT_MODE;
-    bootArgs->Video.v_baseAddr = 0xb8000;
-    bootArgs->Video.v_width    = minfo.XResolution;
-    bootArgs->Video.v_height   = minfo.YResolution;
-    bootArgs->Video.v_depth    = 8;
-    bootArgs->Video.v_rowBytes = 0x8000;
-	
+    Boot_Video	Video;		/* Video Information */    
+    
+    Video.v_display  = VGA_TEXT_MODE;
+    Video.v_width    = 0xb8000;
+    Video.v_height   = minfo.XResolution;
+    Video.v_depth    = minfo.YResolution;
+    Video.v_rowBytes = 8;
+    Video.v_baseAddr = 0x8000;    
+    
+    setBootArgsVideoStruct(&Video);
+    
     return errSuccess;  // always return success
 }
 
@@ -566,7 +569,7 @@ __getNumberArrayFromProperty( const char *  propKey,
     return count;
 }
 
-static int initGraphicsMode ()
+static int initGraphicsMode (void)
 {
 	unsigned long params[4];
 	int           count;
@@ -634,12 +637,4 @@ __setVideoMode( int mode)
 		setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
-}
-
-//==========================================================================
-// Return the current video mode, VGA_TEXT_MODE or GRAPHICS_MODE.
-
-inline int __getVideoMode(void)
-{
-    return bootArgs->Video.v_display;
 }

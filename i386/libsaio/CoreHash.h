@@ -13,7 +13,7 @@
 
 //CoreHash Header and reserved fields
 #define CoreHashHeader              \
-        char name[10];              \
+        char *name;                 \
         int  id;                    \
         UT_hash_handle hh;          /* makes this structure hashable */
 
@@ -39,14 +39,20 @@ static struct HObj * HObj##_NewStrVar(const char *name, struct HObj **container 
     if (!var)                                                                               \
         return NULL;                                                                        \
                                                                                             \
-    strlcpy(var->name, name, sizeof(var->name));											\
+    bzero(var,sizeof(struct HObj));                                                         \
+                                                                                            \
+    var->name = newString(name);                                                            \
+    if (!var->name) {                                                                       \
+        free(var);                                                                          \
+        return NULL;                                                                        \
+    }                                                                                       \
                                                                                             \
 	if (setjmp(h_buf_error) == -1) {                                                        \
         																					\
 		free(var);                                                                          \
 		return NULL;                                                                        \
 	} else {                                                                                \
-		HASH_ADD_STR( *container, name, var );                                              \
+        HASH_ADD_KEYPTR( hh, *container, name, strlen(name), var );                         \
 																							\
 	}                                                                                       \
 	return var;																				\
@@ -80,6 +86,7 @@ static void HObj##_DeleteStrVar(const char *name, struct HObj *container ) {    
 	} else {                                                                    \
 		HASH_DEL( container, var);                                              \
 	}                                                                           \
+    if (var->name) free(var->name);                                             \
     free(var);                                                                  \
 }
 
@@ -155,6 +162,7 @@ static void HObj##_DeleteIntVar(int id, struct HObj *container ) {					\
    } else {																			\
         HASH_DEL( container, var);													\
    }																				\
+   if (var->name) free(var->name);                                                  \
    free(var);																		\
 }
 
@@ -191,6 +199,7 @@ static void HObj##_DeleteAll(struct HObj *container ) {         \
 	} else {                                                    \
 			HASH_ITER(hh, container, current_var, tmp) {        \
 			HASH_DEL(container,current_var);                    \
+            if (current_var->name) free(current_var->name);     \
 			free(current_var);                                  \
 		}                                                       \
 	}                                                           \

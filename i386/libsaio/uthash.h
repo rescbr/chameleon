@@ -646,6 +646,7 @@ do {                                                                            
            _he_hh_nxt = _he_thh->hh_next;                                        \
            HASH_TO_BKT( _he_thh->hashv, tbl->num_buckets*2, _he_bkt);            \
            _he_newbkt = &(_he_new_buckets[ _he_bkt ]);                           \
+            if (!_he_newbkt) { uthash_fatal( "out of memory"); }                 \
            if (++(_he_newbkt->count) > tbl->ideal_chain_maxlen) {                \
              tbl->nonideal_items++;                                              \
              _he_newbkt->expand_mult = _he_newbkt->count /                       \

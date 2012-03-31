@@ -1,3 +1,5 @@
+- Improved Xcode4.3+ support 
+
 - Sync'd LoginToLion with the last Enzo's update (want more about LoginToLion ? please follow or participate to this thread : http://forum.voodooprojects.org/index.php/topic,2125.0.html)
 - fixed some bugs
 - Added an option to change the acpi detection method (only for acpi 64 users) 

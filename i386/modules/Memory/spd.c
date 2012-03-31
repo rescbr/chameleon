@@ -268,7 +268,10 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
     int        i, speed;
     uint8_t    spd_size, spd_type;
-    uint32_t   base, mmio, hostc;
+    uint32_t   base;
+#if DEBUG_SPD
+    uint32_t    mmio, hostc;
+#endif
     bool       dump = false;
     RamSlotInfo_t*  slot;
 	
@@ -276,11 +279,13 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	DBG("SMBus CmdReg: 0x%x\n", cmd);
 	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
 	
-	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
     base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
+#if DEBUG_SPD
+    mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
 	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
     DBG("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
 			smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
+#endif
 	
     getBoolForKey("DumpSPD", &dump, DEFAULT_BOOT_CONFIG);
     bool fullBanks ;  // needed at least for laptops

@@ -141,11 +141,11 @@ int main (int argc, const char * argv[]) {
     
     mach_port_t                  masterPort;
 	
-	io_registry_entry_t         entry,entry2;
+	io_registry_entry_t         entry = MACH_PORT_NULL;
 	
 	kern_return_t                 err;
 	
-	CFDataRef                     data;
+	CFDataRef                     data = NULL;
 	
 	CFAllocatorRef               allocator=kCFAllocatorDefault;
 	
@@ -154,7 +154,7 @@ int main (int argc, const char * argv[]) {
 	unsigned long uuid32 = 0,Model32 = 0 ;
 	NSString *filename, *fullfilename ;
 	NSArray *namechunks;
-	NSMutableArray *chunks;	
+	NSMutableArray *chunks = nil;	
 	NSString *outStr, *inStr;
     
 	if (argc == 2) {	
@@ -216,11 +216,11 @@ int main (int argc, const char * argv[]) {
 	
 	if (err == KERN_SUCCESS){		
 		
-		entry2=IORegistryEntryFromPath(masterPort, [@"IODeviceTree:/efi" UTF8String]);
+		entry=IORegistryEntryFromPath(masterPort, [@"IODeviceTree:/efi" UTF8String]);
         
-		if (entry2!=MACH_PORT_NULL) {			
+		if (entry!=MACH_PORT_NULL) {			
 			
-			data = IORegistryEntrySearchCFProperty( entry2, kIOServicePlane, CFSTR("motherboard-name"), allocator, kIORegistryIterateRecursively);
+			data = IORegistryEntrySearchCFProperty( entry, kIOServicePlane, CFSTR("motherboard-name"), allocator, kIORegistryIterateRecursively);
 			
 			if (data != NULL) {
 				rawdata=CFDataGetBytePtr(data);
@@ -229,7 +229,7 @@ int main (int argc, const char * argv[]) {
 				
 				char *ModelStr = ( char* )rawdata;
 				
-				if (len = strlen(ModelStr)) 
+				if ((len = strlen(ModelStr))) 
 				{
 					Model32 = OSSwapHostToBigInt32(adler32( (unsigned char *) ModelStr, len ));
 					
@@ -256,7 +256,7 @@ int main (int argc, const char * argv[]) {
                     
                     [mem release];					
 				}				
-				
+
 				goto out;
 			}			
 			
@@ -277,7 +277,7 @@ int main (int argc, const char * argv[]) {
 				
 				const char *uuidStr = getStringFromUUID(( EFI_CHAR8* )rawdata);
 				
-				if (strlen(uuidStr)) 
+				if (strlen(uuidStr) >= UUID_STR_LEN ) 
 				{
 					uuid32 = OSSwapHostToBigInt32(adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
 					
@@ -301,8 +301,9 @@ int main (int argc, const char * argv[]) {
                         
                     }
                     [mem release]; 				
-				}				
-				
+				}
+                
+                
 				goto out;
                 
 			}			
@@ -311,17 +312,11 @@ int main (int argc, const char * argv[]) {
         
 	}
 	out:
-    if (chunks != NULL) {
+    if (chunks != nil) {
         [chunks release];
-    }
-    if (data != NULL) {
-        CFRelease(data);
-    }
+    }    
     if (entry != MACH_PORT_NULL) {
         IOObjectRelease(entry);
-    }
-    if (entry2 != MACH_PORT_NULL) {
-        IOObjectRelease(entry2);
     }
     [pool drain];
     return 0;

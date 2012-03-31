@@ -94,7 +94,7 @@ typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
  Hookable function pointer called during the driver loading phase that
  allows other code to cause additional drivers to be loaded.
  */
-extern struct multiboot_info *gMI;
+//extern struct multiboot_info *gMI;
 
 
 struct compressed_kernel_header {

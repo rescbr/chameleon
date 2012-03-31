@@ -1974,11 +1974,7 @@ static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 	position_t current_pos = pos(p.x, p.y);
 	
 	for (i=0; i < strlen(ch); i++)
-	{
-		int cha=(int)ch[i];
-		
-		cha-=32;
-		
+	{		
 		// newline ?
 		if ( ch[i] == '\n' )
 		{
@@ -2068,27 +2064,38 @@ static int initFont(font_t *font, image_t *data)
 			{
 				font->chars[count]->width = ( end - start) - 1;
 				font->chars[count]->height = font->height;
-				
-				if ( ( font->chars[count]->pixels = malloc( font->chars[count]->width * data->image->height * 4) ) )
 				{
-					space += ( font->chars[count]->width * data->image->height * 4 );
-					// we skip the first line because there are just the red pixels for the char width
-					for( y = 1; y< (font->height); y++)
-					{
-						for( x2 = (unsigned)start, x3 = 0; x2 < (unsigned)end; x2++, x3++)
-						{
-							pixel( font->chars[count], x3, y ) = pixel( data->image, x2, y );
-						}	
-					}
-					
-					// check if font is monospaced
-					if( ( count > 0 ) && ( font->width != font->chars[count]->width ) )
-						monospaced = true;
-					
-					font->width = font->chars[count]->width;
-					
-					count++;
-				}
+                    int pixels_size = (font->chars[count]->width * data->image->height * 4);
+                    
+                    if (!(pixels_size > 0))
+                    {
+                        continue;
+                    }
+                    
+                    if ( !( font->chars[count]->pixels = malloc( pixels_size ) ) )
+                    {
+                        continue;
+                    }               
+
+					space += pixels_size;
+                }
+				// we skip the first line because there are just the red pixels for the char width
+                for( y = 1; y< (font->height); y++)
+                {
+                    for( x2 = (unsigned)start, x3 = 0; x2 < (unsigned)end; x2++, x3++)
+                    {
+                        pixel( font->chars[count], x3, y ) = pixel( data->image, x2, y );
+                    }	
+                }
+                
+                // check if font is monospaced
+                if( ( count > 0 ) && ( font->width != font->chars[count]->width ) )
+                    monospaced = true;
+                
+                font->width = font->chars[count]->width;
+                
+                count++;	
+				
 			}
 		}
 	}
@@ -2335,16 +2342,15 @@ static void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, u
 	progressbar.width = width;
 	progressbar.height = buff->height;
 	
-	int x=0,x2=0,y=0;
+	int x,x2,y;
 	
 	for(y=0; y<buff->height; y++)
 	{
-		for(x=0; x<todraw; x++, x2++)
+		for(x=0,x2=0; x<todraw; x++, x2++)
 		{
 			if(x2 == (buff->width-1)) x2=0;
 			pixel(&progressbar, x,y).value = pixel(buff, x2,y).value;
 		}
-		x2=0;
 	}
 	
 	for(y=0; y<buff->height; y++)
@@ -2358,7 +2364,6 @@ static void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, u
 			pixel(&progressbar, width - 1, y).value = pixel(buffBG, buffBG->width - 1, y).value;
 		if(progress == 0)
 			pixel(&progressbar, 0, y).value = pixel(buffBG, buffBG->width - 1, y).value;
-		x2=0;
 	}
 	
 	blend(&progressbar, blendInto, p);
@@ -2469,7 +2474,6 @@ int updateInfoMenu(int key)
 			break;
 			
 		case kReturnKey:
-			key = 0;
 			if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
 				showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
 			

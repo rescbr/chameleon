@@ -201,6 +201,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr );
 static TagPtr XMLGetElementWithID( TagPtr dict, const char* id );
 static bool getOSVersion(BVRef bvr, char *str);
 static bool CheckDarwin(BVRef bvr);
+static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *systemVersion);
 
 //==========================================================================
 
@@ -821,13 +822,18 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 		spc = 1;
     }
 #endif
-	
+	map = (struct DiskBVMap *) malloc( sizeof(*map) );
+    if ( !map )
+    {
+        return NULL;    
+    }
+    
     do {
         // Create a new mapping.
-		
-        map = (struct DiskBVMap *) malloc( sizeof(*map) );
-        if ( map )
-        {
+		//map = (struct DiskBVMap *) malloc( sizeof(*map) );
+        //if ( map )
+        //{
+        
             map->biosdev = biosdev;
             map->bvr     = NULL;
             map->bvrcnt  = 0;
@@ -1039,7 +1045,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                 else free( booterUFS );
             }
 #endif
-        }
+        //}
     } while (0);
 	
     /*
@@ -1339,14 +1345,14 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     // Determine whether the partition entry size is valid.
 	
     UInt64                     gptBlock       = 0;
-    UInt32                     gptCheck       = 0;
+    //UInt32                     gptCheck       = 0;
     UInt32                     gptCount       = 0;
     UInt32                     gptID          = 0;
     gpt_ent *                  gptMap         = 0;
     UInt32                     gptSize        = 0;
 	
     gptBlock = OSSwapLittleToHostInt64(headerMap->hdr_lba_table);
-    gptCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_table);
+    //gptCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_table);
     gptCount = OSSwapLittleToHostInt32(headerMap->hdr_entries);
     gptSize  = OSSwapLittleToHostInt32(headerMap->hdr_entsz);
 	
@@ -1550,6 +1556,35 @@ static TagPtr XMLGetElementWithID( TagPtr dict, const char* id )
 	return tmp;
 }
 
+static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *systemVersion)
+{
+    if (!loadConfigFile(dirSpec, systemVersion))
+    {
+        TagPtr pkg_p = XMLCastArray(XMLGetProperty(systemVersion->dictionary, (const char*)"Packages"));
+        
+        if (pkg_p)
+        {
+            
+            char *version = NULL;
+            
+            version = XMLCastString(XMLGetProperty(
+                                                   XMLGetElementWithID(pkg_p, 
+                                                                       "com.apple.mpkg.OSInstall"), 
+                                                   (const char*)"Version"));
+            
+            if (version && strlen(version) >= 4) 
+            {
+                *str = '\0';
+                strncat(str, version, 4);
+                return true;
+                
+            }						
+        }					
+    }
+    
+    return false;
+}
+
 static bool getOSVersion(BVRef bvr, char *str)
 {
 	bool valid = false;	
@@ -1573,32 +1608,19 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else 
 		{
-			/* Much clean */
-			sprintf(dirSpec, "hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			sprintf(dirSpec, "hd(%d,%d)/OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.8
 			
-			if (!loadConfigFile(dirSpec, &systemVersion))
+			if (!getOSInstallVersion(dirSpec, str, &systemVersion))
 			{
-				TagPtr pkg_p = XMLCastArray(XMLGetProperty(systemVersion.dictionary, (const char*)"Packages"));
-				
-				if (pkg_p)
-				{
-					
-					char *version = NULL;
-					
-					version = XMLCastString(XMLGetProperty(
-														   XMLGetElementWithID(pkg_p, 
-																			   "com.apple.mpkg.OSInstall"), 
-														   (const char*)"Version"));
-					
-					if (version && strlen(version) >= 4) 
-					{
-						*str = '\0';
-						strncat(str, version, 4);
-						return true;
-						
-					}						
-				}					
-			}	
+                sprintf(dirSpec, "hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.7
+                
+                if (!getOSInstallVersion(dirSpec, str, &systemVersion))
+                        return false;
+                    else
+                        return true;
+								
+			}
+            else return true;
 		}
 	}
 	
@@ -1668,14 +1690,13 @@ static bool CheckDarwin(BVRef bvr)
 static void scanFSLevelBVRSettings(BVRef chain)
 {
 	BVRef bvr;
-	int   ret;
 #ifdef BOOT_HELPER_SUPPORT
+    int   ret;
 	char  label[BVSTRLEN];
 	int   fh, fileSize, error;
 #endif
 	for (bvr = chain; bvr; bvr = bvr->next)
 	{
-		ret = -1;
 #ifdef BOOT_HELPER_SUPPORT
 		error = 0;
         

@@ -14,9 +14,6 @@
 #include "bootstruct.h"
 #include "vbe.h"
 
-int __getVideoMode(void);
-
-
 char * __decodeRLE( const void * rleData, int rleBlocks, int outBytes );
 
 void __drawColorRectangle( unsigned short x, unsigned short y, unsigned short width, unsigned short height, unsigned char  colorIndex );

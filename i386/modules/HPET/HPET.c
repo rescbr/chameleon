@@ -118,7 +118,10 @@ static void force_enable_hpet(pci_dt_t *lpc_dev)
 
 static void force_enable_hpet_via(pci_dt_t *lpc_dev)
 {
-	uint32_t	val, hpet_address = 0xFED00000;
+	uint32_t	val;
+#if DEBUG_HPET
+    uint32_t hpet_address = 0xFED00000;
+#endif
 	unsigned int i;
 	
 	for(i = 1; i < sizeof(lpc_controllers_via) / sizeof(lpc_controllers_via[0]); i++)
@@ -131,15 +134,20 @@ static void force_enable_hpet_via(pci_dt_t *lpc_dev)
 			DBG("VIA %s LPC Interface [%04x:%04x], MMIO\n", 
 				lpc_controllers_via[i].name, lpc_dev->vendor_id, lpc_dev->device_id);
 			
-			if (val & 0x80)
+            if (val & 0x80)
 			{
+#if DEBUG_HPET
+
 				hpet_address = (val & ~0x3ff);
 				DBG("HPET at 0x%lx\n", hpet_address);
+#endif
 			}
 			else 
 			{
 				val = 0xfed00000 | 0x80;
 				pci_config_write32(lpc_dev->dev.addr, 0x68, val);
+#if DEBUG_HPET
+
 				val = pci_config_read32(lpc_dev->dev.addr, 0x68);
 				if (val & 0x80)
 				{
@@ -150,6 +158,7 @@ static void force_enable_hpet_via(pci_dt_t *lpc_dev)
 				{
 					DBG("Unable to enable HPET");
 				}
+#endif
 			}
 		}
 	}
@@ -159,7 +168,10 @@ static void force_enable_hpet_via(pci_dt_t *lpc_dev)
 
 static void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 {
-	uint32_t	val, hpet_address = 0xFED00000;
+	uint32_t	val;
+#if DEBUG_HPET
+    uint32_t hpet_address = 0xFED00000;
+#endif
 	unsigned int i;
 	void		*rcba;
 	
@@ -182,23 +194,30 @@ static void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 				val = REG32(rcba, 0x3404);
 				if (val & 0x80)
 				{
+#if DEBUG_HPET
 					// HPET is enabled in HPTC. Just not reported by BIOS
 					DBG(" HPET is enabled in HPTC, just not reported by BIOS\n");
 					hpet_address |= (val & 3) << 12 ;
 					DBG(" HPET MMIO @ 0x%lx\n", hpet_address);
+#endif
 				}
 				else
-				{
+				{                    
 					// HPET disabled in HPTC. Trying to enable
 					DBG(" HPET is disabled in HPTC, trying to enable\n");									
 					REG32(rcba, 0x3404) = val | 0x80;
+#if DEBUG_HPET
+
 					hpet_address |= (val & 3) << 12 ;
 					DBG(" Force enabled HPET, MMIO @ 0x%lx\n", hpet_address);
+#endif
 				}
 				
-				// verify if the job is done
-				val = REG32(rcba, 0x3404);
+				
 #if DEBUG_HPET	
+                // verify if the job is done
+				val = REG32(rcba, 0x3404);
+                
 				if (!(val & 0x80))
 					printf(" Failed to force enable HPET\n");
 #endif

@@ -259,7 +259,7 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 	
 	
     // generate the text: e.g. 5EB1869F-C4FA-3502-BDEB-3B8ED5D87292
-    i = 0; fmtbase = 0;
+    fmtbase = 0;
     for(fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++) {
         for(i=0; i < uuidfmt[fmtidx]; i++) {
             uint8_t byte = mdresult[fmtbase+i];
@@ -846,8 +846,7 @@ void scanDisks(void)
 BVRef selectBootVolume( BVRef chain )
 {
 	bool filteredChain = false;
-	bool foundPrimary = false;
-	BVRef bvr, bvr1 = 0, bvr2 = 0;
+	BVRef bvr = 0;
 	
 	if (chain->filtered) filteredChain = true;
 	
@@ -859,6 +858,7 @@ BVRef selectBootVolume( BVRef chain )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
 #endif
+
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.
@@ -874,7 +874,7 @@ BVRef selectBootVolume( BVRef chain )
         }
         free(val);
     }	
-	
+
 	/*
 	 * Scannig the volume chain backwards and trying to find 
 	 * a HFS+ volume with valid boot record signature.
@@ -883,39 +883,41 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	for ( bvr = chain; bvr; bvr = bvr->next )
 	{
-		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev ) foundPrimary = true;
 		// zhell -- Undo a regression that was introduced from r491 to 492.
 		// if gBIOSBootVolume is set already, no change is required
-		if ( bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume)
+		if ( (bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume))
 			&& gBIOSBootVolume
 			&& (!filteredChain || (filteredChain && bvr->visible))
-			&& bvr->biosdev == gBIOSDev )
-			bvr2 = bvr;
+			&& (bvr->biosdev == gBIOSDev) )
+        {
+            goto out; /* (1) */
+        }
 		// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
 		// from r491,
-		if ( bvr->flags & kBVFlagBootable
+		if ( (bvr->flags & kBVFlagBootable)
 			&& ! gBIOSBootVolume
-			&& bvr->biosdev == gBIOSDev )
-			bvr2 = bvr;
+			&& (bvr->biosdev == gBIOSDev) )
+        {
+            goto out; /* (2) */
+        }
 	}  
-	
+	/*
+     * cparm: 
+     * For cases (1) and (2), there is no need to continue the loop since only one biosdev can be the gBIOSDev
+     *     
+     */
 	
 	/*
 	 * Use the standrad method for selecting the boot volume.
 	 */
-	if (foundPrimary)
-	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
-			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev ) bvr1 = bvr;
-			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )    bvr2 = bvr;
+			if ( (bvr->flags & kBVFlagNativeBoot) && (bvr->biosdev == gBIOSDev) ) {break;}
+			if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) )    {break;}
 		}
-	}
 	
-	bvr = bvr2 ? bvr2 :
-	bvr1 ? bvr1 : chain;
-	
-	return bvr;
+out:
+	return bvr ? bvr : chain;
 }
 
 //==========================================================================
@@ -962,7 +964,7 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 {
     const char * cp;
     BVRef bvr = gRootVolume;
-    int          biosdev = (int)get_env(envgBIOSDev);
+    //int          biosdev = (int)get_env(envgBIOSDev);
 	
     // Search for left parenthesis in the path specification.
 	
@@ -1033,7 +1035,7 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
         for ( ; *cp && *cp != RP; cp++) /* LOOP */;
         if (*cp == RP) cp++;
         
-        biosdev = dp->biosdev + unit;
+        int biosdev = dp->biosdev + unit;
         bvr = newBootVolumeRef(biosdev, part);
 		
         if(bvr == NULL)
