@@ -846,19 +846,19 @@ void scanDisks(void)
 BVRef selectBootVolume( BVRef chain )
 {
 	bool filteredChain = false;
-	BVRef bvr = 0;
+	bool foundPrimary = false;
+	BVRef bvr, bvr1 = 0, bvr2 = 0;
 	
 	if (chain->filtered) filteredChain = true;
 	
-    int gBIOSDev = (int)get_env(envgBIOSDev);
-    
+	int gBIOSDev = (int)get_env(envgBIOSDev);
+
 #if UNUSED
 	if (multiboot_partition_set)
 		for ( bvr = chain; bvr; bvr = bvr->next )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
 #endif
-
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.
@@ -873,51 +873,65 @@ BVRef selectBootVolume( BVRef chain )
             }
         }
         free(val);
-    }	
-
+    }
+	
 	/*
 	 * Scannig the volume chain backwards and trying to find 
 	 * a HFS+ volume with valid boot record signature.
 	 * If not found any active partition then we will
 	 * select this volume as the boot volume.
 	 */
-	for ( bvr = chain; bvr; bvr = bvr->next )
-	{
-		// zhell -- Undo a regression that was introduced from r491 to 492.
-		// if gBIOSBootVolume is set already, no change is required
-		if ( (bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume))
-			&& gBIOSBootVolume
-			&& (!filteredChain || (filteredChain && bvr->visible))
-			&& (bvr->biosdev == gBIOSDev) )
-        {
-            goto out; /* (1) */
-        }
-		// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
-		// from r491,
-		if ( (bvr->flags & kBVFlagBootable)
-			&& ! gBIOSBootVolume
-			&& (bvr->biosdev == gBIOSDev) )
-        {
-            goto out; /* (2) */
-        }
-	}  
-	/*
-     * cparm: 
-     * For cases (1) and (2), there is no need to continue the loop since only one biosdev can be the gBIOSDev
-     *     
-     */
 	
+	{
+		bvr = chain;
+		do {
+#if UNUSED
+			if (multiboot_skip_partition_set) {
+				if (bvr->part_no == multiboot_skip_partition) {bvr = bvr->next; continue;}
+			}
+#endif
+			if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) ) foundPrimary = true;
+			// zhell -- Undo a regression that was introduced from r491 to 492.
+			// if gBIOSBootVolume is set already, no change is required
+			if ( (bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume))
+				&& gBIOSBootVolume
+				&& (!filteredChain || (filteredChain && bvr->visible))
+				&& (bvr->biosdev == gBIOSDev) )
+			{
+				bvr2 = bvr;
+				bvr = bvr->next;
+				continue;
+			}
+			// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
+			// from r491,
+			if ( bvr->flags & kBVFlagBootable
+				&& ! gBIOSBootVolume
+				&& bvr->biosdev == gBIOSDev )
+			{
+				bvr2 = bvr;
+				bvr = bvr->next;
+				continue;
+			}
+			
+		} while (bvr != NULL);
+	}
+		
 	/*
 	 * Use the standrad method for selecting the boot volume.
 	 */
+	if (foundPrimary)
+	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
-			if ( (bvr->flags & kBVFlagNativeBoot) && (bvr->biosdev == gBIOSDev) ) {break;}
-			if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) )    {break;}
+			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev ) bvr1 = bvr;
+			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )    bvr2 = bvr;
 		}
+	}
 	
-out:
-	return bvr ? bvr : chain;
+	bvr = bvr2 ? bvr2 :
+	bvr1 ? bvr1 : chain;
+	
+	return bvr;
 }
 
 //==========================================================================
