@@ -227,7 +227,7 @@ msgstr "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 #: Resources/templates/Localizable.strings:4
 #, no-wrap
 msgid "Chameleon Bootloader Package"
-msgstr "Pacchetto del bootloader di Chameleon"
+msgstr "Installazione di Chameleon"
 
 #. type: "ERROR_BOOTVOL"
 #: Resources/templates/Localizable.strings:9

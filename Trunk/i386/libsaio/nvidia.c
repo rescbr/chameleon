@@ -521,7 +521,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0614, "GeForce 9800 GT" },
 	{ 0x10DE0615, "GeForce GTS 250" },
 	{ 0x10DE0617, "GeForce 9800M GTX" },
-	{ 0x10DE0618, "GeForce GTX 260M" },
+	{ 0x10DE0618, "GeForce GTX 260M" }, // Subsystem Id: 1043 202B Asus GTX 680
 	{ 0x10DE0619, "Quadro FX 4700 X2" },
 	{ 0x10DE061A, "Quadro FX 3700" },
 	{ 0x10DE061B, "Quadro VX 200" },
@@ -1098,7 +1098,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
 	{ 0x10DE1245, "GeForce GTS 450" },
 	{ 0x10DE1246, "GeForce GTX 550M" },
-	{ 0x10DE1247, "GeForce GT 555M" },
+	{ 0x10DE1247, "GeForce GT 635M" }, // Subsystem Id: 1043 212C Asus GeForce GT 635M
 	{ 0x10DE1248, "GeForce GTX 555M" },
 	{ 0x10DE124D, "GeForce GTX 555M" },
 //	{ 0x10DE1250, "Unknown" },
