@@ -855,9 +855,13 @@ BVRef selectBootVolume( BVRef chain )
 
 #if UNUSED
 	if (multiboot_partition_set)
-		for ( bvr = chain; bvr; bvr = bvr->next )
+		for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) {
+            if (!bvr) {
+                break;
+            }
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
+        }
 #endif
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
@@ -866,7 +870,11 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	char *val = XMLDecode(getStringForKey(kDefaultPartition, DEFAULT_BOOT_CONFIG));
     if (val) {
-        for ( bvr = chain; bvr; bvr = bvr->next ) {
+        for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) 
+        {
+            if (!bvr) {
+                break;
+            }
             if (matchVolumeToString(bvr, val, false)) {
                 free(val);
                 return bvr;
@@ -882,12 +890,15 @@ BVRef selectBootVolume( BVRef chain )
 	 * select this volume as the boot volume.
 	 */
 	
-	{
-		bvr = chain;
-		do {
+	{     
+        for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next)
+        {
+            if (!bvr) {
+                break;
+            }
 #if UNUSED
 			if (multiboot_skip_partition_set) {
-				if (bvr->part_no == multiboot_skip_partition) {bvr = bvr->next; continue;}
+				if (bvr->part_no == multiboot_skip_partition) continue;
 			}
 #endif
 			if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) ) foundPrimary = true;
@@ -898,22 +909,18 @@ BVRef selectBootVolume( BVRef chain )
 				&& (!filteredChain || (filteredChain && bvr->visible))
 				&& (bvr->biosdev == gBIOSDev) )
 			{
-				bvr2 = bvr;
-				bvr = bvr->next;
-				continue;
+				bvr2 = bvr;				
 			}
+            
 			// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
 			// from r491,
 			if ( bvr->flags & kBVFlagBootable
 				&& ! gBIOSBootVolume
 				&& bvr->biosdev == gBIOSDev )
 			{
-				bvr2 = bvr;
-				bvr = bvr->next;
-				continue;
+				bvr2 = bvr;				
 			}
-			
-		} while (bvr != NULL);
+        }
 	}
 		
 	/*
@@ -921,8 +928,11 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	if (foundPrimary)
 	{
-		for ( bvr = chain; bvr; bvr = bvr->next )
-		{
+		for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next)
+        {
+            if (!bvr) {
+                break;
+            }
 			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev ) bvr1 = bvr;
 			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )    bvr2 = bvr;
 		}

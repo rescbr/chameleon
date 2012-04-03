@@ -1695,8 +1695,10 @@ static void scanFSLevelBVRSettings(BVRef chain)
 	char  label[BVSTRLEN];
 	int   fh, fileSize, error;
 #endif
-	for (bvr = chain; bvr; bvr = bvr->next)
-	{
+	for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) {
+        if (!bvr) {
+            break;
+        }
 #ifdef BOOT_HELPER_SUPPORT
 		error = 0;
         
@@ -1933,8 +1935,10 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 	}
 	
 #if DEBUG
-	for (bvr = chain; bvr; bvr = bvr->next)
-	{
+	for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) {
+        if (!bvr) {
+            break;
+        }
 		printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
 	}
 	printf("count: %d\n", bvCount);
@@ -1951,10 +1955,13 @@ int freeFilteredBVChain(const BVRef chain)
 {
 	int ret = 1;
 	BVRef bvr = chain;
-	BVRef nextBVR = NULL;
-	
-	while (bvr)
+	BVRef nextBVR = NULL;	
+        
+	while (bvr < (BVRef)ULONG_MAX)
 	{
+        if (!bvr) {
+            break;
+        }
 		nextBVR = bvr->next;
 		
 		if (bvr->filtered)

@@ -1,3 +1,5 @@
+- Added a dirty workaround to selectBootVolume (still need more investigations to find out what happening exactly during the bvchain construction, and how the h... the loop can stop with gcc)
+
 - Improved Xcode4.3+ support 
 
 - Sync'd LoginToLion with the last Enzo's update (want more about LoginToLion ? please follow or participate to this thread : http://forum.voodooprojects.org/index.php/topic,2125.0.html)
