@@ -92,11 +92,11 @@
 #define kDefaultiMac								"iMac8,1"
 #define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0903051113"
 // defaults for an iMac11,1 core i3/i5/i7
-#define kDefaultiMacNehalem							"iMac11,1"
-#define kDefaultiMacNehalemBIOSVersion				"    IM111.88Z.0034.B00.0903051113"
+#define kDefaultiMacNehalem							"iMac11,3"
+#define kDefaultiMacNehalemBIOSVersion				"    IM112.88Z.0057.B00.1005051455"
 // defaults for an iMac12,1
 #define kDefaultiMacSandy							"iMac12,1"
-#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B00.1102091756"
+#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B0A.1104221555"
 
 // defaults for a Mac Pro
 #define kDefaultMacProFamily						"MacPro"
@@ -104,11 +104,11 @@
 #define kDefaultMacProBIOSVersion					"    MP31.88Z.006C.B05.0903051113"
 // defaults for a Mac Pro 4,1 core i7/Xeon
 #define kDefaultMacProNehalem						"MacPro4,1"
-#define kDefaultMacProNehalemBIOSVersion			"    MP41.88Z.0081.B04.0903051113"
+#define kDefaultMacProNehalemBIOSVersion			"    MP41.88Z.0081.B08.1001221313"
 // defaults for a Mac Pro 5,1 core i7/Xeon
 #define kDefaultMacProWestmere						"MacPro5,1"
 #define kDefaultMacProWestmereBIOSVersion			"    MP51.88Z.007F.B00.1008031144"
-#define kDefaulMacProWestmereBIOSReleaseDate		"08/03/10"
+#define kDefaultMacProWestmereBIOSReleaseDate		"08/03/10"
 //-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -333,8 +333,8 @@ void setDefaultSMBData(void)
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
 
-							case CPU_MODEL_SANDY:			// Intel Core i3, i5, i7 LGA1155 (32nm)
-							case CPU_MODEL_SANDY_XEON:		// Intel Xeon E3
+							case CPU_MODEL_SANDYBRIDGE:		// Intel Core i3, i5, i7 LGA1155 (32nm)
+							case CPU_MODEL_IVYBRIDGE:		// Intel Core i3, i5, i7 LGA1155 (22nm)
 								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
@@ -348,8 +348,9 @@ void setDefaultSMBData(void)
 
 							case CPU_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
+							case CPU_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
 								defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
-								defaultBIOSInfo.releaseDate		= kDefaulMacProWestmereBIOSReleaseDate;
+								defaultBIOSInfo.releaseDate		= kDefaultMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;

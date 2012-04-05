@@ -887,26 +887,48 @@ typedef struct {
 /* Several ID's we need in the library */
 #define PCI_VENDOR_ID_LOGITECH                  0x046d
 #define PCI_VENDOR_ID_WACOM                     0x056a
+#define PCI_VENDOR_ID_COMPAQ                    0x0e11
+#define PCI_VENDOR_ID_NCR                       0x1000
 #define PCI_VENDOR_ID_ATI                       0x1002
-#define PCI_VENDOR_ID_NSC                       0x100b /* National Semiconductor Corporation */
+#define PCI_VENDOR_ID_NS                        0x100b
+#define PCI_VENDOR_ID_TSENG                     0x100c
+#define PCI_VENDOR_ID_WEITEK                    0x100e
+#define PCI_VENDOR_ID_DEC                       0x1011
 #define PCI_VENDOR_ID_CIRRUS                    0x1013
-#define PCI_VENDOR_ID_IBM                       0x1014 /* International Business Machines Corporation */
+#define PCI_VENDOR_ID_IBM                       0x1014
 #define PCI_VENDOR_ID_AMD                       0x1022
-#define PCI_VENDOR_ID_DELL                      0x1028 /* Dell Computer Corporation */
+#define PCI_VENDOR_ID_DELL                      0x1028
+#define PCI_VENDOR_ID_MATROX                    0x102B
 #define PCI_VENDOR_ID_NEC                       0x1033
-#define PCI_VENDOR_ID_SIS                       0x1039 /* Silicon Integrated Systems */
-#define PCI_VENDOR_ID_ASUS                      0x1043 /* Asustek Computer Inc */
-#define PCI_VENDOR_ID_TEXAS_INSTRUMENTS         0x104c
-#define PCI_VENDOR_ID_SONY                      0x104d /* Sony Corporatio */
+#define PCI_VENDOR_ID_FD                        0x1036
+#define PCI_VENDOR_ID_SI                        0x1039
+#define PCI_VENDOR_ID_HP                        0x103c
+#define PCI_VENDOR_ID_ASUS                      0x1043
+#define PCI_VENDOR_ID_TI                        0x104c // Texas Istruments
+#define PCI_VENDOR_ID_SONY                      0x104d
 #define PCI_VENDOR_ID_HITACHI                   0x1054
 #define PCI_VENDOR_ID_MOTOROLA                  0x1057
 #define PCI_VENDOR_ID_APPLE                     0x106b
+#define PCI_VENDOR_ID_SUN                       0x108e
+#define PCI_VENDOR_ID_CMD                       0x1095
 #define PCI_VENDOR_ID_NVIDIA                    0x10de
 #define PCI_VENDOR_ID_REALTEK                   0x10ec
 #define PCI_VENDOR_ID_VIA                       0x1106
-#define PCI_VENDOR_ID_D_LINK                    0x1186 /* D-Link System Inc */
-#define PCI_VENDOR_ID_MARVELL                   0x11ab /* Marvell Semiconductor Germany GmbH */
+#define PCI_VENDOR_ID_DLINK                     0x1186
+#define PCI_VENDOR_ID_MARVELL                   0x11ab
+#define PCI_VENDOR_ID_NETGEAR                   0x1385
+#define PCI_VENDOR_ID_IOMEGA                    0x13ca
+#define PCI_VENDOR_ID_SAMSUNG                   0x144d
+#define PCI_VENDOR_ID_GIGABYTE                  0x1458
+#define PCI_VENDOR_ID_BROADCOM                  0x14e4
+#define PCI_VENDOR_ID_ATHEROS                   0x168c
+#define PCI_VENDOR_ID_LINKSYS                   0x1737
+#define PCI_VENDOR_ID_BELKIN                    0x1799
+#define PCI_VENDOR_ID_LENOVO                    0x17aa
 #define PCI_VENDOR_ID_RALINK                    0x1814
+#define PCI_VENDOR_ID_SITECOM                   0x182d
+#define PCI_VENDOR_ID_JMICRON                   0x197B
+#define PCI_VENDOR_ID_OCZ                       0x1b85
 #define PCI_VENDOR_ID_INTEL                     0x8086
 
 #endif /* !__LIBSAIO_PCI_H */

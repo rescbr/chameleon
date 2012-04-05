@@ -111,8 +111,8 @@ uint8_t reg_FALSE[] = { 0x00, 0x00, 0x00, 0x00 };
 
 static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x00000000, "Unknown"			},
-	{ 0x80860042, "Intel HD Graphics 3000" },
-	{ 0x80860046, "Intel HD Graphics 3000 Mobile" },
+	{ 0x80860042, "Desktop Graphics" },
+	{ 0x80860046, "Mobile Graphics" },
 	{ 0x808627A2, "Mobile GMA950"	},
 	{ 0x808627AE, "Mobile GMA950"	},
 	{ 0x808627A6, "Mobile GMA950"	},
