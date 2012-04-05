@@ -288,15 +288,16 @@ void scan_cpu(PlatformInfo_t *p)
 		int intelCPU = p->CPU.Model;
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
 			/* Nehalem CPU model */
-			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM ||
-										  p->CPU.Model == CPU_MODEL_FIELDS ||
-										  p->CPU.Model == CPU_MODEL_DALES ||
-										  p->CPU.Model == CPU_MODEL_DALES_32NM ||
-										  p->CPU.Model == CPU_MODEL_WESTMERE ||
-										  p->CPU.Model == CPU_MODEL_NEHALEM_EX ||
+			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM		||
+										  p->CPU.Model == CPU_MODEL_FIELDS		||
+										  p->CPU.Model == CPU_MODEL_DALES		||
+										  p->CPU.Model == CPU_MODEL_DALES_32NM	||
+										  p->CPU.Model == CPU_MODEL_WESTMERE	||
+										  p->CPU.Model == CPU_MODEL_NEHALEM_EX	||
 										  p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
-										  p->CPU.Model == CPU_MODEL_SANDY ||
-										  p->CPU.Model == CPU_MODEL_SANDY_XEON)) {
+										  p->CPU.Model == CPU_MODEL_SANDYBRIDGE ||
+										  p->CPU.Model == CPU_MODEL_JAKETOWN	||
+										  p->CPU.Model == CPU_MODEL_IVYBRIDGE	)) {
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
 				bus_ratio_max = bitfield(msr, 14, 8);

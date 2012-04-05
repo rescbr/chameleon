@@ -180,21 +180,21 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
     FSReadFile readFile;
     BVRef      bvr;
     unsigned long    length, length2;
-  
+
     // Resolve the boot volume from the file spec.
 
     if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
         return -1;
-  
+
     *binary = (void *)kLoadAddr;
-  
+
     // Read file into load buffer. The data in the load buffer will be
     // overwritten by the next LoadFile() call.
 
     gFSLoadAddress = (void *) LOAD_ADDR;
 
     readFile = bvr->fs_readfile;
-  
+
     if (readFile != NULL) {
         // Read the first 4096 bytes (fat header)
         length = readFile(bvr, (char *)filePath, *binary, 0, 0x1000);
@@ -219,7 +219,7 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
             ThinFatFile(binary, &length);
         }
     }
-  
+
     return length;
 }
 
@@ -576,7 +576,7 @@ int tell(int fdesc)
 int read(int fdesc, char * buf, int count)
 {
     struct iob * io;
-    
+
     if ((io = iob_from_fdesc(fdesc)) == NULL)
         return (-1);
 
@@ -820,7 +820,7 @@ BVRef selectBootVolume( BVRef chain )
 		for ( bvr = chain; bvr; bvr = bvr->next )
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) 
 				return bvr;
-	
+
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
 	 * to override the default selection.
@@ -836,7 +836,7 @@ BVRef selectBootVolume( BVRef chain )
         }
         free(val);
     }
-	
+
 	/*
 	 * Scannig the volume chain backwards and trying to find 
 	 * a HFS+ volume with valid boot record signature.
@@ -862,7 +862,7 @@ BVRef selectBootVolume( BVRef chain )
 			&& ! gBIOSBootVolume
 			&& bvr->biosdev == gBIOSDev )
 			bvr2 = bvr;
-	}  
+	}
 	
 	
 	/*

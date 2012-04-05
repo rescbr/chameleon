@@ -31,7 +31,8 @@ uint32_t stringlength = 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
-	if(string) {
+	if(string)
+	{
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
@@ -73,14 +74,16 @@ struct DevPropString *devprop_create_string(void)
 	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
 	
 	if(string == NULL)
+	{
 		return NULL;
+	}
 	
 	memset(string, 0, sizeof(struct DevPropString));
 	string->length = 12;
 	string->WHAT2 = 0x01000000;
 	return string;
 }
- 
+
 struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
 {
 	struct DevPropDevice	*device;
@@ -91,8 +94,11 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 		return NULL;
 	}
 	device = malloc(sizeof(struct DevPropDevice));
-
+	if (!device) {
+        return NULL;
+    }
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
+        free(device);
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
@@ -104,15 +110,21 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	int		x, curr = 0;
 	char	buff[] = "00";
 
-	for (x = 0; x < strlen(path); x++) {
-		if (!strncmp(&path[x], pci_device_string, strlen(pci_device_string))) {
+	for (x = 0; x < strlen(path); x++)
+	{
+		if (!strncmp(&path[x], pci_device_string, strlen(pci_device_string)))
+		{
 			x+=strlen(pci_device_string);
 			curr=x;
 			while(path[++x] != ',');
 			if(x-curr == 2)
+			{
 				sprintf(buff, "%c%c", path[curr], path[curr+1]);
+			}
 			else if(x-curr == 1)
+			{
 				sprintf(buff, "%c", path[curr]);
+			}
 			else 
 			{
 				printf("ERROR parsing device path\n");
@@ -125,9 +137,13 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 			curr = x;
 			while(path[++x] != ')');
 			if(x-curr == 2)
+			{
 				sprintf(buff, "%c%c", path[curr], path[curr+1]);
+			}
 			else if(x-curr == 1)
+			{
 				sprintf(buff, "%c", path[curr]);
+			}
 			else
 			{
 				printf("ERROR parsing device path\n");
@@ -141,7 +157,10 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	}
 	
 	if(!numpaths)
+	{
+        free(device);
 		return NULL;
+	}
 	
 	device->numentries = 0x00;
 	
@@ -171,8 +190,13 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	string->length += device->length;
 	
 	if(!string->entries)
+	{
 		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
-			return 0;
+		{
+            free(device);
+			return NULL;
+		}
+	}
 	
 	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
 	string->entries[string->numentries-1] = device;
@@ -184,13 +208,17 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 {
 	
 	if(!nm || !vl || !len)
+	{
 		return 0;
+	}
 	
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
 	uint8_t *data = (uint8_t*)malloc(length);
 	{
 		if(!data)
+		{
 			return 0;
+		}
 		
 		memset(data, 0, length);
 		uint32_t off= 0;
@@ -219,11 +247,17 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	
 	uint8_t *newdata = (uint8_t*)malloc((length + offset));
 	if(!newdata)
+	{
 		return 0;
+	}
 	if(device->data)
+	{
 		if(offset > 1)
+		{
 			memcpy(newdata, device->data, offset);
-
+		}
+	}
+	
 	memcpy(newdata + offset, data, length);
 	
 	device->length += length;
@@ -231,9 +265,13 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	device->numentries++;
 	
 	if(!device->data)
+	{
 		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+	}
 	else
+	{
 		free(device->data);
+	}
 	
 	free(data);
 	device->data = newdata;
@@ -247,7 +285,9 @@ char *devprop_generate_string(struct DevPropString *string)
 	char *ptr = buffer;
 	
 	if(!buffer)
+	{
 		return NULL;
+	}
 
 	sprintf(buffer, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
 			dp_swap16(string->numentries), string->WHAT3);
@@ -283,7 +323,7 @@ char *devprop_generate_string(struct DevPropString *string)
 		
 		buffer += 8;
 		uint8_t *dataptr = string->entries[i]->data;
-		for(x = 0; x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
+		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
 		{
 			sprintf(buffer, "%02x", *dataptr++);
 			buffer += 2;
@@ -296,7 +336,9 @@ char *devprop_generate_string(struct DevPropString *string)
 void devprop_free_string(struct DevPropString *string)
 {
 	if(!string)
+	{
 		return;
+	}
 	
 	int i;
 	for(i = 0; i < string->numentries; i++)
@@ -321,18 +363,30 @@ void devprop_free_string(struct DevPropString *string)
 
 int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
 {
-	if(!device)
-		return 0;
 	uint8_t builtin = 0x0;
-	if((vendor_id != 0x168c) && (builtin_set == 0)) 
+	
+	if(device)
 	{
-		builtin_set = 1;
-		builtin = 0x01;
+		
+		if((vendor_id != 0x168c) && (builtin_set == 0)) 
+		{
+			builtin_set = 1;
+			builtin = 0x01;
+		}
+		
+		if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+		{
+			return 0;
+		}
+		
+		devices_number++;
+		return 1;
 	}
-	if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+	else
+	{
 		return 0;
-	devices_number++;
-	return 1;
+	}
+	
 }
 
 void set_eth_builtin(pci_dt_t *eth_dev)

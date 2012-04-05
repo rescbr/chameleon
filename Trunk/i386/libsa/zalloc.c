@@ -111,7 +111,7 @@ void * safe_malloc(size_t size, const char *file, int line)
         smallestSize = 0;
         bestFit = -1;
 #endif
- 
+
 	for (i = 0; i < availableNodes; i++)
 	{
 		// find node with equal size, or if not found,
