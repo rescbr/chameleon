@@ -54,7 +54,7 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 		getBoolForKey(kEnableWifi, &do_wifi_devprop, DEFAULT_BOOT_CONFIG);
 		
 		if (do_wifi_devprop)		
-		set_wifi_airport(current);
+            set_wifi_airport(current);
 		
 	}
 	
@@ -104,6 +104,9 @@ static int devprop_add_network_template(struct DevPropDevice *device, uint16_t v
 static void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
+    if (!devicepath) {
+        return ;
+    }
 	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
 	
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
@@ -145,6 +148,9 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
 	char tmp[16];
 	
 	char *devicepath = get_pci_dev_path(wlan_dev);
+    if (!devicepath) {
+        return ;
+    }
 	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
 	
 	verbose("Wifi Controller [%04x:%04x] :: %s\n", wlan_dev->vendor_id, wlan_dev->device_id, devicepath);
@@ -158,7 +164,7 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
 		sprintf(tmp, "Airport");
 		devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp) + 1);
 		devprop_add_value(device, "device_type", (uint8_t *) tmp, strlen(tmp) + 1);
-
+        
 		
 		unsigned int i = 0;
 		for( ; i < sizeof(known_wifi_cards) / sizeof(known_wifi_cards[0]); i++)

@@ -196,7 +196,12 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 		}
 	}
 	
-	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
+    if((string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device)))== NULL)
+    {
+        free(device);
+        free(string->entries);
+        return NULL;
+    }
 	string->entries[string->numentries-1] = device;
 	
 	return device;
@@ -264,7 +269,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	
 	if(!device->data)
 	{
-		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+		//device->data = (uint8_t*)malloc(sizeof(uint8_t)); //IMHO this is useless
 	}
 	else
 	{

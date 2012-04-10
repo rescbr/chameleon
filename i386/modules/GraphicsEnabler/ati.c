@@ -458,16 +458,16 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x95C5,	0x01051A93, CHIP_FAMILY_RV620,		"Qimonda Radeon HD 3450",			kNull		},
     
     { 0x95CC,	0x00000000/*0x1b0317aa*/, CHIP_FAMILY_RV620,		"ATI FirePro V3700 (FireGL)",       kNull		},
-
+    
 	/* Evergreen */
 	{ 0x6898,	0x0B001002, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kZonalis	},
-
+    
 	{ 0x6898,	0x032E1043, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
-
+    
 	{ 0x6898,	0x00D0106B, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kLangur		},
-
+    
 	{ 0x6898,	0xE140174B, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
-
+    
 	{ 0x6898,	0x29611682, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",				kUakari		},
 	
 	{ 0x6899,	0x21E41458, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5850",				kUakari		},
@@ -513,9 +513,9 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68C8,	0x2306103C, CHIP_FAMILY_REDWOOD,	"ATI FirePro V4800 (FireGL)",		kNull		},
 	
 	{ 0x68D8,	0x03561043, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
-
+    
 	{ 0x68D8,	0x21D91458, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
-
+    
 	{ 0x68D8,	0x5690174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",				kNull		},
 	{ 0x68D8,	0x5730174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",				kNull		},
 	{ 0x68D8,	0xE151174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",				kBaboon		},
@@ -524,9 +524,9 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x68D8,	0x301017AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",				kNull		},
 	{ 0x68D8,	0x301117AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",				kNull		},
-
+    
 	{ 0x68D9,	0x301017AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
-
+    
 	{ 0x68DA,	0x5630174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
 	
 	{ 0x68DA,	0x30001787, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
@@ -536,13 +536,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E0,	0x04561028, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	},
 	
 	{ 0x68E0,	0x1433103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470M",				kEulemur	},
-
+    
 	{ 0x68E1,	0x1426103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
 	
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
 	{ 0x68F9,	0x5530174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",				kNull		},
-
+    
 	{ 0x68F9,	0x20091787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 	{ 0x68F9,	0x22911787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 	{ 0x68F9,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
@@ -558,11 +558,11 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6718,	0x67181002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
 	
 	{ 0x6718,	0x31301682, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",				kNull		},
-
+    
 	{ 0x6738,	0x00D01002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	{ 0x6738,	0x21FA1002,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	{ 0x6738,	0x67381002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
-
+    
 	{ 0x6738,	0x21FA1458,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
 	
 	{ 0x6738,	0x31031682,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",				kDuckweed	},
@@ -576,13 +576,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x67391002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
 	{ 0x6739,	0x21F81458, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
-
+    
 	{ 0x6739,	0x24411462, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 	
 	{ 0x6739,	0x31101682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},   
 	
 	{ 0x6739,	0xE177174B,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
-		
+    
 	{ 0x6740,	0x1657103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	{ 0x6740,	0x165A103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6770M",				kNull		},
 	
@@ -592,7 +592,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6741,	0x1646103C, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6750M",				kNull		},
 	
 	{ 0x6741,	0x9080104D,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M",				kNull		},
-
+    
 	{ 0x6758,	0x67581002,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",				kBulrushes	},
 	
 	{ 0x6758,	0x22051458,	CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",				kBulrushes	},
@@ -708,10 +708,10 @@ static radeon_card_info_t radeon_cards[] = {
 	
 	{ 0x6758,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",		kBulrushes	},
 	{ 0x6759,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6500 Series",		kNull		},
-
+    
 	{ 0x6760,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400M Series",		kNull		},
 	{ 0x6761,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6430M Series",		kNull		},
-		
+    
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",		kNull		},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",		kBulrushes	},
 	
@@ -787,35 +787,35 @@ typedef struct {
 
 dev_prop_t ati_devprop_list[] = {
 	{FLAGTRUE,	false,	"@0,AAPL,boot-display",		get_bootdisplay_val,	NULVAL							},
-//	{FLAGTRUE,	false,	"@0,ATY,EFIDisplay",		NULL,					STRVAL("TMDSA")					},
+    //	{FLAGTRUE,	false,	"@0,ATY,EFIDisplay",		NULL,					STRVAL("TMDSA")					},
 	
-//	{FLAGTRUE,	true,	"@0,AAPL,vram-memory",		get_vrammemory_val,		NULVAL							},
-//	{FLAGTRUE,	true,	"@0,compatible",			get_name_val,			NULVAL							},
-//	{FLAGTRUE,	true,	"@0,connector-type",		get_conntype_val,		NULVAL							},
-//	{FLAGTRUE,	true,	"@0,device_type",			NULL,					STRVAL("display")				},
-//	{FLAGTRUE,	false,	"@0,display-connect-flags", NULL,					DWRVAL((uint32_t)0)				},
-//	{FLAGTRUE,	true,	"@0,display-type",			NULL,					STRVAL("NONE")					},
+    //	{FLAGTRUE,	true,	"@0,AAPL,vram-memory",		get_vrammemory_val,		NULVAL							},
+    //	{FLAGTRUE,	true,	"@0,compatible",			get_name_val,			NULVAL							},
+    //	{FLAGTRUE,	true,	"@0,connector-type",		get_conntype_val,		NULVAL							},
+    //	{FLAGTRUE,	true,	"@0,device_type",			NULL,					STRVAL("display")				},
+    //	{FLAGTRUE,	false,	"@0,display-connect-flags", NULL,					DWRVAL((uint32_t)0)				},
+    //	{FLAGTRUE,	true,	"@0,display-type",			NULL,					STRVAL("NONE")					},
 	{FLAGTRUE,	true,	"@0,name",					get_name_val,			NULVAL							},
-//	{FLAGTRUE,	true,	"@0,VRAM,memsize",			get_vrammemsize_val,	NULVAL							},
+    //	{FLAGTRUE,	true,	"@0,VRAM,memsize",			get_vrammemsize_val,	NULVAL							},
 	
-//	{FLAGTRUE,	false,	"AAPL,aux-power-connected", NULL,					DWRVAL((uint32_t)1)				},
-//	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,					DWRVAL((uint32_t)0)				},
+    //	{FLAGTRUE,	false,	"AAPL,aux-power-connected", NULL,					DWRVAL((uint32_t)1)				},
+    //	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,					DWRVAL((uint32_t)0)				},
 	{FLAGTRUE,	false,	"ATY,bin_image",			get_binimage_val,		NULVAL							},
 	{FLAGTRUE,	false,	"ATY,Copyright",			NULL,	STRVAL("Copyright AMD Inc. All Rights Reserved. 2005-2010") },
 	{FLAGTRUE,	false,	"ATY,Card#",				get_romrevision_val,	NULVAL							},
 	{FLAGTRUE,	false,	"ATY,VendorID",				NULL,					WRDVAL((uint16_t)0x1002)		},
 	{FLAGTRUE,	false,	"ATY,DeviceID",				get_deviceid_val,		NULVAL							},
 	
-//	{FLAGTRUE,	false,	"ATY,MCLK",					get_mclk_val,			NULVAL							},
-//	{FLAGTRUE,	false,	"ATY,SCLK",					get_sclk_val,			NULVAL							},
-//	{FLAGTRUE,	false,	"ATY,RefCLK",				get_refclk_val,			DWRVAL((uint32_t)0x0a8c)		},
+    //	{FLAGTRUE,	false,	"ATY,MCLK",					get_mclk_val,			NULVAL							},
+    //	{FLAGTRUE,	false,	"ATY,SCLK",					get_sclk_val,			NULVAL							},
+    //	{FLAGTRUE,	false,	"ATY,RefCLK",				get_refclk_val,			DWRVAL((uint32_t)0x0a8c)		},
 	
-//	{FLAGTRUE,	false,	"ATY,PlatformInfo",			get_platforminfo_val,	NULVAL							},
+    //	{FLAGTRUE,	false,	"ATY,PlatformInfo",			get_platforminfo_val,	NULVAL							},
 	
 	{FLAGTRUE,	false,	"name",						get_nameparent_val,		NULVAL							},
 	{FLAGTRUE,	false,	"device_type",				get_nameparent_val,		NULVAL							},
 	{FLAGTRUE,	false,	"model",					get_model_val,			STRVAL("ATI Radeon")			},
-//	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
+    //	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
 	
 	{FLAGTRUE,	false,	NULL,						NULL,					NULVAL							}
 };
@@ -883,11 +883,11 @@ bool get_model_val(value_t *val)
 
 bool get_conntype_val(value_t *val)
 {
-//Connector types:
-//0x4 : DisplayPort
-//0x400: DL DVI-I
-//0x800: HDMI
-
+    //Connector types:
+    //0x4 : DisplayPort
+    //0x400: DL DVI-I
+    //0x800: HDMI
+    
 	return false;
 }
 
@@ -927,7 +927,7 @@ bool get_romrevision_val(value_t *val)
 		return false;
 	
 	rev = card->rom + *(uint8_t *)(card->rom + OFFSET_TO_GET_ATOMBIOS_STRINGS_START);
-
+    
 	val->type = kPtr;
 	val->size = strlen((char *)rev);
 	val->data = malloc(val->size);
@@ -1029,9 +1029,9 @@ void devprop_add_list(dev_prop_t devprop_list[])
 				if (devprop_list[i].default_val.type != kNul)
 				{
 					devprop_add_value(card->device, devprop_list[i].name,
-						devprop_list[i].default_val.type == kCst ?
-						(uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
-						devprop_list[i].default_val.size);
+                                      devprop_list[i].default_val.type == kCst ?
+                                      (uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
+                                      devprop_list[i].default_val.size);
 				}
 				
 				if (devprop_list[i].all_ports)
@@ -1042,9 +1042,9 @@ void devprop_add_list(dev_prop_t devprop_list[])
 						{
 							devprop_list[i].name[1] = 0x30 + pnum; // convert to ascii
 							devprop_add_value(card->device, devprop_list[i].name,
-								devprop_list[i].default_val.type == kCst ?
-								(uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
-								devprop_list[i].default_val.size);
+                                              devprop_list[i].default_val.type == kCst ?
+                                              (uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
+                                              devprop_list[i].default_val.size);
 						}
 					}
 					devprop_list[i].name[1] = 0x30; // write back our "@0," for a next possible card
@@ -1052,7 +1052,7 @@ void devprop_add_list(dev_prop_t devprop_list[])
 			}
 		}
 	}
-
+    
 	free(val);
 }
 
@@ -1206,7 +1206,7 @@ bool read_disabled_vbios(void)
 			// wait for SPLL_CHG_STATUS to change to 1
 			cg_spll_status = 0;
 			while (!(cg_spll_status & R600_SPLL_CHG_STATUS))
-			cg_spll_status = RegRead32(R600_CG_SPLL_STATUS);
+                cg_spll_status = RegRead32(R600_CG_SPLL_STATUS);
 		}
 		RegWrite32(RADEON_VIPH_CONTROL, viph_control);
 		RegWrite32(RADEON_BUS_CNTL, bus_cntl);
@@ -1265,7 +1265,7 @@ bool read_disabled_vbios(void)
 			RegWrite32(R600_CTXSW_VID_LOWER_GPIO_CNTL, ctxsw_vid_lower_gpio_cntl);
 			RegWrite32(R600_LOWER_GPIO_ENABLE, lower_gpio_enable);
 		}
-
+    
 	return ret;
 }
 
@@ -1347,7 +1347,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
 	
 	verbose("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
-		card->fb, card->mmio, card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
+            card->fb, card->mmio, card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
 	
 	card->posted = radeon_card_posted();
 	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
@@ -1369,15 +1369,15 @@ static bool init_card(pci_dt_t *pci_dev)
 		}
 	}
 	
-//	card->ports = 2; // default - Azi: default is card_configs
+    //	card->ports = 2; // default - Azi: default is card_configs
 	
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
 		card->flags |= EVERGREEN;
-//		card->ports = 3; //Azi: use the AtiPorts key if needed
+        //		card->ports = 3; //Azi: use the AtiPorts key if needed
 	}
 	
-//	atN = 0;
+    //	atN = 0;
 	
 	// Check AtiConfig key for a framebuffer name,
 	card->cfg_name = getStringForKey(kAtiConfig, DEFAULT_BOOT_CONFIG);
@@ -1387,7 +1387,7 @@ static bool init_card(pci_dt_t *pci_dev)
 		// use cfg_name on radeon_cards, to retrive the default name from card_configs,
 		card->cfg_name = card_configs[card->info->cfg_name].name;
 		// and leave ports alone!
-//		card->ports = card_configs[card->info->cfg_name].ports;
+        //		card->ports = card_configs[card->info->cfg_name].ports;
 		
 		// which means one of the fb's or kNull
 		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
@@ -1415,9 +1415,9 @@ static bool init_card(pci_dt_t *pci_dev)
 		
 		verbose("Nr of ports set to framebuffer's default: %d\n", card->ports);
 	}
-//	else
-//		card->ports = 2/1 ?; // set a min if 0 ports ?
-//		verbose("Nr of ports set to min: %d\n", card->ports);
+    //	else
+    //		card->ports = 2/1 ?; // set a min if 0 ports ?
+    //		verbose("Nr of ports set to min: %d\n", card->ports);
 	
 	sprintf(name, "ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
@@ -1435,16 +1435,21 @@ static bool init_card(pci_dt_t *pci_dev)
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	char *devicepath;
-	
-	if (!init_card(ati_dev))
-		return false;
-	
+    
 	// -------------------------------------------------
 	// Find a better way to do this (in device_inject.c)
 	if (!string)
 		string = devprop_create_string();
 	
 	devicepath = get_pci_dev_path(ati_dev);
+    if (!devicepath) {
+        return false;
+    }
+    verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
+            ati_dev->vendor_id, ati_dev->device_id, devicepath);
+    if (!init_card(ati_dev))
+		return false;
+    
 	card->device = devprop_add_device(string, devicepath);
 	if (!card->device)
 		return false;

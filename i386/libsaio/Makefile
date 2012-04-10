@@ -37,7 +37,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
         disk.o sys.o cache.o bootstruct.o \
         stringTable.o load.o pci.o allocate.o misc.o \
 		vbe.o hfs.o hfs_compare.o \
-        xml.o md5c.o device_tree.o modules.o \
+        xml.o md5.o device_tree.o modules.o \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \

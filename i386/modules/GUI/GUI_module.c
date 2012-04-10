@@ -211,7 +211,7 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		gui.logo.draw = false;
 		drawBackground();		
 		updateVRAM();
-
+        
 		if(!gVerboseMode)
 		{
 			// Disable outputs, they will still show in the boot log.
@@ -220,20 +220,20 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		}
 		
 	}	
-	 
+    
 }
 
 void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
 	// Start and display the gui
 	msglog("* Attempting to Display GUI\n");
-
+    
 	if (initGUI())
 	{
 		
 		useGUI = false; // initGUI() returned with an error, disabling GUI.		
 		msglog("* GUI failed to Display, or disabled by user (a.k.a you)\n");
-
+        
 		
 	}
 	else
@@ -242,7 +242,7 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 		replace_system_function("_getBootOptions", &GUI_getBootOptions);
 		replace_system_function("_clearBootArgs", &GUI_clearBootArgs);
         replace_system_function("_addBootArg", &GUI_addBootArg);  
-
+        
         replace_system_function("_showHelp", &GUI_showHelp);
 		
 		replace_system_function("_printf", &GUI_printf);
@@ -267,7 +267,7 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
         showMessage = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showMessage");        
         showTextBuffer = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showTextBuffer");
 		safe_set_env(envgBootArgs,(uint32_t)gBootArgs);
-
+        
 		msglog("* GUI successfully Displayed\n");
 		
 	}
@@ -365,7 +365,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 			{
 				bool shouldboot = ( res != DO_NOT_BOOT );
                 safe_set_env(envShouldboot, shouldboot);
-
+                
 				if ( shouldboot )
 					gui.menu.draw = false;
 				
@@ -374,7 +374,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 					case BOOT_NORMAL:
 						gVerboseMode = false;
                         safe_set_env(envgBootMode, kBootModeNormal);
-
+                        
 						break;
 						
 					case BOOT_VERBOSE:
@@ -698,7 +698,7 @@ int GUI_getBootOptions(bool firstRun)
 	bool    showPrompt, newShowPrompt, isCDROM;
     int     optionKey;
     int devcnt = (int)get_env(envgDeviceCount);
-
+    
 	// Initialize default menu selection entry.
 	gBootVolume = menuBVR = selectBootVolume(getBvChain());
 	
@@ -710,7 +710,7 @@ int GUI_getBootOptions(bool firstRun)
 	{
 		isCDROM = false;
 	}
-	    
+    
 	// ensure we're in graphics mode if gui is setup
 	if (gui.initialised && (getVideoMode() == VGA_TEXT_MODE))
 	{
@@ -752,7 +752,7 @@ int GUI_getBootOptions(bool firstRun)
 	{
 		gBootMode |= kBootModeQuiet;
         safe_set_env(envgBootMode,gBootMode);
-
+        
 	}
 	
 	// If the user is holding down a modifier key, enter safe mode.
@@ -761,7 +761,7 @@ int GUI_getBootOptions(bool firstRun)
 		
 		gBootMode |= kBootModeSafe;
         safe_set_env(envgBootMode,gBootMode);
-
+        
 	}
 	
 	// Checking user pressed keys
@@ -778,7 +778,7 @@ int GUI_getBootOptions(bool firstRun)
 	{
 		gBootMode &= ~kBootModeQuiet;
         safe_set_env(envgBootMode,gBootMode);
-
+        
 		timeout = 0;
 	}
 	// If user typed 'v' or 'V', boot in verbose mode.
@@ -815,16 +815,26 @@ int GUI_getBootOptions(bool firstRun)
 		char *name = NULL;
 		int cnt;
 		
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG))
-		{
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) {
 			prompt = malloc(cnt + 1);
+            if (!prompt) {
+                stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			strncat(prompt, val, cnt);
-		}
-		else 
-		{
+		} else {
 			name = malloc(80);
+            if (!name) {
+                stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			getBootVolumeDescription(gBootVolume, name, 79, false);
-			prompt = malloc(256);
+			prompt = malloc(256);            
+            if (!prompt) {
+                free(name);
+                stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			sprintf(prompt, "Press ENTER to start up from %s, or press any key to enter startup options.", name);
 			free(name);
 		}
@@ -914,7 +924,7 @@ int GUI_getBootOptions(bool firstRun)
             goto done;
         }
 	}
-
+    
 	if (devcnt)
 	{
 		// Allocate memory for an array of menu items.
@@ -960,7 +970,7 @@ int GUI_getBootOptions(bool firstRun)
                 
 				// Display banner and show hardware info.
 				gprintf(&gui.screen, bootBanner + 1, (int)(get_env(envConvMem) + get_env(envExtMem)) / 1024);
-
+                
 			}
 			
 			// redraw background

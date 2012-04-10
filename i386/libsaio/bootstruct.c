@@ -352,6 +352,9 @@ finalizeBootStruct(void)
 		}
 		
 		DT__FlattenDeviceTree((void **)&addr, &size);
+        if (!size) {
+            stop("Couldn't get flatten device tree\n");
+        }
 		bootArgs->deviceTreeP = (uint32_t)addr;
 		bootArgs->deviceTreeLength = size;
 	}        

@@ -66,11 +66,7 @@
 #include "disk.h"
 #include "modules.h"
 #include "xml.h"
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
-# include <Kernel/libkern/crypto/md5.h>
-#else
-# include <sys/md5.h>
-#endif
+# include "md5.h"
 #include <uuid/uuid.h>
 #if 0 /* No OS X release has ever included this. */
 #include <Kernel/uuid/namespace.h>

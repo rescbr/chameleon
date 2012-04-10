@@ -740,6 +740,9 @@ int loadSystemConfig(void)
         "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"bt(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+        "rd(0,0)/OS X Install Data/com.apple.Boot.plist",
+		"/OS X Install Data/com.apple.Boot.plist",
+		"bt(0,0)/OS X Install Data/com.apple.Boot.plist",
         "rd(0,0)/Mac OS X Install Data/com.apple.Boot.plist",
 		"/Mac OS X Install Data/com.apple.Boot.plist",
 		"bt(0,0)/Mac OS X Install Data/com.apple.Boot.plist"

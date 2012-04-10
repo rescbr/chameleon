@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		AB0E930C14C6223500F798D7 /* cpu_intel_amd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpu_intel_amd.c; sourceTree = "<group>"; };
+		AB22095D15334C9E00AA9851 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
 		AB42D02115187F2C0078E84A /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		AB42D02215187F2C0078E84A /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
 		AB42D02315187F2C0078E84A /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
@@ -265,7 +266,7 @@
 		AB43B31C14C37E520018D529 /* libsaio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libsaio.h; sourceTree = "<group>"; };
 		AB43B31D14C37E520018D529 /* load.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = load.c; sourceTree = "<group>"; };
 		AB43B31E14C37E520018D529 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		AB43B31F14C37E520018D529 /* md5c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5c.c; sourceTree = "<group>"; };
+		AB43B31F14C37E520018D529 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
 		AB43B32014C37E520018D529 /* misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = misc.c; sourceTree = "<group>"; };
 		AB43B32114C37E520018D529 /* msdos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = msdos.c; sourceTree = "<group>"; };
 		AB43B32214C37E520018D529 /* msdos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msdos.h; sourceTree = "<group>"; };
@@ -1019,7 +1020,8 @@
 				AB43B31C14C37E520018D529 /* libsaio.h */,
 				AB43B31D14C37E520018D529 /* load.c */,
 				AB43B31E14C37E520018D529 /* Makefile */,
-				AB43B31F14C37E520018D529 /* md5c.c */,
+				AB43B31F14C37E520018D529 /* md5.c */,
+				AB22095D15334C9E00AA9851 /* md5.h */,
 				AB43B32014C37E520018D529 /* misc.c */,
 				ABE5FF4E14F9495500447F78 /* modules.c */,
 				ABE5FF4F14F9495500447F78 /* modules.h */,

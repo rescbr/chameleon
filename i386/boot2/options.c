@@ -116,11 +116,11 @@ static bool flushKeyboardBuffer(void)
 
 //==========================================================================
 
-static int countdown( const char * msg, int row, int timeout, int *optionKey )
+static int countdown( const char * msg, register int row, register int timeout, int *optionKey )
 {
-    unsigned long time;
+    register unsigned long time;
     int ch  = 0;
-    int col = strlen(msg) + 1;
+    register int col = strlen(msg) + 1;
 	
     
     flushKeyboardBuffer();
@@ -682,12 +682,24 @@ int getBootOptions(bool firstRun)
 		
 		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) {
 			prompt = malloc(cnt + 1);
+            if (!prompt) {
+                stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			strncat(prompt, val, cnt);
 		} else {
 			name = malloc(80);
+            if (!name) {
+                stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			getBootVolumeDescription(gBootVolume, name, 79, false);
 			prompt = malloc(256);            
-            
+            if (!prompt) {
+                free(name);
+                stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
+                return -1;
+            }
 			sprintf(prompt, "Press ENTER to start up from %s, or press any key to enter startup options.", name);
 			free(name);
 		}
@@ -1277,6 +1289,10 @@ void showTextFile(const char * filename)
 		size = MAX_TEXT_FILE_SIZE;
 	}
 	buf = malloc(size);
+    if (!buf) {
+        printf("Couldn't allocate memory for the buf in showTextFile\n"); 
+        return ;
+    }
 	read(fd, buf, size);
 	close(fd);
 	showTextBuffer(buf, size);

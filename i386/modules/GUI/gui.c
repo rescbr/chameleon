@@ -2601,13 +2601,15 @@ void drawBootGraphics(void)
 		// Prepare the data for the default Apple boot image. 
 		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
 		if (appleBootPict) { 
-			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
-			if (bootImageData) {	
-				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
-				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
-				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
-				free(bootImageData);
-			}
+			if (convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData) == 0)
+            {
+                if (bootImageData) {	
+                    x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
+                    y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
+                    drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
+                    free(bootImageData);
+                }
+            }			
 			free(appleBootPict); 
 		} 
 	} 

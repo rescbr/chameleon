@@ -35,7 +35,7 @@ void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 	if (current && current->class_id == PCI_CLASS_STORAGE_SATA)
 	{
 		devicepath = get_pci_dev_path(current);
-		if (devicepath[0] != 0)
+		if (devicepath)
 		{
 			verbose("SATA device : [%04x:%04x :: %04x] :: %s\n",  
 					current->vendor_id, current->device_id,current->class_id,

@@ -89,6 +89,9 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 				continue;
 			}
 			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));
+            if (!new) {
+                continue;
+            }
 			bzero(new, sizeof(pci_dt_t));
 			new->dev.addr	= pci_addr;
 			new->vendor_id	= id & 0xffff;
@@ -145,6 +148,11 @@ void build_pci_dt(void)
 	dev_path = malloc(sizeof(char) * 256);	// TODO: remove
 	
 	root_pci_dev = malloc(sizeof(pci_dt_t));
+    
+    if (!dev_path || !root_pci_dev) {
+        stop("Couldn't allocate memory for the pci root device\n");
+        return ;
+    }
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	enable_pci_devs();
 	scan_pci_bus(root_pci_dev, 0);
@@ -160,6 +168,10 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	char* buffer = malloc(sizeof(char) * 256);
 	
+    if (!buffer) {
+        return NULL;
+    }
+    
 	pci_dt_t	*current;
 	pci_dt_t	*end;
 	char		tmp[64];

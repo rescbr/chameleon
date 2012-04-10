@@ -1,3 +1,7 @@
+- Stability fixes
+- Added mountain lion auto_installer compatibility
+- Changed md5c.c to the Xnu's md5.c
+
 - Added a dirty workaround to selectBootVolume (still need more investigations to find out what happening exactly during the bvchain construction, and how the h... the loop can stop with gcc)
 
 - Improved Xcode4.3+ support 

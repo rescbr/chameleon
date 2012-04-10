@@ -1,6 +1,6 @@
 /*
-Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
-*/
+ Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
+ */
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
@@ -98,15 +98,17 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	char *model;
 	uint8_t BuiltIn = 0x00;
 	uint8_t ClassFix[4] = { 0x00, 0x00, 0x03, 0x00 };
-
+    
 	devicepath = get_pci_dev_path(gma_dev);
-
+    if (!devicepath) {
+        return false;
+    }
 	bar[0] = pci_config_read32(gma_dev->dev.addr, 0x10);
 #if UNUSED
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 #endif
 	model = get_gma_model((gma_dev->vendor_id << 16) | gma_dev->device_id);
-
+    
 	verbose("Intel %s [%04x:%04x] :: %s\n",
 			model, gma_dev->vendor_id, gma_dev->device_id, devicepath);
 	
@@ -124,7 +126,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);	
-
+    
 	if ((strcmp(model, "Mobile GMA950")  == 0) ||
 		(strcmp(model, "Mobile GMA3150")  == 0))
 	{
@@ -170,7 +172,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
     }
     
-
+    
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if(!stringdata)
 	{

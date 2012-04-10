@@ -505,7 +505,8 @@ static U8 *parse_acpi_processor(const struct acpi_namespace *ns, U8 * current, U
     id = *current++;
     pmbase = *(U32 *) current;
     current += 4;
-	
+    (void)current; // Silent a warning reported by the clang static analizer . 
+
 #if DEBUG_ACPI_DECODE
     DBG( "Found CPU object: ");
     dprint_namespace(&new_ns);

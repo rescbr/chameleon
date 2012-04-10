@@ -37,26 +37,24 @@ void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* 
 	
 	if(current && current->class_id == PCI_CLASS_DISPLAY_VGA)
 	{
-		char *devicepath = get_pci_dev_path(current);
-
+        
 		switch (current->vendor_id)
 		{
 			case PCI_VENDOR_ID_ATI:
-				verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-								current->vendor_id, current->device_id, devicepath);
+				
 				setup_ati_devprop(current);
 				break;
 				
 			case PCI_VENDOR_ID_INTEL: 
 				setup_gma_devprop(current);
 				break;
-					
+                
 			case PCI_VENDOR_ID_NVIDIA: 
 				setup_nvidia_devprop(current);
 				break;
 			default:
 				break;
 		}		
-		 
+        
 	}
 }

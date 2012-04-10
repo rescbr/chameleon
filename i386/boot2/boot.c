@@ -310,14 +310,17 @@ static int ExecKernel(void *binary)
 			appleBootPict = (uint8_t *) __decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
 			if (appleBootPict)
 			{ 
-				__convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
-				if (bootImageData)
-				{	
-					x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
-					y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
-					__drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
-					free(bootImageData);
-				}
+				if(__convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData) == 0)
+                {
+                    if (bootImageData)
+                    {	
+                        x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
+                        y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
+                        __drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
+                        free(bootImageData);
+                    }
+                }
+				
 				free(appleBootPict); 
 			}
             
@@ -1036,6 +1039,9 @@ static void getRootDevice()
 				uuidSet = false;
 				char *           valueBuffer;
 				valueBuffer = malloc(VALUE_SIZE);
+                if (!valueBuffer) { 
+                    return;
+                }
 				char *           argP = bootArgs->CommandLine;
 				valueBuffer[0] = '*';
 				if (cnt > VALUE_SIZE)

@@ -13,15 +13,15 @@
 typedef struct DeviceTreeNodeProperty {
     char                name[kPropNameLength];  // NUL terminated property name
     unsigned long       length;         // Length (bytes) of folloing prop value
-                                        //  unsigned long       value[1];       // Variable length value of property
-                                        // Padded to a multiple of a longword?
+    //  unsigned long       value[1];       // Variable length value of property
+    // Padded to a multiple of a longword?
 } DeviceTreeNodeProperty;
 
 typedef struct OpaqueDTEntry {
     unsigned long       nProperties;    // Number of props[] elements (0 => end)
     unsigned long       nChildren;      // Number of children[] elements
-                                        //  DeviceTreeNodeProperty      props[];// array size == nProperties
-                                        //  DeviceTreeNode      children[];     // array size == nChildren
+    //  DeviceTreeNodeProperty      props[];// array size == nProperties
+    //  DeviceTreeNode      children[];     // array size == nChildren
 } DeviceTreeNode;
 
 typedef char DTPropertyNameBuf[32];
@@ -73,14 +73,13 @@ Property *
 DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
     Property *prop;
-
+    
     DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%x)\n", DT__GetName(node), name, length, value);
     if (freeProperties == NULL) {
         void *buf = malloc(kAllocSize);
-        int i;
-        
-        DPRINTF("Allocating more free properties\n");
         if (buf == 0) return 0;
+        int i;   
+        DPRINTF("Allocating more free properties\n");
         bzero(buf, kAllocSize);
         // Use the first property to record the allocated buffer
         // for later freeing.
@@ -97,11 +96,11 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
     }
     prop = freeProperties;
     freeProperties = prop->next;
-
+    
     prop->name = name;
     prop->length = length;
     prop->value = value;
-
+    
     // Always add to end of list
     if (node->properties == 0) {
         node->properties = prop;
@@ -110,12 +109,12 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
     }
     node->last_prop = prop;
     prop->next = 0;
-
+    
     DPRINTF("Done [0x%x]\n", prop);
     
     DTInfo.numProperties++;
     DTInfo.totalPropertySize += RoundToLong(length);
-
+    
     return prop;
 }
 
@@ -123,13 +122,12 @@ Node *
 DT__AddChild(Node *parent, const char *name)
 {
     Node *node;
-
+    
     if (freeNodes == NULL) {
         void *buf = malloc(kAllocSize);
-        int i;
-        
-        DPRINTF("Allocating more free nodes\n");
         if (buf == 0) return 0;
+        int i;        
+        DPRINTF("Allocating more free nodes\n");
         bzero(buf, kAllocSize);
         node = (Node *)buf;
         // Use the first node to record the allocated buffer
@@ -149,7 +147,7 @@ DT__AddChild(Node *parent, const char *name)
     freeNodes = node->next;
     DPRINTF("Got free node 0x%x\n", node);
     DPRINTF("prop = 0x%x, children = 0x%x, next = 0x%x\n", node->properties, node->children, node->next);
-
+    
     if (parent == NULL) {
         rootNode = node;
         node->next = 0;
@@ -202,14 +200,14 @@ DT__Finalize(void)
 {
     Node *node;
     Property *prop;
-
+    
     DPRINTF("DT__Finalize\n");
     for (prop = allocedProperties; prop != NULL; prop = prop->next) {
         free(prop->value);
     }
     allocedProperties = NULL;
     freeProperties = NULL;
-
+    
     for (node = allocedNodes; node != NULL; node = node->next) {
         free((void *)node->children);
     }
@@ -218,7 +216,7 @@ DT__Finalize(void)
     rootNode = NULL;
     
     // XXX leaks any created strings
-
+    
     DTInfo.numNodes = 0;
     DTInfo.numProperties = 0;
     DTInfo.totalPropertySize = 0;
@@ -231,12 +229,12 @@ FlattenNodes(Node *node, void *buffer)
     DeviceTreeNode *flatNode;
     DeviceTreeNodeProperty *flatProp;
     int count;
-
+    
     if (node == 0) return buffer;
-
+    
     flatNode = (DeviceTreeNode *)buffer;
     buffer += sizeof(DeviceTreeNode);
-
+    
     for (count = 0, prop = node->properties; prop != 0; count++, prop = prop->next) {
         flatProp = (DeviceTreeNodeProperty *)buffer;
         strcpy(flatProp->name, prop->name);
@@ -246,12 +244,12 @@ FlattenNodes(Node *node, void *buffer)
         buffer += RoundToLong(prop->length);
     }
     flatNode->nProperties = count;
-
+    
     for (count = 0, node = node->children; node != 0; count++, node = node->next) {
         buffer = FlattenNodes(node, buffer);
     }
     flatNode->nChildren = count;
-
+    
     return buffer;
 }
 
@@ -268,16 +266,16 @@ DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
 {
     uint32_t totalSize;
     void *buf;
-
+    
     DPRINTF("DT__FlattenDeviceTree(0x%x, 0x%x)\n", buffer_p, length);
 #if DEBUG
     if (buffer_p) DT__PrintTree(rootNode);
 #endif
     
     totalSize = DTInfo.numNodes * sizeof(DeviceTreeNode) + 
-        DTInfo.numProperties * sizeof(DeviceTreeNodeProperty) +
-        DTInfo.totalPropertySize;
-
+    DTInfo.numProperties * sizeof(DeviceTreeNodeProperty) +
+    DTInfo.totalPropertySize;
+    
     DPRINTF("Total size 0x%x\n", totalSize);
     if (buffer_p != 0) {
         if (totalSize == 0) {
@@ -287,6 +285,10 @@ DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
                 buf = malloc(totalSize);
             } else {
                 buf = *buffer_p;
+            }
+            if (!buf) {
+                *length = 0;
+                return;
             }
             bzero(buf, totalSize);
             
@@ -302,7 +304,7 @@ char *
 DT__GetName(Node *node)
 {
     Property *prop;
-
+    
     //DPRINTF("DT__GetName(0x%x)\n", node);
     //DPRINTF("Node properties = 0x%x\n", node->properties);
     for (prop = node->properties; prop; prop = prop->next) {
@@ -322,26 +324,26 @@ DT__FindNode(const char *path, bool createIfMissing)
     DTPropertyNameBuf nameBuf;
     char *bp;
     int i;
-
+    
     DPRINTF("DT__FindNode('%s', %d)\n", path, createIfMissing);
     
     // Start at root
     node = rootNode;
     DPRINTF("root = 0x%x\n", rootNode);
-
+    
     while (node) {
         // Skip leading slash
         while (*path == '/') path++;
-
+        
         for (i=0, bp = nameBuf; ++i < kDTMaxEntryNameLength && *path && *path != '/'; bp++, path++) *bp = *path;
         *bp = '\0';
-
+        
         if (nameBuf[0] == '\0') {
             // last path entry
             break;
         }
         DPRINTF("Node '%s'\n", nameBuf);
-
+        
         for (child = node->children; child != 0; child = child->next) {
             DPRINTF("Child 0x%x\n", child);
             if (strcmp(DT__GetName(child), nameBuf) == 0) {
@@ -353,7 +355,7 @@ DT__FindNode(const char *path, bool createIfMissing)
             char *str = malloc(strlen(nameBuf) + 1);
             // XXX this will leak
             strcpy(str, nameBuf);
-
+            
             child = DT__AddChild(node, str);
         }
         node = child;
@@ -368,19 +370,19 @@ DT__PrintNode(Node *node, int level)
 {
     char spaces[10], *cp = spaces;
     Property *prop;
-
+    
     if (level > 9) level = 9;
     while (level--) *cp++ = ' ';
     *cp = '\0';
-
+    
     printf("%s===Node===\n", spaces);
     for (prop = node->properties; prop; prop = prop->next) {
         char c = *((char *)prop->value);
         if (prop->length < 64 && (
-            strcmp(prop->name, "name") == 0 || 
-            (c >= '0' && c <= '9') ||
-            (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') || c == '_')) {
+                                  strcmp(prop->name, "name") == 0 || 
+                                  (c >= '0' && c <= '9') ||
+                                  (c >= 'a' && c <= 'z') ||
+                                  (c >= 'A' && c <= 'Z') || c == '_')) {
             printf("%s Property '%s' [%d] = '%s'\n", spaces, prop->name, prop->length, prop->value);
         } else {
             printf("%s Property '%s' [%d] = (data)\n", spaces, prop->name, prop->length);

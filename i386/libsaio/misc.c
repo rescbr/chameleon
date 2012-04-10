@@ -132,7 +132,9 @@ struct ran_obj* random_init (int rmin, int rmax)
 	int tab[rand_tab_len];
 	
 	struct ran_obj * self = (struct ran_obj * )malloc(sizeof(struct ran_obj));	
-	
+	if (!self) {
+        return NULL;
+    }
     bzero(self,sizeof(struct ran_obj));
     
 	self->rmin= rmin;

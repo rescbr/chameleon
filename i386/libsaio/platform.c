@@ -70,23 +70,27 @@ typedef enum envtype {
 
 struct env_struct {
     unsigned long long value;                    
-    char name[10]; 
+    char *name; 
     void * ptr;
     //int lock;
     enum envtype Type;
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
-static void CopyVarPtr (struct env_struct *var, void* ptr, size_t size);
+static int CopyVarPtr (struct env_struct *var, void* ptr, size_t size);
 static struct env_struct *find_env(const char *name);
 static void _re_set_env_copy(struct env_struct *var , void* ptr,size_t size);
 struct env_struct *platform_env = NULL;
 
 
-static void CopyVarPtr (struct env_struct *var, void* ptr, size_t size)
+static int CopyVarPtr (struct env_struct *var, void* ptr, size_t size)
 {
     var->ptr = malloc(size);
+    if (!var->ptr) {
+        return 0;
+    }
     memcpy(var->ptr, ptr, size);
+    return 1;
 }
 
 static struct env_struct *find_env(const char *name) {
@@ -141,17 +145,24 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
     struct env_struct *var;
     
     var = (struct env_struct*)malloc(sizeof(struct env_struct));
+    if (!var) {
+        return;
+    }
     if (Type == kEnvPtr) {
-        CopyVarPtr( var,  ptr, size);
+        if (!CopyVarPtr( var,  ptr, size)) return;
     } 
     else if (Type == kEnvValue) 
         var->value = value;
     else
         return;
     
-    var->Type = Type;
+    var->Type = Type;    
     
-    strlcpy(var->name, name, sizeof(var->name));
+    var->name = newString(name);
+    if (!var->name) {        
+        free(var);
+        return;
+    }
 	
 	if (setjmp(h_buf_error) == -1) {
 		printf("_set_env: Unable to set environement variable"); // don't try to acces to the string 'name', 
@@ -161,7 +172,7 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
 #endif
 		return;
 	} else {
-		HASH_ADD_STR( platform_env, name, var );
+        HASH_ADD_KEYPTR( hh, platform_env, name, strlen(var->name), var );
 	}
 }
 
@@ -316,9 +327,11 @@ static void delete_env(struct env_struct *var) {
 #endif
 		return;
 	} else {
-		HASH_DEL( platform_env, var);  
+		HASH_DEL( platform_env, var);
+        if (var->name) free(var->name);            
+        free(var);
+        
 	}
-    free(var);
 }
 
 void unset_env(const char *name) {
@@ -341,6 +354,7 @@ void free_platform_env(void) {
 	} else {
 		HASH_ITER(hh, platform_env, current_var, tmp) {    
 			HASH_DEL(platform_env,current_var);
+            if (current_var->name) free(current_var->name);
 			free(current_var);           
 		}
 	}     
@@ -352,20 +366,28 @@ void debug_platform_env(void)
     struct env_struct *current_var = platform_env;
     for(current_var=platform_env;current_var;current_var=(struct env_struct*)(current_var->hh.next)) 
     {
+#if DEBUG_PLATFORM  >= 2
         if (current_var->Type == kEnvValue)
             printf(" Name = %s | Type = VALUE | Value = 0x%04x\n",current_var->name,(uint32_t)current_var->value);
         else if (current_var->Type == kEnvPtr )
             printf(" Name = %s | Type = PTR(Copy) | Value = 0x%x\n",current_var->name,(uint32_t)current_var->ptr);
-
+#else
+        
+        if (current_var->Type == kEnvValue)
+            printf("%s: 0x%04x\n",current_var->name,(uint32_t)current_var->value);
+        else if (current_var->Type == kEnvPtr )
+            printf("%s(ptr): 0x%x\n",current_var->name,(uint32_t)current_var->ptr);
+#endif
+        
     }
     getc();
 }
 #endif
 
 /** 
-    Scan platform hardware information, called by the main entry point (common_boot() ) 
-    _before_ bootConfig xml parsing settings are loaded
-*/
+ Scan platform hardware information, called by the main entry point (common_boot() ) 
+ _before_ bootConfig xml parsing settings are loaded
+ */
 void scan_platform(void)
 {	
 	//memset(&Platform, 0, sizeof(PlatformInfo_t));
@@ -375,7 +397,7 @@ void scan_platform(void)
 #if DEBUG_PLATFORM
     DBG("CPU: %s\n", (char*)get_env_ptr(envBrandString));
     if (get_env(envVendor) == CPUID_VENDOR_AMD)
-	DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", (uint32_t)get_env(envVendor), (uint32_t)get_env(envModel), (uint32_t)get_env(envExtModel));
+        DBG("CPU: Vendor/Model/ExtModel: 0x%x/0x%x/0x%x\n", (uint32_t)get_env(envVendor), (uint32_t)get_env(envModel), (uint32_t)get_env(envExtModel));
 	DBG("CPU: Family/ExtFamily:      0x%x/0x%x\n", (uint32_t)get_env(envFamily), (uint32_t)get_env(envExtFamily));
     if (get_env(envVendor) == CPUID_VENDOR_AMD) {
         DBG("CPU (AMD): TSCFreq:               %dMHz\n", (uint32_t)(get_env(envTSCFreq) / 1000000));
@@ -506,7 +528,7 @@ static void read_rtc(EFI_TIME *time) {
             century = (century & 0x0F) + ((century / 16) * 10);
         }
     }    
-        
+    
     // Calculate the full (4-digit) year
     
     if(century_register != 0) {
@@ -514,7 +536,7 @@ static void read_rtc(EFI_TIME *time) {
     } else {
         //year += (CURRENT_YEAR / 100) * 100;
         //if(year < CURRENT_YEAR) year += 100;        
-
+        
         if ((year += 1900) < 1970)
             year += 100;
     }
@@ -529,7 +551,9 @@ static void read_rtc(EFI_TIME *time) {
 
 void rtc_time(EFI_TIME *time) {
     
-    read_rtc(time);    
+    read_rtc(time);
+    
+    time->TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     
     return ;
 }

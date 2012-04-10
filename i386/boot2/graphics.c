@@ -57,33 +57,41 @@ __convertImage( unsigned short width,
                unsigned char **newImageData )
 {
     int cnt;
-    unsigned char *img = 0;
+    unsigned char *img;
     unsigned short *img16;
     unsigned long *img32;
 	
     switch ( VIDEO(depth) ) {
 		case 16 :
+        {
 			img16 = malloc(width * height * 2);
-			if ( !img16 ) break;
+			if ( !img16 ) return 1;
 			for (cnt = 0; cnt < (width * height); cnt++)
 				img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
 			img = (unsigned char *)img16;
+            *newImageData = img;
 			break;
-			
+        }
 		case 32 :
+        {
 			img32 = malloc(width * height * 4);
-			if ( !img32 ) break;
+			if ( !img32 ) return 1;
 			for (cnt = 0; cnt < (width * height); cnt++)
 				img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
 			img = (unsigned char *)img32;
+            *newImageData = img;
 			break;
-			
+        }
 		default :
+        {
 			img = malloc(width * height);
+            if ( !img ) return 1; 
 			bcopy(imageData, img, width * height);
+            *newImageData = img;
 			break;
+        }
     }
-    *newImageData = img;
+    
     return 0;
 }
 

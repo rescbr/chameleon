@@ -646,18 +646,20 @@ do {                                                                            
            _he_hh_nxt = _he_thh->hh_next;                                        \
            HASH_TO_BKT( _he_thh->hashv, tbl->num_buckets*2, _he_bkt);            \
            _he_newbkt = &(_he_new_buckets[ _he_bkt ]);                           \
-            if (!_he_newbkt) { uthash_fatal( "out of memory"); }                 \
-           if (++(_he_newbkt->count) > tbl->ideal_chain_maxlen) {                \
-             tbl->nonideal_items++;                                              \
-             _he_newbkt->expand_mult = _he_newbkt->count /                       \
-                                        tbl->ideal_chain_maxlen;                 \
-           }                                                                     \
-           _he_thh->hh_prev = NULL;                                              \
-           _he_thh->hh_next = _he_newbkt->hh_head;                               \
-           if (_he_newbkt->hh_head) _he_newbkt->hh_head->hh_prev =               \
-                _he_thh;                                                         \
-           _he_newbkt->hh_head = _he_thh;                                        \
-           _he_thh = _he_hh_nxt;                                                 \
+           if (_he_newbkt) {                                                     \
+                if (++(_he_newbkt->count) > tbl->ideal_chain_maxlen) {           \
+                    tbl->nonideal_items++;                                       \
+                    _he_newbkt->expand_mult = _he_newbkt->count /                \
+                                                tbl->ideal_chain_maxlen;         \
+                }                                                                \
+                _he_thh->hh_prev = NULL;                                         \
+                _he_thh->hh_next = _he_newbkt->hh_head;                          \
+                if (_he_newbkt->hh_head) _he_newbkt->hh_head->hh_prev =          \
+                        _he_thh;                                                 \
+                _he_newbkt->hh_head = _he_thh;                                   \
+                _he_thh = _he_hh_nxt;                                            \
+            }                                                                    \
+            else { uthash_fatal( "out of memory"); }                             \
         }                                                                        \
     }                                                                            \
     uthash_free( tbl->buckets, tbl->num_buckets*sizeof(struct UT_hash_bucket) ); \

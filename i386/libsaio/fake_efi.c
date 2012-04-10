@@ -79,6 +79,15 @@ static VOID setupEfiConfigurationTable();
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
 	char *string = malloc(37);
+    if (!string) {
+#if DEBUG_EFI
+        char string_d[37];
+        efi_guid_unparse_upper(pGuid, string_d);
+        printf("Couldn't allocate Guid String for %s\n", string_d);        
+#endif
+        return NULL;
+    }
+
 	efi_guid_unparse_upper(pGuid, string);
 	return string;
 }
@@ -150,6 +159,11 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
     if (pGuid == NULL || table == NULL)
 		return EFI_INVALID_PARAMETER;
     
+    char * GuidStr = mallocStringForGuid(pGuid);
+    if (!GuidStr) {
+        return EFI_OUT_OF_RESOURCES;
+    }
+    
 	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
 	if (archCpuType == CPU_TYPE_I386)
@@ -185,7 +199,8 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		gNumTables64++ ;
 	}    
 	
-    Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
+    
+    Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, GuidStr);
     
     // Use the pointer to the GUID we just stuffed into the system table
     DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
@@ -557,8 +572,16 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 	
 	if (!key || !(*key) || !src) return 0;
 	
-	*len = strlen(src);
-	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
+    int tmp_len = strlen(src);
+    
+	dst = (EFI_CHAR16*) malloc( ((tmp_len)+1) * 2 );
+    if (!dst) 
+    {
+        *len = 0;
+        return NULL;
+    }
+    
+    *len = tmp_len;
 	{
 		size_t		 i = 0;
 		for (; i < (*len); i++)	 dst[i] = src[i];

@@ -79,6 +79,10 @@ void sputc(int c, struct putc_info * pi)
 void initBooterLog(void)
 {
 	msgbuf = malloc(BOOTER_LOG_SIZE);
+    if (!msgbuf) {
+        printf("Couldn't allocate buffer for booter log\n");
+        return;
+    }
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;    
 

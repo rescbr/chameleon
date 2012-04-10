@@ -1205,20 +1205,23 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	dcfg_t default_dcfg_1;
 	bool dcfg0_set = false;
 	bool dcfg1_set = false;
-
+    
 	devicepath = get_pci_dev_path(nvda_dev);
+    if (!devicepath) {
+        return false;
+    }
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 	
 	delay(50);
-		
+    
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
-
+    
 	// Amount of VRAM in kilobytes
-
+    
 	videoRam = mem_detect(regs, nvCardType, nvda_dev);
-
+    
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
 	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s\n",  
@@ -1227,6 +1230,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			devicepath);	
 	
 	rom = malloc(NVIDIA_ROM_SIZE);
+    if (!rom) {
+        printf("Couldn't allocate momory for device rom\n");
+        return false;
+    }    
+    
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 	if (getBoolForKey(kUseNvidiaROM, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
@@ -1241,9 +1249,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	} else {
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
-
+        
 		// TODO: we should really check for the signature before copying the rom, i think.
-
+        
 		// PRAMIN first
 		nvRom = (uint8_t*)&regs[NV_PRAMIN_OFFSET];
 		bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
@@ -1253,13 +1261,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			// PROM next
 			// Enable PROM access
 			(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
-
+            
 			nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
 			bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
 			
 			// disable PROM access
 			(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED;	
-
+            
 			// Valid Signature ?
 			if (rom[0] != 0x55 && rom[1] != 0xaa) {
 				// 0xC0000 last
@@ -1280,16 +1288,16 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			DBG("PRAM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
 		}
 	}
-
+    
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
 		printf("ERROR: nVidia ROM Patching Failed!\n");
         free(rom);
 		return false;
 	}
 	DBG("nvidia rom successfully patched\n");
-
+    
 	rom_pci_header = (struct pci_rom_pci_header_t*)(rom + *(uint16_t *)&rom[24]);
-
+    
 	// check for 'PCIR' sig
 	if (rom_pci_header->signature == 0x50434952) {
 		if (rom_pci_header->device != nvda_dev->device_id) {
@@ -1303,17 +1311,17 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 	DBG("nvidia model : %s\n",model);
-
-
+    
+    
 	if (!string) {
 		string = devprop_create_string();
 	}
 	device = devprop_add_device(string, devicepath);
-
+    
 	/* FIXME: for primary graphics card only */
 	boot_display = 1;
 	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
-
+    
 	if(nvPatch == PATCH_ROM_SUCCESS_HAS_LVDS) {
 		uint8_t built_in = 0x01;
 		devprop_add_value(device, "@0,built-in", &built_in, 1);
@@ -1322,6 +1330,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// get bios version
 	const int MAX_BIOS_VERSION_LENGTH = 32;
 	char* version_str = (char*)malloc(MAX_BIOS_VERSION_LENGTH);
+    if (!version_str) {
+        printf("Couldn't allocate momory for device version_str\n");
+        free(rom);
+        return false;
+    }
 	memset(version_str, 0, MAX_BIOS_VERSION_LENGTH);
 	int i, version_start;
 	int crlf_count = 0;
@@ -1352,11 +1365,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	}
 	
 	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
-
+    
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
 	if (getValueForKey(kNVCAP, &value, &len, DEFAULT_BOOT_CONFIG) && len == NVCAP_LEN * 2) {
 		uint8_t	new_NVCAP[NVCAP_LEN];
- 
+        
 		if (hex2bin(value, new_NVCAP, NVCAP_LEN) == 0) {
 			verbose("Using user supplied NVCAP for %s :: %s\n", model, devicepath);
 			memcpy(default_NVCAP, new_NVCAP, NVCAP_LEN);
@@ -1369,7 +1382,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		{			
 			dcfg0_set = true;
 			verbose("@0,display-cfg: %02x%02x%02x%02x\n",
-				   default_dcfg_0.val0, default_dcfg_0.val1, default_dcfg_0.val2, default_dcfg_0.val3);
+                    default_dcfg_0.val0, default_dcfg_0.val1, default_dcfg_0.val2, default_dcfg_0.val3);
 		}
 	}
 	
@@ -1379,7 +1392,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		{			
 			dcfg1_set = true;
 			verbose("@1,display-cfg: %02x%02x%02x%02x\n",
-				   default_dcfg_1.val0, default_dcfg_1.val1, default_dcfg_1.val2, default_dcfg_1.val3);
+                    default_dcfg_1.val0, default_dcfg_1.val1, default_dcfg_1.val2, default_dcfg_1.val3);
 		}
 	}
 	
@@ -1391,14 +1404,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	{
 		memcpy(&default_dcfg_1, default_dcfg,DCFG_LEN );
 	}
-
- #if DEBUG_NVCAP
-        printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
-		default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
-		default_NVCAP[4], default_NVCAP[5], default_NVCAP[6], default_NVCAP[7],
-		default_NVCAP[8], default_NVCAP[9], default_NVCAP[10], default_NVCAP[11],
-		default_NVCAP[12], default_NVCAP[13], default_NVCAP[14], default_NVCAP[15],
-		default_NVCAP[16], default_NVCAP[17], default_NVCAP[18], default_NVCAP[19]);
+    
+#if DEBUG_NVCAP
+    printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
+           default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
+           default_NVCAP[4], default_NVCAP[5], default_NVCAP[6], default_NVCAP[7],
+           default_NVCAP[8], default_NVCAP[9], default_NVCAP[10], default_NVCAP[11],
+           default_NVCAP[12], default_NVCAP[13], default_NVCAP[14], default_NVCAP[15],
+           default_NVCAP[16], default_NVCAP[17], default_NVCAP[18], default_NVCAP[19]);
 #endif
 	
 	devprop_add_nvidia_template(device);
@@ -1411,10 +1424,16 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getBoolForKey(kVBIOS, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
-
+    
 	stringdata = malloc(sizeof(uint8_t) * string->length);
+    if (!stringdata) { 
+        free(rom);
+        free(version_str);
+        printf("Couldn't allocate momory for device stringdata\n");
+        return false;
+    }
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
-
+    
 	return true;
 }
