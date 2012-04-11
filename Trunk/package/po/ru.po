@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-06 22:38+0000\n"
-"PO-Revision-Date: 2012-03-21 17:57+0200\n"
+"PO-Revision-Date: 2012-04-10 17:48+0200\n"
 "Last-Translator: ltodoto <ltodoto@live.ru>\n"
 "Language-Team: ru <ru@li.org>\n"
 "Language: ru\n"
@@ -239,7 +239,7 @@ msgstr "Уже установлена более новая версия Chamele
 #: Resources/templates/Localizable.strings:13
 #, no-wrap
 msgid "This software cannot be installed on this computer."
-msgstr "Это ПО не может быть установлено на этом компьютере."
+msgstr "Это ПО не может быть установлено на данном компьютере."
 
 #. type: "Chameleon_title"
 #: Resources/templates/Localizable.strings:19
@@ -541,7 +541,7 @@ msgstr "RestartFix=No"
 #: Resources/templates/Localizable.strings:100
 #, no-wrap
 msgid "Disables the automatically enabled restart fix."
-msgstr " Отключение включённой по умолчанию корректировки ACPI для перезагрузки."
+msgstr "Отключение включённой по умолчанию корректировки ACPI для перезагрузки."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:102
@@ -580,6 +580,9 @@ msgstr "UseKernelCache=Yes"
 #, no-wrap
 msgid "For Lion only. Enables loading of the pre-linked kernel. This will ignore /E/E and /S/L/E. ONLY use this is you have know it contains everything you need."
 msgstr ""
+"Только OSX Lion. Обеспечивает загрузку предварительно скомпонованного ядра. "
+"При этом будут проигнорированы кеши /E/E и /S/L/E. Используйте ТОЛЬКО если "
+"вы знаете, что оно содержит всё, что Вам нужно."
 
 #. type: "Wake_title"
 #: Resources/templates/Localizable.strings:111
@@ -604,6 +607,8 @@ msgstr "CSTUsingSystemIO=Yes"
 #, no-wrap
 msgid "New C-State _CST generation method using SystemIO registers instead of FixedHW."
 msgstr ""
+"Новый метод генерации C-State _CST с использованием регистров SystemIO "
+"вместо FixedHW."
 
 #. type: "DropSSDT_title"
 #: Resources/templates/Localizable.strings:119
@@ -845,7 +850,7 @@ msgstr "UseAtiROM=Yes"
 #: Resources/templates/Localizable.strings:181
 #, no-wrap
 msgid "Enables UseAtiROM options."
-msgstr ""
+msgstr "Включение параметра UseAtiROM."
 
 #. type: "UseNvidiaROM_title"
 #: Resources/templates/Localizable.strings:183
@@ -922,6 +927,9 @@ msgstr "npci=0x2000"
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x2000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr ""
+"Предназначено для предотвращения зависания на строке 'PCI configuration "
+"begin' на некоторых системах. 0x2000 является одним из возможных значений "
+"kIOPCIConfiguratorPFM64, согласно исходному коду IOPCIFamily."
 
 #. type: "Npci3_title"
 #: Resources/templates/Localizable.strings:204
@@ -934,6 +942,9 @@ msgstr "npci=0x3000"
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr ""
+"Предназначено для предотвращения зависания на строке 'PCI configuration "
+"begin' на некоторых системах. 0x3000 является одним из возможных значений "
+"kIOPCIConfiguratorPFM64, согласно исходному коду IOPCIFamily."
 
 #. type: "Darkwake_title"
 #: Resources/templates/Localizable.strings:207
@@ -946,6 +957,8 @@ msgstr "darkwake=0"
 #, no-wrap
 msgid "Lion only. Disables the 'low power wake' feature which can sometimes leave the screen black after wake from sleep."
 msgstr ""
+"Только OSX Lion. Отключение функции 'low power wake', которая иногда может "
+"оставить экран в выключенном состоянии после выхода из спящего режима."
 
 #. type: "mac-de_title"
 #: Resources/templates/Localizable.strings:214
@@ -1035,6 +1048,8 @@ msgstr "Embed"
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
 msgstr ""
+"Упрощённый вариант новой темы по умолчанию, используемый при построении "
+"версии Chameleon, которая требует встроенную тему."
 
 #. type: "Legacy_title"
 #: Resources/templates/Localizable.strings:239
@@ -1047,12 +1062,13 @@ msgstr "Legacy"
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr ""
+"Оригинальная тема Chameleon по умолчанию, которая появилась в версии 2.0 RC1"
 
 #. type: "Default_description"
 #: Resources/templates/Localizable.strings:243
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
-msgstr ""
+msgstr "Тема Chameleon по умолчанию, которая появилась в версии 2.0 RC5"
 
 #. type: "Bullet_title"
 #: Resources/templates/Localizable.strings:245
@@ -1064,7 +1080,7 @@ msgstr "Bullet"
 #: Resources/templates/Localizable.strings:246
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
-msgstr ""
+msgstr "Прелестная простая тема, выпущенная NoSmokingBandit в апреле 2009 года."
 
 #. type: "Control_title"
 #: Resources/templates/Localizable.strings:254
@@ -1137,13 +1153,15 @@ msgstr "Параметры отображения."
 #: Resources/templates/Localizable.strings:278
 #, no-wrap
 msgid "KeyLayout"
-msgstr ""
+msgstr "Раскладка"
 
 #. type: "Keymaps_description"
 #: Resources/templates/Localizable.strings:279
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr ""
+"Выберите основную раскладку клавиатуры. Эта опция также позволит установить "
+"модуль Keylayout и различные раскладки."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:282

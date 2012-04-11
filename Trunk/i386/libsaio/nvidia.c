@@ -84,15 +84,23 @@ const char *nvidia_name_0[]             =	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]             =	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]          =	{ "AAPL,slot-name", "Slot-1"		 };
 
-// uint8_t display_cfg_0[]			=	{0x03, 0x01, 0x03, 0x00};
-// uint8_t display_cfg_1[]			=	{0xff, 0xff, 0x00, 0x01};
-// uint8_t connector_type_1[]		=	{0x00, 0x08, 0x00, 0x00};
-
 static uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
 	0x00, 0x00, 0x00, 0x00
 };
+
+#define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
+
+static uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
+static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
+
+// uint8_t display_cfg_0[]			=	{0x03, 0x01, 0x03, 0x00};
+// uint8_t display_cfg_1[]			=	{0xff, 0xff, 0x00, 0x01};
+// uint8_t connector_type_1[]		=	{0x00, 0x08, 0x00, 0x00};
+
+#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
+#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static uint8_t default_NVPM[]= {
     0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -101,14 +109,7 @@ static uint8_t default_NVPM[]= {
     0x00, 0x00, 0x00, 0x00
 };
 
-#define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
 #define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
-
-static uint8_t default_dcfg_0[]		=	{0xff, 0xff, 0xff, 0xff};
-static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0xff, 0xff};
-
-#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
-#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
@@ -869,6 +870,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0BD0 - 0BDF
 	// 0BE0 - 0BEF
 //	{ 0x10DE0BE4, "nVidia High Definition Audio Controller" },
+//	{ 0x10DE0BE9, "nVidia High Definition Audio Controller" },
 	// 0BF0 - 0BFF
 	// 0C00 - 0C0F
 	// 0C10 - 0C1F
@@ -1766,13 +1768,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
+	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
     //	devprop_add_value(device, "@1,connector-type", connector_type_1, 4); // fixme
     //	devprop_add_value(device, "@0,display-cfg", display_cfg_0, 4);
     //	devprop_add_value(device, "@1,display-cfg", display_cfg_1, 4);
-	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
 	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
 	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
 	

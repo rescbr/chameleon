@@ -646,7 +646,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E1,	0x30001043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
 	{ 0x68E1,	0x3000148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
 	{ 0x68E1,	0x30001682, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
-	{ 0x68E1,	0x3000174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450M",				kEulemur	},
+	{ 0x68E1,	0x3000174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	}, // http://forge.voodooprojects.org/p/chameleon/issues/238/
 	{ 0x68E1,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
 	{ 0x68E1,	0x300017AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
 	{ 0x68E1,	0x3001148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",				kEulemur	},
