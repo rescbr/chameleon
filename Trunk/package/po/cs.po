@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.1svn-r1870\n"
 "POT-Creation-Date: 2012-03-06 22:38+0000\n"
-"PO-Revision-Date: 2012-04-16 16:12+0200\n"
-"Last-Translator: Radek <valin@buchlovice.org>\n"
+"PO-Revision-Date: 2012-04-18 09:55+0200\n"
+"Last-Translator: martin63 <martin.badin@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "Program sestavil: %WHOBUILD%, jazyk pÅ™eloÅ¾il: vaLin"
+msgstr "Program sestavil: %WHOBUILD%, jazyk pÅ™eloÅ¾il: vaLin, martin63"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -734,7 +734,7 @@ msgstr "1024x600x32"
 #: Resources/templates/Localizable.strings:140
 #, no-wrap
 msgid "Set Graphics Mode to 1024x600x32"
-msgstr "Nastavit Graphics Mode na 1024x600x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1024x600x32"
 
 #. type: "1024x768x32_title"
 #: Resources/templates/Localizable.strings:142
@@ -746,7 +746,7 @@ msgstr "1024x768x32"
 #: Resources/templates/Localizable.strings:143
 #, no-wrap
 msgid "Set Graphics Mode to 1024x768x32"
-msgstr "Nastavit Graphics Mode na 1024x768x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1024x768x32"
 
 #. type: "1280x768x32_title"
 #: Resources/templates/Localizable.strings:145
@@ -758,7 +758,7 @@ msgstr "1280x768x32"
 #: Resources/templates/Localizable.strings:146
 #, no-wrap
 msgid "Set Graphics Mode to 1280x768x32"
-msgstr "Nastavit Graphics Mode na 1280x768x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1280x768x32"
 
 #. type: "1280x800x32_title"
 #: Resources/templates/Localizable.strings:148
@@ -770,7 +770,7 @@ msgstr "1280x800x32"
 #: Resources/templates/Localizable.strings:149
 #, no-wrap
 msgid "Set Graphics Mode to 1280x800x32"
-msgstr "Nastavit Graphics Mode na 1280x800x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1280x800x32"
 
 #. type: "1280x1024x32_title"
 #: Resources/templates/Localizable.strings:151
@@ -782,7 +782,7 @@ msgstr "1280x1024x32"
 #: Resources/templates/Localizable.strings:152
 #, no-wrap
 msgid "Set Graphics Mode to 1280x1024x32"
-msgstr "Nastavit Graphics Mode na 1280x1024x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1280x1024x32"
 
 #. type: "1280x960x32_title"
 #: Resources/templates/Localizable.strings:154
@@ -794,7 +794,7 @@ msgstr "1280x960x32"
 #: Resources/templates/Localizable.strings:155
 #, no-wrap
 msgid "Set Graphics Mode to 1280x960x32"
-msgstr "Nastavit Graphics Mode na 1280x960x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1280x960x32"
 
 #. type: "1440x900x32_title"
 #: Resources/templates/Localizable.strings:157
@@ -806,7 +806,7 @@ msgstr "1440x900x32"
 #: Resources/templates/Localizable.strings:158
 #, no-wrap
 msgid "Set Graphics Mode to 1440x900x32"
-msgstr "Nastavit Graphics Mode na 1440x900x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1440x900x32"
 
 #. type: "1600x900x32_title"
 #: Resources/templates/Localizable.strings:160
@@ -818,7 +818,7 @@ msgstr "1600x900x32"
 #: Resources/templates/Localizable.strings:161
 #, no-wrap
 msgid "Set Graphics Mode to 1600x900x32"
-msgstr "Nastavit Graphics Mode na 1600x900x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1600x900x32"
 
 #. type: "1600x1200x32_title"
 #: Resources/templates/Localizable.strings:163
@@ -830,7 +830,7 @@ msgstr "1600x1200x32"
 #: Resources/templates/Localizable.strings:164
 #, no-wrap
 msgid "Set Graphics Mode to 1600x1200x32"
-msgstr "Nastavit Graphics Mode na 1600x1200x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1600x1200x32"
 
 #. type: "1680x1050x32_title"
 #: Resources/templates/Localizable.strings:166
@@ -842,7 +842,7 @@ msgstr "1680x1050x32"
 #: Resources/templates/Localizable.strings:167
 #, no-wrap
 msgid "Set Graphics Mode to 1680x1050x32"
-msgstr "Nastavit Graphics Mode na 1680x1050x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1680x1050x32"
 
 #. type: "1920x1080x32_title"
 #: Resources/templates/Localizable.strings:169
@@ -854,7 +854,7 @@ msgstr "1920x1080x32"
 #: Resources/templates/Localizable.strings:170
 #, no-wrap
 msgid "Set Graphics Mode to 1920x1080x32"
-msgstr "Nastavit Graphics Mode na 1920x1080x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1920x1080x32"
 
 #. type: "1920x1200x32_title"
 #: Resources/templates/Localizable.strings:172
@@ -866,7 +866,7 @@ msgstr "1920x1200x32"
 #: Resources/templates/Localizable.strings:173
 #, no-wrap
 msgid "Set Graphics Mode to 1920x1200x32"
-msgstr "Nastavit Graphics Mode na 1920x1200x32"
+msgstr "Nastavit rozliÅ¡enÃ­ na 1920x1200x32"
 
 #. type: "GraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:177

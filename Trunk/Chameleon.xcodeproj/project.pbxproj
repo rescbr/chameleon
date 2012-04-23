@@ -1369,6 +1369,36 @@
 		B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
 		B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
 		B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
+		B4526097153EFCE90018E994 /* ar.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ar.po; sourceTree = "<group>"; };
+		B4526098153EFCE90018E994 /* bg.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bg.po; sourceTree = "<group>"; };
+		B4526099153EFCE90018E994 /* bs.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bs.po; sourceTree = "<group>"; };
+		B452609A153EFCE90018E994 /* ca.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ca.po; sourceTree = "<group>"; };
+		B452609B153EFCE90018E994 /* chameleon.pot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chameleon.pot; sourceTree = "<group>"; };
+		B452609C153EFCE90018E994 /* cs.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cs.po; sourceTree = "<group>"; };
+		B452609D153EFCE90018E994 /* de.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = de.po; sourceTree = "<group>"; };
+		B452609E153EFCE90018E994 /* el.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = el.po; sourceTree = "<group>"; };
+		B452609F153EFCE90018E994 /* en.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = en.po; sourceTree = "<group>"; };
+		B45260A0153EFCE90018E994 /* es.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = es.po; sourceTree = "<group>"; };
+		B45260A1153EFCE90018E994 /* fa.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fa.po; sourceTree = "<group>"; };
+		B45260A2153EFCE90018E994 /* fr.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fr.po; sourceTree = "<group>"; };
+		B45260A3153EFCE90018E994 /* he.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = he.po; sourceTree = "<group>"; };
+		B45260A4153EFCE90018E994 /* hr.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hr.po; sourceTree = "<group>"; };
+		B45260A5153EFCE90018E994 /* hu.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hu.po; sourceTree = "<group>"; };
+		B45260A6153EFCE90018E994 /* id.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = id.po; sourceTree = "<group>"; };
+		B45260A7153EFCE90018E994 /* it.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = it.po; sourceTree = "<group>"; };
+		B45260A8153EFCE90018E994 /* ja.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ja.po; sourceTree = "<group>"; };
+		B45260A9153EFCE90018E994 /* ko.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ko.po; sourceTree = "<group>"; };
+		B45260AA153EFCE90018E994 /* mk.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mk.po; sourceTree = "<group>"; };
+		B45260AB153EFCE90018E994 /* nl.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nl.po; sourceTree = "<group>"; };
+		B45260AC153EFCE90018E994 /* pl.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pl.po; sourceTree = "<group>"; };
+		B45260AD153EFCE90018E994 /* pt-BR.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pt-BR.po"; sourceTree = "<group>"; };
+		B45260AE153EFCE90018E994 /* pt-PT.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pt-PT.po"; sourceTree = "<group>"; };
+		B45260AF153EFCE90018E994 /* ro.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ro.po; sourceTree = "<group>"; };
+		B45260B0153EFCE90018E994 /* ru.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ru.po; sourceTree = "<group>"; };
+		B45260B1153EFCE90018E994 /* sr.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sr.po; sourceTree = "<group>"; };
+		B45260B2153EFCE90018E994 /* zh_CN.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_CN.po; sourceTree = "<group>"; };
+		B45260B3153EFCE90018E994 /* zh_TW.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_TW.po; sourceTree = "<group>"; };
+		B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "po4a-chameleon.cfg"; sourceTree = "<group>"; };
 		B4AABE5914C3B8B90055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5B14C3B8C70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5D14C3B8D70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
@@ -1394,9 +1424,9 @@
 				019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */,
 				B0056D8311F3868000754B65 /* package */,
 				B0146EFF11FDEF550010765C /* README */,
+				A31301A71503CB9900E8C718 /* README.translators */,
 				B0056D7C11F3868000754B65 /* TODO */,
 				369689D214BD0B470013D77F /* version */,
-				A31301A71503CB9900E8C718 /* README.translators */,
 			);
 			name = Chameleon;
 			sourceTree = "<group>";
@@ -3245,15 +3275,17 @@
 		B0056D8311F3868000754B65 /* package */ = {
 			isa = PBXGroup;
 			children = (
-				B0056D8511F3868000754B65 /* Distribution */,
 				A35D2189141A75DC00969AC0 /* builddmg.sh */,
 				A35D2188141A75DC00969AC0 /* buildpkg.sh */,
 				361BC70214BD977700236488 /* Changes.txt */,
-				A396E4F31502D0580025A245 /* Resources.old */,
-				A396E2CA150247630025A245 /* Resources */,
+				B0056D8511F3868000754B65 /* Distribution */,
 				361BC70514BD97A800236488 /* dmg */,
 				361BC70414BD979700236488 /* Icons */,
 				36B43E8114BCE91300D29461 /* OptionalSettings */,
+				B4526096153EFCE90018E994 /* po */,
+				B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */,
+				A396E2CA150247630025A245 /* Resources */,
+				A396E4F31502D0580025A245 /* Resources.old */,
 				A3F1F20D141B9B0D00DDA709 /* Scripts */,
 				364E0DDF14BCFB6600F55E58 /* Scripts.templates */,
 				A35D2187141A75DC00969AC0 /* slimpkg.sh */,
@@ -3503,6 +3535,42 @@
 				B4189A0D14BFBF0A00ED5B0B /* yesno.c */,
 			);
 			name = lxdialog;
+			sourceTree = "<group>";
+		};
+		B4526096153EFCE90018E994 /* po */ = {
+			isa = PBXGroup;
+			children = (
+				B4526097153EFCE90018E994 /* ar.po */,
+				B4526098153EFCE90018E994 /* bg.po */,
+				B4526099153EFCE90018E994 /* bs.po */,
+				B452609A153EFCE90018E994 /* ca.po */,
+				B452609B153EFCE90018E994 /* chameleon.pot */,
+				B452609C153EFCE90018E994 /* cs.po */,
+				B452609D153EFCE90018E994 /* de.po */,
+				B452609E153EFCE90018E994 /* el.po */,
+				B452609F153EFCE90018E994 /* en.po */,
+				B45260A0153EFCE90018E994 /* es.po */,
+				B45260A1153EFCE90018E994 /* fa.po */,
+				B45260A2153EFCE90018E994 /* fr.po */,
+				B45260A3153EFCE90018E994 /* he.po */,
+				B45260A4153EFCE90018E994 /* hr.po */,
+				B45260A5153EFCE90018E994 /* hu.po */,
+				B45260A6153EFCE90018E994 /* id.po */,
+				B45260A7153EFCE90018E994 /* it.po */,
+				B45260A8153EFCE90018E994 /* ja.po */,
+				B45260A9153EFCE90018E994 /* ko.po */,
+				B45260AA153EFCE90018E994 /* mk.po */,
+				B45260AB153EFCE90018E994 /* nl.po */,
+				B45260AC153EFCE90018E994 /* pl.po */,
+				B45260AD153EFCE90018E994 /* pt-BR.po */,
+				B45260AE153EFCE90018E994 /* pt-PT.po */,
+				B45260AF153EFCE90018E994 /* ro.po */,
+				B45260B0153EFCE90018E994 /* ru.po */,
+				B45260B1153EFCE90018E994 /* sr.po */,
+				B45260B2153EFCE90018E994 /* zh_CN.po */,
+				B45260B3153EFCE90018E994 /* zh_TW.po */,
+			);
+			path = po;
 			sourceTree = "<group>";
 		};
 		B4AABE5814C3B8B90055ECD1 /* AddOption */ = {
