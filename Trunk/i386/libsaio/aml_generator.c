@@ -491,7 +491,8 @@ unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int o
 		}
 		
 		if (offset - old != node->Size) 
-			verbose("Node size incorrect: 0x%x\n", node->Type);
+			verbose("Node size incorrect: type=0x%x size=%x offset=%x\n",
+			node->Type, node->Size, (offset - old));
 	}
 	
 	return offset;

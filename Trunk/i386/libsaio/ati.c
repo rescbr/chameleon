@@ -73,7 +73,7 @@ typedef enum {
 	CHIP_FAMILY_TURKS,
 	/* Southern Islands */
 	CHIP_FAMILY_TAHITI,
-//	CHIP_FAMILY_PITCAIRN,
+	CHIP_FAMILY_PITCAIRN,
 //	CHIP_FAMILY_VERDE,
 //	CHIP_FAMILY_THAMES,
 //	CHIP_FAMILY_LOMBOK,
@@ -262,7 +262,9 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x9400,	0x021E1043, CHIP_FAMILY_R600,		"ATI Radeon HD ????",                   kNull		},
 	{ 0x9400,	0x25521002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",                kNull		},
 	{ 0x9400,	0x30001002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 PRO",               kNull		},
+	{ 0x9400,	0x31421002, CHIP_FAMILY_R600,		"ATI Radeon HD 2900 XT",                kNull		},
 
+	{ 0x9440,	0x05021002, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",                   kMotmot		},
 	{ 0x9440,	0x0851174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",                   kMotmot		},
 	{ 0x9440,	0x114A174B, CHIP_FAMILY_RV770,		"Sapphire Radeon HD4870 Vapor-X",       kCardinal	},
 	{ 0x9440,	0x24401682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",                   kMotmot		},
@@ -271,12 +273,16 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9440,	0x24451682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",                   kMotmot		},
 
 	{ 0x9441,	0x24401682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870 X2",                kMotmot		},
+	{ 0x9441,	0x25421002, CHIP_FAMILY_RV770,		"PowerColor HD 4870 X2",                kMotmot		},
 
+	{ 0x9442,	0x05021002, CHIP_FAMILY_RV770,		"MSI R4850-T2D512",                     kMotmot		},
 	{ 0x9442,	0x080110B0, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x9442,	0x24701682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x9442,	0x24711682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x9442,	0xE104174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
+	{ 0x9442,	0xE810174B, CHIP_FAMILY_RV770,		"Sapphire HD 4850",                     kMotmot		},
 
+	{ 0x944A,	0x02A21028, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x944A,	0x30001043, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x944A,	0x30001458, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x944A,	0x30001462, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
@@ -286,6 +292,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x944A,	0x30001787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 	{ 0x944A,	0x300017AF, CHIP_FAMILY_RV770,		"ATI Radeon HD 4850",                   kMotmot		},
 
+	{ 0x944C,	0x05021002, CHIP_FAMILY_RV770,		"ATI Radeon HD 4830",                   kMotmot		},
+	{ 0x944C,	0x20031787, CHIP_FAMILY_RV770,		"ATI Radeon HD 4830",                   kMotmot		},
 	{ 0x944C,	0x24801682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4830",                   kMotmot		},
 	{ 0x944C,	0x24811682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4830",                   kMotmot		},
 
@@ -296,6 +304,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x944E,	0x3261174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4810",                   kMotmot		},
 
 	{ 0x9480,	0x01211025, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",                  kGliff		},
+ 	{ 0x9480,	0x03111025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
+ 	{ 0x9480,	0x03121025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
+ 	{ 0x9480,	0x031C1025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
+ 	{ 0x9480,	0x031D1025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
+ 	{ 0x9480,	0x036C1025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
+ 	{ 0x9480,	0x036D1025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
 	{ 0x9480,	0x3628103C, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",                  kGliff		},
 	{ 0x9480,	0x9035104D, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",                  kGliff		},
 	{ 0x9480,	0xFD001179, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",                  kNull		},
@@ -339,6 +353,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x94C1,	0x11101462, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 XT",                kNull		},
 
 	{ 0x94C3,	0x03421002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
+	{ 0x94C3,	0x94C31002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
 
 	{ 0x94C3,	0x01011A93, CHIP_FAMILY_RV610,		"Qimonda Radeon HD 2400 PRO",			kNull		},
 	{ 0x94C3,	0x03021028, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
@@ -372,10 +387,10 @@ static radeon_card_info_t radeon_cards[] = {
 
 //	{ 0x9505,	0x024A1043, CHIP_FAMILY_RV670,		"ATI Radeon HD ???",                    kNull		},
 	{ 0x9505,	0x25421002, CHIP_FAMILY_RV670,		"ATI Radeon HD 3850",                   kNull		},
-	{ 0x9505,	0x30001002, CHIP_FAMILY_RV670,		"ATI Radeon HD 3690",                   kNull		},
+	{ 0x9505,	0x30001002, CHIP_FAMILY_RV630,		"ATI Radeon HD 3690",                   kNull		},
 	{ 0x9505,	0x3000148C, CHIP_FAMILY_RV670,		"ATI Radeon HD 3850",                   kNull		},
 	{ 0x9505,	0x3000174B, CHIP_FAMILY_RV670,		"Sapphire Radeon HD 3690",              kNull		},
-	{ 0x9505,	0x30001787, CHIP_FAMILY_RV670,		"ATI Radeon HD 3690",                   kNull		},
+	{ 0x9505,	0x30001787, CHIP_FAMILY_RV630,		"ATI Radeon HD 3690",                   kNull		},
 	{ 0x9505,	0x30011043, CHIP_FAMILY_RV670,		"ATI Radeon HD 4730",                   kNull		},
 	{ 0x9505,	0x3001148C, CHIP_FAMILY_RV670,		"ATI Radeon HD 4730",                   kNull		},
 	{ 0x9505,	0x3001174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",                   kNull		},
@@ -385,7 +400,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9505,	0x3010174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",                   kNull		},
 	{ 0x9505,	0x301017AF, CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",                   kNull		},
 	{ 0x9505,	0x4730174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 4730",                   kNull		},
-	
+
 	{ 0x9540,	0x30501787, CHIP_FAMILY_RV710,		"ATI Radeon HD 4590",                   kNull		},
 	{ 0x9540,	0x4590174B, CHIP_FAMILY_RV710,		"ATI Radeon HD 4590",                   kNull		},
 
@@ -781,6 +796,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x31101682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0x31131682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0x31141682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
+	{ 0x6739,	0x31171682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0x67391002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0xAA881002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0xE174174B, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
@@ -1078,6 +1094,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9488,	0x00000000, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650 Series",			kGliff	},
 
 	{ 0x9490,	0x00000000, CHIP_FAMILY_RV730,		"ATI Radeon HD 4600 Series",			kFlicker	},
+
 	{ 0x9498,	0x00000000, CHIP_FAMILY_RV730,		"ATI Radeon HD 4600 Series",			kFlicker	},
 
 	{ 0x94B3,	0x00000000, CHIP_FAMILY_RV740,		"ATI Radeon HD 4770",                   kFlicker	},
@@ -1087,6 +1104,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x94C1,	0x00000000, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 Series",            kIago		},
 
 	{ 0x94C3,	0x00000000, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 Series",            kIago		},
+
 	{ 0x94C4,	0x00000000, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 Series",            kIago		},
 	{ 0x94C5,	0x00000000, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 Series",            kIago		},
 	{ 0x94C6,	0x00000000, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 Series",            kIago		},
@@ -1099,13 +1117,17 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x9500,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3800 Series",            kMegalodon	},
 	{ 0x9501,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3800 Series",            kMegalodon	},
+
 	{ 0x9505,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3800 Series",            kMegalodon	},
-	{ 0x9507,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3830",                   kMegalodon	},
+
+	{ 0x9507,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3850",                   kMegalodon	},
+
 	{ 0x950F,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3870 X2",                kMegalodon	},
 
 	{ 0x9511,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3850 X2",                kMegalodon	},
 
-	{ 0x9513,	0x00000000, CHIP_FAMILY_RV670,		"ATI Radeon HD 3850 X2",                kMegalodon	},
+	{ 0x9513,	0x00000000, CHIP_FAMILY_RV630,		"ATI Radeon HD 3850 X2",                kMegalodon	},
+
 	{ 0x9519,	0x00000000, CHIP_FAMILY_RV670,		"AMD FireStream 9170",                  kMegalodon	},
 
 	{ 0x9540,	0x00000000, CHIP_FAMILY_RV710,		"ATI Radeon HD 4550",                   kNull		},
@@ -1163,7 +1185,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68A1,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Mobility Radeon HD 5800 Series",   kNomascus	}, // CHIP_FAMILY_BROADWAY ??
 
 	{ 0x68A8,	0x00000000, CHIP_FAMILY_JUNIPER,	"AMD Mobility Radeon HD 6800 Series",   kUakari		}, 
-//	{ 0x68A9,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD ??? Series",			kNull		},
+//	{ 0x68A9,	0x00000000, CHIP_FAMILY_JUNIPER,	"FirePro V5800 (FireGL) Graphics Adapter",			kNull		},
 
 
 	{ 0x68B0,	0x00000000, CHIP_FAMILY_CYPRESS,	"ATI Mobility Radeon HD 5800 Series",   kNull		}, // CHIP_FAMILY_BROADWAY ??
@@ -1179,7 +1201,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6570M/5700 Series",		kNull		},
 	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"AMD Radeon HD 6500M/5600/5700 Series", kNull		},
 	{ 0x68C8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5650 Series",			kVervet		},	
-//	{ 0x68C9,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD ??? Series",			kNull		},
+//	{ 0x68C9,	0x00000000, CHIP_FAMILY_REDWOOD,	"FirePro V3800 (FireGL",			kNull		},
 
 	{ 0x68D8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5600 Series",			kBaboon		},
 	{ 0x68D9,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5500/5600 Series",		kBaboon		},
@@ -1192,12 +1214,14 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5400 Series",   kEulemur	},
 
 	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6300M Series",			kNull		},
+	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6300M Series",			kNull		},
 
 //	{ 0x68E8,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD ??? Series",			kNull		},
 //	{ 0x68E9,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD ??? Series",			kNull		},
 
 //	{ 0x68F8,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD ??? Series",			kNull		},
 	{ 0x68F9,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5400 Series",			kNull		},
+	{ 0x68FA,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 7300 Series",			kNull		},
 
 //	{ 0x68FE,	0x00000000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD ??? Series",			kNull		},
 
@@ -1226,13 +1250,20 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6758,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670 Series",			kBulrushes	},
 	{ 0x6759,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6570/7570 Series",		kNull		},
 
+	{ 0x675D,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 7500 Series",			kNull		},
+
 	{ 0x675F,	0x00000000, CHIP_FAMILY_TURKS,		"AMD Radeon HD 5500 Series",			kNull		},
 	{ 0x6760,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400M Series",			kNull		},
 	{ 0x6761,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6430M Series",			kNull		},
 
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6400 Series",			kNull		},
 
+	{ 0x6772,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 7400A Series",			kNull		},
+
+	{ 0x6778,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 7000 Series",			kNull		},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 6450 Series",			kBulrushes	},
+
+	{ 0x677B,	0x00000000, CHIP_FAMILY_CAICOS,		"AMD Radeon HD 7400 Series",			kNull		},
 
 	/* Southen Islands */
 
@@ -1263,11 +1294,11 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6818,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7800 Series",            kNull		},
 	{ 0x6819,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7800 Series",            kNull		},
-//	{ 0x6820,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
-//	{ 0x6821,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
+//	{ 0x6820,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7800M Series",            kNull		},
+//	{ 0x6821,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7800M Series",            kNull		},
 
 //	{ 0x6823,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
-//	{ 0x6824,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
+//	{ 0x6824,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700M Series",            kNull		},
 //	{ 0x6825,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
 //	{ 0x6826,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
 //	{ 0x6827,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ???M Series",            kNull		},
@@ -1290,6 +1321,10 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x683D,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700 Series",            kNull		},
 
 //	{ 0x683F,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700 Series",            kNull		},
+
+//	{ 0x6841,	0x00000000, CHIP_FAMILY_THAMES,		"AMD Radeon HD 7850 Series",            kNull		},
+
+//	{ 0x6843,	0x00000000, CHIP_FAMILY_THAMES,		"AMD Radeon HD 7670M Series",            kNull		},
 
 //	{ 0x684C,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD ??? Series",             kNull		},
 

@@ -113,23 +113,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000,	/*0x00000000,*/	"Unknown" },
 //========================================
 	// 0000 - 0040	
-    //	{ 0x10DE0001,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0002,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0003,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0005,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0006,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0007,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0008,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0009,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE000A,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE000B,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE000C,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE000D,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0010,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0011,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0012,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0014,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0018,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
 	// 0040 - 004F	
 	{ 0x10DE0040,	/*0x00000000,*/	"GeForce 6800 Ultra" },
 	{ 0x10DE0041,	/*0x00000000,*/	"GeForce 6800" },
@@ -143,11 +126,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE004D,	/*0x00000000,*/	"Quadro FX 3400" },
 	{ 0x10DE004E,	/*0x00000000,*/	"Quadro FX 4000" },
 	// 0050 - 005F
-    //	{ 0x10DE0059,	/*0x00000000,*/	"CK804 AC'97 Audio Controller" },
 	// 0060 - 006F
-    //	{ 0x10DE006A,	/*0x00000000,*/	"nForce2 AC97 Audio Controler (MCP)" },
-    //	{ 0x10DE0067,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE0073,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
 	// 0070 - 007F
 	// 0080 - 008F
 	// 0090 - 009F
@@ -171,7 +150,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE00CC,	/*0x00000000,*/	"Quadro FX Go1400" },
 	{ 0x10DE00CD,	/*0x00000000,*/	"Quadro FX 3450/4000 SDI" },
 	{ 0x10DE00CE,	/*0x00000000,*/	"Quadro FX 1400" },
-    //	{ 0x10DE00DA,	/*0x00000000,*/	"nForce3 Audio" },
 	// 00D0 - 00DF	
 	// 00E0 - 00EF	
 	// 00F0 - 00FF	
@@ -216,8 +194,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0168,	/*0x00000000,*/	"GeForce Go 6400" },
 	{ 0x10DE0169,	/*0x00000000,*/	"GeForce 6250" },
 	{ 0x10DE016A,	/*0x00000000,*/	"GeForce 7100 GS" },
-	{ 0x10DE016C,	/*0x00000000,*/	"NVIDIA NV44GLM" }, //
-	{ 0x10DE016D,	/*0x00000000,*/	"NVIDIA NV44GLM" }, //
+	{ 0x10DE016C,	/*0x00000000,*/	"NVIDIA NV44GLM" },
+	{ 0x10DE016D,	/*0x00000000,*/	"NVIDIA NV44GLM" },
 	// 0170 - 017F	
 	// 0180 - 018F	
 	// 0190 - 019F		
@@ -229,7 +207,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE019E,	/*0x00000000,*/	"Quadro FX 4600" },
 	// 01A0 - 01AF
 	// 01B0 - 01BF
-    //	{ 0x10DE01B1,	/*0x00000000,*/	"nForce AC'97 Audio Controller" },
 	// 01C0 - 01CF
 	// 01D0 - 01DF
 	{ 0x10DE01D0,	/*0x00000000,*/	"GeForce 7350 LE" },
@@ -248,7 +225,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE01DF,	/*0x00000000,*/	"GeForce 7300 GS" },
 	// 01E0 - 01EF	
 	// 01F0 - 01FF
-	{ 0x10DE01F0,	/*0x00000000,*/	"GeForce4 MX" }, //
+	{ 0x10DE01F0,	/*0x00000000,*/	"GeForce4 MX" },
 	// 0200 - 020F	
 	// 0210 - 021F	
 	{ 0x10DE0211,	/*0x00000000,*/	"GeForce 6800" },
@@ -258,18 +235,18 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0220 - 022F
 	{ 0x10DE0221,	/*0x00000000,*/	"GeForce 6200" },
 	{ 0x10DE0222,	/*0x00000000,*/	"GeForce 6200 A-LE" },
-	{ 0x10DE0228,	/*0x00000000,*/	"NVIDIA NV44M" }, // 
+	{ 0x10DE0228,	/*0x00000000,*/	"NVIDIA NV44M" },
 	// 0230 - 023F
 	// 0240 - 024F
 	{ 0x10DE0240,	/*0x00000000,*/	"GeForce 6150" },
 	{ 0x10DE0241,	/*0x00000000,*/	"GeForce 6150 LE" },
 	{ 0x10DE0242,	/*0x00000000,*/	"GeForce 6100" },
-	{ 0x10DE0243,	/*0x00000000,*/	"NVIDIA C51" }, //
+	{ 0x10DE0243,	/*0x00000000,*/	"NVIDIA C51" },
 	{ 0x10DE0244,	/*0x00000000,*/	"GeForce Go 6150" },
 	{ 0x10DE0245,	/*0x00000000,*/	"Quadro NVS 210S / GeForce 6150LE" },
 	{ 0x10DE0247,	/*0x00000000,*/	"GeForce Go 6100" },
 	// 0250 - 025F
-	{ 0x10DE025B,	/*0x00000000,*/	"Quadro4 700 XGL" }, //
+	{ 0x10DE025B,	/*0x00000000,*/	"Quadro4 700 XGL" },
 	// 0260 - 026F
 	// 0270 - 027F
 	// 0280 - 028F
@@ -312,20 +289,20 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE031B,	/*0x00000000,*/	"GeForce FX Go5650" },
 	{ 0x10DE031C,	/*0x00000000,*/	"Quadro FX Go700" },
 	// 0320 - 032F
-	{ 0x10DE0320,	/*0x00000000,*/	"GeForce FX 5200" }, //
-	{ 0x10DE0321,	/*0x00000000,*/	"GeForce FX 5200 Ultra" }, //
-	{ 0x10DE0322,	/*0x00000000,*/	"GeForce FX 5200" }, //
-	{ 0x10DE0323,	/*0x00000000,*/	"GeForce FX 5200 LE" }, //
+	{ 0x10DE0320,	/*0x00000000,*/	"GeForce FX 5200" },
+	{ 0x10DE0321,	/*0x00000000,*/	"GeForce FX 5200 Ultra" },
+	{ 0x10DE0322,	/*0x00000000,*/	"GeForce FX 5200" },
+	{ 0x10DE0323,	/*0x00000000,*/	"GeForce FX 5200 LE" },
 	{ 0x10DE0324,	/*0x00000000,*/	"GeForce FX Go5200" },
 	{ 0x10DE0325,	/*0x00000000,*/	"GeForce FX Go5250" },
 	{ 0x10DE0326,	/*0x00000000,*/	"GeForce FX 5500" },
 	{ 0x10DE0328,	/*0x00000000,*/	"GeForce FX Go5200 32M/64M" },
-	{ 0x10DE0329,	/*0x00000000,*/	"GeForce FX Go5200" }, //
+	{ 0x10DE0329,	/*0x00000000,*/	"GeForce FX Go5200" },
 	{ 0x10DE032A,	/*0x00000000,*/	"Quadro NVS 55/280 PCI" },
 	{ 0x10DE032B,	/*0x00000000,*/	"Quadro FX 500/600 PCI" },
 	{ 0x10DE032C,	/*0x00000000,*/	"GeForce FX Go53xx Series" },
 	{ 0x10DE032D,	/*0x00000000,*/	"GeForce FX Go5100" },
-    //	{ 0x10DE032F,	/*0x00000000,*/	"NVIDIA NV34GL" },//
+	//  { 0x10DE032F,	/*0x00000000,*/	"NVIDIA NV34GL" },
 	// 0330 - 033F
 	{ 0x10DE0330,	/*0x00000000,*/	"GeForce FX 5900 Ultra" },
 	{ 0x10DE0331,	/*0x00000000,*/	"GeForce FX 5900" },
@@ -339,14 +316,14 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0342,	/*0x00000000,*/	"GeForce FX 5700" },
 	{ 0x10DE0343,	/*0x00000000,*/	"GeForce FX 5700LE" },
 	{ 0x10DE0344,	/*0x00000000,*/	"GeForce FX 5700VE" },
-    //	{ 0x10DE0345,	/*0x00000000,*/	"NVIDIA NV36.5" }, //
+	//  { 0x10DE0345,	/*0x00000000,*/	"NVIDIA NV36.5" },
 	{ 0x10DE0347,	/*0x00000000,*/	"GeForce FX Go5700" },
 	{ 0x10DE0348,	/*0x00000000,*/	"GeForce FX Go5700" },
-    //	{ 0x10DE0349,	/*0x00000000,*/	"NVIDIA NV36M Pro" }, //
-    //	{ 0x10DE034B,	/*0x00000000,*/	"NVIDIA NV36MAP" }, //
+	//  { 0x10DE0349,	/*0x00000000,*/	"NVIDIA NV36M Pro" },
+	//  { 0x10DE034B,	/*0x00000000,*/	"NVIDIA NV36MAP" },
 	{ 0x10DE034C,	/*0x00000000,*/	"Quadro FX Go1000" },
 	{ 0x10DE034E,	/*0x00000000,*/	"Quadro FX 1100" },
-    //	{ 0x10DE034F,	/*0x00000000,*/	"NVIDIA NV36GL" }, //
+	//  { 0x10DE034F,	/*0x00000000,*/	"NVIDIA NV36GL" },
 	// 0350 - 035F
 	// 0360 - 036F
 	// 0370 - 037F
@@ -423,22 +400,22 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 04A0 - 04AF
 	// 04B0 - 04BF
 	// 04C0 - 04CF
-	{ 0x10DE04C0,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C1,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C2,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C3,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C4,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C5,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C6,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C7,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C8,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04C9,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CA,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CB,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CC,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CD,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CE,	/*0x00000000,*/	"NVIDIA G78" }, //
-	{ 0x10DE04CF,	/*0x00000000,*/	"NVIDIA G78" }, //
+	{ 0x10DE04C0,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C1,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C2,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C3,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C4,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C5,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C6,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C7,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C8,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04C9,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CA,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CB,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CC,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CD,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CE,	/*0x00000000,*/	"NVIDIA G78" },
+	{ 0x10DE04CF,	/*0x00000000,*/	"NVIDIA G78" },
 	// 04D0 - 04DF
 	// 04E0 - 04EF
 	// 04F0 - 04FF
@@ -467,32 +444,32 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE05E1,	/*0x00000000,*/	"GeForce GTX 280" },
 	{ 0x10DE05E2,	/*0x00000000,*/	"GeForce GTX 260" },
 	{ 0x10DE05E3,	/*0x00000000,*/	"GeForce GTX 285" },
-	{ 0x10DE05E4,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05E5,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05E4,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05E5,	/*0x00000000,*/	"NVIDIA GT200" },
 	{ 0x10DE05E6,	/*0x00000000,*/	"GeForce GTX 275" },
 	{ 0x10DE05E7,	/*0x00000000,*/	"Tesla C1060" },
-	{ 0x10DE05E8,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05E9,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05E8,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05E9,	/*0x00000000,*/	"NVIDIA GT200" },
 	{ 0x10DE05EA,	/*0x00000000,*/	"GeForce GTX 260" },
 	{ 0x10DE05EB,	/*0x00000000,*/	"GeForce GTX 295" },
-	{ 0x10DE05EC,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05EC,	/*0x00000000,*/	"NVIDIA GT200" },
 	{ 0x10DE05ED,	/*0x00000000,*/	"Quadroplex 2200 D2" },
-	{ 0x10DE05EE,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05EF,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05EE,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05EF,	/*0x00000000,*/	"NVIDIA GT200" },
 	// 05F0 - 05FF
-	{ 0x10DE05F0,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F1,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F2,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F3,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F4,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F5,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F6,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05F7,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05F0,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F1,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F2,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F3,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F4,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F5,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F6,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05F7,	/*0x00000000,*/	"NVIDIA GT200" },
 	{ 0x10DE05F8,	/*0x00000000,*/	"Quadroplex 2200 S4" },
 	{ 0x10DE05F9,	/*0x00000000,*/	"Quadro CX" },
-	{ 0x10DE05FA,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05FB,	/*0x00000000,*/	"NVIDIA GT200" }, //
-	{ 0x10DE05FC,	/*0x00000000,*/	"NVIDIA GT200" }, //
+	{ 0x10DE05FA,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05FB,	/*0x00000000,*/	"NVIDIA GT200" },
+	{ 0x10DE05FC,	/*0x00000000,*/	"NVIDIA GT200" },
 	{ 0x10DE05FD,	/*0x00000000,*/	"Quadro FX 5800" },
 	{ 0x10DE05FE,	/*0x00000000,*/	"Quadro FX 4800" },
 	{ 0x10DE05FF,	/*0x00000000,*/	"Quadro FX 3800" },
@@ -520,7 +497,19 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0614,	/*0x00000000,*/	"GeForce 9800 GT" },
 	{ 0x10DE0615,	/*0x00000000,*/	"GeForce GTS 250" },
 	{ 0x10DE0617,	/*0x00000000,*/	"GeForce 9800M GTX" },
-	{ 0x10DE0618,	/*0x00000000,*/	"GeForce GTX 260M" }, // Subsystem Id: 1043 202B Asus GTX 680
+	/* START */
+	{ 0x10DE0618,	/*0x00000000,*/	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x1025028E,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x102802A1,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x102802A2,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x10431A52,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x10432028,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x1043202B,	"Asus GTX 680" }, // Subsystem Id: 1043 202B Asus GTX 680
+	// { 0x10DE0618,	0x10432033,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x15580481,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x15580577,	"GeForce GTX 260M" },
+	// { 0x10DE0618,	0x15580860,	"GeForce GTX 260M" },
+	/* END */
 	{ 0x10DE0619,	/*0x00000000,*/	"Quadro FX 4700 X2" },
 	{ 0x10DE061A,	/*0x00000000,*/	"Quadro FX 3700" },
 	{ 0x10DE061B,	/*0x00000000,*/	"Quadro VX 200" },
@@ -533,35 +522,35 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0621,	/*0x00000000,*/	"GeForce GT 230" },
 	{ 0x10DE0622,	/*0x00000000,*/	"GeForce 9600 GT" },
 	{ 0x10DE0623,	/*0x00000000,*/	"GeForce 9600 GS" },
-	{ 0x10DE0624,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0624,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE0625,	/*0x00000000,*/	"GeForce 9600 GSO 512"},
 	{ 0x10DE0626,	/*0x00000000,*/	"GeForce GT 130" },
 	{ 0x10DE0627,	/*0x00000000,*/	"GeForce GT 140" },
 	{ 0x10DE0628,	/*0x00000000,*/	"GeForce 9800M GTS" },
-	{ 0x10DE0629,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0629,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE062A,	/*0x00000000,*/	"GeForce 9700M GTS" },
 	{ 0x10DE062B,	/*0x00000000,*/	"GeForce 9800M GS" },
 	{ 0x10DE062C,	/*0x00000000,*/	"GeForce 9800M GTS" },
 	{ 0x10DE062D,	/*0x00000000,*/	"GeForce 9600 GT" },
 	{ 0x10DE062E,	/*0x00000000,*/	"GeForce 9600 GT" },
-	{ 0x10DE062F,	/*0x00000000,*/	"GeForce 9800 S" }, //
+	{ 0x10DE062F,	/*0x00000000,*/	"GeForce 9800 S" },
 	// 0630 - 063F
-	{ 0x10DE0630,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0630,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE0631,	/*0x00000000,*/	"GeForce GTS 160M" },
 	{ 0x10DE0632,	/*0x00000000,*/	"GeForce GTS 150M" },
-	{ 0x10DE0633,	/*0x00000000,*/	"NVIDIA G94" }, //
-	{ 0x10DE0634,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0633,	/*0x00000000,*/	"NVIDIA G94" },
+	{ 0x10DE0634,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE0635,	/*0x00000000,*/	"GeForce 9600 GSO" },
-	{ 0x10DE0636,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0636,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE0637,	/*0x00000000,*/	"GeForce 9600 GT" },
 	{ 0x10DE0638,	/*0x00000000,*/	"Quadro FX 1800" },
-	{ 0x10DE0639,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE0639,	/*0x00000000,*/	"NVIDIA G94" },
 	{ 0x10DE063A,	/*0x00000000,*/	"Quadro FX 2700M" },
-	{ 0x10DE063B,	/*0x00000000,*/	"NVIDIA G94" }, //
-	{ 0x10DE063C,	/*0x00000000,*/	"NVIDIA G94" }, //
-	{ 0x10DE063D,	/*0x00000000,*/	"NVIDIA G94" }, //
-	{ 0x10DE063E,	/*0x00000000,*/	"NVIDIA G94" }, //
-	{ 0x10DE063F,	/*0x00000000,*/	"NVIDIA G94" }, //
+	{ 0x10DE063B,	/*0x00000000,*/	"NVIDIA G94" },
+	{ 0x10DE063C,	/*0x00000000,*/	"NVIDIA G94" },
+	{ 0x10DE063D,	/*0x00000000,*/	"NVIDIA G94" },
+	{ 0x10DE063E,	/*0x00000000,*/	"NVIDIA G94" },
+	{ 0x10DE063F,	/*0x00000000,*/	"NVIDIA G94" },
 	// 0640 - 064F
 	{ 0x10DE0640,	/*0x00000000,*/	"GeForce 9500 GT" },
 	{ 0x10DE0641,	/*0x00000000,*/	"GeForce 9400 GT" },
@@ -577,30 +566,30 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE064B,	/*0x00000000,*/	"GeForce 9500M G" },
 	{ 0x10DE064C,	/*0x00000000,*/	"GeForce 9650M GT" },
 	// 0650 - 065F
-	{ 0x10DE0650,	/*0x00000000,*/	"NVIDIA G96-825" }, //
+	{ 0x10DE0650,	/*0x00000000,*/	"NVIDIA G96-825" },
 	{ 0x10DE0651,	/*0x00000000,*/	"GeForce G 110M" },
 	{ 0x10DE0652,	/*0x00000000,*/	"GeForce GT 130M" },
 	{ 0x10DE0653,	/*0x00000000,*/	"GeForce GT 120M" },
 	{ 0x10DE0654,	/*0x00000000,*/	"GeForce GT 220M" },
 	{ 0x10DE0655,	/*0x00000000,*/	"GeForce GT 120" },
 	{ 0x10DE0656,	/*0x00000000,*/	"GeForce 9650 S" },
-	{ 0x10DE0657,	/*0x00000000,*/	"NVIDIA G96" }, //
+	{ 0x10DE0657,	/*0x00000000,*/	"NVIDIA G96" },
 	{ 0x10DE0658,	/*0x00000000,*/	"Quadro FX 380" },
 	{ 0x10DE0659,	/*0x00000000,*/	"Quadro FX 580" },
 	{ 0x10DE065A,	/*0x00000000,*/	"Quadro FX 1700M" },
 	{ 0x10DE065B,	/*0x00000000,*/	"GeForce 9400 GT" },
 	{ 0x10DE065C,	/*0x00000000,*/	"Quadro FX 770M" },
-	{ 0x10DE065D,	/*0x00000000,*/	"NVIDIA G96" }, //
-	{ 0x10DE065E,	/*0x00000000,*/	"NVIDIA G96" }, //
+	{ 0x10DE065D,	/*0x00000000,*/	"NVIDIA G96" },
+	{ 0x10DE065E,	/*0x00000000,*/	"NVIDIA G96" },
 	{ 0x10DE065F,	/*0x00000000,*/	"GeForce G210" },
 	// 0660 - 066F
 	// 0670 - 067F
 	// 0680 - 068F
 	// 0690 - 069F
 	// 06A0 - 06AF
-	{ 0x10DE06A0,	/*0x00000000,*/	"NVIDIA GT214" }, //
+	{ 0x10DE06A0,	/*0x00000000,*/	"NVIDIA GT214" },
 	// 06B0 - 06BF
-	{ 0x10DE06B0,	/*0x00000000,*/	"NVIDIA GT214" }, //
+	{ 0x10DE06B0,	/*0x00000000,*/	"NVIDIA GT214" },
 	// 06C0 - 06CF
 	{ 0x10DE06C0,	/*0x00000000,*/	"GeForce GTX 480" },
 	{ 0x10DE06C3,	/*0x00000000,*/	"GeForce GTX D12U" },
@@ -608,9 +597,17 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06CA,	/*0x00000000,*/	"GeForce GTX 480M" },
 	{ 0x10DE06CD,	/*0x00000000,*/	"GeForce GTX 470" },
 	// 06D0 - 06DF
-	{ 0x10DE06D1,	/*0x00000000,*/	"Tesla C2050" },	// TODO: sub-device id: 0x0771
-	{ 0x10DE06D1,	/*0x00000000,*/	"Tesla C2070" },	// TODO: sub-device id: 0x0772
-	{ 0x10DE06D2,	/*0x00000000,*/	"Tesla M2070" },
+	/* START */
+	{ 0x10DE06D1,	/*0x00000000,*/	"Tesla C2050 / C2070" },
+	// { 0x10DE06D1,	0x10DE0771,	"Tesla C2050" },
+	// { 0x10DE06D1,	0x10DE0772,	"Tesla C2070" },
+	{ 0x10DE06D2,	/*0x00000000,*/	"Tesla M2070 / X2070" },
+	// { 0x10DE06D2,	0x10DE0774,	"Tesla M2070" },
+	// { 0x10DE06D2,	0x10DE0830,	"Tesla M2070" },
+	// { 0x10DE06D2,	0x10DE0842,	"Tesla M2070" },
+	// { 0x10DE06D2,	0x10DE088F,	"Tesla X2070" },
+	// { 0x10DE06D2,	0x10DE0908,	"Tesla M2070" },
+	/* END */
 	{ 0x10DE06D8,	/*0x00000000,*/	"Quadro 6000" },
 	{ 0x10DE06D9,	/*0x00000000,*/	"Quadro 5000" },
 	{ 0x10DE06DA,	/*0x00000000,*/	"Quadro 5000M" },
@@ -634,24 +631,24 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06EA,	/*0x00000000,*/	"Quadro NVS 150M" },
 	{ 0x10DE06EB,	/*0x00000000,*/	"Quadro NVS 160M" },
 	{ 0x10DE06EC,	/*0x00000000,*/	"GeForce G 105M" },
-	{ 0x10DE06ED,	/*0x00000000,*/	"NVIDIA G98" }, //
+	{ 0x10DE06ED,	/*0x00000000,*/	"NVIDIA G98" },
 	{ 0x10DE06EF,	/*0x00000000,*/	"GeForce G 103M" },
 	// 06F0 - 06FF
-	{ 0x10DE06F0,	/*0x00000000,*/	"NVIDIA G98" }, //
+	{ 0x10DE06F0,	/*0x00000000,*/	"NVIDIA G98" },
 	{ 0x10DE06F1,	/*0x00000000,*/	"GeForce G105M" },
-	{ 0x10DE06F2,	/*0x00000000,*/	"NVIDIA G98" }, //
-	{ 0x10DE06F3,	/*0x00000000,*/	"NVIDIA G98" }, //
-	{ 0x10DE06F4,	/*0x00000000,*/	"NVIDIA G98" }, //
-	{ 0x10DE06F5,	/*0x00000000,*/	"NVIDIA G98" }, //
-	{ 0x10DE06F6,	/*0x00000000,*/	"NVIDIA G98" }, //
-	{ 0x10DE06F7,	/*0x00000000,*/	"NVIDIA G98" }, //
+	{ 0x10DE06F2,	/*0x00000000,*/	"NVIDIA G98" },
+	{ 0x10DE06F3,	/*0x00000000,*/	"NVIDIA G98" },
+	{ 0x10DE06F4,	/*0x00000000,*/	"NVIDIA G98" },
+	{ 0x10DE06F5,	/*0x00000000,*/	"NVIDIA G98" },
+	{ 0x10DE06F6,	/*0x00000000,*/	"NVIDIA G98" },
+	{ 0x10DE06F7,	/*0x00000000,*/	"NVIDIA G98" },
 	{ 0x10DE06F8,	/*0x00000000,*/	"Quadro NVS 420" },
 	{ 0x10DE06F9,	/*0x00000000,*/	"Quadro FX 370 LP" },
 	{ 0x10DE06FA,	/*0x00000000,*/	"Quadro NVS 450" },
 	{ 0x10DE06FB,	/*0x00000000,*/	"Quadro FX 370M" },
-	{ 0x10DE06FC,	/*0x00000000,*/	"NVIDIA G98" }, //
+	{ 0x10DE06FC,	/*0x00000000,*/	"NVIDIA G98" },
 	{ 0x10DE06FD,	/*0x00000000,*/	"Quadro NVS 295" },
-	{ 0x10DE06FE,	/*0x00000000,*/	"NVIDIA G98" }, //
+	{ 0x10DE06FE,	/*0x00000000,*/	"NVIDIA G98" },
 	{ 0x10DE06FF,	/*0x00000000,*/	"HICx16 + Graphics" },
 	// 0700 - 070F
 	// 0710 - 071F
@@ -659,14 +656,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0730 - 073F
 	// 0740 - 074F
 	// 0750 - 075F
-    //	{ 0x10DE0759,	/*0x00000000,*/	"nVidia Standard Dual Channel PCI IDE Controller" },
 	// 0760 - 076F
 	// 0770 - 077F
-    //	{ 0x10DE0774,	/*0x00000000,*/	"nVidia Microsoft UAA Bus Driver for High Definition Audio" },
-    //	{ 0x10DE077B,	/*0x00000000,*/	"nVidia Standard OpenHCD USB Host Controller" },
-    //	{ 0x10DE077C,	/*0x00000000,*/	"nVidia Standard Enhanced PCI to USB Host Controller" },
-    //	{ 0x10DE077D,	/*0x00000000,*/	"nVidia Standard OpenHCD USB Host Controller" },
-    //	{ 0x10DE077E,	/*0x00000000,*/	"nVidia Standard Enhanced PCI to USB Host Controller" },
 	// 0780 - 078F
 	// 0790 - 079F
 	// 07A0 - 07AF
@@ -678,17 +669,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE07E1,	/*0x00000000,*/	"GeForce 7100 / nForce 630i" },
 	{ 0x10DE07E2,	/*0x00000000,*/	"GeForce 7050 / nForce 630i" },
 	{ 0x10DE07E3,	/*0x00000000,*/	"GeForce 7050 / nForce 610i" },
-    //	{ 0x10DE07E4,	/*0x00000000,*/	"NVIDIA MCP73" },
 	{ 0x10DE07E5,	/*0x00000000,*/	"GeForce 7050 / nForce 620i" },
-    //	{ 0x10DE07E6,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07E7,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07E8,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07E9,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07EA,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07EB,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07ED,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07EE,	/*0x00000000,*/	"NVIDIA MCP73" },
-    //	{ 0x10DE07EF,	/*0x00000000,*/	"NVIDIA MCP73" },
 	// 07F0 - 07FF
 	// 0800 - 080F
 	// 0810 - 081F
@@ -696,8 +677,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0830 - 083F
 	// 0840 - 084F
 	{ 0x10DE0840,	/*0x00000000,*/	"GeForce 8200M" },
-    //	{ 0x10DE0841,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0842,	/*0x00000000,*/	"NVIDIA MCP77/78" },
 	{ 0x10DE0844,	/*0x00000000,*/	"GeForce 9100M G" },
 	{ 0x10DE0845,	/*0x00000000,*/	"GeForce 8200M G" },
 	{ 0x10DE0846,	/*0x00000000,*/	"GeForce 9200" },
@@ -710,29 +689,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE084D,	/*0x00000000,*/	"nForce 750a SLI" },
 	{ 0x10DE084F,	/*0x00000000,*/	"GeForce 8100 / nForce 720a" },
 	// 0850 - 085F
-    //	{ 0x10DE0850,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0851,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0852,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0853,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0854,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0855,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0856,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0857,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0858,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE0859,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085A,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085B,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085C,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085D,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085E,	/*0x00000000,*/	"NVIDIA MCP77/78" },
-    //	{ 0x10DE085F,	/*0x00000000,*/	"NVIDIA MCP77/78" },
 	// 0860 - 086F
-	{ 0x10DE0860,	/*0x00000000,*/	"GeForce 9300" }, //
+	{ 0x10DE0860,	/*0x00000000,*/	"GeForce 9300" },
 	{ 0x10DE0861,	/*0x00000000,*/	"GeForce 9400" },
 	{ 0x10DE0862,	/*0x00000000,*/	"GeForce 9400M G" },
 	{ 0x10DE0863,	/*0x00000000,*/	"GeForce 9400M" },
 	{ 0x10DE0864,	/*0x00000000,*/	"GeForce 9300" },
-	{ 0x10DE0865,	/*0x00000000,*/	"GeForce 9300" }, //
+	{ 0x10DE0865,	/*0x00000000,*/	"GeForce 9300" },
 	{ 0x10DE0866,	/*0x00000000,*/	"GeForce 9400M G" },
 	{ 0x10DE0867,	/*0x00000000,*/	"GeForce 9400" },
 	{ 0x10DE0868,	/*0x00000000,*/	"nForce 760i SLI" },
@@ -757,16 +720,16 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0890 - 089F
 	// 08A0 - 08AF
 	{ 0x10DE08A0,	/*0x00000000,*/	"GeForce 320M" },
-    //	{ 0x10DE08A1,	/*0x00000000,*/	"NVIDIA MCP89-MZT" },
-    //	{ 0x10DE08A2,	/*0x00000000,*/	"NVIDIA MCP89-EPT" },
+	// { 0x10DE08A1,	/*0x00000000,*/	"NVIDIA MCP89-MZT" },
+	// { 0x10DE08A2,	/*0x00000000,*/	"NVIDIA MCP89-EPT" },
 	{ 0x10DE08A3,	/*0x00000000,*/	"GeForce 320M" },
 	{ 0x10DE08A4,	/*0x00000000,*/	"GeForce 320M" },
 	{ 0x10DE08A5,	/*0x00000000,*/	"GeForce 320M" },
 	// 08B0 - 08BF
-    //	{ 0x10DE08B0,	/*0x00000000,*/	"Unknown" },
+	// { 0x10DE08B0,	/*0x00000000,*/	"MCP83 MMD" },
 	{ 0x10DE08B1,	/*0x00000000,*/	"GeForce 300M" },
-    //	{ 0x10DE08B2,	/*0x00000000,*/	"NVIDIA MCP83-MJ" },
-    //	{ 0x10DE08B3,	/*0x00000000,*/	"NVIDIA MCP89 MM9" },
+	// { 0x10DE08B2,	/*0x00000000,*/	"NVIDIA MCP83-MJ" },
+	// { 0x10DE08B3,	/*0x00000000,*/	"NVIDIA MCP89 MM9" },
 	// 08C0 - 08CF
 	// 08D0 - 08DF
 	// 08E0 - 08EF
@@ -788,12 +751,12 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 09E0 - 09EF
 	// 09F0 - 09FF
 	// 0A00 - 0A0F
-    //	{ 0x10DE0A00,	/*0x00000000,*/	"NVIDIA GT212" },
+	// { 0x10DE0A00,	/*0x00000000,*/	"NVIDIA GT212" },
 	// 0A10 - 0A1F
-    //	{ 0x10DE0A10,	/*0x00000000,*/	"NVIDIA GT212" },
+	// { 0x10DE0A10,	/*0x00000000,*/	"NVIDIA GT212" },
 	// 0A20 - 0A2F
 	{ 0x10DE0A20,	/*0x00000000,*/	"GeForce GT 220" }, // subsystem 10de:0a20:1043:8311
-    //	{ 0x10DE0A21,	/*0x00000000,*/	"NVIDIA D10M2-20" },
+	// { 0x10DE0A21,	/*0x00000000,*/	"NVIDIA D10M2-20" },
 	{ 0x10DE0A22,	/*0x00000000,*/	"GeForce 315" },
 	{ 0x10DE0A23,	/*0x00000000,*/	"GeForce 210" },
 	{ 0x10DE0A26,	/*0x00000000,*/	"GeForce 405" },
@@ -805,18 +768,19 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A2C,	/*0x00000000,*/	"NVS 5100M" },
 	{ 0x10DE0A2D,	/*0x00000000,*/	"GeForce GT 320M" },	
 	// 0A30 - 0A3F
-    //	{ 0x10DE0A30,	/*0x00000000,*/	"NVIDIA GT216" },
+	// { 0x10DE0A30,	/*0x00000000,*/	"NVIDIA GT216" },
+	{ 0x10DE0A32,	/*0x00000000,*/	"GeForce GT 415" },
 	{ 0x10DE0A34,	/*0x00000000,*/	"GeForce GT 240M" },
 	{ 0x10DE0A35,	/*0x00000000,*/	"GeForce GT 325M" },
 	{ 0x10DE0A38,	/*0x00000000,*/	"Quadro 400" },
 	{ 0x10DE0A3C,	/*0x00000000,*/	"Quadro FX 880M" },
-    //	{ 0x10DE0A3D,	/*0x00000000,*/	"NVIDIA N10P-ES" },
-    //	{ 0x10DE0A3F,	/*0x00000000,*/	"NVIDIA GT216-INT" },
+	// { 0x10DE0A3D,	/*0x00000000,*/	"NVIDIA N10P-ES" },
+	// { 0x10DE0A3F,	/*0x00000000,*/	"NVIDIA GT216-INT" },
 	// 0A40 - 0A4F
 	// 0A50 - 0A5F
 	// 0A60 - 0A6F
 	{ 0x10DE0A60,	/*0x00000000,*/	"GeForce G210" },
-    //	{ 0x10DE0A61,	/*0x00000000,*/	"NVIDIA NVS 2100" },
+	// { 0x10DE0A61,	/*0x00000000,*/	"NVIDIA NVS 2100" },
 	{ 0x10DE0A62,	/*0x00000000,*/	"GeForce 205" },
 	{ 0x10DE0A63,	/*0x00000000,*/	"GeForce 310" },
 	{ 0x10DE0A64,	/*0x00000000,*/	"ION" },
@@ -838,12 +802,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A75,	/*0x00000000,*/	"GeForce G310M" },
 	{ 0x10DE0A76,	/*0x00000000,*/	"ION" },
 	{ 0x10DE0A78,	/*0x00000000,*/	"Quadro FX 380 LP" },
-    //	{ 0x10DE0A79,	/*0x00000000,*/	"Unknown" },
+	// { 0x10DE0A79,	/*0x00000000,*/	"N12M-NS-S" },
 	{ 0x10DE0A7A,	/*0x00000000,*/	"GeForce 315M" },
+	{ 0x10DE0A7B,	/*0x00000000,*/	"GeForce 505" },
 	{ 0x10DE0A7C,	/*0x00000000,*/	"Quadro FX 380M" },
-    //	{ 0x10DE0A7D,	/*0x00000000,*/	"NVIDIA GT218-ES" },
-    //	{ 0x10DE0A7E,	/*0x00000000,*/	"NVIDIA GT218-INT-S" },
-    //	{ 0x10DE0A7F,	/*0x00000000,*/	"NVIDIA GT218-INT-B" },
+	// { 0x10DE0A7D,	/*0x00000000,*/	"NVIDIA GT218-ES" },
+	// { 0x10DE0A7E,	/*0x00000000,*/	"NVIDIA GT218-INT-S" },
+	// { 0x10DE0A7F,	/*0x00000000,*/	"NVIDIA GT218-INT-B" },
 	// 0A80 - 0A8F
 	// 0A90 - 0A9F
 	// 0AA0 - 0AAF
@@ -867,8 +832,6 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0BC0 - 0BCF
 	// 0BD0 - 0BDF
 	// 0BE0 - 0BEF
-    //	{ 0x10DE0BE4,	/*0x00000000,*/	"nVidia High Definition Audio Controller" },
-    //	{ 0x10DE0BE9,	/*0x00000000,*/	"nVidia High Definition Audio Controller" },
 	// 0BF0 - 0BFF
 	// 0C00 - 0C0F
 	// 0C10 - 0C1F
@@ -890,8 +853,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0CA8,	/*0x00000000,*/	"GeForce GTS 260M" },
 	{ 0x10DE0CA9,	/*0x00000000,*/	"GeForce GTS 250M" },
 	{ 0x10DE0CAC,	/*0x00000000,*/	"GeForce GT 220" },
-    //	{ 0x10DE0CAD,	/*0x00000000,*/	"NVIDIA N10E-ES" },
-    //	{ 0x10DE0CAE,	/*0x00000000,*/	"NVIDIA GT215-INT" },
+	//  { 0x10DE0CAD,	/*0x00000000,*/	"NVIDIA N10E-ES" },
+	//  { 0x10DE0CAE,	/*0x00000000,*/	"NVIDIA GT215-INT" },
 	{ 0x10DE0CAF,	/*0x00000000,*/	"GeForce GT 335M" },
 	// 0CB0 - 0CBF	
 	{ 0x10DE0CB0,	/*0x00000000,*/	"GeForce GTS 350M" },
@@ -915,26 +878,26 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0DB0 - 0DBF
 	// 0DC0 - 0DCF
 	{ 0x10DE0DC0,	/*0x00000000,*/	"GeForce GT 440" },
-	{ 0x10DE0DC1,	/*0x00000000,*/	"D12-P1-35" },
-	{ 0x10DE0DC2,	/*0x00000000,*/	"D12-P1-35" },
+	//  { 0x10DE0DC1,	/*0x00000000,*/	"D12-P1-35" },
+	//  { 0x10DE0DC2,	/*0x00000000,*/	"D12-P1-35" },
 	{ 0x10DE0DC4,	/*0x00000000,*/	"GeForce GTS 450" },
 	{ 0x10DE0DC5,	/*0x00000000,*/	"GeForce GTS 450" },
 	{ 0x10DE0DC6,	/*0x00000000,*/	"GeForce GTS 450" },
-	{ 0x10DE0DCA,	/*0x00000000,*/	"GF10x" },
-    //	{ 0x10DE0DCC,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE0DCA,	/*0x00000000,*/	"GF10x" },
+	//  { 0x10DE0DCC,	/*0x00000000,*/	"N12E-GS" },
 	{ 0x10DE0DCD,	/*0x00000000,*/	"GeForce GT 555M" },
 	{ 0x10DE0DCE,	/*0x00000000,*/	"GeForce GT 555M" },
-    //	{ 0x10DE0DCF,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE0DCF,	/*0x00000000,*/	"N12P-GT-B" },
 	// 0DD0 - 0DDF	
-    //	{ 0x10DE0DD0,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE0DD0,	/*0x00000000,*/	"N11E-GT" },
 	{ 0x10DE0DD1,	/*0x00000000,*/	"GeForce GTX 460M" }, // subsystem 10de:0dd1:1558:8687
 	{ 0x10DE0DD2,	/*0x00000000,*/	"GeForce GT 445M" },
 	{ 0x10DE0DD3,	/*0x00000000,*/	"GeForce GT 435M" },
 	{ 0x10DE0DD6,	/*0x00000000,*/	"GeForce GT 550M" },
 	{ 0x10DE0DD8,	/*0x00000000,*/	"Quadro 2000" },
 	{ 0x10DE0DDA,	/*0x00000000,*/	"Quadro 2000M" },
-	{ 0x10DE0DDE,	/*0x00000000,*/	"GF106-ES" },
-	{ 0x10DE0DDF,	/*0x00000000,*/	"GF106-INT" },
+	//  { 0x10DE0DDE,	/*0x00000000,*/	"GF106-ES" },
+	//  { 0x10DE0DDF,	/*0x00000000,*/	"GF106-INT" },
 	// 0DE0 - 0DEF
 	{ 0x10DE0DE0,	/*0x00000000,*/	"GeForce GT 440" },
 	{ 0x10DE0DE1,	/*0x00000000,*/	"GeForce GT 430" }, // subsystem 10de:0de1:3842:1430
@@ -948,7 +911,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DEC,	/*0x00000000,*/	"GeForce GT 525M" },
 	{ 0x10DE0DED,	/*0x00000000,*/	"GeForce GT 520M" },
 	{ 0x10DE0DEE,	/*0x00000000,*/	"GeForce GT 415M" },
-    //	{ 0x10DE0DEF,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE0DEF,	/*0x00000000,*/	"N13P-NS1-A1" },
 	// 0DF0 - 0DFF	
 	{ 0x10DE0DF0,	/*0x00000000,*/	"GeForce GT 425M" },
 	{ 0x10DE0DF1,	/*0x00000000,*/	"GeForce GT 420M" },
@@ -959,11 +922,11 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DF6,	/*0x00000000,*/	"GeForce GT 550M" },
 	{ 0x10DE0DF7,	/*0x00000000,*/	"GeForce GT 520M" },
 	{ 0x10DE0DF8,	/*0x00000000,*/	"Quadro 600" },
-    //	{ 0x10DE0DF9,	/*0x00000000,*/	"Unknown" },
+	{ 0x10DE0DF9,	/*0x00000000,*/	"Quadro 500M" },
 	{ 0x10DE0DFA,	/*0x00000000,*/	"Quadro 1000M" },
 	{ 0x10DE0DFC,	/*0x00000000,*/	"NVS 5200M" },
-	{ 0x10DE0DFE,	/*0x00000000,*/	"GF108 ES" },
-	{ 0x10DE0DFF,	/*0x00000000,*/	"GF108 INT" },
+	//  { 0x10DE0DFE,	/*0x00000000,*/	"GF108 ES" },
+	//  { 0x10DE0DFF,	/*0x00000000,*/	"GF108 INT" },
 	// 0E00 - 0E0F
 	// 0E10 - 0E1F
 	// 0E20 - 0E2F
@@ -971,16 +934,17 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0E22,	/*0x00000000,*/	"GeForce GTX 460" }, // subsystem 10de:0e22:1462:2322
 	{ 0x10DE0E23,	/*0x00000000,*/	"GeForce GTX 460 SE" },
 	{ 0x10DE0E24,	/*0x00000000,*/	"GeForce GTX 460" },
-	{ 0x10DE0E25,	/*0x00000000,*/	"D12U-50" },
+	//  { 0x10DE0E25,	/*0x00000000,*/	"D12U-50" },
+	{ 0x10DE0E28,	/*0x00000000,*/	"GeForce GTX 460" },
 	// 0E30 - 0E3F
 	{ 0x10DE0E30,	/*0x00000000,*/	"GeForce GTX 470M" },
 	{ 0x10DE0E31,	/*0x00000000,*/	"GeForce GTX 485M" },
-    //	{ 0x10DE0E32,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE0E32,	/*0x00000000,*/	"N12E-GT" },
 	{ 0x10DE0E38,	/*0x00000000,*/	"GF104GL" },
 	{ 0x10DE0E3A,	/*0x00000000,*/	"Quadro 3000M" },
 	{ 0x10DE0E3B,	/*0x00000000,*/	"Quadro 4000M" },
-	{ 0x10DE0E3E,	/*0x00000000,*/	"GF104-ES" },
-	{ 0x10DE0E3F,	/*0x00000000,*/	"GF104-INT" },
+	//  { 0x10DE0E3E,	/*0x00000000,*/	"GF104-ES" },
+	//  { 0x10DE0E3F,	/*0x00000000,*/	"GF104-INT" },
 	// 0E40 - 0E4F
 	// 0E50 - 0E5F
 	// 0E60 - 0E6F
@@ -1010,6 +974,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0FD1,	/*0x00000000,*/	"GeForce GT 650M" },
 	{ 0x10DE0FD2,	/*0x00000000,*/	"GeForce GT 640M" },
 	{ 0x10DE0FD4,	/*0x00000000,*/	"GeForce GTX 660M" },
+	//  { 0x10DE0FDB,	/*0x00000000,*/	"GK107-ESP-A1" },
 	// 0FE0 - 0FEF
 	// 0FF0 - 0FFF
 	// 1000 - 100F
@@ -1018,24 +983,26 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1030 - 103F
 	// 1040 - 104F
 	{ 0x10DE1040,	/*0x00000000,*/	"GeForce GT 520" },
+	//  { 0x10DE1041,	/*0x00000000,*/	"D13M1-45" },
 	{ 0x10DE1042,	/*0x00000000,*/	"GeForce 510" },
+	{ 0x10DE1048,	/*0x00000000,*/	"GeForce 605" },
 	{ 0x10DE1049,	/*0x00000000,*/	"GeForce GT 620" },
 	// 1050 - 105F
 	{ 0x10DE1050,	/*0x00000000,*/	"GeForce GT 520M" },
 	{ 0x10DE1051,	/*0x00000000,*/	"GeForce GT 520MX" },
-    //	{ 0x10DE1052,	/*0x00000000,*/	"Unknown" },
+	{ 0x10DE1052,	/*0x00000000,*/	"GeForce GT 520M" },
 	{ 0x10DE1054,	/*0x00000000,*/	"GeForce GT 410M" },
 	{ 0x10DE1055,	/*0x00000000,*/	"GeForce 410M" },
 	{ 0x10DE1056,	/*0x00000000,*/	"Quadro NVS 4200M" },
 	{ 0x10DE1057,	/*0x00000000,*/	"Quadro NVS 4200M" },
 	{ 0x10DE1058,	/*0x00000000,*/	"GeForce 610M" },
-    //	{ 0x10DE1059,	/*0x00000000,*/	"AUDIO" },
+	{ 0x10DE1059,	/*0x00000000,*/	"GeForce 610M" },
 	{ 0x10DE105A,	/*0x00000000,*/	"GeForce 610M" },
 	// 1060 - 106F
 	// 1070 - 107F
-    //	{ 0x10DE107D,	/*0x00000000,*/	"Unknown" },
-    //	{ 0x10DE107E,	/*0x00000000,*/	"Unknown" },
-	{ 0x10DE107F,	/*0x00000000,*/	"NVIDIA GF119-ES" },
+	//  { 0x10DE107D,	/*0x00000000,*/	"GF119" },
+	//  { 0x10DE107E,	/*0x00000000,*/	"GF119-INT" },
+	//  { 0x10DE107F,	/*0x00000000,*/	"GF119-ES" },
 	// 1080 - 108F
 	{ 0x10DE1080,	/*0x00000000,*/	"GeForce GTX 580" },
 	{ 0x10DE1081,	/*0x00000000,*/	"GeForce GTX 570" }, // subsystem 10de:1081:10de:087e
@@ -1047,11 +1014,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1088,	/*0x00000000,*/	"GeForce GTX 590" },
 	{ 0x10DE1089,	/*0x00000000,*/	"GeForce GTX 580" },
 	{ 0x10DE108B,	/*0x00000000,*/	"GeForce GTX 590" },
+	//  { 0x10DE108C,	/*0x00000000,*/	"D13U" },
+	{ 0x10DE108E,	/*0x00000000,*/	"Tesla C2090" },
 	// 1090 - 109F
 	{ 0x10DE1091,	/*0x00000000,*/	"Tesla M2090" },
 	{ 0x10DE1094,	/*0x00000000,*/	"Tesla M2075 Dual-Slot Computing Processor Module" },
 	{ 0x10DE1096,	/*0x00000000,*/	"Tesla C2075" },
-	{ 0x10DE1098,	/*0x00000000,*/	"D13U" },
+	//  { 0x10DE1098,	/*0x00000000,*/	"D13U" },
 	{ 0x10DE109A,	/*0x00000000,*/	"Quadro 5010M" },
 	{ 0x10DE109B,	/*0x00000000,*/	"Quadro 7000" },
 	// 10A0 - 10AF
@@ -1059,7 +1028,7 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 10C0 - 10CF
 	{ 0x10DE10C0,	/*0x00000000,*/	"GeForce 9300 GS" },
 	{ 0x10DE10C3,	/*0x00000000,*/	"GeForce 8400 GS" },
-    //	{ 0x10DE10C4,	/*0x00000000,*/	"NVIDIA ION" },
+	{ 0x10DE10C4,	/*0x00000000,*/	"NVIDIA ION" },
 	{ 0x10DE10C5,	/*0x00000000,*/	"GeForce 405" },
 	// 10D0 - 10DF
 	{ 0x10DE10D8,	/*0x00000000,*/	"NVS 300" },
@@ -1070,6 +1039,17 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1120 - 112F
 	// 1130 - 113F
 	// 1140 - 114F
+	//  { 0x10DE1140,	/*0x00000000,*/	"GF117" },
+	{ 0x10DE1141,	/*0x00000000,*/	"GeForce 610M" },
+	{ 0x10DE1142,	/*0x00000000,*/	"GeForce 620M" },
+	//  { 0x10DE1143,	/*0x00000000,*/	"N13P-GV" },
+	//  { 0x10DE1144,	/*0x00000000,*/	"GF117" },
+	//  { 0x10DE1145,	/*0x00000000,*/	"GF117" },
+	//  { 0x10DE1146,	/*0x00000000,*/	"GF117" },
+	//  { 0x10DE1147,	/*0x00000000,*/	"GF117" },
+	//  { 0x10DE1149,	/*0x00000000,*/	"GF117-ES" },
+	//  { 0x10DE114A,	/*0x00000000,*/	"GF117-INT" },
+	//  { 0x10DE114B,	/*0x00000000,*/	"PCI-GEN3-B" },
 	// 1150 - 115F
 	// 1160 - 116F
 	// 1170 - 117F
@@ -1085,8 +1065,10 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1200 - 120F
 	{ 0x10DE1200,	/*0x00000000,*/	"GeForce GTX 560 Ti" },
 	{ 0x10DE1201,	/*0x00000000,*/	"GeForce GTX 560" },
+	{ 0x10DE1202,	/*0x00000000,*/	"GeForce GTX 560 Ti" },
 	{ 0x10DE1203,	/*0x00000000,*/	"GeForce GTX 460 SE v2" },
 	{ 0x10DE1205,	/*0x00000000,*/	"GeForce GTX 460 v2" },
+	{ 0x10DE1206,	/*0x00000000,*/	"GeForce GTX 555" },
 	{ 0x10DE1208,	/*0x00000000,*/	"GeForce GTX 560 SE" },
 	{ 0x10DE1210,	/*0x00000000,*/	"GeForce GTX 570M" },
 	{ 0x10DE1211,	/*0x00000000,*/	"GeForce GTX 580M" },
@@ -1100,8 +1082,9 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE1246,	/*0x00000000,*/	"GeForce GTX 550M" },
 	{ 0x10DE1247,	/*0x00000000,*/	"GeForce GT 635M" }, // Subsystem Id: 1043 212C Asus GeForce GT 635M
 	{ 0x10DE1248,	/*0x00000000,*/	"GeForce GTX 555M" },
+	{ 0x10DE124B,	/*0x00000000,*/	"GeForce GT 640" },
 	{ 0x10DE124D,	/*0x00000000,*/	"GeForce GTX 555M" },
-    //	{ 0x10DE1250,	/*0x00000000,*/	"Unknown" },
+	//  { 0x10DE1250,	/*0x00000000,*/	"GF116-INT" },
 	{ 0x10DE1251,	/*0x00000000,*/	"GeForce GTX 560M" },
 	// 1260 - 126F
 	// 1270 - 127F
@@ -1113,49 +1096,13 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 12D0 - 12DF
 	// 12E0 - 12EF
 	// 12F0 - 12FF
-    //	{ 0x10DE8001,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE8067,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
-    //	{ 0x10DE8073,	/*0x00000000,*/	"NVIDIA HDMI Audio" },
 };
 
-static uint16_t swap16(uint16_t x)
-{
-	return (((x & 0x00FF) << 8) | ((x & 0xFF00) >> 8));
-}
-
-static uint16_t read16(uint8_t *ptr, uint16_t offset)
-{
-	uint8_t ret[2];
-
-	ret[0] = ptr[offset+1];
-	ret[1] = ptr[offset];
-
-	return *((uint16_t*)&ret);
-}
-
-#if 0
-static uint32_t swap32(uint32_t x)
-{
-	return ((x & 0x000000FF) << 24) | ((x & 0x0000FF00) << 8 ) | ((x & 0x00FF0000) >> 8 ) | ((x & 0xFF000000) >> 24);
-}
-
-static uint8_t	read8(uint8_t *ptr, uint16_t offset)
-{ 
-	return ptr[offset];
-}
-
-static uint32_t read32(uint8_t *ptr, uint16_t offset)
-{
-	uint8_t ret[4];
-
-	ret[0] = ptr[offset+3];
-	ret[1] = ptr[offset+2];
-	ret[2] = ptr[offset+1];
-	ret[3] = ptr[offset];
-
-	return *((uint32_t*)&ret);
-}
-#endif
+#define READ_BYTE(rom, offset) (*(u_char *)(rom + offset))
+#define READ_LE_SHORT(rom, offset) (READ_BYTE(rom, offset+1) << 8 | READ_BYTE(rom, offset))
+#define READ_LE_INT(rom, offset)   (READ_LE_SHORT(rom, offset+2) << 16 | READ_LE_SHORT(rom, offset))
+#define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
+#define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
 static int patch_nvidia_rom(uint8_t *rom)
 {
@@ -1164,15 +1111,15 @@ static int patch_nvidia_rom(uint8_t *rom)
 		return PATCH_ROM_FAILED;
 	}
 	
-	uint16_t dcbptr = swap16(read16(rom, 0x36));
+	uint16_t dcbptr = READ_LE_SHORT(rom, 0x36);
 
 	if (!dcbptr) {
 		printf("no dcb table found\n");
 		return PATCH_ROM_FAILED;
 	}
-//	else
-//		printf("dcb table at offset 0x%04x\n", dcbptr);
-	 
+	else
+		printf("dcb table at offset 0x%04x\n", dcbptr);
+
 	uint8_t *dcbtable		 = &rom[dcbptr];
 	uint8_t dcbtable_version = dcbtable[0];
 	uint8_t headerlength	 = 0;
@@ -1189,11 +1136,11 @@ static int patch_nvidia_rom(uint8_t *rom)
 			numentries	 = dcbtable[2];
 			recordlength = dcbtable[3];
 
-			sig = *(uint32_t *)&dcbtable[6];
+			sig = READ_LE_INT(dcbtable, 6);
 		}
 		else
 		{
-			sig = *(uint32_t *)&dcbtable[4];
+			sig = READ_LE_INT(dcbtable, 4);
 			headerlength = 8;
 		}
 		
@@ -1237,8 +1184,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	for (i = 0; i < numentries; i++)
 	{
 		uint32_t connection;
-		connection = *(uint32_t *)&dcbtable[headerlength + recordlength * i];
-
+		connection = READ_LE_INT(dcbtable,headerlength + recordlength * i);
 		/* Should we allow discontinuous DCBs? Certainly DCB I2C tables can be discontinuous */
 		if ((connection & 0x0000000f) == 0x0000000f) /* end of records */ 
 			continue;
@@ -1557,10 +1503,10 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	videoRam = mem_detect(regs, nvCardType, nvda_dev);
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
-	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s\n",
+	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s device number: %d\n",
 			model, (uint32_t)(videoRam / 1024 / 1024),
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
-			devicepath);
+			devicepath, devices_number);
 	
 	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id,
@@ -1590,22 +1536,24 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		// TODO: we should really check for the signature before copying the rom, i think.
 		
 		// PRAMIN first
-		nvRom = (uint8_t*)&regs[NV_PRAMIN_OFFSET];
-		bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-		
+
+                // PROM next
+                // Enable PROM access
+                (REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
+
+                nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
+                bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
+
+                // disable PROM access
+                (REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED;
+
 		// Valid Signature ?
 		if (rom[0] != 0x55 && rom[1] != 0xaa)
 		{
-			// PROM next
-			// Enable PROM access
-			(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
-			
-			nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
-			bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-			
-			// disable PROM access
-			(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED;
-			
+                        // PRAMIN first
+                        nvRom = (uint8_t*)&regs[NV_PRAMIN_OFFSET];
+                        bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
+
 			// Valid Signature ?
 			if (rom[0] != 0x55 && rom[1] != 0xaa)
 			{
