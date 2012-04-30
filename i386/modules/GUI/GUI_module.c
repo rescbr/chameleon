@@ -278,7 +278,8 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
  ** replace various menu functions. Finaly, initialize the gui and hook
  ** into important events.
  **/
-void GUI_start(moduleList_t* module)
+void GUI_start(void);
+void GUI_start(void)
 {
 	register_hook_callback("GUI_Display", &GUI_diplay_hook);				
 	
@@ -453,6 +454,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
         {
 			
 			CursorState cursorState;
+			cursorState.x = cursorState.y = cursorState.type=0;
 			
 			// Set cursor at current position, and clear inverse video.
 			
@@ -484,7 +486,7 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 			{
 				moveCursor( 0, MenuRow + MenuSelection - MenuTop );
 				printMenuItem( &gMenuItems[MenuSelection], 1 );
-				moved = restoreCursor( &cursorState );
+				/*moved =*/ restoreCursor( &cursorState );
 				
 			}
 			else
@@ -515,7 +517,8 @@ static void GUI_showMenu( const MenuItem * items, int count,
 {
     int         i;
     CursorState cursorState;
-	
+	cursorState.x = cursorState.y = cursorState.type=0;
+
     if ( items == NULL || count == 0 ) 
 		return;
 	

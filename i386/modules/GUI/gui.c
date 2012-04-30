@@ -2652,11 +2652,11 @@ int GUI_initGraphicsMode (void)
 }
 
 
-int GUI_countdown( const char * msg, int row, int timeout , int *optionKey)
+int GUI_countdown( const char * msg, register int row, register int timeout , int *optionKey)
 {
-    unsigned long time;
-    register int ch  = 0;
-    int col = strlen(msg) + 1;
+    register unsigned long time;
+    int ch  = 0;
+    register int col = strlen(msg) + 1;
 	
     flushKeyboardBuffer();
 	
@@ -2731,5 +2731,3 @@ int GUI_countdown( const char * msg, int row, int timeout , int *optionKey)
 	
     return ch;
 }
-
-

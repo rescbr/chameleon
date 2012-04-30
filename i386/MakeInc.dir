@@ -39,6 +39,16 @@ installhdrs::
 
 .SUFFIXES: .s .i .c .o
 
+ifeq "makedep" "NO"
+.c.o .m.o:
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+
+$(OBJROOT)/%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+
+$(OBJROOT)/%.o: %.m
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+else
 .c.o .m.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
 	    -MD -dependency-file $(OBJROOT)/$*.d
@@ -53,6 +63,7 @@ $(OBJROOT)/%.o: %.m
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
 	    -MD -dependency-file $(OBJROOT)/$*.d
 	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+endif
 
 #.s.o:
 #	cc $(INC) -E $< > $(OBJROOT)/$*.o2

@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright 2010,2011 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright 2010,2011,2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
  */
 
 #include "libsaio.h"

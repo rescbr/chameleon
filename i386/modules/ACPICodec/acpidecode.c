@@ -201,7 +201,7 @@ static U8 *parse_acpi_namestring(const struct acpi_namespace *ns_context, struct
 
 static U8 *parse_acpi_buffer(const struct acpi_namespace *ns, U8 * current, U8 * end)
 {
-    U32 pkglen, lengthEncoding;
+    U32 pkglen = 0, lengthEncoding = 0;
     (void)ns;
     (void)end;
     if (*current != AML_BUFFER_OP)
@@ -432,8 +432,8 @@ static U8 *parse_acpi_method(const struct acpi_namespace *ns, U8 * current, U8 *
 {
     U8 *new_end = current;
     U8 *temp;
-    U32 pkglen;
-    U32 lengthEncoding;
+    U32 pkglen = 0;
+    U32 lengthEncoding = 0;
     struct acpi_namespace new_ns;
     
     (void)end;
@@ -485,8 +485,8 @@ static U8 *parse_acpi_processor(const struct acpi_namespace *ns, U8 * current, U
 {
     U8 *new_end = current;
     U8 *temp;
-    U32 pkglen;
-    U32 lengthEncoding;
+    U32 pkglen = 0;
+    U32 lengthEncoding = 0;
     struct acpi_namespace new_ns;
     U8 id;
     U32 pmbase;
@@ -506,7 +506,7 @@ static U8 *parse_acpi_processor(const struct acpi_namespace *ns, U8 * current, U
     pmbase = *(U32 *) current;
     current += 4;
     (void)current; // Silent a warning reported by the clang static analizer . 
-
+	
 #if DEBUG_ACPI_DECODE
     DBG( "Found CPU object: ");
     dprint_namespace(&new_ns);
@@ -554,8 +554,8 @@ static U8 *parse_acpi_namedobj(const struct acpi_namespace *ns, U8 * current, U8
                 DBG( "\n");
 #endif
             } else if (*(current + 1) == AML_FIELD_OP) {
-                U32 pkglen;
-                U32 lengthEncoding;
+                U32 pkglen = 0;
+                U32 lengthEncoding = 0;
                 
                 current += 2;
                 DBG( "FieldOp at memory location %p\n", current);
@@ -563,8 +563,8 @@ static U8 *parse_acpi_namedobj(const struct acpi_namespace *ns, U8 * current, U8
                 current += pkglen;
             } else if (*(current + 1) == AML_DEVICE_OP) {
                 U8 *new_end;
-                U32 pkglen;
-                U32 lengthEncoding;
+                U32 pkglen = 0;
+                U32 lengthEncoding = 0;
                 struct acpi_namespace new_ns;
                 
                 current += 2;
@@ -587,8 +587,8 @@ static U8 *parse_acpi_namedobj(const struct acpi_namespace *ns, U8 * current, U8
                 current = parse_acpi_processor(ns, current, end);
             } else if (*(current + 1) == AML_INDEXFIELD_OP) {
                 U8 *new_end;
-                U32 pkglen;
-                U32 lengthEncoding;
+                U32 pkglen = 0;
+                U32 lengthEncoding = 0;
                 struct acpi_namespace new_ns;
                 
                 current += 2;
@@ -627,8 +627,8 @@ static U8 *parse_acpi_type1opcode(const struct acpi_namespace *ns, U8 * current,
         case AML_IF_OP:
         {
             U8 *new_end;
-            U32 pkgLen;
-            U32 lengthEncoding;
+            U32 pkgLen = 0;
+            U32 lengthEncoding = 0;
             
             DBG( "Found IfOp\n");
             current++;
@@ -644,8 +644,8 @@ static U8 *parse_acpi_type1opcode(const struct acpi_namespace *ns, U8 * current,
         case AML_ELSE_OP:
         {
             U8 *new_end;
-            U32 pkgLen;
-            U32 lengthEncoding;
+            U32 pkgLen = 0;
+            U32 lengthEncoding = 0;
             
             DBG( "Found ElseOp\n");
             current++;
@@ -732,8 +732,8 @@ static U8 *parse_acpi_package(const struct acpi_namespace *ns, U8 * current, U8 
     (void)ns;
     (void)end;
     if (*current == AML_PACKAGE_OP) {
-        U32 pkglen;
-        U32 lengthEncoding;
+        U32 pkglen = 0;
+        U32 lengthEncoding = 0;
         
         DBG( "Found PackageOp\n");
         current++;
@@ -791,8 +791,8 @@ static U8 *parse_acpi_namespacemodifierobj(const struct acpi_namespace *ns, U8 *
         {
             U8 *new_end;
             struct acpi_namespace new_ns;
-            U32 scopeLen;
-            U32 lengthEncoding;
+            U32 scopeLen = 0;
+            U32 lengthEncoding = 0;
             
             current++;
             parsePackageLength(current, &scopeLen, &lengthEncoding);

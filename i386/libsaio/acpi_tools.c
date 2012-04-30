@@ -90,54 +90,70 @@ U32 FindAcpiTables(ACPI_TABLES * acpi_tables)
     if (!success)
         success = GetRsdtPointer((void *)0x0F0000, 0x10000, acpi_tables);
 	
-    if (!success)
+    if (!success || (acpi_tables->RsdtPointer == 0ul))
         return (0ul);
     
-    GetXsdtPointer(acpi_tables);
+    success = GetXsdtPointer(acpi_tables);
     
     // Find FACP table pointer which is one of table pointers in the RDST
     acpi_tables->FacpPointer = (ACPI_TABLE_FADT *)
     GetTablePtr(acpi_tables->RsdtPointer, NAMESEG("FACP"));
     if (acpi_tables->FacpPointer == 0ul)
-        return (0ul);
-    
-    // Find FACP(64) table pointer which is one of table pointers in the XDST
-    acpi_tables->FacpPointer64 = (ACPI_TABLE_FADT *)
-    GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("FACP"));
+        return (0ul);    
     
     // Find the DSDT which is included in the FACP table
     acpi_tables->DsdtPointer = (ACPI_TABLE_DSDT *) acpi_tables->FacpPointer->Dsdt;
-    if ((*(U32 *) (acpi_tables->DsdtPointer->Header.Signature) != NAMESEG("DSDT")) ||
+    if ((acpi_tables->DsdtPointer == 0ul) || (*(U32 *) (acpi_tables->DsdtPointer->Header.Signature) != NAMESEG("DSDT")) ||
         (GetChecksum(acpi_tables->DsdtPointer, acpi_tables->DsdtPointer->Header.Length) != 0))
-        return (0ul);
-    
-	{
-		// Find the XDSDT which is included in the FACP(64) table
-		ACPI_TABLE_DSDT *DsdtPointer64 = (ACPI_TABLE_DSDT *)((U32)acpi_tables->FacpPointer64->XDsdt);
-		if ((*(U32*) (DsdtPointer64->Header.Signature) == NAMESEG("DSDT")) &&
-			(GetChecksum(DsdtPointer64, DsdtPointer64->Header.Length) == 0))
-			acpi_tables->DsdtPointer64 = (ACPI_TABLE_DSDT *) DsdtPointer64;
-	}    
+        return (0ul);   
     
     // Find the FACS which is included in the FACP table
     acpi_tables->FacsPointer = (ACPI_TABLE_FACS *) acpi_tables->FacpPointer->Facs;
-    if (*(U32 *) (acpi_tables->FacsPointer->Signature) != NAMESEG("FACS"))
+    if ((acpi_tables->FacsPointer == 0ul) || (*(U32 *) (acpi_tables->FacsPointer->Signature) != NAMESEG("FACS")))
         return (0ul);
     
-	{
-		// Find the XFACS which is included in the FACP(64) table
-		ACPI_TABLE_FACS *FacsPointer64 = (ACPI_TABLE_FACS *)((U32)acpi_tables->FacpPointer64->XFacs);
-		if (*(U32*) (FacsPointer64->Signature) == NAMESEG("FACS"))
-			acpi_tables->FacsPointer64 = (ACPI_TABLE_FACS *) FacsPointer64;
-	}    
-	
     // Find the MADT table which is one of the table pointers in the RSDT
     acpi_tables->MadtPointer = (ACPI_TABLE_MADT *) GetTablePtr(acpi_tables->RsdtPointer, NAMESEG("APIC"));
     if (acpi_tables->MadtPointer == 0ul)
         return (0ul);
+    
+    do {
+        
+        if (!success || (acpi_tables->XsdtPointer == 0ul))
+            break;
+        
+        // Find FACP(64) table pointer which is one of table pointers in the XDST
+        acpi_tables->FacpPointer64 = (ACPI_TABLE_FADT *)
+        GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("FACP"));
+        
+        if (acpi_tables->FacpPointer64 == 0ul)
+            break;
+        
+		// Find the XDSDT which is included in the FACP(64) table
+		ACPI_TABLE_DSDT *DsdtPointer64 = (ACPI_TABLE_DSDT *)((U32)acpi_tables->FacpPointer64->XDsdt);
+        
+        if (DsdtPointer64 == 0ul)
+            break;
+        
+		if ((*(U32*) (DsdtPointer64->Header.Signature) == NAMESEG("DSDT")) &&
+			(GetChecksum(DsdtPointer64, DsdtPointer64->Header.Length) == 0))
+			acpi_tables->DsdtPointer64 = (ACPI_TABLE_DSDT *) DsdtPointer64;
+        
+        // Find the XFACS which is included in the FACP(64) table
+		ACPI_TABLE_FACS *FacsPointer64 = (ACPI_TABLE_FACS *)((U32)acpi_tables->FacpPointer64->XFacs);
+        
+        if (FacsPointer64 == 0ul)
+            break;
+        
+		if (*(U32*) (FacsPointer64->Signature) == NAMESEG("FACS"))
+			acpi_tables->FacsPointer64 = (ACPI_TABLE_FACS *) FacsPointer64;
+        
+        
+        // Find the MADT(64) table which is one of the table pointers in the XSDT
+        acpi_tables->MadtPointer64 = (ACPI_TABLE_MADT *) GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("APIC"));
+        
+    } while (0);	
 	
-	// Find the MADT(64) table which is one of the table pointers in the XSDT
-    acpi_tables->MadtPointer64 = (ACPI_TABLE_MADT *) GetTablePtr64(acpi_tables->XsdtPointer, NAMESEG("APIC"));
 	
     return (1ul);
 }

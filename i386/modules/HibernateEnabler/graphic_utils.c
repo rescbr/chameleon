@@ -434,6 +434,8 @@ setVESATextMode( unsigned short cols,
 				unsigned char  bitsPerPixel )
 {
     VBEModeInfoBlock  minfo;
+	minfo.XResolution = 0;
+    minfo.YResolution = 0;
     unsigned short    mode = modeEndOfList;
 	
     if ( (cols != 80) || (rows != 25) )  // not 80x25 mode

@@ -74,6 +74,10 @@ static char sccsid[] = "@(#)strtol.c	5.4 (Berkeley) 2/23/91";
 #include "libsa.h"
 #include <limits.h>
 
+#ifndef UQUAD_MAX
+#define UQUAD_MAX     0xffffffffffffffffUL    
+#endif
+
 /*
  * Convert a string to a long integer.
  *

@@ -181,7 +181,7 @@ static void init_pic(void)
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     
-	outb(0x70, inb(0x70)|0x80); /* Disable NMI */  
+	//outb(0x70, inb(0x70)|0x80); /* Disable NMI */ is this really necessary ? 
 	
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
 	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
@@ -960,7 +960,7 @@ void getKernelCachePath(void)
 					free(platformInfo);	
 				}
 				
-				DBG("Adler32: %08lX\n",bootInfo->adler32);
+				DBG("Adler32: %08lX\n",Adler32);
 				
 				if (gBootVolume->OSVersion[3] < '6')
 				{

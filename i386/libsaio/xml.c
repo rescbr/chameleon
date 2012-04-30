@@ -148,7 +148,7 @@ int XMLTagCount( TagPtr dict )
 			&& (dict->type != kTagTypeArray)	// If we are an array, any element is valid
 			) continue;
 		
-		if(tag->type == kTagTypeKey) printf("Located key %s\n", tag->string);
+		//if(tag->type == kTagTypeKey) printf("Located key %s\n", tag->string);
         
 		count++;
     }
@@ -443,6 +443,8 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			int integer = (int)GetRefString(id);
 			
 			TagPtr tmpTag = NewTag();
+            if (tmpTag == 0) return -1;
+			
 			tmpTag->type = kTagTypeInteger;
 			tmpTag->string = (char*) integer;
 			tmpTag->tag = 0;
@@ -652,10 +654,12 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 {
     long   length, integer;
 	bool negative = false;
-    TagPtr tmpTag = 0;
+    TagPtr tmpTag;
 	char* val = buffer;
     int size;
 	
+    tmpTag = NewTag();
+    if (tmpTag == 0) return -1;
 	
 	if(buffer[0] == '<') 
 	{
@@ -674,10 +678,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 	
     size = length = FixDataMatchingTag(buffer, kXMLTagInteger);
     if (length == -1) return -1;
-    
-    tmpTag = NewTag();
-    if (tmpTag == 0) return -1;
-    
+	
     integer = 0;
     
 	if(size > 1 && (val[1] == 'x' || val[1] == 'X'))	// Hex value

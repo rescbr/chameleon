@@ -23,11 +23,11 @@
 
 /* sys.c */
 /*
-extern int    open_bvdev(const char *bvd, const char *path);
-extern int    close(int fdesc);
-extern int    file_size(int fdesc);
-extern int    read(int fdesc, char *buf, int count);
-*/
+ extern int    open_bvdev(const char *bvd, const char *path);
+ extern int    close(int fdesc);
+ extern int    file_size(int fdesc);
+ extern int    read(int fdesc, char *buf, int count);
+ */
 
 /*************************************************************************************************/
 
@@ -132,10 +132,12 @@ void *png_alloc_realloc(void *addr, size_t size)
 
 void png_alloc_free(void *addr)
 {
+    if (!addr) return;
+    
 	png_alloc_node_t *node = png_alloc_find_node(addr);
-	if (!node)
-		return;
-	png_alloc_remove_node(node);
+	if (node)
+        png_alloc_remove_node(node);
+    
 	free(addr);
 }
 
@@ -284,13 +286,13 @@ vector8_t *vector8_copy(vector8_t *p)
 /*************************************************************************************************/
 
 const uint32_t LENBASE[29] = { 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51,
-		59, 67, 83, 99, 115, 131, 163, 195, 227, 258 };
+	59, 67, 83, 99, 115, 131, 163, 195, 227, 258 };
 const uint32_t LENEXTRA[29] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4,
-		4, 5, 5, 5, 5, 0 };
+	4, 5, 5, 5, 5, 0 };
 const uint32_t DISTBASE[30] = { 1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385,
-		513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577 };
+	513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577 };
 const uint32_t DISTEXTRA[30] = { 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9,
-		10, 10, 11, 11, 12, 12, 13, 13 };
+	10, 10, 11, 11, 12, 12, 13, 13 };
 // code length code lengths
 const uint32_t CLCL[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
@@ -339,7 +341,7 @@ int HuffmanTree_makeFromLengths(HuffmanTree *tree, const vector32_t *bitlen, uin
 	blcount = vector32_new(maxbitlen + 1, 0);
 	nextcode = vector32_new(maxbitlen + 1, 0);
     if (!tree1d || !blcount || !nextcode || !nextcode->data) {
-        return 1; // FIXME
+        goto error;
     }
 	for (bits = 0; bits < numcodes; bits++)
 		blcount->data[bitlen->data[bits]]++; // count number of instances of each code length
@@ -368,15 +370,29 @@ int HuffmanTree_makeFromLengths(HuffmanTree *tree, const vector32_t *bitlen, uin
 				treepos = tree2d->data[2 * treepos + bit] - numcodes;
 		}
 	return 0;
+error:
+    if (tree1d) {
+        vector32_cleanup(tree1d);
+        png_alloc_free(tree1d);
+    }
+    if (blcount) {
+        vector32_cleanup(blcount);
+        png_alloc_free(blcount);
+    }
+    if (nextcode) {
+        vector32_cleanup(nextcode);
+        png_alloc_free(nextcode);
+    }    
+    return 1;
 }
 
 int HuffmanTree_decode(const HuffmanTree *tree, bool *decoded, uint32_t *result, size_t *treepos,
-		uint32_t bit)
+					   uint32_t bit)
 {	// Decodes a symbol from the tree
 	const vector32_t *tree2d = tree->tree2d;
     if (!tree2d) {
         return 1; // FIXME
-
+		
     }
 	uint32_t numcodes = (uint32_t) tree2d->size / 2;
 	if (*treepos >= numcodes)
@@ -432,7 +448,7 @@ void Inflator_generateFixedTrees(HuffmanTree *tree, HuffmanTree *treeD)
 }
 
 uint32_t Inflator_huffmanDecodeSymbol(const uint8_t *in, size_t *bp, const HuffmanTree *codetree,
-		size_t inlength)
+									  size_t inlength)
 {	// decode a single symbol from given list of bits with given code tree. returns the symbol
 	bool decoded = false;
 	uint32_t ct = 0;
@@ -443,7 +459,7 @@ uint32_t Inflator_huffmanDecodeSymbol(const uint8_t *in, size_t *bp, const Huffm
 			return 0;
 		}
 		Inflator_error = HuffmanTree_decode(codetree, &decoded, &ct, &treepos,
-				Zlib_readBitFromStream(bp, in));
+											Zlib_readBitFromStream(bp, in));
 		if (Inflator_error)
 			return 0; // stop, an error happened
 		if (decoded)
@@ -452,7 +468,7 @@ uint32_t Inflator_huffmanDecodeSymbol(const uint8_t *in, size_t *bp, const Huffm
 }
 
 void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const uint8_t *in,
-		size_t *bp, size_t inlength)
+									size_t *bp, size_t inlength)
 {	// get the tree of a deflated block with dynamic tree, the tree itself is also Huffman
 	// compressed with a known tree
 	size_t i, n;
@@ -560,7 +576,7 @@ void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const
 }
 
 void Inflator_inflateHuffmanBlock(vector8_t *out, const uint8_t *in, size_t *bp, size_t *pos,
-		size_t inlength, uint32_t btype)
+								  size_t inlength, uint32_t btype)
 {
 	HuffmanTree *codetree, *codetreeD; // the code tree for Huffman codes, dist codes
 	codetree = HuffmanTree_new();
@@ -627,7 +643,7 @@ void Inflator_inflateHuffmanBlock(vector8_t *out, const uint8_t *in, size_t *bp,
 }
 
 void Inflator_inflateNoCompression(vector8_t *out, const uint8_t *in, size_t *bp, size_t *pos,
-		size_t inlength)
+								   size_t inlength)
 {
 	while ((*bp & 0x7) != 0)
 		(*bp)++; // go to first boundary of byte
@@ -838,7 +854,7 @@ int PNG_paethPredictor(int a, int b, int c) // Paeth predicter, used by PNG filt
 }
 
 void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t *precon,
-		size_t bytewidth, uint32_t filterType, size_t length)
+						  size_t bytewidth, uint32_t filterType, size_t length)
 {
 	size_t i;
     if (!recon) {
@@ -846,38 +862,38 @@ void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t
         return;
     }
 	switch (filterType) {
-	case 0:
-		for (i = 0; i < length; i++)
-			recon[i] = scanline[i];
-		break;
-	case 1:
-		for (i = 0; i < bytewidth; i++)
-			recon[i] = scanline[i];
-		for (i = bytewidth; i < length; i++)
-			recon[i] = scanline[i] + recon[i - bytewidth];
-		break;
-	case 2:
-		if (precon)
-			for (i = 0; i < length; i++)
-				recon[i] = scanline[i] + precon[i];
-		else
+		case 0:
 			for (i = 0; i < length; i++)
 				recon[i] = scanline[i];
-		break;
-	case 3:
-		if (precon) {
-			for (i = 0; i < bytewidth; i++)
-				recon[i] = scanline[i] + precon[i] / 2;
-			for (i = bytewidth; i < length; i++)
-				recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) / 2);
-		} else {
+			break;
+		case 1:
 			for (i = 0; i < bytewidth; i++)
 				recon[i] = scanline[i];
 			for (i = bytewidth; i < length; i++)
-				recon[i] = scanline[i] + recon[i - bytewidth] / 2;
-		}
-		break;
-	case 4:             
+				recon[i] = scanline[i] + recon[i - bytewidth];
+			break;
+		case 2:
+			if (precon)
+				for (i = 0; i < length; i++)
+					recon[i] = scanline[i] + precon[i];
+			else
+				for (i = 0; i < length; i++)
+					recon[i] = scanline[i];
+			break;
+		case 3:
+			if (precon) {
+				for (i = 0; i < bytewidth; i++)
+					recon[i] = scanline[i] + precon[i] / 2;
+				for (i = bytewidth; i < length; i++)
+					recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) / 2);
+			} else {
+				for (i = 0; i < bytewidth; i++)
+					recon[i] = scanline[i];
+				for (i = bytewidth; i < length; i++)
+					recon[i] = scanline[i] + recon[i - bytewidth] / 2;
+			}
+			break;
+		case 4:             
             if (precon) {
                 for (i = 0; i < bytewidth; i++)
                     recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(0, precon[i], 0));
@@ -890,16 +906,16 @@ void PNG_unFilterScanline(uint8_t *recon, const uint8_t *scanline, const uint8_t
                 for (i = bytewidth; i < length; i++)
                     recon[i] = (uint8_t) (scanline[i] + PNG_paethPredictor(recon[i - bytewidth], 0, 0));
             }
-		break;
-	default:
-		PNG_error = 36; // error: nonexistent filter type given
-		return;
+			break;
+		default:
+			PNG_error = 36; // error: nonexistent filter type given
+			return;
 	}
 }
 
 void PNG_adam7Pass(uint8_t *out, uint8_t *linen, uint8_t *lineo, const uint8_t *in, uint32_t w,
-		size_t passleft, size_t passtop, size_t spacex, size_t spacey, size_t passw, size_t passh,
-		uint32_t bpp)
+				   size_t passleft, size_t passtop, size_t spacex, size_t spacey, size_t passw, size_t passh,
+				   uint32_t bpp)
 {	// filter and reposition the pixels into the output when the image is Adam7 interlaced. This
 	// function can only do it after the full image is already decoded. The out buffer must have
 	// the correct allocated memory size already.
@@ -911,14 +927,14 @@ void PNG_adam7Pass(uint8_t *out, uint8_t *linen, uint8_t *lineo, const uint8_t *
 		size_t i, b;
 		uint8_t filterType = in[y * linelength], *prevline = (y == 0) ? 0 : lineo;
 		PNG_unFilterScanline(linen, &in[y * linelength + 1], prevline, bytewidth, filterType,
-				(w * bpp + 7) / 8);
+							 (w * bpp + 7) / 8);
 		if (PNG_error)
 			return;
 		if (bpp >= 8)
 			for (i = 0; i < passw; i++)
 				for (b = 0; b < bytewidth; b++) // b = current byte of this pixel
 					out[bytewidth * w * (passtop + spacey * y) + bytewidth *
-							(passleft + spacex * i) + b] = linen[bytewidth * i + b];
+						(passleft + spacex * i) + b] = linen[bytewidth * i + b];
 		else
 			for (i = 0; i < passw; i++) {
 				size_t obp, bp;
@@ -945,7 +961,7 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
         return 1; // FIXME : find the appropiate error return
     }
     uint8_t *out_data = out->data ;
-
+	
 	if (bitDepth == 8 && colorType == 0) // greyscale
 		for (i = 0; i < numpixels; i++) {
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[i];
@@ -956,7 +972,7 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 			for (c = 0; c < 3; c++)
 				out_data[4 * i + c] = in[3 * i + c];
 			out_data[4 * i + 3] = (info->key_defined && (in[3 * i + 0] == info->key_r) &&
-					(in[3 * i + 1] == info->key_g) && (in[3 * i + 2] == info->key_b)) ? 0 : 255;
+								   (in[3 * i + 1] == info->key_g) && (in[3 * i + 2] == info->key_b)) ? 0 : 255;
 		}
 	else if (bitDepth == 8 && colorType == 3) // indexed color (palette)
 		for (i = 0; i < numpixels; i++) {
@@ -978,16 +994,16 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 		for (i = 0; i < numpixels; i++) {
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[2 * i];
 			out_data[4 * i + 3] = (info->key_defined && (256U * in[i] + in[i + 1] == info->key_r))
-					? 0 : 255;
+			? 0 : 255;
 		}
 	else if (bitDepth == 16 && colorType == 2) // RGB color
 		for (i = 0; i < numpixels; i++) {
 			for (c = 0; c < 3; c++)
 				out_data[4 * i + c] = in[6 * i + 2 * c];
 			out_data[4 * i + 3] = (info->key_defined &&
-					(256U * in[6 * i + 0] + in[6 * i + 1] == info->key_r) &&
-					(256U * in[6 * i + 2] + in[6 * i + 3] == info->key_g) &&
-					(256U * in[6 * i + 4] + in[6 * i + 5] == info->key_b)) ? 0 : 255;
+								   (256U * in[6 * i + 0] + in[6 * i + 1] == info->key_r) &&
+								   (256U * in[6 * i + 2] + in[6 * i + 3] == info->key_g) &&
+								   (256U * in[6 * i + 4] + in[6 * i + 5] == info->key_b)) ? 0 : 255;
 		}
 	else if (bitDepth == 16 && colorType == 4) // greyscale with alpha
 		for (i = 0; i < numpixels; i++) {
@@ -1001,10 +1017,10 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 	else if (bitDepth < 8 && colorType == 0) // greyscale
 		for (i = 0; i < numpixels; i++) {
 			uint32_t value = (PNG_readBitsFromReversedStream(&bp, in, bitDepth) * 255) /
-					((1 << bitDepth) - 1); // scale value from 0 to 255
+			((1 << bitDepth) - 1); // scale value from 0 to 255
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = (uint8_t) value;
 			out_data[4 * i + 3] = (info->key_defined && value &&
-					(((1U << bitDepth) - 1U) == info->key_r) && ((1U << bitDepth) - 1U)) ? 0 : 255;
+								   (((1U << bitDepth) - 1U) == info->key_r) && ((1U << bitDepth) - 1U)) ? 0 : 255;
 		}
 	else if (bitDepth < 8 && colorType == 3) // palette
 		for (i = 0; i < numpixels; i++) {
@@ -1078,6 +1094,12 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				vector8_resize(idat, offset + chunkLength);
 			} else
 				idat = vector8_new(chunkLength, 0);
+            
+            if (!idat)
+            {
+                PNG_error = 1;
+                return NULL;
+            }
 			for (i = 0; i < chunkLength; i++)
 				idat->data[offset + i] = in[pos + 4 + i];
 			pos += (4 + chunkLength);
@@ -1142,6 +1164,11 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 	uint32_t bpp = PNG_getBpp(info);
 	vector8_t *scanlines; // now the out buffer will be filled
 	scanlines = vector8_new(((info->width * (info->height * bpp + 7)) / 8) + info->height, 0);
+    if (!scanlines)
+    {
+        PNG_error = 1;
+		return NULL;
+    }
 	PNG_error = Zlib_decompress(scanlines, idat);
 	if (PNG_error)
 		return NULL; // stop if the zlib decompressor returned an error
@@ -1160,27 +1187,27 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				const uint8_t *prevline;
 				prevline = (y == 0) ? 0 : &out_data[(y - 1) * info->width * bytewidth];
 				PNG_unFilterScanline(&out_data[linestart - y], &scanlines->data[linestart + 1],
-						prevline, bytewidth, filterType, linelength);
+									 prevline, bytewidth, filterType, linelength);
 				if (PNG_error)
 					return NULL;
 				linestart += (1 + linelength); // go to start of next scanline
-		} else { // less than 8 bits per pixel, so fill it up bit per bit
-			vector8_t *templine; // only used if bpp < 8
-			templine = vector8_new((info->width * bpp + 7) >> 3, 0);
-			for (y = 0, obp = 0; y < info->height; y++) {
-				uint32_t filterType = scanlines->data[linestart];
-				const uint8_t *prevline;
-				prevline = (y == 0) ? 0 : &out_data[(y - 1) * info->width * bytewidth];
-				PNG_unFilterScanline(templine->data, &scanlines->data[linestart + 1], prevline,
-						bytewidth, filterType, linelength);
-				if (PNG_error)
-					return NULL;
-				for (bp = 0; bp < info->width * bpp;)
-					PNG_setBitOfReversedStream(&obp, out_data, PNG_readBitFromReversedStream(&bp,
-							templine->data));
-				linestart += (1 + linelength); // go to start of next scanline
+			} else { // less than 8 bits per pixel, so fill it up bit per bit
+				vector8_t *templine; // only used if bpp < 8
+				templine = vector8_new((info->width * bpp + 7) >> 3, 0);
+				for (y = 0, obp = 0; y < info->height; y++) {
+					uint32_t filterType = scanlines->data[linestart];
+					const uint8_t *prevline;
+					prevline = (y == 0) ? 0 : &out_data[(y - 1) * info->width * bytewidth];
+					PNG_unFilterScanline(templine->data, &scanlines->data[linestart + 1], prevline,
+										 bytewidth, filterType, linelength);
+					if (PNG_error)
+						return NULL;
+					for (bp = 0; bp < info->width * bpp;)
+						PNG_setBitOfReversedStream(&obp, out_data, PNG_readBitFromReversedStream(&bp,
+																								 templine->data));
+					linestart += (1 + linelength); // go to start of next scanline
+				}
 			}
-		}
 	} else { // interlaceMethod is 1 (Adam7)
 		int i;
 		size_t passw[7] = {
@@ -1195,7 +1222,7 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 		};
 		size_t passstart[7] = { 0 };
 		size_t pattern[28] = { 0, 4, 0, 2, 0, 1, 0, 0, 0, 4, 0, 2, 0, 1, 8, 8, 4, 4, 2, 2, 1, 8, 8,
-				8, 4, 4, 2, 2 }; // values for the adam7 passes
+			8, 4, 4, 2, 2 }; // values for the adam7 passes
 		for (i = 0; i < 6; i++)
 			passstart[i + 1] = passstart[i] + passh[i] * ((passw[i] ? 1 : 0) + (passw[i] * bpp + 7) / 8);
 		vector8_t *scanlineo, *scanlinen; // "old" and "new" scanline
@@ -1203,8 +1230,8 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 		scanlinen = vector8_new((info->width * bpp + 7) / 8, 0);
 		for (i = 0; i < 7; i++)
 			PNG_adam7Pass(out_data, scanlinen->data, scanlineo->data, &scanlines->data[passstart[i]],
-					info->width, pattern[i], pattern[i + 7], pattern[i + 14], pattern[i + 21],
-					passw[i], passh[i], bpp);
+						  info->width, pattern[i], pattern[i + 7], pattern[i + 14], pattern[i + 21],
+						  passw[i], passh[i], bpp);
 	}
 	if (info->colorType != 6 || info->bitDepth != 8) { // conversion needed
 #if 1
@@ -1237,7 +1264,7 @@ int main(int argc, char **argv)
 	FILE *infp, *outfp;
 	uint8_t *inbuf;
 	uint32_t n;
-
+	
 	if (stat(fname, &statbuf) != 0) {
 		perror("stat");
 		return 1;
@@ -1256,20 +1283,20 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	fclose(infp);
-
+	
 	printf("input file: %s (size: %d)\n", fname, insize);
-
+	
 	info = PNG_decode(inbuf, insize);
 	free(inbuf);
 	printf("PNG_error: %d\n", PNG_error);
 	if (PNG_error != 0)
 		return 1;
-
+	
 	printf("width: %d, height: %d\nfirst 16 bytes: ", info->width, info->height);
 	for (n = 0; n < 16; n++)
 		printf("%02x ", info->image->data[n]);
 	printf("\n");
-
+	
 	outsize = info->width * info->height * 4;
 	printf("image size: %d\n", outsize);
 	if (outsize != info->image->size) {
@@ -1285,14 +1312,14 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	fclose(outfp);
-
+	
 #ifdef ALLOC_DEBUG
 	png_alloc_node_t *node;
 	for (node = png_alloc_head, n = 1; node; node = node->next, n++)
 		printf("node %d (%p) addr = %p, size = %ld\n", n, node, node->addr, node->size);
 #endif
 	png_alloc_free_all(); // also frees info and image data from PNG_decode
-
+	
 	return 0;
 }
 

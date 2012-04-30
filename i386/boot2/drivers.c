@@ -434,7 +434,7 @@ long
 LoadDriverPList( char * dirSpec, char * name, long bundleType )
 {
     long      length, executablePathLength, bundlePathLength;
-    ModulePtr module;
+    ModulePtr module = 0;
     TagPtr    personalities;
     char *    buffer = 0;
     char *    tmpExecutablePath = 0;
@@ -480,6 +480,8 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         ret = ParseXML(buffer, &module, &personalities);
         if (ret != 0) { break; }
 		
+		if (!module) {ret = -1;break;} // Should never happen but it will make the compiler happy
+
         // Allocate memory for the driver path and the plist.
 		
         module->executablePath = tmpExecutablePath;
@@ -490,13 +492,14 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
         {
             if ( module->plistAddr ) free(module->plistAddr);
+			ret = -1;
             break;
         }
 		
         // Save the driver path in the module.
         //strcpy(module->driverPath, tmpDriverPath);
-        tmpExecutablePath = 0;
-        tmpBundlePath = 0;
+        //tmpExecutablePath = 0;
+        //tmpBundlePath = 0;
 		
         // Add the plist to the module.
 		
@@ -530,9 +533,12 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
     while (0);
     
     if ( buffer )        free( buffer );
-    if ( tmpExecutablePath ) free( tmpExecutablePath );
-    if ( tmpBundlePath ) free( tmpBundlePath );
-	
+    if (ret != 0)
+    {
+        if ( tmpExecutablePath ) free( tmpExecutablePath );
+        if ( tmpBundlePath ) free( tmpBundlePath );
+        if ( module )        free( module );
+    }	
     return ret;
 }
 

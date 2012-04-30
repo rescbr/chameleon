@@ -296,6 +296,8 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // because we're stuck in extended memory at this point.
     struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);	
 
+	if (mi_p == NULL) 
+        return BAD_BOOT_DEVICE;
 #if 0	
     /*
      * cparm: I'm not an asm guru but i don't see what's the use of this part of code, moreover some 

@@ -612,7 +612,7 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
                 (*bvr->bv_free)(bvr);
                 bvr = NULL;
             }
-            if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+            if ( bvr && readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
             {
             	bvr->flags |= kBVFlagBootable;
             }
@@ -771,7 +771,7 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                 (*bvr->bv_free)(bvr);
                 bvr = NULL;
             }
-            if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+            if ( bvr && readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
             {
             	bvr->flags |= kBVFlagBootable;
             }

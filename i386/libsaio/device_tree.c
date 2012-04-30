@@ -320,7 +320,7 @@ DT__GetName(Node *node)
 Node *
 DT__FindNode(const char *path, bool createIfMissing)
 {
-    Node *node, *child;
+    Node *node, *child = 0;
     DTPropertyNameBuf nameBuf;
     char *bp;
     int i;
@@ -352,11 +352,14 @@ DT__FindNode(const char *path, bool createIfMissing)
         }
         if (child == 0 && createIfMissing) {
             DPRINTF("Creating node\n");
-            char *str = malloc(strlen(nameBuf) + 1);
+            //char *str = malloc(strlen(nameBuf) + 1);
             // XXX this will leak
-            strcpy(str, nameBuf);
+            //strcpy(str, nameBuf);
             
-            child = DT__AddChild(node, str);
+            const char *str = newString(nameBuf);
+            if (str) {
+                child = DT__AddChild(node, str);
+            }
         }
         node = child;
     }

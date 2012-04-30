@@ -64,13 +64,25 @@ extern string_ref* ref_strings;
 #define kXMLStringIDRef "IDREF="
 
 
-#define kPropCFBundleIdentifier ("CFBundleIdentifier")
-#define kPropCFBundleExecutable ("CFBundleExecutable")
-#define kPropOSBundleRequired   ("OSBundleRequired")
-#define kPropOSBundleLibraries  ("OSBundleLibraries")
-#define kPropIOKitPersonalities ("IOKitPersonalities")
-#define kPropIONameMatch        ("IONameMatch")
+#define kPropCFBundleIdentifier         ("CFBundleIdentifier")
+#define kPropCFBundleExecutable         ("CFBundleExecutable")
+#define kPropOSBundleRequired           ("OSBundleRequired")
+#define kPropOSBundleLibraries          ("OSBundleLibraries")
+#define kPropOSBundlePriority           ("OSBundlePriority")
+#define kPropOSBundleEnabled            ("OSBundleEnabled")
+#define kPropIOKitPersonalities         ("IOKitPersonalities")
+#define kPropIONameMatch                ("IONameMatch")
+#define kPropCFBundleGetInfoString      ("CFBundleGetInfoString")
 
+#define kPropNSHumanReadableCopyright   ("NSHumanReadableCopyright")
+#define kPropCFBundleShortVersionString ("CFBundleShortVersionString")
+#define kPropCFBundleIconFile           ("CFBundleIconFile")
+#define kPropCFBundleVersion            ("CFBundleVersion")
+#define kPropCFBundlePackageType        ("CFBundlePackageType")
+#define kPropCFBundleName               ("CFBundleName")
+#define kPropNSPrincipalClass           ("NSPrincipalClass")
+#define kPropIOClass                    ("IOClass")
+#define kPropIOProviderClass            ("IOProviderClass")
 
 #define DEFAULT_BOOT_CONFIG_DICT      (TagPtr)0
 #define DEFAULT_SYSTEM_CONFIG_DICT    (TagPtr)1

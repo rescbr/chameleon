@@ -78,8 +78,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size);
 
 EFI_STATUS load_module(char* module);
-EFI_STATUS load_bundle(const char* bundle);
-VOID load_all_bundles(void);
 
 EFI_STATUS is_module_loaded(const char* name);
 VOID module_loaded(const char* name);
@@ -100,5 +98,16 @@ EFI_STATUS replace_system_function(const char* symbol, void* newAddress);
 EFI_STATUS replace_function_any(const char* symbol, void* newAddress);
 
 extern unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*));
+
+
+long InitBundleSupport(void);
+long FileLoadBundles(char *dirSpec, long plugin);
+long LoadBundlePList(char *dirSpec, char *name, long bundleType);
+long LoadMatchedBundles(void);
+long MatchBundlesLibraries(void);
+long LoadBundles( char * dirSpec );
+void * GetBundleDict( char * bundle_id );
+void * GetBundlePersonalities( char * bundle_id );
+char * GetBundlePath( char * bundle_id );
 
 #endif /* __BOOT_MODULES_H */

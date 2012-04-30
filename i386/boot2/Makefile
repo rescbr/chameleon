@@ -76,7 +76,7 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(LD)   -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) 		
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) #-e boot2		
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
 	
@@ -134,7 +134,7 @@ Symbols.dylib: Symbols.o
 
 	@##size $(SYMROOT)/${SYMBOLS_MODULE} 
 
-Symbols.o:
+Symbols.o: Symbols.plist
 	@rm -rf $(SYMROOT)/Symbols.h
 	@echo "typedef struct {" >> $(SYMROOT)/Symbols.h
 	@echo "	char*	symbol;" >> $(SYMROOT)/Symbols.h
@@ -150,6 +150,20 @@ Symbols.o:
 	@echo "\t[CC] $@"
 	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(UTILDIR)/Symbols.c $(INC) -o $(OBJROOT)/Symbols.o 
 
+Symbols.plist: 
+	@rm -rf $(SYMROOT)/Symbols.plist
+	@echo "<?xml version="1.0" encoding="UTF-8"?>" >> $(SYMROOT)/Symbols.plist
+	@echo "<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"> " >> $(SYMROOT)/Symbols.plist
+	@echo "<plist version="1.0">" >> $(SYMROOT)/Symbols.plist
+	@echo "<dict>" >> $(SYMROOT)/Symbols.plist 
+	@echo "<key>IOKitPersonalities</key>" >> $(SYMROOT)/Symbols.plist
+	@echo "<dict>" >> $(SYMROOT)/Symbols.plist
+	@nm -g $(SYMROOT)/boot.sys | tr . _ | awk '{print "<key>"$$3"</key><string>"$$1"</string>"}' >> $(SYMROOT)/Symbols.plist
+	@echo "</dict>" >> $(SYMROOT)/Symbols.plist
+	@echo "</dict>" >> $(SYMROOT)/Symbols.plist
+	@echo "</plist>" >> $(SYMROOT)/Symbols.plist
+	@plutil -convert xml1 $(SYMROOT)/Symbols.plist 
+    
 
 install_i386:: all $(INSTALLDIR)
 	cp $(SYMROOT)/boot $(OTHER_FILES) $(INSTALLDIR)
