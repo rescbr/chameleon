@@ -1331,7 +1331,8 @@ static char *get_nvidia_model(uint32_t id)
 {
 	int i;
 	
-	for (i = 1; i < (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++) {
+	for (i = 1; i < (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++)
+	{
 		if (NVKnownChipsets[i].device == id)
 		{
 			return NVKnownChipsets[i].name;
@@ -1503,9 +1504,10 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	videoRam = mem_detect(regs, nvCardType, nvda_dev);
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
-	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s device number: %d\n",
+	verbose("nVidia %s %dMB NV%02x [%04x:%04x] (subsys [%04x:%04x]) :: %s device number: %d\n",
 			model, (uint32_t)(videoRam / 1024 / 1024),
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
+			nvda_dev->subsys_id.subsys.vendor_id, nvda_dev->subsys_id.subsys.device_id,
 			devicepath, devices_number);
 	
 	rom = malloc(NVIDIA_ROM_SIZE);

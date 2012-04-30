@@ -246,6 +246,8 @@ SMBValueSetter SMBSetters[] =
 
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, assetTag),		NULL,	NULL,	NULL},
 
+	{kSMBTypeMemoryDevice,	kSMBWord,	getFieldOffset(SMBMemoryDevice, errorHandle),   NULL,   getSMBMemoryDeviceMemoryErrorHandle,    NULL},
+
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, partNumber),	kSMBMemoryDevicePartNumberKey,		
 		getSMBMemoryDevicePartNumber,	NULL},
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.1svn-r1870\n"
 "POT-Creation-Date: 2012-03-06 22:38+0000\n"
-"PO-Revision-Date: 2012-04-18 09:55+0200\n"
+"PO-Revision-Date: 2012-04-28 21:53+0200\n"
 "Last-Translator: martin63 <martin.badin@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
@@ -939,7 +939,7 @@ msgstr "NÄ›meckÃ½ Mac klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:215
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro nÄ›meckou klÃ¡vesnici Mac"
 
 #. type: "mac-es_title"
 #: Resources/templates/Localizable.strings:217
@@ -951,7 +951,7 @@ msgstr "Å panÄ›lskÃ¡ Mac klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:218
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro Å¡panÄ›lskou klÃ¡vesnici Mac"
 
 #. type: "mac-fr_title"
 #: Resources/templates/Localizable.strings:220
@@ -963,7 +963,7 @@ msgstr "Francouzsky Mac klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:221
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro francouzskou klÃ¡vesnici Mac"
 
 #. type: "mac-it_title"
 #: Resources/templates/Localizable.strings:223
@@ -975,7 +975,7 @@ msgstr "ItalskÃ¡ Mac klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:224
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro italskou klÃ¡vesnici Mac"
 
 #. type: "mac-se_title"
 #: Resources/templates/Localizable.strings:226
@@ -987,7 +987,7 @@ msgstr "Å vÃ©dskÃ¡ Mac klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:227
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro Å¡vÃ©dskou klÃ¡vesnici Mac"
 
 #. type: "pc-fr_title"
 #: Resources/templates/Localizable.strings:229
@@ -999,7 +999,7 @@ msgstr "Francouzsky PC klÃ¡vesnice"
 #: Resources/templates/Localizable.strings:230
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
-msgstr ""
+msgstr "PouÅ¾itÃ­ rozloÅ¾enÃ­ klÃ¡vesnice pro francouzskou klÃ¡vesnici Mac"
 
 #. type: "Embed_title"
 #: Resources/templates/Localizable.strings:236

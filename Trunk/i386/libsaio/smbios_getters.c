@@ -230,6 +230,12 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 //	return true;
 }
 
+bool getSMBMemoryDeviceMemoryErrorHandle(returnType *value)
+{
+    value->word = 0xFFFF;
+    return true;
+}
+
 bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 {
 	static int idx = -1;

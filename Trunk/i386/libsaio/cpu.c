@@ -359,10 +359,10 @@ void scan_cpu(PlatformInfo_t *p)
 	if ( tscFrequency < 1000 )//TEST
 	{
 	tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
-	DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
+	// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
 	}
 	else{
-	DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
+	// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
 	}
 	fsbFrequency = 0;
 	cpuFrequency = 0;
