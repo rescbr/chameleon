@@ -32,13 +32,8 @@ static long  gImageLastKernelAddr;
 #define kPageSize     4096
 #define RoundPage(x)  ((((unsigned)(x)) + kPageSize - 1) & ~(kPageSize - 1))
 
-#if UNUSED
-long
-AllocateMemoryRange(char * rangeName, long start, long length, long type)
-#else
 long
 AllocateMemoryRange(char * rangeName, long start, long length)
-#endif
 {
     char *nameBuf;
     uint32_t *buffer;
@@ -62,21 +57,21 @@ long
 AllocateKernelMemory( long inSize )
 {
     long addr;
-
+    
     if (gImageLastKernelAddr == 0)
 	{
         gImageLastKernelAddr = RoundPage( bootArgs->kaddr +
-                                          bootArgs->ksize );
+                                         bootArgs->ksize );
     }
     addr = gImageLastKernelAddr;
     gImageLastKernelAddr += RoundPage(inSize);
-
+    
     if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) )
 	{
         stop ("AllocateKernelMemory error");
     }
-        
+    
     bootArgs->ksize = gImageLastKernelAddr - bootArgs->kaddr;
-
+    
     return addr;
 }

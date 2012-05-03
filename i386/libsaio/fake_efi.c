@@ -20,7 +20,10 @@
 #include "sl.h"
 #include "modules.h"
 #include "vers.h"
+
+#ifndef NO_SMP_SUPPORT
 #include "smp-imps.h"
+#endif
 
 #ifndef DEBUG_EFI
 #define DEBUG_EFI 0
@@ -87,7 +90,7 @@ static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 #endif
         return NULL;
     }
-
+    
 	efi_guid_unparse_upper(pGuid, string);
 	return string;
 }
@@ -106,7 +109,7 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0};
 
 /* Info About the current Firmware */
 #define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
-static EFI_CHAR16 const FIRMWARE_NAME[] = {'C','u','p','e','r','t','i','n','o', 0};  
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','a','s','h','e','r','b','r','u','m','-','2', 0};  
 static EFI_UINT32 const FIRMWARE_REVISION = 0x00010800; //1.8
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
 
@@ -137,16 +140,22 @@ Node *gEfiConfigurationTableNode = NULL;
 0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
 }
 
+#ifndef NO_SMP_SUPPORT
 #define EFI_MPS_TABLE_GUID \
 { \
 0xeb9d2d2f,0x2d88,0x11d3,{0x9a,0x16,0x0,0x90,0x27,0x3f,0xc1,0x4d} \
 }
+#endif
+
 /* From Foundation/Efi/Guid/Smbios/SmBios.c */
 EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
 EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
 EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
+
+#ifndef NO_SMP_SUPPORT
 EFI_GUID gEfiMpsTableGuid = EFI_MPS_TABLE_GUID;
+#endif
 
 EFI_UINT32                    gNumTables32 = 0;
 EFI_UINT64                    gNumTables64 = 0;
@@ -295,10 +304,12 @@ void finalizeEFIConfigTable(void )
 		{
             sprintf(id, "%s", "RSD2");
         }
+#ifndef NO_SMP_SUPPORT
 		else if (memcmp(&Guid, &gEfiMpsTableGuid, sizeof(EFI_GUID)) == 0)
 		{
             sprintf(id, "%s", "_MP_");
         } 
+#endif
 		
         msglog("table [%d]:%s , 32Bit addr : 0x%x\n",i,id,table);
         
@@ -710,24 +721,18 @@ static VOID setupEfiDeviceTree(void)
 			size = sizeof(appleClut8);
 			long clut = AllocateKernelMemory(size);
 			bcopy(&appleClut8, (void*)clut, size);
-#if UNUSED
-			AllocateMemoryRange( "BootCLUT", clut, size,-1);
-			
-#else
+            
 			AllocateMemoryRange( "BootCLUT", clut, size);
 			
-#endif
 		}
 		
 		{
 #include "failedboot.h"	
 			size = 32 + kFailedBootWidth * kFailedBootHeight;
 			long bootPict = AllocateKernelMemory(size);
-#if UNUSED
-			AllocateMemoryRange( "Pict-FailedBoot", bootPict, size,-1);    
-#else
+            
 			AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
-#endif
+            
 			((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
 			((boot_progress_element *)bootPict)->height = kFailedBootHeight;
 			((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
@@ -991,7 +996,7 @@ static VOID setupEfiConfigurationTable()
 {
     if (smbios_p)
         addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-	
+#ifndef NO_SMP_SUPPORT
 	if (get_env(envVendor) == CPUID_VENDOR_INTEL )
 	{
 		int num_cpus;
@@ -1012,7 +1017,7 @@ static VOID setupEfiConfigurationTable()
         }        
 #endif               
 	}	
-	
+#endif
 	// PM_Model
 	if (get_env(envIsServer))
     {

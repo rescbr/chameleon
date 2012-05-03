@@ -14,8 +14,6 @@
 #include "bootstruct.h"
 #include "modules.h"
 
-#define kEnableMemory		"EnableMemoryModule"	    
-
 pci_dt_t * dram_controller_dev = NULL;
 pci_dt_t * smbus_controller_dev = NULL;
 
@@ -28,22 +26,15 @@ void is_Memory_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, vo
 
 void Memory_start(void);
 void Memory_start(void)
-{
-	
-	bool enable = true;
-	
-	getBoolForKey(kEnableMemory, &enable, DEFAULT_BOOT_CONFIG);
-
+{	
+    
     if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086) 
-		enable = false;
+		return;	
+    
+    register_hook_callback("PCIDevice", &Memory_PCIDevice_hook);
+    register_hook_callback("ScanMemory", &Memory_hook);
+    register_hook_callback("isMemoryRegistred", &is_Memory_Registred_Hook);
 	
-	enable = (execute_hook("isMemoryRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
-    	    
-    if (enable) {
-		register_hook_callback("PCIDevice", &Memory_PCIDevice_hook);
-		register_hook_callback("ScanMemory", &Memory_hook);
-		register_hook_callback("isMemoryRegistred", &is_Memory_Registred_Hook);
-	}
 }
 
 void Memory_PCIDevice_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -69,11 +60,9 @@ void Memory_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, voi
 			
 	if(smbus_controller_dev)
 	{
-#if UNUSED
-		scan_spd(Platform, smbus_controller_dev);
-#else
+
 		scan_spd(smbus_controller_dev);
-#endif
+
 	}
     	
 }

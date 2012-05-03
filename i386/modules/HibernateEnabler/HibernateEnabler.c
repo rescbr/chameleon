@@ -14,7 +14,7 @@
 #define kWake				"Wake"				/* boot.c */
 #define kForceWake			"ForceWake"			/* boot.c */
 #define kWakeImage			"WakeImage"			/* boot.c */
-#define kEnableHibernate	"EnableHibernateModule"
+
 void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void HibernateEnabler_start(void);
 
@@ -78,12 +78,6 @@ void HibernateEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void*
 
 void HibernateEnabler_start(void)
 {
-	bool enable = true;
-	getBoolForKey(kEnableHibernate, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable)
-	{
-		register_hook_callback("PreBoot", &HibernateEnabler_hook);
-		register_hook_callback("spinActivity_hook", &spinActivityIndicator_hook);
-	}
+	register_hook_callback("PreBoot", &HibernateEnabler_hook);
+	register_hook_callback("spinActivity_hook", &spinActivityIndicator_hook);
 }

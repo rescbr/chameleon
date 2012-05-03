@@ -28,11 +28,8 @@ __convertImage( unsigned short width,
                const unsigned char *imageData,
                unsigned char **newImageData );
 
-#if UNUSED
-int __setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
-#else
+
 int __setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel);
-#endif
 
 int __getNumberArrayFromProperty( const char *  propKey,
                                  unsigned long numbers[],
@@ -48,13 +45,7 @@ __getVESAModeWithProperties( unsigned short     width,
                             VBEModeInfoBlock * outModeInfo,
                             unsigned short *   vesaVersion );
 
-
-#if UNUSED
-void
-__setVideoMode( int mode, int drawgraphics);
-#else
 void
 __setVideoMode( int mode);
-#endif
 
 #endif /* !__BOOT_GRAPHICS_H */

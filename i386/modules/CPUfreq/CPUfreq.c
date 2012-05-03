@@ -1,5 +1,5 @@
 /*
- * Copyright 2010,2011 valv, cparm <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright 2010,2011,2012 valv, cparm <armelcadetpetit@gmail.com>. All rights reserved.
  */
 #include "libsaio.h"
 #include "bootstruct.h"
@@ -223,18 +223,12 @@ void CPUfreq_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, vo
 void CPUfreq_start(void);
 void CPUfreq_start(void)
 {	
-	bool enable = true;
-	getBoolForKey(kEnableCPUfreq, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable)
-	{
-		if (get_env(envFeatures) & CPUID_FEATURE_MSR)
-		{
-			register_hook_callback("PreBoot", &CPUfreq_hook);		
-		} 
-		else
-		{
-			verbose ("Unsupported CPU: CPUfreq disabled !!!\n");		
-		}	
-	}
+	if (get_env(envFeatures) & CPUID_FEATURE_MSR)
+    {
+        register_hook_callback("PreBoot", &CPUfreq_hook);		
+    } 
+    else
+    {
+        verbose ("Unsupported CPU: CPUfreq disabled !!!\n");		
+    }	
 }

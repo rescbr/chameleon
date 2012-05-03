@@ -19,8 +19,8 @@
 /*
  * Alternatively you can choose to comply with APSL
  */
- 
- 
+
+
 /*
  * DCB-Table parsing is based on software (nouveau driver) originally distributed under following license:
  *
@@ -90,11 +90,9 @@ uint8_t default_NVCAP[]= {
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
 
+//TODO: once the bundles will be implemented, add a plist reader so there will be no need anymore to hardcode the device ids of each cards, each one will be able to add his own device ids in the plist, it willl work great if the card is supported by the apple's drivers
 struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
-    // temporary placement
-	{ 0x10DE0DF4, "GeForce GT 450M" }, //Azi + issue #99
-	{ 0x10DE1251, "GeForce GTX 560M" }, // Asus G74SX
     //========================================
 	// 0040 - 004F	
 	{ 0x10DE0040, "GeForce 6800 Ultra" },
@@ -270,7 +268,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0325, "GeForce FX Go5250" },
 	{ 0x10DE0326, "GeForce FX 5500" },
 	{ 0x10DE0328, "GeForce FX Go5200 32M / 64M" },
-	{ 0x10DE032A, "Quadro NVS 55/280 PCI" },
+	{ 0x10DE032A, "Quadro NVS 55 / 280 PCI" },
 	{ 0x10DE032B, "Quadro FX 500 / 600 PCI" },
 	{ 0x10DE032C, "GeForce FX Go53xx Series" },
 	{ 0x10DE032D, "GeForce FX Go5100" },
@@ -433,8 +431,10 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE061B, "Quadro VX 200" },
 	{ 0x10DE061C, "Quadro FX 3600M" },
 	{ 0x10DE061D, "Quadro FX 2800M" },
+    { 0x10DE061E, "Quadro FX 3700M" },
 	{ 0x10DE061F, "Quadro FX 3800M" },
 	// 0620 - 062F	
+    { 0x10DE0621, "GeForce GT 230" },
 	{ 0x10DE0622, "GeForce 9600 GT" },
 	{ 0x10DE0623, "GeForce 9600 GS" },
 	{ 0x10DE0625, "GeForce 9600 GSO 512"},
@@ -442,6 +442,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0627, "GeForce GT 140" },
 	{ 0x10DE0628, "GeForce 9800M GTS" },
 	{ 0x10DE062A, "GeForce 9700M GTS" },
+    { 0x10DE062B, "GeForce 9800M GS" },
 	{ 0x10DE062C, "GeForce 9800M GTS" },
 	{ 0x10DE062D, "GeForce 9600 GT" },
 	{ 0x10DE062E, "GeForce 9600 GT" },
@@ -471,6 +472,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0652, "GeForce GT 130M" },
 	{ 0x10DE0653, "GeForce GT 120M" },
 	{ 0x10DE0654, "GeForce GT 220M" },
+    { 0x10DE0655, "GeForce GT 120" },
 	{ 0x10DE0656, "GeForce 9650 S" },
 	{ 0x10DE0658, "Quadro FX 380" },
 	{ 0x10DE0659, "Quadro FX 580" },
@@ -500,6 +502,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06DD, "Quadro 4000" },
 	{ 0x10DE06DE, "Tesla M2050 / M2070" },	// TODO: sub-device id for the M2050: 0x0846
 	// 0x10DE06DE also applies to misc S2050, X2070, M2050, M2070
+    { 0x10DE06DF, "Tesla M2070-Q" },
 	// 06E0 - 06EF	
 	{ 0x10DE06E0, "GeForce 9300 GE" },
 	{ 0x10DE06E1, "GeForce 9300 GS" },
@@ -516,11 +519,13 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE06EC, "GeForce G 105M" },
 	{ 0x10DE06EF, "GeForce G 103M" },
 	// 06F0 - 06FF	
+    { 0x10DE06F1, "GeForce G105M" },
 	{ 0x10DE06F8, "Quadro NVS 420" },
 	{ 0x10DE06F9, "Quadro FX 370 LP" },
 	{ 0x10DE06FA, "Quadro NVS 450" },
 	{ 0x10DE06FB, "Quadro FX 370M" },
 	{ 0x10DE06FD, "Quadro NVS 295" },
+    { 0x10DE06FF, "HICx16 + Graphics" },
 	// 0700 - 070F
 	// 0710 - 071F
 	// 0720 - 072F
@@ -547,6 +552,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0820 - 082F
 	// 0830 - 083F
 	// 0840 - 084F
+    { 0x10DE0840, "GeForce 8200M" },
 	{ 0x10DE0844, "GeForce 9100M G" },
 	{ 0x10DE0845, "GeForce 8200M G" },
 	{ 0x10DE0846, "GeForce 9200" },
@@ -569,6 +575,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0866, "GeForce 9400M G" },
 	{ 0x10DE0867, "GeForce 9400" },
 	{ 0x10DE0868, "nForce 760i SLI" },
+    { 0x10DE0869, "GeForce 9400" },
 	{ 0x10DE086A, "GeForce 9400" },
 	{ 0x10DE086C, "GeForce 9300 / nForce 730i" },
 	{ 0x10DE086D, "GeForce 9200" },
@@ -588,6 +595,9 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0880 - 088F
 	// 0890 - 089F
 	// 08A0 - 08AF
+    { 0x10DE08A0, "GeForce 320M" },
+    { 0x10DE08A4, "GeForce 320M" },
+    { 0x10DE08A5, "GeForce 320M" },
 	// 08B0 - 08BF
 	// 08C0 - 08CF
 	// 08D0 - 08DF	
@@ -615,6 +625,8 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A20, "GeForce GT220" },
 	{ 0x10DE0A22, "GeForce 315" },
 	{ 0x10DE0A23, "GeForce 210" },
+    { 0x10DE0A26, "GeForce 405" }, 
+    { 0x10DE0A27, "GeForce 405" },
 	{ 0x10DE0A28, "GeForce GT 230M" },
 	{ 0x10DE0A29, "GeForce GT 330M" },
 	{ 0x10DE0A2A, "GeForce GT 230M" },
@@ -624,6 +636,7 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 0A30 - 0A3F	
 	{ 0x10DE0A34, "GeForce GT 240M" },
 	{ 0x10DE0A35, "GeForce GT 325M" },
+    { 0x10DE0A38, "Quadro 400" },
 	{ 0x10DE0A3C, "Quadro FX 880M" },
 	// 0A40 - 0A4F
 	// 0A50 - 0A5F
@@ -648,7 +661,9 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0A73, "GeForce 305M" },
 	{ 0x10DE0A74, "GeForce G210M" },
 	{ 0x10DE0A75, "GeForce G310M" },
+    { 0x10DE0A76, "ION" },
 	{ 0x10DE0A78, "Quadro FX 380 LP" },
+    { 0x10DE0A7A, "GeForce 315M" },
 	{ 0x10DE0A7C, "Quadro FX 380M" },
 	// 0A80 - 0A8F
 	// 0A90 - 0A9F
@@ -689,10 +704,11 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0CA2, "GeForce GT 320" },
 	{ 0x10DE0CA3, "GeForce GT 240" },
 	{ 0x10DE0CA4, "GeForce GT 340" },
+    { 0x10DE0CA5, "GeForce GT 220" },
 	{ 0x10DE0CA7, "GeForce GT 330" },
 	{ 0x10DE0CA8, "GeForce GTS 260M" },
 	{ 0x10DE0CA9, "GeForce GTS 250M" },
-	{ 0x10DE0CAC, "GeForce 315" },
+	{ 0x10DE0CAC, "GeForce GT 220" },
 	{ 0x10DE0CAF, "GeForce GT 335M" },
 	// 0CB0 - 0CBF	
 	{ 0x10DE0CB0, "GeForce GTS 350M" },
@@ -722,26 +738,40 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0DC5, "GeForce GTS 450" },
 	{ 0x10DE0DC6, "GeForce GTS 450" },
 	{ 0x10DE0DCA, "GF10x" },
+    { 0x10DE0DCD, "GeForce GT 555M" },
+    { 0x10DE0DCE, "GeForce GT 555M" },
 	// 0DD0 - 0DDF	
 	{ 0x10DE0DD1, "GeForce GTX 460M" },
 	{ 0x10DE0DD2, "GeForce GT 445M" },
 	{ 0x10DE0DD3, "GeForce GT 435M" },
+    { 0x10DE0DD6, "GeForce GT 550M" },
 	{ 0x10DE0DD8, "Quadro 2000" },
+    { 0x10DE0DDA, "Quadro 2000M" },
 	{ 0x10DE0DDE, "GF106-ES" },
 	{ 0x10DE0DDF, "GF106-INT" },
 	// 0DE0 - 0DEF	
 	{ 0x10DE0DE0, "GeForce GT 440" },
 	{ 0x10DE0DE1, "GeForce GT 430" },
 	{ 0x10DE0DE2, "GeForce GT 420" },
+    { 0x10DE0DE4, "GeForce GT 520" },
 	{ 0x10DE0DE5, "GeForce GT 530" },
+    { 0x10DE0DE9, "GeForce GT 630M" },
 	{ 0x10DE0DEB, "GeForce GT 555M" },
+    { 0x10DE0DEC, "GeForce GT 525M" },
+    { 0x10DE0DED, "GeForce GT 520M" },
 	{ 0x10DE0DEE, "GeForce GT 415M" },
 	// 0DF0 - 0DFF	
 	{ 0x10DE0DF0, "GeForce GT 425M" },
 	{ 0x10DE0DF1, "GeForce GT 420M" },
 	{ 0x10DE0DF2, "GeForce GT 435M" },
 	{ 0x10DE0DF3, "GeForce GT 420M" },
+    { 0x10DE0DF4, "GeForce GT 540M" },
+    { 0x10DE0DF5, "GeForce GT 525M" },
+    { 0x10DE0DF6, "GeForce GT 550M" },
+    { 0x10DE0DF7, "GeForce GT 520M" },
 	{ 0x10DE0DF8, "Quadro 600" },
+    { 0x10DE0DFA, "Quadro 1000M" },
+    { 0x10DE0DFC, "NVS 5200M" },
 	{ 0x10DE0DFE, "GF108 ES" },
 	{ 0x10DE0DFF, "GF108 INT" },
 	// 0E00 - 0E0F
@@ -754,7 +784,10 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x10DE0E25, "D12U-50" },
 	// 0E30 - 0E3F	
 	{ 0x10DE0E30, "GeForce GTX 470M" },
+    { 0x10DE0E31, "GeForce GTX 485M" },
 	{ 0x10DE0E38, "GF104GL" },
+    { 0x10DE0E3A, "Quadro 3000M" },
+    { 0x10DE0E3B, "Quadro 4000M" },
 	{ 0x10DE0E3E, "GF104-ES" },
 	{ 0x10DE0E3F, "GF104-INT" },
 	// 0E40 - 0E4F	
@@ -790,29 +823,91 @@ struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1020 - 102F
 	// 1030 - 103F
 	// 1040 - 104F
-	{ 0x10DE1040, "GeForce GT 520" },	
+	{ 0x10DE1040, "GeForce GT 520" },
+	{ 0x10DE1042, "GeForce 510" },
+    { 0x10DE1049, "GeForce GT 620" },
 	// 1050 - 105F
 	{ 0x10DE1050, "GeForce GT 520M" },
+    { 0x10DE1051, "GeForce GT 520MX" },
+    { 0x10DE1054, "GeForce GT 410M" },
+    { 0x10DE1055, "GeForce 410M" },
+    { 0x10DE1056, "Quadro NVS 4200M" },
+    { 0x10DE1057, "Quadro NVS 4200M" },
 	// 1060 - 106F
 	// 1070 - 107F
+    { 0x10DE107F, "NVIDIA GF119-ES" },
 	// 1080 - 108F
 	{ 0x10DE1080, "GeForce GTX 580" },
 	{ 0x10DE1081, "GeForce GTX 570" },
 	{ 0x10DE1082, "GeForce GTX 560 Ti" },
 	{ 0x10DE1083, "D13U" },
+    { 0x10DE1084, "GeForce GTX 560" }, 
+    { 0x10DE1086, "GeForce GTX 570" },
+    { 0x10DE1087, "GeForce GTX 560 Ti 448 Cores" },
 	{ 0x10DE1088, "GeForce GTX 590" },
+    { 0x10DE1089, "GeForce GTX 580" }, 
+    { 0x10DE108B, "GeForce GTX 590" },
 	// 1090 - 109F	
+    { 0x10DE1091, "Tesla M2090" },
+    { 0x10DE1094, "Tesla M2075" },
+    { 0x10DE1096, "Tesla C2075" },
 	{ 0x10DE1098, "D13U" },
-	{ 0x10DE109A, "N12E-Q5" },
+	{ 0x10DE109A, "Quadro 5010M" }, 
+    { 0x10DE109B, "Quadro 7000" },
 	// 10A0 - 10AF
 	// 10B0 - 10BF
 	// 10C0 - 10CF
+    { 0x10DE10C0, "GeForce 9300 GS" },
 	{ 0x10DE10C3, "GeForce 8400 GS" },
 	{ 0x10DE10C5, "GeForce 405" },
-	// 1200 - 
+	// 10D0 - 10DF
+    { 0x10DE10D8, "NVS 300" },
+    // 10E0 - 10EF
+    // 10F0 - 10FF
+    // 1100 - 110F
+    // 1110 - 111F
+    // 1120 - 112F
+    // 1130 - 113F
+    // 1140 - 114F
+    // 1150 - 115F
+    // 1160 - 116F
+    // 1170 - 117F
+    // 1180 - 118F
+    { 0x10DE1180, "GeForce GTX 680" },
+    // 1190 - 119F
+    // 11A0 - 11AF
+    // 11B0 - 11BF
+    // 11C0 - 11CF
+    // 11D0 - 11DF
+    // 11E0 - 11EF
+    // 11F0 - 11FF
+    // 1200 - 120F
 	{ 0x10DE1200, "GeForce GTX 560 Ti" },
+    { 0x10DE1201, "GeForce GTX 560" },
+    { 0x10DE1203, "GeForce GTX 460 SE v2" },
+    // 1210 - 121F
+    { 0x10DE1210, "GeForce GTX 570M" },
+    { 0x10DE1211, "GeForce GTX 580M" },
+    // 1220 - 122F
+    // 1230 - 123F
+    // 1240 - 124F
+    { 0x10DE1241, "GeForce GT 545" }, 
+    { 0x10DE1243, "GeForce GT 545" }, 
 	{ 0x10DE1244, "GeForce GTX 550 Ti" },
-	{ 0x10DE1245, "GeForce GTS 450" }	
+	{ 0x10DE1245, "GeForce GTS 450" },
+	{ 0x10DE1247, "GeForce GT 555M" },
+    // 1250 - 125F
+    { 0x10DE1251, "GeForce GTX 560M" }
+    // 1260 - 126F
+    // 1270 - 127F
+    // 1280 - 128F
+    // 1290 - 129F
+    // 12A0 - 12AF
+    // 12B0 - 12BF
+    // 12C0 - 12CF
+    // 12D0 - 12DF
+    // 12E0 - 12EF
+    // 12F0 - 12FF
 };
 static uint16_t swap16(uint16_t x);
 static uint16_t read16(uint8_t *ptr, uint16_t offset);
@@ -876,8 +971,8 @@ static int patch_nvidia_rom(uint8_t *rom)
 		printf("no dcb table found\n");
 		return PATCH_ROM_FAILED;
 	}/* else
-	 printf("dcb table at offset 0x%04x\n", dcbptr);
-	 */
+      printf("dcb table at offset 0x%04x\n", dcbptr);
+      */
 	uint8_t *dcbtable = &rom[dcbptr];
 	uint8_t dcbtable_version = dcbtable[0];
 	uint8_t headerlength = 0;
@@ -939,7 +1034,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		entries[num_outputs].type = connection & 0xf;
 		entries[num_outputs].index = num_outputs;
 		entries[num_outputs++].heads = (uint8_t*)&(dcbtable[(headerlength + recordlength * i) + 1]);
-
+        
 	}
 	
 	int has_lvds = false;
@@ -1047,7 +1142,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 
 static char *get_nvidia_model(uint32_t id) {
 	unsigned int	i;
-
+    
 	for (i=1; i< (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++) {
 		if (NVKnownChipsets[i].device == id) {
 			return NVKnownChipsets[i].name;
@@ -1060,7 +1155,7 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 {
 	int	fd;
 	int	size;
-
+    
 	if ((fd = open_bvdev("bt(0,0)", filename)) < 0) {
 		return 0;
 	}
@@ -1077,10 +1172,10 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 static int devprop_add_nvidia_template(struct DevPropDevice *device)
 {
 	char	tmp[16]; 
-
+    
 	if(!device)
 		return 0;
-
+    
 	if(!DP_ADD_TEMP_VAL(device, nvidia_compatible_0))
 		return 0;
 	if(!DP_ADD_TEMP_VAL(device, nvidia_device_type_0))
@@ -1100,7 +1195,7 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 	sprintf(tmp, "Slot-%x",devices_number);
 	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
 	devices_number++;
-
+    
 	return 1;
 }
 
@@ -1109,12 +1204,12 @@ static int hex2bin(const char *hex, uint8_t *bin, int len)
 	char	*p;
 	int	i;
 	char	buf[3];
- 
+    
 	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
 		printf("[ERROR] bin2hex input error\n");
 		return -1;
 	}
- 
+    
 	buf[2] = '\0';
 	p = (char *) hex;
 	for (i=0; i<len; i++) {

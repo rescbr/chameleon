@@ -10,8 +10,7 @@ INSTALL_MD_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/
 OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 	      -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-	      -mpreferred-stack-boundary=2 -fno-align-functions \
-	      -march=pentium4 -msse2 -mfpmath=sse -msoft-float  
+          -march=pentium4 -msse2 -msoft-float -ffreestanding -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
 
 INC = -I. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSAIODIR)
 ifneq "" "$(wildcard /bin/mkdirs)"

@@ -539,6 +539,12 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
             *size = overrideSize;
             return true;		
         }
+        else if (getValueForConfigTableKey(&bootInfo->bootConfig, key, &overrideVal, &overrideSize) && overrideSize)
+        {
+            *val = overrideVal;
+            *size = overrideSize;
+            return true;		
+        }
     }
     
     return ret;

@@ -25,11 +25,9 @@
 int previewTotalSectors = 0;
 uint8_t *previewSaveunder = 0;
 int previewLoadedSectors = 0;
-#if UNUSED
-static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
-#else
+
+
 static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel);
-#endif
 
 void
 loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or)
@@ -136,11 +134,8 @@ static int initGraphicsMode ()
 	if ( params[2] == 256 ) params[2] = 8;
 	if ( params[2] == 555 ) params[2] = 16;
 	if ( params[2] == 888 ) params[2] = 32;
-#if UNUSED
-	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
-#else
+
 	return setVESAGraphicsMode( params[0], params[1], params[2] );
-#endif
 }
 
 //==========================================================================
@@ -315,11 +310,8 @@ getVESAModeWithProperties( unsigned short     width,
 
 //==========================================================================
 // setVESAGraphicsMode
-#if UNUSED
-static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
-#else
+
 static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel)
-#endif
 {
     VBEModeInfoBlock  minfo;
     unsigned short    mode;
@@ -438,6 +430,9 @@ setVESATextMode( unsigned short cols,
     minfo.YResolution = 0;
     unsigned short    mode = modeEndOfList;
 	
+    minfo.XResolution = 0;
+    minfo.YResolution = 0;
+    
     if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
     {
         mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
@@ -476,13 +471,9 @@ setVESATextMode( unsigned short cols,
 // setVideoMode
 //
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
-#if UNUSED
-void
-setVideoMode( int mode, int drawgraphics)
-#else
+
 void
 setVideoMode( int mode)
-#endif
 {
     unsigned long params[4];
     int           count;
@@ -601,11 +592,8 @@ void drawPreview(void *src, uint8_t * saveunder)
 	
 	if (src && (uncomp=DecompressData(src, &origwidth, &origheight, &origbpx)))
 	{
-#if UNUSED
-		if (!setVESAGraphicsMode(origwidth, origheight, origbpx, 0))
-#else
+
 		if (!setVESAGraphicsMode(origwidth, origheight, origbpx))
-#endif
 			if (initGraphicsMode () != errSuccess)
 				return;
 		screen = (uint8_t *) VIDEO (baseAddr);

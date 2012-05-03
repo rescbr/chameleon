@@ -14,9 +14,7 @@ DEBUG = -DNOTHING
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fno-stack-protector \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
-    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-    -mpreferred-stack-boundary=2 -fno-align-functions \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float  
+    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -ffreestanding -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
 
 DEFINES=
 CONFIG = hd
@@ -41,7 +39,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o acpi_tools.o smbios.o smp-imps.o uterror.o lzss.o
+        convert.o acpi_tools.o smbios.o uterror.o lzss.o 
 
 # example for AcpiCodec
 #SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
@@ -70,6 +68,9 @@ SAIO_OBJS += freebsd.o openbsd.o
 
 #CFLAGS += -DNO_HAIKU_SUPPORT # -256 bytes
 SAIO_OBJS += befs.o
+
+#CFLAGS += -DNO_SMP_SUPPORT 
+SAIO_OBJS += smp-imps.o
 
 # Options disabled by default:
 

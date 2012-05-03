@@ -168,20 +168,19 @@ long LoadDrivers( char * dirSpec )
 		if ( gBootFileType == kBlockDeviceType )
 		{
 			// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
-#ifndef OPTION_ROM
+            
 			// First try a specfic OS version folder ie 10.5
 			
 			step = 1;
 			execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
 			
-#endif
 			
 			// First try a specfic OS version folder ie 10.5
 			sprintf(dirSpecExtra, "/Extra/%s/", (char*)gBootVolume->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next try to load Extra extensions from the selected root partition.
-				strcpy(dirSpecExtra, "/Extra/");
+				strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 				{
 					// If failed, then try to load Extra extensions from the boot partition
@@ -193,14 +192,14 @@ long LoadDrivers( char * dirSpec )
 						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 						{	
 							// Next we'll try the base
-							strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+							strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
 							FileLoadDrivers(dirSpecExtra, 0);
 						}
 					}
-#ifndef OPTION_ROM
+                    
 					step = 2;
 					execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
-#endif
+                    
 				}
 				
 			}	
@@ -209,13 +208,13 @@ long LoadDrivers( char * dirSpec )
 			// Also try to load Extensions from boot helper partitions.
 			if (gBootVolume->flags & kBVFlagBooter)
 			{
-				strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
+				strlcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/", sizeof(dirSpecExtra));
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 				{
-					strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
+					strlcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/", sizeof(dirSpecExtra));
 					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 					{
-						strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
+						strlcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/", sizeof(dirSpecExtra));
 						FileLoadDrivers(dirSpecExtra, 0);
 					}
 				}
@@ -233,7 +232,7 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				strcpy(gExtensionsSpec, dirSpec);
+				strlcpy(gExtensionsSpec, dirSpec, 4096);
 				strcat(gExtensionsSpec, "System/Library/");
 				FileLoadDrivers(gExtensionsSpec, 0);
 			}
@@ -315,7 +314,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
         if (strcmp(name + length - 5, ".kext")) continue;
 		
         // Save the file name.
-        strcpy(gFileName, name);
+        strlcpy(gFileName, name, 4096);
 		
         // Determine the bundle type.
         sprintf(gTempSpec, "%s/%s", dirSpec, gFileName);
@@ -417,12 +416,7 @@ LoadDriverMKext( char * fileSpec )
     // Add the MKext to the memory map.
     sprintf(segName, "DriversPackage-%lx", driversAddr);    
     
-#if UNUSED
-    AllocateMemoryRange(segName, driversAddr, driversLength,
-                        kBootDriverTypeMKEXT);
-#else
     AllocateMemoryRange(segName, driversAddr, driversLength);
-#endif
 	
     return 0;
 }
@@ -451,15 +445,15 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         tmpExecutablePath = malloc(executablePathLength);
         if (tmpExecutablePath == 0) break;
 		
-        strcpy(tmpExecutablePath, gFileSpec);
-		
+        strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
+        
         sprintf(gFileSpec, "%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 		
         tmpBundlePath = malloc(bundlePathLength);
         if (tmpBundlePath == 0) break;
 		
-        strcpy(tmpBundlePath, gFileSpec);
+        strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
 		
         // Construct the file spec to the plist, then load it.
 		
@@ -542,7 +536,6 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
     return ret;
 }
 
-
 //==========================================================================
 // LoadMatchedModules
 
@@ -582,12 +575,7 @@ long LoadMatchedModules( void )
 			
             if ((length != -1) && executableAddr)
             {
-				//driverModuleAddr = (void *)kLoadAddr;
-                //if (length != 0)
-                //{
-				//    ThinFatFile(&driverModuleAddr, &length);
-				//}
-				
+                
                 // Make make in the image area.
 				
 				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL, NULL, NULL);
@@ -615,21 +603,17 @@ long LoadMatchedModules( void )
                 driver->bundlePathLength = module->bundlePathLength;
 				
                 // Save the plist, module and bundle.
-                strcpy(driver->plistAddr, module->plistAddr);
+                strlcpy(driver->plistAddr, module->plistAddr,driver->plistLength);
                 if (length != 0)
                 {
                     memcpy(driver->executableAddr, executableAddr, length);
                 }
-                strcpy(driver->bundlePathAddr, module->bundlePath);
+                strlcpy(driver->bundlePathAddr, module->bundlePath, module->bundlePathLength);
 				
                 // Add an entry to the memory map.
                 sprintf(segName, "Driver-%lx", (unsigned long)driver);                
-#if UNUSED
-                AllocateMemoryRange(segName, driverAddr, driverLength,
-                                    kBootDriverTypeKEXT);
-#else
+                
                 AllocateMemoryRange(segName, driverAddr, driverLength);
-#endif
                 
             }
         }
@@ -837,7 +821,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
 		{
 			archCpuType=CPU_TYPE_I386;
-			/*ret =*/ ThinFatFile(&binary, &len);
+			ThinFatFile(&binary, &len);
 		}
 		
 		ret = DecodeMachO(binary, rentry, raddr, rsize);
@@ -848,6 +832,6 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			ret = DecodeMachO(binary, rentry, raddr, rsize);
 		}
 	}
-	
+    
 	return ret;
 }

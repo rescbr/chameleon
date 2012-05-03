@@ -257,15 +257,15 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 		register_hook_callback("GUI_PreBoot", &GUI_PreBoot_hook);
 		
         
-        getBvChain = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getBvChain");
-        getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getMemoryInfoString");
+        getBvChain = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_getBvChain");
+        getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_getMemoryInfoString");
         
-        printMemoryInfo = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_printMemoryInfo");
-        lspci = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_lspci");        
-        showHelp = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showHelp");
-        showTextFile = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showTextFile");
-        showMessage = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showMessage");        
-        showTextBuffer = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showTextBuffer");
+        printMemoryInfo = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_printMemoryInfo");
+        lspci = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_lspci");        
+        showHelp = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_showHelp");
+        showTextFile = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_showTextFile");
+        showMessage = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_showMessage");        
+        showTextBuffer = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_showTextBuffer");
 		safe_set_env(envgBootArgs,(uint32_t)gBootArgs);
         
 		msglog("* GUI successfully Displayed\n");

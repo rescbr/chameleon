@@ -41,17 +41,10 @@ extern long LoadMatchedModules( void );
 extern long InitDriverSupport(void);
 extern long GetDriverGbl(void);
 
-#define kEnableNBI			"EnableNBIModule"
-
 void NetbookInstaller_start(void);
 void NetbookInstaller_start(void)
-{
-	bool enable = true;
-	getBoolForKey(kEnableNBI, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable) 
+{	 
 	register_hook_callback("PreBoot", &NBI_PreBoot_hook);		
-	
 }
 
 void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
@@ -175,11 +168,9 @@ void NBI_md0Ramdisk()
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{				
-#if UNUSED
-                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);   
-#else
+
                 AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
-#endif
+
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{

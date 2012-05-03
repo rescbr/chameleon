@@ -159,13 +159,10 @@ extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );
-#if UNUSED
-long
-AllocateMemoryRange(char * rangeName, long start, long length, long type);
-#else
+
 long
 AllocateMemoryRange(char * rangeName, long start, long length);
-#endif
+
 /* misc.c */
 extern void   enableA20(void);
 extern void   turnOffFloppy(void);
@@ -254,16 +251,10 @@ extern long   GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
 extern long   GetFSUUID(char *spec, char *uuidStr);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
 extern int    openmem(char *buf, int len);
-#if UNUSED
-extern int    open(const char *path, int flags);
-#else
+
 extern int    open(const char *path);
-#endif
-#if UNUSED
-extern int    open_bvdev(const char *bvd, const char *path, int flags);
-#else
 extern int    open_bvdev(const char *bvd, const char *path);
-#endif
+
 extern int    close(int fdesc);
 extern int    file_size(int fdesc);
 extern int    read(int fdesc, char *buf, int count);
@@ -281,11 +272,9 @@ extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * fla
                           long * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
-#if UNUSED
-extern void scanDisks(int biosdev, int *count);
-#else
+
 extern void scanDisks(void);
-#endif
+
 extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);
 extern void   setRootVolume(BVRef volume);

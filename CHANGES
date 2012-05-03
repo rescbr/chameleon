@@ -1,3 +1,7 @@
+- Implemented the Runtime Bundles Modules
+- Updated nvidia and ati device id
+- Small security fixes
+
 - Stability fixes
 - Added mountain lion auto_installer compatibility
 - Changed md5c.c to the Xnu's md5.c

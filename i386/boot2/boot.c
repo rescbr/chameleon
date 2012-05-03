@@ -57,9 +57,7 @@
 #include "libsa.h"
 #include "platform.h"
 #include "graphics.h"
-#ifndef OPTION_ROM
 #include "appleboot.h"
-#endif
 #include "modules.h"
 #include "xml.h"
 #include "options.h"
@@ -143,14 +141,6 @@ static inline void malloc_error(char *addr, size_t size)
 }
 #endif
 
-#if 0
-static inline void exception_error(char *msg, int nb)
-{
-    printf("\r\nException number = %d\r\nmessage = %s\r\n\r\n", nb, msg);
-    asm volatile ("hlt");
-}
-#endif
-
 BVRef getBvChain(void)
 {	
 	return bvChain;	
@@ -164,9 +154,6 @@ void initialize_runtime(void)
 {
 	zeroBSS();
 	malloc_init(0, 0, 0, malloc_error);
-#if 0
-	exception_init(exception_error);
-#endif
 }
 
 static void init_pic(void)
@@ -181,7 +168,7 @@ static void init_pic(void)
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     
-	//outb(0x70, inb(0x70)|0x80); /* Disable NMI */ is this really necessary ? 
+	//outb(0x70, inb(0x70)|0x80); /* Disable NMI */  
 	
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
 	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
@@ -287,13 +274,8 @@ static int ExecKernel(void *binary)
     
 	if ((execute_hook("GUI_ExecKernel", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)) // (bootArgs->Video.v_display == VGA_TEXT_MODE)	
 	{
-#if UNUSED
-		__setVideoMode( GRAPHICS_MODE, 0 );
-#else
-		__setVideoMode( GRAPHICS_MODE );
-#endif
+        __setVideoMode( GRAPHICS_MODE );
 		
-#ifndef OPTION_ROM
         
 		if(!gVerboseMode)
 		{			
@@ -325,7 +307,6 @@ static int ExecKernel(void *binary)
 			}
             
 		}
-#endif
 	}
     
     finalizeEFIConfigTable();
@@ -470,7 +451,7 @@ void common_boot(int biosdev)
     setBootGlobals(bvChain);
     
     // Load Booter boot.plist config file
-    /*status =*/ loadBooterConfig();
+    loadBooterConfig();
 	
     {
         bool isServer = false;    
@@ -499,7 +480,6 @@ void common_boot(int biosdev)
 	}	
     
     {	
-#ifndef OPTION_ROM
         bool ScanSingleDrive = false;
         // Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
         if (getBoolForKey(kScanSingleDriveKey, &ScanSingleDrive, DEFAULT_BOOT_CONFIG) && ScanSingleDrive)
@@ -513,13 +493,8 @@ void common_boot(int biosdev)
             scanBootVolumes(BIOSDev, &bvCount);
         } 
         else 
-#endif
         {
-#if UNUSED
-            scanDisks(BIOSDev, &bvCount);
-#else
             scanDisks();
-#endif
         }    
         
 	}
@@ -531,24 +506,13 @@ void common_boot(int biosdev)
     
 	gBootVolume = selectBootVolume(bvChain);
 	
-	{
-		// Intialize module system
-		EFI_STATUS sysinit = init_module_system();
-		if((sysinit == EFI_SUCCESS) || (sysinit == EFI_ALREADY_STARTED) /*should never happen*/ ) 
-		{
-			load_all_modules();
-		}
-	}	
-	
+	LoadBundles("/Extra/");
+    
     load_all_internal_modules();
     
     // Loading preboot ramdisk if exists.
 	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
     
-#ifndef OPTION_ROM
-    
-    
-	
     {
         // Disable rescan option by default
         bool CDROMRescan = false;
@@ -571,9 +535,7 @@ void common_boot(int biosdev)
 		{
             safe_set_env(envgEnableCDROMRescan, promptForRescanOption());
 		}
-	}
-    
-#endif	
+	}    
 	
 #if DEBUG
     printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
@@ -621,10 +583,9 @@ void common_boot(int biosdev)
 			if(gBootVolume == NULL)
 			{
 				freeFilteredBVChain(bvChain);
-#ifndef OPTION_ROM
+                
 				if (get_env(envgEnableCDROMRescan))
 					rescanBIOSDevice((int)get_env(envgBIOSDev));
-#endif
 				
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
                 safe_set_env(envgDeviceCount,devcnt);
@@ -843,11 +804,9 @@ void common_boot(int biosdev)
 	{
 		if (getVideoMode() == GRAPHICS_MODE)
 		{	// if we are already in graphics-mode,
-#if UNUSED
-			__setVideoMode(VGA_TEXT_MODE, 0);	// switch back to text mode
-#else
+            
 			__setVideoMode(VGA_TEXT_MODE);	// switch back to text mode
-#endif
+            
 		}
     }
 #ifdef NBP_SUPPORT

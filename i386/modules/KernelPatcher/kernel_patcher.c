@@ -226,7 +226,7 @@ static int determineKernelArchitecture(void* kernelData)
 static int locate_symbols(void* kernelData)
 {
 	char is64 = 1;
-	parse_mach("VirtualXnuSyms",kernelData, NULL, symbol_handler);
+	parse_mach("VirtualXnuSyms",kernelData, symbol_handler);
 	//handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
 	return 1 << is64;
 }

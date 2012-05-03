@@ -37,11 +37,8 @@ void HPET_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 void HPET_start(void);
 void HPET_start(void)
 {
-	bool enable = true;
-	getBoolForKey(EnableHPETModule, &enable, DEFAULT_BOOT_CONFIG);
 	
-	if (enable)	
-		register_hook_callback("PCIDevice", &HPET_hook);
+	register_hook_callback("PCIDevice", &HPET_hook);
 }
 
 /*

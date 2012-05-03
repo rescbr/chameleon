@@ -13,7 +13,6 @@
 #include "modules.h"
 #include "Keylayout.h"
 
-#define kEnableKeyMap "EnableKeyMapper"
 static int AZERTY_switch(int c);
 void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 int Keymapper_getc(void);
@@ -240,29 +239,22 @@ out:
 void Keymapper_start(void);
 void Keymapper_start(void)
 {
-	
-	bool enable = true;
-	getBoolForKey(kEnableKeyMap, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable)
-	{
-		if (Keylayout_real_start()) 
-		{
-			return;
-		} 
-
+    if (Keylayout_real_start()) 
+    {
+        return;
+    } 
+    
 #ifdef TRUNK	
-		if (!replace_system_function("_getchar", &Keymapper_getc)) 
-		{
-			printf("no function getchar() to replace. Keymapper will not be used ! \n");
-						
-		}		
+    if (!replace_system_function("_getchar", &Keymapper_getc)) 
+    {
+        printf("no function getchar() to replace. Keymapper will not be used ! \n");
+        
+    }		
 #else
-		if (replace_system_function("_getc", &Keymapper_getc) != EFI_SUCCESS) 
-		{
-			printf("no function getc() to replace. Keymapper will not be used ! \n");
-		}
+    if (replace_system_function("_getc", &Keymapper_getc) != EFI_SUCCESS) 
+    {
+        printf("no function getc() to replace. Keymapper will not be used ! \n");
+    }
 #endif
-		
-	}
+    	
 }

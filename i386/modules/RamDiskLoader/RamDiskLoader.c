@@ -3,7 +3,7 @@
  *  Chameleon
  *
  *  Created by cparm on 05/12/10. <armelcadetpetit@gmail.com>
- *  Copyright 2010. All rights reserved.
+ *  Copyright 2010,2012. All rights reserved.
  *
  */
 
@@ -15,7 +15,6 @@
 #include "disk.h"
 
 
-#define kEnableEDL			"EnableRamDiskLoader"
 void loadPrebootRAMDisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void md0Ramdisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void processRAMDiskCommand_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
@@ -135,19 +134,13 @@ void is_Ram_Disk_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, 
 void RamDiskLoader_start(void);
 void RamDiskLoader_start(void)
 {
-	bool enable = true;
-	getBoolForKey(kEnableEDL, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable)
-	{
-		register_hook_callback("loadPrebootRAMDisk", &loadPrebootRAMDisk_hook);
-		register_hook_callback("md0Ramdisk", &md0Ramdisk_hook);
-		register_hook_callback("processRAMDiskCommand", &processRAMDiskCommand_hook);
-		register_hook_callback("ramDiskLoadDrivers", &ramDiskLoadDrivers_hook);	
-		register_hook_callback("newRamDisk_BVR", &newRamDisk_BVR_hook);
-		register_hook_callback("p_get_ramdisk_info", &p_get_ramdisk_info_hook);
-		register_hook_callback("p_ramdiskReadBytes", &p_ramdiskReadBytes_hook);
-        register_hook_callback("isRamDiskRegistred", &is_Ram_Disk_Registred_Hook);
-	}
+    register_hook_callback("loadPrebootRAMDisk", &loadPrebootRAMDisk_hook);
+    register_hook_callback("md0Ramdisk", &md0Ramdisk_hook);
+    register_hook_callback("processRAMDiskCommand", &processRAMDiskCommand_hook);
+    register_hook_callback("ramDiskLoadDrivers", &ramDiskLoadDrivers_hook);	
+    register_hook_callback("newRamDisk_BVR", &newRamDisk_BVR_hook);
+    register_hook_callback("p_get_ramdisk_info", &p_get_ramdisk_info_hook);
+    register_hook_callback("p_ramdiskReadBytes", &p_ramdiskReadBytes_hook);
+    register_hook_callback("isRamDiskRegistred", &is_Ram_Disk_Registred_Hook);
 
 }

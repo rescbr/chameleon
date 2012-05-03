@@ -2,6 +2,13 @@
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
  */
+
+/*
+ * Copyright 2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ *
+ * Cleaned, Added (runtime) bundles module support, based on a dylib environement.
+ *
+ */
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "modules.h"
@@ -21,10 +28,10 @@ unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
 
 moduleHook_t* moduleCallbacks = NULL;
-moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*)) = NULL;
 moduleHook_t* get_callback(const char* name);
+static unsigned int load_module(char * name, char* module);
 
 #if DEBUG_MODULES
 VOID print_hook_list()
@@ -52,70 +59,165 @@ VOID print_symbol_list()
 }
 #endif
 
+#if DYLIB_SUPPORT
 
-/*
- * Initialize the module system by loading the Symbols.dylib module.
- * Once loaded, locate the _lookup_symbol function so that internal
- * symbols can be resolved.
- */
-EFI_STATUS init_module_system(void)
+typedef struct dylbList_t
+{
+	char* dylib_name;
+	struct dylbList_t* next;
+} dylbList_t;
+
+dylbList_t* loadedDylib = NULL;
+
+
+static EFI_STATUS is_system_loaded(void)
 {
 	msglog("* Attempting to load system module\n");
-	
-	// Intialize module system
-    EFI_STATUS status = load_module(SYMBOLS_MODULE);
-	if((status == EFI_SUCCESS) || (status == EFI_ALREADY_STARTED)/*should never happen*/ )        
-	{
-		lookup_symbol = (void*)lookup_all_symbols(SYMBOLS_MODULE,SYMBOL_LOOKUP_SYMBOL);
-		
-		if((UInt32)lookup_symbol != 0xFFFFFFFF)
-		{
-			return EFI_SUCCESS;
-		}
-		
-	}
-	
+    
+    
+    if((UInt32)lookup_symbol != 0xFFFFFFFF)
+    {
+#if	DEBUG_MODULES == 2
+        printf("System successfully Loaded.\n");
+        getc();    
+#endif
+        return EFI_SUCCESS;
+    }
+    
+    
+#if	DEBUG_MODULES == 2
+    printf("Failed to load system module\n");
+    getc();    
+#endif
 	return EFI_LOAD_ERROR;
 }
 
+/*
+ * print out the information about the loaded module
+ */
+static VOID add_dylib(const char* name)
+{
+	dylbList_t* new_entry = malloc(sizeof(dylbList_t));
+	if (new_entry)
+	{	
+		new_entry->next = loadedDylib;
+		
+		loadedDylib = new_entry;
+		
+		new_entry->dylib_name = (char*)name;		
+	}
+}
+
+static EFI_STATUS is_dylib_loaded(const char* name)
+{
+	dylbList_t* entry = loadedDylib;
+	while(entry)
+	{
+		DBG("Comparing %s with %s\n", name, entry->dylib_name);
+		char *fullname = newStringWithFormat("%s.dylib",name);
+		if(fullname && ((strcmp(entry->dylib_name, name) == 0) || (strcmp(entry->dylib_name, fullname) == 0)))
+		{
+			free(fullname);
+			DBG("Located module %s\n", name);
+			return EFI_SUCCESS;
+		}
+		else
+		{
+			entry = entry->next;
+		}
+		
+	}
+	DBG("Module %s not found\n", name);
+	
+	return EFI_NOT_FOUND;
+}
 
 /*
- * Load all modules in the /Extra/modules/ directory
- * Module depencdies will be loaded first
- * MOdules will only be loaded once. When loaded  a module must
- * setup apropriete function calls and hooks as required.
- * NOTE: To ensure a module loads after another you may 
- * link one module with the other. For dyld to allow this, you must
- * reference at least one symbol within the module.
+ * Load a dylib 
+ *
+ * ex: load_dylib("/Extra/modules/", "AcpiCodec.dylib");
+ */
+VOID load_dylib(const char * dylib_path, const char * name)
+{
+    void (*module_start)(void);
+
+    char *tmp = newStringWithFormat("%s%s",dylib_path, name);								
+    if (!tmp) {
+        return;
+    }
+    char *dylib_name = newString(name);								
+    if (!dylib_name) {
+        free(tmp);
+        return;
+    }
+    msglog("* Attempting to load module: %s\n", tmp);
+    module_start = (void*)load_module(dylib_name,tmp);
+    
+    if(module_start && ( module_start != (void*)0xFFFFFFFF))
+    {
+        add_dylib(name);
+        module_start();
+    }
+    else
+    {
+        // failed to load or already loaded
+        free(tmp);
+        free(dylib_name);
+        
+    }
+}
+
+/*
+ * Load all dylib in the /Extra/modules/ directory
  */
 
-VOID load_all_modules(void)
+VOID load_all_dylib(void)
 {
 	char* name;
 	long flags;
 	long time;
+    
+    if (is_system_loaded() != EFI_SUCCESS) return;
+    
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+    void (*module_start)(void);
 	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
-		if ((strcmp(SYMBOLS_MODULE,name)) == 0) continue; // if we found Symbols.dylib, just skip it
+		if ((strcmp("Symbols.dylib",name)) == 0) continue; // if we found Symbols.dylib, just skip it
 		
-		int len =  strlen(name);
+        if (is_dylib_loaded(name) == EFI_SUCCESS) continue;
+		
+        int len =  strlen(name);
 		int ext_size = sizeof("dylib");
 		
 		if (len >= ext_size)
 		{
 			if(strcmp(&name[len - ext_size], ".dylib") == 0)
 			{				
-				char *tmp = newString(name);								
+				char *tmp = newStringWithFormat("/Extra/modules/%s",name);								
 				if (!tmp) {
 					continue;
 				}
-				msglog("* Attempting to load module: %s\n", tmp);			
-				if(load_module(tmp) != EFI_SUCCESS)
-				{
-					// failed to load or already loaded
-					//free(tmp);
+                char *dylib_name = newString(name);								
+				if (!dylib_name) {
+                    free(tmp);
+					continue;
 				}
+				msglog("* Attempting to load module: %s\n", tmp);
+                module_start = (void*)load_module(dylib_name,tmp);
+                
+				if(module_start && ( module_start != (void*)0xFFFFFFFF))
+				{
+                    add_dylib(name);
+					module_start();
+				}
+                else
+                {
+                    // failed to load or already loaded
+					free(tmp);
+                    free(dylib_name);
+
+                }
 			}
 #if DEBUG_MODULES
 			else 
@@ -144,42 +246,29 @@ VOID load_all_modules(void)
 #endif
 }
 
+#endif
+
 /*
- * Load a module file in /Extra/modules
- * TODO: verify version number of module
+ * Load a module file 
  */
-EFI_STATUS load_module(char* module)
+static unsigned int load_module(char * name, char* module)
 {
-	void (*module_start)(void) = NULL;
-	
-	
-	// Check to see if the module has already been loaded
-	if(is_module_loaded(module) == EFI_SUCCESS)
-	{
-		msglog("Module %s already registred\n", module);
-		return EFI_ALREADY_STARTED;
-	}
+	unsigned int module_start = 0xFFFFFFFF;
+    
 	
 	int fh = -1;
-	char *modString=NULL;
-	modString = newStringWithFormat( "/Extra/modules/%s", module);
-	if (!modString) {
-		printf("Unable to allocate module name : /Extra/modules/%s\n", module);
-		return EFI_OUT_OF_RESOURCES;
-	}
-	fh = open(modString);
+	
+	fh = open(module);
 	if(fh < 0)
 	{		
 #if DEBUG_MODULES
-		DBG("Unable to locate module %s\n", modString);
+		DBG("Unable to locate module %s\n", module);
 		getc();
 #else
-		msglog("Unable to locate module %s\n", modString);
+		msglog("Unable to locate module %s\n", module);
 #endif
-		free(modString);
-		return EFI_OUT_OF_RESOURCES;		
+		return 0xFFFFFFFF;		
 	}
-	EFI_STATUS ret = EFI_SUCCESS;
 	
 	{
 		int moduleSize = file_size(fh);
@@ -194,27 +283,11 @@ EFI_STATUS load_module(char* module)
 		if (module_base && read(fh, module_base, moduleSize) == moduleSize)
 		{
 			
-			DBG("Module %s read in.\n", modString);
+			DBG("Module %s read in.\n", module);
 			
 			// Module loaded into memory, parse it
-			module_start = parse_mach(module, module_base, &load_module, &add_symbol);
-			
-			if(module_start && (module_start != (void*)0xFFFFFFFF))
-			{
-				module_loaded(module);
-				// Notify the system that it was laoded
-				(*module_start)();	// Start the module
-				msglog("%s successfully Loaded.\n", module);
-			}
-			else
-			{
-				// The module does not have a valid start function
-				printf("Unable to start %s\n", module);	
-				ret = EFI_NOT_STARTED;
-#if DEBUG_MODULES			
-				getc();
-#endif
-			}		
+			module_start = parse_mach(name, module_base, &add_symbol);			
+            
 		}
 		else
 		{
@@ -222,12 +295,11 @@ EFI_STATUS load_module(char* module)
 #if DEBUG_MODULES		
 			getc();
 #endif
-			ret = EFI_LOAD_ERROR;
+			module_start = 0xFFFFFFFF;
 		}
 	}
 	close(fh);
-	free(modString);
-	return ret;
+	return module_start;
 }
 
 moduleHook_t* get_callback(const char* name)
@@ -351,12 +423,12 @@ long   vmsize;
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
-void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
+unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
 {	
 	char is64 = false;
-	void (*module_start)(void) = NULL;
+	unsigned int module_start = 0xFFFFFFFF;
 	EFI_STATUS bind_status = EFI_SUCCESS;
-    		
+    
 	// TODO convert all of the structs to a union	
 	struct dyld_info_command* dyldInfoCommand = NULL;	
 	struct symtab_command* symtabCommand = NULL;	
@@ -384,7 +456,7 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 		{
 			printf("Modules: Invalid mach magic\n");
 			getc();
-			return NULL;
+			return 0xFFFFFFFF;
 		}
 		
 		
@@ -515,45 +587,11 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 					
 				case LC_LOAD_DYLIB:
 				case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
-				{
-					struct dylib_command* dylibCommand = binary + binaryIndex;
-					char* weak_module  = binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-										
-					char *name=NULL;
-					name = newStringWithFormat( "%s.dylib", weak_module);
-					if (!name) {
-						printf("Unable to allocate module name : %s\n", weak_module);
-						return NULL;
-					}
-					if(dylib_loader)
-					{
-						EFI_STATUS statue = dylib_loader(weak_module);
-						
-						if( statue != EFI_SUCCESS)
-						{
-							if (statue != EFI_ALREADY_STARTED)
-							{
-								// Unable to load dependancy
-								//free(weak_module);
-								return NULL;
-							}
-							
-						} 
-						
-					}
-					//free(weak_module);
-					
-					break;
-				}				
+                    break;
+                    
 				case LC_ID_DYLIB:
-                {
-                    /*struct dylib_command* dylibCommand = binary + binaryIndex;
-					 moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
-					 moduleVersion =	dylibCommand->dylib.current_version;
-					 moduleCompat =	dylibCommand->dylib.compatibility_version;
-					 */
-                }
-					break;
+                    break;
+                    
 					
 				case LC_DYLD_INFO:
 					// Bind and rebase info is stored here
@@ -578,7 +616,7 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 	}		
 	
 	// bind_macho uses the symbols.
-	module_start = (void*)handle_symtable(module, (UInt32)binary, symtabCommand, symbol_handler, is64);
+	module_start = handle_symtable(module, (UInt32)binary, symtabCommand, symbol_handler, is64);
     
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
@@ -605,7 +643,7 @@ void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), l
 	}
 	
     if (bind_status != EFI_SUCCESS) {
-        module_start = (void*)0xFFFFFFFF;
+        module_start = 0xFFFFFFFF;
     }
     
 	return  module_start;
@@ -898,7 +936,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 #if DEBUG_MODULES==2
 				DBG("BIND_OPCODE_SET_ADDEND_SLEB: %d\n", addend);
 #endif
-
+                
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
@@ -950,7 +988,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 #if DEBUG_MODULES==2
 				DBG("BIND_OPCODE_ADD_ADDR_ULEB: 0x%X\n", segmentAddress);
 #endif
-
+                
 				break;
 				
 			case BIND_OPCODE_DO_BIND:
@@ -990,7 +1028,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				}
 				while(bind_stream[i] & 0x80);
 				
-				                
+                
                 if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
@@ -1004,7 +1042,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
                     goto error;                    
                     
 				}
-
+                
 				segmentAddress += tmp + sizeof(void*);
 				
 				
@@ -1155,56 +1193,16 @@ long long add_symbol(char* module,char* symbol, long long addr, char is64)
 	
 }
 
-/*
- * print out the information about the loaded module
- */
-VOID module_loaded(const char* name)
-{
-	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
-	if (new_entry)
-	{	
-		new_entry->next = loadedModules;
-		
-		loadedModules = new_entry;
-		
-		new_entry->module = (char*)name;		
-	}
-}
-
-EFI_STATUS is_module_loaded(const char* name)
-{
-	moduleList_t* entry = loadedModules;
-	while(entry)
-	{
-		DBG("Comparing %s with %s\n", name, entry->module);
-		char *fullname = newStringWithFormat("%s.dylib",name);
-		if(fullname && ((strcmp(entry->module, name) == 0) || (strcmp(entry->module, fullname) == 0)))
-		{
-			free(fullname);
-			DBG("Located module %s\n", name);
-			return EFI_SUCCESS;
-		}
-		else
-		{
-			entry = entry->next;
-		}
-		
-	}
-	DBG("Module %s not found\n", name);
-	
-	return EFI_NOT_FOUND;
-}
-
 // Look for symbols using the Smbols moduel function.
 // If non are found, look through the list of module symbols
 unsigned int lookup_all_symbols(const char* module, const char* name)
 {
     
     unsigned int addr = 0xFFFFFFFF;
-
+    
     do {
         
-        if ((module != NULL) && (strcmp(module,SYMBOLS_MODULE) != 0))
+        if ((module != NULL) && (strcmp(module,SYMBOLS_BUNDLE) != 0))
             break;        
         
         if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
@@ -1218,8 +1216,8 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
         } 
         
     } while (0);
-            
-		
+    
+    
 	{
 		symbolList_t* entry = moduleSymbols;
 		while(entry)
@@ -1240,7 +1238,7 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
             {
                 entry = entry->next;
             }             
-            			
+            
 		}
 	}
 	
@@ -1253,7 +1251,7 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
 #endif
 out:
     return addr;
-
+    
 }
 
 
@@ -1379,7 +1377,7 @@ EFI_STATUS replace_function(const char* module, const char* symbol, void* newAdd
 EFI_STATUS replace_system_function(const char* symbol, void* newAddress)
 {		 
 	
-	return replace_function(SYMBOLS_MODULE,symbol,newAddress);
+	return replace_function(SYMBOLS_BUNDLE,symbol,newAddress);
 	
 }
 
@@ -1388,4 +1386,696 @@ EFI_STATUS replace_function_any(const char* symbol, void* newAddress)
 	
 	return replace_function(NULL,symbol,newAddress);
 	
+}
+/*
+ * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
+ *
+ * @APPLE_LICENSE_HEADER_START@
+ * 
+ * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
+ * Reserved.  This file contains Original Code and/or Modifications of
+ * Original Code as defined in and that are subject to the Apple Public
+ * Source License Version 2.0 (the 'License').  You may not use this file
+ * except in compliance with the License.  Please obtain a copy of the
+ * License at http://www.apple.com/publicsource and read it before using
+ * this file.
+ * 
+ * The Original Code and all software distributed under the License are
+ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ * 
+ * @APPLE_LICENSE_HEADER_END@
+ */
+/*
+ *  drivers.c - Driver Loading Functions.
+ *
+ *  Copyright (c) 2000 Apple Computer, Inc.
+ *
+ *  DRI: Josh de Cesare
+ */
+
+/*
+ * Copyright 2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ *
+ * Cleaned, Added (runtime) bundles support.
+ *
+ */
+#include <mach-o/fat.h>
+#include <libkern/OSByteOrder.h>
+#include <mach/machine.h>
+
+#include "sl.h"
+#include "xml.h"
+
+struct Module {  
+	struct Module *nextModule;
+	long          willLoad;
+	TagPtr        dict;
+    TagPtr        personalities;
+	char          *plistAddr;
+	long          plistLength;
+	char          *executablePath;
+	char          *bundlePath;
+	long          bundlePathLength;
+};
+typedef struct Module Module, *ModulePtr;
+
+
+enum {
+	kCFBundleType2,
+	kCFBundleType3
+};
+
+enum {
+	BundlePriorityNull = 0,
+	BundlePriorityInit = 1,
+	BundlePrioritySystem = 2,
+	BundlePrioritySystemLib = 3,
+    BundlePriorityNormalPriority = 4,
+    BundlePriorityLowestPriority = 99,
+	BundlePriorityEnd = 100 // can not be assigned
+    
+};
+
+static ModulePtr gModuleHead;
+static char *    gModulesSpec;
+static char *    gDriverSpec;
+static char *    gFileSpec;
+static char *    gTempSpec;
+static char *    gFileName;
+static int       gLowestLoadPriority;
+
+static long ParseXML(char *buffer, ModulePtr *module);
+static ModulePtr FindBundle( char * bundle_id );
+
+static void
+FreeBundleSupport( void )
+{
+    
+    if ( gModulesSpec )         free(gModulesSpec);
+    if ( gDriverSpec)           free(gDriverSpec);
+    if ( gFileSpec  )           free(gFileSpec);
+    if ( gTempSpec )            free(gTempSpec);
+    if ( gFileName )            free(gFileName);
+}
+
+//==========================================================================
+// InitBundleSupport
+
+long
+InitBundleSupport( void )
+{
+	DBG("InitBundleSupport\n");
+    
+    static bool BundleSet = false;
+    
+    if (BundleSet == true)  return 0;    
+    
+    gModulesSpec    = malloc( 4096 );
+    gDriverSpec     = malloc( 4096 );
+    gFileSpec       = malloc( 4096 );
+    gTempSpec       = malloc( 4096 );
+    gFileName       = malloc( 4096 );	
+    
+    if ( !gModulesSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
+        goto error;
+    
+    BundleSet = true;
+    
+    return 0;
+error:
+    FreeBundleSupport();
+    return 1;
+}
+
+//==========================================================================
+// LoadBundles
+
+long LoadBundles( char * dirSpec )
+{	
+	DBG("LoadBundles\n");
+    
+    if ( InitBundleSupport() != 0 )
+        return 1;
+	
+	
+	strlcpy(gModulesSpec, dirSpec, 4096);
+    strlcat(gModulesSpec, "Modules", 4096 - 1);
+    FileLoadBundles(gModulesSpec, 0);		
+    
+	
+    MatchBundlesLibraries();
+	
+    LoadMatchedBundles();
+    
+	DBG("LoadBundles Finished\n");
+    
+    return 0;
+}
+
+//==========================================================================
+// FileLoadBundles
+long
+FileLoadBundles( char * dirSpec, long plugin )
+{
+    long         ret, length, flags, time, bundleType;
+    long long	 index;
+    long         result = -1;
+    const char * name;
+    
+	DBG("FileLoadBundles in %s\n",dirSpec);
+    
+    index = 0;
+    while (1) {
+        ret = GetDirEntry(dirSpec, &index, &name, &flags, &time);
+        if (ret == -1) break;
+		
+        // Make sure this is a directory.
+        if ((flags & kFileTypeMask) != kFileTypeDirectory) continue;
+        
+        // Make sure this is a kext.
+        length = strlen(name);
+        if (strcmp(name + length - 7, ".bundle")) continue;
+		
+        // Save the file name.
+        strlcpy(gFileName, name, 4096);
+		DBG("Load Bundles %s\n",gFileName);
+        
+        // Determine the bundle type.
+        sprintf(gTempSpec, "%s/%s", dirSpec, gFileName);
+        ret = GetFileInfo(gTempSpec, "Contents", &flags, &time);
+        if (ret == 0) bundleType = kCFBundleType2;
+        else bundleType = kCFBundleType3;
+		
+		DBG("Bundles type = %d\n",bundleType);
+        
+        if (!plugin)
+            sprintf(gDriverSpec, "%s/%s/%sPlugIns", dirSpec, gFileName,
+                    (bundleType == kCFBundleType2) ? "Contents/" : "");
+		
+        ret = LoadBundlePList( dirSpec, gFileName, bundleType);
+		
+        if (result != 0)
+			result = ret;
+		
+        if (!plugin) 
+			FileLoadBundles(gDriverSpec, 1);
+    }
+	
+    return result;
+}
+
+
+static void add_bundle(ModulePtr module,char* name)
+{
+	ModulePtr new_entry= malloc(sizeof(Module));
+	DBG("Adding bundle %s \n", name );
+	if (new_entry)
+	{	
+		new_entry->nextModule = gModuleHead;
+		
+		gModuleHead = new_entry;
+		
+		new_entry->executablePath = module->executablePath;
+        new_entry->bundlePath = module->bundlePath;
+        new_entry->bundlePathLength = module->bundlePathLength;
+        new_entry->plistAddr = module->plistAddr;
+        new_entry->willLoad = module->willLoad;
+        new_entry->dict = module->dict;
+        new_entry->plistLength = module->plistLength;
+        new_entry->personalities = module->personalities;
+        
+	}	
+	
+}
+
+//==========================================================================
+// LoadBundlePList
+
+long
+LoadBundlePList( char * dirSpec, char * name, long bundleType )
+{
+    long      length, executablePathLength, bundlePathLength;
+    ModulePtr module = 0;
+    char *    buffer = 0;
+    char *    tmpExecutablePath = 0;
+    char *    tmpBundlePath = 0;
+    long      ret = -1;
+	DBG("LoadBundlePList\n");
+    
+    do {
+        // Save the driver path.
+        
+        sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
+                (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+        executablePathLength = strlen(gFileSpec) + 1;
+		
+        tmpExecutablePath = malloc(executablePathLength);
+        if (tmpExecutablePath == 0) break;
+        
+        strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
+        
+        sprintf(gFileSpec, "%s/%s", dirSpec, name);
+        bundlePathLength = strlen(gFileSpec) + 1;
+		
+        tmpBundlePath = malloc(bundlePathLength);
+        if (tmpBundlePath == 0) break;
+		
+        strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
+        
+        
+        // Construct the file spec to the plist, then load it.
+		
+        sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
+                (bundleType == kCFBundleType2) ? "Contents/" : "");
+		
+		DBG("Loading Bundle PList %s\n",gFileSpec);
+        
+        length = LoadFile(gFileSpec);
+        if (length == -1) break;
+		
+        length = length + 1;
+        buffer = malloc(length);
+        if (buffer == 0) break;
+		
+        strlcpy(buffer, (char *)kLoadAddr, length);
+		
+        // Parse the plist.
+		
+        ret = ParseXML(buffer, &module);
+        if (ret != 0 ) { printf("Unable to read plist of %s",name); break; }
+		
+		if (!module) break; // Should never happen but it will make the compiler happy
+        
+        // Allocate memory for the driver path and the plist.
+        
+        module->executablePath = tmpExecutablePath;
+        module->bundlePath = tmpBundlePath;
+        module->bundlePathLength = bundlePathLength;
+        module->plistAddr = malloc(length);
+		
+        if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
+        {
+            if ( module->plistAddr ) free(module->plistAddr);
+			ret = -1;
+            break;
+        }       
+		
+        // Add the plist to the module.
+		
+        strlcpy(module->plistAddr, (char *)kLoadAddr, length);
+        module->plistLength = length;
+		
+        // Add the module to the module list.
+        
+        add_bundle(module, name);  
+        
+        
+        ret = 0;
+    }
+    while (0);
+    
+    if ( buffer )        free( buffer );
+    if ( module )        free( module );
+    
+    if (ret != 0) {
+        if ( tmpExecutablePath ) free( tmpExecutablePath );
+        if ( tmpBundlePath ) free( tmpBundlePath );
+    }	
+    return ret;
+}
+
+#define WillLoadBundles                                                                             \
+module = gModuleHead;                                                                               \
+while (module != NULL)                                                                              \
+{                                                                                                   \
+if (module->willLoad == willLoad)                                                               \
+{                                                                                               \
+prop = XMLGetProperty(module->dict, kPropCFBundleExecutable);                               \
+\
+if (prop != 0)                                                                              \
+{                                                                                           \
+fileName = prop->string;                                                                \
+sprintf(gFileSpec, "%s%s", module->executablePath, fileName);                           \
+\
+module_start = (void*)load_module((char*)fileName,gFileSpec);                           \
+if(!module_start || (*module_start == (void*)0xFFFFFFFF))                               \
+{                                                                                       \
+if (module->willLoad > BundlePrioritySystemLib)                                                           \
+{                                                                                   \
+module->willLoad = BundlePriorityNull ;                                                          \
+printf("Unable to start %s\n", gFileSpec);                                      \
+}                                                                                   \
+} else module_start();                                                                                       \
+if (module->willLoad == BundlePrioritySystem)                                                              \
+{                                                                                       \
+lookup_symbol = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,SYMBOL_LOOKUP_SYMBOL);     \
+if((UInt32)lookup_symbol != 0xFFFFFFFF)                                             \
+{                                                                                   \
+msglog("%s successfully Loaded.\n", gFileSpec);                                 \
+} else return -1;                                                                   \
+}                                                                                       \
+}                                                                                           \
+}                                                                                               \
+module = module->nextModule;                                                                    \
+}       
+
+//==========================================================================
+// LoadMatchedBundles
+
+long LoadMatchedBundles( void )
+{
+    TagPtr        prop;
+    ModulePtr     module;
+    char          *fileName;
+    void (*module_start)(void);
+    long willLoad;
+    
+	DBG("LoadMatchedBundles\n");
+    
+	int priority_end = MIN(gLowestLoadPriority+1, BundlePriorityEnd);
+    
+    for (willLoad = BundlePrioritySystem; willLoad < priority_end ; willLoad++)
+    {
+        
+        WillLoadBundles ;
+        
+    }
+    
+    return 0;
+}
+
+//==========================================================================
+// MatchBundlesLibraries
+
+long MatchBundlesLibraries( void )
+{
+    
+    TagPtr     prop, prop2;
+    ModulePtr  module, module2,dummy_module;
+	
+    // Check for active modules with the same Bundle IDs or same principal class, only one must remain  (except for type 3 aka system libs)
+    {
+        module = gModuleHead;
+        
+        while (module != 0)
+        {
+            if (!(module->willLoad > BundlePriorityInit)) // if the module load priority is not higher than initialized, continue
+            {
+                module = module->nextModule;
+                continue;
+            }
+            
+            prop = XMLGetProperty(module->dict, kPropNSPrincipalClass);
+            prop2 = XMLGetProperty(module->dict, kPropCFBundleIdentifier); 
+            
+            if (prop != 0 && prop2 != 0)
+            {                    
+                module2 = gModuleHead;
+                
+                TagPtr prop3,prop4;
+                
+                while (module2 != 0)
+                {
+                    prop3 = XMLGetProperty(module2->dict, kPropNSPrincipalClass);
+                    prop4 = XMLGetProperty(module2->dict, kPropCFBundleIdentifier);              
+                    
+                    if ((prop3 != 0) && (prop4 != 0) && (module != module2))
+                    {
+                        
+                        if ((module2->willLoad == BundlePrioritySystemLib) && ((strcmp(prop2->string, prop4->string)!= 0) /*&& (!strcmp(prop->string, prop3->string))*/)) {
+                            continue;
+                        }
+                        
+                        if ((!strcmp(prop2->string, prop4->string)) || (!strcmp(prop->string, prop3->string))) {
+                            if (module2->willLoad > BundlePriorityNull) module2->willLoad = BundlePriorityNull;
+                        }
+                        
+                    }
+                    module2 = module2->nextModule;
+                }  
+                
+            }
+            
+            module = module->nextModule;
+        }
+    }
+    
+    // Check for dependencies (it works in most cases, still a little buggy but should be sufficient for what we have to do, 
+	// clearly the Achilles' heel of this implementation, please use dependencies with caution !!!)
+    dummy_module = gModuleHead;
+    while (dummy_module != 0)
+    {
+        module = gModuleHead;
+        
+        while (module != 0)
+        {
+            if (module->willLoad > BundlePrioritySystemLib)
+            {                     
+                prop = XMLGetProperty(module->dict, kPropOSBundleLibraries);
+                if (prop != 0)
+                {
+                    prop = prop->tag;
+                    while (prop != 0)
+                    {
+                        module2 = gModuleHead;
+                        while (module2 != 0)
+                        {
+                            prop2 = XMLGetProperty(module2->dict, kPropCFBundleIdentifier);
+                            if ((prop2 != 0) && (!strncmp(prop->string, prop2->string, strlen( prop->string))))
+                            {
+                                // found a parent
+                                
+                                if (module2->willLoad > BundlePriorityInit)
+                                {                                    
+                                    // parent is active
+                                    if (module->willLoad == BundlePriorityNull) {
+                                        module->willLoad = BundlePriorityNormalPriority;
+                                    }                                        
+                                    
+                                    // Check if the version of the parent >= version of the child
+                                    if (strtol(XMLCastString ( XMLGetProperty(module2->dict,"CFBundleShortVersionString") ), NULL, 10) >= strtol(XMLCastString( prop->tag ), NULL, 10)) {
+                                        
+                                        if ((module2->willLoad >= module->willLoad) && (module->willLoad > BundlePrioritySystemLib))
+											module->willLoad = MIN(MAX(module->willLoad, module2->willLoad+1), BundlePriorityLowestPriority); // child must be loaded after the parent, this allow the to find symbols of the parent while we bind the child.
+                                        
+                                    } else {
+                                        module->willLoad = BundlePriorityNull;
+                                        goto nextmodule;
+                                    }
+                                    break;
+                                }
+                                
+                            }
+							if (module->willLoad != BundlePriorityNull) module->willLoad = BundlePriorityNull;
+                            module2 = module2->nextModule;
+                        }
+                        if (module->willLoad == BundlePriorityNull) goto nextmodule;
+                        prop = prop->tagNext;
+                    }
+                }
+            }
+        nextmodule:
+            module = module->nextModule;
+        }
+        
+		dummy_module = dummy_module->nextModule;
+    }	
+	
+    // Get the lowest load priority
+    {
+        gLowestLoadPriority = BundlePriorityNormalPriority;
+        module = gModuleHead;
+        
+        while (module != 0)
+        {
+            if (module->willLoad > BundlePriorityInit)
+            {                
+                gLowestLoadPriority = MIN(module->willLoad, BundlePriorityLowestPriority);                
+            }
+            module = module->nextModule;
+        }
+    }
+    
+    return 0;
+}
+
+
+//==========================================================================
+// FindBundle
+
+static ModulePtr
+FindBundle( char * bundle_id )
+{
+    ModulePtr module;
+    TagPtr    prop;
+	DBG("FindBundle %s\n",bundle_id);
+    
+    module = gModuleHead;
+    
+    while (module != 0)
+    {
+        prop = XMLGetProperty(module->dict, kPropCFBundleIdentifier);
+        if ((prop != 0) && !strcmp(bundle_id, prop->string)) break;
+        module = module->nextModule;
+    }
+    
+    return module;
+}
+
+//==========================================================================
+// GetBundleDict
+
+void *
+GetBundleDict( char * bundle_id )
+{
+    ModulePtr module;
+	DBG("GetBundleDict %s\n",bundle_id);
+    
+    module = FindBundle( bundle_id );
+    
+    if (module != 0)
+    {
+        return (void *)module->dict;
+    }
+    
+    return 0;
+}
+
+//==========================================================================
+// GetBundlePersonality
+
+void *
+GetBundlePersonality( char * bundle_id )
+{
+    ModulePtr module;
+	DBG("GetBundlePersonalities %s\n",bundle_id);
+    
+    module = FindBundle( bundle_id );
+    
+    if (module != 0)
+    {
+        return (void *)module->personalities;
+    }
+    
+    return 0;
+}
+
+//==========================================================================
+// GetBundlePath
+
+char *
+GetBundlePath( char * bundle_id )
+{
+    ModulePtr module;
+	DBG("GetBundlePath %s\n",bundle_id);
+    
+    module = FindBundle( bundle_id );
+    
+    if (module != 0)
+    {
+        return module->bundlePath;
+    }
+    
+    return 0;
+}
+
+//==========================================================================
+// ParseXML
+
+static long
+ParseXML( char * buffer, ModulePtr * module )
+{
+	long       length, pos;
+	TagPtr     moduleDict, prop;
+	ModulePtr  tmpModule;
+	
+    pos = 0;
+	DBG("ParseXML\n");
+    
+	if (!module) {
+        return -1;
+    }
+	
+    while (1)
+    {
+        length = XMLParseNextTag(buffer + pos, &moduleDict);
+        if (length == -1) break;
+		
+        pos += length;
+		
+        if (moduleDict == 0) continue;
+        if (moduleDict->type == kTagTypeDict) break;
+		
+        XMLFreeTag(moduleDict);
+    }
+	
+    if (length == -1) 
+    {
+        return -1;
+    }
+	
+    
+    tmpModule = malloc(sizeof(Module));
+    if (tmpModule == 0)
+    {
+        XMLFreeTag(moduleDict);
+        return -1;
+    }
+    tmpModule->dict = moduleDict;
+    
+    do {
+        prop = XMLGetProperty(moduleDict, kPropOSBundleEnabled);
+        if ((prop != 0) && prop->string)
+        {
+            if ( (strlen(prop->string) >= 1) && (prop->string[0] == 'N' || prop->string[0] == 'n') )
+            {
+                tmpModule->willLoad = 0;
+                break;
+            }
+        }
+        prop = XMLGetProperty(moduleDict, kPropNSPrincipalClass);
+        if ((prop != 0) && prop->string)
+        {
+            if (!strcmp(prop->string,SYSLIB_CLASS)) 
+            {
+                tmpModule->willLoad = BundlePrioritySystemLib;
+                break;
+            }
+            if (!strcmp(prop->string,SYS_CLASS)) 
+            {
+                tmpModule->willLoad = BundlePrioritySystem;
+                break;
+            }
+        }        
+        
+        prop = XMLGetProperty(moduleDict, kPropOSBundlePriority);
+        if ((prop != 0) && prop->string)
+        {
+            int tmpwillLoad;
+            if ((tmpwillLoad = strtoul(prop->string, NULL, 10)) > BundlePrioritySystemLib )
+            {            
+                tmpModule->willLoad = MIN(tmpwillLoad, BundlePriorityLowestPriority);
+                break;
+                
+            }
+            
+        }   
+        
+        tmpModule->willLoad = BundlePriorityNormalPriority;
+        
+    } while (0);
+    
+    // Get the personalities.
+    tmpModule->personalities = XMLGetProperty(moduleDict, kPropIOKitPersonalities);
+    
+    *module = tmpModule;
+	
+	
+	
+    return 0;
 }

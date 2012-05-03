@@ -66,11 +66,8 @@ static uint32_t load_keyboard_layout_file(const char *filename) {
 	char     magic[KEYBOARD_LAYOUTS_MAGIC_SIZE];
 	uint32_t version;
 	
-#if UNUSED
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
-#else
+
 	if ((fd = open_bvdev("bt(0,0)", filename)) < 0) {		
-#endif
 		goto fail; // fail
 	}
 	

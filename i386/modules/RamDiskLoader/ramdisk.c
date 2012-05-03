@@ -96,11 +96,9 @@ void md0Ramdisk()
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{				
-#if UNUSED
-                AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size, kBootDriverTypeInvalid);   
-#else
+
                 AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
-#endif
+
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{

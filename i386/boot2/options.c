@@ -199,13 +199,12 @@ static void showBootPrompt(int row, bool visible)
 	clearBootArgs();
 	
 	if (visible) {
-#ifndef OPTION_ROM
+        
 		if (get_env(envgEnableCDROMRescan))
 		{
 			printf( "%s",bootRescanPrompt );
 		}
 		else
-#endif
 		{
             printf( "%s",bootPrompt );
 		}
@@ -489,7 +488,6 @@ static const char * extractKernelName( char ** cpp )
     return kn;
 }
 
-#ifndef OPTION_ROM
 //==========================================================================
 
 void printMemoryInfo(void)
@@ -569,7 +567,6 @@ void lspci(void)
 		setActiveDisplayPage(0);
 	}
 }
-#endif
 
 //==========================================================================
 
@@ -852,7 +849,6 @@ int getBootOptions(bool firstRun)
 					/*
 					 * TODO: this needs to be refactored.
 					 */
-#ifndef OPTION_ROM
 #if UNUSED
 					if (strcmp( booterCommand, "video" ) == 0)
 					{
@@ -889,7 +885,6 @@ int getBootOptions(bool firstRun)
 						{
 							showHelp();
 						}
-#endif
 					key = 0;
 					showBootPrompt(nextRow, showPrompt);
 					break;
@@ -902,7 +897,7 @@ int getBootOptions(bool firstRun)
 			case kEscapeKey:
 				clearBootArgs();
 				break;
-#ifndef OPTION_ROM
+                
 			case kF5Key:
 				// New behavior:
 				// Clear gBootVolume to restart the loop
@@ -916,15 +911,13 @@ int getBootOptions(bool firstRun)
 				
 			case kF10Key:
                 safe_set_env(envgScanSingleDrive, false);
-#if UNUSED
-                scanDisks((int)get_env(envgBIOSDev), &bvCount);
-#else
+                
                 scanDisks();
-#endif
+                
 				gBootVolume = NULL;
 				clearBootArgs();
 				break;
-#endif
+                
 			default:
 				key = 0;
 				break;
@@ -1042,8 +1035,7 @@ processBootOptions(void)
 	loadSystemConfig();
     
 #if virtualM || PCI_FIX // we can simply make an option for this fix
-    addBootArg("npci=0x2000");
-    
+    addBootArg("npci=0x2000");    
 #endif
 #if verbose 
     addBootArg("-v");    
@@ -1156,8 +1148,6 @@ processBootOptions(void)
 	safe_set_env(envArgCntRemaining,ArgCntRemaining);
     return 0;
 }
-
-#ifndef OPTION_ROM
 
 //==========================================================================
 // Load the help file and display the file contents on the screen.
@@ -1298,9 +1288,7 @@ void showTextFile(const char * filename)
 	showTextBuffer(buf, size);
 	free(buf);
 }
-#endif
 
-#ifndef OPTION_ROM
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
@@ -1310,4 +1298,3 @@ bool promptForRescanOption(void)
 		return false;
 	}
 }
-#endif

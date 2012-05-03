@@ -421,11 +421,9 @@ bool is_smbus_controller(pci_dt_t* pci_dt)
 	}
 	return false;
 }	
-#if UNUSED
-void scan_spd(PlatformInfo_t *p, pci_dt_t* smbus_controller_dev)
-#else
+
+
 void scan_spd(pci_dt_t* smbus_controller_dev)
-#endif
 {
 	int i = 0;
 	for ( ; (unsigned)i <  sizeof(smbus_controllers) / sizeof(smbus_controllers[0]); i++ )

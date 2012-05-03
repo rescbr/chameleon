@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 cparm <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright (c) 2011,2012 cparm <armelcadetpetit@gmail.com>. All rights reserved.
  *
  */
 
@@ -19,7 +19,6 @@
 #define DBG(x...)
 #endif
 	
-#define kEnableSATA	"EnableSATAModule"
 void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
 uint8_t default_SATA_ID[]= {
@@ -62,12 +61,6 @@ void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 void YellowIconFixer_start(void);
 void YellowIconFixer_start(void)
 {
-	bool enable = true;
-	getBoolForKey(kEnableSATA, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable)
-	{
-		register_hook_callback("PCIDevice", &SATA_hook);
-	}
+    register_hook_callback("PCIDevice", &SATA_hook);
 }
 

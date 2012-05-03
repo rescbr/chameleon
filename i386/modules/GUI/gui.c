@@ -89,13 +89,10 @@ static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 static int dprintf( window_t * window, const char * fmt, ...);
 #endif
 static void sputc(int c, struct putc_info * pi);
-#if UNUSED
-static inline
-void vramwrite (void *data, int width, int height);
-#else
+
 static inline
 void vramwrite (void *data, int width);
-#endif
+
 static void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected);
 static int startGUI(void);
 static void free_theme_list();
@@ -1105,8 +1102,8 @@ int initGUI(void)
 	if (!dummybool) {
 		return 1;
 	}
-    getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_getMemoryInfoString");
-    showHelp = (void*)lookup_all_symbols(SYMBOLS_MODULE,"_showHelp");
+    getMemoryInfoString = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_getMemoryInfoString");
+    showHelp = (void*)lookup_all_symbols(SYMBOLS_BUNDLE,"_showHelp");
 
 	
 	getBoolForKey("RandomTheme", &theme_ran, DEFAULT_BOOT_CONFIG);
@@ -1303,11 +1300,8 @@ static int startGUI(void)
 								// lets copy the screen into the back buffer
                                 memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 
-#if UNUSED
-								setVideoMode( GRAPHICS_MODE, 0 );
-#else
 								setVideoMode( GRAPHICS_MODE );
-#endif
+
 								gui.initialised = true;								
 								return 0;
 							}
@@ -1619,13 +1613,9 @@ void updateGraphicBootPrompt(int key)
 	return;
 }
 
-#if UNUSED
-static inline
-void vramwrite (void *data, int width, int height)
-#else
+
 static inline
 void vramwrite (void *data, int width)
-#endif
 {
 	if (VIDEO (depth) == 0x20 /*32*/ && VIDEO (rowBytes) == (unsigned long)gui.backbuffer->width * 4)
 		memcpy((uint8_t *)vram, gui.backbuffer->pixels, VIDEO (rowBytes)*VIDEO (height));
@@ -1678,11 +1668,9 @@ void updateVRAM()
 		if (gui.infobox.draw)
 			blend( gui.infobox.pixmap, gui.backbuffer, gui.infobox.pos );
 	}
-#if UNUSED
-	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width, gui.backbuffer->height );
-#else
+
 	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width );
-#endif
+
 	if (gui.redraw)
 	{
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
@@ -2573,11 +2561,9 @@ void drawBootGraphics(void)
 	if (getVideoMode() == VGA_TEXT_MODE
 		|| (screen_params[0] != (uint32_t)oldScreenWidth && screen_params[1] != (uint32_t)oldScreenHeight) )
 	{
-#if UNUSED
-		setVideoMode(GRAPHICS_MODE, 0);
-#else
+
 		setVideoMode(GRAPHICS_MODE);
-#endif
+
 	}
 	
 	if (getValueForKey("-checkers", &dummyVal, &length, DEFAULT_BOOT_CONFIG)) {
@@ -2644,11 +2630,8 @@ int GUI_initGraphicsMode (void)
 	if ( params[2] == 555 ) params[2] = 16;
 	if ( params[2] == 888 ) params[2] = 32;
 	
-#if UNUSED
-	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );
-#else
 	return setVESAGraphicsMode( params[0], params[1], params[2] );
-#endif
+
 }
 
 

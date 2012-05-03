@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 cparm. All rights reserved.
+ * Copyright 2011,2012 cparm. All rights reserved.
  */
 #include "libsaio.h"
 #include "bootstruct.h"
@@ -20,12 +20,9 @@
 #define DBG(x...)	
 #endif
 
-#define kEnableSMBIOSPatcher			"EnableSMBIOSPatcher"
 void getSmbiosPatched_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void getProductName_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 void getboardproduct_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
-void is_SMB_Patcher_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
-
 
 void getSmbiosPatched_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {	
@@ -86,20 +83,12 @@ void getboardproduct_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* 
 	
 }
 
-void is_SMB_Patcher_Registred_Hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6){}
-
 void SMBiosPatcher_start(void);
 void SMBiosPatcher_start(void)
 {	
-    bool enable = true;
-	getBoolForKey(kEnableSMBIOSPatcher, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	enable = (execute_hook("isSMBIOSRegistred", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS);
     
-	if (enable) {
 	register_hook_callback("getSmbiosPatched", &getSmbiosPatched_hook);	
 	register_hook_callback("getProductNamePatched", &getProductName_hook);
     register_hook_callback("getboardproductPatched", &getboardproduct_hook);
-    register_hook_callback("isSMBIOSRegistred", &is_SMB_Patcher_Registred_Hook);
-    }
+    
 }

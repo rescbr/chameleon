@@ -2,19 +2,18 @@ TODO List for Chameleon Boot Loader
 ====================================
 
 - update cpu_intel_amd
-- update project with corehash
-
-
-- Implement the bundles
+- split nvidia, gma and ati code into separate modules
+- implement cpu topology
 - Backport cconfig from the trunk
 - move winfs, bsdfs, ext2fs, befs and lspci into modules
+- Implement a Host like in bits to avoid some return issues
 
+- update project with corehash
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 
   will be done simply by destroying the pool
 
 - Try to sync our prf() with the apple/mach __doprnt() (in Xnu/osfmk/kern/printf.c) to normalize the formating in our printf, sprintf, etc ..., and facilitate bug fixes
 
-- Implement a Host like in bits to avoid some return issues
 
 - Implement snprintf to avoid buffer overflow in some case
 

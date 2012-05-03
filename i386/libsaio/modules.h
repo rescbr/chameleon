@@ -4,6 +4,13 @@
  *
  */
 
+/*
+ * Copyright 2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ *
+ * Cleaned, Added bundles support.
+ *
+ */
+
 // There is a bug with the module system / rebasing / binding
 // that causes static variables to be incorrectly rebased or bound
 // Disable static variables for the moment
@@ -27,13 +34,6 @@ typedef struct symbolList_t
 	struct symbolList_t* next;
 } symbolList_t;
 
-typedef struct moduleList_t
-{
-	char* module;
-	//struct moduleHook_t* hook_list;
-	struct moduleList_t* next;
-} moduleList_t;
-
 typedef struct callbackList_t
 {
 	void(*callback)(void*, void*, void*, void*, void*, void*);
@@ -47,7 +47,7 @@ typedef struct moduleHook_t
 	struct moduleHook_t* next;
 } moduleHook_t;
 
-#define SYMBOLS_MODULE "Symbols.dylib"
+#define SYMBOLS_BUNDLE "Symbols"
 
 #define SYMBOL_DYLD_STUB_BINDER	"dyld_stub_binder"
 #define SYMBOL_LOOKUP_SYMBOL	"_lookup_symbol"
@@ -56,9 +56,12 @@ typedef struct moduleHook_t
 #define SECT_NON_LAZY_SYMBOL_PTR	"__nl_symbol_ptr"
 #define SECT_SYMBOL_STUBS			"__symbol_stub"
 
-EFI_STATUS init_module_system(void);
-VOID load_all_modules(void);
+#define SYS_CLASS  "SYMS"
+#define SYSLIB_CLASS "SYS_LIB"
 
+#define BundleHighPriority "high"
+#define BundleNormalPriority "normal"
+#define BundleLowPriority "low"
 /*
  * Modules Interface
  * execute_hook
@@ -77,14 +80,9 @@ void bind_location(UInt32* location, char* value, UInt32 addend, int type);
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size);
 
-EFI_STATUS load_module(char* module);
-
-EFI_STATUS is_module_loaded(const char* name);
-VOID module_loaded(const char* name);
-
 long long add_symbol(char* module,char* symbol, long long addr, char is64);
 
-void* parse_mach(char *module, void* binary, EFI_STATUS(*dylib_loader)(char*), long long(*symbol_handler)(char*, char*, long long, char));
+unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char));
 
 unsigned int handle_symtable(char *module, UInt32 base,
 							 struct symtab_command* symtabCommand,
@@ -107,7 +105,7 @@ long LoadMatchedBundles(void);
 long MatchBundlesLibraries(void);
 long LoadBundles( char * dirSpec );
 void * GetBundleDict( char * bundle_id );
-void * GetBundlePersonalities( char * bundle_id );
+void * GetBundlePersonality( char * bundle_id );
 char * GetBundlePath( char * bundle_id );
 
 #endif /* __BOOT_MODULES_H */

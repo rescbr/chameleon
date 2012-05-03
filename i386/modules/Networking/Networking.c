@@ -20,7 +20,6 @@
 #endif
 #define kEnableWifi			"EnableWifi"	
 #define kEthernetBuiltIn	"EthernetBuiltIn"	
-#define kEnableNetworking	"EnableNetworkModule"
 
 static void set_eth_builtin(pci_dt_t *eth_dev);
 static void set_wifi_airport(pci_dt_t *wlan_dev);
@@ -62,13 +61,8 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 
 void Networking_start(void);
 void Networking_start(void)
-{
-	bool enable = true;
-	getBoolForKey(kEnableNetworking, &enable, DEFAULT_BOOT_CONFIG) ;
-	
-	if (enable) {
-		register_hook_callback("PCIDevice", &Networking_hook);
-	}
+{	
+	register_hook_callback("PCIDevice", &Networking_hook);
 }
 
 /* a fine place for this code */

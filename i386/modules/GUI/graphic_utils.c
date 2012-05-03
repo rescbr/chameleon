@@ -630,6 +630,9 @@ setVESATextMode( unsigned short cols,
     minfo.YResolution = 0;
     unsigned short    mode = modeEndOfList;
 	
+    minfo.XResolution = 0;
+    minfo.YResolution = 0;
+    
     if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
     {
         mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
@@ -668,13 +671,9 @@ setVESATextMode( unsigned short cols,
 // setVideoMode
 //
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
-#if UNUSED
-void
-setVideoMode( int mode, int drawgraphics)
-#else
+
 void
 setVideoMode( int mode)
-#endif
 {
     unsigned long params[4];
     int           count;
@@ -730,11 +729,8 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 
 //==========================================================================
 // setVESAGraphicsMode
-#if UNUSED
-int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
-#else
+
 int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel)
-#endif
 {
     VBEModeInfoBlock  minfo;
     unsigned short    mode;

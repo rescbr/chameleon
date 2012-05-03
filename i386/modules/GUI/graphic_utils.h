@@ -68,11 +68,8 @@ int getNumberArrayFromProperty( const char *  propKey,
                                  unsigned long numbers[],
                                  unsigned long maxArrayCount );
 
-#if UNUSED
-int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate );
-#else
+
 int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel);
-#endif
 
 void getGraphicModeParams(unsigned long params[]);
 char *getVBEModeInfoString(void);
@@ -99,11 +96,9 @@ void drawColorRectangle( unsigned short x,
                         unsigned short height,
                         unsigned char  colorIndex );
 
-#if UNUSED
-void setVideoMode(int mode, int drawgraphics);
-#else
+
 void setVideoMode(int mode);
-#endif
+
 char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
 
 

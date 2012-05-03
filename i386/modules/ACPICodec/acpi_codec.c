@@ -49,6 +49,7 @@
 #include "pci_root.h"
 #include "sl.h"
 #include "convert.h"
+#include "modules.h"
 
 U64 rsd_p;
 ACPI_TABLES acpi_tables;
@@ -190,6 +191,22 @@ return entry;												\
 __RES(pss, long)    
 __RES(cst, int)  
 
+static config_file_t *personality = (config_file_t*)0;
+static void initPersonality (void)
+{
+    TagPtr dict = GetBundlePersonality( __BUNDLE_ID__ );
+    if (dict) {
+        
+        if ((personality = (config_file_t*)malloc(sizeof(config_file_t))))
+        {
+            memset(personality, 0, sizeof(config_file_t));
+            personality->dictionary = dict;
+            personality->canOverride = true;
+            
+        }
+    }
+    
+}
 
 static ACPI_TABLE_HEADER * get_new_table_in_list(U32 *new_table_list, U32 Signature, U8 *retIndex )
 {
@@ -370,7 +387,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 			printf("\n");			
 #endif					
 			int method = 0;
-			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+			getIntForKey(kAcpiMethod, &method, personality);
 			
 			
 			if (method != 0x2)
@@ -477,7 +494,7 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
             printf("\n");			
 #endif			
             int method = 0;
-			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+			getIntForKey(kAcpiMethod, &method, personality);
 			
 			
 			if (method != 0x2)
@@ -995,12 +1012,12 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 		U32 temp32 = 0;
 		U64 temp64=  0;
 		int tdp;
-		if (getIntForKey("TDP", &tdp, DEFAULT_BOOT_CONFIG))
+		if (getIntForKey("TDP", &tdp, personality))
 		{
 			temp32 = (U32) (tdp*8) ; 
 			
 			int tdc;
-			if (getIntForKey("TDC", &tdc, DEFAULT_BOOT_CONFIG))
+			if (getIntForKey("TDC", &tdc, personality))
 			{
 				temp32 = (U32) (temp32) | tdc<<16 ; 
 				
@@ -1115,6 +1132,12 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
                     cpu->max_ratio_as_cfg = (U32) ((U32)platform_info >> 8) & 0xff; 
 					cpu->min_ratio        = (U32) ((platform_info >> 40) & 0xff);
 					
+                    cpu->tdc_tdp_limits_for_turbo_flag = (platform_info & (1ULL << 29)) ? 1 : 0;
+					cpu->ratio_limits_for_turbo_flag   = (platform_info & (1ULL << 28)) ? 1 : 0;
+					cpu->xe_available = cpu->tdc_tdp_limits_for_turbo_flag | cpu->ratio_limits_for_turbo_flag;
+					
+
+                    
 					if (is_sandybridge() || is_jaketown())
 					{
 						cpu->package_power_limit = rdmsr64(MSR_PKG_RAPL_POWER_LIMIT);
@@ -1491,7 +1514,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 	}
 	
 	// Generating Pstate PKG
-	if (p_states_count) 
+	if (p_states_count > 0) 
 	{									
         U32 fsb = (U32)get_env(envFSBFreq);
 		U8 minPSratio = (p_states[p_states_count-1].Frequency / (fsb / 10000000 ));
@@ -1511,7 +1534,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		
 		{
 			int user_max_ratio = 0;
-			getIntForKey(kMaxRatio, &user_max_ratio, DEFAULT_BOOT_CONFIG);
+			getIntForKey(kMaxRatio, &user_max_ratio, personality);
 			if (user_max_ratio >= minPSratio && maxPSratio >= user_max_ratio)
 			{									
 				
@@ -1530,7 +1553,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		
 		{
 			int user_min_ratio = 0;
-			getIntForKey(kMinRatio, &user_min_ratio, DEFAULT_BOOT_CONFIG);
+			getIntForKey(kMinRatio, &user_min_ratio, personality);
 			if (user_min_ratio >= minPSratio && cpu_ratio >= user_min_ratio)
 			{
 				
@@ -1553,26 +1576,39 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		if (maxPSratio >= cpu_ratio && cpu_ratio >= minPSratio)	maxPSratio = cpu_ratio;													
 		
 		{
-			TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"P-States")); // TODO: fix me
 			int  base = 16;								
 			U8 expert = 0; /* Default: 0 , mean mixed mode 
 						    * expert mode : 1 , mean add only p-states found in boot.plist
 						    */
-			
-			
+            
+            TagPtr PstateTag;                           
+            U32 pstate_tag_count = 0;
+            
 			{
-				if (personality)
+                
+                
+                if (personality->dictionary) 
+                {
+                    PstateTag = XMLCastDict(XMLGetProperty(personality->dictionary, (const char*)"P-States"));
+                    if (PstateTag) pstate_tag_count = XMLTagCount(PstateTag) ;
+                }
+                
+                if (!pstate_tag_count) 
+                    if ((PstateTag = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"P-States")))) pstate_tag_count = XMLTagCount(PstateTag);                    
+                
+                
+				if ((pstate_tag_count > 0) && PstateTag)
 				{
-					char *tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Mode"));
+					char *tmpstr = XMLCastString(XMLGetProperty(PstateTag, (const char*)"Mode"));
 					
 					if (strcmp(tmpstr,"Expert") == 0)
 					{
-						p_states_count = XMLTagCount(personality) - 1 ; // - 1 = - ("Mode" tag) 										
+						p_states_count = pstate_tag_count - 1 ; // - 1 = - ("Mode" tag) 										
 						expert = 1;
 					}
 					
 					
-					if ((tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Base"))))
+					if ((tmpstr = XMLCastString(XMLGetProperty(PstateTag, (const char*)"Base"))))
 					{
 						
 						if (expert) p_states_count--; // -=  ("Base" tag) 
@@ -1598,12 +1634,12 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 				{			
 					char *Lat1 = NULL, *clk = NULL, *Pw = NULL, *Lat2 = NULL, *Ctrl = NULL ;
 					
-					if (personality)
+					if ((pstate_tag_count > 0) && PstateTag)
 					{
 						sprintf(MatchStat, "%d",i);
-						TagPtr match_Status = XMLGetProperty(personality, (const char*)MatchStat); 								   
+						TagPtr match_Status = XMLGetProperty(PstateTag, (const char*)MatchStat); 								   
 						
-						if (match_Status)
+						if (match_Status  && (XMLTagCount(match_Status) > 0))
 						{												
 							
 							clk  = XMLCastString(XMLGetProperty(match_Status, (const char*)"CoreFreq"));
@@ -1619,7 +1655,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
                     
 					unsigned long Frequency  = 0x00000000;
 					
-					if (!expert || !personality) Frequency  = p_states[i].Frequency;
+					if (!expert || !pstate_tag_count) Frequency  = p_states[i].Frequency;
 					
 					if (clk) 
 						Frequency  = strtoul((const char *)clk, NULL,base);
@@ -1677,7 +1713,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						
 						{
 							U32 Control  = 0 /*encode_pstate(curr_ratio)*/ ;
-							if (!expert || !personality) Control = p_states[i].Control;									
+							if (!expert || !pstate_tag_count) Control = p_states[i].Control;									
 							pstate->control = resolve_pss(Control, Ctrl, base); // Control
 						}														
 						
@@ -1721,29 +1757,43 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 //-----------------------------------------------------------------------------
 static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 {
-	{
-		TagPtr personality = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"C-States")); // TODO :fix me
-		
-		if (personality)
+	{ 
+        
+		TagPtr CstateTag;		
+        U32 entry_count = 0;
+        
+        if (personality->dictionary) 
+        {
+            CstateTag = XMLCastDict(XMLGetProperty(personality->dictionary, (const char*)"C-States"));
+            if (CstateTag) entry_count = XMLTagCount(CstateTag);
+        }
+        
+        if (!entry_count)            
+            CstateTag = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"C-States"));            
+        
+        
+		if (CstateTag)
 		{
 			int  base = 16;	
 			
-			U32 entry_count = XMLTagCount(personality);
-			char *tmpstr =NULL;
+			entry_count = XMLTagCount(CstateTag);			
 			
-			if ((tmpstr = XMLCastString(XMLGetProperty(personality, (const char*)"Base"))))
-			{
-				
-				entry_count--; // -=  ("Base" tag) 
-				
-				int mybase = strtol(tmpstr, NULL, 10);	
-				
-				if (mybase == 8 || mybase == 10 || mybase == 16 )
-					base = mybase;									
-			}
-			
-			if (entry_count)
-			{				
+			if (entry_count > 0)
+			{	
+                {
+                    char *tmpstr;
+                    
+                    if ((tmpstr = XMLCastString(XMLGetProperty(CstateTag, (const char*)"Base"))))
+                    {
+                        
+                        entry_count--; // -=  ("Base" tag) 
+                        
+                        int mybase = strtol(tmpstr, NULL, 10);	
+                        
+                        if (mybase == 8 || mybase == 10 || mybase == 16 )
+                            base = mybase;									
+                    }
+                }				
 				
 				cpu->pkg_io_cstates.num_cstates = 0;
 				cpu->pkg_mwait_cstates.num_cstates = 0;
@@ -1758,7 +1808,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 						char *Lat = NULL, *Pw = NULL, *BWidth= NULL, *BOffset= NULL, *Address= NULL, *AccessSize= NULL, *index= NULL;
 						
 						sprintf(MatchStat, "C%d",i);
-						TagPtr match_Status = XMLGetProperty(personality, (const char*)MatchStat);
+						TagPtr match_Status = XMLGetProperty(CstateTag, (const char*)MatchStat);
 						if (match_Status)
 						{	
 							Pw   = XMLCastString(XMLGetProperty(match_Status, (const char*)"Power"));
@@ -1896,14 +1946,14 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 			bool tmpval;
 			
 			
-			if (getBoolForKey(kEnableC2State, &tmpval, DEFAULT_BOOT_CONFIG))
+			if (getBoolForKey(kEnableC2State, &tmpval, personality))
 			{
 				c2_enabled = tmpval;
 			}
             
-			if (!getIntForKey("C3StateOption", &c3_enabled, DEFAULT_BOOT_CONFIG))
+			if (!getIntForKey("C3StateOption", &c3_enabled, personality))
 			{
-				c3_enabled = (getBoolForKey(kEnableC3State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 3 : 0;
+				c3_enabled = (getBoolForKey(kEnableC3State, &tmpval, personality)&&tmpval) ? 3 : 0;
 			}		
 			if (c3_enabled == 6)
 			{
@@ -1911,10 +1961,10 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 			}
 			else 
 			{
-				c4_enabled = (getBoolForKey(kEnableC4State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;
+				c4_enabled = (getBoolForKey(kEnableC4State, &tmpval, personality)&&tmpval) ? 1 : 0;
 			}
-			c6_enabled = (getBoolForKey(kEnableC6State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;
-			c7_enabled = (getBoolForKey(kEnableC7State, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval) ? 1 : 0;		
+			c6_enabled = (getBoolForKey(kEnableC6State, &tmpval, personality)&&tmpval) ? 1 : 0;
+			c7_enabled = (getBoolForKey(kEnableC7State, &tmpval, personality)&&tmpval) ? 1 : 0;		
 		}
 		
 		cpu->pkg_mwait_cstates.num_cstates = 0;
@@ -2407,7 +2457,7 @@ static U32 buildMADT(U32 * new_table_list, ACPI_TABLE_DSDT *dsdt, MADT_INFO * ma
     
     {		
 		bool tmpval;		
-		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;		
+		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, personality)&&tmpval;		
 	}
     
     if (oem_apic == true) 
@@ -3669,7 +3719,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 			cstates_enabled = BuildCstateInfo(&cpu, pmbase);
 			if (cstates_enabled)
 			{
-				getBoolForKey(KEnableMwait, &enable_mwait, DEFAULT_BOOT_CONFIG);
+				getBoolForKey(KEnableMwait, &enable_mwait, personality);
 			}
 		}
 		
@@ -3680,7 +3730,7 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 			pstates_enabled = BuildPstateInfo(&cpu);
 			if (pstates_enabled)
 			{
-				const char *str = getStringForKey(KAcpiCoordType, DEFAULT_BOOT_CONFIG);
+				const char *str = getStringForKey(KAcpiCoordType, personality);
 				U8 tmp  = (U8)strtoul(str, NULL,16);
 				if ((tmp == ACPI_COORD_TYPE_SW_ALL) || (tmp == ACPI_COORD_TYPE_SW_ANY) || (tmp == ACPI_COORD_TYPE_HW_ALL) )
 				{
@@ -3998,7 +4048,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	if (get_env(envVendor) == CPUID_VENDOR_INTEL) 
 	{	
 		fix_restart = true;
-		getBoolForKey(kRestartFix, &fix_restart, DEFAULT_BOOT_CONFIG);
+		getBoolForKey(kRestartFix, &fix_restart, personality);
 		
 	} else {
 		verbose ("Not an Intel platform: Restart Fix disabled !!!\n");
@@ -4139,7 +4189,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	if (fadt_mod->PreferredProfile != get_env(envType)) 
 	{
 		bool val = false;  
-		getBoolForKey("PreferInternalProfileDetect", &val, DEFAULT_BOOT_CONFIG); // if true Give prior to the profile resolved trought the CPU model
+		getBoolForKey("PreferInternalProfileDetect", &val, personality); // if true Give prior to the profile resolved trought the CPU model
 		
 		val = get_env(envIsServer) ;
 		
@@ -4155,7 +4205,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 	}
 	
 	// Set PM_Profile and System-type if user wanted this value to be forced
-	if ( (value=getStringForKey("SystemType", DEFAULT_BOOT_CONFIG))!=NULL)
+	if ( (value=getStringForKey("SystemType", personality))!=NULL)
 	{
 		if ((Type = (unsigned char) strtoul(value, NULL, 10) ) <= MaxSupportedPMProfile)
 		{
@@ -4173,7 +4223,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 		} else printf("Error: system-type must be 0..6. Defaulting to %d !\n", (U8)get_env(envType));
 	}		
 	
-	getBoolForKey(KIntelFADT, &intelfadtspec, DEFAULT_BOOT_CONFIG);
+	getBoolForKey(KIntelFADT, &intelfadtspec, personality);
 	if ((pmbase == 0) && (cpu_map_error == 0) && (intelfadtspec == true)) 
 	{
 		ACPI_TABLE_DSDT *DsdtPointer ;
@@ -4200,7 +4250,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
         fadt_mod->Flags|= 0x400;		
 		
 		int type = PCI_RESET_TYPE;
-		getIntForKey(KResetType, &type, DEFAULT_BOOT_CONFIG);
+		getIntForKey(KResetType, &type, personality);
 		if (type == KEYBOARD_RESET_TYPE)
 		{
 			//Azi: keyboard reset; http://forum.voodooprojects.org/index.php/topic,1056.msg9802.html#msg9802
@@ -4264,7 +4314,19 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 
 static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 {
-	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")); // TODO: fix me
+	TagPtr DropTables_p = 0;        
+    int DropTables_tag_count = 0;
+    
+    if (personality->dictionary) 
+    {
+        DropTables_p = XMLCastDict(XMLGetProperty(personality->dictionary, (const char*)"ACPIDropTables"));
+        if (DropTables_p) DropTables_tag_count = XMLTagCount(DropTables_p) ;
+    }
+    
+    if (!DropTables_tag_count) 
+        if ((DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")))) DropTables_tag_count = XMLTagCount(DropTables_p);    
+    
+    
 	U32 new_table = 0ul;
 	U8 new_table_index = 0, table_added = 0;
 	ACPI_TABLE_XSDT *xsdt = (void*)0ul, *xsdt_mod = (void*)0ul;
@@ -4310,7 +4372,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				}
 				
 				int method = 0;
-				getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+				getIntForKey(kAcpiMethod, &method, personality);
 				
 				
 				if (method != 0x2)
@@ -4340,7 +4402,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				bool oem = false;
 				char oemOption[OEMOPT_SIZE];
 				sprintf(oemOption, "oem%s",tableSig );
-				if (getBoolForKey(oemOption, &oem, DEFAULT_BOOT_CONFIG) && oem) // This method don't work for DSDT and FACS
+				if (getBoolForKey(oemOption, &oem, personality) && oem) // This method don't work for DSDT and FACS
 				{ 
 					
 					DBG("   %s required\n", oemOption);
@@ -4352,12 +4414,13 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				}
 			}
 			
+            if ((DropTables_tag_count > 0) && DropTables_p) 
 			{
 				TagPtr match_drop = XMLGetProperty(DropTables_p, (const char*)tableSig);                    
 				if ( match_drop ) 
 				{
 					char *tmp = XMLCastString(match_drop);
-					if (strcmp(tmp,"No") != 0)
+					if (tmp && (strcmp(tmp,"No") != 0))
 					{
 						dropoffset++;
 						DBG("   %s table dropped\n",tableSig);
@@ -4443,7 +4506,18 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 
 static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_table_list)
 {			
-	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")); // TODO: fix me
+	TagPtr DropTables_p = 0;        
+    int DropTables_tag_count = 0;
+    
+    if (personality->dictionary) 
+    {
+        DropTables_p = XMLCastDict(XMLGetProperty(personality->dictionary, (const char*)"ACPIDropTables"));
+        if (DropTables_p) DropTables_tag_count = XMLTagCount(DropTables_p) ;
+    }
+    
+    if (!DropTables_tag_count) 
+        if ((DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables")))) DropTables_tag_count = XMLTagCount(DropTables_p); 
+	
 	U32 new_table = 0ul;
 	U8 new_table_index = 0, table_added = 0;
 	U32 dropoffset=0, index;
@@ -4478,7 +4552,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 		{			
 			
 			int method = 0;
-			getIntForKey(kAcpiMethod, &method, DEFAULT_BOOT_CONFIG);
+			getIntForKey(kAcpiMethod, &method, personality);
 			
 			
 			if (method != 0x2)
@@ -4507,7 +4581,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 			bool oem = false;
 			char oemOption[OEMOPT_SIZE];
 			sprintf(oemOption, "oem%s",tableSig );
-			if (getBoolForKey(oemOption, &oem, DEFAULT_BOOT_CONFIG) && oem) // This method don't work for DSDT and FACS
+			if (getBoolForKey(oemOption, &oem, personality) && oem) // This method don't work for DSDT and FACS
 			{ 
 				DBG("   %s required\n", oemOption);
 				
@@ -4518,6 +4592,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 			}
 		}
         
+        if ((DropTables_tag_count > 0) && DropTables_p)
 		{
 			TagPtr match_drop = XMLGetProperty(DropTables_p, (const char*)tableSig);
 			if ( match_drop )
@@ -4639,6 +4714,8 @@ EFI_STATUS setupAcpi(void)
 		getc();
 		return EFI_NOT_FOUND;
 	}
+    
+    initPersonality();
 	
 	{
 		U8 i;
@@ -4649,20 +4726,20 @@ EFI_STATUS setupAcpi(void)
 		}
 		bool tmpval;
 		
-		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-		oem_fadt=getBoolForKey(kOEMFADT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		oem_dsdt=getBoolForKey(kOEMDSDT, &tmpval, personality)&&tmpval;
+		oem_fadt=getBoolForKey(kOEMFADT, &tmpval, personality)&&tmpval;
         
-		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-		gen_ssdt=getBoolForKey(KForceSSDT, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, personality)&&tmpval;
+		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, personality)&&tmpval;
+		gen_ssdt=getBoolForKey(KForceSSDT, &tmpval, personality)&&tmpval;
+		update_acpi=getBoolForKey(kUpdateACPI, &tmpval, personality)&&tmpval;
 		
-		speed_step=getBoolForKey(kSpeedstep, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-		turbo_enabled=(U32)getBoolForKey(kCoreTurbo, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		speed_step=getBoolForKey(kSpeedstep, &tmpval, personality)&&tmpval;
+		turbo_enabled=(U32)getBoolForKey(kCoreTurbo, &tmpval, personality)&&tmpval;
 #if BUILD_ACPI_TSS 
-		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		gen_tsta=(U32)getBoolForKey(kGenerateTStates, &tmpval, personality)&&tmpval;
 #endif
-		checkOem=getBoolForKey(kOnlySignedAml, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
+		checkOem=getBoolForKey(kOnlySignedAml, &tmpval, personality)&&tmpval;
 	} 
     
 	{
@@ -4971,7 +5048,7 @@ EFI_STATUS setupAcpi(void)
         MADT_INFO madt_info;
         bool strip_madt = true;
         
-        getBoolForKey(kSTRIPAPIC, &strip_madt, DEFAULT_BOOT_CONFIG);
+        getBoolForKey(kSTRIPAPIC, &strip_madt, personality);
         
         if ((strip_madt == false) || (!buildMADT(new_table_list, DsdtPtr, &madt_info ))) 
         {
@@ -4982,7 +5059,7 @@ EFI_STATUS setupAcpi(void)
             
             {		
                 bool tmpval;		
-                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;		
+                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, personality)&&tmpval;		
             } 
             
             if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)

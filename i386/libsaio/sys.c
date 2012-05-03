@@ -119,11 +119,8 @@ BVRef gBootVolume;
 static BVRef newBootVolumeRef( int biosdev, int partno );
 static int GetFreeFd(void);
 static struct iob * iob_from_fdesc(int fdesc);
-#if UNUSED
-static int open_bvr(BVRef bvr, const char *filePath, int flags);
-#else
+
 static int open_bvr(BVRef bvr, const char *filePath);
-#endif
 
 //==========================================================================
 // LoadVolumeFile - LOW-LEVEL FILESYSTEM FUNCTION.
@@ -383,11 +380,8 @@ static struct iob * iob_from_fdesc(int fdesc)
 
 //==========================================================================
 // open() - Open the file specified by 'path' for reading.
-#if UNUSED
-static int open_bvr(BVRef bvr, const char *filePath, int flags)
-#else
+
 static int open_bvr(BVRef bvr, const char *filePath)
-#endif
 {
 	struct iob	*io;
 	int		fdesc;
@@ -423,31 +417,22 @@ static int open_bvr(BVRef bvr, const char *filePath)
 	return fdesc;
 }
 
-#if UNUSED
-int open(const char *path, int flags)
-#else
+
 int open(const char *path)
-#endif
 {
 	const char	*filepath;
 	BVRef		bvr;
 	
 	// Resolve the boot volume from the file spec.
 	if ((bvr = getBootVolumeRef(path, &filepath)) != NULL) {
-#if UNUSED
-		return open_bvr(bvr, filepath, flags);
-#else
+        
         return open_bvr(bvr, filepath);
-#endif
 	}
 	return -1;
 }
 
-#if UNUSED
-int open_bvdev(const char *bvd, const char *path, int flags)
-#else
+
 int open_bvdev(const char *bvd, const char *path)
-#endif
 {
 	const struct devsw	*dp;
 	const char		*cp;
@@ -486,11 +471,8 @@ int open_bvdev(const char *bvd, const char *path)
 				}
 			}
 			bvr = newBootVolumeRef(dp->biosdev + unit, partition);
-#if UNUSED
-            return open_bvr(bvr, path, flags);
-#else
+            
             return open_bvr(bvr, path);
-#endif
 		}
 	}
 	return -1;
@@ -811,11 +793,8 @@ void scanBootVolumes( int biosdev, int * count )
 }
 
 //==========================================================================
-#if UNUSED
-void scanDisks(int biosdev, int *count)
-#else
+
 void scanDisks(void)
-#endif
 {
 #define MAX_HDD_COUNT 32
 	int bvCount;
@@ -848,7 +827,7 @@ BVRef selectBootVolume( BVRef chain )
 	if (chain->filtered) filteredChain = true;
 	
 	int gBIOSDev = (int)get_env(envgBIOSDev);
-
+    
 #if UNUSED
 	if (multiboot_partition_set)
 		for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) {
@@ -918,7 +897,7 @@ BVRef selectBootVolume( BVRef chain )
 			}
         }
 	}
-		
+    
 	/*
 	 * Use the standrad method for selecting the boot volume.
 	 */
