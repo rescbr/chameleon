@@ -150,16 +150,22 @@ static uint64_t measure_aperf_frequency(void)
  */
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency, fsbFrequency, cpuFrequency;
-	uint64_t	msr, flex_ratio;
-	uint8_t		maxcoef, maxdiv, currcoef, bus_ratio_max, currdiv;
+	uint64_t	tscFrequency = 0;
+	uint64_t	fsbFrequency = 0;
+	uint64_t	cpuFrequency =0;
+	uint64_t	msr = 0;
+	uint64_t	flex_ratio = 0;
+	uint32_t	max_ratio = 0;
+	uint32_t	min_ratio = 0;
+	uint8_t		bus_ratio_max = 0;
+	uint8_t		bus_ratio_min = 0;
+	uint8_t		currdiv = 0;
+	uint8_t		currcoef = 0;
+	uint8_t		maxdiv = 0;
+	uint8_t		maxcoef = 0;
+
 	const char	*newratio;
-	int			len, myfsb;
-	uint8_t		bus_ratio_min;
-	uint32_t	max_ratio, min_ratio;
-	
-	max_ratio = min_ratio = myfsb = bus_ratio_min = 0;
-	maxcoef = maxdiv = bus_ratio_max = currcoef = currdiv = 0;
+	int			len = 0;
 	
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
@@ -281,8 +287,6 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 	tscFrequency = measure_tsc_frequency();
-	fsbFrequency = 0;
-	cpuFrequency = 0;
 	
 	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
 		int intelCPU = p->CPU.Model;
@@ -299,26 +303,18 @@ void scan_cpu(PlatformInfo_t *p)
 										  p->CPU.Model == CPU_MODEL_JAKETOWN	||
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE	)) {
 				msr = rdmsr64(MSR_PLATFORM_INFO);
-				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
-				bus_ratio_max = bitfield(msr, 14, 8);
-				bus_ratio_min = bitfield(msr, 46, 40); //valv: not sure about this one (Remarq.1)
+//				DBG("MSR_PLATFORM_INFO: 0x%x\n", bitfield(msr, 63, 0));
+				bus_ratio_max = bitfield(msr, 15, 8);	//MacMan: Changed bitfield to match Apple tsc.c
+				bus_ratio_min = bitfield(msr, 47, 40);	//MacMan: Changed bitfield to match Apple tsc.c
 				msr = rdmsr64(MSR_FLEX_RATIO);
-				DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
+//				DBG("MSR_FLEX_RATIO: 0x%x\n", bitfield(msr, 31, 0));
 				if (bitfield(msr, 16, 16)) {
-					flex_ratio = bitfield(msr, 14, 8);
-					/* bcc9: at least on the gigabyte h67ma-ud2h,
-					 where the cpu multipler can't be changed to
-					 allow overclocking, the flex_ratio msr has unexpected (to OSX)
-					 contents.	These contents cause mach_kernel to
-					 fail to compute the bus ratio correctly, instead
-					 causing the system to crash since tscGranularity
-					 is inadvertently set to 0.
-					 */
+					flex_ratio = bitfield(msr, 15, 8);	//MacMan: Changed bitfield to match Apple tsc.c
 					if (flex_ratio == 0) {
 						/* Clear bit 16 (evidently the presence bit) */
 						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 						msr = rdmsr64(MSR_FLEX_RATIO);
-						verbose("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
+//						DBG("Null flex ratio detected. MSR_FLEX_RATIO now: %08x\n", bitfield(msr, 31, 0));
 					} else {
 						if (bus_ratio_max > flex_ratio) {
 							bus_ratio_max = flex_ratio;
@@ -329,20 +325,43 @@ void scan_cpu(PlatformInfo_t *p)
 				if (bus_ratio_max) {
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
-				//valv: Turbo Ratio Limit
-				if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
-					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
-					cpuFrequency = bus_ratio_max * fsbFrequency;
-					max_ratio = bus_ratio_max * 10;
-				} else {
-					cpuFrequency = tscFrequency;
+
+				//MacMan: Turbo Ratio Limit
+				switch (intelCPU) 
+				{
+					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
+					{
+						cpuFrequency = tscFrequency;
+						DBG("cpu.c (%d)CPU_MODEL_NEHALEM_EX or CPU_MODEL_WESTMERE_EX Found\n", __LINE__);
+						break;
+					}
+					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+					{
+						msr = rdmsr64(MSR_IA32_PERF_STATUS);
+						currcoef = bitfield(msr, 15, 8);
+						cpuFrequency = currcoef * fsbFrequency;
+						maxcoef = bus_ratio_max;
+						break;
+					}
+					default:
+					{
+						msr = rdmsr64(MSR_IA32_PERF_STATUS);
+						currcoef = bitfield(msr, 7, 0);
+						cpuFrequency = currcoef * fsbFrequency;
+						maxcoef = bus_ratio_max;
+						break;
+					}
 				}
+						
 				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
 					if (len >= 3) max_ratio = (max_ratio + 5);
 					
-					verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
+					DBG("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 					
 					// extreme overclockers may love 320 ;)
 					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
@@ -353,17 +372,13 @@ void scan_cpu(PlatformInfo_t *p)
 						max_ratio = (bus_ratio_max * 10);
 					}
 				}
-				//valv: to be uncommented if Remarq.1 didn't stick
-				/*if (bus_ratio_max > 0) bus_ratio = flex_ratio;*/
-				p->CPU.MaxRatio = max_ratio;
-				p->CPU.MinRatio = min_ratio;
+
+				p->CPU.MaxRatio = bus_ratio_max;
+				p->CPU.MinRatio = bus_ratio_min;
 				
-				myfsb = fsbFrequency / 1000000;
-				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio);
-				currcoef = bus_ratio_max;
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
+				DBG("MSR_IA32_PERF_STATUS: 0x%08x\n", bitfield(msr, 31, 0));
 				currcoef = bitfield(msr, 12, 8);
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = bitfield(msr, 46, 46);
@@ -484,25 +499,41 @@ void scan_cpu(PlatformInfo_t *p)
 #endif
 	
 	p->CPU.MaxCoef = maxcoef;
-	p->CPU.MaxDiv = maxdiv;
+	if (maxdiv == 0){
+		p->CPU.MaxDiv = bus_ratio_max;
+	}
+	else {
+		p->CPU.MaxDiv = maxdiv;
+	}
 	p->CPU.CurrCoef = currcoef;
-	p->CPU.CurrDiv = currdiv;
+	if (currdiv == 0){
+		p->CPU.CurrDiv = currcoef;
+	}
+	else {
+		p->CPU.CurrDiv = currdiv;
+	}
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
 	
 	// keep formatted with spaces instead of tabs
-	DBG("CPU: Brand String:             %s\n",              p->CPU.BrandString);
-    DBG("CPU: Vendor/Family/ExtFamily:  0x%x/0x%x/0x%x\n",  p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
-    DBG("CPU: Model/ExtModel/Stepping:  0x%x/0x%x/0x%x\n",  p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
-    DBG("CPU: MaxCoef/CurrCoef:         0x%x/0x%x\n",       p->CPU.MaxCoef, p->CPU.CurrCoef);
-    DBG("CPU: MaxDiv/CurrDiv:           0x%x/0x%x\n",       p->CPU.MaxDiv, p->CPU.CurrDiv);
-    DBG("CPU: TSCFreq:                  %dMHz\n",           p->CPU.TSCFrequency / 1000000);
-    DBG("CPU: FSBFreq:                  %dMHz\n",           p->CPU.FSBFrequency / 1000000);
-    DBG("CPU: CPUFreq:                  %dMHz\n",           p->CPU.CPUFrequency / 1000000);
-    DBG("CPU: NoCores/NoThreads:        %d/%d\n",           p->CPU.NoCores, p->CPU.NoThreads);
-    DBG("CPU: Features:                 0x%08x\n",          p->CPU.Features);
-#if DEBUG_CPU
+	DBG("CPU: Brand String:                %s\n",                 p->CPU.BrandString);
+    DBG("CPU: Vendor:                      0x%x\n",				  p->CPU.Vendor);
+	DBG("CPU: Family / ExtFamily:          0x%x / 0x%x\n",		  p->CPU.Family, p->CPU.ExtFamily);
+    DBG("CPU: Model / ExtModel / Stepping: 0x%x / 0x%x / 0x%x\n", p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
+    DBG("CPU: Number of Cores / Threads:   %d / %d\n",            p->CPU.NoCores, p->CPU.NoThreads);
+    DBG("CPU: Features:                    0x%08x\n",             p->CPU.Features);
+    DBG("CPU: TSC Frequency:               %d MHz\n",             p->CPU.TSCFrequency / 1000000);
+    DBG("CPU: FSB Frequency:               %d MHz\n",             p->CPU.FSBFrequency / 1000000);
+    DBG("CPU: CPU Frequency:               %d MHz\n",             p->CPU.CPUFrequency / 1000000);
+	DBG("CPU: Minimum Bus Ratio:           %d\n",                 p->CPU.MinRatio);
+    DBG("CPU: Maximum Bus Ratio:           %d\n",                 p->CPU.MaxRatio);
+	DBG("CPU: Current Bus Ratio:           %d\n",                 p->CPU.CurrCoef);
+//	DBG("CPU: Maximum Multiplier:          %d\n",				  p->CPU.MaxCoef);
+//  DBG("CPU: Maximum Divider:             %d\n",				  p->CPU.MaxDiv);
+//	DBG("CPU: Current Divider:             %d\n",				  p->CPU.CurrDiv);
+
+#if DEBUG_CPU 
 	pause();
 #endif
 }

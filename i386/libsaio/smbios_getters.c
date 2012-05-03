@@ -86,6 +86,15 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						value->word = qpibusspeed;
 						return true;
 					}
+					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+					{
+						int busspeed;
+						busspeed = 100;
+						value->word = busspeed;
+						return true;
+					}
 				}
 			}
 		}
@@ -109,18 +118,10 @@ uint16_t simpleGetSMBOemProcessorType(void)
 
 bool getSMBOemProcessorType(returnType *value)
 {
-	static bool done = false;		
-		
 	value->word = simpleGetSMBOemProcessorType();
 
 	if (Platform.CPU.Vendor == 0x756E6547) // Intel
 	{
-		if (!done)
-		{
-			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, Platform.CPU.Family, Platform.CPU.Model);
-			done = true;
-		}
-		
 		switch (Platform.CPU.Family) 
 		{
 			case 0x06:
@@ -137,7 +138,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
-                    case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5 LGA2011 (32nm)
+                    case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 							value->word = 0x0501;			// Xeon 
 						else
@@ -161,11 +162,14 @@ bool getSMBOemProcessorType(returnType *value)
 							value->word = 0x0701;			// Core i7
 						return true;
 
-					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7, Xeon E3-12xx LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
-							value->word = 0x0901;			// Core i3
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+							value->word = 0x0501;			// Xeon
+						else
+							if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+								value->word = 0x0901;			// Core i3
 						else
 							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
 								value->word = 0x0601;		// Core i5

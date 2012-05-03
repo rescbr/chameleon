@@ -426,7 +426,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	if (acpi_cpu_count > 0) 
 	{
 		struct p_state initial, maximum, minimum, p_states[32];
-		uint8_t p_states_count = 0;		
+		uint8_t p_states_count = 0;
+		uint64_t msr = 0;
 		
 		// Retrieving P-States, ported from code by superhai (c)
 		switch (Platform.CPU.Family) {
@@ -563,14 +564,11 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
-					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
-					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
-					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 					{
 						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...
 						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
+						verbose("P-States: min %d, max %d\n", minimum.Control, maximum.Control);			
 						
 						// Sanity check
 						if (maximum.Control < minimum.Control) 
@@ -591,7 +589,41 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 								p_states_count++;
 							}
 						}
+						verbose("Number of P-States Generated: %d\n", p_states_count);
+						break;
+					}	
+					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+					{
+						msr = rdmsr64(MSR_IA32_PERF_STATUS);
+						initial.Control = bitfield(msr, 15, 8);
+						msr = rdmsr64(MSR_IA32_PERF_STATUS);
+						maximum.Control = bitfield(msr, 15, 8);
+						minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 						
+						verbose("P-States: min %d, max %d\n", minimum.Control, maximum.Control);
+						
+						// Sanity check
+						if (maximum.Control < minimum.Control) 
+						{
+							DBG("Insane control values!");
+							p_states_count = 0;
+						}
+						else
+						{
+							uint8_t i;
+							p_states_count = 0;
+							
+							for (i = maximum.Control; i >= minimum.Control; i--) 
+							{
+								p_states[p_states_count].Control = i;
+								p_states[p_states_count].CID = p_states[p_states_count].Control << 1;
+								p_states[p_states_count].Frequency = (Platform.CPU.FSBFrequency / 1000000) * i;
+								p_states_count++;
+							}
+						}
+						verbose("Number of P-States Generated: %d\n", p_states_count);
 						break;
 					}	
 					default:
@@ -781,6 +813,9 @@ int setupAcpi(void)
 	const char *filename;
 	char dirSpec[128];
 	int len = 0;
+	
+	// always reset cpu count to 0 when injecting new acpi
+	acpi_cpu_count = 0;
 
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))

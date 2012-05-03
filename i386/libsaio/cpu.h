@@ -16,14 +16,16 @@ extern void scan_cpu(PlatformInfo_t *);
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x00000198
+#define MSR_CORE_THREAD_COUNT	0x35	// Undocumented. Nehalem and newer only 
+#define MSR_FLEX_RATIO			0x194	// Undocumented. 
+#define MSR_IA32_EXT_CONFIG		0xEE	// Undocumented. Core Solo and Core Duo only
+#define MSR_PKG_CST_CONFIG_CTL	0xE2
+#define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199
-#define MSR_IA32_EXT_CONFIG		0x00EE
-#define MSR_FLEX_RATIO			0x194
-#define MSR_TURBO_RATIO_LIMIT	0x1AD
-#define	MSR_PLATFORM_INFO		0xCE
-#define MSR_CORE_THREAD_COUNT	0x35			// Undocumented
 #define MSR_IA32_PLATFORM_ID	0x17
+#define	MSR_PLATFORM_INFO		0xCE
+#define MSR_TURBO_RATIO_LIMIT	0x1AD
+
 
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
