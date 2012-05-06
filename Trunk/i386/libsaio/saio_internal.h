@@ -119,12 +119,9 @@ extern void   turnOffFloppy(void);
 extern int	  testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer );
 
 /* hfs_compare.c */
-extern int32_t FastUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1,
-							   u_int16_t *uniStr2, u_int32_t len2, int byte_order);
-extern void utf_encodestr( const u_int16_t * ucsp, int ucslen,
-                u_int8_t * utf8p, u_int32_t bufsize, int byte_order );
-extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp,
-                u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
+extern int32_t FastUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1, u_int16_t *uniStr2, u_int32_t len2, int byte_order);
+extern void utf_encodestr( const u_int16_t * ucsp, int ucslen, u_int8_t * utf8p, u_int32_t bufsize, int byte_order );
+extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp, u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
 
 /* load.c */
 extern bool gHaveKernelCache;

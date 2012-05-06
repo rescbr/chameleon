@@ -564,9 +564,9 @@ void scan_cpu(PlatformInfo_t *p)
 		cpuFrequency = tscFrequency;
 		DBG("0 ! using the default value for FSB !\n");
 	}
-	
+
 	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
-	
+
 #endif
 	
 	p->CPU.MaxCoef = maxcoef;

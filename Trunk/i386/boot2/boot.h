@@ -113,6 +113,7 @@
 
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"				/* nvidia.c */
+#define kHDMI				"HDMI"				/* nvidia.c */
 #define kDcfg0				"display_0"			/* nvidia.c */
 #define kDcfg1				"display_1"			/* nvidia.c */
 

@@ -89,7 +89,7 @@ choice_group_items[0]=""
 choice_group_exclusive[0]=""
 
 # Package name
-declare -r packagename="Chameleon"
+declare -r packagename="Enoch"
 
 # Package identifiers
 declare -r chameleon_package_identity="org.chameleon"
@@ -952,7 +952,7 @@ generateChoices() {
 makedistribution ()
 {
     declare -r distributionDestDir="${SYMROOT}"
-    declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
+    declare -r distributionFilename="${packagename// /}-rev.${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
 
     rm -f "${distributionDestDir}/${packagename// /}"*.pkg

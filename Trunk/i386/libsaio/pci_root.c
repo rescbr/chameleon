@@ -75,7 +75,7 @@ int getPciRootUID(void)
 		goto out;
 	}
 
-	
+
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
 	{

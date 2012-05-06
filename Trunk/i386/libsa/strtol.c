@@ -66,7 +66,7 @@
  *      Added support for "0b101..." binary constants.
  *      Commented out references to errno.
  */
- 
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)strtol.c	5.4 (Berkeley) 2/23/91";
 #endif /* LIBC_SCCS and not lint */

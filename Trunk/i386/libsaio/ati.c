@@ -636,6 +636,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68D8,	0x56701545, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",                   kNull		},
 	{ 0x68D8,	0x5690174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",                   kNull		},
 	{ 0x68D8,	0x5730174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",                   kNull		},
+	{ 0x68D8,	0x68E01028, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",                   kBaboon		},
 	{ 0x68D8,	0xE151174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",                   kEulemur	},
 	{ 0x68D8,	0xE155174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",                   kNull		},
 	{ 0x68D8,	0xE166174B, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670",                   kUakari		},
@@ -785,7 +786,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6738,	0x67381002, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",                   kDuckweed	},
 	{ 0x6738,	0xE178174B, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6870",                   kDuckweed	},
 
-	{ 0x6739,	0x03B41043, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
+	{ 0x6739,	0x03B41043, CHIP_FAMILY_BARTS,		"ASUS EAH6850 DirectCU",                   kDuckweed	},
 	{ 0x6739,	0x174B174B, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0x200F1787, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kDuckweed	},
 	{ 0x6739,	0x21F81458, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",                   kBulrushes	},
@@ -1947,7 +1948,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	if (!card->info->device_id)
 	{
 		verbose("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%08x] \n", 
-				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id);
+				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id);
 		return false;
 	}
 	
@@ -1995,16 +1996,18 @@ static bool init_card(pci_dt_t *pci_dev)
 	{
 		// use cfg_name on radeon_cards, to retrive the default name from card_configs,
 		card->cfg_name = card_configs[card->info->cfg_name].name;
-		// and leave ports alone!
-//		card->ports = card_configs[card->info->cfg_name].ports;
+		// Uncommented the following line and added verbose for debugging AtiPorts issues on some cards
+		card->ports = card_configs[card->info->cfg_name].ports;
+		// Report number of ports card reports
+		verbose("Card reported ports: %d\n", card->ports);
 		
 		// which means one of the fb's or kNull
-		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
+		verbose("Framebuffer set to: %s using device's default.\n", card->cfg_name);
 	}
 	else
 	{
 		// else, use the fb name returned by AtiConfig.
-		verbose("(AtiConfig) Framebuffer set to: %s\n", card->cfg_name);
+		verbose("Framebuffer set to: %s using AtiConfig=%s\n", card->cfg_name, card->cfg_name);
 	}
 	
 	// Check AtiPorts key for nr of ports,
@@ -2013,7 +2016,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	if (n_ports > 0)
 	{
 		card->ports = n_ports; // use it.
-		verbose("(AtiPorts) Nr of ports set to: %d\n", card->ports);
+		verbose("Number of ports set to: %d using AtiPorts=%d\n", card->ports, card->ports);
     }
 	else// if (card->cfg_name > 0) // do we want 0 ports if fb is kNull or mistyped ?
 	{
@@ -2022,7 +2025,7 @@ static bool init_card(pci_dt_t *pci_dev)
 			if (strcmp(card->cfg_name, card_configs[i].name) == 0)
 				card->ports = card_configs[i].ports; // default
 		
-		verbose("Nr of ports set to framebuffer's default: %d\n", card->ports);
+		verbose("Number of ports set to: %d using framebuffer's default.\n", card->ports);
 	}
 //	else
 //		card->ports = 2/1 ?; // set a min if 0 ports ?
@@ -2044,16 +2047,21 @@ static bool init_card(pci_dt_t *pci_dev)
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	char *devicepath;
-	
-	if (!init_card(ati_dev))
-		return false;
-	
+
 	// -------------------------------------------------
 	// Find a better way to do this (in device_inject.c)
 	if (!string)
 		string = devprop_create_string();
 	
 	devicepath = get_pci_dev_path(ati_dev);
+	if (!devicepath) {
+		return false;
+	}
+	verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
+		ati_dev->vendor_id, ati_dev->device_id, devicepath);
+	if (!init_card(ati_dev))
+		return false;
+
 	card->device = devprop_add_device(string, devicepath);
 	if (!card->device)
 		return false;
@@ -2078,11 +2086,11 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	stringlength = string->length;
 	// -------------------------------------------------
 	
-	verbose("ATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
-			chip_family_name[card->info->chip_family], card->info->model_name,
-			(uint32_t)(card->vram_size / (1024 * 1024)), card->cfg_name,
+	verbose("%s %dMB [%04x:%04x] (subsys [%04x:%04x]) (%s:%s) :: %s\n",
+			card->info->model_name, (uint32_t)(card->vram_size / (1024 * 1024)),
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
+			chip_family_name[card->info->chip_family], card->cfg_name, 
 			devicepath);
 	
 	free(card);

@@ -53,39 +53,45 @@ long ThinFatFile(void **binary, unsigned long *length)
   uint32_t fapoffset;
   uint32_t fapsize;	
   
-  if (fhp->magic == FAT_MAGIC) {
-    nfat = fhp->nfat_arch;
-    swapped = 0;
-  } else if (fhp->magic == FAT_CIGAM) {
-    nfat = OSSwapInt32(fhp->nfat_arch);
-    swapped = 1;
-  } else {
-    return -1;
-  }
-  
-  for (; nfat > 0; nfat--, fap++) {
-    if (swapped) {
-      fapcputype = OSSwapInt32(fap->cputype);
-      fapoffset = OSSwapInt32(fap->offset);
-      fapsize = OSSwapInt32(fap->size);
-    }
+	if (fhp->magic == FAT_MAGIC)
+	{
+		nfat = fhp->nfat_arch;
+		swapped = 0;
+	}
+	else if (fhp->magic == FAT_CIGAM)
+	{
+		nfat = OSSwapInt32(fhp->nfat_arch);
+		swapped = 1;
+	}
 	else
 	{
-		fapcputype = fap->cputype;
-		fapoffset = fap->offset;
-		fapsize = fap->size;
+		return -1;
 	}
-    
-    if (fapcputype == archCpuType) {
-      *binary = (void *) ((unsigned long)*binary + fapoffset);
-	  size = fapsize;
-	  break;
-    }
-  }
-  
-  if (length != 0) *length = size;
-  
-  return 0;
+	for (; nfat > 0; nfat--, fap++)
+	{
+		if (swapped)
+		{
+			fapcputype = OSSwapInt32(fap->cputype);
+			fapoffset = OSSwapInt32(fap->offset);
+			fapsize = OSSwapInt32(fap->size);
+		}
+		else
+		{
+			fapcputype = fap->cputype;
+			fapoffset = fap->offset;
+			fapsize = fap->size;
+		}
+		if (fapcputype == archCpuType)
+		{
+			*binary = (void *) ((unsigned long)*binary + fapoffset);
+			size = fapsize;
+			break;
+		}
+	}
+
+	if (length != 0) *length = size;
+
+	return 0;
 }
 
 long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
@@ -98,14 +104,15 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   unsigned long  cnt;
   long  ret = -1;
   unsigned int entry = 0;
-  
+
   gBinaryAddress = (unsigned long)binary;
-  
+
   mH = (struct mach_header *)(gBinaryAddress);
   switch (archCpuType)
 	{
 		case CPU_TYPE_I386:
-			if (mH->magic != MH_MAGIC) {
+			if (mH->magic != MH_MAGIC)
+			{
 				error("Mach-O file has bad magic number\n");
 				return -1;
 			}
@@ -114,7 +121,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		case CPU_TYPE_X86_64:
 			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) 
 				return -1;
-			if (mH->magic != MH_MAGIC_64) {
+			if (mH->magic != MH_MAGIC_64)
+			{
 				error("Mach-O file has bad magic number\n");
 				return -1;
 			}
@@ -124,7 +132,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			error("Unknown CPU type\n");
 			return -1;
 	}
-			
+
   cmdBase = cmdstart;
 
 #if DEBUG
@@ -137,33 +145,35 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   printf("flags:      %x\n", (unsigned)mH->flags);
   getchar();
 #endif
-  
-  ncmds = mH->ncmds;
-  
-  for (cnt = 0; cnt < ncmds; cnt++) {
-    cmd = ((long *)cmdBase)[0];
-    cmdsize = ((long *)cmdBase)[1];
-    unsigned int load_addr;
-    unsigned int load_size;
-    
-    switch (cmd) {
-	case LC_SEGMENT_64:      
-    case LC_SEGMENT:
-      ret = DecodeSegment(cmdBase, &load_addr, &load_size);
-      if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR) {
-          vmaddr = MIN(vmaddr, load_addr);
-          vmend = MAX(vmend, load_addr + load_size);
-      }
-      break;
-      
-    case LC_UNIXTHREAD:
-      ret = DecodeUnixThread(cmdBase, &entry);
-      break;
 
-    case LC_SYMTAB:
-      break;
-      
-    default:
+  ncmds = mH->ncmds;
+
+	for (cnt = 0; cnt < ncmds; cnt++)
+	{
+		cmd = ((long *)cmdBase)[0];
+		cmdsize = ((long *)cmdBase)[1];
+		unsigned int load_addr;
+		unsigned int load_size;
+
+		switch (cmd)
+		{
+			case LC_SEGMENT_64:      
+			case LC_SEGMENT:
+			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
+			if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR)
+			{
+				vmaddr = MIN(vmaddr, load_addr);
+				vmend = MAX(vmend, load_addr + load_size);
+			}
+			break;
+			case LC_UNIXTHREAD:
+			ret = DecodeUnixThread(cmdBase, &entry);
+			break;
+
+			case LC_SYMTAB:
+			break;
+
+			default:
 #if NOTDEF
       printf("Ignoring cmd type %d.\n", (unsigned)cmd);
 #endif
@@ -180,7 +190,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
   *raddr = (char *)vmaddr;
   
   cmdBase = cmdstart;
-  for (cnt = 0; cnt < ncmds; cnt++) {
+  for (cnt = 0; cnt < ncmds; cnt++)
+{
 	cmd = ((long *)cmdBase)[0];
 	cmdsize = ((long *)cmdBase)[1];
 		
@@ -243,7 +254,8 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 #endif	  
   }
 
-  if (vmsize == 0 || filesize == 0) {
+  if (vmsize == 0 || filesize == 0)
+  {
       *load_addr = ~0;
       *load_size = 0;
       return 0;

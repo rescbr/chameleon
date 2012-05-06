@@ -260,7 +260,7 @@ typedef struct {
 #define PCI_CB_IO_BASE_1_HI					0x36
 #define PCI_CB_IO_LIMIT_1					0x38
 #define PCI_CB_IO_LIMIT_1_HI					0x3a
-#define	 PCI_CB_IO_RANGE_MASK					~0x03
+#define	PCI_CB_IO_RANGE_MASK					~0x03
 /* 0x3c-0x3d are same as for htype 0 */
 #define PCI_CB_BRIDGE_CONTROL					0x3e
 #define PCI_CB_BRIDGE_CTL_PARITY				0x01			/* Similar to standard bridge control register */
@@ -428,7 +428,6 @@ typedef struct {
 #define PCI_PCIX_STATUS_266MHZ					0x40000000		/* 266 MHz capable */
 #define PCI_PCIX_STATUS_533MHZ					0x80000000		/* 533 MHz capable */
 #define PCI_PCIX_SIZEOF						4
-
 
 /* PCI-X Bridges */
 #define PCI_PCIX_BRIDGE_SEC_STATUS				2			/* Secondary bus status register offset */
@@ -768,6 +767,7 @@ typedef struct {
 #define PCI_CLASS_STORAGE_RAID					0x0104
 #define PCI_CLASS_STORAGE_ATA					0x0105
 #define PCI_CLASS_STORAGE_SATA					0x0106
+#define PCI_CLASS_STORAGE_SATA_AHCI				0x010601
 #define PCI_CLASS_STORAGE_SAS					0x0107
 #define PCI_CLASS_STORAGE_OTHER					0x0180
 
@@ -824,6 +824,7 @@ typedef struct {
 #define PCI_CLASS_SYSTEM_TIMER					0x0802
 #define PCI_CLASS_SYSTEM_RTC					0x0803
 #define PCI_CLASS_SYSTEM_PCI_HOTPLUG				0x0804
+#define PCI_CLASS_SYSTEM_SDHCI					0x0805
 #define PCI_CLASS_SYSTEM_OTHER					0x0880
 
 #define PCI_BASE_CLASS_INPUT					0x09
@@ -852,6 +853,10 @@ typedef struct {
 #define PCI_CLASS_SERIAL_ACCESS					0x0c01
 #define PCI_CLASS_SERIAL_SSA					0x0c02
 #define PCI_CLASS_SERIAL_USB					0x0c03
+#define PCI_CLASS_SERIAL_USB_UHCI				0x0c0300
+#define PCI_CLASS_SERIAL_USB_OHCI				0x0c0310
+#define PCI_CLASS_SERIAL_USB_EHCI				0x0c0320
+#define PCI_CLASS_SERIAL_USB_XHCI				0x0c0330
 #define PCI_CLASS_SERIAL_FIBER					0x0c04
 #define PCI_CLASS_SERIAL_SMBUS					0x0c05
 #define PCI_CLASS_SERIAL_INFINIBAND				0x0c06
@@ -860,6 +865,7 @@ typedef struct {
 #define PCI_CLASS_WIRELESS_IRDA					0x0d00
 #define PCI_CLASS_WIRELESS_CONSUMER_IR				0x0d01
 #define PCI_CLASS_WIRELESS_RF					0x0d10
+#define PCI_CLASS_WIRELESS_WHCI					0x0d1010
 #define PCI_CLASS_WIRELESS_OTHER				0x0d80
 
 #define PCI_BASE_CLASS_INTELLIGENT				0x0e
