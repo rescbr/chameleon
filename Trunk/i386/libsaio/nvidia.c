@@ -1055,8 +1055,8 @@ static struct nv_chipsets_t NVKnownChipsets[] = {
 	// 1170 - 117F
 	// 1180 - 118F
 	{ 0x10DE1180,	"GeForce GTX 680" },
-	{ 0x10DE1188,	"GeForce GTX 690" }
-	{ 0x10DE1189,	"GeForce GTX 670" }
+	{ 0x10DE1188,	"GeForce GTX 690" },
+	{ 0x10DE1189,	"GeForce GTX 670" },
 	// 1190 - 119F
 	// 11A0 - 11AF
 	// 11B0 - 11BF
