@@ -50,9 +50,7 @@ uint64_t timeRDTSC(void)
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-4)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-5))
     };
-	
-    //int_enabled = ml_set_interrupts_enabled(FALSE);
-    
+
 restart:
     if (attempts >= 9) // increase to up to 9 attempts.
         // This will flash-reboot. TODO: Use tscPanic instead.
@@ -88,10 +86,8 @@ restart:
     set_PIT2(0);			// reset timer 2 to be zero
     disable_PIT2();			// turn off PIT 2
 	
-    //ml_set_interrupts_enabled(int_enabled);
     return intermediate;
 }
-
 
 /*
  * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
@@ -355,14 +351,10 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 	tscFrequency = measure_tsc_frequency();
-	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
-	if ( tscFrequency < 1000 )//TEST
+	/* if usual method failed */
+	if ( tscFrequency < 1000 )
 	{
-	tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
-	// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
-	}
-	else{
-	// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
+	tscFrequency = timeRDTSC() * 20;
 	}
 	fsbFrequency = 0;
 	cpuFrequency = 0;
@@ -564,9 +556,6 @@ void scan_cpu(PlatformInfo_t *p)
 		cpuFrequency = tscFrequency;
 		DBG("0 ! using the default value for FSB !\n");
 	}
-
-	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
-
 #endif
 	
 	p->CPU.MaxCoef = maxcoef;

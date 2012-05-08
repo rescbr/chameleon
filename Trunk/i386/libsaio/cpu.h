@@ -109,8 +109,7 @@ static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *da
  *   bit 0 gates the clock,
  *   bit 1 gates output to speaker.
  */
-inline static void
-enable_PIT2(void)
+static inline void enable_PIT2(void)
 {
     /* Enable gate, disable speaker */
     __asm__ volatile(
@@ -121,8 +120,7 @@ enable_PIT2(void)
 					 : : : "%al" );
 }
 
-inline static void
-disable_PIT2(void)
+static inline void disable_PIT2(void)
 {
     /* Disable gate and output to speaker */
     __asm__ volatile(
@@ -230,7 +228,5 @@ get_PIT2(unsigned int *value)
 
     return result;
 }
-
-
 
 #endif /* !__LIBSAIO_CPU_H */
