@@ -14,8 +14,8 @@ Example arguments include
 
  kernel: kernel name                (e.g. "mach_kernel" - must be in "/" )
 
- flags: -v (verbose)                -s (single user mode)
-        -x (safe mode)              -f (ignore caches)
+ flags: -v (verbose),                -s (single user mode),
+        -x (safe mode),              -f (ignore caches),
         -F (ignore "Kernel Flags" specified in boot configuration file)
 
  "Graphics Mode"="WIDTHxHEIGHTxDEPTH" (e.g. "1024x768x32")
@@ -30,18 +30,22 @@ using safe mode.  Type -x to start up in safe mode, which ignores all
 cached driver files.
 
 Special booter hotkeys:
+-----------------------
   F5            Rescans optical drive.
   F10           Scans and displays all BIOS accessible drives.
 
 Special booter commands:
+------------------------
   ?memory       Displays information about the computer's memory.
   ?video        Displays VESA video modes supported by the computer's BIOS.
   ?norescan     Leaves optical drive rescan mode.
 
 Additional useful command-line options:
+---------------------------------------
   config=<file>             Use an alternate Boot.plist file.
 
 Options useful in the org.chameleon.Boot.plist file:
+----------------------------------------------------
   Wait=Yes|No             Prompt for a key press before starting the kernel.
   "Quiet Boot"=Yes|No     Use quiet boot mode (no messages or prompt).
   Timeout=8               Number of seconds to pause at the boot: prompt.
@@ -122,16 +126,16 @@ Options useful in the org.chameleon.Boot.plist file:
                             (default paths:
                               /Extra/SMBIOS.plist bt(0,0)/Extra/SMBIOS.plist).
 
-  SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding if
-                           smbios.plist doesn't exist, factory values are kept.
+  SMBIOSdefaults=No       Don't use the Default values for SMBIOS overriding.
+                          If smbios.plist doesn't exist, factory values are kept.
 
-  "Scan Single Drive"     Scan the drive only where the booter got loaded from.
-    =Yes|No               Fix rescan pbs when using a DVD reader in AHCI mode.
+  "Scan Single Drive"     Only scan the drive from which the booter got loaded.
+    =Yes|No               Fixes rescan-problems (DVD reader in AHCI mode).
   Rescan=Yes              Enable CD-ROM rescan mode.
-  "Rescan Prompt"=Yes     Prompts for enable CD-ROM rescan mode.
-  SystemId=<UUID>         Set manually the system id UUID,
-                          SMUUID in smbios config (reserved field) isn't used.
-  SystemType=<n>          Set the system type where n is between 0..6
-                            (default =1 (Desktop)
+  "Rescan Prompt"=Yes     Prompt for enabling CD-ROM rescan mode.
+  SystemId=<UUID>         Set the system id manually to UUID.
+                          SMUUID in smbios config (reserved field) isn't used then.
+  SystemType=<n>          Set the system type to n, where n is between 0..6
+                          (default=1 Desktop)
   md0=<file>              Load raw img file into memory for use as XNU's md0
                           ramdisk. /Extra/Postboot.img is used otherwise.

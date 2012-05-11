@@ -716,17 +716,35 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E4,	0x397917AA, CHIP_FAMILY_CEDAR,		"AMD Radeon HD 6370M",                  kNull		},
 	{ 0x68E4,	0x84A01043, CHIP_FAMILY_CEDAR,		"AMD Radeon HD 6370M",                  kNull		},
 
+	{ 0x68F9,	0x00011019, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x00021019, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x00191019, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
 	{ 0x68F9,	0x010E1002, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x03CA1043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x05181025, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x05191025, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x010E1028, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x174B3000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6230",                   kNull		},
 	{ 0x68F9,	0x174B6250, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6250",                   kNull		},
 	{ 0x68F9,	0x174B6290, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6290",                   kNull		},
 	{ 0x68F9,	0x20091787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x21261028, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
 	{ 0x68F9,	0x2126103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x21301462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x21311462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x21331462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x21801462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x21811462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x21821462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x21831462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
 	{ 0x68F9,	0x22911787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x22301462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x22311462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x23401462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x24951462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x2AAC103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x2AEC103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",                   kNull		},
 	{ 0x68F9,	0x300017AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6250",                   kNull		},
 	{ 0x68F9,	0x3001148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6250",                   kNull		},
@@ -738,12 +756,26 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x301117AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",                   kNull		},
 	{ 0x68F9,	0x301217AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",                   kNull		},
 	{ 0x68F9,	0x301317AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",                   kNull		},
+	{ 0x68F9,	0x301417AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x3580103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x360217AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x360317AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x360F17AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x361917AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x39831642, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
+	{ 0x68F9,	0x39841642, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x39871642, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x3987174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
 	{ 0x68F9,	0x39971462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x3A051642, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x3B311642, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350A",                  kNull		},
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",                   kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",                   kNull		},
 	{ 0x68F9,	0x5530174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5530",                   kNull		},
+	{ 0x68F9,	0x6230174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6230",                   kNull		},
+	{ 0x68F9,	0x6350174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x7350148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 7350",                   kNull		},
+	{ 0x68F9,	0xE127174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0xE145174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0xE153174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 
@@ -1400,6 +1432,7 @@ bool get_sclk_val(value_t *val);
 bool get_refclk_val(value_t *val);
 bool get_platforminfo_val(value_t *val);
 bool get_vramtotalsize_val(value_t *val);
+bool get_hdmiaudio(value_t * val);
 
 typedef struct {
 	uint32_t				flags;
@@ -1424,6 +1457,7 @@ dev_prop_t ati_devprop_list[] = {
 	
 //	{FLAGTRUE,	false,	"AAPL,aux-power-connected", NULL,					DWRVAL((uint32_t)1)				},
 //	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,					DWRVAL((uint32_t)0)				},
+//	{FLAGTRUE,	false,	"AAPL,overwrite_binimage",	get_binimage_owr,		NULVAL							},
 	{FLAGTRUE,	false,	"ATY,bin_image",			get_binimage_val,		NULVAL							},
 	{FLAGTRUE,	false,	"ATY,Copyright",			NULL,	STRVAL("Copyright AMD Inc. All Rights Reserved. 2005-2011") },
 	{FLAGTRUE,	false,	"ATY,Card#",				get_romrevision_val,	NULVAL							},
@@ -1440,9 +1474,26 @@ dev_prop_t ati_devprop_list[] = {
 	{FLAGTRUE,	false,	"device_type",				get_nameparent_val,		NULVAL							},
 	{FLAGTRUE,	false,	"model",					get_model_val,			STRVAL("ATI Radeon")			},
 //	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
+	{FLAGTRUE,	false, "hda-gfx",					get_hdmiaudio,	NULVAL},
 	
 	{FLAGTRUE,	false,	NULL,						NULL,					NULVAL							}
 };
+
+bool get_hdmiaudio(value_t * val)
+{
+	bool doit = false;
+	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit){
+		val->type = kStr;
+		val->size = strlen("onboard-1") + 1;
+		val->data = (uint8_t *)"onboard-1";
+		
+		return true;
+		
+		
+		
+	}
+	return false;
+}
 
 bool get_bootdisplay_val(value_t *val)
 {
@@ -1500,9 +1551,10 @@ bool get_model_val(value_t *val)
 bool get_conntype_val(value_t *val)
 {
 //Connector types:
-//0x4 : DisplayPort
+//0x200: VGA
 //0x400: DL DVI-I
 //0x800: HDMI
+//0x4 : DisplayPort
 
 	return false;
 }
@@ -1597,6 +1649,7 @@ bool get_platforminfo_val(value_t *val)
 
 bool get_vramtotalsize_val(value_t *val)
 {
+
 	val->type = kCst;
 	val->size = 4;
 	val->data = (uint8_t *)&card->vram_size;
@@ -1730,7 +1783,7 @@ void get_vram_size(void)
 	chip_family_t chip_family = card->info->chip_family;
 	
 	card->vram_size = 0;
-	
+
 	if (chip_family >= CHIP_FAMILY_CEDAR)
 		// size in MB on evergreen
 		// XXX watch for overflow!!!
@@ -1946,7 +1999,7 @@ static bool init_card(pci_dt_t *pci_dev)
 				break;
 		}
 	}
-	
+
     //	if (!card->info->device_id || !card->info->cfg_name)
 	if (!card->info->device_id)
 	{
@@ -1958,7 +2011,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
-	
+
 	verbose("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
 		card->fb, card->mmio, card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
 	
@@ -1981,7 +2034,7 @@ static bool init_card(pci_dt_t *pci_dev)
 			verbose("\n");
 		}
 	}
-	
+
 //	card->ports = 2; // default - Azi: default is card_configs
 	
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
@@ -1991,7 +2044,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	}
 	
 //	atN = 0;
-	
+
 	// Check AtiConfig key for a framebuffer name,
 	card->cfg_name = getStringForKey(kAtiConfig, &bootInfo->chameleonConfig);
 	// if none,
@@ -2080,7 +2133,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 #endif
 	
 	devprop_add_list(ati_devprop_list);
-	
+
 	// -------------------------------------------------
 	// Find a better way to do this (in device_inject.c)
 	//Azi: XXX tried to fix a malloc error in vain; this is related to XCode 4 compilation!
