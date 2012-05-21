@@ -319,6 +319,89 @@ static void moveCursor( int col, int row )
 {
     setCursorPosition( col, row, 0 );
 }
+
+/*
+ *
+ */
+
+bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
+{
+	const char *val;
+	
+    int size = 0;
+	int sum = 0;
+    
+	bool negative = false;
+	bool percentage = false;
+    
+    config = resolveConfig(config);
+	
+    if (getValueForKey(key, &val, &size, config))
+	{
+		if ( size )
+		{
+			if (*val == '-')
+			{
+				negative = true;
+				val++;
+				size--;
+			}
+			
+			if (val[size-1] == '%')
+			{
+				percentage = true;
+				size--;
+			}
+			
+			// convert string to integer
+			for (sum = 0; size > 0; size--)
+			{
+				if (*val < '0' || *val > '9')
+					return false;
+				
+				sum = (sum * 10) + (*val++ - '0');
+			}
+			
+			if (percentage)
+				sum = ( dimension_max * sum ) / 100;
+			
+			// calculate offset from opposite origin
+			if (negative)
+				sum =  ( ( dimension_max - object_size ) - sum );
+			
+		} else {
+			
+			// null value calculate center
+			sum = ( dimension_max - object_size ) / 2;
+			
+		}
+		
+		*value = (uint16_t) sum;
+		return true;
+	}
+	
+	// key not found
+    return false;
+}
+
+static bool getColorForKey( const char *key, unsigned int *value, config_file_t *config )
+{
+    const char *val;
+    int size;
+    
+    config = resolveConfig(config);
+    
+    if (getValueForKey(key, &val, &size, config))
+	{
+		if (*val == '#')
+		{
+            val++;
+			*value = strtol(val, NULL, 16);
+			return true;
+        }
+    }
+    return false;
+}
 //==========================================================================
 
 /* Flush keyboard buffer; returns TRUE if any of the flushed
@@ -1035,9 +1118,7 @@ static int randomTheme(char *dirspec, const char **theme) {
 
 	if (i) {			
 		
-		srand (time18());		
-		
-		uint8_t choosen = rand() % i;
+		uint8_t choosen = arc4random_uniform(i+1);
 						
 		themeList_t* entry = themeList;
 
@@ -2653,8 +2734,8 @@ int GUI_countdown( const char * msg, register int row, register int timeout , in
 		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
 		
 		char dummy[80];
-		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
-		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
+		getBootVolumeDescription( ((BVRef)(uint32_t)get_env(envgBootVolume)), dummy, sizeof(dummy) - 1, true );
+		drawDeviceIcon( ((BVRef)(uint32_t)get_env(envgBootVolume)), gui.screen.pixmap, p, true );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
 		
 		// make this screen the new background

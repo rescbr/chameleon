@@ -102,8 +102,6 @@ extern uint8_t checksum8( void * start, unsigned int length );
 extern unsigned long
 adler32( unsigned char * buffer, long length );
 extern void * bsearch(register const void *key,const void *base0,size_t nmemb,register size_t size,register int (*compar)(const void *, const void *));
-extern int      rand (void);
-extern void     srand (unsigned int seed);
 /*
  * strtol.c
  */
@@ -130,11 +128,12 @@ extern int slvprintf(char * buffer, int len, const char * fmt, va_list arg);
 extern void   free(void * start);
 extern void * realloc(void * ptr, size_t size);
 
-//#if SAFE_MALLOC
-//extern size_t zalloced_size;
-//#endif
-
+#ifdef SAFE_MALLOC
+extern size_t zalloced_size;
+extern void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *, size_t, const char *, int));
+#else
 extern void   malloc_init(char * start, int size, int nodes, void (*malloc_error)(char *, size_t));
+#endif
 extern void * malloc(size_t size);
 
 #endif /* !__BOOT_LIBSA_H */

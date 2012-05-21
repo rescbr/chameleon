@@ -48,17 +48,16 @@
 #include "bootstruct.h"
 #include "platform.h"
 
-//extern int	vprf(const char * fmt, va_list ap);
-
-bool gVerboseMode;
-bool gErrors;
-
 /* Kabyl: BooterLog */
 #define BOOTER_LOG_SIZE    (128 * 1024)
 #define SAFE_LOG_SIZE    134
 
-char *msgbuf = 0;
-char *cursor = 0;
+struct LOG {
+    char *buf;
+    char *cursor;
+};
+typedef struct LOG LOG;
+static LOG booterlog;
 
 struct putc_info {
     char * str;
@@ -78,62 +77,64 @@ void sputc(int c, struct putc_info * pi)
 
 void initBooterLog(void)
 {
-	msgbuf = malloc(BOOTER_LOG_SIZE);
-    if (!msgbuf) {
+	booterlog.buf = malloc(BOOTER_LOG_SIZE);
+    if (!booterlog.buf) {
         printf("Couldn't allocate buffer for booter log\n");
+        booterlog.cursor = 0;
+        booterlog.buf = 0;
         return;
     }
-	bzero(msgbuf, BOOTER_LOG_SIZE);
-	cursor = msgbuf;    
-
+	bzero(booterlog.buf, BOOTER_LOG_SIZE);
+	booterlog.cursor = booterlog.buf;    
+	
 }
 
 char *getConsoleMsg(void)
 {
-    return msgbuf;
+    return booterlog.buf;
 }
 char *getConsoleCursor(void)
 {
-    return cursor;
+    return booterlog.buf;
 }
 void setConsoleMsg(char *p)
 {
-    msgbuf = p;
+    booterlog.buf = p;
 }
 void setConsoleCursor(char *p)
 {
-    cursor = p;
+    booterlog.cursor = p;
 }
-
 
 void msglog(const char * fmt, ...)
 {
 	va_list ap;
 	struct putc_info pi;
 	
-	if (!msgbuf)
+	if (!booterlog.buf)
 		return;
 	
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 		return;
 	
 	va_start(ap, fmt);
-	pi.str = cursor;
+	pi.str = booterlog.cursor;
 	pi.last_str = 0;
 	prf(fmt, ap, sputc, &pi);
 	va_end(ap);
-	cursor += strlen((char *)cursor);
+	booterlog.cursor += strlen((char *)booterlog.cursor);
 }
 
 void setupBooterLog(void)
 {
-	if (!msgbuf)
+	if (!booterlog.buf)
 		return;	
     
 	Node *node = DT__FindNode("/", false);
 	if (node)
-		DT__AddProperty(node, "boot-log", strlen((char *)msgbuf) + 1, msgbuf);
+		DT__AddProperty(node, "boot-log", strlen((char *)booterlog.buf) + 1, booterlog.buf);
 }
+
 /* Kabyl: !BooterLog */
 
 
@@ -191,15 +192,15 @@ int printf(const char * fmt, ...)
 		/* Kabyl: BooterLog */
 		struct putc_info pi;
 		
-		if (!msgbuf)
+		if (!booterlog.buf)
 			return 0;
 		
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+		if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 			return 0;
-		pi.str = cursor;
+		pi.str = booterlog.cursor;
 		pi.last_str = 0;
 		prf(fmt, ap, sputc, &pi);
-		cursor +=  strlen((char *)cursor);
+		booterlog.cursor +=  strlen((char *)booterlog.cursor);
 	}
 	
 	va_end(ap);    
@@ -212,7 +213,7 @@ int verbose(const char * fmt, ...)
     va_list ap;
     
 	va_start(ap, fmt);
-    if (gVerboseMode)
+    if (get_env(envgVerboseMode))
     {
 		prf(fmt, ap, putchar, 0);
     }
@@ -221,15 +222,15 @@ int verbose(const char * fmt, ...)
 		/* Kabyl: BooterLog */
 		struct putc_info pi;
 		
-		if (!msgbuf)
+		if (!booterlog.buf)
 			return 0;
 		
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+		if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 			return 0;
-		pi.str = cursor;
+		pi.str = booterlog.cursor;
 		pi.last_str = 0;
 		prf(fmt, ap, sputc, &pi);
-		cursor +=  strlen((char *)cursor);
+		booterlog.cursor +=  strlen((char *)booterlog.cursor);
 	}
 	
     va_end(ap);    
@@ -240,12 +241,31 @@ int verbose(const char * fmt, ...)
 int error(const char * fmt, ...)
 {
     va_list ap;
-    gErrors = true;
-    va_start(ap, fmt);
+    struct putc_info pi;
+	int len;
+	char *str = NULL;
 	
-	prf(fmt, ap, putchar, 0);
-    
-	va_end(ap);
+    va_start(ap, fmt);
+	len = prf(fmt, ap, 0, 0);
+	if (len > 0)
+	{
+		str = newEmptyStringWithLength(len);
+		if (str != NULL) 
+		{
+			pi.last_str = 0;
+			
+			pi.str = str;
+			
+			prf(fmt, ap, sputc, &pi);
+			*pi.str = '\0';
+		}
+		
+	}	
+    va_end(ap);
+	
+	set_env_copy(envConsoleErr, str, len);
+	free(str);
+	
     return(0);
 }
 

@@ -297,7 +297,7 @@ void HibernateBoot(char *image_filename)
 	IOHibernateImageHeader * header = &_header;
 	long buffer;
 	
-    if(gBootVolume->OSVersion[3] >= '7') // TODO: unlocked, but please check the compatibility with the 10.8
+    if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] >= '7') // TODO: unlocked, but please check the compatibility with the 10.8
     {
         HibernateBoot107(image_filename);
         return;

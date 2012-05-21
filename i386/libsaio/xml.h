@@ -47,8 +47,6 @@ struct string_ref
 };
 typedef struct string_ref string_ref;
 
-extern string_ref* ref_strings;
-
 #define kXMLTagPList   "plist "
 #define kXMLTagDict    "dict"
 #define kXMLTagKey     "key"
@@ -83,6 +81,7 @@ extern string_ref* ref_strings;
 #define kPropNSPrincipalClass           ("NSPrincipalClass")
 #define kPropIOClass                    ("IOClass")
 #define kPropIOProviderClass            ("IOProviderClass")
+#define kPropOSBundleWorkspace          ("OSBundleWorkspace")
 
 #define DEFAULT_BOOT_CONFIG_DICT      (TagPtr)0
 #define DEFAULT_SYSTEM_CONFIG_DICT    (TagPtr)1

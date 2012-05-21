@@ -10,7 +10,7 @@ BUNDLE_EXEC = $(BUNDLE_NAME)
 BUNDLE_LIBS = 
 BUNDLE_INFO      = 
 BUNDLE_ID      =  com.boot.SMBIOS.SMBIOSPLATFORM.MEMORY.memory
-BUNDLE_COPYRIGHT = 
+BUNDLE_COPYRIGHT = GPL V2.0
 BUNDLE_LICENCE   = 
 BUNDLE_VERSION   = 1.0
 BUNDLE_ICON      =
@@ -98,6 +98,8 @@ bundle:
 	@mkdir $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/PlugIns	
 	@mv $(SYMROOT)/$(BUNDLE_EXEC) $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/MacOS	
 	@#mv $(SYMROOT)/$(SYMBOLS_BUNDLE_LIBS) $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/PlugIns	
+	@cp GPL_V2_LICENSE $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Resources	
+	@cp MEMTEST86_LICENSE $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Resources	
 	
 	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "CFBundleGetInfoString" '$(BUNDLE_INFO)'	
 	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "NSHumanReadableCopyright" '$(BUNDLE_COPYRIGHT)'	

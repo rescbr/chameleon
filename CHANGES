@@ -1,3 +1,13 @@
+- security and stability fixes
+- Improved Xcode4.3+ and clang compatibility
+- Fixed a bug in device_inject.c
+- Updated uthash, utarrey, etc ... to v1.9.6 
+- Replaced arc4random by the freebsd version (found in darwin's libc) 
+(also Removed others random generators since the pseudo-random generator now work perfectly )
+- Implemented gettimeofday taken from libpayload
+- finaly back to safe_malloc
+- Sync'd the cpu legacy method to the trunk
+
 - Implemented the Runtime Bundles Modules
 - Updated nvidia and ati device id
 - Small security fixes

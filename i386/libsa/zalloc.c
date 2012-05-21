@@ -399,11 +399,8 @@ void * realloc(void * start, size_t newsize)
 {
     if (!start || !(newsize>0)) return NULL;
     
-#ifdef SAFE_MALLOC
-    void * newstart = safe_malloc(newsize, __FILE__, __LINE__);
-#else
     void * newstart = malloc(newsize);
-#endif
+
     if (newstart) {        
         bcopy(start, newstart, newsize);
     } 

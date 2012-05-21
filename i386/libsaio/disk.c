@@ -887,7 +887,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                     // turbo - we want the booter type scanned also
                 case FDISK_BOOTER:
                     if (part->bootid & FDISK_ACTIVE) {
-                        gBIOSBootVolume = newFDiskBVRef(
+                        /*gBIOSBootVolume =*/
+						safe_set_env(envgBIOSBootVolume, (uint32_t)newFDiskBVRef(
                                                         biosdev, partno,
                                                         part->relsect,
                                                         part,
@@ -900,7 +901,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                                                         HFSGetDescription,
                                                         HFSFree,
                                                         0,
-                                                        kBIOSDevTypeHardDrive, 0);
+                                                        kBIOSDevTypeHardDrive, 0));
                         break;
                     }
 #ifndef UFS_SUPPORT						
@@ -1511,7 +1512,8 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 #endif
 					default:						
 						if (biosdev == (int)get_env(envgBIOSDev))
-							gBIOSBootVolume = bvr;
+							//gBIOSBootVolume = bvr;
+							safe_set_env(envgBIOSBootVolume, (uint32_t)bvr);
 						break;
 				}
             }            

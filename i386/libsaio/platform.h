@@ -119,9 +119,11 @@ typedef struct _RamSlotInfo_t {
 #define envSysId                "boot.hw.sysid"
 #define envgBIOSDev             "boot.hw.bios_device"
 #define envgDeviceCount         "boot.hw.device_count"
+#define envarchCpuType			"boot.hw.cputype"
 
+#define envgHaveKernelCache		"boot.kern.HaveKernelCache"
 #define envAdler32				"boot.kern.adler32"
-#define envkCache               "boot.kern.kernelcache"
+#define envkCacheFile           "boot.kern.kernelcache"
 #define envMKextName            "boot.kern.mkextcache"
 #define envArgCntRemaining      "boot.kern.argCount_remaining"
 #define envgBootArgs			"boot.kern.boot_args"
@@ -132,6 +134,7 @@ typedef struct _RamSlotInfo_t {
 #define envgEnableCDROMRescan   "boot.options.rescan_cdrom"
 #define envgScanSingleDrive     "boot.options.single_drive"
 #define envShouldboot           "boot.options.should_boot"
+#define envgVerboseMode         "boot.options.boot_verbose"
 
 #define envDriverExtSpec        "boot.drivers.extspec"
 #define envDriverSpec           "boot.drivers.spec"
@@ -152,11 +155,19 @@ typedef struct _RamSlotInfo_t {
 #define envgMenuStart            "boot.ui.menu_start"
 #define envgMenuEnd              "boot.ui.menu_end"
 
+#define envConsoleErr			"boot.console.stderr"
+
+#define envgBootFileType		"boot.disk.Bootfiletype"
+#define envHFSLoadVerbose		"boot.disk.HFSLoadVerbose"
+#define envgFSLoadAddress		"boot.disk.FSLoadAddress"
+#define envgBIOSBootVolume		"boot.disk.BIOSBootVolume"
+#define envgBootVolume			"boot.disk.BootVolume"
+
 #define envConvMem               "boot.memmap.Conventional"
 #define envExtMem                "boot.memmap.Extended"
 #define envMemoryMap             "boot.memmap.Address"
 #define envMemoryMapCnt          "boot.memmap.Count"
-
+#define envMemoryMapNode		 "boot.memmap.devNode"
 
 #define envRamFrequency         "boot.ram.frequency"
 #define envRamCas               "boot.ram.tCAS"

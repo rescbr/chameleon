@@ -421,6 +421,13 @@ bool getIntForKey( const char *key, int *value, config_file_t *config )
     return false;
 }
 
+config_file_t *resolveConfig(config_file_t *config)
+{
+	ASSERT_CONFIG
+	config_file_t *new_config = config;
+	return new_config;
+}
+#if UNUSED
 /*
  *
  */
@@ -483,7 +490,7 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 	
 	// key not found
     return false;
-}         
+}
 
 /*
  *	get color value from plist format #RRGGBB
@@ -507,6 +514,7 @@ bool getColorForKey( const char *key, unsigned int *value, config_file_t *config
     }
     return false;
 }
+#endif
 
 bool getValueForKey( const char *key, const char **val, int *size, config_file_t *config )
 {

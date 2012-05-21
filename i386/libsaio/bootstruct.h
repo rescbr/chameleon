@@ -41,7 +41,7 @@ extern boot_args_Legacy  *bootArgsLegacy;
 extern boot_args_107	 *bootArgs107;
 extern boot_args_108	 *bootArgs108;
 
-extern Node *gMemoryMapNode;
+//extern Node *gMemoryMapNode;
 
 #define VGA_TEXT_MODE 0
 

@@ -34,7 +34,7 @@
 #include "ppmsetup.h"
 //
 // All tables and structures must be byte-packed to match the ACPI specification
-#pragma pack(1)
+//#pragma pack(1)
 
 #define ACPI_SIG_DSDT      "DSDT" // Differentiated System Description Table
 #define ACPI_SIG_FADT      "FACP" // Fixed ACPI Description Table
@@ -164,7 +164,7 @@ typedef struct acpi_table_header {
     U32 OemRevision; // OEM revision number
     U8 AslCompilerId[4]; // ASCII ASL compiler vendor ID
     U32 AslCompilerRevision; // ASL compiler version
-} ACPI_TABLE_HEADER;
+} __attribute__((packed))ACPI_TABLE_HEADER;
 
 // GAS - Generic Address Structure (ACPI 2.0+)
 typedef struct acpi_generic_address {
@@ -173,7 +173,7 @@ typedef struct acpi_generic_address {
     U8 BitOffset; // Bit offset within the register
     U8 AccessWidth; // Minimum Access size (ACPI 3.0)
     U64 Address; // 64-bit address of struct or register
-} ACPI_GENERIC_ADDRESS;
+} __attribute__((packed))ACPI_GENERIC_ADDRESS;
 
 // RSDP - Root System Description Pointer (Signature is "RSD PTR ")
 typedef struct acpi_table_rsdp {
@@ -186,7 +186,7 @@ typedef struct acpi_table_rsdp {
     U64 XsdtPhysicalAddress; // 64-bit physical address of the XSDT (ACPI 2.0+)
     U8 ExtendedChecksum; // Checksum of entire table (ACPI 2.0+)
     U8 Reserved[3]; // Reserved, must be zero
-} ACPI_TABLE_RSDP;
+} __attribute__((packed))ACPI_TABLE_RSDP;
 
 #define ACPI_RSDP_REV0_SIZE     20 // Size of original ACPI 1.0 RSDP
 
@@ -194,20 +194,20 @@ typedef struct acpi_table_rsdp {
 typedef struct acpi_table_rsdt {
     ACPI_TABLE_HEADER Header; // Common ACPI table header
     U32 TableOffsetEntry[1]; // Array of pointers to ACPI tables
-} ACPI_TABLE_RSDT;
+} __attribute__((packed))ACPI_TABLE_RSDT;
 
 
 // XSDT - Root System Description Table
 typedef struct acpi_table_xsdt {
     ACPI_TABLE_HEADER Header; // Common ACPI table header
     U64 TableOffsetEntry[1]; // Array of pointers to ACPI tables
-} ACPI_TABLE_XSDT;
+} __attribute__((packed))ACPI_TABLE_XSDT;
 
 // DSDT - Differentiated System Description Table
 typedef struct acpi_table_dsdt {
     ACPI_TABLE_HEADER Header; // Common ACPI table header
     U32 EntryStart;
-} ACPI_TABLE_DSDT;
+} __attribute__((packed))ACPI_TABLE_DSDT;
 
 // FACS - Firmware ACPI Control Structure (FACS)
 typedef struct acpi_table_facs {
@@ -220,7 +220,7 @@ typedef struct acpi_table_facs {
     U64 XFirmwareWakingVector; // 64-bit version of the Firmware Waking Vector (ACPI 2.0+)
     U8 Version; // Version of this table (ACPI 2.0+)
     U8 Reserved[31]; // Reserved, must be zero
-} ACPI_TABLE_FACS;
+} __attribute__((packed))ACPI_TABLE_FACS;
 
 // SBST - Smart Battery Specification Table - Version 1
 typedef struct acpi_table_sbst
@@ -230,7 +230,7 @@ typedef struct acpi_table_sbst
     U32                  LowLevel;
     U32                  CriticalLevel;
 	
-} ACPI_TABLE_SBST;
+} __attribute__((packed))ACPI_TABLE_SBST;
 
 // ASF - Alert Standard Format table (Signature "ASF!")
 typedef struct acpi_table_asf
@@ -247,7 +247,7 @@ typedef struct acpi_table_dmar
     U8						Flags;
     U8						Reserved[10];
 	
-} ACPI_TABLE_DMAR;
+} __attribute__((packed))ACPI_TABLE_DMAR;
 
 // HPET - High Precision Event Timer table - Version 1
 typedef struct acpi_table_hpet
@@ -259,7 +259,7 @@ typedef struct acpi_table_hpet
     U16						MinimumTick;        /* Main counter min tick, periodic mode */
     U8						Flags;
 	
-} ACPI_TABLE_HPET;
+} __attribute__((packed))ACPI_TABLE_HPET;
 
 //MCFG - PCI Memory Mapped Configuration table and sub-table -  Version 1
 typedef struct acpi_table_mcfg
@@ -276,7 +276,7 @@ typedef struct acpi_table_uefi
     U8						Identifier[16];     /* UUID identifier */
     U16						DataOffset;         /* Offset of remaining data in table */
 	
-} ACPI_TABLE_UEFI;
+} __attribute__((packed))ACPI_TABLE_UEFI;
 
 // ECDT - Embedded Controller Boot Resources Table - Version 1 
 typedef struct acpi_table_ecdt
@@ -288,7 +288,7 @@ typedef struct acpi_table_ecdt
     U8						Gpe;                /* The GPE for the EC */
     U8						Id[1];              /* Full namepath of the EC in the ACPI namespace */
 	
-} ACPI_TABLE_ECDT;
+} __attribute__((packed))ACPI_TABLE_ECDT;
 
 // FADT - Fixed ACPI Description Table (Signature "FACP")
 typedef struct acpi_table_fadt {
@@ -344,19 +344,19 @@ typedef struct acpi_table_fadt {
     ACPI_GENERIC_ADDRESS XPmTimerBlock; // 64-bit Extended Power Mgt Timer Ctrl Reg Blk address
     ACPI_GENERIC_ADDRESS XGpe0Block; // 64-bit Extended General Purpose Event 0 Reg Blk address
     ACPI_GENERIC_ADDRESS XGpe1Block; // 64-bit Extended General Purpose Event 1 Reg Blk address
-} ACPI_TABLE_FADT;
+} __attribute__((packed))ACPI_TABLE_FADT;
 
 // SSDT - Secondary System Description Table
 typedef struct acpi_table_ssdt {
     ACPI_TABLE_HEADER Header; // Common ACPI table header
-} ACPI_TABLE_SSDT;
+} __attribute__((packed))ACPI_TABLE_SSDT;
 
 //MADT - Multiple APIC Description Table
 typedef struct acpi_table_madt {
     ACPI_TABLE_HEADER Header; // Common ACPI table header
     U32 Address; // Physical address of local APIC
     U32 Flags;
-} ACPI_TABLE_MADT;
+} __attribute__((packed))ACPI_TABLE_MADT;
 
 
 // Values for subtable type in ACPI_SUBTABLE_HEADER
@@ -378,7 +378,7 @@ enum AcpiMadtType {
 typedef struct acpi_subtable_header {
     U8 Type;
     U8 Length;
-} ACPI_SUBTABLE_HEADER;
+} __attribute__((packed))ACPI_SUBTABLE_HEADER;
 
 // MADT Sub-tables, correspond to Type in ACPI_SUBTABLE_HEADER
 
@@ -388,7 +388,7 @@ typedef struct acpi_madt_local_apic {
     U8 ProcessorId; // ACPI processor id
     U8 Id; // Processor's local APIC id
     U32 LapicFlags;
-} ACPI_MADT_LOCAL_APIC;
+} __attribute__((packed))ACPI_MADT_LOCAL_APIC;
 
 // 1: IO APIC
 typedef struct acpi_madt_io_apic {
@@ -397,7 +397,7 @@ typedef struct acpi_madt_io_apic {
     U8 Reserved; // Reserved - must be zero
     U32 Address; // APIC physical address
     U32 GlobalIrqBase; // Global system interrupt where INTI lines start
-} ACPI_MADT_IO_APIC;
+} __attribute__((packed))ACPI_MADT_IO_APIC;
 
 // 2: Interrupt Override
 typedef struct acpi_madt_interrupt_override {
@@ -406,14 +406,14 @@ typedef struct acpi_madt_interrupt_override {
     U8 SourceIrq; // Interrupt source (IRQ)
     U32 GlobalIrq; // Global system interrupt
     U16 IntiFlags;
-} ACPI_MADT_INTERRUPT_OVERRIDE;
+} __attribute__((packed))ACPI_MADT_INTERRUPT_OVERRIDE;
 
 // 3: NMI Source
 typedef struct acpi_madt_nmi_source {
     ACPI_SUBTABLE_HEADER Header;
     U16 IntiFlags;
     U32 GlobalIrq; // Global system interrupt
-} ACPI_MADT_NMI_SOURCE;
+} __attribute__((packed))ACPI_MADT_NMI_SOURCE;
 
 // 4: Local APIC NMI
 typedef struct acpi_madt_local_apic_nmi {
@@ -421,14 +421,14 @@ typedef struct acpi_madt_local_apic_nmi {
     U8 ProcessorId; // ACPI processor id
     U16 IntiFlags;
     U8 Lint; // LINTn to which NMI is connected
-} ACPI_MADT_LOCAL_APIC_NMI;
+} __attribute__((packed))ACPI_MADT_LOCAL_APIC_NMI;
 
 // 5: Address Override
 typedef struct acpi_madt_local_apic_override {
     ACPI_SUBTABLE_HEADER Header;
     U16 Reserved; // Reserved, must be zero
     U64 Address; // APIC physical address
-} ACPI_MADT_LOCAL_APIC_OVERRIDE;
+} __attribute__((packed))ACPI_MADT_LOCAL_APIC_OVERRIDE;
 
 // 6: I/O Sapic
 typedef struct acpi_madt_io_sapic {
@@ -437,7 +437,7 @@ typedef struct acpi_madt_io_sapic {
     U8 Reserved; // Reserved, must be zero
     U32 GlobalIrqBase; // Global interrupt for SAPIC start
     U64 Address; // SAPIC physical address
-} ACPI_MADT_IO_SAPIC;
+} __attribute__((packed))ACPI_MADT_IO_SAPIC;
 
 // 7: Local Sapic
 typedef struct acpi_madt_local_sapic {
@@ -449,7 +449,7 @@ typedef struct acpi_madt_local_sapic {
     U32 LapicFlags;
     U32 Uid; // Numeric UID - ACPI 3.0
     char UidString[1]; // String UID  - ACPI 3.0
-} ACPI_MADT_LOCAL_SAPIC;
+} __attribute__((packed))ACPI_MADT_LOCAL_SAPIC;
 
 // 8: Platform Interrupt Source
 typedef struct acpi_madt_interrupt_source {
@@ -461,7 +461,7 @@ typedef struct acpi_madt_interrupt_source {
     U8 IoSapicVector; // Vector value for PMI interrupts
     U32 GlobalIrq; // Global system interrupt
     U32 Flags; // Interrupt Source Flags
-} ACPI_MADT_INTERRUPT_SOURCE;
+} __attribute__((packed))ACPI_MADT_INTERRUPT_SOURCE;
 
 // 9: Processor X2APIC
 typedef struct acpi_madt_x2apic {
@@ -470,7 +470,7 @@ typedef struct acpi_madt_x2apic {
     U32 x2apicId; // Processor's X2APIC ID
     U32 x2apicFlags;
     U32 UID;
-} ACPI_MADT_X2APIC;
+} __attribute__((packed))ACPI_MADT_X2APIC;
 
 // Common flags fields for MADT subtables
 
@@ -499,111 +499,111 @@ typedef struct acpi_madt_x2apic {
 typedef struct packageLength {
     U8 packageLength0;
     U8 packageLength1;
-} ACPI_PACKAGE_LENGTH;
+} __attribute__((packed))ACPI_PACKAGE_LENGTH;
 
 typedef struct acpi_scope {
     U8 scopeOpcode;
     ACPI_PACKAGE_LENGTH pkgLength;
     U8 rootChar;
-} ACPI_SCOPE;
+} __attribute__((packed))ACPI_SCOPE;
 
 typedef struct dual_name_path {
     U8 prefix;
     U32 nameseg[2];
-} DUAL_NAME_PATH;
+} __attribute__((packed))DUAL_NAME_PATH;
 
 typedef struct multi_name_path {
     U8 prefix;
     U8 segCount;
     U32 nameseg[MAX_SUPPORTED_CPU_NAMESEGS];
-} MULTI_NAME_PATH;
+} __attribute__((packed))MULTI_NAME_PATH;
 
 typedef struct generic_register {
     U8 genericRegisterField;
     ACPI_PACKAGE_LENGTH pkgLength;
     ACPI_GENERIC_ADDRESS gas;
-} ACPI_GENERIC_REGISTER;
+} __attribute__((packed))ACPI_GENERIC_REGISTER;
 
 typedef struct package {
     U8 packageOpcode;
     ACPI_PACKAGE_LENGTH pkgLength;
     U8 numElements;
-} ACPI_PACKAGE;
+} __attribute__((packed))ACPI_PACKAGE;
 
 typedef struct small_package {
     U8 packageOpcode;
     U8 packageLength;
     U8 numElements;
-} ACPI_SMALL_PACKAGE;
+} __attribute__((packed))ACPI_SMALL_PACKAGE;
 
 typedef struct small_buffer {
     U8 bufferOpcode;
     U8 packageLength;
-} ACPI_SMALL_BUFFER;
+} __attribute__((packed))ACPI_SMALL_BUFFER;
 
 typedef struct end_tag {
     U8 endTagField;
     U8 checksum;
-} ACPI_END_TAG;
+} __attribute__((packed))ACPI_END_TAG;
 
 typedef struct return_name_seg {
     U8 returnOpcode;
     U32 name;
-} ACPI_RETURN_NAME_SEG;
+} __attribute__((packed))ACPI_RETURN_NAME_SEG;
 
 typedef struct return_package {
     U8 returnOpcode;
     ACPI_PACKAGE package;
-} ACPI_RETURN_PACKAGE;
+} __attribute__((packed))ACPI_RETURN_PACKAGE;
 
 typedef struct return_zero {
     U8 returnOpcode;
     U8 zeroOpcode;
-} ACPI_RETURN_ZERO;
+} __attribute__((packed))ACPI_RETURN_ZERO;
 
 typedef struct return_opcode {
     U8 returnOpcode;
     U8 opcodeToReturn;
-} ACPI_RETURN_OPCODE;
+} __attribute__((packed))ACPI_RETURN_OPCODE;
 
 typedef struct byteConst {
     U8 byteOpcode;
     U8 byteData;
-} ACPI_BYTE_CONST;
+} __attribute__((packed))ACPI_BYTE_CONST;
 
 typedef struct wordConst {
     U8 wordOpcode;
     U16 wordData;
-} ACPI_WORD_CONST;
+} __attribute__((packed))ACPI_WORD_CONST;
 
 typedef struct dwordConst {
     U8 dwordOpcode;
     U32 dwordData;
-} ACPI_DWORD_CONST;
+} __attribute__((packed))ACPI_DWORD_CONST;
 
 typedef struct small_method {
     U8 methodOpcode;
     U8 packageLength;
     U32 name;
     U8 methodFlags;
-} ACPI_SMALL_METHOD;
+} __attribute__((packed))ACPI_SMALL_METHOD;
 
 typedef struct method {
     U8 methodOpcode;
     ACPI_PACKAGE_LENGTH pkgLength;
     U32 name;
     U8 methodFlags;
-} ACPI_METHOD;
+} __attribute__((packed))ACPI_METHOD;
 
 typedef struct namePath {
     U8 nameOpcode;
     U32 name;
-} ACPI_NAME_PATH;
+} __attribute__((packed))ACPI_NAME_PATH;
 
 typedef struct named_dword {
     ACPI_NAME_PATH namePath;
     ACPI_DWORD_CONST dword;
-} ACPI_NAMED_DWORD;
+} __attribute__((packed))ACPI_NAMED_DWORD;
 
 typedef struct rootNamePath {
     U8 nameOpcode;
@@ -614,22 +614,22 @@ typedef struct rootNamePath {
 typedef struct root_named_dword {
     ACPI_ROOT_NAME_PATH rootNamePath;
     ACPI_DWORD_CONST dword;
-} ACPI_ROOT_NAMED_DWORD;
+} __attribute__((packed))ACPI_ROOT_NAMED_DWORD;
 
 typedef struct named_object {
     ACPI_NAME_PATH namePath;
     ACPI_PACKAGE package;
-} ACPI_NAMED_OBJECT;
+} __attribute__((packed))ACPI_NAMED_OBJECT;
 
 typedef struct small_named_object {
     ACPI_NAME_PATH namePath;
     ACPI_SMALL_PACKAGE package;
-} ACPI_SMALL_NAMED_OBJECT;
+} __attribute__((packed))ACPI_SMALL_NAMED_OBJECT;
 
 typedef struct create_dword_field {
     ACPI_NAME_PATH namePath;
     ACPI_SMALL_PACKAGE package;
-} ACPI_CREATE_DWORD_FIELD;
+} __attribute__((packed))ACPI_CREATE_DWORD_FIELD;
 
 typedef struct tstate_package {
     ACPI_SMALL_PACKAGE package;
@@ -638,7 +638,7 @@ typedef struct tstate_package {
     ACPI_DWORD_CONST TransLatency;
     ACPI_DWORD_CONST Control;
     ACPI_DWORD_CONST Status;
-} ACPI_TSTATE_PACKAGE;
+} __attribute__((packed))ACPI_TSTATE_PACKAGE;
 
 typedef struct pstate_package {
     ACPI_SMALL_PACKAGE package;
@@ -648,7 +648,7 @@ typedef struct pstate_package {
     ACPI_DWORD_CONST BMLatency;
     ACPI_DWORD_CONST Control;
     ACPI_DWORD_CONST Status;
-} ACPI_PSTATE_PACKAGE;
+} __attribute__((packed))ACPI_PSTATE_PACKAGE;
 
 typedef struct psd_package {
     ACPI_SMALL_PACKAGE package;
@@ -657,7 +657,7 @@ typedef struct psd_package {
     ACPI_DWORD_CONST Domain;
     ACPI_DWORD_CONST CoordType;
     ACPI_DWORD_CONST NumProcessors;
-} ACPI_PSD_PACKAGE;
+} __attribute__((packed))ACPI_PSD_PACKAGE;
 
 typedef struct csd_package {
     ACPI_SMALL_PACKAGE package;
@@ -667,7 +667,7 @@ typedef struct csd_package {
     ACPI_DWORD_CONST CoordType;
     ACPI_DWORD_CONST NumProcessors;
     ACPI_DWORD_CONST Index;
-} ACPI_CSD_PACKAGE;
+} __attribute__((packed))ACPI_CSD_PACKAGE;
 
 typedef struct tsd_package {
     ACPI_SMALL_PACKAGE package;
@@ -676,7 +676,7 @@ typedef struct tsd_package {
     ACPI_DWORD_CONST Domain;
     ACPI_DWORD_CONST CoordType;
     ACPI_DWORD_CONST NumProcessors;
-} ACPI_TSD_PACKAGE;
+} __attribute__((packed))ACPI_TSD_PACKAGE;
 
 typedef struct processor {
     U8 processorOpCode;
@@ -685,8 +685,8 @@ typedef struct processor {
     ACPI_BYTE_CONST ProcID;
     ACPI_DWORD_CONST PblkAddr;
     ACPI_BYTE_CONST PblkLen;
-} ACPI_PROCESSOR;
+} __attribute__((packed))ACPI_PROCESSOR;
 
-#pragma pack()
+//#pragma pack()
 
 #endif /* !__LIBSAIO_INTEL_ACPI_H */

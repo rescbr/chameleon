@@ -54,6 +54,7 @@ EFI_CHAR8*  getUUIDFromString(const char *source)
 }
 
 /** XXX AsereBLN replace by strtoul */
+#if UNUSED
 uint32_t ascii_hex_to_int(char *buff) 
 {
 	uint32_t	value = 0, i, digit;
@@ -72,6 +73,7 @@ uint32_t ascii_hex_to_int(char *buff)
 	}
 	return	value;
 }
+#endif
 
 void *convertHexStr2Binary(const char *hexStr, int *outLength)
 {

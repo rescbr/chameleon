@@ -27,7 +27,7 @@ OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float  
+		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE  
 
 DEFINES=
 CONFIG = hd
@@ -68,7 +68,7 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
-#CFLAGS += -DSAFE_MALLOC 
+CFLAGS += -DSAFE_MALLOC 
 
 # CFLAGS += -DBOOT_HELPER_SUPPORT # +992 bytes
 
@@ -80,7 +80,7 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
 	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) #-e boot2
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -e boot2
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
 	

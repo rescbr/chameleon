@@ -29,8 +29,13 @@
 
 /* arc4random.c */
 extern void arc4_init(void);
-extern void   arc4rand(void *ptr, u_int len, int reseed);
-extern uint32_t  arc4random(void);
+extern void arc4random_buf(void *_buf, size_t n);
+extern u_int32_t arc4random_uniform(u_int32_t upper_bound);
+extern u_int32_t arc4random(void);
+extern void arc4random_addrandom(u_char *dat, int datlen);
+extern void arc4random_stir(void);
+#define arc4random_unirange(lo,hi) arc4random_uniform(hi - lo + 1) + lo
+#define arc4random_range(lo,hi) (arc4random() % (hi - lo + 1)) + lo
 
 /* asm.s */
 extern void   real_to_prot(void);
@@ -57,7 +62,6 @@ extern int    ebiosEjectMedia(int biosdev);
 extern void   putc(int ch);
 extern void   putca(int ch, int attr, int repeat);
 extern int    getc(void);
-extern void   pause();
 extern int    readKeyboardStatus(void);
 extern int    readKeyboardShiftFlags(void);
 extern unsigned int time18(void);
@@ -97,14 +101,12 @@ extern boot_args_common * getBootArgs(void);
 
 
 /* cache.c */
-extern void CacheReset();
+extern void   CacheReset();
 extern void   CacheInit(CICell ih, long blockSize);
 extern long   CacheRead(CICell ih, char *buffer, long long offset,
                         long length, long cache);
 
 /* console.c */
-extern bool   gVerboseMode;
-extern bool   gErrors;
 extern void   initBooterLog(void);
 extern void   setupBooterLog(void);
 extern void   putchar(int ch);
@@ -122,9 +124,9 @@ extern void setConsoleCursor(char *p);
 extern void pause(void); 
 
 /* disk.c */
-extern void rescanBIOSDevice(int biosdev);
+extern void   rescanBIOSDevice(int biosdev);
 extern struct DiskBVMap* diskResetBootVolumes(int biosdev);
-extern void diskFreeMap(struct DiskBVMap *map);
+extern void   diskFreeMap(struct DiskBVMap *map);
 extern int    testBiosread( int biosdev, unsigned long long secno );
 extern BVRef  diskScanBootVolumes(int biosdev, int *count);
 extern void   diskSeek(BVRef bvr, long long position);
@@ -148,7 +150,6 @@ extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp,
 						  u_int16_t *ucslen, u_int32_t bufsize, int byte_order );
 
 /* load.c */
-extern bool   gHaveKernelCache;
 extern long ThinFatFile(void **binary, unsigned long *length);
 extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize);
 
@@ -157,20 +158,26 @@ extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
  */
 extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
-/* memory.c */
-long AllocateKernelMemory( long inSize );
+/* lib.c */
+extern int bcd2dec(int b);
+extern int dec2bcd(int d);
 
-long
+
+/* memory.c */
+extern long AllocateKernelMemory( long inSize );
+
+extern long
 AllocateMemoryRange(char * rangeName, long start, long length);
 
 /* misc.c */
 extern void   enableA20(void);
 extern void   turnOffFloppy(void);
-
+#if UNUSED
 extern void     random_free (struct ran_obj* self);
 extern int      random (struct ran_obj* self);
 extern struct   ran_obj* random_init (int rmin, int rmax);
 extern void     usefixedrandom (bool opt);
+#endif
 
 extern void     getPlatformName(char *nameBuf);
 
@@ -205,9 +212,9 @@ extern void safe_set_env(const char *name , unsigned long long value);
 extern void re_set_env(const char *name , unsigned long long value) ;
 extern void unset_env(const char *name);
 extern void free_platform_env(void);
+void showError(void);
 
 void debug_platform_env(void);
-
 
 /* stringTable.c */
 extern char * newStringFromList(char **list, int *size);
@@ -221,8 +228,11 @@ extern bool   getValueForKey(const char *key, const char **val, int *size, confi
 extern const char * getStringForKey(const char * key,  config_file_t *config);
 extern bool   getBoolForKey(const char *key, bool *val, config_file_t *configBuff);
 extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff);
+extern config_file_t *resolveConfig(config_file_t *config);
+#if UNUSED
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
 extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
+#endif
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
 extern int    loadBooterConfig(void);
 extern int    loadSystemConfig(void);
@@ -238,11 +248,11 @@ extern char * getNextArg(char ** ptr, char * val);
 extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
 
 /* sys.c */
-extern BVRef getBootVolumeRef( const char * path, const char ** outPath );
+extern BVRef  getBootVolumeRef( const char * path, const char ** outPath );
 extern long   LoadVolumeFile(BVRef bvr, const char *fileSpec);
 extern long   LoadFile(const char *fileSpec);
 extern long   ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length);
-extern long LoadThinFatFile(const char *fileSpec, void **binary);
+extern long	  LoadThinFatFile(const char *fileSpec, void **binary);
 extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char **name,
                           long *flags, long *time);
 extern long   GetFileInfo(const char *dirSpec, const char *name,
@@ -261,6 +271,7 @@ extern int    read(int fdesc, char *buf, int count);
 extern int    write(int fdesc, const char *buf, int count);
 extern int    writebyte(int fdesc, char value);
 extern int    writeint(int fdesc, int value);
+extern struct iob * iob_from_fdesc(int fdesc);
 extern int    b_lseek(int fdesc, int addr, int ptr);
 extern int    tell(int fdesc);
 extern const char * systemConfigDir(void);
@@ -281,15 +292,20 @@ extern void   setRootVolume(BVRef volume);
 extern void   setBootGlobals(BVRef chain);
 extern int    getDeviceDescription(BVRef volume, char *str);
 
-extern int    gBootFileType;
-extern BVRef  gBootVolume;
-extern BVRef  gBIOSBootVolume;
+/* rtc.c */
+extern void rtc_read_clock(struct tm *time) ;
 
 /* smp.c */
 extern void * getMPSTable();
 
+/* time.c */
+extern int gettimeofday(struct timeval *tv, void *tz);
+
 /* uterror.c  */
-extern jmp_buf h_buf_error;
+extern jmp_buf uterror;
 extern void init_ut_fnc(void);
+
+//#define LOCALIZE
+//extern int localVPrintf(const char *format, va_list ap);
 
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

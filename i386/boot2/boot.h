@@ -45,8 +45,6 @@ enum {
 	kF10Key			= 0x4400
 };
 
-
-
 /*
  * Flags to the booter or kernel
  */
@@ -83,32 +81,6 @@ extern void initialize_runtime(void);
 extern void common_boot(int biosdev);
 extern BVRef getBvChain(void);
 
-/*
- * drivers.c
- */
-extern long LoadDrivers(char * dirSpec);
-extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
-
-typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
-/*!
- Hookable function pointer called during the driver loading phase that
- allows other code to cause additional drivers to be loaded.
- */
-//extern struct multiboot_info *gMI;
-
-
-struct compressed_kernel_header {
-    u_int32_t signature;
-    u_int32_t compress_type;
-    u_int32_t adler32;
-    u_int32_t uncompressed_size;
-    u_int32_t compressed_size;
-    u_int32_t reserved[11];
-    char      platform_name[PLATFORM_NAME_LEN];
-    char      root_path[ROOT_PATH_LEN];
-    u_int8_t  data[0];
-};
-typedef struct compressed_kernel_header compressed_kernel_header;
 
 /*
  * prompt.c

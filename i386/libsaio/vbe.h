@@ -230,7 +230,7 @@ enum {
  * CRTC information block passed to function 4F02
  * to override default refresh rate.
  */
-#pragma pack(1)
+//#pragma pack(1)
 
 typedef struct {
     unsigned short  HTotal;
@@ -243,9 +243,9 @@ typedef struct {
     unsigned long   PixelClock;    /* in Hz            */
     unsigned short  RefreshRate;   /* units of 0.01 Hz */
     unsigned char   Reserved[40];
-} VBECRTCInfoBlock;
+} __attribute__((packed)) VBECRTCInfoBlock;
 
-#pragma pack()
+//#pragma pack()
 
 /*
  * Defined flags for 'Flags' field in VBECRTCInfoBlock.

@@ -129,7 +129,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].device =	ascii_hex_to_int(buff);
+			device->pci_dev_path[numpaths].device =	(uint8_t)strtoul(buff, NULL, 16);
 			
 			x += 3; // 0x
 			curr = x;
@@ -148,7 +148,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				numpaths = 0;
 				break;
 			}
-			device->pci_dev_path[numpaths].function = ascii_hex_to_int(buff); // TODO: find dev from char *path
+			device->pci_dev_path[numpaths].function = (uint8_t)strtoul(buff, NULL, 16); // TODO: find dev from char *path
 			
 			numpaths++;
 		}
@@ -189,20 +189,17 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	if(!string->entries)
 	{
-		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
+		if((string->entries = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice) * MAX_STRING_NUM_ENTRIES))== NULL)
 		{
             free(device);
 			return NULL;
 		}
 	}
+	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
 	
-    if((string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device)))== NULL)
-    {
-        free(device);
-        free(string->entries);
-        return NULL;
-    }
-	string->entries[string->numentries-1] = device;
+	string->numentries++;
+    
+	string_entries_arrey[string->numentries-1] = device;
 	
 	return device;
 }
@@ -297,36 +294,38 @@ char *devprop_generate_string(struct DevPropString *string)
 	buffer += 24;
 	int i = 0, x = 0;
 	
+	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
+
 	while(i < string->numentries)
 	{
-		sprintf(buffer, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
-				dp_swap16(string->entries[i]->numentries), string->entries[i]->WHAT2);
+		sprintf(buffer, "%08x%04x%04x", dp_swap32(string_entries_arrey[i]->length),
+				dp_swap16(string_entries_arrey[i]->numentries), string_entries_arrey[i]->WHAT2);
 		
 		buffer += 16;
-		sprintf(buffer, "%02x%02x%04x%08x%08x", string->entries[i]->acpi_dev_path.type,
-				string->entries[i]->acpi_dev_path.subtype,
-				dp_swap16(string->entries[i]->acpi_dev_path.length),
-				string->entries[i]->acpi_dev_path._HID,
-				dp_swap32(string->entries[i]->acpi_dev_path._UID));
+		sprintf(buffer, "%02x%02x%04x%08x%08x", string_entries_arrey[i]->acpi_dev_path.type,
+				string_entries_arrey[i]->acpi_dev_path.subtype,
+				dp_swap16(string_entries_arrey[i]->acpi_dev_path.length),
+				string_entries_arrey[i]->acpi_dev_path._HID,
+				dp_swap32(string_entries_arrey[i]->acpi_dev_path._UID));
 		
 		buffer += 24;
-		for(x=0;x < string->entries[i]->num_pci_devpaths; x++)
+		for(x=0;x < string_entries_arrey[i]->num_pci_devpaths; x++)
 		{
-			sprintf(buffer, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
-					string->entries[i]->pci_dev_path[x].subtype,
-					dp_swap16(string->entries[i]->pci_dev_path[x].length),
-					string->entries[i]->pci_dev_path[x].function,
-					string->entries[i]->pci_dev_path[x].device);
+			sprintf(buffer, "%02x%02x%04x%02x%02x", string_entries_arrey[i]->pci_dev_path[x].type,
+					string_entries_arrey[i]->pci_dev_path[x].subtype,
+					dp_swap16(string_entries_arrey[i]->pci_dev_path[x].length),
+					string_entries_arrey[i]->pci_dev_path[x].function,
+					string_entries_arrey[i]->pci_dev_path[x].device);
 			buffer += 12;
 		}
 		
-		sprintf(buffer, "%02x%02x%04x", string->entries[i]->path_end.type,
-				string->entries[i]->path_end.subtype,
-				dp_swap16(string->entries[i]->path_end.length));
+		sprintf(buffer, "%02x%02x%04x", string_entries_arrey[i]->path_end.type,
+				string_entries_arrey[i]->path_end.subtype,
+				dp_swap16(string_entries_arrey[i]->path_end.length));
 		
 		buffer += 8;
-		uint8_t *dataptr = string->entries[i]->data;
-		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
+		uint8_t *dataptr = string_entries_arrey[i]->data;
+		for(x = 0; (uint32_t)x < (string_entries_arrey[i]->length) - (24 + (6 * string_entries_arrey[i]->num_pci_devpaths)) ; x++)
 		{
 			sprintf(buffer, "%02x", *dataptr++);
 			buffer += 2;
@@ -344,17 +343,20 @@ void devprop_free_string(struct DevPropString *string)
 	}
 	
 	int i;
+	
+	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
+
 	for(i = 0; i < string->numentries; i++)
 	{
-		if(string->entries[i])
+		if(string_entries_arrey[i])
 		{
-			if(string->entries[i]->data)
+			if(string_entries_arrey[i]->data)
 			{
-				free(string->entries[i]->data);
-				string->entries[i]->data = NULL;
+				free(string_entries_arrey[i]->data);
+				string_entries_arrey[i]->data = NULL;
 			}
-			free(string->entries[i]);
-			string->entries[i] = NULL;
+			free(string_entries_arrey[i]);
+			string_entries_arrey[i] = NULL;
 		}
 	}
 	

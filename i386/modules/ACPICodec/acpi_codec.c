@@ -94,7 +94,7 @@ static ACPI_TABLE_RSDP * gen_alloc_rsdp_v2_from_v1(ACPI_TABLE_RSDP *rsdp );
 static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt);
 static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt);
 static void MakeAcpiSgn(void);
-static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename );
+static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filename );
 static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer);
 static ACPI_GENERIC_ADDRESS FillGASStruct(U32 Address, U8 Length);
 static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list);
@@ -557,7 +557,7 @@ static void MakeAcpiSgn(void)
     
 }
 
-static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
+static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filename )
 {	
 	int fd = -1;
 	char acpi_file[512];
@@ -567,7 +567,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, char *filename )
     
 	sprintf(acpi_file, "%s%s",dirspec, filename); 
 	
-	HFSLoadVerbose = 0;
+	safe_set_env(envHFSLoadVerbose, 0);
 	fd=open(acpi_file);
 	
 	if (fd<0)
@@ -4743,10 +4743,10 @@ EFI_STATUS setupAcpi(void)
 	} 
     
 	{
-		char* name;
-		long flags;
-		long time;
-		long ret = -1;
+        long         ret, length, flags, time;
+        long long	 index = 0;
+        const char * name;
+        
 		U8 i = 0;
 		char dirspec[512];
 		bool acpidir_found = false;
@@ -4782,70 +4782,76 @@ EFI_STATUS setupAcpi(void)
         
 		if (acpidir_found == true)
 		{
-            struct dirstuff* AcpiDir = opendir(dirspec);
-            if (AcpiDir != NULL)
+            if (checkOem == true)
             {
-                if (checkOem == true)
-                {
-                    MakeAcpiSgn();
-                }
-                
-                while(readdir(AcpiDir, (const char**)&name, &flags, &time) >= 0)
-                {		
-                    if((strstr(name, ".aml")) && ((strlen(dirspec)+strlen(name)) < 512))
-                    {					
-                        // Some simple verifications to save time in case of those tables simply named as follow:
-                        if ((strncmp(name, "RSDT", 4) == 0) || (strncmp(name, "rsdt", 4) == 0) ||
-                            (strncmp(name, "XSDT", 4) == 0) || (strncmp(name, "xsdt", 4) == 0) ||
-                            (strncmp(name, "RSDP", 4) == 0) || (strncmp(name, "rsdp", 4) == 0))
-                        { 
-                            continue;
-                        }
-                        
-                        if ((strncmp(name, "FACS", 4) == 0) || (strncmp(name, "facs", 4) == 0)) // FACS is not supported
-                        { 
-                            continue;
-                        }					
-                        
-                        DBG("* Attempting to load acpi table: %s\n", name);			
-                        if ( (new_table_list[i]=(U32)loadACPITable(new_table_list,dirspec,name)))
-                        {
-                            if (i < MAX_ACPI_TABLE)
-                            {
-                                i++;
-                            } 
-                            else
-                            {
-                                DBG("Max nb of allowed aml files reached, exiting .");
-                                break;
-                            }						
-                        } 					
-                        
-                    }
+                MakeAcpiSgn();
+            }
+            
+            while (1) {
+                ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
+                if (ret == -1) break;
 #if DEBUG_ACPI
-                    else 
-                    {
-                        
-                        printf("Ignoring %s\n", name);
-                    }
+                printf("testing %s\n", name);
 #endif
-                    
-                }
+                // Make sure this is a directory.
+                if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;
                 
-                if (i)
+                // Make sure this is a kext.
+                length = strlen(name);
+                if (strcmp(name + length - 4, ".aml"))
                 {
-                    //sanitize the new tables list 
-                    sanitize_new_table_list(new_table_list);
-                    
-                    //move to kernel memory 
-                    move_table_list_to_kmem(new_table_list);
-                    
-                    DBG("New ACPI tables Loaded in memory\n");
+#if DEBUG_ACPI
+                    printf("Ignoring %s\n", name);
+#endif
+                    continue;
                 }
                 
-                closedir(AcpiDir);
-				
-            }			
+                // Some simple verifications to save time in case of those tables simply named as follow:
+                if ((strncmp(name, "RSDT", 4) == 0) || (strncmp(name, "rsdt", 4) == 0) ||
+                    (strncmp(name, "XSDT", 4) == 0) || (strncmp(name, "xsdt", 4) == 0) ||
+                    (strncmp(name, "RSDP", 4) == 0) || (strncmp(name, "rsdp", 4) == 0))
+                { 
+#if DEBUG_ACPI
+                    printf("Ignoring %s\n", name);
+#endif
+                    continue;
+                }                    
+                
+                if ((strncmp(name, "FACS", 4) == 0) || (strncmp(name, "facs", 4) == 0)) // FACS is not supported
+                { 
+#if DEBUG_ACPI
+                    printf("Ignoring %s\n", name);
+#endif
+                    continue;
+                }					
+                
+                DBG("* Attempting to load acpi table: %s\n", name);			
+                if ( (new_table_list[i]=(U32)loadACPITable(new_table_list,dirspec,name)))
+                {
+                    if (i < MAX_ACPI_TABLE)
+                    {
+                        i++;
+                    } 
+                    else
+                    {
+                        DBG("Max nb of allowed aml files reached, exiting .");
+                        break;
+                    }						
+                }
+            }
+            
+            if (i)
+            {
+                //sanitize the new tables list 
+                sanitize_new_table_list(new_table_list);
+                
+                //move to kernel memory 
+                move_table_list_to_kmem(new_table_list);
+                
+                DBG("New ACPI tables Loaded in memory\n");
+            }          
+			
+			
 		}
 		
 	}			

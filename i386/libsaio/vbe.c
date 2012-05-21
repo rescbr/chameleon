@@ -76,9 +76,11 @@ int setVBEDACFormat(unsigned char format)
 }
 #endif
 
+#if UNUSED
+
 int getEDID( void * edidBlock, UInt8 block)
 {
-	bzero(&bb, sizeof(bb));
+	bzero(&bb, sizeof(biosBuf_t));
     bb.intno  = 0x10;
     bb.eax.rr = funcGetEDID;
 	bb.ebx.r.l= 0x01;
@@ -93,7 +95,6 @@ int getEDID( void * edidBlock, UInt8 block)
 
 
 
-#if UNUSED
 /*
  * Default GTF parameter values.
  */

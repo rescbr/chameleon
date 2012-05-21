@@ -179,67 +179,56 @@ VOID load_all_dylib(void)
     
     if (is_system_loaded() != EFI_SUCCESS) return;
     
-	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+    long         ret, length, flags, time, bundleType;
+    long long	 index;
+    long         result = -1;
+    const char * name;
     void (*module_start)(void);
-	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
-	{
-		if ((strcmp("Symbols.dylib",name)) == 0) continue; // if we found Symbols.dylib, just skip it
-		
-        if (is_dylib_loaded(name) == EFI_SUCCESS) continue;
-		
-        int len =  strlen(name);
-		int ext_size = sizeof("dylib");
-		
-		if (len >= ext_size)
-		{
-			if(strcmp(&name[len - ext_size], ".dylib") == 0)
-			{				
-				char *tmp = newStringWithFormat("/Extra/modules/%s",name);								
-				if (!tmp) {
-					continue;
-				}
-                char *dylib_name = newString(name);								
-				if (!dylib_name) {
-                    free(tmp);
-					continue;
-				}
-				msglog("* Attempting to load module: %s\n", tmp);
-                module_start = (void*)load_module(dylib_name,tmp);
-                
-				if(module_start && ( module_start != (void*)0xFFFFFFFF))
-				{
-                    add_dylib(name);
-					module_start();
-				}
-                else
-                {
-                    // failed to load or already loaded
-					free(tmp);
-                    free(dylib_name);
-
-                }
-			}
-#if DEBUG_MODULES
-			else 
-			{
-				DBG("Ignoring %s\n", name);
-			}
-#endif
-		}		
-#if DEBUG_MODULES
-		else 
-		{
-			DBG("Ignoring %s\n", name);
-		}
-#endif
-		
-	}
 	
-	if (moduleDir)
-	{
-		closedir(moduleDir);
+	DBG("FileLoadBundles in %s\n",dirSpec);
+    
+    index = 0;
+    while (1) {
+        ret = GetDirEntry("/Extra/modules/", &index, &name, &flags, &time);
+        if (ret == -1) break;       
 		
-	}
+        // Make sure this is not a directory.
+        if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;
+        
+        if ((strcmp("Symbols.dylib",name)) == 0) continue; // if we found Symbols.dylib, just skip it
+        
+        if (is_dylib_loaded(name) == EFI_SUCCESS) continue;
+        
+        
+        // Make sure this is a kext.
+        length = strlen(name);
+        if (strcmp(name + length - 6, ".dylib")) continue;
+		
+        char *tmp = newStringWithFormat( "/Extra/modules/%s",name);								
+        if (!tmp) {
+            continue;
+        }
+        char *dylib_name = newString(name);								
+        if (!dylib_name) {
+            free(tmp);
+            continue;
+        }
+        msglog("* Attempting to load module: %s\n", tmp);
+        module_start = (void*)load_module(dylib_name,tmp);
+        
+        if(module_start && ( module_start != (void*)0xFFFFFFFF))
+        {
+            add_dylib(name);
+            module_start();
+        }
+        else
+        {
+            // failed to load or already loaded
+            free(tmp);
+            free(dylib_name);
+            
+        }
+    }	
 	
 #if DEBUG_MODULES
 	print_symbol_list();
@@ -1356,7 +1345,7 @@ EFI_STATUS replace_function(const char* module, const char* symbol, void* newAdd
 	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
 	{
-		UInt32* jumpPointer = malloc(sizeof(UInt32*));
+		UInt32* jumpPointer = malloc(sizeof(UInt32));
 		if (!jumpPointer) {
 			return EFI_OUT_OF_RESOURCES;
 		}
@@ -1436,6 +1425,7 @@ struct Module {
 	long          willLoad;
 	TagPtr        dict;
     TagPtr        personalities;
+	//pool_t        workspace;
 	char          *plistAddr;
 	long          plistLength;
 	char          *executablePath;
@@ -1669,7 +1659,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         ret = ParseXML(buffer, &module);
         if (ret != 0 ) { printf("Unable to read plist of %s",name); break; }
 		
-		if (!module) break; // Should never happen but it will make the compiler happy
+		if (!module) {ret = -1;break;} // Should never happen but it will make the compiler happy
         
         // Allocate memory for the driver path and the plist.
         

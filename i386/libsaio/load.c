@@ -31,15 +31,12 @@
 #include <mach/machine/thread_status.h>
 
 #include "sl.h"
+#include "platform.h"
 
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
-
-
-unsigned long gBinaryAddress;
-bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
-cpu_type_t archCpuType=CPU_TYPE_I386;
+static unsigned long gBinaryAddress;
 
 // Public Functions
 
@@ -87,7 +84,7 @@ long ThinFatFile(void **binary, unsigned long *length)
 				fapsize = fap->size;
 			}
 			
-			if (fapcputype == archCpuType)
+			if (fapcputype == get_env(envarchCpuType))
 			{
 				*binary = (void *) ((unsigned long)*binary + fapoffset);
 				size = fapsize;
@@ -111,7 +108,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	{
 		struct mach_header *mH;
 		mH = (struct mach_header *)(gBinaryAddress);
-		switch (archCpuType)
+		switch (get_env(envarchCpuType))
 		{
 			case CPU_TYPE_I386:
 				if (mH->magic != MH_MAGIC)
@@ -276,7 +273,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	}
 	
 	if (vmsize && (strcmp(segname, "__PRELINK") == 0 || strcmp(segname, "__PRELINK_INFO") == 0))
-		gHaveKernelCache = true;
+		safe_set_env(envgHaveKernelCache, true);
 	
 	// Copy from file load area.
 	if (vmsize>0 && filesize>0)
@@ -294,7 +291,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 
 static long DecodeUnixThread(long cmdBase, unsigned int *entry)
 {
-	switch (archCpuType)
+	switch (get_env(envarchCpuType))
 	{
 		case CPU_TYPE_I386:
 		{

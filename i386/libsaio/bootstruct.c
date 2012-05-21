@@ -43,7 +43,7 @@ boot_args_108     *bootArgs108  = NULL;
 /* ... */
 
 PrivateBootInfo_t *bootInfo  = NULL;
-Node              *gMemoryMapNode  = NULL;
+//Node              *gMemoryMapNode  = NULL;
 
 static char platformName[64];
 static MemoryRange memoryMap[kMemoryMapCountMax];
@@ -110,13 +110,14 @@ void initKernBootStruct( void )
                 }  
             }		      
             
-            gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
+            Node *gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
             
             set_env(envConvMem, convmem);
             set_env(envExtMem,  extmem);
             set_env(envMemoryMap, (uint32_t)memoryMap);
             set_env(envMemoryMapCnt, memoryMapCount);
-            
+			set_env(envMemoryMapNode, (uint32_t)gMemoryMapNode);
+
             
             init_done = 1;
         }

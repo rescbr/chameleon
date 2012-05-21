@@ -40,7 +40,22 @@
 #include "xml.h"
 #include "modules.h"
 
-long LoadDrivers( char * dirSpec );
-long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
+struct compressed_kernel_header {
+    u_int32_t signature;
+    u_int32_t compress_type;
+    u_int32_t adler32;
+    u_int32_t uncompressed_size;
+    u_int32_t compressed_size;
+    u_int32_t reserved[11];
+    char      platform_name[PLATFORM_NAME_LEN];
+    char      root_path[ROOT_PATH_LEN];
+    u_int8_t  data[0];
+};
+typedef struct compressed_kernel_header compressed_kernel_header;
+
+extern long LoadDrivers(char * dirSpec);
+extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
+
+typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
 
 #endif /* _BOOT2_DRIVERS_H */

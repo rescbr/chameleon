@@ -26,6 +26,7 @@
 #include "saio_internal.h"
 #include "bootstruct.h"
 #include "device_tree.h"
+#include "platform.h"
 
 static long  gImageLastKernelAddr;
 
@@ -48,7 +49,7 @@ AllocateMemoryRange(char * rangeName, long start, long length)
     buffer[0] = start;
     buffer[1] = length;
     
-    DT__AddProperty(gMemoryMapNode, nameBuf, 2 * sizeof(uint32_t), (char *)buffer);
+    DT__AddProperty((Node*)(uint32_t)get_env(envMemoryMapNode), nameBuf, 2 * sizeof(uint32_t), (char *)buffer);
     
     return 0;
 }

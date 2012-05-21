@@ -61,6 +61,7 @@
 #include "modules.h"
 #include "xml.h"
 #include "options.h"
+#include "drivers.h"
 
 #ifndef DEBUG_BOOT
 #define DEBUG_BOOT 0
@@ -78,28 +79,22 @@ typedef struct platform_info {
 	char rootPath[ROOT_PATH_LEN];
 } PlatformInfo;
 
-static char gBootKernelCacheFile[Cache_len_name];
-static char gMKextName[Cache_len_name];
-
 static BVRef   bvChain;
 static bool forcecache = false;
 
+static char gBootKernelCacheFile[Cache_len_name];
+static char gMKextName[Cache_len_name];
 static void zeroBSS(void);
-#ifdef SAFE_MALLOC
-static inline void malloc_error(char *addr, size_t size, const char *file, int line);
-#else
-static inline void malloc_error(char *addr, size_t size);
-#endif
 static int ExecKernel(void *binary);
 static void getRootDevice();
-#ifdef NBP_SUPPORT
-static bool gUnloadPXEOnExit = false;
-#endif
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size);
 static bool found_extra_kext(void);
 static void determineCpuArch(void);
 static void init_pic(void);
 void getKernelCachePath(void);
+#ifdef NBP_SUPPORT
+static bool gUnloadPXEOnExit = false;
+#endif
 
 
 /*
@@ -159,6 +154,7 @@ void initialize_runtime(void)
 static void init_pic(void)
 {
     /* Remap IRQ's */
+	/*
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);
@@ -167,7 +163,7 @@ static void init_pic(void)
     outb(0xA1, 0x02);
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
-    
+    */
 	//outb(0x70, inb(0x70)|0x80); /* Disable NMI */  
 	
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
@@ -184,10 +180,10 @@ static int ExecKernel(void *binary)
     
     bootArgs->kaddr = bootArgs->ksize = 0;
 	
-	if(gBootVolume->OSVersion[3] <= '6')
+	if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
 	{
 		bootArgs->Header.Version  = kBootArgsVersion1;		
-		bootArgs->Header.Revision = gBootVolume->OSVersion[3];	
+		bootArgs->Header.Revision = ((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3];	
 	}
 	else 
 	{		
@@ -196,7 +192,7 @@ static int ExecKernel(void *binary)
 		bootArgs->Header.Version  = kBootArgsVersion;		
 		bootArgs->Header.Revision = kBootArgsRevision;
 #else
-		if(gBootVolume->OSVersion[3] >= '7')
+		if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] >= '7')
 		{
 			bootArgs->Header.Version  = 2;
 			bootArgs->Header.Revision = 0;
@@ -216,29 +212,22 @@ static int ExecKernel(void *binary)
 	
     // Load boot drivers from the specifed root path.
 	
-    if (!gHaveKernelCache)
+    if (!get_env(envgHaveKernelCache))
 	{
 		LoadDrivers("/");
     }
     
-    if (gErrors)
-	{
-        printf("Errors encountered while starting up the computer.\n");
-#if DEBUG_BOOT
-        printf("Pausing %d seconds...\n", kBootErrorTimeout);
-        sleep(kBootErrorTimeout);
-#endif
-    }
+    showError();
 	
 	execute_hook("md0Ramdisk", NULL, NULL, NULL, NULL, NULL, NULL);
     
     setupFakeEfi();
     
-    verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
+    verbose("Starting Darwin %s\n",( get_env(envarchCpuType) == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 #ifdef NBP_SUPPORT
     // Cleanup the PXE base code.
 	
-    if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit )
+    if ( (get_env(envgBootFileType) == kNetworkDeviceType) && gUnloadPXEOnExit )
 	{
 		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
         {
@@ -277,7 +266,7 @@ static int ExecKernel(void *binary)
         __setVideoMode( GRAPHICS_MODE );
 		
         
-		if(!gVerboseMode)
+		if(!get_env(envgVerboseMode))
 		{			
 			__drawColorRectangle(0, 0, DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, 0x01); 
             
@@ -317,7 +306,7 @@ static int ExecKernel(void *binary)
     
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
-    switch (gBootVolume->OSVersion[3]) {
+    switch (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3]) {
 		case '4':
 		case '5':
 		case '6':
@@ -342,7 +331,7 @@ static int ExecKernel(void *binary)
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
     
-	switch (gBootVolume->OSVersion[3]) {
+	switch (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3]) {
 		case '4':						
 		case '5':
 		case '6':
@@ -425,8 +414,6 @@ void common_boot(int biosdev)
     
 	init_ut_fnc();
     
-    arc4_init();
-    
 	initBooterLog();    
     
 	// Initialize boot info structure.
@@ -435,14 +422,19 @@ void common_boot(int biosdev)
     // Scan and record the system's hardware information.
     scan_platform();
 	
+	// Pseudo-random generator initialization.
+    arc4_init(); 
+	
     set_env(envgBIOSDev, (BIOSDev = biosdev & kBIOSDevMask));    
     set_env(envShouldboot, false);
-    set_env(envkCache, (uint32_t)gBootKernelCacheFile);
+    set_env(envkCacheFile, (uint32_t)gBootKernelCacheFile);
     set_env(envMKextName, (uint32_t)gMKextName);
-    
+	set_env(envHFSLoadVerbose, 1);
+	set_env(envarchCpuType, CPU_TYPE_I386);
+	set_env(envgHaveKernelCache, false);
+
     InitBootPrompt();
-    
-    
+        
     // First get info for boot volume.
     scanBootVolumes(BIOSDev, 0);
     
@@ -501,14 +493,13 @@ void common_boot(int biosdev)
     
     // Create a separated bvr chain using the specified filters.
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
-    safe_set_env(envgDeviceCount,devcnt);
+    safe_set_env(envgDeviceCount,devcnt);    
     
-    
-	gBootVolume = selectBootVolume(bvChain);
+	//gBootVolume = selectBootVolume(bvChain);
+	safe_set_env(envgBootVolume, (uint32_t)selectBootVolume(bvChain));
+
 	
-	LoadBundles("/Extra/");
-    
-    load_all_internal_modules();
+	LoadBundles("/Extra/");    
     
     // Loading preboot ramdisk if exists.
 	execute_hook("loadPrebootRAMDisk", NULL, NULL, NULL, NULL, NULL, NULL);		
@@ -538,8 +529,8 @@ void common_boot(int biosdev)
 	}    
 	
 #if DEBUG
-    printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-    printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+    printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBootVolume)), ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBootVolume))->flags);
+    printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBIOSBootVolume)), ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->flags);
     getc();
 #endif
     
@@ -567,7 +558,6 @@ void common_boot(int biosdev)
 		
         // Initialize globals.		
         safe_set_env(envSysConfigValid, false);
-        gErrors        = false;
 		
         status = getBootOptions(firstRun);
         firstRun = false;
@@ -580,7 +570,7 @@ void common_boot(int biosdev)
         if ( status == -1 )
         {
 			// gBootVolume == NULL usually means the user hit escape.
-			if(gBootVolume == NULL)
+			if(((BVRef)(uint32_t)get_env(envgBootVolume)) == NULL)
 			{
 				freeFilteredBVChain(bvChain);
                 
@@ -602,11 +592,13 @@ void common_boot(int biosdev)
 		{
 			if (strncmp(val, "x86_64", 4) == 0)
 			{
-				archCpuType = CPU_TYPE_X86_64;
+				safe_set_env(envarchCpuType, CPU_TYPE_X86_64);
+
 			} 
 			else if (strncmp(val, "i386", 4) == 0)
 			{
-				archCpuType = CPU_TYPE_I386;
+				safe_set_env(envarchCpuType, CPU_TYPE_I386);
+
 			}
 			else 
 			{
@@ -629,7 +621,7 @@ void common_boot(int biosdev)
 		
 		if (((get_env(envgBootMode) & kBootModeSafe) == 0) &&
 			!get_env(envgOverrideKernel) &&
-			(gBootFileType == kBlockDeviceType) &&
+			(get_env(envgBootFileType) == kBlockDeviceType) &&
 			(gMKextName[0] == '\0') && 
 			!getValueForBootKey(bootArgs->CommandLine, kIgnorePrelinkKern, &val, &len))
 		{    		
@@ -649,7 +641,7 @@ void common_boot(int biosdev)
 			trycache = false;
 		}
         
-		verbose("Loading Darwin %s\n", gBootVolume->OSVersion);
+		verbose("Loading Darwin %s\n", ((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
 		{
 			long cachetime, kerneltime = 0, exttime;
 			if (trycache && !forcecache) do {
@@ -665,7 +657,7 @@ void common_boot(int biosdev)
                         break;
                     }
                 }
-                else if (gBootVolume->kernelfound != true) // Should never happen.
+                else if (((BVRef)(uint32_t)get_env(envgBootVolume))->kernelfound != true) // Should never happen.
                 {
                     bootFile = kDefaultKernel;
                     goto out;
@@ -711,12 +703,12 @@ void common_boot(int biosdev)
 			{
                 bootFile = gBootKernelCacheFile;
                 verbose("Loading kernel cache %s\n", bootFile);
-				if (gBootVolume->OSVersion[3] > '6')
+				if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] > '6')
 				{					
 					ret = LoadThinFatFile(bootFile, &binary);
-					if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
+					if ((ret <= 0) && (get_env(envarchCpuType) == CPU_TYPE_X86_64))
 					{
-						archCpuType = CPU_TYPE_I386;
+						safe_set_env(envarchCpuType, CPU_TYPE_I386);
 						ret = LoadThinFatFile(bootFile, &binary);				
 					}
 				}
@@ -760,9 +752,9 @@ void common_boot(int biosdev)
 			
             verbose("Loading kernel %s\n", bootFileSpec);
             ret = LoadThinFatFile(bootFileSpec, &binary);
-            if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
+            if ((ret <= 0) && (get_env(envarchCpuType) == CPU_TYPE_X86_64))
             {
-				archCpuType = CPU_TYPE_I386;
+				safe_set_env(envarchCpuType, CPU_TYPE_I386);
 				ret = LoadThinFatFile(bootFileSpec, &binary);				
             }
 			
@@ -780,7 +772,7 @@ void common_boot(int biosdev)
 			
 			sleep(1);
 #ifdef NBP_SUPPORT
-            if (gBootFileType == kNetworkDeviceType)
+            if (get_env(envgBootFileType) == kNetworkDeviceType)
 			{
                 // Return control back to PXE. Don't unload PXE base code.
                 gUnloadPXEOnExit = false;
@@ -810,7 +802,7 @@ void common_boot(int biosdev)
 		}
     }
 #ifdef NBP_SUPPORT
-    if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit)
+    if ((get_env(envgBootFileType) == kNetworkDeviceType) && gUnloadPXEOnExit)
 	{
 		nbpUnloadBaseCode();
     }
@@ -821,11 +813,12 @@ static void determineCpuArch(void)
 {
 	if (cpu_mode_is64bit())
 	{
-		archCpuType = CPU_TYPE_X86_64;
+		safe_set_env(envarchCpuType, CPU_TYPE_X86_64);
+
 	}
 	else
 	{
-		archCpuType = CPU_TYPE_I386;
+		safe_set_env(envarchCpuType, CPU_TYPE_I386);
 	}
 }
 
@@ -864,11 +857,11 @@ void getKernelCachePath(void)
 		}
 		else
 		{
-			if(gBootVolume->OSVersion[3] > '6')
+			if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] > '6')
 			{					
 				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
 			}
-			else if(gBootVolume->OSVersion[3] <= '6')
+			else if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
 			{			 
 				
 				PlatformInfo    *platformInfo = malloc(sizeof(PlatformInfo));
@@ -921,7 +914,7 @@ void getKernelCachePath(void)
 				
 				DBG("Adler32: %08lX\n",Adler32);
 				
-				if (gBootVolume->OSVersion[3] < '6')
+				if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] < '6')
 				{
 					long flags, cachetime;
 					int ret = -1;
@@ -938,7 +931,7 @@ void getKernelCachePath(void)
 					}
 					
 				} else if (Adler32)
-					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64", Adler32); //Snow Leopard
+					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (get_env(envarchCpuType) == CPU_TYPE_I386) ? "i386" : "x86_64", Adler32); //Snow Leopard
 				
 			}	
 		}
@@ -981,7 +974,7 @@ static void getRootDevice()
 			//
 			// Try an alternate method for getting the root UUID on boot helper partitions.
 			//
-			if (gBootVolume->flags & kBVFlagBooter)
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagBooter)
 			{
 				if((loadHelperConfig() == 0)
 				   && getValueForKey(kHelperRootUUIDKey, &val, &cnt, &bootInfo->helperConfig) )
@@ -1020,7 +1013,7 @@ static void getRootDevice()
 				goto out;
 			}
 			
-			if (gBootVolume->fs_getuuid && gBootVolume->fs_getuuid (gBootVolume, bootInfo->uuidStr) == 0)
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid && (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid (((BVRef)(uint32_t)get_env(envgBootVolume)), bootInfo->uuidStr) == 0))
 			{
 				verbose("Setting boot-uuid to: %s\n", bootInfo->uuidStr);
 				//uuidSet = true;                
@@ -1036,55 +1029,41 @@ out:
     SetgRootDevice(val);
 }
 
-static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size)
+static bool find_file_with_ext(const char* dir, const char *ext, const char * name_to_compare, size_t ext_size)
 {
-	char* name;
-	long flags;
-	long time;
-	struct dirstuff* moduleDir = opendir(dir);
-	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
-	{		
-		int len = strlen(name);
+    long         ret, length, flags, time;
+    long long	 index;
+    const char * name;
+    
+	DBG("FileLoadBundles in %s\n",dirSpec);
+    
+    index = 0;
+    while (1) {
+        ret = GetDirEntry(dir, &index, &name, &flags, &time);
+        if (ret == -1) break;
 		
-		if (len >= ext_size)
-		{
-			if(strcmp(&name[len - ext_size], ext) == 0)
-			{	
-				if (name_compare)
-				{
-					if (strcmp(name, name_compare) == 0)
-					{
-						DBG("found : %s\n", name);
-						closedir(moduleDir);
-						return true;
-					}
-				}
-				else
-				{
-					DBG("found : %s\n", name);
-					closedir(moduleDir);
-					return true;
-				}			
-			}
-#if DEBUG_BOOT
-			else 
-			{
-				DBG("Ignoring %s\n", name);
-			}
-#endif
-		}		
-#if DEBUG_BOOT
-		else 
-		{
-			DBG("Ignoring %s\n", name);
-		}
-#endif		
-	}
-	
-	if (moduleDir) {
-		closedir(moduleDir);
+        // Make sure this is not a directory.
+        if ((flags & kFileTypeMask) != kFileTypeFlat) continue;
+        
+        // Make sure this is a kext or mkext.
+        length = strlen(name);
+        if (strcmp(name + length - ext_size, ext)) continue;
 		
-	}
+        if (name_to_compare)
+        {
+            if (strcmp(name, name_to_compare) == 0)
+            {
+                DBG("found : %s\n", name);
+                return true;
+            }
+        }
+        else
+        {
+            DBG("found : %s\n", name);
+            return true;
+        }
+		
+    }	
 	return false;
 }
 
@@ -1098,9 +1077,9 @@ static bool found_extra_kext(void)
 {	
 #define EXTENSIONS "Extensions"
 #define MKEXT_EXT  ".mkext"	
-#define MKEXT_EXT_SIZE sizeof("mkext")
+#define MKEXT_EXT_SIZE strlen(MKEXT_EXT)
 #define KEXT_EXT  ".kext"	
-#define KEXT_EXT_SIZE sizeof("kext")
+#define KEXT_EXT_SIZE strlen(KEXT_EXT)
 	
 	long flags;
 	long exttime;

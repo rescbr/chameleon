@@ -110,15 +110,8 @@ enum {
 
 static struct iob iob[NFILES];
 
-void * gFSLoadAddress = 0;
-
-// Turbo - save what we think is our original BIOS boot volume if we have one 0xab
-BVRef gBIOSBootVolume = NULL;
-BVRef gBootVolume;
-
 static BVRef newBootVolumeRef( int biosdev, int partno );
 static int GetFreeFd(void);
-static struct iob * iob_from_fdesc(int fdesc);
 
 static int open_bvr(BVRef bvr, const char *filePath);
 
@@ -135,8 +128,8 @@ long LoadVolumeFile(BVRef bvr, const char *filePath)
     // Read file into load buffer. The data in the load buffer will be
     // overwritten by the next LoadFile() call.
 	
-    gFSLoadAddress = (void *) LOAD_ADDR;
-	
+	safe_set_env(envgFSLoadAddress, (uint32_t)(void *)LOAD_ADDR);
+
     fileSize = bvr->fs_loadfile(bvr, (char *)filePath);
 	
     // Return the size of the file, or -1 if load failed.
@@ -162,6 +155,7 @@ long LoadFile(const char * fileSpec)
     return LoadVolumeFile(bvr, filePath);
 }
 
+#if UNUSED
 long ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length)
 {
     const char *filePath;
@@ -175,6 +169,7 @@ long ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint
 	
     return bvr->fs_readfile(bvr, (char *)filePath, buffer, offset, length);
 }
+#endif
 
 long LoadThinFatFile(const char *fileSpec, void **binary)
 {
@@ -194,7 +189,7 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
     // Read file into load buffer. The data in the load buffer will be
     // overwritten by the next LoadFile() call.
 	
-    gFSLoadAddress = (void *) LOAD_ADDR;
+	safe_set_env(envgFSLoadAddress, (uint32_t)(void *)LOAD_ADDR);
 	
     readFile = bvr->fs_readfile;
 	
@@ -318,6 +313,8 @@ long GetFileInfo(const char * dirSpec, const char * name,
     if (gMakeDirSpec == 0)
         gMakeDirSpec = (char *)malloc(1024);
 	
+	if (!gMakeDirSpec) return -1;
+
     if (!dirSpec) {
         long       idx, len;
 		
@@ -367,7 +364,7 @@ static int GetFreeFd(void)
 // Return a pointer to an allocated 'iob' based on the file descriptor
 // provided. Returns NULL if the file descriptor given is invalid.
 
-static struct iob * iob_from_fdesc(int fdesc)
+struct iob * iob_from_fdesc(int fdesc)
 {
     register struct iob * io;
 	
@@ -408,7 +405,9 @@ static int open_bvr(BVRef bvr, const char *filePath)
 	}
 	
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
-	gFSLoadAddress = io->i_buf;
+	//gFSLoadAddress = io->i_buf;
+	safe_set_env(envgFSLoadAddress, (uint32_t)(void *)io->i_buf);
+
 	io->i_filesize = bvr->fs_loadfile(bvr, (char *)filePath);
 	if (io->i_filesize < 0) {
 		close(fdesc);
@@ -531,6 +530,7 @@ int file_size(int fdesc)
     return io->i_filesize;
 }
 
+#if UNUSED
 //==========================================================================
 
 struct dirstuff * opendir(const char * path)
@@ -582,7 +582,6 @@ int readdir(struct dirstuff * dirp, const char ** name, long * flags,
 										 0, 0);
 }
 
-#if UNUSED
 long GetFSUUID(char *spec, char *uuidStr)
 {
     BVRef      bvr;
@@ -635,7 +634,6 @@ int openmem(char * buf, int len)
     return fdesc;
 }
 
-#endif
 //==========================================================================
 // lseek() - Reposition the byte offset of the file descriptor from the
 //           beginning of the file. Returns the relocated offset.
@@ -651,7 +649,7 @@ int b_lseek(int fdesc, int offset, int ptr)
 	
     return offset;
 }
-#if UNUSED
+
 //==========================================================================
 // tell() - Returns the byte offset of the file descriptor.
 
@@ -689,7 +687,6 @@ int write(int fdesc, const char * buf, int count)
     return count;
 }
 #if UNUSED
-
 int writebyte(int fdesc, char value)
 {
     struct iob * io;
@@ -760,7 +757,7 @@ int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
 
 const char * systemConfigDir()
 {
-    if (gBootFileType == kNetworkDeviceType)
+    if (get_env(envgBootFileType) == kNetworkDeviceType)
 		return "";
     return "/Library/Preferences/SystemConfiguration";
 }
@@ -768,8 +765,6 @@ const char * systemConfigDir()
 #endif
 
 //==========================================================================
-
-int gBootFileType;
 
 void scanBootVolumes( int biosdev, int * count )
 {
@@ -782,13 +777,14 @@ void scanBootVolumes( int biosdev, int * count )
 		bvr = nbpScanBootVolumes(biosdev, count);
 		if (bvr != NULL)
 		{
-			gBootFileType = kNetworkDeviceType;
+			safe_set_env(envgBootFileType, kNetworkDeviceType);
 		}
 #endif
 	}
 	else
 	{
-		gBootFileType = kBlockDeviceType;
+		safe_set_env(envgBootFileType, kBlockDeviceType);
+
 	}
 }
 
@@ -880,7 +876,7 @@ BVRef selectBootVolume( BVRef chain )
 			// zhell -- Undo a regression that was introduced from r491 to 492.
 			// if gBIOSBootVolume is set already, no change is required
 			if ( (bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume))
-				&& gBIOSBootVolume
+				&& get_env(envgBIOSBootVolume)
 				&& (!filteredChain || (filteredChain && bvr->visible))
 				&& (bvr->biosdev == gBIOSDev) )
 			{
@@ -890,7 +886,7 @@ BVRef selectBootVolume( BVRef chain )
 			// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
 			// from r491,
 			if ( bvr->flags & kBVFlagBootable
-				&& ! gBIOSBootVolume
+				&& !get_env(envgBIOSBootVolume)/*gBIOSBootVolume*/
 				&& bvr->biosdev == gBIOSDev )
 			{
 				bvr2 = bvr;				
@@ -943,11 +939,12 @@ void setRootVolume(BVRef volume)
 void setBootGlobals(BVRef chain)
 {
 	// Record default boot device.
-	gBootVolume = selectBootVolume(chain);
+	BVRef gBootVolume = selectBootVolume(chain);
 	
 	// turbo - Save the ORIGINAL boot volume too for loading our mkext
-	if (!gBIOSBootVolume) gBIOSBootVolume = gBootVolume;
-	
+	if (!get_env(envgBIOSBootVolume)) safe_set_env(envgBIOSBootVolume, (uint32_t)gBootVolume);
+
+	safe_set_env(envgBootVolume, (uint32_t)gBootVolume);
 	setRootVolume(gBootVolume);	
 }
 
@@ -1075,7 +1072,7 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 	if (biosdev == kPseudoBIOSDevBooter)
 	{
 		if (bvr1 == NULL )
-			bvr1 = gBIOSBootVolume;
+			bvr1 = (BVRef)(uint32_t)get_env(envgBIOSBootVolume);
 	}
 	else
 	{

@@ -39,7 +39,6 @@ installhdrs::
 
 .SUFFIXES: .s .i .c .o
 
-ifeq "makedep" "NO"
 .c.o .m.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
 
@@ -48,35 +47,15 @@ $(OBJROOT)/%.o: %.c
 
 $(OBJROOT)/%.o: %.m
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
-else
-.c.o .m.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
-
-$(OBJROOT)/%.o: %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
-
-$(OBJROOT)/%.o: %.m
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o \
-	    -MD -dependency-file $(OBJROOT)/$*.d
-	md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
-endif
-
-#.s.o:
-#	cc $(INC) -E $< > $(OBJROOT)/$*.o2
-#	$(AS) -o $(OBJROOT)/$@ $(OBJROOT)/$*.o2
 
 .s.o:
-	gcc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
+	$(CC) $(CPPFLAGS) -no-integrated-as -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
 
 boot2.o:
-	gcc $(CPPFLAGS) -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s
+	$(CC) $(CPPFLAGS) -Wa,-n -c $(INC) -no-integrated-as -arch i386 -o $(OBJROOT)/$(@F) boot2.s
 	
 $(OBJROOT)/%.o: %.s
-	gcc $(CPPFLAGS) -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
+	$(CC) $(CPPFLAGS) -no-integrated-as -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
 
 $(DIRS_NEEDED) $(INSTALLDIR) $(SRCROOT):
 	$(MKDIRS) $@

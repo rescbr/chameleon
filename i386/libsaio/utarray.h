@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2011, Troy D. Hanson   http://uthash.sourceforge.net
+Copyright (c) 2008-2012, Troy D. Hanson   http://uthash.sourceforge.net
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTARRAY_H
 #define UTARRAY_H
 
-#define UTARRAY_VERSION 1.9.4
+#define UTARRAY_VERSION 1.9.6
 
 #ifdef __GNUC__
 #define _UNUSED_ __attribute__ ((__unused__)) 
@@ -37,8 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libsaio.h"
 
-#define oom() longjmp(h_buf_error,-1)
-
+#ifndef utarray_oom
+#define utarray_oom() longjmp(uterror,-1)
+#endif
+#ifndef __utarray_malloc
+#define __utarray_malloc(sz) malloc(sz)      /* malloc fcn                      */
+#endif
+#ifndef __utarray_free
+#define __utarray_free(ptr) free(ptr)     /* free fcn                        */
+#endif
+#ifndef __utarray_realloc
+#define __utarray_realloc(ptr,sz) realloc(ptr,sz)     /* realloc fcn                        */
+#endif
 typedef void (ctor_f)(void *dst, const void *src);
 typedef void (dtor_f)(void *elt);
 typedef void (init_f)(void *elt);
@@ -68,25 +78,25 @@ typedef struct {
         (a)->icd.dtor(utarray_eltptr(a,_ut_i));                               \
       }                                                                       \
     }                                                                         \
-    free((a)->d);                                                             \
+    __utarray_free((a)->d);                                                             \
   }                                                                           \
   (a)->n=0;                                                                   \
 } while(0)
 
 #define utarray_new(a,_icd) do {                                              \
-  a=(UT_array*)malloc(sizeof(UT_array));                                      \
+  a=(UT_array*)utarray_malloc(sizeof(UT_array));                                      \
   utarray_init(a,_icd);                                                       \
 } while(0)
 
 #define utarray_free(a) do {                                                  \
   utarray_done(a);                                                            \
-  free(a);                                                                    \
+  __utarray_free(a);                                                                    \
 } while(0)
 
 #define utarray_reserve(a,by) do {                                            \
   if (((a)->i+by) > ((a)->n)) {                                               \
     while(((a)->i+by) > ((a)->n)) { (a)->n = ((a)->n ? (2*(a)->n) : 8); }     \
-    if ( ((a)->d=(char*)realloc((a)->d, (a)->n*(a)->icd.sz)) == NULL) oom();  \
+    if ( ((a)->d=(char*)__utarray_realloc((a)->d, (a)->n*(a)->icd.sz)) == NULL) utarray_oom();  \
   }                                                                           \
 } while(0)
 
@@ -185,10 +195,10 @@ typedef struct {
   (a)->i -= (len);                                                            \
 } while(0)
 
-#define utarray_renew(a,u) do {                                               \
-  if (a) utarray_clear(a); \
-  else utarray_new((a),(u));   \
-} while(0);
+#define utarray_renew(a,u) do {                                                 \
+  if (a) utarray_clear(a);                                                      \
+  else utarray_new((a),(u));                                                    \
+} while(0)
 
 #define utarray_clear(a) do {                                                 \
   if ((a)->i > 0) {                                                           \
@@ -210,6 +220,7 @@ typedef struct {
 
 #define utarray_front(a) (((a)->i) ? (_utarray_eltptr(a,0)) : NULL)
 #define utarray_next(a,e) (((e)==NULL) ? utarray_front(a) : ((((a)->i) > (utarray_eltidx(a,e)+1)) ? _utarray_eltptr(a,utarray_eltidx(a,e)+1) : NULL))
+#define utarray_prev(a,e) (((e)==NULL) ? utarray_back(a) : ((utarray_eltidx(a,e) > 0) ? _utarray_eltptr(a,utarray_eltidx(a,e)-1) : NULL))
 #define utarray_back(a) (((a)->i) ? (_utarray_eltptr(a,(a)->i-1)) : NULL)
 #define utarray_eltidx(a,e) (((char*)(e) >= (char*)((a)->d)) ? (((char*)(e) - (char*)((a)->d))/(a)->icd.sz) : -1)
 
@@ -220,7 +231,7 @@ static void utarray_str_cpy(void *dst, const void *src) {
 }
 static void utarray_str_dtor(void *elt) {
   char **eltc = (char**)elt;
-  if (*eltc) free(*eltc);
+  if (*eltc) __utarray_free(*eltc);
 }
 static const UT_icd ut_str_icd _UNUSED_ = {sizeof(char*),NULL,utarray_str_cpy,utarray_str_dtor};
 static const UT_icd ut_int_icd _UNUSED_ = {sizeof(int),NULL,NULL,NULL};

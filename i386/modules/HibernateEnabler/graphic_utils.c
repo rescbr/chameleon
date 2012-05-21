@@ -10,7 +10,7 @@
 #include "bmdecompress.h"
 #include "vbe.h"
 #include "appleClut8.h"
-
+#include "platform.h"
 
 #ifndef offsetof
 #define offsetof(st, m) \
@@ -482,7 +482,7 @@ setVideoMode( int mode)
     if ( mode == GRAPHICS_MODE )
     {
   		if ( (err=initGraphicsMode ()) == errSuccess ) {
-			if (gVerboseMode) {
+			if (get_env(envgVerboseMode)) {
 				// Tell the kernel to use text mode on a linear frame buffer display
                 setBootArgsVideoMode(FB_TEXT_MODE);
 			} else {

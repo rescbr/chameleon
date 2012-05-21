@@ -10,7 +10,7 @@ INSTALL_MD_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/
 OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 	      -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-          -march=pentium4 -msse2 -msoft-float -ffreestanding -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
+          -march=pentium4 -msse2 -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
 
 INC = -I. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSAIODIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
@@ -42,7 +42,7 @@ ALLSRC =  $(SFILES) $(CFILES) $(HFILES) $(OTHERFILES)
 LIBS = libsa.a
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-#CFLAGS += -DSAFE_MALLOC
+CFLAGS += -DSAFE_MALLOC
 
 all embedtheme: $(DIRS_NEEDED) $(LIBS)
 

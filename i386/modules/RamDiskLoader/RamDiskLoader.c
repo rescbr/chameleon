@@ -13,6 +13,7 @@
 #include "ramdisk.h"
 #include "drivers.h"
 #include "disk.h"
+#include "platform.h"
 
 
 void loadPrebootRAMDisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
@@ -60,7 +61,7 @@ void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 			break;
 		case 1:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next we'll try the base
@@ -70,7 +71,7 @@ void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 			break;
 		case 2:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next we'll try the base

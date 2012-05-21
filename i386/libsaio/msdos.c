@@ -52,6 +52,7 @@
 
 #include "msdos_private.h"
 #include "msdos.h"
+#include "platform.h"
 
 #define LABEL_LENGTH		11
 #define MSDOS_CACHE_BLOCKSIZE BPS
@@ -131,14 +132,14 @@ int MSDOSProbe(const void * buffer)
     union bootsector    *bsp;
     struct bpb33        *b33;
     struct bpb50        *b50;
-    struct bpb710       *b710;
+    //struct bpb710       *b710;
     u_int16_t	        bps;
     u_int8_t		spc;
 	
     bsp = (union bootsector *)buffer;
     b33 = (struct bpb33 *)bsp->bs33.bsBPB;
     b50 = (struct bpb50 *)bsp->bs50.bsBPB;
-    b710 = (struct bpb710 *)bsp->bs710.bsBPB;
+    //b710 = (struct bpb710 *)bsp->bs710.bsBPB;
     
     /* We only work with 512, 1024, and 2048 byte sectors */
     bps = OSSwapLittleToHostInt16(b33->bpbBytesPerSec);
@@ -207,9 +208,11 @@ MSDOSInitPartition (CICell ih)
 	
     /* Check to make sure valid sectors per cluster */
     spc = b33->bpbSecPerClust;
-    if ((spc == 0 ) || (spc & (spc - 1))) 
+    if ((spc == 0 ) || (spc & (spc - 1)))
+    {
+        free (buf);
 		return -1;
-	
+	}
 	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0) { /* It's FAT32 */
 		if (memcmp(((struct extboot *)bsp->bs710.bsExt)->exFileSysType, "FAT32   ", 8))
 		{
@@ -669,7 +672,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	st =  (struct msdosdirstate *)(long) *dirIndex;
 	if (!st)
 	{
-		st=malloc (sizeof (*st));
+		st=malloc (sizeof (struct msdosdirstate));
 		if (dirPath[0])
 		{
 			uint8_t *buf=malloc(msdosclustersize);
@@ -779,7 +782,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 		cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
 	size = (uint32_t)OSReadLittleInt32 ((dirp->deFileSize),0);
 	if (size<=offset)
+    {
+        free (buf);
 		return -1;
+    }
 	nskip=offset/msdosclustersize;
 	for (i=0;i<nskip;i++)
 		msdosreadcluster (ih, 0, 0, &cluster);
@@ -860,7 +866,9 @@ MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 
 long MSDOSLoadFile(CICell ih, char * filePath)
 {
-    return MSDOSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+    //return MSDOSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+	return MSDOSReadFile(ih, filePath, (void *)(uint32_t)get_env(envgFSLoadAddress), 0, 0);
+
 }
 
 /* Fix up volume label. */
@@ -905,7 +913,10 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 		str[0]=0;
 		return;
 	}
-    
+	
+    bzero(label,sizeof(label));
+	bzero(vfatlabel,sizeof(vfatlabel));
+
 	label[0] = '\0';
 	
 	initRoot (&st);
@@ -955,6 +966,7 @@ MSDOSGetUUID(CICell ih, char *uuidStr)
 	
 	if (MSDOSInitPartition (ih)<0)
 	{
+        free (buf);
 		return -1;
 	}
 	bzero (uuidStr, 16);

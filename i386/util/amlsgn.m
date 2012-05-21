@@ -238,8 +238,8 @@ int main (int argc, const char * argv[]) {
                     NSMutableData * mem = [[NSMutableData alloc] initWithContentsOfFile : inStr  ];
 					if (!mem) {
                         NSLog(@"Error while opening the file : %@ \n",inStr);
-                        //CFRelease(data);
-                        //data = NULL;
+                        CFRelease(data);
+                        data = NULL;
                         goto out;
                     }
 					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)[mem mutableBytes];
@@ -258,8 +258,8 @@ int main (int argc, const char * argv[]) {
                     
                     [mem release];					
 				}				
-                //CFRelease(data);
-                //data = NULL;
+                CFRelease(data);
+                data = NULL;
                 goto out;
 			}			
 			
@@ -290,8 +290,8 @@ int main (int argc, const char * argv[]) {
 					NSMutableData * mem = [[NSMutableData alloc] initWithContentsOfFile : inStr  ];
 					if (!mem) {
                         NSLog(@"Error while opening the file : %@\n",inStr);
-                        //CFRelease(data);
-                        //data = NULL;
+                        CFRelease(data);
+                        data = NULL;
                         goto out;
                     }
 					ACPI_TABLE_HEADER * head = (ACPI_TABLE_HEADER *)[mem mutableBytes];
@@ -308,8 +308,8 @@ int main (int argc, const char * argv[]) {
                     [mem release]; 				
 				}
                 
-                //CFRelease(data);
-                //data = NULL;
+                CFRelease(data);
+                data = NULL;
                 goto out;
                 
 			}			

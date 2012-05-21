@@ -129,8 +129,9 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		}
 		
 		// Force arch=i386 + -v
-		archCpuType = CPU_TYPE_I386;
-		gVerboseMode = true;
+		//archCpuType = CPU_TYPE_I386;
+		safe_set_env(envarchCpuType, CPU_TYPE_I386);
+		safe_set_env(envgVerboseMode, true);
 	}
 }
 
@@ -208,7 +209,7 @@ long NBI_LoadDrivers( char * dirSpec )
 	int step = 0;
 	execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
 #ifdef NBP_SUPPORT	
-    if ( gBootFileType == kNetworkDeviceType )
+    if ( get_env(envgBootFileType) == kNetworkDeviceType )
     {
         if (NetLoadDrivers(dirSpec) != 0)
 		{
@@ -218,7 +219,7 @@ long NBI_LoadDrivers( char * dirSpec )
     }
     else
 #endif
-		if ( gBootFileType == kBlockDeviceType )
+		if ( get_env(envgBootFileType) == kBlockDeviceType )
 		{
 			verbose("Loading Recovery Extensions\n");
 			strcpy(dirSpecExtra, "/Extra/RecoveryExtensions/");
@@ -227,7 +228,7 @@ long NBI_LoadDrivers( char * dirSpec )
 #ifdef BOOT_HELPER_SUPPORT			
 			// TODO: fix this, the order does matter, and it's not correct now.
 			// Also try to load Extensions from boot helper partitions.
-			if (gBootVolume->flags & kBVFlagBooter)
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagBooter)
 			{
 				strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0)

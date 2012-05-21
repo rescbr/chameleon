@@ -194,7 +194,9 @@ long UFSGetUUID(CICell ih, char *uuidStr)
 
 long UFSLoadFile( CICell ih, char * filePath )
 {
-    return UFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+    //return UFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+	return UFSReadFile(ih, filePath, (void *)(uint32_t)get_env(envgFSLoadAddress), 0, 0);
+
 }
 
 long UFSReadFile( CICell ih, char * filePath, void * base, uint64_t offset, uint64_t length )

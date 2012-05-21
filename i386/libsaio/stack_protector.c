@@ -33,7 +33,7 @@
 long __stack_chk_guard[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 //__private_extern__ void __guard_setup(void) /*__attribute__ ((visibility ("hidden")))*/;
-static void __guard_setup(void) __attribute__((constructor));
+void __guard_setup(void) __attribute__((constructor));
 
 void __stack_chk_fail(void);
 
@@ -46,7 +46,7 @@ __guard_setup(void)
 	size_t i;
 	long guard[__arraycount(__stack_chk_guard)];	
 	
-	arc4rand(guard, sizeof(guard), 0);
+	arc4random_buf(guard, sizeof(guard));
 	for (i = 0; i < __arraycount(guard); i++)
 		__stack_chk_guard[i] = guard[i];
 	
@@ -56,14 +56,14 @@ __guard_setup(void)
      to the "terminator canary" */
 	((char*)__stack_chk_guard)[0] = 0; ((char*)__stack_chk_guard)[1] = 0;
 	((char*)__stack_chk_guard)[2] = '\n'; ((char*)__stack_chk_guard)[3] = 255;	
-  
+	
 }
 
 void
 __stack_chk_fail()
 {
 #ifndef BOOT1
-  stop("stack overflow");
+	stop("stack overflow");
 #endif
-  for(;;);
+	for(;;);
 }

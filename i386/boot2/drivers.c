@@ -91,6 +91,8 @@ static char *    gFileSpec;
 static char *    gTempSpec;
 static char *    gFileName;
 
+long LoadDrivers( char * dirSpec );
+long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 long InitDriverSupport(void);
 long FileLoadDrivers(char *dirSpec, long plugin);
 long LoadDriverMKext(char *fileSpec);
@@ -156,7 +158,7 @@ long LoadDrivers( char * dirSpec )
 	int step = 0;
 	execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
 #ifdef NBP_SUPPORT	
-    if ( gBootFileType == kNetworkDeviceType )
+    if ( get_env(envgBootFileType) == kNetworkDeviceType )
     {
         if (NetLoadDrivers(dirSpec) != 0) {
             error("Could not load drivers from the network\n");
@@ -165,7 +167,7 @@ long LoadDrivers( char * dirSpec )
     }
     else
 #endif
-		if ( gBootFileType == kBlockDeviceType )
+		if ( get_env(envgBootFileType) == kBlockDeviceType )
 		{
 			// First try to load Extra extensions from the ramdisk if isn't aliased as bt(0,0).
             
@@ -176,7 +178,7 @@ long LoadDrivers( char * dirSpec )
 			
 			
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "/Extra/%s/", (char*)gBootVolume->OSVersion);
+			sprintf(dirSpecExtra, "/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
 			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{	
 				// Next try to load Extra extensions from the selected root partition.
@@ -185,10 +187,11 @@ long LoadDrivers( char * dirSpec )
 				{
 					// If failed, then try to load Extra extensions from the boot partition
 					// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-					if (!(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no))
+					//if (!(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no))
+					if (!((((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->biosdev == ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev)  && (((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->part_no == ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no)))
 					{
 						// First try a specfic OS version folder ie 10.5
-						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)gBootVolume->OSVersion);
+						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
 						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 						{	
 							// Next we'll try the base
@@ -206,7 +209,7 @@ long LoadDrivers( char * dirSpec )
 #ifdef BOOT_HELPER_SUPPORT
 			// TODO: fix this, the order does matter, and it's not correct now.
 			// Also try to load Extensions from boot helper partitions.
-			if (gBootVolume->flags & kBVFlagBooter)
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagBooter)
 			{
 				strlcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/", sizeof(dirSpecExtra));
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
@@ -810,25 +813,25 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             printf("adler mismatch\n");
             return -1;
         }
-        char* BootKernelCacheFile = (char*)(uint32_t)get_env(envkCache);
-		if (((get_env(envgBootMode) & kBootModeSafe) == 0) && (BootKernelCacheFile[0] != '\0') && gBootVolume->OSVersion[3] > '6') 
+        char* BootKernelCacheFile = (char*)(uint32_t)get_env(envkCacheFile);
+		if (((get_env(envgBootMode) & kBootModeSafe) == 0) && (BootKernelCacheFile[0] != '\0') && ((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] > '6') 
 			safe_set_env(envAdler32, kernel_header->adler32);
     }
 	
 	{
 		unsigned long len;
 		ret = ThinFatFile(&binary, &len);
-		if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
+		if ((ret == 0) && (len == 0) && (get_env(envarchCpuType)==CPU_TYPE_X86_64))
 		{
-			archCpuType=CPU_TYPE_I386;
+			safe_set_env(envarchCpuType, CPU_TYPE_I386);
 			ThinFatFile(&binary, &len);
 		}
 		
 		ret = DecodeMachO(binary, rentry, raddr, rsize);
 		
-		if (ret<0 && archCpuType==CPU_TYPE_X86_64)
+		if (ret<0 && get_env(envarchCpuType)==CPU_TYPE_X86_64)
 		{
-			archCpuType=CPU_TYPE_I386;
+			safe_set_env(envarchCpuType, CPU_TYPE_I386);
 			ret = DecodeMachO(binary, rentry, raddr, rsize);
 		}
 	}

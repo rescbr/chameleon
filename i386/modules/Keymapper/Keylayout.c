@@ -25,6 +25,22 @@
 
 #define kKeyboardLayout "KeyboardLayout"
 
+//==========================================================================
+// lseek() - Reposition the byte offset of the file descriptor from the
+//           beginning of the file. Returns the relocated offset.
+
+int key_b_lseek(int fdesc, int offset, int ptr)
+{
+    struct iob * io;
+	
+    if ((io = iob_from_fdesc(fdesc)) == NULL)
+        return (-1);
+	
+    io->i_offset = offset;
+	
+    return offset;
+}
+
 struct keyboard_layout *current_layout = NULL;
 int getchar_replacement(void);
 
@@ -99,7 +115,7 @@ static uint32_t load_keyboard_layout_file(const char *filename) {
 	if (!current_layout)
 		goto fail;
 
-	b_lseek(fd, KEYBOARD_LAYOUTS_MAP_OFFSET, 0);
+	key_b_lseek(fd, KEYBOARD_LAYOUTS_MAP_OFFSET, 0);
 	
 	if (read(fd, (char*) current_layout, sizeof(*current_layout)) != sizeof(*current_layout)) {
 		printf("Wrong keyboard layout file %s size\n", filename);

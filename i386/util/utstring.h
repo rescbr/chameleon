@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2011, Troy D. Hanson   http://uthash.sourceforge.net
+Copyright (c) 2008-2012, Troy D. Hanson   http://uthash.sourceforge.net
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTSTRING_H
 #define UTSTRING_H
 
-#define UTSTRING_VERSION 1.9.4
+#define UTSTRING_VERSION 1.9.6
 
 #ifdef __GNUC__
 #define _UNUSED_ __attribute__ ((__unused__)) 
@@ -36,8 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "libsaio.h"
-#define oom() longjmp(h_buf_error,-1)
-
+#ifndef utstring_oom
+#define utstring_oom() longjmp(THIS_BUF_ERROR,-1)
+#endif
+#ifndef __utstring_malloc
+#define __utstring_malloc(sz) pool_alloc(THIS_POOL,sz)      /* malloc fcn                      */
+#endif
+#ifndef __utstring_free
+#define __utstring_free(ptr) pool_free(THIS_POOL,ptr)     /* free fcn                        */
+#endif
+#ifndef __utarray_realloc
+#define __utarray_realloc(ptr,sz) pool_realloc(THIS_POOL,nmemb,sz)     /* realloc fcn                        */
+#endif
+#ifndef __utarray_calloc
+#define __utarray_calloc(n,sz) pool_calloc(THIS_POOL,n,sz)     /* calloc fcn                        */
+#endif
 typedef struct {
     char *d;
     size_t n; /* allocd size */
@@ -47,8 +60,8 @@ typedef struct {
 #define utstring_reserve(s,amt)                            \
 do {                                                       \
   if (((s)->n - (s)->i) < (size_t)(amt)) {                 \
-     (s)->d = (char*)realloc((s)->d, (s)->n + amt);        \
-     if ((s)->d == NULL) oom();                            \
+     (s)->d = (char*)__utarray_realloc((s)->d, (s)->n + amt);        \
+     if ((s)->d == NULL) utstring_oom();                   \
      (s)->n += amt;                                        \
   }                                                        \
 } while(0)
@@ -62,31 +75,22 @@ do {                                                       \
 
 #define utstring_done(s)                                   \
 do {                                                       \
-  if ((s)->d != NULL) free((s)->d);                        \
+  if ((s)->d != NULL) __utstring_free((s)->d);             \
   (s)->n = 0;                                              \
 } while(0)
 
 #define utstring_free(s)                                   \
 do {                                                       \
   utstring_done(s);                                        \
-  free(s);                                                 \
+  __utstring_free(s);                                      \
 } while(0)
 
-#if 0
 #define utstring_new(s)                                    \
 do {                                                       \
-   s = (UT_string*)calloc(sizeof(UT_string),1);            \
-   if (!s) oom();                                          \
+   s = (UT_string*)__utarray_calloc(sizeof(UT_string),1);  \
+   if (!s) utstring_oom();                                 \
    utstring_init(s);                                       \
 } while(0)
-#else
-#define utstring_new(s)                                    \
-do {                                                       \
-s = (UT_string*)malloc(sizeof(UT_string));                 \
-if (!s) oom();                                             \
-utstring_init(s);                                          \
-} while(0)
-#endif
 
 #define utstring_renew(s)                                  \
 do {                                                       \
@@ -105,18 +109,18 @@ do {                                                       \
 
 #define utstring_bincpy(s,b,l)                             \
 do {                                                       \
-  utstring_reserve((s),(l)+1);                               \
+  utstring_reserve((s),(l)+1);                             \
   if (l) memcpy(&(s)->d[(s)->i], b, l);                    \
-  (s)->i += l;                                               \
-  (s)->d[(s)->i]='\0';                                         \
+  (s)->i += l;                                             \
+  (s)->d[(s)->i]='\0';                                     \
 } while(0)
 
-#define utstring_concat(dst,src)                           \
-do {                                                       \
-  utstring_reserve(dst,(src->i)+1);                        \
-  if (src->i) memcpy(&(dst)->d[(dst)->i], src->d, src->i); \
-  dst->i += src->i;                                        \
-  dst->d[dst->i]='\0';                                     \
+#define utstring_concat(dst,src)                                    \
+do {                                                                \
+    utstring_reserve((dst),((src)->i)+1);                           \
+    if ((src)->i) memcpy(&(dst)->d[(dst)->i], (src)->d, (src)->i);  \
+    (dst)->i += (src)->i;                                           \
+    (dst)->d[(dst)->i]='\0';                                        \
 } while(0)
 
 #define utstring_len(s) ((unsigned)((s)->i))
@@ -132,7 +136,7 @@ _UNUSED_ static void utstring_printf_va(UT_string *s, const char *fmt, va_list a
 #else
       va_copy(cp, ap);
 #endif
-      n = vsnprintf (&s->d[s->i], s->n-s->i, fmt, cp);
+      n = vsnprintf (&s->d[s->i], s->n-s->i, fmt, cp); // vsnprintf not implemented yet in chameleon
       va_end(cp);
 
       if ((n > -1) && (n < (int)(s->n-s->i))) {

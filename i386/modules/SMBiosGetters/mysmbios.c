@@ -535,11 +535,10 @@ const char* sm_get_random_productNumber(void)
         int rand_sn1 ;
         int rand_sn2 ;
         int rand_sn3 ;
-        struct ran_obj* random_serial_obj = random_init(0,35);
-        rand_sn1 = random(random_serial_obj);
-        rand_sn2 = random(random_serial_obj);
-        rand_sn3 = random(random_serial_obj);
-        random_free(random_serial_obj); 
+        
+        rand_sn1 = arc4random_unirange(0,35);
+        rand_sn2 = arc4random_unirange(0,35);
+        rand_sn3 = arc4random_unirange(0,35);
         
         // Append all charaters to the string 
         char tmp[2];
@@ -566,10 +565,8 @@ const char* sm_get_random_week(void)
     {           
         // Get randomized characters
         int rand_week ;
-        struct ran_obj* random_week_obj = random_init(0,47)/* random_init(1,48) */;
-        rand_week = random(random_week_obj);        
-        random_free(random_week_obj); 
-        
+        rand_week = arc4random_unirange(0,47);
+                
         // Append all charaters to the string 
         char tmp[3];
         bzero(tmp,sizeof(tmp));
@@ -595,10 +592,9 @@ const char* sm_get_random_year(void)
     {           
         // Get randomized characters
         int rand_year ;
-        struct ran_obj* random_year_obj = random_init(0,9);
-        rand_year = random(random_year_obj);        
-        random_free(random_year_obj);
         
+        rand_year = arc4random_unirange(0,9);
+		
         // Append all charaters to the string 
         char tmp[2];
         bzero(tmp,sizeof(tmp));
@@ -622,10 +618,9 @@ const char* sm_get_random_country(void)
         
         // Get randomized characters
         int rand_country ;
-        struct ran_obj* random_country_obj = random_init(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
-        rand_country = random(random_country_obj);        
-        random_free(random_country_obj);       
         
+        rand_country = arc4random_unirange(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
+		
         strlcpy (str, sm_country_list[rand_country].code,strlen(sm_country_list[rand_country].code)+1);
         
         DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);

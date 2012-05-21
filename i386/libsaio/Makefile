@@ -14,7 +14,7 @@ DEBUG = -DNOTHING
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fno-stack-protector \
     -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
     -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
-    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -ffreestanding -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
+    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
 
 DEFINES=
 CONFIG = hd
@@ -31,7 +31,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
+SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random-fbsd.o   \
         disk.o sys.o cache.o bootstruct.o \
         stringTable.o load.o pci.o allocate.o misc.o \
 		vbe.o hfs.o hfs_compare.o \
@@ -39,22 +39,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random.o   \
         cpu.o platform.o \
         fake_efi.o \
 		device_inject.o pci_root.o \
-        convert.o acpi_tools.o smbios.o uterror.o lzss.o 
-
-# example for AcpiCodec
-#SAIO_OBJS += acpi_codec.o acpicode.o ACPICodec.o acpidecode.o
-
-# example for AcpiPatcher
-#SAIO_OBJS += aml_generator.o acpi_patcher.o AcpiPatcher.o 
-
-# example for GE
-#SAIO_OBJS += nvidia.o ati.o gma.o GraphicsEnabler.o
-
-# example for SMBiosGetters
-#SAIO_OBJS += mysmbios.o smbios_decode.o smbios_getters.o SMBiosGetters.o
-
-# example for GUI
-#SAIO_OBJS += graphic_utils.o gui.o picopng.o GUI_module.o
+        convert.o acpi_tools.o smbios.o uterror.o lzss.o lib.o rtc.o time.o
 
 # Options enabled by default:
 #CFLAGS += -DNO_WIN_SUPPORT # -7744 bytes

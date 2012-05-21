@@ -96,7 +96,6 @@ static void GUI_showMessage(char *message);
 
 int GUI_printf(const char * fmt, ...);
 int GUI_verbose(const char * fmt, ...);
-int GUI_error(const char * fmt, ...);
 void GUI_stop(const char * fmt, ...);
 
 
@@ -106,8 +105,6 @@ struct putc_info {
     char * last_str;
 };
 void sputc(int c, struct putc_info * pi);
-extern char *msgbuf;
-extern char *cursor;
 
 static void (*showTextBuffer)(char *, int ) = NULL;
 static char *(*getMemoryInfoString)(void) = NULL;
@@ -179,7 +176,7 @@ static bool KernelStart = false;
  **/
 void GUI_ExecKernel_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6)
 {
-	if(!gVerboseMode)
+	if(!get_env(envgVerboseMode))
 	{
 		// Note: shouldn't be needed, but just in case
 		drawBootGraphics();
@@ -212,7 +209,7 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		drawBackground();		
 		updateVRAM();
         
-		if(!gVerboseMode)
+		if(!get_env(envgVerboseMode))
 		{
 			// Disable outputs, they will still show in the boot log.
 			replace_system_function("_printf", &GUI_verbose);
@@ -247,7 +244,6 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 		
 		replace_system_function("_printf", &GUI_printf);
 		replace_system_function("_verbose", &GUI_verbose);
-		replace_system_function("_error", &GUI_error);
 		replace_system_function("_stop", &GUI_stop);
 		replace_system_function("_showMessage", &GUI_showMessage);
         
@@ -373,25 +369,25 @@ static int GUI_updateMenu( int key, void ** paramPtr )
 				switch (res)
 				{
 					case BOOT_NORMAL:
-						gVerboseMode = false;
+						safe_set_env(envgVerboseMode, false);
                         safe_set_env(envgBootMode, kBootModeNormal);
                         
 						break;
 						
 					case BOOT_VERBOSE:
-						gVerboseMode = true;
+						safe_set_env(envgVerboseMode, true);
                         safe_set_env(envgBootMode, kBootModeNormal);
 						GUI_addBootArg(kVerboseModeFlag);
 						break;
 						
 					case BOOT_IGNORECACHE:
-						gVerboseMode = false;
+						safe_set_env(envgVerboseMode, false);
                         safe_set_env(envgBootMode, kBootModeNormal);
 						GUI_addBootArg(kIgnoreCachesFlag);
 						break;
 						
 					case BOOT_SINGLEUSER:
-						gVerboseMode = true;
+						safe_set_env(envgVerboseMode, true);
                         safe_set_env(envgBootMode, kBootModeNormal);
 						GUI_addBootArg(kSingleUserModeFlag);
 						break;
@@ -703,8 +699,9 @@ int GUI_getBootOptions(bool firstRun)
     int devcnt = (int)get_env(envgDeviceCount);
     
 	// Initialize default menu selection entry.
-	gBootVolume = menuBVR = selectBootVolume(getBvChain());
-	
+	/*gBootVolume =*/ menuBVR = selectBootVolume(getBvChain());
+	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
+
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev)))
 	{
 		isCDROM = true;
@@ -831,7 +828,7 @@ int GUI_getBootOptions(bool firstRun)
                 stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
                 return -1;
             }
-			getBootVolumeDescription(gBootVolume, name, 79, false);
+			getBootVolumeDescription(((BVRef)(uint32_t)get_env(envgBootVolume)), name, 79, false);
 			prompt = malloc(256);            
             if (!prompt) {
                 free(name);
@@ -892,7 +889,8 @@ int GUI_getBootOptions(bool firstRun)
                 // Look at partitions hosting OS X other than the CD-ROM
                 for (bvr = getBvChain(); bvr; bvr=bvr->next) {
                     if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != (int)get_env(envgBIOSDev)) {
-                        gBootVolume = bvr;
+                        //gBootVolume = bvr;
+						safe_set_env(envgBootVolume, (uint32_t)bvr);
                     }
                 }
             }
@@ -1097,7 +1095,8 @@ int GUI_getBootOptions(bool firstRun)
 					GUI_showBootPrompt(nextRow, showPrompt);
 					break;
 				}
-				gBootVolume = menuBVR;
+				//gBootVolume = menuBVR;
+				safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 				setRootVolume(menuBVR);
                 safe_set_env(envgBIOSDev,menuBVR->biosdev);
 				break;
@@ -1112,7 +1111,8 @@ int GUI_getBootOptions(bool firstRun)
 				// if the user enabled rescanning the optical drive.
 				// Otherwise boot the default boot volume.
 				if (get_env(envgEnableCDROMRescan)) {
-					gBootVolume = NULL;
+					//gBootVolume = NULL;
+					safe_set_env(envgBootVolume, (uint32_t)NULL);
 					GUI_clearBootArgs();
 				}
 				break;
@@ -1124,7 +1124,9 @@ int GUI_getBootOptions(bool firstRun)
 #else
                 scanDisks();
 #endif
-				gBootVolume = NULL;
+				//gBootVolume = NULL;
+				safe_set_env(envgBootVolume, (uint32_t)NULL);
+
 				GUI_clearBootArgs();
 				break;
 				
@@ -1202,34 +1204,13 @@ done:
 	return 0;
 }
 
-
-
-int GUI_error(const char * fmt, ...)
-{
-    va_list ap;
-    gErrors = true;
-    va_start(ap, fmt);
-	
-	if (getVideoMode() == VGA_TEXT_MODE)
-	{
-		prf(fmt, ap, putchar, 0);
-    }
-	else
-	{
-		vprf(fmt, ap);
-	}
-	
-	va_end(ap);
-    return(0);
-}
-
 int GUI_verbose(const char * fmt, ...)
 {
     va_list ap;
     
 	va_start(ap, fmt);
 	
-    if (gVerboseMode && (KernelStart == false))
+    if (get_env(envgVerboseMode) && (KernelStart == false))
     {
 		if (getVideoMode() == VGA_TEXT_MODE)
 		{
@@ -1244,15 +1225,15 @@ int GUI_verbose(const char * fmt, ...)
 	/* Kabyl: BooterLog */
 	struct putc_info pi;
 	
-	if (!msgbuf)
+	if (!getConsoleMsg())
 		return 0;
 	
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	if (((getConsoleCursor() - getConsoleMsg()) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 		return 0;
-	pi.str = cursor;
+	pi.str = getConsoleCursor();
 	pi.last_str = 0;
 	prf(fmt, ap, sputc, &pi);
-	cursor +=  strlen((char *)cursor);
+	setConsoleCursor(getConsoleCursor() + strlen(getConsoleCursor()));
 	
 	
     va_end(ap);
@@ -1278,15 +1259,15 @@ int GUI_printf(const char * fmt, ...)
 	/* Kabyl: BooterLog */
 	struct putc_info pi;
 	
-	if (!msgbuf)
+	if (!getConsoleMsg())
 		return 0;
 	
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	if (((getConsoleCursor() - getConsoleMsg()) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 		return 0;
-	pi.str = cursor;
+	pi.str = getConsoleCursor();
 	pi.last_str = 0;
 	prf(fmt, ap, sputc, &pi);
-	cursor +=  strlen((char *)cursor);
+	setConsoleCursor(getConsoleCursor() + strlen(getConsoleCursor()));
 	
 	va_end(ap);
     return 0;

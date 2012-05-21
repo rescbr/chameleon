@@ -9,7 +9,7 @@
 #include "libsaio.h"
 
 
-jmp_buf h_buf_error;
+jmp_buf uterror;
 
 void init_ut_fnc(void)
 {

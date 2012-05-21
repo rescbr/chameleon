@@ -22,7 +22,7 @@
 static struct HObj * HObj##_FindStrVar(const char *name, struct HObj *container) {          \
     struct HObj *var;                                                                       \
                                                                                             \
-	if (setjmp(h_buf_error) == -1) {                                                        \
+	if (setjmp(uterror) == -1) {                                                        \
                                                                                             \
 		return NULL;                                                                        \
 	} else {                                                                                \
@@ -47,7 +47,7 @@ static struct HObj * HObj##_NewStrVar(const char *name, struct HObj **container 
         return NULL;                                                                        \
     }                                                                                       \
                                                                                             \
-	if (setjmp(h_buf_error) == -1) {                                                        \
+	if (setjmp(uterror) == -1) {                                                        \
         																					\
 		free(var);                                                                          \
 		return NULL;                                                                        \
@@ -81,7 +81,7 @@ static void HObj##_DeleteStrVar(const char *name, struct HObj *container ) {    
             return;                                                             \
         }                                                                       \
                                                                                 \
-	if (setjmp(h_buf_error) == -1) {                                            \
+	if (setjmp(uterror) == -1) {                                            \
 		return;                                                                 \
 	} else {                                                                    \
 		HASH_DEL( container, var);                                              \
@@ -104,7 +104,7 @@ __CHDeleteStrVar(HObj)
 static struct HObj * HObj##_FindIntVar(int id, struct HObj *container) {					\
     struct HObj *var;                                                                       \
                                                                                             \
-    if (setjmp(h_buf_error) == -1) {                                                        \
+    if (setjmp(uterror) == -1) {                                                        \
 																							\
         return NULL;                                                                        \
                 } else {                                                                    \
@@ -123,7 +123,7 @@ static struct HObj * HObj##_NewIntVar(int id, struct HObj **container ) {					\
 																							\
      var->id = id;																			\
 																							\
-     if (setjmp(h_buf_error) == -1) {                                                       \
+     if (setjmp(uterror) == -1) {                                                       \
 																							\
             free(var);                                                                      \
             return NULL;                                                                    \
@@ -157,7 +157,7 @@ static void HObj##_DeleteIntVar(int id, struct HObj *container ) {					\
         return;																		\
    }																				\
 																					\
-   if (setjmp(h_buf_error) == -1) {													\
+   if (setjmp(uterror) == -1) {													\
         return;																		\
    } else {																			\
         HASH_DEL( container, var);													\
@@ -194,7 +194,7 @@ static void HObj##_Debug(struct HObj *container )                               
 static void HObj##_DeleteAll(struct HObj *container ) {         \
 	struct HObj *current_var, *tmp;                             \
 																\
-	if (setjmp(h_buf_error) == -1) {                            \
+	if (setjmp(uterror) == -1) {                            \
 	return;														\
 	} else {                                                    \
 			HASH_ITER(hh, container, current_var, tmp) {        \

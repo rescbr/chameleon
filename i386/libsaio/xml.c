@@ -39,7 +39,7 @@ dict = bootInfo->smbiosConfig.dictionary  ;         \
 else if (dict == DEFAULT_HELPER_CONFIG_DICT)   \
 dict = bootInfo->helperConfig.dictionary  ; 
 
-string_ref *ref_strings = NULL;
+static string_ref *ref_strings = NULL;
 
 /// TODO: remove below
 static char* buffer_start = NULL;

@@ -585,8 +585,9 @@ int getBootOptions(bool firstRun)
     int     optionKey;
 	
 	// Initialize default menu selection entry.
-	gBootVolume = menuBVR = selectBootVolume(getBvChain());
-	
+	/*gBootVolume =*/ menuBVR = selectBootVolume(getBvChain());
+	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
+
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev))) {
 		isCDROM = true;
 	} else {
@@ -690,7 +691,7 @@ int getBootOptions(bool firstRun)
                 stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
                 return -1;
             }
-			getBootVolumeDescription(gBootVolume, name, 79, false);
+			getBootVolumeDescription(((BVRef)(uint32_t)get_env(envgBootVolume)), name, 79, false);
 			prompt = malloc(256);            
             if (!prompt) {
                 free(name);
@@ -745,7 +746,8 @@ int getBootOptions(bool firstRun)
                 // Look at partitions hosting OS X other than the CD-ROM
                 for (bvr = getBvChain(); bvr; bvr=bvr->next) {
                     if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != (int)get_env(envgBIOSDev)) {
-                        gBootVolume = bvr;
+                        //gBootVolume = bvr;
+						safe_set_env(envgBootVolume, (uint32_t)bvr);
                     }
                 }
             }
@@ -889,7 +891,8 @@ int getBootOptions(bool firstRun)
 					showBootPrompt(nextRow, showPrompt);
 					break;
 				}
-				gBootVolume = menuBVR;
+				//gBootVolume = menuBVR;
+				safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 				setRootVolume(menuBVR);
                 safe_set_env(envgBIOSDev,menuBVR->biosdev);
 				break;
@@ -904,7 +907,8 @@ int getBootOptions(bool firstRun)
 				// if the user enabled rescanning the optical drive.
 				// Otherwise boot the default boot volume.
 				if (get_env(envgEnableCDROMRescan)) {
-					gBootVolume = NULL;
+					//gBootVolume = NULL;
+					safe_set_env(envgBootVolume, (uint32_t)NULL);
 					clearBootArgs();
 				}
 				break;
@@ -914,7 +918,9 @@ int getBootOptions(bool firstRun)
                 
                 scanDisks();
                 
-				gBootVolume = NULL;
+				//gBootVolume = NULL;
+				safe_set_env(envgBootVolume, (uint32_t)NULL);
+
 				clearBootArgs();
 				break;
                 
@@ -992,11 +998,11 @@ processBootOptions(void)
 	
     // Update the unit and partition number.
 	
-    if ( gBootVolume )
+    if ( ((BVRef)(uint32_t)get_env(envgBootVolume)) )
     {
-        if (!( gBootVolume->flags & kBVFlagNativeBoot ))
+        if (!( ((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagNativeBoot ))
         {
-            readBootSector( gBootVolume->biosdev, gBootVolume->part_boff,
+            readBootSector( ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBootVolume))->part_boff,
 						   (void *) 0x7c00 );
 			
             //
@@ -1004,13 +1010,13 @@ processBootOptions(void)
             // foreign booter.
             //
 			
-            chainbootdev  = gBootVolume->biosdev;
+            chainbootdev  = ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev;
             chainbootflag = 1;
 			
             return 1;
         }
 		
-        setRootVolume(gBootVolume);
+        setRootVolume(((BVRef)(uint32_t)get_env(envgBootVolume)));
 		
     }
     // If no boot volume fail immediately because we're just going to fail
@@ -1059,11 +1065,11 @@ processBootOptions(void)
             if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
                 safe_set_env(envgOverrideKernel,true);
             }
-        } else if (gBootVolume->kernelfound == true) {
+        } else if (((BVRef)(uint32_t)get_env(envgBootVolume))->kernelfound == true) {
 			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
         } else { 
             
-            printf("No kernel found on this volume : hd(%d,%d)\n", BIOS_DEV_UNIT(gBootVolume), gBootVolume->part_no);
+            printf("No kernel found on this volume : hd(%d,%d)\n", BIOS_DEV_UNIT(((BVRef)(uint32_t)get_env(envgBootVolume))), ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no);
             sleep(1);
             return -1;
         }
@@ -1120,8 +1126,9 @@ processBootOptions(void)
 	
 	if(!get_env(envShouldboot))
 	{
-		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, DEFAULT_BOOT_CONFIG ) ||
+		bool gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, DEFAULT_BOOT_CONFIG ) ||
 		getValueForKey( kSingleUserModeFlag, &val, &cnt, DEFAULT_BOOT_CONFIG );
+		safe_set_env(envgVerboseMode, gVerboseMode);
 		
 		long gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, DEFAULT_BOOT_CONFIG ) ) ?
 		kBootModeSafe : kBootModeNormal;

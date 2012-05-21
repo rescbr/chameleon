@@ -206,7 +206,7 @@ memmove(void *dst, const void *src, size_t ulen)
     bcopy(src, dst, ulen);   
     return dst;
 }
-
+#if UNUSED
 int
 ptol(const char *str)
 {
@@ -219,7 +219,7 @@ ptol(const char *str)
 	else c = 0;
 	return c;
 }
-
+#endif
 /*
  * atoi:
  *
@@ -239,7 +239,7 @@ atoi(const char *cp)
 	
 	return( number );
 }
-
+#if UNUSED
 /*
  * convert an integer to an ASCII string.
  * inputs:
@@ -276,7 +276,7 @@ itoa(
 	
 	return str;
 }
-
+#endif
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
  * full size of dst, not space left).  At most siz-1 characters
@@ -351,7 +351,7 @@ size_t strlen(const char * str)
 {	
 	return (size_t)_mach_strlen(str);
 }
-
+#if UNUSED
 /*
  * Does the same thing as strlen, except only looks up
  * to max chars inside the buffer. 
@@ -371,7 +371,7 @@ strnlen(const char *s, size_t max) {
 	
 	return p - s;
 }
-
+#endif
 /* 
  * Deprecation Warning:
  *	strcat() is being deprecated. Please use strlcat() instead.
@@ -406,6 +406,7 @@ strcat(
  *              NULL		If MALLOC() fails.
  * 
  */
+
 static char *
 STRDUP(const char *string)
 {
@@ -562,20 +563,6 @@ adler32( unsigned char * buffer, long length )
 	result = (highHalf << 16) | lowHalf;
 	
 	return result;
-}
-
-static long holdrand = 1L;
-#define	RAND_MAX	0x7fffffff
-
-void srand (unsigned int seed)
-{
-	holdrand = (long)seed;
-}
-
-int rand (void)
-{	
-	holdrand = holdrand * 214013L + 2531011L;
-	return ((holdrand >> 16) & RAND_MAX);
 }
 
 /*-

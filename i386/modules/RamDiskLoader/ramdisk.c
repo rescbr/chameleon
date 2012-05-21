@@ -393,6 +393,8 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
 {
     char extensionsSpec[1024];
     int ramdiskUnit;
+    long  ret, flags, cachetime;
+	
     for(ramdiskUnit = 0; ramdiskUnit < gRAMDiskMI->mi_mods_count; ++ramdiskUnit)
     {
         int partCount; // unused
@@ -405,16 +407,18 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
         for(; ramdiskChain != NULL; ramdiskChain = ramdiskChain->next)
         {
             sprintf(extensionsSpec, "rd(%d,%d)/Extra/", ramdiskUnit, ramdiskChain->part_no);
-            struct dirstuff *extradir = opendir(extensionsSpec);
-            closedir(extradir);
-            if(extradir != NULL)
+            
+            ret = GetFileInfo(NULL, extensionsSpec, &flags, &cachetime);
+            
+            if (!ret) continue;
+            
+            if (((flags & kFileTypeMask) != kFileTypeDirectory)) continue;
+            
+            ret = FileLoadDrivers_p(extensionsSpec, 0 /* this is a kext root dir, not a kext with plugins */);
+            if(ret != 0)
             {
-                int ret = FileLoadDrivers_p(extensionsSpec, 0 /* this is a kext root dir, not a kext with plugins */);
-                if(ret != 0)
-                {
-                    verbose("FileLoadDrivers failed on a ramdisk\n");
-                    return ret;
-                }
+                verbose("FileLoadDrivers failed on a ramdisk\n");
+                return ret;
             }
         }
     }

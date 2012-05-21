@@ -11,6 +11,7 @@
 #define DP_ADD_TEMP_VAL(dev, val) devprop_add_value(dev, (char*)val[0], (uint8_t*)val[1], strlen(val[1]) + 1)
 #define DP_ADD_TEMP_VAL_DATA(dev, val) devprop_add_value(dev, (char*)val.name, (uint8_t*)val.data, val.size)
 #define MAX_PCI_DEV_PATHS 4
+#define MAX_STRING_NUM_ENTRIES 100
 
 extern struct DevPropString *string;
 extern uint8_t *stringdata;
@@ -68,7 +69,7 @@ struct DevPropString {
 	uint32_t WHAT2;			// 0x01000000 ?
 	uint16_t numentries;
 	uint16_t WHAT3;			// 0x0000     ?
-	struct DevPropDevice **entries;
+	struct DevPropDevice *entries;
 };
 
 char			*efi_inject_get_devprop_string(uint32_t *len);

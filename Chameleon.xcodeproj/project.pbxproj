@@ -213,7 +213,6 @@
 		AB43B2E514C37E520018D529 /* prf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = prf.c; sourceTree = "<group>"; };
 		AB43B2E614C37E520018D529 /* printf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = printf.c; sourceTree = "<group>"; };
 		AB43B2E714C37E520018D529 /* qsort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qsort.c; sourceTree = "<group>"; };
-		AB43B2E814C37E520018D529 /* rand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rand.c; sourceTree = "<group>"; };
 		AB43B2E914C37E520018D529 /* setjmp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = setjmp.s; sourceTree = "<group>"; };
 		AB43B2EA14C37E520018D529 /* string.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string.c; sourceTree = "<group>"; };
 		AB43B2EB14C37E520018D529 /* strtol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = strtol.c; sourceTree = "<group>"; };
@@ -261,7 +260,6 @@
 		AB43B31714C37E520018D529 /* hfs_CaseTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hfs_CaseTables.h; sourceTree = "<group>"; };
 		AB43B31814C37E520018D529 /* hfs_compare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hfs_compare.c; sourceTree = "<group>"; };
 		AB43B31914C37E520018D529 /* intel_acpi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = intel_acpi.h; sourceTree = "<group>"; };
-		AB43B31A14C37E520018D529 /* internal_modules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = internal_modules.h; sourceTree = "<group>"; };
 		AB43B31B14C37E520018D529 /* io_inline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io_inline.h; sourceTree = "<group>"; };
 		AB43B31C14C37E520018D529 /* libsaio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libsaio.h; sourceTree = "<group>"; };
 		AB43B31D14C37E520018D529 /* load.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = load.c; sourceTree = "<group>"; };
@@ -388,12 +386,10 @@
 		AB43B3A214C37E520018D529 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AB43B3A414C37E520018D529 /* dram_controllers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dram_controllers.c; sourceTree = "<group>"; };
 		AB43B3A514C37E520018D529 /* dram_controllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dram_controllers.h; sourceTree = "<group>"; };
-		AB43B3A614C37E520018D529 /* GPL_V2_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GPL_V2_LICENSE; sourceTree = "<group>"; };
 		AB43B3A714C37E520018D529 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AB43B3A814C37E520018D529 /* mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mem.c; sourceTree = "<group>"; };
 		AB43B3A914C37E520018D529 /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
 		AB43B3AA14C37E520018D529 /* Memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Memory.c; sourceTree = "<group>"; };
-		AB43B3AB14C37E520018D529 /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
 		AB43B3AC14C37E520018D529 /* memvendors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memvendors.h; sourceTree = "<group>"; };
 		AB43B3AD14C37E520018D529 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		AB43B3AE14C37E520018D529 /* spd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = spd.c; sourceTree = "<group>"; };
@@ -452,15 +448,18 @@
 		AB43B3F214C383120018D529 /* udivdi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = udivdi3.c; sourceTree = "<group>"; };
 		AB43B3F314C383120018D529 /* umoddi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = umoddi3.c; sourceTree = "<group>"; };
 		AB43B3F814C384040018D529 /* stack_protector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack_protector.c; sourceTree = "<group>"; };
-		AB43B42A14C3A8080018D529 /* arc4random.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = arc4random.c; sourceTree = "<group>"; };
 		AB79217514F38CF200F5EB39 /* bootXnu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootXnu.h; sourceTree = "<group>"; };
 		AB79219214F3919E00F5EB39 /* ModuleHelp.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModuleHelp.txt; sourceTree = "<group>"; };
+		ABA0C7BF1568190C003440AF /* arc4random-fbsd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "arc4random-fbsd.c"; sourceTree = "<group>"; };
+		ABA0C7C01568190C003440AF /* lib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lib.c; sourceTree = "<group>"; };
+		ABA0C7C11568190C003440AF /* rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rtc.c; sourceTree = "<group>"; };
+		ABA0C7C21568190C003440AF /* time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = time.c; sourceTree = "<group>"; };
+		ABAC08601568835800C89CC3 /* GPL_V2_LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = GPL_V2_LICENSE; sourceTree = "<group>"; };
+		ABAC08611568836C00C89CC3 /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
 		ABB4CE7D151E39740053B64E /* lzss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzss.c; sourceTree = "<group>"; };
 		ABD521F114F9197900B62550 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
 		ABD521F214F9197900B62550 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
 		ABD521F314F9197900B62550 /* uterror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uterror.c; sourceTree = "<group>"; };
-		ABD521F414F9197900B62550 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
-		ABD521F514F9197900B62550 /* utstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utstring.h; sourceTree = "<group>"; };
 		ABD9A1FC150F706A008DA465 /* CoreHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHash.h; sourceTree = "<group>"; };
 		ABD9A1FF150F80C4008DA465 /* CoreHash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoreHash.c; sourceTree = "<group>"; };
 		ABE5FF4E14F9495500447F78 /* modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = modules.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
@@ -954,7 +953,6 @@
 				AB43B2E514C37E520018D529 /* prf.c */,
 				AB43B2E614C37E520018D529 /* printf.c */,
 				AB43B2E714C37E520018D529 /* qsort.c */,
-				AB43B2E814C37E520018D529 /* rand.c */,
 				AB43B2E914C37E520018D529 /* setjmp.s */,
 				AB43B2EA14C37E520018D529 /* string.c */,
 				AB43B2EB14C37E520018D529 /* strtol.c */,
@@ -966,13 +964,16 @@
 		AB43B2ED14C37E520018D529 /* libsaio */ = {
 			isa = PBXGroup;
 			children = (
+				ABA0C7BF1568190C003440AF /* arc4random-fbsd.c */,
+				ABA0C7C01568190C003440AF /* lib.c */,
+				ABA0C7C11568190C003440AF /* rtc.c */,
+				ABA0C7C21568190C003440AF /* time.c */,
 				ABB4CE7D151E39740053B64E /* lzss.c */,
 				AB43B2EE14C37E520018D529 /* acpi.h */,
 				AB43B2EF14C37E520018D529 /* acpi_tools.c */,
 				AB43B2F014C37E520018D529 /* acpi_tools.h */,
 				AB43B2F114C37E520018D529 /* allocate.c */,
 				AB43B2F214C37E520018D529 /* apic.h */,
-				AB43B42A14C3A8080018D529 /* arc4random.c */,
 				AB43B2F314C37E520018D529 /* asm.s */,
 				AB43B2F414C37E520018D529 /* befs.c */,
 				AB43B2F514C37E520018D529 /* befs.h */,
@@ -1015,7 +1016,6 @@
 				AB43B31714C37E520018D529 /* hfs_CaseTables.h */,
 				AB43B31814C37E520018D529 /* hfs_compare.c */,
 				AB43B31914C37E520018D529 /* intel_acpi.h */,
-				AB43B31A14C37E520018D529 /* internal_modules.h */,
 				AB43B31B14C37E520018D529 /* io_inline.h */,
 				AB43B31C14C37E520018D529 /* libsaio.h */,
 				AB43B31D14C37E520018D529 /* load.c */,
@@ -1061,8 +1061,6 @@
 				ABD521F114F9197900B62550 /* utarray.h */,
 				ABD521F214F9197900B62550 /* uthash.h */,
 				ABD521F314F9197900B62550 /* uterror.c */,
-				ABD521F414F9197900B62550 /* utlist.h */,
-				ABD521F514F9197900B62550 /* utstring.h */,
 				AB43B34114C37E520018D529 /* vbe.c */,
 				AB43B34214C37E520018D529 /* vbe.h */,
 				AB43B34314C37E520018D529 /* xml.c */,
@@ -1259,12 +1257,12 @@
 			children = (
 				AB43B3A414C37E520018D529 /* dram_controllers.c */,
 				AB43B3A514C37E520018D529 /* dram_controllers.h */,
-				AB43B3A614C37E520018D529 /* GPL_V2_LICENSE */,
+				ABAC08601568835800C89CC3 /* GPL_V2_LICENSE */,
 				AB43B3A714C37E520018D529 /* Makefile */,
 				AB43B3A814C37E520018D529 /* mem.c */,
 				AB43B3A914C37E520018D529 /* mem.h */,
 				AB43B3AA14C37E520018D529 /* Memory.c */,
-				AB43B3AB14C37E520018D529 /* MEMTEST86_LICENSE */,
+				ABAC08611568836C00C89CC3 /* MEMTEST86_LICENSE */,
 				AB43B3AC14C37E520018D529 /* memvendors.h */,
 				AB43B3AD14C37E520018D529 /* README */,
 				AB43B3AE14C37E520018D529 /* spd.c */,

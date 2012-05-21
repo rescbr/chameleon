@@ -1,6 +1,6 @@
-Memory.dylib is a module for Chameleon (the Darwin/XNU boot loader based on Apple's boot-132).
+Memory is a module for Chameleon (the Darwin/XNU boot loader based on Apple's boot-132).
 
-Memory.dylib can be freely distributed under the term of the GPL V2 license.
+Memory can be freely distributed under the term of the GPL V2 license.
 
 see GPL_V2_LICENSE and MEMTEST86_LICENSE for more informations.
 

@@ -31,7 +31,6 @@
 #include "io_inline.h"
 #include "saio_types.h"
 #include "saio_internal.h"
-#include "internal_modules.h"
 #include "uthash.h"
 
 #endif /* !__LIBSAIO_LIBSAIO_H */

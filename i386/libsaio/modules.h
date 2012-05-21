@@ -59,9 +59,6 @@ typedef struct moduleHook_t
 #define SYS_CLASS  "SYMS"
 #define SYSLIB_CLASS "SYS_LIB"
 
-#define BundleHighPriority "high"
-#define BundleNormalPriority "normal"
-#define BundleLowPriority "low"
 /*
  * Modules Interface
  * execute_hook

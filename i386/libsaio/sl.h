@@ -60,9 +60,6 @@ enum {
 #define Seek(c, p)     diskSeek(c, p);
 #define Read(c, a, l)  diskRead(c, a, l);
 
-extern void * gFSLoadAddress;
-extern cpu_type_t archCpuType;
-extern unsigned long               HFSLoadVerbose;
-cpu_type_t detectCpuType ();
+//extern void * gFSLoadAddress;
 
 #endif /* !__LIBSAIO_SL_H */

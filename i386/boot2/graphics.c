@@ -32,6 +32,7 @@
 #include "appleClut8.h"
 #include "bootstruct.h"
 #include "modules.h"
+#include "platform.h"
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
 
@@ -617,7 +618,7 @@ __setVideoMode( int mode)
     if ( mode == GRAPHICS_MODE )
     {
   		if ( (err=initGraphicsMode ()) == errSuccess ) {
-			if (gVerboseMode) {
+			if (get_env(envgVerboseMode)) {
 				// Tell the kernel to use text mode on a linear frame buffer display
 				bootArgs->Video.v_display = FB_TEXT_MODE;
 			} else {

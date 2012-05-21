@@ -31,6 +31,7 @@
 #include <hfs/hfs_format.h>
 
 #include "hfs.h"
+#include "platform.h"
 
 #define kBlockSize (0x200)
 
@@ -75,9 +76,6 @@ static char                    gLinkTemp[64];
 static long long               gVolID;
 
 #endif /* !__i386__ */
-
-unsigned long               HFSLoadVerbose = 1;
-
 
 static long ReadFile(void *file, uint64_t *length, void *base, uint64_t offset);
 static long GetCatalogEntryInfo(void *entry, long *flags, long *time,
@@ -261,7 +259,8 @@ long HFSInitPartition(CICell ih)
 
 long HFSLoadFile(CICell ih, char * filePath)
 {
-    return HFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+    //return HFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+	return HFSReadFile(ih, filePath, (void *)(uint32_t)get_env(envgFSLoadAddress), 0, 0);
 }
 
 long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint64_t length)
@@ -304,11 +303,11 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 	
     getDeviceDescription(ih, devStr);
 	
-	if (HFSLoadVerbose) {
+	if (get_env(envHFSLoadVerbose)) {
 		verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
 				(gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
-	} else if (HFSLoadVerbose == 0) {		
-		HFSLoadVerbose = 1;
+	} else if (get_env(envHFSLoadVerbose) == 0) {		
+		safe_set_env(envHFSLoadVerbose, 1);
 	}
     
     return length;

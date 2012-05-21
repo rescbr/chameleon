@@ -254,7 +254,7 @@ strtoul(const char *nptr, char **endptr, int base)
 	
 	return (acc);
 }
-
+#if UNUSED
 /*
  * Convert a string to an unsigned quad integer.
  *
@@ -334,3 +334,4 @@ strtouq(const char *nptr,
 	
 	return (acc);
 }
+#endif

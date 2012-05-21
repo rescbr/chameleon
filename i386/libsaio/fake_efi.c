@@ -175,7 +175,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
     
 	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
-	if (archCpuType == CPU_TYPE_I386)
+	if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
 		i = gNumTables32;
 	}
@@ -193,7 +193,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
         return EFI_ABORTED;
     }    
     
-    if (archCpuType == CPU_TYPE_I386)
+    if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{       
         
         gEfiConfigurationTable32[i].VendorGuid = *pGuid;
@@ -227,7 +227,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 
 static VOID EFI_ST_FIX_CRC32(void)
 {
-	if (archCpuType == CPU_TYPE_I386)
+	if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
 		gST32->Hdr.CRC32 = 0;
 		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
@@ -241,7 +241,7 @@ static VOID EFI_ST_FIX_CRC32(void)
 
 void finalizeEFIConfigTable(void )
 {    
-    if (archCpuType == CPU_TYPE_I386)
+    if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
 		EFI_SYSTEM_TABLE_32 *efiSystemTable = gST32;        
         
@@ -265,7 +265,7 @@ void finalizeEFIConfigTable(void )
     uint32_t table ;
     EFI_GUID Guid;
     
-    if (archCpuType == CPU_TYPE_I386)
+    if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
 		num = gST32->NumberOfTableEntries;        
         
@@ -278,7 +278,7 @@ void finalizeEFIConfigTable(void )
 	msglog("EFI Configuration table :\n");
     for (i=0; i<num; i++)
 	{
-        if (archCpuType == CPU_TYPE_I386)
+        if (get_env(envarchCpuType) == CPU_TYPE_I386)
         {
             table = gEfiConfigurationTable32[i].VendorTable;
             Guid =  gEfiConfigurationTable32[i].VendorGuid;
@@ -736,7 +736,7 @@ static VOID setupEfiDeviceTree(void)
 			((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
 			((boot_progress_element *)bootPict)->height = kFailedBootHeight;
 			((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
-			if (gBootVolume->OSVersion[3] == '8') 
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
             {
                 ((boot_progress_element *)bootPict)->res[0] = size - 32; 
             }
@@ -806,13 +806,13 @@ static VOID setupEfiDeviceTree(void)
 		Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");		
 		Node *kernelCompatibilityNode = 0; // ??? not sure that it should be used like that (because it's maybe the kernel capability and not the cpu capability)
 		
-		if (gBootVolume->OSVersion[3] > '6')
+		if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] > '6')
 		{
 			kernelCompatibilityNode = DT__AddChild(efiNode, "kernel-compatibility");	
 			DT__AddProperty(kernelCompatibilityNode, "i386", sizeof(uint32_t), (EFI_UINT32*)&DEVICE_SUPPORTED);
 		}
 		
-		if (archCpuType == CPU_TYPE_I386)
+		if (get_env(envarchCpuType) == CPU_TYPE_I386)
 		{
 			// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 			// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
@@ -1005,9 +1005,9 @@ static VOID setupEfiConfigurationTable()
 		
 		if (mps_p)
 		{
-			uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
+			//uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
 			
-			addConfigurationTable(&gEfiMpsTableGuid, &mps, NULL);
+			addConfigurationTable(&gEfiMpsTableGuid, ((uint64_t*)((uint32_t)mps_p)), NULL);
 		}
 		
 #if DEBUG_EFI
@@ -1062,7 +1062,7 @@ void setupFakeEfi(void)
 	setup_Smbios();
 	
 	// Initialize the base table
-	if (archCpuType == CPU_TYPE_I386)
+	if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
 		setupEfiTables(32); 
 	}
