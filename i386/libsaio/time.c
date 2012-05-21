@@ -113,7 +113,7 @@ static void gettimeofday_init(void)
  * @param tz Added for compatability - not used.
  * @return 0 for success (this function cannot return non-zero currently).
  *
- * WARNING : In this implemetation gettimeofday() WILL NOT WORK until the cpu is initialized.
+ * WARNING : In this implementation gettimeofday() will not work until the cpu is not initialized.
  */
 int gettimeofday(struct timeval *tv, void *tz)
 {
