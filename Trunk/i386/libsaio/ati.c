@@ -695,7 +695,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E1,	0x3000148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",                  kEulemur	},
 	{ 0x68E1,	0x30001682, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",                  kEulemur	},
 	{ 0x68E1,	0x3000174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	}, 
-	{ 0x68E1,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",                  kEulemur	},
+	{ 0x68E1,	0x30001787, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	}, // 5430M ???
 	{ 0x68E1,	0x300017AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",                  kEulemur	},
 	{ 0x68E1,	0x3001148C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5430M",                  kEulemur	},
 	{ 0x68E1,	0x301417AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kEulemur	},
@@ -778,6 +778,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0xE127174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0xE145174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0xE153174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0xE164174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 
 	/* Northen Islands */
 	{ 0x6718,	0x0B001002, CHIP_FAMILY_CAYMAN,		"AMD Radeon HD 6970",                   kGibba		},
@@ -924,8 +925,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x679A,	0x32211682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",                   kNull		},
 	{ 0x679A,	0xE207174B, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7950",                   kNull		},
 
-	{ 0x6818,	0x042F1043, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7870",                   kNull		},
-	{ 0x6818,	0xE217174B, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7870",                   kNull		},
+	{ 0x6818,	0x042F1043, CHIP_FAMILY_PITCAIRN,	"Asus HD 7870",                         kNull		},
+	{ 0x6818,	0x04311043, CHIP_FAMILY_PITCAIRN,	"Asus HD 7870",                         kNull		},
+	{ 0x6818,	0x0B041002, CHIP_FAMILY_PITCAIRN,	"ATI Radeon HD 7870",                   kNull		},
+	{ 0x6818,	0x25541458, CHIP_FAMILY_PITCAIRN,	"Gigabyte HD 7870",                     kNull		},
+	{ 0x6818,	0xE217174B, CHIP_FAMILY_PITCAIRN,	"ATI Radeon HD 7870",                   kNull		},
+
+	{ 0x6819,	0x04311043, CHIP_FAMILY_PITCAIRN,	"Asus HD 7850",                         kNull		},
 	{ 0x6819,	0x23201787, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7800 Series",            kNull		},
 
 //	{ 0x683D,	0x04211043, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7770",                   kNull		},

@@ -49,85 +49,119 @@
 #define kTextModeKey		"Text Mode"
 #define kQuietBootKey		"Quiet Boot"
 #define kKernelFlagsKey		"Kernel Flags"
-#define kKernelArchKey      "Kernel Architecture"
-#define karch				"arch"				/* boot.c */
-#define kProductVersion		"ProductVersion"	/* boot.c */
+#define kKernelArchKey		"Kernel Architecture"
 #define kMKextCacheKey		"MKext Cache"
 #define kKernelNameKey		"Kernel"
 #define kKernelCacheKey		"Kernel Cache"
 #define kUseKernelCache		"UseKernelCache"	/* boot.c */
 #define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey			"Timeout"
+#define kTimeoutKey		"Timeout"
 #define kRootDeviceKey		"rd"
 #define kBootUUIDKey		"boot-uuid"
 #define kHelperRootUUIDKey	"Root UUID"
 #define kPlatformKey		"platform"
-#define kACPIKey			"acpi"
+#define kACPIKey		"acpi"
 #define kCDROMPromptKey		"CD-ROM Prompt"
 #define kCDROMOptionKey		"CD-ROM Option Key"
 #define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		    "Rescan"
+#define kRescanKey		"Rescan"
 #define kScanSingleDriveKey	"Scan Single Drive"
 #define kInstantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
-#define kGUIKey				"GUI"
+#define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"			// gui.c
+#define kShowInfoKey		"ShowInfo"		// gui.c
 #define kWaitForKeypressKey	"Wait"
 
-#define kDSDT				"DSDT"				/* acpi_patcher.c */
-#define kDropSSDT			"DropSSDT"			/* acpi_patcher.c */
-#define kRestartFix			"RestartFix"		/* acpi_patcher.c */
+/* AsereBLN: added these keys */
+#define kUseAtiROM		"UseAtiROM"		/* ati.c */
+#define kWake			"Wake"			/* boot.c */
+#define kForceWake		"ForceWake"		/* boot.c */
+#define kWakeImage		"WakeImage"		/* boot.c */
+#define kProductVersion		"ProductVersion"	/* boot.c */
+#define karch			"arch"			/* boot.c */
+#define kDSDT			"DSDT"			/* acpi_patcher.c */
+#define kDropSSDT		"DropSSDT"		/* acpi_patcher.c */
+#define kDeviceProperties	"device-properties"	/* device_inject.c */
+#define kHidePartition		"Hide Partition"	/* disk.c */
+#define kRenamePartition	"Rename Partition"	/* disk.c */
+#define kSMBIOSKey		"SMBIOS"		/* fake_efi.c */
+#define kSystemID		"SystemId"		/* fake_efi.c */
+#define kSystemType		"SystemType"		/* fake_efi.c */
+#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
+#define kVBIOS			"VBIOS"			/* nvidia.c */
+#define kPCIRootUID		"PCIRootUID"		/* pci_root.c */
+#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
+#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
+#define kForceHPET		"ForceHPET"		/* pci_setup.c */
+#define kUseMemDetect		"UseMemDetect"		/* platform.c */
+#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
+#define kUSBBusFix		"USBBusFix"		/* usb.c */
+#define kEHCIacquire		"EHCIacquire"		/* usb.c */
+#define kUHCIreset		"UHCIreset"		/* usb.c */
+#define kEHCIhard		"EHCIhard"		/* usb.c */
+#define kDefaultPartition	"Default Partition"	/* sys.c */
+
+/* Duvel300: added this */
+#define kRestartFix		"RestartFix"		/* acpi_patcher.c */
+
+/* Signal64: added this key */
+#define kLegacyOff		"USBLegacyOff"		/* usb.c */
+
+/* Lebidou: added this key */
+
+
+/* Meklort: added this key */
+#define kMD0Image		"md0"			/* ramdisk.h */
+
+/* Andyvand: added these keys */
+//#define kSSDT			"SSDT"			/* acpi_patcher.c */
+//#define kHPET			"HPET"			/* acpi_patcher.c */
+//#define kSBST			"SBST"			/* acpi_patcher.c */
+//#define kECDT			"ECDT"			/* acpi_patcher.c */
+//#define kASFT			"ASFT"			/* acpi_patcher.c */
+//#define kDMAR			"DMAR"			/* acpi_patcher.c */
+//#define kFADT			"FADT"			/* acpi_patcher.c */
+//#define kAPIC			"APIC"			/* acpi_patcher.c */
+//#define kMCFG			"MCFG"			/* acpi_patcher.c */
+//#define kOEMDSDT		"oemDSDT"		/* acpi_patcher.c */
+//#define kOEMSSDT		"oemSSDT"		/* acpi_patcher.c */
+//#define kOEMHPET		"oemHPET"		/* acpi_patcher.c */
+//#define kOEMSBST		"oemSBST"		/* acpi_patcher.c */
+//#define kOEMECDT		"oemECDT"		/* acpi_patcher.c */
+//#define kOEMASFT		"oemASFT"		/* acpi_patcher.c */
+//#define kOEMDMAR		"oemDMAR"		/* acpi_patcher.c */
+//#define kOEMFADT		"oemFADT"		/* acpi_patcher.c */
+//#define kOEMAPIC		"oemAPIC"		/* acpi_patcher.c */
+//#define kOEMMCFG		"oemMCFG"		/* acpi_patcher.c */
+//#define kDropHPET		"DropHPET"		/* acpi_patcher.c */
+//#define kDropSLIC		"DropSLIC"		/* acpi_patcher.c */
+//#define kDropSBST		"DropSBST"		/* acpi_patcher.c */
+//#define kDropECDT		"DropECDT"		/* acpi_patcher.c */
+//#define kDropASFT		"DropASFT"		/* acpi_patcher.c */
+//#define kDropDMAR		"DropDMAR"		/* acpi_patcher.c */
+//#define kUpdateACPI		"UpdateACPI"		/* acpi_patcher.c */
+
+/* Mojodojo: added these keys */
 #define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
 #define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
 #define kCSTUsingSystemIO	"CSTUsingSystemIO"	/* acpi_patcher.c */
 #define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
 #define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
 #define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
+/* valv: added these keys */
+#define kbusratio		"busratio"		/* cpu.c */
+#define kDcfg0			"display_0"		/* nvidia.c */
+#define kDcfg1			"display_1"		/* nvidia.c */
 
-#define kWake				"Wake"				/* boot.c */
-#define kForceWake			"ForceWake"			/* boot.c */
-#define kWakeImage			"WakeImage"			/* boot.c */
+/* Kabyl: added these keys */
 
-#define kbusratio			"busratio"			/* cpu.c */
-
-#define kDeviceProperties	"device-properties"	/* device_inject.c */
-
-#define kHidePartition		"Hide Partition"	/* disk.c */
-#define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
-
-#define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-#define kSystemID			"SystemId"			/* fake_efi.c */
-#define kSystemType			"SystemType"		/* fake_efi.c */
-
-#define kUseMemDetect		"UseMemDetect"	    /* platform.c */
-
-#define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-
-#define kUseAtiROM			"UseAtiROM"			/* ati.c */
-#define kAtiConfig			"AtiConfig"			/* ati.c */
-#define kAtiPorts			"AtiPorts"			/* ati.c */
+#define kAtiConfig		"AtiConfig"		/* ati.c */
+#define kAtiPorts		"AtiPorts"		/* ati.c */
 #define kATYbinimage		"ATYbinimage"		/* ati.c */
 
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS				"VBIOS"				/* nvidia.c */
-#define kDcfg0				"display_0"			/* nvidia.c */
-#define kDcfg1				"display_1"			/* nvidia.c */
-
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
+/* cosmo1: added these keys */
 #define kEnableHDMIAudio	"EnableHDMIAudio"	/*ati.c && nvidia.c */
-#define kForceHPET			"ForceHPET"			/* pci_setup.c */
-
-#define kMD0Image			"md0"				/* ramdisk.h */
-
-#define kUSBBusFix			"USBBusFix"			/* usb.c */
-#define kEHCIacquire		"EHCIacquire"		/* usb.c */
-#define kUHCIreset			"UHCIreset"			/* usb.c */
-#define kLegacyOff			"USBLegacyOff"		/* usb.c */
-#define kEHCIhard			"EHCIhard"			/* usb.c */
 
 /*
  * Flags to the booter or kernel
