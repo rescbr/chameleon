@@ -111,7 +111,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	if (fd < 0)
 	{
 		// NOT FOUND:
-		verbose("ACPI table not found: %s\n", filename);
+		verbose("ACPI Table not found: %s\n", filename);
 		*dirSpec = '\0';
 	}
 
@@ -984,7 +984,7 @@ int setupAcpi(void)
 		else
 		{
 			rsdp_mod->RsdtAddress=0;
-			printf("RSDT not found or RSDT incorrect\n");
+			printf("RSDT not found or incorrect\n");
 		}
 
 		if (version)
@@ -992,7 +992,7 @@ int setupAcpi(void)
 			struct acpi_2_xsdt *xsdt, *xsdt_mod;
 
 			// FIXME: handle 64-bit address correctly
-			
+
 			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
 			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress,
 					xsdt->Length);

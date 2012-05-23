@@ -1373,7 +1373,7 @@
 		B4526098153EFCE90018E994 /* bg.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bg.po; sourceTree = "<group>"; };
 		B4526099153EFCE90018E994 /* bs.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bs.po; sourceTree = "<group>"; };
 		B452609A153EFCE90018E994 /* ca.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ca.po; sourceTree = "<group>"; };
-		B452609B153EFCE90018E994 /* chameleon.pot */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chameleon.pot; sourceTree = "<group>"; };
+		B452609B153EFCE90018E994 /* chameleon.pot */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 4; path = chameleon.pot; sourceTree = "<group>"; };
 		B452609C153EFCE90018E994 /* cs.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cs.po; sourceTree = "<group>"; };
 		B452609D153EFCE90018E994 /* de.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = de.po; sourceTree = "<group>"; };
 		B452609E153EFCE90018E994 /* el.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = el.po; sourceTree = "<group>"; };

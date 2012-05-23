@@ -305,6 +305,10 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x944E,	0x3260174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4810",                   kMotmot		},
 	{ 0x944E,	0x3261174B, CHIP_FAMILY_RV770,		"ATI Radeon HD 4810",                   kMotmot		},
 
+	{ 0x9460,	0x27021682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4890",                   kMotmot		},
+	{ 0x9460,	0xE115174b, CHIP_FAMILY_RV770,		"ATI Radeon HD 4890",                   kMotmot		},
+	{ 0x9460,	0xE118174b, CHIP_FAMILY_RV770,		"ATI Radeon HD 4890",                   kMotmot		},
+
 	{ 0x9480,	0x01211025, CHIP_FAMILY_RV730,		"ATI Radeon HD 4650M",                  kGliff		},
  	{ 0x9480,	0x03111025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
  	{ 0x9480,	0x03121025, CHIP_FAMILY_RV730,		"ATI Radeon HD 5165M",                  kNull		},
