@@ -699,7 +699,7 @@ int GUI_getBootOptions(bool firstRun)
     int devcnt = (int)get_env(envgDeviceCount);
     
 	// Initialize default menu selection entry.
-	/*gBootVolume =*/ menuBVR = selectBootVolume(getBvChain());
+	menuBVR = selectBootVolume(getBvChain());
 	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev)))
@@ -889,7 +889,6 @@ int GUI_getBootOptions(bool firstRun)
                 // Look at partitions hosting OS X other than the CD-ROM
                 for (bvr = getBvChain(); bvr; bvr=bvr->next) {
                     if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != (int)get_env(envgBIOSDev)) {
-                        //gBootVolume = bvr;
 						safe_set_env(envgBootVolume, (uint32_t)bvr);
                     }
                 }
@@ -1095,7 +1094,6 @@ int GUI_getBootOptions(bool firstRun)
 					GUI_showBootPrompt(nextRow, showPrompt);
 					break;
 				}
-				//gBootVolume = menuBVR;
 				safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 				setRootVolume(menuBVR);
                 safe_set_env(envgBIOSDev,menuBVR->biosdev);
@@ -1111,7 +1109,6 @@ int GUI_getBootOptions(bool firstRun)
 				// if the user enabled rescanning the optical drive.
 				// Otherwise boot the default boot volume.
 				if (get_env(envgEnableCDROMRescan)) {
-					//gBootVolume = NULL;
 					safe_set_env(envgBootVolume, (uint32_t)NULL);
 					GUI_clearBootArgs();
 				}
@@ -1124,7 +1121,6 @@ int GUI_getBootOptions(bool firstRun)
 #else
                 scanDisks();
 #endif
-				//gBootVolume = NULL;
 				safe_set_env(envgBootVolume, (uint32_t)NULL);
 
 				GUI_clearBootArgs();

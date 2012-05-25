@@ -25,10 +25,11 @@ BUNDLE_CLASS_PROVIDER = SYSTEM
 
 OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
-		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) \
+		-fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions \
 		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE  
 
+GFLAGS	=
 DEFINES=
 CONFIG = hd
 SYMDIR = $(SYMROOT)
@@ -54,7 +55,7 @@ VPATH = $(OBJROOT):$(SYMROOT)
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o mboot.o 	
+OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o  	
 # button.o browser.o scrollbar.o == NOTYET	
 
 UTILDIR = ../util
@@ -69,6 +70,9 @@ BOOT2ADDR = 20200
 MAXBOOTSIZE = 458240
 
 CFLAGS += -DSAFE_MALLOC 
+
+#GFLAGS += -DNO_MULTIBOOT_SUPPORT 
+OBJS += mboot.o
 
 # CFLAGS += -DBOOT_HELPER_SUPPORT # +992 bytes
 

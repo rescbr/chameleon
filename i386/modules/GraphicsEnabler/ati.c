@@ -1535,12 +1535,15 @@ static bool init_card(pci_dt_t *pci_dev)
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	char *devicepath;
-    
-	// -------------------------------------------------
-	// Find a better way to do this (in device_inject.c)
-	if (!string)
-		string = devprop_create_string();
 	
+	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+	if (!string)
+    {
+		string = devprop_create_string();
+        if (!string) return false;
+        safe_set_env(envEFIString,(uint32_t)string);
+	}
+		
 	devicepath = get_pci_dev_path(ati_dev);
     if (!devicepath) {
         return false;
@@ -1564,16 +1567,8 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(card->device, "ATY,IOSpaceOffset", &io, 8);
 #endif
 	
-	devprop_add_list(ati_devprop_list);
-	
-	// -------------------------------------------------
-	// Find a better way to do this (in device_inject.c)
-	//Azi: XXX tried to fix a malloc error in vain; this is related to XCode 4 compilation!
-	stringdata = malloc(sizeof(uint8_t) * string->length);
-	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-	stringlength = string->length;
-	// -------------------------------------------------
-	
+	devprop_add_list(ati_devprop_list);    
+		
 	verbose("%s %dMB [%04x:%04x] (subsys [%04x:%04x]) (%s:%s) :: %s\n",
 			card->info->model_name, (uint32_t)(card->vram_size / (1024 * 1024)),
 			ati_dev->vendor_id, ati_dev->device_id,

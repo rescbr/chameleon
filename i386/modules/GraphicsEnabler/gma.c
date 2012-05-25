@@ -112,8 +112,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	verbose("Intel %s [%04x:%04x] :: %s\n",
 			model, gma_dev->vendor_id, gma_dev->device_id, devicepath);
 	
+	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 	if (!string)
+    {
 		string = devprop_create_string();
+        if (!string) return false;
+        safe_set_env(envEFIString,(uint32_t)string);
+	}
+	
 	struct DevPropDevice *device = devprop_add_device(string, devicepath);
 	
 	if(!device)
@@ -170,19 +176,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
     else if (strcmp(model, "Intel HD Graphics 3000")  == 0)
     {
         devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
-    }
-    
-    
-	stringdata = malloc(sizeof(uint8_t) * string->length);
-	if(!stringdata)
-	{
-		printf("No stringdata press a key...\n");
-		getc();
-		return false;
-	}
-	
-	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-	stringlength = string->length;
-	
+    }	
 	return true;
 }

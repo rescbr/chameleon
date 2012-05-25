@@ -18,7 +18,6 @@
 
 static int rootuid = 10; //value means function wasnt ran yet
 
-
 int getPciRootUID(void)
 {
 	const char *val;

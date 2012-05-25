@@ -90,7 +90,7 @@ LABEL(boot2)
 
     pushl   %edx                # bootdev
     call    _boot
-
+#ifndef NO_MULTIBOOT_SUPPORT
     testb   $0xff, _chainbootflag
     jnz     start_chain_boot    # Jump to a foreign booter
 
@@ -342,5 +342,5 @@ _cause_crash:
 _Gdtr_high:
     .word GDTLIMIT
     .long vtop(_Gdt + OFFSET_1MEG)
-	
+#endif
 /**/

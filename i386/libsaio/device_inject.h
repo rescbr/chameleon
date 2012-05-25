@@ -13,10 +13,6 @@
 #define MAX_PCI_DEV_PATHS 4
 #define MAX_STRING_NUM_ENTRIES 100
 
-extern struct DevPropString *string;
-extern uint8_t *stringdata;
-extern uint32_t stringlength;
-extern uint32_t devices_number;
 extern void setupDeviceProperties(Node *node);
 
 #define DEV_PATH_HEADER		\
@@ -73,7 +69,6 @@ struct DevPropString {
 };
 
 char			*efi_inject_get_devprop_string(uint32_t *len);
-//int			devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
 struct DevPropString	*devprop_create_string(void);
 struct DevPropDevice	*devprop_add_device(struct DevPropString *string, char *path);
 int			devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);

@@ -157,6 +157,9 @@ typedef struct _RamSlotInfo_t {
 
 #define envConsoleErr			"boot.console.stderr"
 
+#define envDeviceNumber         "boot.dev.efi.devcount"
+#define envEFIString            "boot.dev.efi.efistring"
+
 #define envgBootFileType		"boot.disk.Bootfiletype"
 #define envHFSLoadVerbose		"boot.disk.HFSLoadVerbose"
 #define envgFSLoadAddress		"boot.disk.FSLoadAddress"
@@ -249,12 +252,6 @@ typedef struct _PlatformInfo_t {
 	int8_t				sysid[16];
     
 } PlatformInfo_t;
-#endif
-
-#ifdef ShowCurrentDate
-#include "efi.h"
-extern char * Date(void);
-extern void rtc_time(EFI_TIME *time);
 #endif
 
 #endif /* !__LIBSAIO_PLATFORM_H */

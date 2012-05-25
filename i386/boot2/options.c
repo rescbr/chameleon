@@ -585,7 +585,7 @@ int getBootOptions(bool firstRun)
     int     optionKey;
 	
 	// Initialize default menu selection entry.
-	/*gBootVolume =*/ menuBVR = selectBootVolume(getBvChain());
+	menuBVR = selectBootVolume(getBvChain());
 	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev))) {
@@ -746,7 +746,6 @@ int getBootOptions(bool firstRun)
                 // Look at partitions hosting OS X other than the CD-ROM
                 for (bvr = getBvChain(); bvr; bvr=bvr->next) {
                     if ((bvr->flags & kBVFlagSystemVolume) && bvr->biosdev != (int)get_env(envgBIOSDev)) {
-                        //gBootVolume = bvr;
 						safe_set_env(envgBootVolume, (uint32_t)bvr);
                     }
                 }
@@ -891,7 +890,6 @@ int getBootOptions(bool firstRun)
 					showBootPrompt(nextRow, showPrompt);
 					break;
 				}
-				//gBootVolume = menuBVR;
 				safe_set_env(envgBootVolume, (uint32_t)menuBVR);
 				setRootVolume(menuBVR);
                 safe_set_env(envgBIOSDev,menuBVR->biosdev);
@@ -946,9 +944,6 @@ done:
 
 //==========================================================================
 
-extern unsigned char chainbootdev;
-extern unsigned char chainbootflag;
-
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
     int argLen = argName ? strlen(argName) : 0;
@@ -1000,6 +995,7 @@ processBootOptions(void)
 	
     if ( ((BVRef)(uint32_t)get_env(envgBootVolume)) )
     {
+#ifndef NO_MULTIBOOT_SUPPORT
         if (!( ((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagNativeBoot ))
         {
             readBootSector( ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBootVolume))->part_boff,
@@ -1010,12 +1006,15 @@ processBootOptions(void)
             // foreign booter.
             //
 			
+			extern unsigned char chainbootdev;
+			extern unsigned char chainbootflag;
+			
             chainbootdev  = ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev;
             chainbootflag = 1;
 			
             return 1;
         }
-		
+#endif
         setRootVolume(((BVRef)(uint32_t)get_env(envgBootVolume)));
 		
     }

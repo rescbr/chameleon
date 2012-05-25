@@ -2,7 +2,10 @@
  * Copyright (c) 2005 Apple Computer, Inc.  All Rights Reserved.
  */
 
-#if 1
+#include "libsaio.h"
+#include "device_tree.h"
+
+//#if 1
 /*
  
  Structures for a Flattened Device Tree 
@@ -32,10 +35,7 @@ enum {
 
 /* length of DTEntryNameBuf = kDTMaxEntryNameLength +1*/
 typedef char DTEntryNameBuf[32];
-#endif
-
-#include "libsaio.h"
-#include "device_tree.h"
+//#endif
 
 #if DEBUG
 #define DPRINTF(args...) printf(args)
@@ -97,7 +97,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
     prop = freeProperties;
     freeProperties = prop->next;
     
-    prop->name = name;
+    prop->name = newString(name);
     prop->length = length;
     prop->value = value;
     
@@ -203,13 +203,15 @@ DT__Finalize(void)
     
     DPRINTF("DT__Finalize\n");
     for (prop = allocedProperties; prop != NULL; prop = prop->next) {
-        free(prop->value);
+        if (prop->value) free(prop->value);
+        if (prop->name) free(prop->name);
+
     }
     allocedProperties = NULL;
     freeProperties = NULL;
     
     for (node = allocedNodes; node != NULL; node = node->next) {
-        free((void *)node->children);
+        if (node->children) free((void *)node->children);
     }
     allocedNodes = NULL;
     freeNodes = NULL;

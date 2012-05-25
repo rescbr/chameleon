@@ -866,7 +866,6 @@ MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 
 long MSDOSLoadFile(CICell ih, char * filePath)
 {
-    //return MSDOSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
 	return MSDOSReadFile(ih, filePath, (void *)(uint32_t)get_env(envgFSLoadAddress), 0, 0);
 
 }

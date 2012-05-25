@@ -95,7 +95,7 @@ char *getConsoleMsg(void)
 }
 char *getConsoleCursor(void)
 {
-    return booterlog.buf;
+    return booterlog.cursor;
 }
 void setConsoleMsg(char *p)
 {

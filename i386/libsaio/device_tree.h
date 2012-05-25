@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 typedef struct _Property {
-    const char *             name;
+    char *             name;
     uint32_t           length;
     void *             value;
 

@@ -34,22 +34,19 @@ static long  gImageLastKernelAddr;
 #define RoundPage(x)  ((((unsigned)(x)) + kPageSize - 1) & ~(kPageSize - 1))
 
 long
-AllocateMemoryRange(char * rangeName, long start, long length)
+AllocateMemoryRange(const char * rangeName, long start, long length)
 {
-    char *nameBuf;
     uint32_t *buffer;
-    
-    nameBuf = malloc(strlen(rangeName) + 1);
-    if (nameBuf == 0) return -1;
-    strcpy(nameBuf, rangeName);
-    
+   
+    if (!rangeName) return -1;
+
     buffer = malloc(2 * sizeof(uint32_t));
-    if (buffer == 0) {free(nameBuf);return -1;}
+    if (buffer == 0) {return -1;}
     
     buffer[0] = start;
     buffer[1] = length;
     
-    DT__AddProperty((Node*)(uint32_t)get_env(envMemoryMapNode), nameBuf, 2 * sizeof(uint32_t), (char *)buffer);
+    DT__AddProperty((Node*)(uint32_t)get_env(envMemoryMapNode), rangeName, 2 * sizeof(uint32_t), (char *)buffer);
     
     return 0;
 }

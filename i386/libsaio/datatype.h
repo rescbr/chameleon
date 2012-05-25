@@ -36,8 +36,8 @@ typedef uint16_t U16;
 typedef uint32_t U32;
 typedef uint64_t U64;
 
-/*
-//typedef uint32_t bool;
+#if 0
+typedef uint32_t bool;
 #ifndef false
 #define true  1
 #endif
@@ -49,6 +49,6 @@ typedef uint64_t U64;
 #ifndef NULL
 #define NULL ((void *) 0)
 #endif
-*/
+#endif
 
 #endif /* DATATYPE_H */

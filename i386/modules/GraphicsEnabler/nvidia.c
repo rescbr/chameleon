@@ -1192,10 +1192,18 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 		return 0;
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
-	sprintf(tmp, "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
-	devices_number++;
-    
+    {
+        uint32_t devices_number;
+        
+        if (!(devices_number = (uint32_t)get_env(envDeviceNumber))) {
+           devices_number = 1;
+        } 
+        
+        sprintf(tmp, "Slot-%x",devices_number);
+        devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
+        safe_set_env(envDeviceNumber,devices_number+1);
+    }
+        
 	return 1;
 }
 
@@ -1290,7 +1298,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	char				*model;
 	const char			*value;
 	bool				doit;
-    
+	
+	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+
 	static const dcfg_t default_dcfg [] = {
 		{0xff,0xff,0xff,0xff},
 	};
@@ -1405,12 +1415,15 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
             //return false;
 		}
 	}
-	DBG("nvidia model : %s\n",model);
-    
-    
-	if (!string) {
+	DBG("nvidia model : %s\n",model);	
+
+    if (!string)
+    {
 		string = devprop_create_string();
-	}
+        if (!string) {free(rom);return false;}
+        safe_set_env(envEFIString,(uint32_t)string);
+	}	
+	
 	device = devprop_add_device(string, devicepath);
     
 	/* FIXME: for primary graphics card only */
@@ -1519,16 +1532,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getBoolForKey(kVBIOS, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
-    
-	stringdata = malloc(sizeof(uint8_t) * string->length);
-    if (!stringdata) { 
-        free(rom);
-        free(version_str);
-        printf("Couldn't allocate momory for device stringdata\n");
-        return false;
-    }
-	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-	stringlength = string->length;
     
 	return true;
 }

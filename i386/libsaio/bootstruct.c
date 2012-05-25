@@ -43,7 +43,6 @@ boot_args_108     *bootArgs108  = NULL;
 /* ... */
 
 PrivateBootInfo_t *bootInfo  = NULL;
-//Node              *gMemoryMapNode  = NULL;
 
 static char platformName[64];
 static MemoryRange memoryMap[kMemoryMapCountMax];

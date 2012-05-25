@@ -2,7 +2,7 @@ TODO List for Chameleon Boot Loader
 ====================================
 
 - split nvidia, gma and ati code into separate modules
-- move device_inject, winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
+- move device_inject, MBR (OSX works better on Guid partition theme anyway), winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 
   will be done simply by destroying the pool
 - Implement snprintf to avoid buffer overflow in some case

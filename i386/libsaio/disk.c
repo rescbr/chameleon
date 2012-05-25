@@ -886,8 +886,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                     
                     // turbo - we want the booter type scanned also
                 case FDISK_BOOTER:
-                    if (part->bootid & FDISK_ACTIVE) {
-                        /*gBIOSBootVolume =*/
+                    if (part->bootid & FDISK_ACTIVE) {                        
 						safe_set_env(envgBIOSBootVolume, (uint32_t)newFDiskBVRef(
                                                         biosdev, partno,
                                                         part->relsect,
@@ -1512,7 +1511,6 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 #endif
 					default:						
 						if (biosdev == (int)get_env(envgBIOSDev))
-							//gBIOSBootVolume = bvr;
 							safe_set_env(envgBIOSBootVolume, (uint32_t)bvr);
 						break;
 				}

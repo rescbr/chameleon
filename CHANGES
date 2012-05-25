@@ -1,4 +1,14 @@
 - security and stability fixes
+- Removed useless codes in efistring modules
+- Fixed bugs related to device_inject.c
+- Fixed bugs related to device_tree.c
+- Fixed bugs related to hfs.c
+- Fixed a bug in the booterlog introduced in the previous version
+- Fixed a bug in randomTheme intoduced in the previous version
+- Added LoginToLion Cub Devices (credit to Enzo)
+
+
+- security and stability fixes
 - Improved Xcode4.3+ and clang compatibility
 - Fixed a bug in device_inject.c
 - Updated uthash, utarrey, etc ... to v1.9.6 

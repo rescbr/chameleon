@@ -129,7 +129,6 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		}
 		
 		// Force arch=i386 + -v
-		//archCpuType = CPU_TYPE_I386;
 		safe_set_env(envarchCpuType, CPU_TYPE_I386);
 		safe_set_env(envgVerboseMode, true);
 	}

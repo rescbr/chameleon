@@ -6,14 +6,12 @@ UTILDIR = ../util
 LIBSADIR = ../libsa
 BOOT2DIR = ../boot2
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
-#SYMROOT=
 
 OPTIM = -Os -Oz
-DEBUG = -DNOTHING
-#DEBUG = -DDEBUG_CPU=1 -DDEBUG_MEM=1 -DDEBUG_SPD=1 -DDEBUG_PCI=1 -DDEBUG_SMBIOS=1
+DEBUG = 
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fno-stack-protector \
-    -D__ARCHITECTURE__=\"i386\" -DSAIO_INTERNAL_USER \
-    -DRCZ_COMPRESSED_FILE_SUPPORT $(DEBUG) \
+    -D__ARCHITECTURE__=\"i386\" \
+    $(DEBUG) \
     -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
 
 DEFINES=
@@ -42,6 +40,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random-fbsd.o   \
         convert.o acpi_tools.o smbios.o uterror.o lzss.o lib.o rtc.o time.o
 
 # Options enabled by default:
+
 #CFLAGS += -DNO_WIN_SUPPORT # -7744 bytes
 SAIO_OBJS += ntfs.o msdos.o exfat.o
 
@@ -54,10 +53,12 @@ SAIO_OBJS += freebsd.o openbsd.o
 #CFLAGS += -DNO_HAIKU_SUPPORT # -256 bytes
 SAIO_OBJS += befs.o
 
-#CFLAGS += -DNO_SMP_SUPPORT 
-SAIO_OBJS += smp-imps.o
-
 # Options disabled by default:
+
+CFLAGS += -DNO_BOOT_IMG
+
+CFLAGS += -DNO_SMP_SUPPORT 
+#SAIO_OBJS += smp-imps.o
 
 #CFLAGS += -DUFS_SUPPORT # +3616 bytes
 #SAIO_OBJS += ufs.o ufs_byteorder.o
@@ -82,19 +83,8 @@ ALLSRC =  $(SFILES) $(CFILES) \
 	$(HFILES) $(OTHERFILES)
 LIBS = libsaio.a
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
-#GENFILES = $(SYMROOT)/saio_internal.h \
-#	$(SYMROOT)/saio_external.h \
-#	$(SYMROOT)/saio_defs.h \
-#	$(SYMROOT)/saio_table.c
-
-#SIG = $(SYMROOT)/sig
 
 all embedtheme: $(DIRS_NEEDED) libsaio.h embedded.h $(LIBS)
-
-#libsaio_static.a: $(SAIO_OBJS)
-#	rm -f $(SYMROOT)/$@
-#	ar q $(SYMROOT)/$@ $(SAIO_OBJS)
-#	ranlib $(SYMROOT)/$@
 
 fake_efi.o: vers.h
 vers.h:
@@ -111,15 +101,6 @@ libsaio.a: $(SAIO_EXTERN_OBJS) $(SAIO_OBJS)
 
 embedded.h:
 	@cd $(SYMROOT)/../../doc && xxd -i BootHelp.txt > $(SYMROOT)/embedded.h
-	
-#saio_internal.h: saio_external.h
-#saio_table.c: saio_external.h
-#saio_defs.h: saio_external.h
-#saio_external.h: saio.def
-#	$(SIG) -d $(SYMROOT) -n saio saio.def
-
-#installhdrs:: $(INSTALLDIR)
-#	cp $(INSTALLED_HFILES) $(INSTALLDIR)
 
 include ../MakeInc.dir
 

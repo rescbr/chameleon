@@ -114,6 +114,8 @@ static int destroyFont(font_t *font);
 static int unloadGraphics(void);
 static int freeBackBuffer( window_t *window );
 static bool is_image_loaded(int i);
+static bool GUI_getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size );
+static bool GUI_getColorForKey( const char *key, unsigned int *value, config_file_t *config );
 
 #define LOADPNG(src, img, alt_img) if (loadThemeImage(src, #img, alt_img) != 0) { return 1; }
 
@@ -324,7 +326,7 @@ static void moveCursor( int col, int row )
  *
  */
 
-bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
+static bool GUI_getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
 {
 	const char *val;
 	
@@ -384,7 +386,7 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
     return false;
 }
 
-static bool getColorForKey( const char *key, unsigned int *value, config_file_t *config )
+static bool GUI_getColorForKey( const char *key, unsigned int *value, config_file_t *config )
 {
     const char *val;
     int size;
@@ -849,10 +851,10 @@ static void setupDeviceList(config_file_t *theme)
 			gui.devicelist.height = ((images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing) * MIN(gui.maxdevices, devcnt) + (images[iDeviceScrollPrev].image->height + images[iDeviceScrollNext].image->height) + gui.devicelist.iconspacing);
 			gui.devicelist.width  = (images[iSelection].image->width + gui.devicelist.iconspacing);
 			
-			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
+			if(GUI_getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , images[iSelection].image->width ) )
 				gui.devicelist.pos.x = pixel;
 			
-			if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
+			if(GUI_getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , gui.devicelist.height ) )
 				gui.devicelist.pos.y = pixel;
 			break;
 			
@@ -861,19 +863,19 @@ static void setupDeviceList(config_file_t *theme)
 			gui.devicelist.width = ((images[iSelection].image->width + gui.devicelist.iconspacing) * MIN(gui.maxdevices, devcnt) + (images[iDeviceScrollPrev].image->width + images[iDeviceScrollNext].image->width) + gui.devicelist.iconspacing);
 			gui.devicelist.height = (images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing);
 			
-			if(getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
+			if(GUI_getDimensionForKey("devices_pos_x", &pixel, theme, gui.screen.width , gui.devicelist.width ) )
 				gui.devicelist.pos.x = pixel;
 			else
 				gui.devicelist.pos.x = ( gui.screen.width - gui.devicelist.width ) / 2;
 			
-			if(getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
+			if(GUI_getDimensionForKey("devices_pos_y", &pixel, theme, gui.screen.height , images[iSelection].image->height ) )
 				gui.devicelist.pos.y = pixel;
 			else
 				gui.devicelist.pos.y = ( gui.screen.height - gui.devicelist.height ) / 2;
 			break;
 	}
 	
-	if(getColorForKey("devices_bgcolor", &color, theme))
+	if(GUI_getColorForKey("devices_bgcolor", &color, theme))
 		gui.devicelist.bgcolor = (color & 0x00FFFFFF);
 	
 	if(getIntForKey("devices_transparency", &alpha, theme))
@@ -898,7 +900,7 @@ static void loadThemeValues(config_file_t *theme)
 	/*
 	 * Parse screen parameters
 	 */
-	if(getColorForKey("screen_bgcolor", &color, theme ))
+	if(GUI_getColorForKey("screen_bgcolor", &color, theme ))
 		gui.screen.bgcolor = (color & 0x00FFFFFF);
 	
 	if(getIntForKey("screen_textmargin_h", &val, theme))
@@ -910,37 +912,37 @@ static void loadThemeValues(config_file_t *theme)
 	/*
 	 * Parse background parameters
 	 */
-	if(getDimensionForKey("background_pos_x", &pixel, theme, screen_width , images[iBackground].image->width ) )
+	if(GUI_getDimensionForKey("background_pos_x", &pixel, theme, screen_width , images[iBackground].image->width ) )
 		gui.background.pos.x = pixel;
 	
-	if(getDimensionForKey("background_pos_y", &pixel, theme, screen_height , images[iBackground].image->height ) )
+	if(GUI_getDimensionForKey("background_pos_y", &pixel, theme, screen_height , images[iBackground].image->height ) )
 		gui.background.pos.y = pixel;
 	
 	/*
 	 * Parse logo parameters
 	 */
-	if(getDimensionForKey("logo_pos_x", &pixel, theme, screen_width , images[iLogo].image->width ) )
+	if(GUI_getDimensionForKey("logo_pos_x", &pixel, theme, screen_width , images[iLogo].image->width ) )
 		gui.logo.pos.x = pixel;
 	
-	if(getDimensionForKey("logo_pos_y", &pixel, theme, screen_height , images[iLogo].image->height ) )
+	if(GUI_getDimensionForKey("logo_pos_y", &pixel, theme, screen_height , images[iLogo].image->height ) )
 		gui.logo.pos.y = pixel;
 	
 	/*
 	 * Parse progress bar parameters
 	 */
-	if(getDimensionForKey("progressbar_pos_x", &pixel, theme, screen_width , 0 ) )
+	if(GUI_getDimensionForKey("progressbar_pos_x", &pixel, theme, screen_width , 0 ) )
 		gui.progressbar.pos.x = pixel;
 	
-	if(getDimensionForKey("progressbar_pos_y", &pixel, theme, screen_height , 0 ) )
+	if(GUI_getDimensionForKey("progressbar_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.progressbar.pos.y = pixel;
 	
 	/*
 	 * Parse countdown text parameters
 	 */
-	if(getDimensionForKey("countdown_pos_x", &pixel, theme, screen_width , 0 ) )
+	if(GUI_getDimensionForKey("countdown_pos_x", &pixel, theme, screen_width , 0 ) )
 		gui.countdown.pos.x = pixel;
 	
-	if(getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
+	if(GUI_getDimensionForKey("countdown_pos_y", &pixel, theme, screen_height , 0 ) )
 		gui.countdown.pos.y = pixel;
 	
     /*
@@ -957,10 +959,10 @@ static void loadThemeValues(config_file_t *theme)
 	if(getIntForKey("infobox_height", &val, theme) && val >= 0)
 		gui.infobox.height = MIN( screen_height , (unsigned)val );
 	
-	if(getDimensionForKey("infobox_pos_x", &pixel, theme, screen_width , gui.infobox.width ) )
+	if(GUI_getDimensionForKey("infobox_pos_x", &pixel, theme, screen_width , gui.infobox.width ) )
 		gui.infobox.pos.x = pixel;
 	
-	if(getDimensionForKey("infobox_pos_y", &pixel, theme, screen_height , gui.infobox.height ) )
+	if(GUI_getDimensionForKey("infobox_pos_y", &pixel, theme, screen_height , gui.infobox.height ) )
 		gui.infobox.pos.y = pixel;
 	
 	if(getIntForKey("infobox_textmargin_h", &val, theme))
@@ -969,7 +971,7 @@ static void loadThemeValues(config_file_t *theme)
 	if(getIntForKey("infobox_textmargin_v", &val, theme))
 		gui.infobox.vborder = MIN( gui.infobox.height , val );
 	
-	if(getColorForKey("infobox_bgcolor", &color, theme))
+	if(GUI_getColorForKey("infobox_bgcolor", &color, theme))
 		gui.infobox.bgcolor = (color & 0x00FFFFFF);
 	
 	if(getIntForKey("infobox_transparency", &alpha, theme))
@@ -978,20 +980,20 @@ static void loadThemeValues(config_file_t *theme)
 	/*
 	 * Parse menu parameters
 	 */
-	if(getDimensionForKey("menu_width", &pixel, theme, gui.screen.width , 0 ) )
+	if(GUI_getDimensionForKey("menu_width", &pixel, theme, gui.screen.width , 0 ) )
 		gui.menu.width = pixel;
 	else
 		gui.menu.width = images[iMenuSelection].image->width;
 	
-	if(getDimensionForKey("menu_height", &pixel, theme, gui.screen.height , 0 ) )
+	if(GUI_getDimensionForKey("menu_height", &pixel, theme, gui.screen.height , 0 ) )
 		gui.menu.height = pixel;
 	else
 		gui.menu.height = (infoMenuItemsCount) * images[iMenuSelection].image->height;
 	
-	if(getDimensionForKey("menu_pos_x", &pixel, theme, screen_width , gui.menu.width ) )
+	if(GUI_getDimensionForKey("menu_pos_x", &pixel, theme, screen_width , gui.menu.width ) )
 		gui.menu.pos.x = pixel;
 	
-	if(getDimensionForKey("menu_pos_y", &pixel, theme, screen_height , gui.menu.height ) )
+	if(GUI_getDimensionForKey("menu_pos_y", &pixel, theme, screen_height , gui.menu.height ) )
 		gui.menu.pos.y = pixel;
 	
 	if(getIntForKey("menu_textmargin_h", &val, theme))
@@ -1000,7 +1002,7 @@ static void loadThemeValues(config_file_t *theme)
 	if(getIntForKey("menu_textmargin_v", &val, theme))
 		gui.menu.vborder = MIN( gui.menu.height , val );
 	
-	if(getColorForKey("menu_bgcolor", &color, theme))
+	if(GUI_getColorForKey("menu_bgcolor", &color, theme))
 		gui.menu.bgcolor = (color & 0x00FFFFFF);
 	
 	if(getIntForKey("menu_transparency", &alpha, theme))
@@ -1009,16 +1011,16 @@ static void loadThemeValues(config_file_t *theme)
 	/*
 	 * Parse bootprompt parameters
 	 */
-	if(getDimensionForKey("bootprompt_width", &pixel, theme, screen_width , 0 ) )
+	if(GUI_getDimensionForKey("bootprompt_width", &pixel, theme, screen_width , 0 ) )
 		gui.bootprompt.width = pixel;
 	
 	if(getIntForKey("bootprompt_height", &val, theme) && val >= 0)
 		gui.bootprompt.height = MIN( screen_height , (unsigned)val );
 	
-	if(getDimensionForKey("bootprompt_pos_x", &pixel, theme, screen_width , gui.bootprompt.width ) )
+	if(GUI_getDimensionForKey("bootprompt_pos_x", &pixel, theme, screen_width , gui.bootprompt.width ) )
 		gui.bootprompt.pos.x = pixel;
 	
-	if(getDimensionForKey("bootprompt_pos_y", &pixel, theme, screen_height , gui.bootprompt.height ) )
+	if(GUI_getDimensionForKey("bootprompt_pos_y", &pixel, theme, screen_height , gui.bootprompt.height ) )
 		gui.bootprompt.pos.y = pixel;
 	
 	if(getIntForKey("bootprompt_textmargin_h", &val, theme) && val >= 0)
@@ -1027,16 +1029,16 @@ static void loadThemeValues(config_file_t *theme)
 	if(getIntForKey("bootprompt_textmargin_v", &val, theme) && val >= 0)
 		gui.bootprompt.vborder = MIN( gui.bootprompt.height , (unsigned)val );
 	
-	if(getColorForKey("bootprompt_bgcolor", &color, theme))
+	if(GUI_getColorForKey("bootprompt_bgcolor", &color, theme))
 		gui.bootprompt.bgcolor = (color & 0x00FFFFFF);
 	
 	if(getIntForKey("bootprompt_transparency", &alpha, theme))
 		gui.bootprompt.bgcolor = gui.bootprompt.bgcolor | (( 255 - ( alpha & 0xFF) ) << 24);
 	
-	if(getColorForKey("font_small_color", &color, theme))
+	if(GUI_getColorForKey("font_small_color", &color, theme))
 		gui.screen.font_small_color = (color & 0x00FFFFFF);
 	
-	if(getColorForKey("font_console_color", &color, theme))
+	if(GUI_getColorForKey("font_console_color", &color, theme))
 		gui.screen.font_console_color = (color & 0x00FFFFFF);
 }
 
@@ -1118,36 +1120,30 @@ static int randomTheme(char *dirspec, const char **theme) {
 
 	if (i) {			
 		
-		uint8_t choosen = arc4random_uniform(i+1);
-						
+		uint8_t choosen = arc4random_uniform(i);
+#if DEBUG_GUI
+		printf("choosen number (nb = %d), i = %d \n", choosen, i);
+#endif	
 		themeList_t* entry = themeList;
 
 		while(entry)
 		{
 
-			if (entry->nb == choosen) break;
+			if (entry->nb == choosen) {
+#if DEBUG_GUI
+				
+				printf("choosen theme  %s (nb = %d)\n", entry->theme, entry->nb);
+				sleep(1);
+#endif
+				*theme = entry->theme;			
+				
+				sta = startGUI();
+				
+				break;
+			}
 			
 			entry = entry->next;
-		}
-		
-		if (entry) {
-#if DEBUG_GUI
-
-			printf("choosen theme  %s (nb = %d)\n", entry->theme, entry->nb);
-			sleep(1);
-#endif
-			*theme = entry->theme;			
-			
-			sta = startGUI();
-			
-
-		}	 
-#if DEBUG_GUI
-		else {
-			goto out;
-		}
-#endif
-	
+		}	
 		
 		free_theme_list();
 		
@@ -1160,16 +1156,6 @@ static int randomTheme(char *dirspec, const char **theme) {
 	}	
 #endif
 	return sta;	
-	
-#if DEBUG_GUI
-out:
-		printf("random theme failed !!\n");
-		
-		sleep(1);		
-#endif
-	return sta;	
-	
-	
 }
 
 int initGUI(void)
@@ -1254,7 +1240,12 @@ int initGUI(void)
 		
 		ret = randomTheme(dirsrc, &theme_name);
  		
-		if (ret) printf("randomTheme Failed !! \n");
+		if (ret) {
+			printf("randomTheme Failed !! \n");
+//#if DEBUG_GUI
+			getc();
+//#endif
+		}
 #if DEBUG_GUI
 		else
         {

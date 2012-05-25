@@ -49,7 +49,9 @@ static long                    gCaseSensitive;
 static long                    gBlockSize;
 static long                    gCacheBlockSize;
 static char                    *gBTreeHeaderBuffer;
-static BTHeaderRec             *gBTHeaders[2];
+static BTHeaderRec             gBaseBTHeaders[2];
+static BTHeaderRec             **gBTHeaders = (BTHeaderRec**)gBaseBTHeaders;
+
 static char                    *gHFSMdbVib;
 static HFSMasterDirectoryBlock *gHFSMDB;
 static char                    *gHFSPlusHeader;
@@ -67,7 +69,8 @@ static long                    gBlockSize;
 static long                    gCaseSensitive;
 static long                    gCacheBlockSize;
 static char                    gBTreeHeaderBuffer[512];
-static BTHeaderRec             *gBTHeaders[2];
+static BTHeaderRec             gBaseBTHeaders[2];
+static BTHeaderRec             **gBTHeaders = (BTHeaderRec**)gBaseBTHeaders;
 static char                    gHFSMdbVib[kBlockSize];
 static HFSMasterDirectoryBlock *gHFSMDB =(HFSMasterDirectoryBlock*)gHFSMdbVib;
 static char                    gHFSPlusHeader[kBlockSize];
@@ -259,7 +262,6 @@ long HFSInitPartition(CICell ih)
 
 long HFSLoadFile(CICell ih, char * filePath)
 {
-    //return HFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
 	return HFSReadFile(ih, filePath, (void *)(uint32_t)get_env(envgFSLoadAddress), 0, 0);
 }
 

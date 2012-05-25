@@ -696,7 +696,7 @@ static VOID setupSystemType()
     kType = get_env(envType);
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(uint8_t), &kType);
 }
-
+#ifdef NO_BOOT_IMG
 struct boot_progress_element {
 	unsigned int	width;
 	unsigned int	height;
@@ -705,7 +705,7 @@ struct boot_progress_element {
 	unsigned char	data[0];
 };
 typedef struct boot_progress_element boot_progress_element;
-
+#endif
 static VOID setupEfiDeviceTree(void)
 {	
 	Node		*node;
@@ -713,7 +713,8 @@ static VOID setupEfiDeviceTree(void)
 	node = DT__FindNode("/", false);
 	
 	if (node == 0) stop("Couldn't get root node");
-	
+    
+#ifndef NO_BOOT_IMG
 	{
 		long           size;
 		{
@@ -722,7 +723,12 @@ static VOID setupEfiDeviceTree(void)
 			long clut = AllocateKernelMemory(size);
 			bcopy(&appleClut8, (void*)clut, size);
             
-			AllocateMemoryRange( "BootCLUT", clut, size);
+            if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
+            {
+                AllocateMemoryRange( "FailedCLUT", clut, size);
+            
+            } else
+                AllocateMemoryRange( "BootCLUT", clut, size);
 			
 		}
 		
@@ -730,8 +736,12 @@ static VOID setupEfiDeviceTree(void)
 #include "failedboot.h"	
 			size = 32 + kFailedBootWidth * kFailedBootHeight;
 			long bootPict = AllocateKernelMemory(size);
+            if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
+            {
+                AllocateMemoryRange( "FailedImage", bootPict, size);    
             
-			AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
+            } else
+                AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
             
 			((boot_progress_element *)bootPict)->width  = kFailedBootWidth;
 			((boot_progress_element *)bootPict)->height = kFailedBootHeight;
@@ -743,7 +753,7 @@ static VOID setupEfiDeviceTree(void)
 			bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
 		}
 	}
-	
+#endif
 	//Fix an error with the Lion's (DP2+) installer	
 	if (execute_hook("getboardproductPatched", NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 	{
@@ -1004,9 +1014,7 @@ static VOID setupEfiConfigurationTable()
 		void *mps_p = imps_probe(&num_cpus);
 		
 		if (mps_p)
-		{
-			//uint64_t mps = ((uint64_t)((uint32_t)mps_p));        
-			
+		{		
 			addConfigurationTable(&gEfiMpsTableGuid, ((uint64_t*)((uint32_t)mps_p)), NULL);
 		}
 		

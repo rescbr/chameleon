@@ -8,6 +8,7 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "device_inject.h"
+#include "platform.h"
 
 #ifndef DEBUG_ETHERNET
 #define DEBUG_ETHERNET 0
@@ -73,6 +74,7 @@ static int devprop_add_network_template(struct DevPropDevice *device, uint16_t v
 	
 	if(device)
 	{
+        uint32_t devices_number;
 		
 		if((vendor_id != 0x168c) && (builtin_set == 0)) 
 		{
@@ -85,7 +87,13 @@ static int devprop_add_network_template(struct DevPropDevice *device, uint16_t v
 			return 0;
 		}
 		
-		devices_number++;
+        if (!(devices_number = (uint32_t)get_env(envDeviceNumber))) {
+            devices_number = 1;
+        }     
+        
+        
+        safe_set_env(envDeviceNumber,devices_number+1);            
+        
 		return 1;
 	}
 	else
@@ -101,24 +109,24 @@ static void set_eth_builtin(pci_dt_t *eth_dev)
     if (!devicepath) {
         return ;
     }
-	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
-	
+	struct DevPropDevice *device;
+    struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 	
 	if (!string)
+    {
 		string = devprop_create_string();
-	
+        if (!string) return;
+        safe_set_env(envEFIString,(uint32_t)string);
+	}
+    
 	device = devprop_add_device(string, devicepath);
 	if(device)
 	{
 		verbose("Setting up lan keys\n");
 		devprop_add_network_template(device, eth_dev->vendor_id);
-		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
-		if(stringdata)
-		{
-			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-			stringlength = string->length;
-		}
+        devprop_generate_string(string);		
 	}
 }
 
@@ -145,13 +153,18 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
     if (!devicepath) {
         return ;
     }
-	struct DevPropDevice *device /*= (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice))*/;
-	
+	struct DevPropDevice *device ;
+    struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+
 	verbose("Wifi Controller [%04x:%04x] :: %s\n", wlan_dev->vendor_id, wlan_dev->device_id, devicepath);
 	
 	if (!string)
+    {
 		string = devprop_create_string();
-	
+        if (!string) return;
+        safe_set_env(envEFIString,(uint32_t)string);
+	}
+    
 	device = devprop_add_device(string, devicepath);
 	if(device)
 	{
@@ -168,20 +181,8 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
 			{
 				verbose("Setting up wifi keys\n");
 				
-				devprop_add_value(device, "model", (uint8_t*)known_wifi_cards[i].model, (strlen(known_wifi_cards[i].model) + 1));
-				
-				// NOTE: I would set the subsystem id and subsystem vendor id here,
-				// however, those values seem to be ovverriden in the boot process.
-				// A batter method would be injecting the DTGP dsdt method
-				// and then injectinve the subsystem id there.
-				
-				stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
-				if(stringdata)
-				{
-					memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-					stringlength = string->length;
-				}
-				
+				devprop_add_value(device, "model", (uint8_t*)known_wifi_cards[i].model, (strlen(known_wifi_cards[i].model) + 1));				
+				                
 				return;
 				
 			}

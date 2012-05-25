@@ -495,7 +495,6 @@ void common_boot(int biosdev)
     bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &devcnt);
     safe_set_env(envgDeviceCount,devcnt);    
     
-	//gBootVolume = selectBootVolume(bvChain);
 	safe_set_env(envgBootVolume, (uint32_t)selectBootVolume(bvChain));
 
 	
@@ -564,8 +563,10 @@ void common_boot(int biosdev)
         if (status == -1) continue;
 		
         status = processBootOptions();
+#ifndef NO_MULTIBOOT_SUPPORT
         // Status==1 means to chainboot
         if ( status ==  1 ) break;
+#endif
         // Status==-1 means that the config file couldn't be loaded or that gBootVolume is NULL
         if ( status == -1 )
         {
@@ -790,7 +791,8 @@ void common_boot(int biosdev)
             }
         }
     }
-    
+	
+#ifndef NO_MULTIBOOT_SUPPORT
     // chainboot
     if (status==1)
 	{
@@ -801,6 +803,12 @@ void common_boot(int biosdev)
             
 		}
     }
+#else
+	printf("No proper Darwin Partition found, reseting ... \n");
+	pause();
+	common_boot(biosdev);
+#endif
+	
 #ifdef NBP_SUPPORT
     if ((get_env(envgBootFileType) == kNetworkDeviceType) && gUnloadPXEOnExit)
 	{

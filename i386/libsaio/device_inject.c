@@ -11,6 +11,7 @@
 #include "pci_root.h"
 #include "device_inject.h"
 #include "convert.h"
+#include "platform.h"
 
 #ifndef DEBUG_INJECT
 #define DEBUG_INJECT 0
@@ -22,13 +23,10 @@
 #define DBG(x...)
 #endif
 
-uint32_t devices_number = 1;
-struct DevPropString *string = 0;
-uint8_t *stringdata = 0;
-uint32_t stringlength = 0;
-
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
+    struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+
 	if(string)
 	{
 		*len = string->length;
@@ -42,6 +40,8 @@ void setupDeviceProperties(Node *node)
 {
 	const char *val;
 	uint8_t *binStr;
+    uint8_t *kbinStr;
+
 	int cnt, cnt2;
 	
 	static char DEVICE_PROPERTIES_PROP[] = "device-properties";
@@ -62,14 +62,20 @@ void setupDeviceProperties(Node *node)
     
 	if (cnt > 1)
 	{
-		binStr = convertHexStr2Binary(val, &cnt2);
-		if (cnt2 > 0) DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
+		binStr = convertHexStr2Binary(val, &cnt2);  
+        
+        if (cnt2 > 0)
+        {
+            kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);        
+            bcopy(binStr,kbinStr,cnt2);        
+            DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
+        }
 	}
 }
 
 struct DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
+	struct DevPropString *string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
 	
 	if(string == NULL)
 	{
