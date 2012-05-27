@@ -21,7 +21,6 @@
 #define DBG(x...)
 #endif
 
-
 uint8_t GMAX3100_vals[23][4] = {
 	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
 	{ 0x01,0x00,0x00,0x00 },	//1 "AAPL,SelfRefreshSupported"
@@ -107,7 +106,6 @@ uint8_t HD3000_os_info[20] = {
 	0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
 };
 
-
 uint8_t reg_TRUE[]	= { 0x01, 0x00, 0x00, 0x00 };
 uint8_t reg_FALSE[] = { 0x00, 0x00, 0x00, 0x00 };
 
@@ -118,29 +116,28 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x80860046, "HD2000"  },
 	{ 0x80862582, "GMA 915"	},
 	{ 0x80862592, "GMA 915"	},
-	{ 0x808627A2, "GMA950"	},
-	{ 0x808627AE, "GMA950"	},
-//	{ 0x808627A6, "Mobile GMA950"	},
+	{ 0x808627A2, "Mobile GMA950"	},
+	{ 0x808627AE, "Mobile GMA950"	},
+//	{ 0x808627A6, "Mobile GMA950"	}, //not a GPU
 	{ 0x8086A011, "Mobile GMA3150"	},
 	{ 0x8086A012, "Mobile GMA3150"	},
 	{ 0x80862772, "Desktop GMA950"	},
-//	{ 0x80862776, "Desktop GMA950"	},
+//	{ 0x80862776, "Desktop GMA950"	}, //not a GPU
 //	{ 0x8086A001, "Desktop GMA3150" },
 	{ 0x8086A001, "Mobile GMA3150"	},
 	{ 0x8086A002, "Desktop GMA3150" },
-
-	{ 0x80862A02, "GMAX3100"},
-	{ 0x80862A03, "GMAX3100"},
-	{ 0x80862A12, "GMAX3100"},
-	{ 0x80862A13, "GMAX3100"},
-	{ 0x80862A42, "GMAX3100"},
-	{ 0x80862A43, "GMAX3100"},
-	{ 0x80860102, "HD2000"	},
-	{ 0x80860106, "HD2000"	},
-	{ 0x80860112, "HD3000"	},
-	{ 0x80860116, "HD3000"	},
-	{ 0x80860122, "HD3000"	},
-	{ 0x80860126, "HD3000"	},
+	{ 0x80862A02, "GMAX3100"		},
+//	{ 0x80862A03, "GMAX3100"		}, //not a GPU
+	{ 0x80862A12, "GMAX3100"		},
+	{ 0x80862A13, "GMAX3100"		},
+	{ 0x80862A42, "GMAX3100"		},
+	{ 0x80862A43, "GMAX3100"		},
+	{ 0x80860102, "Intel HD Graphics 2000"		},
+	{ 0x80860106, "Intel HD Graphics 2000 Mobile"	},
+	{ 0x80860112, "Intel HD Graphics 3000"		},
+	{ 0x80860116, "Intel HD Graphics 3000 Mobile"	},
+	{ 0x80860122, "Intel HD Graphics 3000"		},
+	{ 0x80860126, "Intel HD Graphics 3000 Mobile"	},
 };
 
 char *get_gma_model(uint32_t id) {
@@ -191,15 +188,13 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);	
 	
-	if ((strcmp("Mobile GMA950", model) == 0) ||
-		(strcmp("Mobile GMA3150",model) == 0))
+	if ((strcmp("Mobile GMA950", model) == 0) || (strcmp("Mobile GMA3150",model) == 0))
 	{
 		devprop_add_value(device, "AAPL,HasPanel", reg_TRUE, 4);
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
-	else if ((strcmp("Desktop GMA950", model) == 0) ||
-			 (strcmp("Desktop GMA3150",model) == 0))
+	else if ((strcmp("Desktop GMA950", model) == 0) || (strcmp("Desktop GMA3150",model) == 0))
 	{
 		BuiltIn = 0x01;
 		devprop_add_value(device, "built-in", &BuiltIn, 1);

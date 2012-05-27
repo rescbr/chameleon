@@ -463,6 +463,19 @@ static int unloadGraphics(void)
 	return 0;
 }
 
+int freeBackBuffer( window_t *window )
+{
+    if (gui.backbuffer && gui.backbuffer->pixels)
+        {
+            free(gui.backbuffer->pixels);
+            free(gui.backbuffer);
+            gui.backbuffer = 0;
+            return 0;
+        }
+
+    return 1;
+}
+
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
 	
@@ -493,8 +506,9 @@ int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
+	{
 		return 1;
-	
+	}
 	gui.backbuffer->pixels = malloc( window->width * window->height * 4 );
 	if(!gui.backbuffer->pixels)
 	{
@@ -509,24 +523,13 @@ int createBackBuffer( window_t *window )
 	return 0;
 }
 
-int freeBackBuffer( window_t *window )
-{
-    if (gui.backbuffer && gui.backbuffer->pixels)
-        {
-            free(gui.backbuffer->pixels);
-            free(gui.backbuffer);
-            gui.backbuffer = 0;
-            return 0;
-        }
-
-    return 1;
-}
-
 int createWindowBuffer( window_t *window )
 {
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
+	{
 		return 1;
+	}
 
 	window->pixmap->pixels = malloc( window->width * window->height * 4 );
 	if(!window->pixmap->pixels)
@@ -902,7 +905,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 			{				
 
 				// Use HFS or HFSRAID icon depending on bvr flags.
-				if (device->flags & kBVFlagBooter) {
+				if (device->flags & kBVFlagBooter)
+				{
                     
 					switch (device->OSVersion[3]) {
 						case '8':
@@ -925,10 +929,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 							break;
 					}
 					
-				} 
-                else
-				{					
-					
+				} else {					
+
 					switch (device->OSVersion[3]) {
 						case '8':
 							devicetype = is_image_loaded(iDeviceHFS_ML) ? iDeviceHFS_ML : is_image_loaded(iDeviceHFS) ? iDeviceHFS : iDeviceGeneric;
@@ -1567,6 +1569,21 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 	drawStr(text, font, blendInto, p);
 }
 
+int destroyFont(font_t *font)
+{
+    int i;
+    for (i = 0; i < CHARACTERS_COUNT; i++)
+    {
+        if (font->chars[i])
+        {
+            if (font->chars[i]->pixels) free (font->chars[i]->pixels);
+            free (font->chars[i]);
+            font->chars[i] = 0;
+         }
+    }
+    return 0;
+}
+
 int initFont(font_t *font, image_t *data)
 {
 	unsigned int x = 0, y = 0, x2 = 0, x3 = 0;
@@ -1624,21 +1641,6 @@ int initFont(font_t *font, image_t *data)
 	font->count = count;
 
 	return 0;
-}
-
-int destroyFont(font_t *font)
-{
-    int i;
-    for (i = 0; i < CHARACTERS_COUNT; i++)
-    {
-        if (font->chars[i])
-        {
-            if (font->chars[i]->pixels) free (font->chars[i]->pixels);
-            free (font->chars[i]);
-            font->chars[i] = 0;
-         }
-    }
-    return 0;
 }
 
 void colorFont(font_t *font, uint32_t color)
@@ -1939,15 +1941,21 @@ void drawInfoMenuItems()
 	for ( i = 0, n = iMenuBoot; i < infoMenuItemsCount; i++, n++)
 	{
 		if (i == infoMenuSelection)
+		{
 			blend(selection, gui.menu.pixmap, position);
+		}
 
 		pbuff = images[n].image;
 		if (offset && i >= INFOMENU_NATIVEBOOT_START && i <= INFOMENU_NATIVEBOOT_END)
+		{
 			blend( images[n + (iMenuHelp - iMenuBoot)].image , gui.menu.pixmap, 
 				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+		}
 		else
+		{
 			blend( pbuff, gui.menu.pixmap, 
 				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
+		}
 
 		drawStr(infoMenuItems[i].text, &font_console, gui.menu.pixmap, 
 			pos(position.x + (pbuff->width + gui.menu.hborder), 
@@ -1976,58 +1984,63 @@ int updateInfoMenu(int key)
 	{
 
 		case KEY_UP:	// up arrow
-				if (infoMenuSelection > 0)
+			if (infoMenuSelection > 0)
+			{
+				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
 				{
-					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
-						infoMenuSelection -= 4;
-					
-					else
-						infoMenuSelection--;
-						drawInfoMenuItems();
-						updateVRAM();
-					
-				} else {
-					
-					gui.menu.draw = false;
-					gui.redraw = true;
-
-					updateVRAM();
-					
-					return CLOSE_INFO_MENU;
+					infoMenuSelection -= 4;
 				}
-				break;
-
-		case KEY_DOWN:	// down arrow
-				if (infoMenuSelection < infoMenuItemsCount - 1)
-				{
-					if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
-						infoMenuSelection += 4;
-					else
-						infoMenuSelection++;
-					drawInfoMenuItems();
-					updateVRAM();
-				}
-				break;
-
-		case KEY_ENTER:
-				key = 0;
-				if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
-					showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
-
-				else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO )
-					showInfoBox( getVBEInfoString(), getVBEModeInfoString() );
-			
-				else if( infoMenuSelection == MENU_SHOW_HELP )
-					showHelp();
-
 				else
 				{
-					int buff = infoMenuSelection;
-					infoMenuSelection = 0;
-					return buff;
+					infoMenuSelection--;
 				}
-				break;
-		}
+				drawInfoMenuItems();
+				updateVRAM();
+
+			}
+			else
+			{
+
+				gui.menu.draw = false;
+				gui.redraw = true;
+
+				updateVRAM();
+				
+				return CLOSE_INFO_MENU;
+			}
+			break;
+
+		case KEY_DOWN:	// down arrow
+			if (infoMenuSelection < infoMenuItemsCount - 1)
+			{
+				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
+					infoMenuSelection += 4;
+				else
+					infoMenuSelection++;
+				drawInfoMenuItems();
+				updateVRAM();
+			}
+			break;
+
+		case KEY_ENTER:
+			key = 0;
+			if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
+				showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
+
+			else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO )
+				showInfoBox( getVBEInfoString(), getVBEModeInfoString() );
+			
+			else if( infoMenuSelection == MENU_SHOW_HELP )
+				showHelp();
+
+			else
+			{
+				int buff = infoMenuSelection;
+				infoMenuSelection = 0;
+				return buff;
+			}
+			break;
+	}
 	return DO_NOT_BOOT;
 }
 

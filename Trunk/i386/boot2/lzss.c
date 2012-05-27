@@ -46,7 +46,7 @@
 #define F         18    /* upper limit for match_length */
 #define THRESHOLD 2     /* encode string into position and length
                            if match_length is greater than this */
-#define NIL       N     /* index for root of binary search trees */
+//#define NIL       N     /* index for root of binary search trees */
 
 int
 decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen)
@@ -59,7 +59,6 @@ decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen)
     unsigned int flags;
     
     dst = dststart;
-    srcend = src + srclen;
     for (i = 0; i < N - F; i++)
         text_buf[i] = ' ';
     r = N - F;

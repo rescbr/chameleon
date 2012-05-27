@@ -32,9 +32,13 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_DOTHAN		0x0D			// Dothan
 #define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
 #define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
+#define CPU_MODEL_CONROE		0x0F
+#define CPU_MODEL_CELERON		0x16
 #define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
+#define CPU_MODEL_WOLFDALE		0x17
 #define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
 #define CPU_MODEL_ATOM			0x1C			// Atom
+#define CPU_MODEL_XEON_MP		0x1D
 #define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
 #define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
 #define CPU_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale

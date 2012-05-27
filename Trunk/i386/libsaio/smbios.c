@@ -96,7 +96,7 @@
 #define kDefaultiMacNehalemBIOSVersion				"    IM112.88Z.0057.B00.1005051455"
 // defaults for an iMac12,1
 #define kDefaultiMacSandy							"iMac12,1"
-#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B0A.1104221555"
+#define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B1F.1223021756"
 
 // defaults for a Mac Pro
 #define kDefaultMacProFamily						"MacPro"
