@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		012E60F7137AC68F00E35218 /* ati_reg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati_reg.h; sourceTree = "<group>"; };
+		012E60F7137AC68F00E35218 /* ati.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
 		012E60F8137AC68F00E35218 /* smbios_decode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = smbios_decode.c; sourceTree = "<group>"; };
 		012E60F9137AC68F00E35218 /* smbios_getters.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = smbios_getters.c; sourceTree = "<group>"; };
 		012E60FA137AC68F00E35218 /* smbios_getters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = smbios_getters.h; sourceTree = "<group>"; };
@@ -1399,6 +1399,12 @@
 		B45260B2153EFCE90018E994 /* zh_CN.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_CN.po; sourceTree = "<group>"; };
 		B45260B3153EFCE90018E994 /* zh_TW.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_TW.po; sourceTree = "<group>"; };
 		B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "po4a-chameleon.cfg"; sourceTree = "<group>"; };
+		B49234A91571906A00F168C2 /* freebsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = freebsd.c; sourceTree = "<group>"; };
+		B49234AA1571906A00F168C2 /* freebsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = freebsd.h; sourceTree = "<group>"; };
+		B49234AB1571906A00F168C2 /* gma.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
+		B49234AC1571906A00F168C2 /* gma.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
+		B49234AF15719CBF00F168C2 /* openbsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = openbsd.c; sourceTree = "<group>"; };
+		B49234B015719CBF00F168C2 /* openbsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = openbsd.h; sourceTree = "<group>"; };
 		B4AABE5914C3B8B90055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5B14C3B8C70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5D14C3B8D70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
@@ -3172,7 +3178,7 @@
 				B00F494A11F6089500B1D7C5 /* aml_generator.c */,
 				B00F494911F6089500B1D7C5 /* aml_generator.h */,
 				B0056D2911F3868000754B65 /* asm.s */,
-				012E60F7137AC68F00E35218 /* ati_reg.h */,
+				012E60F7137AC68F00E35218 /* ati.h */,
 				B0056D2A11F3868000754B65 /* ati.c */,
 				B0056D2C11F3868000754B65 /* bios.h */,
 				B0056D2D11F3868000754B65 /* bios.s */,
@@ -3203,10 +3209,10 @@
 				B0056D3F11F3868000754B65 /* fake_efi.c */,
 				B0056D4011F3868000754B65 /* fake_efi.h */,
 				B0056D4111F3868000754B65 /* fdisk.h */,
-				B495AC9B1551EA7B00B5E8A6 /* freebsd.c */,
-				B495AC9C1551EA7B00B5E8A6 /* freebsd.h */,
-				B495AC981551EA5D00B5E8A6 /* gma.c */,
-				B495AC991551EA5D00B5E8A6 /* gma.h */,
+				B49234A91571906A00F168C2 /* freebsd.c */,
+				B49234AA1571906A00F168C2 /* freebsd.h */,
+				B49234AB1571906A00F168C2 /* gma.c */,
+				B49234AC1571906A00F168C2 /* gma.h */,
 				B0056D4411F3868000754B65 /* hfs_CaseTables.h */,
 				B0056D4511F3868000754B65 /* hfs_compare.c */,
 				B0056D4211F3868000754B65 /* hfs.c */,
@@ -3230,11 +3236,13 @@
 				B0056D5811F3868000754B65 /* ntfs_private.h */,
 				B0056D5911F3868000754B65 /* nvidia.c */,
 				B0056D5A11F3868000754B65 /* nvidia.h */,
-				B0056D5B11F3868000754B65 /* pci.c */,
-				B0056D5C11F3868000754B65 /* pci.h */,
+				B49234AF15719CBF00F168C2 /* openbsd.c */,
+				B49234B015719CBF00F168C2 /* openbsd.h */,
 				B0056D5D11F3868000754B65 /* pci_root.c */,
 				B0056D5E11F3868000754B65 /* pci_root.h */,
 				B0056D5F11F3868000754B65 /* pci_setup.c */,
+				B0056D5B11F3868000754B65 /* pci.c */,
+				B0056D5C11F3868000754B65 /* pci.h */,
 				B0056D6011F3868000754B65 /* platform.c */,
 				B0056D6111F3868000754B65 /* platform.h */,
 				B0056D6211F3868000754B65 /* saio_internal.h */,

@@ -69,10 +69,9 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
     DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%x)\n", DT__GetName(node), name, length, value);
     if (freeProperties == NULL) {
         void *buf = malloc(kAllocSize);
-        int i;
-        
-        DPRINTF("Allocating more free properties\n");
         if (buf == 0) return 0;
+        int i;
+        DPRINTF("Allocating more free properties\n");
         bzero(buf, kAllocSize);
         // Use the first property to record the allocated buffer
         // for later freeing.
@@ -118,10 +117,9 @@ DT__AddChild(Node *parent, const char *name)
 
     if (freeNodes == NULL) {
         void *buf = malloc(kAllocSize);
-        int i;
-        
-        DPRINTF("Allocating more free nodes\n");
         if (buf == 0) return 0;
+        int i;
+        DPRINTF("Allocating more free nodes\n");
         bzero(buf, kAllocSize);
         node = (Node *)buf;
         // Use the first node to record the allocated buffer
