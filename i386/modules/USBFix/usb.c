@@ -43,6 +43,9 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 	if(!usbList)
 	{
 		usbList = (struct pciList*)malloc(sizeof(struct pciList));
+        if (!usbList) {
+            return;
+        }
 		usbList->next = NULL;
 		usbList->pciDev = pci_dev;
 		
@@ -54,6 +57,9 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 			current = current->next;
 		}
 		current->next = (struct pciList*)malloc(sizeof(struct pciList));
+        if (!current) {
+            return;
+        }
 		current = current->next;
 		
 		current->pciDev = pci_dev;

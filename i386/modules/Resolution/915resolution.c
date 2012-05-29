@@ -247,6 +247,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 {
 	UInt32 z;
 	vbios_map * map = malloc(sizeof(vbios_map));
+    if (!map) {
+        return 0;
+
+    }
 	for(z=0; z<sizeof(vbios_map); z++) ((char*)map)[z]=0;
 	/*
 	 * Determine chipset

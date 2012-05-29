@@ -88,6 +88,108 @@ struct DevPropString *devprop_create_string(void)
 	return string;
 }
 
+struct DevPropDevice *devprop_make_device(pci_dt_t *pci_dt)
+{
+	struct DevPropDevice	*device;
+    int numpaths = 0;
+
+	pci_dt_t	*current;
+	pci_dt_t	*end;
+	
+	end = root_pci_dev;
+    
+	device = malloc(sizeof(struct DevPropDevice));
+	if (!device) {
+        return NULL;
+    }
+    memset(device, 0, sizeof(struct DevPropDevice));
+
+	device->acpi_dev_path._UID = getPciRootUID();
+	while (end != pci_dt)
+	{
+		current = pci_dt;
+		while (current->parent != end)
+			current = current->parent;			
+		end = current;
+
+		{
+            device->pci_dev_path[numpaths].device =	(uint8_t)current->dev.bits.dev;
+			device->pci_dev_path[numpaths].function = (uint8_t)current->dev.bits.func;
+            numpaths++;
+		} 
+		
+	}
+			
+	if(!numpaths)
+	{
+        printf("ERROR parsing device path\n");
+        free(device);
+		return NULL;
+	}
+	
+	device->numentries = 0x00;
+	
+	device->acpi_dev_path.length = 0x0c;
+	device->acpi_dev_path.type = 0x02;
+	device->acpi_dev_path.subtype = 0x01;
+	device->acpi_dev_path._HID = 0xd041030a;
+	
+	device->num_pci_devpaths = numpaths;
+	device->length = 24 + (6*numpaths);
+	
+	int		i; 
+	
+	for(i = 0; i < numpaths; i++)
+	{
+		device->pci_dev_path[i].length = 0x06;
+		device->pci_dev_path[i].type = 0x01;
+		device->pci_dev_path[i].subtype = 0x01;
+	}
+	
+	device->path_end.length = 0x04;
+	device->path_end.type = 0x7f;
+	device->path_end.subtype = 0xff;
+	
+	device->data = NULL;
+			
+	return device;
+}
+
+struct DevPropDevice *devprop_add_device(struct DevPropString *string, pci_dt_t * pci_dt)
+{
+	struct DevPropDevice	*device;
+		
+	if (string == NULL || pci_dt == NULL) {
+		return NULL;
+	}
+	device = devprop_make_device(pci_dt);
+	if (!device) {
+        return NULL;
+    }
+		
+	device->string = string;
+	string->length += device->length;
+	
+	if(!string->entries)
+	{
+		if((string->entries = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice) * MAX_STRING_NUM_ENTRIES))== NULL)
+		{
+            printf("ERROR parsing device path 2\n");
+            
+            free(device);
+			return NULL;
+		}
+	}
+	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
+	
+	string->numentries++;
+    
+	string_entries_arrey[string->numentries-1] = device;
+	
+	return device;
+}
+
+#if 0
 struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
 {
 	struct DevPropDevice	*device;
@@ -103,7 +205,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
     }
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
         free(device);
-		printf("ERROR parsing device path\n");
+		printf("ERROR parsing device path 1\n");
 		return NULL;
 	}
 	
@@ -111,49 +213,46 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	device->acpi_dev_path._UID = getPciRootUID();
 	
 	int numpaths = 0;
-	int		x, curr = 0;
-	char	buff[] = "00";
+	int		x, curr = 0, w = 0;
+    
+	char	buff[16];
 	
+    
 	for (x = 0; x < strlen(path); x++) 
 	{
+        
 		if (!strncmp(&path[x], pci_device_string, strlen(pci_device_string)))
 		{
 			x+=strlen(pci_device_string);
 			curr=x;
 			while(path[++x] != ',');
-			if(x-curr == 2)
-			{
-				sprintf(buff, "%c%c", path[curr], path[curr+1]);
-			}
-			else if(x-curr == 1)
-			{
-				sprintf(buff, "%c", path[curr]);
-			}
-			else 
-			{
-				printf("ERROR parsing device path\n");
-				numpaths = 0;
-				break;
-			}
+            
+            w = x-curr;
+            
+            if ((w > 4) || /*(w > sizeof(buff)) ||*/ (w == 0)) {
+                printf("ERROR parsing device path 2\n");
+                break;
+            }
+            
+            snprintf(buff, x-curr, "%s",&path[curr]);
+			
 			device->pci_dev_path[numpaths].device =	(uint8_t)strtoul(buff, NULL, 16);
 			
+            bzero(buff, sizeof(buff));
+            
 			x += 3; // 0x
 			curr = x;
 			while(path[++x] != ')');
-			if(x-curr == 2)
-			{
-				sprintf(buff, "%c%c", path[curr], path[curr+1]);
-			}
-			else if(x-curr == 1)
-			{
-				sprintf(buff, "%c", path[curr]);
-			}
-			else
-			{
-				printf("ERROR parsing device path\n");
-				numpaths = 0;
-				break;
-			}
+            
+            w = x-curr;
+            
+            if ((w > 4) || /*(w > sizeof(buff)) ||*/ (w == 0)) {
+                printf("ERROR parsing device path 3\n");
+                break;
+            }
+            
+            snprintf(buff, x-curr, "%s",&path[curr]);
+            
 			device->pci_dev_path[numpaths].function = (uint8_t)strtoul(buff, NULL, 16); // TODO: find dev from char *path
 			
 			numpaths++;
@@ -162,6 +261,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	if(!numpaths)
 	{
+        printf("ERROR parsing device path 4\n");
         free(device);
 		return NULL;
 	}
@@ -197,6 +297,8 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	{
 		if((string->entries = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice) * MAX_STRING_NUM_ENTRIES))== NULL)
 		{
+            printf("ERROR parsing device path 6\n");
+            
             free(device);
 			return NULL;
 		}
@@ -209,6 +311,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	return device;
 }
+#endif
 
 int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len)
 {

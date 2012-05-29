@@ -40,19 +40,19 @@ installhdrs::
 .SUFFIXES: .s .i .c .o
 
 .c.o .m.o:
-	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -no-integrated-as -c $(INC) $< -o $(OBJROOT)/$*.o 
 
 $(OBJROOT)/%.o: %.c
-	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -no-integrated-as -c $(INC) $< -o $(OBJROOT)/$*.o 
 
 $(OBJROOT)/%.o: %.m
-	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -no-integrated-as -c $(INC) $< -o $(OBJROOT)/$*.o 
 
 .s.o:
 	$(CC) $(CPPFLAGS) $(GFLAGS) -no-integrated-as -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<
 
 boot2.o:
-	$(CC) $(CPPFLAGS)$(GFLAGS)  -Wa,-n -c $(INC) -no-integrated-as -arch i386 -o $(OBJROOT)/$(@F) boot2.s
+	$(CC) $(CPPFLAGS)$(GFLAGS) -no-integrated-as -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s
 	
 $(OBJROOT)/%.o: %.s
 	$(CC) $(CPPFLAGS) $(GFLAGS) -no-integrated-as -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) $<

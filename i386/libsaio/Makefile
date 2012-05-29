@@ -12,8 +12,8 @@ DEBUG =
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fno-stack-protector \
     -D__ARCHITECTURE__=\"i386\" \
     $(DEBUG) \
-    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
-
+    -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) -march=pentium4 -msse2 -msoft-float  -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse 
+GFLAGS	= 
 DEFINES=
 CONFIG = hd
 INC = -I. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(BOOT2DIR)

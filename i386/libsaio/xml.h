@@ -82,6 +82,7 @@ typedef struct string_ref string_ref;
 #define kPropIOClass                    ("IOClass")
 #define kPropIOProviderClass            ("IOProviderClass")
 #define kPropOSBundleWorkspace          ("OSBundleWorkspace")
+#define kPropCFBundleLocalizations		("CFBundleLocalizations")
 
 #define DEFAULT_BOOT_CONFIG_DICT      (TagPtr)0
 #define DEFAULT_SYSTEM_CONFIG_DICT    (TagPtr)1

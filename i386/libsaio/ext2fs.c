@@ -20,9 +20,9 @@ bool EX2Probe (const void *buf)
 void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 {
 	char * buf=malloc (EX2ProbeSize);
-	str[0]=0;
 	if (!buf)
 		return;
+    str[0]=0;
 	Seek(ih, 0);
 	Read(ih, (long)buf, EX2ProbeSize);
 	if (!EX2Probe (buf))

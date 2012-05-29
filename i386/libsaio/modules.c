@@ -1425,6 +1425,9 @@ struct Module {
 	long          willLoad;
 	TagPtr        dict;
     TagPtr        personalities;
+#if 0
+	config_file_t *LanguageConfig; // we will use an xml file instead of pure txt file ... it's easier to parse
+#endif
 	//pool_t        workspace;
 	char          *plistAddr;
 	long          plistLength;
@@ -2054,9 +2057,41 @@ ParseXML( char * buffer, ModulePtr * module )
                 
             }
             
-        }   
-        
+        }
+		
         tmpModule->willLoad = BundlePriorityNormalPriority;
+		
+#if 0
+		prop = XMLGetProperty(moduleDict, kPropCFBundleLocalizations);
+        if ((prop != 0) && prop->string)
+        {
+			char * path = newStringWithFormat("%s%s",module->bundlePath,prop->string);
+			if (path == NULL) {
+				break;
+			}
+			
+            if (loadConfigFile(path, module->LanguageConfig) != 0)
+			{
+				free(path);
+				path = NULL;
+				
+				const char * default_local;
+				if ((default_local = getStringForKey(kPropCFBundleLocalizations, DEFAULT_BOOT_CONFIG))) 
+				{
+					path = newStringWithFormat("%s%s",module->bundlePath,default_local);
+					if (path == NULL) {
+						break;
+					}
+					loadConfigFile(path, module->LanguageConfig);
+				}
+
+			}
+			
+			if (path) {
+				free(path);
+			}            
+        }
+#endif
         
     } while (0);
     

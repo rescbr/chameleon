@@ -52,77 +52,37 @@
 #define BOOTER_LOG_SIZE    (128 * 1024)
 #define SAFE_LOG_SIZE    134
 
-struct LOG {
+#define LOG    1
+#define PRINT  2
+
+struct log_t {
     char *buf;
-    char *cursor;
+    char *ptr;
 };
-typedef struct LOG LOG;
-static LOG booterlog;
-
-struct putc_info {
-    char * str;
-    char * last_str;
-};
-
-void sputc(int c, struct putc_info * pi)
-{
-	if (pi->last_str)
-		if (pi->str == pi->last_str)
-		{
-			*(pi->str) = '\0';
-			return;
-		}
-	*(pi->str)++ = c;
-}
+typedef struct log_t log_t;
+static log_t booterlog;
 
 void initBooterLog(void)
 {
 	booterlog.buf = malloc(BOOTER_LOG_SIZE);
     if (!booterlog.buf) {
         printf("Couldn't allocate buffer for booter log\n");
-        booterlog.cursor = 0;
+        booterlog.ptr = 0;
         booterlog.buf = 0;
         return;
     }
 	bzero(booterlog.buf, BOOTER_LOG_SIZE);
-	booterlog.cursor = booterlog.buf;    
+	booterlog.ptr = booterlog.buf;    
 	
 }
 
-char *getConsoleMsg(void)
+void
+debug_putc(char c)
 {
-    return booterlog.buf;
-}
-char *getConsoleCursor(void)
-{
-    return booterlog.cursor;
-}
-void setConsoleMsg(char *p)
-{
-    booterlog.buf = p;
-}
-void setConsoleCursor(char *p)
-{
-    booterlog.cursor = p;
-}
-
-void msglog(const char * fmt, ...)
-{
-	va_list ap;
-	struct putc_info pi;
-	
-	if (!booterlog.buf)
-		return;
-	
-	if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-		return;
-	
-	va_start(ap, fmt);
-	pi.str = booterlog.cursor;
-	pi.last_str = 0;
-	prf(fmt, ap, sputc, &pi);
-	va_end(ap);
-	booterlog.cursor += strlen((char *)booterlog.cursor);
+    if (((booterlog.ptr-booterlog.buf) < (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+        *booterlog.ptr=c;
+        booterlog.ptr++;
+    }
 }
 
 void setupBooterLog(void)
@@ -141,7 +101,7 @@ void setupBooterLog(void)
 /*
  * write one character to console
  */
-void putchar(int c)
+void putchar(char c)
 {
 	if ( c == '\t' )
 	{
@@ -181,57 +141,60 @@ int getchar()
 	return (c);
 }
 
+int
+reallyVPrint(const char *format, va_list ap, int flag)
+{
+    if (flag & PRINT) prf(format, ap, putchar);
+	
+    if (flag & LOG)
+	{
+		/* Kabyl: BooterLog */		
+		prf(format, ap, debug_putc);
+	}
+    return 0;
+}
+
+int localVPrintf(const char *format, va_list ap, int flag)
+{
+    /**/
+    
+    reallyVPrint(format, ap, flag);
+    return 0;
+}
+
 int printf(const char * fmt, ...)
 {
     va_list ap;
 	va_start(ap, fmt);
 	
-	prf(fmt, ap, putchar, 0);
-	
-	{
-		/* Kabyl: BooterLog */
-		struct putc_info pi;
-		
-		if (!booterlog.buf)
-			return 0;
-		
-		if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-			return 0;
-		pi.str = booterlog.cursor;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		booterlog.cursor +=  strlen((char *)booterlog.cursor);
-	}
+	localVPrintf(fmt, ap, LOG | PRINT);
 	
 	va_end(ap);    
     
     return 0;
 }
 
+void msglog(const char * fmt, ...)
+{
+    va_list ap;
+	va_start(ap, fmt);	
+	
+    localVPrintf(fmt, ap, LOG);
+	
+	va_end(ap);    
+}
+
 int verbose(const char * fmt, ...)
 {
     va_list ap;
-    
+    int flag = 0;
 	va_start(ap, fmt);
     if (get_env(envgVerboseMode))
     {
-		prf(fmt, ap, putchar, 0);
+		flag = PRINT;
     }
 	
-	{
-		/* Kabyl: BooterLog */
-		struct putc_info pi;
-		
-		if (!booterlog.buf)
-			return 0;
-		
-		if (((booterlog.cursor - booterlog.buf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-			return 0;
-		pi.str = booterlog.cursor;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		booterlog.cursor +=  strlen((char *)booterlog.cursor);
-	}
+    localVPrintf(fmt, ap, LOG | flag);
 	
     va_end(ap);    
     
@@ -241,23 +204,21 @@ int verbose(const char * fmt, ...)
 int error(const char * fmt, ...)
 {
     va_list ap;
-    struct putc_info pi;
 	int len;
 	char *str = NULL;
 	
     va_start(ap, fmt);
-	len = prf(fmt, ap, 0, 0);
+    
+    localVPrintf(fmt, ap, 0);
+
+    
+	len = prf(fmt, ap, 0);
 	if (len > 0)
 	{
 		str = newEmptyStringWithLength(len);
 		if (str != NULL) 
-		{
-			pi.last_str = 0;
-			
-			pi.str = str;
-			
-			prf(fmt, ap, sputc, &pi);
-			*pi.str = '\0';
+		{			
+			vsnprintf(str,len,fmt,ap);
 		}
 		
 	}	
@@ -276,7 +237,7 @@ void stop(const char * fmt, ...)
 	printf("\n");
 	va_start(ap, fmt);
 	
-	prf(fmt, ap, putchar, 0);
+    localVPrintf(fmt, ap, PRINT);
 	
 	va_end(ap);
 	printf("\nThis is a non recoverable error! System HALTED!!!");
@@ -294,23 +255,17 @@ void pause(void)
 char * newStringWithFormat(const char * fmt, ...)
 {
     va_list ap;
-    struct putc_info pi;
 	int len;
 	char *str = NULL;
 	
     va_start(ap, fmt);
-	len = prf(fmt, ap, 0, 0);
+	len = prf(fmt, ap, 0);
 	if (len > 0)
 	{
 		str = newEmptyStringWithLength(len);
 		if (str != NULL) 
-		{
-			pi.last_str = 0;
-			
-			pi.str = str;
-			
-			prf(fmt, ap, sputc, &pi);
-			*pi.str = '\0';
+		{			
+			vsnprintf(str,len,fmt,ap);
 		}
 		
 	}	

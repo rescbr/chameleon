@@ -927,7 +927,7 @@ void get_vram_size(void);
 bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, uint32_t subsys_id);
 void free_val(value_t *val);
 
-void devprop_add_list(dev_prop_t devprop_list[]);
+int devprop_add_list(dev_prop_t devprop_list[]);
 
 bool get_bootdisplay_val(value_t *val)
 {
@@ -1026,15 +1026,17 @@ bool get_romrevision_val(value_t *val)
 	uint8_t *rev;
 	if (!card->rom)
 		return false;
-	
-	rev = card->rom + *(uint8_t *)(card->rom + OFFSET_TO_GET_ATOMBIOS_STRINGS_START);
     
-	val->type = kPtr;
-	val->size = strlen((char *)rev);
 	val->data = malloc(val->size);
 	
 	if (!val->data)
 		return false;
+    
+	rev = card->rom + *(uint8_t *)(card->rom + OFFSET_TO_GET_ATOMBIOS_STRINGS_START);
+    
+	val->type = kPtr;
+	val->size = strlen((char *)rev);
+	
 	
 	memcpy(val->data, rev, val->size);
 	
@@ -1097,9 +1099,12 @@ void free_val(value_t *val)
 	bzero(val, sizeof(value_t));
 }
 
-void devprop_add_list(dev_prop_t devprop_list[])
+int devprop_add_list(dev_prop_t devprop_list[])
 {
 	value_t *val = malloc(sizeof(value_t));
+    if (!val) {
+        return -1;
+    }
 	int i, pnum;
 	
 	for (i = 0; devprop_list[i].name != NULL; i++)
@@ -1155,6 +1160,7 @@ void devprop_add_list(dev_prop_t devprop_list[])
 	}
     
 	free(val);
+    return 0;
 }
 
 bool validate_rom(struct pci_rom_bios_t *rom_header, pci_dt_t *pci_dev)
@@ -1239,14 +1245,17 @@ bool read_vbios(bool from_pci)
 	
 	if (!validate_rom(rom_addr, card->pci_dev))
 		return false;
-	
-	card->rom_size = rom_addr->size * 512;
-	if (!card->rom_size)
-		return false;
-	
+    
 	card->rom = malloc(card->rom_size);
 	if (!card->rom)
 		return false;
+    
+	card->rom_size = rom_addr->size * 512;
+	if (!card->rom_size)
+    {
+        free(card->rom);
+		return false;
+    }	
 	
 	memcpy(card->rom, (void *)rom_addr, card->rom_size);
 	
@@ -1534,8 +1543,6 @@ static bool init_card(pci_dt_t *pci_dev)
 
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
-	char *devicepath;
-	
 	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 	if (!string)
     {
@@ -1544,16 +1551,12 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
         safe_set_env(envEFIString,(uint32_t)string);
 	}
 		
-	devicepath = get_pci_dev_path(ati_dev);
-    if (!devicepath) {
-        return false;
-    }
-    verbose("ATI VGA Controller [%04x:%04x] :: %s \n", 
-            ati_dev->vendor_id, ati_dev->device_id, devicepath);
+	verbose("ATI VGA Controller [%04x:%04x] \n", 
+            ati_dev->vendor_id, ati_dev->device_id);
     if (!init_card(ati_dev))
 		return false;
     
-	card->device = devprop_add_device(string, devicepath);
+	card->device = devprop_add_device(string, ati_dev);
 	if (!card->device)
 		return false;
 	// -------------------------------------------------
@@ -1567,14 +1570,13 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(card->device, "ATY,IOSpaceOffset", &io, 8);
 #endif
 	
-	devprop_add_list(ati_devprop_list);    
+	if (devprop_add_list(ati_devprop_list) == -1) return false; //fix me : remove all properties for this device
 		
-	verbose("%s %dMB [%04x:%04x] (subsys [%04x:%04x]) (%s:%s) :: %s\n",
+	verbose("%s %dMB [%04x:%04x] (subsys [%04x:%04x]) (%s:%s) \n",
 			card->info->model_name, (uint32_t)(card->vram_size / (1024 * 1024)),
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
-			chip_family_name[card->info->chip_family], card->cfg_name, 
-			devicepath);
+			chip_family_name[card->info->chip_family], card->cfg_name);
 	
 	free(card);
 	

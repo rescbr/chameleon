@@ -1280,7 +1280,6 @@ typedef struct _dcfg_t {
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
 	struct DevPropDevice		*device;
-	char						*devicepath;
 	struct pci_rom_pci_header_t	*rom_pci_header;	
 	volatile uint8_t	*regs;
 	uint8_t				*rom;
@@ -1310,11 +1309,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	dcfg_t default_dcfg_1;
 	bool dcfg0_set = false;
 	bool dcfg1_set = false;
-    
-	devicepath = get_pci_dev_path(nvda_dev);
-    if (!devicepath) {
-        return false;
-    }
+    	
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 	
@@ -1329,10 +1324,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
     
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
-	verbose("nVidia %s %dMB NV%02x [%04x:%04x] :: %s\n",  
+	verbose("nVidia %s %dMB NV%02x [%04x:%04x]\n",  
 			model, (uint32_t)(videoRam / 1024 / 1024),
-			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
-			devicepath);	
+			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id);	
 	
 	rom = malloc(NVIDIA_ROM_SIZE);
     if (!rom) {
@@ -1424,7 +1418,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
         safe_set_env(envEFIString,(uint32_t)string);
 	}	
 	
-	device = devprop_add_device(string, devicepath);
+	device = devprop_add_device(string, nvda_dev);
     
 	/* FIXME: for primary graphics card only */
 	boot_display = 1;
@@ -1479,7 +1473,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		uint8_t	new_NVCAP[NVCAP_LEN];
         
 		if (hex2bin(value, new_NVCAP, NVCAP_LEN) == 0) {
-			verbose("Using user supplied NVCAP for %s :: %s\n", model, devicepath);
+			verbose("Using user supplied NVCAP for %s \n", model);
 			memcpy(default_NVCAP, new_NVCAP, NVCAP_LEN);
 		}
 	}

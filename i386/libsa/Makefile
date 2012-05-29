@@ -10,8 +10,8 @@ INSTALL_MD_DIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/
 OPTIM = -Os -Oz
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
 	      -fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
-          -march=pentium4 -msse2 -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse
-
+          -march=pentium4 -msse2 -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE -mpreferred-stack-boundary=2 -fno-align-functions -mfpmath=sse 
+GFLAGS	= 
 INC = -I. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSAIODIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
@@ -25,7 +25,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o bzero.o bcopy.o prf.o printf.o zalloc.o\
+SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o bzero.o bcopy.o printf.o zalloc.o\
 	string.o strtol.o \
 	setjmp.o qsort.o efi_tables.o 
 	

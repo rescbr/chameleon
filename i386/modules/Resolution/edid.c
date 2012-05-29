@@ -141,6 +141,9 @@ char* readEDID(void)
 	} while(blocks_left);
 
 	char* ret = malloc(sizeof(edidInfo));
+    if (!ret) {
+        return 0;
+    }
 	memcpy(ret, edidInfo, sizeof(edidInfo));
 	return ret;
 }

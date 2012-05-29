@@ -11,9 +11,9 @@ bool FreeBSDProbe (const void *buf)
 void FreeBSDGetDescription(CICell ih, char *str, long strMaxLen)
 {
 	char * buf=malloc(FreeBSDProbeSize);
-	str[0]=0;
 	if (!buf)
 		return;
+    str[0]=0;
 	Seek(ih, 0);
 	Read(ih, (long)buf, FreeBSDProbeSize);
 	if (!FreeBSDProbe (buf))

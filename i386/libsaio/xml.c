@@ -44,7 +44,7 @@ static string_ref *ref_strings = NULL;
 /// TODO: remove below
 static char* buffer_start = NULL;
 // TODO: redo the next two functions
-static void SaveRefString(char* string, int id)
+static int SaveRefString(char* string, int id)
 {
 	//printf("Adding Ref String %d (%s)\n", id, string);
 	string_ref* tmp = ref_strings;
@@ -52,19 +52,30 @@ static void SaveRefString(char* string, int id)
 	{
 		if(tmp->id == id)
 		{
-			tmp->string = malloc(strlen(string+1));
+			tmp->string = malloc(strlen(string)+1);
+            if (!tmp->string) {
+                return -1;
+            }
 			sprintf(tmp->string, "%s", string);
-			return;
+			return 0;
 		}
 		tmp = tmp->next;
 	}
 	
 	string_ref* new_ref = malloc(sizeof(string_ref));
+    if (!new_ref) {
+        return -1;
+    }
 	new_ref->string = malloc(strlen(string)+1);
+    if (!new_ref->string) {
+        free(new_ref);
+        return -1;
+    }
 	sprintf(new_ref->string, "%s", string);
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
+    return 0;
 }
 
 static char* GetRefString(int id)
@@ -249,6 +260,9 @@ XMLParseFile( char * buffer, TagPtr * dict )
 	
 	
     configBuffer = malloc(strlen(buffer)+1);
+    if (!configBuffer) {
+        return -1;
+    }
     strcpy(configBuffer, buffer);
 	
 	buffer_start = configBuffer;
@@ -342,7 +356,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			}
 			length = ParseTagString(buffer + pos, tag);
             
-			SaveRefString(buffer + pos, id);
+			if (SaveRefString(buffer + pos, id) != 0) return -1;
 		}
 		else if(!strncmp(tagName + strlen(kXMLTagString " "), kXMLStringIDRef, strlen(kXMLStringIDRef)))
 		{
@@ -415,7 +429,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			}
 			length = ParseTagInteger(buffer + pos, tag);
 			
-			SaveRefString((*tag)->string, id);
+			if (SaveRefString((*tag)->string, id) != 0) return -1;
 		}
 		else if(!strncmp(tagName + strlen(kXMLTagInteger " "), kXMLStringIDRef, strlen(kXMLStringIDRef)))
 		{

@@ -114,7 +114,9 @@ removeKeyFromTable(const char *key, char *table)
     len = strlen(key);
     tab = (char *)table;
     buf = (char *)malloc(len + 3);
-	
+	if (!buf) {
+        return false;
+    }
     sprintf(buf, "\"%s\"", key);
     len = strlen(buf);
 	
@@ -172,6 +174,9 @@ newStringFromList(
 		return 0;
     bufsize = end - begin + 1;
     newstr = malloc(bufsize);
+    if (!newstr) {
+        return 0;
+    }
     strlcpy(newstr, begin, bufsize);
     *list = end;
     *size = newsize;
@@ -251,6 +256,9 @@ char *newStringForStringTableKey(
     
     if (getValueForConfigTableKey(config, key, &val, &size)) {
 		newstr = (char *)malloc(size+1);
+        if (!newstr) {
+            return 0;
+        }
 		for (p = newstr; size; size--, p++, val++) {
 			if ((*p = *val) == '\\') {
 				switch (*++val) {
@@ -290,6 +298,9 @@ newStringForKey(char *key, config_file_t *config)
     
     if (getValueForKey(key, &val, &size, config) && size) {
 		newstr = (char *)malloc(size + 1);
+        if (!newstr) {
+            return 0;
+        }
 		strlcpy(newstr, val, size + 1);
 		return newstr;
     } else {

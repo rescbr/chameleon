@@ -29,7 +29,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stac
 		-mpreferred-stack-boundary=2 -fno-align-functions \
 		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE  
 
-GFLAGS	=
+GFLAGS	= 
 DEFINES=
 CONFIG = hd
 SYMDIR = $(SYMROOT)
@@ -71,8 +71,8 @@ MAXBOOTSIZE = 458240
 
 CFLAGS += -DSAFE_MALLOC 
 
-#GFLAGS += -DNO_MULTIBOOT_SUPPORT 
-OBJS += mboot.o
+GFLAGS += -DNO_MULTIBOOT_SUPPORT 
+#OBJS += mboot.o
 
 # CFLAGS += -DBOOT_HELPER_SUPPORT # +992 bytes
 

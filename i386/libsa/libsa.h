@@ -112,15 +112,39 @@ extern unsigned long long strtouq(const char *nptr, char ** endptr, int base);
 /*
  * prf.c
  */
-extern int prf(const char * fmt, va_list ap, void (*putfn_p)(),
-			   void * putfn_arg);
+//extern int prf(const char * fmt, va_list ap, void (*putfn_p)(),
+//			   void * putfn_arg);
 
 /*
  * printf.c
  */
 extern int sprintf(char *s, const char * format, ...);
-extern int slvprintf(char * buffer, int len, const char * fmt, va_list arg);
+extern int snprintf(char *str, size_t size, const char *format, ...);
+extern int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+extern void 
+    _doprnt(
+            register const char     *fmt,
+            va_list	                 argp,
+            /* character output routine */
+            void                    (*putc)(char),
+            int                     radix);          /* default radix - for '%r' */
 
+extern int
+prf(
+    const char	*fmt,
+    va_list				ap,
+    /* character output routine */
+    void			(*putc)(char));
+    
+extern int
+    __doprnt(
+             const char	*fmt,
+             va_list		argp,
+             /* character output routine */
+             void			(*putc)(int ch, void *arg),
+             void                    *arg,
+             int			radix);
+    
 /*
  * zalloc.c
  */

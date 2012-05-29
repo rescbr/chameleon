@@ -109,8 +109,11 @@ extern long   CacheRead(CICell ih, char *buffer, long long offset,
 /* console.c */
 extern void   initBooterLog(void);
 extern void   setupBooterLog(void);
-extern void   putchar(int ch);
+extern void   putchar(char ch);
+extern void   debug_putc(char c);
 extern int    getchar(void);
+extern int localVPrintf(const char *format, va_list ap, int flag);
+extern int reallyVPrint(const char *format, va_list ap, int flag);
 extern void   msglog(const char * format, ...);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);

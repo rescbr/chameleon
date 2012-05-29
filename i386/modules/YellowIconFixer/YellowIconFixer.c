@@ -31,39 +31,32 @@ void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 {
 	pci_dt_t* current = arg1;
 	struct DevPropDevice		*device;
-	char						*devicepath;
     struct DevPropString        *string;
 	if (current && current->class_id == PCI_CLASS_STORAGE_SATA)
 	{
-		devicepath = get_pci_dev_path(current);
-		if (devicepath)
-		{			
-            
-            string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
-
-			if (!string)
-			{
-				string = devprop_create_string();
-                if (!string) return;
-                safe_set_env(envEFIString,(uint32_t)string);
-			}
-			device = devprop_add_device(string, devicepath);
-            if (!device) return;
-
+		string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
+        
+        if (!string)
+        {
+            string = devprop_create_string();
+            if (!string) return;
+            safe_set_env(envEFIString,(uint32_t)string);
+        }
+        device = devprop_add_device(string, current);
+        if (!device) return;
+        
 #if PROOFOFCONCEPT
-            uint16_t vendor_id =  current->vendor_id & 0xFFFF;
-            uint16_t device_id =  current->device_id & 0xFFFF;
-            
-			devprop_add_value(device, "vendor-id", (uint8_t*)&vendor_id, 4);
-			devprop_add_value(device, "device-id", (uint8_t*)&device_id, 4);
+        uint16_t vendor_id =  current->vendor_id & 0xFFFF;
+        uint16_t device_id =  current->device_id & 0xFFFF;
+        
+        devprop_add_value(device, "vendor-id", (uint8_t*)&vendor_id, 4);
+        devprop_add_value(device, "device-id", (uint8_t*)&device_id, 4);
 #else
-            devprop_add_value(device, "device-id", default_SATA_ID, SATA_ID_LEN);
-
+        devprop_add_value(device, "device-id", default_SATA_ID, SATA_ID_LEN);
+        
 #endif          
-			verbose("SATA device : [%04x:%04x :: %04x] :: %s\n",  
-					current->vendor_id, current->device_id,current->class_id,
-					devicepath);			
-		}
+        verbose("SATA device : [%04x:%04x :: %04x]\n",  
+                current->vendor_id, current->device_id,current->class_id);
 	}	
 	
 }

@@ -93,18 +93,13 @@ static void GUI_showMenu( const MenuItem * items, int count, int selection, int 
 static int GUI_updateMenu( int key, void ** paramPtr );
 static void GUI_showHelp(void);
 static void GUI_showMessage(char *message);
-
+/*
 int GUI_printf(const char * fmt, ...);
 int GUI_verbose(const char * fmt, ...);
 void GUI_stop(const char * fmt, ...);
-
-
-/* console.c */
-struct putc_info {
-    char * str;
-    char * last_str;
-};
-void sputc(int c, struct putc_info * pi);
+*/
+int
+GUI_reallyVPrint(const char *format, va_list ap, int flag);
 
 static void (*showTextBuffer)(char *, int ) = NULL;
 static char *(*getMemoryInfoString)(void) = NULL;
@@ -212,7 +207,7 @@ void GUI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 		if(!get_env(envgVerboseMode))
 		{
 			// Disable outputs, they will still show in the boot log.
-			replace_system_function("_printf", &GUI_verbose);
+			replace_system_function("_printf", &verbose);
 			//drawBootGraphics();
 		}
 		
@@ -241,12 +236,12 @@ void GUI_diplay_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
         replace_system_function("_addBootArg", &GUI_addBootArg);  
         
         replace_system_function("_showHelp", &GUI_showHelp);
-		
-		replace_system_function("_printf", &GUI_printf);
-		replace_system_function("_verbose", &GUI_verbose);
-		replace_system_function("_stop", &GUI_stop);
-		replace_system_function("_showMessage", &GUI_showMessage);
         
+        replace_system_function("_reallyVPrint", &GUI_reallyVPrint);
+		//replace_system_function("_printf", &GUI_printf);
+		//replace_system_function("_verbose", &GUI_verbose);
+		//replace_system_function("_stop", &GUI_stop);
+		replace_system_function("_showMessage", &GUI_showMessage);
 		
 		// Hook for the boot screen 	
 		register_hook_callback("GUI_ExecKernel", &GUI_ExecKernel_hook);
@@ -1200,6 +1195,36 @@ done:
 	return 0;
 }
 
+int
+GUI_reallyVPrint(const char *format, va_list ap, int flag)
+{
+#define LOG    1
+#define PRINT  2
+    
+    if (KernelStart == false)
+    {
+        if (flag & PRINT) {
+            
+            if (getVideoMode() == VGA_TEXT_MODE)
+            {
+                prf(format, ap, putchar);
+            }
+            else
+            {
+                vprf(format, ap);
+            }
+        }
+    }   
+    
+    if (flag & LOG)
+    {
+        /* Kabyl: BooterLog */		
+        prf(format, ap, debug_putc);
+    }    
+    
+    return 0;
+}
+#if 0
 int GUI_verbose(const char * fmt, ...)
 {
     va_list ap;
@@ -1210,7 +1235,7 @@ int GUI_verbose(const char * fmt, ...)
     {
 		if (getVideoMode() == VGA_TEXT_MODE)
 		{
-			prf(fmt, ap, putchar, 0);
+			prf(fmt, ap, putchar);
 		}
 		else
 		{
@@ -1218,19 +1243,10 @@ int GUI_verbose(const char * fmt, ...)
 		}
     }
 	
-	/* Kabyl: BooterLog */
-	struct putc_info pi;
-	
-	if (!getConsoleMsg())
-		return 0;
-	
-	if (((getConsoleCursor() - getConsoleMsg()) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-		return 0;
-	pi.str = getConsoleCursor();
-	pi.last_str = 0;
-	prf(fmt, ap, sputc, &pi);
-	setConsoleCursor(getConsoleCursor() + strlen(getConsoleCursor()));
-	
+	{
+		/* Kabyl: BooterLog */		
+		prf(fmt, ap, debug_putc);
+	}
 	
     va_end(ap);
     return(0);
@@ -1245,26 +1261,18 @@ int GUI_printf(const char * fmt, ...)
 		
 		if (getVideoMode() == VGA_TEXT_MODE)
 		{
-			prf(fmt, ap, putchar, 0);
+			prf(fmt, ap, putchar);
 		}
 		else
 		{
 			vprf(fmt, ap);
 		}
 	}
-	/* Kabyl: BooterLog */
-	struct putc_info pi;
-	
-	if (!getConsoleMsg())
-		return 0;
-	
-	if (((getConsoleCursor() - getConsoleMsg()) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
-		return 0;
-	pi.str = getConsoleCursor();
-	pi.last_str = 0;
-	prf(fmt, ap, sputc, &pi);
-	setConsoleCursor(getConsoleCursor() + strlen(getConsoleCursor()));
-	
+    
+	{
+		/* Kabyl: BooterLog */		
+		prf(fmt, ap, debug_putc);
+	}
 	va_end(ap);
     return 0;
 }
@@ -1278,7 +1286,7 @@ void GUI_stop(const char * fmt, ...)
 	
 	if (getVideoMode() == VGA_TEXT_MODE)
 	{
-		prf(fmt, ap, putchar, 0);
+		prf(fmt, ap, putchar);
 	} 
 	else 
 	{
@@ -1290,7 +1298,7 @@ void GUI_stop(const char * fmt, ...)
 	halt();
 	while (1);
 }
-
+#endif
 void GUI_showHelp(void)
 {
 	if (getVideoMode() == GRAPHICS_MODE) {

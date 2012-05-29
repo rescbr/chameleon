@@ -1,11 +1,12 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
+- Try to sync our prf() with the apple/mach __doprnt() (in Xnu/osfmk/kern/printf.c) to normalize the formating in our printf, sprintf, etc ..., and facilitate bug fixes (almost done !!)
+
 - split nvidia, gma and ati code into separate modules
 - move device_inject, MBR (OSX works better on Guid partition theme anyway), winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 
   will be done simply by destroying the pool
-- Implement snprintf to avoid buffer overflow in some case
 
 - implement cpu topology
 - Backport cconfig from the trunk
@@ -13,9 +14,6 @@ TODO List for Chameleon Boot Loader
 - Implement a Host like in bits to avoid some return issues
 
 - update project with corehash
-
-- Try to sync our prf() with the apple/mach __doprnt() (in Xnu/osfmk/kern/printf.c) to normalize the formating in our printf, sprintf, etc ..., and facilitate bug fixes
-
 
 NOTE: It seems that nvram variables must be set thru efiRuntimeServices->SetVariable(...),
   then, the /options node is filled by kernel depending on the Runtime Services.

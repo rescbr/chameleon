@@ -69,10 +69,6 @@ char dirsrc[22];
 #include "art.h"
 #endif
 
-struct putc_info {
-    char * str;
-    char * last_str;
-};
 
 static int loadThemeImage(char *src, const char *image, int alt_image);
 static void loadBootGraphics(char *src);
@@ -88,7 +84,6 @@ static void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 #if DEBUG_GUI
 static int dprintf( window_t * window, const char * fmt, ...);
 #endif
-static void sputc(int c, struct putc_info * pi);
 
 static inline
 void vramwrite (void *data, int width);
@@ -1750,38 +1745,47 @@ void updateVRAM()
 	}
 }
 
+struct putc_info {
+	char * str;
+	char * last_str;
+};
 static void
-sputc(int c, struct putc_info * pi)
+sputc(int c, void * pi)
 {
-    if (pi->last_str)
-        if (pi->str == pi->last_str) {
-            *(pi->str) = '\0';
-            return;
-        }
-    *(pi->str)++ = c;
+	if (((struct putc_info*)pi)->last_str)
+		if (((struct putc_info*)pi)->str == ((struct putc_info*)pi)->last_str) {
+			*(((struct putc_info*)pi)->str) = '\0';
+			return;
+		}
+	*(((struct putc_info*)pi)->str)++ = c;
 }
 
 int gprintf( window_t * window, const char * fmt, ...)
 {
 	char *formattedtext;
-	
-	va_list ap;
-	
 	struct putc_info pi;
-	
+
+	va_list ap;
+		
 	if ((formattedtext = malloc(1024)) != NULL) {
-		// format the text
-		va_start(ap, fmt);
-		pi.str = formattedtext;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		*pi.str = '\0';
-		va_end(ap);
+		
 		
 		position_t	origin, cursor, bounds;
 		
 		int i;
 		int character;
+		
+		va_start(ap, fmt);
+		
+		localVPrintf(fmt, ap, 0);
+
+		// format the text
+		pi.str = formattedtext;
+		pi.last_str = 0;
+		__doprnt(fmt, ap, sputc, &pi, 10);
+		*pi.str = '\0';
+		
+		va_end(ap);
 		
 		origin.x = MAX( window->cursor.x, window->hborder );
 		origin.y = MAX( window->cursor.y, window->vborder );
@@ -1849,24 +1853,27 @@ static int dprintf( window_t * window, const char * fmt, ...)
 	char *formattedtext;
 	
 	va_list ap;
-	
+	struct putc_info pi;
+    
+    
 	//window = &gui.debug;
 	
-	struct putc_info pi;
-	
 	if ((formattedtext = malloc(1024)) != NULL) {
-		// format the text
-		va_start(ap, fmt);
-		pi.str = formattedtext;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		*pi.str = '\0';
-		va_end(ap);
-		
+				
 		position_t	origin, cursor, bounds;
 		
 		int i;
 		int character;
+		
+		va_start(ap, fmt);
+		
+		// format the text
+		pi.str = formattedtext;
+		pi.last_str = 0;
+		__doprnt(fmt, ap, sputc, &pi, 10);
+		*pi.str = '\0';
+		
+		va_end(ap);
 		
 		origin.x = MAX( gui.debug.cursor.x, window->hborder );
 		origin.y = MAX( gui.debug.cursor.y, window->vborder );
@@ -1929,24 +1936,26 @@ static int dprintf( window_t * window, const char * fmt, ...)
 	return 1;
 }
 #endif
+
 int vprf(const char * fmt, va_list ap)
 {
 	int i;
 	int character;
+	struct putc_info pi;
 	
 	char *formattedtext;
 	window_t *window = &gui.screen;
-	struct putc_info pi;
 	
 	position_t	origin, cursor, bounds;
 	font_t *font = &font_console;
 	
-	if ((formattedtext = malloc(1024)) != NULL) {
+	if ((formattedtext = malloc(1024)) != NULL){
+		
 		// format the text
-		pi.str = formattedtext;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		*pi.str = '\0';
+			pi.str = formattedtext;
+			pi.last_str = 0;
+			__doprnt(fmt, ap, sputc, &pi, 10);
+			*pi.str = '\0';
 		
 		origin.x = MAX( window->cursor.x, window->hborder );
 		origin.y = MAX( window->cursor.y, window->vborder );
@@ -1954,7 +1963,7 @@ int vprf(const char * fmt, va_list ap)
 		bounds.y = ( window->height - ( window->vborder * 2 ) );
 		cursor = origin;
 		
-		for( i=0; i< strlen(formattedtext); i++ )
+		for( i=0; i< strlen(formattedtext) ; i++ )
 		{
 			character = formattedtext[i];
 			character -= 32;

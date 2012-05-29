@@ -164,6 +164,7 @@ void build_pci_dt(void)
 #endif
 }
 
+#if 0
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	char* buffer = malloc(sizeof(char) * 256);
@@ -200,6 +201,7 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 	}
 	return buffer;
 }
+#endif
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
@@ -222,10 +224,9 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 	current = pci_dt;
 	while (current) 
 	{
-		printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
+		printf("%02x:%02x.%x [%04x] [%04x:%04x] \n", 
 			   current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
-			   current->class_id, current->vendor_id, current->device_id, 
-			   get_pci_dev_path(current));
+			   current->class_id, current->vendor_id, current->device_id);
 		dump_pci_dt(current->children);
 		current = current->next;
 	}

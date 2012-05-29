@@ -90,7 +90,6 @@ static char *get_gma_model(uint32_t id) {
 bool setup_gma_devprop(pci_dt_t *gma_dev)
 {
 	//int	len;
-	char *devicepath;
 #if UNUSED
 	volatile uint8_t *regs;
 #endif
@@ -99,18 +98,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	uint8_t BuiltIn = 0x00;
 	uint8_t ClassFix[4] = { 0x00, 0x00, 0x03, 0x00 };
     
-	devicepath = get_pci_dev_path(gma_dev);
-    if (!devicepath) {
-        return false;
-    }
 	bar[0] = pci_config_read32(gma_dev->dev.addr, 0x10);
 #if UNUSED
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 #endif
 	model = get_gma_model((gma_dev->vendor_id << 16) | gma_dev->device_id);
     
-	verbose("Intel %s [%04x:%04x] :: %s\n",
-			model, gma_dev->vendor_id, gma_dev->device_id, devicepath);
+	verbose("Intel %s [%04x:%04x]\n",
+			model, gma_dev->vendor_id, gma_dev->device_id);
 	
 	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 	if (!string)
@@ -120,7 +115,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         safe_set_env(envEFIString,(uint32_t)string);
 	}
 	
-	struct DevPropDevice *device = devprop_add_device(string, devicepath);
+	struct DevPropDevice *device = devprop_add_device(string, gma_dev);
 	
 	if(!device)
 	{

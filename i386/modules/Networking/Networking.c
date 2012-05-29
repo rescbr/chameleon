@@ -104,15 +104,11 @@ static int devprop_add_network_template(struct DevPropDevice *device, uint16_t v
 }
 
 static void set_eth_builtin(pci_dt_t *eth_dev)
-{
-	char *devicepath = get_pci_dev_path(eth_dev);
-    if (!devicepath) {
-        return ;
-    }
+{	
 	struct DevPropDevice *device;
     struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 
-	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
+	verbose("LAN Controller [%04x:%04x]\n", eth_dev->vendor_id, eth_dev->device_id);
 	
 	if (!string)
     {
@@ -121,7 +117,7 @@ static void set_eth_builtin(pci_dt_t *eth_dev)
         safe_set_env(envEFIString,(uint32_t)string);
 	}
     
-	device = devprop_add_device(string, devicepath);
+	device = devprop_add_device(string, eth_dev);
 	if(device)
 	{
 		verbose("Setting up lan keys\n");
@@ -148,15 +144,11 @@ struct wifi_cards known_wifi_cards[] =
 static void set_wifi_airport(pci_dt_t *wlan_dev)
 {
 	char tmp[16];
-	
-	char *devicepath = get_pci_dev_path(wlan_dev);
-    if (!devicepath) {
-        return ;
-    }
+		
 	struct DevPropDevice *device ;
     struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 
-	verbose("Wifi Controller [%04x:%04x] :: %s\n", wlan_dev->vendor_id, wlan_dev->device_id, devicepath);
+	verbose("Wifi Controller [%04x:%04x]\n", wlan_dev->vendor_id, wlan_dev->device_id);
 	
 	if (!string)
     {
@@ -165,7 +157,7 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
         safe_set_env(envEFIString,(uint32_t)string);
 	}
     
-	device = devprop_add_device(string, devicepath);
+	device = devprop_add_device(string, wlan_dev);
 	if(device)
 	{
 		sprintf(tmp, "Airport");
