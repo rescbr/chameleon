@@ -268,7 +268,9 @@ static void printMenuItem( const MenuItem * item, int highlight )
     else
         putca(' ', 0x07, 40);
 	
-    printf("  %40s\n", item->name);
+	char Item[40];
+	snprintf(Item, sizeof(Item), item->name);	
+    printf("  %s\n", Item);
 }
 
 //==========================================================================

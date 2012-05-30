@@ -182,7 +182,17 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, pci_dt_t 
 	}
 	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
 	
-	string->numentries++;
+	if ((string->numentries+1) < MAX_STRING_NUM_ENTRIES)
+    {
+		string->numentries++;
+		
+    }
+    else
+    {
+        free(string->entries);
+        free(device);
+        return NULL;
+    }	
     
 	string_entries_arrey[string->numentries-1] = device;
 	
@@ -305,7 +315,17 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	}
 	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
 	
-	string->numentries++;
+	if ((string->numentries+1) < MAX_STRING_NUM_ENTRIES)
+    {
+		string->numentries++;
+		
+    }
+    else
+    {
+        free(string->entries);
+        free(device);
+        return NULL;
+    }	
     
 	string_entries_arrey[string->numentries-1] = device;
 	
@@ -407,6 +427,10 @@ char *devprop_generate_string(struct DevPropString *string)
 
 	while(i < string->numentries)
 	{
+		if (!(i<MAX_STRING_NUM_ENTRIES)) 
+        {
+            continue;
+        }
 		sprintf(buffer, "%08x%04x%04x", dp_swap32(string_entries_arrey[i]->length),
 				dp_swap16(string_entries_arrey[i]->numentries), string_entries_arrey[i]->WHAT2);
 		
@@ -454,9 +478,13 @@ void devprop_free_string(struct DevPropString *string)
 	int i;
 	
 	struct DevPropDevice **string_entries_arrey = (struct DevPropDevice **) string->entries;
-
+	
 	for(i = 0; i < string->numentries; i++)
 	{
+        if (!(i<MAX_STRING_NUM_ENTRIES)) 
+        {
+            continue;
+        }
 		if(string_entries_arrey[i])
 		{
 			if(string_entries_arrey[i]->data)
@@ -464,11 +492,12 @@ void devprop_free_string(struct DevPropString *string)
 				free(string_entries_arrey[i]->data);
 				string_entries_arrey[i]->data = NULL;
 			}
-			free(string_entries_arrey[i]);
-			string_entries_arrey[i] = NULL;
 		}
 	}
-	
+    
+    free(string->entries);
+    string->entries = NULL;
+    
 	free(string);
 	string = NULL;
 }

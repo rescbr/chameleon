@@ -27,7 +27,7 @@
  *  DRI: Josh de Cesare
  */
 
-#include <sl.h>
+#include "sl.h"
 #include "hfs_CaseTables.h"
 
 #if ! UNCOMPRESSED

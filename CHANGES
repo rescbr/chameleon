@@ -1,3 +1,6 @@
+- security, stability, bugs fixes
+- moved __doprnt to the xnu version
+
 - security and stability fixes
 - Fixed a bug where prf may return a wrong string len (for ex : in the previous versions newStringWithformat("%02x%02x%02x%02x%02x%02x",101,117,104,113,103,100) may not return the entire string) 
 - Fixed a bug in xml.c 

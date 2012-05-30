@@ -528,8 +528,8 @@ void common_boot(int biosdev)
 	}    
 	
 #if DEBUG
-    printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBootVolume)), ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBootVolume))->flags);
-    printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBIOSBootVolume)), ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->flags);
+    printf(" Default: %p, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBootVolume)), ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBootVolume))->flags);
+    printf(" bt(0,0): %p, ->biosdev: %d, ->part_no: %d ->flags: %d\n", ((BVRef)(uint32_t)get_env(envgBIOSBootVolume)), ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->biosdev, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->part_no, ((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->flags);
     getc();
 #endif
     

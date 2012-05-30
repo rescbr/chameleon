@@ -199,15 +199,18 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 {
 	int *ret = (int *)arg1;
 	int c = *(int *)ret;
-	
+	char *kMatchkey = NULL;
+    
 	// Check for xml map in the config file
 	if (match_map == NULL)				
 		match_map = XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"KeyboardMap");
 	
 	if (match_map)
 	{
-		char *kMatchkey = 0; 
-		sprintf(kMatchkey, "%d",c);
+		kMatchkey = newStringWithFormat("%d",c); 
+        if (!kMatchkey) {
+            return;
+        }        
 		TagPtr match_key;
 		if ((match_key = XMLGetProperty(match_map, (const char*)kMatchkey)))
 		{
@@ -227,13 +230,13 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 			map_kb_type =  "NONE"; // Default to QWERTY
 	}
 	
-	if (strcmp(map_kb_type, "AZERTY") == 0)		
+	if (map_kb_type && (strcmp(map_kb_type, "AZERTY") == 0))		
         c = AZERTY_switch(c);
 	
 out:
 	
 	*ret = c;
-	
+	if (kMatchkey) free(kMatchkey);
 }
 
 void Keymapper_start(void);

@@ -27,7 +27,7 @@
  *  DRI: Josh de Cesare
  */
 
-#include <sl.h>
+#include "sl.h"
 #include <hfs/hfs_format.h>
 
 #include "hfs.h"
@@ -418,9 +418,9 @@ HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     }
 	
 #if DEBUG
-    printf("extent start 0x%x\n", (unsigned long)GetExtentStart(extents, 0));
-    printf("block size 0x%x\n", (unsigned long)gBlockSize);
-    printf("Allocation offset 0x%x\n", (unsigned long)gAllocationOffset);
+    printf("extent start 0x%lx\n", (unsigned long)GetExtentStart(extents, 0));
+    printf("block size 0x%lx\n", (unsigned long)gBlockSize);
+    printf("Allocation offset 0x%lx\n", (unsigned long)gAllocationOffset);
 #endif
     *firstBlock = ((unsigned long long)GetExtentStart(extents, 0) * (unsigned long long) gBlockSize + gAllocationOffset) / 512ULL;
     return 0;

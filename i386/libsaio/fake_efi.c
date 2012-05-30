@@ -696,16 +696,7 @@ static VOID setupSystemType()
     kType = get_env(envType);
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(uint8_t), &kType);
 }
-#ifdef NO_BOOT_IMG
-struct boot_progress_element {
-	unsigned int	width;
-	unsigned int	height;
-	int			yOffset;
-	unsigned int	res[5];
-	unsigned char	data[0];
-};
-typedef struct boot_progress_element boot_progress_element;
-#endif
+
 static VOID setupEfiDeviceTree(void)
 {	
 	Node		*node;
@@ -748,7 +739,7 @@ static VOID setupEfiDeviceTree(void)
 			((boot_progress_element *)bootPict)->yOffset = kFailedBootOffset;	
 			if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
             {
-                ((boot_progress_element *)bootPict)->res[0] = size - 32; 
+                ((boot_progress_element *)bootPict)->data_size = size - 32; 
             }
 			bcopy((char *)gFailedBootPict, (char *)(bootPict + 32), size - 32);
 		}

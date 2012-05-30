@@ -103,6 +103,7 @@ void setupBooterLog(void)
  */
 void putchar(char c)
 {
+	
 	if ( c == '\t' )
 	{
 		for (c = 0; c < 8; c++) putc(' ');
@@ -113,7 +114,7 @@ void putchar(char c)
     {
 		putc('\r');
     }
-	
+		
 	putc(c);
 }
 

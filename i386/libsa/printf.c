@@ -119,6 +119,8 @@ _doprnt(
 {
     __doprnt(fmt, argp, dummy_putc, putc, radix);
 }
+#endif
+#if 1
 #define Ctod(c) ((c) - '0')
 
 #define MAXBUF (sizeof(long long int) * 8)	/* enough for binary */
@@ -651,7 +653,7 @@ snprintf(char *str, size_t size, const char *format, ...)
     return(retval);
 }
 
-#if 1
+#if 0
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *

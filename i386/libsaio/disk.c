@@ -310,7 +310,7 @@ static int Biosread( int biosdev, unsigned long long secno )
     }
     divisor = bps / BPS;
 	
-    DEBUG_DISK(("Biosread dev %x sec %d bps %d\n", biosdev, secno, bps));
+    DEBUG_DISK(("Biosread dev %x sec %llu bps %d\n", biosdev, secno, bps));
 	
     // To read the disk sectors, use EBIOS if we can. Otherwise,
     // revert to the standard BIOS calls.
@@ -338,8 +338,8 @@ static int Biosread( int biosdev, unsigned long long secno )
                 rc = 0;
                 break;
             }
-            printf("  EBIOS read error: %s\n", bios_error(rc), rc);
-            printf("    Block 0x%x Sectors %d\n", secno, xnsecs);
+            printf("  EBIOS read error (%d): %s\n", rc, bios_error(rc) );
+            printf("    Block 0x%llx Sectors %d\n", secno, xnsecs);
             sleep(1);
         }
     }
@@ -380,8 +380,8 @@ static int Biosread( int biosdev, unsigned long long secno )
                 rc = 0;
                 break;
             }
-            printf("  BIOS read error: %s\n", bios_error(rc), rc);
-            printf("    Block %d, Cyl %d Head %d Sector %d\n",
+            printf("  BIOS read error(%d): %s\n", rc, bios_error(rc));
+            printf("    Block %llu, Cyl %d Head %d Sector %d\n",
                    secno, cyl, head, sec);
             sleep(1);
         }
@@ -431,7 +431,7 @@ static int readBytes( int biosdev, unsigned long long blkno,
     int    error;
     int    copy_len;
 	
-    DEBUG_DISK(("%s: dev %x block %x [%d] -> 0x%x...", __FUNCTION__,
+    DEBUG_DISK(("%s: dev %x block %llu [%d] -> 0x%x...", __FUNCTION__,
                 biosdev, blkno, byteCount, (unsigned)cbuf));
 	
     for ( ; byteCount; cbuf += copy_len, blkno++ )
@@ -1955,7 +1955,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
         if (!bvr) {
             break;
         }
-		printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
+		printf(" bvr: %p, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
 	}
 	printf("count: %d\n", bvCount);
 	getc();

@@ -1,8 +1,6 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
-- Try to sync our prf() with the apple/mach __doprnt() (in Xnu/osfmk/kern/printf.c) to normalize the formating in our printf, sprintf, etc ..., and facilitate bug fixes (almost done !!)
-
 - split nvidia, gma and ati code into separate modules
 - move device_inject, MBR (OSX works better on Guid partition theme anyway), winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 

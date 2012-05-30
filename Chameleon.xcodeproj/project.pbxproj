@@ -210,7 +210,6 @@
 		AB43B2E214C37E520018D529 /* libsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libsa.h; sourceTree = "<group>"; };
 		AB43B2E314C37E520018D529 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AB43B2E414C37E520018D529 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
-		AB43B2E514C37E520018D529 /* prf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = prf.c; sourceTree = "<group>"; };
 		AB43B2E614C37E520018D529 /* printf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = printf.c; sourceTree = "<group>"; };
 		AB43B2E714C37E520018D529 /* qsort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qsort.c; sourceTree = "<group>"; };
 		AB43B2E914C37E520018D529 /* setjmp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = setjmp.s; sourceTree = "<group>"; };
@@ -953,7 +952,6 @@
 				AB43B2E214C37E520018D529 /* libsa.h */,
 				AB43B2E314C37E520018D529 /* Makefile */,
 				AB43B2E414C37E520018D529 /* memory.h */,
-				AB43B2E514C37E520018D529 /* prf.c */,
 				AB43B2E614C37E520018D529 /* printf.c */,
 				AB43B2E714C37E520018D529 /* qsort.c */,
 				AB43B2E914C37E520018D529 /* setjmp.s */,

@@ -74,7 +74,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
     Property *prop;
     
-    DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%x)\n", DT__GetName(node), name, length, value);
+    DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, %p)\n", DT__GetName(node), name, length, value);
     if (freeProperties == NULL) {
         void *buf = malloc(kAllocSize);
         if (buf == 0) return 0;
@@ -110,7 +110,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
     node->last_prop = prop;
     prop->next = 0;
     
-    DPRINTF("Done [0x%x]\n", prop);
+    DPRINTF("Done [%p]\n", prop);
     
     DTInfo.numProperties++;
     DTInfo.totalPropertySize += RoundToLong(length);
@@ -142,11 +142,11 @@ DT__AddChild(Node *parent, const char *name)
             node++;
         }
     }
-    DPRINTF("DT__AddChild(0x%x, '%s')\n", parent, name);
+    DPRINTF("DT__AddChild(%p, '%s')\n", parent, name);
     node = freeNodes;
     freeNodes = node->next;
-    DPRINTF("Got free node 0x%x\n", node);
-    DPRINTF("prop = 0x%x, children = 0x%x, next = 0x%x\n", node->properties, node->children, node->next);
+    DPRINTF("Got free node %p\n", node);
+    DPRINTF("prop = %p, children = %p, next = %p\n", node->properties, node->children, node->next);
     
     if (parent == NULL) {
         rootNode = node;
@@ -205,7 +205,7 @@ DT__Finalize(void)
     for (prop = allocedProperties; prop != NULL; prop = prop->next) {
         if (prop->value) free(prop->value);
         if (prop->name) free(prop->name);
-
+		
     }
     allocedProperties = NULL;
     freeProperties = NULL;
@@ -269,7 +269,7 @@ DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
     uint32_t totalSize;
     void *buf;
     
-    DPRINTF("DT__FlattenDeviceTree(0x%x, 0x%x)\n", buffer_p, length);
+    DPRINTF("DT__FlattenDeviceTree(%p, %u)\n", buffer_p, *length);
 #if DEBUG
     if (buffer_p) DT__PrintTree(rootNode);
 #endif
@@ -331,7 +331,7 @@ DT__FindNode(const char *path, bool createIfMissing)
     
     // Start at root
     node = rootNode;
-    DPRINTF("root = 0x%x\n", rootNode);
+    DPRINTF("root = %p\n", rootNode);
     
     while (node) {
         // Skip leading slash
@@ -347,7 +347,7 @@ DT__FindNode(const char *path, bool createIfMissing)
         DPRINTF("Node '%s'\n", nameBuf);
         
         for (child = node->children; child != 0; child = child->next) {
-            DPRINTF("Child 0x%x\n", child);
+            DPRINTF("Child %p\n", child);
             if (strcmp(DT__GetName(child), nameBuf) == 0) {
                 break;
             }

@@ -257,7 +257,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		return 0;
 	}
 	
-#if DEBUG
+#if 0
 	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 		   segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
 		   (unsigned) segCmd->nsects, (unsigned)segCmd->flags);

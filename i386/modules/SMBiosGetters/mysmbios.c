@@ -543,13 +543,13 @@ const char* sm_get_random_productNumber(void)
         // Append all charaters to the string 
         char tmp[2];
         bzero(tmp,sizeof(tmp));
-        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn1]);
-        strlcpy (str, tmp, sizeof(tmp)+1);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn1]);
+        strlcpy (str, tmp, sizeof(str));
         
-        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn2]);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn2]);
         strcat (str, tmp);
         
-        sprintf(tmp,"%c",sn_gen_pn_str[rand_sn3]);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn3]);
         strcat (str, tmp);
         
         DBG ("fake_productNumber: %s\n",str);
@@ -566,17 +566,17 @@ const char* sm_get_random_week(void)
         // Get randomized characters
         int rand_week ;
         rand_week = arc4random_unirange(0,47);
-                
+        
         // Append all charaters to the string 
         char tmp[3];
         bzero(tmp,sizeof(tmp));
         
         if (rand_week < 10) {
-            sprintf(tmp,"0%d",rand_week);
-            strlcpy (str, tmp, sizeof(tmp)+1);
+            snprintf(tmp, sizeof(tmp),"0%d",rand_week);
+            strlcpy (str, tmp, sizeof(str));
         } else if (rand_week < 100) { // avoid overflow in case random return a number >= 100
-            sprintf(tmp,"%d",rand_week);
-            strlcpy (str, tmp, sizeof(tmp)+1);
+            snprintf(tmp, sizeof(tmp),"%d",rand_week);
+            strlcpy (str, tmp, sizeof(str));
         }      
         
         DBG ("fake_week: %s\n",str);
@@ -600,8 +600,8 @@ const char* sm_get_random_year(void)
         bzero(tmp,sizeof(tmp));
         
         if (rand_year < 10) {
-            sprintf(tmp,"%d",rand_year);
-            strlcpy (str, tmp, sizeof(tmp)+1);
+            snprintf(tmp, sizeof(tmp),"%d",rand_year);
+            strlcpy (str, tmp, sizeof(str));
         }
         
         DBG ("fake_year: %s\n",str);
