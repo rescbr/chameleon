@@ -29,9 +29,12 @@ pci_dt_t * dram_controller_dev = NULL;
 /** Return if a CPU feature specified by feature is activated (true) or not (false)  */
 bool platformCPUFeature(uint32_t feature)
 {
-	if (Platform.CPU.Features & feature) {
+	if (Platform.CPU.Features & feature)
+	{
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }

@@ -80,10 +80,12 @@
 #include "disk.h"
 // For EFI_GUID
 #include "efi.h"
-#include "efi_tables.h"
+
 
 typedef struct gpt_hdr gpt_hdr;
 typedef struct gpt_ent gpt_ent;
+
+#include "efi_tables.h"
 
 #define PROBEFS_SIZE     BPS * 4 /* buffer size for filesystem probe */
 #define CD_BPS           2048    /* CD-ROM block size */
@@ -92,43 +94,31 @@ typedef struct gpt_ent gpt_ent;
 #define kAPMSector       2       /* Sector number of Apple partition map */
 #define kAPMCDSector     8       /* Translated sector of Apple partition map on a CD */
 
-/*
- * IORound and IOTrunc convenience functions, in the spirit
- * of vm's round_page() and trunc_page().
- */
-#define IORound(value,multiple) \
-        ((((value) + (multiple) - 1) / (multiple)) * (multiple))
+// IORound and IOTrunc convenience functions, in the spirit of vm's round_page() and trunc_page().
+#define IORound(value, multiple) ((((value) + (multiple) - 1) / (multiple)) * (multiple))
+#define IOTrunc(value, multiple) (((value) / (multiple)) * (multiple));
 
-#define IOTrunc(value,multiple) \
-        (((value) / (multiple)) * (multiple));
-
-/*
- * trackbuf points to the start of the track cache. Biosread()
- * will store the sectors read from disk to this memory area.
- *
- * biosbuf points to a sector within the track cache, and is
- * updated by Biosread().
- */
+// trackbuf points to the start of the track cache. Biosread() 
+// will store the sectors read from disk to this memory area.
 static char * const trackbuf = (char *) ptov(BIOS_ADDR);
+
+// biosbuf points to a sector within the track cache, and is updated by Biosread().
 static char * biosbuf;
 
-/*
- * Map a disk drive to bootable volumes contained within.
- */
-struct DiskBVMap {
-    int                biosdev;  // BIOS device number (unique)
-    BVRef              bvr;      // chain of boot volumes on the disk
-    int                bvrcnt;   // number of boot volumes
-    struct DiskBVMap * next;     // linkage to next mapping
+// Map a disk drive to bootable volumes contained within.
+struct DiskBVMap
+{
+    int					biosdev;	// BIOS device number (unique).
+    BVRef				bvr;		// Chain of boot volumes on the disk.
+    int					bvrcnt;		// Number of boot volumes.
+    struct DiskBVMap *	next;		// Linkage to next mapping.
 };
 
 static struct DiskBVMap * gDiskBVMap  = NULL;
 static struct disk_blk0 * gBootSector = NULL;
 
-// Function pointers to be filled in if ramdisks are available:
-int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
-                      unsigned int byteoff,
-                      unsigned int byteCount, void * buffer ) = NULL;
+// Function pointers to be filled in when a ramdisk is available:
+int (*p_ramdiskReadBytes)(int biosdev, unsigned int blkno, unsigned int byteoff, unsigned int byteCount, void * buffer) = NULL;
 int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip) = NULL;
 
 static bool getOSVersion(BVRef bvr, char *str);
@@ -137,275 +127,294 @@ extern void spinActivityIndicator(int sectors);
 
 //==========================================================================
 
-static int getDriveInfo( int biosdev,  struct driveInfo *dip )
+static int getDriveInfo(int biosdev, struct driveInfo *dip)
 {
-    static struct driveInfo cached_di;
-    int cc;
-    
-    // Real BIOS devices are 8-bit, so anything above that is for internal use.
-    // Don't cache ramdisk drive info since it doesn't require several BIOS
-    // calls and is thus not worth it.
-    if(biosdev >= 0x100)
-    {
-        if(p_get_ramdisk_info != NULL)
-            cc = (*p_get_ramdisk_info)(biosdev, dip);
-        else
-            cc = -1;
-        if(cc < 0)
-        {
-            dip->valid = 0;
-            return -1;
-        }
-        else
-            return 0;
-    }
+	static struct driveInfo cached_di;
+	int cc;
 
-    if ( !cached_di.valid || biosdev != cached_di.biosdev )
-    {
-	cc = get_drive_info(biosdev, &cached_di);
-        if (cc < 0) {
-	    cached_di.valid = 0;
-            DEBUG_DISK(("get_drive_info returned error\n"));
-	    return (-1); // BIOS call error
+	// Real BIOS devices are 8-bit, so anything above that is for internal use.
+	// Don't cache ramdisk drive info since it doesn't require several BIOS
+	// calls and is thus not worth it.
+	if (biosdev >= 0x100)
+	{
+		if (p_get_ramdisk_info != NULL)
+		{
+			cc = (*p_get_ramdisk_info)(biosdev, dip);
+		}
+		else
+		{
+			cc = -1;
+		}
+		if (cc < 0)
+		{
+			dip->valid = 0;
+			return -1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
-    }
 
-    bcopy(&cached_di, dip, sizeof(cached_di));
+	if (!cached_di.valid || biosdev != cached_di.biosdev)
+	{
+	cc = get_drive_info(biosdev, &cached_di);
 
-    return 0;
+		if (cc < 0)
+		{
+			cached_di.valid = 0;
+			DEBUG_DISK(("get_drive_info returned error\n"));
+			return (-1); // BIOS call error
+		}
+	}
+
+	bcopy(&cached_di, dip, sizeof(cached_di));
+
+	return 0;
 }
 
 //==========================================================================
 // Maps (E)BIOS return codes to message strings.
 
-struct NamedValue {
-    unsigned char value;
-    const char *  name;
+struct NamedValue
+{
+	unsigned char value;
+	const char *  name;
 };
 
-static const char * getNameForValue( const struct NamedValue * nameTable,
-                                     unsigned char value )
+static const char * getNameForValue(const struct NamedValue * nameTable, unsigned char value)
 {
-    const struct NamedValue * np;
+	const struct NamedValue * np;
 
-    for ( np = nameTable; np->value; np++)
-        if (np->value == value)
-            return np->name;
-
-    return NULL;
+	for ( np = nameTable; np->value; np++)
+	{
+		if (np->value == value)
+		{
+			return np->name;
+		}
+	}
+	return NULL;
 }
 
 #define ECC_CORRECTED_ERR 0x11
 
 static const struct NamedValue bios_errors[] = {
-    { 0x10, "Media error"                },
-    { 0x11, "Corrected ECC error"        },
-    { 0x20, "Controller or device error" },
-    { 0x40, "Seek failed"                },
-    { 0x80, "Device timeout"             },
-    { 0xAA, "Drive not ready"            },
-    { 0x00, 0                            }
+	{ 0x10, "Media error"                },
+	{ 0x11, "Corrected ECC error"        },
+	{ 0x20, "Controller or device error" },
+	{ 0x40, "Seek failed"                },
+	{ 0x80, "Device timeout"             },
+	{ 0xAA, "Drive not ready"            },
+	{ 0x00, 0                            }
 };
 
 static const char * bios_error(int errnum)
 {
-    static char  errorstr[] = "Error 0x00";
-    const char * errname;
+	static char  errorstr[] = "Error 0x00";
+	const char * errname;
 
-    errname = getNameForValue( bios_errors, errnum );
-    if ( errname ) return errname;
+	errname = getNameForValue(bios_errors, errnum);
 
-    sprintf(errorstr, "Error 0x%02x", errnum);
-    return errorstr;   // No string, print error code only
+	if (errname)
+	{
+		return errname;
+	}
+
+	sprintf(errorstr, "Error 0x%02x", errnum);
+	return errorstr; // No string, print error code only
 }
 
 //==========================================================================
-// Use BIOS INT13 calls to read the sector specified. This function will
-// also perform read-ahead to cache a few subsequent sector to the sector
-// cache.
+// Use BIOS INT13 calls to read the sector specified. This function will also
+// perform read-ahead to cache a few subsequent sector to the sector cache.
 // 
-// Return:
-//   0 on success, or an error code from INT13/F2 or INT13/F42 BIOS call.
+// Returns 0 on success, or an error code from INT13/F2 or INT13/F42 BIOS call.
 
 static bool cache_valid = false;
 
-static int Biosread( int biosdev, unsigned long long secno )
+static int Biosread(int biosdev, unsigned long long secno)
 {
-    static int xbiosdev, xcyl, xhead;
-    static unsigned int xsec, xnsecs;
-    struct driveInfo di;
+	static int xbiosdev, xcyl, xhead;
+	static unsigned int xsec, xnsecs;
+	struct driveInfo di;
 
-    int  rc = -1;
-    int  cyl, head, sec;
-    int  tries = 0;
-    int bps, divisor;
+	int  rc = -1;
+	int  cyl, head, sec;
+	int  tries = 0;
+	int bps, divisor;
 
-    if (getDriveInfo(biosdev, &di) < 0) {
-	return -1;
-    }
-    if (di.no_emulation) {
-	/* Always assume 2k block size; BIOS may lie about geometry */
-	bps = 2048;
-    } else {
-	bps = di.di.params.phys_nbps;
-        if (bps == 0) {
-            return -1;
-        }
-    }
-    divisor = bps / BPS;
+	if (getDriveInfo(biosdev, &di) < 0)
+	{
+		return -1;
+	}
+	if (di.no_emulation)
+	{
+		/* Always assume 2k block size; BIOS may lie about geometry */
+		bps = 2048;
+	}
+	else
+	{
+		bps = di.di.params.phys_nbps;
 
-    DEBUG_DISK(("Biosread dev %x sec %d bps %d\n", biosdev, secno, bps));
+		if (bps == 0)
+		{
+			return -1;
+		}
+	}
+	divisor = bps / BPS;
 
-    // To read the disk sectors, use EBIOS if we can. Otherwise,
-    // revert to the standard BIOS calls.
+	DEBUG_DISK(("Biosread dev %x sec %d bps %d\n", biosdev, secno, bps));
 
-    if ((biosdev >= kBIOSDevTypeHardDrive) &&
-        (di.uses_ebios & EBIOS_FIXED_DISK_ACCESS))
-    {
-        if (cache_valid &&
-            (biosdev == xbiosdev) &&
-            (secno >= xsec) &&
-            ((unsigned int)secno < (xsec + xnsecs)))
-        {
-            biosbuf = trackbuf + (BPS * (secno - xsec));
-            return 0;
-        }
+	// To read the disk sectors, use EBIOS if we can. Otherwise,
+	// revert to the standard BIOS calls.
 
-        xnsecs = N_CACHE_SECS;
-        xsec   = (secno / divisor) * divisor;
-        cache_valid = false;
+	if ((biosdev >= kBIOSDevTypeHardDrive) && (di.uses_ebios & EBIOS_FIXED_DISK_ACCESS))
+	{
+		if (cache_valid && (biosdev == xbiosdev) && (secno >= xsec) && ((unsigned int)secno < (xsec + xnsecs)))
+		{
+			biosbuf = trackbuf + (BPS * (secno - xsec));
+			return 0;
+		}
 
-        while ((rc = ebiosread(biosdev, secno / divisor, xnsecs / divisor)) && (++tries < 5))
-        {
-            if (rc == ECC_CORRECTED_ERR) {
-                /* Ignore corrected ECC errors */
-                rc = 0;
-                break;
-            }
-            error("  EBIOS read error: %s\n", bios_error(rc), rc);
-            error("    Block 0x%x Sectors %d\n", secno, xnsecs);
-            sleep(1);
-        }
-    }
-    else
-    {
-	/* spc = spt * heads */
-	int spc = (di.di.params.phys_spt * di.di.params.phys_heads);
-        cyl  = secno / spc;
-        head = (secno % spc) / di.di.params.phys_spt;
-        sec  = secno % di.di.params.phys_spt;
+		xnsecs = N_CACHE_SECS;
+		xsec = (secno / divisor) * divisor;
+		cache_valid = false;
 
-        if (cache_valid &&
-            (biosdev == xbiosdev) &&
-            (cyl == xcyl) &&
-            (head == xhead) &&
-            ((unsigned int)sec >= xsec) &&
-            ((unsigned int)sec < (xsec + xnsecs)))
-        {
-            // this sector is in trackbuf cache
-            biosbuf = trackbuf + (BPS * (sec - xsec));
-            return 0;
-        }
+		while ((rc = ebiosread(biosdev, secno / divisor, xnsecs / divisor)) && (++tries < 5))
+		{
+			if (rc == ECC_CORRECTED_ERR)
+			{
+				/* Ignore corrected ECC errors */
+				rc = 0;
+				break;
+			}
 
-        // Cache up to a track worth of sectors, but do not cross a
-        // track boundary.
+			error("  EBIOS read error: %s\n", bios_error(rc), rc);
+			error("    Block 0x%x Sectors %d\n", secno, xnsecs);
+			sleep(1);
+		}
+	}
 
-        xcyl   = cyl;
-        xhead  = head;
-        xsec   = sec;
-        xnsecs = ((unsigned int)(sec + N_CACHE_SECS) > di.di.params.phys_spt) ? (di.di.params.phys_spt - sec) : N_CACHE_SECS;
-        cache_valid = false;
+	else
+	{
+		/* spc = spt * heads */
+		int spc = (di.di.params.phys_spt * di.di.params.phys_heads);
+		cyl  = secno / spc;
+		head = (secno % spc) / di.di.params.phys_spt;
+		sec  = secno % di.di.params.phys_spt;
 
-        while ((rc = biosread(biosdev, cyl, head, sec, xnsecs)) &&
-               (++tries < 5))
-        {
-            if (rc == ECC_CORRECTED_ERR) {
-                /* Ignore corrected ECC errors */
-                rc = 0;
-                break;
-            }
-            error("  BIOS read error: %s\n", bios_error(rc), rc);
-            error("    Block %d, Cyl %d Head %d Sector %d\n",
-                  secno, cyl, head, sec);
-            sleep(1);
-        }
-    }
+		if (cache_valid && (biosdev == xbiosdev) && (cyl == xcyl) &&
+			(head == xhead) && ((unsigned int)sec < (xsec + xnsecs)))
+		{
+			// this sector is in trackbuf cache
+			biosbuf = trackbuf + (BPS * (sec - xsec));
+			return 0;
+		}
 
-    // If the BIOS reported success, mark the sector cache as valid.
+		// Cache up to a track worth of sectors, but do not cross a track boundary.
 
-    if (rc == 0) {
-        cache_valid = true;
-    }
-    biosbuf  = trackbuf + (secno % divisor) * BPS;
-    xbiosdev = biosdev;
+		xcyl   = cyl;
+		xhead  = head;
+		xsec   = sec;
+		xnsecs = ((unsigned int)(sec + N_CACHE_SECS) > di.di.params.phys_spt) ? (di.di.params.phys_spt - sec) : N_CACHE_SECS;
+
+		cache_valid = false;
+
+		while ((rc = biosread(biosdev, cyl, head, sec, xnsecs)) && (++tries < 5))
+		{
+			if (rc == ECC_CORRECTED_ERR)
+			{
+				/* Ignore corrected ECC errors */
+				rc = 0;
+				break;
+			}
+			error("  BIOS read error: %s\n", bios_error(rc), rc);
+			error("  Block %d, Cyl %d Head %d Sector %d\n",
+			secno, cyl, head, sec);
+			sleep(1);
+		}
+	}
+
+	// If the BIOS reported success, mark the sector cache as valid.
+
+	if (rc == 0)
+	{
+		cache_valid = true;
+	}
+
+	biosbuf  = trackbuf + (secno % divisor) * BPS;
+	xbiosdev = biosdev;
     
-    spinActivityIndicator(xnsecs);
+	spinActivityIndicator(xnsecs);
 
-    return rc;
+	return rc;
 }
 
 //==========================================================================
 
-int testBiosread( int biosdev, unsigned long long secno )
+int testBiosread(int biosdev, unsigned long long secno)
 {
 	return Biosread(biosdev, secno);
 }
 
 //==========================================================================
 
-static int readBytes( int biosdev, unsigned long long blkno,
-                      unsigned int byteoff,
-                      unsigned int byteCount, void * buffer )
+static int readBytes(int biosdev, unsigned long long blkno, unsigned int byteoff, unsigned int byteCount, void * buffer)
 {
-    // ramdisks require completely different code for reading.
-    if(p_ramdiskReadBytes != NULL && biosdev >= 0x100)
-        return (*p_ramdiskReadBytes)(biosdev, blkno, byteoff, byteCount, buffer);
+	// ramdisks require completely different code for reading.
+	if(p_ramdiskReadBytes != NULL && biosdev >= 0x100)
+	{
+		return (*p_ramdiskReadBytes)(biosdev, blkno, byteoff, byteCount, buffer);
+	}
 
-    char * cbuf = (char *) buffer;
-    int    error;
-    int    copy_len;
+	char * cbuf = (char *) buffer;
+	int error;
+	int copy_len;
 
-    DEBUG_DISK(("%s: dev %x block %x [%d] -> 0x%x...", __FUNCTION__,
-                biosdev, blkno, byteCount, (unsigned)cbuf));
+	DEBUG_DISK(("%s: dev %x block %x [%d] -> 0x%x...", __FUNCTION__, biosdev, blkno, byteCount, (unsigned)cbuf));
 
-    for ( ; byteCount; cbuf += copy_len, blkno++ )
-    {
-        error = Biosread( biosdev, blkno );
-        if ( error )
-        {
-            DEBUG_DISK(("error\n"));
-            return (-1);
-        }
+	for (; byteCount; cbuf += copy_len, blkno++)
+	{
+		error = Biosread(biosdev, blkno);
 
-        copy_len = ((byteCount + byteoff) > BPS) ? (BPS - byteoff) : byteCount;
-        bcopy( biosbuf + byteoff, cbuf, copy_len );
-        byteCount -= copy_len;
-        byteoff = 0;
-    }
+		if (error)
+		{
+			DEBUG_DISK(("error\n"));
+			return (-1);
+		}
 
-    DEBUG_DISK(("done\n"));
+		copy_len = ((byteCount + byteoff) > BPS) ? (BPS - byteoff) : byteCount;
+		bcopy( biosbuf + byteoff, cbuf, copy_len );
+		byteCount -= copy_len;
+		byteoff = 0;
+	}
 
-    return 0;    
+	DEBUG_DISK(("done\n"));
+
+	return 0;    
 }
 
 //==========================================================================
 
 static int isExtendedFDiskPartition( const struct fdisk_part * part )
 {
-    static unsigned char extParts[] =
-    {
-        0x05,   /* Extended */
-        0x0f,   /* Win95 extended */
-        0x85,   /* Linux extended */
-    };
+	static unsigned char extParts[] =
+	{
+		0x05,   /* Extended */
+		0x0f,   /* Win95 extended */
+		0x85,   /* Linux extended */
+	};
 
-    unsigned int i;
+	unsigned int i;
 
-    for (i = 0; i < sizeof(extParts)/sizeof(extParts[0]); i++)
-    {
-        if (extParts[i] == part->systid) return 1;
-    }
-    return 0;
+	for (i = 0; i < sizeof(extParts)/sizeof(extParts[0]); i++)
+	{
+		if (extParts[i] == part->systid)
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
 
 //==========================================================================
@@ -413,87 +422,88 @@ static int isExtendedFDiskPartition( const struct fdisk_part * part )
 static int getNextFDiskPartition( int biosdev, int * partno,
                                   const struct fdisk_part ** outPart )
 {
-    static int                 sBiosdev = -1;
-    static int                 sNextPartNo;
-    static unsigned int        sFirstBase;
-    static unsigned int        sExtBase;
-    static unsigned int        sExtDepth;
-    static struct fdisk_part * sExtPart;
-    struct fdisk_part *        part;
+	static int                 sBiosdev = -1;
+	static int                 sNextPartNo;
+	static unsigned int        sFirstBase;
+	static unsigned int        sExtBase;
+	static unsigned int        sExtDepth;
+	static struct fdisk_part * sExtPart;
+	struct fdisk_part *        part;
 
-    if ( sBiosdev != biosdev || *partno < 0 )
-    {
-        // Fetch MBR.
-        if ( readBootSector( biosdev, DISK_BLK0, 0 ) ) return 0;
+	if ( sBiosdev != biosdev || *partno < 0 )
+	{
+		// Fetch MBR.
+		if ( readBootSector( biosdev, DISK_BLK0, 0 ) ) return 0;
 
-        sBiosdev    = biosdev;
-        sNextPartNo = 0;
-        sFirstBase  = 0;
-        sExtBase    = 0;
-        sExtDepth   = 0;
-        sExtPart    = NULL;
-    }
+		sBiosdev    = biosdev;
+		sNextPartNo = 0;
+		sFirstBase  = 0;
+		sExtBase    = 0;
+		sExtDepth   = 0;
+		sExtPart    = NULL;
+	}
 
-    while (1)
-    {
-        part  = NULL;
+	while (1)
+	{
+		part  = NULL;
 
-        if ( sNextPartNo < FDISK_NPART )
-        {
-            part = (struct fdisk_part *) gBootSector->parts[sNextPartNo];
-        }
-        else if ( sExtPart )
-        {
-            unsigned int blkno = sExtPart->relsect + sFirstBase;
+		if ( sNextPartNo < FDISK_NPART )
+		{
+			part = (struct fdisk_part *) gBootSector->parts[sNextPartNo];
+		}
+		else if ( sExtPart )
+		{
+			unsigned int blkno = sExtPart->relsect + sFirstBase;
 
-            // Save the block offset of the first extended partition.
+			// Save the block offset of the first extended partition.
 
-            if (sExtDepth == 0) {
-                sFirstBase = blkno;
-            }
-            sExtBase = blkno;
+			if (sExtDepth == 0)
+			{
+				sFirstBase = blkno;
+			}
+			sExtBase = blkno;
 
-            // Load extended partition table.
+			// Load extended partition table.
 
-            if ( readBootSector( biosdev, blkno, 0 ) == 0 )
-            {
-                sNextPartNo = 0;
-                sExtDepth++;
-                sExtPart = NULL;
-                continue;
-            }
-            // Fall through to part == NULL
-        }
+			if ( readBootSector( biosdev, blkno, 0 ) == 0 )
+			{
+				sNextPartNo = 0;
+				sExtDepth++;
+				sExtPart = NULL;
+				continue;
+			}
+			// Fall through to part == NULL
+		}
 
-        if ( part == NULL ) break;  // Reached end of partition chain.
+		if ( part == NULL ) break;  // Reached end of partition chain.
 
-        // Advance to next partition number.
+		// Advance to next partition number.
 
-        sNextPartNo++;
+		sNextPartNo++;
 
-        if ( isExtendedFDiskPartition(part) )
-        {
-            sExtPart = part;
-            continue;
-        }
+		if ( isExtendedFDiskPartition(part) )
+		{
+			sExtPart = part;
+			continue;
+		}
 
-        // Skip empty slots.
+		// Skip empty slots.
 
-        if ( part->systid == 0x00 )
-        {
-            continue;
-        }
+		if ( part->systid == 0x00 )
+		{
+			continue;
+		}
 
-        // Change relative offset to an absolute offset.
-        part->relsect += sExtBase;
+		// Change relative offset to an absolute offset.
+		part->relsect += sExtBase;
 
-        *outPart = part;
-        *partno  = sExtDepth ? (int)(sExtDepth + FDISK_NPART) : sNextPartNo;
+		*outPart = part;
+		*partno  = sExtDepth ? (int)(sExtDepth + FDISK_NPART) : sNextPartNo;
 
-        break;
-    }
+		break;
+	}
 
-    return (part != NULL);
+	return (part != NULL);
 }
 
 //==========================================================================
@@ -509,27 +519,29 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
                             BVFree bvFreeFunc,
                             int probe, int type, unsigned int bvrFlags )
 {
-    BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
-    if ( bvr )
-    {
-        bzero(bvr, sizeof(*bvr));
+	BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
+	if ( bvr )
+	{
+		bzero(bvr, sizeof(*bvr));
 
-        bvr->biosdev        = biosdev;
-        bvr->part_no        = partno;
-        bvr->part_boff      = blkoff;
-        bvr->part_type      = part->systid;
-        bvr->fs_loadfile    = loadFunc;
-        bvr->fs_readfile    = readFunc;
-        bvr->fs_getdirentry = getdirFunc;
-        bvr->fs_getfileblock= getBlockFunc;
-        bvr->fs_getuuid     = getUUIDFunc;
-        bvr->description    = getDescriptionFunc;
-        bvr->type           = type;
-        bvr->bv_free        = bvFreeFunc;
+		bvr->biosdev        = biosdev;
+		bvr->part_no        = partno;
+		bvr->part_boff      = blkoff;
+		bvr->part_type      = part->systid;
+		bvr->fs_loadfile    = loadFunc;
+		bvr->fs_readfile    = readFunc;
+		bvr->fs_getdirentry = getdirFunc;
+		bvr->fs_getfileblock= getBlockFunc;
+		bvr->fs_getuuid     = getUUIDFunc;
+		bvr->description    = getDescriptionFunc;
+		bvr->type           = type;
+		bvr->bv_free        = bvFreeFunc;
 
-        if ((part->bootid & FDISK_ACTIVE) && (part->systid == FDISK_HFS))
-            bvr->flags |= kBVFlagPrimary;
-
+		if ((part->bootid & FDISK_ACTIVE) && (part->systid == FDISK_HFS))
+		{
+			bvr->flags |= kBVFlagPrimary;
+		}
+		
         // Probe the filesystem.
 
         if ( initFunc )
@@ -540,8 +552,7 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
             {
                 // filesystem probe failed.
 
-                DEBUG_DISK(("%s: failed probe on dev %x part %d\n",
-                            __FUNCTION__, biosdev, partno));
+                DEBUG_DISK(("%s: failed probe on dev %x part %d\n", __FUNCTION__, biosdev, partno));
 
                 (*bvr->bv_free)(bvr);
                 bvr = NULL;
@@ -561,8 +572,11 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
             bvr = NULL;
         }
     }
-    if (bvr) bvr->flags |= bvrFlags;
-    return bvr;
+
+	if (bvr) bvr->flags |= bvrFlags;
+	{
+		return bvr;
+	}
 }
 
 //==========================================================================
@@ -612,8 +626,7 @@ BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
             {
                 // filesystem probe failed.
 
-                DEBUG_DISK(("%s: failed probe on dev %x part %d\n",
-                            __FUNCTION__, biosdev, partno));
+                DEBUG_DISK(("%s: failed probe on dev %x part %d\n", __FUNCTION__, biosdev, partno));
 
                 (*bvr->bv_free)(bvr);
                 bvr = NULL;
@@ -638,21 +651,29 @@ BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
 //==========================================================================
 
 // GUID's in LE form:
-// HFS+ partition - 48465300-0000-11AA-AA11-00306543ECAC
-EFI_GUID const GPT_HFS_GUID		   = { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
-
-// turbo - Apple Boot Partition - 426F6F74-0000-11AA-AA11-00306543ECAC
-EFI_GUID const GPT_BOOT_GUID	   = { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
-
-// turbo - or an EFI System Partition - C12A7328-F81F-11D2-BA4B-00A0C93EC93B
+// http://en.wikipedia.org/wiki/GUID_Partition_Table
+// 00000000-0000-0000-0000-000000000000 - Unused Entry partition 
+// 024DEE41-33E7-11D3-9D69-0008C781F39F - MBR partition scheme  
+// C12A7328-F81F-11D2-BA4B-00A0C93EC93B - turbo - or an EFI System Partition
 EFI_GUID const GPT_EFISYS_GUID	   = { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } };
-
-// zef - Basic Data Partition - EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 for foreign OS support
-EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
-
-// Microsoft Reserved Partition - E3C9E316-0B5C-4DB8-817DF92DF00215AE
+// 21686148-6449-6E6F-744E-656564454649 - BIOS Boot partition 
+// E3C9E316-0B5C-4DB8-817D-F92DF00215AE - Microsoft Reserved Partition 
 EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
-
+// EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 - zef - Basic Data Partition -  for foreign OS support
+EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
+// 5808C8AA-7E8F-42E0-85D2-E1E90434CFB3 - Logical Disk Manager metadata partition
+// AF9B60A0-1431-4F62-BC68-3311714A69AD - Logical Disk Manager data partition
+// DE94BBA4-06D1-4D40-A16A-BFD50179D6AC - Windows Recovery Environment
+// 48465300-0000-11AA-AA11-00306543ECAC - Hierarchical File System Plus (HFS+) partition
+EFI_GUID const GPT_HFS_GUID		   = { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
+// 55465300-0000-11AA-AA11-00306543ECAC - Apple UFS 
+// 52414944-0000-11AA-AA11-00306543ECAC - Apple RAID partition
+// 426F6F74-0000-11AA-AA11-00306543ECAC - turbo - Apple Boot Partition
+EFI_GUID const GPT_BOOT_GUID	   = { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
+// 4C616265-6C00-11AA-AA11-00306543ECAC - Apple Label
+// 5265636F-7665-11AA-AA11-00306543ECAC - Apple TV Recovery partition
+// 53746F72-6167-11AA-AA11-00306543ECAC - Apple Core Storage (i.e. Lion FileVault) partition (Apple_Boot Recovery HD)
+// EFI_GUID const GPT_RECOVERY_GUID	   = { 0x53746F72, 0x6167, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
 
 BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                    const gpt_ent * part,
@@ -1348,6 +1369,11 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
                 	  								0, 0, 0, 0, 0, 0, NTFSGetDescription,
                 		  							(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
 								break;
+							  case FDISK_LINUX:
+							    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+                	  								0, 0, 0, 0, 0, 0, EX2GetDescription,
+                		  							(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+								break;
 
                 default:
                   bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
@@ -1583,7 +1609,7 @@ void diskFreeMap(struct DiskBVMap *map)
 
 BVRef diskScanBootVolumes( int biosdev, int * countPtr )
 {
-    struct DiskBVMap *        map;
+    struct DiskBVMap *        map = NULL;
     BVRef bvr;
     int count = 0;
 
@@ -1850,13 +1876,13 @@ bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
         volStart = strbreak(entryStart, &volEnd, &volLen);
         if(!volLen)
             continue;
-        
+
         aliasStart = strbreak(volEnd, 0, &aliasLen);
         if(!aliasLen)
             continue;
-        
+
         if ( matchVolumeToString(bvr, volStart, volLen) )
-        {   
+        {
             strncat(str, aliasStart, MIN(strMaxLen, aliasLen));
             free(aliasList);
         
@@ -1877,25 +1903,25 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
         return;
     
     type = (unsigned char) bvr->part_type;
-    	
+
     if (useDeviceDescription)
     {
         int len = getDeviceDescription(bvr, str);
         if(len >= strMaxLen)
             return;
-        
+
         strcpy(str + len, " ");
         len++;
         strMaxLen -= len;
         p += len;
     }
-	
+
     /* See if a partition rename is preferred */
     if(getVolumeLabelAlias(bvr, p, strMaxLen)) {
         strncpy(bvr->label, p, strMaxLen); 
         return; // we're done here no need to seek for real name
     }
-      
+
     //
     // Get the volume label using filesystem specific functions
     // or use the alternate volume label if available.
@@ -1916,32 +1942,39 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
             strncpy(p, name, strMaxLen);
         }
     }
-    
+
     // Set the devices label
     sprintf(bvr->label, p);
 }
 
 //==========================================================================
-int readBootSector( int biosdev, unsigned int secno, void * buffer )
+int readBootSector(int biosdev, unsigned int secno, void * buffer)
 {
-    struct disk_blk0 * bootSector = (struct disk_blk0 *) buffer;
-    int                error;
+	int error;
+	struct disk_blk0 * bootSector = (struct disk_blk0 *) buffer;
 
-    if ( bootSector == NULL )
-    {
-        if ( gBootSector == NULL )
-        {
-            gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
-            if ( gBootSector == NULL ) return -1;
-        }
+	if (bootSector == NULL)
+	{
+		if (gBootSector == NULL)
+		{
+			gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
+
+			if (gBootSector == NULL)
+			{
+				return -1;
+			}
+		}
+
         bootSector = gBootSector;
-    }
+	}
 
-    error = readBytes( biosdev, secno, 0, BPS, bootSector );
-    if ( error || bootSector->signature != DISK_SIGNATURE )
-        return -1;
+	error = readBytes(biosdev, secno, 0, BPS, bootSector);
 
-    return 0;
+	if (error || bootSector->signature != DISK_SIGNATURE)
+	{
+		return -1;
+	}
+	return 0;
 }
 
 /*
@@ -1985,7 +2018,7 @@ int testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer )
 //==========================================================================
 // Handle seek request from filesystem modules.
 
-void diskSeek( BVRef bvr, long long position )
+void diskSeek(BVRef bvr, long long position)
 {
     bvr->fs_boff = position / BPS;
     bvr->fs_byteoff = position % BPS;

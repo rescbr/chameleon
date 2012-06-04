@@ -503,14 +503,14 @@ static struct mem_controller_t dram_controllers[] = {
 	{ 0x8086, 0x2A10, "GME965/GLE960",	setup_p35, get_fsb_im965,	get_timings_im965	},
 	{ 0x8086, 0x2A40, "PM/GM45/47",		setup_p35, get_fsb_im965,	get_timings_im965	},
 
-	{ 0x8086, 0x29B0, "Q35",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29B0, "Q35",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x29C0, "P35/G33",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x29D0, "Q33",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29D0, "Q33",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x29E0, "X38/X48",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x2E00, "Eaglelake",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x2E10, "Q45/Q43",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x2E20, "P45/G45",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x2E30, "G41",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x2E30, "G41",		setup_p35, get_fsb_i965,	get_timings_p35		},
 
 	{ 0x8086, 0xD131, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0xD132, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
@@ -522,6 +522,7 @@ static struct mem_controller_t dram_controllers[] = {
 	{ 0x8086, 0x3405, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0x3406, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0x3407, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+
 };
 
 static const char *memory_channel_types[] =

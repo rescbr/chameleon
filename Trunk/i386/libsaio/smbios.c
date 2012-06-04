@@ -80,7 +80,7 @@
 // defaults for a MacBook
 #define kDefaultMacBookFamily						"MacBook"
 #define kDefaultMacBook								"MacBook4,1"
-#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0903051113"
+#define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0809221748"
 
 // defaults for a MacBook Pro
 #define kDefaultMacBookProFamily					"MacBookPro"
@@ -200,7 +200,11 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),		NULL,	NULL,	NULL},
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),	NULL,	NULL,	NULL},
-
+	//-------------------------------------------------------------------------------------------------------------------------
+	// SystemEnclosure
+	//-------------------------------------------------------------------------------------------------------------------------
+	{kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, manufacturer),
+		kSMBBaseBoardManufacturerKey,	NULL,	&defaultBaseBoard.manufacturer	},
 
 	//-------------------------------------------------------------------------------------------------------------------------
 	// ProcessorInformation
@@ -830,4 +834,3 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 		structHeader = (SMBStructHeader *)structPtr;
 	}
 }
-

@@ -158,7 +158,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	if(!numpaths)
 	{
-        free(device);
+		free(device);
 		return NULL;
 	}
 	
@@ -193,7 +193,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	{
 		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)))== NULL)
 		{
-            free(device);
+			free(device);
 			return NULL;
 		}
 	}
@@ -257,7 +257,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 			memcpy(newdata, device->data, offset);
 		}
 	}
-	
+
 	memcpy(newdata + offset, data, length);
 	
 	device->length += length;
@@ -364,21 +364,21 @@ void devprop_free_string(struct DevPropString *string)
 int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
 {
 	uint8_t builtin = 0x0;
-	
+
 	if(device)
 	{
-		
+
 		if((vendor_id != 0x168c) && (builtin_set == 0)) 
 		{
 			builtin_set = 1;
 			builtin = 0x01;
 		}
-		
+
 		if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
 		{
 			return 0;
 		}
-		
+
 		devices_number++;
 		return 1;
 	}
@@ -386,7 +386,7 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 	{
 		return 0;
 	}
-	
+
 }
 
 void set_eth_builtin(pci_dt_t *eth_dev)

@@ -450,7 +450,7 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
 	for (; i < (*len); i++)	 dst[i] = src[i];
 	dst[(*len)] = '\0';
-	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+	*len = ((*len)+1)*2; // return the CHAR16 bufsize including zero terminated CHAR16
 	return dst;
 }
 
@@ -622,6 +622,7 @@ void setupBoardId()
 /*
  * Populate the chosen node
  */
+
 void setupChosenNode()
 {
 	Node *chosenNode;

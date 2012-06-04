@@ -29,7 +29,9 @@ void BeFSGetDescription(CICell ih, char *str, long strMaxLen)
 	char * buf=malloc (BeFSProbeSize);
 	str[0]=0;
 	if (!buf)
+	{
 		return;
+	}
 	Seek(ih, 0);
 	Read(ih, (long)buf, BeFSProbeSize);
 	if (!BeFSProbe (buf))

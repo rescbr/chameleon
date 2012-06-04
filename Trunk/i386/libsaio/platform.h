@@ -83,7 +83,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define SMB_MEM_TYPE_DDR		18
 #define SMB_MEM_TYPE_DDR2		19
 #define SMB_MEM_TYPE_FBDIMM		20
-#define SMB_MEM_TYPE_DDR3		24				// Supported in 10.5.6+ AppleSMBIOS
+#define SMB_MEM_TYPE_DDR3		24			// Supported in 10.5.6+ AppleSMBIOS
 
 /* Memory Configuration Types */ 
 #define SMB_MEM_CHANNEL_UNKNOWN		0
@@ -138,7 +138,7 @@ typedef struct _PlatformInfo_t {
 		char			BrandString[48];		// 48 Byte Branding String
 		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 	} CPU;
-	
+
 	struct RAM {
 		uint64_t		Frequency;				// Ram Frequency
 		uint32_t		Divider;				// Memory divider
@@ -151,15 +151,15 @@ typedef struct _PlatformInfo_t {
 		uint8_t			Type;					// Standard SMBIOS v2.5 Memory Type
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];	// Information about each slot
 	} RAM;
-	
+
 	struct DMI {
-		int			MaxMemorySlots;				// number of memory slots populated by SMBIOS
-		int			CntMemorySlots;				// number of memory slots counted
-		int			MemoryModules;				// number of memory modules installed
-		int			DIMM[MAX_RAM_SLOTS];		// Information and SPD mapping for each slot
+		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
+		int			CntMemorySlots;		// number of memory slots counted
+		int			MemoryModules;		// number of memory modules installed
+		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
-	
-	uint8_t				Type; // System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+
+	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;
 } PlatformInfo_t;
 

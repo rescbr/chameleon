@@ -798,11 +798,11 @@ void scanDisks(int biosdev, int *count)
     hd++;
 	}
 
-  // Also scanning CD/DVD drive.
+	// Also scanning CD/DVD drive.
 	if (biosDevIsCDROM(gBIOSDev))
 	{
-	  bvCount = 0;
-  	scanBootVolumes(gBIOSDev, &bvCount);
+		bvCount = 0;
+		scanBootVolumes(gBIOSDev, &bvCount);
 	}
 }
 
@@ -1000,7 +1000,7 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
         if (*cp == RP) cp++;
         
         biosdev = dp->biosdev + unit;
-        bvr = newBootVolumeRef(biosdev, part);
+	bvr = newBootVolumeRef(biosdev, part);
 
         if(bvr == NULL)
             return NULL;

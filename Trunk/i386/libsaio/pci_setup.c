@@ -6,6 +6,13 @@
 #include "nvidia.h"
 #include "modules.h"
 
+#define DEBUG_PCI 0
+
+#if DEBUG_PCI
+#define DBG(x...)  msglog(x)
+#else
+#define DBG(x...)
+#endif
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern void set_eth_builtin(pci_dt_t *eth_dev);
@@ -13,6 +20,8 @@ extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
 
 extern pci_dt_t *dram_controller_dev;
+
+uint16_t vgaVendor;
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
@@ -33,18 +42,23 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 		switch (current->class_id)
 		{
 			case PCI_CLASS_BRIDGE_HOST:
+				DBG("Setup BRIDGE_HOST \n");
 					if (current->dev.addr == PCIADDR(0, 0, 0))
 						dram_controller_dev = current;
 				break;
 				
 			case PCI_CLASS_NETWORK_ETHERNET: 
+				DBG("Setup ETHERNET %s enabled\n", do_eth_devprop?"":"no");
 				if (do_eth_devprop)
 					set_eth_builtin(current);
 				break;
 				
 			case PCI_CLASS_DISPLAY_VGA:
+				DBG("GraphicsEnabler %s enabled\n", do_gfx_devprop?"":"no");
 				if (do_gfx_devprop)
-					switch (current->vendor_id)
+				{
+					vgaVendor = current->vendor_id;
+					switch (vgaVendor)
 					{
 						case PCI_VENDOR_ID_ATI:
 							setup_ati_devprop(current); 
@@ -58,20 +72,23 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							setup_nvidia_devprop(current);
 							break;
 					}
+				}
 				break;
 
 			case PCI_CLASS_SERIAL_USB:
+				DBG("USB fix \n");
 				notify_usb_dev(current);
 				break;
 
 			case PCI_CLASS_BRIDGE_ISA:
+				DBG("Force HPET %s enabled\n", do_enable_hpet?"":"no");
 				if (do_enable_hpet)
 					force_enable_hpet(current);
 				break;
 		}
 		
 		execute_hook("PCIDevice", current, NULL, NULL, NULL);
-		
+		DBG("setup_pci_devs current devID=%08x\n", current->device_id);
 		setup_pci_devs(current->children);
 		current = current->next;
 	}

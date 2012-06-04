@@ -196,6 +196,10 @@ extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
 extern bool useGUI;
 
+extern void *gRootPCIDev;
+
+extern uint16_t vgaVendor;;
+
 /*
  * Boot Modes
  */

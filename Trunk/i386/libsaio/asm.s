@@ -82,7 +82,7 @@
  * New boot0 (boot1 has been deprecated). Booter must now reside in its own partition, no disk label required.
  *
  * Revision 1.1.1.2  1999/08/04 21:16:57  wsanchez
- * Impoort of boot-66
+ * Import of boot-66
  *
  * Revision 1.3  1999/08/04 21:12:12  wsanchez
  * Update APSL
@@ -344,11 +344,11 @@ LABEL(_halt)
 //
 // Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
 //
+//
+LABEL(_disableIRQs)
 // The ACPI specification dictates that the 8259 (PC-AT compatible) vectors
 // must be disabled (that is, masked) when enabling the ACPI APIC operation
 // but this isn't done (apparently) on all mobo's and thus we do that here.
-//
-LABEL(_disableIRQs)
 
 	push %eax // Saving register data
 

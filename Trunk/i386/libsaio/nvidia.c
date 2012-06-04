@@ -59,7 +59,7 @@
 #endif
 
 #if DEBUG_NVIDIA
-#define DBG(x...)	printf(x)
+#define DBG(x...)	verbose(x)
 #else
 #define DBG(x...)
 #endif
@@ -99,16 +99,14 @@ static uint8_t default_NVCAP[]= {
 static uint8_t default_dcfg_0[]		=	{0x03, 0x01, 0x03, 0x00};
 static uint8_t default_dcfg_1[]		=	{0xff, 0xff, 0x00, 0x01};
 
-// uint8_t connector_type_1[]		=	{0x00, 0x08, 0x00, 0x00};
-
 #define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
 #define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 static uint8_t default_NVPM[]= {
-    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00
+	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
 };
 
 #define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
@@ -157,6 +155,46 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 01B0 - 01BF
 	// 01C0 - 01CF
 	// 01D0 - 01DF
+	{ 0x10DE01D7,	0x1025006C,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250090,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250096,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250100,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250107,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250110,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10250112,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102501C2,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102501C8,	"Acer GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102801C2,	"Dell Quadro NVS 110M" },
+	{ 0x10DE01D7,	0x102801C8,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102801CC,	"Dell Quadro NVS 110M" },
+	{ 0x10DE01D7,	0x102801D7,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102801E2,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102801F9,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x102801FE,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10282003,	"Dell GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10338848,	"NEC GeForce Go 7300" },
+	{ 0x10DE01D7,	0x103C30B2,	"HP GeForce Go 7300" },
+	{ 0x10DE01D7,	0x103C30B7,	"HP GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10431212,	"Asus GeForce Go 7300" },
+	{ 0x10DE01D7,	0x104313A2,	"Asus GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10431441,	"Asus GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10DE0000,	"nVidia GeForce Go 7300" },
+	{ 0x10DE01D7,	0x10DE014B,	"nVidia Quadro NVS 110M" },
+	{ 0x10DE01D7,	0x11790001,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x11790002,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x1179FF00,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x1179FF01,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x1179FF02,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x1179FF10,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x1179FF31,	"Toshiba GeForce Go 7300" },
+	{ 0x10DE01D7,	0x13DC1172,	"Netbost GeForce Go 7300" },
+	{ 0x10DE01D7,	0x144D8063,	"Samsung GeForce Go 7300" },
+	{ 0x10DE01D7,	0x144DC024,	"Samsung GeForce Go 7300" },
+	{ 0x10DE01D7,	0x144DC026,	"Samsung GeForce Go 7300" },
+	{ 0x10DE01D7,	0x144DC513,	"Samsung GeForce Go 7300" },
+	{ 0x10DE01D7,	0x14C00012,	"Compal GeForce Go 7300" },
+
+	{ 0x10DE01D7,	0xC0181631,	"GeForce Go 7300" },
 	{ 0x10DE01D8,	0x10250090,	"Acer GeForce Go 7400" },
 	{ 0x10DE01D8,	0x102801C8,	"Dell GeForce Go 7400" },
 	{ 0x10DE01D8,	0x102801CC,	"Dell Quadro NVS 120M" },
@@ -337,6 +375,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE05E2,	0x104382C4,	"Asus GTX 260" },
 	{ 0x10DE05E2,	0x104382CF,	"Asus GTX 260" },
 	{ 0x10DE05E2,	0x104382E3,	"Asus GTX 260" },
+	{ 0x10DE05E2,	0x104382EB,	"ASUS ENGTX260" },
 	{ 0x10DE05E2,	0x10B00801,	"Gainward GTX 260" },
 	{ 0x10DE05E2,	0x10DE0585,	"nVidia GTX 260" },
 	{ 0x10DE05E2,	0x10DE0617,	"nVidia GTX 260" },
@@ -963,7 +1002,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE01D2,	NV_SUB_IDS,	"GeForce 7550 LE" },
 	{ 0x10DE01D3,	NV_SUB_IDS,	"GeForce 7300 SE/7200 GS" },
 	{ 0x10DE01D6,	NV_SUB_IDS,	"GeForce Go 7200" },
-	{ 0x10DE01D7,	NV_SUB_IDS,	"Quadro NVS 110M / GeForce Go 7300" }, // 71 SubID
+	{ 0x10DE01D7,	NV_SUB_IDS,	"Quadro NVS 110M / GeForce Go 7300" },
 	{ 0x10DE01D8,	NV_SUB_IDS,	"GeForce Go 7400" },
 	{ 0x10DE01D9,	NV_SUB_IDS,	"GeForce Go 7450" },
 	{ 0x10DE01DA,	NV_SUB_IDS,	"Quadro NVS 110M" },

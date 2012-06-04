@@ -140,7 +140,7 @@ static uint64_t measure_tsc_frequency(void)
 	 * Hz so we need to convert our milliseconds to seconds. Since we're
 	 * dividing by the milliseconds, we simply multiply by 1000.
 	 */
-	
+
 	/* Unlike linux, we're not limited to 32-bit, but we do need to take care
 	 * that we're going to multiply by 1000 first so we do need at least some
 	 * arithmetic headroom. For now, 32-bit should be enough.
@@ -227,13 +227,13 @@ void scan_cpu(PlatformInfo_t *p)
 	uint64_t	msr, flex_ratio;
 	uint8_t		maxcoef, maxdiv, currcoef, bus_ratio_max, currdiv;
 	const char	*newratio;
-	int			len, myfsb;
+	int		len, myfsb;
 	uint8_t		bus_ratio_min;
 	uint32_t	max_ratio, min_ratio;
-	
+
 	max_ratio = min_ratio = myfsb = bus_ratio_min = 0;
 	maxcoef = maxdiv = bus_ratio_max = currcoef = currdiv = 0;
-	
+
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]);
@@ -248,7 +248,7 @@ void scan_cpu(PlatformInfo_t *p)
 	else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1) {
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
-	
+
 #if DEBUG_CPU
 	{
 		int		i;
@@ -260,7 +260,7 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 	}
 #endif
-	
+
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
 	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
@@ -268,9 +268,9 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
-	
+
 	p->CPU.Model += (p->CPU.ExtModel << 4);
-	
+
 	if (p->CPU.Vendor == CPUID_VENDOR_INTEL &&
 		p->CPU.Family == 0x06 &&
 		p->CPU.Model >= CPUID_MODEL_NEHALEM &&
@@ -292,7 +292,7 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
-	
+
 	/* get brand string (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
 	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004) {
@@ -352,7 +352,7 @@ void scan_cpu(PlatformInfo_t *p)
 	if (p->CPU.NoThreads > p->CPU.NoCores) {
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
-	
+
 	tscFrequency = measure_tsc_frequency();
 	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
 	/* if usual method failed */
@@ -366,7 +366,7 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	fsbFrequency = 0;
 	cpuFrequency = 0;
-	
+
 	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
 		int intelCPU = p->CPU.Model;
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
@@ -408,7 +408,7 @@ void scan_cpu(PlatformInfo_t *p)
 						}
 					}
 				}
-				
+
 				if (bus_ratio_max) {
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
@@ -424,9 +424,9 @@ void scan_cpu(PlatformInfo_t *p)
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
 					if (len >= 3) max_ratio = (max_ratio + 5);
-					
+
 					verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
-					
+
 					// extreme overclockers may love 320 ;)
 					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
 						cpuFrequency = (fsbFrequency * max_ratio) / 10;
@@ -440,7 +440,7 @@ void scan_cpu(PlatformInfo_t *p)
 				/*if (bus_ratio_max > 0) bus_ratio = flex_ratio;*/
 				p->CPU.MaxRatio = max_ratio;
 				p->CPU.MinRatio = min_ratio;
-				
+
 				myfsb = fsbFrequency / 1000000;
 				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio);
 				currcoef = bus_ratio_max;
@@ -452,7 +452,7 @@ void scan_cpu(PlatformInfo_t *p)
 				maxdiv = bitfield(msr, 46, 46);
 				/* Non-integer bus ratio for the current-multi (undocumented)*/
 				currdiv = bitfield(msr, 14, 14);
-				
+
 				// This will always be model >= 3
 				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f))
 				{
@@ -463,7 +463,7 @@ void scan_cpu(PlatformInfo_t *p)
 					/* XXX */
 					maxcoef = currcoef;
 				}
-				
+
 				if (maxcoef) {
 					if (maxdiv) {
 						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
@@ -493,7 +493,7 @@ void scan_cpu(PlatformInfo_t *p)
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) / 2 + 4;
 				break;
-				
+
 			case 0x01: /* K10 */
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
@@ -509,22 +509,22 @@ void scan_cpu(PlatformInfo_t *p)
 				maxcoef	 = bitfield(msr, 54, 49) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) + 0x10;
 				currdiv = 2 << bitfield(msr, 8, 6);
-				
+
 				break;
-				
+
 			case 0x05: /* K14 */
 				msr = rdmsr64(K10_COFVID_STATUS);
 				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
 				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
 				currdiv += bitfield(msr, 3, 0);
-				
+
 				break;
-				
+
 			case 0x02: /* K11 */
 				// not implimented
 				break;
 		}
-		
+
 		if (maxcoef)
 		{
 			if (currdiv)
@@ -534,7 +534,7 @@ void scan_cpu(PlatformInfo_t *p)
 					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
 				else
 					fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
-				
+
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 			} else {
 				if (!cpuFrequency)
@@ -568,7 +568,7 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
 
 #endif
-	
+
 	p->CPU.MaxCoef = maxcoef;
 	p->CPU.MaxDiv = maxdiv;
 	p->CPU.CurrCoef = currcoef;
@@ -576,7 +576,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.TSCFrequency = tscFrequency;
 	p->CPU.FSBFrequency = fsbFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
-	
+
 	// keep formatted with spaces instead of tabs
 	DBG("CPU: Brand String:             %s\n",              p->CPU.BrandString);
     DBG("CPU: Vendor/Family/ExtFamily:  0x%x/0x%x/0x%x\n",  p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);

@@ -845,6 +845,7 @@ int initGUI(void)
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
+	gDualLink =((screen_params[0] * screen_params[1]) > (1<<20))?1:0;
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {

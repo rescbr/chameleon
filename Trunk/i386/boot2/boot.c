@@ -75,7 +75,10 @@ char		*gPlatformName = gCacheNameAdler;
 char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
 char		gMacOSVersion[8];
-int			bvCount = 0, gDeviceCount = 0;
+void		*gRootPCIDev;
+
+int		gDualLink;
+int		bvCount = 0, gDeviceCount = 0;
 //int		menucount = 0;
 long		gBootMode; /* defaults to 0 == kBootModeNormal */
 BVRef		bvr, menuBVR, bvChain;

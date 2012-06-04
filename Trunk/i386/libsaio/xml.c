@@ -715,13 +715,13 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 		return 0;
 	}
 	
-    size = length = FixDataMatchingTag(buffer, kXMLTagInteger);
-    if (length == -1) return -1;
-    
-    tmpTag = NewTag();
-    if (tmpTag == 0) return -1;
-    
-    integer = 0;
+	size = length = FixDataMatchingTag(buffer, kXMLTagInteger);
+	if (length == -1) return -1;
+
+	tmpTag = NewTag();
+	if (tmpTag == 0) return -1;
+
+	integer = 0;
 
 	if(size > 1 && (val[1] == 'x' || val[1] == 'X'))	// Hex value
 	{

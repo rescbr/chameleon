@@ -70,9 +70,9 @@ struct bios {
 	uint8_t		size;			/* Size in multiples of 512 */
 };
 
-#define NV_SUB_IDS                              0x00000000
+#define NV_SUB_IDS							0x00000000
 #define NV_PMC_OFFSET							0x000000
-#define NV_PMC_SIZE                             0x2ffff
+#define NV_PMC_SIZE							0x2ffff
 #define NV_PDISPLAY_OFFSET						0x610000
 #define NV_PDISPLAY_SIZE						0x10000
 
@@ -81,10 +81,10 @@ struct bios {
 #define NV_PRAMIN_OFFSET						0x00700000
 #define NV_PRAMIN_SIZE							0x00100000
 #define NV04_PFB_FIFO_DATA						0x0010020c
-#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK	0xfff00000
-#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_SHIFT	20
-#define NVC0_MEM_CTRLR_COUNT					0x00121c74
-#define NVC0_MEM_CTRLR_RAM_AMOUNT				0x0010f20c
+#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK				0xfff00000
+#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_SHIFT				20
+#define NVC0_MEM_CTRLR_COUNT						0x00121c74
+#define NVC0_MEM_CTRLR_RAM_AMOUNT					0x0010f20c
 
 #define NV_PBUS_PCI_NV_20						0x00001850
 #define NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED	(0 << 0)
