@@ -121,7 +121,7 @@ typedef enum {
     //	CHIP_FAMILY_LOMBOK,
     //	CHIP_FAMILY_NEWZEALAND,
 	CHIP_FAMILY_LAST
-} chip_family_t;
+} ati_chip_family_t;
 
 typedef struct {
 	const char		*name;
@@ -183,7 +183,7 @@ typedef enum {
 typedef struct {
 	uint16_t				device_id;
 	uint32_t				subsys_id;
-	chip_family_t			chip_family;
+	ati_chip_family_t		chip_family;
 	const char				*model_name;
 	config_name_t			cfg_name;
 } radeon_card_info_t;

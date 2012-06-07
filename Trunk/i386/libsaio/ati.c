@@ -87,7 +87,7 @@ static card_config_t card_configs[] = {
 	{"Flicker",		3},
 	{"Galago",		2},
 	{"Gliff",		3},
-	{"Hoolock",		3},
+	{"Hoolock",		1},
 	{"Hypoprion",		2},
 	{"Iago",		2},
 	{"Kakapo",		3},
@@ -983,7 +983,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x796C,	0x00000000, CHIP_FAMILY_RS740,		"ATI Radeon IGP ",                      kNull			},
 	{ 0x796D,	0x00000000, CHIP_FAMILY_RS740,		"ATI Radeon IGP ",                      kNull			},
 	{ 0x796E,	0x00000000, CHIP_FAMILY_RS740,		"ATI Radeon IGP ",                      kNull			},
-	{ 0x796F,	0x00000000, CHIP_FAMILY_RS740,		"ATI Radeon HD ",                       kNull			},
+	{ 0x796F,	0x00000000, CHIP_FAMILY_RS740,		"ATI Radeon IGP ",                      kNull			},
 
 	/* standard/default models */
 
@@ -1605,7 +1605,8 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 
 void get_vram_size(void)
 {
-	chip_family_t chip_family = card->info->chip_family;
+//	chip_family_t chip_family = card->info->chip_family;
+    ati_chip_family_t chip_family = card->info->chip_family;
 	
 	card->vram_size = 0;
 
@@ -1649,7 +1650,8 @@ bool read_vbios(bool from_pci)
 bool read_disabled_vbios(void)
 {
 	bool ret = false;
-	chip_family_t chip_family = card->info->chip_family;
+//	chip_family_t chip_family = card->info->chip_family;
+    ati_chip_family_t chip_family = card->info->chip_family;
 	
 	if (chip_family >= CHIP_FAMILY_RV770)
 	{

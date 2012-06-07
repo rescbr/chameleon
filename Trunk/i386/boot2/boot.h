@@ -105,6 +105,9 @@
 /* Duvel300: added this */
 #define kRestartFix		"RestartFix"		/* acpi_patcher.c */
 
+/* Slice: added this */
+#define kPS2RestartFix		"PS2RestartFix"		/* acpi_patcher.c */
+
 /* Signal64: added this key */
 #define kLegacyOff		"USBLegacyOff"		/* usb.c */
 

@@ -304,7 +304,7 @@ static int Biosread(int biosdev, unsigned long long secno)
 		sec  = secno % di.di.params.phys_spt;
 
 		if (cache_valid && (biosdev == xbiosdev) && (cyl == xcyl) &&
-			(head == xhead) && ((unsigned int)sec < (xsec + xnsecs)))
+			(head == xhead) && ((unsigned int)sec >= xsec) && ((unsigned int)sec < (xsec + xnsecs)))
 		{
 			// this sector is in trackbuf cache
 			biosbuf = trackbuf + (BPS * (sec - xsec));
