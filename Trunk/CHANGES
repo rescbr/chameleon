@@ -1,3 +1,18 @@
+- Merge more cparm's (security, stability, bugs fixes) improvements from his branch.
+  http://forge.voodooprojects.org/p/chameleon/source/tree/HEAD/branches/cparm
+- Merge "Restart fix Removed" from trunk r1992 by Slice's patch
+- Added nVidia process sub-dev ids.
+- Merge EnableHDMIAudio changes from commit 1950 by Cosmosis Jones.
+- Merge patch by Geoff Seeley http://forge.voodooprojects.org/p/chameleon/issues/59/
+- Apply patch by Michael Seydl http://forge.voodooprojects.org/p/chameleon/issues/48/
+- Apply patch by Michael Seydl http://forge.voodooprojects.org/p/chameleon/issues/247/
+- Apply patch by rafi rafi http://forge.voodooprojects.org/p/chameleon/issues/246/
+- Added ID for Radeon HD5570 and some subID: http://forge.voodooprojects.org/p/chameleon/issues/243/
+- Merge cparm's (security, stability, bugs fixes) improvements from his branch.
+- Added ID and correct FB for:  http://forge.voodooprojects.org/p/chameleon/issues/238/
+- Added next coming CHIPSET and ID definition (Mosts of it commented) ML?
+  (found via netkas.org): http://lists.freedesktop.org/archives/dri-devel/2012-March/020388.html
+- Merge IVY Bridge stuff from Chimera Branch.
 - Added boot support for Mountain Lion 10.8 (credits to ErmaC) & updated the default theme (credits to blackosx)
 - cparm : Fixed naming convention for raid hfs devices in gui
 - Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/

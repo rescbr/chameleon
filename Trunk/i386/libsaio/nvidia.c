@@ -597,6 +597,11 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0A10 - 0A1F
 	// 0A20 - 0A2F
 	{ 0x10DE0A20,	0x10438311,	"Asus GeForce GT 220" },
+	{ 0x10DE0A20,	0x10DE069A,	"nVidia GeForce GT 220" },
+	{ 0x10DE0A20,	0x14621910,	"MSi GeForce GT 220" },
+	{ 0x10DE0A20,	0x14621911,	"MSi GeForce GT 220" },
+	{ 0x10DE0A20,	0x14621990,	"MSi GeForce GT 220" },
+	{ 0x10DE0A20,	0x16423920,	"Bitland GeForce GT 220" },
 	{ 0x10DE0A28,	0x1B0A903B,	"Pegatron GeForce GT 230" },
 	// 0A30 - 0A3F
 	{ 0x10DE0A34,	0x10250200,	"Acer GeForce GT 240M" },
@@ -732,7 +737,17 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0CA9,	0x16423942,	"Bitland GeForce GTS 250M" },
 	{ 0x10DE0CAF,	0x10DE0782,	"nVidia GeForce GT 335M" },
 	// 0CB0 - 0CBF
+	{ 0x10DE0CB0,	0x10250367,	"Acer GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x10250368,	"Acer GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x10250422,	"Acer GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x10250463,	"Acer GeForce GTS 350M" },
 	{ 0x10DE0CB0,	0x10DE080D,	"nVidia GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x1179FD30,	"Toshiba GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x1179FF50,	"Toshiba GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x15580511,	"Clevo GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x15580512,	"Clevo GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x15588687,	"Clevo GeForce GTS 350M" },
+	{ 0x10DE0CB0,	0x15588689,	"Clevo GeForce GTS 350M" },
 	// 0CC0 - 0CCF
 	// 0CD0 - 0CDF
 	// 0CE0 - 0CEF
