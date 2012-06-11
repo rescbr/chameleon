@@ -334,7 +334,7 @@ char* readEDID()
 			for(i = 0; i < 16; i++) msglog("0x%02X ", edidInfo[((i+1) * (j + 1)) - 1]);
 			msglog("\n");
 		}
-		
+
 		
 		
 		if(status == 0)
@@ -385,6 +385,10 @@ char* readEDID()
 	} while(blocks_left);
 
 	char* ret = malloc(sizeof(edidInfo));
+	if (!ret)
+	{
+		return 0;
+	}
 	memcpy(ret, edidInfo, sizeof(edidInfo));
 	return ret;
 }

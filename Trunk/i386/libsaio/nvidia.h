@@ -65,10 +65,28 @@ typedef struct {
 
 #define DCB_LOC_ON_CHIP 0
 
-struct bios {
+struct bios
+{
 	uint16_t	signature;		/* 0x55AA */
 	uint8_t		size;			/* Size in multiples of 512 */
 };
+
+#define NVIDIA_ROM_SIZE				0x10000
+#define PATCH_ROM_SUCCESS			1
+#define PATCH_ROM_SUCCESS_HAS_LVDS		2
+#define PATCH_ROM_FAILED			0
+#define MAX_NUM_DCB_ENTRIES			16
+#define TYPE_GROUPED				0xff
+#define READ_BYTE(rom, offset) (*(u_char *)(rom + offset))
+#define READ_LE_SHORT(rom, offset) (READ_BYTE(rom, offset+1) << 8 | READ_BYTE(rom, offset))
+#define READ_LE_INT(rom, offset)   (READ_LE_SHORT(rom, offset+2) << 16 | READ_LE_SHORT(rom, offset))
+#define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
+#define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
+
+#define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
+#define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
+#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
+#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
 
 #define NV_SUB_IDS							0x00000000
 #define NV_PMC_OFFSET							0x000000

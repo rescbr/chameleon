@@ -195,8 +195,8 @@ unsigned int aml_fill_name(struct aml_chunk* node, const char* name)
 	}
 	
 	unsigned int root = 0;
-	
-	if ((len % 4) == 1 && name[0] == '\\')
+
+	if (((len % 4) == 1) && (name[0] == '\\'))
 		root++;
 			
 	if (count == 1) 
@@ -204,6 +204,7 @@ unsigned int aml_fill_name(struct aml_chunk* node, const char* name)
 		node->Length = 4 + root;
 		node->Buffer = malloc(node->Length);
 		memcpy(node->Buffer, name, 4 + root);
+
 		return node->Length;
 	}
 	
@@ -418,12 +419,12 @@ unsigned int aml_write_size(unsigned int size, char* buffer, unsigned int offset
 	else if (size <= 0xfff) 
 	{
 		buffer[offset++] = 0x40 | (size & 0xf); /* 0x40 is type, 0x0X is first nibble of length */
-		buffer[offset++] = (size >> 4) & 0xff;  /* +1 bytes for rest length */
+		buffer[offset++] = (size >> 4) & 0xff; /* +1 bytes for rest length */
 	}
 	else if (size <= 0xfffff) 
 	{
 		buffer[offset++] = 0x80 | (size & 0xf); /* 0x80 is type, 0x0X is first nibble of length */
-		buffer[offset++] = (size >> 4) & 0xff;  /* +2 bytes for rest length */
+		buffer[offset++] = (size >> 4) & 0xff; /* +2 bytes for rest length */
 		buffer[offset++] = (size >> 12) & 0xff;
 	}
     else 

@@ -1022,113 +1022,130 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 	map->bvrcnt++;
     }
 #endif
-    // Actually this should always be true given the above code
-    if(map == gDiskBVMap)
-    {
-        // Don't leave a null map in the chain
-        if(map->bvrcnt == 0 && map->bvr == NULL)
-        {
-            gDiskBVMap = map->next;
-            free(map);
-            map = NULL;
-        }
-    }
+	// Actually this should always be true given the above code
+	if(map == gDiskBVMap)
+	{
+		// Don't leave a null map in the chain
+		if(map->bvrcnt == 0 && map->bvr == NULL)
+		{
+			gDiskBVMap = map->next;
+			free(map);
+			map = NULL;
+		}
+	}
 
-    if (countPtr) *countPtr = map ? map->bvrcnt : 0;
+	if (countPtr) *countPtr = map ? map->bvrcnt : 0;
 
-    return map ? map->bvr : NULL;
+		return map ? map->bvr : NULL;
 }
 
 //==========================================================================
 
 static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 {
-    struct DiskBVMap *        map;
-    struct Block0 *block0_p;
-    unsigned int blksize;
-    unsigned int factor;
-    void *buffer = malloc(BPS);
-
-    /* Check for alternate block size */
-    if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0) {
-        return NULL;
-    }
-    block0_p = buffer;
-    if (OSSwapBigToHostInt16(block0_p->sbSig) == BLOCK0_SIGNATURE) {
-        blksize = OSSwapBigToHostInt16(block0_p->sbBlkSize);
-        if (blksize != BPS) {
-            free(buffer);
-            buffer = malloc(blksize);
-        }
-        factor = blksize / BPS;
-    } else {
-        blksize = BPS;
-        factor = 1;
-    }
+	struct DiskBVMap *        map;
+	struct Block0 *block0_p;
+	unsigned int blksize;
+	unsigned int factor;
+	void *buffer = malloc(BPS);
+	if (!buffer)
+	{
+		return NULL;
+	}
+	/* Check for alternate block size */
+	if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0)
+	{
+		return NULL;
+	}
+	block0_p = buffer;
+	if (OSSwapBigToHostInt16(block0_p->sbSig) == BLOCK0_SIGNATURE)
+	{
+		blksize = OSSwapBigToHostInt16(block0_p->sbBlkSize);
+		if (blksize != BPS)
+		{
+			free(buffer);
+			buffer = malloc(blksize);
+			if (!buffer)
+			{
+				return NULL;
+			}
+		}
+		factor = blksize / BPS;
+	}
+	else
+	{
+		blksize = BPS;
+		factor = 1;
+	}
     
-    do {
-        // Create a new mapping.
+	do
+	{
+		// Create a new mapping.
 
-        map = (struct DiskBVMap *) malloc( sizeof(*map) );
-        if ( map )
-        {
-            int error;
-            DPME *dpme_p = (DPME *)buffer;
-            UInt32 i, npart = UINT_MAX;
-            BVRef bvr;
+		map = (struct DiskBVMap *) malloc( sizeof(*map) );
+		if ( map )
+		{
+			int error;
+			DPME *dpme_p = (DPME *)buffer;
+			UInt32 i, npart = UINT_MAX;
+			BVRef bvr;
 
-            map->biosdev = biosdev;
-            map->bvr     = NULL;
-            map->bvrcnt  = 0;
-            map->next    = gDiskBVMap;
-            gDiskBVMap   = map;
+			map->biosdev = biosdev;
+			map->bvr     = NULL;
+			map->bvrcnt  = 0;
+			map->next    = gDiskBVMap;
+			gDiskBVMap   = map;
 
-            for (i=0; i<npart; i++) {
-                error = readBytes( biosdev, (kAPMSector + i) * factor, 0, blksize, buffer );
+			for (i=0; i<npart; i++)
+			{
+				error = readBytes( biosdev, (kAPMSector + i) * factor, 0, blksize, buffer );
 
-                if (error || OSSwapBigToHostInt16(dpme_p->dpme_signature) != DPME_SIGNATURE) {
-                    break;
-                }
+				if (error || OSSwapBigToHostInt16(dpme_p->dpme_signature) != DPME_SIGNATURE)
+				{
+					break;
+				}
 
-                if (i==0) {
-                    npart = OSSwapBigToHostInt32(dpme_p->dpme_map_entries);
-                }
-                /*
-                printf("name = %s, %s%s  %d -> %d [%d -> %d] {%d}\n",
-                       dpme.dpme_name, dpme.dpme_type, (dpme.dpme_flags & DPME_FLAGS_BOOTABLE) ? "(bootable)" : "",
-                       dpme.dpme_pblock_start, dpme.dpme_pblocks,
-                       dpme.dpme_lblock_start, dpme.dpme_lblocks,
-                       dpme.dpme_boot_block);
-                */
+				if (i==0)
+				{
+					npart = OSSwapBigToHostInt32(dpme_p->dpme_map_entries);
+				}
+				/*
+				printf("name = %s, %s%s  %d -> %d [%d -> %d] {%d}\n",
+				dpme.dpme_name, dpme.dpme_type, (dpme.dpme_flags & DPME_FLAGS_BOOTABLE) ? "(bootable)" : "",
+				dpme.dpme_pblock_start, dpme.dpme_pblocks,
+				dpme.dpme_lblock_start, dpme.dpme_lblocks,
+				dpme.dpme_boot_block);
+				*/
 
-                if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0) {
-                    bvr = newAPMBVRef(biosdev,
-                                      i,
-                                      OSSwapBigToHostInt32(dpme_p->dpme_pblock_start) * factor,
-                                      dpme_p,
-                                      HFSInitPartition,
-                                      HFSLoadFile,
-                                      HFSReadFile,
-                                      HFSGetDirEntry,
-                                      HFSGetFileBlock,
-                                      HFSGetUUID,
-                                      HFSGetDescription,
-                                      HFSFree,
-                                      0,
-                                      kBIOSDevTypeHardDrive, 0);
-                    bvr->next = map->bvr;
-                    map->bvr = bvr;
-                    map->bvrcnt++;
-                }
-            }
-        }
-    } while (0);
+				if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0)
+				{
+					bvr = newAPMBVRef(biosdev,
+					i,
+					OSSwapBigToHostInt32(dpme_p->dpme_pblock_start) * factor,
+					dpme_p,
+					HFSInitPartition,
+					HFSLoadFile,
+					HFSReadFile,
+					HFSGetDirEntry,
+					HFSGetFileBlock,
+					HFSGetUUID,
+					HFSGetDescription,
+					HFSFree,
+					0,
+					kBIOSDevTypeHardDrive, 0);
+					bvr->next = map->bvr;
+					map->bvr = bvr;
+					map->bvrcnt++;
+				}
+			}
+		}
+	} while (0);
 
-    free(buffer);
+	free(buffer);
 
-    if (countPtr) *countPtr = map ? map->bvrcnt : 0;
+	if (countPtr) *countPtr = map ? map->bvrcnt : 0;
 
-    return map ? map->bvr : NULL;
+	return map ? map->bvr : NULL;
 }
 
 //==========================================================================
@@ -1140,319 +1157,332 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
  */
 static int probeFileSystem(int biosdev, unsigned int blkoff)
 {
-  // detected filesystem type;
-  int result = -1;
-  int fatbits;
+	// detected filesystem type;
+	int result = -1;
+	int fatbits;
 
-  // Allocating buffer for 4 sectors.
-  const void * probeBuffer = malloc(PROBEFS_SIZE);
-  if (probeBuffer == NULL)
-    goto exit;
+	// Allocating buffer for 4 sectors.
+	const void * probeBuffer = malloc(PROBEFS_SIZE);
+	if (probeBuffer == NULL)
+		goto exit;
 
-  // Reading first 4 sectors of current partition
-  int error = readBytes(biosdev, blkoff, 0, PROBEFS_SIZE, (void *)probeBuffer);
-  if (error)
-    goto exit;
+	// Reading first 4 sectors of current partition
+	int error = readBytes(biosdev, blkoff, 0, PROBEFS_SIZE, (void *)probeBuffer);
 
-  if (HFSProbe(probeBuffer))
-    result = FDISK_HFS;
-  else if (EX2Probe(probeBuffer))
-	  result = FDISK_LINUX;
-  else if (FreeBSDProbe(probeBuffer))
-	  result = FDISK_FREEBSD;
-  else if (OpenBSDProbe(probeBuffer))
-	  result = FDISK_OPENBSD;
-  else if (NTFSProbe(probeBuffer))
-    result = FDISK_NTFS;
-  else if (BeFSProbe(probeBuffer))
-    result = FDISK_BEFS;
-  else if ( (fatbits = MSDOSProbe(probeBuffer)) )
-  {
-	  switch (fatbits)
-	  {
-		  case 32:
-		  default:
-			  result = FDISK_FAT32;
-			  break;
-		  case 16:
-			  result = FDISK_DOS16B;
-			  break;
-		  case 12:
-			  result = FDISK_DOS12;
-			  break;			  
-	  }
-  }
-  else
-  // Couldn't detect filesystem type
-    result = 0;
-  
+	if (error)
+		goto exit;
+
+	if (HFSProbe(probeBuffer))
+		result = FDISK_HFS;
+
+	else if (EX2Probe(probeBuffer))
+		result = FDISK_LINUX;
+
+	else if (FreeBSDProbe(probeBuffer))
+		result = FDISK_FREEBSD;
+
+	else if (OpenBSDProbe(probeBuffer))
+		result = FDISK_OPENBSD;
+
+	else if (NTFSProbe(probeBuffer))
+		result = FDISK_NTFS;
+
+	else if (BeFSProbe(probeBuffer))
+		result = FDISK_BEFS;
+
+	else if ( (fatbits = MSDOSProbe(probeBuffer)) )
+	{
+		switch (fatbits)
+		{
+			case 32:
+			default:
+				result = FDISK_FAT32;
+				break;
+			case 16:
+				result = FDISK_DOS16B;
+				break;
+			case 12:
+				result = FDISK_DOS12;
+				break;			  
+		}
+	}
+	else
+		// Couldn't detect filesystem type
+		result = 0;
+
 exit:
-  if (probeBuffer != NULL) free((void *)probeBuffer);
-  return result;
+	if (probeBuffer != NULL) free((void *)probeBuffer);
+		return result;
 }
 
 static bool isPartitionUsed(gpt_ent * partition)
 {
-    //
-    // Ask whether the given partition is used.
-    //
+	//
+	// Ask whether the given partition is used.
+	//
 
-    return efi_guid_is_null((EFI_GUID const*)partition->ent_type) ? false : true;
+	return efi_guid_is_null((EFI_GUID const*)partition->ent_type) ? false : true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 {
-    struct DiskBVMap *        map = NULL;
-    void *buffer = malloc(BPS);
-    int error;
-    if ( (error = readBytes( biosdev, /*secno*/0, 0, BPS, buffer )) != 0) {
-        verbose("Failed to read boot sector from BIOS device %02xh. Error=%d\n", biosdev, error);
-        goto scanErr;
-    }
-    struct REAL_disk_blk0 *fdiskMap = buffer;
-    if ( OSSwapLittleToHostInt16(fdiskMap->signature) != DISK_SIGNATURE )
-    {
-        verbose("Failed to find boot signature on BIOS device %02xh\n", biosdev);
-        goto scanErr;
-    }
+	struct DiskBVMap *        map = NULL;
+	void *buffer = malloc(BPS);
+	int error;
+	if ( (error = readBytes( biosdev, /*secno*/0, 0, BPS, buffer )) != 0)
+	{
+		verbose("Failed to read boot sector from BIOS device %02xh. Error=%d\n", biosdev, error);
+		goto scanErr;
+	}
+	struct REAL_disk_blk0 *fdiskMap = buffer;
+	if ( OSSwapLittleToHostInt16(fdiskMap->signature) != DISK_SIGNATURE )
+	{
+		verbose("Failed to find boot signature on BIOS device %02xh\n", biosdev);
+		goto scanErr;
+	}
 
-    int fdiskID = 0;
-    unsigned index;
-    for ( index = 0; index < FDISK_NPART; index++ )
-    {
-        if ( fdiskMap->parts[index].systid )
-        {
-            if ( fdiskMap->parts[index].systid == 0xEE )
-            {
-                // Fail if two 0xEE partitions are present which
-                // means the FDISK code will wind up parsing it.
-                if ( fdiskID )  goto scanErr;
+	int fdiskID = 0;
+	unsigned index;
+	for ( index = 0; index < FDISK_NPART; index++ )
+	{
+		if ( fdiskMap->parts[index].systid )
+		{
+			if ( fdiskMap->parts[index].systid == 0xEE )
+			{
+				// Fail if two 0xEE partitions are present which
+				// means the FDISK code will wind up parsing it.
+				if ( fdiskID )  goto scanErr;
 
-                fdiskID = index + 1;
-            }
-        }
-    }
+				fdiskID = index + 1;
+			}
+		}
+	}
 
-    if ( fdiskID == 0 )  goto scanErr;
-    verbose("Attempting to read GPT\n");
+	if ( fdiskID == 0 )  goto scanErr;
+	verbose("Attempting to read GPT\n");
 
-    if(readBytes(biosdev, 1, 0, BPS, buffer) != 0)
-        goto scanErr;
+	if(readBytes(biosdev, 1, 0, BPS, buffer) != 0)
+		goto scanErr;
     
-    gpt_hdr *headerMap = buffer;
+	gpt_hdr *headerMap = buffer;
 
-    // Determine whether the partition header signature is present.
+	// Determine whether the partition header signature is present.
 
-    if ( memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)) )
-    {
-        goto scanErr;
-    }
+	if ( memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)) )
+	{
+		goto scanErr;
+	}
 
-    // Determine whether the partition header size is valid.
+	// Determine whether the partition header size is valid.
 
-    UInt32 headerCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_self);
-    UInt32 headerSize  = OSSwapLittleToHostInt32(headerMap->hdr_size);
+	UInt32 headerCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_self);
+	UInt32 headerSize  = OSSwapLittleToHostInt32(headerMap->hdr_size);
 
-    if ( headerSize < offsetof(gpt_hdr, padding) )
-    {
-        goto scanErr;
-    }
+	if ( headerSize < offsetof(gpt_hdr, padding) )
+	{
+		goto scanErr;
+	}
 
-    if ( headerSize > BPS )
-    {
-        goto scanErr;
-    }
+	if ( headerSize > BPS )
+	{
+		goto scanErr;
+	}
 
-    // Determine whether the partition header checksum is valid.
+	// Determine whether the partition header checksum is valid.
 
-    headerMap->hdr_crc_self = 0;
+	headerMap->hdr_crc_self = 0;
 
-    if ( crc32(0, headerMap, headerSize) != headerCheck )
-    {
-        goto scanErr;
-    }
+	if ( crc32(0, headerMap, headerSize) != headerCheck )
+	{
+		goto scanErr;
+	}
 
-    // Determine whether the partition entry size is valid.
+	// Determine whether the partition entry size is valid.
 
-    UInt64                     gptBlock       = 0;
-    UInt32                     gptCheck       = 0;
-    UInt32                     gptCount       = 0;
-    UInt32                     gptID          = 0;
-    gpt_ent *                  gptMap         = 0;
-    UInt32                     gptSize        = 0;
+	UInt64                     gptBlock       = 0;
+	UInt32                     gptCheck       = 0;
+	UInt32                     gptCount       = 0;
+	UInt32                     gptID          = 0;
+	gpt_ent *                  gptMap         = 0;
+	UInt32                     gptSize        = 0;
 
-    gptBlock = OSSwapLittleToHostInt64(headerMap->hdr_lba_table);
-    gptCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_table);
-    gptCount = OSSwapLittleToHostInt32(headerMap->hdr_entries);
-    gptSize  = OSSwapLittleToHostInt32(headerMap->hdr_entsz);
+	gptBlock = OSSwapLittleToHostInt64(headerMap->hdr_lba_table);
+	gptCheck = OSSwapLittleToHostInt32(headerMap->hdr_crc_table);
+	gptCount = OSSwapLittleToHostInt32(headerMap->hdr_entries);
+	gptSize  = OSSwapLittleToHostInt32(headerMap->hdr_entsz);
 
-    if ( gptSize < sizeof(gpt_ent) )
-    {
-        goto scanErr;
-    }
+	if ( gptSize < sizeof(gpt_ent) )
+	{
+		goto scanErr;
+	}
 
-    // Allocate a buffer large enough to hold one map, rounded to a media block.
-    free(buffer);
-    buffer = NULL;
+	// Allocate a buffer large enough to hold one map, rounded to a media block.
+	free(buffer);
+	buffer = NULL;
 
-    UInt32 bufferSize = IORound(gptCount * gptSize, BPS);
-    if(bufferSize == 0)
-        goto scanErr;
-    buffer = malloc(bufferSize);
+	UInt32 bufferSize = IORound(gptCount * gptSize, BPS);
+	if (bufferSize == 0)
+		goto scanErr;
+	buffer = malloc(bufferSize);
 
-    if(readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
-        goto scanErr;
+	if (readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
+		goto scanErr;
 
-    verbose("Read GPT\n");
+	verbose("Read GPT\n");
 
-    // Allocate a new map for this BIOS device and insert it into the chain
-    map = malloc(sizeof(*map));
-    map->biosdev = biosdev;
-    map->bvr = NULL;
-    map->bvrcnt = 0;
-    map->next = gDiskBVMap;
-    gDiskBVMap = map;
+	// Allocate a new map for this BIOS device and insert it into the chain
+	map = malloc(sizeof(*map));
+	map->biosdev = biosdev;
+	map->bvr = NULL;
+	map->bvrcnt = 0;
+	map->next = gDiskBVMap;
+	gDiskBVMap = map;
 
-    // fdisk like partition type id.
-    int fsType = 0;
+	// fdisk like partition type id.
+	int fsType = 0;
     
-    for(gptID = 1; gptID <= gptCount; ++gptID)
-    {
-				BVRef bvr = NULL;
-				unsigned int bvrFlags = 0;
-    
-        // size on disk can be larger than sizeof(gpt_ent)
-        gptMap = (gpt_ent *) ( buffer + ( (gptID - 1) * gptSize)  );
+	for(gptID = 1; gptID <= gptCount; ++gptID)
+	{
+		BVRef bvr = NULL;
+		unsigned int bvrFlags = 0;
 
-        // NOTE: EFI_GUID's are in LE and we know we're on an x86.
-        // The IOGUIDPartitionScheme.cpp code uses byte-based UUIDs, we don't.
+		// size on disk can be larger than sizeof(gpt_ent)
+		gptMap = (gpt_ent *) ( buffer + ( (gptID - 1) * gptSize)  );
 
-        if (isPartitionUsed(gptMap))
-        {
-            char stringuuid[100];
-            efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid);
-            verbose("Reading GPT partition %d, type %s\n", gptID, stringuuid);
+		// NOTE: EFI_GUID's are in LE and we know we're on an x86.
+		// The IOGUIDPartitionScheme.cpp code uses byte-based UUIDs, we don't.
 
-            // Getting fdisk like partition type.
-            fsType = probeFileSystem(biosdev, gptMap->ent_lba_start);
+		if (isPartitionUsed(gptMap))
+		{
+			char stringuuid[100];
+			efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid);
+			verbose("Reading GPT partition %d, type %s\n", gptID, stringuuid);
 
-            if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
-                 (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
-            {
-                bvrFlags = (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ? kBVFlagBooter : 0;
-                bvr = newGPTBVRef(biosdev,
-                                      gptID,
-                                      gptMap->ent_lba_start,
-                                      gptMap,
-                                      HFSInitPartition,
-                                      HFSLoadFile,
-                                      HFSReadFile,
-                                      HFSGetDirEntry,
-                                      HFSGetFileBlock,
-                                      HFSGetUUID,
-                                      HFSGetDescription,
-                                      HFSFree,
-                                      0,
-                                      kBIOSDevTypeHardDrive, bvrFlags);
-            }
+			// Getting fdisk like partition type.
+			fsType = probeFileSystem(biosdev, gptMap->ent_lba_start);
+
+				if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
+				(efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
+				{
+					bvrFlags = (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ? kBVFlagBooter : 0;
+					bvr = newGPTBVRef(biosdev,
+					gptID,
+					gptMap->ent_lba_start,
+					gptMap,
+					HFSInitPartition,
+					HFSLoadFile,
+					HFSReadFile,
+					HFSGetDirEntry,
+					HFSGetFileBlock,
+					HFSGetUUID,
+					HFSGetDescription,
+					HFSFree,
+					0,
+					kBIOSDevTypeHardDrive, bvrFlags);
+				}
 
 			// zef - foreign OS support
-            if ( (efi_guid_compare(&GPT_BASICDATA_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
-                 (efi_guid_compare(&GPT_BASICDATA2_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
-            {
-							switch (fsType)
-              {
-							  case FDISK_NTFS:
-							    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                	  								0, 0, 0, 0, 0, 0, NTFSGetDescription,
-                		  							(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
-								break;
-							  case FDISK_LINUX:
-							    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                	  								0, 0, 0, 0, 0, 0, EX2GetDescription,
-                		  							(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
-								break;
+			if ( (efi_guid_compare(&GPT_BASICDATA_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
+			(efi_guid_compare(&GPT_BASICDATA2_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
+			{
+				switch (fsType)
+				{
+					case FDISK_NTFS:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						0, 0, 0, 0, 0, 0, NTFSGetDescription,
+						(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
 
-                default:
-                  bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                                    0, 0, 0, 0, 0, 0, 0,
-                                    (BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
-                break;
-              }
-							  
-            }
+					case FDISK_LINUX:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						0, 0, 0, 0, 0, 0, EX2GetDescription,
+						(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
 
-            // turbo - save our booter partition
-            // zef - only on original boot device
-            if ( (efi_guid_compare(&GPT_EFISYS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
-            {
-							switch (fsType)
-              {
-                case FDISK_HFS:
-                  if (readBootSector( biosdev, gptMap->ent_lba_start, (void *)0x7e00 ) == 0)
-                  {
-                    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                          HFSInitPartition,
-                          HFSLoadFile,
-                          HFSReadFile,
-                          HFSGetDirEntry,
-                          HFSGetFileBlock,
-                          HFSGetUUID,
-                          HFSGetDescription,
-                          HFSFree,
-                          0, kBIOSDevTypeHardDrive, kBVFlagEFISystem);
-                  }
-                break;
+					default:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						0, 0, 0, 0, 0, 0, 0,
+						(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
+				}
 
-                case FDISK_FAT32:
-                  if (testFAT32EFIBootSector( biosdev, gptMap->ent_lba_start, (void *)0x7e00 ) == 0)
-                  {
-                    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                          MSDOSInitPartition,
-                          MSDOSLoadFile,
-                          MSDOSReadFile,
-                          MSDOSGetDirEntry,
-                          MSDOSGetFileBlock,
-                          MSDOSGetUUID,
-                          MSDOSGetDescription,
-                          MSDOSFree,
-                          0, kBIOSDevTypeHardDrive, kBVFlagEFISystem);
-                  }
-                break;
+			}
 
-                if (biosdev == gBIOSDev)
-                  gBIOSBootVolume = bvr;
-              }
-            }            
+			// turbo - save our booter partition
+			// zef - only on original boot device
+			if ( (efi_guid_compare(&GPT_EFISYS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
+			{
+				switch (fsType)
+				{
+					case FDISK_HFS:
+					if (readBootSector( biosdev, gptMap->ent_lba_start, (void *)0x7e00 ) == 0)
+					{
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						HFSInitPartition,
+						HFSLoadFile,
+						HFSReadFile,
+						HFSGetDirEntry,
+						HFSGetFileBlock,
+						HFSGetUUID,
+						HFSGetDescription,
+						HFSFree,
+						0, kBIOSDevTypeHardDrive, kBVFlagEFISystem);
+					}
+					break;
 
-						if (bvr)
-						{
-              // Fixup bvr with the fake fdisk partition type.
-              if (fsType > 0) bvr->part_type = fsType;
+					case FDISK_FAT32:
+					if (testFAT32EFIBootSector( biosdev, gptMap->ent_lba_start, (void *)0x7e00 ) == 0)
+					{
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						MSDOSInitPartition,
+						MSDOSLoadFile,
+						MSDOSReadFile,
+						MSDOSGetDirEntry,
+						MSDOSGetFileBlock,
+						MSDOSGetUUID,
+						MSDOSGetDescription,
+						MSDOSFree,
+						0, kBIOSDevTypeHardDrive, kBVFlagEFISystem);
+					}
+					break;
 
-							bvr->next = map->bvr;
-							map->bvr = bvr;
-							++map->bvrcnt;
-						}
+					if (biosdev == gBIOSDev)
 
-        }
-    }
+						gBIOSBootVolume = bvr;
 
-scanErr:
-    free(buffer);
+				}
+			}
 
-    if(map)
-    {
-        if(countPtr) *countPtr = map->bvrcnt;
-        return map->bvr;
-    }
-    else
-    {
-        if(countPtr) *countPtr = 0;
-        return NULL;
-    }
+			if (bvr)
+			{
+				// Fixup bvr with the fake fdisk partition type.
+				if (fsType > 0) bvr->part_type = fsType;
+
+				bvr->next = map->bvr;
+				map->bvr = bvr;
+				++map->bvrcnt;
+			}
+
+		}
+	}
+
+	scanErr:
+	free(buffer);
+
+	if(map)
+	{
+		if(countPtr) *countPtr = map->bvrcnt;
+			return map->bvr;
+
+	}
+	else
+	{
+		if(countPtr) *countPtr = 0;
+			return NULL;
+
+	}
 }
 
 static bool getOSVersion(BVRef bvr, char *str)
@@ -1473,9 +1503,9 @@ static bool getOSVersion(BVRef bvr, char *str)
 		
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{	
-            bvr->OSisServer = true;
+			bvr->OSisServer = true;
 			valid = true;
-		}		
+		}
 	}
 	
 	if (valid)
@@ -1501,61 +1531,61 @@ static bool getOSVersion(BVRef bvr, char *str)
 
 static void scanFSLevelBVRSettings(BVRef chain)
 {
-  BVRef bvr;
-  char  dirSpec[512], fileSpec[512];
-  char  label[BVSTRLEN];
-  int   ret;
-  long  flags, time;
-  int   fh, fileSize, error;
+	BVRef bvr;
+	char  dirSpec[512], fileSpec[512];
+	char  label[BVSTRLEN];
+	int   ret;
+	long  flags, time;
+	int   fh, fileSize, error;
 
-  for (bvr = chain; bvr; bvr = bvr->next)
-  {
-    ret = -1;
-    error = 0;
+	for (bvr = chain; bvr; bvr = bvr->next)
+	{
+		ret = -1;
+		error = 0;
     
-    //
-    // Check for alternate volume label on boot helper partitions.
-    //
-    if (bvr->flags & kBVFlagBooter)
-    {
-      sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-      strcpy(fileSpec, ".disk_label.contentDetails");
-      ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
-      if (!ret)
-      {
-        fh = open(strcat(dirSpec, fileSpec), 0);
-        fileSize = file_size(fh);
-        if (fileSize > 0 && fileSize < BVSTRLEN)
-        {
-          if (read(fh, label, fileSize) != fileSize)
-            error = -1;
-        }
-        else
-          error = -1;
+		//
+		// Check for alternate volume label on boot helper partitions.
+		//
+		if (bvr->flags & kBVFlagBooter)
+		{
+			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			strcpy(fileSpec, ".disk_label.contentDetails");
+			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
+			if (!ret)
+			{
+				fh = open(strcat(dirSpec, fileSpec), 0);
+				fileSize = file_size(fh);
+				if (fileSize > 0 && fileSize < BVSTRLEN)
+				{
+					if (read(fh, label, fileSize) != fileSize)
+						error = -1;
+				}
+				else
+					error = -1;
 
-        close(fh);
+				close(fh);
 
-        if (!error)
-        {
-          label[fileSize] = '\0';
-          strcpy(bvr->altlabel, label);
-        }
-      }
-    }
+				if (!error)
+				{
+					label[fileSize] = '\0';
+					strcpy(bvr->altlabel, label);
+				}
+			}
+		}
 
-    //
-    // Check for SystemVersion.plist or ServerVersion.plist
-    // to determine if a volume hosts an installed system.
-    //
-    if (bvr->flags & kBVFlagNativeBoot)
-    {
-        if (getOSVersion(bvr,bvr->OSVersion) == true)
-        {
-            bvr->flags |= kBVFlagSystemVolume;
-        }
-    }
+		//
+		// Check for SystemVersion.plist or ServerVersion.plist
+		// to determine if a volume hosts an installed system.
+		//
+		if (bvr->flags & kBVFlagNativeBoot)
+		{
+			if (getOSVersion(bvr,bvr->OSVersion) == true)
+			{
+				bvr->flags |= kBVFlagSystemVolume;
+			}
+		}
 
-  }
+	}
 }
 
 void rescanBIOSDevice(int biosdev)
@@ -1569,220 +1599,245 @@ void rescanBIOSDevice(int biosdev)
 
 struct DiskBVMap* diskResetBootVolumes(int biosdev)
 {
-    struct DiskBVMap *        map;
-    struct DiskBVMap *prevMap = NULL;
-    for ( map = gDiskBVMap; map; prevMap = map, map = map->next ) {
-        if ( biosdev == map->biosdev ) {
-            break;
-        }
-    }
-    if(map != NULL)
-    {
-        verbose("Resetting BIOS device %xh\n", biosdev);
-        // Reset the biosbuf cache
-        cache_valid = false;
-        if(map == gDiskBVMap)
-            gDiskBVMap = map->next;
-        else if(prevMap != NULL)
-            prevMap->next = map->next;
-        else
-            stop("");
-    }
-    // Return the old map, either to be freed, or reinserted later
-    return map;
+	struct DiskBVMap *        map;
+	struct DiskBVMap *prevMap = NULL;
+	for ( map = gDiskBVMap; map; prevMap = map, map = map->next )
+	{
+		if ( biosdev == map->biosdev )
+		{
+			break;
+		}
+	}
+
+	if(map != NULL)
+	{
+		verbose("Resetting BIOS device %xh\n", biosdev);
+		// Reset the biosbuf cache
+		cache_valid = false;
+		if(map == gDiskBVMap)
+			gDiskBVMap = map->next;
+		else if(prevMap != NULL)
+			prevMap->next = map->next;
+	else
+		stop("");
+	}
+	// Return the old map, either to be freed, or reinserted later
+	return map;
 }
 
 // Frees a DiskBVMap and all of its BootVolume's
 void diskFreeMap(struct DiskBVMap *map)
 {
-    if(map != NULL)
-    {
-        while(map->bvr != NULL)
-        {
-            BVRef bvr = map->bvr;
-            map->bvr = bvr->next;
-            (*bvr->bv_free)(bvr);
-        }
-        free(map);
-    }
+	if(map != NULL)
+	{
+		while(map->bvr != NULL)
+		{
+			BVRef bvr = map->bvr;
+			map->bvr = bvr->next;
+			(*bvr->bv_free)(bvr);
+		}
+
+		free(map);
+	}
 }
 
 BVRef diskScanBootVolumes( int biosdev, int * countPtr )
 {
-    struct DiskBVMap *        map = NULL;
-    BVRef bvr;
-    int count = 0;
+	struct DiskBVMap *        map = NULL;
+	BVRef bvr;
+	int count = 0;
 
-    // Find an existing mapping for this device.
+	// Find an existing mapping for this device.
 
-    for ( map = gDiskBVMap; map; map = map->next ) {
-        if ( biosdev == map->biosdev ) {
-            count = map->bvrcnt;
-            break;
-        }
-    }
+	for ( map = gDiskBVMap; map; map = map->next )
+	{
+		if ( biosdev == map->biosdev )
+		{
+			count = map->bvrcnt;
+			break;
+		}
+	}
 
-    if (map == NULL) {
-        bvr = diskScanGPTBootVolumes(biosdev, &count);
-        if (bvr == NULL) {
-          bvr = diskScanFDiskBootVolumes(biosdev, &count);
-        }
-        if (bvr == NULL) {
-          bvr = diskScanAPMBootVolumes(biosdev, &count);
-        }
-        if (bvr)
-        {
-          scanFSLevelBVRSettings(bvr);
-        }
-    } else {
-        bvr = map->bvr;
-    }
-    if (countPtr)  *countPtr += count;
-    return bvr;
+	if (map == NULL)
+	{
+		bvr = diskScanGPTBootVolumes(biosdev, &count);
+		if (bvr == NULL)
+		{
+			bvr = diskScanFDiskBootVolumes(biosdev, &count);
+		}
+		if (bvr == NULL)
+		{
+			bvr = diskScanAPMBootVolumes(biosdev, &count);
+		}
+		if (bvr)
+		{
+          	scanFSLevelBVRSettings(bvr);
+		}
+	}
+	else
+	{
+		bvr = map->bvr;
+	}
+	if (countPtr)  *countPtr += count;
+	return bvr;
 }
 
 BVRef getBVChainForBIOSDev(int biosdev)
 {
-  BVRef chain = NULL;
-  struct DiskBVMap * map = NULL;
+	BVRef chain = NULL;
+	struct DiskBVMap * map = NULL;
 
-  for (map = gDiskBVMap; map; map = map->next)
-  {
-    if (map->biosdev == biosdev)
-    {
-      chain = map->bvr;
-      break;
-    }
-  }
-  
-  return chain;
+	for (map = gDiskBVMap; map; map = map->next)
+	{
+		if (map->biosdev == biosdev)
+		{
+			chain = map->bvr;
+			break;
+		}
+	}
+
+	return chain;
 }
 
 BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count)
 {
-  BVRef chain = NULL;
-  BVRef bvr = NULL;
-  BVRef newBVR = NULL;
-  BVRef prevBVR = NULL;
+	BVRef chain = NULL;
+	BVRef bvr = NULL;
+	BVRef newBVR = NULL;
+	BVRef prevBVR = NULL;
 
-  struct DiskBVMap * map = NULL;
-  int bvCount = 0;
+	struct DiskBVMap * map = NULL;
+	int bvCount = 0;
 
-  const char *raw = 0;
-  char* val = 0;
-  int len;
+	const char *raw = 0;
+	char* val = 0;
+	int len;
     
-  getValueForKey(kHidePartition, &raw, &len, &bootInfo->chameleonConfig);
-  if(raw)
-  {
-      val = XMLDecode(raw);  
-  }
+	getValueForKey(kHidePartition, &raw, &len, &bootInfo->chameleonConfig);
+	if(raw)
+	{
+		val = XMLDecode(raw);  
+	}
 
-  /*
-   * Traverse gDISKBVmap to get references for
-   * individual bvr chains of each drive.
-   */
-  for (map = gDiskBVMap; map; map = map->next)
-  {
-    for (bvr = map->bvr; bvr; bvr = bvr->next)
-    {
-      /*
-       * Save the last bvr.
-       */
-      if (newBVR) prevBVR = newBVR;
+	/*
+	 * Traverse gDISKBVmap to get references for
+	 * individual bvr chains of each drive.
+	 */
+	for (map = gDiskBVMap; map; map = map->next)
+	{
+		for (bvr = map->bvr; bvr; bvr = bvr->next)
+		{
+			/*
+			 * Save the last bvr.
+			 */
+			if (newBVR) prevBVR = newBVR;
 
-      /*
-       * Allocate and copy the matched bvr entry into a new one.
-       */
-      newBVR = (BVRef) malloc(sizeof(*newBVR));
-      bcopy(bvr, newBVR, sizeof(*newBVR));
+			/*
+			 * Allocate and copy the matched bvr entry into a new one.
+			 */
+			newBVR = (BVRef) malloc(sizeof(*newBVR));
+			if (!newBVR)
+			{
+				continue;
+			}
+			bcopy(bvr, newBVR, sizeof(*newBVR));
 
-      /*
-       * Adjust the new bvr's fields.
-       */
-      newBVR->next = NULL;
-      newBVR->filtered = true;
+			/*
+			 * Adjust the new bvr's fields.
+			 */
+			newBVR->next = NULL;
+			newBVR->filtered = true;
 
-      if ( (!allowFlags || newBVR->flags & allowFlags)
-          && (!denyFlags || !(newBVR->flags & denyFlags) )
-          && (newBVR->biosdev >= minBIOSDev && newBVR->biosdev <= maxBIOSDev)
-         )
-        newBVR->visible = true;
-      
-      /*
-       * Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
-       * to be able to hide foreign partitions from the boot menu.
-       *
-       */
-      if ( (newBVR->flags & kBVFlagForeignBoot) )
-      {
-        char *start, *next = val;
-        long len = 0;  
-        do
-        {
-          start = strbreak(next, &next, &len);
-          if(len && matchVolumeToString(newBVR, start, len) )
-	        newBVR->visible = false;
-        }
-        while ( next && *next );
-      }
+			if ( (!allowFlags || newBVR->flags & allowFlags)
+				&& (!denyFlags || !(newBVR->flags & denyFlags) )
+				&& (newBVR->biosdev >= minBIOSDev && newBVR->biosdev <= maxBIOSDev)
+				)
+			{
+				newBVR->visible = true;
+			}
 
-      /*
-       * Use the first bvr entry as the starting chain pointer.
-       */
-      if (!chain)
-        chain = newBVR;
+			/*
+			 * Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
+			 * to be able to hide foreign partitions from the boot menu.
+			 *
+			 */
+			if ( (newBVR->flags & kBVFlagForeignBoot) )
+			{
+				char *start, *next = val;
+				long len = 0;  
+				do
+				{
+					start = strbreak(next, &next, &len);
+					if(len && matchVolumeToString(newBVR, start, len) )
+					{
+						newBVR->visible = false;
+					}
+				}
+				while ( next && *next );
+			}
 
-      /*
-       * Update the previous bvr's link pointer to use the new memory area.
-       */
-      if (prevBVR)
-        prevBVR->next = newBVR;
-        
-      if (newBVR->visible)
-        bvCount++;
-    }
-  }
+			/*
+			 * Use the first bvr entry as the starting chain pointer.
+			 */
+			if (!chain)
+			{
+				chain = newBVR;
+			}
+
+			/*
+			 * Update the previous bvr's link pointer to use the new memory area.
+			 */
+			if (prevBVR)
+			{
+				prevBVR->next = newBVR;
+			}
+
+			if (newBVR->visible)
+			{
+				bvCount++;
+			}
+		}
+	}
 
 #if DEBUG //Azi: warning - too big for boot-log.. far too big.. i mean HUGE!! :P
-  for (bvr = chain; bvr; bvr = bvr->next)
-  {
-    printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
-  }
-  printf("count: %d\n", bvCount);
-  getchar();
+	for (bvr = chain; bvr; bvr = bvr->next)
+	{
+		printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
+	}
+	printf("count: %d\n", bvCount);
+	getchar();
 #endif
 
-  *count = bvCount;
-  
-  free(val);  
-  return chain;
+	*count = bvCount;
+
+	free(val);  
+	return chain;
 }
 
 int freeFilteredBVChain(const BVRef chain)
 {
-  int ret = 1;
-  BVRef bvr = chain;
-  BVRef nextBVR = NULL;
+	int ret = 1;
+	BVRef bvr = chain;
+	BVRef nextBVR = NULL;
   
-  while (bvr)
-  {
-    nextBVR = bvr->next;
+	while (bvr)
+	{
+		nextBVR = bvr->next;
 
-    if (bvr->filtered)
-    {
-      free(bvr);
-    }
-    else
-    {
-      ret = 0;
-      break;
-    }
+		if (bvr->filtered)
+		{
+			free(bvr);
+		}
+		else
+		{
+			ret = 0;
+			break;
+		}
 
-    bvr = nextBVR;
-  }
-  
-  return ret;
+		bvr = nextBVR;
+	}
+
+	return ret;
 }
 
 //==========================================================================
@@ -1814,32 +1869,36 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 	char testStr[128];
 
 	if ( !bvr || !match || !*match)
+	{
 		return 0;
-	
+	}
+
 	if ( bvr->biosdev < 0x80 || bvr->biosdev >= 0x100 )
+	{
         return 0;
+	}
+
+	// Try to match hd(x,y) first.
+	sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
+		return true;
     
-    // Try to match hd(x,y) first.
-    sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
-    if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
-        return true;
+	// Try to match volume UUID.
+	if ( bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0)
+	{
+		if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
+			return true;
+	}
     
-    // Try to match volume UUID.
-    if ( bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0)
-    {
-        if( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
-            return true;
-    }
+	// Try to match volume label (always quoted).
+	if ( bvr->description )
+	{
+		bvr->description(bvr, testStr, sizeof(testStr)-1);
+		if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
+			return true;
+	}
     
-    // Try to match volume label (always quoted).
-    if ( bvr->description )
-    {
-        bvr->description(bvr, testStr, sizeof(testStr)-1);
-        if( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
-            return true;
-    }
-    
-    return false;
+	return false;
 }
 
 /* If Rename Partition has defined an alias, then extract it for description purpose.
@@ -1849,102 +1908,120 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 
 bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 {
-    char *aliasList, *entryStart, *entryNext;
+	char *aliasList, *entryStart, *entryNext;
     
-    if ( !str || strMaxLen <= 0)
-        return false;
-    
-    aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->chameleonConfig));
-    if ( !aliasList )
-        return false;
-    
-    for ( entryStart = entryNext = aliasList;
-          entryNext && *entryNext;
-          entryStart = entryNext )
-    {
-        char *volStart, *volEnd, *aliasStart;
-        long volLen, aliasLen;
-        
-        // Delimit current entry
-        entryNext = strchr(entryStart, ';');
-        if ( entryNext )
-        {
-            *entryNext = '\0';
-            entryNext++;
-        }
-        
-        volStart = strbreak(entryStart, &volEnd, &volLen);
-        if(!volLen)
-            continue;
+	if ( !str || strMaxLen <= 0)
+	{
+		return false;
+	}
 
-        aliasStart = strbreak(volEnd, 0, &aliasLen);
-        if(!aliasLen)
-            continue;
+	aliasList = XMLDecode(getStringForKey(kRenamePartition, &bootInfo->chameleonConfig));
+	if ( !aliasList )
+	{
+		return false;
+	}
 
-        if ( matchVolumeToString(bvr, volStart, volLen) )
-        {
-            strncat(str, aliasStart, MIN(strMaxLen, aliasLen));
-            free(aliasList);
+	for ( entryStart = entryNext = aliasList;
+		 entryNext && *entryNext;
+		 entryStart = entryNext )
+	{
+		char *volStart, *volEnd, *aliasStart;
+		long volLen, aliasLen;
         
-            return true;
-        }
-    }
+		// Delimit current entry
+		entryNext = strchr(entryStart, ';');
+		if ( entryNext )
+		{
+			*entryNext = '\0';
+			entryNext++;
+		}
+        
+		volStart = strbreak(entryStart, &volEnd, &volLen);
+		if(!volLen)
+		{
+			continue;
+		}
+
+		aliasStart = strbreak(volEnd, 0, &aliasLen);
+		if(!aliasLen)
+		{
+			continue;
+		}
+
+		if ( matchVolumeToString(bvr, volStart, volLen) )
+		{
+			strncat(str, aliasStart, MIN(strMaxLen, aliasLen));
+			free(aliasList);
+
+			return true;
+		}
+	}
     
-    free(aliasList);
-    return false;
+	free(aliasList);
+	return false;
 }
 
 void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDeviceDescription )
 {
-    unsigned char type;
-    char *p = str;
+	unsigned char type;
+	char *p = str;
     
-    if(!bvr || !p || strMaxLen <= 0)
-        return;
-    
-    type = (unsigned char) bvr->part_type;
+	if(!bvr || !p || strMaxLen <= 0)
+	{
+		return;
+	}
 
-    if (useDeviceDescription)
-    {
-        int len = getDeviceDescription(bvr, str);
-        if(len >= strMaxLen)
-            return;
+	type = (unsigned char) bvr->part_type;
 
-        strcpy(str + len, " ");
-        len++;
-        strMaxLen -= len;
-        p += len;
-    }
+	if (useDeviceDescription)
+	{
+		int len = getDeviceDescription(bvr, str);
+		if(len >= strMaxLen)
+			return;
 
-    /* See if a partition rename is preferred */
-    if(getVolumeLabelAlias(bvr, p, strMaxLen)) {
-        strncpy(bvr->label, p, strMaxLen); 
-        return; // we're done here no need to seek for real name
-    }
+		strcpy(str + len, " ");
+		len++;
+		strMaxLen -= len;
+		p += len;
+	}
 
-    //
-    // Get the volume label using filesystem specific functions
-    // or use the alternate volume label if available.
-    //
+	/* See if a partition rename is preferred */
+	if (getVolumeLabelAlias(bvr, p, strMaxLen))
+	{
+		strncpy(bvr->label, p, strMaxLen); 
+		return; // we're done here no need to seek for real name
+	}
+
+	//
+	// Get the volume label using filesystem specific functions
+	// or use the alternate volume label if available.
+	//
 	if (*bvr->altlabel != '\0')
-        strncpy(p, bvr->altlabel, strMaxLen);
+		strncpy(p, bvr->altlabel, strMaxLen);
 	else if (bvr->description)
-        bvr->description(bvr, p, strMaxLen);
+		bvr->description(bvr, p, strMaxLen);
 
-    if (*p == '\0') {
-        const char * name = getNameForValue( fdiskTypes, type );
-        if (name == NULL) {
-            name = bvr->type_name;
-        }
-        if (name == NULL) {
-            sprintf(p, "TYPE %02x", type);
-        } else {
-            strncpy(p, name, strMaxLen);
-        }
-    }
+		if (*p == '\0')
+		{
+			const char * name = getNameForValue( fdiskTypes, type );
 
-    // Set the devices label
-    sprintf(bvr->label, p);
+		if (name == NULL)
+		{
+			name = bvr->type_name;
+		}
+
+		if (name == NULL)
+		{
+			sprintf(p, "TYPE %02x", type);
+		}
+		else
+		{
+			strncpy(p, name, strMaxLen);
+		}
+	}
+
+	// Set the devices label
+	sprintf(bvr->label, p);
 }
 
 //==========================================================================
@@ -1980,39 +2057,43 @@ int readBootSector(int biosdev, unsigned int secno, void * buffer)
 /*
  * Format of boot1f32 block.
  */
- 
+
 #define BOOT1F32_MAGIC      "BOOT       "
 #define BOOT1F32_MAGICLEN   11
 
 struct disk_boot1f32_blk {
-    unsigned char    init[3];
-    unsigned char    fsheader[87];
-    unsigned char    magic[BOOT1F32_MAGICLEN];
-    unsigned char    bootcode[409];
-    unsigned short   signature;
+	unsigned char    init[3];
+	unsigned char    fsheader[87];
+	unsigned char    magic[BOOT1F32_MAGICLEN];
+	unsigned char    bootcode[409];
+	unsigned short   signature;
 };
 
 int testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer )
 {
-    struct disk_boot1f32_blk * bootSector = (struct disk_boot1f32_blk *) buffer;
-    int                error;
+	struct disk_boot1f32_blk * bootSector = (struct disk_boot1f32_blk *) buffer;
+	int                error;
 
-    if ( bootSector == NULL )
-    {
-        if ( gBootSector == NULL )
-        {
-            gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
-            if ( gBootSector == NULL ) return -1;
-        }
-        bootSector = (struct disk_boot1f32_blk *) gBootSector;
-    }
+	if ( bootSector == NULL )
+	{
+		if ( gBootSector == NULL )
+		{
+			gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
+			if ( gBootSector == NULL )
+			{
+				return -1;
+			}
+		}
+		bootSector = (struct disk_boot1f32_blk *) gBootSector;
+	}
 
-    error = readBytes( biosdev, secno, 0, BPS, bootSector );
-    if ( error || bootSector->signature != DISK_SIGNATURE
-         || strncmp((const char *)bootSector->magic, BOOT1F32_MAGIC, BOOT1F32_MAGICLEN) )
-      return -1;
-
-    return 0;
+	error = readBytes( biosdev, secno, 0, BPS, bootSector );
+	if ( error || bootSector->signature != DISK_SIGNATURE
+		|| strncmp((const char *)bootSector->magic, BOOT1F32_MAGIC, BOOT1F32_MAGICLEN) )
+	{
+		return -1;
+	}
+	return 0;
 }
 
 //==========================================================================
@@ -2020,8 +2101,8 @@ int testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer )
 
 void diskSeek(BVRef bvr, long long position)
 {
-    bvr->fs_boff = position / BPS;
-    bvr->fs_byteoff = position % BPS;
+	bvr->fs_boff = position / BPS;
+	bvr->fs_byteoff = position % BPS;
 }
 
 //==========================================================================
@@ -2029,50 +2110,54 @@ void diskSeek(BVRef bvr, long long position)
 
 int diskRead( BVRef bvr, long addr, long length )
 {
-    return readBytes( bvr->biosdev,
-                      bvr->fs_boff + bvr->part_boff,
-                      bvr->fs_byteoff,
-                      length,
-                      (void *) addr );
+	return readBytes( bvr->biosdev,
+		bvr->fs_boff + bvr->part_boff,
+		bvr->fs_byteoff,
+		length,
+		(void *) addr );
 }
 
 int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
 {
-    int secs;
-    unsigned char *cbuf = (unsigned char *)buffer;
-    unsigned int copy_len;
-    int rc;
+	int secs;
+	unsigned char *cbuf = (unsigned char *)buffer;
+	unsigned int copy_len;
+	int rc;
 
-    if ((len & (BPS-1)) != 0) {
-        error("raw disk read not sector aligned");
-        return -1;
-    }
-    secno += bvr->part_boff;
+	if ((len & (BPS-1)) != 0)
+	{
+		error("raw disk read not sector aligned");
+		return -1;
+	}
+	secno += bvr->part_boff;
 
-    cache_valid = false;
+	cache_valid = false;
 
-    while (len > 0) {
-        secs = len / BPS;
-        if (secs > N_CACHE_SECS) secs = N_CACHE_SECS;
-        copy_len = secs * BPS;
+	while (len > 0)
+	{
+		secs = len / BPS;
+		if (secs > N_CACHE_SECS) secs = N_CACHE_SECS;
+			copy_len = secs * BPS;
 
-        //printf("rdr: ebiosread(%d, %d, %d)\n", bvr->biosdev, secno, secs);
-        if ((rc = ebiosread(bvr->biosdev, secno, secs)) != 0) {
-            /* Ignore corrected ECC errors */
-            if (rc != ECC_CORRECTED_ERR) {
-                error("  EBIOS read error: %s\n", bios_error(rc), rc);
-                error("    Block %d Sectors %d\n", secno, secs);
-                return rc;
-            }
-        }
-        bcopy( trackbuf, cbuf, copy_len );
-        len -= copy_len;
-        cbuf += copy_len;
-        secno += secs;
-        spinActivityIndicator(secs);
-    }
+		//printf("rdr: ebiosread(%d, %d, %d)\n", bvr->biosdev, secno, secs);
+		if ((rc = ebiosread(bvr->biosdev, secno, secs)) != 0)
+		{
+			/* Ignore corrected ECC errors */
+			if (rc != ECC_CORRECTED_ERR)
+			{
+				error("  EBIOS read error: %s\n", bios_error(rc), rc);
+				error("    Block %d Sectors %d\n", secno, secs);
+				return rc;
+			}
+		}
+		bcopy( trackbuf, cbuf, copy_len );
+		len -= copy_len;
+		cbuf += copy_len;
+		secno += secs;
+		spinActivityIndicator(secs);
+	}
 
-    return 0;
+	return 0;
 }
 
 int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
@@ -2082,33 +2167,37 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
     unsigned int copy_len;
     int rc;
 
-    if ((len & (BPS-1)) != 0) {
-        error("raw disk write not sector aligned");
-        return -1;
-    }
-    secno += bvr->part_boff;
+	if ((len & (BPS-1)) != 0)
+	{
+		error("raw disk write not sector aligned");
+		return -1;
+	}
+	secno += bvr->part_boff;
 
-    cache_valid = false;
+	cache_valid = false;
 
-    while (len > 0) {
-        secs = len / BPS;
-        if (secs > N_CACHE_SECS) secs = N_CACHE_SECS;
-        copy_len = secs * BPS;
+	while (len > 0)
+	{
+		secs = len / BPS;
+		if (secs > N_CACHE_SECS) secs = N_CACHE_SECS;
+			copy_len = secs * BPS;
 
-        bcopy( cbuf, trackbuf, copy_len );
-        //printf("rdr: ebioswrite(%d, %d, %d)\n", bvr->biosdev, secno, secs);
-        if ((rc = ebioswrite(bvr->biosdev, secno, secs)) != 0) {
-            error("  EBIOS write error: %s\n", bios_error(rc), rc);
-            error("    Block %d Sectors %d\n", secno, secs);
-            return rc;
-        }
-        len -= copy_len;
-        cbuf += copy_len;
-        secno += secs;
-        spinActivityIndicator(secs);
-    }
+		bcopy( cbuf, trackbuf, copy_len );
+		//printf("rdr: ebioswrite(%d, %d, %d)\n", bvr->biosdev, secno, secs);
+		if ((rc = ebioswrite(bvr->biosdev, secno, secs)) != 0)
+		{
+			error("  EBIOS write error: %s\n", bios_error(rc), rc);
+			error("    Block %d Sectors %d\n", secno, secs);
+			return rc;
+		}
 
-    return 0;
+		len -= copy_len;
+		cbuf += copy_len;
+		secno += secs;
+		spinActivityIndicator(secs);
+	}
+
+	return 0;
 }
 
 int diskIsCDROM(BVRef bvr)

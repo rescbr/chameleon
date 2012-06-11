@@ -278,6 +278,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9505,	0x3010174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",                   kNull		},
 	{ 0x9505,	0x301017AF, CHIP_FAMILY_RV670,		"ATI Radeon HD 4750",                   kNull		},
 	{ 0x9505,	0x4730174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 4730",                   kNull		},
+	{ 0x9505,	0xE630174B, CHIP_FAMILY_RV670,		"ATI Radeon HD 3800 Series",            kNull		},
 
 	{ 0x9540,	0x30501787, CHIP_FAMILY_RV710,		"ATI Radeon HD 4590",                   kNull		},
 	{ 0x9540,	0x4590174B, CHIP_FAMILY_RV710,		"ATI Radeon HD 4590",                   kNull		},
@@ -412,6 +413,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x689C,	0x034A1043, CHIP_FAMILY_HEMLOCK,	"ATI Radeon HD 5970",                   kUakari		},
 	{ 0x689C,	0x03521043, CHIP_FAMILY_HEMLOCK,	"ASUS ARES",                            kUakari		},
 	{ 0x689C,	0x039E1043, CHIP_FAMILY_HEMLOCK,	"ASUS EAH5870",                         kUakari		},
+	{ 0x689C,	0x25421002, CHIP_FAMILY_HEMLOCK,	"ATI Radeon HD 5970",                   kUakari		},
 	{ 0x689C,	0x30201682, CHIP_FAMILY_HEMLOCK,	"ATI Radeon HD 5970",                   kUakari		},
 
 	{ 0x68A0,	0x03081025, CHIP_FAMILY_CYPRESS,	"ATI Mobility Radeon HD 5830",			kNomascus	},

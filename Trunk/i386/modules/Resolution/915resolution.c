@@ -253,6 +253,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 {
 	UInt32 z;
 	vbios_map * map = malloc(sizeof(vbios_map));
+	if (!map)
+	{
+		return 0;
+	}
 	for(z=0; z<sizeof(vbios_map); z++) ((char*)map)[z]=0;
 	/*
 	 * Determine chipset
@@ -512,6 +516,8 @@ void unlock_vbios(vbios_map * map)
 			outb(CONFIG_MECH_ONE_DATA + 1, 0x33);
 			outb(CONFIG_MECH_ONE_DATA + 2, 0x33);
 			break;
+		default:
+			break;
 	}
 	
 #if DEBUG
@@ -564,6 +570,8 @@ void relock_vbios(vbios_map * map)
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000090);
 			outb(CONFIG_MECH_ONE_DATA + 1, map->b1);
 			outb(CONFIG_MECH_ONE_DATA + 2, map->b2);
+			break;
+		default:
 			break;
 	}
 	
@@ -863,6 +871,8 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 		{
 			break;
 		}
+		default:
+			break;
 	}
 	//		}
 	//	}
