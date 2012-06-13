@@ -101,6 +101,10 @@ static nvidia_card_info_t nvidia_cards[] = {
     /* ------ Specific DeviceID and SubDevID. ------ */
 	// 0000 - 0040
 	// 0040 - 004F
+	{ 0x10DE0040,	0x10438178,	"Asus V9999 Ultra V62.11" },
+	{ 0x10DE0040,	0x1043817D,	"Asus V9999GT V61.21" },
+	{ 0x10DE0040,	0x10DE0205,	"nVidia GeForce 6800 Ultra" },
+	{ 0x10DE0040,	0x7FFFFFFF,	"GeForce 6800 Ultra [NV40.0]" },
 	// 0050 - 005F
 	// 0060 - 006F
 	// 0070 - 007F
@@ -808,6 +812,10 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DD8,	0x103C084A,	"HP nVidia Quadro 2000" },
 	{ 0x10DE0DD8,	0x10DE084A,	"nVidia Quadro 2000" }, // mauriziopasotti
 	{ 0x10DE0DD8,	0x10DE0914,	"nVidia Quadro 2000 D" },
+	{ 0x10DE0DDE,	0x1043203D,	"Asus GF106-ES" },
+	{ 0x10DE0DDE,	0x1043203E,	"Asus GF106-ES" },
+	{ 0x10DE0DDE,	0x10432040,	"Asus GF106-ES" },
+	{ 0x10DE0DDE,	0x10432041,	"Asus GF106-ES" },
 	// 0DE0 - 0DEF
 	{ 0x10DE0DE0,	0x10DE0828,	"nVidia GeForce GT 440" },
 	{ 0x10DE0DE1,	0x38421430,	"EVGA GeForce GT 430" },
@@ -825,6 +833,16 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DE9,	0x103C181B,	"HP GeForce GT 630M" },
 	{ 0x10DE0DE9,	0x103C181D,	"HP GeForce GT 630M" },
 	{ 0x10DE0DE9,	0x103C1837,	"HP GeForce GT 630M" },
+	{ 0x10DE0DEF,	0x104310AC,	"Asus N13P-NS1-A1" },
+	{ 0x10DE0DEF,	0x104310BC,	"Asus N13P-NS1-A1" },
+	{ 0x10DE0DEF,	0x104310CC,	"Asus N13P-NS1-A1" },
+	{ 0x10DE0DEF,	0x10431407,	"Asus N13P-NS1-A1" },
+	{ 0x10DE0DEF,	0x10431447,	"Asus N13P-NS1-A1" },
+	{ 0x10DE0DEF,	0x17AA21F3,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F4,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F5,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F6,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA5005,	"Lenovo NVS 5400M" },
 	// 0DF0 - 0DFF
 	{ 0x10DE0DF0,	0x1B0A9077,	"Pegatron GeForce GT 425M" },
 	{ 0x10DE0DF0,	0x1B0A909A,	"Pegatron GeForce GT 425M" },
@@ -833,6 +851,15 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DF4,	0x18490DF4,	"ASRock GeForce GT 540M" },
 	{ 0x10DE0DF5,	0x10280511,	"Dell GeForce GT 525M" },
 	{ 0x10DE0DF5,	0x10280521,	"Dell GeForce GT 525M" },
+	{ 0x10DE0DFE,	0x10431407,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431447,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431482,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431502,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431512,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431522,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431532,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x10431552,	"Asus GF108 ES" },
+	{ 0x10DE0DFE,	0x1B0A206C,	"GF108 ES" },
 	// 0E00 - 0E0F
 	// 0E10 - 0E1F
 	// 0E20 - 0E2F
@@ -881,7 +908,16 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0FA0 - 0FAF
 	// 0FB0 - 0FBF
 	// 0FC0 - 0FCF
+	{ 0x10DE0FC2,	0x103C0936,	"HP GeForce GT 630" },
+	{ 0x10DE0FC2,	0x174B0630,	"PC Panther GeForce GT 630" },
 	// 0FD0 - 0FDF
+	{ 0x10DE0FD3,	0x10250713,	"Acer GeForce GT 640M LE" },
+	{ 0x10DE0FD3,	0x10250717,	"Acer GeForce GT 640M LE" },
+	{ 0x10DE0FD3,	0x104D909A,	"Sony GeForce GT 640M LE" },
+	{ 0x10DE0FD3,	0x104D909C,	"Sony GeForce GT 640M LE" },
+	{ 0x10DE0FDB,	0x1179FB12,	"Toshiba GK107-ESP-A1" },
+	{ 0x10DE0FDB,	0x1179FB18,	"Toshiba GK107-ESP-A1" },
+	{ 0x10DE0FDB,	0x1179FB1A,	"Toshiba GK107-ESP-A1" },
 	// 0FE0 - 0FEF
 	// 0FF0 - 0FFF
 	// 1000 - 100F
@@ -917,6 +953,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1055,	0x104D908B,	"Sony GeForce 410M" }, // shulillo vedder
 	// 1060 - 106F
 	// 1070 - 107F
+	{ 0x10DE107D,	0x103C094E,	"HP NVS 310" },
 	// 1080 - 108F
 	{ 0x10DE1080,	0x104383BB,	"Asus GeForce GTX 580" },
 	{ 0x10DE1080,	0x14622550,	"MSi GeForce GTX 580" },
@@ -962,6 +999,24 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1120 - 112F
 	// 1130 - 113F
 	// 1140 - 114F
+	{ 0x10DE1140,	0x1025064A,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025064C,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250680,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250692,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250694,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250702,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250719,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250725,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250728,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025072B,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025072E,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250732,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10280565,	"Dell GeForce GT 630M" },
+	{ 0x10DE1140,	0x10280568,	"Dell GeForce GT 630M" },
+	{ 0x10DE1140,	0x17AA3901,	"Lenovo GeForce GT 610M" },
+	{ 0x10DE1140,	0x17AA3903,	"Lenovo GeForce GT 610M" },
+	{ 0x10DE1140,	0x17AA3983,	"Lenovo GeForce GT 610M" },
+	{ 0x10DE1140,	0x17AA500D,	"Lenovo GeForce GT 620M" },
 	// 1150 - 115F
 	// 1160 - 116F
 	// 1170 - 117F
@@ -1809,7 +1864,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DD6,	NV_SUB_IDS,	"GeForce GT 550M" },
 	{ 0x10DE0DD8,	NV_SUB_IDS,	"Quadro 2000" },
 	{ 0x10DE0DDA,	NV_SUB_IDS,	"Quadro 2000M" },
-	//  { 0x10DE0DDE,	NV_SUB_IDS,	"GF106-ES" },
+	{ 0x10DE0DDE,	NV_SUB_IDS,	"GF106-ES" },
 	//  { 0x10DE0DDF,	NV_SUB_IDS,	"GF106-INT" },
 	// 0DE0 - 0DEF
 	{ 0x10DE0DE0,	NV_SUB_IDS,	"GeForce GT 440" },
@@ -1824,7 +1879,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DEC,	NV_SUB_IDS,	"GeForce GT 525M" },
 	{ 0x10DE0DED,	NV_SUB_IDS,	"GeForce GT 520M" },
 	{ 0x10DE0DEE,	NV_SUB_IDS,	"GeForce GT 415M" },
-	//  { 0x10DE0DEF,	NV_SUB_IDS,	"N13P-NS1-A1" },
+	{ 0x10DE0DEF,	NV_SUB_IDS,	"N13P-NS1-A1" },
 	// 0DF0 - 0DFF
 	{ 0x10DE0DF0,	NV_SUB_IDS,	"GeForce GT 425M" },
 	{ 0x10DE0DF1,	NV_SUB_IDS,	"GeForce GT 420M" },
@@ -1838,7 +1893,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DF9,	NV_SUB_IDS,	"Quadro 500M" },
 	{ 0x10DE0DFA,	NV_SUB_IDS,	"Quadro 1000M" },
 	{ 0x10DE0DFC,	NV_SUB_IDS,	"NVS 5200M" },
-	//  { 0x10DE0DFE,	NV_SUB_IDS,	"GF108 ES" },
+	{ 0x10DE0DFE,	NV_SUB_IDS,	"GF108 ES" },
 	//  { 0x10DE0DFF,	NV_SUB_IDS,	"GF108 INT" },
 	// 0E00 - 0E0F
 	// 0E10 - 0E1F
@@ -1871,6 +1926,8 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0EE0 - 0EEF
 	// 0EF0 - 0EFF
 	// 0F00 - 0F0F
+	{ 0x10DE0F00,	NV_SUB_IDS,	"GeForce GT 630" },
+	{ 0x10DE0F01,	NV_SUB_IDS,	"GeForce GT 620" },
 	// 0F10 - 0F1F
 	// 0F20 - 0F2F
 	// 0F30 - 0F3F
@@ -1883,11 +1940,15 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0FA0 - 0FAF
 	// 0FB0 - 0FBF
 	// 0FC0 - 0FCF
+	{ 0x10DE0FC0,	NV_SUB_IDS,	"GeForce GT 640" },
+	{ 0x10DE0FC1,	NV_SUB_IDS,	"GeForce GT 640" },
+	{ 0x10DE0FC2,	NV_SUB_IDS,	"GeForce GT 630" },
 	// 0FD0 - 0FDF
 	{ 0x10DE0FD1,	NV_SUB_IDS,	"GeForce GT 650M" },
 	{ 0x10DE0FD2,	NV_SUB_IDS,	"GeForce GT 640M" },
+	{ 0x10DE0FD3,	NV_SUB_IDS,	"GeForce GT 640M LE" },
 	{ 0x10DE0FD4,	NV_SUB_IDS,	"GeForce GTX 660M" },
-	//  { 0x10DE0FDB,	NV_SUB_IDS,	"GK107-ESP-A1" },
+	{ 0x10DE0FDB,	NV_SUB_IDS,	"GK107-ESP-A1" },
 	// 0FE0 - 0FEF
 	// 0FF0 - 0FFF
 	// 1000 - 100F
@@ -1900,6 +1961,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1042,	NV_SUB_IDS,	"GeForce 510" },
 	{ 0x10DE1048,	NV_SUB_IDS,	"GeForce 605" },
 	{ 0x10DE1049,	NV_SUB_IDS,	"GeForce GT 620" },
+	{ 0x10DE104A,	NV_SUB_IDS,	"GeForce GT 610" },
 	// 1050 - 105F
 	{ 0x10DE1050,	NV_SUB_IDS,	"GeForce GT 520M" },
 	{ 0x10DE1051,	NV_SUB_IDS,	"GeForce GT 520MX" },
@@ -1913,7 +1975,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE105A,	NV_SUB_IDS,	"GeForce 610M" },
 	// 1060 - 106F
 	// 1070 - 107F
-	//  { 0x10DE107D,	NV_SUB_IDS,	"GF119" },
+	{ 0x10DE107D,	NV_SUB_IDS,	"NVS 310" },
 	//  { 0x10DE107E,	NV_SUB_IDS,	"GF119-INT" },
 	//  { 0x10DE107F,	NV_SUB_IDS,	"GF119-ES" },
 	// 1080 - 108F
@@ -1952,7 +2014,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1120 - 112F
 	// 1130 - 113F
 	// 1140 - 114F
-	//  { 0x10DE1140,	NV_SUB_IDS,	"GF117" },
+	{ 0x10DE1140,	NV_SUB_IDS,	"GeForce GT 610M" },
 	{ 0x10DE1141,	NV_SUB_IDS,	"GeForce 610M" },
 	{ 0x10DE1142,	NV_SUB_IDS,	"GeForce 620M" },
 	//  { 0x10DE1143,	NV_SUB_IDS,	"N13P-GV" },

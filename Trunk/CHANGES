@@ -18,6 +18,8 @@
 - Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/
 - Added Guerrero's patch on gui.c: http://forge.voodooprojects.org/p/chameleon/issues/178/
 - cparm : Ported the OS detection to the trunk, updated the default theme to v 1.1 (credit to blackosx) 
+- Merge correction for "Invalid package length algorithm in aml_generator.c" (credits to rphilipson)
+  http://forum.voodooprojects.org/index.php/topic,2297.0.html
 - Added scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s,
   disabled by default: http://forum.voodooprojects.org/index.php/topic,2158.0.html
 - Added exFAT volume label support (FAT64) support (credit to dmazar):
