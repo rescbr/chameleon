@@ -493,6 +493,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68A1,	0x1522103C, CHIP_FAMILY_CYPRESS,	"ATI Mobility Radeon HD 5850",		kHoolock	},
 
 	{ 0x68A8,	0x050E1025, CHIP_FAMILY_CYPRESS,	"AMD Radeon HD 6850M",				kUakari		},
+    
+    { 0x68B8,	0x25431002, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kVervet		},
 
 	{ 0x68B8,	0x00CF106B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5770",				kHoolock	},
 
@@ -554,6 +556,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x68D8,	0x301017AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730",				kNull		},
 	{ 0x68D8,	0x301117AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5690",				kNull		},
+    
+    { 0x68D9,	0x30501682, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5570",				kEulemur	},
 
 	{ 0x68D9,	0x301017AF, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5630",				kNull		},
 
@@ -568,6 +572,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68E0,	0x1433103C, CHIP_FAMILY_CEDAR,		"ATI Mobility Radeon HD 5470",		kEulemur	},
 
 	{ 0x68E1,	0x1426103C, CHIP_FAMILY_CEDAR,		"ATI Mobility Radeon HD 5430",		kEulemur	},
+    
+    { 0x68E1,	0x3000174b, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 
 	{ 0x68E4,	0x1426103C, CHIP_FAMILY_CEDAR,		"AMD Radeon HD 6370M ",				kNull		},
 
@@ -577,7 +583,8 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 
-	{ 0x68F9,	0x23401462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
+	{ 0x68F9,	0x21331462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
+    { 0x68F9,	0x23401462, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",				kEulemur	},
 
 	{ 0x68F9,	0x5470174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",				kNull		},
 	{ 0x68F9,	0x5490174B, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",				kNull		},
@@ -639,6 +646,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6739,	0x24411462, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 
 	{ 0x6739,	0x31101682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
+    { 0x6739,	0x31171682, CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 
 	{ 0x6739,	0xE177174B,	CHIP_FAMILY_BARTS,		"AMD Radeon HD 6850",				kDuckweed	},
 

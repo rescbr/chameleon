@@ -119,7 +119,6 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x8086A012, "Mobile GMA3150"	},
 	{ 0x80862772, "Desktop GMA950"	},
 	{ 0x80862776, "Desktop GMA950"	},
-//	{ 0x8086A001, "Desktop GMA3150" },
 	{ 0x8086A001, "Mobile GMA3150"	},
 	{ 0x8086A002, "Desktop GMA3150" },
 	{ 0x80862A02, "GMAX3100"		},
@@ -134,6 +133,10 @@ static struct gma_gpu_t KnownGPUS[] = {
 	{ 0x80860116, "Intel HD Graphics 3000 Mobile"	},
 	{ 0x80860122, "Intel HD Graphics 3000"			},
 	{ 0x80860126, "Intel HD Graphics 3000 Mobile"	},
+    { 0x80860152, "Intel HD Graphics 2500"			},
+    { 0x80860156, "Intel HD Graphics 2500 Mobile"	},
+    { 0x80860162, "Intel HD Graphics 4000"			},
+    { 0x80860166, "Intel HD Graphics 4000 Mobile"	},
 };
 
 char *get_gma_model(uint32_t id) {
@@ -280,6 +283,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 		device_id = 0x00000126;											// Inject a valid mobile GPU device id instead of patching kexts
+		devprop_add_value(device, "device-id", (uint8_t*)&device_id, sizeof(device_id));
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
+		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
+		devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
+	}
+    else if (model == (char *)"Intel HD Graphics 4000")
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+        device_id = 0x00000166;											// Inject a valid mobile GPU device id instead of patching kexts
 		devprop_add_value(device, "device-id", (uint8_t*)&device_id, sizeof(device_id));
 		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
 		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
