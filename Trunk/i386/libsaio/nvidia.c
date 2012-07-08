@@ -339,6 +339,11 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0407,	0x106B00A0,	"Apple GeForce 8600M GT" },
 	{ 0x10DE0407,	0x106B00A3,	"Apple GeForce 8600M GT" },
 	{ 0x10DE0407,	0x106B00A4,	"Apple GeForce 8600M GT" },
+
+	{ 0x10DE040C,	0x103C30C5,	"HP Quadro FX 570M" },
+	{ 0x10DE040C,	0x104381F7,	"Asus Quadro FX 570M" },
+	{ 0x10DE040C,	0x10CF1423,	"Fujitsu Quadro FX 570M" },
+	{ 0x10DE040C,	0x17AA20D9,	"Lenovo Quadro FX 570M" },
 	// 0410 - 041F
 	{ 0x10DE0410,	0x174B3058,	"PC Partner GeForce GT 330" },
 	// 0420 - 042F
