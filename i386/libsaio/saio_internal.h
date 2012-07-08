@@ -92,12 +92,11 @@ extern void   initKernBootStruct(void);
 extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 extern void   reserveKernLegacyBootStruct(void);
-extern void   reserveKern107BootStruct(void);
-extern void   reserveKern108BootStruct(void);
+extern void   reserveKernBootStruct(void);
 extern void   setBootArgsVideoMode(int mode);
 extern void         setBootArgsVideoStruct(Boot_Video	*Video);
 extern uint32_t     getVideoMode(void);
-extern boot_args_common * getBootArgs(void);
+extern boot_args * getBootArgs(void);
 
 
 /* cache.c */

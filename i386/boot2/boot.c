@@ -90,7 +90,6 @@ static void getRootDevice();
 static bool find_file_with_ext(const char* dir, const char *ext, const char * name_compare, size_t ext_size);
 static bool found_extra_kext(void);
 static void determineCpuArch(void);
-static void init_pic(void);
 void getKernelCachePath(void);
 #ifdef NBP_SUPPORT
 static bool gUnloadPXEOnExit = false;
@@ -151,25 +150,6 @@ void initialize_runtime(void)
 	malloc_init(0, 0, 0, malloc_error);
 }
 
-static void init_pic(void)
-{
-    /* Remap IRQ's */
-	/*
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    */
-	//outb(0x70, inb(0x70)|0x80); /* Disable NMI */  
-	
-	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
-	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
-}
-
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
 
@@ -182,20 +162,20 @@ static int ExecKernel(void *binary)
 	
 	if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
 	{
-		bootArgs->Header.Version  = kBootArgsVersion1;		
-		bootArgs->Header.Revision = ((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3];	
+		bootArgs->Version  = kBootArgsVersion1;		
+		bootArgs->Revision = ((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3];	
 	}
 	else 
 	{		
 #if kBootArgsVersion > 1
 		
-		bootArgs->Header.Version  = kBootArgsVersion;		
-		bootArgs->Header.Revision = kBootArgsRevision;
+		bootArgs->Version  = kBootArgsVersion;		
+		bootArgs->Revision = kBootArgsRevision;
 #else
 		if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] >= '7')
 		{
-			bootArgs->Header.Version  = 2;
-			bootArgs->Header.Revision = 0;
+			bootArgs->Version  = 2;
+			bootArgs->Revision = 0;
 		}
 #endif
 	}
@@ -208,7 +188,11 @@ static int ExecKernel(void *binary)
                        (int *)&bootArgs->ksize );
     
     if ( ret != 0 )
-        return ret;    
+        return ret; 
+    
+    // Reserve space for boot args for 10.7 only (for 10.6 and earlier, we will convert (to legacy) the structure and reserve kernel memory for it later.)
+	if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] >= '7')
+        reserveKernBootStruct();
 	
     // Load boot drivers from the specifed root path.
 	
@@ -306,21 +290,8 @@ static int ExecKernel(void *binary)
     
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
-    switch (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3]) {
-		case '4':
-		case '5':
-		case '6':
-			reserveKernLegacyBootStruct();
-			break;		
-		case '7':
-			reserveKern107BootStruct();
-			break;
-		case '8':
-			reserveKern108BootStruct();
-			break;
-		default:
-			break;
-	}	
+    if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6') 
+		reserveKernLegacyBootStruct(); 	
 	
 #if UNUSED
 	turnOffFloppy();
@@ -331,28 +302,17 @@ static int ExecKernel(void *binary)
 	IMPS_LAPIC_WRITE(LAPIC_LVT1, LAPIC_ICR_DM_NMI);
 #endif
     
-	switch (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3]) {
-		case '4':						
-		case '5':
-		case '6':
-			// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
-			startprog( kernelEntry, bootArgsLegacy );
-			break;		
-		case '7':
-			init_pic();
-			// Jump to kernel's entry point. There's no going back now.  XXX LION XXX
-			startprog( kernelEntry, bootArgs107 );
-			break;
-		case '8':
-			init_pic();
-			// Jump to kernel's entry point. There's no going back now.  XXX MOUNTAIN LION XXX
-			startprog( kernelEntry, bootArgs108 );
-			break;
-		default:
-			printf("Error: Unsupported Darwin version\n");
-			getc();
-			break;
+	if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6') {		
+		
+		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
+		startprog( kernelEntry, bootArgsLegacy );
 	}	
+    
+	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
+	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
+    
+	// Jump to kernel's entry point. There's no going back now. XXX LION XXX
+    startprog( kernelEntry, bootArgs );
     
     // Should not be reached
 	

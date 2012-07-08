@@ -1,3 +1,6 @@
+- security fixes in printf.c
+- Fixed a weird bug in boot arguments that could prevent 10.8 to boot
+
 - security, stability, bugs fixes
 - moved __doprnt to the xnu version
 

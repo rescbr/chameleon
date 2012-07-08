@@ -30,17 +30,13 @@
 #include "bootstruct.h"
 #include "platform.h"
 
-boot_args_common  *bootArgs = NULL;
-
 
 /*==========================================================================
  * structure of parameters passed to
  * the kernel by the booter.
  */
-boot_args_Legacy  *bootArgsLegacy  = NULL;
-boot_args_107     *bootArgs107  = NULL;
-boot_args_108     *bootArgs108  = NULL;
-/* ... */
+boot_args_legacy  *bootArgsLegacy= NULL;
+boot_args         *bootArgs= NULL;
 
 PrivateBootInfo_t *bootInfo  = NULL;
 
@@ -58,13 +54,13 @@ void initKernBootStruct( void )
 		
 		unsigned long    memoryMapCount = 0;
 		
-        bootArgs = (boot_args_common *)malloc(sizeof(boot_args_common));
+        bootArgs = (boot_args *)malloc(sizeof(boot_args));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
         if (bootArgs == NULL || bootInfo == NULL)
             stop("Couldn't allocate boot info\n");
         else
         {
-            bzero(bootArgs, sizeof(boot_args_common));
+            bzero(bootArgs, sizeof(boot_args));
             bzero(bootInfo, sizeof(PrivateBootInfo_t));
             
             // Get system memory map. Also update the size of the
@@ -147,89 +143,49 @@ void setBootArgsVideoStruct(Boot_Video	*Video)
     bootArgs->Video.v_baseAddr = Video->v_baseAddr;
     return;
 }
-boot_args_common * getBootArgs(void)
+boot_args * getBootArgs(void)
 {
     return bootArgs;
-}
-
-#define AllocateKernelMemoryForBootArgs(Ver)                           \
-{ \
-bootArgs##Ver = (boot_args_##Ver *)AllocateKernelMemory(sizeof(boot_args_##Ver));\
-}
-
-#define CopyCommonBootArgsHeader(Ver)                           \
-{ \
-bootArgs##Ver->Revision = bootArgs->Header.Revision ;\
-bootArgs##Ver->Version = bootArgs->Header.Version   ;\
-}
-
-// For 10.6, 10.5 and 10.4 please use :Legacy:, for 10.7 use :107:, for 10.8 use :108:
-#define CopyCommonBootArgs(Ver)                           \
-{ \
-bcopy(bootArgs->CommandLine, bootArgs##Ver->CommandLine, BOOT_LINE_LENGTH);\
-bootArgs##Ver->MemoryMap = bootArgs->MemoryMap ;\
-bootArgs##Ver->MemoryMapSize = bootArgs->MemoryMapSize ;\
-bootArgs##Ver->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;\
-bootArgs##Ver->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;\
-bootArgs##Ver->Video = bootArgs->Video ;\
-bootArgs##Ver->deviceTreeP = bootArgs->deviceTreeP ;\
-bootArgs##Ver->deviceTreeLength = bootArgs->deviceTreeLength ;\
-bootArgs##Ver->kaddr = bootArgs->kaddr ;\
-bootArgs##Ver->ksize = bootArgs->ksize ;\
-bootArgs##Ver->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;\
-bootArgs##Ver->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;\
-bootArgs##Ver->efiSystemTable = bootArgs->efiSystemTable ;\
-bootArgs##Ver->efiMode = bootArgs->efiMode ;\
-bootArgs##Ver->performanceDataStart = bootArgs->performanceDataStart ;\
-bootArgs##Ver->performanceDataSize = bootArgs->performanceDataSize ;\
-bootArgs##Ver->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;\
-}
-
-/* 
- * Darwin 10.7+ specific boot arguments 
- *
- * for 10.7 use :107:, for 10.8 use :108:
- */
-#define Copy107plusBootArgs(Ver)                           \
-{ \
-bootArgs##Ver->keyStoreDataStart = bootArgs->keyStoreDataStart ;\
-bootArgs##Ver->keyStoreDataSize = bootArgs->keyStoreDataSize ;\
-bootArgs##Ver->bootMemStart = bootArgs->bootMemStart ;\
-bootArgs##Ver->bootMemSize = bootArgs->bootMemSize ;\
-bootArgs##Ver->PhysicalMemorySize = bootArgs->PhysicalMemorySize ;\
-bootArgs##Ver->FSBFrequency = bootArgs->FSBFrequency ;\
-bootArgs##Ver->debugMode = bootArgs->debugMode ;\
-}
-
-#define init_boot_args(Ver)                           \
-{ \
-AllocateKernelMemoryForBootArgs(Ver);\
-CopyCommonBootArgsHeader(Ver);\
-CopyCommonBootArgs(Ver);\
 }
 
 /* Copy boot args after kernel and record address. */
 
 void
-reserveKern107BootStruct(void)
-{	
-	init_boot_args(107);
-	Copy107plusBootArgs(107);
-}
-
-void
-reserveKern108BootStruct(void)
-{	
-	init_boot_args(108);	
-	Copy107plusBootArgs(108);
+reserveKernBootStruct(void)
+{
+    void *oldAddr = bootArgs;	
 	
-	/* Darwin 10.8 specific boot arguments */		
+    bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
+    bcopy(oldAddr, bootArgs, sizeof(boot_args));
+    
 }
 
 void
 reserveKernLegacyBootStruct(void)
-{
-	init_boot_args(Legacy);
+{    
+    bootArgsLegacy = (boot_args_legacy *)AllocateKernelMemory(sizeof(boot_args_legacy));
+    
+	bootArgsLegacy->Revision = bootArgs->Revision ;
+	bootArgsLegacy->Version = bootArgs->Version   ;
+	bcopy(bootArgs->CommandLine, bootArgsLegacy->CommandLine, BOOT_LINE_LENGTH);
+	bootArgsLegacy->MemoryMap = bootArgs->MemoryMap ;
+	bootArgsLegacy->MemoryMapSize = bootArgs->MemoryMapSize ;
+	bootArgsLegacy->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;
+	bootArgsLegacy->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;
+	bootArgsLegacy->Video = bootArgs->Video ;
+	bootArgsLegacy->deviceTreeP = bootArgs->deviceTreeP ;
+	bootArgsLegacy->deviceTreeLength = bootArgs->deviceTreeLength ;
+	bootArgsLegacy->kaddr = bootArgs->kaddr ;
+	bootArgsLegacy->ksize = bootArgs->ksize ;
+	bootArgsLegacy->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart ;
+	bootArgsLegacy->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount ;
+	bootArgsLegacy->efiSystemTable = bootArgs->efiSystemTable ;
+	bootArgsLegacy->efiMode = bootArgs->efiMode ;
+	bootArgsLegacy->performanceDataStart = bootArgs->performanceDataStart ;
+	bootArgsLegacy->performanceDataSize = bootArgs->performanceDataSize ;
+	bootArgsLegacy->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart ;
+    
+	
 }
 
 void

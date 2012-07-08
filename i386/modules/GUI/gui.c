@@ -122,7 +122,7 @@ static bool GUI_getColorForKey( const char *key, unsigned int *value, config_fil
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif
 
-#define VIDEO(x) (((boot_args_common*)getBootArgs())->Video.v_ ## x)
+#define VIDEO(x) (((boot_args*)getBootArgs())->Video.v_ ## x)
 
 #define vram VIDEO(baseAddr)
 

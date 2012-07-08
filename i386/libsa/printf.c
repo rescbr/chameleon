@@ -549,7 +549,7 @@ __doprnt(
                     }			    
                 }
                 while (++p != &buf[MAXBUF]) {
-                    (*putc)(*p, arg);
+                    if (putc) (*putc)(*p, arg);
                     nprinted++;
                 }
                 

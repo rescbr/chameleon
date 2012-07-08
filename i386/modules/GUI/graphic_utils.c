@@ -11,7 +11,7 @@
 #include "gui.h"
 #include "platform.h"
 
-#define VIDEO(x) (((boot_args_common*)getBootArgs())->Video.v_ ## x)
+#define VIDEO(x) (((boot_args*)getBootArgs())->Video.v_ ## x)
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 static unsigned long lookUpCLUTIndex( unsigned char index,
