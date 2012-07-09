@@ -1,3 +1,5 @@
+- Fixed a bug in the bundle dependency dispatcher
+
 - security fixes in printf.c
 - Fixed a weird bug in boot arguments that could prevent 10.8 to boot
 

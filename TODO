@@ -1,6 +1,9 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
+- Move acpicodec to the IndustryStandard acpi efi library
+
+
 - split nvidia, gma and ati code into separate modules
 - move device_inject, MBR (OSX works better on Guid partition theme anyway), winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
 - Implement a pool allocator, so each module will run and allocate memory in there own pool, de-alloc all allocated memory by the module, 

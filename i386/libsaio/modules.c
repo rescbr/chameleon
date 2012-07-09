@@ -1888,7 +1888,7 @@ long MatchBundlesLibraries( void )
         {
             if (module->willLoad > BundlePriorityInit)
             {                
-                gLowestLoadPriority = MIN(module->willLoad, BundlePriorityLowestPriority);                
+                gLowestLoadPriority = MIN(MAX(module->willLoad,gLowestLoadPriority), BundlePriorityLowestPriority);                 
             }
             module = module->nextModule;
         }
