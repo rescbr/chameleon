@@ -87,7 +87,7 @@ static card_config_t card_configs[] = {
 	{"Flicker",		3},
 	{"Galago",		2},
 	{"Gliff",		3},
-	{"Hoolock",		1},
+	{"Hoolock",		3},
 	{"Hypoprion",		2},
 	{"Iago",		2},
 	{"Kakapo",		3},
@@ -838,7 +838,13 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6818,	0xE217174B, CHIP_FAMILY_PITCAIRN,	"ATI Radeon HD 7870",                   kNull		},
 
 	{ 0x6819,	0x04311043, CHIP_FAMILY_PITCAIRN,	"Asus HD 7850",                         kNull		},
-	{ 0x6819,	0x23201787, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7800 Series",            kNull		},
+	{ 0x6819,	0x04331043, CHIP_FAMILY_PITCAIRN,	"Asus HD 7850",                         kNull		},
+	{ 0x6819,	0x0B041002, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // ATI
+	{ 0x6819,	0x201C1787, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // HIS
+	{ 0x6819,	0x23201787, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // HIS
+	{ 0x6819,	0x25531458, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // Gigabyte
+	{ 0x6819,	0x32601682, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // XFX
+	{ 0x6819,	0xE218174B, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7850",                   kNull		}, // Sapphire
 
 //	{ 0x683D,	0x04211043, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7770",                   kNull		},
 //	{ 0x683D,	0x25561458, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7770",                   kNull		},
