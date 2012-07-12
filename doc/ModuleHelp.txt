@@ -17,6 +17,22 @@ GraphicsEnabler module:
   VBIOS=Yes|No            Inject VBIOS to device-properties.
 
 
+  NVIDIA card injection usage e.g: // TODO : add memory info for each card to this structure 
+
+		<key>NVIDIA</key>
+		<array>
+		<dict>
+		<key>Chipset Name</key>
+		<string>Quadro FX 380</string>
+		<key>IOPCIPrimaryMatch</key>
+		<string>0x10DE0658</string>
+		</dict>
+		.
+		.
+		.
+		.
+		</array>
+
 Networking module:
 -----------------
   EnableNetworkModule=Yes|No	Fully enable/disable the Networking module (Enabled by default, if the module is installed)

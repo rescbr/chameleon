@@ -98,7 +98,6 @@ extern int atoi(const char *);
 extern char *itoa(int	,char	*);
 extern const char *strstr(const char *, const char *);
 
-extern uint8_t checksum8( void * start, unsigned int length );
 extern unsigned long
 adler32( unsigned char * buffer, long length );
 extern void * bsearch(register const void *key,const void *base0,size_t nmemb,register size_t size,register int (*compar)(const void *, const void *));

@@ -498,6 +498,19 @@ const char* sm_get_random_week(void);
 const char* sm_get_random_year(void);
 const char* sm_get_random_country(void);
 
+/* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
+static uint8_t checksum8( void * start, unsigned int length )
+{
+    uint8_t   csum = 0;
+    uint8_t * cp = (uint8_t *) start;
+    unsigned int i;
+	
+    for ( i = 0; i < length; i++)
+        csum += *cp++;
+	
+    return csum;
+}
+
 const char *getDefaultSMBproductName(void)
 {
 	setDefaultSMBData();

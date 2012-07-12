@@ -1,52 +1,108 @@
+/*-
+ * Copyright (c) 2005-2009 Jung-uk Kim <jkim@FreeBSD.org>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 
+/*
+ * Detect SMBIOS and export information about the SMBIOS into the
+ * environment.
+ *
+ * System Management BIOS Reference Specification, v2.6 Final
+ * http://www.dmtf.org/standards/published_documents/DSP0134_2.6.0.pdf
+ */
+
+/*
+ * 2.1.1 SMBIOS Structure Table Entry Point
+ *
+ * "On non-EFI systems, the SMBIOS Entry Point structure, described below, can
+ * be located by application software by searching for the anchor-string on
+ * paragraph (16-byte) boundaries within the physical memory address range
+ * 000F0000h to 000FFFFFh. This entry point encapsulates an intermediate anchor
+ * string that is used by some existing DMI browsers."
+ */
 
 #include "libsaio.h"
 #include "SMBIOS.h"
 #include "Platform.h"
 
-static const char * const SMTAG = "_SM_";
-static const char* const DMITAG= "_DMI_";
-static struct SMBEntryPoint *getAddressOfSmbiosTable(void);
+#define SMBIOS_START            0xf0000
+#define SMBIOS_LENGTH           0x10000
+#define SMBIOS_STEP             0x10
+#define SMBIOS_SIG              "_SM_"
+#define SMBIOS_DMI_SIG          "_DMI_"
 
-static struct SMBEntryPoint *getAddressOfSmbiosTable(void)
+#define SMBIOS_GET8(base, off)  (*(uint8_t *)((base) + (off)))
+#define SMBIOS_GET16(base, off) (*(uint16_t *)((base) + (off)))
+#define SMBIOS_GET32(base, off) (*(uint32_t *)((base) + (off)))
+
+#define SMBIOS_GETLEN(base)     SMBIOS_GET8(base, 0x01)
+#define SMBIOS_GETSTR(base)     ((base) + SMBIOS_GETLEN(base))
+
+typedef char* caddr_t;
+
+static uint8_t
+smbios_checksum(const caddr_t addr, const uint8_t len)
 {
-	struct SMBEntryPoint	*smbios;
-	/* 
-	 * The logic is to start at 0xf0000 and end at 0xfffff iterating 16 bytes at a time looking
-	 * for the SMBIOS entry-point structure anchor (literal ASCII "_SM_").
-	 */
-	smbios = (struct SMBEntryPoint*) SMBIOS_RANGE_START;
-	while (smbios <= (struct SMBEntryPoint *)SMBIOS_RANGE_END)
-	{
-		if (COMPARE_DWORD(smbios->anchor, SMTAG)  && 
-			COMPARE_DWORD(smbios->dmi.anchor, DMITAG) &&
-			smbios->dmi.anchor[4]==DMITAG[4] &&
-			checksum8(smbios, sizeof(struct SMBEntryPoint)) == 0)
-	    {			
-			return ((void*)smbios);
-	    }
-		smbios = (struct SMBEntryPoint*) ( ((char*) smbios) + 16 );
-	}
-	printf("Error: Could not find original SMBIOS !!\n");
-	pause();
-	return NULL;
+	uint8_t         sum;
+	int             i;
+	
+	for (sum = 0, i = 0; i < len; i++)
+		sum += SMBIOS_GET8(addr, i);
+	return (sum);
+}
+
+static caddr_t
+smbios_sigsearch(const caddr_t addr, const uint32_t len)
+{
+	caddr_t         cp;
+	
+	/* Search on 16-byte boundaries. */
+	for (cp = addr; cp < addr + len; cp += SMBIOS_STEP)
+		if (strncmp(cp, SMBIOS_SIG, 4) == 0 &&
+			smbios_checksum(cp, SMBIOS_GET8(cp, 0x05)) == 0 &&
+			strncmp(cp + 0x10, SMBIOS_DMI_SIG, 5) == 0 &&
+			smbios_checksum(cp + 0x10, 0x0f) == 0)
+			return (cp);
+	return (NULL);
 }
 
 struct SMBEntryPoint *getSmbiosOriginal()
 {    	
-    static struct SMBEntryPoint *orig = NULL; // cached
+    static caddr_t smbios = NULL; // cached
     
-    if (orig == NULL)
+    if (smbios == NULL)
 	{
-		orig = getAddressOfSmbiosTable();		
+		/* Search signatures and validate checksums. */
+		smbios = smbios_sigsearch((caddr_t)ptov(SMBIOS_START), SMBIOS_LENGTH);
 		
-		if (orig)
+		if (smbios)
 		{
 			verbose("Found System Management BIOS (SMBIOS) table\n");			
 		}
         
     }
-    return orig;    
+    return (struct SMBEntryPoint *)smbios;    
 }
 
 /* get product Name from original SMBIOS */

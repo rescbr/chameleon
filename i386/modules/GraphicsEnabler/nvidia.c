@@ -54,6 +54,7 @@
 #include "platform.h"
 #include "device_inject.h"
 #include "nvidia.h"
+#include "xml.h"
 
 #ifndef DEBUG_NVIDIA
 #define DEBUG_NVIDIA 0
@@ -90,7 +91,6 @@ uint8_t default_NVCAP[]= {
 
 #define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
 
-//TODO: once the bundles will be implemented, add a plist reader so there will be no need anymore to hardcode the device ids of each cards, each one will be able to add his own device ids in the plist, it willl work great if the card is supported by the apple's drivers
 struct nv_chipsets_t NVKnownChipsets[] = {
 	{ 0x00000000, "Unknown" },
     //========================================
@@ -1141,13 +1141,40 @@ static int patch_nvidia_rom(uint8_t *rom)
 }
 
 static char *get_nvidia_model(uint32_t id) {
-	unsigned int	i;
-    
+	unsigned int	i, count;
+	TagPtr NVDIATag;                           
+	char *model_name = NULL, *match_id = NULL;	
+
+	// First check in the plist, (for e.g this can override any hardcoded devices)
+	if ((NVDIATag = XMLCastArray(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"NVIDIA"))))
+	{
+		count = XMLTagCount(NVDIATag);
+
+		for (i=0; i<count; i++) 
+		{
+			TagPtr element = XMLGetElement( NVDIATag, i );
+			if (element) 
+			{
+				match_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCIPrimaryMatch"));
+
+				if (strtoul(match_id, NULL, 16) == id) 
+				{
+					model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
+					if (model_name) 
+					{
+						return model_name;
+					}
+				}				
+			}
+		}	
+	}
+	
 	for (i=1; i< (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++) {
 		if (NVKnownChipsets[i].device == id) {
 			return NVKnownChipsets[i].name;
 		}
 	}
+	
 	return NVKnownChipsets[0].name;
 }
 

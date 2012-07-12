@@ -9,6 +9,23 @@
 /* Begin PBXFileReference section */
 		AB0E930C14C6223500F798D7 /* cpu_intel_amd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpu_intel_amd.c; sourceTree = "<group>"; };
 		AB22095D15334C9E00AA9851 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		AB30EB4615AD7D3E000ACA09 /* acpi_codec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = acpi_codec.c; sourceTree = "<group>"; };
+		AB30EB4715AD7D3E000ACA09 /* acpi_codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acpi_codec.h; sourceTree = "<group>"; };
+		AB30EB4815AD7D3E000ACA09 /* acpicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = acpicode.c; sourceTree = "<group>"; };
+		AB30EB4915AD7D3E000ACA09 /* acpicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acpicode.h; sourceTree = "<group>"; };
+		AB30EB4A15AD7D3E000ACA09 /* ACPICodec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ACPICodec.c; sourceTree = "<group>"; };
+		AB30EB4B15AD7D3E000ACA09 /* acpidecode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = acpidecode.c; sourceTree = "<group>"; };
+		AB30EB4C15AD7D3E000ACA09 /* acpidecode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acpidecode.h; sourceTree = "<group>"; };
+		AB30EB4D15AD7D3E000ACA09 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		AB30EB4E15AD7DC6000ACA09 /* AcpiAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AcpiAdditions.h; sourceTree = "<group>"; };
+		AB30EB4F15AD7E77000ACA09 /* portable_efi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = portable_efi.h; sourceTree = "<group>"; };
+		AB30EB5815AD8399000ACA09 /* Acpi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi.h; sourceTree = "<group>"; };
+		AB30EB5915AD8399000ACA09 /* Acpi10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi10.h; sourceTree = "<group>"; };
+		AB30EB5A15AD8399000ACA09 /* Acpi20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi20.h; sourceTree = "<group>"; };
+		AB30EB5B15AD8399000ACA09 /* Acpi30.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi30.h; sourceTree = "<group>"; };
+		AB30EB5C15AD8399000ACA09 /* Acpi40.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi40.h; sourceTree = "<group>"; };
+		AB30EB5D15AD8399000ACA09 /* Acpi50.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acpi50.h; sourceTree = "<group>"; };
+		AB30EB5E15AD8399000ACA09 /* AcpiAml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AcpiAml.h; sourceTree = "<group>"; };
 		AB42D02115187F2C0078E84A /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		AB42D02215187F2C0078E84A /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
 		AB42D02315187F2C0078E84A /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
@@ -625,6 +642,38 @@
 			name = Chameleon;
 			sourceTree = "<group>";
 		};
+		AB30EB4515AD7D3E000ACA09 /* ACPICodecV2 */ = {
+			isa = PBXGroup;
+			children = (
+				AB30EB5715AD8398000ACA09 /* IndustryStandard */,
+				AB30EB4E15AD7DC6000ACA09 /* AcpiAdditions.h */,
+				AB30EB4615AD7D3E000ACA09 /* acpi_codec.c */,
+				AB30EB4715AD7D3E000ACA09 /* acpi_codec.h */,
+				AB30EB4815AD7D3E000ACA09 /* acpicode.c */,
+				AB30EB4915AD7D3E000ACA09 /* acpicode.h */,
+				AB30EB4A15AD7D3E000ACA09 /* ACPICodec.c */,
+				AB30EB4B15AD7D3E000ACA09 /* acpidecode.c */,
+				AB30EB4C15AD7D3E000ACA09 /* acpidecode.h */,
+				AB30EB4D15AD7D3E000ACA09 /* Makefile */,
+				AB30EB4F15AD7E77000ACA09 /* portable_efi.h */,
+			);
+			path = ACPICodecV2;
+			sourceTree = "<group>";
+		};
+		AB30EB5715AD8398000ACA09 /* IndustryStandard */ = {
+			isa = PBXGroup;
+			children = (
+				AB30EB5815AD8399000ACA09 /* Acpi.h */,
+				AB30EB5915AD8399000ACA09 /* Acpi10.h */,
+				AB30EB5A15AD8399000ACA09 /* Acpi20.h */,
+				AB30EB5B15AD8399000ACA09 /* Acpi30.h */,
+				AB30EB5C15AD8399000ACA09 /* Acpi40.h */,
+				AB30EB5D15AD8399000ACA09 /* Acpi50.h */,
+				AB30EB5E15AD8399000ACA09 /* AcpiAml.h */,
+			);
+			path = IndustryStandard;
+			sourceTree = "<group>";
+		};
 		AB42D02015187F2C0078E84A /* embed */ = {
 			isa = PBXGroup;
 			children = (
@@ -1074,6 +1123,7 @@
 			isa = PBXGroup;
 			children = (
 				AB43B34914C37E520018D529 /* ACPICodec */,
+				AB30EB4515AD7D3E000ACA09 /* ACPICodecV2 */,
 				AB43B35214C37E520018D529 /* ACPIPatcher */,
 				AB43B35914C37E520018D529 /* CPUfreq */,
 				ABA02704156CE81A00F8E5F3 /* Ext2fs */,

@@ -57,6 +57,19 @@ void *loadSSDTTable(int ssdt_number);
 
 #define RSDP_CHECKSUM_LENGTH 20
 
+/* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
+static uint8_t checksum8( void * start, unsigned int length )
+{
+    uint8_t   csum = 0;
+    uint8_t * cp = (uint8_t *) start;
+    unsigned int i;
+	
+    for ( i = 0; i < length; i++)
+        csum += *cp++;
+	
+    return csum;
+}
+
 /*-
  *	FOR biosacpi_search_rsdp AND biosacpi_find_rsdp
  *

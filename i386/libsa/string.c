@@ -523,19 +523,6 @@ char* strbreak(const char *str, char **next, long *len)
     return start;
 }
 
-/* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
-uint8_t checksum8( void * start, unsigned int length )
-{
-    uint8_t   csum = 0;
-    uint8_t * cp = (uint8_t *) start;
-    unsigned int i;
-	
-    for ( i = 0; i < length; i++)
-        csum += *cp++;
-	
-    return csum;
-}
-
 unsigned long
 adler32( unsigned char * buffer, long length )
 {
