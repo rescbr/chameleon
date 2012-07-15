@@ -165,7 +165,7 @@ static int ExecKernel(void *binary)
 	}
 	
 	md0Ramdisk();
-	
+
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 	verbose("Boot Args: %s\n", bootArgs->CommandLine);
 

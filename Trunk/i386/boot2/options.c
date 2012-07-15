@@ -1351,7 +1351,7 @@ void showTextBuffer(char *buf_orig, int size)
 		showInfoBox( "Press q to continue, space for next page.\n",buf_orig );
 		return;
 	}
-	
+
 		// Create a copy so that we don't mangle the original
 		buf = malloc(size + 1);
 		memcpy(buf, buf_orig, size);

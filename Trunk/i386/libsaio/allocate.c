@@ -38,7 +38,7 @@ AllocateMemoryRange(char * rangeName, long start, long length, long type)
 {
     char *nameBuf;
     uint32_t *buffer;
-    
+
     nameBuf = malloc(strlen(rangeName) + 1);
     if (nameBuf == 0) return -1;
     strcpy(nameBuf, rangeName);
@@ -71,7 +71,7 @@ AllocateKernelMemory( long inSize )
 	{
         stop ("AllocateKernelMemory error");
     }
-        
+
     bootArgs->ksize = gImageLastKernelAddr - bootArgs->kaddr;
 
     return addr;

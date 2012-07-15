@@ -760,7 +760,7 @@ static radeon_card_info_t radeon_cards[] = {
 
 	{ 0x6758,	0x00121028, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
 	{ 0x6758,	0x0B0E1028, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
-	{ 0x6758,	0x20121787, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
+	{ 0x6758,	0x20121787, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kPithecia	},
 	{ 0x6758,	0x22051458, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
 	{ 0x6758,	0x31811682, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
 	{ 0x6758,	0x31831682, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},

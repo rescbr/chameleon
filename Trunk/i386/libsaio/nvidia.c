@@ -388,6 +388,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 05E0 - 05EF
 	{ 0x10DE05E0,	0x10DE064E,	"nVidia GeForce GTX 295" },
 	{ 0x10DE05E0,	0x38421291,	"EVGA GeForce GTX 295" },
+
 	{ 0x10DE05E2,	0x10438291,	"Asus GeForce GTX 260" },
 	{ 0x10DE05E2,	0x10438298,	"Asus GeForce GTX 260" },
 	{ 0x10DE05E2,	0x104382C4,	"Asus GeForce GTX 260" },
@@ -452,6 +453,51 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0611,	0x3842C802,	"EVGA GeForce 8800 GT" },
 
 	{ 0x10DE0612,	0x3842C875,	"EVGA GeForce 9800 GTX+" },
+
+	{ 0x10DE0615,	0x104382E6,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x104382FB,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438303,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438305,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438312,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438338,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438339,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x1043833C,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10438345,	"Asus GeForce GTS 250" },
+	{ 0x10DE0615,	0x10480F67,	"ELSA GeForce GTS 250" },
+	{ 0x10DE0615,	0x10B00401,	"Gainward GeForce GTS 250" },
+	{ 0x10DE0615,	0x10190000,	"Elitegroup GeForce GTS 250" },
+	{ 0x10DE0615,	0x107D2723,	"Leadteck GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0592,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0593,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0652,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0719,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE079E,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x11503842,	"TMC GeForce GTS 250" }, // Thinking Machines Corporation
+	{ 0x10DE0615,	0x11513842,	"JAE GeForce GTS 250" },
+	{ 0x10DE0615,	0x11553842,	"Pine GeForce GTS 250" },
+	{ 0x10DE0615,	0x11563842,	"Periscope GeForce GTS 250" },
+	{ 0x10DE0615,	0x145834C7,	"Gigabyte GeForce GTS 250" },
+	{ 0x10DE0615,	0x145834CB,	"Gigabyte GeForce GTS 250" },
+	{ 0x10DE0615,	0x145834E7,	"Gigabyte GeForce GTS 250" },
+	{ 0x10DE0615,	0x145834E9,	"Gigabyte GeForce GTS 250" },
+	{ 0x10DE0615,	0x14621542,	"MSi GeForce GTS 250" },
+	{ 0x10DE0615,	0x14621543,	"MSi GeForce GTS 250" },
+	{ 0x10DE0615,	0x14628090,	"MSi GeForce GTS 250" },
+	{ 0x10DE0615,	0x16822600,	"XFX GeForce GTS 250" },
+	{ 0x10DE0615,	0x16822601,	"XFX GeForce GTS 250" },
+	{ 0x10DE0615,	0x16822605,	"XFX GeForce GTS 250" },
+	//{ 0x10DE0615,	0x196E0593,	" GeForce GTS 250" },
+	{ 0x10DE0615,	0x19DA2103,	"Zotac GeForce GTS 250" },
+	{ 0x10DE0615,	0x19DA3056,	"Zotac GeForce GTS 250" },
+	{ 0x10DE0615,	0x19DA5103,	"Zotac GeForce GTS 250" },
+	//{ 0x10DE0615,	0x19F1,	"BFG GeForce GTS 250" },
+	{ 0x10DE0615,	0x1ACC9252,	"Point of View GeForce GTS 250" },
+	{ 0x10DE0615,	0x1ACC9253,	"Point of View GeForce GTS 250" },
+	{ 0x10DE0615,	0x1ACC925C,	"Point of View GeForce GTS 250" },
+	{ 0x10DE0615,	0x1B0A9038,	"Pegatron GeForce GTS 250" },
+	{ 0x10DE0615,	0x38421145,	"EVGA GeForce GTS 250" },
+	{ 0x10DE0615,	0x38421158,	"EVGA GeForce GTS 250" },
+	//{ 0x10DE0615,	0x7377,	"Colorful GeForce GTS 250" },
 
 	{ 0x10DE0618,	0x1025028E,	"Acer GeForce GTX 260M" },
 	{ 0x10DE0618,	0x102802A1,	"Dell GeForce GTX 260M" },
@@ -2288,7 +2334,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	uint8_t *dcbtable		 = &rom[dcbptr];
 	uint8_t dcbtable_version = dcbtable[0];
 	uint8_t headerlength	 = 0;
-	uint8_t numentries		 = 0;
+	uint8_t numentries	 = 0;
 	uint8_t recordlength	 = 0;
 	
 	if (dcbtable_version >= 0x20)
@@ -2308,7 +2354,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			sig = READ_LE_INT(dcbtable, 4);
 			headerlength = 8;
 		}
-		
+
 		if (sig != 0x4edcbdcb)
 		{
 			printf("Bad display config block signature (0x%8x)\n", sig); //Azi: issue #48
@@ -2321,7 +2367,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		
 		strncpy(sig, (char *)&dcbtable[-7], 7);
 		recordlength = 10;
-		
+
 		if (strcmp(sig, "DEV_REC"))
 		{
 			printf("Bad Display Configuration Block signature (%s)\n", sig);
@@ -2338,14 +2384,14 @@ static int patch_nvidia_rom(uint8_t *rom)
 		numentries = MAX_NUM_DCB_ENTRIES;
 	
 	uint8_t num_outputs = 0, i = 0;
-	
+
 	struct dcbentry
 	{
 		uint8_t type;
 		uint8_t index;
 		uint8_t *heads;
 	} entries[numentries];
-	
+
 	for (i = 0; i < numentries; i++)
 	{
 		uint32_t connection;
@@ -2362,6 +2408,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		entries[num_outputs].type = connection & 0xf;
 		entries[num_outputs].index = num_outputs;
 		entries[num_outputs++].heads = (uint8_t*)&(dcbtable[(headerlength + recordlength * i) + 1]);
+
 	}
 	
 	int has_lvds = false;
@@ -2377,7 +2424,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 			entries[i].type = TYPE_GROUPED;
 		}
 	}
-	
+
 	// if we have a LVDS output, we group the rest to the second channel
 	if (has_lvds)
 	{
@@ -2385,7 +2432,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		{
 			if (entries[i].type == TYPE_GROUPED)
 				continue;
-			
+
 			channel2 |= ( 0x1 << entries[i].index);
 			entries[i].type = TYPE_GROUPED;
 		}
@@ -2411,7 +2458,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							//printf("group channel 1\n");
 							channel1 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
-							
+
 							if ((entries[i-1].type == 0x0))
 							{
 								channel1 |= ( 0x1 << entries[i-1].index);
@@ -2425,12 +2472,12 @@ static int patch_nvidia_rom(uint8_t *rom)
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
-						
+
 						case 1:
 							//printf("group channel 2 : %d\n", i);
 							channel2 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
-							
+
 							if ((entries[i - 1].type == 0x0))
 							{
 								channel2 |= ( 0x1 << entries[i-1].index);
@@ -2444,6 +2491,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
+						default:
+							break;
+
 					}
 					break;
 				}
@@ -2454,7 +2504,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	// if we have left ungrouped outputs merge them to the empty channel
 	uint8_t *togroup;// = (channel1 ? (channel2 ? NULL : &channel2) : &channel1);
 	togroup = &channel2;
-	
+
 	for (i = 0; i < num_outputs; i++)
 	{
 		if (entries[i].type != TYPE_GROUPED)
@@ -2516,14 +2566,14 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 {
 	int fd;
 	int size;
-	
+
 	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
 	{
 		return 0;
 	}
-	
+
 	size = file_size(fd);
-	
+
 	if (size > bufsize)
 	{
 		printf("Filesize of %s is bigger than expected! Truncating to 0x%x Bytes!\n",
@@ -2532,17 +2582,17 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 	}
 	size = read(fd, (char *)buf, size);
 	close(fd);
-	
+
 	return size > 0 ? size : 0;
 }
 
 static int devprop_add_nvidia_template(struct DevPropDevice *device)
 {
 	char tmp[16];
-	
+
 	if (!device)
 		return 0;
-	
+
 	if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_0))
 		return 0;
 	if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_0))
@@ -2571,24 +2621,24 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 	sprintf(tmp, "Slot-%x",devices_number);
 	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
 	devices_number++;
-	
+
 	return 1;
 }
 
 int hex2bin(const char *hex, uint8_t *bin, int len)
 {
 	char	*p;
-	int		i;
+	int	i;
 	char	buf[3];
-	
+
 	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
 		printf("[ERROR] bin2hex input error\n");
 		return -1;
 	}
-	
+
 	buf[2] = '\0';
 	p = (char *) hex;
-	
+
 	for (i = 0; i < len; i++)
 	{
 		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
@@ -2683,11 +2733,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
-	
+
 	// Amount of VRAM in kilobytes
 	videoRam = mem_detect(regs, nvCardType, nvda_dev);
 	model = get_nvidia_model(((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id));
-	
+
 	verbose("%s %dMB NV%02x [%04x:%04x]-[%04x:%04x] :: %s device number: %d\n",
 			model, (uint32_t)(videoRam / 1024 / 1024),
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
@@ -2697,12 +2747,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id,
 			(uint16_t)nvda_dev->device_id);
-	
+
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->chameleonConfig) && doit)
 	{
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
-		
+
 		if (nvBiosOveride > 0)
 		{
 			verbose("Using nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
@@ -2718,7 +2768,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	{
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
-		
+
         // PROM first
         // Enable PROM access
         (REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
@@ -2762,15 +2812,15 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
             			}//end PRAM check
                 }//end PROM check
     	}//end load rom from bios
-	
+
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED)
 	{
 		printf("ERROR: nVidia ROM Patching Failed!\n");
 		//return false;
 	}
-	
+
 	rom_pci_header = (option_rom_pci_header_t*)(rom + *(uint16_t *)&rom[24]);
-	
+
 	// check for 'PCIR' sig
 	if (rom_pci_header->signature == 0x50434952)
 	{
@@ -2784,19 +2834,19 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
 		}
 	}
-	
+
 	if (!string) {
 		string = devprop_create_string();
 	}
 	device = devprop_add_device(string, devicepath);
-	
+
 	/* FIXME: for primary graphics card only */
 	boot_display = 1;
 	if (devices_number == 1)
 	{
 		devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t*)&boot_display, 4);
 	}
-	
+
 	if (nvPatch == PATCH_ROM_SUCCESS_HAS_LVDS) {
 		uint8_t built_in = 0x01;
 		devprop_add_value(device, "@0,built-in", &built_in, 1);
@@ -2805,12 +2855,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// get bios version
 	const int MAX_BIOS_VERSION_LENGTH = 32;
 	char* version_str = (char*)malloc(MAX_BIOS_VERSION_LENGTH);
-	
+
 	memset(version_str, 0, MAX_BIOS_VERSION_LENGTH);
-	
+
 	int i, version_start;
 	int crlf_count = 0;
-	
+
 	// only search the first 384 bytes
 	for (i = 0; i < 0x180; i++)
 	{
@@ -2846,7 +2896,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
-	
+
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->chameleonConfig) && len == NVCAP_LEN * 2)
 	{
 		uint8_t new_NVCAP[NVCAP_LEN];
@@ -2857,11 +2907,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			memcpy(default_NVCAP, new_NVCAP, NVCAP_LEN);
 		}
 	}
-	
+
 	if (getValueForKey(kDcfg0, &value, &len, &bootInfo->chameleonConfig) && len == DCFG0_LEN * 2)
 	{
 		uint8_t new_dcfg0[DCFG0_LEN];
-		
+
 		if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0)
 		{
 			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
@@ -2875,17 +2925,17 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getValueForKey(kDcfg1, &value, &len, &bootInfo->chameleonConfig) && len == DCFG1_LEN * 2)
 	{
 		uint8_t new_dcfg1[DCFG1_LEN];
-		
+
 		if (hex2bin(value, new_dcfg1, DCFG1_LEN) == 0)
 		{
 			memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
-			
+
 			verbose("Using user supplied @1,display-cfg\n");
 			printf("@1,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_1[0], default_dcfg_1[1], default_dcfg_1[2], default_dcfg_1[3]);
 		}
 	}
-	
+
 #if DEBUG_NVCAP
 	printf("NVCAP: %02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x-%02x%02x%02x%02x\n",
 	default_NVCAP[0], default_NVCAP[1], default_NVCAP[2], default_NVCAP[3],
@@ -2923,6 +2973,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
-	
+
 	return true;
 }
