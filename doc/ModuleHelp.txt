@@ -17,7 +17,7 @@ GraphicsEnabler module:
   VBIOS=Yes|No            Inject VBIOS to device-properties.
 
 
-  NVIDIA card injection usage e.g: // TODO : add memory info for each card to this structure 
+  NVIDIA card injection usage e.g: see doc/com.apple.Boot.example.plist for an example
 
 		<key>NVIDIA</key>
 		<array>
@@ -26,6 +26,24 @@ GraphicsEnabler module:
 		<string>Quadro FX 380</string>
 		<key>IOPCIPrimaryMatch</key>
 		<string>0x10DE0658</string>
+		<key>VRam Size</key>
+		<string>256</string>
+		</dict>
+		<dict>
+		<key>Chipset Name</key>
+		<string>YOUR_CARD_NAME</string>
+		<key>IOPCIPrimaryMatch</key>
+		<string>YOUR_CARD_ID</string>
+		<key>VRam Size</key>
+		<string>YOUR_CARD_VRAM_SIZE</string>
+		</dict>
+		<dict>
+		<key>Chipset Name</key>
+		<string>YOUR_SECOND_CARD_NAME</string>
+		<key>IOPCIPrimaryMatch</key>
+		<string>YOUR_SECOND_CARD_ID</string>
+		<key>VRam Size</key>
+		<string>YOUR_SECOND_CARD_VRAM_SIZE</string>
 		</dict>
 		.
 		.

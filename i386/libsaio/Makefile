@@ -36,7 +36,7 @@ SAIO_OBJS = table.o asm.o bios.o biosfn.o arc4random-fbsd.o   \
         xml.o md5.o device_tree.o modules.o \
         cpu.o platform.o \
         fake_efi.o \
-		device_inject.o pci_root.o \
+		device_inject.o \
         convert.o acpi_tools.o smbios.o uterror.o lzss.o lib.o rtc.o time.o
 
 # Options enabled by default:

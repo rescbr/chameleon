@@ -64,6 +64,8 @@ extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
 extern void		build_pci_dt(void);
 extern void		dump_pci_dt(pci_dt_t *);
 extern void		setup_pci_devs(pci_dt_t *pci_dt);
+extern int      getPciRootUID(void);
+
 //-----------------------------------------------------------------------------
 // added by iNDi
 

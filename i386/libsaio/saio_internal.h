@@ -183,6 +183,8 @@ extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 #endif
 
+
+
 /* platform.c */
 extern void scan_platform(void);
 extern void SetgRootDevice(const char * str);

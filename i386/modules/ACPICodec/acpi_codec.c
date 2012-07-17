@@ -46,10 +46,10 @@
 #include "platform.h"
 #include "cpu.h"
 #include "xml.h"
-#include "pci_root.h"
 #include "sl.h"
 #include "convert.h"
 #include "modules.h"
+#include "pci.h"
 
 U64 rsd_p;
 ACPI_TABLES acpi_tables;

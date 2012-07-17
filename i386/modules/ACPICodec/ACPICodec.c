@@ -6,7 +6,6 @@
 #include "libsaio.h"
 #include "modules.h"
 #include "bootstruct.h"
-#include "pci_root.h"
 #include "acpi_codec.h"
 
 void ACPICodec_start(void);

@@ -921,7 +921,7 @@ static char *get_nvidia_model(uint32_t id);
 static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bufsize);
 static int devprop_add_nvidia_template(struct DevPropDevice *device);
 static int hex2bin(const char *hex, uint8_t *bin, int len);
-static unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev);
+static unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t id);
 
 
 static uint16_t swap16(uint16_t x)
@@ -958,6 +958,50 @@ static uint32_t read32(uint8_t *ptr, uint16_t offset)
 	return *((uint32_t*)&ret);
 }
 #endif
+
+typedef struct cardList_t
+{
+	char* model;
+	uint32_t id;
+	uint64_t videoRam;
+	struct cardList_t* next;
+} cardList_t;
+
+cardList_t* cardList = NULL;
+
+static void add_card(char* model, uint32_t id, uint64_t videoRam)
+{
+	
+	cardList_t* new_card = malloc(sizeof(cardList_t));
+	if (new_card)
+	{	
+		new_card->next = cardList;
+		
+		cardList = new_card;
+		
+		new_card->id = id;
+		new_card->videoRam = videoRam;
+		new_card->model = model;
+	}	
+}
+
+static cardList_t* FindCardWithId(uint32_t id)
+{
+	cardList_t* entry = cardList;
+	while(entry)
+	{		
+		if(entry->id == id)
+		{
+			return entry;
+		}
+		else
+		{
+			entry = entry->next;
+		}             
+		
+	}
+	return NULL;
+}
 
 static int patch_nvidia_rom(uint8_t *rom)
 {
@@ -1140,33 +1184,41 @@ static int patch_nvidia_rom(uint8_t *rom)
 	return (has_lvds ? PATCH_ROM_SUCCESS_HAS_LVDS : PATCH_ROM_SUCCESS);
 }
 
-static char *get_nvidia_model(uint32_t id) {
+static void fill_card_list(void) 
+{
 	unsigned int	i, count;
 	TagPtr NVDIATag;                           
-	char *model_name = NULL, *match_id = NULL;	
-
-	// First check in the plist, (for e.g this can override any hardcoded devices)
+	char *model_name = NULL, *match_id = NULL, *vram_size = NULL;	
+	
 	if ((NVDIATag = XMLCastArray(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"NVIDIA"))))
 	{
 		count = XMLTagCount(NVDIATag);
-
+		
 		for (i=0; i<count; i++) 
 		{
 			TagPtr element = XMLGetElement( NVDIATag, i );
 			if (element) 
 			{
 				match_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCIPrimaryMatch"));
-
-				if (strtoul(match_id, NULL, 16) == id) 
-				{
-					model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
-					if (model_name) 
-					{
-						return model_name;
-					}
-				}				
+				model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
+				vram_size  = XMLCastString(XMLGetProperty(element, (const char*)"VRam Size"));
+				add_card(model_name,strtoul(match_id, NULL, 16),strtoul(vram_size, NULL, 10));								
 			}
 		}	
+	}	
+}
+
+static char *get_nvidia_model(uint32_t id) {
+	unsigned int	i;		
+
+	// First check in the plist, (for e.g this can override any hardcoded devices)
+	cardList_t * nvcard = FindCardWithId(id);
+	if (nvcard) 
+	{
+		if (nvcard->model) 
+		{
+			return nvcard->model;
+		}
 	}
 	
 	for (i=1; i< (sizeof(NVKnownChipsets) / sizeof(NVKnownChipsets[0])); i++) {
@@ -1259,25 +1311,19 @@ static int hex2bin(const char *hex, uint8_t *bin, int len)
 	return 0;
 }
 
-unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev)
+unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t id)
 {
 	unsigned long long vram_size = 0;
 	
-	if (nvCardType < NV_ARCH_50)
+	cardList_t * nvcard = FindCardWithId(id);
+	if (nvcard) 
 	{
-		vram_size  = REG32(NV04_PFB_FIFO_DATA);
-		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
-	}
-	else if (nvCardType < NV_ARCH_C0)
-	{
-		vram_size = REG32(NV04_PFB_FIFO_DATA);
-		vram_size |= (vram_size & 0xff) << 32;
-		vram_size &= 0xffffffff00ll;
-	}
-	else // >= NV_ARCH_C0
-	{
-		vram_size = REG32(NVC0_MEM_CTRLR_RAM_AMOUNT) << 20;
-		vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
+		if (nvcard->videoRam > 0) 
+		{
+			vram_size = nvcard->videoRam * 1024 * 1024;
+			
+			return vram_size;
+		}
 	}
 	
 	// Workaround for GT 420/430 & 9600M GT
@@ -1293,6 +1339,25 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		default: 
             break;
 	}
+	
+	if (!vram_size) {
+		if (nvCardType < NV_ARCH_50)
+		{
+			vram_size  = REG32(NV04_PFB_FIFO_DATA);
+			vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
+		}
+		else if (nvCardType < NV_ARCH_C0)
+		{
+			vram_size = REG32(NV04_PFB_FIFO_DATA);
+			vram_size |= (vram_size & 0xff) << 32;
+			vram_size &= 0xffffffff00ll;
+		}
+		else // >= NV_ARCH_C0
+		{
+			vram_size = REG32(NVC0_MEM_CTRLR_RAM_AMOUNT) << 20;
+			vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
+		}
+	}	
 	
 	return vram_size;
 }
@@ -1327,6 +1392,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
 
+	fill_card_list();
+	
 	static const dcfg_t default_dcfg [] = {
 		{0xff,0xff,0xff,0xff},
 	};
@@ -1343,18 +1410,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	delay(50);
     
 	// get card type
-	nvCardType = (REG32(0) >> 20) & 0x1ff;
-    
-	// Amount of VRAM in kilobytes
-    
-	videoRam = mem_detect(regs, nvCardType, nvda_dev);
-    
+	nvCardType = (REG32(0) >> 20) & 0x1ff;    
+	 
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
-	verbose("nVidia %s %dMB NV%02x [%04x:%04x]\n",  
-			model, (uint32_t)(videoRam / 1024 / 1024),
-			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id);	
-	
+	// Amount of VRAM in kilobytes
+    
+	videoRam = mem_detect(regs, nvCardType, nvda_dev, (nvda_dev->vendor_id << 16) | nvda_dev->device_id);
+			
 	rom = malloc(NVIDIA_ROM_SIZE);
     if (!rom) {
         printf("Couldn't allocate momory for device rom\n");
@@ -1429,6 +1492,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		if (rom_pci_header->device != nvda_dev->device_id) {
 			// Get Model from the OpROM
 			model = get_nvidia_model((rom_pci_header->vendor << 16) | rom_pci_header->device);
+			
+			// Amount of VRAM in kilobytes
+			
+			videoRam = mem_detect(regs, nvCardType, nvda_dev, (rom_pci_header->vendor << 16) | rom_pci_header->device);
+			
 		} else {
 			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
             // ??
@@ -1436,7 +1504,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
             //return false;
 		}
 	}
-	DBG("nvidia model : %s\n",model);	
+	verbose("nVidia %s %dMB NV%02x [%04x:%04x]\n",  
+			model, (uint32_t)(videoRam / 1024 / 1024),
+			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id);	
 
     if (!string)
     {

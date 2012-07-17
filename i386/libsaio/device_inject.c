@@ -8,7 +8,6 @@
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
-#include "pci_root.h"
 #include "device_inject.h"
 #include "convert.h"
 #include "platform.h"
@@ -32,7 +31,6 @@ char *efi_inject_get_devprop_string(uint32_t *len)
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
-	verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
 	return NULL;
 }
 
@@ -42,7 +40,7 @@ void setupDeviceProperties(Node *node)
 	uint8_t *binStr;
     uint8_t *kbinStr;
 
-	int cnt, cnt2;
+	int cnt = 0, cnt2 = 0;
 	
 	static char DEVICE_PROPERTIES_PROP[] = "device-properties";
 	
@@ -50,11 +48,14 @@ void setupDeviceProperties(Node *node)
 	 */
 	uint32_t strlength;
 	char *string = efi_inject_get_devprop_string(&strlength);
-	
+	if (string == NULL) {
+		verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
+		return;
+	}
 	/* Use the static "device-properties" boot config key contents if available,
 	 * otheriwse use the generated one.
 	 */  
-	if (!getValueForKey(kDeviceProperties, &val, &cnt, DEFAULT_BOOT_CONFIG) && string)
+	if (!getValueForKey(kDeviceProperties, &val, &cnt, DEFAULT_BOOT_CONFIG))
 	{
 		val = (const char*)string;
 		cnt = strlength * 2;
