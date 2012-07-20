@@ -1,3 +1,4 @@
+- Added Recovery Icon for Default Theme (TODO) (credits to blackosx).
 - Merge Intel Graphics 4000 device IDs from Chimera (Commit 1999).
 - Merge more cparm's (security, stability, bugs fixes) improvements from his branch.
   http://forge.voodooprojects.org/p/chameleon/source/tree/HEAD/branches/cparm
