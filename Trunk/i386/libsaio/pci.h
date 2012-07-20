@@ -35,8 +35,7 @@ typedef struct pci_dt_t {
 		} subsys;
 		uint32_t	subsys_id;
 	}subsys_id;
-	uint8_t		revision;
-	uint8_t		subclass;
+
 	uint16_t	class_id;	
 
 	struct pci_dt_t			*parent;
