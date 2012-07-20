@@ -278,7 +278,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
         slot = &Platform.RAM.DIMM[i];
         spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
-		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
+		DBG("SPD[0] (size): 0x%02x @0x%x\n", spd_size, 0x50 + i);
         // Check spd is present
         if (spd_size && (spd_size != 0xff))
         {

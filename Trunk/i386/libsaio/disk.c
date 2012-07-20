@@ -1490,17 +1490,18 @@ static bool getOSVersion(BVRef bvr, char *str)
 	bool valid = false;	
 	config_file_t systemVersion;
 	char  dirSpec[512];	
-	
+
 	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	
 	if (!loadConfigFile(dirSpec, &systemVersion))
 	{
 		valid = true;
 	}
-	else 
+	else
 	{
+	/* Mac OS X Server */
 		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
-		
+
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{	
 			bvr->OSisServer = true;

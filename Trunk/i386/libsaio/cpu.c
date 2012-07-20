@@ -464,23 +464,27 @@ void scan_cpu(PlatformInfo_t *p)
 					maxcoef = currcoef;
 				}
 
-				if (maxcoef) {
-					if (maxdiv) {
-						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-					} else {
-						fsbFrequency = (tscFrequency / maxcoef);
+				if (maxcoef)
+					{
+					if (maxdiv)
+						{
+							fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+						} else {
+							fsbFrequency = (tscFrequency / maxcoef);
 					}
-					if (currdiv) {
-						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-					} else {
-						cpuFrequency = (fsbFrequency * currcoef);
+						if (currdiv)
+						{
+							cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+						} else {
+							cpuFrequency = (fsbFrequency * currcoef);
 					}
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 				}
 			}
 		}
 		/* Mobile CPU */
-		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28)) {
+		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
+		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
 	}
@@ -559,7 +563,8 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 #if 0
-	if (!fsbFrequency) {
+	if (!fsbFrequency)
+	{
 		fsbFrequency = (DEFAULT_FSB * 1000);
 		cpuFrequency = tscFrequency;
 		DBG("0 ! using the default value for FSB !\n");
@@ -578,16 +583,19 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.CPUFrequency = cpuFrequency;
 
 	// keep formatted with spaces instead of tabs
-	DBG("CPU: Brand String:             %s\n",              p->CPU.BrandString);
-    DBG("CPU: Vendor/Family/ExtFamily:  0x%x/0x%x/0x%x\n",  p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
-    DBG("CPU: Model/ExtModel/Stepping:  0x%x/0x%x/0x%x\n",  p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
-    DBG("CPU: MaxCoef/CurrCoef:         0x%x/0x%x\n",       p->CPU.MaxCoef, p->CPU.CurrCoef);
-    DBG("CPU: MaxDiv/CurrDiv:           0x%x/0x%x\n",       p->CPU.MaxDiv, p->CPU.CurrDiv);
-    DBG("CPU: TSCFreq:                  %dMHz\n",           p->CPU.TSCFrequency / 1000000);
-    DBG("CPU: FSBFreq:                  %dMHz\n",           (p->CPU.FSBFrequency + 500000) / 1000000);
-    DBG("CPU: CPUFreq:                  %dMHz\n",           p->CPU.CPUFrequency / 1000000);
-    DBG("CPU: NoCores/NoThreads:        %d/%d\n",           p->CPU.NoCores, p->CPU.NoThreads);
-    DBG("CPU: Features:                 0x%08x\n",          p->CPU.Features);
+	DBG("\n---------------------------------------------\n");
+	DBG("CPU: Brand String:\t\t\t\t %s\n",                      p->CPU.BrandString);
+	DBG("CPU: Vendor/Family/ExtFamily:\t 0x%x/0x%x/0x%x\n",     p->CPU.Vendor, p->CPU.Family, p->CPU.ExtFamily);
+	DBG("CPU: Model/ExtModel/Stepping:\t 0x%x/0x%x/0x%x\n",     p->CPU.Model, p->CPU.ExtModel, p->CPU.Stepping);
+	DBG("CPU: MaxCoef/CurrCoef:\t\t\t 0x%x/0x%x\n",             p->CPU.MaxCoef, p->CPU.CurrCoef);
+	DBG("CPU: MaxDiv/CurrDiv:\t\t\t 0x%x/0x%x\n",               p->CPU.MaxDiv, p->CPU.CurrDiv);
+	DBG("CPU: TSCFreq:\t\t\t\t %dMHz\n",                        p->CPU.TSCFrequency / 1000000);
+	DBG("CPU: FSBFreq:\t\t\t\t\t %dMHz\n",                      (p->CPU.FSBFrequency + 500000) / 1000000);
+	DBG("CPU: CPUFreq:\t\t\t\t %dMHz\n",                        p->CPU.CPUFrequency / 1000000);
+	DBG("CPU: Number of CPU Cores:\t\t %d\n",                   p->CPU.NoCores);
+	DBG("CPU: Number of CPU Threads:\t %d\n",                   p->CPU.NoThreads);
+	DBG("CPU: Features:\t\t\t\t\t 0x%08x\n",                    p->CPU.Features);
+	DBG("---------------------------------------------\n");
 #if DEBUG_CPU
 	pause();
 #endif

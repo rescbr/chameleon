@@ -29,8 +29,10 @@
 boolean_t tableSign(char *table, const char *sgn)
 {
 	int i;
-	for (i=0; i<4; i++) {
-		if ((table[i] &~0x20) != (sgn[i] &~0x20)) {
+	for (i=0; i<4; i++)
+	{
+		if ((table[i] &~0x20) != (sgn[i] &~0x20))
+		{
 			return false;
 		}
 	}
@@ -174,6 +176,11 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 			for (j=0; j<4; j++) 
 			{
 				char c = dsdt[offset+j];
+				if( c == '\\')
+				{
+					offset = i + 8 + (dsdt[i+7] >> 6);
+					c = dsdt[offset+j];
+				}
 
 				if (!aml_isvalidchar(c)) 
 				{
@@ -189,16 +196,20 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
 
-                if (acpi_cpu_count == 0)
-                    acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
-				
-				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
-				
-				if (++acpi_cpu_count == 32) return;
+				if (acpi_cpu_count == 0)
+				{
+					verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count]);
+				} else {
+					verbose("And %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count]);
+				}
+
+				if (++acpi_cpu_count == 32)
+				break;
 			}
 		}
 	}
-	// DBG("end finding cpu names: cpu names found: %d\n", acpi_cpu_count);
+	DBG("end finding cpu names: cpu names found: %d\n", acpi_cpu_count);
+	return;
 }
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
