@@ -27,6 +27,7 @@ set -u  # Abort with unset variables
 CONFIG_MODULES=""
 CONFIG_KLIBC_MODULE=""
 CONFIG_UCLIBCXX_MODULE=""
+CONFIG_SATA_MODULE=""
 CONFIG_RESOLUTION_MODULE=""
 CONFIG_KEYLAYOUT_MODULE=""
 source "${SRCROOT}/auto.conf"
@@ -571,6 +572,25 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             # Add the klibc package because the uClibc module is dependent of klibc module
             addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId $klibcPackageRefId" "${choiceId}"
             # End build uClibc package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_SATA_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/Sata.dylib" ]]; then
+        {
+            # Start build Sata package module
+            choiceId="Sata"
+            moduleFile="Sata.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build Sata package module
         }
         fi
 
