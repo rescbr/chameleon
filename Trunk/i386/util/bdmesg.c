@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	const UInt8 *msglog = CFDataGetBytePtr((CFDataRef)bootLog);
 	if (msglog)
 		printf("%s\n", msglog);
-    
+
     CFRelease(bootLog);
 	return 0;
 }

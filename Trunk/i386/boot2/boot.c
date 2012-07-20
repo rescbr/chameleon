@@ -239,10 +239,10 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 	if (cacheFile[0] != 0)
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
 	else {
-		// Mountain Lion and Lion prelink kernel cache file
+		// Lion and Mountain Lion prelink kernel cache file
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
 			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
-        }
+		}
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
 			sprintf(kernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386)
