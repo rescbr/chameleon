@@ -523,6 +523,7 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
     # klibc.dylib                 #
     # Resolution.dylib            #
     # uClibcxx.dylib              #
+    # Sata.dylib                  #
     # Keylayout.dylib             #
     ###############################
     if [ "$(ls -A "${SYMROOT}/i386/modules")" ]; then

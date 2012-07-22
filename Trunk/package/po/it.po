@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-07-20 02:22+0200\n"
-"PO-Revision-Date: 2012-03-07 00:07-0000\n"
+"PO-Revision-Date: 2012-07-22 22:15-0000\n"
 "Last-Translator: ErmaC\n"
 "Language-Team: it <it@li.org>\n"
 "Language: it\n"
@@ -332,15 +332,18 @@ msgstr ""
 #: Resources/templates/Localizable.strings:43
 #, no-wrap
 msgid "Sata"
-msgstr ""
+msgstr "Sata"
 
 #. type: "Sata_description"
 #: Resources/templates/Localizable.strings:44
 #, no-wrap
 msgid ""
-"Modulo Sata, Conosciuto come  YellowIconFixer nella branch di cparm.\n"
-"Utile per aggirare le Icone gialle dei dischi rigidi (anche utile per sistemare i problemi con il programma di lettura DVD della Aapple in Moutain Lion)."
+"Sata module, known as YellowIconFixer in cparm's branch.\n"
+"Useful to fix yellow icon issue (can also fix an issue with the Apple's dvd player application in Mountain lion)."
 msgstr ""
+"Modulo Sata, Conosciuto come  YellowIconFixer nella branch di cparm.\n"
+"Utile per aggirare le Icone gialle dei dischi rigidi\n"
+"(anche utile per sistemare i problemi con il programma di lettura DVD della Apple in Moutain Lion)."
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:47
