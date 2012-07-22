@@ -272,7 +272,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 			sprintf(kernelCacheFile, "%s.%08lX", kDefaultCachePathLeo, adler32);
 		}
 	}
-
+/* Issue: http://forge.voodooprojects.org/p/chameleon/issues/270/
 	// kernelCacheFile must start with a /
 	if (kernelCacheFile[0] != '/') {
 		char *str = strdup(kernelCacheFile);
@@ -281,7 +281,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 		sprintf(kernelCacheFile, "/%s", str);
 		free(str);
 	}
-
+*/
 	// Check if the kernel cache file exists
 	ret = -1;
 
