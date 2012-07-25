@@ -1317,6 +1317,23 @@
 		B00F494A11F6089500B1D7C5 /* aml_generator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aml_generator.c; sourceTree = "<group>"; };
 		B0146EFF11FDEF550010765C /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		B0146F0011FDEFB90010765C /* GPL_V2_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GPL_V2_LICENSE; sourceTree = "<group>"; };
+		B412979E15BE0C4F00073B54 /* acpi_codec.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = acpi_codec.c; path = AcpiCodec/acpi_codec.c; sourceTree = "<group>"; };
+		B412979F15BE0C4F00073B54 /* acpi_tools.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = acpi_tools.c; path = AcpiCodec/acpi_tools.c; sourceTree = "<group>"; };
+		B41297A015BE0C4F00073B54 /* acpicode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = acpicode.c; path = AcpiCodec/acpicode.c; sourceTree = "<group>"; };
+		B41297A115BE0C4F00073B54 /* ACPICodec.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = ACPICodec.c; path = AcpiCodec/ACPICodec.c; sourceTree = "<group>"; };
+		B41297A215BE0C4F00073B54 /* acpidecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = acpidecode.c; path = AcpiCodec/acpidecode.c; sourceTree = "<group>"; };
+		B41297A315BE0C4F00073B54 /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; name = Cconfig; path = AcpiCodec/Cconfig; sourceTree = "<group>"; };
+		B41297A515BE0C4F00073B54 /* acpi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi.h; sourceTree = "<group>"; };
+		B41297A615BE0C4F00073B54 /* acpi_codec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi_codec.h; sourceTree = "<group>"; };
+		B41297A715BE0C4F00073B54 /* acpi_tools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi_tools.h; sourceTree = "<group>"; };
+		B41297A815BE0C4F00073B54 /* acpicode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpicode.h; sourceTree = "<group>"; };
+		B41297A915BE0C4F00073B54 /* acpidecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpidecode.h; sourceTree = "<group>"; };
+		B41297AA15BE0C4F00073B54 /* datatype.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = datatype.h; sourceTree = "<group>"; };
+		B41297AB15BE0C4F00073B54 /* intel_acpi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = intel_acpi.h; sourceTree = "<group>"; };
+		B41297AC15BE0C4F00073B54 /* ppm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppm.h; sourceTree = "<group>"; };
+		B41297AD15BE0C4F00073B54 /* ppmsetup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ppmsetup.h; sourceTree = "<group>"; };
+		B41297AE15BE0C4F00073B54 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = AcpiCodec/Makefile; sourceTree = "<group>"; };
+		B41297AF15BE0C4F00073B54 /* Readme.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = Readme.txt; path = AcpiCodec/Readme.txt; sourceTree = "<group>"; };
 		B41899FB14BFBE2400ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B41899FD14BFBE4500ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		B41899FE14BFBE5200ED5B0B /* boot0md.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = boot0md.s; sourceTree = "<group>"; };
@@ -2757,6 +2774,7 @@
 		A3561CAB1414024C00E9B51E /* modules */ = {
 			isa = PBXGroup;
 			children = (
+				B412979C15BE0C3100073B54 /* AcpiCodec */,
 				A3561CAC1414024C00E9B51E /* Cconfig */,
 				A3561CAD1414024C00E9B51E /* HelloWorld */,
 				A3561CB21414024C00E9B51E /* include */,
@@ -3602,6 +3620,39 @@
 				B0056E1911F3868000754B65 /* xnulogo.png */,
 			);
 			path = User_Guide_src;
+			sourceTree = "<group>";
+		};
+		B412979C15BE0C3100073B54 /* AcpiCodec */ = {
+			isa = PBXGroup;
+			children = (
+				B412979E15BE0C4F00073B54 /* acpi_codec.c */,
+				B412979F15BE0C4F00073B54 /* acpi_tools.c */,
+				B41297A015BE0C4F00073B54 /* acpicode.c */,
+				B41297A115BE0C4F00073B54 /* ACPICodec.c */,
+				B41297A215BE0C4F00073B54 /* acpidecode.c */,
+				B41297A315BE0C4F00073B54 /* Cconfig */,
+				B41297A415BE0C4F00073B54 /* include */,
+				B41297AE15BE0C4F00073B54 /* Makefile */,
+				B41297AF15BE0C4F00073B54 /* Readme.txt */,
+			);
+			name = AcpiCodec;
+			sourceTree = "<group>";
+		};
+		B41297A415BE0C4F00073B54 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				B41297A515BE0C4F00073B54 /* acpi.h */,
+				B41297A615BE0C4F00073B54 /* acpi_codec.h */,
+				B41297A715BE0C4F00073B54 /* acpi_tools.h */,
+				B41297A815BE0C4F00073B54 /* acpicode.h */,
+				B41297A915BE0C4F00073B54 /* acpidecode.h */,
+				B41297AA15BE0C4F00073B54 /* datatype.h */,
+				B41297AB15BE0C4F00073B54 /* intel_acpi.h */,
+				B41297AC15BE0C4F00073B54 /* ppm.h */,
+				B41297AD15BE0C4F00073B54 /* ppmsetup.h */,
+			);
+			name = include;
+			path = AcpiCodec/include;
 			sourceTree = "<group>";
 		};
 		B4189A0314BFBED900ED5B0B /* config */ = {

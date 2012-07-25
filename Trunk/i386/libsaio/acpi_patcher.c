@@ -159,13 +159,14 @@ uint32_t acpi_cpu_p_blk = 0;
 void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 {
 	uint32_t i;
-	// DBG("start finding cpu names. length %d\n", length);
+
+	DBG("start finding cpu names. length %d\n", length);
+
 	for (i=0; i<length-7; i++) 
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
-
-		// DBG("dsdt: %x%x\n", dsdt[i], dsdt[i+1]);
+			DBG("dsdt: %x%x\n", dsdt[i], dsdt[i+1]);
 
 			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
 
@@ -176,11 +177,6 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 			for (j=0; j<4; j++) 
 			{
 				char c = dsdt[offset+j];
-				if( c == '\\')
-				{
-					offset = i + 8 + (dsdt[i+7] >> 6);
-					c = dsdt[offset+j];
-				}
 
 				if (!aml_isvalidchar(c)) 
 				{
@@ -196,20 +192,17 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
 
-				if (acpi_cpu_count == 0)
-				{
-					verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count]);
-				} else {
-					verbose("And %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count]);
-				}
+                if (acpi_cpu_count == 0)
+                    acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
 
-				if (++acpi_cpu_count == 32)
-				break;
+				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+				
+				if (++acpi_cpu_count == 32) return;
 			}
 		}
 	}
+
 	DBG("end finding cpu names: cpu names found: %d\n", acpi_cpu_count);
-	return;
 }
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
@@ -289,9 +282,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 			resource_template_register_fixedhw[9] = 0x00;
 			resource_template_register_fixedhw[18] = 0x00;
 			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-			aml_add_byte(tmpl, 0x01); // C1
-			aml_add_word(tmpl, 0x0001); // Latency
-			aml_add_dword(tmpl, 0x000003e8); // Power
+			aml_add_byte(tmpl, 0x01);		// C1
+			aml_add_word(tmpl, 0x0001);		// Latency
+			aml_add_dword(tmpl, 0x000003e8);	// Power
 
 			uint8_t p_blk_lo, p_blk_hi;
 
@@ -304,9 +297,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C2
 				resource_template_register_systemio[12] = p_blk_hi; // C2
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x02); // C2
-				aml_add_word(tmpl, 0x0040); // Latency
-				aml_add_dword(tmpl, 0x000001f4); // Power
+				aml_add_byte(tmpl, 0x02);		// C2
+				aml_add_word(tmpl, 0x0040);		// Latency
+				aml_add_dword(tmpl, 0x000001f4);	// Power
 			}
 
 			if (c4_enabled) // C4
@@ -318,9 +311,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C4
 				resource_template_register_systemio[12] = p_blk_hi; // C4
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x04); // C4
-				aml_add_word(tmpl, 0x0080); // Latency
-				aml_add_dword(tmpl, 0x000000C8); // Power
+				aml_add_byte(tmpl, 0x04);		// C4
+				aml_add_word(tmpl, 0x0080);		// Latency
+				aml_add_dword(tmpl, 0x000000C8);	// Power
 			}
 			else if (c3_enabled) // C3
 			{
@@ -331,18 +324,22 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C3
 				resource_template_register_systemio[12] = p_blk_hi; // C3
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x03);			// C3
-				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_byte(tmpl, 0x03);		// C3
+				aml_add_word(tmpl, 0x0060);		// Latency
 				aml_add_dword(tmpl, 0x0000015e);	// Power
 			}
 		}
 		else
 		{
 			// C1
+			resource_template_register_fixedhw[8] = 0x01;
+			resource_template_register_fixedhw[9] = 0x02;
+			resource_template_register_fixedhw[18] = 0x01;
+
 			resource_template_register_fixedhw[11] = 0x00; // C1
 			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-			aml_add_byte(tmpl, 0x01);			// C1
-			aml_add_word(tmpl, 0x0001);			// Latency
+			aml_add_byte(tmpl, 0x01);		// C1
+			aml_add_word(tmpl, 0x0001);		// Latency
 			aml_add_dword(tmpl, 0x000003e8);	// Power
 
 			resource_template_register_fixedhw[18] = 0x03;
@@ -352,8 +349,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x10; // C2
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x02);			// C2
-				aml_add_word(tmpl, 0x0040);			// Latency
+				aml_add_byte(tmpl, 0x02);		// C2
+				aml_add_word(tmpl, 0x0040);		// Latency
 				aml_add_dword(tmpl, 0x000001f4);	// Power
 			}
 
@@ -362,8 +359,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x30; // C4
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x04);			// C4
-				aml_add_word(tmpl, 0x0080);			// Latency
+				aml_add_byte(tmpl, 0x04);		// C4
+				aml_add_word(tmpl, 0x0080);		// Latency
 				aml_add_dword(tmpl, 0x000000C8);	// Power
 			}
 			else if (c3_enabled)
@@ -371,8 +368,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x20; // C3
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x03);			// C3
-				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_byte(tmpl, 0x03);		// C3
+				aml_add_word(tmpl, 0x0060);		// Latency
 				aml_add_dword(tmpl, 0x0000015e);	// Power
 			}
 		}
@@ -581,12 +578,13 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+
 					{
                         if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN))
                         {
-                            maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
+				maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
                         } else {
-                            maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
+				maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
                         }
                         minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 
@@ -738,15 +736,17 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Set PM_Profile from System-type if only user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
 	{
-	    if (value) 
-	      { // user has overriden the SystemType so take care of it in FACP
-		verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
-		fadt_mod->PM_Profile = Platform.Type;
-	    }
-	    else
-	    { // PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
-	      Platform.Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
-	    }  
+		if (value) 
+		{
+			// user has overriden the SystemType so take care of it in FACP
+			verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
+			fadt_mod->PM_Profile = Platform.Type;
+		}
+		else
+		{
+			// PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
+			Platform.Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
+		}  
 	}
 	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
 	// because we need to take care of facp original content, if it is correct.
@@ -775,7 +775,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 			fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
 			fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
-			verbose("FADT: Restart Fix applied !\n");
+			verbose("FADT: ACPI Restart Fix applied!\n");
 		}
 
 	}
@@ -856,8 +856,8 @@ int setupAcpi(void)
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
 	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
 
-	// DBG("generating p-states config: %d\n", generate_pstates);
-	// DBG("generating c-states config: %d\n", generate_cstates);
+	DBG("generating p-states config: %d\n", generate_pstates);
+	DBG("generating c-states config: %d\n", generate_cstates);
 
 	{
 		int i;
@@ -967,7 +967,7 @@ int setupAcpi(void)
 					// Generate _CST SSDT
 					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 					{
-						// DBG("c-states generated\n");
+						DBG("C-States generated\n");
 						generate_cstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -975,7 +975,7 @@ int setupAcpi(void)
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 					{
-						// DBG("p-states generated\n");
+						DBG("P-States generated\n");
 						generate_pstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -1173,7 +1173,7 @@ int setupAcpi(void)
 		}
 		else
 		{
-	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
+			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi10_p = (uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 		}

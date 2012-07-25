@@ -816,6 +816,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6798,	0x23171787, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
 	{ 0x6798,	0x254D1458, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
 	{ 0x6798,	0x27701462, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
+	{ 0x6798,	0x30001002, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
 	{ 0x6798,	0x32101682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
 	{ 0x6798,	0x32111682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},
 	{ 0x6798,	0x32121682, CHIP_FAMILY_TAHITI,		"AMD Radeon HD 7970",                   kNull		},

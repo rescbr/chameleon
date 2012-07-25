@@ -1,7 +1,7 @@
 /*
  * spd.c - serial presence detect memory information
  *
- * Originally restored from pcefi10.5
+ * Originally restored from pcefi10.5 by netkas
  * Dynamic mem detection original impl. by Rekursor
  * System profiler fix and other fixes by Mozodojo.
  */
@@ -70,30 +70,31 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 #define SBMBLKDAT 7
 
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
+
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
-    int l1, h1, l2, h2;
-    unsigned long long t;
+	int l1, h1, l2, h2;
+	unsigned long long t;
 	
-    outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
-    outb(base + SMBHSTDAT, 0xff);
+	outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
+	outb(base + SMBHSTDAT, 0xff);
 	
-    rdtsc(l1, h1);
-    while ( inb(base + SMBHSTSTS) & 0x01)    // wait until read
-    {  
-     rdtsc(l2, h2);
-     t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
-     if (t > 5)
-      return 0xFF;                  // break
-    }
+	rdtsc(l1, h1);
+	while ( inb(base + SMBHSTSTS) & 0x01)    // wait until read
+	{  
+		rdtsc(l2, h2);
+		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
+		if (t > 5)
+			return 0xFF;                  // break
+	}
 	
-    outb(base + SMBHSTCMD, cmd);
-    outb(base + SMBHSTADD, (adr << 1) | 0x01 );
-    outb(base + SMBHSTCNT, 0x48 );
+	outb(base + SMBHSTCMD, cmd);
+	outb(base + SMBHSTADD, (adr << 1) | 0x01 );
+	outb(base + SMBHSTCNT, 0x48 );
 	
-    rdtsc(l1, h1);
+	rdtsc(l1, h1);
 	
- 	while (!( inb(base + SMBHSTSTS) & 0x02))		// wait til command finished
+	while (!( inb(base + SMBHSTSTS) & 0x02))		// wait til command finished
 	{	
 		rdtsc(l2, h2);
 		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
@@ -123,7 +124,8 @@ int spd_indexes[] = {
 static void init_spd(char * spd, uint32_t base, int slot)
 {
 	int i;
-	for (i=0; i< SPD_INDEXES_SIZE; i++) {
+	for (i=0; i< SPD_INDEXES_SIZE; i++)
+	{
 		READ_SPD(spd, base, slot, spd_indexes[i]);
 	}
 }
@@ -204,7 +206,7 @@ int getDDRspeedMhz(const char * spd)
 /** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
 const char *getDDRSerial(const char* spd)
 {
-    static char asciiSerial[16];
+	static char asciiSerial[16];
     
     if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
     {
@@ -215,7 +217,7 @@ const char *getDDRSerial(const char* spd)
 	sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
     }
 
-    return strdup(asciiSerial);
+	return strdup(asciiSerial);
 }
 
 /** Get DDR3 or DDR2 Part Number, always return a valid ptr */
@@ -231,10 +233,11 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 		start = 73;
 	}
 	
-    // Check that the spd part name is zero terminated and that it is ascii:
-    bzero(asciiPartNo, sizeof(asciiPartNo));
+	// Check that the spd part name is zero terminated and that it is ascii:
+	bzero(asciiPartNo, sizeof(asciiPartNo));
 	char c;
-	for (i=start; i < start + sizeof(asciiPartNo); i++) {
+	for (i=start; i < start + sizeof(asciiPartNo); i++)
+	{
 		READ_SPD(spd, base, slot, i); // only read once the corresponding model part (ddr3 or ddr2)
 		c = spd[i];
 		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...
@@ -252,75 +255,77 @@ int mapping []= {0,2,1,3,4,6,5,7,8,10,9,11};
 /** Read from smbus the SPD content and interpret it for detecting memory attributes */
 static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
-    int        i, speed;
-    uint8_t    spd_size, spd_type;
-    uint32_t   base, mmio, hostc;
-//  bool       dump = false;
-    RamSlotInfo_t*  slot;
+	int        i, speed;
+	uint8_t    spd_size, spd_type;
+	uint32_t   base, mmio, hostc;
+//	bool       dump = false;
+	RamSlotInfo_t*  slot;
 
 	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
 	DBG("SMBus CmdReg: 0x%x\n", cmd);
 	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
 
 	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
-    base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
+	base = pci_config_read16(smbus_dev->dev.addr, 0x20) & 0xFFFE;
 	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
-    verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
-		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
+	verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
+	smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 
 //Azi: no use for this!
 //  getBoolForKey("DumpSPD", &dump, &bootInfo->chameleonConfig);
 	// needed at least for laptops
-    bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
+	bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
 	char spdbuf[MAX_SPD_SIZE];
-    // Search MAX_RAM_SLOTS slots
-    for (i = 0; i <  MAX_RAM_SLOTS; i++){
-        slot = &Platform.RAM.DIMM[i];
-        spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
+	// Search MAX_RAM_SLOTS slots
+	for (i = 0; i <  MAX_RAM_SLOTS; i++){
+		slot = &Platform.RAM.DIMM[i];
+		spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
 		DBG("SPD[0] (size): 0x%02x @0x%x\n", spd_size, 0x50 + i);
-        // Check spd is present
-        if (spd_size && (spd_size != 0xff))
-        {
+	// Check spd is present
+	if (spd_size && (spd_size != 0xff))
+	{
 
-			slot->spd = spdbuf;
-            slot->InUse = true;
+		slot->spd = spdbuf;
+		slot->InUse = true;
 
-            bzero(slot->spd, spd_size);
-            
+		bzero(slot->spd, spd_size);
+
             // Copy spd data into buffer
-            
-			//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
-            init_spd(slot->spd, base, i);
-		
-            switch (slot->spd[SPD_MEMORY_TYPE])  {
-            case SPD_MEMORY_TYPE_SDRAM_DDR2:
-                
-                slot->ModuleSize = ((1 << (slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17) * 
-                                    ((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);
-                break;
-                
-            case SPD_MEMORY_TYPE_SDRAM_DDR3:
-                
-                slot->ModuleSize = ((slot->spd[4] & 0x0f) + 28 ) + ((slot->spd[8] & 0x7)  + 3 );
-                slot->ModuleSize -= (slot->spd[7] & 0x7) + 25;
-                slot->ModuleSize = ((1 << slot->ModuleSize) * (((slot->spd[7] >> 3) & 0x1f) + 1));
-                
-                break;
-            }
-            
-            spd_type = (slot->spd[SPD_MEMORY_TYPE] < ((char) 12) ? slot->spd[SPD_MEMORY_TYPE] : 0);
-            slot->Type = spd_mem_to_smbios[spd_type];
-            slot->PartNo = getDDRPartNum(slot->spd, base, i);
-            slot->Vendor = getVendorName(slot, base, i);
-            slot->SerialNo = getDDRSerial(slot->spd);
 
-            // determine spd speed
-            speed = getDDRspeedMhz(slot->spd);
-            if (slot->Frequency<speed) slot->Frequency = speed;
+		//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
+		init_spd(slot->spd, base, i);
+
+		switch (slot->spd[SPD_MEMORY_TYPE])
+		{
+			case SPD_MEMORY_TYPE_SDRAM_DDR2:
+
+				slot->ModuleSize = ((1 << ((slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17)) * 
+				((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);
+			break;
+
+			case SPD_MEMORY_TYPE_SDRAM_DDR3:
+
+				slot->ModuleSize = ((slot->spd[4] & 0x0f) + 28 ) + ((slot->spd[8] & 0x7)  + 3 );
+				slot->ModuleSize -= (slot->spd[7] & 0x7) + 25;
+				slot->ModuleSize = ((1 << slot->ModuleSize) * (((slot->spd[7] >> 3) & 0x1f) + 1));
+
+			break;
+		}
+
+		spd_type = (slot->spd[SPD_MEMORY_TYPE] < ((char) 12) ? slot->spd[SPD_MEMORY_TYPE] : 0);
+		slot->Type = spd_mem_to_smbios[spd_type];
+		slot->PartNo = getDDRPartNum(slot->spd, base, i);
+		slot->Vendor = getVendorName(slot, base, i);
+		slot->SerialNo = getDDRSerial(slot->spd);
+
+		// determine spd speed
+		speed = getDDRspeedMhz(slot->spd);
+		if (slot->Frequency<speed) slot->Frequency = speed;
 			
 			// pci memory controller if available, is more reliable
-			if (Platform.RAM.Frequency > 0) {
+			if (Platform.RAM.Frequency > 0)
+			{
 				uint32_t freq = (uint32_t)Platform.RAM.Frequency / 500000;
 				// now round off special cases
 				uint32_t fmod100 = freq %100;
@@ -343,20 +348,17 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
                        slot->Vendor,
                        slot->PartNo,
                        slot->SerialNo); 
-            
 
-        }
 
-        // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
-        Platform.DMI.DIMM[i]= 
-        i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
-        mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
-        
+		}
 
-        
+		// laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
+		Platform.DMI.DIMM[i]= 
+        	i>0 && Platform.RAM.DIMM[1].InUse==false && fullBanks && Platform.DMI.CntMemorySlots == 2 ? 
+        	mapping[i] : i; // for laptops case, mapping setup would need to be more generic than this
 		slot->spd = NULL;
 
-    } // for
+	} // for
 }
 
 static struct smbus_controllers_t smbus_controllers[] = {
@@ -383,33 +385,32 @@ static struct smbus_controllers_t smbus_controllers[] = {
 // find_and_read_smbus_controller(root_pci_dev);
 bool find_and_read_smbus_controller(pci_dt_t* pci_dt)
 {
-    pci_dt_t	*current = pci_dt;
-    int i;
+	pci_dt_t	*current = pci_dt;
+	int i;
 
-    while (current) {
+	while (current) {
 #if 0
-        printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
-               current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
-               current->class_id, current->vendor_id, current->device_id, 
-               get_pci_dev_path(current));
+		printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
+		current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
+		current->class_id, current->vendor_id, current->device_id, 
+		get_pci_dev_path(current));
 #endif
 	for ( i = 0; i <  sizeof(smbus_controllers) / sizeof(smbus_controllers[0]); i++ )
-        {
-            if (current->vendor_id == smbus_controllers[i].vendor &&
-                current->device_id == smbus_controllers[i].device)
-            {
-                smbus_controllers[i].read_smb(current); // read smb
-                return true;
-            }        
-        }
-        find_and_read_smbus_controller(current->children);
-        current = current->next;
-    }
+	{
+		if (current->vendor_id == smbus_controllers[i].vendor && current->device_id == smbus_controllers[i].device)
+		{
+			smbus_controllers[i].read_smb(current); // read smb
+			return true;
+			}
+		}
+		find_and_read_smbus_controller(current->children);
+		current = current->next;
+	}
     return false; // not found
 }
 
 void scan_spd(PlatformInfo_t *p)
 {
-    find_and_read_smbus_controller(root_pci_dev);
+	find_and_read_smbus_controller(root_pci_dev);
 }
 

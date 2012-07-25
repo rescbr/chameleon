@@ -458,6 +458,22 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0603,	0x174B1058,	"PC Partner GeForce GT 230" },
 	{ 0x10DE0603,	0x1B0A9044,	"Pegatron GeForce GT 230" },
 
+	{ 0x10DE0604,	0x10DE0504,	"nVidia GeForce 9800 GX2" },
+
+	{ 0x10DE0605,	0x10DE0612,	"nVidia GeForce 9800 GT" },
+	{ 0x10DE0605,	0x10DE062D,	"nVidia GeForce 9800 GT" },
+	{ 0x10DE0605,	0x14621460,	"MSi GeForce 9800 GT" },
+
+	{ 0x10DE0607,	0x10DE0736,	"nVidia GeForce GTS 240" },
+
+	{ 0x10DE0608,	0x1028019C,	"Dell GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x102802A1,	"Dell GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x10432003,	"Asus GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x1179FF01,	"Toshiba GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x15580481,	"Clevo GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x15880577,	"Solidum GeForce 9800M GTX" },
+	{ 0x10DE0608,	0x161F207A,	"Arima GeForce 9800M GTX" },
+
 	{ 0x10DE0609,	0x1028019B,	"Dell GeForce 8800M GTS" },
 	{ 0x10DE0609,	0x103C30D4,	"HP GeForce 8800M GTS" },
 	{ 0x10DE0609,	0x104381F7,	"Asus GeForce 8800M GTS" },
