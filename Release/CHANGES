@@ -1,3 +1,4 @@
+- Fixed HD4000 graphicsenabler code. Thanks to proteinshake for AAPL,ig-platform-id info.
 - Added AtiPorts option to GraphicsEnabler, so users can override the default number of ports. It proved
   to be useful when used to limit the number of ports that a framebuffer registers, which seems to be a
   requirement on laptops that can only use 2 ports at the same time.
