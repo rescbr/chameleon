@@ -34,16 +34,16 @@ struct putc_info //Azi: exists on console.c & gui.c
     char * last_str;
 };
 
-static int
-sputc(int c, struct putc_info * pi) //Azi: same as above
+static int sputc(int c, struct putc_info * pi) //Azi: same as above
 {
     if (pi->last_str)
-        if (pi->str == pi->last_str) {
-            *(pi->str) = '\0';
-            return 0;
+        if (pi->str == pi->last_str)
+	{
+		*(pi->str) = '\0';
+		return 0;
         }
-    *(pi->str)++ = c;
-    return c;
+	*(pi->str)++ = c;
+	return c;
 }
 
 /*VARARGS1*/

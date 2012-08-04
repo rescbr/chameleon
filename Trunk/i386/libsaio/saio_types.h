@@ -72,7 +72,7 @@ typedef struct Tag Tag, *TagPtr;
 typedef struct
 {
 	char	plist[16384];	// buffer for plist
-	TagPtr	dictionary;	// buffer for xml dictionary
+	TagPtr	dictionary;     // buffer for xml dictionary
 	bool	canOverride;	// flag to mark a dictionary can be overriden
 } config_file_t;
 
@@ -110,8 +110,8 @@ struct boot_drive_info
 	unsigned short control_port_base;
 	unsigned char  head_flags;
 	unsigned char  vendor_info;
-	unsigned char  irq	   : 4;
-	unsigned char  irq_unused  : 4;
+	unsigned char  irq          : 4;
+	unsigned char  irq_unused   : 4;
 	unsigned char  block_count;
 	unsigned char  dma_channel : 4;
 	unsigned char  dma_type	   : 4;
@@ -136,12 +136,14 @@ struct driveInfo
 	int valid;
 };
 
+
 typedef struct FinderInfo
 {
 	unsigned char data[16];
 } FinderInfo;
 
-struct	BootVolume;
+
+struct		BootVolume;
 typedef struct BootVolume * BVRef;
 typedef struct BootVolume * CICell;
 
@@ -159,10 +161,10 @@ typedef void (*BVFree)(CICell ih);
 
 struct iob
 {
-    unsigned int   i_flgs;          /* see F_* below */
-    unsigned int   i_offset;        /* seek byte offset in file */
-    int            i_filesize;      /* size of file */
-    char *         i_buf;           /* file load address */
+	char *         i_buf;           /* file load address */
+	unsigned int   i_flgs;          /* see F_* below */
+	unsigned int   i_offset;        /* seek byte offset in file */
+	int            i_filesize;      /* size of file */
 };
 
 #define BPS	   512				/* sector size of the device */
@@ -177,7 +179,7 @@ struct iob
 struct dirstuff {
 	char *		   dir_path;		/* directory path */
 	long long	   dir_index;		/* directory entry index */
-	BVRef		   dir_bvr;		/* volume reference */
+	BVRef		   dir_bvr;         /* volume reference */
 };
 
 #define BVSTRLEN 32
@@ -204,8 +206,8 @@ struct BootVolume
     char             type_name[BVSTRLEN]; /* (type of partition, eg. Apple_HFS) */
     BVFree           bv_free;         /* BVFree function */
     uint32_t         modTime;
-    char			       label[BVSTRLEN]; /* partition volume label */
-    char			       altlabel[BVSTRLEN]; /* partition volume label */
+    char			 label[BVSTRLEN]; /* partition volume label */
+    char			 altlabel[BVSTRLEN]; /* partition volume label */
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
     char			 OSVersion[8];

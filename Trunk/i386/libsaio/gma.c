@@ -191,7 +191,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		pause();
 		return false;
 	}
-	
+
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);	
 	
@@ -308,7 +308,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
 		devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
 	}
-	
+
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{

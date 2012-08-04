@@ -112,7 +112,7 @@ static char *    gTempSpec;
 static char *    gFileName;
 
 /*static*/ unsigned long
-Adler32( unsigned char * buffer, long length )
+Adler32(unsigned char * buffer, long length)
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -120,7 +120,7 @@ Adler32( unsigned char * buffer, long length )
     lowHalf  = 1;
     highHalf = 0;
   
-	for ( cnt = 0; cnt < length; cnt++ )
+	for (cnt = 0; cnt < length; cnt++)
     {
         if ((cnt % 5000) == 0)
         {
@@ -656,7 +656,8 @@ MatchLibraries( void )
     ModulePtr  module, module2;
     long       done;
 
-    do {
+    do
+	{
         done = 1;
         module = gModuleHead;
         
@@ -665,15 +666,19 @@ MatchLibraries( void )
             if (module->willLoad == 1)
             {
                 prop = XMLGetProperty(module->dict, kPropOSBundleLibraries);
+
                 if (prop != 0)
                 {
                     prop = prop->tag;
+
                     while (prop != 0)
                     {
                         module2 = gModuleHead;
+
                         while (module2 != 0)
                         {
                             prop2 = XMLGetProperty(module2->dict, kPropCFBundleIdentifier);
+
                             if ((prop2 != 0) && (!strcmp(prop->string, prop2->string)))
                             {
                                 if (module2->willLoad == 0) module2->willLoad = 1;
@@ -703,19 +708,24 @@ MatchLibraries( void )
 static ModulePtr
 FindModule( char * name )
 {
-    ModulePtr module;
-    TagPtr    prop;
+	ModulePtr module;
+	TagPtr    prop;
+
+	module = gModuleHead;
+
+	while (module != 0)
+	{
+		prop = GetProperty(module->dict, kPropCFBundleIdentifier);
+
+		if ((prop != 0) && !strcmp(name, prop->string))
+		{
+			break;
+		}
+
+		module = module->nextModule;
+	}
     
-    module = gModuleHead;
-    
-    while (module != 0)
-    {
-        prop = GetProperty(module->dict, kPropCFBundleIdentifier);
-        if ((prop != 0) && !strcmp(name, prop->string)) break;
-        module = module->nextModule;
-    }
-    
-    return module;
+	return module;
 }
 #endif /* NOTDEF */
 
@@ -743,19 +753,19 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
     
         XMLFreeTag(moduleDict);
     }
-  
+
     if (length == -1) return -1;
 
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
-	if ( (required == 0) ||
-		(required->type != kTagTypeString) ||
-		!strcmp(required->string, "Safe Boot"))
+
+	if ( (required == 0) || (required->type != kTagTypeString) || !strcmp(required->string, "Safe Boot"))
+
 	{
 		XMLFreeTag(moduleDict);
 		return -2;
 	}
 
-    tmpModule = malloc(sizeof(Module));
+	tmpModule = malloc(sizeof(Module));
     if (tmpModule == 0)
     {
         XMLFreeTag(moduleDict);
@@ -798,7 +808,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	printf("compressed_size: 0x%x\n", kernel_header->compressed_size);
 	getchar();
 #endif
-	
+
 	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
 		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))

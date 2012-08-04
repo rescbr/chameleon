@@ -106,7 +106,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			case PCI_HEADER_TYPE_CARDBUS:
 				secondary_bus = pci_config_read8(pci_addr, PCI_SECONDARY_BUS);
 				if (secondary_bus != 0)
-					{
+				{
 					scan_pci_bus(new, secondary_bus);
 				}
 				break;

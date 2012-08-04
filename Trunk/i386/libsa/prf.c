@@ -56,12 +56,11 @@
  * Printn prints a number n in base b.
  * We don't use recursion to avoid deep kernel stacks.
  */
-static void
-printn(n, b, flag, minwidth, putfn_p, putfn_arg)
-u_long n;
-int b, flag, minwidth;
-void (*putfn_p)();
-void *putfn_arg;
+static void printn(n, b, flag, minwidth, putfn_p, putfn_arg)
+	u_long n;
+	int b, flag, minwidth;
+	void (*putfn_p)();
+	void *putfn_arg;
 {
 	char prbuf[11];
 	register char *cp;
@@ -72,7 +71,8 @@ void *putfn_arg;
 		n = (unsigned)(-(int)n);
 	}
 	cp = prbuf;
-	do {
+	do
+	{
 		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + n%b];
 		n /= b;
 		width++;
@@ -90,23 +90,22 @@ void *putfn_arg;
 	while (cp > prbuf);
 }
 
-int prf(
-		char *fmt,
-		unsigned int *adx,
-		void (*putfn_p)(),
-		void *putfn_arg
-		)
+int prf(char *fmt, unsigned int *adx, void (*putfn_p)(), void *putfn_arg )
 {
 	int b, c, len =0;
 	char *s;
 	int flag = 0, width = 0;
 	int minwidth;
-	
+
 loop:
-	while ((c = *fmt++) != '%') {
+	while ((c = *fmt++) != '%')
+	{
 		if(c == '\0')
+		{
 			return len;
-		if (putfn_p) {
+		}
+		if (putfn_p)
+		{
 			(*putfn_p)(c, putfn_arg);
 		}
 		len++;
@@ -121,7 +120,8 @@ again:
 			flag |= SPACE;
 			goto again;
 		case '0':
-			if (minwidth == 0) {
+			if (minwidth == 0)
+			{
 				/* this is a flag */
 				flag |= ZERO;
 				goto again;
@@ -150,29 +150,35 @@ again:
 		case 'o': case 'O':
 			b = 8;
 		number:
-			if (putfn_p) {
+			if (putfn_p)
+			{
 				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
 			}
 			len++;
 			break;
 		case 's':
 			s = (char *)*adx;
-			while ((c = *s++)) {
-				if (putfn_p) {
+			while ((c = *s++))
+			{
+				if (putfn_p)
+				{
 					(*putfn_p)(c, putfn_arg);
 				}
 				len++;
 				width++;
 			}
-			while (width++ < minwidth) {
-				if (putfn_p) {
+			while (width++ < minwidth)
+			{
+				if (putfn_p)
+				{
 					(*putfn_p)(' ', putfn_arg);
 				}
 				len++;
 			}
 			break;
 		case 'c':
-			if (putfn_p) {
+			if (putfn_p)
+			{
 				(*putfn_p)((char)*adx, putfn_arg);
 			}
 			len++;

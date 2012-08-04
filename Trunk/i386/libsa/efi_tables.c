@@ -129,16 +129,18 @@ void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out)
 
 bool efi_guid_is_null(EFI_GUID const *pGuid)
 {
-    if(pGuid->Data1 == 0 && pGuid->Data2 == 0 && pGuid->Data3 == 0)
+    if (pGuid->Data1 == 0 && pGuid->Data2 == 0 && pGuid->Data3 == 0)
     {
         int i;
-        for(i=0; i<8; ++i)
+
+        for (i = 0; i < 8; ++i)
         {
-            if(pGuid->Data4[i] != 0)
+            if (pGuid->Data4[i] != 0)
                 return false;
         }
         return true;
     }
+
     return false;
 }
 
@@ -154,9 +156,11 @@ int efi_guid_compare(EFI_GUID const *pG1, EFI_GUID const *pG2)
     COMPARE_MEMBER_AND_RETURN_IF_NE(pG1, pG2, Data2);
     COMPARE_MEMBER_AND_RETURN_IF_NE(pG1, pG2, Data3);
     int i;
-    for(i=0; i<8; ++i)
+
+    for(i = 0; i < 8; ++i)
     {
         COMPARE_MEMBER_AND_RETURN_IF_NE(pG1, pG2, Data4[i]);
     }
     return 0;
 }
+

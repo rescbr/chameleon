@@ -1069,31 +1069,31 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-    int argLen = argName ? strlen(argName) : 0;
-    int len = argLen + cnt + 1;  // +1 to account for space
+	int argLen = argName ? strlen(argName) : 0;
+	int len = argLen + cnt + 1;  // + 1 to account for space.
+
+	if (len > *cntRemainingP)
+	{
+		error("Warning: boot arguments too long, truncating\n");
+		return false;
+	}
 
 	if (argName)
+	{
+		strncpy(*argP, argName, argLen);
+		*argP += argLen;
+		*argP[0] = '=';
+		(*argP)++;
 		len++; // +1 to account for '='
+	}
 
-    if (len > *cntRemainingP) {
-        error("Warning: boot arguments too long, truncating\n");
-        return false;
-    }
+	strncpy(*argP, val, cnt);
+	*argP += cnt;
+	*argP[0] = ' ';
+	(*argP)++;
+	*cntRemainingP -= len;
 
-    if (argName) {
-        strncpy( *argP, argName, argLen );
-        *argP += argLen;
-        *argP[0] = '=';
-        (*argP)++;
-    }
-
-    strncpy( *argP, val, cnt );
-    *argP += cnt;
-    *argP[0] = ' ';
-    (*argP)++;
-
-    *cntRemainingP -= len;
-    return true;
+	return true;
 }
 
 // 

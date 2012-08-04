@@ -69,8 +69,8 @@ char *cursor = 0;
 
 struct putc_info //Azi: exists on gui.c & printf.c
 {
-    char * str;
-    char * last_str;
+	char * str;
+	char * last_str;
 };
 
 static int
@@ -83,7 +83,7 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 		return 0;
 	}
 	*(pi->str)++ = c;
-    return c;
+	return c;
 }
 
 void initBooterLog(void)
@@ -91,7 +91,7 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
-	msglog("%s\n", "Enoch by ErmaC (r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
+	msglog("%s\n", "Enoch (r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
 }
 
 void msglog(const char * fmt, ...)
@@ -100,10 +100,14 @@ void msglog(const char * fmt, ...)
 	struct putc_info pi;
 
 	if (!msgbuf)
+	{
 		return;
+	}
 
 	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	{
 		return;
+	}
 
 	va_start(ap, fmt);
 	pi.str = cursor;
@@ -116,7 +120,9 @@ void msglog(const char * fmt, ...)
 void setupBooterLog(void)
 {
 	if (!msgbuf)
+	{
 		return;
+	}
 
 	Node *node = DT__FindNode("/", false);
 	if (node)
@@ -136,23 +142,27 @@ int putchar(int c)
 	}
 
 	if ( c == '\n' )
-    {
+	{
 		bios_putchar('\r');
-    }
+	}
 
 	bios_putchar(c);
     
-    return c;
+	return c;
 }
 
 int getc()
 {
-    int c = bgetc();
+	int c = bgetc();
 
-    if ((c & 0xff) == 0)
-        return c;
-    else
-        return (c & 0xff);
+	if ((c & 0xff) == 0)
+	{
+		return c;
+	}
+	else
+	{
+		return (c & 0xff);
+	}
 }
 
 // Read and echo a character from console.  This doesn't echo backspace
@@ -171,12 +181,16 @@ int getchar()
 
 int printf(const char * fmt, ...)
 {
-    va_list ap;
+	va_list ap;
 	va_start(ap, fmt);
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
+	}
 	else
+	{
 		vprf(fmt, ap);
+	}
 
 	{
 		/* Kabyl: BooterLog */
@@ -194,7 +208,7 @@ int printf(const char * fmt, ...)
 	}
 
 	va_end(ap);
-    return 0;
+	return 0;
 }
 
 int verbose(const char * fmt, ...)
@@ -202,44 +216,52 @@ int verbose(const char * fmt, ...)
     va_list ap;
 
 	va_start(ap, fmt);
-    if (gVerboseMode)
-    {
+	if (gVerboseMode)
+	{
 		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 			prf(fmt, ap, putchar, 0);
 		else
 			vprf(fmt, ap);
-    }
+	}
 
 	{
 		/* Kabyl: BooterLog */
 		struct putc_info pi;
 
 		if (!msgbuf)
+		{
 			return 0;
+		}
 
 		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+		{
 			return 0;
+		}
 		pi.str = cursor;
 		pi.last_str = 0;
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
 
-    va_end(ap);
-    return(0);
+	va_end(ap);
+	return(0);
 }
 
 int error(const char * fmt, ...)
 {
-    va_list ap;
-    gErrors = true;
-    va_start(ap, fmt);
+	va_list ap;
+	gErrors = true;
+	va_start(ap, fmt);
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-    else
+	}
+	else
+	{
 		vprf(fmt, ap);
+	}
 	va_end(ap);
-    return(0);
+	return(0);
 }
 
 void stop(const char * fmt, ...)
@@ -248,9 +270,12 @@ void stop(const char * fmt, ...)
 
 	printf("\n");
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-	} else {
+	}
+	else
+	{
 		vprf(fmt, ap);
 	}
 	va_end(ap);

@@ -22,8 +22,7 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 /*
- * Copyright 1994 NeXT Computer, Inc.
- * All rights reserved.
+ * Copyright 1994 NeXT Computer, Inc. All rights reserved.
  */
 
 #ifndef __BOOT2_BOOT_H
@@ -182,8 +181,7 @@
 #define kCDBootTimeout       8
 
 /*
- * A global set by boot() to record the device that the booter
- * was loaded from.
+ * A global set by boot() to record the device that the booter was loaded from.
  */
 #define ROOT_DEVICE_SIZE 512
 extern int  gBIOSDev;
@@ -206,11 +204,12 @@ extern uint16_t vgaVendor;;
 /*
  * Boot Modes
  */
-enum {
-    kBootModeNormal = 0,
-    kBootModeSafe   = 1,
-    kBootModeSecure = 2,
-    kBootModeQuiet  = 4
+enum
+{
+	kBootModeNormal = 0,
+	kBootModeSafe   = 1,
+	kBootModeSecure = 2,
+	kBootModeQuiet  = 4
 };
 
 extern void initialize_runtime();
@@ -282,9 +281,10 @@ void showHelp();
 void showTextFile();
 char *getMemoryInfoString();
 
-typedef struct {
-    char   name[80];
-    void * param;
+typedef struct
+{
+	char   name[80];
+	void * param;
 } MenuItem;
 
 /*
@@ -292,16 +292,17 @@ typedef struct {
  */
 extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
-struct compressed_kernel_header {
-  u_int32_t signature;
-  u_int32_t compress_type;
-  u_int32_t adler32;
-  u_int32_t uncompressed_size;
-  u_int32_t compressed_size;
-  u_int32_t reserved[11];
-  char      platform_name[64];
-  char      root_path[256];
-  u_int8_t  data[0];
+struct compressed_kernel_header
+{
+	u_int32_t signature;
+	u_int32_t compress_type;
+	u_int32_t adler32;
+	u_int32_t uncompressed_size;
+	u_int32_t compressed_size;
+	u_int32_t reserved[11];
+	char      platform_name[64];
+	char      root_path[256];
+	 u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 

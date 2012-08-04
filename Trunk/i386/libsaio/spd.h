@@ -12,11 +12,12 @@
 
 void scan_spd(PlatformInfo_t *p);
 
-struct smbus_controllers_t {
+struct smbus_controllers_t
+{
 	uint32_t	vendor;
 	uint32_t	device;
 	char		*name;
-    void (*read_smb)(pci_dt_t *smbus_dev);
+	void (*read_smb)(pci_dt_t *smbus_dev);
 };
 
 

@@ -7,10 +7,11 @@
 #ifndef __MEMVEN_H
 #define __MEMVEN_H
 
-typedef struct _vidTag {
-    uint8_t bank;
-    uint8_t code;
-    const char*  name;
+typedef struct _vidTag
+{
+	uint8_t		bank;
+	uint8_t		code;
+	const char*	name;
 } VenIdName;
 
 VenIdName vendorMap[] = {

@@ -139,8 +139,7 @@ size_t strlen(const char * s)
 /*#endif*/
 
 /* NOTE: Moved from ntfs.c */
-int
-memcmp(const void *p1, const void *p2, size_t len)
+int memcmp(const void *p1, const void *p2, size_t len)
 {
     while (len--) {
         if (*(const char*)(p1++) != *(const char*)(p2++))
@@ -149,8 +148,7 @@ memcmp(const void *p1, const void *p2, size_t len)
     return 0;
 }
 
-int
-strcmp(const char * s1, const char * s2)
+int strcmp(const char * s1, const char * s2)
 {
 	while (*s1 && (*s1 == *s2)) {
 		s1++;
@@ -168,8 +166,7 @@ int strncmp(const char * s1, const char * s2, size_t len)
 	return(n<0 ? 0 : *s1 - *--s2);
 }
 
-char *
-strcpy(char * s1, const char * s2)
+char * strcpy(char * s1, const char * s2)
 {
 	register char *ret = s1;
 	while ((*s1++ = *s2++))
@@ -177,8 +174,7 @@ strcpy(char * s1, const char * s2)
 	return ret;
 }
 
-char *
-strncpy(char * s1, const char * s2, size_t n)
+char * strncpy(char * s1, const char * s2, size_t n)
 {
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
@@ -186,8 +182,7 @@ strncpy(char * s1, const char * s2, size_t n)
 	return ret;
 }
 
-char *
-strstr(const char *in, const char *str)
+char * strstr(const char *in, const char *str)
 {
     char c;
     size_t len;
@@ -210,8 +205,7 @@ strstr(const char *in, const char *str)
     return (char *) (in - 1);
 }
 
-int
-ptol(const char *str)
+int ptol(const char *str)
 {
 	register int c = *str;
 
@@ -223,8 +217,7 @@ ptol(const char *str)
 	return c;
 }
 
-int
-atoi(const char *str)
+int atoi(const char *str)
 {
 	register int sum = 0;
 	while (*str == ' ' || *str == '\t')

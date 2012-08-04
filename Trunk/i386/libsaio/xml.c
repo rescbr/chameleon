@@ -67,42 +67,46 @@ char* GetRefString(int id)
 	return "";
 }
 
-struct Module {
-  struct Module *nextModule;
-  long          willLoad;
-  TagPtr        dict;
-  char          *plistAddr;
-  long          plistLength;
-  char          *driverPath;
+struct Module
+{
+	struct Module *nextModule;
+	long		willLoad;
+	TagPtr		dict;
+	char		* plistAddr;
+	long		plistLength;
+	char		* driverPath;
 };
 typedef struct Module Module, *ModulePtr;
 
-struct DriverInfo {
-  char *plistAddr;
-  long plistLength;
-  void *moduleAddr;
-  long moduleLength;
+struct DriverInfo
+{
+	char	* plistAddr;
+	long	plistLength;
+	void	* moduleAddr;
+	long	moduleLength;
 };
 typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
 
 #define kDriverPackageSignature1 'MKXT'
 #define kDriverPackageSignature2 'MOSX'
 
-struct DriversPackage {
-  unsigned long signature1;
-  unsigned long signature2;
-  unsigned long length;
-  unsigned long adler32;
-  unsigned long version;
-  unsigned long numDrivers;
-  unsigned long reserved1;
-  unsigned long reserved2;
+struct DriversPackage
+{
+	unsigned long signature1;
+	unsigned long signature2;
+	unsigned long length;
+	unsigned long adler32;
+	unsigned long version;
+	unsigned long numDrivers;
+	unsigned long reserved1;
+	unsigned long reserved2;
 };
 typedef struct DriversPackage DriversPackage;
 
-enum {
-  kCFBundleType2,
-  kCFBundleType3
+enum
+{
+	kCFBundleType2,
+	kCFBundleType3
 };
 
 
@@ -126,26 +130,33 @@ static void FreeSymbol(char *string);
 //==========================================================================
 // XMLGetProperty
 
-TagPtr
-XMLGetProperty( TagPtr dict, const char * key )
+TagPtr XMLGetProperty(TagPtr dict, const char * key)
 {
-    TagPtr tagList, tag;
+	if (dict->type != kTagTypeDict)
+	{
+		return 0;
+	}
 
-    if (dict->type != kTagTypeDict) return 0;
-    
-    tag = 0;
-    tagList = dict->tag;
-    while (tagList)
-    {
-        tag = tagList;
-        tagList = tag->tagNext;
+	TagPtr tag = 0;
+	TagPtr tagList = dict->tag;
+
+	while (tagList)
+	{
+		tag = tagList;
+		tagList = tag->tagNext;
         
-        if ((tag->type != kTagTypeKey) || (tag->string == 0)) continue;
-        
-        if (!strcmp(tag->string, key)) return tag->tag;
-    }
-    
-    return 0;
+		if ((tag->type != kTagTypeKey) || (tag->string == 0))
+		{
+			continue;
+		}
+
+		if (!strcmp(tag->string, key))
+		{
+			return tag->tag;
+		}
+	}
+
+	return 0;
 }
 
 //==========================================================================

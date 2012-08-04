@@ -378,20 +378,23 @@ void scan_cpu(PlatformInfo_t *p)
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
-	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f)))
+	{
 		int intelCPU = p->CPU.Model;
-		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
+		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))
+		{
 			/* Nehalem CPU model */
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM		||
-										  p->CPU.Model == CPU_MODEL_FIELDS		||
-										  p->CPU.Model == CPU_MODEL_DALES		||
+										  p->CPU.Model == CPU_MODEL_FIELDS	||
+										  p->CPU.Model == CPU_MODEL_DALES	||
 										  p->CPU.Model == CPU_MODEL_DALES_32NM	||
 										  p->CPU.Model == CPU_MODEL_WESTMERE	||
 										  p->CPU.Model == CPU_MODEL_NEHALEM_EX	||
 										  p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
 										  p->CPU.Model == CPU_MODEL_SANDYBRIDGE ||
 										  p->CPU.Model == CPU_MODEL_JAKETOWN	||
-										  p->CPU.Model == CPU_MODEL_IVYBRIDGE	)) {
+										  p->CPU.Model == CPU_MODEL_IVYBRIDGE	))
+			{
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
 				bus_ratio_max = bitfield(msr, 14, 8);
@@ -420,18 +423,21 @@ void scan_cpu(PlatformInfo_t *p)
 					}
 				}
 
-				if (bus_ratio_max) {
+				if (bus_ratio_max)
+				{
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
 				//valv: Turbo Ratio Limit
-				if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
+				if ((intelCPU != 0x2e) && (intelCPU != 0x2f))
+				{
 					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
 				} else {
 					cpuFrequency = tscFrequency;
 				}
-				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
+				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
+				{
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
 					if (len >= 3) max_ratio = (max_ratio + 5);
@@ -439,7 +445,8 @@ void scan_cpu(PlatformInfo_t *p)
 					verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 					// extreme overclockers may love 320 ;)
-					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
+					if ((max_ratio >= min_ratio) && (max_ratio <= 320))
+					{
 						cpuFrequency = (fsbFrequency * max_ratio) / 10;
 						if (len >= 3) maxdiv = 1;
 						else maxdiv = 0;
@@ -476,18 +483,18 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 
 				if (maxcoef)
-					{
+				{
 					if (maxdiv)
-						{
-							fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-						} else {
-							fsbFrequency = (tscFrequency / maxcoef);
+					{
+						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+					} else {
+						fsbFrequency = (tscFrequency / maxcoef);
 					}
-						if (currdiv)
-						{
-							cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-						} else {
-							cpuFrequency = (fsbFrequency * currcoef);
+					if (currdiv)
+					{
+						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+					} else {
+						cpuFrequency = (fsbFrequency * currcoef);
 					}
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 				}

@@ -29,52 +29,62 @@
 #include "libsaio.h"
 #include "vbe.h"
 
-/* 
- * Various inline routines for video I/O
- */
-static inline void
-outi (int port, int index, int val)
+// Various inline routines for video I/O
+
+static biosBuf_t bb;
+
+
+//==============================================================================
+
+static inline void outi(int port, int index, int val)
 {
     outw (port, (val << 8) | index);
 }
 
-static inline void
-outib (int port, int index, int val)
+
+//==============================================================================
+static inline void outib(int port, int index, int val)
 {
     outb (port, index);
     outb (port + 1, val);
 }
 
-static inline int
-ini (int port, int index)
+
+//==============================================================================
+
+static inline int ini(int port, int index)
 {
     outb (port, index);
     return inb (port + 1);
 }
 
-static inline void
-rmwi (int port, int index, int clear, int set)
+
+//==============================================================================
+
+static inline void rmwi(int port, int index, int clear, int set)
 {
     outb (port, index);
     outb (port + 1, (inb (port + 1) & ~clear) | set);
 }
 
-/*
- * Globals
- */
-static biosBuf_t bb;
 
-int getVBEInfo( void * infoBlock )
+//==============================================================================
+
+int getVBEInfo(void * infoBlock)
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcGetControllerInfo;
     bb.es     = SEG( infoBlock );
     bb.edi.rr = OFF( infoBlock );
-    bios( &bb );
+    bios(&bb);
+
     return(bb.eax.r.h);
 }
 
-int getVBEModeInfo( int mode, void * minfo_p )
+
+//==============================================================================
+
+int getVBEModeInfo(int mode, void * minfo_p)
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcGetModeInfo;
@@ -82,8 +92,12 @@ int getVBEModeInfo( int mode, void * minfo_p )
     bb.es     = SEG(minfo_p);
     bb.edi.rr = OFF(minfo_p);
     bios(&bb);
+
     return(bb.eax.r.h);
 }
+
+
+//==============================================================================
 
 int getVBEDACFormat(unsigned char *format)
 {
@@ -95,6 +109,9 @@ int getVBEDACFormat(unsigned char *format)
     return(bb.eax.r.h);
 }
 
+
+//==============================================================================
+
 int setVBEDACFormat(unsigned char format)
 {
     bb.intno = 0x10;
@@ -102,8 +119,10 @@ int setVBEDACFormat(unsigned char format)
     bb.ebx.r.l = subfuncSet;
     bb.ebx.r.h = format;
     bios(&bb);
+
     return(bb.eax.r.h);
 }
+
 
 /*
  * Default GTF parameter values.

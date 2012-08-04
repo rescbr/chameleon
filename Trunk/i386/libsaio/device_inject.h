@@ -18,7 +18,8 @@ extern uint32_t stringlength;
 
 extern void setupDeviceProperties(Node *node);
 
-struct ACPIDevPath {
+struct ACPIDevPath
+{
 	uint8_t		type;		// = 2 ACPI device-path
 	uint8_t		subtype;	// = 1 ACPI Device-path
 	uint16_t	length;		// = 0x0c
@@ -26,7 +27,8 @@ struct ACPIDevPath {
 	uint32_t	_UID;		// = 0x00000000 PCI ROOT
 };
 
-struct PCIDevPath {
+struct PCIDevPath
+{
 	uint8_t		type;		// = 1 Hardware device-path
 	uint8_t		subtype;	// = 1 PCI
 	uint16_t	length;		// = 6
@@ -34,13 +36,15 @@ struct PCIDevPath {
 	uint8_t		device;		// pci dev number
 };
 
-struct DevicePathEnd {
+struct DevicePathEnd
+{
 	uint8_t		type;		// = 0x7f
 	uint8_t		subtype;	// = 0xff
 	uint16_t	length;		// = 4;
 };
 
-struct DevPropDevice {
+struct DevPropDevice
+{
 	uint32_t length;
 	uint16_t numentries;
 	uint16_t WHAT2;										// 0x0000 ?
@@ -55,7 +59,8 @@ struct DevPropDevice {
 	// ------------------------	
 };
 
-struct DevPropString {
+struct DevPropString
+{
 	uint32_t length;
 	uint32_t WHAT2;			// 0x01000000 ?
 	uint16_t numentries;

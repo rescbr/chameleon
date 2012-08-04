@@ -206,12 +206,12 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 
 int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len)
 {
-	
+
 	if(!nm || !vl || !len)
 	{
 		return 0;
 	}
-	
+
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
 	uint8_t *data = (uint8_t*)malloc(length);
 	{
@@ -219,12 +219,12 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		{
 			return 0;
 		}
-		
+
 		memset(data, 0, length);
 		uint32_t off= 0;
 		data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
 		data[off] =   ((strlen(nm) * 2) + 6) & 0x00FF;
-		
+
 		off += 4;
 		uint32_t i=0, l = strlen(nm);
 		for(i = 0 ; i < l ; i++, off += 2)
@@ -241,7 +241,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		{
 			data[off] = *vl++;
 		}
-	}	
+	}
 	
 	uint32_t offset = device->length - (24 + (6 * device->num_pci_devpaths));
 	
@@ -272,10 +272,10 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	{
 		free(device->data);
 	}
-	
+
 	free(data);
 	device->data = newdata;
-	
+
 	return 1;
 }
 
@@ -307,7 +307,7 @@ char *devprop_generate_string(struct DevPropString *string)
 				dp_swap32(string->entries[i]->acpi_dev_path._UID));
 
 		buffer += 24;
-		for(x=0;x < string->entries[i]->num_pci_devpaths; x++)
+		for(x = 0;x < string->entries[i]->num_pci_devpaths; x++)
 		{
 			sprintf(buffer, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
 					string->entries[i]->pci_dev_path[x].subtype,

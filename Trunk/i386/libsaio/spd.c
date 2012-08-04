@@ -69,6 +69,19 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 #define SMBHSTDAT 5
 #define SBMBLKDAT 7
 
+int spd_indexes[] = {
+	SPD_MEMORY_TYPE,
+	SPD_DDR3_MEMORY_BANK,
+	SPD_DDR3_MEMORY_CODE,
+	SPD_NUM_ROWS,
+	SPD_NUM_COLUMNS,
+	SPD_NUM_DIMM_BANKS,
+	SPD_NUM_BANKS_PER_SDRAM,
+	4,7,8,9,12,64, /* TODO: give names to these values */
+	95,96,97,98, 122,123,124,125 /* UIS */
+};
+#define SPD_INDEXES_SIZE (sizeof(spd_indexes) / sizeof(int))
+
 /** Read one byte from the intel i2c, used for reading SPD on intel chipsets only. */
 
 unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
@@ -107,18 +120,6 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 /* SPD i2c read optimization: prefetch only what we need, read non prefetcheable bytes on the fly */
 #define READ_SPD(spd, base, slot, x) spd[x] = smb_read_byte_intel(base, 0x50 + slot, x)
 
-int spd_indexes[] = {
-	SPD_MEMORY_TYPE,
-	SPD_DDR3_MEMORY_BANK,
-	SPD_DDR3_MEMORY_CODE,
-	SPD_NUM_ROWS,
-	SPD_NUM_COLUMNS,
-	SPD_NUM_DIMM_BANKS,
-	SPD_NUM_BANKS_PER_SDRAM,
-	4,7,8,9,12,64, /* TODO: give names to these values */
-	95,96,97,98, 122,123,124,125 /* UIS */
-};
-#define SPD_INDEXES_SIZE (sizeof(spd_indexes) / sizeof(int))
 
 /** Read from spd *used* values only*/
 static void init_spd(char * spd, uint32_t base, int slot)
@@ -134,34 +135,40 @@ static void init_spd(char * spd, uint32_t base, int slot)
     have different formats, always return a valid ptr.*/
 const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 {
-    uint8_t bank = 0;
-    uint8_t code = 0;
-    int i = 0;
-    uint8_t * spd = (uint8_t *) slot->spd;
+	uint8_t bank = 0;
+	uint8_t code = 0;
+	int i = 0;
+	uint8_t * spd = (uint8_t *) slot->spd;
 
-    if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) { // DDR3
-        bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
-        code = spd[SPD_DDR3_MEMORY_CODE];
-        for (i=0; i < VEN_MAP_SIZE; i++)
-            if (bank==vendorMap[i].bank && code==vendorMap[i].code)
-                return vendorMap[i].name;
-    }
-    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) {
-        if(spd[64]==0x7f) {
-            for (i=64; i<72 && spd[i]==0x7f;i++) {
-			  bank++;
-			  READ_SPD(spd, base, slot_num,i+1); // prefetch next spd byte to read for next loop
+	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3)
+	{ // DDR3
+		bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
+		code = spd[SPD_DDR3_MEMORY_CODE];
+		for (i=0; i < VEN_MAP_SIZE; i++)
+			if (bank==vendorMap[i].bank && code==vendorMap[i].code)
+				return vendorMap[i].name;
+	}
+	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR)
+	{
+		if(spd[64]==0x7f)
+		{
+			for (i=64; i<72 && spd[i]==0x7f;i++)
+			{
+				bank++;
+				READ_SPD(spd, base, slot_num,i+1); // prefetch next spd byte to read for next loop
 			}
 			READ_SPD(spd, base, slot_num,i);
-            code = spd[i];
-        } else {
-            code = spd[64]; 
-            bank = 0;
-        }
-        for (i=0; i < VEN_MAP_SIZE; i++)
-            if (bank==vendorMap[i].bank && code==vendorMap[i].code)
-                return vendorMap[i].name;
-    }
+			code = spd[i];
+		}
+		else
+		{
+			code = spd[64]; 
+			bank = 0;
+		}
+		for (i=0; i < VEN_MAP_SIZE; i++)
+			if (bank==vendorMap[i].bank && code==vendorMap[i].code)
+				return vendorMap[i].name;
+	}
     /* OK there is no vendor id here lets try to match the partnum if it exists */
     if (strstr(slot->PartNo,"GU332") == slot->PartNo) // Unifosa fingerprint
         return "Unifosa";
@@ -171,33 +178,37 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 /** Get Default Memory Module Speed (no overclocking handled) */
 int getDDRspeedMhz(const char * spd)
 {
-    if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) { 
-        switch(spd[12])  {
-        case 0x0f:
-            return 1066;
-        case 0x0c:
-            return 1333;
-        case 0x0a:
-            return 1600;
-        case 0x14:
-        default:
-            return 800;
-        }
-    } 
-    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2)  {
-        switch(spd[9]) {
-        case 0x50:
-            return 400;
-        case 0x3d:
-            return 533;
-        case 0x30:
-            return 667;
-        case 0x25:
-        default:
-            return 800;
-        }
-    }
-    return  800; // default freq for unknown types
+	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3)
+	{ 
+		switch(spd[12])
+		{
+			case 0x0f:
+				return 1066;
+			case 0x0c:
+				return 1333;
+			case 0x0a:
+				return 1600;
+			case 0x14:
+			default:
+				return 800;
+		}
+	} 
+	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR)
+	{
+		switch(spd[9])
+		{
+			case 0x50:
+				return 400;
+			case 0x3d:
+				return 533;
+			case 0x30:
+				return 667;
+			case 0x25:
+			default:
+				return 800;
+		}
+	}
+	return  800; // default freq for unknown types
 }
 
 #define SMST(a) ((uint8_t)((spd[a] & 0xf0) >> 4))
@@ -208,14 +219,14 @@ const char *getDDRSerial(const char* spd)
 {
 	static char asciiSerial[16];
     
-    if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
-    {
-	sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(122) /*& 0x7*/, SLST(122), SMST(123), SLST(123), SMST(124), SLST(124), SMST(125), SLST(125));
-    }
-    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) // DDR2 or DDR
-    { 
-	sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
-    }
+	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
+	{
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(122) /*& 0x7*/, SLST(122), SMST(123), SLST(123), SMST(124), SLST(124), SMST(125), SLST(125));
+	}
+	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR) // DDR2 or DDR
+	{
+		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
+	}
 
 	return strdup(asciiSerial);
 }
@@ -226,10 +237,12 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 	static char asciiPartNo[32];
 	int i, start=0, index = 0;
 
-    if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) {
+	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3)
+	{
 		start = 128;
 	}
-    else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2) {
+	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR)
+	{
 		start = 73;
 	}
 	
@@ -291,7 +304,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
 		bzero(slot->spd, spd_size);
 
-            // Copy spd data into buffer
+		// Copy spd data into buffer
 
 		//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
 		init_spd(slot->spd, base, i);
@@ -388,25 +401,26 @@ bool find_and_read_smbus_controller(pci_dt_t* pci_dt)
 	pci_dt_t	*current = pci_dt;
 	int i;
 
-	while (current) {
+	while (current)
+	{
 #if 0
 		printf("%02x:%02x.%x [%04x] [%04x:%04x] :: %s\n", 
 		current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
 		current->class_id, current->vendor_id, current->device_id, 
 		get_pci_dev_path(current));
 #endif
-	for ( i = 0; i <  sizeof(smbus_controllers) / sizeof(smbus_controllers[0]); i++ )
-	{
-		if (current->vendor_id == smbus_controllers[i].vendor && current->device_id == smbus_controllers[i].device)
+		for ( i = 0; i <  sizeof(smbus_controllers) / sizeof(smbus_controllers[0]); i++ )
 		{
-			smbus_controllers[i].read_smb(current); // read smb
-			return true;
+			if (current->vendor_id == smbus_controllers[i].vendor && current->device_id == smbus_controllers[i].device)
+			{
+				smbus_controllers[i].read_smb(current); // read smb
+				return true;
 			}
 		}
 		find_and_read_smbus_controller(current->children);
 		current = current->next;
 	}
-    return false; // not found
+	return false; // not found
 }
 
 void scan_spd(PlatformInfo_t *p)

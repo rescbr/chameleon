@@ -102,21 +102,27 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 /* Size of SMBIOS UUID in bytes */
 #define UUID_LEN			16
 
-typedef struct _RamSlotInfo_t {
-    uint32_t		ModuleSize;					// Size of Module in MB
-    uint32_t		Frequency;					// in Mhz
-    const char*		Vendor;
-    const char*		PartNo;
-    const char*		SerialNo;
-    char*			spd;						// SPD Dump
-    bool			InUse;
-    uint8_t			Type;
-    uint8_t			BankConnections;			// table type 6, see (3.3.7)
-    uint8_t			BankConnCnt;
+typedef struct _RamSlotInfo_t
+{
+	uint32_t		ModuleSize;					// Size of Module in MB
+	uint32_t		Frequency;					// in Mhz
+	const char*		Vendor;
+	const char*		PartNo;
+	const char*		SerialNo;
+	char*			spd;						// SPD Dump
+	bool			InUse;
+	uint8_t			Type;
+	uint8_t			BankConnections;			// table type 6, see (3.3.7)
+	uint8_t			BankConnCnt;
 } RamSlotInfo_t;
 
-typedef struct _PlatformInfo_t {
-	struct CPU {
+
+//==============================================================================
+
+typedef struct _PlatformInfo_t
+{
+	struct CPU
+	{
 		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint32_t		Vendor;					// Vendor
 		uint32_t		Signature;				// Signature
@@ -140,7 +146,8 @@ typedef struct _PlatformInfo_t {
 		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 	} CPU;
 
-	struct RAM {
+	struct RAM
+	{
 		uint64_t		Frequency;				// Ram Frequency
 		uint32_t		Divider;				// Memory divider
 		uint8_t			CAS;					// CAS 1/2/2.5/3/4/5/6/7
@@ -153,7 +160,8 @@ typedef struct _PlatformInfo_t {
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];	// Information about each slot
 	} RAM;
 
-	struct DMI {
+	struct DMI
+	{
 		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
 		int			CntMemorySlots;		// number of memory slots counted
 		int			MemoryModules;		// number of memory modules installed

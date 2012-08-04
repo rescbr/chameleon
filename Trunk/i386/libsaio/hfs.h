@@ -23,9 +23,7 @@
 extern long HFSInitPartition(CICell ih);
 extern long HFSLoadFile(CICell ih, char * filePath);
 extern long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t length);
-extern long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
-                           char ** name, long * flags, long * time,
-                           FinderInfo * finderInfo, long * infoValid);
+extern long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** name, long * flags, long * time, FinderInfo * finderInfo, long * infoValid);
 extern void HFSGetDescription(CICell ih, char *str, long strMaxLen);
 extern long HFSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock);
 extern long HFSGetUUID(CICell ih, char *uuidStr);

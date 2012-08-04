@@ -20,10 +20,8 @@
  * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
- * Copyright 1993 NeXT, Inc.
- * All rights reserved.
+ *
+ * Copyright 1993 NeXT, Inc. All rights reserved.
  */
 
 #include "bootstruct.h"
@@ -135,34 +133,34 @@ out:
     return true;
 }
 
-char *
-newStringFromList(
-    char **list,
-    int *size
-)
+char *newStringFromList(char **list, int *size)
 {
-    char *begin = *list, *end;
-    char *newstr;
-    int newsize = *size;
-    int bufsize;
+	char *begin = *list, *end;
+	char *newstr;
+	int newsize = *size;
+	int bufsize;
     
-    while (*begin && newsize && isspace(*begin)) {
-	begin++;
-	newsize--;
-    }
-    end = begin;
-    while (*end && newsize && !isspace(*end)) {
-	end++;
-	newsize--;
-    }
-    if (begin == end)
-	return 0;
-    bufsize = end - begin + 1;
-    newstr = malloc(bufsize);
-    strlcpy(newstr, begin, bufsize);
-    *list = end;
-    *size = newsize;
-    return newstr;
+	while (*begin && newsize && isspace(*begin))
+	{
+		begin++;
+		newsize--;
+	}
+	end = begin;
+	while (*end && newsize && !isspace(*end))
+	{
+		end++;
+		newsize--;
+	}
+	if (begin == end)
+	{
+		return 0;
+	}
+	bufsize = end - begin + 1;
+	newstr = malloc(bufsize);
+	strlcpy(newstr, begin, bufsize);
+	*list = end;
+	*size = newsize;
+	return newstr;
 }
 
 #endif
@@ -194,22 +192,26 @@ int stringLength(const char *table, int compress)
 
 bool getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size)
 {
-	if (config->dictionary != 0 ) {
+	if (config->dictionary != 0 )
+	{
 		// Look up key in XML dictionary
 		TagPtr value;
 		value = XMLGetProperty(config->dictionary, key);
-		if (value != 0) {
-			if (value->type != kTagTypeString) {
-				error("Non-string tag '%s' found in config file\n",
-					  key);
+		if (value != 0)
+		{
+			if (value->type != kTagTypeString)
+			{
+				error("Non-string tag '%s' found in config file\n", key);
 				return false;
 			}
 			*val = value->string;
 			*size = strlen(value->string);
 			return true;
 		}
-	} else {
-	
+	}
+	else
+	{
+
 		// Legacy plist-style table
 
 	}
@@ -224,42 +226,44 @@ bool getValueForConfigTableKey(config_file_t *config, const char *key, const cha
  * in the string table matching 'key'.  Also translates
  * \n escapes in the string.
  */
-char *newStringForStringTableKey(
-	char *table,
-	char *key,
-	config_file_t *config
-)
+char *newStringForStringTableKey(char *table, char *key, config_file_t *config)
 {
-    const char *val;
-    char *newstr, *p;
-    int size;
+	const char *val;
+	char *newstr, *p;
+	int size;
     
-    if (getValueForConfigTableKey(config, key, &val, &size)) {
-	newstr = (char *)malloc(size+1);
-	for (p = newstr; size; size--, p++, val++) {
-	    if ((*p = *val) == '\\') {
-		switch (*++val) {
-		case 'r':
-		    *p = '\r';
-		    break;
-		case 'n':
-		    *p = '\n';
-		    break;
-		case 't':
-		    *p = '\t';
-		    break;
-		default:
-		    *p = *val;
-		    break;
+	if (getValueForConfigTableKey(config, key, &val, &size))
+	{
+		newstr = (char *)malloc(size+1);
+		for (p = newstr; size; size--, p++, val++)
+		{
+			if ((*p = *val) == '\\')
+			{
+			switch (*++val)
+			{
+				case 'r':
+					*p = '\r';
+				break;
+				case 'n':
+					*p = '\n';
+				break;
+				case 't':
+					*p = '\t';
+				break;
+				default:
+					*p = *val;
+				break;
+			}
+			size--;
 		}
-		size--;
-	    }
 	}
 	*p = '\0';
 	return newstr;
-    } else {
-	return 0;
-    }
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 #endif
@@ -267,17 +271,20 @@ char *newStringForStringTableKey(
 char *
 newStringForKey(char *key, config_file_t *config)
 {
-    const char *val;
-    char *newstr;
-    int size;
+	const char *val;
+	char *newstr;
+	int size;
     
-    if (getValueForKey(key, &val, &size, config) && size) {
-	newstr = (char *)malloc(size + 1);
-	strlcpy(newstr, val, size + 1);
-	return newstr;
-    } else {
-	return 0;
-    }
+	if (getValueForKey(key, &val, &size, config) && size)
+	{
+		newstr = (char *)malloc(size + 1);
+		strlcpy(newstr, val, size + 1);
+		return newstr;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 /* parse a command line
@@ -440,22 +447,22 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 			{
 				if (*val < '0' || *val > '9')
 					return false;
-				
+
 				sum = (sum * 10) + (*val++ - '0');
 			}
 
 			if (percentage)
 				sum = ( dimension_max * sum ) / 100;
-			
+
 			// calculate offset from opposite origin
 			if (negative)
 				sum =  ( ( dimension_max - object_size ) - sum );
 
 		} else {
-			
+
 			// null value calculate center
 			sum = ( dimension_max - object_size ) / 2;
-			
+
 		}
 
 		*value = (uint16_t) sum;

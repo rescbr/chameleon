@@ -32,8 +32,7 @@
 
 #if ! UNCOMPRESSED
 
-static unsigned short *
-UncompressStructure(struct compressed_block *bp, int count, int size)
+static unsigned short * UncompressStructure(struct compressed_block *bp, int count, int size)
 {
     unsigned short *out = malloc(size);
     unsigned short *op = out;
@@ -58,8 +57,7 @@ UncompressStructure(struct compressed_block *bp, int count, int size)
     return out;
 }
 
-static void
-InitCompareTables(void)
+static void InitCompareTables(void)
 {
     if (gCompareTable == 0) {
         gCompareTable = UncompressStructure(gCompareTableCompressed,
@@ -306,8 +304,7 @@ int32_t BinaryUnicodeCompare (u_int16_t * str1, u_int32_t length1,
  * ucslen is the number of UCS-2 input characters (not bytes)
  * bufsize is the size of the output buffer in bytes
  */
-void
-utf_encodestr( const u_int16_t * ucsp, int ucslen,
+void utf_encodestr( const u_int16_t * ucsp, int ucslen,
                u_int8_t * utf8p, u_int32_t bufsize, int byte_order )
 {
 	u_int8_t *bufend;

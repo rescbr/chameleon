@@ -73,7 +73,7 @@ static uint64_t ptov64(uint32_t addr)
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'.',':','E','r','m','a','C',':','.','_','1','.','0', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = { 'A', 'p', 'p', 'l', 'e', '\0' };
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 /* Default platform system_id (fix by IntVar) */
