@@ -766,6 +766,7 @@ void scan_cpu(void)
 			case CPUID_MODEL_NEHALEM_EX:
 			case CPUID_MODEL_SANDYBRIDGE:
 			case CPUID_MODEL_JAKETOWN:
+            case CPUID_MODEL_IVYBRIDGE:
 			{
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 				NoThreads = bitfield((uint32_t)msr, 15,  0);
@@ -914,7 +915,8 @@ void scan_cpu(void)
                                    Model == CPUID_MODEL_NEHALEM_EX ||
                                    Model == CPUID_MODEL_WESTMERE_EX ||
                                    Model == CPUID_MODEL_SANDYBRIDGE ||
-                                   Model == CPUID_MODEL_JAKETOWN)) 
+                                   Model == CPUID_MODEL_JAKETOWN ||
+                                   Model == CPUID_MODEL_IVYBRIDGE)) 
 			{
 				uint8_t		bus_ratio_max = 0;
 				uint64_t	flex_ratio = 0;

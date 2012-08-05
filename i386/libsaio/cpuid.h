@@ -92,24 +92,38 @@
 #define CPUID_FEATURE_TM2       _HBit(8)  /* Thermal Monitor 2 */
 #define CPUID_FEATURE_SSSE3     _HBit(9)  /* Supplemental SSE3 instructions */
 #define CPUID_FEATURE_CID       _HBit(10) /* L1 Context ID */
+#define CPUID_FEATURE_SEGLIM64  _HBit(11) /* 64-bit segment limit checking */
 #define CPUID_FEATURE_CX16      _HBit(13) /* CmpXchg16b instruction */
 #define CPUID_FEATURE_xTPR      _HBit(14) /* Send Task PRiority msgs */
 #define CPUID_FEATURE_PDCM      _HBit(15) /* Perf/Debug Capability MSR */
 
+#define CPUID_FEATURE_PCID      _HBit(17) /* ASID-PCID support */
 #define CPUID_FEATURE_DCA       _HBit(18) /* Direct Cache Access */
 #define CPUID_FEATURE_SSE4_1    _HBit(19) /* Streaming SIMD extensions 4.1 */
 #define CPUID_FEATURE_SSE4_2    _HBit(20) /* Streaming SIMD extensions 4.2 */
 #define CPUID_FEATURE_xAPIC     _HBit(21) /* Extended APIC Mode */
 #define CPUID_FEATURE_MOVBE     _HBit(22) /* MOVBE instruction */
 #define CPUID_FEATURE_POPCNT    _HBit(23) /* POPCNT instruction */
+#define CPUID_FEATURE_TSCTMR    _HBit(24) /* TSC deadline timer */
 #define CPUID_FEATURE_AES       _HBit(25) /* AES instructions */
 #define CPUID_FEATURE_XSAVE     _HBit(26) /* XSAVE instructions */
 #define CPUID_FEATURE_OSXSAVE   _HBit(27) /* XGETBV/XSETBV instructions */
+#define CPUID_FEATURE_AVX1_0	_HBit(28) /* AVX 1.0 instructions */
 #define CPUID_FEATURE_VMM       _HBit(31) /* VMM (Hypervisor) present */
 #define CPUID_FEATURE_SEGLIM64  _HBit(11) /* 64-bit segment limit checking */
 #define CPUID_FEATURE_PCID      _HBit(17) /* ASID-PCID support */
 #define CPUID_FEATURE_TSCTMR    _HBit(24) /* TSC deadline timer */
 #define CPUID_FEATURE_AVX1_0	_HBit(28) /* AVX 1.0 instructions */
+#define CPUID_FEATURE_F16C	_HBit(29) /* Float16 convert instructions */
+#define CPUID_FEATURE_RDRAND	_HBit(30) /* RDRAND instruction */
+
+/*
+ * Leaf 7, subleaf 0 additional features.
+ * Bits returned in %ebx to a CPUID request with {%eax,%ecx} of (0x7,0x0}:
+ */
+#define CPUID_LEAF7_FEATURE_RDWRFSGS _Bit(0)	/* FS/GS base read/write */
+#define CPUID_LEAF7_FEATURE_SMEP     _Bit(7)	/* Supervisor Mode Execute Protect */
+#define CPUID_LEAF7_FEATURE_ENFSTRG  _Bit(9)	/* ENhanced Fast STRinG copy */
 
 /*
  * The CPUID_EXTFEATURE_XXX values define 64-bit values
@@ -145,9 +159,9 @@
 #define CPUID_MODEL_DALES_32NM	0x25	/* Clarkdale, Arrandale */
 #define CPUID_MODEL_WESTMERE	0x2C	/* Gulftown, Westmere-EP, Westmere-WS */
 #define CPUID_MODEL_WESTMERE_EX	0x2F
-/* Additional internal models go here */
 #define CPUID_MODEL_SANDYBRIDGE	0x2A
 #define CPUID_MODEL_JAKETOWN	0x2D
+#define CPUID_MODEL_IVYBRIDGE	0x3A
 
 typedef enum { eax, ebx, ecx, edx } cpuid_register_t;
 
@@ -260,7 +274,8 @@ typedef struct {
 	uint64_t	cpuid_extfeatures;
 	uint32_t	cpuid_signature;
 	uint8_t   	cpuid_brand; 
-	
+    uint8_t		cpuid_processor_flag;
+
 	uint32_t	cache_size[LCACHE_MAX];
 	uint32_t	cache_linesize;
 
@@ -316,6 +331,7 @@ typedef struct {
 	cpuid_thermal_leaf_t	*cpuid_thermal_leafp;
 	cpuid_arch_perf_leaf_t	*cpuid_arch_perf_leafp;
 	cpuid_xsave_leaf_t	*cpuid_xsave_leafp;
+    uint32_t		cpuid_leaf7_features;
 } i386_cpu_info_t;
 
 
