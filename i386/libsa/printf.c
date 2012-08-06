@@ -296,9 +296,9 @@ __doprnt(
                          * Bit field
                          */
                         register int j;
-                        if (any)
+                        if (any) {
                             if (putc) (*putc)(',', arg);
-                            else {
+                        } else {
                                 if (putc) (*putc)('<', arg);
                                 any = true;
                             }
@@ -314,9 +314,9 @@ __doprnt(
                                              base, putc, arg);
                     }
                     else if (u & (1<<(i-1))) {
-                        if (any)
+                        if (any) {
                             if (putc) (*putc)(',', arg);
-                            else {
+                        } else {
                                 if (putc) (*putc)('<', arg);
                                 any = true;
                             }

@@ -1,8 +1,9 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
-- Move acpicodec to the IndustryStandard acpi efi library
+- What is 'QSUVW' and why it's not at the begining of the boot file as with xcode 4.3.x and all the previous versions
 
+- Move acpicodec to the IndustryStandard acpi efi library
 
 - split nvidia, gma and ati code into separate modules
 - move device_inject, MBR (OSX works better on Guid partition theme anyway), winfs, bsdfs, ext2fs, befs, and the command lspci, memory, more and video into modules
