@@ -52,6 +52,8 @@
 #ifndef _ATI_REG_H_
 #define _ATI_REG_H_
 
+
+#define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 #define DATVAL(x)			{kPtr, sizeof(x), (uint8_t *)x}
 #define STRVAL(x)			{kStr, sizeof(x), (uint8_t *)x}
 #define BYTVAL(x)			{kCst, 1, (uint8_t *)x}
@@ -189,19 +191,19 @@ typedef struct {
 } radeon_card_info_t;
 
 typedef struct {
-	struct DevPropDevice	*device;
+	struct DevPropDevice		*device;
 	radeon_card_info_t		*info;
-	pci_dt_t				*pci_dev;
-	uint8_t					*fb;
-	uint8_t					*mmio;
-	uint8_t					*io;
-	uint8_t					*rom;
-	uint32_t				rom_size;
-	uint32_t				vram_size;
-	const char				*cfg_name;
-	uint8_t					ports;
-	uint32_t				flags;
-	bool					posted;
+	pci_dt_t			*pci_dev;
+	uint8_t				*fb;
+	uint8_t				*mmio;
+	uint8_t				*io;
+	uint8_t				*rom;
+	uint32_t			rom_size;
+	uint32_t			vram_size;
+	const char			*cfg_name;
+	uint8_t				ports;
+	uint32_t			flags;
+	bool				posted;
 } card_t;
 card_t *card;
 
@@ -214,17 +216,17 @@ card_t *card;
 //static uint8_t atN = 0;
 
 typedef struct {
-	type_t					type;
-	uint32_t				size;
-	uint8_t					*data;
+	type_t				type;
+	uint32_t			size;
+	uint8_t				*data;
 } value_t;
 
 typedef struct {
-	uint32_t				flags;
-	bool					all_ports;
-	char					*name;
-	bool					(*get_value)(value_t *val);
-	value_t					default_val;
+	uint32_t			flags;
+	bool				all_ports;
+	char				*name;
+	bool				(*get_value)(value_t *val);
+	value_t				default_val;
 } dev_prop_t;
 
 bool get_bootdisplay_val(value_t *val);

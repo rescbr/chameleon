@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2002-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 2002-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,7 +18,6 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #ifndef __BOOTSTRUCT_H
@@ -30,8 +28,8 @@
 #include "bios.h"
 #include "device_tree.h"
 
-/*!
-    Kernel boot args global also used by booter for its own data.
+/*
+ * Kernel boot args global also used by booter for its own data.
  */
 extern boot_args *bootArgs;
 extern boot_args_pre_lion *bootArgsPreLion;
@@ -51,11 +49,6 @@ extern Node *gMemoryMapNode;
 #define NDRIVERS  500
 
 #define CONFIG_SIZE (40 * 4096)
-
-/*
- * Max size for config data array, in bytes.
- */
-#define IO_CONFIG_DATA_SIZE		163840
 
 #define kMemoryMapCountMax 40
 
@@ -101,13 +94,14 @@ typedef struct
 /*
  * ACPI defined memory range types.
  */
-enum {
-    kMemoryRangeUsable   = 1,    // RAM usable by the OS.
-    kMemoryRangeReserved = 2,    // Reserved. (Do not use)
-    kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.
-    kMemoryRangeNVS      = 4,    // ACPI NVS memory. (Do not use)
+enum
+{
+	kMemoryRangeUsable   = 1,    // RAM usable by the OS.
+	kMemoryRangeReserved = 2,    // Reserved. (Do not use)
+	kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.
+	kMemoryRangeNVS      = 4,    // ACPI NVS memory. (Do not use)
 
-    /* Undefined types should be treated as kMemoryRangeReserved */
+	/* Undefined types should be treated as kMemoryRangeReserved */
 };
 
 /*!
@@ -118,31 +112,32 @@ enum {
     uses internally. Some fields (e.g. the video information) remain interesting
     to the kernel and are thus located in bootArgs although with different field names.
  */
-typedef struct PrivateBootInfo {
-    int              convmem;                      // conventional memory
-    int              extmem;                       // extended memory
+typedef struct PrivateBootInfo
+{
+	int              convmem;                      // conventional memory
+	int              extmem;                       // extended memory
 #if 0
-    int              numBootDrivers;               // number of drivers loaded
+	int              numBootDrivers;               // number of drivers loaded
 #endif
-    char             bootFile[128];                // kernel file name
+	char             bootFile[128];                // kernel file name
 
-    unsigned long    memoryMapCount;
-    MemoryRange      memoryMap[kMemoryMapCountMax];
+	unsigned long    memoryMapCount;
+	MemoryRange      memoryMap[kMemoryMapCountMax];
 
-    PCI_bus_info_t   pciInfo;
+	PCI_bus_info_t   pciInfo;
 
 #if 0
-    driver_config_t  driverConfig[NDRIVERS];
+	driver_config_t  driverConfig[NDRIVERS];
 #endif
-    char *           configEnd;			// pointer to end of config files
-    char             config[CONFIG_SIZE];
+	char *           configEnd;		// pointer to end of config files
+	char             config[CONFIG_SIZE];
 
-    config_file_t    bootConfig;		// com.apple.Boot.plist
-    config_file_t    chameleonConfig;		// org.chameleon.Boot.plist which can override bootConfig keys
-    config_file_t    themeConfig;		// theme.plist
-    config_file_t    smbiosConfig;		// smbios.plist
-    config_file_t    helperConfig;		// boot helper partition's boot.plist
-    config_file_t    ramdiskConfig;		// RAMDisk.plist
+	config_file_t    bootConfig;		// com.apple.Boot.plist
+	config_file_t    chameleonConfig;	// org.chameleon.Boot.plist which can override bootConfig keys
+	config_file_t    themeConfig;		// theme.plist
+	config_file_t    smbiosConfig;		// smbios.plist
+	config_file_t    helperConfig;		// boot helper partition's boot.plist
+	config_file_t    ramdiskConfig;		// RAMDisk.plist
 
 	bool             memDetect;
 } PrivateBootInfo_t;
