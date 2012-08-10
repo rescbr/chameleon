@@ -302,6 +302,11 @@ FileLoadDrivers( char * dirSpec, long plugin )
 			return 0;
 		
         strcat(dirSpec, "Extensions");
+        
+        // here we are clearely in a situation where we'll have to load all drivers as with the option -f, in my experience, sometime it can help to add it explicitly in the bootargs
+        extern void addBootArg(const char * );
+        addBootArg("-f");
+        
     }
 	
     index = 0;
@@ -334,7 +339,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
         if (result != 0)
 			result = ret;
 		
-        if (!plugin) 
+        if (!plugin)
 			FileLoadDrivers(gDriverSpec, 1);
     }
 	

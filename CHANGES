@@ -1,4 +1,6 @@
-- Added memory info to the nvidia plist structure, so now one can add several cards to the plist and set a customized name and memory info for each cards 
+- Added beta support for Xcode 4.4
+
+- Added memory info to the nvidia plist structure, so now one can add several cards to the plist and set a customized name and memory info for each cards
 - Implemented a method to inject new graphics cards from a plist, no need to hardcode device ids anymore !! (for now, only nvidia cards are supported, see doc/ModuleHelp.txt for usage)
 - Moved the smbios detection code to the freebsd one
 

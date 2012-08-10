@@ -17,8 +17,7 @@ CFLAGS = $(RC_CFLAGS) $(OPTIM) -Wmost -Werror -g
 LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
-
-PROGRAMS = machOconv bdmesg amlsgn
+PROGRAMS = md.o machOconv bdmesg amlsgn 
 
 OUTFILES = $(PROGRAMS)
 
@@ -35,9 +34,11 @@ bdmesg: bdmesg.o
 amlsgn: 
 	$(CC) -arch i386 -framework IOKit -framework Foundation -mmacosx-version-min=10.5 amlsgn.m -o $(SYMROOT)/amlsgn
 
-
+md.o: 
+	$(CC) -mdynamic-no-pic -Wall -dead_strip -arch i386 -mmacosx-version-min=10.5 md.c -o $(SYMROOT)/md
 
 include ../MakeInc.dir
+
 
 #dependencies
 -include $(OBJROOT)/Makedep

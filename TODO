@@ -1,7 +1,7 @@
 TODO List for Chameleon Boot Loader
 ====================================
 
-- What is 'QSUVW' and why it's not at the begining of the boot file as with xcode 4.3.x and all the previous versions
+- Find out who to build libstuff & ld_classic inside this project
 
 - Move acpicodec to the IndustryStandard acpi efi library
 

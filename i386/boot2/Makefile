@@ -36,6 +36,8 @@ SYMDIR = $(SYMROOT)
 LIBSADIR = ../libsa
 LIBSAIODIR = ../libsaio
 UTILDIR = ../util
+BINROOT = ../../bin
+
 INC = -I. -I.. -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(UTILDIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
@@ -82,11 +84,11 @@ all embedtheme: $(DIRS_NEEDED) boot
 
 boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
-	@$(CC) -static -Wl,-preload -Wl,-segaddr,__INIT,$(BOOT2ADDR) \
-	        -nostdlib -arch i386 -Wl,-segalign,20 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) -e boot2
+	@$(BINROOT)/ld_classic -static -segalign 20 -segaddr __INIT $(BOOT2ADDR) -preload \
+	        -arch i386 \
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) #-e boot2
 	@echo "\t[MACHOCONV] boot"
-	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot &> /dev/null
+	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot #&> /dev/null
 	
 	@make Symbols	
 	@rm -rf $(SYMROOT)/$(SYMBOLS_BUNDLE).bundle	

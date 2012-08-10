@@ -476,6 +476,9 @@
 		ABAC08601568835800C89CC3 /* GPL_V2_LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = GPL_V2_LICENSE; sourceTree = "<group>"; };
 		ABAC08611568836C00C89CC3 /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
 		ABB4CE7D151E39740053B64E /* lzss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzss.c; sourceTree = "<group>"; };
+		ABBBFCF715D557A4002D7A1E /* md.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md.c; sourceTree = "<group>"; };
+		ABBBFCFA15D55908002D7A1E /* ld_classic */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ld_classic; sourceTree = "<group>"; };
+		ABBBFCFB15D55908002D7A1E /* ld_classic.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = ld_classic.1; sourceTree = "<group>"; };
 		ABD521F114F9197900B62550 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
 		ABD521F214F9197900B62550 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
 		ABD521F314F9197900B62550 /* uterror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uterror.c; sourceTree = "<group>"; };
@@ -626,6 +629,7 @@
 		08FB7794FE84155DC02AAC07 /* Chameleon */ = {
 			isa = PBXGroup;
 			children = (
+				ABBBFCF915D55908002D7A1E /* bin */,
 				B0056DBA11F3868000754B65 /* artwork */,
 				B0056E0611F3868000754B65 /* doc */,
 				AB43B2B514C37E520018D529 /* i386 */,
@@ -1420,6 +1424,7 @@
 				AB43B3DC14C37E530018D529 /* Intel_Acpi */,
 				AB43B3E214C37E530018D529 /* machOconv.c */,
 				AB43B3E314C37E530018D529 /* Makefile */,
+				ABBBFCF715D557A4002D7A1E /* md.c */,
 				AB43B3E414C37E530018D529 /* Symbols.c */,
 				AB43B3E514C37E530018D529 /* WKdm.h */,
 				AB43B3E614C37E530018D529 /* WKdmDecompress.c */,
@@ -1447,6 +1452,15 @@
 				ABA02707156CE81A00F8E5F3 /* Makefile */,
 			);
 			path = Ext2fs;
+			sourceTree = "<group>";
+		};
+		ABBBFCF915D55908002D7A1E /* bin */ = {
+			isa = PBXGroup;
+			children = (
+				ABBBFCFA15D55908002D7A1E /* ld_classic */,
+				ABBBFCFB15D55908002D7A1E /* ld_classic.1 */,
+			);
+			path = bin;
 			sourceTree = "<group>";
 		};
 		B0056CD411F3868000754B65 /* sym */ = {
