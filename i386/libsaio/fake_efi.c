@@ -85,13 +85,13 @@ static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
     if (!string) {
 #if DEBUG_EFI
         char string_d[37];
-        efi_guid_unparse_upper(pGuid, string_d);
+        efi_guid_unparse_upper(pGuid, string_d, sizeof(string_d));
         printf("Couldn't allocate Guid String for %s\n", string_d);        
 #endif
         return NULL;
     }
     
-	efi_guid_unparse_upper(pGuid, string);
+	efi_guid_unparse_upper(pGuid, string, 37);
 	return string;
 }
 
@@ -290,24 +290,24 @@ void finalizeEFIConfigTable(void )
             Guid =  gEfiConfigurationTable64[i].VendorGuid;
             
         }
-        char id[5];
+        char id[4+1];
         bzero(id,sizeof(id));        
         if (memcmp(&Guid, &gEfiSmbiosTableGuid, sizeof(EFI_GUID)) == 0)
 		{
-            sprintf(id, "%s", "_SM_");
+            snprintf(id, sizeof(id),"%s", "_SM_");
         }
 		else if (memcmp(&Guid, &gEfiAcpiTableGuid, sizeof(EFI_GUID)) == 0)
 		{
-            sprintf(id, "%s", "RSD1");
+            snprintf(id,sizeof(id), "%s", "RSD1");
         }
 		else if (memcmp(&Guid, &gEfiAcpi20TableGuid, sizeof(EFI_GUID)) == 0)
 		{
-            sprintf(id, "%s", "RSD2");
+            snprintf(id, sizeof(id),"%s", "RSD2");
         }
 #ifndef NO_SMP_SUPPORT
 		else if (memcmp(&Guid, &gEfiMpsTableGuid, sizeof(EFI_GUID)) == 0)
 		{
-            sprintf(id, "%s", "_MP_");
+            snprintf(id, sizeof(id),"%s", "_MP_");
         } 
 #endif
 		
@@ -918,17 +918,17 @@ void setupSmbiosConfigFile(const char *filename)
 		if (getValueForKey("SMBIOS", &override_pathname, &len, DEFAULT_BOOT_CONFIG) && len > 0)
 		{
 			// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
-			sprintf(dirSpecSMBIOS, override_pathname);
+			snprintf(dirSpecSMBIOS, sizeof(dirSpecSMBIOS),override_pathname);
 			err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG);
 		}
 		else
 		{
 			// Check selected volume's Extra.
-			sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
+			snprintf(dirSpecSMBIOS, sizeof(dirSpecSMBIOS),"/Extra/%s", filename);
 			if ((err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG)))
 			{
 				// Check booter volume/rdbt Extra.
-				sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
+				snprintf(dirSpecSMBIOS, sizeof(dirSpecSMBIOS),"bt(0,0)/Extra/%s", filename);
 				err = loadConfigFile(dirSpecSMBIOS, DEFAULT_SMBIOS_CONFIG);
 			}
 		}

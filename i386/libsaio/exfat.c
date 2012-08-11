@@ -212,7 +212,7 @@ EXFATGetDescription(CICell ih, char *str, long strMaxLen)
  * Reads the boot sector, does some checking, generates UUID
  * (like the one you get on Windows???)
  */
-long EXFATGetUUID(CICell ih, char *uuidStr)
+long EXFATGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
     struct exfatbootfile *boot;
     void *buf = malloc(MAX_BLOCK_SIZE);
@@ -241,7 +241,7 @@ long EXFATGetUUID(CICell ih, char *uuidStr)
         return -1;
 
     // Use UUID like the one you get on Windows
-    sprintf(uuidStr, "%04X-%04X",   (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
+    snprintf(uuidStr, strMaxLen,"%04X-%04X",   (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
                                     (unsigned short)boot->bf_volsn & 0xFFFF);
 
     DBG("EXFATGetUUID: %x:%x = %s\n", ih->biosdev, ih->part_no, uuidStr);

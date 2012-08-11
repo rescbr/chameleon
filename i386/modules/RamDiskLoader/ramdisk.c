@@ -44,22 +44,22 @@ void md0Ramdisk()
 				   DEFAULT_BOOT_CONFIG))
 	{
 		// Use user specified md0 file
-		sprintf(filename, "%s", override_filename);
+		snprintf(filename, sizeof(filename) ,"%s", override_filename);
 		fh = open(filename);
 		
 		if(fh < 0)
 		{
-			sprintf(filename, "bt(0,0)/Extra/%s", override_filename);
+			snprintf(filename, sizeof(filename) ,"bt(0,0)/Extra/%s", override_filename);
 			fh = open(filename);
 			
 			if(fh < 0)
 			{
-				sprintf(filename, "rd(0,0)/Extra/%s", override_filename);
+				snprintf(filename, sizeof(filename) ,"rd(0,0)/Extra/%s", override_filename);
 				fh = open(filename);
 
 				if(fh < 0)
 				{
-					sprintf(filename, "/Extra/%s", override_filename);
+					snprintf(filename, sizeof(filename) ,"/Extra/%s", override_filename);
 					fh = open(filename);
 				}
 			}
@@ -68,17 +68,17 @@ void md0Ramdisk()
 
 	if(fh < 0)
 	{
-		sprintf(filename, "bt(0,0)/Extra/Postboot.img");
+		snprintf(filename, sizeof(filename) ,"bt(0,0)/Extra/Postboot.img");
 		fh = open(filename);
 		
 		if(fh < 0)
 		{
-			sprintf(filename, "rd(0,0)/Extra/Postboot.img");
+			snprintf(filename, sizeof(filename) ,"rd(0,0)/Extra/Postboot.img");
 			fh = open(filename);
 
 			if(fh < 0)
 			{
-				sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
+				snprintf(filename, sizeof(filename) ,"/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
 				fh = open(filename);
 			}
 		}
@@ -182,7 +182,7 @@ int mountRAMDisk(const char * param)
 	if (error == 0)
 	{
 		// Save filename in gRAMDiskFile to display information.
-		strcpy(gRAMDiskFile, param);
+		strlcpy(gRAMDiskFile, param, sizeof(gRAMDiskFile));
 
 		// Set gRAMDiskMI as well for the multiboot ramdisk driver hook.
 		gRAMDiskMI = malloc(sizeof(multiboot_info));
@@ -219,7 +219,7 @@ int mountRAMDisk(const char * param)
 				char dirSpec[128];
 
 				// Reading ramdisk configuration.
-				strcpy(dirSpec, RAMDISKCONFIG_FILENAME);
+				strlcpy(dirSpec, RAMDISKCONFIG_FILENAME, sizeof(dirSpec));
 
 				if (loadConfigFile(dirSpec, &ramdiskConfig) == 0)
 				{
@@ -406,7 +406,7 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
         }
         for(; ramdiskChain != NULL; ramdiskChain = ramdiskChain->next)
         {
-            sprintf(extensionsSpec, "rd(%d,%d)/Extra/", ramdiskUnit, ramdiskChain->part_no);
+            snprintf(extensionsSpec, sizeof(extensionsSpec) ,"rd(%d,%d)/Extra/", ramdiskUnit, ramdiskChain->part_no);
             
             ret = GetFileInfo(NULL, extensionsSpec, &flags, &cachetime);
             
@@ -414,7 +414,7 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p)
             
             if (((flags & kFileTypeMask) != kFileTypeDirectory)) continue;
             
-            ret = FileLoadDrivers_p(extensionsSpec, 0 /* this is a kext root dir, not a kext with plugins */);
+            ret = FileLoadDrivers_p(extensionsSpec, sizeof(extensionsSpec), 0 /* this is a kext root dir, not a kext with plugins */);
             if(ret != 0)
             {
                 verbose("FileLoadDrivers failed on a ramdisk\n");

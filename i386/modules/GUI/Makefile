@@ -25,6 +25,7 @@ include ../../MakePaths.dir
 OBJROOT=../../../obj/i386/modules/$(DIR)
 SYMROOT=../../../sym/i386/modules/
 DSTROOT=../../../dst/i386/modules/
+BINROOT = ../../../bin
 
 
 UTILDIR = ../../util
@@ -34,14 +35,14 @@ BOOT2DIR = ../../boot2
 
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
 
-OPTIM = -Os -Oz
+OPTIM = -O0 # -Os -Oz
 DEBUG = -DNOTHING
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fstack-protector-all \
     -D__ARCHITECTURE__=\"i386\"  \
     $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common #-fstack-protector-all
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common -ffreestanding
 
 DEFINES=
 CONFIG = hd
@@ -127,20 +128,20 @@ bundle:
 	@plutil -convert xml1 $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info.plist
 
 stack_protector.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o" 
 
 GUI_module.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "GUI_module.c" $(INC) -o "$(OBJROOT)/GUI_module.o" 
 
 gui.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gui.c" $(INC) -o "$(OBJROOT)/gui.o" 
 
 
 picopng.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "picopng.c" $(INC) -o "$(OBJROOT)/picopng.o" 
 
 graphic_utils.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "graphic_utils.c" $(INC) -o "$(OBJROOT)/graphic_utils.o" 
 	
 art.h:
 	@if [ "$(PNGCRUSH)" ]; then	\

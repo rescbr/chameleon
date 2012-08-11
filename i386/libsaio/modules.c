@@ -1488,11 +1488,11 @@ InitBundleSupport( void )
     
     if (BundleSet == true)  return 0;    
     
-    gModulesSpec    = malloc( 4096 );
-    gDriverSpec     = malloc( 4096 );
-    gFileSpec       = malloc( 4096 );
-    gTempSpec       = malloc( 4096 );
-    gFileName       = malloc( 4096 );	
+    gModulesSpec    = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gDriverSpec     = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gFileSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gTempSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gFileName       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     
     if ( !gModulesSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         goto error;
@@ -1516,8 +1516,8 @@ long LoadBundles( char * dirSpec )
         return 1;
 	
 	
-	strlcpy(gModulesSpec, dirSpec, 4096);
-    strlcat(gModulesSpec, "Modules", 4096 - 1);
+	strlcpy(gModulesSpec, dirSpec, DEFAULT_BUNDLE_SPEC_SIZE);
+    strlcat(gModulesSpec, "Modules", DEFAULT_BUNDLE_SPEC_SIZE);
     FileLoadBundles(gModulesSpec, 0);		
     
 	
@@ -1555,11 +1555,11 @@ FileLoadBundles( char * dirSpec, long plugin )
         if (strcmp(name + length - 7, ".bundle")) continue;
 		
         // Save the file name.
-        strlcpy(gFileName, name, 4096);
+        strlcpy(gFileName, name, DEFAULT_BUNDLE_SPEC_SIZE);
 		DBG("Load Bundles %s\n",gFileName);
         
         // Determine the bundle type.
-        sprintf(gTempSpec, "%s/%s", dirSpec, gFileName);
+        snprintf(gTempSpec,DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s", dirSpec, gFileName);
         ret = GetFileInfo(gTempSpec, "Contents", &flags, &time);
         if (ret == 0) bundleType = kCFBundleType2;
         else bundleType = kCFBundleType3;
@@ -1567,7 +1567,7 @@ FileLoadBundles( char * dirSpec, long plugin )
 		DBG("Bundles type = %d\n",bundleType);
         
         if (!plugin)
-            sprintf(gDriverSpec, "%s/%s/%sPlugIns", dirSpec, gFileName,
+            snprintf(gDriverSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%sPlugIns", dirSpec, gFileName,
                     (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         ret = LoadBundlePList( dirSpec, gFileName, bundleType);
@@ -1623,7 +1623,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
     do {
         // Save the driver path.
         
-        sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
+        snprintf(gFileSpec,DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%s", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 		
@@ -1632,7 +1632,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         
         strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
         
-        sprintf(gFileSpec, "%s/%s", dirSpec, name);
+        snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 		
         tmpBundlePath = malloc(bundlePathLength);
@@ -1643,7 +1643,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         
         // Construct the file spec to the plist, then load it.
 		
-        sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
+        snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%sInfo.plist", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
 		DBG("Loading Bundle PList %s\n",gFileSpec);
@@ -1713,7 +1713,7 @@ prop = XMLGetProperty(module->dict, kPropCFBundleExecutable);                   
 if (prop != 0)                                                                              \
 {                                                                                           \
 fileName = prop->string;                                                                \
-sprintf(gFileSpec, "%s%s", module->executablePath, fileName);                           \
+snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s%s", module->executablePath, fileName);                           \
 \
 module_start = (void*)load_module((char*)fileName,gFileSpec);                           \
 if(!module_start || (*module_start == (void*)0xFFFFFFFF))                               \

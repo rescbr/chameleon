@@ -318,7 +318,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     return;
 }
 
-long NTFSGetUUID(CICell ih, char *uuidStr)
+long NTFSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
 	bool NTFSProbe(const void*);
 
@@ -341,7 +341,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	// Check for NTFS signature
 	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 ) {
 		// If not NTFS, maybe it is EXFAT
-		return EXFATGetUUID(ih, uuidStr);
+		return EXFATGetUUID(ih, uuidStr, strMaxLen);
 	}
 
 	// Check for non-null volume serial number
@@ -349,7 +349,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 		return -1;
 
 	// Use UUID like the one you get on Windows
-	sprintf(uuidStr, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
+	snprintf(uuidStr,strMaxLen, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
 									(unsigned short)boot->bf_volsn & 0xFFFF);
 
 	return 0;

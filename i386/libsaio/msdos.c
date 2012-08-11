@@ -835,7 +835,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 		toread-=msdosclustersize;
 	}
 	
-  getDeviceDescription(ih, devStr);
+  getDeviceDescription(ih, devStr, sizeof(devStr));
 	verbose("Read FAT%d file: [%s/%s] %d bytes.\n",
             msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
 	free (buf);
@@ -999,8 +999,10 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 }
 
 long 
-MSDOSGetUUID(CICell ih, char *uuidStr)
+MSDOSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
+    (void)strMaxLen;
+    
 	char *buf = malloc (512);
     if (!buf) {
         return -1;
@@ -1012,6 +1014,11 @@ MSDOSGetUUID(CICell ih, char *uuidStr)
         free (buf);
 		return -1;
 	}
+    if (strMaxLen<16)
+    {
+        free (buf);
+        return -1;
+    }
 	bzero (uuidStr, 16);
 	Seek(ih, 0);
 	Read(ih, (long)buf, 512);

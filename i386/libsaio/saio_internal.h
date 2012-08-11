@@ -175,7 +175,7 @@ AllocateMemoryRange(const char * rangeName, long start, long length);
 extern void   enableA20(void);
 extern void   turnOffFloppy(void);
 
-extern void     getPlatformName(char *nameBuf);
+extern void     getPlatformName(char *nameBuf, int size);
 
 #ifdef NBP_SUPPORT
 /* nbp.c */
@@ -256,8 +256,8 @@ extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char *
 extern long   GetFileInfo(const char *dirSpec, const char *name,
                           long *flags, long *time);
 extern long   GetFileBlock(const char *fileSpec, unsigned long long *firstBlock);
-extern long   GetFSUUID(char *spec, char *uuidStr);
-extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
+extern long   GetFSUUID(char *spec, char *uuidStr, long strMaxLen);
+extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr, long strMaxLen);
 extern int    openmem(char *buf, int len);
 
 extern int    open(const char *path);
@@ -288,7 +288,7 @@ extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);
 extern void   setRootVolume(BVRef volume);
 extern void   setBootGlobals(BVRef chain);
-extern int    getDeviceDescription(BVRef volume, char *str);
+extern int    getDeviceDescription(BVRef volume, char *str, long strMaxLen);
 
 /* rtc.c */
 extern void rtc_read_clock(struct tm *time) ;

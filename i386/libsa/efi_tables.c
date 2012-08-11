@@ -115,9 +115,9 @@ uint32_t crc32(uint32_t crc, const void *buf, size_t size)
  * Utility function to make a device tree string from an EFI_GUID
  */
 
-void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out)
+void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out, long strMaxlen)
 {
-    sprintf(out, "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+    snprintf(out, strMaxlen, "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
         pGuid->Data1, /* - */
         pGuid->Data2, /* - */
         pGuid->Data3, /* - */

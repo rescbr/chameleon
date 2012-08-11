@@ -1278,7 +1278,7 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
            devices_number = 1;
         } 
         
-        sprintf(tmp, "Slot-%x",devices_number);
+        snprintf(tmp, sizeof(tmp) ,"Slot-%x",devices_number);
         devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
         safe_set_env(envDeviceNumber,devices_number+1);
     }
@@ -1424,7 +1424,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
         return false;
     }    
     
-	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
+	snprintf(nvFilename, sizeof(nvFilename) ,"/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 	if (getBoolForKey(kUseNvidiaROM, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
@@ -1563,9 +1563,9 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 	
-	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
+	snprintf(biosVersion, sizeof(biosVersion) ,"%s", (nvBiosOveride > 0) ? nvFilename : version_str);
     
-	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
+	snprintf(kNVCAP, sizeof(kNVCAP) ,"NVCAP_%04x", nvda_dev->device_id);
 	if (getValueForKey(kNVCAP, &value, &len, DEFAULT_BOOT_CONFIG) && len == NVCAP_LEN * 2) {
 		uint8_t	new_NVCAP[NVCAP_LEN];
         

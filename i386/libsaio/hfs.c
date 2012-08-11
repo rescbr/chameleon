@@ -303,7 +303,7 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 		return -1;
     }
 	
-    getDeviceDescription(ih, devStr);
+    getDeviceDescription(ih, devStr, sizeof(devStr));
 	
 	if (get_env(envHFSLoadVerbose)) {
 		verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
@@ -426,12 +426,12 @@ HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     return 0;
 }
 
-long HFSGetUUID(CICell ih, char *uuidStr)
+long HFSGetUUID(CICell ih, char *uuidStr ,  long strMaxLen)
 {
     if (HFSInitPartition(ih) == -1) return -1;
     if (gVolID == 0LL)  return -1;
 	
-    return CreateUUIDString((uint8_t*)(&gVolID), sizeof(gVolID), uuidStr);
+    return CreateUUIDString((uint8_t*)(&gVolID), sizeof(gVolID), uuidStr, strMaxLen);
 }
 
 // Private Functions
@@ -580,8 +580,15 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags,
         hfsPlusFile = (HFSPlusCatalogFile *)entry;
         if ((SWAP_BE32(hfsPlusFile->userInfo.fdType) == kHardLinkFileType) &&
             (SWAP_BE32(hfsPlusFile->userInfo.fdCreator) == kHFSPlusCreator)) {
-			sprintf(gLinkTemp, "%s/%s%ld", HFSPLUSMETADATAFOLDER,
+			
+#ifdef __i386__
+            snprintf(gLinkTemp, 64 ,"%s/%s%ld", HFSPLUSMETADATAFOLDER,
 					HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+#else
+            snprintf(gLinkTemp, sizeof(gLinkTemp),"%s/%s%ld", HFSPLUSMETADATAFOLDER,
+					HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+#endif
+            
 			result = ResolvePathToCatalogEntry(gLinkTemp, flags, entry,
 											   kHFSRootFolderID, &tmpDirIndex);
         }

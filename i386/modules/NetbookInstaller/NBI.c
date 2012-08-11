@@ -25,21 +25,7 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 //void NBI_loadBootGraphics(void);
 void NBI_md0Ramdisk_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
 
-#ifdef NBP_SUPPORT
-extern long NetLoadDrivers(char *dirSpec);
-#endif
-extern long FileLoadDrivers(char *dirSpec, long plugin);
-
-extern long LoadDriverMKext(char *fileSpec);
-extern long LoadDriverPList(char *dirSpec, char *name, long bundleType);
-
-extern long MatchLibraries( void );
-#if UNUSED
-extern long MatchPersonalities( void );
-#endif
-extern long LoadMatchedModules( void );
-extern long InitDriverSupport(void);
-extern long GetDriverGbl(void);
+//extern long GetDriverGbl(void);
 
 void NetbookInstaller_start(void);
 void NetbookInstaller_start(void)
@@ -153,7 +139,7 @@ void NBI_md0Ramdisk()
 	
 	// TODO: embed NBI.img in this file
 	// If runNetbookInstaller is true, then the system has changed states, patch it 
-	sprintf(filename, "%s", "Extra/NetbookInstaller.img");;
+	snprintf(filename, sizeof(filename),"%s", "Extra/NetbookInstaller.img");;
 	fh = open(filename);
 	
 	if (fh >= 0)
@@ -221,22 +207,22 @@ long NBI_LoadDrivers( char * dirSpec )
 		if ( get_env(envgBootFileType) == kBlockDeviceType )
 		{
 			verbose("Loading Recovery Extensions\n");
-			strcpy(dirSpecExtra, "/Extra/RecoveryExtensions/");
-			FileLoadDrivers(dirSpecExtra, 0);
+			strlcpy(dirSpecExtra, "/Extra/RecoveryExtensions/", sizeof(dirSpecExtra));
+			FileLoadDrivers(dirSpecExtra, sizeof(dirSpecExtra), 0);
 			
 #ifdef BOOT_HELPER_SUPPORT			
 			// TODO: fix this, the order does matter, and it's not correct now.
 			// Also try to load Extensions from boot helper partitions.
 			if (((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagBooter)
 			{
-				strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				strlcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/", sizeof(dirSpecExtra));
+				if (FileLoadDrivers(dirSpecExtra, sizeof(dirSpecExtra), 0) != 0)
 				{
-					strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
-					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					strlcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/", sizeof(dirSpecExtra));
+					if (FileLoadDrivers(dirSpecExtra, sizeof(dirSpecExtra), 0) != 0)
 					{
-						strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
-						FileLoadDrivers(dirSpecExtra, 0);
+						strlcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/", sizeof(dirSpecExtra));
+						FileLoadDrivers(dirSpecExtra, sizeof(dirSpecExtra), 0);
 					}
 				}
 			}
@@ -256,9 +242,9 @@ long NBI_LoadDrivers( char * dirSpec )
 			{
                char * ExtensionsSpec = (char*)(uint32_t)get_env(envDriverExtSpec);
 
-				strcpy(ExtensionsSpec, dirSpec);
-				strcat(ExtensionsSpec, "System/Library/");
-				FileLoadDrivers(ExtensionsSpec, 0);
+				strlcpy(ExtensionsSpec, dirSpec, DEFAULT_DRIVER_SPEC_SIZE);
+				strlcat(ExtensionsSpec, "System/Library/", DEFAULT_DRIVER_SPEC_SIZE);
+				FileLoadDrivers(ExtensionsSpec,DEFAULT_DRIVER_SPEC_SIZE, 0);
 			}
 		}
 		else

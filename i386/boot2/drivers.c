@@ -94,7 +94,7 @@ static char *    gFileName;
 long LoadDrivers( char * dirSpec );
 long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 long InitDriverSupport(void);
-long FileLoadDrivers(char *dirSpec, long plugin);
+long FileLoadDrivers(char *dirSpec, long size,long plugin);
 long LoadDriverMKext(char *fileSpec);
 long LoadDriverPList(char *dirSpec, char *name, long bundleType);
 long LoadMatchedModules(void);
@@ -122,11 +122,11 @@ InitDriverSupport( void )
     
     if (DriverSet == true)  return 0;    
     
-    gExtensionsSpec = malloc( 4096 );
-    gDriverSpec     = malloc( 4096 );
-    gFileSpec       = malloc( 4096 );
-    gTempSpec       = malloc( 4096 );
-    gFileName       = malloc( 4096 );	
+    gExtensionsSpec = malloc( DEFAULT_DRIVER_SPEC_SIZE );
+    gDriverSpec     = malloc( DEFAULT_DRIVER_SPEC_SIZE );
+    gFileSpec       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
+    gTempSpec       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
+    gFileName       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
     
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         stop("InitDriverSupport error");
@@ -178,12 +178,12 @@ long LoadDrivers( char * dirSpec )
 			
 			
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
-			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			snprintf(dirSpecExtra, sizeof(dirSpecExtra) ,"/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
+			if (FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0) != 0)
 			{	
 				// Next try to load Extra extensions from the selected root partition.
 				strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				if (FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0) != 0)
 				{
 					// If failed, then try to load Extra extensions from the boot partition
 					// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
@@ -191,12 +191,12 @@ long LoadDrivers( char * dirSpec )
 					if (!((((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->biosdev == ((BVRef)(uint32_t)get_env(envgBootVolume))->biosdev)  && (((BVRef)(uint32_t)get_env(envgBIOSBootVolume))->part_no == ((BVRef)(uint32_t)get_env(envgBootVolume))->part_no)))
 					{
 						// First try a specfic OS version folder ie 10.5
-						sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
-						if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+						snprintf(dirSpecExtra, sizeof(dirSpecExtra),"bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
+						if (FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0) != 0)
 						{	
 							// Next we'll try the base
 							strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
-							FileLoadDrivers(dirSpecExtra, 0);
+							FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0);
 						}
 					}
                     
@@ -212,13 +212,13 @@ long LoadDrivers( char * dirSpec )
 			if (((BVRef)(uint32_t)get_env(envgBootVolume))->flags & kBVFlagBooter)
 			{
 				strlcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/", sizeof(dirSpecExtra));
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				if (FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0) != 0)
 				{
 					strlcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/", sizeof(dirSpecExtra));
-					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					if (FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0) != 0)
 					{
 						strlcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/", sizeof(dirSpecExtra));
-						FileLoadDrivers(dirSpecExtra, 0);
+						FileLoadDrivers(dirSpecExtra, DEFAULT_DRIVER_SPEC_SIZE, 0);
 					}
 				}
 			}
@@ -235,9 +235,9 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				strlcpy(gExtensionsSpec, dirSpec, 4096);
-				strcat(gExtensionsSpec, "System/Library/");
-				FileLoadDrivers(gExtensionsSpec, 0);
+				strlcpy(gExtensionsSpec, dirSpec, DEFAULT_DRIVER_SPEC_SIZE);
+				strlcat(gExtensionsSpec, "System/Library/", DEFAULT_DRIVER_SPEC_SIZE);
+				FileLoadDrivers(gExtensionsSpec, DEFAULT_DRIVER_SPEC_SIZE, 0);
 			}
 		}
 		else
@@ -264,7 +264,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	long  ret, flags, time, time2;
 	char altDirSpec[512];
 	
-	sprintf (altDirSpec, "%s%s", dirSpec, extDirSpec);
+	snprintf (altDirSpec, sizeof(altDirSpec),"%s%s", dirSpec, extDirSpec);
 	ret = GetFileInfo(altDirSpec, "Extensions.mkext", &flags, &time);
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
 	{
@@ -272,7 +272,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 		if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeDirectory) ||
 			(((get_env(envgBootMode) & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
-			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
+			snprintf(gDriverSpec, DEFAULT_DRIVER_SPEC_SIZE,"%sExtensions.mkext", altDirSpec);
 			verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
 			if (LoadDriverMKext(gDriverSpec) == 0) return 0;
 		}
@@ -284,7 +284,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 // FileLoadDrivers
 
 long
-FileLoadDrivers( char * dirSpec, long plugin )
+FileLoadDrivers( char * dirSpec, long size, long plugin )
 {
     long         ret, length, flags, time, bundleType;
     long long	 index;
@@ -301,7 +301,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
         else if (FileLoadMKext(dirSpec, "") == 0)
 			return 0;
 		
-        strcat(dirSpec, "Extensions");
+        strlcat(dirSpec, "Extensions", size);
         
         // here we are clearely in a situation where we'll have to load all drivers as with the option -f, in my experience, sometime it can help to add it explicitly in the bootargs
         extern void addBootArg(const char * );
@@ -322,16 +322,16 @@ FileLoadDrivers( char * dirSpec, long plugin )
         if (strcmp(name + length - 5, ".kext")) continue;
 		
         // Save the file name.
-        strlcpy(gFileName, name, 4096);
+        strlcpy(gFileName, name, DEFAULT_DRIVER_SPEC_SIZE);
 		
         // Determine the bundle type.
-        sprintf(gTempSpec, "%s/%s", dirSpec, gFileName);
+        snprintf(gTempSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s", dirSpec, gFileName);
         ret = GetFileInfo(gTempSpec, "Contents", &flags, &time);
         if (ret == 0) bundleType = kCFBundleType2;
         else bundleType = kCFBundleType3;
 		
         if (!plugin)
-            sprintf(gDriverSpec, "%s/%s/%sPlugIns", dirSpec, gFileName,
+            snprintf(gDriverSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%sPlugIns", dirSpec, gFileName,
                     (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         ret = LoadDriverPList(dirSpec, gFileName, bundleType);
@@ -340,7 +340,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
 			result = ret;
 		
         if (!plugin)
-			FileLoadDrivers(gDriverSpec, 1);
+			FileLoadDrivers(gDriverSpec, 0, 1);
     }
 	
     return result;
@@ -368,7 +368,7 @@ NetLoadDrivers( char * dirSpec )
 #endif
 	
     // INTEL modification
-    sprintf(gDriverSpec, "%s%s.mkext", dirSpec, bootInfo->bootFile);
+    snprintf(gDriverSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s%s.mkext", dirSpec, bootInfo->bootFile);
     
     verbose("NetLoadDrivers: Loading from [%s]\n", gDriverSpec);
     
@@ -422,7 +422,7 @@ LoadDriverMKext( char * fileSpec )
     memcpy((void *)driversAddr, (void *)package, driversLength);
 	
     // Add the MKext to the memory map.
-    sprintf(segName, "DriversPackage-%lx", driversAddr);    
+    snprintf(segName, sizeof(segName),"DriversPackage-%lx", driversAddr);
     
     AllocateMemoryRange(segName, driversAddr, driversLength);
 	
@@ -446,7 +446,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
     do {
         // Save the driver path.
         
-        sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
+        snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%s", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 		
@@ -455,7 +455,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 		
         strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
         
-        sprintf(gFileSpec, "%s/%s", dirSpec, name);
+        snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 		
         tmpBundlePath = malloc(bundlePathLength);
@@ -465,7 +465,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 		
         // Construct the file spec to the plist, then load it.
 		
-        sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
+        snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%sInfo.plist", dirSpec, name,
                 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         length = LoadFile(gFileSpec);
@@ -568,7 +568,7 @@ long LoadMatchedModules( void )
             if (prop != 0)
             {
                 fileName = prop->string;
-                sprintf(gFileSpec, "%s%s", module->executablePath, fileName);
+                snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s%s", module->executablePath, fileName);
                 length = LoadThinFatFile(gFileSpec, &executableAddr);
 				if (length == 0)
 				{
@@ -619,7 +619,7 @@ long LoadMatchedModules( void )
                 strlcpy(driver->bundlePathAddr, module->bundlePath, module->bundlePathLength);
 				
                 // Add an entry to the memory map.
-                sprintf(segName, "Driver-%lx", (unsigned long)driver);                
+                snprintf(segName, sizeof(segName),"Driver-%lx", (unsigned long)driver);
                 
                 AllocateMemoryRange(segName, driverAddr, driverLength);
                 

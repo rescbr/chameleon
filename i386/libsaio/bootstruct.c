@@ -95,7 +95,7 @@ void initKernBootStruct( void )
                 if (node == 0) {
                     stop("Couldn't create root node");
                 }
-                getPlatformName(platformName);
+                getPlatformName(platformName, sizeof(platformName));
                 
                 {
                     int nameLen;

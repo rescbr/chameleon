@@ -180,14 +180,16 @@ long UFSInitPartition( CICell ih )
 
 #if !BOOT1
 
-long UFSGetUUID(CICell ih, char *uuidStr)
+long UFSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
+    (void)strMaxLen;
+    
   long long uuid = gUFSLabel.ul_uuid;
 
   if (UFSInitPartition(ih) == -1) return -1;
   if (uuid == 0LL)  return -1;
 
-  return CreateUUIDString((uint8_t*)(&uuid), sizeof(uuid), uuidStr);
+  return CreateUUIDString((uint8_t*)(&uuid), sizeof(uuid), uuidStr, strMaxLen);
 }
 
 #endif /* !BOOT1 */

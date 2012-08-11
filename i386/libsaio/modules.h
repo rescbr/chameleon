@@ -23,6 +23,9 @@
 #include <mach-o/nlist.h>
 #include "efi.h"
 
+#define DEFAULT_BUNDLE_SPEC_SIZE 4096
+
+
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
 

@@ -1413,7 +1413,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
         if(isPartitionUsed(gptMap))
         {
             char stringuuid[100];
-            efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid);
+            efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid, sizeof(stringuuid));
             verbose("Reading GPT partition %d, type %s\n", gptID, stringuuid);
 			
             // Getting fdisk like partition type.
@@ -1604,7 +1604,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	config_file_t systemVersion;
 	char  dirSpec[512];	
 	
-	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	
 	if (!loadConfigFile(dirSpec, &systemVersion))
 	{
@@ -1612,7 +1612,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	}
 	else 
 	{
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{	
@@ -1621,11 +1621,11 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else 
 		{
-			sprintf(dirSpec, "hd(%d,%d)/OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.8
+			snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.8
 			
 			if (!getOSInstallVersion(dirSpec, str, &systemVersion))
 			{
-                sprintf(dirSpec, "hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.7
+                snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.7
                 
                 if (!getOSInstallVersion(dirSpec, str, &systemVersion))
                     return false;
@@ -1671,14 +1671,14 @@ static bool CheckDarwin(BVRef bvr)
     
     bvr->kernelfound = true;
     
-    sprintf(dirspec,kdirspec[0],BIOS_DEV_UNIT(bvr), bvr->part_no);
+    snprintf(dirspec,sizeof(dirspec),kdirspec[0],BIOS_DEV_UNIT(bvr), bvr->part_no);
     
     ret = GetFileInfo(NULL, dirspec, &flags, &time);
     
     if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
 #if UNUSED
         
-        sprintf(dirspec,kdirspec[1],BIOS_DEV_UNIT(bvr), bvr->part_no);
+        snprintf(dirspec,sizeof(dirspec),kdirspec[1],BIOS_DEV_UNIT(bvr), bvr->part_no);
         
         ret = GetFileInfo(NULL, dirspec, &flags, &time); 
         
@@ -2041,12 +2041,12 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
         return 0;
     
     // Try to match hd(x,y) first.
-    sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
+    snprintf(testStr, sizeof(testStr),"hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
     if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
         return true;
     
     // Try to match volume UUID.
-    if ( bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr) == 0)
+    if ( bvr->fs_getuuid && bvr->fs_getuuid(bvr, testStr, sizeof(testStr)) == 0)
     {
         if( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
             return true;
@@ -2127,11 +2127,11 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 	
     if (useDeviceDescription)
     {
-        int len = getDeviceDescription(bvr, str);
+        int len = getDeviceDescription(bvr, str, strMaxLen);
         if(len >= strMaxLen)
             return;
         
-        strcpy(str + len, " ");
+        strlcpy(str + len, " ", strMaxLen);
         len++;
         strMaxLen -= len;
         p += len;
@@ -2158,14 +2158,14 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
             name = bvr->type_name;
         }
         if (name == NULL) {
-            sprintf(p, "TYPE %02x", type);
+            snprintf(p, strMaxLen, "TYPE %02x", type);
         } else {
             strncpy(p, name, strMaxLen);
         }
     }
     
     // Set the devices label
-    sprintf(bvr->label, p);
+    snprintf(bvr->label, sizeof(bvr->label), p);
 }
 
 //==========================================================================

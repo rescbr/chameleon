@@ -188,7 +188,7 @@ getVESAModeWithProperties( unsigned short     width,
     //bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
     
-    strcpy( (char*)&vbeInfo, "VBE2" );
+    strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
     {

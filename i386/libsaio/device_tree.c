@@ -239,7 +239,7 @@ FlattenNodes(Node *node, void *buffer)
     
     for (count = 0, prop = node->properties; prop != 0; count++, prop = prop->next) {
         flatProp = (DeviceTreeNodeProperty *)buffer;
-        strcpy(flatProp->name, prop->name);
+        strlcpy(flatProp->name, prop->name, kPropNameLength);
         flatProp->length = prop->length;
         buffer += sizeof(DeviceTreeNodeProperty);
         bcopy(prop->value, buffer, prop->length);

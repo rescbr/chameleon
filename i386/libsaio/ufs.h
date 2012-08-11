@@ -28,6 +28,6 @@ extern long UFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
                            FinderInfo * finderInfo, long * infoValid);
 extern void UFSGetDescription(CICell ih, char *str, long strMaxLen);
 extern long UFSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock);
-extern long UFSGetUUID(CICell ih, char *uuidStr);
+extern long UFSGetUUID(CICell ih, char *uuidStr, long strMaxLen);
 extern void UFSFree(CICell ih);
 

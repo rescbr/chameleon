@@ -61,22 +61,22 @@ void ramDiskLoadDrivers_hook(void* arg1, void* arg2, void* arg3, void* arg4, voi
 			break;
 		case 1:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "rd(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
-			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			snprintf(dirSpecExtra, sizeof(dirSpecExtra),"rd(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
+			if (FileLoadDrivers(dirSpecExtra, sizeof(dirSpecExtra),0) != 0)
 			{	
 				// Next we'll try the base
-				strcpy(dirSpecExtra, "rd(0,0)/Extra/");
-				FileLoadDrivers(dirSpecExtra, 0);
+				strlcpy(dirSpecExtra, "rd(0,0)/Extra/",sizeof(dirSpecExtra));
+				FileLoadDrivers(dirSpecExtra,sizeof(dirSpecExtra), 0);
 			}
 			break;
 		case 2:
 			// First try a specfic OS version folder ie 10.5
-			sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
-			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+			snprintf(dirSpecExtra, sizeof(dirSpecExtra),"bt(0,0)/Extra/%s/", (char*)((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion);
+			if (FileLoadDrivers(dirSpecExtra,sizeof(dirSpecExtra), 0) != 0)
 			{	
 				// Next we'll try the base
-				strcpy(dirSpecExtra, "bt(0,0)/Extra/");
-				FileLoadDrivers(dirSpecExtra, 0);
+				strlcpy(dirSpecExtra, "bt(0,0)/Extra/",sizeof(dirSpecExtra));
+				FileLoadDrivers(dirSpecExtra,sizeof(dirSpecExtra), 0);
 			}
 			break;
 		default:

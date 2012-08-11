@@ -91,60 +91,60 @@
 #define OLDSALUTATION "# DO NOT DELETE THIS LINE"
 #define OLDSALUTATIONLEN (sizeof OLDSALUTATION - 1)
 
-char file_array[IObuffer];      /* read file and store crunched names */
-char dep_line[LINESIZE];        /* line being processed */
-char dot_o[LINESIZE];           /* <foo.o>: prefix */
-char *path_component[100];      /* stores components for a path while being
+static char file_array[IObuffer];      /* read file and store crunched names */
+static char dep_line[LINESIZE];        /* line being processed */
+static char dot_o[LINESIZE];           /* <foo.o>: prefix */
+static char *path_component[100];      /* stores components for a path while being
                                  crunched */
 
-struct dep {                    /* stores paths that a file depends on */
+static struct dep {                    /* stores paths that a file depends on */
     int len;
     char *str;
 } dep_files[1000];
-int dep_file_index;
+static int dep_file_index;
 
-int qsort_strcmp(struct dep *a, struct dep *b)
+static int qsort_strcmp(struct dep *a, struct dep *b)
 {
     extern int strcmp();
     return strcmp(a->str, b->str);
 }
 
-char *outfile = (char *) 0;     /* generate dependency file */
-FILE *out;
+static char *outfile = (char *) 0;     /* generate dependency file */
+static FILE *out;
 
-char *makefile = (char *) 0;    /* user supplied makefile name */
-char *real_mak_name;            /* actual makefile name (if not supplied) */
-char shadow_mak_name[LINESIZE]; /* changes done here then renamed */
-FILE *mak;                      /* for reading makefile */
-FILE *makout;                   /* for writing shadow */
-char makbuf[LINESIZE];          /* one line buffer for makefile */
-struct stat makstat;            /* stat of makefile for time comparisons */
-int mak_eof = 0;                        /* eof seen on makefile */
-FILE *find_mak(), *temp_mak();
+static char *makefile = (char *) 0;    /* user supplied makefile name */
+static char *real_mak_name;            /* actual makefile name (if not supplied) */
+static char shadow_mak_name[LINESIZE]; /* changes done here then renamed */
+static FILE *mak;                      /* for reading makefile */
+static FILE *makout;                   /* for writing shadow */
+static char makbuf[LINESIZE];          /* one line buffer for makefile */
+static struct stat makstat;            /* stat of makefile for time comparisons */
+static int mak_eof = 0;                        /* eof seen on makefile */
 
-int delete = 0;                 /* -d delete dependency file */
-int debug = 0;
-int     D_contents = 0;         /* print file contents */
-int     D_depend = 0;           /* print dependency processing info */
-int     D_make = 0;             /* print makefile processing info */
-int     D_open = 0;             /* print after succesful open */
-int     D_time = 0;             /* print time comparison info */
-int force = 1;                  /* always update dependency info */
-int update = 0;                 /* it's ok if the -m file does not exist */
-int verbose = 0;                /* tell me something */
-int expunge = 0;                /* first flush dependency stuff from makefile */
+static int delete = 0;                 /* -d delete dependency file */
+static int debug = 0;
+static int     D_contents = 0;         /* print file contents */
+static int     D_depend = 0;           /* print dependency processing info */
+static int     D_make = 0;             /* print makefile processing info */
+static int     D_open = 0;             /* print after succesful open */
+static int     D_time = 0;             /* print time comparison info */
+static int force = 1;                  /* always update dependency info */
+static int update = 0;                 /* it's ok if the -m file does not exist */
+static int verbose = 0;                /* tell me something */
+static int expunge = 0;                /* first flush dependency stuff from makefile */
 
 
-char *name;
-
-static void scan_mak(FILE *, FILE *, char *);
-static void finish_mak(FILE *, FILE *);
-static void output_dep(FILE *out);
-static void parse_dep(void);
-static void save_dot_o(void);
+static char *name;
 static int read_dep(register char *file);
-static void skip_mak(register FILE *makin, register FILE *makout);
+static void save_dot_o(void);
+static void parse_dep(void);
+static void output_dep(FILE *out);
+static FILE *find_mak(char *file);
+static FILE *temp_mak(void);
+static void scan_mak(FILE *, FILE *, char *);
 static void expunge_mak(register FILE *makin, register FILE *makout);
+static void skip_mak(register FILE *makin, register FILE *makout);
+static void finish_mak(FILE *, FILE *);
 
 int main(int argc, register char **argv)
 {
@@ -294,6 +294,7 @@ int main(int argc, register char **argv)
 usage:
     fprintf(stderr, "usage: md -f -Dcdmot -m makefile -o outputfile -v <file1> ... <filen>\n");
     exit(1);
+    return 1;
 }
 
 
@@ -523,8 +524,7 @@ static void output_dep(FILE *out)
 }
 
 /* process makefile */
-FILE *
-find_mak(char *file)
+static FILE *find_mak(char *file)
 {
     FILE *mak;
     
@@ -576,13 +576,12 @@ find_mak(char *file)
     return mak;
 }
 
-FILE *
-temp_mak()
+static FILE *temp_mak(void)
 {
     FILE *mak;
     
-    strcpy(shadow_mak_name, real_mak_name);
-    strcat(shadow_mak_name, ".md");
+    strlcpy(shadow_mak_name, real_mak_name, sizeof(shadow_mak_name));
+    strlcat(shadow_mak_name, ".md", sizeof(shadow_mak_name));
     
     /*
      * For SGS stuff, in case still linked to master version

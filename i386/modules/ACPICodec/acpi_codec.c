@@ -565,7 +565,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filen
 	DBG("Searching for %s file ...\n", filename);
 	// Check booting partition	
     
-	sprintf(acpi_file, "%s%s",dirspec, filename); 
+	snprintf(acpi_file, sizeof(acpi_file), "%s%s",dirspec, filename);
 	
 	safe_set_env(envHFSLoadVerbose, 0);
 	fd=open(acpi_file);
@@ -1624,7 +1624,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 			
 			{
 				U32 dropPSS = 0, Pstatus = 0;
-				char MatchStat[5];
+				char MatchStat[4+1];
 #ifdef pstate_power_support
 				U32 TDP = compute_tdp(cpu);								
 #endif
@@ -1636,7 +1636,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 					
 					if ((pstate_tag_count > 0) && PstateTag)
 					{
-						sprintf(MatchStat, "%d",i);
+						snprintf(MatchStat, sizeof(MatchStat),"%d",i);
 						TagPtr match_Status = XMLGetProperty(PstateTag, (const char*)MatchStat); 								   
 						
 						if (match_Status  && (XMLTagCount(match_Status) > 0))
@@ -1801,13 +1801,13 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 				
 				{
 					U32 i;
-					char MatchStat[5];					
+					char MatchStat[4+1];
 					
 					for (i = 0; i < 32 ; i++)
 					{
 						char *Lat = NULL, *Pw = NULL, *BWidth= NULL, *BOffset= NULL, *Address= NULL, *AccessSize= NULL, *index= NULL;
 						
-						sprintf(MatchStat, "C%d",i);
+						snprintf(MatchStat, sizeof(MatchStat),"C%d",i);
 						TagPtr match_Status = XMLGetProperty(CstateTag, (const char*)MatchStat);
 						if (match_Status)
 						{	
@@ -4401,7 +4401,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 			{
 				bool oem = false;
 				char oemOption[OEMOPT_SIZE];
-				sprintf(oemOption, "oem%s",tableSig );
+				snprintf(oemOption, sizeof(oemOption), "oem%s",tableSig );
 				if (getBoolForKey(oemOption, &oem, personality) && oem) // This method don't work for DSDT and FACS
 				{ 
 					
@@ -4580,7 +4580,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 		{
 			bool oem = false;
 			char oemOption[OEMOPT_SIZE];
-			sprintf(oemOption, "oem%s",tableSig );
+			snprintf(oemOption, sizeof(oemOption),"oem%s",tableSig );
 			if (getBoolForKey(oemOption, &oem, personality) && oem) // This method don't work for DSDT and FACS
 			{ 
 				DBG("   %s required\n", oemOption);
@@ -4754,7 +4754,7 @@ EFI_STATUS setupAcpi(void)
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
         if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
 		{
-            sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
+            snprintf(dirspec, sizeof(dirspec),"rd(0,0)/Extra/Acpi/");
             acpidir_found = true;
             
         }
@@ -4764,7 +4764,7 @@ EFI_STATUS setupAcpi(void)
             ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
             if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 			{
-                sprintf(dirspec, "/Extra/Acpi/");
+                snprintf(dirspec, sizeof(dirspec), "/Extra/Acpi/");
                 acpidir_found = true;
 				
             }
@@ -4773,7 +4773,7 @@ EFI_STATUS setupAcpi(void)
                 ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
                 if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 				{
-                    sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
+                    snprintf(dirspec, sizeof(dirspec),"bt(0,0)/Extra/Acpi/");
                     acpidir_found = true;
 					
                 } 

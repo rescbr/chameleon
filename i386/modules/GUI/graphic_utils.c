@@ -886,7 +886,7 @@ char *getVBEInfoString(void)
 	
 	small = (vbeInfo.TotalMemory < 16);
 	
-	sprintf(buff, "VESA v%d.%d %d%s (%s)\n",
+	snprintf(buff, sizeof(char)*256,"VESA v%d.%d %d%s (%s)\n",
 			vbeInfo.VESAVersion >> 8,
 			vbeInfo.VESAVersion & 0xf,
 			small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),

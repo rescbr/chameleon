@@ -27,5 +27,5 @@
 
 extern void EXFATGetDescription(CICell ih, char *str, long strMaxLen);
 extern bool EXFATProbe (const void *buf);
-extern long EXFATGetUUID(CICell ih, char *uuidStr);
+extern long EXFATGetUUID(CICell ih, char *uuidStr, long strMaxLen);
 

@@ -830,7 +830,7 @@ static bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyStri
 		current = structHeader->handle;
 	}
     
-	sprintf(key, "%s%d", keyString, idx);
+	snprintf(key, sizeof(key),"%s%d", keyString, idx);
     
 	if (value)
 	{

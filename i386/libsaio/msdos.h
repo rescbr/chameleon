@@ -28,6 +28,6 @@ extern long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
                            char ** name, long * flags, long * time,
                            FinderInfo * finderInfo, long * infoValid);
 extern long MSDOSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock);
-extern long MSDOSGetUUID(CICell ih, char *uuidStr);
+extern long MSDOSGetUUID(CICell ih, char *uuidStr, long strMaxLen);
 extern void MSDOSFree(CICell ih);
 extern int MSDOSProbe (const void *buf);

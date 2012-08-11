@@ -40,6 +40,8 @@
 #include "xml.h"
 #include "modules.h"
 
+#define DEFAULT_DRIVER_SPEC_SIZE 4096
+
 struct compressed_kernel_header {
     u_int32_t signature;
     u_int32_t compress_type;
@@ -53,9 +55,21 @@ struct compressed_kernel_header {
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 
-extern long LoadDrivers(char * dirSpec);
+extern long LoadDrivers( char * dirSpec );
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
+extern long InitDriverSupport(void);
+extern long FileLoadDrivers(char *dirSpec, long size,long plugin);
+extern long LoadDriverMKext(char *fileSpec);
+extern long LoadDriverPList(char *dirSpec, char *name, long bundleType);
+extern long LoadMatchedModules(void);
+extern long MatchLibraries(void);
+#if UNUSED
+extern long MatchPersonalities(void);
+#endif
+#ifdef NBP_SUPPORT
+extern long NetLoadDrivers(char *dirSpec);
+#endif
 
-typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
+typedef long (*FileLoadDrivers_t)(char *dirSpec, long size, long plugin);
 
 #endif /* _BOOT2_DRIVERS_H */

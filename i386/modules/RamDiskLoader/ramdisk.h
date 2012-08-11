@@ -32,8 +32,6 @@ extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
 extern BVRef gRAMDiskVolume;
 extern bool gRAMDiskBTAliased;
 
-extern long FileLoadDrivers(char *dirSpec, long plugin);
-
 extern void setRAMDiskBTHook(bool mode);
 extern int mountRAMDisk(const char * param);
 extern void processRAMDiskCommand(char ** argPtr, const char * cmd);

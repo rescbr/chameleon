@@ -965,7 +965,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				int		size;
 				char		altname[40];
                 
-				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);	
+				snprintf(altname, sizeof(altname),"%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);
                 if (smbios_properties[j].table_type == cur->type &&
                     smbios_properties[j].value_type == SMSTRING &&
                     smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
@@ -1003,7 +1003,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 		int	numnec=-1;
 		char	buffer[40];
         
-		sprintf(buffer, "SMtable%d", i);
+		snprintf(buffer, sizeof(buffer),"SMtable%d", i);
 		if (!getIntForKey(buffer, &numnec, DEFAULT_SMBIOS_CONFIG)) {
 			numnec = -1;
 		}
@@ -1017,7 +1017,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				int		size;
 				char		altname[40];
                 
-				sprintf(altname, "%s_%d",smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type] + 1);
+				snprintf(altname, sizeof(altname), "%s_%d",smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type] + 1);
                 if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
                     smbios_properties[j].value_type==SMSTRING &&
                     smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
@@ -1133,7 +1133,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				int		num;
 				char		altname[40];
                 
-				sprintf(altname, "%s_%d", smbios_properties[j].name, tablespresent[newcur->type] + 1);
+				snprintf(altname, sizeof(altname), smbios_properties[j].name, tablespresent[newcur->type] + 1);
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
                         case SMSTRING:
@@ -1233,7 +1233,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 		int	numnec = -1;
 		char	buffer[40];
         
-		sprintf(buffer, "SMtable%d", i);
+		snprintf(buffer, sizeof(buffer),"SMtable%d", i);
 		if (!getIntForKey(buffer, &numnec, DEFAULT_SMBIOS_CONFIG)) {
 			numnec = -1;
 		}
@@ -1259,7 +1259,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				int		num;
 				char		altname[40];
                 
-				sprintf(altname, "%s_%d", smbios_properties[j].name, tablespresent[newcur->type] + 1);
+				snprintf(altname, sizeof(altname),"%s_%d", smbios_properties[j].name, tablespresent[newcur->type] + 1);
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
                         case SMSTRING:

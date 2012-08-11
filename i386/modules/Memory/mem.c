@@ -48,17 +48,17 @@ void dumpPhysAddr(const char * title, void * a, int len)
     }
 
     if (len%STEP==0) return;
-    sprintf(buffer,"%02x:", i);
+    snprintf(buffer, sizeof(buffer),"%02x:", i);
     for (j=0; j < STEP; j++)  {
         if (j<(len%STEP))
-            sprintf(str, " %02x", ad[i+j]);
+            snprintf(str, sizeof(str)," %02x", ad[i+j]);
         else
-            strcpy(str, "   " );  
+            strlcpy(str, "   " , sizeof(str));
         strlcat(buffer, str, sizeof(buffer));
     }
     strlcat(buffer,"  ", sizeof(buffer));
     for (j=0; j < (len%STEP); j++)  {
-        sprintf(str, "%c", DC(ad[i+j]));  
+        snprintf(str, sizeof(str) ,"%c", DC(ad[i+j]));
         strlcat(buffer, str, sizeof(buffer));
     }
     printf("%s\n",buffer);
@@ -96,7 +96,7 @@ void dumpAllTablesOfType(int i)
 	for(dmihdr = FindFirstDmiTableOfType(i, 4);
 		dmihdr;
 		dmihdr = FindNextDmiTableOfType(i, 4)) {
-		sprintf(title,"Table (type %d) :" , i); 
+		snprintf(title,sizeof(title),"Table (type %d) :" , i);
 		dumpPhysAddr(title, dmihdr, dmihdr->length+32);
 	}
 }

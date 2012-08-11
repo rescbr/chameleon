@@ -181,7 +181,7 @@ void addBootArg(const char * argStr)
 	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
 	{
 		*gBootArgsPtr++ = ' ';
-		strcat(gBootArgs, argStr);
+		strlcat(gBootArgs, argStr, BOOT_STRING_LEN);
 		gBootArgsPtr += strlen(argStr);
 	}
 }
@@ -536,7 +536,7 @@ char *getMemoryInfoString(void)
 	if(!buff) return 0;
 	
 	char info[] = "BIOS reported memory ranges:\n";
-	sprintf(buff, "%s", info);
+	snprintf(buff, sizeof(char)*1024 ,"%s", info);
 	int memoryMapCount = (int)get_env(envMemoryMapCnt);
 	
     for (i=0; i<memoryMapCount; i++) {
@@ -700,7 +700,7 @@ int getBootOptions(bool firstRun)
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
                 return -1;
             }
-			sprintf(prompt, "Press ENTER to start up from %s, or press any key to enter startup options.", name);
+			snprintf(prompt, 256,"Press ENTER to start up from %s, or press any key to enter startup options.", name);
 			free(name);
 		}
 		
@@ -1231,14 +1231,14 @@ void showHelp(void)
 	int fd = -1;
 	char dirspec[512];
 	char filename[512];
-	sprintf(filename, "BootHelp.txt");
+	snprintf(filename, sizeof(filename), "BootHelp.txt");
 	
 	// Check Extra on booting partition
-	sprintf(dirspec,"/Extra/%s",filename);
+	snprintf(dirspec, sizeof(dirspec),"/Extra/%s",filename);
 	fd=open (dirspec);
 	if (fd<0)
 	{	// Fall back to booter partition
-		sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
+		snprintf(dirspec, sizeof(dirspec),"bt(0,0)/Extra/%s",filename);
 		fd=open (dirspec);
 		if (fd<0)
 		{

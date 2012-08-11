@@ -9,7 +9,7 @@
 
 uint32_t crc32(uint32_t crc, const void *buf, size_t size);
 
-void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out);
+void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out, long strMaxlen);
 bool efi_guid_is_null(EFI_GUID const *pGuid);
 int efi_guid_compare(EFI_GUID const *pG1, EFI_GUID const *pG2);
 

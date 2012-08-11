@@ -224,11 +224,12 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 }
 
 // filesystem-specific getUUID functions call this shared string generator
-long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
+long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr, long strMaxLen)
 {
     unsigned  fmtbase, fmtidx, i;
     uint8_t   uuidfmt[] = { 4, 2, 2, 2, 6 };
     char     *p = uuidStr;
+    char     *end = p + strMaxLen;
     MD5_CTX   md5c;
     uint8_t   mdresult[16];
 	
@@ -250,6 +251,15 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
     fmtbase = 0;
     for(fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++) {
         for(i=0; i < uuidfmt[fmtidx]; i++) {
+            if (p > end)
+            {
+                break;
+            }
+            else if (p == end)
+            {
+                break;
+                *p = '\0';
+            }
             uint8_t byte = mdresult[fmtbase+i];
             char nib;
 			
@@ -582,7 +592,7 @@ int readdir(struct dirstuff * dirp, const char ** name, long * flags,
 										 0, 0);
 }
 
-long GetFSUUID(char *spec, char *uuidStr)
+long GetFSUUID(char *spec, char *uuidStr, long strMaxLen)
 {
     BVRef      bvr;
     long       rval = -1;
@@ -592,7 +602,7 @@ long GetFSUUID(char *spec, char *uuidStr)
         return -1;
 	
     if(bvr->fs_getuuid)
-        rval = bvr->fs_getuuid(bvr, uuidStr);
+        rval = bvr->fs_getuuid(bvr, uuidStr, strMaxLen);
 	
     return rval;
 }
@@ -1099,7 +1109,7 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 // getDeviceDescription() - Extracts unit number and partition number
 // from bvr structure into "dw(u,p)" format.
 // Returns length of the out string
-int getDeviceDescription(BVRef bvr, char *str)
+int getDeviceDescription(BVRef bvr, char *str, long strMaxLen)
 {
     if(!str)
         return 0;
@@ -1114,7 +1124,7 @@ int getDeviceDescription(BVRef bvr, char *str)
         
 		dp--;
 		if (dp->name)
-            return sprintf(str, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
+            return snprintf(str, strMaxLen, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
 	}
 	
 	return 0;

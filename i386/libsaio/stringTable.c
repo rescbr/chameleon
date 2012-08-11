@@ -117,7 +117,7 @@ removeKeyFromTable(const char *key, char *table)
 	if (!buf) {
         return false;
     }
-    sprintf(buf, "\"%s\"", key);
+    snprintf(buf, len + 3,"\"%s\"", key);
     len = strlen(buf);
 	
     while(*tab) {
@@ -603,13 +603,15 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
     TagPtr     tag;
     pos = 0;
     char       *configBuffer;
-	
-    configBuffer = malloc(strlen(buffer)+1);
+    
+	length = strlen(buffer) + 1;
+    
+    configBuffer = malloc(length);
     if (!configBuffer) {
         return -1;
     }   
     
-    strcpy(configBuffer, buffer);
+    strlcpy(configBuffer, buffer, length );
 	
     while (1)
     {

@@ -1191,7 +1191,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 	if (!do_load)
 		return false;
 	
-	sprintf(file_name, "/Extra/%04x_%04x_%08x.rom", vendor_id, device_id, subsys_id);
+	snprintf(file_name, sizeof(file_name),"/Extra/%04x_%04x_%08x.rom", vendor_id, device_id, subsys_id);
 	if ((fd = open_bvdev("bt(0,0)", file_name)) < 0)
 		return false;
 	
@@ -1528,12 +1528,12 @@ static bool init_card(pci_dt_t *pci_dev)
     //		card->ports = 2/1 ?; // set a min if 0 ports ?
     //		verbose("Nr of ports set to min: %d\n", card->ports);
 	
-	sprintf(name, "ATY,%s", card->cfg_name);
+	snprintf(name, sizeof(name),"ATY,%s", card->cfg_name);
 	aty_name.type = kStr;
 	aty_name.size = strlen(name) + 1;
 	aty_name.data = (uint8_t *)name;
 	
-	sprintf(name_parent, "ATY,%sParent", card->cfg_name);
+	snprintf(name_parent, sizeof(name_parent),"ATY,%sParent", card->cfg_name);
 	aty_nameparent.type = kStr;
 	aty_nameparent.size = strlen(name_parent) + 1;
 	aty_nameparent.data = (uint8_t *)name_parent;

@@ -45,7 +45,7 @@ else
   MKDIRS = /bin/mkdir -p
 endif
 AS = as
-LD = gcc
+LD = $(BINROOT)/ld_classic
 # LIBS= -lc_static
 LIBS= -L$(SYMDIR) -lsaio -lsa
 LIBDEP= $(SYMDIR)/libsaio.a $(SYMDIR)/libsa.a

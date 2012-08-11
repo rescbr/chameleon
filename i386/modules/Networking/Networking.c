@@ -160,7 +160,7 @@ static void set_wifi_airport(pci_dt_t *wlan_dev)
 	device = devprop_add_device(string, wlan_dev);
 	if(device)
 	{
-		sprintf(tmp, "Airport");
+		snprintf(tmp, sizeof(tmp),"Airport");
 		devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp) + 1);
 		devprop_add_value(device, "device_type", (uint8_t *) tmp, strlen(tmp) + 1);
         

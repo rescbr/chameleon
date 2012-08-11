@@ -143,7 +143,7 @@ uint32_t Keylayout_real_start(void)
 	
 	if (getValueForKey("KeyLayout", &val, &len, DEFAULT_BOOT_CONFIG))
 	{
-		sprintf(layoutPath, "/Extra/Keymaps/%s", val);
+		snprintf(layoutPath, sizeof(layoutPath),"/Extra/Keymaps/%s", val);
 		// Add the extension if needed
 		if (len <= 4 || strcmp(val+len-4,".lyt") != 0)
 			strlcat(layoutPath, ".lyt", sizeof(layoutPath));

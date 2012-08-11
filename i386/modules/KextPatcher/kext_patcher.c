@@ -478,7 +478,7 @@ bool patch_hda_controller(TagPtr plist, char* plistbuffer, void* start)
 	
 	
 	char* new_str = malloc(strlen("0xXXXX000&0xFFFE0000")+1);
-	sprintf(new_str, "0x04030000&amp;0xFFFE0000"); // todo, pass in actual class id
+	snprintf(new_str, strlen("0xXXXX000&0xFFFE0000")+1,"0x04030000&amp;0xFFFE0000"); // todo, pass in actual class id
 	
 	
 	char* orig_string = "0x04020000&amp;0xFFFE0000"; //XMLCastString(match_class);
@@ -633,7 +633,7 @@ bool patch_bcm_kext(TagPtr plist, char* plistbuffer, void* start)
 
 	
 	char* new_str = malloc(strlen("pci14e4,xxxx")+1);
-	sprintf(new_str, "pci14e4,%02x", patch_bcm_deviceid);
+	snprintf(new_str, strlen("pci14e4,xxxx")+1,"pci14e4,%02x", patch_bcm_deviceid);
 
 	// Check to see if we *really* need to modify the plist, if not, return false
 	// so that *if* this were going ot be the only modified kext, the repacking code
@@ -742,7 +742,7 @@ bool patch_gma_kexts(TagPtr plist, char* plistbuffer, void* start)
 	offset =		XMLCastStringOffset(XMLGetProperty(personality, (const char*)"IOPCIPrimaryMatch"));
 	
 	char* newstring = malloc(strlen("0x00008086") + 1);
-	sprintf(newstring, "0x%04x", 0x8086 | (patch_gma_deviceid << 16));
+	snprintf(newstring, strlen("0x00008086") + 1,"0x%04x", 0x8086 | (patch_gma_deviceid << 16));
 	
 	DBG("Replacing %s with %s\n", "0x00008086", newstring); 
 	replace_string("0x27A28086", newstring, plistbuffer + offset, 10240);

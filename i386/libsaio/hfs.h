@@ -28,6 +28,6 @@ extern long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
                            FinderInfo * finderInfo, long * infoValid);
 extern void HFSGetDescription(CICell ih, char *str, long strMaxLen);
 extern long HFSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock);
-extern long HFSGetUUID(CICell ih, char *uuidStr);
+extern long HFSGetUUID(CICell ih, char *uuidStr,  long strMaxLen);
 extern void HFSFree(CICell ih);
 extern bool HFSProbe (const void *buf);

@@ -221,7 +221,7 @@ typedef long (*FSGetFileBlock)(CICell ih, char *filePath, unsigned long long *fi
 typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long * dirIndex,
                               char ** name, long * flags, long * time,
                               FinderInfo * finderInfo, long * infoValid);
-typedef long (*FSGetUUID)(CICell ih, char *uuidStr);
+typedef long (*FSGetUUID)(CICell ih, char *uuidStr, long strMaxLen);
 typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
 // Can be just pointed to free or a special free function
 typedef void (*BVFree)(CICell ih);

@@ -56,7 +56,7 @@ static int SaveRefString(char* string, int id)
             if (!tmp->string) {
                 return -1;
             }
-			sprintf(tmp->string, "%s", string);
+			snprintf(tmp->string, strlen(string)+1,"%s", string);
 			return 0;
 		}
 		tmp = tmp->next;
@@ -71,7 +71,7 @@ static int SaveRefString(char* string, int id)
         free(new_ref);
         return -1;
     }
-	sprintf(new_ref->string, "%s", string);
+	snprintf(new_ref->string, strlen(string)+1,"%s", string);
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
@@ -258,12 +258,12 @@ XMLParseFile( char * buffer, TagPtr * dict )
 	char       *configBuffer;
 	
 	
-	
-    configBuffer = malloc(strlen(buffer)+1);
+	length = strlen(buffer) +  1;
+    configBuffer = malloc(length);
     if (!configBuffer) {
         return -1;
     }
-    strcpy(configBuffer, buffer);
+    strlcpy(configBuffer, buffer, length);
 	
 	buffer_start = configBuffer;
     
@@ -974,7 +974,7 @@ struct Symbol
 {
     long          refCount;
     struct Symbol *next;
-    char          string[];
+    char          *string; 
 };
 typedef struct Symbol Symbol, *SymbolPtr;
 
@@ -997,18 +997,26 @@ NewSymbol( char * string )
     // Add the new symbol.
     if (symbol == 0)
     {
+        int len;
 #if USEMALLOC
-        symbol = (SymbolPtr)malloc(sizeof(Symbol) + 1 + strlen(string));
+        symbol = (SymbolPtr)malloc(sizeof(Symbol) );
 #else
-        symbol = (SymbolPtr)AllocateBootXMemory(sizeof(Symbol) + 1 + strlen(string));
+        symbol = (SymbolPtr)AllocateBootXMemory(sizeof(Symbol));
 #endif
         if (symbol == 0) {            
             stop("NULL symbol!");        
             return 0;
         }
+        len = strlen(string) + 1;
+        symbol->string = (char*)malloc(len);
+        if (symbol->string == 0) {
+            free(symbol);
+            stop("NULL symbol->string!");
+            return 0;
+        }
         // Set the symbol's data.
         symbol->refCount = 0;
-        strcpy(symbol->string, string);
+        strlcpy(symbol->string, string, len); 
         
         // Add the symbol to the list.
         symbol->next = gSymbolsHead;
@@ -1046,6 +1054,7 @@ FreeSymbol( char * string )
     else gSymbolsHead = symbol->next;
     
     // Free the symbol's memory.
+    if (symbol->string) free(symbol->string);
     free(symbol);
 }
 #endif

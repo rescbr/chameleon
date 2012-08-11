@@ -188,15 +188,15 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 		end = current;
 		if (current->parent == root_pci_dev)
 		{
-			sprintf(tmp, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
+			snprintf(tmp, sizeof(tmp),"PciRoot(0x%x)/Pci(0x%x,0x%x)", uid,
 					current->dev.bits.dev, current->dev.bits.func);
 		} 
 		else 
 		{
-			sprintf(tmp, "/Pci(0x%x,0x%x)", 
+			snprintf(tmp, sizeof(tmp) ,"/Pci(0x%x,0x%x)",
 					current->dev.bits.dev, current->dev.bits.func);
 		}
-		sprintf(buffer, "%s%s", buffer, tmp);
+		snprintf(buffer, sizeof(char) * 256,"%s%s", buffer, tmp);
 	}
 	return buffer;
 }

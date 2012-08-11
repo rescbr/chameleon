@@ -1,3 +1,4 @@
+- Security fixes 
 - Added beta support for Xcode 4.4
 
 - Added memory info to the nvidia plist structure, so now one can add several cards to the plist and set a customized name and memory info for each cards

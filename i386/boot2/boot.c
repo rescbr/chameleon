@@ -690,15 +690,15 @@ void common_boot(int biosdev)
 #ifdef BOOT_HELPER_SUPPORT
 			
             // Try to load kernel image from alternate locations on boot helper partitions.
-            sprintf(bootFileSpec, "com.apple.boot.P/%s", bootFile);
+            snprintf(bootFileSpec, sizeof(bootFileSpec),"com.apple.boot.P/%s", bootFile);
             ret = GetFileInfo(NULL, bootFileSpec, &flags, &time);
   	  	    if (ret == -1)
   	  	    {
-				sprintf(bootFileSpec, "com.apple.boot.R/%s", bootFile);
+				snprintf(bootFileSpec, sizeof(bootFileSpec), "com.apple.boot.R/%s", bootFile);
 				ret = GetFileInfo(NULL, bootFileSpec, &flags, &time);
 				if (ret == -1)
 				{
-					sprintf(bootFileSpec, "com.apple.boot.S/%s", bootFile);
+					snprintf(bootFileSpec, sizeof(bootFileSpec), "com.apple.boot.S/%s", bootFile);
 					ret = GetFileInfo(NULL, bootFileSpec, &flags, &time);
 					if (ret == -1)
 					{
@@ -827,7 +827,7 @@ void getKernelCachePath(void)
 		{
 			if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] > '6')
 			{
-				sprintf(gBootKernelCacheFile, "%s", kDefaultCachePath);
+				snprintf(gBootKernelCacheFile, sizeof(gBootKernelCacheFile), "%s", kDefaultCachePath);
 			}
 			else if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
 			{
@@ -888,18 +888,18 @@ void getKernelCachePath(void)
 					int ret = -1;
 					
 					if (Adler32) {
-						sprintf(gBootKernelCacheFile, "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",Adler32);
+						snprintf(gBootKernelCacheFile, sizeof(gBootKernelCacheFile), "%s.%08lX", "/System/Library/Caches/com.apple.kernelcaches/kernelcache",Adler32);
 						ret = GetFileInfo(NULL, gBootKernelCacheFile, &flags, &cachetime);
 					}
 					
 					if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
 					{
 						safe_set_env(envAdler32, 0);
-						sprintf(gBootKernelCacheFile, "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache");
+						snprintf(gBootKernelCacheFile, sizeof(gBootKernelCacheFile), "%s", "/System/Library/Caches/com.apple.kernelcaches/kernelcache");
 					}
 					
 				} else if (Adler32)
-					sprintf(gBootKernelCacheFile, "%s_%s.%08lX", kDefaultCachePath, (get_env(envarchCpuType) == CPU_TYPE_I386) ? "i386" : "x86_64", Adler32); //Snow Leopard
+					snprintf(gBootKernelCacheFile, sizeof(gBootKernelCacheFile), "%s_%s.%08lX", kDefaultCachePath, (get_env(envarchCpuType) == CPU_TYPE_I386) ? "i386" : "x86_64", Adler32); //Snow Leopard
 				
 			}
 		}
@@ -981,7 +981,7 @@ static void getRootDevice()
 				goto out;
 			}
 			
-			if (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid && (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid (((BVRef)(uint32_t)get_env(envgBootVolume)), bootInfo->uuidStr) == 0))
+			if (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid && (((BVRef)(uint32_t)get_env(envgBootVolume))->fs_getuuid (((BVRef)(uint32_t)get_env(envgBootVolume)), bootInfo->uuidStr, sizeof(bootInfo->uuidStr)) == 0))
 			{
 				verbose("Setting boot-uuid to: %s\n", bootInfo->uuidStr);
 				//uuidSet = true;
@@ -1129,9 +1129,9 @@ static char *FIXED_BOOTFILE_PATH(char * str)
     
 	// bootFile must start with a / if it not start with a device name
 	if (!bootFileWithDevice && (str)[0] != '/')
-		sprintf(bootFile, "/%s", str); // append a leading /
+		snprintf(bootFile, sizeof(bootfile), "/%s", str); // append a leading /
 	else
-		strlcpy(bootFile, bootInfo->bootFile, sizeof(bootInfo->bootFile));
+		strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
 	
 	return bootfile;
 }

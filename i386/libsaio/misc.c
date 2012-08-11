@@ -125,8 +125,8 @@ void turnOffFloppy(void)
 //
 #ifndef BOOT1
 void
-getPlatformName(char *nameBuf)
+getPlatformName(char *nameBuf, int size)
 {
-    strcpy(nameBuf, "ACPI");
+    strlcpy(nameBuf, "ACPI", size);
 }
 #endif
