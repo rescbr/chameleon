@@ -34,7 +34,8 @@ typedef uint32_t SMBDWord;
 typedef uint64_t SMBQWord;
 
 
-typedef struct DMIEntryPoint {
+typedef struct DMIEntryPoint
+{
     SMBByte    anchor[5];
     SMBByte    checksum;
     SMBWord    tableLength;
@@ -43,7 +44,8 @@ typedef struct DMIEntryPoint {
     SMBByte    bcdRevision;
 } __attribute__((packed)) DMIEntryPoint;
 
-typedef struct SMBEntryPoint {
+typedef struct SMBEntryPoint
+{
     SMBByte    anchor[4];
     SMBByte    checksum;
     SMBByte    entryPointLength;
@@ -59,7 +61,8 @@ typedef struct SMBEntryPoint {
 // Header common to all SMBIOS structures
 //
 
-typedef struct SMBStructHeader {
+typedef struct SMBStructHeader
+{
     SMBByte    type;
     SMBByte    length;
     SMBWord    handle;
@@ -84,7 +87,8 @@ typedef struct SMBAnchor
 // SMBIOS structure types.
 //
 
-enum {
+enum
+{
     kSMBTypeBIOSInformation             =  0,
     kSMBTypeSystemInformation           =  1,
     kSMBTypeBaseBoard					=  2,
@@ -110,7 +114,8 @@ enum {
 //
 // BIOS Information (Type 0)
 //
-typedef struct SMBBIOSInformation {
+typedef struct SMBBIOSInformation
+{
     SMB_STRUCT_HEADER               // Type 0
     SMBString  vendor;              // BIOS vendor name
     SMBString  version;             // BIOS version
@@ -124,7 +129,8 @@ typedef struct SMBBIOSInformation {
 // System Information (Type 1)
 //
 
-typedef struct SMBSystemInformation {
+typedef struct SMBSystemInformation
+{
     // 2.0+ spec (8 bytes)
     SMB_STRUCT_HEADER               // Type 1
     SMBString  manufacturer;
@@ -143,7 +149,8 @@ typedef struct SMBSystemInformation {
 // Base Board (Type 2)
 //
 
-typedef struct SMBBaseBoard {
+typedef struct SMBBaseBoard
+{
     SMB_STRUCT_HEADER               // Type 2
     SMBString	manufacturer;
     SMBString	product;
@@ -162,7 +169,8 @@ typedef struct SMBBaseBoard {
 } __attribute__((packed)) SMBBaseBoard;
 
 // Values for boardType in Type 2 records
-enum {
+enum
+{
     kSMBBaseBoardUnknown				= 0x01,
     kSMBBaseBoardOther					= 0x02,
     kSMBBaseBoardServerBlade			= 0x03,
@@ -183,7 +191,8 @@ enum {
 // System Enclosure (Type 3)
 //
 
-typedef struct SMBSystemEnclosure {
+typedef struct SMBSystemEnclosure
+{
     SMB_STRUCT_HEADER               // Type 3
     SMBString  manufacturer;
     SMBByte    type;
@@ -201,7 +210,8 @@ typedef struct SMBSystemEnclosure {
 // Processor Information (Type 4)
 //
 
-typedef struct SMBProcessorInformation {
+typedef struct SMBProcessorInformation
+{
     // 2.0+ spec (26 bytes)
     SMB_STRUCT_HEADER               // Type 4
     SMBString  socketDesignation;
@@ -233,7 +243,8 @@ typedef struct SMBProcessorInformation {
 // Obsoleted since SMBIOS version 2.1
 //
 
-typedef struct SMBMemoryModule {
+typedef struct SMBMemoryModule
+{
     SMB_STRUCT_HEADER               // Type 6
     SMBString  socketDesignation;
     SMBByte    bankConnections;
@@ -252,7 +263,8 @@ typedef struct SMBMemoryModule {
 // Cache Information (Type 7)
 //
 
-typedef struct SMBCacheInformation {
+typedef struct SMBCacheInformation
+{
     SMB_STRUCT_HEADER               // Type 7
     SMBString  socketDesignation;
     SMBWord    cacheConfiguration;
@@ -266,7 +278,8 @@ typedef struct SMBCacheInformation {
     SMBByte    associativity;
 } __attribute__((packed)) SMBCacheInformation;
 
-typedef struct SMBSystemSlot {
+typedef struct SMBSystemSlot
+{
     // 2.0+ spec (12 bytes)
     SMB_STRUCT_HEADER               // Type 9
     SMBString   slotDesignation;
@@ -284,7 +297,8 @@ typedef struct SMBSystemSlot {
 // Physical Memory Array (Type 16)
 //
 
-typedef struct SMBPhysicalMemoryArray {
+typedef struct SMBPhysicalMemoryArray
+{
     // 2.1+ spec (15 bytes)
     SMB_STRUCT_HEADER               // Type 16
     SMBByte    physicalLocation;    // physical location
@@ -296,7 +310,8 @@ typedef struct SMBPhysicalMemoryArray {
 } __attribute__((packed)) SMBPhysicalMemoryArray;
 
 // Memory Array - Use
-enum {
+enum
+{
     kSMBMemoryArrayUseOther             = 0x01,
     kSMBMemoryArrayUseUnknown           = 0x02,
     kSMBMemoryArrayUseSystemMemory      = 0x03,
@@ -307,7 +322,8 @@ enum {
 };
 
 // Memory Array - Error Correction Types
-enum {
+enum
+{
     kSMBMemoryArrayErrorCorrectionTypeOther         = 0x01,
     kSMBMemoryArrayErrorCorrectionTypeUnknown       = 0x02,
     kSMBMemoryArrayErrorCorrectionTypeNone          = 0x03,
@@ -321,7 +337,8 @@ enum {
 // Memory Device (Type 17)
 //
 
-typedef struct SMBMemoryDevice {
+typedef struct SMBMemoryDevice
+{
     // 2.1+ spec (21 bytes)
     SMB_STRUCT_HEADER               // Type 17
     SMBWord    arrayHandle;         // handle of the parent memory array
@@ -347,7 +364,8 @@ typedef struct SMBMemoryDevice {
 // Firmware Volume Description (Apple Specific - Type 128)
 //
 
-enum {
+enum
+{
     FW_REGION_RESERVED   = 0,
     FW_REGION_RECOVERY   = 1,
     FW_REGION_MAIN       = 2,
@@ -364,7 +382,8 @@ typedef struct FW_REGION_INFO
     SMBDWord   EndAddress;
 } __attribute__((packed)) FW_REGION_INFO;
 
-typedef struct SMBFirmwareVolume {
+typedef struct SMBFirmwareVolume
+{
     SMB_STRUCT_HEADER               // Type 128
     SMBByte           RegionCount;
     SMBByte           Reserved[3];
@@ -378,7 +397,8 @@ typedef struct SMBFirmwareVolume {
 // Memory SPD Data   (Apple Specific - Type 130)
 //
 
-typedef struct SMBMemorySPD {
+typedef struct SMBMemorySPD
+{
 	SMB_STRUCT_HEADER               // Type 130
 	SMBWord           Type17Handle;
 	SMBWord           Offset;
@@ -390,7 +410,8 @@ typedef struct SMBMemorySPD {
 // OEM Processor Type (Apple Specific - Type 131)
 //
 
-typedef struct SMBOemProcessorType {
+typedef struct SMBOemProcessorType
+{
 	SMB_STRUCT_HEADER
 	SMBWord    ProcessorType;
 } __attribute__((packed)) SMBOemProcessorType;
@@ -398,7 +419,8 @@ typedef struct SMBOemProcessorType {
 //
 // OEM Processor Bus Speed (Apple Specific - Type 132)
 //
-typedef struct SMBOemProcessorBusSpeed {
+typedef struct SMBOemProcessorBusSpeed
+{
 	SMB_STRUCT_HEADER
 	SMBWord    ProcessorBusSpeed;   // MT/s unit
 } __attribute__((packed)) SMBOemProcessorBusSpeed;

@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,18 +18,15 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-
-/* 
+ *
+ * 
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
  * All rights reserved.	 The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
- */
-
-/*
+ *
+ *
  *			INTEL CORPORATION PROPRIETARY INFORMATION
  *
  *	This software is supplied under the terms of a license	agreement or 
@@ -38,14 +34,11 @@
  *	nor disclosed except in accordance with the terms of that agreement.
  *
  *	Copyright 1988, 1989 by Intel Corporation
- */
-
-/*
+ *
+ *
  * Copyright 1993 NeXT Computer, Inc.
  * All rights reserved.
- */
-
-/*
+ *
  * Completely reworked by Sam Streeper (sam_s@NeXT.com)
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */

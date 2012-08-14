@@ -278,13 +278,13 @@ struct aml_chunk* aml_add_alias(struct aml_chunk* parent, const char* name1, con
 	if (node)
 	{
 		node->Type = AML_CHUNK_ALIAS;
-		
+
 		node->Length = 8;
 		node->Buffer = malloc(node->Length);
 		aml_fill_simple_name(node->Buffer, name1);
 		aml_fill_simple_name(node->Buffer+4, name2);
 	}
-	
+
 	return node;
 }
 

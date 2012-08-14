@@ -1,3 +1,9 @@
+- Add more nVidia and Ati Device and Subdevice IDs.
+- Substitutes some simpler command in place of md which fixes this first issue
+  credits to bltz http://forge.voodooprojects.org/p/chameleon/issues/279/
+- Fix crash with missing *_o.png image
+  credits to bltz http://forge.voodooprojects.org/p/chameleon/issues/280/
+- General code cleanups.
 - This revision is devoted to Samantha, AKA DHP or Revogirl in the OSx86 scene.
   A young talent we lost prematurely.
   Part of her work will now live on in the Chameleon source code.

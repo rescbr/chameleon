@@ -109,7 +109,10 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						DBG("qpimult %d\n", qpimult);
 						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
 						// Rek: rounding decimals to match original mac profile info
-						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
+						if (qpibusspeed%100 != 0)
+						{
+							qpibusspeed = ((qpibusspeed+50)/100)*100;
+						}
 						DBG("qpibusspeed %d\n", qpibusspeed);
 						value->word = qpibusspeed;
 						return true;
@@ -176,41 +179,63 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
 					case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;			// Xeon 
+						{
+							value->word = 0x0501;			// Xeon
+						}
 						else
+						{
 							value->word = 0x0701;			// Core i7
+						}
 						return true;
 
 					case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
 							value->word = 0x0501;			// Xeon
+						}
 						else
+						{
 							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+							{
 								value->word = 0x0601;		// Core i5
+							}
 							else
+							{
 								value->word = 0x0701;		// Core i7
+							}
+						}
 						return true;
 
 					case CPU_MODEL_DALES:
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
 							value->word = 0x0601;			// Core i5
+						}
 						else
+						{
 							value->word = 0x0701;			// Core i7
+						}
 						return true;
 
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7, Xeon E3-12xx LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
 							value->word = 0x0501;			// Xeon
-						else
-							if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						}
+						else if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						{
 								value->word = 0x0901;		// Core i3
-						else
-							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						}
+						else if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
 								value->word = 0x0601;		// Core i5
-							else
+						}
+						else
+						{
 								value->word = 0x0701;		// Core i7
+						}
 						return true;
 				}
 			}
@@ -288,7 +313,9 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	}
 
 	if (!bootInfo->memDetect)
+	{
 		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -314,7 +341,9 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 	}
 
 	if (!bootInfo->memDetect)
+	{
 		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -337,7 +366,9 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	}
 
 	if (!bootInfo->memDetect)
+	{
 		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }

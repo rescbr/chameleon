@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2004 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Copyright (c) 1999-2004 Apple Computer, Inc.  All Rights Reserved.
  * 
@@ -20,7 +19,6 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #include "libsaio.h"

@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2002 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -18,14 +17,12 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
  * 2008-05-24:
  * Tamas Kosarszky: changed caption for partition type 0x07
  * and added caption for type 0xEE.
- */
-/*
+ *
+ *
  * Copyright (c) 1997 Tobias Weingartner
  * All rights reserved.
  *

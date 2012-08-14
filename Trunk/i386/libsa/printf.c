@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,7 +18,6 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 /*
  * Copyright 1993 NeXT, Inc.
@@ -30,18 +28,20 @@
 
 struct putc_info //Azi: exists on console.c & gui.c
 {
-    char * str;
-    char * last_str;
+	char * str;
+	char * last_str;
 };
 
 static int sputc(int c, struct putc_info * pi) //Azi: same as above
 {
-    if (pi->last_str)
-        if (pi->str == pi->last_str)
+	if (pi->last_str)
 	{
-		*(pi->str) = '\0';
-		return 0;
-        }
+		if (pi->str == pi->last_str)
+		{
+			*(pi->str) = '\0';
+			return 0;
+		}
+	}
 	*(pi->str)++ = c;
 	return c;
 }
@@ -50,25 +50,25 @@ static int sputc(int c, struct putc_info * pi) //Azi: same as above
 /* now slprintf() return the length of the string as in man sprintf()*/
 int sprintf(char * str, const char * fmt, ...)
 {
-    va_list ap;
-    struct putc_info pi;
+	va_list ap;
+	struct putc_info pi;
 
-    va_start(ap, fmt);
-    pi.str = str;
-    pi.last_str = 0;
-    prf(fmt, ap, sputc, &pi);
-    *pi.str = '\0';
-    va_end(ap);
-    return (pi.str - str);
+	va_start(ap, fmt);
+	pi.str = str;
+	pi.last_str = 0;
+	prf(fmt, ap, sputc, &pi);
+	*pi.str = '\0';
+	va_end(ap);
+	return (pi.str - str);
 }
 
 /*VARARGS1*/
 int slvprintf(char * str, int len, const char * fmt, va_list ap)
 {
-    struct putc_info pi;
-    pi.str = str;
-    pi.last_str = str + len - 1;
-    prf(fmt, ap, sputc, &pi);
-    *pi.str = '\0';
-    return (pi.str - str);
+	struct putc_info pi;
+	pi.str = str;
+	pi.last_str = str + len - 1;
+	prf(fmt, ap, sputc, &pi);
+	*pi.str = '\0';
+	return (pi.str - str);
 }

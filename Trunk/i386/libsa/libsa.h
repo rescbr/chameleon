@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,7 +18,6 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #ifndef __BOOT_LIBSA_H
@@ -37,54 +35,54 @@
  */
 static inline int isupper(int c)
 {
-    return (c >= 'A' && c <= 'Z');
+	return (c >= 'A' && c <= 'Z');
 }
 
 static inline int islower(int c)
 {
-    return (c >= 'a' && c <= 'z');
+	return (c >= 'a' && c <= 'z');
 }
 
 static inline int isalpha(int c)
 {
-    return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+	return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
 }
 
 static inline int isascii(int c)
 {
-    return ( (c >= 0x20) && (c < 0x7f) );
+	return ( (c >= 0x20) && (c < 0x7f) );
 }
 
 static inline int isspace(int c)
 {
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\12');
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\12');
 }
 
 static inline int isdigit(int c)
 {
-    return (c >= '0' && c <= '9');
+	return (c >= '0' && c <= '9');
 }
 
 static inline int isxdigit(int c)
 {
-    return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
+	return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
 }
 
 static inline int ispunct(int c)
 {
-    return (c == '.' || c == '-');
+	return (c == '.' || c == '-');
 }
 
 /*
  * string.c
  */
 #ifndef bcopy
-extern void   bcopy(const void * src, void * dst, size_t len);
+extern void bcopy(const void * src, void * dst, size_t len);
 #endif
 
 #ifndef bzero
-extern void   bzero(void * dst, size_t len);
-extern void   __bzero(void * dst, size_t len);
+extern void bzero(void * dst, size_t len);
+extern void __bzero(void * dst, size_t len);
 #endif
 
 extern void * memset(void * dst, int c, size_t n);
@@ -104,7 +102,7 @@ extern char * strncat(char * s1, const char * s2, size_t n);
 extern char * strdup(const char *s1);
 
 #if STRNCASECMP
-extern int    strncasecmp(const char * s1, const char * s2, size_t n);
+extern int strncasecmp(const char *s1, const char *s2, size_t n);
 #endif
 
 extern char * strchr(const char *str, int c);

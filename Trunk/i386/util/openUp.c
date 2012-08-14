@@ -1,7 +1,6 @@
 /* 
  * Copyright (c) 2001 Apple Computer, Inc. All rights reserved. 
  *  
- * @APPLE_LICENSE_HEADER_START@ 
  * 
  * The contents of this file constitute Original Code as defined in and 
  * are subject to the Apple Public Source License Version 1.1 (the 
@@ -17,10 +16,8 @@
  * License for the specific language governing rights and limitations 
  * under the License. 
  * 
- * @APPLE_LICENSE_HEADER_END@ 
- */ 
-/* 
- * Shantonu Sen <<EMAIL REMOVED>> 
+ * 
+ * Shantonu Sen
  * openUp.c - program to set the "first-open-window" field of a volume 
  * 
  * Get the directory ID for the first argument, and set it as word 2 

@@ -19,24 +19,23 @@ extern int previewTotalSectors;
 extern int previewLoadedSectors;
 extern uint8_t *previewSaveunder;
 
-static unsigned long
-getmemorylimit(void)
+static unsigned long getmemorylimit(void)
 {
-  int line;
-  int i;
-  MemoryRange *mp = bootInfo->memoryMap;
+	int line;
+	int i;
+	MemoryRange *mp = bootInfo->memoryMap;
   
-  // Activate and clear page 1
-  line = 1;
-  for (i = 0; i < bootInfo->memoryMapCount; i++)
-  {
-    if((mp->type == 1) && ((unsigned long)mp->base == 0x100000))
-    {
-      return (unsigned long)(mp->base + mp->length);
-    }
-    mp++;
-  }
-  return 0x10000000;
+	// Activate and clear page 1
+	line = 1;
+	for (i = 0; i < bootInfo->memoryMapCount; i++)
+	{
+		if((mp->type == 1) && ((unsigned long)mp->base == 0x100000))
+		{
+			return (unsigned long)(mp->base + mp->length);
+		}
+		mp++;
+	}
+	return 0x10000000;
 }
 
 static void WakeKernel(IOHibernateImageHeader * header)
@@ -50,26 +49,27 @@ static void WakeKernel(IOHibernateImageHeader * header)
 	int32_t   	byteCnt;
 	u_int32_t 	lowHalf, highHalf;
 	u_int32_t 	sum;
-	
+
 	printf("\nWake Kernel!\n");
-	
+
 	dst   = (unsigned long *) (header->restore1CodePage << 12);
 	count = header->restore1PageCount;
 	proc  = (header->restore1CodeOffset + ((uint32_t) dst));
 	newSP = header->restore1StackOffset + (header->restore1CodePage << 12);
-	
+
 	src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 
 							  + header->fileExtentMapSize);
 	sum  = 0;
-	
+
 	for (page = 0; page < count; page++)
 	{
 		compressedSize = 4096;
-		
+
 		lowHalf = 1;
 		highHalf = 0;
-		
-		for (cnt = 0; cnt < compressedSize; cnt += 0x20) {
+
+		for (cnt = 0; cnt < compressedSize; cnt += 0x20)
+		{
 			dst[0] = src[0];
 			dst[1] = src[1];
 			dst[2] = src[2];
@@ -78,21 +78,22 @@ static void WakeKernel(IOHibernateImageHeader * header)
 			dst[5] = src[5];
 			dst[6] = src[6];
 			dst[7] = src[7];
-			for (byteCnt = 0; byteCnt < 0x20; byteCnt++) {
+			for (byteCnt = 0; byteCnt < 0x20; byteCnt++)
+			{
 				lowHalf += ((u_int8_t *) dst)[byteCnt];
 				highHalf += lowHalf;
 			}
 			src += 8;
 			dst += 8;
 		}
-		
+
 		lowHalf  %= 65521L;
 		highHalf %= 65521L;
 		sum += (highHalf << 16) | lowHalf;
 	}
 	header->actualRestore1Sum = sum;
 	startprog (proc, header);
-	
+
 	return;
 }
 
@@ -103,7 +104,7 @@ void HibernateBoot(char *image_filename)
 	IOHibernateImageHeader _header;
 	IOHibernateImageHeader * header = &_header;
 	long buffer;
-	
+
 	size = ReadFileAtOffset (image_filename, header, 0, sizeof(IOHibernateImageHeader));
 	printf("header read size %x\n", size);
 	
@@ -128,9 +129,14 @@ void HibernateBoot(char *image_filename)
 		uint32_t machineSignature;
 		size = GetProp(gChosenPH, kIOHibernateMachineSignatureKey,
 					   (char *)&machineSignature, sizeof(machineSignature));
-		if (size != sizeof(machineSignature)) machineSignature = 0;
+		if (size != sizeof(machineSignature))
+		{
+			machineSignature = 0;
+		}
 		if (machineSignature != header->machineSignature)
+		{
 			break;
+		}
 	}
 #endif
 	
@@ -145,7 +151,7 @@ void HibernateBoot(char *image_filename)
 		getchar();
 		return;
 	}
-	
+
 	bcopy(header, (void *) mem_base, sizeof(IOHibernateImageHeader));
 	header = (IOHibernateImageHeader *) mem_base;
 	
@@ -163,9 +169,11 @@ void HibernateBoot(char *image_filename)
 		previewLoadedSectors = 0;
 		previewSaveunder = &(progressSaveUnder[0][0]);
 		if (preview_offset+header->previewSize<imageSize)
+		{
 			ReadFileAtOffset (image_filename, (char *)(long)(buffer+preview_offset+header->previewSize),
 							  sizeof(IOHibernateImageHeader)+preview_offset+header->previewSize,
 							  imageSize-(preview_offset+header->previewSize));
+		}
 		previewTotalSectors = 0;
 		previewLoadedSectors = 0;
 		previewSaveunder = 0;
@@ -183,7 +191,8 @@ void HibernateBoot(char *image_filename)
 	
 // Depends on NVRAM
 #if 0
-	if (header->encryptStart) {
+	if (header->encryptStart)
+	{
 		// decryption data
 		static const unsigned char first_iv[AES_BLOCK_SIZE]
 		= {  0xa3, 0x63, 0x65, 0xa9, 0x0b, 0x71, 0x7b, 0x1c,

@@ -88,33 +88,37 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 {
 	int l1, h1, l2, h2;
 	unsigned long long t;
-	
-	outb(base + SMBHSTSTS, 0x1f);					// reset SMBus Controller
+
+	outb(base + SMBHSTSTS, 0x1f);	// reset SMBus Controller
 	outb(base + SMBHSTDAT, 0xff);
-	
+
 	rdtsc(l1, h1);
 	while ( inb(base + SMBHSTSTS) & 0x01)    // wait until read
-	{  
+	{
 		rdtsc(l2, h2);
 		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
 		if (t > 5)
-			return 0xFF;                  // break
+		{
+			return 0xFF;	// break
+		}
 	}
-	
+
 	outb(base + SMBHSTCMD, cmd);
 	outb(base + SMBHSTADD, (adr << 1) | 0x01 );
 	outb(base + SMBHSTCNT, 0x48 );
-	
+
 	rdtsc(l1, h1);
-	
-	while (!( inb(base + SMBHSTSTS) & 0x02))		// wait til command finished
-	{	
+
+	while (!( inb(base + SMBHSTSTS) & 0x02))	// wait til command finished
+	{
 		rdtsc(l2, h2);
 		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);
 		if (t > 5)
-			break;									// break after 5ms
-    }
-    return inb(base + SMBHSTDAT);
+		{
+			break;	// break after 5ms
+		}
+	}
+	return inb(base + SMBHSTDAT);
 }
 
 /* SPD i2c read optimization: prefetch only what we need, read non prefetcheable bytes on the fly */
@@ -145,8 +149,12 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 		bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
 		code = spd[SPD_DDR3_MEMORY_CODE];
 		for (i=0; i < VEN_MAP_SIZE; i++)
+		{
 			if (bank==vendorMap[i].bank && code==vendorMap[i].code)
+			{
 				return vendorMap[i].name;
+			}
+		}
 	}
 	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR)
 	{
@@ -166,16 +174,22 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 			bank = 0;
 		}
 		for (i=0; i < VEN_MAP_SIZE; i++)
+		{
 			if (bank==vendorMap[i].bank && code==vendorMap[i].code)
+			{
 				return vendorMap[i].name;
+			}
+		}
 	}
-    /* OK there is no vendor id here lets try to match the partnum if it exists */
-    if (strstr(slot->PartNo,"GU332") == slot->PartNo) // Unifosa fingerprint
-        return "Unifosa";
-    return "NoName";
+	/* OK there is no vendor id here lets try to match the partnum if it exists */
+	if (strstr(slot->PartNo,"GU332") == slot->PartNo) // Unifosa fingerprint
+	{
+		return "Unifosa";
+	}
+	return "NoName";
 }
 
-/** Get Default Memory Module Speed (no overclocking handled) */
+/* Get Default Memory Module Speed (no overclocking handled) */
 int getDDRspeedMhz(const char * spd)
 {
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3)
@@ -214,7 +228,7 @@ int getDDRspeedMhz(const char * spd)
 #define SMST(a) ((uint8_t)((spd[a] & 0xf0) >> 4))
 #define SLST(a) ((uint8_t)(spd[a] & 0x0f))
 
-/** Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
+/* Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
 const char *getDDRSerial(const char* spd)
 {
 	static char asciiSerial[16];
@@ -231,7 +245,7 @@ const char *getDDRSerial(const char* spd)
 	return strdup(asciiSerial);
 }
 
-/** Get DDR3 or DDR2 Part Number, always return a valid ptr */
+/* Get DDR3 or DDR2 Part Number, always return a valid ptr */
 const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 {
 	static char asciiPartNo[32];
@@ -253,10 +267,15 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 	{
 		READ_SPD(spd, base, slot, i); // only read once the corresponding model part (ddr3 or ddr2)
 		c = spd[i];
-		if (isalpha(c) || isdigit(c) || ispunct(c)) // It seems that System Profiler likes only letters and digits...
+		if (isalpha(c) || isdigit(c) || ispunct(c))
+		{
+			// It seems that System Profiler likes only letters and digits...
 			asciiPartNo[index++] = c;
+		}
 		else if (!isascii(c))
+		{
 			break;
+		}
 	}
 	
 	return strdup(asciiPartNo);
@@ -265,7 +284,7 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 int mapping []= {0,2,1,3,4,6,5,7,8,10,9,11};
 
 
-/** Read from smbus the SPD content and interpret it for detecting memory attributes */
+/* Read from smbus the SPD content and interpret it for detecting memory attributes */
 static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
 	int        i, speed;
@@ -284,57 +303,61 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	verbose("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
 	smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 
-//Azi: no use for this!
-//  getBoolForKey("DumpSPD", &dump, &bootInfo->chameleonConfig);
+	//Azi: no use for this!
+	//  getBoolForKey("DumpSPD", &dump, &bootInfo->chameleonConfig);
 	// needed at least for laptops
 	bool fullBanks = Platform.DMI.MemoryModules == Platform.DMI.CntMemorySlots;
 
 	char spdbuf[MAX_SPD_SIZE];
 	// Search MAX_RAM_SLOTS slots
-	for (i = 0; i <  MAX_RAM_SLOTS; i++){
+	for (i = 0; i <  MAX_RAM_SLOTS; i++)
+	{
 		slot = &Platform.RAM.DIMM[i];
 		spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
 		DBG("SPD[0] (size): 0x%02x @0x%x\n", spd_size, 0x50 + i);
-	// Check spd is present
-	if (spd_size && (spd_size != 0xff))
-	{
-
-		slot->spd = spdbuf;
-		slot->InUse = true;
-
-		bzero(slot->spd, spd_size);
-
-		// Copy spd data into buffer
-
-		//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
-		init_spd(slot->spd, base, i);
-
-		switch (slot->spd[SPD_MEMORY_TYPE])
+		// Check spd is present
+		if (spd_size && (spd_size != 0xff))
 		{
-			case SPD_MEMORY_TYPE_SDRAM_DDR2:
 
-				slot->ModuleSize = ((1 << ((slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17)) * 
-				((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);
-			break;
+			slot->spd = spdbuf;
+			slot->InUse = true;
 
-			case SPD_MEMORY_TYPE_SDRAM_DDR3:
+			bzero(slot->spd, spd_size);
 
-				slot->ModuleSize = ((slot->spd[4] & 0x0f) + 28 ) + ((slot->spd[8] & 0x7)  + 3 );
-				slot->ModuleSize -= (slot->spd[7] & 0x7) + 25;
-				slot->ModuleSize = ((1 << slot->ModuleSize) * (((slot->spd[7] >> 3) & 0x1f) + 1));
+			// Copy spd data into buffer
 
-			break;
-		}
+			//for (x = 0; x < spd_size; x++) slot->spd[x] = smb_read_byte_intel(base, 0x50 + i, x);
+			init_spd(slot->spd, base, i);
 
-		spd_type = (slot->spd[SPD_MEMORY_TYPE] < ((char) 12) ? slot->spd[SPD_MEMORY_TYPE] : 0);
-		slot->Type = spd_mem_to_smbios[spd_type];
-		slot->PartNo = getDDRPartNum(slot->spd, base, i);
-		slot->Vendor = getVendorName(slot, base, i);
-		slot->SerialNo = getDDRSerial(slot->spd);
+			switch (slot->spd[SPD_MEMORY_TYPE])
+			{
+				case SPD_MEMORY_TYPE_SDRAM_DDR2:
 
-		// determine spd speed
-		speed = getDDRspeedMhz(slot->spd);
-		if (slot->Frequency<speed) slot->Frequency = speed;
+					slot->ModuleSize = ((1 << ((slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17)) * 
+					((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);
+				break;
+
+				case SPD_MEMORY_TYPE_SDRAM_DDR3:
+
+					slot->ModuleSize = ((slot->spd[4] & 0x0f) + 28 ) + ((slot->spd[8] & 0x7)  + 3 );
+					slot->ModuleSize -= (slot->spd[7] & 0x7) + 25;
+					slot->ModuleSize = ((1 << slot->ModuleSize) * (((slot->spd[7] >> 3) & 0x1f) + 1));
+
+				break;
+			}
+
+			spd_type = (slot->spd[SPD_MEMORY_TYPE] < ((char) 12) ? slot->spd[SPD_MEMORY_TYPE] : 0);
+			slot->Type = spd_mem_to_smbios[spd_type];
+			slot->PartNo = getDDRPartNum(slot->spd, base, i);
+			slot->Vendor = getVendorName(slot, base, i);
+			slot->SerialNo = getDDRSerial(slot->spd);
+
+			// determine spd speed
+			speed = getDDRspeedMhz(slot->spd);
+			if (slot->Frequency<speed)
+			{
+				slot->Frequency = speed;
+			}
 			
 			// pci memory controller if available, is more reliable
 			if (Platform.RAM.Frequency > 0)
@@ -342,7 +365,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				uint32_t freq = (uint32_t)Platform.RAM.Frequency / 500000;
 				// now round off special cases
 				uint32_t fmod100 = freq %100;
-				switch(fmod100) {
+				switch(fmod100)
+				{
 					case  1:	freq--;	break;
 					case 32:	freq++;	break;
 					case 65:	freq++; break;

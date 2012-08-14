@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,17 +18,12 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/* 
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
- */
-
-/*
+ *
  * boot2() -- second stage boot.
  *
  * This function must be located at 0:BOOTER_ADDR and will be called

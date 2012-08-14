@@ -34,19 +34,19 @@
 #define kSMBBIOSInformationReleaseDateKey			"SMbiosdate"
 
 /* System Information */
-#define kSMBSystemInformationManufacturerKey		"SMmanufacturer"
+#define kSMBSystemInformationManufacturerKey			"SMmanufacturer"
 #define kSMBSystemInformationProductNameKey			"SMproductname"
 #define kSMBSystemInformationVersionKey				"SMsystemversion"
-#define kSMBSystemInformationSerialNumberKey		"SMserial"
+#define kSMBSystemInformationSerialNumberKey			"SMserial"
 #define kSMBSystemInformationFamilyKey				"SMfamily"
 
 /* Base Board */
 #define kSMBBaseBoardManufacturerKey				"SMboardmanufacturer"
-#define kSMBBaseBoardProductKey						"SMboardproduct"
+#define kSMBBaseBoardProductKey					"SMboardproduct"
 
 /* Processor Information */
-#define kSMBProcessorInformationExternalClockKey	"SMexternalclock"
-#define kSMBProcessorInformationMaximumClockKey		"SMmaximalclock"
+#define kSMBProcessorInformationExternalClockKey		"SMexternalclock"
+#define kSMBProcessorInformationMaximumClockKey			"SMmaximalclock"
 
 /* Memory Device */
 #define kSMBMemoryDeviceDeviceLocatorKey			"SMmemdevloc"
@@ -58,8 +58,8 @@
 #define kSMBMemoryDevicePartNumberKey				"SMmempart"
 
 /* Apple Specific */
-#define kSMBOemProcessorTypeKey						"SMcputype"
-#define kSMBOemProcessorBusSpeedKey					"SMbusspeed"
+#define kSMBOemProcessorTypeKey					"SMcputype"
+#define kSMBOemProcessorBusSpeedKey				"SMbusspeed"
 
 //-------------------------------------------------------------------------------------------------------------------------
 // Default SMBIOS Data
@@ -74,33 +74,33 @@
 
 // defaults for a Mac mini 
 #define kDefaultMacminiFamily						"Macmini"
-#define kDefaultMacmini								"Macmini1,1"
+#define kDefaultMacmini							"Macmini1,1"
 #define kDefaultMacminiBIOSVersion					"    MM21.88Z.009A.B00.0903051113"
 
 // defaults for a MacBook
 #define kDefaultMacBookFamily						"MacBook"
-#define kDefaultMacBook								"MacBook4,1"
+#define kDefaultMacBook							"MacBook4,1"
 #define kDefaultMacBookBIOSVersion					"    MB41.88Z.0073.B00.0809221748"
 
 // defaults for a MacBook Pro
 #define kDefaultMacBookProFamily					"MacBookPro"
-#define kDefaultMacBookPro							"MacBookPro4,1"
+#define kDefaultMacBookPro						"MacBookPro4,1"
 #define kDefaultMacBookProBIOSVersion				"    MBP41.88Z.0073.B00.0903051113"
 
 // defaults for an iMac
-#define kDefaultiMacFamily							"iMac"
-#define kDefaultiMac								"iMac8,1"
+#define kDefaultiMacFamily						"iMac"
+#define kDefaultiMac							"iMac8,1"
 #define kDefaultiMacBIOSVersion						"    IM81.88Z.00C1.B00.0903051113"
 // defaults for an iMac11,1 core i3/i5/i7
-#define kDefaultiMacNehalem							"iMac11,3"
+#define kDefaultiMacNehalem						"iMac11,3"
 #define kDefaultiMacNehalemBIOSVersion				"    IM112.88Z.0057.B00.1005051455"
 // defaults for an iMac12,1
-#define kDefaultiMacSandy							"iMac12,1"
+#define kDefaultiMacSandy						"iMac12,1"
 #define kDefaultiMacSandyBIOSVersion				"    IM121.88Z.0047.B1F.1223021756"
 
 // defaults for a Mac Pro
 #define kDefaultMacProFamily						"MacPro"
-#define kDefaultMacPro								"MacPro3,1"
+#define kDefaultMacPro							"MacPro3,1"
 #define kDefaultMacProBIOSVersion					"    MP31.88Z.006C.B05.0903051113"
 // defaults for a Mac Pro 4,1 core i7/Xeon
 #define kDefaultMacProNehalem						"MacPro4,1"
@@ -114,18 +114,21 @@
 
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
 
-typedef struct {
+typedef struct
+{
 	SMBStructHeader *orig;
 	SMBStructHeader *new;
 } SMBStructPtrs;
 
-struct {
+struct
+{
 	char *vendor;
 	char *version;
 	char *releaseDate;
 } defaultBIOSInfo;
 
-struct {
+struct
+{
 	char *manufacturer;
 	char *productName;
 	char *version;
@@ -133,13 +136,15 @@ struct {
 	char *family;
 } defaultSystemInfo;
 
-struct {
+struct
+{
 	char *manufacturer;
 	char *product;
 } defaultBaseBoard;
 
 
-typedef struct {
+typedef struct
+{
 	uint8_t			type;
 	SMBValueType	valueType;
 	uint8_t			fieldOffset;
@@ -275,20 +280,20 @@ SMBEntryPoint *neweps	= 0;
 static uint8_t stringIndex;	// increament when a string is added and set the field value accordingly
 static uint8_t stringsSize;	// add string size
 
-static SMBWord tableLength		= 0;
-static SMBWord handle			= 0;
+static SMBWord tableLength	= 0;
+static SMBWord handle		= 0;
 static SMBWord maxStructSize	= 0;
 static SMBWord structureCount	= 0;
 
 /* Rewrite this function */
 void setDefaultSMBData(void)
 {
-	defaultBIOSInfo.vendor			= kDefaultVendorManufacturer;
-	defaultBIOSInfo.releaseDate		= kDefaultBIOSReleaseDate;
+	defaultBIOSInfo.vendor              = kDefaultVendorManufacturer;
+	defaultBIOSInfo.releaseDate         = kDefaultBIOSReleaseDate;
 
-	defaultSystemInfo.manufacturer	= kDefaultVendorManufacturer;
-	defaultSystemInfo.version		= kDefaultSystemVersion;
-	defaultSystemInfo.serialNumber	= kDefaultSerialNumber;
+	defaultSystemInfo.manufacturer      = kDefaultVendorManufacturer;
+	defaultSystemInfo.version           = kDefaultSystemVersion;
+	defaultSystemInfo.serialNumber      = kDefaultSerialNumber;
 
 	defaultBaseBoard.manufacturer	= kDefaultVendorManufacturer;
 	defaultBaseBoard.product		= kDefaultBoardProduct;
@@ -320,7 +325,7 @@ void setDefaultSMBData(void)
 
 			case 2:
 				defaultBIOSInfo.version			= kDefaultiMacBIOSVersion;
-				defaultSystemInfo.productName	= kDefaultiMac;
+				defaultSystemInfo.productName		= kDefaultiMac;
 				defaultSystemInfo.family		= kDefaultiMacFamily;
 				break;
 			default:
@@ -331,11 +336,11 @@ void setDefaultSMBData(void)
 					{
 						switch (Platform.CPU.Model)
 						{
-							case CPU_MODEL_FIELDS:			// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+							case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 							case CPU_MODEL_DALES:
-							case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+							case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
-								defaultSystemInfo.productName	= kDefaultiMacNehalem;
+								defaultSystemInfo.productName		= kDefaultiMacNehalem;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
 
@@ -343,13 +348,13 @@ void setDefaultSMBData(void)
 							case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5 LGA2011 (32nm)
 							case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 								defaultBIOSInfo.version			= kDefaultiMacSandyBIOSVersion;
-								defaultSystemInfo.productName	= kDefaultiMacSandy;
+								defaultSystemInfo.productName		= kDefaultiMacSandy;
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								break;
-							case CPU_MODEL_NEHALEM:			// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-							case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+							case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+							case CPU_MODEL_NEHALEM_EX:			// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 								defaultBIOSInfo.version			= kDefaultMacProNehalemBIOSVersion;
-								defaultSystemInfo.productName	= kDefaultMacProNehalem;
+								defaultSystemInfo.productName		= kDefaultMacProNehalem;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;
 
@@ -357,22 +362,22 @@ void setDefaultSMBData(void)
 							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
 								defaultBIOSInfo.version			= kDefaultMacProWestmereBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaultMacProWestmereBIOSReleaseDate;
-								defaultSystemInfo.productName	= kDefaultMacProWestmere;
+								defaultSystemInfo.productName		= kDefaultMacProWestmere;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;
 
 							default:
 								defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
-								defaultSystemInfo.productName	= kDefaultMacPro;
+								defaultSystemInfo.productName		= kDefaultMacPro;
 								defaultSystemInfo.family		= kDefaultMacProFamily;
 								break;
 						}
 						break;
 					}
 					default:
-						defaultBIOSInfo.version			= kDefaultMacProBIOSVersion;
+						defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
 						defaultSystemInfo.productName	= kDefaultMacPro;
-						defaultSystemInfo.family		= kDefaultMacProFamily;
+						defaultSystemInfo.family	= kDefaultMacProFamily;
 						break;
 				}
 				break;
@@ -398,11 +403,19 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 	sprintf(key, "%s%d", keyString, idx);
 
 	if (value)
+	{
 		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
+		{
 			return true;
+		}
+	}
 	else
+	{
 		if (getValueForKey(key, string, &len, SMBPlist))
+		{
 			return true;
+		}
+	}
 	return false;
 }
 
@@ -411,9 +424,11 @@ char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
 	if (!field)
+	{
 		return NULL;
+	}
 
-	for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
+	for (field--; field != 0 && strlen((char *)stringPtr) > 0;
 		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
 
 	return (char *)stringPtr;
@@ -424,7 +439,10 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	int strSize;
 
 	if (!field)
+	{
 		return;
+	}
+
 	if (!string)
 	{
 		*field = 0;
@@ -435,7 +453,9 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 
 	// remove any spaces found at the end
 	while ((strSize != 0) && (string[strSize - 1] == ' '))
+	{
 		strSize--;
+	}
 
 	if (strSize == 0)
 	{
@@ -458,7 +478,9 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	int val;
 
 	if (numOfSetters <= idx)
+	{
 		return false;
+	}
 
 	switch (SMBSetters[idx].valueType)
 	{
@@ -466,15 +488,28 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			if (SMBSetters[idx].keyString)
 			{
 				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
+				{
 					break;
+				}
 				else
+				{
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+					{
 						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
+						{
 							break;
+						}
+					}
+				}
+
 			}
 			if (SMBSetters[idx].getSMBValue)
+			{
 				if (SMBSetters[idx].getSMBValue((returnType *)&string))
+				{
 					break;
+				}
+			}
 			if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue))
 			{
 				string = *(SMBSetters[idx].defaultValue);
@@ -491,8 +526,12 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			{
 				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
 				if (!parsed)
+				{
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+					{
 						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
+					}
+				}
 				if (parsed)
 				{
 					switch (SMBSetters[idx].valueType)
@@ -513,8 +552,12 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			}
 
 			if (SMBSetters[idx].getSMBValue)
+			{
 				if (SMBSetters[idx].getSMBValue(value))
+				{
 					return true;
+				}
+			}
 #if 0
 			if (*(SMBSetters[idx].defaultValue))
 			{
@@ -526,8 +569,9 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	}
 
 	if (SMBSetters[idx].valueType == kSMBString && string)
+	{
 		setSMBStringForField(structPtr->new, string, &value->byte);
-
+	}
 	return true;
 }
 
@@ -625,16 +669,20 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	stringsSize = 0;
 
 	if (handle < structPtr->orig->handle)
+	{
 		handle = structPtr->orig->handle;
+	}
 
 	memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
 
 	for (i = 0; i < numOfSetters; i++)
+	{
 		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length))
 		{
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
+	}
 
 	if (setterFound)
 	{
@@ -642,8 +690,9 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
 		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
-
+		}
 		structSize = ptr - (uint8_t *)structPtr->new;
 	}
 	else
@@ -652,8 +701,10 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
 		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
-		
+		}
+
 		structSize = ptr - (uint8_t *)structPtr->orig;
 		memcpy((void *)structPtr->new, structPtr->orig, structSize);
 	}
@@ -663,7 +714,9 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	tableLength += structSize;
 
 	if (structSize > maxStructSize)
+	{
 		maxStructSize = structSize;
+	}
 
 	structureCount++;
 }
@@ -696,7 +749,9 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
 		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
+		}
 
 		structPtr->orig = (SMBStructHeader *)ptr;
 	}
@@ -716,30 +771,40 @@ void setupSMBIOSTable(void)
 	bool setSMB = true;
 
 	if (!origeps)
+	{
 		return;
+	}
 
 	neweps = origeps;
 
 	structPtr = (SMBStructPtrs *)malloc(sizeof(SMBStructPtrs));
 	if (!structPtr)
+	{
 		return;
+	}
 	
 	buffer = malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
+	{
 		return;
+	}
 
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
 
 	getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);
 	if (setSMB)
+	{
 		setDefaultSMBData();
+	}
 
 	setupNewSMBIOSTable(origeps, structPtr);
 
 	neweps = (SMBEntryPoint *)AllocateKernelMemory(sizeof(SMBEntryPoint));
 	if (!neweps)
+	{
 		return;
+	}
 	bzero(neweps, sizeof(SMBEntryPoint));
 
 	neweps->anchor[0]			= '_';
@@ -763,7 +828,9 @@ void setupSMBIOSTable(void)
 	neweps->dmi.bcdRevision		= 0x24;
 
 	if (!neweps->dmi.tableAddress)
+	{
 		return;
+	}
 
 	memcpy((void *)neweps->dmi.tableAddress, buffer, tableLength);
 
@@ -783,7 +850,9 @@ void *getSmbios(int which)
 	{
 		case SMBIOS_ORIGINAL:
 			if (!origeps)
+			{
 				origeps = getAddressOfSmbiosTable();
+			}
 			return origeps;
 		case SMBIOS_PATCHED:
 			return neweps;
@@ -818,9 +887,13 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 			case kSMBTypeMemoryDevice:
 				Platform.DMI.CntMemorySlots++;
 				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
+				{
 					Platform.DMI.MemoryModules++;
+				}
 				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
+				{
 					Platform.RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
+				}
 				dimmnbr++;
 				break;
 		}
@@ -829,7 +902,9 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
 
 		if (((uint16_t *)structPtr)[0] == 0)
+		{
 			structPtr += 2;
+		}
 
 		structHeader = (SMBStructHeader *)structPtr;
 	}

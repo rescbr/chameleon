@@ -258,7 +258,9 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
 		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
+		}
 
 		structHeader = (SMBStructHeader *)ptr;
 	}

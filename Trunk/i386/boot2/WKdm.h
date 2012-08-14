@@ -6,9 +6,8 @@
  *  Paul Wilson -- wilson@cs.utexas.edu
  *  Scott F. Kaplan -- sfkaplan@cs.utexas.edu
  *  September 1997
- */
-
-/* compressed output format, in memory order
+ *
+ *  compressed output format, in memory order
  *  1. a four-word HEADER containing four one-word values:
  *     i.   a one-word code saying what algorithm compressed the data
  *     ii.  an integer WORD offset into the page saying

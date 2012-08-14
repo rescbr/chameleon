@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,9 +18,7 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
  * Copyright 1993 NeXT Computer, Inc.
  * All rights reserved.
  *
@@ -39,7 +36,8 @@
 int zout;
 #endif
 
-typedef struct {
+typedef struct
+{
 	char * start;
 	size_t size;
 } zmem;
@@ -65,7 +63,7 @@ size_t zalloced_size;
 static void malloc_error(char *addr, size_t size, const char *file, int line)
 {
 #ifdef i386
-    asm volatile ("hlt");
+	asm volatile ("hlt");
 #endif
 }
 
@@ -111,7 +109,10 @@ void * safe_malloc(size_t size, const char *file, int line)
 
         if (size == 0)
 	{
-		if (zerror) (*zerror)((char *)0xdeadbeef, 0, file, line);
+		if (zerror)
+		{
+			(*zerror)((char *)0xdeadbeef, 0, file, line);
+        	}
         }
 #if BEST_FIT
 	smallestSize = 0;
@@ -160,7 +161,10 @@ void * safe_malloc(size_t size, const char *file, int line)
 done:
 	if ((ret == 0) || (ret + size >= zalloc_end))
 	{
-		if (zerror) (*zerror)(ret, size, file, line);
+		if (zerror)
+		{
+			(*zerror)(ret, size, file, line);
+		}
 	}
 
 	if (ret != 0)
@@ -191,7 +195,9 @@ void free(void * pointer)
 #endif
 
 	if (!start)
-	return;
+	{
+		return;
+	}
 
 	for (i = 0; i < allocedNodes; i++)
 	{
@@ -212,9 +218,14 @@ void free(void * pointer)
 	}
 	if (!found)
 	{
-		if (zerror) (*zerror)(pointer, rp, "free", 0);
+		if (zerror)
+		{
+			(*zerror)(pointer, rp, "free", 0);
+		}
 		else
-		return;
+		{
+			return;
+		}
 	}
 #if ZDEBUG
         zalloced_size -= tsize;
@@ -241,7 +252,10 @@ void free(void * pointer)
 		{
                         if (++availableNodes > totalNodes)
 			{
-				if (zerror) (*zerror)((char *)0xf000f000, 0, "free", 0);
+				if (zerror)
+				{
+					(*zerror)((char *)0xf000f000, 0, "free", 0);
+				}
 			}
 			zinsert(zavailable, i); 
 			zavailable[i].start = start;
@@ -252,7 +266,10 @@ void free(void * pointer)
 
 	if (++availableNodes > totalNodes)
 	{
-		if (zerror) (*zerror)((char *)0xf000f000, 1, "free", 0);
+		if (zerror)
+		{
+			(*zerror)((char *)0xf000f000, 1, "free", 0);
+		}
 	}
 	zavailable[i].start = start;
 	zavailable[i].size  = tsize;
@@ -274,7 +291,10 @@ static void zallocate(char * start,int size)
 
 	if (++allocedNodes > totalNodes)
 	{
-		if (zerror) (*zerror)((char *)0xf000f000, 2, "zallocate", 0);
+		if (zerror)
+		{
+			(*zerror)((char *)0xf000f000, 2, "zallocate", 0);
+		}
 	};
 }
 

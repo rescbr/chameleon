@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,9 +18,7 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
  * Copyright (c) 1992 NeXT Computer, Inc.
  *
  * IBM PC disk partitioning data structures.
@@ -61,32 +58,35 @@
 /*
  * Format of fdisk partion entry (if present).
  */
-struct fdisk_part {
-    unsigned char    bootid;    /* bootable or not */
-    unsigned char    beghead;   /* begining head, sector, cylinder */
-    unsigned char    begsect;   /* begcyl is a 10-bit number */
-    unsigned char    begcyl;    /* High 2 bits are in begsect */
-    unsigned char    systid;    /* OS type */
-    unsigned char    endhead;   /* ending head, sector, cylinder */
-    unsigned char    endsect;   /* endcyl is a 10-bit number */
-    unsigned char    endcyl;    /* High 2 bits are in endsect */
-    unsigned long    relsect;   /* partion physical offset on disk */
-    unsigned long    numsect;   /* number of sectors in partition */
+struct fdisk_part
+{
+	unsigned char    bootid;    /* bootable or not */
+	unsigned char    beghead;   /* begining head, sector, cylinder */
+	unsigned char    begsect;   /* begcyl is a 10-bit number */
+	unsigned char    begcyl;    /* High 2 bits are in begsect */
+	unsigned char    systid;    /* OS type */
+	unsigned char    endhead;   /* ending head, sector, cylinder */
+	unsigned char    endsect;   /* endcyl is a 10-bit number */
+	unsigned char    endcyl;    /* High 2 bits are in endsect */
+	unsigned long    relsect;   /* partion physical offset on disk */
+	unsigned long    numsect;   /* number of sectors in partition */
 } __attribute__((packed));
 
 /*
  * Format of boot block.
  */
-struct disk_blk0 {
-    unsigned char    bootcode[DISK_BOOTSZ];
-    unsigned char    parts[FDISK_NPART][sizeof (struct fdisk_part)];
-    unsigned short   signature;
+struct disk_blk0
+{
+	unsigned char    bootcode[DISK_BOOTSZ];
+	unsigned char    parts[FDISK_NPART][sizeof (struct fdisk_part)];
+	unsigned short   signature;
 };
 
-struct REAL_disk_blk0 {
-    unsigned char    bootcode[DISK_BOOTSZ];
-    struct fdisk_part    parts[FDISK_NPART];
-    unsigned short   signature;
+struct REAL_disk_blk0
+{
+	unsigned char    bootcode[DISK_BOOTSZ];
+	struct fdisk_part    parts[FDISK_NPART];
+	unsigned short   signature;
 } __attribute__((packed));
 
 #endif /* !__LIBSAIO_FDISK_H */

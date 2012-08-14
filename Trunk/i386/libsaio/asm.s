@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,16 +18,12 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/* 
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
- */
-/*
+ *
  * HISTORY
  * $Log: asm.s,v $
  * Revision 1.8  2005/06/24 22:47:12  curtisg

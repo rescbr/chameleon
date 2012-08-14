@@ -42,51 +42,53 @@ boolean_t tableSign(char *table, const char *sgn)
 /* Gets the ACPI 1.0 RSDP address */
 static struct acpi_2_rsdp* getAddressOfAcpiTable()
 {
-    /* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
-	
-    void *acpi_addr = (void*)ACPI_RANGE_START;
-    for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
-    {
-        if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
-        {
-            uint8_t csum = checksum8(acpi_addr, 20);
-            if(csum == 0)
-            {
-                // Only return the table if it is a true version 1.0 table (Revision 0)
-                if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
-                    return acpi_addr;
-            }
-        }
-    }
-    return NULL;
+	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
+
+	void *acpi_addr = (void*)ACPI_RANGE_START;
+	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
+	{
+		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
+		{
+			uint8_t csum = checksum8(acpi_addr, 20);
+			if(csum == 0)
+			{
+			// Only return the table if it is a true version 1.0 table (Revision 0)
+				if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
+				return acpi_addr;
+			}
+		}
+	}
+	return NULL;
 }
 
 /* Gets the ACPI 2.0 RSDP address */
 static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 {
-    /* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
-	
-    void *acpi_addr = (void*)ACPI_RANGE_START;
-    for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
-    {
-        if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
-        {
-            uint8_t csum = checksum8(acpi_addr, 20);
+	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
-            /* Only assume this is a 2.0 or better table if the revision is greater than 0
-             * NOTE: ACPI 3.0 spec only seems to say that 1.0 tables have revision 1
-             * and that the current revision is 2.. I am going to assume that rev > 0 is 2.0.
-             */
+	void *acpi_addr = (void*)ACPI_RANGE_START;
+	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
+	{
+		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
+		{
+			uint8_t csum = checksum8(acpi_addr, 20);
 
-            if(csum == 0 && (((struct acpi_2_rsdp*)acpi_addr)->Revision > 0))
-            {
-                uint8_t csum2 = checksum8(acpi_addr, sizeof(struct acpi_2_rsdp));
-                if(csum2 == 0)
-                    return acpi_addr;
-            }
-        }
-    }
-    return NULL;
+			/* Only assume this is a 2.0 or better table if the revision is greater than 0
+			 * NOTE: ACPI 3.0 spec only seems to say that 1.0 tables have revision 1
+			 * and that the current revision is 2.. I am going to assume that rev > 0 is 2.0.
+			 */
+
+			if(csum == 0 && (((struct acpi_2_rsdp*)acpi_addr)->Revision > 0))
+			{
+				uint8_t csum2 = checksum8(acpi_addr, sizeof(struct acpi_2_rsdp));
+				if(csum2 == 0)
+				{
+					return acpi_addr;
+				}
+			}
+		}
+	}
+	return NULL;
 }
 
 /* The folowing ACPI Table search algo. should be reused anywhere needed:*/
@@ -94,7 +96,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
 	int fd = 0;
 	char dirSpec[512] = "";
-	
+
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
 	sprintf(dirSpec, "%s", filename); 
@@ -140,7 +142,7 @@ void *loadACPITable (const char * filename)
 				close (fd);
 				return NULL;
 			}
-			
+
 			DBG("Table %s read and stored at: %x\n", dirspec, tableAddr);
 			close (fd);
 			return tableAddr;
@@ -192,12 +194,15 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
 
-                if (acpi_cpu_count == 0)
-                    acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
+				if (acpi_cpu_count == 0)
+					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
 
 				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
-				
-				if (++acpi_cpu_count == 32) return;
+
+				if (++acpi_cpu_count == 32)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -421,20 +426,22 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 		0x00, 0x30, 0x00, 0x00, 0x49, 0x4E, 0x54, 0x4C, /* .0..INTL */
 		0x31, 0x03, 0x10, 0x20,							/* 1.._		*/
 	};
-	
-	if (Platform.CPU.Vendor != 0x756E6547) {
+
+	if (Platform.CPU.Vendor != 0x756E6547)
+	{
 		verbose ("Not an Intel platform: P-States will not be generated !!!\n");
 		return NULL;
 	}
 
-	if (!(Platform.CPU.Features & CPU_FEATURE_MSR)) {
+	if (!(Platform.CPU.Features & CPU_FEATURE_MSR))
+	{
 		verbose ("Unsupported CPU: P-States will not be generated !!! No MSR support\n");
 		return NULL;
 	}
 
 	if (acpi_cpu_count == 0)
 		get_acpi_cpu_names((void*)dsdt, dsdt->Length);
-	
+
 	if (acpi_cpu_count > 0)
 	{
 		struct p_state initial, maximum, minimum, p_states[32];
@@ -580,13 +587,16 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 
 					{
-                        if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN))
-                        {
-				maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
-                        } else {
-				maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
-                        }
-                        minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
+					if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_IVYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN))
+					{
+						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
+					}
+					else
+					{
+						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff;
+					}
+
+					minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 
 						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
 
@@ -626,6 +636,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 
 			struct aml_chunk* root = aml_create_node(NULL);
 				aml_add_buffer(root, ssdt_header, sizeof(ssdt_header)); // SSDT header
+
 					struct aml_chunk* scop = aml_add_scope(root, "\\_PR_");
 						struct aml_chunk* name = aml_add_name(scop, "PSS_");
 							struct aml_chunk* pack = aml_add_package(name);
@@ -682,7 +693,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt)
 {
 	extern void setupSystemType(); 
-	
+
 	struct acpi_2_fadt *fadt_mod;
 	bool fadt_rev2_needed = false;
 	bool fix_restart;
@@ -746,7 +757,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		{
 			// PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
 			Platform.Type = fadt_mod->PM_Profile <= 6 ? fadt_mod->PM_Profile : 1;
-		}  
+		}
 	}
 	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
 	// because we need to take care of facp original content, if it is correct.
@@ -790,7 +801,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
-		
+
 		verbose("FADT: Using custom DSDT!\n");
 	}
 
@@ -872,7 +883,7 @@ int setupAcpi(void)
 			{
 				ssdt_count++;
 			}
-			else 
+			else
 			{
 				break;
 			}
@@ -917,7 +928,7 @@ int setupAcpi(void)
 			uint32_t *rsdt_entries;
 			int rsdt_entries_num;
 			int dropoffset=0, i;
-			
+
 			// mozo: using malloc cos I didn't found how to free already allocated kernel memory
 			rsdt_mod=(struct acpi_2_rsdt *)malloc(rsdt->Length); 
 			memcpy (rsdt_mod, rsdt, rsdt->Length);
@@ -971,7 +982,7 @@ int setupAcpi(void)
 						generate_cstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
-					
+
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 					{
@@ -1163,7 +1174,7 @@ int setupAcpi(void)
 			DBG("New extended checksum %d\n", rsdp_mod->ExtendedChecksum);
 
 		}
-		
+
 		//verbose("Patched ACPI version %d DSDT\n", version+1);
 		if (version)
 		{

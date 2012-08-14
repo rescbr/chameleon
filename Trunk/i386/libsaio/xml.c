@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 2003 Apple Computer, Inc.  All Rights
  * Reserved.  
@@ -19,7 +18,6 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #include "bootstruct.h"

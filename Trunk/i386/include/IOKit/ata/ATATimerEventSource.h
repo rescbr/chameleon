@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2001-2008 Apple Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 1.1 (the
@@ -17,7 +16,6 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #ifndef _ATATIMEREVENTSOURCE_H

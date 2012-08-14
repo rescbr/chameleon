@@ -41,7 +41,9 @@ static void setup_p35(pci_dt_t *dram_dev)
 	// Activate MMR I/O
 	dev0 = pci_config_read32(dram_dev->dev.addr, 0x48);
 	if (!(dev0 & 0x1))
+	{
 		pci_config_write8(dram_dev->dev.addr, 0x48, (dev0 | 1));
+	}
 }
 
 int nhm_bus = 0x3F;
@@ -63,7 +65,9 @@ static void setup_nhm(pci_dt_t *dram_dev)
 		did &= 0xFF00;
 		
 		if(vid == 0x8086 && did >= 0x2C00)
+		{
 			nhm_bus = possible_nhm_bus[i]; 
+		}
 	}
 }
 
@@ -103,17 +107,17 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 	switch (mch_fsb)
 	{
 		case 533:
-			switch ((mch_cfg >> 4) & 7)
+		switch ((mch_cfg >> 4) & 7)
 		{
 			case 1:	mch_ratio = 200000; break;
 			case 2:	mch_ratio = 250000; break;
 			case 3:	mch_ratio = 300000; break;
 		}
-			break;
+		break;
 			
 		default:
 		case 800:
-			switch ((mch_cfg >> 4) & 7)
+		switch ((mch_cfg >> 4) & 7)
 		{
 			case 0:	mch_ratio = 100000; break;
 			case 1:	mch_ratio = 125000; break;
@@ -122,10 +126,10 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 			case 4:	mch_ratio = 266667; break; // 2.666666667
 			case 5:	mch_ratio = 333333; break; // 3.333333333
 		}
-			break;
+		break;
 			
 		case 1066:
-			switch ((mch_cfg >> 4) & 7)
+		switch ((mch_cfg >> 4) & 7)
 		{
 			case 1:	mch_ratio = 100000; break;
 			case 2:	mch_ratio = 125000; break;
@@ -133,27 +137,27 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 			case 4:	mch_ratio = 200000; break;
 			case 5:	mch_ratio = 250000; break;
 		}
-			break;
+		break;
 			
 		case 1333:
-			switch ((mch_cfg >> 4) & 7)
+		switch ((mch_cfg >> 4) & 7)
 		{
 			case 2:	mch_ratio = 100000; break;
 			case 3:	mch_ratio = 120000; break;
 			case 4:	mch_ratio = 160000; break;
 			case 5:	mch_ratio = 200000; break;
 		}
-			break;
+		break;
 			
 		case 1600:
-			switch ((mch_cfg >> 4) & 7)
+		switch ((mch_cfg >> 4) & 7)
 		{
 			case 3:	mch_ratio = 100000; break;
 			case 4:	mch_ratio = 133333; break; // 1.333333333
 			case 5:	mch_ratio = 150000; break;
 			case 6:	mch_ratio = 200000; break;
 		}
-			break;
+		break;
 	}
 	
 	DBG("mch_ratio %d\n", mch_ratio);
@@ -223,7 +227,8 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 			}
 			break;
 		case 1066:
-			switch ((mch_cfg >> 4)&7) {
+			switch ((mch_cfg >> 4)&7)
+			{
 				case 5:	mch_ratio = 150000; break;
 				case 6:	mch_ratio = 200000; break;
 			}
@@ -305,9 +310,13 @@ static void get_timings_i965(pci_dt_t *dram_dev)
 	Platform.RAM.RAS = (Precharge_Register >> 11) & 0x1F;
 	
 	if ((c0ckectrl >> 20 & 0xF) && (c1ckectrl >> 20 & 0xF))
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+	}
 	else
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+	}
 }
 
 // Get im965 Memory Timings
@@ -351,10 +360,14 @@ static void get_timings_im965(pci_dt_t *dram_dev)
 	// RAS Active to precharge (tRAS)
 	Platform.RAM.RAS = (Precharge_Register >> 21) & 0x1F;
 	
-	if ((c0ckectrl >> 20 & 0xF) && (c1ckectrl >> 20 & 0xF)) 
+	if ((c0ckectrl >> 20 & 0xF) && (c1ckectrl >> 20 & 0xF))
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+	}
 	else
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+	}
 }
 
 // Get P35 Memory Timings
@@ -400,29 +413,40 @@ static void get_timings_p35(pci_dt_t *dram_dev)
 	Memory_Check = *ptr & 0xFFFFFFFF;	
 	
 	// On P45, check 1A8
-	if(dram_dev->device_id > 0x2E00) {
+	if(dram_dev->device_id > 0x2E00)
+	{
 		ptr = (long*)(dev0 + offset + 0x1A8);
 		Memory_Check = *ptr & 0xFFFFFFFF;	
 		Memory_Check >>= 2;
 		Memory_Check &= 1;
 		Memory_Check = !Memory_Check;
-	} else {
+	}
+	else
+	{
 		ptr = (long*)(dev0 + offset + 0x1E8);
 		Memory_Check = *ptr & 0xFFFFFFFF;		
 	}
 	
 	// Determine DDR-II or DDR-III
 	if (Memory_Check & 1)
+	{
 		Platform.RAM.Type = SMB_MEM_TYPE_DDR2;
+	}
 	else
+	{
 		Platform.RAM.Type = SMB_MEM_TYPE_DDR3;
-	
+	}
+
 	// CAS Latency (tCAS)
 	if(dram_dev->device_id > 0x2E00)
+	{
 		Platform.RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 6;
+	}
 	else
+	{
 		Platform.RAM.CAS = ((ODT_Control_Register >> 8) & 0x3F) - 9;
-	
+	}
+
 	// RAS-To-CAS (tRCD)
 	Platform.RAM.TRC = (Read_Register >> 17) & 0xF;
 	
@@ -433,10 +457,14 @@ static void get_timings_p35(pci_dt_t *dram_dev)
 	Platform.RAM.RAS = Precharge_Register & 0x3F;
 	
 	// Channel configuration
-	if (((c0ckectrl >> 20) & 0xF) && ((c1ckectrl >> 20) & 0xF)) 
+	if (((c0ckectrl >> 20) & 0xF) && ((c1ckectrl >> 20) & 0xF))
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+	}
 	else
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+	}
 }
 
 // Get Nehalem Memory Timings
@@ -454,12 +482,18 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	
 	// Get the first valid channel
 	if(mc_control & 1)
+	{
 		fvc_bn = 4; 
+	}
 	else if(mc_control & 2)
+	{
 		fvc_bn = 5; 
+	}
 	else if(mc_control & 7) 
+	{
 		fvc_bn = 6; 
-	
+	}
+
 	// Now, detect timings
 	mc_channel_bank_timing = pci_config_read32(PCIADDR(nhm_bus, fvc_bn, 0), 0x88);
 	mc_channel_mrs_value = pci_config_read32(PCIADDR(nhm_bus, fvc_bn, 0), 0x70);
@@ -478,11 +512,17 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 	
 	// Single , Dual or Triple Channels
 	if (mc_control == 1 || mc_control == 2 || mc_control == 4 )
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_SINGLE;
+	}
 	else if (mc_control == 7)
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_TRIPLE;
+	}
 	else
+	{
 		Platform.RAM.Channels = SMB_MEM_CHANNEL_DUAL;
+	}
 }
 
 static struct mem_controller_t dram_controllers[] = {
@@ -534,30 +574,36 @@ void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
 	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
-	if ((dram_controllers[i].vendor == dram_dev->vendor_id) 
-				&& (dram_controllers[i].device == dram_dev->device_id))
+	{
+		if ((dram_controllers[i].vendor == dram_dev->vendor_id) && (dram_controllers[i].device == dram_dev->device_id))
 		{
 			verbose("%s%s DRAM Controller [%4x:%4x] at %02x:%02x.%x\n", 
-						(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
-						dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
-						dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
+				(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
+				dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
+				dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
 			
 			if (dram_controllers[i].initialise != NULL)
+			{
 				dram_controllers[i].initialise(dram_dev);
-							
+			}
+
 			if (dram_controllers[i].poll_timings != NULL)
+			{
 				dram_controllers[i].poll_timings(dram_dev);
-								
+			}
+
 			if (dram_controllers[i].poll_speed != NULL)
+			{
 				dram_controllers[i].poll_speed(dram_dev);
+			}
 
 			verbose("Frequency detected: %d MHz (%d) %s Channel \n\tCAS:%d tRC:%d tRP:%d RAS:%d (%d-%d-%d-%d)\n", 
-						(uint32_t)Platform.RAM.Frequency / 1000000,
-						(uint32_t)Platform.RAM.Frequency / 500000,
-						memory_channel_types[Platform.RAM.Channels]
-					,Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS
-					,Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS
-					);
+				(uint32_t)Platform.RAM.Frequency / 1000000,
+				(uint32_t)Platform.RAM.Frequency / 500000,
+				memory_channel_types[Platform.RAM.Channels],
+				Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS,
+				Platform.RAM.CAS, Platform.RAM.TRC, Platform.RAM.TRP, Platform.RAM.RAS);
 //			getchar();		
-		}	
-}	
+		}
+	}
+}

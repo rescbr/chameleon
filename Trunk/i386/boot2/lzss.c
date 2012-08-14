@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,9 +18,8 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/**************************************************************
+ *
+***************************************************************
  LZSS.C -- A Data Compression Program
 ***************************************************************
     4/6/1989 Haruhiko Okumura
@@ -31,8 +29,8 @@
         NIFTY-Serve PAF01022
         CompuServe  74050,1022
 
-**************************************************************/
-/*
+**************************************************************+
+ *
  *  lzss.c - Package for decompressing lzss compressed objects
  *
  *  Copyright (c) 2003 Apple Computer, Inc.

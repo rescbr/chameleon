@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
@@ -19,14 +18,11 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
  * Copyright 1993 NeXT Computer, Inc.
  * All rights reserved.
- */
-
-/*  Copyright 2007 David Elliott
+ *
+ *  Copyright 2007 David Elliott
     2007-12-30 dfe
     - Enhanced code to normalize segment/offset to huge pointers so that any
       linear address within the first MB of memory can be passed to BIOS
@@ -34,8 +30,8 @@
       next segment and also allows stack variables to be used whereas the
       old code could only operate on static data in the first 64k.
       NOTE: Requires bios.s change to respect DS.
- */
-/*  Copyright 2007 VMware Inc.
+ *
+ *  Copyright 2007 VMware Inc.
     2007-12-29 dfe
     - Added ebiosEjectMedia
  */

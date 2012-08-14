@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1998-2009 Apple Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -18,7 +17,6 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
  */
 
 #ifndef _IOKIT_SCSI_CMDS_MODE_DEFINITIONS_H_

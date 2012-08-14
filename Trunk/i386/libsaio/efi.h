@@ -156,17 +156,17 @@ typedef union
 //
 typedef struct
 {
-  EFI_UINT16  Year;
-  EFI_UINT8   Month;
-  EFI_UINT8   Day;
-  EFI_UINT8   Hour;
-  EFI_UINT8   Minute;
-  EFI_UINT8   Second;
-  EFI_UINT8   Pad1;
-  EFI_UINT32  Nanosecond;
-  EFI_INT16   TimeZone;
-  EFI_UINT8   Daylight;
-  EFI_UINT8   Pad2;
+	EFI_UINT16  Year;
+	EFI_UINT8   Month;
+	EFI_UINT8   Day;
+	EFI_UINT8   Hour;
+	EFI_UINT8   Minute;
+	EFI_UINT8   Second;
+	EFI_UINT8   Pad1;
+	EFI_UINT32  Nanosecond;
+	EFI_INT16   TimeZone;
+	EFI_UINT8   Daylight;
+	EFI_UINT8   Pad2;
 } EFI_TIME;
 
 
@@ -180,22 +180,23 @@ typedef struct
 
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
-typedef enum {
-  EfiReservedMemoryType,
-  EfiLoaderCode,
-  EfiLoaderData,
-  EfiBootServicesCode,
-  EfiBootServicesData,
-  EfiRuntimeServicesCode,
-  EfiRuntimeServicesData,
-  EfiConventionalMemory,
-  EfiUnusableMemory,
-  EfiACPIReclaimMemory,
-  EfiACPIMemoryNVS,
-  EfiMemoryMappedIO,
-  EfiMemoryMappedIOPortSpace,
-  EfiPalCode,
-  EfiMaxMemoryType
+typedef enum
+{
+	EfiReservedMemoryType,
+	EfiLoaderCode,
+	EfiLoaderData,
+	EfiBootServicesCode,
+	EfiBootServicesData,
+	EfiRuntimeServicesCode,
+	EfiRuntimeServicesData,
+	EfiConventionalMemory,
+	EfiUnusableMemory,
+	EfiACPIReclaimMemory,
+	EfiACPIMemoryNVS,
+	EfiMemoryMappedIO,
+	EfiMemoryMappedIOPortSpace,
+	EfiPalCode,
+	EfiMaxMemoryType
 } EFI_MEMORY_TYPE;
 
 typedef struct
@@ -231,13 +232,14 @@ typedef EFI_UINT64  EFI_PHYSICAL_ADDRESS;
 typedef EFI_UINT64  EFI_VIRTUAL_ADDRESS;
 
 #define EFI_MEMORY_DESCRIPTOR_VERSION 1
-typedef struct {
-  EFI_UINT32            Type;
-  EFI_UINT32            Pad;
-  EFI_PHYSICAL_ADDRESS  PhysicalStart;
-  EFI_VIRTUAL_ADDRESS   VirtualStart;
-  EFI_UINT64            NumberOfPages;
-  EFI_UINT64            Attribute;
+typedef struct
+{
+	EFI_UINT32            Type;
+	EFI_UINT32            Pad;
+	EFI_PHYSICAL_ADDRESS  PhysicalStart;
+	EFI_VIRTUAL_ADDRESS   VirtualStart;
+	EFI_UINT64            NumberOfPages;
+	EFI_UINT64            Attribute;
 } __attribute__((aligned(8))) EFI_MEMORY_DESCRIPTOR;
 
 
@@ -303,9 +305,9 @@ EFI_STATUS
 
 typedef struct
 {
-  EFI_UINT32  Resolution;
-  EFI_UINT32  Accuracy;
-  EFI_BOOLEAN SetsToZero;
+	EFI_UINT32  Resolution;
+	EFI_UINT32  Accuracy;
+	EFI_BOOLEAN SetsToZero;
 } __attribute__((aligned(4))) EFI_TIME_CAPABILITIES;
 
 typedef

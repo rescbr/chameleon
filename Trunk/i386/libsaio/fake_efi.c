@@ -92,7 +92,7 @@ Node *gEfiConfigurationTableNode = NULL;
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
-	
+
 	//Azi: as is, cpu's with em64t will use EFI64 on pre 10.6 systems,
 	// wich seems to cause no problem. In case it does, force i386 arch.
 	if (archCpuType == CPU_TYPE_I386)
@@ -103,34 +103,40 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	{
 		i = gST64->NumberOfTableEntries;
 	}
-	
+
 	// We only do adds, not modifications and deletes like InstallConfigurationTable
 	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
+	{
 		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
-	
+	}
+
 	if (pGuid == NULL)
+	{
 		return EFI_INVALID_PARAMETER;
-	
+	}
+
 	if (table != NULL)
 	{
 		// FIXME
 		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorGuid = *pGuid;
 		//((EFI_CONFIGURATION_TABLE_64 *)gST->ConfigurationTable)[i].VendorTable = (EFI_PTR64)table;
-		
+
 		//++gST->NumberOfTableEntries;
-		
+
 		Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
-		
+
 		// Use the pointer to the GUID we just stuffed into the system table
 		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
-		
+
 		// The "table" property is the 32-bit (in our implementation) physical address of the table
 		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
-		
+
 		// Assume the alias pointer is a global or static piece of data
 		if (alias != NULL)
+		{
 			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
-		
+		}
+
 		return EFI_SUCCESS;
 	}
 	return EFI_UNSUPPORTED;
@@ -198,28 +204,28 @@ void setupEfiTables32(void)
 	// exited so we can probably get by with leaving the handles as zero.
 	efiSystemTable->ConsoleInHandle = 0;
 	efiSystemTable->ConIn = 0;
-	
+
 	efiSystemTable->ConsoleOutHandle = 0;
 	efiSystemTable->ConOut = 0;
-	
+
 	efiSystemTable->StandardErrorHandle = 0;
 	efiSystemTable->StdErr = 0;
-	
+
 	efiSystemTable->RuntimeServices = (EFI_PTR32)&fakeEfiPages->efiRuntimeServices;
-	
+
 	// According to the EFI spec, BootServices aren't valid after the
 	// boot process is exited so we can probably do without it.
 	// Apple didn't provide a definition for it in pexpert/i386/efi.h
 	// so I'm guessing they don't use it.
 	efiSystemTable->BootServices = 0;
-	
+
 	efiSystemTable->NumberOfTableEntries = 0;
 	efiSystemTable->ConfigurationTable = (EFI_PTR32)fakeEfiPages->efiConfigurationTable;
-	
+
 	// We're done. Now CRC32 the thing so the kernel will accept it.
 	// Must be initialized to zero before CRC32, done above.
 	gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
-	
+
 	// --------------------------------------------------------------------
 	// Runtime services
 	EFI_RUNTIME_SERVICES_32 *efiRuntimeServices = &fakeEfiPages->efiRuntimeServices;
@@ -228,7 +234,7 @@ void setupEfiTables32(void)
 	efiRuntimeServices->Hdr.HeaderSize = sizeof(EFI_RUNTIME_SERVICES_32);
 	efiRuntimeServices->Hdr.CRC32 = 0;
 	efiRuntimeServices->Hdr.Reserved = 0;
-	
+
 	// There are a number of function pointers in the efiRuntimeServices table.
 	// These are the Foundation (e.g. core) services and are expected to be present on
 	// all EFI-compliant machines.	Some kernel extensions (notably AppleEFIRuntime)
@@ -251,15 +257,15 @@ void setupEfiTables32(void)
 	efiRuntimeServices->SetVariable = (EFI_PTR32)unsupportedret_fp;
 	efiRuntimeServices->GetNextHighMonotonicCount = (EFI_PTR32)unsupportedret_fp;
 	efiRuntimeServices->ResetSystem = (EFI_PTR32)voidret_fp;
-	
+
 	// We're done.	Now CRC32 the thing so the kernel will accept it
 	efiRuntimeServices->Hdr.CRC32 = crc32(0L, efiRuntimeServices, efiRuntimeServices->Hdr.HeaderSize);
-	
+
 	// --------------------------------------------------------------------
 	// Finish filling in the rest of the boot args that we need.
 	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
 	bootArgs->efiMode = kBootArgsEfiMode32;
-	
+
 	// The bootArgs structure as a whole is bzero'd so we don't need to fill in
 	// things like efiRuntimeServices* and what not.
 	//
@@ -278,18 +284,18 @@ void setupEfiTables64(void)
 		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
 		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
 	};
-	
+
 	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
-	
+
 	// Zero out all the tables in case fields are added later
 	bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
-	
+
 	// --------------------------------------------------------------------
 	// Initialize some machine code that will return EFI_UNSUPPORTED for
 	// functions returning int and simply return for void functions.
 	memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
 	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
-	
+
 	// --------------------------------------------------------------------
 	// System table
 	EFI_SYSTEM_TABLE_64 *efiSystemTable = gST64 = &fakeEfiPages->efiSystemTable;
@@ -298,36 +304,36 @@ void setupEfiTables64(void)
 	efiSystemTable->Hdr.HeaderSize = sizeof(EFI_SYSTEM_TABLE_64);
 	efiSystemTable->Hdr.CRC32 = 0; // Initialize to zero and then do CRC32
 	efiSystemTable->Hdr.Reserved = 0;
-	
+
 	efiSystemTable->FirmwareVendor = ptov64((EFI_PTR32)&fakeEfiPages->firmwareVendor);
 	memcpy(fakeEfiPages->firmwareVendor, FIRMWARE_VENDOR, sizeof(FIRMWARE_VENDOR));
 	efiSystemTable->FirmwareRevision = FIRMWARE_REVISION;
-	
+
 	// XXX: We may need to have basic implementations of ConIn/ConOut/StdErr
 	// The EFI spec states that all handles are invalid after boot services have been
 	// exited so we can probably get by with leaving the handles as zero.
 	efiSystemTable->ConsoleInHandle = 0;
 	efiSystemTable->ConIn = 0;
-	
+
 	efiSystemTable->ConsoleOutHandle = 0;
 	efiSystemTable->ConOut = 0;
-	
+
 	efiSystemTable->StandardErrorHandle = 0;
 	efiSystemTable->StdErr = 0;
-	
+
 	efiSystemTable->RuntimeServices = ptov64((EFI_PTR32)&fakeEfiPages->efiRuntimeServices);
 	// According to the EFI spec, BootServices aren't valid after the
 	// boot process is exited so we can probably do without it.
 	// Apple didn't provide a definition for it in pexpert/i386/efi.h
 	// so I'm guessing they don't use it.
 	efiSystemTable->BootServices = 0;
-	
+
 	efiSystemTable->NumberOfTableEntries = 0;
 	efiSystemTable->ConfigurationTable = ptov64((EFI_PTR32)fakeEfiPages->efiConfigurationTable);
-	
+
 	// We're done.	Now CRC32 the thing so the kernel will accept it
 	gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
-	
+
 	// --------------------------------------------------------------------
 	// Runtime services
 	EFI_RUNTIME_SERVICES_64 *efiRuntimeServices = &fakeEfiPages->efiRuntimeServices;
@@ -336,7 +342,7 @@ void setupEfiTables64(void)
 	efiRuntimeServices->Hdr.HeaderSize = sizeof(EFI_RUNTIME_SERVICES_64);
 	efiRuntimeServices->Hdr.CRC32 = 0;
 	efiRuntimeServices->Hdr.Reserved = 0;
-	
+
 	// There are a number of function pointers in the efiRuntimeServices table.
 	// These are the Foundation (e.g. core) services and are expected to be present on
 	// all EFI-compliant machines.	Some kernel extensions (notably AppleEFIRuntime)
@@ -346,7 +352,7 @@ void setupEfiTables64(void)
 	// but it is nice if we can at least prevent a complete crash by
 	// at least providing some sort of implementation until one can be provided
 	// nicely in a kext.
-	
+
 	void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
 	void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
 	efiRuntimeServices->GetTime = ptov64((EFI_PTR32)unsupportedret_fp);
@@ -360,15 +366,15 @@ void setupEfiTables64(void)
 	efiRuntimeServices->SetVariable = ptov64((EFI_PTR32)unsupportedret_fp);
 	efiRuntimeServices->GetNextHighMonotonicCount = ptov64((EFI_PTR32)unsupportedret_fp);
 	efiRuntimeServices->ResetSystem = ptov64((EFI_PTR32)voidret_fp);
-	
+
 	// We're done.	Now CRC32 the thing so the kernel will accept it
 	efiRuntimeServices->Hdr.CRC32 = crc32(0L, efiRuntimeServices, efiRuntimeServices->Hdr.HeaderSize);
-	
+
 	// --------------------------------------------------------------------
 	// Finish filling in the rest of the boot args that we need.
 	bootArgs->efiSystemTable = (uint32_t)efiSystemTable;
 	bootArgs->efiMode = kBootArgsEfiMode64;
-	
+
 	// The bootArgs structure as a whole is bzero'd so we don't need to fill in
 	// things like efiRuntimeServices* and what not.
 	//
@@ -443,12 +449,18 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
 	EFI_CHAR16*	 dst = 0;
 	size_t		 i = 0;
-	
-	if (!key || !(*key) || !len || !src) return 0;
+
+	if (!key || !(*key) || !len || !src)
+	{
+		return 0;
+	}
 	
 	*len = strlen(src);
 	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
-	for (; i < (*len); i++)	 dst[i] = src[i];
+	for (; i < (*len); i++)
+	{
+		dst[i] = src[i];
+	}
 	dst[(*len)] = '\0';
 	*len = ((*len)+1)*2; // return the CHAR16 bufsize including zero terminated CHAR16
 	return dst;
@@ -462,21 +474,28 @@ static	EFI_CHAR8* getSmbiosUUID()
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
 	SMBByte					*p;
-	
+
 	p = (SMBByte*)Platform.UUID;
-	
+
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
 	{
-		if (p[i] != 0x00) isZero = 0;
-		if (p[i] != 0xff) isOnes = 0;
+		if (p[i] != 0x00)
+		{
+			isZero = 0;
+		}
+
+		if (p[i] != 0xff)
+		{
+			isOnes = 0;
+		}
 	}
-	
+
 	if (isZero || isOnes) // empty or setable means: no uuid present
 	{
 		verbose("No UUID present in SMBIOS System Information Table\n");
 		return 0;
 	}
-	
+
 	memcpy(uuid, p, UUID_LEN);
 	return uuid;
 }
@@ -499,9 +518,11 @@ static EFI_CHAR8* getSystemID()
 		sysId = 0;
 	}
 
-	if (!ret) // no bios dmi UUID available, set a fixed value for system-id
+	if (!ret)
+	{
+		// no bios dmi UUID available, set a fixed value for system-id
 		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
-
+	}
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
 	return ret;
 }
@@ -513,7 +534,10 @@ static EFI_CHAR8* getSystemID()
 void setupSystemType()
 {
 	Node *node = DT__FindNode("/", false);
-	if (node == 0) stop("Couldn't get root node");
+	if (node == 0)
+	{
+		stop("Couldn't get root node");
+	}
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
@@ -525,10 +549,13 @@ void setupEfiDeviceTree(void)
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
-	
+
 	node = DT__FindNode("/", false);
 
-	if (node == 0) stop("Couldn't get root node");
+	if (node == 0)
+	{
+		stop("Couldn't get root node");
+	}
 
 	// We could also just do DT__FindNode("/efi/platform", true)
 	// But I think eventually we want to fill stuff in the efi node
@@ -543,7 +570,7 @@ void setupEfiDeviceTree(void)
 	{
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
 	}
-	
+
 	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 
@@ -559,7 +586,7 @@ void setupEfiDeviceTree(void)
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
-		
+
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
 	}
 	else
@@ -579,26 +606,38 @@ void setupEfiDeviceTree(void)
 	// because the DT_AddProperty function does not copy its args.
 
 	if (Platform.CPU.FSBFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
-	
+	}
+
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
 	if (Platform.CPU.TSCFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
+	}
 
 	if (Platform.CPU.CPUFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
+	}
 
 	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
 	if ((ret=getSystemID()))
+	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
+	}
 
 	// Export SystemSerialNumber if present
 	if ((ret16=getSmbiosChar16("SMserial", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
+	}
 
 	// Export Model if present
 	if ((ret16=getSmbiosChar16("SMproductname", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
+	}
 
 	// Fill /efi/device-properties node.
 	setupDeviceProperties(node);
@@ -611,13 +650,16 @@ void setupBoardId()
 {
 	Node *node;
 	node = DT__FindNode("/", false);
-	if (node == 0) {
+	if (node == 0)
+	{
 		stop("Couldn't get root node");
 	}
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
+	{
 		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
-}		
+	}
+}
 
 /*
  * Populate the chosen node
@@ -628,11 +670,15 @@ void setupChosenNode()
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
 	if (chosenNode == 0)
+	{
 		stop("Couldn't get chosen node");
+	}
 
 	int bootUUIDLength = strlen(gBootUUIDString);
 	if (bootUUIDLength)
+	{
 		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
+	}
 }
 
 /*
@@ -644,7 +690,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	const char *override_pathname = NULL;
 	int			len = 0, err = 0;
 	extern void scan_mem();
-	
+
 	// Take in account user overriding
 	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
 	{

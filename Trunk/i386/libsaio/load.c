@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
  * 
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 2.0 (the
@@ -17,9 +16,7 @@
  * License for the specific language governing rights and limitations
  * under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
  *  load.c - Functions for decoding a Mach-o Kernel.
  *
  *  Copyright (c) 1998-2003 Apple Computer, Inc.
@@ -303,15 +300,21 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		}
 
 		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
+		{
 			gHaveKernelCache = true;
-  
-  // Copy from file load area.
-  if (vmsize>0 && filesize>0)
-	bcopy((char *)fileaddr, (char *)vmaddr, vmsize>filesize?filesize:vmsize);
+		}
+
+	// Copy from file load area.
+	if (vmsize>0 && filesize>0)
+	{
+		bcopy((char *)fileaddr, (char *)vmaddr, vmsize>filesize?filesize:vmsize);
+	}
   
 	// Zero space at the end of the segment.
 	if (vmsize > filesize)
-	bzero((char *)(vmaddr + filesize), vmsize - filesize);
+	{
+		bzero((char *)(vmaddr + filesize), vmsize - filesize);
+	}
 
 	*load_addr = vmaddr;
 	*load_size = vmsize;

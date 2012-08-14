@@ -1,8 +1,6 @@
 /*
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_LICENSE_HEADER_START@
- * 
  * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
  * 
  * This file contains Original Code and/or Modifications of Original Code
@@ -20,11 +18,8 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  * 
- * @APPLE_LICENSE_HEADER_END@
- */
-/*	$NetBSD: ntfs.h,v 1.9 1999/10/31 19:45:26 jdolecek Exp $	*/
-
-/*-
+ *	$NetBSD: ntfs.h,v 1.9 1999/10/31 19:45:26 jdolecek Exp $
+ *
  * Copyright (c) 1998, 1999 Semen Ustimenko
  * All rights reserved.
  *
