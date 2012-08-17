@@ -86,7 +86,7 @@ boot: embedded.h machOconv $(OBJS) $(LIBDEP)
 	@echo "\t[LD] boot.sys"
 	@$(BINROOT)/ld_classic -static -segalign 20 -segaddr __INIT $(BOOT2ADDR) -preload \
 	        -arch i386 \
-		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) #-e boot2
+		-o $(SYMROOT)/boot.sys $(filter %.o,$^) $(LIBS) #-e start
 	@echo "\t[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv $(SYMROOT)/boot.sys $(SYMROOT)/boot #&> /dev/null
 	

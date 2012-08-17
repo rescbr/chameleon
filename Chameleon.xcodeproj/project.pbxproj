@@ -9,6 +9,7 @@
 /* Begin PBXFileReference section */
 		AB0E930C14C6223500F798D7 /* cpu_intel_amd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpu_intel_amd.c; sourceTree = "<group>"; };
 		AB22095D15334C9E00AA9851 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		AB3117CF15DBCBDE00DA0817 /* fake_crt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fake_crt.c; sourceTree = "<group>"; };
 		AB42D02115187F2C0078E84A /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		AB42D02215187F2C0078E84A /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
 		AB42D02315187F2C0078E84A /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
@@ -917,6 +918,7 @@
 				AB43B2D414C37E520018D529 /* options.c */,
 				AB43B2D514C37E520018D529 /* options.h */,
 				AB43B2D614C37E520018D529 /* prompt.c */,
+				AB3117CF15DBCBDE00DA0817 /* fake_crt.c */,
 			);
 			path = boot2;
 			sourceTree = "<group>";

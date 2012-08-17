@@ -19,6 +19,7 @@ endif
 # clearly handles it appropriately so I have no idea why Apple omitted it.
 #OMIT_FRAME_POINTER_CFLAG=-fomit-frame-pointer
 OMIT_FRAME_POINTER_CFLAG=
+HAVE_MD = YES
 
 installsrc:: $(SRCROOT)
 	cp $(ALLSRC) $(SRCROOT)
@@ -39,6 +40,8 @@ installhdrs::
 
 .SUFFIXES: .s .i .c .o
 
+ifeq ($(HAVE_MD),YES)
+
 .c.o .m.o:
 	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
 	$(SYMROOT)/md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
@@ -50,6 +53,20 @@ $(OBJROOT)/%.o: %.c
 $(OBJROOT)/%.o: %.m
 	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
 	$(SYMROOT)/md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
+
+else
+
+.c.o .m.o:
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+
+$(OBJROOT)/%.o: %.c
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+
+$(OBJROOT)/%.o: %.m
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o 
+    
+endif
+
 
 # Use GCC or LLVM-GCC for assembly files 
 .s.o:

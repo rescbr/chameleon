@@ -1,4 +1,7 @@
-- Security fixes 
+- Added fake_crt.c to fix a linker issue ... but it still dont work.
+- Added minor changes to makeinc.dir
+
+- Security fixes
 - Added beta support for Xcode 4.4
 
 - Added memory info to the nvidia plist structure, so now one can add several cards to the plist and set a customized name and memory info for each cards
