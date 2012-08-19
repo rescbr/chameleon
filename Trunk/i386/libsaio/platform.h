@@ -42,7 +42,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_XEON_MP		0x1D
 #define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
 #define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
-#define CPU_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
+#define CPU_MODEL_CLARKDALE		0x25			// Clarkdale, Arrandale
 #define CPU_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
 #define CPU_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
 #define CPU_MODEL_JAKETOWN		0x2D			// Sandy Bridge-E, Sandy Bridge-EP

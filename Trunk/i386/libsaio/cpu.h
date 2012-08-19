@@ -41,6 +41,10 @@ extern void scan_cpu(PlatformInfo_t *);
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
 
 // CPUID Values
+
+#define CPUID_MODEL_PRESCOTT		3	// Celeron D, Pentium 4 (90nm)
+#define CPUID_MODEL_NOCONA		4	// Xeon Nocona, Irwindale (90nm)
+#define CPUID_MODEL_PRESLER		6	// Pentium 4, Pentium D (65nm)
 #define CPUID_MODEL_DOTHAN		13	// Dothan
 #define CPUID_MODEL_YONAH		14	// Intel Mobile Core Solo, Duo
 #define CPUID_MODEL_MEROM		15	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
@@ -49,16 +53,18 @@ extern void scan_cpu(PlatformInfo_t *);
 #define CPUID_MODEL_PENRYN		23	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
 #define CPUID_MODEL_WOLFDALE		23
 #define CPUID_MODEL_NEHALEM		26	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-#define CPUID_MODEL_ATOM		28	// Intel Atom (45nm)
+#define CPUID_MODEL_ATOM		28	// Intel Atom (45nm) Pineview, Silverthorne
 #define CPUID_MODEL_XEON_MP		29
-#define CPUID_MODEL_FIELDS		30	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+#define CPUID_MODEL_FIELDS		30	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm),(Clarksfiled, Lynnfield, Jasper Forest)
 #define CPUID_MODEL_DALES		31	// Havendale, Auburndale
-#define CPUID_MODEL_DALES_32NM		37	// Intel Core i3, i5 LGA1156 (32nm)
+#define CPUID_MODEL_CLARKDALE		37	// Intel Core i3, i5 LGA1156 (32nm), (Arrandale, Clarksdale)
+#define CPUID_MODEL_LINCROFT		38	// Intel Atom (45nm) Z6xx (single core)
 #define CPUID_MODEL_SANDYBRIDGE		42	// Intel Core i3, i5, i7 LGA1155 (32nm)
 #define CPUID_MODEL_WESTMERE		44	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-#define CPUID_MODEL_JAKETOWN		45	// Intel Xeon E5 LGA2011 (22nm)
+#define CPUID_MODEL_JAKETOWN		45	// Intel Xeon E5 LGA2011 (32nm), SandyBridge-E, SandyBridge-EN, SandyBridge-EP
 #define CPUID_MODEL_NEHALEM_EX		46	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 #define CPUID_MODEL_WESTMERE_EX		47	// Intel Xeon E7
+#define CPUID_MODEL_CEDARVIEW		54	// Intel Atom (32nm)
 #define CPUID_MODEL_IVYBRIDGE		58	// Intel Core i5, i7 LGA1155 (22nm)
 
 static inline uint64_t rdtsc64(void)

@@ -1508,11 +1508,12 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 					}
 					break;
 
+					default:
 					if (biosdev == gBIOSDev)
 					{
 						gBIOSBootVolume = bvr;
 					}
-
+					break;
 				}
 			}
 

@@ -79,7 +79,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_CLARKDALE:	// Intel Core i3, i5 LGA1156 (32nm)
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
@@ -219,7 +219,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7, Xeon E3-12xx LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
-					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_CLARKDALE:			// Intel Core i3, i5 LGA1156 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 						{
 							value->word = 0x0501;			// Xeon

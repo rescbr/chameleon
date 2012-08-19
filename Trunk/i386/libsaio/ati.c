@@ -1965,6 +1965,7 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
+		verbose("ATI Radeon EVERGREEN family\n");
 		card->flags |= EVERGREEN;
 //		card->ports = 3; //Azi: use the AtiPorts key if needed
 	}

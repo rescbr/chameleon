@@ -422,7 +422,7 @@ void scan_cpu(PlatformInfo_t *p)
 			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM		||
 										  p->CPU.Model == CPU_MODEL_FIELDS	||
 										  p->CPU.Model == CPU_MODEL_DALES	||
-										  p->CPU.Model == CPU_MODEL_DALES_32NM	||
+										  p->CPU.Model == CPU_MODEL_CLARKDALE	||
 										  p->CPU.Model == CPU_MODEL_WESTMERE	||
 										  p->CPU.Model == CPU_MODEL_NEHALEM_EX	||
 										  p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
