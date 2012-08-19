@@ -1461,6 +1461,12 @@
 		B45260B2153EFCE90018E994 /* zh_CN.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_CN.po; sourceTree = "<group>"; };
 		B45260B3153EFCE90018E994 /* zh_TW.po */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zh_TW.po; sourceTree = "<group>"; };
 		B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "po4a-chameleon.cfg"; sourceTree = "<group>"; };
+		B484E1CD15E19F08005E977B /* ld_classic */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ld_classic; sourceTree = "<group>"; };
+		B484E1CE15E19F08005E977B /* ld_classic.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = ld_classic.1; sourceTree = "<group>"; };
+		B484E1E415E19F85005E977B /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; name = Cconfig; path = md/Cconfig; sourceTree = "<group>"; };
+		B484E1E515E19F85005E977B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = md/Makefile; sourceTree = "<group>"; };
+		B484E1E615E19F85005E977B /* md.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; name = md.1; path = md/md.1; sourceTree = "<group>"; };
+		B484E1E715E19F85005E977B /* md.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = md.c; path = md/md.c; sourceTree = "<group>"; };
 		B49234A91571906A00F168C2 /* freebsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = freebsd.c; sourceTree = "<group>"; };
 		B49234AA1571906A00F168C2 /* freebsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = freebsd.h; sourceTree = "<group>"; };
 		B49234AB1571906A00F168C2 /* gma.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
@@ -1571,6 +1577,7 @@
 			children = (
 				B0056D8211F3868000754B65 /* APPLE_LICENSE */,
 				B0056DBA11F3868000754B65 /* artwork */,
+				B484E1CC15E19F08005E977B /* bin */,
 				369689D014BD0AF10013D77F /* BLOCKERS */,
 				369689D114BD0AF10013D77F /* Cconfig */,
 				B0056D8111F3868000754B65 /* CHANGES */,
@@ -3221,6 +3228,7 @@
 				B0056D1611F3868000754B65 /* libsa */,
 				B0056D2411F3868000754B65 /* libsaio */,
 				B0056D7611F3868000754B65 /* Makefile */,
+				B484E1E315E19F6E005E977B /* md */,
 				A3561CAB1414024C00E9B51E /* modules */,
 				B0056D7911F3868000754B65 /* util */,
 			);
@@ -3833,6 +3841,26 @@
 				B45260B3153EFCE90018E994 /* zh_TW.po */,
 			);
 			path = po;
+			sourceTree = "<group>";
+		};
+		B484E1CC15E19F08005E977B /* bin */ = {
+			isa = PBXGroup;
+			children = (
+				B484E1CD15E19F08005E977B /* ld_classic */,
+				B484E1CE15E19F08005E977B /* ld_classic.1 */,
+			);
+			path = bin;
+			sourceTree = "<group>";
+		};
+		B484E1E315E19F6E005E977B /* md */ = {
+			isa = PBXGroup;
+			children = (
+				B484E1E415E19F85005E977B /* Cconfig */,
+				B484E1E515E19F85005E977B /* Makefile */,
+				B484E1E615E19F85005E977B /* md.1 */,
+				B484E1E715E19F85005E977B /* md.c */,
+			);
+			name = md;
 			sourceTree = "<group>";
 		};
 		B4AABE5814C3B8B90055ECD1 /* AddOption */ = {
