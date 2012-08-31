@@ -557,7 +557,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0618,	0x102802A2,	"Dell GeForce GTX 260M" },
 	{ 0x10DE0618,	0x10431A52,	"Asus GeForce GTX 260M" },
 	{ 0x10DE0618,	0x10432028,	"Asus GeForce GTX 170M" },
-	{ 0x10DE0618,	0x1043202B,	"Asus GTX 680" },
+	{ 0x10DE0618,	0x1043202B,	"Asus GeForce GTX 680" },
 	{ 0x10DE0618,	0x10432033,	"Asus GeForce GTX 260M" },
 	{ 0x10DE0618,	0x15580481,	"Clevo/Kapok GeForce GTX 260M" },
 	{ 0x10DE0618,	0x15580577,	"Clevo/Kapok GeForce GTX 260M" },
@@ -571,13 +571,30 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0622,	0x10621432,	"MSi GeForce 9600GT" },
 	// 0630 - 063F
 	// 0640 - 064F
+	{ 0x10DE0640,	0x101910BD,	"Elitegroup GeForge 9500 GT" },
+	{ 0x10DE0640,	0x101910C0,	"Elitegroup GeForge 9500 GT" },
+	{ 0x10DE0640,	0x1043829A,	"Asus GeForge 9500 GT" },
+	{ 0x10DE0640,	0x104382B4,	"Asus GeForge 9500 GT" },
+	{ 0x10DE0640,	0x104382FD,	"Asus GeForge 9500 GT" },
 	{ 0x10DE0640,	0x106B00AD,	"Apple GeForge 9500 GT" },
 	{ 0x10DE0640,	0x106B00B3,	"Apple GeForge 9500 GT" },
 	{ 0x10DE0640,	0x106B061B,	"Apple GeForge 9500 GT" },
+	{ 0x10DE0640,	0x10B01401,	"Gainward GeForge 9500 GT" },
+	{ 0x10DE0640,	0x10DE0551,	"nVidia GeForge 9500 GT" },
+	{ 0x10DE0640,	0x10DE057D,	"nVidia GeForge 9500 GT" },
+	{ 0x10DE0640,	0x10DE0648,	"nVidia GeForge 9500 GT" },
 	{ 0x10DE0640,	0x10DE077F,	"Inno3D GeForge 9500GT HDMI" },
+	{ 0x10DE0640,	0x14583498,	"GigaByte GeForge 9500 GT" },
+	{ 0x10DE0640,	0x145834A9,	"GigaByte GeForge 9500 GT" },
 	{ 0x10DE0640,	0x14621290,	"MSi GeForge 9500 GT" },
 	{ 0x10DE0640,	0x14621291,	"MSi GeForge 9500 GT" },
+	{ 0x10DE0640,	0x14621575,	"MSi GeForge 9500 GT" },
 	{ 0x10DE0640,	0x16423796,	"Bitland GeForge 9500 GT" },
+	{ 0x10DE0640,	0x1682400A,	"XFX GeForge 9500 GT" },
+	{ 0x10DE0640,	0x196E0643,	"PNY GeForge 9500GT" },
+	{ 0x10DE0640,	0x19DA7046,	"Zotac GeForge 9500 GT" },
+	{ 0x10DE0640,	0x1ACC9091,	"Point of View GeForge 9500 GT" },
+	{ 0x10DE0640,	0x3842C958,	"EVGA GeForge 9500 GT" },
 
 	{ 0x10DE0647,	0x106B00A9,	"Apple GeForge 9600M GT" },
 	{ 0x10DE0647,	0x106B00B0,	"Apple GeForge 9600M GT" },
@@ -775,6 +792,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0A20,	0x16423920,	"Bitland GeForce GT 220" },
 
 	{ 0x10DE0A28,	0x10338897,	"NEC GeForce GT 230" },
+	{ 0x10DE0A28,	0x103C1000,	"HP GeForce GT 230" },
 	{ 0x10DE0A28,	0x103C2AA7,	"HP GeForce GT 230" },
 	{ 0x10DE0A28,	0x103C363C,	"HP GeForce GT 230" },
 	{ 0x10DE0A28,	0x103C363E,	"HP GeForce GT 230" },
@@ -1523,7 +1541,9 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1160 - 116F
 	// 1170 - 117F
 	// 1180 - 118F
+	{ 0x10DE1180,	0x00001255,	"Afox GTX 680" },
 	{ 0x10DE1180,	0x104383F0,	"Asus GTX680-2GD5" },
+	{ 0x10DE1180,	0x104383F6,	"Asus GTX 680 Direct CU II" },
 	{ 0x10DE1180,	0x104383F7,	"Asus GTX 680 Direct CU II" },
 	{ 0x10DE1180,	0x10DE0969,	"nVidia GTX 680" },
 	{ 0x10DE1180,	0x10DE097A,	"nVidia GeForce GTX 680" },
@@ -1538,6 +1558,10 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1180,	0x38422680,	"EVGA GTX 680" },
 	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
 
+	{ 0x10DE1183,	0x10DE1000,	"nVidia GTX 660 Ti" },
+	{ 0x10DE1183,	0x14622843,	"MSi GTX 660 Ti" },
+	{ 0x10DE1183,	0x19DA1280,	"Zoac GTX 660 Ti" },
+
 	{ 0x10DE1185,	0x174B2260,	"PC Partner GeForce GTX 660" },
 
 	{ 0x10DE1188,	0x10438406,	"Asus GeForce GTX 690" },
@@ -1547,6 +1571,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1189,	0x10438405,	"Asus GTX 670 Direct CU II TOP" },
 	{ 0x10DE1189,	0x10DE097A,	"nVidia GeForce GTX 670" },
 	{ 0x10DE1189,	0x14583542,	"Gigabyte GeForce GTX 670" },
+	{ 0x10DE1189,	0x14622840,	"MSi GeForce GTX 670" },
 	{ 0x10DE1189,	0x15691189,	"Palit GTX 670 JetStream" },
 	{ 0x10DE1189,	0x174B1260,	"PC Partner GeForce GTX 670" },
 	{ 0x10DE1189,	0x19DA1255,	"Zotac GTX 670 AMP! Edition" },
@@ -1596,12 +1621,14 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1211,	0x15587200,	"Clevo GeForce GTX 580M" },
 
 	{ 0x10DE1212,	0x1028057B,	"Dell GeForce GTX 675M" },
+	{ 0x10DE1212,	0x10DE095D,	"nVidia GeForce GTX 675M" },
 	{ 0x10DE1212,	0x144DC0D0,	"Samsung GeForce GTX 675M" },
 	{ 0x10DE1212,	0x146210CB,	"MSi GeForce GTX 675M" },
 
 	{ 0x10DE1213,	0x102804BA,	"Dell GeForce GTX 670M" },
 	{ 0x10DE1213,	0x10432119,	"Dell GeForce GTX 670M" },
 	{ 0x10DE1213,	0x10432120,	"Dell GeForce GTX 670M" },
+	{ 0x10DE1213,	0x10DE095E,	"nVidia GeForce GTX 670M" },
 	{ 0x10DE1213,	0x1179FB12,	"Toshiba GeForce GTX 670M" },
 	{ 0x10DE1213,	0x1179FB18,	"Toshiba GeForce GTX 670M" },
 	{ 0x10DE1213,	0x1179FB1A,	"Toshiba GeForce GTX 670M" },
@@ -2623,12 +2650,17 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1170 - 117F
 	// 1180 - 118F
 	{ 0x10DE1180,	NV_SUB_IDS,	"GeForce GTX 680" },
+	{ 0x10DE1183,	NV_SUB_IDS,	"GeForce GTX 660 Ti" },
 	{ 0x10DE1185,	NV_SUB_IDS,	"GeForce GTX 660" },
 	{ 0x10DE1188,	NV_SUB_IDS,	"GeForce GTX 690" },
 	{ 0x10DE1189,	NV_SUB_IDS,	"GeForce GTX 670" },
+	{ 0x10DE118F,	NV_SUB_IDS,	"Tesla K10" },
 	// 1190 - 119F
 	// 11A0 - 11AF
 	// 11B0 - 11BF
+	{ 0x10DE11BC,	NV_SUB_IDS,	"Quadro K5000M" },
+	{ 0x10DE11BD,	NV_SUB_IDS,	"Quadro K4000M" },
+	{ 0x10DE11BE,	NV_SUB_IDS,	"Quadro K3000M" },
 	// 11C0 - 11CF
 	// 11D0 - 11DF
 	// 11E0 - 11EF
@@ -2652,7 +2684,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1244,	NV_SUB_IDS,	"GeForce GTX 550 Ti" },
 	{ 0x10DE1245,	NV_SUB_IDS,	"GeForce GTS 450" },
 	{ 0x10DE1246,	NV_SUB_IDS,	"GeForce GTX 550M" },
-	{ 0x10DE1247,	NV_SUB_IDS,	"GeForce GT 635M" },
+	{ 0x10DE1247,	NV_SUB_IDS,	"GeForce GT 635M" }, // 555M ?
 	{ 0x10DE1248,	NV_SUB_IDS,	"GeForce GTX 555M" },
 	{ 0x10DE1249,	NV_SUB_IDS,	"GeForce GTS 450M" }, // no M?
 	{ 0x10DE124B,	NV_SUB_IDS,	"GeForce GT 640" },
@@ -2678,7 +2710,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		printf("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
 		return PATCH_ROM_FAILED;
 	}
-	
+
 	uint16_t dcbptr = READ_LE_SHORT(rom, 0x36);
 
 	if (!dcbptr)
@@ -2689,7 +2721,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 //	else
 //		printf("dcb table at offset 0x%04x\n", dcbptr);
 
-	uint8_t *dcbtable		 = &rom[dcbptr];
+	uint8_t *dcbtable	 = &rom[dcbptr];
 	uint8_t dcbtable_version = dcbtable[0];
 	uint8_t headerlength	 = 0;
 	uint8_t numentries	 = 0;
@@ -2829,7 +2861,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							channel1 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
 
-							if ((entries[i-1].type == 0x0))
+							if (entries[i-1].type == 0x0)
 							{
 								channel1 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
@@ -2848,7 +2880,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 							channel2 |= ( 0x1 << entries[i].index);
 							entries[i].type = TYPE_GROUPED;
 
-							if ((entries[i - 1].type == 0x0))
+							if (entries[i - 1].type == 0x0)
 							{
 								channel2 |= ( 0x1 << entries[i-1].index);
 								entries[i-1].type = TYPE_GROUPED;
@@ -3092,7 +3124,7 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			break;
 	}
 
-	if (!vram_size) 
+	if (!vram_size)
 	{
 		// Finally, if vram_size still not set do the calculation with our own method
 		if (nvCardType < NV_ARCH_50)
@@ -3112,7 +3144,7 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 		}
 	}
-	
+
 	return vram_size;
 }
 
@@ -3325,7 +3357,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->chameleonConfig) && len == NVCAP_LEN * 2)
 	{
 		uint8_t new_NVCAP[NVCAP_LEN];
-		
+
 		if (hex2bin(value, new_NVCAP, NVCAP_LEN) == 0)
 		{
 			verbose("Using user supplied NVCAP for %s :: %s\n", model, devicepath);
@@ -3340,13 +3372,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		if (hex2bin(value, new_dcfg0, DCFG0_LEN) == 0)
 		{
 			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
-			
+
 			verbose("Using user supplied @0,display-cfg\n");
 			printf("@0,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3]);
 		}
 	}
-	
+
 	if (getValueForKey(kDcfg1, &value, &len, &bootInfo->chameleonConfig) && len == DCFG1_LEN * 2)
 	{
 		uint8_t new_dcfg1[DCFG1_LEN];

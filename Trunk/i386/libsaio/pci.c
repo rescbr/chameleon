@@ -92,10 +92,11 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 				continue;
 			}
 			bzero(new, sizeof(pci_dt_t));
+
 			new->dev.addr				= pci_addr;
 			new->vendor_id				= id & 0xffff;
 			new->device_id				= (id >> 16) & 0xffff;
-			new->subsys_id.subsys_id	= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
+			new->subsys_id.subsys_id		= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
 			new->class_id				= pci_config_read16(pci_addr, PCI_CLASS_DEVICE);
 			new->parent	= start;
 

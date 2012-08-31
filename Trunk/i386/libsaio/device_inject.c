@@ -23,11 +23,11 @@
 #define DBG(x...)
 #endif
 
-uint32_t devices_number = 1;
-uint32_t builtin_set = 0;
-struct DevPropString *string = 0;
-uint8_t *stringdata = 0;
-uint32_t stringlength = 0;
+uint32_t devices_number		= 1;
+uint32_t builtin_set		= 0;
+struct DevPropString *string	= 0;
+uint8_t *stringdata		= 0;
+uint32_t stringlength		= 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
@@ -281,6 +281,8 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 
 char *devprop_generate_string(struct DevPropString *string)
 {
+	int i = 0, x = 0;
+
 	char *buffer = (char*)malloc(string->length * 2);
 	char *ptr = buffer;
 	
@@ -292,8 +294,7 @@ char *devprop_generate_string(struct DevPropString *string)
 	sprintf(buffer, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
 			dp_swap16(string->numentries), string->WHAT3);
 	buffer += 24;
-	int i = 0, x = 0;
-	
+
 	while(i < string->numentries)
 	{
 		sprintf(buffer, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
@@ -397,7 +398,9 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
 	if (!string)
+	{
 		string = devprop_create_string();
+	}
 
 	device = devprop_add_device(string, devicepath);
 	if(device)

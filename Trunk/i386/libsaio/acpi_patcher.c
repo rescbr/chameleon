@@ -1,5 +1,6 @@
 /*
  * Copyright 2008 mackerintel
+ * 2010 mojodojo, 2012 slice
  */
 
 #include "libsaio.h"
@@ -891,7 +892,8 @@ int setupAcpi(void)
 	}
 
 	// Do the same procedure for both versions of ACPI
-	for (version=0; version<2; version++) {
+	for (version=0; version<2; version++)
+	{
 		struct acpi_2_rsdp *rsdp, *rsdp_mod;
 		struct acpi_2_rsdt *rsdt, *rsdt_mod;
 		int rsdplength;
@@ -902,9 +904,13 @@ int setupAcpi(void)
 		{
 			DBG("No ACPI version %d found. Ignoring\n", version+1);
 			if (version)
+			{
 				addConfigurationTable(&gEfiAcpi20TableGuid, NULL, "ACPI_20");
+			}
 			else
+			{
 				addConfigurationTable(&gEfiAcpiTableGuid, NULL, "ACPI");
+			}
 			continue;
 		}
 		rsdplength=version?rsdp->Length:20;
@@ -939,7 +945,9 @@ int setupAcpi(void)
 			{
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
+				{
 					continue;
+				}
 
 				DBG("TABLE %c%c%c%c,",table[0],table[1],table[2],table[3]);
 
@@ -955,7 +963,9 @@ int setupAcpi(void)
 					DBG("DSDT found\n");
 
 					if(new_dsdt)
+					{
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+					}
 
 					continue;
 				}
@@ -1057,7 +1067,9 @@ int setupAcpi(void)
 				{
 					char *table=(char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
+					{
 						continue;
+					}
 					xsdt_entries[i-dropoffset]=xsdt_entries[i];
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
@@ -1068,8 +1080,10 @@ int setupAcpi(void)
 					{
 						DBG("DSDT found\n");
 
-						if (new_dsdt) 
+						if (new_dsdt)
+						{
 							xsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+						}
 
 						DBG("TABLE %c%c%c%c@%x,",table[0],table[1],table[2],table[3],xsdt_entries[i]);
 						
