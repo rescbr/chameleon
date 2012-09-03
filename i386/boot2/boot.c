@@ -159,6 +159,17 @@ static int ExecKernel(void *binary)
     int                       ret;
     
     bootArgs->kaddr = bootArgs->ksize = 0;
+		
+	{
+		bool KPRebootOption = false;
+		bool HiDPIOption = false;
+
+		getBoolForKey(kRebootOnPanic, &KPRebootOption, DEFAULT_BOOT_CONFIG);
+		if (KPRebootOption == true) bootArgs->flags |= kBootArgsFlagRebootOnPanic;
+		
+		getBoolForKey(kEnableHiDPI, &HiDPIOption, DEFAULT_BOOT_CONFIG);
+		if (HiDPIOption == true) bootArgs->flags |= kBootArgsFlagHiDPI;
+	}
 	
 	if(((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
 	{
