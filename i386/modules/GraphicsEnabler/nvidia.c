@@ -1624,5 +1624,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
     
+	free(rom);
 	return true;
 }

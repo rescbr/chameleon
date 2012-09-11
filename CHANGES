@@ -1,3 +1,6 @@
+- Security fixes
+- Updated smbus(spd.c) and radeon(ati.c) card list (taken from the last cosmo1t's update)
+
 - Added two boot options for High resolution display and reboot on kernel panic
 
 - Added fake_crt.c to fix a linker issue ... but it still dont work.

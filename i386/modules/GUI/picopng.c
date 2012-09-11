@@ -58,13 +58,6 @@ vector8_t *vector8_new(size_t size, uint8_t value);
 vector8_t *vector8_copy(vector8_t *p);
 
 
-
-
-
-
-
-
-
 png_alloc_node_t *png_alloc_find_node(void *addr)
 {
 	png_alloc_node_t *node;

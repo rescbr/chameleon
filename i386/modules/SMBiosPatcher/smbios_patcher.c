@@ -293,22 +293,6 @@ static uint8_t checksum8( void * start, unsigned int length )
     return csum;
 }
 
-const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
-{
-    int i;
-    
-    for (i=0; sm_defaults[i].key[0]; i++) {
-		if (!strcmp (sm_defaults[i].key, key)) {
-			return sm_defaults[i].value;
-		}
-	}
-    
-    // Shouldn't happen
-    printf ("Error: no default for %s known\n", key);
-    sleep (2);
-    return "";
-}
-
 const char* sm_get_random_productNumber(void)
 {
     static char str[4] = {0x00,0x00,0x00,0x00};
@@ -326,14 +310,14 @@ const char* sm_get_random_productNumber(void)
         // Append all charaters to the string 
         char tmp[2];
         bzero(tmp,sizeof(tmp));
-        snprintf(tmp,sizeof(tmp),"%c",sn_gen_pn_str[rand_sn1]);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn1]);
         strlcpy (str, tmp, sizeof(str));
         
-        snprintf(tmp,sizeof(tmp),"%c",sn_gen_pn_str[rand_sn2]);
-        strcat (str, tmp);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn2]);
+        strlcat (str, tmp, sizeof(str));
         
-        snprintf(tmp,sizeof(tmp),"%c",sn_gen_pn_str[rand_sn3]);
-        strcat (str, tmp);
+        snprintf(tmp, sizeof(tmp),"%c",sn_gen_pn_str[rand_sn3]);
+        strlcat (str, tmp, sizeof(str));
         
         DBG ("fake_productNumber: %s\n",str);
         
@@ -355,10 +339,10 @@ const char* sm_get_random_week(void)
         bzero(tmp,sizeof(tmp));
         
         if (rand_week < 10) {
-            snprintf(tmp,sizeof(tmp),"0%d",rand_week);
+            snprintf(tmp, sizeof(tmp),"0%d",rand_week);
             strlcpy (str, tmp, sizeof(str));
         } else if (rand_week < 100) { // avoid overflow in case random return a number >= 100
-            snprintf(tmp,sizeof(tmp),"%d",rand_week);
+            snprintf(tmp, sizeof(tmp),"%d",rand_week);
             strlcpy (str, tmp, sizeof(str));
         }      
         
@@ -377,13 +361,13 @@ const char* sm_get_random_year(void)
         int rand_year ;
         
         rand_year = arc4random_unirange(0,9);
-        
+		
         // Append all charaters to the string 
         char tmp[2];
         bzero(tmp,sizeof(tmp));
         
         if (rand_year < 10) {
-            snprintf(tmp,sizeof(tmp),"%d",rand_year);
+            snprintf(tmp, sizeof(tmp),"%d",rand_year);
             strlcpy (str, tmp, sizeof(str));
         }
         
@@ -403,13 +387,28 @@ const char* sm_get_random_country(void)
         int rand_country ;
         
         rand_country = arc4random_unirange(0,(sizeof(sm_country_list) / sizeof(sm_country_list[0]))-1);
-        
+		
         strlcpy (str, sm_country_list[rand_country].code,strlen(sm_country_list[rand_country].code)+1);
         
         DBG ("fake_country: %s (%s)\n",str,sm_country_list[rand_country].info);
         
     }
     return str;
+}
+
+const char* sm_search_str(const SMStrEntryPair*	sm_defaults, const char * key)
+{
+    int i;
+    
+    for (i=0; sm_defaults[i].key[0]; i++) {
+		if (!strcmp (sm_defaults[i].key, key)) {
+			return sm_defaults[i].value;
+		}
+	}
+    
+    // Shouldn't happen
+    printf ("Error: no default for %s known\n", key);
+    return "";
 }
 
 const char* sm_get_defstr(const char * key, int table_num)
@@ -545,26 +544,29 @@ const char* sm_get_defstr(const char * key, int table_num)
             getBoolForKey(kSMBIOSRandomSerial, &randomSerial, DEFAULT_BOOT_CONFIG) ;
             
             if ( randomSerial ) // useless
-                strlcpy (fake_serial,sm_get_random_country(), strlen(sm_get_random_country())+1);
-            else
-                strlcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"), strlen(sm_search_str(sm_chosen, "SMserialProductCountry"))+1);
-            
-            if ( randomSerial ) // useless
-                strcat (fake_serial,sm_get_random_year());
-            else
-                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialYear"));
-            
-            if ( randomSerial ) // useless
-                strcat (fake_serial,sm_get_random_week());
-            else
-                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialWeek"));            
-            
-            if ( randomSerial )
-                strcat (fake_serial,sm_get_random_productNumber());
-            else
-                strcat (fake_serial,sm_search_str(sm_chosen, "SMserialProductNumber"));
-            
-            strcat (fake_serial,sm_search_str(sm_chosen, "SMserialModel"));
+				strlcpy (fake_serial,sm_get_random_country(), strlen(sm_get_random_country())+1);
+			else
+				strlcpy (fake_serial,sm_search_str(sm_chosen, "SMserialProductCountry"), strlen(sm_search_str(sm_chosen, "SMserialProductCountry"))+1);
+			
+			if ( randomSerial ) // useless
+				strlcat (fake_serial,sm_get_random_year(),sizeof(fake_serial));
+			else
+				strlcat (fake_serial,sm_search_str(sm_chosen, "SMserialYear"),sizeof(fake_serial));
+			
+			
+			if ( randomSerial ) // useless
+				strlcat(fake_serial,sm_get_random_week(),sizeof(fake_serial));
+			else
+				strlcat (fake_serial,sm_search_str(sm_chosen, "SMserialWeek"),sizeof(fake_serial));            
+			
+			
+			if ( randomSerial )
+				strlcat (fake_serial,sm_get_random_productNumber(),sizeof(fake_serial));
+			else
+				strlcat (fake_serial,sm_search_str(sm_chosen, "SMserialProductNumber"),sizeof(fake_serial));
+			
+			
+			strlcat(fake_serial, sm_search_str(sm_chosen, "SMserialModel"),sizeof(fake_serial));
             
             serial_done = true;
             

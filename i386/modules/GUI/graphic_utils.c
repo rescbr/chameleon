@@ -146,8 +146,8 @@ printVBEModeInfo(void)
 	
   	//bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
-
-    strcpy( (char*)&vbeInfo, "VBE2" );
+	
+	strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
         return;
@@ -204,10 +204,8 @@ char *getVBEModeInfoString(void)
     VBEModeInfoBlock modeInfo;
     int              err;
 	
-  	//bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
-
-    strcpy( (char*)&vbeInfo, "VBE2" );
+	strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
         return 0;
@@ -221,9 +219,7 @@ char *getVBEModeInfoString(void)
     {
         // Get mode information.
 		
-        //bzero( &modeInfo, sizeof(modeInfo) );
         bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
-
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -373,8 +369,8 @@ void drawCheckerBoard(void)
 
 int
 getNumberArrayFromProperty( const char *  propKey,
-                             unsigned long numbers[],
-                             unsigned long maxArrayCount )
+						   unsigned long numbers[],
+						   unsigned long maxArrayCount )
 {
     char * propStr;
     unsigned long    count = 0;
@@ -439,10 +435,10 @@ static void * stosl(void * dst, long val, long len)
 }
 
 void drawColorRectangle( unsigned short x,
-                          unsigned short y,
-                          unsigned short width,
-                          unsigned short height,
-                          unsigned char  colorIndex )
+						unsigned short y,
+						unsigned short width,
+						unsigned short height,
+						unsigned char  colorIndex )
 {
     long   pixelBytes;
     long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
@@ -474,12 +470,12 @@ void drawColorRectangle( unsigned short x,
 
 static unsigned short
 getVESAModeWithProperties( unsigned short     width,
-                            unsigned short     height,
-                            unsigned char      bitsPerPixel,
-                            unsigned short     attributesSet,
-                            unsigned short     attributesClear,
-                            VBEModeInfoBlock * outModeInfo,
-                            unsigned short *   vesaVersion )
+						  unsigned short     height,
+						  unsigned char      bitsPerPixel,
+						  unsigned short     attributesSet,
+						  unsigned short     attributesClear,
+						  VBEModeInfoBlock * outModeInfo,
+						  unsigned short *   vesaVersion )
 {
     VBEInfoBlock     vbeInfo;
     unsigned short * modePtr;
@@ -498,7 +494,7 @@ getVESAModeWithProperties( unsigned short     width,
     //bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
     
-    strcpy( (char*)&vbeInfo, "VBE2" );
+	strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );
     err = getVBEInfo( &vbeInfo );
     if ( err != errSuccess )
     {
@@ -516,9 +512,7 @@ getVESAModeWithProperties( unsigned short     width,
     {
         // Get mode information.
 		
-        //bzero( &modeInfo, sizeof(modeInfo) );
-        bzero( &modeInfo, sizeof(VBEModeInfoBlock) );
-		
+        bzero( &modeInfo, sizeof(VBEModeInfoBlock) );		
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
@@ -589,7 +583,6 @@ getVESAModeWithProperties( unsigned short     width,
 			( modeBitsPerPixel     == bitsPerPixel ) )
         {
             matchedMode = *modePtr;
-            //bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );            
             bcopy( &modeInfo, outModeInfo, sizeof(VBEModeInfoBlock) );
 			
             break;
@@ -637,10 +630,10 @@ setVESATextMode( unsigned short cols,
     if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
     {
         mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
-                                           maColorModeBit |
-                                           maModeIsSupportedBit,
-                                           maGraphicsModeBit,
-                                           &minfo, NULL );
+										 maColorModeBit |
+										 maModeIsSupportedBit,
+										 maGraphicsModeBit,
+										 &minfo, NULL );
     }
 	
     if ( ( mode == modeEndOfList ) || ( setVBEMode(mode, NULL) != errSuccess ) )
@@ -686,10 +679,10 @@ setVideoMode( int mode)
 			if (get_env(envgVerboseMode)) {
 				// Tell the kernel to use text mode on a linear frame buffer display
                 setBootArgsVideoMode(FB_TEXT_MODE);
-
+				
 			} else {
                 setBootArgsVideoMode(GRAPHICS_MODE);
-
+				
 			}
 		}
     }
@@ -706,7 +699,7 @@ setVideoMode( int mode)
 		setVESATextMode( params[0], params[1], 4 );
         setBootArgsVideoMode(VGA_TEXT_MODE);
     }
-
+	
 }
 
 //==========================================================================
@@ -850,12 +843,12 @@ void getGraphicModeParams(unsigned long params[]) {
 	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
 	
 	/* mode = */getVESAModeWithProperties( params[0], params[1], params[2],
-									 maColorModeBit             |
-									 maModeIsSupportedBit       |
-									 maGraphicsModeBit          |
-									 maLinearFrameBufferAvailBit,
-									 0,
-									 &minfo, &vesaVersion );
+										  maColorModeBit             |
+										  maModeIsSupportedBit       |
+										  maGraphicsModeBit          |
+										  maLinearFrameBufferAvailBit,
+										  0,
+										  &minfo, &vesaVersion );
 	
 	params[0] = minfo.XResolution;
 	params[1] = minfo.YResolution;
@@ -873,10 +866,9 @@ char *getVBEInfoString(void)
 	char *buff = malloc(sizeof(char)*256);
 	if(!buff) return 0;
 	
-	//bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
-
-	strcpy( (char*)&vbeInfo, "VBE2" );
+	
+	strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)
 		goto error;
@@ -887,11 +879,11 @@ char *getVBEInfoString(void)
 	small = (vbeInfo.TotalMemory < 16);
 	
 	snprintf(buff, sizeof(char)*256,"VESA v%d.%d %d%s (%s)\n",
-			vbeInfo.VESAVersion >> 8,
-			vbeInfo.VESAVersion & 0xf,
-			small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
-			small ? "KB" : "MB",
-			VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
+			 vbeInfo.VESAVersion >> 8,
+			 vbeInfo.VESAVersion & 0xf,
+			 small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
+			 small ? "KB" : "MB",
+			 VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
 	
 	return buff;
 error:

@@ -94,10 +94,10 @@ static int GUI_updateMenu( int key, void ** paramPtr );
 static void GUI_showHelp(void);
 static void GUI_showMessage(char *message);
 /*
-int GUI_printf(const char * fmt, ...);
-int GUI_verbose(const char * fmt, ...);
-void GUI_stop(const char * fmt, ...);
-*/
+ int GUI_printf(const char * fmt, ...);
+ int GUI_verbose(const char * fmt, ...);
+ void GUI_stop(const char * fmt, ...);
+ */
 int
 GUI_reallyVPrint(const char *format, va_list ap, int flag);
 
@@ -509,7 +509,7 @@ static void GUI_showMenu( const MenuItem * items, int count,
     int         i;
     CursorState cursorState;
 	cursorState.x = cursorState.y = cursorState.type=0;
-
+	
     if ( items == NULL || count == 0 ) 
 		return;
 	
@@ -673,7 +673,7 @@ void GUI_addBootArg(const char * argStr)
 	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
 	{
 		*gBootArgsPtr++ = ' ';
-		strcat(gBootArgs, argStr);
+		strlcat(gBootArgs, argStr, BOOT_STRING_LEN);
 		gBootArgsPtr += strlen(argStr);
 	}
 }
@@ -696,7 +696,7 @@ int GUI_getBootOptions(bool firstRun)
 	// Initialize default menu selection entry.
 	menuBVR = selectBootVolume(getBvChain());
 	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
-
+	
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev)))
 	{
 		isCDROM = true;
@@ -1117,7 +1117,7 @@ int GUI_getBootOptions(bool firstRun)
                 scanDisks();
 #endif
 				safe_set_env(envgBootVolume, (uint32_t)NULL);
-
+				
 				GUI_clearBootArgs();
 				break;
 				
