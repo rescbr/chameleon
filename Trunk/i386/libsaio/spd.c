@@ -287,8 +287,8 @@ int mapping []= {0,2,1,3,4,6,5,7,8,10,9,11};
 /* Read from smbus the SPD content and interpret it for detecting memory attributes */
 static void read_smb_intel(pci_dt_t *smbus_dev)
 { 
-	int        i, speed;
-	uint8_t    spd_size, spd_type;
+	uint16_t   speed;
+	uint8_t    i, spd_size, spd_type;
 	uint32_t   base, mmio, hostc;
 //	bool       dump = false;
 	RamSlotInfo_t*  slot;

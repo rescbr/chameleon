@@ -107,7 +107,8 @@ Options useful in the org.chameleon.Boot.plist file:
 
   DropSSDT=Yes              Skip the SSDT tables while relocating the ACPI tables.
   DSDT=<file>               Use an alternate DSDT.aml file 
-                              (default path: /DSDT.aml /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
+                              (default path: /DSDT.aml
+                               /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
 
   GenerateCStates=Yes     Enable auto generation of processor idle sleep states
                             (C-States).

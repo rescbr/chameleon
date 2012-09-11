@@ -23,6 +23,9 @@ fi
 set -u  # Abort with unset variables
 #set -e # Abort with any error can be suppressed locally using EITHER cmd||true OR set -e;cmd;set +e
 
+export LC_COLLATE='C'
+export LC_CTYPE='C'
+
 # ====== CONFIGURATION ======
 CONFIG_MODULES=""
 CONFIG_KLIBC_MODULE=""

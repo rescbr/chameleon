@@ -99,6 +99,7 @@
 		36AB75E814BD095E005B8045 /* PowerManagement.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PowerManagement.txt; path = OptionalSettings/PowerManagement.txt; sourceTree = "<group>"; };
 		36AB75E914BD095E005B8045 /* Resolution.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Resolution.txt; path = OptionalSettings/Resolution.txt; sourceTree = "<group>"; };
 		36AB75EA14BD095E005B8045 /* Video.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Video.txt; path = OptionalSettings/Video.txt; sourceTree = "<group>"; };
+		36B0F58515FD7E95009E3EF4 /* bootargs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
 		65ED53931204B83200B22507 /* disk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = disk.h; sourceTree = "<group>"; };
 		6DBAFD1313B0D21E0047ED33 /* modules_support.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = modules_support.s; sourceTree = "<group>"; };
 		6DBAFD1413B0D21E0047ED33 /* modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = modules.c; sourceTree = "<group>"; };
@@ -1463,10 +1464,6 @@
 		B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "po4a-chameleon.cfg"; sourceTree = "<group>"; };
 		B484E1CD15E19F08005E977B /* ld_classic */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ld_classic; sourceTree = "<group>"; };
 		B484E1CE15E19F08005E977B /* ld_classic.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = ld_classic.1; sourceTree = "<group>"; };
-		B484E1E415E19F85005E977B /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; name = Cconfig; path = md/Cconfig; sourceTree = "<group>"; };
-		B484E1E515E19F85005E977B /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = md/Makefile; sourceTree = "<group>"; };
-		B484E1E615E19F85005E977B /* md.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; name = md.1; path = md/md.1; sourceTree = "<group>"; };
-		B484E1E715E19F85005E977B /* md.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = md.c; path = md/md.c; sourceTree = "<group>"; };
 		B49234A91571906A00F168C2 /* freebsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = freebsd.c; sourceTree = "<group>"; };
 		B49234AA1571906A00F168C2 /* freebsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = freebsd.h; sourceTree = "<group>"; };
 		B49234AB1571906A00F168C2 /* gma.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
@@ -3228,7 +3225,6 @@
 				B0056D1611F3868000754B65 /* libsa */,
 				B0056D2411F3868000754B65 /* libsaio */,
 				B0056D7611F3868000754B65 /* Makefile */,
-				B484E1E315E19F6E005E977B /* md */,
 				A3561CAB1414024C00E9B51E /* modules */,
 				B0056D7911F3868000754B65 /* util */,
 			);
@@ -3358,6 +3354,7 @@
 				B0056D2C11F3868000754B65 /* bios.h */,
 				B0056D2D11F3868000754B65 /* bios.s */,
 				B0056D2E11F3868000754B65 /* biosfn.c */,
+				36B0F58515FD7E95009E3EF4 /* bootargs.h */,
 				B0056D2F11F3868000754B65 /* bootstruct.c */,
 				B0056D3011F3868000754B65 /* bootstruct.h */,
 				B0056D3111F3868000754B65 /* cache.c */,
@@ -3852,17 +3849,6 @@
 			path = bin;
 			sourceTree = "<group>";
 		};
-		B484E1E315E19F6E005E977B /* md */ = {
-			isa = PBXGroup;
-			children = (
-				B484E1E415E19F85005E977B /* Cconfig */,
-				B484E1E515E19F85005E977B /* Makefile */,
-				B484E1E615E19F85005E977B /* md.1 */,
-				B484E1E715E19F85005E977B /* md.c */,
-			);
-			name = md;
-			sourceTree = "<group>";
-		};
 		B4AABE5814C3B8B90055ECD1 /* AddOption */ = {
 			isa = PBXGroup;
 			children = (
@@ -4292,7 +4278,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0440;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -5106,6 +5092,7 @@
 		1DEB919008733D9F0010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -5120,6 +5107,7 @@
 		1DEB919108733D9F0010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";

@@ -233,8 +233,6 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x94C1,	0x11101462, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 XT",                kNull		},
 
 	{ 0x94C3,	0x03421002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
-	{ 0x94C3,	0x94C31002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
-
 	{ 0x94C3,	0x01011A93, CHIP_FAMILY_RV610,		"Qimonda Radeon HD 2400 PRO",			kNull		},
 	{ 0x94C3,	0x03021028, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
 	{ 0x94C3,	0x03421002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
@@ -256,6 +254,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x94C3,	0x3000174B, CHIP_FAMILY_RV610,		"ATI Radeon HD 2350",                   kNull		},
 	{ 0x94C3,	0x30001787, CHIP_FAMILY_RV610,		"ATI Radeon HD 2350",                   kNull		},
 	{ 0x94C3,	0x37161642, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
+	{ 0x94C3,	0x94C31002, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
 	{ 0x94C3,	0xE370174B, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
 	{ 0x94C3,	0xE400174B, CHIP_FAMILY_RV610,		"ATI Radeon HD 2400 PRO",               kNull		},
 
@@ -488,6 +487,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68BA,	0x31531682, CHIP_FAMILY_JUNIPER,	"AMD Radeon HD 6770",                   kVervet		},
 	{ 0x68BA,	0xE144174B, CHIP_FAMILY_JUNIPER,	"AMD Radeon HD 6770",                   kVervet		},
 
+	{ 0x68BE,	0x200A1787, CHIP_FAMILY_JUNIPER,	"HIS ATI 5750",                   kVervet		},
 	{ 0x68BE,	0x22881787, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 5750",                   kVervet		},
 	{ 0x68BE,	0x3000148C, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750",                   kNull		},
 	{ 0x68BE,	0x3000174B, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750",                   kNull		},
@@ -523,6 +523,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68C1,	0x042E1025, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kNull		},
 	{ 0x68C1,	0x042F1025, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kNull		},
 	{ 0x68C1,	0x9071104D, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
+	{ 0x68C1,	0x1449103C, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
 	{ 0x68C1,	0xFD001179, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
 	{ 0x68C1,	0xFD121179, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
 	{ 0x68C1,	0xFD501179, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5650",			kEulemur	},
@@ -630,11 +631,11 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x00021019, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x00191019, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
 	{ 0x68F9,	0x010E1002, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
+	{ 0x68F9,	0x010E1028, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x03741043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x03CA1043, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x05181025, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x05191025, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
-	{ 0x68F9,	0x010E1028, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x174B3000, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6230",                   kNull		},
 	{ 0x68F9,	0x174B6250, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6250",                   kNull		},
 	{ 0x68F9,	0x174B6290, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6290",                   kNull		},
@@ -668,6 +669,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x301217AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5490",                   kNull		},
 	{ 0x68F9,	0x301317AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5470",                   kNull		},
 	{ 0x68F9,	0x301417AF, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 6350",                   kNull		},
+	{ 0x68F9,	0x30321682, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",			kEulemur	},
+	{ 0x68F9,	0x303A1682, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",			kEulemur	},
 	{ 0x68F9,	0x3580103C, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kNull		},
 	{ 0x68F9,	0x360217AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
 	{ 0x68F9,	0x360317AA, CHIP_FAMILY_CEDAR,		"ATI Radeon HD 5450",                   kEulemur	},
@@ -789,6 +792,7 @@ static radeon_card_info_t radeon_cards[] = {
  	{ 0x6741,	0x9080104D, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6630M",                  kNull		},
 
 	{ 0x6758,	0x00121028, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
+	{ 0x6758,	0x0B0E1002, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kPithecia	},
 	{ 0x6758,	0x0B0E1028, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},
 	{ 0x6758,	0x20121787, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kPithecia	},
 	{ 0x6758,	0x20141787, CHIP_FAMILY_TURKS,		"AMD Radeon HD 6670",                   kBulrushes	},

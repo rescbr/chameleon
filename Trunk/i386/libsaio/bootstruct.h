@@ -42,7 +42,6 @@ extern Node *gMemoryMapNode;
 //#define FB_TEXT_MODE          2
 
 
-
 /*
  * Maximum number of boot drivers that can be loaded.
  */

@@ -1547,16 +1547,25 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1180,	0x104383F7,	"Asus GTX 680 Direct CU II" },
 	{ 0x10DE1180,	0x10DE0969,	"nVidia GTX 680" },
 	{ 0x10DE1180,	0x10DE097A,	"nVidia GeForce GTX 680" },
-	{ 0x10DE1180,	0x118010B0,	"Gainward GTX 680" },
+	{ 0x10DE1180,	0x10B01180,	"Gainward GTX 680" },
 	{ 0x10DE1180,	0x1458353C,	"GV-N680OC-2GD WindForce GTX 680 OC" },
+	{ 0x10DE1180,	0x14622820,	"MSi N680GTX TwinFrozer" },
 	{ 0x10DE1180,	0x14622830,	"MSi GTX 680 Lightning" },
+	{ 0x10DE1180,	0x14622831,	"MSi GTX 680 Lightning LN2" },
 	{ 0x10DE1180,	0x15691180,	"Palit GTX 680 JetStream" },
+	{ 0x10DE1180,	0x15691181,	"Palit GTX 680 JetStream" },
 	{ 0x10DE1180,	0x15691189,	"Palit GTX 680 JetStream" },
 	{ 0x10DE1180,	0x174B1255,	"PC Partner GeForce GTX 680" },
+	{ 0x10DE1180,	0x196E0969,	"PNY GTX 680" },
 	{ 0x10DE1180,	0x19DA1255,	"Zotac GTX 680" },
+	{ 0x10DE1180,	0x19DA1260,	"Zotac GTX680" },
+	{ 0x10DE1180,	0x1ACC684A,	"Point of View GTX 680" },
 	{ 0x10DE1180,	0x38421582,	"EVGA GTX 680" },
 	{ 0x10DE1180,	0x38422680,	"EVGA GTX 680" },
 	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
+	{ 0x10DE1180,	0x38422683,	"EVGA GTX 680 SC" },
+	{ 0x10DE1180,	0x38422686,	"EVGA GTX 680" },
+	{ 0x10DE1180,	0x38422689,	"EVGA GTX 680" },
 
 	{ 0x10DE1183,	0x10DE1000,	"nVidia GTX 660 Ti" },
 	{ 0x10DE1183,	0x14622843,	"MSi GTX 660 Ti" },
@@ -1580,6 +1589,17 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1190 - 119F
 	// 11A0 - 11AF
 	// 11B0 - 11BF
+	{ 0x10DE11BC,	0x1028053F,	"Dell Quadro K5000M" },
+	{ 0x10DE11BC,	0x1028153F,	"Dell Quadro K5000M" },
+	{ 0x10DE11BC,	0x10CF1762,	"Fujitsu Quadro K5000M" },
+	{ 0x10DE11BC,	0x15580270,	"Clevo Quadro K5000M" },
+	{ 0x10DE11BC,	0x15580371,	"Clevo Quadro K5000M" },
+
+	{ 0x10DE11BD,	0x10CF1761,	"Fujitsu Quadro K4000M" },
+
+	{ 0x10DE11BE,	0x10CF1760,	"Fujitsu Quadro K3000M" },
+	{ 0x10DE11BE,	0x15585105,	"Clevo Quadro K3000M" },
+	{ 0x10DE11BE,	0x15587102,	"Clevo Quadro K3000M" },
 	// 11C0 - 11CF
 	// 11D0 - 11DF
 	// 11E0 - 11EF
@@ -1601,6 +1621,8 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1201,	0x14622383,	"MSi GeForce GTX 560" },
 
 	{ 0x10DE1206,	0x10DE0958,	"nVidia GeForce GTX 555" },
+
+	{ 0x10DE1207,	0x174B0645,	"PC Partner GeForce GT 645" },
 
 	{ 0x10DE1210,	0x10431487,	"Asus GeForce GTX 570M" },
 	{ 0x10DE1210,	0x10432104,	"Asus GeForce GTX 570M" },
@@ -2811,7 +2833,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 	
 	int has_lvds = false;
 	uint8_t channel1 = 0, channel2 = 0;
-	
+
 	for (i = 0; i < num_outputs; i++)
 	{
 		if (entries[i].type == 3)
@@ -3430,5 +3452,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 
+	free(rom);
 	return true;
 }

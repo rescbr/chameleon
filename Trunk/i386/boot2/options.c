@@ -210,21 +210,31 @@ static void showBootPrompt(int row, bool visible)
 		clearScreenRows( row, kScreenLastRow );
 	}
 
-	//clearBootArgs();
+	clearBootArgs();
 
-	if (visible) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			if (gEnableCDROMRescan) {
+	if (visible)
+	{
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			if (gEnableCDROMRescan)
+			{
 				printf( bootRescanPrompt );
-			} else {
+			}
+			else
+			{
 				printf( bootPrompt );
-                printf( gBootArgs );
+				printf( gBootArgs );
 			}
 		}
-	} else {
-		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
-//			clearGraphicBootPrompt();
-		} else {
+	}
+	else
+	{
+		if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+		{
+			clearGraphicBootPrompt();
+		}
+		else
+		{
 			printf("Press Enter to start up the foreign OS. ");
 		}
 	}
@@ -1130,46 +1140,43 @@ processBootArgument(
 // Maximum config table value size
 #define VALUE_SIZE 2048
 
-int
-processBootOptions()
+int processBootOptions()
 {
-    const char *cp  = gBootArgs;
-    const char *val = 0;
-    const char *kernel;
-    int         cnt;
-    int         userCnt;
-    int         cntRemaining;
-    char       *argP;
-    char       *configKernelFlags;
-    char       *valueBuffer;
+	const char *cp  = gBootArgs;
+	const char *val = 0;
+	const char *kernel;
+	int         cnt;
+	int         userCnt;
+	int         cntRemaining;
+	char       *argP;
+	char       *configKernelFlags;
+	char       *valueBuffer;
 
-    valueBuffer = malloc(VALUE_SIZE);
+	valueBuffer = malloc(VALUE_SIZE);
     
-    skipblanks( &cp );
+	skipblanks( &cp );
 
-    // Update the unit and partition number.
+	// Update the unit and partition number.
 
-    if ( gBootVolume )
-    {
-        if (!( gBootVolume->flags & kBVFlagNativeBoot ))
-        {
-            readBootSector( gBootVolume->biosdev, gBootVolume->part_boff,
-                            (void *) 0x7c00 );
+	if ( gBootVolume )
+	{
+		if (!( gBootVolume->flags & kBVFlagNativeBoot ))
+		{
+			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
+			//
+			// Setup edx, and signal intention to chain load the
+			// foreign booter.
+			// 
 
-            //
-            // Setup edx, and signal intention to chain load the
-            // foreign booter.
-            //
+			chainbootdev  = gBootVolume->biosdev;
+			chainbootflag = 1;
 
-            chainbootdev  = gBootVolume->biosdev;
-            chainbootflag = 1;
+			return 1;
+		}
 
-            return 1;
-        }
+		setRootVolume(gBootVolume);
 
-        setRootVolume(gBootVolume);
-
-    }
+	}
     // If no boot volume fail immediately because we're just going to fail
     // trying to load the config file anyway.
     else
@@ -1345,19 +1352,22 @@ void showTextBuffer(char *buf_orig, int size)
 	int	line_offset;
 	int	c;
 
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		showInfoBox( "Press q to continue, space for next page.\n",buf_orig );
 		return;
 	}
 
-		// Create a copy so that we don't mangle the original
-		buf = malloc(size + 1);
-		memcpy(buf, buf_orig, size);
+	// Create a copy so that we don't mangle the original
+	buf = malloc(size + 1);
+	memcpy(buf, buf_orig, size);
 	
 
         bp = buf;
-        while (size-- > 0) {
-		if (*bp == '\n') {
+        while (size-- > 0)
+	{
+		if (*bp == '\n')
+		{
 			*bp = '\0';
 		}
 		bp++;
@@ -1367,43 +1377,57 @@ void showTextBuffer(char *buf_orig, int size)
 
         setActiveDisplayPage(1);
 
-        while (1) {
+        while (1)
+	{
 		clearScreenRows(0, 24);
 		setCursorPosition(0, 0, 1);
 		bp = buf;
-		for (line = 0; *bp != '\1' && line < line_offset; line++) {
-			while (*bp != '\0') {
+		for (line = 0; *bp != '\1' && line < line_offset; line++)
+		{
+			while (*bp != '\0')
+			{
 				bp++;
 			}
 			bp++;
 		}
-		for (line = 0; *bp != '\1' && line < 23; line++) {
+		for (line = 0; *bp != '\1' && line < 23; line++)
+		{
 			setCursorPosition(0, line, 1);
 			printf("%s\n", bp);
-			while (*bp != '\0') {
+			while (*bp != '\0')
+			{
 				bp++;
 			}
 			bp++;
 		}
 
 		setCursorPosition(0, 23, 1);
-		if (*bp == '\1') {
+		if (*bp == '\1')
+		{
 			printf("[Type %sq or space to quit viewer]", (line_offset > 0) ? "p for previous page, " : "");
-		} else {
+		}
+		else
+		{
 			printf("[Type %s%sq to quit viewer]", (line_offset > 0) ? "p for previous page, " : "", (*bp != '\1') ? "space for next page, " : "");
 		}
 
 		c = getchar();
-		if (c == 'q' || c == 'Q') {
+		if (c == 'q' || c == 'Q')
+		{
 			break;
 		}
-		if ((c == 'p' || c == 'P') && line_offset > 0) {
+		if ((c == 'p' || c == 'P') && line_offset > 0)
+		{
 			line_offset -= 23;
 		}
-		if (c == ' ') {
-			if (*bp == '\1') {
+		if (c == ' ')
+		{
+			if (*bp == '\1')
+			{
 				break;
-			} else {
+			}
+			else
+			{
 				line_offset += 23;
 			}
 		}
@@ -1413,9 +1437,12 @@ void showTextBuffer(char *buf_orig, int size)
 
 void showHelp(void)
 {
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
-	} else {
+	}
+	else
+	{
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
 	}
 }
@@ -1427,14 +1454,16 @@ void showTextFile(const char * filename)
 	int	fd;
 	int	size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
         size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+        if (size > MAX_TEXT_FILE_SIZE)
+	{
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
@@ -1461,9 +1490,11 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (ASCII_KEY(key)) {
+		switch (ASCII_KEY(key))
+		{
 		case KEY_BKSP:
-			if (digitsI > 0) {
+			if (digitsI > 0)
+			{
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
 				// Assume x is not 0;
@@ -1472,7 +1503,9 @@ int selectAlternateBootDevice(int bootdevice)
 				// Overwrite with space without moving cursor position
 				putca(' ', 0x07, 1);
 				digitsI--;
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1480,25 +1513,33 @@ int selectAlternateBootDevice(int bootdevice)
 		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
-			if (end == digits && *end == '\0') {
+			if (end == digits && *end == '\0')
+			{
 				// User entered empty string
 				printf("\nUsing default boot device %x\n", bootdevice);
 				key = 0;
-			} else if(end != digits && *end == '\0') {
+			}
+			else if(end != digits && *end == '\0')
+			{
 				bootdevice = newbootdevice;
 				printf("\n");
 				key = 0; // We gots da boot device
-			} else {
+			}
+			else
+			{
 				printf("\nCouldn't parse. try again: ");
 				digitsI = 0;
 			}
 			break;
 
 		default:
-			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2)
+			{
 				putchar(ASCII_KEY(key));
 				digits[digitsI++] = ASCII_KEY(key);
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1511,9 +1552,12 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == KEY_ENTER) {
+	if (getchar() == KEY_ENTER)
+	{
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }

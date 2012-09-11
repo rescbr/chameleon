@@ -163,6 +163,10 @@
 /* cosmo1: added these keys */
 #define kEnableHDMIAudio	"EnableHDMIAudio"	/*ati.c && nvidia.c */
 
+/* cparm: added these keys */
+#define kRebootOnPanic		"RebootOnPanic"
+#define kEnableHiDPI		"EnableHiDPI"		// enable High resolution display (aka Retina)
+
 /*
  * Flags to the booter or kernel
  */

@@ -51,9 +51,9 @@ echo -e $COL_BLACK"	Building $VOLUME_NAME DMG"$COL_RESET
 echo -e $COL_BLACK"	----------------------"$COL_RESET
 echo ""
 
-# =================================
+# ==================================
 # 1) Clean previous builded contents
-# =================================
+# ==================================
 
 	if [ -x ${SRC_FOLDER} ]; then
 		echo "	Deleting previous existing source folder/content "

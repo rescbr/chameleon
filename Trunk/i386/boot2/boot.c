@@ -123,8 +123,25 @@ static int ExecKernel(void *binary)
 {
 	int			ret;
 	entry_t		kernelEntry;
-	
+
 	bootArgs->kaddr = bootArgs->ksize = 0;
+
+	{
+		bool KPRebootOption = false;
+		bool HiDPIOption = false;
+
+		getBoolForKey(kRebootOnPanic, &KPRebootOption, &bootInfo->chameleonConfig);
+		if (KPRebootOption == true)
+		{
+			bootArgs->flags |= kBootArgsFlagRebootOnPanic;
+		}
+		getBoolForKey(kEnableHiDPI, &HiDPIOption, &bootInfo->chameleonConfig);
+		if (HiDPIOption == true)
+		{
+			bootArgs->flags |= kBootArgsFlagHiDPI;
+		}
+	}
+
 	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
 
 	ret = DecodeKernel(binary,
@@ -185,10 +202,13 @@ static int ExecKernel(void *binary)
 	// This will draw the boot graphics unless we are in
 	// verbose mode.
 	if (gVerboseMode)
+	{
 		setVideoMode( GRAPHICS_MODE, 0 );
+	}
 	else
+	{
 		drawBootGraphics();
-
+	}
 	setupBooterLog();
 
 	finalizeBootStruct();
@@ -204,7 +224,8 @@ static int ExecKernel(void *binary)
 
 		startprog( kernelEntry, bootArgs );
 	}
-	else {
+	else
+	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
 
@@ -234,15 +255,19 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 
 	// Use specify kernel cache file if not empty
 	if (cacheFile[0] != 0)
+	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
-	else {
+	}
+	else
+	{
 		// Lion and Mountain Lion prelink kernel cache file
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")))
 		{
 			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
 		}
 		// Snow Leopard prelink kernel cache file
-		else if (checkOSVersion("10.6")) {
+		else if (checkOSVersion("10.6"))
+		{
 			sprintf(kernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386)
 					? "i386" : "x86_64");
 			int lnam = strlen(kernelCacheFile) + 9; //with adler32
@@ -262,7 +287,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 				}
 			}
 		}
-		else {
+		else
+		{
 			// Reset cache name.
 			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
 			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
@@ -272,10 +298,13 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 /* Issue: http://forge.voodooprojects.org/p/chameleon/issues/270/
 	// kernelCacheFile must start with a /
-	if (kernelCacheFile[0] != '/') {
+	if (kernelCacheFile[0] != '/')
+	{
 		char *str = strdup(kernelCacheFile);
 		if (str == NULL)
+		{
 			return -1;
+		}
 		sprintf(kernelCacheFile, "/%s", str);
 		free(str);
 	}
@@ -297,7 +326,9 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 				sprintf(kernelCachePath, "com.apple.boot.S%s", kernelCacheFile);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				{
 					ret = -1;
+				}
 			}
 		}
 	}
@@ -307,7 +338,9 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 		strcpy(kernelCachePath, kernelCacheFile);
 		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 		if ((flags & kFileTypeMask) != kFileTypeFlat)
+		{
 			ret = -1;
+		}
 	}
 
 	// Exit if kernel cache file wasn't found
