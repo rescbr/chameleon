@@ -27,7 +27,7 @@
 
 char* gSMBIOSBoardModel;
 
-static char fake_serial[11];
+static char fake_serial[12];
 
 static char const sn_gen_pn_str[36] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
 
