@@ -1005,6 +1005,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0DC4,	0x1ACC4513,	"Point of View GeForce GTS 450" },
 	{ 0x10DE0DC4,	0x1ACC4523,	"Point of View GeForce GTS 450" },
 	{ 0x10DE0DC4,	0x1ACC45C2,	"Point of View GeForce GTS 450" },
+	{ 0x10DE0DC4,	0x38421351,	"EVGA GeForce GTS 450" },
 	{ 0x10DE0DC4,	0x38421452,	"EVGA GeForce GTS 450" },
 
 	{ 0x10DE0DCD,	0x10280491,	"Dell GeForce GT 555M" },
@@ -1569,7 +1570,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 
 	{ 0x10DE1183,	0x10DE1000,	"nVidia GTX 660 Ti" },
 	{ 0x10DE1183,	0x14622843,	"MSi GTX 660 Ti" },
-	{ 0x10DE1183,	0x19DA1280,	"Zoac GTX 660 Ti" },
+	{ 0x10DE1183,	0x19DA1280,	"Zotac GTX 660 Ti" },
 
 	{ 0x10DE1185,	0x174B2260,	"PC Partner GeForce GTX 660" },
 
@@ -1676,7 +1677,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1246,	0x10280571,	"Dell GeForce GT 550M" },
 
 	{ 0x10DE1247,	0x10431407,	"Asus GeForce GT 555M" },
-	{ 0x10DE1247,	0x10431752,	"Asus GeForce GT 635M" },
+	{ 0x10DE1247,	0x10431752,	"Asus GeForce GT 555M" },
 	{ 0x10DE1247,	0x10432050,	"Asus GeForce GT 555M" },
 	{ 0x10DE1247,	0x10432051,	"Asus GeForce GT 555M" },
 	{ 0x10DE1247,	0x10432119,	"Asus GeForce GT 670M" },
@@ -2706,9 +2707,9 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1244,	NV_SUB_IDS,	"GeForce GTX 550 Ti" },
 	{ 0x10DE1245,	NV_SUB_IDS,	"GeForce GTS 450" },
 	{ 0x10DE1246,	NV_SUB_IDS,	"GeForce GTX 550M" },
-	{ 0x10DE1247,	NV_SUB_IDS,	"GeForce GT 635M" }, // 555M ?
+	{ 0x10DE1247,	NV_SUB_IDS,	"GeForce GT 555M" },
 	{ 0x10DE1248,	NV_SUB_IDS,	"GeForce GTX 555M" },
-	{ 0x10DE1249,	NV_SUB_IDS,	"GeForce GTS 450M" }, // no M?
+	{ 0x10DE1249,	NV_SUB_IDS,	"GeForce GTS 450" }, // 450M?
 	{ 0x10DE124B,	NV_SUB_IDS,	"GeForce GT 640" },
 	{ 0x10DE124D,	NV_SUB_IDS,	"GeForce GTX 555M" },
 	//  { 0x10DE1250,	NV_SUB_IDS,	"GF116-INT" },
