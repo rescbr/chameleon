@@ -146,6 +146,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9440,	0x24451682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870",                   kMotmot		},
 
 	{ 0x9441,	0x02601043, CHIP_FAMILY_RV770,		"ASUS EAH4870x2",                kMotmot		},
+	{ 0x9441,	0x02841043, CHIP_FAMILY_RV770,		"ASUS EAH4870x2",                kMotmot		},
 	{ 0x9441,	0x24401682, CHIP_FAMILY_RV770,		"ATI Radeon HD 4870 X2",                kMotmot		},
 	{ 0x9441,	0x25421002, CHIP_FAMILY_RV770,		"PowerColor HD 4870 X2",                kMotmot		},
 

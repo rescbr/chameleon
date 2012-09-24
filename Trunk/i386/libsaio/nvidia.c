@@ -1602,6 +1602,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE11BE,	0x15585105,	"Clevo Quadro K3000M" },
 	{ 0x10DE11BE,	0x15587102,	"Clevo Quadro K3000M" },
 	// 11C0 - 11CF
+	{ 0x10DE11C0,	0x10DE0995,	"Inno3D GeForce GTX660" },
 	// 11D0 - 11DF
 	// 11E0 - 11EF
 	// 11F0 - 11FF
@@ -2685,6 +2686,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE11BD,	NV_SUB_IDS,	"Quadro K4000M" },
 	{ 0x10DE11BE,	NV_SUB_IDS,	"Quadro K3000M" },
 	// 11C0 - 11CF
+	{ 0x10DE11C0,	NV_SUB_IDS,	"GeForce GTX 660" },
 	// 11D0 - 11DF
 	// 11E0 - 11EF
 	// 11F0 - 11FF
