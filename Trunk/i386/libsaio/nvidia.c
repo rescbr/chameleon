@@ -473,6 +473,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 
 	{ 0x10DE0605,	0x10DE0612,	"nVidia GeForce 9800 GT" },
 	{ 0x10DE0605,	0x10DE062D,	"nVidia GeForce 9800 GT" },
+	{ 0x10DE0605,	0x145834A2,	"Gigabyte GV-N98TOC-512H" },
 	{ 0x10DE0605,	0x14621460,	"MSi GeForce 9800 GT" },
 
 	{ 0x10DE0607,	0x10DE0736,	"nVidia GeForce GTS 240" },
@@ -625,6 +626,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE06CD,	0x10DE079F,	"Point of View GeForce GTX 470" },
 	{ 0x10DE06CD,	0x10DE979F,	"nVidia GeForce GTX 470" },
 	{ 0x10DE06CD,	0x145834F5,	"GigaByte GeForce GTX 470" },
+	{ 0x10DE06CD,	0x14622220,	"MSi GeForce GTX 470 Twin Frozr II" },
 	{ 0x10DE06CD,	0x19DA0010,	"Zotac GTX 470" },
 	{ 0x10DE06CD,	0x19DA1153,	"Zotac GeForce GTX 470" },
 	{ 0x10DE06CD,	0x38421472,	"EVGA GeForce GTX 470" },
@@ -1589,6 +1591,18 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1189,	0x38422678,	"EVGA GTX 670" },
 	// 1190 - 119F
 	// 11A0 - 11AF
+	{ 0x10DE11A0,	0x10280550,	"Dell GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x10280551,	"Dell GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x1028057B,	"Dell GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x10280580,	"Dell GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x146210BC,	"MSi GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x146210BE,	"MSi GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15580270,	"Clevo GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15580271,	"Clevo GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15580371,	"Clevo GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15580372,	"Clevo GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15585105,	"Clevo GeForce GTX 680M" },
+	{ 0x10DE11A0,	0x15587102,	"Clevo GeForce GTX 680M" },
 	// 11B0 - 11BF
 	{ 0x10DE11BC,	0x1028053F,	"Dell Quadro K5000M" },
 	{ 0x10DE11BC,	0x1028153F,	"Dell Quadro K5000M" },
@@ -2681,6 +2695,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE118F,	NV_SUB_IDS,	"Tesla K10" },
 	// 1190 - 119F
 	// 11A0 - 11AF
+	{ 0x10DE11A0,	NV_SUB_IDS,	"GeForce GTX 680M" },
 	// 11B0 - 11BF
 	{ 0x10DE11BC,	NV_SUB_IDS,	"Quadro K5000M" },
 	{ 0x10DE11BD,	NV_SUB_IDS,	"Quadro K4000M" },
