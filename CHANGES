@@ -1,3 +1,8 @@
+- Few security fixes
+- Fixed a serious bug in picopng
+- Fixed a bug in gui.c, related to the images loading
+- Fixed a bug with acpi, where no acpi table may be configured 
+
 - Security fixes
 - Updated smbus(spd.c) and radeon(ati.c) card list (taken from the last cosmo1t's update)
 

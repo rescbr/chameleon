@@ -110,16 +110,23 @@ void *png_alloc_malloc(size_t size)
 
 void *png_alloc_realloc(void *addr, size_t size)
 {
-	void *new_addr;
+	void *new_addr = NULL;
 	if (!addr)
 		return png_alloc_malloc(size);
-	new_addr = realloc(addr, size);
-	if (new_addr && (new_addr != addr)) {
-		png_alloc_node_t *old_node;
-		old_node = png_alloc_find_node(addr);
-		png_alloc_remove_node(old_node);
-		png_alloc_add_node(new_addr, size);
+	
+	png_alloc_node_t *old_node;
+	old_node = png_alloc_find_node(addr);
+	
+	if (old_node) 
+	{
+		new_addr = realloc(addr, size);
+		if (new_addr && (new_addr != addr)) 
+		{		
+			png_alloc_remove_node(old_node);
+			png_alloc_add_node(new_addr, size);
+		}
 	}
+	
 	return new_addr;
 }
 

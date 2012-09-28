@@ -64,16 +64,17 @@
  * necessary hardware.
  */
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid);
-static VOID EFI_ST_FIX_CRC32(void);
-static EFI_STATUS setupAcpiNoMod();
+static VOID EFI_ST_FIX_CRC32(VOID);
+static EFI_STATUS setupAcpiNoMod(VOID);
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len);
-static EFI_CHAR8* getSmbiosUUID();
-static int8_t *getSystemID();
-static VOID setupSystemType();
-static VOID setupEfiDeviceTree(void);
-static VOID setup_Smbios();
-static VOID setup_machine_signature();
-static VOID setupEfiConfigurationTable();
+static EFI_CHAR8* getSmbiosUUID(VOID);
+static int8_t *getSystemID(VOID);
+static VOID setupSystemType(VOID);
+static VOID setupEfiDeviceTree(VOID);
+static VOID setup_Smbios(VOID);
+static VOID setup_machine_signature(VOID);
+static VOID setupEfiConfigurationTable(VOID);
+static EFI_STATUS EFI_FindAcpiTables(VOID);
 
 /*==========================================================================
  * Utility function to make a device tree string from an EFI_GUID
@@ -469,12 +470,13 @@ void Register_Smbios_Efi(void* smbios)
  * ACPI 
  */
 
-static uint64_t     local_rsd_p;
+static uint64_t     local_rsd_p			= 0;
+static uint64_t     kFSBFrequency		= 0;
+static uint32_t		kHardware_signature = 0;
+static uint8_t		kType				= 0;
+static uint32_t		kAdler32			= 0;
 static ACPI_TABLES  acpi_tables;
-static uint64_t     kFSBFrequency;
-static uint32_t		kHardware_signature;
-static uint8_t		kType;
-static uint32_t		kAdler32;
+
 
 EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev )
 {
@@ -490,42 +492,72 @@ EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev )
 		{
 			Status = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");			
 		}
-	}		
+	}
+	else 
+	{
+		Status = setupAcpiNoMod();
+	}
+		
 	
 	return Status;	
 }
 
+static EFI_STATUS EFI_FindAcpiTables(VOID)
+{
+	EFI_STATUS ret = EFI_UNSUPPORTED;
+	
+	if (local_rsd_p)
+	{
+		return EFI_SUCCESS;
+	}
+
+	if (!FindAcpiTables(&acpi_tables))
+	{
+		printf("Failed to detect ACPI tables.\n");
+		ret = EFI_NOT_FOUND;
+	}
+	
+	local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+	
+	if (local_rsd_p)
+	{
+		ret = EFI_SUCCESS;
+	}
+	return ret;
+
+}
+
 /* Setup ACPI without any patch. */
-static EFI_STATUS setupAcpiNoMod()
+static EFI_STATUS setupAcpiNoMod(VOID)
 {    	
 	EFI_STATUS ret = EFI_UNSUPPORTED;
 	
-    ACPI_TABLE_RSDP* rsdp = (ACPI_TABLE_RSDP*)((uint32_t)local_rsd_p);
-    if(rsdp->Revision > 0 && (GetChecksum(rsdp, sizeof(ACPI_TABLE_RSDP)) == 0))
+	if (EFI_FindAcpiTables() == EFI_SUCCESS) 
 	{
-		ret = addConfigurationTable(&gEfiAcpi20TableGuid, &local_rsd_p, "ACPI_20");		 
-	}
-	else
-	{
-		ret = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");		
-	}
+		ACPI_TABLE_RSDP* rsdp = (ACPI_TABLE_RSDP*)((uint32_t)local_rsd_p);
+		if(rsdp->Revision > 0 && (GetChecksum(rsdp, sizeof(ACPI_TABLE_RSDP)) == 0))
+		{
+			ret = addConfigurationTable(&gEfiAcpi20TableGuid, &local_rsd_p, "ACPI_20");		 
+		}
+		else
+		{
+			ret = addConfigurationTable(&gEfiAcpiTableGuid, &local_rsd_p, "ACPI");		
+		}
+	}    
 	
 	return ret;
 }
 
-EFI_STATUS setup_acpi (void)
+EFI_STATUS setup_acpi (VOID)
 {	
 	EFI_STATUS ret = EFI_UNSUPPORTED;	
 	
 	do {
-        if (!FindAcpiTables(&acpi_tables))
-        {
-            printf("Failed to detect ACPI tables.\n");
-            ret = EFI_NOT_FOUND;
+		
+        if ((ret = EFI_FindAcpiTables()) != EFI_SUCCESS)
+        {            
             break;
-        }
-        
-        local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+        }        
         
         {
             ACPI_TABLE_FADT *FacpPointer = (acpi_tables.FacpPointer64 != (void*)0ul) ? (ACPI_TABLE_FADT *)acpi_tables.FacpPointer64 : (ACPI_TABLE_FADT *)acpi_tables.FacpPointer;
@@ -606,7 +638,7 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
  * Get the SystemID from the bios dmi info
  */
 
-static EFI_CHAR8* getSmbiosUUID()
+static EFI_CHAR8* getSmbiosUUID(VOID)
 {
 	static EFI_CHAR8		 uuid[UUID_LEN];
 	int						 i, isZero, isOnes;
@@ -648,7 +680,7 @@ static EFI_CHAR8* getSmbiosUUID()
  * or from the bios if not, or from a fixed value if no bios value is found 
  */
 
-static int8_t *getSystemID()
+static int8_t *getSystemID(VOID)
 {
     static int8_t				sysid[16];
 	// unable to determine UUID for host. Error: 35 fix
@@ -687,7 +719,7 @@ static int8_t *getSystemID()
  * facp content to reflect in ioregs
  */
 
-static VOID setupSystemType()
+static VOID setupSystemType(VOID)
 {
 	Node *node = DT__FindNode("/", false);
 	if (node == 0) stop("Couldn't get root node");
@@ -697,7 +729,7 @@ static VOID setupSystemType()
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(uint8_t), &kType);
 }
 
-static VOID setupEfiDeviceTree(void)
+static VOID setupEfiDeviceTree(VOID)
 {	
 	Node		*node;
 	
@@ -941,7 +973,7 @@ void setupSmbiosConfigFile(const char *filename)
 	}
 }
 
-static VOID setup_Smbios()
+static VOID setup_Smbios(VOID)
 {			
 	if (execute_hook("getSmbiosPatched",NULL, NULL, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 	{
@@ -951,7 +983,7 @@ static VOID setup_Smbios()
 	}	
 }
 
-static VOID setup_machine_signature()
+static VOID setup_machine_signature(VOID)
 {
 	Node *chosenNode = DT__FindNode("/chosen", false);
 	if (chosenNode)
@@ -961,12 +993,11 @@ static VOID setup_machine_signature()
 			do {
 				if (!local_rsd_p)
 				{			
-					if (!FindAcpiTables(&acpi_tables)){
+					if ( EFI_FindAcpiTables() != EFI_SUCCESS)
+					{
 						printf("Failed to detect ACPI tables.\n");
 						break;
-					}
-					
-					local_rsd_p = ((uint64_t)((uint32_t)acpi_tables.RsdPointer));
+					}					
 				}
 				
 				ACPI_TABLE_FACS *FacsPointer = (acpi_tables.FacsPointer64 != (void*)0ul) ? (ACPI_TABLE_FACS *)acpi_tables.FacsPointer64:(ACPI_TABLE_FACS *)acpi_tables.FacsPointer;				
@@ -993,7 +1024,7 @@ static VOID setup_machine_signature()
  * Installs all the needed configuration table entries
  */
 
-static VOID setupEfiConfigurationTable()
+static VOID setupEfiConfigurationTable(VOID)
 {
     if (smbios_p)
         addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);

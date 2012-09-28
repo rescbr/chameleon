@@ -1433,6 +1433,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
 		} else {
 			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
+			free(rom);
 			return false;
 		}
 	} else {

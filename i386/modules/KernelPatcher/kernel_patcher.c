@@ -558,7 +558,9 @@ static void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, 
 			bytes[patchLocation + 3] = 0x00;	// cpuid_extfamily
 			bytes[patchLocation + 4] = 0x02;	// cpuid_stepping
 
+#if 0
 			patchLocation = jumpLocation;
+#endif
 			// We now have 14 bytes available for a patch
 		}
 		else 

@@ -501,7 +501,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
         width = 0;
         height = 0;
         imagedata = NULL;
-        if ( strlen(theme_name) > 0 && (loadPngImage(dirspec, &width, &height, &imagedata)) == 0)
+        if ((strlen(theme_name) > 0) && (loadPngImage(dirspec, &width, &height, &imagedata) != -1 ))
         {
             images[i].image->width = width;
             images[i].image->height = height;
@@ -509,6 +509,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             flipRB(images[i].image);
 			
 			DBG("[ %s ] succesfully loaded and registred !!\n", dirspec);
+			DBG("width = %d : height = %d !!\n",images[i].image->width,images[i].image->height);
 			
             return 0;
         }
@@ -520,7 +521,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
             embed_data = embeddedImages[e].pngdata;
             embed_size = *embeddedImages[e].length;
 			
-            if (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata) == 0)
+            if (loadEmbeddedPngImage(embed_data, embed_size, &width, &height, &imagedata) != -1)
             {
                 images[i].image->width = width;
                 images[i].image->height = height;
@@ -541,6 +542,9 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 				images[i].image->width = images[alt_image].image->width;
 				images[i].image->height = images[alt_image].image->height;
 				images[i].image->pixels = images[alt_image].image->pixels;
+				
+				DBG("Passing to alt_image !!\n");
+				DBG("width = %d : height = %d !!\n",images[alt_image].image->width,images[alt_image].image->height);
 				
 			} else {
 				
@@ -575,7 +579,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 	printf("[ %s/%s/%s.png ] not used in this version, skipped !!\n",src, theme_name, image);
 	sleep(2);
 #endif
-	return 1;
+	return 0;
 }
 
 static int loadGraphics(char *src)
@@ -983,7 +987,7 @@ static void loadThemeValues(config_file_t *theme)
 	if(GUI_getDimensionForKey("menu_height", &pixel, theme, gui.screen.height , 0 ) )
 		gui.menu.height = pixel;
 	else
-		gui.menu.height = (infoMenuItemsCount) * images[iMenuSelection].image->height;
+		gui.menu.height = infoMenuItemsCount * images[iMenuSelection].image->height;
 	
 	if(GUI_getDimensionForKey("menu_pos_x", &pixel, theme, screen_width , gui.menu.width ) )
 		gui.menu.pos.x = pixel;
@@ -2585,9 +2589,9 @@ static void loadBootGraphics(char *src)
 		return;
 	}
 	sprintf(dirspec, "%s/%s/boot.png", src, theme_name);
-	if (strlen(theme_name) == 0 || loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) != 0) {
+	if ((strlen(theme_name) == 0) || (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) == -1)) {
 #ifdef EMBED_THEME
-		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) != 0)
+		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) == -1)
 #endif
 			usePngImage = false; 
 	}
