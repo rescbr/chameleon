@@ -18,7 +18,7 @@
 #include "bootstruct.h"
 #include "graphic_utils.h"
 #include "picopng.h"
-//#include "options.h"
+#include "CoreHash.h"
 
 int GUI_initGraphicsMode (void);
 int GUI_countdown( const char * msg, int row, int timeout , int *optionKey);
@@ -56,9 +56,8 @@ enum {
 
 typedef struct themeList_t
 {
-	char* theme;
-	unsigned char nb;
-	struct themeList_t* next;
+	CoreHashHeader
+	unsigned char nb;	
 } themeList_t;
 
 /*

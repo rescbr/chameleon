@@ -1,3 +1,5 @@
+- Security fixes
+
 - Few security fixes
 - Fixed a serious bug in picopng
 - Fixed a bug in gui.c, related to the images loading

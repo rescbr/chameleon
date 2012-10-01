@@ -194,14 +194,14 @@ static void HObj##_Debug(struct HObj *container )                               
 static void HObj##_DeleteAll(struct HObj *container ) {         \
 	struct HObj *current_var, *tmp;                             \
 																\
-	if (setjmp(uterror) == -1) {                            \
+	if (setjmp(uterror) == -1) {                                \
 	return;														\
 	} else {                                                    \
 			HASH_ITER(hh, container, current_var, tmp) {        \
-			HASH_DEL(container,current_var);                    \
-            if (current_var->name) free(current_var->name);     \
-			free(current_var);                                  \
-		}                                                       \
+				HASH_DEL(container,current_var);                \
+				if (current_var->name) free(current_var->name); \
+		    }                                                   \
+		free(current_var);                                      \
 	}                                                           \
 }
 

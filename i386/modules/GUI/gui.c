@@ -48,7 +48,9 @@ enum {
 
 static config_file_t    themeConfig;				           // theme.plist
 
-themeList_t* themeList = NULL;
+// CoreHash Declarations
+__CHNewStrVar(themeList_t)
+CHUnInit(themeList_t)
 
 static void (*showHelp)(void) = NULL;
 static char *(*getMemoryInfoString)(void) = NULL;
@@ -62,6 +64,11 @@ font_t font_console;
 #define IMG_REQUIRED -1
 #define THEME_NAME_DEFAULT	"Default"
 const char* theme_name = THEME_NAME_DEFAULT;
+
+#define  MAX_THEMES 255
+
+struct themeList_t *gthemeList = NULL;
+static char tmp_theme[64]; // should be engouth 
 
 char dirsrc[22];
 
@@ -1041,44 +1048,33 @@ static void loadThemeValues(config_file_t *theme)
 		gui.screen.font_console_color = (color & 0x00FFFFFF);
 }
 
-#define  MAX_THEMES 255
-
-static void add_theme(const char* theme, uint8_t nb)
+static void add_theme(const char *theme, uint8_t nb) 
 {
-	
-	themeList_t* new_theme = malloc(sizeof(themeList_t));
-	if (new_theme)
-	{	
-		new_theme->next = themeList;
-		
-		themeList = new_theme;
-		
-		new_theme->nb = nb;
-		new_theme->theme = newString(theme);
-	}	
-}
-
-static void free_theme_list()
-{
-	themeList_t* entry = themeList;
-	while(entry)
+    struct themeList_t *new_theme;
+    
+    new_theme = themeList_t_NewStrVar(theme, &gthemeList);
+	if (!new_theme) 
 	{
-#if DEBUG_GUI
-		printf("freeing  %s (nb = %d)\n", entry->theme, entry->nb);		
-#endif
-		
-		char *theme = entry->theme;
-		themeList_t* tmp = NULL;
-		
-		tmp = entry;
-		entry = entry->next;		
-		
-		free(theme);		
-		free(tmp);
-		
-	}
+		return;
+	}    
+    new_theme->nb = nb;   
 }
 
+static char *get_theme_by_index(uint8_t i)
+{
+    struct themeList_t *current_theme;
+    for(current_theme=gthemeList;current_theme;current_theme=(struct themeList_t*)(current_theme->hh.next)) 
+    {        
+        if (current_theme->nb == i)
+            return current_theme->name;        
+    }
+    return NULL;
+}
+
+static void free_theme_list(void) 
+{
+    themeList_t_DeleteAll(gthemeList);     
+}
 
 static int randomTheme(char *dirspec, const char **theme) {
 	
@@ -1105,16 +1101,18 @@ static int randomTheme(char *dirspec, const char **theme) {
 		
 		i++;
 		
-	}	
+	}
+
 #if DEBUG_GUI
-	themeList_t* debugentry = themeList;
-	printf("theme list: \n");
-	while(debugentry)
-	{
-		printf("*  %s (nb = %d)\n", debugentry->theme, debugentry->nb);		
-		debugentry = debugentry->next;
-	}	
-	printf("\n");
+	printf("theme list: \n");		
+	printf("\n");	
+	struct themeList_t *current_theme;
+    for(current_theme=gthemeList;current_theme;current_theme=(struct themeList_t*)(current_theme->hh.next)) 
+    {        
+		printf("*  %s (nb = %d)\n", current_theme->name, current_theme->nb);		
+        
+    }
+	
 #endif
 
 	if (i) {			
@@ -1122,38 +1120,34 @@ static int randomTheme(char *dirspec, const char **theme) {
 		uint8_t choosen = arc4random_uniform(i);
 #if DEBUG_GUI
 		printf("choosen number (nb = %d), i = %d \n", choosen, i);
-#endif	
-		themeList_t* entry = themeList;
-
-		while(entry)
+#endif		
+		
+		char *tmp = get_theme_by_index(choosen);
+		
+		if (tmp) 
 		{
-
-			if (entry->nb == choosen) {
-#if DEBUG_GUI
-				
-				printf("choosen theme  %s (nb = %d)\n", entry->theme, entry->nb);
-				sleep(1);
-#endif
-				*theme = entry->theme;			
-				
-				sta = startGUI();
-				
-				break;
-			}
-			
-			entry = entry->next;
-		}	
+			bzero(tmp_theme,sizeof(tmp_theme));
+			strlcpy(tmp_theme, tmp, sizeof(tmp_theme));
+		}		
 		
 		free_theme_list();
 		
+		if (tmp_theme[0]) 
+		{
+			*theme = tmp_theme;			
+			
+			sta = startGUI();
+		}		
 	}  
+	else 
+	{
 #if DEBUG_GUI
-	else {
 		printf("No theme found !!\n");
-		
 		sleep(1);
-	}	
 #endif
+		free_theme_list();
+
+	}	
 	return sta;	
 }
 

@@ -359,8 +359,8 @@ void free_platform_env(void) {
 		HASH_ITER(hh, platform_env, current_var, tmp) {    
 			HASH_DEL(platform_env,current_var);
             if (current_var->name) free(current_var->name);
-			free(current_var);           
 		}
+		free(current_var);
 	}     
 }
 
