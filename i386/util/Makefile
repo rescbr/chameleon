@@ -17,7 +17,7 @@ CFLAGS = $(RC_CFLAGS) $(OPTIM) -Wmost -Werror -g
 LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)
-PROGRAMS = md.o machOconv bdmesg amlsgn 
+PROGRAMS = md.o machOconv bdmesg amlsgn fdisk440
 
 OUTFILES = $(PROGRAMS)
 
@@ -33,6 +33,9 @@ bdmesg: bdmesg.o
 
 amlsgn: 
 	$(CC) -arch i386 -framework IOKit -framework Foundation -mmacosx-version-min=10.5 amlsgn.m -o $(SYMROOT)/amlsgn
+
+fdisk440: 
+	$(CC) $(LDFALGS) -mmacosx-version-min=10.5 -arch i386 -o $(SYMROOT)/fdisk440 fdisk/*.c
 
 md.o: 
 	$(CC) -mdynamic-no-pic -Wall -dead_strip -arch i386 -mmacosx-version-min=10.5 md.c -o $(SYMROOT)/md
