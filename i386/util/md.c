@@ -441,7 +441,7 @@ static void parse_dep(void)
             if (c) cp[-1]=0;/* end component C style */
             
             /* ignore . */;
-            if (!strcmp(path_component[i], "."))
+            if (!strncmp(path_component[i], ".", sizeof(".")))
                 ;       /* if "component" != .. */
             else            /* don't reduce /component/.. to nothing */
                 i++;    /* there could be symbolic links! */

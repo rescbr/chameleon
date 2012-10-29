@@ -265,13 +265,13 @@ static const struct NamedValue bios_errors[] = {
 
 static const char * bios_error(int errnum)
 {
-    static char  errorstr[] = "Error 0x00";
+    static char  errorstr[11];
     const char * errname;
 	
     errname = getNameForValue( bios_errors, errnum );
     if ( errname ) return errname;
 	
-    sprintf(errorstr, "Error 0x%02x", errnum);
+    snprintf(errorstr, sizeof(errorstr), "Error 0x%02x", errnum);
     return errorstr;   // No string, print error code only
 }
 
@@ -1162,7 +1162,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
              dpme.dpme_boot_block);
              */
             
-            if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0) {
+            if (strncmp(dpme_p->dpme_type, "Apple_HFS",sizeof("Apple_HFS")) == 0) {
                 bvr = newAPMBVRef(biosdev,
                                   i,
                                   OSSwapBigToHostInt32(dpme_p->dpme_pblock_start) * factor,
@@ -1706,6 +1706,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 #ifdef BOOT_HELPER_SUPPORT
     int   ret;
 	char  label[BVSTRLEN];
+	char  dirSpec[256];
 	int   fh, fileSize, error;
 #endif
 	for (bvr = chain; bvr < (BVRef)ULONG_MAX; bvr = bvr->next) {
@@ -1720,12 +1721,14 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		//
 		if (bvr->flags & kBVFlagBooter)
 		{
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			strcpy(fileSpec, ".disk_label.contentDetails");
+			snprintf(dirSpec, sizeof(dirsSpec),"hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			strlcpy(fileSpec, ".disk_label.contentDetails", sizeof(fileSpec));
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
-				fh = open(strcat(dirSpec, fileSpec));
+				strlcat(dirSpec, fileSpec, sizeof(dirSpec));
+
+				fh = open(dirSpec);
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{
@@ -1740,7 +1743,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 				if (!error)
 				{
 					label[fileSize] = '\0';
-					strcpy(bvr->altlabel, label);
+					strlcpy(bvr->altlabel, label, sizeof(bvr->altlabel));
 				}
 			}
 		}

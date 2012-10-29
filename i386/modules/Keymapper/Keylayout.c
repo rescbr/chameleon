@@ -145,7 +145,7 @@ uint32_t Keylayout_real_start(void)
 	{
 		snprintf(layoutPath, sizeof(layoutPath),"/Extra/Keymaps/%s", val);
 		// Add the extension if needed
-		if (len <= 4 || strcmp(val+len-4,".lyt") != 0)
+		if (len <= 4 || strncmp(val+len-4,".lyt", sizeof(".lyt")) != 0)
 			strlcat(layoutPath, ".lyt", sizeof(layoutPath));
 
 		if (!load_keyboard_layout_file(layoutPath))

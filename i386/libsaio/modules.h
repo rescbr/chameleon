@@ -24,7 +24,7 @@
 #include "efi.h"
 
 #define DEFAULT_BUNDLE_SPEC_SIZE 4096
-
+#define macho_64 1
 
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
@@ -80,14 +80,28 @@ void bind_location(UInt32* location, char* value, UInt32 addend, int type);
 void rebase_macho(void* base, char* rebase_stream, UInt32 size);
 EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size);
 
+#if macho_64
 long long add_symbol(char* module,char* symbol, long long addr, char is64);
+#else
+long long add_symbol(char* module,char* symbol, long long addr);
+#endif
 
+#if macho_64
 unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char));
+#else
+unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long));
+#endif
 
+#if macho_64
 unsigned int handle_symtable(char *module, UInt32 base,
 							 struct symtab_command* symtabCommand,
 							 long long(*symbol_handler)(char*, char*, long long, char),
 							 char is64);
+#else
+unsigned int handle_symtable(char *module, UInt32 base,
+							 struct symtab_command* symtabCommand,
+							 long long(*symbol_handler)(char*, char*, long long));
+#endif
 
 unsigned int lookup_all_symbols(const char* module, const char* name);
 

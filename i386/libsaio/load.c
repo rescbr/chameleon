@@ -272,7 +272,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 			   stop("Kernel overflows available space");
 	}
 	
-	if (vmsize && (strcmp(segname, "__PRELINK") == 0 || strcmp(segname, "__PRELINK_INFO") == 0))
+	if (vmsize && (strncmp(segname, "__PRELINK", sizeof("__PRELINK")) == 0 || strncmp(segname, "__PRELINK_INFO", sizeof("__PRELINK_INFO")) == 0))
 		safe_set_env(envgHaveKernelCache, true);
 	
 	// Copy from file load area.

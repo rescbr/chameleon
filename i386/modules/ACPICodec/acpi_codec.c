@@ -182,7 +182,7 @@ static inline unsigned u										\
 resolve_##s(unsigned u defaultentry, char *str, int base)       \
 {																\
 unsigned u entry  = defaultentry;							\
-if (str && (strcmp(str,"Default") != 0)) {					\
+if (str && (strncmp(str,"Default",sizeof("Default")) != 0)) {					\
 entry  = strtoul((const char *)str, NULL,base);				\
 }															\
 return entry;												\
@@ -1601,7 +1601,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 				{
 					char *tmpstr = XMLCastString(XMLGetProperty(PstateTag, (const char*)"Mode"));
 					
-					if (strcmp(tmpstr,"Expert") == 0)
+					if (strncmp(tmpstr,"Expert",sizeof("Expert")) == 0)
 					{
 						p_states_count = pstate_tag_count - 1 ; // - 1 = - ("Mode" tag) 										
 						expert = 1;
@@ -4420,7 +4420,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
 				if ( match_drop ) 
 				{
 					char *tmp = XMLCastString(match_drop);
-					if (tmp && (strcmp(tmp,"No") != 0))
+					if (tmp && (strncmp(tmp,"No",sizeof("No")) != 0))
 					{
 						dropoffset++;
 						DBG("   %s table dropped\n",tableSig);
@@ -4598,7 +4598,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 			if ( match_drop )
 			{
 				char *tmp = XMLCastString(match_drop);
-				if (strcmp(tmp,"No") != 0)
+				if (strncmp(tmp,"No",sizeof("No")) != 0)
 				{						
 					dropoffset++;
 					DBG("   %s table dropped\n",tableSig);
@@ -4801,7 +4801,7 @@ EFI_STATUS setupAcpi(void)
                 
                 // Make sure this is a kext.
                 length = strlen(name);
-                if (strcmp(name + length - 4, ".aml"))
+                if (strncmp(name + length - 4, ".aml",sizeof(".aml")) != 0)
                 {
 #if DEBUG_ACPI
                     printf("Ignoring %s\n", name);

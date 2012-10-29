@@ -112,11 +112,25 @@ static bool gUnloadPXEOnExit = false;
 
 static void zeroBSS(void)
 {
+#if (defined(__clang__)) /* WARNING : must be first, __GNUC__ seems to be also defined */
+	
+	extern char  bss_start  __asm("section$start$__DATA$__bss");
+    extern char  bss_end    __asm("section$end$__DATA$__bss");
+    extern char  common_start  __asm("section$start$__DATA$__common");
+    extern char  common_end    __asm("section$end$__DATA$__common");
+	
+	bzero(&bss_start, (&bss_end - &bss_start));
+	bzero(&common_start, (&common_end - &common_start));
+	
+#elif (defined(__GNUC__)) || (defined(__llvm__))
+	
 	extern char _DATA__bss__begin, _DATA__bss__end;
 	extern char _DATA__common__begin, _DATA__common__end;
 	
 	bzero(&_DATA__bss__begin, (&_DATA__bss__end - &_DATA__bss__begin));
 	bzero(&_DATA__common__begin, (&_DATA__common__end - &_DATA__common__begin));
+	
+#endif
 }
 
 //==========================================================================
@@ -242,7 +256,7 @@ static int ExecKernel(void *binary)
 		{
 			wait = true;
 			
-			if (strval && ((strcmp(strval, "no") == 0) || (strcmp(strval, "No") == 0)))
+			if (strval && ((strncmp(strval, "no", sizeof("no")) == 0) || (strncmp(strval, "No", sizeof("No")) == 0)))
 			{
 				wait = false;
 			}
@@ -618,7 +632,7 @@ void common_boot(int biosdev)
 			long cachetime, kerneltime = 0, exttime;
 			if (trycache && !forcecache) do {
 				
-                if (strcmp(bootInfo->bootFile, kDefaultKernel) != 0) {
+                if (strncmp(bootInfo->bootFile, kDefaultKernel,sizeof(kDefaultKernel)) != 0) {
                     // if we haven't found the kernel yet, don't use the cache
                     ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
                     if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
@@ -1026,7 +1040,7 @@ static bool find_file_with_ext(const char* dir, const char *ext, const char * na
         
         // Make sure this is a kext or mkext.
         length = strlen(name);
-        if (strcmp(name + length - ext_size, ext)) continue;
+        if (strncmp(name + length - ext_size, ext, ext_size)) continue;
 		
         if (name_to_compare)
         {

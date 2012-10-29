@@ -739,11 +739,11 @@ static void setDefaultSMBData(void)
                 {
                     sm_chosen = sm_macbook_defaults ;
                 }
-                else if (!strcmp ("iMac12,1", str))
+                else if (!strncmp ("iMac12,1", str,sizeof("iMac12,1")))
                 {
                     sm_chosen = sm_imac_sandy_defaults ;
                 }
-                else if (!strcmp ("iMac11,1", str))
+                else if (!strncmp ("iMac11,1", str, sizeof("iMac11,1")))
                 {
                     sm_chosen = sm_imac_core_defaults ;
                 }
@@ -919,7 +919,7 @@ static bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
             
 			if (SMBSetters[idx].keyString)
 			{
-                if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue) && randomSerial && (!strcmp ("SMserial", SMBSetters[idx].keyString)))
+                if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue) && randomSerial && (!strncmp ("SMserial", SMBSetters[idx].keyString, sizeof("SMserial"))))
                 {
                     string = *(SMBSetters[idx].defaultValue);
                     break;

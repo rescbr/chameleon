@@ -377,8 +377,8 @@ bool patch_kext(TagPtr plist, char* plistbuffer, void* start)
 #if UNUSED
 	if(/*patch_gma_deviceid &&*/
 	    (
-			(strcmp(bundleID, "com.apple.driver.AppleIntelGMA950") == 0) ||
-			(strcmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer") == 0)
+			(strncmp(bundleID, "com.apple.driver.AppleIntelGMA950", sizeof( "com.apple.driver.AppleIntelGMA950")) == 0) ||
+			(strncmp(bundleID, "com.apple.driver.AppleIntelIntegratedFramebuffer",sizeof("com.apple.driver.AppleIntelIntegratedFramebuffer")) == 0)
 		 )
 	   )
 	{

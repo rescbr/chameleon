@@ -1,4 +1,9 @@
 - Security fixes
+- Using of optimized version for bcopy, bzero, strcmp, strcpy, strncpy, strlcat, strlcpy, strlen, strncmp, memset and memcmp
+- Replaced strcmp (deprecated and unsecure) by strncmp as far as possible
+- Decided to keep ld_classic to keep the compatibility with the apple's compiler from snow leopard (xcode 3.x) to Mountain lion (xcode 4.5)  (in fact this has not changed since the last commit ;-) )
+
+- Security fixes
 
 - Few security fixes
 - Fixed a serious bug in picopng

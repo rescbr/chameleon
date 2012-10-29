@@ -810,7 +810,8 @@ int GUI_getBootOptions(bool firstRun)
 		char *name = NULL;
 		int cnt;
 		
-		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) {
+		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) 
+		{			
 			prompt = malloc(cnt + 1);
             if (!prompt) {
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
@@ -830,7 +831,7 @@ int GUI_getBootOptions(bool firstRun)
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
                 return -1;
             }
-			sprintf(prompt, "Press ENTER to start up from %s, or press any key to enter startup options.", name);
+			snprintf(prompt, 256 ,"Press ENTER to start up from %s, or press any key to enter startup options.", name);
 			free(name);
 		}
 		
@@ -1038,7 +1039,7 @@ int GUI_getBootOptions(bool firstRun)
 					/*
 					 * TODO: this needs to be refactored.
 					 */
-					if (strcmp( booterCommand, "video" ) == 0)
+					if (strncmp( booterCommand, "video", sizeof("video") ) == 0)
 					{
 						if (getVideoMode() == GRAPHICS_MODE)
 						{
@@ -1049,7 +1050,7 @@ int GUI_getBootOptions(bool firstRun)
 							printVBEModeInfo();
 						}
 					}
-					else if ( strcmp( booterCommand, "memory" ) == 0)
+					else if ( strncmp( booterCommand, "memory", sizeof("memory") ) == 0)
 					{
 						if (getVideoMode() == GRAPHICS_MODE ) 
 						{
@@ -1060,20 +1061,20 @@ int GUI_getBootOptions(bool firstRun)
 							printMemoryInfo();
 						}
 					}
-					else if (strcmp(booterCommand, "lspci") == 0)
+					else if (strncmp(booterCommand, "lspci", sizeof( "lspci")) == 0)
 					{
 						lspci();
 					}
-					else if (strcmp(booterCommand, "more") == 0)
+					else if (strncmp(booterCommand, "more",  sizeof("more")) == 0)
 					{
 						showTextFile(booterParam);
 					}
-					else if (strcmp(booterCommand, "rd") == 0)
+					else if (strncmp(booterCommand, "rd", sizeof("rd")) == 0)
 					{
 						if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 							showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
 					} 
-					else if (strcmp(booterCommand, "norescan") == 0)
+					else if (strncmp(booterCommand, "norescan", sizeof("norescan")) == 0)
 					{
 						if (get_env(envgEnableCDROMRescan))
                         {

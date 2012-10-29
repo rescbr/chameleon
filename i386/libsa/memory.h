@@ -93,9 +93,15 @@
 #define LOAD_ADDR         0x18100000  // 64M File load buffer
 #define LOAD_LEN          0x04000000
 
+#define SANDBOX_ADDR      0x1C100000  // 256M modules sandbox aera, 
+#define SANDBOX_LEN       0x10000000
+
+#define SANDBOX_PER_MODULE 0x1000000  // 16M per module
+
+#define SANDBOX_MAX_MODULE SANDBOX_LEN/SANDBOX_PER_MODULE // Max nb of module
+
 // Location of data fed to boot2 by the prebooter
-#define PREBOOT_DATA      0x1C100000  // Still have enough room for a 63M ramdisk image
-                                      // in case of 512MB system memory.
+#define PREBOOT_DATA      0x2C100000  
 
 #define TFTP_ADDR         LOAD_ADDR   // tftp download buffer
 #define TFTP_LEN          LOAD_LEN

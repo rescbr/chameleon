@@ -308,27 +308,27 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 	char param[1024];
 	getNextArg(&ptr, param);
 
-	if (strcmp(cmd, "m") == 0)
+	if (strncmp(cmd, "m",sizeof("m")) == 0)
 	{
 		mountRAMDisk(param);
 		sleep(2);
 	}
-	else if (strcmp(cmd, "u") == 0)
+	else if (strncmp(cmd, "u", sizeof("u")) == 0)
 	{
 		umountRAMDisk();
 		sleep(2);
 	}
-	else if (strcmp(cmd, "e") == 0)
+	else if (strncmp(cmd, "e", sizeof("e")) == 0)
 	{
 		setRAMDiskBTHook(true);
 		sleep(2);
 	}
-	else if (strcmp(cmd, "d") == 0)
+	else if (strncmp(cmd, "d", sizeof("d")) == 0)
 	{
 		setRAMDiskBTHook(false);
 		sleep(2);
 	}
-	else if (strcmp(cmd, "i") == 0)
+	else if (strncmp(cmd, "i", sizeof("i")) == 0)
 	{
 		setActiveDisplayPage(1);
 		clearScreenRows(0, 24);

@@ -604,12 +604,12 @@ static const char const MOTHERBOARD_NAME_PROP[] = "motherboard-name";
 
 static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 {
-	if (!GetgPlatformName() && strcmp(key, "SMproductname") == 0)
+	if (!GetgPlatformName() && strncmp(key, "SMproductname", sizeof("SMproductname")) == 0)
 		readSMBIOS(thePlatformName);
 	
 	const char	*PlatformName =  GetgPlatformName() ;
 	
-	const char	*src = (strcmp(key, "SMproductname") == 0) ? PlatformName : getStringForKey(key, DEFAULT_SMBIOS_CONFIG);
+	const char	*src = (strncmp(key, "SMproductname", sizeof("SMproductname")) == 0) ? PlatformName : getStringForKey(key, DEFAULT_SMBIOS_CONFIG);
 	
 	EFI_CHAR16*	 dst = 0;	
 	

@@ -195,14 +195,14 @@ VOID load_all_dylib(void)
         // Make sure this is not a directory.
         if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;
         
-        if ((strcmp("Symbols.dylib",name)) == 0) continue; // if we found Symbols.dylib, just skip it
+        if ((strncmp("Symbols.dylib",name, sizeof("Symbols.dylib"))) == 0) continue; // if we found Symbols.dylib, just skip it
         
         if (is_dylib_loaded(name) == EFI_SUCCESS) continue;
         
         
         // Make sure this is a kext.
         length = strlen(name);
-        if (strcmp(name + length - 6, ".dylib")) continue;
+        if (strncmp(name + length - 6, ".dylib", 6)) continue;
 		
         char *tmp = newStringWithFormat( "/Extra/modules/%s",name);								
         if (!tmp) {
@@ -269,14 +269,20 @@ static unsigned int load_module(char * name, char* module)
 			module_base = (char*) malloc(moduleSize);
 		}		
 		
-		if (module_base && read(fh, module_base, moduleSize) == moduleSize)
+		if (!module_base)
+		{
+			goto out;
+		}
+		
+		if (read(fh, module_base, moduleSize) == moduleSize)
 		{
 			
 			DBG("Module %s read in.\n", module);
 			
 			// Module loaded into memory, parse it
-			module_start = parse_mach(name, module_base, &add_symbol);			
-            
+			module_start = parse_mach(name, module_base, &add_symbol);            
+			
+			
 		}
 		else
 		{
@@ -284,9 +290,10 @@ static unsigned int load_module(char * name, char* module)
 #if DEBUG_MODULES		
 			getc();
 #endif
-			module_start = 0xFFFFFFFF;
+			free(module_base);
 		}
 	}
+out:
 	close(fh);
 	return module_start;
 }
@@ -412,9 +419,15 @@ long   vmsize;
  * symbols will still be available (TODO: fix this). This should not
  * happen as all dependencies are verified before the sybols are read in.
  */
+#if macho_64
 unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
+#else
+unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long))	// TODO: add param to specify valid archs
+#endif
 {	
+#if macho_64
 	char is64 = false;
+#endif
 	unsigned int module_start = 0xFFFFFFFF;
 	EFI_STATUS bind_status = EFI_SUCCESS;
     
@@ -424,7 +437,9 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 	
 	{
 		struct segment_command *segCommand = NULL;
+#if macho_64
 		struct segment_command_64 *segCommand64 = NULL;
+#endif
 		struct load_command *loadCommand = NULL;
 		UInt32 binaryIndex = 0;
 		UInt16 cmd = 0;
@@ -432,15 +447,19 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 		// Parse through the load commands
 		if(((struct mach_header*)binary)->magic == MH_MAGIC)
 		{
+#if macho_64
 			is64 = false;
+#endif
 			binaryIndex += sizeof(struct mach_header);
 		}
+#if macho_64
 		else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
 		{
 			// NOTE: modules cannot be 64bit...
 			is64 = true;
 			binaryIndex += sizeof(struct mach_header_64);
 		}
+#endif
 		else
 		{
 			printf("Modules: Invalid mach magic\n");
@@ -477,7 +496,7 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 					
 					//printf("Segment name is %s\n", segCommand->segname);
 					
-					if(strcmp("__TEXT", segCommand->segname) == 0)
+					if(strncmp("__TEXT", segCommand->segname, sizeof("__TEXT")) == 0)
 					{
 						UInt32 sectionIndex;
 						
@@ -509,7 +528,7 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 							sectionIndex += sizeof(struct section);
 							
 							
-							if(strcmp("__text", sect->sectname) == 0)
+							if(strncmp("__text", sect->sectname,sizeof("__text")) == 0)
 							{
 								// __TEXT,__text found, save the offset and address for when looking for the calls.
 								textSection = sect->offset;
@@ -519,14 +538,15 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 						}
 					}
 					break;
-				}				
+				}	
+#if macho_64
 				case LC_SEGMENT_64:	// 64bit macho's
 				{
 					segCommand64 = binary + binaryIndex;
 					
 					//printf("Segment name is %s\n", segCommand->segname);
 					
-					if(strcmp("__TEXT", segCommand64->segname) == 0)
+					if(strncmp("__TEXT", segCommand64->segname, sizeof("__TEXT")) == 0)
 					{
 						UInt32 sectionIndex;
 						
@@ -558,7 +578,7 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 							sectionIndex += sizeof(struct section_64);
 							
 							
-							if(strcmp("__text", sect->sectname) == 0)
+							if(strncmp("__text", sect->sectname, sizeof("__text")) == 0)
 							{
 								// __TEXT,__text found, save the offset and address for when looking for the calls.
 								textSection = sect->offset;
@@ -570,7 +590,8 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 					}
 					
 					break;
-				}				
+				}
+#endif
 				case LC_DYSYMTAB:
 					break;
 					
@@ -605,8 +626,11 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 	}		
 	
 	// bind_macho uses the symbols.
+#if macho_64
 	module_start = handle_symtable(module, (UInt32)binary, symtabCommand, symbol_handler, is64);
-    
+#else
+	module_start = handle_symtable(module, (UInt32)binary, symtabCommand, symbol_handler);
+#endif
 	// Rebase the module before binding it.
 	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
 	{
@@ -991,7 +1015,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
+				else if(symbolName && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
                     getc();
@@ -1024,7 +1048,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
+				else if(symbolName && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
                     getc();
@@ -1048,7 +1072,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 					
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, BIND_TYPE_POINTER);
 				}
-				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
+				else if(symbolName && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
                     getc();
@@ -1096,7 +1120,7 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 						segmentAddress += tmp2 + sizeof(void*);
 					}
 				}
-				else if(symbolName && (strcmp(symbolName, SYMBOL_DYLD_STUB_BINDER) != 0))
+				else if(symbolName && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
 				{
 					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
                     getc();
@@ -1159,10 +1183,15 @@ void bind_location(UInt32* location, char* value, UInt32 addend, int type)
  * adjust it's internal symbol list (sort) to optimize locating new symbols
  * NOTE: returns the address if the symbol is "start", else returns 0xFFFFFFFF
  */
+#if macho_64
 long long add_symbol(char* module,char* symbol, long long addr, char is64)
+#else
+long long add_symbol(char* module,char* symbol, long long addr)
+#endif
 {
+#if macho_64
 	if(is64) return  0xFFFFFFFF; // Fixme
-	
+#endif
 	// This only can handle 32bit symbols 
 	symbolList_t* new_entry= malloc(sizeof(symbolList_t));
 	DBG("Adding symbol %s at 0x%X\n", symbol, addr);
@@ -1191,7 +1220,7 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
     
     do {
         
-        if ((module != NULL) && (strcmp(module,SYMBOLS_BUNDLE) != 0))
+        if ((module != NULL) && (strncmp(module,SYMBOLS_BUNDLE,sizeof(SYMBOLS_BUNDLE)) != 0))
             break;        
         
         if(lookup_symbol && (UInt32)lookup_symbol != 0xFFFFFFFF)
@@ -1232,7 +1261,7 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
 	}
 	
 #if DEBUG_MODULES
-	if(strcmp(name, SYMBOL_DYLD_STUB_BINDER) != 0)
+	if(strncmp(name, SYMBOL_DYLD_STUB_BINDER, sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0)
 	{
 		verbose("Unable to locate symbol %s\n", name);
 		getc();
@@ -1248,8 +1277,11 @@ out:
  * parse the symbol table
  * Lookup any undefined symbols
  */
-
+#if macho_64
 unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long, char), char is64)
+#else
+unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long))
+#endif
 {		
 	unsigned int module_start = 0xFFFFFFFF;
 	
@@ -1258,22 +1290,28 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
         return 0xFFFFFFFF;
     }
 	char* symbolString = base + (char*)symtabCommand->stroff;
-	//char* symbolTable = base + symtabCommand->symoff;
+#if macho_64
 	if(!is64)
+#endif
 	{
 		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
 		while(symbolIndex < symtabCommand->nsyms)
 		{						
 			if(symbolEntry->n_value)
 			{				
-				if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0))
+				if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strncmp(symbolString + symbolEntry->n_un.n_strx, "start", sizeof("start")) == 0))
 				{
 					module_start = base + symbolEntry->n_value;
 					DBG("n_value %x module_start %x\n", (unsigned)symbolEntry->n_value, (unsigned)module_start);
 				}
 				else
 				{
+#if macho_64
 					symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
+#else
+					symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value);
+#endif
+
 				}
 #if DEBUG_MODULES
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
@@ -1301,6 +1339,7 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
 			symbolIndex++;	// TODO remove
 		}
 	}
+#if macho_64
 	else
 	{
 		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
@@ -1308,7 +1347,7 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
 		while(symbolIndex < symtabCommand->nsyms)
 		{	
 			
-			if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strcmp(symbolString + symbolEntry->n_un.n_strx, "start") == 0))
+			if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strncmp(symbolString + symbolEntry->n_un.n_strx, "start",sizeof("start")) == 0))
 			{
 				module_start = (unsigned int)(base + symbolEntry->n_value);
 			}
@@ -1321,6 +1360,7 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
 			symbolIndex++;	// TODO remove
 		}
 	}
+#endif
 	
 	return module_start;
 	
@@ -1552,7 +1592,7 @@ FileLoadBundles( char * dirSpec, long plugin )
         
         // Make sure this is a kext.
         length = strlen(name);
-        if (strcmp(name + length - 7, ".bundle")) continue;
+        if (strncmp(name + length - 7, ".bundle",7)) continue;
 		
         // Save the file name.
         strlcpy(gFileName, name, DEFAULT_BUNDLE_SPEC_SIZE);
@@ -2034,12 +2074,12 @@ ParseXML( char * buffer, ModulePtr * module )
         prop = XMLGetProperty(moduleDict, kPropNSPrincipalClass);
         if ((prop != 0) && prop->string)
         {
-            if (!strcmp(prop->string,SYSLIB_CLASS)) 
+            if (!strncmp(prop->string,SYSLIB_CLASS, sizeof(SYSLIB_CLASS))) 
             {
                 tmpModule->willLoad = BundlePrioritySystemLib;
                 break;
             }
-            if (!strcmp(prop->string,SYS_CLASS)) 
+            if (!strncmp(prop->string,SYS_CLASS, sizeof(SYS_CLASS))) 
             {
                 tmpModule->willLoad = BundlePrioritySystem;
                 break;

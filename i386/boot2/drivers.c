@@ -319,7 +319,7 @@ FileLoadDrivers( char * dirSpec, long size, long plugin )
         
         // Make sure this is a kext.
         length = strlen(name);
-        if (strcmp(name + length - 5, ".kext")) continue;
+        if (strncmp(name + length - 5, ".kext", 5)) continue;
 		
         // Save the file name.
         strlcpy(gFileName, name, DEFAULT_DRIVER_SPEC_SIZE);
@@ -744,7 +744,7 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
     required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
     if ( (required == 0) ||
 		(required->type != kTagTypeString) ||
-		!strcmp(required->string, "Safe Boot"))
+		!strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
     {
         XMLFreeTag(moduleDict);
         return -2;

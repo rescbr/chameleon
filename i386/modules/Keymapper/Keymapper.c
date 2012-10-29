@@ -230,7 +230,7 @@ void Keymapper_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, 
 			map_kb_type =  "NONE"; // Default to QWERTY
 	}
 	
-	if (map_kb_type && (strcmp(map_kb_type, "AZERTY") == 0))		
+	if (map_kb_type && (strncmp(map_kb_type, "AZERTY",sizeof("AZERTY")) == 0))		
         c = AZERTY_switch(c);
 	
 out:

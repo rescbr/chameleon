@@ -853,30 +853,30 @@ int getBootOptions(bool firstRun)
 					 * TODO: this needs to be refactored.
 					 */
 #if UNUSED
-					if (strcmp( booterCommand, "video" ) == 0)
+					if (strncmp( booterCommand, "video", sizeof("video") ) == 0)
 					{
 						printVBEModeInfo();
 					}
 					else
 #endif
-						if ( strcmp( booterCommand, "memory" ) == 0) 
+						if ( strncmp( booterCommand, "memory", sizeof("memory") ) == 0) 
 						{
 							printMemoryInfo();
 						}
-						else if (strcmp(booterCommand, "lspci") == 0) 
+						else if (strncmp(booterCommand, "lspci", sizeof( "lspci")) == 0) 
 						{
 							lspci();
 						} 
-						else if (strcmp(booterCommand, "more") == 0) 
+						else if (strncmp(booterCommand, "more",  sizeof("more")) == 0) 
 						{
 							showTextFile(booterParam);
 						}
-						else if (strcmp(booterCommand, "rd") == 0) 
+						else if (strncmp(booterCommand, "rd", sizeof("rd")) == 0) 
 						{
 							if (execute_hook("processRAMDiskCommand", (void*)argPtr, &booterParam, NULL, NULL, NULL, NULL) != EFI_SUCCESS)
 								showMessage("ramdisk module not found, please install RamdiskLoader.dylib in /Extra/modules/");
 						} 
-						else if (strcmp(booterCommand, "norescan") == 0)
+						else if (strncmp(booterCommand, "norescan", sizeof("norescan")) == 0)
 						{
 							if (get_env(envgEnableCDROMRescan))
 							{
@@ -1063,7 +1063,7 @@ processBootOptions(void)
     } else {
         if ( getValueForKey( kKernelNameKey, &val, &cnt, DEFAULT_BOOT_CONFIG ) ) {
             strlcpy( bootInfo->bootFile, val, sizeof(bootInfo->bootFile) );
-            if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
+            if (strncmp( bootInfo->bootFile, kDefaultKernel, sizeof(kDefaultKernel) ) != 0) {
                 safe_set_env(envgOverrideKernel,true);
             }
         } else if (((BVRef)(uint32_t)get_env(envgBootVolume))->kernelfound == true) {

@@ -427,7 +427,7 @@ static int getImageIndexByName(const char *name)
     int i;
 	for (i = 0; (unsigned)i < sizeof(images) / sizeof(images[0]); i++)
 	{
-	    if (strcmp(name, images[i].name) == 0)
+	    if (strncmp(name, images[i].name, sizeof(images[i].name)) == 0)
 	        return i; // found the name
 	}
 	return -1;
@@ -444,7 +444,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 	// NOTE: This algorithm assumes that the embeddedImages is sorted.
 	// This is currently done using the make file. If the array is every 
 	// manualy generated, this *will* fail to work properly.
-	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
+	while((result = strncmp(name, embeddedImages[compareIndex].name, sizeof(embeddedImages[compareIndex].name))) != 0)
 	{
 		if(result > 0)	// We need to search a HIGHER index
 		{
@@ -503,7 +503,7 @@ static int loadThemeImage(char* src, const char *image, int alt_image)
 				return 1;
 			}
 		}
-        sprintf(dirspec, "%s/%s/%s.png", src, theme_name, image);
+        snprintf(dirspec, sizeof(dirspec),"%s/%s/%s.png", src, theme_name, image);
 		
         width = 0;
         height = 0;
@@ -847,7 +847,7 @@ static void setupDeviceList(config_file_t *theme)
 	// check layout for horizontal or vertical
 	gui.layout = HorizontalLayout;
 	if(getValueForKey( "devices_layout", &string, &len, theme)) {
-		if (!strcmp (string, "vertical")) {
+		if (!strncmp (string, "vertical",sizeof("vertical"))) {
 			gui.layout = VerticalLayout;
 		}
 	}
@@ -1181,17 +1181,17 @@ int initGUI(void)
 		retry:
 			ret = GetFileInfo("rd(0,0)/Extra/", "Themes", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-				sprintf(dirsrc, "rd(0,0)/Extra/Themes");
+				snprintf(dirsrc,sizeof(dirsrc), "rd(0,0)/Extra/Themes");
 				
 			} else {
 				ret = GetFileInfo("/Extra/", "Themes", &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-					sprintf(dirsrc, "/Extra/Themes");
+					snprintf(dirsrc,sizeof(dirsrc), "/Extra/Themes");
 					
 				} else {
 					ret = GetFileInfo("bt(0,0)/Extra/", "Themes", &flags, &time);
 					if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-						sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+						snprintf(dirsrc,sizeof(dirsrc), "bt(0,0)/Extra/Themes");
 						
 					} else {
 						printf("Failed to find the /extra/Themes folder\n");
@@ -1205,17 +1205,17 @@ int initGUI(void)
 		{		
 			ret = GetFileInfo("rd(0,0)/Extra/Themes/", theme_name, &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-				sprintf(dirsrc, "rd(0,0)/Extra/Themes");
+				snprintf(dirsrc,sizeof(dirsrc), "rd(0,0)/Extra/Themes");
 				
 			} else {
 				ret = GetFileInfo("/Extra/Themes/", theme_name, &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-					sprintf(dirsrc, "/Extra/Themes");
+					snprintf(dirsrc,sizeof(dirsrc), "/Extra/Themes");
 					
 				} else {
 					ret = GetFileInfo("bt(0,0)/Extra/Themes/", theme_name, &flags, &time);
 					if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) {
-						sprintf(dirsrc, "bt(0,0)/Extra/Themes");
+						snprintf(dirsrc,sizeof(dirsrc), "bt(0,0)/Extra/Themes");
 						
 					} else {
 						printf("Failed to find the /extra/Themes/%s folder\n",theme_name);
@@ -1265,7 +1265,7 @@ int initGUI(void)
 			
 		}		
 #endif		
-		if (ret && (strcmp(theme_name, THEME_NAME_DEFAULT) != 0)) {
+		if (ret && (strncmp(theme_name, THEME_NAME_DEFAULT,sizeof(THEME_NAME_DEFAULT)) != 0)) {
 			theme_name = THEME_NAME_DEFAULT;
 			ret = startGUI();
 			
@@ -1287,7 +1287,7 @@ static int startGUI(void)
 		return 1;
 	}
 	
-	sprintf(dirspec, "%s/%s/theme.plist", dirsrc ,theme_name);
+	snprintf(dirspec, sizeof(dirspec), "%s/%s/theme.plist", dirsrc ,theme_name);
 	
 	if (loadConfigFile(dirspec, &themeConfig) != 0) {
 		
@@ -2582,7 +2582,7 @@ static void loadBootGraphics(char *src)
 		usePngImage = false; 
 		return;
 	}
-	sprintf(dirspec, "%s/%s/boot.png", src, theme_name);
+	snprintf(dirspec, sizeof(dirspec), "%s/%s/boot.png", src, theme_name);
 	if ((strlen(theme_name) == 0) || (loadPngImage(dirspec, &bootImageWidth, &bootImageHeight, &bootImageData) == -1)) {
 #ifdef EMBED_THEME
 		if ((loadEmbeddedPngImage(__boot_png, __boot_png_len, &bootImageWidth, &bootImageHeight, &bootImageData)) == -1)

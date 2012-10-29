@@ -393,7 +393,7 @@ void showError(void)
     struct env_struct *current_var;
     for(current_var=platform_env;current_var;current_var=(struct env_struct*)(current_var->hh.next)) 
     {
-		if (strcmp(current_var->name, envConsoleErr) == 0) {
+		if (strncmp(current_var->name, envConsoleErr, sizeof(envConsoleErr)) == 0) {
 			if (current_var->Type == kEnvPtr) {
 				printf("stderr: %s \n",(char*)(uint32_t)current_var->ptr);
 			}

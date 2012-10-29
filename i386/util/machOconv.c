@@ -119,7 +119,7 @@ usage:
 
 	case LC_SEGMENT:
 #define scp	((struct segment_command *)cp)
-	    isDATA = (strcmp(scp->segname, "__DATA") == 0);
+	    isDATA = (strncmp(scp->segname, "__DATA", sizeof("__DATA")) == 0);
 	    if (isDATA)
 	    	vmsize = swap(scp->filesize);
 	    else

@@ -21,6 +21,10 @@ endif
 OMIT_FRAME_POINTER_CFLAG=
 HAVE_MD = YES
 
+##CC = clang
+##CC = llvm-gcc
+##CC = gcc
+
 installsrc:: $(SRCROOT)
 	cp $(ALLSRC) $(SRCROOT)
 	cd $(SRCROOT); chmod a-w $(ALLSRC)

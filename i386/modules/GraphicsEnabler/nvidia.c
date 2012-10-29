@@ -1044,7 +1044,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		
 		strncpy(sig, (char *)&dcbtable[-7], 7);
 		recordlength = 10;
-		if (strcmp(sig, "DEV_REC")) {
+		if (strncmp(sig, "DEV_REC",sizeof("DEV_REC"))) {
 			printf("Bad Display Configuration Block signature (%s)\n", sig);
 			return PATCH_ROM_FAILED;
 		}

@@ -128,21 +128,21 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);	
     
-	if ((strcmp(model, "Mobile GMA950")  == 0) ||
-		(strcmp(model, "Mobile GMA3150")  == 0))
+	if ((strncmp(model, "Mobile GMA950", sizeof("Mobile GMA950"))  == 0) ||
+		(strncmp(model, "Mobile GMA3150", sizeof("Mobile GMA3150"))  == 0))
 	{
 		devprop_add_value(device, "AAPL,HasPanel", reg_TRUE, 4);
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	} 
-	else if ((strcmp(model, "Desktop GMA950")== 0) || 
-			 (strcmp(model, "Desktop GMA3150") == 0))
+	else if ((strncmp(model, "Desktop GMA950",sizeof("Desktop GMA950"))== 0) || 
+			 (strncmp(model, "Desktop GMA3150",sizeof("Desktop GMA3150")) == 0))
 	{
 		BuiltIn = 0x01;
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
-	else if ( strcmp(model, "GMAX3100")  == 0 ) 
+	else if ( strncmp(model, "GMAX3100", sizeof("GMAX3100"))  == 0 ) 
 	{
 		devprop_add_value(device, "AAPL,HasPanel",GMAX3100_vals[0], 4);
 		devprop_add_value(device, "AAPL,SelfRefreshSupported",GMAX3100_vals[1], 4);
@@ -168,7 +168,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[21], 4);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
-    else if (strcmp(model, "Intel HD Graphics 3000")  == 0)
+    else if (strncmp(model, "Intel HD Graphics 3000", sizeof("Intel HD Graphics 3000"))  == 0)
     {
         devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
     }	

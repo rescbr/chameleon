@@ -30,6 +30,18 @@
 		AB021459161C3B9F007F5325 /* user.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = user.h; sourceTree = "<group>"; };
 		AB02145A161C3B9F007F5325 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		AB0E930C14C6223500F798D7 /* cpu_intel_amd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpu_intel_amd.c; sourceTree = "<group>"; };
+		AB19DD0816392AFD00CF3455 /* __bzero.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = __bzero.s; sourceTree = "<group>"; };
+		AB19DD3A1639360E00CF3455 /* strcmp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strcmp.s; sourceTree = "<group>"; };
+		AB19DD451639370A00CF3455 /* strcpy.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strcpy.s; sourceTree = "<group>"; };
+		AB19DD461639375500CF3455 /* strlcat.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strlcat.s; sourceTree = "<group>"; };
+		AB19DD47163937C800CF3455 /* strlcpy.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strlcpy.s; sourceTree = "<group>"; };
+		AB19DD481639382000CF3455 /* strlen.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strlen.s; sourceTree = "<group>"; };
+		AB19DD491639389500CF3455 /* strncmp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strncmp.s; sourceTree = "<group>"; };
+		AB19DD4A163938D300CF3455 /* strncpy.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = strncpy.s; sourceTree = "<group>"; };
+		AB19DD4B16393A1500CF3455 /* memcmp.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = memcmp.s; sourceTree = "<group>"; };
+		AB19DD5D16393CD800CF3455 /* memset.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = memset.s; sourceTree = "<group>"; };
+		AB19DD6616393D6400CF3455 /* memset_pattern_sse2.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = memset_pattern_sse2.s; sourceTree = "<group>"; };
+		AB19DD6B16393E1400CF3455 /* bzero_scalar.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = bzero_scalar.s; sourceTree = "<group>"; };
 		AB22095D15334C9E00AA9851 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
 		AB3117CF15DBCBDE00DA0817 /* fake_crt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fake_crt.c; sourceTree = "<group>"; };
 		AB42D02115187F2C0078E84A /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
@@ -461,8 +473,6 @@
 		AB43B3E414C37E530018D529 /* Symbols.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Symbols.c; sourceTree = "<group>"; };
 		AB43B3E514C37E530018D529 /* WKdm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKdm.h; sourceTree = "<group>"; };
 		AB43B3E614C37E530018D529 /* WKdmDecompress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WKdmDecompress.c; sourceTree = "<group>"; };
-		AB43B3EC14C383120018D529 /* bcopy.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = bcopy.s; sourceTree = "<group>"; };
-		AB43B3ED14C383120018D529 /* bzero.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = bzero.s; sourceTree = "<group>"; };
 		AB43B3EE14C383120018D529 /* divdi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = divdi3.c; sourceTree = "<group>"; };
 		AB43B3EF14C383120018D529 /* moddi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = moddi3.c; sourceTree = "<group>"; };
 		AB43B3F014C383120018D529 /* qdivrem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qdivrem.c; sourceTree = "<group>"; };
@@ -470,6 +480,7 @@
 		AB43B3F214C383120018D529 /* udivdi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = udivdi3.c; sourceTree = "<group>"; };
 		AB43B3F314C383120018D529 /* umoddi3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = umoddi3.c; sourceTree = "<group>"; };
 		AB43B3F814C384040018D529 /* stack_protector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack_protector.c; sourceTree = "<group>"; };
+		AB6DE3E6163976A80065E17F /* bcopy_scalar.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = bcopy_scalar.s; sourceTree = "<group>"; };
 		AB79217514F38CF200F5EB39 /* bootXnu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootXnu.h; sourceTree = "<group>"; };
 		AB79219214F3919E00F5EB39 /* ModuleHelp.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModuleHelp.txt; sourceTree = "<group>"; };
 		ABA0C7BF1568190C003440AF /* arc4random-fbsd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "arc4random-fbsd.c"; sourceTree = "<group>"; };
@@ -993,24 +1004,35 @@
 		AB43B2DE14C37E520018D529 /* libsa */ = {
 			isa = PBXGroup;
 			children = (
-				AB43B3EC14C383120018D529 /* bcopy.s */,
-				AB43B3ED14C383120018D529 /* bzero.s */,
+				AB6DE3E6163976A80065E17F /* bcopy_scalar.s */,
+				AB19DD0816392AFD00CF3455 /* __bzero.s */,
+				AB19DD6B16393E1400CF3455 /* bzero_scalar.s */,
 				AB43B3EE14C383120018D529 /* divdi3.c */,
-				AB43B3EF14C383120018D529 /* moddi3.c */,
-				AB43B3F014C383120018D529 /* qdivrem.c */,
-				AB43B3F114C383120018D529 /* quad.h */,
-				AB43B3F214C383120018D529 /* udivdi3.c */,
-				AB43B3F314C383120018D529 /* umoddi3.c */,
 				AB43B2DF14C37E520018D529 /* efi_tables.c */,
 				AB43B2E014C37E520018D529 /* efi_tables.h */,
 				AB43B2E214C37E520018D529 /* libsa.h */,
 				AB43B2E314C37E520018D529 /* Makefile */,
 				AB43B2E414C37E520018D529 /* memory.h */,
+				AB19DD4B16393A1500CF3455 /* memcmp.s */,
+				AB19DD5D16393CD800CF3455 /* memset.s */,
+				AB19DD6616393D6400CF3455 /* memset_pattern_sse2.s */,
+				AB43B3EF14C383120018D529 /* moddi3.c */,
 				AB43B2E614C37E520018D529 /* printf.c */,
+				AB43B3F014C383120018D529 /* qdivrem.c */,
 				AB43B2E714C37E520018D529 /* qsort.c */,
+				AB43B3F114C383120018D529 /* quad.h */,
 				AB43B2E914C37E520018D529 /* setjmp.s */,
+				AB19DD3A1639360E00CF3455 /* strcmp.s */,
+				AB19DD451639370A00CF3455 /* strcpy.s */,
+				AB19DD461639375500CF3455 /* strlcat.s */,
+				AB19DD47163937C800CF3455 /* strlcpy.s */,
+				AB19DD481639382000CF3455 /* strlen.s */,
+				AB19DD491639389500CF3455 /* strncmp.s */,
+				AB19DD4A163938D300CF3455 /* strncpy.s */,
 				AB43B2EA14C37E520018D529 /* string.c */,
 				AB43B2EB14C37E520018D529 /* strtol.c */,
+				AB43B3F214C383120018D529 /* udivdi3.c */,
+				AB43B3F314C383120018D529 /* umoddi3.c */,
 				AB43B2EC14C37E520018D529 /* zalloc.c */,
 			);
 			path = libsa;

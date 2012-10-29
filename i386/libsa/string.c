@@ -25,9 +25,9 @@
 
 #include "libsa.h"
 
-static int _mach_strlen(const char *str);
 static char *STRDUP(const char *string);
 
+#if 0
 /*
  * Abstract:
  *      strcmp (s1, s2) compares the strings "s1" and "s2".
@@ -90,7 +90,6 @@ strncmp(
 	
 	return 0;
 }
-
 
 /*
  * Abstract:
@@ -170,6 +169,7 @@ strlcpy(char *dst, const char *src, size_t siz)
 	
 	return(s - src - 1);	/* count does not include NUL */
 }
+#endif
 
 /*
  * History:
@@ -200,12 +200,15 @@ strstr(const char *in, const char *str)
     return (const char *) (in - 1);
 }
 
+#if 0
 void *
 memmove(void *dst, const void *src, size_t ulen)
 {
     bcopy(src, dst, ulen);   
     return dst;
 }
+#endif
+
 #if UNUSED
 int
 ptol(const char *str)
@@ -277,6 +280,8 @@ itoa(
 	return str;
 }
 #endif
+
+#if 0
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
  * full size of dst, not space left).  At most siz-1 characters
@@ -311,6 +316,7 @@ strlcat(char *dst, const char *src, size_t siz)
 	
 	return(dlen + (s - src));       /* count does not include NUL */
 }
+#endif
 
 /*
  *
@@ -334,6 +340,8 @@ strncat(char *s1, const char *s2, unsigned long n)
 	return(os1);
 }
 
+#if 0
+static int _mach_strlen(const char *str);
 static int
 _mach_strlen(const char *str)
 {
@@ -351,6 +359,8 @@ size_t strlen(const char * str)
 {	
 	return (size_t)_mach_strlen(str);
 }
+#endif
+
 #if UNUSED
 /*
  * Does the same thing as strlen, except only looks up
@@ -585,6 +595,7 @@ adler32( unsigned char * buffer, long length )
  * SUCH DAMAGE.
  */
 
+#if 0
 /*
  * Compare memory regions.
  */
@@ -601,7 +612,7 @@ memcmp(const void *s1, const void *s2, size_t n)
 	}
 	return (0);
 }
-
+#endif
 /*
  * Perform a binary search.
  *

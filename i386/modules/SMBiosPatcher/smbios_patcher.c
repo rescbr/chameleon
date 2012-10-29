@@ -505,11 +505,11 @@ const char* sm_get_defstr(const char * key, int table_num)
             {
                 sm_chosen = sm_macbook_defaults ;
             }
-            else if (!strcmp ("iMac12,1", str))
+            else if (!strncmp ("iMac12,1", str, sizeof("iMac12,1")))
             {
                 sm_chosen = sm_imac_sandy_defaults ;
             }
-            else if (!strcmp ("iMac11,1", str))
+            else if (!strncmp ("iMac11,1", str,sizeof("iMac11,1")))
             {
                 sm_chosen = sm_imac_core_defaults ;
             }
@@ -535,7 +535,7 @@ const char* sm_get_defstr(const char * key, int table_num)
     }             
     
 	
-    if (!strcmp ("SMserial", key)) {
+    if (!strncmp ("SMserial", key, sizeof("SMserial"))) {
         
         if (!serial_done) {
             bzero  (fake_serial,sizeof(fake_serial));      
@@ -970,7 +970,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				snprintf(altname, sizeof(altname),"%s_%d",smbios_properties[j].name, tablespresent[cur->type] + 1);
                 if (smbios_properties[j].table_type == cur->type &&
                     smbios_properties[j].value_type == SMSTRING &&
-                    smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
+                    smbios_properties[j].auto_str && randomSerial && (!strncmp ("SMserial", smbios_properties[j].name, sizeof("SMserial")))) {
                     
                     stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[cur->type])) + 1;
                     
@@ -1022,7 +1022,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 				snprintf(altname, sizeof(altname), "%s_%d",smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type] + 1);
                 if (smbios_properties[j].table_type == smbios_table_descriptions[i].type &&
                     smbios_properties[j].value_type==SMSTRING &&
-                    smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name))) {
+                    smbios_properties[j].auto_str && randomSerial && (!strncmp ("SMserial", smbios_properties[j].name, sizeof("SMserial")))) {
                     
                     stringlen += strlen(smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[smbios_table_descriptions[i].type])) + 1;
                     
@@ -1139,7 +1139,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
                         case SMSTRING:
-                            if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                            if (smbios_properties[j].auto_str && randomSerial && (!strncmp ("SMserial", smbios_properties[j].name,sizeof("SMserial"))))
                             {
                                 str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
                                 size = strlen(str);
@@ -1265,7 +1265,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 				if (smbios_properties[j].table_type == newcur->type) {
 					switch (smbios_properties[j].value_type) {
                         case SMSTRING:
-                            if (smbios_properties[j].auto_str && randomSerial && (!strcmp ("SMserial", smbios_properties[j].name)))
+                            if (smbios_properties[j].auto_str && randomSerial && (!strncmp ("SMserial", smbios_properties[j].name,sizeof("SMserial"))))
                             {
                                 str = smbios_properties[j].auto_str(smbios_properties[j].name, tablespresent[newcur->type]);
                                 size = strlen(str);
