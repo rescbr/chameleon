@@ -2,16 +2,16 @@
  * Copyright 2010 Evan Lojewski. All rights reserved.
  *
  */
-#ifdef CONFIG_MODULES
-#ifndef CONFIG_MODULE_DEBUG
-#define CONFIG_MODULE_DEBUG 0
-#endif
-
 #include "boot.h"
 #include "bootstruct.h"
 #include "modules.h"
 #include "boot_modules.h"
 #include <vers.h>
+
+#ifdef CONFIG_MODULES
+#ifndef CONFIG_MODULE_DEBUG
+#define CONFIG_MODULE_DEBUG 0
+#endif
 
 
 #if CONFIG_MODULE_DEBUG
@@ -23,10 +23,8 @@
 #endif
 
 // NOTE: Global so that modules can link with this
-UInt64 textAddress = 0;
-UInt64 textSection = 0;
-
-void* symbols_module_start = (void*)0xFFFFFFFF;	// Global, value is populated by the makefile with actual address
+static UInt64 textAddress = 0;
+static UInt64 textSection = 0;
 
 /** Internal symbols, however there are accessor methods **/
 moduleHook_t* moduleCallbacks = NULL;
@@ -48,10 +46,12 @@ int init_module_system()
     
 	int retVal = 0;
 	void (*module_start)(void) = NULL;
-	char* module_data = symbols_module_start + BOOT2_ADDR;
+
+	extern char  symbols_start  __asm("section$start$__DATA$__Symbols");
+	char* module_data = &symbols_start;
     
 	// Intialize module system
-	if(symbols_module_start != (void*)0xFFFFFFFF)
+	if(module_data)
 	{
 		// Module system  was compiled in (Symbols.dylib addr known)
 		module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
@@ -60,7 +60,6 @@ int init_module_system()
 		{
 			// Notify the system that it was laoded
 			module_loaded(SYMBOLS_MODULE, SYMBOLS_AUTHOR, SYMBOLS_DESCRIPTION, SYMBOLS_VERSION, SYMBOLS_COMPAT);
-			
 			(*module_start)();	// Start the module. This will point to load_all_modules due to the way the dylib was constructed.
 			execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 			DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
@@ -69,25 +68,8 @@ int init_module_system()
 		}
 		else
 		{
-            module_data -= 0x10;    // XCODE 4 HACK
-            module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
-            
-            if(module_start && module_start != (void*)0xFFFFFFFF)
-            {
-                // Notify the system that it was laoded
-                module_loaded(SYMBOLS_MODULE, SYMBOLS_AUTHOR, SYMBOLS_DESCRIPTION, SYMBOLS_VERSION, SYMBOLS_COMPAT);
-                
-                (*module_start)();	// Start the module. This will point to load_all_modules due to the way the dylib was constructed.
-                execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
-                DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
-                retVal = 1;
-                
-            }
-            else
-            {
-                // The module does not have a valid start function
-                printf("Unable to start %s\n", SYMBOLS_MODULE); getchar();
-            }		
+			// The module does not have a valid start function
+			printf("Unable to start %s at 0x%x\n", SYMBOLS_MODULE, module_data); pause();
 		}		
 	}
 	return retVal;
@@ -104,7 +86,6 @@ void start_built_in_module(const char* name,
     // Notify the module system that this module really exists, specificaly, let other module link with it
     module_loaded(name, author, description, version, compat);
 }
-
 
 /*
  * Load all modules in the /Extra/modules/ directory
@@ -326,7 +307,7 @@ unsigned int lookup_all_symbols(const char* name)
 void* parse_mach(void* binary, 
                  int(*dylib_loader)(char*), 
                  long long(*symbol_handler)(char*, long long, char),
-                 void (*section_handler)(char* section, char* segment, long long offset, long long address)
+                 void (*section_handler)(char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
 )
 {	
 	char is64 = false;
@@ -361,14 +342,13 @@ void* parse_mach(void* binary,
 	}
 	else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
 	{
-		// NOTE: modules cannot be 64bit...
+		// NOTE: modules cannot be 64bit. This is used to parse the kernel and kexts
 		is64 = true;
 		binaryIndex += sizeof(struct mach_header_64);
 	}
 	else
 	{
-		//verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
-		//getchar();
+		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
 		return NULL;
 	}
 	
@@ -411,9 +391,7 @@ void* parse_mach(void* binary,
                         
                         sectionIndex += sizeof(struct section);
                         
-                        if(section_handler) section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
-                        
-                        
+                        if(section_handler) section_handler(sect->sectname, segCommand->segname, (void*)sect, sect->offset, sect->addr);
                         
                         if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
                         {
@@ -439,10 +417,9 @@ void* parse_mach(void* binary,
                         
                         sectionIndex += sizeof(struct section_64);
                         
-                        if(section_handler) section_handler(sect->sectname, segCommand->segname, sect->offset, sect->addr);
-                        
-                        
-                        if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
+                        if(section_handler) section_handler(sect->sectname, segCommand64->segname, (void*)sect, sect->offset, sect->addr);
+
+                        if((strcmp("__TEXT", segCommand64->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
                         {
                             // __TEXT,__text found, save the offset and address for when looking for the calls.
                             textSection = sect->offset;
@@ -1151,4 +1128,28 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 {
     return 0;
 }
+
+void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
+{
+	printf("WARNING: register_hook_callback is not supported when compiled in.\n");
+	pause();
+}
+
+int replace_function(const char* symbol, void* newAddress)
+{
+	printf("WARNING: replace_functions is not supported when compiled in.\n");
+	pause();
+	return 0;
+}
+
+void start_built_in_module(const char* name, 
+                           const char* author, 
+                           const char* description,
+                           UInt32 version,
+                           UInt32 compat,
+                           void(*start_function)(void))
+{
+    start_function();
+}
+
 #endif

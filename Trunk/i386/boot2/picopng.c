@@ -65,13 +65,21 @@ void png_alloc_remove_node(png_alloc_node_t *node)
 		return;
 	}
 	if (node->prev)
+	{
 		node->prev->next = node->next;
+	}
 	if (node->next)
+	{
 		node->next->prev = node->prev;
+	}
 	if (node == png_alloc_head)
+	{
 		png_alloc_head = node->next;
+	}
 	if (node == png_alloc_tail)
+	{
 		png_alloc_tail = node->prev;
+	}
 	node->prev = node->next = node->addr = NULL;
 	free(node);
 }
@@ -85,16 +93,25 @@ void *png_alloc_malloc(size_t size)
 
 void *png_alloc_realloc(void *addr, size_t size)
 {
-	void *new_addr;
+	void *new_addr = NULL;
 	if (!addr)
+	{
 		return png_alloc_malloc(size);
-	new_addr = realloc(addr, size);
-	if (new_addr && (new_addr != addr)) {
-		png_alloc_node_t *old_node;
-		old_node = png_alloc_find_node(addr);
-		png_alloc_remove_node(old_node);
-		png_alloc_add_node(new_addr, size);
 	}
+
+	png_alloc_node_t *old_node;
+	old_node = png_alloc_find_node(addr);
+
+	if (old_node)
+	{
+		new_addr = realloc(addr, size);
+		if (new_addr && (new_addr != addr))
+		{
+			png_alloc_remove_node(old_node);
+			png_alloc_add_node(new_addr, size);
+		}
+	}
+
 	return new_addr;
 }
 

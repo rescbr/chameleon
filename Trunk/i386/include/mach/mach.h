@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 1999-2005 Apple Computer, Inc. All rights reserved.
  *
- * @APPLE_OSREFERENCE_LICENSE_HEADER_START@
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -23,9 +22,6 @@
  * Please see the License for the specific language governing rights and
  * limitations under the License.
  * 
- * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
- */
-/* 
  * Mach Operating System
  * Copyright (c) 1991,1990,1989 Carnegie Mellon University
  * All Rights Reserved.
@@ -49,9 +45,7 @@
  * 
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
- */
-
-/* 
+ *
  *  Includes all the types that a normal user
  *  of Mach programs should need
  */

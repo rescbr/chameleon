@@ -1223,7 +1223,7 @@ void updateGraphicBootPrompt()
 	return;
 }
 
-inline void vramwrite (void *data, int width, int height)
+static inline void vramwrite (void *data, int width, int height)
 {
 	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4)
 	{

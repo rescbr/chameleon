@@ -22,8 +22,6 @@
 #ifndef __STD_HEADER_ITERATOR_BASE
 #define __STD_HEADER_ITERATOR_BASE 1
 
-#pragma GCC visibility push(default)
-
 namespace std{
 	template<class Iterator> struct iterator_traits;
 	template<class T> struct iterator_traits<T*>;
@@ -297,8 +295,6 @@ namespace std{
 	}
 
 }
-
-#pragma GCC visibility pop
 
 #endif
 

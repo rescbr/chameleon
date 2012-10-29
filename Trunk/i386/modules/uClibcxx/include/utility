@@ -24,8 +24,6 @@
 #ifndef __STD_HEADER_UTILITY
 #define __STD_HEADER_UTILITY 1
 
-#pragma GCC visibility push(default)
-
 namespace std{
 
 	namespace rel_ops {
@@ -82,7 +80,5 @@ namespace std{
 
 
 }
-
-#pragma GCC visibility pop
 
 #endif	//__STD_HEADER_UTILITY

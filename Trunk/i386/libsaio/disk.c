@@ -1385,6 +1385,10 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 		goto scanErr;
 	}
 	buffer = malloc(bufferSize);
+	if (!buffer)
+	{
+        	goto scanErr;
+	}
 
 	if (readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
 	{
@@ -1394,6 +1398,10 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 
 	// Allocate a new map for this BIOS device and insert it into the chain
 	map = malloc(sizeof(*map));
+	if (!map)
+	{
+		goto scanErr;
+	}
 	map->biosdev = biosdev;
 	map->bvr = NULL;
 	map->bvrcnt = 0;
@@ -1534,7 +1542,10 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 	}
 
 	scanErr:
-	free(buffer);
+	if (buffer) 
+	{
+		free(buffer);
+	}
 
 	if(map)
 	{
@@ -1593,6 +1604,24 @@ static bool getOSVersion(BVRef bvr, char *str)
 			valid = false;
 	}
 	
+	if(!valid)
+	{
+		int fh = -1;
+		sprintf(dirSpec, "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		fh = open(dirSpec, 0);
+
+		if (fh >= 0)
+		{
+			valid = true;
+			bvr->OSisInstaller = true;
+			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+		}
+		else
+		{
+			close(fh);
+		}
+	}
+
 	return valid;
 }
 
@@ -2082,8 +2111,8 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 			return;
 		}
 
-		strcpy(str + len, " ");
-		len++;
+		strcpy(str + len, bvr->OSisInstaller ? " (Installer) " : " ");
+		len += bvr->OSisInstaller ? 13 : 1;
 		strMaxLen -= len;
 		p += len;
 	}

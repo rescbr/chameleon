@@ -27,8 +27,6 @@
 #ifndef HEADER_STD_MEMORY
 #define HEADER_STD_MEMORY 1
 
-#pragma GCC visibility push(default)
-
 namespace std{
 
 template <class T> class allocator;
@@ -189,8 +187,6 @@ public:
 };
 
 }	//namespace std
-
-#pragma GCC visibility pop
 
 #endif
 

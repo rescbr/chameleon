@@ -96,7 +96,7 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
 	int fd = 0;
-	char dirSpec[512] = "";
+	char dirSpec[512];
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
@@ -702,21 +702,29 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
+	if (Platform.CPU.Vendor == 0x756E6547)
+	{	/* Intel */
 		fix_restart = true;
 		fix_restart_ps2 = false;
 		if ( getBoolForKey(kPS2RestartFix, &fix_restart_ps2, &bootInfo->chameleonConfig) && fix_restart_ps2)
+		{
 			fix_restart = true;
-		else
-			getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
 		}
 		else
 		{
-			verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
-			fix_restart = false;
+			getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
+		}
+	}
+	else
+	{
+		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
+		fix_restart = false;
 	}
 
-	if (fix_restart) fadt_rev2_needed = true;
+	if (fix_restart)
+	{
+		fadt_rev2_needed = true;
+	}
 
 	// Allocate new fadt table
 	if (fadt->Length < 0x84 && fadt_rev2_needed)
@@ -737,13 +745,19 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		if (Platform.Type > 6)  
 		{
 			if(fadt_mod->PM_Profile<=6)
+			{
 				Platform.Type = fadt_mod->PM_Profile; // get the fadt if correct
-			else 
+			}
+			else
+			{
 				Platform.Type = 1;		/* Set a fixed value (Desktop) */
+			}
 			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		}
 		else
+		{
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
+		}
 	}
 	// Set PM_Profile from System-type if only user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
@@ -799,7 +813,9 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 
 		fadt_mod->DSDT=(uint32_t)new_dsdt;
 		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		{
 			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+		}
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
@@ -1048,8 +1064,8 @@ int setupAcpi(void)
 			// FIXME: handle 64-bit address correctly
 
 			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
-			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress,
-					xsdt->Length);
+			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt->Length);
+
 			if (xsdt && (uint64_t)rsdp->XsdtAddress<0xffffffff && xsdt->Length<0x10000)
 			{
 				uint64_t *xsdt_entries;
@@ -1071,6 +1087,7 @@ int setupAcpi(void)
 						continue;
 					}
 					xsdt_entries[i-dropoffset]=xsdt_entries[i];
+
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
 						dropoffset++;

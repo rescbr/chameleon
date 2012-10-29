@@ -20,8 +20,6 @@
 
 #include <system_configuration.h>
 
-#pragma GCC visibility push(default)
-
 //The following is used to support GCC symbol visibility patch
 
 #ifdef GCC_HASCLASSVISIBILITY
@@ -53,8 +51,6 @@
 namespace std{
 	typedef signed long int streamsize;
 }
-
-#pragma GCC visibility pop
 
 #endif
 

@@ -11,7 +11,7 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building modules is important.
-SUBDIRS =
+SUBDIRS = KernelPatcher
 
 ifdef CONFIG_KLIBC_MODULE
 SUBDIRS += klibc
@@ -34,11 +34,11 @@ SUBDIRS += Keylayout
 endif
 
 ifdef CONFIG_SATA_MODULE
-SUBDIRS += sata
+SUBDIRS += Sata
 endif
 
 ifdef CONFIG_ACPICODEC_MODULE
-SUBDIRS += ACPICodec
+SUBDIRS += AcpiCodec
 endif
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static

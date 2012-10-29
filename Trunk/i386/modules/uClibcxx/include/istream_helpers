@@ -25,8 +25,6 @@
 #ifndef __STD_HEADER_ISTREAM_HELPERS
 #define __STD_HEADER_ISTREAM_HELPERS 1
 
-#pragma GCC visibility push(default)
-
 namespace std{
 
 
@@ -56,8 +54,8 @@ namespace std{
 				break;
 			}
 		}
-		if (temp.size() == 0)
-			stream.setstate(ios_base::eofbit|ios_base::failbit);
+		//if (temp.size() == 0)
+			//stream.setstate(ios_base::eofbit|ios_base::failbit);
 
 		return temp;
 	}
@@ -76,8 +74,8 @@ namespace std{
 				break;
 			}
 		}
-		if (temp.size() == 0)
-			stream.setstate(ios_base::eofbit|ios_base::failbit);
+		//if (temp.size() == 0)
+			//stream.setstate(ios_base::eofbit|ios_base::failbit);
 
 		return temp;
 	}
@@ -331,12 +329,10 @@ namespace std{
 			is.rdbuf()->sbumpc();
 		}
 		if(traits::eq_int_type(c, eof)){
-			is.setstate(ios_base::eofbit);
+			//is.setstate(ios_base::eofbit);
 		}
 	}
 }
-
-#pragma GCC visibility pop
 
 #endif
 

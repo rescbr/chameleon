@@ -29,8 +29,6 @@
 #ifndef __STD_HEADER_MAP
 #define __STD_HEADER_MAP
 
-#pragma GCC visibility push(default)
-
 namespace std{
 
 
@@ -253,8 +251,6 @@ protected:
 		(multimap<Key,T,Compare,Allocator>& x, multimap<Key,T,Compare,Allocator>& y);
 
 }
-
-#pragma GCC visibility pop
 
 #endif
 

@@ -1658,11 +1658,20 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1211,	0x15587101,	"Clevo GeForce GTX 580M" },
 	{ 0x10DE1211,	0x15587200,	"Clevo GeForce GTX 580M" },
 
+	{ 0x10DE1212,	0x10280550,	"Dell GeForce GTX 675M" },
+	{ 0x10DE1212,	0x10280551,	"Dell GeForce GTX 675M" },
 	{ 0x10DE1212,	0x1028057B,	"Dell GeForce GTX 675M" },
+	{ 0x10DE1212,	0x10280580,	"Dell GeForce GTX 675M" },
 	{ 0x10DE1212,	0x10DE095D,	"nVidia GeForce GTX 675M" },
 	{ 0x10DE1212,	0x144DC0D0,	"Samsung GeForce GTX 675M" },
 	{ 0x10DE1212,	0x146210CB,	"MSi GeForce GTX 675M" },
+	{ 0x10DE1212,	0x15580270,	"Clevo GeForce GTX 675M" },
+	{ 0x10DE1212,	0x15580271,	"Clevo GeForce GTX 675M" },
+	{ 0x10DE1212,	0x15585105,	"Clevo GeForce GTX 675M" },
+	{ 0x10DE1212,	0x15587102,	"Clevo GeForce GTX 675M" },
 
+	{ 0x10DE1213,	0x10432119,	"Asus GeForce GTX 670M" },
+	{ 0x10DE1213,	0x10432120,	"Asus GeForce GTX 670M" },
 	{ 0x10DE1213,	0x102804BA,	"Dell GeForce GTX 670M" },
 	{ 0x10DE1213,	0x10432119,	"Dell GeForce GTX 670M" },
 	{ 0x10DE1213,	0x10432120,	"Dell GeForce GTX 670M" },
@@ -1671,7 +1680,10 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE1213,	0x1179FB18,	"Toshiba GeForce GTX 670M" },
 	{ 0x10DE1213,	0x1179FB1A,	"Toshiba GeForce GTX 670M" },
 	{ 0x10DE1213,	0x146210CB,	"MSi GeForce GTX 670M" },
+	{ 0x10DE1213,	0x15580371,	"Clevo GeForce GTX 670M" },
 	{ 0x10DE1213,	0x15585105,	"Clevo GeForce GTX 670M" },
+	{ 0x10DE1213,	0x15587102,	"Clevo GeForce GTX 670M" },
+	{ 0x10DE1213,	0x15588000,	"Clevo GeForce GTX 670M" },
 
 	{ 0x10DE1241,	0x10DE091D,	"nVidia GeForce GT 545" },
 
@@ -3246,6 +3258,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		else
 		{
 			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
+			free(rom);
 			return false;
 		}
 	}
