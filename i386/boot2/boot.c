@@ -112,12 +112,12 @@ static bool gUnloadPXEOnExit = false;
 
 static void zeroBSS(void)
 {
-#if (defined(__clang__)) /* WARNING : must be first, __GNUC__ seems to be also defined */
+#if (defined(__clang__)) && (defined(__XCODE45_HACK__))/* WARNING : must be first, __GNUC__ seems to be also defined */
 	
-	extern char  bss_start  __asm("section$start$__DATA$__bss");
-    extern char  bss_end    __asm("section$end$__DATA$__bss");
-    extern char  common_start  __asm("section$start$__DATA$__common");
-    extern char  common_end    __asm("section$end$__DATA$__common");
+	extern int  bss_start  __asm("section$start$__DATA$__bss");
+    extern int  bss_end    __asm("section$end$__DATA$__bss");
+    extern int  common_start  __asm("section$start$__DATA$__common");
+    extern int  common_end    __asm("section$end$__DATA$__common");
 	
 	bzero(&bss_start, (&bss_end - &bss_start));
 	bzero(&common_start, (&common_end - &common_start));
