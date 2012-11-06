@@ -32,7 +32,7 @@
 #include "libsa.h"
 #include "memory.h"
 
-#define ZDEBUG 1
+#define ZDEBUG 0
 
 #if ZDEBUG
 int zout;

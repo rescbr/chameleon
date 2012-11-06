@@ -7,6 +7,32 @@
 
 #include "convert.h"
 
+/** convert URL to a string */
+char * newStringFromURL(char* string)
+{    
+	char * buffer = newString(string);
+	
+	int maxlen = strlen(buffer);	
+	
+	// replace "%20" by spaces.
+	int len = 0;
+	while (buffer[len] != '\0') {
+		if (buffer[len] == '%' && buffer[len+1] == '2' && buffer[len+2] == '0')
+		{
+			buffer[len] = ' ';
+			
+			strlcpy(&buffer[len+1], &buffer[len+3], maxlen - (len+1)); 			
+		}
+		len++;
+	}
+	
+	//DBG("%s maxlen : %d, newlen : %lu\n",buffer, maxlen, strlen(buffer));
+	// This will leak a little bit, i mean as you can see the final string will be slightly smaller than the allocated string buffer, 
+	// to fix this you can realloc the buffer, or do another newString(xxx) then free the first buffer, i choose to do nothing.
+	
+    return buffer ;
+}
+
 /** Transform a 16 bytes hexadecimal value UUID to a string */
 const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 {

@@ -282,6 +282,7 @@ struct BootVolume {
     bool             filtered;        /* newFilteredBVChain() will set to TRUE */
     bool             visible;         /* will shown in the device list */
     char			 OSVersion[8];
+	char			 OSInstall[30];
     bool			 kernelfound;       /* mach_kernel found in default location, currently only /mach_kernel is supported */
     bool             OSisServer;        /* 1 = OS X server , 0 = OS X client, not to be confused with Platform->CPU.isServer which means it tries to emulate an xserve in the smbios */
 };

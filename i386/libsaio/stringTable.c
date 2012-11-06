@@ -600,7 +600,7 @@ printSystemConfig(char *p1)
 int ParseXMLFile( char * buffer, TagPtr * dict )
 {
     long       length, pos;
-    TagPtr     tag;
+    TagPtr     tag = 0;
     pos = 0;
     char       *configBuffer;
     
@@ -766,19 +766,20 @@ int loadSystemConfig(void)
 	char *dirspec[] = {
         "rd(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-		"bt(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
-        "rd(0,0)/OS X Install Data/com.apple.Boot.plist",
-		"/OS X Install Data/com.apple.Boot.plist",
-		"bt(0,0)/OS X Install Data/com.apple.Boot.plist",
-        "rd(0,0)/Mac OS X Install Data/com.apple.Boot.plist",
-		"/Mac OS X Install Data/com.apple.Boot.plist",
-		"bt(0,0)/Mac OS X Install Data/com.apple.Boot.plist"
+		"bt(0,0)/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
     
+	char *dirspecInstall[] = {
+        "rd(0,0)/%s/com.apple.Boot.plist",
+		"/%s/com.apple.Boot.plist",
+		"bt(0,0)/%s/com.apple.Boot.plist"																			   
+	};
+	char tmp[60];	
+	
     config_file_t *config = &bootInfo->SystemConfig;
 
     
-	int i, fd, count, ret=-1, fixedsize;
+	int i, fd, count, fixedsize;
 	
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
@@ -793,12 +794,32 @@ int loadSystemConfig(void)
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
-			ret=0;			
-			break;
+			return 0;
 		}
 	}
 	
-	return ret;
+	BVRef bvr = ((BVRef)(uint32_t)get_env(envgBootVolume));
+	
+	for(i = 0; (unsigned)i< sizeof(dirspecInstall)/sizeof(dirspecInstall[0]); i++)
+	{
+		snprintf(tmp, sizeof(tmp),dirspecInstall[i], bvr->OSInstall); 
+
+		if ((fd = open(tmp)) >= 0)
+		{
+			// read file
+			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
+			count = read(fd, config->plist, fixedsize);
+			close(fd);
+            if (count != fixedsize) continue;
+			
+			// build xml dictionary
+			ParseXMLFile(config->plist, &config->dictionary);
+            safe_set_env(envSysConfigValid,true);
+			return 0;
+		}
+	}
+
+	return -1;
 }
 
 #ifdef BOOT_HELPER_SUPPORT

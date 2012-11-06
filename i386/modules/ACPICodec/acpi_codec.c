@@ -216,11 +216,14 @@ static ACPI_TABLE_HEADER * get_new_table_in_list(U32 *new_table_list, U32 Signat
 	
 	for (index = 0; index < (MAX_ACPI_TABLE + RESERVED_AERA); index++)
 	{
-		if (*(U32 *) (table_array[index]->Signature) == Signature)
-		{
-			*retIndex = index;
-			return table_array[index] ;
-		}
+        if (table_array[index])
+        {
+            if (*(U32 *) (table_array[index]->Signature) == Signature)
+            {
+                *retIndex = index;
+                return table_array[index] ;
+            }
+        }		
 	}
 	return (void*)0ul;
 }
@@ -233,10 +236,13 @@ static U8 get_number_of_tables_in_list(U32 *new_table_list, U32 Signature )
 	
 	for (index = 0; index < (MAX_ACPI_TABLE + RESERVED_AERA); index++)
 	{
-		if (*(U32 *) (table_array[index]->Signature) == Signature)
-		{
-			InstalledTables++ ;
-		}
+        if (table_array[index])
+        {
+            if (*(U32 *) (table_array[index]->Signature) == Signature)
+            {
+                InstalledTables++ ;
+            }
+        }		
 	}
 	return InstalledTables;
 }
@@ -1581,7 +1587,7 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						    * expert mode : 1 , mean add only p-states found in boot.plist
 						    */
             
-            TagPtr PstateTag;                           
+            TagPtr PstateTag = 0;
             U32 pstate_tag_count = 0;
             
 			{
@@ -1759,7 +1765,7 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 {
 	{ 
         
-		TagPtr CstateTag;		
+		TagPtr CstateTag = 0;
         U32 entry_count = 0;
         
         if (personality->dictionary) 
@@ -4914,7 +4920,7 @@ EFI_STATUS setupAcpi(void)
 	
 	if (rsdp == (void*)0ul || (GetChecksum(rsdp, (rsdp->Revision == 0) ? ACPI_RSDP_REV0_SIZE:sizeof(ACPI_TABLE_RSDP)) != 0) )
 	{
-		printf("Error : ACPI RSD PTR Revision %d checksum is incorrect or table not found \n",rsdp->Revision );
+		printf("Error : ACPI RSD PTR checksum is incorrect or table not found \n");
 		Register_Acpi_Efi(NULL, 0);
 		return EFI_UNSUPPORTED;
 	}

@@ -55,6 +55,7 @@
 #include "bootstruct.h"
 #include "platform.h"
 #include "sl.h"
+#include "convert.h"
 
 #include "fdisk.h"
 #ifdef UFS_SUPPORT
@@ -202,6 +203,7 @@ static TagPtr XMLGetElementWithID( TagPtr dict, const char* id );
 static bool getOSVersion(BVRef bvr, char *str);
 static bool CheckDarwin(BVRef bvr);
 static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *systemVersion);
+static bool getOSInstallURL(BVRef bvr, const char *dirSpec, config_file_t *config_file);
 
 //==========================================================================
 
@@ -1584,6 +1586,14 @@ static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *s
                                                    XMLGetElementWithID(pkg_p, 
                                                                        "com.apple.mpkg.OSInstall"), 
                                                    (const char*)"Version"));
+			
+			if (!version) 
+			{
+				version = XMLCastString(XMLGetProperty(
+													   XMLGetElementWithID(pkg_p, 
+																		   "com.apple.pkg.CompatibilityUpdate"), 
+													   (const char*)"Version"));
+			}
             
             if (version && strlen(version) >= 4) 
             {
@@ -1598,15 +1608,54 @@ static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *s
     return false;
 }
 
+static bool getOSInstallURL(BVRef bvr, const char *dirSpec, config_file_t *config_file)
+{
+    if (!loadConfigFile(dirSpec, config_file))
+    {
+        char *encoded_url = XMLCastString(XMLGetProperty(config_file->dictionary, (const char*)"Product URL"));
+		
+		if (!encoded_url) {
+			goto out;
+		}
+		
+		DBG("encoded_url %s\n",encoded_url);
+		
+		//char * dev_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"; // strlen = 36			
+		
+		//char * osx_product = "x-osproduct://";	// strlen = 14			
+		
+		char * val = &encoded_url[(36+14)+1];
+		
+		DBG("val %s\n",val);
+		
+		char * buffer = newStringFromURL(val);
+		
+		if (!buffer) 
+		{
+			goto out;
+		}
+		
+		DBG("buffer %s\n",buffer);				
+		
+		strlcpy(bvr->OSInstall, buffer, sizeof(bvr->OSInstall));
+		
+		free(buffer);
+		
+		return true;
+    }
+out:
+    return false;
+}
+
 static bool getOSVersion(BVRef bvr, char *str)
 {
 	bool valid = false;	
-	config_file_t systemVersion;
+	config_file_t config_file;
 	char  dirSpec[512];	
 	
 	snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	
-	if (!loadConfigFile(dirSpec, &systemVersion))
+	if (!loadConfigFile(dirSpec, &config_file))
 	{
 		valid = true;
 	}
@@ -1614,26 +1663,30 @@ static bool getOSVersion(BVRef bvr, char *str)
 	{
 		snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		
-		if (!loadConfigFile(dirSpec, &systemVersion))
+		if (!loadConfigFile(dirSpec, &config_file))
 		{	
             bvr->OSisServer = true;
 			valid = true;
 		}
 		else 
 		{
-			snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.8
-			
-			if (!getOSInstallVersion(dirSpec, str, &systemVersion))
-			{
-                snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/Mac OS X Install Data/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no); // 10.7
-                
-                if (!getOSInstallVersion(dirSpec, str, &systemVersion))
-                    return false;
-                else
-                    return true;
-                
+			snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no); 
+			DBG("dirSpec %s\n",dirSpec);
+
+			if (!loadConfigFile(dirSpec, &config_file))
+			{	
+				if (getOSInstallURL(bvr, dirSpec, &config_file)) 
+				{
+					snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/%s/index.sproduct", BIOS_DEV_UNIT(bvr), bvr->part_no, bvr->OSInstall); 
+					
+					DBG("dirSpec %s\n",dirSpec);
+					
+					if (!getOSInstallVersion(dirSpec, str, &config_file))
+						return false;
+					else
+						return true;
+				}
 			}
-            else return true;
 		}
 	}
 	
@@ -1642,7 +1695,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 		
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if  (getValueForKey(kProductVersion, &val, &len, &config_file))
 		{
 			// getValueForKey uses const char for val
 			// so copy it and trim

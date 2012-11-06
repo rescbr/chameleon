@@ -683,9 +683,9 @@ void common_boot(int biosdev)
 				}
 			} while (0);
 		}
-        
+
         do {
-            if (trycache == true)
+            if (trycache == true || forcecache == true)
 			{
                 bootFile = gBootKernelCacheFile;
                 verbose("Loading kernel cache %s\n", bootFile);

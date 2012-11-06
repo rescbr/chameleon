@@ -639,8 +639,10 @@ do {                                                                            
     unsigned _he_bkt_i;                                                          \
     struct UT_hash_handle *_he_thh, *_he_hh_nxt;                                 \
     UT_hash_bucket *_he_new_buckets, *_he_newbkt;                                \
-    _he_new_buckets = (UT_hash_bucket*)uthash_malloc(                            \
-             2 * tbl->num_buckets * sizeof(struct UT_hash_bucket));              \
+    unsigned long _he_bkt_size = 2 * tbl->num_buckets                            \
+                                    * sizeof(struct UT_hash_bucket);             \
+    if (!(_he_bkt_size > 0)) { uthash_fatal( "unknown error"); }                 \
+    _he_new_buckets = (UT_hash_bucket*)uthash_malloc(_he_bkt_size);              \
     if (!_he_new_buckets) { uthash_fatal( "out of memory"); }                    \
     memset(_he_new_buckets, 0,                                                   \
             2 * tbl->num_buckets * sizeof(struct UT_hash_bucket));               \

@@ -59,8 +59,6 @@
 #define SMBIOS_GETLEN(base)     SMBIOS_GET8(base, 0x01)
 #define SMBIOS_GETSTR(base)     ((base) + SMBIOS_GETLEN(base))
 
-typedef char* caddr_t;
-
 static uint8_t
 smbios_checksum(const caddr_t addr, const uint8_t len)
 {

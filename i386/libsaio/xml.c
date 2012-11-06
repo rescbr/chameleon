@@ -253,7 +253,7 @@ long
 XMLParseFile( char * buffer, TagPtr * dict )
 {
     long       length, pos;
-    TagPtr     tag;
+    TagPtr     tag = 0;
     pos = 0;
 	char       *configBuffer;
 	
@@ -544,6 +544,7 @@ ParseTagList( char * buffer, TagPtr * tag, long type, long empty )
 	TagPtr tagList, tmpTag;
     
     tagList = 0;
+    tmpTag = 0;
     pos = 0;
     
     if (!empty)
@@ -911,7 +912,7 @@ static TagPtr
 NewTag( void )
 {
 	long   cnt;
-	TagPtr tag;
+	TagPtr tag = 0;
     
     if (gTagsFree == 0)
     {

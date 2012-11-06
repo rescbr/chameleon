@@ -613,25 +613,30 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 	
 	EFI_CHAR16*	 dst = 0;	
 	
-	if (!key || !(*key) || !src) return 0;
+	if (!key || !(*key) || !src) goto error;
 	
     int tmp_len = strlen(src);
     
-	dst = (EFI_CHAR16*) malloc( ((tmp_len)+1) * 2 );
+    *len = ((tmp_len)+1) * 2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+    
+    if (!(*len > 0)) goto error;
+    
+	dst = (EFI_CHAR16*) malloc( *len );
     if (!dst) 
     {
-        *len = 0;
-        return NULL;
+        goto error;
     }
     
-    *len = tmp_len;
 	{
 		size_t		 i = 0;
-		for (; i < (*len); i++)	 dst[i] = src[i];
+		for (; i < (tmp_len); i++)	 dst[i] = src[i];
 	}
-	dst[(*len)] = '\0';
-	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+	dst[(tmp_len)] = '\0';
 	return dst;
+    
+error:
+    *len = 0;
+    return NULL;
 }
 
 /*

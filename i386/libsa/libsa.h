@@ -55,6 +55,9 @@
 #define isxdigit(c) ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
 #define ispunct(c)  (c == '.' || c == '-') //Azi: TODO - add more ponctuation characters as needed; at least these two, i need for PartNo.
 
+
+typedef char* caddr_t;
+
 /*
  * string.c
  */
@@ -107,12 +110,6 @@ extern void * bsearch(register const void *key,const void *base0,size_t nmemb,re
 extern long strtol(const char * nptr, char ** endptr, int base);
 extern unsigned long strtoul(const char * nptr, char ** endptr, int base);
 extern unsigned long long strtouq(const char *nptr, char ** endptr, int base);
-
-/*
- * prf.c
- */
-//extern int prf(const char * fmt, va_list ap, void (*putfn_p)(),
-//			   void * putfn_arg);
 
 /*
  * printf.c
