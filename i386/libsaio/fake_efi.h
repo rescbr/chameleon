@@ -16,7 +16,7 @@ setupFakeEfi(void);
 
 extern EFI_STATUS setup_acpi (void);
 
-extern EFI_STATUS addConfigurationTable();
+extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias);
 
 extern struct SMBEntryPoint	*getSmbiosOriginal();
 

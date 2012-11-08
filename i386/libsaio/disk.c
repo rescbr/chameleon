@@ -204,6 +204,17 @@ static bool getOSVersion(BVRef bvr, char *str);
 static bool CheckDarwin(BVRef bvr);
 static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *systemVersion);
 static bool getOSInstallURL(BVRef bvr, const char *dirSpec, config_file_t *config_file);
+static BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
+				  const gpt_ent * part,
+				  FSInit initFunc, FSLoadFile loadFunc,
+				  FSReadFile readFunc,
+				  FSGetDirEntry getdirFunc,
+				  FSGetFileBlock getBlockFunc,
+				  FSGetUUID getUUIDFunc,
+				  BVGetDescription getDescriptionFunc,
+				  BVFree bvFreeFunc,
+				  int probe, int type, unsigned int bvrFlags );
+static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen);
 
 //==========================================================================
 
@@ -717,7 +728,7 @@ EFI_GUID const GPT_BASICDATA_GUID = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 
 EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
 
 
-BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
+static BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 				  const gpt_ent * part,
 				  FSInit initFunc, FSLoadFile loadFunc,
 				  FSReadFile readFunc,
@@ -2124,7 +2135,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" etc; ...
  */
 
-bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
+static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 {
     char *aliasList, *entryStart, *entryNext;
     

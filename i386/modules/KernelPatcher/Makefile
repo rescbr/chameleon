@@ -36,7 +36,7 @@ INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/Pr
 
 OPTIM = -O3
 DEBUG = -DNOTHING
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -fstack-protector-all \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wall -fstack-protector-all \
     -D__ARCHITECTURE__=\"i386\"  \
     $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \

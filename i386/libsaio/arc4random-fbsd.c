@@ -73,6 +73,7 @@ static int arc4_count;
 
 static inline u_int8_t arc4_getbyte(void);
 static void arc4_stir(void);
+__private_extern__ void _arc4_fork_child(void);
 
 static struct {
 	struct timeval	tv;

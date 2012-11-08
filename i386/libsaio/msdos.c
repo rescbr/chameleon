@@ -773,7 +773,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 		*flags = kFileTypeFlat;
 	
 	// Calculate a fake timestamp using modification date and time values.
-	*time = (dirp->deMDate & 0x7FFF) << 16 + dirp->deMTime;
+	*time = (dirp->deMDate & 0x7FFF) << (16 + dirp->deMTime); 
 	
 	if (infoValid)
 		*infoValid = 1;

@@ -29,6 +29,7 @@
 
 #include "sl.h"
 #include "hfs_CaseTables.h"
+#include "hfs.h"
 
 #if ! UNCOMPRESSED
 

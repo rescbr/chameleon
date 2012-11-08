@@ -94,7 +94,7 @@ void getKernelCachePath(void);
 #ifdef NBP_SUPPORT
 static bool gUnloadPXEOnExit = false;
 #endif
-
+static void getRootDevice(void);
 
 /*
  * How long to wait (in seconds) to load the
@@ -931,7 +931,7 @@ void getKernelCachePath(void)
 	}
 }
 
-static void getRootDevice()
+static void getRootDevice(void)
 {
 	// Maximum config table value size
 #define VALUE_SIZE 2048

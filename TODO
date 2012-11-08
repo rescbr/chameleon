@@ -12,7 +12,6 @@ TODO List for Chameleon Boot Loader
 
 - implement cpu topology
 - Backport cconfig from the trunk
-- update cpu_intel_amd
 - Implement a Host like in bits to avoid some return issues
 
 - update project with corehash

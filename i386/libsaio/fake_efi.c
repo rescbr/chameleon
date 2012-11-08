@@ -162,7 +162,7 @@ EFI_UINT32                    gNumTables32 = 0;
 EFI_UINT64                    gNumTables64 = 0;
 EFI_CONFIGURATION_TABLE_32 gEfiConfigurationTable32[MAX_CONFIGURATION_TABLE_ENTRIES];
 EFI_CONFIGURATION_TABLE_64 gEfiConfigurationTable64[MAX_CONFIGURATION_TABLE_ENTRIES];
-extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
+EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
 	

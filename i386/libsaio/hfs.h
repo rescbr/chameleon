@@ -31,3 +31,8 @@ extern long HFSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock
 extern long HFSGetUUID(CICell ih, char *uuidStr,  long strMaxLen);
 extern void HFSFree(CICell ih);
 extern bool HFSProbe (const void *buf);
+
+
+extern int32_t	FastRelString(u_int8_t * str1, u_int8_t * str2);
+extern int32_t BinaryUnicodeCompare (u_int16_t * str1, u_int32_t length1,
+									 u_int16_t * str2, u_int32_t length2);

@@ -28,6 +28,7 @@
  */
 
 #include "sl.h"
+#include "libsaio.h"
 
 struct CacheEntry {
   CICell    ih;
@@ -60,7 +61,7 @@ unsigned long     gCacheMisses;
 unsigned long     gCacheEvicts;
 #endif
 
-void CacheReset()
+void CacheReset(void)
 {
     gCacheIH = NULL;
 }

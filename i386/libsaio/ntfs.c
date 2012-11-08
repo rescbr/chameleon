@@ -24,6 +24,7 @@
  */
 #include "libsaio.h"
 #include "sl.h"
+#include "ntfs.h"
 
 /*
  * dmazar, 14/7/2011 - support for EXFAT volume label reading

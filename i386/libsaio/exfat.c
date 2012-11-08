@@ -35,6 +35,7 @@
 
 #include "libsaio.h"
 #include "sl.h"
+#include "exfat.h"
 
 #ifndef DEBUG_EXFAT
 #define DEBUG_EXFAT 0

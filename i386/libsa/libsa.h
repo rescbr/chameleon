@@ -140,7 +140,14 @@ extern int
              void			(*putc)(int ch, void *arg),
              void                    *arg,
              int			radix);
-    
+  
+/*
+ * qsort.c
+ */
+
+extern void qsort(void *a,size_t n,size_t es, int (*cmp)());
+
+
 /*
  * zalloc.c
  */

@@ -47,11 +47,11 @@ installhdrs::
 ifeq ($(HAVE_MD),YES)
 
 .c.o .m.o:
-	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -Wmissing-prototypes -Wmissing-declarations $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
 	$(SYMROOT)/md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d
 
 $(OBJROOT)/%.o: %.c
-	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
+	$(CC) $(CPPFLAGS) $(GFLAGS) $(CFLAGS) $(DEFINES) -c $(INC) -Wmissing-prototypes -Wmissing-declarations $< -o $(OBJROOT)/$*.o -MD -dependency-file $(OBJROOT)/$*.d
 	$(SYMROOT)/md -u $(OBJROOT)/Makedep -f -d $(OBJROOT)/$*.d 
 
 $(OBJROOT)/%.o: %.m

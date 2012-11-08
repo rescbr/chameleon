@@ -108,11 +108,6 @@ static long CompareHFSPlusCatalogKeys(void *key, void *testKey);
 static long CompareHFSExtentsKeys(void *key, void *testKey);
 static long CompareHFSPlusExtentsKeys(void *key, void *testKey);
 
-extern long FastRelString(u_int8_t *str1, u_int8_t *str2);
-extern long BinaryUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1,
-                                 u_int16_t *uniStr2, u_int32_t len2);
-
-
 static void SwapFinderInfo(FndrFileInfo *dst, FndrFileInfo *src)
 {
     dst->fdType = SWAP_BE32(src->fdType);

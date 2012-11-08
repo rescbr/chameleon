@@ -22,7 +22,8 @@
 
 pci_dt_t	*root_pci_dev;
 static char* dev_path;	// TODO: Figure out what is going on here...
-
+static void scan_pci_bus(pci_dt_t *start, uint8_t bus);
+static void enable_pci_devs(void);
 
 uint8_t pci_config_read8(uint32_t pci_addr, uint8_t reg)
 {
@@ -66,7 +67,7 @@ void pci_config_write32(uint32_t pci_addr, uint8_t reg, uint32_t data)
 	outl(PCI_DATA_REG, data);
 }
 
-void scan_pci_bus(pci_dt_t *start, uint8_t bus)
+static void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 {
 	pci_dt_t	*new;
 	pci_dt_t	**current = &start->children;
@@ -124,7 +125,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 	}
 }
 
-void enable_pci_devs(void)
+static void enable_pci_devs(void)
 {
 	uint16_t id;
 	uint32_t rcba, *fd;

@@ -395,7 +395,7 @@ static uint32_t compute_bclk(void)
  * - CPUFreq = FSBFreq * multi
  */
 
-void scan_cpu(PlatformInfo_t *p)
+void scan_cpu(void)
 {
 	uint64_t	msr = 0;        
     
@@ -616,6 +616,7 @@ void scan_cpu(PlatformInfo_t *p)
                 case CPUID_MODEL_NEHALEM_EX:
                 case CPUID_MODEL_SANDYBRIDGE:
                 case CPUID_MODEL_JAKETOWN:
+				case CPUID_MODEL_IVYBRIDGE:
                 {
                     msr = rdmsr64(MSR_CORE_THREAD_COUNT);
                     NoThreads = bitfield((uint32_t)msr, 15,  0);
@@ -628,7 +629,7 @@ void scan_cpu(PlatformInfo_t *p)
     
     if (NoCores == 0)
 	{
-        if (p->CPU.Vendor == CPUID_VENDOR_AMD)
+        if (Vendor == CPUID_VENDOR_AMD)
         {
             if (!cores_per_package) {
                 //legacy method
@@ -660,7 +661,7 @@ void scan_cpu(PlatformInfo_t *p)
             CPUFreq = measure_aperf_frequency();
         }
         
-        if ((Vendor == 0x68747541 /* AMD */) && (Family == 0x0f))
+        if ((Vendor == CPUID_VENDOR_AMD) && (Family == 0x0f))
         {
             switch(ExtFamily)
             {

@@ -13,7 +13,7 @@ INSTALLDIR = $(DSTROOT)/usr/standalone/i386
 LOCALBIN = $(DSTROOT)/usr/local/bin
 
 OPTIM = -Os -Oz
-CFLAGS = $(RC_CFLAGS) $(OPTIM) -Wmost -Werror -g
+CFLAGS = $(RC_CFLAGS) $(OPTIM) -Wall -Werror -g
 LDFLAGS =
 CFILES = machOconv.c
 ALLSRC = $(CFILES) $(MFILES) $(HFILES) $(EXPORT_HFILES)

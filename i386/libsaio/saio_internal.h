@@ -100,7 +100,7 @@ extern boot_args * getBootArgs(void);
 
 
 /* cache.c */
-extern void   CacheReset();
+extern void   CacheReset(void);
 extern void   CacheInit(CICell ih, long blockSize);
 extern long   CacheRead(CICell ih, char *buffer, long long offset,
                         long length, long cache);

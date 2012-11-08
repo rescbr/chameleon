@@ -24,10 +24,10 @@ BUNDLE_CLASS = SYMS
 BUNDLE_CLASS_PROVIDER = SYSTEM
 
 OPTIM = -Os -Oz
-CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror -fno-stack-protector \
+CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wall -fno-stack-protector \
 		-fno-builtin -static $(OMIT_FRAME_POINTER_CFLAG) \
 		-mpreferred-stack-boundary=2 -fno-align-functions \
-		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE  
+		-march=pentium4 -msse2 -mfpmath=sse -msoft-float -Qunused-arguments -ffreestanding -DBOOT_CORE  -Werror
 
 GFLAGS	= 
 DEFINES=
