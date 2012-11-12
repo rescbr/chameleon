@@ -180,12 +180,10 @@ getVESAModeWithProperties( unsigned short     width,
 	
     // Clear output mode info.
 	
-    //bzero( outModeInfo, sizeof(*outModeInfo) );
 	bzero( outModeInfo, sizeof(VBEModeInfoBlock) );
 	
     // Get VBE controller info containing the list of supported modes.
 	
-    //bzero( &vbeInfo, sizeof(vbeInfo) );
     bzero( &vbeInfo, sizeof(VBEInfoBlock) );
     
     strlcpy( (char*)&vbeInfo, "VBE2", sizeof(VBEInfoBlock) );

@@ -116,10 +116,10 @@ BVRef nbpScanBootVolumes( int biosdev, int * countPtr )
 
     if ( !gNetBVR )
     {
-        gNetBVR = malloc( sizeof(*gNetBVR) );
+        gNetBVR = malloc( sizeof(struct BootVolume) );
         if ( gNetBVR )
         {
-            bzero(gNetBVR, sizeof(*gNetBVR));
+            bzero(gNetBVR, sizeof(struct BootVolume));
             gNetBVR->biosdev = biosdev;
             gNetBVR->flags   = kBVFlagPrimary | kBVFlagNativeBoot;
             gNetBVR->description = NBPGetDescription;

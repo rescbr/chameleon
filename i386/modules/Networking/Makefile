@@ -58,7 +58,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-NET_OBJS = Networking.o stack_protector.o
+NET_OBJS = Networking.o device_inject.o stack_protector.o
 
 
 SFILES =
@@ -84,7 +84,7 @@ bundle:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/stack_protector.o $(OBJROOT)/Networking.o -o $(SYMROOT)/$(BUNDLE_EXEC)
+	$(OBJROOT)/stack_protector.o $(OBJROOT)/device_inject.o $(OBJROOT)/Networking.o -o $(SYMROOT)/$(BUNDLE_EXEC)
 	@rm -rf $(SYMROOT)/$(BUNDLE_NAME).bundle	
 	@mkdir $(SYMROOT)/$(BUNDLE_NAME).bundle	
 	@mkdir $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents	
@@ -117,6 +117,10 @@ stack_protector.o:
 
 Networking.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "Networking.c" $(INC) -o "$(OBJROOT)/Networking.o"
+
+device_inject.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/device_inject.c" $(INC) -o "$(OBJROOT)/device_inject.o"
+
 
 include ../../MakeInc.dir
 

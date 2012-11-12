@@ -476,7 +476,7 @@ struct compressed_block gLowerCaseTableCompressed[] = {
 // Please update count if you add/remove entries but also please just let
 // the compiler calculate it so you don't get it wrong.
 //#define kLowerCaseTableNBlocks 182
-#define kLowerCaseTableNBlocks (sizeof(gLowerCaseTableCompressed)/sizeof(*gLowerCaseTableCompressed))
+#define kLowerCaseTableNBlocks (sizeof(gLowerCaseTableCompressed)/sizeof(struct compressed_block))
 // WARNING: The expanded size MUST be updated if you change the table and
 // cannot be calculated at compile time.
 #define kLowerCaseTableDataSize 5632 /* size of uncompressed structure in bytes */
@@ -552,7 +552,7 @@ struct compressed_block gCompareTableCompressed[] = {
 // Please update count if you add/remove entries but also please just let
 // the compiler calculate it so you don't get it wrong.
 //#define kCompareTableNBlocks 64
-#define kCompareTableNBlocks (sizeof(gCompareTableCompressed)/sizeof(*gCompareTableCompressed))
+#define kCompareTableNBlocks (sizeof(gCompareTableCompressed)/sizeof(struct compressed_block))
 // WARNING: The expanded size MUST be updated if you change the table and
 // cannot be calculated at compile time.
 #define kCompareTableDataSize 512 /* size of uncompressed structure in bytes */

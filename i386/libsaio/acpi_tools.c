@@ -194,9 +194,13 @@ static ACPI_TABLE_HEADER *GetTablePtr(ACPI_TABLE_RSDT * rsdt, U32 signature)
     // Compute number of table pointers included in RSDT
     num_tables = get_num_tables(rsdt);
     
-    for (index = 0; index < num_tables; index++) {
+    for (index = 0; index < num_tables; index++) 
+	{
+		if (!table_array[index]) continue;
+		
         if ((*(U32 *) (table_array[index]->Signature) == signature) &&
-            (GetChecksum(table_array[index], table_array[index]->Length) == 0)) {
+            (GetChecksum(table_array[index], table_array[index]->Length) == 0)) 
+		{
             return (table_array[index]);
         }
     }
@@ -222,11 +226,15 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 	switch (method) {
 		case 0x2:
 		{
-			for (index = 0; index < num_tables; index++) {
+			for (index = 0; index < num_tables; index++) 
+			{
 				U64 ptr = xsdt->TableOffsetEntry[index];
 				
+				if (!ptr) continue;
+				
 				if ((*(U32 *) ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Signature == signature) &&
-					(GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) == 0)) {
+					(GetChecksum(((ACPI_TABLE_HEADER *) (unsigned long)ptr), ((ACPI_TABLE_HEADER *) (unsigned long)ptr)->Length) == 0)) 
+				{
 					return (((ACPI_TABLE_HEADER *) (unsigned long)ptr));
 				}        
 			}
@@ -237,9 +245,13 @@ static ACPI_TABLE_HEADER *GetTablePtr64(ACPI_TABLE_XSDT * xsdt, U32 signature)
 		{
 			ACPI_TABLE_HEADER *table = (ACPI_TABLE_HEADER *) xsdt->TableOffsetEntry;		
 			
-			for (index = 0; index < num_tables; index++) {
+			for (index = 0; index < num_tables; index++)
+			{
+				if (!table) continue;
+
 				if (((U32) (table->Signature) == signature) &&
-					(GetChecksum(table, table->Length) == 0)) {
+					(GetChecksum(table, table->Length) == 0))
+				{
 					return (table);
 				}
 				// Move array pointer to next 64-bit pointer
@@ -292,9 +304,14 @@ static U32 GetRsdtPointer(void *mem_addr, U32 mem_size, ACPI_TABLES * acpi_table
     if (current == 0ul)
         return (0ul);
     
-    for (; current < end; current += 16) {
-        if (*(volatile U64 *)current == NAMESEG64("RSD PTR ")) {
-            if (GetChecksum(current, ACPI_RSDP_REV0_SIZE) == 0) {
+    for (; current < end; current += 16) 
+	{
+		if (!current) continue;
+
+        if (*(volatile U64 *)current == NAMESEG64("RSD PTR ")) 
+		{
+            if (GetChecksum(current, ACPI_RSDP_REV0_SIZE) == 0) 
+			{
                 // RSD pointer structure checksum okay, lookup the RSDT pointer.                
                 acpi_tables->RsdPointer = (ACPI_TABLE_RSDP *)current;
                 acpi_tables->RsdtPointer = (ACPI_TABLE_RSDT *) acpi_tables->RsdPointer->RsdtPhysicalAddress;

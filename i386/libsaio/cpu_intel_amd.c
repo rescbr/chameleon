@@ -448,7 +448,7 @@ void scan_cpu(void)
     else if (Vendor != CPUID_VENDOR_AMD)
     {
         stop("Error: CPU unsupported\n");
-    	halt();
+        return;
     }
 	
     /* get extended cpuid results */

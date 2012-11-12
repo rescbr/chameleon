@@ -62,9 +62,6 @@
 /* Maximum number of SPD bytes */
 #define MAX_SPD_SIZE			256
 
-/* Size of SMBIOS UUID in bytes */
-#define UUID_LEN			16
-
 typedef struct _RamSlotInfo_t {
     uint32_t		ModuleSize;						// Size of Module in MB
     uint32_t		Frequency; // in Mhz
@@ -120,6 +117,8 @@ typedef struct _RamSlotInfo_t {
 #define envgBIOSDev             "boot.hw.bios_device"
 #define envgDeviceCount         "boot.hw.device_count"
 #define envarchCpuType			"boot.hw.cputype"
+
+#define envPCIRootDev           "boot.hw.pci_root_dev"
 
 #define envgHaveKernelCache		"boot.kern.HaveKernelCache"
 #define envAdler32				"boot.kern.adler32"

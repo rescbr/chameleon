@@ -58,7 +58,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SATA_OBJS = YellowIconFixer.o stack_protector.o
+SATA_OBJS = YellowIconFixer.o device_inject.o stack_protector.o
 
 
 SFILES =
@@ -84,7 +84,7 @@ bundle:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
 	-macosx_version_min 10.6 \
-	$(OBJROOT)/stack_protector.o $(OBJROOT)/YellowIconFixer.o -o $(SYMROOT)/$(BUNDLE_EXEC)
+	$(OBJROOT)/stack_protector.o $(OBJROOT)/device_inject.o $(OBJROOT)/YellowIconFixer.o -o $(SYMROOT)/$(BUNDLE_EXEC)
 	@rm -rf $(SYMROOT)/$(BUNDLE_NAME).bundle	
 	@mkdir $(SYMROOT)/$(BUNDLE_NAME).bundle	
 	@mkdir $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents	
@@ -117,6 +117,10 @@ stack_protector.o:
 
 YellowIconFixer.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "YellowIconFixer.c" $(INC) -o "$(OBJROOT)/YellowIconFixer.o"
+
+device_inject.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/device_inject.c" $(INC) -o "$(OBJROOT)/device_inject.o"
+
 
 include ../../MakeInc.dir
 

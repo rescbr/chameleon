@@ -923,7 +923,7 @@ static struct SMBEntryPoint *smbios_dry_run(struct SMBEntryPoint *origsmbios)
 	ret->anchor[1] = 0x53;
 	ret->anchor[2] = 0x4d;
 	ret->anchor[3] = 0x5f; 
-	ret->entryPointLength = sizeof(*ret);
+	ret->entryPointLength = sizeof(struct SMBEntryPoint);
 	ret->majorVersion = 2;
 	ret->minorVersion = 1;
 	ret->maxStructureSize = 0; // will be calculated later in this function
@@ -1361,7 +1361,7 @@ static void smbios_real_run(struct SMBEntryPoint * origsmbios, struct SMBEntryPo
 	newsmbios->dmi.checksum = 0;
 	newsmbios->dmi.checksum = 256 - checksum8(&newsmbios->dmi, sizeof(newsmbios->dmi));
 	newsmbios->checksum = 0;
-	newsmbios->checksum = 256 - checksum8(newsmbios, sizeof(*newsmbios));
+	newsmbios->checksum = 256 - checksum8(newsmbios, sizeof(struct SMBEntryPoint));
 	
 	if (!done) {
 		verbose("Patched DMI Table\n");

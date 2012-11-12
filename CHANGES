@@ -1,4 +1,8 @@
 - Security fixes
+- Implemented random uuid
+- device_inject is now embedded into the modules that need it, and not in the core anymore
+
+- Security fixes
 - Fixed few bugs in AcpiCodec
 - Fixes some bugs related to the auto-installer 
 

@@ -588,10 +588,10 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
 						   BVFree bvFreeFunc,
 						   int probe, int type, unsigned int bvrFlags )
 {
-    BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
+    BVRef bvr = (BVRef) malloc( sizeof(struct BootVolume) );
     if ( bvr )
     {
-        bzero(bvr, sizeof(*bvr));
+        bzero(bvr, sizeof(struct BootVolume));
 		
         bvr->biosdev        = biosdev;
         bvr->part_no        = partno;
@@ -658,10 +658,10 @@ BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
 				  BVFree bvFreeFunc,
 				  int probe, int type, unsigned int bvrFlags )
 {
-    BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
+    BVRef bvr = (BVRef) malloc( sizeof(struct BootVolume) );
     if ( bvr )
     {
-        bzero(bvr, sizeof(*bvr));
+        bzero(bvr, sizeof(struct BootVolume));
 		
         bvr->biosdev        = biosdev;
         bvr->part_no        = partno;
@@ -739,10 +739,10 @@ static BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 				  BVFree bvFreeFunc,
 				  int probe, int type, unsigned int bvrFlags )
 {
-    BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
+    BVRef bvr = (BVRef) malloc( sizeof(struct BootVolume) );
     if ( bvr )
     {
-        bzero(bvr, sizeof(*bvr));
+        bzero(bvr, sizeof(struct BootVolume));
 		
         bvr->biosdev        = biosdev;
         bvr->part_no        = partno;
@@ -837,7 +837,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 #endif
     // Create a new mapping.
     
-	map = (struct DiskBVMap *) malloc( sizeof(*map) );
+	map = (struct DiskBVMap *) malloc( sizeof(struct DiskBVMap) );
     if ( !map )
     {
         return NULL;    
@@ -1138,7 +1138,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
     
     // Create a new mapping.
     
-    map = (struct DiskBVMap *) malloc( sizeof(*map) );
+    map = (struct DiskBVMap *) malloc( sizeof(struct DiskBVMap) );
     if ( !map )
     {
         return NULL;
@@ -1399,7 +1399,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     DBG("Read GPT\n");
 	
     // Allocate a new map for this BIOS device and insert it into the chain
-    map = malloc(sizeof(*map));
+    map = (struct DiskBVMap *) malloc(sizeof(struct DiskBVMap));
     if (!map) {
         goto scanErr;
     }
@@ -1830,6 +1830,10 @@ static void scanFSLevelBVRSettings(BVRef chain)
 void rescanBIOSDevice(int biosdev)
 {
 	struct DiskBVMap *oldMap = diskResetBootVolumes(biosdev);
+    if (oldMap == NULL)
+    {
+        return;
+    }
 	CacheReset();
 	diskFreeMap(oldMap);
 	oldMap = NULL;
@@ -1856,7 +1860,10 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
         else if(prevMap != NULL)
             prevMap->next = map->next;
         else
-            stop("");
+        {
+            stop("diskResetBootVolumes error\n");
+            return NULL;
+        }
     }
     // Return the old map, either to be freed, or reinserted later
     return map;
@@ -1966,11 +1973,11 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			/*
 			 * Allocate and copy the matched bvr entry into a new one.
 			 */
-			newBVR = (BVRef) malloc(sizeof(*newBVR));
+			newBVR = (BVRef) malloc(sizeof(struct BootVolume));
             if (!newBVR) {
                 continue;
             }
-			bcopy(bvr, newBVR, sizeof(*newBVR));
+			bcopy(bvr, newBVR, sizeof(struct BootVolume));
 			
 			/*
 			 * Adjust the new bvr's fields.
@@ -2245,7 +2252,7 @@ int readBootSector( int biosdev, unsigned int secno, void * buffer )
     {
         if ( gBootSector == NULL )
         {
-            gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
+            gBootSector = (struct disk_blk0 *) malloc(sizeof(struct disk_blk0));
             if ( gBootSector == NULL ) return -1;
         }
         bootSector = gBootSector;
@@ -2283,7 +2290,7 @@ int testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer )
     {
         if ( gBootSector == NULL )
         {
-            gBootSector = (struct disk_blk0 *) malloc(sizeof(*gBootSector));
+            gBootSector = (struct disk_blk0 *) malloc(sizeof(struct disk_blk0));
             if ( gBootSector == NULL ) return -1;
         }
         bootSector = (struct disk_boot1f32_blk *) gBootSector;

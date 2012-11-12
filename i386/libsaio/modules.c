@@ -357,12 +357,8 @@ EFI_STATUS execute_hook(const char* name, void* arg1, void* arg2, void* arg3, vo
  *			hook is executed. When registering a new callback name, the callback is added sorted.
  *			NOTE: the hooks take four void* arguments.
  */
-VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
-{	
-	DBG("Adding callback for hook '%s'.\n", name);
-	
-	moduleHook_t* hook = get_callback(name);
-	
+static VOID __register_hook_callback(moduleHook_t* hook, const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
+{
 	if(hook)
 	{
 		// append
@@ -402,7 +398,28 @@ VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	print_hook_list();
 	getc();
 #endif
+}
+
+VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
+{	
+	DBG("Adding callback for hook '%s'.\n", name);
 	
+	moduleHook_t* hook = get_callback(name);
+	
+	__register_hook_callback(hook, name, callback);
+}
+
+VOID register_one_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*))
+{	
+	DBG("Adding one callback for hook '%s'.\n", name);
+	
+	moduleHook_t* hook = get_callback(name);
+	
+	if (hook) 
+	{
+		return;
+	}	
+	__register_hook_callback(hook, name, callback);
 }
 
 #if DEBUG_MODULES

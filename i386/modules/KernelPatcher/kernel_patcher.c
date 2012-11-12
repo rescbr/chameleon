@@ -8,6 +8,16 @@
 #include "platform.h"
 #include "modules.h"
 
+#ifndef DEBUG_KERNEL_PATCHER
+#define DEBUG_KERNEL_PATCHER 0
+#endif
+
+#if DEBUG_KERNEL_PATCHER
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
+
 long long symbol_handler(char* module, char* symbolName, long long addr, char is64);
 
 patchRoutine_t* patches = NULL;
@@ -17,6 +27,8 @@ static void register_kernel_symbol(int kernelType, const char* name);
 static kernSymbols_t* lookup_kernel_symbol(const char* name);
 static int determineKernelArchitecture(void* kernelData);
 static int locate_symbols(void* kernelData);
+static unsigned int parse_mach_64(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char));
+static unsigned int handle_symtable_64(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long, char), char is64);
 
 /*
  * Internal patches provided by this module.
@@ -219,6 +231,310 @@ static int determineKernelArchitecture(void* kernelData)
 	}
 }
 
+static unsigned int parse_mach_64(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
+{	
+	char is64 = false;
+	unsigned int module_start = 0xFFFFFFFF;
+	EFI_STATUS bind_status = EFI_SUCCESS;
+    
+	// TODO convert all of the structs to a union	
+	struct dyld_info_command* dyldInfoCommand = NULL;	
+	struct symtab_command* symtabCommand = NULL;	
+	
+	{
+		struct segment_command *segCommand = NULL;
+		struct segment_command_64 *segCommand64 = NULL;
+		struct load_command *loadCommand = NULL;
+		UInt32 binaryIndex = 0;
+		UInt16 cmd = 0;
+		
+		// Parse through the load commands
+		if(((struct mach_header*)binary)->magic == MH_MAGIC)
+		{
+			is64 = false;
+			binaryIndex += sizeof(struct mach_header);
+		}
+		else if(((struct mach_header_64*)binary)->magic == MH_MAGIC_64)
+		{
+			// NOTE: modules cannot be 64bit...
+			is64 = true;
+			binaryIndex += sizeof(struct mach_header_64);
+		}
+		else
+		{
+			printf("Modules: Invalid mach magic\n");
+			getc();
+			return 0xFFFFFFFF;
+		}
+		
+		
+		
+		/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
+		 {
+		 printf("Module is not a dylib. Unable to load.\n");
+		 getc();
+		 return NULL; // Module is in the incorrect format
+		 }*/
+		
+		while(cmd < ((struct mach_header*)binary)->ncmds)
+		{
+			cmd++;
+			
+			loadCommand = binary + binaryIndex;
+			UInt32 cmdSize = loadCommand->cmdsize;
+			
+			
+			switch ((loadCommand->cmd & 0x7FFFFFFF))
+			{
+				case LC_SYMTAB:
+					symtabCommand = binary + binaryIndex;
+					break;
+					
+				case LC_SEGMENT: // 32bit macho
+				{
+					segCommand = binary + binaryIndex;
+					
+					//printf("Segment name is %s\n", segCommand->segname);
+					
+					if(strncmp("__TEXT", segCommand->segname, sizeof("__TEXT")) == 0)
+					{
+						UInt32 sectionIndex;
+						
+#if DEBUG_KERNEL_PATCHER
+						unsigned long fileaddr;
+						long   filesize;					
+						vmaddr = (segCommand->vmaddr & 0x3fffffff);
+						vmsize = segCommand->vmsize;	  
+						fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand->fileoff);
+						filesize = segCommand->filesize;
+						
+						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+							   segCommand->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+							   (unsigned) segCommand->nsects, (unsigned)segCommand->flags);
+#if DEBUG_KERNEL_PATCHER==2
+						
+						getc();
+#endif
+#endif
+						
+						sectionIndex = sizeof(struct segment_command);
+						
+						struct section *sect;
+						
+						while(sectionIndex < segCommand->cmdsize)
+						{
+							sect = binary + binaryIndex + sectionIndex;
+							
+							sectionIndex += sizeof(struct section);
+							
+							
+							if(strncmp("__text", sect->sectname,sizeof("__text")) == 0)
+							{
+								// __TEXT,__text found, save the offset and address for when looking for the calls.
+								textSection = sect->offset;
+								textAddress = sect->addr;
+								break;
+							}					
+						}
+					}
+					break;
+				}	
+				case LC_SEGMENT_64:	// 64bit macho's
+				{
+					segCommand64 = binary + binaryIndex;
+					
+					//printf("Segment name is %s\n", segCommand->segname);
+					
+					if(strncmp("__TEXT", segCommand64->segname, sizeof("__TEXT")) == 0)
+					{
+						UInt32 sectionIndex;
+						
+#if DEBUG_KERNEL_PATCHER						
+						unsigned long fileaddr;
+						long   filesize;					
+						vmaddr = (segCommand64->vmaddr & 0x3fffffff);
+						vmsize = segCommand64->vmsize;	  
+						fileaddr = ((unsigned long)(binary + binaryIndex) + segCommand64->fileoff);
+						filesize = segCommand64->filesize;
+						
+						printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+							   segCommand64->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+							   (unsigned) segCommand64->nsects, (unsigned)segCommand64->flags);
+#if DEBUG_KERNEL_PATCHER==2
+						
+						getc();
+#endif
+#endif
+						
+						sectionIndex = sizeof(struct segment_command_64);
+						
+						struct section_64 *sect;
+						
+						while(sectionIndex < segCommand64->cmdsize)
+						{
+							sect = binary + binaryIndex + sectionIndex;
+							
+							sectionIndex += sizeof(struct section_64);
+							
+							
+							if(strncmp("__text", sect->sectname, sizeof("__text")) == 0)
+							{
+								// __TEXT,__text found, save the offset and address for when looking for the calls.
+								textSection = sect->offset;
+								textAddress = sect->addr;
+								
+								break;
+							}					
+						}
+					}
+					
+					break;
+				}
+				case LC_DYSYMTAB:
+					break;
+					
+				case LC_LOAD_DYLIB:
+				case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
+                    break;
+                    
+				case LC_ID_DYLIB:
+                    break;
+                    
+					
+				case LC_DYLD_INFO:
+					// Bind and rebase info is stored here
+					dyldInfoCommand = binary + binaryIndex;
+					break;
+					
+				case LC_UUID:
+					break;
+					
+				case LC_UNIXTHREAD:
+					break;
+					
+				default:
+					DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
+					break;
+					
+			}
+			
+			binaryIndex += cmdSize;
+		}
+		//if(!moduleName) return NULL;
+	}		
+	
+	// bind_macho uses the symbols.
+	module_start = handle_symtable_64(module, (UInt32)binary, symtabCommand, symbol_handler, is64);
+
+	// Rebase the module before binding it.
+	if(dyldInfoCommand && dyldInfoCommand->rebase_off)
+	{
+		rebase_macho(binary, (char*)dyldInfoCommand->rebase_off, dyldInfoCommand->rebase_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->bind_off)
+	{
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off && (bind_status == EFI_SUCCESS))
+	{
+		// NOTE: this currently should never happen.
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
+	}
+	
+	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off && (bind_status == EFI_SUCCESS))
+	{
+		// NOTE: we are binding the lazy pointers as a module is laoded,
+		// This should be changed to bind when a symbol is referened at runtime instead.
+		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
+	}
+	
+    if (bind_status != EFI_SUCCESS) {
+        module_start = 0xFFFFFFFF;
+    }
+    
+	return  module_start;
+	
+}
+
+static unsigned int handle_symtable_64(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long, char), char is64)
+{		
+	unsigned int module_start = 0xFFFFFFFF;
+	
+	UInt32 symbolIndex = 0;
+    if (!symtabCommand) {
+        return 0xFFFFFFFF;
+    }
+	char* symbolString = base + (char*)symtabCommand->stroff;
+	if(!is64)
+	{
+		struct nlist* symbolEntry = (void*)base + symtabCommand->symoff;
+		while(symbolIndex < symtabCommand->nsyms)
+		{						
+			if(symbolEntry->n_value)
+			{				
+				if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strncmp(symbolString + symbolEntry->n_un.n_strx, "start", sizeof("start")) == 0))
+				{
+					module_start = base + symbolEntry->n_value;
+					DBG("n_value %x module_start %x\n", (unsigned)symbolEntry->n_value, (unsigned)module_start);
+				}
+				else
+				{
+					symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
+
+					
+				}
+#if DEBUG_KERNEL_PATCHER
+				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
+				printf("%s %s\n", isTexT ? "__TEXT :" : "__DATA(OR ANY) :", symbolString + symbolEntry->n_un.n_strx);
+#if DEBUG_KERNEL_PATCHER==2	
+				
+				if(strcmp(symbolString + symbolEntry->n_un.n_strx, "_BootHelp_txt") == 0)
+				{
+					long long addr = (long long)base + symbolEntry->n_value;
+					unsigned char *BootHelp = NULL;
+					BootHelp  = (unsigned char*)(UInt32)addr;					
+					printf("method 1: __DATA : BootHelp_txt[0] %x\n", BootHelp[0]);
+					
+					long long addr2 = symbolEntry->n_value;
+					unsigned char *BootHelp2 = NULL;
+					BootHelp2  = (unsigned char*)(UInt32)addr2;					
+					printf("method 2:  __DATA : BootHelp_txt[0] %x\n", BootHelp2[0]);
+				}
+#endif
+#endif
+				
+			}
+			
+			symbolEntry++;
+			symbolIndex++;	// TODO remove
+		}
+	}
+	else
+	{
+		struct nlist_64* symbolEntry = (void*)base + symtabCommand->symoff;
+		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now)	
+		while(symbolIndex < symtabCommand->nsyms)
+		{	
+			
+			if(strstr(symbolString + symbolEntry->n_un.n_strx, "module_start") || (strncmp(symbolString + symbolEntry->n_un.n_strx, "start",sizeof("start")) == 0))
+			{
+				module_start = (unsigned int)(base + symbolEntry->n_value);
+			}
+			else
+			{
+				symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value, is64);
+			}
+			
+			symbolEntry++;
+			symbolIndex++;	// TODO remove
+		}
+	}	
+	return module_start;
+	
+}
+
 /**
  **		This functions located the requested symbols in the mach-o file.
  **			as well as determines the start of the __TEXT segment and __TEXT,__text sections
@@ -226,7 +542,7 @@ static int determineKernelArchitecture(void* kernelData)
 static int locate_symbols(void* kernelData)
 {
 	char is64 = 1;
-	parse_mach("VirtualXnuSyms",kernelData, symbol_handler);
+	parse_mach_64("VirtualXnuSyms",kernelData, symbol_handler);
 	//handle_symtable((UInt32)kernelData, symtableData, &symbol_handler, determineKernelArchitecture(kernelData) == KERNEL_64);
 	return 1 << is64;
 }

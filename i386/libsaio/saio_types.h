@@ -35,6 +35,7 @@
 #include <IOKit/IOTypes.h>
 #endif
 #include "bootXnu.h"
+#include "uuidP.h"
 
 #if DEBUG
 #define DEBUG_DISK(x)    printf x
@@ -77,6 +78,7 @@
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kSMBIOSKey			"SMBIOS"			/* fake_efi.c */
 #define kSystemID			"SystemId"			/* fake_efi.c */
+#define kRandomSystemID		"RandomSystemId"	/* fake_efi.c */
 #define kSystemType			"SystemType"		/* fake_efi.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
@@ -85,6 +87,9 @@
 #define kAcpiMethod			"Acpi2Method"		// 2 (= method 2) for some machines that may hang on acpi 2 (aka acpi 64 bit) detection (replace the old kUnsafeACPI "UnsafeACPI") 	
 #define kRebootOnPanic		"RebootOnPanic"
 #define kEnableHiDPI		"EnableHiDPI"		// enable High resolution display (aka Retina)
+
+#define UUID_LEN	 sizeof(uuid_t)
+#define UUID_STR_LEN sizeof(uuid_string_t)
 
 
 #define PLATFORM_NAME_LEN 64

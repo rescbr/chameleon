@@ -58,7 +58,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o stack_protector.o
+GRAPHICS_ENABLER_OBJS = nvidia.o ati.o gma.o GraphicsEnabler.o device_inject.o stack_protector.o
 
 
 SFILES =
@@ -84,6 +84,7 @@ bundle:
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
     $(OBJROOT)/stack_protector.o \
+    $(OBJROOT)/device_inject.o \
     $(OBJROOT)/nvidia.o \
 	$(OBJROOT)/ati.o \
 	$(OBJROOT)/gma.o \
@@ -129,6 +130,10 @@ nvidia.o:
 
 gma.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "gma.c" $(INC) -o "$(OBJROOT)/gma.o"
+
+device_inject.o: 	
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/device_inject.c" $(INC) -o "$(OBJROOT)/device_inject.o"
+
 
 include ../../MakeInc.dir
 

@@ -9,6 +9,7 @@
 #define MAX_CONFIGURATION_TABLE_ENTRIES (uint32_t)10
 #include "efi.h"
 #include "SMBIOS.h"
+#include "device_tree.h"
 
 
 extern void

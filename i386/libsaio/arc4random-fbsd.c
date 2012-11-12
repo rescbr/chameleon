@@ -284,12 +284,12 @@ arc4random_uniform(u_int32_t upper_bound)
 	return (r % upper_bound);
 }
 
+#if 0
 void
 arc4_init(void)
 {	
 }
 
-#if 0
 /*-------- Test code for i386 --------*/
 #include <stdio.h>
 #include <machine/pctr.h>

@@ -111,13 +111,13 @@ static uint32_t load_keyboard_layout_file(const char *filename) {
 	if (current_layout)
 		free(current_layout);
 		
-	current_layout = malloc(sizeof(*current_layout));
+	current_layout = malloc(sizeof(struct keyboard_layout));
 	if (!current_layout)
 		goto fail;
 
 	key_b_lseek(fd, KEYBOARD_LAYOUTS_MAP_OFFSET, 0);
 	
-	if (read(fd, (char*) current_layout, sizeof(*current_layout)) != sizeof(*current_layout)) {
+	if (read(fd, (char*) current_layout, sizeof(struct keyboard_layout)) != sizeof(struct keyboard_layout)) {
 		printf("Wrong keyboard layout file %s size\n", filename);
 		goto fail;
 	}

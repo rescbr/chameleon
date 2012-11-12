@@ -202,7 +202,7 @@ Xedit(cmd, disk, mbr, tt, offset)
 
 	/* Unused, so just zero out */
 	if (pp->id == DOSPTYP_UNUSED) {
-		memset(pp, 0, sizeof(*pp));
+		memset(pp, 0, sizeof(prt_t));
 		printf("Partition %d is disabled.\n", pn + 1);
 		return (ret);
 	}

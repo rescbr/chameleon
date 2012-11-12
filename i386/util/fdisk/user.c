@@ -168,7 +168,7 @@ USER_modify(disk, tt, offset, reloff)
 	    if (yn) {
 	      strlcpy(cmd.cmd, "erase", sizeof(cmd.cmd));
 	      cmd.args[0] = '\0';
-	      st /* false positive ?? */ = Xerase(&cmd, disk, mbr, tt, offset);
+	      Xerase(&cmd, disk, mbr, tt, offset);
 	      modified = 1;
 	    }
 	}
@@ -215,7 +215,7 @@ again:
 
 	/* Write out MBR */
 	if (modified) {
-		if (st /*??*/ == CMD_SAVE) {
+		if (st == CMD_SAVE) {
 		  	int shared = 0;
 			printf("Writing current MBR to disk.\n");
 			fd = DISK_openshared(disk->name, O_RDWR, &shared);

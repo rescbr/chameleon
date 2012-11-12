@@ -53,7 +53,6 @@ struct pciList
 #define PCI_ADDR_REG		0xcf8
 #define PCI_DATA_REG		0xcfc
 
-extern pci_dt_t		*root_pci_dev;
 extern uint8_t		pci_config_read8(uint32_t, uint8_t);
 extern uint16_t		pci_config_read16(uint32_t, uint8_t);
 extern uint32_t		pci_config_read32(uint32_t, uint8_t);
@@ -63,7 +62,7 @@ extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
 //extern char		*get_pci_dev_path(pci_dt_t *);
 extern void		build_pci_dt(void);
 extern void		dump_pci_dt(pci_dt_t *);
-extern void		setup_pci_devs(pci_dt_t *pci_dt);
+extern void		setup_root_pci_devs(void);
 extern int      getPciRootUID(void);
 
 //-----------------------------------------------------------------------------

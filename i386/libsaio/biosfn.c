@@ -827,7 +827,7 @@ static int readDriveParameters(int drive, struct driveParameters *dp)
         dp->cylinders = bb.ecx.r.h | ((bb.ecx.r.l & 0xC0) << 2);
         dp->totalDrives = bb.edx.r.l;
     } else {
-        bzero(dp, sizeof(*dp));
+        bzero(dp, sizeof(struct driveParameters));
     }
     return bb.eax.r.h;
 

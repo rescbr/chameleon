@@ -24,7 +24,7 @@
 #include "efi.h"
 
 #define DEFAULT_BUNDLE_SPEC_SIZE 4096
-#define macho_64 1
+#define macho_64 0
 
 extern unsigned long long textAddress;
 extern unsigned long long textSection;
@@ -74,6 +74,7 @@ typedef struct moduleHook_t
  */
 EFI_STATUS execute_hook(const char* name, void*, void*, void*, void*, void*, void*);
 VOID register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*));
+VOID register_one_callback(const char* name, void(*callback)(void*, void*, void*, void*, void*, void*));
 
 void rebase_location(UInt32* location, char* base, int type);
 void bind_location(UInt32* location, char* value, UInt32 addend, int type);

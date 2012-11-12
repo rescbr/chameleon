@@ -53,12 +53,14 @@
 #import <Foundation/Foundation.h>
 #import <IOKit/IOReturn.h>
 
+#include <uuid/uuid.h>
+
 #include "Intel_Acpi/acpidecode.h"
 #include "Intel_Acpi/ppmsetup.h"
 
 unsigned long uuid32;
-#define UUID_LEN	16
-#define UUID_STR_LEN UUID_LEN*2 + 8
+#define UUID_LEN	 sizeof(uuid_t)
+#define UUID_STR_LEN sizeof(uuid_string_t)
 typedef int8_t    EFI_CHAR8;
 
 unsigned long

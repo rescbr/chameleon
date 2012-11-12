@@ -57,7 +57,10 @@ void initKernBootStruct( void )
         bootArgs = (boot_args *)malloc(sizeof(boot_args));
         bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
         if (bootArgs == NULL || bootInfo == NULL)
+        {
             stop("Couldn't allocate boot info\n");
+            return;
+        }
         else
         {
             bzero(bootArgs, sizeof(boot_args));
@@ -94,6 +97,7 @@ void initKernBootStruct( void )
                 node = DT__FindNode("/", true);
                 if (node == 0) {
                     stop("Couldn't create root node");
+                    return;
                 }
                 getPlatformName(platformName, sizeof(platformName));
                 
@@ -204,6 +208,7 @@ finalizeBootStruct(void)
 			
 			// XXX could make a two-part map here
 			stop("No memory map found\n");
+            return;
 		}
 		
 		
@@ -281,6 +286,7 @@ finalizeBootStruct(void)
 			// I Guess that if sane_size == 0 we've got a big problem here, 
 			// and it means that the memory map was not converted properly
 			stop("Unable to convert memory map into proper format\n");
+            return;
 		}
 		
 #define MEG		(1024*1024)
@@ -305,11 +311,13 @@ finalizeBootStruct(void)
 		addr = (void *)AllocateKernelMemory(size);
 		if (addr == 0) {
 			stop("Couldn't allocate device tree\n");
+            return;
 		}
 		
 		DT__FlattenDeviceTree((void **)&addr, &size);
         if (!size) {
             stop("Couldn't get flatten device tree\n");
+            return;
         }
 		bootArgs->deviceTreeP = (uint32_t)addr;
 		bootArgs->deviceTreeLength = size;

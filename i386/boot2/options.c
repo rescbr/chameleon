@@ -561,7 +561,7 @@ void lspci(void)
 		setCursorPosition(0, 0, 1);
 	}
 	
-	dump_pci_dt(root_pci_dev->children);
+	dump_pci_dt(((pci_dt_t *)(uint32_t)get_env(envPCIRootDev))->children);
 	
 	pause();
 	

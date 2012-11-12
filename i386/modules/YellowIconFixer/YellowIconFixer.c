@@ -64,6 +64,7 @@ void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void*
 void YellowIconFixer_start(void);
 void YellowIconFixer_start(void)
 {
+	register_device_inject();
     register_hook_callback("PCIDevice", &SATA_hook);
 }
 

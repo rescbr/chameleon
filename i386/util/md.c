@@ -566,6 +566,7 @@ static FILE *find_mak(char *file)
         fprintf(stderr, "%s: file = \"%s\" ", name, real_mak_name);
         perror("stat");
         fflush(stdout), fflush(stderr);
+		fclose(mak);
         return NULL;
     }
     if (D_open)

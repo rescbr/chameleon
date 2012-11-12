@@ -14,7 +14,6 @@
 #include "fake_efi.h"
 #include "efi_tables.h"
 #include "platform.h"
-#include "device_inject.h"
 #include "convert.h"
 #include "pci.h"
 #include "sl.h"
@@ -75,6 +74,7 @@ static VOID setup_Smbios(VOID);
 static VOID setup_machine_signature(VOID);
 static VOID setupEfiConfigurationTable(VOID);
 static EFI_STATUS EFI_FindAcpiTables(VOID);
+static VOID efi_setupDeviceProperties(Node *node);
 
 /*==========================================================================
  * Utility function to make a device tree string from an EFI_GUID
@@ -110,12 +110,9 @@ static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'A','p','p','l','e', 0};
 
 /* Info About the current Firmware */
 #define FIRMWARE_MAINTENER "cparm, armelcadetpetit@gmail.com" 
-static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','a','s','h','e','r','b','r','u','m','-','2', 0};  
-static EFI_UINT32 const FIRMWARE_REVISION = 0x00010800; //1.8
+static EFI_CHAR16 const FIRMWARE_NAME[] = {'M','a','s','h','e','r','b','r','u','m','-','2','.','1', 0};  
+static EFI_UINT32 const FIRMWARE_REVISION = 0x00020100; //2.1
 static EFI_UINT32 const DEVICE_SUPPORTED = 0x00000001;
-
-/* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
@@ -240,7 +237,50 @@ static VOID EFI_ST_FIX_CRC32(void)
 	}
 }
 
-void finalizeEFIConfigTable(void )
+static VOID efi_setupDeviceProperties(Node *node)
+{
+	const char *val;
+	uint8_t *binStr;
+    uint8_t *kbinStr;
+    
+	int cnt = 0, cnt2 = 0;
+	
+	static char DEVICE_PROPERTIES_PROP[] = "device-properties";
+	
+	EFI_STATUS ret = EFI_NO_MEDIA;
+	
+	execute_hook("setupDeviceProperties", node, &ret, NULL, NULL, NULL, NULL);
+	
+	if (ret != EFI_SUCCESS)
+	{
+		/* 
+		 * Use the static "device-properties" boot config key contents if available
+		 */
+		if (!getValueForKey(kDeviceProperties, &val, &cnt, DEFAULT_BOOT_CONFIG))
+		{        
+            return;	
+		}
+		
+		if (cnt > 1)
+		{
+			binStr = convertHexStr2Binary(val, &cnt2);
+			
+			if (cnt2 > 0)
+			{
+				kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);
+				
+				if (kbinStr)
+				{
+					bcopy(binStr,kbinStr,cnt2);
+					DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
+				}            
+			}
+		}
+	}	
+}
+
+
+void finalizeEFIConfigTable(void)
 {    
     if (get_env(envarchCpuType) == CPU_TYPE_I386)
 	{
@@ -691,15 +731,36 @@ static int8_t *getSystemID(VOID)
 	// unable to determine UUID for host. Error: 35 fix
 	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
 	// belong to smbios config only ...
-	EFI_CHAR8*	ret = getUUIDFromString(getStringForKey(kSystemID, DEFAULT_BOOT_CONFIG));
+	EFI_CHAR8*	ret = NULL;	
+	uuid_t uuid;
+	
+	{
+		bool value = false;
+		if (getBoolForKey( kRandomSystemID, &value, DEFAULT_BOOT_CONFIG ) && value) 
+		{ 
+			uuid_generate_random(uuid);
+			ret = (EFI_CHAR8*)uuid;
+			if (ret) goto out;
+		}
+	}
+	
+	
+	{
+		const char *user_uuid =  getStringForKey(kSystemID, DEFAULT_BOOT_CONFIG);
+		if (user_uuid)
+		{
+			ret = getUUIDFromString(user_uuid);
+		}
+	}
 	
 	if (!ret) // try bios dmi info UUID extraction	
 		ret = getSmbiosUUID();
 	
 	if (!ret)
 	{
-		// no bios dmi UUID available, set a fixed value for system-id
-		ret=getUUIDFromString((const char*) SYSTEM_ID);
+		// no bios dmi UUID available, get random uuid		
+		uuid_generate_random(uuid);
+		ret = (EFI_CHAR8*)uuid;		
 		verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
 	}
 	else	
@@ -710,8 +771,10 @@ static int8_t *getSystemID(VOID)
 		
 	}
 	
+out:	
 	if (ret)
-	{        
+	{      
+
 		memcpy(sysid, ret, UUID_LEN);
         set_env_copy(envSysId, sysid, sizeof(sysid));
 	}
@@ -727,7 +790,11 @@ static int8_t *getSystemID(VOID)
 static VOID setupSystemType(VOID)
 {
 	Node *node = DT__FindNode("/", false);
-	if (node == 0) stop("Couldn't get root node");
+	if (node == 0)
+    {
+        stop("Couldn't get root node");
+        return;
+    }
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
     kType = get_env(envType);
@@ -740,7 +807,11 @@ static VOID setupEfiDeviceTree(VOID)
 	
 	node = DT__FindNode("/", false);
 	
-	if (node == 0) stop("Couldn't get root node");
+	if (node == 0)
+    {
+        stop("Couldn't get root node");
+        return;
+    }
     
 #ifndef NO_BOOT_IMG
 	{
@@ -934,7 +1005,7 @@ static VOID setupEfiDeviceTree(VOID)
 	}		
 	
 	// Fill /efi/device-properties node.			
-	setupDeviceProperties(efiNode);
+	efi_setupDeviceProperties(efiNode);
 }
 
 /*
@@ -1090,7 +1161,7 @@ static VOID setupEfiConfigurationTable(VOID)
 void setupFakeEfi(void)
 {
 	// Collect PCI info &| Generate device prop string
-	setup_pci_devs(root_pci_dev);
+	setup_root_pci_devs();
 	
 	// load smbios.plist file if any
 	setupSmbiosConfigFile("SMBIOS.plist");

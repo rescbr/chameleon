@@ -269,7 +269,10 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		   (vmaddr >= HIB_ADDR &&
 			(vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN))))
 	{
-			   stop("Kernel overflows available space");
+        *load_addr = ~0;
+		*load_size = 0;
+        stop("Kernel overflows available space");
+        return -1;
 	}
 	
 	if (vmsize && (strncmp(segname, "__PRELINK", sizeof("__PRELINK")) == 0 || strncmp(segname, "__PRELINK_INFO", sizeof("__PRELINK_INFO")) == 0))

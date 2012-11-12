@@ -181,7 +181,7 @@ typedef struct SMBSystemInformation {
 	SMBString  version;
 	SMBString  serialNumber;
 	// 2.1+ spec (25 bytes)
-	SMBByte    uuid[16];            // can be all 0 or all 1's
+	SMBByte    uuid[UUID_LEN];            // can be all 0 or all 1's
 	SMBByte    wakeupReason;        // reason for system wakeup
 	// 2.4+ spec (27 bytes)
     SMBString  skuNumber;

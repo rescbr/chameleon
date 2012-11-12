@@ -12,6 +12,7 @@
 #include "ati.h"
 #include "gma.h"
 #include "modules.h"
+#include "device_inject.h"
 
 
 void GraphicsEnabler_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6);
@@ -19,6 +20,7 @@ void GraphicsEnabler_start(void);
 
 void GraphicsEnabler_start(void)
 {
+	register_device_inject();
 	register_hook_callback("PCIDevice", &GraphicsEnabler_hook);
 }
 

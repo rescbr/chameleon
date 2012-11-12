@@ -48,6 +48,7 @@ UncompressStructure(struct compressed_block *bp, int count, int size)
         if(out + size <= op + bp->count)
         {
             stop("HFS+ Unicode tables are malformed\n");
+            return 0;
         }
         data = bp->data;
         for (j=0; j<bp->count; j++) {

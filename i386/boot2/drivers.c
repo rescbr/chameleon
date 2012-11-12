@@ -129,7 +129,10 @@ InitDriverSupport( void )
     gFileName       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
     
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
+    {
         stop("InitDriverSupport error");
+        return -1;
+    }
     
     DriverSet = true;
     set_env(envDriverExtSpec,(uint32_t)gExtensionsSpec);

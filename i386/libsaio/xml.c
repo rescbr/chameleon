@@ -1027,7 +1027,12 @@ NewSymbol( char * string )
     // Update the refCount and return the string.
     symbol->refCount++;
     
-    if (lastGuy && lastGuy->next != 0) stop("last guy not last!");
+    if (lastGuy && lastGuy->next != 0)
+    {
+        free(symbol);
+        stop("last guy not last!");
+        return 0;
+    }
     return symbol->string;
 }
 

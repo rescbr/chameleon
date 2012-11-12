@@ -407,8 +407,9 @@ void common_boot(int biosdev)
     // Scan and record the system's hardware information.
     scan_platform();
 	
+  
 	// Pseudo-random generator initialization.
-    arc4_init();
+    // arc4_init();
 	
     set_env(envgBIOSDev, (BIOSDev = biosdev & kBIOSDevMask));
     set_env(envShouldboot, false);
@@ -419,12 +420,12 @@ void common_boot(int biosdev)
 	set_env(envgHaveKernelCache, false);
     
     InitBootPrompt();
-    
+  
     // First get info for boot volume.
     scanBootVolumes(BIOSDev, 0);
     
     bvChain = getBVChainForBIOSDev(BIOSDev);
-    
+
     setBootGlobals(bvChain);
     
     // Load Booter boot.plist config file
@@ -899,7 +900,7 @@ void getKernelCachePath(void)
                     SetgRootPath(platformInfo->rootPath);
 #endif
 					
-					Adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(*platformInfo)));
+					Adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(PlatformInfo)));
 					safe_set_env(envAdler32, Adler32);
 					
 					free(platformInfo);

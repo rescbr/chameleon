@@ -9,6 +9,7 @@
 #include "pci.h"
 #include "device_inject.h"
 #include "platform.h"
+#include "fake_efi.h"
 
 #ifndef DEBUG_ETHERNET
 #define DEBUG_ETHERNET 0
@@ -63,6 +64,7 @@ void Networking_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5,
 void Networking_start(void);
 void Networking_start(void)
 {	
+	register_device_inject();
 	register_hook_callback("PCIDevice", &Networking_hook);
 }
 

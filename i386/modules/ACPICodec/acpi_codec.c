@@ -379,6 +379,9 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
     {
 		U64 ptr = xsdt->TableOffsetEntry[index];
 		
+		if (!ptr) continue;
+
+		
 		{				
 			if (ptr > ULONG_MAX)
 			{
@@ -493,6 +496,8 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
 	
     for (index=0;index<num_tables;index++)
     {
+		if (!table_array[index]) continue;
+
         {				
 #if DEBUG_ACPI	
             printf("* Processing : ");
@@ -516,7 +521,7 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
             
         }
         
-        {
+        {			
             if (*(U32 *) (table_array[index]->Signature) == NAMESEG(ACPI_SIG_FADT))
             {
                 ACPI_TABLE_FADT *FacpPointer = ((ACPI_TABLE_FADT*)table_array[index]);
@@ -703,7 +708,7 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
     
     current = (U8 *) DsdtPointer;
     current = decodeTableHeader(current, &header);
-    end = current - sizeof(*header) + header->Length;
+    end = current - sizeof(ACPI_TABLE_HEADER) + header->Length;
     ns.depth = 0;
     acpi_processor_count = 0;
 	//DBG("* DSDT debug start\n");
@@ -3716,6 +3721,8 @@ static U32 BuildSsdt(MADT_INFO * madt_info, ACPI_TABLE_DSDT *dsdt, void * buffer
 			return(0);
 		}
 		
+		bzero(&cpu, sizeof(CPU_DETAILS));
+		
 		collect_cpu_info(&cpu);
 		
 		if (enable_cstates && pmbase)
@@ -4554,7 +4561,8 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	
 	for (index = 0; index < num_tables; index++)
 	{
-        
+		if (!table_array[index]) continue;
+
 		{			
 			
 			int method = 0;

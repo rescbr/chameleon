@@ -67,13 +67,8 @@
 #include "modules.h"
 #include "xml.h"
 # include "md5.h"
-#include <uuid/uuid.h>
-#if 0 /* No OS X release has ever included this. */
-#include <Kernel/uuid/namespace.h>
-#else
 /* copied from uuid/namespace.h, just like BootX's fs.c does. */
 UUID_DEFINE( kFSUUIDNamespaceSHA1, 0xB3, 0xE2, 0x0F, 0x39, 0xF2, 0x92, 0x11, 0xD6, 0x97, 0xA4, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC );
-#endif
 
 #if UNUSED
 extern int multiboot_partition;
@@ -400,7 +395,7 @@ static int open_bvr(BVRef bvr, const char *filePath)
 	
 	fdesc = GetFreeFd();
 	io = &iob[fdesc];
-	bzero(io, sizeof(*io));
+	bzero(io, sizeof(struct iob));
 	
 	// Mark the descriptor as taken.
 	io->i_flgs = F_ALLOC;
@@ -632,7 +627,7 @@ int openmem(char * buf, int len)
 	
     fdesc = GetFreeFd();
     io = &iob[fdesc];
-    bzero(io, sizeof(*io));
+    bzero(io, sizeof(struct iob));
 	
     // Mark the descriptor as taken. Set the F_MEM flag to indicate
     // that the file buffer is provided by the caller.

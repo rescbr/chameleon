@@ -8,7 +8,7 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "modules.h"
-#include "device_inject.h"
+#include "platform.h"
 
 #ifndef DEBUG_PCI
 #define DEBUG_PCI 0
@@ -20,8 +20,6 @@
 #define DBG(x...)
 #endif
 
-pci_dt_t	*root_pci_dev;
-static char* dev_path;	// TODO: Figure out what is going on here...
 static void scan_pci_bus(pci_dt_t *start, uint8_t bus);
 static void enable_pci_devs(void);
 
@@ -145,14 +143,17 @@ static void enable_pci_devs(void)
 
 void build_pci_dt(void)
 {
-	dev_path = malloc(sizeof(char) * 256);	// TODO: remove
-	
-	root_pci_dev = malloc(sizeof(pci_dt_t));
+    pci_dt_t	*root_pci_dev;
+
+	root_pci_dev = malloc(sizeof(pci_dt_t));    
     
-    if (!dev_path || !root_pci_dev) {
+    if (!root_pci_dev)
+    {
         stop("Couldn't allocate memory for the pci root device\n");
         return ;
     }
+    set_env(envPCIRootDev,(uint32_t)root_pci_dev);
+    
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	enable_pci_devs();
 	scan_pci_bus(root_pci_dev, 0);
@@ -164,56 +165,29 @@ void build_pci_dt(void)
 #endif
 }
 
-#if 0
-char *get_pci_dev_path(pci_dt_t *pci_dt)
-{
-	char* buffer = malloc(sizeof(char) * 256);
-	
-    if (!buffer) {
-        return NULL;
-    }
-    
-	pci_dt_t	*current;
-	pci_dt_t	*end;
-	char		tmp[64];
-	
-	buffer[0] = 0;	
-	end = root_pci_dev;
-	
-	int uid = getPciRootUID();
-	while (end != pci_dt)
-	{
-		current = pci_dt;
-		while (current->parent != end)
-			current = current->parent;			
-		end = current;
-		if (current->parent == root_pci_dev)
-		{
-			snprintf(tmp, sizeof(tmp),"PciRoot(0x%x)/Pci(0x%x,0x%x)", uid,
-					current->dev.bits.dev, current->dev.bits.func);
-		} 
-		else 
-		{
-			snprintf(tmp, sizeof(tmp) ,"/Pci(0x%x,0x%x)",
-					current->dev.bits.dev, current->dev.bits.func);
-		}
-		snprintf(buffer, sizeof(char) * 256,"%s%s", buffer, tmp);
-	}
-	return buffer;
-}
-#endif
-
-void setup_pci_devs(pci_dt_t *pci_dt)
-{
-	pci_dt_t *current = pci_dt;
+static void setup_pci_devs(pci_dt_t *current)
+{    
 	
 	while (current)
-	{		
+	{
 		execute_hook("PCIDevice", (void*)current, NULL, NULL, NULL, NULL, NULL);
 		
 		setup_pci_devs(current->children);
 		current = current->next;
 	}
+}
+
+void setup_root_pci_devs(void)
+{
+    pci_dt_t *root_pci_dev = (pci_dt_t *)(uint32_t)get_env(envPCIRootDev);
+
+    if (!root_pci_dev)
+    {
+        stop("No PCI root device\n");
+        return ;
+    }
+	
+	setup_pci_devs(root_pci_dev);
 }
 
 #ifndef OPTION_ROM

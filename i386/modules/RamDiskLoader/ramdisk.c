@@ -130,6 +130,10 @@ void umountRAMDisk(void)
 	{
 		// Release ramdisk BVRef and DiskBVMap.
 		struct DiskBVMap *oldMap = diskResetBootVolumes(0x100);
+        if (oldMap == NULL)
+        {
+            return;
+        }
 		CacheReset();
 		diskFreeMap(oldMap);
 
