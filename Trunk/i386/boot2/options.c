@@ -270,14 +270,14 @@ static void updateBootArgs( int key )
                 {
                     updateGraphicBootPrompt();
                 }
-            }            
+            }
 			break;
 
         default:
             if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
             {
                 *gBootArgsPtr++ = key;
-                
+
                 if( bootArgs->Video.v_display != VGA_TEXT_MODE ) updateGraphicBootPrompt();
                 else if ( key >= ' ' && key < 0x7f) putchar(key);
 			}
@@ -1013,8 +1013,10 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI) {
-				if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+			if (useGUI)
+			{
+				if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+				{
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1030,7 +1032,8 @@ int getBootOptions(bool firstRun)
 					nextRow = kMenuTopRow;
 					showPrompt = true;
 
-					if (gDeviceCount) {
+					if (gDeviceCount)
+					{
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
 						nextRow += MIN(gDeviceCount, kMenuMaxItems) + 3;
@@ -1043,7 +1046,7 @@ int getBootOptions(bool firstRun)
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
 					updateVRAM();
-                    updateGraphicBootPrompt();
+                    			updateGraphicBootPrompt();
 				}
 			}
 			key = 0;
@@ -1122,19 +1125,26 @@ processBootArgument(
     int cnt;
     bool found = false;
 
-    if (getValueForBootKey(userString, argName, &val, &cnt)) {
-        // Don't copy; these values will be copied at the end of argument processing.
-        found = true;
-    } else if (getValueForBootKey(kernelFlags, argName, &val, &cnt)) {
-        // Don't copy; these values will be copied at the end of argument processing.
-        found = true;
-    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig)) {
-        copyArgument(argName, val, cnt, argP, cntRemainingP);
-        found = true;
-    }
-    if (found && foundVal)
-        strlcpy(foundVal, val, foundValSize);
-    return found;
+	if (getValueForBootKey(userString, argName, &val, &cnt))
+	{
+		// Don't copy; these values will be copied at the end of argument processing.
+		found = true;
+	}
+	else if (getValueForBootKey(kernelFlags, argName, &val, &cnt))
+	{
+		// Don't copy; these values will be copied at the end of argument processing.
+		found = true;
+	}
+	else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig))
+	{
+		copyArgument(argName, val, cnt, argP, cntRemainingP);
+		found = true;
+	}
+	if (found && foundVal)
+	{
+		strlcpy(foundVal, val, foundValSize);
+	}
+	return found;
 }
 
 // Maximum config table value size

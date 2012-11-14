@@ -620,6 +620,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 06C0 - 06CF
 	{ 0x10DE06C0,	0x10438359,	"Asus GeForce GTX 480" },
 	{ 0x10DE06C0,	0x10DE075F,	"nVidia GeForce GTX 480" },
+	{ 0x10DE06C0,	0x19DA1152,	"Zotac GeForce GTX 480" },
 	{ 0x10DE06C0,	0x38421480,	"EVGA GTX 480" },
 	{ 0x10DE06C0,	0x38421482,	"EVGA GTX 480" },
 
