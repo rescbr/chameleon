@@ -353,10 +353,7 @@ DT__FindNode(const char *path, bool createIfMissing)
             }
         }
         if (child == 0 && createIfMissing) {
-            DPRINTF("Creating node\n");
-            //char *str = malloc(strlen(nameBuf) + 1);
-            // XXX this will leak
-            //strcpy(str, nameBuf);
+            DPRINTF("Creating node\n");     
             
             const char *str = newString(nameBuf);
             if (str) {

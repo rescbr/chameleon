@@ -156,7 +156,10 @@ USER_modify(disk, tt, offset, reloff)
 
 	/* Read MBR & partition */
 	mbr = MBR_alloc(NULL);
+	if (!mbr) errx(1, "out of memory");
 	fd = DISK_open(disk->name, O_RDONLY);
+	if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
 	MBR_read(disk, fd, offset, mbr);
 	DISK_close(fd);
 
@@ -256,6 +259,8 @@ USER_print_disk(disk, do_dump)
 	mbr_t *mbr;
 
 	fd = DISK_open(disk->name, O_RDONLY);
+	if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
 	/*offset = firstoff = 0;*/
 
 	if (!do_dump)

@@ -339,7 +339,7 @@ long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** nam
         if ((dirFlags & kFileTypeMask) != kFileTypeUnknown) return -1;
     }
 	
-    GetCatalogEntry(dirIndex, name, flags, time, finderInfo, infoValid);
+    if (GetCatalogEntry(dirIndex, name, flags, time, finderInfo, infoValid) != 0) return -1;
     if (*dirIndex == 0) *dirIndex = -1;
     if ((*flags & kFileTypeMask) == kFileTypeUnknown) return -1;
 	
@@ -360,7 +360,7 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
 	
     /* Fill some crucial data structures by side effect. */
     dirIndex = 0;
-    HFSGetDirEntry(ih, "/", &dirIndex, &name, &flags, &time, 0, 0);
+    if (HFSGetDirEntry(ih, "/", &dirIndex, &name, &flags, &time, 0, 0) != 0) return;
 	
     /* Now we can loook up the volume name node. */
     nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
@@ -368,7 +368,7 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
 	
     dirIndex = (long long) firstLeafNode * nodeSize;
 	
-    GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0);
+    if (GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0) != 0) return;
 	
     strncpy(str, name, strMaxLen);
     str[strMaxLen] = '\0';
@@ -611,6 +611,10 @@ static long GetCatalogEntry(long long * dirIndex, char ** name,
 	
     nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
     nodeBuf  = (char *)malloc(nodeSize);
+	if (!nodeBuf) 
+	{
+		return -1;
+	}
     node     = (BTNodeDescriptor *)nodeBuf;
 	
     index   = (long) (*dirIndex % nodeSize);
@@ -743,6 +747,10 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
     curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
     nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
     nodeBuf  = (char *)malloc(nodeSize);
+	if (!nodeBuf) 
+	{
+		return -1;
+	}
     node     = (BTNodeDescriptor *)nodeBuf;
 	
     while (1) {

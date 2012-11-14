@@ -167,7 +167,10 @@ DISK_getlabelmetrics(name)
 	/* Get label metrics */
 	if ((fd = DISK_open(name, O_RDONLY)) != -1) {
 		lm = malloc(sizeof(DISK_metrics));
-
+		if (!lm) {
+			err(1, "DISK_getlabelmetrics: Could not allocate memory");
+			return NULL;
+		}
 		if (fstat(fd, &st) == -1)
 		  err(1, "%s", name);
 		if (!S_ISREG(st.st_mode) || S_ISBLK(st.st_mode)) {

@@ -73,6 +73,7 @@ void png_alloc_add_node(void *addr, size_t size)
 	if (png_alloc_find_node(addr))
 		return;
 	node = malloc(sizeof (png_alloc_node_t));
+	if (!node) return;
 	node->addr = addr;
 	node->size = size;
 	node->prev = png_alloc_tail;
@@ -104,6 +105,7 @@ void png_alloc_remove_node(png_alloc_node_t *node)
 void *png_alloc_malloc(size_t size)
 {
 	void *addr = malloc(size);
+	if (!addr) return NULL;
 	png_alloc_add_node(addr, size);
 	return addr;
 }
@@ -1347,6 +1349,10 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
         goto failed;
     }
     pngData = malloc(pngSize);
+	if (!pngData) {
+		error = -1;
+        goto failed;
+	}
     if (read(pngFile, (char *) pngData, pngSize) != pngSize) {
         error = -1;
         goto failed;
@@ -1365,6 +1371,11 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
         goto failed;
     }
 	uint8_t *result = malloc(info->width*4*info->height);
+	if (!result) 
+	{
+		error = -1;
+        goto failed;
+	}
     *width = info->width;
     *height = info->height;
 	memcpy(result, info->image->data, info->width*4*info->height);
@@ -1397,6 +1408,11 @@ int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_
         goto failed;
     }
 	uint8_t *result = malloc(info->width*4*info->height);
+	if (!result) 
+	{
+		error = -1;
+        goto failed;
+	}
 	*width = info->width;
     *height = info->height;
 	memcpy(result, info->image->data, info->width*4*info->height);

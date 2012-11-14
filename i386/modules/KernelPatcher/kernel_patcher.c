@@ -129,6 +129,8 @@ static void register_kernel_patch(void* patch, int arch, int cpus)
 	if(patches == NULL)
 	{
 		patches = entry = malloc(sizeof(patchRoutine_t));
+		
+		if (!entry || !patches) return;
 	}
 	else
 	{
@@ -139,6 +141,9 @@ static void register_kernel_patch(void* patch, int arch, int cpus)
 		}
 		
 		entry->next = malloc(sizeof(patchRoutine_t));
+		
+		if (!entry) return;
+		
 		entry = entry->next;
 	}
 	
@@ -153,6 +158,7 @@ static void register_kernel_symbol(int kernelType, const char* name)
 	if(kernelSymbols == NULL)
 	{
 		kernelSymbols = malloc(sizeof(kernSymbols_t));
+		if (!kernelSymbols) return;
 		kernelSymbols->next = NULL;
 		kernelSymbols->symbol = (char*)name;
 		kernelSymbols->addr = 0;
@@ -166,6 +172,8 @@ static void register_kernel_symbol(int kernelType, const char* name)
 		}
 		
 		symbol->next = malloc(sizeof(kernSymbols_t));
+		if (!symbol->next) return;
+
 		symbol = symbol->next;
 
 		symbol->next = NULL;

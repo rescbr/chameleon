@@ -93,10 +93,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
     {
         // the resulting binary will be the half size of the input hex string
         binStr = malloc(len / 2);
-        if (!binStr) {
-            *outLength = 0;
-            return NULL;
-        }
+        if (!binStr) goto out;
         binStrIdx = 0;
         hexNibbleIdx = 0;
         for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
@@ -132,9 +129,9 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
         *outLength = binStrIdx;
         return binStr;
     }
-    else
-    {
-        *outLength = 0;
-        return NULL;
-    }
+    
+out:
+	*outLength = 0;    
+    return NULL;
+    
 }

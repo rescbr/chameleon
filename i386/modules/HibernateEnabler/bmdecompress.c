@@ -46,6 +46,9 @@ PreviewDecompress16(uint32_t * compressBuffer,
     uint16_t * sc1 = malloc((width+2) * sizeof(uint16_t));
     uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
     uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
+	
+	if (!sc0 || !sc1 || !sc2 || !sc3) return;
+	
     uint32_t   sr0, sr1, sr2, sr3;
     
     bzero(sc0, (width+2) * sizeof(uint16_t));
@@ -147,6 +150,10 @@ PreviewDecompress32(uint32_t * compressBuffer,
     uint16_t * sc1 = malloc((width+2) * sizeof(uint16_t));
     uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
     uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
+	
+	if (!sc0 || !sc1 || !sc2 || !sc3) return;
+
+	
     uint32_t   sr0, sr1, sr2, sr3;
     
     bzero(sc0, (width+2) * sizeof(uint16_t));

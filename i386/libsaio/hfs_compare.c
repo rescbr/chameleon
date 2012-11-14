@@ -37,6 +37,11 @@ static unsigned short *
 UncompressStructure(struct compressed_block *bp, int count, int size)
 {
     unsigned short *out = malloc(size);
+	if (!out) 
+	{
+		stop("UncompressStructure unable to allocate memory\n");
+		return 0;
+	}
     unsigned short *op = out;
     unsigned short data;
     int i, j;

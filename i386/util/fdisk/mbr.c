@@ -237,7 +237,10 @@ MBR_pcopy(disk, mbr)
 	mbr_t *mbrd;
 	
 	mbrd = MBR_alloc(NULL);
+	if (!mbr) errx(1, "out of memory");
 	fd = DISK_open(disk->name, O_RDONLY);
+	if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
 	MBR_read(disk, fd, offset, mbrd);
 	DISK_close(fd);
 	MBR_parse(disk, offset, reloff, mbrd);
@@ -393,6 +396,7 @@ MBR_parse_spec(FILE *f, disk_t *disk)
 
 	if (mbr == NULL) {
 	    mbr = MBR_alloc(prev_mbr);
+		if (!mbr) errx(1, "out of memory");
 	    if (head == NULL)
 		head = mbr;
 	}
@@ -446,6 +450,7 @@ mbr_t *
 MBR_alloc(mbr_t *parent)
 {
   mbr_t *mbr = (mbr_t *)malloc(sizeof(mbr_t));
+  if (!mbr) return NULL;
   bzero(mbr, sizeof(mbr_t));
   if (parent) {
     parent->next = mbr;
@@ -475,9 +480,12 @@ MBR_read_all(disk_t *disk)
   int i, fd, offset, firstoff;
 
   fd = DISK_open(disk->name, O_RDONLY);
+  if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
   firstoff = offset = 0;
   do {
     mbr = MBR_alloc(mbr);
+	if (!mbr) errx(1, "out of memory");
     if (head == NULL) {
       head = mbr;
     }
@@ -511,6 +519,8 @@ MBR_write_all(disk_t *disk, mbr_t *mbr)
   int fd;
 
   fd = DISK_open(disk->name, O_RDWR);
+  if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
   while (mbr) {
     MBR_make(mbr);
     result = MBR_write(disk, fd, mbr);

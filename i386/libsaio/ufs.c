@@ -168,6 +168,7 @@ long UFSInitPartition( CICell ih )
     gFragsPerBlock = gBlockSize / gFragSize;
     if (gTempBlock != 0) free(gTempBlock);
     gTempBlock = malloc(gBlockSize);
+	if (!gTempBlock) return -1;
     CacheInit(ih, gBlockSize);
 
     gCurrentIH = ih;

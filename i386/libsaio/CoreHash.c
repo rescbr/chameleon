@@ -49,7 +49,11 @@ struct env_struct *platform_env = NULL;
 static void CopyVarPtr (struct env_struct *var, void* ptr, size_t size)
 {
     var->ptr = malloc(size);
-    memcpy(var->ptr, ptr, size);
+	if (var->ptr)
+	{
+		memcpy(var->ptr, ptr, size);
+
+	}
 }
 
 static struct env_struct *find_env(const char *name) {

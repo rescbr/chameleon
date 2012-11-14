@@ -264,17 +264,21 @@ static VOID efi_setupDeviceProperties(Node *node)
 		if (cnt > 1)
 		{
 			binStr = convertHexStr2Binary(val, &cnt2);
-			
-			if (cnt2 > 0)
+			if (binStr) 
 			{
-				kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);
-				
-				if (kbinStr)
+				if (cnt2 > 0)
 				{
-					bcopy(binStr,kbinStr,cnt2);
-					DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
-				}            
+					kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);
+					
+					if (kbinStr)
+					{
+						bcopy(binStr,kbinStr,cnt2);
+						DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
+					}            
+				}
+				free(binStr);
 			}
+			
 		}
 	}	
 }

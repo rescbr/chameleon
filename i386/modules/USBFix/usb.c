@@ -57,7 +57,7 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 			current = current->next;
 		}
 		current->next = (struct pciList*)malloc(sizeof(struct pciList));
-        if (!current) {
+        if (!current->next) {
             return;
         }
 		current = current->next;

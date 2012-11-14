@@ -352,7 +352,7 @@ static EFI_STATUS setupDeviceProperties(Node *node)
 	const char *val;
 	uint8_t *binStr;
     uint8_t *kbinStr;
-    
+    EFI_STATUS ret = EFI_DEVICE_ERROR;
 	int cnt = 0, cnt2 = 0;
 	
 	static char DEVICE_PROPERTIES_PROP[] = "device-properties";
@@ -372,19 +372,23 @@ static EFI_STATUS setupDeviceProperties(Node *node)
 	if (cnt > 1)
 	{
 		binStr = convertHexStr2Binary(val, &cnt2);
-        
-        if (cnt2 > 0)
-        {
-            kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);
-			if (kbinStr) 
+        if (binStr) 
+		{
+			if (cnt2 > 0)
 			{
-				bcopy(binStr,kbinStr,cnt2);
-				DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
-				return EFI_SUCCESS;
+				kbinStr = (uint8_t*)AllocateKernelMemory(cnt2);
+				if (kbinStr) 
+				{
+					bcopy(binStr,kbinStr,cnt2);
+					DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, kbinStr);
+					ret = EFI_SUCCESS;
+				}
 			}
-        }
+			free(binStr);
+		}
+        
 	}
-	return EFI_DEVICE_ERROR;
+	return ret;
 
 }
 
