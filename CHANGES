@@ -1,3 +1,6 @@
+- Fixed a bug in ati.c
+- Update ati.c and nvidia.c
+
 - Security fixes
 - Implemented random uuid
 - device_inject is now embedded into the modules that need it, and not in the core anymore

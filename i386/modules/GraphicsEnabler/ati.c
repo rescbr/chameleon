@@ -843,6 +843,7 @@ bool get_refclk_val(value_t *val);
 bool get_platforminfo_val(value_t *val);
 bool get_vramtotalsize_val(value_t *val);
 bool validate_rom(struct pci_rom_bios_t *rom_header, pci_dt_t *pci_dev);
+bool get_hdmiaudio(value_t * val);
 
 typedef struct {
 	uint32_t				flags;
@@ -883,6 +884,8 @@ dev_prop_t ati_devprop_list[] = {
 	{FLAGTRUE,	false,	"device_type",				get_nameparent_val,		NULVAL							},
 	{FLAGTRUE,	false,	"model",					get_model_val,			STRVAL("ATI Radeon")			},
     //	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
+	{FLAGTRUE,  false,  "hda-gfx",					get_hdmiaudio,			NULVAL							},
+
 	
 	{FLAGTRUE,	false,	NULL,						NULL,					NULVAL							}
 };
@@ -892,8 +895,24 @@ bool read_vbios(bool from_pci);
 void get_vram_size(void);
 bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, uint32_t subsys_id);
 void free_val(value_t *val);
-
 int devprop_add_list(dev_prop_t devprop_list[]);
+
+bool get_hdmiaudio(value_t * val)
+{
+	bool doit = false;
+	if(getBoolForKey(kEnableHDMIAudio, &doit, DEFAULT_BOOT_CONFIG) && doit){
+		val->type = kStr;
+		val->size = strlen("onboard-1") + 1;
+		val->data = (uint8_t *)"onboard-1";
+		
+		return true;
+		
+		
+		
+	}
+	return false;
+}
+
 
 bool get_bootdisplay_val(value_t *val)
 {
@@ -1212,16 +1231,13 @@ bool read_vbios(bool from_pci)
 	if (!validate_rom(rom_addr, card->pci_dev))
 		return false;
     
+	card->rom_size = rom_addr->size * 512;
+	if (!card->rom_size)   
+		return false;    
+	
 	card->rom = malloc(card->rom_size);
 	if (!card->rom)
-		return false;
-    
-	card->rom_size = rom_addr->size * 512;
-	if (!card->rom_size)
-    {
-        free(card->rom);
-		return false;
-    }	
+		return false;		
 	
 	memcpy(card->rom, (void *)rom_addr, card->rom_size);
 	
@@ -1461,9 +1477,9 @@ static bool init_card(pci_dt_t *pci_dev)
 		// use cfg_name on radeon_cards, to retrive the default name from card_configs,
 		card->cfg_name = card_configs[card->info->cfg_name].name;
 		// Uncommented the following line and added verbose for debugging AtiPorts issues on some cards
-		card->ports = card_configs[card->info->cfg_name].ports;
+		//card->ports = card_configs[card->info->cfg_name].ports;
 		// Report number of ports card reports
-		verbose("Card reported ports: %d\n", card->ports);
+		//verbose("Card reported ports: %d\n", card->ports);
 		
 		// which means one of the fb's or kNull
 		verbose("Framebuffer set to: %s using device's default.\n", card->cfg_name);
@@ -1471,7 +1487,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	else
 	{
 		// else, use the fb name returned by AtiConfig.
-		verbose("Framebuffer set to: %s using AtiConfig=%s\n", card->cfg_name, card->cfg_name);
+		verbose("(AtiConfig) Framebuffer set to: %s\n", card->cfg_name);
 	}
     
 	// Check AtiPorts key for nr of ports,
@@ -1480,7 +1496,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	if (n_ports > 0)
 	{
 		card->ports = n_ports; // use it.
-		verbose("Number of ports set to: %d using AtiPorts=%d\n", card->ports, card->ports);
+		verbose("(AtiPorts) Nr of ports set to: %d\n", card->ports);
     }
 	else// if (card->cfg_name > 0) // do we want 0 ports if fb is kNull or mistyped ?
 	{

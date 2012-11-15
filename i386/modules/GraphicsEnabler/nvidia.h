@@ -52,8 +52,9 @@
 
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"				/* nvidia.c */
-#define kDcfg0              "display_0"            /* nvidia.c */
-#define kDcfg1              "display_1"            /* nvidia.c */
+#define kDcfg0              "display_0"         /* nvidia.c */
+#define kDcfg1              "display_1"         /* nvidia.c */
+#define kEnableHDMIAudio    "EnableHDMIAudio"   /* nvidia.c */
 
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 

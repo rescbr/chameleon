@@ -1624,6 +1624,16 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (getBoolForKey(kVBIOS, &doit, DEFAULT_BOOT_CONFIG) && doit) {
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (uint32_t)(rom[2] * 512));
 	}
+	
+	//add HDMI Audio back to nvidia
+	doit = false;
+	//http://forge.voodooprojects.org/p/chameleon/issues/67/
+	if(getBoolForKey(kEnableHDMIAudio, &doit, DEFAULT_BOOT_CONFIG) && doit)
+	{
+		static uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
+		devprop_add_value(device, "@1,connector-type",connector_type_1, 4);
+	}
+	//end Nvidia HDMI Audio
     
 	free(rom);
 	return true;
