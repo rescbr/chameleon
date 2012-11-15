@@ -1,5 +1,8 @@
 /*
- Original patch by nawcom -> http://forum.voodooprojects.org/index.php/topic,1029.msg4427.html#msg4427
+ Original patch by Nawcom
+ http://forum.voodooprojects.org/index.php/topic,1029.0.html
+ 
+ Original Intel HDx000 code from valv
  */
 #include "libsaio.h"
 #include "bootstruct.h"
@@ -18,62 +21,119 @@
 #define DBG(x...)
 #endif
 
-uint8_t HD3000_os_info[20] = {
-    0x30,0x49,0x01,0x11,0x11,0x11,0x08,0x00,0x00,0x01,
-    0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
-};
-
 uint8_t GMAX3100_vals[22][4] = {
 	{ 0x01,0x00,0x00,0x00 },
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x08 },	
+	{ 0x01,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x08 },
 	{ 0x64,0x00,0x00,0x00 },
 	{ 0x00,0x00,0x00,0x08 },
 	{ 0x01,0x00,0x00,0x00 },
-	{ 0x20,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x20,0x03,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x08,0x52,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x00,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
-	{ 0x01,0x00,0x00,0x00 }, 
+	{ 0x20,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
+	{ 0x20,0x03,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x08,0x52,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
 	{ 0x3B,0x00,0x00,0x00 },
 	{ 0x00,0x00,0x00,0x00 }
 };
-uint8_t reg_TRUE[] = { 0x01 ,0x00 ,0x00 ,0x00 };
-uint8_t reg_FALSE[] = { 0x00,0x00,0x00,0x00 };
+
+uint8_t HD2000_vals[16][4] = {
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x14,0x00,0x00,0x00 },
+	{ 0xfa,0x00,0x00,0x00 },
+	{ 0x2c,0x01,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x14,0x00,0x00,0x00 },
+	{ 0xf4,0x01,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
+};
+
+uint8_t HD3000_vals[16][4] = {
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x14,0x00,0x00,0x00 },
+	{ 0xfa,0x00,0x00,0x00 },
+	{ 0x2c,0x01,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x14,0x00,0x00,0x00 },
+	{ 0xf4,0x01,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x00,0x00,0x00,0x00 },
+	{ 0x01,0x00,0x00,0x00 },
+};
+
+uint8_t HD2000_tbl_info[18] = {
+	0x30,0x44,0x02,0x02,0x02,0x02,0x00,0x00,0x00,
+	0x00,0x01,0x02,0x02,0x02,0x00,0x01,0x02,0x02
+};
+uint8_t HD2000_os_info[20] = {
+	0x30,0x49,0x01,0x11,0x11,0x11,0x08,0x00,0x00,0x01,
+	0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
+};
+
+// The following values came from a Sandy Bridge MacBook Air
+uint8_t HD3000_tbl_info[18] = {
+	0x30,0x44,0x02,0x02,0x02,0x02,0x00,0x00,0x00,
+	0x00,0x02,0x02,0x02,0x02,0x01,0x01,0x01,0x01
+};
+
+// The following values came from a Sandy Bridge MacBook Air
+uint8_t HD3000_os_info[20] = {
+	0x30,0x49,0x01,0x12,0x12,0x12,0x08,0x00,0x00,0x01,
+	0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
+};
+
+
+uint8_t reg_TRUE[]	= { 0x01, 0x00, 0x00, 0x00 };
+uint8_t reg_FALSE[] = { 0x00, 0x00, 0x00, 0x00 };
 
 static struct gma_gpu_t KnownGPUS[] = {
-	{ 0x00000000, "Unknown" },
-	{ 0x808627A2, "Mobile GMA950" },
-	{ 0x808627AE, "Mobile GMA950" },
-	{ 0x808627A6, "Mobile GMA950" },
-	{ 0x8086A011, "Mobile GMA3150" },
-	{ 0x8086A012, "Mobile GMA3150" },
-	{ 0x80862772, "Desktop GMA950" },
-	{ 0x80862776, "Desktop GMA950" },
-	{ 0x8086A001, "Mobile GMA3150" },
+	{ 0x00000000, "Unknown"			},
+	{ 0x808627A2, "Mobile GMA950"	},
+	{ 0x808627AE, "Mobile GMA950"	},
+	{ 0x808627A6, "Mobile GMA950"	},
+	{ 0x8086A011, "Mobile GMA3150"	},
+	{ 0x8086A012, "Mobile GMA3150"	},
+	{ 0x80862772, "Desktop GMA950"	},
+	{ 0x80862776, "Desktop GMA950"	},
+	//	{ 0x8086A001, "Desktop GMA3150" },
+	{ 0x8086A001, "Mobile GMA3150"	},
 	{ 0x8086A002, "Desktop GMA3150" },
-	{ 0x80862A02, "GMAX3100" },
-	{ 0x80862A03, "GMAX3100" },
-	{ 0x80862A12, "GMAX3100" },
-	{ 0x80862A13, "GMAX3100" },
-	{ 0x80862A42, "GMAX3100" },
-	{ 0x80862A43, "GMAX3100" },
-    { 0x80860102, "Intel HD Graphics 3000" },
-    { 0x80860106, "Intel HD Graphics 3000" },
-    { 0x8086010A, "Intel HD Graphics 3000" },
-    { 0x80860112, "Intel HD Graphics 3000" },
-    { 0x80860116, "Intel HD Graphics 3000" },
-    { 0x80860122, "Intel HD Graphics 3000" },
-    { 0x80860126, "Intel HD Graphics 3000" }
+	{ 0x80862A02, "GMAX3100"		},
+	{ 0x80862A03, "GMAX3100"		},
+	{ 0x80862A12, "GMAX3100"		},
+	{ 0x80862A13, "GMAX3100"		},
+	{ 0x80862A42, "GMAX3100"		},
+	{ 0x80862A43, "GMAX3100"		},
+	{ 0x80860102, "Intel HD Graphics 2000"			},
+	{ 0x80860106, "Intel HD Graphics 2000 Mobile"	},
+	{ 0x80860112, "Intel HD Graphics 3000"			},
+	{ 0x80860116, "Intel HD Graphics 3000 Mobile"	},
+	{ 0x80860122, "Intel HD Graphics 3000"			},
+	{ 0x80860126, "Intel HD Graphics 3000 Mobile"	},
 };
+
 static char *get_gma_model(uint32_t id);
 
 static char *get_gma_model(uint32_t id) {
@@ -97,7 +157,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	char *model;
 	uint8_t BuiltIn = 0x00;
 	uint8_t ClassFix[4] = { 0x00, 0x00, 0x03, 0x00 };
-    
+	unsigned int			device_id;	
+
 	bar[0] = pci_config_read32(gma_dev->dev.addr, 0x10);
 #if UNUSED
 	regs = (uint8_t *) (bar[0] & ~0x0f);
@@ -168,9 +229,66 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL01,Stretch",GMAX3100_vals[21], 4);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 	}
-    else if (strncmp(model, "Intel HD Graphics 3000", sizeof("Intel HD Graphics 3000"))  == 0)
-    {
-        devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
-    }	
+	else if (strncmp(model, "Intel HD Graphics 2000 Mobile", sizeof("Intel HD Graphics 2000 Mobile"))  == 0)
+	{
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
+		devprop_add_value(device, "AAPL00,PixelFormat", HD2000_vals[0], 4);
+		devprop_add_value(device, "AAPL00,T1", HD2000_vals[1], 4);
+		devprop_add_value(device, "AAPL00,T2", HD2000_vals[2], 4);
+		devprop_add_value(device, "AAPL00,T3", HD2000_vals[3], 4);
+		devprop_add_value(device, "AAPL00,T4", HD2000_vals[4], 4);
+		devprop_add_value(device, "AAPL00,T5", HD2000_vals[5], 4);
+		devprop_add_value(device, "AAPL00,T6", HD2000_vals[6], 4);
+		devprop_add_value(device, "AAPL00,T7", HD2000_vals[7], 4);
+		devprop_add_value(device, "AAPL00,LinkType", HD2000_vals[8], 4);
+		devprop_add_value(device, "AAPL00,LinkFormat", HD2000_vals[9], 4);
+		devprop_add_value(device, "AAPL00,DualLink", HD2000_vals[10], 4);
+		devprop_add_value(device, "AAPL00,Dither", HD2000_vals[11], 4);
+		devprop_add_value(device, "AAPL00,DataJustify", HD3000_vals[12], 4);
+		devprop_add_value(device, "graphic-options", HD2000_vals[13], 4);
+		devprop_add_value(device, "AAPL,tbl-info", HD2000_tbl_info, 18);
+		devprop_add_value(device, "AAPL,os-info", HD2000_os_info, 20);
+	}
+	else if (strncmp(model, "Intel HD Graphics 3000 Mobile", sizeof("Intel HD Graphics 3000 Mobile"))  == 0)
+	{
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
+		devprop_add_value(device, "AAPL00,PixelFormat", HD3000_vals[0], 4);
+		devprop_add_value(device, "AAPL00,T1", HD3000_vals[1], 4);
+		devprop_add_value(device, "AAPL00,T2", HD3000_vals[2], 4);
+		devprop_add_value(device, "AAPL00,T3", HD3000_vals[3], 4);
+		devprop_add_value(device, "AAPL00,T4", HD3000_vals[4], 4);
+		devprop_add_value(device, "AAPL00,T5", HD3000_vals[5], 4);
+		devprop_add_value(device, "AAPL00,T6", HD3000_vals[6], 4);
+		devprop_add_value(device, "AAPL00,T7", HD3000_vals[7], 4);
+		devprop_add_value(device, "AAPL00,LinkType", HD3000_vals[8], 4);
+		devprop_add_value(device, "AAPL00,LinkFormat", HD3000_vals[9], 4);
+		devprop_add_value(device, "AAPL00,DualLink", HD3000_vals[10], 4);
+		devprop_add_value(device, "AAPL00,Dither", HD3000_vals[11], 4);
+		devprop_add_value(device, "AAPL00,DataJustify", HD3000_vals[12], 4);
+		devprop_add_value(device, "graphic-options", HD3000_vals[13], 4);
+		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
+		devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
+	}
+	else if (strncmp(model, "Intel HD Graphics 2000", sizeof("Intel HD Graphics 2000"))  == 0)
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "device-id", (uint8_t*)&device_id, sizeof(device_id));
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
+		devprop_add_value(device, "AAPL,tbl-info", HD2000_tbl_info, 18);
+		devprop_add_value(device, "AAPL,os-info", HD2000_os_info, 20);
+	}
+	else if (strncmp(model, "Intel HD Graphics 3000", sizeof("Intel HD Graphics 3000"))  == 0)
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		device_id = 0x00000126;											// Inject a valid mobile GPU device id instead of patching kexts
+		devprop_add_value(device, "device-id", (uint8_t*)&device_id, sizeof(device_id));
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); 
+		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
+		devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
+	}    	
 	return true;
 }
