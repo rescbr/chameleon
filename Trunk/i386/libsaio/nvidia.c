@@ -1254,6 +1254,14 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0FC0 - 0FCF
 	{ 0x10DE0FC2,	0x103C0936,	"HP GeForce GT 630" },
 	{ 0x10DE0FC2,	0x174B0630,	"PC Panther GeForce GT 630" },
+
+	{ 0x10DE0FC6,	0x10B00FC6,	"Gainward GeForce GTX 650" },
+	{ 0x10DE0FC6,	0x10DE0973,	"nVidia GeForce GTX 650" },
+	{ 0x10DE0FC6,	0x14583553,	"Gigabyte GeForce GTX 650" },
+	{ 0x10DE0FC6,	0x14583555,	"Gigabyte GeForce GTX 650" },
+	{ 0x10DE0FC6,	0x15690FC6,	"Palit GeForce GTX 650" },
+	{ 0x10DE0FC6,	0x19DA1288,	"Zotac GeForce GTX 650" },
+
 	// 0FD0 - 0FDF
 	{ 0x10DE0FD1,	0x10280552,	"Dell GeForce GT 650M" },
 	{ 0x10DE0FD1,	0x10280566,	"Dell GeForce GT 650M" },
@@ -1646,6 +1654,9 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE11BE,	0x15587102,	"Clevo Quadro K3000M" },
 	// 11C0 - 11CF
 	{ 0x10DE11C0,	0x10DE0995,	"Inno3D GeForce GTX660" },
+
+	{ 0x10DE11C6,	0x10DE1016,	"nVidia GeForce GTX 650 Ti" },
+	{ 0x10DE11C6,	0x156911C6,	"Palit GeForce GTX 650 Ti" },
 	// 11D0 - 11DF
 	// 11E0 - 11EF
 	// 11F0 - 11FF
@@ -2340,7 +2351,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE0840,	NV_SUB_IDS,	"GeForce 8200M" },
 	{ 0x10DE0844,	NV_SUB_IDS,	"GeForce 9100M G" },
 	{ 0x10DE0845,	NV_SUB_IDS,	"GeForce 8200M G" },
-	{ 0x10DE0846,	NV_SUB_IDS,	"GeForce 9200" },
+	{ 0x10DE0846,	NV_SUB_IDS,	"GeForce 9200" }, // Tesla M2050 ??
 	{ 0x10DE0847,	NV_SUB_IDS,	"GeForce 9100" },
 	{ 0x10DE0848,	NV_SUB_IDS,	"GeForce 8300" },
 	{ 0x10DE0849,	NV_SUB_IDS,	"GeForce 8200" },
@@ -2376,7 +2387,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	{ 0x10DE087A,	NV_SUB_IDS,	"GeForce 9400" },
 	{ 0x10DE087D,	NV_SUB_IDS,	"ION 9400M" },
 	{ 0x10DE087E,	NV_SUB_IDS,	"ION LE" },
-	{ 0x10DE087F,	NV_SUB_IDS,	"ION LE" },
+	{ 0x10DE087F,	NV_SUB_IDS,	"ION LE" }, // Tesla M2070-Q ??
 	// 0880 - 088F
 	// 0890 - 089F
 	// 08A0 - 08AF
@@ -2650,6 +2661,7 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0FF0 - 0FFF
 	{ 0x10DE0FFB,	NV_SUB_IDS,	"Quadro K2000M" },
 	{ 0x10DE0FFC,	NV_SUB_IDS,	"Quadro K1000M" },
+	{ 0x10DE0FFD,	NV_SUB_IDS,	"NVS 510" },
 	{ 0x10DE0FFF,	NV_SUB_IDS,	"Quadro 410" },
 	// 1000 - 100F
 	// 1010 - 101F

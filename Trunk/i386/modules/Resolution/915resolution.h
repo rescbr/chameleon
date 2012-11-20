@@ -112,7 +112,8 @@ typedef enum {
 	CT_915G, CT_915GM, CT_945G, CT_945GM, CT_945GME, CT_946GZ, 
 	CT_955X, CT_G965, CT_Q965, CT_965GM, CT_975X, 
 	CT_P35, CT_X48, CT_B43, CT_Q45, CT_P45,
-	CT_GM45, CT_G41, CT_G31, CT_G45, CT_500, CT_3150
+	CT_GM45, CT_G41, CT_G31, CT_G45, CT_500, CT_3150,
+	CT_CORE_PROC
 } chipset_type;
 
 
@@ -123,10 +124,10 @@ typedef enum {
 
 
 typedef struct {
-	char         *base;
-	ATOM_ROM_HEADER  *AtomRomHeader;
-	unsigned short         *MasterCommandTables;
-	unsigned short         *MasterDataTables;
+	char			*base;
+	ATOM_ROM_HEADER		*AtomRomHeader;
+	unsigned short		*MasterCommandTables;
+	unsigned short		*MasterDataTables;
 } bios_tables_t;
 
 typedef struct {
@@ -156,8 +157,8 @@ typedef struct {
 	UInt16 hsyncstart;
 	UInt16 hsyncend;
 	UInt16 y1;
-    UInt16 vtotal;
-    UInt16 y2;
+	UInt16 vtotal;
+	UInt16 y2;
 	UInt16 vblank;
 	UInt16 vsyncstart;
 	UInt16 vsyncend;
@@ -197,7 +198,7 @@ typedef struct {
 typedef struct {
 	unsigned char unknown[6];
 	
-    vbios_modeline_type3 modelines[];
+	vbios_modeline_type3 modelines[];
 } __attribute__((packed)) vbios_resolution_type3;
 
 typedef struct {
@@ -220,8 +221,6 @@ typedef struct {
 	
 	UInt8 unlocked;
 } vbios_map;
-
-
 
 vbios_map * open_vbios(chipset_type);
 void close_vbios (vbios_map*);
