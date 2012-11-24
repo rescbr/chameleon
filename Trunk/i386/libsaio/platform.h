@@ -57,7 +57,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_ATOM_2000		0x36			// 
 #define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPU_MODEL_HASWELL		0x3C			// 
-#define CPU_MODEL_IVY_BRIDGE_E5		0x3E			// 
+#define CPU_MODEL_IVYBRIDGE_E5		0x3E			// 
 
 /* CPU Features */
 #define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set

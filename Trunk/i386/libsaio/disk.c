@@ -675,7 +675,7 @@ EFI_GUID const GPT_EFISYS_GUID	   = { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 
 // E3C9E316-0B5C-4DB8-817D-F92DF00215AE - Microsoft Reserved Partition 
 EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
 // EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 - zef - Basic Data Partition -  for foreign OS support
-EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
+EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } }; //ExFat
 // 5808C8AA-7E8F-42E0-85D2-E1E90434CFB3 - Logical Disk Manager metadata partition
 // AF9B60A0-1431-4F62-BC68-3311714A69AD - Logical Disk Manager data partition
 // DE94BBA4-06D1-4D40-A16A-BFD50179D6AC - Windows Recovery Environment

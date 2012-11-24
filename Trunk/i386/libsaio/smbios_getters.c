@@ -32,6 +32,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 						// set external clock to 0 for SANDY
 						// removes FSB info from system profiler as on real mac's.
 					case CPU_MODEL_SANDYBRIDGE:
+					case CPU_MODEL_IVYBRIDGE_E5:
 					case CPU_MODEL_IVYBRIDGE:
 						value->word = 0;
 						break;
@@ -119,6 +120,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					}
 					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_IVYBRIDGE_E5:
 					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 					{
 						int busspeed;
@@ -219,6 +221,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7, Xeon E3-12xx LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_IVYBRIDGE_E5:
 					case CPU_MODEL_CLARKDALE:			// Intel Core i3, i5 LGA1156 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 						{

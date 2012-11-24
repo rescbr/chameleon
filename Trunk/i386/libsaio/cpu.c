@@ -428,6 +428,7 @@ void scan_cpu(PlatformInfo_t *p)
 										  p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
 										  p->CPU.Model == CPU_MODEL_SANDYBRIDGE ||
 										  p->CPU.Model == CPU_MODEL_JAKETOWN	||
+										  p->CPU.Model == CPU_MODEL_IVYBRIDGE_E5	||
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE	))
 			{
 				msr = rdmsr64(MSR_PLATFORM_INFO);
