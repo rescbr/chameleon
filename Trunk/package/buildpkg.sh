@@ -22,7 +22,7 @@ fi
 # Prevent the script from doing bad things
 set -u  # Abort with unset variables
 #set -e # Abort with any error can be suppressed locally using EITHER cmd||true OR set -e;cmd;set +e
-imgck=$( md5 "${PKGROOT}/Resources/distribution/background.tif" | awk {'print $4'} )
+imgck=$( md5 "${PKGROOT}/Resources/distribution/background" | awk {'print $4'} )
 imgok=$"309d2ce520459f0442a92309512448f8"
 
 # ====== LANGUAGE SETUP ======
@@ -1096,7 +1096,8 @@ makedistribution ()
     ditto --noextattr --noqtn "${PKGROOT}/Resources/common" "${PKG_BUILD_DIR}/${packagename}/Resources/en.lproj"
 
     # CleanUp the directory
-    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -depth -exec rm -rf {} \;
+    find "${PKG_BUILD_DIR}/${packagename}" -name .svn -print0 | xargs -0 rm -rf
+    find "${PKG_BUILD_DIR}/${packagename}" -name '*.DS_Store' -type f -delete
     find "${PKG_BUILD_DIR}/${packagename}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
 
     # Make substitutions for version, revision, stage, developers, credits, etc..
