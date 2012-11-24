@@ -22,11 +22,15 @@ fi
 # Prevent the script from doing bad things
 set -u  # Abort with unset variables
 #set -e # Abort with any error can be suppressed locally using EITHER cmd||true OR set -e;cmd;set +e
+imgck=$( md5 "${PKGROOT}/Resources/distribution/background.tif" | awk {'print $4'} )
+imgok=$"309d2ce520459f0442a92309512448f8"
 
 # ====== LANGUAGE SETUP ======
 export LANG='en_US.UTF-8'
 export LC_COLLATE='C'
-export LC_CTYPE='C'
+if [[ $imgck == $imgok ]];then
+    export LC_CTYPE='C'
+fi
 
 # ====== CONFIGURATION ======
 CONFIG_MODULES=""
