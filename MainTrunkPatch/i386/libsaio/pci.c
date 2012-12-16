@@ -75,36 +75,49 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 	uint8_t		secondary_bus;
 	uint8_t		header_type;
 
-	for (dev = 0; dev < 32; dev++) {
-		for (func = 0; func < 8; func++) {
+	for (dev = 0; dev < 32; dev++)
+	{
+		for (func = 0; func < 8; func++)
+		{
 			pci_addr = PCIADDR(bus, dev, func);
 			id = pci_config_read32(pci_addr, PCI_VENDOR_ID);
-			if (!id || id == 0xffffffff) {
+			if (!id || id == 0xffffffff)
+			{
 				continue;
 			}
 			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));
+			if (!new)
+			{
+				continue;
+			}
 			bzero(new, sizeof(pci_dt_t));
+
 			new->dev.addr				= pci_addr;
 			new->vendor_id				= id & 0xffff;
 			new->device_id				= (id >> 16) & 0xffff;
-			new->subsys_id.subsys_id	= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
+			new->subsys_id.subsys_id		= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
 			new->class_id				= pci_config_read16(pci_addr, PCI_CLASS_DEVICE);
 			new->parent	= start;
 
 			header_type = pci_config_read8(pci_addr, PCI_HEADER_TYPE);
-			switch (header_type & 0x7f) {
+			switch (header_type & 0x7f)
+			{
 			case PCI_HEADER_TYPE_BRIDGE:
 			case PCI_HEADER_TYPE_CARDBUS:
 				secondary_bus = pci_config_read8(pci_addr, PCI_SECONDARY_BUS);
-				if (secondary_bus != 0) {
+				if (secondary_bus != 0)
+				{
 					scan_pci_bus(new, secondary_bus);
 				}
 				break;
+				default:
+					break;
 			}
 			*current = new;
 			current = &new->next;
 
-			if ((func == 0) && ((header_type & 0x80) == 0)) {
+			if ((func == 0) && ((header_type & 0x80) == 0))
+			{
 				break;
 			}
 		}
@@ -119,7 +132,9 @@ void enable_pci_devs(void)
 	id = pci_config_read16(PCIADDR(0, 0x00, 0), 0x00);
 	/* make sure we're on Intel chipset */
 	if (id != 0x8086)
+	{
 		return;
+	}
 	rcba = pci_config_read32(PCIADDR(0, 0x1f, 0), 0xf0) & ~1;
 	fd = (uint32_t *)(rcba + 0x3418);
 	/* set SMBus Disable (SD) to 0 */
@@ -132,6 +147,12 @@ void enable_pci_devs(void)
 void build_pci_dt(void)
 {
 	root_pci_dev = malloc(sizeof(pci_dt_t));
+
+	if (!root_pci_dev)
+	{
+		return;
+	}
+
 	bzero(root_pci_dev, sizeof(pci_dt_t));
 	enable_pci_devs();
 	scan_pci_bus(root_pci_dev, 0);
@@ -163,7 +184,9 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 		{
 			sprintf(tmp, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
 				current->dev.bits.dev, current->dev.bits.func);
-		} else {
+		}
+		else
+		{
 			sprintf(tmp, "/Pci(0x%x,0x%x)", 
 				current->dev.bits.dev, current->dev.bits.func);
 		}
@@ -177,8 +200,9 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 	pci_dt_t	*current;
 
 	current = pci_dt;
-	while (current) {
-		printf("%02x:%02x.%x [%04x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n", 
+	while (current)
+	{
+		printf("%02x:%02x.%x [%04x%02x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n", 
 			current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
 			current->class_id, current->vendor_id, current->device_id, 
 			current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id, 
