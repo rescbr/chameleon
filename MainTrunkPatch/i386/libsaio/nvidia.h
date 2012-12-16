@@ -50,12 +50,21 @@
 #ifndef __LIBSAIO_NVIDIA_H
 #define __LIBSAIO_NVIDIA_H
 
+struct nvidia_pci_info_t;
+
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 
 typedef struct {
 	uint32_t    device; // VendorID + DeviceID
+	char        *name;
+} nvidia_pci_info_t;
+
+struct nvidia_card_info_t;
+
+typedef struct {
+	uint32_t    device; // VendorID + DeviceID
 	uint32_t    subdev; // SubdeviceID + SubvendorID
-	char        *name_model;
+	char        *name;
 	//bool        kEnableHDMIAudio   //	HDMi
 	//VRAM
 } nvidia_card_info_t;
@@ -65,26 +74,43 @@ typedef struct {
 
 #define DCB_LOC_ON_CHIP 0
 
-struct bios {
+struct bios
+{
 	uint16_t	signature;		/* 0x55AA */
 	uint8_t		size;			/* Size in multiples of 512 */
 };
 
-#define NV_SUB_IDS                              0x00000000
+#define NVIDIA_ROM_SIZE				0x20000
+#define PATCH_ROM_SUCCESS			1
+#define PATCH_ROM_SUCCESS_HAS_LVDS		2
+#define PATCH_ROM_FAILED			0
+#define MAX_NUM_DCB_ENTRIES			16
+#define TYPE_GROUPED				0xff
+#define READ_BYTE(rom, offset) (*(u_char *)(rom + offset))
+#define READ_LE_SHORT(rom, offset) (READ_BYTE(rom, offset+1) << 8 | READ_BYTE(rom, offset))
+#define READ_LE_INT(rom, offset)   (READ_LE_SHORT(rom, offset+2) << 16 | READ_LE_SHORT(rom, offset))
+#define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
+#define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
+
+#define NVCAP_LEN ( sizeof(default_NVCAP) / sizeof(uint8_t) )
+#define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
+#define DCFG0_LEN ( sizeof(default_dcfg_0) / sizeof(uint8_t) )
+#define DCFG1_LEN ( sizeof(default_dcfg_1) / sizeof(uint8_t) )
+
 #define NV_PMC_OFFSET							0x000000
-#define NV_PMC_SIZE                             0x2ffff
+#define NV_PMC_SIZE							0x2ffff
 #define NV_PDISPLAY_OFFSET						0x610000
 #define NV_PDISPLAY_SIZE						0x10000
 
 #define NV_PROM_OFFSET							0x300000
-#define NV_PROM_SIZE							0x0000ffff
+#define NV_PROM_SIZE							0x0001ffff
 #define NV_PRAMIN_OFFSET						0x00700000
 #define NV_PRAMIN_SIZE							0x00100000
 #define NV04_PFB_FIFO_DATA						0x0010020c
-#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK	0xfff00000
-#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_SHIFT	20
-#define NVC0_MEM_CTRLR_COUNT					0x00121c74
-#define NVC0_MEM_CTRLR_RAM_AMOUNT				0x0010f20c
+#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK				0xfff00000
+#define NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_SHIFT				20
+#define NVC0_MEM_CTRLR_COUNT						0x00121c74
+#define NVC0_MEM_CTRLR_RAM_AMOUNT					0x0010f20c
 
 #define NV_PBUS_PCI_NV_20						0x00001850
 #define NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED	(0 << 0)
@@ -140,5 +166,10 @@ struct bios {
 // variant of C51, seems based on a G70 design
 #define CHIPSET_C512            0x03D0
 #define CHIPSET_G73_BRIDGED     0x02E0
+
+extern uint8_t default_NVCAP[];
+extern uint8_t default_NVPM[];
+extern uint8_t default_dcfg_0[];
+extern uint8_t default_dcfg_1[];
 
 #endif /* !__LIBSAIO_NVIDIA_H */
