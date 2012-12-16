@@ -9,7 +9,7 @@
 
 #include "aml_generator.h"
 
-bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
+bool aml_add_to_parent(AML_CHUNK* parent, AML_CHUNK* node)
 {
 	if (parent && node)
 	{
@@ -21,12 +21,12 @@ bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
 			case AML_CHUNK_DWORD:
 			case AML_CHUNK_QWORD:
 			case AML_CHUNK_ALIAS:
-				verbose("aml_add_to_parent: node doesn't support child nodes!\n");
+				verbose("aml_add_to_parent: Node doesn't support child nodes!\n");
 				return false;
 			case AML_CHUNK_NAME:
 				if (parent->First) 
 				{
-					verbose("aml_add_to_parent: name node supports only one child node!\n");
+					verbose("aml_add_to_parent: Name node supports only one child node!\n");
 					return false;
 				}
 				break;
@@ -49,23 +49,23 @@ bool aml_add_to_parent(struct aml_chunk* parent, struct aml_chunk* node)
 	return false;
 }
 
-struct aml_chunk* aml_create_node(struct aml_chunk* parent)
+AML_CHUNK* aml_create_node(AML_CHUNK* parent)
 {
-	struct aml_chunk* node = (struct aml_chunk*)malloc(sizeof(struct aml_chunk));
+	AML_CHUNK* node = (AML_CHUNK*)malloc(sizeof(AML_CHUNK));
 	
 	aml_add_to_parent(parent, node);
 	
 	return node;
 }
 
-void aml_destroy_node(struct aml_chunk* node)
+void aml_destroy_node(AML_CHUNK* node)
 {
 	// Delete child nodes
-	struct aml_chunk* child = node->First;
+	AML_CHUNK* child = node->First;
 	
 	while (child) 
 	{
-		struct aml_chunk* next = child->Next;
+		AML_CHUNK* next = child->Next;
 		
 		if (child->Buffer)
 			free(child->Buffer);
@@ -82,14 +82,14 @@ void aml_destroy_node(struct aml_chunk* node)
 	free(node);
 }
 
-struct aml_chunk* aml_add_buffer(struct aml_chunk* parent, const char* buffer, unsigned int size)
+AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, const char* buffer, uint32_t size)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node) 
 	{
 		node->Type = AML_CHUNK_NONE;
-		node->Length = size;
+		node->Length = (uint16_t)size;
 		node->Buffer = malloc(node->Length);
 		memcpy(node->Buffer, buffer, node->Length);
 	}
@@ -97,9 +97,9 @@ struct aml_chunk* aml_add_buffer(struct aml_chunk* parent, const char* buffer, u
 	return node;
 }
 
-struct aml_chunk* aml_add_byte(struct aml_chunk* parent, unsigned char value)
+AML_CHUNK* aml_add_byte(AML_CHUNK* parent, unsigned char value)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node) 
 	{
@@ -113,9 +113,9 @@ struct aml_chunk* aml_add_byte(struct aml_chunk* parent, unsigned char value)
 	return node;
 }
 
-struct aml_chunk* aml_add_word(struct aml_chunk* parent, unsigned int value)
+AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node) 
 	{
@@ -129,9 +129,9 @@ struct aml_chunk* aml_add_word(struct aml_chunk* parent, unsigned int value)
 	return node;
 }
 
-struct aml_chunk* aml_add_dword(struct aml_chunk* parent, unsigned long value)
+AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node) 
 	{
@@ -147,9 +147,9 @@ struct aml_chunk* aml_add_dword(struct aml_chunk* parent, unsigned long value)
 	return node;
 }
 
-struct aml_chunk* aml_add_qword(struct aml_chunk* parent, unsigned long long value)
+AML_CHUNK* aml_add_qword(AML_CHUNK* parent, uint64_t value)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node) 
 	{
@@ -169,7 +169,7 @@ struct aml_chunk* aml_add_qword(struct aml_chunk* parent, unsigned long long val
 	return node;
 }
 
-unsigned int aml_fill_simple_name(char* buffer, const char* name)
+uint32_t aml_fill_simple_name(char* buffer, const char* name)
 {
 	if (strlen(name) < 4) 
 	{
@@ -181,55 +181,62 @@ unsigned int aml_fill_simple_name(char* buffer, const char* name)
 	return 4;
 }
 
-unsigned int aml_fill_name(struct aml_chunk* node, const char* name)
+uint32_t aml_fill_name(AML_CHUNK* node, const char* name)
 {
-	if (!node) 
+	int len, offset, count;
+	uint32_t root = 0;
+
+	if (!node)
+	{
 		return 0;
-	
-	int len = strlen(name), offset = 0, count = len / 4;
-	
+	}
+
+	len = strlen(name);
+	offset = 0;
+	count = len >> 2;
+
 	if ((len % 4) > 1 || count == 0) 
 	{
 		verbose("aml_fill_name: pathname %s has incorrect length! Must be 4, 8, 12, 16, etc...\n", name);
 		return 0;
 	}
 	
-	unsigned int root = 0;
-	
-	if ((len % 4) == 1 && name[0] == '\\')
+	if (((len % 4) == 1) && (name[0] == '\\'))
 		root++;
 			
 	if (count == 1) 
 	{
-		node->Length = 4 + root;
-		node->Buffer = malloc(node->Length);
+		node->Length = (uint16_t)(4 + root);
+		node->Buffer = malloc(node->Length+4);
 		memcpy(node->Buffer, name, 4 + root);
-		return node->Length;
+		offset += 4 + root;
+		return (uint32_t)offset;
 	}
 	
 	if (count == 2) 
 	{
 		node->Length = 2 + 8;
-		node->Buffer = malloc(node->Length);
+		node->Buffer = malloc(node->Length+4);
 		node->Buffer[offset++] = 0x5c; // Root Char
 		node->Buffer[offset++] = 0x2e; // Double name
 		memcpy(node->Buffer+offset, name + root, 8);
-		return node->Length;
+		offset += 8;
+		return (uint32_t)offset;
 	}
 	
-	node->Length = 3 + count*4;
-	node->Buffer = malloc(node->Length);
+	node->Length = (uint16_t)(3 + (count << 2));
+	node->Buffer = malloc(node->Length+4);
 	node->Buffer[offset++] = 0x5c; // Root Char
 	node->Buffer[offset++] = 0x2f; // Multi name
-	node->Buffer[offset++] = count; // Names count
+	node->Buffer[offset++] = (char)count; // Names count
 	memcpy(node->Buffer+offset, name + root, count*4);
-	
-	return node->Length;
+	offset += count*4;
+	return (uint32_t)offset;
 }
 
-struct aml_chunk* aml_add_scope(struct aml_chunk* parent, const char* name)
+AML_CHUNK* aml_add_scope(AML_CHUNK* parent, const char* name)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node)
 	{
@@ -241,9 +248,9 @@ struct aml_chunk* aml_add_scope(struct aml_chunk* parent, const char* name)
 	return node;
 }
 
-struct aml_chunk* aml_add_name(struct aml_chunk* parent, const char* name)
+AML_CHUNK* aml_add_name(AML_CHUNK* parent, const char* name)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node)
 	{
@@ -255,9 +262,25 @@ struct aml_chunk* aml_add_name(struct aml_chunk* parent, const char* name)
 	return node;
 }
 
-struct aml_chunk* aml_add_package(struct aml_chunk* parent)
+AML_CHUNK* aml_add_method(AML_CHUNK* parent, const char* name, uint8_t args)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		int offset = aml_fill_name(node, name);
+		node->Type = AML_CHUNK_METHOD;
+
+		node->Length++;
+		node->Buffer[offset] = args;
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_package(AML_CHUNK* parent)
+{
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node)
 	{
@@ -270,50 +293,182 @@ struct aml_chunk* aml_add_package(struct aml_chunk* parent)
 	return node;
 }
 
-struct aml_chunk* aml_add_alias(struct aml_chunk* parent, const char* name1, const char* name2)
+AML_CHUNK* aml_add_alias(AML_CHUNK* parent, const char* name1, const char* name2)
 {
-	struct aml_chunk* node = aml_create_node(parent);
+	AML_CHUNK* node = aml_create_node(parent);
 	
 	if (node)
 	{
 		node->Type = AML_CHUNK_ALIAS;
-		
+
 		node->Length = 8;
 		node->Buffer = malloc(node->Length);
 		aml_fill_simple_name(node->Buffer, name1);
 		aml_fill_simple_name(node->Buffer+4, name2);
 	}
-	
+
 	return node;
 }
 
-unsigned char aml_get_size_length(unsigned int size)
+AML_CHUNK* aml_add_return_name(AML_CHUNK* parent, const char* name)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_CHUNK_RETURN;
+		aml_fill_name(node, name);
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_return_byte(AML_CHUNK* parent, uint8_t value)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_CHUNK_RETURN;
+		aml_add_byte(node, value);
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_device(AML_CHUNK* parent, const char* name)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_CHUNK_DEVICE;
+		aml_fill_name(node, name);
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_local0(AML_CHUNK* parent)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_CHUNK_LOCAL0;
+		node->Length = 1;
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_store(AML_CHUNK* parent)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_STORE_OP;
+		node->Length = 1;
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_byte_buffer(AML_CHUNK* parent, const char* data, uint32_t size)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+	    int offset = 0;
+		node->Type = AML_CHUNK_BUFFER;
+		node->Length = (uint8_t)(size + 2);
+		node->Buffer = malloc (node->Length);
+		node->Buffer[offset++] = AML_CHUNK_BYTE;
+		node->Buffer[offset++] = (char)size;
+		memcpy(node->Buffer+offset,data, node->Length);
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, const char* string)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+	    unsigned int offset=0;
+	    unsigned int len = strlen(string);
+		node->Type = AML_CHUNK_BUFFER;
+		node->Length = (uint8_t)(len + 3);
+		node->Buffer = malloc (node->Length);
+		node->Buffer[offset++] = AML_CHUNK_BYTE;
+		node->Buffer[offset++] = (char)len;
+		memcpy(node->Buffer+offset,string, len);
+		node->Buffer[offset+len] = '\0';
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_string(AML_CHUNK* parent, const char* string)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+	    int len = strlen(string);
+		node->Type = AML_CHUNK_STRING;
+		node->Length = (uint8_t)(len + 1);
+		node->Buffer = malloc (len);
+		memcpy(node->Buffer,string, len);
+		node->Buffer[len] = '\0';
+	}
+
+	return node;
+}
+
+AML_CHUNK* aml_add_return(AML_CHUNK* parent)
+{
+	AML_CHUNK* node = aml_create_node(parent);
+
+	if (node)
+	{
+		node->Type = AML_CHUNK_RETURN;
+		//aml_add_byte(node, value);
+	}
+
+	return node;
+}
+
+uint8_t aml_get_size_length(uint32_t size)
 {
 	if (size + 1 <= 0x3f)
 		return 1;
-	else if (size + 2 <= 0x3fff)
+	else if (size + 2 <= 0xfff) /* Encode in 4 bits and 1 byte */
 		return 2;
-	else if (size + 3 <= 0x3fffff)
+	else if (size + 3 <= 0xfffff) /* Encode in 4 bits and 2 bytes */
 		return 3;
 	
-	return 4;
+	return 4; /* Encode 0xfffffff in 4 bits and 2 bytes */
 }
 
-unsigned int aml_calculate_size(struct aml_chunk* node)
+uint32_t aml_calculate_size(AML_CHUNK* node)
 {
 	if (node)
 	{
-		node->Size = 0;
-		
 		// Calculate child nodes size
-		struct aml_chunk* child = node->First;
-		unsigned char child_count = 0;
+		AML_CHUNK* child = node->First;
+		uint8_t child_count = 0;
 		
+		node->Size = 0;
 		while (child) 
 		{
 			child_count++;
 			
-			node->Size += aml_calculate_size(child);
+			node->Size += (uint16_t)aml_calculate_size(child);
 			
 			child = child->Next;
 		}
@@ -321,12 +476,23 @@ unsigned int aml_calculate_size(struct aml_chunk* node)
 		switch (node->Type) 
 		{
 			case AML_CHUNK_NONE:
+			case AML_STORE_OP:
+			case AML_CHUNK_LOCAL0:
 				node->Size += node->Length;
 				break;
+
+			case AML_CHUNK_METHOD:
 			case AML_CHUNK_SCOPE:
+			case AML_CHUNK_BUFFER:
 				node->Size += 1 + node->Length;
 				node->Size += aml_get_size_length(node->Size);
 				break;
+
+			case AML_CHUNK_DEVICE:
+				node->Size += 2 + node->Length;
+				node->Size += aml_get_size_length(node->Size);
+				break;
+
 			case AML_CHUNK_PACKAGE:
 				node->Buffer[0] = child_count;
 				node->Size += 1 + node->Length;
@@ -350,6 +516,8 @@ unsigned int aml_calculate_size(struct aml_chunk* node)
 			case AML_CHUNK_QWORD:
 			case AML_CHUNK_ALIAS:
 			case AML_CHUNK_NAME:
+			case AML_CHUNK_RETURN:
+			case AML_CHUNK_STRING:
 				node->Size += 1 + node->Length;
 				break;
 		}
@@ -360,14 +528,14 @@ unsigned int aml_calculate_size(struct aml_chunk* node)
 	return 0;
 }
 
-unsigned int aml_write_byte(unsigned char value, char* buffer, unsigned int offset)
+uint32_t aml_write_byte(uint8_t value, char* buffer, uint32_t offset)
 {
 	buffer[offset++] = value;
 	
 	return offset;
 }
 
-unsigned int aml_write_word(unsigned int value, char* buffer, unsigned int offset)
+uint32_t aml_write_word(uint16_t value, char* buffer, uint32_t offset)
 {
 	buffer[offset++] = value & 0xff;
 	buffer[offset++] = value >> 8;
@@ -375,7 +543,7 @@ unsigned int aml_write_word(unsigned int value, char* buffer, unsigned int offse
 	return offset;
 }
 
-unsigned int aml_write_dword(unsigned long value, char* buffer, unsigned int offset)
+uint32_t aml_write_dword(uint32_t value, char* buffer, uint32_t offset)
 {
 	buffer[offset++] = value & 0xff;
 	buffer[offset++] = (value >> 8) & 0xff;
@@ -385,7 +553,7 @@ unsigned int aml_write_dword(unsigned long value, char* buffer, unsigned int off
 	return offset;
 }
 
-unsigned int aml_write_qword(unsigned long long value, char* buffer, unsigned int offset)
+uint32_t aml_write_qword(uint64_t value, char* buffer, uint32_t offset)
 {
 	buffer[offset++] = value & 0xff;
 	buffer[offset++] = (value >> 8) & 0xff;
@@ -399,7 +567,7 @@ unsigned int aml_write_qword(unsigned long long value, char* buffer, unsigned in
 	return offset;
 }
 
-unsigned int aml_write_buffer(const char* value, unsigned int size, char* buffer, unsigned int offset)
+uint32_t aml_write_buffer(const char* value, uint32_t size, char* buffer, uint32_t offset)
 {
 	if (size > 0)
 	{
@@ -409,27 +577,27 @@ unsigned int aml_write_buffer(const char* value, unsigned int size, char* buffer
 	return offset + size;
 }
 
-unsigned int aml_write_size(unsigned int size, char* buffer, unsigned int offset)
+uint32_t aml_write_size(uint32_t size, char* buffer, uint32_t offset)
 {
-	if (size <= 0x3f)
+	if (size <= 0x3f) /* simple 1 byte length in 6 bits */
 	{
-		buffer[offset++] = size;
+		buffer[offset++] = (char)size;
 	}
-	else if (size <= 0x3fff) 
+	else if (size <= 0xfff) 
 	{
-		buffer[offset++] = 0x40 | (size & 0xf);
-		buffer[offset++] = (size >> 4) & 0xff;
+		buffer[offset++] = 0x40 | (size & 0xf); /* 0x40 is type, 0x0X is first nibble of length */
+		buffer[offset++] = (size >> 4) & 0xff; /* +1 bytes for rest length */
 	}
-	else if (size <= 0x3fffff) 
+	else if (size <= 0xfffff) 
 	{
-		buffer[offset++] = 0x80 | (size & 0xf);
-		buffer[offset++] = (size >> 4) & 0xff;
+		buffer[offset++] = 0x80 | (size & 0xf); /* 0x80 is type, 0x0X is first nibble of length */
+		buffer[offset++] = (size >> 4) & 0xff; /* +2 bytes for rest length */
 		buffer[offset++] = (size >> 12) & 0xff;
 	}
     else 
 	{
-		buffer[offset++] = 0xc0 | (size & 0xf);
-		buffer[offset++] = (size >> 4) & 0xff;
+		buffer[offset++] = 0xc0 | (size & 0xf); /* 0xC0 is type, 0x0X is first nibble of length */
+		buffer[offset++] = (size >> 4) & 0xff;  /* +3 bytes for rest length */
 		buffer[offset++] = (size >> 12) & 0xff;
 		buffer[offset++] = (size >> 20) & 0xff;
 	}
@@ -437,11 +605,12 @@ unsigned int aml_write_size(unsigned int size, char* buffer, unsigned int offset
 	return offset;
 }
 
-unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int offset)
+uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 {
 	if (node && buffer) 
 	{
-		unsigned int old = offset;
+		uint32_t old = offset;
+		AML_CHUNK* child = node->First;
 		
 		switch (node->Type) 
 		{
@@ -449,8 +618,22 @@ unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int o
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 
+			case AML_CHUNK_LOCAL0:
+			case AML_STORE_OP:
+				offset = aml_write_byte(node->Type, buffer, offset);
+				break;
+				
+			case AML_CHUNK_DEVICE:
+				offset = aml_write_byte(AML_CHUNK_OP, buffer, offset);
+				offset = aml_write_byte(node->Type, buffer, offset);
+				offset = aml_write_size(node->Size-3, buffer, offset);
+				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
+				break;
+
 			case AML_CHUNK_SCOPE:
+			case AML_CHUNK_METHOD:
 			case AML_CHUNK_PACKAGE:
+			case AML_CHUNK_BUFFER:
 				offset = aml_write_byte(node->Type, buffer, offset);
 				offset = aml_write_size(node->Size-1, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
@@ -473,6 +656,8 @@ unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int o
 			case AML_CHUNK_QWORD:
 			case AML_CHUNK_ALIAS:
 			case AML_CHUNK_NAME:
+			case AML_CHUNK_RETURN:
+			case AML_CHUNK_STRING:
 				offset = aml_write_byte(node->Type, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
@@ -481,8 +666,6 @@ unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int o
 				break;
 		}
 
-		struct aml_chunk* child = node->First;
-		
 		while (child) 
 		{
 			offset = aml_write_node(child, buffer, offset);
@@ -491,7 +674,8 @@ unsigned int aml_write_node(struct aml_chunk* node, char* buffer, unsigned int o
 		}
 		
 		if (offset - old != node->Size) 
-			verbose("Node size incorrect: 0x%x\n", node->Type);
+			verbose("Node size incorrect: type=0x%x size=%x offset=%x\n",
+			node->Type, node->Size, (offset - old));
 	}
 	
 	return offset;
