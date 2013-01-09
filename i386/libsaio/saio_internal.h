@@ -163,7 +163,7 @@ extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 /* lib.c */
 extern int bcd2dec(int b);
 extern int dec2bcd(int d);
-
+#define abs(x) ((x) < 0 ? - (x) : (x))
 
 /* memory.c */
 extern long AllocateKernelMemory( long inSize );

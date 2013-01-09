@@ -35,8 +35,6 @@
 extern boot_args_legacy *bootArgsLegacy;
 extern boot_args        *bootArgs;
 
-#define VGA_TEXT_MODE 0
-
 #if 0
 /*
  * Maximum number of boot drivers that can be loaded.

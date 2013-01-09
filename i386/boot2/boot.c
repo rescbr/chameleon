@@ -133,6 +133,7 @@ static void zeroBSS(void)
 #endif
 }
 
+#ifdef ZALLOC
 //==========================================================================
 // Malloc error function
 
@@ -149,6 +150,15 @@ static inline void malloc_error(char *addr, size_t size)
 }
 #endif
 
+#else
+
+static inline void print_callback(char *s)
+{
+    printf("%s", s);
+}
+
+#endif
+
 BVRef getBvChain(void)
 {
 	return bvChain;
@@ -161,7 +171,12 @@ BVRef getBvChain(void)
 void initialize_runtime(void)
 {
 	zeroBSS();
+#ifdef ZALLOC
 	malloc_init(0, 0, 0, malloc_error);
+#else
+	__printf_init(print_callback);
+    
+#endif
 }
 
 //==========================================================================
@@ -397,6 +412,8 @@ void common_boot(int biosdev)
 #endif
 	printf("Starting Chameleon ...\n");
     
+	Install_Default_Handler();
+	
 	init_ut_fnc();
     
 	initBooterLog();
@@ -433,7 +450,7 @@ void common_boot(int biosdev)
 	
     {
         bool isServer = false;
-        getBoolForKey(kIsServer, &isServer, DEFAULT_BOOT_CONFIG); // set this as soon as possible
+        getBoolForKey(kIsServer, &isServer, DEFAULT_BOOT_CONFIG); // we must set this as soon as possible
         set_env(envIsServer , isServer);
     }
 	
@@ -900,7 +917,7 @@ void getKernelCachePath(void)
                     SetgRootPath(platformInfo->rootPath);
 #endif
 					
-					Adler32 = OSSwapHostToBigInt32(adler32((unsigned char *)platformInfo, sizeof(PlatformInfo)));
+					Adler32 = OSSwapHostToBigInt32(local_adler32((unsigned char *)platformInfo, sizeof(PlatformInfo)));
 					safe_set_env(envAdler32, Adler32);
 					
 					free(platformInfo);

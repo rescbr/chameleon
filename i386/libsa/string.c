@@ -25,9 +25,9 @@
 
 #include "libsa.h"
 
+static int _mach_strlen(const char *str);
 static char *STRDUP(const char *string);
 
-#if 0
 /*
  * Abstract:
  *      strcmp (s1, s2) compares the strings "s1" and "s2".
@@ -169,7 +169,6 @@ strlcpy(char *dst, const char *src, size_t siz)
 	
 	return(s - src - 1);	/* count does not include NUL */
 }
-#endif
 
 /*
  * History:
@@ -200,16 +199,13 @@ strstr(const char *in, const char *str)
     return (const char *) (in - 1);
 }
 
-#if 0
 void *
 memmove(void *dst, const void *src, size_t ulen)
 {
     bcopy(src, dst, ulen);   
     return dst;
 }
-#endif
 
-#if UNUSED
 int
 ptol(const char *str)
 {
@@ -222,7 +218,7 @@ ptol(const char *str)
 	else c = 0;
 	return c;
 }
-#endif
+
 /*
  * atoi:
  *
@@ -242,7 +238,7 @@ atoi(const char *cp)
 	
 	return( number );
 }
-#if UNUSED
+
 /*
  * convert an integer to an ASCII string.
  * inputs:
@@ -279,9 +275,6 @@ itoa(
 	
 	return str;
 }
-#endif
-
-#if 0
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
  * full size of dst, not space left).  At most siz-1 characters
@@ -316,7 +309,6 @@ strlcat(char *dst, const char *src, size_t siz)
 	
 	return(dlen + (s - src));       /* count does not include NUL */
 }
-#endif
 
 /*
  *
@@ -340,8 +332,6 @@ strncat(char *s1, const char *s2, unsigned long n)
 	return(os1);
 }
 
-#if 0
-static int _mach_strlen(const char *str);
 static int
 _mach_strlen(const char *str)
 {
@@ -359,9 +349,7 @@ size_t strlen(const char * str)
 {	
 	return (size_t)_mach_strlen(str);
 }
-#endif
 
-#if UNUSED
 /*
  * Does the same thing as strlen, except only looks up
  * to max chars inside the buffer. 
@@ -381,7 +369,7 @@ strnlen(const char *s, size_t max) {
 	
 	return p - s;
 }
-#endif
+
 /* 
  * Deprecation Warning:
  *	strcat() is being deprecated. Please use strlcat() instead.
@@ -424,7 +412,11 @@ STRDUP(const char *string)
 	char *copy;   
 	
 	len = strlen(string) + 1;
-	copy = malloc(len);
+#if (defined(MEMORY_TEST))
+	copy = _malloc(len);
+#else
+    copy = malloc(len);
+#endif
 	if (copy == NULL)
 		return (NULL);
 	bcopy(string, copy, len);
@@ -482,7 +474,6 @@ strncasecmp(const char *s1, const char *s2, size_t n)
     return (0);
 }
 #endif
-
 /*
  *
  */
@@ -534,7 +525,7 @@ char* strbreak(const char *str, char **next, long *len)
 }
 
 unsigned long
-adler32( unsigned char * buffer, long length )
+local_adler32( unsigned char * buffer, long length )
 {
     long          cnt;
     unsigned long result, lowHalf, highHalf;
@@ -563,7 +554,7 @@ adler32( unsigned char * buffer, long length )
 }
 
 /*-
- * For memcmp, bsearch.
+ * For memcmp, bsearch, memchr , memcpy, memmove, bcopy.
  * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -595,7 +586,6 @@ adler32( unsigned char * buffer, long length )
  * SUCH DAMAGE.
  */
 
-#if 0
 /*
  * Compare memory regions.
  */
@@ -612,7 +602,7 @@ memcmp(const void *s1, const void *s2, size_t n)
 	}
 	return (0);
 }
-#endif
+
 /*
  * Perform a binary search.
  *
@@ -654,3 +644,261 @@ register int (*compar)(const void *, const void *);
 	}
 	return (NULL);
 }
+
+void *
+memchr(const void *s, int c, size_t n)
+{
+	if (n != 0) {
+		const unsigned char *p = s;
+		
+		do {
+			if (*p++ == (unsigned char)c)
+				return ((void *)(p - 1));
+		} while (--n != 0);
+	}
+	return (NULL);
+}
+
+#if 1
+/*
+ * sizeof(word) MUST BE A POWER OF TWO
+ * SO THAT wmask BELOW IS ALL ONES
+ */
+typedef int word;               /* "word" used for optimal copy speed */
+
+#define wsize   sizeof(word)
+#define wmask   (wsize - 1)
+
+/*
+ * Copy a block of memory, handling overlap.
+ * This is the routine that actually implements
+ * (the portable versions of) bcopy, memcpy, and memmove.
+ */
+
+void
+bcopy(const void *src0, void *dst0, size_t length)
+{
+	memcpy(dst0,src0,length);
+}
+
+void *memcpy(void *dst0, const void *src0, size_t length)
+{
+	char *dst = dst0;
+	const char *src = src0;
+	size_t t;
+	
+	if (length == 0 || dst == src)          /* nothing to do */
+		goto done;
+	
+	/*
+	 * Macros: loop-t-times; and loop-t-times, t>0
+	 */
+#define TLOOP(s) if (t) TLOOP1(s)
+#define TLOOP1(s) do { s; } while (--t)
+	
+	if ((unsigned long)dst < (unsigned long)src) {
+		/*
+		 * Copy forward.
+		 */
+		t = (uintptr_t)src;     /* only need low bits */
+		if ((t | (uintptr_t)dst) & wmask) {
+			/*
+			 * Try to align operands.  This cannot be done
+			 * unless the low bits match.
+			 */
+			if ((t ^ (uintptr_t)dst) & wmask || length < wsize)
+				t = length;
+			else
+				t = wsize - (t & wmask);
+			length -= t;
+			TLOOP1(*dst++ = *src++);
+		}
+		/*
+		 * Copy whole words, then mop up any trailing bytes.
+		 */
+		t = length / wsize;
+		TLOOP(*(word *)dst = *(word *)src; src += wsize; dst += wsize);
+		t = length & wmask;
+		TLOOP(*dst++ = *src++);
+	} else {
+		/*
+		 * Copy backwards.  Otherwise essentially the same.
+		 * Alignment works as before, except that it takes
+		 * (t&wmask) bytes to align, not wsize-(t&wmask).
+		 */
+		src += length;
+		dst += length;
+		t = (uintptr_t)src;
+		if ((t | (uintptr_t)dst) & wmask) {
+			if ((t ^ (uintptr_t)dst) & wmask || length <= wsize)
+				t = length;
+			else
+				t &= wmask;
+			length -= t;
+			TLOOP1(*--dst = *--src);
+		}
+		t = length / wsize;
+		TLOOP(src -= wsize; dst -= wsize; *(word *)dst = *(word *)src);
+		t = length & wmask;
+		TLOOP(*--dst = *--src);
+	}
+done:
+	return (dst0);
+}
+
+
+#ifdef wsize
+#undef wsize
+#endif
+#ifdef wmask
+#undef wmask
+#endif
+#define wsize   sizeof(u_int)
+#define wmask   (wsize - 1)
+
+
+void bzero(void *dst0, size_t length)
+{	
+#ifdef RETURN
+#undef RETURN
+#endif
+#ifdef VAL
+#undef VAL
+#endif
+#ifdef WIDEVAL
+#undef WIDEVAL
+#endif
+#define RETURN  return
+#define VAL     0
+#define WIDEVAL 0
+	
+	size_t t;
+	u_char *dst;
+	
+	dst = dst0;
+	/*
+	 * If not enough words, just fill bytes.  A length >= 2 words
+	 * guarantees that at least one of them is `complete' after
+	 * any necessary alignment.  For instance:
+	 *
+	 *      |-----------|-----------|-----------|
+	 *      |00|01|02|03|04|05|06|07|08|09|0A|00|
+	 *                ^---------------------^
+	 *               dst             dst+length-1
+	 *
+	 * but we use a minimum of 3 here since the overhead of the code
+	 * to do word writes is substantial.
+	 */
+	if (length < 3 * wsize) {
+		while (length != 0) {
+			*dst++ = VAL;
+			--length;
+		}
+		RETURN;
+	}
+	
+	/* Align destination by filling in bytes. */
+	if ((t = (long)dst & wmask) != 0) {
+		t = wsize - t;
+		length -= t;
+		do {
+			*dst++ = VAL;
+		} while (--t != 0);
+	}
+	
+	/* Fill words.  Length was >= 2*words so we know t >= 1 here. */
+	t = length / wsize;
+	do {
+		*(u_int *)dst = WIDEVAL;
+		dst += wsize;
+	} while (--t != 0);
+	
+	/* Mop up trailing bytes, if any. */
+	t = length & wmask;
+	if (t != 0)
+		do {
+			*dst++ = VAL;
+		} while (--t != 0);
+	RETURN;
+}
+
+
+void *
+memset(void *dst0, int c0, size_t length)
+{
+#ifdef RETURN
+#undef RETURN
+#endif	
+#ifdef VAL
+#undef VAL
+#endif
+#ifdef WIDEVAL
+#undef WIDEVAL
+#endif
+	
+#define VAL     c0
+#define WIDEVAL c
+#define RETURN  return (dst0)
+	
+	size_t t;
+	u_int c;
+	u_char *dst;
+	
+	dst = dst0;
+	/*
+	 * If not enough words, just fill bytes.  A length >= 2 words
+	 * guarantees that at least one of them is `complete' after
+	 * any necessary alignment.  For instance:
+	 *
+	 *      |-----------|-----------|-----------|
+	 *      |00|01|02|03|04|05|06|07|08|09|0A|00|
+	 *                ^---------------------^
+	 *               dst             dst+length-1
+	 *
+	 * but we use a minimum of 3 here since the overhead of the code
+	 * to do word writes is substantial.
+	 */
+	if (length < 3 * wsize) {
+		while (length != 0) {
+			*dst++ = VAL;
+			--length;
+		}
+		RETURN;
+	}
+	
+	if ((c = (u_char)c0) != 0) {    /* Fill the word. */
+		c = (c << 8) | c;       /* u_int is 16 bits. */
+#if UINT_MAX > 0xffff
+		c = (c << 16) | c;      /* u_int is 32 bits. */
+#endif
+#if UINT_MAX > 0xffffffff
+		c = (c << 32) | c;      /* u_int is 64 bits. */
+#endif
+	}
+	
+	/* Align destination by filling in bytes. */
+	if ((t = (long)dst & wmask) != 0) {
+		t = wsize - t;
+		length -= t;
+		do {
+			*dst++ = VAL;
+		} while (--t != 0);
+	}
+	
+	/* Fill words.  Length was >= 2*words so we know t >= 1 here. */
+	t = length / wsize;
+	do {
+		*(u_int *)dst = WIDEVAL;
+		dst += wsize;
+	} while (--t != 0);
+	
+	/* Mop up trailing bytes, if any. */
+	t = length & wmask;
+	if (t != 0)
+		do {
+			*dst++ = VAL;
+		} while (--t != 0);
+	RETURN;
+}
+
+#endif

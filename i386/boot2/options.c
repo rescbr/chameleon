@@ -589,7 +589,7 @@ int getBootOptions(bool firstRun)
 	// Initialize default menu selection entry.
 	menuBVR = selectBootVolume(getBvChain());
 	safe_set_env(envgBootVolume, (uint32_t)menuBVR);
-
+	
 	if (biosDevIsCDROM((int)get_env(envgBIOSDev))) {
 		isCDROM = true;
 	} else {
@@ -687,21 +687,26 @@ int getBootOptions(bool firstRun)
                 return -1;
             }
 			strncat(prompt, val, cnt);
-		} else {
-			name = malloc(80);
-            if (!name) {
-                stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
-                return -1;
-            }
-			getBootVolumeDescription(((BVRef)(uint32_t)get_env(envgBootVolume)), name, 79, false);
-			prompt = malloc(256);            
+		} else {			
+            prompt = malloc(256);
             if (!prompt) {
-                free(name);
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
                 return -1;
             }
-			snprintf(prompt, 256,"Press ENTER to start up from %s, or press any key to enter startup options.", name);
-			free(name);
+            BVRef bvr;
+            if (( bvr = ((BVRef)(uint32_t)get_env(envgBootVolume)))) {
+                name = malloc(80);
+                bzero(name,80);
+                if (!name) {
+                    stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
+                    return -1;
+                }
+                getBootVolumeDescription(bvr, name, 79, false);
+                
+                snprintf(prompt, 256,"Press ENTER to start up from %s, or press any key to enter startup options.", name);
+                free(name);
+            } else snprintf(prompt, 256,"Press ENTER to start up, or press any key to enter startup options.");
+			
 		}
 		
 		if (getIntForKey( kCDROMOptionKey, &optionKey, DEFAULT_BOOT_CONFIG )) {
@@ -920,7 +925,7 @@ int getBootOptions(bool firstRun)
                 
 				//gBootVolume = NULL;
 				safe_set_env(envgBootVolume, (uint32_t)NULL);
-
+				
 				clearBootArgs();
 				break;
                 

@@ -25,14 +25,24 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-SA_OBJS = qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o __bzero.o bzero_scalar.o strcmp.o strcpy.o strncpy.o strlcpy.o strncmp.o strlcat.o bcopy_scalar.o memcmp.o memset.o memset_pattern_sse2.o strlen.o printf.o zalloc.o\
+SA_OBJS = __bzero.o ffs.o qdivrem.o umoddi3.o udivdi3.o divdi3.o moddi3.o printf.o \
 	string.o strtol.o \
-	setjmp.o qsort.o efi_tables.o 
-	
-SFILES = setjmp.s bzero.s bcopy.s __bzero.s bzero_scalar.s strcmp.s strcpy.s strncpy.s strlcpy.s strncmp.s strlcat.s memcmp.s memset.s memset_pattern_sse2.s strlen.s
-CFILES = qdivrem.c umoddi3.c udivdi3.c divdi3.c moddi3.c prf.c printf.c zalloc.c \
+	setjmp.o qsort.o efi_tables.o jemalloc.o sbrk.o ctype.o __printf.o    
+
+SFILES = setjmp.s __bzero.s ffs.s
+CFILES = qdivrem.c umoddi3.c udivdi3.c divdi3.c moddi3.c printf.c zalloc.c \
 	string.c strtol.c \
-	qsort.c efi_tables.c 
+	qsort.c efi_tables.c sbrk.c ctype.c __printf.c
+
+HFILES = memory.h
+EXPORTED_HFILES = libsa.h memory.h
+INSTALLED_SA_HFILES = libsa.h
+OTHERFILES = Makefile
+ALLSRC =  $(SFILES) $(CFILES) $(HFILES) $(OTHERFILES)
+LIBS = libsa.a
+DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
+
+CFLAGS += -DSAFE_MALLOC #if zalloc
 
 HFILES = memory.h
 EXPORTED_HFILES = libsa.h memory.h

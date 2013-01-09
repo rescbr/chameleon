@@ -411,7 +411,7 @@ LoadDriverMKext( char * fileSpec )
         ( GetPackageElement(signature2) != kDriverPackageSignature2) ||
         ( GetPackageElement(length)      > kLoadSize )               ||
         ( GetPackageElement(alder32)    !=
-		 adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
+		 local_adler32((unsigned char *)&package->version, GetPackageElement(length) - 0x10) ) )
     {
         return -1;
     }
@@ -816,7 +816,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
             return -1;
         }
         if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-            adler32(binary, uncompressed_size))
+            local_adler32(binary, uncompressed_size))
 		{
             printf("adler mismatch\n");
             return -1;

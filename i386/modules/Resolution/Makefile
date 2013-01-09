@@ -31,6 +31,7 @@ UTILDIR = ../../util
 LIBSADIR = ../../libsa
 LIBSAIODIR = ../../libsaio
 BOOT2DIR = ../../boot2
+INCLUDE = ../include
 
 INSTALLDIR = $(DSTROOT)/System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/standalone
 
@@ -44,7 +45,7 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wall -fstack-protector-
     -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common  
 DEFINES=
 CONFIG = hd
-INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(BOOT2DIR)
+INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(INCLUDE) -I$(BOOT2DIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else

@@ -42,6 +42,7 @@
 // (?) : if AMD_SUPPORT then (LEGACY_CPU = 1 && INTEL_SUPPORT = disabled)
 //		   else LEGACY_CPU = INTEL_SUPPORT
 
+static uint64_t __tsc = 0;
 
 #if LEGACY_CPU
 
@@ -538,8 +539,8 @@ static uint32_t compute_bclk(void)
     temp8 = inb(PIT_CH2_LATCH_REG);
     temp8 &= ~(CH2_SPEAKER | CH2_GATE_IN);
     outb(PIT_CH2_LATCH_REG, temp8);
-	
     bclk = (start - stop) * 2 / DELAY_IN_US;
+    __tsc = (start - stop) * 1000;
 	
     // Round bclk to the nearest 100/12 integer value
     bclk = ((((bclk * 24) + 100) / 200) * 200) / 24;
@@ -593,8 +594,19 @@ void scan_cpu(void)
 	uint32_t    cpuid_max_basic = 0;
 	uint32_t    cpuid_max_ext = 0;
 	uint32_t	sub_Cstates = 0;
-	uint32_t    extensions = 0;    
+	uint32_t    extensions = 0;
+#ifndef AMD_SUPPORT
+	
+    uint32_t	Cpuid_cache_linesize = 0;
+	uint32_t	Cpuid_cache_size = 0;
+    uint32_t	Cpuid_cores_per_package = 0;
     
+    uint32_t	Cache_size[LCACHE_MAX];
+	uint32_t	Cache_linesize = 0;
+    
+    uint32_t	cpuid_leaf7_features = 0;
+	
+#endif
 	uint8_t		maxcoef = 0, maxdiv = 0, currcoef = 0, currdiv = 0;
     char		CpuBrandString[48];	// 48 Byte Branding String
     
@@ -643,7 +655,15 @@ void scan_cpu(void)
              */
             CpuBrandString[0] = '\0';
         }
-	}  
+	}
+    
+    /* Get cache and addressing info. */
+	if (cpuid_max_ext >= 0x80000006) {
+		do_cpuid(0x80000006, reg);
+		Cpuid_cache_linesize   = bitfield32(reg[ecx], 7, 0);		
+		Cpuid_cache_size       = bitfield32(reg[ecx],31,16);
+		
+	}
 	
     /*
 	 * Get processor signature and decode
@@ -739,6 +759,127 @@ void scan_cpu(void)
 		invariant_APIC_timer = bitfield(reg[eax], 2, 2); //  "Invariant APIC Timer"
         fine_grain_clock_mod = bitfield(reg[eax], 4, 4);
 	}
+    
+    if (Model == CPUID_MODEL_IVYBRIDGE) {
+		/*
+		 * XSAVE Features:
+		 */
+		do_cpuid(0x7, reg);
+		cpuid_leaf7_features = reg[ebx];
+        
+		DBG(" Feature Leaf7:\n");
+		DBG("  EBX           : 0x%x\n", reg[ebx]);
+	}
+    
+    {
+        uint32_t	cpuid_result[4];
+        uint32_t	reg[4];
+        uint32_t	index;
+        uint32_t	linesizes[LCACHE_MAX];
+        bool	cpuid_deterministic_supported = false;
+        
+        DBG("cpuid_set_cache_info\n");
+        
+        bzero( linesizes, sizeof(linesizes) );
+        
+        /*
+         * Get cache info using leaf 4, the "deterministic cache parameters."
+         * Most processors Mac OS X supports implement this flavor of CPUID.
+         * Loop over each cache on the processor.
+         */
+        do_cpuid(0, cpuid_result);
+        if (cpuid_result[eax] >= 4)
+            cpuid_deterministic_supported = true;
+        
+        for (index = 0; cpuid_deterministic_supported; index++) {
+            cache_type_t	type = Lnone;
+            uint32_t	cache_type;
+            uint32_t	cache_level;
+            uint32_t	cache_sharing;
+            uint32_t	cache_linesize;
+            uint32_t	cache_sets;
+            uint32_t	cache_associativity;
+            uint32_t	cache_size;
+            uint32_t	cache_partitions;
+            
+            reg[eax] = 4;		/* cpuid request 4 */
+            reg[ecx] = index;	/* index starting at 0 */
+            cpuid(reg);
+            DBG("cpuid(4) index=%d eax=0x%x\n", index, reg[eax]);
+            cache_type = bitfield32(reg[eax], 4, 0);
+            if (cache_type == 0)
+                break;		/* no more caches */
+            cache_level  		= bitfield32(reg[eax],  7,  5);
+            cache_sharing	 	= bitfield32(reg[eax], 25, 14) + 1;
+            Cpuid_cores_per_package
+            = bitfield32(reg[eax], 31, 26) + 1;
+            cache_linesize		= bitfield32(reg[ebx], 11,  0) + 1;
+            cache_partitions	= bitfield32(reg[ebx], 21, 12) + 1;
+            cache_associativity	= bitfield32(reg[ebx], 31, 22) + 1;
+            cache_sets 		= bitfield32(reg[ecx], 31,  0) + 1;
+            
+            /* Map type/levels returned by CPUID into cache_type_t */
+            switch (cache_level) {
+                case 1:
+                    type = cache_type == 1 ? L1D :
+                    cache_type == 2 ? L1I :
+                    Lnone;
+                    break;
+                case 2:
+                    type = cache_type == 3 ? L2U :
+                    Lnone;
+                    break;
+                case 3:
+                    type = cache_type == 3 ? L3U :
+                    Lnone;
+                    break;
+                default:
+                    type = Lnone;
+            }
+            
+            /* The total size of a cache is:
+             *	( linesize * sets * associativity * partitions )
+             */
+            if (type != Lnone) {
+                cache_size = cache_linesize * cache_sets *
+                cache_associativity * cache_partitions;
+                Cache_size[type] = cache_size;
+                linesizes[type] = cache_linesize;              
+                
+                
+            }
+        }
+        
+        /*
+         * If deterministic cache parameters are not available, use
+         * something else
+         */
+        if (Cpuid_cores_per_package == 0) {
+            Cpuid_cores_per_package = 1;
+            
+            /* cpuid define in 1024 quantities */
+            Cache_size[L2U] = Cpuid_cache_size * 1024;
+            
+            linesizes[L2U] = Cpuid_cache_linesize;
+            
+            DBG(" cache_size[L2U]      : %d\n",
+                Cache_size[L2U]);
+            DBG(" linesizes[L2U]       : %d\n",
+                Cpuid_cache_linesize);
+        }
+        
+        /*
+         * What linesize to publish?  We use the L2 linesize if any,
+         * else the L1D.
+         */
+        if ( linesizes[L2U] )
+            Cache_linesize = linesizes[L2U];
+        else if (linesizes[L1D])
+            Cache_linesize = linesizes[L1D];
+        else stop("no linesize");
+        DBG(" cache_linesize    : %d\n", Cache_linesize);    
+        
+    }
 	
     if ((Vendor == CPUID_VENDOR_INTEL) && 
 		(Family == 0x06))
@@ -787,8 +928,16 @@ void scan_cpu(void)
 				cores_per_package = 1;
 		}		
 #endif
+#ifndef AMD_SUPPORT
+        if (Cpuid_cores_per_package) {
+            cores_per_package   = Cpuid_cores_per_package ;
+        }
+#endif
 		NoThreads    = logical_per_package;
 		NoCores      = cores_per_package ? cores_per_package : 1 ;
+		
+		
+		
 	}
 	
 	/* End of Copyright: from Apple's XNU cpuid.c */
@@ -1122,6 +1271,11 @@ void scan_cpu(void)
 	set_env(envDynamicAcceleration,  dynamic_acceleration);    
 	set_env(envInvariantAPICTimer,	 invariant_APIC_timer);    
 	set_env(envFineGrainClockMod,  fine_grain_clock_mod);
+    set_env_copy(envCacheSize, Cache_size, sizeof(uint32_t) * LCACHE_MAX);
+	set_env(envCacheLinesize, Cache_linesize);
+    set_env(envLeaf7Features, cpuid_leaf7_features);
+    set_env(envTSC__ , __tsc);
+	
 #endif
 	set_env(envNoThreads,	 NoThreads);    
 	set_env(envNoCores,		 NoCores);

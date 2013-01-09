@@ -554,7 +554,7 @@ static void MakeAcpiSgn(void)
 	
 	if ((DefaultplatformName = readDefaultPlatformName()))
 	{
-		Model32 = OSSwapHostToBigInt32(adler32( (unsigned char *) DefaultplatformName, strlen(DefaultplatformName)));
+		Model32 = OSSwapHostToBigInt32(local_adler32( (unsigned char *) DefaultplatformName, strlen(DefaultplatformName)));
 	}
 	
 	uuid32 = 0;    
@@ -563,7 +563,7 @@ static void MakeAcpiSgn(void)
 	
 	if (strlen(uuidStr)) 
 	{
-		uuid32 = OSSwapHostToBigInt32(adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
+		uuid32 = OSSwapHostToBigInt32(local_adler32( (unsigned char *) uuidStr, UUID_STR_LEN ));
 	}
     
 }
@@ -4810,8 +4810,8 @@ EFI_STATUS setupAcpi(void)
 #if DEBUG_ACPI
                 printf("testing %s\n", name);
 #endif
-                // Make sure this is a directory.
-                if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;
+                // Make sure this is a not directory.
+				if ((flags & kFileTypeMask) != kFileTypeFlat) continue;
                 
                 // Make sure this is a kext.
                 length = strlen(name);

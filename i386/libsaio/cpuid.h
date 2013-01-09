@@ -80,7 +80,7 @@
 #define CPUID_FEATURE_HTT       _Bit(28)  /* Hyper-Threading Technology */
 #define CPUID_FEATURE_TM        _Bit(29)  /* Thermal Monitor (TM1) */
 #define CPUID_FEATURE_PBE       _Bit(31)  /* Pend Break Enable */
- 
+
 #define CPUID_FEATURE_SSE3      _HBit(0)  /* Streaming SIMD extensions 3 */
 #define CPUID_FEATURE_PCLMULQDQ _HBit(1)  /* PCLMULQDQ instruction */
 #define CPUID_FEATURE_DTES64    _HBit(2)  /* 64-bit DS layout */
@@ -165,34 +165,32 @@
 
 typedef enum { eax, ebx, ecx, edx } cpuid_register_t;
 
-#if UNUSED
 static inline void
 cpuid(uint32_t *data)
 {
 	asm("cpuid"
 		: "=a" (data[eax]),
-		  "=b" (data[ebx]),
-		  "=c" (data[ecx]),
-		  "=d" (data[edx])
+		"=b" (data[ebx]),
+		"=c" (data[ecx]),
+		"=d" (data[edx])
 		: "a"  (data[eax]),
-		  "b"  (data[ebx]),
-		  "c"  (data[ecx]),
-		  "d"  (data[edx]));
+		"b"  (data[ebx]),
+		"c"  (data[ecx]),
+		"d"  (data[edx]));
 }
-#endif
 
 static inline void
 do_cpuid(uint32_t selector, uint32_t *data)
 {
 	asm("cpuid"
 		: "=a" (data[0]),
-		  "=b" (data[1]),
-		  "=c" (data[2]),
-		  "=d" (data[3])
+		"=b" (data[1]),
+		"=c" (data[2]),
+		"=d" (data[3])
 		: "a"(selector),
-		  "b" (0),
-		  "c" (0),
-		  "d" (0));
+		"b" (0),
+		"c" (0),
+		"d" (0));
 }
 
 /*
@@ -212,10 +210,10 @@ typedef struct {
 
 #ifdef KERNEL
 #define CACHE_DESC(value,type,size,linesize,text) \
-	{ value, type, size, linesize, text }
+{ value, type, size, linesize, text }
 #else
 #define CACHE_DESC(value,type,size,linesize,text) \
-	{ value, type, size, linesize }
+{ value, type, size, linesize }
 #endif /* KERNEL */
 
 /* Monitor/mwait Leaf: */
@@ -263,7 +261,7 @@ typedef struct {
 	char		cpuid_vendor[16];
 	char		cpuid_brand_string[48];
 	const char	*cpuid_model_string;
-
+	
 	cpu_type_t	cpuid_type;	/* this is *not* a cpu_type_t in our <mach/machine.h> */
 	uint8_t		cpuid_family;
 	uint8_t		cpuid_model;
@@ -275,20 +273,20 @@ typedef struct {
 	uint32_t	cpuid_signature;
 	uint8_t   	cpuid_brand; 
     uint8_t		cpuid_processor_flag;
-
+	
 	uint32_t	cache_size[LCACHE_MAX];
 	uint32_t	cache_linesize;
-
+	
 	uint8_t		cache_info[64];    /* list of cache descriptors */
-
+	
 	uint32_t	cpuid_cores_per_package;
 	uint32_t	cpuid_logical_per_package;
 	uint32_t	cache_sharing[LCACHE_MAX];
 	uint32_t	cache_partitions[LCACHE_MAX];
-
+	
 	cpu_type_t	cpuid_cpu_type;			/* <mach/machine.h> */
 	cpu_subtype_t	cpuid_cpu_subtype;		/* <mach/machine.h> */	
-
+	
 	/* Per-vendor info */
 	cpuid_mwait_leaf_t	cpuid_mwait_leaf;	
 #define cpuid_mwait_linesize_max	cpuid_mwait_leaf.linesize_max
@@ -298,33 +296,33 @@ typedef struct {
 	cpuid_thermal_leaf_t	cpuid_thermal_leaf;
 	cpuid_arch_perf_leaf_t	cpuid_arch_perf_leaf;
 	cpuid_xsave_leaf_t	cpuid_xsave_leaf;
-
+	
 	/* Cache details: */
 	uint32_t	cpuid_cache_linesize;
 	uint32_t	cpuid_cache_L2_associativity;
 	uint32_t	cpuid_cache_size;
-
+	
 	/* Virtual and physical address aize: */
 	uint32_t	cpuid_address_bits_physical;
 	uint32_t	cpuid_address_bits_virtual;
-
+	
 	uint32_t	cpuid_microcode_version;
-
+	
 	/* Numbers of tlbs per processor [i|d, small|large, level0|level1] */
 	uint32_t	cpuid_tlb[2][2][2];
-			#define	TLB_INST	0
-			#define	TLB_DATA	1
-			#define	TLB_SMALL	0
-			#define	TLB_LARGE	1
+#define	TLB_INST	0
+#define	TLB_DATA	1
+#define	TLB_SMALL	0
+#define	TLB_LARGE	1
 	uint32_t	cpuid_stlb;
-
+	
 	uint32_t	core_count;
 	uint32_t	thread_count;
-
+	
 	/* Max leaf ids available from CPUID */
 	uint32_t	cpuid_max_basic;
 	uint32_t	cpuid_max_ext;
-
+	
 	/* Family-specific info links */
 	uint32_t		cpuid_cpufamily;
 	cpuid_mwait_leaf_t	*cpuid_mwait_leafp;	

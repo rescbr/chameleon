@@ -34,7 +34,10 @@ moduleHook_t* get_callback(const char* name);
 static unsigned int load_module(char * name, char* module);
 
 #if DEBUG_MODULES
-VOID print_hook_list()
+VOID print_symbol_list(VOID);
+VOID print_hook_list(VOID);
+
+VOID print_hook_list(VOID)
 {
 	moduleHook_t* hooks = moduleCallbacks;
 	printf("Hook list: \n");
@@ -46,7 +49,7 @@ VOID print_hook_list()
 	printf("\n");
 }
 
-VOID print_symbol_list()
+VOID print_symbol_list(VOID)
 {
 	symbolList_t* symbol = moduleSymbols;
 	printf("Symbol list: \n");
@@ -140,7 +143,7 @@ static EFI_STATUS is_dylib_loaded(const char* name)
 VOID load_dylib(const char * dylib_path, const char * name)
 {
     void (*module_start)(void);
-
+	
     char *tmp = newStringWithFormat("%s%s",dylib_path, name);								
     if (!tmp) {
         return;
@@ -939,7 +942,18 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				UInt8 symbolFlags = immediate;
                 DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symbolFlags);
 #endif				
-				symbolAddr = lookup_all_symbols(NULL ,symbolName);
+				
+				symbolAddr = lookup_all_symbols("EXTERNAL" ,symbolName); /* Dirty hack, this will be replaced soon by a better mechanism */
+				
+                if (symbolAddr == 0xFFFFFFFF) symbolAddr = lookup_all_symbols(NULL ,symbolName);
+				
+                if((symbolAddr == 0xFFFFFFFF) && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
+				{					
+					printf("Unable to bind symbol %s needed by %s\n", symbolName, module);
+                    getc();
+                    goto error;
+                    
+				}
 				
 				break;
             }
@@ -1248,7 +1262,7 @@ unsigned int lookup_all_symbols(const char* module, const char* name)
                 DBG("Internal symbol %s located at 0x%X\n", name, addr);
                 goto out;
             }
-        } 
+        }        
         
     } while (0);
     
@@ -1328,7 +1342,7 @@ unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* s
 #else
 					symbol_handler(module, symbolString + symbolEntry->n_un.n_strx, (long long)base + symbolEntry->n_value);
 #endif
-
+					
 				}
 #if DEBUG_MODULES
 				bool isTexT = (((unsigned)symbolEntry->n_value > (unsigned)vmaddr) && ((unsigned)(vmaddr + vmsize) > (unsigned)symbolEntry->n_value ));
@@ -1625,7 +1639,7 @@ FileLoadBundles( char * dirSpec, long plugin )
         
         if (!plugin)
             snprintf(gDriverSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%sPlugIns", dirSpec, gFileName,
-                    (bundleType == kCFBundleType2) ? "Contents/" : "");
+					 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         ret = LoadBundlePList( dirSpec, gFileName, bundleType);
 		
@@ -1681,7 +1695,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         // Save the driver path.
         
         snprintf(gFileSpec,DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%s", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+				 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 		
         tmpExecutablePath = malloc(executablePathLength);
@@ -1701,7 +1715,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         // Construct the file spec to the plist, then load it.
 		
         snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s/%sInfo.plist", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/" : "");
+				 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
 		DBG("Loading Bundle PList %s\n",gFileSpec);
         
@@ -2141,7 +2155,7 @@ ParseXML( char * buffer, ModulePtr * module )
 					}
 					loadConfigFile(path, module->LanguageConfig);
 				}
-
+				
 			}
 			
 			if (path) {

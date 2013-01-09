@@ -28,17 +28,17 @@
 /* Memory addresses used by booter and friends */
 
 /*  DFE 2007-12-21: Changed BASE_SEG to be conditional
-    This allows boot1u and other planned first-stage booters to avoid
-    maintaining their own copies of asm.s and bios.s and instead
-    simply build the files from libsaio with the right preprocessor
-    definitions.
-
-    This affects BASE_ADDR and OFFSET16() thus obviating the need for
-    separate BASE1U_ADDR and OFFSET1U16() macros.
-
-    Be careful though as changing these values with preprocessor macros
-    obviously requires rebuilding the source files.  That means in particular
-    that libsaio.a is only suitable for boot2.
+ This allows boot1u and other planned first-stage booters to avoid
+ maintaining their own copies of asm.s and bios.s and instead
+ simply build the files from libsaio with the right preprocessor
+ definitions.
+ 
+ This affects BASE_ADDR and OFFSET16() thus obviating the need for
+ separate BASE1U_ADDR and OFFSET1U16() macros.
+ 
+ Be careful though as changing these values with preprocessor macros
+ obviously requires rebuilding the source files.  That means in particular
+ that libsaio.a is only suitable for boot2.
  */
 #if defined(BASE_SEG)
 /* assume user knows what he's doing */
@@ -86,22 +86,24 @@
 
 #define KERNEL_ADDR       0x00100000  // 128M kernel + drivers
 #define KERNEL_LEN        0x08000000
+#define KERNEL_VALID_ADDR(x)  ((((unsigned long)x) >= KERNEL_ADDR ) && (((unsigned long)x) < (KERNEL_ADDR + KERNEL_LEN)))
 
+#ifdef ZALLOC
 #define ZALLOC_ADDR       0x08100000  // 256M zalloc area
 #define ZALLOC_LEN        0x10000000
+#define ZALLOC_VALID_MEMORY(x)  ((((unsigned long)x) >= ZALLOC_ADDR ) && (((unsigned long)x) < (ZALLOC_ADDR + ZALLOC_LEN)))
+#else
+#define MALLOC_ADDR       0x08100000  // 256M zalloc area
+#define MALLOC_LEN        0x10000000
+#define MALLOC_VALID_ADDR(x)  ((((unsigned long)x) >= MALLOC_ADDR ) && (((unsigned long)x) < (MALLOC_ADDR + MALLOC_LEN)))
 
+#endif
 #define LOAD_ADDR         0x18100000  // 64M File load buffer
 #define LOAD_LEN          0x04000000
 
-#define SANDBOX_ADDR      0x1C100000  // 256M modules sandbox aera, 
-#define SANDBOX_LEN       0x10000000
-
-#define SANDBOX_PER_MODULE 0x1000000  // 16M per module
-
-#define SANDBOX_MAX_MODULE SANDBOX_LEN/SANDBOX_PER_MODULE // Max nb of module
-
 // Location of data fed to boot2 by the prebooter
-#define PREBOOT_DATA      0x2C100000  
+#define PREBOOT_DATA      0x1C100000  // Still have enough room for a 63M ramdisk image
+// in case of 512MB system memory.
 
 #define TFTP_ADDR         LOAD_ADDR   // tftp download buffer
 #define TFTP_LEN          LOAD_LEN
@@ -123,8 +125,8 @@
 #define SEGMENT(addr)     (((addr) & 0xF0000) >> 4)
 
 /*  Extract segment/offset in normalized form so that the resulting far pointer
-    will point to something that is very unlikely to straddle a segment.
-    This is sometimes known as a "huge" pointer.
+ will point to something that is very unlikely to straddle a segment.
+ This is sometimes known as a "huge" pointer.
  */
 #define NORMALIZED_OFFSET(addr)      ((addr) & 0x000F)
 #define NORMALIZED_SEGMENT(addr)     (((addr) & 0xFFFF0) >> 4)
@@ -144,5 +146,9 @@
  * Each descriptor entry require 8 bytes.
  */
 #define GDTLIMIT  ( NGDTENT * 8 )
+
+#ifndef PAGE_SIZE
+#define PAGE_SIZE     4096
+#endif
 
 #endif /* !__BOOT_MEMORY_H */

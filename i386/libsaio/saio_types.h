@@ -88,6 +88,9 @@
 #define kRebootOnPanic		"RebootOnPanic"
 #define kEnableHiDPI		"EnableHiDPI"		// enable High resolution display (aka Retina)
 
+#define VGA_TEXT_MODE 0
+
+
 #define UUID_LEN	 sizeof(uuid_t)
 #define UUID_STR_LEN sizeof(uuid_string_t)
 
@@ -169,42 +172,42 @@ typedef struct {
  */
 struct boot_drive_info {
     struct drive_params {
-	unsigned short buf_size;
-	unsigned short info_flags;
-	unsigned long  phys_cyls;
-	unsigned long  phys_heads;
-	unsigned long  phys_spt;
-	unsigned long long phys_sectors;
-	unsigned short phys_nbps;
-	unsigned short dpte_offset;
-	unsigned short dpte_segment;
-	unsigned short key;
-	unsigned char  path_len;
-	unsigned char  reserved1;
-	unsigned short reserved2;
-	unsigned char  bus_type[4];
-	unsigned char  interface_type[8];
-	unsigned char  interface_path[8];
-	unsigned char  dev_path[8];
-	unsigned char  reserved3;
-	unsigned char  checksum;
+		unsigned short buf_size;
+		unsigned short info_flags;
+		unsigned long  phys_cyls;
+		unsigned long  phys_heads;
+		unsigned long  phys_spt;
+		unsigned long long phys_sectors;
+		unsigned short phys_nbps;
+		unsigned short dpte_offset;
+		unsigned short dpte_segment;
+		unsigned short key;
+		unsigned char  path_len;
+		unsigned char  reserved1;
+		unsigned short reserved2;
+		unsigned char  bus_type[4];
+		unsigned char  interface_type[8];
+		unsigned char  interface_path[8];
+		unsigned char  dev_path[8];
+		unsigned char  reserved3;
+		unsigned char  checksum;
     } params __attribute__((packed));
     struct drive_dpte {
-	unsigned short io_port_base;
-	unsigned short control_port_base;
-	unsigned char  head_flags;
-	unsigned char  vendor_info;
-	unsigned char  irq         : 4;
-	unsigned char  irq_unused  : 4;
-	unsigned char  block_count;
-	unsigned char  dma_channel : 4;
-	unsigned char  dma_type    : 4;
-	unsigned char  pio_type    : 4;
-	unsigned char  pio_unused  : 4;
-	unsigned short option_flags;
-	unsigned short reserved;
-	unsigned char  revision;
-	unsigned char  checksum;
+		unsigned short io_port_base;
+		unsigned short control_port_base;
+		unsigned char  head_flags;
+		unsigned char  vendor_info;
+		unsigned char  irq         : 4;
+		unsigned char  irq_unused  : 4;
+		unsigned char  block_count;
+		unsigned char  dma_channel : 4;
+		unsigned char  dma_type    : 4;
+		unsigned char  pio_type    : 4;
+		unsigned char  pio_unused  : 4;
+		unsigned short option_flags;
+		unsigned short reserved;
+		unsigned char  revision;
+		unsigned char  checksum;
     } dpte __attribute__((packed));
 } __attribute__((packed));
 typedef struct boot_drive_info boot_drive_info_t;
@@ -293,15 +296,15 @@ struct BootVolume {
 };
 
 enum {
-  kBVFlagPrimary          = 0x01,
-  kBVFlagNativeBoot       = 0x02,
-  kBVFlagForeignBoot      = 0x04,
-  kBVFlagBootable         = 0x08,
-  kBVFlagEFISystem        = 0x10,
+	kBVFlagPrimary          = 0x01,
+	kBVFlagNativeBoot       = 0x02,
+	kBVFlagForeignBoot      = 0x04,
+	kBVFlagBootable         = 0x08,
+	kBVFlagEFISystem        = 0x10,
 #ifdef BOOT_HELPER_SUPPORT
-  kBVFlagBooter           = 0x20,
+	kBVFlagBooter           = 0x20,
 #endif
-  kBVFlagSystemVolume     = 0x40
+	kBVFlagSystemVolume     = 0x40
 };
 
 enum {
@@ -334,6 +337,16 @@ enum {
 
 #ifndef min
 #define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+#if 0
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
 #endif
 
 #define	round2(x, m)	(((x) + (m / 2)) & ~(m - 1))

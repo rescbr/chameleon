@@ -124,7 +124,7 @@ long LoadVolumeFile(BVRef bvr, const char *filePath)
     // overwritten by the next LoadFile() call.
 	
 	safe_set_env(envgFSLoadAddress, (uint32_t)(void *)LOAD_ADDR);
-
+	
     fileSize = bvr->fs_loadfile(bvr, (char *)filePath);
 	
     // Return the size of the file, or -1 if load failed.
@@ -319,7 +319,7 @@ long GetFileInfo(const char * dirSpec, const char * name,
         gMakeDirSpec = (char *)malloc(1024);
 	
 	if (!gMakeDirSpec) return -1;
-
+	
     if (!dirSpec) {
         long       idx, len;
 		
@@ -412,7 +412,7 @@ static int open_bvr(BVRef bvr, const char *filePath)
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
 	//gFSLoadAddress = io->i_buf;
 	safe_set_env(envgFSLoadAddress, (uint32_t)(void *)io->i_buf);
-
+	
 	io->i_filesize = bvr->fs_loadfile(bvr, (char *)filePath);
 	if (io->i_filesize < 0) {
 		close(fdesc);
@@ -616,6 +616,7 @@ long GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
 	
     return bvr->fs_getfileblock(bvr, (char *)filePath, firstBlock);
 }
+#endif
 
 //==========================================================================
 // openmem()
@@ -654,7 +655,7 @@ int b_lseek(int fdesc, int offset, int ptr)
 	
     return offset;
 }
-
+#if UNUSED
 //==========================================================================
 // tell() - Returns the byte offset of the file descriptor.
 
@@ -789,7 +790,7 @@ void scanBootVolumes( int biosdev, int * count )
 	else
 	{
 		safe_set_env(envgBootFileType, kBlockDeviceType);
-
+		
 	}
 }
 
@@ -948,7 +949,7 @@ void setBootGlobals(BVRef chain)
 	
 	// turbo - Save the ORIGINAL boot volume too for loading our mkext
 	if (!get_env(envgBIOSBootVolume)) safe_set_env(envgBIOSBootVolume, (uint32_t)gBootVolume);
-
+	
 	safe_set_env(envgBootVolume, (uint32_t)gBootVolume);
 	setRootVolume(gBootVolume);	
 }

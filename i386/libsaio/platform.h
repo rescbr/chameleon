@@ -16,6 +16,11 @@
 
 #define quad(hi,lo)         (((uint64_t)(hi)) << 32 | (lo))
 
+/* Only for 32bit values */
+#define bit32(n)		(1U << (n))
+#define bitmask32(h,l)		((bit32(h)|(bit32(h)-1)) & ~(bit32(l)-1))
+#define bitfield32(x,h,l)	((((x) & bitmask32(h,l)) >> l))
+
 /* Additional models supported by Chameleon (NOT SUPPORTED BY THE APPLE'S ORIGINAL KERNEL) */
 #define CPUID_MODEL_BANIAS          0x09
 #define CPUID_MODEL_DOTHAN          0x0D
@@ -93,8 +98,14 @@ typedef struct _RamSlotInfo_t {
 #define envBrand            "boot.cpu.brand"   
 #define envFeatures         "boot.cpu.feature_bits"
 #define envExtFeatures      "boot.cpu.extfeature_bits"
+#define envCacheSize        "boot.cpu.cache_size"               //cache_size[LCACHE_MAX]
+#define envCacheLinesize    "boot.cpu.cache_linesize"
+#define envLeaf7Features    "boot.cpu.cpuid_leaf7_features"
+#define cpuid_features()        ((uint32_t)get_env(envFeatures))
+#define cpuid_leaf7_features()  ((uint32_t)get_env(envLeaf7Features))
+#define envTSC__            "boot.cpu.__tsc"
 
-#define envSubCstates       "boot.cpu.mwait.sub_Cstates"   
+#define envSubCstates       "boot.cpu.mwait.sub_Cstates"
 #define envExtensions       "boot.cpu.mwait.extensions"   
 
 #define envDynamicAcceleration  "boot.cpu.thermal.dynamic_acceleration"
@@ -155,6 +166,7 @@ typedef struct _RamSlotInfo_t {
 #define envgMenuEnd              "boot.ui.menu_end"
 
 #define envConsoleErr			"boot.console.stderr"
+#define envErrno                "boot.errno"
 
 #define envDeviceNumber         "boot.dev.efi.devcount"
 #define envEFIString            "boot.dev.efi.efistring"
@@ -184,6 +196,12 @@ typedef struct _RamSlotInfo_t {
 #define envDMIMaxMemorySlots    "boot.dmi.max_slots"
 #define envDMICntMemorySlots    "boot.dmi.slots_count"
 #define envDmiDimm              "boot.dmi.dimm"
+
+#define envVBEModeInfoBlock		"boot.video.VBEModeInfoBlock"
+
+/* helpers ... */
+#define set_errno(x) safe_set_env(envErrno,x)
+#define get_errno()  ((int)get_env(envErrno))
 
 #if UNUSED
 typedef struct _PlatformInfo_t {

@@ -20,6 +20,7 @@ extern void scan_cpu(void);
 #define MSR_CORE_THREAD_COUNT   0x035
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
+#define MSR_IA32_MISC_ENABLE    0x000001A0
 
 #define DEFAULT_FSB		100000          /* for now, hardcoding 100MHz for old CPUs */
 

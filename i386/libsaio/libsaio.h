@@ -31,6 +31,13 @@
 #include "io_inline.h"
 #include "saio_types.h"
 #include "saio_internal.h"
+#include "assert.h"
+
+#include "CException.h"
 #include "uthash.h"
+#include "utlist.h"
+#include "utarray.h"
+#include "utstring.h"
+
 
 #endif /* !__LIBSAIO_LIBSAIO_H */
