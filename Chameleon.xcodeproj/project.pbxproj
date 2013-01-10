@@ -500,7 +500,6 @@
 		ABBBFCFB15D55908002D7A1E /* ld_classic.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = ld_classic.1; sourceTree = "<group>"; };
 		ABD521F114F9197900B62550 /* utarray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
 		ABD521F214F9197900B62550 /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
-		ABD521F314F9197900B62550 /* uterror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uterror.c; sourceTree = "<group>"; };
 		ABD9A1FC150F706A008DA465 /* CoreHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHash.h; sourceTree = "<group>"; };
 		ABD9A1FF150F80C4008DA465 /* CoreHash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoreHash.c; sourceTree = "<group>"; };
 		ABE5FF4E14F9495500447F78 /* modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = modules.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
@@ -1239,7 +1238,6 @@
 				AB43B34014C37E520018D529 /* ufs_byteorder.h */,
 				ABD521F114F9197900B62550 /* utarray.h */,
 				ABD521F214F9197900B62550 /* uthash.h */,
-				ABD521F314F9197900B62550 /* uterror.c */,
 				AB43B34114C37E520018D529 /* vbe.c */,
 				AB43B34214C37E520018D529 /* vbe.h */,
 				AB43B34314C37E520018D529 /* xml.c */,

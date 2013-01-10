@@ -22,7 +22,7 @@
 static struct HObj * HObj##_FindStrVar(const char *name, struct HObj *container) {          \
     struct HObj *var;                                                                       \
                                                                                             \
-	if (setjmp(uterror) == -1) {                                                        \
+	if (setjmp(uterror) == -1) {															\
                                                                                             \
 		return NULL;                                                                        \
 	} else {                                                                                \

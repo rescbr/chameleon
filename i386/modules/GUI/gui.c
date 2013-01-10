@@ -48,6 +48,8 @@ enum {
 
 static config_file_t    themeConfig;				           // theme.plist
 
+jmp_buf uterror;
+
 // CoreHash Declarations
 __CHNewStrVar(themeList_t)
 CHUnInit(themeList_t)

@@ -57,7 +57,7 @@ do {                                                                            
 #define UTHASH_VERSION 1.9.6
 
 #ifndef uthash_fatal
-#define uthash_fatal(msg) longjmp(uterror,-1)        /* fatal error (out of memory,etc) */
+#define uthash_fatal(msg) Throw(-1)        /* fatal error (out of memory,etc) */
 #endif
 #ifndef uthash_malloc
 #define uthash_malloc(sz) malloc(sz)      /* malloc fcn                      */

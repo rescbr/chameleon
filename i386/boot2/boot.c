@@ -412,9 +412,7 @@ void common_boot(int biosdev)
 #endif
 	printf("Starting Chameleon ...\n");
     
-	Install_Default_Handler();
-	
-	init_ut_fnc();
+	Install_Default_Handler();	
     
 	initBooterLog();
     
