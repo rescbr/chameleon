@@ -13,6 +13,9 @@
 #include "bootstruct.h"
 #include "modules.h"
 
+#include "sl.h"
+#include "xml.h"
+
 #ifndef DEBUG_MODULES
 #define DEBUG_MODULES 0
 #endif
@@ -23,6 +26,23 @@
 #define DBG(x...)
 #endif
 
+struct Bundle {  
+	struct Bundle *nextBundle;
+	long          willLoad;
+	TagPtr        dict;
+    TagPtr        personalities;
+#if 0
+	config_file_t *LanguageConfig; // we will use an xml file instead of pure txt file ... it's easier to parse
+#endif
+	//pool_t        workspace;
+	char          *plistAddr;
+	long          plistLength;
+	char          *executablePath;
+	char          *bundlePath;
+	long          bundlePathLength;
+};
+typedef struct Bundle Bundle, *BundlePtr;
+
 // NOTE: Global so that modules can link with this
 unsigned long long textAddress = 0;
 unsigned long long textSection = 0;
@@ -31,7 +51,14 @@ moduleHook_t* moduleCallbacks = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*, int(*strcmp_callback)(const char*, const char*)) = NULL;
 moduleHook_t* get_callback(const char* name);
-static unsigned int load_module(char * name, char* module);
+static unsigned int load_module(char * name, char* module, BundlePtr bundle);
+static EFI_STATUS _bind_macho(char* module, void* base, char* bind_stream, UInt32 size, BundlePtr bundle);
+
+#if macho_64
+static unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char), BundlePtr bundle);
+#else
+static unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long), BundlePtr bundle);
+#endif
 
 #if DEBUG_MODULES
 VOID print_symbol_list(VOID);
@@ -154,7 +181,7 @@ VOID load_dylib(const char * dylib_path, const char * name)
         return;
     }
     msglog("* Attempting to load module: %s\n", tmp);
-    module_start = (void*)load_module(dylib_name,tmp);
+    module_start = (void*)load_module(dylib_name,tmp, NULL);
     
     if(module_start && ( module_start != (void*)0xFFFFFFFF))
     {
@@ -217,7 +244,7 @@ VOID load_all_dylib(void)
             continue;
         }
         msglog("* Attempting to load module: %s\n", tmp);
-        module_start = (void*)load_module(dylib_name,tmp);
+        module_start = (void*)load_module(dylib_name,tmp, NULL);
         
         if(module_start && ( module_start != (void*)0xFFFFFFFF))
         {
@@ -243,7 +270,7 @@ VOID load_all_dylib(void)
 /*
  * Load a module file 
  */
-static unsigned int load_module(char * name, char* module)
+static unsigned int load_module(char * name, char* module, BundlePtr bundle)
 {
 	unsigned int module_start = 0xFFFFFFFF;
     
@@ -283,7 +310,7 @@ static unsigned int load_module(char * name, char* module)
 			DBG("Module %s read in.\n", module);
 			
 			// Module loaded into memory, parse it
-			module_start = parse_mach(name, module_base, &add_symbol);            
+			module_start = parse_mach(name, module_base, &add_symbol, bundle);            
 			
 			
 		}
@@ -440,9 +467,9 @@ long   vmsize;
  * happen as all dependencies are verified before the sybols are read in.
  */
 #if macho_64
-unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char))	// TODO: add param to specify valid archs
+static unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char), BundlePtr bundle)	// TODO: add param to specify valid archs
 #else
-unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long))	// TODO: add param to specify valid archs
+static unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long), BundlePtr bundle)	// TODO: add param to specify valid archs
 #endif
 {	
 #if macho_64
@@ -659,20 +686,20 @@ unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(c
 	
 	if(dyldInfoCommand && dyldInfoCommand->bind_off)
 	{
-		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size);
+		bind_status = _bind_macho(module, binary, (char*)dyldInfoCommand->bind_off, dyldInfoCommand->bind_size, bundle);
 	}
 	
 	if(dyldInfoCommand && dyldInfoCommand->weak_bind_off && (bind_status == EFI_SUCCESS))
 	{
 		// NOTE: this currently should never happen.
-		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size);
+		bind_status = _bind_macho(module, binary, (char*)dyldInfoCommand->weak_bind_off, dyldInfoCommand->weak_bind_size, bundle);
 	}
 	
 	if(dyldInfoCommand && dyldInfoCommand->lazy_bind_off && (bind_status == EFI_SUCCESS))
 	{
 		// NOTE: we are binding the lazy pointers as a module is laoded,
 		// This should be changed to bind when a symbol is referened at runtime instead.
-		bind_status = bind_macho(module, binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size);
+		bind_status = _bind_macho(module, binary, (char*)dyldInfoCommand->lazy_bind_off, dyldInfoCommand->lazy_bind_size, bundle);
 	}
 	
     if (bind_status != EFI_SUCCESS) {
@@ -861,6 +888,11 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 // There is apossibility that this could cause issues,
 // however the macho file is 32 bit, so it shouldn't matter too much
 EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
+{
+	return _bind_macho( module, base, bind_stream, size, NULL);
+}
+
+static EFI_STATUS _bind_macho(char* module, void* base, char* bind_stream, UInt32 size, BundlePtr bundle)
 {	
 	bind_stream += (UInt32)base;
 	
@@ -942,10 +974,34 @@ EFI_STATUS bind_macho(char* module, void* base, char* bind_stream, UInt32 size)
 				UInt8 symbolFlags = immediate;
                 DBG("BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM: %s, 0x%X\n", symbolName, symbolFlags);
 #endif				
+				symbolAddr = 0xFFFFFFFF;
+				TagPtr     prop;
 				
-				symbolAddr = lookup_all_symbols("EXTERNAL" ,symbolName); /* Dirty hack, this will be replaced soon by a better mechanism */
+				if (bundle != NULL)
+				{
+					prop = XMLGetProperty(bundle->dict, kPropOSBundleLibraries);
+					if (prop != 0)
+					{
+						prop = prop->tag;
+						while (prop != 0)
+						{
+							/* the order in OSBundleLibraries is important */
+
+							if (prop->string)
+							{
+								symbolAddr = lookup_all_symbols(prop->string ,symbolName); 
+								
+								if (symbolAddr != 0xFFFFFFFF) break; // the symbol is found , we can exit the loop
+							}							
+							
+							prop = prop->tagNext;
+
+						}
+					}
+					
+				}				
 				
-                if (symbolAddr == 0xFFFFFFFF) symbolAddr = lookup_all_symbols(NULL ,symbolName);
+                if (symbolAddr == 0xFFFFFFFF) symbolAddr = lookup_all_symbols(NULL ,symbolName); // at this point if the symbol is still undefined, we search everywhere by starting to the internal symbols
 				
                 if((symbolAddr == 0xFFFFFFFF) && (strncmp(symbolName, SYMBOL_DYLD_STUB_BINDER,sizeof(SYMBOL_DYLD_STUB_BINDER)) != 0))
 				{					
@@ -1488,25 +1544,7 @@ EFI_STATUS replace_function_any(const char* symbol, void* newAddress)
 #include <libkern/OSByteOrder.h>
 #include <mach/machine.h>
 
-#include "sl.h"
-#include "xml.h"
 
-struct Module {  
-	struct Module *nextModule;
-	long          willLoad;
-	TagPtr        dict;
-    TagPtr        personalities;
-#if 0
-	config_file_t *LanguageConfig; // we will use an xml file instead of pure txt file ... it's easier to parse
-#endif
-	//pool_t        workspace;
-	char          *plistAddr;
-	long          plistLength;
-	char          *executablePath;
-	char          *bundlePath;
-	long          bundlePathLength;
-};
-typedef struct Module Module, *ModulePtr;
 
 
 enum {
@@ -1525,22 +1563,22 @@ enum {
     
 };
 
-static ModulePtr gModuleHead;
-static char *    gModulesSpec;
+static BundlePtr gBundleHead;
+static char *    gBundlesSpec;
 static char *    gDriverSpec;
 static char *    gFileSpec;
 static char *    gTempSpec;
 static char *    gFileName;
 static int       gLowestLoadPriority;
 
-static long ParseXML(char *buffer, ModulePtr *module);
-static ModulePtr FindBundle( char * bundle_id );
+static long ParseXML(char *buffer, BundlePtr *module);
+static BundlePtr FindBundle( char * bundle_id );
 
 static void
 FreeBundleSupport( void )
 {
     
-    if ( gModulesSpec )         free(gModulesSpec);
+    if ( gBundlesSpec )         free(gBundlesSpec);
     if ( gDriverSpec)           free(gDriverSpec);
     if ( gFileSpec  )           free(gFileSpec);
     if ( gTempSpec )            free(gTempSpec);
@@ -1559,13 +1597,13 @@ InitBundleSupport( void )
     
     if (BundleSet == true)  return 0;    
     
-    gModulesSpec    = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gBundlesSpec    = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     gDriverSpec     = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     gFileSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     gTempSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     gFileName       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
     
-    if ( !gModulesSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
+    if ( !gBundlesSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         goto error;
     
     BundleSet = true;
@@ -1587,9 +1625,9 @@ long LoadBundles( char * dirSpec )
         return 1;
 	
 	
-	strlcpy(gModulesSpec, dirSpec, DEFAULT_BUNDLE_SPEC_SIZE);
-    strlcat(gModulesSpec, "Modules", DEFAULT_BUNDLE_SPEC_SIZE);
-    FileLoadBundles(gModulesSpec, 0);		
+	strlcpy(gBundlesSpec, dirSpec, DEFAULT_BUNDLE_SPEC_SIZE);
+    strlcat(gBundlesSpec, "Modules", DEFAULT_BUNDLE_SPEC_SIZE);
+    FileLoadBundles(gBundlesSpec, 0);		
     
 	
     MatchBundlesLibraries();
@@ -1654,15 +1692,15 @@ FileLoadBundles( char * dirSpec, long plugin )
 }
 
 
-static void add_bundle(ModulePtr module,char* name)
+static void add_bundle(BundlePtr module,char* name)
 {
-	ModulePtr new_entry= malloc(sizeof(Module));
+	BundlePtr new_entry= malloc(sizeof(Bundle));
 	DBG("Adding bundle %s \n", name );
 	if (new_entry)
 	{	
-		new_entry->nextModule = gModuleHead;
+		new_entry->nextBundle = gBundleHead;
 		
-		gModuleHead = new_entry;
+		gBundleHead = new_entry;
 		
 		new_entry->executablePath = module->executablePath;
         new_entry->bundlePath = module->bundlePath;
@@ -1684,7 +1722,7 @@ long
 LoadBundlePList( char * dirSpec, char * name, long bundleType )
 {
     long      length, executablePathLength, bundlePathLength;
-    ModulePtr module = 0;
+    BundlePtr module = 0;
     char *    buffer = 0;
     char *    tmpExecutablePath = 0;
     char *    tmpBundlePath = 0;
@@ -1774,7 +1812,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
 }
 
 #define WillLoadBundles                                                                             \
-module = gModuleHead;                                                                               \
+module = gBundleHead;                                                                               \
 while (module != NULL)                                                                              \
 {                                                                                                   \
 if (module->willLoad == willLoad)                                                               \
@@ -1786,7 +1824,7 @@ if (prop != 0)                                                                  
 fileName = prop->string;                                                                \
 snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s%s", module->executablePath, fileName);                           \
 \
-module_start = (void*)load_module((char*)fileName,gFileSpec);                           \
+module_start = (void*)load_module((char*)fileName,gFileSpec,module);                           \
 if(!module_start || (*module_start == (void*)0xFFFFFFFF))                               \
 {                                                                                       \
 if (module->willLoad > BundlePrioritySystemLib)                                                           \
@@ -1805,7 +1843,7 @@ msglog("%s successfully Loaded.\n", gFileSpec);                                 
 }                                                                                       \
 }                                                                                           \
 }                                                                                               \
-module = module->nextModule;                                                                    \
+module = module->nextBundle;                                                                    \
 }       
 
 //==========================================================================
@@ -1814,7 +1852,7 @@ module = module->nextModule;                                                    
 long LoadMatchedBundles( void )
 {
     TagPtr        prop;
-    ModulePtr     module;
+    BundlePtr     module;
     char          *fileName;
     void (*module_start)(void);
     long willLoad;
@@ -1840,17 +1878,17 @@ long MatchBundlesLibraries( void )
 {
     
     TagPtr     prop, prop2;
-    ModulePtr  module, module2,dummy_module;
+    BundlePtr  module, module2,dummy_module;
 	
     // Check for active modules with the same Bundle IDs or same principal class, only one must remain  (except for type 3 aka system libs)
     {
-        module = gModuleHead;
+        module = gBundleHead;
         
         while (module != 0)
         {
             if (!(module->willLoad > BundlePriorityInit)) // if the module load priority is not higher than initialized, continue
             {
-                module = module->nextModule;
+                module = module->nextBundle;
                 continue;
             }
             
@@ -1859,7 +1897,7 @@ long MatchBundlesLibraries( void )
             
             if (prop != 0 && prop2 != 0)
             {                    
-                module2 = gModuleHead;
+                module2 = gBundleHead;
                 
                 TagPtr prop3,prop4;
                 
@@ -1880,21 +1918,21 @@ long MatchBundlesLibraries( void )
                         }
                         
                     }
-                    module2 = module2->nextModule;
+                    module2 = module2->nextBundle;
                 }  
                 
             }
             
-            module = module->nextModule;
+            module = module->nextBundle;
         }
     }
     
     // Check for dependencies (it works in most cases, still a little buggy but should be sufficient for what we have to do, 
 	// clearly the Achilles' heel of this implementation, please use dependencies with caution !!!)
-    dummy_module = gModuleHead;
+    dummy_module = gBundleHead;
     while (dummy_module != 0)
     {
-        module = gModuleHead;
+        module = gBundleHead;
         
         while (module != 0)
         {
@@ -1906,7 +1944,7 @@ long MatchBundlesLibraries( void )
                     prop = prop->tag;
                     while (prop != 0)
                     {
-                        module2 = gModuleHead;
+                        module2 = gBundleHead;
                         while (module2 != 0)
                         {
                             prop2 = XMLGetProperty(module2->dict, kPropCFBundleIdentifier);
@@ -1936,7 +1974,7 @@ long MatchBundlesLibraries( void )
                                 
                             }
 							if (module->willLoad != BundlePriorityNull) module->willLoad = BundlePriorityNull;
-                            module2 = module2->nextModule;
+                            module2 = module2->nextBundle;
                         }
                         if (module->willLoad == BundlePriorityNull) goto nextmodule;
                         prop = prop->tagNext;
@@ -1944,16 +1982,16 @@ long MatchBundlesLibraries( void )
                 }
             }
         nextmodule:
-            module = module->nextModule;
+            module = module->nextBundle;
         }
         
-		dummy_module = dummy_module->nextModule;
+		dummy_module = dummy_module->nextBundle;
     }	
 	
     // Get the lowest load priority
     {
         gLowestLoadPriority = BundlePriorityNormalPriority;
-        module = gModuleHead;
+        module = gBundleHead;
         
         while (module != 0)
         {
@@ -1961,7 +1999,7 @@ long MatchBundlesLibraries( void )
             {                
                 gLowestLoadPriority = MIN(MAX(module->willLoad,gLowestLoadPriority), BundlePriorityLowestPriority);                 
             }
-            module = module->nextModule;
+            module = module->nextBundle;
         }
     }
     
@@ -1972,20 +2010,20 @@ long MatchBundlesLibraries( void )
 //==========================================================================
 // FindBundle
 
-static ModulePtr
+static BundlePtr
 FindBundle( char * bundle_id )
 {
-    ModulePtr module;
+    BundlePtr module;
     TagPtr    prop;
 	DBG("FindBundle %s\n",bundle_id);
     
-    module = gModuleHead;
+    module = gBundleHead;
     
     while (module != 0)
     {
         prop = XMLGetProperty(module->dict, kPropCFBundleIdentifier);
         if ((prop != 0) && !strcmp(bundle_id, prop->string)) break;
-        module = module->nextModule;
+        module = module->nextBundle;
     }
     
     return module;
@@ -1997,7 +2035,7 @@ FindBundle( char * bundle_id )
 void *
 GetBundleDict( char * bundle_id )
 {
-    ModulePtr module;
+    BundlePtr module;
 	DBG("GetBundleDict %s\n",bundle_id);
     
     module = FindBundle( bundle_id );
@@ -2016,7 +2054,7 @@ GetBundleDict( char * bundle_id )
 void *
 GetBundlePersonality( char * bundle_id )
 {
-    ModulePtr module;
+    BundlePtr module;
 	DBG("GetBundlePersonalities %s\n",bundle_id);
     
     module = FindBundle( bundle_id );
@@ -2035,7 +2073,7 @@ GetBundlePersonality( char * bundle_id )
 char *
 GetBundlePath( char * bundle_id )
 {
-    ModulePtr module;
+    BundlePtr module;
 	DBG("GetBundlePath %s\n",bundle_id);
     
     module = FindBundle( bundle_id );
@@ -2052,11 +2090,11 @@ GetBundlePath( char * bundle_id )
 // ParseXML
 
 static long
-ParseXML( char * buffer, ModulePtr * module )
+ParseXML( char * buffer, BundlePtr * module )
 {
 	long       length, pos;
 	TagPtr     moduleDict, prop;
-	ModulePtr  tmpModule;
+	BundlePtr  tmpBundle;
 	
     pos = 0;
 	DBG("ParseXML\n");
@@ -2084,13 +2122,13 @@ ParseXML( char * buffer, ModulePtr * module )
     }
 	
     
-    tmpModule = malloc(sizeof(Module));
-    if (tmpModule == 0)
+    tmpBundle = malloc(sizeof(Bundle));
+    if (tmpBundle == 0)
     {
         XMLFreeTag(moduleDict);
         return -1;
     }
-    tmpModule->dict = moduleDict;
+    tmpBundle->dict = moduleDict;
     
     do {
         prop = XMLGetProperty(moduleDict, kPropOSBundleEnabled);
@@ -2098,7 +2136,7 @@ ParseXML( char * buffer, ModulePtr * module )
         {
             if ( (strlen(prop->string) >= 1) && (prop->string[0] == 'N' || prop->string[0] == 'n') )
             {
-                tmpModule->willLoad = 0;
+                tmpBundle->willLoad = 0;
                 break;
             }
         }
@@ -2107,12 +2145,12 @@ ParseXML( char * buffer, ModulePtr * module )
         {
             if (!strncmp(prop->string,SYSLIB_CLASS, sizeof(SYSLIB_CLASS))) 
             {
-                tmpModule->willLoad = BundlePrioritySystemLib;
+                tmpBundle->willLoad = BundlePrioritySystemLib;
                 break;
             }
             if (!strncmp(prop->string,SYS_CLASS, sizeof(SYS_CLASS))) 
             {
-                tmpModule->willLoad = BundlePrioritySystem;
+                tmpBundle->willLoad = BundlePrioritySystem;
                 break;
             }
         }        
@@ -2123,14 +2161,14 @@ ParseXML( char * buffer, ModulePtr * module )
             int tmpwillLoad;
             if ((tmpwillLoad = strtoul(prop->string, NULL, 10)) > BundlePrioritySystemLib )
             {            
-                tmpModule->willLoad = MIN(tmpwillLoad, BundlePriorityLowestPriority);
+                tmpBundle->willLoad = MIN(tmpwillLoad, BundlePriorityLowestPriority);
                 break;
                 
             }
             
         }
 		
-        tmpModule->willLoad = BundlePriorityNormalPriority;
+        tmpBundle->willLoad = BundlePriorityNormalPriority;
 		
 #if 0
 		prop = XMLGetProperty(moduleDict, kPropCFBundleLocalizations);
@@ -2167,9 +2205,9 @@ ParseXML( char * buffer, ModulePtr * module )
     } while (0);
     
     // Get the personalities.
-    tmpModule->personalities = XMLGetProperty(moduleDict, kPropIOKitPersonalities);
+    tmpBundle->personalities = XMLGetProperty(moduleDict, kPropIOKitPersonalities);
     
-    *module = tmpModule;
+    *module = tmpBundle;
 	
 	
 	

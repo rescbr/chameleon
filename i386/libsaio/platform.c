@@ -98,16 +98,19 @@ static int CopyVarPtr (struct env_struct *var, void* ptr, size_t size)
 }
 
 static struct env_struct *find_env(const char *name) {
-    struct env_struct *var;
-    
-	if (setjmp(uterror) == -1) {
+    struct env_struct *var = NULL;    
+	CEXCEPTION_T e = CEXCEPTION_NONE;
+	
+	Try
+	{
+		HASH_FIND_STR( platform_env, name, var );  
+	}
+	Catch(e)
+	{
 #if DEBUG_PLATFORM
 		printf("find_env: Unable to find environement variable\n"); 
         getc();
 #endif
-		return NULL;
-	} else {
-		HASH_FIND_STR( platform_env, name, var );  
 	}
     return var;
 }
@@ -153,7 +156,11 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
         return;
     }
     if (Type == kEnvPtr) {
-        if (!CopyVarPtr( var,  ptr, size)) return;
+        if (!CopyVarPtr( var,  ptr, size)) 
+		{
+			free(var);
+			return;
+		}
     } 
     else if (Type == kEnvValue) 
         var->value = value;
@@ -163,21 +170,30 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
     var->Type = Type;    
     
     var->name = newString(name);
-    if (!var->name) {        
+    if (!var->name) { 
+		if (Type == kEnvPtr && var->ptr) free(var->ptr);
         free(var);
         return;
     }
 	
-	if (setjmp(uterror) == -1) {
+	CEXCEPTION_T e = CEXCEPTION_NONE;
+	
+	Try
+	{
+		HASH_ADD_KEYPTR( hh, platform_env, name, strlen(var->name), var );
+	}
+	Catch(e)
+	{
 		printf("_set_env: Unable to set environement variable"); // don't try to acces to the string 'name', 
 		//'cause we just returned from the longjump, stack as already changed state.
 #if DEBUG_PLATFORM
 		getc();
 #endif
-		return;
-	} else {
-        HASH_ADD_KEYPTR( hh, platform_env, name, strlen(var->name), var );
-	}
+		if (Type == kEnvPtr && var->ptr) free(var->ptr);
+		free(var->name);
+		free(var);
+
+	}	
 }
 
 /* Warning: set_env will create a new variable each time it will be called, 
@@ -322,19 +338,23 @@ void re_set_env(const char *name , unsigned long long value) {
 	return;    
 }
 
-static void delete_env(struct env_struct *var) {
+static void delete_env(struct env_struct *var) {	
 	
-	if (setjmp(uterror) == -1) {
+	CEXCEPTION_T e = CEXCEPTION_NONE;
+	
+	Try
+	{
+		HASH_DEL( platform_env, var);
+        if (var->name) free(var->name);    
+		if (var->Type == kEnvPtr && var->ptr) free(var->ptr);
+        free(var);
+	}
+	Catch(e)
+	{
 		printf("delete_env: Unable to delete environement variable\n");
 #if DEBUG_PLATFORM
         getc();	
 #endif
-		return;
-	} else {
-		HASH_DEL( platform_env, var);
-        if (var->name) free(var->name);            
-        free(var);
-        
 	}
 }
 
@@ -347,21 +367,26 @@ void unset_env(const char *name) {
 }
 
 void free_platform_env(void) {
-    struct env_struct *current_var, *tmp; 
-    
-	if (setjmp(uterror) == -1) {
+    struct env_struct *current_var, *tmp;    
+	CEXCEPTION_T e = CEXCEPTION_NONE;
+	
+	Try
+	{
+		HASH_ITER(hh, platform_env, current_var, tmp) {    
+			HASH_DEL(platform_env,current_var);
+            if (current_var->name) free(current_var->name);
+			if (current_var->Type == kEnvPtr && current_var->ptr) free(current_var->ptr);
+
+		}
+		free(current_var);
+	}
+	Catch(e)
+	{
 		printf("free_platform_env: Unable to delete all environement variables\n"); 
 #if DEBUG_PLATFORM
 		getc();
 #endif
-		return;
-	} else {
-		HASH_ITER(hh, platform_env, current_var, tmp) {    
-			HASH_DEL(platform_env,current_var);
-            if (current_var->name) free(current_var->name);
-		}
-		free(current_var);
-	}     
+	}
 }
 
 #if DEBUG_PLATFORM

@@ -1,3 +1,6 @@
+- Updated platform.c
+- Updated modules.c 
+
 - Updated cpu.c
 - Added a C exeption handler
 - Added libz

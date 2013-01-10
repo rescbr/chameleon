@@ -88,12 +88,6 @@ long long add_symbol(char* module,char* symbol, long long addr);
 #endif
 
 #if macho_64
-unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long, char));
-#else
-unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long));
-#endif
-
-#if macho_64
 unsigned int handle_symtable(char *module, UInt32 base,
 							 struct symtab_command* symtabCommand,
 							 long long(*symbol_handler)(char*, char*, long long, char),
