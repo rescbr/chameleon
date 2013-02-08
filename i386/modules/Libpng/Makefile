@@ -42,11 +42,11 @@ CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wall -fstack-protector-
     $(DEBUG) \
     -fno-builtin $(OMIT_FRAME_POINTER_CFLAG) \
     -mpreferred-stack-boundary=2 -fno-align-functions \
-    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common  
+    -march=pentium4 -msse2 -mfpmath=sse -msoft-float -fno-common -nostdinc
 
 DEFINES=
 CONFIG = hd
-INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I$(INCLUDE) -I$(BOOT2DIR)
+INC = -I. -I.. -I$(SYMROOT) -I$(UTILDIR) -I$(INCLUDE) -I$(BOOT2DIR)
 ifneq "" "$(wildcard /bin/mkdirs)"
   MKDIRS = /bin/mkdirs
 else
@@ -59,7 +59,7 @@ LIBS=
 
 VPATH = $(OBJROOT):$(SYMROOT)
 
-PNG_OBJS = PngFile.o png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o stack_protector.o
+PNG_OBJS = __libpng_init.o png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o stack_protector.o
 
 
 SFILES =
@@ -109,16 +109,12 @@ bundle:
 	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "CFBundleExecutable" '$(BUNDLE_EXEC)'	
 	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "IOClass" '$(BUNDLE_CLASS)'	
 	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "IOProviderClass" '$(BUNDLE_CLASS_PROVIDER)'	
-	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "OSBundleLibraries" -dict "com.boot.LIBS.libstdio" '0' "com.boot.LIBS.libz" '0'
+	@defaults write $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info "OSBundleLibraries" -dict "com.boot.LIBS.libsystem_c" '0' "com.boot.LIBS.libz" '0'
 	@plutil -convert xml1 $(SYMROOT)/$(BUNDLE_NAME).bundle/Contents/Info.plist
 
 stack_protector.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "$(LIBSAIODIR)/stack_protector.c" $(INC) -o "$(OBJROOT)/stack_protector.o"
         
-
-PngFile.o: 	
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "PngFile.c" $(INC) -o "$(OBJROOT)/PngFile.o"
-
 png.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "png.c" $(INC) -o "$(OBJROOT)/png.o"
 
@@ -163,6 +159,12 @@ pngwtran.o:
 
 pngwutil.o: 	
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "pngwutil.c" $(INC) -o "$(OBJROOT)/pngwutil.o"
+
+
+__libpng_init.o:
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEFINES) -c "__libpng_init.c" $(INC) -o "$(OBJROOT)/__libpng_init.o"
+
+
 
 include ../../MakeInc.dir
 

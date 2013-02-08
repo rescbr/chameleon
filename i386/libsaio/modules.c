@@ -60,6 +60,12 @@ static unsigned int parse_mach(char *module, void* binary, long long(*symbol_han
 static unsigned int parse_mach(char *module, void* binary, long long(*symbol_handler)(char*, char*, long long), BundlePtr bundle);
 #endif
 
+#if macho_64
+unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long, char), char is64);
+#else
+unsigned int handle_symtable(char *module, UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, char*, long long));
+#endif
+
 #if DEBUG_MODULES
 VOID print_symbol_list(VOID);
 VOID print_hook_list(VOID);
@@ -130,6 +136,8 @@ static VOID add_dylib(const char* name)
 	dylbList_t* new_entry = malloc(sizeof(dylbList_t));
 	if (new_entry)
 	{	
+		bzero(new_entry,sizeof(dylbList_t));
+		
 		new_entry->next = loadedDylib;
 		
 		loadedDylib = new_entry;
@@ -277,7 +285,7 @@ static unsigned int load_module(char * name, char* module, BundlePtr bundle)
 	
 	int fh = -1;
 	
-	fh = open(module);
+	fh = open(module,0);
 	if(fh < 0)
 	{		
 #if DEBUG_MODULES
@@ -303,6 +311,7 @@ static unsigned int load_module(char * name, char* module, BundlePtr bundle)
 		{
 			goto out;
 		}
+		bzero(module_base,moduleSize);
 		
 		if (read(fh, module_base, moduleSize) == moduleSize)
 		{
@@ -397,6 +406,8 @@ static VOID __register_hook_callback(moduleHook_t* hook, const char* name, void(
 			DBG("Unable to allocate memory for callback \n");
 			return;
 		}
+		bzero(newCallback,sizeof(callbackList_t));
+		
 		newCallback->next = hook->callbacks;
 		hook->callbacks = newCallback;
 		newCallback->callback = callback;
@@ -409,6 +420,8 @@ static VOID __register_hook_callback(moduleHook_t* hook, const char* name, void(
 			DBG("Unable to allocate memory for hook '%s'.\n", name);
 			return;
 		}
+		bzero(newHook,sizeof(moduleHook_t));
+		
 		newHook->name = name;
 		newHook->callbacks = malloc(sizeof(callbackList_t));
 		if (!newHook->callbacks) {
@@ -416,6 +429,8 @@ static VOID __register_hook_callback(moduleHook_t* hook, const char* name, void(
 			free(newHook);
 			return;
 		}
+		bzero(newHook->callbacks,sizeof(callbackList_t));
+		
 		newHook->callbacks->callback = callback;
 		newHook->callbacks->next = NULL;
 		
@@ -986,7 +1001,7 @@ static EFI_STATUS _bind_macho(char* module, void* base, char* bind_stream, UInt3
 						while (prop != 0)
 						{
 							/* the order in OSBundleLibraries is important */
-
+							
 							if (prop->string)
 							{
 								symbolAddr = lookup_all_symbols(prop->string ,symbolName); 
@@ -995,7 +1010,7 @@ static EFI_STATUS _bind_macho(char* module, void* base, char* bind_stream, UInt3
 							}							
 							
 							prop = prop->tagNext;
-
+							
 						}
 					}
 					
@@ -1284,6 +1299,8 @@ long long add_symbol(char* module,char* symbol, long long addr)
 	DBG("Adding symbol %s at 0x%X\n", symbol, addr);
 	if (new_entry)
 	{	
+		bzero(new_entry,sizeof(symbolList_t));
+		
 		new_entry->next = moduleSymbols;
 		
 		moduleSymbols = new_entry;
@@ -1476,6 +1493,7 @@ EFI_STATUS replace_function(const char* module, const char* symbol, void* newAdd
 		if (!jumpPointer) {
 			return EFI_OUT_OF_RESOURCES;
 		}
+		bzero(jumpPointer,sizeof(UInt32));
 		
 		*binary++ = 0xFF;	// Jump
 		*binary++ = 0x25;	// Long Jump
@@ -1597,11 +1615,11 @@ InitBundleSupport( void )
     
     if (BundleSet == true)  return 0;    
     
-    gBundlesSpec    = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
-    gDriverSpec     = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
-    gFileSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
-    gTempSpec       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
-    gFileName       = malloc( DEFAULT_BUNDLE_SPEC_SIZE );
+    gBundlesSpec    = calloc( DEFAULT_BUNDLE_SPEC_SIZE, sizeof(char) );
+    gDriverSpec     = calloc( DEFAULT_BUNDLE_SPEC_SIZE, sizeof(char) );
+    gFileSpec       = calloc( DEFAULT_BUNDLE_SPEC_SIZE, sizeof(char) );
+    gTempSpec       = calloc( DEFAULT_BUNDLE_SPEC_SIZE, sizeof(char) );
+    gFileName       = calloc( DEFAULT_BUNDLE_SPEC_SIZE, sizeof(char) );
     
     if ( !gBundlesSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
         goto error;
@@ -1698,6 +1716,8 @@ static void add_bundle(BundlePtr module,char* name)
 	DBG("Adding bundle %s \n", name );
 	if (new_entry)
 	{	
+		bzero(new_entry,sizeof(Bundle));
+		
 		new_entry->nextBundle = gBundleHead;
 		
 		gBundleHead = new_entry;
@@ -1736,7 +1756,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
 				 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 		
-        tmpExecutablePath = malloc(executablePathLength);
+        tmpExecutablePath = calloc(executablePathLength,sizeof(char));
         if (tmpExecutablePath == 0) break;
         
         strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
@@ -1744,7 +1764,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         snprintf(gFileSpec, DEFAULT_BUNDLE_SPEC_SIZE,"%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 		
-        tmpBundlePath = malloc(bundlePathLength);
+        tmpBundlePath = calloc(bundlePathLength,sizeof(char));
         if (tmpBundlePath == 0) break;
 		
         strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
@@ -1763,6 +1783,8 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
         length = length + 1;
         buffer = malloc(length);
         if (buffer == 0) break;
+		
+		bzero(buffer, length);
 		
         strlcpy(buffer, (char *)kLoadAddr, length);
 		
@@ -1786,6 +1808,7 @@ LoadBundlePList( char * dirSpec, char * name, long bundleType )
 			ret = -1;
             break;
         }       
+		bzero(module->plistAddr, length);
 		
         // Add the plist to the module.
 		
@@ -2128,6 +2151,8 @@ ParseXML( char * buffer, BundlePtr * module )
         XMLFreeTag(moduleDict);
         return -1;
     }
+	bzero(tmpBundle, sizeof(Bundle));
+	
     tmpBundle->dict = moduleDict;
     
     do {

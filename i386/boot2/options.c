@@ -532,7 +532,7 @@ char *getMemoryInfoString(void)
 {
     unsigned long i;
     MemoryRange *mp = (MemoryRange*)(uint32_t)get_env(envMemoryMap);
-	char *buff = malloc(sizeof(char)*1024);
+	char *buff = calloc(1024, sizeof(char));
 	if(!buff) return 0;
 	
 	char info[] = "BIOS reported memory ranges:\n";
@@ -681,22 +681,21 @@ int getBootOptions(bool firstRun)
 		int cnt;
 		
 		if (getValueForKey(kCDROMPromptKey, &val, &cnt, DEFAULT_BOOT_CONFIG)) {
-			prompt = malloc(cnt + 1);
+			prompt = calloc(cnt + 1, sizeof(char));
             if (!prompt) {
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
                 return -1;
             }
 			strncat(prompt, val, cnt);
 		} else {			
-            prompt = malloc(256);
+            prompt = calloc(256, sizeof(char));
             if (!prompt) {
                 stop("Couldn't allocate memory for the prompt\n"); //TODO: Find a better stategie
                 return -1;
             }
             BVRef bvr;
             if (( bvr = ((BVRef)(uint32_t)get_env(envgBootVolume)))) {
-                name = malloc(80);
-                bzero(name,80);
+                name = calloc(80, sizeof(char));
                 if (!name) {
                     stop("Couldn't allocate memory for the device name\n"); //TODO: Find a better stategie
                     return -1;
@@ -792,7 +791,7 @@ int getBootOptions(bool firstRun)
     
 	if (devcnt) {
 		// Allocate memory for an array of menu items.
-		menuItems = malloc(sizeof(MenuItem) * devcnt);
+		menuItems = calloc(devcnt,sizeof(MenuItem));
 		if (menuItems == NULL) {
 			goto done;
 		}
@@ -1240,11 +1239,11 @@ void showHelp(void)
 	
 	// Check Extra on booting partition
 	snprintf(dirspec, sizeof(dirspec),"/Extra/%s",filename);
-	fd=open (dirspec);
+	fd=open (dirspec,0);
 	if (fd<0)
 	{	// Fall back to booter partition
 		snprintf(dirspec, sizeof(dirspec),"bt(0,0)/Extra/%s",filename);
-		fd=open (dirspec);
+		fd=open (dirspec,0);
 		if (fd<0)
 		{
 			printf("BootHelp not found: %s\n", filename);
@@ -1252,7 +1251,7 @@ void showHelp(void)
 		}
 	}
 	int BootHelp_txt_len = file_size (fd);
-	void *BootHelp_txt=malloc(BootHelp_txt_len);
+	void *BootHelp_txt=calloc(BootHelp_txt_len, sizeof(char));
 	if (BootHelp_txt)
 	{
 		if (read (fd, BootHelp_txt, BootHelp_txt_len)!=BootHelp_txt_len)
@@ -1291,7 +1290,7 @@ void showTextFile(const char * filename)
 	if (size > MAX_TEXT_FILE_SIZE) {
 		size = MAX_TEXT_FILE_SIZE;
 	}
-	buf = malloc(size);
+	buf = calloc(size,sizeof(char));
     if (!buf) {
         printf("Couldn't allocate memory for the buf in showTextFile\n"); 
         return ;

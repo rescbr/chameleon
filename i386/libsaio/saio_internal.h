@@ -199,13 +199,13 @@ extern void SetgRootPath(const char * str);
 extern char * GetgRootPath(void);
 #endif
 
-extern void re_set_env_copy(const char *name , void* ptr,size_t size);
+extern void re_set_env_ptr(const char *name , void* ptr,size_t size);
 extern void set_env(const char *name, unsigned long long value );
-extern void set_env_copy(const char *name, void * ptr, size_t size );
-extern unsigned long long get_env_var(const char *name);
+extern int set_env_ptr(const char *name, void * ptr, size_t size );
+extern unsigned long long get_env_value(const char *name);
 extern unsigned long long get_env(const char *name);
 extern void * get_env_ptr(const char *name);
-extern void safe_set_env_copy(const char *name , void * ptr, size_t size );
+extern int safe_set_env_ptr(const char *name , void * ptr, size_t size );
 extern void safe_set_env(const char *name , unsigned long long value);
 extern void re_set_env(const char *name , unsigned long long value) ;
 extern void unset_env(const char *name);
@@ -260,7 +260,7 @@ extern long   GetFSUUID(char *spec, char *uuidStr, long strMaxLen);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr, long strMaxLen);
 extern int    openmem(char *buf, int len);
 
-extern int    open(const char *path);
+extern int    open(const char *path ,int mode);
 extern int    open_bvdev(const char *bvd, const char *path);
 
 extern int    close(int fdesc);
@@ -270,7 +270,7 @@ extern int    write(int fdesc, const char *buf, int count);
 extern int    writebyte(int fdesc, char value);
 extern int    writeint(int fdesc, int value);
 extern struct iob * iob_from_fdesc(int fdesc);
-extern int    b_lseek(int fdesc, int addr, int ptr);
+extern int    lseek(int fdesc, int addr, int ptr);
 extern int    tell(int fdesc);
 extern const char * systemConfigDir(void);
 extern struct dirstuff * opendir(const char *path);

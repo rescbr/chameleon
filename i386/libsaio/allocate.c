@@ -37,10 +37,10 @@ long
 AllocateMemoryRange(const char * rangeName, long start, long length)
 {
     uint32_t *buffer;
-   
+	
     if (!rangeName) return -1;
-
-    buffer = malloc(2 * sizeof(uint32_t));
+	
+    buffer = calloc(2 , sizeof(uint32_t));
     if (buffer == 0) {return -1;}
     
     buffer[0] = start;
@@ -67,6 +67,8 @@ AllocateKernelMemory( long inSize )
     if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) )
 	{
         stop ("AllocateKernelMemory error");
+		return 0;
+		
     }
     
     bootArgs->ksize = gImageLastKernelAddr - bootArgs->kaddr;

@@ -1337,7 +1337,7 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
     int error = 0;
 	
     //pngFile = open_bvdev("bt(0,0)", filename);
-	pngFile = open(filename);
+	pngFile = open(filename,0);
 	//if (pngFile == -1) {
     if (pngFile < 0) {
         error = -1;

@@ -24,9 +24,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include <stdio.h>
+#include <stdlib.h>
 
+#include <sys/types.h>
+#include <sys/cdefs.h>
+#include <Availability.h>
 
-#include "libsaio.h"
+#include <_types.h>
+extern void arc4random_buf(void *_buf, size_t n);
+extern void   stop(const char *format, ...);
+extern void halt(void);
 
 #define __arraycount(__x)       (sizeof(__x) / sizeof(__x[0]))
 
@@ -63,7 +71,7 @@ void
 __stack_chk_fail()
 {
 #ifndef BOOT1
-	stop("stack overflow");
+	printf("stack overflow");
 #endif
-	for(;;);
+	halt();
 }

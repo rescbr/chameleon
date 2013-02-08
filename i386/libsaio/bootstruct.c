@@ -116,7 +116,7 @@ void initKernBootStruct( void )
             set_env(envMemoryMap, (uint32_t)memoryMap);
             set_env(envMemoryMapCnt, memoryMapCount);
 			set_env(envMemoryMapNode, (uint32_t)gMemoryMapNode);
-
+			
             
             init_done = 1;
         }
@@ -158,8 +158,8 @@ void
 reserveKernBootStruct(void)
 {
     void *oldAddr = bootArgs;	
-	
     bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
+	assert(bootArgs != NULL);
     bcopy(oldAddr, bootArgs, sizeof(boot_args));
     
 }
@@ -168,15 +168,21 @@ void
 reserveKernLegacyBootStruct(void)
 {    
     bootArgsLegacy = (boot_args_legacy *)AllocateKernelMemory(sizeof(boot_args_legacy));
-    
+    assert(bootArgsLegacy != NULL);
+	bzero(bootArgsLegacy,sizeof(boot_args_legacy));
 	bootArgsLegacy->Revision = bootArgs->Revision ;
 	bootArgsLegacy->Version = bootArgs->Version   ;
 	bcopy(bootArgs->CommandLine, bootArgsLegacy->CommandLine, BOOT_LINE_LENGTH);
 	bootArgsLegacy->MemoryMap = bootArgs->MemoryMap ;
 	bootArgsLegacy->MemoryMapSize = bootArgs->MemoryMapSize ;
 	bootArgsLegacy->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize ;
-	bootArgsLegacy->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;
-	bootArgsLegacy->Video = bootArgs->Video ;
+	bootArgsLegacy->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion ;	
+	bootArgsLegacy->Video.v_display  = bootArgs->Video.v_display;
+    bootArgsLegacy->Video.v_width    = bootArgs->Video.v_width ;
+    bootArgsLegacy->Video.v_height   = bootArgs->Video.v_height;
+    bootArgsLegacy->Video.v_depth    = bootArgs->Video.v_depth;
+    bootArgsLegacy->Video.v_rowBytes = bootArgs->Video.v_rowBytes;
+    bootArgsLegacy->Video.v_baseAddr = bootArgs->Video.v_baseAddr;	
 	bootArgsLegacy->deviceTreeP = bootArgs->deviceTreeP ;
 	bootArgsLegacy->deviceTreeLength = bootArgs->deviceTreeLength ;
 	bootArgsLegacy->kaddr = bootArgs->kaddr ;
@@ -202,7 +208,7 @@ finalizeBootStruct(void)
 		
 		uint64_t	sane_size = 0;  /* Memory size to use for defaults calculations */
 		
-		int memoryMapCount = (int)get_env(envMemoryMapCnt);
+		unsigned long memoryMapCount = (unsigned long)get_env(envMemoryMapCnt);
 		
 		if (memoryMapCount == 0) {
 			

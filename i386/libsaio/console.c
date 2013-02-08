@@ -114,7 +114,7 @@ void putchar(char c)
     {
 		putc('\r');
     }
-		
+	
 	putc(c);
 }
 
@@ -211,7 +211,7 @@ int error(const char * fmt, ...)
     va_start(ap, fmt);
     
     localVPrintf(fmt, ap, 0);
-
+	
     
 	len = prf(fmt, ap, 0);
 	if (len > 0)
@@ -225,7 +225,7 @@ int error(const char * fmt, ...)
 	}	
     va_end(ap);
 	
-	set_env_copy(envConsoleErr, str, len);
+	set_env_ptr(envConsoleErr, str, len);
 	free(str);
 	
     return(0);

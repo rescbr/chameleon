@@ -1,32 +1,79 @@
+/*
+ * contains some ideas from the Mark VanderVoord's CException project
+ *
+ * Copyright (c) 2012-2013 Cadet-Petit Armel
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
+ *    distribution.
+ *
+ *  * Neither the name of Cadet-Petit Armel nor the names of the
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #include "CException.h"
 #include "libsaio.h"
+#include "modules.h"
+#include "assert.h"
 
-volatile CEXCEPTION_FRAME_T CExceptionFrames[CEXCEPTION_NUM_ID] = { {0} };
+static CEXCEPTION_FRAME_T *CExceptionFrames = NULL;
+static CEXCEPTION_FRAME_T *CExceptionMainFrames = NULL;
+
+#ifdef DEBUG_EXCEPTION
+static unsigned long frameCount = 0;
+#endif	
 
 //------------------------------------------------------------------------------------------
 //  Install or Restore Default handler
 //------------------------------------------------------------------------------------------
 int Install_Default_Handler(void)
 {
-#define XTRY Try
+#define XTRY \
+{																\
+pushFrame();                                                \
+if ((e = setjmp(CExceptionFrames->cx)) == 0) {                                \
+e = CEXCEPTION_NONE;                                       \
+if (1)
+	
 #define XCATCH(e)                                               \
-else { }                                                    \
-CExceptionFrames[MY_ID].Exception = CEXCEPTION_NONE;        \
+else { }                                            \
 }                                                           \
-else                                                        \
-{ e = CExceptionFrames[MY_ID].Exception; e=e; }             \
-CExceptionFrames[MY_ID].pFrame = PrevFrame;                 \
-}                                                           \
-if (CExceptionFrames[CEXCEPTION_GET_ID].Exception != CEXCEPTION_NONE)
+}																\
+if (e != CEXCEPTION_NONE)
     
     CEXCEPTION_T e = CEXCEPTION_NONE;
 	
 	XTRY
 	{
+		CExceptionMainFrames = CExceptionFrames;
 	}
 	XCATCH(e)
 	{
-        halt();
+        if (e != EXIT_SUCCESS) {
+            popFrame();
+            halt();
+        }
     }
     return 1;
 }
@@ -35,39 +82,50 @@ if (CExceptionFrames[CEXCEPTION_GET_ID].Exception != CEXCEPTION_NONE)
 //  Throw
 //------------------------------------------------------------------------------------------
 void Throw(CEXCEPTION_T ExceptionID)
-{
-    unsigned int MY_ID = CEXCEPTION_GET_ID;
-    CExceptionFrames[MY_ID].Exception = ExceptionID;
-    if (CExceptionFrames[MY_ID].pFrame)
-    {
-        longjmp(*CExceptionFrames[MY_ID].pFrame, 1);
-    }
-    CEXCEPTION_NO_CATCH_HANDLER(MY_ID);
+{    
+	longjmp(CExceptionFrames->cx, ExceptionID);
+    
 }
 
-//------------------------------------------------------------------------------------------
-//  Explanation of what it's all for:
-//------------------------------------------------------------------------------------------
-/*
- #define Try
- {                                                                   <- give us some local scope.  most compilers are happy with this
- jmp_buf *PrevFrame, NewFrame;                                   <- prev frame points to the last try block's frame.  new frame gets created on stack for this Try block
- unsigned int MY_ID = CEXCEPTION_GET_ID;                         <- look up this task's id for use in frame array.  always 0 if single-tasking
- PrevFrame = CExceptionFrames[CEXCEPTION_GET_ID].pFrame;         <- set pointer to point at old frame (which array is currently pointing at)
- CExceptionFrames[MY_ID].pFrame = &NewFrame;                     <- set array to point at my new frame instead, now
- CExceptionFrames[MY_ID].Exception = CEXCEPTION_NONE;            <- initialize my exception id to be NONE
- if (setjmp(NewFrame) == 0) {                                    <- do setjmp.  it returns 1 if longjump called, otherwise 0
- if (1)                                                          <- this is here to force proper scoping.  it requires braces or a single line to be but after Try, otherwise won't compile.  This is always true at this point.
- if (1) is also always true and the compiler will not warn
- #define Catch(e)
- else { }                                                    <- this also forces proper scoping.  Without this they could stick their own 'else' in and it would get ugly
- CExceptionFrames[MY_ID].Exception = CEXCEPTION_NONE;        <- no errors happened, so just set the exception id to NONE (in case it was corrupted)
- }
- else                                                            <- an exception occurred
- { e = CExceptionFrames[MY_ID].Exception; e=e;}                  <- assign the caught exception id to the variable passed in.
- CExceptionFrames[MY_ID].pFrame = PrevFrame;                     <- make the pointer in the array point at the previous frame again, as if NewFrame never existed.
- }                                                                   <- finish off that local scope we created to have our own variables
- if (CExceptionFrames[CEXCEPTION_GET_ID].Exception != CEXCEPTION_NONE)  <- start the actual 'catch' processing if we have an exception id saved away
- if (Install_or_Restore_Default_Handler)                                <- and finally we re-install the default exceptions handler to be sure that throw, exit, assert, etc... point to the right place
- */
+void pushFrame(void)
+{
+	CEXCEPTION_FRAME_T* frame = (CEXCEPTION_FRAME_T*)malloc(sizeof(CEXCEPTION_FRAME_T));    
+	assert( frame != NULL );
+	bzero(frame,sizeof(CEXCEPTION_FRAME_T));	
+	frame->pFrame = CExceptionFrames;
+	CExceptionFrames = frame;
+#ifdef DEBUG_EXCEPTION
+	frameCount++;
+#endif	
+}
 
+void popFrame(void)
+{
+    
+	CEXCEPTION_FRAME_T* frame = NULL;
+	assert( CExceptionFrames != NULL );
+	frame = CExceptionFrames->pFrame;
+	if (CExceptionFrames->zone) execute_hook("destroy_zone", CExceptionFrames->zone, NULL, NULL, NULL, NULL, NULL);
+	free(CExceptionFrames);
+	CExceptionFrames = frame;
+#ifdef DEBUG_EXCEPTION
+    if (frameCount) frameCount--;
+#endif    
+}
+
+#ifdef DEBUG_EXCEPTION
+unsigned long getFramesCount(void)
+{    
+	return frameCount;
+}
+#endif
+
+CEXCEPTION_FRAME_T * getcurrentFrame(void)
+{    
+	return CExceptionFrames;
+}
+
+CEXCEPTION_FRAME_T * getMainFrames(void)
+{    
+	return CExceptionMainFrames;
+}

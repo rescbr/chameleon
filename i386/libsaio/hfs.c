@@ -151,19 +151,37 @@ long HFSInitPartition(CICell ih)
     }
 	
 #ifdef __i386__
-    if (!gTempStr) gTempStr = (char *)malloc(4096);
-    if (!gLinkTemp) gLinkTemp = (char *)malloc(64);
-    if (!gBTreeHeaderBuffer) gBTreeHeaderBuffer = (char *)malloc(512);
+    if (!gTempStr) gTempStr = (char *)calloc(4096,sizeof(char));
+    if (!gLinkTemp) gLinkTemp = (char *)calloc(64,sizeof(char));
+    if (!gBTreeHeaderBuffer) gBTreeHeaderBuffer = (char *)calloc(512,sizeof(char));
     if (!gHFSMdbVib) {
-        gHFSMdbVib = (char *)malloc(kBlockSize);
+        gHFSMdbVib = (char *)calloc(kBlockSize,sizeof(char));
         gHFSMDB = (HFSMasterDirectoryBlock *)gHFSMdbVib;
     }
     if (!gHFSPlusHeader) {
-        gHFSPlusHeader = (char *)malloc(kBlockSize);
+        gHFSPlusHeader = (char *)calloc(kBlockSize,sizeof(char));
         gHFSPlus = (HFSPlusVolumeHeader *)gHFSPlusHeader;
     }
     if (!gTempStr || !gLinkTemp || !gBTreeHeaderBuffer ||
-        !gHFSMdbVib || !gHFSPlusHeader) return -1;
+        !gHFSMdbVib || !gHFSPlusHeader) {
+		
+		if (gTempStr) free(gTempStr);		
+		if (gLinkTemp) free(gLinkTemp);
+		if (gBTreeHeaderBuffer) free(gBTreeHeaderBuffer);
+		if (gHFSMdbVib) free(gHFSMdbVib);
+		if (gHFSPlusHeader) free(gHFSPlusHeader);
+		
+		gTempStr = NULL;
+		gLinkTemp = NULL;
+		gBTreeHeaderBuffer= NULL;
+		gHFSMdbVib = NULL;
+		gHFSPlusHeader = NULL; 
+		
+		gHFSPlus = NULL;
+		gHFSMDB = NULL;
+		
+		return -1;
+	}
 #endif /* __i386__ */
 	
     gAllocationOffset = 0;
@@ -578,10 +596,10 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags,
 			
 #ifdef __i386__
             snprintf(gLinkTemp, 64 ,"%s/%s%ld", HFSPLUSMETADATAFOLDER,
-					HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+					 HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
 #else
             snprintf(gLinkTemp, sizeof(gLinkTemp),"%s/%s%ld", HFSPLUSMETADATAFOLDER,
-					HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+					 HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
 #endif
             
 			result = ResolvePathToCatalogEntry(gLinkTemp, flags, entry,
@@ -610,7 +628,7 @@ static long GetCatalogEntry(long long * dirIndex, char ** name,
     }
 	
     nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
-    nodeBuf  = (char *)malloc(nodeSize);
+    nodeBuf  = (char *)calloc(nodeSize, sizeof(char));
 	if (!nodeBuf) 
 	{
 		return -1;
@@ -746,7 +764,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 	
     curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
     nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
-    nodeBuf  = (char *)malloc(nodeSize);
+    nodeBuf  = (char *)calloc(nodeSize , sizeof(char));
 	if (!nodeBuf) 
 	{
 		return -1;
@@ -891,7 +909,7 @@ static long ReadExtent(char * extent, uint64_t extentSize,
             }
 			
             if (extentBuffer == 0) {
-                extentBuffer = malloc(sizeofExtent * extentDensity);
+                extentBuffer = calloc(sizeofExtent * extentDensity, sizeof(char));
                 if (extentBuffer == 0) return -1;
             }
 			

@@ -65,7 +65,7 @@ __convertImage( unsigned short width,
     switch ( VIDEO(depth) ) {
 		case 16 :
         {
-			img16 = malloc(width * height * 2);
+			img16 = calloc(2,width * height);
 			if ( !img16 ) return 1;
 			for (cnt = 0; cnt < (width * height); cnt++)
 				img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
@@ -75,7 +75,7 @@ __convertImage( unsigned short width,
         }
 		case 32 :
         {
-			img32 = malloc(width * height * 4);
+			img32 = calloc(4,width * height);
 			if ( !img32 ) return 1;
 			for (cnt = 0; cnt < (width * height); cnt++)
 				img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
@@ -85,7 +85,7 @@ __convertImage( unsigned short width,
         }
 		default :
         {
-			img = malloc(width * height);
+			img = calloc(1,width * height);
             if ( !img ) return 1; 
 			bcopy(imageData, img, width * height);
             *newImageData = img;
@@ -409,7 +409,7 @@ char * __decodeRLE( const void * rleData, int rleBlocks, int outBytes )
         unsigned char value;
     } * bp = (struct RLEBlock *) rleData;
 	
-    out = cp = malloc( outBytes );
+    out = cp = calloc(1, outBytes );
     if ( out == NULL ) return NULL;
 	
     while ( rleBlocks-- )

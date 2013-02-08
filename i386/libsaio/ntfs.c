@@ -68,34 +68,34 @@ ntfs_find_attr(
  */
 static int
 ntfs_fixup(
-            char *buf,
-            size_t len,
-            u_int32_t magic,
-            u_int32_t bytesPerSector)
+		   char *buf,
+		   size_t len,
+		   u_int32_t magic,
+		   u_int32_t bytesPerSector)
 {
 	struct fixuphdr *fhp = (struct fixuphdr *) buf;
 	int             i;
 	u_int16_t       fixup;
 	u_int16_t      *fxp;
 	u_int16_t      *cfxp;
-        u_int32_t	fixup_magic;
-        u_int16_t	fixup_count;
-        u_int16_t	fixup_offset;
-        
-        fixup_magic = OSReadLittleInt32(&fhp->fh_magic,0);
+	u_int32_t	fixup_magic;
+	u_int16_t	fixup_count;
+	u_int16_t	fixup_offset;
+	
+	fixup_magic = OSReadLittleInt32(&fhp->fh_magic,0);
 	if (fixup_magic != magic) {
 		error("ntfs_fixup: magic doesn't match: %08x != %08x\n",
-		       fixup_magic, magic);
+			  fixup_magic, magic);
 		return (ERROR);
 	}
-        fixup_count = OSReadLittleInt16(&fhp->fh_fnum,0);
+	fixup_count = OSReadLittleInt16(&fhp->fh_fnum,0);
 	if ((fixup_count - 1) * bytesPerSector != len) {
 		error("ntfs_fixup: " \
-		       "bad fixups number: %d for %ld bytes block\n", 
-		       fixup_count, (long)len);	/* XXX printf kludge */
+			  "bad fixups number: %d for %ld bytes block\n", 
+			  fixup_count, (long)len);	/* XXX printf kludge */
 		return (ERROR);
 	}
-        fixup_offset = OSReadLittleInt16(&fhp->fh_foff,0);
+	fixup_offset = OSReadLittleInt16(&fhp->fh_foff,0);
 	if (fixup_offset >= len) {
 		error("ntfs_fixup: invalid offset: %x", fixup_offset);
 		return (ERROR);
@@ -109,7 +109,7 @@ ntfs_fixup(
 			return (ERROR);
 		}
 		*cfxp = *fxp;
-                cfxp = (u_int16_t *)(((caddr_t)cfxp) + bytesPerSector);
+		cfxp = (u_int16_t *)(((caddr_t)cfxp) + bytesPerSector);
 	}
 	return (0);
 }
@@ -120,10 +120,10 @@ ntfs_fixup(
  */
 static int
 ntfs_find_attr(
-                char *buf,
-                u_int32_t attrType,
-                void **attrData,
-                size_t *attrSize)
+			   char *buf,
+			   u_int32_t attrType,
+			   void **attrData,
+			   size_t *attrSize)
 {
     struct filerec *filerec;
     struct attr *attr;
@@ -173,12 +173,12 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     void *nameAttr;
     size_t nameSize;
     char *buf;
-
-    buf = (char *)malloc(MAX_CLUSTER_SIZE);
+	
+    buf = (char *)calloc(MAX_CLUSTER_SIZE, sizeof(char));
     if (buf == 0) {
         goto error;
     }
-
+	
     /*
      * Read the boot sector, check signatures, and do some minimal
      * sanity checking.  NOTE: the size of the read below is intended
@@ -187,7 +187,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
      */
     Seek(ih, 0);
     Read(ih, (long)buf, MAX_BLOCK_SIZE);
-
+	
     boot = (struct bootfile *) buf;
     
     /*
@@ -202,7 +202,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     {
         goto error;
     }
-
+	
     /*
      * Check the "NTFS    " signature.
      */
@@ -217,7 +217,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 		
 		goto error;
     }
-
+	
     /*
      * Make sure the bytes per sector and sectors per cluster are
      * powers of two, and within reasonable ranges.
@@ -228,7 +228,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
         //verbose("NTFS: invalid bytes per sector (%d)\n", bytesPerSector);
         goto error;
     }
-
+	
     sectorsPerCluster = boot->bf_spc;	/* Just one byte; no swapping needed */
     if ((sectorsPerCluster & (sectorsPerCluster-1)) || sectorsPerCluster > 128)
     {
@@ -263,7 +263,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     else
         mftRecordSize *= bytesPerSector * sectorsPerCluster;
     //verbose("NTFS: MFT record size = %d\n", mftRecordSize);
-
+	
     /*
      * Read the MFT record for $Volume.  This assumes the first four
      * file records in the MFT are contiguous; if they aren't, we
@@ -275,7 +275,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
      */
     mftOffset = mftCluster * sectorsPerCluster * bytesPerSector;
     mftOffset += mftRecordSize * NTFS_VOLUMEINO;
-
+	
     Seek(ih, mftOffset);
     Read(ih, (long)buf, mftRecordSize);
 #if UNUSED
@@ -287,11 +287,11 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     if (read(fd, buf, mftRecordSize) != mftRecordSize)
     {
         //verbose("NTFS: error reading MFT $Volume record: %s\n",
-                strerror(errno));
+		strerror(errno));
         goto error;
     }
 #endif
-
+	
     if (ntfs_fixup(buf, mftRecordSize, NTFS_FILEMAGIC, bytesPerSector) != 0)
     {
         //verbose("NTFS: block fixup failed\n");
@@ -308,13 +308,13 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     }
     
     str[0] = '\0';
-
+	
     utf_encodestr( nameAttr, nameSize / 2, (u_int8_t *)str, strMaxLen, OSLittleEndian );
-
+	
     free(buf);
     return;
-
- error:
+	
+error:
     if (buf) free(buf);
     return;
 }
@@ -322,12 +322,14 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 long NTFSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
 	bool NTFSProbe(const void*);
-
+	
 	struct bootfile *boot;
 	void *buf = malloc(MAX_BLOCK_SIZE);
 	if ( !buf )
 		return -1;
-
+	
+	bzero(buf,MAX_BLOCK_SIZE);
+	
 	/*
 	 * Read the boot sector, check signatures, and do some minimal
 	 * sanity checking.	 NOTE: the size of the read below is intended
@@ -336,23 +338,27 @@ long NTFSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 	 */
 	Seek(ih, 0);
 	Read(ih, (long)buf, MAX_BLOCK_SIZE);
-
+	
 	boot = (struct bootfile *) buf;
-
+	
 	// Check for NTFS signature
 	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 ) {
 		// If not NTFS, maybe it is EXFAT
+		free(buf);
 		return EXFATGetUUID(ih, uuidStr, strMaxLen);
 	}
-
+	
 	// Check for non-null volume serial number
 	if( !boot->bf_volsn )
+	{
+		free(buf);
 		return -1;
-
+	}
+	
 	// Use UUID like the one you get on Windows
 	snprintf(uuidStr,strMaxLen, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
-									(unsigned short)boot->bf_volsn & 0xFFFF);
-
+			 (unsigned short)boot->bf_volsn & 0xFFFF);
+	
 	return 0;
 }    
 

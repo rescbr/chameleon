@@ -111,7 +111,7 @@ void NBI_PreBoot_hook(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5
 			{
 				register_hook_callback("md0Ramdisk", NBI_md0Ramdisk_hook);
 			}
-
+			
 		}
 		
 		// Force arch=i386 + -v
@@ -140,7 +140,7 @@ void NBI_md0Ramdisk()
 	// TODO: embed NBI.img in this file
 	// If runNetbookInstaller is true, then the system has changed states, patch it 
 	snprintf(filename, sizeof(filename),"%s", "Extra/NetbookInstaller.img");;
-	fh = open(filename);
+	fh = open(filename, 0);
 	
 	if (fh >= 0)
 	{
@@ -154,9 +154,9 @@ void NBI_md0Ramdisk()
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{				
-
+				
                 AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
-
+				
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{
@@ -190,7 +190,7 @@ long NBI_LoadDrivers( char * dirSpec )
 	
     if ( InitDriverSupport() != 0 )
         return 0;
-   
+	
 	int step = 0;
 	execute_hook("ramDiskLoadDrivers", &step, NULL, NULL, NULL, NULL, NULL);
 #ifdef NBP_SUPPORT	
@@ -228,7 +228,7 @@ long NBI_LoadDrivers( char * dirSpec )
 			}
 #endif
             char * MKextName = (char*)(uint32_t)get_env(envMKextName);
-
+			
 			if (MKextName[0] != '\0')
 			{
 				verbose("LoadDrivers: Loading from [%s]\n", MKextName);
@@ -240,8 +240,8 @@ long NBI_LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-               char * ExtensionsSpec = (char*)(uint32_t)get_env(envDriverExtSpec);
-
+				char * ExtensionsSpec = (char*)(uint32_t)get_env(envDriverExtSpec);
+				
 				strlcpy(ExtensionsSpec, dirSpec, DEFAULT_DRIVER_SPEC_SIZE);
 				strlcat(ExtensionsSpec, "System/Library/", DEFAULT_DRIVER_SPEC_SIZE);
 				FileLoadDrivers(ExtensionsSpec,DEFAULT_DRIVER_SPEC_SIZE, 0);

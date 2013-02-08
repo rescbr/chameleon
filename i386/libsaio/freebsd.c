@@ -13,6 +13,8 @@ void FreeBSDGetDescription(CICell ih, char *str, long strMaxLen)
 	char * buf=malloc(FreeBSDProbeSize);
 	if (!buf)
 		return;
+	bzero(buf, FreeBSDProbeSize);
+	
     str[0]=0;
 	Seek(ih, 0);
 	Read(ih, (long)buf, FreeBSDProbeSize);

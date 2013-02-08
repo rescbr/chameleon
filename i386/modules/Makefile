@@ -26,7 +26,7 @@ SRCROOT=/tmp
 VPATH = $(OBJROOT):$(SYMROOT)
 
 # The order of building is important.
-SUBDIRS = Libstdio Freetype1 uClibcxx lua Libz Libpng HelloWorld KernelPatcher USBFix Networking HPET NetbookInstaller CPUfreq Keymapper YellowIconFixer ACPICodec ACPIPatcher GraphicsEnabler Memory RamDiskLoader SMBiosPatcher SMBiosGetters GUI HibernateEnabler 
+SUBDIRS = Libc Freetype1 uClibcxx lua Libz Libpng HelloWorld KernelPatcher USBFix Networking HPET NetbookInstaller CPUfreq Keymapper YellowIconFixer ACPICodec ACPIPatcher GraphicsEnabler Memory RamDiskLoader SMBiosPatcher SMBiosGetters GUI HibernateEnabler 
 SUBDIRS += libpixman cairo libwebcore # graphics lib replacement (solution 1)
 SUBDIRS += libefi libeg tryme # graphics lib replacement (solution 2)
 

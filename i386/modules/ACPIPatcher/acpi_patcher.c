@@ -284,16 +284,16 @@ void *loadSSDTTable(int ssdt_number)
 	
 	sprintf(dirspec, "/%s", filename); // start searching root
 	
-	fd=open (dirspec);
+	fd=open (dirspec,0);
 	
 	if (fd<0)
 	{	// Check Extra on booting partition
 		sprintf(dirspec,"/Extra/%s",filename);
-		fd=open (dirspec);
+		fd=open (dirspec,0);
 		if (fd<0)
 		{	// Fall back to booter partition
 			sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-			fd=open (dirspec);
+			fd=open (dirspec,0);
 			if (fd<0)
 			{
 				DBG("SSDT Table not found: %s\n", filename);
@@ -348,17 +348,17 @@ void *loadACPITable(char *key)
 	
 	sprintf(dirspec, "/%s", filename); // start searching root
 	
-	fd=open (dirspec);
+	fd=open (dirspec,0);
 	
 	if (fd<0)
 	{	
 		// Check Extra on booting partition
 		sprintf(dirspec,"/Extra/%s",filename);
-		fd=open (dirspec);
+		fd=open (dirspec,0);
 		if (fd<0)
 		{	// Fall back to booter partition
 			sprintf(dirspec,"bt(0,0)/Extra/%s",filename);
-			fd=open (dirspec);
+			fd=open (dirspec,0);
 			if (fd<0)
 			{				
 				DBG("ACPI Table not found: %s\n", key);
@@ -827,7 +827,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
             
             uint8_t cpu_div = (uint8_t)get_env(envCurrDiv);
             uint8_t cpu_coef = (uint8_t)get_env(envCurrCoef);
-
+			
             uint8_t cpu_ratio = 0;
 			
             if (cpu_div) 								
@@ -990,7 +990,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	return NULL;
 }
 
-  
+
 struct acpi_2_gas FillGASStruct(uint32_t Address, uint8_t Length)
 {
 	struct acpi_2_gas TmpGAS;
@@ -1022,7 +1022,7 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 	const char * value;
 	bool aspmOff = true;
 	bool msiOff = true;
-
+	
 	// Restart Fix
 	if (get_env(envVendor) == CPUID_VENDOR_INTEL) {	/* Intel */
 		fix_restart = true;
@@ -1034,7 +1034,7 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 	
 	if (fix_restart)
 		fadt_rev2_needed = true;
-			
+	
 	// Allocate new fadt table
 	if ((UpdateFADT) && (((fadt_file) && (fadt_file->Length < sizeof(struct acpi_2_fadt))) ||
 						 ((!fadt_file) && (fadt->Length < sizeof(struct acpi_2_fadt)))))        
@@ -1079,16 +1079,16 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 		fadt_mod->Reserved[0] = 0;
 		fadt_mod->Reserved[1] = 0;
 		fadt_mod->Reserved[2] = 0;
-        		
-			fadt_mod->X_PM1a_EVT_BLK = FillGASStruct(fadt_mod->PM1A_Event_Block_Address, fadt_mod->PM1_Event_Block_Length);
-			fadt_mod->X_PM1b_EVT_BLK = FillGASStruct(fadt_mod->PM1B_Event_Block_Address, fadt_mod->PM1_Event_Block_Length);
-			fadt_mod->X_PM1a_CNT_BLK = FillGASStruct(fadt_mod->PM1A_Control_Block_Address, fadt_mod->PM1_Control_Block_Length);
-			fadt_mod->X_PM1b_CNT_BLK = FillGASStruct(fadt_mod->PM1B_Control_Block_Address, fadt_mod->PM1_Control_Block_Length);
-			fadt_mod->X_PM2_CNT_BLK = FillGASStruct(fadt_mod->PM2_Control_Block_Address, fadt_mod->PM2_Control_Block_Length);
-			fadt_mod->X_PM_TMR_BLK = FillGASStruct(fadt_mod->PM_Timer_Block_Address, fadt_mod->PM_Timer_Block_Length);
-			fadt_mod->X_GPE0_BLK = FillGASStruct(fadt_mod->GPE0_Block_Address, fadt_mod->GPE0_Block_Length);
-			fadt_mod->X_GPE1_BLK = FillGASStruct(fadt_mod->GPE1_Block_Address, fadt_mod->GPE1_Block_Length);
-	        
+		
+		fadt_mod->X_PM1a_EVT_BLK = FillGASStruct(fadt_mod->PM1A_Event_Block_Address, fadt_mod->PM1_Event_Block_Length);
+		fadt_mod->X_PM1b_EVT_BLK = FillGASStruct(fadt_mod->PM1B_Event_Block_Address, fadt_mod->PM1_Event_Block_Length);
+		fadt_mod->X_PM1a_CNT_BLK = FillGASStruct(fadt_mod->PM1A_Control_Block_Address, fadt_mod->PM1_Control_Block_Length);
+		fadt_mod->X_PM1b_CNT_BLK = FillGASStruct(fadt_mod->PM1B_Control_Block_Address, fadt_mod->PM1_Control_Block_Length);
+		fadt_mod->X_PM2_CNT_BLK = FillGASStruct(fadt_mod->PM2_Control_Block_Address, fadt_mod->PM2_Control_Block_Length);
+		fadt_mod->X_PM_TMR_BLK = FillGASStruct(fadt_mod->PM_Timer_Block_Address, fadt_mod->PM_Timer_Block_Length);
+		fadt_mod->X_GPE0_BLK = FillGASStruct(fadt_mod->GPE0_Block_Address, fadt_mod->GPE0_Block_Length);
+		fadt_mod->X_GPE1_BLK = FillGASStruct(fadt_mod->GPE1_Block_Address, fadt_mod->GPE1_Block_Length);
+		
 		verbose("Converted ACPI V%d FADT to ACPI V4 FADT\n", (fadt) ? fadt->Revision : fadt->Revision);
 	} else {
 		
@@ -1182,15 +1182,15 @@ patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt, bool UpdateFA
 		fadt_mod->Boot_Flags &= 0xFFF7;
 	}
 	
-		fadt_mod->FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
-		if ((uint32_t)(&(fadt_mod->X_FIRMWARE_CTRL))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
-			fadt_mod->X_FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
-        
+	fadt_mod->FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
+	if ((uint32_t)(&(fadt_mod->X_FIRMWARE_CTRL))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		fadt_mod->X_FIRMWARE_CTRL=(uint32_t)fadt->FIRMWARE_CTRL;
+	
     
     safe_set_env(envHardwareSignature,((struct acpi_2_facs *)fadt->FIRMWARE_CTRL)->hardware_signature);
-
+	
 	DBG("setting hardware_signature to %x \n",(uint32_t)get_env(envHardwareSignature));
-    	
+	
 	// Patch DSDT Address if we have loaded a DSDT table
 	if(new_dsdt)
 	{		
@@ -1214,7 +1214,7 @@ EFI_STATUS setupAcpi(void)
 	int version;
     EFI_STATUS Status = EFI_ABORTED;
 	void *new_dsdt=NULL, *new_hpet=NULL, *new_sbst=NULL, *new_ecdt=NULL, *new_asft=NULL, *new_dmar=NULL, *new_apic=NULL, *new_mcfg=NULL, *new_ssdts[14];
-
+	
 	struct acpi_2_ssdt *new_ssdt[17]; // 15 + 2 additional tables for pss & cst 
 	struct acpi_2_fadt *fadt; // will be used in CST generator
 	struct acpi_2_fadt *fadt_mod=NULL;
@@ -1244,7 +1244,7 @@ EFI_STATUS setupAcpi(void)
 		oem_dmar=getBoolForKey(kOEMDMAR, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		oem_apic=getBoolForKey(kOEMAPIC, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		oem_mcfg=getBoolForKey(kOEMMCFG, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
-
+		
 		gen_csta=getBoolForKey(kGenerateCStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
 		gen_psta=getBoolForKey(kGeneratePStates, &tmpval, DEFAULT_BOOT_CONFIG)&&tmpval;
         
@@ -1260,7 +1260,7 @@ EFI_STATUS setupAcpi(void)
 		gen_psta= true;
 		gen_csta= true;
 	} 
-
+	
     
 	// Load replacement ACPI tables
 	if (!oem_dsdt)
@@ -1311,7 +1311,7 @@ EFI_STATUS setupAcpi(void)
 		curssdt=0;
 		
 	}
-
+	
 	DBG("New ACPI tables Loaded in memory\n");
 	TagPtr DropTables_p = XMLCastDict(XMLGetProperty(DEFAULT_BOOT_CONFIG_DICT, (const char*)"ACPIDropTables"));
 	// Do the same procedure for both versions of ACPI
@@ -1326,7 +1326,7 @@ EFI_STATUS setupAcpi(void)
 		
 		if ((update_acpi) && (rsdp->Revision == 0))
 		{
-
+			
 			rsdp_conv = gen_rsdp_v2_from_v1(rsdp);
 			gen_xsdt = true;
 			version = 1;
@@ -1393,7 +1393,7 @@ EFI_STATUS setupAcpi(void)
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
 					continue;
-                                				
+				
 				DBG("TABLE %c%c%c%c,",table[0],table[1],table[2],table[3]);
 				
 				rsdt_entries[i-dropoffset]=rsdt_entries[i];
@@ -1409,7 +1409,7 @@ EFI_STATUS setupAcpi(void)
 						continue;
 					}
 				}
-                                
+				
 				if ((!(oem_hpet)) && tableSign(table, "HPET"))
 				{
 					DBG("HPET found\n");
@@ -1420,7 +1420,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                                
+				
 				if ((!(oem_sbst)) && tableSign(table, "SBST"))
 				{
 					DBG("SBST found\n");
@@ -1431,7 +1431,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                               
+				
 				if ((!(oem_ecdt)) && tableSign(table, "ECDT"))
 				{
 					DBG("ECDT found\n");
@@ -1444,7 +1444,7 @@ EFI_STATUS setupAcpi(void)
 					
 					continue;
 				}
-                                
+				
 				if ((!(oem_asft)) && tableSign(table, "ASF!"))
 				{
 					DBG("ASF! found\n");
@@ -1455,7 +1455,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                                
+				
 				if ((!(oem_dmar)) && tableSign(table, "DMAR"))
 				{
 					DBG("DMAR found\n");
@@ -1466,7 +1466,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                                
+				
 				if ((!(oem_apic)) && tableSign(table, "APIC"))
 				{
 					DBG("APIC found\n");
@@ -1477,7 +1477,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                                
+				
 				if ((!(oem_mcfg)) && tableSign(table, "MCFG"))
 				{
 					DBG("MCFG found\n");
@@ -1488,7 +1488,7 @@ EFI_STATUS setupAcpi(void)
 					}
 					continue;
 				}
-                                
+				
 				if ((!(oem_ssdt))  && tableSign(table, "SSDT"))
 				{
 					DBG("SSDT %d found", curssdt);
@@ -1502,14 +1502,14 @@ EFI_STATUS setupAcpi(void)
 					curssdt++;
 					continue;
 				}
-                                
+				
 				if ((!(oem_dsdt)) && tableSign(table, "DSDT"))
 				{										
 					DBG("DSDT found\n");
 					rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
 					continue;				
 				}
-                                
+				
 				if (tableSign(table, "FACP"))
 				{					
 					fadt=(struct acpi_2_fadt *)rsdt_entries[i];
@@ -1657,7 +1657,7 @@ EFI_STATUS setupAcpi(void)
 				rsdt_mod->Length+=4;
 			
 			DBG("RSDT: Original checksum %d, ", rsdt_mod->Checksum);			
-			            
+			
             setchecksum((struct acpi_common_header *)rsdt_mod);
 			
 			DBG("New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
@@ -1701,7 +1701,7 @@ EFI_STATUS setupAcpi(void)
 					xsdt_mod=(struct acpi_2_xsdt*)AllocateKernelMemory(xsdt->Length); 
 					memcpy(xsdt_mod, xsdt, xsdt->Length);
 				}
-               
+				
                 update_rsdp_with_xsdt(rsdp_mod, xsdt_mod);
                 
 				int xsdt_entries_num=(xsdt_mod->Length-sizeof(struct acpi_2_xsdt))/8;
@@ -1712,7 +1712,7 @@ EFI_STATUS setupAcpi(void)
 					char *table=(char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
 						continue;
-					                                        
+					
 					xsdt_entries[i-dropoffset]=xsdt_entries[i];
 					
 					char table4[5];
@@ -1726,7 +1726,7 @@ EFI_STATUS setupAcpi(void)
 							continue;
 						}
 					}
-					                    
+					
                     if ((!(oem_hpet)) && tableSign(table, "HPET"))
 					{
 						DBG("HPET found\n");
@@ -1737,7 +1737,7 @@ EFI_STATUS setupAcpi(void)
 						}
 						continue;
 					}
-                                                           
+					
                     if ((!(oem_sbst)) && tableSign(table, "SBST"))
 					{
 						DBG("SBST found\n");
@@ -1748,7 +1748,7 @@ EFI_STATUS setupAcpi(void)
 						}
 						continue;
 					}
-                                        
+					
                     if ((!(oem_ecdt)) && tableSign(table, "ECDT"))
 					{
 						DBG("ECDT found\n");
@@ -1761,7 +1761,7 @@ EFI_STATUS setupAcpi(void)
 						
 						continue;
 					}
-                                        
+					
                     if ((!(oem_asft)) && tableSign(table, "ASF!"))
 					{
 						DBG("ASF! found\n");
@@ -1773,7 +1773,7 @@ EFI_STATUS setupAcpi(void)
 						continue;
 					}
                     
-                                       
+					
                     if ((!(oem_dmar)) && tableSign(table, "DMAR"))
 					{
 						DBG("DMAR found\n");
@@ -1784,7 +1784,7 @@ EFI_STATUS setupAcpi(void)
 						}
 						continue;
 					}
-                                        
+					
                     if ((!(oem_apic)) && tableSign(table, "APIC"))
 					{
 						DBG("APIC found\n");
@@ -2006,7 +2006,7 @@ EFI_STATUS setupAcpi(void)
 		// Correct the checksum of RSDP      
 		
 		DBG("RSDP: Original checksum %d, ", rsdp_mod->Checksum);		
-		        
+		
         setRsdpchecksum(rsdp_mod);
 		
 		DBG("New checksum %d\n", rsdp_mod->Checksum);
@@ -2025,9 +2025,9 @@ EFI_STATUS setupAcpi(void)
 		
 		
         Status = Register_Acpi_Efi(rsdp_mod, version+1);
-
+		
 	}
-
+	
 #if DEBUG_DSDT
 	printf("Press a key to continue... (DEBUG_DSDT)\n");
 	getc();

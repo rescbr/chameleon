@@ -885,7 +885,7 @@ dev_prop_t ati_devprop_list[] = {
 	{FLAGTRUE,	false,	"model",					get_model_val,			STRVAL("ATI Radeon")			},
     //	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
 	{FLAGTRUE,  false,  "hda-gfx",					get_hdmiaudio,			NULVAL							},
-
+	
 	
 	{FLAGTRUE,	false,	NULL,						NULL,					NULVAL							}
 };
@@ -1012,7 +1012,7 @@ bool get_romrevision_val(value_t *val)
 	if (!card->rom)
 		return false;
     
-	val->data = malloc(val->size);
+	val->data = calloc(1, val->size);
 	
 	if (!val->data)
 		return false;
@@ -1054,7 +1054,7 @@ bool get_refclk_val(value_t *val)
 
 bool get_platforminfo_val(value_t *val)
 {
-	val->data = malloc(0x80);
+	val->data = calloc(1,0x80);
 	if (!val->data)
 		return false;
 	
@@ -1086,7 +1086,7 @@ void free_val(value_t *val)
 
 int devprop_add_list(dev_prop_t devprop_list[])
 {
-	value_t *val = malloc(sizeof(value_t));
+	value_t *val = calloc(1,sizeof(value_t));
     if (!val) {
         return -1;
     }
@@ -1181,7 +1181,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 		return false;
 	
 	card->rom_size = file_size(fd);
-	card->rom = malloc(card->rom_size);
+	card->rom = calloc(1,card->rom_size);
 	if (!card->rom)
 		return false;
 	
@@ -1235,7 +1235,7 @@ bool read_vbios(bool from_pci)
 	if (!card->rom_size)   
 		return false;    
 	
-	card->rom = malloc(card->rom_size);
+	card->rom = calloc(1,card->rom_size);
 	if (!card->rom)
 		return false;		
 	
@@ -1383,7 +1383,7 @@ bool devprop_add_pci_config_space(void)
 {
 	int offset;
 	
-	uint8_t *config_space = malloc(0x100);
+	uint8_t *config_space = calloc(1,0x100);
 	if (!config_space)
 		return false;
 	
@@ -1533,7 +1533,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
         if (!string) return false;
         safe_set_env(envEFIString,(uint32_t)string);
 	}
-		
+	
 	verbose("ATI VGA Controller [%04x:%04x] \n", 
             ati_dev->vendor_id, ati_dev->device_id);
     if (!init_card(ati_dev))
@@ -1554,7 +1554,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 #endif
 	
 	if (devprop_add_list(ati_devprop_list) == -1) return false; //fix me : remove all properties for this device
-		
+	
 	verbose("%s %dMB [%04x:%04x] (subsys [%04x:%04x]) (%s:%s) \n",
 			card->info->model_name, (uint32_t)(card->vram_size / (1024 * 1024)),
 			ati_dev->vendor_id, ati_dev->device_id,

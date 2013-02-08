@@ -502,7 +502,7 @@ void scan_cpu(void)
     }
     else if (Vendor != CPUID_VENDOR_AMD)
         do_cpuid(1, reg);
-
+	
 	Signature        = reg[eax];
 	Stepping         = bitfield(reg[eax],  3,  0);
 	Model            = bitfield(reg[eax],  7,  4);
@@ -511,7 +511,7 @@ void scan_cpu(void)
 	ExtFamily        = bitfield(reg[eax], 27, 20);
 	Brand            = bitfield(reg[ebx],  7,  0);
 	Features         = quad(reg[ecx], reg[edx]);
-    		
+	
     /* Fold extensions into family/model */
 	if (Family == 0x0f)
 		Family += ExtFamily;
@@ -543,14 +543,14 @@ void scan_cpu(void)
         if (Vendor == CPUID_VENDOR_AMD)
         {
             /* Fold in the Hardware P-State control feature bit, if present */
-           ExtFeatures |=
+			ExtFeatures |=
             reg[edx] & (uint32_t)_Bit(7);
             
             /* Fold in the read-only effective frequency interface feature bit, if present */
             ExtFeatures |=
             reg[edx] & (uint32_t)_Bit(10);
         }
-
+		
 	}    
 	
     if (Vendor == CPUID_VENDOR_AMD )
@@ -646,14 +646,14 @@ void scan_cpu(void)
 	/* End of Copyright: from Apple's XNU cpuid.c */
     
 	FSBFreq = (uint64_t)(compute_bclk() * 1000000);
-
+	
 #ifdef LEGACY_CPU
 	TSCFreq = measure_tsc_frequency();
 #endif	
 	
     if (Vendor == CPUID_VENDOR_AMD)
     {
-
+		
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_STATUS		0xC0010071
         if (ExtFeatures & _Bit(10))
@@ -754,22 +754,22 @@ void scan_cpu(void)
         DBG("%s platform detected.\n", isMobile?"Mobile":"Desktop");
     }
     else if ((Vendor == CPUID_VENDOR_INTEL) && 
-		((Family == 0x06) || 
-		 (Family == 0x0f)))
+			 ((Family == 0x06) || 
+			  (Family == 0x0f)))
 	{
 		if ((Family == 0x06 && Model >= 0x0c) || 
 			(Family == 0x0f && Model >= 0x03))
 		{
 			/* Nehalem CPU model */
 			if (Family == 0x06 && (Model == CPUID_MODEL_NEHALEM || 
-                                          Model == CPUID_MODEL_FIELDS || 
-                                          Model == CPUID_MODEL_DALES || 
-                                          Model == CPUID_MODEL_DALES_32NM || 
-                                          Model == CPUID_MODEL_WESTMERE ||
-                                          Model == CPUID_MODEL_NEHALEM_EX ||
-                                          Model == CPUID_MODEL_WESTMERE_EX ||
-                                          Model == CPUID_MODEL_SANDYBRIDGE ||
-                                          Model == CPUID_MODEL_JAKETOWN)) 
+								   Model == CPUID_MODEL_FIELDS || 
+								   Model == CPUID_MODEL_DALES || 
+								   Model == CPUID_MODEL_DALES_32NM || 
+								   Model == CPUID_MODEL_WESTMERE ||
+								   Model == CPUID_MODEL_NEHALEM_EX ||
+								   Model == CPUID_MODEL_WESTMERE_EX ||
+								   Model == CPUID_MODEL_SANDYBRIDGE ||
+								   Model == CPUID_MODEL_JAKETOWN)) 
 			{
 				uint8_t		bus_ratio_max = 0, bus_ratio_min = 0;
 				uint32_t	max_ratio = 0;
@@ -940,10 +940,10 @@ void scan_cpu(void)
 				isMobile = (rdmsr64(0x17) & (1 << 28));
 				break;
 		}
-
+		
 		DBG("%s platform detected.\n",isMobile?"Mobile":"Desktop");
 	}
-
+	
 	if (!CPUFreq) CPUFreq = TSCFreq;
     if (!TSCFreq) TSCFreq = CPUFreq;
     
@@ -960,8 +960,8 @@ void scan_cpu(void)
     
 	set_env(envCPUIDMaxBasic, cpuid_max_basic);
 	set_env(envCPUIDMaxBasic, cpuid_max_ext);
-
-    set_env_copy(envBrandString, CpuBrandString, sizeof(CpuBrandString));
+	
+    set_env_ptr(envBrandString, CpuBrandString, sizeof(CpuBrandString));
 	set_env(envSignature, Signature);    
 	set_env(envStepping,  Stepping);    
 	set_env(envFamily,	 Family);    
@@ -970,9 +970,9 @@ void scan_cpu(void)
 	set_env(envBrand,	 Brand);    
 	set_env(envFeatures,  Features);
     set_env(envExtFeatures,  ExtFeatures);
-
+	
 	set_env(envExtensions,   extensions); 
-
+	
 	set_env(envNoThreads,	 NoThreads);    
 	set_env(envNoCores,		 NoCores);
 	set_env(envIsMobile,		 isMobile);

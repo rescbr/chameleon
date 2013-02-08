@@ -284,7 +284,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
 	hostc = pci_config_read8(smbus_dev->dev.addr, 0x40);
     DBG("Scanning SMBus [%04x:%04x], mmio: 0x%x, ioport: 0x%x, hostc: 0x%x\n", 
-			smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
+		smbus_dev->vendor_id, smbus_dev->device_id, mmio, base, hostc);
 #endif
 	
     getBoolForKey("DumpSPD", &dump, DEFAULT_BOOT_CONFIG);
@@ -292,16 +292,16 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
     
     int DMIMaxMemorySlots = (int)get_env(envDMIMaxMemorySlots);
     int DMIMemModules = (int)get_env(envDMIMemModules);
-
+	
     fullBanks = (bool)(DMIMemModules == DMIMaxMemorySlots) ;
     
     // Search MAX_RAM_SLOTS slots
 	char spdbuf[MAX_SPD_SIZE];
 	
     RamSlotInfo_t *RamDIMM = get_env_ptr(envRamDimm);
-
+	
     static int	DmiDIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
-
+	
     uint64_t		RamFrequency = get_env(envRamFrequency);
     
     for (i = 0; i <  MAX_RAM_SLOTS; i++){
@@ -324,7 +324,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				case SPD_MEMORY_TYPE_SDRAM_DDR2:
 					
 					/*slot->ModuleSize = ((1 << (slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17) * 
-										((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);*/
+					 ((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);*/
 					
 					slot->ModuleSize = ((1 << ((slot->spd[SPD_NUM_ROWS] & 0x0f) + (slot->spd[SPD_NUM_COLUMNS] & 0x0f) - 17)) * 
 										((slot->spd[SPD_NUM_DIMM_BANKS] & 0x7) + 1) * slot->spd[SPD_NUM_BANKS_PER_SDRAM]);
@@ -374,8 +374,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 					slot->PartNo,
 					slot->SerialNo); 
 #if DEBUG_SPD			
-				dumpPhysAddr("spd content: ",slot->spd, spd_size);
-				getc();
+			dumpPhysAddr("spd content: ",slot->spd, spd_size);
+			getc();
 #endif           
         }
         // laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
@@ -387,28 +387,28 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 		
     } // for
     
-    safe_set_env_copy(envDmiDimm, DmiDIMM, sizeof(DmiDIMM));
-
+    safe_set_env_ptr(envDmiDimm, DmiDIMM, sizeof(DmiDIMM));
+	
 }
 
 static struct smbus_controllers_t smbus_controllers[] = {
-		
-		{0x8086, 0x269B, "ESB2",read_smb_intel },
-		{0x8086, 0x25A4, "6300ESB",read_smb_intel },
-		{0x8086, 0x24C3, "ICH4",read_smb_intel },
-		{0x8086, 0x24D3, "ICH5",read_smb_intel },
-		{0x8086, 0x266A, "ICH6",read_smb_intel },
-		{0x8086, 0x27DA, "ICH7",read_smb_intel },
-		{0x8086, 0x283E, "ICH8",read_smb_intel },
-		{0x8086, 0x2930, "ICH9",read_smb_intel },
-		{0x8086, 0x3A30, "ICH10R",read_smb_intel },
-		{0x8086, 0x3A60, "ICH10B",read_smb_intel },
-		{0x8086, 0x3B30, "5 Series",read_smb_intel },
-		{0x8086, 0x1C22, "6 Series",read_smb_intel },
-		{0x8086, 0x1E22, "7 Series",read_smb_intel },
-		{0x8086, 0x5032, "EP80579",read_smb_intel },
-		{0x8086, 0x1D22, "X79 Series",read_smb_intel },
-		
+	
+	{0x8086, 0x269B, "ESB2",read_smb_intel },
+	{0x8086, 0x25A4, "6300ESB",read_smb_intel },
+	{0x8086, 0x24C3, "ICH4",read_smb_intel },
+	{0x8086, 0x24D3, "ICH5",read_smb_intel },
+	{0x8086, 0x266A, "ICH6",read_smb_intel },
+	{0x8086, 0x27DA, "ICH7",read_smb_intel },
+	{0x8086, 0x283E, "ICH8",read_smb_intel },
+	{0x8086, 0x2930, "ICH9",read_smb_intel },
+	{0x8086, 0x3A30, "ICH10R",read_smb_intel },
+	{0x8086, 0x3A60, "ICH10B",read_smb_intel },
+	{0x8086, 0x3B30, "5 Series",read_smb_intel },
+	{0x8086, 0x1C22, "6 Series",read_smb_intel },
+	{0x8086, 0x1E22, "7 Series",read_smb_intel },
+	{0x8086, 0x5032, "EP80579",read_smb_intel },
+	{0x8086, 0x1D22, "X79 Series",read_smb_intel },
+	
 };
 
 bool is_smbus_controller(pci_dt_t* pci_dt)

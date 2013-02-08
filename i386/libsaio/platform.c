@@ -1,7 +1,7 @@
 /*
  *  platform_env.c
  * 
- * Copyright 2012 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
+ * Copyright 2012-2013 Cadet-petit Armel <armelcadetpetit@gmail.com>. All rights reserved.
  */
 
 #include "libsaio.h"
@@ -81,19 +81,21 @@ struct env_struct {
     UT_hash_handle hh;         /* makes this structure hashable */
 };
 
-static int CopyVarPtr (struct env_struct *var, void* ptr, size_t size);
+static int SetVarPtr (struct env_struct *var, void* ptr, size_t size);
 static struct env_struct *find_env(const char *name);
-static void _re_set_env_copy(struct env_struct *var , void* ptr,size_t size);
+static void _re_set_env_ptr(struct env_struct *var , void* ptr,size_t size);
 struct env_struct *platform_env = NULL;
 
 
-static int CopyVarPtr (struct env_struct *var, void* ptr, size_t size)
+static int SetVarPtr (struct env_struct *var, void* ptr, size_t size)
 {
     var->ptr = malloc(size);
     if (!var->ptr) {
         return 0;
     }
-    memcpy(var->ptr, ptr, size);
+	bzero(var->ptr,size);
+	if (ptr)         
+		memcpy(var->ptr, ptr, size);
     return 1;
 }
 
@@ -115,7 +117,7 @@ static struct env_struct *find_env(const char *name) {
     return var;
 }
 
-static void _re_set_env_copy(struct env_struct *var , void* ptr,size_t size) {
+static void _re_set_env_ptr(struct env_struct *var , void* ptr,size_t size) {
     
 	if (var->Type == kEnvPtr) {
 		return ;
@@ -126,24 +128,24 @@ static void _re_set_env_copy(struct env_struct *var , void* ptr,size_t size) {
         var->ptr = NULL;
     }
     
-    CopyVarPtr(var, ptr,  size);
+    SetVarPtr(var, ptr,  size);
 	
 	return;    
 }
 
-void re_set_env_copy(const char *name , void* ptr,size_t size) {
+void re_set_env_ptr(const char *name , void* ptr,size_t size) {
 	struct env_struct *var;
     
 	var = find_env(name);
 	if (!var|| (var->Type == kEnvPtr)) {
-		printf("re_set_env_copy: Unable to find environement variable %s\n",name);
+		printf("re_set_env_ptr: Unable to find environement variable %s\n",name);
 #if DEBUG_PLATFORM
         getc();
 #endif
 		return ;
 	} 
     
-    _re_set_env_copy(var , ptr, size);
+    _re_set_env_ptr(var , ptr, size);
 	
 	return;    
 }
@@ -155,8 +157,10 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
     if (!var) {
         return;
     }
+	bzero(var,sizeof(struct env_struct));
+	
     if (Type == kEnvPtr) {
-        if (!CopyVarPtr( var,  ptr, size)) 
+        if (!SetVarPtr( var,  ptr, size)) 
 		{
 			free(var);
 			return;
@@ -165,7 +169,10 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
     else if (Type == kEnvValue) 
         var->value = value;
     else
+	{
+		free(var);
         return;
+	}
     
     var->Type = Type;    
     
@@ -192,7 +199,7 @@ static void _set_env(const char *name, unsigned long long value,  enum envtype T
 		if (Type == kEnvPtr && var->ptr) free(var->ptr);
 		free(var->name);
 		free(var);
-
+		
 	}	
 }
 
@@ -221,24 +228,25 @@ void set_env(const char *name, unsigned long long value ) {
     _set_env(name, value, kEnvValue,0,0);
 }
 
-void set_env_copy(const char *name, void * ptr, size_t size ) {
+int set_env_ptr(const char *name, void * ptr, size_t size ) {
     _set_env(name, 0, kEnvPtr,ptr,size);
+	return 0;
 }
 
-unsigned long long get_env_var(const char *name) {
+unsigned long long get_env_value(const char *name) {
 	struct env_struct *var;
     
 	var = find_env(name);
 	if (!var) {
 #if DEBUG_PLATFORM
-		printf("get_env_var: Unable to find environement variable %s\n",name);
+		printf("get_env_value: Unable to find environement variable %s\n",name);
         getc();
 #endif
 		return 0;
 	}
     
     if (var->Type != kEnvValue) {
-        printf("get_env_var: Variable %s is not a value\n",name);
+        printf("get_env_value: Variable %s is not a value\n",name);
 #if DEBUG_PLATFORM
         getc();
 #endif
@@ -251,7 +259,7 @@ unsigned long long get_env_var(const char *name) {
 
 unsigned long long get_env(const char *name) {	
 	
-	return get_env_var(name);;
+	return get_env_value(name);
     
 }
 
@@ -301,17 +309,17 @@ static void _safe_set_env(const char *name, unsigned long long value,  enum envt
         if (Type == kEnvValue) 
             var->value = value;
         else if (Type == kEnvPtr)
-            _re_set_env_copy(var,ptr,size);            
+            _re_set_env_ptr(var,ptr,size);            
     }
 	
 	return;    
 }
 
-void safe_set_env_copy(const char *name , void * ptr, size_t size ) {
+int safe_set_env_ptr(const char *name , void * ptr, size_t size ) {
     
     _safe_set_env(name, 0, kEnvPtr,ptr,size);
 	
-	return;    
+	return 0;
 }
 
 void safe_set_env(const char *name , unsigned long long value) {
@@ -376,7 +384,7 @@ void free_platform_env(void) {
 			HASH_DEL(platform_env,current_var);
             if (current_var->name) free(current_var->name);
 			if (current_var->Type == kEnvPtr && current_var->ptr) free(current_var->ptr);
-
+			
 		}
 		free(current_var);
 	}

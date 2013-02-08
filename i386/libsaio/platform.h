@@ -200,8 +200,8 @@ typedef struct _RamSlotInfo_t {
 #define envVBEModeInfoBlock		"boot.video.VBEModeInfoBlock"
 
 /* helpers ... */
-#define set_errno(x) safe_set_env(envErrno,x)
-#define get_errno()  ((int)get_env(envErrno))
+//#define set_errno(x) safe_set_env(envErrno,x)
+//#define get_errno()  ((int)get_env(envErrno))
 
 #if UNUSED
 typedef struct _PlatformInfo_t {

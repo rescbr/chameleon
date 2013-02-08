@@ -170,34 +170,15 @@ extern caddr_t brk(caddr_t x);
  */
 extern void   free(void * start);
 extern void * realloc(void * ptr, size_t size);
+#if 0
+extern void * reallocf(void * ptr, size_t size);
+#endif
 extern void * malloc(size_t size);
 extern void * calloc(size_t number, size_t size);
 
 extern size_t malloc_usable_size(const void *ptr);
 extern int posix_memalign(void **memptr, size_t alignment, size_t size);
 extern void	malloc_print_stats(void);
-
-__attribute__ ((__unused__)) static void *reallocf(void *p, size_t size)
-{
-	void *newp;
-	newp = realloc(p,size );
-	if (! newp)
-		free(p);
-	return (newp );
-}
-
-__attribute__ ((__unused__)) static void * mallocCopy (size_t size,void *p)
-{
-    void  *newp;
-    
-    if (p == NULL) return NULL;
-    
-    newp = malloc( size );
-    if (newp != NULL) {
-        memcpy(newp, p, size);
-    }
-    return newp;
-}
 
 extern int	 ffs(int);
 

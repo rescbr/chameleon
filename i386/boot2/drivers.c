@@ -122,11 +122,11 @@ InitDriverSupport( void )
     
     if (DriverSet == true)  return 0;    
     
-    gExtensionsSpec = malloc( DEFAULT_DRIVER_SPEC_SIZE );
-    gDriverSpec     = malloc( DEFAULT_DRIVER_SPEC_SIZE );
-    gFileSpec       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
-    gTempSpec       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
-    gFileName       = malloc( DEFAULT_DRIVER_SPEC_SIZE );
+    gExtensionsSpec = calloc( DEFAULT_DRIVER_SPEC_SIZE, sizeof(char) );
+    gDriverSpec     = calloc( DEFAULT_DRIVER_SPEC_SIZE, sizeof(char) );
+    gFileSpec       = calloc( DEFAULT_DRIVER_SPEC_SIZE, sizeof(char) );
+    gTempSpec       = calloc( DEFAULT_DRIVER_SPEC_SIZE, sizeof(char) );
+    gFileName       = calloc( DEFAULT_DRIVER_SPEC_SIZE, sizeof(char) );
     
     if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
     {
@@ -335,7 +335,7 @@ FileLoadDrivers( char * dirSpec, long size, long plugin )
 		
         if (!plugin)
             snprintf(gDriverSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%sPlugIns", dirSpec, gFileName,
-                    (bundleType == kCFBundleType2) ? "Contents/" : "");
+					 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         ret = LoadDriverPList(dirSpec, gFileName, bundleType);
 		
@@ -450,10 +450,10 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         // Save the driver path.
         
         snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%s", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+				 (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 		
-        tmpExecutablePath = malloc(executablePathLength);
+        tmpExecutablePath = calloc(executablePathLength, sizeof(char));
         if (tmpExecutablePath == 0) break;
 		
         strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
@@ -461,7 +461,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s", dirSpec, name);
         bundlePathLength = strlen(gFileSpec) + 1;
 		
-        tmpBundlePath = malloc(bundlePathLength);
+        tmpBundlePath = calloc(bundlePathLength, sizeof(char));
         if (tmpBundlePath == 0) break;
 		
         strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
@@ -469,7 +469,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         // Construct the file spec to the plist, then load it.
 		
         snprintf(gFileSpec, DEFAULT_DRIVER_SPEC_SIZE,"%s/%s/%sInfo.plist", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/" : "");
+				 (bundleType == kCFBundleType2) ? "Contents/" : "");
 		
         length = LoadFile(gFileSpec);
         if (length == -1) break;
@@ -477,6 +477,8 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         length = length + 1;
         buffer = malloc(length);
         if (buffer == 0) break;
+		
+		bzero(buffer,length);
 		
         strlcpy(buffer, (char *)kLoadAddr, length);
 		
@@ -486,7 +488,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
         if (ret != 0) { break; }
 		
 		if (!module) {ret = -1;break;} // Should never happen but it will make the compiler happy
-
+		
         // Allocate memory for the driver path and the plist.
 		
         module->executablePath = tmpExecutablePath;
@@ -500,6 +502,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 			ret = -1;
             break;
         }
+		bzero(module->plistAddr,length);
 		
         // Save the driver path in the module.
         //strcpy(module->driverPath, tmpDriverPath);
@@ -759,6 +762,7 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
         XMLFreeTag(moduleDict);
         return -1;
     }
+	bzero(tmpModule,sizeof(Module));
     tmpModule->dict = moduleDict;
 	
     // For now, load any module that has OSBundleRequired != "Safe Boot".
@@ -807,6 +811,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			printf("Unable to allocate memory for uncompressed kernel\n");
             return -1;
 		}
+		bzero(binary,uncompressed_size);
 		
         size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
                                OSSwapBigToHostInt32(kernel_header->compressed_size));

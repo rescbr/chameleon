@@ -1,6 +1,6 @@
 /*
-    File added by David F. Elliott <dfe@cox.net> on 2007/06/26
-*/
+ File added by David F. Elliott <dfe@cox.net> on 2007/06/26
+ */
 
 #include "libsaio.h"
 #include "boot.h"
@@ -36,10 +36,10 @@ void dochainload();
 // be exactly 4 bytes above the address of the return address.
 // It is intended to be used as an lvalue with a statement like this -= OFFSET_1MEG;
 #define RETURN_ADDRESS_USING_FIRST_ARG(arg) \
-    (*(uint32_t*)((char*)&(arg) - 4))
+(*(uint32_t*)((char*)&(arg) - 4))
 
 #define FIX_RETURN_ADDRESS_USING_FIRST_ARG(arg) \
-    RETURN_ADDRESS_USING_FIRST_ARG(arg) -= OFFSET_1MEG
+RETURN_ADDRESS_USING_FIRST_ARG(arg) -= OFFSET_1MEG
 
 extern void jump_to_chainbooter(void);
 extern unsigned char chainbootdev;
@@ -89,18 +89,18 @@ void multiboot_to_boot(int multiboot_magic, struct multiboot_info *mi_orig)
 void chainLoad(void)
 {
     /*  TODO: We ought to load the appropriate partition table, for example
-        the MBR if booting a primary partition or the particular extended
-        partition table if booting a logical drive.  For example, the
-        regular MS MBR booter will relocate itself (e.g. the MBR) from
-        0:7C00 to 0:0600 and will use SI as the offset when reading
-        the partition data from itself.  Thus when it jumps to the partition
-        boot sector, SI will be 0x600 + 446 + i<<4 where i is the partition
-        table index.
-    
-        On the other hand, our code for the non-Multiboot case doesn't do
-        this either, although GRUB does.
+	 the MBR if booting a primary partition or the particular extended
+	 partition table if booting a logical drive.  For example, the
+	 regular MS MBR booter will relocate itself (e.g. the MBR) from
+	 0:7C00 to 0:0600 and will use SI as the offset when reading
+	 the partition data from itself.  Thus when it jumps to the partition
+	 boot sector, SI will be 0x600 + 446 + i<<4 where i is the partition
+	 table index.
+	 
+	 On the other hand, our code for the non-Multiboot case doesn't do
+	 this either, although GRUB does.
      */
-
+	
     const unsigned char *bootcode = (const unsigned char*)0x7c00;
     if(bootcode[0x1fe] == 0x55 && bootcode[0x1ff] == 0xaa)
     {
@@ -141,15 +141,15 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
 
 
 /*!
-    Returns a pointer to the first safe address we can use for stowing the multiboot info.
-    This might actually be a bit pedantic because mboot.c32 and GRUB both stow the multiboot
-    info in low memory meaning that the >= 128 MB location we choose is plenty high enough.
+ Returns a pointer to the first safe address we can use for stowing the multiboot info.
+ This might actually be a bit pedantic because mboot.c32 and GRUB both stow the multiboot
+ info in low memory meaning that the >= 128 MB location we choose is plenty high enough.
  */
 void *determine_safe_hi_addr(int multiboot_magic, struct multiboot_info *mi_orig)
 {
     // hi_addr must be at least up in 128MB+ space so it doesn't get clobbered
     void *hi_addr = (void*)PREBOOT_DATA;
-
+	
     // Fail if the magic isn't correct.  We'll complain later.
     if(multiboot_magic != MULTIBOOT_INFO_MAGIC)
         return NULL;
@@ -192,16 +192,16 @@ void *determine_safe_hi_addr(int multiboot_magic, struct multiboot_info *mi_orig
         }
     }
     // TODO: Copy syms (never needed), mmap, drives, config table, loader name, apm table, VBE info
-
+	
     // Round up to page size
     hi_addr = (void*)(((uint32_t)hi_addr + 0xfff) & ~(uint32_t)0xfff);
     return hi_addr;
 }
 
 /*!
-    Like malloc but with a preceding input/output parameter which points to the next available
-    location for data.  The original value of *hi_addr is returned and *hi_addr is incremented
-    by size bytes.
+ Like malloc but with a preceding input/output parameter which points to the next available
+ location for data.  The original value of *hi_addr is returned and *hi_addr is incremented
+ by size bytes.
  */
 void * _hi_malloc(void **hi_addr, size_t size)
 {
@@ -211,9 +211,9 @@ void * _hi_malloc(void **hi_addr, size_t size)
 }
 
 /*!
-    Like strdup but with a preceding input/output parameter.  The original value of *hi_addr is
-    returned and *hi_addr is incremented by the number of bytes necessary to complete the string
-    copy including its NUL terminator.
+ Like strdup but with a preceding input/output parameter.  The original value of *hi_addr is
+ returned and *hi_addr is incremented by the number of bytes necessary to complete the string
+ copy including its NUL terminator.
  */
 char * _hi_strdup(void **hi_addr, char *src)
 {
@@ -231,16 +231,19 @@ char * _hi_strdup(void **hi_addr, char *src)
 #define hi_strdup(src) _hi_strdup(&hi_addr, (src))
 
 /*!
-    Copies the Multiboot info and any associated data (e.g. various strings and any multiboot modules)
-    up to very high RAM (above 128 MB) to ensure it doesn't get clobbered by the booter.
+ Copies the Multiboot info and any associated data (e.g. various strings and any multiboot modules)
+ up to very high RAM (above 128 MB) to ensure it doesn't get clobbered by the booter.
  */
 struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_info *mi_orig)
 {
     void *hi_addr = determine_safe_hi_addr(multiboot_magic, mi_orig);
     if(hi_addr == NULL)
         return NULL;
-        
+	
     struct multiboot_info *mi_copy = hi_malloc(sizeof(struct multiboot_info));
+	if (!mi_copy) {
+		iloop();
+	}
     memcpy(mi_copy, mi_orig, sizeof(struct multiboot_info));
     
     // Copy the command line
@@ -257,10 +260,12 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
     if(mi_orig->mi_flags & MULTIBOOT_INFO_HAS_MODS)
     {        
         struct multiboot_module *dst_modules = hi_malloc(sizeof(struct multiboot_module) * mi_orig->mi_mods_count);
-
+		if (!dst_modules) {
+			iloop();
+		}
         struct multiboot_module *src_modules = (void*)mi_orig->mi_mods_addr;
         mi_copy->mi_mods_addr = (uint32_t)dst_modules;
-
+		
         // Copy all of the module info plus the actual module into high memory
         uint32_t i;
         for(i=0; i < mi_orig->mi_mods_count; ++i)
@@ -268,8 +273,11 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
             // Assume mod_end is 1 past the actual end (i.e. it is start + size, not really end (i.e. start + size - 1))
             // This is what GRUB and mboot.c32 do although the spec is unclear on this.
             uint32_t mod_length = src_modules[i].mm_mod_end - src_modules[i].mm_mod_start;
-
+			
             dst_modules[i].mm_mod_start = (uint32_t)hi_malloc(mod_length);
+			if (!dst_modules[i].mm_mod_start) {
+				iloop();
+			}
             dst_modules[i].mm_mod_end = (uint32_t)dst_modules[i].mm_mod_start + mod_length;
             memcpy((char*)dst_modules[i].mm_mod_start, (char*)src_modules[i].mm_mod_start, mod_length);
             
@@ -279,7 +287,7 @@ struct multiboot_info * copyMultibootInfo(int multiboot_magic, struct multiboot_
     }
     // Make sure that only stuff that didn't need to be copied or that we did deep copy is indicated in the copied struct.
     mi_copy->mi_flags &= MULTIBOOT_INFO_HAS_MEMORY | MULTIBOOT_INFO_HAS_BOOT_DEVICE | MULTIBOOT_INFO_HAS_CMDLINE | MULTIBOOT_INFO_HAS_LOADER_NAME | MULTIBOOT_INFO_HAS_MODS;
-
+	
     return mi_copy;
 }
 
@@ -295,7 +303,7 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // makes a BIOS call from real mode which of course won't work
     // because we're stuck in extended memory at this point.
     struct multiboot_info *mi_p = copyMultibootInfo(multiboot_magic, mi_orig);	
-
+	
 	if (mi_p == NULL) 
         return BAD_BOOT_DEVICE;
 #if 0	
@@ -317,34 +325,34 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // instruction pointer ( current minus 1 MB ).  It does not fix our return
     // address nor does it fix the return address of our caller.
     continue_at_low_address();
-
+	
 	// Now fix our return address.	
     FIX_RETURN_ADDRESS_USING_FIRST_ARG(multiboot_magic);
 	
     // We can now do just about anything, including return to our caller correctly.
     // However, our caller must fix his return address if he wishes to return to
     // his caller and so on and so forth.
-
-
+	
+	
 	
     /*  Zero the BSS and initialize malloc */
     initialize_runtime();
-
+	
     //gMI = mi_p;
-
+	
     /*  Set up a temporary bootArgs so we can call console output routines
-        like printf that check the v_display.  Note that we purposefully
-        do not initialize anything else at this early stage.
-
-        We are reasonably sure we're already in text mode if GRUB booted us.
-        This is the same assumption that initKernBootStruct makes.
-        We could check the multiboot info I guess, but why bother?
+	 like printf that check the v_display.  Note that we purposefully
+	 do not initialize anything else at this early stage.
+	 
+	 We are reasonably sure we're already in text mode if GRUB booted us.
+	 This is the same assumption that initKernBootStruct makes.
+	 We could check the multiboot info I guess, but why bother?
      */
     boot_args temporaryBootArgsData;
     bzero(&temporaryBootArgsData, sizeof(boot_args));
     bootArgs = &temporaryBootArgsData;
     bootArgs->Video.v_display = VGA_TEXT_MODE;
-
+	
     // Since we call multiboot ourselves, its return address will be correct.
     // That is unless it's inlined in which case it does not matter.
     uint32_t bootdevice = multiboot(multiboot_magic, mi_p);
@@ -370,11 +378,11 @@ static inline uint32_t multiboot(int multiboot_magic, struct multiboot_info *mi)
     printf("Multiboot info @0x%x\n", (uint32_t)mi);
     if(mi->mi_flags & MULTIBOOT_INFO_HAS_LOADER_NAME)
         printf("Loaded by %s\n", mi->mi_loader_name);
-
+	
     // Multiboot puts boot device in high byte
     // Normal booter wants it in low byte
     uint32_t bootdevice = mi->mi_boot_device_drive;
-
+	
     //bool doSelectDevice = false;
     if(mi->mi_flags & MULTIBOOT_INFO_HAS_BOOT_DEVICE)
     {

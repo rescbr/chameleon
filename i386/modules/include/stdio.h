@@ -61,13 +61,11 @@
 #ifndef	_STDIO_H_
 #define	_STDIO_H_
 
+#include <sys/types.h>
 #include <sys/cdefs.h>
 #include <Availability.h>
 
 #include <_types.h>
-#include "saio_types.h"
-#include "platform.h"
-
 
 #ifndef _VA_LIST
 #define _VA_LIST
@@ -163,8 +161,6 @@ typedef	struct __sFILE {
 	fpos_t	_offset;	/* current lseek offset (see WARNING) */
 } FILE;
 
-
-
 __BEGIN_DECLS
 extern FILE *__stdinp;
 extern FILE *__stdoutp;
@@ -238,10 +234,6 @@ __END_DECLS
 #endif
 #endif
 
-#define	 STDIN_FILENO	0	/* standard input file descriptor */
-#define	STDOUT_FILENO	1	/* standard output file descriptor */
-#define	STDERR_FILENO	2	/* standard error file descriptor */
-
 /* ANSI-C */
 
 __BEGIN_DECLS
@@ -253,16 +245,10 @@ int	 fgetc(FILE *);
 int	 fgetpos(FILE * __restrict, fpos_t *);
 char *fgets(char * __restrict, int, FILE *);
 FILE	*fopen(const char * __restrict, const char * __restrict) ;
-
 int	 fprintf(FILE * __restrict, const char * __restrict, ...);
 int	 fputc(int, FILE *);
-
 int	 fputs(const char * __restrict, FILE * __restrict);
-
 size_t	 fread(void * __restrict, size_t, size_t, FILE * __restrict);
-
-FILE	*freopen(const char * __restrict, const char * __restrict,
-                 FILE * __restrict);
 FILE	*fdopen(int, const char *);
 
 int	 fscanf(FILE * __restrict, const char * __restrict, ...) __scanflike(2, 3);
@@ -271,22 +257,25 @@ int	 fsetpos(FILE *, const fpos_t *);
 long	 ftell(FILE *);
 size_t	 fwrite(const void * __restrict, size_t, size_t, FILE * __restrict) ;
 
+int	 printf(const char * __restrict, ...) __printflike(1, 2);
+int	 putc(int, FILE *);
+int putchar(int);
 void puts(const char *);
 int ungetc(int , FILE *);
 int ungetchar(int );
-
-extern FILE *stdin;
-extern FILE *stdout;
-extern FILE *stderr;
-int	 fseeko(FILE *, off_t, int);
-off_t	 ftello(FILE *);
-int
-vfprintf(FILE *fp, const char *fmt0, va_list ap);
+int	 sprintf(char * __restrict, const char * __restrict, ...) __printflike(2, 3);
+int	 ungetc(int, FILE *);
+int	 vfprintf(FILE * __restrict, const char * __restrict, va_list) __printflike(2, 0);
 __END_DECLS
 
 /* Additional functionality provided by:
  * POSIX.1-1988
  */
+#if __DARWIN_C_LEVEL >= 198808L
+__BEGIN_DECLS
+int	 fileno(FILE *);
+__END_DECLS
+#endif /* __DARWIN_C_LEVEL >= 198808L */
 
 
 /* Additional functionality provided by:
@@ -295,18 +284,12 @@ __END_DECLS
  * and the omnibus ISO/IEC 9945-1: 1996
  */
 
-//#if __DARWIN_C_LEVEL >= 199506L
-
-
+#if __DARWIN_C_LEVEL >= 199506L
 #define	__sfeof(p)	(((p)->_flags & __SEOF) != 0)
 #define	__sferror(p)	(((p)->_flags & __SERR) != 0)
 #define	__sclearerr(p)	((void)((p)->_flags &= ~(__SERR|__SEOF)))
 #define	__sfileno(p)	((p)->_file)
-
-
-
-
-//#endif /* __DARWIN_C_LEVEL >= 199506L */
+#endif /* __DARWIN_C_LEVEL >= 199506L */
 
 
 
@@ -320,7 +303,19 @@ __END_DECLS
 #define	_OFF_T
 typedef	__darwin_off_t		off_t;
 #endif
+
+__BEGIN_DECLS
+int	 fseeko(FILE *, off_t, int);
+off_t	 ftello(FILE *);
+__END_DECLS
 #endif /* __DARWIN_C_LEVEL >= 200112L */
+
+#if __DARWIN_C_LEVEL >= 200112L || defined(_C99_SOURCE) || defined(__cplusplus)
+__BEGIN_DECLS
+int	 snprintf(char * __restrict, size_t, const char * __restrict, ...) __printflike(3, 4);
+int	 vsnprintf(char * __restrict, size_t, const char * __restrict, va_list) __printflike(3, 0);
+__END_DECLS
+#endif /* __DARWIN_C_LEVEL >= 200112L || defined(_C99_SOURCE) || defined(__cplusplus) */
 
 /* Additional functionality provided by:
  * POSIX.1-2008
@@ -336,9 +331,12 @@ typedef __darwin_ssize_t        ssize_t;
 
 
 
-
-
-
+/*
+ * Stdio function-access interface.
+ */
+#if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
+#define	fileno_unlocked(p)	__sfileno(p)
+#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
 
 
 #endif /* _STDIO_H_ */

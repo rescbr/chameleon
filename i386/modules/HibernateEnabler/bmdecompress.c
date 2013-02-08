@@ -152,7 +152,7 @@ PreviewDecompress32(uint32_t * compressBuffer,
     uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
 	
 	if (!sc0 || !sc1 || !sc2 || !sc3) return;
-
+	
 	
     uint32_t   sr0, sr1, sr2, sr3;
     
@@ -246,20 +246,27 @@ PreviewDecompress32(uint32_t * compressBuffer,
 void *
 DecompressData(void *srcbase, int *dw, int *dh, int *bitsPerPixel)
 {
-    uint32_t * src = (uint32_t *) srcbase;
+    uint32_t * src = (uint32_t *) srcbase, size;
 	void * ret;
     
     *bitsPerPixel = 8 * ((int) src[0]);
 	*dw = (int) src[1];
 	*dh = (int) src[2];
 	
-	ret = malloc ((*dw * *dh * *bitsPerPixel)/ 8);
+	size = (*dw * *dh * *bitsPerPixel)/ 8;
+	if (!size) 
+	{
+		return 0;
+	}
+	
+	ret = malloc (size);
     
     if (!ret) 
     {
         return 0;
     }
-    
+	bzero(ret, size);
+	
     switch(*bitsPerPixel)
     {
         case 32:

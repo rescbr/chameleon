@@ -19,15 +19,14 @@
 #  define ZLIB_INTERNAL
 #endif
 
-#include "libsa.h"
 #include "zlib.h"
 
 #ifdef STDC
 #  if !(defined(_WIN32_WCE) && defined(_MSC_VER))
 #    include <stddef.h>
 #  endif
-//#  include <string.h>
-//#  include <stdlib.h>
+#  include <string.h>
+#  include <stdlib.h>
 #endif
 
 #ifndef local
@@ -244,7 +243,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 
 /* Diagnostic functions */
 #ifdef DEBUG
-#  include "stdio.h"
+#  include <stdio.h>
    extern int ZLIB_INTERNAL z_verbose;
    extern void ZLIB_INTERNAL z_error OF((char *m));
 #  define Assert(cond,msg) {if(!(cond)) z_error(msg);}

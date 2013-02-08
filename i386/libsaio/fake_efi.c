@@ -82,10 +82,11 @@ static VOID efi_setupDeviceProperties(Node *node);
 
 static inline char * mallocStringForGuid(EFI_GUID const *pGuid)
 {
-	char *string = malloc(37);
+	char *string = calloc(37,sizeof(char));
     if (!string) {
 #if DEBUG_EFI
         char string_d[37];
+		bzero(string_d,37);
         efi_guid_unparse_upper(pGuid, string_d, sizeof(string_d));
         printf("Couldn't allocate Guid String for %s\n", string_d);        
 #endif
@@ -494,10 +495,10 @@ bootArgs->efiMode = kBootArgsEfiMode##mode;\
 
 /* These should be const but DT__AddProperty takes char* */
 #if UNUSED
-static const char const TSC_Frequency_prop[] = "TSCFrequency";
-static const char const CPU_Frequency_prop[] = "CPUFrequency";
+static const char TSC_Frequency_prop[] = "TSCFrequency";
+static const char CPU_Frequency_prop[] = "CPUFrequency";
 #endif
-static const char const FSB_Frequency_prop[] = "FSBFrequency";
+static const char FSB_Frequency_prop[] = "FSBFrequency";
 
 /*==========================================================================
  * SMBIOS
@@ -541,7 +542,7 @@ EFI_STATUS Register_Acpi_Efi(void* rsd_p, unsigned char rev )
 	{
 		Status = setupAcpiNoMod();
 	}
-		
+	
 	
 	return Status;	
 }
@@ -554,7 +555,7 @@ static EFI_STATUS EFI_FindAcpiTables(VOID)
 	{
 		return EFI_SUCCESS;
 	}
-
+	
 	if (!FindAcpiTables(&acpi_tables))
 	{
 		printf("Failed to detect ACPI tables.\n");
@@ -568,7 +569,7 @@ static EFI_STATUS EFI_FindAcpiTables(VOID)
 		ret = EFI_SUCCESS;
 	}
 	return ret;
-
+	
 }
 
 /* Setup ACPI without any patch. */
@@ -624,22 +625,22 @@ EFI_STATUS setup_acpi (VOID)
  */
 
 /* These should be const but DT__AddProperty takes char* */
-static const char const FIRMWARE_REVISION_PROP[] = "firmware-revision";
-static const char const FIRMWARE_ABI_PROP[] = "firmware-abi";
-static const char const FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char const FIRMWARE_NAME_PROP[] = "firmware-name";
-static const char const FIRMWARE_DATE_PROP[] = "firmware-date";
-static const char const FIRMWARE_DEV_PROP[] = "firmware-maintener";
-static const char const FIRMWARE_PUBLISH_PROP[] = "firmware-publisher";
+static const char FIRMWARE_REVISION_PROP[] = "firmware-revision";
+static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
+static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
+static const char FIRMWARE_NAME_PROP[] = "firmware-name";
+static const char FIRMWARE_DATE_PROP[] = "firmware-date";
+static const char FIRMWARE_DEV_PROP[] = "firmware-maintener";
+static const char FIRMWARE_PUBLISH_PROP[] = "firmware-publisher";
 
 
-static const char const FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
-static const char const FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
-static const char const SYSTEM_ID_PROP[] = "system-id";
-static const char const SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
-static const char const SYSTEM_TYPE_PROP[] = "system-type";
-static const char const MODEL_PROP[] = "Model";
-static const char const MOTHERBOARD_NAME_PROP[] = "motherboard-name";
+static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
+static const char SYSTEM_ID_PROP[] = "system-id";
+static const char SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
+static const char SYSTEM_TYPE_PROP[] = "system-type";
+static const char MODEL_PROP[] = "Model";
+static const char MOTHERBOARD_NAME_PROP[] = "motherboard-name";
 
 
 /*
@@ -670,7 +671,8 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
     {
         goto error;
     }
-    
+    bzero(dst, *len);
+	
 	{
 		size_t		 i = 0;
 		for (; i < (tmp_len); i++)	 dst[i] = src[i];
@@ -778,9 +780,9 @@ static int8_t *getSystemID(VOID)
 out:	
 	if (ret)
 	{      
-
+		
 		memcpy(sysid, ret, UUID_LEN);
-        set_env_copy(envSysId, sysid, sizeof(sysid));
+        set_env_ptr(envSysId, sysid, sizeof(sysid));
 	}
 	
 	return sysid;
@@ -829,7 +831,7 @@ static VOID setupEfiDeviceTree(VOID)
             if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
             {
                 AllocateMemoryRange( "FailedCLUT", clut, size);
-            
+				
             } else
                 AllocateMemoryRange( "BootCLUT", clut, size);
 			
@@ -842,7 +844,7 @@ static VOID setupEfiDeviceTree(VOID)
             if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] == '8') 
             {
                 AllocateMemoryRange( "FailedImage", bootPict, size);    
-            
+				
             } else
                 AllocateMemoryRange( "Pict-FailedBoot", bootPict, size);    
             

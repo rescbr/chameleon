@@ -22,6 +22,7 @@ void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 	char * buf=malloc (EX2ProbeSize);
 	if (!buf)
 		return;
+	bzero(buf,EX2ProbeSize );
     str[0]=0;
 	Seek(ih, 0);
 	Read(ih, (long)buf, EX2ProbeSize);

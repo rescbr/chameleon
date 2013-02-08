@@ -316,7 +316,7 @@ long GetFileInfo(const char * dirSpec, const char * name,
     const char * entryName;
 	
     if (gMakeDirSpec == 0)
-        gMakeDirSpec = (char *)malloc(1024);
+        gMakeDirSpec = (char *)calloc(1024,sizeof(char));
 	
 	if (!gMakeDirSpec) return -1;
 	
@@ -422,7 +422,7 @@ static int open_bvr(BVRef bvr, const char *filePath)
 }
 
 
-int open(const char *path)
+int open(const char *path, int mode)
 {
 	const char	*filepath;
 	BVRef		bvr;
@@ -446,7 +446,7 @@ int open_bvdev(const char *bvd, const char *path)
 	int			unit;
 	int			partition;
 	
-	if ((i = open(path)) >= 0) {
+	if ((i = open(path, 0)) >= 0) {
 		return i;
 	}
 	
@@ -551,6 +551,8 @@ struct dirstuff * opendir(const char * path)
     if (dirp == NULL)
         goto error;
 	
+	bzero(dirp,sizeof(struct dirstuff));
+	
     dirp->dir_path = newString(dirPath);
     if (dirp->dir_path == NULL)
         goto error;
@@ -644,7 +646,7 @@ int openmem(char * buf, int len)
 // lseek() - Reposition the byte offset of the file descriptor from the
 //           beginning of the file. Returns the relocated offset.
 
-int b_lseek(int fdesc, int offset, int ptr)
+int lseek(int fdesc, int offset, int ptr)
 {
     struct iob * io;
 	
@@ -733,6 +735,8 @@ struct dirstuff * vol_opendir(BVRef bvr, const char * path)
     dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
     if (dirp == NULL)
         goto error;
+	
+	bzero(dirp,sizeof(struct dirstuff));
 	
     dirp->dir_path = newString(path);
     if (dirp->dir_path == NULL)

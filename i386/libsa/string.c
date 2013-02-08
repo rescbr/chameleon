@@ -412,11 +412,9 @@ STRDUP(const char *string)
 	char *copy;   
 	
 	len = strlen(string) + 1;
-#if (defined(MEMORY_TEST))
-	copy = _malloc(len);
-#else
-    copy = malloc(len);
-#endif
+	
+    copy = calloc(len, sizeof(char));
+	
 	if (copy == NULL)
 		return (NULL);
 	bcopy(string, copy, len);

@@ -31,8 +31,9 @@ static bool PngHandleFile (FILE *pfFile , unsigned char **ppbImageData,
 static void
 png_cexcept_error(png_structp png_ptr, png_const_charp msg)
 {
-   if(png_ptr)
-     ;
+   //if(png_ptr)     ; // ???
+   (void)png_ptr;
+	
    printf("libpng error: %s\n", msg);
    {
       Throw (-1);
@@ -203,18 +204,21 @@ static bool PngHandleFile (FILE *pfFile , unsigned char **ppbImageData,
             free (pbImageData);
             pbImageData = NULL;
         }
-        if ((pbImageData = (png_byte *) malloc(ulRowBytes * (*piHeight)
-                                               * sizeof(png_byte))) == NULL)
+        if ((pbImageData = (png_byte *) calloc(ulRowBytes * (*piHeight)
+                                               , sizeof(png_byte))) == NULL)
         {
             png_error(png_ptr, "Visual PNG: out of memory");
-        }
+        }		
+
         *ppbImageData = pbImageData;
         
         /* and allocate memory for an array of row-pointers */
         
-        if ((ppbRowPointers = (png_bytepp) malloc((*piHeight)
-                                                  * sizeof(png_bytep))) == NULL)
-        {
+        //if ((ppbRowPointers = (png_bytepp) malloc((*piHeight)
+        //                                          * sizeof(png_bytep))) == NULL)
+        if ((ppbRowPointers = (png_bytepp)calloc((*piHeight)
+												          , sizeof(png_bytep))) == NULL)
+		{
             png_error(png_ptr, "Visual PNG: out of memory");
         }
         

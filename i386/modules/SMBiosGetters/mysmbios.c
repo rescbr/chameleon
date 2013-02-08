@@ -76,7 +76,7 @@ typedef struct {
 } SMStrEntryPair;
 
 // defaults for a MacBook
-static const SMStrEntryPair const sm_macbook_defaults[]={
+static const SMStrEntryPair sm_macbook_defaults[]={
 	{"SMbiosvendor",            "Apple Inc."                    },
 	{"SMbiosversion",           "MB41.88Z.00C1.B00.0802091535"	},
 	{"SMbiosdate",              "02/09/2008"                    },
@@ -96,7 +96,7 @@ static const SMStrEntryPair const sm_macbook_defaults[]={
 };
 
 // defaults for a MacBook Pro
-static const SMStrEntryPair const sm_macbookpro_defaults[]={
+static const SMStrEntryPair sm_macbookpro_defaults[]={
 	{"SMbiosvendor",            "Apple Inc."                    },
 	{"SMbiosversion",           "MBP41.88Z.00C1.B03.0802271651"	},
 	{"SMbiosdate",              "02/27/2008"                    },
@@ -116,7 +116,7 @@ static const SMStrEntryPair const sm_macbookpro_defaults[]={
 };
 
 // defaults for a Mac mini 
-static const SMStrEntryPair const sm_macmini_defaults[]={
+static const SMStrEntryPair sm_macmini_defaults[]={
 	{"SMbiosvendor",            "Apple Inc."                    },
 	{"SMbiosversion",           "MM21.88Z.009A.B00.0706281359"	},
 	{"SMbiosdate",              "06/28/2007"                    },
@@ -136,7 +136,7 @@ static const SMStrEntryPair const sm_macmini_defaults[]={
 };
 
 // defaults for an iMac
-static const SMStrEntryPair const sm_imac_defaults[]={
+static const SMStrEntryPair sm_imac_defaults[]={
 	{"SMbiosvendor",            "Apple Inc."                    },
 	{"SMbiosversion",           "IM71.88Z.007A.B03.0803051705"	},
 	{"SMbiosdate",              "03/05/2008"                    },
@@ -156,7 +156,7 @@ static const SMStrEntryPair const sm_imac_defaults[]={
 };
 
 // defaults for a Mac Pro
-static const SMStrEntryPair const sm_macpro_defaults[]={
+static const SMStrEntryPair sm_macpro_defaults[]={
 	{"SMbiosvendor",            "Apple Computer, Inc."			},
 	{"SMbiosversion",           "MP31.88Z.006C.B02.0801021250"	},
 	{"SMbiosdate",              "01/02/2008"					},
@@ -176,7 +176,7 @@ static const SMStrEntryPair const sm_macpro_defaults[]={
 };
 
 // defaults for an iMac11,1 core i3/i5/i7
-static const SMStrEntryPair const sm_imac_core_defaults[]={
+static const SMStrEntryPair sm_imac_core_defaults[]={
 	{"SMbiosvendor",            "Apple Inc."					},
 	{"SMbiosversion",           "IM111.88Z.0034.B00.0910301727"	},
 	{"SMbiosdate",              "10/30/2009"					},
@@ -196,7 +196,7 @@ static const SMStrEntryPair const sm_imac_core_defaults[]={
 };
 
 // defaults for an iMac12,1 : todo: populate correctly 
-static const SMStrEntryPair const sm_imac_sandy_defaults[]={
+static const SMStrEntryPair sm_imac_sandy_defaults[]={
 	{"SMbiosvendor",             "Apple Inc."					},
 	{"SMbiosversion",            "IM121.88Z.0047.B00.1102091756"},
 	{"SMbiosdate",               "10/30/2011"					},
@@ -216,7 +216,7 @@ static const SMStrEntryPair const sm_imac_sandy_defaults[]={
 };
 
 // defaults for a Mac Pro 4,1 core i7/Xeon
-static const SMStrEntryPair const sm_macpro_core_defaults[]={
+static const SMStrEntryPair sm_macpro_core_defaults[]={
 	{"SMbiosvendor",            "Apple Computer, Inc."			},
 	{"SMbiosversion",           "MP41.88Z.0081.B03.0902231259"	},
 	{"SMbiosdate",              "02/23/2009"					},
@@ -236,7 +236,7 @@ static const SMStrEntryPair const sm_macpro_core_defaults[]={
 };
 
 // defaults for a Mac Pro 5,1 Westmere
-static const SMStrEntryPair const sm_macpro_westmere_defaults[]={
+static const SMStrEntryPair sm_macpro_westmere_defaults[]={
 	{"SMbiosvendor",            "Apple Computer, Inc."			},
 	{"SMbiosversion",           "MP51.88Z.007F.B00.1008031144"	},
 	{"SMbiosdate",              "08/03/2010"					},
@@ -256,7 +256,7 @@ static const SMStrEntryPair const sm_macpro_westmere_defaults[]={
 };
 
 // default for a Xserve
-static const SMStrEntryPair const sm_xserve_defaults[]={
+static const SMStrEntryPair sm_xserve_defaults[]={
     {"SMbiosvendor",            "Apple Inc."					},
     {"SMbiosversion",           "XS21.88Z.006C.B06.0804011317"	},
     {"SMbiosdate",              "04/01/2008"					},
@@ -280,7 +280,7 @@ typedef struct {
     const char* info;
 } SMProductCountry;
 
-static const SMProductCountry const sm_country_list[]={
+static const SMProductCountry sm_country_list[]={
     {"1C",		"China"                                 },
     {"2Z",		"Refurbished"                           },
     {"4H",		"China"                                 },
@@ -1202,6 +1202,8 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
 	if (!structPtr)
 		return NULL;
 	
+	bzero(structPtr,sizeof(SMBStructPtrs));
+	
 	buffer = (uint8_t *)malloc(SMB_ALLOC_SIZE);
 	if (!buffer)
     {
@@ -1263,7 +1265,7 @@ SMBEntryPoint * setupSMBIOSTable(SMBEntryPoint *origeps)
     
 	free(buffer);
     free(structPtr);
-
+	
 	decodeSMBIOSTable(neweps);
     
     return neweps;
@@ -1319,7 +1321,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
     safe_set_env(envDMIMaxMemorySlots, MaxMemorySlots);
     safe_set_env(envDMICntMemorySlots, CntMemorySlots);
     safe_set_env(envDMIMemModules, MemoryModules);
-    safe_set_env_copy(envRamDimm, RamDimm, sizeof(RamDimm));
+    safe_set_env_ptr(envRamDimm, RamDimm, sizeof(RamDimm));
     
     
 }

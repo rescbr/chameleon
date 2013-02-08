@@ -72,7 +72,7 @@ free((a)->d);                                                             \
 } while(0)
 
 #define utarray_new(a,_icd) do {                                              \
-a=(UT_array*)malloc(sizeof(UT_array));                                      \
+a=(UT_array*)calloc(1,sizeof(UT_array));                                      \
 utarray_init(a,_icd);                                                       \
 } while(0)
 

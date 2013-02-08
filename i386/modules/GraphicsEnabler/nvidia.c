@@ -972,7 +972,7 @@ cardList_t* cardList = NULL;
 static void add_card(char* model, uint32_t id, uint64_t videoRam)
 {
 	
-	cardList_t* new_card = malloc(sizeof(cardList_t));
+	cardList_t* new_card = calloc(1,sizeof(cardList_t));
 	if (new_card)
 	{	
 		new_card->next = cardList;
@@ -1210,7 +1210,7 @@ static void fill_card_list(void)
 
 static char *get_nvidia_model(uint32_t id) {
 	unsigned int	i;		
-
+	
 	// First check in the plist, (for e.g this can override any hardcoded devices)
 	cardList_t * nvcard = FindCardWithId(id);
 	if (nvcard) 
@@ -1275,14 +1275,14 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
         uint32_t devices_number;
         
         if (!(devices_number = (uint32_t)get_env(envDeviceNumber))) {
-           devices_number = 1;
+			devices_number = 1;
         } 
         
         snprintf(tmp, sizeof(tmp) ,"Slot-%x",devices_number);
         devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
         safe_set_env(envDeviceNumber,devices_number+1);
     }
-        
+	
 	return 1;
 }
 
@@ -1391,7 +1391,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	bool				doit;
 	
 	struct DevPropString *string = (struct DevPropString *)(uint32_t)get_env(envEFIString);
-
+	
 	fill_card_list();
 	
 	static const dcfg_t default_dcfg [] = {
@@ -1403,7 +1403,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	dcfg_t default_dcfg_1;
 	bool dcfg0_set = false;
 	bool dcfg1_set = false;
-    	
+	
 	bar[0] = pci_config_read32(nvda_dev->dev.addr, 0x10 );
 	regs = (uint8_t *) (bar[0] & ~0x0f);
 	
@@ -1411,14 +1411,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
     
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;    
-	 
+	
 	model = get_nvidia_model((nvda_dev->vendor_id << 16) | nvda_dev->device_id);
 	
 	// Amount of VRAM in kilobytes
     
 	videoRam = mem_detect(regs, nvCardType, nvda_dev, (nvda_dev->vendor_id << 16) | nvda_dev->device_id);
-			
-	rom = malloc(NVIDIA_ROM_SIZE);
+	
+	rom = calloc(1,NVIDIA_ROM_SIZE);
     if (!rom) {
         printf("Couldn't allocate momory for device rom\n");
         return false;
@@ -1508,7 +1508,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	verbose("nVidia %s %dMB NV%02x [%04x:%04x]\n",  
 			model, (uint32_t)(videoRam / 1024 / 1024),
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id);	
-
+	
     if (!string)
     {
 		string = devprop_create_string();
@@ -1529,7 +1529,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	
 	// get bios version
 	const int MAX_BIOS_VERSION_LENGTH = 32;
-	char* version_str = (char*)malloc(MAX_BIOS_VERSION_LENGTH);
+	char* version_str = (char*)calloc(MAX_BIOS_VERSION_LENGTH, sizeof(char));
     if (!version_str) {
         printf("Couldn't allocate momory for device version_str\n");
         free(rom);

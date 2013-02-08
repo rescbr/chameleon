@@ -1,3 +1,37 @@
+/*
+ * contains some ideas from the Mark VanderVoord's CException project
+ *
+ * Copyright (c) 2012-2013 Cadet-Petit Armel
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
+ *    distribution.
+ *
+ *  * Neither the name of Cadet-Petit Armel nor the names of the
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #ifndef _CEXCEPTION_H
 #define _CEXCEPTION_H
 
@@ -9,6 +43,7 @@ extern "C"
 #endif
 	
 #define CEXCEPTION_USE_CONFIG_FILE
+	//#define DEBUG_EXCEPTION
 	
 	//To Use CException, you have a number of options:
 	//1. Just include it and run with the defaults
@@ -58,38 +93,38 @@ extern "C"
 #endif
 	
 	//exception frame structures
-	typedef struct {
-		jmp_buf* pFrame;
-		CEXCEPTION_T volatile Exception;
+	typedef struct CEXCEPTION_FRAME {
+		jmp_buf cx;
+		struct CEXCEPTION_FRAME *pFrame;   
+		void *zone; 
+		void *atexit;
+		int new_registration;
+		int err_no;
 	} CEXCEPTION_FRAME_T;
 	
-	//actual root frame storage (only one if single-tasking)
-	extern volatile CEXCEPTION_FRAME_T CExceptionFrames[];
+    void pushFrame(void);
+    void popFrame(void);
+    unsigned long getFramesCount(void);
+	CEXCEPTION_FRAME_T * getcurrentFrame(void);
+	CEXCEPTION_FRAME_T * getMainFrames(void);
 	
 	//Try (see C file for explanation)
-#define Try															\
+#define Try														\
 {																\
-jmp_buf *PrevFrame, NewFrame;                               \
-unsigned int MY_ID = CEXCEPTION_GET_ID;                     \
-PrevFrame = CExceptionFrames[CEXCEPTION_GET_ID].pFrame;     \
-CExceptionFrames[MY_ID].pFrame = (jmp_buf*)(&NewFrame);     \
-CExceptionFrames[MY_ID].Exception = CEXCEPTION_NONE;        \
-if (setjmp(NewFrame) == 0) {                                \
+pushFrame();                                                \
+if ((e = setjmp(getcurrentFrame()->cx)) == 0) {                                \
+e = CEXCEPTION_NONE;                                       \
 if (1)
 	
 	//Catch (see C file for explanation)
 #define Catch(e)													\
 else { }                                            \
-CExceptionFrames[MY_ID].Exception = CEXCEPTION_NONE;    \
 }                                                           \
-else                                                        \
-{ e = CExceptionFrames[MY_ID].Exception; e=e; }             \
-CExceptionFrames[MY_ID].pFrame = PrevFrame;                 \
+popFrame();\
 }																\
-if (Install_Default_Handler())                                  \
-if (CExceptionFrames[CEXCEPTION_GET_ID].Exception != CEXCEPTION_NONE)
+if (e != CEXCEPTION_NONE)
 	
-	
+    
 	//Throw an Error
 	void Throw(CEXCEPTION_T ExceptionID);
 	int Install_Default_Handler(void);
@@ -105,13 +140,7 @@ if (CExceptionFrames[CEXCEPTION_GET_ID].Exception != CEXCEPTION_NONE)
 ((void) ((e == 0) ? Throw(EXIT_SUCCESS) : __exit (#e, e, __FILE__, __LINE__)))
 #define __exit(estr, e, file, line) \
 ((void)printf ("%s:%u: exit status `%s'\n", file, line, estr), Throw(e))
-#endif
-	
-	
-#define abort()  \
-((void) (__abort ( __FILE__, __LINE__)))
-#define __abort(file, line) \
-((void)printf ("%s:%u: aborted \n", file, line), Throw(SIGABRT))
+#endif	
 	
 #ifdef __cplusplus
 }   // extern "C"

@@ -40,10 +40,10 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
     if (!eUUID) return "";
     const unsigned char * uuid = (unsigned char*) eUUID;
     snprintf(msg, sizeof(msg), "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-		    uuid[0], uuid[1], uuid[2], uuid[3], 
-		    uuid[4], uuid[5], uuid[6], uuid[7],
-		    uuid[8], uuid[9], uuid[10],uuid[11],
-		    uuid[12],uuid[13],uuid[14],uuid[15]);
+			 uuid[0], uuid[1], uuid[2], uuid[3], 
+			 uuid[4], uuid[5], uuid[6], uuid[7],
+			 uuid[8], uuid[9], uuid[10],uuid[11],
+			 uuid[12],uuid[13],uuid[14],uuid[15]);
     return msg ;
 }
 
@@ -94,6 +94,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
         // the resulting binary will be the half size of the input hex string
         binStr = malloc(len / 2);
         if (!binStr) goto out;
+		bzero(binStr,len / 2 );
         binStrIdx = 0;
         hexNibbleIdx = 0;
         for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)

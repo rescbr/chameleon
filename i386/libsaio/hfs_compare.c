@@ -42,10 +42,11 @@ UncompressStructure(struct compressed_block *bp, int count, int size)
 		stop("UncompressStructure unable to allocate memory\n");
 		return 0;
 	}
+	bzero(out,size);
     unsigned short *op = out;
     unsigned short data;
     int i, j;
-
+	
     for (i=0; i<count; i++, bp++) {
         // If this happens (it shouldn't) please fix size and/or double check that count really is
         // the number of elements in the array.
@@ -72,7 +73,7 @@ InitCompareTables(void)
         gCompareTable = UncompressStructure(gCompareTableCompressed,
                                             kCompareTableNBlocks, kCompareTableDataSize);
         gLowerCaseTable = UncompressStructure(gLowerCaseTableCompressed,
-                                            kLowerCaseTableNBlocks, kLowerCaseTableDataSize);
+											  kLowerCaseTableNBlocks, kLowerCaseTableDataSize);
     }
 }
 
@@ -92,14 +93,14 @@ int32_t	FastRelString(u_int8_t * str1, u_int8_t * str2)
 {
 	int32_t  bestGuess;
 	u_int8_t length, length2;
-
+	
 #if ! UNCOMPRESED
-        InitCompareTables();
+	InitCompareTables();
 #endif
-
+	
 	length = *(str1++);
 	length2 = *(str2++);
-
+	
 	if (length == length2)
 		bestGuess = 0;
 	else if (length < length2)
@@ -109,24 +110,24 @@ int32_t	FastRelString(u_int8_t * str1, u_int8_t * str2)
 		bestGuess = 1;
 		length = length2;
 	}
-
+	
 	while (length--)
 	{
 		u_int32_t aChar, bChar;
-
+		
 		aChar = *(str1++);
 		bChar = *(str2++);
 		
 		if (aChar != bChar)	/* If they don't match exacly, do case conversion */
 		{
 			u_int16_t aSortWord, bSortWord;
-
+			
 			aSortWord = gCompareTable[aChar];
 			bSortWord = gCompareTable[bChar];
-
+			
 			if (aSortWord > bSortWord)
 				return 1;
-
+			
 			if (aSortWord < bSortWord)
 				return -1;
 		}
@@ -200,20 +201,20 @@ int32_t	FastRelString(u_int8_t * str1, u_int8_t * str2)
 //
 
 int32_t FastUnicodeCompare( u_int16_t * str1, register u_int32_t length1,
-                            u_int16_t * str2, register u_int32_t length2, int byte_order )
+						   u_int16_t * str2, register u_int32_t length2, int byte_order )
 {
 	register u_int16_t c1,c2;
 	register u_int16_t temp;
-
+	
 #if ! UNCOMPRESSED
-        InitCompareTables();
+	InitCompareTables();
 #endif
-
+	
 	while (1) {
 		/* Set default values for c1, c2 in case there are no more valid chars */
 		c1 = 0;
 		c2 = 0;
-
+		
 		/* Find next non-ignorable char from str1, or zero if no more */
 		while (length1 && c1 == 0) {
 			if (byte_order == OSBigEndian)
@@ -224,7 +225,7 @@ int32_t FastUnicodeCompare( u_int16_t * str1, register u_int32_t length1,
 			if ((temp = gLowerCaseTable[c1>>8]) != 0)		// is there a subtable for this upper byte?
 				c1 = gLowerCaseTable[temp + (c1 & 0x00FF)];	// yes, so fold the char
 		}
-
+		
 		/* Find next non-ignorable char from str2, or zero if no more */
 		while (length2 && c2 == 0) {
 			if (byte_order == OSBigEndian)
@@ -235,7 +236,7 @@ int32_t FastUnicodeCompare( u_int16_t * str1, register u_int32_t length1,
 			if ((temp = gLowerCaseTable[c2>>8]) != 0)		// is there a subtable for this upper byte?
 				c2 = gLowerCaseTable[temp + (c2 & 0x00FF)];	// yes, so fold the char
 		}
-
+		
 		if (c1 != c2)	/* found a difference, so stop looping */
 			break;
 		
@@ -257,33 +258,33 @@ int32_t FastUnicodeCompare( u_int16_t * str1, register u_int32_t length1,
 int32_t BinaryUnicodeCompare (u_int16_t * str1, u_int32_t length1,
                               u_int16_t * str2, u_int32_t length2)
 {
-        register u_int16_t c1, c2;
-        int32_t bestGuess;
-        u_int32_t length;
-
-        bestGuess = 0;
-
-        if (length1 < length2) {
-                length = length1;
-                --bestGuess;
-        } else if (length1 > length2) {
-                length = length2;
-                ++bestGuess;
-        } else {
-                length = length1;
-        }
-
-        while (length--) {
-                c1 = *(str1++);
-                c2 = *(str2++);
-
-                if (c1 > c2)
-                        return (1);
-                if (c1 < c2)
-                        return (-1);
-        }
-
-        return (bestGuess);
+	register u_int16_t c1, c2;
+	int32_t bestGuess;
+	u_int32_t length;
+	
+	bestGuess = 0;
+	
+	if (length1 < length2) {
+		length = length1;
+		--bestGuess;
+	} else if (length1 > length2) {
+		length = length2;
+		++bestGuess;
+	} else {
+		length = length1;
+	}
+	
+	while (length--) {
+		c1 = *(str1++);
+		c2 = *(str2++);
+		
+		if (c1 > c2)
+			return (1);
+		if (c1 < c2)
+			return (-1);
+	}
+	
+	return (bestGuess);
 }
 
 
@@ -315,32 +316,32 @@ int32_t BinaryUnicodeCompare (u_int16_t * str1, u_int32_t length1,
  */
 void
 utf_encodestr( const u_int16_t * ucsp, int ucslen,
-               u_int8_t * utf8p, u_int32_t bufsize, int byte_order )
+			  u_int8_t * utf8p, u_int32_t bufsize, int byte_order )
 {
 	u_int8_t *bufend;
 	u_int16_t ucs_ch;
-
+	
 	bufend = utf8p + bufsize;
-
+	
 	while (ucslen-- > 0) {
-                if (byte_order == OSBigEndian)
+		if (byte_order == OSBigEndian)
 		    ucs_ch = SWAP_BE16(*ucsp++);
-                else
-                    ucs_ch = SWAP_LE16(*ucsp++);
-
+		else
+			ucs_ch = SWAP_LE16(*ucsp++);
+		
 		if (ucs_ch < 0x0080) {
 			if (utf8p >= bufend)
 				break;
 			if (ucs_ch == '\0')
 				continue;	/* skip over embedded NULLs */
 			*utf8p++ = ucs_ch;
-
+			
 		} else if (ucs_ch < 0x800) {
 			if ((utf8p + 1) >= bufend)
 				break;
 			*utf8p++ = (ucs_ch >> 6)   | 0xc0;
 			*utf8p++ = (ucs_ch & 0x3f) | 0x80;
-
+			
 		} else {
 			if ((utf8p + 2) >= bufend)
 				break;
@@ -349,7 +350,7 @@ utf_encodestr( const u_int16_t * ucsp, int ucslen,
 			*utf8p++ = ((ucs_ch) & 0x3f)      | 0x80;
 		}
 	}
-
+	
 	*utf8p = '\0';
 }
 
@@ -367,62 +368,62 @@ void utf_decodestr(const u_int8_t * utf8p, u_int16_t * ucsp, u_int16_t * ucslen,
 	u_int16_t *bufend;
 	u_int16_t ucs_ch;
 	u_int8_t  byte;
-
+	
 	bufstart = ucsp;
 	bufend = (u_int16_t *)((u_int8_t *)ucsp + bufsize);
-
+	
 	while ((byte = *utf8p++) != '\0') {
 		if (ucsp >= bufend)
 			break;
-
+		
 		/* check for ascii */
 		if (byte < 0x80) {
 			ucs_ch = byte;
 			
-                        if (byte_order == OSBigEndian)
-		            *ucsp++ = SWAP_BE16(ucs_ch);
-                        else
-                            *ucsp++ = SWAP_LE16(ucs_ch);
+			if (byte_order == OSBigEndian)
+				*ucsp++ = SWAP_BE16(ucs_ch);
+			else
+				*ucsp++ = SWAP_LE16(ucs_ch);
 			
 			continue;
 		}
-
+		
 		switch (byte & 0xf0) {
-		/*  2 byte sequence*/
-		case 0xc0:
-		case 0xd0:
-			/* extract bits 6 - 10 from first byte */
-			ucs_ch = (byte & 0x1F) << 6;  
-			break;
-		/* 3 byte sequence*/
-		case 0xe0:
-			/* extract bits 12 - 15 from first byte */
-			ucs_ch = (byte & 0x0F) << 6;
-
-			/* extract bits 6 - 11 from second byte */
-			if (((byte = *utf8p++) & 0xc0) != 0x80)
+				/*  2 byte sequence*/
+			case 0xc0:
+			case 0xd0:
+				/* extract bits 6 - 10 from first byte */
+				ucs_ch = (byte & 0x1F) << 6;  
+				break;
+				/* 3 byte sequence*/
+			case 0xe0:
+				/* extract bits 12 - 15 from first byte */
+				ucs_ch = (byte & 0x0F) << 6;
+				
+				/* extract bits 6 - 11 from second byte */
+				if (((byte = *utf8p++) & 0xc0) != 0x80)
+					goto stop;
+				
+				ucs_ch += (byte & 0x3F);
+				ucs_ch <<= 6;
+				break;
+			default:
 				goto stop;
-
-			ucs_ch += (byte & 0x3F);
-			ucs_ch <<= 6;
-			break;
-		default:
-			goto stop;
 		}
-
+		
 		/* extract bits 0 - 5 from final byte */
 		if (((byte = *utf8p++) & 0xc0) != 0x80)
 			goto stop;
 		ucs_ch += (byte & 0x3F);  
-
-                if (byte_order == OSBigEndian)
-                    *ucsp++ = SWAP_BE16(ucs_ch);
-                else
-                    *ucsp++ = SWAP_LE16(ucs_ch);
+		
+		if (byte_order == OSBigEndian)
+			*ucsp++ = SWAP_BE16(ucs_ch);
+		else
+			*ucsp++ = SWAP_LE16(ucs_ch);
 	}
 stop:
-        if (byte_order == OSBigEndian)
-            *ucslen = SWAP_BE16(ucsp - bufstart);
-        else
-            *ucslen = SWAP_LE16(ucsp - bufstart);
+	if (byte_order == OSBigEndian)
+		*ucslen = SWAP_BE16(ucsp - bufstart);
+	else
+		*ucslen = SWAP_LE16(ucsp - bufstart);
 }

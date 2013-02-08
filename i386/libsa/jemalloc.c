@@ -269,6 +269,9 @@
 #define je_malloc            malloc
 #define je_free              free
 #define je_realloc           realloc
+#if 0
+#define je_reallocf          reallocf
+#endif
 #define je_memalign          memalign
 #define je_valloc            valloc
 #define je_calloc            calloc
@@ -279,6 +282,9 @@
 void* malloc(size_t size) __attribute__ ((weak, alias ("je_malloc")));
 void  free(void* ptr) __attribute__ ((weak, alias ("je_free")));
 void* realloc(void* ptr, size_t size) __attribute__ ((weak, alias ("je_realloc")));
+#if 0
+void* reallocf(void* ptr, size_t size) __attribute__ ((weak, alias ("je_reallocf")));
+#endif
 void* memalign(size_t boundary, size_t size) __attribute__ ((weak, alias ("je_memalign")));
 void* valloc(size_t size) __attribute__ ((weak, alias ("je_valloc")));
 void* calloc(size_t num, size_t size) __attribute__ ((weak, alias("je_calloc")));
@@ -4086,7 +4092,7 @@ FUNC_NAME(je_calloc)(size_t num, size_t size)
 	size_t num_size;
     
 	if (malloc_init()) {
-		num_size = 0;
+		//num_size = 0;
 		ret = NULL;
 		goto RETURN;
 	}
@@ -4176,6 +4182,20 @@ FUNC_NAME(je_realloc)(void *ptr, size_t size)
 RETURN:
 	return (ret);
 }
+
+#if 0
+void *
+FUNC_NAME(je_reallocf)(void *ptr, size_t size);
+void *
+FUNC_NAME(je_reallocf)(void *ptr, size_t size)
+{
+	void *ret;	    
+	ret = realloc(ptr, size );
+    if (! ret)
+		free(ptr);		
+		return (ret);
+}
+#endif
 
 void
 FUNC_NAME(je_free)(void *ptr);

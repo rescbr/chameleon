@@ -380,7 +380,7 @@ static ACPI_TABLE_RSDT * gen_alloc_rsdt_from_xsdt(ACPI_TABLE_XSDT *xsdt)
 		U64 ptr = xsdt->TableOffsetEntry[index];
 		
 		if (!ptr) continue;
-
+		
 		
 		{				
 			if (ptr > ULONG_MAX)
@@ -497,7 +497,7 @@ static ACPI_TABLE_XSDT * gen_alloc_xsdt_from_rsdt(ACPI_TABLE_RSDT *rsdt)
     for (index=0;index<num_tables;index++)
     {
 		if (!table_array[index]) continue;
-
+		
         {				
 #if DEBUG_ACPI	
             printf("* Processing : ");
@@ -570,7 +570,7 @@ static void MakeAcpiSgn(void)
 
 static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filename )
 {	
-	int fd = -1;
+	int fd = -1, size;
 	char acpi_file[512];
     
 	DBG("Searching for %s file ...\n", filename);
@@ -579,18 +579,26 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filen
 	snprintf(acpi_file, sizeof(acpi_file), "%s%s",dirspec, filename);
 	
 	safe_set_env(envHFSLoadVerbose, 0);
-	fd=open(acpi_file);
+	fd=open(acpi_file, 0);
 	
 	if (fd<0)
 	{							
 		DBG("Couldn't open ACPI Table: %s\n", acpi_file);
 		return (void *)0ul ;				
 	}		
-	
-	void *tableAddr=(void*)malloc(file_size (fd));
+	size = file_size (fd);
+	if (!size) 
+	{
+		close(fd);
+		return (void *)0ul ;				
+		
+	}
+	void *tableAddr=(void*)malloc(size);
     
 	if (tableAddr)
 	{
+		bzero(tableAddr,size);
+		
 		if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
 		{
 			printf("Couldn't read table %s\n",acpi_file);
@@ -1147,7 +1155,7 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 					cpu->ratio_limits_for_turbo_flag   = (platform_info & (1ULL << 28)) ? 1 : 0;
 					cpu->xe_available = cpu->tdc_tdp_limits_for_turbo_flag | cpu->ratio_limits_for_turbo_flag;
 					
-
+					
                     
 					if (is_sandybridge() || is_jaketown())
 					{
@@ -4562,7 +4570,7 @@ static U32 process_rsdt(ACPI_TABLE_RSDP *rsdp_mod , bool gen_xsdt, U32 *new_tabl
 	for (index = 0; index < num_tables; index++)
 	{
 		if (!table_array[index]) continue;
-
+		
 		{			
 			
 			int method = 0;
@@ -4720,7 +4728,10 @@ EFI_STATUS setupAcpi(void)
 	bool gen_ssdt=false; // will force to generate ssdt even if gen_csta and gen_psta = false
     bool gen_tsta=false;
 	bool oem_dsdt=false, oem_fadt=false;
-	
+#if 0
+	extern void GC_set_find_leak(int);
+	GC_set_find_leak(1);
+#endif
 	// Find original rsdp        
 	if (!FindAcpiTables(&acpi_tables))
 	{
@@ -5147,7 +5158,7 @@ EFI_STATUS setupAcpi(void)
 		
 		if (process_rsdt(rsdp_mod, false, new_table_list))
 			break;			
-			
+		
 		printf("Error: Incorect ACPI RSD PTR or not found \n");
 		Register_Acpi_Efi(NULL, 0);
 		return EFI_ABORTED;
@@ -5180,5 +5191,11 @@ EFI_STATUS setupAcpi(void)
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
 	getc();
 #endif
+#if 0
+	extern void GC_gcollect(void);
+	GC_gcollect();
+	getc();
+#endif
+	
 	return Status;
 }

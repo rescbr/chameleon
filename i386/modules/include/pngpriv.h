@@ -42,8 +42,9 @@
 /* This is required for the definition of abort(), used as a last ditch
  * error handler when all else fails.
  */
-#include "libsaio.h"
-#include "platform.h"
+#include <stdlib.h>
+#include <string.h>
+
 
 /* This is used to find 'offsetof', used below for alignment tests. */
 #include <stddef.h>

@@ -185,7 +185,7 @@ MSDOSInitPartition (CICell ih)
 		return 0;
 	}
 	
-	buf=malloc (512);
+	buf=calloc (512,sizeof(char));
     if (!buf) 
     {      
         return -1;
@@ -273,7 +273,7 @@ readSector(CICell ih, off_t readOffset, char *buf, int size)
 		long relOffset = readOffset % BPS;
 		char *cacheBuffer;
 		
-		cacheBuffer = malloc(MSDOS_CACHE_BLOCKSIZE);
+		cacheBuffer = calloc(MSDOS_CACHE_BLOCKSIZE ,sizeof(char));
         if (!cacheBuffer) 
         {      
             return -1;
@@ -688,6 +688,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
         {      
             return -1;
         }
+		bzero(st,sizeof (struct msdosdirstate) );
 		if (dirPath[0])
 		{
 			uint8_t *buf=malloc(msdosclustersize);
@@ -696,6 +697,8 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
                 free (st);
                 return -1;
             }
+			bzero(buf,msdosclustersize );
+			
 			dirp = getdirpfrompath (ih, dirPath, buf);
 			if (!dirp || !(dirp->deAttributes & ATTR_DIRECTORY))
 			{
@@ -727,7 +730,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	{
 		int i;
 		for (i=0;vfatname[i];i++);
-		*name = malloc (256);
+		*name = calloc (256, sizeof(char));
         if (!*name) 
         {
             free (st->buf);
@@ -740,7 +743,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	{
 		int i, j, k;
 		uint16_t tmp[13];
-		*name = malloc (26);
+		*name = calloc (26, sizeof(char));
         if (!*name) 
         {
             free (st->buf);
@@ -805,6 +808,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
     if (!buf) {
         return -1;
     }
+	bzero(buf,msdosclustersize);
 	dirp = getdirpfrompath (ih, filePath, buf);
 	
 	if (!dirp || (dirp->deAttributes & ATTR_DIRECTORY))
@@ -862,6 +866,8 @@ MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     if (!buf) {
         return -1;
     }
+	bzero(buf,msdosclustersize);
+	
 	dirp = getdirpfrompath (ih, filePath, buf);
 	if (!dirp || (dirp->deAttributes & ATTR_DIRECTORY))
 	{
@@ -961,6 +967,8 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
     if (!st.buf) {
         return;
     }
+	bzero(st.buf,msdosclustersize);
+	
 	while ((dirp = getnextdirent (ih, vfatlabel, &st)))
 		if (dirp->deAttributes & ATTR_VOLUME) {
 			strncpy((char *)label, (char *)dirp->deName, LABEL_LENGTH);
@@ -981,7 +989,7 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 	
     /* else look in the boot blocks */
     if (!labelfound || str[0] == '\0') {
-		char *buf = malloc (512);
+		char *buf = calloc (512, sizeof(char));
         if (!buf) {
             return;
         }
@@ -1006,7 +1014,7 @@ MSDOSGetUUID(CICell ih, char *uuidStr, long strMaxLen)
 {
     (void)strMaxLen;
     
-	char *buf = malloc (512);
+	char *buf = calloc (512, sizeof(char));
     if (!buf) {
         return -1;
     }

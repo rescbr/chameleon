@@ -181,18 +181,18 @@ void initialize_runtime(void)
 
 //==========================================================================
 // execKernel - Load the kernel image (mach-o) and jump to its entry point.
+static entry_t                   kernelEntry;
 
 static int ExecKernel(void *binary)
 {
-    entry_t                   kernelEntry;
     int                       ret;
     
     bootArgs->kaddr = bootArgs->ksize = 0;
-		
+	
 	{
 		bool KPRebootOption = false;
 		bool HiDPIOption = false;
-
+		
 		getBoolForKey(kRebootOnPanic, &KPRebootOption, DEFAULT_BOOT_CONFIG);
 		if (KPRebootOption == true) bootArgs->flags |= kBootArgsFlagRebootOnPanic;
 		
@@ -330,9 +330,6 @@ static int ExecKernel(void *binary)
     
 	execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL, NULL, NULL);	// Notify modules that the kernel is about to be started
 	
-    if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6')
-		reserveKernLegacyBootStruct();
-	
 #if UNUSED
 	turnOffFloppy();
 #endif
@@ -344,10 +341,12 @@ static int ExecKernel(void *binary)
     
 	if (((BVRef)(uint32_t)get_env(envgBootVolume))->OSVersion[3] <= '6') {
 		
+        reserveKernLegacyBootStruct();
+		
 		// Jump to kernel's entry point. There's no going back now. XXX LEGACY OS XXX
 		startprog( kernelEntry, bootArgsLegacy );
 	}
-    
+	
 	outb(0x21, 0xff);   /* Maskout all interrupts Pic1 */
 	outb(0xa1, 0xff);   /* Maskout all interrupts Pic2 */
     
@@ -422,7 +421,7 @@ void common_boot(int biosdev)
     // Scan and record the system's hardware information.
     scan_platform();
 	
-  
+	
 	// Pseudo-random generator initialization.
     // arc4_init();
 	
@@ -435,12 +434,12 @@ void common_boot(int biosdev)
 	set_env(envgHaveKernelCache, false);
     
     InitBootPrompt();
-  
+	
     // First get info for boot volume.
     scanBootVolumes(BIOSDev, 0);
     
     bvChain = getBVChainForBIOSDev(BIOSDev);
-
+	
     setBootGlobals(bvChain);
     
     // Load Booter boot.plist config file
@@ -699,7 +698,7 @@ void common_boot(int biosdev)
 				}
 			} while (0);
 		}
-
+		
         do {
             if (trycache == true || forcecache == true)
 			{
@@ -721,7 +720,7 @@ void common_boot(int biosdev)
 				}
 				
                 if (ret >= 0)
-				{
+				{					
                     break;
                 }
 				
@@ -783,7 +782,7 @@ void common_boot(int biosdev)
 #endif
         }
 		else
-		{
+		{			
             /* Won't return if successful. */
             if ( ExecKernel(binary))
             {
@@ -819,16 +818,8 @@ void common_boot(int biosdev)
 }
 
 static void determineCpuArch(void)
-{
-	if (cpu_mode_is64bit())
-	{
-		safe_set_env(envarchCpuType, CPU_TYPE_X86_64);
-        
-	}
-	else
-	{
-		safe_set_env(envarchCpuType, CPU_TYPE_I386);
-	}
+{	
+	safe_set_env(envarchCpuType, cpu_mode_is64bit() ? CPU_TYPE_X86_64 : CPU_TYPE_I386);
 }
 
 void getKernelCachePath(void)
@@ -999,7 +990,7 @@ static void getRootDevice(void)
 				int ArgCntRemaining = (int)get_env(envArgCntRemaining);
 				uuidSet = false;
 				char *           valueBuffer;
-				valueBuffer = malloc(VALUE_SIZE);
+				valueBuffer = calloc(VALUE_SIZE,sizeof(char));
                 if (!valueBuffer) {
                     return;
                 }

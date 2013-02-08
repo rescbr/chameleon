@@ -205,15 +205,15 @@ static bool CheckDarwin(BVRef bvr);
 static bool getOSInstallVersion(const char *dirSpec, char *str, config_file_t *systemVersion);
 static bool getOSInstallURL(BVRef bvr, const char *dirSpec, config_file_t *config_file);
 static BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
-				  const gpt_ent * part,
-				  FSInit initFunc, FSLoadFile loadFunc,
-				  FSReadFile readFunc,
-				  FSGetDirEntry getdirFunc,
-				  FSGetFileBlock getBlockFunc,
-				  FSGetUUID getUUIDFunc,
-				  BVGetDescription getDescriptionFunc,
-				  BVFree bvFreeFunc,
-				  int probe, int type, unsigned int bvrFlags );
+						 const gpt_ent * part,
+						 FSInit initFunc, FSLoadFile loadFunc,
+						 FSReadFile readFunc,
+						 FSGetDirEntry getdirFunc,
+						 FSGetFileBlock getBlockFunc,
+						 FSGetUUID getUUIDFunc,
+						 BVGetDescription getDescriptionFunc,
+						 BVFree bvFreeFunc,
+						 int probe, int type, unsigned int bvrFlags );
 static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen);
 
 //==========================================================================
@@ -729,15 +729,15 @@ EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D,
 
 
 static BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
-				  const gpt_ent * part,
-				  FSInit initFunc, FSLoadFile loadFunc,
-				  FSReadFile readFunc,
-				  FSGetDirEntry getdirFunc,
-				  FSGetFileBlock getBlockFunc,
-				  FSGetUUID getUUIDFunc,
-				  BVGetDescription getDescriptionFunc,
-				  BVFree bvFreeFunc,
-				  int probe, int type, unsigned int bvrFlags )
+						 const gpt_ent * part,
+						 FSInit initFunc, FSLoadFile loadFunc,
+						 FSReadFile readFunc,
+						 FSGetDirEntry getdirFunc,
+						 FSGetFileBlock getBlockFunc,
+						 FSGetUUID getUUIDFunc,
+						 BVGetDescription getDescriptionFunc,
+						 BVFree bvFreeFunc,
+						 int probe, int type, unsigned int bvrFlags )
 {
     BVRef bvr = (BVRef) malloc( sizeof(struct BootVolume) );
     if ( bvr )
@@ -842,7 +842,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
     {
         return NULL;    
     }
-    
+    bzero(map,sizeof(struct DiskBVMap));
+	
     do {		
         
         map->biosdev = biosdev;
@@ -901,19 +902,19 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                 case FDISK_BOOTER:
                     if (part->bootid & FDISK_ACTIVE) {                        
 						safe_set_env(envgBIOSBootVolume, (uint32_t)newFDiskBVRef(
-                                                        biosdev, partno,
-                                                        part->relsect,
-                                                        part,
-                                                        HFSInitPartition,
-                                                        HFSLoadFile,
-                                                        HFSReadFile,
-                                                        HFSGetDirEntry,
-                                                        HFSGetFileBlock,
-                                                        HFSGetUUID,
-                                                        HFSGetDescription,
-                                                        HFSFree,
-                                                        0,
-                                                        kBIOSDevTypeHardDrive, 0));
+																				 biosdev, partno,
+																				 part->relsect,
+																				 part,
+																				 HFSInitPartition,
+																				 HFSLoadFile,
+																				 HFSReadFile,
+																				 HFSGetDirEntry,
+																				 HFSGetFileBlock,
+																				 HFSGetUUID,
+																				 HFSGetDescription,
+																				 HFSFree,
+																				 0,
+																				 kBIOSDevTypeHardDrive, 0));
                         break;
                     }
 #ifndef UFS_SUPPORT						
@@ -1116,6 +1117,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	if (!buffer) {
         return NULL;
     }
+	bzero(buffer,BPS);
     /* Check for alternate block size */
     if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0) {
         return NULL;
@@ -1129,6 +1131,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
             if (!buffer) {
                 return NULL;
             }
+			bzero(buffer,BPS);
         }
         factor = blksize / BPS;
     } else {
@@ -1143,7 +1146,8 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
     {
         return NULL;
     }
-    
+	bzero(map,sizeof(struct DiskBVMap));
+	
     do {
         
         int error;
@@ -1220,7 +1224,7 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 #endif
     
 	// Allocating buffer for 4 sectors.
-	const void * probeBuffer = malloc(PROBEFS_SIZE);
+	const void * probeBuffer = calloc(1,PROBEFS_SIZE);
 	if (probeBuffer == NULL)
 		goto exit;
 	
@@ -1295,6 +1299,7 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     if (!buffer) {
         goto scanErr;
     }
+	bzero(buffer,BPS);
     int error;	
     if ( (error = readBytes( biosdev, /*secno*/0, 0, BPS, buffer )) != 0) {
         DBG("Failed to read boot sector from BIOS device %02xh. Error=%d\n", biosdev, error);
@@ -1393,6 +1398,8 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
 	if (!buffer) {
         goto scanErr;
     }
+	bzero(buffer,bufferSize);
+	
     if(readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
         goto scanErr;
 	
@@ -1403,6 +1410,8 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
     if (!map) {
         goto scanErr;
     }
+	bzero(map,sizeof(struct DiskBVMap));
+	
     map->biosdev = biosdev;
     map->bvr = NULL;
     map->bvrcnt = 0;
@@ -1683,7 +1692,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		{
 			snprintf(dirSpec, sizeof(dirSpec),"hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no); 
 			DBG("dirSpec %s\n",dirSpec);
-
+			
 			if (!loadConfigFile(dirSpec, &config_file))
 			{	
 				if (getOSInstallURL(bvr, dirSpec, &config_file)) 
@@ -1791,8 +1800,8 @@ static void scanFSLevelBVRSettings(BVRef chain)
 			if (!ret)
 			{
 				strlcat(dirSpec, fileSpec, sizeof(dirSpec));
-
-				fh = open(dirSpec);
+				
+				fh = open(dirSpec,0);
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{
@@ -1977,6 +1986,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
             if (!newBVR) {
                 continue;
             }
+			bzero(newBVR,sizeof(struct BootVolume));
+			
 			bcopy(bvr, newBVR, sizeof(struct BootVolume));
 			
 			/*
@@ -2254,7 +2265,9 @@ int readBootSector( int biosdev, unsigned int secno, void * buffer )
         {
             gBootSector = (struct disk_blk0 *) malloc(sizeof(struct disk_blk0));
             if ( gBootSector == NULL ) return -1;
+			bzero(gBootSector,sizeof(struct disk_blk0));
         }
+		
         bootSector = gBootSector;
     }
 	
@@ -2292,6 +2305,7 @@ int testFAT32EFIBootSector( int biosdev, unsigned int secno, void * buffer )
         {
             gBootSector = (struct disk_blk0 *) malloc(sizeof(struct disk_blk0));
             if ( gBootSector == NULL ) return -1;
+			bzero(gBootSector,sizeof(struct disk_blk0));
         }
         bootSector = (struct disk_boot1f32_blk *) gBootSector;
     }

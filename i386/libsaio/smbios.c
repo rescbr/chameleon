@@ -182,7 +182,7 @@ int readSMBIOS(int value)
 							return 0;
 						
 						for (field--; field != 0 && strlen((char *)stringPtr) > 0; 
-							 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
+							 field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1)){};
 						
 						//DBG("original SMBIOS Product name: %s\n",(char *)stringPtr);
                         SetgPlatformName((char *)stringPtr);

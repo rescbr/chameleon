@@ -73,7 +73,7 @@ free(s);                                                 \
 
 #define utstring_new(s)                                    \
 do {                                                       \
-s = (UT_string*)malloc(sizeof(UT_string));            \
+s = (UT_string*)calloc(1,sizeof(UT_string));            \
 if (!s) exit(-1);                                          \
 utstring_init(s);                                       \
 } while(0)
@@ -320,7 +320,7 @@ _UNUSED_ static long utstring_find(
     V_HaystackLen = s->i - V_StartPosition;
     if ( (V_HaystackLen >= P_NeedleLen) && (P_NeedleLen > 0) )
     {
-        V_KMP_Table = (long *)malloc(sizeof(long) * (P_NeedleLen + 1));
+        V_KMP_Table = (long *)calloc((P_NeedleLen + 1), sizeof(long));
         if (V_KMP_Table != NULL)
         {
             _utstring_BuildTable(P_Needle, P_NeedleLen, V_KMP_Table);
@@ -366,7 +366,7 @@ _UNUSED_ static long utstring_findR(
     V_HaystackLen = V_StartPosition + 1;
     if ( (V_HaystackLen >= P_NeedleLen) && (P_NeedleLen > 0) )
     {
-        V_KMP_Table = (long *)malloc(sizeof(long) * (P_NeedleLen + 1));
+        V_KMP_Table = (long *)calloc((P_NeedleLen + 1), sizeof(long));
         if (V_KMP_Table != NULL)
         {
             _utstring_BuildTableR(P_Needle, P_NeedleLen, V_KMP_Table);

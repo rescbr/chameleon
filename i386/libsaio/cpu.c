@@ -795,7 +795,7 @@ void scan_cpu(void)
             cache_type_t	type = Lnone;
             uint32_t	cache_type;
             uint32_t	cache_level;
-            uint32_t	cache_sharing;
+            //uint32_t	cache_sharing;
             uint32_t	cache_linesize;
             uint32_t	cache_sets;
             uint32_t	cache_associativity;
@@ -810,7 +810,7 @@ void scan_cpu(void)
             if (cache_type == 0)
                 break;		/* no more caches */
             cache_level  		= bitfield32(reg[eax],  7,  5);
-            cache_sharing	 	= bitfield32(reg[eax], 25, 14) + 1;
+            //cache_sharing	 	= bitfield32(reg[eax], 25, 14) + 1;
             Cpuid_cores_per_package
             = bitfield32(reg[eax], 31, 26) + 1;
             cache_linesize		= bitfield32(reg[ebx], 11,  0) + 1;
@@ -1254,7 +1254,7 @@ void scan_cpu(void)
 #ifndef AMD_SUPPORT
 	set_env(envMicrocodeVersion, MicrocodeVersion);    
 #endif
-    set_env_copy(envBrandString, CpuBrandString, sizeof(CpuBrandString));
+    set_env_ptr(envBrandString, CpuBrandString, sizeof(CpuBrandString));
 	set_env(envSignature, Signature);    
 	set_env(envStepping,  Stepping);    
 	set_env(envFamily,	 Family);    
@@ -1271,7 +1271,7 @@ void scan_cpu(void)
 	set_env(envDynamicAcceleration,  dynamic_acceleration);    
 	set_env(envInvariantAPICTimer,	 invariant_APIC_timer);    
 	set_env(envFineGrainClockMod,  fine_grain_clock_mod);
-    set_env_copy(envCacheSize, Cache_size, sizeof(uint32_t) * LCACHE_MAX);
+    set_env_ptr(envCacheSize, Cache_size, sizeof(uint32_t) * LCACHE_MAX);
 	set_env(envCacheLinesize, Cache_linesize);
     set_env(envLeaf7Features, cpuid_leaf7_features);
     set_env(envTSC__ , __tsc);
@@ -1291,6 +1291,5 @@ void scan_cpu(void)
 	
 #ifdef AMD_SUPPORT
     msglog("AMD CPU Detection Enabled\n");
-#endif
-	
+#endif	
 }

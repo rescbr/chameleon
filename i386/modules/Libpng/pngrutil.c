@@ -3662,8 +3662,9 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
       if (pb < pa) pa = pb, a = b;
       if (pc < pa) a = c;
-
+#if 0
       c = b;
+#endif
       a += *row;
       *row++ = (png_byte)a;
    }

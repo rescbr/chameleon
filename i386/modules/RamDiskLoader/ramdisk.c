@@ -25,8 +25,8 @@ int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
 int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip) = NULL;
 
 int multibootRamdiskReadBytes( int biosdev, unsigned int blkno,
-									 unsigned int byteoff,
-									 unsigned int byteCount, void * buffer );
+							  unsigned int byteoff,
+							  unsigned int byteCount, void * buffer );
 int multiboot_get_ramdisk_info(int biosdev, struct driveInfo *dip);
 static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
 
@@ -41,64 +41,64 @@ void md0Ramdisk()
 	int len;
 	
 	if(getValueForKey(kMD0Image, &override_filename, &len,  
-				   DEFAULT_BOOT_CONFIG))
+					  DEFAULT_BOOT_CONFIG))
 	{
 		// Use user specified md0 file
 		snprintf(filename, sizeof(filename) ,"%s", override_filename);
-		fh = open(filename);
+		fh = open(filename, 0);
 		
 		if(fh < 0)
 		{
 			snprintf(filename, sizeof(filename) ,"bt(0,0)/Extra/%s", override_filename);
-			fh = open(filename);
+			fh = open(filename, 0);
 			
 			if(fh < 0)
 			{
 				snprintf(filename, sizeof(filename) ,"rd(0,0)/Extra/%s", override_filename);
-				fh = open(filename);
-
+				fh = open(filename, 0);
+				
 				if(fh < 0)
 				{
 					snprintf(filename, sizeof(filename) ,"/Extra/%s", override_filename);
-					fh = open(filename);
+					fh = open(filename, 0);
 				}
 			}
 		}
 	}
-
+	
 	if(fh < 0)
 	{
 		snprintf(filename, sizeof(filename) ,"bt(0,0)/Extra/Postboot.img");
-		fh = open(filename);
+		fh = open(filename, 0);
 		
 		if(fh < 0)
 		{
 			snprintf(filename, sizeof(filename) ,"rd(0,0)/Extra/Postboot.img");
-			fh = open(filename);
-
+			fh = open(filename, 0);
+			
 			if(fh < 0)
 			{
 				snprintf(filename, sizeof(filename) ,"/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
-				fh = open(filename);
+				fh = open(filename, 0);
 			}
 		}
 	}
-
+	
 	if (fh >= 0)
 	{
 		verbose("Enabling ramdisk %s\n", filename);
-
+		
 		ramdiskPtr.size  = file_size(fh);
 		ramdiskPtr.base = AllocateKernelMemory(ramdiskPtr.size);
-
+		
 		if(ramdiskPtr.size && ramdiskPtr.base)
 		{
 			// Read new ramdisk image contents in kernel memory.
 			if (read(fh, (char*) ramdiskPtr.base, ramdiskPtr.size) == ramdiskPtr.size)
 			{				
-
+				
                 AllocateMemoryRange("RAMDisk", ramdiskPtr.base, ramdiskPtr.size);
-
+				
 				Node* node = DT__FindNode("/chosen/memory-map", false);
 				if(node != NULL)
 				{
@@ -118,9 +118,9 @@ void md0Ramdisk()
 		{
 			verbose("md0 image %s is empty.\n", filename);
 		}
-
+		
 		close(fh);
-
+		
 	}
 }
 
@@ -136,21 +136,21 @@ void umountRAMDisk(void)
         }
 		CacheReset();
 		diskFreeMap(oldMap);
-
+		
 		// Free multiboot info and module structures.
 		if ((void *)gRAMDiskMI->mi_mods_addr != NULL) free((void *)gRAMDiskMI->mi_mods_addr);
 		if (gRAMDiskMI != NULL) free(gRAMDiskMI);
-
+		
 		// Reset multiboot structures.
 		gRAMDiskMI = NULL;
 		
 		*gRAMDiskFile = '\0';
-
+		
 		// Release ramdisk driver hooks.
 		p_get_ramdisk_info = NULL;
 		p_ramdiskReadBytes = NULL;
 		LoadExtraDrivers_p = NULL;
-
+		
 		// Reset ramdisk bvr
 		gRAMDiskVolume = NULL;
 		printf("\nunmounting: done");
@@ -161,51 +161,54 @@ int mountRAMDisk(const char * param)
 {
 	int fh = 0, ramDiskSize;
 	int error = 0;
-
+	
 	// Get file handle for ramdisk file.
-	fh = open(param);
+	fh = open(param, 0);
 	if (fh != -1)
 	{
 		printf("\nreading ramdisk image: %s\n", param);
-
+		
 		ramDiskSize = file_size(fh);
 		if (ramDiskSize > 0)
 		{
 			// Unmount previously mounted image if exists.
 			umountRAMDisk();
-
+			
 			// Read new ramdisk image contents into PREBOOT_DATA area.
 			if (read(fh, (char *)PREBOOT_DATA, ramDiskSize) != ramDiskSize) error = -1;
 		}
 		else error = -1;
-
+		
 		close(fh);
 	}
 	else error = -1;
-
+	
 	if (error == 0)
 	{
 		// Save filename in gRAMDiskFile to display information.
 		strlcpy(gRAMDiskFile, param, sizeof(gRAMDiskFile));
-
+		
 		// Set gRAMDiskMI as well for the multiboot ramdisk driver hook.
 		gRAMDiskMI = malloc(sizeof(multiboot_info));
 		
 		struct multiboot_module * ramdisk_module = malloc(sizeof(multiboot_module));
-
+		
 		// Fill in multiboot info and module structures.
 		if (gRAMDiskMI != NULL && ramdisk_module != NULL)
 		{
+			bzero(gRAMDiskMI, sizeof(multiboot_info));
+			bzero(ramdisk_module, sizeof(multiboot_module));
+			
 			gRAMDiskMI->mi_mods_count = 1;
 			gRAMDiskMI->mi_mods_addr = (uint32_t)ramdisk_module;
 			ramdisk_module->mm_mod_start = PREBOOT_DATA;
 			ramdisk_module->mm_mod_end = PREBOOT_DATA + ramDiskSize;
-
+			
 			// Set ramdisk driver hooks.
 			p_get_ramdisk_info = &multiboot_get_ramdisk_info;
 			p_ramdiskReadBytes = &multibootRamdiskReadBytes;
 			LoadExtraDrivers_p = &multiboot_LoadExtraDrivers;
-
+			
 			int partCount; // unused
 			// Save bvr of the mounted image.
 			gRAMDiskVolume = diskScanBootVolumes(0x100, &partCount);
@@ -215,16 +218,16 @@ int mountRAMDisk(const char * param)
 				printf("\nRamdisk contains no partitions.\n");
 				pause();
                 
-               // error = -1; // ??
-
+				// error = -1; // ??
+				
 			}
 			else
 			{
 				char dirSpec[128];
-
+				
 				// Reading ramdisk configuration.
 				strlcpy(dirSpec, RAMDISKCONFIG_FILENAME, sizeof(dirSpec));
-
+				
 				if (loadConfigFile(dirSpec, &ramdiskConfig) == 0)
 				{
 					getBoolForKey("BTAlias", &gRAMDiskBTAliased, &ramdiskConfig);
@@ -233,7 +236,7 @@ int mountRAMDisk(const char * param)
 				{
 					verbose("\nno ramdisk config...\n");
 				}
-
+				
 				printf("\nmounting: done");
 			}
 		}
@@ -267,15 +270,15 @@ void showInfoRAMDisk(void)
 {
 	int len;
 	const char *val;
-
+	
 	if (gRAMDiskMI != NULL)
 	{
 		struct multiboot_module * ramdisk_module = (void *)gRAMDiskMI->mi_mods_addr;
-
+		
 		printf("\nfile: %s %d", gRAMDiskFile,
-		ramdisk_module->mm_mod_end - ramdisk_module->mm_mod_start);
+			   ramdisk_module->mm_mod_end - ramdisk_module->mm_mod_start);
 		printf("\nalias: %s", gRAMDiskBTAliased ? "enabled" : "disabled");
-
+		
 		// Display ramdisk information if available.
 		if (getValueForKey("Info", &val, &len, &ramdiskConfig))
 		{
@@ -311,7 +314,7 @@ void processRAMDiskCommand(char ** argPtr, const char * cmd)
 	char * ptr = *argPtr;
 	char param[1024];
 	getNextArg(&ptr, param);
-
+	
 	if (strncmp(cmd, "m",sizeof("m")) == 0)
 	{
 		mountRAMDisk(param);

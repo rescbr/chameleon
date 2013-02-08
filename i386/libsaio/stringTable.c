@@ -113,7 +113,7 @@ removeKeyFromTable(const char *key, char *table)
 	
     len = strlen(key);
     tab = (char *)table;
-    buf = (char *)malloc(len + 3);
+    buf = (char *)calloc(len + 3, sizeof(char));
 	if (!buf) {
         return false;
     }
@@ -173,7 +173,7 @@ newStringFromList(
     if (begin == end)
 		return 0;
     bufsize = end - begin + 1;
-    newstr = malloc(bufsize);
+    newstr = calloc(bufsize, sizeof(char));
     if (!newstr) {
         return 0;
     }
@@ -255,7 +255,7 @@ char *newStringForStringTableKey(
     ASSERT_CONFIG
     
     if (getValueForConfigTableKey(config, key, &val, &size)) {
-		newstr = (char *)malloc(size+1);
+		newstr = (char *)calloc(size+1,sizeof(char));
         if (!newstr) {
             return 0;
         }
@@ -297,7 +297,7 @@ newStringForKey(char *key, config_file_t *config)
     ASSERT_CONFIG
     
     if (getValueForKey(key, &val, &size, config) && size) {
-		newstr = (char *)malloc(size + 1);
+		newstr = (char *)calloc(size + 1, sizeof(char));
         if (!newstr) {
             return 0;
         }
@@ -606,7 +606,7 @@ int ParseXMLFile( char * buffer, TagPtr * dict )
     
 	length = strlen(buffer) + 1;
     
-    configBuffer = malloc(length);
+    configBuffer = (char*)calloc(length,sizeof(char));
     if (!configBuffer) {
         return -1;
     }   
@@ -645,7 +645,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
     
     ASSERT_CONFIG
     
-	if ((fd = open(configFile)) < 0) {
+	if ((fd = open(configFile, 0)) < 0) {
 		return -1;
 	}
 	
@@ -655,7 +655,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	count = read(fd, config->plist, fixedsize);
 	close(fd);
     if (count != fixedsize) return -1;
-
+	
 	// build xml dictionary	
 	return ParseXMLFile(config->plist, &config->dictionary);
 }
@@ -683,14 +683,14 @@ int loadBooterConfig(void)
     
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
-		if ((fd = open(dirspec[i])) >= 0)
+		if ((fd = open(dirspec[i], 0)) >= 0)
 		{
 			// read file
             fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);
 			count = read(fd, config->plist, fixedsize);
 			close(fd);
             if (count != fixedsize) continue;
-
+			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
@@ -725,13 +725,13 @@ int loadOverrideConfig(void)
 	};
     
     config_file_t *config = &bootInfo->overrideConfig;
-
+	
     
 	int i, fd, count, ret=-1, fixedsize;
     
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
-		if ((fd = open(dirspec[i])) >= 0)
+		if ((fd = open(dirspec[i], 0)) >= 0)
 		{
 			// read file
 			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
@@ -777,13 +777,13 @@ int loadSystemConfig(void)
 	char tmp[60];	
 	
     config_file_t *config = &bootInfo->SystemConfig;
-
+	
     
 	int i, fd, count, fixedsize;
 	
 	for(i = 0; (unsigned)i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
 	{
-		if ((fd = open(dirspec[i])) >= 0)
+		if ((fd = open(dirspec[i], 0)) >= 0)
 		{
 			// read file
 			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
@@ -803,8 +803,8 @@ int loadSystemConfig(void)
 	for(i = 0; (unsigned)i< sizeof(dirspecInstall)/sizeof(dirspecInstall[0]); i++)
 	{
 		snprintf(tmp, sizeof(tmp),dirspecInstall[i], bvr->OSInstall); 
-
-		if ((fd = open(tmp)) >= 0)
+		
+		if ((fd = open(tmp, 0)) >= 0)
 		{
 			// read file
 			fixedsize = MIN(file_size(fd),IO_CONFIG_DATA_SIZE);            
@@ -818,7 +818,7 @@ int loadSystemConfig(void)
 			return 0;
 		}
 	}
-
+	
 	return -1;
 }
 
@@ -845,10 +845,10 @@ int loadHelperConfig(void)
 	// This is a simple rock - paper scissors algo. R beats S, P beats R, S beats P
 	// If all three, S is used for now. This should be change dto something else (say, timestamp?)
 	
-	pfd = open(dirspec[0]);
+	pfd = open(dirspec[0], 0);
 	if(pfd >= 0)	// com.apple.boot.P exists
 	{
-		sfd = open(dirspec[2]); // com.apple.boot.S takes precidence if it also exists
+		sfd = open(dirspec[2], 0); // com.apple.boot.S takes precidence if it also exists
 		if(sfd >= 0)
 		{
 			// Use sfd
@@ -871,7 +871,7 @@ int loadHelperConfig(void)
 			count = read(pfd, config->plist, fixedsize);
 			close(pfd);
             if (count != fixedsize) return -1;
-
+			
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
             safe_set_env(envSysConfigValid,true);
@@ -881,10 +881,10 @@ int loadHelperConfig(void)
 	}
 	else
 	{
-		rfd = open(dirspec[1]); // com.apple.boot.R exists
+		rfd = open(dirspec[1], 0); // com.apple.boot.R exists
 		if(rfd >= 0)
 		{
-			pfd = open(dirspec[2]); // com.apple.boot.P takes recidence if it exists
+			pfd = open(dirspec[2], 0); // com.apple.boot.P takes recidence if it exists
 			if(pfd >= 0)
 			{
 				// use sfd
@@ -893,7 +893,7 @@ int loadHelperConfig(void)
 				close(pfd);
 				close(rfd);
                 if (count != fixedsize) return -1;
-
+				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);
@@ -907,7 +907,7 @@ int loadHelperConfig(void)
 				count = read(rfd, config->plist, fixedsize);
 				close(rfd);
                 if (count != fixedsize) return -1;
-
+				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);
@@ -918,7 +918,7 @@ int loadHelperConfig(void)
 		}
 		else
 		{
-			sfd = open(dirspec[2]); // com.apple.boot.S exists, but nothing else does
+			sfd = open(dirspec[2], 0); // com.apple.boot.S exists, but nothing else does
 			if(sfd >= 0)
 			{
 				// use sfd
@@ -926,7 +926,7 @@ int loadHelperConfig(void)
 				count = read(sfd, config->plist, fixedsize);
 				close(sfd);
                 if (count != fixedsize) return -1;
-
+				
 				// build xml dictionary
 				ParseXMLFile(config->plist, &config->dictionary);
                 safe_set_env(envSysConfigValid,true);
@@ -944,7 +944,7 @@ int loadHelperConfig(void)
 static char * AllocInitStringWithLength(const char * oldString, int len)
 {
 	char *Buf = NULL;
-	Buf = malloc(len);
+	Buf = (char*)calloc(len,sizeof(char));
 	if (Buf == NULL) return NULL;
 	
 	if (oldString != NULL)

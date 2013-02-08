@@ -323,7 +323,7 @@ local void tr_static_init()
  */
 #ifdef GEN_TREES_H
 #  ifndef DEBUG
-#    include "stdio.h"
+#    include <stdio.h>
 #  endif
 
 #  define SEPARATOR(i, last, width) \

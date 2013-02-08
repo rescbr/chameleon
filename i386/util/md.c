@@ -95,7 +95,7 @@ static char file_array[IObuffer];      /* read file and store crunched names */
 static char dep_line[LINESIZE];        /* line being processed */
 static char dot_o[LINESIZE];           /* <foo.o>: prefix */
 static char *path_component[100];      /* stores components for a path while being
-                                 crunched */
+										crunched */
 
 static struct dep {                    /* stores paths that a file depends on */
     int len;
@@ -418,7 +418,7 @@ static void parse_dep(void)
         cp = dep_line;
         lp[-1] = 0;
         /* skip .o file name */
-        while ((c = *cp++) && c != ':'); if (!c) continue;
+        while ((c = *cp++) && c != ':'){}; if (!c) continue;
     next_filename:
         i = 0;
         abspath = 0;
@@ -488,7 +488,7 @@ static void output_dep(FILE *out)
             printf("dep_files[%d] = %s\n", j, dep_files[j].str);
         }
     typedef int (*qsort_strcmp_fixer)(const void *, const void *);
-
+	
     int (*qsort_strcmp_fix)(const void *, const void *) = (qsort_strcmp_fixer)qsort_strcmp;
     
     qsort(dep_files, dep_file_index, sizeof (struct dep), qsort_strcmp_fix);

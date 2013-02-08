@@ -52,7 +52,7 @@ static int SaveRefString(char* string, int id)
 	{
 		if(tmp->id == id)
 		{
-			tmp->string = malloc(strlen(string)+1);
+			tmp->string = calloc(strlen(string)+1, sizeof(char));
             if (!tmp->string) {
                 return -1;
             }
@@ -66,12 +66,15 @@ static int SaveRefString(char* string, int id)
     if (!new_ref) {
         return -1;
     }
-	new_ref->string = malloc(strlen(string)+1);
+	bzero(new_ref,sizeof(string_ref));
+	
+	new_ref->string = calloc(strlen(string)+1, sizeof(char));
     if (!new_ref->string) {
         free(new_ref);
         return -1;
     }
-	snprintf(new_ref->string, strlen(string)+1,"%s", string);
+	
+	snprintf(new_ref->string, (strlen(string)+1)* sizeof(char),"%s", string);
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
@@ -207,7 +210,7 @@ XMLDecode(const char* src)
     const char *s;
     char *out, *o;
     
-    if ( !src || !(len = strlen(src)) || !(out = malloc(len+1)) )
+    if ( !src || !(len = strlen(src)) || !(out = calloc(len+1,sizeof(char))) )
         return 0;
     
     o = out;
@@ -259,7 +262,7 @@ XMLParseFile( char * buffer, TagPtr * dict )
 	
 	
 	length = strlen(buffer) +  1;
-    configBuffer = malloc(length);
+    configBuffer = calloc(length, sizeof(char));
     if (!configBuffer) {
         return -1;
     }
@@ -917,7 +920,7 @@ NewTag( void )
     if (gTagsFree == 0)
     {
 #if USEMALLOC
-        tag = (TagPtr)malloc(kTagsPerBlock * sizeof(Tag));
+        tag = (TagPtr)calloc(sizeof(Tag), kTagsPerBlock);
 #else
         tag = (TagPtr)AllocateBootXMemory(kTagsPerBlock * sizeof(Tag));
 #endif
@@ -1008,8 +1011,10 @@ NewSymbol( char * string )
             stop("NULL symbol!");        
             return 0;
         }
+		bzero(symbol,sizeof(Symbol) );
+		
         len = strlen(string) + 1;
-        symbol->string = (char*)malloc(len);
+        symbol->string = (char*)calloc(len,sizeof(char));
         if (symbol->string == 0) {
             free(symbol);
             stop("NULL symbol->string!");
