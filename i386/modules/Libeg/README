@@ -1,0 +1,4 @@
+tryme.c will let you see what this framebuffer will be capable in the next future, it's composed of a suite of animations that should be fast enough to be smooth and eye candy on most systemes,
+but it can be very slow on some machines.
+
+warning : the text renderer do not work for the moment, you will not be warned when an animation is finished up, so when it seems to be in pause just press any key to continue.

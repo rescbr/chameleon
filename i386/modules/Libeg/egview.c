@@ -130,7 +130,7 @@ VOID egViewBufferUpdate(IN OUT EG_VIEW *View)
         {
             memset(&earlier,0,sizeof(struct timeval));
 
-            if(gettimeofday(&earlier,NULL))
+            if(gettimeofday(&earlier,NULL) != 0)
             {
                 
                 ASSERT(FALSE);
@@ -144,7 +144,7 @@ VOID egViewBufferUpdate(IN OUT EG_VIEW *View)
             
             memset(&later,0,sizeof(struct timeval));
             
-            if(gettimeofday(&later,NULL))
+            if(gettimeofday(&later,NULL) != 0)
             {
                 
                 ASSERT(FALSE);

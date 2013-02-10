@@ -119,7 +119,7 @@ int gettimeofday(struct timeval *tv, void *tz)
 {
     cpu_khz = (uint32_t)(get_env(envCPUFreq) / 1000);
     if (!(cpu_khz>0)) {
-        return 1;
+        return -1;
     }
 	/*
 	 * Call the gtod init when we need it - this keeps the code from

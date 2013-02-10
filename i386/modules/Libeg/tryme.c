@@ -32,6 +32,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* PLEASE SEE THE REAME */
+
 #include "libegint.h"
 #include <xml.h>
 #include <IOGraphics.h>
@@ -546,7 +548,7 @@ BOOLEAN LoadGui(VOID)
 			if ((icnsImage = egDecodeICNS((UINT8 *)image->PixelData, image->Width * image->Height * 4, 128, TRUE)))
 			{				
 				
-				EG_IMAGE_VIEW * iconeView =  egCreateImageViewFromData((EG_PIXEL *)image->PixelData, image->Width, image->Height, TRUE , 20, 20, name16, TRUE);	
+				EG_IMAGE_VIEW * iconeView =  egCreateImageViewFromData((EG_PIXEL *)image->PixelData, image->Width, image->Height, TRUE , 40, 40, name16, TRUE);
 				
 				if (iconeView) {
 					iconeRef = egViewAddImageView(screen, iconeView);
@@ -648,6 +650,8 @@ BOOLEAN LoadGui(VOID)
         
         
     }
+    egViewUpdate(screen);
+    getc();
 	egViewRemoveImageView(screen, ConsoleImageViewRef);
 
     /*
@@ -691,9 +695,9 @@ BOOLEAN LoadGui(VOID)
         uint32_t x2,y2;
 
         for (c = 0; c < 5; c++) {
-            if(gettimeofday(&earlier,NULL))
+            if(gettimeofday(&earlier,NULL) != 0)
             {                
-                assert(1);
+                exit(-1);
             }
             int inc = 1,count = 0;
             x = deviceView->PosX;
@@ -786,22 +790,13 @@ BOOLEAN LoadGui(VOID)
                 }
                 
             }
-            if(gettimeofday(&later,NULL))
+            if(gettimeofday(&later,NULL) != 0)
             {
                 
-                exit(1);
+                exit(-1);
             }
             
-            CHAR16 Destination[512];                    
-            
-            SPrint (
-                    Destination,
-                    sizeof(Destination),
-                    L"animation %d took %lld microseconds to finish", c,
-                    timeval_diff(NULL,&later,&earlier));
-            
-            UINTN TextWidth;
-            
+                       
             EG_POSITION pos ;
             pos.x = (screen_params[0] - MIN(LAYOUT_TEXT_WIDTH, screen_params[0])) /2;
             pos.y = (screen_params[1] - MIN(TEXT_LINE_HEIGHT, screen_params[1])) /2;
@@ -814,13 +809,31 @@ BOOLEAN LoadGui(VOID)
             
             assert(TextImageView);
             assert(TextImageView->Image);
-            MenuBackgroundPixel.a -=50;
+            //MenuBackgroundPixel.a -=50;
             egFillImage(TextImageView->Image, &MenuBackgroundPixel);
             
             // render the text
+            
+            CHAR16 Destination[512];
+            
+            SPrint (
+                    Destination,
+                    sizeof(Destination),
+                    L"animation %d took %lld microseconds to finish", c,
+                    timeval_diff(NULL,&later,&earlier));
+             
+            /*
+            CHAR8 Destination8[512];
+            snprintf(Destination8, sizeof(Destination8), "animation %d took %lld microseconds to finish", c,
+                     timeval_diff(NULL,&later,&earlier));
+             
+            AsciiStrToUnicodeStr(Destination8, Destination);
+            */
+            /*
+            UINTN TextWidth;
             egMeasureText(Destination, &TextWidth, NULL);
             egRenderText(Destination, TextImageView->Image, (TextImageView->Image->Width - TextWidth) >> 1, 2);
-            
+            */
             egViewAddImageView(screen, TextImageView);
             egFreeImageView(TextImageView);
             egViewUpdate(screen);
@@ -937,9 +950,9 @@ BOOLEAN LoadGui(VOID)
             
         }
         
-        getc();
+        //getc();
         
-        egViewRemoveImageViewByName(screen, L"plug_in_Icon", sizeof(L"plug_in_Icon"));
+        //egViewRemoveImageViewByName(screen, L"plug_in_Icon", sizeof(L"plug_in_Icon"));
         egViewUpdate(screen);
         getc();        
        

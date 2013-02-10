@@ -49,6 +49,7 @@ void
 exit(status)
 	int status;
 {
+    
 	__cxa_finalize(NULL);
 	if (__cleanup)
 		(*__cleanup)();

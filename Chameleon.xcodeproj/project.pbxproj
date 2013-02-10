@@ -475,6 +475,7 @@
 		AB5BBD77164D3C9A000C872E /* pack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pack.c; sourceTree = "<group>"; };
 		AB79217514F38CF200F5EB39 /* bootXnu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bootXnu.h; sourceTree = "<group>"; };
 		AB79219214F3919E00F5EB39 /* ModuleHelp.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ModuleHelp.txt; sourceTree = "<group>"; };
+		AB7BC1DD16C80A0C00EA5FAE /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		AB7BEAC116C2A6C60098D72E /* __libc_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = __libc_init.c; sourceTree = "<group>"; };
 		AB7BEAC216C2A6C60098D72E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		AB7BEAC416C2A6C60098D72E /* fclose.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fclose.c; sourceTree = "<group>"; };
@@ -828,6 +829,8 @@
 		ABAEBAFB16C3EB6E0010968B /* PngFile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PngFile.c; sourceTree = "<group>"; };
 		ABAEBAFC16C3EB6E0010968B /* PngFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PngFile.h; sourceTree = "<group>"; };
 		ABAEBAFD16C3EB6E0010968B /* tryme.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tryme.c; sourceTree = "<group>"; };
+		ABB0131B16C6CBED001EEC83 /* memcpy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memcpy.c; sourceTree = "<group>"; };
+		ABB0131C16C6CBED001EEC83 /* memcpy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memcpy.h; sourceTree = "<group>"; };
 		ABB4CE7D151E39740053B64E /* lzss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzss.c; sourceTree = "<group>"; };
 		ABBBFCF715D557A4002D7A1E /* md.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md.c; sourceTree = "<group>"; };
 		ABBBFCFA15D55908002D7A1E /* ld_classic */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ld_classic; sourceTree = "<group>"; };
@@ -838,8 +841,6 @@
 		ABD9A1FF150F80C4008DA465 /* CoreHash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoreHash.c; sourceTree = "<group>"; };
 		ABE5FF4E14F9495500447F78 /* modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = modules.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		ABE5FF4F14F9495500447F78 /* modules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = modules.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		ABFA456816C5372D004869B8 /* memcpy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memcpy.c; sourceTree = "<group>"; };
-		ABFA456916C5372D004869B8 /* memcpy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memcpy.h; sourceTree = "<group>"; };
 		ABFF913F169D87C200D6BEBB /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		ABFF9140169D87C200D6BEBB /* png.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = png.c; sourceTree = "<group>"; };
 		ABFF9144169D87C200D6BEBB /* pngerror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pngerror.c; sourceTree = "<group>"; };
@@ -2359,9 +2360,10 @@
 				ABAEBAFA16C3EB6E0010968B /* Makefile */,
 				ABAEBAFB16C3EB6E0010968B /* PngFile.c */,
 				ABAEBAFC16C3EB6E0010968B /* PngFile.h */,
-				ABFA456816C5372D004869B8 /* memcpy.c */,
-				ABFA456916C5372D004869B8 /* memcpy.h */,
+				ABB0131B16C6CBED001EEC83 /* memcpy.c */,
+				ABB0131C16C6CBED001EEC83 /* memcpy.h */,
 				ABAEBAFD16C3EB6E0010968B /* tryme.c */,
+				AB7BC1DD16C80A0C00EA5FAE /* README */,
 			);
 			path = Libeg;
 			sourceTree = "<group>";

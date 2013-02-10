@@ -1,3 +1,11 @@
+- Added a test suite for libeg , please see the README
+- Added egpng.c, egview, egimageview to libeg
+- Added libeg (based on refit-libeg)
+- Added libefi (based on edk2)
+- Updated module/include (it should be more standard now)
+- Added libc
+- Removed libsaio module
+
 - Updated platform.c
 - Updated modules.c 
 

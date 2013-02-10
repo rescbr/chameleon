@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 #include <pexpert/i386/boot.h>
 #include "memcpy.h" // a fast memcpy
+#include <string.h>
 
 #define MAX_FILE_SIZE (1024*1024*1024)
 
