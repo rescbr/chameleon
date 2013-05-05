@@ -422,7 +422,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	}
 	
 	if (!(Platform.CPU.Features & CPU_FEATURE_MSR)) {
-		verbose ("Unsupported CPU: P-States will not be generated !!! No MSR support\n");
+		verbose ("Unsupported CPU: P-States will not be generated !!!\n");
 		return NULL;
 	}
 	
@@ -583,7 +583,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
                         }
                         minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 						
-						verbose("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);			
+						verbose("P-States: min %d, max %d\n", minimum.Control, maximum.Control);
 						
 						// Sanity check
 						if (maximum.Control < minimum.Control) 
@@ -608,7 +608,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						break;
 					}	
 					default:
-						verbose ("Unsupported CPU: P-States not generated !!! Unknown CPU Type\n");
+						verbose ("Unsupported CPU: P-States not generated !!!\n");
 						break;
 				}
 			}
@@ -847,8 +847,8 @@ int setupAcpi(void)
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
 	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
 	
-    DBG("generating p-states config: %d\n", generate_pstates);
-    DBG("generating c-states config: %d\n", generate_cstates);
+    DBG("Generating P-states config: %d\n", generate_pstates);
+    DBG("Generating C-states config: %d\n", generate_cstates);
     
 	{
 		int i;
@@ -957,7 +957,7 @@ int setupAcpi(void)
 					// Generate _CST SSDT
 					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 					{
-                        DBG("c-states generated\n");
+                        DBG("C-states generated\n");
 						generate_cstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -965,7 +965,7 @@ int setupAcpi(void)
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 					{
-                        DBG("p-states generated\n");
+                        DBG("P-states generated\n");
 						generate_pstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}

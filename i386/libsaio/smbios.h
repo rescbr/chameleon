@@ -386,6 +386,7 @@ typedef struct SMBMemorySPD {
 	SMBWord           Data[];
 } __attribute__((packed)) SMBMemorySPD;
 
+
 //
 // OEM Processor Type (Apple Specific - Type 131)
 //

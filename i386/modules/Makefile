@@ -41,12 +41,15 @@ ifdef CONFIG_ACPICODEC_MODULE
 SUBDIRS += AcpiCodec
 endif
 
+ifdef CONFIG_FILENVRAM_MODULE
+SUBDIRS += FileNVRAM
+endif
+
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBSAIODIR = $(SRCROOT)/i386/libsaio
 INC = -I$(LIBSAIODIR)
-
 
 ifeq (${CONFIG_MODULES}, y)
 all: $(SYMROOT) $(OBJROOT) objroot_dirs $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h all-recursive

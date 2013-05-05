@@ -192,15 +192,17 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
-							value->word = 0x0901;			// Core i3
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+							value->word = 0x0501;			// Xeon
 						else
-							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x0601;		// Core i5
-							else
-								value->word = 0x0701;		// Core i7
-						return true;
-				}
+							if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+								value->word = 0x0901;			// Core i3
+                            else
+                                if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+                                    value->word = 0x0601;		// Core i5
+                                else
+                                    value->word = 0x0701;		// Core i7
+                    return true;				}
 			}
 		}
 	}

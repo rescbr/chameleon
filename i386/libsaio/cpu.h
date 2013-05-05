@@ -16,17 +16,18 @@ extern void scan_cpu(PlatformInfo_t *);
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x00000198
+#define MSR_CORE_THREAD_COUNT	0x35	// Undocumented. Nehalem and newer only 
+#define MSR_FLEX_RATIO          0x194	// Undocumented. 
+#define MSR_IA32_EXT_CONFIG     0xEE	// Undocumented. Core Solo and Core Duo only
+#define MSR_PKG_CST_CONFIG_CTL	0xE2
+#define	MSR_IA32_PERF_STATUS	0x198
 #define MSR_IA32_PERF_CONTROL	0x199
-#define MSR_IA32_EXT_CONFIG		0x00EE
-#define MSR_FLEX_RATIO			0x194
-#define MSR_TURBO_RATIO_LIMIT	0x1AD
-#define	MSR_PLATFORM_INFO		0xCE
-#define MSR_CORE_THREAD_COUNT	0x35			// Undocumented
 #define MSR_IA32_PLATFORM_ID	0x17
+#define	MSR_PLATFORM_INFO       0xCE
+#define MSR_TURBO_RATIO_LIMIT	0x1AD
 
-#define K8_FIDVID_STATUS		0xC0010042
-#define K10_COFVID_STATUS		0xC0010071
+#define K8_FIDVID_STATUS        0xC0010042
+#define K10_COFVID_STATUS       0xC0010071
 
 #define MSR_AMD_MPERF           0x000000E7
 #define MSR_AMD_APERF           0x000000E8
@@ -39,23 +40,6 @@ extern void scan_cpu(PlatformInfo_t *);
 // DFE: These two constants come from Linux except CLOCK_TICK_RATE replaced with CLKNUM
 #define CALIBRATE_TIME_MSEC	30		/* 30 msecs */
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
-
-// CPUID Values
-#define CPUID_MODEL_YONAH		14	// Intel Mobile Core Solo, Duo
-#define CPUID_MODEL_MEROM		15	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
-#define CPUID_MODEL_PENRYN		23	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-#define CPUID_MODEL_NEHALEM		26	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-#define CPUID_MODEL_ATOM		28	// Intel Atom (45nm)
-#define CPUID_MODEL_FIELDS		30	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-#define CPUID_MODEL_DALES		31	// Havendale, Auburndale
-#define CPUID_MODEL_DALES_32NM	37	// Intel Core i3, i5 LGA1156 (32nm)
-#define CPUID_MODEL_SANDYBRIDGE	42	// Intel Core i3, i5, i7 LGA1155 (32nm)
-#define CPUID_MODEL_WESTMERE	44	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-#define CPUID_MODEL_JAKETOWN	45	// Intel Xeon E5 LGA2011 (22nm)
-#define CPUID_MODEL_NEHALEM_EX	46	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
-#define CPUID_MODEL_WESTMERE_EX	47	// Intel Xeon E7
-#define CPUID_MODEL_IVYBRIDGE	58	// Intel Core i5, i7 LGA1155 (22nm)
-
 
 static inline uint64_t rdtsc64(void)
 {
