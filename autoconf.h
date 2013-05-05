@@ -1,7 +1,7 @@
 //
 // Automatically generated make config: don't edit
 // Chameleon Configuration
-// Tue Feb 19 12:47:50 2013
+// Sun May  5 19:13:55 2013
 // 
 #define CONFIG_IS_BUILTIN   1
 #define CONFIG_IS_MODULE    2
