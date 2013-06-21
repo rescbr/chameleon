@@ -384,7 +384,8 @@ void scan_cpu(PlatformInfo_t *p)
 						      p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
 						      p->CPU.Model == CPU_MODEL_SANDYBRIDGE ||
 						      p->CPU.Model == CPU_MODEL_JAKETOWN    ||
-						      p->CPU.Model == CPU_MODEL_IVYBRIDGE   )) {
+						      p->CPU.Model == CPU_MODEL_IVYBRIDGE   ||
+						      p->CPU.Model == CPU_MODEL_HASWELL     )){
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 //				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
 				bus_ratio_max = bitfield(msr, 15, 8);	//MacMan: Changed bitfield to match Apple tsc.c
@@ -421,6 +422,7 @@ void scan_cpu(PlatformInfo_t *p)
 					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+                    case CPU_MODEL_HASWELL:     // Intel Core i3, i5, i7, Xeon E3 LGA1050 (22nm)
 					{
 						msr = rdmsr64(MSR_IA32_PERF_STATUS);
 						currcoef = bitfield(msr, 15, 8);

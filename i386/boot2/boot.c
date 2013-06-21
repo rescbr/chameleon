@@ -145,7 +145,7 @@ static int ExecKernel(void *binary)
 	reserveKernBootStruct();
 	
 	// Notify modules that the kernel has been decoded
-	execute_hook("DecodedKernel", (void*)binary, NULL, NULL, NULL);
+	execute_hook("DecodedKernel", (void*)binary, (void*)bootArgs->kaddr, (void*)bootArgs->ksize, NULL);
 	
 	setupFakeEfi();
 	
@@ -198,7 +198,8 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 	
 	// Jump to kernel's entry point. There's no going back now.
-	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+    {
 		
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
@@ -238,10 +239,14 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 
 	// Use specify kernel cache file if not empty
 	if (cacheFile[0] != 0)
+    {
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
-	else {
-    		// Lion and Mountain Lion prelink kernel cache file
-		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8"))) {
+    }
+	else
+    {
+    		// Lion, Mountain Lion and Mavericks prelink kernel cache file
+		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+        {
 			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
 		}
 		// Snow Leopard prelink kernel cache file

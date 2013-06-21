@@ -12,6 +12,8 @@
 #include "platform.h"
 #include "device_inject.h"
 #include "gma.h"
+#include "vbe.h"
+#include "graphics.h"
 
 #ifndef DEBUG_GMA
 #define DEBUG_GMA 0

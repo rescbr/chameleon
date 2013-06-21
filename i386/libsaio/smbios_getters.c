@@ -33,6 +33,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 						// removes FSB info from system profiler as on real mac's.     
 					case CPU_MODEL_SANDYBRIDGE:     
 					case CPU_MODEL_IVYBRIDGE:
+                    case CPU_MODEL_HASWELL:
 						value->word = 0;
 						break;
 					default:
@@ -192,6 +193,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
+                    case CPU_MODEL_HASWELL:             // Intel Core i3, i5, i7, Xeon E3 LGA1155 (22nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 							value->word = 0x0501;			// Xeon
 						else
@@ -202,7 +204,8 @@ bool getSMBOemProcessorType(returnType *value)
                                     value->word = 0x0601;		// Core i5
                                 else
                                     value->word = 0x0701;		// Core i7
-                    return true;				}
+                    return true;
+                }
 			}
 		}
 	}

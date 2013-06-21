@@ -793,6 +793,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 static long
 ParseTagData( char * buffer, TagPtr * tag )
 {
+    int actuallen = 0;
     long   length;
     TagPtr tmpTag;
 
@@ -806,13 +807,11 @@ ParseTagData( char * buffer, TagPtr * tag )
 	//printf("Data: %s\n", buffer);
 	//	getchar();
 	
-	// TODO: base64 decode
-	
-	char* string = NewSymbol(buffer);
+    char* string = BASE64Decode(buffer, strlen(buffer), &actuallen);
     tmpTag->type = kTagTypeData;
     tmpTag->string = string;
     tmpTag->tag = 0;
-	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
+	tmpTag->offset = actuallen; // buffer_start ? buffer - buffer_start: 0;
     tmpTag->tagNext = 0;
     
     *tag = tmpTag;
@@ -972,7 +971,7 @@ XMLFreeTag( TagPtr tag )
 #if DOFREE
     if (tag == 0) return;
   
-    if (tag->string) FreeSymbol(tag->string);
+    if (!XMLIsInteger(tag) && tag->string) FreeSymbol(tag->string);
   
     XMLFreeTag(tag->tag);
     XMLFreeTag(tag->tagNext);
@@ -1114,6 +1113,10 @@ bool XMLIsDict(TagPtr entry)
     return entry && (entry->type == kTagTypeDict);
 }
 
+bool XMLIsData(TagPtr entry)
+{
+    return entry && (entry->type == kTagTypeData);
+}
 
 TagPtr XMLCastDict(TagPtr dict)
 {
@@ -1136,6 +1139,20 @@ char* XMLCastString(TagPtr dict)
 	if((dict->type == kTagTypeString) ||
 	   (dict->type == kTagTypeKey)) return dict->string;
 	
+	return NULL;
+}
+
+char* XMLCastData(TagPtr dict, int* length)
+{
+	if(!dict) return NULL;
+    
+	if((dict->type == kTagTypeData) ||
+	   (dict->type == kTagTypeKey))
+    {
+        *length = dict->offset;
+        return dict->string;
+    }
+	*length = 0;
 	return NULL;
 }
 

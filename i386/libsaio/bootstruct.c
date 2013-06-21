@@ -110,7 +110,7 @@ void
 reserveKernBootStruct(void)
 {
 	if ((gMacOSVersion[0] == '1') && (gMacOSVersion[1] == '0')
-		&& (gMacOSVersion[2] == '.') && (gMacOSVersion[3] == '7' || gMacOSVersion[3] == '8'))
+		&& (gMacOSVersion[2] == '.') && (gMacOSVersion[3] == '7' || gMacOSVersion[3] == '8' || gMacOSVersion[3] == '9'))
 	{
 		void *oldAddr = bootArgs;
 		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
@@ -146,7 +146,7 @@ finalizeBootStruct(void)
 	bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
 	bootArgs->MemoryMapDescriptorVersion = 0;
 	
-	for (i=0; i<memoryMapCount; i++, memoryMap++) {
+	for (i = 0; i < memoryMapCount; i++, memoryMap++) {
 		range = &bootInfo->memoryMap[i];
 		switch(range->type) {
 			case kMemoryRangeACPI:

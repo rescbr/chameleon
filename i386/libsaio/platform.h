@@ -45,6 +45,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_NEHALEM_EX	0x2E			// Beckton
 #define CPU_MODEL_WESTMERE_EX	0x2F            // Westmere-EX
 #define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
+#define CPU_MODEL_HASWELL		0x3C			// Haswell
 
 /* CPU Features */
 #define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set

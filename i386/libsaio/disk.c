@@ -1341,20 +1341,26 @@ static BVRef diskScanGPTBootVolumes( int biosdev, int * countPtr )
             if ( (efi_guid_compare(&GPT_BASICDATA_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ||
                  (efi_guid_compare(&GPT_BASICDATA2_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
             {
-							switch (fsType)
-              {
-							  case FDISK_NTFS:
-							    bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                	  								0, 0, 0, 0, 0, 0, NTFSGetDescription,
-                		  							(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
-								break;
-
-                default:
-                  bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-                                    0, 0, 0, 0, 0, 0, 0,
-                                    (BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
-                break;
-              }
+				switch (fsType)
+				{
+					case FDISK_NTFS:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+                                          0, 0, 0, 0, 0, 0, NTFSGetDescription,
+                                          (BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
+                        
+					case FDISK_LINUX:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+                                          0, 0, 0, 0, 0, 0, EX2GetDescription,
+                                          (BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
+                        
+					default:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+                                          0, 0, 0, 0, 0, 0, 0,
+                                          (BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
+				}
 							  
             }
 

@@ -30,6 +30,7 @@
 #include "term.h"
 #include "embedded.h"
 #include "pci.h"
+#include "modules.h"
 
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
@@ -188,13 +189,14 @@ static void clearBootArgs(void)
 	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 		clearGraphicBootPrompt();
 	}
+    execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
 }
 
-static void addBootArg(const char * argStr)
+void addBootArg(const char * argStr)
 {
 	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
 	{
-		*gBootArgsPtr++ = ' ';
+		if(gBootArgsPtr != gBootArgs) *gBootArgsPtr++ = ' ';
 		strcat(gBootArgs, argStr);
 		gBootArgsPtr += strlen(argStr);
 	}
@@ -848,7 +850,7 @@ int getBootOptions(bool firstRun)
 		goto done;
 	}
 
-	if (gDeviceCount) {
+	if (gDeviceCount >0) {
 		// Allocate memory for an array of menu items.
 		menuItems = malloc(sizeof(MenuItem) * gDeviceCount);
 		if (menuItems == NULL) {
@@ -856,7 +858,7 @@ int getBootOptions(bool firstRun)
 		}
 
 		// Associate a menu item for each BVRef.
-		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=0; bvr; bvr=bvr->next) {
+		for (bvr=bvChain, i=gDeviceCount-1, selectIndex=-1; bvr; bvr=bvr->next) {
 			if (bvr->visible) {
 				getBootVolumeDescription(bvr, menuItems[i].name, sizeof(menuItems[i].name) - 1, true);
 				menuItems[i].param = (void *) bvr;
@@ -866,6 +868,15 @@ int getBootOptions(bool firstRun)
 				i--;
 			}
 		}
+        // Jief : In case the default partition (returned by selectBootVolume) is not in the menu
+		if ( selectIndex == -1 )
+		{
+			selectIndex = 0;
+            
+			// gDeviceCount is actually > 0, so menuItems[selectIndex] exists
+			menuBVR = (BVRef)(menuItems[selectIndex].param);
+			// what happen is bvChain is empty ?
+        }
 	}
 
 	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
@@ -1058,6 +1069,8 @@ done:
 		free(menuItems);
 		menuItems = NULL;
 	}
+// The next line if uncommented will write the command line boot options to nvram
+//    execute_hook("BootOptions", gBootArgs, gBootArgsPtr, NULL, NULL);
 	return 0;
 }
 

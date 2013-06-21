@@ -1,3 +1,19 @@
+-macman: Chimera 2.1.0 specific changes:
+	Added Haswell CPU support with model and speed detection
+	Disabled writing of boot arguments to nvram
+	Reverted AMD graphics card reporting and log messages to Chimera v1.11.1 style
+	Reverted NVIDIA graphics card reporting to Chimera v1.11.1 style
+	Included mosts changes from trunk r2246 that didn't conflict with Chimera 2.0.1 fixes and enhancements 
+- Fix menuBVR initialization problem
+- Implement ErmaC's HDAEnabler.dylib module
+- Fix Bug in the loop that look for an ATI card. Credits to Jief Luce
+- Fix extension without kPropOSBundleRequired property weren't loaded. Credits to Jief Luce
+- Fix Revision mismatch http://forge.voodooprojects.org/p/chameleon/issues/330/
+- ErmaC : Improve PCI info. Interface program and device revision.
+- Fix Possible bug in i386/libsaio/device_inject.c devprop_add_device() http://forge.voodooprojects.org/p/chameleon/issues/319/
+- Fix warnings/errors from new llvm/clang (xcode 4.6)
+- Fix base64 decode, fixes Issue http://forge.voodooprojects.org/p/chameleon/issues/320/
+- meklort : FileNVRAM module import
 -macman: Chimera 2.0.1 specific changes:
 	iMessage login fix by Meklort from Chameleon 2.2 r2169
 	HD4000 support from Chimera 1.11.1

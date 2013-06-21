@@ -15,7 +15,7 @@
 
 
 #if CONFIG_MODULE_DEBUG
-#define DBG(x...)	printf(x);
+#define DBG(x...)	printf(x)
 #define DBGPAUSE()	getchar()
 #else
 #define DBG(x...)
@@ -149,6 +149,11 @@ int load_module(char* module)
 	}
 	
 	unsigned int moduleSize = file_size(fh);
+    if(moduleSize == 0)
+    {
+        DBG("WARNING: The module %s has a file size of %d, the module will not be loaded.\n", modString, moduleSize);
+        return 0;
+    }
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{

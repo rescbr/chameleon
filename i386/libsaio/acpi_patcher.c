@@ -572,10 +572,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+                    case CPU_MODEL_HASWELL:     // Intel Core i3, i5, i7, Xeon E3 LGA1155 (22nm)
 
 					{
 						if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) ||
-                            (Platform.CPU.Model == CPU_MODEL_JAKETOWN))
+                            (Platform.CPU.Model == CPU_MODEL_JAKETOWN) ||
+                            (Platform.CPU.Model == CPU_MODEL_HASWELL))
                         {
                             maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
                         } else {

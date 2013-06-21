@@ -43,6 +43,8 @@ enum {
     iDeviceGeneric_o,
     iDeviceHFS,
     iDeviceHFS_o,
+    iDeviceHFS_mav,
+	iDeviceHFS_mav_o,
     iDeviceHFS_ML,
     iDeviceHFS_ML_o,
     iDeviceHFS_Lion,
@@ -55,6 +57,8 @@ enum {
     iDeviceHFS_Tiger_o,
     iDeviceHFSRAID,
     iDeviceHFSRAID_o,
+    iDeviceHFSRAID_mav,
+	iDeviceHFSRAID_mav_o,
     iDeviceHFSRAID_ML,
     iDeviceHFSRAID_ML_o,
     iDeviceHFSRAID_Lion,
@@ -118,6 +122,8 @@ image_t images[] = {
     {.name = "device_generic_o",            .image = NULL},
     {.name = "device_hfsplus",              .image = NULL},
     {.name = "device_hfsplus_o",            .image = NULL},
+    {.name = "device_hfsplus_mav",          .image = NULL},
+	{.name = "device_hfsplus_mav_o",        .image = NULL},
     {.name = "device_hfsplus_ml",           .image = NULL},
     {.name = "device_hfsplus_ml_o",         .image = NULL},
     {.name = "device_hfsplus_lion",         .image = NULL},
@@ -131,6 +137,8 @@ image_t images[] = {
 
     {.name = "device_hfsraid",              .image = NULL},
     {.name = "device_hfsraid_o",            .image = NULL},
+    {.name = "device_hfsraid_mav",          .image = NULL},
+	{.name = "device_hfsraid_mav_o",        .image = NULL},
     {.name = "device_hfsraid_ml",           .image = NULL},
     {.name = "device_hfsraid_ml_o",         .image = NULL},
     {.name = "device_hfsraid_lion",         .image = NULL},
@@ -228,7 +236,9 @@ static int getImageIndexByName(const char *name)
 	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
 	{
 	    if (strcmp(name, images[i].name) == 0)
+        {
 	        return i; // found the name
+        }
 	}
 	return -1;
 }
@@ -351,6 +361,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+    LOADPNG(device_hfsplus_mav,             iDeviceHFS);
+	LOADPNG(device_hfsplus_mav_o,           iDeviceHFS_mav);
 	LOADPNG(device_hfsplus_ml,              iDeviceHFS);
 	LOADPNG(device_hfsplus_ml_o,            iDeviceHFS_ML);
 	LOADPNG(device_hfsplus_lion,            iDeviceHFS);
@@ -364,6 +376,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+    LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_mav_o,           iDeviceHFSRAID_mav);
 	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_ml_o,            iDeviceHFSRAID_ML);
 	LOADPNG(device_hfsraid_lion,            iDeviceHFSRAID);
@@ -884,6 +898,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 			{
 				// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
 				switch (device->OSVersion[3]) {
+                    case '9':
+						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
+						break;
 					case '8':
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_ML : iDeviceHFS_ML);
 						break;

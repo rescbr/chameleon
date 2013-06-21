@@ -65,9 +65,9 @@
 #define DBG(x...)
 #endif
 
-#define NVIDIA_ROM_SIZE				0x10000
+#define NVIDIA_ROM_SIZE				0x20000
 #define PATCH_ROM_SUCCESS			1
-#define PATCH_ROM_SUCCESS_HAS_LVDS	2
+#define PATCH_ROM_SUCCESS_HAS_LVDS		2
 #define PATCH_ROM_FAILED			0
 #define MAX_NUM_DCB_ENTRIES			16
 #define TYPE_GROUPED				0xff
@@ -112,280 +112,340 @@ static uint8_t default_NVPM[]= {
 
 #define NVPM_LEN ( sizeof(default_NVPM) / sizeof(uint8_t) )
 
-static nvidia_card_info_t nvidia_cards[] = {
-    /* ========================================================================================
-     * Layout is device(VendorId + DeviceId), subdev (SubvendorId + SubdeviceId), display name.
-     * ========================================================================================
-     */
-	/*Unknown*/	{ 0x10DE0000,	NV_SUB_IDS,	"Unknown" },
-    /* ------ Specific DeviceID and SubDevID. ------ */
-	// 0000 - 0040
-	// 0040 - 004F
-	{ 0x10DE0040,   NV_SUB_IDS, "GeForce 6800 Ultra" },
-	{ 0x10DE0041,	NV_SUB_IDS, "GeForce 6800" },
-	{ 0x10DE0042,	NV_SUB_IDS, "GeForce 6800 LE" },
-	{ 0x10DE0043,	NV_SUB_IDS, "GeForce 6800 XE" },
-	{ 0x10DE0044,	NV_SUB_IDS, "GeForce 6800 XT" },
-	{ 0x10DE0045,	NV_SUB_IDS, "GeForce 6800 GT" },
-	{ 0x10DE0046,	NV_SUB_IDS, "GeForce 6800 GT" },
-	{ 0x10DE0047,	NV_SUB_IDS, "GeForce 6800 GS" },
-	{ 0x10DE0048,	NV_SUB_IDS, "GeForce 6800 XT" },
-	{ 0x10DE004D,	NV_SUB_IDS, "Quadro FX 3400" },
-	{ 0x10DE004E,	NV_SUB_IDS, "Quadro FX 4000" },
+/*static nvidia_pci_info_t nvidia_card_vendors[] = {
+	{ 0x10190000,	"Elitegroup" },
+	{ 0x10250000,	"Acer" },
+	{ 0x10280000,	"Dell" },
+	{ 0x10330000,	"NEC" },
+	{ 0x103C0000,	"HP" },
+	{ 0x10430000,	"Asus" },
+	{ 0x104D0000,	"Sony" },
+	{ 0x105B0000,	"Foxconn" },
+	{ 0x106B0000,	"Apple" },
+	{ 0x10710000,	"Mitac" },
+	{ 0x107B0000,	"Gateway" },
+	{ 0x107D0000,	"Leadtek" },
+	{ 0x109F0000,	"Trigem" },
+	{ 0x10B00000,	"Gainward" },
+	{ 0x10CF0000,	"Fujitsu" },
+	{ 0x10DE0000,	"nVidia" },
+	{ 0x11790000,	"Toshiba" },
+	{ 0x12970000,	"Shuttle" },
+	{ 0x13DC0000,	"Netbost" },
+	{ 0x144D0000,	"Samsung" },
+	{ 0x14580000,	"Gigabyte" },
+	{ 0x14620000,	"MSi" },
+	{ 0x14C00000,	"Compal" },
+	{ 0x152D0000,	"Quanta" },
+	{ 0x15540000,	"Prolink" },
+	{ 0x15580000,	"Clevo" },
+	{ 0x15690000,	"Palit" },
+	{ 0x161F0000,	"Arima" },
+ 	{ 0x16310000,	"NEC" },
+	{ 0x16420000,	"Bitland" },
+	{ 0x16820000,	"XFX" },
+	{ 0x17340000,	"Fujitsu" },
+	{ 0x174B0000,	"PC Partner" },
+	{ 0x17AA0000,	"Lenovo" },
+ 	{ 0x17C00000,	"Wistron" },
+	{ 0x17FF0000,	"Benq" },
+	{ 0x18490000,	"ASRock" },
+	{ 0x18540000,	"LG" },
+	{ 0x18640000,	"LG" },
+	{ 0x18940000,	"LG" },
+	{ 0x19610000,	"ESS" },
+	{ 0x196E0000,	"PNY" },
+	{ 0x19910000,	"Topstar" },
+	{ 0x19DA0000,	"Zotac" },
+	{ 0x19F10000,	"BFG" },
+	{ 0x1ACC0000,	"Point of View" },
+	{ 0x1B0A0000,	"Pegatron" },
+	{ 0x1B130000,	"Jaton" },
+	{ 0x34420000,	"Bihl" },
+	{ 0x38420000,	"EVGA" },
+	{ 0x73770000,	"Colorful" },
+}; */
+
+static nvidia_pci_info_t nvidia_card_generic[] = {
+	// 0000 - 0040	
+	{ 0x10DE0000,	"Unknown" },
+	// 0040 - 004F	
+	{ 0x10DE0040,	"GeForce 6800 Ultra" },
+	{ 0x10DE0041,	"GeForce 6800" },
+	{ 0x10DE0042,	"GeForce 6800 LE" },
+	{ 0x10DE0043,	"GeForce 6800 XE" },
+	{ 0x10DE0044,	"GeForce 6800 XT" },
+	{ 0x10DE0045,	"GeForce 6800 GT" },
+	{ 0x10DE0046,	"GeForce 6800 GT" },
+	{ 0x10DE0047,	"GeForce 6800 GS" },
+	{ 0x10DE0048,	"GeForce 6800 XT" },
+	{ 0x10DE004D,	"Quadro FX 3400" },
+	{ 0x10DE004E,	"Quadro FX 4000" },
 	// 0050 - 005F
 	// 0060 - 006F
 	// 0070 - 007F
 	// 0080 - 008F
 	// 0090 - 009F
-	{ 0x10DE0090,	NV_SUB_IDS, "GeForce 7800 GTX" },
-	{ 0x10DE0091,	NV_SUB_IDS, "GeForce 7800 GTX" },
-	{ 0x10DE0092,	NV_SUB_IDS, "GeForce 7800 GT" },
-	{ 0x10DE0093,	NV_SUB_IDS, "GeForce 7800 GS" },
-	{ 0x10DE0095,	NV_SUB_IDS, "GeForce 7800 SLI" },
-	{ 0x10DE0098,	NV_SUB_IDS, "GeForce Go 7800" },
-	{ 0x10DE0099,	NV_SUB_IDS, "GeForce Go 7800 GTX" },
-	{ 0x10DE009D,	NV_SUB_IDS, "Quadro FX 4500" },
-	// 00A0 - 00AF
-	// 00B0 - 00BF
-	// 00C0 - 00CF
-	{ 0x10DE00C0,	NV_SUB_IDS, "GeForce 6800 GS" },
-	{ 0x10DE00C1,	NV_SUB_IDS, "GeForce 6800" },
-	{ 0x10DE00C2,	NV_SUB_IDS, "GeForce 6800 LE" },
-	{ 0x10DE00C3,	NV_SUB_IDS, "GeForce 6800 XT" },
-	{ 0x10DE00C8,	NV_SUB_IDS, "GeForce Go 6800" },
-	{ 0x10DE00C9,	NV_SUB_IDS, "GeForce Go 6800 Ultra" },
-	{ 0x10DE00CC,	NV_SUB_IDS, "Quadro FX Go1400" },
-	{ 0x10DE00CD,	NV_SUB_IDS, "Quadro FX 3450/4000 SDI" },
-	{ 0x10DE00CE,	NV_SUB_IDS, "Quadro FX 1400" },
+	{ 0x10DE0090,	"GeForce 7800 GTX" },
+	{ 0x10DE0091,	"GeForce 7800 GTX" },
+	{ 0x10DE0092,	"GeForce 7800 GT" },
+	{ 0x10DE0093,	"GeForce 7800 GS" },
+	{ 0x10DE0095,	"GeForce 7800 SLI" },
+	{ 0x10DE0098,	"GeForce Go 7800" },
+	{ 0x10DE0099,	"GeForce Go 7800 GTX" },
+	{ 0x10DE009D,	"Quadro FX 4500" },
+	// 00A0 - 00AF	
+	// 00B0 - 00BF	
+	// 00C0 - 00CF	
+	{ 0x10DE00C0,	"GeForce 6800 GS" },
+	{ 0x10DE00C1,	"GeForce 6800" },
+	{ 0x10DE00C2,	"GeForce 6800 LE" },
+	{ 0x10DE00C3,	"GeForce 6800 XT" },
+	{ 0x10DE00C8,	"GeForce Go 6800" },
+	{ 0x10DE00C9,	"GeForce Go 6800 Ultra" },
+	{ 0x10DE00CC,	"Quadro FX Go1400" },
+	{ 0x10DE00CD,	"Quadro FX 3450/4000 SDI" },
+	{ 0x10DE00CE,	"Quadro FX 1400" },
 	// 00D0 - 00DF
 	// 00E0 - 00EF
 	// 00F0 - 00FF
-	{ 0x10DE00F1,	NV_SUB_IDS, "GeForce 6600 GT" },
-	{ 0x10DE00F2,	NV_SUB_IDS, "GeForce 6600" },
-	{ 0x10DE00F3,	NV_SUB_IDS, "GeForce 6200" },
-	{ 0x10DE00F4,	NV_SUB_IDS, "GeForce 6600 LE" },
-	{ 0x10DE00F5,	NV_SUB_IDS, "GeForce 7800 GS" },
-	{ 0x10DE00F6,	NV_SUB_IDS, "GeForce 6800 GS/XT" },
-	{ 0x10DE00F8,	NV_SUB_IDS, "Quadro FX 3400/4400" },
-	{ 0x10DE00F9,	NV_SUB_IDS, "GeForce 6800 Series GPU" },
+	{ 0x10DE00F1,	"GeForce 6600 GT" },
+	{ 0x10DE00F2,	"GeForce 6600" },
+	{ 0x10DE00F3,	"GeForce 6200" },
+	{ 0x10DE00F4,	"GeForce 6600 LE" },
+	{ 0x10DE00F5,	"GeForce 7800 GS" },
+	{ 0x10DE00F6,	"GeForce 6800 GS/XT" },
+	{ 0x10DE00F8,	"Quadro FX 3400/4400" },
+	{ 0x10DE00F9,	"GeForce 6800 Series GPU" },
 	// 0100 - 010F
 	// 0110 - 011F
 	// 0120 - 012F
 	// 0130 - 013F
 	// 0140 - 014F
-	{ 0x10DE0140,   NV_SUB_IDS, "GeForce 6600 GT" },
-	{ 0x10DE0141,	NV_SUB_IDS, "GeForce 6600" },
-	{ 0x10DE0142,	NV_SUB_IDS, "GeForce 6600 LE" },
-	{ 0x10DE0143,	NV_SUB_IDS, "GeForce 6600 VE" },
-	{ 0x10DE0144,	NV_SUB_IDS, "GeForce Go 6600" },
-	{ 0x10DE0145,	NV_SUB_IDS, "GeForce 6610 XL" },
-	{ 0x10DE0146,	NV_SUB_IDS, "GeForce Go 6600 TE/6200 TE" },
-	{ 0x10DE0147,	NV_SUB_IDS, "GeForce 6700 XL" },
-	{ 0x10DE0148,	NV_SUB_IDS, "GeForce Go 6600" },
-	{ 0x10DE0149,	NV_SUB_IDS, "GeForce Go 6600 GT" },
-	{ 0x10DE014A,	NV_SUB_IDS, "Quadro NVS 440" },
-	{ 0x10DE014C,	NV_SUB_IDS, "Quadro FX 550" },
-	{ 0x10DE014D,	NV_SUB_IDS, "Quadro FX 550" },
-	{ 0x10DE014E,	NV_SUB_IDS, "Quadro FX 540" },
-	{ 0x10DE014F,	NV_SUB_IDS, "GeForce 6200" },
+	{ 0x10DE0140,	"GeForce 6600 GT" },
+	{ 0x10DE0141,	"GeForce 6600" },
+	{ 0x10DE0142,	"GeForce 6600 LE" },
+	{ 0x10DE0143,	"GeForce 6600 VE" },
+	{ 0x10DE0144,	"GeForce Go 6600" },
+	{ 0x10DE0145,	"GeForce 6610 XL" },
+	{ 0x10DE0146,	"GeForce Go 6600 TE/6200 TE" },
+	{ 0x10DE0147,	"GeForce 6700 XL" },
+	{ 0x10DE0148,	"GeForce Go 6600" },
+	{ 0x10DE0149,	"GeForce Go 6600 GT" },
+	{ 0x10DE014A,	"Quadro NVS 440" },
+	{ 0x10DE014C,	"Quadro FX 550" },
+	{ 0x10DE014D,	"Quadro FX 550" },
+	{ 0x10DE014E,	"Quadro FX 540" },
+	{ 0x10DE014F,	"GeForce 6200" },
 	// 0150 - 015F
 	// 0160 - 016F
-	{ 0x10DE0160,	NV_SUB_IDS, "GeForce 6500" },
-	{ 0x10DE0161,	NV_SUB_IDS, "GeForce 6200 TurboCache(TM)" },
-	{ 0x10DE0162,	NV_SUB_IDS, "GeForce 6200SE TurboCache(TM)" },
-	{ 0x10DE0163,	NV_SUB_IDS, "GeForce 6200 LE" },
-	{ 0x10DE0164,	NV_SUB_IDS, "GeForce Go 6200" },
-	{ 0x10DE0165,	NV_SUB_IDS, "Quadro NVS 285" },
-	{ 0x10DE0166,	NV_SUB_IDS, "GeForce Go 6400" },
-	{ 0x10DE0167,	NV_SUB_IDS, "GeForce Go 6200" },
-	{ 0x10DE0168,	NV_SUB_IDS, "GeForce Go 6400" },
-	{ 0x10DE0169,	NV_SUB_IDS, "GeForce 6250" },
-	{ 0x10DE016A,	NV_SUB_IDS, "GeForce 7100 GS" },
+	{ 0x10DE0160,	"GeForce 6500" },
+	{ 0x10DE0161,	"GeForce 6200 TurboCache(TM)" },
+	{ 0x10DE0162,	"GeForce 6200SE TurboCache(TM)" },
+	{ 0x10DE0163,	"GeForce 6200 LE" },
+	{ 0x10DE0164,	"GeForce Go 6200" },
+	{ 0x10DE0165,	"Quadro NVS 285" },
+	{ 0x10DE0166,	"GeForce Go 6400" },
+	{ 0x10DE0167,	"GeForce Go 6200" },
+	{ 0x10DE0168,	"GeForce Go 6400" },
+	{ 0x10DE0169,	"GeForce 6250" },
+	{ 0x10DE016A,	"GeForce 7100 GS" },
+	{ 0x10DE016C,	"NVIDIA NV44GLM" },
+	{ 0x10DE016D,	"NVIDIA NV44GLM" },
 	// 0170 - 017F
 	// 0180 - 018F
 	// 0190 - 019F
-	{ 0x10DE0191,	NV_SUB_IDS, "GeForce 8800 GTX" },
-	{ 0x10DE0193,	NV_SUB_IDS, "GeForce 8800 GTS" },
-	{ 0x10DE0194,	NV_SUB_IDS, "GeForce 8800 Ultra" },
-	{ 0x10DE0197,	NV_SUB_IDS, "Tesla C870" },
-	{ 0x10DE019D,	NV_SUB_IDS, "Quadro FX 5600" },
-	{ 0x10DE019E,	NV_SUB_IDS, "Quadro FX 4600" },
+	{ 0x10DE0191,	"GeForce 8800 GTX" },
+	{ 0x10DE0193,	"GeForce 8800 GTS" },
+	{ 0x10DE0194,	"GeForce 8800 Ultra" },
+	{ 0x10DE0197,	"Tesla C870" },
+	{ 0x10DE019D,	"Quadro FX 5600" },
+	{ 0x10DE019E,	"Quadro FX 4600" },
 	// 01A0 - 01AF
 	// 01B0 - 01BF
 	// 01C0 - 01CF
 	// 01D0 - 01DF
-	{ 0x10DE01D0,	NV_SUB_IDS, "GeForce 7350 LE" },
-	{ 0x10DE01D1,	NV_SUB_IDS, "GeForce 7300 LE" },
-	{ 0x10DE01D2,	NV_SUB_IDS, "GeForce 7550 LE" },
-	{ 0x10DE01D3,	NV_SUB_IDS, "GeForce 7300 SE/7200 GS" },
-	{ 0x10DE01D6,	NV_SUB_IDS, "GeForce Go 7200" },
-	{ 0x10DE01D7,	NV_SUB_IDS, "GeForce Go 7300" },
-	{ 0x10DE01D8,	NV_SUB_IDS, "GeForce Go 7400" },
-	{ 0x10DE01D9,	NV_SUB_IDS, "GeForce Go 7400 GS" },
-	{ 0x10DE01DA,	NV_SUB_IDS, "Quadro NVS 110M" },
-	{ 0x10DE01DB,	NV_SUB_IDS, "Quadro NVS 120M" },
-	{ 0x10DE01DC,	NV_SUB_IDS, "Quadro FX 350M" },
-	{ 0x10DE01DD,	NV_SUB_IDS, "GeForce 7500 LE" },
-	{ 0x10DE01DE,	NV_SUB_IDS, "Quadro FX 350" },
-	{ 0x10DE01DF,	NV_SUB_IDS, "GeForce 7300 GS" },
+	{ 0x10DE01D0,	"GeForce 7350 LE" },
+	{ 0x10DE01D1,	"GeForce 7300 LE" },
+	{ 0x10DE01D2,	"GeForce 7550 LE" },
+	{ 0x10DE01D3,	"GeForce 7300 SE/7200 GS" },
+	{ 0x10DE01D6,	"GeForce Go 7200" },
+	{ 0x10DE01D7,	"GeForce Go 7300" },
+	{ 0x10DE01D8,	"GeForce Go 7400" },
+	{ 0x10DE01D9,	"GeForce Go 7450" },
+	{ 0x10DE01DA,	"Quadro NVS 110M" },
+	{ 0x10DE01DB,	"Quadro NVS 120M" },
+	{ 0x10DE01DC,	"Quadro FX 350M" },
+	{ 0x10DE01DD,	"GeForce 7500 LE" },
+	{ 0x10DE01DE,	"Quadro FX 350" },
+	{ 0x10DE01DF,	"GeForce 7300 GS" },
 	// 01E0 - 01EF
 	// 01F0 - 01FF
+	{ 0x10DE01F0,	"GeForce4 MX" },
 	// 0200 - 020F
 	// 0210 - 021F
-	{ 0x10DE0211,	NV_SUB_IDS, "GeForce 6800" },
-	{ 0x10DE0212,	NV_SUB_IDS, "GeForce 6800 LE" },
-	{ 0x10DE0215,	NV_SUB_IDS, "GeForce 6800 GT" },
-	{ 0x10DE0218,	NV_SUB_IDS, "GeForce 6800 XT" },
+	{ 0x10DE0211,	"GeForce 6800" },
+	{ 0x10DE0212,	"GeForce 6800 LE" },
+	{ 0x10DE0215,	"GeForce 6800 GT" },
+	{ 0x10DE0218,	"GeForce 6800 XT" },
 	// 0220 - 022F
-	{ 0x10DE0221,	NV_SUB_IDS, "GeForce 6200" },
-	{ 0x10DE0222,	NV_SUB_IDS, "GeForce 6200 A-LE" },
+	{ 0x10DE0221,	"GeForce 6200" },
+	{ 0x10DE0222,	"GeForce 6200 A-LE" },
+	{ 0x10DE0228,	"NVIDIA NV44M" },
 	// 0230 - 023F
 	// 0240 - 024F
-	{ 0x10DE0240,	NV_SUB_IDS, "GeForce 6150" },
-	{ 0x10DE0241,	NV_SUB_IDS, "GeForce 6150 LE" },
-	{ 0x10DE0242,	NV_SUB_IDS, "GeForce 6100" },
-	{ 0x10DE0244,	NV_SUB_IDS, "GeForce Go 6150" },
-	{ 0x10DE0245,	NV_SUB_IDS, "Quadro NVS 210S / GeForce 6150LE" },
-	{ 0x10DE0247,	NV_SUB_IDS, "GeForce Go 6100" },
+	{ 0x10DE0240,	"GeForce 6150" },
+	{ 0x10DE0241,	"GeForce 6150 LE" },
+	{ 0x10DE0242,	"GeForce 6100" },
+	{ 0x10DE0243,	"NVIDIA C51" },
+	{ 0x10DE0244,	"GeForce Go 6150" },
+	{ 0x10DE0245,	"Quadro NVS 210S / GeForce 6150LE" },
+	{ 0x10DE0247,	"GeForce Go 6100" },
 	// 0250 - 025F
+	{ 0x10DE025B,	"Quadro4 700 XGL" },
 	// 0260 - 026F
 	// 0270 - 027F
 	// 0280 - 028F
 	// 0290 - 029F
-	{ 0x10DE0290,	NV_SUB_IDS, "GeForce 7900 GTX" },
-	{ 0x10DE0291,	NV_SUB_IDS, "GeForce 7900 GT/GTO" },
-	{ 0x10DE0292,	NV_SUB_IDS, "GeForce 7900 GS" },
-	{ 0x10DE0293,	NV_SUB_IDS, "GeForce 7950 GX2" },
-	{ 0x10DE0294,	NV_SUB_IDS, "GeForce 7950 GX2" },
-	{ 0x10DE0295,	NV_SUB_IDS, "GeForce 7950 GT" },
-	{ 0x10DE0298,	NV_SUB_IDS, "GeForce Go 7900 GS" },
-	{ 0x10DE0299,	NV_SUB_IDS, "Quadro NVS 510M" },
-	{ 0x10DE029A,	NV_SUB_IDS, "Quadro FX 2500M" },
-	{ 0x10DE029B,	NV_SUB_IDS, "Quadro FX 1500M" },
-	{ 0x10DE029C,	NV_SUB_IDS, "Quadro FX 5500" },
-	{ 0x10DE029D,	NV_SUB_IDS, "Quadro FX 3500" },
-	{ 0x10DE029E,	NV_SUB_IDS, "Quadro FX 1500" },
-	{ 0x10DE029F,	NV_SUB_IDS, "Quadro FX 4500 X2" },
+	{ 0x10DE0290,	"GeForce 7900 GTX" },
+	{ 0x10DE0291,	"GeForce 7900 GT/GTO" },
+	{ 0x10DE0292,	"GeForce 7900 GS" },
+	{ 0x10DE0293,	"GeForce 7950 GX2" },
+	{ 0x10DE0294,	"GeForce 7950 GX2" },
+	{ 0x10DE0295,	"GeForce 7950 GT" },
+	{ 0x10DE0298,	"GeForce Go 7900 GS" },
+	{ 0x10DE0299,	"GeForce Go 7900 GTX" },
+	{ 0x10DE029A,	"Quadro FX 2500M" },
+	{ 0x10DE029B,	"Quadro FX 1500M" },
+	{ 0x10DE029C,	"Quadro FX 5500" },
+	{ 0x10DE029D,	"Quadro FX 3500" },
+	{ 0x10DE029E,	"Quadro FX 1500" },
+	{ 0x10DE029F,	"Quadro FX 4500 X2" },
 	// 02A0 - 02AF
 	// 02B0 - 02BF
 	// 02C0 - 02CF
 	// 02D0 - 02DF
 	// 02E0 - 02EF
-	{ 0x10DE02E0,	NV_SUB_IDS, "GeForce 7600 GT" },
-	{ 0x10DE02E1,	NV_SUB_IDS, "GeForce 7600 GS" },
-	{ 0x10DE02E2,	NV_SUB_IDS, "GeForce 7300 GT" },
-	{ 0x10DE02E3,	NV_SUB_IDS, "GeForce 7900 GS" },
-	{ 0x10DE02E4,	NV_SUB_IDS, "GeForce 7950 GT" },
+	{ 0x10DE02E0,	"GeForce 7600 GT" },
+	{ 0x10DE02E1,	"GeForce 7600 GS" },
+	{ 0x10DE02E2,	"GeForce 7300 GT" },
+	{ 0x10DE02E3,	"GeForce 7900 GS" },
+	{ 0x10DE02E4,	"GeForce 7950 GT" },
 	// 02F0 - 02FF
 	// 0300 - 030F
-	{ 0x10DE0301,	NV_SUB_IDS, "GeForce FX 5800 Ultra" },
-	{ 0x10DE0302,	NV_SUB_IDS, "GeForce FX 5800" },
-	{ 0x10DE0308,	NV_SUB_IDS, "Quadro FX 2000" },
-	{ 0x10DE0309,	NV_SUB_IDS, "Quadro FX 1000" },
+	{ 0x10DE0301,	"GeForce FX 5800 Ultra" },
+	{ 0x10DE0302,	"GeForce FX 5800" },
+	{ 0x10DE0308,	"Quadro FX 2000" },
+	{ 0x10DE0309,	"Quadro FX 1000" },
 	// 0310 - 031F
-	{ 0x10DE0311,	NV_SUB_IDS, "GeForce FX 5600 Ultra" },
-	{ 0x10DE0312,	NV_SUB_IDS, "GeForce FX 5600" },
-	{ 0x10DE0314,	NV_SUB_IDS, "GeForce FX 5600XT" },
-	{ 0x10DE031A,	NV_SUB_IDS, "GeForce FX Go5600" },
-	{ 0x10DE031B,	NV_SUB_IDS, "GeForce FX Go5650" },
-	{ 0x10DE031C,	NV_SUB_IDS, "Quadro FX Go700" },
+	{ 0x10DE0311,	"GeForce FX 5600 Ultra" },
+	{ 0x10DE0312,	"GeForce FX 5600" },
+	{ 0x10DE0314,	"GeForce FX 5600XT" },
+	{ 0x10DE031A,	"GeForce FX Go5600" },
+	{ 0x10DE031B,	"GeForce FX Go5650" },
+	{ 0x10DE031C,	"Quadro FX Go700" },
 	// 0320 - 032F
-    { 0x10DE0320,	NV_SUB_IDS, "GeForce FX 5200" },
-	{ 0x10DE0321,	NV_SUB_IDS, "GeForce FX 5200 Ultra" },
-	{ 0x10DE0322,	NV_SUB_IDS, "GeForce FX 5200" },
-	{ 0x10DE0323,	NV_SUB_IDS, "GeForce FX 5200 LE" },
-	{ 0x10DE0324,	NV_SUB_IDS, "GeForce FX Go5200" },
-	{ 0x10DE0325,	NV_SUB_IDS, "GeForce FX Go5250" },
-	{ 0x10DE0326,	NV_SUB_IDS, "GeForce FX 5500" },
-	{ 0x10DE0328,	NV_SUB_IDS, "GeForce FX Go5200 32M/64M" },
-    { 0x10DE0329,	NV_SUB_IDS, "GeForce FX Go5200" },
-	{ 0x10DE032A,	NV_SUB_IDS, "Quadro NVS 55/280 PCI" },
-	{ 0x10DE032B,	NV_SUB_IDS, "Quadro FX 500/600 PCI" },
-	{ 0x10DE032C,	NV_SUB_IDS, "GeForce FX Go53xx Series" },
-	{ 0x10DE032D,	NV_SUB_IDS, "GeForce FX Go5100" },
+	{ 0x10DE0320,	"GeForce FX 5200" },
+	{ 0x10DE0321,	"GeForce FX 5200 Ultra" },
+	{ 0x10DE0322,	"GeForce FX 5200" },
+	{ 0x10DE0323,	"GeForce FX 5200 LE" },
+	{ 0x10DE0324,	"GeForce FX Go5200" },
+	{ 0x10DE0325,	"GeForce FX Go5250" },
+	{ 0x10DE0326,	"GeForce FX 5500" },
+	{ 0x10DE0328,	"GeForce FX Go5200 32M/64M" },
+	{ 0x10DE0329,	"GeForce FX Go5200" },
+	{ 0x10DE032A,	"Quadro NVS 55/280 PCI" },
+	{ 0x10DE032B,	"Quadro FX 500/600 PCI" },
+	{ 0x10DE032C,	"GeForce FX Go53xx Series" },
+	{ 0x10DE032D,	"GeForce FX Go5100" },
+	{ 0x10DE032F,	"NV34GL" },
 	// 0330 - 033F
-	{ 0x10DE0330,	NV_SUB_IDS, "GeForce FX 5900 Ultra" },
-	{ 0x10DE0331,	NV_SUB_IDS, "GeForce FX 5900" },
-	{ 0x10DE0332,	NV_SUB_IDS, "GeForce FX 5900XT" },
-	{ 0x10DE0333,	NV_SUB_IDS, "GeForce FX 5950 Ultra" },
-	{ 0x10DE0334,	NV_SUB_IDS, "GeForce FX 5900ZT" },
-	{ 0x10DE0338,	NV_SUB_IDS, "Quadro FX 3000" },
-	{ 0x10DE033F,	NV_SUB_IDS, "Quadro FX 700" },
+	{ 0x10DE0330,	"GeForce FX 5900 Ultra" },
+	{ 0x10DE0331,	"GeForce FX 5900" },
+	{ 0x10DE0332,	"GeForce FX 5900XT" },
+	{ 0x10DE0333,	"GeForce FX 5950 Ultra" },
+	{ 0x10DE0334,	"GeForce FX 5900ZT" },
+	{ 0x10DE0338,	"Quadro FX 3000" },
+	{ 0x10DE033F,	"Quadro FX 700" },
 	// 0340 - 034F
-	{ 0x10DE0341,	NV_SUB_IDS, "GeForce FX 5700 Ultra" },
-	{ 0x10DE0342,	NV_SUB_IDS, "GeForce FX 5700" },
-	{ 0x10DE0343,	NV_SUB_IDS, "GeForce FX 5700LE" },
-	{ 0x10DE0344,	NV_SUB_IDS, "GeForce FX 5700VE" },
-	{ 0x10DE0347,	NV_SUB_IDS, "GeForce FX Go5700" },
-	{ 0x10DE0348, 	NV_SUB_IDS,	"GeForce FX Go5700" },
-	{ 0x10DE034C,	NV_SUB_IDS, "Quadro FX Go1000" },
-	{ 0x10DE034E,	NV_SUB_IDS, "Quadro FX 1100" },
+	{ 0x10DE0341,	"GeForce FX 5700 Ultra" },
+	{ 0x10DE0342,	"GeForce FX 5700" },
+	{ 0x10DE0343,	"GeForce FX 5700LE" },
+	{ 0x10DE0344,	"GeForce FX 5700VE" },
+	{ 0x10DE0345,	"NV36.5" },
+	{ 0x10DE0347,	"GeForce FX Go5700" },
+	{ 0x10DE0348,	"GeForce FX Go5700" },
+	{ 0x10DE0349,	"NV36M Pro" },
+	{ 0x10DE034B,	"NV36MAP" },
+	{ 0x10DE034C,	"Quadro FX Go1000" },
+	{ 0x10DE034E,	"Quadro FX 1100" },
+	{ 0x10DE034F,	"NV36GL" },
 	// 0350 - 035F
 	// 0360 - 036F
 	// 0370 - 037F
 	// 0380 - 038F
-	{ 0x10DE038B,	NV_SUB_IDS, "GeForce 7650 GS" },
+	{ 0x10DE038B,	"GeForce 7650 GS" },
 	// 0390 - 039F
-	{ 0x10DE0390,	NV_SUB_IDS, "GeForce 7650 GS" },
-	{ 0x10DE0391,	NV_SUB_IDS, "GeForce 7600 GT" },
-	{ 0x10DE0392,	NV_SUB_IDS, "GeForce 7600 GS" },
-	{ 0x10DE0393,	NV_SUB_IDS, "GeForce 7300 GT" },
-	{ 0x10DE0394,	NV_SUB_IDS, "GeForce 7600 LE" },
-	{ 0x10DE0395,	NV_SUB_IDS, "GeForce 7300 GT" },
-	{ 0x10DE0397,	NV_SUB_IDS, "GeForce Go 7700" },
-	{ 0x10DE0398,	NV_SUB_IDS, "GeForce Go 7600" },
-	{ 0x10DE0399,	NV_SUB_IDS, "GeForce Go 7600 GT"},
-	{ 0x10DE039A,	NV_SUB_IDS, "Quadro NVS 300M" },
-	{ 0x10DE039B,	NV_SUB_IDS, "GeForce Go 7900 SE" },
-	{ 0x10DE039C,	NV_SUB_IDS, "Quadro FX 550M" },
-	{ 0x10DE039E,	NV_SUB_IDS, "Quadro FX 560" },
+	{ 0x10DE0390,	"GeForce 7650 GS" },
+	{ 0x10DE0391,	"GeForce 7600 GT" },
+	{ 0x10DE0392,	"GeForce 7600 GS" },
+	{ 0x10DE0393,	"GeForce 7300 GT" },
+	{ 0x10DE0394,	"GeForce 7600 LE" },
+	{ 0x10DE0395,	"GeForce 7300 GT" },
+	{ 0x10DE0397,	"GeForce Go 7700" },
+	{ 0x10DE0398,	"GeForce Go 7600" },
+	{ 0x10DE0399,	"GeForce Go 7600 GT"},
+	{ 0x10DE039A,	"Quadro NVS 300M" },
+	{ 0x10DE039B,	"GeForce Go 7900 SE" },
+	{ 0x10DE039C,	"Quadro FX 560M" },
+	{ 0x10DE039E,	"Quadro FX 560" },
 	// 03A0 - 03AF
 	// 03B0 - 03BF
 	// 03C0 - 03CF
 	// 03D0 - 03DF
-	{ 0x10DE03D0,	NV_SUB_IDS, "GeForce 6150SE nForce 430" },
-	{ 0x10DE03D1,	NV_SUB_IDS, "GeForce 6100 nForce 405" },
-	{ 0x10DE03D2,	NV_SUB_IDS, "GeForce 6100 nForce 400" },
-	{ 0x10DE03D5,	NV_SUB_IDS, "GeForce 6100 nForce 420" },
-	{ 0x10DE03D6,	NV_SUB_IDS, "GeForce 7025 / nForce 630a" },
+	{ 0x10DE03D0,	"GeForce 6150SE nForce 430" },
+	{ 0x10DE03D1,	"GeForce 6100 nForce 405" },
+	{ 0x10DE03D2,	"GeForce 6100 nForce 400" },
+	{ 0x10DE03D5,	"GeForce 6100 nForce 420" },
+	{ 0x10DE03D6,	"GeForce 7025 / nForce 630a" },
 	// 03E0 - 03EF
 	// 03F0 - 03FF
 	// 0400 - 040F
-	{ 0x10DE0400,	NV_SUB_IDS, "GeForce 8600 GTS" },
-	{ 0x10DE0401,	NV_SUB_IDS, "GeForce 8600 GT" },
-	{ 0x10DE0402,	NV_SUB_IDS, "GeForce 8600 GT" },
-	{ 0x10DE0403,	NV_SUB_IDS, "GeForce 8600 GS" },
-	{ 0x10DE0404,	NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE0405,	NV_SUB_IDS, "GeForce 9500M GS" },
-	{ 0x10DE0406,	NV_SUB_IDS, "GeForce 8300 GS" },
-	{ 0x10DE0407,	NV_SUB_IDS, "GeForce 8600M GT" },
-	{ 0x10DE0408,	NV_SUB_IDS, "GeForce 9650M GS" },
-	{ 0x10DE0409,	NV_SUB_IDS, "GeForce 8700M GT" },
-	{ 0x10DE040A,	NV_SUB_IDS, "Quadro FX 370" },
-	{ 0x10DE040B,	NV_SUB_IDS, "Quadro NVS 320M" },
-	{ 0x10DE040C,	NV_SUB_IDS, "Quadro FX 570M" },
-	{ 0x10DE040D,	NV_SUB_IDS, "Quadro FX 1600M" },
-	{ 0x10DE040E,	NV_SUB_IDS, "Quadro FX 570" },
-	{ 0x10DE040F,	NV_SUB_IDS, "Quadro FX 1700" },
+	{ 0x10DE0400,	"GeForce 8600 GTS" },
+	{ 0x10DE0401,	"GeForce 8600 GT" },
+	{ 0x10DE0402,	"GeForce 8600 GT" },
+	{ 0x10DE0403,	"GeForce 8600 GS" },
+	{ 0x10DE0404,	"GeForce 8400 GS" },
+	{ 0x10DE0405,	"GeForce 9500M GS" },
+	{ 0x10DE0406,	"GeForce 8300 GS" },
+	{ 0x10DE0407,	"GeForce 8600M GT" },
+	{ 0x10DE0408,	"GeForce 9650M GS" },
+	{ 0x10DE0409,	"GeForce 8700M GT" },
+	{ 0x10DE040A,	"Quadro FX 370" },
+	{ 0x10DE040B,	"Quadro NVS 320M" },
+	{ 0x10DE040C,	"Quadro FX 570M" },
+	{ 0x10DE040D,	"Quadro FX 1600M" },
+	{ 0x10DE040E,	"Quadro FX 570" },
+	{ 0x10DE040F,	"Quadro FX 1700" },
 	// 0410 - 041F
-	{ 0x10DE0410,	NV_SUB_IDS, "GeForce GT 330" },
+	{ 0x10DE0410,	"GeForce GT 330" },
 	// 0420 - 042F
-	{ 0x10DE0420,	NV_SUB_IDS, "GeForce 8400 SE" },
-	{ 0x10DE0421,	NV_SUB_IDS, "GeForce 8500 GT" },
-	{ 0x10DE0422,	NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE0423,	NV_SUB_IDS, "GeForce 8300 GS" },
-	{ 0x10DE0424,	NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE0425,	NV_SUB_IDS, "GeForce 8600M GS" },
-	{ 0x10DE0426,	NV_SUB_IDS, "GeForce 8400M GT" },
-	{ 0x10DE0427,	NV_SUB_IDS, "GeForce 8400M GS" },
-	{ 0x10DE0428,	NV_SUB_IDS, "GeForce 8400M G" },
-	{ 0x10DE0429,	NV_SUB_IDS, "Quadro NVS 140M" },
-	{ 0x10DE042A,	NV_SUB_IDS, "Quadro NVS 130M" },
-	{ 0x10DE042B,	NV_SUB_IDS, "Quadro NVS 135M" },
-	{ 0x10DE042C,	NV_SUB_IDS, "GeForce 9400 GT" },
-	{ 0x10DE042D,	NV_SUB_IDS, "Quadro FX 360M" },
-	{ 0x10DE042E,	NV_SUB_IDS, "GeForce 9300M G" },
-	{ 0x10DE042F,	NV_SUB_IDS, "Quadro NVS 290" },
+	{ 0x10DE0420,	"GeForce 8400 SE" },
+	{ 0x10DE0421,	"GeForce 8500 GT" },
+	{ 0x10DE0422,	"GeForce 8400 GS" },
+	{ 0x10DE0423,	"GeForce 8300 GS" },
+	{ 0x10DE0424,	"GeForce 8400 GS" },
+	{ 0x10DE0425,	"GeForce 8600M GS" },
+	{ 0x10DE0426,	"GeForce 8400M GT" },
+	{ 0x10DE0427,	"GeForce 8400M GS" },
+	{ 0x10DE0428,	"GeForce 8400M G" },
+	{ 0x10DE0429,	"Quadro NVS 140M" },
+	{ 0x10DE042A,	"Quadro NVS 130M" },
+	{ 0x10DE042B,	"Quadro NVS 135M" },
+	{ 0x10DE042C,	"GeForce 9400 GT" },
+	{ 0x10DE042D,	"Quadro FX 360M" },
+	{ 0x10DE042E,	"GeForce 9300M G" },
+	{ 0x10DE042F,	"Quadro NVS 290" },
 	// 0430 - 043F
 	// 0440 - 044F
 	// 0450 - 045F
@@ -396,6 +456,22 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 04A0 - 04AF
 	// 04B0 - 04BF
 	// 04C0 - 04CF
+	{ 0x10DE04C0,	"NVIDIA G78" },
+	{ 0x10DE04C1,	"NVIDIA G78" },
+	{ 0x10DE04C2,	"NVIDIA G78" },
+	{ 0x10DE04C3,	"NVIDIA G78" },
+	{ 0x10DE04C4,	"NVIDIA G78" },
+	{ 0x10DE04C5,	"NVIDIA G78" },
+	{ 0x10DE04C6,	"NVIDIA G78" },
+	{ 0x10DE04C7,	"NVIDIA G78" },
+	{ 0x10DE04C8,	"NVIDIA G78" },
+	{ 0x10DE04C9,	"NVIDIA G78" },
+	{ 0x10DE04CA,	"NVIDIA G78" },
+	{ 0x10DE04CB,	"NVIDIA G78" },
+	{ 0x10DE04CC,	"NVIDIA G78" },
+	{ 0x10DE04CD,	"NVIDIA G78" },
+	{ 0x10DE04CE,	"NVIDIA G78" },
+	{ 0x10DE04CF,	"NVIDIA G78" },
 	// 04D0 - 04DF
 	// 04E0 - 04EF
 	// 04F0 - 04FF
@@ -403,12 +479,12 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0510 - 051F
 	// 0520 - 052F
 	// 0530 - 053F
-    { 0x10DE0530,	NV_SUB_IDS, "GeForce 7190M / nForce 650M" },
-	{ 0x10DE0531,	NV_SUB_IDS, "GeForce 7150M / nForce 630M" },
-	{ 0x10DE0533,	NV_SUB_IDS, "GeForce 7000M / nForce 610M" },
-	{ 0x10DE053A,	NV_SUB_IDS, "GeForce 7050 PV / nForce 630a" },
-	{ 0x10DE053B,	NV_SUB_IDS, "GeForce 7050 PV / nForce 630a" },
-	{ 0x10DE053E,	NV_SUB_IDS, "GeForce 7025 / nForce 630a" },
+	{ 0x10DE0530,	"GeForce 7190M / nForce 650M" },
+	{ 0x10DE0531,	"GeForce 7150M / nForce 630M" },
+	{ 0x10DE0533,	"GeForce 7000M / nForce 610M" },
+	{ 0x10DE053A,	"GeForce 7050 PV / nForce 630a" },
+	{ 0x10DE053B,	"GeForce 7050 PV / nForce 630a" },
+	{ 0x10DE053E,	"GeForce 7025 / nForce 630a" },
 	// 0540 - 054F
 	// 0550 - 055F
 	// 0560 - 056F
@@ -420,168 +496,193 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 05C0 - 05CF
 	// 05D0 - 05DF
 	// 05E0 - 05EF
-	{ 0x10DE05E0,	NV_SUB_IDS, "GeForce GTX 295" },
-	{ 0x10DE05E1,	NV_SUB_IDS, "GeForce GTX 280" },
-	{ 0x10DE05E2,	NV_SUB_IDS, "GeForce GTX 260" },
-	{ 0x10DE05E3,	NV_SUB_IDS, "GeForce GTX 285" },
-	{ 0x10DE05E6,	NV_SUB_IDS, "GeForce GTX 275" },
-	{ 0x10DE05E7,	0x10DE0595, "Tesla T10 Processor" },
-	{ 0x10DE05E7,	0x10DE066A,	"Tesla C1060" },
-	{ 0x10DE05E7,	0x10DE068F,	"Tesla T10 Processor" },
-	{ 0x10DE05E7,	0x10DE0697,	"Tesla M1060" },
-	{ 0x10DE05E7,	0x10DE0714,	"Tesla M1060" },
-	{ 0x10DE05E7,	0x10DE0743,	"Tesla M1060" },
-	{ 0x10DE05EA,	NV_SUB_IDS, "GeForce GTX 260" },
-	{ 0x10DE05EB,	NV_SUB_IDS, "GeForce GTX 295" },
-	{ 0x10DE05ED,	NV_SUB_IDS, "Quadroplex 2200 D2" },
+	{ 0x10DE05E0,	"GeForce GTX 295" },
+	{ 0x10DE05E1,	"GeForce GTX 280" },
+	{ 0x10DE05E2,	"GeForce GTX 260" },
+	{ 0x10DE05E3,	"GeForce GTX 285" },
+	{ 0x10DE05E4,	"NVIDIA GT200" },
+	{ 0x10DE05E5,	"NVIDIA GT200" },
+	{ 0x10DE05E6,	"GeForce GTX 275" },
+	{ 0x10DE05E7,	"nVidia Tesla C1060" },
+	{ 0x10DE05E8,	"NVIDIA GT200" },
+	{ 0x10DE05E9,	"NVIDIA GT200" },
+	{ 0x10DE05EA,	"GeForce GTX 260" },
+	{ 0x10DE05EB,	"GeForce GTX 295" },
+	{ 0x10DE05EC,	"NVIDIA GT200" },
+	{ 0x10DE05ED,	"Quadroplex 2200 D2" },
+	{ 0x10DE05EE,	"NVIDIA GT200" },
+	{ 0x10DE05EF,	"NVIDIA GT200" },
 	// 05F0 - 05FF
-	{ 0x10DE05F8,	NV_SUB_IDS, "Quadroplex 2200 S4" },
-	{ 0x10DE05F9,	NV_SUB_IDS, "Quadro CX" },
-	{ 0x10DE05FD,	NV_SUB_IDS, "Quadro FX 5800" },
-	{ 0x10DE05FE,	NV_SUB_IDS, "Quadro FX 4800" },
-	{ 0x10DE05FF,	NV_SUB_IDS, "Quadro FX 3800" },
+	{ 0x10DE05F0,	"NVIDIA GT200" },
+	{ 0x10DE05F1,	"NVIDIA GT200" },
+	{ 0x10DE05F2,	"NVIDIA GT200" },
+	{ 0x10DE05F3,	"NVIDIA GT200" },
+	{ 0x10DE05F4,	"NVIDIA GT200" },
+	{ 0x10DE05F5,	"NVIDIA GT200" },
+	{ 0x10DE05F6,	"NVIDIA GT200" },
+	{ 0x10DE05F7,	"NVIDIA GT200" },
+	{ 0x10DE05F8,	"Quadroplex 2200 S4" },
+	{ 0x10DE05F9,	"NVIDIA Quadro CX" },
+	{ 0x10DE05FA,	"NVIDIA GT200" },
+	{ 0x10DE05FB,	"NVIDIA GT200" },
+	{ 0x10DE05FC,	"NVIDIA GT200" },
+	{ 0x10DE05FD,	"Quadro FX 5800" },
+	{ 0x10DE05FE,	"Quadro FX 4800" },
+	{ 0x10DE05FF,	"Quadro FX 3800" },
 	// 0600 - 060F
-	{ 0x10DE0600,	NV_SUB_IDS, "GeForce 8800 GTS 512" },
-	{ 0x10DE0601,	NV_SUB_IDS, "GeForce 9800 GT" },
-	{ 0x10DE0602,	NV_SUB_IDS, "GeForce 8800 GT" },
-	{ 0x10DE0603,	NV_SUB_IDS, "GeForce GT 230" },
-	{ 0x10DE0604,	NV_SUB_IDS, "GeForce 9800 GX2" },
-	{ 0x10DE0605,	NV_SUB_IDS, "GeForce 9800 GT" },
-	{ 0x10DE0606,	NV_SUB_IDS, "GeForce 8800 GS" },
-	{ 0x10DE0607,	NV_SUB_IDS, "GeForce GTS 240" },
-	{ 0x10DE0608,	NV_SUB_IDS, "GeForce 9800M GTX" },
-	{ 0x10DE0609,	NV_SUB_IDS, "GeForce 8800M GTS" },
-	{ 0x10DE060A,	NV_SUB_IDS, "GeForce GTX 280M" },
-	{ 0x10DE060B,	NV_SUB_IDS, "GeForce 9800M GT" },
-	{ 0x10DE060C,	NV_SUB_IDS, "GeForce 8800M GTX" },
-	{ 0x10DE060D,	NV_SUB_IDS, "GeForce 8800 GS" },
-	{ 0x10DE060F,	NV_SUB_IDS, "GeForce GTX 285M" },
+	{ 0x10DE0600,	"GeForce 8800 GTS" },
+	{ 0x10DE0601,	"GeForce 9800 GT" },
+	{ 0x10DE0602,	"GeForce 8800 GT" },
+	{ 0x10DE0603,	"GeForce GT 230" },
+	{ 0x10DE0604,	"GeForce 9800 GX2" },
+	{ 0x10DE0605,	"GeForce 9800 GT" },
+	{ 0x10DE0606,	"GeForce 8800 GS" },
+	{ 0x10DE0607,	"GeForce GTS 240" },
+	{ 0x10DE0608,	"GeForce 9800M GTX" },
+	{ 0x10DE0609,	"GeForce 8800M GTS" },
+	{ 0x10DE060A,	"GeForce GTX 280M" },
+	{ 0x10DE060B,	"GeForce 9800M GT" },
+	{ 0x10DE060C,	"GeForce 8800M GTX" },
+	{ 0x10DE060D,	"GeForce 8800 GS" },
+	{ 0x10DE060F,	"GeForce GTX 285M" },
 	// 0610 - 061F
-	{ 0x10DE0610,	NV_SUB_IDS, "GeForce 9600 GSO" },
-	{ 0x10DE0611,	NV_SUB_IDS, "GeForce 8800 GT" },
-	{ 0x10DE0612,	NV_SUB_IDS, "GeForce 9800 GTX" },
-	{ 0x10DE0613,	NV_SUB_IDS, "GeForce 9800 GTX+" },
-	{ 0x10DE0614,	NV_SUB_IDS, "GeForce 9800 GT" },
-	{ 0x10DE0615,	NV_SUB_IDS, "GeForce GTS 250" },
-	{ 0x10DE0617,	NV_SUB_IDS, "GeForce 9800M GTX" },
-	{ 0x10DE0618,	NV_SUB_IDS, "GeForce GTX 260M" },
-	{ 0x10DE0619,	NV_SUB_IDS, "Quadro FX 4700 X2" },
-	{ 0x10DE061A,	NV_SUB_IDS, "Quadro FX 3700" },
-	{ 0x10DE061B,	NV_SUB_IDS, "Quadro VX 200" },
-	{ 0x10DE061C,	NV_SUB_IDS, "Quadro FX 3600M" },
-	{ 0x10DE061D,	NV_SUB_IDS, "Quadro FX 2800M" },
-	{ 0x10DE061E,	NV_SUB_IDS, "Quadro FX 3700M" },
-	{ 0x10DE061F,	NV_SUB_IDS, "Quadro FX 3800M" },
+	{ 0x10DE0610,	"GeForce 9600 GSO" },
+	{ 0x10DE0611,	"GeForce 8800 GT" },
+	{ 0x10DE0612,	"GeForce 9800 GTX" },
+	{ 0x10DE0613,	"GeForce 9800 GTX+" },
+	{ 0x10DE0614,	"GeForce 9800 GT" },
+	{ 0x10DE0615,	"GeForce GTS 250" },
+	{ 0x10DE0617,	"GeForce 9800M GTX" },
+	{ 0x10DE0618,	"GeForce GTX 260M" },
+	{ 0x10DE0619,	"Quadro FX 4700 X2" },
+	{ 0x10DE061A,	"Quadro FX 3700" },
+	{ 0x10DE061B,	"Quadro VX 200" },
+	{ 0x10DE061C,	"Quadro FX 3600M" },
+	{ 0x10DE061D,	"Quadro FX 2800M" },
+	{ 0x10DE061E,	"Quadro FX 3700M" },
+	{ 0x10DE061F,	"Quadro FX 3800M" },
 	// 0620 - 062F
-	{ 0x10DE0621,	NV_SUB_IDS, "GeForce GT 230" },
-	{ 0x10DE0622,	NV_SUB_IDS, "GeForce 9600 GT" },
-	{ 0x10DE0623,	NV_SUB_IDS, "GeForce 9600 GS" },
-	{ 0x10DE0625,	NV_SUB_IDS, "GeForce 9600 GSO 512"},
-	{ 0x10DE0626,	NV_SUB_IDS, "GeForce GT 130" },
-	{ 0x10DE0627,	NV_SUB_IDS, "GeForce GT 140" },
-	{ 0x10DE0628,	NV_SUB_IDS, "GeForce 9800M GTS" },
-	{ 0x10DE062A,	NV_SUB_IDS, "GeForce 9700M GTS" },
-	{ 0x10DE062B,	NV_SUB_IDS, "GeForce 9800M GS" },
-	{ 0x10DE062C,	NV_SUB_IDS, "GeForce 9800M GTS" },
-	{ 0x10DE062D,	NV_SUB_IDS, "GeForce 9600 GT" },
-	{ 0x10DE062E,	NV_SUB_IDS, "GeForce 9600 GT" },
+	{ 0x10DE0620,	"NVIDIA G94" },
+	{ 0x10DE0621,	"GeForce GT 230" },
+	{ 0x10DE0622,	"GeForce 9600 GT" },
+	{ 0x10DE0623,	"GeForce 9600 GS" },
+	{ 0x10DE0624,	"NVIDIA G94" },
+	{ 0x10DE0625,	"GeForce 9600 GSO 512"},
+	{ 0x10DE0626,	"GeForce GT 130" },
+	{ 0x10DE0627,	"GeForce GT 140" },
+	{ 0x10DE0628,	"GeForce 9800M GTS" },
+	{ 0x10DE0629,	"NVIDIA G94" },
+	{ 0x10DE062A,	"GeForce 9700M GTS" },
+	{ 0x10DE062B,	"GeForce 9800M GS" },
+	{ 0x10DE062C,	"GeForce 9800M GTS" },
+	{ 0x10DE062D,	"GeForce 9600 GT" },
+	{ 0x10DE062E,	"GeForce 9600 GT" },
+	{ 0x10DE062F,	"GeForce 9800 S" },
 	// 0630 - 063F
-	{ 0x10DE0631,	NV_SUB_IDS, "GeForce GTS 160M" },
-	{ 0x10DE0632,	NV_SUB_IDS, "GeForce GTS 150M" },
-	{ 0x10DE0635,	NV_SUB_IDS, "GeForce 9600 GSO" },
-	{ 0x10DE0637,	NV_SUB_IDS, "GeForce 9600 GT" },
-	{ 0x10DE0638,	NV_SUB_IDS, "Quadro FX 1800" },
-	{ 0x10DE063A,	NV_SUB_IDS, "Quadro FX 2700M" },
+	{ 0x10DE0630,	"GeForce 9700 S" },
+	{ 0x10DE0631,	"GeForce GTS 160M" },
+	{ 0x10DE0632,	"GeForce GTS 150M" },
+	{ 0x10DE0633,	"NVIDIA G94" },
+	{ 0x10DE0634,	"NVIDIA G94" },
+	{ 0x10DE0635,	"GeForce 9600 GSO" },
+	{ 0x10DE0636,	"NVIDIA G94" },
+	{ 0x10DE0637,	"GeForce 9600 GT" },
+	{ 0x10DE0638,	"Quadro FX 1800" },
+	{ 0x10DE0639,	"NVIDIA G94" },
+	{ 0x10DE063A,	"Quadro FX 2700M" },
+	{ 0x10DE063B,	"NVIDIA G94" },
+	{ 0x10DE063C,	"NVIDIA G94" },
+	{ 0x10DE063D,	"NVIDIA G94" },
+	{ 0x10DE063E,	"NVIDIA G94" },
+	{ 0x10DE063F,	"NVIDIA G94" },
 	// 0640 - 064F
-	{ 0x10DE0640,	NV_SUB_IDS, "GeForce 9500 GT" },
-	{ 0x10DE0641,	NV_SUB_IDS, "GeForce 9400 GT" },
-	{ 0x10DE0642,	NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE0643,	NV_SUB_IDS, "GeForce 9500 GT" },
-	{ 0x10DE0644,	NV_SUB_IDS, "GeForce 9500 GS" },
-	{ 0x10DE0645,	NV_SUB_IDS, "GeForce 9500 GS" },
-	{ 0x10DE0646,	NV_SUB_IDS, "GeForce GT 120" },
-	{ 0x10DE0647,	NV_SUB_IDS, "GeForce 9600M GT" },
-	{ 0x10DE0648,	NV_SUB_IDS, "GeForce 9600M GS" },
-	{ 0x10DE0649,	NV_SUB_IDS, "GeForce 9600M GT" },
-	{ 0x10DE064A,	NV_SUB_IDS, "GeForce 9700M GT" },
-	{ 0x10DE064B,	NV_SUB_IDS, "GeForce 9500M G" },
-	{ 0x10DE064C,	NV_SUB_IDS, "GeForce 9650M GT" },
+	{ 0x10DE0640,	"GeForce 9500 GT" },
+	{ 0x10DE0641,	"GeForce 9400 GT" },
+	{ 0x10DE0642,	"GeForce 8400 GS" },
+	{ 0x10DE0643,	"GeForce 9500 GT" },
+	{ 0x10DE0644,	"GeForce 9500 GS" },
+	{ 0x10DE0645,	"GeForce 9500 GS" },
+	{ 0x10DE0646,	"GeForce GT 120" },
+	{ 0x10DE0647,	"GeForce 9600M GT" },
+	{ 0x10DE0648,	"GeForce 9600M GS" },
+	{ 0x10DE0649,	"GeForce 9600M GT" },
+	{ 0x10DE064A,	"GeForce 9700M GT" },
+	{ 0x10DE064B,	"GeForce 9500M G" },
+	{ 0x10DE064C,	"GeForce 9650M GT" },
 	// 0650 - 065F
-	{ 0x10DE0651,	NV_SUB_IDS, "GeForce G 110M" },
-	{ 0x10DE0652,	NV_SUB_IDS, "GeForce GT 130M" },
-	{ 0x10DE0653,	NV_SUB_IDS, "GeForce GT 120M" },
-	{ 0x10DE0654,	NV_SUB_IDS, "GeForce GT 220M" },
-	{ 0x10DE0655,	NV_SUB_IDS, "GeForce GT 120" },
-	{ 0x10DE0656,	NV_SUB_IDS, "GeForce 9650 S" },
-	{ 0x10DE0658,	NV_SUB_IDS, "Quadro FX 380" },
-	{ 0x10DE0659,	NV_SUB_IDS, "Quadro FX 580" },
-	{ 0x10DE065A,	NV_SUB_IDS, "Quadro FX 1700M" },
-	{ 0x10DE065B,	NV_SUB_IDS, "GeForce 9400 GT" },
-	{ 0x10DE065C,	NV_SUB_IDS, "Quadro FX 770M" },
-	{ 0x10DE065F,	NV_SUB_IDS, "GeForce G210" },
+	{ 0x10DE0650,	"NVIDIA G96-825" },
+	{ 0x10DE0651,	"GeForce G 110M" },
+	{ 0x10DE0652,	"GeForce GT 130M" },
+	{ 0x10DE0653,	"GeForce GT 120M" },
+	{ 0x10DE0654,	"GeForce GT 220M" },
+	{ 0x10DE0655,	"GeForce GT 120" },
+	{ 0x10DE0656,	"GeForce 9650 S" },
+	{ 0x10DE0657,	"NVIDIA G96" },
+	{ 0x10DE0658,	"Quadro FX 380" },
+	{ 0x10DE0659,	"Quadro FX 580" },
+	{ 0x10DE065A,	"Quadro FX 1700M" },
+	{ 0x10DE065B,	"GeForce 9400 GT" },
+	{ 0x10DE065C,	"Quadro FX 770M" },
+	{ 0x10DE065D,	"NVIDIA G96" },
+	{ 0x10DE065E,	"NVIDIA G96" },
+	{ 0x10DE065F,	"GeForce G210" },
 	// 0660 - 066F
 	// 0670 - 067F
 	// 0680 - 068F
 	// 0690 - 069F
 	// 06A0 - 06AF
+	{ 0x10DE06A0,	"NVIDIA GT214" },
 	// 06B0 - 06BF
+	{ 0x10DE06B0,	"NVIDIA GT214" },
 	// 06C0 - 06CF
-	{ 0x10DE06C0,	NV_SUB_IDS, "GeForce GTX 480" },
-	{ 0x10DE06C4,	NV_SUB_IDS, "GeForce GTX 465" },
-	{ 0x10DE06CA,	NV_SUB_IDS, "GeForce GTX 480M" },
-	{ 0x10DE06CD,	NV_SUB_IDS, "GeForce GTX 470" },
+	{ 0x10DE06C0,	"GeForce GTX 480" },
+	{ 0x10DE06C3,	"GeForce GTX D12U" },
+	{ 0x10DE06C4,	"GeForce GTX 465" },
+	{ 0x10DE06CA,	"GeForce GTX 480M" },
+	{ 0x10DE06CD,	"GeForce GTX 470" },
 	// 06D0 - 06DF
-	{ 0x10DE06D1,	0x10DE0771,	"Tesla C2050" },
-	{ 0x10DE06D1,	0x10DE0772,	"Tesla C2070" },
-	{ 0x10DE06D2,	0x10DE0774,	"Tesla M2070" },
-	{ 0x10DE06D2,	0x10DE0830,	"Tesla M2070" },
-	{ 0x10DE06D2,	0x10DE0842,	"Tesla M2070" },
-	{ 0x10DE06D2,	0x10DE088F,	"Tesla X2070" },
-	{ 0x10DE06D2,	0x10DE0908,	"Tesla M2070" },
-	{ 0x10DE06D8,	NV_SUB_IDS, "Quadro 6000" },
-	{ 0x10DE06D9,	NV_SUB_IDS, "Quadro 5000" },
-	{ 0x10DE06DA,	NV_SUB_IDS, "Quadro 5000M" },
-	{ 0x10DE06DC,	NV_SUB_IDS, "Quadro 6000" },
-	{ 0x10DE06DD,	NV_SUB_IDS, "Quadro 4000" },
-	{ 0x10DE06DE,	0x10DE0773,	"Tesla S2050" },
-	{ 0x10DE06DE,	0x10DE077A,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE082F,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE0830,	"Tesla M2070" },
-	{ 0x10DE06DE,	0x10DE0831,	"Tesla M2070" },
-	{ 0x10DE06DE,	0x10DE0832,	"Tesla M2070" },
-	{ 0x10DE06DE,	0x10DE0840,	"Tesla X2070" },
-	{ 0x10DE06DE,	0x10DE0842,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE0843,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE0846,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE0866,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE0907,	"Tesla M2050" },
-	{ 0x10DE06DE,	0x10DE091E,	"Tesla M2050" },
-	{ 0x10DE06DF,	0x10DE0842,	"Tesla M2070-Q" },
-	{ 0x10DE06DF,	0x10DE084D,	"Tesla M2070-Q" },
-	{ 0x10DE06DF,	0x10DE087F,	"Tesla M2070-Q" },
+	{ 0x10DE06D1,	"Tesla C2050" },
+	{ 0x10DE06D2,	"Tesla M2070" },
+	{ 0x10DE06D8,	"Quadro 6000" },
+	{ 0x10DE06D9,	"Quadro 5000" },
+	{ 0x10DE06DA,	"Quadro 5000M" },
+	{ 0x10DE06DC,	"Quadro 6000" },
+	{ 0x10DE06DD,	"Quadro 4000" },
+	{ 0x10DE06DE,	"Tesla M2050" },
+	{ 0x10DE06DF,	"Tesla M2070-Q" },
 	// 06E0 - 06EF
-	{ 0x10DE06E0,   NV_SUB_IDS, "GeForce 9300 GE" },
-	{ 0x10DE06E1,   NV_SUB_IDS, "GeForce 9300 GS" },
-	{ 0x10DE06E2,   NV_SUB_IDS, "GeForce 8400" },
-	{ 0x10DE06E3,   NV_SUB_IDS, "GeForce 8400 SE" },
-	{ 0x10DE06E4,   NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE06E5,   NV_SUB_IDS, "GeForce 9300M GS" },
-	{ 0x10DE06E6,   NV_SUB_IDS, "GeForce G100" },
-	{ 0x10DE06E7,   NV_SUB_IDS, "GeForce 9300 SE" },
-	{ 0x10DE06E8,   NV_SUB_IDS, "GeForce 9200M GS" },
-	{ 0x10DE06E9,   NV_SUB_IDS, "GeForce 9300M GS" },
-	{ 0x10DE06EA,   NV_SUB_IDS, "Quadro NVS 150M" },
-	{ 0x10DE06EB,   NV_SUB_IDS, "Quadro NVS 160M" },
-	{ 0x10DE06EC,   NV_SUB_IDS, "GeForce G 105M" },
-	{ 0x10DE06EF,   NV_SUB_IDS, "GeForce G 103M" },
+	{ 0x10DE06E0,	"GeForce 9300 GE" },
+	{ 0x10DE06E1,	"GeForce 9300 GS" },
+	{ 0x10DE06E2,	"GeForce 8400" },
+	{ 0x10DE06E3,	"GeForce 8400 SE" },
+	{ 0x10DE06E4,	"GeForce 8400 GS" },
+	{ 0x10DE06E5,	"GeForce 9300M GS" },
+	{ 0x10DE06E6,	"GeForce G100" },
+	{ 0x10DE06E7,	"GeForce 9300 SE" },
+	{ 0x10DE06E8,	"GeForce 9200M GE" },
+	{ 0x10DE06E9,	"GeForce 9300M GS" },
+	{ 0x10DE06EA,	"Quadro NVS 150M" },
+	{ 0x10DE06EB,	"Quadro NVS 160M" },
+	{ 0x10DE06EC,	"GeForce G 105M" },
+	{ 0x10DE06ED,	"NVIDIA G98" },
+	{ 0x10DE06EF,	"GeForce G 103M" },
 	// 06F0 - 06FF
-	{ 0x10DE06F1,   NV_SUB_IDS, "GeForce G105M" },
-	{ 0x10DE06F8,   NV_SUB_IDS, "Quadro NVS 420" },
-	{ 0x10DE06F9,   NV_SUB_IDS, "Quadro FX 370 LP" },
-	{ 0x10DE06FA,   NV_SUB_IDS, "Quadro NVS 450" },
-	{ 0x10DE06FB,   NV_SUB_IDS, "Quadro FX 370M" },
-	{ 0x10DE06FD,   NV_SUB_IDS, "Quadro NVS 295" },
-	{ 0x10DE06FF,   NV_SUB_IDS, "HICx16 + Graphics" },
+	{ 0x10DE06F0,	"NVIDIA G98" },
+	{ 0x10DE06F1,	"GeForce G105M" },
+	{ 0x10DE06F2,	"NVIDIA G98" },
+	{ 0x10DE06F3,	"NVIDIA G98" },
+	{ 0x10DE06F4,	"NVIDIA G98" },
+	{ 0x10DE06F5,	"NVIDIA G98" },
+	{ 0x10DE06F6,	"NVIDIA G98" },
+	{ 0x10DE06F7,	"NVIDIA G98" },
+	{ 0x10DE06F8,	"Quadro NVS 420" },
+	{ 0x10DE06F9,	"Quadro FX 370 LP" },
+	{ 0x10DE06FA,	"Quadro NVS 450" },
+	{ 0x10DE06FB,	"Quadro FX 370M" },
+	{ 0x10DE06FC,	"NVIDIA G98" },
+	{ 0x10DE06FD,	"Quadro NVS 295" },
+	{ 0x10DE06FE,	"NVIDIA G98" },
+	{ 0x10DE06FF,	"HICx16 + Graphics" },
 	// 0700 - 070F
 	// 0710 - 071F
 	// 0720 - 072F
@@ -597,64 +698,71 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 07C0 - 07CF
 	// 07D0 - 07DF
 	// 07E0 - 07EF
-	{ 0x10DE07E0,   NV_SUB_IDS, "GeForce 7150 / nForce 630i" },
-	{ 0x10DE07E1,   NV_SUB_IDS, "GeForce 7100 / nForce 630i" },
-	{ 0x10DE07E2,   NV_SUB_IDS, "GeForce 7050 / nForce 630i" },
-	{ 0x10DE07E3,   NV_SUB_IDS, "GeForce 7050 / nForce 610i" },
-	{ 0x10DE07E5,   NV_SUB_IDS, "GeForce 7050 / nForce 620i" },
+	{ 0x10DE07E0,	"GeForce 7150 / nForce 630i" },
+	{ 0x10DE07E1,	"GeForce 7100 / nForce 630i" },
+	{ 0x10DE07E2,	"GeForce 7050 / nForce 630i" },
+	{ 0x10DE07E3,	"GeForce 7050 / nForce 610i" },
+	{ 0x10DE07E5,	"GeForce 7050 / nForce 620i" },
 	// 07F0 - 07FF
 	// 0800 - 080F
 	// 0810 - 081F
 	// 0820 - 082F
 	// 0830 - 083F
 	// 0840 - 084F
-	{ 0x10DE0840,   NV_SUB_IDS, "GeForce 8200M" },
-	{ 0x10DE0844,   NV_SUB_IDS, "GeForce 9100M G" },
-	{ 0x10DE0845,   NV_SUB_IDS, "GeForce 8200M G" },
-	{ 0x10DE0846,   NV_SUB_IDS, "GeForce 9200" },
-	{ 0x10DE0847,   NV_SUB_IDS, "GeForce 9100" },
-	{ 0x10DE0848,   NV_SUB_IDS, "GeForce 8300" },
-	{ 0x10DE0849,   NV_SUB_IDS, "GeForce 8200" },
-	{ 0x10DE084A,   NV_SUB_IDS, "nForce 730a" },
-	{ 0x10DE084B,   NV_SUB_IDS, "GeForce 9200" },
-	{ 0x10DE084C,   NV_SUB_IDS, "nForce 980a/780a SLI" },
-	{ 0x10DE084D,   NV_SUB_IDS, "nForce 750a SLI" },
-	{ 0x10DE084F,   NV_SUB_IDS, "GeForce 8100 / nForce 720a" },
+	{ 0x10DE0840,	"GeForce 8200M" },
+	{ 0x10DE0844,	"GeForce 9100M G" },
+	{ 0x10DE0845,	"GeForce 8200M G" },
+	{ 0x10DE0846,	"GeForce 9200" },
+	{ 0x10DE0847,	"GeForce 9100" },
+	{ 0x10DE0848,	"GeForce 8300" },
+	{ 0x10DE0849,	"GeForce 8200" },
+	{ 0x10DE084A,	"nForce 730a" },
+	{ 0x10DE084B,	"GeForce 9200" },
+	{ 0x10DE084C,	"nForce 980a/780a SLI" },
+	{ 0x10DE084D,	"nForce 750a SLI" },
+	{ 0x10DE084F,	"GeForce 8100 / nForce 720a" },
 	// 0850 - 085F
 	// 0860 - 086F
-	{ 0x10DE0860,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE0861,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE0862,   NV_SUB_IDS, "GeForce 9400M G" },
-	{ 0x10DE0863,   NV_SUB_IDS, "GeForce 9400M" },
-	{ 0x10DE0864,   NV_SUB_IDS, "GeForce 9300" },
-	{ 0x10DE0865,   NV_SUB_IDS, "ION" },
-	{ 0x10DE0866,   NV_SUB_IDS, "GeForce 9400M G" },
-	{ 0x10DE0867,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE0868,   NV_SUB_IDS, "nForce 760i SLI" },
-	{ 0x10DE0869,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE086A,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE086C,   NV_SUB_IDS, "GeForce 9300 / nForce 730i" },
-	{ 0x10DE086D,   NV_SUB_IDS, "GeForce 9200" },
-	{ 0x10DE086E,   NV_SUB_IDS, "GeForce 9100M G" },
-	{ 0x10DE086F,   NV_SUB_IDS, "GeForce 8200M G" },
+	{ 0x10DE0860,	"GeForce 9300" },
+	{ 0x10DE0861,	"GeForce 9400" },
+	{ 0x10DE0862,	"GeForce 9400M G" },
+	{ 0x10DE0863,	"GeForce 9400M" },
+	{ 0x10DE0864,	"GeForce 9300" },
+	{ 0x10DE0865,	"GeForce 9300" },
+	{ 0x10DE0866,	"GeForce 9400M G" },
+	{ 0x10DE0867,	"GeForce 9400" },
+	{ 0x10DE0868,	"nForce 760i SLI" },
+	{ 0x10DE0869,	"GeForce 9400" },
+	{ 0x10DE086A,	"GeForce 9400" },
+	{ 0x10DE086C,	"GeForce 9300 / nForce 730i" },
+	{ 0x10DE086D,	"GeForce 9200" },
+	{ 0x10DE086E,	"GeForce 9100M G" },
+	{ 0x10DE086F,	"GeForce 8200M G" },
 	// 0870 - 087F
-	{ 0x10DE0870,   NV_SUB_IDS, "GeForce 9400M" },
-	{ 0x10DE0871,   NV_SUB_IDS, "GeForce 9200" },
-	{ 0x10DE0872,   NV_SUB_IDS, "GeForce G102M" },
-	{ 0x10DE0873,   NV_SUB_IDS, "GeForce G102M" },
-	{ 0x10DE0874,   NV_SUB_IDS, "ION" },
-	{ 0x10DE0876,   NV_SUB_IDS, "ION" },
-	{ 0x10DE087A,   NV_SUB_IDS, "GeForce 9400" },
-	{ 0x10DE087D,   NV_SUB_IDS, "ION" },
-	{ 0x10DE087E,   NV_SUB_IDS, "ION LE" },
-	{ 0x10DE087F,   NV_SUB_IDS, "ION LE" },
+	{ 0x10DE0870,	"GeForce 9400M" },
+	{ 0x10DE0871,	"GeForce 9200" },
+	{ 0x10DE0872,	"GeForce G102M" },
+	{ 0x10DE0873,	"GeForce G205M" },
+	{ 0x10DE0874,	"ION 9300M" },
+	{ 0x10DE0876,	"ION 9400M" },
+	{ 0x10DE087A,	"GeForce 9400" },
+	{ 0x10DE087D,	"ION 9400M" },
+	{ 0x10DE087E,	"ION LE" },
+	{ 0x10DE087F,	"ION LE" }, // Tesla M2070-Q ??
 	// 0880 - 088F
 	// 0890 - 089F
 	// 08A0 - 08AF
-	{ 0x10DE08A0,   NV_SUB_IDS, "GeForce 320M" },
-	{ 0x10DE08A4,   NV_SUB_IDS, "GeForce 320M" },
-	{ 0x10DE08A5,   NV_SUB_IDS, "GeForce 320M" },
+	{ 0x10DE08A0,	"GeForce 320M" },
+	{ 0x10DE08A1,	"MCP89-MZT" },
+	{ 0x10DE08A2,	"GeForce 320M" },
+	{ 0x10DE08A3,	"GeForce 320M" },
+	{ 0x10DE08A4,	"GeForce 320M" },
+	{ 0x10DE08A5,	"GeForce 320M" },
 	// 08B0 - 08BF
+	{ 0x10DE08B0,	"MCP83 MMD" },
+	{ 0x10DE08B1,	"GeForce 300M" },
+	{ 0x10DE08B2,	"GeForce 300M" }, // MCP83-MJ
+	{ 0x10DE08B3,	"MCP89 MM9" },
 	// 08C0 - 08CF
 	// 08D0 - 08DF
 	// 08E0 - 08EF
@@ -676,52 +784,64 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 09E0 - 09EF
 	// 09F0 - 09FF
 	// 0A00 - 0A0F
+	// { 0x10DE0A00,	"NVIDIA GT212" },
 	// 0A10 - 0A1F
+	// { 0x10DE0A10,	"NVIDIA GT212" },
 	// 0A20 - 0A2F
-	{ 0x10DE0A20,   NV_SUB_IDS, "GeForce GT220" },
-	{ 0x10DE0A22,   NV_SUB_IDS, "GeForce 315" },
-	{ 0x10DE0A23,   NV_SUB_IDS, "GeForce 210" },
-	{ 0x10DE0A26,   NV_SUB_IDS, "GeForce 405" },
-	{ 0x10DE0A27,   NV_SUB_IDS, "GeForce 405" },
-	{ 0x10DE0A28,   NV_SUB_IDS, "GeForce GT 230M" },
-	{ 0x10DE0A29,   NV_SUB_IDS, "GeForce GT 330M" },
-	{ 0x10DE0A2A,   NV_SUB_IDS, "GeForce GT 230M" },
-	{ 0x10DE0A2B,   NV_SUB_IDS, "GeForce GT 330M" },
-	{ 0x10DE0A2C,   NV_SUB_IDS, "NVS 5100M" },
-	{ 0x10DE0A2D,   NV_SUB_IDS, "GeForce GT 320M" },
+	{ 0x10DE0A20,	"GeForce GT 220" },
+	{ 0x10DE0A21,	"D10M2-20" },
+	{ 0x10DE0A22,	"GeForce 315" },
+	{ 0x10DE0A23,	"GeForce 210" },
+	{ 0x10DE0A26,	"GeForce 405" },
+	{ 0x10DE0A27,	"GeForce 405" },
+	{ 0x10DE0A28,	"GeForce GT 230" },
+	{ 0x10DE0A29,	"GeForce GT 330M" },
+	{ 0x10DE0A2A,	"GeForce GT 230M" },
+	{ 0x10DE0A2B,	"GeForce GT 330M" },
+	{ 0x10DE0A2C,	"NVS 5100M" },
+	{ 0x10DE0A2D,	"GeForce GT 320M" },	
 	// 0A30 - 0A3F
-    { 0x10DE0A32,   NV_SUB_IDS, "GeForce GT 415" },
-	{ 0x10DE0A34,   NV_SUB_IDS, "GeForce GT 240M" },
-	{ 0x10DE0A35,   NV_SUB_IDS, "GeForce GT 325M" },
-	{ 0x10DE0A38,   NV_SUB_IDS, "Quadro 400" },
-	{ 0x10DE0A3C,   NV_SUB_IDS, "Quadro FX 880M" },
+	{ 0x10DE0A30,	"GeForce GT 330M" },
+	{ 0x10DE0A32,	"GeForce GT 415" },
+	{ 0x10DE0A34,	"GeForce GT 240M" },
+	{ 0x10DE0A35,	"GeForce GT 325M" },
+	{ 0x10DE0A38,	"Quadro 400" },
+	{ 0x10DE0A3C,	"Quadro FX 880M" },
+	{ 0x10DE0A3D,	"N10P-ES" },
+	{ 0x10DE0A3F,	"GT216-INT" },
 	// 0A40 - 0A4F
 	// 0A50 - 0A5F
 	// 0A60 - 0A6F
-	{ 0x10DE0A60,   NV_SUB_IDS, "GeForce G210" },
-	{ 0x10DE0A62,   NV_SUB_IDS, "GeForce 205" },
-	{ 0x10DE0A63,   NV_SUB_IDS, "GeForce 310" },
-	{ 0x10DE0A64,   NV_SUB_IDS, "ION" },
-	{ 0x10DE0A65,   NV_SUB_IDS, "GeForce 210" },
-	{ 0x10DE0A66,   NV_SUB_IDS, "GeForce 310" },
-	{ 0x10DE0A67,   NV_SUB_IDS, "GeForce 315" },
-	{ 0x10DE0A68,   NV_SUB_IDS, "GeForce G105M" },
-	{ 0x10DE0A69,   NV_SUB_IDS, "GeForce G105M" },
-	{ 0x10DE0A6A,   NV_SUB_IDS, "NVS 2100M" },
-	{ 0x10DE0A6C,   NV_SUB_IDS, "NVS 3100M" },
-	{ 0x10DE0A6E,   NV_SUB_IDS, "GeForce 305M" },
-	{ 0x10DE0A6F,   NV_SUB_IDS, "ION" },
+	{ 0x10DE0A60,	"GeForce G210" },
+	{ 0x10DE0A61,	"NVS 2100" },
+	{ 0x10DE0A62,	"GeForce 205" },
+	{ 0x10DE0A63,	"GeForce 310" },
+	{ 0x10DE0A64,	"ION" },
+	{ 0x10DE0A65,	"GeForce 210" },
+	{ 0x10DE0A66,	"GeForce 310" },
+	{ 0x10DE0A67,	"GeForce 315" },
+	{ 0x10DE0A68,	"GeForce G105M" },
+	{ 0x10DE0A69,	"GeForce G105M" },
+	{ 0x10DE0A6A,	"NVS 2100M" },
+	{ 0x10DE0A6C,	"NVS 3100M" },
+	{ 0x10DE0A6E,	"GeForce 305M" },
+	{ 0x10DE0A6F,	"ION" },	
 	// 0A70 - 0A7F
-	{ 0x10DE0A70,   NV_SUB_IDS, "GeForce 310M" },
-	{ 0x10DE0A71,   NV_SUB_IDS, "GeForce 305M" },
-	{ 0x10DE0A72,   NV_SUB_IDS, "GeForce 310M" },
-	{ 0x10DE0A73,   NV_SUB_IDS, "GeForce 305M" },
-	{ 0x10DE0A74,   NV_SUB_IDS, "GeForce G210M" },
-	{ 0x10DE0A75,   NV_SUB_IDS, "GeForce 310M" },
-	{ 0x10DE0A76,   NV_SUB_IDS, "ION" },
-	{ 0x10DE0A78,   NV_SUB_IDS, "Quadro FX 380 LP" },
-	{ 0x10DE0A7A,   NV_SUB_IDS, "GeForce 315M" },
-	{ 0x10DE0A7C,   NV_SUB_IDS, "Quadro FX 380M" },
+	{ 0x10DE0A70,	"GeForce 310M" },
+	{ 0x10DE0A71,	"GeForce 305M" },
+	{ 0x10DE0A72,	"GeForce 310M" },
+	{ 0x10DE0A73,	"GeForce 305M" },
+	{ 0x10DE0A74,	"GeForce G210M" },
+	{ 0x10DE0A75,	"GeForce G310M" },
+	{ 0x10DE0A76,	"ION" },
+	{ 0x10DE0A78,	"Quadro FX 380 LP" },
+	// { 0x10DE0A79,	"N12M-NS-S" },
+	{ 0x10DE0A7A,	"GeForce 315M" },
+	{ 0x10DE0A7B,	"GeForce 505" },
+	{ 0x10DE0A7C,	"Quadro FX 380M" },
+	{ 0x10DE0A7D,	"N11M-ES" }, //SUBIDS
+	{ 0x10DE0A7E,	"GT218-INT-S" },
+	{ 0x10DE0A7F,	"GT218-INT-B" },
 	// 0A80 - 0A8F
 	// 0A90 - 0A9F
 	// 0AA0 - 0AAF
@@ -757,20 +877,22 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0C80 - 0C8F
 	// 0C90 - 0C9F
 	// 0CA0 - 0CAF
-	{ 0x10DE0CA0,   NV_SUB_IDS, "GeForce GT 330 " },
-	{ 0x10DE0CA2,   NV_SUB_IDS, "GeForce GT 320" },
-	{ 0x10DE0CA3,   NV_SUB_IDS, "GeForce GT 240" },
-	{ 0x10DE0CA4,   NV_SUB_IDS, "GeForce GT 340" },
-	{ 0x10DE0CA5,   NV_SUB_IDS, "GeForce GT 220" },
-	{ 0x10DE0CA7,   NV_SUB_IDS, "GeForce GT 330" },
-	{ 0x10DE0CA8,   NV_SUB_IDS, "GeForce GTS 260M" },
-	{ 0x10DE0CA9,   NV_SUB_IDS, "GeForce GTS 250M" },
-	{ 0x10DE0CAC,   NV_SUB_IDS, "GeForce GT 220" },
-	{ 0x10DE0CAF,   NV_SUB_IDS, "GeForce GT 335M" },
-	// 0CB0 - 0CBF
-	{ 0x10DE0CB0,   NV_SUB_IDS, "GeForce GTS 350M" },
-	{ 0x10DE0CB1,   NV_SUB_IDS, "GeForce GTS 360M" },
-	{ 0x10DE0CBC,   NV_SUB_IDS, "Quadro FX 1800M" },
+	{ 0x10DE0CA0,	"GeForce GT 330 " },
+	{ 0x10DE0CA2,	"GeForce GT 320" },
+	{ 0x10DE0CA3,	"GeForce GT 240" },
+	{ 0x10DE0CA4,	"GeForce GT 340" },
+	{ 0x10DE0CA5,	"GeForce GT 220" },
+	{ 0x10DE0CA7,	"GeForce GT 330" },
+	{ 0x10DE0CA8,	"GeForce GTS 260M" },
+	{ 0x10DE0CA9,	"GeForce GTS 250M" },
+	{ 0x10DE0CAC,	"GeForce GT 220" },
+	{ 0x10DE0CAD,	"N10E-ES" }, // SUBIDS
+	{ 0x10DE0CAE,	"GT215-INT" },
+	{ 0x10DE0CAF,	"GeForce GT 335M" },
+	// 0CB0 - 0CBF	
+	{ 0x10DE0CB0,	"GeForce GTS 350M" },
+	{ 0x10DE0CB1,	"GeForce GTS 360M" },
+	{ 0x10DE0CBC,	"Quadro FX 1800M" },
 	// 0CC0 - 0CCF
 	// 0CD0 - 0CDF
 	// 0CE0 - 0CEF
@@ -788,58 +910,75 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0DA0 - 0DAF
 	// 0DB0 - 0DBF
 	// 0DC0 - 0DCF
-	{ 0x10DE0DC0,   NV_SUB_IDS, "GeForce GT 440" },
-	{ 0x10DE0DC4,   NV_SUB_IDS, "GeForce GTS 450" },
-	{ 0x10DE0DC5,   NV_SUB_IDS, "GeForce GTS 450" },
-	{ 0x10DE0DC6,   NV_SUB_IDS, "GeForce GTS 450" },
-	{ 0x10DE0DCD,   NV_SUB_IDS, "GeForce GT 555M" },
-	{ 0x10DE0DCE,   NV_SUB_IDS, "GeForce GT 555M" },
-	// 0DD0 - 0DDF
-	{ 0x10DE0DD1,   NV_SUB_IDS, "GeForce GTX 460M" },
-	{ 0x10DE0DD2,   NV_SUB_IDS, "GeForce GT 445M" },
-	{ 0x10DE0DD3,   NV_SUB_IDS, "GeForce GT 435M" },
-	{ 0x10DE0DD6,   NV_SUB_IDS, "GeForce GT 550M" },
-	{ 0x10DE0DD8,	0x10DE084A,	"Quadro 2000" },
-	{ 0x10DE0DD8,	0x10DE0914,	"Quadro 2000D" },
-	{ 0x10DE0DDA,   NV_SUB_IDS, "Quadro 2000M" },
+	{ 0x10DE0DC0,	"GeForce GT 440" },
+	//  { 0x10DE0DC1,	"D12-P1-35" },
+	//  { 0x10DE0DC2,	"D12-P1-35" },
+	{ 0x10DE0DC4,	"GeForce GTS 450" },
+	{ 0x10DE0DC5,	"GeForce GTS 450" },
+	{ 0x10DE0DC6,	"GeForce GTS 450" },
+	//  { 0x10DE0DCA,	"GF10x" },
+	//  { 0x10DE0DCC,	"N12E-GS" },
+	{ 0x10DE0DCD,	"GeForce GT 555M" },
+	{ 0x10DE0DCE,	"GeForce GT 555M" },
+	//  { 0x10DE0DCF,	"N12P-GT-B" },
+	// 0DD0 - 0DDF	
+	//  { 0x10DE0DD0,	"N11E-GT" },
+	{ 0x10DE0DD1,	"GeForce GTX 460M" },
+	{ 0x10DE0DD2,	"GeForce GT 445M" },
+	{ 0x10DE0DD3,	"GeForce GT 435M" },
+	{ 0x10DE0DD6,	"GeForce GT 550M" },
+	{ 0x10DE0DD8,	"Quadro 2000" },
+	{ 0x10DE0DDA,	"Quadro 2000M" },
+	{ 0x10DE0DDE,	"GF106-ES" },
+	//  { 0x10DE0DDF,	"GF106-INT" },
 	// 0DE0 - 0DEF
-	{ 0x10DE0DE0,   NV_SUB_IDS, "GeForce GT 440" },
-	{ 0x10DE0DE1,   NV_SUB_IDS, "GeForce GT 430" },
-	{ 0x10DE0DE2,   NV_SUB_IDS, "GeForce GT 420" },
-	{ 0x10DE0DE4,   NV_SUB_IDS, "GeForce GT 520" },
-	{ 0x10DE0DE5,   NV_SUB_IDS, "GeForce GT 530" },
-    { 0x10DE0DE8,   NV_SUB_IDS, "GeForce GT 620M" },
-	{ 0x10DE0DE9,   NV_SUB_IDS, "GeForce GT 630M" },
-    { 0x10DE0DEA,   NV_SUB_IDS, "GeForce 610M" },
-	{ 0x10DE0DEB,   NV_SUB_IDS, "GeForce GT 555M" },
-	{ 0x10DE0DEC,   NV_SUB_IDS, "GeForce GT 525M" },
-	{ 0x10DE0DED,   NV_SUB_IDS, "GeForce GT 520M" },
-	{ 0x10DE0DEE,   NV_SUB_IDS, "GeForce GT 415M" },
-    { 0x10DE0DEF,   NV_SUB_IDS, "NVS 5400M" },
+	{ 0x10DE0DE0,	"GeForce GT 440" },
+	{ 0x10DE0DE1,	"GeForce GT 430" },
+	{ 0x10DE0DE2,	"GeForce GT 420" },
+	{ 0x10DE0DE3,	"GeForce GT 635M" },
+	{ 0x10DE0DE4,	"GeForce GT 520" },
+	{ 0x10DE0DE5,	"GeForce GT 530" },
+	{ 0x10DE0DE8,	"GeForce GT 620M" },
+	{ 0x10DE0DE9,	"GeForce GT 630M" },
+	{ 0x10DE0DEA,	"GeForce GT 610M" },
+	{ 0x10DE0DEB,	"GeForce GT 555M" },
+	{ 0x10DE0DEC,	"GeForce GT 525M" },
+	{ 0x10DE0DED,	"GeForce GT 520M" },
+	{ 0x10DE0DEE,	"GeForce GT 415M" },
+	{ 0x10DE0DEF,	"N13P-NS1-A1" },
 	// 0DF0 - 0DFF
-	{ 0x10DE0DF0,   NV_SUB_IDS, "GeForce GT 425M" },
-	{ 0x10DE0DF1,   NV_SUB_IDS, "GeForce GT 420M" },
-	{ 0x10DE0DF2,   NV_SUB_IDS, "GeForce GT 435M" },
-	{ 0x10DE0DF3,   NV_SUB_IDS, "GeForce GT 420M" },
-	{ 0x10DE0DF4,   NV_SUB_IDS, "GeForce GT 540M" },
-	{ 0x10DE0DF5,   NV_SUB_IDS, "GeForce GT 525M" },
-	{ 0x10DE0DF6,   NV_SUB_IDS, "GeForce GT 550M" },
-	{ 0x10DE0DF7,   NV_SUB_IDS, "GeForce GT 520M" },
-	{ 0x10DE0DF8,   NV_SUB_IDS, "Quadro 600" },
-    { 0x10DE0DF9,   NV_SUB_IDS, "Quadro 500M" },
-	{ 0x10DE0DFA,   NV_SUB_IDS, "Quadro 1000M" },
-	{ 0x10DE0DFC,   NV_SUB_IDS, "NVS 5200M" },
+	{ 0x10DE0DF0,	"GeForce GT 425M" },
+	{ 0x10DE0DF1,	"GeForce GT 420M" },
+	{ 0x10DE0DF2,	"GeForce GT 435M" },
+	{ 0x10DE0DF3,	"GeForce GT 420M" },
+	{ 0x10DE0DF4,	"GeForce GT 540M" },
+	{ 0x10DE0DF5,	"GeForce GT 525M" },
+	{ 0x10DE0DF6,	"GeForce GT 550M" },
+	{ 0x10DE0DF7,	"GeForce GT 520M" },
+	{ 0x10DE0DF8,	"Quadro 600" },
+	{ 0x10DE0DF9,	"Quadro 500M" },
+	{ 0x10DE0DFA,	"Quadro 1000M" },
+	{ 0x10DE0DFC,	"NVS 5200M" },
+	{ 0x10DE0DFE,	"GF108 ES" },
+	//  { 0x10DE0DFF,	"GF108 INT" },
 	// 0E00 - 0E0F
 	// 0E10 - 0E1F
 	// 0E20 - 0E2F
-	{ 0x10DE0E22,   NV_SUB_IDS, "GeForce GTX 460" },
-	{ 0x10DE0E23,   NV_SUB_IDS, "GeForce GTX 460 SE" },
-	{ 0x10DE0E24,   NV_SUB_IDS, "GeForce GTX 460" },
+	{ 0x10DE0E21,	"D12U-25" },
+	{ 0x10DE0E22,	"GeForce GTX 460" },
+	{ 0x10DE0E23,	"GeForce GTX 460 SE" },
+	{ 0x10DE0E24,	"GeForce GTX 460" },
+	//  { 0x10DE0E25,	"D12U-50" },
+	{ 0x10DE0E28,	"GeForce GTX 460" },
 	// 0E30 - 0E3F
-	{ 0x10DE0E30,   NV_SUB_IDS, "GeForce GTX 470M" },
-	{ 0x10DE0E31,   NV_SUB_IDS, "GeForce GTX 485M" },
-	{ 0x10DE0E3A,   NV_SUB_IDS, "Quadro 3000M" },
-	{ 0x10DE0E3B,   NV_SUB_IDS, "Quadro 4000M" },
+	{ 0x10DE0E30,	"GeForce GTX 470M" },
+	{ 0x10DE0E31,	"GeForce GTX 485M" },
+	//  { 0x10DE0E32,	"N12E-GT" },
+	{ 0x10DE0E38,	"GF104GL" },
+	{ 0x10DE0E3A,	"Quadro 3000M" },
+	{ 0x10DE0E3B,	"Quadro 4000M" },
+	//  { 0x10DE0E3E,	"GF104-ES" },
+	//  { 0x10DE0E3F,	"GF104-INT" },
 	// 0E40 - 0E4F
 	// 0E50 - 0E5F
 	// 0E60 - 0E6F
@@ -853,8 +992,8 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0EE0 - 0EEF
 	// 0EF0 - 0EFF
 	// 0F00 - 0F0F
-    { 0x10DE0F00,   NV_SUB_IDS, "GeForce GT 630" },
-    { 0x10DE0F01,   NV_SUB_IDS, "GeForce GT 620" },
+	{ 0x10DE0F00,	"GeForce GT 630" },
+	{ 0x10DE0F01,	"GeForce GT 620" },
 	// 0F10 - 0F1F
 	// 0F20 - 0F2F
 	// 0F30 - 0F3F
@@ -867,71 +1006,103 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 0FA0 - 0FAF
 	// 0FB0 - 0FBF
 	// 0FC0 - 0FCF
-    { 0x10DE0FC0,   NV_SUB_IDS, "GeForce GT 640" },
-    { 0x10DE0FC1,   NV_SUB_IDS, "GeForce GT 640" },
-    { 0x10DE0FC2,   NV_SUB_IDS, "GeForce GT 630" },
-    { 0x10DE0FCE,   NV_SUB_IDS, "GeForce GT 640M LE" },
+	{ 0x10DE0FC0,	"GeForce GT 640" },
+	{ 0x10DE0FC1,	"GeForce GT 640" },
+	{ 0x10DE0FC2,	"GeForce GT 630" },
+	{ 0x10DE0FC6,	"GeForce GTX 650" },
 	// 0FD0 - 0FDF
-    { 0x10DE0FD1,   NV_SUB_IDS, "GeForce GT 650M" },
-	{ 0x10DE0FD2,   NV_SUB_IDS, "GeForce GT 640M" },
-    { 0x10DE0FD3,   NV_SUB_IDS, "GeForce GT 640M LE" },
-	{ 0x10DE0FD4,   NV_SUB_IDS, "GeForce GTX 660M" },
-    { 0x10DE0FD5,   NV_SUB_IDS, "GeForce GT 650M" },
-    { 0x10DE0FD8,   NV_SUB_IDS, "GeForce GT 640M" },
+	{ 0x10DE0FD1,	"GeForce GT 650M" },
+	{ 0x10DE0FD2,	"GeForce GT 640M" },
+	{ 0x10DE0FD3,	"GeForce GT 640M LE" },
+	{ 0x10DE0FD4,	"GeForce GTX 660M" },
+	{ 0x10DE0FD5,	"GeForce GT 650M" },
+	{ 0x10DE0FD8,	"GeForce GT 640M" },
+	{ 0x10DE0FD9,	"GeForce GT 645M" },
+	{ 0x10DE0FDB,	"GK107-ESP-A1" },
+	{ 0x10DE0FDF,	"GeForce GT 740M" },
 	// 0FE0 - 0FEF
-    { 0x10DE0FE0,   NV_SUB_IDS, "GeForce GTX 660M" },
+	{ 0x10DE0FE0,	"GeForce GTX 660M" },
+	{ 0x10DE0FE1,	"GeForce GT 730M" },
+	{ 0x10DE0FE3,	"GeForce GT 745M" },
+	{ 0x10DE0FE4,	"GeForce GT 750M" },
 	// 0FF0 - 0FFF
-    { 0x10DE0FFF,   NV_SUB_IDS, "Quadro 410" },
+	{ 0x10DE0FF2,	"VGX K1" },
+	{ 0x10DE0FF8,	"Quadro K500M" },
+	{ 0x10DE0FF9,	"Quadro K2000D" },
+	{ 0x10DE0FFA,	"Quadro K600" },
+	{ 0x10DE0FFB,	"Quadro K2000M" },
+	{ 0x10DE0FFC,	"Quadro K1000M" },
+	{ 0x10DE0FFD,	"NVS 510" },
+	{ 0x10DE0FFE,	"Quadro K2000" },
+	{ 0x10DE0FFF,	"Quadro 410" },
 	// 1000 - 100F
+	{ 0x10DE1003,	"GeForce GTX Titan LE" },
+	{ 0x10DE1004,	"GeForce GTX 780" },
+	{ 0x10DE1005,	"GeForce GTX Titan" },
 	// 1010 - 101F
+	{ 0x10DE101F,	"Tesla K20" },
 	// 1020 - 102F
+	{ 0x10DE1020,	"Tesla K20X" },
+	{ 0x10DE1021,	"Tesla K20Xm" },
+	{ 0x10DE1022,	"Tesla K20c" },
+	{ 0x10DE1026,	"Tesla K20s" },
+	{ 0x10DE1028,	"Tesla K20m" },
 	// 1030 - 103F
 	// 1040 - 104F
-	{ 0x10DE1040,   NV_SUB_IDS, "GeForce GT 520" },
-	{ 0x10DE1042,   NV_SUB_IDS, "GeForce 510" },
-    { 0x10DE1048,   NV_SUB_IDS, "GeForce 605" },
-	{ 0x10DE1049,   NV_SUB_IDS, "GeForce GT 620" },
-    { 0x10DE104A,   NV_SUB_IDS, "GeForce GT 610" },
+	{ 0x10DE1040,	"GeForce GT 520" },
+	//  { 0x10DE1041,	"D13M1-45" },
+	{ 0x10DE1042,	"GeForce 510" },
+	{ 0x10DE1048,	"GeForce 605" },
+	{ 0x10DE1049,	"GeForce GT 620" },
+	{ 0x10DE104A,	"GeForce GT 610" },
+	{ 0x10DE104B,	"GeForce GT 625" },
 	// 1050 - 105F
-	{ 0x10DE1050,   NV_SUB_IDS, "GeForce GT 520M" },
-	{ 0x10DE1051,   NV_SUB_IDS, "GeForce GT 520MX" },
-    { 0x10DE1052,   NV_SUB_IDS, "GeForce GT 520M" },
-	{ 0x10DE1054,   NV_SUB_IDS, "GeForce GT 410M" },
-	{ 0x10DE1055,   NV_SUB_IDS, "GeForce 410M" },
-	{ 0x10DE1056,   NV_SUB_IDS, "Quadro NVS 4200M" },
-	{ 0x10DE1057,   NV_SUB_IDS, "Quadro NVS 4200M" },
-    { 0x10DE1058,   NV_SUB_IDS, "GeForce 610M" },
-    { 0x10DE1059,   NV_SUB_IDS, "GeForce 610M" },
-    { 0x10DE105A,   NV_SUB_IDS, "GeForce 610M" },
+	{ 0x10DE1050,	"GeForce GT 520M" },
+	{ 0x10DE1051,	"GeForce GT 520MX" },
+	{ 0x10DE1052,	"GeForce GT 520M" },
+	{ 0x10DE1054,	"GeForce GT 410M" },
+	{ 0x10DE1055,	"GeForce 410M" },
+	{ 0x10DE1056,	"Quadro NVS 4200M" },
+	{ 0x10DE1057,	"Quadro NVS 4200M" },
+	{ 0x10DE1058,	"GeForce GT 610M" },
+	{ 0x10DE1059,	"GeForce 610M" },
+	{ 0x10DE105A,	"GeForce 610M" },
+	{ 0x10DE105B,	"GeForce 705A" },
 	// 1060 - 106F
 	// 1070 - 107F
-    { 0x10DE107D,   NV_SUB_IDS, "NVS 310" },
+	{ 0x10DE107C,	"Quadro NVS 315" },
+	{ 0x10DE107D,	"Quadro NVS 310" },
+	//  { 0x10DE107E,	"GF119-INT" },
+	{ 0x10DE107F,	"GF119-ES" },
 	// 1080 - 108F
-	{ 0x10DE1080,   NV_SUB_IDS, "GeForce GTX 580" },
-	{ 0x10DE1081,   NV_SUB_IDS, "GeForce GTX 570" },
-	{ 0x10DE1082,   NV_SUB_IDS, "GeForce GTX 560 Ti" },
-	{ 0x10DE1084,   NV_SUB_IDS, "GeForce GTX 560" },
-	{ 0x10DE1086,   NV_SUB_IDS, "GeForce GTX 570" },
-	{ 0x10DE1087,   NV_SUB_IDS, "GeForce GTX 560 Ti 448" },
-	{ 0x10DE1088,   NV_SUB_IDS, "GeForce GTX 590" },
-	{ 0x10DE1089,   NV_SUB_IDS, "GeForce GTX 580" },
-	{ 0x10DE108B,   NV_SUB_IDS, "GeForce GTX 590" },
+	{ 0x10DE1080,	"GeForce GTX 580" },
+	{ 0x10DE1081,	"GeForce GTX 570" },
+	{ 0x10DE1082,	"GeForce GTX 560 Ti" },
+	{ 0x10DE1083,	"D13U" },
+	{ 0x10DE1084,	"GeForce GTX 560" },
+	{ 0x10DE1086,	"GeForce GTX 570 HD" },
+	{ 0x10DE1087,	"GeForce GTX 560 Ti-448" },
+	{ 0x10DE1088,	"GeForce GTX 590" },
+	{ 0x10DE1089,	"GeForce GTX 580" },
+	{ 0x10DE108B,	"GeForce GTX 590" },
+	//  { 0x10DE108C,	"D13U" },
+	{ 0x10DE108E,	"Tesla C2090" },
 	// 1090 - 109F
-    { 0x10DE1091,	0x10DE0887,	"Tesla M2090" },
-	{ 0x10DE1091,	0x10DE088E,	"Tesla X2090" },
-	{ 0x10DE1091,	0x10DE0891,	"Tesla X2090" },
-	{ 0x10DE1094,	0x10DE0888,	"nVidia Tesla M2075" },
-	{ 0x10DE1096,   NV_SUB_IDS, "Tesla C2075" },
-	{ 0x10DE109A,   NV_SUB_IDS, "Quadro 5010M" },
-	{ 0x10DE109B,   NV_SUB_IDS, "Quadro 7000" },
+	{ 0x10DE1091,	"Tesla M2090" }, // X2090
+	{ 0x10DE1094,	"Tesla M2075" },
+	{ 0x10DE1096,	"Tesla C2075" },
+	{ 0x10DE1098,	"D13U" },
+	{ 0x10DE109A,	"Quadro 5010M" },
+	{ 0x10DE109B,	"Quadro 7000" },
 	// 10A0 - 10AF
 	// 10B0 - 10BF
 	// 10C0 - 10CF
-	{ 0x10DE10C0,   NV_SUB_IDS, "GeForce 9300 GS" },
-	{ 0x10DE10C3,   NV_SUB_IDS, "GeForce 8400 GS" },
-	{ 0x10DE10C5,   NV_SUB_IDS, "GeForce 405" },
+	{ 0x10DE10C0,	"GeForce 9300 GS" },
+	{ 0x10DE10C3,	"GeForce 8400 GS" },
+	{ 0x10DE10C4,	"ION" },
+	{ 0x10DE10C5,	"GeForce 405" },
 	// 10D0 - 10DF
-	{ 0x10DE10D8,   NV_SUB_IDS, "NVS 300" },
+	{ 0x10DE10D8,	"Quadro NVS 300" },
 	// 10E0 - 10EF
 	// 10F0 - 10FF
 	// 1100 - 110F
@@ -939,64 +1110,296 @@ static nvidia_card_info_t nvidia_cards[] = {
 	// 1120 - 112F
 	// 1130 - 113F
 	// 1140 - 114F
-    { 0x10DE1140,   NV_SUB_IDS, "GeForce GT 620M / GT 630M" },
+	{ 0x10DE1140,	"GeForce GT 610M" },
+	{ 0x10DE1141,	"GeForce 610M" },
+	{ 0x10DE1142,	"GeForce 620M" },
+	//  { 0x10DE1143,	"N13P-GV" },
+	//  { 0x10DE1144,	"GF117" },
+	//  { 0x10DE1145,	"GF117" },
+	//  { 0x10DE1146,	"GF117" },
+	//  { 0x10DE1147,	"GF117" },
+	{ 0x10DE1149,	"GF117-ES" },
+	//  { 0x10DE114A,	"GF117-INT" },
+	//  { 0x10DE114B,	"PCI-GEN3-B" },
 	// 1150 - 115F
 	// 1160 - 116F
 	// 1170 - 117F
 	// 1180 - 118F
-	{ 0x10DE1180,   NV_SUB_IDS, "GeForce GTX 680" },
-    { 0x10DE1188,   NV_SUB_IDS, "GeForce GTX 690" },
-    { 0x10DE1189,   NV_SUB_IDS, "GeForce GTX 670" },
+	{ 0x10DE1180,	"GeForce GTX 680" },
+	{ 0x10DE1183,	"GeForce GTX 660 Ti" },
+	{ 0x10DE1185,	"GeForce GTX 660" },
+	{ 0x10DE1188,	"GeForce GTX 690" },
+	{ 0x10DE1189,	"GeForce GTX 670" },
+	{ 0x10DE118F,	"Tesla K10" },
 	// 1190 - 119F
+	{ 0x10DE119F,	"GeForce GTX 780M" },
 	// 11A0 - 11AF
+	{ 0x10DE11A0,	"GeForce GTX 680M" },
+	{ 0x10DE11A1,	"GeForce GTX 670MX" },
+	{ 0x10DE11A2,	"GeForce GTX 675MX" },
+	{ 0x10DE11A3,	"GeForce GTX 680MX" },
+	{ 0x10DE11A7,	"GeForce GTX 675MX" },
 	// 11B0 - 11BF
+	{ 0x10DE11BA,	"Quadro K5000" },
+	{ 0x10DE11BC,	"Quadro K5000M" },
+	{ 0x10DE11BD,	"Quadro K4000M" },
+	{ 0x10DE11BE,	"Quadro K3000M" },
+	{ 0x10DE11BF,	"VGX K2" },
 	// 11C0 - 11CF
+	{ 0x10DE11C0,	"GeForce GTX 660" },
+	{ 0x10DE11C2,	"GeForce GTX 650 Ti BOOST" },
+	{ 0x10DE11C3,	"GeForce GTX 650 Ti" },
+	{ 0x10DE11C4,	"GeForce GTX 645" },
+	{ 0x10DE11C6,	"GeForce GTX 650 Ti" },
 	// 11D0 - 11DF
 	// 11E0 - 11EF
+	{ 0x10DE11E0,	"GeForce GTX 770M" },
+	{ 0x10DE11E1,	"N14E-GE-B-A1" },
+	{ 0x10DE11E2,	"GeForce GTX 765M" },
+	{ 0x10DE11E3,	"GeForce GTX 760M" },
 	// 11F0 - 11FF
+	{ 0x10DE11FA,	"Quadro K4000" },
 	// 1200 - 120F
-	{ 0x10DE1200,   NV_SUB_IDS, "GeForce GTX 560 Ti" },
-	{ 0x10DE1201,   NV_SUB_IDS, "GeForce GTX 560" },
-	{ 0x10DE1203,   NV_SUB_IDS, "GeForce GTX 460 SE v2" },
-    { 0x10DE1205,   NV_SUB_IDS, "GeForce GTX 460 v2" },
-    { 0x10DE1206,   NV_SUB_IDS, "GeForce GTX 555" },
-    { 0x10DE1207,   NV_SUB_IDS, "GeForce GT 645" },
-    { 0x10DE1208,   NV_SUB_IDS, "GeForce GTX 560 SE" },
-	// 1210 - 121F
-	{ 0x10DE1210,   NV_SUB_IDS, "GeForce GTX 570M" },
-	{ 0x10DE1211,   NV_SUB_IDS, "GeForce GTX 580M" },
-    { 0x10DE1212,   NV_SUB_IDS, "GeForce GTX 675M" },
-	{ 0x10DE1213,   NV_SUB_IDS, "GeForce GTX 670M" },
-	// 1220 - 122F
-	// 1230 - 123F
-	// 1240 - 124F
-    { 0x10DE1240,   NV_SUB_IDS, "GeForce GT 620M" },
-	{ 0x10DE1241,   NV_SUB_IDS, "GeForce GT 545" },
-	{ 0x10DE1243,   NV_SUB_IDS, "GeForce GT 545" },
-	{ 0x10DE1244,   NV_SUB_IDS, "GeForce GTX 550 Ti" },
-	{ 0x10DE1245,   NV_SUB_IDS, "GeForce GTS 450" },
-    { 0x10DE1246,   NV_SUB_IDS, "GeForce GTX 550M" },
-	{ 0x10DE1247,   NV_SUB_IDS, "GeForce GT 555M" },
-	{ 0x10DE1247,   0x10DE212A, "GT 635M" },
-	{ 0x10DE1247,   0x10DE212B, "GT 635M" },
-	{ 0x10DE1247,   0x10DE212C, "GT 635M" },
-    { 0x10DE1248,   NV_SUB_IDS, "GeForce GT 555M / GT 635M" },
-    { 0x10DE124B,   NV_SUB_IDS, "GeForce GT 640" },
-    { 0x10DE1249,   NV_SUB_IDS, "GeForce GTS 450" },
-    { 0x10DE124B,   NV_SUB_IDS, "GeForce GT 640" },
-    { 0x10DE124D,   NV_SUB_IDS, "GeForce GT 555M / GT 635M" },
-	// 1250 - 125F
-	{ 0x10DE1251,   NV_SUB_IDS, "GeForce GTX 560M" },
+	{ 0x10DE1200,	"GeForce GTX 560 Ti" },
+	{ 0x10DE1201,	"GeForce GTX 560" },
+	{ 0x10DE1202,	"GeForce GTX 560 Ti" },
+	{ 0x10DE1203,	"GeForce GTX 460 SE v2" },
+	{ 0x10DE1205,	"GeForce GTX 460 v2" },
+	{ 0x10DE1206,	"GeForce GTX 555" },
+	{ 0x10DE1207,	"GeForce GT 645" },
+	{ 0x10DE1208,	"GeForce GTX 560 SE" },
+	{ 0x10DE1210,	"GeForce GTX 570M" },
+	{ 0x10DE1211,	"GeForce GTX 580M" },
+	{ 0x10DE1212,	"GeForce GTX 675M" },
+	{ 0x10DE1213,	"GeForce GTX 670M" },
+	{ 0x10DE1240,	"GeForce GT 620M" },
+	{ 0x10DE1241,	"GeForce GT 545" },
+	{ 0x10DE1243,	"GeForce GT 545" },
+	{ 0x10DE1244,	"GeForce GTX 550 Ti" },
+	{ 0x10DE1245,	"GeForce GTS 450" },
+	{ 0x10DE1246,	"GeForce GT 550M" },
+	{ 0x10DE1247,	"GeForce GT 555M" },
+	{ 0x10DE1248,	"GeForce GT 555M" },
+	{ 0x10DE1249,	"GeForce GTS 450" },
+	{ 0x10DE124B,	"GeForce GT 640" },
+	{ 0x10DE124D,	"GeForce GT 555M" },
+	//  { 0x10DE1250,	"GF116-INT" },
+	{ 0x10DE1251,	"GeForce GTX 560M" },
 	// 1260 - 126F
 	// 1270 - 127F
 	// 1280 - 128F
+	{ 0x10DE1280,	"GeForce GT 635" },
 	// 1290 - 129F
+	{ 0x10DE1290,	"GeForce GT 730M" },
+	{ 0x10DE1291,	"GeForce GT 735M" },
+	{ 0x10DE1292,	"GeForce GT 740M" },
+	{ 0x10DE1293,	"GeForce GT 730M" },
+	{ 0x10DE1294,	"GeForce GT 740M" },
 	// 12A0 - 12AF
+	//{ 0x10DE12A0,	"GeForce GT ???" },
 	// 12B0 - 12BF
 	// 12C0 - 12CF
 	// 12D0 - 12DF
 	// 12E0 - 12EF
 	// 12F0 - 12FF
+};
+
+static nvidia_card_info_t nvidia_card_exceptions[] = {
+    /* ========================================================================================
+     * Layout is device(VendorId + DeviceId), subdev (SubvendorId + SubdeviceId), display name.
+     * ========================================================================================
+     */
+    /* ------ Specific DeviceID and SubDevID. ------ */
+	// 0000 - 00FF
+	{ 0x10DE0040,	0x10438178,	"Asus V9999 Ultra V62.11" },
+	{ 0x10DE0040,	0x1043817D,	"Asus V9999GT V61.21" },
+	{ 0x10DE0040,	0x7FFFFFFF,	"GeForce 6800 Ultra [NV40.0]" },
+	// 0100 - 01FF
+	{ 0x10DE01D7,	0x102801C2,	"Dell Quadro NVS 110M" },
+	{ 0x10DE01D7,	0x102801CC,	"Dell Quadro NVS 110M" },
+	{ 0x10DE01D7,	0x10DE014B,	"nVidia Quadro NVS 110M" },
+
+	{ 0x10DE01D8,	0x102801CC,	"Dell Quadro NVS 120M" },
+	{ 0x10DE01D8,	0x10282003,	"Dell Quadro NVS 120M" },
+
+	{ 0x10DE01DA,	0x10280407,	"Dell GeForce 7300 LE" },
+	// 0200 - 02FF
+	{ 0x10DE025B,	0x10480D23,	"ELSA Gloria4 700XGL" },
+	// 0300 - 03FF
+	{ 0x10DE0391,	0x10DE047A,	"Galaxy GeForce 7600 GT" },
+	{ 0x10DE0391,	0x19F120DE,	"Galaxy GeForce 7600 GT" },
+
+	{ 0x10DE0393,	0x00000400,	"Apple GeForce 7300GT" },
+	// 0400 - 04FF
+	{ 0x10DE0402,	0x10DE0439,	"Galaxy 8600GT" },
+	{ 0x10DE0402,	0x10DE0505,	"Galaxy 8600GT" },
+	// 0500 - 05FF
+	{ 0x10DE05E2,	0x104382EB,	"ASUS ENGTX260" },
+	{ 0x10DE05E2,	0x16822390,	"HFX GeForce GTX 260" },
+	{ 0x10DE05E2,	0x17870000,	"HIS GeForce GTX 260" },
+
+	{ 0x10DE05E6,	0x10B00401,	"Gainward GeForce GTX 285" },
+
+	{ 0x10DE05E7,	0x10DE0595,	"nVidia Tesla T10 Processor" },
+	{ 0x10DE05E7,	0x10DE066A,	"nVidia Tesla C1060" },
+	{ 0x10DE05E7,	0x10DE068F,	"nVidia Tesla T10 Processor" },
+	{ 0x10DE05E7,	0x10DE0697,	"nVidia Tesla M1060" },
+	{ 0x10DE05E7,	0x10DE0714,	"nVidia Tesla M1060" },
+	{ 0x10DE05E7,	0x10DE0743,	"nVidia Tesla M1060" },
+	// 0600 - 06FF
+	{ 0x10DE0600,	0x10DE0000,	"Abit GeForce 8800 GTS" },
+
+	{ 0x10DE0605,	0x145834A2,	"Gigabyte GV-N98TOC-512H" },
+
+	{ 0x10DE0608,	0x15880577,	"Solidum GeForce 9800M GTX" },
+
+	{ 0x10DE0609,	0x11700121,	"Inventec GeForce 8800M GTS" },
+
+	{ 0x10DE0612,	0x104382A6,	"Asus GeForce 9800 GTX+" },
+	{ 0x10DE0612,	0x10DE0571,	"nVidia GeForce 9800 GTX+" },
+	{ 0x10DE0612,	0x10DE0592,	"nVidia GeForce 9800 GTX+" },
+	{ 0x10DE0612,	0x3842C842,	"EVGA GeForce 9800 GTX+" },
+	{ 0x10DE0612,	0x3842C875,	"EVGA GeForce 9800 GTX+" },
+
+	{ 0x10DE0615,	0x10480F67,	"ELSA GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0592,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0593,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0652,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE0719,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x10DE079E,	"Palit GeForce GTS 250" },
+	{ 0x10DE0615,	0x11503842,	"TMC GeForce GTS 250" }, // Thinking Machines Corporation
+	{ 0x10DE0615,	0x11513842,	"JAE GeForce GTS 250" },
+	{ 0x10DE0615,	0x11553842,	"Pine GeForce GTS 250" },
+	{ 0x10DE0615,	0x11563842,	"Periscope GeForce GTS 250" },
+
+	{ 0x10DE0618,	0x10432028,	"Asus GeForce GTX 170M" },
+	{ 0x10DE0618,	0x1043202B,	"Asus GeForce GTX 680" },
+
+	{ 0x10DE0622,	0x104382AC,	"Asus EN9600GT Magic" },
+
+	{ 0x10DE0640,	0x10DE077F,	"Inno3D GeForce 9500GT HDMI" },
+
+	{ 0x10DE0649,	0x1043202D,	"Asus GeForce GT 220M" },
+
+	{ 0x10DE06CD,	0x10DE079F,	"Point of View GeForce GTX 470" },
+	{ 0x10DE06CD,	0x14622220,	"MSi GeForce GTX 470 Twin Frozr II" },
+
+	{ 0x10DE06D1,	0x10DE0772,	"nVidia Tesla C2070" },
+
+	{ 0x10DE06D2,	0x10DE088F,	"nVidia Tesla X2070" },
+
+	{ 0x10DE06DE,	0x10DE0773,	"nVidia Tesla S2050" },
+	{ 0x10DE06DE,	0x10DE0830,	"nVidia Tesla M2070" },
+	{ 0x10DE06DE,	0x10DE0831,	"nVidia Tesla M2070" },
+	{ 0x10DE06DE,	0x10DE0832,	"nVidia Tesla M2070" },
+	{ 0x10DE06DE,	0x10DE0840,	"nVidia Tesla X2070" },
+
+	{ 0x10DE06E4,	0x10438322,	"Asus EN8400GS" },
+	{ 0x10DE06E4,	0x14583475,	"GV-NX84S256HE [GeForce 8400 GS]" },
+
+	{ 0x10DE06E8,	0x10280262,	"Dell GeForce 9200M GS" },
+	{ 0x10DE06E8,	0x10280271,	"Dell GeForce 9200M GS" },
+	{ 0x10DE06E8,	0x10280272,	"Dell GeForce 9200M GS" },
+	{ 0x10DE06E8,	0x103C30F4,	"HP GeForce 9200M GS" },
+	{ 0x10DE06E8,	0x103C30F7,	"HP GeForce 9200M GS" },
+	{ 0x10DE06E8,	0x103C3603,	"HP GeForce 9200M GS" },
+	// 0700 - 07FF
+	// 0800 - 08FF
+	{ 0x10DE0873,	0x104319B4,	"Asus GeForce G102M" },
+	// 0900 - 09FF
+	// 0A00 - 0AFF
+	{ 0x10DE0A6F,	0x12974003,	"Shuttle XS 3510MA" },
+
+	{ 0x10DE0A70,	0x17AA3605,	"Lenovo ION" },
+
+	{ 0x10DE0A73,	0x17AA3607,	"Lenovo ION" },
+	{ 0x10DE0A73,	0x17AA3610,	"Lenovo ION" },
+
+	{ 0x10DE0A75,	0x17AA3605,	"Lenovo ION" },
+	// 0B00 - 0BFF
+	// 0C00 - 0CFF
+	{ 0x10DE0CA3,	0x14628041,	"MSi VN240GT-MD1G" },
+	{ 0x10DE0CA3,	0x16423926,	"Bitland GeForce GT 230" },
+	// 0D00 - 0DFF
+	{ 0x10DE0DD8,	0x10DE0914,	"nVidia Quadro 2000D" },
+
+	{ 0x10DE0DEF,	0x17AA21F3,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F4,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F5,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA21F6,	"Lenovo NVS 5400M" },
+	{ 0x10DE0DEF,	0x17AA5005,	"Lenovo NVS 5400M" },
+
+	// 0E00 - 0EFF
+	{ 0x10DE0E22,	0x1043835D,	"Asus ENGTX460" },
+
+	{ 0x10DE0E23,	0x10B00401,	"Gainward GeForce GTX 460" },
+	// 0F00 - 0FFF
+	{ 0x10DE0FD2,	0x10280595,	"Dell GeForce GT 640M LE" },
+	{ 0x10DE0FD2,	0x102805B2,	"Dell GeForce GT 640M LE" },
+	// 1000 - 10FF
+	{ 0x10DE1080,	0x14622561,	"MSI N580GTX Lightning" },
+	{ 0x10DE1080,	0x14622563,	"MSI N580GTX Lightning" },
+
+	{ 0x10DE1086,	0x10DE0871,	"Inno3D GeForce GTX 570" },
+
+	{ 0x10DE1087,	0x104383D6,	"Asus ENGTX560Ti448 DCII" },
+
+	{ 0x10DE1091,	0x10DE088E,	"nVidia Tesla X2090" },
+	{ 0x10DE1091,	0x10DE0891,	"nVidia Tesla X2090" },
+	// 1100 - 11FF
+	{ 0x10DE1140,	0x1025064A,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025064C,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250680,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250692,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250694,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250702,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250719,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250725,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250728,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025072B,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x1025072E,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10250732,	"Acer GeForce GT 620M" },
+	{ 0x10DE1140,	0x10280565,	"Dell GeForce GT 630M" },
+	{ 0x10DE1140,	0x10280568,	"Dell GeForce GT 630M" },
+	{ 0x10DE1140,	0x144DC0D5,	"Samsung GeForce GT 630M" },
+	{ 0x10DE1140,	0x17AA500D,	"Lenovo GeForce GT 620M" },
+	{ 0x10DE1140,	0x1B0A20DD,	"Pegatron GeForce GT 620M" },
+	{ 0x10DE1140,	0x1B0A20FD,	"Pegatron GeForce GT 620M" },
+
+	{ 0x10DE1180,	0x00001255,	"Afox GTX 680" },
+	{ 0x10DE1180,	0x104383F0,	"Asus GTX680-2GD5" },
+	{ 0x10DE1180,	0x104383F6,	"Asus GTX 680 Direct CU II" },
+	{ 0x10DE1180,	0x104383F7,	"Asus GTX 680 Direct CU II" },
+	{ 0x10DE1180,	0x1458353C,	"GV-N680OC-2GD WindForce GTX 680 OC" },
+	{ 0x10DE1180,	0x14622820,	"MSi N680GTX TwinFrozer" },
+	{ 0x10DE1180,	0x14622830,	"MSi GTX 680 Lightning" },
+	{ 0x10DE1180,	0x14622831,	"MSi GTX 680 Lightning LN2" },
+	{ 0x10DE1180,	0x15691180,	"Palit GTX 680 JetStream" },
+	{ 0x10DE1180,	0x15691181,	"Palit GTX 680 JetStream" },
+	{ 0x10DE1180,	0x15691189,	"Palit GTX 680 JetStream" },
+	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
+	{ 0x10DE1180,	0x38422683,	"EVGA GTX 680 SC" },
+
+	{ 0x10DE1189,	0x10438405,	"Asus GTX 670 Direct CU II TOP" },
+	{ 0x10DE1189,	0x15691189,	"Palit GTX 670 JetStream" },
+	{ 0x10DE1189,	0x19DA1255,	"Zotac GTX 670 AMP! Edition" },
+
+	{ 0x10DE11A1,	0x15587102,	"Clevo N13E-GR" },
+
+	{ 0x10DE11C0,	0x10DE0995,	"Inno3D GeForce GTX660" },
+
+	{ 0x10DE11C6,	0x1043842A,	"GTX650TI-1GD5" },
+	// 1200 - 12FF
+	{ 0x10DE1247,	0x10432119,	"Asus GeForce GT 670M" },
+	{ 0x10DE1247,	0x10432120,	"Asus GeForce GT 670M" },
+	{ 0x10DE1247,	0x1043212A,	"Asus GeForce GT 635M" },
+	{ 0x10DE1247,	0x1043212B,	"Asus GeForce GT 635M" },
+	{ 0x10DE1247,	0x1043212C,	"Asus GeForce GT 635M" },
+	{ 0x10DE1247,	0x152D0930,	"Quanta GeForce GT 635M" },
+
+	{ 0x10DE1248,	0x152D0930,	"Quanta GeForce GT 635M" },
+
+	{ 0x10DE124D,	0x146210CC,	"MSi GeForce GT 635M" },
 };
 
 static int patch_nvidia_rom(uint8_t *rom)
@@ -1226,7 +1629,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 
 static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 {
-	int i;
+//	int i, j;
+    int i;
+//	static char name_model[128];
 
 	// First check in the plist, (for e.g this can override any hardcoded devices)
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
@@ -1238,23 +1643,44 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 		}
 	}
 
-	for (i = 1; i < (sizeof(nvidia_cards) / sizeof(nvidia_cards[0])); i++) // size of nvidia_cards array for-loop
+	// Then check the exceptions table
+	if (subsys_id)
 	{
-		if ((nvidia_cards[i].device == device_id) && (nvidia_cards[i].subdev == subsys_id))
-            {
-                return nvidia_cards[i].name_model;
-                break;
-            }
-            else if ((nvidia_cards[i].device == device_id) && (nvidia_cards[i].subdev == 0x00000000))
-            {
-                return nvidia_cards[i].name_model;
-                break;
-            }
+		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++)
+		{
+			if ((nvidia_card_exceptions[i].device == device_id) &&
+			    (nvidia_card_exceptions[i].subdev == subsys_id))
+			{
+				return nvidia_card_exceptions[i].name;
+			}
+		}
 	}
-    return nvidia_cards[0].name_model;
+
+	// At last try the generic names
+	for (i = 1; i < (sizeof(nvidia_card_generic) / sizeof(nvidia_card_generic[0])); i++)
+	{
+        	if (nvidia_card_generic[i].device == device_id)
+		{
+/*			if (subsys_id)
+			{
+				for (j = 0; j < (sizeof(nvidia_card_vendors) / sizeof(nvidia_card_vendors[0])); j++)
+				{
+					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000))
+					{
+						sprintf(name_model, "%s %s",
+							nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
+						name_model[sizeof(name_model) - 1] = '\0';
+						return name_model;
+					}
+				}
+			} */
+			return nvidia_card_generic[i].name;
+		}
+	}
+	return nvidia_card_generic[0].name;
 }
 
-static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bufsize)
+static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
 {
 	int fd;
 	int size;
@@ -1265,14 +1691,11 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t *buf, int bu
 	}
 
 	size = file_size(fd);
-
-	if (size > bufsize)
-	{
-		printf("Filesize of %s is bigger than expected! Truncating to 0x%x Bytes!\n",
-				filename, bufsize);
-		size = bufsize;
-	}
-	size = read(fd, (char *)buf, size);
+    if(size)
+    {
+        *buf = malloc(size);
+        size = read(fd, (char *)buf, size);
+    }
 	close(fd);
 
 	return size > 0 ? size : 0;
@@ -1366,14 +1789,37 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		case 0x0647: // 9600M GT 0647
 			vram_size = 512*1024*1024;  // 512 MB
 			break;
+		case 0x0649:	// 9600M GT 0649
+			// 10DE06491043202D 1GB VRAM
+			if (((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) == 0x1043202D )
+			{
+				vram_size = 1024*1024*1024; // 1 GB
+			}
+			break;
 		case 0x0A65: // GT 210
 		case 0x0DE0: // GT 440
 		case 0x0DE1: // GT 430
 		case 0x0DE2: // GT 420
-		case 0x0DEC: // GT 525M
-		case 0x0DF4: // GT 540M
-		case 0x0DF5: // GT 525M
+		case 0x0DEC: // GT 525M 0DEC
 			vram_size = 1024*1024*1024; // 1 GB
+			break;
+		case 0x0DE9: // GT 630M
+			// 10DE0DE9103C181D 1GB VRAM
+			if (((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) == 0x103C181D )
+			{
+				vram_size = 1024*1024*1024; // 1 GB
+			}
+			break;
+		case 0x0DF4: // GT 540M
+		case 0x0DF5: // GT 525M 0DF5
+			vram_size = 1024*1024*1024; // 1 GB
+			break;
+		case 0x11C6:	// GTX650TI 11C6
+			// 10DE11C61043842A 1GB VRAM
+			if (((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) == 0x1043842A )
+			{
+				vram_size = 1024*1024*1024; // 1 GB
+			}
 			break;
 		case 0x1251: // GTX 560M
 			vram_size = 1536*1024*1024; // 1.5 GB
@@ -1382,7 +1828,7 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			break;
 	}
 
-	if (!vram_size) 
+	if (!vram_size)
 	{ // Finally, if vram_size still not set do the calculation with our own method
 		if (nvCardType < NV_ARCH_50)
 		{
@@ -1445,14 +1891,13 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// Amount of VRAM in kilobytes
 	videoRam = mem_detect(regs, nvCardType, nvda_dev,((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) );
 
-	rom = malloc(NVIDIA_ROM_SIZE);
 	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id,
 			(uint16_t)nvda_dev->device_id);
 
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->chameleonConfig) && doit)
 	{
 		verbose("Looking for nvidia video bios file %s\n", nvFilename);
-		nvBiosOveride = load_nvidia_bios_file(nvFilename, rom, NVIDIA_ROM_SIZE);
+		nvBiosOveride = load_nvidia_bios_file(nvFilename, &rom);
 
 		if (nvBiosOveride > 0)
 		{
@@ -1462,11 +1907,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		else
 		{
 			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
+			free(rom);
 			return false;
 		}
 	}
 	else
 	{
+        rom = malloc(NVIDIA_ROM_SIZE);
+
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
 
@@ -1506,11 +1954,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 					printf("ERROR: Unable to locate nVidia Video BIOS\n");
 					return false;
 				}
-                else
-                {
-                    DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
-                }
-            			}//end PRAM check
+                		else
+                		{
+                			    DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+                		}
+            		}//end PRAM check
                 }//end PROM check
     	}//end load rom from bios
 
@@ -1528,10 +1976,10 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		if (rom_pci_header->device_id != nvda_dev->device_id)
 		{
 			// Get Model from the OpROM
-			model = get_nvidia_model(((rom_pci_header->vendor_id << 16) | rom_pci_header->device_id), NV_SUB_IDS);
+			model = get_nvidia_model(((rom_pci_header->vendor_id << 16) | rom_pci_header->device_id), 0);
 
 			// Get VRAM again
-			videoRam = mem_detect(regs, nvCardType, nvda_dev,((rom_pci_header->vendor_id << 16) | rom_pci_header->device_id), NV_SUB_IDS );
+			videoRam = mem_detect(regs, nvCardType, nvda_dev, ((rom_pci_header->vendor_id << 16) | rom_pci_header->device_id), 0);
 
 		}
 		else
@@ -1604,7 +2052,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			}
 		}
 	}
-	
+
 	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
 
