@@ -1,9 +1,17 @@
 -macman: Chimera 2.1.0 specific changes:
+	Rollbacked FileNVRAM.dylib to v1.1.2
+	Includes most changes from trunk r2248 while retaining all previous Chimera v2.1.0 fixes and enhancements
+- Fix issue booting x86 after rev.2175 (Credits to Mario, Alex and Leon).
+-macman: Chimera 2.1.0 specific changes:
 	Added Haswell CPU support with model and speed detection
 	Disabled writing of boot arguments to nvram
 	Reverted AMD graphics card reporting and log messages to Chimera v1.11.1 style
 	Reverted NVIDIA graphics card reporting to Chimera v1.11.1 style
-	Included mosts changes from trunk r2246 that didn't conflict with Chimera 2.0.1 fixes and enhancements 
+	Included mosts changes from trunk r2246 that didn't conflict with Chimera 2.0.1 fixes and enhancements
+- Add boot support to 10.9 (thx old napalm)
+- ErmaC : Update gui Icons OS detection
+- Update default theme Icon set (thx BlackOsx)
+- Add Linux GPT Partition Label 
 - Fix menuBVR initialization problem
 - Implement ErmaC's HDAEnabler.dylib module
 - Fix Bug in the loop that look for an ATI card. Credits to Jief Luce

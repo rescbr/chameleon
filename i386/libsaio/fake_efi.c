@@ -84,7 +84,8 @@ static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by u
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
 
 /* movl $0x80000003,%eax; ret */
-static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS[] = {0x48, 0xb8, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc3};
+static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_32[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
+static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_64[] = {0x48, 0xb8, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc3};
 
 EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
@@ -167,7 +168,7 @@ void setupEfiTables32(void)
 		EFI_CONFIGURATION_TABLE_32 efiConfigurationTable[MAX_CONFIGURATION_TABLE_ENTRIES];
 		EFI_CHAR16 firmwareVendor[sizeof(FIRMWARE_VENDOR)/sizeof(EFI_CHAR16)];
 		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
-		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS_32)/sizeof(uint8_t)];
 	};
 	
 	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
@@ -179,7 +180,7 @@ void setupEfiTables32(void)
 	// Initialize some machine code that will return EFI_UNSUPPORTED for
 	// functions returning int and simply return for void functions.
 	memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
-	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
+	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS_32, sizeof(UNSUPPORTEDRET_INSTRUCTIONS_32));
 	
 	// --------------------------------------------------------------------
 	// System table
@@ -277,7 +278,7 @@ void setupEfiTables64(void)
 		EFI_CONFIGURATION_TABLE_64 efiConfigurationTable[MAX_CONFIGURATION_TABLE_ENTRIES];
 		EFI_CHAR16 firmwareVendor[sizeof(FIRMWARE_VENDOR)/sizeof(EFI_CHAR16)];
 		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
-		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS)/sizeof(uint8_t)];
+		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS_64)/sizeof(uint8_t)];
 	};
 	
 	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
@@ -289,7 +290,7 @@ void setupEfiTables64(void)
 	// Initialize some machine code that will return EFI_UNSUPPORTED for
 	// functions returning int and simply return for void functions.
 	memcpy(fakeEfiPages->voidret_instructions, VOIDRET_INSTRUCTIONS, sizeof(VOIDRET_INSTRUCTIONS));
-	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS, sizeof(UNSUPPORTEDRET_INSTRUCTIONS));
+	memcpy(fakeEfiPages->unsupportedret_instructions, UNSUPPORTEDRET_INSTRUCTIONS_64, sizeof(UNSUPPORTEDRET_INSTRUCTIONS_64));
 	
 	// --------------------------------------------------------------------
 	// System table

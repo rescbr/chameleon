@@ -1578,6 +1578,8 @@ static int patch_nvidia_rom(uint8_t *rom)
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
+                        default:
+							break;
 					}
 					break;
 				}

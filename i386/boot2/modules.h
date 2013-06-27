@@ -15,8 +15,8 @@
 #define MODULE_PATH		"/Extra/modules/"
 
 #define SYMBOLS_MODULE "Symbols.dylib"
-#define SYMBOLS_AUTHOR "Chameleon"
-#define SYMBOLS_DESCRIPTION "Chameleon symbols for linking"
+#define SYMBOLS_AUTHOR "Chimera"
+#define SYMBOLS_DESCRIPTION "Chimera symbols for linking"
 #define SYMBOLS_VERSION     0
 #define SYMBOLS_COMPAT      0
 

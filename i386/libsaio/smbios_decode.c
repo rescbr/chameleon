@@ -18,6 +18,10 @@
 #define DBG(x...)	msglog(x)
 #endif
 
+static SMBWord minorVersion;
+
+extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
+
 static const char *
 SMBMemoryDeviceTypes[] =
 {
@@ -51,10 +55,6 @@ SMBMemoryDeviceTypes[] =
 static const int
 kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes)   /
 sizeof(SMBMemoryDeviceTypes[0]);
-
-static SMBWord minorVersion;
-
-extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);
 
 //-------------------------------------------------------------------------------------------------------------------------
 // BIOSInformation
