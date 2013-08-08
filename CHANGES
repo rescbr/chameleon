@@ -1,4 +1,6 @@
--macman: Chimera 2.1.0 specific changes:
+-macman: Chimera 2.1.2 specific changes:
+	Removed all closed source modules
+-macman: Chimera 2.1.i specific changes:
 	Rollbacked FileNVRAM.dylib to v1.1.2
 	Includes most changes from trunk r2248 while retaining all previous Chimera v2.1.0 fixes and enhancements
 - Fix issue booting x86 after rev.2175 (Credits to Mario, Alex and Leon).
