@@ -112,6 +112,8 @@
 #define kAtiPorts			"AtiPorts"			/* ati.c */
 #define kATYbinimage		"ATYbinimage"		/* ati.c */
 
+#define kIGPlatformID		"IGPlatformID"		/* gma.c */             // MacMan
+
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"				/* nvidia.c */
 #define kDcfg0				"display_0"			/* nvidia.c */
@@ -119,6 +121,7 @@
 
 #define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
 #define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
+#define kIGPEnabler         "IGPEnabler"        /* pci_setup.c */       // MacMan
 #define kEnableHDMIAudio	"EnableHDMIAudio"	/*ati.c && nvidia.c */
 #define kForceHPET			"ForceHPET"			/* pci_setup.c */
 

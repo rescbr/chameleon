@@ -1,3 +1,7 @@
+-macman: Chimera 2.2.0 specific changes:
+	Added suport for Intel HD Graphics 2500, Intel HD Graphics 4600, Intel HD Graphics 4600 Mobile and Intel HD Graphics 5000
+	Added new boot key IGPEnabler=Yes|No for automatic device-properties generation for Intel IGP when GraphicsEnabler=No 
+	Added new boot key IGPlatformID=<value> to allow for overriding or setting Intel HD Graphics Platform ID
 -macman: Chimera 2.1.2 specific changes:
 	Removed all closed source modules
 -macman: Chimera 2.1.i specific changes:

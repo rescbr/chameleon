@@ -286,7 +286,7 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Model != CPU_MODEL_ATOM		// MSR is *NOT* available on the Intel Atom CPU
 		)
 	{
-		msr = rdmsr64(MSR_CORE_THREAD_COUNT);					// Undocumented MSR in Nehalem and newer CPUs
+		msr = rdmsr64(MSR_CORE_THREAD_COUNT);					// MacMan: Undocumented MSR in Nehalem and newer CPUs
 		p->CPU.NoCores		= bitfield((uint32_t)msr, 31, 16);	// Using undocumented MSR to get actual values
 		p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);	// Using undocumented MSR to get actual values
 	}
@@ -389,7 +389,7 @@ void scan_cpu(PlatformInfo_t *p)
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 //				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
 				bus_ratio_max = bitfield(msr, 15, 8);	//MacMan: Changed bitfield to match Apple tsc.c
-				bus_ratio_min = bitfield(msr, 47, 40);	//MacMan: Changed bitfield to match Apple tsc.c
+ 				bus_ratio_min = bitfield(msr, 47, 40);	//MacMan: Changed bitfield to match Apple tsc.c
 				msr = rdmsr64(MSR_FLEX_RATIO);
 //				DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
 				if (bitfield(msr, 16, 16)) {
@@ -461,7 +461,7 @@ void scan_cpu(PlatformInfo_t *p)
 			} else {
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
 				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
-				currcoef = bitfield(msr, 12, 8);
+				currcoef = bitfield(msr, 15, 8);                //MacMan: Fixed bitfield to Intel documentation
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = bitfield(msr, 46, 46);
 				/* Non-integer bus ratio for the current-multi (undocumented)*/

@@ -14,6 +14,7 @@
 #include "gma.h"
 #include "vbe.h"
 #include "graphics.h"
+#include "stdio.h"
 
 #ifndef DEBUG_GMA
 #define DEBUG_GMA 0
@@ -96,13 +97,13 @@ uint8_t HD2000_os_info[20] = {
 	0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
 };
 
-// The following values came from a Sandy Bridge MacBook Air
+// MacMan: The following values came from a Sandy Bridge MacBook Air
 uint8_t HD3000_tbl_info[18] = {
 	0x30,0x44,0x02,0x02,0x02,0x02,0x00,0x00,0x00,
 	0x00,0x02,0x02,0x02,0x02,0x01,0x01,0x01,0x01
 };
 
-// The following values came from a Sandy Bridge MacBook Air
+//MacMan:  The following values came from a Sandy Bridge MacBook Air
 uint8_t HD3000_os_info[20] = {
 	0x30,0x49,0x01,0x12,0x12,0x12,0x08,0x00,0x00,0x01,
 	0xf0,0x1f,0x01,0x00,0x00,0x00,0x10,0x07,0x00,0x00
@@ -139,6 +140,10 @@ static struct gma_gpu_t KnownGPUS[] = {
     { 0x80860156, "Intel HD Graphics 2500 Mobile"	},
     { 0x80860162, "Intel HD Graphics 4000"			},
     { 0x80860166, "Intel HD Graphics 4000 Mobile"	},
+    { 0x80860412, "Intel HD Graphics 4600"			}, // MacMan
+    { 0x80860416, "Intel HD Graphics 4600 Mobile"	}, // MacMan
+    { 0x80860422, "Intel HD Graphics 5000"			}, // MacMan
+    { 0x80860426, "Intel HD Graphics 5000 Mobile"	}, // MacMan
 };
 
 char *get_gma_model(uint32_t id) {
@@ -154,7 +159,9 @@ char *get_gma_model(uint32_t id) {
 
 bool setup_gma_devprop(pci_dt_t *gma_dev)
 {
-	char					*devicepath;
+    int						len;
+    const char				*value;
+    char					*devicepath;
 	volatile uint8_t		*regs;
 	uint32_t				bar[7];
 	char					*model;
@@ -163,8 +170,15 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	uint8_t ClassFix[4] =           { 0x00, 0x00, 0x03, 0x00 };
     uint8_t hd3k_device_id[4] =     { 0x26, 0x01, 0x00, 0x00 };
     uint8_t hd4k_device_id[4] =     { 0x66, 0x01, 0x00, 0x00 };
-    uint8_t ig_id[4] =              { 0x0A, 0x00, 0x66, 0x01 };
-    uint8_t ig_id_mobile[4] =       { 0x09, 0x00, 0x66, 0x01 };
+    uint8_t hd4600_device_id[4] =   { 0x12, 0x04, 0x00, 0x00 }; // MacMan
+    uint8_t hd5k_device_id[4] =     { 0x16, 0x04, 0x00, 0x00 }; // MacMan
+    uint8_t snb_id_3k[4] =          { 0x10, 0x00, 0x03, 0x00 };
+    uint8_t ig_id_2500[4] =         { 0x0B, 0x00, 0x66, 0x01 }; // MacMan
+    uint8_t ig_id_4k[4] =           { 0x0A, 0x00, 0x66, 0x01 };
+    uint8_t ig_id_4k_mobile[4] =    { 0x09, 0x00, 0x66, 0x01 }; // MacMan
+    uint8_t ig_id_4600[4] =         { 0x00, 0x00, 0x16, 0x04 }; // MacMan
+    uint8_t ig_id_5k[4] =           { 0x00, 0x00, 0x26, 0x04 }; // MacMan
+    uint8_t ig_platform_id[4] =     { 0x00, 0x00, 0x00, 0x00 }; // MacMan
 	
 	devicepath = get_pci_dev_path(gma_dev);
 	
@@ -240,6 +254,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
 		devprop_add_value(device, "AAPL,tbl-info", HD2000_tbl_info, 18);
 		devprop_add_value(device, "AAPL,os-info", HD2000_os_info, 20);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
+            verbose("Setting %s for snb-platform-id\n", value);
+        }
 	}
 	else if (model == (char *)&"Intel HD Graphics 2000 Mobile")
 	{
@@ -261,6 +281,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL00,T7", HD2000_vals[7], 4);
 		devprop_add_value(device, "AAPL,os-info", HD2000_os_info, 20);
 		devprop_add_value(device, "AAPL,tbl-info", HD2000_tbl_info, 18);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
+            verbose("Setting %s for snb-platform-id\n", value);
+        }
 	}
     else if (model == (char *)&"Intel HD Graphics 3000")
 	{
@@ -270,6 +296,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
 		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
 		devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
+            verbose("Using %s for snb-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,snb-platform-id", snb_id_3k, 4);
+        }
 	}
 	else if (model == (char *)&"Intel HD Graphics 3000 Mobile")
 	{
@@ -291,6 +327,29 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL00,T7", HD3000_vals[7], 4);
 		devprop_add_value(device, "AAPL,os-info", HD3000_os_info, 20);
 		devprop_add_value(device, "AAPL,tbl-info", HD3000_tbl_info, 18);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
+            verbose("Setting %s for snb-platform-id\n", value);
+        }
+	}
+    else if (model == (char *)&"Intel HD Graphics 2500")                                // MacMan
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "device-id", hd4k_device_id, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            verbose("Using %s for ig-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_id_2500, 4);
+        }
 	}
     else if (model == (char *)&"Intel HD Graphics 4000")
 	{
@@ -298,16 +357,68 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "class-code", ClassFix, 4);
 		devprop_add_value(device, "device-id", hd4k_device_id, 4);
 		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
-		devprop_add_value(device, "AAPL,ig-platform-id", ig_id, 4);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            verbose("Using %s for ig-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4k, 4);
+        }
 	}
     else if (model == (char *)&"Intel HD Graphics 4000 Mobile")
 	{
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
 		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
-		devprop_add_value(device, "AAPL,ig-platform-id", ig_id_mobile, 4);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            verbose("Using %s for ig-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4k_mobile, 4);
+        }
 	}
-    
+    else if (model == (char *)&"Intel HD Graphics 4600")     //MacMan
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "device-id", hd4600_device_id, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            verbose("Using %s for ig-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600, 4);
+        }
+	}
+    else if (model == (char *)&"Intel HD Graphics 5000")     //MacMan
+	{
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "device-id", hd5k_device_id, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+        if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
+        {
+            sscanf(value, "%8x", ig_platform_id);
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            verbose("Using %s for ig-platform-id\n", value);
+        }
+        else
+        {
+            devprop_add_value(device, "AAPL,ig-platform-id", ig_id_5k, 4);
+        }
+	}
+      
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{

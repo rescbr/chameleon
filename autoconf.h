@@ -1,10 +1,11 @@
 //
 // Automatically generated make config: don't edit
 // Chameleon Configuration
-// Wed Aug  7 21:43:55 2013
+// Fri Aug  9 19:56:27 2013
 // 
 #define CONFIG_IS_BUILTIN   1
 #define CONFIG_IS_MODULE    2
+#define CONFIG_KLIBC_MODULE CONFIG_IS_BUILTIN
 #define CONFIG_BOOT1_HFS_VERBOSE CONFIG_IS_BUILTIN
 #define CONFIG_BOOT1_HFS CONFIG_IS_BUILTIN
 #define CONFIG_MODULES CONFIG_IS_BUILTIN

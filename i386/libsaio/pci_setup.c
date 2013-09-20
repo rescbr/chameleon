@@ -17,13 +17,14 @@ extern pci_dt_t *dram_controller_dev;
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
-	bool do_eth_devprop, do_gfx_devprop, do_enable_hpet;
+	bool do_eth_devprop, do_gfx_devprop, do_enable_hpet, do_igp_devprop;
 	pci_dt_t *current = pci_dt;
 
 	do_eth_devprop = do_gfx_devprop = do_enable_hpet = false;
 
 	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
+    getBoolForKey(kIGPEnabler, &do_igp_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
 	while (current)
@@ -43,7 +44,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				break;
 				
 			case PCI_CLASS_DISPLAY_VGA:
-				if (do_gfx_devprop)
+				if (do_gfx_devprop){
 					switch (current->vendor_id)
 					{
 						case PCI_VENDOR_ID_ATI:
@@ -59,6 +60,10 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							break;
 					}
 				break;
+                } else if (do_igp_devprop){
+                        setup_gma_devprop(current);
+                        break;
+                }
 
 			case PCI_CLASS_SERIAL_USB:
 				notify_usb_dev(current);
