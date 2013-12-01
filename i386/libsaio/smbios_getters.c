@@ -37,7 +37,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 					case CPU_MODEL_HASWELL:
 					case CPU_MODEL_HASWELL_MB:
 					case CPU_MODEL_HASWELL_ULT:
-					case CPU_MODEL_HASWELL_ULX:
+					case CPU_MODEL_CRYSTALWELL:
 
 						value->word = 0;
 						break;
@@ -75,6 +75,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
+					case CPU_MODEL_PENTIUM_M:
 					case CPU_MODEL_DOTHAN:		// Intel Pentium M
 					case CPU_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
 					case CPU_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
@@ -82,6 +83,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_ATOM:		// Intel Atom (45nm)
 						return false;
 
+					case 0x19:
 					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:
@@ -89,12 +91,14 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPU_MODEL_SANDYBRIDGE:
+					case CPU_MODEL_JAKETOWN:
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
 						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 						unsigned long did, vid;
-						int i;
+						unsigned int i;
 						
 						// Nehalem supports Scrubbing
 						// First, locate the PCI bus where the MCH is located
@@ -115,7 +119,10 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						DBG("qpimult %d\n", qpimult);
 						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
 						// Rek: rounding decimals to match original mac profile info
-						if (qpibusspeed%100 != 0)qpibusspeed = ((qpibusspeed+50)/100)*100;
+						if (qpibusspeed%100 != 0)
+						{
+							qpibusspeed = ((qpibusspeed+50)/100)*100;
+						}
 						DBG("qpibusspeed %d\n", qpibusspeed);
 						value->word = qpibusspeed;
 						return true;
@@ -161,6 +168,7 @@ bool getSMBOemProcessorType(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
+					case CPU_MODEL_PENTIUM_M:
 					case CPU_MODEL_DOTHAN:				// Intel Pentium M
 					case CPU_MODEL_YONAH:				// Intel Mobile Core Solo, Duo
 					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
@@ -169,49 +177,84 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 					case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
-					case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
 							value->word = 0x0501;			// Xeon 
-						else
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
 							value->word = 0x0701;			// Core i7
+						}
 						return true;
 
 					case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-							value->word = 0x0501;// Xeon
-						else
-							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x0601;			// Core i5
-							else
-								value->word = 0x0701;			// Core i7
+						{
+							value->word = 0x501;// Xeon
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x601;			// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x701;			// Core i7
+						}
+
 						return true;
 
 					case CPU_MODEL_DALES:
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-							value->word = 0x0601;			// Core i5
+						{
+							value->word = 0x601;			// Core i5
+						}
 						else
+						{
 							value->word = 0x0701;			// Core i7
+						}
 						return true;
 
 					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
 					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPU_MODEL_IVYBRIDGE_XEON:
 					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
 					case CPU_MODEL_HASWELL:
 					case CPU_MODEL_HASWELL_MB:
 					case CPU_MODEL_HASWELL_ULT:
-					case CPU_MODEL_HASWELL_ULX:
+					case CPU_MODEL_CRYSTALWELL:
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
+							value->word = 0x0501;		// Xeon
+						}
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
-							value->word = 0x0901;			// Core i3
-						else
-							if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
-								value->word = 0x0601;		// Core i5
-							else
-								value->word = 0x0701;		// Core i7
+						{
+							value->word = 0x901;		// Core i3
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x601;		// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x0701;		// Core i7
+						}
 						return true;
+
+					case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
+					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
+						value->word = 0x0501;			// Core i7
+						return true;
+
+					case 0x19:					// Intel Core i5 650 @3.20 Ghz
+						value->word = 0x601;			// Core i5
+						return true;
+					default:
+						break; //Unsupported CPU type
 				}
 			}
+			default:
+				break; 
 		}
 	}
 	
@@ -292,7 +335,7 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	value->string = NOT_AVAILABLE;
 	return true;
 }
-	
+
 bool getSMBMemoryDeviceSerialNumber(returnType *value)
 {
 	static int idx = -1;
@@ -300,7 +343,7 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 
 	idx++;
 
-    DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
+	DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
 
 	if (idx < MAX_RAM_SLOTS)
 	{

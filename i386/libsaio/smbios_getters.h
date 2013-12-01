@@ -12,7 +12,8 @@
 
 #define NOT_AVAILABLE			"N/A"
 
-typedef enum {
+typedef enum
+{
 	kSMBString,
 	kSMBByte,
 	kSMBWord,
@@ -20,7 +21,8 @@ typedef enum {
 //	kSMBQWord
 } SMBValueType;
 
-typedef union {
+typedef union
+{
 	const char	*string;
 	uint8_t		byte;
 	uint16_t	word;

@@ -41,7 +41,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
 
 // CPUID Values
-
+/*
 #define CPUID_MODEL_PRESCOTT		3   // 0x03 Celeron D, Pentium 4 (90nm)
 #define CPUID_MODEL_NOCONA		4   // 0x04 Xeon Nocona, Irwindale (90nm)
 #define CPUID_MODEL_PRESLER		6   // 0x06 Pentium 4, Pentium D (65nm)
@@ -73,9 +73,11 @@ extern void scan_cpu(PlatformInfo_t *);
 #define CPUID_MODEL_HASWELL_MB		63  // 0x3F Mobile/Laptop version
 //#define CPUID_MODEL_HASWELL_H		??  // 0x??
 #define CPUID_MODEL_HASWELL_ULT		69  // 0x45
-#define CPUID_MODEL_HASWELL_ULX		70  // 0x46
-
+#define CPUID_MODEL_CRYSTALWELL		70  // 0x46
+*/
 /* HASWELL-DT HASWELL-MB HASWELL-H HASWELL-ULT HASWELL ULX*/
+
+//BROADWELL-ROCKWELL
 
 static inline uint64_t rdtsc64(void)
 {

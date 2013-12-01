@@ -51,6 +51,8 @@ uint64_t timeRDTSC(void)
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-5))
 	};
 
+	//int_enabled = ml_set_interrupts_enabled(FALSE);
+
 restart:
 	if (attempts >= 9) // increase to up to 9 attempts.
 	{
@@ -89,6 +91,7 @@ restart:
 	set_PIT2(0);			// reset timer 2 to be zero
 	disable_PIT2();			// turn off PIT 2
 	
+	//ml_set_interrupts_enabled(int_enabled);
 	return intermediate;
 }
 
@@ -288,6 +291,20 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 #endif
 
+/*
+    EAX (Intel):
+    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
+    +--------+----------------+--------+----+----+--------+--------+--------+
+    |########|Extended family |Extmodel|####|type|familyid|  model |stepping|
+    +--------+----------------+--------+----+----+--------+--------+--------+
+
+    EAX (AMD):
+    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
+    +--------+----------------+--------+----+----+--------+--------+--------+
+    |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
+    +--------+----------------+--------+----+----+--------+--------+--------+
+*/
+
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
 	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
@@ -397,9 +414,9 @@ void scan_cpu(PlatformInfo_t *p)
 
 	tscFrequency = measure_tsc_frequency();
 	/* if usual method failed */
-	if ( tscFrequency < 1000 )
+	if ( tscFrequency < 1000 )//TEST
 	{
-	tscFrequency = timeRDTSC() * 20;
+		tscFrequency = timeRDTSC() * 20;
 	}
 	fsbFrequency = 0;
 	cpuFrequency = 0;
@@ -425,7 +442,7 @@ void scan_cpu(PlatformInfo_t *p)
 										  p->CPU.Model == CPU_MODEL_HASWELL_MB  ||
 										  //p->CPU.Model == CPU_MODEL_HASWELL_H  ||
 										  p->CPU.Model == CPU_MODEL_HASWELL_ULT  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL_ULX ))
+										  p->CPU.Model == CPU_MODEL_CRYSTALWELL ))
 			{
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
@@ -510,14 +527,14 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.MinRatio = min_ratio;
 
 				myfsb = fsbFrequency / 1000000;
-				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio);
+				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);
 				currcoef = bus_ratio_max;
 			}
 			else
 			{
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
 				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
-				currcoef = bitfield(msr, 15, 8);
+				currcoef = bitfield(msr, 12, 8);
 				/* Non-integer bus ratio for the max-multi*/
 				maxdiv = bitfield(msr, 46, 46);
 				/* Non-integer bus ratio for the current-multi (undocumented)*/

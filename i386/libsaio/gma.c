@@ -620,6 +620,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_HASWELL_D_GT2: // 0412
         case GMA_HASWELL_M_GT2: // 0416
         case GMA_HASWELL_S_GT2: // 041a
+        case GMA_HASWELL_E_GT1: // 040e
+        case GMA_HASWELL_E_GT2: // 041e
+        case GMA_HASWELL_E_GT3: // 042e
         case GMA_HASWELL_D_GT3: // 0422
         case GMA_HASWELL_M_GT3: // 0426
         case GMA_HASWELL_S_GT3: // 042a

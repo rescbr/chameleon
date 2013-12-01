@@ -1010,6 +1010,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0FC1,	"GeForce GT 640" },
 	{ 0x10DE0FC2,	"GeForce GT 630" },
 	{ 0x10DE0FC6,	"GeForce GTX 650" },
+	{ 0x10DE0FCD,	"GeForce GT 755M" },
 	// 0FD0 - 0FDF
 	{ 0x10DE0FD1,	"GeForce GT 650M" },
 	{ 0x10DE0FD2,	"GeForce GT 640M" },
@@ -1039,6 +1040,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1003,	"GeForce GTX Titan LE" },
 	{ 0x10DE1004,	"GeForce GTX 780" },
 	{ 0x10DE1005,	"GeForce GTX Titan" },
+	{ 0x10DE100A,	"GeForce GTX 780 Ti" },
 	// 1010 - 101F
 	{ 0x10DE101F,	"Tesla K20" },
 	// 1020 - 102F
@@ -1129,8 +1131,12 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1183,	"GeForce GTX 660 Ti" },
 	{ 0x10DE1184,	"GeForce GTX 770" },
 	{ 0x10DE1185,	"GeForce GTX 660" },
+	{ 0x10DE1187,	"GeForce GTX 760" },
 	{ 0x10DE1188,	"GeForce GTX 690" },
 	{ 0x10DE1189,	"GeForce GTX 670" },
+//	{ 0x10DE118A,	"GRID K520" },
+//	{ 0x10DE118B,	"GRID K200" },
+	{ 0x10DE118E,	"GeForce GTX 760 (192-bit)" },
 	{ 0x10DE118F,	"Tesla K10" },
 	// 1190 - 119F
 	{ 0x10DE119F,	"GeForce GTX 780M" },
@@ -1201,6 +1207,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1293,	"GeForce GT 730M" },
 	{ 0x10DE1294,	"GeForce GT 740M" },
 	{ 0x10DE1295,	"GeForce GT 710M" },
+	{ 0x10DE1298,	"GeForce GT 720M" },
 	// 12A0 - 12AF
 	//{ 0x10DE12A0,	"GeForce GT ???" },
 	{ 0x10DE12AF,	"GK208-INT" },
@@ -1388,6 +1395,8 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 	{ 0x10DE1180,	0x15691189,	"Palit GTX 680 JetStream" },
 	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
 	{ 0x10DE1180,	0x38422683,	"EVGA GTX 680 SC" },
+
+	{ 0x10DE1187,	0x14583614,	"GV-N760OC-4GD" },
 
 	{ 0x10DE1189,	0x10438405,	"Asus GTX 670 Direct CU II TOP" },
 	{ 0x10DE1189,	0x15691189,	"Palit GTX 670 JetStream" },
@@ -1672,8 +1681,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	{
 		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++)
 		{
-			if ((nvidia_card_exceptions[i].device == device_id) &&
-			    (nvidia_card_exceptions[i].subdev == subsys_id))
+			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))
 			{
 				return nvidia_card_exceptions[i].name;
 			}
@@ -1896,8 +1904,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// Amount of VRAM in kilobytes
 	videoRam = mem_detect(regs, nvCardType, nvda_dev,((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) );
 
-	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id,
-			(uint16_t)nvda_dev->device_id);
+	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->chameleonConfig) && doit)
 	{
@@ -1919,7 +1926,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	else
 	{
 		rom = malloc(NVIDIA_ROM_SIZE);
-
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
 

@@ -1,5 +1,6 @@
 /*
  * Copyright 2008 mackerintel
+ * 2010 mojodojo, 2012 slice
  */
 
 #include "libsaio.h"
@@ -29,8 +30,10 @@
 boolean_t tableSign(char *table, const char *sgn)
 {
 	int i;
-	for (i=0; i<4; i++) {
-		if ((table[i] &~0x20) != (sgn[i] &~0x20)) {
+	for (i=0; i<4; i++)
+	{
+		if ((table[i] &~0x20) != (sgn[i] &~0x20))
+		{
 			return false;
 		}
 	}
@@ -40,53 +43,56 @@ boolean_t tableSign(char *table, const char *sgn)
 /* Gets the ACPI 1.0 RSDP address */
 static struct acpi_2_rsdp* getAddressOfAcpiTable()
 {
-    /* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
-	
-    void *acpi_addr = (void*)ACPI_RANGE_START;
-    for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
-    {
-        if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
-        {
-            uint8_t csum = checksum8(acpi_addr, 20);
-            if(csum == 0)
-            {
-                // Only return the table if it is a true version 1.0 table (Revision 0)
-                if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
-                    return acpi_addr;
-            }
-        }
-    }
-    return NULL;
+	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
+
+	void *acpi_addr = (void*)ACPI_RANGE_START;
+	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
+	{
+		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
+		{
+			uint8_t csum = checksum8(acpi_addr, 20);
+			if(csum == 0)
+			{
+			// Only return the table if it is a true version 1.0 table (Revision 0)
+				if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
+				return acpi_addr;
+			}
+		}
+	}
+	return NULL;
 }
 
 /* Gets the ACPI 2.0 RSDP address */
 static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 {
-    /* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
-	
-    void *acpi_addr = (void*)ACPI_RANGE_START;
-    for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
-    {
-        if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
-        {
-            uint8_t csum = checksum8(acpi_addr, 20);
-			
-            /* Only assume this is a 2.0 or better table if the revision is greater than 0
-             * NOTE: ACPI 3.0 spec only seems to say that 1.0 tables have revision 1
-             * and that the current revision is 2.. I am going to assume that rev > 0 is 2.0.
-             */
-			
-            if(csum == 0 && (((struct acpi_2_rsdp*)acpi_addr)->Revision > 0))
-            {
-                uint8_t csum2 = checksum8(acpi_addr, sizeof(struct acpi_2_rsdp));
-                if(csum2 == 0)
-                    return acpi_addr;
-            }
-        }
-    }
-    return NULL;
+	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
+
+	void *acpi_addr = (void*)ACPI_RANGE_START;
+	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
+	{
+		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
+		{
+			uint8_t csum = checksum8(acpi_addr, 20);
+
+			/* Only assume this is a 2.0 or better table if the revision is greater than 0
+			 * NOTE: ACPI 3.0 spec only seems to say that 1.0 tables have revision 1
+			 * and that the current revision is 2.. I am going to assume that rev > 0 is 2.0.
+			 */
+
+			if(csum == 0 && (((struct acpi_2_rsdp*)acpi_addr)->Revision > 0))
+			{
+				uint8_t csum2 = checksum8(acpi_addr, sizeof(struct acpi_2_rsdp));
+				if(csum2 == 0)
+				{
+					return acpi_addr;
+				}
+			}
+		}
+	}
+	return NULL;
 }
-/** The folowing ACPI Table search algo. should be reused anywhere needed:*/
+
+/* The folowing ACPI Table search algo. should be reused anywhere needed:*/
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
 	int fd = 0;
@@ -110,7 +116,7 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	if (fd < 0)
 	{
 		// NOT FOUND:
-		verbose("ACPI table not found: %s\n", filename);
+		verbose("ACPI Table not found: %s\n", filename);
 		*dirSpec = '\0';
 	}
 
@@ -194,7 +200,10 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 
 				verbose("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
 
-				if (++acpi_cpu_count == 32) return;
+				if (++acpi_cpu_count == 32)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -507,7 +516,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 						// Sanity check
 						if (maximum.CID < minimum.CID) 
 						{
-							DBG("Insane FID values!");
+							DBG("P-States: Insane FID values!");
 							p_states_count = 0;
 						}
 						else
@@ -576,13 +585,13 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					//case CPU_MODEL_HASWELL_H:	//
 					case CPU_MODEL_HASWELL_MB:	//
 					case CPU_MODEL_HASWELL_ULT:	//
-					case CPU_MODEL_HASWELL_ULX:	//
+					case CPU_MODEL_CRYSTALWELL:	//
 
 					{
 					if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN) ||
 						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_HASWELL) ||
 						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE_XEON) || (Platform.CPU.Model == CPU_MODEL_HASWELL_MB) ||
-						(Platform.CPU.Model == CPU_MODEL_HASWELL_ULT) || (Platform.CPU.Model == CPU_MODEL_HASWELL_ULX))
+						(Platform.CPU.Model == CPU_MODEL_HASWELL_ULT) || (Platform.CPU.Model == CPU_MODEL_CRYSTALWELL))
 					{
 						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
 					}
@@ -696,20 +705,29 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	const char * value;
 
 	// Restart Fix
-	if (Platform.CPU.Vendor == 0x756E6547) {	/* Intel */
+	if (Platform.CPU.Vendor == 0x756E6547)
+	{	/* Intel */
 		fix_restart = true;
 		fix_restart_ps2 = false;
 		if ( getBoolForKey(kPS2RestartFix, &fix_restart_ps2, &bootInfo->chameleonConfig) && fix_restart_ps2)
+		{
 			fix_restart = true;
+		}
 		else
+		{
 			getBoolForKey(kRestartFix, &fix_restart, &bootInfo->chameleonConfig);
-		
-	} else {
+		}
+	}
+	else
+	{
 		verbose ("Not an Intel platform: Restart Fix not applied !!!\n");
 		fix_restart = false;
 	}
 
-	if (fix_restart) fadt_rev2_needed = true;
+	if (fix_restart)
+	{
+		fadt_rev2_needed = true;
+	}
 
 	// Allocate new fadt table
 	if (fadt->Length < 0x84 && fadt_rev2_needed)
@@ -730,13 +748,19 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		if (Platform.Type > 6)  
 		{
 			if(fadt_mod->PM_Profile<=6)
+			{
 				Platform.Type = fadt_mod->PM_Profile; // get the fadt if correct
+			}
 			else
+			{
 				Platform.Type = 1;		/* Set a fixed value (Desktop) */
+			}
 			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		}
 		else
+		{
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
+		}
 	}
 	// Set PM_Profile from System-type if only user wanted this value to be forced
 	if (fadt_mod->PM_Profile != Platform.Type) 
@@ -760,7 +784,8 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Patch FADT to fix restart
 	if (fix_restart)
 	{
-		if (fix_restart_ps2) {
+		if (fix_restart_ps2)
+		{
 			fadt_mod->Flags|= 0x400;
 			fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
 			fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
@@ -770,7 +795,8 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_Value		= 0xfe;   // Value to write to reset the system
 			msglog("FADT: PS2 Restart Fix applied!\n");
 		}
-		else {
+		else
+		{
 			fadt_mod->Flags|= 0x400;
 			fadt_mod->Reset_SpaceID		= 0x01;   // System I/O
 			fadt_mod->Reset_BitWidth	= 0x08;   // 1 byte
@@ -790,7 +816,9 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 
 		fadt_mod->DSDT=(uint32_t)new_dsdt;
 		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		{
 			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+		}
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
@@ -807,8 +835,8 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 /* Setup ACPI without replacing DSDT. */
 int setupAcpiNoMod()
 {
-	//	addConfigurationTable(&gEfiAcpiTableGuid, getAddressOfAcpiTable(), "ACPI");
-	//	addConfigurationTable(&gEfiAcpi20TableGuid, getAddressOfAcpi20Table(), "ACPI_20");
+//	addConfigurationTable(&gEfiAcpiTableGuid, getAddressOfAcpiTable(), "ACPI");
+//	addConfigurationTable(&gEfiAcpi20TableGuid, getAddressOfAcpi20Table(), "ACPI_20");
 	/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 	acpi10_p = (uint32_t)getAddressOfAcpiTable();
 	acpi20_p = (uint32_t)getAddressOfAcpi20Table();
@@ -831,7 +859,7 @@ int setupAcpi(void)
 	// always reset cpu count to 0 when injecting new acpi
 	acpi_cpu_count = 0;
 
-	// Try using the file specified with the DSDT option
+	/* Try using the file specified with the DSDT option */
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
 	{
 		sprintf(dirSpec, filename);
@@ -854,7 +882,7 @@ int setupAcpi(void)
 	int  ssdt_count=0;
 
 	// SSDT Options
-	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false; 
+	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false;
 
 	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
@@ -895,9 +923,13 @@ int setupAcpi(void)
 		{
 			DBG("No ACPI version %d found. Ignoring\n", version+1);
 			if (version)
+			{
 				addConfigurationTable(&gEfiAcpi20TableGuid, NULL, "ACPI_20");
+			}
 			else
+			{
 				addConfigurationTable(&gEfiAcpiTableGuid, NULL, "ACPI");
+			}
 			continue;
 		}
 		rsdplength=version?rsdp->Length:20;
@@ -932,7 +964,9 @@ int setupAcpi(void)
 			{
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
+				{
 					continue;
+				}
 
 				DBG("TABLE %c%c%c%c,",table[0],table[1],table[2],table[3]);
 
@@ -948,10 +982,13 @@ int setupAcpi(void)
 					DBG("DSDT found\n");
 
 					if(new_dsdt)
+					{
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+					}
 
 					continue;
 				}
+
 				if (tableSign(table, "FACP"))
 				{
 					struct acpi_2_fadt *fadt, *fadt_mod;
@@ -1021,7 +1058,7 @@ int setupAcpi(void)
 		else
 		{
 			rsdp_mod->RsdtAddress=0;
-			printf("RSDT not found or RSDT incorrect\n");
+			printf("RSDT not found or incorrect\n");
 		}
 
 		if (version)
@@ -1050,8 +1087,9 @@ int setupAcpi(void)
 				{
 					char *table=(char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
+					{
 						continue;
-
+					}
 					xsdt_entries[i-dropoffset]=xsdt_entries[i];
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
@@ -1064,7 +1102,9 @@ int setupAcpi(void)
 						DBG("DSDT found\n");
 
 						if (new_dsdt)
+						{
 							xsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+						}
 
 						DBG("TABLE %c%c%c%c@%x,",table[0],table[1],table[2],table[3],xsdt_entries[i]);
 						
@@ -1146,7 +1186,7 @@ int setupAcpi(void)
 				 */
 
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
-				verbose("XSDT not found or XSDT incorrect\n");
+				verbose("XSDT not found or incorrect\n");
 			}
 		}
 

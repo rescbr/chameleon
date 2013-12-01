@@ -571,6 +571,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 		{
 			switch (Platform.CPU.Model)
 			{
+				case 0x19:			// Intel Core i5 650 @3.20 Ghz
 				case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 				case CPU_MODEL_DALES:
 				case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
@@ -585,7 +586,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPU_MODEL_HASWELL:
 				case CPU_MODEL_HASWELL_MB:
 				case CPU_MODEL_HASWELL_ULT:
-				case CPU_MODEL_HASWELL_ULX:
+				case CPU_MODEL_CRYSTALWELL:
 
 					break;
 

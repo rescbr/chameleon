@@ -61,7 +61,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_HASWELL_MB		0x3F			// Haswell MB
 //#define CPU_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPU_MODEL_HASWELL_ULT		0x45			// Haswell ULT
-#define CPU_MODEL_HASWELL_ULX		0x46			// Haswell ULX
+#define CPU_MODEL_CRYSTALWELL		0x46			// Haswell ULX
 
 /* CPU Features */
 #define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set
@@ -115,17 +115,18 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 /* Size of SMBIOS UUID in bytes */
 #define UUID_LEN			16
 
-typedef struct _RamSlotInfo_t {
-    uint32_t		ModuleSize;					// Size of Module in MB
-    uint32_t		Frequency;					// in Mhz
-    const char*		Vendor;
-    const char*		PartNo;
-    const char*		SerialNo;
-    char*			spd;						// SPD Dump
-    bool			InUse;
-    uint8_t			Type;
-    uint8_t			BankConnections;			// table type 6, see (3.3.7)
-    uint8_t			BankConnCnt;
+typedef struct _RamSlotInfo_t
+{
+	uint32_t		ModuleSize;					// Size of Module in MB
+	uint32_t		Frequency;					// in Mhz
+	const char*		Vendor;
+	const char*		PartNo;
+	const char*		SerialNo;
+	char*			spd;						// SPD Dump
+	bool			InUse;
+	uint8_t			Type;
+	uint8_t			BankConnections;			// table type 6, see (3.3.7)
+	uint8_t			BankConnCnt;
 } RamSlotInfo_t;
 
 typedef struct _PlatformInfo_t {
