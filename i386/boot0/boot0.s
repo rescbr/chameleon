@@ -52,12 +52,12 @@
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG				EQU  CONFIG_BOOT0_DEBUG
+DEBUG				EQU  1
 
 ;
 ; Set to 1 to enable verbose mode
 ;
-VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
+VERBOSE				EQU  0
 
 ;
 ; Various constants.
@@ -75,6 +75,7 @@ kPartTableOffset	EQU  0x1be
 kMBRPartTable		EQU  kMBRBuffer + kPartTableOffset
 
 kSectorBytes		EQU  512			; sector size in bytes
+kChameleonBoot1hSignature		EQU		0xBB99								; boot sector signature
 kBootSignature		EQU  0xAA55			; boot sector signature
 kHFSPSignature		EQU  'H+'			; HFS+ volume signature
 kHFSPCaseSignature	EQU  'HX'			; HFS+ volume case-sensitive signature
@@ -164,20 +165,46 @@ kDriveNumber		EQU  0x80
 ;
 ; Macros.
 ;
-%macro DebugCharMacro 1
-    mov   al, %1
-    call  print_char
+
+%macro PrintCharMacro 1
+	mov		al, %1
+	call	print_char
 %endmacro
+
+%macro PrintHexEaxMacro 0
+	call	print_hex
+%endmacro
+
+%macro PrintHexMacro 1
+	mov eax, %1
+	call	print_hex
+%endmacro
+
+;%macro xGetCharMacro 0
+;	call	getc
+;%endmacro
+
+%if DEBUG
+  %define PrintChar(x) PrintCharMacro x
+  %define PrintHex(x) PrintHexMacro x
+  %define PrintHexEax PrintHexEaxMacro
+;  %define xGetChar xGetCharMarco
+%else
+  %define PrintChar(x)
+  %define PrintHex(x)
+  %define PrintHexEax
+;  %define xGetChar
+%endif
 
 %macro LogString 1
     mov   di, %1
     call  log_string
 %endmacro
 
-%if DEBUG
-%define DebugChar(x)  DebugCharMacro x
+%if VERBOSE
+  %define LogString(x) LogStringMacro x
 %else
-%define DebugChar(x)
+  %define LogString(x)
 %endif
 
 ;--------------------------------------------------------------------------
@@ -223,12 +250,8 @@ start:
 ;
 start_reloc:
 
-    DebugChar('>')
-
-%if DEBUG
-    mov     al, dl
-    call    print_hex
-%endif
+    PrintChar('8')
+    PrintChar('>')
 
     ;
     ; Since this code may not always reside in the MBR, always start by
@@ -250,11 +273,13 @@ start_reloc:
     call    find_boot				; will not return on success
 
 error:
-    LogString(boot_error_str)
+;    LogString(boot_error_str)
 
 hang:
     hlt
     jmp     hang
+
+
 
 
 ;--------------------------------------------------------------------------
@@ -269,124 +294,6 @@ hang:
 ;
 find_boot:
 
-    ;
-    ; Check for boot block signature 0xAA55 following the 4 partition
-    ; entries.
-    ;
-    cmp     WORD [si + part_size * kPartCount], kBootSignature
-    jne	    .exit        	  			; boot signature not found.
-
-    xor	    bx, bx						; BL will be set to 1 later in case of
-										; Protective MBR has been found
-
-    inc     bh							; BH = 1. Giving a chance for a second pass
-										; to boot an inactive but boot1h aware HFS+ partition
-										; by scanning the MBR partition entries again.
-
-.start_scan:							
-    mov     cx, kPartCount          	; number of partition entries per table
-
-.loop:
-
-    ;
-    ; First scan through the partition table looking for the active
-    ; partition.
-    ;
-%if DEBUG
-    mov     al, [si + part.type] 	   ; print partition type
-    call    print_hex
-%endif
-
-    mov	    eax, [si + part.lba]					; save starting LBA of current 
-    mov	    [my_lba], eax							; MBR partition entry for read_lba function
-    cmp     BYTE [si + part.type], 0				; unused partition?
-    je      .continue  								; skip to next entry
-    cmp	    BYTE [si + part.type], kPartTypePMBR	; check for Protective MBR 
-    jne	    .testPass
-
-    mov     BYTE [si + part.bootid], kPartInactive	; found Protective MBR
-        											; clear active flag to make sure this protective
-													; partition won't be used as a bootable partition.
-    mov	    bl, 1									; Assume we can deal with GPT but try to scan
-					    							; later if not found any other bootable partitions.
-
-.testPass:
-    cmp	    bh, 1
-    jne	    .Pass2
-
-.Pass1:
-    cmp     BYTE [si + part.bootid], kPartActive	; In pass 1 we are walking on the standard path
-                                                    ; by trying to hop on the active partition.
-    jne     .continue
-    xor	  	dh, dh               					; Argument for loadBootSector to skip HFS+ partition
-											        ; signature check.
-    jmp     .tryToBoot
-
-.Pass2:    
-    cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
-                                                    ; equipped with boot1h in its boot record
-                                                    ; regardless if it's active or not.
-    jne     .continue
-  	mov 	dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
-
-    DebugChar('*')
-
-    ;
-    ; Found boot partition, read boot sector to memory.
-    ;
-
-.tryToBoot:
-
-    call    loadBootSector
-    jne     .continue
-    jmp	    SHORT initBootLoader
-
-.continue:
-    add     si, BYTE part_size     			; advance SI to next partition entry
-    loop    .loop                 		 	; loop through all partition entries
-
-    ;
-    ; Scanned all partitions but not found any with active flag enabled
-    ; Anyway if we found a protective MBR before we still have a chance 
-    ; for a possible GPT Header at LBA 1
-    ;    
-    dec	    bl
-    jnz     .switchPass2					; didn't find Protective MBR before
-    call    checkGPT
-
-.switchPass2:
-    ;
-    ; Switching to Pass 2 
-    ; try to find a boot1h aware HFS+ MBR partition
-    ;
-    dec	    bh
-    mov	    si, kMBRPartTable				; set SI to first entry of MBR Partition table
-    jz      .start_scan						; scan again
-    
-.exit:
-    ret										; Giving up.
-
-
-    ;
-    ; Jump to partition booter. The drive number is already in register DL.
-    ; SI is pointing to the modified partition entry.
-    ;
-initBootLoader:    
-
-DebugChar('J')
-
-%if VERBOSE
-    LogString(done_str)
-%endif
-
-    jmp     kBoot0LoadAddr
-
-    
-    ; 
-    ; Found Protective MBR Partition Type: 0xEE
-    ; Check for 'EFI PART' string at the beginning
-    ; of LBA1 for possible GPT Table Header
-    ;
 checkGPT:
     push    bx
 
@@ -404,6 +311,7 @@ checkGPT:
     mov     [my_lba], eax								; save starting LBA for read_lba function
     mov     cx, [si + gpth.NumberOfPartitionEntries]	; number of GUID Partition Array entries
     mov     bx, [si + gpth.SizeOfPartitionEntry]		; size of GUID Partition Array entry
+    
     push    bx											; push size of GUID Partition entry
 
     ;
@@ -440,9 +348,12 @@ checkGPT:
 %if VERBOSE
     LogString(gpt_str)
 %endif
-
+	
+	PrintChar('P')
+	mov dh, 1 ; partition number to give to boot1h
+		
 .gpt_loop:
-
+;PrintChar('1')
     mov     eax, [si + gpta.PartitionTypeGUID + kGUIDLastDwordOffs]
 	
 	cmp		eax, kAppleGUID			; check current GUID Partition for Apple's GUID type
@@ -456,24 +367,25 @@ checkGPT:
 	jne		.gpt_continue
 
 .gpt_ok:
+;PrintChar('2')
     ;
     ; Found HFS Partition
     ;
 
     mov	    eax, [si + gpta.StartingLBA]			; load boot sector from StartingLBA
     mov	    [my_lba], eax		
-	mov		dh, 1									; Argument for loadBootSector to check HFS+ partition signature.
     call    loadBootSector
     jne	    .gpt_continue							; no boot loader signature
-
-    mov	    si, kMBRPartTable						; fake the current GUID Partition
-    mov	    [si + part.lba], eax					; as MBR style partition for boot1h
-    mov     BYTE [si + part.type], kPartTypeHFS		; with HFS+ filesystem type (0xAF)
+%if VERBOSE
+    ;LogString(test_str)
+%endif
+PrintChar('!')
+	mov     ecx, [si + gpta.StartingLBA]
     jmp	    SHORT initBootLoader    
     
 .gpt_continue:
-
     add	    si, bx									; advance SI to next partition entry
+    inc     dh
     loop    .gpt_loop								; loop through all partition entries	
 
 .exit:
@@ -486,8 +398,6 @@ checkGPT:
 ;
 ; Arguments:
 ;   DL = drive number (0x80 + unit number)
-;   DH = 0 skip HFS+ partition signature checking
-;        1 enable HFS+ partition signature checking
 ;   [my_lba] = starting LBA.
 ;
 ; Returns:
@@ -502,42 +412,14 @@ loadBootSector:
     call    load
     jc      error
 
-	or		dh, dh
-	jz		.checkBootSignature
-	
-.checkHFSSignature:
-
-%if VERBOSE
-    LogString(test_str)
-%endif
-
-	;
-	; Looking for HFSPlus ('H+') or HFSPlus case-sensitive ('HX') signature.
-	;
-	mov		ax, [kBoot0LoadAddr + 2 * kSectorBytes]
-    cmp     ax, kHFSPSignature		; 'H+'
-	je		.checkBootSignature
-	cmp		ax, kHFSPCaseSignature	; 'HX'
-    je		.checkBootSignature
-	
-	;
-	; Looking for boot1f32 magic string.
-	;
-	mov		ax, [kBoot0LoadAddr + kFAT32BootCodeOffset]
-	cmp		ax, kBoot1FAT32Magic
-    jne     .exit
-
-.checkBootSignature:
     ;
-    ; Check for boot block signature 0xAA55
+    ; Check for chameleon boot block signature of boot1h
     ;
     mov	    di, bx
-    cmp     WORD [di + kSectorBytes - 2], kBootSignature
+    cmp     WORD [di + kSectorBytes - 4], kChameleonBoot1hSignature
 
 .exit:
-
     popa
-
     ret
 
 
@@ -568,6 +450,22 @@ load:
     pop     cx
     ret
 
+
+initBootLoader:    
+  	LogString(done_str)
+
+  PrintChar('J')
+
+;	mov eax,kBoot0LoadAddr
+;	call print_hex
+;	mov eax,[kBoot0LoadAddr]
+;	call print_hex
+;push si
+;pop eax
+;PrintHexEax
+;PrintHex(edx)
+
+    jmp     kBoot0LoadAddr
 
 ;--------------------------------------------------------------------------
 ; read_lba - Read sectors from a partition using LBA addressing.
@@ -604,7 +502,7 @@ read_lba:
     ; It pushes 2 bytes with a smaller opcode than if WORD was used
     push    BYTE 16                 ; offset 0-1, packet size
 
-    DebugChar('<')
+    PrintChar('<')
 %if DEBUG
     mov  eax, ecx
     call print_hex
@@ -632,7 +530,7 @@ read_lba:
 
     jnc     .exit
 
-    DebugChar('R')                  ; indicate INT13/F42 error
+;    PrintChar('R')                  ; indicate INT13/F42 error
 
     ;
     ; Issue a disk reset on error.
@@ -658,19 +556,19 @@ read_lba:
 ; Clobber list:
 ;   DI
 ;
-log_string:
-    pusha
-        
-    push	di
-    mov		si, log_title_str
-    call	print_string
-
-    pop		si
-    call	print_string
-
-    popa
-    
-    ret
+;log_string:
+;    pusha
+;        
+;    push	di
+;    mov		si, log_title_str
+;    call	print_string
+;
+;    pop		si
+;    call	print_string
+;
+;    popa
+;    
+;    ret
 
     
 ;--------------------------------------------------------------------------
@@ -762,12 +660,12 @@ getc:
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
-log_title_str		db  10, 13, 'boot0: ', 0
-boot_error_str   	db  'error', 0
+;log_title_str		db  10, 13, 'boot0: ', 0
+;boot_error_str   	db  'err', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
-test_str		db  'test', 0
+;test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
 
@@ -791,7 +689,8 @@ pad_boot:
     times 440-($-$$) db 0
 
 pad_table_and_sig:
-    times 510-($-$$) db 0
+    times 508-($-$$) db 0
+    dw    kChameleonBoot1hSignature
     dw    kBootSignature
 	
 	
