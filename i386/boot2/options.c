@@ -988,7 +988,7 @@ int getBootOptions(bool firstRun)
 			}
 			gBootVolume = menuBVR;
 			setRootVolume(menuBVR);
-			gBIOSDev = menuBVR->biosdev;
+//????			gBIOSDev = menuBVR->biosdev;
 			break;
 
 		case KEY_ESC:

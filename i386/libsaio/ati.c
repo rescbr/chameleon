@@ -2175,6 +2175,8 @@ static bool init_card(pci_dt_t *pci_dev)
 				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys.vendor_id, pci_dev->subsys_id.subsys.device_id);
 		return false;
 	}
+   	verbose("Found ATI card! Device ID:[%04x:%04x] Subsystem ID:[%08x] - Radeon [%04x:%08x] %s\n", 
+		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
 	
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);

@@ -241,6 +241,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 	if (cacheFile[0] != 0)
 	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
+		verbose("Specified kernel cache file path=%s\n", cacheFile);
 	}
 	else
 	{
@@ -248,6 +249,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
 		{
 			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
+			verbose("L & ML kernel cache file path=%s\n", kernelCacheFile);
 		}
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
@@ -269,6 +271,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 					prev_time = time;
 				}
 			}
+            verbose("SnowLeo kernel cache file path=%s\n", kernelCacheFile);
 		}
 		else {
 			// Reset cache name.
@@ -276,6 +279,7 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
 			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 			sprintf(kernelCacheFile, "%s.%08lX", kDefaultCachePathLeo, adler32);
+            verbose("Reseted kernel cache file path=%s\n", kernelCacheFile);
 		}
 	}
 
@@ -363,7 +367,7 @@ void boot(int biosdev)
 // If biosdev is kBIOSDevNetwork, then this function will return if
 // booting was unsuccessful. This allows the PXE firmware to try the
 // next boot device on its list.
-void common_boot(int biosdev)
+void common_boot(int biosDevAndPart)
 {
 	bool	 		quiet;
 	bool	 		firstRun = true;
@@ -378,7 +382,8 @@ void common_boot(int biosdev)
 	gUnloadPXEOnExit = true;
 	
 	// Record the device that the booter was loaded from.
-	gBIOSDev = biosdev & kBIOSDevMask;
+	gBIOSDev = biosDevAndPart & kBIOSDevMask;
+	gBootPartition = ((biosDevAndPart & 0xFF00) >> 8);
 	
 	// Initialize boot info structure.
 	initKernBootStruct();
@@ -388,13 +393,7 @@ void common_boot(int biosdev)
 	// Setup VGA text mode.
 	// Not sure if it is safe to call setVideoMode() before the
 	// config table has been loaded. Call video_mode() instead.
-#if DEBUG
-	printf("before video_mode\n");
-#endif
 	video_mode( 2 );  // 80x25 mono text mode.
-#if DEBUG
-	printf("after video_mode\n");
-#endif
 	
 	// Scan and record the system's hardware information.
 	scan_platform();
@@ -458,12 +457,22 @@ void common_boot(int biosdev)
 	init_module_system();
 		
 #if DEBUG
-	printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
+	printf("gBIOSDev=%d\n", gBIOSDev);
+	printf("gBootPartition=%d\n", gBootPartition);
+	
+	printf(" gBootVolume: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
 			 gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-	printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
+	printf(" gBIOSBootVolume==bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
 			 gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+	
+	for (BVRef bvr = bvChain; bvr; bvr = bvr->next)
+	{
+		printf(" chain: %d, dev: %d, part: %d, flags: %d, ver:%s vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->OSVersion, bvr->visible);
+	}
+
 	getchar();
 #endif
+
 	
 	useGUI = true;
 	// Override useGUI default

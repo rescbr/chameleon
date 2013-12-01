@@ -208,6 +208,7 @@ extern void   setBootGlobals(BVRef chain);
 extern int    getDeviceDescription(BVRef volume, char *str);
 
 extern int    gBIOSDev;
+extern int    gBootPartition;
 extern int    gBootFileType;
 extern BVRef  gBootVolume;
 extern BVRef  gBIOSBootVolume;

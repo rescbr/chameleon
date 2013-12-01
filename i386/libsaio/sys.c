@@ -888,6 +888,7 @@ BVRef selectBootVolume( BVRef chain )
 #define LP '('
 #define RP ')'
 int gBIOSDev;
+int gBootPartition;
 
 /*!
     This is like boot2's gBootVolume except it is for the internal use of
@@ -907,13 +908,29 @@ void setRootVolume(BVRef volume)
 
 void setBootGlobals(BVRef chain)
 {
+	gBIOSBootVolume = NULL;
+  	for ( BVRef bvr = chain; bvr; bvr = bvr->next )
+	{
+  		if (bvr->biosdev == gBIOSDev  &&  bvr->part_no == gBootPartition) {
+  			gBIOSBootVolume = bvr;
+  		}
+	}
+  	if ( gBIOSBootVolume == NULL ) {
+  		printf("BUG!!! -> gBIOSBootVolume == NULL\n");
+  		getchar();
+  	}
+  	else
+  	{
+  		//printf("gBIOSBootVolume %d %d %d\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no);
+  	}
+
   // Record default boot device.
-  gBootVolume = selectBootVolume(chain);
+  //gBootVolume = selectBootVolume(chain);
   
   // turbo - Save the ORIGINAL boot volume too for loading our mkext
-  if (!gBIOSBootVolume) gBIOSBootVolume = gBootVolume;
+  //if (!gBIOSBootVolume) gBIOSBootVolume = gBootVolume;
   
-  setRootVolume(gBootVolume);	
+  setRootVolume(gBIOSBootVolume);
 }
 
 /*!
