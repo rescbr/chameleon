@@ -20,7 +20,7 @@ SUBDIRS_PRE =
 
 SUBDIRS_PRE += util
 
-SUBDIRS = $(SUBDIRS_PRE) klibc libsa libsaio boot0 boot1 boot2 cdboot modules
+SUBDIRS = $(SUBDIRS_PRE) klibc libsa libsaio boot0 boot1 boot2 cdboot
 
 modules-builtin:
 	@cd modules; ${MAKE} BUILT_IN=yes
