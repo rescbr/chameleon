@@ -42,7 +42,8 @@
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG				EQU		CONFIG_BOOT1_HFS_DEBUG
+SIMPLEDEBUG				EQU		1 ; only print_char for space reason
+DEBUG				EQU		0
 
 ;
 ; Set to 1 to enable unused code.
@@ -52,7 +53,7 @@ UNUSED				EQU		0
 ;
 ; Set to 1 to enable verbose mode.
 ;
-VERBOSE				EQU		CONFIG_BOOT1_HFS_VERBOSE
+VERBOSE				EQU		0
 
 ;
 ; Various constants.
@@ -66,6 +67,7 @@ maxSectorCount		EQU		64									; maximum sector count for readSectors
 maxNodeSize			EQU		16384
 
 kSectorBytes		EQU		512									; sector size in bytes
+kChameleonBoot1hSignature		EQU		0xBB99								; boot sector signature
 kBootSignature		EQU		0xAA55								; boot sector signature
 
 kBoot1StackAddress	EQU		0xFFF0								; boot1 stack pointer
@@ -85,17 +87,25 @@ kBoot2Address		EQU		kSectorBytes						; boot2 load address
 ; giving the size of the structure.
 ;
 			struc part
-.bootid		resb 1		; bootable or not 
-.head		resb 1		; starting head, sector, cylinder
-.sect		resb 1		;
-.cyl		resb 1		;
-.type		resb 1		; partition type
-.endhead	resb 1		; ending head, sector, cylinder
-.endsect	resb 1		;
-.endcyl		resb 1		;
-.lba		resd 1		; starting lba
-.sectors	resd 1		; size in sectors
-			endstruc
+;.bootid		resb 1		; bootable or not 
+;.head		resb 1		; starting head, sector, cylinder
+;.sect		resb 1		;
+;.cyl		resb 1		;
+;.type		resb 1		; partition type
+;.endhead	resb 1		; ending head, sector, cylinder
+;.endsect	resb 1		;
+;.endcyl		resb 1		;
+;.lba		resd 1		; starting lba
+;.sectors	resd 1		; size in sectors
+;			endstruc
+						  	struc	gpta
+.PartitionTypeGUID			resb	16
+.UniquePartitionGUID		resb	16
+.StartingLBA				resb	8
+.EndingLBA					resb	8
+;.Attributes					resb	8
+;.PartitionName				resb	72
+							endstruc
 
 ;-------------------------------------------------------------------------
 ; HFS+ related structures and constants
@@ -308,26 +318,17 @@ kForkTypeResource	EQU		0xFF
 	ret
 %endmacro
 
-%macro DebugCharMacro 1
-	pushad
-	mov		al, %1
-	call	print_char
-	call	getc
-	popad
-%endmacro
-
 %macro PrintCharMacro 1
-	pushad
 	mov		al, %1
 	call	print_char
-	popad
 %endmacro
 
-%macro PutCharMacro 1
-	call	print_char
+%macro PrintHexEaxMacro 0
+	call	print_hex
 %endmacro
 
 %macro PrintHexMacro 1
+	mov eax, %1
 	call	print_hex
 %endmacro
 
@@ -336,21 +337,29 @@ kForkTypeResource	EQU		0xFF
 	call	print_string
 %endmacro
         
-%macro LogString 1
+%macro LogStringMacro 1
 	mov		di, %1
 	call	log_string
 %endmacro
 
-%if DEBUG
-  %define DebugChar(x) DebugCharMacro x
+%if SIMPLEDEBUG
   %define PrintChar(x) PrintCharMacro x
-  %define PutChar(x) PutCharMacro
-  %define PrintHex(x) PrintHexMacro x
 %else
-  %define DebugChar(x)
   %define PrintChar(x)
-  %define PutChar(x)
+%endif
+
+%if DEBUG
+  %define PrintHex(x) PrintHexMacro x
+  %define PrintHexEax PrintHexEaxMacro
+%else
   %define PrintHex(x)
+  %define PrintHexEax
+%endif
+
+%if VERBOSE
+  %define LogString(x) LogStringMacro x
+%else
+  %define LogString(x)
 %endif
 	
 ;--------------------------------------------------------------------------
@@ -368,6 +377,7 @@ start:
     ; Set up the stack to grow down from kBoot1StackSegment:kBoot1StackAddress.
     ; Interrupts should be off while the stack is being manipulated.
     ;
+
     cli                             ; interrupts off
     xor		ax, ax                  ; zero ax
     mov		ss, ax                  ; ss <- 0
@@ -376,6 +386,8 @@ start:
 
     mov     ds, ax                  ; ds <- 0
     mov     es, ax                  ; es <- 0
+
+	push ecx ; save the current partition LBA offset. will be poped after reloc
 
     ;
     ; Relocate boot1 code.
@@ -387,7 +399,6 @@ start:
     mov		cx, kSectorBytes		; copy 256 words
     rep		movsb					; repeat string move (word) operation
     pop		si
-    
     ;
     ; Code relocated, jump to startReloc in relocated location.
     ;
@@ -400,14 +411,25 @@ start:
 ; Start execution from the relocated location.
 ;
 startReloc:
+	PrintChar ('>')
 
     ;
     ; Initializing global variables.
     ;
-    mov     eax, [si + part.lba]
-    mov     [gPartLBA], eax					; save the current partition LBA offset
+	pop ecx    
+    ;PrintHex(ecx)
+    mov     DWORD [gPartLBA], ecx			; save the current partition LBA offset
     mov     [gBIOSDriveNumber], dl			; save BIOS drive number
+    mov     [gBIOSDrivePartNumber], dh			; save BIOS drive number
 	mov		WORD [gMallocPtr], mallocStart	; set free space pointer
+
+	PrintHex([gPartLBA])
+	xor eax,eax
+	mov al,[gBIOSDriveNumber]
+	PrintHexEax
+	xor eax,eax
+	mov al,[gBIOSDrivePartNumber]
+	PrintHexEax
 
     ;
     ; Loading upper 512 bytes of boot1h and HFS+ Volume Header.
@@ -417,6 +439,7 @@ startReloc:
     mov     al, 2							; read 2 sectors: sector 1 of boot1h + HFS+ Volume Header
     mov     edx, kBoot1Sector1Addr
     call    readLBA
+;	PrintChar ('2')
 
     ;
     ; Initializing more global variables.
@@ -425,6 +448,8 @@ startReloc:
 	bswap	eax								; convert to little-endian
 	shr		eax, 9							; convert to sector unit
 	mov		[gBlockSize], eax				; save blockSize as little-endian sector unit!
+
+;	PrintChar ('3')
 
 	;
 	; Looking for HFSPlus ('H+') or HFSPlus case-sensitive ('HX') signature.
@@ -439,6 +464,8 @@ startReloc:
 ; Find stage2 boot file in a HFS+ Volume's root folder.
 ;
 findRootBoot:
+	PrintChar ('!')
+;%if 0
 	mov		al, kHFSCatalogFileID
 	lea		si, [searchCatalogKey]
 	lea		di, [kHFSPlusBuffer + HFSPlusVolumeHeader.catalogFile + HFSPlusForkData.extents]
@@ -472,36 +499,22 @@ findRootBoot:
 	lea		di, [si + HFSPlusCatalogFile.dataFork + HFSPlusForkData.extents]
 	call	readExtent
 
-%if VERBOSE
 	LogString(root_str)
-%endif
 
 boot2:
-
-%if DEBUG
-	DebugChar ('!')
-%endif
-
-%if UNUSED
-	;
-	; Waiting for a key press.
-	;
-
-    mov     ah, 0
-    int		0x16
-%endif
+	PrintChar ('J')
 
     mov     dl, [gBIOSDriveNumber]			; load BIOS drive number
+    mov     dh, [gBIOSDrivePartNumber]			; load part number
     jmp     kBoot2Segment:kBoot2Address
+;%endif	
 
 error:
-
-%if VERBOSE
+	PrintChar ('E')
     LogString(error_str)
-%endif
-	
+
 hang:
-    hlt
+    call getc
     jmp     hang
 
 ;--------------------------------------------------------------------------
@@ -684,7 +697,28 @@ print_string:
 
 %endif ; VERBOSE
 
+%if SIMPLEDEBUG
+
+;--------------------------------------------------------------------------
+; Write a ASCII character to the console.
+;
+; Arguments:
+;   AL = ASCII character.
+;
+print_char:
+    pushad
+    mov     bx, 1                   		; BH=0, BL=1 (blue)
+    mov     ah, 0x0e                		; bios INT 10, Function 0xE
+    int     0x10                    		; display byte in tty mode
+    popad
+    ret
+
+%endif
+
+
 %if DEBUG
+
+%if UNUSED
 
 ;--------------------------------------------------------------------------
 ; Write the 4-byte value to the console in hex.
@@ -705,12 +739,12 @@ print_hex:
     ror     eax, 8
     loop    .loop
 
-%if UNUSED
+;%if UNUSED
 	mov     al, 10							; carriage return
 	call    print_char
 	mov     al, 13
 	call    print_char
-%endif ; UNUSED
+;%endif ; UNUSED
 
     popad
     ret
@@ -724,6 +758,8 @@ print_nibble:
 .print_ascii:
     call    print_char
     ret
+
+%endif ; UNUSED
 
 ;--------------------------------------------------------------------------
 ; getc - wait for a key press
@@ -991,8 +1027,9 @@ root_str			db		'/boot', NULL
 ; Azi: boot1h.s:994: error: TIMES value -67 is negative
 ;
 pad_table_and_sig:
-	times			510-($-$$) db 0
-	dw				kBootSignature
+	times			508-($-$$) db 0
+	dw              kChameleonBoot1hSignature
+	dw				kBootSignature // remove this ! Don't forgot boot0.s, line 419 : -4 become -2
 
 ;
 ; Sector 1 code area
@@ -1190,7 +1227,7 @@ getBTreeRecord:
 	mov		si, di
 	lodsd
 	PrintChar('k')
-	PrintHex()
+	PrintHexEax()
 	lodsw
 	cmp		ax, 0
 	je		.printExit
@@ -1215,11 +1252,11 @@ getBTreeRecord:
 	mov		si, di
 	xor		eax, eax
 	lodsw
-	PrintHex()
+	PrintHexEax()
 	lodsd
-	PrintHex()
+	PrintHexEax()
 	lodsd
-	PrintHex()
+	PrintHexEax()
 	popad
 ;
 ;
@@ -1478,8 +1515,9 @@ pad_sector_1:
 
 	ABSOLUTE		kHFSPlusBuffer + HFSPlusVolumeHeader_size
 
-gPartLBA			resd	1
+gPartLBA			resd	4
 gBIOSDriveNumber	resw	1
+gBIOSDrivePartNumber	resw	1
 gBlockSize			resd	1
 gMallocPtr			resw	1
 
