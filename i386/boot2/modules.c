@@ -944,7 +944,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 }
                  
 
-inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
+static inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
 {	
 	// do actual update
 	char* newValue = value + addend;

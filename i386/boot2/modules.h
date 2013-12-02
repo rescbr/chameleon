@@ -95,9 +95,9 @@ unsigned int	handle_symtable(UInt32 base,
 							 long long(*symbol_handler)(char*, long long, char),
 							 char is64);
 void			rebase_macho(void* base, char* rebase_stream, UInt32 size);
-inline void		rebase_location(UInt32* location, char* base, int type);
+static inline void		rebase_location(UInt32* location, char* base, int type);
 void			bind_macho(void* base, UInt8* bind_stream, UInt32 size);
-inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
+static inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
 
 
 
