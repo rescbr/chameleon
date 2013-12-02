@@ -777,7 +777,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 		toread-=msdosclustersize;
 	}
 	
-  getDeviceDescription(ih, devStr);
+	getDeviceDescription(ih, devStr);
 	verbose("Read FAT%d file: [%s/%s] %d bytes.\n",
             msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
 	free (buf);
@@ -840,7 +840,7 @@ MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 
 long MSDOSLoadFile(CICell ih, char * filePath)
 {
-    return MSDOSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
+	return MSDOSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
 }
 
 /* Fix up volume label. */

@@ -21,18 +21,23 @@
 # B) User can select only one of the options from the list.
 # Set Exclusive=False for A, or Exclusive=True for B.
 #
-Exclusive=False
+Exclusive=True
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
-Text@arch:arch=i386
-Bool@EHCIacquire:EHCIacquire=Yes
-Bool@EthernetBuiltIn:EthernetBuiltIn=Yes
-#Bool@EnableWifi:EnableWifi=Yes
-Bool@ForceHPET:ForceHPET=Yes
-Bool@ForceWake:ForceWake=Yes
-Bool@RestartFix:RestartFix=No
-Bool@UHCIreset:UHCIreset=Yes
-Bool@UseMemDetect:UseMemDetect=No
-Bool@UseKernelCache:UseKernelCache=Yes
-Bool@Wake:Wake=Yes
+Text@IntelAzulx00:IntelAzulFB=0
+Text@IntelAzulx01:IntelAzulFB=1
+Text@IntelAzulx02:IntelAzulFB=2
+Text@IntelAzulx03:IntelAzulFB=3
+Text@IntelAzulx04:IntelAzulFB=4
+Text@IntelAzulx05:IntelAzulFB=5
+Text@IntelAzulx06:IntelAzulFB=6
+Text@IntelAzulx07:IntelAzulFB=7
+Text@IntelAzulx08:IntelAzulFB=8
+Text@IntelAzulx09:IntelAzulFB=9
+Text@IntelAzulx10:IntelAzulFB=10
+Text@IntelAzulx11:IntelAzulFB=11
+Text@IntelAzulx12:IntelAzulFB=12
+Text@IntelAzulx13:IntelAzulFB=13
+Text@IntelAzulx14:IntelAzulFB=14
+Text@IntelAzulx15:IntelAzulFB=15

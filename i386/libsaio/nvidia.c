@@ -83,7 +83,7 @@ const char *nvidia_compatible_0[]       =	{ "@0,compatible",	"NVDA,NVMac"	 };
 const char *nvidia_compatible_1[]       =	{ "@1,compatible",	"NVDA,NVMac"	 };
 const char *nvidia_device_type_0[]      =	{ "@0,device_type",	"display"	 };
 const char *nvidia_device_type_1[]      =	{ "@1,device_type",	"display"	 };
-const char *nvidia_device_type[]        =	{ "device_type",	"NVDA,Parent"	 };
+const char *nvidia_device_type_parent[] =	{ "device_type",	"NVDA,Parent"	 };
 const char *nvidia_device_type_child[]	=	{ "device_type",	"NVDA,Child"	 };
 const char *nvidia_name_0[]             =	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]             =	{ "@1,name",		"NVDA,Display-B" };
@@ -1010,6 +1010,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0FC1,	"GeForce GT 640" },
 	{ 0x10DE0FC2,	"GeForce GT 630" },
 	{ 0x10DE0FC6,	"GeForce GTX 650" },
+	{ 0x10DE0FCD,	"GeForce GT 755M" },
 	// 0FD0 - 0FDF
 	{ 0x10DE0FD1,	"GeForce GT 650M" },
 	{ 0x10DE0FD2,	"GeForce GT 640M" },
@@ -1039,6 +1040,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1003,	"GeForce GTX Titan LE" },
 	{ 0x10DE1004,	"GeForce GTX 780" },
 	{ 0x10DE1005,	"GeForce GTX Titan" },
+	{ 0x10DE100A,	"GeForce GTX 780 Ti" },
 	// 1010 - 101F
 	{ 0x10DE101F,	"Tesla K20" },
 	// 1020 - 102F
@@ -1127,9 +1129,14 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 1180 - 118F
 	{ 0x10DE1180,	"GeForce GTX 680" },
 	{ 0x10DE1183,	"GeForce GTX 660 Ti" },
+	{ 0x10DE1184,	"GeForce GTX 770" },
 	{ 0x10DE1185,	"GeForce GTX 660" },
+	{ 0x10DE1187,	"GeForce GTX 760" },
 	{ 0x10DE1188,	"GeForce GTX 690" },
 	{ 0x10DE1189,	"GeForce GTX 670" },
+//	{ 0x10DE118A,	"GRID K520" },
+//	{ 0x10DE118B,	"GRID K200" },
+	{ 0x10DE118E,	"GeForce GTX 760 (192-bit)" },
 	{ 0x10DE118F,	"Tesla K10" },
 	// 1190 - 119F
 	{ 0x10DE119F,	"GeForce GTX 780M" },
@@ -1152,6 +1159,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE11C4,	"GeForce GTX 645" },
 	{ 0x10DE11C6,	"GeForce GTX 650 Ti" },
 	// 11D0 - 11DF
+	{ 0x10DE11D0,	"GK106-INT353" },
 	// 11E0 - 11EF
 	{ 0x10DE11E0,	"GeForce GTX 770M" },
 	{ 0x10DE11E1,	"N14E-GE-B-A1" },
@@ -1159,6 +1167,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE11E3,	"GeForce GTX 760M" },
 	// 11F0 - 11FF
 	{ 0x10DE11FA,	"Quadro K4000" },
+	{ 0x10DE11FC,	"Quadro 2100M" },
 	// 1200 - 120F
 	{ 0x10DE1200,	"GeForce GTX 560 Ti" },
 	{ 0x10DE1201,	"GeForce GTX 560" },
@@ -1189,14 +1198,21 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 1270 - 127F
 	// 1280 - 128F
 	{ 0x10DE1280,	"GeForce GT 635" },
+	{ 0x10DE1282,	"GeForce GT 640" },
+	{ 0x10DE1284,	"GeForce GT 630" },
 	// 1290 - 129F
 	{ 0x10DE1290,	"GeForce GT 730M" },
 	{ 0x10DE1291,	"GeForce GT 735M" },
 	{ 0x10DE1292,	"GeForce GT 740M" },
 	{ 0x10DE1293,	"GeForce GT 730M" },
 	{ 0x10DE1294,	"GeForce GT 740M" },
+	{ 0x10DE1295,	"GeForce GT 710M" },
+	{ 0x10DE1298,	"GeForce GT 720M" },
 	// 12A0 - 12AF
 	//{ 0x10DE12A0,	"GeForce GT ???" },
+	{ 0x10DE12AF,	"GK208-INT" },
+	{ 0x10DE12B0,	"GK208-CS-Q" },
+	{ 0x10DE12BA,	"Quadro K510M" }
 	// 12B0 - 12BF
 	// 12C0 - 12CF
 	// 12D0 - 12DF
@@ -1380,6 +1396,8 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
 	{ 0x10DE1180,	0x38422683,	"EVGA GTX 680 SC" },
 
+	{ 0x10DE1187,	0x14583614,	"GV-N760OC-4GD" },
+
 	{ 0x10DE1189,	0x10438405,	"Asus GTX 670 Direct CU II TOP" },
 	{ 0x10DE1189,	0x15691189,	"Palit GTX 670 JetStream" },
 	{ 0x10DE1189,	0x19DA1255,	"Zotac GTX 670 AMP! Edition" },
@@ -1387,6 +1405,7 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 	{ 0x10DE11A1,	0x15587102,	"Clevo N13E-GR" },
 
 	{ 0x10DE11C0,	0x10DE0995,	"Inno3D GeForce GTX660" },
+	{ 0x10DE11C0,	0x1458354E,	"GV-N660OC-2GD" },
 
 	{ 0x10DE11C6,	0x1043842A,	"GTX650TI-1GD5" },
 	// 1200 - 12FF
@@ -1468,7 +1487,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 	}
 	
 	if (numentries >= MAX_NUM_DCB_ENTRIES)
+	{
 		numentries = MAX_NUM_DCB_ENTRIES;
+	}
 
 	uint8_t num_outputs = 0, i = 0;
 
@@ -1486,11 +1507,17 @@ static int patch_nvidia_rom(uint8_t *rom)
 
 		/* Should we allow discontinuous DCBs? Certainly DCB I2C tables can be discontinuous */
 		if ((connection & 0x0000000f) == 0x0000000f) /* end of records */ 
+		{
 			continue;
+		}
 		if (connection == 0x00000000) /* seen on an NV11 with DCB v1.5 */ 
+		{
 			continue;
+		}
 		if ((connection & 0xf) == 0x6) /* we skip type 6 as it doesnt appear on macbook nvcaps */
+		{
 			continue;
+		}
 
 		entries[num_outputs].type = connection & 0xf;
 		entries[num_outputs].index = num_outputs;
@@ -1518,7 +1545,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 		for (i = 0; i < num_outputs; i++)
 		{
 			if (entries[i].type == TYPE_GROUPED)
+			{
 				continue;
+			}
 
 			channel2 |= ( 0x1 << entries[i].index);
 			entries[i].type = TYPE_GROUPED;
@@ -1533,7 +1562,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 			for (i=0; i<num_outputs; i++)
 			{
 				if (entries[i].type == TYPE_GROUPED)
+				{
 					continue;
+				}
 				// if type is TMDS, the prior output is ANALOG
 				// we always group ANALOG and TMDS
 				// if there is a TV output after TMDS, we group it to that channel as well
@@ -1578,6 +1609,9 @@ static int patch_nvidia_rom(uint8_t *rom)
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
+						default:
+							break;
+
 					}
 					break;
 				}
@@ -1647,8 +1681,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	{
 		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++)
 		{
-			if ((nvidia_card_exceptions[i].device == device_id) &&
-			    (nvidia_card_exceptions[i].subdev == subsys_id))
+			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))
 			{
 				return nvidia_card_exceptions[i].name;
 			}
@@ -1690,11 +1723,12 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
 	}
 
 	size = file_size(fd);
-    if(size)
-    {
-        *buf = malloc(size);
-        size = read(fd, (char *)buf, size);
-    }
+
+	if (size)
+	{
+		*buf = malloc(size);
+		size = read(fd, (char *)buf, size);
+	}
 	close(fd);
 
 	return size > 0 ? size : 0;
@@ -1721,13 +1755,13 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 		return 0;
 	if (devices_number == 1)
 	{
-	  if (!DP_ADD_TEMP_VAL(device, nvidia_device_type))
-		  return 0;
+		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_parent))
+			return 0;
 	}
 	else
 	{
-	  if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_child))
-		  return 0;
+		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_child))
+			return 0;
 	}
 
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
@@ -1739,37 +1773,10 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 	return 1;
 }
 
-int hex2bin(const char *hex, uint8_t *bin, int len)
-{
-	char	*p;
-	int	i;
-	char	buf[3];
-
-	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
-		printf("[ERROR] bin2hex input error\n");
-		return -1;
-	}
-
-	buf[2] = '\0';
-	p = (char *) hex;
-
-	for (i = 0; i < len; i++)
-	{
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
-			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
-			return -2;
-		}
-		buf[0] = *p++;
-		buf[1] = *p++;
-		bin[i] = (unsigned char) strtoul(buf, NULL, 16);
-	}
-	return 0;
-}
-
 unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
 	unsigned long long vram_size = 0;
-	
+
 	// First check if any value exist in the plist
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
 	if (nvcard) 
@@ -1813,6 +1820,13 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 		case 0x0DF5: // GT 525M 0DF5
 			vram_size = 1024*1024*1024;
 			break;
+		case 0x0F00:	// GT 630
+			// 10DE0F0014583544 2GB VRAM
+			//if (((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) == 0x14583544 )
+			//{
+				vram_size = -2147483648UL;//2147483648;
+			//}
+			break;
 		case 0x11C6:	// GTX650TI 11C6
 			// 10DE11C61043842A 1GB VRAM
 			if (((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) == 0x1043842A )
@@ -1851,30 +1865,30 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 }
 
 static bool checkNvRomSig(uint8_t * aRom){
-    return aRom != NULL && (aRom[0] == 0x55 && aRom[1] == 0xaa);
+	return aRom != NULL && (aRom[0] == 0x55 && aRom[1] == 0xaa);
 }
 
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
-	struct DevPropDevice	*device;
-	char					*devicepath;
-	option_rom_pci_header_t *rom_pci_header;
+	struct DevPropDevice		*device = NULL;
+	char				*devicepath = NULL;
+	option_rom_pci_header_t		*rom_pci_header;
 	volatile uint8_t		*regs;
-	uint8_t					*rom;
-	uint8_t					*nvRom;
-	uint8_t					nvCardType;
-	unsigned long long		videoRam;
-	uint32_t				nvBiosOveride;
-	uint32_t				bar[7];
-	uint32_t				boot_display;
-	int						nvPatch;
-	int						len;
-	char					biosVersion[32];
-	char					nvFilename[32];
-	char					kNVCAP[12];
-	char					*model;
-	const char				*value;
-	bool					doit;
+	uint8_t				*rom = NULL;
+	uint8_t				*nvRom;
+	uint8_t				nvCardType = 0;
+	unsigned long long		videoRam = 0;
+	uint32_t			nvBiosOveride;
+	uint32_t			bar[7];
+	uint32_t			boot_display = 0;
+	int				nvPatch = 0;
+	int				len;
+	char				biosVersion[64];
+	char				nvFilename[64];
+	char				kNVCAP[12];
+	char				*model = NULL;
+	const char			*value;
+	bool				doit;
 
 	fill_card_list();
 
@@ -1890,8 +1904,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// Amount of VRAM in kilobytes
 	videoRam = mem_detect(regs, nvCardType, nvda_dev,((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id) );
 
-	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id,
-			(uint16_t)nvda_dev->device_id);
+	sprintf(nvFilename, "/Extra/%04x_%04x.rom", (uint16_t)nvda_dev->vendor_id, (uint16_t)nvda_dev->device_id);
 
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->chameleonConfig) && doit)
 	{
@@ -1912,41 +1925,40 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	}
 	else
 	{
-        rom = malloc(NVIDIA_ROM_SIZE);
-
+		rom = malloc(NVIDIA_ROM_SIZE);
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
 
-        // PROM first
-        // Enable PROM access
-        (REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
-        nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
+		// PROM first
+		// Enable PROM access
+		(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
+		nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
 
-        // Valid Signature ?
+		// Valid Signature ?
 		if (checkNvRomSig(nvRom))
 		{
-            bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-            DBG("PROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
-        }
-        else
-        {
+			bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
+			DBG("PROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+		}
+		else
+		{
 
-            // disable PROM access
-            (REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED;
+			// disable PROM access
+			(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_ENABLED;
 
-	    //PRAM next
-            nvRom = (uint8_t*)&regs[NV_PRAMIN_OFFSET];
+			//PRAM next
+			nvRom = (uint8_t*)&regs[NV_PRAMIN_OFFSET];
 
-            if(checkNvRomSig(nvRom))
-            {
-                bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-                DBG("PRAM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
-            }
-            else
-    		{
+			if(checkNvRomSig(nvRom))
+			{
+				bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
+				DBG("PRAM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+			}
+			else
+			{
 				// 0xC0000 last
 				bcopy((char *)0xc0000, rom, NVIDIA_ROM_SIZE);
-				
+
 				// Valid Signature ?
 				if (!checkNvRomSig(rom))
 				{
@@ -2102,7 +2114,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	default_NVCAP[12], default_NVCAP[13], default_NVCAP[14], default_NVCAP[15],
 	default_NVCAP[16], default_NVCAP[17], default_NVCAP[18], default_NVCAP[19]);
 #endif
-	
+
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
 	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
@@ -2112,20 +2124,46 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
 	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
 
-	if (getBoolForKey(kVBIOS, &doit, &bootInfo->chameleonConfig) && doit)
+	/******************** Added Marchrius.**********************/
+	//              For the AppleBacklightDisplay              //
+	/***********************************************************/
+	if (getBoolForKey(kEnableBacklight, &doit, &bootInfo->chameleonConfig) && doit)
 	{
-		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
+		uint8_t AAPL_value[] = {0x01, 0x00, 0x00, 0x00}; //Is the same for all
+		devprop_add_value(device, "AAPL,HasPanel", AAPL_value, 4);
+		devprop_add_value(device, "AAPL,Haslid", AAPL_value, 4);
+		devprop_add_value(device, "AAPL,backlight-control", AAPL_value, 4);
+		devprop_add_value(device, "@0,backlight-control", AAPL_value, 4);
 	}
+	/************************** End ****************************/
 
-	//add HDMI Audio back to nvidia
+	/***********************************************************/
+	//                    For the DualLink                     //
+	/***********************************************************/
+	if (getBoolForKey(kEnableDualLink, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		uint8_t AAPL00_value[] = {0x01, 0x00, 0x00, 0x00};
+		devprop_add_value(device, "AAPL00,DualLink", AAPL00_value, 4);
+	}
+	/************************** End ****************************/
+
+	/************************ HDMI Audio ***********************/
 	doit = false;
 	//http://forge.voodooprojects.org/p/chameleon/issues/67/
 	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit)
 	{
 		static uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
+		devprop_add_value(device, "@0,connector-type",connector_type_1, 4);
 		devprop_add_value(device, "@1,connector-type",connector_type_1, 4);
+		devprop_add_value(device, "@2,connector-type",connector_type_1, 4);
+		devprop_add_value(device, "@3,connector-type",connector_type_1, 4);
 	}
-	//end Nvidia HDMI Audio
+	/************************ End Audio *************************/
+
+	if (getBoolForKey(kVBIOS, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));
+	}
 
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);

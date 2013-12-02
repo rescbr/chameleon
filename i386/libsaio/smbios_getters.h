@@ -12,7 +12,8 @@
 
 #define NOT_AVAILABLE			"N/A"
 
-typedef enum {
+typedef enum
+{
 	kSMBString,
 	kSMBByte,
 	kSMBWord,
@@ -20,7 +21,8 @@ typedef enum {
 //	kSMBQWord
 } SMBValueType;
 
-typedef union {
+typedef union
+{
 	const char	*string;
 	uint8_t		byte;
 	uint16_t	word;
@@ -33,6 +35,7 @@ extern bool getProcessorInformationMaximumClock(returnType *value);
 extern bool getSMBOemProcessorBusSpeed(returnType *value);
 extern bool getSMBOemProcessorType(returnType *value);
 extern bool getSMBMemoryDeviceMemoryType(returnType *value);
+extern bool getSMBMemoryDeviceMemoryErrorHandle(returnType *value);
 extern bool getSMBMemoryDeviceMemorySpeed(returnType *value);
 extern bool getSMBMemoryDeviceManufacturer(returnType *value);
 extern bool getSMBMemoryDeviceSerialNumber(returnType *value);

@@ -31,7 +31,8 @@ uint32_t stringlength = 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
-	if(string) {
+	if(string)
+	{
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
@@ -55,17 +56,20 @@ void setupDeviceProperties(Node *node)
   /* Use the static "device-properties" boot config key contents if available,
    * otheriwse use the generated one.
    */  
-  if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->chameleonConfig) && string)
-  {
-    val = (const char*)string;
-    cnt = strlength * 2;
-  } 
-    
-  if (cnt > 1)
-  {
-    binStr = convertHexStr2Binary(val, &cnt2);
-    if (cnt2 > 0) DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
-  }
+	if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->chameleonConfig) && string)
+	{
+		val = (const char*)string;
+		cnt = strlength * 2;
+	}
+
+	if (cnt > 1)
+	{
+		binStr = convertHexStr2Binary(val, &cnt2);
+		if (cnt2 > 0)
+		{
+			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
+		}
+	}
 }
 
 struct DevPropString *devprop_create_string(void)
@@ -113,14 +117,14 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				sprintf(buff, "%c%c", path[curr], path[curr+1]);
 			else if(x-curr == 1)
 				sprintf(buff, "%c", path[curr]);
-			else 
+			else
 			{
 				printf("ERROR parsing device path\n");
 				numpaths = 0;
 				break;
 			}
 			device->pci_dev_path[numpaths].device =	ascii_hex_to_int(buff);
-			
+
 			x += 3; // 0x
 			curr = x;
 			while(path[++x] != ')');
@@ -135,7 +139,7 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 				break;
 			}
 			device->pci_dev_path[numpaths].function = ascii_hex_to_int(buff); // TODO: find dev from char *path
-			
+
 			numpaths++;
 		}
 	}
@@ -190,8 +194,10 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	uint8_t *data = (uint8_t*)malloc(length);
 	{
 		if(!data)
+		{
 			return 0;
-		
+		}
+
 		memset(data, 0, length);
 		uint32_t off= 0;
 		data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
@@ -203,7 +209,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		{
 			data[off] = *nm++;
 		}
-		
+
 		off += 2;
 		l = len;
 		uint32_t *datalength = (uint32_t*)&data[off];
@@ -219,25 +225,35 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	
 	uint8_t *newdata = (uint8_t*)malloc((length + offset));
 	if(!newdata)
+	{
 		return 0;
+	}
 	if(device->data)
+	{
 		if(offset > 1)
+		{
 			memcpy(newdata, device->data, offset);
+		}
+	}
 
 	memcpy(newdata + offset, data, length);
 	
 	device->length += length;
 	device->string->length += length;
 	device->numentries++;
-	
+
 	if(!device->data)
+	{
 		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+	}
 	else
+	{
 		free(device->data);
-	
+	}
+
 	free(data);
 	device->data = newdata;
-	
+
 	return 1;
 }
 
@@ -245,15 +261,17 @@ char *devprop_generate_string(struct DevPropString *string)
 {
 	char *buffer = (char*)malloc(string->length * 2);
 	char *ptr = buffer;
-	
+
 	if(!buffer)
+	{
 		return NULL;
+	}
 
 	sprintf(buffer, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
 			dp_swap16(string->numentries), string->WHAT3);
 	buffer += 24;
 	int i = 0, x = 0;
-	
+
 	while(i < string->numentries)
 	{
 		sprintf(buffer, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
@@ -295,9 +313,12 @@ char *devprop_generate_string(struct DevPropString *string)
 
 void devprop_free_string(struct DevPropString *string)
 {
+
 	if(!string)
+	{
 		return;
-	
+	}
+
 	int i;
 	for(i = 0; i < string->numentries; i++)
 	{
@@ -312,10 +333,48 @@ void devprop_free_string(struct DevPropString *string)
 			string->entries[i] = NULL;
 		}
 	}
-	
+
 	free(string);
 	string = NULL;
 }
+
+/* ======================================================= */
+
+
+/*******************************************************************
+ * Decodes a sequence of 'len' hexadecimal chars from 'hex' into   *
+ * a binary. returns -1 in case of error (i.e. badly formed chars) *
+ *******************************************************************/
+int hex2bin(const char *hex, uint8_t *bin, int len)
+{
+	char	*p;
+	int	i;
+	char	buf[3];
+
+	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2)
+	{
+		printf("[ERROR] bin2hex input error\n");
+		return -1;
+	}
+
+	buf[2] = '\0';
+	p = (char *) hex;
+
+	for (i = 0; i < len; i++)
+	{
+		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
+		{
+			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
+			return -2;
+		}
+		buf[0] = *p++;
+		buf[1] = *p++;
+		bin[i] = (unsigned char) strtoul(buf, NULL, 16);
+	}
+	return 0;
+}
+
+/* ======================================================= */
 
 /* a fine place for this code */
 
