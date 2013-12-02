@@ -1,7 +1,7 @@
 ; Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
 ;
 ; @APPLE_LICENSE_HEADER_START@
-; 
+;
 ; Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
 ; Reserved.  This file contains Original Code and/or Modifications of
 ; Original Code as defined in and that are subject to the Apple Public
@@ -9,7 +9,7 @@
 ; except in compliance with the License.  Please obtain a copy of the
 ; License at http://www.apple.com/publicsource and read it before using
 ; this file.
-; 
+;
 ; The Original Code and all software distributed under the License are
 ; distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 ; EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -17,7 +17,7 @@
 ; FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
 ; License for the specific language governing rights and limitations
 ; under the License.
-; 
+;
 ; @APPLE_LICENSE_HEADER_END@
 ;
 ; Partition Boot Loader: boot1h
@@ -25,7 +25,7 @@
 ; This program is designed to reside in sector 0+1 of an HFS+ partition.
 ; It expects that the MBR has left the drive number in DL
 ; and a pointer to the partition entry in SI.
-; 
+;
 ; This version requires a BIOS with EBIOS (LBA) support.
 ;
 ; This code is written for the NASM assembler.
@@ -70,6 +70,7 @@ kSectorBytes		EQU		512									; sector size in bytes
 kChameleonBoot1hSignature		EQU		0xBB99								; boot sector signature
 kBootSignature		EQU		0xAA55								; boot sector signature
 
+kBoot1Segment		EQU  0x0000
 kBoot1StackAddress	EQU		0xFFF0								; boot1 stack pointer
 kBoot1LoadAddr		EQU		0x7C00								; boot1 load address
 kBoot1RelocAddr		EQU		0xE000								; boot1 relocated address
@@ -87,7 +88,7 @@ kBoot2Address		EQU		kSectorBytes						; boot2 load address
 ; giving the size of the structure.
 ;
 			struc part
-;.bootid		resb 1		; bootable or not 
+;.bootid		resb 1		; bootable or not
 ;.head		resb 1		; starting head, sector, cylinder
 ;.sect		resb 1		;
 ;.cyl		resb 1		;
@@ -266,7 +267,7 @@ kForkTypeResource	EQU		0xFF
 .fileMode			resw	1
 .special			resd	1
 					endstruc
-					
+
 ;
 ; FileInfo
 ;
@@ -336,7 +337,7 @@ kForkTypeResource	EQU		0xFF
 	mov		si, %1
 	call	print_string
 %endmacro
-        
+
 %macro LogStringMacro 1
 	mov		di, %1
 	call	log_string
@@ -361,7 +362,7 @@ kForkTypeResource	EQU		0xFF
 %else
   %define LogString(x)
 %endif
-	
+
 ;--------------------------------------------------------------------------
 ; Start of text segment.
 
@@ -384,62 +385,63 @@ start:
     mov     sp, kBoot1StackAddress  ; sp <- top of stack
     sti                             ; reenable interrupts
 
-    mov     ds, ax                  ; ds <- 0
     mov     es, ax                  ; es <- 0
+    mov     ds, ax                  ; ds <- 0
 
 	push ecx ; save the current partition LBA offset. will be poped after reloc
 
     ;
     ; Relocate boot1 code.
     ;
-    push	si
     mov		si, kBoot1LoadAddr		; si <- source
     mov		di, kBoot1RelocAddr		; di <- destination
     cld								; auto-increment SI and/or DI registers
-    mov		cx, kSectorBytes		; copy 256 words
+    mov		cx, kSectorBytes*2		; copy 2 sectors (boot1 is 2 sectors)
     rep		movsb					; repeat string move (word) operation
-    pop		si
     ;
     ; Code relocated, jump to startReloc in relocated location.
     ;
 	; FIXME: Is there any way to instruct NASM to compile a near jump
 	; using absolute address instead of relative displacement?
 	;
-	jmpabs	startReloc
+
+	;jmpabs	startReloc
+	jmp     kBoot1Segment:start_reloc
 
 ;--------------------------------------------------------------------------
 ; Start execution from the relocated location.
 ;
-startReloc:
-	PrintChar ('>')
-
+start_reloc:
+  PrintChar ('1')
+  PrintChar ('>')
     ;
     ; Initializing global variables.
     ;
-	pop ecx    
-    ;PrintHex(ecx)
+	pop ecx
+  ;PrintHex(ecx)
     mov     DWORD [gPartLBA], ecx			; save the current partition LBA offset
     mov     [gBIOSDriveNumber], dl			; save BIOS drive number
     mov     [gBIOSDrivePartNumber], dh			; save BIOS drive number
 	mov		WORD [gMallocPtr], mallocStart	; set free space pointer
 
-	PrintHex([gPartLBA])
-	xor eax,eax
-	mov al,[gBIOSDriveNumber]
-	PrintHexEax
-	xor eax,eax
-	mov al,[gBIOSDrivePartNumber]
-	PrintHexEax
+;  PrintHex([gPartLBA])
+;  xor eax,eax
+;  mov al,[gBIOSDriveNumber]
+;  PrintHexEax
+;  xor eax,eax
+;  mov al,[gBIOSDrivePartNumber]
+;  PrintHexEax
 
     ;
     ; Loading upper 512 bytes of boot1h and HFS+ Volume Header.
     ;
-	xor		ecx, ecx						; sector 1 of current partition
-	inc		ecx
-    mov     al, 2							; read 2 sectors: sector 1 of boot1h + HFS+ Volume Header
-    mov     edx, kBoot1Sector1Addr
+	;xor		ecx, ecx						; sector 1 of current partition
+	;inc		ecx
+	mov ecx, 2
+    mov     al, 1							; read 2 sectors: sector 1 of boot1h + HFS+ Volume Header
+    mov     edx, kHFSPlusBuffer
     call    readLBA
-;	PrintChar ('2')
+;  PrintChar ('2')
 
     ;
     ; Initializing more global variables.
@@ -449,7 +451,7 @@ startReloc:
 	shr		eax, 9							; convert to sector unit
 	mov		[gBlockSize], eax				; save blockSize as little-endian sector unit!
 
-;	PrintChar ('3')
+;  PrintChar ('3')
 
 	;
 	; Looking for HFSPlus ('H+') or HFSPlus case-sensitive ('HX') signature.
@@ -464,7 +466,7 @@ startReloc:
 ; Find stage2 boot file in a HFS+ Volume's root folder.
 ;
 findRootBoot:
-	PrintChar ('!')
+  PrintChar ('!')
 ;%if 0
 	mov		al, kHFSCatalogFileID
 	lea		si, [searchCatalogKey]
@@ -502,15 +504,15 @@ findRootBoot:
 	LogString(root_str)
 
 boot2:
-	PrintChar ('J')
+  PrintChar ('J')
 
     mov     dl, [gBIOSDriveNumber]			; load BIOS drive number
     mov     dh, [gBIOSDrivePartNumber]			; load part number
     jmp     kBoot2Segment:kBoot2Address
-;%endif	
+;%endif
 
 error:
-	PrintChar ('E')
+  PrintChar ('E')
     LogString(error_str)
 
 hang:
@@ -523,7 +525,7 @@ hang:
 ; Arguments:
 ;   AX = number of 512-byte sectors to read (valid from 1-1280).
 ;   EDX = pointer to where the sectors should be stored.
-;   ECX = sector offset in partition 
+;   ECX = sector offset in partition
 ;
 ; Returns:
 ;   CF = 0  success
@@ -559,7 +561,7 @@ readSectors:
 ; Arguments:
 ;   AL = number of 512-byte sectors to read (valid from 1-127).
 ;   EDX = pointer to where the sectors should be stored.
-;   ECX = sector offset in partition 
+;   ECX = sector offset in partition
 ;   [bios_drive_number] = drive number (0x80 + unit number)
 ;
 ; Returns:
@@ -669,7 +671,7 @@ log_string:
     call	print_string
 
     popad
-    
+
     ret
 
 ;-------------------------------------------------------------------------
@@ -748,7 +750,7 @@ print_hex:
 
     popad
     ret
-	
+
 print_nibble:
     and     al, 0x0f
     add     al, '0'
@@ -760,16 +762,6 @@ print_nibble:
     ret
 
 %endif ; UNUSED
-
-;--------------------------------------------------------------------------
-; getc - wait for a key press
-;
-getc:
-    pushad
-    mov     ah, 0
-    int		0x16
-    popad
-    ret
 
 ;--------------------------------------------------------------------------
 ; Write a ASCII character to the console.
@@ -809,7 +801,7 @@ ConvertStrToUni:
     inc		cl								; increment string length count
     cmp		al, NULL						; check for string terminator
     jne		.loop
-    
+
     pop		di								; restore unicode string length pointer
     dec		cl								; ignoring terminator from length count
     mov		[di], cl						; save string length
@@ -878,15 +870,15 @@ ConvertHFSUniStr255ToLE:
 ;
 compareHFSPlusExtentKeys:
 	pushad
-	
+
 	mov		dl, 0							; DL = result of comparison, DH = bestGuess
 	mov		eax, [si + HFSPlusExtentKey.fileID]
 	cmp		eax, [di + HFSPlusExtentKey.fileID]
 	jne		.checkFlags
-	
+
 	cmp		BYTE [si + HFSPlusExtentKey.forkType], kForkTypeData
 	jne		.checkFlags
-	
+
 	mov		eax, [si + HFSPlusExtentKey.startBlock]
 	cmp		eax, [di + HFSPlusExtentKey.startBlock]
 	je		compareHFSPlusCatalogKeys.exit
@@ -949,16 +941,24 @@ compareHFSPlusCatalogKeys:
 .trialKeyGreater:
     dec		dl
     jmp		.exit
-    
+
 .searchKeyGreater:
     inc		dl
-	
+
 .exit:
 	mov		[bp + BTree.searchResult], dl
     cmp		dl, 0							; set flags to check relation between keys
 
 	popad
 	ret
+
+;--------------------------------------------------------------------------
+; Static data.
+;
+
+%if VERBOSE
+root_str			db		'/boot', NULL
+%endif
 
 ;--------------------------------------------------------------------------
 ; Allocate memory
@@ -1008,14 +1008,6 @@ free:
 %endif ; UNUSED
 
 ;--------------------------------------------------------------------------
-; Static data.
-;
-
-%if VERBOSE
-root_str			db		'/boot', NULL
-%endif
-
-;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized sector with zeroes. The last
 ; two bytes is the mandatory boot sector signature.
 ;
@@ -1029,11 +1021,21 @@ root_str			db		'/boot', NULL
 pad_table_and_sig:
 	times			508-($-$$) db 0
 	dw              kChameleonBoot1hSignature
-	dw				kBootSignature // remove this ! Don't forgot boot0.s, line 419 : -4 become -2
+	dw				kBootSignature ; remove this ! Don't forgot boot0.s, line 419 : -4 become -2
 
 ;
 ; Sector 1 code area
 ;
+
+;--------------------------------------------------------------------------
+; getc - wait for a key press
+;
+getc:
+    pushad
+    mov     ah, 0
+    int		0x16
+    popad
+    ret
 
 ;--------------------------------------------------------------------------
 ; lookUpBTree - initializes a new BTree instance and
@@ -1094,11 +1096,11 @@ lookUpBTree:
 	mov		bx, [bp + BTree.nodeBuffer + BTNodeDescriptor.numRecords]
 	xchg	bh, bl
 	dec		bx
-	
+
 .bsearch:
 	cmp		ax, bx
 	ja		.checkResult							; jump if lowerBound > upperBound
-	
+
 	mov		cx, ax
 	add		cx, bx
 	shr		cx, 1									; test index = (lowerBound + upperBound / 2)
@@ -1109,22 +1111,22 @@ lookUpBTree:
 	pushad
 	jl		.csearchLessThanTrial
 	jg		.csearchGreaterThanTrial
-	PrintChar('=')
+  PrintChar('=')
 	jmp		.csearchCont
 .csearchGreaterThanTrial:
-	PrintChar('>')
+  PrintChar('>')
 	jmp		.csearchCont
 .csearchLessThanTrial:
-	PrintChar('<')
+  PrintChar('<')
 .csearchCont:
 	popad
 %endif ; UNUSED
-	
+
 .adjustBounds:
 	je		.checkResult
 	jl		.searchLessThanTrial
 	jg		.searchGreaterThanTrial
-	jmp		.bsearch	
+	jmp		.bsearch
 
 .searchLessThanTrial:
 	mov		bx, cx
@@ -1135,7 +1137,7 @@ lookUpBTree:
 	mov		ax, cx
 	inc		ax										; lowerBound = index + 1
 	jmp		.bsearch
-	
+
 .checkResult:
 	cmp		BYTE [bp + BTree.searchResult], 0
 	jge		.foundKey
@@ -1151,7 +1153,7 @@ lookUpBTree:
 	mov		bx, [bx]
 	mov		edx, [bx]
 	jmp		.readNode
-	
+
 .exit:
 	cmp		BYTE [bp + BTree.searchResult], 0
 	ret
@@ -1219,15 +1221,13 @@ getBTreeRecord:
 .exit:
 	pop		di									; restore address of trialKey
 
-%if UNUSED	
+%if UNUSED
 ;
 ; Print catalog trial key
 ;
 	pushad
 	mov		si, di
 	lodsd
-	PrintChar('k')
-	PrintHexEax()
 	lodsw
 	cmp		ax, 0
 	je		.printExit
@@ -1235,28 +1235,24 @@ getBTreeRecord:
 .printLoop:
 	lodsw
 	call	print_char
-	loop	.printLoop  
+	loop	.printLoop
 .printExit:
 	popad
 ;
 ;
 ;
 %endif ; UNUSED
-	
-%if UNUSED	
+
+%if UNUSED
 ;
 ; Print extent trial key
 ;
 	pushad
-	PrintChar('k')
 	mov		si, di
 	xor		eax, eax
 	lodsw
-	PrintHexEax()
 	lodsd
-	PrintHexEax()
 	lodsd
-	PrintHexEax()
 	popad
 ;
 ;
@@ -1266,7 +1262,7 @@ getBTreeRecord:
 	pop		si									; restore SI
 	call	bx									; call key compare proc
 	popad
-	ret 
+	ret
 
 ;--------------------------------------------------------------------------
 ; readExtent - read extents from a HFS+ file (multiple extent support)
@@ -1336,7 +1332,7 @@ readExtent:
 
 	pop		ebx
 	jmp		.beginExtentBlock
-	
+
 .continue:
 	mov		edx, [di + HFSPlusExtentDescriptor.blockCount]
 	call	blockToSector								; ECX = converted current extent's blockCount to sectors
@@ -1364,20 +1360,20 @@ readExtent:
 	mov		edx, [di + HFSPlusExtentDescriptor.startBlock]
 	call	blockToSector								; ECX = converted to sectors
 	add		ecx, eax									; file offset converted to sectors
-	
+
 	push	si
 	mov		ax, si
 	mov		edx, [bp + BTree.readBufferPtr]
 	call	readSectors
 	pop		si
-	
+
 	add		ebx, esi
 	mov		ax, si
 	cwde
 	shl		ax, 9										; convert SI (read sector count) to byte unit
 	add		[bp + BTree.readBufferPtr], eax
 	sub		[bp + BTree.readSize], esi
-	
+
 	jz		.exit
 
 .nextExtent:
