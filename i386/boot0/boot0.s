@@ -1,7 +1,7 @@
 ; Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
 ;
 ; @APPLE_LICENSE_HEADER_START@
-; 
+;
 ; Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
 ; Reserved.  This file contains Original Code and/or Modifications of
 ; Original Code as defined in and that are subject to the Apple Public
@@ -9,7 +9,7 @@
 ; except in compliance with the License.  Please obtain a copy of the
 ; License at http://www.apple.com/publicsource and read it before using
 ; this file.
-; 
+;
 ; The Original Code and all software distributed under the License are
 ; distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 ; EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -17,7 +17,7 @@
 ; FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
 ; License for the specific language governing rights and limitations
 ; under the License.
-; 
+;
 ; @APPLE_LICENSE_HEADER_END@
 ;
 ; Boot Loader: boot0
@@ -26,7 +26,7 @@
 ; responsibility is to locate the active partition, load the
 ; partition booter into memory, and jump to the booter's entry point.
 ; It leaves the boot drive in DL and a pointer to the partition entry in SI.
-; 
+;
 ; This boot loader must be placed in the Master Boot Record.
 ;
 ; In order to coexist with a fdisk partition table (64 bytes), and
@@ -80,7 +80,7 @@ kBootSignature		EQU  0xAA55			; boot sector signature
 kHFSPSignature		EQU  'H+'			; HFS+ volume signature
 kHFSPCaseSignature	EQU  'HX'			; HFS+ volume case-sensitive signature
 kFAT32BootCodeOffset EQU  0x5a			; offset of boot code in FAT32 boot sector
-kBoot1FAT32Magic	EQU  'BO'			; Magic string to detect our boot1f32 code 
+kBoot1FAT32Magic	EQU  'BO'			; Magic string to detect our boot1f32 code
 
 
 kGPTSignatureLow	EQU  'EFI '			; GUID Partition Table Header Signature
@@ -93,7 +93,7 @@ kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR 
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
 										; with existing tools that do not understand GPT partition structures.
-							  			; The Protective MBR has the same format as a legacy MBR 
+							  			; The Protective MBR has the same format as a legacy MBR
 					  					; and contains one partition entry with an OSType set to 0xEE
 										; reserving the entire space used on the disk by the GPT partitions,
 										; including all headers.
@@ -101,7 +101,7 @@ kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR 
 kPartActive	        EQU  0x80			; active flag enabled
 kPartInactive	    EQU  0x00			; active flag disabled
 kHFSGUID	        EQU  0x48465300		; first 4 bytes of Apple HFS Partition Type GUID.
-kAppleGUID			EQU  0xACEC4365		; last 4 bytes of Apple type GUIDs. 
+kAppleGUID			EQU  0xACEC4365		; last 4 bytes of Apple type GUIDs.
 kEFISystemGUID		EQU  0x3BC93EC9		; last 4 bytes of EFI System Partition Type GUID:
 										; C12A7328-F81F-11D2-BA4B-00A0C93EC93B
 
@@ -118,7 +118,7 @@ kDriveNumber		EQU  0x80
 ; giving the size of the structure.
 ;
            struc part
-.bootid    resb 1      ; bootable or not 
+.bootid    resb 1      ; bootable or not
 .head      resb 1      ; starting head, sector, cylinder
 .sect      resb 1      ;
 .cyl       resb 1      ;
@@ -134,7 +134,7 @@ kDriveNumber		EQU  0x80
 ; Format of GPT Partition Table Header
 ;
 							struc	gpth
-.Signature 					resb	8 
+.Signature 					resb	8
 .Revision  					resb	4
 .HeaderSize					resb	4
 .HeaderCRC32				resb	4
@@ -150,7 +150,7 @@ kDriveNumber		EQU  0x80
 .PartitionEntryArrayCRC32	resb	4
 							endstruc
 
-;				
+;
 ; Format of GUID Partition Entry Array
 ;
 						  	struc	gpta
@@ -213,7 +213,7 @@ kDriveNumber		EQU  0x80
     SEGMENT .text
 
     ORG     kBoot0RelocAddr
-    
+
 ;--------------------------------------------------------------------------
 ; Boot code is loaded at 0:7C00h.
 ;
@@ -237,8 +237,8 @@ start:
     mov     si, kBoot0LoadAddr      ; si <- source
     mov     di, kBoot0RelocAddr     ; di <- destination
     cld                             ; auto-increment SI and/or DI registers
-    mov     cx, kSectorBytes/2      ; copy 256 words
-    repnz   movsw                   ; repeat string move (word) operation
+    mov     cx, kSectorBytes      ; copy 512 bytes
+    repnz   movsb                   ; repeat string move (word) operation
 
     ;
     ; Code relocated, jump to start_reloc in relocated location.
@@ -250,13 +250,12 @@ start:
 ;
 start_reloc:
 
-    PrintChar('8')
-    PrintChar('>')
-
     ;
     ; Since this code may not always reside in the MBR, always start by
     ; loading the MBR to kMBRBuffer and LBA1 to kGPTBuffer.
     ;
+  PrintChar('0')
+  PrintChar('>')
 
     xor     eax, eax
     mov     [my_lba], eax			; store LBA sector 0 for read_lba function
@@ -276,7 +275,7 @@ error:
 ;    LogString(boot_error_str)
 
 hang:
-    hlt
+	call getc
     jmp     hang
 
 
@@ -311,7 +310,7 @@ checkGPT:
     mov     [my_lba], eax								; save starting LBA for read_lba function
     mov     cx, [si + gpth.NumberOfPartitionEntries]	; number of GUID Partition Array entries
     mov     bx, [si + gpth.SizeOfPartitionEntry]		; size of GUID Partition Array entry
-    
+
     push    bx											; push size of GUID Partition entry
 
     ;
@@ -348,14 +347,14 @@ checkGPT:
 %if VERBOSE
     LogString(gpt_str)
 %endif
-	
-	PrintChar('P')
+
+  PrintChar('P')
 	mov dh, 1 ; partition number to give to boot1h
-		
+
 .gpt_loop:
 ;PrintChar('1')
     mov     eax, [si + gpta.PartitionTypeGUID + kGUIDLastDwordOffs]
-	
+
 	cmp		eax, kAppleGUID			; check current GUID Partition for Apple's GUID type
 	je		.gpt_ok
 
@@ -373,20 +372,20 @@ checkGPT:
     ;
 
     mov	    eax, [si + gpta.StartingLBA]			; load boot sector from StartingLBA
-    mov	    [my_lba], eax		
+    mov	    [my_lba], eax
     call    loadBootSector
     jne	    .gpt_continue							; no boot loader signature
 %if VERBOSE
     ;LogString(test_str)
 %endif
-PrintChar('!')
+  PrintChar('!')
 	mov     ecx, [si + gpta.StartingLBA]
-    jmp	    SHORT initBootLoader    
-    
+    jmp	    SHORT initBootLoader
+
 .gpt_continue:
     add	    si, bx									; advance SI to next partition entry
     inc     dh
-    loop    .gpt_loop								; loop through all partition entries	
+    loop    .gpt_loop								; loop through all partition entries
 
 .exit:
     pop     bx
@@ -406,7 +405,7 @@ PrintChar('!')
 ;
 loadBootSector:
     pusha
-    
+
     mov     al, 3
     mov     bx, kBoot0LoadAddr
     call    load
@@ -451,20 +450,8 @@ load:
     ret
 
 
-initBootLoader:    
-  	LogString(done_str)
-
+initBootLoader:
   PrintChar('J')
-
-;	mov eax,kBoot0LoadAddr
-;	call print_hex
-;	mov eax,[kBoot0LoadAddr]
-;	call print_hex
-;push si
-;pop eax
-;PrintHexEax
-;PrintHex(edx)
-
     jmp     kBoot0LoadAddr
 
 ;--------------------------------------------------------------------------
@@ -502,12 +489,6 @@ read_lba:
     ; It pushes 2 bytes with a smaller opcode than if WORD was used
     push    BYTE 16                 ; offset 0-1, packet size
 
-    PrintChar('<')
-%if DEBUG
-    mov  eax, ecx
-    call print_hex
-%endif
-        
     ;
     ; INT13 Func 42 - Extended Read Sectors
     ;
@@ -546,7 +527,7 @@ read_lba:
     popad
     ret
 
-    
+
 ;--------------------------------------------------------------------------
 ; Write a string with 'boot0: ' prefix to the console.
 ;
@@ -558,7 +539,7 @@ read_lba:
 ;
 ;log_string:
 ;    pusha
-;        
+;
 ;    push	di
 ;    mov		si, log_title_str
 ;    call	print_string
@@ -567,10 +548,10 @@ read_lba:
 ;    call	print_string
 ;
 ;    popa
-;    
+;
 ;    ret
 
-    
+
 ;--------------------------------------------------------------------------
 ; Write a string to the console.
 ;
@@ -637,7 +618,7 @@ print_hex:
 
     popad
     ret
-	
+
 print_nibble:
     and     al, 0x0f
     add     al, '0'
@@ -647,6 +628,8 @@ print_nibble:
 .print_ascii:
     call    print_char
     ret
+%endif ;DEBUG
+
 
 getc:
     pusha
@@ -654,20 +637,6 @@ getc:
     int    0x16
     popa
     ret
-%endif ;DEBUG
-	
-
-;--------------------------------------------------------------------------
-; NULL terminated strings.
-;
-;log_title_str		db  10, 13, 'boot0: ', 0
-;boot_error_str   	db  'err', 0
-
-%if VERBOSE
-gpt_str			db  'GPT', 0
-;test_str		db  'test', 0
-done_str		db  'done', 0
-%endif
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last
@@ -677,7 +646,7 @@ done_str		db  'done', 0
 ; that the 'times' argument is negative.
 
 ;
-; According to EFI specification, maximum boot code size is 440 bytes 
+; According to EFI specification, maximum boot code size is 440 bytes
 ;
 
 ;
@@ -692,8 +661,8 @@ pad_table_and_sig:
     times 508-($-$$) db 0
     dw    kChameleonBoot1hSignature
     dw    kBootSignature
-	
-	
+
+
 	ABSOLUTE 0xE400
 
 ;
