@@ -45,33 +45,34 @@ OMIT_FRAME_POINTER_CFLAG=
 $(OBJROOT)/%.o32: %.c
 	@echo "\t[CC32] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $@ 
+	$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $@ 
 
 $(OBJROOT)/%.o64: %.c
 	@echo "\t[CC64] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $@ 
+	$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $@ 
 
 
 $(OBJROOT)/%.o: %.c
 	@echo "\t[CC] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
+	pwd
+	$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
 
 $(OBJROOT)/%.o: %.m
 	@echo "\t[M] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
+	$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
 
 $(OBJROOT)/%.o: %.cpp
 	@echo "\t[CPP] $<"
 	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -MM -M -o $@.Makedep
-	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ 
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ 
 
 $(OBJROOT)/%.o: %.s
 	@echo "\t[AS] $<"
 	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -MM -M -o $@.Makedep
-	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -o $@
+	$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -o $@
 
 CONFIG_FILES=$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config
 $(CONFIG_FILES): $(SRCROOT)/.config
