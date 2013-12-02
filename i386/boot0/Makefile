@@ -17,9 +17,12 @@ OBJS := $(addprefix $(SYMROOT)/, $(OBJS))
 
 all: $(DIRS_NEEDED) $(OBJS)
 
+#To rebuild boot0 if boot0.s is touched
+$(SYMROOT)/boot0: boot0.s
+	
 $(OBJS): $(SRCROOT)/autoconf.inc
 	@echo "\t[NASM] $(@F)"
-	@$(NASM) $(@F).s -o $@
+	$(NASM) $(@F).s -o $@
 
 clean-local:
 	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "\t[RM] $${o}"; fi; done
