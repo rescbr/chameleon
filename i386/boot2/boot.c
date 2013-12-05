@@ -464,7 +464,7 @@ void common_boot(int biosdev)
 			 gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
 	getchar();
 #endif
-	
+
 	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->chameleonConfig);

@@ -629,6 +629,18 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	SMBWord structSize;
 	int i;
 
+    /* http://forge.voodooprojects.org/p/chameleon/issues/361/ */
+	bool forceFullMemInfo = false;
+
+	if (structPtr->orig->type == kSMBTypeMemoryDevice)
+	{
+		getBoolForKey(kMemFullInfo, &forceFullMemInfo, &bootInfo->chameleonConfig);
+		if (forceFullMemInfo)
+		{
+			structPtr->orig->length = 27;
+		}
+	}
+
 	stringIndex = 1;
 	stringsSize = 0;
 

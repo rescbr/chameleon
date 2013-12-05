@@ -154,6 +154,9 @@
 #define kHDEFLayoutID		"HDEFLayoutID"		/* hda.c */
 #define kHDAULayoutID		"HDAULayoutID"		/* hda.c */
 
+/* Karas: added these keys */
+#define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
+
 /*
  * Flags to the booter or kernel
  */

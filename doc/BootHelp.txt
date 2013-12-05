@@ -135,7 +135,9 @@ Options useful in the org.chameleon.Boot.plist file:
   EnableC3State=Yes       Enable specific Processor power state, C3.
   EnableC4State=Yes       Enable specific Processor power state, C4.
 
-  SMBIOS=<file>             Use an alternate SMBIOS.plist file 
+  ForceFullMemInfo=Yes    Force SMBIOS Table 17 to be 27 bytes long (disabled by default).
+
+  SMBIOS=<file>             Use an alternate SMBIOS.plist file
                               (default path: /smbios.plist /Extra/smbios.plist
                                bt(0,0)/Extra/smbios.plist).
 
