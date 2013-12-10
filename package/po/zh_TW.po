@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-08-28 15:43+0200\n"
-"PO-Revision-Date: 2013-07-22 03:05-0000\n"
-"Last-Translator: crazybirdy <crazybirdy@ms96.url.com.tw>\n"
+"PO-Revision-Date: 2013-12-10 07:23+0000\n"
+"Last-Translator: crazybirdy <>\n"
 "Language-Team: zh_TW <zh_TW@li.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1368580081.0\n"
+"X-POOTLE-MTIME: 1386660204.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -36,7 +37,7 @@ msgstr "請勿安裝到 Apple 的 Macintosh 電腦"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:27
 msgid "Developers :"
-msgstr "開發者 :"
+msgstr "開發人員 :"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:28
@@ -46,7 +47,7 @@ msgstr "%DEVELOP%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:30
 msgid "Thanks to :"
-msgstr "感謝 :"
+msgstr "感謝協助 :"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:31
@@ -56,7 +57,7 @@ msgstr "%CREDITS%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:33
 msgid "Package :"
-msgstr "封裝者 :"
+msgstr "封裝人員 :"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:34
@@ -312,7 +313,7 @@ msgstr ""
 "模組安裝位置 /Extra/modules/klibc.dylib\n"
 "此模組在 Chameleon 的 library 不敷使用時，可提供一個標準的 c library 給其他模組鏈結使用 。\n"
 "目前僅有 uClibc++ library 鏈結使用。\n"
-"源代碼: http://www.kernel.org/pub/linux/libs/klibc/ "
+"源代碼: http://www.kernel.org/pub/linux/libs/klibc/"
 
 #. type: "ACPICodec_title"
 #: Resources/templates/Localizable.strings:43
@@ -326,7 +327,10 @@ msgstr "ACPICodec"
 msgid ""
 "This module provides a substitute for the internal acpi patcher.\n"
 "Dependencies: none"
-msgstr "模組安裝位置 /Extra/modules/ACPICodec.dylibACPICodec 提供了內部 APCI 修正的可替換模組。"
+msgstr ""
+"模組安裝位置 /Extra/modules/ACPICodec.dylib\n"
+"ACPICodec 提供了內部 APCI 修正的可替換模組。\n"
+"依存: 無"
 
 #. type: "HDAEnabler_title"
 #: Resources/templates/Localizable.strings:47
@@ -478,6 +482,8 @@ msgid ""
 "The GraphicsEnabler nVidia code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"NVIDIAGraphicsEnabler 移植了 nVidia code 模組:\n"
+"依存: 無"
 
 #. type: "AMDGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:87
@@ -492,6 +498,8 @@ msgid ""
 "The GraphicsEnabler AMD/ATi code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"AMDGraphicsEnabler 移植了 AMD/ATi code 模組:\n"
+"依存: 無"
 
 #. type: "IntelGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:91
@@ -506,6 +514,8 @@ msgid ""
 "The GraphicsEnabler gma(Intel) code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"IntelGraphicsEnabler 移植了 gma(Intel) code 模組:\n"
+"依存: 無"
 
 #. type: "Options_title"
 #: Resources/templates/Localizable.strings:100
@@ -767,10 +777,10 @@ msgstr "DropHPET=Yes"
 
 #. type: "DropHPET_description"
 #: Resources/templates/Localizable.strings:168
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Discard the motherboard's built-in SSDT tables."
 msgid "Discard the motherboard's built-in HPET table."
-msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 SSDT 表，可讀取 Extra 資料夾中的 SSDT 資料。/Extra/SSDT.aml。"
+msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 HPET 表。"
 
 #. type: "DropSBST_title"
 #: Resources/templates/Localizable.strings:170
@@ -780,10 +790,10 @@ msgstr "DropSBST=Yes"
 
 #. type: "DropSBST_description"
 #: Resources/templates/Localizable.strings:171
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Discard the motherboard's built-in SSDT tables."
 msgid "Discard the motherboard's built-in SBST table."
-msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 SSDT 表，可讀取 Extra 資料夾中的 SSDT 資料。/Extra/SSDT.aml。"
+msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 SBST 表。"
 
 #. type: "DropECDT_title"
 #: Resources/templates/Localizable.strings:173
@@ -793,10 +803,10 @@ msgstr "DropECDT=Yes"
 
 #. type: "DropECDT_description"
 #: Resources/templates/Localizable.strings:174
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Discard the motherboard's built-in SSDT tables."
 msgid "Discard the motherboard's built-in ECDT table."
-msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 SSDT 表，可讀取 Extra 資料夾中的 SSDT 資料。/Extra/SSDT.aml。"
+msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 ECDT 表。"
 
 #. type: "DropASFT_title"
 #: Resources/templates/Localizable.strings:176
@@ -806,10 +816,10 @@ msgstr "DropASFT=Yes"
 
 #. type: "DropASFT_description"
 #: Resources/templates/Localizable.strings:177
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Discard the motherboard's built-in SSDT tables."
 msgid "Discard the motherboard's built-in ASF! table."
-msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 SSDT 表，可讀取 Extra 資料夾中的 SSDT 資料。/Extra/SSDT.aml。"
+msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 ASF! 表。"
 
 #. type: "DropDMAR_title"
 #: Resources/templates/Localizable.strings:179
@@ -821,7 +831,7 @@ msgstr "DropDMAR=Yes"
 #: Resources/templates/Localizable.strings:180
 #, no-wrap
 msgid "Discard the motherboard's built-in DMAR table, this key action resolve the problem with VT-d panics."
-msgstr ""
+msgstr "(預設是 No) 設定 Yes 忽略主機板 BIOS 內建之 DMAR 表，可以解決 VT-d 造成的 內核崩潰問題。"
 
 #. type: "EnableC2State_title"
 #: Resources/templates/Localizable.strings:182
@@ -1078,7 +1088,7 @@ msgid ""
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"001 (0x01, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx02_title"
 #: Resources/templates/Localizable.strings:250
@@ -1095,7 +1105,7 @@ msgid ""
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 2:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"002 (0x02, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx03_title"
 #: Resources/templates/Localizable.strings:254
@@ -1112,7 +1122,7 @@ msgid ""
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 3:\n"
-"003 (0x03, 0x00, 0x00, 0x00)."
+"003 (0x03, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx12_title"
 #: Resources/templates/Localizable.strings:258
@@ -1129,7 +1139,7 @@ msgid ""
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 12:\n"
-"00C (0x0C, 0x00, 0x00, 0x00)."
+"00C (0x0C, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx32_title"
 #: Resources/templates/Localizable.strings:262
@@ -1145,8 +1155,8 @@ msgid ""
 "Set HDEF layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"設定 HDAU layout-it 為 32:\n"
-"020 (0x20, 0x00, 0x00, 0x00)."
+"設定 HDEF layout-it 為 32:\n"
+"020 (0x20, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx40_title"
 #: Resources/templates/Localizable.strings:266
@@ -1163,7 +1173,7 @@ msgid ""
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 40:\n"
-"028 (0x28, 0x00, 0x00, 0x00)."
+"028 (0x28, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx65_title"
 #: Resources/templates/Localizable.strings:270
@@ -1180,7 +1190,7 @@ msgid ""
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 65:\n"
-"041 (0x41, 0x00, 0x00, 0x00)."
+"041 (0x41, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx99_title"
 #: Resources/templates/Localizable.strings:274
@@ -1197,7 +1207,7 @@ msgid ""
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 99:\n"
-"063 (0x63, 0x00, 0x00, 0x00)."
+"063 (0x63, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx269_title"
 #: Resources/templates/Localizable.strings:278
@@ -1214,7 +1224,7 @@ msgid ""
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 269:\n"
-"10D (0x0D, 0x01, 0x00, 0x00)."
+"10D (0x0D, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx387_title"
 #: Resources/templates/Localizable.strings:282
@@ -1231,7 +1241,7 @@ msgid ""
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 387:\n"
-"183 (0x83, 0x01, 0x00, 0x00)."
+"183 (0x83, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx388_title"
 #: Resources/templates/Localizable.strings:286
@@ -1248,7 +1258,7 @@ msgid ""
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 388:\n"
-"184 (0x84, 0x01, 0x00, 0x00)."
+"184 (0x84, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx389_title"
 #: Resources/templates/Localizable.strings:290
@@ -1265,7 +1275,7 @@ msgid ""
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 389:\n"
-"185 (0x85, 0x01, 0x00, 0x00)."
+"185 (0x85, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx392_title"
 #: Resources/templates/Localizable.strings:294
@@ -1282,7 +1292,7 @@ msgid ""
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 392:\n"
-"188 (0x88, 0x01, 0x00, 0x00)."
+"188 (0x88, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx398_title"
 #: Resources/templates/Localizable.strings:298
@@ -1299,7 +1309,7 @@ msgid ""
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 398:\n"
-"18E (0x8E, 0x01, 0x00, 0x00)."
+"18E (0x8E, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx662_title"
 #: Resources/templates/Localizable.strings:302
@@ -1316,7 +1326,7 @@ msgid ""
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 662:\n"
-"296 (0x96, 0x02, 0x00, 0x00)."
+"296 (0x96, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx663_title"
 #: Resources/templates/Localizable.strings:306
@@ -1333,7 +1343,7 @@ msgid ""
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 663:\n"
-"297 (0x97, 0x02, 0x00, 0x00)."
+"297 (0x97, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx664_title"
 #: Resources/templates/Localizable.strings:310
@@ -1350,7 +1360,7 @@ msgid ""
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 664:\n"
-"298 (0x98, 0x02, 0x00, 0x00)."
+"298 (0x98, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx885_title"
 #: Resources/templates/Localizable.strings:314
@@ -1367,7 +1377,7 @@ msgid ""
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 885:\n"
-"375 (0x75, 0x03, 0x00, 0x00)."
+"375 (0x75, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx887_title"
 #: Resources/templates/Localizable.strings:318
@@ -1384,7 +1394,7 @@ msgid ""
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 887:\n"
-"377 (0x77, 0x03, 0x00, 0x00)."
+"377 (0x77, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx888_title"
 #: Resources/templates/Localizable.strings:322
@@ -1401,7 +1411,7 @@ msgid ""
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 888:\n"
-"378 (0x78, 0x03, 0x00, 0x00)."
+"378 (0x78, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx889_title"
 #: Resources/templates/Localizable.strings:326
@@ -1418,7 +1428,7 @@ msgid ""
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 889:\n"
-"379 (0x79, 0x03, 0x00, 0x00)."
+"379 (0x79, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx892_title"
 #: Resources/templates/Localizable.strings:330
@@ -1435,7 +1445,7 @@ msgid ""
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 892:\n"
-"37C (0x7C, 0x03, 0x00, 0x00)."
+"37C (0x7C, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx898_title"
 #: Resources/templates/Localizable.strings:334
@@ -1452,7 +1462,7 @@ msgid ""
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 898:\n"
-"382 (0x82, 0x03, 0x00, 0x00)."
+"382 (0x82, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDxBD7_title"
 #: Resources/templates/Localizable.strings:338
@@ -1469,7 +1479,7 @@ msgid ""
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
 "設定 HDEF layout-it 為 1981:\n"
-"7BD (0xBD, 0x07, 0x00, 0x00)."
+"7BD (0xBD, 0x07, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx01_description"
 #: Resources/templates/Localizable.strings:345
@@ -1479,7 +1489,7 @@ msgid ""
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"001 (0x01, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx02_description"
 #: Resources/templates/Localizable.strings:349
@@ -1489,7 +1499,7 @@ msgid ""
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 2:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"002 (0x02, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx03_description"
 #: Resources/templates/Localizable.strings:353
@@ -1499,7 +1509,7 @@ msgid ""
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 3:\n"
-"003 (0x03, 0x00, 0x00, 0x00)."
+"003 (0x03, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:357
@@ -1509,7 +1519,7 @@ msgid ""
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 12:\n"
-"00C (0x0C, 0x00, 0x00, 0x00)."
+"00C (0x0C, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:361
@@ -1519,7 +1529,7 @@ msgid ""
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 32:\n"
-"020 (0x20, 0x00, 0x00, 0x00)."
+"020 (0x20, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:365
@@ -1529,7 +1539,7 @@ msgid ""
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 40:\n"
-"028 (0x28, 0x00, 0x00, 0x00)."
+"028 (0x28, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx65_description"
 #: Resources/templates/Localizable.strings:369
@@ -1539,7 +1549,7 @@ msgid ""
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 65:\n"
-"041 (0x41, 0x00, 0x00, 0x00)."
+"041 (0x41, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx99_description"
 #: Resources/templates/Localizable.strings:373
@@ -1549,7 +1559,7 @@ msgid ""
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 99:\n"
-"063 (0x63, 0x00, 0x00, 0x00)."
+"063 (0x63, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx269_description"
 #: Resources/templates/Localizable.strings:377
@@ -1559,7 +1569,7 @@ msgid ""
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 269:\n"
-"10D (0x0D, 0x01, 0x00, 0x00)."
+"10D (0x0D, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx387_description"
 #: Resources/templates/Localizable.strings:381
@@ -1569,7 +1579,7 @@ msgid ""
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 387:\n"
-"183 (0x83, 0x01, 0x00, 0x00)."
+"183 (0x83, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx388_description"
 #: Resources/templates/Localizable.strings:385
@@ -1579,7 +1589,7 @@ msgid ""
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 388:\n"
-"184 (0x84, 0x01, 0x00, 0x00)."
+"184 (0x84, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx389_description"
 #: Resources/templates/Localizable.strings:389
@@ -1589,7 +1599,7 @@ msgid ""
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 389:\n"
-"185 (0x85, 0x01, 0x00, 0x00)."
+"185 (0x85, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx392_description"
 #: Resources/templates/Localizable.strings:393
@@ -1599,7 +1609,7 @@ msgid ""
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 392:\n"
-"188 (0x88, 0x01, 0x00, 0x00)."
+"188 (0x88, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx398_description"
 #: Resources/templates/Localizable.strings:397
@@ -1609,7 +1619,7 @@ msgid ""
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 398:\n"
-"18E (0x8E, 0x01, 0x00, 0x00)."
+"18E (0x8E, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx662_description"
 #: Resources/templates/Localizable.strings:401
@@ -1619,7 +1629,7 @@ msgid ""
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 662:\n"
-"296 (0x96, 0x02, 0x00, 0x00)."
+"296 (0x96, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx663_description"
 #: Resources/templates/Localizable.strings:405
@@ -1629,7 +1639,7 @@ msgid ""
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 663:\n"
-"297 (0x97, 0x02, 0x00, 0x00)."
+"297 (0x97, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx664_description"
 #: Resources/templates/Localizable.strings:409
@@ -1639,7 +1649,7 @@ msgid ""
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 664:\n"
-"298 (0x98, 0x02, 0x00, 0x00)."
+"298 (0x98, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx885_description"
 #: Resources/templates/Localizable.strings:413
@@ -1649,7 +1659,7 @@ msgid ""
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 885:\n"
-"375 (0x75, 0x03, 0x00, 0x00)."
+"375 (0x75, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx887_description"
 #: Resources/templates/Localizable.strings:417
@@ -1659,7 +1669,7 @@ msgid ""
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 887:\n"
-"377 (0x77, 0x03, 0x00, 0x00)."
+"377 (0x77, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx888_description"
 #: Resources/templates/Localizable.strings:421
@@ -1669,7 +1679,7 @@ msgid ""
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 888:\n"
-"378 (0x78, 0x03, 0x00, 0x00)."
+"378 (0x78, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx889_description"
 #: Resources/templates/Localizable.strings:425
@@ -1679,7 +1689,7 @@ msgid ""
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 889:\n"
-"379 (0x79, 0x03, 0x00, 0x00)."
+"379 (0x79, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx892_description"
 #: Resources/templates/Localizable.strings:429
@@ -1689,7 +1699,7 @@ msgid ""
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 892:\n"
-"37C (0x7C, 0x03, 0x00, 0x00)."
+"37C (0x7C, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx898_description"
 #: Resources/templates/Localizable.strings:433
@@ -1699,7 +1709,7 @@ msgid ""
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 898:\n"
-"382 (0x82, 0x03, 0x00, 0x00)."
+"382 (0x82, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDxBD7_description"
 #: Resources/templates/Localizable.strings:437
@@ -1709,7 +1719,7 @@ msgid ""
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
 "設定 HDAU layout-it 為 1981:\n"
-"7BD (0xBD, 0x07, 0x00, 0x00)."
+"7BD (0xBD, 0x07, 0x00, 0x00)。"
 
 #. type: "IntelCaprix00_title"
 #: Resources/templates/Localizable.strings:442
@@ -1721,7 +1731,7 @@ msgstr "01660000"
 #: Resources/templates/Localizable.strings:443
 #, no-wrap
 msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660000."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660000。"
 
 #. type: "IntelCaprix01_title"
 #: Resources/templates/Localizable.strings:445
@@ -1733,7 +1743,7 @@ msgstr "01660001"
 #: Resources/templates/Localizable.strings:446
 #, no-wrap
 msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660001."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660001。"
 
 #. type: "IntelCaprix02_title"
 #: Resources/templates/Localizable.strings:448
@@ -1745,7 +1755,7 @@ msgstr "01660002"
 #: Resources/templates/Localizable.strings:449
 #, no-wrap
 msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660002."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660002。"
 
 #. type: "IntelCaprix03_title"
 #: Resources/templates/Localizable.strings:451
@@ -1757,7 +1767,7 @@ msgstr "01660003"
 #: Resources/templates/Localizable.strings:452
 #, no-wrap
 msgid "Set 01660003 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660003."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660003。"
 
 #. type: "IntelCaprix04_title"
 #: Resources/templates/Localizable.strings:454
@@ -1769,7 +1779,7 @@ msgstr "01660004"
 #: Resources/templates/Localizable.strings:455
 #, no-wrap
 msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660004."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660004。"
 
 #. type: "IntelCaprix05_title"
 #: Resources/templates/Localizable.strings:457
@@ -1781,7 +1791,7 @@ msgstr "01620005"
 #: Resources/templates/Localizable.strings:458
 #, no-wrap
 msgid "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Desktop) AAPL,ig-platform-id 為 01660005."
+msgstr "設定 Intel HD4000 (Desktop) 顯示卡的 AAPL,ig-platform-id 為 01660005。"
 
 #. type: "IntelCaprix06_title"
 #: Resources/templates/Localizable.strings:460
@@ -1793,7 +1803,7 @@ msgstr "01620006"
 #: Resources/templates/Localizable.strings:461
 #, no-wrap
 msgid "Set 01620006 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Desktop) AAPL,ig-platform-id 為 01660006."
+msgstr "設定 Intel HD4000 (Desktop) 顯示卡的 AAPL,ig-platform-id 為 01660006。"
 
 #. type: "IntelCaprix07_title"
 #: Resources/templates/Localizable.strings:463
@@ -1805,7 +1815,7 @@ msgstr "01620007"
 #: Resources/templates/Localizable.strings:464
 #, no-wrap
 msgid "Set 01620007 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Desktop) AAPL,ig-platform-id 為 01660007."
+msgstr "設定 Intel HD4000 (Desktop) 顯示卡的 AAPL,ig-platform-id 為 01660007。"
 
 #. type: "IntelCaprix08_title"
 #: Resources/templates/Localizable.strings:466
@@ -1817,7 +1827,7 @@ msgstr "01660008"
 #: Resources/templates/Localizable.strings:467
 #, no-wrap
 msgid "Set 01660008 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660008."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660008。"
 
 #. type: "IntelCaprix09_title"
 #: Resources/templates/Localizable.strings:469
@@ -1829,7 +1839,7 @@ msgstr "01660009"
 #: Resources/templates/Localizable.strings:470
 #, no-wrap
 msgid "Set 01660009 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 01660009."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 01660009。"
 
 #. type: "IntelCaprix10_title"
 #: Resources/templates/Localizable.strings:472
@@ -1841,7 +1851,7 @@ msgstr "0166000a"
 #: Resources/templates/Localizable.strings:473
 #, no-wrap
 msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 0166000a."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0166000a。"
 
 #. type: "IntelCaprix11_title"
 #: Resources/templates/Localizable.strings:475
@@ -1853,7 +1863,7 @@ msgstr "0166000b"
 #: Resources/templates/Localizable.strings:476
 #, no-wrap
 msgid "Set 0166000b for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "設定 Intel HD4000 (Mobile) AAPL,ig-platform-id 為 0166000b."
+msgstr "設定 Intel HD4000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0166000b。"
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:480
@@ -1865,7 +1875,7 @@ msgstr "00000604"
 #: Resources/templates/Localizable.strings:481
 #, no-wrap
 msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 00000604."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 00000604。"
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:483
@@ -1877,7 +1887,7 @@ msgstr "0000060c"
 #: Resources/templates/Localizable.strings:484
 #, no-wrap
 msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0000060c."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0000060c。"
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:486
@@ -1889,7 +1899,7 @@ msgstr "00001604"
 #: Resources/templates/Localizable.strings:487
 #, no-wrap
 msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 00001604."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 00001604。"
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:489
@@ -1901,7 +1911,7 @@ msgstr "0000160a"
 #: Resources/templates/Localizable.strings:490
 #, no-wrap
 msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0000160a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0000160a。"
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:492
@@ -1913,7 +1923,7 @@ msgstr "0000160c"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0000160c."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0000160c。"
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:495
@@ -1925,7 +1935,7 @@ msgstr "00002604"
 #: Resources/templates/Localizable.strings:496
 #, no-wrap
 msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 00002604."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 00002604。"
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:498
@@ -1937,7 +1947,7 @@ msgstr "0000260a"
 #: Resources/templates/Localizable.strings:499
 #, no-wrap
 msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0000260a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0000260a。"
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:501
@@ -1947,10 +1957,10 @@ msgstr "0000260c"
 
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:502
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
 msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0600260a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0600260c。"
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:504
@@ -1962,7 +1972,7 @@ msgstr "0000260d"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0000260d."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0000260d。"
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:507
@@ -1974,7 +1984,7 @@ msgstr "02001604"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
 msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 02001604."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 02001604。"
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:510
@@ -1986,7 +1996,7 @@ msgstr "0300220d"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
 msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Desktop) AAPL,ig-platform-id 為 0300220d."
+msgstr "設定 Intel HD5000 (Desktop) 顯示卡的 AAPL,ig-platform-id 為 0300220d。"
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:513
@@ -1998,7 +2008,7 @@ msgstr "0500260a"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0500260a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0500260a。"
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:516
@@ -2010,7 +2020,7 @@ msgstr "0600260a"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
 msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0600260a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0600260a。"
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:519
@@ -2022,7 +2032,7 @@ msgstr "0700260d"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
 msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0700260d."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0700260d。"
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:522
@@ -2034,7 +2044,7 @@ msgstr "0800260a"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
 msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 0800260a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 0800260a。"
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:525
@@ -2046,7 +2056,7 @@ msgstr "08002e0a"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "設定 Intel HD5000 (Mobile) AAPL,ig-platform-id 為 08002e0a."
+msgstr "設定 Intel HD5000 (Mobile) 顯示卡的 AAPL,ig-platform-id 為 08002e0a。"
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:530
@@ -2058,7 +2068,7 @@ msgstr "AD2000b"
 #: Resources/templates/Localizable.strings:531
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD2000b."
-msgstr "設定 Analog Devices AD2000b 的 HDEF PinConfiguration 值."
+msgstr "設定 Analog Devices AD2000b 的 HDEF PinConfiguration 值。"
 
 #. type: "AD1981HD_PinConf_title"
 #: Resources/templates/Localizable.strings:533
@@ -2070,7 +2080,7 @@ msgstr "AD1981HD"
 #: Resources/templates/Localizable.strings:534
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1981HD."
-msgstr "設定 Analog Devices AD1981HD 的 HDEF PinConfiguration 值."
+msgstr "設定 Analog Devices AD1981HD 的 HDEF PinConfiguration 值。"
 
 #. type: "AD1988B_PinConf_title"
 #: Resources/templates/Localizable.strings:536
@@ -2082,7 +2092,7 @@ msgstr "AD1988b"
 #: Resources/templates/Localizable.strings:537
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1988b."
-msgstr "設定 Analog Devices AD1988b 的 HDEF PinConfiguration 值."
+msgstr "設定 Analog Devices AD1988b 的 HDEF PinConfiguration 值。"
 
 #. type: "ALC888_PinConf_title"
 #: Resources/templates/Localizable.strings:539
@@ -2094,7 +2104,7 @@ msgstr "ALC888"
 #: Resources/templates/Localizable.strings:540
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC888."
-msgstr "設定 Realtek ALC888 的 HDEF PinConfiguration 值."
+msgstr "設定 Realtek ALC888 的 HDEF PinConfiguration 值。"
 
 #. type: "ALC1200_PinConf_title"
 #: Resources/templates/Localizable.strings:542
@@ -2106,7 +2116,7 @@ msgstr "ALC1200"
 #: Resources/templates/Localizable.strings:543
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC1200."
-msgstr "設定 Realtek ALC1200 的 HDEF PinConfiguration 值."
+msgstr "設定 Realtek ALC1200 的 HDEF PinConfiguration 值。"
 
 #. type: "00_PinConf_title"
 #: Resources/templates/Localizable.strings:545
@@ -2118,7 +2128,7 @@ msgstr "00"
 #: Resources/templates/Localizable.strings:546
 #, no-wrap
 msgid "Set HDEF PinConfiguration for ???."
-msgstr ""
+msgstr "設定 音效卡 的 HDEF PinConfiguration 值。"
 
 #. type: "GraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:550
@@ -2128,10 +2138,10 @@ msgstr "GraphicsEnabler=Yes"
 
 #. type: "GraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:551
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Enables the option to autodetect NVIDIA based GPUs and inject the correct info."
 msgid "Enables the option to autodetect NVIDIA, AMD/ATI or Intel based GPUs and inject the correct info."
-msgstr "(預設是 No) 啟用顯示卡偵測功能。自動識別 顯示卡 GPU 並注入正確的設備屬性資訊。"
+msgstr "(預設是 No) 啟用顯示卡偵測功能。自動識別 NVIDIA, AMD/ATI or Intel 顯示卡 GPU 並注入正確的設備屬性資訊。"
 
 #. type: "EnableHDMIAudio_title"
 #: Resources/templates/Localizable.strings:553
@@ -2191,7 +2201,7 @@ msgstr "SkipIntelGfx=Yes"
 #: Resources/templates/Localizable.strings:566
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for Intel based GPUs."
-msgstr ""
+msgstr "(預設是 No) 取消 GraphicsEnbaler 自動偵測 Intel 顯示卡晶片。"
 
 #. type: "SkipNvidiaGfx_title"
 #: Resources/templates/Localizable.strings:568
@@ -2203,7 +2213,7 @@ msgstr "SkipNvidiaGfx=Yes"
 #: Resources/templates/Localizable.strings:569
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for NVIDIA based GPUs."
-msgstr ""
+msgstr "(預設是 No) 取消 GraphicsEnbaler 自動偵測 NVIDIA 顯示卡晶片。"
 
 #. type: "SkipAtiGfx_title"
 #: Resources/templates/Localizable.strings:571
@@ -2215,7 +2225,7 @@ msgstr "SkipAtiGfx=Yes"
 #: Resources/templates/Localizable.strings:572
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for AMD/ATI based GPUs."
-msgstr ""
+msgstr "(預設是 No) 取消 GraphicsEnbaler 自動偵測 AMD/ATI 顯示卡晶片。"
 
 #. type: "EnableBacklight_title"
 #: Resources/templates/Localizable.strings:574
@@ -2227,7 +2237,7 @@ msgstr "EnableBacklight=Yes"
 #: Resources/templates/Localizable.strings:575
 #, no-wrap
 msgid "Enables Backlight options for laptop with nVidia cards."
-msgstr ""
+msgstr "(預設是 No) 啟用桌上型 nVidia 顯示卡的 背光(Backlight) 選項。"
 
 #. type: "EnableDualLink_title"
 #: Resources/templates/Localizable.strings:577
@@ -2239,7 +2249,7 @@ msgstr "EnableDualLink=Yes"
 #: Resources/templates/Localizable.strings:578
 #, no-wrap
 msgid "Enables DualLink options for nVidia and ATi cards."
-msgstr ""
+msgstr "(預設是 No) 啟用 nVidia 及 ATi 顯示卡的 DualLink 選項。"
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:584
@@ -2315,6 +2325,10 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/280062-waiting-for-root-device-when-kernel-cache-used-only-with-some-disks-fix/\n"
 "Findings credits to bcc9."
 msgstr ""
+"說明: 修正部分硬碟在 10.8.x 使用 UseKernelCache=Yes 時，會發生 Waiting for root device 的錯誤。\n"
+"來自 bcc9 的發現。\n"
+"http://www.insanelymac.com/forum/topic/280062-waiting-for-root-device-when-"
+"kernel-cache-used-only-with-some-disks-fix/"
 
 #. type: "Darkwake_title"
 #: Resources/templates/Localizable.strings:604
@@ -2343,6 +2357,11 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
+"新的系統偏好設定 Nvidia 控制面板，可啓用 Nvidia Web Driver。\n"
+"參考資訊: 新的 Nvidia 零售版驅動安裝解決方案。\n"
+"http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-"
+"install-solution/\n"
+"歸功於 meklort 及 Rampage Dev 的發現。"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:613
@@ -2357,6 +2376,9 @@ msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
 "More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 msgstr ""
+"避免 OSX 的 VT-D 虛擬化功能 造成的 DMAR 程序問題。\n"
+"詳情參考 bcc9 說明: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-"
+"after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
 #: Resources/templates/Localizable.strings:621
@@ -2440,7 +2462,7 @@ msgstr "內崁主題"
 #: Resources/templates/Localizable.strings:645
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
-msgstr "Embed：小而簡單且可於編譯 boot 時，內崁在 Chameleon 裡的主題. "
+msgstr "Embed：小而簡單且可於編譯 boot 時，內崁在 Chameleon 裡的主題。"
 
 #. type: "Legacy_title"
 #: Resources/templates/Localizable.strings:647
@@ -2452,13 +2474,13 @@ msgstr "傳統主題"
 #: Resources/templates/Localizable.strings:648
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
-msgstr "Legacy：Chameleon v2.0 RC1 的原始預設主題."
+msgstr "Legacy：Chameleon v2.0 RC1 的原始預設主題。"
 
 #. type: "Default_description"
 #: Resources/templates/Localizable.strings:651
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
-msgstr "Default：Chameleon v2.0 RC5 的新版預設主題."
+msgstr "Default：Chameleon v2.0 RC5 的新版預設主題。"
 
 #. type: "Bullet_title"
 #: Resources/templates/Localizable.strings:653
@@ -2470,20 +2492,20 @@ msgstr "子彈主題"
 #: Resources/templates/Localizable.strings:654
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
-msgstr "Bullet：來自 NoSmokingBandit 2009.4 的一個小巧可愛的子彈主題."
+msgstr "Bullet：來自 NoSmokingBandit 2009.4 的一個小巧可愛的子彈主題。"
 
 #. type: "Audio_title"
 #: Resources/templates/Localizable.strings:663
 #, no-wrap
 msgid "Audio"
-msgstr ""
+msgstr "音效卡選項"
 
 #. type: "Audio_description"
 #: Resources/templates/Localizable.strings:664
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options that deal with audio."
-msgstr "一些設定顯示卡的選項。"
+msgstr "設定 Audio 音效卡的選項。"
 
 #. type: "Control_title"
 #: Resources/templates/Localizable.strings:667
@@ -2541,67 +2563,66 @@ msgstr "設定選用一個解析度。"
 
 #. type: "HDEFLayout_title"
 #: Resources/templates/Localizable.strings:687
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "KeyLayout"
 msgid "HDEF Layout"
-msgstr "鍵盤佈局"
+msgstr "音效卡 HDA 選項"
 
 #. type: "HDEFLayout_description"
 #: Resources/templates/Localizable.strings:688
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
-msgstr ""
+msgstr "設定音效卡 HDA controller 的 HDEF Layout ID。"
 
 #. type: "HDAULayout_title"
 #: Resources/templates/Localizable.strings:691
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "KeyLayout"
 msgid "HDAU Layout"
-msgstr "鍵盤佈局"
+msgstr "音效卡 HDMI 選項"
 
 #. type: "HDAULayout_description"
 #: Resources/templates/Localizable.strings:692
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
-msgstr ""
+msgstr "設定音效卡 HDMI controller 的 HDAU Layout ID。"
 
 #. type: "IntelCapri_title"
 #: Resources/templates/Localizable.strings:695
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
 #: Resources/templates/Localizable.strings:696
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
-msgstr ""
+msgstr "設定一個 Intel HD4000 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "IntelAzul_title"
 #: Resources/templates/Localizable.strings:699
-#, fuzzy, no-wrap
-
+#, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:700
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr ""
+msgstr "設定一個 Intel HD5000 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:703
 #, no-wrap
 msgid "HDEF PinConfiguration"
-msgstr ""
+msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
 #: Resources/templates/Localizable.strings:704
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one resolution to use."
 msgid "Set one HDEF PinConfiguration to use."
-msgstr "設定選用一個解析度。"
+msgstr "設定選用一個 HDEF PinConfiguration。"
 
 #. type: "Video_title"
 #: Resources/templates/Localizable.strings:707
