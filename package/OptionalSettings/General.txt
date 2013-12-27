@@ -31,6 +31,7 @@ Bool@EthernetBuiltIn:EthernetBuiltIn=Yes
 #Bool@EnableWifi:EnableWifi=Yes
 Bool@ForceHPET:ForceHPET=Yes
 Bool@ForceWake:ForceWake=Yes
+Bool@ForceFullMemInfo:ForceFullMemInfo=Yes
 Bool@RestartFix:RestartFix=No
 Bool@UHCIreset:UHCIreset=Yes
 Bool@UseMemDetect:UseMemDetect=No

@@ -141,6 +141,9 @@ Dependencies: none";
 "ForceWake_title" = "ForceWake=Yes";
 "ForceWake_description" = "This option enables you to bypass bad sleep images.";
 
+"ForceFullMemInfo_title" = "ForceFullMemInfo=Yes";
+"ForceFullMemInfo_description" = "Force SMBIOS Table 17 to be 27 bytes long.";
+
 "RestartFix_title" = "RestartFix=No";
 "RestartFix_description" = "Disables the automatically enabled restart fix.";
 
