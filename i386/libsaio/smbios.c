@@ -209,7 +209,7 @@ typedef struct
 	char *productName;
 	char *version;
 	char *serialNumber;
-	char *skuNumber;
+	char *skuNumber;	// ErmaC
 	char *family;
 } defaultSystemInfo_t;
 
@@ -222,6 +222,11 @@ typedef struct
 {
 	char *manufacturer;
 	char *product;
+	char *productName;		// ErmaC
+	char *serialNumber;		// ErmaC
+	char *assetTagNumber;		// ErmaC
+	char *locationInChassis;	// ErmaC
+	char *boardType;		// ErmaC
 } defaultBaseBoard_t;
 
 defaultBaseBoard_t defaultBaseBoard;
@@ -293,38 +298,40 @@ SMBValueSetter SMBSetters[] =
 
 	// Bungo
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, version),
-		kSMBBaseBoardVersionKey, NULL, NULL}, // SMboardproductname - MacPro3,1
+		kSMBBaseBoardVersionKey, NULL, &defaultBaseBoard.productName}, // SMboardproductname - MacPro3,1
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, serialNumber),
-		kSMBBaseBoardSerialNumberKey, NULL, NULL}, // SMboardserial - C02140302D5DMT31M
-    
-	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),               kSMBBaseBoardAssetTagNumberKey,
-        NULL,                       NULL		},
-    
-	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),            kSMBBaseBoardLocationInChassisKey,
-        NULL,                       NULL		},
-	
-	{kSMBTypeBaseBoard,	kSMBByte,	getFieldOffset(SMBBaseBoard, boardType),            kSMBBaseBoardTypeKey,
-        NULL,                       NULL		},
+		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber }, // SMboardserial - C02140302D5DMT31M
+
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTagNumber),
+		kSMBBaseBoardAssetTagNumberKey, NULL, &defaultBaseBoard.assetTagNumber }, // SMboardassetag - Base Board Asset Tag#
+
+	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
+		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component
+
+	{kSMBTypeBaseBoard,	kSMBByte,getFieldOffset(SMBBaseBoard, boardType),
+		kSMBBaseBoardTypeKey,NULL, &defaultBaseBoard.boardType }, // SMboardtype - 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
+	//
 
     // Bungo
 	/* =======================
 	 System Enclosure (Type 3)
 	 ========================= */
-	{kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, manufacturer),	kSMBSystemEnclosureManufacturerKey,
-        NULL,	&defaultBaseBoard.manufacturer	},
+	{kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, manufacturer),
+		kSMBSystemEnclosureManufacturerKey, NULL,	&defaultBaseBoard.manufacturer }, // SMchassismanufacturer - Apple Inc.
 
-    {kSMBTypeSystemEnclosure,	kSMBByte,	getFieldOffset(SMBSystemEnclosure, type),			kSMBSystemEnclosureTypeKey,
-        NULL,                       NULL		},
+	{kSMBTypeSystemEnclosure, kSMBByte,	getFieldOffset(SMBSystemEnclosure, type),
+		kSMBSystemEnclosureTypeKey, NULL, &defaultBaseBoard.boardType	}, // SMchassistype - 7
 
-    {kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, version),        kSMBSystemEnclosureVersionKey,
-        NULL,	&defaultBaseBoard.product       },
+	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, version),
+		kSMBSystemEnclosureVersionKey, NULL, &defaultBaseBoard.product }, // SMchassisversion - Mac-F42C88C8
 
-    {kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, serialNumber),	kSMBSystemEnclosureSerialNumberKey,
-        NULL,                       NULL		},
+	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, serialNumber),
+		kSMBSystemEnclosureSerialNumberKey, NULL, &defaultSystemInfo.serialNumber }, // SMchassisserial
 
-    {kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, assetTagNumber), kSMBSystemEnclosureAssetTagNumberKey,
-        NULL,                       NULL		},
+	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, assetTagNumber),
+		kSMBSystemEnclosureAssetTagNumberKey, NULL, &defaultBaseBoard.assetTagNumber }, // SMchassisassettag - Pro Enclosure
+
 
 	/* ============================
 	 Processor Information (Type 4)
@@ -438,6 +445,10 @@ void setDefaultSMBData(void)
 
 	defaultBaseBoard.manufacturer       = kDefaultVendorManufacturer;
 	defaultBaseBoard.product            = kDefaultBoardProduct;
+	defaultBaseBoard.boardType          = kDefaultBoardType;		// ErmaC 
+	defaultBaseBoard.serialNumber       = KDefaultBoardSerialNumber;	// ErmaC
+	defaultBaseBoard.assetTagNumber     = KDefaultBoardAssetTagNumber;	// ErmaC
+	defaultBaseBoard.locationInChassis  = kDefaultLocatioInChassis;		// ErmaC
 
 	if (platformCPUFeature(CPU_FEATURE_MOBILE))
 	{

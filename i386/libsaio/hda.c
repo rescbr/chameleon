@@ -236,6 +236,7 @@ static hdacc_codecs know_codecs[] = {
     { HDA_CODEC_ALC892, 0,          "Realtek ALC892" },
     { HDA_CODEC_ALC898, 0,          "Realtek ALC898" },
     { HDA_CODEC_ALC899, 0,          "Realtek ALC899" },
+    { HDA_CODEC_ALC900, 0,          "Realtek ALC1150" },
     { HDA_CODEC_AD1882, 0,          "Analog Devices AD1882" },
     { HDA_CODEC_AD1882A, 0,         "Analog Devices AD1882A" },
     { HDA_CODEC_AD1883, 0,          "Analog Devices AD1883" },
@@ -617,12 +618,12 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	case HDA_NVIDIA_GK104:
 	case HDA_NVIDIA_GF110:
 	case HDA_NVIDIA_GF119:
-        case HDA_NVIDIA_GT116:
+	case HDA_NVIDIA_GT116:
 	case HDA_NVIDIA_GT104:
 	case HDA_NVIDIA_GT108:
 	case HDA_NVIDIA_GT106:
 	case HDA_NVIDIA_GT100:
-        case HDA_NVIDIA_0BE4:
+	case HDA_NVIDIA_0BE4:
 	case HDA_NVIDIA_0BE3:
 	case HDA_NVIDIA_0BE2:
 

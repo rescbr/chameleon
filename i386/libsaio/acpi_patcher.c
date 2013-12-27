@@ -110,16 +110,24 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 		{
 			sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
 			fd = open(dirSpec, 0);
+			if (fd < 0)
+			{
+				// NOT FOUND:
+				verbose("ACPI Table not found: %s\n", filename);
+				*dirSpec = '\0';
+			}
 		}
 	}
 
+// Bungo
+/*** Moved above
 	if (fd < 0)
 	{
 		// NOT FOUND:
 		verbose("ACPI Table not found: %s\n", filename);
 		*dirSpec = '\0';
 	}
-
+***/
 	if (outDirspec) *outDirspec = dirSpec; 
 	return fd;
 }

@@ -1192,7 +1192,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1249,	"GeForce GTS 450" },
 	{ 0x10DE124B,	"GeForce GT 640" },
 	{ 0x10DE124D,	"GeForce GT 555M" },
-	//  { 0x10DE1250,	"GF116-INT" },
+	{ 0x10DE1250,	"GF116-INT" },
 	{ 0x10DE1251,	"GeForce GTX 560M" },
 	// 1260 - 126F
 	// 1270 - 127F
@@ -2054,7 +2054,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 						{
 							version_start += 8;
 						}
-						
+
 						strncpy(version_str, (const char*)rom+version_start, i-version_start);
 						break;
 					}
