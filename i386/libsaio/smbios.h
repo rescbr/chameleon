@@ -118,6 +118,13 @@ typedef struct SMBBIOSInformation {
     SMBString  releaseDate;         // BIOS release date
     SMBByte    romSize;             // (n); 64K * (n+1) bytes
     SMBQWord   characteristics;     // supported BIOS functions
+    // Bungo
+    SMBByte    characteristicsExt1; // BIOS characteristics extension byte 1
+    SMBByte    characteristicsExt2; // BIOS characteristics extension byte 2
+    SMBByte    releaseMajor;        // BIOS release (major)
+    SMBByte    releaseMinor;        // BIOS release (minor)
+    SMBByte    ECreleaseMajor;      // Embedded Controller firmware release (major)
+    SMBByte    ECreleaseMinor;      // Embedded Controller firmware release (minor)
 } __attribute__((packed)) SMBBIOSInformation;
 
 //

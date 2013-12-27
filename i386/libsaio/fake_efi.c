@@ -76,8 +76,10 @@ static uint64_t ptov64(uint32_t addr)
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
-/* Default platform system_id (fix by IntVar) */
-static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
+// Bungo
+/* Default platform system_id (fix by IntVar)
+ static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
+ */
 
 /* Just a ret instruction */
 static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
@@ -463,13 +465,14 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 		dst[i] = src[i];
 	}
 	dst[(*len)] = '\0';
-	*len = ((*len)+1)*2; // return the CHAR16 bufsize in cluding zero terminated CHAR16
+	*len = ((*len)+1)*2; // return the CHAR16 bufsize including zero terminated CHAR16
 	return dst;
 }
 
+// Bungo
 /*
  * Get the SystemID from the bios dmi info
- */
+
 static	EFI_CHAR8* getSmbiosUUID()
 {
 	static EFI_CHAR8		 uuid[UUID_LEN];
@@ -501,10 +504,10 @@ static	EFI_CHAR8* getSmbiosUUID()
 	return uuid;
 }
 
-/*
- * return a binary UUID value from the overriden SystemID and SMUUID if found, 
- * or from the bios if not, or from a fixed value if no bios value is found 
- */
+
+// return a binary UUID value from the overriden SystemID and SMUUID if found, 
+// or from the bios if not, or from a fixed value if no bios value is found 
+
 static EFI_CHAR8* getSystemID()
 {
 	// unable to determine UUID for host. Error: 35 fix
@@ -527,6 +530,7 @@ static EFI_CHAR8* getSystemID()
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
 	return ret;
 }
+ */
 
 /*
  * Must be called AFTER setup Acpi because we need to take care of correct
@@ -546,7 +550,8 @@ void setupSystemType()
 
 void setupEfiDeviceTree(void)
 {
-	EFI_CHAR8*	 ret = 0;
+	// Bungo
+	// EFI_CHAR8*	 ret = 0;
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
@@ -622,11 +627,19 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
-	// Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
+	// Bungo
+	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
 	if ((ret=getSystemID()))
 	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
+	*/
+
+	if (Platform.UUID)
+	{
+		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
+	}
+	//
 
 	// Export SystemSerialNumber if present
 	if ((ret16=getSmbiosChar16("SMserial", &len)))
