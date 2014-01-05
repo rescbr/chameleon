@@ -139,43 +139,67 @@
 #define KDefaultBoardAssetTagNumber			"Pro-Enclosure" // ErmaC
 #define kDefaultLocatioInChassis			"Part Component" // ErmaC
 
-// defaults for a Mac mini
+//=========== Mac mini ===========
 #define kDefaultMacminiFamily				"Macmini"
 #define kDefaultMacmini					"Macmini1,1"
 #define kDefaultMacminiBIOSVersion			"    MM21.88Z.009A.B00.0903051113"
+// MacMini5,1 Mac-8ED6AF5B48C039E1 - MM51.88Z.0077.B0F.1110201309
+// MacMini5,2 Mac-4BC72D62AD45599E
+// MacMini5,3
 
-// defaults for a MacBook
+// MacMini 6,1 - Mac-F65AE981FFA204ED
+// MacMini 6,2
+//#define kDefaultMacmini62				"Macmini6,2"
+//#define kDefaultMacmini62BIOSVersion			"    MM61.88Z.0106.B00.1208091121"
+//#define kDefaultMacmini62BoardProduct			"Mac-F65AE981FFA204ED"
+//#define kDefaultMacmini62BIOSReleaseDate		"10/14/2012"
+
+//=========== MacBook ===========
 #define kDefaultMacBookFamily				"MacBook"
 #define kDefaultMacBook					"MacBook4,1"
 #define kDefaultMacBookBIOSVersion			"    MB41.88Z.0073.B00.0903051113"
-
-// defaults for a MacBook Pro
+//=========== MacBookAir ===========
+// MacBookAir4,1 - Mac-C08A6BB70A942AC2
+// MacBookAir4,2 - Mac-742912EFDBEE19B3
+// MacBookAir6,1 - Mac-35C1E88140C3E6CF - MBA61.88Z.0099.B04.1309271229
+// MacBookAir6,2 - Mac-7DF21CB3ED6977E5 - MBA62.88Z.00EF.B00.1205221442
+//=========== MacBookPro ===========
 #define kDefaultMacBookProFamily			"MacBookPro"
 #define kDefaultMacBookPro				"MacBookPro4,1"
 #define kDefaultMacBookProBIOSVersion			"    MBP41.88Z.0073.B00.0903051113"
+// MacBookPro8,1 - Mac-94245B3640C91C81 - MBP81.88Z.0047.B24.1110141131
+// MacBookPro8,2 - Mac_94245A3940C91C80
+// MacBookPro8,3 - Mac-942459F5819B171B
+// MacBookPro11,2 - Mac-3CBD00234E554E41 - MBP112.88Z.0138.B02.1310181745
+// MacBookPro11,3 - Mac-2BD1B31983FE1663 - MBP112.88Z.0138.B02.1310181745
 
-// defaults for an iMac
+//=========== iMac ===========
 #define kDefaultiMacFamily				"iMac"
 #define kDefaultiMac					"iMac8,1"
 #define kDefaultiMacBIOSVersion				"    IM81.88Z.00C1.B00.0903051113"
-// defaults for an iMac11,1 core i3/i5/i7
+// iMac10,1
+// iMac11,1 core i3/i5/i7
 #define kDefaultiMacNehalem				"iMac11,1"
 #define kDefaultiMacNehalemBIOSVersion			"    IM111.88Z.0034.B00.0903051113"
+// iMac11,2
+// iMac11,3
 // defaults for an iMac12,1
 #define kDefaultiMacSandy				"iMac12,1"
 #define kDefaultiMacSandyBIOSVersion			"    IM121.88Z.0047.B00.1102091756"
 
-// defaults for a Mac Pro
+//=========== MacPro ===========
 #define kDefaultMacProFamily				"MacPro"
 #define kDefaultMacPro					"MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
 // defaults for a Mac Pro 4,1 core i7/Xeon
 #define kDefaultMacProNehalem				"MacPro4,1"
-#define kDefaultMacProNehalemBIOSVersion		"    MP41.88Z.0081.B04.0903051113"
+#define kDefaultMacProNehalemBIOSVersion		"    MP41.88Z.0081.B08.1001221313"
 // defaults for a Mac Pro 5,1 core i7/Xeon
 #define kDefaultMacProWestmere				"MacPro5,1"
 #define kDefaultMacProWestmereBIOSVersion		"    MP51.88Z.007F.B03.1010071432"
 #define kDefaultMacProWestmereBIOSReleaseDate		"10/07/2010"
+// defaults for a Mac Pro 6,1
+// MacPro6,1 - Mac-F60DEB81FF30ACF6 - MP61.88Z.0116.B00.1311020956
 //-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -309,7 +333,7 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
 		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component
 
-	{kSMBTypeBaseBoard,	kSMBByte,getFieldOffset(SMBBaseBoard, boardType),
+	{kSMBTypeBaseBoard,	kSMBByte, getFieldOffset(SMBBaseBoard, boardType),
 		kSMBBaseBoardTypeKey,NULL, &defaultBaseBoard.boardType }, // SMboardtype - 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
 	//
 

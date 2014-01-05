@@ -134,7 +134,7 @@ void decodeSystemEnclosure(SMBSystemEnclosure *structHeader)
 	DBG("\tManufacturer: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->manufacturer));
 	DBG("\tType: %d\n", structHeader->type);
 	DBG("\tVersion: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->version));
-	DBG("\tSerial Number: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
+	DBG("\tSerial Number:  ** PRIVATE **\n"); //%s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber));
 	DBG("\tAsset Tag Number: %s\n", getSMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTagNumber));
 	// Boot-up State:
 	// Power Supply State

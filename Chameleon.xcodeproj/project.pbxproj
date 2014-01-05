@@ -97,9 +97,7 @@
 		360A04BC1861F48F0091F464 /* smbios_getters.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios_getters.c; sourceTree = "<group>"; };
 		360A04BD1861F48F0091F464 /* smbios_getters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios_getters.h; sourceTree = "<group>"; };
 		360A04BE1861F48F0091F464 /* smbios.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios.c; sourceTree = "<group>"; };
-		360A04BF1861F48F0091F464 /* smbios.c.diff */ = {isa = PBXFileReference; lastKnownFileType = text; path = smbios.c.diff; sourceTree = "<group>"; };
 		360A04C01861F48F0091F464 /* smbios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios.h; sourceTree = "<group>"; };
-		360A04C11861F48F0091F464 /* smbios.h.diff */ = {isa = PBXFileReference; lastKnownFileType = text; path = smbios.h.diff; sourceTree = "<group>"; };
 		360A04C21861F48F0091F464 /* spd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spd.c; sourceTree = "<group>"; };
 		360A04C31861F48F0091F464 /* spd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spd.h; sourceTree = "<group>"; };
 		360A04C41861F48F0091F464 /* stringTable.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stringTable.c; sourceTree = "<group>"; };
@@ -3419,9 +3417,7 @@
 				360A04BC1861F48F0091F464 /* smbios_getters.c */,
 				360A04BD1861F48F0091F464 /* smbios_getters.h */,
 				360A04BE1861F48F0091F464 /* smbios.c */,
-				360A04BF1861F48F0091F464 /* smbios.c.diff */,
 				360A04C01861F48F0091F464 /* smbios.h */,
-				360A04C11861F48F0091F464 /* smbios.h.diff */,
 				360A04C21861F48F0091F464 /* spd.c */,
 				360A04C31861F48F0091F464 /* spd.h */,
 				360A04C41861F48F0091F464 /* stringTable.c */,

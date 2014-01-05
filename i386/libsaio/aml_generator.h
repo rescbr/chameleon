@@ -29,10 +29,10 @@ struct aml_chunk
 {
 	unsigned char		Type;
 	unsigned int		Length;
-	char*				Buffer;
-	
+	char*			Buffer;
+
 	unsigned int		Size;
-	
+
 	struct aml_chunk*	Next;
 	struct aml_chunk*	First;
 	struct aml_chunk*	Last;

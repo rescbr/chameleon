@@ -227,7 +227,6 @@ enum
 /* =======================
  System Enclosure (Type 3)
  ========================= */
-
 typedef struct SMBSystemEnclosure
 {
 	SMB_STRUCT_HEADER               // Type 3
