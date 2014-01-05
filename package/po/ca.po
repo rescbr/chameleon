@@ -7,16 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-05-11 17:17-0000\n"
-"Last-Translator: ErmaC\n"
+"POT-Creation-Date: 2013-12-27 14:14+0000\n"
+"PO-Revision-Date: 2013-12-29 12:16+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: ca <ca@li.org>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1368280430.0\n"
+"X-POOTLE-MTIME: 1388319382.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -458,10 +459,9 @@ msgstr ""
 
 #. type: "NVIDIAGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:83
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "NVIDIAGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "NVIDIAGraphicsEnabler"
 
 #. type: "NVIDIAGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:84
@@ -473,10 +473,9 @@ msgstr ""
 
 #. type: "AMDGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:87
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "AMDGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "AMDGraphicsEnabler"
 
 #. type: "AMDGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:88
@@ -488,10 +487,9 @@ msgstr ""
 
 #. type: "IntelGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:91
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "IntelGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "IntelGraphicsEnabler"
 
 #. type: "IntelGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:92
@@ -671,10 +669,9 @@ msgstr "Aquesta opció permet ignorar imatges de repòs defectuoses."
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "ForceWake=Yes"
+msgstr "ForceFullMemInfo=Yes"
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
@@ -1129,10 +1126,9 @@ msgstr ""
 #. type: "HDAULayoutIDx32_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:363
-#, fuzzy, no-wrap
-#| msgid "LayoutID=392"
+#, no-wrap
 msgid "LayoutID=32"
-msgstr "LayoutID=392"
+msgstr "LayoutID=32"
 
 #. type: "HDEFLayoutIDx32_description"
 #: Resources/templates/Localizable.strings:266
@@ -1765,10 +1761,9 @@ msgstr ""
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:483
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00000604"
-msgstr "01660000"
+msgstr "00000604"
 
 #. type: "IntelAzulx00_description"
 #: Resources/templates/Localizable.strings:484
@@ -1778,10 +1773,9 @@ msgstr ""
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000060c"
-msgstr "01660000"
+msgstr "0000060c"
 
 #. type: "IntelAzulx01_description"
 #: Resources/templates/Localizable.strings:487
@@ -1791,10 +1785,9 @@ msgstr ""
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00001604"
-msgstr "01660000"
+msgstr "00001604"
 
 #. type: "IntelAzulx02_description"
 #: Resources/templates/Localizable.strings:490
@@ -1804,10 +1797,9 @@ msgstr ""
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160a"
-msgstr "01660000"
+msgstr "0000160a"
 
 #. type: "IntelAzulx03_description"
 #: Resources/templates/Localizable.strings:493
@@ -1817,10 +1809,9 @@ msgstr ""
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160c"
-msgstr "01660000"
+msgstr "0000160c"
 
 #. type: "IntelAzulx04_description"
 #: Resources/templates/Localizable.strings:496
@@ -1830,10 +1821,9 @@ msgstr ""
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00002604"
-msgstr "01660000"
+msgstr "00002604"
 
 #. type: "IntelAzulx05_description"
 #: Resources/templates/Localizable.strings:499
@@ -1843,10 +1833,9 @@ msgstr ""
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260a"
-msgstr "01660000"
+msgstr "0000260a"
 
 #. type: "IntelAzulx06_description"
 #: Resources/templates/Localizable.strings:502
@@ -1856,10 +1845,9 @@ msgstr ""
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260c"
-msgstr "01660000"
+msgstr "0000260c"
 
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:505
@@ -1869,10 +1857,9 @@ msgstr ""
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260d"
-msgstr "01660000"
+msgstr "0000260d"
 
 #. type: "IntelAzulx08_description"
 #: Resources/templates/Localizable.strings:508
@@ -1884,7 +1871,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "02001604"
-msgstr ""
+msgstr "02001604"
 
 #. type: "IntelAzulx09_description"
 #: Resources/templates/Localizable.strings:511
@@ -1896,7 +1883,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:513
 #, no-wrap
 msgid "0300220d"
-msgstr ""
+msgstr "0300220d"
 
 #. type: "IntelAzulx10_description"
 #: Resources/templates/Localizable.strings:514
@@ -1908,7 +1895,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:516
 #, no-wrap
 msgid "0500260a"
-msgstr ""
+msgstr "0500260a"
 
 #. type: "IntelAzulx11_description"
 #: Resources/templates/Localizable.strings:517
@@ -1920,7 +1907,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:519
 #, no-wrap
 msgid "0600260a"
-msgstr ""
+msgstr "0600260a"
 
 #. type: "IntelAzulx12_description"
 #: Resources/templates/Localizable.strings:520
@@ -1932,7 +1919,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "0700260d"
-msgstr ""
+msgstr "0700260d"
 
 #. type: "IntelAzulx13_description"
 #: Resources/templates/Localizable.strings:523
@@ -1944,7 +1931,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:525
 #, no-wrap
 msgid "0800260a"
-msgstr ""
+msgstr "0800260a"
 
 #. type: "IntelAzulx14_description"
 #: Resources/templates/Localizable.strings:526
@@ -1956,7 +1943,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:528
 #, no-wrap
 msgid "08002e0a"
-msgstr ""
+msgstr "08002e0a"
 
 #. type: "IntelAzulx15_description"
 #: Resources/templates/Localizable.strings:529
@@ -2247,7 +2234,7 @@ msgstr "Només per Lion. Desactiva la característica 'low power wake' que en oc
 #: Resources/templates/Localizable.strings:610
 #, no-wrap
 msgid "nvda_drv=1"
-msgstr ""
+msgstr "nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
 #: Resources/templates/Localizable.strings:611
@@ -2481,7 +2468,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:698
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
 #: Resources/templates/Localizable.strings:699
@@ -2493,7 +2480,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:702
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:703
@@ -2509,10 +2496,9 @@ msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
 #: Resources/templates/Localizable.strings:707
-#, fuzzy, no-wrap
-#| msgid "Set one resolution to use."
+#, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
-msgstr "Estableix la resolució del teu monitor"
+msgstr ""
 
 #. type: "Video_title"
 #: Resources/templates/Localizable.strings:710

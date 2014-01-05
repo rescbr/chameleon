@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-06-04 17:50+0000\n"
+"PO-Revision-Date: 2013-12-29 12:00+0000\n"
 "Last-Translator: Mill <ceruns@ymail.com>\n"
 "Language-Team: ko <ko@li.org>\n"
 "Language: ko\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1370368229.0\n"
+"X-POOTLE-MTIME: 1388318425.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -678,10 +678,9 @@ msgstr "선택 시 잠자기때 저장한 이미지가 에러난 경우 우회�
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "강제 깨우기(ForceWake=Yes)"
+msgstr ""
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
@@ -1144,23 +1143,19 @@ msgstr ""
 #. type: "HDAULayoutIDx32_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:363
-#, fuzzy, no-wrap
-#| msgid "LayoutID=392"
+#, no-wrap
 msgid "LayoutID=32"
-msgstr "LayoutID=392"
+msgstr "LayoutID=32"
 
 #. type: "HDEFLayoutIDx32_description"
 #: Resources/templates/Localizable.strings:266
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 2:\n"
-#| "002 (0x02, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 2:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"HDEF layout-it 을 32로 설정:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
 #: Resources/templates/Localizable.strings:269
@@ -1527,16 +1522,13 @@ msgstr ""
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:364
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 2:\n"
-#| "002 (0x02, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 2:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"HDAU layout-it을 32로 설정:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:368
@@ -1874,220 +1866,195 @@ msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 0166000b 설정."
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:483
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00000604"
-msgstr "01660000"
+msgstr "00000604"
 
 #. type: "IntelAzulx00_description"
 #: Resources/templates/Localizable.strings:484
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01660000 설정."
+msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 00000604설정."
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000060c"
-msgstr "01660000"
+msgstr "0000060c"
 
 #. type: "IntelAzulx01_description"
 #: Resources/templates/Localizable.strings:487
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01660000 설정."
+msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 0000060c 설정."
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00001604"
-msgstr "01660000"
+msgstr "00001604"
 
 #. type: "IntelAzulx02_description"
 #: Resources/templates/Localizable.strings:490
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 01660004로 설정."
+msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160a"
-msgstr "01660000"
+msgstr "0000160a"
 
 #. type: "IntelAzulx03_description"
 #: Resources/templates/Localizable.strings:493
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0000160a로 설정."
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160c"
-msgstr "01660000"
+msgstr "0000160c"
 
 #. type: "IntelAzulx04_description"
 #: Resources/templates/Localizable.strings:496
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01660000 설정."
+msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 0000160c 설정."
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00002604"
-msgstr "01660000"
+msgstr "00002604"
 
 #. type: "IntelAzulx05_description"
 #: Resources/templates/Localizable.strings:499
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 01660004로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 00002604 로 설정."
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260a"
-msgstr "01660000"
+msgstr "0000260a"
 
 #. type: "IntelAzulx06_description"
 #: Resources/templates/Localizable.strings:502
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0000260a 로 설정."
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260c"
-msgstr "01660000"
+msgstr "0000260c"
 
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:505
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0600260c 로 설정."
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260d"
-msgstr "01660000"
+msgstr "0000260d"
 
 #. type: "IntelAzulx08_description"
 #: Resources/templates/Localizable.strings:508
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01660000 설정."
+msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 0000260d 설정."
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "02001604"
-msgstr ""
+msgstr "02001604"
 
 #. type: "IntelAzulx09_description"
 #: Resources/templates/Localizable.strings:511
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 01660004로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 02001604 로 설정."
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:513
 #, no-wrap
 msgid "0300220d"
-msgstr ""
+msgstr "0300220d"
 
 #. type: "IntelAzulx10_description"
 #: Resources/templates/Localizable.strings:514
-#, fuzzy, no-wrap
-#| msgid "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01620005 설정."
+msgstr "Intel Haswell (데스크톱) 의 AAPL,ig-platform-id로 0300220d 설정."
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:516
 #, no-wrap
 msgid "0500260a"
-msgstr ""
+msgstr "0500260a"
 
 #. type: "IntelAzulx11_description"
 #: Resources/templates/Localizable.strings:517
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (모바일) AAPL 를 위해 ig-platform-id를 0500260a 로 설정."
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:519
 #, no-wrap
 msgid "0600260a"
-msgstr ""
+msgstr "0600260a"
 
 #. type: "IntelAzulx12_description"
 #: Resources/templates/Localizable.strings:520
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0600260a 로 설정."
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "0700260d"
-msgstr ""
+msgstr "0700260d"
 
 #. type: "IntelAzulx13_description"
 #: Resources/templates/Localizable.strings:523
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (모바일) 의 AAPL,ig-platform-id로 01660000 설정."
+msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 0700260d설정."
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:525
 #, no-wrap
 msgid "0800260a"
-msgstr ""
+msgstr "0800260a"
 
 #. type: "IntelAzulx14_description"
 #: Resources/templates/Localizable.strings:526
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0800260a로 설정."
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:528
 #, no-wrap
 msgid "08002e0a"
-msgstr ""
+msgstr "08002e0a"
 
 #. type: "IntelAzulx15_description"
 #: Resources/templates/Localizable.strings:529
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Intel HD4000 (Mobile) AAPL 를 위해 ig-platform-id를 0166000a로 설정."
+msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 08002e0a 로 설정."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:533
@@ -2378,7 +2345,7 @@ msgstr "Lion전용. 선택 시 잠자기 모드에서 깨어난 후 가끔 화�
 #: Resources/templates/Localizable.strings:610
 #, no-wrap
 msgid "nvda_drv=1"
-msgstr ""
+msgstr "nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
 #: Resources/templates/Localizable.strings:611
@@ -2389,6 +2356,10 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
+"시스템 환경설정 아래에 Nvidia Web Driver 라는 새로운 새로운 환경 설정 패널을 생성합니다. \n"
+"정보: 새로운 Nvidia 정식 드라이버 설치 방법\n"
+"http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/ (영문)\n"
+"기여: merklort, Rampage Dev."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:616
@@ -2624,16 +2595,15 @@ msgstr "Intel HD4000 을 위한 one AAPL,ig-platform-id 설정"
 
 #. type: "IntelAzul_title"
 #: Resources/templates/Localizable.strings:702
-#, fuzzy, no-wrap
+#, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr "IIntel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:703
-#, fuzzy, no-wrap
-#| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+#, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr "Intel HD4000 을 위한 one AAPL,ig-platform-id 설정"
+msgstr "Intel HD5000 사용을 위해 AAPL,ig-platform-id 하나 설정"
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:706

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.1svn-r1870\n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-06-08 13:43+0000\n"
-"Last-Translator: martin63 <martin.badin@gmail.com>\n"
+"PO-Revision-Date: 2013-12-29 12:13+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: cs <cs@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1370699010.0\n"
+"X-POOTLE-MTIME: 1388319197.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -464,10 +464,9 @@ msgstr ""
 
 #. type: "NVIDIAGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:83
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "NVIDIAGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "NVIDIAGraphicsEnabler"
 
 #. type: "NVIDIAGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:84
@@ -479,10 +478,9 @@ msgstr ""
 
 #. type: "AMDGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:87
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "AMDGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "AMDGraphicsEnabler"
 
 #. type: "AMDGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:88
@@ -494,10 +492,9 @@ msgstr ""
 
 #. type: "IntelGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:91
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "IntelGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "IntelGraphicsEnabler"
 
 #. type: "IntelGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:92
@@ -677,10 +674,9 @@ msgstr "Tato možnost vám dovolí obejít vadné sleep images."
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "ForceWake=Yes"
+msgstr "ForceFullMemInfo=Yes"
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
@@ -780,10 +776,9 @@ msgstr "DropHPET=Yes"
 
 #. type: "DropHPET_description"
 #: Resources/templates/Localizable.strings:171
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in HPET table."
-msgstr "Vyřadí SSDT tabulky obsažené v základní desce."
+msgstr "Vyřadí HPET tabulky obsažené v základní desce."
 
 #. type: "DropSBST_title"
 #: Resources/templates/Localizable.strings:173
@@ -793,10 +788,9 @@ msgstr "DropSBST=Yes"
 
 #. type: "DropSBST_description"
 #: Resources/templates/Localizable.strings:174
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in SBST table."
-msgstr "Vyřadí SSDT tabulky obsažené v základní desce."
+msgstr "Vyřadí SBST tabulky obsažené v základní desce."
 
 #. type: "DropECDT_title"
 #: Resources/templates/Localizable.strings:176
@@ -806,10 +800,9 @@ msgstr "DropECDT=Yes"
 
 #. type: "DropECDT_description"
 #: Resources/templates/Localizable.strings:177
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in ECDT table."
-msgstr "Vyřadí SSDT tabulky obsažené v základní desce."
+msgstr "Vyřadí ECDT tabulky obsažené v základní desce."
 
 #. type: "DropASFT_title"
 #: Resources/templates/Localizable.strings:179
@@ -819,10 +812,9 @@ msgstr "DropASFT=Yes"
 
 #. type: "DropASFT_description"
 #: Resources/templates/Localizable.strings:180
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in ASF! table."
-msgstr "Vyřadí SSDT tabulky obsažené v základní desce."
+msgstr "Vyřadí ASF! tabulky obsažené v základní desce."
 
 #. type: "DropDMAR_title"
 #: Resources/templates/Localizable.strings:182
@@ -1147,23 +1139,19 @@ msgstr ""
 #. type: "HDAULayoutIDx32_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:363
-#, fuzzy, no-wrap
-#| msgid "LayoutID=392"
+#, no-wrap
 msgid "LayoutID=32"
-msgstr "LayoutID=392"
+msgstr "LayoutID=32"
 
 #. type: "HDEFLayoutIDx32_description"
 #: Resources/templates/Localizable.strings:266
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 2:\n"
-#| "002 (0x02, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Nastavit HDAU layout na 0:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"Nastavit HDEF layout na 32:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
 #: Resources/templates/Localizable.strings:269
@@ -1530,16 +1518,13 @@ msgstr ""
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:364
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 2:\n"
-#| "002 (0x02, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Nastavit HDAU layout na 0:\n"
-"002 (0x02, 0x00, 0x00, 0x00)."
+"Nastavit HDAU layout na 32:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:368
@@ -1877,220 +1862,195 @@ msgstr "Nastavit 0166000b pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:483
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00000604"
-msgstr "01660000"
+msgstr "00000604"
 
 #. type: "IntelAzulx00_description"
 #: Resources/templates/Localizable.strings:484
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660000 pro Intel HD4000 (Mobile) AAPL,ig-platform-id."
+msgstr "Nastavit 00000604 pro Intel HD5000 (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000060c"
-msgstr "01660000"
+msgstr "0000060c"
 
 #. type: "IntelAzulx01_description"
 #: Resources/templates/Localizable.strings:487
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660000 pro Intel HD4000 (Mobile) AAPL,ig-platform-id."
+msgstr "Nastavit 0000060c pro Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00001604"
-msgstr "01660000"
+msgstr "00001604"
 
 #. type: "IntelAzulx02_description"
 #: Resources/templates/Localizable.strings:490
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660004 pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 01660004 pro Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160a"
-msgstr "01660000"
+msgstr "0000160a"
 
 #. type: "IntelAzulx03_description"
 #: Resources/templates/Localizable.strings:493
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0000160a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160c"
-msgstr "01660000"
+msgstr "0000160c"
 
 #. type: "IntelAzulx04_description"
 #: Resources/templates/Localizable.strings:496
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660000 pro Intel HD4000 (Mobile) AAPL,ig-platform-id."
+msgstr "Nastavit 0000160c pro Intel HD5000 (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00002604"
-msgstr "01660000"
+msgstr "00002604"
 
 #. type: "IntelAzulx05_description"
 #: Resources/templates/Localizable.strings:499
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660004 pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 00002604 pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260a"
-msgstr "01660000"
+msgstr "0000260a"
 
 #. type: "IntelAzulx06_description"
 #: Resources/templates/Localizable.strings:502
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0000260a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260c"
-msgstr "01660000"
+msgstr "0000260c"
 
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:505
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0600260c pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260d"
-msgstr "01660000"
+msgstr "0000260d"
 
 #. type: "IntelAzulx08_description"
 #: Resources/templates/Localizable.strings:508
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660000 pro Intel HD4000 (Mobile) AAPL,ig-platform-id."
+msgstr "Nastavit 0000260d pro Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "02001604"
-msgstr ""
+msgstr "02001604"
 
 #. type: "IntelAzulx09_description"
 #: Resources/templates/Localizable.strings:511
-#, fuzzy, no-wrap
-#| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660004 pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 02001604 pro Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:513
 #, no-wrap
 msgid "0300220d"
-msgstr ""
+msgstr "0300220d"
 
 #. type: "IntelAzulx10_description"
 #: Resources/templates/Localizable.strings:514
-#, fuzzy, no-wrap
-#| msgid "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
-msgstr "Nastavit 01620005 pro Intel HD4000 (Desktop) AAPL, ig-platform-id."
+msgstr "Nastavit 0300220d pro Intel Haswell (Desktop) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:516
 #, no-wrap
 msgid "0500260a"
-msgstr ""
+msgstr "0500260a"
 
 #. type: "IntelAzulx11_description"
 #: Resources/templates/Localizable.strings:517
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0500260a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:519
 #, no-wrap
 msgid "0600260a"
-msgstr ""
+msgstr "0600260a"
 
 #. type: "IntelAzulx12_description"
 #: Resources/templates/Localizable.strings:520
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0600260a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "0700260d"
-msgstr ""
+msgstr "0700260d"
 
 #. type: "IntelAzulx13_description"
 #: Resources/templates/Localizable.strings:523
-#, fuzzy, no-wrap
-#| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 01660000 pro Intel HD4000 (Mobile) AAPL,ig-platform-id."
+msgstr "Nastavit 0700260d pro Intel HD5000 (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:525
 #, no-wrap
 msgid "0800260a"
-msgstr ""
+msgstr "0800260a"
 
 #. type: "IntelAzulx14_description"
 #: Resources/templates/Localizable.strings:526
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 0800260a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:528
 #, no-wrap
 msgid "08002e0a"
-msgstr ""
+msgstr "08002e0a"
 
 #. type: "IntelAzulx15_description"
 #: Resources/templates/Localizable.strings:529
-#, fuzzy, no-wrap
-#| msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+#, no-wrap
 msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Nastavit 0166000a pro Intel HD4000 (Mobile) AAPL, ig-platform-id."
+msgstr "Nastavit 08002e0a pro Intel HD5000 (Mobile) AAPL, ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:533
@@ -2619,16 +2579,15 @@ msgstr "Nastavit jednu AAPL,ig-platform-id požitelnú pro vaši Intel HD4000."
 
 #. type: "IntelAzul_title"
 #: Resources/templates/Localizable.strings:702
-#, fuzzy, no-wrap
+#, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:703
-#, fuzzy, no-wrap
-#| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+#, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr "Nastavit jednu AAPL,ig-platform-id požitelnú pro vaši Intel HD4000."
+msgstr "Nastavit jednu AAPL,ig-platform-id požitelnú pro vaši Intel HD5000."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:706

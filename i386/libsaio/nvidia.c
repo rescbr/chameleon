@@ -1139,6 +1139,8 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE118E,	"GeForce GTX 760 (192-bit)" },
 	{ 0x10DE118F,	"Tesla K10" },
 	// 1190 - 119F
+	{ 0x10DE1192,	"GeForce GK104" },
+	{ 0x10DE1193,	"GeForce GTX 760 Ti" },
 	{ 0x10DE119F,	"GeForce GTX 780M" },
 	// 11A0 - 11AF
 	{ 0x10DE11A0,	"GeForce GTX 680M" },
@@ -1181,6 +1183,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1211,	"GeForce GTX 580M" },
 	{ 0x10DE1212,	"GeForce GTX 675M" },
 	{ 0x10DE1213,	"GeForce GTX 670M" },
+	//{ 0x10DE121F,	"GF114-INT" },
 	{ 0x10DE1240,	"GeForce GT 620M" },
 	{ 0x10DE1241,	"GeForce GT 545" },
 	{ 0x10DE1243,	"GeForce GT 545" },
@@ -1212,6 +1215,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	//{ 0x10DE12A0,	"GeForce GT ???" },
 	{ 0x10DE12AF,	"GK208-INT" },
 	{ 0x10DE12B0,	"GK208-CS-Q" },
+	{ 0x10DE12B9,	"Quadro K610M" },
 	{ 0x10DE12BA,	"Quadro K510M" }
 	// 12B0 - 12BF
 	// 12C0 - 12CF
@@ -1486,8 +1490,7 @@ static int patch_nvidia_rom(uint8_t *rom)
 		return PATCH_ROM_FAILED;
 	}
 	
-	if (numentries >= MAX_NUM_DCB_ENTRIES)
-	{
+	if (numentries >= MAX_NUM_DCB_ENTRIES) {
 		numentries = MAX_NUM_DCB_ENTRIES;
 	}
 

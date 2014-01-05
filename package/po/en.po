@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-08-28 15:47-0000\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2013-12-29 12:14+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: en <en@li.org>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"X-POOTLE-MTIME: 1388319263.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -682,16 +683,15 @@ msgstr "This option enables you to bypass bad sleep images."
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "ForceWake=Yes"
+msgstr "ForceFullMemInfo=Yes"
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "Force SMBIOS Table 17 to be 27 bytes long."
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:147
@@ -1879,7 +1879,7 @@ msgstr "00000604"
 #: Resources/templates/Localizable.strings:484
 #, no-wrap
 msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
@@ -1891,7 +1891,7 @@ msgstr "0000060c"
 #: Resources/templates/Localizable.strings:487
 #, no-wrap
 msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0000060c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
@@ -1903,7 +1903,7 @@ msgstr "00001604"
 #: Resources/templates/Localizable.strings:490
 #, no-wrap
 msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
@@ -1915,7 +1915,7 @@ msgstr "0000160a"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0000160a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
@@ -1927,7 +1927,7 @@ msgstr "0000160c"
 #: Resources/templates/Localizable.strings:496
 #, no-wrap
 msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0000160c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
@@ -1939,7 +1939,7 @@ msgstr "00002604"
 #: Resources/templates/Localizable.strings:499
 #, no-wrap
 msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
@@ -1951,7 +1951,7 @@ msgstr "0000260a"
 #: Resources/templates/Localizable.strings:502
 #, no-wrap
 msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0000260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
@@ -1963,7 +1963,7 @@ msgstr "0000260c"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
@@ -1975,7 +1975,7 @@ msgstr "0000260d"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
 msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0000260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:510
@@ -1987,7 +1987,7 @@ msgstr "02001604"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
 msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:513
@@ -1999,7 +1999,7 @@ msgstr "0300220d"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
-msgstr "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
+msgstr "Set 0300220d for Intel Haswell (Desktop) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:516
@@ -2011,7 +2011,7 @@ msgstr "0500260a"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
 msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:519
@@ -2023,7 +2023,7 @@ msgstr "0600260a"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
 msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0600260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:522
@@ -2035,7 +2035,7 @@ msgstr "0700260d"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
 msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0700260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:525
@@ -2047,7 +2047,7 @@ msgstr "0800260a"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 0800260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:528
@@ -2059,7 +2059,7 @@ msgstr "08002e0a"
 #: Resources/templates/Localizable.strings:529
 #, no-wrap
 msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgstr "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:533
