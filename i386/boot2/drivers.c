@@ -244,11 +244,11 @@ long LoadDrivers( char * dirSpec )
             else
             {
 				if (gMacOSVersion[3] == '9') {
-					strcpy(gExtensionsSpec, dirSpec);
+                    strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
 				}
-                strcpy(gExtensionsSpec, dirSpec);
+                strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/") */
                 strcat(gExtensionsSpec, "System/Library/");
                 FileLoadDrivers(gExtensionsSpec, 0);
             }
@@ -278,7 +278,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 	long	ret, flags, time, time2;
 	char	altDirSpec[512];
 	
-	sprintf (altDirSpec, "%s%s", dirSpec, extDirSpec);
+	snprintf(altDirSpec, sizeof(altDirSpec), "%s%s", dirSpec, extDirSpec);
 	ret = GetFileInfo(altDirSpec, "Extensions.mkext", &flags, &time);
 
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat))
@@ -289,7 +289,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 			|| ((flags & kFileTypeMask) != kFileTypeDirectory)
 			|| (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
-			sprintf(gDriverSpec, "%sExtensions.mkext", altDirSpec);
+            snprintf(gDriverSpec, sizeof(altDirSpec) + 18, "%sExtensions.mkext", altDirSpec);
 			verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
 
 			if (LoadDriverMKext(gDriverSpec) == 0)
@@ -336,17 +336,17 @@ FileLoadDrivers( char * dirSpec, long plugin )
         if (strcmp(name + length - 5, ".kext")) continue;
 
         // Save the file name.
-        strcpy(gFileName, name);
+        strlcpy(gFileName, name, 4096);
     
         // Determine the bundle type.
-        sprintf(gTempSpec, "%s/%s", dirSpec, gFileName);
+        snprintf(gTempSpec, 4096, "%s/%s", dirSpec, gFileName);
         ret = GetFileInfo(gTempSpec, "Contents", &flags, &time);
         if (ret == 0) bundleType = kCFBundleType2;
         else bundleType = kCFBundleType3;
 
         if (!plugin)
-            sprintf(gDriverSpec, "%s/%s/%sPlugIns", dirSpec, gFileName,
-                    (bundleType == kCFBundleType2) ? "Contents/" : "");
+          snprintf(gDriverSpec, 4096, "%s/%s/%sPlugIns", dirSpec, gFileName,
+                   (bundleType == kCFBundleType2) ? "Contents/" : "");
 
         ret = LoadDriverPList(dirSpec, gFileName, bundleType);
 
@@ -383,7 +383,7 @@ NetLoadDrivers( char * dirSpec )
 #endif
 
     // INTEL modification
-    sprintf(gDriverSpec, "%s%s.mkext", dirSpec, bootInfo->bootFile);
+    snprintf(gDriverSpec, 4096, "%s%s.mkext", dirSpec, bootInfo->bootFile);
     
     verbose("NetLoadDrivers: Loading from [%s]\n", gDriverSpec);
     
@@ -436,7 +436,7 @@ LoadDriverMKext( char * fileSpec )
     memcpy((void *)driversAddr, (void *)package, driversLength);
 
     // Add the MKext to the memory map.
-    sprintf(segName, "DriversPackage-%lx", driversAddr);
+    snprintf(segName, sizeof(segName), "DriversPackage-%lx", driversAddr);
     AllocateMemoryRange(segName, driversAddr, driversLength,
                         kBootDriverTypeMKEXT);
 
@@ -460,18 +460,22 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
     do {
         // Save the driver path.
         
-        if(name) sprintf(gFileSpec, "%s/%s/%s", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
-        else sprintf(gFileSpec, "%s/%s", dirSpec,
-                     (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+        if(name)
+          snprintf(gFileSpec, 4096, "%s/%s/%s", dirSpec, name,
+                   (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
+        else
+          snprintf(gFileSpec, 4096, "%s/%s", dirSpec,
+                   (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
         executablePathLength = strlen(gFileSpec) + 1;
 
         tmpExecutablePath = malloc(executablePathLength);
         if (tmpExecutablePath == 0) break;
         strcpy(tmpExecutablePath, gFileSpec);
   
-        if(name) sprintf(gFileSpec, "%s/%s", dirSpec, name);
-        else sprintf(gFileSpec, "%s", dirSpec);
+        if(name) 
+          snprintf(gFileSpec, 4096, "%s/%s", dirSpec, name);
+        else
+          snprintf(gFileSpec, 4096, "%s", dirSpec);
         bundlePathLength = strlen(gFileSpec) + 1;
 
         tmpBundlePath = malloc(bundlePathLength);
@@ -481,10 +485,12 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 
         // Construct the file spec to the plist, then load it.
 
-        if(name) sprintf(gFileSpec, "%s/%s/%sInfo.plist", dirSpec, name,
-                (bundleType == kCFBundleType2) ? "Contents/" : "");
-        else sprintf(gFileSpec, "%s/%sInfo.plist", dirSpec,
-                     (bundleType == kCFBundleType2) ? "Contents/" : "");
+        if(name)
+          snprintf(gFileSpec, 4096, "%s/%s/%sInfo.plist", dirSpec, name,
+                   (bundleType == kCFBundleType2) ? "Contents/" : "");
+        else
+          snprintf(gFileSpec, 4096, "%s/%sInfo.plist", dirSpec,
+                   (bundleType == kCFBundleType2) ? "Contents/" : "");
 
         length = LoadFile(gFileSpec);
         if (length == -1) break;
@@ -574,7 +580,7 @@ LoadMatchedModules( void )
 			if (prop != 0)
 			{
 				fileName = prop->string;
-				sprintf(gFileSpec, "%s%s", module->executablePath, fileName);
+				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
 				length = LoadThinFatFile(gFileSpec, &executableAddr);
 				if (length == 0)
 				{
@@ -629,7 +635,7 @@ LoadMatchedModules( void )
 				strcpy(driver->bundlePathAddr, module->bundlePath);
 
 				// Add an entry to the memory map.
-				sprintf(segName, "Driver-%lx", (unsigned long)driver);
+				snprintf(segName, sizeof(segName), "Driver-%lx", (unsigned long)driver);
 				AllocateMemoryRange(segName, driverAddr, driverLength,
 									kBootDriverTypeKEXT);
 			}
