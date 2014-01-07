@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-07-22 03:12-0000\n"
+"PO-Revision-Date: 2013-12-29 12:07+0000\n"
 "Last-Translator: Maniac <emafrias@gmail.com>\n"
 "Language-Team: es <es@li.org>\n"
 "Language: es\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1371470563.0\n"
+"X-POOTLE-MTIME: 1388318845.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -680,10 +680,9 @@ msgstr "Habilita la opción de ignorar imágenes de reposo o hibernación defect
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "ForceWake=Yes"
+msgstr "ForceFullMemInfo=Yes"
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
@@ -915,10 +914,9 @@ msgstr "GenerateTStates=Yes"
 
 #. type: "GenerateTStates_description"
 #: Resources/templates/Localizable.strings:204
-#, fuzzy, no-wrap
-#| msgid "Enable auto generation of processor power performance states (P-States)."
+#, no-wrap
 msgid "Enable auto generation of processor power performance states (T-States)."
-msgstr "Habilita la generación automática de estados de carga o P-States del procesador."
+msgstr "Habilita la generación automática de estados de carga o T-States del procesador."
 
 #. type: "1024x600x32_title"
 #: Resources/templates/Localizable.strings:208
@@ -2577,7 +2575,7 @@ msgstr "Set one HDAU Layout ID to use for your HDMi controller."
 #: Resources/templates/Localizable.strings:698
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
 #: Resources/templates/Localizable.strings:699
@@ -2589,14 +2587,13 @@ msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 #: Resources/templates/Localizable.strings:702
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:703
-#, fuzzy, no-wrap
-#| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+#, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr ""
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:706
@@ -2606,10 +2603,9 @@ msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
 #: Resources/templates/Localizable.strings:707
-#, fuzzy, no-wrap
-#| msgid "Set one resolution to use."
+#, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
-msgstr "Permite fijar la resolución de pantalla para nuestro monitor"
+msgstr ""
 
 #. type: "Video_title"
 #: Resources/templates/Localizable.strings:710

@@ -7,15 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.1svn-r1870\n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-05-11 13:32+0000\n"
+"PO-Revision-Date: 2014-01-05 13:57+0000\n"
 "Last-Translator: minlite <miromarkarian@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1368280430.0\n"
+"X-POOTLE-MTIME: 1388930225.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -30,7 +31,7 @@ msgstr "v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:25
 msgid "Do not install to an Apple Macintosh computer"
-msgstr "بر روی کامپیوتر های مکینتاش نصب نکنید."
+msgstr "بر روی کامپیوتر های مکینتاش اپل نصب نکنید"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:27
@@ -65,12 +66,12 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "ساختن بسته توسط :%WHOBUILD% , ترجمه زبان توسط : cyrus"
+msgstr "ساختن بسته توسط: %WHOBUILD%، ترجمه زبان توسط: cyrus و minlite"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
 msgid "Copyright © %CPRYEAR%"
-msgstr "Copyright © %CPRYEAR%"
+msgstr "Copyright © %CPRYEAR%‫‪‪‫"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
@@ -79,95 +80,92 @@ msgid ""
 "evolved from the development of David Elliott's fake EFI implementation "
 "added to Apple's boot-132 project."
 msgstr ""
-"کامیلیون یک بوت لودر است که توسعه یافته ترکیب fake efi توسط دیوید الیوت با "
-"Apple boot-132 می باشد."
+"کامیلیون یک بوت لودر برگفته از ترکیب قسمت هایی از پیاده سازی EFI تقلبی توسط "
+"دیوید الیوت است که به پروژه boot-132 اپل اضافه شده اند."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
 msgid "Chameleon v2 is extended with many features. For example:"
-msgstr "در کامیلیون نسخه دوم  خصوصیات زیادی توسعه یافته است . مانند:"
+msgstr "در نسخه دوم کامیلیون خصوصیات زیادی توسعه یافته اند. مانند:"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr ""
-"-ظاهری با قابلیت شخصی سازی کامل برای افزودن تعدای از رنگ ها به بوت لودر "
-"داروین."
+msgstr "- ظاهری با قابلیت شخصی سازی کامل برای زیبا سازی بوت لودر داروین."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
 msgid ""
 "- Load a ramdisk to directly boot retail DVDs without additional programs."
 msgstr ""
-"بارگیری یک ramdisk برای بوت مستقیم دی وی دی اصلی بدونه نیاز به برنامه های "
+"- بارگیری یک ramdisk برای بوت مستقیم دی وی دی اصلی بدون نیاز به برنامه های "
 "اضافی ."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
 msgstr ""
-"-قابلیت هایبر نت . از قابلیت شروع مجدد سیستم عامل مک خود با یک تصویر پیش "
+"- قابلیت خواب زمستانی. از قابلیت شروع مجدد سیستم عامل مک خود با یک تصویر پیش "
 "نمایش لذت ببرید."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
 msgid "- SMBIOS override to modify the factory SMBIOS values."
-msgstr ""
-"-قابیلت نادیده گرفتن smbios تعریف شده توسط کارخانه و جایگزینی با smbios دیگر."
+msgstr "- قابلیت استفاده از SMBIOS متفرقه برای جایگزین کردن SMBIOS کارخانه."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
 msgid ""
 "- DSDT override to use a modified fixed DSDT which can solve several issues."
 msgstr ""
-"-نادیده گرفتن DSDT . برای استفاده از یک DSDT ویرایش شده که می تواند تعدادی "
-"از مشکلات را حل کند."
+"- قابلیت استفاده از DSDT متفرقه ویرایش شده که می تواند تعدادی از مشکلات "
+"احتمالی را حل کند."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
 msgid "- Device Property Injection via device-properties string."
-msgstr "-تزریق مشخصات دستگاه ها توسط device-properties sting"
+msgstr "- تزریق مشخصات دستگاه توسط رشته device-properties."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
 msgid "- hybrid boot0 / boot1h for MBR and GPT partitioned disks."
-msgstr "-boot0/boot1h پیوندی برای دیسک MBR و GPT"
+msgstr "- boot0/boot1h پیوندی برای دیسک های پارتیشن شده به روش MBR و GPT."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:29
 msgid "- Automatic FSB detection code even for recent AMD CPUs."
-msgstr "-تشخیص خودکار FSB حتی برای سی پی یو های AMD"
+msgstr "- تشخیص خودکار FSB حتی برای سی پی یو های جدید AMD."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:30
 msgid "- Apple Software RAID support."
-msgstr "-پشتیبانی از قابلیت نرم افزاری RAID اپل ."
+msgstr "- پشتیبانی از قابلیت RAID نرم افزاری اپل ."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:31
 msgid "- Nvidia &amp; ATI/AMD Graphics Card Enabler."
-msgstr "-فعال سازی کار ت گرافیک های ;Nvidia&amp,ATI/AMD"
+msgstr "- فعال سازی کارت گرافیک های: Nvidia و ATI/AMD."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:32
 msgid "- Module support"
-msgstr "-پشتیبانی از ماژول."
+msgstr "- پشتیبانی از ماژول."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:33
 msgid "- Memory detection adapted from memtest86:&nbsp;"
-msgstr "-تشخیص کارت حافظه بهینه سازی شده memtest86:&nbsp;"
+msgstr "- تشخیص حافظه برگرفته از برنامه memtest86."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
 msgid ""
 "- Automatic P-State &amp; C-State generation for native power management."
-msgstr "-مدیریت انرژی به صورت بومی با استفاده از ایجاد c-state,pstate&amp"
+msgstr "- ایجاد خودکار P-State و C-State ها برای مدیریت قدرت بومی."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:35
 msgid "- Message logging."
-msgstr "-نمایش پیغامهای که هنگام بوت نمایش داده می شوند بعد از ورود به سیستم ."
+msgstr "- قابلیت لاگ کردن پیغام ها."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:37
@@ -177,12 +175,12 @@ msgstr "کد تحت نسخه 2 از لایسنس عمومی Gnu منتشر می 
 #. type: Content of: <html><body><p><span>
 #: Resources/templates/Description.html:40
 msgid "FAQ's:&nbsp;"
-msgstr "پرسش و پاسخ ها:&nbsp;"
+msgstr "سوالات متداول: "
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:22
 msgid "The scripts have completed and a file named&nbsp;"
-msgstr "اسکریپت ها کامل شده و تحت یک فایل که نامیده شده است &nbsp;"
+msgstr "اسکریپت ها کامل شده و یک فایل نامیده شده است &nbsp;"
 
 #. type: Content of: <html><body><div><p><span>
 #: Resources/templates/Conclusion.html:22
@@ -192,7 +190,7 @@ msgstr "@LOG_FILENAME@"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:23
 msgid "&nbsp;has been written to the root of your chosen partition."
-msgstr "&nbsp;در ریشه پارتیشن انتخاب شده نوشته می شود."
+msgstr "&nbsp; در ریشه پارتیشن انتخاب شده نوشته می شود."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:25
@@ -210,8 +208,8 @@ msgid ""
 "&nbsp;to find out if the installation was successful and keep it for a "
 "record of what was done."
 msgstr ""
-"&nbsp;برای اینکه فهمیدن این موضوع که نصب موفقیت آمیز بوده است و نگهداشتن آن "
-"برای اینکه مشخص شود چه عملیاتی انجام شده است."
+"&nbsp;برای فهمیدن این موضوع که نصب موفقیت آمیز بوده است، آن را برای این که "
+"بدانید چه کار هایی انجام شده است نگه دارید."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
@@ -246,7 +244,7 @@ msgstr "نسخه جدیدتری از کامیلیون بر روی سیستم ن�
 #: Resources/templates/Localizable.strings:13
 #, no-wrap
 msgid "This software cannot be installed on this computer."
-msgstr "این نرم افزار بر روی این کامپیوتر نصب نمی شود ."
+msgstr "این نرم افزار بر روی این کامپیوتر نصب نمی شود."
 
 #. type: "Chameleon_title"
 #: Resources/templates/Localizable.strings:19
@@ -264,9 +262,9 @@ msgid ""
 "boot2 (On the partition's root directory) for loading kernel etc."
 msgstr ""
 "کامیلیون نیازمند سه فایل ضروری است. (به شکل ساده)\n"
-"boot0 (بر روی درایو MBR) ;که boot1را بار گیری می کند .\n"
+"boot0 (بر روی MBR درایو); که boot1 را بار گیری می کند .\n"
 "boot1 (بر روی بوت سکتور پارتیشن) برای اینکه boot2 را پیدا کند .\n"
-"boot2 (در پارتیشن ریشه ) بر بارگیری کرنل و غیره."
+"boot2 (در فلدر ریشه پارتیشن) بر بارگیری کرنل و غیره."
 
 #. type: "Default_title"
 #: Resources/templates/Localizable.strings:25
@@ -279,7 +277,10 @@ msgstr "استاندارد"
 #: Resources/templates/Localizable.strings:26
 #, no-wrap
 msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
-msgstr "فایل های کامیلیون را در ریشه پارتیشن انتخاب شده با استفاده از boot0 یا boot0mdبسته به سیستم شما بدونه آسیب زدن به نسخه های نصب شده ویندوز (در صورت وجود )نصب می کند ."
+msgstr ""
+"فایل های کامیلیون را در ریشه پارتیشن انتخاب شده با استفاده از boot0 یا "
+"boot0md بسته به سیستم شما بدونه آسیب زدن به نسخه های نصب شده ویندوز (در صورت "
+"وجود) نصب کن."
 
 #. type: "noboot_title"
 #: Resources/templates/Localizable.strings:28
