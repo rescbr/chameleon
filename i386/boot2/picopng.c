@@ -1097,14 +1097,22 @@ int main(int argc, char **argv)
 		printf("file empty\n");
 		return 1;
 	}
-	insize = (uint32_t) statbuf.st_size;
-	inbuf = malloc(insize);
 	infp = fopen(fname, "rb");
 	if (!infp) {
 		perror("fopen");
 		return 1;
-	} else if (fread(inbuf, 1, insize, infp) != insize) {
+	}
+	insize = (uint32_t) statbuf.st_size;
+	inbuf = malloc(insize);
+    if (!inbuf) {
+      perror("malloc");
+      fclose(infp);
+      return 1;
+    }
+    if (fread(inbuf, 1, insize, infp) != insize) {
 		perror("fread");
+        free(inbuf);
+        fclose(infp);
 		return 1;
 	}
 	fclose(infp);
