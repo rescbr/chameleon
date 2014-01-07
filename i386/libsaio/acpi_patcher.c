@@ -93,41 +93,33 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 }
 
 /* The folowing ACPI Table search algo. should be reused anywhere needed:*/
+/* WARNING: outDirspec string will be overwritten by subsequent calls! */
 int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 {
 	int fd = 0;
-	char dirSpec[512];
+	static char dirSpec[512];
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	sprintf(dirSpec, "%s", filename); 
+	snprintf(dirSpec, sizeof(dirSpec), "%s", filename); 
 	fd = open(dirSpec, 0);
 	if (fd < 0)
-	{	
-		sprintf(dirSpec, "/Extra/%s", filename); 
-		fd = open(dirSpec, 0);
-		if (fd < 0)
+    {	
+      snprintf(dirSpec, sizeof(dirSpec), "/Extra/%s", filename); 
+      fd = open(dirSpec, 0);
+      if (fd < 0)
 		{
-			sprintf(dirSpec, "bt(0,0)/Extra/%s", filename);
-			fd = open(dirSpec, 0);
-			if (fd < 0)
+          snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/%s", filename);
+          fd = open(dirSpec, 0);
+          if (fd < 0)
 			{
-				// NOT FOUND:
-				verbose("ACPI Table not found: %s\n", filename);
-				*dirSpec = '\0';
+              // NOT FOUND:
+              verbose("ACPI Table not found: %s\n", filename);
+              *dirSpec = '\0';
 			}
 		}
 	}
 
-// Bungo
-/*** Moved above
-	if (fd < 0)
-	{
-		// NOT FOUND:
-		verbose("ACPI Table not found: %s\n", filename);
-		*dirSpec = '\0';
-	}
-***/
 	if (outDirspec) *outDirspec = dirSpec; 
 	return fd;
 }
@@ -870,7 +862,7 @@ int setupAcpi(void)
 	/* Try using the file specified with the DSDT option */
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
 	{
-		sprintf(dirSpec, filename);
+      snprintf(dirSpec, sizeof(dirSpec), filename);
 	}
 	else
 	{
