@@ -75,9 +75,8 @@ void setupDeviceProperties(Node *node)
 struct DevPropString *devprop_create_string(void)
 {
 	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
-	
-	if(string == NULL)
-		return NULL;
+	if (string == NULL)
+      return NULL;
 	
 	memset(string, 0, sizeof(struct DevPropString));
 	string->length = 12;
@@ -87,19 +86,24 @@ struct DevPropString *devprop_create_string(void)
  
 struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
 {
-	struct DevPropDevice	*device;
-	const char		pciroot_string[] = "PciRoot(0x";
-	const char		pci_device_string[] = "Pci(0x";
+	struct DevPropDevice	*device = NULL;
+	static const char		pciroot_string[] = "PciRoot(0x";
+	static const char		pci_device_string[] = "Pci(0x";
 
 	if (string == NULL || path == NULL) {
+		printf("ERROR null device path\n");
 		return NULL;
 	}
-	device = malloc(sizeof(struct DevPropDevice));
 
 	if (strncmp(path, pciroot_string, strlen(pciroot_string))) {
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
+
+	if (!(device = malloc(sizeof(struct DevPropDevice)))) {
+      printf("ERROR malloc failed\n");
+      return NULL;
+    }
 
 	memset(device, 0, sizeof(struct DevPropDevice));
 	device->acpi_dev_path._UID = getPciRootUID();
@@ -144,8 +148,10 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 		}
 	}
 	
-	if(!numpaths)
-		return NULL;
+	if (!numpaths) {
+      free(device);
+      return NULL;
+    }
 	
 	device->numentries = 0x00;
 	
@@ -172,12 +178,15 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 	
 	device->string = string;
 	device->data = NULL;
+	
+	if (!string->entries)
+      if (!(string->entries = (struct DevPropDevice**) malloc(sizeof(device) * DEV_PROP_DEVICE_MAX_ENTRIES))) {
+        free(device);
+        return NULL;
+      }
+	
+    /* FIXME: probably needs bounds checking, as well as error handling in event of malloc failure */
 	string->length += device->length;
-	
-	if(!string->entries)
-		if((string->entries = (struct DevPropDevice**)malloc(sizeof(device)*DEV_PROP_DEVICE_MAX_ENTRIES))== NULL)
-			return 0;
-	
 	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
 	string->entries[string->numentries-1] = device;
 	
@@ -397,23 +406,21 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
-	struct DevPropDevice *device = (struct DevPropDevice*)malloc(sizeof(struct DevPropDevice));
+	struct DevPropDevice *device = NULL;
 
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
-	if (!string)
-		string = devprop_create_string();
+    if(!string)
+      string = devprop_create_string();
 
-	device = devprop_add_device(string, devicepath);
-	if(device)
-	{
-		verbose("Setting up lan keys\n");
-		devprop_add_network_template(device, eth_dev->vendor_id);
-		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
-		if(stringdata)
-		{
-			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-			stringlength = string->length;
-		}
+    device = devprop_add_device(string, devicepath);
+	if(device) {
+      verbose("Setting up lan keys\n");
+      devprop_add_network_template(device, eth_dev->vendor_id);
+      stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
+      if(stringdata) {
+        memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
+        stringlength = string->length;
+      }
 	}
 }
