@@ -105,7 +105,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						
 						// Nehalem supports Scrubbing
 						// First, locate the PCI bus where the MCH is located
-						for(i = 0; i < sizeof(possible_nhm_bus); i++)
+						for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++)
 						{
 							vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
 							did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
