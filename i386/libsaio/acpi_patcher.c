@@ -296,9 +296,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 			resource_template_register_fixedhw[9] = 0x00;
 			resource_template_register_fixedhw[18] = 0x00;
 			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-			aml_add_byte(tmpl, 0x01); // C1
-			aml_add_word(tmpl, 0x0001); // Latency
-			aml_add_dword(tmpl, 0x000003e8); // Power
+			aml_add_byte(tmpl, 0x01);		// C1
+			aml_add_word(tmpl, 0x0001);		// Latency
+			aml_add_dword(tmpl, 0x000003e8);	// Power
 
 			uint8_t p_blk_lo, p_blk_hi;
 
@@ -311,9 +311,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C2
 				resource_template_register_systemio[12] = p_blk_hi; // C2
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x02); // C2
-				aml_add_word(tmpl, 0x0040); // Latency
-				aml_add_dword(tmpl, 0x000001f4); // Power
+				aml_add_byte(tmpl, 0x02);		// C2
+				aml_add_word(tmpl, 0x0040);		// Latency
+				aml_add_dword(tmpl, 0x000001f4);	// Power
 			}
 
 			if (c4_enabled) // C4
@@ -325,9 +325,9 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C4
 				resource_template_register_systemio[12] = p_blk_hi; // C4
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x04); // C4
-				aml_add_word(tmpl, 0x0080); // Latency
-				aml_add_dword(tmpl, 0x000000C8); // Power
+				aml_add_byte(tmpl, 0x04);		// C4
+				aml_add_word(tmpl, 0x0080);		// Latency
+				aml_add_dword(tmpl, 0x000000C8);	// Power
 			}
 			else if (c3_enabled) // C3
 			{
@@ -338,8 +338,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				resource_template_register_systemio[11] = p_blk_lo; // C3
 				resource_template_register_systemio[12] = p_blk_hi; // C3
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
-				aml_add_byte(tmpl, 0x03);			// C3
-				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_byte(tmpl, 0x03);		// C3
+				aml_add_word(tmpl, 0x0060);		// Latency
 				aml_add_dword(tmpl, 0x0000015e);	// Power
 			}
 		}
@@ -348,8 +348,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 			// C1
 			resource_template_register_fixedhw[11] = 0x00; // C1
 			aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-			aml_add_byte(tmpl, 0x01);			// C1
-			aml_add_word(tmpl, 0x0001);			// Latency
+			aml_add_byte(tmpl, 0x01);		// C1
+			aml_add_word(tmpl, 0x0001);		// Latency
 			aml_add_dword(tmpl, 0x000003e8);	// Power
 
 			resource_template_register_fixedhw[18] = 0x03;
@@ -359,8 +359,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x10; // C2
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x02);			// C2
-				aml_add_word(tmpl, 0x0040);			// Latency
+				aml_add_byte(tmpl, 0x02);		// C2
+				aml_add_word(tmpl, 0x0040);		// Latency
 				aml_add_dword(tmpl, 0x000001f4);	// Power
 			}
 
@@ -369,8 +369,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x30; // C4
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x04);			// C4
-				aml_add_word(tmpl, 0x0080);			// Latency
+				aml_add_byte(tmpl, 0x04);		// C4
+				aml_add_word(tmpl, 0x0080);		// Latency
 				aml_add_dword(tmpl, 0x000000C8);	// Power
 			}
 			else if (c3_enabled)
@@ -378,8 +378,8 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 				tmpl = aml_add_package(pack);
 				resource_template_register_fixedhw[11] = 0x20; // C3
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
-				aml_add_byte(tmpl, 0x03);			// C3
-				aml_add_word(tmpl, 0x0060);			// Latency
+				aml_add_byte(tmpl, 0x03);		// C3
+				aml_add_word(tmpl, 0x0060);		// Latency
 				aml_add_dword(tmpl, 0x0000015e);	// Power
 			}
 		}
@@ -875,6 +875,7 @@ int setupAcpi(void)
 	else
 	{
 		sprintf(dirSpec, "DSDT.aml");
+		//verbose("dirSpec, DSDT.aml");
 	}
 
 	// Load replacement DSDT
@@ -895,18 +896,20 @@ int setupAcpi(void)
 	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
 	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
+	//getBoolForKey(kGenerateTStates, &generate_tstates, &bootInfo->chameleonConfig);
 
 	DBG("Generating P-States config: %d\n", generate_pstates);
 	DBG("Generating C-States config: %d\n", generate_cstates);
+	//DBG("Generating T-States config: %d\n", generate_tstates);
 
 	{
 		int i;
 
-		for (i=0; i<30; i++)
+		for (i = 0; i < 30; i++)
 		{
 			char filename[512];
 
-			sprintf(filename, i>0?"SSDT-%d.aml":"SSDT.aml", i);
+			sprintf(filename, i > 0?"SSDT-%d.aml":"SSDT.aml", i);
 
 			if ( (new_ssdt[ssdt_count] = loadACPITable(filename)) )
 			{
@@ -920,7 +923,7 @@ int setupAcpi(void)
 	}
 
 	// Do the same procedure for both versions of ACPI
-	for (version=0; version<2; version++) {
+	for (version = 0; version < 2; version++) {
 		struct acpi_2_rsdp *rsdp, *rsdp_mod;
 		struct acpi_2_rsdt *rsdt, *rsdt_mod;
 		int rsdplength;
@@ -988,7 +991,7 @@ int setupAcpi(void)
 				if (tableSign(table, "DSDT"))
 				{
 					DBG("DSDT found\n");
-
+					verbose("Custom DSDT table was found\n");
 					if(new_dsdt)
 					{
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
@@ -1102,6 +1105,7 @@ int setupAcpi(void)
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
+						verbose("OEM SSDT tables was dropped\n");
 						dropoffset++;
 						continue;
 					}
@@ -1151,6 +1155,12 @@ int setupAcpi(void)
 							ssdt_count++;
 						}
 
+						// Generating _TSS SSDT
+						/*if (generate_tstates && (new_ssdt[ssdt_count] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+						{
+							generate_tstates = false; // Generate SSDT only once!
+							ssdt_count++;
+						}*/
 						continue;
 					}
 
@@ -1168,7 +1178,7 @@ int setupAcpi(void)
 				xsdt_entries=(uint64_t *)(xsdt_mod+1);
 
 				// Mozodojo: Insert additional SSDTs into XSDT
-				if(ssdt_count>0)
+				if(ssdt_count > 0)
 				{
 					int j;
 

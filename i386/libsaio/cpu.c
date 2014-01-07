@@ -310,6 +310,7 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
 	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
 	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
+	p->CPU.Type	        = bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);
 	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 

@@ -129,12 +129,18 @@ typedef struct _RamSlotInfo_t
 	uint8_t			BankConnCnt;
 } RamSlotInfo_t;
 
-typedef struct _PlatformInfo_t {
-	struct CPU {
+
+//==============================================================================
+
+typedef struct _PlatformInfo_t
+{
+	struct CPU
+	{
 		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint32_t		Vendor;					// Vendor
 		uint32_t		Signature;				// Signature
 		uint32_t		Stepping;				// Stepping
+		uint32_t		Type;					// Type
 		uint32_t		Model;					// Model
 		uint32_t		ExtModel;				// Extended Model
 		uint32_t		Family;					// Family
