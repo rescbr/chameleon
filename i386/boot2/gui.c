@@ -1811,6 +1811,7 @@ void showInfoBox(char *title, char *text_orig)
 				currentline = lines - visiblelines;
 		}
 	}
+    free(text);
 }
 
 void animateProgressBar()
