@@ -105,14 +105,14 @@ void load_all_modules()
 	long flags;
 	long time;
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
-	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
+	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
-		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
+		if (strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
 		{
 			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 
-			if(!load_module(tmp))
+			if (!load_module(tmp))
 			{
 				// failed to load
 				// free(tmp);
@@ -122,8 +122,8 @@ void load_all_modules()
 		{
 			DBG("Ignoring %s\n", name);
 		}
-
 	}
+    closedir(moduleDir);
 }
 
 
@@ -143,7 +143,7 @@ int load_module(char* module)
 		return 1;
 	}
 	
-	sprintf(modString, MODULE_PATH "%s", module);
+	snprintf(modString, sizeof(modString), MODULE_PATH "%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
@@ -982,19 +982,17 @@ static inline void bind_location(UInt32* location, char* value, UInt32 addend, i
 */
 int replace_function(const char* symbol, void* newAddress)
 {
-	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
 	UInt32 addr = lookup_all_symbols(symbol);
-	
-	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
 	{
-		//DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
-		*binary++ = 0xFF;	// Jump
-		*binary++ = 0x25;	// Long Jump
-		*((UInt32*)binary) = (UInt32)jumpPointer;
-		
-		*jumpPointer = (UInt32)newAddress;
-		return 1;
+      //DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
+      UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
+      char* binary = (char*)addr;
+      *binary++ = 0xFF;	// Jump
+      *binary++ = 0x25;	// Long Jump
+      *((UInt32*)binary) = (UInt32)jumpPointer;
+      *jumpPointer = (UInt32)newAddress;
+      return 1;
 	}
 	return 0;
 }
