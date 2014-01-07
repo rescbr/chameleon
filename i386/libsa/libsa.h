@@ -136,6 +136,7 @@ extern void prf(const char * fmt, va_list ap, int (*putfn_p)(),
  * printf.c
  */
 extern int sprintf(char *s, const char * format, ...);
+extern int snprintf(char *s, size_t size, const char * format, ...);
 extern int slvprintf(char * buffer, int len, const char * fmt, va_list arg);
 
 /*

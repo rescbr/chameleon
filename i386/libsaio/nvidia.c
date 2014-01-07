@@ -1702,10 +1702,9 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 				{
 					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000))
 					{
-						sprintf(name_model, "%s %s",
-							nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
-						name_model[sizeof(name_model) - 1] = '\0';
-						return name_model;
+                      snprintf(name_model, sizeof(name_model), "%s %s",
+                               nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
+                      return name_model;
 					}
 				}
 			}
@@ -2067,7 +2066,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-	sprintf(biosVersion, "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
+	snprintf(biosVersion, sizeof(biosVersion), "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
 	sprintf(kNVCAP, "NVCAP_%04x", nvda_dev->device_id);
 
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->chameleonConfig) && len == NVCAP_LEN * 2)
@@ -2172,6 +2171,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 
+    free(version_str);
 	free(rom);
 	return true;
 }

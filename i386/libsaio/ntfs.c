@@ -272,8 +272,7 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     }
     if (read(fd, buf, mftRecordSize) != mftRecordSize)
     {
-        //verbose("NTFS: error reading MFT $Volume record: %s\n",
-                strerror(errno));
+        //verbose("NTFS: error reading MFT $Volume record: %s\n", strerror(errno));
         goto error;
     }
 #endif

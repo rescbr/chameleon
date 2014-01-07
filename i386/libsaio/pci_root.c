@@ -79,7 +79,7 @@ int getPciRootUID(void)
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
 	{
-		sprintf(dsdt_dirSpec, dsdt_filename);
+        snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
 	}
 	else
 	{
@@ -98,13 +98,14 @@ int getPciRootUID(void)
 	
 	fsize = file_size(fd);
 
-	if ((new_dsdt = malloc(fsize)) == NULL) {
+	if (!(new_dsdt = malloc(fsize))) {
 		verbose("[ERROR] alloc DSDT memory failed\n");
 		close (fd);
 		goto out;
 	}
 	if (read (fd, new_dsdt, fsize) != fsize) {
 		verbose("[ERROR] read %s failed\n", dsdt_filename);
+        free(new_dsdt);
 		close (fd);
 		goto out;
 	}

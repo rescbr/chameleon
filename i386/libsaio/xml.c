@@ -744,6 +744,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 			{
 				printf("ParseTagInteger hex error (0x%x) in buffer %s\n", *val, buffer);
 				getchar();
+                XMLFreeTag(tmpTag);
 				return -1;
 			}
 		}
@@ -1240,5 +1241,7 @@ bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value)
         tagList->tagNext = tmpTag;
         return true;
     }
+
+    XMLFreeTag(tmpTag);
     return false;
 }

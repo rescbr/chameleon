@@ -50,8 +50,6 @@ uint32_t getVBEVideoRam()
 {
 	VBEInfoBlock vbeInfo;
 	int err, small;
-	char *buff = malloc(sizeof(char)*256);
-	if(!buff) return 0;
 	
 	bzero( &vbeInfo, sizeof(vbeInfo) );
 	strcpy( (char*)&vbeInfo, "VBE2" );
@@ -74,9 +72,8 @@ char *getVBEInfoString()
 {
 	VBEInfoBlock vbeInfo;
 	int err, small;
-	char *buff = malloc(sizeof(char)*256);
-	if(!buff) return 0;
-	
+	char* buff = NULL;
+
 	bzero( &vbeInfo, sizeof(vbeInfo) );
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
@@ -86,14 +83,19 @@ char *getVBEInfoString()
 	if ( strncmp( (char *)vbeInfo.VESASignature, "VESA", 4 ) )
 		return 0;
 	
+	buff = malloc(sizeof(char) * 256);
+    if (!buff)
+      return 0;
+
 	small = (vbeInfo.TotalMemory < 16);
 	
-	sprintf(buff, "VESA v%d.%d %d%s (%s)\n",
-           vbeInfo.VESAVersion >> 8,
-           vbeInfo.VESAVersion & 0xf,
-           small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
-           small ? "KB" : "MB",
-           VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
+	snprintf(buff, 256,
+             "VESA v%d.%d %d%s (%s)\n",
+             vbeInfo.VESAVersion >> 8,
+             vbeInfo.VESAVersion & 0xf,
+             small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
+             small ? "KB" : "MB",
+             VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
 
 	return buff;
 }
@@ -109,6 +111,7 @@ printVBEModeInfo()
     VBEModeInfoBlock modeInfo;
     int              err;
     int              line;
+    char*            vbeInfoString = NULL;
 
   	bzero( &vbeInfo, sizeof(vbeInfo) );
     strcpy( (char*)&vbeInfo, "VBE2" );
@@ -123,7 +126,15 @@ printVBEModeInfo()
     clearScreenRows(0, 24);
     setCursorPosition( 0, 0, 1 );
 
-    printf( getVBEInfoString() );
+    vbeInfoString = getVBEInfoString();
+    if (!vbeInfoString) {
+      printf("Error: getVBEInfoString failed\n");
+      return;
+    }
+    printf("%s", vbeInfoString);
+    free(vbeInfoString);
+    vbeInfoString = NULL;
+
 	printf("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
 
    // Loop through the mode list, and find the matching mode.
@@ -173,10 +184,12 @@ char *getVBEModeInfoString()
 	
 	char *buff=malloc(sizeof(char)*3072);
 	if(!buff) return 0;
+    int bufflen = 0;
 
 	// Loop through the mode list, and find the matching mode.
     for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          *modePtr != modeEndOfList; modePtr++ )
+          (*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
+          modePtr++ )
     {
         // Get mode information.
 
@@ -187,10 +200,11 @@ char *getVBEModeInfoString()
             continue;
         }
 
-        sprintf(buff+strlen(buff), "Mode %x: %dx%dx%d mm:%d attr:%x\n",
-               *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-               modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-               modeInfo.ModeAttributes);
+        bufflen += 
+          snprintf(buff+bufflen, 3072-bufflen, "Mode %x: %dx%dx%d mm:%d attr:%x\n",
+                   *modePtr, modeInfo.XResolution, modeInfo.YResolution,
+                   modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+                   modeInfo.ModeAttributes);
 
     }   
 	return buff;

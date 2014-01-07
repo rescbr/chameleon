@@ -247,35 +247,38 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 		// Lion, Mountain Lion and Mavericks prelink kernel cache file
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
 		{
-			sprintf(kernelCacheFile, "%skernelcache", kDefaultCachePathSnow);
+          snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
 		}
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
-			sprintf(kernelCacheFile, "kernelcache_%s", (archCpuType == CPU_TYPE_I386)
-					? "i386" : "x86_64");
-			int lnam = strlen(kernelCacheFile) + 9; //with adler32
+          snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
+                   (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
+          int lnam = strlen(kernelCacheFile) + 9; //with adler32
 
-			char* name;
-			long prev_time = 0;
+          char* name;
+          long prev_time = 0;
 
-			struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
-
-			while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
-			{
-				if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
-					&& strstr(name, kernelCacheFile) && (name[lnam] != '.'))
-				{
-					sprintf(kernelCacheFile, "%s%s", kDefaultCachePathSnow, name);
-					prev_time = time;
-				}
-			}
+          struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
+          /* TODO: handle error? */
+          if (cacheDir) {
+            while (readdir(cacheDir, (const char**)&name, &flags, &time) >= 0) {
+              if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
+                  && strstr(name, kernelCacheFile) && (name[lnam] != '.')) {
+                snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s%s", kDefaultCachePathSnow, name);
+                prev_time = time;
+              }
+            }
+          }
+          closedir(cacheDir);
 		}
 		else {
-			// Reset cache name.
-			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-			sprintf(gCacheNameAdler + 64, "%s,%s", gRootDevice, bootInfo->bootFile);
-			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-			sprintf(kernelCacheFile, "%s.%08lX", kDefaultCachePathLeo, adler32);
+          // Reset cache name.
+          bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+          snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64,
+                   "%s,%s",
+                   gRootDevice, bootInfo->bootFile);
+          adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+          snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
 		}
 	}
 
@@ -284,27 +287,25 @@ long LoadKernelCache(const char* cacheFile, void **binary) {
 
 	// If boot from a boot helper partition check the kernel cache file on it
 	if (gBootVolume->flags & kBVFlagBooter) {
-		sprintf(kernelCachePath, "com.apple.boot.P%s", kernelCacheFile);
-		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-		if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
-		{
-			sprintf(kernelCachePath, "com.apple.boot.R%s", kernelCacheFile);
-			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
-			{
-				sprintf(kernelCachePath, "com.apple.boot.S%s", kernelCacheFile);
-				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-				if ((flags & kFileTypeMask) != kFileTypeFlat)
-					ret = -1;
-			}
-		}
+      snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.P%s", kernelCacheFile);
+      ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+      if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+        snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.R%s", kernelCacheFile);
+        ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+        if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+          snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.S%s", kernelCacheFile);
+          ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+          if ((flags & kFileTypeMask) != kFileTypeFlat)
+            ret = -1;
+        }
+      }
 	}
 	// If not found, use the original kernel cache path.
 	if (ret == -1) {
-		strcpy(kernelCachePath, kernelCacheFile);
-		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-		if ((flags & kFileTypeMask) != kFileTypeFlat)
-			ret = -1;
+      strlcpy(kernelCachePath, kernelCacheFile, sizeof(kernelCachePath));
+      ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+      if ((flags & kFileTypeMask) != kFileTypeFlat)
+        ret = -1;
 	}
 
 	// Exit if kernel cache file wasn't found
@@ -616,7 +617,8 @@ void common_boot(int biosdev)
 					len--;
 					val++;
 				}
-				strlcpy(kernelCacheFile, val, len + 1);
+				/* FIXME: check len vs sizeof(kernelCacheFile) */
+                strlcpy(kernelCacheFile, val, len + 1);
 			} else {
 				kernelCacheFile[0] = 0; // Use default kernel cache file
 			}
@@ -654,29 +656,29 @@ void common_boot(int biosdev)
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
-				sprintf(bootFile, "/%s", bootInfo->bootFile); // append a leading /
+				snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 			else
 				strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
 
 			// Try to load kernel image from alternate locations on boot helper partitions.
 			ret = -1;
 			if ((gBootVolume->flags & kBVFlagBooter) && !bootFileWithDevice) {
-				sprintf(bootFilePath, "com.apple.boot.P%s", bootFile);
+				snprintf(bootFilePath, sizeof(bootFilePath), "com.apple.boot.P%s", bootFile);
 				ret = GetFileInfo(NULL, bootFilePath, &flags, &time);
 				if (ret == -1)
 				{
-					sprintf(bootFilePath, "com.apple.boot.R%s", bootFile);
+					snprintf(bootFilePath, sizeof(bootFilePath), "com.apple.boot.R%s", bootFile);
 					ret = GetFileInfo(NULL, bootFilePath, &flags, &time);
 					if (ret == -1)
 					{
-						sprintf(bootFilePath, "com.apple.boot.S%s", bootFile);
+						snprintf(bootFilePath, sizeof(bootFilePath), "com.apple.boot.S%s", bootFile);
 						ret = GetFileInfo(NULL, bootFilePath, &flags, &time);
 					}
 				}
 			}
 			if (ret == -1) {
 				// No alternate location found, using the original kernel image path.
-				strlcpy(bootFilePath, bootFile,sizeof(bootFilePath));
+				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
 			
 			verbose("Loading kernel %s\n", bootFilePath);
@@ -754,7 +756,7 @@ bool checkOSVersion(const char * version)
 
 static void getOSVersion()
 {
-	strlcpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

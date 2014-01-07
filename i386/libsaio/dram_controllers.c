@@ -57,7 +57,7 @@ static void setup_nhm(pci_dt_t *dram_dev)
 
 	// Nehalem supports Scrubbing
 	// First, locate the PCI bus where the MCH is located
-	for(i = 0; i < sizeof(possible_nhm_bus); i++)
+	for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++)
 	{
 		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_VENDOR_ID);
 		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_DEVICE_ID);
