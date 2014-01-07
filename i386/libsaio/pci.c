@@ -151,7 +151,7 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	pci_dt_t	*current;
 	pci_dt_t	*end;
-	char		tmp[64];
+    int         dev_path_len = 0;
 
 	dev_path[0] = 0;
 	end = root_pci_dev;
@@ -159,19 +159,19 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 	int uid = getPciRootUID();
 	while (end != pci_dt)
 	{
-		current = pci_dt;
-		while (current->parent != end)
-			current = current->parent;			
-		end = current;
-		if (current->parent == root_pci_dev)
-		{
-			sprintf(tmp, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
-				current->dev.bits.dev, current->dev.bits.func);
-		} else {
-			sprintf(tmp, "/Pci(0x%x,0x%x)", 
-				current->dev.bits.dev, current->dev.bits.func);
-		}
-		strcat(dev_path, tmp);
+      current = pci_dt;
+      while (current->parent != end)
+        current = current->parent;			
+      end = current;
+      if (current->parent == root_pci_dev) {
+        dev_path_len += 
+          snprintf(dev_path + dev_path_len, sizeof(dev_path) - dev_path_len, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
+                   current->dev.bits.dev, current->dev.bits.func);
+      } else {
+        dev_path_len +=
+          snprintf(dev_path + dev_path_len, sizeof(dev_path) - dev_path_len, "/Pci(0x%x,0x%x)", 
+                   current->dev.bits.dev, current->dev.bits.func);
+      }
 	}
 	return dev_path;
 }
@@ -184,7 +184,8 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 	while (current) {
 		printf("%02x:%02x.%x [%04x%02x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n", 
 			current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
-			current->class_id, current->vendor_id, current->device_id, 
+               current->class_id, 0 /* FIXME: what should this be? */, 
+               current->vendor_id, current->device_id, 
 			current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id, 
 			get_pci_dev_path(current));
 		dump_pci_dt(current->children);
