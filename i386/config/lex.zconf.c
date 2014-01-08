@@ -820,13 +820,13 @@ static void new_string(void)
 
 static void append_string(const char *str, int size)
 {
+    int new_size = text_size + size + 1;
 	if (new_size > text_asize) {
-      int new_size = text_size + size + 1;
       char* new_text = NULL;
       new_size += START_STRSIZE - 1;
       new_size &= -START_STRSIZE;
       if (!(new_text = realloc(text, new_size)))
-        return;
+		return;
       text = new_text;
       text_asize = new_size;
 	}
