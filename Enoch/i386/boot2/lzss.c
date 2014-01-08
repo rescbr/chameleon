@@ -42,51 +42,58 @@
 
 #include <sl.h>
 
-#define N         4096  /* size of ring buffer - must be power of 2 */
-#define F         18    /* upper limit for match_length */
-#define THRESHOLD 2     /* encode string into position and length
-                           if match_length is greater than this */
-#define NIL       N     /* index for root of binary search trees */
+#define N		4096	/* Size of ring buffer - must be power of 2. */
+#define N_MIN_1		4095
+#define F		18	/* Upper limit for match_length. */
+#define R		N - F
+#define THRESHOLD	2	/* Encode string into position and length if match_length is greater than this. */
+#define NIL		N	/* Index for root of binary search trees. */
 
-int
-decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen)
+
+//==============================================================================
+// Refactoring and bug fix Copyright (c) 2010 by DHP.
+
+int decompress_lzss(u_int8_t * dst, u_int8_t * src, u_int32_t srclen)
 {
-    /* ring buffer of size N, with extra F-1 bytes to aid string comparison */
-    u_int8_t text_buf[N + F - 1];
-    u_int8_t *dststart = dst;
-    u_int8_t *srcend = src + srclen;
-    int  i, j, k, r, c;
-    unsigned int flags;
-    
-    dst = dststart;
-    srcend = src + srclen;
-    for (i = 0; i < N - F; i++)
-        text_buf[i] = ' ';
-    r = N - F;
-    flags = 0;
-    for ( ; ; ) {
-        if (((flags >>= 1) & 0x100) == 0) {
-            if (src < srcend) c = *src++; else break;
-            flags = c | 0xFF00;  /* uses higher byte cleverly */
-        }   /* to count eight */
-        if (flags & 1) {
-            if (src < srcend) c = *src++; else break;
-            *dst++ = c;
-            text_buf[r++] = c;
-            r &= (N - 1);
-        } else {
-            if (src < srcend) i = *src++; else break;
-            if (src < srcend) j = *src++; else break;
-            i |= ((j & 0xF0) << 4);
-            j  =  (j & 0x0F) + THRESHOLD;
-            for (k = 0; k <= j; k++) {
-                c = text_buf[(i + k) & (N - 1)];
-                *dst++ = c;
-                text_buf[r++] = c;
-                r &= (N - 1);
-            }
-        }
-    }
-    
-    return dst - dststart;
+	/*  Four KB ring buffer with 17 extra bytes added to aid string comparisons. */
+	u_int8_t text_buf[N_MIN_1 + F];
+	u_int8_t * dststart = dst;
+	const u_int8_t * srcend = (src + srclen);
+
+	int r = R;
+	int  i, j, k, c;
+	unsigned int flags = 0;
+
+	for (i = 0; i < R; i++) {
+		text_buf[i] = ' ';
+	}
+
+	while (src < srcend) {
+		if (((flags >>= 1) & 0x100) == 0) {
+			c = *src++;
+			flags = c | 0xFF00;  // Clever use of the high byte.
+        	}
+
+        	if ((src < srcend) && (flags & 1)) {
+			c = *src++;
+			*dst++ = c;
+			text_buf[r++] = c;
+			r &= N_MIN_1;
+		} else if ((src + 2) <= srcend) {
+			i = *src++;
+			j = *src++;
+
+			i |= ((j & 0xF0) << 4);
+			j = (j & 0x0F) + THRESHOLD;
+
+			for (k = 0; k <= j; k++) {
+				c = text_buf[(i + k) & N_MIN_1];
+				*dst++ = c;
+				text_buf[r++] = c;
+				r &= N_MIN_1;
+			}
+		}
+	}
+
+	return dst - dststart;
 }

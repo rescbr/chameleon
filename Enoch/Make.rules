@@ -10,9 +10,8 @@ else
 endif
 AS = as
 LD = ld
-CC = cc
-CPP = c++
-
+CC = gcc
+CPP = g++
 PAX = /bin/pax
 NASM = $(shell which nasm) -p $(SRCROOT)/autoconf.inc
 
@@ -40,38 +39,64 @@ DIST_SUBDIRS += $(SUBDIRS)
 #OMIT_FRAME_POINTER_CFLAG=-fomit-frame-pointer
 OMIT_FRAME_POINTER_CFLAG=
 
--include $(OBJROOT)/*.Makedep
-
-$(OBJROOT)/%.o32: %.c
+$(OBJROOT)/%.o32_nodep: %.c
 	@echo "\t[CC32] $<"
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -MM -M -o $@.Makedep
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $@ 
 
-$(OBJROOT)/%.o64: %.c
+$(OBJROOT)/%.o64_nodep: %.c
 	@echo "\t[CC64] $<"
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -MM -M -o $@.Makedep
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $@ 
 
 
 $(OBJROOT)/%.o: %.c
 	@echo "\t[CC] $<"
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
+	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@cat "$(OBJROOT)/$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$(OBJROOT)/$*.d"
+
+$(OBJROOT)/%.o32: %.c
+	@echo "\t[CC32] $<"
+	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch i386 $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@cat "$(OBJROOT)/$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$(OBJROOT)/$*.d"
+
+$(OBJROOT)/%.o64: %.c
+	@echo "\t[CC64] $<"
+	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) -arch x86_64 $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@cat "$(OBJROOT)/$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$(OBJROOT)/$*.d"
 
 $(OBJROOT)/%.o: %.m
 	@echo "\t[M] $<"
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
-	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
+	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@cat "$(OBJROOT)/$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$(OBJROOT)/$*.d"
 
 $(OBJROOT)/%.o: %.cpp
 	@echo "\t[CPP] $<"
-	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -MM -M -o $@.Makedep
-	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ 
+	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ \
+	    -MD -dependency-file $(OBJROOT)/$*.d
+	@cat "$(OBJROOT)/$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$(OBJROOT)/$*.d"
+
+$(OBJROOT)/boot2.o:
+	@echo "\t[AS] boot2.s"
+	@$(CC) -Wa,-n -c $(INC) -arch i386 -o $(OBJROOT)/$(@F) boot2.s \
+		    -MD -dependency-file $*.d
+	@cat "$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$*.d"
 
 $(OBJROOT)/%.o: %.s
 	@echo "\t[AS] $<"
-	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -MM -M -o $@.Makedep
-	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -o $@
+	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 -o $@ $< \
+		    -MD -dependency-file $*.d
+	@cat "$*.d" >>"$(OBJROOT)/Makedep"
+	@rm -f "$*.d"
+
 
 CONFIG_FILES=$(SRCROOT)/auto.conf $(SRCROOT)/autoconf.h $(SRCROOT)/autoconf.inc $(SRCROOT)/.config
 $(CONFIG_FILES): $(SRCROOT)/.config

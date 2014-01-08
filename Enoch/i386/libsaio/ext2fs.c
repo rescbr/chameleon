@@ -18,29 +18,6 @@ bool EX2Probe (const void *buf)
 	return (OSReadLittleInt16(buf+0x438,0)==0xEF53);
 }
 
-void EX2GetDescription(CICell ih, char *str, long strMaxLen)
-{
-	char * buf=malloc (EX2ProbeSize);
-	str[0]=0;
-	if (!buf)
-		return;
-	Seek(ih, 0);
-	Read(ih, (long)buf, EX2ProbeSize);
-	if (!EX2Probe (buf))
-	{
-		free (buf);
-		return;
-	}
-	if (OSReadLittleInt32 (buf+0x44c,0)<1)
-	{
-		free (buf);
-		return;
-	}
-	str[strMaxLen]=0;
-	strncpy (str, buf+0x478, MIN(strMaxLen, 16));
-	free (buf);
-}
-
 long EX2GetUUID(CICell ih, char *uuidStr)
 {
 	uint8_t *b, *buf=malloc (EX2ProbeSize);
@@ -68,4 +45,27 @@ long EX2GetUUID(CICell ih, char *uuidStr)
 		b[10], b[11], b[12], b[13], b[14], b[15]);
 	free (buf);
 	return 0;
+}
+
+void EX2GetDescription(CICell ih, char *str, long strMaxLen)
+{
+	char * buf=malloc (EX2ProbeSize);
+	str[0]=0;
+	if (!buf)
+		return;
+	Seek(ih, 0);
+	Read(ih, (long)buf, EX2ProbeSize);
+	if (!EX2Probe (buf))
+	{
+		free (buf);
+		return;
+	}
+	if (OSReadLittleInt32 (buf+0x44c,0)<1)
+	{
+		free (buf);
+		return;
+	}
+	str[strMaxLen]=0;
+	strncpy (str, buf+0x478, MIN(strMaxLen, 16));
+	free (buf);
 }

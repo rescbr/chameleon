@@ -82,7 +82,7 @@
  * New boot0 (boot1 has been deprecated). Booter must now reside in its own partition, no disk label required.
  *
  * Revision 1.1.1.2  1999/08/04 21:16:57  wsanchez
- * Impoort of boot-66
+ * Import of boot-66
  *
  * Revision 1.3  1999/08/04 21:12:12  wsanchez
  * Update APSL
@@ -338,6 +338,31 @@ LABEL(_halt)
 #endif
     jmp     _halt
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// disableIRQs()
+// http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
+//
+// Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
+//
+//
+LABEL(_disableIRQs)
+// The ACPI specification dictates that the 8259 (PC-AT compatible) vectors
+// must be disabled (that is, masked) when enabling the ACPI APIC operation
+// but this isn't done (apparently) on all mobo's and thus we do that here.
+
+	push %eax // Saving register data
+
+	movb $0x80, %al // Block NMI
+	outb %al, $0x70
+
+	movb $0xff, %al // Load mask
+	outb %al, $0x21 // Disable IRQ's 0-7 on Master PIC
+	outb %al, $0xa1 // Disable IRQ's 8-15 on Slave PIC
+
+	popl %eax // Restore register data
+
+	ret
+
 #ifndef BOOT1
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // startprog(phyaddr, arg)
@@ -345,10 +370,12 @@ LABEL(_halt)
 // Passes arg to the program in %eax.
 //
 LABEL(_startprog)
+    call _disableIRQs        // Taking care of a ACPI bug. (Azi: calling the above)
+
     push    %ebp
     mov     %esp, %ebp
 
-    mov     0xc(%ebp), %eax  // argument to program
+    mov     0xc(%ebp), %eax  // argument to program - bootargs to mach_kernel
     mov     0x8(%ebp), %ecx  // entry offset 
     mov     $0x28, %ebx      // segment
     push    %ebx

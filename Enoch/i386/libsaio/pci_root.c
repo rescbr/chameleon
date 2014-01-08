@@ -50,7 +50,7 @@ int getPciRootUID(void)
 	void *new_dsdt;
 	const char *val;
 	int len,fsize;
-	const char * dsdt_filename=NULL;
+	const char * dsdt_filename = NULL;
 	extern int search_and_get_acpi_fd(const char *, const char **);
 
 	if (rootuid < 10) return rootuid;
@@ -75,11 +75,10 @@ int getPciRootUID(void)
 		goto out;
 	}
 
-	
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
 	{
-        snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
+		snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
 	}
 	else
 	{
@@ -105,7 +104,7 @@ int getPciRootUID(void)
 	}
 	if (read (fd, new_dsdt, fsize) != fsize) {
 		verbose("[ERROR] read %s failed\n", dsdt_filename);
-        free(new_dsdt);
+		free(new_dsdt);
 		close (fd);
 		goto out;
 	}

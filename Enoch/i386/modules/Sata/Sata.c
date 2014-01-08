@@ -20,13 +20,12 @@
 #define DBG(x...)
 #endif
 
-void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4);
-
 uint8_t default_SATA_ID[]= {
 	0x81, 0x26, 0x00, 0x00
 };
 #define SATA_ID_LEN ( sizeof(default_SATA_ID) / sizeof(uint8_t) )
 
+void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4);
 void SATA_hook(void* arg1, void* arg2, void* arg3, void* arg4)
 {
 	pci_dt_t* current = arg1;

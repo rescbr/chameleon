@@ -189,7 +189,6 @@ static void clearBootArgs(void)
 	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
 		clearGraphicBootPrompt();
 	}
-
 	execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
 }
 
@@ -228,7 +227,7 @@ static void showBootPrompt(int row, bool visible)
 		}
 	} else {
 		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
-        clearGraphicBootPrompt();
+			clearGraphicBootPrompt();
 		} else {
 			printf("Press Enter to start up the foreign OS. ");
 		}
@@ -254,8 +253,10 @@ static void updateBootArgs( int key )
                 {
                     x = 80; y--;
                 }
-                if (x) x--;
-                
+                if (x) {
+			x--;
+		}
+
 				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 				{
 					setCursorPosition( x, y, 0 );
@@ -641,28 +642,29 @@ printMemoryInfo(void)
 
 char *getMemoryInfoString()
 {
-  int i, bufflen;
-  MemoryRange *mp = bootInfo->memoryMap;
-  char *buff = malloc(sizeof(char)*1024);
-  if (!buff)
-    return 0;
-	
-  static const char info[] = "BIOS reported memory ranges:\n";
-  bufflen = sprintf(buff, "%s", info);
+	int i, bufflen;
+	MemoryRange *mp = bootInfo->memoryMap;
+	char *buff = malloc(sizeof(char)*1024);
+	if(!buff) {
+		return 0;
+	}
 
-  for (i = 0;
-       (i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
-       i++) {
-    bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
+	static const char info[] = "BIOS reported memory ranges:\n";
+	bufflen = sprintf(buff, "%s", info);
+
+	for (i = 0;
+		(i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
+		i++) {
+		bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
                         (unsigned long)(mp->base >> 32),
                         (unsigned long)(mp->base));
-    bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
+		bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
                         (unsigned long)(mp->length >> 32),
                         (unsigned long)(mp->length),
                         mp->type);
-    mp++;
-  }
-  return buff;
+		mp++;
+	}
+	return buff;
 }
 
 //==========================================================================
@@ -1086,31 +1088,29 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-    int argLen = argName ? strlen(argName) : 0;
-    int len = argLen + cnt + 1;  // +1 to account for space
+	int argLen = argName ? strlen(argName) : 0;
+	int len = argLen + cnt + 1;  // + 1 to account for space.
 
-	if (argName)
+	if (len > *cntRemainingP) {
+		error("Warning: boot arguments too long, truncating\n");
+		return false;
+	}
+
+	if (argName) {
+		strncpy( *argP, argName, argLen );
+		*argP += argLen;
+		*argP[0] = '=';
+		(*argP)++;
 		len++; // +1 to account for '='
+	}
 
-    if (len > *cntRemainingP) {
-        error("Warning: boot arguments too long, truncating\n");
-        return false;
-    }
+	strncpy(*argP, val, cnt);
+	*argP += cnt;
+	*argP[0] = ' ';
+	(*argP)++;
+	*cntRemainingP -= len;
 
-    if (argName) {
-        strncpy( *argP, argName, argLen );
-        *argP += argLen;
-        *argP[0] = '=';
-        (*argP)++;
-    }
-
-    strncpy( *argP, val, cnt );
-    *argP += cnt;
-    *argP[0] = ' ';
-    (*argP)++;
-
-    *cntRemainingP -= len;
-    return true;
+	return true;
 }
 
 // 
@@ -1131,19 +1131,26 @@ processBootArgument(
     int cnt;
     bool found = false;
 
-    if (getValueForBootKey(userString, argName, &val, &cnt)) {
-        // Don't copy; these values will be copied at the end of argument processing.
-        found = true;
-    } else if (getValueForBootKey(kernelFlags, argName, &val, &cnt)) {
-        // Don't copy; these values will be copied at the end of argument processing.
-        found = true;
-    } else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig)) {
-        copyArgument(argName, val, cnt, argP, cntRemainingP);
-        found = true;
-    }
-    if (found && foundVal)
-        strlcpy(foundVal, val, foundValSize);
-    return found;
+	if (getValueForBootKey(userString, argName, &val, &cnt))
+	{
+		// Don't copy; these values will be copied at the end of argument processing.
+		found = true;
+	}
+	else if (getValueForBootKey(kernelFlags, argName, &val, &cnt))
+	{
+		// Don't copy; these values will be copied at the end of argument processing.
+		found = true;
+	}
+	else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig))
+	{
+		copyArgument(argName, val, cnt, argP, cntRemainingP);
+		found = true;
+	}
+	if (found && foundVal)
+	{
+		strlcpy(foundVal, val, foundValSize);
+	}
+	return found;
 }
 
 // Maximum config table value size
@@ -1152,43 +1159,41 @@ processBootArgument(
 int
 processBootOptions()
 {
-    const char *cp  = gBootArgs;
-    const char *val = 0;
-    const char *kernel;
-    int         cnt;
-    int         userCnt;
-    int         cntRemaining;
-    char       *argP;
-    char       *configKernelFlags;
-    char       *valueBuffer;
+	const char *cp  = gBootArgs;
+	const char *val = 0;
+	const char *kernel;
+	int         cnt;
+	int         userCnt;
+	int         cntRemaining;
+	char       *argP;
+	char       *configKernelFlags;
+	char       *valueBuffer;
 
-    valueBuffer = malloc(VALUE_SIZE);
+	valueBuffer = malloc(VALUE_SIZE);
     
-    skipblanks( &cp );
+	skipblanks( &cp );
 
-    // Update the unit and partition number.
+	// Update the unit and partition number.
 
-    if ( gBootVolume )
-    {
-        if (!( gBootVolume->flags & kBVFlagNativeBoot ))
-        {
-            readBootSector( gBootVolume->biosdev, gBootVolume->part_boff,
-                            (void *) 0x7c00 );
+	if ( gBootVolume )
+	{
+		if (!( gBootVolume->flags & kBVFlagNativeBoot ))
+		{
+			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
+			//
+			// Setup edx, and signal intention to chain load the
+			// foreign booter.
+			// 
 
-            //
-            // Setup edx, and signal intention to chain load the
-            // foreign booter.
-            //
+			chainbootdev  = gBootVolume->biosdev;
+			chainbootflag = 1;
 
-            chainbootdev  = gBootVolume->biosdev;
-            chainbootflag = 1;
+			return 1;
+		}
 
-            return 1;
-        }
+		setRootVolume(gBootVolume);
 
-        setRootVolume(gBootVolume);
-
-    }
+	}
     // If no boot volume fail immediately because we're just going to fail
     // trying to load the config file anyway.
     else
@@ -1204,8 +1209,8 @@ processBootOptions()
     // Load com.apple.Boot.plist from the selected volume
     // and use its contents to override default bootConfig.
 
-    loadSystemConfig(&bootInfo->bootConfig);    
-    loadChameleonConfig(&bootInfo->chameleonConfig);
+	loadSystemConfig(&bootInfo->bootConfig);    
+	loadChameleonConfig(&bootInfo->chameleonConfig);
 
     // Use the kernel name specified by the user, or fetch the name
     // in the config table, or use the default if not specified.
@@ -1368,10 +1373,10 @@ void showTextBuffer(char *buf_orig, int size)
 		showInfoBox( "Press q to continue, space for next page.\n",buf_orig );
 		return;
 	}
-	
-		// Create a copy so that we don't mangle the original
-		buf = malloc(size + 1);
-		memcpy(buf, buf_orig, size);
+
+	// Create a copy so that we don't mangle the original
+	buf = malloc(size + 1);
+	memcpy(buf, buf_orig, size);
 	
 
         bp = buf;

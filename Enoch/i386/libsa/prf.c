@@ -60,7 +60,7 @@ static void
 printn(n, b, flag, minwidth, putfn_p, putfn_arg)
 	u_long n;
 	int b, flag, minwidth;
-	int (*putfn_p)();
+	void (*putfn_p)();
 	void *putfn_arg;
 {
 	char prbuf[11];
@@ -73,7 +73,7 @@ printn(n, b, flag, minwidth, putfn_p, putfn_arg)
 	}
 	cp = prbuf;
 	do {
-                *cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + n%b];
+		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + n%b];
 		n /= b;
 		width++;
 	} while (n);
@@ -84,83 +84,111 @@ printn(n, b, flag, minwidth, putfn_p, putfn_arg)
 	}
 	while (width++ < minwidth)
 		(*putfn_p)( (flag & ZERO) ? '0' : ' ', putfn_arg);
-		
+	
 	do
 		(*putfn_p)(*--cp, putfn_arg);
 	while (cp > prbuf);
 }
 
-void prf(
+int prf(
 	char *fmt,
 	unsigned int *adx,
-	int  (*putfn_p)(),
+	void (*putfn_p)(),
 	void *putfn_arg
 )
 {
-	int b, c;
+	int b, c, len =0;
 	char *s;
 	int flag = 0, width = 0;
-        int minwidth;
+	int minwidth;
 
 loop:
 	while ((c = *fmt++) != '%') {
 		if(c == '\0')
-			return;
-		(*putfn_p)(c, putfn_arg);
+		{
+			return len;
+		}
+		if (putfn_p)
+		{
+			(*putfn_p)(c, putfn_arg);
+		}
+		len++;
 	}
-        minwidth = 0;
+	minwidth = 0;
 again:
 	c = *fmt++;
 	switch (c) {
-	case 'l':
-		goto again;
-	case ' ':
-		flag |= SPACE;
-		goto again;
-	case '0':
-		if (minwidth == 0) {
-		    /* this is a flag */
-		    flag |= ZERO;
-		    goto again;
-		} /* fall through */
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-		minwidth *= 10;
-		minwidth += c - '0';
-		goto again;
+		case 'l':
+			goto again;
+		case ' ':
+			flag |= SPACE;
+			goto again;
+		case '0':
+			if (minwidth == 0)
+			{
+				/* this is a flag */
+				flag |= ZERO;
+				goto again;
+			} /* fall through */
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			minwidth *= 10;
+			minwidth += c - '0';
+			goto again;
         case 'X':
-                flag |= UCASE;
-                /* fall through */
-	case 'x':
-		b = 16;
-		goto number;
-	case 'd':
-		b = 10;
-		goto number;
-	case 'o': case 'O':
-		b = 8;
-number:
-		printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
-		break;
-	case 's':
-		s = (char *)*adx;
-		while ((c = *s++)) {
-			(*putfn_p)(c, putfn_arg);
-			width++;
-		}
-		while (width++ < minwidth)
-		    (*putfn_p)(' ', putfn_arg);
-		break;
-	case 'c':
-		(*putfn_p)((char)*adx, putfn_arg);
-		break;
+			flag |= UCASE;
+			/* fall through */
+		case 'x':
+			b = 16;
+			goto number;
+		case 'd':
+			b = 10;
+			goto number;
+		case 'o': case 'O':
+			b = 8;
+		number:
+			if (putfn_p)
+			{
+				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
+			}
+			len++;
+			break;
+		case 's':
+			s = (char *)*adx;
+			while ((c = *s++))
+			{
+				if (putfn_p)
+				{
+					(*putfn_p)(c, putfn_arg);
+				}
+				len++;
+				width++;
+			}
+			while (width++ < minwidth)
+			{
+				if (putfn_p)
+				{
+					(*putfn_p)(' ', putfn_arg);
+				}
+				len++;
+			}
+			break;
+		case 'c':
+			if (putfn_p)
+			{
+				(*putfn_p)((char)*adx, putfn_arg);
+			}
+			len++;
+			break;
+		default:
+			break;
 	}
 	adx++;
 	goto loop;

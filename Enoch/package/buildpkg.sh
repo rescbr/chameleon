@@ -103,7 +103,7 @@ choice_group_items[0]=""
 choice_group_exclusive[0]=""
 
 # Package name
-declare -r packagename="Chameleon"
+declare -r packagename="Enoch"
 
 # Package identifiers
 declare -r chameleon_package_identity="org.chameleon"
@@ -1145,7 +1145,7 @@ generateChoices() {
 makedistribution ()
 {
     declare -r distributionDestDir="${SYMROOT}"
-    declare -r distributionFilename="${packagename// /}-${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}.pkg"
+    declare -r distributionFilename="${packagename// /}-rev.${CHAMELEON_REVISION}.pkg"
     declare -r distributionFilePath="${distributionDestDir}/${distributionFilename}"
 
     rm -f "${distributionDestDir}/${packagename// /}"*.pkg
@@ -1199,7 +1199,8 @@ makedistribution ()
     ditto --noextattr --noqtn "${PKGROOT}/Resources/common" "${PKG_BUILD_DIR}/${packagename}/Resources/en.lproj"
 
     # CleanUp the directory
-    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -depth -exec rm -rf {} \;
+    find "${PKG_BUILD_DIR}/${packagename}" -name .svn -print0 | xargs -0 rm -rf
+    find "${PKG_BUILD_DIR}/${packagename}" -name '*.DS_Store' -type f -delete
     find "${PKG_BUILD_DIR}/${packagename}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
 
     # Make substitutions for version, revision, stage, developers, credits, etc..
@@ -1231,13 +1232,13 @@ makedistribution ()
     echo ""
     echo -e $COL_GREEN" Build info."
     echo -e $COL_GREEN" ==========="
-    echo -e $COL_BLUE"  Package name: "$COL_RESET"${distributionFilename}"
-    echo -e $COL_BLUE"  MD5:          "$COL_RESET"$md5"
-    echo -e $COL_BLUE"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
-    echo -e $COL_BLUE"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
-    echo -e $COL_BLUE"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
-    echo -e $COL_BLUE"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
-    echo -e $COL_BLUE"  Copyright $CHAMELEON_CPRYEAR ""$COL_RESET"
+    echo -e $COL_CYAN"  Package name: "$COL_RESET"${distributionFilename}"
+    echo -e $COL_CYAN"  MD5:          "$COL_RESET"$md5"
+    echo -e $COL_CYAN"  Version:      "$COL_RESET"$CHAMELEON_VERSION"
+    echo -e $COL_CYAN"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
+    echo -e $COL_CYAN"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
+    echo -e $COL_CYAN"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
+    echo -e $COL_CYAN"  Copyright $CHAMELEON_CPRYEAR ""$COL_RESET"
     echo ""
 
 }

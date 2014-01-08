@@ -42,7 +42,7 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
- 
+
 //==========================================================================
 // getVBEVideoRam
 
@@ -84,18 +84,19 @@ char *getVBEInfoString()
 		return 0;
 	
 	buff = malloc(sizeof(char) * 256);
-    if (!buff)
-      return 0;
+	if (!buff) {
+		return 0;
+	}
 
 	small = (vbeInfo.TotalMemory < 16);
 	
 	snprintf(buff, 256,
-             "VESA v%d.%d %d%s (%s)\n",
-             vbeInfo.VESAVersion >> 8,
-             vbeInfo.VESAVersion & 0xf,
-             small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
-             small ? "KB" : "MB",
-             VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
+		"VESA v%d.%d %d%s (%s)\n",
+		vbeInfo.VESAVersion >> 8,
+		vbeInfo.VESAVersion & 0xf,
+		small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
+		small ? "KB" : "MB",
+		VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
 
 	return buff;
 }
@@ -126,87 +127,86 @@ printVBEModeInfo()
     clearScreenRows(0, 24);
     setCursorPosition( 0, 0, 1 );
 
-    vbeInfoString = getVBEInfoString();
-    if (!vbeInfoString) {
-      printf("Error: getVBEInfoString failed\n");
-      return;
-    }
-    printf("%s", vbeInfoString);
-    free(vbeInfoString);
-    vbeInfoString = NULL;
+	vbeInfoString = getVBEInfoString();
+	if (!vbeInfoString) {
+		printf("Error: getVBEInfoString failed\n");
+		return;
+	}
+	printf("%s", vbeInfoString);
+	free(vbeInfoString);
+	vbeInfoString = NULL;
 
 	printf("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
 
-   // Loop through the mode list, and find the matching mode.
+	// Loop through the mode list, and find the matching mode.
 
-    for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          *modePtr != modeEndOfList; modePtr++ )
-    {
-        // Get mode information.
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
+          *modePtr != modeEndOfList; modePtr++ ) {
+		// Get mode information.
 
-        bzero( &modeInfo, sizeof(modeInfo) );
-        err = getVBEModeInfo( *modePtr, &modeInfo );
-        if ( err != errSuccess )
-        {
-            continue;
-        }
+		bzero( &modeInfo, sizeof(modeInfo) );
+		err = getVBEModeInfo( *modePtr, &modeInfo );
+		if ( err != errSuccess )
+		{
+			continue;
+		}
 
-        printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
-               *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-               modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-               modeInfo.ModeAttributes);
+		printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
 
-        if (line++ >= 20) {
-            pause();
-            line = 0;
-            clearScreenRows(0, 24);
-            setCursorPosition( 0, 0, 1 );
-        }
-    }    
-    if (line != 0) {
-        pause();
-    }
-    setActiveDisplayPage(0);
+		if (line++ >= 20) {
+			pause();
+			line = 0;
+			clearScreenRows(0, 24);
+			setCursorPosition( 0, 0, 1 );
+		}
+	}    
+	if (line != 0) {
+		pause();
+	}
+	setActiveDisplayPage(0);
 }
 
 char *getVBEModeInfoString()
 {
 	VBEInfoBlock     vbeInfo;
-    unsigned short * modePtr;
-    VBEModeInfoBlock modeInfo;
-    int              err;
+	unsigned short * modePtr;
+	VBEModeInfoBlock modeInfo;
+	int              err;
 
   	bzero( &vbeInfo, sizeof(vbeInfo) );
-    strcpy( (char*)&vbeInfo, "VBE2" );
-    err = getVBEInfo( &vbeInfo );
-    if ( err != errSuccess )
-        return 0;
-	
+	strcpy( (char*)&vbeInfo, "VBE2" );
+	err = getVBEInfo( &vbeInfo );
+	if ( err != errSuccess ) {
+		return 0;
+	}
 	char *buff=malloc(sizeof(char)*3072);
-	if(!buff) return 0;
-    int bufflen = 0;
+	if(!buff) {
+		return 0;
+	}
+
+	int bufflen = 0;
 
 	// Loop through the mode list, and find the matching mode.
-    for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          (*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
-          modePtr++ )
-    {
-        // Get mode information.
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
+		(*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
+		modePtr++ ) {
+		// Get mode information.
 
-        bzero( &modeInfo, sizeof(modeInfo) );
-        err = getVBEModeInfo( *modePtr, &modeInfo );
-        if ( err != errSuccess )
-        {
-            continue;
-        }
+		bzero( &modeInfo, sizeof(modeInfo) );
+		err = getVBEModeInfo( *modePtr, &modeInfo );
+		if ( err != errSuccess ) {
+			continue;
+		}
 
-        bufflen += 
-          snprintf(buff+bufflen, 3072-bufflen, "Mode %x: %dx%dx%d mm:%d attr:%x\n",
-                   *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-                   modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-                   modeInfo.ModeAttributes);
-
-    }   
+		bufflen += 
+			snprintf(buff+bufflen, 3072-bufflen, "Mode %x: %dx%dx%d mm:%d attr:%x\n",
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
+	}   
 	return buff;
 }
 
@@ -1163,7 +1163,7 @@ setVideoMode( int mode, int drawgraphics)
             params[1] = 25;
         }
 
-		setVESATextMode( params[0], params[1], 4 );
+	setVESATextMode( params[0], params[1], 4 );
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
 
@@ -1205,7 +1205,14 @@ int getVideoMode(void)
 //==========================================================================
 // Display and clear the activity indicator.
 
+// BASIC Indicator
 static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
+
+// Bouncing ball .oOo.
+//static char indicator[] = {46, 111, 79, 248, 79, 111, '\0'};
+
+// ┤┘┴└├┌┬┐
+//static char indicator[] = {180, 217, 193, 192, 195, 218, 194, 191, '\0'};
 
 // To prevent a ridiculously fast-spinning indicator,
 // ensure a minimum of 1/9 sec between animation frames.
@@ -1216,33 +1223,28 @@ spinActivityIndicator(int sectors)
 {
     static unsigned long lastTickTime = 0, currentTickTime;
     
-	if (previewTotalSectors && previewSaveunder)
-	{
+	if (previewTotalSectors && previewSaveunder) {
 		int blob, lastBlob;
 
 		lastBlob = (previewLoadedSectors * kIOHibernateProgressCount) / previewTotalSectors;
 		previewLoadedSectors+=sectors;
 		blob = (previewLoadedSectors * kIOHibernateProgressCount) / previewTotalSectors;
 		
-		if (blob!=lastBlob)
+		if (blob!=lastBlob) {
 			updateProgressBar (previewSaveunder, lastBlob, blob);
+		}
 		return;
 	}
  
 	currentTickTime = time18(); // late binding
-	if (currentTickTime < lastTickTime + MIN_TICKS)
-	{
+	if (currentTickTime < lastTickTime + MIN_TICKS) {
 		return;
-	}
-	else
-	{
+	} else {
 		lastTickTime = currentTickTime;
 	}
-	
-	if (getVideoMode() == VGA_TEXT_MODE)
-	{
-		if (currentIndicator >= sizeof(indicator))
-		{
+
+	if (getVideoMode() == VGA_TEXT_MODE) {
+		if (currentIndicator >= sizeof(indicator)) {
 			currentIndicator = 0;
 		}
 		putchar(indicator[currentIndicator++]);
@@ -1253,8 +1255,7 @@ spinActivityIndicator(int sectors)
 void
 clearActivityIndicator( void )
 {
-    if ( getVideoMode() == VGA_TEXT_MODE )
-    {
+    if ( getVideoMode() == VGA_TEXT_MODE ) {
 		putchar(' ');
 		putchar('\b');
     }

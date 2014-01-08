@@ -66,7 +66,7 @@
  *      Added support for "0b101..." binary constants.
  *      Commented out references to errno.
  */
- 
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)strtol.c	5.4 (Berkeley) 2/23/91";
 #endif /* LIBC_SCCS and not lint */
@@ -103,21 +103,28 @@ strtol(nptr, endptr, base)
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
-	} else if (c == '+')
+	}
+	else if (c == '+')
+	{
 		c = *s++;
-	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
+	}
+
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
-	} else if ((base == 0 || base == 2) &&
-	    c == '0' && (*s == 'b' || *s == 'B')) {
+	}
+	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
+	{
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
 	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
+	}
 
 	/*
 	 * Compute the cutoff value between legal numbers and illegal
@@ -148,7 +155,7 @@ strtol(nptr, endptr, base)
 			break;
 		if (c >= base)
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
 			any = -1;
 		else {
 			any = 1;
@@ -194,35 +201,52 @@ strtoul(nptr, endptr, base)
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
-	} else if (c == '+')
+	}
+	else if (c == '+')
+	{
 		c = *s++;
-	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
+	}
+	if ((base == 0 || base == 16) &&  c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
-	} else if ((base == 0 || base == 2) &&
-	    c == '0' && (*s == 'b' || *s == 'B')) {
+	}
+	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
+	{
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
 	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
+	}
 	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
 	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
 	for (acc = 0, any = 0;; c = *s++) {
 		if (isdigit(c))
+		{
 			c -= '0';
+		}
 		else if (isalpha(c))
+		{
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+		}
 		else
+		{
 			break;
+		}
 		if (c >= base)
+		{
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		}
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		{
 			any = -1;
-		else {
+		}
+		else
+		{
 			any = 1;
 			acc *= base;
 			acc += c;
@@ -231,10 +255,15 @@ strtoul(nptr, endptr, base)
 	if (any < 0) {
 		acc = ULONG_MAX;
 //		errno = ERANGE;
-	} else if (neg)
+	}
+	else if (neg)
+	{
 		acc = -acc;
+	}
 	if (endptr != 0)
+	{
 		*endptr = (char *)(any ? s - 1 : nptr);
+	}
 	return (acc);
 }
 
@@ -269,31 +298,46 @@ strtouq(nptr, endptr, base)
 	} else { 
 		neg = 0;
 		if (c == '+')
+		{
 			c = *s++;
+		}
 	}
-	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
 	}
 	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
+	}
 	qbase = (unsigned)base;
 	cutoff = (unsigned long long)UQUAD_MAX / qbase;
 	cutlim = (unsigned long long)UQUAD_MAX % qbase;
 	for (acc = 0, any = 0;; c = *s++) {
 		if (isdigit(c))
+		{
 			c -= '0';
+		}
 		else if (isalpha(c))
+		{
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+		}
 		else
+		{
 			break;
+		}
 		if (c >= base)
+		{
 			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		}
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		{
 			any = -1;
-		else {
+		}
+		else
+		{
 			any = 1;
 			acc *= qbase;
 			acc += c;
@@ -302,9 +346,14 @@ strtouq(nptr, endptr, base)
 	if (any < 0) {
 		acc = UQUAD_MAX;
 //		errno = ERANGE;
-	} else if (neg)
+	}
+	else if (neg)
+	{
 		acc = -acc;
+	}
 	if (endptr != 0)
+	{
 		*endptr = (char *)(any ? s - 1 : nptr);
+	}
 	return (acc);
 }

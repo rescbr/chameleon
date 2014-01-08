@@ -36,81 +36,81 @@ extern "C" {
 
 struct IOPolledFileExtent
 {
-    uint64_t	start;
-    uint64_t	length;
+	uint64_t	start;
+	uint64_t	length;
 };
 typedef struct IOPolledFileExtent IOPolledFileExtent;
 
 struct IOHibernateImageHeader
 {
-    uint64_t	imageSize;
-    uint64_t	image1Size;
+	uint64_t	imageSize;
+	uint64_t	image1Size;
     
-    uint32_t	restore1CodePage;
-    uint32_t	restore1PageCount;
-    uint32_t	restore1CodeOffset;
-    uint32_t	restore1StackOffset;
+	uint32_t	restore1CodePage;
+	uint32_t	restore1PageCount;
+	uint32_t	restore1CodeOffset;
+	uint32_t	restore1StackOffset;
     
-    uint32_t	pageCount;
-    uint32_t	bitmapSize;
+	uint32_t	pageCount;
+	uint32_t	bitmapSize;
 
-    uint32_t	restore1Sum;
-    uint32_t	image1Sum;
-    uint32_t	image2Sum;
+	uint32_t	restore1Sum;
+	uint32_t	image1Sum;
+	uint32_t	image2Sum;
 
-    uint32_t	actualRestore1Sum;
-    uint32_t	actualImage1Sum;
-    uint32_t	actualImage2Sum;
+	uint32_t	actualRestore1Sum;
+	uint32_t	actualImage1Sum;
+	uint32_t	actualImage2Sum;
 
-    uint32_t	actualUncompressedPages;
-    uint32_t	conflictCount;
-    uint32_t	nextFree;
+	uint32_t	actualUncompressedPages;
+	uint32_t	conflictCount;
+	uint32_t	nextFree;
 
-    uint32_t	signature;
-    uint32_t	processorFlags;
+	uint32_t	signature;
+	uint32_t	processorFlags;
 
-    uint32_t    runtimePages;
-    uint32_t    runtimePageCount;
+	uint32_t	runtimePages;
+	uint32_t	runtimePageCount;
 
-    uint8_t	reserved2[16];
+	uint8_t		reserved2[16];
     
-    uint64_t	encryptStart;
-    uint64_t	machineSignature;
+	uint64_t	encryptStart;
+	uint64_t	machineSignature;
 
-    uint32_t    previewSize;
-    uint32_t    previewPageListSize;
+	uint32_t	previewSize;
+	uint32_t	previewPageListSize;
 
-    uint32_t	diag[4];
+	uint32_t	diag[4];
 
-    int32_t	graphicsInfoOffset;
-    int32_t	cryptVarsOffset;
-    int32_t	memoryMapOffset;
-    uint32_t    memoryMapSize;
-    uint32_t    systemTableOffset;
+	int32_t		graphicsInfoOffset;
+	int32_t		cryptVarsOffset;
+	int32_t		memoryMapOffset;
+	uint32_t	memoryMapSize;
+	uint32_t	systemTableOffset;
 
-    uint32_t	reserved[77];		// make sizeof == 512
+	uint32_t	reserved[77];		// make sizeof == 512
 
-    uint32_t		fileExtentMapSize;
-    IOPolledFileExtent	fileExtentMap[2];
+	uint32_t		fileExtentMapSize;
+	IOPolledFileExtent	fileExtentMap[2];
 };
 typedef struct IOHibernateImageHeader IOHibernateImageHeader;
 
 
 struct hibernate_bitmap_t
 {
-    uint32_t	first_page;
-    uint32_t	last_page;
-    uint32_t	bitmapwords;
-    uint32_t	bitmap[0];
+	uint32_t	first_page;
+	uint32_t	last_page;
+	uint32_t	bitmapwords;
+	uint32_t	bitmap[0];
 };
 typedef struct hibernate_bitmap_t hibernate_bitmap_t;
 
 struct hibernate_page_list_t
 {
-    uint32_t		  list_size;
-    uint32_t		  page_count;
-    uint32_t		  bank_count;
-    hibernate_bitmap_t    bank_bitmap[0];
+	uint32_t		  list_size;
+	uint32_t		  page_count;
+	uint32_t		  bank_count;
+	hibernate_bitmap_t    bank_bitmap[0];
 };
 typedef struct hibernate_page_list_t hibernate_page_list_t;
 
@@ -118,14 +118,14 @@ typedef struct hibernate_page_list_t hibernate_page_list_t;
 
 struct hibernate_cryptwakevars_t
 {
-    uint8_t aes_iv[AES_BLOCK_SIZE];
+	uint8_t aes_iv[AES_BLOCK_SIZE];
 };
 typedef struct hibernate_cryptwakevars_t hibernate_cryptwakevars_t;
 
 struct hibernate_cryptvars_t
 {
-    uint8_t aes_iv[AES_BLOCK_SIZE];
-    aes_ctx ctx;
+	uint8_t aes_iv[AES_BLOCK_SIZE];
+	aes_ctx ctx;
 };
 typedef struct hibernate_cryptvars_t hibernate_cryptvars_t;
 
@@ -134,38 +134,38 @@ typedef struct hibernate_cryptvars_t hibernate_cryptvars_t;
 
 enum 
 {
-    kIOHibernateProgressCount         = 19,
-    kIOHibernateProgressWidth         = 7,
-    kIOHibernateProgressHeight        = 16,
-    kIOHibernateProgressSpacing       = 3,
-    kIOHibernateProgressOriginY       = 81,
+	kIOHibernateProgressCount         = 19,
+	kIOHibernateProgressWidth         = 7,
+	kIOHibernateProgressHeight        = 16,
+	kIOHibernateProgressSpacing       = 3,
+	kIOHibernateProgressOriginY       = 81,
 
-    kIOHibernateProgressSaveUnderSize = 2*5+14*2,
+	kIOHibernateProgressSaveUnderSize = 2*5+14*2,
 
-    kIOHibernateProgressLightGray     = 230,
-    kIOHibernateProgressMidGray       = 174,
-    kIOHibernateProgressDarkGray      = 92
+	kIOHibernateProgressLightGray     = 230,
+	kIOHibernateProgressMidGray       = 174,
+	kIOHibernateProgressDarkGray      = 92
 };
 
 enum
 {
-    kIOHibernatePostWriteSleep   = 0,
-    kIOHibernatePostWriteWake    = 1,
-    kIOHibernatePostWriteHalt    = 2,
-    kIOHibernatePostWriteRestart = 3
+	kIOHibernatePostWriteSleep   = 0,
+	kIOHibernatePostWriteWake    = 1,
+	kIOHibernatePostWriteHalt    = 2,
+	kIOHibernatePostWriteRestart = 3
 };
 
 
 struct hibernate_graphics_t
 {
-    uint32_t physicalAddress;		// Base address of video memory
-    uint32_t mode;			// 
-    uint32_t rowBytes;   		// Number of bytes per pixel row
-    uint32_t width;      		// Width
-    uint32_t height;     		// Height
-    uint32_t depth;      		// Pixel Depth
+	uint32_t physicalAddress;		// Base address of video memory
+	uint32_t mode;			// 
+	uint32_t rowBytes;   		// Number of bytes per pixel row
+	uint32_t width;      		// Width
+	uint32_t height;     		// Height
+	uint32_t depth;      		// Pixel Depth
 
-    uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
+	uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
 };
 typedef struct hibernate_graphics_t hibernate_graphics_t;
 

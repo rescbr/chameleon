@@ -120,9 +120,35 @@ Options useful in the org.chameleon.Boot.plist file:
                               (default path is /private/var/vm/sleepimage).
 
   DropSSDT=Yes              Skip the SSDT tables while relocating the ACPI tables.
+  Drop<file>=Yes            Skip:[HPET, SLIC, SBST, ECDT, ASF! or DMAR]
+
   DSDT=<file>               Use an alternate DSDT.aml file 
                               (default path: /DSDT.aml
                                /Extra/DSDT.aml bt(0,0)/Extra/DSDT.aml).
+  HPET=<file>               Use an alternate HPET.aml file 
+                              (default path: /HPET.aml
+                               /Extra/HPET.aml bt(0,0)/Extra/HPET.aml).
+  SBST=<file>               Use an alternate SBST.aml file 
+                              (default path: /SBST.aml
+                               /Extra/SBST.aml bt(0,0)/Extra/SBST.aml).
+  ECDT=<file>               Use an alternate ECDT.aml file 
+                              (default path: /ECDT.aml
+                               /Extra/ECDT.aml bt(0,0)/Extra/ECDT.aml).
+  ASFT=<file>               Use an alternate ASFT.aml file 
+                              (default path: /ASFT.aml
+                               /Extra/ASFT.aml bt(0,0)/Extra/ASFT.aml).
+  DMAR=<file>               Use an alternate DMAR.aml file 
+                              (default path: /DMAR.aml
+                               /Extra/DMAR.aml bt(0,0)/Extra/DMAR.aml).
+  APIC=<file>               Use an alternate APIC.aml file 
+                              (default path: /APIC.aml
+                               /Extra/APIC.aml bt(0,0)/Extra/APIC.aml).
+  MCFG=<file>               Use an alternate MCFG.aml file 
+                              (default path: /MCFG.aml
+                               /Extra/MCFG.aml bt(0,0)/Extra/MCFG.aml).
+  FADT=<file>               Use an alternate FADT.aml file 
+                              (default path: /FADT.aml
+                               /Extra/FADT.aml bt(0,0)/Extra/FADT.aml).
 
   GenerateCStates=Yes     Enable auto generation of processor idle sleep states
                             (C-States).

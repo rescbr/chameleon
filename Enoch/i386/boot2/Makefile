@@ -36,15 +36,15 @@ THEMEDIR = ../../artwork/themes/$(THEME)
 INC = -I. -I$(SRCROOT) -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
 
 LIBS= -L$(SYMDIR) -lsaio -lsa -lklibc
-LIBDEP= libsaio.a libsa.a libklibc.a 
+LIBDEP= libsaio.a libsa.a libklibc.a
 
 OTHER_FILES =
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
-	   ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o \
-	   modules_support.o boot_modules.o
+OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o ramdisk.o \
+	picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o \
+	modules_support.o boot_modules.o
 # button.o browser.o scrollbar.o == NOTYET
 OBJS := $(addprefix $(OBJROOT)/, $(OBJS))
 
@@ -80,7 +80,7 @@ boot: $(CONFIG_HEADERS) $(SYMROOT)/embedded.h $(OBJS) $(addprefix $(SYMROOT)/, $
 
 endif
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/
-	
+
 	@### First pass, don't worry abount segment alignment.
 	@echo "\t[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \

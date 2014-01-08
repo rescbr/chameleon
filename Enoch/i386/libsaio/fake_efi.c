@@ -73,7 +73,7 @@ static uint64_t ptov64(uint32_t addr)
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = { 'E', 'n', 'o', 'c', 'h', '\0' };
 static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 
 // Bungo
@@ -550,8 +550,7 @@ void setupSystemType()
 
 void setupEfiDeviceTree(void)
 {
-	// Bungo
-	// EFI_CHAR8*	 ret = 0;
+	// EFI_CHAR8*	 ret = 0;  Bungo: not used
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
@@ -634,11 +633,7 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
 	*/
-
-	if (Platform.UUID)
-	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
-	}
 	//
 
 	// Export SystemSerialNumber if present
@@ -790,7 +785,7 @@ void saveOriginalSMBIOS(void)
 	}
 
 	memcpy(tableAddress, (void *)origeps->dmi.tableAddress, origeps->dmi.tableLength);
-	DT__AddProperty(node, "SMBIOS", origeps->dmi.tableLength, tableAddress);
+	DT__AddProperty(node, "SMBIOS-ORIG", origeps->dmi.tableLength, tableAddress);  // Bungo: changed from SMBIOS to SMBIOS-ORIG to differentiate
 }
 
 /*

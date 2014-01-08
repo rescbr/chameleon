@@ -40,6 +40,10 @@
 #define kLionInstallerDataFolder      "/Mac OS X Install Data/"
 #define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
 
+// Mountain Lion installer
+#define kMLionInstallerDataFolder      "/OS X Install Data/"
+#define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+
 /*
  * Keys used in system Boot.plist
  */
@@ -105,6 +109,8 @@
 
 /* Slice: added this */
 #define kPS2RestartFix		"PS2RestartFix"		/* acpi_patcher.c */
+#define kInjectEDID		"InjectEDID"		/* ati.c*/
+#define kCustomEDID		"CustomEDID"		/* ati.c*/
 
 /* Signal64: added this key */
 #define kLegacyOff		"USBLegacyOff"		/* usb.c */
@@ -113,8 +119,25 @@
 
 /* Meklort: added this key */
 #define kMD0Image		"md0"			/* ramdisk.h */
+#define kEnableWifi		"EnableWifi"		/* pci_setup.c */
 
 /* Andyvand: added these keys */
+//#define kSSDT			"SSDT"			/* acpi_patcher.c */
+#define kHPET			"HPET"			/* acpi_patcher.c */
+#define kSBST			"SBST"			/* acpi_patcher.c */
+#define kECDT			"ECDT"			/* acpi_patcher.c */
+#define kASFT			"ASFT"			/* acpi_patcher.c */
+#define kDMAR			"DMAR"			/* acpi_patcher.c */
+#define kFADT			"FADT"			/* acpi_patcher.c */
+#define kAPIC			"APIC"			/* acpi_patcher.c */
+#define kMCFG			"MCFG"			/* acpi_patcher.c */
+#define kDropHPET		"DropHPET"		/* acpi_patcher.c */
+#define kDropSLIC		"DropSLIC"		/* acpi_patcher.c */
+#define kDropSBST		"DropSBST"		/* acpi_patcher.c */
+#define kDropECDT		"DropECDT"		/* acpi_patcher.c */
+#define kDropASFT		"DropASFT"		/* acpi_patcher.c */
+#define kDropDMAR		"DropDMAR"		/* acpi_patcher.c */
+#define kUpdateACPI		"UpdateACPI"		/* acpi_patcher.c */
 
 /* Mojodojo: added these keys */
 #define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
@@ -130,7 +153,7 @@
 #define kDcfg1			"display_1"		/* nvidia.c */
 
 /* Marchrius: added these keys */
-#define kEnableBacklight	"EnableBacklight"	/* nvidia.c */
+#define kEnableBacklight	"EnableBacklight"	/* ati.c && nvidia.c */
 
 /* Kabyl: added these keys */
 #define kAtiConfig		"AtiConfig"		/* ati.c */
@@ -141,18 +164,26 @@
 #define kEnableHDMIAudio	"EnableHDMIAudio"	/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
+#define kRebootOnPanic		"RebootOnPanic"
+#define kEnableHiDPI		"EnableHiDPI"		/* enable High resolution display (aka Retina) */
 
 /* ErmaC: added these keys */
-#define kEnableDualLink		"EnableDualLink"	/* nvidia.c && gma.c*/
+#define kEnableDualLink		"EnableDualLink"	/* ati.c && nvidia.c && gma.c*/
 #define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
 #define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
 #define kSkipAtiGfx		"SkipAtiGfx"		/* pci_setup.c */
+#define kUsbInject		"USBInject"		/* usb.c */
 #define kIntelCapriFB		"IntelCapriFB"		/* gma.c was HD4K-ig */
 #define kIntelAzulFB		"IntelAzulFB"		/* gma.c was HD5K-ig */
 #define kAAPLCustomIG		"InjectIntel-ig"	/* gma.c */
 #define kHDAEnabler		"HDAEnabler"		/* pci_setup.c */
 #define kHDEFLayoutID		"HDEFLayoutID"		/* hda.c */
 #define kHDAULayoutID		"HDAULayoutID"		/* hda.c */
+//#define kHDAPinConf		"HDEFPinConfiguration"	/* hda.c */
+#define kBGRT			"BGRT"			/* acpi_patcher.c */
+#define kDropBGRT		"DropBGRT"		/* acpi_patcher.c */
+#define kDropMCFG		"DropMCFG"		/* acpi_patcher.c */
+#define kDropAPIC		"DropAPIC"		/* acpi_patcher.c */
 
 /* Karas: added these keys */
 #define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
@@ -193,10 +224,10 @@ extern bool useGUI;
  * Boot Modes
  */
 enum {
-    kBootModeNormal = 0,
-    kBootModeSafe   = 1,
-    kBootModeSecure = 2,
-    kBootModeQuiet  = 4
+	kBootModeNormal = 0,
+	kBootModeSafe   = 1,
+	kBootModeSecure = 2,
+	kBootModeQuiet  = 4
 };
 
 extern void initialize_runtime();
@@ -215,16 +246,20 @@ extern void setVideoMode(int mode, int drawgraphics);
 extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
-extern void drawColorRectangle( unsigned short x,
-                                unsigned short y,
-                                unsigned short width,
-                                unsigned short height,
-                                unsigned char  colorIndex );
-extern void drawDataRectangle( unsigned short  x,
-                               unsigned short  y,
-                               unsigned short  width,
-                               unsigned short  height,
-                               unsigned char * data );
+extern void drawColorRectangle(
+                               unsigned short x,
+                               unsigned short y,
+                               unsigned short width,
+                               unsigned short height,
+                               unsigned char  colorIndex
+                               );
+extern void drawDataRectangle(
+                              unsigned short  x,
+                              unsigned short  y,
+                              unsigned short  width,
+                              unsigned short  height,
+                              unsigned char * data
+                              );
 extern int
 convertImage( unsigned short width,
               unsigned short height,
@@ -265,8 +300,8 @@ void showTextFile();
 char *getMemoryInfoString();
 
 typedef struct {
-    char   name[80];
-    void * param;
+	char   name[80];
+	void * param;
 } MenuItem;
 
 /*
@@ -275,15 +310,15 @@ typedef struct {
 extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
 
 struct compressed_kernel_header {
-  u_int32_t signature;
-  u_int32_t compress_type;
-  u_int32_t adler32;
-  u_int32_t uncompressed_size;
-  u_int32_t compressed_size;
-  u_int32_t reserved[11];
-  char      platform_name[64];
-  char      root_path[256];
-  u_int8_t  data[0];
+	u_int32_t signature;
+	u_int32_t compress_type;
+	u_int32_t adler32;
+	u_int32_t uncompressed_size;
+	u_int32_t compressed_size;
+	u_int32_t reserved[11];
+	char      platform_name[64];
+	char      root_path[256];
+	 u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 

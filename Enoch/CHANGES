@@ -20,14 +20,57 @@
 - Fix warnings/errors from new llvm/clang (xcode 4.6)
 - Fix base64 decode, fixes Issue http://forge.voodooprojects.org/p/chameleon/issues/320/
 - meklort : FileNVRAM module import
+- Merge more cparm's (security, stability, bugs fixes) improvements from his branch.
+- cparm : Added two boot options for High resolution display and reboot on kernel panic
 - cparm : Added a workaroud for Xcode 4.4.x compatibility 504B030414030100630004731141000000007D0000008B00000003000B0062696E01990700020041450308001AED80DA50DF6080B0390FE095B3BC129E1FC27C104EC97897EF27CD1175766CB18C66FF42EFB7023911BDFD5E4BC9AEEC32FF3473963F70B255581D7B74DE9F
 - cparm : Fixed a buffer overflow in the plist loader
-- cparm : Ported the nvidia plist helper (less time to spend on the device id more time to code :-) )
+- Add more nVidia and Ati Device and Subdevice IDs.
+- Substitutes some simpler command in place of md which fixes this first issue
+  credits to bltz http://forge.voodooprojects.org/p/chameleon/issues/279/
+- Fix crash with missing *_o.png image
+  credits to bltz http://forge.voodooprojects.org/p/chameleon/issues/280/
+- General code cleanups.
+- This revision is devoted to Samantha, AKA DHP or Revogirl in the OSx86 scene.
+  A young talent we lost prematurely.
+  Part of her work will now live on in the Chameleon source code.
+  Changes: code cleaned, improvements taken from Revoboot.
+  http://www.insanelymac.com/forum/index.php?showtopic=259090
+- Apply patch by Andrey B http://forge.voodooprojects.org/p/chameleon/issues/270/
 - cparm : Added a Sata module, known as YellowIconFixer in my branch, useful to fix yellow icon issue (can also fix an issue with the apple's dvd player application in moutain lion)
-  , for now not added in the pkg script !!! 
-
+- cparm : Ported the nvidia plist helper (less time to spend on the device id more time to code :-) )
+- Added Recovery Icon for Default Theme (TODO) (credits to blackosx).
+- Merge Intel Graphics 4000 device IDs from Chimera (Commit 1999).
+- Merge more cparm's (security, stability, bugs fixes) improvements from his branch.
+  http://forge.voodooprojects.org/p/chameleon/source/tree/HEAD/branches/cparm
+- Merge "Restart fix Removed" from trunk r1992 by Slice's patch
+- Added nVidia process sub-dev ids.
+- Merge EnableHDMIAudio changes from commit 1950 by Cosmosis Jones.
+- Merge patch by Geoff Seeley http://forge.voodooprojects.org/p/chameleon/issues/59/
+- Apply patch by Michael Seydl http://forge.voodooprojects.org/p/chameleon/issues/48/
+- Apply patch by Michael Seydl http://forge.voodooprojects.org/p/chameleon/issues/247/
+- Apply patch by rafi rafi http://forge.voodooprojects.org/p/chameleon/issues/246/
+- Added ID for Radeon HD5570 and some subID: http://forge.voodooprojects.org/p/chameleon/issues/243/
+- Merge cparm's (security, stability, bugs fixes) improvements from his branch.
+- Added ID and correct FB for:  http://forge.voodooprojects.org/p/chameleon/issues/238/
+- Added next coming CHIPSET and ID definition (Mosts of it commented) ML?
+  (found via netkas.org): http://lists.freedesktop.org/archives/dri-devel/2012-March/020388.html
+- Merge IVY Bridge stuff from Chimera Branch.
+- Added boot support for Mountain Lion 10.8 (credits to ErmaC) & updated the default theme (credits to blackosx)
+- cparm : Fixed naming convention for raid hfs devices in gui
+- Added support for using UUIDs with ext2 filesystems (credits to bitz): http://forge.voodooprojects.org/p/chameleon/issues/208/
+- Added Guerrero's patch on gui.c: http://forge.voodooprojects.org/p/chameleon/issues/178/
 - cparm : Ported the OS detection to the trunk, updated the default theme to v 1.1 (credit to blackosx) 
-
+- Merge correction for "Invalid package length algorithm in aml_generator.c" (credits to rphilipson)
+  http://forum.voodooprojects.org/index.php/topic,2297.0.html
+- Added scorpius's patch (to get an unstretched boot screen for nVidia cards on DVI) in boot0.s,
+  disabled by default: http://forum.voodooprojects.org/index.php/topic,2158.0.html
+- Added exFAT volume label support (FAT64) support (credit to dmazar):
+  http://forum.voodooprojects.org/index.php/topic,2095.0.html
+- disableIRQs() http://www.insanelymac.com/forum/index.php?s=&showtopic=255866&view=findpost&p=1677779
+  Port of original patch by: CPARM (who basically did this in boot.c) Thanks!
+  The ACPI specification dictates that the 8259 (PC-AT compatible) vectors
+  must be disabled (that is, masked) when enabling the ACPI APIC operation
+  but this isn't done (apparently) on all mobo's and thus we do that here.
 - Added AtiPorts option to GraphicsEnabler, so users can override the default number of ports. It proved
   to be useful when used to limit the number of ports that a framebuffer registers, which seems to be a
   requirement on laptops that can only use 2 ports at the same time.

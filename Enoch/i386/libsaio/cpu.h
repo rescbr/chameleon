@@ -16,17 +16,89 @@ extern void scan_cpu(PlatformInfo_t *);
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x00000198
-#define MSR_IA32_PERF_CONTROL	0x199
-#define MSR_IA32_EXT_CONFIG		0x00EE
-#define MSR_FLEX_RATIO			0x194
-#define MSR_TURBO_RATIO_LIMIT	0x1AD
-#define	MSR_PLATFORM_INFO		0xCE
-#define MSR_CORE_THREAD_COUNT	0x35			// Undocumented
-#define MSR_IA32_PLATFORM_ID	0x17
+//-- processor type -> p_type:
+#define PT_OEM	0x00	// Intel Original OEM Processor;
+#define PT_OD	0x01 	// Intel Over Drive Processor;
+#define PT_DUAL	0x02	// Intel Dual Processor;
+#define PT_RES	0x03	// Intel Reserved;
 
-#define K8_FIDVID_STATUS		0xC0010042
-#define K10_COFVID_STATUS		0xC0010071
+/* Known MSR registers */
+#define MSR_IA32_PLATFORM_ID        0x0017
+#define MSR_CORE_THREAD_COUNT       0x0035	 /* limited use - not for Penryn or older	*/
+#define IA32_TSC_ADJUST             0x003B
+#define MSR_IA32_BIOS_SIGN_ID       0x008B   /* microcode version */
+#define MSR_FSB_FREQ                0x00CD	 /* limited use - not for i7						*/
+#define	MSR_PLATFORM_INFO           0x00CE   /* limited use - MinRatio for i7 but Max for Yonah	*/
+/* turbo for penryn */
+#define MSR_PKG_CST_CONFIG_CONTROL  0x00E2   /* sandy and ivy */
+#define IA32_MPERF                  0x00E7   /* TSC in C0 only */
+#define IA32_APERF                  0x00E8   /* actual clocks in C0 */
+#define MSR_IA32_EXT_CONFIG         0x00EE	 /* limited use - not for i7						*/
+#define MSR_FLEX_RATIO              0x0194	 /* limited use - not for Penryn or older			*/
+                                                //see no value on most CPUs
+#define	MSR_IA32_PERF_STATUS        0x0198
+#define MSR_IA32_PERF_CONTROL       0x0199
+#define MSR_IA32_CLOCK_MODULATION   0x019A
+#define MSR_THERMAL_STATUS          0x019C
+#define MSR_IA32_MISC_ENABLE        0x01A0
+#define MSR_THERMAL_TARGET          0x01A2	 /* limited use - not for Penryn or older			*/
+#define MSR_TURBO_RATIO_LIMIT       0x01AD	 /* limited use - not for Penryn or older			*/
+
+#define IA32_ENERGY_PERF_BIAS		0x01B0
+//MSR 000001B0                                      0000-0000-0000-0005
+//MSR 000001B1                                      0000-0000-8838-0000
+#define IA32_PLATFORM_DCA_CAP		0x01F8
+//MSR 000001FC                                      0000-0000-0004-005F
+
+// Sandy Bridge & JakeTown specific 'Running Average Power Limit' MSR's.
+#define MSR_RAPL_POWER_UNIT			0x606     /* R/O */
+//MSR 00000606                                      0000-0000-000A-1003
+#define MSR_PKGC3_IRTL          0x60A    /* RW time limit to go C3 */
+// bit 15 = 1 -- the value valid for C-state PM
+#define MSR_PKGC6_IRTL          0x60B    /* RW time limit to go C6 */
+//MSR 0000060B                                      0000-0000-0000-8854
+//Valid + 010=1024ns + 0x54=84mks
+#define MSR_PKGC7_IRTL          0x60C    /* RW time limit to go C7 */
+//MSR 0000060C                                      0000-0000-0000-8854
+#define MSR_PKG_C2_RESIDENCY    0x60D   /* same as TSC but in C2 only */
+
+#define MSR_PKG_RAPL_POWER_LIMIT	0x610
+//MSR 00000610                                      0000-A580-0000-8960
+#define MSR_PKG_ENERGY_STATUS		0x611
+//MSR 00000611                                      0000-0000-3212-A857
+#define MSR_PKG_POWER_INFO			0x614
+//MSR 00000614                                      0000-0000-01E0-02F8
+// Sandy Bridge IA (Core) domain MSR's.
+#define MSR_PP0_POWER_LIMIT			0x638
+#define MSR_PP0_ENERGY_STATUS		0x639
+#define MSR_PP0_POLICY          0x63A
+#define MSR_PP0_PERF_STATUS			0x63B
+
+// Sandy Bridge Uncore (IGPU) domain MSR's (Not on JakeTown).
+#define MSR_PP1_POWER_LIMIT			0x640
+#define MSR_PP1_ENERGY_STATUS		0x641
+//MSR 00000641                                      0000-0000-0000-0000
+#define MSR_PP1_POLICY          0x642
+
+// JakeTown only Memory MSR's.
+#define MSR_PKG_PERF_STATUS			0x613
+#define MSR_DRAM_POWER_LIMIT		0x618
+#define MSR_DRAM_ENERGY_STATUS	0x619
+#define MSR_DRAM_PERF_STATUS		0x61B
+#define MSR_DRAM_POWER_INFO			0x61C
+
+//IVY_BRIDGE
+#define MSR_CONFIG_TDP_NOMINAL  0x648
+#define MSR_CONFIG_TDP_LEVEL1   0x649
+#define MSR_CONFIG_TDP_LEVEL2   0x64A
+#define MSR_CONFIG_TDP_CONTROL  0x64B  /* write once to lock */
+#define MSR_TURBO_ACTIVATION_RATIO 0x64C
+
+//AMD
+#define K8_FIDVID_STATUS        0xC0010042
+#define K10_COFVID_LIMIT        0xC0010061
+#define K10_PSTATE_STATUS       0xC0010064
+#define K10_COFVID_STATUS       0xC0010071
 
 #define MSR_AMD_MPERF           0x000000E7
 #define MSR_AMD_APERF           0x000000E8
@@ -40,7 +112,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define CALIBRATE_TIME_MSEC	30		/* 30 msecs */
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
 
-// CPUID Values
+// CPUID Values Reference
 /*
 #define CPUID_MODEL_PRESCOTT		3   // 0x03 Celeron D, Pentium 4 (90nm)
 #define CPUID_MODEL_NOCONA		4   // 0x04 Xeon Nocona, Irwindale (90nm)
