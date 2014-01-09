@@ -23,9 +23,9 @@
 #ifndef __LIBSAIO_SMBIOS_H
 #define __LIBSAIO_SMBIOS_H
 
-//
-// Based on System Management BIOS Reference Specification v2.5
-//
+
+/* Based on System Management BIOS Reference Specification v2.5 */
+// http://dmtf.org/sites/default/files/standards/documents/DSP0134_2.8.0.pdf
 
 typedef uint8_t  SMBString;
 typedef uint8_t  SMBByte;
@@ -84,7 +84,7 @@ typedef struct SMBAnchor
 /*
  =======================
  SMBIOS structure types.
- =======================*/
+ ======================= */
 enum
 {
 	kSMBTypeBIOSInformation			=  0, // BIOS information (Type 0)
@@ -134,7 +134,7 @@ enum
 	// Inactive (Type 126)
 	kSMBTypeEndOfTable			=  127, // End-of-Table (Type 127)
 
-	/* Apple Specific Structures */
+	// Apple Specific Structures
 	kSMBTypeFirmwareVolume			=  128, // FirmwareVolume (TYPE 128)
 	kSMBTypeMemorySPD			=  130, // MemorySPD (TYPE 130)
 	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
@@ -231,7 +231,8 @@ typedef struct SMBSystemEnclosure
 {
 	SMB_STRUCT_HEADER               // Type 3
 	SMBString  manufacturer;
-	SMBByte    type;		// System Enclosure Indicator
+//	SMBByte    type;		Bungo: renamed to chassisType - convention
+	SMBByte    chassisType;		// System Enclosure Indicator
 	SMBString  version;		// Board Number?
 	SMBString  serialNumber;
 	SMBString  assetTagNumber;
@@ -247,6 +248,27 @@ typedef struct SMBSystemEnclosure
 //	SMBByte	containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
 //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
 } __attribute__((packed)) SMBSystemEnclosure;
+
+// Bungo: values for SMBSystemEnclosure.chassisType
+enum {
+    kSMBchassisOther                    = 0x01,
+    kSMBchassisUnknown                  = 0x02,
+    kSMBchassisDesktop                  = 0x03,
+    kSMBchassisLPDesktop                = 0x04,
+    kSMBchassisPizzaBox                 = 0x05,
+    kSMBchassisMiniTower                = 0x06,
+    kSMBchassisTower                    = 0x07,
+    kSMBchassisPortable                 = 0x08,
+    kSMBchassisLaptop                   = 0x09,
+    kSMBchassisNotebook                 = 0x0A,
+    kSMBchassisHandHeld                 = 0x0B,
+    kSMBchassisDockingStation           = 0x0C,
+    kSMBchassisAllInOne                 = 0x0D,
+    kSMBchassisSubNotebook              = 0x0E,
+    // ...
+    kSMBchassisLunchBox                 = 0x10
+    // fill up if needed ;-)
+};
 
 /* ============================
  Processor Information (Type 4)
