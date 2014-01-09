@@ -1057,7 +1057,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1048,	"GeForce 605" },
 	{ 0x10DE1049,	"GeForce GT 620" },
 	{ 0x10DE104A,	"GeForce GT 610" },
-	{ 0x10DE104B,	"GeForce GT 625" },
+	{ 0x10DE104B,	"GeForce GT 625 (OEM)" },
 	// 1050 - 105F
 	{ 0x10DE1050,	"GeForce GT 520M" },
 	{ 0x10DE1051,	"GeForce GT 520MX" },
@@ -1304,9 +1304,14 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 	{ 0x10DE06CD,	0x10DE079F,	"Point of View GeForce GTX 470" },
 	{ 0x10DE06CD,	0x14622220,	"MSi GeForce GTX 470 Twin Frozr II" },
 
+	{ 0x10DE06D1,	0x10DE0771,	"nVidia Tesla C2050" },
 	{ 0x10DE06D1,	0x10DE0772,	"nVidia Tesla C2070" },
 
+	{ 0x10DE06D2,	0x10DE0774,	"nVidia Tesla M2070" },
+	{ 0x10DE06D2,	0x10DE0830,	"nVidia Tesla M2070" },
+	{ 0x10DE06D2,	0x10DE0842,	"nVidia Tesla M2070" },
 	{ 0x10DE06D2,	0x10DE088F,	"nVidia Tesla X2070" },
+	{ 0x10DE06D2,	0x10DE0908,	"nVidia Tesla M2070" },
 
 	{ 0x10DE06DE,	0x10DE0773,	"nVidia Tesla S2050" },
 	{ 0x10DE06DE,	0x10DE0830,	"nVidia Tesla M2070" },
@@ -1366,6 +1371,12 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 
 	{ 0x10DE1091,	0x10DE088E,	"nVidia Tesla X2090" },
 	{ 0x10DE1091,	0x10DE0891,	"nVidia Tesla X2090" },
+
+	{ 0x10DE1094,	0x10DE0888,	"nVidia Tesla M2075" },
+
+	{ 0x10DE1096,	0x10DE0910,	"nVidia Tesla C2075" },
+	{ 0x10DE1096,	0x10DE0911,	"nVidia Tesla C2050" },
+
 	// 1100 - 11FF
 	{ 0x10DE1140,	0x1025064A,	"Acer GeForce GT 620M" },
 	{ 0x10DE1140,	0x1025064C,	"Acer GeForce GT 620M" },
@@ -1702,9 +1713,9 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 				{
 					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000))
 					{
-                      snprintf(name_model, sizeof(name_model), "%s %s",
-                               nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
-                      return name_model;
+						snprintf(name_model, sizeof(name_model), "%s %s",
+							nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
+						return name_model;
 					}
 				}
 			}
@@ -2171,7 +2182,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 
-    free(version_str);
+	free(version_str);
 	free(rom);
 	return true;
 }
