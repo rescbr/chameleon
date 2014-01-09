@@ -65,16 +65,16 @@ int sprintf(char * str, const char * fmt, ...)
 /*VARARGS1*/
 int snprintf(char * str, size_t size, const char * fmt, ...)
 {
-    va_list ap;
-    struct putc_info pi;
+	va_list ap;
+	struct putc_info pi;
 
-    va_start(ap, fmt);
-    pi.str = str;
-    pi.last_str = str + size - 1;
-    prf(fmt, ap, sputc, &pi);
-    *pi.str = '\0';
-    va_end(ap);
-    return (pi.str - str);
+	va_start(ap, fmt);
+	pi.str = str;
+	pi.last_str = str + size - 1;
+	prf(fmt, ap, sputc, &pi);
+	*pi.str = '\0';
+	va_end(ap);
+	return (pi.str - str);
 }
 
 /*VARARGS1*/

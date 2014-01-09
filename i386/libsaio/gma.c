@@ -354,7 +354,7 @@ static char *get_gma_controller_name(uint16_t device_id, uint16_t vendor_id)
 	{
 		if (intel_gfx_chipsets[i].model == ((device_id << 16) | vendor_id))
 		{
-            snprintf(desc, sizeof(desc), "%s %s", INTEL_NAME, intel_gfx_chipsets[i].label_info);
+			snprintf(desc, sizeof(desc), "%s %s", INTEL_NAME, intel_gfx_chipsets[i].label_info);
 			return desc;
 		}
 	}
@@ -388,14 +388,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	verbose("Class code: [%04x]\n%s [%04x:%04x] (rev %02x)\nSubsystem: [%04x:%04x] :: %s\n",
 			gma_dev->class_id, model, gma_dev->vendor_id, gma_dev->device_id, gma_dev->revision_id, gma_dev->subsys_id.subsys.vendor_id, gma_dev->subsys_id.subsys.device_id, devicepath);
 
-	if (!string)
-	{
+	if (!string) {
 		string = devprop_create_string();
 	}
 
 	struct DevPropDevice *device = devprop_add_device(string, devicepath);
-	if (!device)
-	{
+	if (!device) {
 		printf("Failed initializing dev-prop string dev-entry.\n");
 		pause();
 		return false;

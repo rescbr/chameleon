@@ -107,13 +107,11 @@ void load_all_modules()
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
 	{
-		if (strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
-		{
+		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {
 			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 
-			if (!load_module(tmp))
-			{
+			if(!load_module(tmp)) {
 				// failed to load
 				// free(tmp);
 			}
@@ -123,7 +121,7 @@ void load_all_modules()
 			DBG("Ignoring %s\n", name);
 		}
 	}
-    closedir(moduleDir);
+	closedir(moduleDir);
 }
 
 
@@ -985,14 +983,14 @@ int replace_function(const char* symbol, void* newAddress)
 	UInt32 addr = lookup_all_symbols(symbol);
 	if(addr != 0xFFFFFFFF)
 	{
-      //DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
-      UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
-      char* binary = (char*)addr;
-      *binary++ = 0xFF;	// Jump
-      *binary++ = 0x25;	// Long Jump
-      *((UInt32*)binary) = (UInt32)jumpPointer;
-      *jumpPointer = (UInt32)newAddress;
-      return 1;
+		//DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
+		UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
+		char* binary = (char*)addr;
+		*binary++ = 0xFF;	// Jump
+		*binary++ = 0x25;	// Long Jump
+		*((UInt32*)binary) = (UInt32)jumpPointer;
+		*jumpPointer = (UInt32)newAddress;
+		return 1;
 	}
 	return 0;
 }

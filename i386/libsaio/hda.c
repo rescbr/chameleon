@@ -478,40 +478,50 @@ static hdacc_codecs know_codecs[] = {
 /* get HDA device name */
 static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t controller_vendor_id)
 {
-	int i;
 	static char desc[128];
 
-	for (i = 0; i < HDAC_DEVICES_LEN; i++)
-	{
-		if (know_hda_controller[i].model == ((controller_device_id << 16) | controller_vendor_id))
-		{
-			if(controller_vendor_id == INTEL_VENDORID){
-				sprintf(desc, "Intel %s Hight Definition Audio Controller", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == NVIDIA_VENDORID) {
-				sprintf(desc, "nVidia %s HDA Controller (HDMi)", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == ATI_VENDORID) {
-				sprintf(desc, "ATI %s HDA Controller (HDMi)", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == RDC_VENDORID) {
-				sprintf(desc, "RDC %s Hight Definition Audio Controller", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == VIA_VENDORID) {
-				sprintf(desc, "VIA %s HDA Controller", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == SIS_VENDORID) {
-				sprintf(desc, "SiS %s HDA Controller", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			} else if (controller_vendor_id == ULI_VENDORID) {
-				sprintf(desc, "ULI %s HDA Controller", know_hda_controller[i].desc);
-				desc[sizeof(desc) - 1] = '\0';
-			}
+	const char* name_format  = "Unknown HD Audio device %s";
+	uint32_t controller_model = ((controller_device_id << 16) | controller_vendor_id);
+	int i;
+
+	/* Get format for vendor ID */
+	switch (controller_vendor_id) {
+		case ATI_VENDORID:
+			name_format = "ATI %s HDA Controller (HDMi)"; break;
+
+		case INTEL_VENDORID:
+			name_format = "Intel %s High Definition Audio Controller"; break;
+
+		case NVIDIA_VENDORID:
+			name_format = "nVidia %s HDA Controller (HDMi)"; break;
+
+		case RDC_VENDORID:
+			name_format = "RDC %s High Definition Audio Controller"; break;
+
+		case SIS_VENDORID:
+			name_format = "SiS %s HDA Controller"; break;
+
+		case ULI_VENDORID:
+			name_format = "ULI %s HDA Controller"; break;
+
+		case VIA_VENDORID:
+			name_format = "VIA %s HDA Controller"; break;
+
+		default:
+			break;
+	}
+
+	for (i = 0; i < HDAC_DEVICES_LEN; i++) {
+		if (know_hda_controller[i].model == controller_model) {
+			snprintf(desc, sizeof(desc), name_format, know_hda_controller[i].desc);
 			return desc;
 		}
 	}
-	sprintf(desc, "Unknown HD Audio device");
-	desc[sizeof(desc) - 1] = '\0';
+
+	/* Not in table */
+	snprintf(desc, sizeof(desc),
+		"Unknown HD Audio device, vendor %04x, model %04x",
+		controller_vendor_id, controller_device_id);
 	return desc;
 }
 

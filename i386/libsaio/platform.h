@@ -129,12 +129,15 @@ typedef struct _RamSlotInfo_t
 	uint8_t			BankConnCnt;
 } RamSlotInfo_t;
 
+//==============================================================================
+
 typedef struct _PlatformInfo_t {
 	struct CPU {
 		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint32_t		Vendor;					// Vendor
-		uint32_t		Signature;				// Signature
+		uint32_t		Signature;				// Processor Signature
 		uint32_t		Stepping;				// Stepping
+		uint32_t		Type;					// Type
 		uint32_t		Model;					// Model
 		uint32_t		ExtModel;				// Extended Model
 		uint32_t		Family;					// Family
@@ -168,10 +171,10 @@ typedef struct _PlatformInfo_t {
 	} RAM;
 
 	struct DMI {
-		int			MaxMemorySlots;				// number of memory slots populated by SMBIOS
-		int			CntMemorySlots;				// number of memory slots counted
-		int			MemoryModules;				// number of memory modules installed
-		int			DIMM[MAX_RAM_SLOTS];		// Information and SPD mapping for each slot
+		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
+		int			CntMemorySlots;		// number of memory slots counted
+		int			MemoryModules;		// number of memory modules installed
+		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
 	uint8_t				Type; // System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)

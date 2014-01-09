@@ -43,7 +43,7 @@ struct DevPropDevice {
 	uint16_t numentries;
 	uint16_t WHAT2;								// 0x0000 ?
 	struct ACPIDevPath acpi_dev_path;					// = 0x02010c00 0xd041030a
-	struct PCIDevPath  pci_dev_path[MAX_PCI_DEV_PATHS]; // = 0x01010600 func dev
+	struct PCIDevPath  pci_dev_path[MAX_PCI_DEV_PATHS];			// = 0x01010600 func dev
 	struct DevicePathEnd path_end;						// = 0x7fff0400
 	uint8_t *data;
 	
