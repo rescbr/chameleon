@@ -77,13 +77,13 @@ struct bios {
 	uint8_t		size;			/* Size in multiples of 512 */
 };
 
-#define NV_PMC_OFFSET							0x000000
-#define NV_PMC_SIZE                             0x2ffff
+#define NV_PMC_OFFSET							0x00000000
+#define NV_PMC_SIZE                                                     0x00001000 // 0x2ffff
 #define NV_PDISPLAY_OFFSET						0x610000
 #define NV_PDISPLAY_SIZE						0x10000
 
-#define NV_PROM_OFFSET							0x300000
-#define NV_PROM_SIZE							0x0000ffff
+#define NV_PROM_OFFSET							0x00300000
+#define NV_PROM_SIZE							0x00010000
 #define NV_PRAMIN_OFFSET						0x00700000
 #define NV_PRAMIN_SIZE							0x00100000
 #define NV04_PFB_FIFO_DATA						0x0010020c

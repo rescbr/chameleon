@@ -150,6 +150,7 @@ Options useful in the org.chameleon.Boot.plist file:
   Rescan=Yes                Enable CD-ROM rescan mode.
   "Rescan Prompt"=Yes       Prompts for enable CD-ROM rescan mode.
   SystemId=<UUID>         Set the system id manually to UUID.
+                              Deprecated - Now SMsystemuuid in smbios.plist
                           SMUUID in smbios config (reserved field) isn't used then.
   SystemType=<n>          Set the system type to n, where n is between 0..6
                           (default=1 Desktop)

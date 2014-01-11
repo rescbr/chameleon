@@ -34,7 +34,7 @@ bool aml_add_to_parent(AML_CHUNK* parent, AML_CHUNK* node)
 			default:
 				break;
 		}
-		
+
 		if (!parent->First) {
 			parent->First = node;
 		}
@@ -42,19 +42,19 @@ bool aml_add_to_parent(AML_CHUNK* parent, AML_CHUNK* node)
 			parent->Last->Next = node;
 		}
 		parent->Last = node;
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
 AML_CHUNK* aml_create_node(AML_CHUNK* parent)
 {
 	AML_CHUNK* node = (AML_CHUNK*)malloc(sizeof(AML_CHUNK));
-	
+
 	aml_add_to_parent(parent, node);
-	
+
 	return node;
 }
 
@@ -62,11 +62,11 @@ void aml_destroy_node(AML_CHUNK* node)
 {
 	// Delete child nodes
 	AML_CHUNK* child = node->First;
-	
+
 	while (child) 
 	{
 		AML_CHUNK* next = child->Next;
-		
+
 		if (child->Buffer) {
 			free(child->Buffer);
 		}
@@ -74,7 +74,7 @@ void aml_destroy_node(AML_CHUNK* node)
 		
 		child = next;
 	}
-	
+
 	// Free node
 	if (node->Buffer) {
 		free(node->Buffer);
@@ -86,21 +86,21 @@ void aml_destroy_node(AML_CHUNK* node)
 AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, char* buffer, uint32_t size)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_NONE;
 		node->Length = (uint16_t)size;
 		node->Buffer = malloc(node->Length);
 		memcpy(node->Buffer, buffer, node->Length);
 	}
-	
+
 	return node;
 }
 
 AML_CHUNK* aml_add_byte(AML_CHUNK* parent, uint8_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_BYTE;
 		node->Length = 1;
@@ -113,7 +113,7 @@ AML_CHUNK* aml_add_byte(AML_CHUNK* parent, uint8_t value)
 AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_WORD;
 		node->Length = 2;
@@ -127,7 +127,7 @@ AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value)
 AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_DWORD;
 		node->Length = 4;
@@ -143,7 +143,7 @@ AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value)
 AML_CHUNK* aml_add_qword(AML_CHUNK* parent, uint64_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_QWORD;
 		node->Length = 8;
@@ -199,7 +199,7 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 		offset += 4 + root;
 		return (uint32_t)offset;
 	}
-	
+
 	if (count == 2) {
 		node->Length = 2 + 8;
 		node->Buffer = malloc(node->Length+4);
@@ -209,7 +209,7 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 		offset += 8;
 		return (uint32_t)offset;
 	}
-	
+
 	node->Length = (uint16_t)(3 + (count << 2));
 	node->Buffer = malloc(node->Length+4);
 	node->Buffer[offset++] = 0x5c; // Root Char
@@ -223,7 +223,7 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 AML_CHUNK* aml_add_scope(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_SCOPE;
 
@@ -235,7 +235,7 @@ AML_CHUNK* aml_add_scope(AML_CHUNK* parent, char* name)
 AML_CHUNK* aml_add_name(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
-	
+
 	if (node) {
 		node->Type = AML_CHUNK_NAME;
 
@@ -420,7 +420,7 @@ uint8_t aml_get_size_length(uint32_t size)
 		return 2;
 	else if (size + 3 <= 0xfffff) /* Encode in 4 bits and 2 bytes */
 		return 3;
-	
+
 	return 4; /* Encode 0xfffffff in 4 bits and 2 bytes */
 }
 
@@ -430,7 +430,7 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 		// Calculate child nodes size
 		AML_CHUNK* child = node->First;
 		uint8_t child_count = 0;
-		
+
 		node->Size = 0;
 		while (child) {
 			child_count++;
@@ -439,7 +439,7 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 
 			child = child->Next;
 		}
-		
+
 		switch (node->Type) {
 			case AML_CHUNK_NONE:
 			case AML_STORE_OP:
@@ -618,13 +618,13 @@ uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 
 			child = child->Next;
 		}
-		
+
 		if (offset - old != node->Size) {
 			verbose("Node size incorrect: type=0x%x size=%x offset=%x\n",
 				node->Type, node->Size, (offset - old));
 		}
 	}
-	
+
 	return offset;
 }
 
@@ -652,9 +652,9 @@ int32_t FindBin (uint8_t *dsdt, uint32_t len, uint8_t *bin, unsigned int N)
 uint32_t get_size(uint8_t* Buffer, uint32_t adr)
 {
 	uint32_t temp;
-	
+
 	temp = Buffer[adr] & 0xF0; //keep bits 0x30 to check if this is valid size field
-	
+
 	if(temp <= 0x30) {	    // 0
 		temp = Buffer[adr];
 	} else if(temp == 0x40)	{	// 4

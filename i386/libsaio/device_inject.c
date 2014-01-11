@@ -25,7 +25,7 @@
 
 uint32_t devices_number = 1;
 uint32_t builtin_set = 0;
-struct DevPropString *string = 0;
+DevPropString *string = 0;
 uint8_t *stringdata = 0;
 uint32_t stringlength = 0;
 
@@ -68,7 +68,7 @@ void setupDeviceProperties(Node *node)
 	}
 }
 
-struct DevPropString *devprop_create_string(void)
+DevPropString *devprop_create_string(void)
 {
 	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
 
@@ -82,11 +82,11 @@ struct DevPropString *devprop_create_string(void)
 	return string;
 }
 
-struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *path)
+DevPropDevice *devprop_add_device(DevPropString *string, char *path)
 {
-	struct DevPropDevice	*device = NULL;
-	static const char		pciroot_string[] = "PciRoot(0x";
-	static const char		pci_device_string[] = "Pci(0x";
+	DevPropDevice	*device = NULL;
+	const char		pciroot_string[] = "PciRoot(0x";
+	const char		pci_device_string[] = "Pci(0x";
 
 	if (string == NULL || path == NULL) {
 		printf("ERROR null device path\n");
@@ -97,13 +97,12 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 		printf("ERROR parsing device path\n");
 		return NULL;
 	}
-
-	if (!(device = malloc(sizeof(struct DevPropDevice)))) {
+	if (!(device = malloc(sizeof(DevPropDevice)))) {
 		printf("ERROR malloc failed\n");
 		return NULL;
 	}
 
-	memset(device, 0, sizeof(struct DevPropDevice));
+	memset(device, 0, sizeof(DevPropDevice));
 	device->acpi_dev_path._UID = getPciRootUID();
 
 	int numpaths = 0;
@@ -184,13 +183,13 @@ struct DevPropDevice *devprop_add_device(struct DevPropString *string, char *pat
 
 	/* FIXME: probably needs bounds checking, as well as error handling in event of malloc failure */
 	string->length += device->length;
-	string->entries[string->numentries++] = (struct DevPropDevice*)malloc(sizeof(device));
+	string->entries[string->numentries++] = (DevPropDevice*)malloc(sizeof(device));
 	string->entries[string->numentries-1] = device;
 
 	return device;
 }
 
-int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len)
+int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len)
 {
 
 	if(!nm || !vl || !len) {
@@ -199,8 +198,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
 	uint8_t *data = (uint8_t*)malloc(length);
 	{
-		if(!data)
-		{
+		if(!data) {
 			return 0;
 		}
 
@@ -211,8 +209,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 		
 		off += 4;
 		uint32_t i=0, l = strlen(nm);
-		for(i = 0 ; i < l ; i++, off += 2)
-		{
+		for(i = 0 ; i < l ; i++, off += 2) {
 			data[off] = *nm++;
 		}
 
@@ -230,14 +227,11 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	uint32_t offset = device->length - (24 + (6 * device->num_pci_devpaths));
 	
 	uint8_t *newdata = (uint8_t*)malloc((length + offset));
-	if(!newdata)
-	{
+	if(!newdata) {
 		return 0;
 	}
-	if(device->data)
-	{
-		if(offset > 1)
-		{
+	if(device->data) {
+		if(offset > 1) {
 			memcpy(newdata, device->data, offset);
 		}
 	}
@@ -248,12 +242,9 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	device->string->length += length;
 	device->numentries++;
 
-	if(!device->data)
-	{
+	if(!device->data) {
 		device->data = (uint8_t*)malloc(sizeof(uint8_t));
-	}
-	else
-	{
+	} else {
 		free(device->data);
 	}
 
@@ -263,7 +254,7 @@ int devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint3
 	return 1;
 }
 
-char *devprop_generate_string(struct DevPropString *string)
+char *devprop_generate_string(DevPropString *string)
 {
 	char *buffer = (char*)malloc(string->length * 2);
 	char *ptr = buffer;
@@ -317,11 +308,10 @@ char *devprop_generate_string(struct DevPropString *string)
 	return ptr;
 }
 
-void devprop_free_string(struct DevPropString *string)
+void devprop_free_string(DevPropString *string)
 {
 
-	if(!string)
-	{
+	if(!string) {
 		return;
 	}
 
@@ -384,7 +374,7 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 
 /* a fine place for this code */
 
-int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id)
+int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
 {
 	if(!device)
 		return 0;
@@ -403,7 +393,7 @@ int devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_i
 void set_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
-	struct DevPropDevice *device = NULL;
+	DevPropDevice *device = NULL;
 
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 

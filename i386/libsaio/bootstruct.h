@@ -30,8 +30,8 @@
 #include "bios.h"
 #include "device_tree.h"
 
-/*!
-    Kernel boot args global also used by booter for its own data.
+/*
+ * Kernel boot args global also used by booter for its own data.
  */
 extern boot_args *bootArgs;
 extern boot_args_pre_lion *bootArgsPreLion;
@@ -57,20 +57,21 @@ extern Node *gMemoryMapNode;
  * PCI bus information.
  */
 typedef struct _PCI_bus_info_t {
-    union {
-        struct {
-            unsigned char configMethod1 :1;
-            unsigned char configMethod2 :1;
-            unsigned char               :2;
-            unsigned char specialCycle1 :1;
-            unsigned char specialCycle2 :1;
-        } s;
-        unsigned char d;
-    } u_bus;
-    unsigned char maxBusNum;
-    unsigned char majorVersion;
-    unsigned char minorVersion;
-    unsigned char BIOSPresent;
+	union {
+		struct {
+			unsigned char configMethod1 :1;
+			unsigned char configMethod2 :1;
+			unsigned char               :2;
+			unsigned char specialCycle1 :1;
+			unsigned char specialCycle2 :1;
+		} s;
+		unsigned char d;
+	} u_bus;
+
+	unsigned char maxBusNum;
+	unsigned char majorVersion;
+	unsigned char minorVersion;
+	unsigned char BIOSPresent;
 } PCI_bus_info_t;
 
 typedef struct {

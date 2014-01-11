@@ -331,9 +331,9 @@ uint8_t checksum8( void * start, unsigned int length )
     uint8_t * cp = (uint8_t *) start;
     unsigned int i;
 
-    for ( i = 0; i < length; i++)
-        csum += *cp++;
-
-    return csum;
+	for ( i = 0; i < length; i++) {
+		csum += *cp++;
+	}
+	return csum;
 }
 

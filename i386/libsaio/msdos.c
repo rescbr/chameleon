@@ -130,7 +130,7 @@ int MSDOSProbe(const void * buffer)
 		if (!memcmp((char *)((struct extboot *)bsp->bs50.bsExt)->exFileSysType, "FAT12   ", 8))
 			return 12;
 	}	
-		
+
 	return 0;
 }
 
@@ -188,9 +188,7 @@ MSDOSInitPartition (CICell ih)
 		free (buf);
 		return -1;
 	}
-	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0)
-	{
-		/* It's FAT32 */
+	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0) { /* It's FAT32 */
 		if (memcmp(((struct extboot *)bsp->bs710.bsExt)->exFileSysType, "FAT32   ", 8))
 		{
 			free (buf);
@@ -775,15 +773,14 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	char *ptr = (char *)base;
 	struct direntry *dirp;
 	uint64_t i;
-  char devStr[12];
+	char devStr[12];
 
 	if (MSDOSInitPartition (ih)<0)
 		return -1;
 	if (filePath[0] == '/')
 		filePath++;
 	buf = malloc(msdosclustersize);
-	if (!buf)
-	{
+	if (!buf) {
 		return -1;
 	}
 	dirp = getdirpfrompath (ih, filePath, buf);
@@ -797,8 +794,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	if (msdosfatbits == 32)
 		cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
 	size = (uint32_t)OSReadLittleInt32 ((dirp->deFileSize),0);
-	if (size<=offset)
-	{
+	if (size<=offset) {
 		free (buf);
 		return -1;
 	}
@@ -840,8 +836,7 @@ MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 	if (filePath[0] == '/')
 		filePath++;
 	buf = malloc(msdosclustersize);
-	if (!buf)
-	{
+	if (!buf) {
 		return -1;
 	}
 	dirp = getdirpfrompath (ih, filePath, buf);
@@ -936,8 +931,7 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 	
 	initRoot (&st);
 	st.buf = malloc(msdosclustersize);
-	if (!st.buf)
-	{
+	if (!st.buf) {
 		return;
 	}
 	while ((dirp = getnextdirent (ih, vfatlabel, &st)))
@@ -946,7 +940,7 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 			labelfound = 1;
 			break;
 		}
-		
+
 	free(st.buf);		
 
 	if (vfatlabel[0] && labelfound)
@@ -969,9 +963,7 @@ MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 		union bootsector *bsp = (union bootsector *)buf;
 		Seek(ih, 0);
 		Read(ih, (long)buf, 512);
-		if (msdosfatbits == 32)
-		{
-			/* It's FAT32 */
+		if (msdosfatbits == 32) { /* It's FAT32 */
 			strncpy((char *)label, (char *)((struct extboot *)bsp->bs710.bsExt)->exVolumeLabel, LABEL_LENGTH);
 		}
 		else if (msdosfatbits == 16)
@@ -989,12 +981,11 @@ long
 MSDOSGetUUID(CICell ih, char *uuidStr)
 {
 	char *buf = malloc (512);
-	if (!buf)
-	{
+	if (!buf) {
 		return -1;
 	}
 	union bootsector *bsp = (union bootsector *)buf;
-
+	
 	if (MSDOSInitPartition (ih)<0)
 	{
 		free (buf);

@@ -93,11 +93,10 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
     {
       hexNibble = hexStr[hexStrIdx];
       
-      // ignore all chars except valid hex numbers
-      if ( (hexNibble >= '0' && hexNibble <= '9') ||
-           (hexNibble >= 'A' && hexNibble <= 'F') ||
-           (hexNibble >= 'a' && hexNibble <= 'f') )
-      {
+	// ignore all chars except valid hex numbers
+	if ( (hexNibble >= '0' && hexNibble <= '9') ||
+		(hexNibble >= 'A' && hexNibble <= 'F') ||
+		(hexNibble >= 'a' && hexNibble <= 'f') ) {
         hexByte[hexNibbleIdx++] = hexNibble;
         
         // found both two nibbles, convert to binary

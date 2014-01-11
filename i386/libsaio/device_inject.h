@@ -53,6 +53,8 @@ struct DevPropDevice {
 	// ------------------------	
 };
 
+typedef struct DevPropDevice DevPropDevice;
+
 struct DevPropString {
 	uint32_t length;
 	uint32_t WHAT2;			// 0x01000000 ?
@@ -61,16 +63,20 @@ struct DevPropString {
 	struct DevPropDevice **entries;
 };
 
-extern struct DevPropString *string;
+typedef struct DevPropString DevPropString;
+
+extern DevPropString *string;
 extern uint8_t *stringdata;
 extern uint32_t stringlength;
-struct DevPropString	*devprop_create_string(void);
-struct DevPropDevice	*devprop_add_device(struct DevPropString *string, char *path);
-char			*efi_inject_get_devprop_string(uint32_t *len);
-int			devprop_add_value(struct DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);
-char			*devprop_generate_string(struct DevPropString *string);
-void			devprop_free_string(struct DevPropString *string);
 
-int			devprop_add_network_template(struct DevPropDevice *device, uint16_t vendor_id);
+DevPropString		*devprop_create_string(void);
+DevPropDevice		*devprop_add_device(DevPropString *string, char *path);
+char			*efi_inject_get_devprop_string(uint32_t *len);
+int			devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len);
+char			*devprop_generate_string(DevPropString *string);
+void			devprop_free_string(DevPropString *string);
+
+int			devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id);
 int			hex2bin(const char *hex, uint8_t *bin, int len);
+
 #endif /* !__LIBSAIO_DEVICE_INJECT_H */

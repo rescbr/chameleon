@@ -21,10 +21,8 @@
 
 bool getProcessorInformationExternalClock(returnType *value)
 {
-	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) // Intel
-	{
-		switch (Platform.CPU.Family)
-		{
+	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
+		switch (Platform.CPU.Family) {
 			case 0x06:
 			{
 				switch (Platform.CPU.Model)
@@ -50,9 +48,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 			default:
 				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000);
 		}
-	}
-	else
-	{
+	} else {
 		value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000);
 	}
 
@@ -120,8 +116,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						DBG("qpimult %d\n", qpimult);
 						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
 						// Rek: rounding decimals to match original mac profile info
-						if (qpibusspeed%100 != 0)
-						{
+						if (qpibusspeed%100 != 0) {
 							qpibusspeed = ((qpibusspeed+50)/100)*100;
 						}
 						DBG("qpibusspeed %d\n", qpibusspeed);
@@ -371,17 +366,15 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 	int	map;
 
 	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
+	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
-		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Type != 0)
-		{
+		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Type != 0) {
 			DBG("RAM Detected Type = %d\n", Platform.RAM.DIMM[map].Type);
 			value->byte = Platform.RAM.DIMM[map].Type;
 			return true;
 		}
 	}
-	
+
 	return false;
 //	value->byte = SMB_MEM_TYPE_DDR2;
 //	return true;
@@ -399,11 +392,9 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 	int	map;
 
 	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
+	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
-		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Frequency != 0)
-		{
+		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Frequency != 0) {
 			DBG("RAM Detected Freq = %d Mhz\n", Platform.RAM.DIMM[map].Frequency);
 			value->dword = Platform.RAM.DIMM[map].Frequency;
 			return true;
@@ -432,8 +423,7 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 		}
 	}
 
-	if (!bootInfo->memDetect)
-	{
+	if (!bootInfo->memDetect) {
 		return false;
 	}
 	value->string = NOT_AVAILABLE;
@@ -449,19 +439,16 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 
 	DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
 
-	if (idx < MAX_RAM_SLOTS)
-	{
+	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
-		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].SerialNo) > 0)
-		{
+		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].SerialNo) > 0) {
 			DBG("map=%d,  RAM Detected SerialNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].SerialNo);
 			value->string = Platform.RAM.DIMM[map].SerialNo;
 			return true;
 		}
 	}
 
-	if (!bootInfo->memDetect)
-	{
+	if (!bootInfo->memDetect) {
 		return false;
 	}
 	value->string = NOT_AVAILABLE;
@@ -474,19 +461,16 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	int	map;
 
 	idx++;
-	if (idx < MAX_RAM_SLOTS)
-	{
+	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
-		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].PartNo) > 0)
-		{
+		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].PartNo) > 0) {
 			DBG("map=%d,  RAM Detected PartNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].PartNo);
 			value->string = Platform.RAM.DIMM[map].PartNo;
 			return true;
 		}
 	}
 
-	if (!bootInfo->memDetect)
-	{
+	if (!bootInfo->memDetect) {
 		return false;
 	}
 	value->string = NOT_AVAILABLE;

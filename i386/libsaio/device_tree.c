@@ -218,8 +218,8 @@ DT__FreeProperty(Property *prop)
 void
 DT__FreeNode(Node *node)
 {
-    node->next = freeNodes;
-    freeNodes = node;
+	node->next = freeNodes;
+	freeNodes = node;
 }
 
 //==============================================================================
