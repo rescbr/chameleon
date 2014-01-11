@@ -163,15 +163,32 @@ strcpy(char * s1, const char * s2)
 }
 
 char *
+stpcpy(char * s1, const char * s2)
+{
+	while ((*s1++ = *s2++))
+		continue;
+	return --s1;
+}
+
+char *
 strncpy(char * s1, const char * s2, size_t n)
 {
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
       --n;
-	if (n > 0) {
-		bzero(s1, n);
-	}
+	if (n > 0)
+      bzero(s1, n);
 	return ret;
+}
+
+char *
+stpncpy(char * s1, const char * s2, size_t n)
+{
+	while (n && (*s1++ = *s2++))
+      --n;
+	if (n > 0)
+      bzero(s1, n);
+    return s1;
 }
 
 char *
