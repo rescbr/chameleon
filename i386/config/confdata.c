@@ -16,6 +16,16 @@
 #define LKC_DIRECT_LINK
 #include "lkc.h"
 
+#define max(a, b) ({\
+		typeof(a) _a = a;\
+		typeof(b) _b = b;\
+		_a > _b ? _a : _b; })
+
+#define min(a, b) ({\
+		typeof(a) _a = a;\
+		typeof(b) _b = b;\
+		_a < _b ? _a : _b; })
+
 static void conf_warning(const char *fmt, ...)
 	__attribute__ ((format (printf, 1, 2)));
 
@@ -75,30 +85,47 @@ const char *conf_get_autoconfig_name(void)
 	return name ? name : "auto.conf";
 }
 
+/* TODO: figure out if symbols are always null-terminated */
 static char *conf_expand_value(const char *in)
 {
-	struct symbol *sym;
-	const char *src;
-	static char res_value[SYMBOL_MAXLENGTH];
-	char *dst, name[SYMBOL_MAXLENGTH];
+  static char res_value[SYMBOL_MAXLENGTH + 1];
+  char name[SYMBOL_MAXLENGTH];
+  size_t res_rem = SYMBOL_MAXLENGTH;
+  char *res_ptr = res_value;
+  const char *src;
+  *res_ptr = 0;
+  res_ptr[SYMBOL_MAXLENGTH] = 0;
 
-	res_value[0] = 0;
-	dst = name;
-	while ((src = strchr(in, '$'))) {
-		strncat(res_value, in, src - in);
-		src++;
-		dst = name;
-		while (isalnum(*src) || *src == '_')
-			*dst++ = *src++;
-		*dst = 0;
-		sym = sym_lookup(name, 0);
-		sym_calc_value(sym);
-		strcat(res_value, sym_get_string_value(sym));
-		in = src;
-	}
-	strcat(res_value, in);
+  while ((src = strchr(in, '$'))) {
+    struct symbol *sym;
+    const char *symval;
+    char *name_ptr = name;
+    size_t n = min(res_rem, src - in);
 
-	return res_value;
+    res_ptr = stpncpy(res_ptr, in, n);
+    if (!(res_rem -= n))
+      return res_value; /* buffer full, quit now */
+    src++;
+
+    *name_ptr = 0;
+    while (isalnum(*src) || *src == '_')
+      *name_ptr++ = *src++;
+    *name_ptr = 0;
+
+    sym = sym_lookup(name, 0);
+    sym_calc_value(sym);
+    symval = sym_get_string_value(sym);
+    n = min(res_rem, strlen(symval));
+
+    res_ptr = stpncpy(res_ptr, symval, n);
+    if (!(res_rem -= n))
+      return res_value; /* buffer full, quit now */
+
+    in = src;
+  }
+
+  strncpy(res_ptr, in, res_rem + 1);
+  return res_value;
 }
 
 char *conf_get_default_confname(void)
@@ -110,7 +137,7 @@ char *conf_get_default_confname(void)
 	name = conf_expand_value(conf_defname);
 	env = getenv(SRCTREE);
 	if (env) {
-		sprintf(fullname, "%s/%s", env, name);
+    snprintf(fullname, PATH_MAX+1, "%s/%s", env, name);
 		if (!stat(fullname, &buf))
 			return fullname;
 	}
@@ -570,11 +597,11 @@ int conf_write(const char *name)
 		char *slash;
 
 		if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
-			strcpy(dirname, name);
-			strcat(dirname, "/");
-			basename = conf_get_configname();
+          /* FIXME: add length check */
+          strcpy(stpcpy(dirname, name), "/");
+          basename = conf_get_configname();
 		} else if ((slash = strrchr(name, '/'))) {
-			int size = slash - name + 1;
+			size_t size = slash - name + 1;
 			memcpy(dirname, name, size);
 			dirname[size] = 0;
 			if (slash[1])
@@ -586,11 +613,11 @@ int conf_write(const char *name)
 	} else
 		basename = conf_get_configname();
 
-	sprintf(newname, "%s%s", dirname, basename);
+	snprintf(newname, PATH_MAX+1, "%s%s", dirname, basename);
 	env = getenv("KCONFIG_OVERWRITECONFIG");
 	if (!env || !*env) {
-		sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
-		out = fopen(tmpname, "w");
+      snprintf(tmpname, PATH_MAX+1, "%s.tmpconfig.%d", dirname, (int)getpid());
+      out = fopen(tmpname, "w");
 	} else {
 		*tmpname = 0;
 		out = fopen(newname, "w");
