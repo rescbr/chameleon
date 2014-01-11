@@ -722,25 +722,19 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 	int len;
 	char key[24];
 
-	if (current != structHeader->handle)
-	{
+	if (current != structHeader->handle) {
 		idx++;
 		current = structHeader->handle;
 	}
 
 	sprintf(key, "%s%d", keyString, idx);
 
-	if (value)
-	{
-		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
-		{
+	if (value) {
+		if (getIntForKey(key, (int *)&(value->dword), SMBPlist)) {
 			return true;
 		}
-	}
-	else
-	{
-		if (getValueForKey(key, string, &len, SMBPlist))
-		{
+	} else {
+		if (getValueForKey(key, string, &len, SMBPlist)) {
 			return true;
 		}
 	}
@@ -751,8 +745,7 @@ char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 {
 	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
-	if (!field)
-	{
+	if (!field) {
 		return NULL;
 	}
 
@@ -766,13 +759,11 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 {
 	int strSize;
 
-	if (!field)
-	{
+	if (!field) {
 		return;
 	}
 
-	if (!string)
-	{
+	if (!string) {
 		*field = 0;
 		return;
 	}
@@ -780,13 +771,11 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	strSize = strlen(string);
 
 	// remove any spaces found at the end
-	while ((strSize != 0) && (string[strSize - 1] == ' '))
-	{
+	while ((strSize != 0) && (string[strSize - 1] == ' ')) {
 		strSize--;
 	}
 
-	if (strSize == 0)
-	{
+	if (strSize == 0) {
 		*field = 0;
 		return;
 	}
@@ -805,13 +794,11 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	bool parsed;
 	int val;
 
-	if (numOfSetters <= idx)
-	{
+	if (numOfSetters <= idx) {
 		return false;
 	}
 
-	switch (SMBSetters[idx].valueType)
-	{
+	switch (SMBSetters[idx].valueType) {
 		case kSMBString:
 		{
 			if (SMBSetters[idx].keyString)
@@ -832,16 +819,13 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				}
 
 			}
-			if (SMBSetters[idx].getSMBValue)
-			{
-				if (SMBSetters[idx].getSMBValue((returnType *)&string))
-				{
+			if (SMBSetters[idx].getSMBValue) {
+				if (SMBSetters[idx].getSMBValue((returnType *)&string)) {
 					break;
 				}
 			}
 			// if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue))  Bungo
-			if (useSMBIOSdefaults && (SMBSetters[idx].defaultValue))
-			{
+			if (useSMBIOSdefaults && (SMBSetters[idx].defaultValue)) {
 				string = *(SMBSetters[idx].defaultValue);
 				break;
 			}
@@ -852,20 +836,16 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 		case kSMBWord:
 		case kSMBDWord:
 		//case kSMBQWord:
-			if (SMBSetters[idx].keyString)
-			{
+			if (SMBSetters[idx].keyString) 	{
 				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
 				if (!parsed)
 				{
-					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
-					{
+					if (structPtr->orig->type == kSMBTypeMemoryDevice) { // MemoryDevice only
 						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
 					}
 				}
-				if (parsed)
-				{
-					switch (SMBSetters[idx].valueType)
-					{
+				if (parsed) {
+					switch (SMBSetters[idx].valueType) {
 						case kSMBByte:
 							value->byte = (uint8_t)val;
 							break;
@@ -881,10 +861,8 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				}
 			}
 
-			if (SMBSetters[idx].getSMBValue)
-			{
-				if (SMBSetters[idx].getSMBValue(value))
-				{
+			if (SMBSetters[idx].getSMBValue) {
+				if (SMBSetters[idx].getSMBValue(value)) {
 					return true;
 				}
 			}
@@ -893,8 +871,7 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 			if (useSMBIOSdefaults && (SMBSetters[idx].defaultValue))
 			{
                 // value->dword = *(uint32_t *)(SMBSetters[idx].defaultValue);  Bungo
-                switch (SMBSetters[idx].valueType)
-                {
+                switch (SMBSetters[idx].valueType) {
                     case kSMBByte:
                         value->byte = *(uint8_t *)(SMBSetters[idx].defaultValue);
                         break;
@@ -913,8 +890,7 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	}
 
 	// if (SMBSetters[idx].valueType == kSMBString && string)  Bungo: use null string too -> "Not Specified"
-	if ((SMBSetters[idx].valueType == kSMBString) && string)
-	{
+	if ((SMBSetters[idx].valueType == kSMBString) && string) {
 		setSMBStringForField(structPtr->new, string, &value->byte);
 	}
 	return true;
@@ -1020,11 +996,9 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	/* http://forge.voodooprojects.org/p/chameleon/issues/361/ */
 	bool forceFullMemInfo = false;
 
-	if (structPtr->orig->type == kSMBTypeMemoryDevice)
-	{
+	if (structPtr->orig->type == kSMBTypeMemoryDevice) {
 		getBoolForKey(kMemFullInfo, &forceFullMemInfo, &bootInfo->chameleonConfig);
-		if (forceFullMemInfo)
-		{
+		if (forceFullMemInfo) {
 			structPtr->orig->length = 27;
 		}
 	}
@@ -1032,40 +1006,32 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	stringIndex = 1;
 	stringsSize = 0;
 
-	if (handle < structPtr->orig->handle)
-	{
+	if (handle < structPtr->orig->handle) {
 		handle = structPtr->orig->handle;
 	}
 
 	memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
 
-	for (i = 0; i < numOfSetters; i++)
-	{
-		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length))
-		{
+	for (i = 0; i < numOfSetters; i++) {
+		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length)) {
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
 	}
 
-	if (setterFound)
-	{
+	if (setterFound) {
 		ptr = (uint8_t *)structPtr->new + structPtr->orig->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0)
-		{
+		if (((uint16_t *)ptr)[0] == 0) {
 			ptr += 2;
 		}
 		structSize = ptr - (uint8_t *)structPtr->new;
-	}
-	else
-	{
+	} else {
 		ptr = (uint8_t *)structPtr->orig + structPtr->orig->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0)
-		{
+		if (((uint16_t *)ptr)[0] == 0) {
 			ptr += 2;
 		}
 
@@ -1077,8 +1043,7 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 
 	tableLength += structSize;
 
-	if (structSize > maxStructSize)
-	{
+	if (structSize > maxStructSize) {
 		maxStructSize = structSize;
 	}
 
@@ -1090,10 +1055,8 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 	uint8_t *ptr = (uint8_t *)eps->dmi.tableAddress;
 	structPtr->orig = (SMBStructHeader *)ptr;
 
-	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structPtr->orig + sizeof(SMBStructHeader)));)
-	{
-		switch (structPtr->orig->type)
-		{
+	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structPtr->orig + sizeof(SMBStructHeader)));) {
+		switch (structPtr->orig->type) {
 			/* Skip all Apple Specific Structures */
 			case kSMBTypeFirmwareVolume:
 			case kSMBTypeMemorySPD:
@@ -1114,8 +1077,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 		ptr = (uint8_t *)((uint32_t)structPtr->orig + structPtr->orig->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0)
-		{
+		if (((uint16_t *)ptr)[0] == 0) {
 			ptr += 2;
 		}
 
@@ -1145,8 +1107,7 @@ uint8_t *FixSystemUUID()
 		ptr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0)
-		{
+		if (((uint16_t *)ptr)[0] == 0) {
 			ptr += 2;
 		}
 
@@ -1155,27 +1116,23 @@ uint8_t *FixSystemUUID()
 
 	ptr = ((SMBSystemInformation *)structHeader)->uuid;
 
-	if (!sysId || !ret) // no or bad custom UUID,...
-	{
+	if (!sysId || !ret) { // no or bad custom UUID,...
 		sysId = 0;
         ret = ((SMBSystemInformation *)structHeader)->uuid; // ...try bios dmi info UUID extraction
 	}
 
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) // check if empty or setable, means: no uuid present
 	{
-		if (ret[i] != 0x00)
-		{
+		if (ret[i] != 0x00) {
 			isZero = 0;
 		}
 
-		if (ret[i] != 0xff)
-		{
+		if (ret[i] != 0xff) {
 			isOnes = 0;
 		}
 	}
 
-	if (isZero || isOnes) // if empty or setable...
-	{
+	if (isZero || isOnes)  { // if empty or setable...
 		verbose("No UUID present in SMBIOS System Information Table\n");
 		ret = FixedUUID; // ...set a fixed value for system-id = 000102030405060708090A0B0C0D0E0F
 	}
@@ -1190,22 +1147,19 @@ void setupSMBIOSTable(void)
 	uint8_t *buffer;
 	// bool setSMB = true; Bungo
 
-	if (!origeps)
-	{
+	if (!origeps) {
 		return;
 	}
 
 	neweps = origeps;
 
 	structPtr = (SMBStructPtrs *)malloc(sizeof(SMBStructPtrs));
-	if (!structPtr)
-	{
+	if (!structPtr) {
 		return;
 	}
 	
 	buffer = (uint8_t *)malloc(SMB_ALLOC_SIZE);
-	if (!buffer)
-	{
+	if (!buffer) {
 		free(structPtr);
 		return;
 	}
@@ -1222,8 +1176,7 @@ void setupSMBIOSTable(void)
 	setupNewSMBIOSTable(origeps, structPtr);
 
 	neweps = (SMBEntryPoint *)AllocateKernelMemory(sizeof(SMBEntryPoint));
-	if (!neweps)
-	{
+	if (!neweps) {
 		free(buffer);
 		free(structPtr);
 		return;
@@ -1250,8 +1203,7 @@ void setupSMBIOSTable(void)
 	neweps->dmi.structureCount	= structureCount;
 	neweps->dmi.bcdRevision		= 0x24;
 
-	if (!neweps->dmi.tableAddress)
-	{
+	if (!neweps->dmi.tableAddress) {
 		free(buffer);
 		free(structPtr);
 		return;
@@ -1276,11 +1228,9 @@ void setupSMBIOSTable(void)
 
 void *getSmbios(int which)
 {
-	switch (which)
-	{
+	switch (which) {
 		case SMBIOS_ORIGINAL:
-			if (!origeps)
-			{
+			if (!origeps) {
 				origeps = getAddressOfSmbiosTable();
 			}
 			return origeps;
@@ -1338,12 +1288,10 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 
 			case kSMBTypeMemoryDevice:
 				Platform.DMI.CntMemorySlots++;
-				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
-				{
+				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)	{
 					Platform.DMI.MemoryModules++;
 				}
-				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
-				{
+				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)	{
 					Platform.RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
 				}
 				dimmnbr++;
@@ -1355,8 +1303,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
 
-		if (((uint16_t *)structPtr)[0] == 0)
-		{
+		if (((uint16_t *)structPtr)[0] == 0) {
 			structPtr += 2;
 		}
 

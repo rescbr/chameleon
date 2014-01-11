@@ -222,6 +222,9 @@ static const struct NamedValue bios_errors[] =
 	{ 0x00, 0                            }
 };
 
+
+//==============================================================================
+
 static const char * bios_error(int errnum)
 {
 	static char  errorstr[] = "Error 0x00";

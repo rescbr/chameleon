@@ -271,13 +271,12 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
         goto error;
     }
     if (read(fd, buf, mftRecordSize) != mftRecordSize) {
-	//verbose("NTFS: error reading MFT $Volume record: %s\n", strerror(errno));
+        //verbose("NTFS: error reading MFT $Volume record: %s\n", strerror(errno));
         goto error;
     }
 #endif
 
-    if (ntfs_fixup(buf, mftRecordSize, NTFS_FILEMAGIC, bytesPerSector) != 0)
-    {
+    if (ntfs_fixup(buf, mftRecordSize, NTFS_FILEMAGIC, bytesPerSector) != 0) {
         //verbose("NTFS: block fixup failed\n");
         goto error;
     }
@@ -331,8 +330,9 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	}
 
 	// Check for non-null volume serial number
-	if( !boot->bf_volsn )
+	if( !boot->bf_volsn ) {
 		return -1;
+	}
 
 	// Use UUID like the one you get on Windows
 	sprintf(uuidStr, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
@@ -344,7 +344,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 bool NTFSProbe(const void * buffer)
 {
 	bool result = false;
-	
+
 	const struct bootfile	* part_bootfile = buffer;			// NTFS boot sector structure
 
 	// Looking for NTFS signature.

@@ -294,9 +294,9 @@ long HFSLoadFile(CICell ih, char * filePath)
 
 long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint64_t length)
 {
-    char entry[512];
-    char devStr[12];
-    long dirID, result, flags;
+	char entry[512];
+	char devStr[12];
+	long dirID, result, flags;
 
 	if (HFSInitPartition(ih) == -1)
 	{

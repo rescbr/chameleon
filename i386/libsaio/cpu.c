@@ -415,8 +415,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	tscFrequency = measure_tsc_frequency();
 	/* if usual method failed */
-	if ( tscFrequency < 1000 )//TEST
-	{
+	if ( tscFrequency < 1000 ) { //TEST
 		tscFrequency = timeRDTSC() * 20;
 	}
 	fsbFrequency = 0;
@@ -648,8 +647,7 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 #if 0
-	if (!fsbFrequency)
-	{
+	if (!fsbFrequency) {
 		fsbFrequency = (DEFAULT_FSB * 1000);
 		cpuFrequency = tscFrequency;
 		DBG("0 ! using the default value for FSB !\n");

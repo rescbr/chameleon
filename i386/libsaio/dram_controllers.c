@@ -40,8 +40,7 @@ static void setup_p35(pci_dt_t *dram_dev)
 
 	// Activate MMR I/O
 	dev0 = pci_config_read32(dram_dev->dev.addr, 0x48);
-	if (!(dev0 & 0x1))
-	{
+	if (!(dev0 & 0x1)) {
 		pci_config_write8(dram_dev->dev.addr, 0x48, (dev0 | 1));
 	}
 }
@@ -57,15 +56,13 @@ static void setup_nhm(pci_dt_t *dram_dev)
 
 	// Nehalem supports Scrubbing
 	// First, locate the PCI bus where the MCH is located
-	for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++)
-	{
+	for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++) {
 		vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_VENDOR_ID);
 		did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), PCI_DEVICE_ID);
 		vid &= 0xFFFF;
 		did &= 0xFF00;
 
-		if(vid == 0x8086 && did >= 0x2C00)
-		{
+		if(vid == 0x8086 && did >= 0x2C00) {
 			nhm_bus = possible_nhm_bus[i]; 
 		}
 	}
@@ -91,8 +88,7 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 
 	mch_ratio = 100000;
 
-	switch (mch_cfg & 7)
-	{
+	switch (mch_cfg & 7) {
 		case 0: mch_fsb = 1066; break;
 		case 1: mch_fsb =  533; break;
 		default:
@@ -104,11 +100,9 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 
 	DBG("mch_fsb %d\n", mch_fsb);
 
-	switch (mch_fsb)
-	{
+	switch (mch_fsb) {
 		case 533:
-		switch ((mch_cfg >> 4) & 7)
-		{
+		switch ((mch_cfg >> 4) & 7) {
 			case 1:	mch_ratio = 200000; break;
 			case 2:	mch_ratio = 250000; break;
 			case 3:	mch_ratio = 300000; break;
@@ -117,8 +111,7 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 
 		default:
 		case 800:
-		switch ((mch_cfg >> 4) & 7)
-		{
+		switch ((mch_cfg >> 4) & 7) {
 			case 0:	mch_ratio = 100000; break;
 			case 1:	mch_ratio = 125000; break;
 			case 2:	mch_ratio = 166667; break; // 1.666666667
@@ -129,8 +122,7 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 		break;
 
 		case 1066:
-		switch ((mch_cfg >> 4) & 7)
-		{
+		switch ((mch_cfg >> 4) & 7) {
 			case 1:	mch_ratio = 100000; break;
 			case 2:	mch_ratio = 125000; break;
 			case 3:	mch_ratio = 150000; break;
@@ -140,8 +132,7 @@ static void get_fsb_i965(pci_dt_t *dram_dev)
 		break;
 
 		case 1333:
-		switch ((mch_cfg >> 4) & 7)
-		{
+		switch ((mch_cfg >> 4) & 7) {
 			case 2:	mch_ratio = 100000; break;
 			case 3:	mch_ratio = 120000; break;
 			case 4:	mch_ratio = 160000; break;
@@ -184,8 +175,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 
 	mch_ratio = 100000;
 
-	switch (mch_cfg & 7)
-	{
+	switch (mch_cfg & 7) {
 		case 1: mch_fsb = 533; break;
 		default: 
 		case 2:	mch_fsb = 800; break;
@@ -193,11 +183,9 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 		case 6:	mch_fsb = 1066; break;
 	}
 
-	switch (mch_fsb)
-	{
+	switch (mch_fsb) {
 		case 533:
-			switch ((mch_cfg >> 4) & 7)
-			{
+			switch ((mch_cfg >> 4) & 7) {
 				case 1:	mch_ratio = 125000; break;
 				case 2:	mch_ratio = 150000; break;
 				case 3:	mch_ratio = 200000; break;
@@ -205,8 +193,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 			break;
 
 		case 667:
-			switch ((mch_cfg >> 4)& 7)
-			{
+			switch ((mch_cfg >> 4)& 7) {
 				case 1:	mch_ratio = 100000; break;
 				case 2:	mch_ratio = 120000; break;
 				case 3:	mch_ratio = 160000; break;
@@ -217,8 +204,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 
 		default:
 		case 800:
-			switch ((mch_cfg >> 4) & 7)
-			{
+			switch ((mch_cfg >> 4) & 7) {
 				case 1:	mch_ratio =  83333; break; // 0.833333333
 				case 2:	mch_ratio = 100000; break;
 				case 3:	mch_ratio = 133333; break; // 1.333333333
@@ -227,8 +213,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 			}
 			break;
 		case 1066:
-			switch ((mch_cfg >> 4)&7)
-			{
+			switch ((mch_cfg >> 4)&7) {
 				case 5:	mch_ratio = 150000; break;
 				case 6:	mch_ratio = 200000; break;
 			}
@@ -569,10 +554,8 @@ static const char *memory_channel_types[] =
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
-	{
-		if ((dram_controllers[i].vendor == dram_dev->vendor_id) && (dram_controllers[i].device == dram_dev->device_id))
-		{
+	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++) {
+		if ((dram_controllers[i].vendor == dram_dev->vendor_id) && (dram_controllers[i].device == dram_dev->device_id)) {
 			verbose("%s%s DRAM Controller [%4x:%4x] at %02x:%02x.%x\n", 
 				(dram_dev->vendor_id == 0x8086) ? "Intel Corporation " : "" ,
 				dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
