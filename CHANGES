@@ -1,3 +1,4 @@
+- One of the changes as of rev2284 is boot option SystemId has now been deprecated. Instead use key SMsystemuuid in smbios.plist.
 - ErmaC: Port from Enoch the support for IVY Bridge and Haswell Intel Graphics cards. http://www.insanelymac.com/forum/topic/288241-intel-hd4000-and-haswell-inject-aaplig-platform-id/
 - 2255: ErmaC add Skip flag key for Intel/nVidia/ATi from Enoch
 - 2252: revert define processors name to match with xnu kernel name 
