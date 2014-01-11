@@ -242,7 +242,7 @@ const char *getDDRSerial(const char* spd)
 	{
 		sprintf(asciiSerial, "%X%X%X%X%X%X%X%X", SMST(95) /*& 0x7*/, SLST(95), SMST(96), SLST(96), SMST(97), SLST(97), SMST(98), SLST(98));
 	} else {
-		sprintf(asciiSerial, "0000000000000000");
+		sprintf(asciiSerial, "000000000000000");
 	}
 
 	return strdup(asciiSerial);
