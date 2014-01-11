@@ -761,7 +761,7 @@ ParseTagInteger( char * buffer, TagPtr * tag )
 			}
 			else if ((*val >= 'A' && *val <= 'F'))	// A - F
 			{
-				integer = (integer * 16) + (*val++ - 'a' + 10);
+				integer = (integer * 16) + (*val++ - 'A' + 10);
 			}
 			else
 			{
