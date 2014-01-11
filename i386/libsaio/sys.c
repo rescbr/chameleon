@@ -1079,10 +1079,8 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 		// Bad device specifier, skip past the right paren.
 
 		for (cp++; *cp && *cp != RP; cp++) /* LOOP */;
-		{
-			if (*cp == RP) {
-				cp++;
-			}
+		if (*cp == RP) {
+			cp++;
 		}
 
 		// If gRootVolume was NULL, then bvr will be NULL as well which
