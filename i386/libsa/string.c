@@ -161,10 +161,11 @@ strncpy(char * s1, const char * s2, size_t n)
 {
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
-      --n;
-    /* while (n--) *s1++ = '\0'; */
-    if (n > 0)
-      bzero(s1, n);
+	--n;
+	/* while (n--) *s1++ = '\0'; */
+	if (n > 0) {
+		bzero(s1, n);
+	}
 	return ret;
 }
 
@@ -278,7 +279,7 @@ char* strbreak(const char *str, char **next, long *len)
     if (*start == '"')
     {
         start++;
-        
+
         end = strchr(start, '"');
         if(end)
             quoted = true;
@@ -290,12 +291,12 @@ char* strbreak(const char *str, char **next, long *len)
         for ( end = start; *end && !isspace(*end); end++ )
         {}
     }
-    
+
     *len = end - start;
-    
+
     if(next)
         *next = quoted ? end+1 : end;
-    
+
     return start;
 }
 

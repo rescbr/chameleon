@@ -84,9 +84,9 @@ char *getVBEInfoString()
 		return 0;
 	
 	buff = malloc(sizeof(char) * 256);
-    if (!buff)
-      return 0;
-
+	if (!buff) {
+		return 0;
+	}
 	small = (vbeInfo.TotalMemory < 16);
 	
 	snprintf(buff, 256,
@@ -106,107 +106,109 @@ char *getVBEInfoString()
 void 
 printVBEModeInfo()
 {
-    VBEInfoBlock     vbeInfo;
-    unsigned short * modePtr;
-    VBEModeInfoBlock modeInfo;
-    int              err;
-    int              line;
-    char*            vbeInfoString = NULL;
+	VBEInfoBlock     vbeInfo;
+	unsigned short * modePtr;
+	VBEModeInfoBlock modeInfo;
+	int              err;
+	int              line;
+	char*            vbeInfoString = NULL;
 
   	bzero( &vbeInfo, sizeof(vbeInfo) );
-    strcpy( (char*)&vbeInfo, "VBE2" );
-    err = getVBEInfo( &vbeInfo );
-    if ( err != errSuccess )
-        return;
+	strcpy( (char*)&vbeInfo, "VBE2" );
+	err = getVBEInfo( &vbeInfo );
+	if ( err != errSuccess ) {
+		return;
+	}
 
-    line = 0;
+	line = 0;
 
-    // Activate and clear page 1
-    setActiveDisplayPage(1);
-    clearScreenRows(0, 24);
-    setCursorPosition( 0, 0, 1 );
+	// Activate and clear page 1
+	setActiveDisplayPage(1);
+	clearScreenRows(0, 24);
+	setCursorPosition( 0, 0, 1 );
 
-    vbeInfoString = getVBEInfoString();
-    if (!vbeInfoString) {
-      printf("Error: getVBEInfoString failed\n");
-      return;
-    }
-    printf("%s", vbeInfoString);
-    free(vbeInfoString);
-    vbeInfoString = NULL;
+	vbeInfoString = getVBEInfoString();
+	if (!vbeInfoString) {
+		printf("Error: getVBEInfoString failed\n");
+		return;
+	}
+	printf("%s", vbeInfoString);
+	free(vbeInfoString);
+	vbeInfoString = NULL;
 
 	printf("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
 
-   // Loop through the mode list, and find the matching mode.
+	// Loop through the mode list, and find the matching mode.
 
-    for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
           *modePtr != modeEndOfList; modePtr++ )
-    {
-        // Get mode information.
+	{
+		// Get mode information.
 
-        bzero( &modeInfo, sizeof(modeInfo) );
-        err = getVBEModeInfo( *modePtr, &modeInfo );
-        if ( err != errSuccess )
-        {
-            continue;
-        }
+		bzero( &modeInfo, sizeof(modeInfo) );
+		err = getVBEModeInfo( *modePtr, &modeInfo );
+		if ( err != errSuccess )
+		{
+			continue;
+		}
 
-        printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
-               *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-               modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-               modeInfo.ModeAttributes);
+		printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
 
-        if (line++ >= 20) {
-            pause();
-            line = 0;
-            clearScreenRows(0, 24);
-            setCursorPosition( 0, 0, 1 );
-        }
-    }    
-    if (line != 0) {
-        pause();
-    }
-    setActiveDisplayPage(0);
+		if (line++ >= 20) {
+			pause();
+			line = 0;
+			clearScreenRows(0, 24);
+			setCursorPosition( 0, 0, 1 );
+		}
+	}    
+	if (line != 0) {
+		pause();
+	}
+	setActiveDisplayPage(0);
 }
 
 char *getVBEModeInfoString()
 {
 	VBEInfoBlock     vbeInfo;
-    unsigned short * modePtr;
-    VBEModeInfoBlock modeInfo;
-    int              err;
+	unsigned short * modePtr;
+	VBEModeInfoBlock modeInfo;
+	int              err;
 
   	bzero( &vbeInfo, sizeof(vbeInfo) );
-    strcpy( (char*)&vbeInfo, "VBE2" );
-    err = getVBEInfo( &vbeInfo );
-    if ( err != errSuccess )
-        return 0;
-	
+	strcpy( (char*)&vbeInfo, "VBE2" );
+	err = getVBEInfo( &vbeInfo );
+	if ( err != errSuccess ) {
+		return 0;
+	}
 	char *buff=malloc(sizeof(char)*3072);
-	if(!buff) return 0;
-    int bufflen = 0;
+	if(!buff) {
+		return 0;
+	}
+
+	int bufflen = 0;
 
 	// Loop through the mode list, and find the matching mode.
-    for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          (*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
-          modePtr++ )
-    {
-        // Get mode information.
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
+		(*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
+		modePtr++ )
+	{
+		// Get mode information.
 
-        bzero( &modeInfo, sizeof(modeInfo) );
-        err = getVBEModeInfo( *modePtr, &modeInfo );
-        if ( err != errSuccess )
-        {
-            continue;
-        }
+		bzero( &modeInfo, sizeof(modeInfo) );
+		err = getVBEModeInfo( *modePtr, &modeInfo );
+		if ( err != errSuccess ) {
+			continue;
+		}
 
-        bufflen += 
-          snprintf(buff+bufflen, 3072-bufflen, "Mode %x: %dx%dx%d mm:%d attr:%x\n",
-                   *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-                   modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-                   modeInfo.ModeAttributes);
-
-    }   
+		bufflen += 
+			snprintf(buff+bufflen, 3072-bufflen, "Mode %x: %dx%dx%d mm:%d attr:%x\n",
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
+	}   
 	return buff;
 }
 

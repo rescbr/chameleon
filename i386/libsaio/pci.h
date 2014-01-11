@@ -105,7 +105,7 @@ typedef struct {
 	uint32_t		signature;		// 0x24506E50 '$PnP'
 	uint8_t			revision;		//	1
 	uint8_t			length;
-	uint16_t		offset;				
+	uint16_t		offset;
 	uint8_t			checksum;
 	uint32_t		identifier;
 	uint16_t		manufacturer;

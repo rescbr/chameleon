@@ -1104,15 +1104,15 @@ int main(int argc, char **argv)
 	}
 	insize = (uint32_t) statbuf.st_size;
 	inbuf = malloc(insize);
-    if (!inbuf) {
-      perror("malloc");
-      fclose(infp);
-      return 1;
-    }
-    if (fread(inbuf, 1, insize, infp) != insize) {
+	if (!inbuf) {
+		perror("malloc");
+		fclose(infp);
+		return 1;
+	}
+	if (fread(inbuf, 1, insize, infp) != insize) {
 		perror("fread");
-        free(inbuf);
-        fclose(infp);
+		free(inbuf);
+		fclose(infp);
 		return 1;
 	}
 	fclose(infp);

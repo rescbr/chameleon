@@ -67,10 +67,8 @@ bool getProcessorInformationMaximumClock(returnType *value)
 
 bool getSMBOemProcessorBusSpeed(returnType *value)
 {
-	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) // Intel
-	{		
-		switch (Platform.CPU.Family) 
-		{
+	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
+		switch (Platform.CPU.Family) {
 			case 0x06:
 			{
 				switch (Platform.CPU.Model)
@@ -113,7 +111,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 							did &= 0xFF00;
 							
 							if(vid == 0x8086 && did >= 0x2C00)
-								nhm_bus = possible_nhm_bus[i]; 
+								nhm_bus = possible_nhm_bus[i];
 						}
 
 						unsigned long qpimult, qpibusspeed;
@@ -143,12 +141,10 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 
 uint16_t simpleGetSMBOemProcessorType(void)
 {
-	if (Platform.CPU.NoCores >= 4) 
-	{
+	if (Platform.CPU.NoCores >= 4) {
 		return 0x0501;	// Quad-Core Xeon
 	}
-	else if (Platform.CPU.NoCores == 1) 
-	{
+	else if (Platform.CPU.NoCores == 1) {
 		return 0x0201;	// Core Solo
 	};
 	
@@ -157,7 +153,7 @@ uint16_t simpleGetSMBOemProcessorType(void)
 
 bool getSMBOemProcessorType(returnType *value)
 {
-	static bool done = false;		
+	static bool done = false;
 
 	value->word = simpleGetSMBOemProcessorType();
 
@@ -168,74 +164,84 @@ bool getSMBOemProcessorType(returnType *value)
 			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, (uint32_t)Platform.CPU.Family, (uint32_t)Platform.CPU.Model);
 			done = true;
 		}
-
-		switch (Platform.CPU.Family) 
-		{
+		// Bungo: fixes Oem Processor Type - better matching IMHO
+		switch (Platform.CPU.Family) {
 			case 0x06:
 			{
 				switch (Platform.CPU.Model)
 				{
-					case CPU_MODEL_PENTIUM_M:
-					case CPU_MODEL_DOTHAN:				// Intel Pentium M
-					case CPU_MODEL_YONAH:				// Intel Mobile Core Solo, Duo
-					case CPU_MODEL_MEROM:				// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
-					case CPU_MODEL_PENRYN:				// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-					case CPU_MODEL_ATOM:				// Intel Atom (45nm)
+
+					case CPU_MODEL_DOTHAN:				// 0x0D - Intel Pentium M model D
+						value->word = 0x101;
 						return true;
 
-					case CPU_MODEL_NEHALEM:				// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_WESTMERE:			// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_WESTMERE_EX:			// Intel Xeon E7
-					case CPU_MODEL_JAKETOWN:			// Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-						{
-							value->word = 0x0501;			// Xeon 
-						}
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
-						{
-							value->word = 0x0701;			// Core i7
-						}
+					case CPU_MODEL_YONAH:				// 0x0E - Intel Mobile Core Solo, Duo
+					case CPU_MODEL_CELERON:
+						value->word = 0x201;
 						return true;
 
-					case CPU_MODEL_FIELDS:				// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPU_MODEL_XEON_MP:				// 0x1D - Six-Core Xeon 7400, "Dunnington", 45nm
+						value->word = 0x401;
+						return true;
+
+					case CPU_MODEL_MEROM:				// 0x0F - Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPU_MODEL_PENRYN:				// 0x17 - Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 						{
-							value->word = 0x501;// Xeon
+							value->word = 0x402;			// Xeon
 						}
-						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+					case CPU_MODEL_PENTIUM_M:			// 0x09 - Banias
+					case CPU_MODEL_LINCROFT:			// 0x27 - Intel Atom, "Lincroft", 45nm
+					case CPU_MODEL_ATOM:				// 0x1C - Intel Atom (45nm)
+						return true;
+
+					case CPU_MODEL_NEHALEM_EX:			// 0x2E - Nehalem-ex, "Beckton", 45nm
+					case CPU_MODEL_NEHALEM:				// 0x1A - Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
 						{
-							value->word = 0x601;			// Core i5
+							value->word = 0x501;			// Xeon
 						}
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
 						{
 							value->word = 0x701;			// Core i7
 						}
-
 						return true;
 
-					case CPU_MODEL_DALES:
+					case CPU_MODEL_FIELDS:				// 0x1E - Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
+							value->word = 0x501;			// Lynnfiled Quad-Core Xeon
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x701;			// Core i7
+						}
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
 						{
 							value->word = 0x601;			// Core i5
 						}
-						else
+						return true;
+
+					case CPU_MODEL_DALES:					// 0x1F - Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
 						{
-							value->word = 0x0701;			// Core i7
+							value->word = 0x901;		// Core i3
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x602;			// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x702;			// Core i7
+						}
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x602;			// Core i5
 						}
 						return true;
 
-					case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
-					case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
-					case CPU_MODEL_IVYBRIDGE_XEON:
-					case CPU_MODEL_DALES_32NM:			// Intel Core i3, i5 LGA1156 (32nm)
-					case CPU_MODEL_HASWELL:
-					case CPU_MODEL_HASWELL_MB:
-					case CPU_MODEL_HASWELL_ULT:
-					case CPU_MODEL_CRYSTALWELL:
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
-						{
-							value->word = 0x0501;		// Xeon
-						}
+					case CPU_MODEL_DALES_32NM:			// 0x25 - Intel Core i3, i5 LGA1156 (32nm) (Clarkdale, Arrandale)
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
 						{
 							value->word = 0x901;		// Core i3
@@ -244,13 +250,106 @@ bool getSMBOemProcessorType(returnType *value)
 						{
 							value->word = 0x601;		// Core i5
 						}
+						if(strstr(Platform.CPU.BrandString, "Core(TM) i5 CPU M 540"))
+						{
+							value->word = 0x602;		// Core i5
+						}
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
 						{
-							value->word = 0x0701;		// Core i7
+							value->word = 0x701;		// Core i7
+						}
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x602;		// Core i5
 						}
 						return true;
 
+					case CPU_MODEL_WESTMERE:			// 0x2C - Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPU_MODEL_WESTMERE_EX:			// 0x2F - Intel Xeon E7
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
+							value->word = 0x501;		// Xeon
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x701;		// Core i7
+						}
+						return true;
 
+					case CPU_MODEL_JAKETOWN:			// 0x2D - Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
+					case CPU_MODEL_SANDYBRIDGE:			// 0x2A - Intel Core i3, i5, i7 LGA1155 (32nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon(R)"))
+						{
+							value->word = 0x501;		// Xeon
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						{
+							value->word = 0x903;		// Core i3
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x603;		// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x703;		// Core i7
+						}
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x603;		// Core i5
+						}
+						return true;
+
+					case CPU_MODEL_IVYBRIDGE:			// 0x3A - Intel Core i3, i5, i7 LGA1155 (22nm)
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						{
+							value->word = 0x903;		// Core i3 - Apple doesn't use it
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x604;		// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x704;		// Core i7
+						}
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x604;		// Core i5
+						}
+						return true;
+
+					case CPU_MODEL_IVYBRIDGE_XEON:		// 0x3E -
+						value->word = 0xA01;
+						return true;
+
+					case CPU_MODEL_HASWELL:				// 0x3C -
+					case CPU_MODEL_HASWELL_MB:			// 0x3F -
+					case CPU_MODEL_HASWELL_ULT:			// 0x45 -
+					case CPU_MODEL_CRYSTALWELL:			// 0x46
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i3"))
+						{
+							value->word = 0x905;		// Core i3 - Apple doesn't use it
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i5"))
+						{
+							value->word = 0x605;		// Core i5
+						}
+						if (strstr(Platform.CPU.BrandString, "Core(TM) i7"))
+						{
+							value->word = 0x705;		// Core i7
+						}
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x605;		// Core i5
+						}
+						return true;
+
+					case 0x15:					// EP80579 integrated processor
+						value->word = 0x301;			//
+						return true;
+
+					case 0x13:					// Core i5, Xeon MP, "Havendale", "Auburndale", 45nm
 					case 0x19:					// Intel Core i5 650 @3.20 Ghz
 						value->word = 0x601;			// Core i5
 						return true;
@@ -259,7 +358,7 @@ bool getSMBOemProcessorType(returnType *value)
 				}
 			}
 			default:
-				break; 
+				break;
 		}
 	}
 	
@@ -403,17 +502,16 @@ static const char* const DMITAG = "_DMI_";
 SMBEntryPoint *getAddressOfSmbiosTable(void)
 {
 	SMBEntryPoint	*smbios;
-	/* 
+	/*
 	 * The logic is to start at 0xf0000 and end at 0xfffff iterating 16 bytes at a time looking
 	 * for the SMBIOS entry-point structure anchor (literal ASCII "_SM_").
 	 */
 	smbios = (SMBEntryPoint*)SMBIOS_RANGE_START;
 	while (smbios <= (SMBEntryPoint *)SMBIOS_RANGE_END) {
-		if (COMPARE_DWORD(smbios->anchor, SMTAG)  && 
+		if (COMPARE_DWORD(smbios->anchor, SMTAG)  &&
 			COMPARE_DWORD(smbios->dmi.anchor, DMITAG) &&
 			smbios->dmi.anchor[4] == DMITAG[4] &&
-			checksum8(smbios, sizeof(SMBEntryPoint)) == 0)
-	    {
+			checksum8(smbios, sizeof(SMBEntryPoint)) == 0) {
 			return smbios;
 	    }
 		smbios = (SMBEntryPoint*)(((char*)smbios) + 16);

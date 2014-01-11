@@ -902,7 +902,7 @@ int conf_write_autoconf(void)
 	}
 	fclose(out);
 	fclose(out_h);
-    fclose(out_inc);
+	fclose(out_inc);
 
 	name = getenv("CCONFIG_AUTOHEADER");
 	if (!name) name = "autoconf.h";

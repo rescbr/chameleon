@@ -641,28 +641,29 @@ printMemoryInfo(void)
 
 char *getMemoryInfoString()
 {
-  int i, bufflen;
-  MemoryRange *mp = bootInfo->memoryMap;
-  char *buff = malloc(sizeof(char)*1024);
-  if (!buff)
-    return 0;
-	
-  static const char info[] = "BIOS reported memory ranges:\n";
-  bufflen = sprintf(buff, "%s", info);
+	int i, bufflen;
+	MemoryRange *mp = bootInfo->memoryMap;
+	char *buff = malloc(sizeof(char)*1024);
+	if(!buff) {
+		return 0;
+	}
 
-  for (i = 0;
-       (i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
-       i++) {
-    bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
+	static const char info[] = "BIOS reported memory ranges:\n";
+	bufflen = sprintf(buff, "%s", info);
+
+	for (i = 0;
+		(i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
+		i++) {
+		bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
                         (unsigned long)(mp->base >> 32),
                         (unsigned long)(mp->base));
-    bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
+		bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
                         (unsigned long)(mp->length >> 32),
                         (unsigned long)(mp->length),
                         mp->type);
-    mp++;
-  }
-  return buff;
+		mp++;
+	}
+	return buff;
 }
 
 //==========================================================================
