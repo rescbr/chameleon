@@ -27,6 +27,34 @@
 #include "sl.h"
 #include "xml.h"
 
+#define kXMLTagPList        "plist "
+#define kXMLTagPListLen     (sizeof(kXMLTagPList) - 1)
+#define kXMLTagDict         "dict"
+#define kXMLTagDictLen      (sizeof(kXMLTagDict) - 1)
+#define kXMLTagKey          "key"
+#define kXMLTagKeyLen       (sizeof(kXMLTagKey) - 1)
+#define kXMLTagString       "string"
+#define kXMLTagStringLen    (sizeof(kXMLTagString) - 1)
+#define kXMLTagInteger      "integer"
+#define kXMLTagIntegerLen   (sizeof(kXMLTagInteger) - 1)
+#define kXMLTagData         "data"
+#define kXMLTagDataLen      (sizeof(kXMLTagData) - 1)
+#define kXMLTagDate         "date"
+#define kXMLTagDateLen      (sizeof(kXMLTagDate) - 1)
+#define kXMLTagFalse        "false/"
+#define kXMLTagFalseLen     (sizeof(kXMLTagFalse) - 1)
+#define kXMLTagTrue         "true/"
+#define kXMLTagTrueLen      (sizeof(kXMLTagTrue) - 1)
+#define kXMLTagArray        "array"
+#define kXMLTagArrayLen     (sizeof(kXMLTagArray) - 1)
+// for back-references used by libkern serializer
+#define kXMLTagReference    "reference"
+#define kXMLTagReferenceLen (sizeof(kXMLTagReference) - 1)
+#define kXMLStringID        "ID="
+#define kXMLStringIDLen     (sizeof(kXMLStringID) - 1)
+#define kXMLStringIDRef     "IDREF="
+#define kXMLStringIDRefLen  (sizeof(kXMLStringIDRef) - 1)
+
 string_ref *ref_strings = NULL;
 
 /// TODO: remove below
@@ -350,22 +378,23 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 	}
 
 	/***** string ****/
-    else if (!strncmp(tagName, kXMLTagString, strlen(kXMLTagString))) {
-      if (!tagName[strlen(kXMLTagString)]) /* <string> */
+    else if (!strncmp(tagName, kXMLTagString, kXMLTagStringLen)) {
+      if (!tagName[kXMLTagStringLen]) /* <string> */
         {
           length = ParseTagString(buffer + pos, tag);
         }
-      else if (' ' == tagName[strlen(kXMLTagString)]) /* <string ...> */
+      else if (' ' == tagName[kXMLTagStringLen]) /* <string ...> */
         {
           // TODO: save tag if if found
-          if(!strncmp(tagName + strlen(kXMLTagString " "), kXMLStringID, strlen(kXMLStringID))) /* <string ID= ...> */
+          if(!strncmp(tagName + kXMLTagStringLen + 1, (kXMLStringID "\""), kXMLStringIDLen + 1)) /* <string ID="...> */
             {
               // ID=
               int id = 0;
-              int cnt = strlen(kXMLTagString " " kXMLStringID "\"") + 1;
+              /* find end of ID string */
+              int cnt = kXMLTagStringLen + 1 + kXMLStringIDLen + 2;
               while ((tagName[cnt] != '\0') && (tagName[cnt] != '"')) cnt++;
               tagName[cnt] = 0;
-              char* val = tagName + strlen(kXMLTagString " " kXMLStringID "\"");
+              char* val = tagName + kXMLTagStringLen + 1 + kXMLStringIDLen + 1;
               while(*val)
                 {
                   if ((*val >= '0' && *val <= '9'))	// 0 - 9
@@ -383,7 +412,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			
               SaveRefString(buffer + pos, id);
             }
-          else if(!strncmp(tagName + strlen(kXMLTagString " "), kXMLStringIDRef, strlen(kXMLStringIDRef))) /* <string IDREF= ...> */
+          else if(!strncmp(tagName + kXMLTagStringLen + 1, kXMLStringIDRef, kXMLStringIDRefLen)) /* <string IDREF= ...> */
             {
               // IDREF=
               int id = 0;
@@ -426,14 +455,14 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
     }
 	
 	/***** integer ****/
-    else if (!strncmp(tagName, kXMLTagInteger, strlen(kXMLTagInteger))) {
-      if (!tagName[strlen(kXMLTagInteger)]) /* <integer> */
+    else if (!strncmp(tagName, kXMLTagInteger, kXMLTagIntegerLen)) {
+      if (!tagName[kXMLTagIntegerLen]) /* <integer> */
         {
           length = ParseTagInteger(buffer + pos, tag);
         }
-      else if (' ' == tagName[strlen(kXMLTagInteger)]) /* <integer ...> */
+      else if (' ' == tagName[kXMLTagIntegerLen]) /* <integer ...> */
         {
-          if(!strncmp(tagName + strlen(kXMLTagInteger " "), kXMLStringID, strlen(kXMLStringID))) /* <integer ID=...> */
+          if(!strncmp(tagName + kXMLTagIntegerLen + 1, kXMLStringID, kXMLStringIDLen)) /* <integer ID=...> */
             {
               // ID=
               int id = 0;
@@ -458,7 +487,7 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 			
               SaveRefString((*tag)->string, id);
             }
-          else if(!strncmp(tagName + strlen(kXMLTagInteger " "), kXMLStringIDRef, strlen(kXMLStringIDRef))) /* <integer IDREF=...> */
+          else if(!strncmp(tagName + kXMLTagIntegerLen + 1, kXMLStringIDRef, kXMLStringIDRefLen)) /* <integer IDREF=...> */
             {
               // IDREF=
               int id = 0;
@@ -518,18 +547,18 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
 	}
 
 	/***** plist ****/
-	else if (!strncmp(tagName, kXMLTagPList, 6))
+	else if (!strncmp(tagName, kXMLTagPList, kXMLTagPListLen))
 	{
 		length = 0;
 	}
 
 	/***** dict ****/
-    else if (!strncmp(tagName, kXMLTagDict, strlen(kXMLTagDict))) {
-      if (!strncmp(tagName, kXMLTagDict, strlen(kXMLTagDict)) && tagName[strlen(tagName)-1] == '/') /* <dict.../> */
+    else if (!strncmp(tagName, kXMLTagDict, kXMLTagDictLen)) {
+      if (!strncmp(tagName, kXMLTagDict, kXMLTagDictLen) && tagName[strlen(tagName)-1] == '/') /* <dict.../> */
         {
           length = ParseTagList(buffer + pos, tag, kTagTypeDict, 1);
         }
-      else if (!tagName[strlen(kXMLTagDict)] || ' ' == tagName[strlen(kXMLTagDict)]) /* <dict> or<dict ...> */
+      else if (!tagName[kXMLTagDictLen] || ' ' == tagName[kXMLTagDictLen]) /* <dict> or<dict ...> */
         {
           length = ParseTagList(buffer + pos, tag, kTagTypeDict, 0);
         }
@@ -541,24 +570,24 @@ XMLParseNextTag( char * buffer, TagPtr * tag )
     }
 	
 	/***** data ****/
-	else if ((!strncmp(tagName, kXMLTagData, strlen(kXMLTagData)))
-             && (!tagName[strlen(kXMLTagData)]             /* <data> */
-                 || ' ' == tagName[strlen(kXMLTagData)]))  /* <data ...> */
+	else if ((!strncmp(tagName, kXMLTagData, kXMLTagDataLen))
+             && (!tagName[kXMLTagDataLen]             /* <data> */
+                 || ' ' == tagName[kXMLTagDataLen]))  /* <data ...> */
 	{
 		length = ParseTagData(buffer + pos, tag);
 	}
 	
 	/***** date ****/
-	else if ((!strncmp(tagName, kXMLTagDate, strlen(kXMLTagDate)))
-             && (!tagName[strlen(kXMLTagDate)]             /* <date> */
-                 || ' ' == tagName[strlen(kXMLTagDate)]))  /* <date ...> */
+	else if ((!strncmp(tagName, kXMLTagDate, kXMLTagDateLen))
+             && (!tagName[kXMLTagDateLen]             /* <date> */
+                 || ' ' == tagName[kXMLTagDateLen]))  /* <date ...> */
 	{
 		length = ParseTagDate(buffer + pos, tag);
 	}
 	
 	/***** array ****/
-	else if (!strncmp(tagName, kXMLTagArray, strlen(kXMLTagArray))) { /* <array...> */
-      char c = tagName[strlen(kXMLTagArray)];
+	else if (!strncmp(tagName, kXMLTagArray, kXMLTagArrayLen)) { /* <array...> */
+      char c = tagName[kXMLTagArrayLen];
       if ('/' == c) /* <array/> */
         {
           length = ParseTagList(buffer + pos, tag, kTagTypeArray, 1);
