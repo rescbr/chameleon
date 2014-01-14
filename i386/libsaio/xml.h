@@ -25,8 +25,7 @@
 #ifndef __LIBSAIO_XML_H
 #define __LIBSAIO_XML_H
 
-enum xmltype
-{
+enum xmltype {
 	kTagTypeNone = 0,
 	kTagTypeDict,
 	kTagTypeKey,
@@ -72,8 +71,7 @@ extern string_ref* ref_strings;
 #define kPropIONameMatch        ("IONameMatch")
 
 /*
-struct Tag
-{
+struct Tag {
 	long       type;
 	char       *string;
 	struct Tag *tag;
