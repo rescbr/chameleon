@@ -628,18 +628,12 @@ void setupEfiDeviceTree(void)
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID()))
-	{
+	if ((ret=getSystemID())) {
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
 	*/
 
-	// Bungo
-	//if (Platform.UUID)
-	//{
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
-	//}
-	//
+	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
 	// Export SystemSerialNumber if present
 	if ((ret16=getSmbiosChar16("SMserial", &len)))
