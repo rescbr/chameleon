@@ -157,7 +157,7 @@ struct iob {
 	char *		   i_buf;			/* file load address */
 };
 
-#define BPS		   512				/* sector size of the device */
+#define BPS	   512				/* sector size of the device */
 #define F_READ	   0x1				/* file opened for reading */
 #define F_WRITE	   0x2				/* file opened for writing */
 #define F_ALLOC	   0x4				/* buffer allocated */
@@ -169,7 +169,7 @@ struct iob {
 struct dirstuff {
 	char *		   dir_path;		/* directory path */
 	long long	   dir_index;		/* directory entry index */
-	BVRef		   dir_bvr;			/* volume reference */
+	BVRef		   dir_bvr;		/* volume reference */
 };
 
 #define BVSTRLEN 32
@@ -217,7 +217,7 @@ enum {
 
 enum {
 	kBIOSDevTypeFloppy		= 0x00,
-	kBIOSDevTypeHardDrive	= 0x80,
+	kBIOSDevTypeHardDrive		= 0x80,
 	kBIOSDevTypeNetwork		= 0xE0,
 	kBIOSDevUnitMask		= 0x0F,
 	kBIOSDevTypeMask		= 0xF0,
@@ -238,9 +238,8 @@ enum {
 //#define BIOS_DEV_TYPE(d)	((d) & kBIOSDevTypeMask)
 #define BIOS_DEV_UNIT(bvr)	((bvr)->biosdev - (bvr)->type)
 
-/*
- * KernBootStruct device types.
- */
+// KernBootStruct device types.
+
 enum {
 	DEV_SD = 0,
 	DEV_HD = 1,
@@ -271,7 +270,7 @@ enum {
 }; //gBootFileType_t;
 
 enum {
-	kCursorTypeHidden	 = 0x0100,
+	kCursorTypeHidden    = 0x0100,
 	kCursorTypeUnderline = 0x0607
 };
 

@@ -144,6 +144,7 @@
 
 /* ErmaC: added these keys */
 #define kEnableDualLink		"EnableDualLink"	/* nvidia.c && gma.c*/
+#define kNvidiaGeneric		"NvidiaGeneric"		/* nvidia.c */
 #define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
 #define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
 #define kSkipAtiGfx		"SkipAtiGfx"		/* pci_setup.c */
@@ -156,6 +157,10 @@
 
 /* Karas: added these keys */
 #define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
+
+/* Bungo: added these keys */
+// mask private data or no
+#define kPrivateData		"PrivateData"		/* smbios_decode.c */
 
 /*
  * Flags to the booter or kernel

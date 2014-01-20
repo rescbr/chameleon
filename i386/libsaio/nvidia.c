@@ -77,6 +77,7 @@
 #define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
+char generic_name[128];
 extern uint32_t devices_number;
 
 const char *nvidia_compatible_0[]       =	{ "@0,compatible",	"NVDA,NVMac"	 };
@@ -1639,7 +1640,6 @@ static int patch_nvidia_rom(uint8_t *rom)
 static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 {
 	int i, j;
-	static char name_model[128];
 
 	// First check in the plist, (for e.g this can override any hardcoded devices)
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
@@ -1652,9 +1652,9 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	// Then check the exceptions table
 	if (subsys_id) {
 		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++) {
-			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))
-			{
+			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id)) {
 				return nvidia_card_exceptions[i].name;
+				break;
 			}
 		}
 	}
@@ -1665,9 +1665,9 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 			if (subsys_id) {
 				for (j = 0; j < (sizeof(nvidia_card_vendors) / sizeof(nvidia_card_vendors[0])); j++) {
 					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000)) {
-						snprintf(name_model, sizeof(name_model), "%s %s",
+						snprintf(generic_name, 128, "%s %s", // sizeof(generic_name), "%s %s",
 							nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
-						return name_model;
+						return &generic_name[0];
 					}
 				}
 			}
