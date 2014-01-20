@@ -256,10 +256,8 @@ static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HE
 static int getImageIndexByName(const char *name)
 {
 	int i;
-	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
-	{
-		if (strcmp(name, images[i].name) == 0)
-		{
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++) {
+		if (strcmp(name, images[i].name) == 0) {
 			return i; // found the name
 		}
 	}
@@ -279,26 +277,18 @@ static int getEmbeddedImageIndexByName(const char *name)
 	// generated manualy, this *will* fail to work properly.
 	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
 	{
-		if (result > 0)	// We need to search a HIGHER index
-		{
-			if (compareIndex != lowerLimit)
-			{
+		if (result > 0)	{ // We need to search a HIGHER index
+			if (compareIndex != lowerLimit) {
 				lowerLimit = compareIndex;
-			}
-			else
-			{
+			} else {
 				return -1;
 			}
 			compareIndex = (upperLimit + lowerLimit + 1) >> 1;	// Midpoint, round up
 		}
-		else  // We Need to search a LOWER index
-		{
-			if (compareIndex != upperLimit)
-			{
+		else { // We Need to search a LOWER index
+			if (compareIndex != upperLimit) {
 				upperLimit = compareIndex;
-			}
-			else
-			{
+			} else {
 				return -1;
 			}
 			compareIndex = (upperLimit + lowerLimit) >> 1;	// Midpoint, round down
@@ -517,10 +507,8 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 	int destx = 0, desty = 0;
 	int srcx = pos.x, srcy = pos.y;
 	
-	for( ; desty < height; desty++, srcy++)
-	{
-		for( destx = 0, srcx = pos.x; destx < width; destx++, srcx++ )
-		{
+	for( ; desty < height; desty++, srcy++) {
+		for( destx = 0, srcx = pos.x; destx < width; destx++, srcx++ ) {
 			pixel( cropped, destx, desty ).value = pixel( from, srcx, srcy ).value;
 		}
 	}
@@ -530,13 +518,11 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
-	if(!gui.backbuffer)
-	{
+	if(!gui.backbuffer) {
 		return 1;
 	}
 	gui.backbuffer->pixels = malloc( window->width * window->height * 4 );
-	if(!gui.backbuffer->pixels)
-	{
+	if(!gui.backbuffer->pixels) {
 		free(gui.backbuffer);
 		gui.backbuffer = 0;
 		return 1;
@@ -551,14 +537,12 @@ int createBackBuffer( window_t *window )
 int createWindowBuffer( window_t *window )
 {
 	window->pixmap = malloc(sizeof(pixmap_t));
-	if(!window->pixmap)
-	{
+	if(!window->pixmap) {
 		return 1;
 	}
 
 	window->pixmap->pixels = malloc( window->width * window->height * 4 );
-	if(!window->pixmap->pixels)
-	{
+	if(!window->pixmap->pixels) {
 		free(window->pixmap);
 		window->pixmap = 0;
 		return 1;
@@ -1078,8 +1062,7 @@ void drawDeviceList (int start, int end, int selection)
 
 	makeRoundedCorners( gui.devicelist.pixmap);
 
-	switch (gui.layout)
-	{
+	switch (gui.layout) {
 
 		case VerticalLayout:
 			p.x = (gui.devicelist.width /2);
@@ -1106,34 +1089,26 @@ void drawDeviceList (int start, int end, int selection)
 	}
 	
 	// draw visible device icons
-	for (i = 0; i < gui.maxdevices; i++)
-	{
+	for (i = 0; i < gui.maxdevices; i++) {
 		BVRef param = menuItems[start + i].param;
 
 		bool isSelected = ((start + i) == selection) ? true : false;
-		if (isSelected)
-		{
-			if (param->flags & kBVFlagNativeBoot)
-			{
+		if (isSelected) {
+			if (param->flags & kBVFlagNativeBoot) {
 				infoMenuNativeBoot = true;
-			}
-			else
-			{
+			} else {
 				infoMenuNativeBoot = false;
-				if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END)
-				{
+				if(infoMenuSelection >= INFOMENU_NATIVEBOOT_START && infoMenuSelection <= INFOMENU_NATIVEBOOT_END) {
 					infoMenuSelection = 0;
 				}
 			}
 
-			if (gui.menu.draw)
-			{
+			if (gui.menu.draw) {
 				drawInfoMenuItems();
 			}
 			getBoolForKey(kShowInfoKey, &shoWinfo, &bootInfo->chameleonConfig);
 			
-			if (shoWinfo && showBootBanner)
-			{
+			if (shoWinfo && showBootBanner) {
 				gui.debug.cursor = pos( 10, 100);
 				dprintf( &gui.screen, "label:     %s\n",   param->label );
 				dprintf( &gui.screen, "biosdev:   0x%x\n", param->biosdev );
@@ -1156,24 +1131,20 @@ void drawDeviceList (int start, int end, int selection)
 		
 		drawDeviceIcon( param, gui.devicelist.pixmap, p, isSelected);
 		
-		if (gui.layout == HorizontalLayout)
-		{
+		if (gui.layout == HorizontalLayout) {
 			p.x += images[iSelection].image->width + gui.devicelist.iconspacing; 
 		}
-		if (gui.layout == VerticalLayout)
-		{
+		if (gui.layout == VerticalLayout) {
 			p.y += ( images[iSelection].image->height + font_console.chars[0]->height + gui.devicelist.iconspacing ); 
 		}
 	}
 
 	// draw prev indicator
-	if (start)
-	{
+	if (start) {
 		blend( images[iDeviceScrollPrev].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollPrev].image, p_prev ) );
 	}
 	// draw next indicator
-	if ( end < gDeviceCount - 1 )
-	{
+	if ( end < gDeviceCount - 1 ) {
 		blend( images[iDeviceScrollNext].image, gui.devicelist.pixmap, centeredAt( images[iDeviceScrollNext].image, p_next ) );
 	}
 	gui.redraw = true;
@@ -1189,8 +1160,7 @@ void clearGraphicBootPrompt()
 	//prompt_pos=0;
 
 	
-	if( gui.bootprompt.draw == true )
-	{
+	if( gui.bootprompt.draw == true ) {
 		gui.bootprompt.draw = false;
 		gui.redraw = true;
 		// this causes extra frames to be drawn
@@ -1228,23 +1198,17 @@ void updateGraphicBootPrompt()
 static inline
 void vramwrite (void *data, int width, int height)
 {
-	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4)
-	{
+	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4) {
 		memcpy((uint8_t *)vram, gui.backbuffer->pixels, VIDEO (rowBytes)*VIDEO (height));
-	}
-	else
-	{
+	} else {
 		uint32_t r, g, b;
 		int i, j;
-		for (i = 0; i < VIDEO (height); i++)
-		{
-			for (j = 0; j < VIDEO (width); j++)
-			{
+		for (i = 0; i < VIDEO (height); i++) {
+			for (j = 0; j < VIDEO (width); j++) {
 				b = ((uint8_t *) data)[4*i*width + 4*j];
 				g = ((uint8_t *) data)[4*i*width + 4*j + 1];
 				r = ((uint8_t *) data)[4*i*width + 4*j + 2];
-				switch (VIDEO (depth))
-				{
+				switch (VIDEO (depth)) {
 					case 32:
 						*(uint32_t *)(((uint8_t *)vram)+i*VIDEO (rowBytes) + j*4) = (b&0xff) | ((g&0xff)<<8) | ((r&0xff)<<16);
 						break;
@@ -1267,30 +1231,24 @@ void vramwrite (void *data, int width, int height)
 
 void updateVRAM()
 {
-	if (gui.redraw)
-	{
-		if (gui.devicelist.draw)
-		{
+	if (gui.redraw) {
+		if (gui.devicelist.draw) {
 			blend( gui.devicelist.pixmap, gui.backbuffer, gui.devicelist.pos );
 		}
-		if (gui.bootprompt.draw)
-		{
+		if (gui.bootprompt.draw) {
 			blend( gui.bootprompt.pixmap, gui.backbuffer, gui.bootprompt.pos );
 		}
-		if (gui.menu.draw)
-		{
+		if (gui.menu.draw) {
 			blend( gui.menu.pixmap, gui.backbuffer, gui.menu.pos );
 		}
-		if (gui.infobox.draw)
-		{
+		if (gui.infobox.draw) {
 			blend( gui.infobox.pixmap, gui.backbuffer, gui.infobox.pos );
 		}
 	}
 
 	vramwrite ( gui.backbuffer->pixels, gui.backbuffer->width, gui.backbuffer->height );
 
-	if (gui.redraw)
-	{
+	if (gui.redraw) {
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 		gui.redraw = false;
 	}
@@ -1305,10 +1263,8 @@ struct putc_info //Azi: exists on console.c & printf.c
 static int
 sputc(int c, struct putc_info * pi) //Azi: same as above
 {
-	if (pi->last_str)
-	{
-		if (pi->str == pi->last_str)
-		{
+	if (pi->last_str) {
+		if (pi->str == pi->last_str) {
 			*(pi->str) = '\0';
 			return 0;
 		}
@@ -1349,28 +1305,24 @@ int gprintf( window_t * window, const char * fmt, ...)
 
 		font_t *font = &font_console;
 
-		for( i=0; i< strlen(formattedtext); i++ )
-		{
+		for( i=0; i< strlen(formattedtext); i++ ) {
 			character = formattedtext[i];
 			
 			character -= 32;
 
 			// newline ?
-			if( formattedtext[i] == '\n' )
-			{
+			if( formattedtext[i] == '\n' ) {
 				cursor.x = window->hborder;
 				cursor.y += font->height;
 
-				if ( cursor.y > bounds.y )
-				{
+				if ( cursor.y > bounds.y ) {
 					cursor.y = origin.y;
 				}
 				continue;
 			}
 
 			// tab ?
-			if( formattedtext[i] == '\t' )
-			{
+			if( formattedtext[i] == '\t' ) {
 				cursor.x += ( font->chars[0]->width * 5 );
 			}
 
@@ -1382,8 +1334,7 @@ int gprintf( window_t * window, const char * fmt, ...)
 			cursor.x += font->chars[character]->width;
 
 			// check x pos and do newline
-			if ( cursor.x > bounds.x )
-			{
+			if ( cursor.x > bounds.x ) {
 				cursor.x = origin.x;
 				cursor.y += font->height;
 			}
@@ -1400,7 +1351,6 @@ int gprintf( window_t * window, const char * fmt, ...)
 		free(formattedtext);
 		
 		return 0;
-
 	}
 	return 1;
 }
@@ -1439,47 +1389,40 @@ int dprintf( window_t * window, const char * fmt, ...)
 		
 		font_t *font = &font_console;
 		
-		for( i=0; i< strlen(formattedtext); i++ )
-		{
+		for( i=0; i< strlen(formattedtext); i++ ) {
 			character = formattedtext[i];
 			
 			character -= 32;
 			
 			// newline ?
-			if( formattedtext[i] == '\n' )
-			{
+			if( formattedtext[i] == '\n' ) {
 				cursor.x = window->hborder;
 				cursor.y += font->height;
 				
-				if ( cursor.y > bounds.y )
-				{
+				if ( cursor.y > bounds.y ) {
 					cursor.y = origin.y;
 				}
 				continue;
 			}
 			
 			// tab ?
-			if( formattedtext[i] == '\t' )
-			{
+			if( formattedtext[i] == '\t' ) {
 				cursor.x += ( font->chars[0]->width * 5 );
 			}
 			// draw the character
-			if( font->chars[character])
-			{
+			if( font->chars[character]) {
 				blend(font->chars[character], gui.backbuffer, cursor);
 			}
 			cursor.x += font->chars[character]->width;
 			
 			// check x pos and do newline
-			if ( cursor.x > bounds.x )
-			{
+			if ( cursor.x > bounds.x ) {
 				cursor.x = origin.x;
 				cursor.y += font->height;
 			}
 			
 			// check y pos and reset to origin.y
-			if ( cursor.y > bounds.y )
-			{
+			if ( cursor.y > bounds.y ) {
 				cursor.y = origin.y;
 			}
 		}
@@ -1520,18 +1463,15 @@ int vprf(const char * fmt, va_list ap)
 		bounds.y = ( window->height - ( window->vborder * 2 ) );
 		cursor = origin;
 
-		for( i=0; i< strlen(formattedtext); i++ )
-		{
+		for( i=0; i< strlen(formattedtext); i++ ) {
 			character = formattedtext[i];
 			character -= 32;
 			
 			// newline ?
-			if( formattedtext[i] == '\n' )
-			{
+			if( formattedtext[i] == '\n' ) {
 				cursor.x = window->hborder;
 				cursor.y += font->height;
-				if ( cursor.y > bounds.y )
-				{
+				if ( cursor.y > bounds.y ) {
 					gui.redraw = true;
 					updateVRAM();
 					cursor.y = window->vborder;
@@ -1541,30 +1481,26 @@ int vprf(const char * fmt, va_list ap)
 			}
 
 			// tab ?
-			if( formattedtext[i] == '\t' )
-			{
+			if( formattedtext[i] == '\t' ) {
 				cursor.x = ( cursor.x / ( font->chars[0]->width * 8 ) + 1 ) * ( font->chars[0]->width * 8 );
 				continue;
 			}
 			cursor.x += font->chars[character]->width;
 			
 			// check x pos and do newline
-			if ( cursor.x > bounds.x )
-			{
+			if ( cursor.x > bounds.x ) {
 				cursor.x = origin.x;
 				cursor.y += font->height;
 			}
 
 			// check y pos and reset to origin.y
-			if ( cursor.y > ( bounds.y + font->chars[0]->height) )
-			{
+			if ( cursor.y > ( bounds.y + font->chars[0]->height) ) {
 				gui.redraw = true;
 				updateVRAM();
 				cursor.y = window->vborder;
 			}
 			// draw the character
-			if( font->chars[character])
-			{
+			if( font->chars[character]) {
 				blend(font->chars[character], gui.backbuffer, cursor);
 			}
 		}
@@ -1579,8 +1515,7 @@ int vprf(const char * fmt, va_list ap)
 
 pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 	unsigned int cha = (unsigned int)ch - 32;
-	if (cha >= font->count)
-	{
+	if (cha >= font->count) {
 		// return ? if the font for the char doesn't exists
 		cha = '?' - 32;
 	}
@@ -1589,13 +1524,10 @@ pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 
 position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
 	pixmap_t* pm = charToPixmap(ch, font);
-	if (pm && ((p.x + pm->width) < blendInto->width))
-	{
+	if (pm && ((p.x + pm->width) < blendInto->width)) {
 		blend(pm, blendInto, p);
 		return pos(p.x + pm->width, p.y);
-	}
-	else
-	{
+	} else {
 		return p;
 	}
 }
@@ -1605,19 +1537,16 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 	int i=0;
 	position_t current_pos = pos(p.x, p.y);
 	
-	for (i=0; i < strlen(ch); i++)
-	{
+	for (i=0; i < strlen(ch); i++) {
 		// newline ?
-		if ( ch[i] == '\n' )
-		{
+		if ( ch[i] == '\n' ) {
 			current_pos.x = p.x;
 			current_pos.y += font->height;
 			continue;
 		}
 		
 		// tab ?
-		if ( ch[i] == '\t' )
-		{
+		if ( ch[i] == '\t' ) {
 			current_pos.x += TAB_PIXELS_WIDTH;
 			continue;
 		}
@@ -1635,25 +1564,18 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 
 	// calculate the width in pixels
 	for (i=0; i < strlen(text); i++) {
-		if (text[i] == '\n')
-		{
+		if (text[i] == '\n') {
 			width = 0;
 			height += font->height;
-		}
-		else if (text[i] == '\t')
-		{
+		} else if (text[i] == '\t') {
 			width += TAB_PIXELS_WIDTH;
-		}
-		else
-		{
+		} else {
 			pixmap_t* pm = charToPixmap(text[i], font);
-			if (pm)
-			{
+			if (pm)	{
 				width += pm->width;
 			}
 		}
-		if (width > max_width)
-		{
+		if (width > max_width) {
 			max_width = width;
 		}
 	}
@@ -1667,12 +1589,9 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 int destroyFont(font_t *font)
 {
 	int i;
-	for (i = 0; i < CHARACTERS_COUNT; i++)
-	{
-		if (font->chars[i])
-		{
-			if (font->chars[i]->pixels)
-			{
+	for (i = 0; i < CHARACTERS_COUNT; i++) {
+		if (font->chars[i]) {
+			if (font->chars[i]->pixels) {
 				free (font->chars[i]->pixels);
 			}
 			free (font->chars[i]);
@@ -1692,35 +1611,28 @@ int initFont(font_t *font, image_t *data)
 	
 	font->height = data->image->height;
 
-	for( x = 0; x < data->image->width && count < CHARACTERS_COUNT; x++)
-	{
+	for( x = 0; x < data->image->width && count < CHARACTERS_COUNT; x++) {
 		start = end;
 
 		// if the pixel is red we've reached the end of the char
-		if( pixel( data->image, x, 0 ).value == 0xFFFF0000)
-		{
+		if( pixel( data->image, x, 0 ).value == 0xFFFF0000) {
 			end = x + 1;
 
-			if( (font->chars[count] = malloc(sizeof(pixmap_t)) ) )
-			{
+			if( (font->chars[count] = malloc(sizeof(pixmap_t)) ) ) {
 				font->chars[count]->width = ( end - start) - 1;
 				font->chars[count]->height = font->height;
 			
-				if ( ( font->chars[count]->pixels = malloc( font->chars[count]->width * data->image->height * 4) ) )
-				{
+				if ( ( font->chars[count]->pixels = malloc( font->chars[count]->width * data->image->height * 4) ) ) {
 					space += ( font->chars[count]->width * data->image->height * 4 );
 					// we skip the first line because there are just the red pixels for the char width
-					for( y = 1; y< (font->height); y++)
-					{
-						for( x2 = start, x3 = 0; x2 < end; x2++, x3++)
-						{
+					for( y = 1; y< (font->height); y++) {
+						for( x2 = start, x3 = 0; x2 < end; x2++, x3++) {
 							pixel( font->chars[count], x3, y ) = pixel( data->image, x2, y );
 						}	
 					}
 					
 					// check if font is monospaced
-					if( ( count > 0 ) && ( font->width != font->chars[count]->width ) )
-					{
+					if( ( count > 0 ) && ( font->width != font->chars[count]->width ) ) {
 						monospaced = true;
 					}
 
@@ -1732,13 +1644,11 @@ int initFont(font_t *font, image_t *data)
 		}
 	}
 
-	for (x = count; x < CHARACTERS_COUNT; x++)
-	{
+	for (x = count; x < CHARACTERS_COUNT; x++) {
 		font->chars[x] = NULL;
 	}
 
-	if(monospaced)
-	{
+	if(monospaced) {
 		font->width = 0;
 	}
 
@@ -1749,8 +1659,7 @@ int initFont(font_t *font, image_t *data)
 
 void colorFont(font_t *font, uint32_t color)
 {
-	if( !color )
-	{
+	if( !color ) {
 		return;
 	}
 
@@ -1758,17 +1667,13 @@ void colorFont(font_t *font, uint32_t color)
 	int count = 0;
 	pixel_t *buff;
 	
-	while( font->chars[count++] )
-	{
+	while( font->chars[count++] ) {
 		width = font->chars[count-1]->width;
 		height = font->chars[count-1]->height;
-		for( y = 0; y < height; y++ )
-		{
-			for( x = 0; x < width; x++ )
-			{
+		for( y = 0; y < height; y++ ) {
+			for( x = 0; x < width; x++ ) {
 				buff = &(pixel( font->chars[count-1], x, y ));
-				if( buff->ch.a )
-				{
+				if( buff->ch.a ) {
 					buff->ch.r = (color & 0xFFFF0000) >> 16;
 					buff->ch.g = (color & 0xFF00FF00) >> 8;
 					buff->ch.b = (color & 0xFF0000FF);
@@ -1801,13 +1706,10 @@ void makeRoundedCorners(pixmap_t *p)
 	
 	uint8_t alpha=0;
 	
-	for( y=0; y<10; y++)
-	{
-		for( x=0; x<10; x++)
-		{
+	for( y=0; y<10; y++) {
+		for( x=0; x<10; x++) {
 			// skip if the pixel should be visible
-			if(roundedCorner[y][x] != 0xFF) 
-			{ 
+			if(roundedCorner[y][x] != 0xFF)	{ 
 				alpha = ( roundedCorner[y][x] ? (uint8_t) (roundedCorner[y][x] * pixel(p, x, y).ch.a) / 255 : 0 );
 				// Upper left corner
 				pixel(p, x, y).ch.a = alpha;
@@ -1845,10 +1747,8 @@ void showInfoBox(char *title, char *text_orig)
 	position_t pos_title = pos ( gui.infobox.vborder, gui.infobox.vborder );
 
 	// calculate number of lines in the title
-	for ( i = 0, lines = 1; i<strlen(title); i++ )
-	{
-		if( title[i] == '\n')
-		{
+	for ( i = 0, lines = 1; i<strlen(title); i++ ) {
+		if( title[i] == '\n') {
 			lines++;
 		}
 	}
@@ -1868,30 +1768,23 @@ void showInfoBox(char *title, char *text_orig)
 	visiblelines = ( ( gui.infobox.height - ( gui.infobox.vborder * 2 ) ) / font_console.height ) - 1;
 	
 	// lets display the text and allow scroll thru using up down / arrows
-	while(1)
-	{
+	while(1) {
 		// move to current line in text
-		for( offset = 0, i = 0; offset < strlen(text); offset++ )
-		{
-			if( currentline == i)
-			{
+		for( offset = 0, i = 0; offset < strlen(text); offset++ ) {
+			if( currentline == i) {
 				break;
 			}
-			if( text[offset] =='\n')
-			{
+			if( text[offset] =='\n') {
 				i++;
 			}
 		}
 
 		// find last visible line in text and place \0
-		for( i = offset, cnt = 0; i < strlen(text); i++)
-		{
-			if(text[i]=='\n')
-			{
+		for( i = offset, cnt = 0; i < strlen(text); i++) {
+			if(text[i]=='\n') {
 				cnt++;
 			}
-			if ( cnt == visiblelines )
-			{
+			if ( cnt == visiblelines ) {
 				text[i]='\0';
 				break;
 			}
@@ -1902,29 +1795,25 @@ void showInfoBox(char *title, char *text_orig)
 		makeRoundedCorners( gui.infobox.pixmap);
 
 		// print the title if present
-		if( title )
-		{
+		if( title ) {
 			drawStr(title, &font_console, gui.infobox.pixmap, pos_title);
 		}
 		// print the text
 		drawStr( text + offset, &font_console, gui.infobox.pixmap, pos_text);
 
 		// restore \n in text
-		if ( cnt == visiblelines )
-		{
+		if ( cnt == visiblelines ) {
 			text[i] = '\n';
 		}
 		position_t pos_indicator =  pos( gui.infobox.width - ( images[iTextScrollPrev].image->width - ( gui.infobox.vborder / 2) ), pos_text.y );
 		
 		// draw prev indicator
-		if(offset)
-		{
+		if(offset) {
 			blend( images[iTextScrollPrev].image, gui.infobox.pixmap, centeredAt( images[iTextScrollPrev].image, pos_indicator ));
 		}
 		
 		// draw next indicator
-		if( lines > ( currentline + visiblelines ) )
-		{
+		if( lines > ( currentline + visiblelines ) ) {
 			pos_indicator.y = ( gui.infobox.height - ( ( images[iTextScrollNext].image->width + gui.infobox.vborder ) / 2 ) );
 			blend( images[iTextScrollNext].image, gui.infobox.pixmap, centeredAt( images[iTextScrollNext].image, pos_indicator ) );
 		}
@@ -1937,38 +1826,30 @@ void showInfoBox(char *title, char *text_orig)
 		
 		key = getchar();
 			
-		if( key == KEY_UP )
-		{
-			if( currentline > 0 )
-			{
+		if( key == KEY_UP ) {
+			if( currentline > 0 ) {
 				currentline--;
 			}
 		}
 
-		if( key == KEY_DOWN )
-		{
-			if( lines > ( currentline + visiblelines ) )
-			{
+		if( key == KEY_DOWN ) {
+			if( lines > ( currentline + visiblelines ) ) {
 				currentline++;
 			}
 		}
 
-		if( key == KEY_ESC || key == 'q' || key == 'Q')
-		{
+		if( key == KEY_ESC || key == 'q' || key == 'Q') {
 			gui.infobox.draw = false;
 			gui.redraw = true;
 			updateVRAM();
 			break;
 		}
 
-		if(key == ' ') // spacebar = next page
-		{
-			if( lines > ( currentline + visiblelines ) )
-			{
+		if(key == ' ') { // spacebar = next page
+			if( lines > ( currentline + visiblelines ) ) {
 				currentline += visiblelines;
 			}
-			if(lines < (currentline + visiblelines))
-			{
+			if(lines < (currentline + visiblelines)) {
 				currentline = lines - visiblelines;
 			}
 		}
@@ -1980,8 +1861,7 @@ void animateProgressBar()
 {
 	int y;
 	
-	if( time18() > lasttime)
-	{
+	if( time18() > lasttime) {
 		lasttime = time18();
 
 		pixmap_t *buffBar = images[iProgressBar].image;
@@ -1990,8 +1870,7 @@ void animateProgressBar()
 	
 		memcpy( buffBar->pixels, buffBar->pixels + 1, ( (buffBar->width*buffBar->height) - 1 ) * 4 );
 
-		for( y = buffBar->height - 1; y > 0; y--)
-		{
+		for( y = buffBar->height - 1; y > 0; y--) {
 			pixel(buffBar, buffBar->width - 1, y) = pixel(buffBar, buffBar->width - 1, y - 1);
 		}
 		pixel(buffBar, buffBar->width-1, 0).value = buff;
@@ -2025,12 +1904,9 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 
 	int x=0,x2=0,y=0;
 	
-	for(y=0; y<buff->height; y++)
-	{
-		for(x=0; x<todraw; x++, x2++)
-		{
-			if(x2 == (buff->width-1))
-			{
+	for(y=0; y<buff->height; y++) {
+		for(x=0; x<todraw; x++, x2++) {
+			if(x2 == (buff->width-1)) {
 				x2=0;
 			}
 			pixel(&progressbar, x,y).value = pixel(buff, x2,y).value;
@@ -2038,23 +1914,18 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 		x2=0;
 	}
 
-	for(y=0; y<buff->height; y++)
-	{
-		for(x=todraw, x2 = 0; x < width - 1; x++, x2++)
-		{
-			if(x2 == (buffBG->width -2 ))
-			{
+	for(y=0; y<buff->height; y++) {
+		for(x=todraw, x2 = 0; x < width - 1; x++, x2++) {
+			if(x2 == (buffBG->width -2 )) {
 				x2 = 0;
 			}
 			pixel(&progressbar, x,y).value = pixel(buffBG, x2,y).value;
 		}
-		if(progress < 100)
-		{
+		if(progress < 100) {
 			pixel(&progressbar, width - 1, y).value = pixel(buffBG, buffBG->width - 1, y).value;
 		}
 
-		if(progress == 0)
-		{
+		if(progress == 0) {
 			pixel(&progressbar, 0, y).value = pixel(buffBG, buffBG->width - 1, y).value;
 		}
 
@@ -2084,21 +1955,16 @@ void drawInfoMenuItems()
 
 	position = pos(0,0);
 	
-	for ( i = 0, n = iMenuBoot; i < infoMenuItemsCount; i++, n++)
-	{
-		if (i == infoMenuSelection)
-		{
+	for ( i = 0, n = iMenuBoot; i < infoMenuItemsCount; i++, n++) {
+		if (i == infoMenuSelection) {
 			blend(selection, gui.menu.pixmap, position);
 		}
 
 		pbuff = images[n].image;
-		if (offset && i >= INFOMENU_NATIVEBOOT_START && i <= INFOMENU_NATIVEBOOT_END)
-		{
+		if (offset && i >= INFOMENU_NATIVEBOOT_START && i <= INFOMENU_NATIVEBOOT_END) {
 			blend( images[n + (iMenuHelp - iMenuBoot)].image , gui.menu.pixmap, 
 				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
-		}
-		else
-		{
+		} else {
 			blend( pbuff, gui.menu.pixmap, 
 				pos((position.x + (gui.menu.hborder / 2)), position.y + ((selection->height - pbuff->height) / 2)));
 		}
@@ -2130,22 +1996,16 @@ int updateInfoMenu(int key)
 	{
 
 		case KEY_UP:	// up arrow
-			if (infoMenuSelection > 0)
-			{
-				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1)
-				{
+			if (infoMenuSelection > 0) {
+				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_END + 1) {
 					infoMenuSelection -= 4;
-				}
-				else
-				{
+				} else {
 					infoMenuSelection--;
 				}
 				drawInfoMenuItems();
 				updateVRAM();
 
-			}
-			else
-			{
+			} else {
 
 				gui.menu.draw = false;
 				gui.redraw = true;
@@ -2157,14 +2017,11 @@ int updateInfoMenu(int key)
 			break;
 
 		case KEY_DOWN:	// down arrow
-			if (infoMenuSelection < infoMenuItemsCount - 1)
-			{
+			if (infoMenuSelection < infoMenuItemsCount - 1) {
 				if(!infoMenuNativeBoot && infoMenuSelection == INFOMENU_NATIVEBOOT_START - 1)
 				{
 					infoMenuSelection += 4;
-				}
-				else
-				{
+				} else {
 					infoMenuSelection++;
 				}
 				drawInfoMenuItems();
@@ -2174,20 +2031,13 @@ int updateInfoMenu(int key)
 
 		case KEY_ENTER:
 			key = 0;
-			if( infoMenuSelection == MENU_SHOW_MEMORY_INFO )
-			{
+			if( infoMenuSelection == MENU_SHOW_MEMORY_INFO ) {
 				showInfoBox( "Memory Info. Press q to quit.\n", getMemoryInfoString());
-			}
-			else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO )
-			{
+			} else if( infoMenuSelection == MENU_SHOW_VIDEO_INFO ) {
 				showInfoBox( getVBEInfoString(), getVBEModeInfoString() );
-			}
-			else if( infoMenuSelection == MENU_SHOW_HELP )
-			{
+			} else if( infoMenuSelection == MENU_SHOW_HELP ) {
 				showHelp();
-			}
-			else
-			{
+			} else {
 				int buff = infoMenuSelection;
 				infoMenuSelection = 0;
 				return buff;
@@ -2265,8 +2115,7 @@ void drawBootGraphics(void)
 	getGraphicModeParams(screen_params);
 
 	// Set graphics mode if the booter was in text mode or the screen resolution has changed.
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
-	{
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) ) {
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
 

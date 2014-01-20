@@ -30,7 +30,7 @@ typedef union {
 } pci_dev_t;
 
 typedef struct pci_dt_t {
-	uint8_t*    regs;
+	uint8_t*	regs;
 	pci_dev_t	dev;
 
 	uint16_t	devfn; /* encoded device & function index */
@@ -71,15 +71,23 @@ extern pci_dt_t		*root_pci_dev;
 extern uint8_t		pci_config_read8(uint32_t, uint8_t);
 extern uint16_t		pci_config_read16(uint32_t, uint8_t);
 extern uint32_t		pci_config_read32(uint32_t, uint8_t);
-extern void			pci_config_write8(uint32_t, uint8_t, uint8_t);
-extern void			pci_config_write16(uint32_t, uint8_t, uint16_t);
-extern void			pci_config_write32(uint32_t, uint8_t, uint32_t);
-extern char			*get_pci_dev_path(pci_dt_t *);
-extern void			build_pci_dt(void);
-extern void			dump_pci_dt(pci_dt_t *);
+extern void		pci_config_write8(uint32_t, uint8_t, uint8_t);
+extern void		pci_config_write16(uint32_t, uint8_t, uint16_t);
+extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
+extern char		*get_pci_dev_path(pci_dt_t *);
+extern void		build_pci_dt(void);
+extern void		dump_pci_dt(pci_dt_t *);
 
-//-----------------------------------------------------------------------------
-// added by iNDi
+/* Option ROM header */
+typedef struct {
+	uint16_t	signature;          // 0xAA55
+	uint8_t		rom_size;           //in 512 bytes blocks
+	uint8_t		jump;           //0xE9 for ATI and Intel, 0xEB for NVidia
+	uint32_t	entry_point;
+	uint8_t		reserved[16];
+	uint16_t	pci_header_offset;  //@0x18
+	uint16_t	expansion_header_offset;
+} option_rom_header_t;
 
 /* Option ROM PCI Data Structure */
 typedef struct {
@@ -97,6 +105,8 @@ typedef struct {
 	uint16_t		reserved;
 } option_rom_pci_header_t;
 
+//-----------------------------------------------------------------------------
+// added by iNDi
 
 typedef struct {
 	uint32_t		signature;		// 0x24506E50 '$PnP'
@@ -115,18 +125,6 @@ typedef struct {
 	uint16_t		reserved;
 	uint16_t		resource_vector;
 } option_rom_pnp_header_t;
-
-/* Option ROM header */
-typedef struct {
-	uint16_t	signature;          // 0xAA55
-	uint8_t		rom_size;           //in 512 bytes blocks
-	uint8_t		jump;           //0xE9 for ATI and Intel, 0xEB for NVidia
-	uint8_t		entry_point[4];  //offset to
-	uint8_t		reserved[16];
-	uint16_t	pci_header_offset;  //@0x18
-	uint16_t	expansion_header_offset;
-} option_rom_header_t;
-
 
 /*
  * Under PCI, each device has 256 bytes of configuration address space,

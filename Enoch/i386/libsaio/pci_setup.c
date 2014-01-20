@@ -2,11 +2,7 @@
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
-//#include "gma.h"
-//#include "nvidia.h"
-//#include "hda.h"
 #include "modules.h"
-//#include "device_inject.h"
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
@@ -25,62 +21,12 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 	bool doit, do_eth_devprop, do_wifi_devprop, do_usb_devprop, do_gfx_devprop, do_enable_hpet, do_hda_devprop = false;
 	pci_dt_t *current = pci_dt;
 
-	//do_eth_devprop = do_wifi_devprop = do_usb_devprop = do_gfx_devprop = do_enable_hpet = do_hda_devprop = false;
-
 	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kEnableWifi, &do_wifi_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kUsbInject, &do_usb_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kHDAEnabler, &do_hda_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
-
-/* tennisgeek http://forum.voodooprojects.org/index.php/topic,1333.0.html
-	// Get some PCI stuff
-	if (hasPciToEfiMapping == -1) {
-		hasPciToEfiMapping = (loadSystemConfig("", &bootInfo->pciConfig, "pci.plist", true) == 0 ? 1 : 0);
-		if (hasPciToEfiMapping) {
-			verbose("pci.plist is found.\n");
-		}
-	}
-
-	if (hasPciToEfiMapping) {
-		// Device ID override injection
-		memset(id_array, sizeof(id_array), 0);
-		sprintf(override_key, "pci%04x,%04x", current->vendor_id, current->device_id);
-		id_count = PciToEfiOverride(override_key, id_array, 4);
-		device = NULL;
-		for (i = 0; i < id_count; i++) {
-			uint8_t fourOctets[4];
-			uint32_t id = id_array[i];
-			if (id == 0) {
-				if (i == 0) {
-					id = current->vendor_id;
-				} else if (i == 1) {
-					id = current->device_id;
-				} else {
-					continue;
-				}
-			}
-
-			fourOctets[0] = id;
-			fourOctets[1] = id >> 8;
-			fourOctets[2] = 0;
-			fourOctets[3] = 0;
-			if (id != 0) {
-				if (device == NULL) {
-					device = devprop_find_device(devicepath);
-					if (device == NULL) {
-						deviceString = devprop_create_string();
-						device = devprop_add_device(deviceString, devicepath);
-					}
-				}
-				devprop_add_value(device, id_keys[i], fourOctets, sizeof(fourOctets));
-				verbose("%s: %s 0x%02x\n", override_key, id_keys[i], id);
-			}
-		}
-		current = current->next;
-	}
-*/ // tennisgeek http://forum.voodooprojects.org/index.php/topic,1333.0.html
 
 	while (current) {
 		devicepath = get_pci_dev_path(current);

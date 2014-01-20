@@ -703,33 +703,25 @@ MatchLibraries( void )
 	ModulePtr  module, module2;
 	long       done;
 
-	do
-	{
+	do {
 		done = 1;
 		module = gModuleHead;
         
-		while (module != 0)
-		{
-			if (module->willLoad == 1)
-			{
+		while (module != 0) {
+			if (module->willLoad == 1) {
 				prop = XMLGetProperty(module->dict, kPropOSBundleLibraries);
 
-				if (prop != 0)
-				{
+				if (prop != 0) {
 					prop = prop->tag;
 
-					while (prop != 0)
-					{
+					while (prop != 0) {
 						module2 = gModuleHead;
 
-						while (module2 != 0)
-						{
+						while (module2 != 0) {
 							prop2 = XMLGetProperty(module2->dict, kPropCFBundleIdentifier);
 
-							if ((prop2 != 0) && (!strcmp(prop->string, prop2->string)))
-							{
-								if (module2->willLoad == 0)
-								{
+							if ((prop2 != 0) && (!strcmp(prop->string, prop2->string))) {
+								if (module2->willLoad == 0) {
 									module2->willLoad = 1;
 								}
 								break;
@@ -763,8 +755,7 @@ FindModule( char * name )
 
 	module = gModuleHead;
 
-	while (module != 0)
-	{
+	while (module != 0) {
 		prop = GetProperty(module->dict, kPropCFBundleIdentifier);
 
 		if ((prop != 0) && !strcmp(name, prop->string)) {
@@ -814,8 +805,7 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
 
-	if ( (required == 0) || (required->type != kTagTypeString) || !strcmp(required->string, "Safe Boot"))
-	{
+	if ( (required == 0) || (required->type != kTagTypeString) || !strcmp(required->string, "Safe Boot")) {
 		XMLFreeTag(moduleDict);
 		return -2;
 	}
@@ -863,20 +853,16 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	getchar();
 #endif
 
-	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
-	{
-		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
-		{
+	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp')) {
+		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) {
 			error("kernel compression is bad\n");
 			return -1;
 		}
 #if NOTDEF
-		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
-		{
+		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name)) {
 			return -1;
 		}
-		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
-		{
+		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path)) {
 			return -1;
 		}
 #endif
@@ -892,16 +878,14 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 		
 		if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-			Adler32(binary, uncompressed_size))
-		{
+			Adler32(binary, uncompressed_size)) {
 			printf("adler mismatch\n");
 			return -1;
 		}
 	}
 	
 	ret = ThinFatFile(&binary, &len);
-	if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
-	{
+	if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64) {
 		archCpuType=CPU_TYPE_I386;
 		ret = ThinFatFile(&binary, &len);
 	}
@@ -910,8 +894,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
 
 	ret = DecodeMachO(binary, rentry, raddr, rsize);
-	if (ret<0 && archCpuType==CPU_TYPE_X86_64)
-	{
+	if (ret<0 && archCpuType==CPU_TYPE_X86_64) {
 		archCpuType=CPU_TYPE_I386;
 		ret = DecodeMachO(binary, rentry, raddr, rsize);
 	}

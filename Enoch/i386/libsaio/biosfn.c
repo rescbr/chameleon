@@ -396,7 +396,6 @@ int biosread(int dev, int cyl, int head, int sec, int num)
 		bb.eax.r.h = 0x00;
 		bios(&bb);
 	}
-
 	return bb.eax.r.h;
 }
 
@@ -903,7 +902,6 @@ bool eisa_present(void)
 		}
 		checked = true;
 	}
-
 	return (isEISA);
 }
 

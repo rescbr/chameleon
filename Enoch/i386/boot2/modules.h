@@ -98,7 +98,6 @@ void			rebase_macho(void* base, char* rebase_stream, UInt32 size);
 void			bind_macho(void* base, UInt8* bind_stream, UInt32 size);
 
 
-
 /********************************************************************************/
 /*	Module Interface														*/
 /********************************************************************************/

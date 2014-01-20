@@ -191,7 +191,7 @@ typedef struct SMBBaseBoard
 	SMBString	product;
 	SMBString	version;
 	SMBString	serialNumber;
-	SMBString	assetTagNumber;
+	SMBString	assetTag;			// Bungo: renamed from assetTagNumber folowing convention
 	SMBByte     featureFlags;			// Collection of flag that identify features of this baseboard
 	SMBString	locationInChassis;
 	SMBWord     chassisHandle;
@@ -231,11 +231,10 @@ typedef struct SMBSystemEnclosure
 {
 	SMB_STRUCT_HEADER               // Type 3
 	SMBString  manufacturer;
-//	SMBByte    type;		Bungo: renamed to chassisType - convention
 	SMBByte    chassisType;		// System Enclosure Indicator
 	SMBString  version;		// Board Number?
 	SMBString  serialNumber;
-	SMBString  assetTagNumber;
+	SMBString  assetTag;		// Bungo: renamed from assetTagNumber folowing convention
 	SMBByte    bootupState;		// State of enclosure when when it was last booted
 	SMBByte    powerSupplyState;	// State of enclosure's power supply when last booted
 	SMBByte    thermalState;	// Thermal state of the enclosure when last booted
@@ -265,9 +264,10 @@ enum {
     kSMBchassisDockingStation           = 0x0C,
     kSMBchassisAllInOne                 = 0x0D,
     kSMBchassisSubNotebook              = 0x0E,
-    // ...
-    kSMBchassisLunchBox                 = 0x10
-    // fill up if needed ;-)
+    // ... fill up if needed ;-)
+    kSMBchassisLunchBox                 = 0x10,
+    // ... fill up if needed ;-)
+    kSMBchassisBladeEnclosing           = 0x1D
 };
 
 /* ============================

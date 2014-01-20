@@ -1125,29 +1125,22 @@ processBootArgument(
                     int *cntRemainingP,         // Output count
                     char *foundVal,             // found value
                     int  foundValSize           // max found value size
-                    )
-{
-    const char *val;
-    int cnt;
-    bool found = false;
+                    ) {
+	const char *val;
+	int cnt;
+	bool found = false;
 
-	if (getValueForBootKey(userString, argName, &val, &cnt))
-	{
+	if (getValueForBootKey(userString, argName, &val, &cnt)) {
 		// Don't copy; these values will be copied at the end of argument processing.
 		found = true;
-	}
-	else if (getValueForBootKey(kernelFlags, argName, &val, &cnt))
-	{
+	} else if (getValueForBootKey(kernelFlags, argName, &val, &cnt)) {
 		// Don't copy; these values will be copied at the end of argument processing.
 		found = true;
-	}
-	else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig))
-	{
+	} else if (getValueForKey(argName, &val, &cnt, &bootInfo->chameleonConfig)) {
 		copyArgument(argName, val, cnt, argP, cntRemainingP);
 		found = true;
 	}
-	if (found && foundVal)
-	{
+	if (found && foundVal) {
 		strlcpy(foundVal, val, foundValSize);
 	}
 	return found;
@@ -1175,15 +1168,13 @@ processBootOptions()
 
 	// Update the unit and partition number.
 
-	if ( gBootVolume )
-	{
-		if (!( gBootVolume->flags & kBVFlagNativeBoot ))
-		{
+	if ( gBootVolume ) {
+		if (!( gBootVolume->flags & kBVFlagNativeBoot )) {
 			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
 			//
 			// Setup edx, and signal intention to chain load the
 			// foreign booter.
-			// 
+			//
 
 			chainbootdev  = gBootVolume->biosdev;
 			chainbootflag = 1;
@@ -1194,167 +1185,169 @@ processBootOptions()
 		setRootVolume(gBootVolume);
 
 	}
-    // If no boot volume fail immediately because we're just going to fail
-    // trying to load the config file anyway.
-    else
-      return -1;
+	// If no boot volume fail immediately because we're just going to fail
+	// trying to load the config file anyway.
+	else {
+		return -1;
+	}
 
-    // Load config table specified by the user, or use the default.
+	// Load config table specified by the user, or use the default.
 
-    if (!getValueForBootKey(cp, "config", &val, &cnt)) {
-      val = 0;
-      cnt = 0;
-    }
+	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+		val = 0;
+		cnt = 0;
+	}
 
-    // Load com.apple.Boot.plist from the selected volume
-    // and use its contents to override default bootConfig.
+	// Load com.apple.Boot.plist from the selected volume
+	// and use its contents to override default bootConfig.
 
 	loadSystemConfig(&bootInfo->bootConfig);    
 	loadChameleonConfig(&bootInfo->chameleonConfig);
 
-    // Use the kernel name specified by the user, or fetch the name
-    // in the config table, or use the default if not specified.
-    // Specifying a kernel name on the command line, or specifying
-    // a non-default kernel name in the config file counts as
-    // overriding the kernel, which causes the kernelcache not
-    // to be used.
+	// Use the kernel name specified by the user, or fetch the name
+	// in the config table, or use the default if not specified.
+	// Specifying a kernel name on the command line, or specifying
+	// a non-default kernel name in the config file counts as
+	// overriding the kernel, which causes the kernelcache not
+	// to be used.
 
-    gOverrideKernel = false;
-    if (( kernel = extractKernelName((char **)&cp) )) {
-        strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
-    } else {
-        if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
-            strlcpy( bootInfo->bootFile, val, cnt+1 );
-        } else {
-            strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
-        }
-    }
+	gOverrideKernel = false;
+	if (( kernel = extractKernelName((char **)&cp) )) {
+		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
+	} else {
+		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+			strlcpy( bootInfo->bootFile, val, cnt+1 );
+		} else {
+			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+		}
+	}
 	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
 		gOverrideKernel = true;
 	}
 
-    cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
-    argP = bootArgs->CommandLine;
+	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
+	argP = bootArgs->CommandLine;
 
 	// Get config kernel flags, if not ignored.
-    if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
+	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
             !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
-        val = "";
-        cnt = 0;
-    }
-    configKernelFlags = malloc(cnt + 1);
-    strlcpy(configKernelFlags, val, cnt + 1);
+		val = "";
+		cnt = 0;
+	}
+	configKernelFlags = malloc(cnt + 1);
+	strlcpy(configKernelFlags, val, cnt + 1);
 
-    // boot-uuid can be set either on the command-line or in the config file
+	// boot-uuid can be set either on the command-line or in the config file
 	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
-        //
-        // Try an alternate method for getting the root UUID on boot helper partitions.
-        //
-        if (gBootVolume->flags & kBVFlagBooter)
-		{
+		//
+		// Try an alternate method for getting the root UUID on boot helper partitions.
+		//
+		if (gBootVolume->flags & kBVFlagBooter) {
 			// Load the configuration store in the boot helper partition
-			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
-        	{
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0) {
 				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
-				if (val != NULL)
+				if (val != NULL) {
 					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
+				}
 			}
-        }
+		}
         
-        // Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+		// Try to get the volume uuid string
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
+		}
          
 		// If we have the volume uuid add it to the commandline arguments
-		if (strlen(gBootUUIDString))
+		if (strlen(gBootUUIDString)) {
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
+		}
 	}
 
-    if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
+	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
-        cnt = 0;
-        if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
-            valueBuffer[0] = '*';
-            cnt++;
-            strlcpy(valueBuffer + 1, val, cnt);
-            val = valueBuffer;
-        } else {
-            if (strlen(gBootUUIDString)) {
-                val = "*uuid";
-                cnt = 5;
-            } else {
-                // Don't set "rd=.." if there is no boot device key
-                // and no UUID.
-                val = "";
-                cnt = 0;
-            }
-        } 
-        if (cnt > 0) {
-            copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
-        }
-        strlcpy( gRootDevice, val, (cnt + 1));
-    }
+		cnt = 0;
+		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
+			valueBuffer[0] = '*';
+			cnt++;
+			strlcpy(valueBuffer + 1, val, cnt);
+			val = valueBuffer;
+		} else {
+			if (strlen(gBootUUIDString)) {
+				val = "*uuid";
+				cnt = 5;
+			} else {
+				// Don't set "rd=.." if there is no boot device key
+				// and no UUID.
+				val = "";
+				cnt = 0;
+			}
+		} 
+		if (cnt > 0) {
+			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+		}
+		strlcpy( gRootDevice, val, (cnt + 1));
+	}
 
-    /*
-     * Removed. We don't need this anymore.
-     *
-    if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
+	/*
+	 * Removed. We don't need this anymore.
+	 *
+	if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
 							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
-        getPlatformName(gPlatformName);
-        copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
-    }
-    */
+		getPlatformName(gPlatformName);
+		copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
+	}
+	*/
 
-    if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
+	if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
         !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-        if (gBootMode & kBootModeSafe) {
-            copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
-        }
-    }
+		if (gBootMode & kBootModeSafe) {
+			copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
+		}
+	}
 
-    // Store the merged kernel flags and boot args.
+	// Store the merged kernel flags and boot args.
 
-    cnt = strlen(configKernelFlags);
-    if (cnt) {
-        if (cnt > cntRemaining) {
-            error("Warning: boot arguments too long, truncating\n");
-            cnt = cntRemaining;
-        }
-        strncpy(argP, configKernelFlags, cnt);
-        argP[cnt++] = ' ';
-        cntRemaining -= cnt;
-    }
-    userCnt = strlen(cp);
-    if (userCnt > cntRemaining) {
-      error("Warning: boot arguments too long, truncating\n");
-      userCnt = cntRemaining;
-    }
-    strncpy(&argP[cnt], cp, userCnt);
-    argP[cnt+userCnt] = '\0';
+	cnt = strlen(configKernelFlags);
+	if (cnt) {
+		if (cnt > cntRemaining) {
+			error("Warning: boot arguments too long, truncating\n");
+			cnt = cntRemaining;
+		}
+		strncpy(argP, configKernelFlags, cnt);
+		argP[cnt++] = ' ';
+		cntRemaining -= cnt;
+	}
+	userCnt = strlen(cp);
+	if (userCnt > cntRemaining) {
+		error("Warning: boot arguments too long, truncating\n");
+		userCnt = cntRemaining;
+	}
+	strncpy(&argP[cnt], cp, userCnt);
+	argP[cnt+userCnt] = '\0';
 
-	if(!shouldboot)
-	{
+	if(!shouldboot) {
 		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
 			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
 		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
 
-        if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
-            gBootMode = kBootModeSafe;
-       }
+		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
+			gBootMode = kBootModeSafe;
+		}
 	}
 
-	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
 		strlcpy(gMKextName, val, cnt + 1);
-	else
+	} else {
 		gMKextName[0]=0;
+	}
 
-    free(configKernelFlags);
-    free(valueBuffer);
+	free(configKernelFlags);
+	free(valueBuffer);
 
-    return 0;
+	return 0;
 }
 
 

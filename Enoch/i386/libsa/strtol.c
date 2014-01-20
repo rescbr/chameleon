@@ -103,26 +103,20 @@ strtol(nptr, endptr, base)
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
-	}
-	else if (c == '+')
-	{
+	} else if (c == '+') {
 		c = *s++;
 	}
 
-	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
-	{
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X')) {
 		c = s[1];
 		s += 2;
 		base = 16;
-	}
-	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
-	{
+	} else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B')) {
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
-	if (base == 0)
-	{
+	if (base == 0) {
 		base = c == '0' ? 8 : 10;
 	}
 
@@ -147,17 +141,19 @@ strtol(nptr, endptr, base)
 	cutlim = cutoff % (unsigned long)base;
 	cutoff /= (unsigned long)base;
 	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
+		if (isdigit(c)) {
 			c -= '0';
-		else if (isalpha(c))
+		} else if (isalpha(c)) {
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		else
+		} else {
 			break;
-		if (c >= base)
+		}
+		if (c >= base) {
 			break;
-		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		}
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
-		else {
+		} else {
 			any = 1;
 			acc *= base;
 			acc += c;
@@ -168,8 +164,9 @@ strtol(nptr, endptr, base)
 //		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
-	if (endptr != 0)
+	if (endptr != 0) {
 		*endptr = (char *)(any ? s - 1 : nptr);
+	}
 	return (acc);
 }
 
@@ -201,52 +198,37 @@ strtoul(nptr, endptr, base)
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
-	}
-	else if (c == '+')
-	{
+	} else if (c == '+') {
 		c = *s++;
 	}
-	if ((base == 0 || base == 16) &&  c == '0' && (*s == 'x' || *s == 'X'))
-	{
+	if ((base == 0 || base == 16) &&  c == '0' && (*s == 'x' || *s == 'X'))	{
 		c = s[1];
 		s += 2;
 		base = 16;
-	}
-	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
-	{
+	} else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B')) {
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
-	if (base == 0)
-	{
+	if (base == 0) {
 		base = c == '0' ? 8 : 10;
 	}
 	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
 	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
 	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
-		{
+		if (isdigit(c)) {
 			c -= '0';
-		}
-		else if (isalpha(c))
-		{
+		} else if (isalpha(c)) {
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		}
-		else
-		{
+		} else {
 			break;
 		}
-		if (c >= base)
-		{
+		if (c >= base) {
 			break;
 		}
-		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
-		{
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
-		}
-		else
-		{
+		} else {
 			any = 1;
 			acc *= base;
 			acc += c;
@@ -255,13 +237,10 @@ strtoul(nptr, endptr, base)
 	if (any < 0) {
 		acc = ULONG_MAX;
 //		errno = ERANGE;
-	}
-	else if (neg)
-	{
+	} else if (neg) {
 		acc = -acc;
 	}
-	if (endptr != 0)
-	{
+	if (endptr != 0) {
 		*endptr = (char *)(any ? s - 1 : nptr);
 	}
 	return (acc);
@@ -297,47 +276,35 @@ strtouq(nptr, endptr, base)
 		c = *s++;
 	} else { 
 		neg = 0;
-		if (c == '+')
-		{
+		if (c == '+') {
 			c = *s++;
 		}
 	}
-	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
-	{
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X')) {
 		c = s[1];
 		s += 2;
 		base = 16;
 	}
-	if (base == 0)
-	{
+	if (base == 0) {
 		base = c == '0' ? 8 : 10;
 	}
 	qbase = (unsigned)base;
 	cutoff = (unsigned long long)UQUAD_MAX / qbase;
 	cutlim = (unsigned long long)UQUAD_MAX % qbase;
 	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
-		{
+		if (isdigit(c)) {
 			c -= '0';
-		}
-		else if (isalpha(c))
-		{
+		} else if (isalpha(c)) {
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		}
-		else
-		{
+		} else {
 			break;
 		}
-		if (c >= base)
-		{
+		if (c >= base) {
 			break;
 		}
-		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
-		{
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
-		}
-		else
-		{
+		} else {
 			any = 1;
 			acc *= qbase;
 			acc += c;
@@ -346,13 +313,10 @@ strtouq(nptr, endptr, base)
 	if (any < 0) {
 		acc = UQUAD_MAX;
 //		errno = ERANGE;
-	}
-	else if (neg)
-	{
+	} else if (neg) {
 		acc = -acc;
 	}
-	if (endptr != 0)
-	{
+	if (endptr != 0) {
 		*endptr = (char *)(any ? s - 1 : nptr);
 	}
 	return (acc);

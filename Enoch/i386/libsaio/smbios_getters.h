@@ -10,7 +10,7 @@
 #define SMBIOS_RANGE_START      0x000F0000
 #define SMBIOS_RANGE_END        0x000FFFFF
 
-#define NOT_AVAILABLE			"N/A"
+#define NOT_AVAILABLE		"N/A"
 
 typedef enum
 {

@@ -80,4 +80,5 @@ void			devprop_free_string(DevPropString *string);
 
 int			devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id);
 int			hex2bin(const char *hex, uint8_t *bin, int len);
+
 #endif /* !__LIBSAIO_DEVICE_INJECT_H */

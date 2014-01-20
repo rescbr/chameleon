@@ -32,15 +32,6 @@
 
 #include <sl.h>
 
-/*
- * Backward compatibility fix for the SDK 10.7 version of loader.h
- */
-
-#ifndef LC_MAIN
-	#define LC_MAIN (0x28|LC_REQ_DYLD) /* replacement for LC_UNIXTHREAD */
-#endif
-
-
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
@@ -63,46 +54,35 @@ long ThinFatFile(void **binary, unsigned long *length)
 	uint32_t fapoffset;
 	uint32_t fapsize;	
   
-	if (fhp->magic == FAT_MAGIC)
-	{
+	if (fhp->magic == FAT_MAGIC) {
 		nfat = fhp->nfat_arch;
 		swapped = 0;
-	}
-	else if (fhp->magic == FAT_CIGAM)
-	{
+	} else if (fhp->magic == FAT_CIGAM) {
 		nfat = OSSwapInt32(fhp->nfat_arch);
 		swapped = 1;
-	}
-	else
-	{
+	} else {
 		return -1;
 	}
 
-	for (; nfat > 0; nfat--, fap++)
-	{
-		if (swapped)
-		{
+	for (; nfat > 0; nfat--, fap++) {
+		if (swapped) {
 			fapcputype = OSSwapInt32(fap->cputype);
 			fapoffset = OSSwapInt32(fap->offset);
 			fapsize = OSSwapInt32(fap->size);
-		}
-		else
-		{
+		} else {
 			fapcputype = fap->cputype;
 			fapoffset = fap->offset;
 			fapsize = fap->size;
 		}
 
-		if (fapcputype == archCpuType)
-		{
+		if (fapcputype == archCpuType) {
 			*binary = (void *) ((unsigned long)*binary + fapoffset);
 			size = fapsize;
 			break;
 		}
 	}
 
-	if (length != 0)
-	{
+	if (length != 0) {
 		*length = size;
 	}
 
@@ -124,6 +104,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	unsigned int entry = 0;
 
 	gBinaryAddress = (unsigned long)binary;
+
 	mH = (struct mach_header *)(gBinaryAddress);
 
 #if DEBUG
@@ -141,8 +122,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	{
 		case CPU_TYPE_I386:
 
-			if (mH->magic != MH_MAGIC)
-			{
+			if (mH->magic != MH_MAGIC) {
 				error("Mach-O file has bad magic number\n");
 				return -1;
 			}
@@ -152,13 +132,11 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		case CPU_TYPE_X86_64:
 
-			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC)
-			{
+			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) {
 				return -1;
 			}
 
-			if (mH->magic != MH_MAGIC_64)
-			{
+			if (mH->magic != MH_MAGIC_64) {
 				error("Mach-O file has bad magic number\n");
 				return -1;
 			}
@@ -182,11 +160,9 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		unsigned int load_addr;
 		unsigned int load_size;
 
-		switch (cmd)
-		{
-			case LC_SEGMENT:
+		switch (cmd) {
 			case LC_SEGMENT_64:
-
+			case LC_SEGMENT:
 			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
 
 			if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR)
@@ -196,7 +172,6 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			}
 			break;
 
-			case LC_MAIN:	/* Mountain Lion's replacement for LC_UNIXTHREAD */
 			case LC_UNIXTHREAD:
 				ret = DecodeUnixThread(cmdBase, &entry);
 			break;
@@ -212,8 +187,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 
 
-	if (ret != 0)
-	{
+	if (ret != 0) {
 		return -1;
 	}
 
@@ -226,15 +200,12 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	cmdBase = cmdstart;
 
-	for (cnt = 0; cnt < ncmds; cnt++)
-{
+	for (cnt = 0; cnt < ncmds; cnt++) {
 	cmd = ((long *)cmdBase)[0];
 	cmdsize = ((long *)cmdBase)[1];
 		
-	if (cmd == LC_SYMTAB)
-        {
-		if (DecodeSymbolTable(cmdBase) != 0)
-		{
+	if (cmd == LC_SYMTAB) {
+		if (DecodeSymbolTable(cmdBase) != 0) {
 			return -1;
 		}
         }
@@ -256,8 +227,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	long   vmsize, filesize;
 	unsigned long vmaddr, fileaddr;
 
-	if (((long *)cmdBase)[0] == LC_SEGMENT_64)
-	{
+	if (((long *)cmdBase)[0] == LC_SEGMENT_64) {
 		struct segment_command_64 *segCmd;
 		segCmd = (struct segment_command_64 *)cmdBase;
 		vmaddr = (segCmd->vmaddr & 0x3fffffff);
@@ -272,9 +242,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
   getchar();
 #endif
-	}
-	else
-	{
+	} else {
 		struct segment_command *segCmd;
 
 		segCmd = (struct segment_command *)cmdBase;
@@ -292,33 +260,28 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 #endif
 	}
 
-	if (vmsize == 0 || filesize == 0)
-	{
+	if (vmsize == 0 || filesize == 0) {
 		*load_addr = ~0;
 		*load_size = 0;
 		return 0;
 	}
 
 		if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
-			 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN))))
-		{
-		stop("Kernel overflows available space");
+			 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
+			stop("Kernel overflows available space");
 		}
 
-		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
-		{
+		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
 			gHaveKernelCache = true;
 		}
 
 	// Copy from file load area.
-	if (vmsize>0 && filesize > 0)
-	{
+	if (vmsize>0 && filesize > 0) {
 		bcopy((char *)fileaddr, (char *)vmaddr, vmsize > filesize ? filesize : vmsize);
 	}
 
 	// Zero space at the end of the segment.
-	if (vmsize > filesize)
-	{
+	if (vmsize > filesize) {
 		bzero((char *)(vmaddr + filesize), vmsize - filesize);
 	}
 
@@ -328,13 +291,11 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	return 0;
 }
 
-
 //==============================================================================
 
 static long DecodeUnixThread(long cmdBase, unsigned int *entry)
 {
-	switch (archCpuType)
-	{
+	switch (archCpuType) {
 		case CPU_TYPE_I386:
 		{
 			i386_thread_state_t *i386ThreadState;

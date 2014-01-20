@@ -107,25 +107,26 @@ char *getVBEInfoString()
 void 
 printVBEModeInfo()
 {
-    VBEInfoBlock     vbeInfo;
-    unsigned short * modePtr;
-    VBEModeInfoBlock modeInfo;
-    int              err;
-    int              line;
-    char*            vbeInfoString = NULL;
+	VBEInfoBlock     vbeInfo;
+	unsigned short * modePtr;
+	VBEModeInfoBlock modeInfo;
+	int              err;
+	int              line;
+	char*            vbeInfoString = NULL;
 
   	bzero( &vbeInfo, sizeof(vbeInfo) );
-    strcpy( (char*)&vbeInfo, "VBE2" );
-    err = getVBEInfo( &vbeInfo );
-    if ( err != errSuccess )
-        return;
+	strcpy( (char*)&vbeInfo, "VBE2" );
+	err = getVBEInfo( &vbeInfo );
+	if ( err != errSuccess ) {
+		return;
+	}
 
-    line = 0;
+	line = 0;
 
-    // Activate and clear page 1
-    setActiveDisplayPage(1);
-    clearScreenRows(0, 24);
-    setCursorPosition( 0, 0, 1 );
+	// Activate and clear page 1
+	setActiveDisplayPage(1);
+	clearScreenRows(0, 24);
+	setCursorPosition( 0, 0, 1 );
 
 	vbeInfoString = getVBEInfoString();
 	if (!vbeInfoString) {

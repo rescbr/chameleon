@@ -159,8 +159,7 @@ DevPropDevice *devprop_add_device(DevPropString *string, char *path)
 	
 	int		i;
 	
-	for(i = 0; i < numpaths; i++)
-	{
+	for(i = 0; i < numpaths; i++) {
 		device->pci_dev_path[i].length = 0x06;
 		device->pci_dev_path[i].type = 0x01;
 		device->pci_dev_path[i].subtype = 0x01;
@@ -196,46 +195,39 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 	}
 	uint32_t length = ((strlen(nm) * 2) + len + (2 * sizeof(uint32_t)) + 2);
 	uint8_t *data = (uint8_t*)malloc(length);
-	{
-		if(!data)
-		{
-			return 0;
-		}
 
-		memset(data, 0, length);
-		uint32_t off= 0;
-		data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
-		data[off] =   ((strlen(nm) * 2) + 6) & 0x00FF;
-		
-		off += 4;
-		uint32_t i=0, l = strlen(nm);
-		for(i = 0 ; i < l ; i++, off += 2)
-		{
-			data[off] = *nm++;
-		}
+	if(!data) {
+		return 0;
+	}
 
-		off += 2;
-		l = len;
-		uint32_t *datalength = (uint32_t*)&data[off];
-		*datalength = (uint32_t)(l + 4);
-		off += 4;
-		for(i = 0 ; i < l ; i++, off++)
-		{
-			data[off] = *vl++;
-		}
+	memset(data, 0, length);
+	uint32_t off= 0;
+	data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
+	data[off] =   ((strlen(nm) * 2) + 6) & 0x00FF;
+
+	off += 4;
+	uint32_t i=0, l = strlen(nm);
+	for(i = 0 ; i < l ; i++, off += 2) {
+		data[off] = *nm++;
+	}
+
+	off += 2;
+	l = len;
+	uint32_t *datalength = (uint32_t*)&data[off];
+	*datalength = (uint32_t)(l + 4);
+	off += 4;
+	for(i = 0 ; i < l ; i++, off++) {
+		data[off] = *vl++;
 	}
 	
 	uint32_t offset = device->length - (24 + (6 * device->num_pci_devpaths));
 	
 	uint8_t *newdata = (uint8_t*)malloc((length + offset));
-	if(!newdata)
-	{
+	if(!newdata) {
 		return 0;
 	}
-	if(device->data)
-	{
-		if(offset > 1)
-		{
+	if(device->data) {
+		if(offset > 1) {
 			memcpy(newdata, device->data, offset);
 		}
 	}
@@ -246,12 +238,9 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 	device->string->length += length;
 	device->numentries++;
 
-	if(!device->data)
-	{
+	if(!device->data) {
 		device->data = (uint8_t*)malloc(sizeof(uint8_t));
-	}
-	else
-	{
+	} else {
 		free(device->data);
 	}
 
@@ -318,18 +307,14 @@ char *devprop_generate_string(DevPropString *string)
 void devprop_free_string(DevPropString *string)
 {
 
-	if(!string)
-	{
+	if(!string) {
 		return;
 	}
 
 	int i;
-	for(i = 0; i < string->numentries; i++)
-	{
-		if(string->entries[i])
-		{
-			if(string->entries[i]->data)
-			{
+	for(i = 0; i < string->numentries; i++) {
+		if(string->entries[i]) {
+			if(string->entries[i]->data) {
 				free(string->entries[i]->data);
 				string->entries[i]->data = NULL;
 			}
@@ -355,8 +340,7 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	int	i;
 	char	buf[3];
 
-	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2)
-	{
+	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
 		printf("[ERROR] bin2hex input error\n");
 		return -1;
 	}
@@ -364,10 +348,8 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	buf[2] = '\0';
 	p = (char *) hex;
 
-	for (i = 0; i < len; i++)
-	{
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
-		{
+	for (i = 0; i < len; i++) {
+		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
 			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
 			return -2;
 		}

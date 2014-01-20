@@ -151,8 +151,7 @@ MD5Update (context, input, inputLen)
 	index = (unsigned int)((context->count[0] >> 3) & 0x3F);
 
 	/* Update number of bits */
-	if ((context->count[0] += ((u_int32_t)inputLen << 3)) < ((u_int32_t)inputLen << 3))
-	{
+	if ((context->count[0] += ((u_int32_t)inputLen << 3)) < ((u_int32_t)inputLen << 3)) {
 		context->count[1]++;
 	}
 
@@ -162,19 +161,18 @@ MD5Update (context, input, inputLen)
 
 	/* Transform as many times as possible. */
 
-	if (inputLen >= partLen)
-	{
+	if (inputLen >= partLen) {
 		memcpy((void *)&context->buffer[index], (const void *)input,
 		    partLen);
 		MD5Transform (context->state, context->buffer);
 
-		for (i = partLen; i + 63 < inputLen; i += 64)
+		for (i = partLen; i + 63 < inputLen; i += 64) {
 			MD5Transform (context->state, &((const unsigned char *)input)[i]);
-
+		}
 		index = 0;
-	}
-	else
+	} else {
 		i = 0;
+	}
 
 	/* Buffer remaining input */
 	memcpy ((void *)&context->buffer[index], (const void *)&((const unsigned char*)input)[i],

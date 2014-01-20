@@ -179,7 +179,6 @@
 #define kHDAEnabler		"HDAEnabler"		/* pci_setup.c */
 #define kHDEFLayoutID		"HDEFLayoutID"		/* hda.c */
 #define kHDAULayoutID		"HDAULayoutID"		/* hda.c */
-//#define kHDAPinConf		"HDEFPinConfiguration"	/* hda.c */
 #define kBGRT			"BGRT"			/* acpi_patcher.c */
 #define kDropBGRT		"DropBGRT"		/* acpi_patcher.c */
 #define kDropMCFG		"DropMCFG"		/* acpi_patcher.c */
@@ -187,6 +186,10 @@
 
 /* Karas: added these keys */
 #define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
+
+/* Bungo: added these keys */
+// mask private data or no
+#define kPrivateData		"PrivateData"		/* smbios_decode.c */
 
 /*
  * Flags to the booter or kernel

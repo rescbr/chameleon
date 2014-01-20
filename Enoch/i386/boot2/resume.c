@@ -28,10 +28,8 @@ getmemorylimit(void)
   
 	// Activate and clear page 1
 	line = 1;
-	for (i = 0; i < bootInfo->memoryMapCount; i++)
-	{
-		if((mp->type == 1) && ((unsigned long)mp->base == 0x100000))
-		{
+	for (i = 0; i < bootInfo->memoryMapCount; i++) {
+		if((mp->type == 1) && ((unsigned long)mp->base == 0x100000)) {
 			return (unsigned long)(mp->base + mp->length);
 		}
 		mp++;
@@ -69,8 +67,7 @@ static void WakeKernel(IOHibernateImageHeader * header)
 		lowHalf = 1;
 		highHalf = 0;
 
-		for (cnt = 0; cnt < compressedSize; cnt += 0x20)
-		{
+		for (cnt = 0; cnt < compressedSize; cnt += 0x20) {
 			dst[0] = src[0];
 			dst[1] = src[1];
 			dst[2] = src[2];
