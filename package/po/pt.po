@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-12-29 11:59+0000\n"
-"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
+"PO-Revision-Date: 2014-01-21 15:36+0000\n"
+"Last-Translator: artur_pt <artursimoes.pt@gmail.com>\n"
 "Language-Team: pt-PT <pt-PT@li.org>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388318373.0\n"
+"X-POOTLE-MTIME: 1390318613.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -703,7 +703,7 @@ msgstr "ForceFullMemInfo=Yes"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "Força Tabela 17 SMBIOS tamanho 27 bytes"
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:147
