@@ -64,6 +64,8 @@
 #define kSMBBaseBoardSerialNumberKey                "SMboardserial"        // C02140302D5DMT31M
 #define kSMBBaseBoardAssetTagKey                    "SMboardassettag"      // Base Board Asset Tag# Bungo: renamed folowing convention
 #define kSMBBaseBoardLocationInChassisKey           "SMboardlocation"      // Part Component
+
+// ErmaC BoardType 0x0a(10) or 0x0b(11) MacPro Family
 #define kSMBBaseBoardTypeKey                        "SMboardtype"          // 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
 
 // Bungo

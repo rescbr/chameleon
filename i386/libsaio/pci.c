@@ -79,7 +79,7 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 		for (func = 0; func < 8; func++) {
 			pci_addr = PCIADDR(bus, dev, func);
 			id = pci_config_read32(pci_addr, PCI_VENDOR_ID);
-			if (!id || id == 0xffffffff) {
+			if (!id || id == 0xfffffffful) {
 				continue;
 			}
 			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));

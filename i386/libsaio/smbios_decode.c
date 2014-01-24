@@ -55,15 +55,15 @@ char *SMBStringForField(SMBStructHeader *structHeader, uint8_t field, const bool
  ===*/
 static const char *SMBWakeUpTypes[] =  // Bungo: strings for wake-up type (Table Type 1 - System Information)
 {
-    "Reserved",                     /* 0x00 */
-    "Other",
-    "Unknown",
-    "APM Timer",
-    "Modem Ring",
-    "LAN Remote",
-    "Power Switch",
-    "PCI PME#",
-    "AC Power Restored"             /* 0x08 */
+	"Reserved",          /* 00h */
+	"Other",             /* 01h */
+	"Unknown",           /* 02h */
+	"APM Timer",         /* 03h */
+	"Modem Ring",        /* 04h */
+	"LAN Remote",        /* 05h */
+	"Power Switch",      /* 06h */
+	"PCI PME#",          /* 07h */
+	"AC Power Restored"  /* 08h */
 };
 
 /*====
@@ -71,19 +71,19 @@ static const char *SMBWakeUpTypes[] =  // Bungo: strings for wake-up type (Table
  ===*/
 static const char *SMBBaseBoardTypes[] =  // Bungo: strings for base board type (Table Type 2 - Base Board Information)
 {
-    "Unknown",                      /* 0x01 */
-    "Other",
-    "Server Blade",
-    "Connectivity Switch",
-    "System Management Module",
-    "Processor Module",
-    "I/O Module",
-    "Memory Module",
-    "Daughter Board",
-    "Motherboard",
-    "Processor+Memory Module",
-    "Processor+I/O Module",
-    "Interconnect Board"            /* 0x0D */
+	"Unknown",                  /* 01h */
+	"Other",                    /* 02h */
+	"Server Blade",             /* 03h */
+	"Connectivity Switch",      /* 04h */
+	"System Management Module", /* 05h */
+	"Processor Module",         /* 06h */
+	"I/O Module",               /* 07h */
+	"Memory Module",            /* 08h */
+	"Daughter Board",           /* 09h */
+	"Motherboard",              /* 0Ah */
+	"Processor+Memory Module",  /* 0Bh */
+	"Processor+I/O Module",     /* 0Ch */
+	"Interconnect Board"        /* 0Dh */
 };
 
  /*===
@@ -91,36 +91,87 @@ static const char *SMBBaseBoardTypes[] =  // Bungo: strings for base board type 
  ===*/
 static const char *SMBChassisTypes[] =  // Bungo: strings for chassis type (Table Type 3 - Chassis Information)
 {
-    "Other",                        /* 0x01 */
-    "Unknown",
-    "Desktop",
-    "Low Profile Desktop",
-    "Pizza Box",
-    "Mini Tower",
-    "Tower",
-    "Portable",
-    "Laptop",
-    "Notebook",
-    "Hand Held",
-    "Docking Station",
-    "All in One",
-    "Sub Notebook",
-    "Space-saving",
-    "Lunch Box",
-    "Main Server Chassis",
-    "Expansion Chassis",
-    "Sub Chassis",
-    "Bus Expansion Chassis",
-    "Peripheral Chassis",
-    "RAID Chassis",
-    "Rack Mount Chassis",
-    "Sealed-case PC",
-    "Multi-system Chassis",
-    "Compact PCI",
-    "Advanced TCA",
-    "Blade",
-    "Blade Enclosing"               /* 0x1D */
+	"Other",                /* 01h */
+	"Unknown",              /* 02h */
+	"Desktop",              /* 03h */
+	"Low Profile Desktop",  /* 04h */
+	"Pizza Box",            /* 05h */
+	"Mini Tower",           /* 06h */
+	"Tower",                /* 07h */
+	"Portable",             /* 08h */
+	"Laptop",               /* 09h */
+	"Notebook",             /* 0Ah */
+	"Hand Held",            /* 0Bh */
+	"Docking Station",      /* 0Ch */
+	"All in One",           /* 0Dh */
+	"Sub Notebook",         /* 0Eh */
+	"Space-saving",         /* 0Fh */
+	"Lunch Box",		/* 10h */
+	"Main Server Chassis",	/* 11h */
+	"Expansion Chassis",	/* 12h */
+	"SubChassis",		/* 13h */
+	"Bus Expansion Chassis",/* 14h */
+	"Peripheral Chassis",	/* 15h */
+	"RAID Chassis",		/* 16h */
+	"Rack Mount Chassis",   /* 17h */
+	"Sealed-case PC",	/* 18h */
+	"Multi-system Chassis", /* 19h */
+	"Compact PCI",		/* 1Ah */
+	"Advanced TCA",		/* 1Bh */
+	"Blade",		/* 1Ch */ // An SMBIOS implementation for a Blade would contain a Type 3 Chassis structure
+	"Blade Enclosing"	/* 1Dh */ // A Blade Enclosure is a specialized chassis that contains a set of Blades.
 };
+
+/*====
+ 7.5.5
+ ===*/
+/*static const char *SMBCpuSocket[] =  // ErmaC: strings for (Table Type 4 - Processor Information )
+{
+	"Other",                // 01h
+    "Unknown",
+    "Daughter Board",
+    "ZIF Socket",
+    "Replaceable Piggy Back",
+    "None",
+    "LIF Socket",
+    "Slot 1",
+    "Slot 2",
+    "370-pin Socket",
+    "Slot A",
+    "Slot M",
+    "Socket 423",
+    "Socket A (Socket 462)",
+    "Socket 478",
+    "Socket 754",
+    "Socket 940",
+    "Socket 939",
+    "Socket mPGA604",
+    "Socket LGA771",
+    "Socket LGA775",
+    "Socket S1",
+    "Socket AM2",
+    "Socket F (1207)",
+    "Socket LGA1366",
+    "Socket G34",
+    "Socket AM3",
+    "Socket C32",
+    "Socket LGA1156",
+    "Socket LGA1567",
+    "Socket PGA988A",
+    "Socket BGA1288",
+    "Socket rPGA988B",
+    "Socket BGA1023",
+    "Socket BGA1224",
+    "Socket BGA1155",
+    "Socket LGA1356",
+    "Socket LGA2011",
+    "Socket FS1",
+    "Socket FS2",
+    "Socket FM1",
+    "Socket FM2",
+    "Socket LGA2011-3",
+    "Socket LGA1356-3"	// 2Ch
+};*/
 
 /*=====
  7.18.2
@@ -207,7 +258,7 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 		}
 	}
 
-	if ((structHeader->wakeupReason < 0) || (structHeader->wakeupReason > 8)) {
+	if (structHeader->wakeupReason > 8) {
 		DBG("\tWake-up Type: %s\n", OutOfSpecStr);
 	} else {
 		DBG("\tWake-up Type: %s\n", SMBWakeUpTypes[structHeader->wakeupReason]);
@@ -358,7 +409,7 @@ void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 void decodeOemProcessorType(SMBOemProcessorType *structHeader)
 {
 	DBG("Apple specific Processor Type:\n");
-	DBG("\tcpu-type: 0x%x\n", ((SMBOemProcessorType *)structHeader)->ProcessorType);
+	DBG("\tCpu-type: 0x%x\n", ((SMBOemProcessorType *)structHeader)->ProcessorType);
 	DBG("\n");
 }
 
@@ -427,6 +478,8 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				decodeMemoryDevice((SMBMemoryDevice *)structHeader);
 				break;
 
+			//kSMBTypeMemoryArrayMappedAddress: // Type 19
+
 			/* Skip all Apple Specific Structures */
 			case kSMBTypeFirmwareVolume: // Type 128
 			case kSMBTypeMemorySPD: // Type 130
@@ -439,6 +492,8 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 			case kSMBTypeOemProcessorBusSpeed: // Type 132
 				decodeOemProcessorBusSpeed((SMBOemProcessorBusSpeed *)structHeader);
 				break;
+
+			//kSMBTypeOemPlatformFeature: // Type 133
 
 			case kSMBTypeEndOfTable: // Type 127
 				/* Skip, to be added at the end */
