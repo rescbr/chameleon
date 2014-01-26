@@ -59,15 +59,15 @@ static network_device known_ethernet_cards[] =
 //    { 0x0000, 0x0000, "Unknown" },
 //    8169
 //    { 0x10EC, 0x8169, "Realtek 8169/8110 Gigabit Ethernet" },
-    { 0x10EC, 0x8168, "Realtek RTL8111/8168 PCI Express Gigabit Ethernet" },
+	{ 0x10EC, 0x8168, "Realtek RTL8111/8168 PCI-E Gigabit Ethernet" },
 //    { 0x10EC, 0x8167, "Realtek 8169/8110 Gigabit Ethernet" },
-    { 0x10EC, 0x8136, "Realtek RTL8101E/RTL8102E PCI Express Fast Ethernet Controller" },
+	{ 0x10EC, 0x8136, "Realtek RTL8101E/RTL8102E PCI-E Fast Ethernet Controller" },
 //    8139
 //    { 0x10EC, 0x8139, "Realtek RTL8139/810x Family Fast Ethernet" },
 //    { 0x1186, 0x1300, "Realtek RTL8139/810x Family Fast Ethernet" },
 //    { 0x1113, 0x1211, "Realtek RTL8139/810x Family Fast Ethernet" },
-    { 0x11AB, 0x4364, "Marvell Yukon Gigabit Adapter 88E8056 Singleport Copper SA" },
-    { 0x11AB, 0x4320, "Marvell Yukon Gigabit Adapter 88E8001 Singleport Copper SA" },
+	{ 0x11AB, 0x4320, "Marvell Yukon Gigabit Adapter 88E8001 Singleport Copper SA" },
+	{ 0x11AB, 0x4364, "Marvell Yukon Gigabit Adapter 88E8056 Singleport Copper SA" },
 //    Broadcom 57XX
 //    { 0x14e4, 0x1600, "Broadcom 5751 Ethernet" },
 //    { 0x14e4, 0x1659, "Broadcom 57XX Ethernet" },
@@ -85,12 +85,16 @@ static network_device known_ethernet_cards[] =
 //    { 0x14e4, 0x16B5, "BCM57785 Gigabit Ethernet PCIe" },
 //    { 0x14e4, 0x1712, "BCM5906 NetLink (TM) Fast Ethernet" },
 //    { 0x14e4, 0x1713, "BCM5906M NetLink (TM) Fast Ethernet" },
+	{ 0x1969, 0x1026, "Atheros AR8121/AR8113/AR8114 Ethernet" },
+	{ 0x1969, 0x1083, "Atheros GbE LAN chip (10/100/1000 Mbit)" },
+	{ 0x197B, 0x0250, "JMicron PCI Express Gigabit Ethernet Adapter (10/1000MBit)" },
 //    Intel 8255x Ethernet
 //    { 0x8086, 0x1051, "Intel 8255x Ethernet" },
 //    { 0x8086, 0x1050, "Intel 8255x Ethernet" },
 //    { 0x8086, 0x1029, "Intel 8255x Ethernet" },
 //    { 0x8086, 0x1030, "Intel 8255x Ethernet" },
-    { 0x8086, 0x10CE, "Intel(R) 82567V-2 PCI Express Gigabit Network" },
+	{ 0x8086, 0x10CE, "Intel(R) 82567V-2 PCI-E Gigabit Network" },
+	{ 0x8086, 0x10D3, "Intel(R) 82574L Gigabit Network Connection" },
 //    { 0x8086, 0x1209, "Intel 8255x Ethernet" },
 //    { 0x8086, 0x1227, "Intel 8255x Ethernet" },
 //    { 0x8086, 0x1228, "Intel 8255x Ethernet" },
@@ -103,7 +107,6 @@ static network_device known_ethernet_cards[] =
 //    { 0x8086, 0x1060, "Intel 8255x Ethernet" },
 //    Atheros AR8151 Ethernet
 //    { 0x1969, 0x1083, "Qualcomm Atheros AR8151 v2.0 Gigabit Ethernet" },
-	{ 0x1969, 0x1026, "Atheros AR8121/AR8113/AR8114 Ethernet" },
 };
 
 static network_device generic_ethernet_cards[] =

@@ -589,8 +589,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
     // if (platformCPUFeature(CPU_FEATURE_MOBILE)) Bungo: doesn't recognise correctly
 	if (PlatformType == 2)  // this method works
 	{
-		if (Platform.CPU.NoCores > 1)
-		{
+		if (Platform.CPU.NoCores > 1) {
 			defaultSystemInfo.productName    = kDefaultMacBookPro;
 			defaultBIOSInfo.version          = kDefaultMacBookProBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookProBIOSReleaseDate;
@@ -598,9 +597,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.product         = kDefaultMacBookProBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
-		}
-		else
-		{
+		} else {
 			defaultSystemInfo.productName    = kDefaultMacBook;
 			defaultBIOSInfo.version          = kDefaultMacBookBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookBIOSReleaseDate;
@@ -609,9 +606,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
 		}
-	}
-	else
-	{
+	} else {
 		switch (Platform.CPU.NoCores)
 		{
 			case 1:
@@ -808,9 +803,7 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
 				{
 					break;
-				}
-				else
-				{
+				} else {
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
 					{
 						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
@@ -1224,6 +1217,9 @@ void setupSMBIOSTable(void)
 	free(structPtr);
 
 	decodeSMBIOSTable(neweps);
+
+	DBG("SMBIOS orig was = %x\n", origeps);
+	DBG("SMBIOS new is = %x\n", neweps);
 }
 
 void *getSmbios(int which)

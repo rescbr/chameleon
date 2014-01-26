@@ -576,7 +576,7 @@ uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 			case AML_CHUNK_DEVICE:
 				offset = aml_write_byte(AML_CHUNK_OP, buffer, offset);
 				offset = aml_write_byte(node->Type, buffer, offset);
-				offset = aml_write_size(node->Size-3, buffer, offset);
+				offset = aml_write_size(node->Size-2, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 

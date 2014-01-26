@@ -145,16 +145,16 @@ typedef struct _PlatformInfo_t {
 		uint32_t		NoCores;				// No Cores per Package
 		uint32_t		NoThreads;				// Threads per Package
 		uint8_t			MaxCoef;				// Max Multiplier
-		uint8_t			MaxDiv;
+		uint8_t			MaxDiv;					// Min Multiplier
 		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;			// TSC Frequency Hz
-		uint64_t		FSBFrequency;			// FSB Frequency Hz
-		uint64_t		CPUFrequency;			// CPU Frequency Hz
+		uint64_t		TSCFrequency;				// TSC Frequency Hz
+		uint64_t		FSBFrequency;				// FSB Frequency Hz
+		uint64_t		CPUFrequency;				// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
-		char			BrandString[48];		// 48 Byte Branding String
-		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
+		char			BrandString[48];			// 48 Byte Branding String
+		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
 	} CPU;
 
 	struct RAM {

@@ -169,6 +169,7 @@
 
 /* ErmaC: added these keys */
 #define kEnableDualLink		"EnableDualLink"	/* ati.c && nvidia.c && gma.c*/
+#define kNvidiaGeneric		"NvidiaGeneric"		/* nvidia.c */
 #define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
 #define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
 #define kSkipAtiGfx		"SkipAtiGfx"		/* pci_setup.c */

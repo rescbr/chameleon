@@ -297,10 +297,10 @@ typedef struct SMBProcessorInformation
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.5+ spec
-//	SMBByte    coreCount;
-//	SMBByte    coreEnabled;
-//	SMBByte    threadCount;
+	// 2.5+ spec (38 bytes)
+	SMBByte    coreCount;
+	SMBByte    coreEnabled;
+	SMBByte    threadCount;
 //	SMBWord    processorCharacteristics;
 	// 2.6+ spec
 //	SMBWord    processorFamily2;
@@ -311,6 +311,19 @@ typedef struct SMBProcessorInformation
 /* =======================================================================
  Memory Controller Information (Type 5) Obsoleted since SMBIOS version 2.1
  ========================================================================= */
+
+typedef struct SMBMemoryControllerInfo {
+	SMB_STRUCT_HEADER 
+	SMBByte			errorDetectingMethod;
+	SMBByte			errorCorrectingCapability;
+	SMBByte			supportedInterleave;
+	SMBByte			currentInterleave;
+	SMBByte			maxMemoryModuleSize;
+	SMBWord			supportedSpeeds;
+	SMBWord			supportedMemoryTypes;
+	SMBByte			memoryModuleVoltage;
+	SMBByte			numberOfMemorySlots;
+} __attribute__((packed)) SMBMemoryControllerInfo;
 
 /* ===================================================================
  Memory Module Information (Type 6) Obsoleted since SMBIOS version 2.1

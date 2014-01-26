@@ -919,6 +919,7 @@ GetNextTag( char * buffer, char ** tag, long * start )
 	if (!c) {
 		return -1;
 	}
+
 	/* tagStart points just past the '<' */
 	/* Find the end of the tag. */
 	tagEnd = tagStart;
