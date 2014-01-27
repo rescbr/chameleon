@@ -392,8 +392,11 @@ void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 	DBG("Memory Device:\n");
 	DBG("\tDevice Locator: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->deviceLocator, neverMask));
 	DBG("\tBank Locator: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->bankLocator, neverMask));
-	DBG("\tMemory Type: %s\n", SMBMemoryDeviceTypes[structHeader->memoryType]);
-
+	if (structHeader->memoryType > kSMBMemoryDeviceTypeCount) {
+		DBG("\tMemory Type: %s\n", OutOfSpecStr);
+	} else {
+		DBG("\tMemory Type: %s\n", SMBMemoryDeviceTypes[structHeader->memoryType]);
+	}
 	if (minorVersion < 0x03 || structHeader->header.length < 0x1B) {
 		return;
 	}
@@ -469,11 +472,15 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				decodeProcessorInformation((SMBProcessorInformation *)structHeader);
 				break;
 
-			//case 6: // kSMBTypeMemoryModule: // Type 6
+			//case kSMBTypeMemoryModule: // Type 6
 			//	decodeMemoryModule((SMBMemoryModule *)structHeader);
 			//	break;
 
-			//case 11: // kSMBOEMStrings: // Type 11
+			//case kSMBTypeSystemSlot: // Type 9
+			//	decodeSMBTypeSystemSlot((SMBOEMStrings *)structHeader);
+			//	break;
+
+			//case kSMBOEMStrings: // Type 11
 			//	decodeSMBOEMStrings((SMBOEMStrings *)structHeader);
 			//	break;
 
@@ -482,6 +489,7 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				break;
 
 			//kSMBTypeMemoryArrayMappedAddress: // Type 19
+			//	break;
 
 			/* Skip all Apple Specific Structures */
 			case kSMBTypeFirmwareVolume: // Type 128
@@ -497,6 +505,8 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				break;
 
 			//kSMBTypeOemPlatformFeature: // Type 133
+
+			//	break;
 
 			case kSMBTypeEndOfTable: // Type 127
 				/* Skip, to be added at the end */
