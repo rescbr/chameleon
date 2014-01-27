@@ -16,15 +16,6 @@ extern void scan_cpu(PlatformInfo_t *);
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
-#define	MSR_IA32_PERF_STATUS	0x00000198
-#define MSR_IA32_PERF_CONTROL	0x199
-#define MSR_IA32_EXT_CONFIG	0x00EE
-#define MSR_FLEX_RATIO		0x194
-#define MSR_TURBO_RATIO_LIMIT	0x1AD
-#define	MSR_PLATFORM_INFO	0xCE
-#define MSR_CORE_THREAD_COUNT	0x35			// Undocumented
-#define MSR_IA32_PLATFORM_ID	0x17
-
 /*
  * The CPUID_FEATURE_XXX values define 64-bit values
  * returned in %ecx:%edx to a CPUID request with %eax of 1: 

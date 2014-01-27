@@ -124,21 +124,18 @@ static uint64_t measure_tsc_frequency(void)
 		pollCount = poll_PIT2_gate();
 		tscEnd = rdtsc64();
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1)
-		{
+		if (pollCount <= 1) {
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the TSC delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC)
-		{
+		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC) {
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (tscEnd - tscStart) < tscDelta )
-		{
+		if ( (tscEnd - tscStart) < tscDelta ) {
 			tscDelta = tscEnd - tscStart;
 		}
 	}
@@ -155,12 +152,9 @@ static uint64_t measure_tsc_frequency(void)
 	 * arithmetic headroom. For now, 32-bit should be enough.
 	 * Also unlike Linux, our compiler can do 64-bit integer arithmetic.
 	 */
-	if (tscDelta > (1ULL<<32))
-	{
+	if (tscDelta > (1ULL<<32)) {
 		retval = 0;
-	}
-	else
-	{
+	} else {
 		retval = tscDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -198,21 +192,18 @@ static uint64_t measure_aperf_frequency(void)
 		pollCount = poll_PIT2_gate();
 		aperfEnd = rdmsr64(MSR_AMD_APERF);
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1)
-		{
+		if (pollCount <= 1) {
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the APERF delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
-		{
+		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC) {
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (aperfEnd - aperfStart) < aperfDelta )
-		{
+		if ( (aperfEnd - aperfStart) < aperfDelta ) {
 			aperfDelta = aperfEnd - aperfStart;
 		}
 	}
@@ -220,12 +211,9 @@ static uint64_t measure_aperf_frequency(void)
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
 	
-	if (aperfDelta > (1ULL<<32))
-	{
+	if (aperfDelta > (1ULL<<32)) {
 		retval = 0;
-	}
-	else
-	{
+	} else {
 		retval = aperfDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -542,8 +530,7 @@ void scan_cpu(PlatformInfo_t *p)
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
-				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1)
-				{
+				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1) {
 					//uint64_t mperf = measure_mperf_frequency();
 					uint64_t aperf = measure_aperf_frequency();
 					cpuFrequency = aperf;
