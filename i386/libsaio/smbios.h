@@ -297,7 +297,7 @@ typedef struct SMBProcessorInformation
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.5+ spec
+	// 2.5+ spec (38 bytes)
 //	SMBByte    coreCount;
 //	SMBByte    coreEnabled;
 //	SMBByte    threadCount;

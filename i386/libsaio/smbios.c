@@ -476,7 +476,7 @@ static SMBWord structureCount	= 0;
 //#define kDefaultMacBookProIvyBoardProduct		"Mac-AFD8A9D944EA4843"
 //#define kDefaultMacBookProIvyBIOSReleaseDate		"10/02/2012"
 
-// MacBookPro11,2 - Mac-3CBD00234E554E41 - MBP112.88Z.0138.B02.1310181745
+// MacBookPro11,2 - Mac-3CBD00234E554E41 - MBP112.88Z.0138.B03.1310291227
 // MacBookPro11,3 - Mac-2BD1B31983FE1663 - MBP112.88Z.0138.B02.1310181745
 
 //=========== iMac ===========
@@ -484,7 +484,7 @@ static SMBWord structureCount	= 0;
 //#define kDefaultiMacBoardAssetTagNumber		"iMac-Aluminum"
 
 #define kDefaultiMac					"iMac8,1"
-#define kDefaultiMacBIOSVersion				"    IM81.88Z.00C1.B00.0802091538"
+#define kDefaultiMacBIOSVersion				"    IM81.88Z.00C1.B00.0903051113"
 #define kDefaultiMacBIOSReleaseDate			"02/09/08"
 #define kDefaultiMacBoardProduct			"Mac-F227BEC8"
 
@@ -589,8 +589,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
     // if (platformCPUFeature(CPU_FEATURE_MOBILE)) Bungo: doesn't recognise correctly
 	if (PlatformType == 2)  // this method works
 	{
-		if (Platform.CPU.NoCores > 1)
-		{
+		if (Platform.CPU.NoCores > 1) {
 			defaultSystemInfo.productName    = kDefaultMacBookPro;
 			defaultBIOSInfo.version          = kDefaultMacBookProBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookProBIOSReleaseDate;
@@ -598,9 +597,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.product         = kDefaultMacBookProBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
-		}
-		else
-		{
+		} else {
 			defaultSystemInfo.productName    = kDefaultMacBook;
 			defaultBIOSInfo.version          = kDefaultMacBookBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookBIOSReleaseDate;
@@ -609,9 +606,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
 		}
-	}
-	else
-	{
+	} else {
 		switch (Platform.CPU.NoCores)
 		{
 			case 1:
@@ -808,9 +803,7 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
 				{
 					break;
-				}
-				else
-				{
+				} else {
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
 					{
 						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
@@ -1224,6 +1217,9 @@ void setupSMBIOSTable(void)
 	free(structPtr);
 
 	decodeSMBIOSTable(neweps);
+
+	DBG("SMBIOS orig was = %x\n", origeps);
+	DBG("SMBIOS new is = %x\n", neweps);
 }
 
 void *getSmbios(int which)

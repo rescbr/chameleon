@@ -40,16 +40,16 @@ bool getProcessorInformationExternalClock(returnType *value)
 						value->word = 0;
 						break;
 					default:
-						value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000);
+						value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
 				}
 			}
 				break;
 
 			default:
-				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000);
+				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
 		}
 	} else {
-		value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000);
+		value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
 	}
 
 	return true;
@@ -57,7 +57,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 
 bool getProcessorInformationMaximumClock(returnType *value)
 {
-	value->word = (uint16_t)(Platform.CPU.CPUFrequency/1000000);
+	value->word = (uint16_t)(Platform.CPU.CPUFrequency/1000000LL);
 	return true;
 }
 
@@ -113,7 +113,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
 						qpimult &= 0x7F;
 						DBG("qpimult %d\n", qpimult);
-						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000));
+						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
 						// Rek: rounding decimals to match original mac profile info
 						if (qpibusspeed%100 != 0) {
 							qpibusspeed = ((qpibusspeed+50)/100)*100;

@@ -243,7 +243,7 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 	DBG("\tVersion: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->version, neverMask));
 	DBG("\tSerial Number: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber, privateData));
 
-	if (minorVersion < 1 || structHeader->header.length < 25) {
+	if (minorVersion < 0x01 || structHeader->header.length < 0x19) {
 		return;
 	}
 
@@ -263,7 +263,7 @@ void decodeSystemInformation(SMBSystemInformation *structHeader)
 	} else {
 		DBG("\tWake-up Type: %s\n", SMBWakeUpTypes[structHeader->wakeupReason]);
 	}
-	if (minorVersion < 4 || structHeader->header.length < 27) {
+	if (minorVersion < 0x04 || structHeader->header.length < 0x1B) {
 		return;
 	}
 
@@ -349,6 +349,9 @@ void decodeProcessorInformation(SMBProcessorInformation *structHeader)
 	DBG("\tSerial Number: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->assetTag, neverMask));
 	DBG("\tPart Number: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->partNumber, neverMask));
+//	DBG("\tCore Count: %d\n", structHeader->coreCount);
+//	DBG("\tCore Enabled: %d\n", structHeader->coreEnabled);
+//	DBG("\tThread Count: %d\n", structHeader->threadCount);
 //	DBG("\tProcessor Family 2: %d\n", structHeader->processorFamily2);
 	DBG("\n");
 }
@@ -391,7 +394,7 @@ void decodeMemoryDevice(SMBMemoryDevice *structHeader)
 	DBG("\tBank Locator: %s\n", SMBStringForField((SMBStructHeader *)structHeader, structHeader->bankLocator, neverMask));
 	DBG("\tMemory Type: %s\n", SMBMemoryDeviceTypes[structHeader->memoryType]);
 
-	if (minorVersion < 3 || structHeader->header.length < 27) {
+	if (minorVersion < 0x03 || structHeader->header.length < 0x1B) {
 		return;
 	}
 	DBG("\tSpeed: %d MHz\n", structHeader->memorySpeed);
