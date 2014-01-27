@@ -443,7 +443,8 @@ static const char SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
-
+static const char DEV_PATH_SUP[] = "DevicePathsSupported";
+static uint32_t DevPathSup = 1;
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
@@ -567,12 +568,9 @@ void setupEfiDeviceTree(void)
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
 
-	if (archCpuType == CPU_TYPE_I386)
-	{
+	if (archCpuType == CPU_TYPE_I386) {
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
-	}
-	else
-	{
+	} else {
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
 	}
 
@@ -585,17 +583,14 @@ void setupEfiDeviceTree(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 
-	if (archCpuType == CPU_TYPE_I386)
-	{
+	if (archCpuType == CPU_TYPE_I386) {
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
 
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
-	}
-	else
-	{
+	} else {
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
 	}
 
@@ -610,21 +605,20 @@ void setupEfiDeviceTree(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 
-	if (Platform.CPU.FSBFrequency != 0)
-	{
+	if (Platform.CPU.FSBFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
 	}
 
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform.CPU.TSCFrequency != 0)
-	{
+	if (Platform.CPU.TSCFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 	}
 
-	if (Platform.CPU.CPUFrequency != 0)
-	{
+	if (Platform.CPU.CPUFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
+
+	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(uint32_t), &DevPathSup);
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
