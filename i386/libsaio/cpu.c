@@ -419,7 +419,7 @@ void scan_cpu(PlatformInfo_t *p)
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE_XEON	||
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE  ||
 										  p->CPU.Model == CPU_MODEL_HASWELL  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL_MB  ||
+										  p->CPU.Model == CPU_MODEL_HASWELL_SVR  ||
 										  //p->CPU.Model == CPU_MODEL_HASWELL_H  ||
 										  p->CPU.Model == CPU_MODEL_HASWELL_ULT  ||
 										  p->CPU.Model == CPU_MODEL_CRYSTALWELL ))

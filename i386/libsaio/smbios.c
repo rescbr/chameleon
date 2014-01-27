@@ -950,7 +950,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPU_MODEL_IVYBRIDGE_XEON:
 				case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 				case CPU_MODEL_HASWELL:
-				case CPU_MODEL_HASWELL_MB:
+				case CPU_MODEL_HASWELL_SVR:
 				case CPU_MODEL_HASWELL_ULT:
 				case CPU_MODEL_CRYSTALWELL:
 
