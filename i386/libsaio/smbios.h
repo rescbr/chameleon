@@ -98,7 +98,7 @@ enum
 	// Port Connector Information (Type 8)
 	kSMBTypeSystemSlot			=  9, // System Slots (Type 9)
 	// On Board Devices Information (Type 10) Obsolete
-	// kSMBOEMStrings			=  11 ,// OEM Strings (Type 11)
+	kSMBOEMStrings			=  11 ,// OEM Strings (Type 11)
 	// System Configuration Options (Type 12)
 	// BIOS Language Information (Type 13)
 	// Group Associations (Type 14)
@@ -240,12 +240,12 @@ typedef struct SMBSystemEnclosure
 	SMBByte    thermalState;	// Thermal state of the enclosure when last booted
 	SMBByte    securityStatus;	// Physical security status of the enclosure when last booted
 	SMBDWord   oemDefined;		// OEM- or BIOS vendor-specific information
-//	SMBByte    height;		// Height of the enclosure, in 'U's
-//	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
-//	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
-//	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
-//	SMBByte	containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
-//	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
+    SMBByte    height;		// Height of the enclosure, in 'U's
+    SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
+    SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
+//    SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
+//    SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
+//    SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
 } __attribute__((packed)) SMBSystemEnclosure;
 
 // Bungo: values for SMBSystemEnclosure.chassisType
@@ -308,28 +308,26 @@ typedef struct SMBProcessorInformation
 
 #define kSMBProcessorInformationMinSize     26
 
+/* ========================================
+ Values for processorType in Type 4 records
+ ======================================== */
+enum
+{
+    kSMBprocessorTypeOther          = 0x01,
+    kSMBprocessorTypeUnknown        = 0x02,
+    kSMBprocessorTypeCPU            = 0x03,
+    kSMBprocessorTypeMPU            = 0x04,
+    kSMBprocessorTypeDSP            = 0x05,
+    kSMBprocessorTypeGPU            = 0x06
+};
+
 /* =======================================================================
- Memory Controller Information (Type 5) Obsoleted since SMBIOS version 2.1
+ Memory Controller Information (Type 5) Obsolete since SMBIOS version 2.1
  ========================================================================= */
 
 /* ===================================================================
- Memory Module Information (Type 6) Obsoleted since SMBIOS version 2.1
+ Memory Module Information (Type 6) Obsolete since SMBIOS version 2.1
  ===================================================================== */
-typedef struct SMBMemoryModule
-{
-    SMB_STRUCT_HEADER               // Type 6
-    SMBString  socketDesignation;
-    SMBByte    bankConnections;
-    SMBByte    currentSpeed;
-    SMBWord    currentMemoryType;
-    SMBByte    installedSize;
-    SMBByte    enabledSize;
-    SMBByte    errorStatus;
-} __attribute__((packed)) SMBMemoryModule;
-
-#define kSMBMemoryModuleSizeNotDeterminable 0x7D
-#define kSMBMemoryModuleSizeNotEnabled      0x7E
-#define kSMBMemoryModuleSizeNotInstalled    0x7F
 
 /* ========================
  Cache Information (Type 7)
@@ -374,11 +372,11 @@ typedef struct SMBSystemSlot
 /* ===================
  OEM Strings (Type 11)
  ===================== */
-//typedef struct SMBOEMStrings
-//{
-//	SMB_STRUCT_HEADER               // Type 11
-//	SMBByte		count;		// number of strings
-//} __attribute__((packed)) SMBOEMStrings;
+typedef struct SMBOEMStrings
+{
+    SMB_STRUCT_HEADER               // Type 11
+    SMBByte		count;              // number of strings
+} __attribute__((packed)) SMBOEMStrings;
 
 /* =============================
  Physical Memory Array (Type 16)

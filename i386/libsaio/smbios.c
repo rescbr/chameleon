@@ -81,14 +81,14 @@
 /* ============================
  Processor Information (Type 4)
  ============================== */
-// Bungo
+// Bungo:
 #define kSMBProcessorInformationSocketKey           "SMcpusocket"
 #define kSMBProcessorInformationManufacturerKey     "SMcpumanufacturer"
 #define kSMBProcessorInformationVersionKey          "SMcpuversion"
 //
 #define kSMBProcessorInformationExternalClockKey	"SMexternalclock"
-#define kSMBProcessorInformationMaximumClockKey		"SMmaximalclock"
-// Bungo
+#define kSMBProcessorInformationMaximalClockKey		"SMmaximalclock"
+// Bungo:
 #define kSMBProcessorInformationCurrentClockKey     "SMcurrentclock"
 #define kSMBProcessorInformationUpgradeKey          "SMcpuupgrade"
 #define kSMBProcessorInformationSerialNumberKey     "SMcpuserial"
@@ -105,6 +105,8 @@
 #define kSMBMemoryDeviceManufacturerKey             "SMmemmanufacturer"     //
 #define kSMBMemoryDeviceSerialNumberKey             "SMmemserial"           //
 #define kSMBMemoryDevicePartNumberKey               "SMmempart"             //
+// Bungo:
+#define kSMBMemoryDeviceAssetTagKey                 "SMmemassettag"         //
 
 /* ===========================================
  Memory SPD Data   (Apple Specific - Type 130)
@@ -181,6 +183,7 @@ typedef struct {
 	char		*version;
 	char		*serialNumber;
 	char		*assetTag;   // Bungo: renamed folowing convention
+    char        *skuNumber;
 } defaultChassis_t;
 
 defaultChassis_t defaultChassis;
@@ -188,7 +191,7 @@ defaultChassis_t defaultChassis;
 typedef struct
 {
 	uint8_t			type;
-	SMBValueType		valueType;
+	SMBValueType	valueType;
 	uint8_t			fieldOffset;
 	char			*keyString;
 	bool			(*getSMBValue)(returnType *);
@@ -199,7 +202,7 @@ SMBValueSetter SMBSetters[] =
 {
 	/* =======================
 	 BIOS Information (Type 0)
-	 ========================= */
+	 =========================*/
 	{ kSMBTypeBIOSInformation, kSMBString, getFieldOffset(SMBBIOSInformation, vendor),
 		kSMBBIOSInformationVendorKey, NULL, &defaultBIOSInfo.vendor }, // SMbiosvendor - Apple Inc.
 
@@ -227,13 +230,13 @@ SMBValueSetter SMBSetters[] =
 
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, serialNumber),
 		kSMBSystemInformationSerialNumberKey, NULL, &defaultSystemInfo.serialNumber }, // SMserial - Serial number
-
-/*	{kSMBTypeSystemInformation,	kSMBByte,	getFieldOffset(SMBSystemInformation, uuid[16]),
-		NULL, NULL, NULL}, // SmUUID/
-
+    /* Bungo:
+ 	{kSMBTypeSystemInformation,	kSMBByte,	getFieldOffset(SMBSystemInformation, uuid),
+		kSMBSystemInformationUUIDKey, NULL, NULL}, // SMsystemuuid
+    
 	{kSMBTypeSystemInformation,	kSMBByte,	getFieldOffset(SMBSystemInformation, wakeupReason),
 		NULL, NULL, NULL}, // reason for system wakeup
-*/
+     */
 
 	// Bungo
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, skuNumber),
@@ -292,6 +295,9 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, assetTag),
 		kSMBSystemEnclosureAssetTagKey, NULL, &defaultChassis.assetTag }, // SMchassisassettag - Pro Enclosure
 
+    /* {kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, skuNumber), NULL, NULL, &defaultChassis.skuNumber },
+    */
+
 	/* ============================
 	 Processor Information (Type 4)
 	 ============================== */
@@ -308,8 +314,7 @@ SMBValueSetter SMBSetters[] =
 		kSMBProcessorInformationExternalClockKey, getProcessorInformationExternalClock,	NULL}, // SMcpuexternalclock
 
 	{kSMBTypeProcessorInformation,	kSMBWord, getFieldOffset(SMBProcessorInformation, maximumClock),
-		kSMBProcessorInformationMaximumClockKey, getProcessorInformationMaximumClock,	NULL}, // SMcpumaxspeed
-
+		kSMBProcessorInformationMaximalClockKey, getProcessorInformationMaximumClock,	NULL}, // SMcpumaximumclock
 	// Bungo
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, currentClock),
 		kSMBProcessorInformationCurrentClockKey, NULL, NULL}, // SMcpucurrentspeed
@@ -317,16 +322,13 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeProcessorInformation,	kSMBByte,	getFieldOffset(SMBProcessorInformation, processorUpgrade),
 		kSMBProcessorInformationUpgradeKey, NULL, NULL}, // SMcpuupgrade
 	//
-
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, serialNumber),
 		kSMBProcessorInformationSerialNumberKey, NULL, NULL},
 
 	// Bungo
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, assetTag),
 		kSMBProcessorInformationAssetTagKey, NULL, NULL}, // SMcpuassettag
-
 	//
-
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, partNumber),
 		kSMBProcessorInformationPartNumberKey, NULL, NULL},
 
@@ -352,14 +354,13 @@ SMBValueSetter SMBSetters[] =
 		kSMBMemoryDeviceSerialNumberKey, getSMBMemoryDeviceSerialNumber, NULL},
 
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, assetTag),
-		NULL, NULL, NULL},
+		kSMBMemoryDeviceAssetTagKey, NULL, NULL},
 
 	{kSMBTypeMemoryDevice,	kSMBWord,	getFieldOffset(SMBMemoryDevice, errorHandle),
 		NULL, getSMBMemoryDeviceMemoryErrorHandle, NULL},
 
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, partNumber),
 		kSMBMemoryDevicePartNumberKey, getSMBMemoryDevicePartNumber, NULL},
-	//
 
 	//-------------------------------------------------------------------------------------------------------------------------
 	// Apple Specific
@@ -382,8 +383,8 @@ SMBEntryPoint *neweps			= 0;
 static uint8_t stringIndex;	// increament when a string is added and set the field value accordingly
 static uint8_t stringsSize;	// add string size
 
-static SMBWord tableLength	= 0;
-static SMBWord handle		= 0;
+static SMBWord tableLength      = 0;
+static SMBWord handle           = 0;
 static SMBWord maxStructSize	= 0;
 static SMBWord structureCount	= 0;
 
@@ -585,6 +586,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 	defaultChassis.manufacturer         = kDefaultVendorManufacturer;
 	defaultChassis.serialNumber         = kDefaultSerialNumber;
 	defaultChassis.assetTag             = kDefaultAssetTag;
+    defaultChassis.skuNumber            = kDefaultSkuNumber;
 
     // if (platformCPUFeature(CPU_FEATURE_MOBILE)) Bungo: doesn't recognise correctly
 	if (PlatformType == 2)  // this method works
@@ -689,10 +691,10 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								break;
 
 							default:
-								defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
-								defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
-								defaultSystemInfo.productName	= kDefaultMacPro;
-								defaultSystemInfo.family	= kDefaultMacProFamily;
+								defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
+								defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
+								defaultSystemInfo.productName   = kDefaultMacPro;
+								defaultSystemInfo.family        = kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 								defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -701,10 +703,10 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						break;
 					}
 					default:
-						defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
-						defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
-						defaultSystemInfo.productName	= kDefaultMacPro;
-						defaultSystemInfo.family	= kDefaultMacProFamily;
+						defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
+						defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
+						defaultSystemInfo.productName   = kDefaultMacPro;
+						defaultSystemInfo.family        = kDefaultMacProFamily;
 						defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 						defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 						defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -771,12 +773,13 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	}
 
 	strSize = strlen(string);
-
+    
+    /* What was this for?
 	// remove any spaces found at the end
 	while ((strSize != 0) && (string[strSize - 1] == ' ')) {
 		strSize--;
 	}
-
+    */
 	if (strSize == 0) {
 		*field = 0;
 		return;
@@ -989,13 +992,12 @@ void addSMBEndOfTable(SMBStructPtrs *structPtr)
 
 void setSMBStruct(SMBStructPtrs *structPtr)
 {
-	bool setterFound = false;
-
-	uint8_t *ptr;
-	SMBWord structSize;
-	int i;
-
-	/* http://forge.voodooprojects.org/p/chameleon/issues/361/ */
+	bool        setterFound = false;
+	uint8_t     *ptr;
+	SMBWord     structSize;
+	int         i;
+    /* Bungo: not needed because of tables lengths fix in next lines
+	// http://forge.voodooprojects.org/p/chameleon/issues/361/
 	bool forceFullMemInfo = false;
 
 	if (structPtr->orig->type == kSMBTypeMemoryDevice) {
@@ -1003,7 +1005,7 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 		if (forceFullMemInfo) {
 			structPtr->orig->length = 27;
 		}
-	}
+	} */
 
 	stringIndex = 1;
 	stringsSize = 0;
@@ -1011,18 +1013,53 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	if (handle < structPtr->orig->handle) {
 		handle = structPtr->orig->handle;
 	}
-
-	memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
-
+    // Bungo: fix unsuported tables lengths from original smbios: extend smaller or truncate bigger
+    switch (structPtr->orig->type) {
+        case kSMBTypeBIOSInformation:
+            structSize = sizeof(SMBBIOSInformation);
+            break;
+        case kSMBTypeSystemInformation:
+            structSize = sizeof(SMBSystemInformation);
+            break;
+        case kSMBTypeBaseBoard:
+            structSize = sizeof(SMBBaseBoard);
+            break;
+        case kSMBTypeSystemEnclosure:
+            structSize = sizeof(SMBSystemEnclosure);
+            break;
+        case kSMBTypeProcessorInformation:
+            structSize = sizeof(SMBProcessorInformation);
+            break;
+        case kSMBTypeMemoryDevice:
+            structSize = sizeof(SMBMemoryDevice);
+            break;
+        default:
+            structSize = structPtr->orig->length; // don't change if not to patch
+            break;
+    }
+    
+    // memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
+    if (structPtr->orig->length <= structSize) {
+        memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
+    } else {
+        memcpy((void *)structPtr->new, structPtr->orig, structSize);
+    }
+    
+    structPtr->new->length = structSize;
+    
 	for (i = 0; i < numOfSetters; i++) {
-		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length)) {
+        // Bungo:
+        //if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length)) {
+        if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structSize)) {
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
 	}
-
+    
 	if (setterFound) {
-		ptr = (uint8_t *)structPtr->new + structPtr->orig->length;
+        // Bungo:
+        // ptr = (uint8_t *)structPtr->new + structPtr->orig->length;
+        ptr = (uint8_t *)structPtr->new + structPtr->new->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
 		if (((uint16_t *)ptr)[0] == 0) {
