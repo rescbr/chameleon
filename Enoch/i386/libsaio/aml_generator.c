@@ -371,7 +371,7 @@ AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, char* StringBuf)
 
 	if (node) {
 		unsigned int offset = 0;
-		unsigned int len = strlen(StringBuf)+1;
+		unsigned int len = strlen(StringBuf);
 		node->Type = AML_CHUNK_BUFFER;
 		node->Length = (uint8_t)(len + 3);
 		node->Buffer = malloc (node->Length);

@@ -574,14 +574,14 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 					case CPU_MODEL_HASWELL:	//
 					case CPU_MODEL_IVYBRIDGE_XEON:  //
 					//case CPU_MODEL_HASWELL_H:	//
-					case CPU_MODEL_HASWELL_MB:	//
+					case CPU_MODEL_HASWELL_SVR:	//
 					case CPU_MODEL_HASWELL_ULT:	//
 					case CPU_MODEL_CRYSTALWELL:	//
 
 					{
 					if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN) ||
 						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_HASWELL) ||
-						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE_XEON) || (Platform.CPU.Model == CPU_MODEL_HASWELL_MB) ||
+						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE_XEON) || (Platform.CPU.Model == CPU_MODEL_HASWELL_SVR) ||
 						(Platform.CPU.Model == CPU_MODEL_HASWELL_ULT) || (Platform.CPU.Model == CPU_MODEL_CRYSTALWELL))
 					{
 						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;

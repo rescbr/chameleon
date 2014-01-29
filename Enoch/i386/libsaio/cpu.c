@@ -417,7 +417,7 @@ void scan_cpu(PlatformInfo_t *p)
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE_XEON	||
 										  p->CPU.Model == CPU_MODEL_IVYBRIDGE  ||
 										  p->CPU.Model == CPU_MODEL_HASWELL  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL_MB  ||
+										  p->CPU.Model == CPU_MODEL_HASWELL_SVR  ||
 										  //p->CPU.Model == CPU_MODEL_HASWELL_H  ||
 										  p->CPU.Model == CPU_MODEL_HASWELL_ULT  ||
 										  p->CPU.Model == CPU_MODEL_CRYSTALWELL ))
@@ -442,7 +442,7 @@ void scan_cpu(PlatformInfo_t *p)
 						/* Clear bit 16 (evidently the presence bit) */
 						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 						msr = rdmsr64(MSR_FLEX_RATIO);
-						DBG("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
+						verbose("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
 					} else {
 						if (bus_ratio_max > flex_ratio) {
 							bus_ratio_max = flex_ratio;
@@ -626,7 +626,7 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("Family:                  0x%x\n",               p->CPU.Family); // Family ex: 6 (06h)
 	DBG("ExtFamily:               0x%x\n",               p->CPU.ExtFamily);
 	DBG("Signature:               %x\n",                 p->CPU.Signature); // CPUID signature
-	/*switch (p->CPU.CpuType) {
+	/*switch (p->CPU.Type) {
 		case PT_OEM:
 			DBG("Processor type:          Intel Original OEM Processor\n");
 			break;
