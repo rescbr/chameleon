@@ -98,7 +98,7 @@ enum
 	// Port Connector Information (Type 8)
 	kSMBTypeSystemSlot			=  9, // System Slots (Type 9)
 	// On Board Devices Information (Type 10) Obsolete
-	// kSMBOEMStrings			=  11 ,// OEM Strings (Type 11)
+	kSMBOEMStrings			=  11 ,// OEM Strings (Type 11)
 	// System Configuration Options (Type 12)
 	// BIOS Language Information (Type 13)
 	// Group Associations (Type 14)
@@ -138,7 +138,8 @@ enum
 	kSMBTypeFirmwareVolume			=  128, // FirmwareVolume (TYPE 128)
 	kSMBTypeMemorySPD			=  130, // MemorySPD (TYPE 130)
 	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
-	kSMBTypeOemProcessorBusSpeed		=  132 //Processor Bus Speed (Type 132)
+	kSMBTypeOemProcessorBusSpeed		=  132 // Processor Bus Speed (Type 132)
+	//kSMBTypeOemPlatformFeature		=  133 // Platform Feature (Type 133)
 };
 
 /* =======================
@@ -240,9 +241,9 @@ typedef struct SMBSystemEnclosure
 	SMBByte    thermalState;	// Thermal state of the enclosure when last booted
 	SMBByte    securityStatus;	// Physical security status of the enclosure when last booted
 	SMBDWord   oemDefined;		// OEM- or BIOS vendor-specific information
-//	SMBByte    height;		// Height of the enclosure, in 'U's
-//	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
-//	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
+	SMBByte    height;		// Height of the enclosure, in 'U's
+	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
+	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
 //	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
 //	SMBByte	containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
 //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
@@ -301,17 +302,29 @@ typedef struct SMBProcessorInformation
 	SMBByte    coreCount;
 	SMBByte    coreEnabled;
 	SMBByte    threadCount;
-//	SMBWord    processorCharacteristics;
-	// 2.6+ spec
+//	SMBWord    processorFuncSupport;
+	// 2.6+ spec (42 bytes)
 //	SMBWord    processorFamily2;
 } __attribute__((packed)) SMBProcessorInformation;
 
 #define kSMBProcessorInformationMinSize     26
 
-/* =======================================================================
- Memory Controller Information (Type 5) Obsoleted since SMBIOS version 2.1
- ========================================================================= */
+/* ========================================
+ Values for processorType in Type 4 records
+ ======================================== */
+enum
+{
+	kSMBprocessorTypeOther          = 0x01,
+	kSMBprocessorTypeUnknown        = 0x02,
+	kSMBprocessorTypeCPU            = 0x03,
+	kSMBprocessorTypeMPU            = 0x04,
+	kSMBprocessorTypeDSP            = 0x05,
+	kSMBprocessorTypeGPU            = 0x06
+};
 
+/* ======================================================================
+ Memory Controller Information (Type 5) Obsolete since SMBIOS version 2.1
+ ======================================================================== */
 typedef struct SMBMemoryControllerInfo {
 	SMB_STRUCT_HEADER 
 	SMBByte			errorDetectingMethod;
@@ -325,9 +338,9 @@ typedef struct SMBMemoryControllerInfo {
 	SMBByte			numberOfMemorySlots;
 } __attribute__((packed)) SMBMemoryControllerInfo;
 
-/* ===================================================================
- Memory Module Information (Type 6) Obsoleted since SMBIOS version 2.1
- ===================================================================== */
+/* ==================================================================
+ Memory Module Information (Type 6) Obsolete since SMBIOS version 2.1
+ ==================================================================== */
 typedef struct SMBMemoryModule
 {
     SMB_STRUCT_HEADER               // Type 6
@@ -378,20 +391,20 @@ typedef struct SMBSystemSlot
 	SMBByte     slotCharacteristics1;
 	// 2.1+ spec (13 bytes)
 	SMBByte     slotCharacteristics2;
-	// 2.6+ spec
+	// 2.6+ spec (17 bytes)
 //	SMBWord		segmentGroupNumber;
 //	SMBByte		busNumber;
-//	SMBByte		devFuncNumber;
+//	SMBByte		deviceFunctionNumber;
 } __attribute__((packed)) SMBSystemSlot;
 
 /* ===================
  OEM Strings (Type 11)
  ===================== */
-//typedef struct SMBOEMStrings
-//{
-//	SMB_STRUCT_HEADER               // Type 11
-//	SMBByte		count;		// number of strings
-//} __attribute__((packed)) SMBOEMStrings;
+typedef struct SMBOEMStrings
+{
+	SMB_STRUCT_HEADER               // Type 11
+	SMBByte		count;		// number of strings
+} __attribute__((packed)) SMBOEMStrings;
 
 /* =============================
  Physical Memory Array (Type 16)
@@ -462,8 +475,8 @@ typedef struct SMBMemoryDevice
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.6+ spec
-//	SMBByte    memoryAtributes;
+	// 2.6+ spec (28 bytes)
+//	SMBByte    attributes;
 	// 2.7+ spec
 //	SMBDWord   memoryExtSize;
 //	SMBWord    confMemClkSpeed;
@@ -571,6 +584,15 @@ typedef struct SMBOemProcessorBusSpeed
 	SMB_STRUCT_HEADER			// Type 132
 	SMBWord    ProcessorBusSpeed;   // MT/s unit
 } __attribute__((packed)) SMBOemProcessorBusSpeed;
+
+/* ==============================================
+ OEM Platform Feature (Apple Specific - Type 133)
+ ================================================ */
+struct SMBOemPlatformFeature
+{
+	SMB_STRUCT_HEADER			// Type 133
+	SMBWord    PlatformFeature;
+} __attribute__((packed)) SMBOemPlatformFeature;
 
 //----------------------------------------------------------------------------------------------------------
 

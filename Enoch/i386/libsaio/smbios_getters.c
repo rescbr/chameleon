@@ -33,7 +33,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 					case CPU_MODEL_IVYBRIDGE_XEON:
 					case CPU_MODEL_IVYBRIDGE:
 					case CPU_MODEL_HASWELL:
-					case CPU_MODEL_HASWELL_MB:
+					case CPU_MODEL_HASWELL_SVR:
 					case CPU_MODEL_HASWELL_ULT:
 					case CPU_MODEL_CRYSTALWELL:
 
@@ -288,7 +288,7 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 					case CPU_MODEL_HASWELL:				// 0x3C -
-					case CPU_MODEL_HASWELL_MB:			// 0x3F -
+					case CPU_MODEL_HASWELL_SVR:			// 0x3F -
 					case CPU_MODEL_HASWELL_ULT:			// 0x45 -
 					case CPU_MODEL_CRYSTALWELL:			// 0x46
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3")) {
