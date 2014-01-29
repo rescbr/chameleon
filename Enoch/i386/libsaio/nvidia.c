@@ -77,6 +77,7 @@
 #define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
+static bool     showGeneric         = false;
 char generic_name[128];
 extern uint32_t devices_number;
 
@@ -1640,7 +1641,6 @@ static int patch_nvidia_rom(uint8_t *rom)
 static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 {
 	int i, j;
-	bool showGeneric =  false;
 
 	// First check in the plist, (for e.g this can override any hardcoded devices)
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
@@ -1651,8 +1651,15 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	}
 
 	//ErmaC added selector for Chameleon "old" style in System Profiler
-	if ((getBoolForKey(kNvidiaGeneric, &showGeneric, &bootInfo->chameleonConfig) && showGeneric) == true) {
-		DBG("- TEST - NOT YET IMPLEMENTED.\n");
+	if (getBoolForKey(kNvidiaGeneric, &showGeneric, &bootInfo->chameleonConfig)) {
+		verbose("\tNvidiaGeneric = Yes\n");
+
+		for (i = 1; i < (sizeof(nvidia_card_generic) / sizeof(nvidia_card_generic[0])); i++) {
+			if (nvidia_card_generic[i].device == device_id) {
+				return nvidia_card_generic[i].name;
+			}
+		}
+	return nvidia_card_generic[0].name;
 	}
 
 	// Then check the exceptions table
