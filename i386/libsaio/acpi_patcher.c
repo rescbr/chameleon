@@ -147,7 +147,7 @@ void *loadACPITable (const char * filename)
 			return tableAddr;
 		}
 		close (fd);
-		verbose("Couldn't allocate memory for table \n", dirspec);
+		printf("Couldn't allocate memory for table \n", dirspec);
 	}  
 	//printf("Couldn't find table %s\n", filename);
 	return NULL;
@@ -772,7 +772,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
-		DBG("FADT: Using custom DSDT!\n");
+		verbose("FADT: Using custom DSDT!\n");
 	}
 
 	// Correct the checksum
@@ -976,7 +976,7 @@ int setupAcpi(void)
 					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
 				}
 
-				DBG("RSDT: Added %d SSDT table(s)\n", ssdt_count);
+				verbose("RSDT: Added %d SSDT table(s)\n", ssdt_count);
 
 			}
 
@@ -989,7 +989,7 @@ int setupAcpi(void)
 			DBG("New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
 		} else {
 			rsdp_mod->RsdtAddress=0;
-			verbose("RSDT not found or RSDT incorrect\n");
+			printf("RSDT not found or incorrect\n");
 		}
 
 		if (version) {
@@ -1043,7 +1043,7 @@ int setupAcpi(void)
 							fadt->Length);
 
 						if (!fadt || (uint64_t)xsdt_entries[i] >= 0xffffffff || fadt->Length>0x10000) {
-							DBG("FADT incorrect or after 4GB. Dropping XSDT\n");
+							verbose("FADT incorrect or after 4GB. Dropping XSDT\n");
 							goto drop_xsdt;
 						}
 
@@ -1088,7 +1088,7 @@ int setupAcpi(void)
 						xsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
 					}
 
-					DBG("Added %d SSDT table(s) into XSDT\n", ssdt_count);
+					verbose("Added %d SSDT table(s) into XSDT\n", ssdt_count);
 				}
 
 				// Correct the checksum of XSDT
@@ -1104,7 +1104,7 @@ int setupAcpi(void)
 				 */
 
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
-				DBG("XSDT not found or XSDT incorrect\n");
+				verbose("XSDT not found or XSDT incorrect\n");
 			}
 		}
 

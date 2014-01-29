@@ -630,14 +630,12 @@ void setupEfiDeviceTree(void)
 	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
 	// Export SystemSerialNumber if present
-	if ((ret16=getSmbiosChar16("SMserial", &len)))
-	{
+	if ((ret16=getSmbiosChar16("SMserial", &len))) {
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
 	}
 
 	// Export Model if present
-	if ((ret16=getSmbiosChar16("SMproductname", &len)))
-	{
+	if ((ret16=getSmbiosChar16("SMproductname", &len))) {
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 	}
 
