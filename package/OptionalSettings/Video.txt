@@ -34,3 +34,4 @@ Bool@SkipNvidiaGfx:SkipNvidiaGfx=Yes
 Bool@SkipAtiGfx:SkipAtiGfx=Yes
 Bool@EnableBacklight:EnableBacklight=Yes
 Bool@EnableDualLink:EnableDualLink=Yes
+Bool@NvidiaGeneric:NvidiaGeneric=Yes

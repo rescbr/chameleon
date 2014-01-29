@@ -58,7 +58,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPU_MODEL_HASWELL		0x3C			// Haswell DT
 #define CPU_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
-#define CPU_MODEL_HASWELL_MB		0x3F			// Haswell MB
+#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell MB
 //#define CPU_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPU_MODEL_HASWELL_ULT		0x45			// Haswell ULT
 #define CPU_MODEL_CRYSTALWELL		0x46			// Haswell ULX
@@ -137,7 +137,7 @@ typedef struct _PlatformInfo_t {
 		uint32_t		Vendor;					// Vendor
 		uint32_t		Signature;				// Processor Signature
 		uint32_t		Stepping;				// Stepping
-		//uint32_t		Type;					// Type
+		//uint16_t		Type;					// Type
 		uint32_t		Model;					// Model
 		uint32_t		ExtModel;				// Extended Model
 		uint32_t		Family;					// Family
@@ -145,16 +145,16 @@ typedef struct _PlatformInfo_t {
 		uint32_t		NoCores;				// No Cores per Package
 		uint32_t		NoThreads;				// Threads per Package
 		uint8_t			MaxCoef;				// Max Multiplier
-		uint8_t			MaxDiv;
+		uint8_t			MaxDiv;					// Min Multiplier
 		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;			// TSC Frequency Hz
-		uint64_t		FSBFrequency;			// FSB Frequency Hz
-		uint64_t		CPUFrequency;			// CPU Frequency Hz
+		uint64_t		TSCFrequency;				// TSC Frequency Hz
+		uint64_t		FSBFrequency;				// FSB Frequency Hz
+		uint64_t		CPUFrequency;				// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
-		char			BrandString[48];		// 48 Byte Branding String
-		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
+		char			BrandString[48];			// 48 Byte Branding String
+		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
 	} CPU;
 
 	struct RAM {

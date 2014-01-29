@@ -371,7 +371,7 @@ AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, char* StringBuf)
 
 	if (node) {
 		unsigned int offset = 0;
-		unsigned int len = strlen(StringBuf)+1;
+		unsigned int len = strlen(StringBuf);
 		node->Type = AML_CHUNK_BUFFER;
 		node->Length = (uint8_t)(len + 3);
 		node->Buffer = malloc (node->Length);
@@ -576,7 +576,7 @@ uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 			case AML_CHUNK_DEVICE:
 				offset = aml_write_byte(AML_CHUNK_OP, buffer, offset);
 				offset = aml_write_byte(node->Type, buffer, offset);
-				offset = aml_write_size(node->Size-3, buffer, offset);
+				offset = aml_write_size(node->Size-2, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 

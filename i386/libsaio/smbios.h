@@ -297,12 +297,12 @@ typedef struct SMBProcessorInformation
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.5+ spec
+	// 2.5+ spec (40 bytes)
 //	SMBByte    coreCount;
 //	SMBByte    coreEnabled;
 //	SMBByte    threadCount;
-//	SMBWord    processorCharacteristics;
-	// 2.6+ spec
+//	SMBWord    processorFuncSupport;
+	// 2.6+ spec (42 bytes)
 //	SMBWord    processorFamily2;
 } __attribute__((packed)) SMBProcessorInformation;
 
@@ -363,10 +363,10 @@ typedef struct SMBSystemSlot
 	SMBByte     slotCharacteristics1;
 	// 2.1+ spec (13 bytes)
 	SMBByte     slotCharacteristics2;
-	// 2.6+ spec
+	// 2.6+ spec (17 bytes)
 //	SMBWord		segmentGroupNumber;
 //	SMBByte		busNumber;
-//	SMBByte		devFuncNumber;
+//	SMBByte		deviceFunctionNumber;
 } __attribute__((packed)) SMBSystemSlot;
 
 /* ===================
@@ -447,8 +447,8 @@ typedef struct SMBMemoryDevice
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.6+ spec
-//	SMBByte    memoryAtributes;
+	// 2.6+ spec (28 bytes)
+//	SMBByte    attributes;
 	// 2.7+ spec
 //	SMBDWord   memoryExtSize;
 //	SMBWord    confMemClkSpeed;
@@ -556,6 +556,15 @@ typedef struct SMBOemProcessorBusSpeed
 	SMB_STRUCT_HEADER			// Type 132
 	SMBWord    ProcessorBusSpeed;   // MT/s unit
 } __attribute__((packed)) SMBOemProcessorBusSpeed;
+
+/* ==============================================
+ OEM Platform Feature (Apple Specific - Type 133)
+ ================================================ */
+struct SMBOemPlatformFeature
+{
+	SMB_STRUCT_HEADER
+	SMBWord    PlatformFeature;
+} __attribute__((packed)) SMBOemPlatformFeature;
 
 //----------------------------------------------------------------------------------------------------------
 

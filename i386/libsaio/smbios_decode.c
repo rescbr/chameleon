@@ -39,15 +39,15 @@ static SMBByte      bcdRevisionHi;                          // DMI rev. major
  ===*/
 static const char *SMBWakeUpTypes[] =  // Bungo: strings for wake-up type (Table Type 1 - System Information)
 {
-	"Reserved",          /* 00h */
-	"Other",             /* 01h */
-	"Unknown",           /* 02h */
-	"APM Timer",         /* 03h */
-	"Modem Ring",        /* 04h */
-	"LAN Remote",        /* 05h */
-	"Power Switch",      /* 06h */
-	"PCI PME#",          /* 07h */
-	"AC Power Restored"  /* 08h */
+	"Reserved",                 /* 00h */
+	"Other",                    /* 01h */
+	"Unknown",                  /* 02h */
+	"APM Timer",                /* 03h */
+	"Modem Ring",               /* 04h */
+	"LAN Remote",               /* 05h */
+	"Power Switch",             /* 06h */
+	"PCI PME#",                 /* 07h */
+	"AC Power Restored"         /* 08h */
 };
 
 /*====
@@ -75,34 +75,34 @@ static const char *SMBBaseBoardTypes[] =  // Bungo: strings for base board type 
  ===*/
 static const char *SMBChassisTypes[] =  // Bungo: strings for chassis type (Table Type 3 - Chassis Information)
 {
-	"Other",                /* 01h */
-	"Unknown",              /* 02h */
-	"Desktop",              /* 03h */
-	"Low Profile Desktop",  /* 04h */
-	"Pizza Box",            /* 05h */
-	"Mini Tower",           /* 06h */
-	"Tower",                /* 07h */
-	"Portable",             /* 08h */
-	"Laptop",               /* 09h */
-	"Notebook",             /* 0Ah */
-	"Hand Held",            /* 0Bh */
-	"Docking Station",      /* 0Ch */
-	"All in One",           /* 0Dh */
-	"Sub Notebook",         /* 0Eh */
-	"Space-saving",         /* 0Fh */
-	"Lunch Box",		/* 10h */
-	"Main Server Chassis",	/* 11h */
-	"Expansion Chassis",	/* 12h */
-	"SubChassis",		/* 13h */
-	"Bus Expansion Chassis",/* 14h */
-	"Peripheral Chassis",	/* 15h */
-	"RAID Chassis",		/* 16h */
-	"Rack Mount Chassis",   /* 17h */
-	"Sealed-case PC",	/* 18h */
-	"Multi-system Chassis", /* 19h */
-	"Compact PCI",		/* 1Ah */
-	"Advanced TCA",		/* 1Bh */
-	"Blade",		/* 1Ch */ // An SMBIOS implementation for a Blade would contain a Type 3 Chassis structure
+	"Other",                    /* 01h */
+	"Unknown",                  /* 02h */
+	"Desktop",                  /* 03h */
+	"Low Profile Desktop",      /* 04h */
+	"Pizza Box",                /* 05h */
+	"Mini Tower",               /* 06h */
+	"Tower",                    /* 07h */
+	"Portable",                 /* 08h */
+	"Laptop",                   /* 09h */
+	"Notebook",                 /* 0Ah */
+	"Hand Held",                /* 0Bh */
+	"Docking Station",          /* 0Ch */
+	"All in One",               /* 0Dh */
+	"Sub Notebook",             /* 0Eh */
+	"Space-saving",             /* 0Fh */
+	"Lunch Box",                /* 10h */
+	"Main Server Chassis",      /* 11h */
+	"Expansion Chassis",        /* 12h */
+	"SubChassis",               /* 13h */
+	"Bus Expansion Chassis",    /* 14h */
+	"Peripheral Chassis",       /* 15h */
+	"RAID Chassis",             /* 16h */
+	"Rack Mount Chassis",       /* 17h */
+	"Sealed-case PC",           /* 18h */
+	"Multi-system Chassis",     /* 19h */
+	"Compact PCI",              /* 1Ah */
+	"Advanced TCA",             /* 1Bh */
+	"Blade",                    /* 1Ch */ // An SMBIOS implementation for a Blade would contain a Type 3 Chassis structure
 	"Blade Enclosing"	/* 1Dh */ // A Blade Enclosure is a specialized chassis that contains a set of Blades.
 };
 
@@ -111,12 +111,12 @@ static const char *SMBChassisTypes[] =  // Bungo: strings for chassis type (Tabl
  ===*/
 static const char *SMBProcessorTypes[] =  // Bungo: strings for processor type (Table Type 4 - Processor Information)
 {
-	"Other",                /* 01h */
-	"Unknown",              /* 02h */
-	"Central Processor",    /* 03h */
-	"Math Processor",       /* 04h */
-	"DSP Processor",        /* 05h */
-	"Video Processor"       /* 06h */
+	"Other",                    /* 01h */
+	"Unknown",                  /* 02h */
+	"Central Processor",        /* 03h */
+	"Math Processor",           /* 04h */
+	"DSP Processor",            /* 05h */
+	"Video Processor"           /* 06h */
 };
 
 /*====
@@ -124,7 +124,7 @@ static const char *SMBProcessorTypes[] =  // Bungo: strings for processor type (
  ===*/
 static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upgrade (Table Type 4 - Processor Information)
 {
-	"Other",                   // 01h
+	"Other",                    /* 01h */
     "Unknown",
     "Daughter Board",
     "ZIF Socket",
@@ -167,7 +167,7 @@ static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upg
     "Socket FM1",
     "Socket FM2",
     "Socket LGA2011-3",
-    "Socket LGA1356-3"         // 2Ch
+    "Socket LGA1356-3"          /* 2Ch */
 };
 
 /*=====
@@ -176,32 +176,32 @@ static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upg
 static const char *
 SMBMemoryDeviceTypes[] =
 {
-	"RAM",          /* 00h  Undefined */
-	"RAM",          /* 01h  Other */
-	"RAM",          /* 02h  Unknown */
-	"DRAM",         /* 03h  DRAM */
-	"EDRAM",        /* 04h  EDRAM */
-	"VRAM",         /* 05h  VRAM */
-	"SRAM",         /* 06h  SRAM */
-	"RAM",          /* 07h  RAM */
-	"ROM",          /* 08h  ROM */
-	"FLASH",        /* 09h  FLASH */
-	"EEPROM",       /* 0Ah  EEPROM */
-	"FEPROM",       /* 0Bh  FEPROM */
-	"EPROM",        /* 0Ch  EPROM */
-	"CDRAM",        /* 0Dh  CDRAM */
-	"3DRAM",        /* 0Eh  3DRAM */
-	"SDRAM",        /* 0Fh  SDRAM */
-	"SGRAM",        /* 10h  SGRAM */
-	"RDRAM",        /* 11h  RDRAM */
-	"DDR SDRAM",    /* 12h  DDR */
-	"DDR2 SDRAM",   /* 13h  DDR2 */
-	"DDR2 FB-DIMM", /* 14h  DDR2 FB-DIMM */
-	"RAM",          /* 15h  unused */
-	"RAM",          /* 16h  unused */
-	"RAM",          /* 17h  unused */
-	"DDR3",         /* 18h  DDR3, chosen in [5776134] */
-	"FBD2"          /* 19h  FBD2 */
+	"RAM",                      /* 00h  Undefined */
+	"RAM",                      /* 01h  Other */
+	"RAM",                      /* 02h  Unknown */
+	"DRAM",                     /* 03h  DRAM */
+	"EDRAM",                    /* 04h  EDRAM */
+	"VRAM",                     /* 05h  VRAM */
+	"SRAM",                     /* 06h  SRAM */
+	"RAM",                      /* 07h  RAM */
+	"ROM",                      /* 08h  ROM */
+	"FLASH",                    /* 09h  FLASH */
+	"EEPROM",                   /* 0Ah  EEPROM */
+	"FEPROM",                   /* 0Bh  FEPROM */
+	"EPROM",                    /* 0Ch  EPROM */
+	"CDRAM",                    /* 0Dh  CDRAM */
+	"3DRAM",                    /* 0Eh  3DRAM */
+	"SDRAM",                    /* 0Fh  SDRAM */
+	"SGRAM",                    /* 10h  SGRAM */
+	"RDRAM",                    /* 11h  RDRAM */
+	"DDR SDRAM",                /* 12h  DDR */
+	"DDR2 SDRAM",               /* 13h  DDR2 */
+	"DDR2 FB-DIMM",             /* 14h  DDR2 FB-DIMM */
+	"RAM",                      /* 15h  unused */
+	"RAM",                      /* 16h  unused */
+	"RAM",                      /* 17h  unused */
+	"DDR3",                     /* 18h  DDR3, chosen in [5776134] */
+	"FBD2"                      /* 19h  FBD2 */
 };
 
 static const int kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes)   /
@@ -372,7 +372,8 @@ void decodeSMBOEMStrings(SMBStructHeader *structHeader)
     char *stringPtr = (char *)structHeader + structHeader->length;
     printHeader(structHeader);
 	DBG("OEM Strings:\n");
-    for (SMBByte i = 1; i <= ((SMBOEMStrings *)structHeader)->count; i++) {
+    SMBByte i;
+    for (i = 1; i <= ((SMBOEMStrings *)structHeader)->count; i++) {
         DBG("\tString %d: %s\n", i, stringPtr);
         stringPtr = stringPtr + strlen(stringPtr) + 1;
     }

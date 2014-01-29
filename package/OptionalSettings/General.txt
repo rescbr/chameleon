@@ -37,3 +37,4 @@ Bool@UHCIreset:UHCIreset=Yes
 Bool@UseMemDetect:UseMemDetect=No
 Bool@UseKernelCache:UseKernelCache=Yes
 Bool@Wake:Wake=Yes
+Bool@PrivateData:PrivateData=No
