@@ -77,6 +77,7 @@
 #define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
+static bool     showGeneric         = false;
 char generic_name[128];
 extern uint32_t devices_number;
 
@@ -1649,10 +1650,22 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 		}
 	}
 
+	//ErmaC added selector for Chameleon "old" style in System Profiler
+	if (getBoolForKey(kNvidiaGeneric, &showGeneric, &bootInfo->chameleonConfig)) {
+		verbose("\tNvidiaGeneric = Yes\n");
+
+		for (i = 1; i < (sizeof(nvidia_card_generic) / sizeof(nvidia_card_generic[0])); i++) {
+			if (nvidia_card_generic[i].device == device_id) {
+				return nvidia_card_generic[i].name;
+			}
+		}
+	return nvidia_card_generic[0].name;
+	}
+
 	// Then check the exceptions table
 	if (subsys_id) {
 		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++) {
-			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id)) {
+			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))	{
 				return nvidia_card_exceptions[i].name;
 				break;
 			}
@@ -1661,7 +1674,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 
 	// At last try the generic names
 	for (i = 1; i < (sizeof(nvidia_card_generic) / sizeof(nvidia_card_generic[0])); i++) {
-        	if (nvidia_card_generic[i].device == device_id) {
+       	if (nvidia_card_generic[i].device == device_id) {
 			if (subsys_id) {
 				for (j = 0; j < (sizeof(nvidia_card_vendors) / sizeof(nvidia_card_vendors[0])); j++) {
 					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000)) {
