@@ -328,6 +328,7 @@ typedef struct compressed_kernel_header compressed_kernel_header;
 
 /* resume.c */
 void HibernateBoot(char *boot_device);
+void HibernateBootSnow(char *boot_device);
 
 /* bmdecompress.c */
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
