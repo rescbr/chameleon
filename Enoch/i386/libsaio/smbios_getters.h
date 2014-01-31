@@ -17,8 +17,8 @@ typedef enum
 	kSMBString,
 	kSMBByte,
 	kSMBWord,
-	kSMBDWord
-//	kSMBQWord
+	kSMBDWord,
+	kSMBQWord
 } SMBValueType;
 
 typedef union
@@ -27,7 +27,7 @@ typedef union
 	uint8_t		byte;
 	uint16_t	word;
 	uint32_t	dword;
-//	uint64_t	qword;
+	uint64_t	qword;
 } returnType;
 
 extern bool getProcessorInformationExternalClock(returnType *value);

@@ -19,6 +19,13 @@
 #define DBG(x...)		msglog(x)
 #endif
 
+#define quad(hi,lo)	(((uint64_t)(hi)) << 32 | (lo))
+
+/* Only for 32bit values */
+#define bit32(n)		(1U << (n))
+#define bitmask32(h,l)		((bit32(h)|(bit32(h)-1)) & ~(bit32(l)-1))
+#define bitfield32(x,h,l)	((((x) & bitmask32(h,l)) >> l))
+
 /*
  * timeRDTSC()
  * This routine sets up PIT counter 2 to count down 1/20 of a second.
