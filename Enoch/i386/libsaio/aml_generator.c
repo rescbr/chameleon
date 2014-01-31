@@ -16,15 +16,15 @@ bool aml_add_to_parent(AML_CHUNK* parent, AML_CHUNK* node)
 	{
 		switch (parent->Type) 
 		{
-			case AML_CHUNK_NONE:
-			case AML_CHUNK_BYTE:
-			case AML_CHUNK_WORD:
-			case AML_CHUNK_DWORD:
-			case AML_CHUNK_QWORD:
-			case AML_CHUNK_ALIAS:
+			case AML_ONES_OP:
+			case AML_BYTE_PREFIX:
+			case AML_WORD_PREFIX:
+			case AML_DWORD_PREFIX:
+			case AML_QWORD_PREFIX:
+			case AML_ALIAS_OP:
 				verbose("aml_add_to_parent: Node doesn't support child nodes!\n");
 				return false;
-			case AML_CHUNK_NAME:
+			case AML_NAME_OP:
 				if (parent->First) {
 					verbose("aml_add_to_parent: Name node supports only one child node!\n");
 					return false;
@@ -88,7 +88,7 @@ AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, char* buffer, uint32_t size)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_NONE;
+		node->Type = AML_ONES_OP;
 		node->Length = (uint16_t)size;
 		node->Buffer = malloc(node->Length);
 		memcpy(node->Buffer, buffer, node->Length);
@@ -102,7 +102,7 @@ AML_CHUNK* aml_add_byte(AML_CHUNK* parent, uint8_t value)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_BYTE;
+		node->Type = AML_BYTE_PREFIX;
 		node->Length = 1;
 		node->Buffer = malloc(node->Length);
 		node->Buffer[0] = value;
@@ -115,7 +115,7 @@ AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_WORD;
+		node->Type = AML_WORD_PREFIX;
 		node->Length = 2;
 		node->Buffer = malloc(node->Length);
 		node->Buffer[0] = value & 0xff;
@@ -129,7 +129,7 @@ AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_DWORD;
+		node->Type = AML_DWORD_PREFIX;
 		node->Length = 4;
 		node->Buffer = malloc(node->Length);
 		node->Buffer[0] = value & 0xff;
@@ -145,7 +145,7 @@ AML_CHUNK* aml_add_qword(AML_CHUNK* parent, uint64_t value)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_QWORD;
+		node->Type = AML_QWORD_PREFIX;
 		node->Length = 8;
 		node->Buffer = malloc(node->Length);
 		node->Buffer[0] = value & 0xff;
@@ -225,7 +225,7 @@ AML_CHUNK* aml_add_scope(AML_CHUNK* parent, char* name)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_SCOPE;
+		node->Type = AML_SCOPE_OP;
 
 		aml_fill_name(node, name);
 	}
@@ -237,7 +237,7 @@ AML_CHUNK* aml_add_name(AML_CHUNK* parent, char* name)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_NAME;
+		node->Type = AML_NAME_OP;
 
 		aml_fill_name(node, name);
 	}
@@ -250,7 +250,7 @@ AML_CHUNK* aml_add_method(AML_CHUNK* parent, char* name, uint8_t args)
 
 	if (node) {
 		unsigned int offset = aml_fill_name(node, name);
-		node->Type = AML_CHUNK_METHOD;
+		node->Type = AML_METHOD_OP;
 
 		node->Length++;
 		node->Buffer[offset] = args;
@@ -264,7 +264,7 @@ AML_CHUNK* aml_add_package(AML_CHUNK* parent)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_PACKAGE;
+		node->Type = AML_PACKAGE_OP;
 
 		node->Length = 1;
 		node->Buffer = malloc(node->Length);
@@ -277,7 +277,7 @@ AML_CHUNK* aml_add_alias(AML_CHUNK* parent, char* name1, char* name2)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_ALIAS;
+		node->Type = AML_ALIAS_OP;
 
 		node->Length = 8;
 		node->Buffer = malloc(node->Length);
@@ -293,7 +293,7 @@ AML_CHUNK* aml_add_return_name(AML_CHUNK* parent, char* name)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_RETURN;
+		node->Type = AML_RETURN_OP;
 		aml_fill_name(node, name);
 	}
 
@@ -305,7 +305,7 @@ AML_CHUNK* aml_add_return_byte(AML_CHUNK* parent, uint8_t value)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_RETURN;
+		node->Type = AML_RETURN_OP;
 		aml_add_byte(node, value);
 	}
 
@@ -317,7 +317,7 @@ AML_CHUNK* aml_add_device(AML_CHUNK* parent, char* name)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_DEVICE;
+		node->Type = AML_EXT_DEVICE_OP;
 		aml_fill_name(node, name);
 	}
 
@@ -329,7 +329,7 @@ AML_CHUNK* aml_add_local0(AML_CHUNK* parent)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_LOCAL0;
+		node->Type = AML_LOCAL0;
 		node->Length = 1;
 	}
 
@@ -354,10 +354,10 @@ AML_CHUNK* aml_add_byte_buffer(AML_CHUNK* parent, char* data, uint32_t size)
 
 	if (node) {
 		int offset = 0;
-		node->Type = AML_CHUNK_BUFFER;
+		node->Type = AML_BUFFER_OP;
 		node->Length = (uint8_t)(size + 2);
 		node->Buffer = malloc (node->Length);
-		node->Buffer[offset++] = AML_CHUNK_BYTE;  //0x0A
+		node->Buffer[offset++] = AML_BYTE_PREFIX;  //0x0A
 		node->Buffer[offset++] = (char)size;
 		memcpy(node->Buffer+offset,data, node->Length);
 	}
@@ -372,10 +372,10 @@ AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, char* StringBuf)
 	if (node) {
 		unsigned int offset = 0;
 		unsigned int len = strlen(StringBuf);
-		node->Type = AML_CHUNK_BUFFER;
+		node->Type = AML_BUFFER_OP;
 		node->Length = (uint8_t)(len + 3);
 		node->Buffer = malloc (node->Length);
-		node->Buffer[offset++] = AML_CHUNK_BYTE;
+		node->Buffer[offset++] = AML_BYTE_PREFIX;
 		node->Buffer[offset++] = (char)len;
 		memcpy(node->Buffer+offset, StringBuf, len);
 		node->Buffer[offset+len] = '\0';
@@ -390,7 +390,7 @@ AML_CHUNK* aml_add_string(AML_CHUNK* parent, char* StringBuf)
 
 	if (node) {
 		int len = strlen(StringBuf);
-		node->Type = AML_CHUNK_STRING;
+		node->Type = AML_STRING_PREFIX;
 		node->Length = (uint8_t)(len + 1);
 		node->Buffer = malloc (len);
 		memcpy(node->Buffer, StringBuf, len);
@@ -405,7 +405,7 @@ AML_CHUNK* aml_add_return(AML_CHUNK* parent)
 	AML_CHUNK* node = aml_create_node(parent);
 
 	if (node) {
-		node->Type = AML_CHUNK_RETURN;
+		node->Type = AML_RETURN_OP;
 		//aml_add_byte(node, value);
 	}
 
@@ -441,31 +441,31 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 		}
 
 		switch (node->Type) {
-			case AML_CHUNK_NONE:
+			case AML_ONES_OP:
 			case AML_STORE_OP:
-			case AML_CHUNK_LOCAL0:
+			case AML_LOCAL0:
 				node->Size += node->Length;
 				break;
 
-			case AML_CHUNK_METHOD:
-			case AML_CHUNK_SCOPE:
-			case AML_CHUNK_BUFFER:
+			case AML_METHOD_OP:
+			case AML_SCOPE_OP:
+			case AML_BUFFER_OP:
 				node->Size += 1 + node->Length;
 				node->Size += aml_get_size_length(node->Size);
 				break;
 
-			case AML_CHUNK_DEVICE:
+			case AML_EXT_DEVICE_OP:
 				node->Size += 2 + node->Length;
 				node->Size += aml_get_size_length(node->Size);
 				break;
 
-			case AML_CHUNK_PACKAGE:
+			case AML_PACKAGE_OP:
 				node->Buffer[0] = child_count;
 				node->Size += 1 + node->Length;
 				node->Size += aml_get_size_length(node->Size);
 				break;
 				
-			case AML_CHUNK_BYTE:
+			case AML_BYTE_PREFIX:
 				if (node->Buffer[0] == 0x0 || node->Buffer[0] == 0x1) {
 					node->Size += node->Length;
 				} else {
@@ -473,13 +473,13 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 				}
 				break;
 				
-			case AML_CHUNK_WORD:
-			case AML_CHUNK_DWORD:
-			case AML_CHUNK_QWORD:
-			case AML_CHUNK_ALIAS:
-			case AML_CHUNK_NAME:
-			case AML_CHUNK_RETURN:
-			case AML_CHUNK_STRING:
+			case AML_WORD_PREFIX:
+			case AML_DWORD_PREFIX:
+			case AML_QWORD_PREFIX:
+			case AML_ALIAS_OP:
+			case AML_NAME_OP:
+			case AML_RETURN_OP:
+			case AML_STRING_PREFIX:
 				node->Size += 1 + node->Length;
 				break;
 		}
@@ -564,32 +564,32 @@ uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 		AML_CHUNK* child = node->First;
 
 		switch (node->Type) {
-			case AML_CHUNK_NONE:
+			case AML_ONES_OP:
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 
-			case AML_CHUNK_LOCAL0:
+			case AML_LOCAL0:
 			case AML_STORE_OP:
 				offset = aml_write_byte(node->Type, buffer, offset);
 				break;
 
-			case AML_CHUNK_DEVICE:
-				offset = aml_write_byte(AML_CHUNK_OP, buffer, offset);
+			case AML_EXT_DEVICE_OP:
+				offset = aml_write_byte(AML_EXT_OP, buffer, offset);
 				offset = aml_write_byte(node->Type, buffer, offset);
 				offset = aml_write_size(node->Size-2, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 
-			case AML_CHUNK_SCOPE:
-			case AML_CHUNK_METHOD:
-			case AML_CHUNK_PACKAGE:
-			case AML_CHUNK_BUFFER:
+			case AML_SCOPE_OP:
+			case AML_METHOD_OP:
+			case AML_PACKAGE_OP:
+			case AML_BUFFER_OP:
 				offset = aml_write_byte(node->Type, buffer, offset);
 				offset = aml_write_size(node->Size-1, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
 
-			case AML_CHUNK_BYTE:
+			case AML_BYTE_PREFIX:
 				if (node->Buffer[0] == 0x0 || node->Buffer[0] == 0x1) {
 					offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				} else {
@@ -598,13 +598,13 @@ uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 				}
 				break;
 
-			case AML_CHUNK_WORD:
-			case AML_CHUNK_DWORD:
-			case AML_CHUNK_QWORD:
-			case AML_CHUNK_ALIAS:
-			case AML_CHUNK_NAME:
-			case AML_CHUNK_RETURN:
-			case AML_CHUNK_STRING:
+			case AML_WORD_PREFIX:
+			case AML_DWORD_PREFIX:
+			case AML_QWORD_PREFIX:
+			case AML_ALIAS_OP:
+			case AML_NAME_OP:
+			case AML_RETURN_OP:
+			case AML_STRING_PREFIX:
 				offset = aml_write_byte(node->Type, buffer, offset);
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;
