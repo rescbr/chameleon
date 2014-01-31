@@ -24,8 +24,8 @@
 #define __LIBSAIO_SMBIOS_H
 
 
-/* Based on System Management BIOS Reference Specification v2.5 */
-// http://dmtf.org/sites/default/files/standards/documents/DSP0134_2.8.0.pdf
+/* Based on System Management BIOS Reference Specification v2.4 */
+// http://dmtf.org/standards/smbios
 
 typedef uint8_t  SMBString;
 typedef uint8_t  SMBByte;
@@ -139,6 +139,7 @@ enum
 	kSMBTypeMemorySPD			=  130, // MemorySPD (TYPE 130)
 	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
 	kSMBTypeOemProcessorBusSpeed		=  132 //Processor Bus Speed (Type 132)
+    //kSMBTypeOemPlatformFeature		=  133 // Platform Feature (Type 133)
 };
 
 /* =======================
@@ -197,11 +198,11 @@ typedef struct SMBBaseBoard
 	SMBWord     chassisHandle;
 	SMBByte     boardType;				// Type of board
 	SMBByte     numberOfContainedHandles;
-//	SMBWord     containedObjectHandles[1];
 	// 0 - 255 contained handles go here but we do not include
 	// them in our structure. Be careful to use numberOfContainedHandles
 	// times sizeof(SMBWord) when computing the actual record size,
 	// if you need it.
+    SMBByte     containedObjectHandles;
 } __attribute__((packed)) SMBBaseBoard;
 
 /* ====================================
@@ -243,7 +244,7 @@ typedef struct SMBSystemEnclosure
     SMBByte    height;		// Height of the enclosure, in 'U's
     SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
     SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
-//    SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
+    SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
 //    SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
 //    SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
 } __attribute__((packed)) SMBSystemEnclosure;
@@ -562,7 +563,7 @@ typedef struct SMBOemProcessorBusSpeed
  ================================================ */
 struct SMBOemPlatformFeature
 {
-	SMB_STRUCT_HEADER
+	SMB_STRUCT_HEADER           // Type 133
 	SMBWord    PlatformFeature;
 } __attribute__((packed)) SMBOemPlatformFeature;
 

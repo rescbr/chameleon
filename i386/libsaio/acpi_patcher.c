@@ -793,6 +793,8 @@ int setupAcpiNoMod()
 	addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 	if(acpi20_p) {
 		addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
+	} else {
+		verbose("No ACPI 2.\n");
 	}
 	return 1;
 }
@@ -989,7 +991,7 @@ int setupAcpi(void)
 			DBG("New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
 		} else {
 			rsdp_mod->RsdtAddress=0;
-			printf("RSDT not found or incorrect\n");
+			printf("RSDT not found or RSDT incorrect\n");
 		}
 
 		if (version) {

@@ -51,10 +51,10 @@ static void WakeKernel(IOHibernateImageHeader * header)
 
 	printf("\nWake Kernel!\n");
 
-	dst   = (unsigned long *) (header->restore1CodePage << 12);
+	dst   = (unsigned long *) (header->restore1CodePhysPage << 12);
 	count = header->restore1PageCount;
 	proc  = (header->restore1CodeOffset + ((uint32_t) dst));
-	newSP = header->restore1StackOffset + (header->restore1CodePage << 12);
+	newSP = header->restore1StackOffset + (header->restore1CodePhysPage << 12);
 
 	src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 
 							  + header->fileExtentMapSize);
@@ -104,7 +104,7 @@ void HibernateBoot(char *image_filename)
 
 	size = ReadFileAtOffset (image_filename, header, 0, sizeof(IOHibernateImageHeader));
 	printf("header read size %x\n", size);
-	
+
 	imageSize = header->image1Size;
 	codeSize  = header->restore1PageCount << 12;
 	if (kIOHibernateHeaderSignature != header->signature) {
@@ -132,11 +132,11 @@ void HibernateBoot(char *image_filename)
 		}
 	}
 #endif
-	
+
 	allocSize = imageSize + ((4095 + sizeof(hibernate_graphics_t)) & ~4095);
-	
+
 	mem_base = getmemorylimit() - allocSize;//TODO: lower this
-	
+
 	printf("mem_base %x\n", mem_base);
 	if (((long long)mem_base + allocSize) < (1024 * bootInfo->extmem + 0x100000)) {
 		printf ("Not enough space to restore image. Press any key to proceed with normal boot.\n");
@@ -146,14 +146,14 @@ void HibernateBoot(char *image_filename)
 
 	bcopy(header, (void *) mem_base, sizeof(IOHibernateImageHeader));
 	header = (IOHibernateImageHeader *) mem_base;
-	
+
 	imageSize -= sizeof(IOHibernateImageHeader);
 	buffer = (long)(header + 1);
 	
 	if (header->previewSize) {
 		uint64_t preview_offset = header->fileExtentMapSize - sizeof(header->fileExtentMap) + codeSize;
 		uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
-		
+
 		ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader), preview_offset+header->previewSize);
 		drawPreview ((void *)(long)(buffer+preview_offset + header->previewPageListSize), &(progressSaveUnder[0][0]));
 		previewTotalSectors = (imageSize-(preview_offset+header->previewSize))/512;
@@ -168,12 +168,12 @@ void HibernateBoot(char *image_filename)
 		previewLoadedSectors = 0;
 		previewSaveunder = 0;
 #if 0
-		AsereBLN:
-		check_vga_nvidia() didn't work as expected (recursion level > 0 & return value).
-		Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
-		and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
-		remove it completely
-		setVideoMode( VGA_TEXT_MODE, 0 );
+	//	AsereBLN:
+	//	check_vga_nvidia() didn't work as expected (recursion level > 0 & return value).
+	//	Unforutnaltely I cannot find a note why to switch back to text mode for nVidia cards only
+	//	and because it check_vga_nvidia does not work (cards normally are behind a bridge) I will
+	//	remove it completely
+	//	setVideoMode( VGA_TEXT_MODE, 0 );
 #endif
 	} else {
 		ReadFileAtOffset (image_filename, (char *)buffer, sizeof(IOHibernateImageHeader), imageSize);

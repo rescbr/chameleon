@@ -170,11 +170,29 @@ static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upg
     "Socket LGA1356-3"          /* 2Ch */
 };
 
+static const char *SMBMemoryDeviceFormFactors[] =    // Bungo: strings for form factor (Table Type 17 - Memory Device)
+{
+    "Other",                    /* 01h */
+    "Unknown",                  /* 02h */
+    "SIMM",                     /* 03h */
+    "SIP",                      /* 04h */
+    "Chip",                     /* 05h */
+    "DIP",                      /* 06h */
+    "ZIP",                      /* 07h */
+    "Proprietary Card",         /* 08h */
+    "DIMM",                     /* 09h */
+    "TSOP",                     /* 0Ah */
+    "Row of chips",             /* 0Bh */
+    "RIMM",                     /* 0Ch */
+    "SODIMM",                   /* 0Dh */
+    "SRIMM",                    /* 0Eh */
+    "FB-DIMM"                   /* 0Fh */
+};
+
 /*=====
  7.18.2
  ====*/
-static const char *
-SMBMemoryDeviceTypes[] =
+static const char *SMBMemoryDeviceTypes[] =
 {
 	"RAM",                      /* 00h  Undefined */
 	"RAM",                      /* 01h  Other */
@@ -236,15 +254,12 @@ void decodeBIOSInformation(SMBStructHeader *structHeader)
 	DBG("BIOS Information:\n");
 	DBG("\tVendor: %s\n", SMBStringForField(structHeader, ((SMBBIOSInformation *)structHeader)->vendor, neverMask));
 	DBG("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBBIOSInformation *)structHeader)->version, neverMask));
-	// Address Segment
-	DBG("\tRelease Date: %s\n", SMBStringForField(structHeader, ((SMBBIOSInformation *)structHeader)->releaseDate, neverMask));
+    DBG("\tRelease Date: %s\n", SMBStringForField(structHeader, ((SMBBIOSInformation *)structHeader)->releaseDate, neverMask));
+    // Address:
+    // Runtime Size:
+    // ROM Size:
+    // DBG("\tCharacteristics: (0x%llX) %s\n", ((SMBBIOSInformation *)structHeader)->characteristics, SMBBIOSInfoChar0[((SMBBIOSInformation *)structHeader)->characteristics]);
 	DBG("\tBIOS Revision: %d.%d\n", ((SMBBIOSInformation *)structHeader)->releaseMajor, ((SMBBIOSInformation *)structHeader)->releaseMinor);
-	// ROM Size
-	// DBG("\tSupported BIOS functions: (0x%llX) %s\n", ((SMBBIOSInformation *)structHeader)->characteristics, SMBBIOSInfoChar0[((SMBBIOSInformation *)structHeader)->characteristics]);
-	// Firmware Major Release
-	// Firmware Minor Release
-	// SMBByte    characteristicsExt1;
-	// SMBByte    characteristicsExt2;
 	DBG("\n");
 }
 
@@ -289,16 +304,15 @@ void decodeBaseBoard(SMBStructHeader *structHeader)
 	DBG("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBBaseBoard *)structHeader)->version, neverMask));
 	DBG("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBBaseBoard *)structHeader)->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField(structHeader, ((SMBBaseBoard *)structHeader)->assetTag, neverMask));
-	// Feature Flags (BYTE)
+	// Features:
 	DBG("\tLocation In Chassis: %s\n", SMBStringForField(structHeader, ((SMBBaseBoard *)structHeader)->locationInChassis, neverMask)); // Part Component
-	// Chassis Handle (WORD)
+	// Chassis Handle:
 	if ((((SMBBaseBoard *)structHeader)->boardType < kSMBBaseBoardUnknown) || (((SMBBaseBoard *)structHeader)->boardType > kSMBBaseBoardInterconnect)) {
 		DBG("\tType: %s\n", OutOfSpecStr);
 	} else {
 		DBG("\tType: %s\n", SMBBaseBoardTypes[(((SMBBaseBoard *)structHeader)->boardType - 1)]);
 	  }
-	// Number of Contained Object Handles (n) (BYTE)
-	// Contained Object Handles n(WORDs)
+    //DBG("\tContained Object Handles: %d\n", ((SMBBaseBoard *)structHeader)->numberOfContainedHandles;
 	DBG("\n");
 }
 
@@ -315,6 +329,7 @@ void decodeSystemEnclosure(SMBStructHeader *structHeader)
 	} else {
 		DBG("\tType: %s\n", SMBChassisTypes[(((SMBSystemEnclosure *)structHeader)->chassisType - 1)]);
 	  }
+    // Lock:
 	DBG("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBSystemEnclosure *)structHeader)->version, neverMask));
 	DBG("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBSystemEnclosure *)structHeader)->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField(structHeader, ((SMBSystemEnclosure *)structHeader)->assetTag, neverMask));
@@ -347,19 +362,37 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 	DBG("\tFamily: 0x%X\n", ((SMBProcessorInformation *)structHeader)->processorFamily);
 	DBG("\tManufacturer: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->manufacturer, neverMask));
 	DBG("\tID: 0x%llX\n", ((SMBProcessorInformation *)structHeader)->processorID);
-	DBG("\tProcessor Version: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->processorVersion, neverMask));
+//	DBG("\tSignature: Type %u, Family %u, Model %u, Stepping %u\n", (eax >> 12) & 0x3, ((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F), ((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F), eax & 0xF);
+    // Flags:
+	DBG("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->processorVersion, neverMask));
 //	DBG("\tVoltage: 0.%xV\n", ((SMBProcessorInformation *)structHeader)->voltage);
 	DBG("\tExternal Clock: %dMHz\n", ((SMBProcessorInformation *)structHeader)->externalClock);
-	DBG("\tMaximal Clock: %dMHz\n", ((SMBProcessorInformation *)structHeader)->maximumClock);
-	DBG("\tCurrent Clock: %dMHz\n", ((SMBProcessorInformation *)structHeader)->currentClock);
+	DBG("\tMax Speed: %dMHz\n", ((SMBProcessorInformation *)structHeader)->maximumClock);
+	DBG("\tCurrent Speed: %dMHz\n", ((SMBProcessorInformation *)structHeader)->currentClock);
+    // Status: Populated/Unpopulated
     if ((((SMBProcessorInformation *)structHeader)->processorUpgrade < 1) || (((SMBProcessorInformation *)structHeader)->processorUpgrade > 0x2C)) {
 		DBG("\tUpgrade: %s\n", OutOfSpecStr);
 	} else {
 		DBG("\tUpgrade: %s\n", SMBProcessorUpgrades[((SMBProcessorInformation *)structHeader)->processorUpgrade - 1]);
 	  }
+    // L1 Cache Handle:
+    // L2 Cache Handle:
+    // L3 Cache Handle:
 	DBG("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->assetTag, neverMask));
 	DBG("\tPart Number: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->partNumber, neverMask));
+/*
+    if(((SMBProcessorInformation *)structHeader)->coreCount != 0) {
+            DBG("\tCore Count: %d\n", ((SMBProcessorInformation *)structHeader)->coreCount);
+    }
+    if(((SMBProcessorInformation *)structHeader)->coreEnabled != 0) {
+            DBG("\tCore Enabled: %d\n", ((SMBProcessorInformation *)structHeader)->coreEnabled);
+    }
+    if(((SMBProcessorInformation *)structHeader)->threadCount != 0) {
+            DBG("\tThread Count: %d\n", ((SMBProcessorInformation *)structHeader)->threadCount);
+    }
+*/
+    // Characteristics:
 //	DBG("\tProcessor Family 2: %d\n", ((SMBProcessorInformation *)structHeader)->processorFamily2);
 	DBG("\n");
 }
@@ -381,26 +414,60 @@ void decodeSMBOEMStrings(SMBStructHeader *structHeader)
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
-// MemoryDevice (Type 17)
+// Memory Device (Type 17)
 //-------------------------------------------------------------------------------------------------------------------------
 void decodeMemoryDevice(SMBStructHeader *structHeader)
 {
     printHeader(structHeader);
 	DBG("Memory Device:\n");
-	DBG("\tDevice Locator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->deviceLocator, neverMask));
+    // Aray Handle
+    if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF) {
+        DBG("\tError Information Handle: No Error\n");
+    } else {
+        DBG("\tError Information Handle: 0x%x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
+      }
+    // Total Width:
+    // Data Width:
+    switch (((SMBMemoryDevice *)structHeader)->memorySize) {
+        case 0:
+            DBG("\tSize: No Module Installed\n");
+            break;
+        case 0x7FFF:
+            DBG("\tSize: 32GB or more\n");
+            break;
+        case 0xFFFF:
+            DBG("\tSize: Unknown\n");
+            break;
+        default:
+            DBG("\tSize: %d %s\n", ((SMBMemoryDevice *)structHeader)->memorySize & 0x7FFF, ((((SMBMemoryDevice *)structHeader)->memorySize & 0x8000) == 0x8000) ? "kB" : "MB");
+            break;
+    }
+    if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F)) {
+ 		DBG("\tForm Factor: %s\n", OutOfSpecStr);
+ 	} else {
+        DBG("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
+      }
+    // Set:
+	DBG("\tLocator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->deviceLocator, neverMask));
 	DBG("\tBank Locator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->bankLocator, neverMask));
-	DBG("\tMemory Type: %s\n", SMBMemoryDeviceTypes[((SMBMemoryDevice *)structHeader)->memoryType]);
+    if (((SMBMemoryDevice *)structHeader)->memoryType > kSMBMemoryDeviceTypeCount) {
+ 		DBG("\tType: %s\n", OutOfSpecStr);
+ 	} else {
+        DBG("\tType: %s\n", SMBMemoryDeviceTypes[((SMBMemoryDevice *)structHeader)->memoryType]);
+      }
+    // Type Detail:
 	DBG("\tSpeed: %d MHz\n", ((SMBMemoryDevice *)structHeader)->memorySpeed);
-	DBG("\tError Handle: %x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
 	DBG("\tManufacturer: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->manufacturer, neverMask));
 	DBG("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->assetTag, neverMask));
 	DBG("\tPart Number: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->partNumber, neverMask));
+    // Rank:
+    // Configured Clock Speed:
 	DBG("\n");
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
-// Apple Specific
+// Apple Specific Processor Type (Type 131)
 //-------------------------------------------------------------------------------------------------------------------------
 void decodeOemProcessorType(SMBStructHeader *structHeader)
 {
@@ -410,6 +477,9 @@ void decodeOemProcessorType(SMBStructHeader *structHeader)
 	DBG("\n");
 }
 
+//-------------------------------------------------------------------------------------------------------------------------
+// Apple Specific Processor Bus Speed (Type 132)
+//-------------------------------------------------------------------------------------------------------------------------
 void decodeOemProcessorBusSpeed(SMBStructHeader *structHeader)
 {
     printHeader(structHeader);
@@ -417,8 +487,31 @@ void decodeOemProcessorBusSpeed(SMBStructHeader *structHeader)
     DBG("\tqpi=%d MT/s\n", ((SMBOemProcessorBusSpeed *)structHeader)->ProcessorBusSpeed);
 	DBG("\n");
 }
+// Info for the Table Above: dmi 2.7+ https://wiki.debian.org/InstallingDebianOn/Thinkpad/T42/lenny?action=AttachFile&do=get&target=dmidecode.Lenny_Thinkpad_T42_2373.txt
+    
 //-------------------------------------------------------------------------------------------------------------------------
-
+// Apple Specific Platform Feature (Type 133)
+//-------------------------------------------------------------------------------------------------------------------------
+//void decodeOemPlatformFeature(SMBStructHeader *structHeader)
+//{
+//	printHeader(structHeader);
+//	DBG("Apple specific Platform Feature\n");
+//	DBG("\t%s\n", ((SMBOemPlatformFeature *)structHeader)->PlatformFeature);
+//	DBG("\n");
+//}
+    
+//-------------------------------------------------------------------------------------------------------------------------
+// Specific (Type 134)
+//-------------------------------------------------------------------------------------------------------------------------
+//void decodeOem(SMBStructHeader *structHeader)
+//{
+//	printHeader(structHeader);
+//	DBG("Apple specific Feature\n");
+//	DBG("\t%s\n", ((SMBOemPlatformFeature *)structHeader)->Feature);
+//	DBG("\n");
+//}
+    
+//-------------------------------------------------------------------------------------------------------------------------
 
 void decodeSMBIOSTable(SMBEntryPoint *eps)
 {
@@ -462,6 +555,10 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 			//case 6: // kSMBTypeMemoryModule: // Type 6
 			//	decodeMemoryModule(structHeader);
 			//	break;
+                
+            //case kSMBTypeSystemSlot: // Type 9
+            //	decodeSMBTypeSystemSlot(structHeader);
+            //	break;
 
 			case kSMBOEMStrings: // Type 11
 				decodeSMBOEMStrings(structHeader);
@@ -486,7 +583,9 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				decodeOemProcessorBusSpeed(structHeader);
 				break;
 
-			//kSMBTypeOemPlatformFeature: // Type 133
+			//case kSMBTypeOemPlatformFeature: // Type 133
+            //	decodeOemPlatformFeature(structHeader);
+            //	break;
 
 			case kSMBTypeEndOfTable: // Type 127
                 DBG("Type: %d, Length: %d, Handle: 0x%04x\n", structHeader->type, structHeader->length, structHeader->handle);
