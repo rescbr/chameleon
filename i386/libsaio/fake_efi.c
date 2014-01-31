@@ -776,7 +776,7 @@ void saveOriginalSMBIOS(void)
 	}
 
 	memcpy(tableAddress, (void *)origeps->dmi.tableAddress, origeps->dmi.tableLength);
-	DT__AddProperty(node, "SMBIOS-ORIG", origeps->dmi.tableLength, tableAddress);  // Bungo: changed from SMBIOS to SMBIOS-ORIG to differentiate
+	DT__AddProperty(node, "SMBIOS", origeps->dmi.tableLength, tableAddress);
 }
 
 /*
