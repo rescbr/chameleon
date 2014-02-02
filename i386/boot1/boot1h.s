@@ -77,7 +77,7 @@ kBoot1RelocAddr		EQU		0xE000								; boot1 relocated address
 kBoot1Sector1Addr	EQU		kBoot1RelocAddr + kSectorBytes		; boot1 load address for sector 1
 kHFSPlusBuffer		EQU		kBoot1Sector1Addr + kSectorBytes	; HFS+ Volume Header address
 
-kBoot2Sectors		EQU		(448 * 1024 - 512) / kSectorBytes	; max size of 'boot' file in sectors
+kBoot2Sectors		EQU		(1000000) / kSectorBytes	; max size of 'boot' file in sectors
 kBoot2Segment		EQU		0x2000								; boot2 load segment
 kBoot2Address		EQU		kSectorBytes						; boot2 load address
 
@@ -466,14 +466,15 @@ start_reloc:
 ; Find stage2 boot file in a HFS+ Volume's root folder.
 ;
 findRootBoot:
-  PrintChar ('!')
 ;%if 0
+;  PrintChar ('a')
 	mov		al, kHFSCatalogFileID
 	lea		si, [searchCatalogKey]
 	lea		di, [kHFSPlusBuffer + HFSPlusVolumeHeader.catalogFile + HFSPlusForkData.extents]
 	call	lookUpBTree
 	jne		error
 
+; PrintChar ('b')
 	lea		si, [bp + BTree.recordDataPtr]
 	mov		si, [si]
 	cmp		WORD [si], kHFSPlusFileRecord
@@ -492,8 +493,10 @@ findRootBoot:
 	bswap	ebx									; convert file size to little-endian
 	add		ebx, kSectorBytes - 1				; adjust size before unit conversion
 	shr		ebx, 9								; convert file size to sector unit
+ PrintChar ('d')
 	cmp		bx, kBoot2Sectors					; check if bigger than max stage2 size
 	ja		error
+ PrintChar ('e')
 	mov		eax, [si + HFSPlusCatalogFile.fileID]
 	bswap	eax									; convert fileID to little-endian
 	xor		ecx, ecx
@@ -1007,22 +1010,6 @@ free:
 
 %endif ; UNUSED
 
-;--------------------------------------------------------------------------
-; Pad the rest of the 512 byte sized sector with zeroes. The last
-; two bytes is the mandatory boot sector signature.
-;
-; If the booter code becomes too large, then nasm will complain
-; that the 'times' argument is negative.
-
-;
-; XXX - compilation errors with debug enabled (see comment above about nasm)
-; Azi: boot1h.s:994: error: TIMES value -67 is negative
-;
-pad_table_and_sig:
-	times			508-($-$$) db 0
-	dw              kChameleonBoot1hSignature
-	dw				kBootSignature ; remove this ! Don't forgot boot0.s, line 419 : -4 become -2
-
 ;
 ; Sector 1 code area
 ;
@@ -1483,7 +1470,7 @@ searchCatKeyNameLen	EQU		($ - searchCatKeyName) / 2
 ;
 pad_sector_1:
 	times			1022-($-$$) db 0
-	dw				kBootSignature
+	dw				kChameleonBoot1hSignature
 
 ;
 ; Local BTree variables

@@ -406,7 +406,7 @@ checkGPT:
 loadBootSector:
     pusha
 
-    mov     al, 3
+    mov     al, 2
     mov     bx, kBoot0LoadAddr
     call    load
     jc      error
@@ -415,7 +415,7 @@ loadBootSector:
     ; Check for chameleon boot block signature of boot1h
     ;
     mov	    di, bx
-    cmp     WORD [di + kSectorBytes - 4], kChameleonBoot1hSignature
+    cmp     WORD [di + kSectorBytes*2 - 2], kChameleonBoot1hSignature
 
 .exit:
     popa
@@ -658,8 +658,7 @@ pad_boot:
     times 440-($-$$) db 0
 
 pad_table_and_sig:
-    times 508-($-$$) db 0
-    dw    kChameleonBoot1hSignature
+    times 510-($-$$) db 0
     dw    kBootSignature
 
 
