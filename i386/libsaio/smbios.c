@@ -787,12 +787,13 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 
 	strSize = strlen(string);
 
-	/* Bungo: What was this for?
-	// remove any spaces found at the end
-	while ((strSize != 0) && (string[strSize - 1] == ' ')) {
-		strSize--;
+	// remove any spaces found at the end but only in MemoryDevice
+	if (structHeader->type == kSMBTypeMemoryDevice) {
+		while ((strSize != 0) && (string[strSize - 1] == ' ')) {
+			strSize--;
+		}
 	}
-	*/
+
 	if (strSize == 0) {
 		*field = 0;
 		return;
