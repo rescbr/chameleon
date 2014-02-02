@@ -2,7 +2,7 @@
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
  * Original Code as defined in and that are subject to the Apple Public
@@ -10,7 +10,7 @@
  * except in compliance with the License.  Please obtain a copy of the
  * License at http://www.apple.com/publicsource and read it before using
  * this file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -18,11 +18,11 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/* 
+/*
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
@@ -33,8 +33,8 @@
 /*
  *			INTEL CORPORATION PROPRIETARY INFORMATION
  *
- *	This software is supplied under the terms of a license	agreement or 
- *	nondisclosure agreement with Intel Corporation and may not be copied 
+ *	This software is supplied under the terms of a license	agreement or
+ *	nondisclosure agreement with Intel Corporation and may not be copied
  *	nor disclosed except in accordance with the terms of that agreement.
  *
  *	Copyright 1988, 1989 by Intel Corporation
@@ -99,10 +99,10 @@ static void zeroBSS(void)
     extern char  bss_end    __asm("section$end$__DATA$__bss");
     extern char  common_start  __asm("section$start$__DATA$__common");
     extern char  common_end    __asm("section$end$__DATA$__common");
-	
+
 	bzero(&bss_start, (&bss_end - &bss_start));
 	bzero(&common_start, (&common_end - &common_start));
-} 
+}
 
 //==========================================================================
 // Malloc error function
@@ -129,47 +129,47 @@ static int ExecKernel(void *binary)
 {
 	int			ret;
 	entry_t		kernelEntry;
-	
+
 	bootArgs->kaddr = bootArgs->ksize = 0;
 	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
-	
+
 	ret = DecodeKernel(binary,
 					   &kernelEntry,
 					   (char **) &bootArgs->kaddr,
 					   (int *)&bootArgs->ksize );
-	
+
 	if ( ret != 0 )
 		return ret;
-	
+
 	// Reserve space for boot args
 	reserveKernBootStruct();
-	
+
 	// Notify modules that the kernel has been decoded
 	execute_hook("DecodedKernel", (void*)binary, (void*)bootArgs->kaddr, (void*)bootArgs->ksize, NULL);
-	
+
 	setupFakeEfi();
-	
+
 	// Load boot drivers from the specifed root path.
 	//if (!gHaveKernelCache)
 	LoadDrivers("/");
-	
+
 	execute_hook("DriversLoaded", (void*)binary, NULL, NULL, NULL);
-	
+
 	clearActivityIndicator();
-	
+
 	if (gErrors) {
 		printf("Errors encountered while starting up the computer.\n");
 		printf("Pausing %d seconds...\n", kBootErrorTimeout);
 		sleep(kBootErrorTimeout);
 	}
-	
+
 	md0Ramdisk();
-	
+
 	verbose("Starting Darwin %s\n",( archCpuType == CPU_TYPE_I386 ) ? "x86" : "x86_64");
 	verbose("Boot Args: %s\n", bootArgs->CommandLine);
 
 	// Cleanup the PXE base code.
-	
+
 	if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
 		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
 		{
@@ -177,12 +177,12 @@ static int ExecKernel(void *binary)
 			sleep(2);
 		}
 	}
-	
+
 	bool dummyVal;
 	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal) {
 		showTextBuffer(msgbuf, strlen(msgbuf));
 	}
-	
+
 	usb_loop();
 
 	// If we were in text mode, switch to graphics mode.
@@ -192,11 +192,11 @@ static int ExecKernel(void *binary)
 		setVideoMode( GRAPHICS_MODE, 0 );
 	else
 		drawBootGraphics();
-	
+
 	setupBooterLog();
-	
+
 	finalizeBootStruct();
-	
+
 	// Jump to kernel's entry point. There's no going back now.
 	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
 	{
@@ -207,7 +207,7 @@ static int ExecKernel(void *binary)
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
-		
+
 		startprog( kernelEntry, bootArgs );
 	}
 	else {
@@ -216,7 +216,7 @@ static int ExecKernel(void *binary)
 
 		startprog( kernelEntry, bootArgsPreLion );
 	}
-	
+
 	// Not reached
 	return 0;
 }
@@ -376,57 +376,57 @@ void common_boot(int biosDevAndPart)
 	int				status;
 	unsigned int	allowBVFlags = kBVFlagSystemVolume | kBVFlagForeignBoot;
 	unsigned int	denyBVFlags = kBVFlagEFISystem;
-	
+
 	// Set reminder to unload the PXE base code. Neglect to unload
 	// the base code will result in a hang or kernel panic.
 	gUnloadPXEOnExit = true;
-	
+
 	// Record the device that the booter was loaded from.
 	gBIOSDev = biosDevAndPart & kBIOSDevMask;
 	gBootPartition = ((biosDevAndPart & 0xFF00) >> 8);
-	
+
 	// Initialize boot info structure.
 	initKernBootStruct();
-	
+
 	initBooterLog();
-	
+
 	// Setup VGA text mode.
 	// Not sure if it is safe to call setVideoMode() before the
 	// config table has been loaded. Call video_mode() instead.
 	video_mode( 2 );  // 80x25 mono text mode.
-	
+
 	// Scan and record the system's hardware information.
 	scan_platform();
-	
+
 	// First get info for boot volume.
 	scanBootVolumes(gBIOSDev, 0);
 	bvChain = getBVChainForBIOSDev(gBIOSDev);
 	setBootGlobals(bvChain);
-	
+
 	// Load boot.plist config file
 	status = loadChameleonConfig(&bootInfo->chameleonConfig);
-	
+
 	if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet) {
 		gBootMode |= kBootModeQuiet;
 	}
-	
+
 	// Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
 	if (getBoolForKey(kInstantMenuKey, &instantMenu, &bootInfo->chameleonConfig) && instantMenu) {
 		firstRun = false;
 	}
-	
+
 	// Loading preboot ramdisk if exists.
 	loadPrebootRAMDisk();
-	
+
 	// Disable rescan option by default
 	gEnableCDROMRescan = false;
-	
+
 	// Enable it with Rescan=y in system config
 	if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->chameleonConfig)
 		&& gEnableCDROMRescan) {
 		gEnableCDROMRescan = true;
 	}
-	
+
 	// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
 	rescanPrompt = false;
 	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig)
@@ -434,37 +434,37 @@ void common_boot(int biosDevAndPart)
 	{
 		gEnableCDROMRescan = promptForRescanOption();
 	}
-	
+
 	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
 	if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->chameleonConfig)
 		&& gScanSingleDrive) {
 		gScanSingleDrive = true;
 	}
-	
+
 	// Create a list of partitions on device(s).
 	if (gScanSingleDrive) {
 		scanBootVolumes(gBIOSDev, &bvCount);
 	} else {
 		scanDisks(gBIOSDev, &bvCount);
 	}
-	
+
 	// Create a separated bvr chain using the specified filters.
 	bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
-	
+
 	gBootVolume = selectBootVolume(bvChain);
-	
-	// Intialize module system 
+
+	// Intialize module system
 	init_module_system();
-		
+
 #if DEBUG
 	printf("gBIOSDev=%d\n", gBIOSDev);
 	printf("gBootPartition=%d\n", gBootPartition);
-	
+
 	printf(" gBootVolume: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
 			 gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
 	printf(" gBIOSBootVolume==bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
 			 gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-	
+
 	for (BVRef bvr = bvChain; bvr; bvr = bvr->next)
 	{
 		printf(" chain: %d, dev: %d, part: %d, flags: %d, ver:%s vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->OSVersion, bvr->visible);
@@ -473,7 +473,7 @@ void common_boot(int biosDevAndPart)
 	getchar();
 #endif
 
-	
+
 	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->chameleonConfig);
@@ -482,9 +482,9 @@ void common_boot(int biosDevAndPart)
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
-	
+
 	setBootGlobals(bvChain);
-	
+
 	// Parse args, load and start kernel.
 	while (1)
 	{
@@ -494,7 +494,7 @@ void common_boot(int biosDevAndPart)
 		int			len, ret = -1;
 		long		flags, sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
-		
+
 		char        bootFile[sizeof(bootInfo->bootFile)];
 		char		bootFilePath[512];
 		char		kernelCacheFile[512];
@@ -502,11 +502,11 @@ void common_boot(int biosDevAndPart)
 		// Initialize globals.
 		sysConfigValid = false;
 		gErrors		   = false;
-		
+
 		status = getBootOptions(firstRun);
 		firstRun = false;
 		if (status == -1) continue;
-		 
+
 		status = processBootOptions();
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;
@@ -517,19 +517,19 @@ void common_boot(int biosDevAndPart)
 			if (gBootVolume == NULL)
 			{
 				freeFilteredBVChain(bvChain);
-				
+
 				if (gEnableCDROMRescan)
 					rescanBIOSDevice(gBIOSDev);
-				
+
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
 				setupDeviceList(&bootInfo->themeConfig);
 			}
 			continue;
 		}
-		
+
 		// Other status (e.g. 0) means that we should proceed with boot.
-		
+
 		// Turn off any GUI elements
 		if ( bootArgs->Video.v_display == GRAPHICS_MODE )
 		{
@@ -541,78 +541,78 @@ void common_boot(int biosDevAndPart)
 			drawBackground();
 			updateVRAM();
 		}
-		
+
 		// Find out which version mac os we're booting.
 		getOSVersion();
-		
+
 		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
 			archCpuType = CPU_TYPE_X86_64;
 		} else {
 			archCpuType = CPU_TYPE_I386;
 		}
-		
+
 		if (getValueForKey(karch, &val, &len, &bootInfo->chameleonConfig)) {
 			if (strncmp(val, "i386", 4) == 0) {
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-		
+
 		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
 			if (strncmp(val, "i386", 4) == 0) {
 				archCpuType = CPU_TYPE_I386;
 			}
 		}
-		
+
 		// Notify modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
-		
+
 		if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig)) {
 			tryresume = true;
 			tryresumedefault = true;
 		} else {
 			tryresumedefault = false;
 		}
-		
+
 		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig)) {
 			forceresume = false;
 		}
-		
+
 		if (forceresume) {
 			tryresume = true;
 			tryresumedefault = false;
 		}
-		
+
 		while (tryresume) {
 			const char *tmp;
 			BVRef bvr;
 			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->chameleonConfig))
 				val = "/private/var/vm/sleepimage";
-			
+
 			// Do this first to be sure that root volume is mounted
 			ret = GetFileInfo(0, val, &flags, &sleeptime);
-			
+
 			if ((bvr = getBootVolumeRef(val, &tmp)) == NULL)
 				break;
-			
+
 			// Can't check if it was hibernation Wake=y is required
 			if (bvr->modTime == 0 && tryresumedefault)
 				break;
-			
+
 			if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				break;
-			
+
 			if (!forceresume && ((sleeptime+3)<bvr->modTime)) {
-#if DEBUG	
+#if DEBUG
 				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",
 						bvr->modTime-sleeptime);
-#endif				  
+#endif
 				break;
 			}
-			
+
 			HibernateBoot((char *)val);
 			break;
 		}
-		
+
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 
 		getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
@@ -646,7 +646,7 @@ void common_boot(int biosDevAndPart)
 				useKernelCache = false;
 
 		} while(0);
-		
+
 		do {
 			if (useKernelCache) {
 				ret = LoadKernelCache(kernelCacheFile, &binary);
@@ -687,7 +687,7 @@ void common_boot(int biosDevAndPart)
 				// No alternate location found, using the original kernel image path.
 				strlcpy(bootFilePath, bootFile,sizeof(bootFilePath));
 			}
-			
+
 			verbose("Loading kernel %s\n", bootFilePath);
 			ret = LoadThinFatFile(bootFilePath, &binary);
 			if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
@@ -696,18 +696,18 @@ void common_boot(int biosDevAndPart)
 				ret = LoadThinFatFile(bootFilePath, &binary);
 			}
 		} while (0);
-		
+
 		clearActivityIndicator();
-		
+
 #if DEBUG
 		printf("Pausing...");
 		sleep(8);
 #endif
-		
+
 		if (ret <= 0) {
 			printf("Can't find %s\n", bootFile);
 			sleep(1);
-			
+
 			if (gBootFileType == kNetworkDeviceType) {
 				// Return control back to PXE. Don't unload PXE base code.
 				gUnloadPXEOnExit = false;
@@ -720,7 +720,7 @@ void common_boot(int biosDevAndPart)
 			ret = ExecKernel(binary);
 		}
 	}
-	
+
 	// chainboot
 	if (status == 1) {
 		// if we are already in graphics-mode,
@@ -728,7 +728,7 @@ void common_boot(int biosDevAndPart)
 			setVideoMode(VGA_TEXT_MODE, 0); // switch back to text mode.
 		}
 	}
-	
+
 	if ((gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit) {
 		nbpUnloadBaseCode();
 	}
@@ -744,9 +744,9 @@ static void selectBiosDevice(void)
 	CacheReset();
 	diskFreeMap(oldMap);
 	oldMap = NULL;
-	
+
 	int dev = selectAlternateBootDevice(gBIOSDev);
-	
+
 	BVRef bvchain = scanBootVolumes(dev, 0);
 	BVRef bootVol = selectBootVolume(bvchain);
 	gBootVolume = bootVol;
@@ -755,7 +755,7 @@ static void selectBiosDevice(void)
 }
 */
 
-bool checkOSVersion(const char * version) 
+bool checkOSVersion(const char * version)
 {
 	return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 			&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
@@ -782,7 +782,7 @@ unsigned long Adler32(unsigned char *buf, long len)
 	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
 	unsigned long result;
 	int k;
-	
+
 	while (len > 0) {
 		k = len < NMAX ? len : NMAX;
 		len -= k;
