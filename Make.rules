@@ -103,7 +103,7 @@ $(RECURSIVE_TARGETS):
 				target=`echo $@ | sed s/-recursive//`; \
 				list='$(SUBDIRS)'; for subdir in $$list; do \
 					echo ================= Making $$target in $$subdir =================; \
-					(cd $$subdir && $(MAKE) $$target)						\
+					(cd $$subdir && "$(MAKE)" $$target)						\
 					|| eval $$failcom;					\
 				done;
 
@@ -128,7 +128,7 @@ $(RECURSIVE_CLEAN_TARGETS):
 					else \
 						local_target="$$target"; \
 					fi; \
-					(cd $$subdir && $(MAKE) $$local_target) \
+					(cd $$subdir && "$(MAKE)" $$local_target) \
 					|| eval $$failcom; \
 				done
 
