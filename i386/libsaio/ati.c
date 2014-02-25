@@ -1568,12 +1568,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6820,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700 Series",			kBuri	}, // ATI7000Controller.kext
 	{ 0x6821,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700 Series",			kBuri	}, // ATI7000Controller.kext
 
-//	{ 0x6823,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 8800M Series",			kBuri	},
+//	{ 0x6823,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 8850M Series",			kBuri	},
 //	{ 0x6824,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700M Series",			kBuri	},
 	{ 0x6825,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7870 Series",			kBuri	}, // ATI7000Controller.kext
 	{ 0x6826,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7700 Series",			kBuri	},
 	{ 0x6827,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 7850M/8850M Series",		kBuri	}, // ATI7000Controller.kext
-//	{ 0x6828,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ??? Series",			kBuri	},
+//	{ 0x6828,	0x00000000, CHIP_FAMILY_VERDE,		"FirePro W600",			kBuri	},
 //	{ 0x6829,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD ??? Series",			kBuri	},
 
 	{ 0x682B,	0x00000000, CHIP_FAMILY_VERDE,		"AMD Radeon HD 8800M Series",            kBuri	},
