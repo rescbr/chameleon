@@ -32,6 +32,12 @@
 #include "pci.h"
 #include "modules.h"
 
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
@@ -1254,15 +1260,21 @@ processBootOptions()
 				}
 			}
 		}
-        
+        /*
 		// Try to get the volume uuid string
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
-         
+        */
 		// If we have the volume uuid add it to the commandline arguments
 		if (strlen(gBootUUIDString)) {
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
+		}
+        
+        // Try to get the volume uuid string
+        if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
+            DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
 
@@ -1274,17 +1286,18 @@ processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else {
+		} else { /*
 			if (strlen(gBootUUIDString)) {
 				val = "*uuid";
 				cnt = 5;
-			} else {
+			} else { */
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			}
-		} 
+			/* } */
+		}
+        
 		if (cnt > 0) {
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}

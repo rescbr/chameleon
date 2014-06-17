@@ -60,7 +60,7 @@ keyncmp(const char *str, const char *key, int n)
 		break;
 	    }
 	} else if (c == '\"') {
-	    /* Premature end of key */
+	    // Premature end of key
 	    return 1;
 	}
 	if (c != *str++) {
@@ -254,8 +254,7 @@ char *newStringForStringTableKey(char *table, char *key, config_file_t *config)
 
 #endif
 
-char *
-newStringForKey(char *key, config_file_t *config)
+char *newStringForKey(char *key, config_file_t *config)
 {
 	const char *val;
 	char *newstr;

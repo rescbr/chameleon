@@ -127,7 +127,7 @@
    ================================================ */
 //#define kSMBOemPlatformFeatureKey                 "SMoemplatformfeature"
 
-/* ==================================================*/
+/* =================================================*/
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
 
 typedef struct

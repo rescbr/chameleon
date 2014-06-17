@@ -261,17 +261,17 @@ void scan_cpu(PlatformInfo_t *p)
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
-#if DEBUG_CPU
+// #if DEBUG_CPU
 	{
 		int		i;
-		printf("CPUID Raw Values:\n");
+		DBG("CPUID Raw Values:\n");
 		for (i=0; i<CPUID_MAX; i++) {
-			printf("%02d: %08x-%08x-%08x-%08x\n", i,
+			DBG("%02d: %08x-%08x-%08x-%08x\n", i,
 				   p->CPU.CPUID[i][0], p->CPU.CPUID[i][1],
 				   p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
 		}
 	}
-#endif
+// #endif
 
 /*
     EAX (Intel):

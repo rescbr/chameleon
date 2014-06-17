@@ -65,6 +65,7 @@
 #include "disk.h"
 #include "ramdisk.h"
 #include "xml.h"
+#include "sl.h"
 
 #include <libkern/crypto/md5.h>
 //#include <uuid/uuid.h>
@@ -74,6 +75,12 @@
 #else
 // from our uuid/namespace.h (UFS and HFS uuids can live in the same space?)
 static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC};
+#endif
+
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
 #endif
 
 extern int multiboot_partition;
@@ -206,18 +213,20 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 	if (readFile != NULL) {
 		// Read the first 4096 bytes (fat header)
 		length = readFile(bvr, (char *)filePath, *binary, 0, 0x1000);
-
+        
 		if (length > 0) {
 			if (ThinFatFile(binary, &length) == 0) {
 				if (length == 0) {
 					return 0;
 				}
 
-				// We found a fat binary; read only the thin part
+                // We found a fat binary; read only the thin part
+                DBG("Fat Binary found. Reading thin part only...\n");
 				length = readFile(bvr, (char *)filePath, (void *)kLoadAddr, (unsigned long)(*binary) - kLoadAddr, length);
 				*binary = (void *)kLoadAddr;
 			} else 	{
 				// Not a fat binary; read the rest of the file
+                DBG("Thin Binary found. Reading rest of the file...\n");
 				length2 = readFile(bvr, (char *)filePath, (void *)(kLoadAddr + length), length, 0);
 
 				if (length2 == -1) {
@@ -234,7 +243,7 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 			ThinFatFile(binary, &length);
 		}
 	}
-  
+    
 	return length;
 }
 

@@ -30,6 +30,7 @@ bool getProcessorInformationExternalClock(returnType *value)
 						// set external clock to 0 for SANDY
 						// removes FSB info from system profiler as on real mac's.
 					case CPU_MODEL_SANDYBRIDGE:
+					case CPU_MODEL_JAKETOWN:
 					case CPU_MODEL_IVYBRIDGE_XEON:
 					case CPU_MODEL_IVYBRIDGE:
 					case CPU_MODEL_HASWELL:
@@ -85,10 +86,10 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
 					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPU_MODEL_IVYBRIDGE_XEON:
 					case CPU_MODEL_HASWELL:
-					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
 					{
 						// thanks to dgobe for i3/i5/i7 bus speed detection
 						int nhm_bus = 0x3F;
@@ -163,8 +164,11 @@ bool getSMBOemProcessorType(returnType *value)
 				switch (Platform.CPU.Model) {
                     case CPU_MODEL_PENTIUM_M:
 					case CPU_MODEL_DOTHAN:				// 0x0D - Intel Pentium M model D
-                    case CPU_MODEL_PRESCOTT:
+                    case CPU_MODEL_IRWINDALE:
                     case CPU_MODEL_NOCONA:
+                        if (strstr(Platform.CPU.BrandString, "Xeon")) {
+							value->word = 0x402;			// 1026 - Xeon
+                        }
                         return true;
                         
 					case CPU_MODEL_PRESLER:
@@ -176,7 +180,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_MEROM:				// 0x0F - Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
                     case CPU_MODEL_XEON_MP:				// 0x1D - Six-Core Xeon 7400, "Dunnington", 45nm
 					case CPU_MODEL_PENRYN:				// 0x17 - Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+						if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0x402;			// 1026 - Xeon
                             return true;
 						}
@@ -195,7 +199,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_NEHALEM:				// 0x1A - Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_FIELDS:				// 0x1E - Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:					// 0x1F - Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-                        if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+                        if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0x501;			// // 1281 - Lynnfiled Quad-Core Xeon
                             return true;
 						}
@@ -219,7 +223,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_DALES_32NM:			// 0x25 - Intel Core i3, i5 LGA1156 (32nm) (Clarkdale, Arrandale)
                     case CPU_MODEL_WESTMERE:			// 0x2C - Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
                     case CPU_MODEL_WESTMERE_EX:			// 0x2F - Intel Xeon E7
-                        if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+                        if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0x501;		// Xeon
                             return true;
 						}
@@ -242,7 +246,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPU_MODEL_JAKETOWN:			// 0x2D - Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
 					case CPU_MODEL_SANDYBRIDGE:			// 0x2A - Intel Core i3, i5, i7 LGA1155 (32nm)
-						if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+						if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0x501;		// Xeon
                             return true;
 						}
@@ -264,7 +268,7 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 					case CPU_MODEL_IVYBRIDGE:			// 0x3A - Intel Core i3, i5, i7 LGA1155 (22nm)
-                        if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+                        if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0xA01;		// 2561 - Xeon
                             return true;
 						}
@@ -293,7 +297,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPU_MODEL_HASWELL_SVR:			// 0x3F -
 					case CPU_MODEL_HASWELL_ULT:			// 0x45 -
 					case CPU_MODEL_CRYSTALWELL:			// 0x46
-                        if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
+                        if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0xA01;		// 2561 - Xeon
                             return true;
 						}
