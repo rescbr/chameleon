@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-27 13:32+0000\n"
+"POT-Creation-Date: 2014-06-25 22:10+0200\n"
 "PO-Revision-Date: 2012-04-11 02:08-0000\n"
 "Last-Translator: ErmaC\n"
 "Language-Team: hu <hu@li.org>\n"
@@ -267,7 +267,7 @@ msgstr ""
 
 #. type: "Default_title"
 #: Resources/templates/Localizable.strings:25
-#: Resources/templates/Localizable.strings:653
+#: Resources/templates/Localizable.strings:656
 #, no-wrap
 msgid "Standard"
 msgstr "Alapértelmezett"
@@ -379,7 +379,7 @@ msgstr ""
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:60
-#: Resources/templates/Localizable.strings:686
+#: Resources/templates/Localizable.strings:689
 #, no-wrap
 msgid "Resolution"
 msgstr "Felbontás"
@@ -450,10 +450,9 @@ msgstr ""
 
 #. type: "NVIDIAGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:83
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "NVIDIAGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "NVIDIAGraphicsEnabler"
 
 #. type: "NVIDIAGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:84
@@ -465,10 +464,9 @@ msgstr ""
 
 #. type: "AMDGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:87
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "AMDGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "AMDGraphicsEnabler"
 
 #. type: "AMDGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:88
@@ -480,10 +478,9 @@ msgstr ""
 
 #. type: "IntelGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:91
-#, fuzzy, no-wrap
-#| msgid "GraphicsEnabler=Yes"
+#, no-wrap
 msgid "IntelGraphicsEnabler"
-msgstr "GraphicsEnabler=Yes"
+msgstr "IntelGraphicsEnabler"
 
 #. type: "IntelGraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:92
@@ -633,10 +630,9 @@ msgstr "EnableWifi=Yes"
 
 #. type: "EnableWifi_description"
 #: Resources/templates/Localizable.strings:136
-#, fuzzy, no-wrap
-#| msgid "Enables the option of adding 'built-in' to your ethernet devices."
+#, no-wrap
 msgid "Enables the option of adding AirPort values to your wireless device."
-msgstr "A hálózati kártyát beépítettként segít betöltetni."
+msgstr ""
 
 #. type: "ForceHPET_title"
 #: Resources/templates/Localizable.strings:138
@@ -664,10 +660,9 @@ msgstr "Ez a beállítás engedi, hogy betölthesd a hibás sleep képeket."
 
 #. type: "ForceFullMemInfo_title"
 #: Resources/templates/Localizable.strings:144
-#, fuzzy, no-wrap
-#| msgid "ForceWake=Yes"
+#, no-wrap
 msgid "ForceFullMemInfo=Yes"
-msgstr "ForceWake=Yes"
+msgstr "ForceFullMemInfo=Yes"
 
 #. type: "ForceFullMemInfo_description"
 #: Resources/templates/Localizable.strings:145
@@ -761,66 +756,57 @@ msgstr "Eldobja az alaplap SSDT tábláját."
 
 #. type: "DropHPET_title"
 #: Resources/templates/Localizable.strings:170
-#, fuzzy, no-wrap
-#| msgid "DropSSDT=Yes"
+#, no-wrap
 msgid "DropHPET=Yes"
-msgstr "DropSSDT=Yes"
+msgstr "DropHPET=Yes"
 
 #. type: "DropHPET_description"
 #: Resources/templates/Localizable.strings:171
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in HPET table."
-msgstr "Eldobja az alaplap SSDT tábláját."
+msgstr ""
 
 #. type: "DropSBST_title"
 #: Resources/templates/Localizable.strings:173
-#, fuzzy, no-wrap
-#| msgid "DropSSDT=Yes"
+#, no-wrap
 msgid "DropSBST=Yes"
-msgstr "DropSSDT=Yes"
+msgstr "DropSBST=Yes"
 
 #. type: "DropSBST_description"
 #: Resources/templates/Localizable.strings:174
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in SBST table."
-msgstr "Eldobja az alaplap SSDT tábláját."
+msgstr ""
 
 #. type: "DropECDT_title"
 #: Resources/templates/Localizable.strings:176
-#, fuzzy, no-wrap
-#| msgid "DropSSDT=Yes"
+#, no-wrap
 msgid "DropECDT=Yes"
-msgstr "DropSSDT=Yes"
+msgstr "DropECDT=Yes"
 
 #. type: "DropECDT_description"
 #: Resources/templates/Localizable.strings:177
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in ECDT table."
-msgstr "Eldobja az alaplap SSDT tábláját."
+msgstr ""
 
 #. type: "DropASFT_title"
 #: Resources/templates/Localizable.strings:179
-#, fuzzy, no-wrap
-#| msgid "DropSSDT=Yes"
+#, no-wrap
 msgid "DropASFT=Yes"
-msgstr "DropSSDT=Yes"
+msgstr "DropASFT=Yes"
 
 #. type: "DropASFT_description"
 #: Resources/templates/Localizable.strings:180
-#, fuzzy, no-wrap
-#| msgid "Discard the motherboard's built-in SSDT tables."
+#, no-wrap
 msgid "Discard the motherboard's built-in ASF! table."
-msgstr "Eldobja az alaplap SSDT tábláját."
+msgstr ""
 
 #. type: "DropDMAR_title"
 #: Resources/templates/Localizable.strings:182
-#, fuzzy, no-wrap
-#| msgid "DropSSDT=Yes"
+#, no-wrap
 msgid "DropDMAR=Yes"
-msgstr "DropSSDT=Yes"
+msgstr "DropDMAR=Yes"
 
 #. type: "DropDMAR_description"
 #: Resources/templates/Localizable.strings:183
@@ -866,17 +852,15 @@ msgstr "Lehetővé teszi a processzor C4-es módba való kapcsolását"
 
 #. type: "EnableC6State_title"
 #: Resources/templates/Localizable.strings:194
-#, fuzzy, no-wrap
-#| msgid "EnableC2State=Yes"
+#, no-wrap
 msgid "EnableC6State=Yes"
-msgstr "EnableC2State=Yes"
+msgstr "EnableC6State=Yes"
 
 #. type: "EnableC6State_description"
 #: Resources/templates/Localizable.strings:195
-#, fuzzy, no-wrap
-#| msgid "Enable specific Processor power state, C2."
+#, no-wrap
 msgid "Enable specific Processor power state, C6."
-msgstr "Lehetővé teszi a processzor C2-es módba való kapcsolását"
+msgstr ""
 
 #. type: "GenerateCStates_title"
 #: Resources/templates/Localizable.strings:197
@@ -904,17 +888,15 @@ msgstr "Automatikusan létrehozza a processzor P módjait (sebesség-lépcsők).
 
 #. type: "GenerateTStates_title"
 #: Resources/templates/Localizable.strings:203
-#, fuzzy, no-wrap
-#| msgid "GenerateCStates=Yes"
+#, no-wrap
 msgid "GenerateTStates=Yes"
-msgstr "GenerateCStates=Yes"
+msgstr "GenerateTStates=Yes"
 
 #. type: "GenerateTStates_description"
 #: Resources/templates/Localizable.strings:204
-#, fuzzy, no-wrap
-#| msgid "Enable auto generation of processor power performance states (P-States)."
+#, no-wrap
 msgid "Enable auto generation of processor power performance states (T-States)."
-msgstr "Automatikusan létrehozza a processzor P módjait (sebesség-lépcsők)."
+msgstr ""
 
 #. type: "1024x600x32_title"
 #: Resources/templates/Localizable.strings:208
@@ -1135,10 +1117,9 @@ msgstr ""
 #. type: "HDAULayoutIDx32_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:363
-#, fuzzy, no-wrap
-#| msgid "LayoutID=392"
+#, no-wrap
 msgid "LayoutID=32"
-msgstr "LayoutID=392"
+msgstr "LayoutID=32"
 
 #. type: "HDEFLayoutIDx32_description"
 #: Resources/templates/Localizable.strings:266
@@ -1771,203 +1752,194 @@ msgstr ""
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:483
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00000604"
-msgstr "01660000"
+msgstr "00000604"
 
 #. type: "IntelAzulx00_description"
 #: Resources/templates/Localizable.strings:484
 #, no-wrap
-msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000060c"
-msgstr "01660000"
+msgstr "0000060c"
 
 #. type: "IntelAzulx01_description"
 #: Resources/templates/Localizable.strings:487
 #, no-wrap
-msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000060c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00001604"
-msgstr "01660000"
+msgstr "00001604"
 
 #. type: "IntelAzulx02_description"
 #: Resources/templates/Localizable.strings:490
 #, no-wrap
-msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160a"
-msgstr "01660000"
+msgstr "0000160a"
 
 #. type: "IntelAzulx03_description"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
-msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000160a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000160c"
-msgstr "01660000"
+msgstr "0000160c"
 
 #. type: "IntelAzulx04_description"
 #: Resources/templates/Localizable.strings:496
 #, no-wrap
-msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000160c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "00002604"
-msgstr "01660000"
+msgstr "00002604"
 
 #. type: "IntelAzulx05_description"
 #: Resources/templates/Localizable.strings:499
 #, no-wrap
-msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260a"
-msgstr "01660000"
+msgstr "0000260a"
 
 #. type: "IntelAzulx06_description"
 #: Resources/templates/Localizable.strings:502
 #, no-wrap
-msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260c"
-msgstr "01660000"
+msgstr "0000260c"
 
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
-msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
-#, fuzzy, no-wrap
-#| msgid "01660000"
+#, no-wrap
 msgid "0000260d"
-msgstr "01660000"
+msgstr "0000260d"
 
 #. type: "IntelAzulx08_description"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
-msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "02001604"
-msgstr ""
+msgstr "02001604"
 
 #. type: "IntelAzulx09_description"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
-msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:513
 #, no-wrap
 msgid "0300220d"
-msgstr ""
+msgstr "0300220d"
 
 #. type: "IntelAzulx10_description"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
-msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
+msgid "Set 0300220d for Intel Haswell (Desktop) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:516
 #, no-wrap
 msgid "0500260a"
-msgstr ""
+msgstr "0500260a"
 
 #. type: "IntelAzulx11_description"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
-msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:519
 #, no-wrap
 msgid "0600260a"
-msgstr ""
+msgstr "0600260a"
 
 #. type: "IntelAzulx12_description"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
-msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0600260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "0700260d"
-msgstr ""
+msgstr "0700260d"
 
 #. type: "IntelAzulx13_description"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
-msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0700260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:525
 #, no-wrap
 msgid "0800260a"
-msgstr ""
+msgstr "0800260a"
 
 #. type: "IntelAzulx14_description"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
-msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0800260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:528
 #, no-wrap
 msgid "08002e0a"
-msgstr ""
+msgstr "08002e0a"
 
 #. type: "IntelAzulx15_description"
 #: Resources/templates/Localizable.strings:529
 #, no-wrap
-msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "AD2000B_PinConf_title"
@@ -2050,10 +2022,9 @@ msgstr "GraphicsEnabler=Yes"
 
 #. type: "GraphicsEnabler_description"
 #: Resources/templates/Localizable.strings:554
-#, fuzzy, no-wrap
-#| msgid "Enables the option to autodetect NVIDIA based GPUs and inject the correct info."
+#, no-wrap
 msgid "Enables the option to autodetect NVIDIA, AMD/ATI or Intel based GPUs and inject the correct info."
-msgstr "Lehetővé teszi az NVIDIA alapú videókártyák automatikus felismerését."
+msgstr ""
 
 #. type: "EnableHDMIAudio_title"
 #: Resources/templates/Localizable.strings:556
@@ -2254,7 +2225,7 @@ msgstr "Csak Lion-hoz. Kikapcsolja a 'low power wake' funkciót, ami néha üres
 #: Resources/templates/Localizable.strings:610
 #, no-wrap
 msgid "nvda_drv=1"
-msgstr ""
+msgstr "nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
 #: Resources/templates/Localizable.strings:611
@@ -2266,14 +2237,26 @@ msgid ""
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
 
-#. type: "Dart0_title"
+#. type: "kext-dev-mode1_title"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
-msgid "dart=0"
+msgid "kext-dev-mode=1"
+msgstr "kext-dev-mode=1"
+
+#. type: "kext-dev-mode1_description"
+#: Resources/templates/Localizable.strings:617
+#, no-wrap
+msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
 
+#. type: "Dart0_title"
+#: Resources/templates/Localizable.strings:619
+#, no-wrap
+msgid "dart=0"
+msgstr "dart=0"
+
 #. type: "Dart0_description"
-#: Resources/templates/Localizable.strings:617
+#: Resources/templates/Localizable.strings:620
 #, no-wrap
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
@@ -2281,279 +2264,277 @@ msgid ""
 msgstr ""
 
 #. type: "mac-de_title"
-#: Resources/templates/Localizable.strings:624
+#: Resources/templates/Localizable.strings:627
 #, no-wrap
 msgid "German Mac Keyboard"
 msgstr "Német Mac kiosztás"
 
 #. type: "mac-de_description"
-#: Resources/templates/Localizable.strings:625
+#: Resources/templates/Localizable.strings:628
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
 msgstr "Használd ezt a kiosztást a német Mac billentyűzetekhez"
 
 #. type: "mac-es_title"
-#: Resources/templates/Localizable.strings:627
+#: Resources/templates/Localizable.strings:630
 #, no-wrap
 msgid "Spanish Mac Keyboard"
 msgstr "Spanyol Mac kiosztás"
 
 #. type: "mac-es_description"
-#: Resources/templates/Localizable.strings:628
+#: Resources/templates/Localizable.strings:631
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
 msgstr "Használd ezt a kiosztást a spanyol Mac billentyűzetekhez."
 
 #. type: "mac-fr_title"
-#: Resources/templates/Localizable.strings:630
+#: Resources/templates/Localizable.strings:633
 #, no-wrap
 msgid "French Mac Keyboard"
 msgstr "Francia Mac kiosztás"
 
 #. type: "mac-fr_description"
-#: Resources/templates/Localizable.strings:631
+#: Resources/templates/Localizable.strings:634
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
 msgstr "Használd ezt a kiosztást a francia Mac billentyűzetekhez."
 
 #. type: "mac-it_title"
-#: Resources/templates/Localizable.strings:633
+#: Resources/templates/Localizable.strings:636
 #, no-wrap
 msgid "Italian Mac Keyboard"
 msgstr "Olasz Mac kiosztás"
 
 #. type: "mac-it_description"
-#: Resources/templates/Localizable.strings:634
+#: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
 msgstr "Használd ezt a kiosztást a olasz Mac billentyűzetekhez."
 
 #. type: "mac-se_title"
-#: Resources/templates/Localizable.strings:636
+#: Resources/templates/Localizable.strings:639
 #, no-wrap
 msgid "Swedish Mac Keyboard"
 msgstr "Svéd Mac kiosztás"
 
 #. type: "mac-se_description"
-#: Resources/templates/Localizable.strings:637
+#: Resources/templates/Localizable.strings:640
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
 msgstr "Használd ezt a kiosztást a svéd Mac billentyűzetekhez"
 
 #. type: "pc-fr_title"
-#: Resources/templates/Localizable.strings:639
+#: Resources/templates/Localizable.strings:642
 #, no-wrap
 msgid "French PC Keyboard"
 msgstr "Francia PC kiosztás"
 
 #. type: "pc-fr_description"
-#: Resources/templates/Localizable.strings:640
+#: Resources/templates/Localizable.strings:643
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
 msgstr "Használd ezt a kiosztást a francia PC billentyűzetekhez."
 
 #. type: "Embed_title"
-#: Resources/templates/Localizable.strings:647
+#: Resources/templates/Localizable.strings:650
 #, no-wrap
 msgid "Embed"
 msgstr "Embed"
 
 #. type: "Embed_description"
-#: Resources/templates/Localizable.strings:648
-#, fuzzy, no-wrap
+#: Resources/templates/Localizable.strings:651
+#, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
-msgstr "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
+msgstr ""
 
 #. type: "Legacy_title"
-#: Resources/templates/Localizable.strings:650
+#: Resources/templates/Localizable.strings:653
 #, no-wrap
 msgid "Legacy"
 msgstr "Örökölt"
 
 #. type: "Legacy_description"
-#: Resources/templates/Localizable.strings:651
+#: Resources/templates/Localizable.strings:654
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr "Chameleon's eredeti témája a v2.0 RC1 verzióból"
 
 #. type: "Default_description"
-#: Resources/templates/Localizable.strings:654
+#: Resources/templates/Localizable.strings:657
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
 msgstr "Az alapértelmezett téma a v2.0 RC5 verzióhoz"
 
 #. type: "Bullet_title"
-#: Resources/templates/Localizable.strings:656
+#: Resources/templates/Localizable.strings:659
 #, no-wrap
 msgid "Bullet"
 msgstr "Bullet"
 
 #. type: "Bullet_description"
-#: Resources/templates/Localizable.strings:657
+#: Resources/templates/Localizable.strings:660
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
 msgstr "Egy egyszerű téma NoSmokingBandit-tól"
 
 #. type: "Audio_title"
-#: Resources/templates/Localizable.strings:666
+#: Resources/templates/Localizable.strings:669
 #, no-wrap
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #. type: "Audio_description"
-#: Resources/templates/Localizable.strings:667
-#, fuzzy, no-wrap
-#| msgid "A selection of options that deal with video."
+#: Resources/templates/Localizable.strings:670
+#, no-wrap
 msgid "A selection of options that deal with audio."
-msgstr "Videóhoz kapcsolódó beállítások."
+msgstr ""
 
 #. type: "Control_title"
-#: Resources/templates/Localizable.strings:670
+#: Resources/templates/Localizable.strings:673
 #, no-wrap
 msgid "Control Options"
 msgstr "Vezérlés"
 
 #. type: "Control_description"
-#: Resources/templates/Localizable.strings:671
+#: Resources/templates/Localizable.strings:674
 #, no-wrap
 msgid "Settings to control how Chameleon works."
 msgstr "Beállítások a Chameleon vezerléséhez."
 
 #. type: "General_title"
-#: Resources/templates/Localizable.strings:674
+#: Resources/templates/Localizable.strings:677
 #, no-wrap
 msgid "General Options"
 msgstr "Általános beállítások"
 
 #. type: "General_description"
-#: Resources/templates/Localizable.strings:675
+#: Resources/templates/Localizable.strings:678
 #, no-wrap
 msgid "Choose from a selection of base options."
 msgstr "Válaszd ki a szükségek alapbeállításokat."
 
 #. type: "KernelFlags_title"
-#: Resources/templates/Localizable.strings:678
+#: Resources/templates/Localizable.strings:681
 #, no-wrap
 msgid "Kernel Flags"
 msgstr "Kernel paraméterek"
 
 #. type: "KernelFlags_description"
-#: Resources/templates/Localizable.strings:679
+#: Resources/templates/Localizable.strings:682
 #, no-wrap
 msgid "Choose from a selection of kernel flags."
 msgstr "Válaszd ki milyen paraméterekkel induljon a kernel"
 
 #. type: "PowerManagement_title"
-#: Resources/templates/Localizable.strings:682
+#: Resources/templates/Localizable.strings:685
 #, no-wrap
 msgid "Power Management"
 msgstr "Energiagazdálkodás"
 
 #. type: "PowerManagement_description"
-#: Resources/templates/Localizable.strings:683
+#: Resources/templates/Localizable.strings:686
 #, no-wrap
 msgid "A selection of options that deal with power management and speedstep."
 msgstr "Beállítások az energiagazdálkodáshoz és a sebesség-lépcsőkhöz."
 
 #. type: "Resolution_description"
-#: Resources/templates/Localizable.strings:687
+#: Resources/templates/Localizable.strings:690
 #, no-wrap
 msgid "Set one resolution to use."
 msgstr "Jelölj ki egy a monitorodnak leginkább megfelelő felbontást."
 
 #. type: "HDEFLayout_title"
-#: Resources/templates/Localizable.strings:690
+#: Resources/templates/Localizable.strings:693
 #, no-wrap
 msgid "HDEF Layout"
 msgstr "HDEF Layout"
 
 #. type: "HDEFLayout_description"
-#: Resources/templates/Localizable.strings:691
+#: Resources/templates/Localizable.strings:694
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
 msgstr ""
 
 #. type: "HDAULayout_title"
-#: Resources/templates/Localizable.strings:694
+#: Resources/templates/Localizable.strings:697
 #, no-wrap
 msgid "HDAU Layout"
 msgstr "HDAU Layout"
 
 #. type: "HDAULayout_description"
-#: Resources/templates/Localizable.strings:695
+#: Resources/templates/Localizable.strings:698
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
 msgstr ""
 
 #. type: "IntelCapri_title"
-#: Resources/templates/Localizable.strings:698
+#: Resources/templates/Localizable.strings:701
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
-#: Resources/templates/Localizable.strings:699
+#: Resources/templates/Localizable.strings:702
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgstr ""
 
 #. type: "IntelAzul_title"
-#: Resources/templates/Localizable.strings:702
+#: Resources/templates/Localizable.strings:705
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
-msgstr ""
+msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
-#: Resources/templates/Localizable.strings:703
+#: Resources/templates/Localizable.strings:706
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
 msgstr ""
 
 #. type: "HDEFPinConfiguration_title"
-#: Resources/templates/Localizable.strings:706
+#: Resources/templates/Localizable.strings:709
 #, no-wrap
 msgid "HDEF PinConfiguration"
 msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
-#: Resources/templates/Localizable.strings:707
-#, fuzzy, no-wrap
-#| msgid "Set one resolution to use."
+#: Resources/templates/Localizable.strings:710
+#, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
-msgstr "Jelölj ki egy a monitorodnak leginkább megfelelő felbontást."
+msgstr ""
 
 #. type: "Video_title"
-#: Resources/templates/Localizable.strings:710
+#: Resources/templates/Localizable.strings:713
 #, no-wrap
 msgid "Video"
 msgstr "Video"
 
 #. type: "Video_description"
-#: Resources/templates/Localizable.strings:711
+#: Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "A selection of options that deal with video."
 msgstr "Videóhoz kapcsolódó beállítások."
 
 #. type: "Keymaps_title"
-#: Resources/templates/Localizable.strings:714
+#: Resources/templates/Localizable.strings:717
 #, no-wrap
 msgid "KeyLayout"
 msgstr "Billentyűzet kiosztás"
 
 #. type: "Keymaps_description"
-#: Resources/templates/Localizable.strings:715
+#: Resources/templates/Localizable.strings:718
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Válassz ki egy kiosztást a használatához. Ez egyúttal telepíti a billentyűzet kiosztás modult is"
 
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:718
+#: Resources/templates/Localizable.strings:721
 #, no-wrap
 msgid "Themes"
 msgstr "Témák"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:719
+#: Resources/templates/Localizable.strings:722
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
