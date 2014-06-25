@@ -92,8 +92,8 @@ kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR 
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
 										; with existing tools that do not understand GPT partition structures.
-							  			; The Protective MBR has the same format as a legacy MBR
-					  					; and contains one partition entry with an OSType set to 0xEE
+										; The Protective MBR has the same format as a legacy MBR
+										; and contains one partition entry with an OSType set to 0xEE
 										; reserving the entire space used on the disk by the GPT partitions,
 										; including all headers.
 
@@ -535,7 +535,9 @@ loadBootSector:
     cmp     WORD [di + kSectorBytes - 2], kBootSignature
 
 .exit:
+
     popa
+
     ret
 
 

@@ -1,3 +1,4 @@
+- Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.
 - ErmaC : Merge tja's patch http://forum.voodooprojects.org/index.php/topic,5951.0.html
 - bitshoveler : Optimized basic string functions strlen, strncmp, strncat, strcat
 - ErmaC : Replaced sprintf with snprintf in spd.c.

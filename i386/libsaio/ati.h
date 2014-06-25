@@ -16,8 +16,6 @@
 #include "device_inject.h"
 #include "ati_reg.h"
 
-
-
 /* DEFINES */
 #define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 
@@ -51,6 +49,7 @@ typedef enum {
 	CHIP_FAMILY_UNKNOW,
 	/* Old */
 	CHIP_FAMILY_R420,
+	CHIP_FAMILY_R423,
 	CHIP_FAMILY_RV410,
 	CHIP_FAMILY_RV515,
 	CHIP_FAMILY_R520,
@@ -84,27 +83,27 @@ typedef enum {
 	CHIP_FAMILY_HEMLOCK,
 	CHIP_FAMILY_JUNIPER,
 	CHIP_FAMILY_REDWOOD,
-	CHIP_FAMILY_BROADWAY,
-    //	CHIP_FAMILY_MADISON,
-    //	CHIP_FAMILY_PARK,
 	/* Northern Islands */
-    //	CHIP_FAMILY_ANTILLES,
 	CHIP_FAMILY_BARTS,
 	CHIP_FAMILY_CAICOS,
 	CHIP_FAMILY_CAYMAN,
 	CHIP_FAMILY_TURKS,
 	/* Southern Islands */
+	CHIP_FAMILY_PALM,
+	CHIP_FAMILY_SUMO,
+	CHIP_FAMILY_SUMO2,
+	CHIP_FAMILY_ARUBA,
 	CHIP_FAMILY_TAHITI,
 	CHIP_FAMILY_PITCAIRN,
 	CHIP_FAMILY_VERDE,
-	CHIP_FAMILY_THAMES,
-	CHIP_FAMILY_LOMBOK,
-    //	CHIP_FAMILY_NEWZEALAND,
-	CHIP_FAMILY_SUMO,
-	CHIP_FAMILY_MANHATTAN,
-	CHIP_FAMILY_VANCOUVER,
-	CHIP_FAMILY_WRESTLER,
-	CHIP_FAMILY_TRINITY,
+	CHIP_FAMILY_OLAND,
+	CHIP_FAMILY_HAINAN,
+	CHIP_FAMILY_BONAIRE,
+	CHIP_FAMILY_KAVERI,
+	CHIP_FAMILY_KABINI,
+	CHIP_FAMILY_HAWAII,
+	/* ... */
+	CHIP_FAMILY_MULLINS,
 	CHIP_FAMILY_LAST
 } ati_chip_family_t;
 
@@ -169,17 +168,17 @@ typedef enum {
 	kSpikerush,
 	kTypha,
 	/* AMD7000Controller */
-	kAji, // TESTING
-	kBuri, // TESTING
-	kChutoro, // TESTING
-	kDashimaki, // TESTING
-	kEbi, // TESTING
-	kGari, // TESTING
-	kFutomaki, // TESTING
-	kHamachi, // TESTING
-	kOPM, // TESTING
-	kIkura, // TESTING
-	kIkuraS, // TESTING
+	kAji,  //4 
+	kBuri, //4 M
+	kChutoro, //5 M
+	kDashimaki, //4
+	kEbi, //5 M
+	kGari, //5 M
+	kFutomaki, //5
+	kHamachi, //4
+	kOPM,
+	kIkura,
+	kIkuraS,
 	kCfgEnd
 } ati_config_name_t;
 
@@ -215,19 +214,19 @@ typedef struct {
 } dev_prop_t;
 
 typedef struct {
-	struct DevPropDevice		*device;
-	radeon_card_info_t		*info;
-	pci_dt_t			*pci_dev;
-	uint8_t				*fb;
-	uint8_t				*mmio;
-	uint8_t				*io;
-	uint8_t				*rom;
-	uint64_t			rom_size;
-	uint64_t			vram_size;
-	const char			*cfg_name;
-	uint8_t				ports;
-	uint32_t			flags;
-	bool				posted;
+	struct DevPropDevice	*device;
+	radeon_card_info_t	*info;
+	pci_dt_t		*pci_dev;
+	uint8_t			*fb;
+	uint8_t			*mmio;
+	uint8_t			*io;
+	uint8_t			*rom;
+	uint64_t		rom_size;
+	uint64_t		vram_size;
+	const char		*cfg_name;
+	uint8_t			ports;
+	uint32_t		flags;
+	bool			posted;
 } card_t;
 
 

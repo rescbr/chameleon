@@ -40,6 +40,10 @@
 #define kLionInstallerDataFolder      "/Mac OS X Install Data/"
 #define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
 
+// Mountain Lion installer
+#define kMLionInstallerDataFolder      "/OS X Install Data/"
+#define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+
 /*
  * Keys used in system Boot.plist
  */

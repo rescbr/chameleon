@@ -666,8 +666,8 @@ int loadChameleonConfig(config_file_t *config, BVRef chain)
 		if ( loadChameleonConfigForDevice(config, "bt(0,0)", dirspec[i]) == 0 ) {
 			return 0;
 		}
-
-		for ( BVRef bvr = chain; bvr; bvr = bvr->next ) {
+		BVRef bvr;
+		for ( bvr = chain; bvr; bvr = bvr->next ) { /* C99 Error */
 			char device[256];
 			getDeviceDescription(bvr, device);
 

@@ -1220,6 +1220,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1281,	"GeForce GT 710" },
 	{ 0x10DE1282,	"GeForce GT 640" },
 	{ 0x10DE1284,	"GeForce GT 630" },
+	{ 0x10DE1286,	"GeForce GT 720" },
 	// 1290 - 129F
 	{ 0x10DE1290,	"GeForce GT 730M" },
 	{ 0x10DE1291,	"GeForce GT 735M" },
@@ -1244,6 +1245,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1341,	"GeForce 840M" },
 	{ 0x10DE1380,	"GeForce GTX 750 Ti" },
 	{ 0x10DE1381,	"GeForce GTX 750" },
+	{ 0x10DE1382,	"GeForce GTX 745" },
 	{ 0x10DE1390,	"GeForce 845M" },
 	{ 0x10DE1391,	"GeForce GTX 850M" },
 	{ 0x10DE1392,	"GeForce GTX 860M" },

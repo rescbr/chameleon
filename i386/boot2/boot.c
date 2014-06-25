@@ -251,6 +251,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	if (cacheFile[0] != 0)
 	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
+		verbose("Specified kernel cache file path = %s\n", cacheFile);
 	}
 	else
 	{
@@ -258,7 +259,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-		}
+			verbose("10.7, 10.8 & 10.9 kernel cache file path = %s\n", kernelCacheFile);		}
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
@@ -279,6 +280,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
+				verbose("Snow Leopard kernel cache file path = %s\n", kernelCacheFile);
 			}
 			closedir(cacheDir);
 		} else {
@@ -289,6 +291,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 				gRootDevice, bootInfo->bootFile);
 			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
+			verbose("Reseted kernel cache file path = %s\n", kernelCacheFile);
 		}
 	}
 

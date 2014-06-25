@@ -615,8 +615,11 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
                     default_HDEF_layout_id[0], default_HDEF_layout_id[1], default_HDEF_layout_id[2], default_HDEF_layout_id[3]);
 	}
 	devprop_add_value(device, "layout-id", default_HDEF_layout_id, HDEF_LEN);
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *)"Built-in", 9); // 0x09
+	devprop_add_value(device, "name", (uint8_t *)"audio", 6); // 0x06
+	devprop_add_value(device, "device_type", (uint8_t *)"High Definition Audio", 22); // 0x16
 	devprop_add_value(device, "built-in", &BuiltIn, 1);
-	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); // 0x0a
 	break;
 
 	/****************************************************************************************************************
