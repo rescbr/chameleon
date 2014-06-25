@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-27 13:32+0000\n"
-"PO-Revision-Date: 2013-12-29 12:07+0000\n"
-"Last-Translator: Maniac <emafrias@gmail.com>\n"
+"PO-Revision-Date: 2014-05-19 21:55+0000\n"
+"Last-Translator: Yllelder <yllelder@gmail.com>\n"
 "Language-Team: es <es@li.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388318845.0\n"
+"X-POOTLE-MTIME: 1400536515.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -453,6 +453,12 @@ msgid ""
 "*Removes a panic in commpage_stuff_routine\n"
 "Dependencies: none"
 msgstr ""
+"El módulo KernelPatcher proporciona parches para lo siguiente:\n"
+"*Habilita el uso del kernelcache con /Extra/Extensions y /Extra/Extensions.mkext\n"
+"*Elimina el chequeo de CPUID\n"
+"*Elimina un LAPIC panic\n"
+"*Elimina un panic en commpage_stuff_routine\n"
+"Dependencias: ninguna"
 
 #. type: "KextPatcher_title"
 #: Resources/templates/Localizable.strings:79
@@ -467,6 +473,8 @@ msgid ""
 "The KextPatcher module provides patches for the following:\n"
 "Dependencies: none"
 msgstr ""
+"El módulo KextPatcher proporciona parches para lo siguiente:\n"
+"Dependencias: ninguna"
 
 #. type: "NVIDIAGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:83
@@ -481,6 +489,8 @@ msgid ""
 "The GraphicsEnabler nVidia code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"El código de GraphicsEnabler nVidia ha sido portado a un módulo.\n"
+"Dependencias: ninguna"
 
 #. type: "AMDGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:87
@@ -495,6 +505,8 @@ msgid ""
 "The GraphicsEnabler AMD/ATi code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"El código de GraphicsEnabler AMD/ATi ha sido portado a un módulo.\n"
+"Dependencias: ninguna"
 
 #. type: "IntelGraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:91
@@ -509,6 +521,8 @@ msgid ""
 "The GraphicsEnabler gma(Intel) code ported to a module.\n"
 "Dependencies: none"
 msgstr ""
+"El código de GraphicsEnabler gma(Intel) ha sido portado a un módulo.\n"
+"Dependencias: ninguna"
 
 #. type: "Options_title"
 #: Resources/templates/Localizable.strings:100
@@ -688,7 +702,7 @@ msgstr "ForceFullMemInfo=Yes"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "Fuerza a SMBIOS Table 17 a ser de 27 bytes de largo."
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:147
@@ -832,7 +846,7 @@ msgstr "DropDMAR=Yes"
 #: Resources/templates/Localizable.strings:183
 #, no-wrap
 msgid "Discard the motherboard's built-in DMAR table, this key action resolve the problem with VT-d panics."
-msgstr ""
+msgstr "Descarta la tabla DMAR integrada en la placa base, esta acción clave resuelve el problema con VT-d panics."
 
 #. type: "EnableC2State_title"
 #: Resources/templates/Localizable.strings:185
@@ -1732,7 +1746,7 @@ msgstr "01660000"
 #: Resources/templates/Localizable.strings:446
 #, no-wrap
 msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660000 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix01_title"
 #: Resources/templates/Localizable.strings:448
@@ -1744,7 +1758,7 @@ msgstr "01660001"
 #: Resources/templates/Localizable.strings:449
 #, no-wrap
 msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660001 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix02_title"
 #: Resources/templates/Localizable.strings:451
@@ -1756,7 +1770,7 @@ msgstr "01660002"
 #: Resources/templates/Localizable.strings:452
 #, no-wrap
 msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660002 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix03_title"
 #: Resources/templates/Localizable.strings:454
@@ -1768,7 +1782,7 @@ msgstr "01660003"
 #: Resources/templates/Localizable.strings:455
 #, no-wrap
 msgid "Set 01660003 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660003 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix04_title"
 #: Resources/templates/Localizable.strings:457
@@ -1780,7 +1794,7 @@ msgstr "01660004"
 #: Resources/templates/Localizable.strings:458
 #, no-wrap
 msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660004 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix05_title"
 #: Resources/templates/Localizable.strings:460
@@ -1792,7 +1806,7 @@ msgstr "01620005"
 #: Resources/templates/Localizable.strings:461
 #, no-wrap
 msgid "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01620005 para Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix06_title"
 #: Resources/templates/Localizable.strings:463
@@ -1804,7 +1818,7 @@ msgstr "01620006"
 #: Resources/templates/Localizable.strings:464
 #, no-wrap
 msgid "Set 01620006 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01620006 para Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix07_title"
 #: Resources/templates/Localizable.strings:466
@@ -1816,7 +1830,7 @@ msgstr "01620007"
 #: Resources/templates/Localizable.strings:467
 #, no-wrap
 msgid "Set 01620007 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01620007 para Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix08_title"
 #: Resources/templates/Localizable.strings:469
@@ -1828,7 +1842,7 @@ msgstr "01660008"
 #: Resources/templates/Localizable.strings:470
 #, no-wrap
 msgid "Set 01660008 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660008 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix09_title"
 #: Resources/templates/Localizable.strings:472
@@ -1840,7 +1854,7 @@ msgstr "01660009"
 #: Resources/templates/Localizable.strings:473
 #, no-wrap
 msgid "Set 01660009 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 01660009 para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix10_title"
 #: Resources/templates/Localizable.strings:475
@@ -1852,7 +1866,7 @@ msgstr "0166000a"
 #: Resources/templates/Localizable.strings:476
 #, no-wrap
 msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 0166000a para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix11_title"
 #: Resources/templates/Localizable.strings:478
@@ -1864,7 +1878,7 @@ msgstr "0166000b"
 #: Resources/templates/Localizable.strings:479
 #, no-wrap
 msgid "Set 0166000b for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr ""
+msgstr "Establece 0166000b para Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:483
@@ -1876,7 +1890,7 @@ msgstr "00000604"
 #: Resources/templates/Localizable.strings:484
 #, no-wrap
 msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 00000604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:486
@@ -1888,7 +1902,7 @@ msgstr "0000060c"
 #: Resources/templates/Localizable.strings:487
 #, no-wrap
 msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0000060c para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:489
@@ -1900,7 +1914,7 @@ msgstr "00001604"
 #: Resources/templates/Localizable.strings:490
 #, no-wrap
 msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:492
@@ -1912,7 +1926,7 @@ msgstr "0000160a"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0000160a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:495
@@ -1924,7 +1938,7 @@ msgstr "0000160c"
 #: Resources/templates/Localizable.strings:496
 #, no-wrap
 msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0000160c para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:498
@@ -1936,7 +1950,7 @@ msgstr "00002604"
 #: Resources/templates/Localizable.strings:499
 #, no-wrap
 msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 00002604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:501
@@ -1948,7 +1962,7 @@ msgstr "0000260a"
 #: Resources/templates/Localizable.strings:502
 #, no-wrap
 msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0000260a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:504
@@ -1960,7 +1974,7 @@ msgstr "0000260c"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0600260c para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:507
@@ -1972,7 +1986,7 @@ msgstr "0000260d"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
 msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0000260d para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:510
@@ -1984,7 +1998,7 @@ msgstr "02001604"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
 msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:513
@@ -1996,7 +2010,7 @@ msgstr "0300220d"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0300220d para Intel Haswell (Desktop) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:516
@@ -2008,7 +2022,7 @@ msgstr "0500260a"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
 msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0500260a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:519
@@ -2020,7 +2034,7 @@ msgstr "0600260a"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
 msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0600260a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:522
@@ -2032,7 +2046,7 @@ msgstr "0700260d"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
 msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0700260d para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:525
@@ -2044,7 +2058,7 @@ msgstr "0800260a"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 0800260a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:528
@@ -2056,7 +2070,7 @@ msgstr "08002e0a"
 #: Resources/templates/Localizable.strings:529
 #, no-wrap
 msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Establece 08002e0a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:533
@@ -2200,7 +2214,7 @@ msgstr "SkipIntelGfx=Yes"
 #: Resources/templates/Localizable.strings:569
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for Intel based GPUs."
-msgstr ""
+msgstr "Saltar la detección automática de GraphicsEnabler para GPUs basados ​​en Intel."
 
 #. type: "SkipNvidiaGfx_title"
 #: Resources/templates/Localizable.strings:571
@@ -2212,7 +2226,7 @@ msgstr "SkipNvidiaGfx=Yes"
 #: Resources/templates/Localizable.strings:572
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for NVIDIA based GPUs."
-msgstr ""
+msgstr "Saltar la detección automática de GraphicsEnabler para GPUs basados ​​en nVIDIA."
 
 #. type: "SkipAtiGfx_title"
 #: Resources/templates/Localizable.strings:574
@@ -2224,7 +2238,7 @@ msgstr "SkipAtiGfx=Yes"
 #: Resources/templates/Localizable.strings:575
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for AMD/ATI based GPUs."
-msgstr ""
+msgstr "Saltar la detección automática de GraphicsEnabler para GPUs basados ​​en AMD/ATI."
 
 #. type: "EnableBacklight_title"
 #: Resources/templates/Localizable.strings:577
@@ -2236,7 +2250,7 @@ msgstr "EnableBacklight=Yes"
 #: Resources/templates/Localizable.strings:578
 #, no-wrap
 msgid "Enables Backlight options for laptop with nVidia cards."
-msgstr ""
+msgstr "Habilita la iluminación de fondo para portátiles con tarjetas nVIDIA."
 
 #. type: "EnableDualLink_title"
 #: Resources/templates/Localizable.strings:580
@@ -2248,7 +2262,7 @@ msgstr "EnableDualLink=Yes"
 #: Resources/templates/Localizable.strings:581
 #, no-wrap
 msgid "Enables DualLink options for nVidia and ATi cards."
-msgstr ""
+msgstr "Habilitar las opciones de DualLink para tarjetas nVIDIA y ATi."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:587
@@ -2324,6 +2338,9 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/280062-waiting-for-root-device-when-kernel-cache-used-only-with-some-disks-fix/\n"
 "Findings credits to bcc9."
 msgstr ""
+"Info aquí: Waiting for root device when kernel cache used only with some disks +CORREGIDO\n"
+"http://www.insanelymac.com/forum/topic/280062-waiting-for-root-device-when-kernel-cache-used-only-with-some-disks-fix/\n"
+"Agradecimientos a bcc9."
 
 #. type: "Darkwake_title"
 #: Resources/templates/Localizable.strings:607
@@ -2352,6 +2369,10 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
+"Introduce un nuevo Panel de Preferencias en Preferencias del Sistema que permite habilitar el Nvidia Web Driver.\n"
+"Info aquí: New Nvidia Retail Driver Install Solution\n"
+"http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
+"Agradecimientos a meklort y a Rampage Dev."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:616
@@ -2366,6 +2387,8 @@ msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
 "More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 msgstr ""
+"Evitar el procesamiento de DMAR causado por VT-d function en Osx (Virtualization).\n"
+"Más información por bcc9 aquí: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
 #: Resources/templates/Localizable.strings:624
@@ -2557,7 +2580,7 @@ msgstr "HDEF Layout"
 #: Resources/templates/Localizable.strings:691
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
-msgstr ""
+msgstr "Establece un HDEF Layout ID a usar por tu controlador HDA."
 
 #. type: "HDAULayout_title"
 #: Resources/templates/Localizable.strings:694
@@ -2593,7 +2616,7 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 #: Resources/templates/Localizable.strings:703
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr ""
+msgstr "Establecer un AAPL,ig-platform-id a usar por tu Intel Haswell."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:706
@@ -2605,7 +2628,7 @@ msgstr "HDEF PinConfiguration"
 #: Resources/templates/Localizable.strings:707
 #, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
-msgstr ""
+msgstr "Establecer un HDEF PinConfiguration a usar."
 
 #. type: "Video_title"
 #: Resources/templates/Localizable.strings:710
