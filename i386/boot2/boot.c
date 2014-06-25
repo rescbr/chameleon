@@ -405,7 +405,7 @@ void common_boot(int biosdev)
 	setBootGlobals(bvChain);
 
 	// Load boot.plist config file
-	status = loadChameleonConfig(&bootInfo->chameleonConfig);
+	status = loadChameleonConfig(&bootInfo->chameleonConfig, bvChain);
 
 	if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet) {
 		gBootMode |= kBootModeQuiet;

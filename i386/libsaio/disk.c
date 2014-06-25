@@ -1591,6 +1591,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 			valid = true;
 			bvr->OSisInstaller = true;
 			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+			close(fh);
 		} else {
 			close(fh);
 		}

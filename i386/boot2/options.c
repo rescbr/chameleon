@@ -1204,7 +1204,7 @@ processBootOptions()
 	// and use its contents to override default bootConfig.
 
 	loadSystemConfig(&bootInfo->bootConfig);    
-	loadChameleonConfig(&bootInfo->chameleonConfig);
+	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
 
 	// Use the kernel name specified by the user, or fetch the name
 	// in the config table, or use the default if not specified.
