@@ -20,7 +20,7 @@
  * @APPLE_LICENSE_HEADER_END@ 
  */ 
 /* 
- * Shantonu Sen
+ * Shantonu Sen <<EMAIL REMOVED>> 
  * openUp.c - program to set the "first-open-window" field of a volume 
  * 
  * Get the directory ID for the first argument, and set it as word 2 

@@ -231,7 +231,7 @@ enum {
 	kPartitionTypeFAT16		= 0x06,     // FAT16
 	kPartitionTypeFAT32		= 0x0C,     // FAT32
 	kPartitionTypeEXT3		= 0x83,     // Linux
-	//kPartitionTypeOSXBoot		= 0xAB,     // Mac OS X Boot partition
+	kPartitionTypeOSXBoot		= 0xAB,     // Mac OS X Boot partition
 	kPartitionTypeFreeBSD		= 0xA5,     // FreeBSD
 	kPartitionTypeOpenBSD		= 0xA6,     // OpenBSD
 	//kPartitionTypeNeXTSTEP	= 0xA7      // NeXTSTEP

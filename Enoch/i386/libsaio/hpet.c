@@ -2,6 +2,10 @@
  * Copyright (c) 2009 Evan Lojewski. All rights reserved.
  */
 
+/*
+ * High Precision Event Timer (HPET)
+ */
+
 #include "libsaio.h"
 #include "pci.h"
 #include "hpet.h"

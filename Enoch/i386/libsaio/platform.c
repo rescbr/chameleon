@@ -20,7 +20,7 @@
 #if DEBUG_PLATFORM
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 PlatformInfo_t    Platform;

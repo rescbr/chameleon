@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-27 13:32+0000\n"
+"POT-Creation-Date: 2014-06-25 22:10+0200\n"
 "PO-Revision-Date: 2012-04-28 17:25+0200\n"
 "Last-Translator: Желязко <slackjackie@gmail.com>\n"
 "Language-Team: bg <bg@li.org>\n"
@@ -268,7 +268,7 @@ msgstr ""
 
 #. type: "Default_title"
 #: Resources/templates/Localizable.strings:25
-#: Resources/templates/Localizable.strings:653
+#: Resources/templates/Localizable.strings:656
 #, no-wrap
 msgid "Standard"
 msgstr "Стандартна"
@@ -380,7 +380,7 @@ msgstr ""
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:60
-#: Resources/templates/Localizable.strings:686
+#: Resources/templates/Localizable.strings:689
 #, no-wrap
 msgid "Resolution"
 msgstr "Резолюция на екрана"
@@ -1790,7 +1790,7 @@ msgstr ""
 #. type: "IntelAzulx00_description"
 #: Resources/templates/Localizable.strings:484
 #, no-wrap
-msgid "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx01_title"
@@ -1802,7 +1802,7 @@ msgstr ""
 #. type: "IntelAzulx01_description"
 #: Resources/templates/Localizable.strings:487
 #, no-wrap
-msgid "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000060c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx02_title"
@@ -1814,7 +1814,7 @@ msgstr ""
 #. type: "IntelAzulx02_description"
 #: Resources/templates/Localizable.strings:490
 #, no-wrap
-msgid "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx03_title"
@@ -1826,7 +1826,7 @@ msgstr ""
 #. type: "IntelAzulx03_description"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
-msgid "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000160a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx04_title"
@@ -1838,7 +1838,7 @@ msgstr ""
 #. type: "IntelAzulx04_description"
 #: Resources/templates/Localizable.strings:496
 #, no-wrap
-msgid "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000160c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx05_title"
@@ -1850,7 +1850,7 @@ msgstr ""
 #. type: "IntelAzulx05_description"
 #: Resources/templates/Localizable.strings:499
 #, no-wrap
-msgid "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx06_title"
@@ -1862,7 +1862,7 @@ msgstr ""
 #. type: "IntelAzulx06_description"
 #: Resources/templates/Localizable.strings:502
 #, no-wrap
-msgid "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx07_title"
@@ -1874,7 +1874,7 @@ msgstr ""
 #. type: "IntelAzulx07_description"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
-msgid "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx08_title"
@@ -1886,7 +1886,7 @@ msgstr ""
 #. type: "IntelAzulx08_description"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
-msgid "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0000260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx09_title"
@@ -1898,7 +1898,7 @@ msgstr ""
 #. type: "IntelAzulx09_description"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
-msgid "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx10_title"
@@ -1910,7 +1910,7 @@ msgstr ""
 #. type: "IntelAzulx10_description"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
-msgid "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id."
+msgid "Set 0300220d for Intel Haswell (Desktop) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx11_title"
@@ -1922,7 +1922,7 @@ msgstr ""
 #. type: "IntelAzulx11_description"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
-msgid "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx12_title"
@@ -1934,7 +1934,7 @@ msgstr ""
 #. type: "IntelAzulx12_description"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
-msgid "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0600260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx13_title"
@@ -1946,7 +1946,7 @@ msgstr ""
 #. type: "IntelAzulx13_description"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
-msgid "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0700260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx14_title"
@@ -1958,7 +1958,7 @@ msgstr ""
 #. type: "IntelAzulx14_description"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
-msgid "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 0800260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "IntelAzulx15_title"
@@ -1970,7 +1970,7 @@ msgstr ""
 #. type: "IntelAzulx15_description"
 #: Resources/templates/Localizable.strings:529
 #, no-wrap
-msgid "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id."
+msgid "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr ""
 
 #. type: "AD2000B_PinConf_title"
@@ -2272,14 +2272,26 @@ msgid ""
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
 
-#. type: "Dart0_title"
+#. type: "kext-dev-mode1_title"
 #: Resources/templates/Localizable.strings:616
+#, no-wrap
+msgid "kext-dev-mode=1"
+msgstr ""
+
+#. type: "kext-dev-mode1_description"
+#: Resources/templates/Localizable.strings:617
+#, no-wrap
+msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
+msgstr ""
+
+#. type: "Dart0_title"
+#: Resources/templates/Localizable.strings:619
 #, no-wrap
 msgid "dart=0"
 msgstr ""
 
 #. type: "Dart0_description"
-#: Resources/templates/Localizable.strings:617
+#: Resources/templates/Localizable.strings:620
 #, no-wrap
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
@@ -2287,281 +2299,281 @@ msgid ""
 msgstr ""
 
 #. type: "mac-de_title"
-#: Resources/templates/Localizable.strings:624
+#: Resources/templates/Localizable.strings:627
 #, no-wrap
 msgid "German Mac Keyboard"
 msgstr ""
 
 #. type: "mac-de_description"
-#: Resources/templates/Localizable.strings:625
+#: Resources/templates/Localizable.strings:628
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
 msgstr "Използване на клавиатурната подредба за немска клавиатура за Mac"
 
 #. type: "mac-es_title"
-#: Resources/templates/Localizable.strings:627
+#: Resources/templates/Localizable.strings:630
 #, no-wrap
 msgid "Spanish Mac Keyboard"
 msgstr ""
 
 #. type: "mac-es_description"
-#: Resources/templates/Localizable.strings:628
+#: Resources/templates/Localizable.strings:631
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
 msgstr "Използване на клавиатурната подредба за испански клавиатура за Mac"
 
 #. type: "mac-fr_title"
-#: Resources/templates/Localizable.strings:630
+#: Resources/templates/Localizable.strings:633
 #, no-wrap
 msgid "French Mac Keyboard"
 msgstr ""
 
 #. type: "mac-fr_description"
-#: Resources/templates/Localizable.strings:631
+#: Resources/templates/Localizable.strings:634
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
 msgstr "Използване на клавиатурната подредба за френски клавиатура за Mac"
 
 #. type: "mac-it_title"
-#: Resources/templates/Localizable.strings:633
+#: Resources/templates/Localizable.strings:636
 #, no-wrap
 msgid "Italian Mac Keyboard"
 msgstr ""
 
 #. type: "mac-it_description"
-#: Resources/templates/Localizable.strings:634
+#: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
 msgstr "Използване на клавиатурната подредба за италианска клавиатура за Mac"
 
 #. type: "mac-se_title"
-#: Resources/templates/Localizable.strings:636
+#: Resources/templates/Localizable.strings:639
 #, no-wrap
 msgid "Swedish Mac Keyboard"
 msgstr ""
 
 #. type: "mac-se_description"
-#: Resources/templates/Localizable.strings:637
+#: Resources/templates/Localizable.strings:640
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
 msgstr "Използване на клавиатурната подредба за шведски клавиатура за Mac"
 
 #. type: "pc-fr_title"
-#: Resources/templates/Localizable.strings:639
+#: Resources/templates/Localizable.strings:642
 #, no-wrap
 msgid "French PC Keyboard"
 msgstr ""
 
 #. type: "pc-fr_description"
-#: Resources/templates/Localizable.strings:640
+#: Resources/templates/Localizable.strings:643
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
 msgstr "Използвайте клавиатурна подредба за френски клавиатура PC"
 
 #. type: "Embed_title"
-#: Resources/templates/Localizable.strings:647
+#: Resources/templates/Localizable.strings:650
 #, no-wrap
 msgid "Embed"
 msgstr "Embed"
 
 #. type: "Embed_description"
-#: Resources/templates/Localizable.strings:648
+#: Resources/templates/Localizable.strings:651
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
 msgstr "Опростена версия на тема по подразбиране се използва при изграждането на версия на Хамелеон, който изисква вграден тема."
 
 #. type: "Legacy_title"
-#: Resources/templates/Localizable.strings:650
+#: Resources/templates/Localizable.strings:653
 #, no-wrap
 msgid "Legacy"
 msgstr "Legacy"
 
 #. type: "Legacy_description"
-#: Resources/templates/Localizable.strings:651
+#: Resources/templates/Localizable.strings:654
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr "Оригинална по подразбиране Хамелеон тема въведена за v2.0 RC1"
 
 #. type: "Default_description"
-#: Resources/templates/Localizable.strings:654
+#: Resources/templates/Localizable.strings:657
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
 msgstr "Вградената тема в Хамелион v2.0 RC5"
 
 #. type: "Bullet_title"
-#: Resources/templates/Localizable.strings:656
+#: Resources/templates/Localizable.strings:659
 #, no-wrap
 msgid "Bullet"
 msgstr "Bullet"
 
 #. type: "Bullet_description"
-#: Resources/templates/Localizable.strings:657
+#: Resources/templates/Localizable.strings:660
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
 msgstr "Прекрасна проста тема от NoSmokingBandit от април 2009."
 
 #. type: "Audio_title"
-#: Resources/templates/Localizable.strings:666
+#: Resources/templates/Localizable.strings:669
 #, no-wrap
 msgid "Audio"
 msgstr ""
 
 #. type: "Audio_description"
-#: Resources/templates/Localizable.strings:667
+#: Resources/templates/Localizable.strings:670
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options that deal with audio."
 msgstr "А изборът на опции, които се занимават с видеото."
 
 #. type: "Control_title"
-#: Resources/templates/Localizable.strings:670
+#: Resources/templates/Localizable.strings:673
 #, no-wrap
 msgid "Control Options"
 msgstr "Опциите за контрол"
 
 #. type: "Control_description"
-#: Resources/templates/Localizable.strings:671
+#: Resources/templates/Localizable.strings:674
 #, no-wrap
 msgid "Settings to control how Chameleon works."
 msgstr "Настройки, за да контролирате как работи Хамелеон."
 
 #. type: "General_title"
-#: Resources/templates/Localizable.strings:674
+#: Resources/templates/Localizable.strings:677
 #, no-wrap
 msgid "General Options"
 msgstr "Общи опции"
 
 #. type: "General_description"
-#: Resources/templates/Localizable.strings:675
+#: Resources/templates/Localizable.strings:678
 #, no-wrap
 msgid "Choose from a selection of base options."
 msgstr "Изберете от избора на базови възможности."
 
 #. type: "KernelFlags_title"
-#: Resources/templates/Localizable.strings:678
+#: Resources/templates/Localizable.strings:681
 #, no-wrap
 msgid "Kernel Flags"
 msgstr "Ядрото опции /Kernel Flags/"
 
 #. type: "KernelFlags_description"
-#: Resources/templates/Localizable.strings:679
+#: Resources/templates/Localizable.strings:682
 #, no-wrap
 msgid "Choose from a selection of kernel flags."
 msgstr "Изберете от избора на ядрото опции /kernel flags/."
 
 #. type: "PowerManagement_title"
-#: Resources/templates/Localizable.strings:682
+#: Resources/templates/Localizable.strings:685
 #, no-wrap
 msgid "Power Management"
 msgstr "Опции на захранването"
 
 #. type: "PowerManagement_description"
-#: Resources/templates/Localizable.strings:683
+#: Resources/templates/Localizable.strings:686
 #, no-wrap
 msgid "A selection of options that deal with power management and speedstep."
 msgstr "Изборът на опции, които се занимават с управление на захранването и speedstep."
 
 #. type: "Resolution_description"
-#: Resources/templates/Localizable.strings:687
+#: Resources/templates/Localizable.strings:690
 #, no-wrap
 msgid "Set one resolution to use."
 msgstr "Задаване на една резолюция."
 
 #. type: "HDEFLayout_title"
-#: Resources/templates/Localizable.strings:690
+#: Resources/templates/Localizable.strings:693
 #, fuzzy, no-wrap
 #| msgid "KeyLayout"
 msgid "HDEF Layout"
 msgstr "KeyLayout"
 
 #. type: "HDEFLayout_description"
-#: Resources/templates/Localizable.strings:691
+#: Resources/templates/Localizable.strings:694
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
 msgstr ""
 
 #. type: "HDAULayout_title"
-#: Resources/templates/Localizable.strings:694
+#: Resources/templates/Localizable.strings:697
 #, fuzzy, no-wrap
 #| msgid "KeyLayout"
 msgid "HDAU Layout"
 msgstr "KeyLayout"
 
 #. type: "HDAULayout_description"
-#: Resources/templates/Localizable.strings:695
+#: Resources/templates/Localizable.strings:698
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
 msgstr ""
 
 #. type: "IntelCapri_title"
-#: Resources/templates/Localizable.strings:698
+#: Resources/templates/Localizable.strings:701
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
 msgstr ""
 
 #. type: "IntelCapri_description"
-#: Resources/templates/Localizable.strings:699
+#: Resources/templates/Localizable.strings:702
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgstr ""
 
 #. type: "IntelAzul_title"
-#: Resources/templates/Localizable.strings:702
+#: Resources/templates/Localizable.strings:705
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr ""
 
 #. type: "IntelAzul_description"
-#: Resources/templates/Localizable.strings:703
+#: Resources/templates/Localizable.strings:706
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
 msgstr ""
 
 #. type: "HDEFPinConfiguration_title"
-#: Resources/templates/Localizable.strings:706
+#: Resources/templates/Localizable.strings:709
 #, no-wrap
 msgid "HDEF PinConfiguration"
 msgstr ""
 
 #. type: "HDEFPinConfiguration_description"
-#: Resources/templates/Localizable.strings:707
+#: Resources/templates/Localizable.strings:710
 #, fuzzy, no-wrap
 #| msgid "Set one resolution to use."
 msgid "Set one HDEF PinConfiguration to use."
 msgstr "Задаване на една резолюция."
 
 #. type: "Video_title"
-#: Resources/templates/Localizable.strings:710
+#: Resources/templates/Localizable.strings:713
 #, no-wrap
 msgid "Video"
 msgstr "Видео"
 
 #. type: "Video_description"
-#: Resources/templates/Localizable.strings:711
+#: Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "A selection of options that deal with video."
 msgstr "А изборът на опции, които се занимават с видеото."
 
 #. type: "Keymaps_title"
-#: Resources/templates/Localizable.strings:714
+#: Resources/templates/Localizable.strings:717
 #, no-wrap
 msgid "KeyLayout"
 msgstr "KeyLayout"
 
 #. type: "Keymaps_description"
-#: Resources/templates/Localizable.strings:715
+#: Resources/templates/Localizable.strings:718
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Изберете един keylayout да се използва. Това също така ще инсталирате модула Keylayout и keymaps."
 
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:718
+#: Resources/templates/Localizable.strings:721
 #, no-wrap
 msgid "Themes"
 msgstr "Теми"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:719
+#: Resources/templates/Localizable.strings:722
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"

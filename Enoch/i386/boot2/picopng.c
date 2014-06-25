@@ -236,11 +236,13 @@ void vector8_init(vector8_t *p)
 vector8_t *vector8_new(size_t size, uint8_t value)
 {
 	vector8_t *p = png_alloc_malloc(sizeof (vector8_t));
-	if(!p) {
+	if(!p)
+	{
 		return NULL;
 	}
 	vector8_init(p);
-	if (size && !vector8_resizev(p, size, value)) {
+	if (size && !vector8_resizev(p, size, value))
+	{
 		vector8_cleanup(p);
 		png_alloc_free(p);
 		return NULL;
@@ -252,7 +254,8 @@ vector8_t *vector8_copy(vector8_t *p)
 {
 	vector8_t *q = vector8_new(p->size, 0);
 	uint32_t n;
-	if (!q) {
+	if (!q)
+	{
         	return NULL;
 	}
 	for (n = 0; n < q->size; n++)
@@ -562,7 +565,8 @@ void Inflator_inflateHuffmanBlock(vector8_t *out, const uint8_t *in, size_t *bp,
 			return;
 		}
 		else if (code <= 255) { // literal symbol
-			if (*pos >= out->size) {
+			if (*pos >= out->size)
+			{
 				vector8_resize(out, (*pos + 1) * 2); // reserve more room
 			}
 			out->data[(*pos)++] = (uint8_t) code;
@@ -745,11 +749,16 @@ uint32_t PNG_getBpp(const PNG_info_t *info)
 	uint32_t bitDepth, colorType;
 	bitDepth = info->bitDepth;
 	colorType = info->colorType;
-	if (colorType == 2) {
+	if (colorType == 2)
+	{
 		return (3 * bitDepth);
-	} else if (colorType >= 4) {
+	}
+	else if (colorType >= 4)
+	{
 		return (colorType - 2) * bitDepth;
-	} else {
+	}
+	else
+	{
 		return bitDepth;
 	}
 }
@@ -975,7 +984,8 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 PNG_info_t *PNG_info_new()
 {
 	PNG_info_t *info = png_alloc_malloc(sizeof (PNG_info_t));
-	if (!info) {
+	if (!info)
+	{
 		return NULL;
 	}
 	uint32_t i;
@@ -996,7 +1006,8 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 	}
 	info = PNG_info_new();
 	PNG_readPngHeader(info, in, size);
-	if (PNG_error) {
+	if (PNG_error)
+	{
 		return NULL;
 	}
 	size_t pos = 33; // first byte of the first chunk after the header
@@ -1030,7 +1041,8 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 			} else
 				idat = vector8_new(chunkLength, 0);
 
-			if (!idat) {
+			if (!idat)
+			{
 				PNG_error = 1;
 				return NULL;
 			}

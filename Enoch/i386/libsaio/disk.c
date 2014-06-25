@@ -1039,8 +1039,10 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 			HFSGetDirEntry,
 			HFSGetFileBlock,
 			HFSGetUUID,
+			HFSGetDescription,
+			HFSFree,
 			0,
-			kBIOSDevTypeHardDrive);
+			kBIOSDevTypeHardDrive, 0);
 		bvr->next = map->bvr;
 		map->bvr = bvr;
 		map->bvrcnt++;
@@ -1077,6 +1079,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	{
 		return NULL;
 	}
+	bzero(buffer,BPS);
 
 	/* Check for alternate block size */
 	if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0)
@@ -1095,6 +1098,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 			{
 				return NULL;
 			}
+			bzero(buffer,BPS);
 		}
 		factor = blksize / BPS;
 	}

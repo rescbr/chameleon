@@ -32,6 +32,12 @@
 
 #include <sl.h>
 
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
@@ -54,10 +60,10 @@ long ThinFatFile(void **binary, unsigned long *length)
 	uint32_t fapoffset;
 	uint32_t fapsize;	
   
-	if (fhp->magic == FAT_MAGIC) {
+	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */{
 		nfat = fhp->nfat_arch;
 		swapped = 0;
-	} else if (fhp->magic == FAT_CIGAM) {
+	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */{
 		nfat = OSSwapInt32(fhp->nfat_arch);
 		swapped = 1;
 	} else {
@@ -107,16 +113,17 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	mH = (struct mach_header *)(gBinaryAddress);
 
-#if DEBUG
-	printf("magic:      %x\n", (unsigned)mH->magic);
-	printf("cputype:    %x\n", (unsigned)mH->cputype);
-	printf("cpusubtype: %x\n", (unsigned)mH->cpusubtype);
-	printf("filetype:   %x\n", (unsigned)mH->filetype);
-	printf("ncmds:      %x\n", (unsigned)mH->ncmds);
-	printf("sizeofcmds: %x\n", (unsigned)mH->sizeofcmds);
-	printf("flags:      %x\n", (unsigned)mH->flags);
-	getchar();
-#endif
+/*#if DEBUG
+	DBG("magic:          0x%x\n", (unsigned)mH->magic);
+	DBG("cputype:        0x%x\n", (unsigned)mH->cputype);
+	DBG("cpusubtype:     0x%x\n", (unsigned)mH->cpusubtype);
+	DBG("filetype:       0x%x\n", (unsigned)mH->filetype);
+	DBG("ncmds:          0x%x\n", (unsigned)mH->ncmds);
+	DBG("sizeofcmds:     0x%x\n", (unsigned)mH->sizeofcmds);
+	DBG("flags:          0x%x\n", (unsigned)mH->flags);
+	DBG("archCpuType:    0x%x\n", archCpuType);
+	//getchar();
+#endif*/
 
 	switch (archCpuType)
 	{
@@ -131,11 +138,11 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			break;
 
 		case CPU_TYPE_X86_64:
-
+/*
 			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) {
 				return -1;
 			}
-
+*/
 			if (mH->magic != MH_MAGIC_64) {
 				error("Mach-O file has bad magic number\n");
 				return -1;
@@ -200,18 +207,21 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	cmdBase = cmdstart;
 
-	for (cnt = 0; cnt < ncmds; cnt++) {
-	cmd = ((long *)cmdBase)[0];
-	cmdsize = ((long *)cmdBase)[1];
+	for (cnt = 0; cnt < ncmds; cnt++)
+	{
+		cmd = ((long *)cmdBase)[0];
+		cmdsize = ((long *)cmdBase)[1];
 		
-	if (cmd == LC_SYMTAB) {
-		if (DecodeSymbolTable(cmdBase) != 0) {
-			return -1;
+		if (cmd == LC_SYMTAB)
+		{
+			if (DecodeSymbolTable(cmdBase) != 0)
+			{
+				return -1;
+			}
 		}
-        }
 
 		cmdBase += cmdsize;
-    }
+	}
 	
 	return ret;
 }
@@ -227,7 +237,8 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	long   vmsize, filesize;
 	unsigned long vmaddr, fileaddr;
 
-	if (((long *)cmdBase)[0] == LC_SEGMENT_64) {
+	if (((long *)cmdBase)[0] == LC_SEGMENT_64)
+	{
 		struct segment_command_64 *segCmd;
 		segCmd = (struct segment_command_64 *)cmdBase;
 		vmaddr = (segCmd->vmaddr & 0x3fffffff);
@@ -260,20 +271,21 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 #endif
 	}
 
-	if (vmsize == 0 || filesize == 0) {
+	if (vmsize == 0 || filesize == 0)
+	{
 		*load_addr = ~0;
 		*load_size = 0;
 		return 0;
 	}
 
-		if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
-			 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
-			stop("Kernel overflows available space");
-		}
+	if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
+		 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
+		stop("Kernel overflows available space");
+	}
 
-		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
-			gHaveKernelCache = true;
-		}
+	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
+		gHaveKernelCache = true;
+	}
 
 	// Copy from file load area.
 	if (vmsize>0 && filesize > 0) {

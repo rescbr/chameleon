@@ -301,9 +301,7 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		//verbose("Chipset Id: %x\n", map->chipset_id);
 		close_vbios(map);
 		return 0;
-	}
-	else
-	{
+	} else {
 		verbose(" Detected chipset/proc id (DRAM controller): %08x\n", map->chipset_id);
 	}
 	
@@ -349,14 +347,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		if (map->bios == BT_ATI_1)
 		{
 			verbose(", BT_ATI_1\n");
-		}
-		else
-		{
+		} else {
 			verbose(", BT_ATI_2\n");
 		}
-	}
-	else
-	{
+	} else {
 		
 		/*
 		 * check if we have NVIDIA
@@ -832,9 +826,7 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usCRTC_V_SyncWidth = mode.v_sync_width;
 
 				mode_timing->usPixelClock = mode.pixel_clock;
-			}
-			else
-			{
+			} else {
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
@@ -882,9 +874,7 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usVSyncWidth = mode.v_sync_width;
 										
 				mode_timing->usPixClk = mode.pixel_clock;
-			}
-			else
-			{
+			} else {
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else

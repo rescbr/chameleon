@@ -381,7 +381,6 @@ static void read_smb_intel(pci_dt_t *smbus_dev) {
 }
 
 static struct smbus_controllers_t smbus_controllers[] = {
-// Info from here: http://cateee.net/lkddb/web-lkddb/I2C_I801.html
 
 	{0x8086, 0x1C22, "6 Series",                                read_smb_intel },
 	{0x8086, 0x1D22, "C600/X79 Series",                         read_smb_intel },

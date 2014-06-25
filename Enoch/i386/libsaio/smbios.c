@@ -186,7 +186,7 @@ typedef struct {
 	uint8_t		chassisType;
 	char		*version;
 	char		*serialNumber;
-	char		*assetTag;   // Bungo: renamed folowing convention
+	char		*assetTag;
 	char		*skuNumber;
 } defaultChassis_t;
 
@@ -575,7 +575,10 @@ static SMBWord structureCount	= 0;
 #define kDefaultMacProHaswellBoardProduct		"Mac-F60DEB81FF30ACF6"
 //#define KDefaultMacProHaswellBoardSerialNumber	"F5K3474008JFNN215"
 
-//#define KDefaultBoardSerialNumber			"C02140302D5DMT31M" // new C07019501PLDCVHAD - C02032101R5DC771H
+//#define KDefaultBoardSerialNumber			"C02140302D5DMT31M"
+//                                          "C07019501PLDCVHAD"
+//                                          "C02032101R5DC771H"
+
 // J593902RA4MFE 3,1
 // J5031046RCZJA 5,1
 // J521101A5CZJC 3,1
@@ -615,7 +618,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 	// if (platformCPUFeature(CPU_FEATURE_MOBILE)) Bungo: doesn't recognise correctly, need fixing
 	if (PlatformType == 2)  // this works but it's a substitute
 	{
-		if (Platform.CPU.NoCores > 1) {
+		if (Platform.CPU.NoCores > 1)
+		{
 			defaultSystemInfo.productName    = kDefaultMacBookPro;
 			defaultBIOSInfo.version          = kDefaultMacBookProBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookProBIOSReleaseDate;
@@ -834,8 +838,10 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				{
 					break;
 				} else {
-					if (structPtr->orig->type == kSMBTypeMemoryDevice) {	// MemoryDevice only
-						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL)) {
+					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+					{
+						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
+						{
 							break;
 						}
 					}
@@ -1015,7 +1021,19 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
- /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) { }*/
+ /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) {
+	SMBOemPlatformFeature *p = (SMBOemPlatformFeature *)structPtr->new;
+
+	p->header.type		= kSMBTypeOemPlatformFeature;
+	p->header.length	= sizeof(SMBOemPlatformFeature);
+	p->header.handle	= handle++;
+
+	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->PlatformFeature));
+
+	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPPlatformFeature) + 2);
+	tableLength += sizeof(SMBOemPlatformFeature) + 2;
+	structureCount++;
+ }*/
 
 //-------------------------------------------------------------------------------------------------------------------------
 // EndOfTable

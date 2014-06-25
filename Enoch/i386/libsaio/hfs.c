@@ -296,7 +296,7 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 {
 	char entry[512];
 	char devStr[12];
-	long dirID, result, flags =0;
+	long dirID, result, flags = 0;
 
 	if (HFSInitPartition(ih) == -1)
 	{

@@ -182,7 +182,7 @@ int printf(const char * fmt, ...)
 	}
 
 	{
-		/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf) {
@@ -216,7 +216,7 @@ int verbose(const char * fmt, ...)
 	}
 
 	{
-		/* Kabyl: BooterLog */
+		// Kabyl: BooterLog
 		struct putc_info pi;
 
 		if (!msgbuf) {
@@ -246,6 +246,24 @@ int error(const char * fmt, ...)
 	} else {
 		vprf(fmt, ap);
 	}
+
+	{
+		// Kabyl: BooterLog
+		struct putc_info pi;
+
+		if (!msgbuf) {
+			return 0;
+		}
+
+		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+			return 0;
+		}
+		pi.str = cursor;
+		pi.last_str = 0;
+		prf(fmt, ap, sputc, &pi);
+		cursor +=  strlen((char *)cursor);
+	}
+
 	va_end(ap);
 	return(0);
 }

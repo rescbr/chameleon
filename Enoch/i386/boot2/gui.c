@@ -990,9 +990,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
 						break;
 				}
-				
+
 				break;
-				
+
 			}
 			//case kPartitionTypeOSXBoot:
 			//	devicetype = iDeviceHFSRECOVERY;		// Use Recovery icon

@@ -5075,11 +5075,11 @@ EFI_STATUS setup_Acpi(void)
 				MadtPointer = (ACPI_TABLE_MADT *)madt_file;	                    
 			}
 
-		}
-		else
+		} else {
 			MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
+		}
 
-			ProcessMadtInfo(MadtPointer, &madt_info);        
+		ProcessMadtInfo(MadtPointer, &madt_info);        
             
 		}
         
@@ -5156,9 +5156,7 @@ EFI_STATUS setup_Acpi(void)
 		/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 		rsd_p = (U32)rsdp_mod;
 		addConfigurationTable(&gEfiAcpi20TableGuid, &rsd_p, "ACPI_20");
-	}
-	else
-	{
+	} else {
 		/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 		rsd_p = (U32)rsdp_mod;
 		addConfigurationTable(&gEfiAcpiTableGuid, &rsd_p, "ACPI");

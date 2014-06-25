@@ -28,37 +28,45 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 	getBoolForKey(kHDAEnabler, &do_hda_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
-	while (current) {
+	while (current)
+	{
 		devicepath = get_pci_dev_path(current);
 
-		switch (current->class_id) {
+		switch (current->class_id)
+		{
 			case PCI_CLASS_BRIDGE_HOST:
 				//DBG("Setup BRIDGE_HOST \n");
-				if (current->dev.addr == PCIADDR(0, 0, 0)) {
+				if (current->dev.addr == PCIADDR(0, 0, 0))
+				{
 					dram_controller_dev = current;
 				}
 				break;
 				
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				//DBG("Setup ETHERNET %s enabled\n", do_eth_devprop?"":"no");
-				if (do_eth_devprop) {
+				if (do_eth_devprop)
+				{
 					setup_eth_builtin(current);
 				}
 				break;
 
 			case PCI_CLASS_NETWORK_OTHER:
 				//DBG("Setup WIRELESS %s enabled\n", do_wifi_devprop?"":"no");
-				if (do_wifi_devprop) {
+				if (do_wifi_devprop)
+				{
 					setup_wifi_airport(current);
 				}
 				break;
 
 			case PCI_CLASS_DISPLAY_VGA:
 				//DBG("GraphicsEnabler %s enabled\n", do_gfx_devprop?"":"no");
-				if (do_gfx_devprop) {
-					switch (current->vendor_id) {
+				if (do_gfx_devprop)
+				{
+					switch (current->vendor_id)
+					{
 						case PCI_VENDOR_ID_ATI:
-							if (getBoolForKey(kSkipAtiGfx, &doit, &bootInfo->chameleonConfig) && doit) {
+							if (getBoolForKey(kSkipAtiGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							{
 								verbose("Skip ATi/AMD gfx device!\n");
 							} else {
 								setup_ati_devprop(current);
@@ -66,7 +74,8 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							break;
 
 						case PCI_VENDOR_ID_INTEL:
-							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit) {
+							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							{
 								verbose("Skip Intel gfx device!\n");
 							} else {
 								setup_gma_devprop(current);
@@ -74,7 +83,8 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							break;
 
 						case PCI_VENDOR_ID_NVIDIA:
-							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit) {
+							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							{
 								verbose("Skip Nvidia gfx device!\n");
 							} else {
 								setup_nvidia_devprop(current);
@@ -84,10 +94,10 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					}
 					break;
 
-
 			case PCI_CLASS_MULTIMEDIA_AUDIO_DEV:
 				//DBG("Setup HDEF %s enabled\n", do_hda_devprop?"":"no");
-				if (do_hda_devprop) {
+				if (do_hda_devprop)
+				{
 					setup_hda_devprop(current);
 				}
 				break;
@@ -95,14 +105,16 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				case PCI_CLASS_SERIAL_USB:
 					//DBG("USB fix \n");
 					notify_usb_dev(current);
-        			        /*if (do_usb_devprop) {
-            				        set_usb_devprop(current);
-            				    }*/
+        			        /*if (do_usb_devprop)
+					{
+						set_usb_devprop(current);
+					}*/
 					break;
 
 				case PCI_CLASS_BRIDGE_ISA:
 					//DBG("Force HPET %s enabled\n", do_enable_hpet?"":"no");
-					if (do_enable_hpet) {
+					if (do_enable_hpet)
+					{
 						force_enable_hpet(current);
 					}
 					break;

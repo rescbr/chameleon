@@ -142,7 +142,8 @@ printVBEModeInfo()
 	// Loop through the mode list, and find the matching mode.
 
 	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          *modePtr != modeEndOfList; modePtr++ ) {
+          *modePtr != modeEndOfList; modePtr++ )
+	{
 		// Get mode information.
 
 		bzero( &modeInfo, sizeof(modeInfo) );
@@ -193,7 +194,8 @@ char *getVBEModeInfoString()
 	// Loop through the mode list, and find the matching mode.
 	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
 		(*modePtr != modeEndOfList) && (bufflen < 3072); /* prevent buffer overrun */
-		modePtr++ ) {
+		modePtr++ )
+	{
 		// Get mode information.
 
 		bzero( &modeInfo, sizeof(modeInfo) );
@@ -1224,28 +1226,33 @@ spinActivityIndicator(int sectors)
 {
     static unsigned long lastTickTime = 0, currentTickTime;
     
-	if (previewTotalSectors && previewSaveunder) {
+	if (previewTotalSectors && previewSaveunder)
+	{
 		int blob, lastBlob;
 
 		lastBlob = (previewLoadedSectors * kIOHibernateProgressCount) / previewTotalSectors;
 		previewLoadedSectors+=sectors;
 		blob = (previewLoadedSectors * kIOHibernateProgressCount) / previewTotalSectors;
 		
-		if (blob!=lastBlob) {
+		if (blob!=lastBlob)
+		{
 			updateProgressBar (previewSaveunder, lastBlob, blob);
 		}
 		return;
 	}
  
 	currentTickTime = time18(); // late binding
-	if (currentTickTime < lastTickTime + MIN_TICKS) {
+	if (currentTickTime < lastTickTime + MIN_TICKS)
+	{
 		return;
 	} else {
 		lastTickTime = currentTickTime;
 	}
 
-	if (getVideoMode() == VGA_TEXT_MODE) {
-		if (currentIndicator >= sizeof(indicator)) {
+	if (getVideoMode() == VGA_TEXT_MODE)
+	{
+		if (currentIndicator >= sizeof(indicator))
+		{
 			currentIndicator = 0;
 		}
 		putchar(indicator[currentIndicator++]);
@@ -1256,9 +1263,10 @@ spinActivityIndicator(int sectors)
 void
 clearActivityIndicator( void )
 {
-    if ( getVideoMode() == VGA_TEXT_MODE ) {
+	if ( getVideoMode() == VGA_TEXT_MODE )
+	{
 		putchar(' ');
 		putchar('\b');
-    }
+	}
 }
 

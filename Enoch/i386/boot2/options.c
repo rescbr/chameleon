@@ -32,6 +32,12 @@
 #include "pci.h"
 #include "modules.h"
 
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
@@ -1088,8 +1094,13 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-	int argLen = argName ? strlen(argName) : 0;
-	int len = argLen + cnt + 1;  // + 1 to account for space.
+    int argLen = argName ? strlen(argName) : 0;
+    int len = argLen + cnt + 1;  // +1 to account for space
+
+	if (argName)
+	{
+		len++; // +1 to account for '='
+	}
 
 	if (len > *cntRemainingP) {
 		error("Warning: boot arguments too long, truncating\n");
@@ -1101,15 +1112,14 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 		*argP += argLen;
 		*argP[0] = '=';
 		(*argP)++;
-		len++; // +1 to account for '='
 	}
 
 	strncpy(*argP, val, cnt);
 	*argP += cnt;
 	*argP[0] = ' ';
 	(*argP)++;
-	*cntRemainingP -= len;
 
+	*cntRemainingP -= len;
 	return true;
 }
 
@@ -1201,8 +1211,8 @@ processBootOptions()
 	// Load com.apple.Boot.plist from the selected volume
 	// and use its contents to override default bootConfig.
 
-	loadSystemConfig(&bootInfo->bootConfig);    
-	loadChameleonConfig(&bootInfo->chameleonConfig);
+	loadSystemConfig(&bootInfo->bootConfig);
+	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
 
 	// Use the kernel name specified by the user, or fetch the name
 	// in the config table, or use the default if not specified.
@@ -1252,15 +1262,20 @@ processBootOptions()
 				}
 			}
 		}
-        
+/*
 		// Try to get the volume uuid string
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
-         
+*/
 		// If we have the volume uuid add it to the commandline arguments
 		if (strlen(gBootUUIDString)) {
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
+		}
+		// Try to get the volume uuid string
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
+			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
 
@@ -1272,17 +1287,18 @@ processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else {
+		} else { /*
 			if (strlen(gBootUUIDString)) {
 				val = "*uuid";
 				cnt = 5;
-			} else {
+			} else { */
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			}
-		} 
+			/* } */
+		}
+
 		if (cnt > 0) {
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}

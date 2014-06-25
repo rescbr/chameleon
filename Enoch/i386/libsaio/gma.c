@@ -512,8 +512,10 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,snb-platform-id",		HD3000_vals[16], 4);// previusly commented
             break;
 
-            /* 0102 */
-        case GMA_SANDYBRIDGE_GT1: // HD Graphics 2000
+        /* 0102 */
+        /* HD Graphics 2000 */
+        case GMA_SANDYBRIDGE_GT1: // 0102
+            device_id = 0x00000102;					// Inject a valid mobile GPU device id instead of patching kexts
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
             devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
@@ -522,9 +524,10 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
             break;
 
-        /* Sandy Bridge */ /* 0112, 0122 */
-        case GMA_SANDYBRIDGE_GT2: // HD Graphics 3000
-        case GMA_SANDYBRIDGE_GT2_PLUS:
+        /* Sandy Bridge */
+        /* HD Graphics 3000 */
+        case GMA_SANDYBRIDGE_GT2: // 0112
+        case GMA_SANDYBRIDGE_GT2_PLUS: // 0122
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
             device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
@@ -534,16 +537,17 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
             break;
 
-        /* Ivy Bridge */ /* 0152, 0156, 015a, 015e, 0162, 0166, 016a, 0172, 0176 */
-        case GMA_IVYBRIDGE_D_GT1: // HD Graphics 4000, HD Graphics 4000 Mobile, HD Graphics P4000, HD Graphics 2500 HD, Graphics 2500 Mobile
-        case GMA_IVYBRIDGE_M_GT1:
-        case GMA_IVYBRIDGE_S_GT1:
+        /* Ivy Bridge */
+        /* HD Graphics 4000, HD Graphics 4000 Mobile, HD Graphics P4000, HD Graphics 2500 HD, Graphics 2500 Mobile */
+        case GMA_IVYBRIDGE_D_GT1: // 0152
+        case GMA_IVYBRIDGE_M_GT1: // 0156
+        case GMA_IVYBRIDGE_S_GT1: // 015A
         case GMA_IVYBRIDGE_S_GT3: // 015e
-        case GMA_IVYBRIDGE_D_GT2:
-        case GMA_IVYBRIDGE_M_GT2:
-        case GMA_IVYBRIDGE_S_GT2:
-        case GMA_IVYBRIDGE_S_GT4: // 0172:
-        case GMA_IVYBRIDGE_S_GT5: // 0176:
+        case GMA_IVYBRIDGE_D_GT2: // 0162
+        case GMA_IVYBRIDGE_M_GT2: // 0166
+        case GMA_IVYBRIDGE_S_GT2: // 016A
+        case GMA_IVYBRIDGE_S_GT4: // 0172
+        case GMA_IVYBRIDGE_S_GT5: // 0176
 
             if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_IVY * 2)
             {
@@ -605,7 +609,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
             break;
 
-        /* Haswell */ // HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile
+        /* Haswell */
+        /* HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile */
         //case 0x80860090:
         //case 0x80860091:
         //case 0x80860092:

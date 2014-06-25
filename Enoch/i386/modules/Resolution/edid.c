@@ -188,7 +188,8 @@ bool verifyEDID(unsigned char *edid)
 
 int edid_is_timing_block(unsigned char *block)
 {
-	if ((block[0] != 0x00) || (block[1] != 0x00) || (block[2] != 0x00) || (block[4] != 0x00)) {
+	if ((block[0] != 0x00) || (block[1] != 0x00) || (block[2] != 0x00) || (block[4] != 0x00))
+	{
 		return 1;
 	} else {
 		return 0;
@@ -202,7 +203,8 @@ int fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UInt
 	unsigned char *block;
 
 	msglog(" Parse Edid:");
-	if(!verifyEDID((unsigned char *)edid)) {
+	if(!verifyEDID((unsigned char *)edid))
+	{
 		msglog(" error\n");
 		return 0;
 	}

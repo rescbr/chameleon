@@ -162,11 +162,11 @@ void setup_eth_builtin(pci_dt_t *eth_dev)
 	if(device)
 	{
 		verbose("Setting up lan keys\n");
-        name_model = get_ethernet_model(eth_dev->vendor_id, eth_dev->device_id);
+		name_model = get_ethernet_model(eth_dev->vendor_id, eth_dev->device_id);
         
 		devprop_add_network_template(device, eth_dev->vendor_id);
-        devprop_add_value(device, "model", (uint8_t*)name_model, (strlen(name_model) + 1));
-        
+		devprop_add_value(device, "model", (uint8_t*)name_model, (strlen(name_model) + 1));
+		devprop_add_value(device, "device_type", (uint8_t*)"ethernet", 9);
 		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata)
 		{

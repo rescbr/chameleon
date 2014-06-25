@@ -19,13 +19,6 @@
 #define DBG(x...)		msglog(x)
 #endif
 
-#define quad(hi,lo)	(((uint64_t)(hi)) << 32 | (lo))
-
-/* Only for 32bit values */
-#define bit32(n)		(1U << (n))
-#define bitmask32(h,l)		((bit32(h)|(bit32(h)-1)) & ~(bit32(l)-1))
-#define bitfield32(x,h,l)	((((x) & bitmask32(h,l)) >> l))
-
 /*
  * timeRDTSC()
  * This routine sets up PIT counter 2 to count down 1/20 of a second.
@@ -257,9 +250,11 @@ void scan_cpu(PlatformInfo_t *p)
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]);
+
 	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]);
 	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]);
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
+
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
 	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) {
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
@@ -274,17 +269,17 @@ void scan_cpu(PlatformInfo_t *p)
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
-#if DEBUG_CPU
+// #if DEBUG_CPU
 	{
 		int		i;
-		printf("CPUID Raw Values:\n");
+		DBG("CPUID Raw Values:\n");
 		for (i=0; i<CPUID_MAX; i++) {
-			printf("%02d: %08x-%08x-%08x-%08x\n", i,
+			DBG("%02d: %08x-%08x-%08x-%08x\n", i,
 				   p->CPU.CPUID[i][0], p->CPU.CPUID[i][1],
 				   p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
 		}
 	}
-#endif
+// #endif
 
 /*  http://www.flounder.com/cpuid_explorer2.htm
     EAX (Intel):
@@ -299,21 +294,15 @@ void scan_cpu(PlatformInfo_t *p)
     |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
     +--------+----------------+--------+----+----+--------+--------+--------+
 */
-
+	p->CPU.MCodeVersion	= (uint32_t)(rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-	// stepping = cpu_feat_eax & 0xF;
-	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
-	// model = (cpu_feat_eax >> 4) & 0xF;
-	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
-	// family = (cpu_feat_eax >> 8) & 0xF;
-	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
-	// type = (cpu_feat_eax >> 12) & 0x3;
-	//p->CPU.Type		= bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);
-	// ext_model = (cpu_feat_eax >> 16) & 0xF;
-	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
-	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
-	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
+	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);     // stepping = cpu_feat_eax & 0xF;
+	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);     // model = (cpu_feat_eax >> 4) & 0xF;
+	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);    // family = (cpu_feat_eax >> 8) & 0xF;
+	//p->CPU.Type		= bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
+	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);   // ext_model = (cpu_feat_eax >> 16) & 0xF;
+	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 
@@ -322,9 +311,49 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Model >= CPU_MODEL_NEHALEM &&
 		p->CPU.Model != CPU_MODEL_ATOM		// MSR is *NOT* available on the Intel Atom CPU
 		) {
-		msr = rdmsr64(MSR_CORE_THREAD_COUNT);					// Undocumented MSR in Nehalem and newer CPUs
-		p->CPU.NoCores		= bitfield((uint32_t)msr, 31, 16);	// Using undocumented MSR to get actual values
-		p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);	// Using undocumented MSR to get actual values
+		/*
+		 * Find the number of enabled cores and threads
+		 * (which determines whether SMT/Hyperthreading is active).
+		 */
+		switch (p->CPU.Model) {
+			case CPU_MODEL_NEHALEM:
+			case CPU_MODEL_FIELDS:
+			case CPU_MODEL_DALES:
+			case CPU_MODEL_NEHALEM_EX:
+			case CPU_MODEL_IVYBRIDGE:
+			case CPU_MODEL_HASWELL:
+			case CPU_MODEL_HASWELL_SVR:
+			//case CPU_MODEL_HASWELL_H:
+			case CPU_MODEL_HASWELL_ULT:
+			case CPU_MODEL_CRYSTALWELL:
+				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+				p->CPU.NoCores		= bitfield((uint32_t)msr, 31, 16);
+				p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);
+				break;
+
+			case CPU_MODEL_DALES_32NM:
+			case CPU_MODEL_WESTMERE:
+			case CPU_MODEL_WESTMERE_EX:
+			case CPU_MODEL_SANDYBRIDGE:
+			case CPU_MODEL_JAKETOWN:
+			// 0x2A 0x2D
+				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+				p->CPU.NoCores		= bitfield((uint32_t)msr, 19, 16);
+				p->CPU.NoThreads	= bitfield((uint32_t)msr, 15,  0);
+				break;
+
+			default:
+				p->CPU.NoCores   = bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+				p->CPU.NoThreads = (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
+				//workaround for N270. I don't know why it detected wrong
+				if ((p->CPU.Model == CPU_MODEL_ATOM) &&
+					(p->CPU.Stepping == 2)) {
+				p->CPU.NoCores = 1;
+			}
+		break;
+
+		} // end switch
+
 	} else if (p->CPU.Vendor == CPUID_VENDOR_AMD) {
 		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
@@ -356,8 +385,10 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		
 		strlcpy(p->CPU.BrandString, s, sizeof(p->CPU.BrandString));
-		
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1))) {
+
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN,
+                     MIN(sizeof(p->CPU.BrandString),
+                         strlen(CPU_STRING_UNKNOWN) + 1))) {
 			/*
 			 * This string means we have a firmware-programmable brand string,
 			 * and the firmware couldn't figure out what sort of CPU we have.
@@ -412,92 +443,98 @@ void scan_cpu(PlatformInfo_t *p)
 		int intelCPU = p->CPU.Model;
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))	{
 			/* Nehalem CPU model */
-			if (p->CPU.Family == 0x06 && (p->CPU.Model == CPU_MODEL_NEHALEM		||
-										  p->CPU.Model == CPU_MODEL_FIELDS	||
-										  p->CPU.Model == CPU_MODEL_DALES	||
-										  p->CPU.Model == CPU_MODEL_DALES_32NM	||
-										  p->CPU.Model == CPU_MODEL_WESTMERE	||
-										  p->CPU.Model == CPU_MODEL_NEHALEM_EX	||
-										  p->CPU.Model == CPU_MODEL_WESTMERE_EX ||
-										  p->CPU.Model == CPU_MODEL_SANDYBRIDGE ||
-										  p->CPU.Model == CPU_MODEL_JAKETOWN ||
-										  p->CPU.Model == CPU_MODEL_IVYBRIDGE_XEON	||
-										  p->CPU.Model == CPU_MODEL_IVYBRIDGE  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL_SVR  ||
-										  //p->CPU.Model == CPU_MODEL_HASWELL_H  ||
-										  p->CPU.Model == CPU_MODEL_HASWELL_ULT  ||
-										  p->CPU.Model == CPU_MODEL_CRYSTALWELL ))
-			{
-				msr = rdmsr64(MSR_PLATFORM_INFO);
-				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
-				bus_ratio_max = bitfield(msr, 15, 8);
-				bus_ratio_min = bitfield(msr, 47, 40); //valv: not sure about this one (Remarq.1)
-				msr = rdmsr64(MSR_FLEX_RATIO);
-				DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
-				if (bitfield(msr, 16, 16)) {
-					flex_ratio = bitfield(msr, 15, 8);
-					/* bcc9: at least on the gigabyte h67ma-ud2h,
-					 where the cpu multipler can't be changed to
-					 allow overclocking, the flex_ratio msr has unexpected (to OSX)
-					 contents.	These contents cause mach_kernel to
-					 fail to compute the bus ratio correctly, instead
-					 causing the system to crash since tscGranularity
-					 is inadvertently set to 0.
-					 */
-					if (flex_ratio == 0) {
-						/* Clear bit 16 (evidently the presence bit) */
-						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
-						msr = rdmsr64(MSR_FLEX_RATIO);
-						verbose("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
-					} else {
-						if (bus_ratio_max > flex_ratio) {
-							bus_ratio_max = flex_ratio;
-						}
-					}
-				}
+			switch (p->CPU.Model) {
+				case CPU_MODEL_NEHALEM:
+				case CPU_MODEL_FIELDS:
+				case CPU_MODEL_DALES:
+				case CPU_MODEL_DALES_32NM:
+				case CPU_MODEL_WESTMERE:
+				case CPU_MODEL_NEHALEM_EX:
+				case CPU_MODEL_WESTMERE_EX:
+/* --------------------------------------------------------- */
+				case CPU_MODEL_SANDYBRIDGE:
+				case CPU_MODEL_JAKETOWN:
+				case CPU_MODEL_IVYBRIDGE_XEON:
+				case CPU_MODEL_IVYBRIDGE:
+				case CPU_MODEL_HASWELL:
+				case CPU_MODEL_HASWELL_SVR:
 
-				if (bus_ratio_max) {
-					fsbFrequency = (tscFrequency / bus_ratio_max);
-				}
-				//valv: Turbo Ratio Limit
-				if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
-					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
-					cpuFrequency = bus_ratio_max * fsbFrequency;
-					max_ratio = bus_ratio_max * 10;
-				} else {
-					cpuFrequency = tscFrequency;
-				}
-				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
-					max_ratio = atoi(newratio);
-					max_ratio = (max_ratio * 10);
-					if (len >= 3) {
-						max_ratio = (max_ratio + 5);
-					}
-
-					verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
-
-					// extreme overclockers may love 320 ;)
-					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
-						cpuFrequency = (fsbFrequency * max_ratio) / 10;
-						if (len >= 3) {
-							maxdiv = 1;
+				case CPU_MODEL_HASWELL_ULT:
+				case CPU_MODEL_CRYSTALWELL:
+/* --------------------------------------------------------- */
+					msr = rdmsr64(MSR_PLATFORM_INFO);
+					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
+					bus_ratio_max = bitfield(msr, 15, 8);
+					bus_ratio_min = bitfield(msr, 47, 40); //valv: not sure about this one (Remarq.1)
+					msr = rdmsr64(MSR_FLEX_RATIO);
+					DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
+					if (bitfield(msr, 16, 16)) {
+						flex_ratio = bitfield(msr, 15, 8);
+						/* bcc9: at least on the gigabyte h67ma-ud2h,
+						 where the cpu multipler can't be changed to
+						 allow overclocking, the flex_ratio msr has unexpected (to OSX)
+						 contents.	These contents cause mach_kernel to
+						 fail to compute the bus ratio correctly, instead
+						 causing the system to crash since tscGranularity
+						 is inadvertently set to 0.
+						 */
+						if (flex_ratio == 0) {
+							/* Clear bit 16 (evidently the presence bit) */
+							wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
+							msr = rdmsr64(MSR_FLEX_RATIO);
+							DBG("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
 						} else {
-							maxdiv = 0;
+							if (bus_ratio_max > flex_ratio) {
+								bus_ratio_max = flex_ratio;
+							}
 						}
-					} else {
-						max_ratio = (bus_ratio_max * 10);
 					}
-				}
-				//valv: to be uncommented if Remarq.1 didn't stick
-				/*if (bus_ratio_max > 0) bus_ratio = flex_ratio;*/
-				p->CPU.MaxRatio = max_ratio;
-				p->CPU.MinRatio = min_ratio;
+
+					if (bus_ratio_max) {
+						fsbFrequency = (tscFrequency / bus_ratio_max);
+					}
+					//valv: Turbo Ratio Limit
+					if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
+						msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
+
+						cpuFrequency = bus_ratio_max * fsbFrequency;
+						max_ratio = bus_ratio_max * 10;
+					} else {
+						cpuFrequency = tscFrequency;
+					}
+					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
+						max_ratio = atoi(newratio);
+						max_ratio = (max_ratio * 10);
+						if (len >= 3) {
+							max_ratio = (max_ratio + 5);
+						}
+
+						verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
+
+						// extreme overclockers may love 320 ;)
+						if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
+							cpuFrequency = (fsbFrequency * max_ratio) / 10;
+							if (len >= 3) {
+								maxdiv = 1;
+							} else {
+								maxdiv = 0;
+							}
+						} else {
+							max_ratio = (bus_ratio_max * 10);
+						}
+					}
+					//valv: to be uncommented if Remarq.1 didn't stick
+					/*if (bus_ratio_max > 0) bus_ratio = flex_ratio;*/
+					p->CPU.MaxRatio = max_ratio;
+					p->CPU.MinRatio = min_ratio;
 
 				myfsb = fsbFrequency / 1000000;
 				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);  // Bungo: fixed wrong Bus-Ratio readout
 				currcoef = bus_ratio_max;
-			} else {
+
+				break;
+
+			default:
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
 				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
 				currcoef = bitfield(msr, 12, 8);  // Bungo: reverted to 2263 state because of wrong old CPUs freq. calculating
@@ -529,6 +566,7 @@ void scan_cpu(PlatformInfo_t *p)
 					}
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 				}
+				break;
 			}
 		}
 		/* Mobile CPU */
@@ -626,7 +664,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	// keep formatted with spaces instead of tabs
 	DBG("\n---------------------------------------------\n");
-   	DBG("--------------- CPU INFO --------------------\n");
+   	DBG("--------------- CPU INFO ---------------\n");
 	DBG("---------------------------------------------\n");
 	DBG("Brand String:            %s\n",                 p->CPU.BrandString); // Processor name (BIOS)
 	DBG("Vendor:                  0x%x\n",               p->CPU.Vendor); // Vendor ex: GenuineIntel
@@ -652,14 +690,17 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("Model:                   0x%x\n",               p->CPU.Model); // Model ex: 37 (025h)
 	DBG("ExtModel:                0x%x\n",               p->CPU.ExtModel);
 	DBG("Stepping:                0x%x\n",               p->CPU.Stepping); // Stepping ex: 5 (05h)
-	DBG("MaxCoef/CurrCoef:        0x%x/0x%x\n",          p->CPU.MaxCoef, p->CPU.CurrCoef);
-	DBG("MaxDiv/CurrDiv:          0x%x/0x%x\n",          p->CPU.MaxDiv, p->CPU.CurrDiv);
+	DBG("MaxCoef:                 0x%x\n",               p->CPU.MaxCoef);
+	DBG("CurrCoef:                0x%x\n",               p->CPU.CurrCoef);
+	DBG("MaxDiv:                  0x%x\n",               p->CPU.MaxDiv);
+	DBG("CurrDiv:                 0x%x\n",               p->CPU.CurrDiv);
 	DBG("TSCFreq:                 %dMHz\n",              p->CPU.TSCFrequency / 1000000);
 	DBG("FSBFreq:                 %dMHz\n",              (p->CPU.FSBFrequency + 500000) / 1000000);
 	DBG("CPUFreq:                 %dMHz\n",              p->CPU.CPUFrequency / 1000000);
 	DBG("Cores:                   %d\n",                 p->CPU.NoCores); // Cores
 	DBG("Logical processor:       %d\n",                 p->CPU.NoThreads); // Logical procesor
 	DBG("Features:                0x%08x\n",             p->CPU.Features);
+	DBG("Microcode version:       %d\n",                 p->CPU.MCodeVersion); // CPU microcode version
 	DBG("\n---------------------------------------------\n");
 #if DEBUG_CPU
 	pause();
