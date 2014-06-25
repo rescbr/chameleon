@@ -20,7 +20,7 @@
 #if DEBUG_INJECT
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 uint32_t devices_number = 1;

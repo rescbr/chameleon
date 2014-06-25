@@ -31,14 +31,14 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MAX			10
 
 #define CPU_MODEL_PRESCOTT		0x03			// Celeron D, Pentium 4 (90nm)
-#define CPU_MODEL_NOCONA		0x04			// Xeon Nocona, Irwindale (90nm)
+#define CPU_MODEL_NOCONA		0x04			// Xeon Nocona/Paxville, Irwindale (90nm)
 #define CPU_MODEL_PRESLER		0x06			// Pentium 4, Pentium D (65nm)
-#define CPU_MODEL_PENTIUM_M		0x09			// Banias
-#define CPU_MODEL_DOTHAN		0x0D			// Dothan
+#define CPU_MODEL_PENTIUM_M		0x09			// Banias Pentium M (130nm)
+#define CPU_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
 #define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
 #define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
 #define CPU_MODEL_CONROE		0x0F			// 
-#define CPU_MODEL_CELERON		0x16			// 
+#define CPU_MODEL_CELERON		0x16			// Merom, Conroe (65nm)
 #define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPU_MODEL_WOLFDALE		0x17			// 
 #define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
@@ -177,7 +177,7 @@ typedef struct _PlatformInfo_t {
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;
 } PlatformInfo_t;
 
