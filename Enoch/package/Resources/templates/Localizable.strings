@@ -580,6 +580,9 @@ Dependencies: none";
 "EnableDualLink_title" = "EnableDualLink=Yes";
 "EnableDualLink_description" = "Enables DualLink options for nVidia and ATi cards.";
 
+"NvidiaGeneric_title" = "NvidiaGeneric=Yes";
+"NvidiaGeneric_description" = "Use the classic Nvidia name for the SystemProfiler (disabled by default).";
+
 // ----------------------------------------------------------------------------
 // Boot options - KERNEL FLAGS
 // ----------------------------------------------------------------------------
