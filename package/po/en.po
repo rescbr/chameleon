@@ -2256,7 +2256,6 @@ msgstr "Enables DualLink options for nVidia and ATi cards."
 #. type: "NvidiaGeneric_title"
 #: Resources/templates/Localizable.strings:583
 #, no-wrap
-#| msgid "SkipNvidiaGfx=Yes"
 msgid "NvidiaGeneric=Yes"
 msgstr "NvidiaGeneric=Yes"
 

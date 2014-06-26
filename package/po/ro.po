@@ -2258,7 +2258,6 @@ msgstr "Permite optiuni DualLink pentru placile video nVidia si ATI."
 #. type: "NvidiaGeneric_title"
 #: Resources/templates/Localizable.strings:583
 #, no-wrap
-#| msgid "SkipNvidiaGfx=Yes"
 msgid "NvidiaGeneric=Yes"
 msgstr "NvidiaGeneric=Yes"
 

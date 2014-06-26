@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-26 01:37+0200\n"
-"PO-Revision-Date: 2013-12-28 07:30+0000\n"
+"PO-Revision-Date: 2014-06-26 01:26+0000\n"
 "Last-Translator: crazybirdy <>\n"
 "Language-Team: zh_CN <zh_CN@li.org>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388215804.0\n"
+"X-POOTLE-MTIME: 1403745967.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -2260,7 +2260,6 @@ msgstr "(默认是 No) 启用 nVidia 及 ATi 显卡的 DualLink 选项。"
 #. type: "NvidiaGeneric_title"
 #: Resources/templates/Localizable.strings:583
 #, no-wrap
-#| msgid "SkipNvidiaGfx=Yes"
 msgid "NvidiaGeneric=Yes"
 msgstr "NvidiaGeneric=Yes"
 
@@ -2268,7 +2267,7 @@ msgstr "NvidiaGeneric=Yes"
 #: Resources/templates/Localizable.strings:584
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
-msgstr ""
+msgstr "(默认是 No) 启用 nVidia 显卡的 传统名称 (只显示 显卡型号，不显示 制造商名称)。"
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:590
@@ -2391,6 +2390,8 @@ msgstr "kext-dev-mode=1"
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
+"Yosemite Developer Previews 不加载未签署或不当签署的 kexts，加入 kext-dev-mode=1 "
+"参数后，即可取消此严格限制，并可使用未签署的 kexts。"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:622
