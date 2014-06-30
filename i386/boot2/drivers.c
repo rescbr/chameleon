@@ -529,6 +529,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	if (ret != 0) {
 		break;
 	}
+
 	// Allocate memory for the driver path and the plist.
 
 	module->executablePath = tmpExecutablePath;

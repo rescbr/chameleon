@@ -430,19 +430,23 @@ static SMBWord structureCount	= 0;
 #define kDefaultMacMiniBoardProduct			"Mac-F4208EAA"
 
 // MacMini5,1 Mac-8ED6AF5B48C039E1 - MM51.88Z.0077.B0F.1110201309
-// MacMini5,2 Mac-4BC72D62AD45599E
-// MacMini5,3
-//#define kDefaultMacMini				"Macmini5,3"
-//#define kDefaultMacMiniBIOSVersion			"    MM51.88Z.0077.B10.1201241549"
-//#define kDefaultMacMiniBoardProduct			"Mac-F65AE981FFA204ED"
-//#define kDefaultMacMiniBIOSReleaseDate		"01/24/2012"
 
-// MacMini 6,1 - Mac-F65AE981FFA204ED
+// MacMini5,2 Mac-4BC72D62AD45599E
+
+// MacMini5,3
+// Bios: MM51.88Z.0077.B10.1201241549
+// Board: Mac-F65AE981FFA204ED
+// Data: 01/24/2012
+
+// MacMini 6,1
+// Bios: MM61.88Z.0106.B03.1211161202
+// Board: Mac-F65AE981FFA204ED
+// Data: 10/14/2012
+
 // MacMini 6,2
-//#define kDefaultMacMini62				"Macmini6,2"
-//#define kDefaultMacMini62BIOSVersion			"    MM61.88Z.0106.B00.1208091121"
-//#define kDefaultMacMini62BoardProduct			"Mac-F65AE981FFA204ED"
-//#define kDefaultMacMini62BIOSReleaseDate		"10/14/2012"
+// Bios: MM61.88Z.0106.B03.1211161202
+// Board: Mac-FC02E91DDD3FA6A4
+// Data: 10/14/2012
 
 //=========== MacBook ===========
 #define kDefaultMacBookFamily				"MacBook"
@@ -458,13 +462,22 @@ static SMBWord structureCount	= 0;
 
 // MacBookAir4,1 - Mac-C08A6BB70A942AC2
 // MacBookAir4,2 - Mac-742912EFDBEE19B3
+
+// MacBookAir5,2
 #define kDefaultMacBookAir				"MacBookAir5,2"
 #define kDefaultMacBookAirBIOSVersion			"    MBA51.88Z.00EF.B00.1205221442"
 #define kDefaultMacBookAirBIOSReleaseDate		"05/10/12"
 #define kDefaultMacBookBoardAirProduct			"Mac-2E6FAB96566FE58C"
 
-// MacBookAir6,1 - Mac-35C1E88140C3E6CF - MBA61.88Z.0099.B04.1309271229
-// MacBookAir6,2 - Mac-7DF21CB3ED6977E5 - MBA62.88Z.00EF.B00.1205221442
+// MacBookAir6,1
+// Bios: MBA61.88Z.0099.B04.1309271229
+// Board: Mac-35C1E88140C3E6CF
+// Data: 24/06/13
+
+// MacBookAir6,2
+// Bios: MBA62.88Z.00EF.B00.1205221442
+// Board: Mac-7DF21CB3ED6977E5
+// Data: 24/06/13
 
 //=========== MacBookPro ===========
 #define kDefaultMacBookProFamily			"MacBook Pro"
@@ -475,19 +488,25 @@ static SMBWord structureCount	= 0;
 #define kDefaultMacBookProBIOSReleaseDate		"02/27/08"
 #define kDefaultMacBookProBoardProduct			"Mac-F42C89C8"
 
-//#define kDefaultMacBookPro				"MacBookPro8,1"
-//#define kDefaultMacBookProBIOSVersion			"    MBP81.88Z.0047.B24.1110141131"
-//#define kDefaultMacBookProBoardProduct		"Mac-94245B3640C91C81"
-//#define kDefaultMacBookProBIOSReleaseDate		"10/14/11"
+// MacBookPro8,1
+// Bios: MBP81.88Z.0047.B24.1110141131
+// Board: Mac-94245B3640C91C81
+// Data: 10/14/11
 
-// MacBookPro8,2 - Mac_94245A3940C91C80
-// MacBookPro8,3 - Mac-942459F5819B171B
+// MacBookPro8,2
+// Bios:
+// Board: Mac_94245A3940C91C80
+// Data: 10/14/11
+
+// MacBookPro8,3
+// Bios:
+// Board: Mac-942459F5819B171B
+// Data: 10/31/11
 
 // MacBookPro10,2
-//#define kDefaultMacBookProIvy				"MacBookPro10,2"
-//#define kDefaultMacBookProIvyBIOSVersion		"    MBP102.88Z.0106.B01.1208311637"
-//#define kDefaultMacBookProIvyBoardProduct		"Mac-AFD8A9D944EA4843"
-//#define kDefaultMacBookProIvyBIOSReleaseDate		"10/02/2012"
+// Bios: MBP102.88Z.0106.B01.1208311637
+// Board: Mac-AFD8A9D944EA4843
+// Data: 10/02/2012
 
 // MacBookPro11,2 - Mac-3CBD00234E554E41 - MBP112.88Z.0138.B03.1310291227
 // MacBookPro11,3 - Mac-2BD1B31983FE1663 - MBP112.88Z.0138.B02.1310181745
@@ -506,7 +525,7 @@ static SMBWord structureCount	= 0;
 // iMac11,1 core i3/i5/i7
 #define kDefaultiMacNehalem				"iMac11,1"
 #define kDefaultiMacNehalemBIOSVersion			"    IM111.88Z.0034.B02.1003171314"
-#define kDefaultiMacNehalemBIOSReleaseDate		"03/30/10"
+#define kDefaultiMacNehalemBIOSReleaseDate		"03/17/10"
 #define kDefaultiMacNehalemBoardProduct			"Mac-F2268DAE"
 // iMac11,2
 // iMac11,3
@@ -514,14 +533,13 @@ static SMBWord structureCount	= 0;
 // iMac12,1
 #define kDefaultiMacSandy				"iMac12,1"
 #define kDefaultiMacSandyBIOSVersion			"    IM121.88Z.0047.B00.1102091756"
-#define kDefaultiMacSandyBIOSReleaseDate		"01/02/08"
+#define kDefaultiMacSandyBIOSReleaseDate		"04/22/11"
 #define kDefaultiMacSandyBoardProduct			"Mac-942B5BF58194151B"
 
-// iMac12,2 Mac-942B59F58194171B
-//#define kDefaultiMacSandy				"iMac12,2"
-//#define kDefaultiMacSandyBIOSVersion			"    IM121.88Z.0047.B1D.1110171110"
-//#define kDefaultiMacSandyBIOSReleaseDate		"10/17/11"
-//#define kDefaultiMacSandyBoardProduct			"Mac-942B59F58194171B"
+// iMac12,2
+// Bios: IM121.88Z.0047.B1D.1110171110"
+// Data: 10/17/11
+// Board: Mac-942B59F58194171B"
 
 // iMac13,1
 // Bios: IM131.88Z.010A.B05.1211151146
@@ -529,10 +547,17 @@ static SMBWord structureCount	= 0;
 // Board: Mac-00BE6ED71E35EB86
 
 // iMac13,2
-//#define kDefaultiMacIvy				"iMac13,2"
-//#define kDefaultiMacIvyBIOSVersion			"    IM131.88Z.00CE.B00.1203281326"
-//#define kDefaultiMacIvyBIOSReleaseDate		"03/28/2012"
-//#define kDefaultiMacIvyBoardProduct			"Mac-FC02E91DDD3FA6A4"
+// Bios: IM131.88Z.00CE.B00.1203281326
+// Data: 03/28/2012
+// Board: Mac-FC02E91DDD3FA6A4
+
+// iMac14,1
+// iMac14,2
+// iMac14,3
+// iMac14,4
+// Bios: IM144.88Z.0179.B03.1405241029
+// Data: 05/20/2014
+// Board: Mac-81E3E92DD6088272
 
 //=========== MacPro ===========
 #define kDefaultMacProFamily				"MacPro" // MacPro's family = "MacPro" not "Mac Pro"

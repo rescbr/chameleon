@@ -252,9 +252,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
 		verbose("Specified kernel cache file path = %s\n", cacheFile);
-	}
-	else
-	{
+	} else {
 		// Lion, Mountain Lion and Mavericks prelink kernel cache file
 		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
 		{
@@ -332,9 +330,11 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// Check if the kernel cache file is more recent (mtime)
 	// than the kernel file or the S/L/E directory
 	ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
+
 	// Check if the kernel file is more recent than the cache file
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat)
-		&& (kerneltime > cachetime)) {
+		&& (kerneltime > cachetime))
+	{
 		DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n",
 				bootInfo->bootFile, kernelCacheFile);
 		return -1;
@@ -343,7 +343,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
 	// Check if the S/L/E directory time is more recent than the cache file
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
-		&& (exttime > cachetime)) {
+		&& (exttime > cachetime))
+	{
 		DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n",
 				kernelCacheFile);
 		return -1;
@@ -669,9 +670,11 @@ void common_boot(int biosdev)
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
+			{
 				snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
-			else
+			} else {
 				strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
+			}
 
 			// Try to load kernel image from alternate locations on boot helper partitions.
 			ret = -1;
@@ -710,7 +713,8 @@ void common_boot(int biosdev)
 		sleep(8);
 #endif
 
-		if (ret <= 0) {
+		if (ret <= 0)
+		{
 			printf("Can't find %s\n", bootFile);
 			sleep(1);
 
@@ -761,7 +765,7 @@ static void selectBiosDevice(void)
 }
 */
 
-bool checkOSVersion(const char * version) 
+bool checkOSVersion(const char * version)
 {
 	return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 			&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
