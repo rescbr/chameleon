@@ -11,6 +11,7 @@ CDBOOT = ${IMGROOT}/usr/standalone/i386/cdboot
 include ${SRCROOT}/Make.rules
 
 # The order of building modules is important.
+SUBDIRS = KernelPatcher
 
 ifdef CONFIG_KLIBC_MODULE
 SUBDIRS += klibc
@@ -40,11 +41,24 @@ ifdef CONFIG_ACPICODEC_MODULE
 SUBDIRS += AcpiCodec
 endif
 
+ifdef CONFIG_FILENVRAM_MODULE
+SUBDIRS += FileNVRAM
+endif
+
+#ifdef CONFIG_KEXTPATCHER_MODULE
+#SUBDIRS += KextPatcher
+#endif
+
+#ifdef CONFIG_HDAENABLER_MODULE
+#SUBDIRS += HDAEnabler
+#endif
+
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
 DEFINES=
 CONFIG = hd
 LIBSAIODIR = $(SRCROOT)/i386/libsaio
 INC = -I$(LIBSAIODIR)
+
 
 ifeq (${CONFIG_MODULES}, y)
 all: $(SYMROOT) $(OBJROOT) objroot_dirs $(SYMROOT)/boot_modules.c $(SYMROOT)/boot_modules.h all-recursive

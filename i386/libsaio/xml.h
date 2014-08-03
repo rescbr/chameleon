@@ -107,6 +107,7 @@ bool XMLIsDict   (TagPtr entry);
 bool XMLIsArray  (TagPtr entry);
 bool XMLIsData   (TagPtr entry);
 
+
 bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value);
 
 long XMLParseNextTag(char *buffer, TagPtr *tag);

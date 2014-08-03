@@ -53,7 +53,7 @@
 #define FDISK_LINUX		0x83    /* Linux native */
 #define FDISK_OPENBSD		0xa6    /* OpenBSD FFS partition */
 #define FDISK_FREEBSD		0xa5    /* FreeBSD UFS2 partition */
-#define FDISK_BEFS          0xeb    /* Haiku BeFS partition */
+#define FDISK_BEFS		0xeb    /* Haiku BeFS partition */
 #define FDISK_UFS		0xa8	/* Apple UFS partition */
 #define FDISK_HFS		0xaf	/* Apple HFS partition */
 #define FDISK_BOOTER		0xab	/* Apple booter partition */

@@ -46,7 +46,7 @@ void SaveRefString(char* string, int id)
 		}
 		tmp = tmp->next;
 	}
-	
+
 	string_ref* new_ref = malloc(sizeof(string_ref));
 	new_ref->string = malloc(strlen(string)+1);
 	sprintf(new_ref->string, "%s", string);
@@ -788,8 +788,8 @@ ParseTagData( char * buffer, TagPtr * tag )
 	//printf("ParseTagData unimplimented\n");
 	//printf("Data: %s\n", buffer);
 	//	getchar();
-	
-    char* string = BASE64Decode(buffer, strlen(buffer), &actuallen);
+
+	char* string = BASE64Decode(buffer, strlen(buffer), &actuallen);
 	tmpTag->type = kTagTypeData;
 	tmpTag->string = string;
 	tmpTag->tag = 0;
@@ -1175,6 +1175,7 @@ char* XMLCastData(TagPtr dict, int* length)
 	*length = 0;
 	return NULL;
 }
+
 
 long XMLCastStringOffset(TagPtr dict)
 {

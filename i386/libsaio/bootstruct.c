@@ -185,7 +185,7 @@ finalizeBootStruct(void)
 	DT__FlattenDeviceTree((void **)&addr, &size);
 	bootArgs->deviceTreeP = (uint32_t)addr;
 	bootArgs->deviceTreeLength = size;
-	
+
 	// Copy BootArgs values to older structure
 	
 	memcpy(&bootArgsPreLion->CommandLine, &bootArgs->CommandLine, BOOT_LINE_LENGTH);

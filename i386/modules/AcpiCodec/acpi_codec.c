@@ -1769,12 +1769,12 @@ static U32 BuildCstateInfo(CPU_DETAILS * cpu, U32 pmbase)
 {
 	{ 
         
-		TagPtr CstateTag = NULL;		
-        U32 entry_count = 0;
+		TagPtr CstateTag = NULL;
+		U32 entry_count = 0;
         
         if (bootInfo->chameleonConfig.dictionary) 
         {
-            CstateTag = XMLCastDict(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char*)"C-States"));
+		CstateTag = XMLCastDict(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char*)"C-States"));
         }       
         
 		if (CstateTag)

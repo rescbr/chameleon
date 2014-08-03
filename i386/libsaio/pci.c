@@ -91,9 +91,9 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			new->dev.addr				= pci_addr;
 			new->vendor_id				= id & 0xffff;
 			new->device_id				= (id >> 16) & 0xffff;
-            new->progif                 = pci_config_read8(pci_addr, PCI_CLASS_PROG);
+			new->progif				= pci_config_read8(pci_addr, PCI_CLASS_PROG);
 			new->revision_id			= pci_config_read8(pci_addr, PCI_CLASS_REVISION);
-			new->subsys_id.subsys_id	= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
+			new->subsys_id.subsys_id		= pci_config_read32(pci_addr, PCI_SUBSYSTEM_VENDOR_ID);
 			new->class_id				= pci_config_read16(pci_addr, PCI_CLASS_DEVICE);
 			//new->subclass_id			= pci_config_read16(pci_addr, PCI_SUBCLASS_DEVICE);
 			new->parent	= start;
@@ -128,7 +128,9 @@ void enable_pci_devs(void)
 	id = pci_config_read16(PCIADDR(0, 0x00, 0), 0x00);
 	/* make sure we're on Intel chipset */
 	if (id != 0x8086)
+	{
 		return;
+	}
 	rcba = pci_config_read32(PCIADDR(0, 0x1f, 0), 0xf0) & ~1; //this is LPC host
 	fd = (uint32_t *)(rcba + 0x3418);
 	/* set SMBus Disable (SD) to 0 */

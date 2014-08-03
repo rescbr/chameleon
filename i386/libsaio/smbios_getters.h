@@ -35,6 +35,7 @@ extern bool getProcessorInformationMaximumClock(returnType *value);
 extern bool getSMBOemProcessorBusSpeed(returnType *value);
 extern bool getSMBOemProcessorType(returnType *value);
 extern bool getSMBMemoryDeviceMemoryType(returnType *value);
+extern bool getSMBMemoryDeviceMemoryErrorHandle(returnType *value);
 extern bool getSMBMemoryDeviceMemorySpeed(returnType *value);
 extern bool getSMBMemoryDeviceManufacturer(returnType *value);
 extern bool getSMBMemoryDeviceSerialNumber(returnType *value);

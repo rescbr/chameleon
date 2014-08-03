@@ -23,14 +23,26 @@ fi
 set -u  # Abort with unset variables
 #set -e # Abort with any error can be suppressed locally using EITHER cmd||true OR set -e;cmd;set +e
 
+# ====== LANGUAGE SETUP ======
+export LANG='en_US.UTF-8'
+export LC_COLLATE='C'
+export LC_CTYPE='C'
+
 # ====== CONFIGURATION ======
 CONFIG_MODULES=""
-CONFIG_KLIBC_MODULE=""
-CONFIG_UCLIBCXX_MODULE=""
-CONFIG_SATA_MODULE=""
 CONFIG_ACPICODEC_MODULE=""
-CONFIG_RESOLUTION_MODULE=""
+CONFIG_AMDGE_MODULE=""
+CONFIG_GMAGE_MODULE=""
+CONFIG_NVIDIAGE_MODULE=""
+CONFIG_KERNELPATCHER_MODULE=""
+CONFIG_KEXTPATCHER_MODULE=""
 CONFIG_KEYLAYOUT_MODULE=""
+CONFIG_KLIBC_MODULE=""
+CONFIG_RESOLUTION_MODULE=""
+CONFIG_HDAENABLER_MODULE=""
+CONFIG_FILENVRAM_MODULE=""
+CONFIG_SATA_MODULE=""
+CONFIG_UCLIBCXX_MODULE=""
 source "${SRCROOT}/auto.conf"
 
 # ====== COLORS ======
@@ -521,101 +533,25 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
     ###############################
     # Supported Modules           #
     ###############################
-    # klibc.dylib                 #
-    # Resolution.dylib            #
-    # uClibcxx.dylib              #
-    # Sata.dylib                  #
     # ACPICodec.dylib             #
+    # AMDGraphicsEnabler.dylib    #
+    # ATiGraphicsEnabler.dylib    #
+    # FileNVRAM.dylib             #
+    # HDAEnabler.dylib            #
+    # HelloWorld.dylib            #
+    # IntelGraphicsEnabler.dylib  #
+    # KernelPatcher.dylib         #
+    # KextPatcher.dylib           #
     # Keylayout.dylib             #
+    # klibc.dylib                 #
+    # NVDIAGraphicEnabler.dylib   #
+    # Resolution.dylib            #
+    # Sata.dylib                  #
+    # uClibcxx.dylib              #
     ###############################
     if [ "$(ls -A "${SYMROOT}/i386/modules")" ]; then
     {
         addGroupChoices "Module"
-
-# -
-        if [[ "${CONFIG_RESOLUTION_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/Resolution.dylib" ]]; then
-        {
-            # Start build Resolution package module
-            choiceId="AutoReso"
-            moduleFile="Resolution.dylib"
-            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
-            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
-            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
-                               --subst="moduleName=$choiceId"               \
-                               --subst="moduleFile=$moduleFile"             \
-                               InstallModule
-
-            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
-            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
-            # End build Resolution package module
-        }
-        fi
-
-# -
-        if [[ "${CONFIG_KLIBC_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/klibc.dylib" ]]; then
-        {
-            # Start build klibc package module
-            choiceId="klibc"
-            moduleFile="${choiceId}.dylib"
-            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
-            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" ${PKG_BUILD_DIR}/${choiceId}/Root
-            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
-                               --subst="moduleName=$choiceId"               \
-                               --subst="moduleFile=$moduleFile"             \
-                               InstallModule
-
-            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
-            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
-            # End build klibc package module
-        }
-        fi
-
-# -
-        if [[ "${CONFIG_UCLIBCXX_MODULE}" = 'm' && -n "${CONFIG_KLIBC_MODULE}" && \
-              -f "${SYMROOT}/i386/modules/uClibcxx.dylib" ]]; then
-        {
-            klibcPackageRefId=""
-            if [[ "${CONFIG_KLIBC_MODULE}" == 'm' ]];then
-                klibcPackageRefId=$(getPackageRefId "${modules_packages_identity}" "klibc")
-            fi
-            # Start build uClibc package module
-            choiceId="uClibc"
-            moduleFile="uClibcxx.dylib"
-            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
-            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
-            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
-                               --subst="moduleName=$choiceId"               \
-                               --subst="moduleFile=$moduleFile"             \
-                               InstallModule
-
-            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
-            # Add the klibc package because the uClibc module is dependent of klibc module
-            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId $klibcPackageRefId" "${choiceId}"
-            # End build uClibc package module
-        }
-        fi
-# -
-        if [[ "${CONFIG_SATA_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/Sata.dylib" ]]; then
-        {
-            # Start build Sata package module
-            choiceId="Sata"
-            moduleFile="Sata.dylib"
-            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
-            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
-            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
-                               --subst="moduleName=$choiceId"               \
-                               --subst="moduleFile=$moduleFile"             \
-                               InstallModule
-
-            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
-            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
-            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
-            # End build Sata package module
-        }
-        fi
 
 # -
         if [[ "${CONFIG_ACPICODEC_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/ACPICodec.dylib" ]]; then
@@ -636,8 +572,103 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             # End build ACPICodec package module
         }
         fi
+# -
+        if [[ "${CONFIG_NVIDIAGE_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/NVIDIAGraphicEnabler.dylib" ]]; then
+        {
+            # Start build NvidiaGraphicsEnabler package module
+            choiceId="NVIDIAGraphicsEnabler"
+            moduleFile="NVIDIAGraphicEnabler.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
 
-# -        # Warning Keylayout module need additional files
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build NvidiaGraphicsEnabler package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_AMDGE_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/AMDGraphicsEnabler.dylib" ]]; then
+        {
+            # Start build AMDGraphicsEnabler package module
+            choiceId="AMDGraphicsEnabler"
+            moduleFile="AMDGraphicsEnabler_title.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build AMDGraphicsEnabler package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_GMAGE_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/IntelGraphicsEnabler.dylib" ]]; then
+        {
+            # Start build IntelGraphicsEnabler package module
+            choiceId="IntelGraphicsEnabler"
+            moduleFile="IntelGraphicsEnabler_title.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build IntelGraphicsEnabler package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_KERNELPATCHER_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/KernelPatcher.dylib" ]]; then
+        {
+            # Start build KernelPatcher package module
+            choiceId="KernelPatcher"
+            moduleFile="KernelPatcher.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build KernelPatcher package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_KEXTPATCHER_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/KextPatcher.dylib" ]]; then
+        {
+            # Start build KextPatcher package module
+            choiceId="KextPatcher"
+            moduleFile="KextPatcher.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build KextPatcher package module
+        }
+        fi
+# -
+        # Warning Keylayout module need additional files
         if [[ "${CONFIG_KEYLAYOUT_MODULE}" = 'm' && -f "${SYMROOT}/i386/modules/Keylayout.dylib" ]]; then
         {
             # Start build Keylayout package module
@@ -671,7 +702,127 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
             # End build Keylayout package module
         }
         fi
+# -
+        if [[ "${CONFIG_KLIBC_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/klibc.dylib" ]]; then
+        {
+            # Start build klibc package module
+            choiceId="klibc"
+            moduleFile="${choiceId}.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" ${PKG_BUILD_DIR}/${choiceId}/Root
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
 
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build klibc package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_RESOLUTION_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/Resolution.dylib" ]]; then
+        {
+            # Start build Resolution package module
+            choiceId="AutoReso"
+            moduleFile="Resolution.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build Resolution package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_HDAENABLER_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/HDAEnabler.dylib" ]]; then
+        {
+            # Start build HDAEnabler package module
+            choiceId="HDAEnabler"
+            moduleFile="HDAEnabler.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build HDAEnabler package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_FILENVRAM_MODULE}" == 'y' && -f "${SYMROOT}/i386/modules/FileNVRAM.dylib" ]]; then
+        {
+            # Start build FileNVRAM package module
+            choiceId="FileNVRAM"
+            moduleFile="FileNVRAM.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build FileNVRAM package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_SATA_MODULE}" == 'm' && -f "${SYMROOT}/i386/modules/Sata.dylib" ]]; then
+        {
+            # Start build Sata package module
+            choiceId="Sata"
+            moduleFile="Sata.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId" "${choiceId}"
+            # End build Sata package module
+        }
+        fi
+# -
+        if [[ "${CONFIG_UCLIBCXX_MODULE}" = 'm' && -n "${CONFIG_KLIBC_MODULE}" && \
+              -f "${SYMROOT}/i386/modules/uClibcxx.dylib" ]]; then
+        {
+            klibcPackageRefId=""
+            if [[ "${CONFIG_KLIBC_MODULE}" == 'm' ]];then
+                klibcPackageRefId=$(getPackageRefId "${modules_packages_identity}" "klibc")
+            fi
+            # Start build uClibc package module
+            choiceId="uClibc"
+            moduleFile="uClibcxx.dylib"
+            mkdir -p "${PKG_BUILD_DIR}/${choiceId}/Root"
+            ditto --noextattr --noqtn "${SYMROOT}/i386/modules/$moduleFile" "${PKG_BUILD_DIR}/${choiceId}/Root"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/${choiceId}" \
+                               --subst="moduleName=$choiceId"               \
+                               --subst="moduleFile=$moduleFile"             \
+                               InstallModule
+
+            packageRefId=$(getPackageRefId "${modules_packages_identity}" "${choiceId}")
+            buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/Extra/modules"
+            # Add the klibc package because the uClibc module is dependent of klibc module
+            addChoice --group="Module"  --start-selected="false"  --pkg-refs="$packageRefId $klibcPackageRefId" "${choiceId}"
+            # End build uClibc package module
+        }
+        fi
+# -
     }
     else
     {
@@ -1057,7 +1208,11 @@ makedistribution ()
 #   Create the final package
     pkgutil --flatten "${PKG_BUILD_DIR}/${packagename}" "${distributionFilePath}"
 
-#   Here is the place to assign an icon to the pkg
+##################################################################
+#   Here is the place to assign an icon to the pkg               #
+#   command used to generate the file:                           #
+#   ditto -c -k --sequesterRsrc --keepParent Icon.icns Icon.zip  #
+##################################################################
     ditto -xk "${PKGROOT}/Icons/pkg.zip" "${PKG_BUILD_DIR}/Icons/"
     DeRez -only icns "${PKG_BUILD_DIR}/Icons/Icons/pkg.icns" > "${PKG_BUILD_DIR}/Icons/tempicns.rsrc"
     Rez -append "${PKG_BUILD_DIR}/Icons/tempicns.rsrc" -o "${distributionFilePath}"
