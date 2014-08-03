@@ -22,6 +22,9 @@
 #define DBGPAUSE()
 #endif
 
+static inline void		rebase_location(UInt32* location, char* base, int type);
+static inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
+
 // NOTE: Global so that modules can link with this
 static UInt64 textAddress = 0;
 static UInt64 textSection = 0;
@@ -42,20 +45,20 @@ int init_module_system()
 {
     // Start any modules that were compiled in first.
     start_built_in_modules();
-    
-    
+
+
 	int retVal = 0;
 	void (*module_start)(void) = NULL;
-	
+
 	extern char  symbols_start  __asm("section$start$__DATA$__Symbols");
 	char* module_data = &symbols_start;
-    
+
 	// Intialize module system
 	if(module_data)
 	{
 		// Module system  was compiled in (Symbols.dylib addr known)
 		module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
-		
+
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
 			// Notify the system that it was laoded
@@ -70,7 +73,7 @@ int init_module_system()
 		{
 			// The module does not have a valid start function
 			printf("Unable to start %s at 0x%x\n", SYMBOLS_MODULE, module_data); pause();
-		}		
+		}
 	}
 	return retVal;
 }
@@ -102,25 +105,23 @@ void load_all_modules()
 	long flags;
 	long time;
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
-	while(readdir(moduleDir, (const char**)&name, &flags, &time) >= 0)
-	{
-		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0)
-		{
+	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0) {
+		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {
 			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
-			
-			if(!load_module(tmp))
-			{
+
+			if(!load_module(tmp)) {
 				// failed to load
 				// free(tmp);
 			}
 		}
-		else 
+		else
 		{
 			DBG("Ignoring %s\n", name);
 		}
 
 	}
+	closedir(moduleDir);
 }
 
 
@@ -140,20 +141,21 @@ int load_module(char* module)
 		return 1;
 	}
 	
-	sprintf(modString, MODULE_PATH "%s", module);
+	snprintf(modString, sizeof(modString), MODULE_PATH "%s", module);
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
 		DBG("WARNING: Unable to locate module %s\n", modString); DBGPAUSE();
 		return 0;
 	}
-	
 	unsigned int moduleSize = file_size(fh);
+
     if(moduleSize == 0)
     {
         DBG("WARNING: The module %s has a file size of %d, the module will not be loaded.\n", modString, moduleSize);
         return 0;
     }
+
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
 	{
@@ -203,10 +205,10 @@ long long add_symbol(char* symbol, long long addr, char is64)
 	entry = malloc(sizeof(symbolList_t));
 	entry->next = moduleSymbols;
 	moduleSymbols = entry;
-	
+
 	entry->addr = (UInt32)addr;
 	entry->symbol = symbol;
-	
+
 	if(!is64 && strcmp(symbol, "start") == 0)
 	{
 		return addr;
@@ -231,17 +233,17 @@ void module_loaded(const char* name, const char* author, const char* description
     if(!name) name = "Unknown";
     if(!author) author = "Unknown";
     if(!description) description = "";
-    
+
 	new_entry->name = name;
-    new_entry->author = author;
-    new_entry->description = description;
+	new_entry->author = author;
+	new_entry->description = description;
 	new_entry->version = version;
-    new_entry->compat = compat;
-    
-    msglog("Module '%s' by '%s' Loaded.\n", name, author);
-    msglog("\tDescription: %s\n", description);
-    msglog("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
-    msglog("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
+	new_entry->compat = compat;
+
+	msglog("Module '%s' by '%s' Loaded.\n", name, author);
+	msglog("\tDescription: %s\n", description);
+	msglog("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
+	msglog("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
 }
 
 int is_module_loaded(const char* name)
@@ -290,7 +292,7 @@ unsigned int lookup_all_symbols(const char* name)
 	printf("Unable to locate symbol %s\n", name);
 	getchar();
 #endif
-	
+
 	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
 	// In the event that a symbol does not exist
 	// Return a pointer to a void function.
@@ -303,7 +305,7 @@ unsigned int lookup_all_symbols(const char* name)
 
 /*
  * Parse through a macho module. The module will be rebased and binded
- * as specified in the macho header. If the module is sucessfuly laoded
+ * as specified in the macho header. If the module is successfully loaded
  * the module iinit address will be returned.
  * NOTE; all dependecies will be loaded before this module is started
  * NOTE: If the module is unable to load ot completeion, the modules
@@ -331,14 +333,14 @@ void* parse_mach(void* binary,
 	struct symtab_command* symtabCommand = NULL;
 	struct segment_command *segCommand = NULL;
 	struct segment_command_64 *segCommand64 = NULL;
-	
+
 	//struct dysymtab_command* dysymtabCommand = NULL;
 	UInt32 binaryIndex = 0;
 	UInt16 cmd = 0;
 	
 	textSection = 0;
 	textAddress = 0;	// reinitialize text location in case it doesn't exist;
-	
+
 	// Parse through the load commands
 	if(((struct mach_header*)binary)->magic == MH_MAGIC)
 	{
@@ -356,9 +358,7 @@ void* parse_mach(void* binary,
 		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
 		return NULL;
 	}
-	
-	
-	
+
 	/*if(((struct mach_header*)binary)->filetype != MH_DYLIB)
 	 {
 	 printf("Module is not a dylib. Unable to load.\n");
@@ -383,22 +383,22 @@ void* parse_mach(void* binary,
 			case LC_SEGMENT: // 32bit macho
                 {
                     segCommand = binary + binaryIndex;
-                    
+
                     UInt32 sectionIndex;
-                    
+
                     sectionIndex = sizeof(struct segment_command);
-                    
+
                     struct section *sect;
-                    
+
                     while(sectionIndex < segCommand->cmdsize)
                     {
                         sect = binary + binaryIndex + sectionIndex;
-                        
+
                         sectionIndex += sizeof(struct section);
-                        
+
                         if(section_handler) section_handler(sect->sectname, segCommand->segname, (void*)sect, sect->offset, sect->addr);
-                        
-						if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
+
+                        if((strcmp("__TEXT", segCommand->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
                         {
                             // __TEXT,__text found, save the offset and address for when looking for the calls.
                             textSection = sect->offset;
@@ -409,19 +409,19 @@ void* parse_mach(void* binary,
 				break;
 			case LC_SEGMENT_64:	// 64bit macho's
                 {
-                    segCommand64 = binary + binaryIndex;				
+                    segCommand64 = binary + binaryIndex;
                     UInt32 sectionIndex;
-                    
+
                     sectionIndex = sizeof(struct segment_command_64);
-                    
+
                     struct section_64 *sect;
-                    
+
                     while(sectionIndex < segCommand64->cmdsize)
                     {
                         sect = binary + binaryIndex + sectionIndex;
-                        
+
                         sectionIndex += sizeof(struct section_64);
-                        
+
                         if(section_handler) section_handler(sect->sectname, segCommand64->segname, (void*)sect, sect->offset, sect->addr);
 
                         if((strcmp("__TEXT", segCommand64->segname) == 0) && (strcmp("__text", sect->sectname) == 0))
@@ -430,11 +430,11 @@ void* parse_mach(void* binary,
                             textSection = sect->offset;
                             textAddress = sect->addr;
                         }					
-                    }	
-				}			
+                    }
+				}
 				break;
 				
-				
+
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB ^ LC_REQ_DYLD:
                 // Required modules
@@ -454,9 +454,9 @@ void* parse_mach(void* binary,
 						free(name);
 					}
 				}
-				
+
 				break;
-				
+
 			case LC_ID_DYLIB:
 				//dylibCommand = binary + binaryIndex;
 				/*moduleName =	binary + binaryIndex + ((UInt32)*((UInt32*)&dylibCommand->dylib.name));
@@ -464,7 +464,7 @@ void* parse_mach(void* binary,
 				 moduleCompat =	dylibCommand->dylib.compatibility_version;
 				 */
 				break;
-				
+
 			case LC_DYLD_INFO:
 			//case LC_DYLD_INFO_ONLY:	// compressed info, 10.6+ macho files, already handeled
 				// Bind and rebase info is stored here
@@ -473,6 +473,8 @@ void* parse_mach(void* binary,
 				
 			case LC_DYSYMTAB:
 			case LC_UUID:
+				break;
+
 			case LC_UNIXTHREAD:
 				break;
 				
@@ -487,7 +489,7 @@ void* parse_mach(void* binary,
 
 	// bind_macho uses the symbols, if the textAdd does not exist (Symbols.dylib, no code), addresses are static and not relative
 	module_start = (void*)handle_symtable((UInt32)binary, symtabCommand, symbol_handler, is64);
-	
+
 	if(dyldInfoCommand)
 	{
 		// Rebase the module before binding it.
@@ -499,7 +501,7 @@ void* parse_mach(void* binary,
 	}
 	
 	return module_start;
-	
+
 }
 
 /*
@@ -509,7 +511,7 @@ void* parse_mach(void* binary,
 
 unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, long long(*symbol_handler)(char*, long long, char), char is64)
 {
-	unsigned int module_start	= 0xFFFFFFFF;	
+	unsigned int module_start	= 0xFFFFFFFF;
 	UInt32 symbolIndex			= 0;
 	char* symbolString			= base + (char*)symtabCommand->stroff;
 
@@ -526,7 +528,7 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 				// Module start located. Start is an alias so don't register it
 				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
-			
+
 			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
@@ -537,17 +539,17 @@ unsigned int handle_symtable(UInt32 base, struct symtab_command* symtabCommand, 
 		// NOTE First entry is *not* correct, but we can ignore it (i'm getting radar:// right now, verify later)	
 		while(symbolIndex < symtabCommand->nsyms)
 		{
-			
-			
+
+
 			// If the symbol is exported by this module
 			if(symbolEntry->n_value &&
 			   symbol_handler(symbolString + symbolEntry->n_un.n_strx, textAddress ? (long long)base + symbolEntry->n_value : symbolEntry->n_value, is64) != 0xFFFFFFFF)
 			{
-				
+
 				// Module start located. Start is an alias so don't register it
 				module_start = textAddress ? base + symbolEntry->n_value : symbolEntry->n_value;
 			}
-			
+
 			symbolEntry++;
 			symbolIndex++;	// TODO remove
 		}
@@ -563,6 +565,7 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 	UInt8 immediate = 0;
 	UInt8 opcode = 0;
 	UInt8 type = 0;
+
 	UInt32 segmentAddress = 0;
 	
 	
@@ -586,7 +589,6 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				opcode = 0;
 				type = 0;
 				segmentAddress = 0;
-			default:
 				break;
 				
 				
@@ -596,29 +598,25 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				
 			case REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
+
 				// Locate address to begin rebasing
 				segmentAddress = 0;
 				struct segment_command* segCommand = NULL; // NOTE: 32bit only
-				
+
 				unsigned int binIndex = 0;
 				index = 0;
-				do
-				{
+				do {
 					segCommand = base + sizeof(struct mach_header) +  binIndex;
-					
-					
+
 					binIndex += segCommand->cmdsize;
 					index++;
-				}
-				while(index <= immediate);
-				
-				
+				} while(index <= immediate);
+
 				segmentAddress = segCommand->fileoff;
 				
 				tmp = 0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp |= (rebase_stream[++i] & 0x7f) << bits;
 					bits += 7;
 				}
@@ -626,19 +624,16 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				
 				segmentAddress += tmp;
 				break;
-				
-				
+
 			case REBASE_OPCODE_ADD_ADDR_ULEB:
 				// Add value to rebase address
 				tmp = 0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp <<= bits;
 					tmp |= rebase_stream[++i] & 0x7f;
 					bits += 7;
-				}
-				while(rebase_stream[i] & 0x80);
+				} while(rebase_stream[i] & 0x80);
 				
 				segmentAddress +=	tmp; 
 				break;
@@ -646,8 +641,8 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_ADD_ADDR_IMM_SCALED:
 				segmentAddress += immediate * sizeof(void*);
 				break;
-				
-				
+
+
 			case REBASE_OPCODE_DO_REBASE_IMM_TIMES:
 				index = 0;
 				for (index = 0; index < immediate; ++index) {
@@ -656,21 +651,18 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 				}
 				break;
 				
-				
 			case REBASE_OPCODE_DO_REBASE_ULEB_TIMES:
 				tmp = 0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp |= (rebase_stream[++i] & 0x7f) << bits;
 					bits += 7;
-				}
-				while(rebase_stream[i] & 0x80);
-				
+				} while(rebase_stream[i] & 0x80);
+
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
 					//DBG("\tRebasing 0x%X\n", segmentAddress);
-					rebase_location(base + segmentAddress, (char*)base, type);					
+					rebase_location(base + segmentAddress, (char*)base, type);
 					segmentAddress += sizeof(void*);
 				}
 				break;
@@ -678,12 +670,10 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_DO_REBASE_ADD_ADDR_ULEB:
 				tmp = 0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp |= (rebase_stream[++i] & 0x7f) << bits;
 					bits += 7;
-				}
-				while(rebase_stream[i] & 0x80);
+				} while(rebase_stream[i] & 0x80);
 				
 				rebase_location(base + segmentAddress, (char*)base, type);
 				
@@ -693,23 +683,19 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 			case REBASE_OPCODE_DO_REBASE_ULEB_TIMES_SKIPPING_ULEB:
 				tmp = 0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp |= (rebase_stream[++i] & 0x7f) << bits;
 					bits += 7;
-				}
-				while(rebase_stream[i] & 0x80);
+				} while(rebase_stream[i] & 0x80);
 				
 				
 				tmp2 =  0;
 				bits = 0;
-				do
-				{
+				do {
 					tmp2 |= (rebase_stream[++i] & 0x7f) << bits;
 					bits += 7;
-				}
-				while(rebase_stream[i] & 0x80);
-				
+				} while(rebase_stream[i] & 0x80);
+
 				index = 0;
 				for (index = 0; index < tmp; ++index) {
 					
@@ -718,45 +704,28 @@ void rebase_macho(void* base, char* rebase_stream, UInt32 size)
 					segmentAddress += tmp2 + sizeof(void*);
 				}
 				break;
+			default:
+				break;
 		}
 		i++;
-	}
-}
-
-inline void rebase_location(UInt32* location, char* base, int type)
-{	
-	switch(type)
-	{
-		case REBASE_TYPE_POINTER:
-		case REBASE_TYPE_TEXT_ABSOLUTE32:
-			*location += (UInt32)base;
-			break;
-			
-		default:
-			break;
 	}
 }
 
 
 UInt32 read_uleb(UInt8* bind_stream, unsigned int* i)
 {
-    // Read in offset
-    UInt32 tmp  = 0;
-    UInt8 bits = 0;
-    do
-    {
-        if(bits < sizeof(UInt32)*8)   // hack
-        {
-            tmp |= (bind_stream[++(*i)] & 0x7f) << bits;
-            bits += 7;
-        }
-        else
-        {
-            ++(*i);
-        }
-    }
-    while(bind_stream[*i] & 0x80);
-    return tmp;
+	// Read in offset
+	UInt32 tmp  = 0;
+	UInt8 bits = 0;
+	do {
+		if(bits < sizeof(UInt32)*8) {  // hack
+			tmp |= (bind_stream[++(*i)] & 0x7f) << bits;
+			bits += 7;
+		} else {
+		++(*i);
+		}
+	} while(bind_stream[*i] & 0x80);
+	return tmp;
 }
 
 
@@ -786,6 +755,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 	// Temperary variables
 	UInt32 tmp = 0;
 	UInt32 tmp2 = 0;
+
 	UInt32 index = 0;
 	unsigned int i = 0;
 	
@@ -805,7 +775,6 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				addend = 0;
 				libraryOrdinal = 0;
 				symbolAddr = 0xFFFFFFFF;
-			default:
 				break;
 				
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_IMM:
@@ -827,22 +796,22 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 
 				symbolAddr = lookup_all_symbols(symbolName);
 				break;
-				
+
 			case BIND_OPCODE_SET_TYPE_IMM:
 				type = immediate;
 				break;
 				
 			case BIND_OPCODE_SET_ADDEND_SLEB:
-				addend = read_uleb(bind_stream, &i);				
+				addend = read_uleb(bind_stream, &i);
 				if(!(bind_stream[i-1] & 0x40)) addend *= -1;
 				break;
 				
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
 				segmentAddress = 0;
-				
+
 				// Locate address
 				struct segment_command* segCommand = NULL;	// NOTE: 32bit only
-				
+
 				unsigned int binIndex = 0;
 				index = 0;
 				do
@@ -852,9 +821,9 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 					index++;
 				}
 				while(index <= immediate);
-				
+
 				segmentAddress = segCommand->fileoff;
-								
+
 				segmentAddress += read_uleb(bind_stream, &i);
 				break;
 				
@@ -866,7 +835,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					address = segmentAddress + (UInt32)base;
-						
+
 					bind_location((UInt32*)address, (char*)symbolAddr, addend, type);
 				}
 				else
@@ -913,14 +882,14 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 				
-				
+
 				break;
 				
 			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-				tmp  = read_uleb(bind_stream, &i);				
+				tmp  = read_uleb(bind_stream, &i);
 				
 				tmp2  = read_uleb(bind_stream, &i);				
-				
+
 				if(symbolAddr != 0xFFFFFFFF)
 				{
 					for(index = 0; index < tmp; index++)
@@ -937,13 +906,30 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 					getchar();
 				}
 				break;
+			default:
+				break;
+
 		}
 		i++;
 	}
 }
-                 
 
-inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
+static inline void rebase_location(UInt32* location, char* base, int type)
+{	
+	switch(type)
+	{
+		case REBASE_TYPE_POINTER:
+		case REBASE_TYPE_TEXT_ABSOLUTE32:
+			*location += (UInt32)base;
+			break;
+			
+		default:
+			break;
+	}
+}
+
+
+static inline void bind_location(UInt32* location, char* value, UInt32 addend, int type)
 {	
 	// do actual update
 	char* newValue = value + addend;
@@ -975,13 +961,12 @@ inline void bind_location(UInt32* location, char* value, UInt32 addend, int type
 */
 int replace_function(const char* symbol, void* newAddress)
 {
-	UInt32* jumpPointer = malloc(sizeof(UInt32*));	 
 	UInt32 addr = lookup_all_symbols(symbol);
-	
-	char* binary = (char*)addr;
 	if(addr != 0xFFFFFFFF)
 	{
 		//DBG("Replacing %s to point to 0x%x\n", symbol, newAddress);
+		UInt32* jumpPointer = malloc(sizeof(UInt32*));
+		char* binary = (char*)addr;
 		*binary++ = 0xFF;	// Jump
 		*binary++ = 0x25;	// Long Jump
 		*((UInt32*)binary) = (UInt32)jumpPointer;
@@ -1004,7 +989,7 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 {
 	DBG("Attempting to execute hook '%s'\n", name); DBGPAUSE();
 	moduleHook_t* hook = hook_exists(name);
-	
+
 	if(hook)
 	{
 		// Loop through all callbacks for this module
@@ -1037,7 +1022,7 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
  *			NOTE: the hooks take four void* arguments.
  */
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
-{	
+{
 	DBG("Adding callback for '%s' hook.\n", name); DBGPAUSE();
 	
 	moduleHook_t* hook = hook_exists(name);
@@ -1053,29 +1038,29 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 	else
 	{
 		// create new hook
-		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));		
+		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));
 		newHook->name = name;
 		newHook->callbacks = malloc(sizeof(callbackList_t));
 		newHook->callbacks->callback = callback;
 		newHook->callbacks->next = NULL;
-		
+
 		newHook->next = moduleCallbacks;
 		moduleCallbacks = newHook;
-		
+
 	}
-	
+
 #if CONFIG_MODULE_DEBUG
 	//print_hook_list();
 	//getchar();
 #endif
-	
+
 }
 
 
 moduleHook_t* hook_exists(const char* name)
 {
 	moduleHook_t* hooks = moduleCallbacks;
-	
+
 	// look for a hook. If it exists, return the moduleHook_t*,
 	// If not, return NULL.
 	while(hooks)
@@ -1089,7 +1074,7 @@ moduleHook_t* hook_exists(const char* name)
 	}
 	//DBG("Hook %s does not exist\n", name);
 	return NULL;
-	
+
 }
 
 #if CONFIG_MODULE_DEBUG

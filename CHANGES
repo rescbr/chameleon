@@ -1,24 +1,43 @@
--macman: Chimera 2.2.0 specific changes:
-	Added suport for Intel HD Graphics 2500, Intel HD Graphics 4600, Intel HD Graphics 4600 Mobile and Intel HD Graphics 5000
-	Added new boot key IGPEnabler=Yes|No for automatic device-properties generation for Intel IGP when GraphicsEnabler=No 
-	Added new boot key IGPlatformID=<value> to allow for overriding or setting Intel HD Graphics Platform ID
--macman: Chimera 2.1.2 specific changes:
-	Removed all closed source modules
--macman: Chimera 2.1.i specific changes:
-	Rollbacked FileNVRAM.dylib to v1.1.2
-	Includes most changes from trunk r2248 while retaining all previous Chimera v2.1.0 fixes and enhancements
-- Fix issue booting x86 after rev.2175 (Credits to Mario, Alex and Leon).
--macman: Chimera 2.1.0 specific changes:
-	Added Haswell CPU support with model and speed detection
-	Disabled writing of boot arguments to nvram
-	Reverted AMD graphics card reporting and log messages to Chimera v1.11.1 style
-	Reverted NVIDIA graphics card reporting to Chimera v1.11.1 style
-	Included mosts changes from trunk r2246 that didn't conflict with Chimera 2.0.1 fixes and enhancements
-- Add boot support to 10.9 (thx old napalm)
-- ErmaC : Update gui Icons OS detection
-- Update default theme Icon set (thx BlackOsx)
-- Add Linux GPT Partition Label 
-- Fix menuBVR initialization problem
+- bitshoveler : Optimized basic string functions strlen, strncmp, strncat, strcat
+- ErmaC : Replaced sprintf with snprintf in spd.c.
+- bitshoveler : Fixed inadvertent text buffer overflow in getDDRSerial
+- bitshoveler : optimize get_hda_controller_name()
+- Bungo : One of the changes as of rev2284 is boot option SystemId has now been deprecated. Instead use key SMsystemuuid in smbios.plist.
+- bitshoveler : Defend against buffer overruns
+- bitshoveler : Fix memory leak, defend against buffer overruns, add a check for malloc() failure
+- bitshoveler : getMemoryInfoString: defend against buffer overruns, change O(n^2) algorithm to O(n)
+- bitshoveler : Add closedir() to match opendir() call; relocate a malloc() call to fix a memory leak on error; better defense against buffer overruns
+- bitshoveler : Improve robustness against buffer overruns
+- bitshoveler : Add closedir() for every opendir() call, make more robust against buffer overruns
+- bitshoveler : Fix memory leak
+- bitshoveler : Fix cppcheck detected memory leak and error, make more robust against buffer overrun
+- bitshoveler : get_pci_dev_path: get rid of tmp buffer, use snprintf, improved O(n) algorithm instead of O(n^2) (whoopee); dump_pci_dt: hack fix for printf format string vs. args mismatch
+- bitshoveler : Fix memory leak; use snprintf instead of sprintf to make more robust
+- bitshoveler : Fix badly formed comment inside #ifdef
+- bitshoveler : setup_gma_devprop: fix memory leak
+- bitshoveler : setup_nhm: fix cppcheck error
+- bitshoveler : Correct cppcheck detected errors, make more robust against errors
+- bitshoveler : AllocateMemoryRange: fix cppcheck detected memory leak
+- bitshoveler : search_and_get_acpi_fd: fix pointer-to-temporary return problem; use snprintf instead of sprintf to prevent buffer overflows
+- bitshoveler : sym_expand_string_value(): fix cppcheck errors; more to be done here
+- bitshoveler : append_string(): fix cppcheck errors
+- bitshoveler : conf_write_autoconf(): fix cppcheck errors
+- bitshoveler : Fix memory leak for new_layout in main()
+- bitshoveler : Implement snprintf(); implement missing zero-fill in strncpy()
+- bitshoveler : Use original *BSD source for strlcpy()
+- ErmaC: Port from Enoch the support for IVY Bridge and Haswell Intel Graphics cards. http://www.insanelymac.com/forum/topic/288241-intel-hd4000-and-haswell-inject-aaplig-platform-id/
+- 2255: ErmaC add Skip flag key for Intel/nVidia/ATi from Enoch
+- 2252: revert define processors name to match with xnu kernel name 
+- 2252: Merge from Enoch the Geoff Seeley patch http://forge.voodooprojects.org/p/chameleon/issues/59/
+- 2251: bdmesg can show Chameleon and Clover boot logs
+- 2248: Infos about lack for 32/64 bit (Credits to Pike R. Alpha)
+- 2248: Fix issue booting x86 after rev.2175 (Credits to Bronxteck, Alex Burma and Leon).
+- 2245: ErmaC : Add new CPU Model IDs
+- 2245: Add boot support to 10.9 (thx old napalm)
+- 2245: ErmaC : Update gui Icons OS detection
+- 2245: Update default theme Icon set (thx BlackOsx)
+- 2243: Add Linux GPT Partition Label
+- 2234: Fix menuBVR initialization problem
 - Implement ErmaC's HDAEnabler.dylib module
 - Fix Bug in the loop that look for an ATI card. Credits to Jief Luce
 - Fix extension without kPropOSBundleRequired property weren't loaded. Credits to Jief Luce
@@ -28,11 +47,6 @@
 - Fix warnings/errors from new llvm/clang (xcode 4.6)
 - Fix base64 decode, fixes Issue http://forge.voodooprojects.org/p/chameleon/issues/320/
 - meklort : FileNVRAM module import
--macman: Chimera 2.0.1 specific changes:
-	iMessage login fix by Meklort from Chameleon 2.2 r2169
-	HD4000 support from Chimera 1.11.1
-	CPU bus and processor speed fix from Chimera 1.11.1
-	Reverted AMD and NVIDIA card reporting to Chimera 1.11.1 style
 - cparm : Added a workaroud for Xcode 4.4.x compatibility 504B030414030100630004731141000000007D0000008B00000003000B0062696E01990700020041450308001AED80DA50DF6080B0390FE095B3BC129E1FC27C104EC97897EF27CD1175766CB18C66FF42EFB7023911BDFD5E4BC9AEEC32FF3473963F70B255581D7B74DE9F
 - cparm : Fixed a buffer overflow in the plist loader
 - cparm : Ported the nvidia plist helper (less time to spend on the device id more time to code :-) )

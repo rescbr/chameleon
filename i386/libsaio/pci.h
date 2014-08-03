@@ -16,10 +16,10 @@
 
 typedef struct {
 	uint32_t		:2;
-	uint32_t	reg :6;
-	uint32_t	func:3;
-	uint32_t	dev :5;
-	uint32_t	bus :8;
+	uint32_t	reg	:6;
+	uint32_t	func	:3;
+	uint32_t	dev	:5;
+	uint32_t	bus	:8;
 	uint32_t		:7;
 	uint32_t	eb	:1;
 } pci_addr_t;
@@ -30,8 +30,10 @@ typedef union {
 } pci_dev_t;
 
 typedef struct pci_dt_t {
-	pci_dev_t				dev;
+	uint8_t*	regs;
+	pci_dev_t	dev;
 
+	uint16_t	devfn; /* encoded device & function index */
 	uint16_t	vendor_id; /* Specifies a vendor ID. The PCI bus configuration code obtains this
                             vendor ID from the vendor ID device register. */
 	uint16_t	device_id; /* Specifies a device ID that identifies the specific device. The PCI
@@ -40,23 +42,27 @@ typedef struct pci_dt_t {
 
 	union {
 		struct {
-			uint16_t	vendor_id;  /* Specifies a subsystem vendor ID. */
-			uint16_t	device_id;  /* Specifies a subsystem device ID that identifies the specific device. */
+			uint16_t	vendor_id; /* Specifies a subsystem vendor ID. */
+			uint16_t	device_id; /* Specifies a subsystem device ID that identifies the specific device. */
 		} subsys;
 		uint32_t	subsys_id;
-	}						subsys_id;
+	}subsys_id;
 
-	uint8_t progif;         /* A read-only register that specifies a register-level programming interface the device has, if it has any at all. */
-    
-	uint8_t revision_id;    /* PCI revision ID. Specifies a revision identifier for a particular device. Where valid IDs are allocated by the vendor. */
-    
-	uint16_t	class_id;   /*  Specifies a class code. This member is a data structure that stores information related to the device's class code device register. */
+	uint8_t progif; /* A read-only register that specifies a register-level programming interface the device has, if it has any at all. */
+
+	uint8_t revision_id; /* PCI revision ID. Specifies a revision identifier for a particular device. Where valid IDs are allocated by the vendor. */
+
+	uint16_t	class_id; /*  Specifies a class code. This member is a data structure that stores information related to the device's class code device register. */
+
+	//uint16_t subclass_id; /* A read-only register that specifies the specific function the device performs. */
 
 	struct pci_dt_t			*parent;
 	struct pci_dt_t			*children;
 	struct pci_dt_t			*next;
-} pci_dt_t;
+} pci_dt_t; // Info
 
+/* Have pci_addr in the same format as the values written to 0xcf8
+ * so register accesses can be made easy. */
 #define PCIADDR(bus, dev, func) ((1 << 31) | (bus << 16) | (dev << 11) | (func << 8))
 #define PCI_ADDR_REG		0xcf8
 #define PCI_DATA_REG		0xcfc
@@ -65,12 +71,12 @@ extern pci_dt_t		*root_pci_dev;
 extern uint8_t		pci_config_read8(uint32_t, uint8_t);
 extern uint16_t		pci_config_read16(uint32_t, uint8_t);
 extern uint32_t		pci_config_read32(uint32_t, uint8_t);
-extern void			pci_config_write8(uint32_t, uint8_t, uint8_t);
-extern void			pci_config_write16(uint32_t, uint8_t, uint16_t);
-extern void			pci_config_write32(uint32_t, uint8_t, uint32_t);
-extern char			*get_pci_dev_path(pci_dt_t *);
-extern void			build_pci_dt(void);
-extern void			dump_pci_dt(pci_dt_t *);
+extern void		pci_config_write8(uint32_t, uint8_t, uint8_t);
+extern void		pci_config_write16(uint32_t, uint8_t, uint16_t);
+extern void		pci_config_write32(uint32_t, uint8_t, uint32_t);
+extern char		*get_pci_dev_path(pci_dt_t *);
+extern void		build_pci_dt(void);
+extern void		dump_pci_dt(pci_dt_t *);
 
 /* Option ROM header */
 typedef struct {
@@ -105,7 +111,7 @@ typedef struct {
 	uint32_t		signature;		// 0x24506E50 '$PnP'
 	uint8_t			revision;		//	1
 	uint8_t			length;
-	uint16_t		offset;				
+	uint16_t		offset;
 	uint8_t			checksum;
 	uint32_t		identifier;
 	uint16_t		manufacturer;
@@ -157,7 +163,7 @@ typedef struct {
 #define PCI_STATUS_SIG_SYSTEM_ERROR 		0x4000		/* Set when we drive SERR */
 #define PCI_STATUS_DETECTED_PARITY			0x8000		/* Set on parity error */
 
-#define PCI_CLASS_REVISION					0x08		/* High 24 bits are class, low 8  revision */
+#define PCI_CLASS_REVISION					0x08			/* High 24 bits are class, low 8  revision */
 #define PCI_CLASS_PROG						0x09			/* Reg. Level Programming Interface know also as PCI_PROG_IF */
 #define PCI_CLASS_DEVICE					0x0a			/* Device subclass */
 //#define PCI_SUBCLASS_DEVICE				0x0b			/* Device class */
@@ -177,7 +183,7 @@ typedef struct {
 /*
  * Base addresses specify locations in memory or I/O space.
  * Decoded size can be determined by writing a value of
- * 0xffffffff to the register, and reading it back.	 Only
+ * 0xffffffff to the register, and reading it back. Only
  * 1 bits are decoded.
  */
 #define PCI_BASE_ADDRESS_0					0x10		/* 32 bits */
@@ -762,177 +768,176 @@ typedef struct {
 
 /*
  * The PCI interface treats multi-function devices as independent
- * devices.	 The slot/function address of each device is encoded
+ * devices. The slot/function address of each device is encoded
  * in a single byte as follows:
  *
  *	7:3 = slot
  *	2:0 = function
  */
-#define PCI_DEVFN(slot,func)				((((slot) & 0x1f) << 3) | ((func) & 0x07))
+#define PCI_DEVFN(slot,func)					((((slot) & 0x1f) << 3) | ((func) & 0x07))
 #define PCI_SLOT(devfn)						(((devfn) >> 3) & 0x1f)
 #define PCI_FUNC(devfn)						((devfn) & 0x07)
 
 /* Device classes and subclasses */
-#define PCI_CLASS_NOT_DEFINED				0x0000
-#define PCI_CLASS_NOT_DEFINED_VGA			0x0001
+#define PCI_CLASS_NOT_DEFINED					0x0000
+#define PCI_CLASS_NOT_DEFINED_VGA				0x0001
 
 // values for the class_sub field for class_base = 0x00 (Device was built prior definition of the class code field)
 
 // values for the class_sub field for class_base = 0x01 (Mass Storage Controller)
-#define PCI_BASE_CLASS_STORAGE				0x01
-#define PCI_CLASS_STORAGE_SCSI				0x0100
-#define PCI_CLASS_STORAGE_IDE				0x0101
-#define PCI_CLASS_STORAGE_FLOPPY			0x0102
-#define PCI_CLASS_STORAGE_IPI				0x0103
-#define PCI_CLASS_STORAGE_RAID				0x0104
-#define PCI_CLASS_STORAGE_ATA				0x0105
-#define PCI_CLASS_STORAGE_SATA				0x0106
-#define PCI_CLASS_STORAGE_SATA_AHCI			0x010601
-#define PCI_CLASS_STORAGE_SAS				0x0107
-#define PCI_CLASS_STORAGE_OTHER				0x0180
+#define PCI_BASE_CLASS_STORAGE					0x01
+#define PCI_CLASS_STORAGE_SCSI					0x0100
+#define PCI_CLASS_STORAGE_IDE					0x0101
+#define PCI_CLASS_STORAGE_FLOPPY				0x0102
+#define PCI_CLASS_STORAGE_IPI					0x0103
+#define PCI_CLASS_STORAGE_RAID					0x0104
+#define PCI_CLASS_STORAGE_ATA					0x0105
+#define PCI_CLASS_STORAGE_SATA					0x0106
+#define PCI_CLASS_STORAGE_SATA_AHCI				0x010601
+#define PCI_CLASS_STORAGE_SAS					0x0107
+#define PCI_CLASS_STORAGE_OTHER					0x0180
 
 // values for the class_sub field for class_base = 0x02 (Network Controller)
-#define PCI_BASE_CLASS_NETWORK				0x02
-#define PCI_CLASS_NETWORK_ETHERNET			0x0200
-#define PCI_CLASS_NETWORK_TOKEN_RING		0x0201
-#define PCI_CLASS_NETWORK_FDDI				0x0202
-#define PCI_CLASS_NETWORK_ATM				0x0203
-#define PCI_CLASS_NETWORK_ISDN				0x0204
-#define PCI_CLASS_NETWORK_OTHER				0x0280
+#define PCI_BASE_CLASS_NETWORK					0x02
+#define PCI_CLASS_NETWORK_ETHERNET				0x0200
+#define PCI_CLASS_NETWORK_TOKEN_RING			0x0201
+#define PCI_CLASS_NETWORK_FDDI					0x0202
+#define PCI_CLASS_NETWORK_ATM					0x0203
+#define PCI_CLASS_NETWORK_ISDN					0x0204
+#define PCI_CLASS_NETWORK_OTHER					0x0280
 
 // values for the class_sub field for class_base = 0x03 (Display Controller)
-#define PCI_BASE_CLASS_DISPLAY				0x03
-#define PCI_CLASS_DISPLAY_VGA				0x0300
-#define PCI_CLASS_DISPLAY_XGA				0x0301
-#define PCI_CLASS_DISPLAY_3D				0x0302
-#define PCI_CLASS_DISPLAY_OTHER				0x0380
+#define PCI_BASE_CLASS_DISPLAY					0x03
+#define PCI_CLASS_DISPLAY_VGA					0x0300
+#define PCI_CLASS_DISPLAY_XGA					0x0301
+#define PCI_CLASS_DISPLAY_3D					0x0302
+#define PCI_CLASS_DISPLAY_OTHER					0x0380
 
 // values for the class_sub field for class_base = 0x04 (Multimedia Controller)
-#define PCI_BASE_CLASS_MULTIMEDIA			0x04
-#define PCI_CLASS_MULTIMEDIA_VIDEO			0x0400  /* video */
-#define PCI_CLASS_MULTIMEDIA_AUDIO			0x0401  /* audio */
-#define PCI_CLASS_MULTIMEDIA_PHONE			0x0402
-#define PCI_CLASS_MULTIMEDIA_AUDIO_DEV		0x0403  /* HD audio */
-#define PCI_CLASS_MULTIMEDIA_OTHER			0x0480
+#define PCI_BASE_CLASS_MULTIMEDIA				0x04
+#define PCI_CLASS_MULTIMEDIA_VIDEO				0x0400 /* video */
+#define PCI_CLASS_MULTIMEDIA_AUDIO				0x0401 /* audio */
+#define PCI_CLASS_MULTIMEDIA_PHONE				0x0402
+#define PCI_CLASS_MULTIMEDIA_AUDIO_DEV				0x0403 /* HD audio */
+#define PCI_CLASS_MULTIMEDIA_OTHER				0x0480
 
 // values for the class_sub field for class_base = 0x05 (Memory Controller)
-#define PCI_BASE_CLASS_MEMORY				0x05
-#define PCI_CLASS_MEMORY_RAM				0x0500
-#define PCI_CLASS_MEMORY_FLASH				0x0501
-#define PCI_CLASS_MEMORY_OTHER				0x0580
+#define PCI_BASE_CLASS_MEMORY					0x05
+#define PCI_CLASS_MEMORY_RAM					0x0500
+#define PCI_CLASS_MEMORY_FLASH					0x0501
+#define PCI_CLASS_MEMORY_OTHER					0x0580
 
 // values for the class_sub field for class_base = 0x06 (Bridge Device)
-#define PCI_BASE_CLASS_BRIDGE				0x06
-#define PCI_CLASS_BRIDGE_HOST				0x0600
-#define PCI_CLASS_BRIDGE_ISA				0x0601
-#define PCI_CLASS_BRIDGE_EISA				0x0602
+#define PCI_BASE_CLASS_BRIDGE					0x06
+#define PCI_CLASS_BRIDGE_HOST					0x0600
+#define PCI_CLASS_BRIDGE_ISA					0x0601
+#define PCI_CLASS_BRIDGE_EISA					0x0602
 #define PCI_CLASS_BRIDGE_MC					0x0603
-#define PCI_CLASS_BRIDGE_PCI				0x0604
-#define PCI_CLASS_BRIDGE_PCMCIA				0x0605
-#define PCI_CLASS_BRIDGE_NUBUS				0x0606
-#define PCI_CLASS_BRIDGE_CARDBUS			0x0607
-#define PCI_CLASS_BRIDGE_RACEWAY			0x0608
-#define PCI_CLASS_BRIDGE_PCI_SEMI			0x0609
-#define PCI_CLASS_BRIDGE_IB_TO_PCI			0x060a
-#define PCI_CLASS_BRIDGE_OTHER				0x0680
+#define PCI_CLASS_BRIDGE_PCI					0x0604
+#define PCI_CLASS_BRIDGE_PCMCIA					0x0605
+#define PCI_CLASS_BRIDGE_NUBUS					0x0606
+#define PCI_CLASS_BRIDGE_CARDBUS				0x0607
+#define PCI_CLASS_BRIDGE_RACEWAY				0x0608
+#define PCI_CLASS_BRIDGE_PCI_SEMI				0x0609
+#define PCI_CLASS_BRIDGE_IB_TO_PCI				0x060a
+#define PCI_CLASS_BRIDGE_OTHER					0x0680
 
 // values for the class_sub field for class_base = 0x07 (Simple Communications Controllers)
-#define PCI_BASE_CLASS_COMMUNICATION		0x07
-#define PCI_CLASS_COMMUNICATION_SERIAL		0x0700
-#define PCI_CLASS_COMMUNICATION_PARALLEL	0x0701
-#define PCI_CLASS_COMMUNICATION_MSERIAL		0x0702
-#define PCI_CLASS_COMMUNICATION_MODEM		0x0703
-#define PCI_CLASS_COMMUNICATION_OTHER		0x0780
+#define PCI_BASE_CLASS_COMMUNICATION				0x07
+#define PCI_CLASS_COMMUNICATION_SERIAL				0x0700
+#define PCI_CLASS_COMMUNICATION_PARALLEL			0x0701
+#define PCI_CLASS_COMMUNICATION_MSERIAL				0x0702
+#define PCI_CLASS_COMMUNICATION_MODEM				0x0703
+#define PCI_CLASS_COMMUNICATION_OTHER				0x0780
 
 // values for the class_sub field for class_base = 0x08 (Base System Peripherals)
-#define PCI_BASE_CLASS_SYSTEM				0x08
-#define PCI_CLASS_SYSTEM_PIC				0x0800
-#define PCI_CLASS_SYSTEM_PIC_IOAPIC         0x080010
-#define PCI_CLASS_SYSTEM_PIC_IOXAPIC        0x080020    /* I/O APIC interrupt controller , 32 bye none-prefectable memory. */
-#define PCI_CLASS_SYSTEM_DMA				0x0801
-#define PCI_CLASS_SYSTEM_TIMER				0x0802
-#define PCI_CLASS_SYSTEM_RTC				0x0803
-#define PCI_CLASS_SYSTEM_PCI_HOTPLUG		0x0804      /* HotPlug Controller */
-#define PCI_CLASS_SYSTEM_SDHCI				0x0805
-#define PCI_CLASS_SYSTEM_OTHER				0x0880
+#define PCI_BASE_CLASS_SYSTEM					0x08
+#define PCI_CLASS_SYSTEM_PIC					0x0800
+#define PCI_CLASS_SYSTEM_PIC_IOAPIC				0x080010
+#define PCI_CLASS_SYSTEM_PIC_IOXAPIC				0x080020 // I/O APIC interrupt controller , 32 bye none-prefectable memory.
+#define PCI_CLASS_SYSTEM_DMA					0x0801
+#define PCI_CLASS_SYSTEM_TIMER					0x0802
+#define PCI_CLASS_SYSTEM_RTC					0x0803
+#define PCI_CLASS_SYSTEM_PCI_HOTPLUG				0x0804 // HotPlug Controller
+#define PCI_CLASS_SYSTEM_SDHCI					0x0805
+#define PCI_CLASS_SYSTEM_OTHER					0x0880
 
 // values for the class_sub field for class_base = 0x09 (Input Devices)
-#define PCI_BASE_CLASS_INPUT				0x09
-#define PCI_CLASS_INPUT_KEYBOARD			0x0900
+#define PCI_BASE_CLASS_INPUT					0x09
+#define PCI_CLASS_INPUT_KEYBOARD				0x0900
 #define PCI_CLASS_INPUT_PEN					0x0901
-#define PCI_CLASS_INPUT_MOUSE				0x0902
-#define PCI_CLASS_INPUT_SCANNER				0x0903
-#define PCI_CLASS_INPUT_GAMEPORT			0x0904
-#define PCI_CLASS_INPUT_OTHER				0x0980
+#define PCI_CLASS_INPUT_MOUSE					0x0902
+#define PCI_CLASS_INPUT_SCANNER					0x0903
+#define PCI_CLASS_INPUT_GAMEPORT				0x0904
+#define PCI_CLASS_INPUT_OTHER					0x0980
 
 // values for the class_sub field for class_base = 0x0a (Docking Stations)
-#define PCI_BASE_CLASS_DOCKING				0x0a
-#define PCI_CLASS_DOCKING_GENERIC			0x0a00
-#define PCI_CLASS_DOCKING_OTHER				0x0a80
+#define PCI_BASE_CLASS_DOCKING					0x0a
+#define PCI_CLASS_DOCKING_GENERIC				0x0a00
+#define PCI_CLASS_DOCKING_OTHER					0x0a80
 
 // values for the class_sub field for class_base = 0x0b (processor)
-#define PCI_BASE_CLASS_PROCESSOR			0x0b
-#define PCI_CLASS_PROCESSOR_386				0x0b00
-#define PCI_CLASS_PROCESSOR_486				0x0b01
-#define PCI_CLASS_PROCESSOR_PENTIUM			0x0b02
-#define PCI_CLASS_PROCESSOR_ALPHA			0x0b10
-#define PCI_CLASS_PROCESSOR_POWERPC			0x0b20
-#define PCI_CLASS_PROCESSOR_MIPS			0x0b30
-#define PCI_CLASS_PROCESSOR_CO				0x0b40  /* Co-Processor */
+#define PCI_BASE_CLASS_PROCESSOR				0x0b
+#define PCI_CLASS_PROCESSOR_386					0x0b00
+#define PCI_CLASS_PROCESSOR_486					0x0b01
+#define PCI_CLASS_PROCESSOR_PENTIUM				0x0b02
+#define PCI_CLASS_PROCESSOR_ALPHA				0x0b10
+#define PCI_CLASS_PROCESSOR_POWERPC				0x0b20
+#define PCI_CLASS_PROCESSOR_MIPS				0x0b30
+#define PCI_CLASS_PROCESSOR_CO					0x0b40 // Co-Processor
 
 // values for the class_sub field for class_base = 0x0c (serial bus controller)
-#define PCI_BASE_CLASS_SERIAL				0x0c
-#define PCI_CLASS_SERIAL_FIREWIRE			0x0c00  /* FireWire (IEEE 1394) */
-#define PCI_CLASS_SERIAL_FIREWIRE_OHCI		0x0c10
-#define PCI_CLASS_SERIAL_ACCESS				0x0c01
-#define PCI_CLASS_SERIAL_SSA				0x0c02
-#define PCI_CLASS_SERIAL_USB				0x0c03  /* Universal Serial Bus */
-#define PCI_IF_UHCI                         0x00    /* Universal Host Controller Interface */
-#define PCI_IF_OHCI                         0x10    /* Open Host Controller Interface */
-#define PCI_IF_EHCI                         0x20    /* Enhanced Host Controller Interface */
-#define PCI_IF_XHCI                         0x30    /* Extensible Host Controller Interface */
-#define PCI_CLASS_SERIAL_FIBER				0x0c04
-#define PCI_CLASS_SERIAL_SMBUS				0x0c05
-#define PCI_CLASS_SERIAL_INFINIBAND			0x0c06
+#define PCI_BASE_CLASS_SERIAL					0x0c
+#define PCI_CLASS_SERIAL_FIREWIRE				0x0c00   /* FireWire (IEEE 1394) */
+#define PCI_CLASS_SERIAL_FIREWIRE_OHCI				0x0c10
+#define PCI_CLASS_SERIAL_ACCESS					0x0c01
+#define PCI_CLASS_SERIAL_SSA					0x0c02
+#define PCI_CLASS_SERIAL_USB					0x0c03  /* Universal Serial Bus */
+#define PCI_IF_UHCI					0x00    /* Universal Host Controller Interface */
+#define PCI_IF_OHCI					0x10    /* Open Host Controller Interface */
+#define PCI_IF_EHCI					0x20    /* Enhanced Host Controller Interface */
+#define PCI_IF_XHCI					0x30    /* Extensible Host Controller Interface */
+#define PCI_CLASS_SERIAL_FIBER					0x0c04
+#define PCI_CLASS_SERIAL_SMBUS					0x0c05
+#define PCI_CLASS_SERIAL_INFINIBAND				0x0c06
 
 // values for the class_sub field for class_base = 0x0d (Wireless Controller)
-#define PCI_BASE_CLASS_WIRELESS				0x0d
-#define PCI_CLASS_WIRELESS_IRDA				0x0d00
-#define PCI_CLASS_WIRELESS_IR				0x0d01
-#define PCI_CLASS_WIRELESS_RF				0x0d10
-#define PCI_CLASS_WIRELESS_BLUETOOTH		0x0d11
-#define PCI_CLASS_WIRELESS_BROADBAND		0x0d12
-#define PCI_CLASS_WIRELESS_80211A			0x0d20
-#define PCI_CLASS_WIRELESS_80211B			0x0d21
-#define PCI_CLASS_WIRELESS_WHCI				0x0d1010
-#define PCI_CLASS_WIRELESS_OTHER			0x80
+#define PCI_BASE_CLASS_WIRELESS					0x0d
+#define PCI_CLASS_WIRELESS_IRDA					0x0d00
+#define PCI_CLASS_WIRELESS_IR					0x0d01
+#define PCI_CLASS_WIRELESS_RF					0x0d10
+#define PCI_CLASS_WIRELESS_BLUETOOTH			0x0d11
+#define PCI_CLASS_WIRELESS_BROADBAND			0x0d12
+#define PCI_CLASS_WIRELESS_80211A				0x0d20
+#define PCI_CLASS_WIRELESS_80211B				0x0d21
+#define PCI_CLASS_WIRELESS_WHCI					0x0d1010
+#define PCI_CLASS_WIRELESS_OTHER				0x80
 
 // values for the class_sub field for class_base = 0x0e (Intelligent I/O Controller)
-#define PCI_BASE_CLASS_INTELLIGENT			0x0e
-#define PCI_CLASS_INTELLIGENT_I2O			0x0e00
+#define PCI_BASE_CLASS_INTELLIGENT				0x0e
+#define PCI_CLASS_INTELLIGENT_I2O				0x0e00
 
 // values for the class_sub field for class_base = 0x0f (Satellite Communication Controller)
-#define PCI_BASE_CLASS_SATELLITE			0x0f
-#define PCI_CLASS_SATELLITE_TV				0x0f00
-#define PCI_CLASS_SATELLITE_AUDIO			0x0f01
-#define PCI_CLASS_SATELLITE_VOICE			0x0f03
-#define PCI_CLASS_SATELLITE_DATA			0x0f04
+#define PCI_BASE_CLASS_SATELLITE				0x0f
+#define PCI_CLASS_SATELLITE_TV					0x0f00
+#define PCI_CLASS_SATELLITE_AUDIO				0x0f01
+#define PCI_CLASS_SATELLITE_VOICE				0x0f03
+#define PCI_CLASS_SATELLITE_DATA				0x0f04
 
 // values for the class_sub field for class_base = 0x10 (Encryption and decryption controller)
-#define PCI_BASE_CLASS_CRYPT				0x10
-#define PCI_CLASS_CRYPT_NETWORK				0x1000
-#define PCI_CLASS_CRYPT_ENTERTAINMENT		0x1010
-#define PCI_CLASS_CRYPT_OTHER				0x1080
-
-// values for the class_sub field for class_base = 0x11 (Data Acquisition and Signal Processing Controllers)
-#define PCI_BASE_CLASS_SIGNAL				0x11
-#define PCI_CLASS_SIGNAL_DPIO				0x1100
-#define PCI_CLASS_SIGNAL_PERF_CTR			0x1101
-#define PCI_CLASS_SIGNAL_SYNCHRONIZER		0x1110
-#define PCI_CLASS_SIGNAL_OTHER				0x1180
+#define PCI_BASE_CLASS_CRYPT					0x10
+#define PCI_CLASS_CRYPT_NETWORK					0x1000
+#define PCI_CLASS_CRYPT_ENTERTAINMENT				0x1010
+#define PCI_CLASS_CRYPT_OTHER					0x1080
+// values for the class_sub field for class_base = 0x12 (Data Acquisition and Signal Processing Controllers)
+#define PCI_BASE_CLASS_SIGNAL					0x11
+#define PCI_CLASS_SIGNAL_DPIO					0x1100
+#define PCI_CLASS_SIGNAL_PERF_CTR				0x1101
+#define PCI_CLASS_SIGNAL_SYNCHRONIZER				0x1110
+#define PCI_CLASS_SIGNAL_OTHER					0x1180
 
 // values for the class_sub field for class_base = 0xff (Device does not fit any defined class)
-#define PCI_CLASS_OTHERS					0xff
+#define PCI_CLASS_OTHERS                        0xff
 
 /* Several ID's we need in the library */
 #define PCI_VENDOR_ID_APPLE					0x106b

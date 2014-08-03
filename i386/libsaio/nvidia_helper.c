@@ -15,35 +15,35 @@
  NVIDIA card injection usage e.g (to be placed in the boot.plist): 
  
  <key>NVIDIA</key>
- <array>
- <dict>
- <key>Chipset Name</key>
- <string>Quadro FX 380</string>
- <key>IOPCIPrimaryMatch</key>
- <string>0x10DE0658</string>
- <key>VRam Size</key>
- <string>256</string>
- </dict>
- <dict>
- <key>Chipset Name</key>
- <string>YOUR_CARD_NAME</string>
- <key>IOPCIPrimaryMatch</key>
- <string>YOUR_CARD_ID</string>
- <key>IOPCISubDevId</key>
- <string>YOUR_CARD_SUB_ID(if necessary)</string>
- <key>VRam Size</key>
- <string>YOUR_CARD_VRAM_SIZE</string>
- </dict>
- <dict>
- <key>Chipset Name</key>
- <string>YOUR_SECOND_CARD_NAME</string>
- <key>IOPCIPrimaryMatch</key>
- <string>YOUR_SECOND_CARD_ID</string>
- <key>IOPCISubDevId</key>
- <string>YOUR_SECOND_CARD_SUB_ID(if necessary)</string>
- <key>VRam Size</key>
- <string>YOUR_SECOND_CARD_VRAM_SIZE</string>
- </dict>
+	<array>
+		<dict>
+			<key>Chipset Name</key>
+			<string>Quadro FX 380</string>
+			<key>IOPCIPrimaryMatch</key>
+			<string>0x10DE0658</string>
+			<key>VRam Size</key>
+			<string>256</string>
+		</dict>
+		<dict>
+			<key>Chipset Name</key>
+			<string>YOUR_CARD_NAME</string>
+			<key>IOPCIPrimaryMatch</key>
+			<string>YOUR_CARD_ID</string>
+			<key>IOPCISubDevId</key>
+			<string>YOUR_CARD_SUB_ID(if necessary)</string>
+			<key>VRam Size</key>
+			<string>YOUR_CARD_VRAM_SIZE</string>
+		</dict>
+		<dict>
+			<key>Chipset Name</key>
+			<string>YOUR_SECOND_CARD_NAME</string>
+			<key>IOPCIPrimaryMatch</key>
+			<string>YOUR_SECOND_CARD_ID</string>
+			<key>IOPCISubDevId</key>
+			<string>YOUR_SECOND_CARD_SUB_ID(if necessary)</string>
+			<key>VRam Size</key>
+			<string>YOUR_SECOND_CARD_VRAM_SIZE</string>
+		</dict>
  .
  .
  .
