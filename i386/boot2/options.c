@@ -1076,7 +1076,8 @@ done:
 		free(menuItems);
 		menuItems = NULL;
 	}
-	execute_hook("BootOptions", gBootArgs, gBootArgsPtr, NULL, NULL);
+// MacMan commented out the next line to prevent writing the command line boot options to nvram
+//	execute_hook("BootOptions", gBootArgs, gBootArgsPtr, NULL, NULL);
 	return 0;
 }
 

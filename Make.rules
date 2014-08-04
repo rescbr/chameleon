@@ -17,8 +17,8 @@ PAX = /bin/pax
 NASM = $(shell which nasm) -p $(SRCROOT)/autoconf.inc
 
 
-CFLAGS	= $(CONFIG_OPTIMIZATION_LEVEL) -g -Wmost -Werror
-CPPFLAGS = $(MORECPP) -g -Wmost -Werror -fno-exceptions -fno-rtti
+CFLAGS	= $(CONFIG_OPTIMIZATION_LEVEL) -g -Wmost -Werror -Wno-unused-function
+CPPFLAGS = $(MORECPP) -g -Wmost -Werror -fno-exceptions -fno-rtti -ffreestanding
 DEFINES=
 
 DIST_SUBDIRS += $(SUBDIRS)

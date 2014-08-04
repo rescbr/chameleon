@@ -670,7 +670,6 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 
 							case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
 							case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
-							case CPU_MODEL_IVYBRIDGE_XEON:
 								defaultBIOSInfo.version         = kDefaultiMacSandyBIOSVersion;
 								defaultBIOSInfo.releaseDate     = kDefaultiMacSandyBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
@@ -694,6 +693,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 							case CPU_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
 							case CPU_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
+                            case CPU_MODEL_IVYBRIDGE_XEON:  // Intel Core i7, Xeon E5 v2 LGA2011 (22nm)  MacMan moved to proper location
 								defaultBIOSInfo.version		= kDefaultMacProWestmereBIOSVersion;
 								defaultBIOSInfo.releaseDate	= kDefaultMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;

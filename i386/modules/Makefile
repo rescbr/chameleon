@@ -49,9 +49,9 @@ endif
 #SUBDIRS += KextPatcher
 #endif
 
-#ifdef CONFIG_HDAENABLER_MODULE
-#SUBDIRS += HDAEnabler
-#endif
+ifdef CONFIG_HDAENABLER_MODULE
+SUBDIRS += HDAEnabler
+endif
 
 CFLAGS= -O3 $(MORECPP) -arch i386 -g -static
 DEFINES=

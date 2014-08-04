@@ -1,0 +1,66 @@
+Chimera 3.0.1 changes from trunk:
+
+Make config
+	In Modules, added HDAEnabler Module, kept Keylayout Module and disabled all others. 
+
+Make.rules
+	Added -Wno-unused-function to CFLAGS
+	Added -ffreestanding to CPPFLAGS
+	
+doc/BootHelp.txt
+	Added Chimera boot flags, removed Chameleon IGP flags and cleaned up.
+	Change ""Boot Banner"=Yes|No    Show boot banner in GUI mode (enabled by default)." from disabled
+	Added "IGPDeviceID=<value>   Override default unsupported device ID injection"
+
+boot2/boot.h		
+	Added Chimera 2.2 IGP keys
+	Added IGPDeviceID key
+	Cleaned up formatting.
+	
+boot2/options.c		
+	Disabled writing the command line boot options to nvram by commenting out:
+		execute_hook("BootOptions", gBootArgs, gBootArgsPtr, NULL, NULL);
+	
+libsaio/ati.c		
+	Edited card names to remove vendor name
+	Kept Chimera verbose strings which are easier to read and understand.
+	
+libsaio/console.c
+	Added "Chimera 3.0.0 Branch of " to msglog for displaying Chimera version in bdmesg
+	
+libsaio/cpu.c
+	Replaced with Chimera version and fixed Haswell CPU speed detection
+	
+libsaio/gma.c
+	Added Chimera 2.2 code
+	Replaced sscanf in Chimera 2.2 code with code not dependent on stdio.h
+	
+libsaio/gma.h
+	Added additional comments and:
+		#define HD_GRAPHICS_4200    "HD Graphics 4200"
+		#define HD_GRAPHICS_4400    "HD Graphics 4400"
+
+libsaio/nvidia.c
+	Removed showGeneric code and returning exception names
+	Added NVIDIA in front of card names to duplicate what Apple does.
+	Added before "verbose("%s %dMB NV%02x [%04x:%04x]-[%04x:%04x] :: %s device number: %d\n",":
+		verbose("---------------------------------------------\n");
+   		verbose("------------ NVIDIA DEVICE INFO --------------\n");
+		verbose("---------------------------------------------\n");
+	
+libsaio/pci_setup.c	
+	Added code for Chimera IGP, removed trunk kSkipAtiGfx, kSkipIntelGfx and kSkipNvidiaGfx
+
+libsaio/smbios.c	
+	In setDefaultSMBData defaults moved CPU_MODEL_IVYBRIDGE_XEON: after case CPU_MODEL_JAKETOWN:
+
+libsaio/smbios_getters.c	
+	"getSMBOemProcessorBusSpeed" removed "case CPU_MODEL_SANDYBRIDGE:", "case CPU_MODEL_IVYBRIDGE:" and "case CPU_MODEL_HASWELL:"
+		Added code to hardcode DMI2 speed on CPU_MODEL_IVYBRIDGE_XEON and CPU_MODEL_JAKETOWN:
+	"getSMBOemProcessorType" modified to better reflect actual models 
+
+modules/Cconfig
+	Uncommented " source "i386/modules/HDAEnabler/Cconfig" "
+	
+modules/Makefile
+	Uncommented " ifdef CONFIG_HDAENABLER_MODULE " block
