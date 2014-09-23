@@ -258,6 +258,14 @@ Dependencies: none";
 "HDEFLayoutIDx03_description" = "Set HDEF layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
 
+"HDEFLayoutIDx05_title" = "LayoutID=5";
+"HDEFLayoutIDx05_description" = "Set HDEF layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDEFLayoutIDx07_title" = "LayoutID=7";
+"HDEFLayoutIDx07_description" = "Set HDEF layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
+
 "HDEFLayoutIDx12_title" = "LayoutID=12";
 "HDEFLayoutIDx12_description" = "Set HDEF layout-it to 12:
 00C (0x0C, 0x00, 0x00, 0x00).";
@@ -355,6 +363,14 @@ Dependencies: none";
 "HDAULayoutIDx03_title" = "LayoutID=3";
 "HDAULayoutIDx03_description" = "Set HDAU layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx05_title" = "LayoutID=5";
+"HDAULayoutIDx05_description" = "Set HDAU layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx07_title" = "LayoutID=7";
+"HDAULayoutIDx07_description" = "Set HDAU layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
 
 "HDAULayoutIDx12_title" = "LayoutID=12";
 "HDAULayoutIDx12_description" = "Set HDAU layout-it to 12:
