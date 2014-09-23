@@ -286,10 +286,10 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
     // 0091 /* ??? */
     // 0092 /* ??? */
 	{GMA_HASWELL_D_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_D_GT2,            HD_GRAPHICS_4600 },
+	{GMA_HASWELL_D_GT2,            HD_GRAPHICS_4600 }, /* 0412 */
 	{GMA_HASWELL_D_GT3,            HD_GRAPHICS_5000 }, /* ??? */
 	{GMA_HASWELL_M_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_M_GT2,            HD_GRAPHICS_4600 },
+	{GMA_HASWELL_M_GT2,            HD_GRAPHICS_4600 }, /* 0416 */
 	{GMA_HASWELL_M_GT3,            HD_GRAPHICS_5000 }, /* ??? */
 	{GMA_HASWELL_S_GT1,            HD_GRAPHICS },
 	{GMA_HASWELL_S_GT2,            "HD Graphics P4600/P4700" },
@@ -298,45 +298,45 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_HASWELL_B_GT2,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_B_GT3,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_E_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_E_GT2,            HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_E_GT2,            HD_GRAPHICS_4400 }, /* 041e */
 	{GMA_HASWELL_E_GT3,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT3,		IRIS_5100 },
 	{GMA_HASWELL_ULT_M_GT1,		HD_GRAPHICS },
-	{GMA_HASWELL_ULT_M_GT2,		"HD Graphics 4400" },
-	{GMA_HASWELL_ULT_M_GT3,		HD_GRAPHICS_5000 },
+	{GMA_HASWELL_ULT_M_GT2,		HD_GRAPHICS_4400 }, /* 0a16 */
+	{GMA_HASWELL_ULT_M_GT3,		HD_GRAPHICS_5000 }, /* 0a26 */
 	{GMA_HASWELL_ULT_S_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_S_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_S_GT3,		IRIS_5100 },
 	{GMA_HASWELL_ULT_B_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_B_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_B_GT3,		IRIS_5100 },
-	{GMA_HASWELL_ULT_E_GT1,		HD_GRAPHICS },
-	{GMA_HASWELL_ULT_E_GT2,		"HD Graphics 4200" },
+	{GMA_HASWELL_ULT_E_GT1,		HD_GRAPHICS_4400 }, /* 0a0e */
+	{GMA_HASWELL_ULT_E_GT2,		HD_GRAPHICS_4200 }, /* 0a1e */
 	// 0A2A /* ??? */
 	{GMA_HASWELL_ULT_E_GT3,		IRIS_5100 },
-	// 0C02 /* Intel Haswell HD Graphics - GTL */
-	// 0C04 /* ??? */
-	// 0C06 /* Intel Haswell HD Graphics - GTL */
-	// 0C12 /* Intel Haswell HD Graphics - GTM */
-	// 0C16 /* Intel Haswell HD Graphics - GTH */
-	// 0C22 /* Intel Haswell HD Graphics - GTH */
-	// 0C26 /* Intel Haswell HD Graphics - GTH */
-	{GMA_HASWELL_CRW_D_GT1,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_SDV_D_GT1_IG,		HD_GRAPHICS }, // 0C02 /* Intel Haswell HD Graphics - GTL */
+	// 0C04 /* DRAM Controller */
+	{GMA_HASWELL_SDV_M_GT1_IG,		HD_GRAPHICS }, // 0C06 /* Intel Haswell HD Graphics - GTL */
+	{GMA_HASWELL_SDV_D_GT2_IG,		HD_GRAPHICS }, // 0C12 /* Intel Haswell HD Graphics - GTM */
+	{GMA_HASWELL_SDV_M_GT2_IG,		HD_GRAPHICS }, // 0C16 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_SDV_D_GT2_PLUS_IG,		HD_GRAPHICS }, // 0C22 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_SDV_M_GT2_PLUS_IG,		HD_GRAPHICS }, // 0C26 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_CRW_D_GT1,		HD_GRAPHICS }, /* 0d02 */
 	{GMA_HASWELL_CRW_D_GT2,		HD_GRAPHICS_4600 },
-	{GMA_HASWELL_CRW_D_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_M_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_M_GT2,		HD_GRAPHICS_4600 },
-	{GMA_HASWELL_CRW_M_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_S_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_S_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_D_GT3,		IRIS_5200 }, /* 0d22 */
+	{GMA_HASWELL_CRW_M_GT1,		HD_GRAPHICS }, /* 0d06 */
+	{GMA_HASWELL_CRW_M_GT2,		HD_GRAPHICS_4600 }, /* 0d16 */
+	{GMA_HASWELL_CRW_M_GT3,		IRIS_5200 }, /* 0d26 */
+	{GMA_HASWELL_CRW_S_GT1,		HD_GRAPHICS }, /* 0d0a */
+	{GMA_HASWELL_CRW_S_GT2,		HD_GRAPHICS }, /* 0d1a */
 	{GMA_HASWELL_CRW_S_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_B_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_B_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_B_GT1,		HD_GRAPHICS }, /* 0d0b */
+	{GMA_HASWELL_CRW_B_GT2,		HD_GRAPHICS }, /* 0d1b */
 	{GMA_HASWELL_CRW_B_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_E_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_E_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_E_GT1,		HD_GRAPHICS }, /* 0d0e */
+	{GMA_HASWELL_CRW_E_GT2,		HD_GRAPHICS }, /* od1e */
 	{GMA_HASWELL_CRW_E_GT3,		IRIS_5200 },
 	{GMA_HASWELL_CRW_M_GT2_PLUS_IG,		HD_GRAPHICS }
 };
@@ -634,12 +634,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_HASWELL_ULT_M_GT3: // 0a26
         case GMA_HASWELL_ULT_S_GT3: // 0a2a
         case GMA_HASWELL_ULT_E_GT3: // 0a2e
-        //case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
-        //case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
-        //case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
-        //case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
-        //case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
-        //case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
+        case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
+        case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
+        case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
+        case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
+        case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
+        case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
         case GMA_HASWELL_CRW_D_GT1: // 0d02
         case GMA_HASWELL_CRW_D_GT2: // 0d12
         case GMA_HASWELL_CRW_D_GT3: // 0d22

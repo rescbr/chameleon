@@ -1043,6 +1043,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1004,	"GeForce GTX 780" },
 	{ 0x10DE1005,	"GeForce GTX Titan" },
 	{ 0x10DE100A,	"GeForce GTX 780 Ti" },
+	{ 0x10DE100C,	"GeForce GTX Titan Black" },
 	// 1010 - 101F
 	{ 0x10DE101F,	"Tesla K20" },
 	// 1020 - 102F
@@ -1221,6 +1222,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1282,	"GeForce GT 640" },
 	{ 0x10DE1284,	"GeForce GT 630" },
 	{ 0x10DE1286,	"GeForce GT 720" },
+	{ 0x10DE1287,	"GeForce GT 730" }, // GK208
 	// 1290 - 129F
 	{ 0x10DE1290,	"GeForce GT 730M" },
 	{ 0x10DE1291,	"GeForce GT 735M" },
@@ -1249,7 +1251,15 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1390,	"GeForce 845M" },
 	{ 0x10DE1391,	"GeForce GTX 850M" },
 	{ 0x10DE1392,	"GeForce GTX 860M" },
-	{ 0x10DE1393,	"GeForce 840M" }
+	{ 0x10DE1393,	"GeForce 840M" },
+	{ 0x10DE13BA,	"Quadro K2200" },
+	{ 0x10DE13BB,	"Quadro K620" },
+	{ 0x10DE13BD,	"Tesla M40" },
+	// 12B0 - 12BF
+	{ 0x10DE13C0,	"GeForce GTX 980" }, // GM204
+//	{ 0x10DE13C1,	"GeForce GTX 9xx" }, // GM204
+	{ 0x10DE13C2,	"GeForce GTX 970" }  // GM204
+//	{ 0x10DE13C3,	"GeForce GTX 9xx" }, // GM204
 };
 
 static nvidia_card_info_t nvidia_card_exceptions[] = {

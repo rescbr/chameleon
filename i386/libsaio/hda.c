@@ -92,7 +92,8 @@ uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 static hda_controller_devices know_hda_controller[] = {
 	//8086  Intel Corporation
-	{ HDA_INTEL_HASWELL,     "Haswell" },
+	{ HDA_INTEL_HASWELL,     "Haswell-ULT" },
+	{ HDA_INTEL_HASWELL2,     "Haswell" },
 	{ HDA_INTEL_CRYSTAL,     "Crystal Well" },
 	{ HDA_INTEL_CPT,     "6 Series/C200 Series Chipset Family" },
 	{ HDA_INTEL_PATSBURG,"C600/X79 series chipset" },
@@ -107,6 +108,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_INTEL_PCH,     "5 Series/3400 Series" },
 	{ HDA_INTEL_PCH2,    "5 Series/3400 Series" },
 	{ HDA_INTEL_SCH,     "System Controller Hub (SCH Poulsbo)" },
+	{ HDA_INTEL_SCH2,     "9 Series" },
 	{ HDA_INTEL_LPT1,     "Lynx Point" },
 	{ HDA_INTEL_LPT2,     "Lynx Point" },
 	{ HDA_INTEL_LYNX,     "Lynx Point-LP" },
@@ -581,20 +583,22 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	* The above case are intended as for HDEF device at address 0x001B0000
 	***********************************************************************/
 		case HDA_INTEL_HASWELL:
+		case HDA_INTEL_HASWELL2:
 		case HDA_INTEL_CRYSTAL:
 		case HDA_INTEL_CPT:
 		case HDA_INTEL_PATSBURG:
-        case HDA_INTEL_PPT1:
+		case HDA_INTEL_PPT1:
 		case HDA_INTEL_82801F:
 		case HDA_INTEL_63XXESB:
 		case HDA_INTEL_82801G:
 		case HDA_INTEL_82801H:
-        case HDA_INTEL_82801I:
+		case HDA_INTEL_82801I:
 		case HDA_INTEL_82801JI:
 		case HDA_INTEL_82801JD:
 		case HDA_INTEL_PCH:
 		case HDA_INTEL_PCH2:
-        case HDA_INTEL_SCH:
+		case HDA_INTEL_SCH:
+		case HDA_INTEL_SCH2:
 		case HDA_INTEL_LPT1:
 		case HDA_INTEL_LPT2:
 		case HDA_INTEL_LYNX:
@@ -620,6 +624,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	devprop_add_value(device, "device_type", (uint8_t *)"High Definition Audio", 22); // 0x16
 	devprop_add_value(device, "built-in", &BuiltIn, 1);
 	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); // 0x0a
+	// "AFGLowPowerState" = <03000000>
 	break;
 
 	/****************************************************************************************************************
