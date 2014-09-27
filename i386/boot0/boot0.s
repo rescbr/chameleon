@@ -283,7 +283,7 @@ find_boot:
 										; to boot an inactive but boot1h aware HFS+ partition
 										; by scanning the MBR partition entries again.
 
-.start_scan:							
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -473,6 +473,7 @@ checkGPT:
     jmp	    SHORT initBootLoader    
     
 .gpt_continue:
+
     add	    si, bx									; advance SI to next partition entry
     loop    .gpt_loop								; loop through all partition entries	
 
@@ -519,7 +520,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;

@@ -283,7 +283,7 @@ find_boot:
 										; to boot an inactive but boot1h aware HFS+ partition
 										; by scanning the MBR partition entries again.
 
-.start_scan:							
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -444,7 +444,7 @@ checkGPT:
 .gpt_loop:
 
     mov     eax, [si + gpta.PartitionTypeGUID + kGUIDLastDwordOffs]
-	
+
 	cmp		eax, kAppleGUID			; check current GUID Partition for Apple's GUID type
 	je		.gpt_ok
 
@@ -519,7 +519,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;
