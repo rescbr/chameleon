@@ -869,7 +869,8 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	{
 		DBG("Decompressing Kernel: ");
 
-		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+		if ((kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) &&
+			(kernel_header->compress_type != OSSwapBigToHostConstInt32('lzvn')))
 		{
 			error("ERROR: kernel compression is bad!\n");
 			return -1;
@@ -887,7 +888,23 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
 		binary = buffer = malloc(uncompressed_size);
 
-		size = decompress_lzss((u_int8_t *)binary, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+		// MinusZwei
+		size = 0;
+		switch (kernel_header->compress_type)
+		{
+			case OSSwapBigToHostConstInt32('lzvn'):
+				size = decompress_lzvn( binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+				break;
+
+			case OSSwapBigToHostConstInt32('lzss'):
+				size = decompress_lzss( (u_int8_t *)binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+				break;
+
+			default:
+				break;
+		}
+		// MinusZwei
+
 		if (uncompressed_size != size) {
 			error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
 			return -1;
@@ -921,9 +938,9 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
 
 	ret = DecodeMachO(binary, rentry, raddr, rsize);
-	if (ret<0 && archCpuType==CPU_TYPE_X86_64)
+	if (ret < 0 && archCpuType == CPU_TYPE_X86_64)
 	{
-		archCpuType=CPU_TYPE_I386;
+		archCpuType = CPU_TYPE_I386;
 		ret = DecodeMachO(binary, rentry, raddr, rsize);
 	}
 

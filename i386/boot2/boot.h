@@ -286,7 +286,14 @@ typedef struct {
 /*
  * lzss.c
  */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+extern int decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen);
+extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+
+/*
+ * lzvn.c
+ */
+extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
+// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
 
 struct compressed_kernel_header {
 	u_int32_t signature;
@@ -297,7 +304,7 @@ struct compressed_kernel_header {
 	u_int32_t reserved[11];
 	char      platform_name[64];
 	char      root_path[256];
-	 u_int8_t  data[0];
+	u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 
