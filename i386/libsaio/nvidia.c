@@ -1134,7 +1134,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1182,	"GeForce GTX 760 Ti" },
 	{ 0x10DE1183,	"GeForce GTX 660 Ti" },
 	{ 0x10DE1184,	"GeForce GTX 770" },
-	{ 0x10DE1185,	"GeForce GTX 660" },
+	{ 0x10DE1185,	"GeForce GTX 660 OEM" },
 	{ 0x10DE1187,	"GeForce GTX 760" },
 	{ 0x10DE1188,	"GeForce GTX 690" },
 	{ 0x10DE1189,	"GeForce GTX 670" },
@@ -1448,6 +1448,8 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 	{ 0x10DE1180,	0x15691189,	"Palit GTX 680 JetStream" },
 	{ 0x10DE1180,	0x38422682,	"EVGA GTX 680 SC" },
 	{ 0x10DE1180,	0x38422683,	"EVGA GTX 680 SC" },
+
+	{ 0x10DE1185,	0x10DE106F,	"nVidia GeForce GTX 760 OEM" }, // GK104
 
 	{ 0x10DE1187,	0x14583614,	"GV-N760OC-4GD" },
 

@@ -416,6 +416,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x95C5,	0x30501787, CHIP_FAMILY_RV620,		"ATI Radeon HD 4250",                   kNull		},
 	{ 0x95C5,	0x4250174B, CHIP_FAMILY_RV620,		"ATI Radeon HD 4250",                   kNull		},
 
+	{ 0x95CF,	0x21431002, CHIP_FAMILY_RV620,		"ATI FirePro 2260",                   kIago}		},
+
 	// Evergreen //
 	{ 0x6898,	0x00D0106B, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",                   kLangur		},
 	{ 0x6898,	0x032E1043, CHIP_FAMILY_CYPRESS,	"ATI Radeon HD 5870",                   kUakari		},
@@ -1364,7 +1366,7 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x95CC,	0x00000000, CHIP_FAMILY_RV620,	"ATI Radeon HD",	kIago       },
 //	{ 0x95CD,	0x00000000, CHIP_FAMILY_RV620,	"ATI Radeon HD",	kIago       },
 //	{ 0x95CE,	0x00000000, CHIP_FAMILY_RV620,	"ATI Radeon HD",	kIago       },
-//	{ 0x95CF,	0x00000000, CHIP_FAMILY_RV620,	"ATI Radeon HD",	kIago       },
+	{ 0x95CF,	0x00000000, CHIP_FAMILY_RV620,	"ATI FirePro 2260",	kIago       },
 
 	/* IGP */
 
@@ -1496,8 +1498,9 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x99A2,	0x00000000, CHIP_FAMILY_ARUBA,	"AMD Radeon HD",      kNull       }, // Mobile
 //	{ 0x99A4,	0x00000000, CHIP_FAMILY_ARUBA,	"AMD Radeon HD",      kNull       },
 
-	{ 0x665C,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon HD 7790",	kFutomaki		},
-	{ 0x665D,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 260",	kFutomaki		},
+	{ 0x6613,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R7 240",	kFutomaki		},
+	{ 0x665C,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon HD 7790",	kFutomaki		},
+	{ 0x665D,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 260",	kFutomaki		},
 
 	/* Evergreen */
 
