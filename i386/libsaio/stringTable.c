@@ -60,7 +60,7 @@ keyncmp(const char *str, const char *key, int n)
 		break;
 	    }
 	} else if (c == '\"') {
-	    /* Premature end of key */
+	    // Premature end of key
 	    return 1;
 	}
 	if (c != *str++) {
@@ -647,41 +647,68 @@ int loadSystemConfig(config_file_t *config)
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadChameleonConfig(config_file_t *config)
+int loadChameleonConfig(config_file_t *config, BVRef chain)
 {
 	char *dirspec[] = {
-		"rd(0,0)/Extra/org.chameleon.Boot.plist",
 		"/Extra/org.chameleon.Boot.plist",
-		"bt(0,0)/Extra/org.chameleon.Boot.plist",
-		
-		"rd(0,0)/Extra/com.apple.Boot.plist",   /* DEPRECIATED */
 		"/Extra/com.apple.Boot.plist",           /* DEPRECIATED */
-		"bt(0,0)/Extra/com.apple.Boot.plist",   /* DEPRECIATED */
 	};
 
-	int i, fd, count, ret=-1;
+	int i;
 
 	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++) {
-		if ((fd = open(dirspec[i], 0)) >= 0) {
-			// Check for depreciated file names and annoy the user about it.
-			if(strstr(dirspec[i], "com.apple.Boot.plist")) {
-				printf("%s is depreciated.\n", dirspec[i]);
-				dirspec[i][strlen(dirspec[i]) - strlen("com.apple.Boot.plist")] = 0;
-				printf("Please use the file %sorg.chameleon.Boot.plist instead.\n", dirspec[i]);
-				pause();
+		if ( loadChameleonConfigForDevice(config, "rd(0,0)", dirspec[i]) == 0 ) {
+			return 0;
+		}
+		if ( loadChameleonConfigForDevice(config, "", dirspec[i]) == 0 ) {
+			return 0;
+		}
+		if ( loadChameleonConfigForDevice(config, "bt(0,0)", dirspec[i]) == 0 ) {
+			return 0;
+		}
+		BVRef bvr;
+		for ( bvr = chain; bvr; bvr = bvr->next ) { /* C99 Error */
+			char device[256];
+			getDeviceDescription(bvr, device);
+
+			if ( loadChameleonConfigForDevice(config, device, dirspec[i]) == 0 ) {
+				return 0;
 			}
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
-			
-			// build xml dictionary
-			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
-			ret=0;
-			break;
 		}
 	}
-	return ret;
+	return -1;
+}
+
+/* loadChameleonConfigForDevice
+ *
+ * Returns 0 - successful.
+ *		  -1 - unsuccesful.
+ */
+int loadChameleonConfigForDevice(config_file_t *config, const char *device, const char *path)
+{
+	char full_path[1024];
+	int fd;
+
+	snprintf(full_path, sizeof(full_path), "%s%s", device, path);
+
+	if ((fd = open(full_path, 0)) >= 0) {
+		// Check for depreciated file names and annoy the user about it.
+		if(strstr(full_path, "com.apple.Boot.plist")) {
+			printf("%s is depreciated.\n", full_path);
+			full_path[strlen(full_path) - strlen("com.apple.Boot.plist")] = 0;
+			printf("Please use the file %sorg.chameleon.Boot.plist instead.\n", full_path);
+			pause();
+		}
+		// read file
+		read(fd, config->plist, IO_CONFIG_DATA_SIZE);
+		close(fd);
+
+		// build xml dictionary
+		ParseXMLFile(config->plist, &config->dictionary);
+		sysConfigValid = true;
+		return 0;
+	}
+	return -1;
 }
 
 /* loadHelperConfig

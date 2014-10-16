@@ -74,8 +74,9 @@ static uint64_t ptov64(uint32_t addr)
 
 /* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
-static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
-
+// Bungo
+//static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
+static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
 // Bungo
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
@@ -436,15 +437,17 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+//static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
+static const char EFI_MODE_PROP[] = "efi-mode";  //Bungo
 static const char SYSTEM_ID_PROP[] = "system-id";
 static const char SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
 static const char DEV_PATH_SUP[] = "DevicePathsSupported";
-static uint32_t DevPathSup = 1;
+static EFI_UINT32 DevPathSup = 1;
+static EFI_UINT32 MachineSig = 0;  //Bungo
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
@@ -567,13 +570,15 @@ void setupEfiDeviceTree(void)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
-
-	if (archCpuType == CPU_TYPE_I386) {
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
-	} else {
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
-	}
-
+    /* Bungo
+     if (archCpuType == CPU_TYPE_I386) {
+     DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+     } else { */
+    DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
+    //	}
+    
+    DT__AddProperty(node, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
+    
 	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
 	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
 
@@ -598,6 +603,11 @@ void setupEfiDeviceTree(void)
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
 
+    // New node: /efi/kernel-compatibility
+    Node *efiKernelComNode = DT__AddChild(node, "kernel-compatibility");
+    len = 1;
+    DT__AddProperty(efiKernelComNode, "x86_64", sizeof(uint32_t), (EFI_UINT32 *)&len);
+    
 	// Now fill in the /efi/platform Node
 	Node *efiPlatformNode = DT__AddChild(node, "platform");
 
@@ -618,7 +628,7 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
-	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(uint32_t), &DevPathSup);
+	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(EFI_UINT32), &DevPathSup);
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
@@ -669,16 +679,34 @@ void setupChosenNode()
 {
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
+    static EFI_UINT8 const RANDOM_SEED[] =
+    {
+        0x40, 0x00, 0x50, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 0x65, 0x00,
+        0x6d, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x62, 0x00, 0x72, 0x00, 0x61, 0x00, 0x72, 0x00,
+        0x79, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00,
+        0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x5c, 0x00, 0x62, 0x00
+    };
+    
+    DT__AddProperty(chosenNode, "random-seed", sizeof(RANDOM_SEED), (EFI_UINT8*) &RANDOM_SEED);
+
 	if (chosenNode == 0)
 	{
 		stop("Couldn't get chosen node");
 	}
 
-	int bootUUIDLength = strlen(gBootUUIDString);
-	if (bootUUIDLength)
+	int length = strlen(gBootUUIDString);
+	if (length)
 	{
-		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
+		DT__AddProperty(chosenNode, "boot-uuid", length + 1, gBootUUIDString);
 	}
+    
+    length = strlen(bootArgs->CommandLine);
+    DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+    
+    length = strlen(bootInfo->bootFile);
+    DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+    
+    DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 }
 
 /*

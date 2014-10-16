@@ -1576,7 +1576,8 @@ static bool getOSVersion(BVRef bvr, char *str)
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
-			strncat(str, val, MIN(len, 4));
+//			strncat(str, val, MIN(len, 4)); // removed since it breaks any OS X version greater than 10.9 i.e. Yosemite 10.10
+            strncat(str, val, len);         // just copy the whole version number instead
 		} else {
 			valid = false;
 		}

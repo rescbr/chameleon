@@ -32,44 +32,53 @@
  * Paths used by chameleon
  */
 
+//kernel path
+#define kDefaultKernelPath          "/"
+#define kDefaultKernelPathYosemite  "/System/Library/Kernels/"
+
 //kernel cache
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+#define kDefaultCachePathLeo        "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow       "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
 // Lion installer
-#define kLionInstallerDataFolder      "/Mac OS X Install Data/"
-#define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
+#define kLionInstallerDataFolder    "/Mac OS X Install Data/"
+#define kLionInstallerPlist         kLionInstallerDataFolder "com.apple.Boot.plist"
+
+// Mountain Lion installer
+#define kMLionInstallerDataFolder   "/OS X Install Data/"
+#define kMLionInstallerPlist        kMLionInstallerDataFolder "com.apple.Boot.plist"
 
 /*
  * Keys used in system Boot.plist
  */
-#define kGraphicsModeKey	"Graphics Mode"
-#define kTextModeKey		"Text Mode"
-#define kQuietBootKey		"Quiet Boot"
-#define kKernelFlagsKey		"Kernel Flags"
-#define kKernelArchKey		"Kernel Architecture"
-#define kMKextCacheKey		"MKext Cache"
-#define kKernelNameKey		"Kernel"
-#define kKernelCacheKey		"Kernel Cache"
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
-#define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey         "Timeout"
-#define kRootDeviceKey		"rd"
-#define kBootUUIDKey		"boot-uuid"
-#define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
-#define kACPIKey            "acpi"
-#define kCDROMPromptKey		"CD-ROM Prompt"
-#define kCDROMOptionKey		"CD-ROM Option Key"
-#define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey          "Rescan"
-#define kScanSingleDriveKey	"Scan Single Drive"
-#define kInstantMenuKey		"Instant Menu"
-#define kDefaultKernel		"mach_kernel"
-#define kGUIKey             "GUI"
-#define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"          /* gui.c */
-#define kWaitForKeypressKey	"Wait"
+#define kGraphicsModeKey        "Graphics Mode"
+#define kTextModeKey            "Text Mode"
+#define kQuietBootKey           "Quiet Boot"
+#define kKernelFlagsKey         "Kernel Flags"
+#define kKernelArchKey          "Kernel Architecture"
+#define kMKextCacheKey          "MKext Cache"
+#define kKernelNameKey          "Kernel"
+#define kKernelCacheKey         "Kernel Cache"
+#define kUseKernelCache         "UseKernelCache"	/* boot.c */
+#define kBootDeviceKey          "Boot Device"
+#define kTimeoutKey             "Timeout"
+#define kRootDeviceKey          "rd"
+#define kBootUUIDKey            "boot-uuid"
+#define kHelperRootUUIDKey      "Root UUID"
+#define kPlatformKey            "platform"
+#define kACPIKey                "acpi"
+#define kCDROMPromptKey         "CD-ROM Prompt"
+#define kCDROMOptionKey         "CD-ROM Option Key"
+#define kRescanPromptKey        "Rescan Prompt"
+#define kRescanKey              "Rescan"
+#define kScanSingleDriveKey     "Scan Single Drive"
+#define kInstantMenuKey         "Instant Menu"
+#define kDefaultKernel          "mach_kernel"
+#define kDefaultKernelYosemite  "kernel"
+#define kGUIKey                 "GUI"
+#define kBootBannerKey          "Boot Banner"
+#define kShowInfoKey            "ShowInfo"          /* gui.c */
+#define kWaitForKeypressKey     "Wait"
 
 /* AsereBLN: added these keys */
 #define kUseAtiROM          "UseAtiROM"         /* ati.c */
@@ -253,6 +262,7 @@ extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, i
 /*
  * drivers.c
  */
+extern char *gDarwinBuildVerStr; // Bungo
 extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
@@ -286,7 +296,14 @@ typedef struct {
 /*
  * lzss.c
  */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+extern int decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen);
+extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+
+/*
+ * lzvn.c
+ */
+extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
+// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
 
 struct compressed_kernel_header {
 	u_int32_t signature;
@@ -306,5 +323,7 @@ void HibernateBoot(char *boot_device);
 
 /* bmdecompress.c */
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
+
+bool checkOSVersion(const char * version);
 
 #endif /* !__BOOT2_BOOT_H */

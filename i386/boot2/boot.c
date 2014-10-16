@@ -80,8 +80,6 @@ int		bvCount = 0, gDeviceCount = 0;
 long		gBootMode; /* defaults to 0 == kBootModeNormal */
 BVRef		bvr, menuBVR, bvChain;
 
-static bool				checkOSVersion(const char * version);
-static void				getOSVersion();
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
@@ -197,9 +195,8 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")) || (checkOSVersion("10.10")))
 	{
-
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
@@ -239,13 +236,13 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	if (cacheFile[0] != 0)
 	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
-	}
-	else
-	{
+        verbose("Specified kernel cache file path = %s\n", cacheFile);
+	} else {
 		// Lion, Mountain Lion and Mavericks prelink kernel cache file
-		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")) || (checkOSVersion("10.10")))
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+            verbose("Kernel cache file path = %s\n", kernelCacheFile);
 		}
 		// Snow Leopard prelink kernel cache file
 		else if (checkOSVersion("10.6")) {
@@ -266,6 +263,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
+                verbose("Snow Leopard Kernel cache file path = %s\n", kernelCacheFile);
 			}
 			closedir(cacheDir);
 		} else {
@@ -309,7 +307,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 
 	// Exit if kernel cache file wasn't found
 	if (ret == -1) {
-		verbose("No Kernel Cache File '%s' found\n", kernelCacheFile);
+		verbose("Kernel Cache File '%s' not found\n", kernelCacheFile);
 		return -1;
 	}
 
@@ -328,7 +326,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// Check if the S/L/E directory time is more recent than the cache file
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
 		&& (exttime > cachetime)) {
-		verbose("/System/Library/Extensions is more recent than KernelCache (%s), ignoring KernelCache\n",
+		verbose("Contents of /System/Library/Extensions is more recent than KernelCache (%s), ignoring KernelCache\n",
 				kernelCacheFile);
 		return -1;
 	}
@@ -379,11 +377,12 @@ void common_boot(int biosdev)
 
 	// Record the device that the booter was loaded from.
 	gBIOSDev = biosdev & kBIOSDevMask;
+    
+    // Initialize boot-log
+    initBooterLog();
 
 	// Initialize boot info structure.
 	initKernBootStruct();
-
-	initBooterLog();
 
 	// Setup VGA text mode.
 	// Not sure if it is safe to call setVideoMode() before the
@@ -405,7 +404,7 @@ void common_boot(int biosdev)
 	setBootGlobals(bvChain);
 
 	// Load boot.plist config file
-	status = loadChameleonConfig(&bootInfo->chameleonConfig);
+	status = loadChameleonConfig(&bootInfo->chameleonConfig, bvChain);
 
 	if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet) {
 		gBootMode |= kBootModeQuiet;
@@ -533,9 +532,6 @@ void common_boot(int biosdev)
 			updateVRAM();
 		}
 
-		// Find out which version mac os we're booting.
-		getOSVersion();
-
 		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
 			archCpuType = CPU_TYPE_X86_64;
 		} else {
@@ -603,7 +599,7 @@ void common_boot(int biosdev)
 			HibernateBoot((char *)val);
 			break;
 		}
-		
+        
 		verbose("Loading Darwin %s\n", gMacOSVersion);
 
 		getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
@@ -623,14 +619,12 @@ void common_boot(int biosdev)
 			}
 
 			if (gOverrideKernel && kernelCacheFile[0] == 0) {
-				verbose("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n",
-						bootInfo->bootFile);
+				verbose("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n", bootInfo->bootFile);
 				useKernelCache = false;
 				break;
 			}
 			if (gMKextName[0] != 0) {
-				verbose("Using a specific MKext Cache (%s), KernelCache will not be used\n",
-						gMKextName);
+				verbose("Using a specific MKext Cache (%s), KernelCache will not be used\n", gMKextName);
 				useKernelCache = false;
 				break;
 			}
@@ -655,9 +649,15 @@ void common_boot(int biosdev)
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
-				snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
-			else
+            {
+                if (checkOSVersion("10.10")) {
+                    snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathYosemite"%s", bootInfo->bootFile); // for Yosemite
+                } else {
+                    snprintf(bootFile, sizeof(bootFile), kDefaultKernelPath"%s", bootInfo->bootFile); // append a leading /
+                }
+            } else {
 				strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
+            }
 
 			// Try to load kernel image from alternate locations on boot helper partitions.
 			ret = -1;
@@ -675,7 +675,8 @@ void common_boot(int biosdev)
 					}
 				}
 			}
-			if (ret == -1) {
+			if (ret == -1)
+            {
 				// No alternate location found, using the original kernel image path.
 				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
@@ -749,13 +750,14 @@ static void selectBiosDevice(void)
 
 bool checkOSVersion(const char * version) 
 {
-	return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
-			&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
-}
-
-static void getOSVersion()
-{
-	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+    if ( (sizeof(version) > 4) && ('.' != version[4]) && ('\0' != version[4])) {
+        return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
+                && (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]))
+                && (gMacOSVersion[4] == version[4]);
+    } else {
+        return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
+                && (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
+    }
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

@@ -125,6 +125,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 // MacMan the following CPUs have fixed DMI2 speeds
                     case CPU_MODEL_IVYBRIDGE_XEON:  // Intel Core i7, Xeon E5 v2 LGA2011 (22nm)
 					case CPU_MODEL_JAKETOWN:        // Intel Core i7, Xeon E5 LGA2011 (32nm)
+                    case CPU_MODEL_HASWELL_SVR:     // Intel Core i7, Xeon E5 LGA2011v3
                     {
                         unsigned long dmi2speed;
                         dmi2speed = 5000;
@@ -162,7 +163,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
 		if (!done) {
-			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, (uint32_t)Platform.CPU.Family, (uint32_t)Platform.CPU.Model);
+/*			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, (uint32_t)Platform.CPU.Family, (uint32_t)Platform.CPU.Model); */
 			done = true;
 		}
 		// Bungo: fixes Oem Processor Type - better matching IMHO

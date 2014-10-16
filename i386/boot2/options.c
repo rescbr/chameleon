@@ -32,6 +32,12 @@
 #include "pci.h"
 #include "modules.h"
 
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
@@ -1093,7 +1099,9 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
     int len = argLen + cnt + 1;  // +1 to account for space
 
 	if (argName)
+    {
 		len++; // +1 to account for '='
+    }
 
     if (len > *cntRemainingP) {
         error("Warning: boot arguments too long, truncating\n");
@@ -1193,7 +1201,11 @@ processBootOptions()
 	else {
 		return -1;
 	}
-
+    
+    // Find out which version mac os we're booting.
+    strlcpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+//    printf("OS Version Booted %s\n", gBootVolume->OSVersion);
+    
 	// Load config table specified by the user, or use the default.
 
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
@@ -1205,7 +1217,7 @@ processBootOptions()
 	// and use its contents to override default bootConfig.
 
 	loadSystemConfig(&bootInfo->bootConfig);    
-	loadChameleonConfig(&bootInfo->chameleonConfig);
+	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
 
 	// Use the kernel name specified by the user, or fetch the name
 	// in the config table, or use the default if not specified.
@@ -1215,16 +1227,23 @@ processBootOptions()
 	// to be used.
 
 	gOverrideKernel = false;
-	if (( kernel = extractKernelName((char **)&cp) )) {
+	if (( kernel = extractKernelName((char **)&cp) ))
+    {
 		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
 	} else {
-		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) )
+        {
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
 		} else {
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+            if ((checkOSVersion("10.10"))) {
+                strlcpy( bootInfo->bootFile, kDefaultKernelYosemite, sizeof(bootInfo->bootFile) );
+            } else {
+                strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+            }
 		}
 	}
-	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
+	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kDefaultKernelYosemite ) != 0))
+    {
 		gOverrideKernel = true;
 	}
 
@@ -1233,7 +1252,8 @@ processBootOptions()
 
 	// Get config kernel flags, if not ignored.
 	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
-            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
+            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig ))
+    {
 		val = "";
 		cnt = 0;
 	}
@@ -1242,51 +1262,68 @@ processBootOptions()
 
 	// boot-uuid can be set either on the command-line or in the config file
 	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
+                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString)))
+    {
 		//
 		// Try an alternate method for getting the root UUID on boot helper partitions.
 		//
-		if (gBootVolume->flags & kBVFlagBooter) {
+		if (gBootVolume->flags & kBVFlagBooter)
+        {
 			// Load the configuration store in the boot helper partition
-			if (loadHelperConfig(&bootInfo->helperConfig) == 0) {
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
+            {
 				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
-				if (val != NULL) {
+				if (val != NULL)
+                {
 					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
 				}
 			}
 		}
-        
+/*
 		// Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) 
+ {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
-         
+*/
 		// If we have the volume uuid add it to the commandline arguments
-		if (strlen(gBootUUIDString)) {
+		if (strlen(gBootUUIDString))
+        {
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
 		}
+        // Try to get the volume uuid string
+        if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+        {
+            gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
+            DBG("boot-uuid: %s\n", gBootUUIDString);
+        }
 	}
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
+                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
+    {
 		cnt = 0;
-		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
+		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig))
+        {
 			valueBuffer[0] = '*';
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else {
-			if (strlen(gBootUUIDString)) {
+		} else { /*
+			if (strlen(gBootUUIDString)) 
+                  {
 				val = "*uuid";
 				cnt = 5;
-			} else {
+			} else { */
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			}
-		} 
-		if (cnt > 0) {
+		/*	} */
+		}
+        
+		if (cnt > 0)
+        {
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
 		strlcpy( gRootDevice, val, (cnt + 1));
@@ -1296,15 +1333,18 @@ processBootOptions()
 	 * Removed. We don't need this anymore.
 	 *
 	if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
-							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
+							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) 
+     {
 		getPlatformName(gPlatformName);
 		copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
 	}
 	*/
 
 	if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-		if (gBootMode & kBootModeSafe) {
+        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt))
+    {
+		if (gBootMode & kBootModeSafe)
+        {
 			copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
 		}
 	}
@@ -1312,8 +1352,10 @@ processBootOptions()
 	// Store the merged kernel flags and boot args.
 
 	cnt = strlen(configKernelFlags);
-	if (cnt) {
-		if (cnt > cntRemaining) {
+	if (cnt)
+    {
+		if (cnt > cntRemaining)
+        {
 			error("Warning: boot arguments too long, truncating\n");
 			cnt = cntRemaining;
 		}
@@ -1322,26 +1364,30 @@ processBootOptions()
 		cntRemaining -= cnt;
 	}
 	userCnt = strlen(cp);
-	if (userCnt > cntRemaining) {
+	if (userCnt > cntRemaining)
+    {
 		error("Warning: boot arguments too long, truncating\n");
 		userCnt = cntRemaining;
 	}
 	strncpy(&argP[cnt], cp, userCnt);
 	argP[cnt+userCnt] = '\0';
 
-	if(!shouldboot) {
+	if(!shouldboot)
+    {
 		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
 			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
 		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
 
-		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
+		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) )
+        {
 			gBootMode = kBootModeSafe;
 		}
 	}
 
-	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+    {
 		strlcpy(gMKextName, val, cnt + 1);
 	} else {
 		gMKextName[0]=0;

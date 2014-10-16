@@ -235,7 +235,7 @@ long LoadDrivers( char * dirSpec )
 					return -1;
 				}
 			} else {
-				if (gMacOSVersion[3] == '9') {
+				if ((checkOSVersion("10.9")) || (checkOSVersion("10.10"))) {
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
@@ -523,6 +523,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	if (ret != 0) {
 		break;
 	}
+        
 	// Allocate memory for the driver path and the plist.
 
 	module->executablePath = tmpExecutablePath;
@@ -837,14 +838,15 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 static char gPlatformName[64];
 #endif
 
-long
-DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
+char *gDarwinBuildVerStr = "Darwin Kernel Version"; // Bungo
+
+long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
-	long ret;
-	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
-	u_int32_t uncompressed_size, size;
-	void *buffer;
-	unsigned long len;
+    long ret = 0;
+    compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
+    u_int32_t uncompressed_size = 0, size = 0, adler32 = 0;
+    void *buffer = NULL;
+    unsigned long len = 0;
 	
 #if 0
 	printf("kernel header:\n");
@@ -858,11 +860,18 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
-		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+        if ((kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) &&
+            (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzvn')))
 		{
-			error("kernel compression is bad\n");
+            verbose ("Decompressing Kernel\n");
+			error("ERROR: Invalid kernel compression\n");
 			return -1;
 		}
+        if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+            verbose ("Decompressing Kernel Using lzss\n");
+        else
+            if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
+                verbose ("Decompressing Kernel Using lzvn\n");
 #if NOTDEF
 		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
 		{
@@ -873,24 +882,38 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			return -1;
 		}
 #endif
-
 		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
 		binary = buffer = malloc(uncompressed_size);
 		
-		size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
-							   OSSwapBigToHostInt32(kernel_header->compressed_size));
-		if (uncompressed_size != size) {
-			error("size mismatch from lzss: %x\n", size);
-			return -1;
-		}
-		
-		if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-			Adler32(binary, uncompressed_size))
-		{
-			printf("adler mismatch\n");
-			return -1;
-		}
-	}
+        // MinusZwei
+        size = 0;
+        switch (kernel_header->compress_type)
+        {
+            case OSSwapBigToHostConstInt32('lzvn'):
+                size = decompress_lzvn( binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+                break;
+                
+            case OSSwapBigToHostConstInt32('lzss'):
+                size = decompress_lzss( (u_int8_t *)binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+                break;
+                
+            default:
+                break;
+        }
+        // MinusZwei
+        
+        if (uncompressed_size != size) {
+            error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+            return -1;
+        }
+        
+        adler32 = Adler32(binary, uncompressed_size);
+        if (OSSwapBigToHostInt32(kernel_header->adler32) != adler32)
+        {
+            error("ERROR: adler mismatch (found: %x, expected: %x).\n", adler32, OSSwapBigToHostInt32(kernel_header->adler32));
+            return -1;
+        }
+    }
 	
 	ret = ThinFatFile(&binary, &len);
 	if (ret == 0 && len == 0 && archCpuType==CPU_TYPE_X86_64)
@@ -899,6 +922,13 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		ret = ThinFatFile(&binary, &len);
 	}
 
+    // Bungo: no range checking, sorry
+    size = 0;
+    while (memcmp((uint8_t *)binary + size, (uint8_t *)gDarwinBuildVerStr, 21)) {
+        size++;
+    }
+    gDarwinBuildVerStr = (char *)binary + size;
+    
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
 

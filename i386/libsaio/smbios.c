@@ -694,6 +694,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
 							case CPU_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
                             case CPU_MODEL_IVYBRIDGE_XEON:  // Intel Core i7, Xeon E5 v2 LGA2011 (22nm)  MacMan moved to proper location
+                            case CPU_MODEL_HASWELL_SVR:     // Intel Core i7, Xeon E5 v3 LGA2011v3 (22nm)
 								defaultBIOSInfo.version		= kDefaultMacProWestmereBIOSVersion;
 								defaultBIOSInfo.releaseDate	= kDefaultMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;

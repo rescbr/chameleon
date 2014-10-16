@@ -43,7 +43,9 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
-	iDeviceHFS_mav,
+    iDeviceHFS_yos,
+    iDeviceHFS_yos_o,
+    iDeviceHFS_mav,
 	iDeviceHFS_mav_o,
 	iDeviceHFS_ML,
 	iDeviceHFS_ML_o,
@@ -58,6 +60,8 @@ enum {
 
 	iDeviceHFSRAID,
 	iDeviceHFSRAID_o,
+    iDeviceHFSRAID_yos,
+    iDeviceHFSRAID_yos_o,
 	iDeviceHFSRAID_mav,
 	iDeviceHFSRAID_mav_o,
 	iDeviceHFSRAID_ML,
@@ -70,6 +74,7 @@ enum {
 	iDeviceHFSRAID_Leo_o,
 	iDeviceHFSRAID_Tiger,
 	iDeviceHFSRAID_Tiger_o,
+    
 	iDeviceEXT3,
 	iDeviceEXT3_o,
 	iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -123,7 +128,9 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
-	{.name = "device_hfsplus_mav",          .image = NULL},
+    {.name = "device_hfsplus_yos",          .image = NULL},
+    {.name = "device_hfsplus_yos_o",        .image = NULL},
+    {.name = "device_hfsplus_mav",          .image = NULL},
 	{.name = "device_hfsplus_mav_o",        .image = NULL},
 	{.name = "device_hfsplus_ml",           .image = NULL},
 	{.name = "device_hfsplus_ml_o",         .image = NULL},
@@ -138,6 +145,8 @@ image_t images[] = {
 
 	{.name = "device_hfsraid",              .image = NULL},
 	{.name = "device_hfsraid_o",            .image = NULL},
+    {.name = "device_hfsraid_yos",          .image = NULL},
+    {.name = "device_hfsraid_yos_o",        .image = NULL},
 	{.name = "device_hfsraid_mav",          .image = NULL},
 	{.name = "device_hfsraid_mav_o",        .image = NULL},
 	{.name = "device_hfsraid_ml",           .image = NULL},
@@ -150,6 +159,7 @@ image_t images[] = {
 	{.name = "device_hfsraid_leo_o",        .image = NULL},
 	{.name = "device_hfsraid_tiger",        .image = NULL},
 	{.name = "device_hfsraid_tiger_o",      .image = NULL},
+    
 	{.name = "device_ext3",                 .image = NULL},
 	{.name = "device_ext3_o",               .image = NULL},
 	{.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -351,6 +361,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+    LOADPNG(device_hfsplus_yos,             iDeviceHFS);
+    LOADPNG(device_hfsplus_yos_o,           iDeviceHFS_yos);
 	LOADPNG(device_hfsplus_mav,             iDeviceHFS);
 	LOADPNG(device_hfsplus_mav_o,           iDeviceHFS_mav);
 	LOADPNG(device_hfsplus_ml,              iDeviceHFS);
@@ -366,6 +378,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+    LOADPNG(device_hfsraid_yos,             iDeviceHFSRAID);
+    LOADPNG(device_hfsraid_yos_o,           iDeviceHFSRAID_yos);
 	LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_mav_o,           iDeviceHFSRAID_mav);
 	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID);
@@ -933,6 +947,11 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 			{
 				// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
 				switch (device->OSVersion[3]) {
+                    case '1':
+                        if ((device->OSVersion[4]) == '0') {
+                        devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+                        break;
+                        }
 					case '9':
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
 						break;

@@ -118,6 +118,8 @@ struct smbus_controllers_t {
 #define SPD_MEMORY_TYPE_SGRAM_DDR			6
 #define SPD_MEMORY_TYPE_SDRAM_DDR			7
 #define SPD_MEMORY_TYPE_SDRAM_DDR2			8
+#define SPD_MEMORY_TYPE_SDRAM_FB_DDR2       9
+#define SPD_MEMORY_TYPE_SDRAM_FBP_DDR2      0xa
 #define SPD_MEMORY_TYPE_SDRAM_DDR3			0xb
 
 /* SPD_MODULE_VOLTAGE values. */
