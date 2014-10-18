@@ -1,0 +1,27 @@
+Chimera 4.0.0 includes the following external changes:
+
+	lzvn code from http://forge.voodooprojects.org/p/chameleon/source/commit/2400/
+	Yosemite diff from http://forge.voodooprojects.org/p/chameleon/issues/375/
+	Yosemite boot loop fix from Piker Alpha
+	
+Files edited:
+	
+i386/boot2/Makefile
+i386/boot2/boot.c
+i386/boot2/boot.h
+i386/boot2/drivers.c
+i386/boot2/gui.c
+i386/boot2/lzss.c
+i386/boot2/lzvn.c
+i386/boot2/options.c
+i386/libsaio/bootstruct.c
+i386/libsaio/console.c
+i386/libsaio/disk.c
+i386/libsaio/fake_efi.c
+i386/libsaio/smbios_getters.c
+i386/libsaio/smbios.c
+
+
+Make.rules Changed to add -Wno-unused-const-variable to CFLAGS
+
+
