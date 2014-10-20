@@ -1,3 +1,7 @@
+- Temp disable klibc module
+- Silence output.
+- Add --no-print-directory.
+- Replace \t with tab.
 - Update Chameleon.xcodeproj
 - ErmaC : Merge LZVN decompression routine by MinusZwei (C Conversion) based on works from Pike R. Alpha and AnV Software (Andy Vandijck).
 - Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.

@@ -18,9 +18,9 @@ OBJS := $(addprefix $(SYMROOT)/, $(OBJS))
 all: $(DIRS_NEEDED) $(OBJS)
 
 $(OBJS): $(SRCROOT)/autoconf.inc
-	@echo "\t[NASM] $(@F)"
+	@echo "	[NASM] $(@F)"
 	@$(NASM) $(@F).s -o $@
 
 clean-local:
-	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "\t[RM] $${o}"; fi; done
+	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "	[RM] $${o}"; fi; done
 	@rm -f $(OBJS)

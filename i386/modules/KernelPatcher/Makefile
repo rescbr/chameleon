@@ -13,7 +13,7 @@ DIR = KernelPatcher
 include ../MakeInc.dir
 
 $(SYMROOT)/modules/$(MODULE_NAME).dylib:
-	@echo "\t[CP] $(MODULE_NAME).dylib"
+	@echo "	[CP] $(MODULE_NAME).dylib"
 	@cp $(MODULE_NAME).dylib $(SRCROOT)/sym/i386/modules/$(MODULE_NAME).dylib
 
 $(SRCROOT)/sym/i386/boot_modules.c:
