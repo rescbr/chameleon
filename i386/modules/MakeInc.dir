@@ -108,7 +108,7 @@ $(SYMROOT)/modules/$(MODULE_NAME).dylib: $(MODULE_OBJS) $(MODULE_DEPENDENCIES) $
 	@echo "	[LD] $(MODULE_NAME).dylib"
 	@ld -arch i386 -undefined dynamic_lookup \
 	-dylib -read_only_relocs suppress \
-	-S -x -Z -dead_strip_dylibs \
+	-S -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
 	-final_output $(MODULE_NAME) \
