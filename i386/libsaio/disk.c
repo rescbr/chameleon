@@ -695,6 +695,15 @@ EFI_GUID const GPT_BASICDATA_GUID	= { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 
 // Microsoft Reserved Partition - E3C9E316-0B5C-4DB8-817DF92DF00215AE
 EFI_GUID const GPT_BASICDATA2_GUID	= { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } }; // 0x0C01 "Microsoft reserved"
 
+// Apple OSX
+//EFI_GUID const GPT_UFS_GUID		= { 0x55465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xA800 "Apple UFS"
+//EFI_GUID const GPT_RAID_GUID		= { 0x52414944, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF01 "Apple RAID"
+//EFI_GUID const GPT_RAID_OFFLINE_GUID	= { 0x52414944, 0x5f4f, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF02 "Apple RAID offline"
+//EFI_GUID const GPT_LABEL_GUID		= { 0x4C616265, 0x6C00, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF03 "Apple label"
+//EFI_GUID const GPT_APPLETV_GUID	= { 0x5265636F, 0x7665, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF04 "Apple TV recovery"
+//EFI_GUID const GPT_CORESTORAGE_GUID	= { 0x53746F72, 0x6167, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF05 "Apple Core storage"
+// same as Apple ZFS
+//EFI_GUID const GPT_ZFS_GUID		= { 0x6A898CC3, 0x1DD2, 0x11B2, { 0x99, 0xA6, 0x08, 0x00, 0x20, 0x73, 0x66, 0x31 } };  // 0xBF01 "Solaris /usr & Apple ZFS
 
 BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                    const gpt_ent * part,
@@ -1039,8 +1048,10 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 			HFSGetDirEntry,
 			HFSGetFileBlock,
 			HFSGetUUID,
+			HFSGetDescription,
+			HFSFree,
 			0,
-			kBIOSDevTypeHardDrive);
+			kBIOSDevTypeHardDrive, 0);
 		bvr->next = map->bvr;
 		map->bvr = bvr;
 		map->bvrcnt++;
@@ -1077,6 +1088,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	{
 		return NULL;
 	}
+	bzero(buffer,BPS);
 
 	/* Check for alternate block size */
 	if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0)
@@ -1095,6 +1107,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 			{
 				return NULL;
 			}
+			bzero(buffer,BPS);
 		}
 		factor = blksize / BPS;
 	}
