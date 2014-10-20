@@ -1035,6 +1035,7 @@ int setupAcpi(void)
 						}
 
 						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
+
 						continue;
 					}
 					if (tableSign(table, "FACP")) {
@@ -1113,6 +1114,7 @@ int setupAcpi(void)
 		DBG("\n");
 
 		// Correct the checksum of RSDP
+
 		DBG("RSDP: Original checksum %d, ", rsdp_mod->Checksum);
 		rsdp_mod->Checksum=0;
 		rsdp_mod->Checksum=256-checksum8(rsdp_mod,20);

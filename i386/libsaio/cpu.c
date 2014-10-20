@@ -106,7 +106,7 @@ static uint64_t measure_tsc_frequency(void)
 	unsigned long pollCount;
 	uint64_t retval = 0;
 	int i;
-	
+
 	/* Time how many TSC ticks elapse in 30 msec using the 8254 PIT
 	 * counter 2. We run this loop 3 times to make sure the cache
 	 * is hot and we take the minimum delta from all of the runs.
@@ -176,7 +176,7 @@ static uint64_t measure_aperf_frequency(void)
 	unsigned long pollCount;
 	uint64_t retval = 0;
 	int i;
-	
+
 	/* Time how many APERF ticks elapse in 30 msec using the 8254 PIT
 	 * counter 2. We run this loop 3 times to make sure the cache
 	 * is hot and we take the minimum delta from all of the runs.
@@ -210,7 +210,7 @@ static uint64_t measure_aperf_frequency(void)
 	/* mperfDelta is now the least number of MPERF ticks the processor made in
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
-	
+
 	if (aperfDelta > (1ULL<<32)) {
 		retval = 0;
 	} else {
@@ -244,9 +244,11 @@ void scan_cpu(PlatformInfo_t *p)
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]);
+
 	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]);
 	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]);
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
+
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
 	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) {
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
@@ -321,13 +323,13 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
 
-	/* get brand string (if supported) */
+	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
 	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004) {
 		uint32_t	reg[4];
 		char		str[128], *s;
 		/*
-		 * The brand string 48 bytes (max), guaranteed to
+		 * The BrandString 48 bytes (max), guaranteed to
 		 * be NULL terminated.
 		 */
 		do_cpuid(0x80000002, reg);
@@ -352,7 +354,7 @@ void scan_cpu(PlatformInfo_t *p)
 			p->CPU.BrandString[0] = '\0';
 		}
 	}
-	
+
 	/* setup features */
 	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
 		p->CPU.Features |= CPU_FEATURE_MMX;

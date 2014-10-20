@@ -23,7 +23,8 @@
 
 /*************************************************************************************************/
 
-typedef struct png_alloc_node {
+typedef struct png_alloc_node
+{
 	struct png_alloc_node *prev, *next;
 	void *addr;
 	size_t size;
@@ -32,31 +33,54 @@ typedef struct png_alloc_node {
 png_alloc_node_t *png_alloc_head = NULL;
 png_alloc_node_t *png_alloc_tail = NULL;
 
+//==============================================================================
+
 png_alloc_node_t *png_alloc_find_node(void *addr)
 {
 	png_alloc_node_t *node;
+
 	for (node = png_alloc_head; node; node = node->next)
+	{
 		if (node->addr == addr)
+		{
 			break;
+		}
+	}
+
 	return node;
 }
+
+
+//==============================================================================
 
 void png_alloc_add_node(void *addr, size_t size)
 {
 	png_alloc_node_t *node;
+
 	if (png_alloc_find_node(addr))
+	{
 		return;
-	node = malloc(sizeof (png_alloc_node_t));
+	}
+
+	node = malloc(sizeof(png_alloc_node_t));
 	node->addr = addr;
 	node->size = size;
 	node->prev = png_alloc_tail;
 	node->next = NULL;
 	png_alloc_tail = node;
+
 	if (node->prev)
+	{
 		node->prev->next = node;
+	}
+
 	if (!png_alloc_head)
+	{
 		png_alloc_head = node;
+	}
 }
+
+//==============================================================================
 
 void png_alloc_remove_node(png_alloc_node_t *node)
 {

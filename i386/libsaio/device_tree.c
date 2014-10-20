@@ -403,7 +403,7 @@ Property *
 DT__GetProperty(Node *node, const char *name)
 {
 	Property *prop;
-    
+
 	for (prop = node->properties; prop; prop = prop->next)
 	{
 		if (strcmp(prop->name, name) == 0)
@@ -411,7 +411,7 @@ DT__GetProperty(Node *node, const char *name)
 			return prop;
 		}
 	}
-    
+
 	return NULL;
 }
 

@@ -105,13 +105,11 @@ void load_all_modules()
 	long flags;
 	long time;
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
-
 	if(!moduleDir)
 	{
 		verbose("Warning: Unable to open modules folder at '/Extra/modules/'. Ingoring modules.\n");
 		return;
 	}
-
 	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0) {
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {
 			char* tmp = malloc(strlen(name) + 1);

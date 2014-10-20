@@ -322,7 +322,7 @@ find_boot:
 											        ; signature check.
     jmp     .tryToBoot
 
-.Pass2:    
+.Pass2:
     cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
                                                     ; equipped with boot1h in its boot record
                                                     ; regardless if it's active or not.
@@ -740,7 +740,7 @@ print_hex:
 
     popad
     ret
-	
+
 print_nibble:
     and     al, 0x0f
     add     al, '0'

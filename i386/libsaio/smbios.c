@@ -267,7 +267,7 @@ SMBValueSetter SMBSetters[] =
 		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber }, // SMboardserial - C02140302D5DMT31M
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTag),
-		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassetag - Base Board Asset Tag#
+		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassettag - Base Board Asset Tag#
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
 		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component

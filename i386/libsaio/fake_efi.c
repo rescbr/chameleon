@@ -93,6 +93,8 @@ EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
+// ==========================================================================
+
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
@@ -145,6 +147,8 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	}
 	return EFI_UNSUPPORTED;
 }
+
+// ==========================================================================
 
 //Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)

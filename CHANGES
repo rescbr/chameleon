@@ -1,3 +1,4 @@
+- Typo
 - Make compile on gcc w/ errors enabled.
 - Remove the '-x' option from the offending 'ld' command
 - Makefile dependency missing for boot0 and boot1h

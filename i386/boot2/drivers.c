@@ -846,8 +846,7 @@ static char gPlatformName[64];
 
 char *gDarwinBuildVerStr = "Darwin Kernel Version"; // Bungo
 
-long
-DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
+long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
 	long ret = 0;
 	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;

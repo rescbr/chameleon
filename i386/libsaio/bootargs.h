@@ -109,8 +109,8 @@ typedef struct Boot_Video	Boot_Video;
 
 /* Snapshot constants of previous revisions that are supported */
 
-#define kBootArgsEfiMode32		32
-#define kBootArgsEfiMode64		64
+#define kBootArgsEfiMode32              32
+#define kBootArgsEfiMode64              64
 
 typedef struct boot_args {
     uint16_t    Revision;	/* Revision of boot_args structure */
