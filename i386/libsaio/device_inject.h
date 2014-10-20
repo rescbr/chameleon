@@ -22,6 +22,8 @@ struct ACPIDevPath {
 	uint16_t	length;		// = 0x0c
 	uint32_t	_HID;		// = 0xD041030A ?
 	uint32_t	_UID;		// = 0x00000000 PCI ROOT
+	uint32_t	_CID;		// = Optional variable length
+
 };
 
 struct PCIDevPath {

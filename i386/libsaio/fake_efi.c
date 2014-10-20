@@ -74,8 +74,9 @@ static uint64_t ptov64(uint32_t addr)
 
 /* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
-static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
-
+// Bungo
+//static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
+static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
 // Bungo
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
@@ -438,12 +439,15 @@ static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
 static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
+static const char EFI_MODE_PROP[] = "efi-mode";  //Bungo
 static const char SYSTEM_ID_PROP[] = "system-id";
 static const char SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
-
+static const char DEV_PATH_SUP[] = "DevicePathsSupported";
+static EFI_UINT32 DevPathSup = 1;
+static EFI_UINT32 MachineSig = 0;  //Bungo
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
@@ -566,18 +570,17 @@ void setupEfiDeviceTree(void)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
-
-	if (archCpuType == CPU_TYPE_I386)
-	{
+/* Bungo
+	if (archCpuType == CPU_TYPE_I386) {
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
-	}
-	else
-	{
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char*)FIRMWARE_ABI_64_PROP_VALUE);
-	}
+	} else { */
+		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
+//	}
 
-	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32*)&FIRMWARE_REVISION);
-	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16*)FIRMWARE_VENDOR);
+	DT__AddProperty(node, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
+
+	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32 *)&FIRMWARE_REVISION);
+	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)FIRMWARE_VENDOR);
 
 	// TODO: Fill in other efi properties if necessary
 
@@ -585,23 +588,25 @@ void setupEfiDeviceTree(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 
-	if (archCpuType == CPU_TYPE_I386)
-	{
+	if (archCpuType == CPU_TYPE_I386) {
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
 
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
-	}
-	else
-	{
+	} else {
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
 	}
 
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
 	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
+
+	// New node: /efi/kernel-compatibility
+	Node *efiKernelComNode = DT__AddChild(node, "kernel-compatibility");
+	len = 1;
+	DT__AddProperty(efiKernelComNode, "x86_64", sizeof(uint32_t), (EFI_UINT32 *)&len);
 
 	// Now fill in the /efi/platform Node
 	Node *efiPlatformNode = DT__AddChild(node, "platform");
@@ -610,46 +615,37 @@ void setupEfiDeviceTree(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 
-	if (Platform.CPU.FSBFrequency != 0)
-	{
+	if (Platform.CPU.FSBFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
 	}
 
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform.CPU.TSCFrequency != 0)
-	{
+	if (Platform.CPU.TSCFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 	}
 
-	if (Platform.CPU.CPUFrequency != 0)
-	{
+	if (Platform.CPU.CPUFrequency != 0) {
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
+	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(EFI_UINT32), &DevPathSup);
+
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID()))
-	{
+	if ((ret=getSystemID())) {
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
 	*/
 
-	// Bungo
-	//if (Platform.UUID)
-	//{
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
-	//}
-	//
+	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
 	// Export SystemSerialNumber if present
-	if ((ret16=getSmbiosChar16("SMserial", &len)))
-	{
+	if ((ret16=getSmbiosChar16("SMserial", &len))) {
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
 	}
 
 	// Export Model if present
-	if ((ret16=getSmbiosChar16("SMproductname", &len)))
-	{
+	if ((ret16=getSmbiosChar16("SMproductname", &len))) {
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 	}
 
@@ -688,11 +684,19 @@ void setupChosenNode()
 		stop("Couldn't get chosen node");
 	}
 
-	int bootUUIDLength = strlen(gBootUUIDString);
-	if (bootUUIDLength)
+	int length = strlen(gBootUUIDString);
+	if (length)
 	{
-		DT__AddProperty(chosenNode, "boot-uuid", bootUUIDLength + 1, gBootUUIDString);
+		DT__AddProperty(chosenNode, "boot-uuid", length + 1, gBootUUIDString);
 	}
+
+	length = strlen(bootArgs->CommandLine);
+	DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+
+	length = strlen(bootInfo->bootFile);
+	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+
+	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 }
 
 /*
@@ -790,7 +794,7 @@ void saveOriginalSMBIOS(void)
 	}
 
 	memcpy(tableAddress, (void *)origeps->dmi.tableAddress, origeps->dmi.tableLength);
-	DT__AddProperty(node, "SMBIOS-ORIG", origeps->dmi.tableLength, tableAddress);  // Bungo: changed from SMBIOS to SMBIOS-ORIG to differentiate
+	DT__AddProperty(node, "SMBIOS", origeps->dmi.tableLength, tableAddress);
 }
 
 /*

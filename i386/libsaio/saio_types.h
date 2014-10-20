@@ -70,7 +70,7 @@ typedef struct Tag Tag, *TagPtr;
 
 typedef struct {
 	char	plist[IO_CONFIG_DATA_SIZE];	// buffer for plist
-	TagPtr	dictionary;     		// buffer for xml dictionary
+	TagPtr	dictionary;			// buffer for xml dictionary
 	bool	canOverride;			// flag to mark a dictionary can be overriden
 } config_file_t;
 
@@ -151,13 +151,13 @@ typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
 typedef void (*BVFree)(CICell ih);
 
 struct iob {
-	unsigned int   i_flgs;			/* see F_* below */
-	unsigned int   i_offset;		/* seek byte offset in file */
-	int			   i_filesize;		/* size of file */
-	char *		   i_buf;			/* file load address */
+	char *         i_buf;           /* file load address */
+	unsigned int   i_flgs;          /* see F_* below */
+	unsigned int   i_offset;        /* seek byte offset in file */
+	int            i_filesize;      /* size of file */
 };
 
-#define BPS		   512				/* sector size of the device */
+#define BPS	   512				/* sector size of the device */
 #define F_READ	   0x1				/* file opened for reading */
 #define F_WRITE	   0x2				/* file opened for writing */
 #define F_ALLOC	   0x4				/* buffer allocated */
@@ -169,7 +169,7 @@ struct iob {
 struct dirstuff {
 	char *		   dir_path;		/* directory path */
 	long long	   dir_index;		/* directory entry index */
-	BVRef		   dir_bvr;			/* volume reference */
+	BVRef		   dir_bvr;		/* volume reference */
 };
 
 #define BVSTRLEN 32
@@ -212,12 +212,13 @@ enum {
 	kBVFlagBootable			= 0x08,
 	kBVFlagEFISystem		= 0x10,
 	kBVFlagBooter			= 0x20,
-	kBVFlagSystemVolume		= 0x40
+	kBVFlagSystemVolume		= 0x40,
+	kBVFlagInstallVolume		= 0x80
 };
 
 enum {
 	kBIOSDevTypeFloppy		= 0x00,
-	kBIOSDevTypeHardDrive	= 0x80,
+	kBIOSDevTypeHardDrive		= 0x80,
 	kBIOSDevTypeNetwork		= 0xE0,
 	kBIOSDevUnitMask		= 0x0F,
 	kBIOSDevTypeMask		= 0xF0,
@@ -225,22 +226,28 @@ enum {
 };
 
 enum {
-	kPartitionTypeHFS		= 0xAF,
-	kPartitionTypeHPFS		= 0x07,
-	kPartitionTypeFAT16		= 0x06,
-	kPartitionTypeFAT32		= 0x0c,
-	kPartitionTypeEXT3		= 0x83,
-	kPartitionTypeBEFS		= 0xEB,
-	kPartitionTypeFreeBSD		= 0xa5,
-	kPartitionTypeOpenBSD		= 0xa6
+	//KPartitionTypeFAT12		= 0x01,     // FAT12
+	kPartitionTypeHPFS		= 0x07,     // Mac OS X
+	kPartitionTypeFAT16		= 0x06,     // FAT16
+	kPartitionTypeFAT32		= 0x0C,     // FAT32
+	kPartitionTypeEXT3		= 0x83,     // Linux
+	kPartitionTypeOSXBoot		= 0xAB,     // Mac OS X Boot partition
+	kPartitionTypeFreeBSD		= 0xA5,     // FreeBSD
+	kPartitionTypeOpenBSD		= 0xA6,     // OpenBSD
+	//kPartitionTypeNeXTSTEP	= 0xA7      // NeXTSTEP
+	//kPartitionTypeNetBSD		= 0xA9      // NetBSD
+	kPartitionTypeHFS		= 0xAF,     // Mac OS X
+	//kPartitionTypeSolaris		= 0xBE,	    // Solaris
+	kPartitionTypeBEFS		= 0xEB,     // BeOS BFS
+	//kPartitionTypeBeOS		= 0xEB,     // BeOS BFS
+	//kPartitionTypeSkyOS		= 0xEC,     // SkyOS
 };
 
 //#define BIOS_DEV_TYPE(d)	((d) & kBIOSDevTypeMask)
 #define BIOS_DEV_UNIT(bvr)	((bvr)->biosdev - (bvr)->type)
 
-/*
- * KernBootStruct device types.
- */
+// KernBootStruct device types.
+
 enum {
 	DEV_SD = 0,
 	DEV_HD = 1,
@@ -271,7 +278,7 @@ enum {
 }; //gBootFileType_t;
 
 enum {
-	kCursorTypeHidden	 = 0x0100,
+	kCursorTypeHidden    = 0x0100,
 	kCursorTypeUnderline = 0x0607
 };
 

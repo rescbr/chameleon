@@ -29,6 +29,16 @@
 #include "libsaio.h"
 #include "bootstruct.h"
 
+#ifndef DEBUG_BOOTSTRUCT
+#define DEBUG_BOOTSTRUCT 0
+#endif
+
+#if DEBUG_BOOTSTRUCT
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
+
 /*==========================================================================
  * Initialize the structure of parameters passed to
  * the kernel by the booter.
@@ -52,7 +62,7 @@ void initKernBootStruct( void )
 		bootArgs = (boot_args *)malloc(sizeof(boot_args));
 		bootArgsPreLion = (boot_args_pre_lion *)malloc(sizeof(boot_args_pre_lion));
 		bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
-		if (bootArgs == 0 || bootInfo == 0)
+		if (bootArgs == 0 || bootArgsPreLion == 0 || bootInfo == 0)
 			stop("Couldn't allocate boot info\n");
 		
 		bzero(bootArgs, sizeof(boot_args));
@@ -115,9 +125,7 @@ reserveKernBootStruct(void)
 		void *oldAddr = bootArgs;
 		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
 		bcopy(oldAddr, bootArgs, sizeof(boot_args));
-	}
-	else
-	{
+	} else {
 		void *oldAddr = bootArgsPreLion;
 		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
 		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
@@ -146,7 +154,8 @@ finalizeBootStruct(void)
 	bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
 	bootArgs->MemoryMapDescriptorVersion = 0;
 	
-	for (i = 0; i < memoryMapCount; i++, memoryMap++) {
+	for (i = 0; i < memoryMapCount; i++, memoryMap++)
+	{
 		range = &bootInfo->memoryMap[i];
 		switch(range->type) {
 			case kMemoryRangeACPI:

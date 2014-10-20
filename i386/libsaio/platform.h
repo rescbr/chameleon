@@ -31,14 +31,14 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MAX			10
 
 #define CPU_MODEL_PRESCOTT		0x03			// Celeron D, Pentium 4 (90nm)
-#define CPU_MODEL_NOCONA		0x04			// Xeon Nocona, Irwindale (90nm)
+#define CPU_MODEL_NOCONA		0x04			// Xeon Nocona/Paxville, Irwindale (90nm)
 #define CPU_MODEL_PRESLER		0x06			// Pentium 4, Pentium D (65nm)
-#define CPU_MODEL_PENTIUM_M		0x09			// Banias
-#define CPU_MODEL_DOTHAN		0x0D			// Dothan
+#define CPU_MODEL_PENTIUM_M		0x09			// Banias Pentium M (130nm)
+#define CPU_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
 #define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
 #define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
 #define CPU_MODEL_CONROE		0x0F			// 
-#define CPU_MODEL_CELERON		0x16			// 
+#define CPU_MODEL_CELERON		0x16			// Merom, Conroe (65nm)
 #define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPU_MODEL_WOLFDALE		0x17			// 
 #define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
@@ -58,7 +58,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPU_MODEL_HASWELL		0x3C			// Haswell DT
 #define CPU_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
-#define CPU_MODEL_HASWELL_MB		0x3F			// Haswell MB
+#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell MB
 //#define CPU_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPU_MODEL_HASWELL_ULT		0x45			// Haswell ULT
 #define CPU_MODEL_CRYSTALWELL		0x46			// Haswell ULX
@@ -137,7 +137,7 @@ typedef struct _PlatformInfo_t {
 		uint32_t		Vendor;					// Vendor
 		uint32_t		Signature;				// Processor Signature
 		uint32_t		Stepping;				// Stepping
-		uint32_t		Type;					// Type
+		//uint16_t		Type;					// Type
 		uint32_t		Model;					// Model
 		uint32_t		ExtModel;				// Extended Model
 		uint32_t		Family;					// Family
@@ -145,16 +145,16 @@ typedef struct _PlatformInfo_t {
 		uint32_t		NoCores;				// No Cores per Package
 		uint32_t		NoThreads;				// Threads per Package
 		uint8_t			MaxCoef;				// Max Multiplier
-		uint8_t			MaxDiv;
+		uint8_t			MaxDiv;					// Min Multiplier
 		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;			// TSC Frequency Hz
-		uint64_t		FSBFrequency;			// FSB Frequency Hz
-		uint64_t		CPUFrequency;			// CPU Frequency Hz
+		uint64_t		TSCFrequency;				// TSC Frequency Hz
+		uint64_t		FSBFrequency;				// FSB Frequency Hz
+		uint64_t		CPUFrequency;				// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
-		char			BrandString[48];		// 48 Byte Branding String
-		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
+		char			BrandString[48];			// 48 Byte Branding String
+		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
 	} CPU;
 
 	struct RAM {
@@ -177,7 +177,7 @@ typedef struct _PlatformInfo_t {
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;
 } PlatformInfo_t;
 

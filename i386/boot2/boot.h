@@ -40,6 +40,10 @@
 #define kLionInstallerDataFolder      "/Mac OS X Install Data/"
 #define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
 
+// Mountain Lion installer
+#define kMLionInstallerDataFolder      "/OS X Install Data/"
+#define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+
 /*
  * Keys used in system Boot.plist
  */
@@ -144,6 +148,7 @@
 
 /* ErmaC: added these keys */
 #define kEnableDualLink		"EnableDualLink"	/* nvidia.c && gma.c*/
+#define kNvidiaGeneric		"NvidiaGeneric"		/* nvidia.c */
 #define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
 #define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
 #define kSkipAtiGfx		"SkipAtiGfx"		/* pci_setup.c */
@@ -156,6 +161,10 @@
 
 /* Karas: added these keys */
 #define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
+
+/* Bungo: added these keys */
+// mask private data or no
+#define kPrivateData		"PrivateData"		/* smbios_decode.c */
 
 /*
  * Flags to the booter or kernel
@@ -243,6 +252,7 @@ extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, i
 /*
  * drivers.c
  */
+extern char *gDarwinBuildVerStr; // Bungo
 extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
@@ -276,7 +286,14 @@ typedef struct {
 /*
  * lzss.c
  */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+extern int decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen);
+extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+
+/*
+ * lzvn.c
+ */
+extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
+// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
 
 struct compressed_kernel_header {
 	u_int32_t signature;
@@ -287,7 +304,7 @@ struct compressed_kernel_header {
 	u_int32_t reserved[11];
 	char      platform_name[64];
 	char      root_path[256];
-	 u_int8_t  data[0];
+	u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 

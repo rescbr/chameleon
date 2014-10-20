@@ -19,7 +19,7 @@ PNGOPTIONS = -rem cHRM -rem gAMA -rem iCCP -rem sRGB
 DIR = boot2
 include ${SRCROOT}/Make.rules
 
-OPTIM = -Os -Oz
+OPTIM = $(CONFIG_OPTIMIZATION_LEVEL)
 CFLAGS	= $(RC_CFLAGS) $(OPTIM) $(MORECPP) -arch i386 -g -Wmost -Werror \
 		-fno-builtin -DSAIO_INTERNAL_USER -static $(OMIT_FRAME_POINTER_CFLAG) -fno-stack-protector \
 		-march=pentium4 -msse2 -msoft-float -nostdinc -include $(SRCROOT)/autoconf.h
@@ -42,7 +42,7 @@ OTHER_FILES =
 
 # The ordering is important;
 # boot2.o must be first.
-OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o mboot.o \
+OBJS = boot2.o boot.o graphics.o drivers.o prompt.o options.o lzss.o lzvn.o mboot.o \
 	   ramdisk.o picopng.o resume.o bmdecompress.o graphic_utils.o gui.o modules.o \
 	   modules_support.o boot_modules.o
 # button.o browser.o scrollbar.o == NOTYET

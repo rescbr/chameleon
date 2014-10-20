@@ -304,7 +304,7 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 	}
 
 	dirID = kHFSRootFolderID;
-	// Skip a lead '\'.  Start in the system folder if there are two.
+	// Skip a lead '/'.  Start in the system folder if there are two.
 	if (filePath[0] == '/')
 	{
 		if (filePath[1] == '/')
@@ -370,7 +370,7 @@ long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** nam
     if (*dirIndex == -1) return -1;
 
     dirID = kHFSRootFolderID;
-    // Skip a lead '\'.  Start in the system folder if there are two.
+    // Skip a lead '/'.  Start in the system folder if there are two.
     if (dirPath[0] == '/') {
         if (dirPath[1] == '/') {
             if (gIsHFSPlus) dirID = SWAP_BE32(((long *)gHFSPlus->finderInfo)[5]);
@@ -435,7 +435,7 @@ HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     if (HFSInitPartition(ih) == -1) return -1;
 
     dirID = kHFSRootFolderID;
-    // Skip a lead '\'.  Start in the system folder if there are two.
+    // Skip a lead '/'.  Start in the system folder if there are two.
     if (filePath[0] == '/') {
         if (filePath[1] == '/') {
             if (gIsHFSPlus) dirID = SWAP_BE32(((long *)gHFSPlus->finderInfo)[5]);

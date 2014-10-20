@@ -67,6 +67,9 @@ DT__FreeNode(Node *node);
 extern char *
 DT__GetName(Node *node);
 
+extern Property *
+DT__GetProperty(Node *node, const char *name);
+
 void
 DT__Initialize(void);
 

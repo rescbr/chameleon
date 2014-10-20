@@ -33,10 +33,14 @@
 #define MENU_SHOW_VIDEO_INFO		5
 #define MENU_SHOW_HELP			6
 
+// ====================================================================
+
 enum {
 	HorizontalLayout	= 0,
 	VerticalLayout		= 1,
 };
+
+// ====================================================================
 
 /*
  * Menu item structure.
@@ -49,6 +53,8 @@ typedef struct {
 	bool		expandable;
 } menuitem_t;
 
+// ====================================================================
+
 /*
  * Image structure.
  */
@@ -57,6 +63,8 @@ typedef struct {
 	char		name[32];
 } image_t;
 
+// ====================================================================
+
 /*
  * Font structure.
  */
@@ -64,8 +72,10 @@ typedef struct {
 	uint16_t	height;			// Font Height 
 	uint16_t	width;			// Font Width for monospace font only
 	pixmap_t	*chars[CHARACTERS_COUNT];
-	uint16_t    count;          // Number of chars in font
+	uint16_t	count;			// Number of chars in font
 } font_t;
+
+// ====================================================================
 
 /*
  * Window structure.
@@ -86,7 +96,9 @@ typedef struct
 	uint32_t	font_console_color;	// Color for consle font AARRGGBB
 	bool		draw;			// Draw flag
 } window_t;
-	
+
+// ====================================================================
+
 /*
  * gui structure
  */

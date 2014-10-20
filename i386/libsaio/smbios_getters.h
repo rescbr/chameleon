@@ -10,15 +10,15 @@
 #define SMBIOS_RANGE_START      0x000F0000
 #define SMBIOS_RANGE_END        0x000FFFFF
 
-#define NOT_AVAILABLE			"N/A"
+#define NOT_AVAILABLE		"N/A"
 
 typedef enum
 {
 	kSMBString,
 	kSMBByte,
 	kSMBWord,
-	kSMBDWord
-//	kSMBQWord
+	kSMBDWord,
+	kSMBQWord
 } SMBValueType;
 
 typedef union
@@ -27,7 +27,7 @@ typedef union
 	uint8_t		byte;
 	uint16_t	word;
 	uint32_t	dword;
-//	uint64_t	qword;
+	uint64_t	qword;
 } returnType;
 
 extern bool getProcessorInformationExternalClock(returnType *value);

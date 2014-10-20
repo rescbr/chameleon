@@ -1572,7 +1572,8 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 		
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		{
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
@@ -1582,15 +1583,18 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 	}
 	
-	if(!valid) {
+	if(!valid)
+	{
 		int fh = -1;
 		sprintf(dirSpec, "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		fh = open(dirSpec, 0);
 
-		if (fh >= 0) {
+		if (fh >= 0)
+		{
 			valid = true;
 			bvr->OSisInstaller = true;
 			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+			close(fh);
 		} else {
 			close(fh);
 		}

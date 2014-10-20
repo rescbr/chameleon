@@ -104,10 +104,11 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
         {
           binChar = 0;
           
-          for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
-          {
-            if (hexNibbleIdx > 0) binChar = binChar << 4;
-            
+          for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++) {
+            if (hexNibbleIdx > 0) {
+			binChar = binChar << 4;
+		}
+
             if (hexByte[hexNibbleIdx] <= '9') binChar += hexByte[hexNibbleIdx] - '0';
             else if (hexByte[hexNibbleIdx] <= 'F') binChar += hexByte[hexNibbleIdx] - ('A' - 10);
             else if (hexByte[hexNibbleIdx] <= 'f') binChar += hexByte[hexNibbleIdx] - ('a' - 10);

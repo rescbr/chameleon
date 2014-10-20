@@ -88,44 +88,45 @@ const char *conf_get_autoconfig_name(void)
 /* TODO: figure out if symbols are always null-terminated */
 static char *conf_expand_value(const char *in)
 {
-  static char res_value[SYMBOL_MAXLENGTH + 1];
-  char name[SYMBOL_MAXLENGTH];
-  size_t res_rem = SYMBOL_MAXLENGTH;
-  char *res_ptr = res_value;
-  const char *src;
-  *res_ptr = 0;
-  res_ptr[SYMBOL_MAXLENGTH] = 0;
+	static char res_value[SYMBOL_MAXLENGTH + 1];
+	char name[SYMBOL_MAXLENGTH];
+	size_t res_rem = SYMBOL_MAXLENGTH;
+	char *res_ptr = res_value;
+	const char *src;
+	*res_ptr = 0;
+	res_ptr[SYMBOL_MAXLENGTH] = 0;
+	while ((src = strchr(in, '$'))) {
+		struct symbol *sym;
+		const char *symval;
+		char *name_ptr = name;
+		size_t n = min(res_rem, src - in);
 
-  while ((src = strchr(in, '$'))) {
-    struct symbol *sym;
-    const char *symval;
-    char *name_ptr = name;
-    size_t n = min(res_rem, src - in);
+		res_ptr = stpncpy(res_ptr, in, n);
+		if (!(res_rem -= n)) {
+			return res_value; /* buffer full, quit now */
+		}
+		src++;
 
-    res_ptr = stpncpy(res_ptr, in, n);
-    if (!(res_rem -= n))
-      return res_value; /* buffer full, quit now */
-    src++;
+		*name_ptr = 0;
+		while (isalnum(*src) || *src == '_') {
+			*name_ptr++ = *src++;
+		}
+		*name_ptr = 0;
 
-    *name_ptr = 0;
-    while (isalnum(*src) || *src == '_')
-      *name_ptr++ = *src++;
-    *name_ptr = 0;
+		sym = sym_lookup(name, 0);
+		sym_calc_value(sym);
+		symval = sym_get_string_value(sym);
+		n = min(res_rem, strlen(symval));
 
-    sym = sym_lookup(name, 0);
-    sym_calc_value(sym);
-    symval = sym_get_string_value(sym);
-    n = min(res_rem, strlen(symval));
+		res_ptr = stpncpy(res_ptr, symval, n);
+		if (!(res_rem -= n)) {
+			return res_value; /* buffer full, quit now */
+		}
+		in = src;
+	}
 
-    res_ptr = stpncpy(res_ptr, symval, n);
-    if (!(res_rem -= n))
-      return res_value; /* buffer full, quit now */
-
-    in = src;
-  }
-
-  strncpy(res_ptr, in, res_rem + 1);
-  return res_value;
+	strncpy(res_ptr, in, res_rem + 1);
+	return res_value;
 }
 
 char *conf_get_default_confname(void)
@@ -137,7 +138,7 @@ char *conf_get_default_confname(void)
 	name = conf_expand_value(conf_defname);
 	env = getenv(SRCTREE);
 	if (env) {
-    snprintf(fullname, PATH_MAX+1, "%s/%s", env, name);
+		snprintf(fullname, PATH_MAX+1, "%s/%s", env, name);
 		if (!stat(fullname, &buf))
 			return fullname;
 	}
@@ -597,38 +598,41 @@ int conf_write(const char *name)
 		char *slash;
 
 		if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
-          /* FIXME: add length check */
-          strcpy(stpcpy(dirname, name), "/");
-          basename = conf_get_configname();
+			/* FIXME: add length check */
+			strcpy(stpcpy(dirname, name), "/");
+			basename = conf_get_configname();
 		} else if ((slash = strrchr(name, '/'))) {
 			size_t size = slash - name + 1;
 			memcpy(dirname, name, size);
 			dirname[size] = 0;
-			if (slash[1])
+			if (slash[1]) {
 				basename = slash + 1;
-			else
+			} else {
 				basename = conf_get_configname();
-		} else
+			}
+		} else {
 			basename = name;
-	} else
+		}
+	} else {
 		basename = conf_get_configname();
-
+	}
 	snprintf(newname, PATH_MAX+1, "%s%s", dirname, basename);
 	env = getenv("KCONFIG_OVERWRITECONFIG");
 	if (!env || !*env) {
-      snprintf(tmpname, PATH_MAX+1, "%s.tmpconfig.%d", dirname, (int)getpid());
-      out = fopen(tmpname, "w");
+		snprintf(tmpname, PATH_MAX+1, "%s.tmpconfig.%d", dirname, (int)getpid());
+		out = fopen(tmpname, "w");
 	} else {
 		*tmpname = 0;
 		out = fopen(newname, "w");
 	}
-	if (!out)
+	if (!out) {
 		return 1;
-
+	}
 	time(&now);
 	env = getenv("KCONFIG_NOTIMESTAMP");
-	if (env && *env)
+	if (env && *env) {
 		use_timestamp = 0;
+	}
 
 	fprintf(out, _("#\n"
 		       "# Automatically generated make config: don't edit\n"
@@ -667,9 +671,9 @@ next:
 			menu = menu->list;
 			continue;
 		}
-		if (menu->next)
+		if (menu->next) {
 			menu = menu->next;
-		else while ((menu = menu->parent)) {
+		} else while ((menu = menu->parent)) {
 			if (menu->next) {
 				menu = menu->next;
 				break;
@@ -682,8 +686,9 @@ next:
 		strcat(dirname, basename);
 		strcat(dirname, ".old");
 		rename(newname, dirname);
-		if (rename(tmpname, newname))
+		if (rename(tmpname, newname)) {
 			return 1;
+		}
 	}
 
 //	conf_message(_("configuration written to %s"), newname);
