@@ -1,3 +1,4 @@
+- Makefile dependency missing for boot0 and boot1h
 - Temp disable klibc module
 - Silence output.
 - Add --no-print-directory.

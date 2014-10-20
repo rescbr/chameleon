@@ -32,6 +32,9 @@ PROGRAMS := $(addprefix $(SYMROOT)/, $(PROGRAMS))
 all: $(DIRS_NEEDED) $(PROGRAMS)
 
 
+#To rebuild boot1h if boot1h.s is touched
+$(SYMROOT)/boot1h: boot1h.s
+
 $(PROGRAMS): $(SRCROOT)/autoconf.inc
 	@echo "	[NASM] $(@F)" 
 	@$(NASM) $(@F).s -o $@
