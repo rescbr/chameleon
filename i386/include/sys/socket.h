@@ -514,6 +514,7 @@ struct cmsghdr {
  * peer from lying about its identity. (Note that cmcred_groups[0]
  * is the effective GID.)
  */
+#if 0
 struct cmsgcred {
 	pid_t	cmcred_pid;		/* PID of sending process */
 	uid_t	cmcred_uid;		/* real UID of sending process */
@@ -522,6 +523,7 @@ struct cmsgcred {
 	short	cmcred_ngroups;		/* number or groups */
 	gid_t	cmcred_groups[CMGROUP_MAX];	/* groups */
 };
+#endif
 #endif
 #endif	/* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
 
