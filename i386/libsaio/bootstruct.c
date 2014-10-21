@@ -118,15 +118,17 @@ void initKernBootStruct( void )
 
 void reserveKernBootStruct(void)
 {
-	if ( LION || MOUNTAIN_LION || MAVERICKS )
+	if ( TIGER || LEOPARD || SNOW_LEOPARD )
 	{
-		void *oldAddr = bootArgs;
-		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
-		bcopy(oldAddr, bootArgs, sizeof(boot_args));
-	} else {
+		// for 10.4 10.5 10.6
 		void *oldAddr = bootArgsPreLion;
 		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
 		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
+	} else {
+		// for 10.7 10.8 10.9 10.10
+		void *oldAddr = bootArgs;
+		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
+		bcopy(oldAddr, bootArgs, sizeof(boot_args));
 	}
 }
 

@@ -54,6 +54,10 @@
 #define kMLionInstallerDataFolder      "/OS X Install Data/"
 #define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
 
+//kernel path
+#define kDefaultKernelPathPreYos	"/"
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite
+
 /*
  * Keys used in system Boot.plist
  */
@@ -80,6 +84,7 @@
 #define kScanSingleDriveKey	"Scan Single Drive"
 #define kInstantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
+#define kOSXKernel		"kernel"		// Yosemite
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
 #define kShowInfoKey		"ShowInfo"		/* gui.c */

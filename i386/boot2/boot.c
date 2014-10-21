@@ -207,9 +207,14 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ( LION || MOUNTAIN_LION || MAVERICKS )
+	if (TIGER || LEOPARD || SNOW_LEOPARD)
 	{
+		// Notify modules that the kernel is about to be started
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
 
+		startprog( kernelEntry, bootArgsPreLion );
+
+	} else {
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
@@ -218,11 +223,6 @@ static int ExecKernel(void *binary)
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
 
 		startprog( kernelEntry, bootArgs );
-	} else {
-		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
-
-		startprog( kernelEntry, bootArgsPreLion );
 	}
 
 	// Not reached
@@ -251,11 +251,16 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
 		verbose("Specified kernel cache file path = %s\n", cacheFile);
 	} else {
-		// Lion, Mountain Lion and Mavericks prelink kernel cache file
-		if ( LION || MOUNTAIN_LION || MAVERICKS )
+		// Leopard prelink kernel cache file
+		if (TIGER || LEOPARD)
 		{
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("10.7, 10.8 & 10.9 kernel cache file path = %s\n", kernelCacheFile);		}
+			// Reset cache name.
+			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+			snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
+			verbose("Reseted kernel cache file path = %s\n", kernelCacheFile);
+		}
 		// Snow Leopard prelink kernel cache file
 		else if ( SNOW_LEOPARD ) {
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
@@ -280,14 +285,10 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 			}
 			closedir(cacheDir);
 		} else {
-			// Reset cache name.
-			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-			snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64,
-				"%s,%s",
-				gRootDevice, bootInfo->bootFile);
-			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
-			verbose("Reseted kernel cache file path = %s\n", kernelCacheFile);
+			// Lion, Mountain Lion, Mavericks, and Yosemite prelink kernel cache file
+			// for 10.7 10.8 10.9 10.10
+			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+			verbose("10.7, 10.8, 10.9 & 10.10 kernel cache file path = %s\n", kernelCacheFile);
 		}
 	}
 
@@ -329,24 +330,41 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// than the kernel file or the S/L/E directory
 	ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
 
-	// Check if the kernel file is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat)
-		&& (kerneltime > cachetime))
+	if (!YOSEMITE)
 	{
-		DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n",
+		// Check if the kernel file is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
+		{
+			DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
+			return -1;
+		}
+
+		ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+		// Check if the S/L/E directory time is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
+		{
+			DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n", kernelCacheFile);
+			return -1;
+		}
+	} else {
+		// for 10.10
+		// Check if the kernel file is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
+		{
+			DBG("Kernel file (%s) is more recent than Kernel Cache (%s), still loading KernelCache\n",
 				bootInfo->bootFile, kernelCacheFile);
-		return -1;
-	}
+			return -1;
+		}
 
-	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
-	// Check if the S/L/E directory time is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
-	{
-		DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n",
+		ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+		// Check if the S/L/E directory time is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
+		{
+			DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache (%s), still loading KernelCache\n",
 				kernelCacheFile);
-		return -1;
+			return -1;
+		}
 	}
-
 	// Since the kernel cache file exists and is the most recent try to load it
 	DBG("Loading kernel cache: '%s'\n", kernelCachePath);
 
@@ -665,7 +683,17 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
+				if (!YOSEMITE)
+				{
+					//printf(HEADER " (%s).\n", bootInfo->bootFile);
+					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
+					//sleep(1);
+				} else {
+
+					//printf(HEADER " (%s).\n", bootInfo->bootFile);
+					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite
+					//sleep(1);
+				}
 			} else {
 				strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
 			}

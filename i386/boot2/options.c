@@ -1238,12 +1238,36 @@ processBootOptions()
 		}
 		else
 		{
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+			if( YOSEMITE ) // is 10.10
+			{
+
+				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
+			}
+			else
+			{ // OSX is not 10.10
+
+				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/%s\n", bootInfo->bootFile);
+			}
 		}
 	}
-	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+
+	if (!YOSEMITE) // not 10.10 so 10.9 and previus
 	{
-		gOverrideKernel = true;
+		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+		{
+	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
+	}
+	else
+	{ // OSX is 10.10
+		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
+		{
+        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space

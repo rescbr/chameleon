@@ -915,7 +915,16 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		if (uncompressed_size != size)
 		{
-			error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
+			{
+				error("ERROR: size mismatch from lzvn (found: %x, expected: %x).\n", size, uncompressed_size);
+			}
+
+			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+			{
+				error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+			}
+
 			return -1;
 		}
 
