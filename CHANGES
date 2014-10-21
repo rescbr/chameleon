@@ -1,3 +1,4 @@
+- blackosx : Add chameleon UI Icons for Yosemite
 - ErmaC : Use macro instead of full checkOSVersion
 - viv xix : Move checkOSVersion into boot header
 - ErmaC : define macro for OS X Versions
