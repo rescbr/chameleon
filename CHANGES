@@ -1,3 +1,4 @@
+- Update efi Header
 - buffer BPS
 - devprop_generate_string optimized by cparm
 - Update CPUID and change conditional logic.

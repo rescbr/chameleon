@@ -32,7 +32,7 @@
  * Paths used by chameleon
  */
 
-//kernel cache
+// kernel cache
 #define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
@@ -72,7 +72,7 @@
 #define kDefaultKernel		"mach_kernel"
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"		// gui.c
+#define kShowInfoKey		"ShowInfo"		/* gui.c */
 #define kWaitForKeypressKey	"Wait"
 
 /* AsereBLN: added these keys */
