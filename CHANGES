@@ -1,3 +1,4 @@
+- ErmaC : Update bootargs
 - crazybirdy : Fit length for "Loading Darwin"
 - meklort : Update align directives to 2^(old_align)
 - Ermac : Bump svn to 2.3
@@ -13,7 +14,7 @@
 - meklort : Silence output.
 - meklort : Add --no-print-directory.
 - meklort : Replace \t with tab.
-- ErmaC :Update Chameleon.xcodeproj
+- ErmaC : Update Chameleon.xcodeproj
 - ErmaC : Merge LZVN decompression routine by MinusZwei (C Conversion) based on works from Pike R. Alpha and AnV Software (Andy Vandijck).
 - Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.
 - ErmaC : Merge tja's patch http://forum.voodooprojects.org/index.php/topic,5951.0.html

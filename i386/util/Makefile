@@ -18,7 +18,6 @@ include ${SRCROOT}/Make.rules
 PROGRAMS = machOconv dyldsymboltool segsize
 OBJS = dyldsymboltool.o32 dyldsymboltool.o64 machOconv.o32 machOconv.o64 segsize.o32 segsize.o64
 
-
 ifeq (${CONFIG_BDMESG}, y)
 PROGRAMS += bdmesg
 OBJS += bdmesg.o32 bdmesg.o64

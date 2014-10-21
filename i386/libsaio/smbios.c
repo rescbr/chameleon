@@ -1046,7 +1046,19 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
- /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) { }*/
+ /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) {
+	SMBOemPlatformFeature *p = (SMBOemPlatformFeature *)structPtr->new;
+
+	p->header.type		= kSMBTypeOemPlatformFeature;
+	p->header.length	= sizeof(SMBOemPlatformFeature);
+	p->header.handle	= handle++;
+
+	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->PlatformFeature));
+
+	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPPlatformFeature) + 2);
+	tableLength += sizeof(SMBOemPlatformFeature) + 2;
+	structureCount++;
+ }*/
 
 //-------------------------------------------------------------------------------------------------------------------------
 // EndOfTable
