@@ -240,8 +240,11 @@ long LoadDrivers( char * dirSpec )
 					error("Could not load %s\n", gMKextName);
 					return -1;
 				}
-			} else {
-				if ( MAVERICKS ) {
+			}
+			else
+			{
+				if ( MAVERICKS || YOSEMITE ) // issue 352
+				{
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);

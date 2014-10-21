@@ -30,7 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
-
+#define YOSEMITE        checkOSVersion("10.10") // Yosemite
 #define MAVERICKS       checkOSVersion("10.9")  // Mavericks
 #define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
 #define LION            checkOSVersion("10.7")  // Lion

@@ -68,12 +68,22 @@ static uint64_t ptov64(uint32_t addr)
 	return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
 }
 
+// ==========================================================================
+// ErmaC
+static inline uint64_t getCPUTick(void)
+{
+	uint32_t lowest;
+	uint32_t highest;
+	__asm__ volatile ("rdtsc" : "=a" (lowest), "=d" (highest));
+	return (uint64_t) highest << 32 | lowest;
+}
+
 /*==========================================================================
  * Fake EFI implementation
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','3', 0};
 // Bungo
 //static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
@@ -699,8 +709,28 @@ void setupChosenNode()
 
 	length = strlen(bootInfo->bootFile);
 	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+//	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
+
+//	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
+
+//	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
 
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
+
+
+//
+//
+
+
+
+
+
+
+
+
+
+
+//
 }
 
 /*
