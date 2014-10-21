@@ -977,7 +977,7 @@ free:
 ;
 
 %if VERBOSE
-root_str			db		'/boot', NULL
+root_str			db		'/boot', CR, LF, NULL
 %endif
 
 ;--------------------------------------------------------------------------
@@ -1431,8 +1431,8 @@ nodeToSector:
 ;
 
 %if VERBOSE
-log_title_str		db		CR, LF, 'boot1: ', NULL
-error_str			db		'error', NULL
+log_title_str		db		'boot1: ', NULL
+error_str		db		'error', NULL
 %endif
 
 searchCatalogKey	dd		kHFSRootFolderID

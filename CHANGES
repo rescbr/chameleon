@@ -1,3 +1,4 @@
+- Slice and Clover Team : Replace "NULL" terminated strings and fit Boot2 Sectors size
 - ErmaC : Update bootargs
 - crazybirdy : Fit length for "Loading Darwin"
 - meklort : Update align directives to 2^(old_align)
