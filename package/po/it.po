@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.2\n"
+"Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-06-26 01:37+0200\n"
 "PO-Revision-Date: 2014-07-25 10:44+0000\n"
@@ -228,7 +228,7 @@ msgstr "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 #: Resources/templates/Localizable.strings:4
 #, no-wrap
 msgid "Chameleon Bootloader Package"
-msgstr "Installazione di Chameleon"
+msgstr "Chameleon"
 
 #. type: "ERROR_BOOTVOL"
 #: Resources/templates/Localizable.strings:9

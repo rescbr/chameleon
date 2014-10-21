@@ -1,3 +1,4 @@
+- Ermac : Bump svn to 2.3
 - ErmaC : Update efi Header
 - cparm : buffer BPS
 - cparm : devprop_generate_string optimized by cparm
