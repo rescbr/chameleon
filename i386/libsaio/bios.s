@@ -80,21 +80,21 @@
     bits of code and data within the first 63.5k and modify the loaders to
     be able to load more than 63.5k.
  */
-    .align 2
+    .align 4
 save_eax:   .space 4
-    .align 2
+    .align 4
 save_edx:   .space 4
-    .align 1
+    .align 2
 save_es:    .space 2
-    .align 1
+    .align 2
 save_flag:  .space 2
-    .align 2
+    .align 4
 new_eax:    .space 4
-    .align 2
+    .align 4
 new_edx:    .space 4
-    .align 1
+    .align 2
 new_es:     .space 2
-    .align 1
+    .align 2
 new_ds:     .space 2
 
     .section __INIT,__text      // turbo - This code must reside within the first segment

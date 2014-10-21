@@ -530,6 +530,12 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 		break;
 	}
 
+	if (!module) // cparm
+	{
+		ret = -1;
+		break;
+	} // Should never happen but it will make the compiler happy
+
 	// Allocate memory for the driver path and the plist.
 
 	module->executablePath = tmpExecutablePath;
@@ -904,7 +910,8 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 		// MinusZwei
 
-		if (uncompressed_size != size) {
+		if (uncompressed_size != size)
+		{
 			error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
 			return -1;
 		}

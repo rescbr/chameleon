@@ -718,7 +718,8 @@ void common_boot(int biosdev)
 			printf("Can't find %s\n", bootFile);
 			sleep(1);
 
-			if (gBootFileType == kNetworkDeviceType) {
+			if (gBootFileType == kNetworkDeviceType)
+			{
 				// Return control back to PXE. Don't unload PXE base code.
 				gUnloadPXEOnExit = false;
 				break;

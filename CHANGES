@@ -1,3 +1,4 @@
+- meklort : Update align directives to 2^(old_align)
 - Ermac : Bump svn to 2.3
 - ErmaC : Update efi Header
 - cparm : buffer BPS

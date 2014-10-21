@@ -88,7 +88,7 @@
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kSMBIOSKey		"SMBIOS"		/* fake_efi.c */
-#define kSystemID		"SystemId"		/* fake_efi.c */
+//#define kSystemID		"SystemId"		/* fake_efi.c */
 #define kSystemType		"SystemType"		/* fake_efi.c */
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS			"VBIOS"			/* nvidia.c && ati.c */
