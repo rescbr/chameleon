@@ -241,7 +241,7 @@ long LoadDrivers( char * dirSpec )
 					return -1;
 				}
 			} else {
-				if (gMacOSVersion[3] == '9') {
+				if ( MAVERICKS ) {
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);

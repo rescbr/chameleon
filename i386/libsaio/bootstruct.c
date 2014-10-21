@@ -27,6 +27,7 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 
 #ifndef DEBUG_BOOTSTRUCT
@@ -115,11 +116,9 @@ void initKernBootStruct( void )
 
 /* Copy boot args after kernel and record address. */
 
-void
-reserveKernBootStruct(void)
+void reserveKernBootStruct(void)
 {
-	if ((gMacOSVersion[0] == '1') && (gMacOSVersion[1] == '0')
-		&& (gMacOSVersion[2] == '.') && (gMacOSVersion[3] == '7' || gMacOSVersion[3] == '8' || gMacOSVersion[3] == '9'))
+	if ( LION || MOUNTAIN_LION || MAVERICKS )
 	{
 		void *oldAddr = bootArgs;
 		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));

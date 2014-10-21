@@ -1,3 +1,5 @@
+- ErmaC : Use macro instead of full checkOSVersion
+- viv xix : Move checkOSVersion into boot header
 - ErmaC : define macro for OS X Versions
 - Slice and Clover Team : Replace "NULL" terminated strings and fit Boot2 Sectors size
 - ErmaC : Update bootargs

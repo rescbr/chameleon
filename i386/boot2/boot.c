@@ -91,8 +91,6 @@ int		bvCount = 0, gDeviceCount = 0;
 long		gBootMode; /* defaults to 0 == kBootModeNormal */
 BVRef		bvr, menuBVR, bvChain;
 
-static bool				checkOSVersion(const char * version);
-static void				getOSVersion();
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
@@ -342,8 +340,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 
 	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
 	// Check if the S/L/E directory time is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
-		&& (exttime > cachetime))
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
 	{
 		DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n",
 				kernelCacheFile);
@@ -550,9 +547,6 @@ void common_boot(int biosdev)
 			drawBackground();
 			updateVRAM();
 		}
-
-		// Find out which version mac os we're booting.
-		getOSVersion();
 
 		if (platformCPUFeature(CPU_FEATURE_EM64T)) {
 			archCpuType = CPU_TYPE_X86_64;
@@ -768,13 +762,14 @@ static void selectBiosDevice(void)
 
 bool checkOSVersion(const char * version)
 {
-	return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
-			&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
-}
-
-static void getOSVersion()
-{
-	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+	if ( (sizeof(version) > 4) && (version[3] == '1') ) {
+		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
+		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3])
+		&& (gMacOSVersion[4] == version[4]));
+	} else {
+		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
+		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
+	}
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

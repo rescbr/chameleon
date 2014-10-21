@@ -324,4 +324,6 @@ void HibernateBoot(char *boot_device);
 /* bmdecompress.c */
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
+bool checkOSVersion(const char * version);
+
 #endif /* !__BOOT2_BOOT_H */
