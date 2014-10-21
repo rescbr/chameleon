@@ -1,16 +1,16 @@
-- Update efi Header
-- buffer BPS
-- devprop_generate_string optimized by cparm
-- Update CPUID and change conditional logic.
-- Typo & ID names
-- Make compile on gcc w/ errors enabled.
-- Remove the '-x' option from the offending 'ld' command
-- Makefile dependency missing for boot0 and boot1h
-- Temp disable klibc module
-- Silence output.
-- Add --no-print-directory.
-- Replace \t with tab.
-- Update Chameleon.xcodeproj
+- ErmaC : Update efi Header
+- cparm : buffer BPS
+- cparm : devprop_generate_string optimized by cparm
+- ErmaC : Update CPUID and change conditional logic.
+- ErmaC : Typo & ID names
+- meklort : Make compile on gcc w/ errors enabled.
+- bitshoveler : Remove the '-x' option from the offending 'ld' command
+- Jief : Makefile dependency missing for boot0 and boot1h
+- ErmaC :Temp disable klibc module
+- meklort : Silence output.
+- meklort : Add --no-print-directory.
+- meklort : Replace \t with tab.
+- ErmaC :Update Chameleon.xcodeproj
 - ErmaC : Merge LZVN decompression routine by MinusZwei (C Conversion) based on works from Pike R. Alpha and AnV Software (Andy Vandijck).
 - Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.
 - ErmaC : Merge tja's patch http://forum.voodooprojects.org/index.php/topic,5951.0.html
