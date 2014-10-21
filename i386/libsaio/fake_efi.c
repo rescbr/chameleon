@@ -718,19 +718,83 @@ void setupChosenNode()
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 
 
-//
-//
+	if(YOSEMITE)
+	{
+		//
+		// Pike R. Alpha - 12 October 2014
+		//
+		UInt8 index = 0;
+		EFI_UINT16 PMTimerValue = 0;
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi = 0;
+		EFI_UINT32 rcx, rdx, rsi, rdi;
 
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		rcx = rdx = rsi = rdi = cpuTick = 0;
 
+		// LEAF_1 - Feature Information (Function 01h).
+		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
+		{
+			//
+			// i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
+			//
+			EFI_UINT32 seedBuffer[16] = {0};
+			//
+			// Main loop to get 16 qwords (four bytes each).
+			//
+			for (index = 0; index < 16; index++)					// 0x17e12:
+			{
+				randomValue = computeRand();					// callq	0x18e20
+				cpuTick = getCPUTick();						// callq	0x121a7
+				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
+				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
+			}									// jb		0x17e12
 
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32*) &seedBuffer);
+		}
+		else
+		{
+			//
+			// All other processors without RDRAND support.
+			//
+			EFI_UINT8 seedBuffer[64] = {0};
+			//
+			// Main loop to get the 64 bytes.
+			//
+			do									// 0x17e55:
+			{
+				PMTimerValue = inw(0x408);					// in		(%dx),	%ax
+				esi = PMTimerValue;						// movzwl	%ax,	%esi
 
+				if (esi < ecx)							// cmp		%ecx,	%esi
+				{
+					continue;						// jb		0x17e55		(retry)
+				}
 
+				cpuTick = getCPUTick();						// callq	0x121a7
+				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				rdi = rsi;							// mov		%rsi,	%rdi
+				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
+				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
+				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
 
+				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
 
+				edi = (edi & 0x2f);						// and		$0x2f,	%edi
+				edi = (edi + esi);						// add		%esi,	%edi
+				index++;							// inc		r12
+				ecx = (edi & 0xffff);						// movzwl	%di,	%ecx
 
+			} while (index < 64);							// cmp		%r14d,	%r12d
+			// jne		0x17e55		(next)
 
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8*) &seedBuffer);
 
-//
+		}
+	}
 }
 
 /*

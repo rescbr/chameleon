@@ -495,3 +495,30 @@ LABEL(_pcpy)
 
     ret
 #endif
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// computeRand()
+//
+// Pike R. Alpha - 12 October 2014
+//
+
+LABEL(_computeRand)
+	pushl	%edx
+	mov		$0xa,	%edx
+
+Repeat:
+	rdrand	%eax
+	jae		Ok
+	jmp		Exit
+
+Ok:
+	dec		%edx
+	pause
+	jne		Repeat
+	mov		$0x0,	%eax
+
+Exit:
+	popl	%edx
+
+	ret
+

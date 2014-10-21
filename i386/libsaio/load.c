@@ -136,7 +136,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 			if (mH->magic != MH_MAGIC)
 			{
-				error("Mach-O file has bad magic number\n");
+				error("Mach-O (i386) file has bad magic number\n");
 				return -1;
 			}
 
@@ -152,7 +152,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 */
 			if (mH->magic != MH_MAGIC_64)
 			{
-				error("Mach-O file has bad magic number\n");
+				error("Mach-O file (x86_64) has bad magic number\n");
 				return -1;
 			}
 
