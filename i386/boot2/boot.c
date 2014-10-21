@@ -209,7 +209,7 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+	if ( LION || MOUNTAIN_LION || MAVERICKS )
 	{
 
 		// Notify modules that the kernel is about to be started
@@ -254,12 +254,12 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 		verbose("Specified kernel cache file path = %s\n", cacheFile);
 	} else {
 		// Lion, Mountain Lion and Mavericks prelink kernel cache file
-		if ((checkOSVersion("10.7")) || (checkOSVersion("10.8")) || (checkOSVersion("10.9")))
+		if ( LION || MOUNTAIN_LION || MAVERICKS )
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
 			verbose("10.7, 10.8 & 10.9 kernel cache file path = %s\n", kernelCacheFile);		}
 		// Snow Leopard prelink kernel cache file
-		else if (checkOSVersion("10.6")) {
+		else if ( SNOW_LEOPARD ) {
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
