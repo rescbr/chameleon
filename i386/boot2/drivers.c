@@ -776,7 +776,8 @@ FindModule( char * name )
 	{
 		prop = GetProperty(module->dict, kPropCFBundleIdentifier);
 
-		if ((prop != 0) && !strcmp(name, prop->string)) {
+		if ((prop != 0) && !strcmp(name, prop->string))
+		{
 			break;
 		}
 
@@ -802,22 +803,26 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 	while (1)
 	{
 		length = XMLParseNextTag(buffer + pos, &moduleDict);
-		if (length == -1) {
+		if (length == -1)
+		{
 			break;
 		}
 
 		pos += length;
 
-		if (moduleDict == 0) {
+		if (moduleDict == 0)
+		{
 			continue;
 		}
-		if (moduleDict->type == kTagTypeDict) {
+		if (moduleDict->type == kTagTypeDict)
+		{
 			break;
 		}
 		XMLFreeTag(moduleDict);
 	}
 
-	if (length == -1) {
+	if (length == -1)
+	{
 		return -1;
 	}
 
@@ -830,7 +835,8 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 	}
 
 	tmpModule = malloc(sizeof(Module));
-	if (tmpModule == 0) {
+	if (tmpModule == 0)
+	{
 		XMLFreeTag(moduleDict);
 		return -1;
 	}
@@ -888,6 +894,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		{
 			return -1;
 		}
+
 		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
 		{
 			return -1;

@@ -166,7 +166,8 @@ static int ExecKernel(void *binary)
 
 	clearActivityIndicator();
 
-	if (gErrors) {
+	if (gErrors)
+	{
 		printf("Errors encountered while starting up the computer.\n");
 		printf("Pausing %d seconds...\n", kBootErrorTimeout);
 		sleep(kBootErrorTimeout);
@@ -176,15 +177,18 @@ static int ExecKernel(void *binary)
 
 	// Cleanup the PXE base code.
 
-	if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit ) {
-		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess ) {
+	if ( (gBootFileType == kNetworkDeviceType) && gUnloadPXEOnExit )
+	{
+		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
+		{
 			printf("nbpUnloadBaseCode error %d\n", (int) ret);
 			sleep(2);
 		}
 	}
 
 	bool dummyVal;
-	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal) {
+	if (getBoolForKey(kWaitForKeypressKey, &dummyVal, &bootInfo->chameleonConfig) && dummyVal)
+	{
 		showTextBuffer(msgbuf, strlen(msgbuf));
 	}
 
@@ -193,9 +197,12 @@ static int ExecKernel(void *binary)
 	// If we were in text mode, switch to graphics mode.
 	// This will draw the boot graphics unless we are in
 	// verbose mode.
-	if (gVerboseMode) {
+	if (gVerboseMode)
+	{
 		setVideoMode( GRAPHICS_MODE, 0 );
-	} else {
+	}
+	else
+	{
 		drawBootGraphics();
 	}
 
@@ -214,7 +221,9 @@ static int ExecKernel(void *binary)
 
 		startprog( kernelEntry, bootArgsPreLion );
 
-	} else {
+	}
+	else
+	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
 
@@ -296,32 +305,44 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	ret = -1;
 
 	// If boot from a boot helper partition check the kernel cache file on it
-	if (gBootVolume->flags & kBVFlagBooter) {
+	if (gBootVolume->flags & kBVFlagBooter)
+	{
 		snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.P%s", kernelCacheFile);
 		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-		if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+
+		if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+		{
 			snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.R%s", kernelCacheFile);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
+
+			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+			{
 				snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.S%s", kernelCacheFile);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-				if ((flags & kFileTypeMask) != kFileTypeFlat) {
+
+				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				{
 					ret = -1;
 				}
 			}
 		}
 	}
+
 	// If not found, use the original kernel cache path.
-	if (ret == -1) {
+	if (ret == -1)
+	{
 		strlcpy(kernelCachePath, kernelCacheFile, sizeof(kernelCachePath));
 		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-		if ((flags & kFileTypeMask) != kFileTypeFlat) {
+
+		if ((flags & kFileTypeMask) != kFileTypeFlat)
+		{
 			ret = -1;
 		}
 	}
 
 	// Exit if kernel cache file wasn't found
-	if (ret == -1) {
+	if (ret == -1)
+	{
 		DBG("No Kernel Cache File '%s' found\n", kernelCacheFile);
 		return -1;
 	}
@@ -330,41 +351,22 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// than the kernel file or the S/L/E directory
 	ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
 
-	if (!YOSEMITE)
+	// Check if the kernel file is more recent than the cache file
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
 	{
-		// Check if the kernel file is more recent than the cache file
-		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
-		{
-			DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
-			return -1;
-		}
-
-		ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
-		// Check if the S/L/E directory time is more recent than the cache file
-		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
-		{
-			DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n", kernelCacheFile);
-			return -1;
-		}
-	} else {
-		// for 10.10
-		// Check if the kernel file is more recent than the cache file
-		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
-		{
-			DBG("Kernel file (%s) is more recent than Kernel Cache (%s), still loading KernelCache\n",
-				bootInfo->bootFile, kernelCacheFile);
-			return -1;
-		}
-
-		ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
-		// Check if the S/L/E directory time is more recent than the cache file
-		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
-		{
-			DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache (%s), still loading KernelCache\n",
-				kernelCacheFile);
-			return -1;
-		}
+		DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
+		return -1;
 	}
+
+	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+
+	// Check if the S/L/E directory time is more recent than the cache file
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
+	{
+		DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n", kernelCacheFile);
+		return -1;
+	}
+
 	// Since the kernel cache file exists and is the most recent try to load it
 	DBG("Loading kernel cache: '%s'\n", kernelCachePath);
 
@@ -440,12 +442,14 @@ void common_boot(int biosdev)
 	// Load boot.plist config file
 	status = loadChameleonConfig(&bootInfo->chameleonConfig, bvChain);
 
-	if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet) {
+	if (getBoolForKey(kQuietBootKey, &quiet, &bootInfo->chameleonConfig) && quiet)
+	{
 		gBootMode |= kBootModeQuiet;
 	}
 
 	// Override firstRun to get to the boot menu instantly by setting "Instant Menu"=y in system config
-	if (getBoolForKey(kInstantMenuKey, &instantMenu, &bootInfo->chameleonConfig) && instantMenu) {
+	if (getBoolForKey(kInstantMenuKey, &instantMenu, &bootInfo->chameleonConfig) && instantMenu)
+	{
 		firstRun = false;
 	}
 
@@ -456,29 +460,31 @@ void common_boot(int biosdev)
 	gEnableCDROMRescan = false;
 
 	// Enable it with Rescan=y in system config
-	if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->chameleonConfig)
-		&& gEnableCDROMRescan) {
+	if (getBoolForKey(kRescanKey, &gEnableCDROMRescan, &bootInfo->chameleonConfig)	&& gEnableCDROMRescan)
+	{
 		gEnableCDROMRescan = true;
 	}
 
 	// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
 	rescanPrompt = false;
-	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig)
-		&& rescanPrompt && biosDevIsCDROM(gBIOSDev))
+	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev))
 	{
 		gEnableCDROMRescan = promptForRescanOption();
 	}
 
 	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
-	if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->chameleonConfig)
-		&& gScanSingleDrive) {
+	if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->chameleonConfig) && gScanSingleDrive)
+	{
 		gScanSingleDrive = true;
 	}
 
 	// Create a list of partitions on device(s).
-	if (gScanSingleDrive) {
+	if (gScanSingleDrive)
+	{
 		scanBootVolumes(gBIOSDev, &bvCount);
-	} else {
+	}
+	else
+	{
 		scanDisks(gBIOSDev, &bvCount);
 	}
 
