@@ -8,17 +8,17 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-18 14:17+0100\n"
-"PO-Revision-Date: 2013-06-27 21:13+0000\n"
-"Last-Translator: ltodoto <ltodoto@live.ru>\n"
+"PO-Revision-Date: 2014-10-22 21:21+0000\n"
+"Last-Translator: SergeNu <konovalov_serj@mail.ru>\n"
 "Language-Team: ru <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1372367628.0\n"
+"X-POOTLE-MTIME: 1414012891.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -82,15 +82,15 @@ msgid ""
 "evolved from the development of David Elliott's fake EFI implementation "
 "added to Apple's boot-132 project."
 msgstr ""
-"Chameleon &mdash; начальный загрузчик, построенный на основе сочетания "
-"компонентов, разработка которых была начата в рамках проекта Дэвида Эллиотта "
-"(David Elliott) по эмуляции прикладного интерфейса EFI в качестве дополнения "
-"к оригинальному проекту загрузчика Apple boot-132."
+"Chameleon - загрузчик, построенный на основе сочетания компонентов, "
+"разработка которых была начата в рамках проекта Дэвида Эллиотта (David "
+"Elliott) по эмуляции прикладного интерфейса EFI в качестве дополнения к "
+"оригинальному проекту загрузчика Apple boot-132."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
 msgid "Chameleon v2 is extended with many features. For example:"
-msgstr "Chameleon v2 обладает широкими возможностями. В том числе:"
+msgstr "Chameleon v2 обладает широкими возможностями. Например:"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
@@ -260,7 +260,7 @@ msgstr "Это ПО не может быть установлено на дан�
 #: Resources/templates/Localizable.strings:19
 #, no-wrap
 msgid "Chameleon Bootloader"
-msgstr "Начальный загрузчик Chameleon"
+msgstr "Загрузчик Chameleon"
 
 #. type: "Chameleon_description"
 #: Resources/templates/Localizable.strings:20
@@ -287,7 +287,10 @@ msgstr "Обыкновенный"
 #: Resources/templates/Localizable.strings:26
 #, no-wrap
 msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Обычная установка Chameleon"
+msgstr ""
+"Установка файлов Chameleon в корень выбранного раздела используя boot0 или "
+"boot0md и основываясь на вашей системе, без уничтожения любой установленной "
+"копии Windows, если таковая имеется."
 
 #. type: "noboot_title"
 #: Resources/templates/Localizable.strings:28
@@ -1113,40 +1116,36 @@ msgstr "Установить 3 карту HDEF:003 (0x03, 0x00, 0x00, 0x00)."
 #. type: "HDAULayoutIDx05_title"
 #: Resources/templates/Localizable.strings:261
 #: Resources/templates/Localizable.strings:367
-#, fuzzy, no-wrap
-#| msgid "LayoutID=65"
+#, no-wrap
 msgid "LayoutID=5"
-msgstr "LayoutID=65"
+msgstr "LayoutID=5"
 
 #. type: "HDEFLayoutIDx05_description"
 #: Resources/templates/Localizable.strings:262
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
-msgstr "Установить 1 карту HDEF:001 (0x01, 0x00, 0x00, 0x00)."
+msgstr ""
+"Установить HDEF и расположить в 5:\n"
+"005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:371
-#, fuzzy, no-wrap
-#| msgid "LayoutID=387"
+#, no-wrap
 msgid "LayoutID=7"
-msgstr "LayoutID=387"
+msgstr "LayoutID=7"
 
 #. type: "HDEFLayoutIDx07_description"
 #: Resources/templates/Localizable.strings:266
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
-msgstr "Установить 1 карту HDEF:001 (0x01, 0x00, 0x00, 0x00)."
+msgstr ""
+"Установить HDEF и расположить в 7:\n"
+"007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
 #: Resources/templates/Localizable.strings:269
@@ -1464,6 +1463,8 @@ msgid ""
 "Set HDEF layout-it to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
+"Установить HDEF и расположить в 1981:\n"
+"7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx01_description"
 #: Resources/templates/Localizable.strings:356
@@ -1472,6 +1473,8 @@ msgid ""
 "Set HDAU layout-it to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 1:\n"
+"001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_description"
 #: Resources/templates/Localizable.strings:360
@@ -1480,6 +1483,8 @@ msgid ""
 "Set HDAU layout-it to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 2:\n"
+"002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_description"
 #: Resources/templates/Localizable.strings:364
@@ -1488,28 +1493,28 @@ msgid ""
 "Set HDAU layout-it to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 3:\n"
+"003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:368
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 885:\n"
-#| "375 (0x75, 0x03, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
-msgstr "Установить значение HDAU layout-it равным 885"
+msgstr ""
+"Установить HDAU и расположить в 5:\n"
+"005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:372
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
-msgstr "Установить 1 карту HDEF:001 (0x01, 0x00, 0x00, 0x00)."
+msgstr ""
+"Установить HDAU и расположить в 7:\n"
+"007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:376
@@ -1518,6 +1523,8 @@ msgid ""
 "Set HDAU layout-it to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 12:\n"
+"00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:380
@@ -1526,6 +1533,8 @@ msgid ""
 "Set HDAU layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 32:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:384
@@ -1534,6 +1543,8 @@ msgid ""
 "Set HDAU layout-it to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 40:\n"
+"028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_description"
 #: Resources/templates/Localizable.strings:388
@@ -1542,6 +1553,8 @@ msgid ""
 "Set HDAU layout-it to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 65:\n"
+"041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_description"
 #: Resources/templates/Localizable.strings:392
@@ -1550,6 +1563,8 @@ msgid ""
 "Set HDAU layout-it to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 99:\n"
+"063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_description"
 #: Resources/templates/Localizable.strings:396
@@ -1558,6 +1573,8 @@ msgid ""
 "Set HDAU layout-it to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 269:\n"
+"10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_description"
 #: Resources/templates/Localizable.strings:400
@@ -1638,6 +1655,8 @@ msgid ""
 "Set HDAU layout-it to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 887:\n"
+"377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_description"
 #: Resources/templates/Localizable.strings:440
@@ -1646,6 +1665,8 @@ msgid ""
 "Set HDAU layout-it to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 888:\n"
+"378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_description"
 #: Resources/templates/Localizable.strings:444
@@ -1654,6 +1675,8 @@ msgid ""
 "Set HDAU layout-it to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 889:\n"
+"379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_description"
 #: Resources/templates/Localizable.strings:448
@@ -1662,6 +1685,8 @@ msgid ""
 "Set HDAU layout-it to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 892:\n"
+"37C (0x0C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_description"
 #: Resources/templates/Localizable.strings:452
@@ -1670,6 +1695,8 @@ msgid ""
 "Set HDAU layout-it to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 898:\n"
+"382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_description"
 #: Resources/templates/Localizable.strings:456
@@ -1678,6 +1705,8 @@ msgid ""
 "Set HDAU layout-it to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
+"Установить HDAU и расположить в 1981:\n"
+"7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "IntelCaprix00_title"
 #: Resources/templates/Localizable.strings:461
@@ -2218,6 +2247,8 @@ msgstr "NvidiaGeneric=Yes"
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
 msgstr ""
+"Использовать классическое название Nvidia для профиля системы (по-умолчанию "
+"отключено)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:606
@@ -2337,6 +2368,10 @@ msgstr "kext-dev-mode=1"
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
+"В версиях Yosemite для разработчиков, неподписанные или неправильно "
+"подписанные кексты не будут загружены. Для того, чтобы использовать "
+"неподписанные кексты для разработки можно отменить проверку, добавив "
+"загрузочный аргумент 'kext-dev-mode=1'."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:638
@@ -2602,7 +2637,7 @@ msgstr "Видео"
 #: Resources/templates/Localizable.strings:733
 #, no-wrap
 msgid "A selection of options that deal with video."
-msgstr "Параметры отображения."
+msgstr "Выбор параметров отображения видео."
 
 #. type: "Keymaps_title"
 #: Resources/templates/Localizable.strings:736
