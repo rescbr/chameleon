@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-18 14:17+0100\n"
-"PO-Revision-Date: 2013-12-29 11:56+0000\n"
-"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
+"PO-Revision-Date: 2014-10-22 21:23+0000\n"
+"Last-Translator: kyndder <kyndder@icloud.com>\n"
 "Language-Team: pt-BR <pt-BR@li.org>\n"
 "Language: pt-BR\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388318218.0\n"
+"X-POOTLE-MTIME: 1414013009.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -703,7 +703,7 @@ msgstr "ForceFullMemInfo=Yes"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "Força a Tabela SMBIOS 17 a ter 27 bytes."
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:147
@@ -1143,44 +1143,36 @@ msgstr ""
 #. type: "HDAULayoutIDx05_title"
 #: Resources/templates/Localizable.strings:261
 #: Resources/templates/Localizable.strings:367
-#, fuzzy, no-wrap
-#| msgid "LayoutID=65"
+#, no-wrap
 msgid "LayoutID=5"
-msgstr "LayoutID=65"
+msgstr "LayoutID=5"
 
 #. type: "HDEFLayoutIDx05_description"
 #: Resources/templates/Localizable.strings:262
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Define HDEF layout-it para 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"Define HDEF layout-id para 5:\n"
+"005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:371
-#, fuzzy, no-wrap
-#| msgid "LayoutID=387"
+#, no-wrap
 msgid "LayoutID=7"
-msgstr "LayoutID=387"
+msgstr "LayoutID=7"
 
 #. type: "HDEFLayoutIDx07_description"
 #: Resources/templates/Localizable.strings:266
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Define HDEF layout-it para 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"Define HDEF layout-id para 7:\n"
+"007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
 #: Resources/templates/Localizable.strings:269
@@ -1571,29 +1563,23 @@ msgstr ""
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:368
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Define HDAU layout-it para 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"Define HDAU layout-id para 5:\n"
+"005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:372
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Define HDAU layout-it para 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)."
+"Define HDAU layout-id para 7:\n"
+"007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:376
@@ -2343,7 +2329,7 @@ msgstr "NvidiaGeneric=Yes"
 #: Resources/templates/Localizable.strings:600
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
-msgstr ""
+msgstr "Usa o nome clássico Nvidia no System Profiler (desabilitado por padrão)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:606
@@ -2466,6 +2452,9 @@ msgstr "kext-dev-mode=1"
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
+"No Developer Preview do Yosemite, kexts Imprópriamente ou não assinadas não "
+"serão carregadas. Para utilizar estes kexts durante o desenvolvimento, esta "
+"verificação pode ser desabilitada adicionando o boot flag 'kext-dev-mode=1'."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:638
