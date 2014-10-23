@@ -124,14 +124,13 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 
 void *loadACPITable (const char * filename)
 {
-	void *tableAddr;
 	const char * dirspec=NULL;
 
 	int fd = search_and_get_acpi_fd(filename, &dirspec);
 
 	if (fd>=0)
 	{
-		tableAddr=(void*)AllocateKernelMemory(file_size (fd));
+      void *tableAddr = (void*)AllocateKernelMemory(file_size (fd));
 		if (tableAddr)
 		{
 			if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
@@ -210,7 +209,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 {
-	char ssdt_header[] =
+	static char const ssdt_header[] =
 	{
 		0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
@@ -219,14 +218,14 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		0x31, 0x03, 0x10, 0x20							/* 1.._		*/
 	};
 	
-	char resource_template_register_fixedhw[] =
+	static char const resource_template_register_fixedhw[] =
 	{
 		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x7F,
 		0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x01, 0x79, 0x00
 	};
 
-	char resource_template_register_systemio[] =
+	static char const resource_template_register_systemio[] =
 	{
 		0x11, 0x14, 0x0A, 0x11, 0x82, 0x0C, 0x00, 0x01,
 		0x08, 0x00, 0x00, 0x15, 0x04, 0x00, 0x00, 0x00,
@@ -409,7 +408,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 {
-	char ssdt_header[] =
+    static char const ssdt_header[] =
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x6A, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x00, /* ..PmRef. */
@@ -513,7 +512,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 							p_states_count = 0;
 						} else {
 							uint8_t vidstep;
-							uint8_t i = 0, u, invalid = 0;
+							uint8_t u, invalid = 0;
 							// Finalize P-States
 							// Find how many P-States machine supports
 							p_states_count = (uint8_t)(maximum.CID - minimum.CID + 1);
@@ -525,7 +524,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 							vidstep = ((maximum.VID << 2) - (minimum.VID << 2)) / (p_states_count - 1);
 
 							for (u = 0; u < p_states_count; u++) {
-								i = u - invalid;
+								uint8_t i = u - invalid;
 
 								p_states[i].CID = maximum.CID - u;
 								p_states[i].FID = (uint8_t)(p_states[i].CID >> 1);
@@ -891,7 +890,7 @@ int setupAcpi(void)
 
 		rsdt=(struct acpi_2_rsdt *)(rsdp->RsdtAddress);
 
-		DBG("RSDT @%x, Length %d\n",rsdt, rsdt->Length);
+		DBG("RSDT @%x, Length %d\n",rsdt, rsdt ? rsdt->Length : 0);
 		
 		if (rsdt && (uint32_t)rsdt !=0xffffffff && rsdt->Length<0x10000) {
 			uint32_t *rsdt_entries;
@@ -1000,7 +999,7 @@ int setupAcpi(void)
 			// FIXME: handle 64-bit address correctly
 
 			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
-			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt->Length);
+			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt ? xsdt->Length : 0);
 
 			if (xsdt && (uint64_t)rsdp->XsdtAddress<0xffffffff && xsdt->Length<0x10000) {
 				uint64_t *xsdt_entries;
