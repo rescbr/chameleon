@@ -79,10 +79,10 @@ extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 
 /* cache.c */
-extern void   CacheReset();
-extern void   CacheInit(CICell ih, long blockSize);
-extern long   CacheRead(CICell ih, char *buffer, long long offset,
-                        long length, long cache);
+extern void      CacheReset();
+extern void      CacheInit(CICell ih, u_int32_t blockSize);
+extern u_int32_t CacheRead(CICell ih, char *buffer, long long offset,
+                           u_int32_t length, long cache);
 
 /* console.c */
 extern bool   gVerboseMode;
@@ -95,7 +95,7 @@ extern int    getchar(void);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
 extern int    verbose(const char *format, ...);
-extern void   stop(const char *format, ...);
+extern void   stop(const char *format, ...) __attribute__ ((noreturn));
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
 
