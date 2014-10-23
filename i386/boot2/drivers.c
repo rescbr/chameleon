@@ -271,7 +271,8 @@ long LoadDrivers( char * dirSpec )
 static long
 FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 {
-	long	ret, flags, time, time2;
+  long      ret, flags;
+  u_int32_t time, time2;
 	char	altDirSpec[512];
 	
 	snprintf(altDirSpec, sizeof(altDirSpec), "%s%s", dirSpec, extDirSpec);
@@ -302,9 +303,10 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 long
 FileLoadDrivers( char * dirSpec, long plugin )
 {
-	long         ret, length, flags, time, bundleType;
 	long long	 index;
+	long         ret, length, flags, bundleType;
 	long         result = -1;
+    u_int32_t    time;
 	const char * name;
 
 	if ( !plugin )

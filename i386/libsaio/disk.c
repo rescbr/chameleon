@@ -1611,7 +1611,8 @@ static void scanFSLevelBVRSettings(BVRef chain)
 	char  dirSpec[512], fileSpec[512];
 	char  label[BVSTRLEN];
 	int   ret;
-	long  flags, time;
+	long  flags;
+    u_int32_t time;
 	int   fh, fileSize, error;
 
 	for (bvr = chain; bvr; bvr = bvr->next) {

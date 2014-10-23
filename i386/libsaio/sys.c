@@ -343,7 +343,7 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 //               Fetch the next directory entry for the given directory.
 
 long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name, 
-                 long * flags, long * time)
+                 long * flags, u_int32_t * time)
 {
 	const char * dirPath;
 	BVRef        bvr;
@@ -369,7 +369,7 @@ long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name,
 static char* gMakeDirSpec;
 
 long GetFileInfo(const char * dirSpec, const char * name,
-                 long * flags, long * time)
+                 long * flags, u_int32_t * time)
 {
 	long long index = 0;
 	const char * entryName;
@@ -795,7 +795,7 @@ int closedir(struct dirstuff * dirp)
 //==========================================================================
 
 int readdir(struct dirstuff * dirp, const char ** name, long * flags,
-	long * time)
+	u_int32_t * time)
 {
 	return dirp->dir_bvr->fs_getdirentry(dirp->dir_bvr,
 		/* dirPath */   dirp->dir_path,
@@ -806,7 +806,7 @@ int readdir(struct dirstuff * dirp, const char ** name, long * flags,
 //==========================================================================
 
 int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
-	long * time, FinderInfo *finderInfo, long *infoValid)
+	u_int32_t * time, FinderInfo *finderInfo, long *infoValid)
 {
 	return dirp->dir_bvr->fs_getdirentry( dirp->dir_bvr,
 			/* dirPath */   dirp->dir_path,

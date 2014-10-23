@@ -175,9 +175,9 @@ extern long   LoadFile(const char *fileSpec);
 extern long   ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length);
 extern long   LoadThinFatFile(const char *fileSpec, void **binary);
 extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char **name,
-                          long *flags, long *time);
+                          long *flags, u_int32_t *time);
 extern long   GetFileInfo(const char *dirSpec, const char *name,
-                          long *flags, long *time);
+                          long *flags, u_int32_t *time);
 extern long   GetFileBlock(const char *fileSpec, unsigned long long *firstBlock);
 extern long   GetFSUUID(char *spec, char *uuidStr);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
@@ -196,9 +196,9 @@ extern const char * systemConfigDir(void);
 extern struct dirstuff * opendir(const char *path);
 extern struct dirstuff * vol_opendir(BVRef bvr, const char *path);
 extern int    closedir(struct dirstuff *dirp);
-extern int    readdir(struct dirstuff *dirp, const char **name, long *flags, long *time);
+extern int    readdir(struct dirstuff *dirp, const char **name, long *flags, u_int32_t *time);
 extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
-                          long * time, FinderInfo *finderInfo, long *infoValid);
+                          u_int32_t * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
 extern void   scanDisks(int biosdev, int *count);

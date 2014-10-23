@@ -103,7 +103,7 @@ void load_all_modules()
 {
 	char* name;
 	long flags;
-	long time;
+	u_int32_t time;
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
 	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0) {
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {

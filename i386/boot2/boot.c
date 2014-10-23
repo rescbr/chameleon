@@ -239,8 +239,9 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 {
 	char		kernelCacheFile[512];
 	char		kernelCachePath[512];
-	long		flags, time, cachetime, kerneltime, exttime, ret=-1;
+	long		flags, ret=-1;
 	unsigned long adler32;
+    u_int32_t time, cachetime, kerneltime, exttime;
 
 	if((gBootMode & kBootModeSafe) != 0) {
 		DBG("Kernel Cache ignored.\n");
@@ -264,8 +265,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
 			int	lnam = strlen(kernelCacheFile) + 9; //with adler32
-			char	*name;
-			long	prev_time = 0;
+			char      *name;
+			u_int32_t prev_time = 0;
 
 			struct	dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
 
@@ -501,7 +502,8 @@ void common_boot(int biosdev)
 		bool		useKernelCache = true; // by default try to use the prelinked kernel
 		const char	*val;
 		int			len, ret = -1;
-		long		flags, sleeptime, time;
+		long		flags;
+        u_int32_t   sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
 
 		char        bootFile[sizeof(bootInfo->bootFile)];
