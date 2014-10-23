@@ -42,5 +42,7 @@ int main(int argc, char *argv[])
 	if (msglog)
 		printf("%s\n", msglog);
 
+    CFRelease(bootLog);
+
 	return 0;
 }
