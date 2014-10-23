@@ -16,7 +16,7 @@ DIRS_NEEDED = $(SYMROOT)
 all embedtheme optionrom: $(DIRS_NEEDED) $(SYMROOT)/cdboot
 
 $(SYMROOT)/cdboot:
-	@echo "\t[NASM] cdboot.s"	
+	@echo "	[NASM] cdboot.s"	
 	@$(NASM) cdboot.s -o $(SYMROOT)/cdboot
 	@dd if=$(SYMROOT)/boot of=$(SYMROOT)/cdboot conv=sync bs=2k seek=1 &> /dev/null
 
@@ -26,5 +26,5 @@ $(SYMROOT)/cdboot:
 		| dd of=$(SYMROOT)/cdboot bs=1 count=4 seek=2044 conv=notrunc &> /dev/null
 
 clean-local:
-	@if [ -f "$(SYMROOT)/cdboot" ];then echo "\t[RM] $(SYMROOT)/cdboot"; fi
+	@if [ -f "$(SYMROOT)/cdboot" ];then echo "	[RM] $(SYMROOT)/cdboot"; fi
 	@rm -f $(SYMROOT)/cdboot

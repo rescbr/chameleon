@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.2\n"
+"Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-26 01:37+0200\n"
+"POT-Creation-Date: 2014-09-18 14:17+0100\n"
 "PO-Revision-Date: 2013-12-29 12:14+0000\n"
 "Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: en <en@li.org>\n"

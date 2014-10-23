@@ -2694,11 +2694,12 @@
 		A3561CB41414024C00E9B51E /* Keylayout */ = {
 			isa = PBXGroup;
 			children = (
-				A3F1F267141B9B3B00DDA709 /* Readme.txt */,
-				A35D216E141A73B000969AC0 /* layouts */,
 				A3561DA81414296600E9B51E /* Cconfig */,
 				A3561DA61414296600E9B51E /* Keylayout.c */,
+				361BF6CE19DBA1820015F031 /* Keylayout.h */,
+				A35D216E141A73B000969AC0 /* layouts */,
 				A3561DA71414296600E9B51E /* Makefile */,
+				A3F1F267141B9B3B00DDA709 /* Readme.txt */,
 			);
 			path = Keylayout;
 			sourceTree = "<group>";
@@ -2948,13 +2949,13 @@
 		A35D2170141A73B000969AC0 /* layouts-src */ = {
 			isa = PBXGroup;
 			children = (
-				A35D2178141A753E00969AC0 /* README */,
 				A35D2171141A73B000969AC0 /* mac-de.slt */,
 				A35D2172141A73B000969AC0 /* mac-es.slt */,
 				A35D2173141A73B000969AC0 /* mac-fr.slt */,
 				A35D2174141A73B000969AC0 /* mac-it.slt */,
 				A35D2175141A73B000969AC0 /* mac-se.slt */,
 				A35D2176141A73B000969AC0 /* pc-fr.slt */,
+				A35D2178141A753E00969AC0 /* README */,
 			);
 			path = "layouts-src";
 			sourceTree = "<group>";
@@ -3730,7 +3731,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3793,6 +3794,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = Chameleon;
@@ -3803,6 +3805,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				GCC_OPTIMIZATION_LEVEL = 2;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = Chameleon;
@@ -3812,8 +3815,8 @@
 		1DEB919408733D9F0010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -3823,8 +3826,8 @@
 		1DEB919508733D9F0010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = macosx;
 			};

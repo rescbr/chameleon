@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.2svn-r2395\n"
+"Project-Id-Version: Chameleon 2.3\n"
 "POT-Creation-Date: 2014-09-18 14:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

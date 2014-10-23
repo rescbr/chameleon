@@ -28,11 +28,21 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
+
+// OS X Versions
+#define YOSEMITE        checkOSVersion("10.10") // Yosemite
+#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
+#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
+#define LION            checkOSVersion("10.7")  // Lion
+#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
+#define LEOPARD         checkOSVersion("10.5")  // Leopard
+#define TIGER           checkOSVersion("10.4")  // Tiger
+
 /*
  * Paths used by chameleon
  */
 
-//kernel cache
+// kernel cache
 #define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
@@ -43,6 +53,10 @@
 // Mountain Lion installer
 #define kMLionInstallerDataFolder      "/OS X Install Data/"
 #define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+
+//kernel path
+#define kDefaultKernelPathPreYos	"/"
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite
 
 /*
  * Keys used in system Boot.plist
@@ -70,9 +84,10 @@
 #define kScanSingleDriveKey	"Scan Single Drive"
 #define kInstantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
+#define kOSXKernel		"kernel"		// Yosemite
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"		// gui.c
+#define kShowInfoKey		"ShowInfo"		/* gui.c */
 #define kWaitForKeypressKey	"Wait"
 
 /* AsereBLN: added these keys */
@@ -88,7 +103,7 @@
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kSMBIOSKey		"SMBIOS"		/* fake_efi.c */
-#define kSystemID		"SystemId"		/* fake_efi.c */
+//#define kSystemID		"SystemId"		/* fake_efi.c */
 #define kSystemType		"SystemType"		/* fake_efi.c */
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS			"VBIOS"			/* nvidia.c && ati.c */
@@ -313,5 +328,7 @@ void HibernateBoot(char *boot_device);
 
 /* bmdecompress.c */
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
+
+bool checkOSVersion(const char * version);
 
 #endif /* !__BOOT2_BOOT_H */

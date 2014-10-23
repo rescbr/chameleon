@@ -32,8 +32,11 @@ PROGRAMS := $(addprefix $(SYMROOT)/, $(PROGRAMS))
 all: $(DIRS_NEEDED) $(PROGRAMS)
 
 
+#To rebuild boot1h if boot1h.s is touched
+$(SYMROOT)/boot1h: boot1h.s
+
 $(PROGRAMS): $(SRCROOT)/autoconf.inc
-	@echo "\t[NASM] $(@F)" 
+	@echo "	[NASM] $(@F)" 
 	@$(NASM) $(@F).s -o $@
 
 install_i386:: all $(INSTALLDIR)
@@ -41,5 +44,5 @@ install_i386:: all $(INSTALLDIR)
 	cd $(INSTALLDIR); chmod u+w $(VERSIONED_FILES) 
 
 clean-local:
-	@for p in $(PROGRAMS); do if [ -f "$${p}" ];then echo "\t[RM] $${p}"; fi; done
+	@for p in $(PROGRAMS); do if [ -f "$${p}" ];then echo "	[RM] $${p}"; fi; done
 	@rm -f $(PROGRAMS)

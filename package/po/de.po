@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.2\n"
+"Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-18 14:17+0100\n"
 "PO-Revision-Date: 2013-12-29 12:04+0000\n"
@@ -1137,44 +1137,36 @@ msgstr ""
 #. type: "HDAULayoutIDx05_title"
 #: Resources/templates/Localizable.strings:261
 #: Resources/templates/Localizable.strings:367
-#, fuzzy, no-wrap
-#| msgid "LayoutID=65"
+#, no-wrap
 msgid "LayoutID=5"
-msgstr "LayoutID=65"
+msgstr "LayoutID=5"
 
 #. type: "HDEFLayoutIDx05_description"
 #: Resources/templates/Localizable.strings:262
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Setzt HDEF Layout auf 1:\n"
-"01 (0x01, 0x00, 0x00,0x00)"
+"Setzt HDEF Layout auf 5:\n"
+"005 (0x05, 0x00, 0x00,0x00)"
 
 #. type: "HDAULayoutIDx07_title"
 #: Resources/templates/Localizable.strings:265
 #: Resources/templates/Localizable.strings:371
-#, fuzzy, no-wrap
-#| msgid "LayoutID=387"
+#, no-wrap
 msgid "LayoutID=7"
-msgstr "LayoutID=387"
+msgstr "LayoutID=7"
 
 #. type: "HDEFLayoutIDx07_description"
 #: Resources/templates/Localizable.strings:266
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDEF layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDEF layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Setzt HDEF Layout auf 1:\n"
-"01 (0x01, 0x00, 0x00,0x00)"
+"Setzt HDEF Layout auf 7:\n"
+"007 (0x07, 0x00, 0x00,0x00)"
 
 #. type: "HDAULayoutIDx12_title"
 #: Resources/templates/Localizable.strings:269
@@ -1565,29 +1557,23 @@ msgstr ""
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:368
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Setzt HDAU Layout auf 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)"
+"Setzt HDAU Layout auf 5:\n"
+"005 (0x05, 0x00, 0x00, 0x00)"
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:372
-#, fuzzy, no-wrap
-#| msgid ""
-#| "Set HDAU layout-it to 1:\n"
-#| "001 (0x01, 0x00, 0x00, 0x00)."
+#, no-wrap
 msgid ""
 "Set HDAU layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Setzt HDAU Layout auf 1:\n"
-"001 (0x01, 0x00, 0x00, 0x00)"
+"Setzt HDAU Layout auf 7:\n"
+"007 (0x07, 0x00, 0x00, 0x00)"
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:376

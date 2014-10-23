@@ -348,9 +348,10 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9553,	0xFFA21179, CHIP_FAMILY_RV710,		"ATI Mobility Radeon HD 4500",			kPeregrine		},
 	{ 0x9553,	0xFFC01179, CHIP_FAMILY_RV710,		"ATI Mobility Radeon HD 4500",			kPeregrine		},
 
- 	{ 0x9555,	0x29241682, CHIP_FAMILY_RV710,		"ATI Radeon HD 4550",                   kNull		},
-	{ 0x9555,	0x24651682, CHIP_FAMILY_RV710,		"ATI Radeon HD4300/HD4500",             kNull		}, 
-	{ 0x9555,	0x3711174B, CHIP_FAMILY_RV710,		"ATI Radeon HD4300/HD4500",             kNull		},
+ 	{ 0x9555,	0x1726103C, CHIP_FAMILY_RV710,		"ATI Radeon HD 4550",                   kShrike		},
+ 	{ 0x9555,	0x29241682, CHIP_FAMILY_RV710,		"ATI Radeon HD 4550",                   kShrike		},
+	{ 0x9555,	0x24651682, CHIP_FAMILY_RV710,		"ATI Radeon HD4300/HD4500",             kShrike		}, 
+	{ 0x9555,	0x3711174B, CHIP_FAMILY_RV710,		"ATI Radeon HD4300/HD4500",             kShrike		},
 
 	{ 0x9581,	0x011F1025, CHIP_FAMILY_RV630,		"ATI Radeon HD 2600",                   kNull		},
 	{ 0x9581,	0x0562107B, CHIP_FAMILY_RV630,		"ATI Radeon HD 2600",                   kNull		},

@@ -1094,8 +1094,8 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-    int argLen = argName ? strlen(argName) : 0;
-    int len = argLen + cnt + 1;  // +1 to account for space
+	int argLen = argName ? strlen(argName) : 0;
+	int len = argLen + cnt + 1;  // + 1 to account for space.
 
 	if (argName)
 	{
@@ -1107,8 +1107,9 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 		return false;
 	}
 
-	if (argName) {
-		strncpy( *argP, argName, argLen );
+	if (argName)
+	{
+		strncpy(*argP, argName, argLen);
 		*argP += argLen;
 		*argP[0] = '=';
 		(*argP)++;
@@ -1118,8 +1119,8 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 	*argP += cnt;
 	*argP[0] = ' ';
 	(*argP)++;
-
 	*cntRemainingP -= len;
+
 	return true;
 }
 
@@ -1201,6 +1202,9 @@ processBootOptions()
 		return -1;
 	}
 
+	// Find out which version mac os we're booting.
+	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+
 	// Load config table specified by the user, or use the default.
 
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
@@ -1225,17 +1229,45 @@ processBootOptions()
 	if (( kernel = extractKernelName((char **)&cp) ))
 	{
 		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
-	} else {
+	}
+	else
+	{
 		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) )
 		{
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
-		} else {
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+		}
+		else
+		{
+			if( YOSEMITE ) // is 10.10
+			{
+
+				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
+			}
+			else
+			{ // OSX is not 10.10
+
+				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/%s\n", bootInfo->bootFile);
+			}
 		}
 	}
-	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+
+	if (!YOSEMITE) // not 10.10 so 10.9 and previus
 	{
-		gOverrideKernel = true;
+		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+		{
+	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
+	}
+	else
+	{ // OSX is 10.10
+		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
+		{
+        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
@@ -1300,12 +1332,16 @@ processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else { /*
+		}
+		else
+		{ /*
 			if (strlen(gBootUUIDString))
 			{
 				val = "*uuid";
 				cnt = 5;
-			} else { */
+			}
+			else
+			{ */
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
@@ -1380,7 +1416,9 @@ processBootOptions()
 	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
 	{
 		strlcpy(gMKextName, val, cnt + 1);
-	} else {
+	}
+	else
+	{
 		gMKextName[0]=0;
 	}
 
@@ -1470,9 +1508,12 @@ void showTextBuffer(char *buf_orig, int size)
 
 void showHelp(void)
 {
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
-	} else {
+	}
+	else
+	{
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
 	}
 }
@@ -1484,14 +1525,16 @@ void showTextFile(const char * filename)
 	int	fd;
 	int	size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
         size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+        if (size > MAX_TEXT_FILE_SIZE)
+	{
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
@@ -1518,9 +1561,11 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (ASCII_KEY(key)) {
+		switch (ASCII_KEY(key))
+		{
 		case KEY_BKSP:
-			if (digitsI > 0) {
+			if (digitsI > 0)
+			{
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
 				// Assume x is not 0;
@@ -1529,7 +1574,9 @@ int selectAlternateBootDevice(int bootdevice)
 				// Overwrite with space without moving cursor position
 				putca(' ', 0x07, 1);
 				digitsI--;
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1537,7 +1584,8 @@ int selectAlternateBootDevice(int bootdevice)
 		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
-			if (end == digits && *end == '\0') {
+			if (end == digits && *end == '\0')
+			{
 				// User entered empty string
 				printf("\nUsing default boot device %x\n", bootdevice);
 				key = 0;
@@ -1552,10 +1600,13 @@ int selectAlternateBootDevice(int bootdevice)
 			break;
 
 		default:
-			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2)
+			{
 				putchar(ASCII_KEY(key));
 				digits[digitsI++] = ASCII_KEY(key);
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1568,9 +1619,12 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == KEY_ENTER) {
+	if (getchar() == KEY_ENTER)
+	{
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }

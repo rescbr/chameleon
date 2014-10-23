@@ -267,7 +267,7 @@ SMBValueSetter SMBSetters[] =
 		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber }, // SMboardserial - C02140302D5DMT31M
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTag),
-		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassetag - Base Board Asset Tag#
+		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassettag - Base Board Asset Tag#
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
 		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component
@@ -1046,7 +1046,19 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
- /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) { }*/
+ /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) {
+	SMBOemPlatformFeature *p = (SMBOemPlatformFeature *)structPtr->new;
+
+	p->header.type		= kSMBTypeOemPlatformFeature;
+	p->header.length	= sizeof(SMBOemPlatformFeature);
+	p->header.handle	= handle++;
+
+	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->PlatformFeature));
+
+	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPPlatformFeature) + 2);
+	tableLength += sizeof(SMBOemPlatformFeature) + 2;
+	structureCount++;
+ }*/
 
 //-------------------------------------------------------------------------------------------------------------------------
 // EndOfTable

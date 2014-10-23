@@ -88,6 +88,7 @@ kGUIDLastDwordOffs	EQU  12				; last 4 byte offset of a GUID
 
 kPartCount			EQU  4				; number of paritions per table
 kPartTypeHFS		EQU  0xaf			; HFS+ Filesystem type
+kPartTypeABHFS		EQU  0xab			; Apple_Boot partition
 kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR (PMBR)
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
@@ -763,13 +764,14 @@ getc:
 ; NULL terminated strings.
 ;
 log_title_str		db  10, 13, 'boot0: ', 0
-boot_error_str   	db  'error', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
 test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
+
+boot_error_str   	db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last

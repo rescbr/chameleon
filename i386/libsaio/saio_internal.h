@@ -28,11 +28,12 @@
 #include "saio_types.h"
 
 /* asm.s */
-extern void   real_to_prot(void);
-extern void   prot_to_real(void);
-extern void   halt(void);
-extern void   startprog(unsigned int address, void *arg);
-extern void   loader(UInt32 code, UInt32 cmdptr);
+extern void			real_to_prot(void);
+extern void			prot_to_real(void);
+extern void			halt(void);
+extern void			startprog(unsigned int address, void *arg);
+extern void			loader(UInt32 code, UInt32 cmdptr);
+extern uint64_t		computeRand(void);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -81,8 +82,7 @@ extern void   finalizeBootStruct(void);
 /* cache.c */
 extern void      CacheReset();
 extern void      CacheInit(CICell ih, u_int32_t blockSize);
-extern u_int32_t CacheRead(CICell ih, char *buffer, long long offset,
-                           u_int32_t length, long cache);
+extern u_int32_t CacheRead(CICell ih, char *buffer, long long offset, u_int32_t length, long cache);
 
 /* console.c */
 extern bool   gVerboseMode;

@@ -18,11 +18,10 @@
  * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
- *  load.c - Functions for decoding a Mach-o Kernel.
  *
- *  Copyright (c) 1998-2003 Apple Computer, Inc.
+ * load.c - Functions for decoding a Mach-o Kernel.
+ *
+ * Copyright (c) 1998-2003 Apple Computer, Inc.
  *
  */
 
@@ -59,19 +58,23 @@ long ThinFatFile(void **binary, unsigned long *length)
 	cpu_type_t fapcputype;
 	uint32_t fapoffset;
 	uint32_t fapsize;	
-  
-	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */{
+
+	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */
+	{
 		nfat = fhp->nfat_arch;
 		swapped = 0;
-	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */{
+	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */
+	{
 		nfat = OSSwapInt32(fhp->nfat_arch);
 		swapped = 1;
 	} else {
 		return -1;
 	}
 
-	for (; nfat > 0; nfat--, fap++) {
-		if (swapped) {
+	for (; nfat > 0; nfat--, fap++)
+	{
+		if (swapped)
+		{
 			fapcputype = OSSwapInt32(fap->cputype);
 			fapoffset = OSSwapInt32(fap->offset);
 			fapsize = OSSwapInt32(fap->size);
@@ -81,14 +84,16 @@ long ThinFatFile(void **binary, unsigned long *length)
 			fapsize = fap->size;
 		}
 
-		if (fapcputype == archCpuType) {
+		if (fapcputype == archCpuType)
+		{
 			*binary = (void *) ((unsigned long)*binary + fapoffset);
 			size = fapsize;
 			break;
 		}
 	}
 
-	if (length != 0) {
+	if (length != 0)
+	{
 		*length = size;
 	}
 
@@ -113,7 +118,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	mH = (struct mach_header *)(gBinaryAddress);
 
-    /*#if DEBUG
+/*#if DEBUG
 	DBG("magic:          0x%x\n", (unsigned)mH->magic);
 	DBG("cputype:        0x%x\n", (unsigned)mH->cputype);
 	DBG("cpusubtype:     0x%x\n", (unsigned)mH->cpusubtype);
@@ -121,16 +126,17 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	DBG("ncmds:          0x%x\n", (unsigned)mH->ncmds);
 	DBG("sizeofcmds:     0x%x\n", (unsigned)mH->sizeofcmds);
 	DBG("flags:          0x%x\n", (unsigned)mH->flags);
-    DBG("archCpuType:    0x%x\n", archCpuType);
+	DBG("archCpuType:    0x%x\n", archCpuType);
 	//getchar();
-    #endif*/
-    
+#endif*/
+
 	switch (archCpuType)
 	{
 		case CPU_TYPE_I386:
 
-			if (mH->magic != MH_MAGIC) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC)
+			{
+				error("Mach-O (i386) file has bad magic number\n");
 				return -1;
 			}
 
@@ -139,12 +145,14 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		case CPU_TYPE_X86_64:
 /*
-			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) {
+			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC)
+			{
 				return -1;
 			}
 */
-			if (mH->magic != MH_MAGIC_64) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC_64)
+			{
+				error("Mach-O file (x86_64) has bad magic number\n");
 				return -1;
 			}
 
@@ -167,7 +175,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		unsigned int load_addr;
 		unsigned int load_size;
 
-		switch (cmd) {
+		switch (cmd)
+		{
 			case LC_SEGMENT_64:
 			case LC_SEGMENT:
 			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
@@ -194,7 +203,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 
 
-	if (ret != 0) {
+	if (ret != 0)
+	{
 		return -1;
 	}
 
@@ -207,19 +217,22 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	cmdBase = cmdstart;
 
-	for (cnt = 0; cnt < ncmds; cnt++) {
+	for (cnt = 0; cnt < ncmds; cnt++)
+	{
 		cmd = ((long *)cmdBase)[0];
 		cmdsize = ((long *)cmdBase)[1];
-
-		if (cmd == LC_SYMTAB) {
-			if (DecodeSymbolTable(cmdBase) != 0) {
+		
+		if (cmd == LC_SYMTAB)
+		{
+			if (DecodeSymbolTable(cmdBase) != 0)
+			{
 				return -1;
 			}
 		}
 
 		cmdBase += cmdsize;
 	}
-	
+
 	return ret;
 }
 
@@ -234,7 +247,8 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	long   vmsize, filesize;
 	unsigned long vmaddr, fileaddr;
 
-	if (((long *)cmdBase)[0] == LC_SEGMENT_64) {
+	if (((long *)cmdBase)[0] == LC_SEGMENT_64)
+	{
 		struct segment_command_64 *segCmd;
 		segCmd = (struct segment_command_64 *)cmdBase;
 		vmaddr = (segCmd->vmaddr & 0x3fffffff);
@@ -267,20 +281,21 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 #endif
 	}
 
-	if (vmsize == 0 || filesize == 0) {
+	if (vmsize == 0 || filesize == 0)
+	{
 		*load_addr = ~0;
 		*load_size = 0;
 		return 0;
 	}
 
-		if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
-			 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
-			stop("Kernel overflows available space");
-		}
+	if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
+		 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
+		stop("Kernel overflows available space");
+	}
 
-		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
-			gHaveKernelCache = true;
-		}
+	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
+		gHaveKernelCache = true;
+	}
 
 	// Copy from file load area.
 	if (vmsize>0 && filesize > 0) {

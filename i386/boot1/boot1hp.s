@@ -269,7 +269,7 @@ startReloc:
     mov     al, 1							; read HFS+ Volume Header
     mov     edx, kHFSPlusBuffer
     call    readLBA
-	jc		NEAR bios_read_error
+    jc      NEAR bios_read_error
 
 	;
 	; Looking for HFSPlus ('H+') or HFSPlus case-sensitive ('HX') signature.

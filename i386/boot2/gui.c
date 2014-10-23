@@ -44,6 +44,8 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
+	iDeviceHFS_yos,
+	iDeviceHFS_yos_o,
 	iDeviceHFS_mav,
 	iDeviceHFS_mav_o,
 	iDeviceHFS_ML,
@@ -59,6 +61,8 @@ enum {
 
 	iDeviceHFSRAID,
 	iDeviceHFSRAID_o,
+	iDeviceHFSRAID_yos,
+	iDeviceHFSRAID_yos_o,
 	iDeviceHFSRAID_mav,
 	iDeviceHFSRAID_mav_o,
 	iDeviceHFSRAID_ML,
@@ -126,6 +130,8 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
+	{.name = "device_hfsplus_yos",          .image = NULL},
+	{.name = "device_hfsplus_yos_o",        .image = NULL},
 	{.name = "device_hfsplus_mav",          .image = NULL},
 	{.name = "device_hfsplus_mav_o",        .image = NULL},
 	{.name = "device_hfsplus_ml",           .image = NULL},
@@ -141,6 +147,8 @@ image_t images[] = {
 
 	{.name = "device_hfsraid",              .image = NULL},
 	{.name = "device_hfsraid_o",            .image = NULL},
+	{.name = "device_hfsraid_yos",          .image = NULL},
+	{.name = "device_hfsraid_yos_o",        .image = NULL},
 	{.name = "device_hfsraid_mav",          .image = NULL},
 	{.name = "device_hfsraid_mav_o",        .image = NULL},
 	{.name = "device_hfsraid_ml",           .image = NULL},
@@ -358,6 +366,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(device_hfsplus_yos,             iDeviceHFS);
+	LOADPNG(device_hfsplus_yos_o,           iDeviceHFS_yos);
 	LOADPNG(device_hfsplus_mav,             iDeviceHFS);
 	LOADPNG(device_hfsplus_mav_o,           iDeviceHFS_mav);
 	LOADPNG(device_hfsplus_ml,              iDeviceHFS);
@@ -373,6 +383,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_yos,             iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_yos_o,           iDeviceHFSRAID_yos);
 	LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_mav_o,           iDeviceHFSRAID_mav);
 	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID);
@@ -984,6 +996,15 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 					case '4':
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Tiger : iDeviceHFS_Tiger);
 						break;
+					case '1':
+						if (device->OSVersion[4] == '0') { // 10.10
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+							break;
+						}
+						//if (device->OSVersion[4] == '1') { // 10.11
+						//	devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_??? : iDeviceHFS_???);
+						//	break;
+						//}
 					default:
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
 						break;

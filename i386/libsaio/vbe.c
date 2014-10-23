@@ -36,7 +36,7 @@ static biosBuf_t bb;
 #if UNUSED
 
 //==============================================================================
-
+#if UNUSED
 static inline void
 outi (int port, int index, int val)
 {
@@ -68,7 +68,7 @@ rmwi(int port, int index, int clear, int set)
     outb (port, index);
     outb (port + 1, (inb (port + 1) & ~clear) | set);
 }
-
+#endif /* UNUSED */
 //==============================================================================
 
 #endif /* UNUSED */

@@ -196,8 +196,10 @@ entry  = strtoul((const char *)str, NULL,base);				\
 return entry;												\
 }
 
-__RES(pss, long)    
-/* __RES(cst, int) */ /* unused */
+__RES(pss, long)
+#if UNUSED
+	__RES(cst, int)  
+#endif /* UNUSED */
 
 static ACPI_TABLE_HEADER * get_new_table_in_list(U32 *new_table_list, U32 Signature, U8 *retIndex )
 {

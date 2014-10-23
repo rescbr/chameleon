@@ -1,3 +1,32 @@
+- ErmaC : Merge Yosemite patch (ready from June 2014) Thanks all involved in the test and develop;
+		Special thanks: Alex J, viv xix, zenith432 from http://forge.voodooprojects.org/p/chameleon/issues/375/
+		Testing and improvements: Pike R. Alpha, ErmaC, Bungo, blackosx, Micky1979, crazybirdy, oldnapalm, janek202, MinusZwei and Andy Vandijck.
+
+- Pike R. Alpha : dinamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- ErmaC : getCPUTick() helper function ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- ErmaC : Add Yosemite Icons detection for chameleon UI
+- blackosx : Add chameleon UI Icons for Yosemite
+- ErmaC : Use macro instead of full checkOSVersion
+- viv xix : Move checkOSVersion into boot header
+- ErmaC : define macro for OS X Versions
+- Slice and Clover Team : Replace "NULL" terminated strings and fit Boot2 Sectors size
+- ErmaC : Update bootargs
+- crazybirdy : Fit length for "Loading Darwin"
+- meklort : Update align directives to 2^(old_align)
+- Ermac : Bump svn to 2.3
+- ErmaC : Update efi Header
+- cparm : buffer BPS
+- cparm : devprop_generate_string optimized by cparm
+- ErmaC : Update CPUID and change conditional logic.
+- ErmaC : Typo & ID names
+- meklort : Make compile on gcc w/ errors enabled.
+- bitshoveler : Remove the '-x' option from the offending 'ld' command
+- Jief : Makefile dependency missing for boot0 and boot1h
+- ErmaC :Temp disable klibc module
+- meklort : Silence output.
+- meklort : Add --no-print-directory.
+- meklort : Replace \t with tab.
+- ErmaC : Update Chameleon.xcodeproj
 - ErmaC : Merge LZVN decompression routine by MinusZwei (C Conversion) based on works from Pike R. Alpha and AnV Software (Andy Vandijck).
 - Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.
 - ErmaC : Merge tja's patch http://forum.voodooprojects.org/index.php/topic,5951.0.html

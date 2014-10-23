@@ -240,8 +240,11 @@ long LoadDrivers( char * dirSpec )
 					error("Could not load %s\n", gMKextName);
 					return -1;
 				}
-			} else {
-				if (gMacOSVersion[3] == '9') {
+			}
+			else
+			{
+				if ( MAVERICKS || YOSEMITE ) // issue 352
+				{
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
@@ -532,6 +535,12 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 		break;
 	}
 
+	if (!module) // cparm
+	{
+		ret = -1;
+		break;
+	} // Should never happen but it will make the compiler happy
+
 	// Allocate memory for the driver path and the plist.
 
 	module->executablePath = tmpExecutablePath;
@@ -769,7 +778,8 @@ FindModule( char * name )
 	{
 		prop = GetProperty(module->dict, kPropCFBundleIdentifier);
 
-		if ((prop != 0) && !strcmp(name, prop->string)) {
+		if ((prop != 0) && !strcmp(name, prop->string))
+		{
 			break;
 		}
 
@@ -795,22 +805,26 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 	while (1)
 	{
 		length = XMLParseNextTag(buffer + pos, &moduleDict);
-		if (length == -1) {
+		if (length == -1)
+		{
 			break;
 		}
 
 		pos += length;
 
-		if (moduleDict == 0) {
+		if (moduleDict == 0)
+		{
 			continue;
 		}
-		if (moduleDict->type == kTagTypeDict) {
+		if (moduleDict->type == kTagTypeDict)
+		{
 			break;
 		}
 		XMLFreeTag(moduleDict);
 	}
 
-	if (length == -1) {
+	if (length == -1)
+	{
 		return -1;
 	}
 
@@ -823,7 +837,8 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 	}
 
 	tmpModule = malloc(sizeof(Module));
-	if (tmpModule == 0) {
+	if (tmpModule == 0)
+	{
 		XMLFreeTag(moduleDict);
 		return -1;
 	}
@@ -848,8 +863,7 @@ static char gPlatformName[64];
 
 char *gDarwinBuildVerStr = "Darwin Kernel Version"; // Bungo
 
-long
-DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
+long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
 	long ret = 0;
 	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
@@ -882,6 +896,7 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		{
 			return -1;
 		}
+
 		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
 		{
 			return -1;
@@ -907,8 +922,18 @@ DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 		// MinusZwei
 
-		if (uncompressed_size != size) {
-			error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+		if (uncompressed_size != size)
+		{
+			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
+			{
+				error("ERROR: size mismatch from lzvn (found: %x, expected: %x).\n", size, uncompressed_size);
+			}
+
+			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+			{
+				error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+			}
+
 			return -1;
 		}
 

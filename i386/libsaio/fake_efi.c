@@ -68,12 +68,22 @@ static uint64_t ptov64(uint32_t addr)
 	return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
 }
 
+// ==========================================================================
+// ErmaC
+static inline uint64_t getCPUTick(void)
+{
+	uint32_t lowest;
+	uint32_t highest;
+	__asm__ volatile ("rdtsc" : "=a" (lowest), "=d" (highest));
+	return (uint64_t) highest << 32 | lowest;
+}
+
 /*==========================================================================
  * Fake EFI implementation
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','3', 0};
 // Bungo
 //static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
 static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
@@ -92,6 +102,8 @@ static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_64[] = {0x48, 0xb8, 0x03, 0x00,
 EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
+
+// ==========================================================================
 
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
@@ -145,6 +157,8 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	}
 	return EFI_UNSUPPORTED;
 }
+
+// ==========================================================================
 
 //Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
@@ -437,7 +451,7 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-/* static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32"; */ /* unused */
+//static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char EFI_MODE_PROP[] = "efi-mode";  //Bungo
 static const char SYSTEM_ID_PROP[] = "system-id";
@@ -695,8 +709,92 @@ void setupChosenNode()
 
 	length = strlen(bootInfo->bootFile);
 	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+//	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
+
+//	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
+
+//	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
 
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
+
+
+	if(YOSEMITE)
+	{
+		//
+		// Pike R. Alpha - 12 October 2014
+		//
+		UInt8 index = 0;
+		EFI_UINT16 PMTimerValue = 0;
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi = 0;
+		EFI_UINT32 rcx, rdx, rsi, rdi;
+
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		rcx = rdx = rsi = rdi = cpuTick = 0;
+
+		// LEAF_1 - Feature Information (Function 01h).
+		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
+		{
+			//
+			// i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
+			//
+			EFI_UINT32 seedBuffer[16] = {0};
+			//
+			// Main loop to get 16 qwords (four bytes each).
+			//
+			for (index = 0; index < 16; index++)					// 0x17e12:
+			{
+				randomValue = computeRand();					// callq	0x18e20
+				cpuTick = getCPUTick();						// callq	0x121a7
+				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
+				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
+			}									// jb		0x17e12
+
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32*) &seedBuffer);
+		}
+		else
+		{
+			//
+			// All other processors without RDRAND support.
+			//
+			EFI_UINT8 seedBuffer[64] = {0};
+			//
+			// Main loop to get the 64 bytes.
+			//
+			do									// 0x17e55:
+			{
+				PMTimerValue = inw(0x408);					// in		(%dx),	%ax
+				esi = PMTimerValue;						// movzwl	%ax,	%esi
+
+				if (esi < ecx)							// cmp		%ecx,	%esi
+				{
+					continue;						// jb		0x17e55		(retry)
+				}
+
+				cpuTick = getCPUTick();						// callq	0x121a7
+				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				rdi = rsi;							// mov		%rsi,	%rdi
+				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
+				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
+				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+
+				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
+
+				edi = (edi & 0x2f);						// and		$0x2f,	%edi
+				edi = (edi + esi);						// add		%esi,	%edi
+				index++;							// inc		r12
+				ecx = (edi & 0xffff);						// movzwl	%di,	%ecx
+
+			} while (index < 64);							// cmp		%r14d,	%r12d
+			// jne		0x17e55		(next)
+
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8*) &seedBuffer);
+
+		}
+	}
 }
 
 /*

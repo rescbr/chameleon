@@ -54,22 +54,22 @@ $(OBJROOT)/%.o64: %.c
 
 
 $(OBJROOT)/%.o: %.c
-	@echo "\t[CC] $<"
+	@echo "	[CC] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
 
 $(OBJROOT)/%.o: %.m
-	@echo "\t[M] $<"
+	@echo "	[M] $<"
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -MM -M -o $@.Makedep
 	@$(CC) $(CFLAGS) $(DEFINES) -c $(INC) $< -o $@ 
 
 $(OBJROOT)/%.o: %.cpp
-	@echo "\t[CPP] $<"
+	@echo "	[CPP] $<"
 	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -MM -M -o $@.Makedep
 	@$(CPP) $(CPPFLAGS) $(CFLAGS) -c "$<" $(INC) -o $@ 
 
 $(OBJROOT)/%.o: %.s
-	@echo "\t[AS] $<"
+	@echo "	[AS] $<"
 	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -MM -M -o $@.Makedep
 	@$(CC) $(CPPFLAGS) -c $(INC) -arch i386 $< -o $@
 
@@ -89,7 +89,7 @@ CONFIG_HEADERS=$(CONFIG_FILES) $(HEADER_VERSION)
 
 # This breaks make, must use make all (FIXME)
 $(DIRS_NEEDED) $(INSTALLDIR) $(OBJROOT) $(SYMROOT):
-	@echo "\t[MKDIR] $@"
+	@echo "	[MKDIR] $@"
 	@$(MKDIRS) $@
 
 # Recursive rules
@@ -127,13 +127,13 @@ $(RECURSIVE_CLEAN_TARGETS):
 					else \
 						local_target="$$target"; \
 					fi; \
-					(cd $$subdir && $(MAKE) $$local_target) \
+					(cd $$subdir && $(MAKE) --no-print-directory $$local_target) \
 					|| eval $$failcom; \
 				done
 
 
 clean-dep:
-	@if [ -f "$(OBJROOT)/Makedep" ];then echo "\t[RM] $(OBJROOT)/Makedep"; fi
+	@if [ -f "$(OBJROOT)/Makedep" ];then echo "	[RM] $(OBJROOT)/Makedep"; fi
 	@rm -f $(OBJROOT)/Makedep
 
 
@@ -141,11 +141,11 @@ FIND_IGNORE := \( -name .git -o -name .svn \) -prune -o -name Cconfig -o
 
 # clean: remove almost everything (execpt auto.conf, autoconf.h, autoconf.inc)
 clean: clean-recursive clean-dep
-	@if [ -d "$(OBJROOT)" ];then echo "\t[RMDIR] $(OBJROOT)"; fi
-	@if [ -d "$(SYMROOT)" ];then echo "\t[RMDIR] $(SYMROOT)"; fi
-	@if [ -d "$(DSTROOT)" ];then echo "\t[RMDIR] $(DSTROOT)"; fi
+	@if [ -d "$(OBJROOT)" ];then echo "	[RMDIR] $(OBJROOT)"; fi
+	@if [ -d "$(SYMROOT)" ];then echo "	[RMDIR] $(SYMROOT)"; fi
+	@if [ -d "$(DSTROOT)" ];then echo "	[RMDIR] $(DSTROOT)"; fi
 	@if [ -d "$(SRCROOT)/i386/modules/module_includes" ];then \
-		echo "\t[RMDIR] $(SRCROOT)/i386/modules/module_includes"; \
+		echo "	[RMDIR] $(SRCROOT)/i386/modules/module_includes"; \
 	 fi
 	@rm -rf $(OBJROOT) $(SYMROOT) $(DSTROOT)        \
             $(SRCROOT)/i386/modules/module_includes 

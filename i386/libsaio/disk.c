@@ -681,20 +681,29 @@ BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
 
 // GUID's in LE form:
 // HFS+ partition - 48465300-0000-11AA-AA11-00306543ECAC
-EFI_GUID const GPT_HFS_GUID		   = { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
+EFI_GUID const GPT_HFS_GUID		= { 0x48465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF00 "Apple HFS/HFS+"
 
 // turbo - Apple Boot Partition - 426F6F74-0000-11AA-AA11-00306543ECAC
-EFI_GUID const GPT_BOOT_GUID	   = { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } };
+EFI_GUID const GPT_BOOT_GUID		= { 0x426F6F74, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAB00 "Apple boot"
 
 // turbo - or an EFI System Partition - C12A7328-F81F-11D2-BA4B-00A0C93EC93B
-EFI_GUID const GPT_EFISYS_GUID	   = { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } };
+EFI_GUID const GPT_EFISYS_GUID		= { 0xC12A7328, 0xF81F, 0x11D2, { 0xBA, 0x4B, 0x00, 0xA0, 0xC9, 0x3E, 0xC9, 0x3B } }; // 0xEF00 "EFI System"
 
 // zef - Basic Data Partition - EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 for foreign OS support
-EFI_GUID const GPT_BASICDATA_GUID  = { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } };
+EFI_GUID const GPT_BASICDATA_GUID	= { 0xEBD0A0A2, 0xB9E5, 0x4433, { 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 } }; // 0x0100 "Microsoft basic data"
 
 // Microsoft Reserved Partition - E3C9E316-0B5C-4DB8-817DF92DF00215AE
-EFI_GUID const GPT_BASICDATA2_GUID = { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } };
+EFI_GUID const GPT_BASICDATA2_GUID	= { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D, 0xF9, 0x2D, 0xF0, 0x02, 0x15, 0xAE } }; // 0x0C01 "Microsoft reserved"
 
+// Apple OSX
+//EFI_GUID const GPT_UFS_GUID		= { 0x55465300, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xA800 "Apple UFS"
+//EFI_GUID const GPT_RAID_GUID		= { 0x52414944, 0x0000, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF01 "Apple RAID"
+//EFI_GUID const GPT_RAID_OFFLINE_GUID	= { 0x52414944, 0x5f4f, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF02 "Apple RAID offline"
+//EFI_GUID const GPT_LABEL_GUID		= { 0x4C616265, 0x6C00, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF03 "Apple label"
+//EFI_GUID const GPT_APPLETV_GUID	= { 0x5265636F, 0x7665, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF04 "Apple TV recovery"
+//EFI_GUID const GPT_CORESTORAGE_GUID	= { 0x53746F72, 0x6167, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF05 "Apple Core storage"
+// same as Apple ZFS
+//EFI_GUID const GPT_ZFS_GUID		= { 0x6A898CC3, 0x1DD2, 0x11B2, { 0x99, 0xA6, 0x08, 0x00, 0x20, 0x73, 0x66, 0x31 } };  // 0xBF01 "Solaris /usr & Apple ZFS
 
 BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                    const gpt_ent * part,
@@ -1039,8 +1048,10 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 			HFSGetDirEntry,
 			HFSGetFileBlock,
 			HFSGetUUID,
+			HFSGetDescription,
+			HFSFree,
 			0,
-			kBIOSDevTypeHardDrive);
+			kBIOSDevTypeHardDrive, 0);
 		bvr->next = map->bvr;
 		map->bvr = bvr;
 		map->bvrcnt++;
@@ -1078,6 +1089,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	{
 		return NULL;
 	}
+	bzero(buffer,BPS);
 
 	/* Check for alternate block size */
 	if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0)
@@ -1096,6 +1108,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 			{
 				return NULL;
 			}
+			bzero(buffer,BPS);
 		}
 		factor = blksize / BPS;
 	}
@@ -1578,7 +1591,12 @@ static bool getOSVersion(BVRef bvr, char *str)
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
-			strncat(str, val, MIN(len, 4));
+			// crazybirdy
+			if (len > 4 && (val[3] == '1')) {
+				strncat(str, val, MIN(len, 5));
+			} else {
+				strncat(str, val, MIN(len, 4));
+			}
 		} else {
 			valid = false;
 		}
