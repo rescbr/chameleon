@@ -1566,7 +1566,13 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 
 static int patch_nvidia_rom(uint8_t *rom)
 {
-	if (!rom || (rom[0] != 0x55 && rom[1] != 0xaa)) {
+	if (!rom)
+	{
+		printf("ROM not found\n");
+		return PATCH_ROM_FAILED;
+	}
+	if (rom[0] != 0x55 && rom[1] != 0xaa)
+	{
 		printf("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
 		return PATCH_ROM_FAILED;
 	}
@@ -1793,7 +1799,6 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 		for (i = 0; i < (sizeof(nvidia_card_exceptions) / sizeof(nvidia_card_exceptions[0])); i++) {
 			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))	{
 				return nvidia_card_exceptions[i].name;
-				break;
 			}
 		}
 	}
@@ -1968,7 +1973,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	option_rom_pci_header_t		*rom_pci_header;
 	volatile uint8_t		*regs;
 	uint8_t				*rom = NULL;
-	uint8_t				*nvRom;
 	uint8_t				nvCardType = 0;
 	unsigned long long		videoRam = 0;
 	uint32_t			nvBiosOveride;
@@ -2013,6 +2017,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			return false;
 		}
 	} else {
+		uint8_t	*nvRom;
 		rom = malloc(NVIDIA_ROM_SIZE);
 		// Otherwise read bios from card
 		nvBiosOveride = 0;
@@ -2020,6 +2025,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		// PROM first
 		// Enable PROM access
 		(REG32(NV_PBUS_PCI_NV_20)) = NV_PBUS_PCI_NV_20_ROM_SHADOW_DISABLED;
+
 		nvRom = (uint8_t*)&regs[NV_PROM_OFFSET];
 
 		// Valid Signature ?
@@ -2055,7 +2061,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED) {
 		printf("ERROR: nVidia ROM Patching Failed!\n");
 		free(rom);
-		//return false;
+		return false;
 	}
 
 	rom_pci_header = (option_rom_pci_header_t*)(rom + *(uint16_t *)&rom[24]);

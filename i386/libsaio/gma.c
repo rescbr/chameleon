@@ -549,65 +549,65 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_IVYBRIDGE_S_GT4: // 0172
         case GMA_IVYBRIDGE_S_GT5: // 0176
 
-            if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_IVY * 2)
-            {
-                uint8_t new_aapl0[AAPL_LEN_IVY];
-                
-                if (hex2bin(value, new_aapl0, AAPL_LEN_IVY) == 0)
-                {
-                    memcpy(default_aapl_ivy, new_aapl0, AAPL_LEN_IVY);
-                    
-                    verbose("Using user supplied AAPL,ig-platform-id\n");
-                    verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
-                           default_aapl_ivy[0], default_aapl_ivy[1], default_aapl_ivy[2], default_aapl_ivy[3]);
-                }
-                devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_ivy, AAPL_LEN_IVY);
-            }
-            else if (getIntForKey(kIntelCapriFB, &n_igs, &bootInfo->chameleonConfig))
-            {
-                if ((n_igs >= 0) || (n_igs <= 11))
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
-                    devprop_add_value(device, "AAPL,ig-platform-id", ivy_bridge_ig_vals[n_igs], 4);
-                }
-                else
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
-                }
-            }
-            else
-            {
-                uint32_t ig_platform_id;
-                uint32_t ram = (((getVBEVideoRam() + 512) / 1024) + 512) / 1024;
-                switch (ram)
-                {
-                    case 96:
-                        ig_platform_id = 0x01660000; // 96mb Mobile
-                        break;
+		if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_IVY * 2)
+		{
+			uint8_t new_aapl0[AAPL_LEN_IVY];
 
-                    case 64:
-                        ig_platform_id = 0x01660009; // 64mb Mobile
-                        break;
+			if (hex2bin(value, new_aapl0, AAPL_LEN_IVY) == 0)
+			{
+				memcpy(default_aapl_ivy, new_aapl0, AAPL_LEN_IVY);
 
-                    case 32:
-                        ig_platform_id = 0x01620005; // 32mb Desktop
-                        break;
+				verbose("Using user supplied AAPL,ig-platform-id\n");
+				verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+				default_aapl_ivy[0], default_aapl_ivy[1], default_aapl_ivy[2], default_aapl_ivy[3]);
+			}
+			devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_ivy, AAPL_LEN_IVY);
+		}
+		else if (getIntForKey(kIntelCapriFB, &n_igs, &bootInfo->chameleonConfig))
+		{
+			if ((n_igs >= 0) || (n_igs <= 11))
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+				devprop_add_value(device, "AAPL,ig-platform-id", ivy_bridge_ig_vals[n_igs], 4);
+			}
+			else
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
+			}
+		}
+		else
+		{
+			uint32_t ig_platform_id;
+			uint32_t ram = (((getVBEVideoRam() + 512) / 1024) + 512) / 1024;
+			switch (ram)
+			{
+				case 96:
+					ig_platform_id = 0x01660000; // 96mb Mobile
+					break;
 
-                    default:
-                        printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
-                               "The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
-                        pause();
-                        return false;	// Exit early before the AAPL,ig-platform-id property is set.
-                        break;
-                }
-                devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
-            }
+				case 64:
+					ig_platform_id = 0x01660009; // 64mb Mobile
+					break;
 
-            devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
-            devprop_add_value(device, "built-in", &BuiltIn, 1);
-            devprop_add_value(device, "class-code", ClassFix, 4);
-            devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
-            break;
+				case 32:
+					ig_platform_id = 0x01620005; // 32mb Desktop
+					break;
+
+				default:
+					printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
+					"The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
+					pause();
+					return false;	// Exit early before the AAPL,ig-platform-id property is set.
+					break;
+			}
+			devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+		}
+
+		devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+		break;
 
         /* Haswell */
         /* HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile */

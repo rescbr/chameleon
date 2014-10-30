@@ -30,7 +30,7 @@
 boolean_t tableSign(char *table, const char *sgn)
 {
 	int i;
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		if ((table[i] &~0x20) != (sgn[i] &~0x20))
 		{
@@ -46,6 +46,7 @@ static struct acpi_2_rsdp* getAddressOfAcpiTable()
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
 	void *acpi_addr = (void*)ACPI_RANGE_START;
+
 	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
 	{
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
@@ -68,6 +69,7 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
 	void *acpi_addr = (void*)ACPI_RANGE_START;
+
 	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
 	{
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
@@ -210,7 +212,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 {
-	char ssdt_header[] =
+	char ssdt_header[] = // cst_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
@@ -409,7 +411,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 {
-	char ssdt_header[] =
+	char ssdt_header[] = // pss_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x6A, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x00, /* ..PmRef. */
@@ -1127,11 +1129,14 @@ int setupAcpi(void)
 			DBG("New extended checksum %d\n", rsdp_mod->ExtendedChecksum);
 		}
 
-		if (version) {
+		if (version)
+		{
 			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi20_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
-		} else {
+		}
+		else
+		{
 			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi10_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");

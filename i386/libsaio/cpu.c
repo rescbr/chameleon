@@ -299,11 +299,11 @@ void scan_cpu(PlatformInfo_t *p)
 
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);     // stepping = cpu_feat_eax & 0xF;
-	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);     // model = (cpu_feat_eax >> 4) & 0xF;
-	p->CPU.Family		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);    // family = (cpu_feat_eax >> 8) & 0xF;
+	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
+	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);	// model = (cpu_feat_eax >> 4) & 0xF;
+	p->CPU.Family		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);	// family = (cpu_feat_eax >> 8) & 0xF;
 	//p->CPU.Type		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
-	p->CPU.ExtModel		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);   // ext_model = (cpu_feat_eax >> 16) & 0xF;
+	p->CPU.ExtModel		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);	// ext_model = (cpu_feat_eax >> 16) & 0xF;
 	p->CPU.ExtFamily	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
@@ -347,14 +347,16 @@ void scan_cpu(PlatformInfo_t *p)
 		} // end switch
 	}
 
-	if (p->CPU.NoCores == 0) {
+	if (p->CPU.NoCores == 0)
+	{
 		p->CPU.NoCores		= (uint8_t)(p->CPU.CoresPerPackage & 0xff);
 		p->CPU.NoThreads	= (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
 	}
 
 	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
-	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004) {
+	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
+	{
 		char	 *s;
 		bzero(str, 128);
 		/*
@@ -367,14 +369,17 @@ void scan_cpu(PlatformInfo_t *p)
 		memcpy(&str[16], (char *)reg, 16);
 		do_cpuid(0x80000004, reg);
 		memcpy(&str[32], (char *)reg, 16);
-		for (s = str; *s != '\0'; s++) {
-			if (*s != ' ') { break; }
+		for (s = str; *s != '\0'; s++)
+		{
+			if (*s != ' ')
+			{
+				break;
+			}
 		}
 		strlcpy(p->CPU.BrandString, s, 48);
 
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN,
-                     MIN(sizeof(p->CPU.BrandString),
-                         strlen(CPU_STRING_UNKNOWN) + 1))) {
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1)))
+		{
 			/*
 			 * This string means we have a firmware-programmable brand string,
 			 * and the firmware couldn't figure out what sort of CPU we have.
@@ -387,55 +392,77 @@ void scan_cpu(PlatformInfo_t *p)
 
 	//workaround for N270. I don't know why it detected wrong
 	// MSR is *NOT* available on the Intel Atom CPU
-	if ((p->CPU.Model == CPU_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270"))) {
+	if ((p->CPU.Model == CPU_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+	{
 		p->CPU.NoCores		= 1;
 		p->CPU.NoThreads	= 2;
 	}
 
-	if (p->CPU.Vendor == CPUID_VENDOR_AMD) {
+	if (p->CPU.Vendor == CPUID_VENDOR_AMD)
+	{
 		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
 	}
 
 	/* setup features */
-	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_MMX;
 	}
-	if ((bit(25) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(25) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE;
 	}
-	if ((bit(26) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(26) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE2;
 	}
-	if ((bit(0) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(0) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE3;
 	}
-	if ((bit(19) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(19) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE41;
 	}
-	if ((bit(20) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(20) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE42;
 	}
-	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0) {
+
+	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_EM64T;
 	}
-	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_MSR;
 	}
+
 	//if ((bit(28) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-	if (p->CPU.NoThreads > p->CPU.NoCores) {
+
+	if (p->CPU.NoThreads > p->CPU.NoCores)
+	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
 
 	tscFrequency = measure_tsc_frequency();
 	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
 	/* if usual method failed */
-	if ( tscFrequency < 1000 ) { //TEST
+	if ( tscFrequency < 1000 )	//TEST
+	{
 		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
 		// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
 	} else {
 		// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
 	}
+
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
@@ -468,7 +495,8 @@ void scan_cpu(PlatformInfo_t *p)
 					bus_ratio_min = bitfield(msr, 47, 40); //valv: not sure about this one (Remarq.1)
 					msr = rdmsr64(MSR_FLEX_RATIO);
 					DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
-					if (bitfield(msr, 16, 16)) {
+					if (bitfield(msr, 16, 16))
+					{
 						flex_ratio = bitfield(msr, 15, 8);
 						/* bcc9: at least on the gigabyte h67ma-ud2h,
 						 where the cpu multipler can't be changed to
@@ -478,48 +506,65 @@ void scan_cpu(PlatformInfo_t *p)
 						 causing the system to crash since tscGranularity
 						 is inadvertently set to 0.
 						 */
-						if (flex_ratio == 0) {
+						if (flex_ratio == 0)
+						{
 							/* Clear bit 16 (evidently the presence bit) */
 							wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 							msr = rdmsr64(MSR_FLEX_RATIO);
 							DBG("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
-						} else {
-							if (bus_ratio_max > flex_ratio) {
+						}
+						else
+						{
+							if (bus_ratio_max > flex_ratio)
+							{
 								bus_ratio_max = flex_ratio;
 							}
 						}
 					}
 
-					if (bus_ratio_max) {
+					if (bus_ratio_max)
+					{
 						fsbFrequency = (tscFrequency / bus_ratio_max);
 					}
+
 					//valv: Turbo Ratio Limit
-					if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
+					if ((intelCPU != 0x2e) && (intelCPU != 0x2f))
+					{
 						msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 
 						cpuFrequency = bus_ratio_max * fsbFrequency;
 						max_ratio = bus_ratio_max * 10;
-					} else {
+					}
+					else
+					{
 						cpuFrequency = tscFrequency;
 					}
-					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
+					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
+					{
 						max_ratio = atoi(newratio);
 						max_ratio = (max_ratio * 10);
-						if (len >= 3) {
+						if (len >= 3)
+						{
 							max_ratio = (max_ratio + 5);
 						}
 
 						verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 						// extreme overclockers may love 320 ;)
-						if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
+						if ((max_ratio >= min_ratio) && (max_ratio <= 320))
+						{
 							cpuFrequency = (fsbFrequency * max_ratio) / 10;
-							if (len >= 3) {
+							if (len >= 3)
+							{
 								maxdiv = 1;
-							} else {
+							}
+							else
+							{
 								maxdiv = 0;
 							}
-						} else {
+						}
+						else
+						{
 							max_ratio = (bus_ratio_max * 10);
 						}
 					}
@@ -544,37 +589,53 @@ void scan_cpu(PlatformInfo_t *p)
 				currdiv = bitfield(msr, 14, 14);
 
 				// This will always be model >= 3
-				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f)) {
+				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f))
+				{
 					/* On these models, maxcoef defines TSC freq */
 					maxcoef = bitfield(msr, 44, 40);
-				} else {
+				}
+				else
+				{
 					/* On lower models, currcoef defines TSC freq */
 					/* XXX */
 					maxcoef = currcoef;
 				}
 
-				if (maxcoef) {
-					if (maxdiv) {
+				if (maxcoef)
+				{
+					if (maxdiv)
+					{
 						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-					} else {
+					}
+					else
+					{
 						fsbFrequency = (tscFrequency / maxcoef);
 					}
-					if (currdiv) {
+
+					if (currdiv)
+					{
 						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-					} else {
+					}
+					else
+					{
 						cpuFrequency = (fsbFrequency * currcoef);
 					}
+
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
 				}
 				break;
 			}
 		}
 		/* Mobile CPU */
-		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28)) {
+		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
+		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
-	} else if ((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f)) {
-		switch(p->CPU.ExtFamily) {
+	}
+	else if ((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
+	{
+		switch(p->CPU.ExtFamily)
+		{
 			case 0x00: /* K8 */
 				msr = rdmsr64(K8_FIDVID_STATUS);
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
@@ -585,7 +646,8 @@ void scan_cpu(PlatformInfo_t *p)
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
-				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1) {
+				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1)
+				{
 					//uint64_t mperf = measure_mperf_frequency();
 					uint64_t aperf = measure_aperf_frequency();
 					cpuFrequency = aperf;
@@ -611,31 +673,47 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 		}
 
-		if (maxcoef) {
-			if (currdiv) {
-				if (!currcoef) {
+		if (maxcoef)
+		{
+			if (currdiv)
+			{
+				if (!currcoef)
+				{
 					currcoef = maxcoef;
 				}
 
-				if (!cpuFrequency) {
+				if (!cpuFrequency)
+				{
 					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
-				} else {
+				}
+				else
+				{
 					fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
 				}
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			} else {
-				if (!cpuFrequency) {
+			}
+			else
+			{
+				if (!cpuFrequency)
+				{
 					fsbFrequency = (tscFrequency / maxcoef);
-				} else {
+				}
+				else
+				{
 					fsbFrequency = (cpuFrequency / maxcoef);
 				}
 				DBG("%d\n", currcoef);
 			}
-		} else if (currcoef) {
-			if (currdiv) {
+		}
+		else if (currcoef)
+		{
+			if (currdiv)
+			{
 				fsbFrequency = ((tscFrequency * currdiv) / currcoef);
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			} else {
+			}
+			else
+			{
 				fsbFrequency = (tscFrequency / currcoef);
 				DBG("%d\n", currcoef);
 			}
@@ -665,7 +743,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	// keep formatted with spaces instead of tabs
 	DBG("\n---------------------------------------------\n");
-   	DBG("--------------- CPU INFO ---------------\n");
+   	DBG("------------------ CPU INFO -----------------\n");
 	DBG("---------------------------------------------\n");
 	DBG("Brand String:            %s\n",                 p->CPU.BrandString); // Processor name (BIOS)
 	DBG("Vendor:                  0x%x\n",               p->CPU.Vendor); // Vendor ex: GenuineIntel

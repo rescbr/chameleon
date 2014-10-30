@@ -64,8 +64,10 @@ bool getProcessorInformationMaximumClock(returnType *value)
 
 bool getSMBOemProcessorBusSpeed(returnType *value)
 {
-	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
-		switch (Platform.CPU.Family) {
+	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) // Intel
+	{
+		switch (Platform.CPU.Family)
+		{
 			case 0x06:
 			{
 				switch (Platform.CPU.Model) {

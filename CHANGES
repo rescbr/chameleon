@@ -1,3 +1,11 @@
+- bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
+- bitshoveler : Comment out some unused functions by expanding "#if UNUSED" conditional (stringTable.c)
+- bitshoveler : Comment out unused static functions, which cause build to fail in "release" mode (vbe.c)
+- bitshoveler : Fix null pointer handling (nvidia.c)
+- bitshoveler : Only write terminating null char if malloc succeeded (strndup.c)
+- bitshoveler : Fix memory leak (bdmesg.c)
+- ErmaC : (re)enable klibc module
+- ErmaC : Merge Recovery Icons(png) courtesy of blackosx
 - ErmaC : Merge Yosemite patch (ready from June 2014) Thanks all involved in the test and develop;
 		Special thanks: Alex J, viv xix, zenith432 from http://forge.voodooprojects.org/p/chameleon/issues/375/
 		Testing and improvements: Pike R. Alpha, ErmaC, Bungo, blackosx, Micky1979, crazybirdy, oldnapalm, janek202, MinusZwei and Andy Vandijck.
@@ -22,7 +30,7 @@
 - meklort : Make compile on gcc w/ errors enabled.
 - bitshoveler : Remove the '-x' option from the offending 'ld' command
 - Jief : Makefile dependency missing for boot0 and boot1h
-- ErmaC :Temp disable klibc module
+- ErmaC : Temp disable klibc module
 - meklort : Silence output.
 - meklort : Add --no-print-directory.
 - meklort : Replace \t with tab.

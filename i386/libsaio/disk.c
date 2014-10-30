@@ -747,10 +747,12 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 
 		// Probe the filesystem.
 
-		if ( initFunc ) {
+		if ( initFunc )
+		{
 			bvr->flags |= kBVFlagNativeBoot;
 
-			if ( probe && initFunc( bvr ) != 0 ) {
+			if ( probe && initFunc( bvr ) != 0 )
+			{
 				// filesystem probe failed.
 
 				DEBUG_DISK(("%s: failed probe on dev %x part %d\n", __FUNCTION__, biosdev, partno));
@@ -758,17 +760,23 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 				(*bvr->bv_free)(bvr);
 				bvr = NULL;
 			}
-			if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 ) {
+			if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+			{
 				bvr->flags |= kBVFlagBootable;
 			}
-		} else if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 ) {
+		}
+		else if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+		{
 			bvr->flags |= kBVFlagForeignBoot;
-		} else 	{
+		}
+		else
+		{
 			(*bvr->bv_free)(bvr);
 			bvr = NULL;
 		}
 	}
-	if (bvr) {
+	if (bvr)
+	{
 		bvr->flags |= bvrFlags;
 	}
 	return bvr;
@@ -1565,23 +1573,27 @@ static bool getOSVersion(BVRef bvr, char *str)
 {
 	bool valid = false;	
 	config_file_t systemVersion;
-	char  dirSpec[512];	
+	char  dirSpec[512];
 
 	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
-	
-	if (!loadConfigFile(dirSpec, &systemVersion)) {
+
+	if (!loadConfigFile(dirSpec, &systemVersion))
+	{
 		valid = true;
-	} else {
+	}
+	else
+	{
 		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
-		{	
+		{
 			bvr->OSisServer = true;
 			valid = true;
 		}
 	}
-	
-	if (valid) {		
+
+	if (valid)
+	{
 		const char *val;
 		int len;
 		
@@ -1591,12 +1603,17 @@ static bool getOSVersion(BVRef bvr, char *str)
 			// so copy it and trim
 			*str = '\0';
 			// crazybirdy
-			if (len > 4 && (val[3] == '1')) {
+			if (len > 4 && (val[3] == '1'))
+			{
 				strncat(str, val, MIN(len, 5));
-			} else {
+			}
+			else
+			{
 				strncat(str, val, MIN(len, 4));
 			}
-		} else {
+		}
+		else
+		{
 			valid = false;
 		}
 	}
@@ -1613,7 +1630,9 @@ static bool getOSVersion(BVRef bvr, char *str)
 			bvr->OSisInstaller = true;
 			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
 			close(fh);
-		} else {
+		}
+		else
+		{
 			close(fh);
 		}
 	}
@@ -1655,7 +1674,8 @@ static void scanFSLevelBVRSettings(BVRef chain)
 
 				close(fh);
 
-				if (!error) {
+				if (!error)
+				{
 					label[fileSize] = '\0';
 					strcpy(bvr->altlabel, label);
 				}
@@ -1664,8 +1684,10 @@ static void scanFSLevelBVRSettings(BVRef chain)
 
 		// Check for SystemVersion.plist or ServerVersion.plist to determine if a volume hosts an installed system.
 
-		if (bvr->flags & kBVFlagNativeBoot) {
-			if (getOSVersion(bvr,bvr->OSVersion) == true) {
+		if (bvr->flags & kBVFlagNativeBoot)
+		{
+			if (getOSVersion(bvr,bvr->OSVersion) == true)
+			{
 				bvr->flags |= kBVFlagSystemVolume;
 			}
 		}

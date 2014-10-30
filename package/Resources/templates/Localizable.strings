@@ -194,6 +194,9 @@ Dependencies: none";
 "EnableC6State_title" = "EnableC6State=Yes";
 "EnableC6State_description" = "Enable specific Processor power state, C6.";
 
+"EnableC7State_title" = "EnableC7State=Yes";
+"EnableC7State_description" = "Enable specific Processor power state, C7.";
+
 "GenerateCStates_title" = "GenerateCStates=Yes";
 "GenerateCStates_description" = "Enable auto generation of processor idle sleep states (C-States).";
 

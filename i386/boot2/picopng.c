@@ -935,12 +935,14 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 	vector8_resize(out, numpixels * 4);
 	uint8_t *out_data = out->size ? out->data : 0;
 	if (bitDepth == 8 && colorType == 0) // greyscale
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[i];
 			out_data[4 * i + 3] = (info->key_defined && (in[i] == info->key_r)) ? 0 : 255;
 		}
 	else if (bitDepth == 8 && colorType == 2) // RGB color
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			for (c = 0; c < 3; c++)
 				out_data[4 * i + c] = in[3 * i + c];
 			out_data[4 * i + 3] = (info->key_defined && (in[3 * i + 0] == info->key_r) &&

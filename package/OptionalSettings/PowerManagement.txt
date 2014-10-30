@@ -30,5 +30,7 @@ Bool@DropSSDT:DropSSDT=Yes
 Bool@EnableC2State:EnableC2State=Yes
 Bool@EnableC3State:EnableC3State=Yes
 Bool@EnableC4State:EnableC4State=Yes
+#Bool@EnableC6State:EnableC6State=Yes
+#Bool@EnableC7State:EnableC7State=Yes
 Bool@GenerateCStates:GenerateCStates=Yes
 Bool@GeneratePStates:GeneratePStates=Yes

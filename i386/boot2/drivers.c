@@ -74,14 +74,14 @@ typedef struct DriverInfo DriverInfo, *DriverInfoPtr;
 #define kDriverPackageSignature2 'MOSX'
 
 struct DriversPackage {
-  unsigned long signature1;
-  unsigned long signature2;
-  unsigned long length;
-  unsigned long adler32;
-  unsigned long version;
-  unsigned long numDrivers;
-  unsigned long reserved1;
-  unsigned long reserved2;
+	unsigned long signature1;
+	unsigned long signature2;
+	unsigned long length;
+	unsigned long adler32;
+	unsigned long version;
+	unsigned long numDrivers;
+	unsigned long reserved1;
+	unsigned long reserved2;
 };
 typedef struct DriversPackage DriversPackage;
 
@@ -103,8 +103,8 @@ long LoadMatchedModules(void);
 static long MatchPersonalities(void);
 static long MatchLibraries(void);
 #ifdef NOTDEF
-static ModulePtr FindModule(char *name);
-static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
+	static ModulePtr FindModule(char *name);
+	static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
 #endif
 static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
 static long InitDriverSupport(void);
@@ -146,12 +146,10 @@ Adler32( unsigned char * buffer, long length )
 	return result;
 }
 
-
 //==========================================================================
 // InitDriverSupport
 
-static long
-InitDriverSupport( void )
+static long InitDriverSupport( void )
 {
 	gExtensionsSpec = malloc( 4096 );
 	gDriverSpec     = malloc( 4096 );
@@ -173,7 +171,8 @@ long LoadDrivers( char * dirSpec )
 {
 	char dirSpecExtra[1024];
 
-	if ( InitDriverSupport() != 0 ) {
+	if ( InitDriverSupport() != 0 )
+	{
 		return 0;
 	}
 
@@ -202,11 +201,13 @@ long LoadDrivers( char * dirSpec )
 
 		// Next try to load Extra extensions from the selected root partition.
 		strcpy(dirSpecExtra, "/Extra/");
-		if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
+		if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+		{
 			// If failed, then try to load Extra extensions from the boot partition
 			// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
 			if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-				|| (gRAMDiskVolume && gRAMDiskBTAliased) ) {
+				|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+			{
 				// Next try a specfic OS version folder ie 10.5
 				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
@@ -216,7 +217,8 @@ long LoadDrivers( char * dirSpec )
 				}
 			}
 		}
-		if(!gHaveKernelCache) {
+		if(!gHaveKernelCache)
+		{
 			// Don't load main driver (from /System/Library/Extentions) if gHaveKernelCache is set.
 			// since these drivers will already be in the kernel cache.
 			// NOTE: when gHaveKernelCache, xnu cannot (by default) load *any* extra kexts from the bootloader.
@@ -234,9 +236,11 @@ long LoadDrivers( char * dirSpec )
 				}
 			}
 
-			if (gMKextName[0] != '\0') {
+			if (gMKextName[0] != '\0')
+			{
 				verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
-				if ( LoadDriverMKext(gMKextName) != 0 ) {
+				if ( LoadDriverMKext(gMKextName) != 0 )
+				{
 					error("Could not load %s\n", gMKextName);
 					return -1;
 				}
@@ -255,7 +259,9 @@ long LoadDrivers( char * dirSpec )
 			}
 
 		}
-	} else {
+	}
+	else
+	{
 		return 0;
 	}
 
@@ -271,8 +277,7 @@ long LoadDrivers( char * dirSpec )
 //==========================================================================
 // FileLoadMKext
 
-static long
-FileLoadMKext( const char * dirSpec, const char * extDirSpec )
+static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 {
 	long	ret, flags, time, time2;
 	char	altDirSpec[512];
@@ -291,7 +296,8 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 			snprintf(gDriverSpec, sizeof(altDirSpec) + 18, "%sExtensions.mkext", altDirSpec);
 			verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
 
-			if (LoadDriverMKext(gDriverSpec) == 0) {
+			if (LoadDriverMKext(gDriverSpec) == 0)
+			{
 				return 0;
 			}
 		}
@@ -302,8 +308,7 @@ FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 //==========================================================================
 // FileLoadDrivers
 
-long
-FileLoadDrivers( char * dirSpec, long plugin )
+long FileLoadDrivers( char * dirSpec, long plugin )
 {
 	long         ret, length, flags, time, bundleType;
 	long long	 index;
@@ -318,7 +323,8 @@ FileLoadDrivers( char * dirSpec, long plugin )
 		}
 
 		// Next try the legacy path.
-		else if (FileLoadMKext(dirSpec, "") == 0) {
+		else if (FileLoadMKext(dirSpec, "") == 0)
+		{
 			return 0;
 		}
 
@@ -334,13 +340,15 @@ FileLoadDrivers( char * dirSpec, long plugin )
 		}
 
 		// Make sure this is a directory.
-		if ((flags & kFileTypeMask) != kFileTypeDirectory) {
+		if ((flags & kFileTypeMask) != kFileTypeDirectory)
+		{
 			continue;
 		}
 
 		// Make sure this is a kext.
 		length = strlen(name);
-		if (strcmp(name + length - 5, ".kext")) {
+		if (strcmp(name + length - 5, ".kext"))
+		{
 			continue;
 		}
 
@@ -350,23 +358,29 @@ FileLoadDrivers( char * dirSpec, long plugin )
 		// Determine the bundle type.
 		snprintf(gTempSpec, 4096, "%s/%s", dirSpec, gFileName);
 		ret = GetFileInfo(gTempSpec, "Contents", &flags, &time);
-		if (ret == 0) {
+		if (ret == 0)
+		{
 			bundleType = kCFBundleType2;
-		} else {
+		}
+		else
+		{
 			bundleType = kCFBundleType3;
 		}
 
-		if (!plugin) {
+		if (!plugin)
+		{
 			snprintf(gDriverSpec, 4096, "%s/%s/%sPlugIns", dirSpec, gFileName, (bundleType == kCFBundleType2) ? "Contents/" : "");
 		}
 
 		ret = LoadDriverPList(dirSpec, gFileName, bundleType);
 
-		if (result != 0) {
+		if (result != 0)
+		{
 			result = ret;
 		}
 
-		if (!plugin) {
+		if (!plugin)
+		{
 			FileLoadDrivers(gDriverSpec, 1);
 		}
 	}
@@ -378,8 +392,7 @@ FileLoadDrivers( char * dirSpec, long plugin )
 //==========================================================================
 // 
 
-long
-NetLoadDrivers( char * dirSpec )
+long NetLoadDrivers( char * dirSpec )
 {
 	long tries;
 
@@ -389,7 +402,8 @@ NetLoadDrivers( char * dirSpec )
 	// Get the name of the kernel
 	cnt = strlen(gBootFile);
 	while (cnt--) {
-		if ((gBootFile[cnt] == '\\')  || (gBootFile[cnt] == ',')) {
+		if ((gBootFile[cnt] == '\\')  || (gBootFile[cnt] == ','))
+		{
 			cnt++;
 			break;
 		}
@@ -404,11 +418,13 @@ NetLoadDrivers( char * dirSpec )
 	tries = 3;
 	while (tries--)
 	{
-		if (LoadDriverMKext(gDriverSpec) == 0) {
+		if (LoadDriverMKext(gDriverSpec) == 0)
+		{
 			break;
 		}
 	}
-	if (tries == -1) {
+	if (tries == -1)
+	{
 		return -1;
 	}
 
@@ -418,8 +434,7 @@ NetLoadDrivers( char * dirSpec )
 //==========================================================================
 // loadDriverMKext
 
-long
-LoadDriverMKext( char * fileSpec )
+long LoadDriverMKext( char * fileSpec )
 {
 	unsigned long    driversAddr, driversLength;
 	long             length;
@@ -430,7 +445,8 @@ LoadDriverMKext( char * fileSpec )
 
 	// Load the MKext.
 	length = LoadThinFatFile(fileSpec, (void **)&package);
-	if (length < sizeof (DriversPackage)) {
+	if (length < sizeof (DriversPackage))
+	{
 		return -1;
 	}
 

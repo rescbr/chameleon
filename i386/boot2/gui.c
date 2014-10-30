@@ -75,6 +75,10 @@ enum {
 	iDeviceHFSRAID_Leo_o,
 	iDeviceHFSRAID_Tiger,
 	iDeviceHFSRAID_Tiger_o,
+
+	iDeviceHFSRECOVERY,
+	iDeviceHFSRECOVERY_o,
+
 	iDeviceEXT3,
 	iDeviceEXT3_o,
 	iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -161,6 +165,10 @@ image_t images[] = {
 	{.name = "device_hfsraid_leo_o",        .image = NULL},
 	{.name = "device_hfsraid_tiger",        .image = NULL},
 	{.name = "device_hfsraid_tiger_o",      .image = NULL},
+
+	{.name = "device_hfsplus_recovery",     .image = NULL},
+	{.name = "device_hfsplus_recovery_o",   .image = NULL},
+
 	{.name = "device_ext3",                 .image = NULL},
 	{.name = "device_ext3_o",               .image = NULL},
 	{.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -397,6 +405,10 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsraid_leo_o,           iDeviceHFSRAID_Leo);
 	LOADPNG(device_hfsraid_tiger,           iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_tiger_o,         iDeviceHFSRAID_Tiger);
+
+	LOADPNG(device_hfsplus_recovery,        iDeviceHFS);
+	LOADPNG(device_hfsplus_recovery_o,      iDeviceHFSRECOVERY);
+
 	LOADPNG(device_ext3,                    iDeviceGeneric);
 	LOADPNG(device_ext3_o,                  iDeviceEXT3);
 	LOADPNG(device_freebsd,                 iDeviceGeneric);        /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -976,39 +988,51 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		{
 			case kPartitionTypeHFS:
 			{
-				// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
-				switch (device->OSVersion[3]) {
-					case '9':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
-						break;
-					case '8':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_ML : iDeviceHFS_ML);
-						break;
-					case '7':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Lion : iDeviceHFS_Lion);
-						break;
-					case '6':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_SL : iDeviceHFS_SL);
-						break;
-					case '5':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Leo : iDeviceHFS_Leo);
-						break;
-					case '4':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Tiger : iDeviceHFS_Tiger);
-						break;
-					case '1':
-						if (device->OSVersion[4] == '0') { // 10.10
-							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+
+				// ErmaC : TODO test needed for recovery icon
+
+				// Use HFSRECOVERY icon.
+//				if (device->flags & kBVFlagBooter)
+//				{
+//					devicetype = iDeviceHFSRECOVERY;
+//				}
+//				else
+//				{
+
+					// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
+					switch (device->OSVersion[3]) {
+						case '9':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
 							break;
-						}
-						//if (device->OSVersion[4] == '1') { // 10.11
-						//	devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_??? : iDeviceHFS_???);
-						//	break;
-						//}
-					default:
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
-						break;
-				}
+						case '8':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_ML : iDeviceHFS_ML);
+							break;
+						case '7':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Lion : iDeviceHFS_Lion);
+							break;
+						case '6':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_SL : iDeviceHFS_SL);
+							break;
+						case '5':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Leo : iDeviceHFS_Leo);
+							break;
+						case '4':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Tiger : iDeviceHFS_Tiger);
+							break;
+						case '1':
+							if (device->OSVersion[4] == '0') { // 10.10
+								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+								break;
+							}
+							//if (device->OSVersion[4] == '1') { // 10.11
+							//	devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_??? : iDeviceHFS_???);
+							//	break;
+							//}
+						default:
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
+							break;
+					}
+//				}
 
 				break;
 

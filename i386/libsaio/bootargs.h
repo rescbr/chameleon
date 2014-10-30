@@ -96,6 +96,18 @@ typedef struct Boot_Video	Boot_Video;
 #define GRAPHICS_MODE			1
 #define FB_TEXT_MODE			2
 
+
+/* Struct describing an image passed in by the booter */
+struct boot_icon_element {
+    unsigned int    width;
+    unsigned int    height;
+    int             y_offset_from_center;
+    unsigned int    data_size;
+    unsigned int    __reserved1[4];
+    unsigned char   data[0];
+};
+typedef struct boot_icon_element boot_icon_element;
+
 /* Boot argument structure - passed into Mach kernel at boot time.
  * "Revision" can be incremented for compatible changes
  */
@@ -114,6 +126,11 @@ typedef struct Boot_Video	Boot_Video;
 
 #define kBootArgsEfiMode32              32
 #define kBootArgsEfiMode64              64
+
+/* Bitfields for boot_args->flags */
+#define kBootArgsFlagRebootOnPanic	(1 << 0)
+#define kBootArgsFlagHiDPI		(1 << 1)
+#define kBootArgsFlagBlack		(1 << 2)
 
 typedef struct boot_args {
     uint16_t    Revision;	/* Revision of boot_args structure */
@@ -142,15 +159,15 @@ typedef struct boot_args {
     uint32_t    efiRuntimeServicesPageCount;
     uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
 
-    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
-    uint32_t    kslide; //    uint32_t    __reserved2;
+    uint32_t    efiSystemTable;		/* physical address of system table in runtime area */
+    uint32_t    kslide;			//    uint32_t    __reserved2;
 
-    uint32_t    performanceDataStart; /* physical address of log */
+    uint32_t    performanceDataStart;	/* physical address of log */
     uint32_t    performanceDataSize;
 
-    uint32_t    keyStoreDataStart; /* physical address of key store data */
+    uint32_t    keyStoreDataStart;	/* physical address of key store data */
     uint32_t    keyStoreDataSize;
-    uint64_t	bootMemStart;
+    uint64_t	bootMemStart;		/* physical address of interpreter boot memory */
     uint64_t	bootMemSize;
     uint64_t    PhysicalMemorySize;
     uint64_t    FSBFrequency;
