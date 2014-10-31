@@ -306,8 +306,7 @@ pass_loop:
 
 	DebugChar('P')					; starting new pass
 	push	dx						; save dl (boot drive) for next pass
-	
-	
+
 .scan_drive:
 
     ;
@@ -325,34 +324,34 @@ pass_loop:
     jc      .next_pass				; MBR load error - normally because we scanned all drives
 
 	DebugChar('D')					; starting disk scanning
-	
+
     ;
     ; Look for the booter partition in the MBR partition table,
     ; which is at offset kMBRPartTable.
     ;
     mov     si, kMBRPartTable		; pointer to partition table
     call    find_boot				; will not return on success
-	
+
 	; if returns - booter partition is not found
-	
+
 	; skip scanning of all drives in Pass1
 	cmp		bh, kPass1
 	je		.next_pass
-	
+
 	; try next drive
 	; if next drive does not exists - will break on the MBR load error above
 	inc		dl
 	jmp		short .scan_drive
-	
+
 
 .next_pass:
 	; all drives scanned - move to next pass
 	pop		dx						; restore orig boot drive
 	dec		bh						; decrement scan pass counter
 	jnz		pass_loop				; if not zero - exec next pass
-	
+
 	; we ran all passes - nothing found - error
-	
+
 error:
     DebugChar('E')
     DebugPause
@@ -386,7 +385,8 @@ find_boot:
     xor	    bl, bl						; BL will be set to 1 later in case of
 										; Protective MBR has been found
 
-.start_scan:							
+
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -418,7 +418,7 @@ find_boot:
 	; 
 	; Code may be harder to read because I tried to optimized it for minimum size.
 	;
-													
+
 .testPass:
 	DebugChar('t')									; testing partition
     xor		dh, dh               					; DH=0 This will be used in Pass3 (partition is active, not HFS+).
@@ -442,11 +442,10 @@ find_boot:
     jne     .continue
 
 
+.tryToBoot:
     ;
     ; Found boot partition, read boot sector to memory.
     ;
-
-.tryToBoot:
 
     call    loadBootSector
     jne     .continue
@@ -499,7 +498,7 @@ checkGPT:
 
     DebugChar('G')								; found GPT
     mov	    si, di
-    
+
     ;
     ; Loading GUID Partition Table Array
     ;
@@ -546,7 +545,7 @@ checkGPT:
 .gpt_loop:
 
     mov     eax, [si + gpta.PartitionTypeGUID + kGUIDLastDwordOffs]
-	
+
 	cmp		eax, kAppleGUID			; check current GUID Partition for Apple's GUID type
 	je		.gpt_ok
 
@@ -623,7 +622,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;
@@ -868,13 +867,14 @@ print_nibble:
 ; NULL terminated strings.
 ;
 log_title_str		db  10, 13, 'boot0:', 0
-boot_error_str   	db  'error', 0
 
 gpt_str			db  'GPT', 0
 ;test_str		db  'test', 0
 done_str		db  'done', 0
 
 %endif
+
+boot_error_str   	db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last

@@ -22,18 +22,15 @@
 
 #include "libsa.h"
 
-static void
-PreviewDecompress16(uint32_t * compressBuffer, 
+static void PreviewDecompress16(uint32_t * compressBuffer, 
 			uint32_t width, uint32_t height, uint32_t row, 
 			uint16_t * output);
 
-static void
-PreviewDecompress32(uint32_t * compressBuffer, 
+static void PreviewDecompress32(uint32_t * compressBuffer, 
                         uint32_t width, uint32_t height, uint32_t row, 
                         uint32_t * output);
 
-static void 
-PreviewDecompress16(uint32_t * compressBuffer, 
+static void PreviewDecompress16(uint32_t * compressBuffer, 
 			uint32_t width, uint32_t height, uint32_t row, 
 			uint16_t * output)
 {
@@ -60,9 +57,12 @@ PreviewDecompress16(uint32_t * compressBuffer,
 	for (j = 0; j < (height + 2); j++) {
 		input = compressBuffer;
 
-		if (j < height) {
+		if (j < height)
+		{
 			input += j;
-		} else {
+		}
+		else
+		{
 			input += height - 1;
 		}
 
@@ -71,20 +71,26 @@ PreviewDecompress16(uint32_t * compressBuffer,
 		uint32_t data = 0, repeat = 0, fetch = 0, count = 0;
 		sr0 = sr1 = sr2 = sr3 = 0;
 
-		for (i = 0; i < (width + 2); i++) {
-			if (i < width) {
-				if (!count) {
+		for (i = 0; i < (width + 2); i++)
+		{
+			if (i < width)
+			{
+				if (!count)
+				{
 					count = *input++;
 					repeat = (count & 0xff000000);
 					count ^= repeat;
 					fetch = true;
-				} else {
+				}
+				else
+				{
 					fetch = (0 == repeat);
 				}
     
 				count--;
     
-				if (fetch) {
+				if (fetch)
+				{
 					data = *((uint16_t *)input);
 					(*((uint16_t *)input))++;
     
@@ -123,12 +129,14 @@ PreviewDecompress16(uint32_t * compressBuffer,
 			sc3[i] = tmp2;
 
 			out &= 0x1f;
-			if ((i > 1) && (j > 1)) {
+			if ((i > 1) && (j > 1))
+			{
 				output[i-2] = out | (out << 5) | (out << 10);
 			}
 		}
 
-		if (j > 1) {
+		if (j > 1)
+		{
 			output += row;
 		}
 	}
@@ -138,8 +146,7 @@ PreviewDecompress16(uint32_t * compressBuffer,
 	free(sc0);
 }
 
-static void 
-PreviewDecompress32(uint32_t * compressBuffer, 
+static void PreviewDecompress32(uint32_t * compressBuffer, 
 			uint32_t width, uint32_t height, uint32_t row, 
 			uint32_t * output)
 {
@@ -151,7 +158,8 @@ PreviewDecompress32(uint32_t * compressBuffer,
 	uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
 	uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
 
-	if (!sc0 || !sc1 || !sc2 || !sc3) {
+	if (!sc0 || !sc1 || !sc2 || !sc3)
+	{
 		return;
 	}
 
@@ -163,11 +171,15 @@ PreviewDecompress32(uint32_t * compressBuffer,
 	bzero(sc3, (width+2) * sizeof(uint16_t));
 
 	uint32_t tmp1, tmp2, out;
-	for (j = 0; j < (height + 2); j++) {
+	for (j = 0; j < (height + 2); j++)
+	{
 		input = compressBuffer;
-		if (j < height) {
+		if (j < height)
+		{
 			input += j;
-		} else {
+		}
+		else
+		{
 			input += height - 1;
 		}
 		input = (uint32_t *)(input[3] + ((uint8_t *)compressBuffer));
@@ -175,20 +187,26 @@ PreviewDecompress32(uint32_t * compressBuffer,
 		uint32_t data = 0, repeat = 0, fetch = 0, count = 0;
 		sr0 = sr1 = sr2 = sr3 = 0;
 
-		for (i = 0; i < (width + 2); i++) {
-			if (i < width) {
-				if (!count) {
+		for (i = 0; i < (width + 2); i++)
+		{
+			if (i < width)
+			{
+				if (!count)
+				{
 					count = *input++;
 					repeat = (count & 0xff000000);
 					count ^= repeat;
 					fetch = true;
-				} else {
+				}
+				else
+				{
 					fetch = (0 == repeat);
 				}
 
 				count--;
 
-				if (fetch) {
+				if (fetch)
+				{
 					data = *input++;
 
 					// grayscale
@@ -226,12 +244,14 @@ PreviewDecompress32(uint32_t * compressBuffer,
 			sc3[i] = tmp2;
 
 			out &= 0xff;
-			if ((i > 1) && (j > 1)) {
+			if ((i > 1) && (j > 1))
+			{
 				output[i-2] = out | (out << 8) | (out << 16);
 			}
 		}
 
-		if (j > 1) {
+		if (j > 1)
+		{
 			output += row;
 		}
 	}
@@ -253,18 +273,21 @@ DecompressData(void *srcbase, int *dw, int *dh, int *bitsPerPixel)
 	*dh = (int) src[2];
 	
 	size = (*dw * *dh * *bitsPerPixel)/ 8;
-	if (!size) {
+	if (!size)
+	{
 		return 0;
 	}
 
 	ret = malloc (size);
 
-	if (!ret) {
-        return 0;
+	if (!ret)
+	{
+		return 0;
 	}
 	bzero(ret, size);
 
-	switch(*bitsPerPixel) {
+	switch(*bitsPerPixel)
+	{
 		case 32:
 			PreviewDecompress32((uint32_t *)srcbase, *dw, *dh, *dw, ret);
 			break;

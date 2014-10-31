@@ -1,25 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-        <key>SMbiosversion</key>
-        <string>MP31.88Z.00C1.B00.0802091544</string>
-        <key>SMmanufacturer</key>
-        <string>Apple Inc.</string>
-        <key>SMproductname</key>
-        <string>MacPro3,1</string>
-        <key>SMsystemversion</key>
-        <string>1.0</string>
-        <key>SMserial</key>
-        <string>W87234JHYA4</string>
+	<key>SMbiosvendor</key>
+	<string>Apple Inc.</string>
+	<key>SMbiosversion</key>
+	<string>MP41.88Z.0081.B08.1001221313</string>
+	<key>SMbiosdate</key>
+	<string>01/22/10</string>
+	<key>SMmanufacturer</key>
+	<string>Apple Inc.</string>
+	<key>SMproductname</key>
+	<string>MacPro4,1</string>
+	<key>SMsystemversion</key>
+	<string>1.4</string>
+	<key>SMserial</key>
+	<string>CK0215824PC</string>
+	<key>SMsystemuuid</key>
+	<string>a8dd17a0-cf10-4323-9841-29a9f08c1d49</string>
+	<key>SMfamily</key>
+	<string>Mac Pro</string>
+	<key>SMboardmanufacturer</key>
+	<string>Apple Inc.</string>
+
+	<key>SMboardproduct</key>
+	<string>Mac-F221BEC8</string>
+	<key>SMboardversion</key>
+	<string>MacPro4,1</string>
+	<key>SMboardserial</key>
+	<string>C02140302D5DMT31M</string>
+	<key>SMboardlocation</key>
+	<string>Part Component</string>
+
+	<key>SMchassismanufacturer</key>
+	<string>Apple Inc.</string>
+	<key>SMchassisversion</key>
+	<string>Mac-F221BEC8</string>
+	<key>SMchassisserial</key>
+	<string>CK0215824PC</string>
+
+	<key>SMchassisassettag</key>
+	<string>Pro-Enclosure</string>
         <key>SMexternalclock</key>
-        <string>333</string>
+        <string>133</string>
         <key>SMmaximalclock</key>
         <string>3000</string>
+
         <key>SMmemtype</key>
-        <string>19</string>
+        <string>24</string>
         <key>SMmemspeed</key>
-        <string>800</string>
+        <string>1600</string>
         <key>SMmemmanufacturer_1</key>
         <string>0xAD00000000000000</string>
         <key>SMmemserial_1</key>
@@ -44,18 +74,47 @@
         <string>0x00003021</string>
         <key>SMmempart_4</key>
         <string>0x48594D503131325336344350362D59352020</string>
+
 </dict>
 </plist>
 <!--
 missing on the example above:
 
-SMbiosvendor
-SMbiosdate
-SMfamily
-SMboardmanufacturer
-SMboardproduct
+// BIOS Information (Type 0)
+SMbiosrelease
+
+// System Information (Type 1)
+SMskunumber
+
+// Base Board (or Module) Information (Type 2)
+SMboardassettag
+SMboardtype
+
+// System Enclosure (Type 3)
+SMchassistype
+
+// Processor Information (Type 4)
+SMcpusocket
+SMcpumanufacturer
+SMcpuversion
+SMcurrentclock
+SMcpuupgrade
+SMcpuserial
+SMcpuassettag
+SMcpupartnumber
+
+//  Memory Device (Type 17)
 SMmemdevloc
 SMmembankloc
-SMcputype
-SMbusspeed
+SMmemassettag
+
+// OEM Processor Type (Apple Specific - Type 131)
+SMoemcputype     renamed from old SMcputype
+
+// OEM Processor Bus Speed (Apple Specific - Type 132)
+SMoemcpubusspeed renamed from old SMbusspeed
+
+OEM Platform Feature (Apple Specific - Type 133)
+// SMoemplatformfeature  NOT YET IMPLEMENTED
+
 -->

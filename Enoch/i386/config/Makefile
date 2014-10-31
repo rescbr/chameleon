@@ -33,11 +33,11 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 all: $(DIRS_NEEDED) $(SYMPROG)
 
 $(SYMPROG): $(OBJS)
-	@echo "\t[LD32] $(@F)_32"
+	@echo "	[LD32] $(@F)_32"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch i386 -o $(SYMROOT)/$(@F)_32 $(OBJROOT)/*.o32
-	@echo "\t[LD64] $(@F)_64"
+	@echo "	[LD64] $(@F)_64"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(DEFINES) -arch x86_64 -o $(SYMROOT)/$(@F)_64 $(OBJROOT)/*.o64
-	@echo "\t[LIPO] $(@F)"
+	@echo "	[LIPO] $(@F)"
 	@lipo -create -arch i386 $(SYMROOT)/$(@F)_32 -arch x86_64 $(SYMROOT)/$(@F)_64 -output $(SYMROOT)/$(@F)
 	@$(RM) $(SYMROOT)/$(@F)_32 $(SYMROOT)/$(@F)_64
 

@@ -286,10 +286,10 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
     // 0091 /* ??? */
     // 0092 /* ??? */
 	{GMA_HASWELL_D_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_D_GT2,            HD_GRAPHICS_4600 },
+	{GMA_HASWELL_D_GT2,            HD_GRAPHICS_4600 }, /* 0412 */
 	{GMA_HASWELL_D_GT3,            HD_GRAPHICS_5000 }, /* ??? */
 	{GMA_HASWELL_M_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_M_GT2,            HD_GRAPHICS_4600 },
+	{GMA_HASWELL_M_GT2,            HD_GRAPHICS_4600 }, /* 0416 */
 	{GMA_HASWELL_M_GT3,            HD_GRAPHICS_5000 }, /* ??? */
 	{GMA_HASWELL_S_GT1,            HD_GRAPHICS },
 	{GMA_HASWELL_S_GT2,            "HD Graphics P4600/P4700" },
@@ -298,45 +298,45 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_HASWELL_B_GT2,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_B_GT3,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_E_GT1,            HD_GRAPHICS },
-	{GMA_HASWELL_E_GT2,            HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_E_GT2,            HD_GRAPHICS_4400 }, /* 041e */
 	{GMA_HASWELL_E_GT3,            HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_D_GT3,		IRIS_5100 },
 	{GMA_HASWELL_ULT_M_GT1,		HD_GRAPHICS },
-	{GMA_HASWELL_ULT_M_GT2,		"HD Graphics 4400" },
-	{GMA_HASWELL_ULT_M_GT3,		HD_GRAPHICS_5000 },
+	{GMA_HASWELL_ULT_M_GT2,		HD_GRAPHICS_4400 }, /* 0a16 */
+	{GMA_HASWELL_ULT_M_GT3,		HD_GRAPHICS_5000 }, /* 0a26 */
 	{GMA_HASWELL_ULT_S_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_S_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_S_GT3,		IRIS_5100 },
 	{GMA_HASWELL_ULT_B_GT1,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_B_GT2,		HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_ULT_B_GT3,		IRIS_5100 },
-	{GMA_HASWELL_ULT_E_GT1,		HD_GRAPHICS },
-	{GMA_HASWELL_ULT_E_GT2,		"HD Graphics 4200" },
+	{GMA_HASWELL_ULT_E_GT1,		HD_GRAPHICS_4400 }, /* 0a0e */
+	{GMA_HASWELL_ULT_E_GT2,		HD_GRAPHICS_4200 }, /* 0a1e */
 	// 0A2A /* ??? */
 	{GMA_HASWELL_ULT_E_GT3,		IRIS_5100 },
-	// 0C02 /* Intel Haswell HD Graphics - GTL */
-	// 0C04 /* ??? */
-	// 0C06 /* Intel Haswell HD Graphics - GTL */
-	// 0C12 /* Intel Haswell HD Graphics - GTM */
-	// 0C16 /* Intel Haswell HD Graphics - GTH */
-	// 0C22 /* Intel Haswell HD Graphics - GTH */
-	// 0C26 /* Intel Haswell HD Graphics - GTH */
-	{GMA_HASWELL_CRW_D_GT1,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_SDV_D_GT1_IG,		HD_GRAPHICS }, // 0C02 /* Intel Haswell HD Graphics - GTL */
+	// 0C04 /* DRAM Controller */
+	{GMA_HASWELL_SDV_M_GT1_IG,		HD_GRAPHICS }, // 0C06 /* Intel Haswell HD Graphics - GTL */
+	{GMA_HASWELL_SDV_D_GT2_IG,		HD_GRAPHICS }, // 0C12 /* Intel Haswell HD Graphics - GTM */
+	{GMA_HASWELL_SDV_M_GT2_IG,		HD_GRAPHICS }, // 0C16 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_SDV_D_GT2_PLUS_IG,		HD_GRAPHICS }, // 0C22 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_SDV_M_GT2_PLUS_IG,		HD_GRAPHICS }, // 0C26 /* Intel Haswell HD Graphics - GTH */
+	{GMA_HASWELL_CRW_D_GT1,		HD_GRAPHICS }, /* 0d02 */
 	{GMA_HASWELL_CRW_D_GT2,		HD_GRAPHICS_4600 },
-	{GMA_HASWELL_CRW_D_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_M_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_M_GT2,		HD_GRAPHICS_4600 },
-	{GMA_HASWELL_CRW_M_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_S_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_S_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_D_GT3,		IRIS_5200 }, /* 0d22 */
+	{GMA_HASWELL_CRW_M_GT1,		HD_GRAPHICS }, /* 0d06 */
+	{GMA_HASWELL_CRW_M_GT2,		HD_GRAPHICS_4600 }, /* 0d16 */
+	{GMA_HASWELL_CRW_M_GT3,		IRIS_5200 }, /* 0d26 */
+	{GMA_HASWELL_CRW_S_GT1,		HD_GRAPHICS }, /* 0d0a */
+	{GMA_HASWELL_CRW_S_GT2,		HD_GRAPHICS }, /* 0d1a */
 	{GMA_HASWELL_CRW_S_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_B_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_B_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_B_GT1,		HD_GRAPHICS }, /* 0d0b */
+	{GMA_HASWELL_CRW_B_GT2,		HD_GRAPHICS }, /* 0d1b */
 	{GMA_HASWELL_CRW_B_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_E_GT1,		HD_GRAPHICS }, /* ??? */
-	{GMA_HASWELL_CRW_E_GT2,		HD_GRAPHICS }, /* ??? */
+	{GMA_HASWELL_CRW_E_GT1,		HD_GRAPHICS }, /* 0d0e */
+	{GMA_HASWELL_CRW_E_GT2,		HD_GRAPHICS }, /* od1e */
 	{GMA_HASWELL_CRW_E_GT3,		IRIS_5200 },
 	{GMA_HASWELL_CRW_M_GT2_PLUS_IG,		HD_GRAPHICS }
 };
@@ -549,65 +549,65 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_IVYBRIDGE_S_GT4: // 0172
         case GMA_IVYBRIDGE_S_GT5: // 0176
 
-            if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_IVY * 2)
-            {
-                uint8_t new_aapl0[AAPL_LEN_IVY];
-                
-                if (hex2bin(value, new_aapl0, AAPL_LEN_IVY) == 0)
-                {
-                    memcpy(default_aapl_ivy, new_aapl0, AAPL_LEN_IVY);
-                    
-                    verbose("Using user supplied AAPL,ig-platform-id\n");
-                    verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
-                           default_aapl_ivy[0], default_aapl_ivy[1], default_aapl_ivy[2], default_aapl_ivy[3]);
-                }
-                devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_ivy, AAPL_LEN_IVY);
-            }
-            else if (getIntForKey(kIntelCapriFB, &n_igs, &bootInfo->chameleonConfig))
-            {
-                if ((n_igs >= 0) || (n_igs <= 11))
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
-                    devprop_add_value(device, "AAPL,ig-platform-id", ivy_bridge_ig_vals[n_igs], 4);
-                }
-                else
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
-                }
-            }
-            else
-            {
-                uint32_t ig_platform_id;
-                uint32_t ram = (((getVBEVideoRam() + 512) / 1024) + 512) / 1024;
-                switch (ram)
-                {
-                    case 96:
-                        ig_platform_id = 0x01660000; // 96mb Mobile
-                        break;
+		if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_IVY * 2)
+		{
+			uint8_t new_aapl0[AAPL_LEN_IVY];
 
-                    case 64:
-                        ig_platform_id = 0x01660009; // 64mb Mobile
-                        break;
+			if (hex2bin(value, new_aapl0, AAPL_LEN_IVY) == 0)
+			{
+				memcpy(default_aapl_ivy, new_aapl0, AAPL_LEN_IVY);
 
-                    case 32:
-                        ig_platform_id = 0x01620005; // 32mb Desktop
-                        break;
+				verbose("Using user supplied AAPL,ig-platform-id\n");
+				verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+				default_aapl_ivy[0], default_aapl_ivy[1], default_aapl_ivy[2], default_aapl_ivy[3]);
+			}
+			devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_ivy, AAPL_LEN_IVY);
+		}
+		else if (getIntForKey(kIntelCapriFB, &n_igs, &bootInfo->chameleonConfig))
+		{
+			if ((n_igs >= 0) || (n_igs <= 11))
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+				devprop_add_value(device, "AAPL,ig-platform-id", ivy_bridge_ig_vals[n_igs], 4);
+			}
+			else
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
+			}
+		}
+		else
+		{
+			uint32_t ig_platform_id;
+			uint32_t ram = (((getVBEVideoRam() + 512) / 1024) + 512) / 1024;
+			switch (ram)
+			{
+				case 96:
+					ig_platform_id = 0x01660000; // 96mb Mobile
+					break;
 
-                    default:
-                        printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
-                               "The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
-                        pause();
-                        return false;	// Exit early before the AAPL,ig-platform-id property is set.
-                        break;
-                }
-                devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
-            }
+				case 64:
+					ig_platform_id = 0x01660009; // 64mb Mobile
+					break;
 
-            devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
-            devprop_add_value(device, "built-in", &BuiltIn, 1);
-            devprop_add_value(device, "class-code", ClassFix, 4);
-            devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
-            break;
+				case 32:
+					ig_platform_id = 0x01620005; // 32mb Desktop
+					break;
+
+				default:
+					printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
+					"The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
+					pause();
+					return false;	// Exit early before the AAPL,ig-platform-id property is set.
+					break;
+			}
+			devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+		}
+
+		devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+		break;
 
         /* Haswell */
         /* HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile */
@@ -634,12 +634,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_HASWELL_ULT_M_GT3: // 0a26
         case GMA_HASWELL_ULT_S_GT3: // 0a2a
         case GMA_HASWELL_ULT_E_GT3: // 0a2e
-        //case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
-        //case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
-        //case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
-        //case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
-        //case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
-        //case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
+        case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
+        case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
+        case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
+        case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
+        case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
+        case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
         case GMA_HASWELL_CRW_D_GT1: // 0d02
         case GMA_HASWELL_CRW_D_GT2: // 0d12
         case GMA_HASWELL_CRW_D_GT3: // 0d22

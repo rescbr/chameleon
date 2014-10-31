@@ -10,7 +10,9 @@ char *strndup(const char *s, size_t n)
 	char *d = malloc(l);
 
 	if (d)
+	{
 		memcpy(d, s, l);
-	d[n] = '\0';
+		d[n] = '\0';
+	}
 	return d;
 }

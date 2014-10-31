@@ -31,6 +31,7 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 int lasttime = 0; // we need this for animating maybe
 
+// ====================================================================
 
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
@@ -43,6 +44,8 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
+	iDeviceHFS_yos,
+	iDeviceHFS_yos_o,
 	iDeviceHFS_mav,
 	iDeviceHFS_mav_o,
 	iDeviceHFS_ML,
@@ -58,6 +61,8 @@ enum {
 
 	iDeviceHFSRAID,
 	iDeviceHFSRAID_o,
+	iDeviceHFSRAID_yos,
+	iDeviceHFSRAID_yos_o,
 	iDeviceHFSRAID_mav,
 	iDeviceHFSRAID_mav_o,
 	iDeviceHFSRAID_ML,
@@ -126,6 +131,8 @@ enum {
 	iFontSmall,
 };
 
+// ====================================================================
+
 image_t images[] = {
 	{.name = "background",                  .image = NULL},
 	{.name = "logo",                        .image = NULL},
@@ -134,6 +141,8 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
+	{.name = "device_hfsplus_yos",          .image = NULL},
+	{.name = "device_hfsplus_yos_o",        .image = NULL},
 	{.name = "device_hfsplus_mav",          .image = NULL},
 	{.name = "device_hfsplus_mav_o",        .image = NULL},
 	{.name = "device_hfsplus_ml",           .image = NULL},
@@ -149,6 +158,8 @@ image_t images[] = {
 
 	{.name = "device_hfsraid",              .image = NULL},
 	{.name = "device_hfsraid_o",            .image = NULL},
+	{.name = "device_hfsraid_yos",          .image = NULL},
+	{.name = "device_hfsraid_yos_o",        .image = NULL},
 	{.name = "device_hfsraid_mav",          .image = NULL},
 	{.name = "device_hfsraid_mav_o",        .image = NULL},
 	{.name = "device_hfsraid_ml",           .image = NULL},
@@ -162,8 +173,8 @@ image_t images[] = {
 	{.name = "device_hfsraid_tiger",        .image = NULL},
 	{.name = "device_hfsraid_tiger_o",      .image = NULL},
 
-	{.name = "device_hfsrecovery",          .image = NULL},
-	{.name = "device_hfsrecovery_o",        .image = NULL},
+	{.name = "device_hfsplus_recovery",     .image = NULL},
+	{.name = "device_hfsplus_recovery_o",   .image = NULL},
 
 	{.name = "device_hfsfusion",            .image = NULL},
 	{.name = "device_hfsfusion_o",          .image = NULL},
@@ -216,6 +227,8 @@ image_t images[] = {
 	{.name = "font_console",                .image = NULL},
 	{.name = "font_small",                  .image = NULL},
 };
+
+// ====================================================================
 
 int imageCnt = 0;
 
@@ -364,6 +377,8 @@ static int loadThemeImage(const char *image, int alt_image)
 	return 1;
 }
 
+// ====================================================================
+
 static int loadGraphics(void)
 {
 	LOADPNG(background,                     IMG_REQUIRED);
@@ -373,6 +388,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+	LOADPNG(device_hfsplus_yos,             iDeviceHFS);
+	LOADPNG(device_hfsplus_yos_o,           iDeviceHFS_yos);
 	LOADPNG(device_hfsplus_mav,             iDeviceHFS);
 	LOADPNG(device_hfsplus_mav_o,           iDeviceHFS_mav);
 	LOADPNG(device_hfsplus_ml,              iDeviceHFS);
@@ -388,6 +405,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_yos,             iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_yos_o,           iDeviceHFSRAID_yos);
 	LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_mav_o,           iDeviceHFSRAID_mav);
 	LOADPNG(device_hfsraid_ml,              iDeviceHFSRAID);
@@ -401,8 +420,8 @@ static int loadGraphics(void)
 	LOADPNG(device_hfsraid_tiger,           iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_tiger_o,         iDeviceHFSRAID_Tiger);
 
-	LOADPNG(device_hfsrecovery,             iDeviceHFS);
-	LOADPNG(device_hfsrecovery_o,           iDeviceHFSRECOVERY);
+	LOADPNG(device_hfsplus_recovery,        iDeviceHFS);
+	LOADPNG(device_hfsplus_recovery_o,      iDeviceHFSRECOVERY);
 
 	LOADPNG(device_hfsfusion,               iDeviceHFS);
 	LOADPNG(device_hfsfusion_o,             iDeviceHFSFUSION);
@@ -461,6 +480,8 @@ static int loadGraphics(void)
 	return 0;
 }
 
+// ====================================================================
+
 static int unloadGraphics(void)
 {
 	int i;
@@ -479,6 +500,8 @@ static int unloadGraphics(void)
 	return 0;
 }
 
+// ====================================================================
+
 int freeBackBuffer( window_t *window )
 {
 	if (gui.backbuffer && gui.backbuffer->pixels) {
@@ -490,6 +513,8 @@ int freeBackBuffer( window_t *window )
 
 	return 1;
 }
+
+// ====================================================================
 
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
@@ -515,6 +540,8 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 	return cropped;
 }
 
+// ====================================================================
+
 int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
@@ -533,6 +560,8 @@ int createBackBuffer( window_t *window )
 
 	return 0;
 }
+
+// ====================================================================
 
 int createWindowBuffer( window_t *window )
 {
@@ -554,6 +583,8 @@ int createWindowBuffer( window_t *window )
 	return 0;
 }
 
+// ====================================================================
+
 int freeWindowBuffer( window_t *window )
 {
 	if (window->pixmap && window->pixmap->pixels) {
@@ -563,6 +594,8 @@ int freeWindowBuffer( window_t *window )
 	}
 	return 1;
 }
+
+// ====================================================================
 
 void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 {
@@ -575,6 +608,8 @@ void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 		}
 	}
 }
+
+// ====================================================================
 
 void drawBackground()
 {
@@ -595,6 +630,8 @@ void drawBackground()
 	
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
+
+// ====================================================================
 
 void setupDeviceList(config_file_t *theme)
 {
@@ -667,6 +704,8 @@ void setupDeviceList(config_file_t *theme)
 		createWindowBuffer(&gui.devicelist);
 	}
 }
+
+// ====================================================================
 
 void loadThemeValues(config_file_t *theme)
 {
@@ -867,6 +906,8 @@ void loadThemeValues(config_file_t *theme)
 	}
 }
 
+// ====================================================================
+
 int initGUI(void)
 {
 	int		val;
@@ -948,10 +989,14 @@ int initGUI(void)
 	return 1;
 }
 
+// ====================================================================
+
 bool is_image_loaded(int i)
 {	
 	return (images[i].image != NULL) ? true : false;
 }
+
+// ====================================================================
 
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
@@ -964,32 +1009,51 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		{
 			case kPartitionTypeHFS:
 			{
-				// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
-				switch (device->OSVersion[3]) {
-					case '9':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
-						//devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSFUSION_mav : iDeviceHFS_mav);
-						break;
-					case '8':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_ML : iDeviceHFS_ML);
-						//devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSFUSION_ML : iDeviceHFS_ML);
-						break;
-					case '7':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Lion : iDeviceHFS_Lion);
-						break;
-					case '6':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_SL : iDeviceHFS_SL);
-						break;
-					case '5':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Leo : iDeviceHFS_Leo);
-						break;
-					case '4':
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Tiger : iDeviceHFS_Tiger);
-						break;
-					default:
-						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
-						break;
-				}
+
+				// ErmaC : TODO test needed for recovery icon
+
+				// Use HFSRECOVERY icon.
+//				if (device->flags & kBVFlagBooter)
+//				{
+//					devicetype = iDeviceHFSRECOVERY;
+//				}
+//				else
+//				{
+
+					// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
+					switch (device->OSVersion[3]) {
+						case '9':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_mav : iDeviceHFS_mav);
+							break;
+						case '8':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_ML : iDeviceHFS_ML);
+							break;
+						case '7':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Lion : iDeviceHFS_Lion);
+							break;
+						case '6':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_SL : iDeviceHFS_SL);
+							break;
+						case '5':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Leo : iDeviceHFS_Leo);
+							break;
+						case '4':
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_Tiger : iDeviceHFS_Tiger);
+							break;
+						case '1':
+							if (device->OSVersion[4] == '0') { // 10.10
+								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+								break;
+							}
+							//if (device->OSVersion[4] == '1') { // 10.11
+							//	devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_??? : iDeviceHFS_???);
+							//	break;
+							//}
+						default:
+							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
+							break;
+					}
+//				}
 
 				break;
 
@@ -1048,6 +1112,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 	drawStrCenteredAt( device->label, &font_small, buffer, p);	
 
 }
+
+// ====================================================================
 
 void drawDeviceList (int start, int end, int selection)
 {
@@ -1153,6 +1219,8 @@ void drawDeviceList (int start, int end, int selection)
 	
 }
 
+// ====================================================================
+
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
@@ -1169,6 +1237,8 @@ void clearGraphicBootPrompt()
 
 	return;
 }
+
+// ====================================================================
 
 void updateGraphicBootPrompt()
 {
@@ -1194,6 +1264,8 @@ void updateGraphicBootPrompt()
 	
 	return;
 }
+
+// ====================================================================
 
 static inline
 void vramwrite (void *data, int width, int height)
@@ -1229,6 +1301,8 @@ void vramwrite (void *data, int width, int height)
 	}
 }
 
+// ====================================================================
+
 void updateVRAM()
 {
 	if (gui.redraw) {
@@ -1254,11 +1328,15 @@ void updateVRAM()
 	}
 }
 
+// ====================================================================
+
 struct putc_info //Azi: exists on console.c & printf.c
 {
 	char * str;
 	char * last_str;
 };
+
+// ====================================================================
 
 static int
 sputc(int c, struct putc_info * pi) //Azi: same as above
@@ -1272,6 +1350,8 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 	*(pi->str)++ = c;
 	return c;
 }
+
+// ====================================================================
 
 int gprintf( window_t * window, const char * fmt, ...)
 {
@@ -1354,6 +1434,8 @@ int gprintf( window_t * window, const char * fmt, ...)
 	}
 	return 1;
 }
+
+// ====================================================================
 
 int dprintf( window_t * window, const char * fmt, ...)
 {
@@ -1438,6 +1520,8 @@ int dprintf( window_t * window, const char * fmt, ...)
 	return 1;
 }
 
+// ====================================================================
+
 int vprf(const char * fmt, va_list ap)
 {
 	int i;
@@ -1513,6 +1597,8 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
+// ====================================================================
+
 pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 	unsigned int cha = (unsigned int)ch - 32;
 	if (cha >= font->count) {
@@ -1521,6 +1607,8 @@ pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 	}
 	return font->chars[cha] ? font->chars[cha] : NULL;
 }
+
+// ====================================================================
 
 position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
 	pixmap_t* pm = charToPixmap(ch, font);
@@ -1531,6 +1619,8 @@ position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, positio
 		return p;
 	}
 }
+
+// ====================================================================
 
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
@@ -1554,6 +1644,8 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 		current_pos = drawChar(ch[i], font, blendInto, current_pos);
 	}
 }
+
+// ====================================================================
 
 void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p)
 {
@@ -1586,6 +1678,8 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 	drawStr(text, font, blendInto, p);
 }
 
+// ====================================================================
+
 int destroyFont(font_t *font)
 {
 	int i;
@@ -1600,6 +1694,8 @@ int destroyFont(font_t *font)
 	}
 	return 0;
 }
+
+// ====================================================================
 
 int initFont(font_t *font, image_t *data)
 {
@@ -1657,6 +1753,8 @@ int initFont(font_t *font, image_t *data)
 	return 0;
 }
 
+// ====================================================================
+
 void colorFont(font_t *font, uint32_t color)
 {
 	if( !color ) {
@@ -1682,6 +1780,8 @@ void colorFont(font_t *font, uint32_t color)
 		}
 	}
 }
+
+// ====================================================================
 
 void makeRoundedCorners(pixmap_t *p)
 {
@@ -1726,6 +1826,8 @@ void makeRoundedCorners(pixmap_t *p)
 		}
 	}
 }
+
+// ====================================================================
 
 void showInfoBox(char *title, char *text_orig)
 {
@@ -1857,6 +1959,8 @@ void showInfoBox(char *title, char *text_orig)
 	free(text);
 }
 
+// ====================================================================
+
 void animateProgressBar()
 {
 	int y;
@@ -1876,6 +1980,8 @@ void animateProgressBar()
 		pixel(buffBar, buffBar->width-1, 0).value = buff;
 	}
 }
+
+// ====================================================================
 
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress)
 {
@@ -1937,6 +2043,8 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 	free(progressbar.pixels);
 }
 
+// ====================================================================
+
 void drawInfoMenuItems()
 {
 	int i,n;
@@ -1979,6 +2087,8 @@ void drawInfoMenuItems()
 	gui.redraw = true;
 }
 
+// ====================================================================
+
 int drawInfoMenu()
 {
 	drawInfoMenuItems();
@@ -1989,6 +2099,8 @@ int drawInfoMenu()
 	
 	return 1;
 }
+
+// ====================================================================
 
 int updateInfoMenu(int key)
 {
@@ -2046,6 +2158,8 @@ int updateInfoMenu(int key)
 	}
 	return DO_NOT_BOOT;
 }
+
+// ====================================================================
 
 uint16_t bootImageWidth = 0; 
 uint16_t bootImageHeight = 0; 
@@ -2149,5 +2263,6 @@ void drawBootGraphics(void)
 			}
 			free(appleBootPict); 
 		} 
-	} 
+	}
 }
+// ====================================================================

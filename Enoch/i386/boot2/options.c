@@ -1094,8 +1094,8 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-    int argLen = argName ? strlen(argName) : 0;
-    int len = argLen + cnt + 1;  // +1 to account for space
+	int argLen = argName ? strlen(argName) : 0;
+	int len = argLen + cnt + 1;  // + 1 to account for space.
 
 	if (argName)
 	{
@@ -1107,8 +1107,9 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 		return false;
 	}
 
-	if (argName) {
-		strncpy( *argP, argName, argLen );
+	if (argName)
+	{
+		strncpy(*argP, argName, argLen);
 		*argP += argLen;
 		*argP[0] = '=';
 		(*argP)++;
@@ -1118,8 +1119,8 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 	*argP += cnt;
 	*argP[0] = ' ';
 	(*argP)++;
-
 	*cntRemainingP -= len;
+
 	return true;
 }
 
@@ -1201,6 +1202,9 @@ processBootOptions()
 		return -1;
 	}
 
+	// Find out which version mac os we're booting.
+	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+
 	// Load config table specified by the user, or use the default.
 
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
@@ -1222,17 +1226,48 @@ processBootOptions()
 	// to be used.
 
 	gOverrideKernel = false;
-	if (( kernel = extractKernelName((char **)&cp) )) {
+	if (( kernel = extractKernelName((char **)&cp) ))
+	{
 		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
-	} else {
-		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+	}
+	else
+	{
+		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) )
+		{
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
-		} else {
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+		}
+		else
+		{
+			if( YOSEMITE ) // is 10.10
+			{
+
+				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
+			}
+			else
+			{ // OSX is not 10.10
+
+				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/%s\n", bootInfo->bootFile);
+			}
 		}
 	}
-	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
-		gOverrideKernel = true;
+
+	if (!YOSEMITE) // not 10.10 so 10.9 and previus
+	{
+		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+		{
+	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
+	}
+	else
+	{ // OSX is 10.10
+		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
+		{
+        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
@@ -1240,7 +1275,8 @@ processBootOptions()
 
 	// Get config kernel flags, if not ignored.
 	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
-            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
+            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig ))
+	{
 		val = "";
 		cnt = 0;
 	}
@@ -1249,49 +1285,63 @@ processBootOptions()
 
 	// boot-uuid can be set either on the command-line or in the config file
 	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
+                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString)))
+	{
 		//
 		// Try an alternate method for getting the root UUID on boot helper partitions.
 		//
-		if (gBootVolume->flags & kBVFlagBooter) {
+		if (gBootVolume->flags & kBVFlagBooter)
+		{
 			// Load the configuration store in the boot helper partition
-			if (loadHelperConfig(&bootInfo->helperConfig) == 0) {
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
+			{
 				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
-				if (val != NULL) {
+				if (val != NULL)
+				{
 					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
 				}
 			}
 		}
 /*
 		// Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 */
 		// If we have the volume uuid add it to the commandline arguments
-		if (strlen(gBootUUIDString)) {
+		if (strlen(gBootUUIDString))
+		{
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
 		}
 		// Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
+                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
+	{
 		cnt = 0;
-		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
+		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig))
+		{
 			valueBuffer[0] = '*';
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else { /*
-			if (strlen(gBootUUIDString)) {
+		}
+		else
+		{ /*
+			if (strlen(gBootUUIDString))
+			{
 				val = "*uuid";
 				cnt = 5;
-			} else { */
+			}
+			else
+			{ */
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
@@ -1299,7 +1349,8 @@ processBootOptions()
 			/* } */
 		}
 
-		if (cnt > 0) {
+		if (cnt > 0)
+		{
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
 		strlcpy( gRootDevice, val, (cnt + 1));
@@ -1309,15 +1360,18 @@ processBootOptions()
 	 * Removed. We don't need this anymore.
 	 *
 	if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
-							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
+							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler)))
+	{
 		getPlatformName(gPlatformName);
 		copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
 	}
 	*/
 
 	if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-		if (gBootMode & kBootModeSafe) {
+        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt))
+	{
+		if (gBootMode & kBootModeSafe)
+		{
 			copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
 		}
 	}
@@ -1325,8 +1379,10 @@ processBootOptions()
 	// Store the merged kernel flags and boot args.
 
 	cnt = strlen(configKernelFlags);
-	if (cnt) {
-		if (cnt > cntRemaining) {
+	if (cnt)
+	{
+		if (cnt > cntRemaining)
+		{
 			error("Warning: boot arguments too long, truncating\n");
 			cnt = cntRemaining;
 		}
@@ -1335,28 +1391,34 @@ processBootOptions()
 		cntRemaining -= cnt;
 	}
 	userCnt = strlen(cp);
-	if (userCnt > cntRemaining) {
+	if (userCnt > cntRemaining)
+	{
 		error("Warning: boot arguments too long, truncating\n");
 		userCnt = cntRemaining;
 	}
 	strncpy(&argP[cnt], cp, userCnt);
 	argP[cnt+userCnt] = '\0';
 
-	if(!shouldboot) {
+	if(!shouldboot)
+	{
 		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
 			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
 		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
 
-		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
+		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) )
+		{
 			gBootMode = kBootModeSafe;
 		}
 	}
 
-	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+	{
 		strlcpy(gMKextName, val, cnt + 1);
-	} else {
+	}
+	else
+	{
 		gMKextName[0]=0;
 	}
 
@@ -1446,9 +1508,12 @@ void showTextBuffer(char *buf_orig, int size)
 
 void showHelp(void)
 {
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
-	} else {
+	}
+	else
+	{
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
 	}
 }
@@ -1460,14 +1525,16 @@ void showTextFile(const char * filename)
 	int	fd;
 	int	size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
         size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+        if (size > MAX_TEXT_FILE_SIZE)
+	{
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
@@ -1494,9 +1561,11 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (ASCII_KEY(key)) {
+		switch (ASCII_KEY(key))
+		{
 		case KEY_BKSP:
-			if (digitsI > 0) {
+			if (digitsI > 0)
+			{
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
 				// Assume x is not 0;
@@ -1505,7 +1574,9 @@ int selectAlternateBootDevice(int bootdevice)
 				// Overwrite with space without moving cursor position
 				putca(' ', 0x07, 1);
 				digitsI--;
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1513,7 +1584,8 @@ int selectAlternateBootDevice(int bootdevice)
 		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
-			if (end == digits && *end == '\0') {
+			if (end == digits && *end == '\0')
+			{
 				// User entered empty string
 				printf("\nUsing default boot device %x\n", bootdevice);
 				key = 0;
@@ -1528,10 +1600,13 @@ int selectAlternateBootDevice(int bootdevice)
 			break;
 
 		default:
-			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2)
+			{
 				putchar(ASCII_KEY(key));
 				digits[digitsI++] = ASCII_KEY(key);
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1544,9 +1619,12 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == KEY_ENTER) {
+	if (getchar() == KEY_ENTER)
+	{
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }

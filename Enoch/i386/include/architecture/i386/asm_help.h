@@ -45,7 +45,7 @@
 #ifdef	__ASSEMBLER__
 
 #define ALIGN						\
-	.align	2, 0x90
+	.align	4, 0x90
 
 #define	ROUND_TO_STACK(len)				\
 	(((len) + STACK_INCR - 1) / STACK_INCR * STACK_INCR)

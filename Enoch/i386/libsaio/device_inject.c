@@ -250,6 +250,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 	return 1;
 }
 
+// devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
 	int len = string->length * 2;
@@ -269,11 +270,13 @@ char *devprop_generate_string(DevPropString *string)
 
 	while(i < string->numentries)
 	{
-	        if (!(i < DEV_PROP_DEVICE_MAX_ENTRIES)) {
+	        if (!(i < DEV_PROP_DEVICE_MAX_ENTRIES))
+		{
 	            break;
 	        }
 
-	        if(!len) {
+	        if(!len)
+		{
 	            break;
 	        }
 
@@ -292,7 +295,8 @@ char *devprop_generate_string(DevPropString *string)
 		len -= 24;
 		for(x = 0;x < string->entries[i]->num_pci_devpaths; x++)
 		{
-			if(!len) {
+			if(!len)
+			{
 				break;
 			}
 			snprintf(buffer, len, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
@@ -304,7 +308,8 @@ char *devprop_generate_string(DevPropString *string)
 			len -= 12;
 		}
 
-		if(!len) {
+		if(!len)
+		{
 			break;
 		}
 
@@ -317,7 +322,8 @@ char *devprop_generate_string(DevPropString *string)
 		uint8_t *dataptr = string->entries[i]->data;
 		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
 		{
-			if(!len) {
+			if(!len)
+			{
 				break;
 			}
 			snprintf(buffer, len, "%02x", *dataptr++);

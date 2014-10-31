@@ -18,11 +18,10 @@
  * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
- *  load.c - Functions for decoding a Mach-o Kernel.
  *
- *  Copyright (c) 1998-2003 Apple Computer, Inc.
+ * load.c - Functions for decoding a Mach-o Kernel.
+ *
+ * Copyright (c) 1998-2003 Apple Computer, Inc.
  *
  */
 
@@ -59,19 +58,23 @@ long ThinFatFile(void **binary, unsigned long *length)
 	cpu_type_t fapcputype;
 	uint32_t fapoffset;
 	uint32_t fapsize;	
-  
-	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */{
+
+	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */
+	{
 		nfat = fhp->nfat_arch;
 		swapped = 0;
-	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */{
+	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */
+	{
 		nfat = OSSwapInt32(fhp->nfat_arch);
 		swapped = 1;
 	} else {
 		return -1;
 	}
 
-	for (; nfat > 0; nfat--, fap++) {
-		if (swapped) {
+	for (; nfat > 0; nfat--, fap++)
+	{
+		if (swapped)
+		{
 			fapcputype = OSSwapInt32(fap->cputype);
 			fapoffset = OSSwapInt32(fap->offset);
 			fapsize = OSSwapInt32(fap->size);
@@ -81,14 +84,16 @@ long ThinFatFile(void **binary, unsigned long *length)
 			fapsize = fap->size;
 		}
 
-		if (fapcputype == archCpuType) {
+		if (fapcputype == archCpuType)
+		{
 			*binary = (void *) ((unsigned long)*binary + fapoffset);
 			size = fapsize;
 			break;
 		}
 	}
 
-	if (length != 0) {
+	if (length != 0)
+	{
 		*length = size;
 	}
 
@@ -129,8 +134,9 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	{
 		case CPU_TYPE_I386:
 
-			if (mH->magic != MH_MAGIC) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC)
+			{
+				error("Mach-O (i386) file has bad magic number\n");
 				return -1;
 			}
 
@@ -139,12 +145,14 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		case CPU_TYPE_X86_64:
 /*
-			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) {
+			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC)
+			{
 				return -1;
 			}
 */
-			if (mH->magic != MH_MAGIC_64) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC_64)
+			{
+				error("Mach-O file (x86_64) has bad magic number\n");
 				return -1;
 			}
 
@@ -167,7 +175,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		unsigned int load_addr;
 		unsigned int load_size;
 
-		switch (cmd) {
+		switch (cmd)
+		{
 			case LC_SEGMENT_64:
 			case LC_SEGMENT:
 			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
@@ -194,7 +203,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		}
 
 
-	if (ret != 0) {
+	if (ret != 0)
+	{
 		return -1;
 	}
 
@@ -222,7 +232,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		cmdBase += cmdsize;
 	}
-	
+
 	return ret;
 }
 

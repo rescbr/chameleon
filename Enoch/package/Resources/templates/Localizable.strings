@@ -194,6 +194,9 @@ Dependencies: none";
 "EnableC6State_title" = "EnableC6State=Yes";
 "EnableC6State_description" = "Enable specific Processor power state, C6.";
 
+"EnableC7State_title" = "EnableC7State=Yes";
+"EnableC7State_description" = "Enable specific Processor power state, C7.";
+
 "GenerateCStates_title" = "GenerateCStates=Yes";
 "GenerateCStates_description" = "Enable auto generation of processor idle sleep states (C-States).";
 
@@ -257,6 +260,14 @@ Dependencies: none";
 "HDEFLayoutIDx03_title" = "LayoutID=3";
 "HDEFLayoutIDx03_description" = "Set HDEF layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
+
+"HDEFLayoutIDx05_title" = "LayoutID=5";
+"HDEFLayoutIDx05_description" = "Set HDEF layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDEFLayoutIDx07_title" = "LayoutID=7";
+"HDEFLayoutIDx07_description" = "Set HDEF layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
 
 "HDEFLayoutIDx12_title" = "LayoutID=12";
 "HDEFLayoutIDx12_description" = "Set HDEF layout-it to 12:
@@ -355,6 +366,14 @@ Dependencies: none";
 "HDAULayoutIDx03_title" = "LayoutID=3";
 "HDAULayoutIDx03_description" = "Set HDAU layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx05_title" = "LayoutID=5";
+"HDAULayoutIDx05_description" = "Set HDAU layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx07_title" = "LayoutID=7";
+"HDAULayoutIDx07_description" = "Set HDAU layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
 
 "HDAULayoutIDx12_title" = "LayoutID=12";
 "HDAULayoutIDx12_description" = "Set HDAU layout-it to 12:

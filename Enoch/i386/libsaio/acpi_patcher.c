@@ -30,7 +30,7 @@
 boolean_t tableSign(char *table, const char *sgn)
 {
 	int i;
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		if ((table[i] &~0x20) != (sgn[i] &~0x20))
 		{
@@ -46,6 +46,7 @@ static struct acpi_2_rsdp* getAddressOfAcpiTable()
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
 	void *acpi_addr = (void*)ACPI_RANGE_START;
+
 	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
 	{
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
@@ -68,6 +69,7 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
 	void *acpi_addr = (void*)ACPI_RANGE_START;
+
 	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
 	{
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
@@ -210,7 +212,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 {
-	char ssdt_header[] =
+	char ssdt_header[] = // cst_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
@@ -413,7 +415,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 {
-	char ssdt_header[] =
+	char ssdt_header[] = // pss_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x6A, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x00, /* ..PmRef. */
@@ -721,7 +723,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			} else {
 				Platform.Type = 1;		/* Set a fixed value (Desktop) */
 			}
-			verbose("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
+			DBG("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		} else {
 			Platform.Type = (unsigned char) strtoul(value, NULL, 10);
 		}
@@ -730,7 +732,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	if (fadt_mod->PM_Profile != Platform.Type) {
 		if (value) {
 			// user has overriden the SystemType so take care of it in FACP
-			verbose("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
+			DBG("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
 			fadt_mod->PM_Profile = Platform.Type;
 		} else {
 			// PM_Profile has a different value and no override has been set, so reflect the user value to ioregs
@@ -738,7 +740,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		}
 	}
 	// We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
-	// because we need to take care of facp original content, if it is correct.
+	// because we need to take care of FACP original content, if it is correct.
 	setupSystemType();
 
 	// Patch FADT to fix restart
@@ -923,14 +925,15 @@ int setupAcpi(void)
 	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
 	//getBoolForKey(kGenerateTStates, &generate_tstates, &bootInfo->chameleonConfig);
 
-	DBG("Generating P-States config: %d\n", generate_pstates);
-	DBG("Generating C-States config: %d\n", generate_cstates);
-	//DBG("Generating T-States config: %d\n", generate_tstates);
+	DBG("Generating P-States config: %s\n", generate_pstates ? "YES" : "NO");
+	DBG("Generating C-States config: %s\n", generate_cstates ? "YES" : "NO");
+	//DBG("Generating T-States config: %s\n", generate_tstates ? "YES" : "NO");
 
 	{
 		int i;
 
-		for (i = 0; i < 30; i++) {
+		for (i = 0; i < 30; i++)
+		{
 			char filename[512];
 
 			sprintf(filename, i > 0 ? "SSDT-%d.aml" : "SSDT.aml", i);
@@ -998,50 +1001,50 @@ int setupAcpi(void)
 				rsdt_entries[i-dropoffset]=rsdt_entries[i];
 
 				if (drop_ssdt && tableSign(table, "SSDT")) {
-					verbose("OEM SSDT tables was dropped\n");
+					DBG("OEM SSDT tables was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (drop_hpet  && tableSign(table, "HPET")) {
-					verbose("OEM HPET table was dropped\n");
+					DBG("OEM HPET table was dropped\n");
 					dropoffset++;
 					continue;
 				}			
 
 				if (drop_slic && tableSign(table, "SLIC")) {
-					verbose("OEM SLIC table was dropped\n");
+					DBG("OEM SLIC table was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (drop_sbst && tableSign(table, "SBST")) {
-					verbose("OEM SBST table was dropped\n");
+					DBG("OEM SBST table was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (drop_ecdt && tableSign(table, "ECDT")) {
-					verbose("OEM ECDT table was dropped\n");
+					DBG("OEM ECDT table was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (drop_asft && tableSign(table, "ASF!")) {
-					verbose("OEM ASF! table was dropped\n");
+					DBG("OEM ASF! table was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (drop_dmar && tableSign(table, "DMAR")) {
-					verbose("OEM DMAR table was dropped\n");
+					DBG("OEM DMAR table was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (tableSign(table, "HPET")) {
 					DBG("HPET found\n");
-					verbose("Custom HPET table was found\n");
+					DBG("Custom HPET table was found\n");
 					if(new_hpet) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_hpet;
 					}
@@ -1050,7 +1053,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "SBST")) {
 					DBG("SBST found\n");
-					verbose("Custom SBST table was found\n");
+					DBG("Custom SBST table was found\n");
 					if(new_sbst) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_sbst;
 					}
@@ -1059,7 +1062,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "ECDT")) {
 					DBG("ECDT found\n");
-					verbose("Custom ECDT table was found\n");
+					DBG("Custom ECDT table was found\n");
 					if(new_ecdt) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_ecdt;
 					}
@@ -1068,7 +1071,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "ASF!")) {
 					DBG("ASF! found\n");
-					verbose("Custom ASF! table was found\n");
+					DBG("Custom ASF! table was found\n");
 					if(new_asft) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_asft;
 					}
@@ -1077,7 +1080,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "DMAR")) {
 					DBG("DMAR found\n");
-					verbose("Custom DMAR table was found\n");
+					DBG("Custom DMAR table was found\n");
 					if(new_dmar) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dmar;
 					}
@@ -1086,7 +1089,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "APIC")) {
 					DBG("APIC found\n");
-					verbose("Custom APIC table was found\n");
+					DBG("Custom APIC table was found\n");
 					if(new_apic) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_apic;
 					}
@@ -1095,7 +1098,7 @@ int setupAcpi(void)
 
 				if (tableSign(table, "MCFG")) {
 					DBG("MCFG found\n");
-					verbose("Custom MCFG table was found\n");
+					DBG("Custom MCFG table was found\n");
 					if(new_mcfg) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_mcfg;
 					}
@@ -1104,7 +1107,7 @@ int setupAcpi(void)
 				}
 				if (tableSign(table, "DSDT")) {
 					DBG("DSDT found\n");
-					verbose("Custom DSDT table was found\n");
+					DBG("Custom DSDT table was found\n");
 					if(new_dsdt) {
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
 					}
@@ -1153,14 +1156,13 @@ int setupAcpi(void)
 			rsdt_entries=(uint32_t *)(rsdt_mod+1);
 
 			// Mozodojo: Insert additional SSDTs into RSDT
-			if(ssdt_count>0) {
+			if(ssdt_count > 0) {
 				int j;
 
 				for (j=0; j<ssdt_count; j++) {
 					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
 				}
-
-				verbose("RSDT: Added %d SSDT table(s)\n", ssdt_count);
+				DBG("RSDT: Added %d SSDT table(s)\n", ssdt_count);
 
 			}
 
@@ -1175,6 +1177,7 @@ int setupAcpi(void)
 			rsdp_mod->RsdtAddress=0;
 			DBG("RSDT not found or RSDT incorrect\n");
 		}
+		DBG("\n");
 
 		if (version) {
 			struct acpi_2_xsdt *xsdt, *xsdt_mod;
@@ -1253,7 +1256,7 @@ int setupAcpi(void)
 						}
 
 						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-						
+
 						continue;
 					}
 
@@ -1410,10 +1413,13 @@ int setupAcpi(void)
 				xsdt_mod->Checksum=256-checksum8(xsdt_mod,xsdt_mod->Length);
 			} else {
 			drop_xsdt:
+
 				DBG("About to drop XSDT\n");
+
 				/*FIXME: Now we just hope that if MacOS doesn't find XSDT it reverts to RSDT. 
 				 * A Better strategy would be to generate
 				 */
+
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
 				verbose("XSDT not found or XSDT incorrect\n");
 			}
@@ -1421,6 +1427,7 @@ int setupAcpi(void)
 		DBG("\n");
 
 		// Correct the checksum of RSDP
+
 		DBG("RSDP: Original checksum %d, ", rsdp_mod->Checksum);
 		rsdp_mod->Checksum=0;
 		rsdp_mod->Checksum=256-checksum8(rsdp_mod,20);
@@ -1433,11 +1440,14 @@ int setupAcpi(void)
 			DBG("New extended checksum %d\n", rsdp_mod->ExtendedChecksum);
 		}
 
-		if (version) {
+		if (version)
+		{
 			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi20_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20");
-		} else {
+		}
+		else
+		{
 			/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 			acpi10_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");

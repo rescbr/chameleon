@@ -23,7 +23,8 @@
 
 /*************************************************************************************************/
 
-typedef struct png_alloc_node {
+typedef struct png_alloc_node
+{
 	struct png_alloc_node *prev, *next;
 	void *addr;
 	size_t size;
@@ -32,31 +33,54 @@ typedef struct png_alloc_node {
 png_alloc_node_t *png_alloc_head = NULL;
 png_alloc_node_t *png_alloc_tail = NULL;
 
+//==============================================================================
+
 png_alloc_node_t *png_alloc_find_node(void *addr)
 {
 	png_alloc_node_t *node;
+
 	for (node = png_alloc_head; node; node = node->next)
+	{
 		if (node->addr == addr)
+		{
 			break;
+		}
+	}
+
 	return node;
 }
+
+
+//==============================================================================
 
 void png_alloc_add_node(void *addr, size_t size)
 {
 	png_alloc_node_t *node;
+
 	if (png_alloc_find_node(addr))
+	{
 		return;
-	node = malloc(sizeof (png_alloc_node_t));
+	}
+
+	node = malloc(sizeof(png_alloc_node_t));
 	node->addr = addr;
 	node->size = size;
 	node->prev = png_alloc_tail;
 	node->next = NULL;
 	png_alloc_tail = node;
+
 	if (node->prev)
+	{
 		node->prev->next = node;
+	}
+
 	if (!png_alloc_head)
+	{
 		png_alloc_head = node;
+	}
 }
+
+//==============================================================================
 
 void png_alloc_remove_node(png_alloc_node_t *node)
 {
@@ -911,12 +935,14 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 	vector8_resize(out, numpixels * 4);
 	uint8_t *out_data = out->size ? out->data : 0;
 	if (bitDepth == 8 && colorType == 0) // greyscale
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[i];
 			out_data[4 * i + 3] = (info->key_defined && (in[i] == info->key_r)) ? 0 : 255;
 		}
 	else if (bitDepth == 8 && colorType == 2) // RGB color
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			for (c = 0; c < 3; c++)
 				out_data[4 * i + c] = in[3 * i + c];
 			out_data[4 * i + 3] = (info->key_defined && (in[3 * i + 0] == info->key_r) &&

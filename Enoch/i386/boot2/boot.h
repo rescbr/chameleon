@@ -28,11 +28,21 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
+
+// OS X Versions
+#define YOSEMITE        checkOSVersion("10.10") // Yosemite
+#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
+#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
+#define LION            checkOSVersion("10.7")  // Lion
+#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
+#define LEOPARD         checkOSVersion("10.5")  // Leopard
+#define TIGER           checkOSVersion("10.4")  // Tiger
+
 /*
  * Paths used by chameleon
  */
 
-//kernel cache
+// kernel cache
 #define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
@@ -43,6 +53,10 @@
 // Mountain Lion installer
 #define kMLionInstallerDataFolder      "/OS X Install Data/"
 #define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+
+//kernel path
+#define kDefaultKernelPathPreYos	"/"
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite
 
 /*
  * Keys used in system Boot.plist
@@ -70,9 +84,10 @@
 #define kScanSingleDriveKey	"Scan Single Drive"
 #define kInstantMenuKey		"Instant Menu"
 #define kDefaultKernel		"mach_kernel"
+#define kOSXKernel		"kernel"		// Yosemite
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"		// gui.c
+#define kShowInfoKey		"ShowInfo"		/* gui.c */
 #define kWaitForKeypressKey	"Wait"
 
 /* AsereBLN: added these keys */
@@ -88,7 +103,7 @@
 #define kHidePartition		"Hide Partition"	/* disk.c */
 #define kRenamePartition	"Rename Partition"	/* disk.c */
 #define kSMBIOSKey		"SMBIOS"		/* fake_efi.c */
-#define kSystemID		"SystemId"		/* fake_efi.c */
+//#define kSystemID		"SystemId"		/* fake_efi.c */
 #define kSystemType		"SystemType"		/* fake_efi.c */
 #define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS			"VBIOS"			/* nvidia.c && ati.c */
@@ -153,7 +168,7 @@
 #define kDcfg1			"display_1"		/* nvidia.c */
 
 /* Marchrius: added these keys */
-#define kEnableBacklight	"EnableBacklight"	/* ati.c && nvidia.c */
+#define kEnableBacklight	"EnableBacklight"	/* nvidia.c */
 
 /* Kabyl: added these keys */
 #define kAtiConfig		"AtiConfig"		/* ati.c */
@@ -312,7 +327,14 @@ typedef struct {
 /*
  * lzss.c
  */
-extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+extern int decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen);
+extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+
+/*
+ * lzvn.c
+ */
+extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
+// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
 
 struct compressed_kernel_header {
 	u_int32_t signature;
@@ -323,7 +345,7 @@ struct compressed_kernel_header {
 	u_int32_t reserved[11];
 	char      platform_name[64];
 	char      root_path[256];
-	 u_int8_t  data[0];
+	u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 
@@ -333,5 +355,7 @@ void HibernateBootSnow(char *boot_device);
 
 /* bmdecompress.c */
 void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
+
+bool checkOSVersion(const char * version);
 
 #endif /* !__BOOT2_BOOT_H */

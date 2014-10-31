@@ -17,17 +17,21 @@ void blend( const pixmap_t *blendThis,		// Source image
 	uint16_t width = (blendThis->width + position.x < blendInto->width) ? blendThis->width: blendInto->width-position.x;
 	uint16_t height = (blendThis->height + position.y < blendInto->height) ? blendThis->height: blendInto->height-position.y;
 	
-	for (dy = position.y, sy = 0; sy < height; dy++, sy++) {
-		for (dx = position.x, sx = 0; sx < width; dx++, sx++) {
+	for (dy = position.y, sy = 0; sy < height; dy++, sy++)
+	{
+		for (dx = position.x, sx = 0; sx < width; dx++, sx++)
+		{
 			alpha = (pixel(blendThis, sx, sy).ch.a);
 
 			/* Skip blending for fully transparent pixel */
-			if (alpha == 0) {
+			if (alpha == 0)
+			{
 				continue;
 			}
 
 			/* For fully opaque pixel, there is no need to interpolate */
-			if (alpha == 255) {
+			if (alpha == 255)
+			{
 				pixel(blendInto, dx, dy).value = pixel(blendThis, sx, sy).value;
 				continue;
 			}
@@ -51,7 +55,8 @@ void blend( const pixmap_t *blendThis,		// Source image
 	}
 }
 
-position_t centeredIn( const pixmap_t *background, const pixmap_t *toCenter ) {
+position_t centeredIn( const pixmap_t *background, const pixmap_t *toCenter )
+{
 	position_t centered;
 	centered.x = ( background->width  - toCenter->width  ) / 2;
 	centered.y = ( background->height - toCenter->height ) / 2;

@@ -68,7 +68,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							if (getBoolForKey(kSkipAtiGfx, &doit, &bootInfo->chameleonConfig) && doit)
 							{
 								verbose("Skip ATi/AMD gfx device!\n");
-							} else {
+							}
+							else
+							{
 								setup_ati_devprop(current);
 							}
 							break;
@@ -77,7 +79,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit)
 							{
 								verbose("Skip Intel gfx device!\n");
-							} else {
+							}
+							else
+							{
 								setup_gma_devprop(current);
 							}
 							break;
@@ -86,7 +90,9 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit)
 							{
 								verbose("Skip Nvidia gfx device!\n");
-							} else {
+							}
+							else
+							{
 								setup_nvidia_devprop(current);
 							}
 							break;

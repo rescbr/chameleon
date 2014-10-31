@@ -42,12 +42,11 @@
 
 #include <sl.h>
 
-#define N		4096	/* Size of ring buffer - must be power of 2. */
-#define N_MIN_1		4095
-#define F		18	/* Upper limit for match_length. */
-#define R		N - F
-#define THRESHOLD	2	/* Encode string into position and length if match_length is greater than this. */
-#define NIL		N	/* Index for root of binary search trees. */
+#define N         4096  /* size of ring buffer - must be power of 2 */
+#define F         18    /* upper limit for match_length */
+#define THRESHOLD 2     /* encode string into position and length
+                           if match_length is greater than this */
+#define NIL       N     /* index for root of binary search trees */
 
 struct encode_state {
     /*
@@ -65,51 +64,53 @@ struct encode_state {
 	int match_position, match_length;
 };
 
-//==============================================================================
-// Refactoring and bug fix Copyright (c) 2010 by DHP.
-
-int decompress_lzss(u_int8_t * dst, u_int8_t * src, u_int32_t srclen)
+int
+decompress_lzss(  u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen )
 {
-	/*  Four KB ring buffer with 17 extra bytes added to aid string comparisons. */
-	u_int8_t text_buf[N_MIN_1 + F];
-	u_int8_t * dststart = dst;
-	const u_int8_t * srcend = (src + srclen);
+	/* ring buffer of size N, with extra F-1 bytes to aid string comparison */
+	u_int8_t text_buf[N + F - 1];
+	u_int8_t *dststart = dst;
+	u_int8_t *dstend = dst + dstlen;
+	u_int8_t *srcend = src + srclen;
+	int  i, j, k, r, c;
+	unsigned int flags;
 
-	int r = R;
-	int  i, j, k, c;
-	unsigned int flags = 0;
-
-	for (i = 0; i < R; i++) {
+	dst = dststart;
+	srcend = src + srclen;
+	for (i = 0; i < N - F; i++)
 		text_buf[i] = ' ';
-	}
-
-	while (src < srcend) {
+	r = N - F;
+	flags = 0;
+	for ( ; ; ) {
 		if (((flags >>= 1) & 0x100) == 0) {
-			c = *src++;
-			flags = c | 0xFF00;  // Clever use of the high byte.
-        	}
-
-        	if ((src < srcend) && (flags & 1)) {
-			c = *src++;
+			if (src < srcend) c = *src++; else break;
+			flags = c | 0xFF00;  /* uses higher byte cleverly */
+		}   /* to count eight */
+		if (flags & 1) {
+			if (src < srcend) c = *src++; else break;
 			*dst++ = c;
+			if (dst >= dstend) {
+				goto finish;
+			}
 			text_buf[r++] = c;
-			r &= N_MIN_1;
-		} else if ((src + 2) <= srcend) {
-			i = *src++;
-			j = *src++;
-
+			r &= (N - 1);
+		} else {
+			if (src < srcend) i = *src++; else break;
+			if (src < srcend) j = *src++; else break;
 			i |= ((j & 0xF0) << 4);
-			j = (j & 0x0F) + THRESHOLD;
-
+			j  =  (j & 0x0F) + THRESHOLD;
 			for (k = 0; k <= j; k++) {
-				c = text_buf[(i + k) & N_MIN_1];
+				c = text_buf[(i + k) & (N - 1)];
 				*dst++ = c;
+				if (dst >= dstend) {
+					goto finish;
+				}
 				text_buf[r++] = c;
-				r &= N_MIN_1;
+				r &= (N - 1);
 			}
 		}
 	}
-
+finish:
 	return dst - dststart;
 }
 
@@ -227,23 +228,20 @@ static void delete_node(struct encode_state *sp, int p)
     sp->parent[p] = NIL;
 }
 
-u_int8_t *compress_lzss(
-                        u_int8_t       * dst,
-                        u_int32_t        dstlen,
-                        u_int8_t       * src,
-                        u_int32_t        srclen)
+u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen )
 {
-    u_int8_t * result = NULL;
     /* Encoding state, mostly tree but some current match stuff */
     struct encode_state *sp;
+
     int  i, c, len, r, s, last_match_length, code_buf_ptr;
     u_int8_t code_buf[17], mask;
-    u_int8_t * srcend = src + srclen;
+    u_int8_t *srcend = src + srcLen;
     u_int8_t *dstend = dst + dstlen;
+
     /* initialize trees */
     sp = (struct encode_state *) malloc(sizeof(*sp));
-    if (!sp) goto finish;
     init_state(sp);
+
     /*
      * code_buf[1..16] saves eight units of code, and code_buf[0] works
      * as eight flags, "1" representing that the unit is an unencoded
@@ -252,13 +250,16 @@ u_int8_t *compress_lzss(
      */
     code_buf[0] = 0;
     code_buf_ptr = mask = 1;
+
     /* Clear the buffer with any character that will appear often. */
     s = 0;  r = N - F;
+
     /* Read F bytes into the last F bytes of the buffer */
     for (len = 0; len < F && src < srcend; len++)
         sp->text_buf[r + len] = *src++;
     if (!len)
-        goto finish;
+        return (void *) 0;  /* text of size zero */
+
     /*
      * Insert the F strings, each of which begins with one or more
      * 'space' characters.  Note the order in which these strings are
@@ -266,6 +267,7 @@ u_int8_t *compress_lzss(
      */
     for (i = 1; i <= F; i++)
         insert_node(sp, r - i);
+
     /*
      * Finally, insert the whole string just read.
      * The global variables match_length and match_position are set.
@@ -292,7 +294,7 @@ u_int8_t *compress_lzss(
                 if (dst < dstend)
                     *dst++ = code_buf[i];
                 else
-                    goto finish;
+                    return (void *) 0;
             code_buf[0] = 0;
             code_buf_ptr = mask = 1;
         }
@@ -301,20 +303,24 @@ u_int8_t *compress_lzss(
             delete_node(sp, s);    /* Delete old strings and */
             c = *src++;
             sp->text_buf[s] = c;    /* read new bytes */
+
             /*
              * If the position is near the end of buffer, extend the buffer
              * to make string comparison easier.
              */
             if (s < F - 1)
                 sp->text_buf[s + N] = c;
+
             /* Since this is a ring buffer, increment the position modulo N. */
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
+
             /* Register the string in text_buf[r..r+F-1] */
             insert_node(sp, r);
         }
         while (i++ < last_match_length) {
             delete_node(sp, s);
+
             /* After the end of text, no need to read, */
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
@@ -323,15 +329,14 @@ u_int8_t *compress_lzss(
                 insert_node(sp, r);
         }
     } while (len > 0);   /* until length of string to be processed is zero */
+
     if (code_buf_ptr > 1) {    /* Send remaining code. */
         for (i = 0; i < code_buf_ptr; i++)
             if (dst < dstend)
                 *dst++ = code_buf[i];
             else
-                goto finish;
+                return (void *) 0;
     }
-    result = dst;
-finish:
-    if (sp) free(sp);
-    return result;
+
+    return dst;
 }

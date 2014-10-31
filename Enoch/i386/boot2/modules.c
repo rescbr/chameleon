@@ -105,6 +105,11 @@ void load_all_modules()
 	long flags;
 	long time;
 	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+	if(!moduleDir)
+	{
+		verbose("Warning: Unable to open modules folder at '/Extra/modules/'. Ingoring modules.\n");
+		return;
+	}
 	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0) {
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {
 			char* tmp = malloc(strlen(name) + 1);
@@ -121,6 +126,7 @@ void load_all_modules()
 		}
 
 	}
+
 	closedir(moduleDir);
 }
 
@@ -278,6 +284,11 @@ unsigned int lookup_all_symbols(const char* name)
 	while(entry)
 	{
 		if(strcmp(entry->symbol, name) == 0)
+		{
+			//DBG("External symbol %s located at 0x%X\n", name, entry->addr);
+			return entry->addr;
+		}
+		else if(strcmp(entry->symbol, name + 1) == 0 && *name == '_') // Allow _strstr to bing to strstr, etc
 		{
 			//DBG("External symbol %s located at 0x%X\n", name, entry->addr);
 			return entry->addr;

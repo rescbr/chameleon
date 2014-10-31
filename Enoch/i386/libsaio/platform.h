@@ -26,26 +26,36 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPU_MODEL_WOLFDALE		0x17			// 
 #define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
-#define CPU_MODEL_ATOM			0x1C			// Pineview
+#define CPU_MODEL_ATOM			0x1C			// Pineview, Bonnell
 #define CPU_MODEL_XEON_MP		0x1D			// MP 7400
 #define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
 #define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
 #define CPU_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
 #define CPU_MODEL_ATOM_SAN		0x26			// Lincroft
-#define CPU_MODEL_LINCROFT		0x27			// 
+#define CPU_MODEL_LINCROFT		0x27			// Bonnell
 #define CPU_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
 #define CPU_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
 #define CPU_MODEL_JAKETOWN		0x2D			// Sandy Bridge-E, Sandy Bridge-EP
 #define CPU_MODEL_NEHALEM_EX		0x2E			// Beckton
 #define CPU_MODEL_WESTMERE_EX		0x2F			// Westmere-EX
-#define CPU_MODEL_ATOM_2000		0x36			// Cedarview
+//#define CPU_MODEL_BONNELL_ATOM	0x35			// Bonnell
+#define CPU_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
+#define CPU_MODEL_SILVERMONT		0x37			// Atom Silvermont
 #define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPU_MODEL_HASWELL		0x3C			// Haswell DT
+#define CPU_MODEL_BROADWELL		0x3D			// Core M, Broadwell / Core-AVX2
 #define CPU_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
-#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell MB
+#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell Server
 //#define CPU_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPU_MODEL_HASWELL_ULT		0x45			// Haswell ULT
-#define CPU_MODEL_CRYSTALWELL		0x46			// Haswell ULX
+#define CPU_MODEL_CRYSTALWELL		0x46			// Crystal Well
+// 4A silvermont / atom
+#define CPU_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000
+// 4E Core???
+#define CPU_MODEL_BRODWELL_SVR		0x4F			// Broadwell Server
+#define CPU_MODEL_BRODWELL_MSVR		0x56			// Broadwell Micro Server
+// 5A silvermont / atom
+// 5D silvermont / atom
 
 /* CPUID Vendor */
 #define CPUID_VENDOR_INTEL      0x756E6547
@@ -277,6 +287,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define SMB_MEM_TYPE_DDR2		19
 #define SMB_MEM_TYPE_FBDIMM		20
 #define SMB_MEM_TYPE_DDR3		24			// Supported in 10.5.6+ AppleSMBIOS
+#define SMB_MEM_TYPE_DDR4		26
 
 /* Memory Configuration Types */ 
 #define SMB_MEM_CHANNEL_UNKNOWN		0
@@ -310,7 +321,8 @@ typedef struct _RamSlotInfo_t
 
 //==============================================================================
 
-typedef struct _PlatformInfo_t {
+typedef struct _PlatformInfo_t
+{
 	struct CPU {
 		uint32_t		Vendor;					// Vendor - char Vendor[16];
 		char			BrandString[48];			// 48 Byte Branding String
