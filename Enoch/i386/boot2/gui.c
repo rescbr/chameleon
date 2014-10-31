@@ -1009,9 +1009,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		{
 			case kPartitionTypeHFS:
 			{
-
 				// ErmaC : TODO test needed for recovery icon
-
 				// Use HFSRECOVERY icon.
 //				if (device->flags & kBVFlagBooter)
 //				{

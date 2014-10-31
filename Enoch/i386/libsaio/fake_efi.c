@@ -771,6 +771,7 @@ void setupChosenNode()
 				}
 
 				cpuTick = getCPUTick();						// callq	0x121a7
+//				printf("value: 0x%llx\n", getCPUTick());
 				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
 				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx

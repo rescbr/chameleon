@@ -153,7 +153,7 @@ typedef long (*FSLoadFile)(CICell ih, char * filePath);
 typedef long (*FSReadFile)(CICell ih, char *filePath, void *base, uint64_t offset, uint64_t length);
 typedef long (*FSGetFileBlock)(CICell ih, char *filePath, unsigned long long *firstBlock);
 typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long * dirIndex,
-							  char ** name, long * flags, long * time,
+							  char ** name, long * flags, u_int32_t * time,
 							  FinderInfo * finderInfo, long * infoValid);
 typedef long (*FSGetUUID)(CICell ih, char *uuidStr);
 typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);

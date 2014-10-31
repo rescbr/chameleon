@@ -242,8 +242,9 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 {
 	char		kernelCacheFile[512];
 	char		kernelCachePath[512];
-	long		flags, time, cachetime, kerneltime, exttime, ret=-1;
+	long		flags, ret=-1;
 	unsigned long adler32;
+	u_int32_t time, cachetime, kerneltime, exttime;
 
 	if((gBootMode & kBootModeSafe) != 0)
 	{
@@ -273,8 +274,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
 			int	lnam = strlen(kernelCacheFile) + 9; //with adler32
-			char	*name;
-			long	prev_time = 0;
+			char      *name;
+			u_int32_t prev_time = 0;
 
 			struct	dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
 
@@ -524,10 +525,11 @@ void common_boot(int biosdev)
 		bool		useKernelCache = true; // by default try to use the prelinked kernel
 		const char	*val;
 		int			len, ret = -1;
-		long		flags, sleeptime, time;
+		long		flags;
+		u_int32_t	sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
 
-		char        bootFile[sizeof(bootInfo->bootFile)];
+		char		bootFile[sizeof(bootInfo->bootFile)];
 		char		bootFilePath[512];
 		char		kernelCacheFile[512];
 
@@ -710,7 +712,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if (!YOSEMITE)
+				if ( !YOSEMITE )
 				{
 					//printf(HEADER " (%s).\n", bootInfo->bootFile);
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
@@ -828,7 +830,8 @@ static void selectBiosDevice(void)
 
 bool checkOSVersion(const char * version)
 {
-	if ( (sizeof(version) > 4) && (version[3] == '1') ) {
+	if ( (sizeof(version) > 4) && ('.' != version[4]) && ('\0' != version[4]) )
+	{
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3])
 		&& (gMacOSVersion[4] == version[4]));

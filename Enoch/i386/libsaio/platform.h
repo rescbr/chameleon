@@ -13,7 +13,25 @@ extern bool platformCPUFeature(uint32_t);
 extern void scan_platform(void);
 extern void dumpPhysAddr(const char * title, void * a, int len);
 
+/* CPUID Vendor */
+#define CPUID_VENDOR_INTEL      0x756E6547
+#define CPUID_VENDOR_AMD        0x68747541
 
+/* CPUID index into cpuid_raw */
+#define CPUID_0				0
+#define CPUID_1				1
+#define CPUID_2				2
+#define CPUID_3				3
+#define CPUID_4				4
+#define CPUID_5				5
+#define CPUID_6				6
+#define CPUID_80			7
+#define CPUID_81			8
+#define CPUID_88			9
+#define CPUID_MAX			10
+
+#define CPU_MODEL_ANY			0x00
+#define CPU_MODEL_UNKNOWN		0x01
 #define CPU_MODEL_PRESCOTT		0x03			// Celeron D, Pentium 4 (90nm)
 #define CPU_MODEL_NOCONA		0x04			// Xeon Nocona/Paxville, Irwindale (90nm)
 #define CPU_MODEL_PRESLER		0x06			// Pentium 4, Pentium D (65nm)
@@ -56,10 +74,6 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_MODEL_BRODWELL_MSVR		0x56			// Broadwell Micro Server
 // 5A silvermont / atom
 // 5D silvermont / atom
-
-/* CPUID Vendor */
-#define CPUID_VENDOR_INTEL      0x756E6547
-#define CPUID_VENDOR_AMD        0x68747541
 
 /* Unknown CPU */
 #define CPU_STRING_UNKNOWN	"Unknown CPU Type"
@@ -238,19 +252,6 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 // DFE: This constant comes from older xnu:
 #define CLKNUM			1193182		/* formerly 1193167 */
-
-/* CPUID index into cpuid_raw */
-#define CPUID_0				0
-#define CPUID_1				1
-#define CPUID_2				2
-#define CPUID_3				3
-#define CPUID_4				4
-#define CPUID_5				5
-#define CPUID_6				6
-#define CPUID_80			7
-#define CPUID_81			8
-#define CPUID_88			9
-#define CPUID_MAX			10
 
 /* CPU Features */
 #define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set

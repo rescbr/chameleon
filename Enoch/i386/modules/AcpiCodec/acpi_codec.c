@@ -4743,13 +4743,14 @@ EFI_STATUS setup_Acpi(void)
 	} 
     
 	{
-        long         ret, length, flags, time;
-        long long	 index = 0;
-        const char * name;
+        long long	index = 0;
+        long		ret, length, flags;
+        u_int32_t	time;
+        const char	* name;
         
-		U8 i = 0;
-		char dirspec[512];
-		bool acpidir_found = false;
+	U8 i = 0;
+	char dirspec[512];
+	bool acpidir_found = false;
 		
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
         if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
@@ -5077,7 +5078,9 @@ EFI_STATUS setup_Acpi(void)
 				MadtPointer = (ACPI_TABLE_MADT *)madt_file;	                    
 			}
 
-		} else {
+		}
+		else
+		{
 			MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
 		}
 
@@ -5158,7 +5161,9 @@ EFI_STATUS setup_Acpi(void)
 		/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 		rsd_p = (U32)rsdp_mod;
 		addConfigurationTable(&gEfiAcpi20TableGuid, &rsd_p, "ACPI_20");
-	} else {
+	}
+	else
+	{
 		/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 		rsd_p = (U32)rsdp_mod;
 		addConfigurationTable(&gEfiAcpiTableGuid, &rsd_p, "ACPI");

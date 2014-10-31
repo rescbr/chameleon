@@ -2,7 +2,7 @@
  * Copyright (c) 2000-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 2.0 (the
  * "License").  You may not use this file except in compliance with the
@@ -16,10 +16,10 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
+ *
  *  hfs.c - File System Module for HFS and HFS+.
  *
  *  Copyright (c) 1999-2002 Apple Computer, Inc.
@@ -45,8 +45,8 @@ static CICell                  gCurrentIH;
 static long long               gAllocationOffset;
 static long                    gIsHFSPlus;
 static long                    gCaseSensitive;
-static long                    gBlockSize;
-static long                    gCacheBlockSize;
+static u_int32_t               gBlockSize;
+static u_int32_t               gCacheBlockSize;
 static char                    *gBTreeHeaderBuffer;
 static BTHeaderRec             *gBTHeaders[2];
 static char                    *gHFSMdbVib;
@@ -59,45 +59,45 @@ static char                    *gTempStr;
 
 #else  /* !__i386__ */
 
-static CICell                  gCurrentIH;
-static long long               gAllocationOffset;
-static long                    gIsHFSPlus;
-static long                    gBlockSize;
-static long                    gCaseSensitive;
-static long                    gCacheBlockSize;
-static char                    gBTreeHeaderBuffer[512];
-static BTHeaderRec             *gBTHeaders[2];
-static char                    gHFSMdbVib[kBlockSize];
-static HFSMasterDirectoryBlock *gHFSMDB =(HFSMasterDirectoryBlock*)gHFSMdbVib;
-static char                    gHFSPlusHeader[kBlockSize];
-static HFSPlusVolumeHeader     *gHFSPlus =(HFSPlusVolumeHeader*)gHFSPlusHeader;
-static char                    gLinkTemp[64];
-static long long               gVolID;
+static CICell			gCurrentIH;
+static long long		gAllocationOffset;
+static long			gIsHFSPlus;
+static long			gCaseSensitive;
+static u_int32_t		gBlockSize;
+static u_int32_t		gCacheBlockSize;
+static char			gBTreeHeaderBuffer[512];
+static BTHeaderRec		*gBTHeaders[2];
+static char			gHFSMdbVib[kBlockSize];
+static HFSMasterDirectoryBlock	*gHFSMDB =(HFSMasterDirectoryBlock*)gHFSMdbVib;
+static char			gHFSPlusHeader[kBlockSize];
+static HFSPlusVolumeHeader	*gHFSPlus =(HFSPlusVolumeHeader*)gHFSPlusHeader;
+static char			gLinkTemp[64];
+static long long		gVolID;
 
 #endif /* !__i386__ */
 
-static long ReadFile(void *file, uint64_t *length, void *base, uint64_t offset);
-static long GetCatalogEntryInfo(void *entry, long *flags, long *time,
+static long ReadFile(void *file, u_int64_t *length, void *base, u_int64_t offset);
+static long GetCatalogEntryInfo(void *entry, long *flags, u_int32_t *time,
                                 FinderInfo *finderInfo, long *infoValid);
 static long ResolvePathToCatalogEntry(char *filePath, long *flags,
-                void *entry, long dirID, long long *dirIndex);
+                void *entry, u_int32_t dirID, long long *dirIndex);
 
 static long GetCatalogEntry(long long *dirIndex, char **name,
-                            long *flags, long *time,
+                            long *flags, u_int32_t *time,
                             FinderInfo *finderInfo, long *infoValid);
-static long ReadCatalogEntry(char *fileName, long dirID, void *entry,
+static long ReadCatalogEntry(char *fileName, u_int32_t dirID, void *entry,
                 long long *dirIndex);
-static long ReadExtentsEntry(long fileID, long startBlock, void *entry);
+static long ReadExtentsEntry(u_int32_t fileID, long startBlock, void *entry);
 
 static long ReadBTreeEntry(long btree, void *key, char *entry, long long *dirIndex);
-static void GetBTreeRecord(long index, char *nodeBuffer, long nodeSize,
+static void GetBTreeRecord(u_int16_t index, char *nodeBuffer, u_int16_t nodeSize,
                 char **key, char **data);
 
-static long ReadExtent(char *extent, uint64_t extentSize, long extentFile,
-                uint64_t offset, uint64_t size, void *buffer, long cache);
+static long ReadExtent(char *extent, u_int64_t extentSize, u_int32_t extentFile,
+                u_int64_t offset, u_int64_t size, void *buffer, long cache);
 
-static long GetExtentStart(void *extents, long index);
-static long GetExtentSize(void *extents, long index);
+static u_int32_t GetExtentStart(void *extents, u_int32_t index);
+static u_int32_t GetExtentSize(void *extents, u_int32_t index);
 
 static long CompareHFSCatalogKeys(void *key, void *testKey);
 static long CompareHFSPlusCatalogKeys(void *key, void *testKey);
@@ -107,7 +107,6 @@ static long CompareHFSPlusExtentsKeys(void *key, void *testKey);
 extern long FastRelString(u_int8_t *str1, u_int8_t *str2);
 extern long BinaryUnicodeCompare(u_int16_t *uniStr1, u_int32_t len1,
                                  u_int16_t *uniStr2, u_int32_t len2);
-
 
 //==============================================================================
 
@@ -119,17 +118,16 @@ static void SwapFinderInfo(FndrFileInfo *dst, FndrFileInfo *src)
 	// Don't bother with location
 }
 
-
 //==============================================================================
 
 void HFSFree(CICell ih)
 {
-	if(gCurrentIH == ih) {
+	if(gCurrentIH == ih)
+	{
 		gCurrentIH = 0;
 	}
 	free(ih);
 }
-
 
 //==============================================================================
 
@@ -150,13 +148,14 @@ bool HFSProbe (const void *buf)
 	return true;
 }
 
-
 //==============================================================================
 
 long HFSInitPartition(CICell ih)
 {
-	long extentSize, extentFile, nodeSize;
+	u_int64_t extentSize;
 	void *extent;
+	u_int32_t extentFile;
+	u_int16_t nodeSize;
 
 	if (ih == gCurrentIH)
 	{
@@ -284,7 +283,6 @@ long HFSInitPartition(CICell ih)
 	return 0;
 }
 
-
 //==============================================================================
 
 long HFSLoadFile(CICell ih, char * filePath)
@@ -292,11 +290,12 @@ long HFSLoadFile(CICell ih, char * filePath)
 	return HFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
 }
 
-long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint64_t length)
+long HFSReadFile(CICell ih, char * filePath, void *base, u_int64_t offset,  u_int64_t length)
 {
 	char entry[512];
 	char devStr[12];
-	long dirID, result, flags = 0;
+	u_int32_t dirID;
+	long result, flags;
 
 	if (HFSInitPartition(ih) == -1)
 	{
@@ -358,11 +357,11 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 	return length;
 }
 
-long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** name, long * flags, long * time, FinderInfo * finderInfo, long * infoValid)
+long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** name, long * flags, u_int32_t * time, FinderInfo * finderInfo, long * infoValid)
 {
 	char entry[512];
-
-	long dirID, dirFlags = 0;
+	u_int32_t dirID;
+	long dirFlags;
 
 	if (HFSInitPartition(ih) == -1)
 	{
@@ -435,19 +434,19 @@ long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** nam
 
 void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 {
-
-	UInt16 nodeSize;
-	UInt32 firstLeafNode;
-	long long dirIndex;
+	long long dirIndex = 0;
 	char *name;
-	long flags =0, time;
+	long flags;
+	u_int32_t firstLeafNode;
+	u_int32_t time;
+	u_int16_t nodeSize;
 
-	if (HFSInitPartition(ih) == -1) {
+	if (HFSInitPartition(ih) == -1)
+	{
 		return;
 	}
 
 	/* Fill some crucial data structures by side effect. */
-	dirIndex = 0;
 	HFSGetDirEntry(ih, "/", &dirIndex, &name, &flags, &time, 0, 0);
 
 	/* Now we can loook up the volume name node. */
@@ -462,13 +461,13 @@ void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 	str[strMaxLen] = '\0';
 }
 
-
 //==============================================================================
 
-long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
+long HFSGetFileBlock(CICell ih, char *filePath, u_int64_t *firstBlock)
 {
 	char entry[512];
-	long dirID, result, flags =0;
+	long result, flags;
+	u_int32_t dirID;
 	void               *extents;
 	HFSCatalogFile     *hfsFile     = (void *)entry;
 	HFSPlusCatalogFile *hfsPlusFile = (void *)entry;
@@ -479,9 +478,7 @@ long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 	}
 
 	dirID = kHFSRootFolderID;
-
-	// Skip a lead '\'.  Start in the system folder if there are two.
-
+	// Skip a lead '/'.  Start in the system folder if there are two.
 	if (filePath[0] == '/')
 	{
 		if (filePath[1] == '/')
@@ -519,13 +516,11 @@ long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 	}
 
 #if DEBUG
-	printf("extent start 0x%x\n", (unsigned long)GetExtentStart(extents, 0));
-	printf("block size 0x%x\n", (unsigned long)gBlockSize);
+	printf("extent start 0x%x\n", GetExtentStart(extents, 0));
+	printf("block size 0x%x\n", gBlockSize);
 	printf("Allocation offset 0x%x\n", (unsigned long)gAllocationOffset);
 #endif
-
-	*firstBlock = ((unsigned long long)GetExtentStart(extents, 0) * (unsigned long long) gBlockSize + gAllocationOffset) / 512ULL;
-
+	*firstBlock = ((u_int64_t) GetExtentStart(extents, 0) * (u_int64_t) gBlockSize + gAllocationOffset) / 512ULL;
 	return 0;
 }
 
@@ -550,15 +545,13 @@ long HFSGetUUID(CICell ih, char *uuidStr)
 //==============================================================================
 // Private Functions
 
-static long ReadFile(void * file, uint64_t * length, void * base, uint64_t offset)
+static long ReadFile(void * file, u_int64_t * length, void * base, u_int64_t offset)
 {
-	void			*extents;
-	long			fileID;
-
-	uint64_t		fileLength;
-
-	HFSCatalogFile		*hfsFile = file;
-	HFSPlusCatalogFile	*hfsPlusFile = file;
+	u_int64_t          fileLength;
+	void               *extents;
+	HFSCatalogFile     *hfsFile     = file;
+	HFSPlusCatalogFile *hfsPlusFile = file;
+	u_int32_t          fileID;
 
 	if (gIsHFSPlus)
 	{
@@ -600,14 +593,14 @@ static long ReadFile(void * file, uint64_t * length, void * base, uint64_t offse
 
 //==============================================================================
 
-static long GetCatalogEntryInfo(void * entry, long * flags, long * time, FinderInfo * finderInfo, long * infoValid)
+static long GetCatalogEntryInfo(void * entry, long * flags, u_int32_t * time, FinderInfo * finderInfo, long * infoValid)
 {
-	long tmpTime = 0;
+	u_int32_t tmpTime = 0;
 	long valid = 0;
 
 	// Get information about the file.
     
-	switch (SWAP_BE16(*(short *)entry))
+	switch ( SWAP_BE16(*(short *)entry) )
 	{
 	case kHFSFolderRecord           :
 		*flags = kFileTypeDirectory;
@@ -654,8 +647,6 @@ static long GetCatalogEntryInfo(void * entry, long * flags, long * time, FinderI
 		*flags = kFileTypeUnknown;
 		tmpTime = 0;
 		break;
-	default:
-		break;
 	}
 
 	if (time != 0)
@@ -672,13 +663,13 @@ static long GetCatalogEntryInfo(void * entry, long * flags, long * time, FinderI
 	return 0;
 }
 
-
 //==============================================================================
 
-static long ResolvePathToCatalogEntry(char * filePath, long * flags, void * entry, long dirID, long long * dirIndex)
+static long ResolvePathToCatalogEntry(char * filePath, long * flags, void * entry, u_int32_t dirID, long long * dirIndex)
 {
 	char			*restPath;
-	long			result, cnt, subFolderID = 0;
+	long			result, cnt;
+	u_int32_t		subFolderID = 0;
 	long long		tmpDirIndex;
 	HFSPlusCatalogFile	*hfsPlusFile;
 
@@ -742,15 +733,16 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags, void * entr
 	return result;
 }
 
-
 //==============================================================================
 
-static long GetCatalogEntry(long long * dirIndex, char ** name, long * flags, long * time, FinderInfo * finderInfo, long * infoValid)
+static long GetCatalogEntry(long long * dirIndex, char ** name, long * flags, u_int32_t * time, FinderInfo * finderInfo, long * infoValid)
 {
-	long              extentSize, nodeSize, curNode, index;
+	u_int64_t         extentSize;
 	void              *extent;
 	char              *nodeBuf, *testKey, *entry;
 	BTNodeDescriptor  *node;
+	u_int32_t         curNode;
+	u_int16_t         nodeSize, index;
 
 	if (gIsHFSPlus)
 	{
@@ -767,11 +759,12 @@ static long GetCatalogEntry(long long * dirIndex, char ** name, long * flags, lo
 	nodeBuf  = (char *)malloc(nodeSize);
 	node     = (BTNodeDescriptor *)nodeBuf;
 
-	index   = (long) (*dirIndex % nodeSize);
-	curNode = (long) (*dirIndex / nodeSize);
+	index   = (u_int16_t) (*dirIndex % nodeSize);
+	curNode = (u_int32_t) (*dirIndex / nodeSize);
 
 	// Read the BTree node and get the record for index.
 	ReadExtent(extent, extentSize, kHFSCatalogFileID, (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
+
 	GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &entry);
 
 	GetCatalogEntryInfo(entry, flags, time, finderInfo, infoValid);
@@ -806,38 +799,35 @@ static long GetCatalogEntry(long long * dirIndex, char ** name, long * flags, lo
 	return 0;
 }
 
-
 //==============================================================================
 
-static long ReadCatalogEntry(char * fileName, long dirID, void * entry, long long * dirIndex)
+static long ReadCatalogEntry(char * fileName, u_int32_t dirID, void * entry, long long * dirIndex)
 {
-	long              length = 0;
+	long              length = strlen(fileName);
 	char              key[sizeof(HFSPlusCatalogKey)];
 	HFSCatalogKey     *hfsKey     = (HFSCatalogKey *)key;
 	HFSPlusCatalogKey *hfsPlusKey = (HFSPlusCatalogKey *)key;
 
 	// Make the catalog key.
-	if (gIsHFSPlus)
+	if ( gIsHFSPlus )
 	{
-		hfsPlusKey->parentID = SWAP_BE32(dirID);
-		length = strlen(fileName);
-
-		if (length > 255)
+		if (length > kHFSPlusMaxFileNameChars)
 		{
-			length = 255;
+			length = kHFSPlusMaxFileNameChars;
 		}
+
+		hfsPlusKey->parentID = SWAP_BE32(dirID);
 
 		utf_decodestr((u_int8_t *)fileName, hfsPlusKey->nodeName.unicode, &(hfsPlusKey->nodeName.length), 512, OSBigEndian);
 	}
 	else
 	{
-		hfsKey->parentID = SWAP_BE32(dirID);
-		length = strlen(fileName);
-
-		if (length > 31)
+		if (length > kHFSMaxFileNameChars)
 		{
-			length = 31;
+			length = kHFSMaxFileNameChars;
 		}
+
+		hfsKey->parentID = SWAP_BE32(dirID);
 
 		hfsKey->nodeName[0] = length;
 		strncpy((char *)(hfsKey->nodeName + 1), fileName, length);
@@ -846,10 +836,9 @@ static long ReadCatalogEntry(char * fileName, long dirID, void * entry, long lon
 	return ReadBTreeEntry(kBTreeCatalog, &key, entry, dirIndex);
 }
 
-
 //==============================================================================
 
-static long ReadExtentsEntry(long fileID, long startBlock, void * entry)
+static long ReadExtentsEntry(u_int32_t fileID, long startBlock, void * entry)
 {
 	char             key[sizeof(HFSPlusExtentKey)];
 	HFSExtentKey     *hfsKey     = (HFSExtentKey *)key;
@@ -872,19 +861,19 @@ static long ReadExtentsEntry(long fileID, long startBlock, void * entry)
 	return ReadBTreeEntry(kBTreeExtents, &key, entry, 0);
 }
 
-
 //==============================================================================
 
 static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dirIndex)
 {
-	long             extentSize;
+	u_int64_t        extentSize;
 	void             *extent;
-	short            extentFile;
+	u_int16_t        extentFile;
 	char             *nodeBuf;
 	BTNodeDescriptor *node;
-	long             nodeSize, result = 0, entrySize = 0;
-	long             curNode, index = 0, lowerBound, upperBound;
-	char             *testKey, *recordData =0;
+	long             result = 0, entrySize = 0;
+	u_int32_t        curNode;
+	char             *testKey, *recordData;
+	u_int16_t        nodeSize, index = 0, lowerBound, upperBound;
 
 	// Figure out which tree is being looked at.
 	if (btree == kBTreeCatalog)
@@ -981,7 +970,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 			}
 			else
 			{
-				break;	// search = trial
+				break;			// search = trial
 			}
 		}
 
@@ -1064,17 +1053,16 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 
 //==============================================================================
 
-static void GetBTreeRecord(long index, char * nodeBuffer, long nodeSize, char ** key, char ** data)
+static void GetBTreeRecord(u_int16_t index, char * nodeBuffer, u_int16_t nodeSize, char ** key, char ** data)
 {
-	long keySize;
-	long recordOffset;
+	u_int16_t recordOffset, keySize;
 
-	recordOffset = SWAP_BE16(*((short *)(nodeBuffer + (nodeSize - 2 * index - 2))));
+	recordOffset = SWAP_BE16(*((u_int16_t *)(nodeBuffer + (nodeSize - 2 * index - 2))));
 	*key = nodeBuffer + recordOffset;
 
 	if (gIsHFSPlus)
 	{
-		keySize = SWAP_BE16(*(short *)*key);
+		keySize = SWAP_BE16(*(u_int16_t *)*key);
 		*data = *key + 2 + keySize;
 	}
 	else
@@ -1086,15 +1074,15 @@ static void GetBTreeRecord(long index, char * nodeBuffer, long nodeSize, char **
 
 //==============================================================================
 
-static long ReadExtent(char * extent, uint64_t extentSize, long extentFile, uint64_t offset, uint64_t size, void * buffer, long cache)
+static long ReadExtent(char * extent, u_int64_t extentSize, u_int32_t extentFile, u_int64_t offset, u_int64_t size, void * buffer, long cache)
 {
-	uint64_t  lastOffset;
-	long long blockNumber, countedBlocks = 0;
-	long long nextExtent = 0, sizeRead = 0, readSize;
-	long long nextExtentBlock, currentExtentBlock = 0;
-	long long readOffset;
-	long long extentDensity, sizeofExtent, currentExtentSize;
-	char *currentExtent, *extentBuffer = 0, *bufferPos = buffer;
+	u_int64_t lastOffset;
+	u_int64_t blockNumber, countedBlocks = 0;
+	u_int64_t nextExtent = 0, sizeRead = 0, readSize;
+	u_int64_t nextExtentBlock, currentExtentBlock = 0;
+	u_int64_t readOffset;
+	u_int64_t extentDensity, sizeofExtent, currentExtentSize;
+	char      *currentExtent, *extentBuffer = 0, *bufferPos = buffer;
 
 	if (offset >= extentSize)
 	{
@@ -1191,9 +1179,9 @@ static long ReadExtent(char * extent, uint64_t extentSize, long extentFile, uint
 
 //==============================================================================
 
-static long GetExtentStart(void * extents, long index)
+static u_int32_t GetExtentStart(void * extents, u_int32_t index)
 {
-	long start;
+	u_int32_t start;
 
 	HFSExtentDescriptor		*hfsExtents		= extents;
 	HFSPlusExtentDescriptor	*hfsPlusExtents	= extents;
@@ -1210,12 +1198,11 @@ static long GetExtentStart(void * extents, long index)
 	return start;
 }
 
-
 //==============================================================================
 
-static long GetExtentSize(void * extents, long index)
+static u_int32_t GetExtentSize(void * extents, u_int32_t index)
 {
-	long size = 0;
+	u_int32_t size = 0;
 
 	HFSExtentDescriptor     *hfsExtents     = extents;
 	HFSPlusExtentDescriptor *hfsPlusExtents = extents;
@@ -1231,7 +1218,6 @@ static long GetExtentSize(void * extents, long index)
 
 	return size;
 }
-
 
 //==============================================================================
 
@@ -1263,7 +1249,6 @@ static long CompareHFSCatalogKeys(void * key, void * testKey)
 
 	return result;
 }
-
 
 //==============================================================================
 
@@ -1312,7 +1297,6 @@ static long CompareHFSPlusCatalogKeys(void * key, void * testKey)
 
 	return result;
 }
-
 
 //==============================================================================
 
@@ -1373,12 +1357,15 @@ static long CompareHFSExtentsKeys(void * key, void * testKey)
 
 static long CompareHFSPlusExtentsKeys(void * key, void * testKey)
 {
-	HFSPlusExtentKey *searchKey, *trialKey;
+	HFSPlusExtentKey	*searchKey, *trialKey;
 
-	long result = -1; // assume searchKey < trialKey
+	long			result;
 
 	searchKey = key;
 	trialKey  = testKey;
+
+	// assume searchKey < trialKey
+	result = -1;
 
 	if (searchKey->fileID == trialKey->fileID)
 	{

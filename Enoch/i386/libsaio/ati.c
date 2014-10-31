@@ -941,7 +941,8 @@ bool get_vrammemsize_val(value_t *val)
 	
 	idx++;
 	memsize = ((uint64_t)card->vram_size << 32);
-	if (idx == 0) {
+	if (idx == 0)
+	{
 		memsize = memsize | (uint64_t)card->vram_size;
 	}
 	val->type = kCst;
@@ -953,7 +954,8 @@ bool get_vrammemsize_val(value_t *val)
 
 bool get_binimage_val(value_t *val)
 {
-	if (!card->rom) {
+	if (!card->rom)
+	{
 		return false;
 	}
 	val->type = kPtr;
@@ -963,12 +965,12 @@ bool get_binimage_val(value_t *val)
 	return true;
 }
 
-
 bool get_romrevision_val(value_t *val)
 {
 	char *cRev="109-B77101-00";
 	uint8_t *rev;
-	if (!card->rom) {
+	if (!card->rom)
+	{
 		val->type = kPtr;
 		val->size = 13;
 		val->data = malloc(val->size);

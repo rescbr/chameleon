@@ -157,7 +157,8 @@ void * safe_malloc(size_t size, const char *file, int line)
 #endif
 
 done:
-	if ((ret == 0) || (ret + size >= zalloc_end)) {
+	if ((ret == 0) || (ret + size >= zalloc_end))
+	{
 		if (zerror)
 		{
 			(*zerror)(ret, size, file, line);

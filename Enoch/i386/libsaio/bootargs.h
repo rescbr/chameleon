@@ -131,6 +131,7 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsFlagRebootOnPanic	(1 << 0)
 #define kBootArgsFlagHiDPI		(1 << 1)
 #define kBootArgsFlagBlack		(1 << 2)
+
 typedef struct boot_args_pre_lion
 {
     uint16_t    Revision;	/* Revision of boot_args structure */
@@ -165,10 +166,6 @@ typedef struct boot_args_pre_lion
     uint32_t    __reserved3[2];
 
 } boot_args_pre_lion;
-
-/* Bitfields for boot_args->flags */
-#define kBootArgsFlagRebootOnPanic      (1 << 0)
-#define kBootArgsFlagHiDPI              (1 << 1)
 
 typedef struct boot_args
 {

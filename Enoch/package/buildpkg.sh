@@ -173,10 +173,14 @@ s&@LOG_FILENAME@&${LOG_FILENAME}&g;t t"
 $chameleonSubsts
 $ownSubst"
 
+    # HACK: Don't try to substitute in TIFF files!
     for file in "$@";do
-        cp -pf "$file" "${file}.in"
-        sed "$allSubst" "${file}.in" > "${file}"
-        rm -f "${file}.in"
+        if [ -z `echo "$file" | grep tiff` ]
+        then
+            cp -pf "$file" "${file}.in"
+            sed "$allSubst" "${file}.in" > "${file}"
+            rm -f "${file}.in"
+        fi
     done
 }
 

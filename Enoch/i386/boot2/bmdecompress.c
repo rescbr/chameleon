@@ -42,7 +42,8 @@ static void PreviewDecompress16(uint32_t * compressBuffer,
 	uint16_t * sc2 = malloc((width+2) * sizeof(uint16_t));
 	uint16_t * sc3 = malloc((width+2) * sizeof(uint16_t));
 
-	if (!sc0 || !sc1 || !sc2 || !sc3) {
+	if (!sc0 || !sc1 || !sc2 || !sc3)
+	{
 		return;
 	}
 
@@ -54,7 +55,8 @@ static void PreviewDecompress16(uint32_t * compressBuffer,
 	bzero(sc3, (width+2) * sizeof(uint16_t));
 
 	uint32_t tmp1, tmp2, out;
-	for (j = 0; j < (height + 2); j++) {
+	for (j = 0; j < (height + 2); j++)
+	{
 		input = compressBuffer;
 
 		if (j < height)
