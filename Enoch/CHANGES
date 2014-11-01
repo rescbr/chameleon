@@ -1,3 +1,4 @@
+- ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
 - bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (MakeInc.dir)
