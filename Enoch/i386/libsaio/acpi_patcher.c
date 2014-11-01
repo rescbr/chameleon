@@ -211,7 +211,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 {
-	static char ssdt_header[] = // cst_ssdt_header
+	static char const ssdt_header[] = // cst_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0xE7, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x17, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x41, /* ..PmRefA */
@@ -414,7 +414,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 {
-	static char ssdt_header[] = // pss_ssdt_header
+	static char const ssdt_header[] = // pss_ssdt_header
 	{
 		0x53, 0x53, 0x44, 0x54, 0x7E, 0x00, 0x00, 0x00, /* SSDT.... */
 		0x01, 0x6A, 0x50, 0x6D, 0x52, 0x65, 0x66, 0x00, /* ..PmRef. */

@@ -1011,12 +1011,12 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 			{
 				// ErmaC : TODO test needed for recovery icon
 				// Use HFSRECOVERY icon.
-//				if (device->flags & kBVFlagBooter)
-//				{
-//					devicetype = iDeviceHFSRECOVERY;
-//				}
-//				else
-//				{
+				if (device->flags & kBVFlagBooter)
+				{
+					devicetype = iDeviceHFSRECOVERY;
+				}
+				else
+				{
 
 					// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
 					switch (device->OSVersion[3]) {
@@ -1051,7 +1051,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
 							break;
 					}
-//				}
+				}
 
 				break;
 
