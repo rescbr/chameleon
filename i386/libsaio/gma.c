@@ -358,50 +358,25 @@ static char *get_gma_controller_name(uint16_t device_id, uint16_t vendor_id)
 	return desc;
 }
 
-/*************************************************************************************
- *  Converts hexadecimal character string 'key' into a binary property for injection *
- *  with correct byte order. Base on hex2bin function from device_inject.c           *
- ************************************************************************************/
-static int hexkey2devprop(const char *key, uint8_t *prop, int length)
-{
-	char	*p;
-	int     i, x;
-	char	buf[length+1];
-    int     len;
-    
-	buf[length-1] = '\0';
-	p = (char *) key;
-    x = length-1;
-    len = (length*2)+1;
-    
-	for (i = 0; i < len; i++) {
-		buf[0] = *p++;
-		buf[1] = *p++;
-		prop[x] = (unsigned char) strtoul(buf, NULL, 16);
-        x--;
-	}
-	return 0;
-}
-
 bool setup_gma_devprop(pci_dt_t *gma_dev)
 {
-	char				*devicepath = NULL;
-	volatile uint8_t	*regs;
-	uint32_t			bar[7];
-	char				*model = NULL;
-	uint8_t BuiltIn =	0x00;
-	int                 len;
-	const char			*value;
-	uint16_t			vendor_id = gma_dev->vendor_id;
-	uint16_t			device_id = gma_dev->device_id;
-	uint8_t ClassFix[4] =           { 0x00, 0x00, 0x03, 0x00 };
+	char                    *devicepath = NULL;
+	volatile uint8_t        *regs;
+	uint32_t                bar[7];
+	char                    *model = NULL;
+	uint8_t BuiltIn =       0x00;
+	int                     len;
+	const char              *value;
+	uint16_t                vendor_id = gma_dev->vendor_id;
+	uint16_t                device_id = gma_dev->device_id;
+	uint8_t ClassFix[4] =   { 0x00, 0x00, 0x03, 0x00 };
     
-    uint8_t hd3k_kmobile_device_id[4] =  { 0x26, 0x01, 0x00 }; // MacMan
-    uint8_t hd4k_device_id[4] =          { 0x62, 0x01, 0x00 }; // MacMan
-    uint8_t hd4400_mobile_device_id[4] = { 0x26, 0x0A, 0x00 }; // MacMan
-    uint8_t hd4600_device_id[4] =        { 0x12, 0x04, 0x00 }; // MacMan
-    uint8_t hd4600_mobile_device_id[4] = { 0x16, 0x04, 0x00 }; // MacMan
-    uint8_t igp_device_id[4] =           { 0x00, 0x00, 0x00 }; // MacMan
+    uint8_t hd3k_kmobile_device_id[4] =  { 0x26, 0x01, 0x00, 0x00 }; // MacMan
+    uint8_t hd4k_device_id[4] =          { 0x62, 0x01, 0x00, 0x00 }; // MacMan
+    uint8_t hd4400_mobile_device_id[4] = { 0x26, 0x0A, 0x00, 0x00 }; // MacMan
+    uint8_t hd4600_device_id[4] =        { 0x12, 0x04, 0x00, 0x00 }; // MacMan
+    uint8_t hd4600_mobile_device_id[4] = { 0x16, 0x04, 0x00, 0x00 }; // MacMan
+    uint8_t igp_device_id[4] =           { 0x00, 0x00, 0x00, 0x00 }; // MacMan
     
     uint8_t snb_id_3k[4] =          { 0x10, 0x00, 0x03, 0x00 }; // MacMan
     uint8_t snb_id_3k_mobile[4] =   { 0x00, 0x00, 0x01, 0x00 }; // MacMan
@@ -508,7 +483,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Setting %s for snb-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
@@ -541,7 +516,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Setting %s for snb-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
@@ -561,7 +536,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for unsupported device id injection.\n", value);
-                hexkey2devprop(value, igp_device_id, 2);
+                hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
@@ -572,7 +547,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for snb-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
@@ -606,7 +581,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Setting %s for snb-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
@@ -629,7 +604,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -652,7 +627,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -677,7 +652,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for unsupported device id injection.\n", value);
-                hexkey2devprop(value, igp_device_id, 2);
+                hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
@@ -688,7 +663,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -711,7 +686,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -740,7 +715,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -797,7 +772,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for unsupported device id injection.\n", value);
-                hexkey2devprop(value, igp_device_id, 2);
+                hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
@@ -808,7 +783,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -825,7 +800,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for unsupported device id injection.\n", value);
-                hexkey2devprop(value, igp_device_id, 2);
+                hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
@@ -836,7 +811,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
@@ -860,7 +835,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
                 verbose("Using %s for unsupported device id injection.\n", value);
-                hexkey2devprop(value, igp_device_id, 2);
+                hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
@@ -871,7 +846,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
                 verbose("Using %s for ig-platform-id\n", value);
-                hexkey2devprop(value, ig_platform_id, 4);
+                hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else

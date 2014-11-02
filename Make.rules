@@ -18,7 +18,7 @@ NASM = $(shell which nasm) -p $(SRCROOT)/autoconf.inc
 
 
 CFLAGS	= $(CONFIG_OPTIMIZATION_LEVEL) -g -Wmost -Werror -Wno-unused-function -Wno-int-conversion
-CPPFLAGS = $(MORECPP) -g -Wmost -Werror -fno-exceptions -fno-rtti -ffreestanding
+CPPFLAGS = $(MORECPP) -g -Wmost -Werror -fno-exceptions -fno-rtti
 DEFINES=
 
 DIST_SUBDIRS += $(SUBDIRS)

@@ -92,7 +92,7 @@ void initBooterLog(void)
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
 //	msglog("%s\n", "Chimera 4.0.0 Branch of " "Chameleon " I386BOOT_CHAMELEONVERSION " (svn-r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
-    msglog("%s\n", "Chimera 4.0.0 Branch of Chameleon" " [" I386BOOT_BUILDDATE "]");
+    msglog("%s\n", "Chimera 4.0.1 Branch of Chameleon" " [" I386BOOT_BUILDDATE "]");
 }
 
 void msglog(const char * fmt, ...)

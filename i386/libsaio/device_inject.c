@@ -361,6 +361,36 @@ int hex2bin(const char *hex, uint8_t *bin, int len)
 	return 0;
 }
 
+/*************************************************************************************
+ *  Converts hexadecimal character string 'hex' into a binary property for injection *
+ *  with correct byte order. Base on hex2bin function                                *
+ ************************************************************************************/
+int hex2devprop(const char *hex, uint8_t *prop, int length)
+{
+    char	*p;
+    int     i, x;
+    char	buf[3];
+    int     len;
+    
+    if (hex == NULL || prop == NULL || length <= 0 || strlen(hex) != length * 2) {
+        printf("[ERROR] hexkey2devprop input error\n");
+        return -1;
+    }
+    
+    buf[2] = '\0';
+    p = (char *) hex;
+    x = length-1;
+    len = (length*2)+1;
+    
+    for (i = 0; i < len; i++) {
+        buf[0] = *p++;
+        buf[1] = *p++;
+        prop[x] = (unsigned char) strtoul(buf, NULL, 16);
+        x--;
+    }
+    return 0;
+}
+
 /* ======================================================= */
 
 /* a fine place for this code */
