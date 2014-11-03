@@ -1,3 +1,4 @@
+- bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
 - ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
 - bitshoveler : Comment out some unused functions by expanding "#if UNUSED" conditional (stringTable.c)

@@ -241,35 +241,33 @@ uint32_t vector8_resize(vector8_t *p, size_t size)
 	return 1;
 }
 
-uint32_t vector8_resizev(vector8_t *p, size_t size, uint8_t value)
-{	// resize and give all new elements the value
-	size_t oldsize = p->size, i;
-	if (!vector8_resize(p, size))
-		return 0;
-	for (i = oldsize; i < size; i++)
-		p->data[i] = value;
-	return 1;
-}
-
-void vector8_init(vector8_t *p)
-{
-	p->data = NULL;
-	p->size = p->allocsize = 0;
-}
-
 vector8_t *vector8_new(size_t size, uint8_t value)
 {
 	vector8_t *p = png_alloc_malloc(sizeof (vector8_t));
-	if(!p)
+	if (!p)
 	{
 		return NULL;
 	}
-	vector8_init(p);
-	if (size && !vector8_resizev(p, size, value))
+
+	p->data = NULL;
+	p->size = p->allocsize = 0;
+	if (size)
 	{
-		vector8_cleanup(p);
-		png_alloc_free(p);
-		return NULL;
+		size_t i;
+		size_t newsize = size * sizeof (uint32_t) * 2;
+		void *data = png_alloc_malloc(newsize);
+		if (!data)
+		{
+			png_alloc_free(p);
+			return NULL;
+		}
+		p->data = (uint8_t *) data;
+		p->allocsize = newsize;
+		p->size = size;
+		for (i = 0; i < size; ++i)
+		{
+			p->data[i] = value;
+		}
 	}
 	return p;
 }
@@ -928,12 +926,21 @@ void PNG_adam7Pass(uint8_t *out, uint8_t *linen, uint8_t *lineo, const uint8_t *
 int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 {	// converts from any color type to 32-bit. return value = LodePNG error code
 	size_t i, c;
-	uint32_t bitDepth, colorType;
-	bitDepth = info->bitDepth;
-	colorType = info->colorType;
-	size_t numpixels = info->width * info->height, bp = 0;
-	vector8_resize(out, numpixels * 4);
-	uint8_t *out_data = out->size ? out->data : 0;
+	size_t numpixels = info->width * info->height;
+	if (!numpixels)
+	{
+		return 0; // nothing to do
+	}
+
+	if (!vector8_resize(out, numpixels * 4))
+	{
+		return 83; // out of memory
+	}
+
+	size_t bp = 0;
+	uint32_t bitDepth = info->bitDepth;
+	uint32_t colorType = info->colorType;
+	uint8_t *out_data = out->data;
 	if (bitDepth == 8 && colorType == 0) // greyscale
 		for (i = 0; i < numpixels; i++)
 		{
@@ -949,14 +956,16 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 					(in[3 * i + 1] == info->key_g) && (in[3 * i + 2] == info->key_b)) ? 0 : 255;
 		}
 	else if (bitDepth == 8 && colorType == 3) // indexed color (palette)
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			if (4U * in[i] >= info->palette->size)
 				return 46;
 			for (c = 0; c < 4; c++) // get rgb colors from the palette
 				out_data[4 * i + c] = info->palette->data[4 * in[i] + c];
 		}
 	else if (bitDepth == 8 && colorType == 4) // greyscale with alpha
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[2 * i + 0];
 			out_data[4 * i + 3] = in[2 * i + 1];
 		}
@@ -965,13 +974,15 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 			for (c = 0; c < 4; c++)
 				out_data[4 * i + c] = in[4 * i + c]; // RGB with alpha
 	else if (bitDepth == 16 && colorType == 0) // greyscale
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[2 * i];
 			out_data[4 * i + 3] = (info->key_defined && (256U * in[i] + in[i + 1] == info->key_r))
 					? 0 : 255;
 		}
 	else if (bitDepth == 16 && colorType == 2) // RGB color
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			for (c = 0; c < 3; c++)
 				out_data[4 * i + c] = in[6 * i + 2 * c];
 			out_data[4 * i + 3] = (info->key_defined &&
@@ -980,7 +991,8 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 					(256U * in[6 * i + 4] + in[6 * i + 5] == info->key_b)) ? 0 : 255;
 		}
 	else if (bitDepth == 16 && colorType == 4) // greyscale with alpha
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[4 * i]; // msb
 			out_data[4 * i + 3] = in[4 * i + 2];
 		}
@@ -989,7 +1001,8 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 			for (c = 0; c < 4; c++)
 				out_data[4 * i + c] = in[8 * i + 2 * c]; // RGB with alpha
 	else if (bitDepth < 8 && colorType == 0) // greyscale
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			uint32_t value = (PNG_readBitsFromReversedStream(&bp, in, bitDepth) * 255) /
 					((1 << bitDepth) - 1); // scale value from 0 to 255
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = (uint8_t) value;
@@ -997,7 +1010,8 @@ int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 					(((1U << bitDepth) - 1U) == info->key_r) && ((1U << bitDepth) - 1U)) ? 0 : 255;
 		}
 	else if (bitDepth < 8 && colorType == 3) // palette
-		for (i = 0; i < numpixels; i++) {
+		for (i = 0; i < numpixels; i++)
+		{
 			uint32_t value = PNG_readBitsFromReversedStream(&bp, in, bitDepth);
 			if (4 * value >= info->palette->size)
 				return 47;
@@ -1026,33 +1040,40 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 {
 	PNG_info_t *info;
 	PNG_error = 0;
-	if (size == 0 || in == 0) {
+	if (size == 0 || in == 0)
+	{
 		PNG_error = 48; // the given data is empty
 		return NULL;
 	}
 	info = PNG_info_new();
 	PNG_readPngHeader(info, in, size);
 	if (PNG_error)
+	{
 		return NULL;
+	}
 	size_t pos = 33; // first byte of the first chunk after the header
 	vector8_t *idat = NULL; // the data from idat chunks
-	bool IEND = false, known_type = true;
+	bool IEND = false;
 	info->key_defined = false;
 	// loop through the chunks, ignoring unknown chunks and stopping at IEND chunk. IDAT data is
 	// put at the start of the in buffer
-	while (!IEND) {
-		size_t i, j;
-		if (pos + 8 >= size) {
+	while (!IEND)
+	{
+		size_t i;
+		if (pos + 8 >= size)
+		{
 			PNG_error = 30; // error: size of the in buffer too small to contain next chunk
 			return NULL;
 		}
 		size_t chunkLength = PNG_read32bitInt(&in[pos]);
 		pos += 4;
-		if (chunkLength > 0x7fffffff) {
+		if (chunkLength > 0x7fffffff)
+		{
 			PNG_error = 63;
 			return NULL;
 		}
-		if (pos + chunkLength >= size) {
+		if (pos + chunkLength >= size)
+		{
 			PNG_error = 35; // error: size of the in buffer too small to contain next chunk
 			return NULL;
 		}
@@ -1084,6 +1105,7 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				return NULL;
 			}
 			for (i = 0; i < info->palette->size; i += 4) {
+                		size_t j;
 				for (j = 0; j < 3; j++)
 					info->palette->data[i + j] = in[pos++]; // RGB
 				info->palette->data[i + 3] = 255; // alpha
@@ -1128,10 +1150,16 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				return NULL;
 			}
 			pos += (chunkLength + 4); // skip 4 letters and uninterpreted data of unimplemented chunk
-			known_type = false;
 		}
 		pos += 4; // step over CRC (which is ignored)
 	}
+
+	if (!idat)
+	{
+		PNG_error = 1; // no data seen
+		return NULL;
+	}
+
 	uint32_t bpp = PNG_getBpp(info);
 	vector8_t *scanlines; // now the out buffer will be filled
 	scanlines = vector8_new(((info->width * (info->height * bpp + 7)) / 8) + info->height, 0);
