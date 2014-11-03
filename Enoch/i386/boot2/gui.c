@@ -81,6 +81,8 @@ enum {
 
 	iDeviceHFSFUSION,
 	iDeviceHFSFUSION_o,
+	iDeviceHFSFUSION_yos,
+	iDeviceHFSFUSION_yos_o,
 	iDeviceHFSFUSION_mav,
 	iDeviceHFSFUSION_mav_o,
 	iDeviceHFSFUSION_ML,
@@ -178,6 +180,8 @@ image_t images[] = {
 
 	{.name = "device_hfsfusion",            .image = NULL},
 	{.name = "device_hfsfusion_o",          .image = NULL},
+	{.name = "device_hfsfusion_yos",        .image = NULL},
+	{.name = "device_hfsfusion_yos_o",      .image = NULL},
 	{.name = "device_hfsfusion_mav",        .image = NULL},
 	{.name = "device_hfsfusion_mav_o",      .image = NULL},
 	{.name = "device_hfsfusion_ml",         .image = NULL},
@@ -425,6 +429,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsfusion,               iDeviceHFS);
 	LOADPNG(device_hfsfusion_o,             iDeviceHFSFUSION);
+	LOADPNG(device_hfsfusion_yos,           iDeviceHFSFUSION);
+	LOADPNG(device_hfsfusion_yos_o,         iDeviceHFSFUSION_yos);
 	LOADPNG(device_hfsfusion_mav,           iDeviceHFSFUSION);
 	LOADPNG(device_hfsfusion_mav_o,         iDeviceHFSFUSION_mav);
 	LOADPNG(device_hfsfusion_ml,            iDeviceHFSFUSION);

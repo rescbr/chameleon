@@ -1,3 +1,4 @@
+- ErmaC : Add more chameleon UI stuff (default) made by blackosx
 - ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
 - ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
