@@ -1,3 +1,4 @@
+- ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
 - bitshoveler : Comment out some unused functions by expanding "#if UNUSED" conditional (stringTable.c)
 - bitshoveler : Comment out unused static functions, which cause build to fail in "release" mode (vbe.c)
