@@ -1,3 +1,4 @@
+- ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
 - ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
 - bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)

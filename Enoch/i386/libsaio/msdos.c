@@ -394,14 +394,14 @@ getnextdirent (CICell ih, uint16_t *longname, struct msdosdirstate *st)
 			st->vfatchecksum = 0;
 			st->vfatnumber = 0;
 			st->nument++;
-			if (((int)(!st->root16 &&st->nument * sizeof (struct direntry))>=msdosclustersize)
-				|| ((int)(st->root16 &&st->nument * sizeof (struct direntry))>=msdosbps))
+			if ((!st->root16 &&st->nument * sizeof (struct direntry)>=msdosclustersize)
+				|| (st->root16 &&st->nument * sizeof (struct direntry)>=msdosbps))
 				st->nument = 0;
 			return dirp;
 		}
 		st->nument++;
-		if (((int)(!st->root16 &&st->nument * sizeof (struct direntry))>=msdosclustersize)
-			|| ((int)(st->root16 &&st->nument * sizeof (struct direntry))>=msdosbps))
+		if ((!st->root16 &&st->nument * sizeof (struct direntry)>=msdosclustersize)
+			|| (st->root16 &&st->nument * sizeof (struct direntry)>=msdosbps))
 			st->nument = 0;		
 	}
 }
