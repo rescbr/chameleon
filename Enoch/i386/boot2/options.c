@@ -58,6 +58,10 @@ enum {
     kScreenLastRow = 24
 };
 
+extern char* msgbuf;
+
+void showTextBuffer(char *buf_orig, int size);
+
 //==========================================================================
 
 typedef struct {
@@ -981,6 +985,8 @@ int getBootOptions(bool firstRun)
 					}
 				} else if (strcmp(booterCommand, "lspci") == 0) {
 					lspci();
+				} else if (strcmp(booterCommand, "log") == 0) {
+			                showTextBuffer(msgbuf, strlen(msgbuf));
 				} else if (strcmp(booterCommand, "more") == 0) {
 					showTextFile(booterParam);
 				} else if (strcmp(booterCommand, "rd") == 0) {

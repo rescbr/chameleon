@@ -230,14 +230,14 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 				}
 
 				// We found a fat binary; read only the thin part
-				DBG("Fat Binary found. Reading thin part only...\n");
+				//DBG("Fat Binary found. Reading thin part only...\n");
 				length = readFile(bvr, (char *)filePath, (void *)kLoadAddr, (unsigned long)(*binary) - kLoadAddr, length);
 				*binary = (void *)kLoadAddr;
 			}
 			else
 			{
 				// Not a fat binary; read the rest of the file
-				DBG("Thin Binary found. Reading rest of the file...\n");
+				//DBG("Thin Binary found. Reading rest of the file...\n");
 				length2 = readFile(bvr, (char *)filePath, (void *)(kLoadAddr + length), length, 0);
 
 				if (length2 == -1)

@@ -6,7 +6,10 @@
 #include "bootstruct.h"
 #include "modules.h"
 #include "boot_modules.h"
+#include "mboot.h"
 #include <vers.h>
+
+#include <string.h>
 
 #ifdef CONFIG_MODULES
 #ifndef CONFIG_MODULE_DEBUG
@@ -35,6 +38,20 @@ moduleList_t* loadedModules = NULL;
 symbolList_t* moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
+char *strrchr(const char *s, int c)
+{
+	const char *found = NULL;
+
+	while (*s) {
+		if (*s == (char)c)
+		{
+			found = s;
+		}
+		s++;
+	}
+
+	return (char *)found;
+}
 
 /*
  * Initialize the module system by loading the Symbols.dylib module.
@@ -62,9 +79,8 @@ int init_module_system()
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
 			// Notify the system that it was laoded
-			module_loaded(SYMBOLS_MODULE, SYMBOLS_AUTHOR, SYMBOLS_DESCRIPTION, SYMBOLS_VERSION, SYMBOLS_COMPAT);
+			module_loaded(SYMBOLS_MODULE, module_start, SYMBOLS_AUTHOR, SYMBOLS_DESCRIPTION, SYMBOLS_VERSION, SYMBOLS_COMPAT);
 			(*module_start)();	// Start the module. This will point to load_all_modules due to the way the dylib was constructed.
-			execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
 			DBG("Module %s Loaded.\n", SYMBOLS_MODULE);
 			retVal = 1;
 
@@ -75,6 +91,53 @@ int init_module_system()
 			printf("Unable to start %s at 0x%x\n", SYMBOLS_MODULE, module_data); pause();
 		}
 	}
+
+	// Look for modules located in the multiboot header.
+	if(gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS)
+	{
+		if(gMI->mi_mods_count)
+		{
+			struct multiboot_module* mod = (struct multiboot_module*)gMI->mi_mods_addr;
+			while(gMI->mi_mods_count--)
+			{
+				if(mod->mm_string)
+				{
+					// Convert string to module name, check for dylib.
+					if(strcmp(&mod->mm_string[strlen(mod->mm_string) - sizeof("dylib")], ".dylib") == 0)
+					{
+						module_data = (char*)mod->mm_mod_start;
+
+						char* last = strrchr(mod->mm_string, '/');
+						if(last)
+						{
+							last++;
+						}
+						else
+						{
+							last = mod->mm_string;
+						}
+
+						char* name = strdup(last);
+						name[strlen(last) - sizeof("dylib")] = 0;
+						DBG("Loading multiboot module %s", name);
+
+						module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
+
+						if(module_start && module_start != (void*)0xFFFFFFFF)
+						{
+							// Notify the system that it was laoded
+							module_loaded(name, module_start, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
+							(*module_start)();	// Start the module
+							DBG("Module %s Loaded.\n", name); DBGPAUSE();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if(retVal) execute_hook("ModulesLoaded", NULL, NULL, NULL, NULL);
+
 	return retVal;
 }
 
@@ -87,7 +150,7 @@ void start_built_in_module(const char* name,
 {
     start_function();
     // Notify the module system that this module really exists, specificaly, let other module link with it
-    module_loaded(name, author, description, version, compat);
+    module_loaded(name, start_function, author, description, version, compat);
 }
 
 /*
@@ -171,7 +234,7 @@ int load_module(char* module)
 		if(module_start && module_start != (void*)0xFFFFFFFF)
 		{
 			// Notify the system that it was laoded
-			module_loaded(module, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
+			module_loaded(module, module_start, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
 			DBG("Module %s Loaded.\n", module); DBGPAUSE();
 		}
@@ -229,7 +292,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 /*
  * print out the information about the loaded module
  */
-void module_loaded(const char* name, const char* author, const char* description, UInt32 version, UInt32 compat)
+void module_loaded(const char* name, void* start, const char* author, const char* description, UInt32 version, UInt32 compat)
 {
 	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
 	new_entry->next = loadedModules;
@@ -247,6 +310,7 @@ void module_loaded(const char* name, const char* author, const char* description
 	new_entry->compat = compat;
 
 	msglog("Module '%s' by '%s' Loaded.\n", name, author);
+	msglog("\tInitialization: 0x%X\n", start);
 	msglog("\tDescription: %s\n", description);
 	msglog("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
 	msglog("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
@@ -487,6 +551,15 @@ void* parse_mach(void* binary,
 				break;
 
 			case LC_UNIXTHREAD:
+				break;
+
+			case LC_VERSION_MIN_MACOSX:
+				break;
+
+			case LC_DATA_IN_CODE:
+				break;
+
+			case LC_FUNCTION_STARTS:
 				break;
 
 			default:

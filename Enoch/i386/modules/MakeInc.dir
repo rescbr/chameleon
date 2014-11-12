@@ -41,10 +41,10 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc -Wmost -Werror \
 endif
 
 
-UTILDIR = ../../util
-LIBSADIR = ../../libsa
-LIBSAIODIR = ../../libsaio
-BOOT2DIR = ../../boot2
+UTILDIR = ${SRCROOT}/i386/util
+LIBSADIR = ${SRCROOT}/i386/libsa
+LIBSAIODIR = ${SRCROOT}/i386/libsaio
+BOOT2DIR = ${SRCROOT}/i386/boot2
 
 MODULE_INCLUDES :=  $(foreach x,$(MODULE_DEPENDENCIES),-I$(SRCROOT)/i386/modules/$(x)/include/)
 
@@ -124,8 +124,8 @@ $(SYMROOT)/modules/$(MODULE_NAME).dylib: $(MODULE_OBJS) $(MODULE_DEPENDENCIES) $
 	@echo "	[LD] $(MODULE_NAME).dylib"
 
 	@ld -arch i386 \
-	-alias _$(MODULE_START) start \
 	-dylib -read_only_relocs suppress \
+	-alias _$(MODULE_START) start \
 	-S -Z -dead_strip_dylibs \
 	-no_uuid \
 	-current_version $(MODULE_VERSION) -compatibility_version $(MODULE_COMPAT_VERSION) \
