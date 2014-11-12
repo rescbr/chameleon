@@ -775,12 +775,12 @@ static int generate_cpu_map_from_acpi(ACPI_TABLE_DSDT * DsdtPointer)
 
 static bool is_sandybridge(void)
 {
-    return Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE;
+    return Platform.CPU.Model == CPUID_MODEL_SANDYBRIDGE;
 }
 
 static bool is_jaketown(void)
 {
-    return Platform.CPU.Model == CPU_MODEL_JAKETOWN;
+    return Platform.CPU.Model == CPUID_MODEL_JAKETOWN;
 }
 
 static U32 get_bclk(void)
@@ -1071,17 +1071,17 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 		{
 			switch (Platform.CPU.Model) 
 			{
-				case CPU_MODEL_DOTHAN: 
-				case CPU_MODEL_YONAH: // Yonah
-				case CPU_MODEL_MEROM: // Merom
-				case CPU_MODEL_PENRYN: // Penryn
-				case CPU_MODEL_ATOM: // Intel Atom (45nm)
+				case CPUID_MODEL_DOTHAN: 
+				case CPUID_MODEL_YONAH: // Yonah
+				case CPUID_MODEL_MEROM: // Merom
+				case CPUID_MODEL_PENRYN: // Penryn
+				case CPUID_MODEL_ATOM: // Intel Atom (45nm)
 				{
 					
 					cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
 					cpu->core_c4_supported = ((sub_Cstates >> 16) & 0xf) ? 1 : 0;
 					
-					if (Platform.CPU.Model == CPU_MODEL_ATOM)
+					if (Platform.CPU.Model == CPUID_MODEL_ATOM)
 					{
 						cpu->core_c2_supported = cpu->core_c3_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
 						cpu->core_c6_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
@@ -1121,15 +1121,15 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 					
 					break;
 				} 
-				case CPU_MODEL_FIELDS:
-				case CPU_MODEL_DALES:
-				case CPU_MODEL_DALES_32NM:
-				case CPU_MODEL_NEHALEM: 
-				case CPU_MODEL_NEHALEM_EX:
-				case CPU_MODEL_WESTMERE:
-				case CPU_MODEL_WESTMERE_EX:
-				case CPU_MODEL_SANDYBRIDGE:
-				case CPU_MODEL_JAKETOWN:
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_DALES_32NM:
+				case CPUID_MODEL_NEHALEM: 
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_WESTMERE_EX:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_JAKETOWN:
 				{		
 					
 					cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
@@ -1332,11 +1332,11 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 			{
 				switch (Platform.CPU.Model) 
 				{
-					case CPU_MODEL_DOTHAN: 
-					case CPU_MODEL_YONAH: // Yonah
-					case CPU_MODEL_MEROM: // Merom
-					case CPU_MODEL_PENRYN: // Penryn
-					case CPU_MODEL_ATOM: // Intel Atom (45nm)
+					case CPUID_MODEL_DOTHAN: 
+					case CPUID_MODEL_YONAH: // Yonah
+					case CPUID_MODEL_MEROM: // Merom
+					case CPUID_MODEL_PENRYN: // Penryn
+					case CPUID_MODEL_ATOM: // Intel Atom (45nm)
 					{
 						bool cpu_dynamic_fsb = false;
 						
@@ -1455,15 +1455,15 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						}
 						break;
 					} 
-					case CPU_MODEL_FIELDS:
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:
-					case CPU_MODEL_NEHALEM: 
-					case CPU_MODEL_NEHALEM_EX:
-					case CPU_MODEL_WESTMERE:
-					case CPU_MODEL_WESTMERE_EX:
-					case CPU_MODEL_SANDYBRIDGE:
-					case CPU_MODEL_JAKETOWN:
+					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_DALES:
+					case CPUID_MODEL_DALES_32NM:
+					case CPUID_MODEL_NEHALEM: 
+					case CPUID_MODEL_NEHALEM_EX:
+					case CPUID_MODEL_WESTMERE:
+					case CPUID_MODEL_WESTMERE_EX:
+					case CPUID_MODEL_SANDYBRIDGE:
+					case CPUID_MODEL_JAKETOWN:
 					{		
 						
 						maximum.Control = rdmsr64(MSR_IA32_PERF_STATUS) & 0xff; // Seems it always contains maximum multiplier value (with turbo, that's we need)...

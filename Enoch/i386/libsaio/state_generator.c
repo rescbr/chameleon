@@ -102,11 +102,11 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 			{
 				switch (Platform.CPU.Model)
 				{
-					case CPU_MODEL_DOTHAN:	// Intel Pentium M
-					case CPU_MODEL_YONAH:	// Intel Mobile Core Solo, Duo
-					case CPU_MODEL_MEROM:	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
-					case CPU_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-					case CPU_MODEL_ATOM:	// Intel Atom (45nm)
+					case CPUID_MODEL_DOTHAN:	// Intel Pentium M
+					case CPUID_MODEL_YONAH:	// Intel Mobile Core Solo, Duo
+					case CPUID_MODEL_MEROM:	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPUID_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+					case CPUID_MODEL_ATOM:	// Intel Atom (45nm)
 					{
 						bool cpu_dynamic_fsb = false;
 
@@ -227,28 +227,28 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 
 						break;
 					}
-					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
-					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
-					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
-					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
-					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
-					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
-					case CPU_MODEL_HASWELL:		//
-					case CPU_MODEL_IVYBRIDGE_XEON:  //
-					//case CPU_MODEL_HASWELL_H:	//
-					case CPU_MODEL_HASWELL_SVR:	//
-					case CPU_MODEL_HASWELL_ULT:	//
-					case CPU_MODEL_CRYSTALWELL:	//
+					case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPUID_MODEL_DALES:
+					case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
+					case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPUID_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPUID_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPUID_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+					case CPUID_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPUID_MODEL_HASWELL:		//
+					case CPUID_MODEL_IVYBRIDGE_XEON:  //
+					//case CPUID_MODEL_HASWELL_H:	//
+					case CPUID_MODEL_HASWELL_SVR:	//
+					case CPUID_MODEL_HASWELL_ULT:	//
+					case CPUID_MODEL_CRYSTALWELL:	//
 
 					{
-					if ((Platform.CPU.Model == CPU_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_JAKETOWN) ||
-						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE) || (Platform.CPU.Model == CPU_MODEL_HASWELL) ||
-						(Platform.CPU.Model == CPU_MODEL_IVYBRIDGE_XEON) || (Platform.CPU.Model == CPU_MODEL_HASWELL_SVR) ||
-						(Platform.CPU.Model == CPU_MODEL_HASWELL_ULT) || (Platform.CPU.Model == CPU_MODEL_CRYSTALWELL))
+					if ((Platform.CPU.Model == CPUID_MODEL_SANDYBRIDGE) || (Platform.CPU.Model == CPUID_MODEL_JAKETOWN) ||
+						(Platform.CPU.Model == CPUID_MODEL_IVYBRIDGE) || (Platform.CPU.Model == CPUID_MODEL_HASWELL) ||
+						(Platform.CPU.Model == CPUID_MODEL_IVYBRIDGE_XEON) || (Platform.CPU.Model == CPUID_MODEL_HASWELL_SVR) ||
+						(Platform.CPU.Model == CPUID_MODEL_HASWELL_ULT) || (Platform.CPU.Model == CPUID_MODEL_CRYSTALWELL))
 					{
 						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
 					}
