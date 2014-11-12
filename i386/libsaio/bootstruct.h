@@ -33,9 +33,9 @@
 /*
  * Kernel boot args global also used by booter for its own data.
  */
-extern boot_args			*bootArgs;
-extern boot_args_pre_lion	*bootArgsPreLion;
-extern Node					*gMemoryMapNode;
+extern boot_args *bootArgs;
+extern boot_args_pre_lion *bootArgsPreLion;
+extern Node *gMemoryMapNode;
 
 #define VGA_TEXT_MODE 0
 //defined in /usr/../boot.h
@@ -47,7 +47,7 @@ extern Node					*gMemoryMapNode;
 /*
  * Maximum number of boot drivers that can be loaded.
  */
-#define NDRIVERS  500
+#define NDRIVERS	500
 
 #define CONFIG_SIZE (40 * 4096)
 

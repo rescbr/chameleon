@@ -36,17 +36,17 @@ all embedtheme: $(DIRS_NEEDED) $(LIBS)
 
 
 $(LIBS): $(OBJS)
-	@echo "\t[RM] $@"
+	@echo "	[RM] $@"
 	@rm -f $@
-	@echo "\t[AR] $(@F)"
+	@echo "	[AR] $(@F)"
 	@ar q $@ $^ &> /dev/null
-	@echo "\t[RANLIB] $(@F)"
+	@echo "	[RANLIB] $(@F)"
 	@ranlib $@
 
 # dependencies
 -include $(OBJROOT)/Makedep
 
 clean-local:
-	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "\t[RM] $${o}"; fi; done
-	@for l in $(LIBS); do if [ -f "$${l}" ];then echo "\t[RM] $${l}"; fi; done
+	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "	[RM] $${o}"; fi; done
+	@for l in $(LIBS); do if [ -f "$${l}" ];then echo "	[RM] $${l}"; fi; done
 	@rm -f $(LIBS) $(OBJS)

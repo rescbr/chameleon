@@ -15,13 +15,13 @@
  */
 
 typedef struct {
-	uint32_t		:2;
-	uint32_t	reg	:6;
-	uint32_t	func	:3;
-	uint32_t	dev	:5;
-	uint32_t	bus	:8;
-	uint32_t		:7;
-	uint32_t	eb	:1;
+	uint32_t         :2;
+	uint32_t	reg  :6;
+	uint32_t	func :3;
+	uint32_t	dev	 :5;
+	uint32_t	bus	 :8;
+	uint32_t		 :7;
+	uint32_t	eb	 :1;
 } pci_addr_t;
 
 typedef union {
@@ -63,7 +63,7 @@ typedef struct pci_dt_t {
 
 /* Have pci_addr in the same format as the values written to 0xcf8
  * so register accesses can be made easy. */
-#define PCIADDR(bus, dev, func) ((1 << 31) | (bus << 16) | (dev << 11) | (func << 8))
+#define PCIADDR(bus, dev, func) ((1L << 31) | (bus << 16) | (dev << 11) | (func << 8))
 #define PCI_ADDR_REG		0xcf8
 #define PCI_DATA_REG		0xcfc
 

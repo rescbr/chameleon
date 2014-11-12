@@ -87,13 +87,13 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
 	Property *prop;
 
-	DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%x)\n", DT__GetName(node), name, length, value);
+	DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%X)\n", DT__GetName(node), name, length, value);
 
 	if (freeProperties == NULL) {
 		void *buf = malloc(kAllocSize);
 		int i;
 
-		DPRINTF("Allocating more free properties\n");
+		DPRINTF("DT__AddProperty: Allocating more free properties\n");
 
 		if (buf == 0) {
 			return 0;
@@ -132,7 +132,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 	node->last_prop = prop;
 	prop->next = 0;
 
-	DPRINTF("Done [0x%x]\n", prop);
+	DPRINTF("DT__AddProperty: done.\n");
 
 	DTInfo.numProperties++;
 	DTInfo.totalPropertySize += RoundToLong(length);
@@ -159,7 +159,7 @@ DT__AddChild(Node *parent, const char *name)
 
 		int i;
 
-		DPRINTF("Allocating more free nodes\n");
+		DPRINTF("DT__AddChild: Allocating more free nodes\n");
 
 		bzero(buf, kAllocSize);
 		node = (Node *)buf;
@@ -183,8 +183,8 @@ DT__AddChild(Node *parent, const char *name)
 	node = freeNodes;
 	freeNodes = node->next;
 
-	DPRINTF("Got free node 0x%x\n", node);
-	DPRINTF("prop = 0x%x, children = 0x%x, next = 0x%x\n", node->properties, node->children, node->next);
+	DPRINTF("DT__AddChild: Got free node 0x%x\n", node);
+	DPRINTF("DT__AddChild: prop = 0x%x, children = 0x%x, next = 0x%x\n", node->properties, node->children, node->next);
 
 	if (parent == NULL)
 	{
@@ -224,22 +224,31 @@ DT__FreeNode(Node *node)
 
 //==============================================================================
 
-void
+Node *
 DT__Initialize(void)
 {
-	DPRINTF("DT__Initialize\n");
+    //DPRINTF("DT__Initialize\n");
+    
+    freeNodes = 0;
+    allocedNodes = 0;
+    freeProperties = 0;
+    allocedProperties = 0;
+    
+    DTInfo.numNodes = 0;
+    DTInfo.numProperties = 0;
+    DTInfo.totalPropertySize = 0;
+    
+    rootNode = DT__AddChild(NULL, "/");
+    DPRINTF("DT__Initialize: done\n");
+    return rootNode;
+}
 
-	freeNodes = 0;
-	allocedNodes = 0;
-	freeProperties = 0;
-	allocedProperties = 0;
+//==============================================================================
 
-	DTInfo.numNodes = 0;
-	DTInfo.numProperties = 0;
-	DTInfo.totalPropertySize = 0;
-
-	rootNode = DT__AddChild(NULL, "/");
-	DPRINTF("DT__Initialize done\n");
+Node *
+DT__GetRootNode(void)
+{
+    return rootNode;
 }
 
 //==============================================================================
@@ -403,7 +412,7 @@ Property *
 DT__GetProperty(Node *node, const char *name)
 {
 	Property *prop;
-    
+
 	for (prop = node->properties; prop; prop = prop->next)
 	{
 		if (strcmp(prop->name, name) == 0)
@@ -411,7 +420,7 @@ DT__GetProperty(Node *node, const char *name)
 			return prop;
 		}
 	}
-    
+
 	return NULL;
 }
 
@@ -430,11 +439,11 @@ DT__FindNode(const char *path, bool createIfMissing)
 	// Start at root
 	node = rootNode;
 
-	DPRINTF("root = 0x%x\n", rootNode);
+	DPRINTF("DT__FindNode: root = 0x%x\n", rootNode);
 
 	while (node)
 	{
-		// Skip leading slash
+		// Skip leading slash(es)
 		while (*path == '/')
 		{
 			path++;
@@ -446,35 +455,34 @@ DT__FindNode(const char *path, bool createIfMissing)
 		}
 
 		*bp = '\0';
-
-	if (nameBuf[0] == '\0')
-	{
-		// last path entry
-		break;
-	}
-
-	DPRINTF("Node '%s'\n", nameBuf);
-
-	for (child = node->children; child != 0; child = child->next)
-	{
-		DPRINTF("Child 0x%x\n", child);
-
-		if (strcmp(DT__GetName(child), nameBuf) == 0)
-		{
-			break;
-		}
-	}
-
+        
+        if (nameBuf[0] == '\0')
+        {
+            // last path entry
+            break;
+        }
+        
+        DPRINTF("DT__FindNode: Node '%s'\n", nameBuf);
+        
+        for (child = node->children; child != 0; child = child->next)
+        {
+            DPRINTF("DT__FindNode: Child 0x%x\n", child);
+            
+            if (strcmp(DT__GetName(child), nameBuf) == 0)
+            {
+                break;
+            }
+        }
+        
         if (child == 0 && createIfMissing)
-	{
-		DPRINTF("Creating node\n");
-
-		char *str = malloc(strlen(nameBuf) + 1);
-		// XXX this will leak
-		strcpy(str, nameBuf);
-
-		child = DT__AddChild(node, str);
-	}
+        {
+            char *str = malloc(strlen(nameBuf) + 1);
+            // XXX this will leak
+            strcpy(str, nameBuf);
+            
+            child = DT__AddChild(node, str);
+            DPRINTF("DT__FindNode: Creating node: %s\n", str);
+        }
 
 		node = child;
 	}

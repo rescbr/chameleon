@@ -16,7 +16,7 @@
 #if DEBUG_PCI
 #define DBG(x...)		printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)       msglog(x)
 #endif
 
 pci_dt_t	*root_pci_dev;
@@ -159,6 +159,7 @@ void build_pci_dt(void)
 }
 
 static char dev_path[256];
+
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	pci_dt_t	*current;

@@ -44,21 +44,21 @@ enum {
 };
 
 enum {
-    kEfiReservedMemoryType	= 0,
-    kEfiLoaderCode		= 1,
-    kEfiLoaderData		= 2,
-    kEfiBootServicesCode	= 3,
-    kEfiBootServicesData	= 4,
-    kEfiRuntimeServicesCode	= 5,
-    kEfiRuntimeServicesData	= 6,
-    kEfiConventionalMemory	= 7,
-    kEfiUnusableMemory		= 8,
-    kEfiACPIReclaimMemory	= 9,
-    kEfiACPIMemoryNVS		= 10,
-    kEfiMemoryMappedIO		= 11,
+    kEfiReservedMemoryType      = 0,
+    kEfiLoaderCode              = 1,
+    kEfiLoaderData              = 2,
+    kEfiBootServicesCode        = 3,
+    kEfiBootServicesData        = 4,
+    kEfiRuntimeServicesCode     = 5,
+    kEfiRuntimeServicesData     = 6,
+    kEfiConventionalMemory      = 7,
+    kEfiUnusableMemory          = 8,
+    kEfiACPIReclaimMemory       = 9,
+    kEfiACPIMemoryNVS           = 10,
+    kEfiMemoryMappedIO          = 11,
     kEfiMemoryMappedIOPortSpace = 12,
-    kEfiPalCode			= 13,
-    kEfiMaxMemoryType		= 14
+    kEfiPalCode                 = 13,
+    kEfiMaxMemoryType           = 14
 };
 
 /*
@@ -96,6 +96,18 @@ typedef struct Boot_Video	Boot_Video;
 #define GRAPHICS_MODE			1
 #define FB_TEXT_MODE			2
 
+
+/* Struct describing an image passed in by the booter */
+struct boot_icon_element {
+    unsigned int    width;
+    unsigned int    height;
+    int             y_offset_from_center;
+    unsigned int    data_size;
+    unsigned int    __reserved1[4];
+    unsigned char   data[0];
+};
+typedef struct boot_icon_element boot_icon_element;
+
 /* Boot argument structure - passed into Mach kernel at boot time.
  * "Revision" can be incremented for compatible changes
  */
@@ -108,9 +120,17 @@ typedef struct Boot_Video	Boot_Video;
 #define kBootArgsPreLionVersion		1
 
 /* Snapshot constants of previous revisions that are supported */
+#define kBootArgsVersion1		1
+#define kBootArgsVersion2		2
+#define kBootArgsRevision2_0		0
 
 #define kBootArgsEfiMode32		32
 #define kBootArgsEfiMode64		64
+
+/* Bitfields for boot_args->flags */
+#define kBootArgsFlagRebootOnPanic	(1 << 0)
+#define kBootArgsFlagHiDPI		(1 << 1)
+#define kBootArgsFlagBlack		(1 << 2)
 
 typedef struct boot_args {
     uint16_t    Revision;	/* Revision of boot_args structure */
@@ -118,7 +138,7 @@ typedef struct boot_args {
 
     uint8_t     efiMode;    /* 32 means 32-bit mode, 64 means 64-bit mode */
     uint8_t     debugMode;  /* Bit field with behavior changes */
-    uint8_t     __reserved1[2];
+    uint16_t    flags; //    uint8_t     __reserved1[2];
 
     char        CommandLine[BOOT_LINE_LENGTH];	/* Passed in command line */
 
@@ -139,19 +159,25 @@ typedef struct boot_args {
     uint32_t    efiRuntimeServicesPageCount;
     uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
 
-    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
-    uint32_t    __reserved2;
+    uint32_t    efiSystemTable;		/* physical address of system table in runtime area */
+    uint32_t    kslide;			//    uint32_t    __reserved2;
 
     uint32_t    performanceDataStart; /* physical address of log */
     uint32_t    performanceDataSize;
 
     uint32_t    keyStoreDataStart; /* physical address of key store data */
     uint32_t    keyStoreDataSize;
-    uint64_t	bootMemStart;
+    uint64_t	bootMemStart;		/* physical address of interpreter boot memory */
     uint64_t	bootMemSize;
     uint64_t    PhysicalMemorySize;
     uint64_t    FSBFrequency;
-    uint32_t    __reserved4[734];
+    //
+    uint64_t    pciConfigSpaceBaseAddress;
+    uint32_t    pciConfigSpaceStartBusNumber;
+    uint32_t    pciConfigSpaceEndBusNumber;
+    uint32_t    __reserved4[730];
+    //
+//    uint32_t    __reserved4[734];
 
 } boot_args;
 
@@ -188,6 +214,8 @@ typedef struct boot_args_pre_lion {
 
 } boot_args_pre_lion;
 
-extern char gMacOSVersion[8];
+extern char     gMacOSVersion[8];
+extern uint32_t MacOSVerCurrent;
+extern uint32_t MacOSVer2Int(const char *osver);
 
 #endif /* _PEXPERT_I386_BOOT_H */

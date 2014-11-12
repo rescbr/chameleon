@@ -423,8 +423,7 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
 }
 
 
-long
-HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
+long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 {
     char entry[512];
     long dirID, result, flags;
@@ -909,7 +908,7 @@ static long ReadExtent(char * extent, uint64_t extentSize,
         // Find the extent for the offset.
         for (; ; nextExtent++) {
             if (nextExtent < extentDensity) {
-                if ((countedBlocks+GetExtentSize(extent, nextExtent)-1)<blockNumber) {
+                if ((countedBlocks + GetExtentSize(extent, nextExtent) - 1) < blockNumber) {
                     countedBlocks += GetExtentSize(extent, nextExtent);
                     continue;
                 }

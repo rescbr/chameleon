@@ -10,7 +10,7 @@
 
 extern void scan_cpu(PlatformInfo_t *);
 
-#define bit(n)				(1ULL << (n))
+#define bit(n)			(1ULL << (n))
 #define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
@@ -102,25 +102,25 @@ extern void scan_cpu(PlatformInfo_t *);
  * The CPUID_EXTFEATURE_XXX values define 64-bit values
  * returned in %ecx:%edx to a CPUID request with %eax of 0x80000001: 
  */
-#define CPUID_EXTFEATURE_SYSCALL     _Bit(11)	/* SYSCALL/sysret */
-#define CPUID_EXTFEATURE_XD	         _Bit(20)	/* eXecute Disable */
+#define CPUID_EXTFEATURE_SYSCALL   _Bit(11)	/* SYSCALL/sysret */
+#define CPUID_EXTFEATURE_XD	   _Bit(20)	/* eXecute Disable */
 
-#define CPUID_EXTFEATURE_1GBPAGE     _Bit(26)	/* 1GB pages */
-#define CPUID_EXTFEATURE_RDTSCP	     _Bit(27)	/* RDTSCP */
-#define CPUID_EXTFEATURE_EM64T	     _Bit(29)	/* Extended Mem 64 Technology */
+#define CPUID_EXTFEATURE_1GBPAGE   _Bit(26)	/* 1GB pages */
+#define CPUID_EXTFEATURE_RDTSCP	   _Bit(27)	/* RDTSCP */
+#define CPUID_EXTFEATURE_EM64T	   _Bit(29)	/* Extended Mem 64 Technology */
 
-#define CPUID_EXTFEATURE_LAHF	     _HBit(0)	/* LAFH/SAHF instructions */
+#define CPUID_EXTFEATURE_LAHF	   _HBit(0)	/* LAFH/SAHF instructions */
 
 /*
  * The CPUID_EXTFEATURE_XXX values define 64-bit values
  * returned in %ecx:%edx to a CPUID request with %eax of 0x80000007: 
  */
-#define CPUID_EXTFEATURE_TSCI        _Bit(8)	/* TSC Invariant */
+#define CPUID_EXTFEATURE_TSCI      _Bit(8)	/* TSC Invariant */
 
 #define	CPUID_CACHE_SIZE	16	/* Number of descriptor values */
 
-#define CPUID_MWAIT_EXTENSION	     _Bit(0)	/* enumeration of WMAIT extensions */
-#define CPUID_MWAIT_BREAK	         _Bit(1)	/* interrupts are break events	   */
+#define CPUID_MWAIT_EXTENSION	_Bit(0)	/* enumeration of WMAIT extensions */
+#define CPUID_MWAIT_BREAK	_Bit(1)	/* interrupts are break events	   */
 
 //-- processor type -> p_type:
 #define PT_OEM	0x00	// Intel Original OEM Processor;
@@ -155,19 +155,19 @@ extern void scan_cpu(PlatformInfo_t *);
 #define IA32_ENERGY_PERF_BIAS		0x01B0
 #define MSR_PACKAGE_THERM_STATUS	0x01B1
 #define IA32_PLATFORM_DCA_CAP		0x01F8
-#define MSR_POWER_CTL				0x01FC   // MSR 000001FC  0000-0000-0004-005F
+#define MSR_POWER_CTL			0x01FC   // MSR 000001FC  0000-0000-0004-005F
 
 // Sandy Bridge & JakeTown specific 'Running Average Power Limit' MSR's.
 #define MSR_RAPL_POWER_UNIT			0x606     /* R/O */
 //MSR 00000606                                      0000-0000-000A-1003
-#define MSR_PKGC3_IRTL				0x60A    /* RW time limit to go C3 */
+#define MSR_PKGC3_IRTL          0x60A    /* RW time limit to go C3 */
 // bit 15 = 1 -- the value valid for C-state PM
-#define MSR_PKGC6_IRTL				0x60B    /* RW time limit to go C6 */
+#define MSR_PKGC6_IRTL          0x60B    /* RW time limit to go C6 */
 //MSR 0000060B                                      0000-0000-0000-8854
 //Valid + 010=1024ns + 0x54=84mks
-#define MSR_PKGC7_IRTL				0x60C    /* RW time limit to go C7 */
+#define MSR_PKGC7_IRTL          0x60C    /* RW time limit to go C7 */
 //MSR 0000060C                                      0000-0000-0000-8854
-#define MSR_PKG_C2_RESIDENCY		0x60D   /* same as TSC but in C2 only */
+#define MSR_PKG_C2_RESIDENCY    0x60D   /* same as TSC but in C2 only */
 
 #define MSR_PKG_RAPL_POWER_LIMIT	0x610 //MSR 00000610  0000-A580-0000-8960
 #define MSR_PKG_ENERGY_STATUS		0x611 //MSR 00000611  0000-0000-3212-A857
@@ -219,21 +219,20 @@ static inline void do_cpuid(uint32_t selector, uint32_t *data)
 {
 	asm volatile ("cpuid"
 				  : "=a" (data[0]),
-					"=b" (data[1]),
-					"=c" (data[2]),
-					"=d" (data[3])
-				  : "a"  (selector));
+				  "=b" (data[1]),
+				  "=c" (data[2]),
+				  "=d" (data[3])
+				  : "a" (selector));
 }
 
 static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *data)
 {
 	asm volatile ("cpuid"
 				  : "=a" (data[0]),
-					"=b" (data[1]),
-					"=c" (data[2]),
-					"=d" (data[3])
-				  : "a"  (selector),
-					"c"  (selector2));
+				  "=b" (data[1]),
+				  "=c" (data[2]),
+				  "=d" (data[3])
+				  : "a" (selector), "c" (selector2));
 }
 
 // DFE: enable_PIT2 and disable_PIT2 come from older xnu

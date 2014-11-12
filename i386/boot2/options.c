@@ -38,6 +38,8 @@
 #define DBG(x...)	msglog(x)
 #endif
 
+char		gMacOSVersion[8];
+uint32_t    MacOSVerCurrent = 0;
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
 
@@ -57,6 +59,24 @@ enum {
     kMenuMaxItems  = 10,
     kScreenLastRow = 24
 };
+
+// 10.9.5 -> 0x0A090500
+uint32_t MacOSVer2Int(const char *osver)
+{
+    uint32_t ret = 0;
+    uint8_t i = 0, k = 1, len = strlen(osver);
+    for (; len > 0; len--) {
+        if (osver[len-1] == '.') {
+            k = 1;
+            i++;
+        } else {
+            ((uint8_t *)&ret)[i] += (osver[len-1] - '0') * k;
+            k = k * 10;
+        }
+    }
+    
+    return ret << (3 - i)*8;
+}
 
 //==========================================================================
 
@@ -181,11 +201,11 @@ static int countdown( const char * msg, int row, int timeout )
 
 //==========================================================================
 
-char   gBootArgs[BOOT_STRING_LEN];
-static char * gBootArgsPtr = gBootArgs;
-static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
-static char   booterCommand[BOOT_STRING_LEN];
-static char   booterParam[BOOT_STRING_LEN];
+char         gBootArgs[BOOT_STRING_LEN];
+static char *gBootArgsPtr = gBootArgs;
+static char *gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
+static char  booterCommand[BOOT_STRING_LEN];
+static char  booterParam[BOOT_STRING_LEN];
 
 static void clearBootArgs(void)
 {
@@ -1175,7 +1195,6 @@ processBootOptions()
 	skipblanks( &cp );
 
 	// Update the unit and partition number.
-
 	if ( gBootVolume ) {
 		if (!( gBootVolume->flags & kBVFlagNativeBoot )) {
 			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
@@ -1200,7 +1219,6 @@ processBootOptions()
 	}
 
 	// Load config table specified by the user, or use the default.
-
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
 		val = 0;
 		cnt = 0;
@@ -1208,9 +1226,12 @@ processBootOptions()
 
 	// Load com.apple.Boot.plist from the selected volume
 	// and use its contents to override default bootConfig.
-
-	loadSystemConfig(&bootInfo->bootConfig);    
-	loadChameleonConfig(&bootInfo->chameleonConfig);
+	loadSystemConfig(&bootInfo->bootConfig);
+	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
+    
+    // Save a version of mac os we're booting.
+    strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+    MacOSVerCurrent = MacOSVer2Int(gMacOSVersion);
 
 	// Use the kernel name specified by the user, or fetch the name
 	// in the config table, or use the default if not specified.
@@ -1225,12 +1246,39 @@ processBootOptions()
 	} else {
 		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
-		} else {
-			strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+		}
+		else
+		{
+			if( YOSEMITE ) // is 10.10
+			{
+
+				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
+			}
+			else
+			{ // OSX is not 10.10
+
+				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
+				//printf(HEADER "/%s\n", bootInfo->bootFile);
+			}
 		}
 	}
-	if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) {
-		gOverrideKernel = true;
+
+	if (!YOSEMITE) // not 10.10 so 10.9 and previus
+	{
+		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
+		{
+	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
+	}
+	else
+	{ // OSX is 10.10
+		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
+		{
+        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
+			gOverrideKernel = true;
+		}
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
@@ -1260,21 +1308,20 @@ processBootOptions()
 				}
 			}
 		}
-        /*
+/* Bungo
 		// Try to get the volume uuid string
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
-        */
+*/
 		// If we have the volume uuid add it to the commandline arguments
 		if (strlen(gBootUUIDString)) {
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
 		}
-        
-        // Try to get the volume uuid string
-        if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		// Try to get the volume uuid string
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
-            DBG("boot-uuid: %s\n", gBootUUIDString);
+			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
 
@@ -1286,21 +1333,25 @@ processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-		} else { /*
+            if (cnt > 0) {
+                copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+            }
+		} else {
 			if (strlen(gBootUUIDString)) {
 				val = "*uuid";
 				cnt = 5;
-			} else { */
+			} else {
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			/* } */
+			}
 		}
-        
+/* Bungo
 		if (cnt > 0) {
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
+*/
 		strlcpy( gRootDevice, val, (cnt + 1));
 	}
 

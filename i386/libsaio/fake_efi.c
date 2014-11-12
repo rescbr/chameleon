@@ -2,8 +2,8 @@
 /*
  * Copyright 2007 David F. Elliott.	 All rights reserved.
  */
-#include "saio_types.h"
-#include "libsaio.h"
+//#include "saio_types.h"
+//#include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "efi.h"
@@ -17,6 +17,16 @@
 #include "convert.h"
 #include "pci.h"
 #include "sl.h"
+#include "failedboot.h"
+#include "appleClut8.h"
+//#include <mach-o/fat.h>
+//#include <mach-o/loader.h>
+
+#if DEBUG
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
 
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
@@ -68,15 +78,25 @@ static uint64_t ptov64(uint32_t addr)
 	return ((uint64_t)addr | 0xFFFFFF8000000000ULL);
 }
 
+// ==========================================================================
+// ErmaC
+static inline uint64_t getCPUTick(void)
+{
+	uint32_t lowest;
+	uint32_t highest;
+	__asm__ volatile ("rdtsc" : "=a" (lowest), "=d" (highest));
+	return (uint64_t) highest << 32 | lowest;
+}
+
 /*==========================================================================
  * Fake EFI implementation
  */
 
 /* Identify ourselves as the EFI firmware vendor */
-static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','2', 0};
+static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','3', 0};
 // Bungo
 //static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
-static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
+static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1, most Macs use it too
 // Bungo
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
@@ -89,11 +109,16 @@ static uint8_t const VOIDRET_INSTRUCTIONS[] = {0xc3};
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_32[] = {0xb8, 0x03, 0x00, 0x00, 0x80, 0xc3};
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_64[] = {0x48, 0xb8, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc3};
 
+/* EFI Guides */
+EFI_GUID const gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
+EFI_GUID const gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
+EFI_GUID const gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
+
 EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
-extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
+EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
 
@@ -111,7 +136,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	// We only do adds, not modifications and deletes like InstallConfigurationTable
 	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
 	{
-		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
+		stop("Fake EFI [ERROR]: Ran out of space for configuration tables [%d]. Increase the reserved size in the code.\n", i);
 	}
 
 	if (pGuid == NULL)
@@ -130,7 +155,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
 
 		// Use the pointer to the GUID we just stuffed into the system table
-		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
+		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void *)pGuid);
 
 		// The "table" property is the 32-bit (in our implementation) physical address of the table
 		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
@@ -138,13 +163,26 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		// Assume the alias pointer is a global or static piece of data
 		if (alias != NULL)
 		{
-			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
+			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char *)alias);
 		}
+        
+        i++;
+        
+        if (archCpuType == CPU_TYPE_I386)
+        {
+            gST32->NumberOfTableEntries = i;
+        }
+        else
+        {
+            gST64->NumberOfTableEntries = i;
+        }
 
 		return EFI_SUCCESS;
 	}
 	return EFI_UNSUPPORTED;
 }
+
+// ==========================================================================
 
 //Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
@@ -403,33 +441,6 @@ static const char FSB_Frequency_prop[] = "FSBFrequency";
 static const char CPU_Frequency_prop[] = "CPUFrequency";
 
 /*==========================================================================
- * SMBIOS
- */
-
-/* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
-
-#define SMBIOS_RANGE_START		0x000F0000
-#define SMBIOS_RANGE_END		0x000FFFFF
-
-/* '_SM_' in little endian: */
-#define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
-
-#define EFI_ACPI_TABLE_GUID \
-{ \
-	0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-}
-
-#define EFI_ACPI_20_TABLE_GUID \
-{ \
-	0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-}
-
-EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
-EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
-
-
-/*==========================================================================
  * Fake EFI implementation
  */
 
@@ -437,7 +448,7 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+//static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char EFI_MODE_PROP[] = "efi-mode";  //Bungo
 static const char SYSTEM_ID_PROP[] = "system-id";
@@ -445,16 +456,19 @@ static const char SYSTEM_SERIAL_PROP[] = "SystemSerialNumber";
 static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
-static const char DEV_PATH_SUP[] = "DevicePathsSupported";
-static EFI_UINT32 DevPathSup = 1;
-static EFI_UINT32 MachineSig = 0;  //Bungo
-static EFI_UINT8 const RANDOM_SEED[] =
+static const char DEV_PATHS_SUP_PROP[] = "DevicePathsSupported";
+static const char MACHINE_SIG_PROP[] = "machine-signature";
+static EFI_UINT32 const ZERO_U32 = 0;
+static EFI_UINT32 const ONE_U32 = 1;
+static const char RANDOM_SEED_PROP[] = "random-seed";
+/*
+static EFI_UINT8 const RANDOM_SEED_PROP_VALUE[] =
 {
     0x40, 0x00, 0x50, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 0x65, 0x00,
     0x6d, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x62, 0x00, 0x72, 0x00, 0x61, 0x00, 0x72, 0x00,
     0x79, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00,
     0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x5c, 0x00, 0x62, 0x00
-};
+}; */
 
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
@@ -545,98 +559,219 @@ static EFI_CHAR8* getSystemID()
  */
 
 /*
- * Must be called AFTER setup Acpi because we need to take care of correct
- * facp content to reflect in ioregs
+ * Must be called AFTER setupAcpi because we need to take care of correct
+ * FACP content to reflect in ioregs
  */
 void setupSystemType()
 {
 	Node *node = DT__FindNode("/", false);
 	if (node == 0)
 	{
-		stop("Couldn't get root node");
+		stop("Couldn't get root '/' node");
 	}
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
 }
 
-void setupEfiDeviceTree(void)
+bool getKernelCompat(EFI_UINT8 *compat)
 {
-	// EFI_CHAR8*	 ret = 0;  Bungo: not used
+    int kernelFileRef;
+    EFI_UINT8 readBytes;
+    char kernelFilePath[512], kernelHeaderBuf[sizeof(struct fat_header) + 4*sizeof(struct fat_arch)];
+    
+    snprintf(kernelFilePath, sizeof(kernelFilePath), "%s", bootInfo->bootFile);
+    //strlcpy(kernelFilePath, bootInfo->bootFile, sizeof(kernelFilePath)); // user defined path
+    DBG("EfiKernelCompat: trying to read kernel header from file '%s'...\n", kernelFilePath);
+    if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
+    } else {
+        snprintf(kernelFilePath, sizeof(kernelFilePath), "/%s", bootInfo->bootFile); // append a leading '/'
+        DBG("EfiKernelCompat: trying to read kernel header from file '%s'...\n", kernelFilePath);
+        if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
+        } else {
+            snprintf(kernelFilePath, sizeof(kernelFilePath), "/System/Library/Kernels/%s", bootInfo->bootFile); // Yosemite path
+            DBG("EfiKernelCompat: trying to read kernel header from file '%s'...\n", kernelFilePath);
+            if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
+            } else {
+                DBG("EfiKernelCompat: can't find any kernel file!\n");
+                return false;
+            }
+        }
+    }
+    
+    if ((readBytes = read(kernelFileRef, kernelHeaderBuf, sizeof(struct fat_header) + 4*sizeof(struct fat_arch))) > 0) {
+        DBG("EfiKernelCompat: OK, read %d bytes from file '%s'.\n", readBytes, kernelFilePath);
+    } else {
+        DBG("EfiKernelCompat: can't read kernel file '%s'!\n", kernelFilePath);
+        return false;
+    }
+    
+    struct fat_header  *fatHeaderPtr = (struct fat_header *)kernelHeaderBuf;
+	struct fat_arch    *fatArchPtr = (struct fat_arch *)(kernelHeaderBuf + sizeof(struct fat_header));
+    struct mach_header *thinHeaderPtr = (struct mach_header *)kernelHeaderBuf;
+    bool swapit = false;
+    
+    switch (fatHeaderPtr->magic) {
+        case FAT_CIGAM:
+            swapit = true;
+            fatHeaderPtr->nfat_arch = OSSwapInt32(fatHeaderPtr->nfat_arch);
+        case FAT_MAGIC:
+            *compat = 0;
+            DBG("EfiKernelCompat: kernel file is a fat binary: %d archs compatibility [", fatHeaderPtr->nfat_arch);
+            if (fatHeaderPtr->nfat_arch > 4) fatHeaderPtr->nfat_arch = 4;
+            for (; fatHeaderPtr->nfat_arch > 0; fatHeaderPtr->nfat_arch--, fatArchPtr++) {
+                if (swapit) fatArchPtr->cputype = OSSwapInt32(fatArchPtr->cputype);
+                switch(fatArchPtr->cputype) {
+                    case CPU_TYPE_I386:
+                        DBG(" i386");
+                        break;
+                    case CPU_TYPE_X86_64:
+                        DBG(" x86_64");
+                        break;
+                    case CPU_TYPE_POWERPC:
+                        DBG(" PPC");
+                        break;
+                    case CPU_TYPE_POWERPC64:
+                        DBG(" PPC64");
+                        break;
+                    default:
+                        DBG(" 0x%x", fatArchPtr->cputype);
+                }
+                if (fatHeaderPtr->nfat_arch - 1 > 0) DBG(" | ");
+                *compat |= (!(fatArchPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(fatArchPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
+            }
+            DBG(" ]\n");
+            break;
+        case MH_CIGAM:
+        case MH_CIGAM_64:
+            thinHeaderPtr->cputype = OSSwapInt32(thinHeaderPtr->cputype);
+        case MH_MAGIC:
+        case MH_MAGIC_64:
+            *compat = (!(thinHeaderPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
+            DBG("EfiKernelCompat: kernel file is a thin binary: 1 arch compatibility found [ %s ].\n", !((thinHeaderPtr->cputype & 0x000000FF) ^ 0x00000007) ? (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "x86_64" : "i386") : (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "PPC64" : "PPC"));
+            break;
+        default:
+            DBG("EfiKernelCompat: unknown kernel file '%s'. Can't determine arch compatibility!\n", kernelFilePath);
+            return false;
+    }
+    
+    return true;
+}
+
+/*
+ * Installs all the needed configuration table entries
+ */
+static void setupEfiConfigurationTable()
+{
+	// smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
+	if (smbios_p) {
+        if (EFI_SUCCESS == addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL)) {
+            DBG("Fake EFI: sucesfuly added %sbit configuration table for SMBIOS: guid {EB9D2D31-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+        }
+    }
+    
+	// Setup ACPI with DSDT overrides (mackerintel's patch)
+	//setupAcpi();
+    
+    if (acpi10_p) {
+        if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI")) {
+            DBG("Fake EFI: sucesfuly added %sbit configuration table for ACPI: guid {EB9D2D30-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+        }
+    }
+    if (acpi20_p) {
+        if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20")) {
+            DBG("Fake EFI: sucesfuly added %sbit configuration table for ACPI_20: guid {8868E871-E4F1-11D3-BC22-0080C73C8881}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+        }
+    }
+    
+	// We've obviously changed the count.. so fix up the CRC32
+	if (archCpuType == CPU_TYPE_I386)
+	{
+		gST32->Hdr.CRC32 = 0;
+		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
+	}
+	else
+	{
+		gST64->Hdr.CRC32 = 0;
+		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
+	}
+}
+
+void setupEfiNode(void)
+{
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
-	Node		*node;
-
-	node = DT__FindNode("/", false);
-
-	if (node == 0)
+    
+	Node *efiNode = DT__FindNode("/efi", true);
+    if (efiNode == 0)
 	{
-		stop("Couldn't get root node");
+		stop("Couldn't get '/efi' node");
 	}
 
-	// We could also just do DT__FindNode("/efi/platform", true)
-	// But I think eventually we want to fill stuff in the efi node
-	// too so we might as well create it so we have a pointer for it too.
-	node = DT__AddChild(node, "efi");
-/* Bungo
+/* Bungo: we have 64 bit ability fake efi but mode may be changed 32/64, like Macs
 	if (archCpuType == CPU_TYPE_I386) {
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (EFI_CHAR8 *)FIRMWARE_ABI_32_PROP_VALUE);
 	} else { */
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
+		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (EFI_CHAR8 *)FIRMWARE_ABI_64_PROP_VALUE);
 //	}
+// So, added 'efi-mode' property to tell us what mode we use 32 or 64 bit
+	DT__AddProperty(efiNode, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
 
-	DT__AddProperty(node, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
-    
-	DT__AddProperty(node, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32 *)&FIRMWARE_REVISION);
-	DT__AddProperty(node, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)FIRMWARE_VENDOR);
+	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32 *)&FIRMWARE_REVISION);
+	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)&FIRMWARE_VENDOR);
 
 	// TODO: Fill in other efi properties if necessary
 
 	// Set up the /efi/runtime-services table node similar to the way a child node of configuration-table
 	// is set up.  That is, name and table properties
-	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
+	Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");
 
 	if (archCpuType == CPU_TYPE_I386) {
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
-
-		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
+		DT__AddProperty(runtimeServicesNode, "table", sizeof(EFI_UINT64), &gST32->RuntimeServices);
 	} else {
-		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
+		DT__AddProperty(runtimeServicesNode, "table", sizeof(EFI_UINT64), &gST64->RuntimeServices);
 	}
 
 	// Set up the /efi/configuration-table node which will eventually have several child nodes for
 	// all of the configuration tables needed by various kernel extensions.
-	gEfiConfigurationTableNode = DT__AddChild(node, "configuration-table");
+	gEfiConfigurationTableNode = DT__AddChild(efiNode, "configuration-table");
 
-	// New node: /efi/kernel-compatibility
-	Node *efiKernelComNode = DT__AddChild(node, "kernel-compatibility");
-    len = 1;
-    DT__AddProperty(efiKernelComNode, "x86_64", sizeof(uint32_t), (EFI_UINT32 *)&len);
-    
-    // Now fill in the /efi/platform Node
-	Node *efiPlatformNode = DT__AddChild(node, "platform");
+	// Set up the /efi/kernel-compatibility node only if 10.7 or better
+    if (MacOSVerCurrent >= MacOSVer2Int("10.7")) {
+        Node *EfiKernelCompatNode = DT__AddChild(efiNode, "kernel-compatibility");
+        EFI_UINT8 compat = (archCpuType == CPU_TYPE_I386) ? 0b00000001 : 0b00000010;
+        getKernelCompat(&compat);
+        if (compat & 0b00000001) DT__AddProperty(EfiKernelCompatNode, "i386", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+        if (compat & 0b00000010) DT__AddProperty(EfiKernelCompatNode, "x86_64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+        if (compat & 0b00000100) DT__AddProperty(EfiKernelCompatNode, "PPC", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+        if (compat & 0b00001000) DT__AddProperty(EfiKernelCompatNode, "PPC64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+    }
+
+	// Now fill in the /efi/platform Node
+	Node *efiPlatformNode = DT__AddChild(efiNode, "platform");
 
 	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 
 	if (Platform.CPU.FSBFrequency != 0) {
-		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
+		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.FSBFrequency);
 	}
 
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
 	if (Platform.CPU.TSCFrequency != 0) {
-		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
+		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.TSCFrequency);
 	}
 
 	if (Platform.CPU.CPUFrequency != 0) {
-		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
+		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.CPUFrequency);
 	}
 
-	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(EFI_UINT32), &DevPathSup);
+	DT__AddProperty(efiPlatformNode, DEV_PATHS_SUP_PROP, sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
@@ -644,8 +779,7 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
 	*/
-
-	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
+	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
 
 	// Export SystemSerialNumber if present
 	if ((ret16=getSmbiosChar16("SMserial", &len))) {
@@ -657,8 +791,11 @@ void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 	}
 
-	// Fill /efi/device-properties node.
-	setupDeviceProperties(node);
+	// Fill /efi/device-properties.
+	setupDeviceProperties(efiNode);
+    
+    // Add configuration table entries to both the services table and the device tree
+	setupEfiConfigurationTable();
 }
 
 /*
@@ -670,45 +807,151 @@ void setupBoardId()
 	node = DT__FindNode("/", false);
 	if (node == 0)
 	{
-		stop("Couldn't get root node");
+		stop("Couldn't get root '/' node");
 	}
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid) + 1, (EFI_CHAR16 *)boardid);
 	}
 }
 
 /*
- * Populate the chosen node
+ * Fill up the root node
+ *
+setupRootNode()
+{
+    
+}
+*/
+/*
+ * Fill up the chosen node
  */
-
 void setupChosenNode()
 {
-	Node *chosenNode;
-	chosenNode = DT__FindNode("/chosen", false);
-	if (chosenNode == 0)
-	{
-		stop("Couldn't get chosen node");
+	Node *chosenNode = DT__FindNode("/chosen", false);
+	if (chosenNode == 0) {
+		stop("setupChosenNode: Couldn't get '/chosen' node");
 	}
 
+    // Add boot-uuid property
 	int length = strlen(gBootUUIDString);
-	if (length)
-	{
+	if (length) {
 		DT__AddProperty(chosenNode, "boot-uuid", length + 1, gBootUUIDString);
 	}
+
+    // Add boot-args property
+	length = strlen(bootArgs->CommandLine);
+	DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+
+    // Add boot-file property
+	length = strlen(bootInfo->bootFile);
+	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
     
-    length = strlen(bootArgs->CommandLine);
-    DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+    //  TODO:
+    //	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
+    //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
+    //	DT__AddProperty(chosenNode, "boot-kernelchache-adler32", sizeof(adler32), adler32);
+
+    // Add machine-signature property
+	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(EFI_UINT32), (EFI_UINT32 *)&Platform.HWSignature);
     
-    length = strlen(bootInfo->bootFile);
-    DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
-//    DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
-//    DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
-//    DT__AddProperty(chosenNode, "boot-kernelchache-adler32", sizeof(adler32), adler32);
-    
-    DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
-    DT__AddProperty(chosenNode, "random-seed", sizeof(RANDOM_SEED), (EFI_UINT8*) &RANDOM_SEED);
+	//if(YOSEMITE)
+    if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // Add random-seed property if Yosemite or better only
+	{
+		//
+		// Pike R. Alpha - 12 October 2014
+		//
+		UInt8 index = 0;
+		EFI_UINT16 PMTimerValue = 0;
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi = 0;
+		EFI_UINT32 rcx, rdx, rsi, rdi;
+
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		rcx = rdx = rsi = rdi = cpuTick = 0;
+
+		// LEAF_1 - Feature Information (Function 01h).
+		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
+		{
+			//
+			// i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
+			//
+			EFI_UINT32 seedBuffer[16] = {0};
+			//
+			// Main loop to get 16 qwords (four bytes each).
+			//
+			for (index = 0; index < 16; index++)					// 0x17e12:
+			{
+				randomValue = computeRand();					// callq	0x18e20
+				cpuTick = getCPUTick();						// callq	0x121a7
+				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
+				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
+			}									// jb		0x17e12
+
+			DT__AddProperty(chosenNode, RANDOM_SEED_PROP, sizeof(seedBuffer), (EFI_UINT32*) &seedBuffer);
+		}
+		else
+		{
+			//
+			// All other processors without RDRAND support.
+			//
+			EFI_UINT8 seedBuffer[64] = {0};
+			//
+			// Main loop to get the 64 bytes.
+			//
+			do									// 0x17e55:
+			{
+				PMTimerValue = inw(0x408);					// in		(%dx),	%ax
+				esi = PMTimerValue;						// movzwl	%ax,	%esi
+
+				if (esi < ecx)							// cmp		%ecx,	%esi
+				{
+					continue;						// jb		0x17e55		(retry)
+				}
+
+				cpuTick = getCPUTick();						// callq	0x121a7
+				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				rdi = rsi;							// mov		%rsi,	%rdi
+				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
+				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
+				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+
+				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
+
+				edi = (edi & 0x2f);						// and		$0x2f,	%edi
+				edi = (edi + esi);						// add		%esi,	%edi
+				index++;							// inc		r12
+				ecx = (edi & 0xffff);						// movzwl	%di,	%ecx
+
+			} while (index < 64);							// cmp		%r14d,	%r12d
+			// jne		0x17e55		(next)
+
+			DT__AddProperty(chosenNode, RANDOM_SEED_PROP, sizeof(seedBuffer), (EFI_UINT8*) &seedBuffer);
+
+		}
+	}
+
+    // setup '/chosen/memory-map' node
+    Node * mapNode = DT__FindNode("/chosen/memory-map", false);
+	if (mapNode == 0) {
+		DBG("setupChosenNode:Couldn't get '/chosen/memory-map' node\n");
+	} else { /*
+        static EFI_UINT64 BootClutPropValue = 0;
+        static EFI_UINT64 FailedBootPictPropValue = 0;
+        BootClutPropValue = ((EFI_UINT64)sizeof(appleClut8) << 32) | (EFI_UINT64)(EFI_UINT8 *)&appleClut8;
+        FailedBootPictPropValue = ((EFI_UINT64)(sizeof(gFailedBootPict) + 32) << 32) | (EFI_UINT64)(EFI_UINT8 *)&gFailedBootPict;
+        if (MacOSVerCurrent < MacOSVer2Int("10.7.3")) {
+            DT__AddProperty(node, "BootCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
+            DT__AddProperty(node, "Pict-FailedBoot", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
+        } else {
+            DT__AddProperty(node, "FailedCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
+            DT__AddProperty(node, "FailedImage", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
+        } */
+    }
 }
 
 /*
@@ -742,42 +985,13 @@ static void setupSmbiosConfigFile(const char *filename)
 
 	if (err)
 	{
-		verbose("No SMBIOS replacement found.\n");
+		DBG("setupSmbiosConfigFile: No SMBIOS replacement found.\n");
 	}
 
 	// get a chance to scan mem dynamically if user asks for it while having the config options
 	// loaded as well, as opposed to when it was in scan_platform(); also load the orig. smbios
 	// so that we can access dmi info, without patching the smbios yet.
 	scan_mem(); 
-}
-
-/*
- * Installs all the needed configuration table entries
- */
-static void setupEfiConfigurationTable()
-{
-	smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-	addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL);
-
-	setupBoardId(); //need to be called after getSmbios
-
-	// Setup ACPI with DSDT overrides (mackerintel's patch)
-	setupAcpi();
-
-	// We've obviously changed the count.. so fix up the CRC32
-	if (archCpuType == CPU_TYPE_I386)
-	{
-		gST32->Hdr.CRC32 = 0;
-		gST32->Hdr.CRC32 = crc32(0L, gST32, gST32->Hdr.HeaderSize);
-	}
-	else
-	{
-		gST64->Hdr.CRC32 = 0;
-		gST64->Hdr.CRC32 = crc32(0L, gST64, gST64->Hdr.HeaderSize);
-	}
-
-	// Setup the chosen node
-	setupChosenNode();
 }
 
 void saveOriginalSMBIOS(void)
@@ -789,19 +1003,21 @@ void saveOriginalSMBIOS(void)
 	node = DT__FindNode("/efi/platform", false);
 	if (!node)
 	{
-		verbose("/efi/platform node not found\n");
+		DBG("saveOriginalSMBIOS: '/efi/platform' node not found\n");
 		return;
 	}
 
 	origeps = getSmbios(SMBIOS_ORIGINAL);
 	if (!origeps)
 	{
+        DBG("saveOriginalSMBIOS: original SMBIOS not found\n");
 		return;
 	}
 
 	tableAddress = (void *)AllocateKernelMemory(origeps->dmi.tableLength);
 	if (!tableAddress)
 	{
+        DBG("saveOriginalSMBIOS: can not allocate memory for original SMBIOS\n");
 		return;
 	}
 
@@ -809,20 +1025,197 @@ void saveOriginalSMBIOS(void)
 	DT__AddProperty(node, "SMBIOS", origeps->dmi.tableLength, tableAddress);
 }
 
+char saveOriginalACPI()
+{
+    Node *node = DT__FindNode("/chosen/acpi", true);
+    if (!node) {
+        DBG("saveOriginalACPI: node '/chosen/acpi' not found. Can't save OEM ACPI tables.\n");
+        return -1;
+    }
+    
+    struct acpi_2_rsdp *RSDP = getRSDPaddress();
+    
+    if (!RSDP) {
+        DBG("saveOriginalACPI: RSDP not found or incorrect, can't save OEM tables.\n");
+        return -1;
+    }
+    
+    DBG("saveOriginalACPI: saving OEM tables into IODT/chosen/acpi...\n");
+    uint32_t length = RSDP->Revision ? RSDP->Length : 20;
+    uint8_t nameLen = strlen("RSDP@") + 8 + 1;
+    char *nameBuf = malloc(nameLen);
+    sprintf(nameBuf, "RSDP@%08X", RSDP);
+    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+    DT__AddProperty(node, nameBuf, length, RSDP);
+    uint8_t total_number = 1;
+    uint32_t total_size = length;
+    uint8_t r, ssdt_number = 0;
+    struct acpi_2_header *RSDT = (struct acpi_2_header *)(RSDP->RsdtAddress), *XSDT = NULL;
+    void *origTable = (void *)(RSDT + 1), *origTable2, *origTable3;
+    if (RSDT && tableSign(RSDT->Signature, "RSDT")) {
+        length = RSDT->Length;
+        nameLen = strlen("RSDT@") + 8 + 1;
+        nameBuf = malloc(nameLen);
+        sprintf(nameBuf, "RSDT@%08X", RSDT);
+        DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+        DT__AddProperty(node, nameBuf, length, RSDT);
+        total_size += length;
+        total_number++;
+        for (; origTable < ((void *)RSDT + RSDT->Length); origTable += 4) {
+            origTable2 = (void *)(*(uint32_t *)origTable);
+            length = ((struct acpi_2_header *)origTable2)->Length;
+            total_size += length;
+            total_number++;
+            if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "SSDT")) {
+                ssdt_number++;
+                if (!strcmp(((struct acpi_2_header *)origTable2)->OEMTableId, "CpuPm")) {
+                    nameLen = strlen("SSDT@") + 8 + 1;
+                    nameBuf = malloc(nameLen);
+                    sprintf(nameBuf, "SSDT@%08X", origTable2);
+                    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                    DT__AddProperty(node, nameBuf, length, origTable2);
+                    origTable2 += sizeof(struct acpi_2_header) + 15;
+                    r = *((uint8_t *)origTable2 - 2) / 3;
+                    for (; r > 0; r--, origTable2 += sizeof(struct ssdt_pmref)) {
+                        origTable3 = (void *)(((struct ssdt_pmref *)origTable2)->addr);
+                        if (!origTable3) continue;
+                        length = ((struct acpi_2_header *)origTable3)->Length;
+                        nameLen = strlen("SSDT_@") + strlen(((struct acpi_2_header *)origTable3)->OEMTableId) + 8 + 1;
+                        nameBuf = malloc(nameLen);
+                        sprintf(nameBuf, "SSDT_%s@%08X", ((struct acpi_2_header *)origTable3)->OEMTableId, origTable3);
+                        DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                        DT__AddProperty(node, nameBuf, length, origTable3);
+                        total_size += length;
+                        total_number++;
+                    }
+                } else {
+                    nameLen = strlen("SSDT-@") + ((ssdt_number < 10) ? 1:2) + 8 + 1;
+                    nameBuf = malloc(nameLen);
+                    sprintf(nameBuf, "SSDT-%d@%08X", ssdt_number, origTable2);
+                    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                    DT__AddProperty(node, nameBuf, length, origTable2);
+                }
+            } else {
+                nameLen = strlen("XXXX@") + 8 + 1;
+                nameBuf = malloc(nameLen);
+                sprintf(nameBuf, "%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], origTable2);
+                DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                DT__AddProperty(node, nameBuf, length, origTable2);
+                if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP")) {
+                    origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->FACS);
+                    length = ((struct acpi_2_header *)origTable3)->Length;
+                    nameLen = strlen("FACS@") + 8 + 1;
+                    nameBuf = malloc(nameLen);
+                    sprintf(nameBuf, "FACS@%08X", origTable3);
+                    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                    DT__AddProperty(node, nameBuf, length, origTable3);
+                    total_size += length;
+                    total_number++;
+                    origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->DSDT);
+                    length = ((struct acpi_2_header *)origTable3)->Length;
+                    nameLen = strlen("DSDT@") + 8 + 1;
+                    nameBuf = malloc(nameLen);
+                    sprintf(nameBuf, "DSDT@%08X", origTable3);
+                    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                    DT__AddProperty(node, nameBuf, length, origTable3);
+                    total_size += length;
+                    total_number++;
+                }
+            }
+        }
+    } else {
+        DBG("saveOriginalACPI: can't find OEM table: RSDT@%08x.\n", RSDT);
+    }
+    
+    if (RSDP->Revision > 0) {
+        XSDT = (struct acpi_2_header *)(RSDP->XsdtAddress);
+        if (XSDT && tableSign(XSDT->Signature, "XSDT")) {
+            length = XSDT->Length;
+            nameLen = strlen("XSDT@") + 8 + 1;
+            nameBuf = malloc(nameLen);
+            sprintf(nameBuf, "XSDT@%08X", XSDT);
+            DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+            DT__AddProperty(node, nameBuf, length, XSDT);
+            total_number++;
+            total_size += length;
+            origTable = (void *)(XSDT + 1);
+            for (r = 0; origTable < ((void *)XSDT + XSDT->Length); origTable += 8, r += 4) {
+                if ((uint64_t)*(uint32_t *)((void *)(RSDT + 1) + r) != *(uint64_t *)origTable) {
+                    origTable2 = (void *)(*(uint64_t *)origTable);
+                    length = ((struct acpi_2_header *)origTable2)->Length;
+                    nameLen = strlen("X_XXXX@") + 8 + 1;
+                    nameBuf = malloc(nameLen);
+                    sprintf(nameBuf, "X_%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], origTable2);
+                    DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                    DT__AddProperty(node, nameBuf, length, origTable2);
+                    total_size += length;
+                    total_number++;
+                    if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP")) {
+                        if (((struct acpi_2_fadt *)origTable2)->FACS != (uint32_t)((struct acpi_2_fadt *)origTable2)->X_FACS) {
+                            origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_FACS);
+                            length = ((struct acpi_2_rsdt *)origTable3)->Length;
+                            nameLen = strlen("X_FACS@") + 8 + 1;
+                            nameBuf = malloc(nameLen);
+                            sprintf(nameBuf, "X_FACS@%08X", origTable3);
+                            DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                            DT__AddProperty(node, nameBuf, length, origTable3);
+                            total_size += length;
+                            total_number++;
+                        }
+                        if (((struct acpi_2_fadt *)origTable2)->DSDT != (uint32_t)((struct acpi_2_fadt *)origTable2)->X_DSDT) {
+                            origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_DSDT);
+                            length = ((struct acpi_2_rsdt *)origTable3)->Length;
+                            nameLen = strlen("X_DSDT@") + 8 + 1;
+                            nameBuf = malloc(nameLen);
+                            sprintf(nameBuf, "X_DSDT@%08X", origTable3);
+                            DBG("saveOriginalACPI: OEM table %s found, size=%d: saving.\n", nameBuf, length);
+                            DT__AddProperty(node, nameBuf, length, origTable3);
+                            total_size += length;
+                            total_number++;
+                        }
+                    }
+                }
+            }
+        } else {
+            DBG("saveOriginalACPI: can't find OEM table: XSDT@%x.\n", origTable);
+        }
+    }
+    
+    DBG("saveOriginalACPI: %d original table%s found and saved, total size=%d.\n", total_number, (total_number != 1) ? "s" : "", total_size);
+    if (!RSDT && !XSDT) return -1;
+    else return total_number;
+}
+
 /*
  * Entrypoint from boot.c
  */
 void setupFakeEfi(void)
 {
-	// Generate efi device strings 
+	// Generate efi device strings
 	setup_pci_devs(root_pci_dev);
 
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
 
 	// load smbios.plist file if any
 	setupSmbiosConfigFile("smbios.plist");
-
-	setupSMBIOSTable();
+    
+    // Setup ACPI with DSDT overrides (mackerintel's patch)
+	setupAcpi();
+    
+    setupSMBIOS();
+    
+    // Setup board-id: need to be called after getSmbios!
+    setupBoardId();
+    
+    // Setup system-type: We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
+	// because we need to take care of FACP original content, if it is correct.
+	setupSystemType();
+    
+    // Setup the '/' node
+	//setupRootNode();
+    
+	// Setup the '/chosen' node
+	setupChosenNode();
 
 	// Initialize the base table
 	if (archCpuType == CPU_TYPE_I386)
@@ -834,11 +1227,10 @@ void setupFakeEfi(void)
 		setupEfiTables64();
 	}
 
-	// Initialize the device tree
-	setupEfiDeviceTree();
+    // Setup efi node
+	setupEfiNode();
 
-	saveOriginalSMBIOS();
-
-	// Add configuration table entries to both the services table and the device tree
-	setupEfiConfigurationTable();
+    saveOriginalSMBIOS();
+    
+    saveOriginalACPI();
 }

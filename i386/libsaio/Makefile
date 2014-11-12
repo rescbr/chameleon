@@ -51,11 +51,11 @@ DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 all: $(DIRS_NEEDED) $(CONFIG_HEADERS) $(LIBS) all-recursive
 
 $(LIBS): $(SAIO_OBJS)
-	@echo "\t[RM] $@"
+	@echo "	[RM] $@"
 	@rm -f $@
-	@echo "\t[AR] $(@F)"
+	@echo "	[AR] $(@F)"
 	@ar q $@ $^ &> /dev/null
-	@echo "\t[RANLIB] $(@F)"
+	@echo "	[RANLIB] $(@F)"
 	@ranlib $(SYMROOT)/$(@F)
 
 clean-local:

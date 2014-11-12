@@ -23,11 +23,11 @@
 #define DBG(x...)	msglog(x)
 #endif
 
-uint32_t devices_number = 1;
-uint32_t builtin_set = 0;
-DevPropString *string = 0;
-uint8_t *stringdata = 0;
-uint32_t stringlength = 0;
+uint32_t devices_number		= 1;
+uint32_t builtin_set		= 0;
+DevPropString *string		= 0;
+uint8_t *stringdata		= 0;
+uint32_t stringlength		= 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
 {
@@ -35,7 +35,7 @@ char *efi_inject_get_devprop_string(uint32_t *len)
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
-	verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
+	DBG("efi_inject_get_devprop_string: NULL, trying stringdata\n");
 	return NULL;
 }
 
@@ -64,13 +64,14 @@ void setupDeviceProperties(Node *node)
 		binStr = convertHexStr2Binary(val, &cnt2);
 		if (cnt2 > 0) {
 			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
+            DBG("Adding device-properties string to DT");
 		}
 	}
 }
 
 DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
+	string = (struct DevPropString *)malloc(sizeof(struct DevPropString));
 
 	if(string == NULL) {
 		return NULL;
@@ -251,9 +252,11 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 	return 1;
 }
 
+// devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
-	char *buffer = (char*)malloc(string->length * 2);
+	int len = string->length * 2;
+	char *buffer = (char*)malloc(len);
 	char *ptr = buffer;
 
 	if(!buffer)
@@ -261,44 +264,73 @@ char *devprop_generate_string(DevPropString *string)
 		return NULL;
 	}
 
-	sprintf(buffer, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
+	snprintf(buffer, len, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
 			dp_swap16(string->numentries), string->WHAT3);
 	buffer += 24;
+	len -= 24;
 	int i = 0, x = 0;
 
 	while(i < string->numentries)
 	{
-		sprintf(buffer, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
+	        if (!(i < DEV_PROP_DEVICE_MAX_ENTRIES))
+		{
+	            break;
+	        }
+
+	        if(!len)
+		{
+	            break;
+	        }
+
+		snprintf(buffer, len, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
 				dp_swap16(string->entries[i]->numentries), string->entries[i]->WHAT2);
 		
 		buffer += 16;
-		sprintf(buffer, "%02x%02x%04x%08x%08x", string->entries[i]->acpi_dev_path.type,
+		len -= 16;
+		snprintf(buffer, len, "%02x%02x%04x%08x%08x", string->entries[i]->acpi_dev_path.type,
 				string->entries[i]->acpi_dev_path.subtype,
 				dp_swap16(string->entries[i]->acpi_dev_path.length),
 				string->entries[i]->acpi_dev_path._HID,
 				dp_swap32(string->entries[i]->acpi_dev_path._UID));
 
 		buffer += 24;
+		len -= 24;
 		for(x = 0;x < string->entries[i]->num_pci_devpaths; x++)
 		{
-			sprintf(buffer, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
+			if(!len)
+			{
+				break;
+			}
+			snprintf(buffer, len, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
 					string->entries[i]->pci_dev_path[x].subtype,
 					dp_swap16(string->entries[i]->pci_dev_path[x].length),
 					string->entries[i]->pci_dev_path[x].function,
 					string->entries[i]->pci_dev_path[x].device);
 			buffer += 12;
+			len -= 12;
 		}
-		
-		sprintf(buffer, "%02x%02x%04x", string->entries[i]->path_end.type,
+
+		if(!len)
+		{
+			break;
+		}
+
+		snprintf(buffer, len, "%02x%02x%04x", string->entries[i]->path_end.type,
 				string->entries[i]->path_end.subtype,
 				dp_swap16(string->entries[i]->path_end.length));
 		
 		buffer += 8;
+		len -= 8;
 		uint8_t *dataptr = string->entries[i]->data;
 		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
 		{
-			sprintf(buffer, "%02x", *dataptr++);
+			if(!len)
+			{
+				break;
+			}
+			snprintf(buffer, len, "%02x", *dataptr++);
 			buffer += 2;
+			len -= 2;
 		}
 		i++;
 	}
@@ -338,7 +370,7 @@ void devprop_free_string(DevPropString *string)
 int hex2bin(const char *hex, uint8_t *bin, int len)
 {
 	char	*p;
-	int	i;
+	int     i;
 	char	buf[3];
 
 	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2) {
@@ -386,7 +418,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 	char *devicepath = get_pci_dev_path(eth_dev);
 	DevPropDevice *device = NULL;
 
-	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
+	DBG("LAN Controller [%04x:%04x] :: %s.\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
 	if(!string) {
 		string = devprop_create_string();
@@ -394,7 +426,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 
 	device = devprop_add_device(string, devicepath);
 	if(device) {
-		verbose("Setting up lan keys\n");
+		verbose("Setting up LAN keys.\n");
 		devprop_add_network_template(device, eth_dev->vendor_id);
 		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata) {

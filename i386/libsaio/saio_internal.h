@@ -28,11 +28,12 @@
 #include "saio_types.h"
 
 /* asm.s */
-extern void   real_to_prot(void);
-extern void   prot_to_real(void);
-extern void   halt(void);
-extern void   startprog(unsigned int address, void *arg);
-extern void   loader(UInt32 code, UInt32 cmdptr);
+extern void		real_to_prot(void);
+extern void		prot_to_real(void);
+extern void		halt(void);
+extern void		startprog(unsigned int address, void *arg);
+extern void		loader(UInt32 code, UInt32 cmdptr);
+extern uint64_t		computeRand(void);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -79,10 +80,9 @@ extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 
 /* cache.c */
-extern void   CacheReset();
-extern void   CacheInit(CICell ih, long blockSize);
-extern long   CacheRead(CICell ih, char *buffer, long long offset,
-                        long length, long cache);
+extern void		CacheReset();
+extern void		CacheInit(CICell ih, long blockSize);
+extern long		CacheRead(CICell ih, char *buffer, long long offset, long length, long cache);
 
 /* console.c */
 extern bool   gVerboseMode;
@@ -98,6 +98,7 @@ extern int    verbose(const char *format, ...);
 extern void   stop(const char *format, ...);
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
+extern uint64_t getRTCdatetime();
 
 /* disk.c */
 extern void   rescanBIOSDevice(int biosdev);
@@ -162,7 +163,8 @@ extern bool	  getDimensionForKey( const char *key, unsigned int *value, config_f
 extern int    loadConfigFile(const char *configFile, config_file_t *configBuff);
 extern int    loadSystemConfig(config_file_t *configBuff);
 extern int    loadHelperConfig(config_file_t *configBuff);
-extern int    loadChameleonConfig(config_file_t *configBuff);
+extern int    loadChameleonConfig(config_file_t *configBuff, BVRef chain);
+extern int    loadChameleonConfigForDevice(config_file_t *configBuff, const char *device, const char *path);
 extern char * newString(const char *oldString);
 extern char * getNextArg(char ** ptr, char * val);
 extern int	  ParseXMLFile( char * buffer, TagPtr * dict );

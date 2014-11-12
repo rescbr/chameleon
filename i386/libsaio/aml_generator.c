@@ -376,9 +376,9 @@ AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, char* StringBuf)
 		node->Length = (uint8_t)(len + 3);
 		node->Buffer = malloc (node->Length);
 		node->Buffer[offset++] = AML_CHUNK_BYTE;
-		node->Buffer[offset++] = (char)len;
+		node->Buffer[offset++] = (char)(len+1);
 		memcpy(node->Buffer+offset, StringBuf, len);
-		node->Buffer[offset+len] = '\0';
+//		node->Buffer[offset+len] = '\0';
 	}
 
 	return node;
@@ -392,9 +392,9 @@ AML_CHUNK* aml_add_string(AML_CHUNK* parent, char* StringBuf)
 		int len = strlen(StringBuf);
 		node->Type = AML_CHUNK_STRING;
 		node->Length = (uint8_t)(len + 1);
-		node->Buffer = malloc (len);
+		node->Buffer = malloc (len+1);
 		memcpy(node->Buffer, StringBuf, len);
-		node->Buffer[len] = '\0';
+//		node->Buffer[len] = '\0';
 	}
 
 	return node;

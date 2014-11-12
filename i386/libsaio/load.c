@@ -18,11 +18,10 @@
  * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
- *  load.c - Functions for decoding a Mach-o Kernel.
  *
- *  Copyright (c) 1998-2003 Apple Computer, Inc.
+ * load.c - Functions for decoding a Mach-o Kernel.
+ *
+ * Copyright (c) 1998-2003 Apple Computer, Inc.
  *
  */
 
@@ -108,10 +107,10 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	unsigned long  cnt;
 	long  ret = -1;
 	unsigned int entry = 0;
-    
+
 	gBinaryAddress = (unsigned long)binary;
 
-	mH = (struct mach_header *)(gBinaryAddress);
+	mH = (struct mach_header *)gBinaryAddress;
 
     /*#if DEBUG
 	DBG("magic:          0x%x\n", (unsigned)mH->magic);
@@ -121,16 +120,17 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	DBG("ncmds:          0x%x\n", (unsigned)mH->ncmds);
 	DBG("sizeofcmds:     0x%x\n", (unsigned)mH->sizeofcmds);
 	DBG("flags:          0x%x\n", (unsigned)mH->flags);
-    DBG("archCpuType:    0x%x\n", archCpuType);
+	DBG("archCpuType:    0x%x\n", archCpuType);
 	//getchar();
     #endif*/
-    
+
 	switch (archCpuType)
 	{
 		case CPU_TYPE_I386:
 
-			if (mH->magic != MH_MAGIC) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC)
+			{
+				error("Mach-O (i386) file has bad magic number\n");
 				return -1;
 			}
 
@@ -143,8 +143,9 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 				return -1;
 			}
 */
-			if (mH->magic != MH_MAGIC_64) {
-				error("Mach-O file has bad magic number\n");
+			if (mH->magic != MH_MAGIC_64)
+			{
+				error("Mach-O file (x86_64) has bad magic number\n");
 				return -1;
 			}
 
@@ -192,13 +193,12 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 #endif
 			break;
 		}
-
-
-	if (ret != 0) {
-		return -1;
-	}
-
-	cmdBase += cmdsize;
+        
+        if (ret != 0) {
+            return -1;
+        }
+        
+        cmdBase += cmdsize;
 	}
 
 	*rentry = (entry_t)( (unsigned long) entry & 0x3fffffff );
@@ -208,18 +208,18 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	cmdBase = cmdstart;
 
 	for (cnt = 0; cnt < ncmds; cnt++) {
-	    cmd = ((long *)cmdBase)[0];
-	    cmdsize = ((long *)cmdBase)[1];
+		cmd = ((long *)cmdBase)[0];
+		cmdsize = ((long *)cmdBase)[1];
 		
-	    if (cmd == LC_SYMTAB) {
-		   if (DecodeSymbolTable(cmdBase) != 0) {
-			return -1;
-		   }
-        }
+		if (cmd == LC_SYMTAB) {
+			if (DecodeSymbolTable(cmdBase) != 0) {
+				return -1;
+			}
+		}
 
 		cmdBase += cmdsize;
-    }
-	
+	}
+
 	return ret;
 }
 

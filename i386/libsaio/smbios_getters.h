@@ -10,6 +10,9 @@
 #define SMBIOS_RANGE_START      0x000F0000
 #define SMBIOS_RANGE_END        0x000FFFFF
 
+/* '_SM_' in little endian: '_MS_' */
+#define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
+
 #define NOT_AVAILABLE		"N/A"
 
 typedef enum
@@ -17,8 +20,8 @@ typedef enum
 	kSMBString,
 	kSMBByte,
 	kSMBWord,
-	kSMBDWord
-//	kSMBQWord
+	kSMBDWord,
+	kSMBQWord
 } SMBValueType;
 
 typedef union
@@ -27,7 +30,7 @@ typedef union
 	uint8_t		byte;
 	uint16_t	word;
 	uint32_t	dword;
-//	uint64_t	qword;
+	uint64_t	qword;
 } returnType;
 
 extern bool getProcessorInformationExternalClock(returnType *value);

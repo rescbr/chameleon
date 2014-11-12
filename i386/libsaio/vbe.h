@@ -58,11 +58,11 @@
  */
 enum {
 	funcGetControllerInfo		= 0x4F00,
-	funcGetModeInfo			= 0x4F01,
-	funcSetMode			= 0x4F02,
-	funcGetCurrentMode		= 0x4F03,
+	funcGetModeInfo             = 0x4F01,
+	funcSetMode                 = 0x4F02,
+	funcGetCurrentMode          = 0x4F03,
 	funcSaveRestoreState		= 0x4F04,
-	funcWindowControl		= 0x4F05,
+	funcWindowControl           = 0x4F05,
 	funcGetSetScanLineLength	= 0x4F06,
 	funcGetSetDisplayStart		= 0x4F07,
 	funcGetSetPaletteFormat		= 0x4F08,
@@ -268,19 +268,20 @@ enum {
  */
 typedef unsigned long VBEPalette[256];
 
-extern int getVBEInfo(void *vinfo_p);
-extern int getVBEModeInfo(int mode, void *minfo_p);
-extern int getVBEDACFormat(unsigned char *format);
-extern int setVBEDACFormat(unsigned char format);
-extern int setVBEPalette(void *palette);
-extern int getVBEPalette(void *palette);
-extern int setVBEMode(unsigned short mode, const VBECRTCInfoBlock *timing);
-extern int getVBECurrentMode(unsigned short *mode);
-extern int getVBEPixelClock(unsigned short mode, unsigned long *pixelClock);
-extern int generateCRTCTiming(unsigned short     width,
+extern uint8_t getVBEInfo(void *vinfo_p);
+extern uint8_t getVBEModeInfo(int mode, void *minfo_p);
+extern uint8_t getVBEDACFormat(unsigned char *format);
+extern uint8_t setVBEDACFormat(unsigned char format);
+extern uint8_t setVBEPalette(void *palette);
+extern uint8_t getVBEPalette(void *palette);
+extern uint8_t setVBEMode(unsigned short mode, const VBECRTCInfoBlock *timing);
+extern uint8_t getVBECurrentMode(unsigned short *mode);
+extern uint8_t getVBEPixelClock(unsigned short mode, unsigned long *pixelClock);
+extern uint8_t generateCRTCTiming(unsigned short     width,
                               unsigned short     height,
                               unsigned long      paramValue,
                               int                paramType,
                               VBECRTCInfoBlock * timing);
+extern uint8_t getVBEEDID(void *edidBlock);
 
 #endif /* !__LIBSAIO_VBE_H */

@@ -151,10 +151,10 @@ typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
 typedef void (*BVFree)(CICell ih);
 
 struct iob {
-	unsigned int   i_flgs;			/* see F_* below */
-	unsigned int   i_offset;		/* seek byte offset in file */
-	int			   i_filesize;		/* size of file */
-	char *		   i_buf;			/* file load address */
+	char *         i_buf;           /* file load address */
+	unsigned int   i_flgs;          /* see F_* below */
+	unsigned int   i_offset;        /* seek byte offset in file */
+	int            i_filesize;      /* size of file */
 };
 
 #define BPS	   512				/* sector size of the device */
@@ -212,7 +212,8 @@ enum {
 	kBVFlagBootable			= 0x08,
 	kBVFlagEFISystem		= 0x10,
 	kBVFlagBooter			= 0x20,
-	kBVFlagSystemVolume		= 0x40
+	kBVFlagSystemVolume		= 0x40,
+	kBVFlagInstallVolume		= 0x80
 };
 
 enum {
@@ -224,15 +225,23 @@ enum {
 	kBIOSDevMask			= 0xFF
 };
 
-enum {
-	kPartitionTypeHFS		= 0xAF,
-	kPartitionTypeHPFS		= 0x07,
-	kPartitionTypeFAT16		= 0x06,
-	kPartitionTypeFAT32		= 0x0c,
-	kPartitionTypeEXT3		= 0x83,
-	kPartitionTypeBEFS		= 0xEB,
-	kPartitionTypeFreeBSD		= 0xa5,
-	kPartitionTypeOpenBSD		= 0xa6
+enum
+{
+	//KPartitionTypeFAT12		= 0x01,     // FAT12
+	kPartitionTypeHPFS		= 0x07,     // Mac OS X
+	kPartitionTypeFAT16		= 0x06,     // FAT16
+	kPartitionTypeFAT32		= 0x0C,     // FAT32
+	kPartitionTypeEXT3		= 0x83,     // Linux
+	kPartitionTypeOSXBoot		= 0xAB,     // Mac OS X Boot partition
+	kPartitionTypeFreeBSD		= 0xA5,     // FreeBSD
+	kPartitionTypeOpenBSD		= 0xA6,     // OpenBSD
+	//kPartitionTypeNeXTSTEP	= 0xA7      // NeXTSTEP
+	//kPartitionTypeNetBSD		= 0xA9      // NetBSD
+	kPartitionTypeHFS		= 0xAF,     // Mac OS X
+	//kPartitionTypeSolaris		= 0xBE,	    // Solaris
+	kPartitionTypeBEFS		= 0xEB,     // BeOS BFS
+	//kPartitionTypeBeOS		= 0xEB,     // BeOS BFS
+	//kPartitionTypeSkyOS		= 0xEC,     // SkyOS
 };
 
 //#define BIOS_DEV_TYPE(d)	((d) & kBIOSDevTypeMask)

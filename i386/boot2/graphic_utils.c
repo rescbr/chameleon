@@ -1,8 +1,8 @@
-
  /* Graphic utility functions and data types
   * Prashant Vaibhav (C) 12/12/2008
   * Chameleon
   */
+
 #include "boot.h"
 #include "graphic_utils.h"
 #include "gui.h"

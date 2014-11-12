@@ -85,6 +85,42 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 	*(pi->str)++ = c;
 	return c;
 }
+// Bungo:
+typedef struct {
+    uint16_t year;
+    uint8_t  mon;
+    uint8_t  day;
+    uint8_t  hour;
+    uint8_t  mins;
+    uint8_t  secs;
+    uint8_t  dlight;
+} datetime_t;
+
+uint64_t getRTCdatetime() // 0xYYYYMMDDHHMMSS0L in decimal
+{
+    biosBuf_t bb;
+    datetime_t datetime;
+    
+    bb.intno = 0x1a;
+	bb.eax.r.h = 0x04; // get RTC date
+    //bb.flags.cf = 0;
+    bios(&bb);
+    if (bb.flags.cf) return 0;
+    datetime.year = (bb.ecx.r.h >> 4) * 1000 + (bb.ecx.r.h & 0x0F) * 100 + (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+    datetime.mon = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+    datetime.day = (bb.edx.r.l >> 4) * 10 + (bb.edx.r.l & 0x0F) * 1;
+    
+    bb.intno = 0x1a;
+	bb.eax.r.h = 0x02; // get RTC time
+    //bb.flags.cf = 0;
+	bios(&bb);
+    if (bb.flags.cf) return 0;
+    datetime.dlight = bb.edx.r.l & 0x0F;
+    datetime.hour = (bb.ecx.r.h >> 4) * 10 + (bb.ecx.r.h & 0x0F) * 1;
+    datetime.mins = (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+    datetime.secs = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+    return *(uint64_t *)&datetime;
+}
 
 void initBooterLog(void)
 {
@@ -92,6 +128,8 @@ void initBooterLog(void)
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
 	msglog("%s\n", "Chameleon " I386BOOT_CHAMELEONVERSION " (Bungo branch) r" I386BOOT_CHAMELEONREVISION " [" I386BOOT_BUILDDATE "]");
+    uint64_t datetime = getRTCdatetime();
+    msglog("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", ((datetime_t*)&datetime)->year, ((datetime_t*)&datetime)->mon, ((datetime_t*)&datetime)->day, ((datetime_t*)&datetime)->hour, ((datetime_t*)&datetime)->mins, ((datetime_t*)&datetime)->secs);
 }
 
 void msglog(const char * fmt, ...)
@@ -246,15 +284,15 @@ int error(const char * fmt, ...)
 	} else {
 		vprf(fmt, ap);
 	}
-    
+
     {
 		// Kabyl: BooterLog
 		struct putc_info pi;
-        
+
 		if (!msgbuf) {
 			return 0;
 		}
-        
+
 		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
 			return 0;
 		}
@@ -263,7 +301,7 @@ int error(const char * fmt, ...)
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
-    
+
 	va_end(ap);
 	return(0);
 }

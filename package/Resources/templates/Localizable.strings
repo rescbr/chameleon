@@ -194,6 +194,9 @@ Dependencies: none";
 "EnableC6State_title" = "EnableC6State=Yes";
 "EnableC6State_description" = "Enable specific Processor power state, C6.";
 
+"EnableC7State_title" = "EnableC7State=Yes";
+"EnableC7State_description" = "Enable specific Processor power state, C7.";
+
 "GenerateCStates_title" = "GenerateCStates=Yes";
 "GenerateCStates_description" = "Enable auto generation of processor idle sleep states (C-States).";
 
@@ -257,6 +260,14 @@ Dependencies: none";
 "HDEFLayoutIDx03_title" = "LayoutID=3";
 "HDEFLayoutIDx03_description" = "Set HDEF layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
+
+"HDEFLayoutIDx05_title" = "LayoutID=5";
+"HDEFLayoutIDx05_description" = "Set HDEF layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDEFLayoutIDx07_title" = "LayoutID=7";
+"HDEFLayoutIDx07_description" = "Set HDEF layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
 
 "HDEFLayoutIDx12_title" = "LayoutID=12";
 "HDEFLayoutIDx12_description" = "Set HDEF layout-it to 12:
@@ -355,6 +366,14 @@ Dependencies: none";
 "HDAULayoutIDx03_title" = "LayoutID=3";
 "HDAULayoutIDx03_description" = "Set HDAU layout-it to 3:
 003 (0x03, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx05_title" = "LayoutID=5";
+"HDAULayoutIDx05_description" = "Set HDAU layout-it to 5:
+005 (0x05, 0x00, 0x00, 0x00).";
+
+"HDAULayoutIDx07_title" = "LayoutID=7";
+"HDAULayoutIDx07_description" = "Set HDAU layout-it to 7:
+007 (0x07, 0x00, 0x00, 0x00).";
 
 "HDAULayoutIDx12_title" = "LayoutID=12";
 "HDAULayoutIDx12_description" = "Set HDAU layout-it to 12:
@@ -481,52 +500,52 @@ Dependencies: none";
 // ----------------------------------------------------------------------------
 
 "IntelAzulx00_title" = "00000604";
-"IntelAzulx00_description" = "Set 00000604 for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx00_description" = "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx01_title" = "0000060c";
-"IntelAzulx01_description" = "Set 0000060c for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx01_description" = "Set 0000060c for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx02_title" = "00001604";
-"IntelAzulx02_description" = "Set 00001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx02_description" = "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx03_title" = "0000160a";
-"IntelAzulx03_description" = "Set 0000160a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx03_description" = "Set 0000160a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx04_title" = "0000160c";
-"IntelAzulx04_description" = "Set 0000160c for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx04_description" = "Set 0000160c for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx05_title" = "00002604";
-"IntelAzulx05_description" = "Set 00002604 for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx05_description" = "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx06_title" = "0000260a";
-"IntelAzulx06_description" = "Set 0000260a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx06_description" = "Set 0000260a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx07_title" = "0000260c";
-"IntelAzulx07_description" = "Set 0600260c for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx07_description" = "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx08_title" = "0000260d";
-"IntelAzulx08_description" = "Set 0000260d for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx08_description" = "Set 0000260d for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx09_title" = "02001604";
-"IntelAzulx09_description" = "Set 02001604 for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx09_description" = "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx10_title" = "0300220d";
-"IntelAzulx10_description" = "Set 0300220d for Intel HD5000 (Desktop) AAPL,ig-platform-id.";
+"IntelAzulx10_description" = "Set 0300220d for Intel Haswell (Desktop) AAPL,ig-platform-id.";
 
 "IntelAzulx11_title" = "0500260a";
-"IntelAzulx11_description" = "Set 0500260a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx11_description" = "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx12_title" = "0600260a";
-"IntelAzulx12_description" = "Set 0600260a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx12_description" = "Set 0600260a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx13_title" = "0700260d";
-"IntelAzulx13_description" = "Set 0700260d for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx13_description" = "Set 0700260d for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx14_title" = "0800260a";
-"IntelAzulx14_description" = "Set 0800260a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx14_description" = "Set 0800260a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 "IntelAzulx15_title" = "08002e0a";
-"IntelAzulx15_description" = "Set 08002e0a for Intel HD5000 (Mobile) AAPL,ig-platform-id.";
+"IntelAzulx15_description" = "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
 // ----------------------------------------------------------------------------
 
@@ -580,6 +599,9 @@ Dependencies: none";
 "EnableDualLink_title" = "EnableDualLink=Yes";
 "EnableDualLink_description" = "Enables DualLink options for nVidia and ATi cards.";
 
+"NvidiaGeneric_title" = "NvidiaGeneric=Yes";
+"NvidiaGeneric_description" = "Use the classic Nvidia name for the SystemProfiler (disabled by default).";
+
 // ----------------------------------------------------------------------------
 // Boot options - KERNEL FLAGS
 // ----------------------------------------------------------------------------
@@ -612,6 +634,9 @@ Findings credits to bcc9.";
 Info here: New Nvidia Retail Driver Install Solution
 http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/
 Findings credits to meklort and Rampage Dev.";
+
+"kext-dev-mode1_title" = "kext-dev-mode=1";
+"kext-dev-mode1_description" = "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg.";
 
 "Dart0_title" = "dart=0";
 "Dart0_description" = "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).

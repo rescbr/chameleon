@@ -27,6 +27,7 @@
  */
 
 #include "libsaio.h"
+#include "boot.h"
 #include "bootstruct.h"
 
 #ifndef DEBUG_BOOTSTRUCT
@@ -56,7 +57,7 @@ void initKernBootStruct( void )
 	Node *node;
 	int nameLen;
 	static int init_done = 0;
-	
+
 	if ( !init_done )
 	{
 		bootArgs = (boot_args *)malloc(sizeof(boot_args));
@@ -64,11 +65,11 @@ void initKernBootStruct( void )
 		bootInfo = (PrivateBootInfo_t *)malloc(sizeof(PrivateBootInfo_t));
 		if (bootArgs == 0 || bootArgsPreLion == 0 || bootInfo == 0)
 			stop("Couldn't allocate boot info\n");
-		
+
 		bzero(bootArgs, sizeof(boot_args));
 		bzero(bootArgsPreLion, sizeof(boot_args_pre_lion));
 		bzero(bootInfo, sizeof(PrivateBootInfo_t));
-		
+
 		// Get system memory map. Also update the size of the
 		// conventional/extended memory for backwards compatibility.
 		
@@ -76,66 +77,66 @@ void initKernBootStruct( void )
 			getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
 						  (unsigned long *) &bootInfo->convmem,
 						  (unsigned long *) &bootInfo->extmem );
-		
+
 		if ( bootInfo->memoryMapCount == 0 )
 		{
 			// BIOS did not provide a memory map, systems with
 			// discontiguous memory or unusual memory hole locations
 			// may have problems.
-			
-			bootInfo->convmem = getConventionalMemorySize();
-			bootInfo->extmem  = getExtendedMemorySize();
+
+			bootInfo->convmem	= getConventionalMemorySize();
+			bootInfo->extmem	= getExtendedMemorySize();
 		}
 		
 		bootInfo->configEnd	   = bootInfo->config;
 		bootArgs->Video.v_display = VGA_TEXT_MODE;
 		
-		DT__Initialize();
-		
-		node = DT__FindNode("/", true);
+        // DeviceTree init
+		//DT__Initialize();
+		//node = DT__FindNode("/", true);
+        node = DT__Initialize();
 		if (node == 0) {
 			stop("Couldn't create root node");
 		}
+        
 		getPlatformName(platformName);
 		nameLen = strlen(platformName) + 1;
 		DT__AddProperty(node, "compatible", nameLen, platformName);
 		DT__AddProperty(node, "model", nameLen, platformName);
-		
+
 		gMemoryMapNode = DT__FindNode("/chosen/memory-map", true);
-		
+
 		bootArgs->Version  = kBootArgsVersion;
 		bootArgs->Revision = kBootArgsRevision;
-		
+
 		bootArgsPreLion->Version  = kBootArgsPreLionVersion;
 		bootArgsPreLion->Revision = kBootArgsPreLionRevision;
-		
+
 		init_done = 1;
 	}
 }
 
-
 /* Copy boot args after kernel and record address. */
 
-void
-reserveKernBootStruct(void)
+void reserveKernBootStruct(void)
 {
-	if ((gMacOSVersion[0] == '1') && (gMacOSVersion[1] == '0')
-		&& (gMacOSVersion[2] == '.') && (gMacOSVersion[3] == '7' || gMacOSVersion[3] == '8' || gMacOSVersion[3] == '9'))
+	if ( TIGER || LEOPARD || SNOW_LEOPARD )
 	{
+		// for 10.4 10.5 10.6
+		void *oldAddr = bootArgsPreLion;
+		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
+		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
+	} else {
+		// for 10.7 10.8 10.9 10.10
 		void *oldAddr = bootArgs;
 		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
 		bcopy(oldAddr, bootArgs, sizeof(boot_args));
 	}
-	else
-	{
-		void *oldAddr = bootArgsPreLion;
-		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
-		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
-	}
 }
 
-void
-finalizeBootStruct(void)
+//==============================================================================
+
+void finalizeBootStruct(void)
 {
 	uint32_t size;
 	void *addr;
@@ -148,7 +149,7 @@ finalizeBootStruct(void)
 		// XXX could make a two-part map here
 		stop("Unable to convert memory map into proper format\n");
 	}
-	
+
 	// convert memory map to boot_args memory map
 	memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
 	bootArgs->MemoryMap = (uint32_t)memoryMap;
@@ -162,45 +163,50 @@ finalizeBootStruct(void)
 			case kMemoryRangeACPI:
 				memoryMap->Type = kEfiACPIReclaimMemory;
 				break;
+
 			case kMemoryRangeNVS:
 				memoryMap->Type = kEfiACPIMemoryNVS;
 				break;
+
 			case kMemoryRangeUsable:
 				memoryMap->Type = kEfiConventionalMemory;
 				break;
+
 			case kMemoryRangeReserved:
+
 			default:
 				memoryMap->Type = kEfiReservedMemoryType;
 				break;
 		}
-		memoryMap->PhysicalStart = range->base;
-		memoryMap->VirtualStart = range->base;
-		memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
-		memoryMap->Attribute = 0;
+
+		memoryMap->PhysicalStart	= range->base;
+		memoryMap->VirtualStart		= range->base;
+		memoryMap->NumberOfPages	= range->length >> I386_PGSHIFT;
+		memoryMap->Attribute		= 0;
 	}
-	
+
 	// copy bootFile into device tree
 	// XXX
-	
+
 	// add PCI info somehow into device tree
 	// XXX
-	
+
 	// Flatten device tree
 	DT__FlattenDeviceTree(0, &size);
 	addr = (void *)AllocateKernelMemory(size);
 	if (addr == 0) {
 		stop("Couldn't allocate device tree\n");
 	}
-	
+
 	DT__FlattenDeviceTree((void **)&addr, &size);
 	bootArgs->deviceTreeP = (uint32_t)addr;
 	bootArgs->deviceTreeLength = size;
 
 	// Copy BootArgs values to older structure
-	
+
 	memcpy(&bootArgsPreLion->CommandLine, &bootArgs->CommandLine, BOOT_LINE_LENGTH);
 	memcpy(&bootArgsPreLion->Video, &bootArgs->Video, sizeof(Boot_Video));
-	
+
 	bootArgsPreLion->MemoryMap = bootArgs->MemoryMap;
 	bootArgsPreLion->MemoryMapSize = bootArgs->MemoryMapSize;
 	bootArgsPreLion->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize;
@@ -208,16 +214,16 @@ finalizeBootStruct(void)
 	
 	bootArgsPreLion->deviceTreeP = bootArgs->deviceTreeP;
 	bootArgsPreLion->deviceTreeLength = bootArgs->deviceTreeLength;
-	
+
 	bootArgsPreLion->kaddr = bootArgs->kaddr;
 	bootArgsPreLion->ksize = bootArgs->ksize;
-	
+
 	bootArgsPreLion->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart;
 	bootArgsPreLion->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount;
 	bootArgsPreLion->efiSystemTable = bootArgs->efiSystemTable;
-	
+
 	bootArgsPreLion->efiMode = bootArgs->efiMode;
-	
+
 	bootArgsPreLion->performanceDataStart = bootArgs->performanceDataStart;
 	bootArgsPreLion->performanceDataSize = bootArgs->performanceDataSize;
 	bootArgsPreLion->efiRuntimeServicesVirtualPageStart = bootArgs->efiRuntimeServicesVirtualPageStart;

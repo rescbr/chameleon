@@ -92,28 +92,30 @@ uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 static hda_controller_devices know_hda_controller[] = {
 	//8086  Intel Corporation
-	{ HDA_INTEL_HASWELL,     "Haswell" },
-	{ HDA_INTEL_CRYSTAL,     "Crystal Well" },
-	{ HDA_INTEL_CPT,     "6 Series/C200 Series Chipset Family" },
-	{ HDA_INTEL_PATSBURG,"C600/X79 series chipset" },
-	{ HDA_INTEL_PPT1,    "7 Series/C210 Series Chipset Family" },
-	{ HDA_INTEL_82801F,  "82801FB/FBM/FR/FW/FRW (ICH6 Family)" },
-	{ HDA_INTEL_63XXESB, "631x/631xESB/632xESB" },
-	{ HDA_INTEL_82801G,  "NM10/ICH7 Family" },
-	{ HDA_INTEL_82801H,  "82801H (ICH8 Family)" },
-	{ HDA_INTEL_82801I,  "82801I (ICH9 Family)" },
-	{ HDA_INTEL_82801JI, "82801JI (ICH10 Family)" },
-	{ HDA_INTEL_82801JD, "82801JD/DO (ICH10 Family) " },
-	{ HDA_INTEL_PCH,     "5 Series/3400 Series" },
-	{ HDA_INTEL_PCH2,    "5 Series/3400 Series" },
-	{ HDA_INTEL_SCH,     "System Controller Hub (SCH Poulsbo)" },
-	{ HDA_INTEL_LPT1,     "Lynx Point" },
-	{ HDA_INTEL_LPT2,     "Lynx Point" },
-	{ HDA_INTEL_LYNX,     "Lynx Point-LP" },
-	{ HDA_INTEL_LYNX2,     "Lynx Point-LP" },
+	{ HDA_INTEL_HASWELL,	"Haswell-ULT" },
+	{ HDA_INTEL_HASWELL2,	"Haswell" },
+	{ HDA_INTEL_CRYSTAL,	"Crystal Well" },
+	{ HDA_INTEL_CPT,	"6 Series/C200 Series Chipset Family" },
+	{ HDA_INTEL_PATSBURG,	"C600/X79 series chipset" },
+	{ HDA_INTEL_PPT1,	"7 Series/C210 Series Chipset Family" },
+	{ HDA_INTEL_82801F,	"82801FB/FBM/FR/FW/FRW (ICH6 Family)" },
+	{ HDA_INTEL_63XXESB,	"631x/631xESB/632xESB" },
+	{ HDA_INTEL_82801G,	"NM10/ICH7 Family" },
+	{ HDA_INTEL_82801H,	"82801H (ICH8 Family)" },
+	{ HDA_INTEL_82801I,	"82801I (ICH9 Family)" },
+	{ HDA_INTEL_82801JI,	"82801JI (ICH10 Family)" },
+	{ HDA_INTEL_82801JD,	"82801JD/DO (ICH10 Family) " },
+	{ HDA_INTEL_PCH,	"5 Series/3400 Series" },
+	{ HDA_INTEL_PCH2,	"5 Series/3400 Series" },
+	{ HDA_INTEL_SCH,	"System Controller Hub (SCH Poulsbo)" },
+	{ HDA_INTEL_SCH2,	"Wildcat Point" },
+	{ HDA_INTEL_LPT1,	"Wellsburg" },
+	{ HDA_INTEL_LPT2,	"Wellsburg" },
+	{ HDA_INTEL_LYNX,	"Lynx Point" },
+	{ HDA_INTEL_LYNX2,	"Lynx Point" },
 	//10de  NVIDIA Corporation
-	{ HDA_NVIDIA_MCP51,  "MCP51" },
-	{ HDA_NVIDIA_MCP55,  "MCP55" },
+	{ HDA_NVIDIA_MCP51,	"MCP51" },
+	{ HDA_NVIDIA_MCP55,	"MCP55" },
 	{ HDA_NVIDIA_MCP61_1, "MCP61" },
 	{ HDA_NVIDIA_MCP61_2, "MCP61" },
 	{ HDA_NVIDIA_MCP65_1, "MCP65" },
@@ -485,7 +487,8 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 	int i;
 
 	/* Get format for vendor ID */
-	switch (controller_vendor_id) {
+	switch (controller_vendor_id)
+	{
 		case ATI_VENDORID:
 			name_format = "ATI %s HDA Controller (HDMi)"; break;
 
@@ -511,8 +514,10 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 			break;
 	}
 
-	for (i = 0; i < HDAC_DEVICES_LEN; i++) {
-		if (know_hda_controller[i].model == controller_model) {
+	for (i = 0; i < HDAC_DEVICES_LEN; i++)
+	{
+		if (know_hda_controller[i].model == controller_model)
+		{
 			snprintf(desc, sizeof(desc), name_format, know_hda_controller[i].desc);
 			return desc;
 		}
@@ -575,26 +580,29 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	verbose("- AUDIO DEVICE INFO -\n");
 	verbose("--------------------------------\n");
 
-	switch ((controller_device_id << 16) | controller_vendor_id) {
+	switch ((controller_device_id << 16) | controller_vendor_id)
+	{
 
 	/***********************************************************************
 	* The above case are intended as for HDEF device at address 0x001B0000
 	***********************************************************************/
 		case HDA_INTEL_HASWELL:
+		case HDA_INTEL_HASWELL2:
 		case HDA_INTEL_CRYSTAL:
 		case HDA_INTEL_CPT:
 		case HDA_INTEL_PATSBURG:
-        case HDA_INTEL_PPT1:
+		case HDA_INTEL_PPT1:
 		case HDA_INTEL_82801F:
 		case HDA_INTEL_63XXESB:
 		case HDA_INTEL_82801G:
 		case HDA_INTEL_82801H:
-        case HDA_INTEL_82801I:
+		case HDA_INTEL_82801I:
 		case HDA_INTEL_82801JI:
 		case HDA_INTEL_82801JD:
 		case HDA_INTEL_PCH:
 		case HDA_INTEL_PCH2:
-        case HDA_INTEL_SCH:
+		case HDA_INTEL_SCH:
+		case HDA_INTEL_SCH2:
 		case HDA_INTEL_LPT1:
 		case HDA_INTEL_LPT2:
 		case HDA_INTEL_LYNX:
@@ -603,7 +611,8 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	if (getValueForKey(kHDEFLayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDEF_LEN * 2)
 	{
 		uint8_t new_HDEF_layout_id[HDEF_LEN];
-		if (hex2bin(value, new_HDEF_layout_id, HDEF_LEN) == 0)	{
+		if (hex2bin(value, new_HDEF_layout_id, HDEF_LEN) == 0)
+		{
 			memcpy(default_HDEF_layout_id, new_HDEF_layout_id, HDEF_LEN);
 			verbose("Using user supplied HDEF layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n", 
 				default_HDEF_layout_id[0], default_HDEF_layout_id[1], default_HDEF_layout_id[2], default_HDEF_layout_id[3]);
@@ -615,8 +624,12 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
                     default_HDEF_layout_id[0], default_HDEF_layout_id[1], default_HDEF_layout_id[2], default_HDEF_layout_id[3]);
 	}
 	devprop_add_value(device, "layout-id", default_HDEF_layout_id, HDEF_LEN);
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *)"Built-in", 9); // 0x09
+	devprop_add_value(device, "name", (uint8_t *)"audio", 6); // 0x06
+	devprop_add_value(device, "device_type", (uint8_t *)"High Definition Audio", 22); // 0x16
 	devprop_add_value(device, "built-in", &BuiltIn, 1);
-	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); // 0x0a
+	// "AFGLowPowerState" = <03000000>
 	break;
 
 	/****************************************************************************************************************

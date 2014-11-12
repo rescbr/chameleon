@@ -32,18 +32,30 @@ typedef struct png_alloc_node {
 png_alloc_node_t *png_alloc_head = NULL;
 png_alloc_node_t *png_alloc_tail = NULL;
 
+//==============================================================================
+
 png_alloc_node_t *png_alloc_find_node(void *addr)
 {
 	png_alloc_node_t *node;
+
 	for (node = png_alloc_head; node; node = node->next)
+	{
 		if (node->addr == addr)
+		{
 			break;
+		}
+	}
+
 	return node;
 }
+
+
+//==============================================================================
 
 void png_alloc_add_node(void *addr, size_t size)
 {
 	png_alloc_node_t *node;
+
 	if (png_alloc_find_node(addr))
 		return;
 	node = malloc(sizeof (png_alloc_node_t));
@@ -52,11 +64,14 @@ void png_alloc_add_node(void *addr, size_t size)
 	node->prev = png_alloc_tail;
 	node->next = NULL;
 	png_alloc_tail = node;
+
 	if (node->prev)
 		node->prev->next = node;
 	if (!png_alloc_head)
 		png_alloc_head = node;
 }
+
+//==============================================================================
 
 void png_alloc_remove_node(png_alloc_node_t *node)
 {
@@ -217,35 +232,33 @@ uint32_t vector8_resize(vector8_t *p, size_t size)
 	return 1;
 }
 
-uint32_t vector8_resizev(vector8_t *p, size_t size, uint8_t value)
-{	// resize and give all new elements the value
-	size_t oldsize = p->size, i;
-	if (!vector8_resize(p, size))
-		return 0;
-	for (i = oldsize; i < size; i++)
-		p->data[i] = value;
-	return 1;
-}
-
-void vector8_init(vector8_t *p)
-{
-	p->data = NULL;
-	p->size = p->allocsize = 0;
-}
-
 vector8_t *vector8_new(size_t size, uint8_t value)
 {
 	vector8_t *p = png_alloc_malloc(sizeof (vector8_t));
-	if(!p)
+	if (!p)
 	{
 		return NULL;
 	}
-	vector8_init(p);
-	if (size && !vector8_resizev(p, size, value))
+
+	p->data = NULL;
+	p->size = p->allocsize = 0;
+	if (size)
 	{
-		vector8_cleanup(p);
-		png_alloc_free(p);
-		return NULL;
+		size_t i;
+		size_t newsize = size * sizeof (uint32_t) * 2;
+		void *data = png_alloc_malloc(newsize);
+		if (!data)
+		{
+			png_alloc_free(p);
+			return NULL;
+		}
+		p->data = (uint8_t *) data;
+		p->allocsize = newsize;
+		p->size = size;
+		for (i = 0; i < size; ++i)
+		{
+			p->data[i] = value;
+		}
 	}
 	return p;
 }
@@ -904,12 +917,21 @@ void PNG_adam7Pass(uint8_t *out, uint8_t *linen, uint8_t *lineo, const uint8_t *
 int PNG_convert(const PNG_info_t *info, vector8_t *out, const uint8_t *in)
 {	// converts from any color type to 32-bit. return value = LodePNG error code
 	size_t i, c;
-	uint32_t bitDepth, colorType;
-	bitDepth = info->bitDepth;
-	colorType = info->colorType;
-	size_t numpixels = info->width * info->height, bp = 0;
-	vector8_resize(out, numpixels * 4);
-	uint8_t *out_data = out->size ? out->data : 0;
+	size_t numpixels = info->width * info->height;
+	if (!numpixels)
+	{
+		return 0; // nothing to do
+	}
+
+	if (!vector8_resize(out, numpixels * 4))
+	{
+		return 83; // out of memory
+	}
+
+	size_t bp = 0;
+	uint32_t bitDepth = info->bitDepth;
+	uint32_t colorType = info->colorType;
+	uint8_t *out_data = out->data;
 	if (bitDepth == 8 && colorType == 0) // greyscale
 		for (i = 0; i < numpixels; i++) {
 			out_data[4 * i + 0] = out_data[4 * i + 1] = out_data[4 * i + 2] = in[i];
@@ -1010,7 +1032,7 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 		return NULL;
 	size_t pos = 33; // first byte of the first chunk after the header
 	vector8_t *idat = NULL; // the data from idat chunks
-	bool IEND = false, known_type = true;
+	bool IEND = false;
 	info->key_defined = false;
 	// loop through the chunks, ignoring unknown chunks and stopping at IEND chunk. IDAT data is
 	// put at the start of the in buffer
@@ -1102,10 +1124,16 @@ PNG_info_t *PNG_decode(const uint8_t *in, uint32_t size)
 				return NULL;
 			}
 			pos += (chunkLength + 4); // skip 4 letters and uninterpreted data of unimplemented chunk
-			known_type = false;
 		}
 		pos += 4; // step over CRC (which is ignored)
 	}
+
+	if (!idat)
+	{
+		PNG_error = 1; // no data seen
+		return NULL;
+	}
+
 	uint32_t bpp = PNG_getBpp(info);
 	vector8_t *scanlines; // now the out buffer will be filled
 	scanlines = vector8_new(((info->width * (info->height * bpp + 7)) / 8) + info->height, 0);

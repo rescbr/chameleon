@@ -70,9 +70,11 @@ DT__GetName(Node *node);
 extern Property *
 DT__GetProperty(Node *node, const char *name);
 
-void
+Node *
 DT__Initialize(void);
 
+Node *
+DT__GetRootNode(void);
 
 // Free up memory used by in-memory representation of device tree.
 

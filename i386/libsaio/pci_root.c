@@ -7,16 +7,16 @@
 #include "bootstruct.h"
 
 #ifndef DEBUG_PCIROOT
-#define DEBUG_PCIROOT 1
+#define DEBUG_PCIROOT 0
 #endif
 
 #if DEBUG_PCIROOT
 #define DBG(x...)  printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)  msglog(x)
 #endif
 
-static int rootuid = 10; //value means function wasnt ran yet
+static int rootuid = 10; //value means function wasn't ran yet
 
 static unsigned int findrootuid(unsigned char * dsdt, int len)
 {
@@ -46,37 +46,36 @@ static unsigned int findpciroot(unsigned char * dsdt,int len)
 int getPciRootUID(void)
 {
 	char dsdt_dirSpec[128];
-
-	void *new_dsdt;
-	const char *val;
-	int len,fsize;
-	const char * dsdt_filename = NULL;
+	void *new_dsdt = NULL;
+	const char *val = "";
+	int len = 0,fsize = 0;
+	const char * dsdt_filename = "";
 	extern int search_and_get_acpi_fd(const char *, const char **);
 
 	if (rootuid < 10) return rootuid;
-	rootuid = 0;	/* default uid = 0 */
+	rootuid = 0;	/* default _UID = 0 */
 
-	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->chameleonConfig)) {
+	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->chameleonConfig) && len) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
 	/* Chameleon compatibility */
-	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->chameleonConfig)) {
+	else if (getValueForKey("PciRoot", &val, &len, &bootInfo->chameleonConfig) && len) {
 		if (isdigit(val[0])) rootuid = val[0] - '0';
 		goto out;
 	}
 	/* PCEFI compatibility */
-	else if (getValueForKey("-pci0", &val, &len, &bootInfo->chameleonConfig)) {
+	else if (getValueForKey("-pci0", &val, &len, &bootInfo->chameleonConfig) && len) {
 		rootuid = 0;
 		goto out;
 	}
-	else if (getValueForKey("-pci1", &val, &len, &bootInfo->chameleonConfig)) {
+	else if (getValueForKey("-pci1", &val, &len, &bootInfo->chameleonConfig) && len) {
 		rootuid = 1;
 		goto out;
 	}
 
 	// Try using the file specified with the DSDT option
-	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
+	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig) && len)
 	{
 		snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
 	}
@@ -85,12 +84,13 @@ int getPciRootUID(void)
 		sprintf(dsdt_dirSpec, "DSDT.aml");
 	}
 	
+    DBG("PCIrootUID: trying DSDT.aml... ");
 	int fd = search_and_get_acpi_fd(dsdt_dirSpec, &dsdt_filename);
 
 	// Check booting partition
 	if (fd<0)
 	{	  
-	  verbose("No DSDT found, using 0 as uid value.\n");
+	  DBG("PCIrootUID: file '%s' not found, using default value.\n", dsdt_filename);
 	  rootuid = 0;
 	  goto out;
 	}
@@ -98,16 +98,18 @@ int getPciRootUID(void)
 	fsize = file_size(fd);
 
 	if (!(new_dsdt = malloc(fsize))) {
-		verbose("[ERROR] alloc DSDT memory failed\n");
+		DBG("PCIrootUID: ERROR: allocating DSDT memory failed.\n");
 		close (fd);
 		goto out;
 	}
+    
 	if (read (fd, new_dsdt, fsize) != fsize) {
-		verbose("[ERROR] read %s failed\n", dsdt_filename);
+		DBG("PCIrootUID: ERROR: failed reading DSDT from '%s'.\n", dsdt_filename);
 		free(new_dsdt);
 		close (fd);
 		goto out;
 	}
+    
 	close (fd);
 
 	rootuid = findpciroot(new_dsdt, fsize);
@@ -117,10 +119,12 @@ int getPciRootUID(void)
 	if (rootuid == 11) rootuid=0; //usually when _UID isnt present, it means uid is zero
 	else if (rootuid < 0 || rootuid > 9) 
 	{
-		printf("PciRoot uid value wasnt found, using 0, if you want it to be 1, use -PciRootUID flag");
+		DBG("PCIrootUID: proper value wasn't found. Using default value (0). Use -PciRootUID flag to force.\n");
 		rootuid = 0;
+        return rootuid;
 	}
+    
 out:
-	verbose("Using PCI-Root-UID value: %d\n", rootuid);
+    DBG("PCIrootUID=0x%02X: using.\n", rootuid);
 	return rootuid;
 }

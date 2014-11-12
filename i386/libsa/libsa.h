@@ -28,6 +28,7 @@
 /* Exported API for standalone library */
 
 #include <mach-o/loader.h>
+#include <mach-o/fat.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdbool.h>
