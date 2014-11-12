@@ -652,7 +652,9 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.product         = kDefaultMacBookProBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
-		} else {
+		}
+		else
+		{
 			defaultSystemInfo.productName    = kDefaultMacBook;
 			defaultBIOSInfo.version          = kDefaultMacBookBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookBIOSReleaseDate;
@@ -661,7 +663,9 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
 		}
-	} else {
+	}
+	else
+	{
 		switch (Platform.CPU.NoCores)
 		{
 			case 1:

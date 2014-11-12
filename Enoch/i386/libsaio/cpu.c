@@ -20,6 +20,78 @@
 #endif
 
 /*
+ * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
+ */
+static uint64_t measure_tsc_frequency(void)
+{
+	uint64_t tscStart;
+	uint64_t tscEnd;
+	uint64_t tscDelta = 0xffffffffffffffffULL;
+	unsigned long pollCount;
+	uint64_t retval = 0;
+	int i;
+
+	/* Time how many TSC ticks elapse in 30 msec using the 8254 PIT
+	 * counter 2. We run this loop 3 times to make sure the cache
+	 * is hot and we take the minimum delta from all of the runs.
+	 * That is to say that we're biased towards measuring the minimum
+	 * number of TSC ticks that occur while waiting for the timer to
+	 * expire. That theoretically helps avoid inconsistencies when
+	 * running under a VM if the TSC is not virtualized and the host
+	 * steals time.	 The TSC is normally virtualized for VMware.
+	 */
+	for(i = 0; i < 10; ++i)
+	{
+		enable_PIT2();
+		set_PIT2_mode0(CALIBRATE_LATCH);
+		tscStart = rdtsc64();
+		pollCount = poll_PIT2_gate();
+		tscEnd = rdtsc64();
+		/* The poll loop must have run at least a few times for accuracy */
+		if (pollCount <= 1)
+		{
+			continue;
+		}
+		/* The TSC must increment at LEAST once every millisecond.
+		 * We should have waited exactly 30 msec so the TSC delta should
+		 * be >= 30. Anything less and the processor is way too slow.
+		 */
+		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC)
+		{
+			continue;
+		}
+		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
+		if ( (tscEnd - tscStart) < tscDelta )
+		{
+			tscDelta = tscEnd - tscStart;
+		}
+	}
+	/* tscDelta is now the least number of TSC ticks the processor made in
+	 * a timespan of 0.03 s (e.g. 30 milliseconds)
+	 * Linux thus divides by 30 which gives the answer in kiloHertz because
+	 * 1 / ms = kHz. But we're xnu and most of the rest of the code uses
+	 * Hz so we need to convert our milliseconds to seconds. Since we're
+	 * dividing by the milliseconds, we simply multiply by 1000.
+	 */
+
+	/* Unlike linux, we're not limited to 32-bit, but we do need to take care
+	 * that we're going to multiply by 1000 first so we do need at least some
+	 * arithmetic headroom. For now, 32-bit should be enough.
+	 * Also unlike Linux, our compiler can do 64-bit integer arithmetic.
+	 */
+	if (tscDelta > (1ULL<<32))
+	{
+		retval = 0;
+	}
+	else
+	{
+		retval = tscDelta * 1000 / 30;
+	}
+	disable_PIT2();
+	return retval;
+}
+
+/*
  * timeRDTSC()
  * This routine sets up PIT counter 2 to count down 1/20 of a second.
  * It pauses until the value is latched in the counter
@@ -96,72 +168,6 @@ restart:
 }
 
 /*
- * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
- */
-static uint64_t measure_tsc_frequency(void)
-{
-	uint64_t tscStart;
-	uint64_t tscEnd;
-	uint64_t tscDelta = 0xffffffffffffffffULL;
-	unsigned long pollCount;
-	uint64_t retval = 0;
-	int i;
-
-	/* Time how many TSC ticks elapse in 30 msec using the 8254 PIT
-	 * counter 2. We run this loop 3 times to make sure the cache
-	 * is hot and we take the minimum delta from all of the runs.
-	 * That is to say that we're biased towards measuring the minimum
-	 * number of TSC ticks that occur while waiting for the timer to
-	 * expire. That theoretically helps avoid inconsistencies when
-	 * running under a VM if the TSC is not virtualized and the host
-	 * steals time.	 The TSC is normally virtualized for VMware.
-	 */
-	for(i = 0; i < 10; ++i)
-	{
-		enable_PIT2();
-		set_PIT2_mode0(CALIBRATE_LATCH);
-		tscStart = rdtsc64();
-		pollCount = poll_PIT2_gate();
-		tscEnd = rdtsc64();
-		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1) {
-			continue;
-		}
-		/* The TSC must increment at LEAST once every millisecond.
-		 * We should have waited exactly 30 msec so the TSC delta should
-		 * be >= 30. Anything less and the processor is way too slow.
-		 */
-		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC) {
-			continue;
-		}
-		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (tscEnd - tscStart) < tscDelta ) {
-			tscDelta = tscEnd - tscStart;
-		}
-	}
-	/* tscDelta is now the least number of TSC ticks the processor made in
-	 * a timespan of 0.03 s (e.g. 30 milliseconds)
-	 * Linux thus divides by 30 which gives the answer in kiloHertz because
-	 * 1 / ms = kHz. But we're xnu and most of the rest of the code uses
-	 * Hz so we need to convert our milliseconds to seconds. Since we're
-	 * dividing by the milliseconds, we simply multiply by 1000.
-	 */
-
-	/* Unlike linux, we're not limited to 32-bit, but we do need to take care
-	 * that we're going to multiply by 1000 first so we do need at least some
-	 * arithmetic headroom. For now, 32-bit should be enough.
-	 * Also unlike Linux, our compiler can do 64-bit integer arithmetic.
-	 */
-	if (tscDelta > (1ULL<<32)) {
-		retval = 0;
-	} else {
-		retval = tscDelta * 1000 / 30;
-	}
-	disable_PIT2();
-	return retval;
-}
-
-/*
  * Original comment/code:
  *  "DFE: Measures the Max Performance Frequency in Hz (64-bit)"
  *
@@ -192,18 +198,21 @@ static uint64_t measure_aperf_frequency(void)
 		pollCount = poll_PIT2_gate();
 		aperfEnd = rdmsr64(MSR_AMD_APERF);
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1) {
+		if (pollCount <= 1)
+		{
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the APERF delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC) {
+		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
+		{
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (aperfEnd - aperfStart) < aperfDelta ) {
+		if ( (aperfEnd - aperfStart) < aperfDelta )
+		{
 			aperfDelta = aperfEnd - aperfStart;
 		}
 	}
@@ -211,9 +220,12 @@ static uint64_t measure_aperf_frequency(void)
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
 
-	if (aperfDelta > (1ULL<<32)) {
+	if (aperfDelta > (1ULL<<32))
+	{
 		retval = 0;
-	} else {
+	}
+	else
+	{
 		retval = aperfDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -256,16 +268,21 @@ void scan_cpu(PlatformInfo_t *p)
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
 
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) {
+	if (p->CPU.CPUID[CPUID_0][0] >= 0x5)
+	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
-	if (p->CPU.CPUID[CPUID_0][0] >= 6) {
+	if (p->CPU.CPUID[CPUID_0][0] >= 6)
+	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}
-	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8) {
+	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+	{
 		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-	} else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1) {
+	}
+	else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+	{
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
@@ -365,7 +382,8 @@ void scan_cpu(PlatformInfo_t *p)
 
 	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
-	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004) {
+	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
+	{
 		uint32_t	reg[4];
 		char		str[128], *s;
 		/*
@@ -378,8 +396,10 @@ void scan_cpu(PlatformInfo_t *p)
 		bcopy((char *)reg, &str[16], 16);
 		do_cpuid(0x80000004, reg);
 		bcopy((char *)reg, &str[32], 16);
-		for (s = str; *s != '\0'; s++) {
-			if (*s != ' ') {
+		for (s = str; *s != '\0'; s++)
+		{
+			if (*s != ' ')
+			{
 				break;
 			}
 		}
@@ -735,11 +755,11 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\n---------------------------------------------\n");
    	DBG("--------------- CPU INFO ---------------\n");
 	DBG("---------------------------------------------\n");
-	DBG("Brand String:            %s\n",                 p->CPU.BrandString); // Processor name (BIOS)
-	DBG("Vendor:                  0x%x\n",               p->CPU.Vendor); // Vendor ex: GenuineIntel
-	DBG("Family:                  0x%x\n",               p->CPU.Family); // Family ex: 6 (06h)
-	DBG("ExtFamily:               0x%x\n",               p->CPU.ExtFamily);
-	DBG("Signature:               %x\n",                 p->CPU.Signature); // CPUID signature
+	DBG("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
+	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
+	DBG("Family:                  0x%x\n",		p->CPU.Family); // Family ex: 6 (06h)
+	DBG("ExtFamily:               0x%x\n",		p->CPU.ExtFamily);
+	DBG("Signature:               %x\n",		p->CPU.Signature); // CPUID signature
 	/*switch (p->CPU.Type) {
 		case PT_OEM:
 			DBG("Processor type:          Intel Original OEM Processor\n");
@@ -756,20 +776,20 @@ void scan_cpu(PlatformInfo_t *p)
 		default:
 			break;
 	}*/
-	DBG("Model:                   0x%x\n",               p->CPU.Model); // Model ex: 37 (025h)
-	DBG("ExtModel:                0x%x\n",               p->CPU.ExtModel);
-	DBG("Stepping:                0x%x\n",               p->CPU.Stepping); // Stepping ex: 5 (05h)
-	DBG("MaxCoef:                 0x%x\n",               p->CPU.MaxCoef);
-	DBG("CurrCoef:                0x%x\n",               p->CPU.CurrCoef);
-	DBG("MaxDiv:                  0x%x\n",               p->CPU.MaxDiv);
-	DBG("CurrDiv:                 0x%x\n",               p->CPU.CurrDiv);
-	DBG("TSCFreq:                 %dMHz\n",              p->CPU.TSCFrequency / 1000000);
-	DBG("FSBFreq:                 %dMHz\n",              (p->CPU.FSBFrequency + 500000) / 1000000);
-	DBG("CPUFreq:                 %dMHz\n",              p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",                 p->CPU.NoCores); // Cores
-	DBG("Logical processor:       %d\n",                 p->CPU.NoThreads); // Logical procesor
-	DBG("Features:                0x%08x\n",             p->CPU.Features);
-	DBG("Microcode version:       %d\n",                 p->CPU.MCodeVersion); // CPU microcode version
+	DBG("Model:                   0x%x\n",		p->CPU.Model); // Model ex: 37 (025h)
+	DBG("ExtModel:                0x%x\n",		p->CPU.ExtModel);
+	DBG("Stepping:                0x%x\n",		p->CPU.Stepping); // Stepping ex: 5 (05h)
+	DBG("MaxCoef:                 0x%x\n",		p->CPU.MaxCoef);
+	DBG("CurrCoef:                0x%x\n",		p->CPU.CurrCoef);
+	DBG("MaxDiv:                  0x%x\n",		p->CPU.MaxDiv);
+	DBG("CurrDiv:                 0x%x\n",		p->CPU.CurrDiv);
+	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
+	DBG("FSBFreq:                 %dMHz\n",		(p->CPU.FSBFrequency + 500000) / 1000000);
+	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
+	DBG("Cores:                   %d\n",		p->CPU.NoCores); // Cores
+	DBG("Logical processor:       %d\n",		p->CPU.NoThreads); // Logical procesor
+	DBG("Features:                0x%08x\n",	p->CPU.Features);
+	DBG("Microcode version:       %d\n",		p->CPU.MCodeVersion); // CPU microcode version
 	DBG("\n---------------------------------------------\n");
 #if DEBUG_CPU
 	pause();

@@ -471,14 +471,18 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	DBG("Memory Device\n");
 // Aray Handle
-	if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF) {
+	if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF)
+	{
 		DBG("\tError Information Handle: No Error\n");
-	} else {
+	}
+	else
+	{
 		DBG("\tError Information Handle: 0x%x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
 	}
 // Total Width:
 // Data Width:
-	switch (((SMBMemoryDevice *)structHeader)->memorySize) {
+	switch (((SMBMemoryDevice *)structHeader)->memorySize)
+	{
 		case 0:
 			DBG("\tSize: No Module Installed\n");
 			break;
@@ -492,17 +496,23 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 			DBG("\tSize: %d %s\n", ((SMBMemoryDevice *)structHeader)->memorySize & 0x7FFF, ((((SMBMemoryDevice *)structHeader)->memorySize & 0x8000) == 0x8000) ? "kB" : "MB");
 			break;
 	}
-	if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F)) {
+	if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F))
+	{
  		DBG("\tForm Factor: %s\n", OutOfSpecStr);
- 	} else {
-        DBG("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
-      }
+ 	}
+	else
+	{
+		DBG("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
+	}
 // Set:
 	DBG("\tLocator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->deviceLocator, neverMask));
 	DBG("\tBank Locator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->bankLocator, neverMask));
-	if (((SMBMemoryDevice *)structHeader)->memoryType > kSMBMemoryDeviceTypeCount) {
+	if (((SMBMemoryDevice *)structHeader)->memoryType > kSMBMemoryDeviceTypeCount)
+	{
 		DBG("\tMemory Type: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		DBG("\tMemory Type: %s\n", SMBMemoryDeviceTypes[((SMBMemoryDevice *)structHeader)->memoryType]);
 	}
 // Type Detail:
@@ -651,7 +661,8 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 		ptr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 

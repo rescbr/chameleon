@@ -611,8 +611,7 @@ static const char * extractKernelName( char ** cpp )
 
 //==========================================================================
 
-static void
-printMemoryInfo(void)
+static void printMemoryInfo(void)
 {
     int line;
     int i;

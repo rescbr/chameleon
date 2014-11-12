@@ -137,41 +137,6 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsFlagBlackBg		(1 << 6)
 #define kBootArgsFlagLoginUI		(1 << 7)
 
-typedef struct boot_args_pre_lion
-{
-    uint16_t    Revision;	/* Revision of boot_args structure */
-    uint16_t    Version;	/* Version of boot_args structure */
-
-    char        CommandLine[BOOT_LINE_LENGTH];	/* Passed in command line */
-
-    uint32_t    MemoryMap;  /* Physical address of memory map */
-    uint32_t    MemoryMapSize;
-    uint32_t    MemoryMapDescriptorSize;
-    uint32_t    MemoryMapDescriptorVersion;
-
-    Boot_Video	Video;		/* Video Information */
-
-    uint32_t    deviceTreeP;	  /* Physical address of flattened device tree */
-    uint32_t    deviceTreeLength; /* Length of flattened tree */
-
-    uint32_t    kaddr;            /* Physical address of beginning of kernel text */
-    uint32_t    ksize;            /* Size of combined kernel text+data+efi */
-
-    uint32_t    efiRuntimeServicesPageStart; /* physical address of defragmented runtime pages */
-    uint32_t    efiRuntimeServicesPageCount;
-
-    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
-
-    uint8_t     efiMode;       /* 32 means 32-bit mode, 64 means 64-bit mode */
-    uint8_t     __reserved1[3];
-    uint32_t    __reserved2[1];
-    uint32_t    performanceDataStart; /* physical address of log */
-    uint32_t    performanceDataSize;
-    uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
-    uint32_t    __reserved3[2];
-
-} boot_args_pre_lion;
-
 typedef struct boot_args
 {
     uint16_t    Revision;	/* Revision of boot_args structure */
@@ -221,6 +186,41 @@ typedef struct boot_args
     uint32_t    __reserved4[728];
 
 } boot_args;
+
+typedef struct boot_args_pre_lion
+{
+    uint16_t    Revision;	/* Revision of boot_args structure */
+    uint16_t    Version;	/* Version of boot_args structure */
+
+    char        CommandLine[BOOT_LINE_LENGTH];	/* Passed in command line */
+
+    uint32_t    MemoryMap;  /* Physical address of memory map */
+    uint32_t    MemoryMapSize;
+    uint32_t    MemoryMapDescriptorSize;
+    uint32_t    MemoryMapDescriptorVersion;
+
+    Boot_Video	Video;		/* Video Information */
+
+    uint32_t    deviceTreeP;	  /* Physical address of flattened device tree */
+    uint32_t    deviceTreeLength; /* Length of flattened tree */
+
+    uint32_t    kaddr;            /* Physical address of beginning of kernel text */
+    uint32_t    ksize;            /* Size of combined kernel text+data+efi */
+
+    uint32_t    efiRuntimeServicesPageStart; /* physical address of defragmented runtime pages */
+    uint32_t    efiRuntimeServicesPageCount;
+
+    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
+
+    uint8_t     efiMode;       /* 32 means 32-bit mode, 64 means 64-bit mode */
+    uint8_t     __reserved1[3];
+    uint32_t    __reserved2[1];
+    uint32_t    performanceDataStart; /* physical address of log */
+    uint32_t    performanceDataSize;
+    uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
+    uint32_t    __reserved3[2];
+
+} boot_args_pre_lion;
 
 extern char gMacOSVersion[8];
 

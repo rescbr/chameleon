@@ -796,6 +796,7 @@ int setupAcpi(void)
 				{
 					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
 				}
+
 				DBG("RSDT: Added %d SSDT table(s)\n", ssdt_count);
 
 			}
