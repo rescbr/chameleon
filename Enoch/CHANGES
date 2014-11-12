@@ -1,3 +1,4 @@
+- ErmaC : define recursive cpu series for BrandString
 - meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
 		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
 - ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name
