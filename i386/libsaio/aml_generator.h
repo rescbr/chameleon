@@ -77,7 +77,7 @@ static inline bool aml_isvalidchar(char c)
 bool aml_add_to_parent(AML_CHUNK* parent, AML_CHUNK* node);
 AML_CHUNK* aml_create_node(AML_CHUNK* parent);
 void aml_destroy_node(AML_CHUNK* node);
-AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, char* buffer, uint32_t size);
+AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, const char* buffer, uint32_t size);
 AML_CHUNK* aml_add_byte(AML_CHUNK* parent, uint8_t value);
 AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value);
 AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value);
