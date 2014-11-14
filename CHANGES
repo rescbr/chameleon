@@ -1,4 +1,5 @@
 - ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
+- bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
 - bitshoveler : Make some constant arrays static; other minor fixes (acpi_patcher.c)
 - bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
