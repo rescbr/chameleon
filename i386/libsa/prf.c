@@ -118,10 +118,11 @@ again:
 		flag |= SPACE;
 		goto again;
 	case '0':
-		if (minwidth == 0) {
-		    /* this is a flag */
-		    flag |= ZERO;
-		    goto again;
+		if (minwidth == 0)
+		{
+			/* this is a flag */
+			flag |= ZERO;
+			goto again;
 		} /* fall through */
 	case '1':
 	case '2':

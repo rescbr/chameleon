@@ -33,8 +33,6 @@
 
 static biosBuf_t bb;
 
-#if UNUSED
-
 //==============================================================================
 #if UNUSED
 static inline void
@@ -70,8 +68,6 @@ rmwi(int port, int index, int clear, int set)
 }
 #endif /* UNUSED */
 //==============================================================================
-
-#endif /* UNUSED */
 
 int getVBEInfo( void * infoBlock )
 {

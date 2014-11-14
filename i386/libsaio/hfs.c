@@ -2,7 +2,7 @@
  * Copyright (c) 2000-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 2.0 (the
  * "License").  You may not use this file except in compliance with the
@@ -16,10 +16,10 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
- */
-/*
+ *
+ *
  *  hfs.c - File System Module for HFS and HFS+.
  *
  *  Copyright (c) 1999-2002 Apple Computer, Inc.
@@ -119,17 +119,16 @@ static void SwapFinderInfo(FndrFileInfo *dst, FndrFileInfo *src)
 	// Don't bother with location
 }
 
-
 //==============================================================================
 
 void HFSFree(CICell ih)
 {
-	if(gCurrentIH == ih) {
+	if(gCurrentIH == ih)
+	{
 		gCurrentIH = 0;
 	}
 	free(ih);
 }
-
 
 //==============================================================================
 
@@ -149,7 +148,6 @@ bool HFSProbe (const void *buf)
 	}
 	return true;
 }
-
 
 //==============================================================================
 
@@ -284,7 +282,6 @@ long HFSInitPartition(CICell ih)
 	return 0;
 }
 
-
 //==============================================================================
 
 long HFSLoadFile(CICell ih, char * filePath)
@@ -352,8 +349,8 @@ long HFSReadFile(CICell ih, char * filePath, void *base, uint64_t offset,  uint6
 	}
 
 	getDeviceDescription(ih, devStr);
-	verbose("Read HFS%s file: [%s/%s] %d bytes.\n",
-		(gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
+
+	verbose("Read HFS%s file: [%s/%s] %d bytes.\n",	(gIsHFSPlus ? "+" : ""), devStr, filePath, (uint32_t)length);
 
 	return length;
 }
@@ -365,37 +362,76 @@ long HFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex, char ** nam
     char entry[512];
     long dirID, dirFlags;
 
-    if (HFSInitPartition(ih) == -1) return -1;
+	if (HFSInitPartition(ih) == -1)
+	{
+		return -1;
+	}
 
-    if (*dirIndex == -1) return -1;
+	if (*dirIndex == -1)
+	{
+		return -1;
+	}
 
-    dirID = kHFSRootFolderID;
-    // Skip a lead '/'.  Start in the system folder if there are two.
-    if (dirPath[0] == '/') {
-        if (dirPath[1] == '/') {
-            if (gIsHFSPlus) dirID = SWAP_BE32(((long *)gHFSPlus->finderInfo)[5]);
-            else dirID = SWAP_BE32(gHFSMDB->drFndrInfo[5]);
-            if (dirID == 0) return -1;
-            dirPath++;
-        }
-        dirPath++;
-    }
+	dirID = kHFSRootFolderID;
 
-    if (*dirIndex == 0) {
-        ResolvePathToCatalogEntry(dirPath, &dirFlags, entry, dirID, dirIndex);
-        if (*dirIndex == 0) *dirIndex = -1;
-        if ((dirFlags & kFileTypeMask) != kFileTypeUnknown) return -1;
-    }
+	// Skip a lead '/'.  Start in the system folder if there are two.
+	if (dirPath[0] == '/')
+	{
+		if (dirPath[1] == '/')
+		{
+			if (gIsHFSPlus)
+			{
+				dirID = SWAP_BE32(((long *)gHFSPlus->finderInfo)[5]);
+			}
+			else
+			{
+				dirID = SWAP_BE32(gHFSMDB->drFndrInfo[5]);
+			}
 
-    GetCatalogEntry(dirIndex, name, flags, time, finderInfo, infoValid);
-    if (*dirIndex == 0) *dirIndex = -1;
-    if ((*flags & kFileTypeMask) == kFileTypeUnknown) return -1;
+			if (dirID == 0)
+			{
+				return -1;
+			}
 
-    return 0;
+			dirPath++;
+		}
+
+		dirPath++;
+	}
+
+	if (*dirIndex == 0)
+	{
+		ResolvePathToCatalogEntry(dirPath, &dirFlags, entry, dirID, dirIndex);
+
+		if (*dirIndex == 0)
+		{
+			*dirIndex = -1;
+		}
+
+		if ((dirFlags & kFileTypeMask) != kFileTypeUnknown)
+		{
+			return -1;
+		}
+	}
+
+	GetCatalogEntry(dirIndex, name, flags, time, finderInfo, infoValid);
+
+	if (*dirIndex == 0)
+	{
+		*dirIndex = -1;
+	}
+
+	if ((*flags & kFileTypeMask) == kFileTypeUnknown)
+	{
+		return -1;
+	}
+
+	return 0;
 }
 
-void
-HFSGetDescription(CICell ih, char *str, long strMaxLen)
+//==============================================================================
+
+void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 {
 
     UInt16 nodeSize;
@@ -404,24 +440,28 @@ HFSGetDescription(CICell ih, char *str, long strMaxLen)
     char *name;
     long flags, time;
 
-    if (HFSInitPartition(ih) == -1)  { return; }
+	if (HFSInitPartition(ih) == -1)
+	{
+		return;
+	}
 
     /* Fill some crucial data structures by side effect. */
     dirIndex = 0;
     HFSGetDirEntry(ih, "/", &dirIndex, &name, &flags, &time, 0, 0);
 
-    /* Now we can loook up the volume name node. */
-    nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
-    firstLeafNode = SWAP_BE32(gBTHeaders[kBTreeCatalog]->firstLeafNode);
+	/* Now we can loook up the volume name node. */
+	nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
+	firstLeafNode = SWAP_BE32(gBTHeaders[kBTreeCatalog]->firstLeafNode);
 
-    dirIndex = (long long) firstLeafNode * nodeSize;
+	dirIndex = (long long) firstLeafNode * nodeSize;
 
-    GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0);
+	GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0);
 
-    strncpy(str, name, strMaxLen);
-    str[strMaxLen] = '\0';
+	strncpy(str, name, strMaxLen);
+	str[strMaxLen] = '\0';
 }
 
+//==============================================================================
 
 long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 {
@@ -431,33 +471,48 @@ long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     HFSCatalogFile     *hfsFile     = (void *)entry;
     HFSPlusCatalogFile *hfsPlusFile = (void *)entry;
 
-    if (HFSInitPartition(ih) == -1) return -1;
-
-    dirID = kHFSRootFolderID;
-    // Skip a lead '/'.  Start in the system folder if there are two.
-    if (filePath[0] == '/') {
-        if (filePath[1] == '/') {
-            if (gIsHFSPlus) dirID = SWAP_BE32(((long *)gHFSPlus->finderInfo)[5]);
-            else dirID = SWAP_BE32(gHFSMDB->drFndrInfo[5]);
-            if (dirID == 0) {
+	if (HFSInitPartition(ih) == -1)
+	{
 		return -1;
-	    }
-            filePath++;
-        }
-        filePath++;
-    }
+	}
 
-    result = ResolvePathToCatalogEntry(filePath, &flags, entry, dirID, 0);
-    if ((result == -1) || ((flags & kFileTypeMask) != kFileTypeFlat)) {
-        printf("HFS: Resolve path %s failed\n", filePath);
-	return -1;
-    }
+	dirID = kHFSRootFolderID;
+	// Skip a lead '/'.  Start in the system folder if there are two.
+	if (filePath[0] == '/')
+	{
+		if (filePath[1] == '/')
+		{
+			if (gIsHFSPlus)
+			{
+				dirID = SWAP_BE32(((long *) gHFSPlus->finderInfo)[5]);
+			}
+			else
+			{
+				dirID = SWAP_BE32(gHFSMDB->drFndrInfo[5]);
+			}
 
-    if (gIsHFSPlus) {
-        extents    = &hfsPlusFile->dataFork.extents;
-    } else {
-        extents    = &hfsFile->dataExtents;
-    }
+			if (dirID == 0)
+			{
+				return -1;
+			}
+			filePath++;
+		}
+		filePath++;
+	}
+
+	result = ResolvePathToCatalogEntry(filePath, &flags, entry, dirID, 0);
+
+	if ((result == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+	{
+		printf("HFS: Resolve path %s failed\n", filePath);
+		return -1;
+	}
+
+	if (gIsHFSPlus) {
+		extents = &hfsPlusFile->dataFork.extents;
+	} else {
+		extents = &hfsFile->dataExtents;
+	}
 
 #if DEBUG
     printf("extent start 0x%x\n", (unsigned long)GetExtentStart(extents, 0));
@@ -468,14 +523,25 @@ long HFSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
     return 0;
 }
 
+
+//==============================================================================
+
 long HFSGetUUID(CICell ih, char *uuidStr)
 {
-    if (HFSInitPartition(ih) == -1) return -1;
-    if (gVolID == 0LL)  return -1;
+	if (HFSInitPartition(ih) == -1)
+	{
+		return -1;
+	}
 
-    return CreateUUIDString((uint8_t*)(&gVolID), sizeof(gVolID), uuidStr);
+	if (gVolID == 0LL)
+	{
+		return -1;
+	}
+
+	return CreateUUIDString((uint8_t*)(&gVolID), sizeof(gVolID), uuidStr);
 }
 
+//==============================================================================
 // Private Functions
 
 static long ReadFile(void * file, uint64_t * length, void * base, uint64_t offset)
@@ -486,34 +552,42 @@ static long ReadFile(void * file, uint64_t * length, void * base, uint64_t offse
     HFSCatalogFile     *hfsFile     = file;
     HFSPlusCatalogFile *hfsPlusFile = file;
 
-    if (gIsHFSPlus) {
-        fileID  = SWAP_BE32(hfsPlusFile->fileID);
-        fileLength = (uint64_t)SWAP_BE64(hfsPlusFile->dataFork.logicalSize);
-        extents = &hfsPlusFile->dataFork.extents;
-    } else {
-        fileID  = SWAP_BE32(hfsFile->fileID);
-        fileLength = SWAP_BE32(hfsFile->dataLogicalSize);
-        extents = &hfsFile->dataExtents;
-    }
+	if (gIsHFSPlus)
+	{
+		fileID  = SWAP_BE32(hfsPlusFile->fileID);
+		fileLength = (uint64_t)SWAP_BE64(hfsPlusFile->dataFork.logicalSize);
+		extents = &hfsPlusFile->dataFork.extents;
+	}
+	else
+	{
+		fileID  = SWAP_BE32(hfsFile->fileID);
+		fileLength = SWAP_BE32(hfsFile->dataLogicalSize);
+		extents = &hfsFile->dataExtents;
+	}
 
-    if (offset > fileLength) {
-        printf("Offset is too large.\n");
-        return -1;
-    }
+	if (offset > fileLength)
+	{
+		printf("Offset is too large.\n");
 
-    if ((*length == 0) || ((offset + *length) > fileLength)) {
-        *length = fileLength - offset;
-    }
+		return -1;
+	}
 
-/*    if (*length > kLoadSize) {
-        printf("File is too large.\n");
-        return -1;
-    }*/
+	if ((*length == 0) || ((offset + *length) > fileLength))
+	{
+		*length = fileLength - offset;
+	}
 
-    *length = ReadExtent((char *)extents, fileLength, fileID,
-                         offset, *length, (char *)base, 0);
+/*
+	if (*length > kLoadSize)
+	{
+		printf("File is too large.\n");
+		return -1;
+	}
+*/
 
-    return 0;
+	*length = ReadExtent((char *)extents, fileLength, fileID, offset, *length, (char *)base, 0);
+
+	return 0;
 }
 
 static long GetCatalogEntryInfo(void * entry, long * flags, long * time,
@@ -522,60 +596,69 @@ static long GetCatalogEntryInfo(void * entry, long * flags, long * time,
     long tmpTime = 0;
     long valid = 0;
 
-    // Get information about the file.
+	// Get information about the file.
     
-    switch ( SWAP_BE16(*(short *)entry) )
-    {
-        case kHFSFolderRecord           :
-            *flags = kFileTypeDirectory;
-            tmpTime = SWAP_BE32(((HFSCatalogFolder *)entry)->modifyDate);
-            break;
+	switch ( SWAP_BE16(*(short *)entry) )
+	{
+	case kHFSFolderRecord           :
+		*flags = kFileTypeDirectory;
+		tmpTime = SWAP_BE32(((HFSCatalogFolder *)entry)->modifyDate);
+		break;
 
-        case kHFSPlusFolderRecord       :
-            *flags = kFileTypeDirectory |
-                     (SWAP_BE16(((HFSPlusCatalogFolder *)entry)->bsdInfo.fileMode) & kPermMask);
-            if (SWAP_BE32(((HFSPlusCatalogFolder *)entry)->bsdInfo.ownerID) != 0)
-                *flags |= kOwnerNotRoot;
-            tmpTime = SWAP_BE32(((HFSPlusCatalogFolder *)entry)->contentModDate);
-            break;
+	case kHFSPlusFolderRecord       :
+		*flags = kFileTypeDirectory | (SWAP_BE16(((HFSPlusCatalogFolder *)entry)->bsdInfo.fileMode) & kPermMask);
+		if (SWAP_BE32(((HFSPlusCatalogFolder *)entry)->bsdInfo.ownerID) != 0)
+		{
+			*flags |= kOwnerNotRoot;
+		}
+		tmpTime = SWAP_BE32(((HFSPlusCatalogFolder *)entry)->contentModDate);
+		break;
 
-        case kHFSFileRecord             :
-            *flags = kFileTypeFlat;
-            tmpTime = SWAP_BE32(((HFSCatalogFile *)entry)->modifyDate);
-            if (finderInfo) {
-                SwapFinderInfo((FndrFileInfo *)finderInfo, &((HFSCatalogFile *)entry)->userInfo);
-                valid = 1;
-            }
-            break;
+	case kHFSFileRecord             :
+		*flags = kFileTypeFlat;
+		tmpTime = SWAP_BE32(((HFSCatalogFile *)entry)->modifyDate);
+		if (finderInfo)
+		{
+			SwapFinderInfo((FndrFileInfo *)finderInfo, &((HFSCatalogFile *)entry)->userInfo);
+			valid = 1;
+		}
+		break;
 
-        case kHFSPlusFileRecord         :
-            *flags = kFileTypeFlat |
-                     (SWAP_BE16(((HFSPlusCatalogFile *)entry)->bsdInfo.fileMode) & kPermMask);
-            if (SWAP_BE32(((HFSPlusCatalogFile *)entry)->bsdInfo.ownerID) != 0)
-                *flags |= kOwnerNotRoot;
-            tmpTime = SWAP_BE32(((HFSPlusCatalogFile *)entry)->contentModDate);
-            if (finderInfo) {
-                SwapFinderInfo((FndrFileInfo *)finderInfo, &((HFSPlusCatalogFile *)entry)->userInfo);
-                valid = 1;
-            }
-            break;
+	case kHFSPlusFileRecord         :
+		*flags = kFileTypeFlat | (SWAP_BE16(((HFSPlusCatalogFile *)entry)->bsdInfo.fileMode) & kPermMask);
+		if (SWAP_BE32(((HFSPlusCatalogFile *)entry)->bsdInfo.ownerID) != 0)
+		{
+			*flags |= kOwnerNotRoot;
+		}
+		tmpTime = SWAP_BE32(((HFSPlusCatalogFile *)entry)->contentModDate);
+		if (finderInfo)
+		{
+			SwapFinderInfo((FndrFileInfo *)finderInfo, &((HFSPlusCatalogFile *)entry)->userInfo);
+			valid = 1;
+		}
+		break;
 
-        case kHFSFileThreadRecord       :
-        case kHFSPlusFileThreadRecord   :
-        case kHFSFolderThreadRecord     :
-        case kHFSPlusFolderThreadRecord :
-            *flags = kFileTypeUnknown;
-            tmpTime = 0;
-            break;
-    }
+	case kHFSFileThreadRecord       :
+	case kHFSPlusFileThreadRecord   :
+	case kHFSFolderThreadRecord     :
+	case kHFSPlusFolderThreadRecord :
+		*flags = kFileTypeUnknown;
+		tmpTime = 0;
+		break;
+	}
 
-    if (time != 0) {
-        // Convert base time from 1904 to 1970.
-        *time = tmpTime - 2082844800;
-    }
-    if (infoValid) *infoValid = valid;
+	if (time != 0)
+	{
+		// Convert base time from 1904 to 1970.
+		*time = tmpTime - 2082844800;
+	}
 
-    return 0;
+	if (infoValid)
+	{
+		*infoValid = valid;
+	}
+
+	return 0;
 }
 
 static long ResolvePathToCatalogEntry(char * filePath, long * flags,
@@ -586,48 +669,64 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags,
     long long tmpDirIndex;
     HFSPlusCatalogFile   *hfsPlusFile;
 
-    // Copy the file name to gTempStr
-    cnt = 0;
-    while ((filePath[cnt] != '/') && (filePath[cnt] != '\0')) cnt++;
-    strlcpy(gTempStr, filePath, cnt+1);
+	// Copy the file name to gTempStr
+	cnt = 0;
+	while ((filePath[cnt] != '/') && (filePath[cnt] != '\0'))
+	{
+		cnt++;
+	}
 
-    // Move restPath to the right place.
-    if (filePath[cnt] != '\0') cnt++;
-    restPath = filePath + cnt;
+	strlcpy(gTempStr, filePath, cnt+1);
 
-    // gTempStr is a name in the current Dir.
-    // restPath is the rest of the path if any.
+	// Move restPath to the right place.
+	if (filePath[cnt] != '\0')
+	{
+		cnt++;
+	}
 
-    result = ReadCatalogEntry(gTempStr, dirID, entry, dirIndex);
-    if (result == -1) {
-	return -1;
-    }
+	restPath = filePath + cnt;
 
-    GetCatalogEntryInfo(entry, flags, 0, 0, 0);
+	// gTempStr is a name in the current Dir.
+	// restPath is the rest of the path if any.
 
-    if ((*flags & kFileTypeMask) == kFileTypeDirectory) {
-        if (gIsHFSPlus)
-            subFolderID = SWAP_BE32(((HFSPlusCatalogFolder *)entry)->folderID);
-        else
-            subFolderID = SWAP_BE32(((HFSCatalogFolder *)entry)->folderID);
-    }
+	result = ReadCatalogEntry(gTempStr, dirID, entry, dirIndex);
 
-    if ((*flags & kFileTypeMask) == kFileTypeDirectory)
-        result = ResolvePathToCatalogEntry(restPath, flags, entry,
-                                           subFolderID, dirIndex);
+	if (result == -1)
+	{
+		return -1;
+	}
 
-    if (gIsHFSPlus && ((*flags & kFileTypeMask) == kFileTypeFlat)) {
-        hfsPlusFile = (HFSPlusCatalogFile *)entry;
-        if ((SWAP_BE32(hfsPlusFile->userInfo.fdType) == kHardLinkFileType) &&
-            (SWAP_BE32(hfsPlusFile->userInfo.fdCreator) == kHFSPlusCreator)) {
-                sprintf(gLinkTemp, "%s/%s%ld", HFSPLUSMETADATAFOLDER,
-                        HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
-                result = ResolvePathToCatalogEntry(gLinkTemp, flags, entry,
-                                                   kHFSRootFolderID, &tmpDirIndex);
-        }
-    }
+	GetCatalogEntryInfo(entry, flags, 0, 0, 0);
 
-    return result;
+	if ((*flags & kFileTypeMask) == kFileTypeDirectory)
+	{
+		if (gIsHFSPlus)
+		{
+			subFolderID = SWAP_BE32(((HFSPlusCatalogFolder *)entry)->folderID);
+		}
+		else
+		{
+			subFolderID = SWAP_BE32(((HFSCatalogFolder *)entry)->folderID);
+		}
+	}
+
+	if ((*flags & kFileTypeMask) == kFileTypeDirectory)
+	{
+		result = ResolvePathToCatalogEntry(restPath, flags, entry, subFolderID, dirIndex);
+	}
+
+	if (gIsHFSPlus && ((*flags & kFileTypeMask) == kFileTypeFlat))
+	{
+		hfsPlusFile = (HFSPlusCatalogFile *)entry;
+
+		if ((SWAP_BE32(hfsPlusFile->userInfo.fdType) == kHardLinkFileType) && (SWAP_BE32(hfsPlusFile->userInfo.fdCreator) == kHFSPlusCreator))
+		{
+			sprintf(gLinkTemp, "%s/%s%ld", HFSPLUSMETADATAFOLDER, HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+			result = ResolvePathToCatalogEntry(gLinkTemp, flags, entry, kHFSRootFolderID, &tmpDirIndex);
+		}
+	}
+
+	return result;
 }
 
 static long GetCatalogEntry(long long * dirIndex, char ** name,
@@ -639,52 +738,59 @@ static long GetCatalogEntry(long long * dirIndex, char ** name,
     char              *nodeBuf, *testKey, *entry;
     BTNodeDescriptor  *node;
 
-    if (gIsHFSPlus) {
-        extent     = &gHFSPlus->catalogFile.extents;
-        extentSize = SWAP_BE64(gHFSPlus->catalogFile.logicalSize);
-    } else {
-        extent     = (HFSExtentDescriptor *)&gHFSMDB->drCTExtRec;
-        extentSize = SWAP_BE32(gHFSMDB->drCTFlSize);
-    }
+	if (gIsHFSPlus)
+	{
+		extent     = &gHFSPlus->catalogFile.extents;
+		extentSize = SWAP_BE64(gHFSPlus->catalogFile.logicalSize);
+	}
+	else
+	{
+		extent     = (HFSExtentDescriptor *)&gHFSMDB->drCTExtRec;
+		extentSize = SWAP_BE32(gHFSMDB->drCTFlSize);
+	}
 
-    nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
-    nodeBuf  = (char *)malloc(nodeSize);
-    node     = (BTNodeDescriptor *)nodeBuf;
+	nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
+	nodeBuf  = (char *)malloc(nodeSize);
+	node     = (BTNodeDescriptor *)nodeBuf;
 
     index   = (long) (*dirIndex % nodeSize);
     curNode = (long) (*dirIndex / nodeSize);
 
-    // Read the BTree node and get the record for index.
-    ReadExtent(extent, extentSize, kHFSCatalogFileID,
-               (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
-    GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &entry);
+	// Read the BTree node and get the record for index.
+	ReadExtent(extent, extentSize, kHFSCatalogFileID, (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
 
-    GetCatalogEntryInfo(entry, flags, time, finderInfo, infoValid);
+	GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &entry);
 
-    // Get the file name.
-    if (gIsHFSPlus) {
-        utf_encodestr(((HFSPlusCatalogKey *)testKey)->nodeName.unicode,
+	GetCatalogEntryInfo(entry, flags, time, finderInfo, infoValid);
+
+	// Get the file name.
+	if (gIsHFSPlus)
+	{
+		utf_encodestr(((HFSPlusCatalogKey *)testKey)->nodeName.unicode,
                       SWAP_BE16(((HFSPlusCatalogKey *)testKey)->nodeName.length),
                       (u_int8_t *)gTempStr, 256, OSBigEndian);
-    } else {
-        strncpy(gTempStr,
-                (const char *)&((HFSCatalogKey *)testKey)->nodeName[1],
-                 ((HFSCatalogKey *)testKey)->nodeName[0]);
-        gTempStr[((HFSCatalogKey *)testKey)->nodeName[0]] = '\0';
-    }
-    *name = gTempStr;
+	}
+	else
+	{
+		strncpy(gTempStr, (const char *)&((HFSCatalogKey *)testKey)->nodeName[1], ((HFSCatalogKey *)testKey)->nodeName[0]);
 
-    // Update dirIndex.
-    index++;
-    if (index == SWAP_BE16(node->numRecords)) {
-        index = 0;
-        curNode = SWAP_BE32(node->fLink);
-    }
-    *dirIndex = (long long) curNode * nodeSize + index;
+		gTempStr[((HFSCatalogKey *)testKey)->nodeName[0]] = '\0';
+	}
+	*name = gTempStr;
 
-    free(nodeBuf);
+	// Update dirIndex.
+	index++;
 
-    return 0;
+	if (index == SWAP_BE16(node->numRecords))
+	{
+		index = 0;
+		curNode = SWAP_BE32(node->fLink);
+	}
+	*dirIndex = (long long) curNode * nodeSize + index;
+
+	free(nodeBuf);
+
+	return 0;
 }
 
 static long ReadCatalogEntry(char * fileName, long dirID,
@@ -711,28 +817,33 @@ static long ReadCatalogEntry(char * fileName, long dirID,
         strncpy((char *)(hfsKey->nodeName + 1), fileName, length);
     }
 
-    return ReadBTreeEntry(kBTreeCatalog, &key, entry, dirIndex);
+	return ReadBTreeEntry(kBTreeCatalog, &key, entry, dirIndex);
 }
 
 static long ReadExtentsEntry(long fileID, long startBlock, void * entry)
 {
-    char             key[sizeof(HFSPlusExtentKey)];
-    HFSExtentKey     *hfsKey     = (HFSExtentKey *)key;
-    HFSPlusExtentKey *hfsPlusKey = (HFSPlusExtentKey *)key;
+	char             key[sizeof(HFSPlusExtentKey)];
+	HFSExtentKey     *hfsKey     = (HFSExtentKey *)key;
+	HFSPlusExtentKey *hfsPlusKey = (HFSPlusExtentKey *)key;
 
-    // Make the extents key.
-    if (gIsHFSPlus) {
-        hfsPlusKey->forkType   = 0;
-        hfsPlusKey->fileID     = SWAP_BE32(fileID);
-        hfsPlusKey->startBlock = SWAP_BE32(startBlock);
-    } else {
-        hfsKey->forkType   = 0;
-        hfsKey->fileID     = SWAP_BE32(fileID);
-        hfsKey->startBlock = SWAP_BE16(startBlock);
-    }
+	// Make the extents key.
+	if (gIsHFSPlus)
+	{
+		hfsPlusKey->forkType   = 0;
+		hfsPlusKey->fileID     = SWAP_BE32(fileID);
+		hfsPlusKey->startBlock = SWAP_BE32(startBlock);
+	}
+	else
+	{
+		hfsKey->forkType   = 0;
+		hfsKey->fileID     = SWAP_BE32(fileID);
+		hfsKey->startBlock = SWAP_BE16(startBlock);
+	}
 
-    return ReadBTreeEntry(kBTreeExtents, &key, entry, 0);
+	return ReadBTreeEntry(kBTreeExtents, &key, entry, 0);
 }
+
+//==============================================================================
 
 static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dirIndex)
 {
@@ -745,121 +856,180 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
     long             curNode, index = 0, lowerBound, upperBound;
     char             *testKey, *recordData;
 
-    // Figure out which tree is being looked at.
-    if (btree == kBTreeCatalog) {
-        if (gIsHFSPlus) {
-            extent     = &gHFSPlus->catalogFile.extents;
-            extentSize = SWAP_BE64(gHFSPlus->catalogFile.logicalSize);
-        } else {
-            extent     = (HFSExtentDescriptor *)&gHFSMDB->drCTExtRec;
-            extentSize = SWAP_BE32(gHFSMDB->drCTFlSize);
-        }
-        extentFile = kHFSCatalogFileID;
-    } else {
-        if (gIsHFSPlus) {
-            extent     = &gHFSPlus->extentsFile.extents;
-            extentSize = SWAP_BE64(gHFSPlus->extentsFile.logicalSize);
-        } else {
-            extent     = (HFSExtentDescriptor *)&gHFSMDB->drXTExtRec;
-            extentSize = SWAP_BE32(gHFSMDB->drXTFlSize);
-        }
-        extentFile = kHFSExtentsFileID;
-    }
+	// Figure out which tree is being looked at.
+	if (btree == kBTreeCatalog)
+	{
+		if (gIsHFSPlus) 
+		{
+			extent     = &gHFSPlus->catalogFile.extents;
+			extentSize = SWAP_BE64(gHFSPlus->catalogFile.logicalSize);
+		}
+		else
+		{
+			extent     = (HFSExtentDescriptor *)&gHFSMDB->drCTExtRec;
+			extentSize = SWAP_BE32(gHFSMDB->drCTFlSize);
+		}
+		extentFile = kHFSCatalogFileID;
+	}
+	else
+	{
+		if (gIsHFSPlus)
+		{
+			extent     = &gHFSPlus->extentsFile.extents;
+			extentSize = SWAP_BE64(gHFSPlus->extentsFile.logicalSize);
+		}
+		else
+		{
+			extent     = (HFSExtentDescriptor *)&gHFSMDB->drXTExtRec;
+			extentSize = SWAP_BE32(gHFSMDB->drXTFlSize);
+		}
+		extentFile = kHFSExtentsFileID;
+	}
 
-    // Read the BTree Header if needed.
-    if (gBTHeaders[btree] == 0) {
-        ReadExtent(extent, extentSize, extentFile, 0, 256,
-                   gBTreeHeaderBuffer + btree * 256, 0);
-        gBTHeaders[btree] = (BTHeaderRec *)(gBTreeHeaderBuffer + btree * 256 +
-                                            sizeof(BTNodeDescriptor));
-        if ((gIsHFSPlus && btree == kBTreeCatalog) &&
-            (gBTHeaders[btree]->keyCompareType == kHFSBinaryCompare)) {
-          gCaseSensitive = 1;
-        }
-    }
+	// Read the BTree Header if needed.
+	if (gBTHeaders[btree] == 0)
+	{
+		ReadExtent(extent, extentSize, extentFile, 0, 256, gBTreeHeaderBuffer + btree * 256, 0);
+		gBTHeaders[btree] = (BTHeaderRec *)(gBTreeHeaderBuffer + btree * 256 + sizeof(BTNodeDescriptor));
 
-    curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
-    nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
-    nodeBuf  = (char *)malloc(nodeSize);
-    node     = (BTNodeDescriptor *)nodeBuf;
+		if ((gIsHFSPlus && btree == kBTreeCatalog) && (gBTHeaders[btree]->keyCompareType == kHFSBinaryCompare))
+		{
+			gCaseSensitive = 1;
+		}
+	}
 
-    while (1) {
-        // Read the current node.
-        ReadExtent(extent, extentSize, extentFile,
-                   (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
+	curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
+	nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
+	nodeBuf  = (char *)malloc(nodeSize);
+	node     = (BTNodeDescriptor *)nodeBuf;
+
+	while (1)
+	{
+		// Read the current node.
+        	ReadExtent(extent, extentSize, extentFile, (long long) curNode * nodeSize, nodeSize, nodeBuf, 1);
+
+		// Find the matching key.
+		lowerBound = 0;
+		upperBound = SWAP_BE16(node->numRecords) - 1;
+
+		while (lowerBound <= upperBound)
+		{
+			index = (lowerBound + upperBound) / 2;
+
+			GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &recordData);
+
+			if (gIsHFSPlus)
+			{
+				if (btree == kBTreeCatalog)
+				{
+					result = CompareHFSPlusCatalogKeys(key, testKey);
+				}
+				else
+				{
+					result = CompareHFSPlusExtentsKeys(key, testKey);
+				}
+			}
+			else
+			{
+				if (btree == kBTreeCatalog)
+				{
+					result = CompareHFSCatalogKeys(key, testKey);
+				}
+				else
+				{
+					result = CompareHFSExtentsKeys(key, testKey);
+				}
+			}
+
+			if (result < 0)
+			{
+				upperBound = index - 1;	// search < trial
+			}
+			else if (result > 0)
+			{
+				lowerBound = index + 1;	// search > trial
+			}
+			else
+			{
+				break;			// search = trial
+			}
+		}
+
+		if (result < 0)
+		{
+			index = upperBound;
+			GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &recordData);
+		}
     
-        // Find the matching key.
-        lowerBound = 0;
-        upperBound = SWAP_BE16(node->numRecords) - 1;
-        while (lowerBound <= upperBound) {
-            index = (lowerBound + upperBound) / 2;
+		// Found the closest key... Recurse on it if this is an index node.
+		if (node->kind == kBTIndexNode)
+		{
+			curNode = SWAP_BE32( *((long *)recordData) );
+		}
+		else
+		{
+			break;
+		}
+	}
 
-            GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &recordData);
+	// Return error if the file was not found.
+	if (result != 0)
+	{
+		free(nodeBuf);
+		return -1;
+	}
 
-            if (gIsHFSPlus) {
-                if (btree == kBTreeCatalog) {
-                    result = CompareHFSPlusCatalogKeys(key, testKey);
-                } else {
-                    result = CompareHFSPlusExtentsKeys(key, testKey);
-                }
-            } else {
-                if (btree == kBTreeCatalog) {
-                    result = CompareHFSCatalogKeys(key, testKey);
-                } else {
-                    result = CompareHFSExtentsKeys(key, testKey);
-                }
-            }
-      
-            if (result < 0) upperBound = index - 1;        // search < trial
-            else if (result > 0) lowerBound = index + 1;   // search > trial
-            else break;                                    // search = trial
-        }
-    
-        if (result < 0) {
-            index = upperBound;
-            GetBTreeRecord(index, nodeBuf, nodeSize, &testKey, &recordData);
-        }
-    
-        // Found the closest key... Recurse on it if this is an index node.
-        if (node->kind == kBTIndexNode) {
-            curNode = SWAP_BE32( *((long *)recordData) );
-        } else break;
-    }
-  
-    // Return error if the file was not found.
-    if (result != 0) { free(nodeBuf); return -1; }
+	if (btree == kBTreeCatalog)
+	{
+		switch (SWAP_BE16(*(short *)recordData))
+		{
+			case kHFSFolderRecord           : entrySize = 70;
+				break;
+			case kHFSFileRecord             : entrySize = 102;
+				break;
+			case kHFSFolderThreadRecord     : entrySize = 46;
+				break;
+			case kHFSFileThreadRecord       : entrySize = 46;
+				break;
+			case kHFSPlusFolderRecord       : entrySize = 88;
+				break;
+			case kHFSPlusFileRecord         : entrySize = 248;
+				break;
+			case kHFSPlusFolderThreadRecord : entrySize = 264;
+				break;
+			case kHFSPlusFileThreadRecord   : entrySize = 264;
+				break;
+		}
+	}
+	else
+	{
+		if (gIsHFSPlus)
+		{
+			entrySize = sizeof(HFSPlusExtentRecord);
+		}
+		else
+		{
+			entrySize = sizeof(HFSExtentRecord);
+		}
+	}
 
-    if (btree == kBTreeCatalog) {
-        switch (SWAP_BE16(*(short *)recordData)) {
-            case kHFSFolderRecord           : entrySize = 70;  break;
-            case kHFSFileRecord             : entrySize = 102; break;
-            case kHFSFolderThreadRecord     : entrySize = 46;  break;
-            case kHFSFileThreadRecord       : entrySize = 46;  break;
-            case kHFSPlusFolderRecord       : entrySize = 88;  break;
-            case kHFSPlusFileRecord         : entrySize = 248; break;
-            case kHFSPlusFolderThreadRecord : entrySize = 264; break;
-            case kHFSPlusFileThreadRecord   : entrySize = 264; break;
-        }
-    } else {
-        if (gIsHFSPlus) entrySize = sizeof(HFSPlusExtentRecord);
-        else entrySize = sizeof(HFSExtentRecord);
-    }
-  
-    bcopy(recordData, entry, entrySize);
+	bcopy(recordData, entry, entrySize);
 
-    // Update dirIndex.
-    if (dirIndex != 0) {
-        index++;
-        if (index == SWAP_BE16(node->numRecords)) {
-            index = 0;
-            curNode = SWAP_BE32(node->fLink);
-        }
-        *dirIndex = (long long) curNode * nodeSize + index;
-    }
-  
-    free(nodeBuf);
-  
-    return 0;
+	// Update dirIndex.
+	if (dirIndex != 0)
+	{
+		index++;
+		if (index == SWAP_BE16(node->numRecords))
+		{
+			index = 0;
+			curNode = SWAP_BE32(node->fLink);
+		}
+		*dirIndex = (long long) curNode * nodeSize + index;
+	}
+
+	free(nodeBuf);
+
+	return 0;
 }
 
 static void GetBTreeRecord(long index, char * nodeBuffer, long nodeSize,
@@ -891,73 +1061,97 @@ static long ReadExtent(char * extent, uint64_t extentSize,
     long long extentDensity, sizeofExtent, currentExtentSize;
     char      *currentExtent, *extentBuffer = 0, *bufferPos = buffer;
 
-    if (offset >= extentSize) return 0;
+	if (offset >= extentSize)
+	{
+		return 0;
+	}
 
-    if (gIsHFSPlus) {
-        extentDensity = kHFSPlusExtentDensity;
-        sizeofExtent  = sizeof(HFSPlusExtentDescriptor);
-    } else {
-        extentDensity = kHFSExtentDensity;
-        sizeofExtent  = sizeof(HFSExtentDescriptor);
-    }
+	if (gIsHFSPlus)
+	{
+		extentDensity = kHFSPlusExtentDensity;
+		sizeofExtent  = sizeof(HFSPlusExtentDescriptor);
+	}
+	else
+	{
+		extentDensity = kHFSExtentDensity;
+		sizeofExtent  = sizeof(HFSExtentDescriptor);
+	}
 
-    lastOffset = offset + size;
-    while (offset < lastOffset) {
-        blockNumber = offset / gBlockSize;
+	lastOffset = offset + size;
 
-        // Find the extent for the offset.
-        for (; ; nextExtent++) {
-            if (nextExtent < extentDensity) {
-                if ((countedBlocks + GetExtentSize(extent, nextExtent) - 1) < blockNumber) {
-                    countedBlocks += GetExtentSize(extent, nextExtent);
-                    continue;
-                }
+	while (offset < lastOffset)
+	{
+		blockNumber = offset / gBlockSize;
 
-                currentExtent = extent + nextExtent * sizeofExtent;
-                break;
-            }
+		// Find the extent for the offset.
+		for (; ; nextExtent++)
+		{
+			if (nextExtent < extentDensity)
+			{
+				if ((countedBlocks + GetExtentSize(extent, nextExtent) -1) < blockNumber)
+				{
+					countedBlocks += GetExtentSize(extent, nextExtent);
+					continue;
+				}
 
-            if (extentBuffer == 0) {
-                extentBuffer = malloc(sizeofExtent * extentDensity);
-                if (extentBuffer == 0) return -1;
-            }
+				currentExtent = extent + nextExtent * sizeofExtent;
+				break;
+			}
 
-            nextExtentBlock = nextExtent / extentDensity;
-            if (currentExtentBlock != nextExtentBlock) {
-                ReadExtentsEntry(extentFile, countedBlocks, extentBuffer);
-                currentExtentBlock = nextExtentBlock;
-            }
+			if (extentBuffer == 0)
+			{
+				extentBuffer = malloc(sizeofExtent * extentDensity);
 
-            currentExtentSize = GetExtentSize(extentBuffer, nextExtent % extentDensity);
+				if (extentBuffer == 0)
+				{
+					return -1;
+				}
+			}
 
-            if ((countedBlocks + currentExtentSize - 1) >= blockNumber) {
-                currentExtent = extentBuffer + sizeofExtent * (nextExtent % extentDensity);
-                break;
-            }
-      
-            countedBlocks += currentExtentSize;
-        }
+			nextExtentBlock = nextExtent / extentDensity;
 
-        readOffset = ((blockNumber - countedBlocks) * gBlockSize) +
-                     (offset % gBlockSize);
-    
+			if (currentExtentBlock != nextExtentBlock)
+			{
+				ReadExtentsEntry(extentFile, countedBlocks, extentBuffer);
+				currentExtentBlock = nextExtentBlock;
+			}
+
+			currentExtentSize = GetExtentSize(extentBuffer, nextExtent % extentDensity);
+
+			if ((countedBlocks + currentExtentSize - 1) >= blockNumber)
+			{
+				currentExtent = extentBuffer + sizeofExtent * (nextExtent % extentDensity);
+				break;
+			}
+
+			countedBlocks += currentExtentSize;
+		}
+
+		readOffset = ((blockNumber - countedBlocks) * gBlockSize) + (offset % gBlockSize);
+
 		// MacWen: fix overflow in multiplication by forcing 64bit multiplication
-        readSize = (long long)GetExtentSize(currentExtent, 0) * gBlockSize - readOffset;
-        if (readSize > (size - sizeRead)) readSize = size - sizeRead;
+		readSize = (long long)GetExtentSize(currentExtent, 0) * gBlockSize - readOffset;
 
-        readOffset += (long long)GetExtentStart(currentExtent, 0) * gBlockSize;
-    
-        CacheRead(gCurrentIH, bufferPos, gAllocationOffset + readOffset,
-                  readSize, cache);
+		if (readSize > (size - sizeRead))
+		{
+			readSize = size - sizeRead;
+		}
 
-        sizeRead += readSize;
-        offset += readSize;
-        bufferPos += readSize;
-    }
+		readOffset += (long long)GetExtentStart(currentExtent, 0) * gBlockSize;
 
-    if (extentBuffer) free(extentBuffer);
+		CacheRead(gCurrentIH, bufferPos, gAllocationOffset + readOffset, readSize, cache);
 
-    return sizeRead;
+		sizeRead += readSize;
+		offset += readSize;
+		bufferPos += readSize;
+	}
+
+	if (extentBuffer)
+	{
+		free(extentBuffer);
+	}
+
+	return sizeRead;
 }
 
 static long GetExtentStart(void * extents, long index)
@@ -966,10 +1160,16 @@ static long GetExtentStart(void * extents, long index)
     HFSExtentDescriptor     *hfsExtents     = extents;
     HFSPlusExtentDescriptor *hfsPlusExtents = extents;
 
-    if (gIsHFSPlus) start = SWAP_BE32(hfsPlusExtents[index].startBlock);
-    else start = SWAP_BE16(hfsExtents[index].startBlock);
+	if (gIsHFSPlus)
+	{
+		start = SWAP_BE32(hfsPlusExtents[index].startBlock);
+	}
+	else
+	{
+		start = SWAP_BE16(hfsExtents[index].startBlock);
+	}
 
-    return start;
+	return start;
 }
 
 static long GetExtentSize(void * extents, long index)
@@ -984,131 +1184,191 @@ static long GetExtentSize(void * extents, long index)
 	return size;
 }
 
+//==============================================================================
+
 static long CompareHFSCatalogKeys(void * key, void * testKey)
 {
-    HFSCatalogKey *searchKey, *trialKey;
-    long          result, searchParentID, trialParentID;
+	HFSCatalogKey *searchKey, *trialKey;
+	long result, searchParentID, trialParentID;
 
-    searchKey = key;
-    trialKey  = testKey;
+	searchKey = key;
+	trialKey  = testKey;
 
-    searchParentID = SWAP_BE32(searchKey->parentID);
-    trialParentID  = SWAP_BE32(trialKey->parentID);
+	searchParentID = SWAP_BE32(searchKey->parentID);
+	trialParentID  = SWAP_BE32(trialKey->parentID);
 
-    // parent dirID is unsigned
-    if (searchParentID > trialParentID)      result = 1;
-    else if (searchParentID < trialParentID) result = -1;
-    else {
-        // parent dirID's are equal, compare names
-        result = FastRelString(searchKey->nodeName, trialKey->nodeName);
-    }
+	// parent dirID is unsigned
+	if (searchParentID > trialParentID)
+	{
+		result = 1;
+	}
+	else if (searchParentID < trialParentID)
+	{
+		result = -1;
+	}
+	else
+	{
+		// parent dirID's are equal, compare names
+		result = FastRelString(searchKey->nodeName, trialKey->nodeName);
+	}
 
-    return result;
+	return result;
 }
+
+//==============================================================================
 
 static long CompareHFSPlusCatalogKeys(void * key, void * testKey)
 {
-    HFSPlusCatalogKey *searchKey, *trialKey;
-    long              result, searchParentID, trialParentID;
-  
-    searchKey = key;
-    trialKey  = testKey;
-  
-    searchParentID = SWAP_BE32(searchKey->parentID);
-    trialParentID  = SWAP_BE32(trialKey->parentID);
+	HFSPlusCatalogKey *searchKey, *trialKey;
+	long result, searchParentID, trialParentID;
 
-    // parent dirID is unsigned
-    if (searchParentID > trialParentID)      result = 1;
-    else if (searchParentID < trialParentID) result = -1;
-    else {
-        // parent dirID's are equal, compare names
-        if ((searchKey->nodeName.length == 0) || (trialKey->nodeName.length == 0))
-            result = searchKey->nodeName.length - trialKey->nodeName.length;
-        else
-          if (gCaseSensitive) {
-            result = BinaryUnicodeCompare(&searchKey->nodeName.unicode[0],
+	searchKey = key;
+	trialKey  = testKey;
+
+	searchParentID = SWAP_BE32(searchKey->parentID);
+	trialParentID  = SWAP_BE32(trialKey->parentID);
+
+	// parent dirID is unsigned
+	if (searchParentID > trialParentID)
+	{
+		result = 1;
+	}
+	else if (searchParentID < trialParentID) 
+	{
+		result = -1;
+	}
+	else
+	{
+		// parent dirID's are equal, compare names
+		if ((searchKey->nodeName.length == 0) || (trialKey->nodeName.length == 0))
+		{
+			result = searchKey->nodeName.length - trialKey->nodeName.length;
+		}
+		else if (gCaseSensitive)
+		{
+			result = BinaryUnicodeCompare(&searchKey->nodeName.unicode[0],
                                           SWAP_BE16(searchKey->nodeName.length),
                                           &trialKey->nodeName.unicode[0],
                                           SWAP_BE16(trialKey->nodeName.length));
-          } else {
-            result = FastUnicodeCompare(&searchKey->nodeName.unicode[0],
+		}
+		else
+		{
+			result = FastUnicodeCompare(&searchKey->nodeName.unicode[0],
                                         SWAP_BE16(searchKey->nodeName.length),
                                         &trialKey->nodeName.unicode[0],
                                         SWAP_BE16(trialKey->nodeName.length), OSBigEndian);
-          }
-    }
+		}
+	}
 
-    return result;
+	return result;
 }
+
+//==============================================================================
 
 static long CompareHFSExtentsKeys(void * key, void * testKey)
 {
-    HFSExtentKey *searchKey, *trialKey;
-    long         result;
-  
-    searchKey = key;
-    trialKey  = testKey;
-  
-    // assume searchKey < trialKey
-    result = -1;            
+	HFSExtentKey *searchKey, *trialKey;
+	long         result;
 
-    if (searchKey->fileID == trialKey->fileID) {
-        // FileNum's are equal; compare fork types
-        if (searchKey->forkType == trialKey->forkType) {
-            // Fork types are equal; compare allocation block number
-            if (searchKey->startBlock == trialKey->startBlock) {
-                // Everything is equal
-                result = 0;
-            } else {
-                // Allocation block numbers differ; determine sign
-                if (SWAP_BE16(searchKey->startBlock) > SWAP_BE16(trialKey->startBlock))
-                    result = 1;
-            }
-        } else {
-            // Fork types differ; determine sign
-            if (searchKey->forkType > trialKey->forkType) result = 1;
-        }
-    } else {
-        // FileNums differ; determine sign
-        if (SWAP_BE32(searchKey->fileID) > SWAP_BE32(trialKey->fileID))
-            result = 1;
-    }
+	searchKey = key;
+	trialKey  = testKey;
 
-    return result;
+	// assume searchKey < trialKey
+	result = -1;            
+
+	if (searchKey->fileID == trialKey->fileID)
+	{
+		// FileNum's are equal; compare fork types
+		if (searchKey->forkType == trialKey->forkType)
+		{
+			// Fork types are equal; compare allocation block number
+			if (searchKey->startBlock == trialKey->startBlock)
+			{
+				// Everything is equal
+				result = 0;
+			}
+			else
+			{
+				// Allocation block numbers differ; determine sign
+				if (SWAP_BE16(searchKey->startBlock) > SWAP_BE16(trialKey->startBlock))
+				{
+					result = 1;
+				}
+			}
+        	}
+		else
+		{
+			// Fork types differ; determine sign
+			if (searchKey->forkType > trialKey->forkType)
+			{
+				result = 1;
+			}
+		}
+	}
+	else
+	{
+		// FileNums differ; determine sign
+		if (SWAP_BE32(searchKey->fileID) > SWAP_BE32(trialKey->fileID))
+		{
+			result = 1;
+		}
+	}
+
+	return result;
 }
+
+
+//==============================================================================
 
 static long CompareHFSPlusExtentsKeys(void * key, void * testKey)
 {
-    HFSPlusExtentKey *searchKey, *trialKey;
-    long             result;
+	HFSPlusExtentKey	*searchKey, *trialKey;
 
-    searchKey = key;
-    trialKey  = testKey;
+	long			result;
 
-    // assume searchKey < trialKey
-    result = -1;
+	searchKey = key;
+	trialKey  = testKey;
 
-    if (searchKey->fileID == trialKey->fileID) {
-        // FileNum's are equal; compare fork types
-        if (searchKey->forkType == trialKey->forkType) {
-            // Fork types are equal; compare allocation block number
-            if (searchKey->startBlock == trialKey->startBlock) {
-                // Everything is equal
-                result = 0;
-            } else {
-                // Allocation block numbers differ; determine sign
-                if (SWAP_BE32(searchKey->startBlock) > SWAP_BE32(trialKey->startBlock))
-                    result = 1;
-            }
-        } else {
-            // Fork types differ; determine sign
-            if (searchKey->forkType > trialKey->forkType) result = 1;
-        }
-    } else {
-        // FileNums differ; determine sign
-        if (SWAP_BE32(searchKey->fileID) > SWAP_BE32(trialKey->fileID))
-            result = 1;
-    }
+	// assume searchKey < trialKey
+	result = -1;
+
+	if (searchKey->fileID == trialKey->fileID)
+	{
+		// FileNum's are equal; compare fork types
+		if (searchKey->forkType == trialKey->forkType)
+		{
+			// Fork types are equal; compare allocation block number
+			if (searchKey->startBlock == trialKey->startBlock)
+			{
+				// Everything is equal
+				result = 0;
+			}
+			else
+			{
+				// Allocation block numbers differ; determine sign
+				if (SWAP_BE32(searchKey->startBlock) > SWAP_BE32(trialKey->startBlock))
+				{
+					result = 1;
+				}
+			}
+		}
+		else
+		{
+			// Fork types differ; determine sign
+			if (searchKey->forkType > trialKey->forkType)
+			{
+				result = 1;
+			}
+		}
+	}
+	else
+	{
+		// FileNums differ; determine sign
+		if (SWAP_BE32(searchKey->fileID) > SWAP_BE32(trialKey->fileID))
+		{
+			result = 1;
+		}
+	}
 
     return result;
 }

@@ -611,8 +611,7 @@ static const char * extractKernelName( char ** cpp )
 
 //==========================================================================
 
-static void
-printMemoryInfo(void)
+static void printMemoryInfo(void)
 {
     int line;
     int i;
@@ -1240,7 +1239,6 @@ processBootOptions()
 		{
 			if( YOSEMITE ) // is 10.10
 			{
-
 				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
 				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
 			}

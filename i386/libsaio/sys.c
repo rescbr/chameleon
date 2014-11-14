@@ -161,7 +161,8 @@ long LoadFile(const char * fileSpec)
 
 	// Resolve the boot volume from the file spec.
 
-	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
+	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
+	{
 		return -1;
 	}
 
@@ -175,11 +176,13 @@ long ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint
 	const char *filePath;
 	BVRef bvr;
 
-	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
+	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
+	{
 		return -1;
 	}
 
-	if (bvr->fs_readfile == NULL) {
+	if (bvr->fs_readfile == NULL)
+	{
 		return -1;
 	}
 
@@ -197,7 +200,8 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 
 	// Resolve the boot volume from the file spec.
 
-	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
+	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
+	{
 		return -1;
 	}
 
@@ -228,19 +232,24 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 				DBG("Fat Binary found. Reading thin part only...\n");
 				length = readFile(bvr, (char *)filePath, (void *)kLoadAddr, (unsigned long)(*binary) - kLoadAddr, length);
 				*binary = (void *)kLoadAddr;
-			} else 	{
+			}
+			else
+			{
 				// Not a fat binary; read the rest of the file
 				DBG("Thin Binary found. Reading rest of the file...\n");
 				length2 = readFile(bvr, (char *)filePath, (void *)(kLoadAddr + length), length, 0);
 
-				if (length2 == -1) {
+				if (length2 == -1)
+				{
 					return -1;
 				}
 
 				length += length2;
 			}
 		}
-	} else {
+	}
+	else
+	{
 		length = bvr->fs_loadfile(bvr, (char *)filePath);
 
 		if (length > 0)
@@ -248,7 +257,7 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 			ThinFatFile(binary, &length);
 		}
 	}
-  
+
 	return length;
 }
 
@@ -301,13 +310,16 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 	i = 0;
 	fmtbase = 0;
 
-	for(fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++) {
-		for (i = 0; i < uuidfmt[fmtidx]; i++) {
+	for(fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++)
+	{
+		for (i = 0; i < uuidfmt[fmtidx]; i++)
+		{
 			uint8_t byte = mdresult[fmtbase + i];
 			char nib = byte >> 4;
 			*p = nib + '0';  // 0x4 -> '4'
 
-			if (*p > '9') {
+			if (*p > '9')
+			{
 				*p = (nib - 9 + ('A'-1));  // 0xB -> 'B'
 			}
 
@@ -316,7 +328,8 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 			nib = byte & 0xf;
 			*p = nib + '0';  // 0x4 -> '4'
 
-			if (*p > '9') {
+			if (*p > '9')
+			{
 				*p = (nib - 9 + ('A'-1));  // 0xB -> 'B'
 			}
 
@@ -325,7 +338,8 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 
 		fmtbase += i;
 
-		if (fmtidx < sizeof(uuidfmt) - 1) {
+		if (fmtidx < sizeof(uuidfmt) - 1)
+		{
 			*(p++) = '-';
 		}
 		else
@@ -350,13 +364,14 @@ long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name,
 
 	// Resolve the boot volume from the dir spec.
 
-	if ((bvr = getBootVolumeRef(dirSpec, &dirPath)) == NULL) {
+	if ((bvr = getBootVolumeRef(dirSpec, &dirPath)) == NULL)
+	{
 		return -1;
 	}
 
-	// Returns 0 on success or -1 when there are no additional entries.
+	// Return 0 on success, or -1 if there are no additional entries.
 
-    return bvr->fs_getdirentry( bvr,
+	return bvr->fs_getdirentry( bvr,
                 /* dirPath */   (char *)dirPath,
                 /* dirIndex */  dirIndex,
                 /* dirEntry */  (char **)name, flags, time, 0, 0 );
@@ -374,7 +389,8 @@ long GetFileInfo(const char * dirSpec, const char * name,
 	long long index = 0;
 	const char * entryName;
 
-	if (gMakeDirSpec == 0) {
+	if (gMakeDirSpec == 0)
+	{
 		gMakeDirSpec = (char *)malloc(1024);
 	}
 
@@ -401,7 +417,8 @@ long GetFileInfo(const char * dirSpec, const char * name,
 
 	while (GetDirEntry(dirSpec, &index, &entryName, flags, time) == 0)
 	{
-		if (strcmp(entryName, name) == 0) {
+		if (strcmp(entryName, name) == 0)
+		{
 			return 0;  // success
 		}
 	}
@@ -434,10 +451,12 @@ static int GetFreeFd(void)
 	int	fd;
 
 	// Locate a free descriptor slot.
-	for (fd = 0; fd < NFILES; fd++) {
-		if (iob[fd].i_flgs == 0) {
+	for (fd = 0; fd < NFILES; fd++)
+	{
+		if (iob[fd].i_flgs == 0)
+		{
 			return fd;
-	    	}
+		}
 	}
 	stop("Out of file descriptors");
 	// not reached
@@ -454,9 +473,12 @@ static struct iob * iob_from_fdesc(int fdesc)
 {
 	register struct iob * io;
 
-	if (fdesc < 0 || fdesc >= NFILES || ((io = &iob[fdesc])->i_flgs & F_ALLOC) == 0) {
+	if (fdesc < 0 || fdesc >= NFILES || ((io = &iob[fdesc])->i_flgs & F_ALLOC) == 0)
+	{
 		return NULL;
-	} else {
+	}
+	else
+	{
 		return io;
 	}
 }
@@ -466,21 +488,21 @@ static struct iob * iob_from_fdesc(int fdesc)
 
 int openmem(char * buf, int len)
 {
-    int          fdesc;
-    struct iob * io;
+	int          fdesc;
+	struct iob * io;
 
-    fdesc = GetFreeFd();
-    io = &iob[fdesc];
-    bzero(io, sizeof(*io));
+	fdesc = GetFreeFd();
+	io = &iob[fdesc];
+	bzero(io, sizeof(*io));
 
-    // Mark the descriptor as taken. Set the F_MEM flag to indicate
-    // that the file buffer is provided by the caller.
+	// Mark the descriptor as taken. Set the F_MEM flag to indicate
+	// that the file buffer is provided by the caller.
 
-    io->i_flgs     = F_ALLOC | F_MEM;
-    io->i_buf      = buf;
-    io->i_filesize = len;
+	io->i_flgs     = F_ALLOC | F_MEM;
+	io->i_buf      = buf;
+	io->i_filesize = len;
 
-    return fdesc;
+	return fdesc;
 }
 
 //==========================================================================
@@ -528,7 +550,8 @@ int open(const char *path, int flags)
 	BVRef		bvr;
 
 	// Resolve the boot volume from the file spec.
-	if ((bvr = getBootVolumeRef(path, &filepath)) != NULL) {
+	if ((bvr = getBootVolumeRef(path, &filepath)) != NULL)
+	{
 		return open_bvr(bvr, filepath, flags);
 	}
 	return -1;
@@ -536,7 +559,7 @@ int open(const char *path, int flags)
 
 int open_bvdev(const char *bvd, const char *path, int flags)
 {
-    const struct devsw	*dp;
+	const struct devsw	*dp;
 	const char			*cp;
 	BVRef				bvr;
 	int					i;
@@ -544,38 +567,46 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 	int					unit;
 	int					partition;
 
-	if ((i = open(path, flags)) >= 0) {
+	if ((i = open(path, flags)) >= 0)
+	{
 		return i;
 	}
 
-	if (bvd == NULL || (len = strlen(bvd)) < 2) {
+	if (bvd == NULL || (len = strlen(bvd)) < 2)
+	{
 		return -1;
 	}
 
-	for (dp=devsw; dp->name; dp++) {
-		if (bvd[0] == dp->name[0] && bvd[1] == dp->name[1]) {
+	for (dp=devsw; dp->name; dp++)
+	{
+		if (bvd[0] == dp->name[0] && bvd[1] == dp->name[1])
+		{
 			unit = 0;
 			partition = 0;
 			/* get optional unit and partition */
 			if (len >= 5 && bvd[2] == '(') { /* min must be present xx(0) */
 				cp = &bvd[3];
 				i = 0;
-				while ((cp - path) < len && isdigit(*cp)) {
+				while ((cp - path) < len && isdigit(*cp))
+				{
 					i = i * 10 + *cp++ - '0';
 					unit = i;
 				}
-				if (*cp++ == ',') {
+				if (*cp++ == ',')
+				{
 					i = 0;
-					while ((cp - path) < len && isdigit(*cp)) {
+					while ((cp - path) < len && isdigit(*cp))
+					{
 						i = i * 10 + *cp++ - '0';
 						partition = i;
 					}
 				}
 			}
 			bvr = newBootVolumeRef(dp->biosdev + unit, partition);
+
 			return open_bvr(bvr, path, flags);
 		}
-    }
+	}
 	return -1;
 }
 
@@ -586,7 +617,8 @@ int close(int fdesc)
 {
 	struct iob * io;
 
-	if ((io = iob_from_fdesc(fdesc)) == NULL) {
+	if ((io = iob_from_fdesc(fdesc)) == NULL)
+	{
 		return (-1);
 	}
 
@@ -603,7 +635,8 @@ int b_lseek(int fdesc, int offset, int ptr)
 {
 	struct iob * io;
 
-	if ((io = iob_from_fdesc(fdesc)) == NULL) {
+	if ((io = iob_from_fdesc(fdesc)) == NULL)
+	{
 		return (-1);
 	}
 
@@ -619,7 +652,8 @@ int tell(int fdesc)
 {
 	struct iob * io;
 
-	if ((io = iob_from_fdesc(fdesc)) == NULL) {
+	if ((io = iob_from_fdesc(fdesc)) == NULL)
+	{
 		return 0;
 	}
 
@@ -820,7 +854,8 @@ int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
 
 const char * systemConfigDir()
 {
-	if (gBootFileType == kNetworkDeviceType) {
+	if (gBootFileType == kNetworkDeviceType)
+	{
 		return "";
 	}
 	return "/Library/Preferences/SystemConfiguration";
@@ -835,12 +870,16 @@ void scanBootVolumes(int biosdev, int * count)
 	BVRef bvr = 0;
 
 	bvr = diskScanBootVolumes(biosdev, count);
-	if (bvr == NULL) {
+	if (bvr == NULL)
+	{
 		bvr = nbpScanBootVolumes(biosdev, count);
-		if (bvr != NULL) {
+		if (bvr != NULL)
+		{
 			gBootFileType = kNetworkDeviceType;
 		}
-	}  else {
+	}
+	else
+	{
 		gBootFileType = kBlockDeviceType;
 	}
 }
@@ -854,14 +893,16 @@ void scanDisks(int biosdev, int *count)
 	int hd = 0;
 
 	// Testing up to MAX_HDD_COUNT hard drives.
-	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT) {
+	while(!testBiosread(0x80 + hd, 0) && hd < MAX_HDD_COUNT)
+	{
 		bvCount = 0;
 		scanBootVolumes(0x80 + hd, &bvCount);
 		hd++;
 	}
 
 	// Also scanning CD/DVD drive.
-	if (biosDevIsCDROM(gBIOSDev)) {
+	if (biosDevIsCDROM(gBIOSDev))
+	{
 		bvCount = 0;
 		scanBootVolumes(gBIOSDev, &bvCount);
 	}
@@ -875,13 +916,17 @@ BVRef selectBootVolume( BVRef chain )
 	bool foundPrimary = false;
 	BVRef bvr, bvr1 = 0, bvr2 = 0;
 	
-	if (chain->filtered) {
+	if (chain->filtered)
+	{
 		filteredChain = true;
 	}
 	
-	if (multiboot_partition_set) {
-		for ( bvr = chain; bvr; bvr = bvr->next ) {
-			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev ) {
+	if (multiboot_partition_set)
+	{
+		for ( bvr = chain; bvr; bvr = bvr->next )
+		{
+			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev )
+			{
 				return bvr;
 			}
 		}
@@ -893,9 +938,12 @@ BVRef selectBootVolume( BVRef chain )
 	 * We accept only kBVFlagSystemVolume or kBVFlagForeignBoot volumes.
 	 */
 	char *val = XMLDecode(getStringForKey(kDefaultPartition, &bootInfo->chameleonConfig));
-	if (val) {
-		for ( bvr = chain; bvr; bvr = bvr->next ) {
-			if (matchVolumeToString(bvr, val, false)) {
+	if (val)
+	{
+		for ( bvr = chain; bvr; bvr = bvr->next )
+		{
+			if (matchVolumeToString(bvr, val, false))
+			{
 				free(val);
 				return bvr;
 			}
@@ -909,11 +957,14 @@ BVRef selectBootVolume( BVRef chain )
 	 * If not found any active partition then we will
 	 * select this volume as the boot volume.
 	 */
-	for ( bvr = chain; bvr; bvr = bvr->next ) {
-		if (multiboot_skip_partition_set) {
+	for ( bvr = chain; bvr; bvr = bvr->next )
+	{
+		if (multiboot_skip_partition_set)
+		{
 			if (bvr->part_no == multiboot_skip_partition) continue;
 		}
-		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev ) {
+		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
+		{
 			foundPrimary = true;
 		}
 
@@ -922,7 +973,8 @@ BVRef selectBootVolume( BVRef chain )
 		if ( bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume)
 			&& gBIOSBootVolume
 			&& (!filteredChain || (filteredChain && bvr->visible))
-			&& bvr->biosdev == gBIOSDev ) {
+			&& bvr->biosdev == gBIOSDev )
+		{
 			bvr2 = bvr;
 		}
 
@@ -930,7 +982,8 @@ BVRef selectBootVolume( BVRef chain )
 		// from r491,
 		if ( bvr->flags & kBVFlagBootable
 			&& ! gBIOSBootVolume
-			&& bvr->biosdev == gBIOSDev ) {
+			&& bvr->biosdev == gBIOSDev )
+		{
 			bvr2 = bvr;
 		}
 	}
@@ -942,10 +995,12 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
-			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev ) {
+			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev )
+			{
 				bvr1 = bvr;
 			}
-			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev ) {
+			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
+			{
 				bvr2 = bvr;
 			}
 		}
@@ -975,7 +1030,8 @@ void setRootVolume(BVRef volume)
 	gRootVolume = volume;
 	// Veto non-native FS.  Basically that means don't allow the root volume to
 	// be set to a volume we can't read files from.
-	if(gRootVolume != NULL && ((gRootVolume->flags & kBVFlagNativeBoot) == 0)) {
+	if(gRootVolume != NULL && ((gRootVolume->flags & kBVFlagNativeBoot) == 0))
+	{
 		gRootVolume = NULL;
 	}
 }
@@ -984,9 +1040,10 @@ void setBootGlobals(BVRef chain)
 {
 	// Record default boot device.
 	gBootVolume = selectBootVolume(chain);
-  
+
 	// turbo - Save the ORIGINAL boot volume too for loading our mkext
-	if (!gBIOSBootVolume) {
+	if (!gBIOSBootVolume)
+	{
 		gBIOSBootVolume = gBootVolume;
 	}
 
@@ -1010,7 +1067,8 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
     // Search for left parenthesis in the path specification.
 
 	for (cp = path; *cp; cp++) {
-		if (*cp == LP || *cp == '/') {
+		if (*cp == LP || *cp == '/')
+		{
 			break;
 		}
 	}
@@ -1019,7 +1077,8 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 		cp = path;
 		// Path is using the implicit current device so if there is
 		// no current device, then we must fail.
-		if (gRootVolume == NULL) {
+		if (gRootVolume == NULL)
+		{
 			return NULL;
 		}
 	} else if ((cp - path) == 2) { // found "xx("
@@ -1034,13 +1093,16 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 
 		// Check the 2 character device name pointed by 'xp'.
 
-		for (dp = devsw; dp->name; dp++) {
-			if ((xp[0] == dp->name[0]) && (xp[1] == dp->name[1])) {
+		for (dp = devsw; dp->name; dp++)
+		{
+			if ((xp[0] == dp->name[0]) && (xp[1] == dp->name[1]))
+			{
 				break;	// Found matching entry.
 			}
 		}
 
-		if (dp->name == NULL) {
+		if (dp->name == NULL)
+		{
 			error("Unknown device '%c%c'\n", xp[0], xp[1]);
 			return NULL;
 		}
@@ -1050,23 +1112,26 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 
 		i = 0;
 
-		while (*cp >= '0' && *cp <= '9') {
+		while (*cp >= '0' && *cp <= '9')
+		{
 			i = i * 10 + *cp++ - '0';
 			unit = i;
 		}
 
-        // Unit is no longer optional and never really was.
-        // If the user failed to specify it then the unit number from the previous kernDev
-        // would have been used which makes little sense anyway.
-        // For example, if the user did fd()/foobar and the current root device was the
-        // second hard disk (i.e. unit 1) then fd() would select the second floppy drive!
-        if (unit == -1) {
+		// Unit is no longer optional and never really was.
+		// If the user failed to specify it then the unit number from the previous kernDev
+		// would have been used which makes little sense anyway.
+		// For example, if the user did fd()/foobar and the current root device was the
+		// second hard disk (i.e. unit 1) then fd() would select the second floppy drive!
+		if (unit == -1)
+		{
 			return NULL;
 		}
 
 		// Extract the optional partition number from the specification.
 
-		if (*cp == ',') {
+		if (*cp == ',')
+		{
 			part = atoi(++cp);
 		}
 
@@ -1078,22 +1143,27 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 
 		for ( ; *cp && *cp != RP; cp++) /* LOOP */;
 
-		if (*cp == RP) {
+		if (*cp == RP)
+		{
 			cp++;
 		}
-        
+
 		biosdev = dp->biosdev + unit;
 
 		bvr = newBootVolumeRef(biosdev, part);
 
-		if (bvr == NULL) {
+		if (bvr == NULL)
+		{
 			return NULL;
 		}
-	} else {
+	}
+	else
+	{
 		// Bad device specifier, skip past the right paren.
 
 		for (cp++; *cp && *cp != RP; cp++) /* LOOP */;
-		if (*cp == RP) {
+		if (*cp == RP)
+		{
 			cp++;
 		}
 
@@ -1119,17 +1189,26 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 	bvr = bvr1 = NULL;
 
 	// Try resolving "rd" and "bt" devices first.
-	if (biosdev == kPseudoBIOSDevRAMDisk) {
-		if (gRAMDiskVolume) {
+	if (biosdev == kPseudoBIOSDevRAMDisk)
+	{
+		if (gRAMDiskVolume)
+		{
 			bvr1 = gRAMDiskVolume;
 		}
-	} else if (biosdev == kPseudoBIOSDevBooter) {
-		if (gRAMDiskVolume != NULL && gRAMDiskBTAliased) {
+	}
+	else if (biosdev == kPseudoBIOSDevBooter)
+	{
+		if (gRAMDiskVolume != NULL && gRAMDiskBTAliased)
+		{
 			bvr1 = gRAMDiskVolume;
-		} else {
+		}
+		else
+		{
 			bvr1 = gBIOSBootVolume;
 		}
-	} else {
+	}
+	else
+	{
 		// Fetch the volume list from the device.
 
 		scanBootVolumes( biosdev, NULL );
@@ -1137,13 +1216,16 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 
 		// Look for a perfect match based on device and partition number.
 
-		for ( bvr1 = NULL, bvr = bvrChain; bvr; bvr = bvr->next ) {
-			if ( ( bvr->flags & kBVFlagNativeBoot ) == 0 ) {
+		for ( bvr1 = NULL, bvr = bvrChain; bvr; bvr = bvr->next )
+		{
+			if ( ( bvr->flags & kBVFlagNativeBoot ) == 0 )
+			{
 				continue;
 			}
 
 			bvr1 = bvr;
-			if ( bvr->part_no == partno ) {
+			if ( bvr->part_no == partno )
+			{
 				break;
 			}
 		}
@@ -1158,19 +1240,23 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 // Returns length of the out string
 int getDeviceDescription(BVRef bvr, char *str)
 {
-	if(!str) {
+	if(!str)
+	{
 		return 0;
 	}
     
 	*str = '\0';
 
-	if (bvr) {
+	if (bvr)
+	{
 		const struct devsw *dp = devsw;
-		while(dp->name && bvr->biosdev >= dp->biosdev) {
+		while(dp->name && bvr->biosdev >= dp->biosdev)
+		{
 			dp++;
         	}
 		dp--;
-		if (dp->name) {
+		if (dp->name)
+		{
 			return sprintf(str, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
 		}
 	}

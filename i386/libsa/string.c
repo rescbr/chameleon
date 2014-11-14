@@ -110,9 +110,9 @@ void bzero(void * dst, size_t len)
 
 size_t strlen(const char * s)
 {
-  const char* save = s;
-  while (*s++);
-  return (--s) - save;
+	const char* save = s;
+	while (*s++);
+	return (--s) - save;
 }
 
 /*#endif*/
@@ -141,16 +141,20 @@ strcmp(const char * s1, const char * s2)
 /* Derived from FreeBSD source */
 int strncmp(const char * s1, const char * s2, size_t n)
 {
-  if (!n)
-    return 0;
-  do {
-    if (*s1 != *s2++)
-      return (*(const unsigned char *)s1 -
-              *(const unsigned char *)(s2 - 1));
-    if (!*s1++)
-      break;
-  } while (--n);
-  return 0;
+	if (!n)
+		return 0;
+	do {
+		if (*s1 != *s2++)
+		{
+			return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
+		}
+
+		if (!*s1++)
+		{
+			break;
+		}
+	} while (--n);
+	return 0;
 }
 
 char *
@@ -165,7 +169,8 @@ strcpy(char * s1, const char * s2)
 char *
 stpcpy(char * s1, const char * s2)
 {
-	while ((*s1++ = *s2++)) {
+	while ((*s1++ = *s2++))
+	{
 		continue;
 	}
 	return --s1;
@@ -176,7 +181,8 @@ strncpy(char * s1, const char * s2, size_t n)
 {
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
-      --n;
+	--n;
+
 	if (n > 0) {
 		bzero(s1, n);
 	}
@@ -187,10 +193,12 @@ char *
 stpncpy(char * s1, const char * s2, size_t n)
 {
 	while (n && (*s1++ = *s2++))
-      --n;
+		--n;
 	if (n > 0)
-      bzero(s1, n);
-    return s1;
+	{
+		bzero(s1, n);
+	}
+	return s1;
 }
 
 char *
@@ -256,7 +264,9 @@ char *strcat(char *s1, const char *s2)
 {
 	register char *ret = s1;
 	while (*s1)
+	{
 		s1++;
+	}
 	while ((*s1++ = *s2++));
 	return ret;
 }

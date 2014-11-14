@@ -222,6 +222,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 
 	// Compute RAM Frequency
 	Platform.RAM.Frequency = (Platform.CPU.FSBFrequency * mch_ratio) / 100000;
+	// DBG("ram_fsb %d\n", Platform.RAM.Frequency);
 }
 
 
@@ -236,6 +237,7 @@ static void get_fsb_nhm(pci_dt_t *dram_dev)
 
 	// Compute RAM Frequency
 	Platform.RAM.Frequency = Platform.CPU.FSBFrequency * mch_ratio / 2;
+	// DBG("ram_fsb %d\n", Platform.RAM.Frequency);
 }
 
 /*

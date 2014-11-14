@@ -328,7 +328,7 @@ find_boot:
                                                     ; equipped with boot1h in its boot record
                                                     ; regardless if it's active or not.
     jne     .continue
-  	mov 	dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
+    mov     dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
 
     DebugChar('*')
 
@@ -350,7 +350,7 @@ find_boot:
     ; Scanned all partitions but not found any with active flag enabled
     ; Anyway if we found a protective MBR before we still have a chance 
     ; for a possible GPT Header at LBA 1
-    ;    
+    ;
     dec	    bl
     jnz     .switchPass2					; didn't find Protective MBR before
     call    checkGPT
@@ -372,7 +372,7 @@ find_boot:
     ; Jump to partition booter. The drive number is already in register DL.
     ; SI is pointing to the modified partition entry.
     ;
-initBootLoader:    
+initBootLoader:
 
 DebugChar('J')
 
@@ -382,7 +382,6 @@ DebugChar('J')
 
     jmp     kBoot0LoadAddr
 
-    
     ; 
     ; Found Protective MBR Partition Type: 0xEE
     ; Check for 'EFI PART' string at the beginning
@@ -463,16 +462,16 @@ checkGPT:
     ;
 
     mov	    eax, [si + gpta.StartingLBA]			; load boot sector from StartingLBA
-    mov	    [my_lba], eax		
-	mov		dh, 1									; Argument for loadBootSector to check HFS+ partition signature.
+    mov	    [my_lba], eax
+    mov     dh, 1						; Argument for loadBootSector to check HFS+ partition signature.
     call    loadBootSector
-    jne	    .gpt_continue							; no boot loader signature
+    jne	    .gpt_continue					; no boot loader signature
 
-    mov	    si, kMBRPartTable						; fake the current GUID Partition
-    mov	    [si + part.lba], eax					; as MBR style partition for boot1h
+    mov	    si, kMBRPartTable					; fake the current GUID Partition
+    mov	    [si + part.lba], eax				; as MBR style partition for boot1h
     mov     BYTE [si + part.type], kPartTypeHFS		; with HFS+ filesystem type (0xAF)
-    jmp	    SHORT initBootLoader    
-    
+    jmp	    SHORT initBootLoader
+
 .gpt_continue:
 
     add	    si, bx									; advance SI to next partition entry
@@ -506,7 +505,7 @@ loadBootSector:
 
 	or		dh, dh
 	jz		.checkBootSignature
-	
+
 .checkHFSSignature:
 
 %if VERBOSE
@@ -611,7 +610,7 @@ read_lba:
     mov  eax, ecx
     call print_hex
 %endif
-        
+
     ;
     ; INT13 Func 42 - Extended Read Sectors
     ;
@@ -621,7 +620,7 @@ read_lba:
     ;   DS:SI = pointer to Disk Address Packet
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   carry = 0 success
     ;           1 error
     ;
@@ -782,7 +781,7 @@ boot_error_str   	db  'error', 0
 ; that the 'times' argument is negative.
 
 ;
-; According to EFI specification, maximum boot code size is 440 bytes 
+; According to EFI specification, maximum boot code size is 440 bytes
 ;
 
 ;

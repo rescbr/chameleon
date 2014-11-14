@@ -28,24 +28,19 @@
  * Copyright (c) 1989 Carnegie-Mellon University
  * All rights reserved.	 The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
- */
-
-/*
- *			INTEL CORPORATION PROPRIETARY INFORMATION
  *
- *	This software is supplied under the terms of a license	agreement or 
- *	nondisclosure agreement with Intel Corporation and may not be copied 
- *	nor disclosed except in accordance with the terms of that agreement.
+ *          INTEL CORPORATION PROPRIETARY INFORMATION
+ *
+ *  This software is supplied under the terms of a license  agreement or 
+ *  nondisclosure agreement with Intel Corporation and may not be copied 
+ *  nor disclosed except in accordance with the terms of that agreement.
  *
  *	Copyright 1988, 1989 by Intel Corporation
- */
-
-/*
+ *
+ *
  * Copyright 1993 NeXT Computer, Inc.
  * All rights reserved.
- */
-
-/*
+ *
  * Completely reworked by Sam Streeper (sam_s@NeXT.com)
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
@@ -536,7 +531,7 @@ void common_boot(int biosdev)
 		long		flags, sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
 
-		char        bootFile[sizeof(bootInfo->bootFile)];
+		char		bootFile[sizeof(bootInfo->bootFile)];
 		char		bootFilePath[512];
 		char		kernelCacheFile[512];
 
@@ -719,7 +714,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if (!YOSEMITE)
+				if ( !YOSEMITE )
 				{
 					//printf(HEADER " (%s).\n", bootInfo->bootFile);
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /

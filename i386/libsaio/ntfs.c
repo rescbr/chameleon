@@ -106,8 +106,7 @@ ntfs_fixup(
  * Find a resident attribute of a given type.  Returns a pointer to the
  * attribute data, and its size in bytes.
  */
-static int
-ntfs_find_attr(
+static int ntfs_find_attr(
                 char *buf,
                 u_int32_t attrType,
                 void **attrData,
@@ -148,79 +147,78 @@ ntfs_find_attr(
 /*
  * Examine a volume to see if we recognize it as a mountable.
  */
-void
-NTFSGetDescription(CICell ih, char *str, long strMaxLen)
+void NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 {
-    struct bootfile *boot;
-    unsigned bytesPerSector;
-    unsigned sectorsPerCluster;
-    int mftRecordSize;
-    u_int64_t totalClusters;
-    u_int64_t cluster, mftCluster;
-    size_t mftOffset;
-    void *nameAttr;
-    size_t nameSize;
-    char *buf;
+	struct bootfile *boot;
+	unsigned bytesPerSector;
+	unsigned sectorsPerCluster;
+	int mftRecordSize;
+	u_int64_t totalClusters;
+	u_int64_t cluster, mftCluster;
+	size_t mftOffset;
+	void *nameAttr;
+	size_t nameSize;
+	char *buf;
 
-    buf = (char *)malloc(MAX_CLUSTER_SIZE);
-    if (buf == 0) {
-        goto error;
-    }
+	buf = (char *)malloc(MAX_CLUSTER_SIZE);
+	if (buf == 0)
+	{
+		goto error;
+	}
 
-    /*
-     * Read the boot sector, check signatures, and do some minimal
-     * sanity checking.  NOTE: the size of the read below is intended
-     * to be a multiple of all supported block sizes, so we don't
-     * have to determine or change the device's block size.
-     */
-    Seek(ih, 0);
-    Read(ih, (long)buf, MAX_BLOCK_SIZE);
+	/*
+	 * Read the boot sector, check signatures, and do some minimal
+	 * sanity checking.  NOTE: the size of the read below is intended
+	 * to be a multiple of all supported block sizes, so we don't
+	 * have to determine or change the device's block size.
+	 */
+	Seek(ih, 0);
+	Read(ih, (long)buf, MAX_BLOCK_SIZE);
 
-    boot = (struct bootfile *) buf;
-    
-    /*
-     * The first three bytes are an Intel x86 jump instruction.  I assume it
-     * can be the same forms as DOS FAT:
-     *    0xE9 0x?? 0x??
-     *    0xEC 0x?? 0x90
-     * where 0x?? means any byte value is OK.
-     */
-    if (boot->reserved1[0] != 0xE9
-        && (boot->reserved1[0] != 0xEB || boot->reserved1[2] != 0x90))
-    {
-        goto error;
-    }
+	boot = (struct bootfile *) buf;
 
-    /*
-     * Check the "NTFS    " signature.
-     */
-    if (memcmp((const char *)boot->bf_sysid, "NTFS    ", 8) != 0)
-    {
-        /*
-         * Check for EXFAT. Finish by jumping to error to free buf,
-         * although if it is EXFAT then it's no an error.
-         */
-        EXFATGetDescription(ih, str, strMaxLen);
-        goto error;
-    }
+	/*
+	 * The first three bytes are an Intel x86 jump instruction.  I assume it
+	 * can be the same forms as DOS FAT:
+	 *    0xE9 0x?? 0x??
+	 *    0xEC 0x?? 0x90
+	 * where 0x?? means any byte value is OK.
+	 */
+	if (boot->reserved1[0] != 0xE9 && (boot->reserved1[0] != 0xEB || boot->reserved1[2] != 0x90))
+	{
+		goto error;
+	}
 
-    /*
-     * Make sure the bytes per sector and sectors per cluster are
-     * powers of two, and within reasonable ranges.
-     */
-    bytesPerSector = OSReadLittleInt16(&boot->bf_bps,0);
-    if ((bytesPerSector & (bytesPerSector-1)) || bytesPerSector < 512 || bytesPerSector > 32768)
-    {
-        //verbose("NTFS: invalid bytes per sector (%d)\n", bytesPerSector);
-        goto error;
-    }
+	/*
+	 * Check the "NTFS    " signature.
+	 */
+	if (memcmp((const char *)boot->bf_sysid, "NTFS    ", 8) != 0)
+	{
+		/*
+		 * Check for EXFAT. Finish by jumping to error to free buf,
+		 * although if it is EXFAT then it's no an error.
+		 */
+		EXFATGetDescription(ih, str, strMaxLen);
+		goto error;
+	}
 
-    sectorsPerCluster = boot->bf_spc;	/* Just one byte; no swapping needed */
-    if ((sectorsPerCluster & (sectorsPerCluster-1)) || sectorsPerCluster > 128)
-    {
-        //verbose("NTFS: invalid sectors per cluster (%d)\n", bytesPerSector);
-        goto error;
-    }
+	/*
+	 * Make sure the bytes per sector and sectors per cluster are
+	 * powers of two, and within reasonable ranges.
+	 */
+	bytesPerSector = OSReadLittleInt16(&boot->bf_bps,0);
+	if ((bytesPerSector & (bytesPerSector-1)) || bytesPerSector < 512 || bytesPerSector > 32768)
+	{
+		//verbose("NTFS: invalid bytes per sector (%d)\n", bytesPerSector);
+		goto error;
+	}
+
+	sectorsPerCluster = boot->bf_spc;	/* Just one byte; no swapping needed */
+	if ((sectorsPerCluster & (sectorsPerCluster-1)) || sectorsPerCluster > 128)
+	{
+		//verbose("NTFS: invalid sectors per cluster (%d)\n", bytesPerSector);
+		goto error;
+	}
     
     /*
      * Calculate the number of clusters from the number of sectors.
@@ -284,22 +282,25 @@ NTFSGetDescription(CICell ih, char *str, long strMaxLen)
     /*
      * Loop over the attributes, looking for $VOLUME_NAME (0x60).
      */
-    if(ntfs_find_attr(buf, NTFS_A_VOLUMENAME, &nameAttr, &nameSize) != 0)
-    {
-        //verbose("NTFS: $VOLUME_NAME attribute not found\n");
-        goto error;
-    }
-    
-    str[0] = '\0';
+	if(ntfs_find_attr(buf, NTFS_A_VOLUMENAME, &nameAttr, &nameSize) != 0)
+	{
+		//verbose("NTFS: $VOLUME_NAME attribute not found\n");
+		goto error;
+	}
 
-    utf_encodestr( nameAttr, nameSize / 2, (u_int8_t *)str, strMaxLen, OSLittleEndian );
+	str[0] = '\0';
 
-    free(buf);
-    return;
+	utf_encodestr( nameAttr, nameSize / 2, (u_int8_t *)str, strMaxLen, OSLittleEndian );
+
+	free(buf);
+	return;
 
  error:
-    if (buf) free(buf);
-    return;
+	if (buf)
+	{
+		free(buf);
+	}
+	return;
 }
 
 long NTFSGetUUID(CICell ih, char *uuidStr)
@@ -308,7 +309,8 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 
 	struct bootfile *boot;
 	void *buf = malloc(MAX_BLOCK_SIZE);
-	if ( !buf ) {
+	if ( !buf )
+	{
 		return -1;
 	}
 
@@ -324,19 +326,20 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	boot = (struct bootfile *) buf;
 
 	// Check for NTFS signature
-	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 ) {
+	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 )
+	{
 		// If not NTFS, maybe it is EXFAT
 		return EXFATGetUUID(ih, uuidStr);
 	}
 
 	// Check for non-null volume serial number
-	if( !boot->bf_volsn ) {
+	if( !boot->bf_volsn )
+	{
 		return -1;
 	}
 
 	// Use UUID like the one you get on Windows
-	sprintf(uuidStr, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
-									(unsigned short)boot->bf_volsn & 0xFFFF);
+	sprintf(uuidStr, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF, (unsigned short)boot->bf_volsn & 0xFFFF);
 
 	return 0;
 }
@@ -349,11 +352,15 @@ bool NTFSProbe(const void * buffer)
 
 	// Looking for NTFS signature.
 	if (strncmp((const char *)part_bootfile->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) == 0)
+	{
 		result = true;
+	}
 
 	// If not NTFS, maybe it is EXFAT
 	if (!result)
+	{
 		result = EXFATProbe(buffer);
+	}
 
 	return result;
 }

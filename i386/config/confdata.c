@@ -107,14 +107,16 @@ static char *conf_expand_value(const char *in)
 	const char *src;
 	*res_ptr = 0;
 	res_ptr[SYMBOL_MAXLENGTH] = 0;
-	while ((src = strchr(in, '$'))) {
+	while ((src = strchr(in, '$')))
+	{
 		struct symbol *sym;
 		const char *symval;
 		char *name_ptr = name;
 		size_t n = min(res_rem, src - in);
 
 		res_ptr = int_stpncpy(res_ptr, in, n);
-		if (!(res_rem -= n)) {
+		if (!(res_rem -= n))
+		{
 			return res_value; /* buffer full, quit now */
 		}
 		src++;
@@ -131,7 +133,8 @@ static char *conf_expand_value(const char *in)
 		n = min(res_rem, strlen(symval));
 
 		res_ptr = int_stpncpy(res_ptr, symval, n);
-		if (!(res_rem -= n)) {
+		if (!(res_rem -= n))
+		{
 			return res_value; /* buffer full, quit now */
 		}
 		in = src;

@@ -4752,33 +4752,33 @@ EFI_STATUS setup_Acpi(void)
 		bool acpidir_found = false;
 		
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
-        if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
 		{
-            sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
-            acpidir_found = true;
+			sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
+			acpidir_found = true;
             
-        }
+		}
 		else
 		{
 			
-            ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
-            if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+			ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
+			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 			{
-                sprintf(dirspec, "/Extra/Acpi/");
-                acpidir_found = true;
+				sprintf(dirspec, "/Extra/Acpi/");
+				acpidir_found = true;
 				
-            }
+			}
 			else
 			{
-                ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
-                if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+				ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
+				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 				{
-                    sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
-                    acpidir_found = true;
+					sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
+					acpidir_found = true;
 					
-                } 
-            }
-        }
+				} 
+			}
+		}
         
 		if (acpidir_found == true)
 		{
@@ -5058,60 +5058,63 @@ EFI_STATUS setup_Acpi(void)
         
         getBoolForKey(kSTRIPAPIC, &strip_madt, &bootInfo->chameleonConfig);
         
-        if ((strip_madt == false) || (!buildMADT(new_table_list, DsdtPtr, &madt_info ))) 
+	if ((strip_madt == false) || (!buildMADT(new_table_list, DsdtPtr, &madt_info ))) 
         {
             
-            ACPI_TABLE_MADT * madt_file = (void*)0ul;
-            ACPI_TABLE_MADT * MadtPointer = (void*)0ul;
-            bool oem_apic=false;
+		ACPI_TABLE_MADT * madt_file = (void*)0ul;
+		ACPI_TABLE_MADT * MadtPointer = (void*)0ul;
+		bool oem_apic=false;
             
-            {		
-                bool tmpval;		
-                oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->chameleonConfig)&&tmpval;		
-            } 
+		{		
+			bool tmpval;		
+			oem_apic=getBoolForKey(kOEMAPIC, &tmpval, &bootInfo->chameleonConfig)&&tmpval;		
+		} 
             
-            if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
-            {		
-                if (oem_apic == false) 
-                {
-                    MadtPointer = (ACPI_TABLE_MADT *)madt_file;	                    
-                }
-                
-            } else
-                MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
+		if ((madt_file = (ACPI_TABLE_MADT *)get_new_table_in_list(new_table_list, NAMESEG("APIC"), &new_table_index)) != (void *)0ul)
+		{		
+			if (oem_apic == false) 
+			{
+				MadtPointer = (ACPI_TABLE_MADT *)madt_file;	                    
+			}
+
+		}
+		else
+		{
+			MadtPointer = (acpi_tables.MadtPointer64 != (void*)0ul) ? (ACPI_TABLE_MADT *)acpi_tables.MadtPointer64 : (ACPI_TABLE_MADT *)acpi_tables.MadtPointer;
+		}
+
+		ProcessMadtInfo(MadtPointer, &madt_info);        
             
-            ProcessMadtInfo(MadtPointer, &madt_info);        
-            
-        }
+		}
         
-        if (gen_ssdt || gen_csta || gen_psta || gen_tsta) 
-        {
-            ProcessSsdt(new_table_list, DsdtPtr, &madt_info, gen_csta, gen_psta, gen_tsta );		
-        }
-    }    
+		if (gen_ssdt || gen_csta || gen_psta || gen_tsta) 
+		{
+			ProcessSsdt(new_table_list, DsdtPtr, &madt_info, gen_csta, gen_psta, gen_tsta );		
+		}
+	}    
 	
 	if (rsdp_mod == (void *)0ul)
-	{		
+	{
 		printf("Error: rsdp_mod == null \n");
 		return EFI_ABORTED;
 	}
-	
-	if (!(rsdp_mod->Length >= ACPI_RSDP_REV0_SIZE)) 
+
+	if (!(rsdp_mod->Length >= ACPI_RSDP_REV0_SIZE))
 	{
 		printf("Error: rsdp_mod size is incorrect \n");
 		return EFI_ABORTED;
-		
+
 	}
-	
+
 	do {
-		
+
 		if ((rsdp_mod->Revision == 0) || (gen_xsdt == true))
 		{
 			if (process_rsdt(rsdp_mod, gen_xsdt, new_table_list))
 				break;
 			printf("Error : ACPI RSD PTR Revision 1 is incorrect, \n");
 		}
-		
+
 		if ((GetChecksum(rsdp_mod, sizeof(ACPI_TABLE_RSDP)) == 0) &&
 			(Revision == 2) &&
 			(rsdplength == sizeof(ACPI_TABLE_RSDP)))
@@ -5119,40 +5122,40 @@ EFI_STATUS setup_Acpi(void)
 			if (process_xsdt(rsdp_mod, new_table_list))
 				break;
 			printf("Error : ACPI RSD PTR Revision 2 is incorrect \n");
-		}		
-		
+		}
+
 		Revision = 0; // fallback to Revision 0
-		
+
 		if (process_rsdt(rsdp_mod, false, new_table_list))
-			break;			
-		
+			break;
+
 		printf("Error: Incorect ACPI RSD PTR or not found \n");
 		return EFI_ABORTED;
-		
+
 	} while (0); 
-	
-	
+
+
 	// Correct the checksum of RSDP      
-	
+
 	DBG("RSDP: Original checksum %d\n", rsdp_mod->Checksum);		
-	
+
 	setRsdpchecksum(rsdp_mod);
-	
+
 	DBG("New checksum %d\n", rsdp_mod->Checksum);
-	
+
 	if (Revision == 2)
 	{
-		DBG("RSDP: Original extended checksum %d\n", rsdp_mod->ExtendedChecksum);			
-		
+		DBG("RSDP: Original extended checksum %d\n", rsdp_mod->ExtendedChecksum);		
+
 		setRsdpXchecksum(rsdp_mod);
-		
+
 		DBG("New extended checksum %d\n", rsdp_mod->ExtendedChecksum);
-		
+
 	}
-	
+
 	verbose("ACPI Revision %d successfully patched\n", Revision);
-	
-    if (Revision == 2)
+
+	if (Revision == 2)
 	{
 		/* XXX aserebln why uint32 cast if pointer is uint64 ? */
 		rsd_p = (U32)rsdp_mod;
@@ -5164,8 +5167,8 @@ EFI_STATUS setup_Acpi(void)
 		rsd_p = (U32)rsdp_mod;
 		addConfigurationTable(&gEfiAcpiTableGuid, &rsd_p, "ACPI");
 	}
-	
-	
+
+
 #if DEBUG_ACPI==2
 	printf("Press a key to continue... (DEBUG_ACPI)\n");
 	getc();
@@ -5176,6 +5179,6 @@ EFI_STATUS setup_Acpi(void)
 int AcpiSetup(void)
 {
 	EFI_STATUS status = setup_Acpi();
-	
+
 	return (status == EFI_SUCCESS);
 }

@@ -41,7 +41,7 @@ int previewLoadedSectors = 0;
 uint8_t *previewSaveunder = 0;
 
 #define VIDEO(x) (bootArgs->Video.v_ ## x)
- 
+
 //==========================================================================
 // getVBEVideoRam
 
@@ -77,13 +77,18 @@ char *getVBEInfoString()
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)
+	{
 		return 0;
+	}
 
 	if ( strncmp( (char *)vbeInfo.VESASignature, "VESA", 4 ) )
+	{
 		return 0;
+	}
 
 	buff = malloc(sizeof(char) * 256);
-	if (!buff) {
+	if (!buff)
+	{
 		return 0;
 	}
 
@@ -157,16 +162,20 @@ printVBEModeInfo()
 			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
 			modeInfo.ModeAttributes);
 
-		if (line++ >= 20) {
+		if (line++ >= 20)
+		{
 			pause();
 			line = 0;
 			clearScreenRows(0, 24);
 			setCursorPosition( 0, 0, 1 );
 		}
 	}
-	if (line != 0) {
+
+	if (line != 0)
+	{
 		pause();
 	}
+
 	setActiveDisplayPage(0);
 }
 
@@ -182,9 +191,11 @@ char *getVBEModeInfoString()
   	bzero( &vbeInfo, sizeof(vbeInfo) );
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
-	if ( err != errSuccess ) {
+	if ( err != errSuccess )
+	{
 		return 0;
 	}
+
 	char *buff=malloc(sizeof(char)*3072);
 	if(!buff)
 	{
@@ -202,7 +213,8 @@ char *getVBEModeInfoString()
 
 		bzero( &modeInfo, sizeof(modeInfo) );
 		err = getVBEModeInfo( *modePtr, &modeInfo );
-		if ( err != errSuccess ) {
+		if ( err != errSuccess )
+		{
 			continue;
 		}
 
@@ -816,24 +828,27 @@ void drawColorRectangle( unsigned short x,
                                 unsigned short height,
                                 unsigned char  colorIndex )
 {
-    long   pixelBytes;
-    long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
-    char * vram;
+	long   pixelBytes;
+	long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
+	char * vram;
 
-    pixelBytes = VIDEO(depth) / 8;
-    vram       = (char *) VIDEO(baseAddr) +
-                 VIDEO(rowBytes) * y + pixelBytes * x;
+	pixelBytes = VIDEO(depth) / 8;
+	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
-    width = MIN(width, VIDEO(width) - x);
-    height = MIN(height, VIDEO(height) - y);
+	width = MIN(width, VIDEO(width) - x);
+	height = MIN(height, VIDEO(height) - y);
 
-    while ( height-- )
-    {
-        int rem = ( pixelBytes * width ) % 4;
-        if ( rem ) bcopy( &color, vram, rem );
-        stosl( vram + rem, color, pixelBytes * width / 4 );
-        vram += VIDEO(rowBytes);
-    }
+	while ( height-- )
+	{
+		int rem = ( pixelBytes * width ) % 4;
+		if ( rem )
+		{
+			bcopy( &color, vram, rem );
+		}
+
+		stosl( vram + rem, color, pixelBytes * width / 4 );
+		vram += VIDEO(rowBytes);
+	}
 }
 
 //==========================================================================
@@ -845,18 +860,18 @@ void drawDataRectangle( unsigned short  x,
                         unsigned short  height,
                         unsigned char * data )
 {
-    unsigned short drawWidth;
-    long   pixelBytes = VIDEO(depth) / 8;
-    unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) +
-        VIDEO(rowBytes) * y + pixelBytes * x;
+	unsigned short drawWidth;
+	long   pixelBytes = VIDEO(depth) / 8;
+	unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
-    drawWidth = MIN(width, VIDEO(width) - x);
-    height = MIN(height, VIDEO(height) - y);
-    while ( height-- ) {
-        bcopy( data, vram, drawWidth * pixelBytes );
-        vram += VIDEO(rowBytes);
-        data += width * pixelBytes;
-    }
+	drawWidth = MIN(width, VIDEO(width) - x);
+	height = MIN(height, VIDEO(height) - y);
+	while ( height-- )
+	{
+		bcopy( data, vram, drawWidth * pixelBytes );
+		vram += VIDEO(rowBytes);
+		data += width * pixelBytes;
+	}
 }
 
 //==============================================================================
@@ -925,7 +940,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 	{
 		if (!setVESAGraphicsMode(origwidth, origheight, origbpx, 0))
 			if (initGraphicsMode () != errSuccess)
+			{
 				return;
+			}
+
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 		loadImageScale (uncomp, origwidth, origheight, origbpx, screen, VIDEO(width), VIDEO(height), VIDEO(depth), VIDEO (rowBytes));
@@ -933,16 +951,21 @@ void drawPreview(void *src, uint8_t * saveunder)
 	else
 	{
 		if (initGraphicsMode () != errSuccess)
+		{
 			return;
+		}
+
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 		// Set the screen to 75% grey.
-        drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
+		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
 	}
 
-
 	pixelShift = VIDEO (depth) >> 4;
-	if (pixelShift < 1) return;
+	if (pixelShift < 1)
+	{
+		return;
+	}
 
 	screen += ((VIDEO (width) 
 				- kIOHibernateProgressCount * (kIOHibernateProgressWidth + kIOHibernateProgressSpacing)) << (pixelShift - 1))
@@ -968,7 +991,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 							in = (in << 3) | (in >> 2);
 						}
 						else
+						{
 							in = *((uint32_t *)out) & 0xff;	// 32
+						}
+
 						saveunder[blob * kIOHibernateProgressSaveUnderSize + saveindex[blob]++] = in;
 						result = ((255 - alpha) * in + alpha * result + 0xff) >> 8;
 					}
@@ -978,7 +1004,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 						*((uint16_t *)out) = (result << 10) | (result << 5) | result;	// 16
 					}
 					else
+					{
 						*((uint32_t *)out) = (result << 16) | (result << 8) | result;	// 32
+					}
+
 				}
 				out += (1 << pixelShift);
 			}
@@ -1029,13 +1058,16 @@ void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 						in = saveunder[blob * kIOHibernateProgressSaveUnderSize + saveindex[blob]++];
 						result = ((255 - alpha) * in + alpha * result + 0xff) / 255;
 					}
+
 					if (1 == pixelShift)
 					{
 						result >>= 3;
 						*((uint16_t *)out) = (result << 10) | (result << 5) | result;	// 16
 					}
 					else
+					{
 						*((uint32_t *)out) = (result << 16) | (result << 8) | result;	// 32
+					}
 				}
 				out += (1 << pixelShift);
 			}
@@ -1044,42 +1076,41 @@ void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 	}
 }
 
-
 //==========================================================================
 // setVESATextMode
 
 static int setVESATextMode( unsigned short cols, unsigned short rows, unsigned char  bitsPerPixel )
 {
-    VBEModeInfoBlock  minfo;
-    unsigned short    mode = modeEndOfList;
+	VBEModeInfoBlock  minfo;
+	unsigned short    mode = modeEndOfList;
 
-    if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
-    {
-        mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
+	if ( (cols != 80) || (rows != 25) )  // not 80x25 mode
+	{
+		mode = getVESAModeWithProperties( cols, rows, bitsPerPixel,
                                           maColorModeBit |
                                           maModeIsSupportedBit,
                                           maGraphicsModeBit,
                                           &minfo, NULL );
-    }
+	}
 
-    if ( ( mode == modeEndOfList ) || ( setVBEMode(mode, NULL) != errSuccess ) )
-    {
-        video_mode( 2 );  // VGA BIOS, 80x25 text mode.
-        minfo.XResolution = 80;
-        minfo.YResolution = 25;
-    }
+	if ( ( mode == modeEndOfList ) || ( setVBEMode(mode, NULL) != errSuccess ) )
+	{
+		video_mode( 2 );  // VGA BIOS, 80x25 text mode.
+		minfo.XResolution = 80;
+		minfo.YResolution = 25;
+	}
 
-    // Update KernBootStruct using info provided by the selected
-    // VESA mode.
+	// Update KernBootStruct using info provided by the selected
+	// VESA mode.
 
-    bootArgs->Video.v_display  = VGA_TEXT_MODE;
-    bootArgs->Video.v_baseAddr = 0xb8000;
-    bootArgs->Video.v_width    = minfo.XResolution;
-    bootArgs->Video.v_height   = minfo.YResolution;
-    bootArgs->Video.v_depth    = 8;
-    bootArgs->Video.v_rowBytes = 0x8000;
+	bootArgs->Video.v_display  = VGA_TEXT_MODE;
+	bootArgs->Video.v_baseAddr = 0xb8000;
+	bootArgs->Video.v_width    = minfo.XResolution;
+	bootArgs->Video.v_height   = minfo.YResolution;
+	bootArgs->Video.v_depth    = 8;
+	bootArgs->Video.v_rowBytes = 0x8000;
 
-    return errSuccess;  // always return success
+	return errSuccess;  // always return success
 }
 
 //==========================================================================
@@ -1089,63 +1120,68 @@ static int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
-    char * propStr;
-    unsigned long    count = 0;
+	char * propStr;
+	unsigned long    count = 0;
 
-    propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
-    if ( propStr )
-    {
-        char * delimiter = propStr;
-        char * p = propStr;
+	propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
+	if ( propStr )
+	{
+		char * delimiter = propStr;
+		char * p = propStr;
 
-        while ( count < maxArrayCount && *p != '\0' )
-        {
-            unsigned long val = strtoul( p, &delimiter, 10 );
-            if ( p != delimiter )
-            {
-                numbers[count++] = val;
-                p = delimiter;
-            }
-            while ( ( *p != '\0' ) && !isdigit(*p) )
-                p++;
-        }
+		while ( count < maxArrayCount && *p != '\0' )
+		{
+			unsigned long val = strtoul( p, &delimiter, 10 );
+			if ( p != delimiter )
+			{
+				numbers[count++] = val;
+				p = delimiter;
+			}
+			while ( ( *p != '\0' ) && !isdigit(*p) )
+				p++;
+		}
 
-        free( propStr );
-    }
+		free( propStr );
+	}
 
-    return count;
+	return count;
 }
 
 //==============================================================================
 
 int initGraphicsMode ()
 {
-  unsigned long params[4];
-  int           count;
+	unsigned long params[4];
+	int           count;
 
-  params[3] = 0;
-  count = getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
+	params[3] = 0;
+	count = getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
 
-  // Try to find a resolution if "Graphics Mode" setting is not available.
-  if ( count < 3 )
-  {
-    // Use the default resolution if we don't have an initialized GUI.
-    if (gui.screen.width == 0 || gui.screen.height == 0)
-    {
-      gui.screen.width = DEFAULT_SCREEN_WIDTH;	
-      gui.screen.height = DEFAULT_SCREEN_HEIGHT;
-    }
+	// Try to find a resolution if "Graphics Mode" setting is not available.
+	if ( count < 3 )
+	{
+		// Use the default resolution if we don't have an initialized GUI.
+		if (gui.screen.width == 0 || gui.screen.height == 0)
+		{
+			gui.screen.width = DEFAULT_SCREEN_WIDTH;	
+			gui.screen.height = DEFAULT_SCREEN_HEIGHT;
+		}
 
-    params[0] = gui.screen.width;
-    params[1] = gui.screen.height;
-    params[2] = 32;
-  }
+		params[0] = gui.screen.width;
+		params[1] = gui.screen.height;
+		params[2] = 32;
+	}
 
-  // Map from pixel format to bits per pixel.
+	// Map from pixel format to bits per pixel.
 
-  if ( params[2] == 256 ) params[2] = 8;
-  if ( params[2] == 555 ) params[2] = 16;
-  if ( params[2] == 888 ) params[2] = 32;
+	if ( params[2] == 256 )
+		params[2] = 8;
+
+	if ( params[2] == 555 )
+		params[2] = 16;
+
+	if ( params[2] == 888 )
+		params[2] = 32;
 
 	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
 }
@@ -1157,47 +1193,51 @@ int initGraphicsMode ()
 
 void setVideoMode( int mode, int drawgraphics)
 {
-    unsigned long params[4];
-    int           count;
-    int           err = errSuccess;
+	unsigned long params[4];
+	int           count;
+	int           err = errSuccess;
 
-    if ( mode == GRAPHICS_MODE )
-    {
-  		if ( (err=initGraphicsMode ()) == errSuccess ) {
-        if (gVerboseMode) {
-            // Tell the kernel to use text mode on a linear frame buffer display
-            bootArgs->Video.v_display = FB_TEXT_MODE;
-        } else {
-            bootArgs->Video.v_display = GRAPHICS_MODE;
-        }
-      }
-    }
+	if ( mode == GRAPHICS_MODE )
+	{
+  		if ( (err=initGraphicsMode ()) == errSuccess )
+		{
+			if (gVerboseMode)
+			{
+				// Tell the kernel to use text mode on a linear frame buffer display
+				bootArgs->Video.v_display = FB_TEXT_MODE;
+			}
+			else
+			{
+				bootArgs->Video.v_display = GRAPHICS_MODE;
+			}
+		}
+	}
 
-    if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
-    {
-        count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
-        if ( count < 2 )
-        {
-            params[0] = 80;  // Default text mode is 80x25.
-            params[1] = 25;
-        }
+	if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
+	{
+		count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		if ( count < 2 )
+		{
+			params[0] = 80;  // Default text mode is 80x25.
+			params[1] = 25;
+		}
 
-	setVESATextMode( params[0], params[1], 4 );
-        bootArgs->Video.v_display = VGA_TEXT_MODE;
-    }
+		setVESATextMode( params[0], params[1], 4 );
+		bootArgs->Video.v_display = VGA_TEXT_MODE;
+	}
 
-    currentIndicator = 0;
+	currentIndicator = 0;
 }
 
 //==============================================================================
-void getGraphicModeParams(unsigned long params[]) {
-
+void getGraphicModeParams(unsigned long params[])
+{
 	params[3] = 0;
 
 	VBEModeInfoBlock  minfo;
 
-    unsigned short    vesaVersion;
-    unsigned short    mode = modeEndOfList;
+	unsigned short    vesaVersion;
+	unsigned short    mode = modeEndOfList;
 
 	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
 
@@ -1225,6 +1265,7 @@ int getVideoMode(void)
 //==========================================================================
 // Display and clear the activity indicator.
 
+// BASIC Indicator
 static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
 
 // To prevent a ridiculously fast-spinning indicator,

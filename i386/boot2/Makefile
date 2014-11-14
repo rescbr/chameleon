@@ -36,7 +36,7 @@ THEMEDIR = $(SRCROOT)/artwork/themes/$(THEME)
 INC = -I. -I$(SRCROOT) -I$(SYMDIR) -I$(LIBSADIR) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
 
 LIBS= -L$(SYMDIR) -lsaio -lsa -lklibc
-LIBDEP= libsaio.a libsa.a libklibc.a 
+LIBDEP= libsaio.a libsa.a libklibc.a
 
 OTHER_FILES =
 
@@ -80,7 +80,7 @@ boot: $(CONFIG_HEADERS) $(SYMROOT)/embedded.h $(OBJS) $(addprefix $(SYMROOT)/, $
 
 endif
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/
-	
+
 	@### First pass, don't worry abount segment alignment.
 	@echo "	[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \

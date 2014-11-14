@@ -717,7 +717,8 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
                    int probe, int type, unsigned int bvrFlags )
 {
 	BVRef bvr = (BVRef) malloc( sizeof(*bvr) );
-	if ( bvr ) {
+	if ( bvr )
+	{
 		bzero(bvr, sizeof(*bvr));
 
 		bvr->biosdev        = biosdev;
@@ -733,14 +734,18 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 		bvr->bv_free        = bvFreeFunc;
 		// FIXME: UCS-2 -> UTF-8 the name
 		strlcpy(bvr->name, "----", DPISTRLEN);
-		if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)part->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)part->ent_type) == 0) ) {
+		if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)part->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)part->ent_type) == 0) )
+		{
 			strlcpy(bvr->type_name, "GPT HFS+", DPISTRLEN);
-		} else {
+		}
+		else
+		{
 			strlcpy(bvr->type_name, "GPT Unknown", DPISTRLEN);
 		}
 
 		/*
-		if ( part->bootid & FDISK_ACTIVE ) {
+		if ( part->bootid & FDISK_ACTIVE )
+		{
 			bvr->flags |= kBVFlagPrimary;
 		}
 		*/
@@ -820,45 +825,45 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 		spc = 1;
 	}
 
-    do {
-        // Create a new mapping.
+	do {
+	// Create a new mapping.
 
-        map = (struct DiskBVMap *) malloc( sizeof(*map) );
-        if ( map )
+	map = (struct DiskBVMap *) malloc( sizeof(*map) );
+	if ( map )
         {
-            map->biosdev = biosdev;
-            map->bvr     = NULL;
-            map->bvrcnt  = 0;
-            map->next    = gDiskBVMap;
-            gDiskBVMap   = map;
+		map->biosdev = biosdev;
+		map->bvr     = NULL;
+		map->bvrcnt  = 0;
+		map->next    = gDiskBVMap;
+		gDiskBVMap   = map;
 
-            // Create a record for each partition found on the disk.
+		// Create a record for each partition found on the disk.
 
-            while ( getNextFDiskPartition( biosdev, &partno, &part ) )
-            {
-                DEBUG_DISK(("%s: part %d [%x]\n", __FUNCTION__,
-                            partno, part->systid));
-                bvr = 0;
+		while ( getNextFDiskPartition( biosdev, &partno, &part ) )
+		{
+			DEBUG_DISK(("%s: part %d [%x]\n", __FUNCTION__,
+				partno, part->systid));
+			bvr = 0;
 
-                switch ( part->systid )
-                {
+			switch ( part->systid )
+			{
 #if UFS_SUPPORT
-                    case FDISK_UFS:
-                       bvr = newFDiskBVRef(
-                                      biosdev, partno,
-                                      part->relsect + UFS_FRONT_PORCH/BPS,
-                                      part,
-                                      UFSInitPartition,
-                                      UFSLoadFile,
-                                      UFSReadFile,
-                                      UFSGetDirEntry,
-                                      UFSGetFileBlock,
-                                      UFSGetUUID,
-                                      UFSGetDescription,
-                                      UFSFree,
-                                      0,
-                                      kBIOSDevTypeHardDrive, 0);
-                        break;
+				case FDISK_UFS:
+					bvr = newFDiskBVRef(
+						biosdev, partno,
+						part->relsect + UFS_FRONT_PORCH/BPS,
+						part,
+						UFSInitPartition,
+						UFSLoadFile,
+						UFSReadFile,
+						UFSGetDirEntry,
+						UFSGetFileBlock,
+						UFSGetUUID,
+						UFSGetDescription,
+						UFSFree,
+						0,
+						kBIOSDevTypeHardDrive, 0);
+				break;
 #endif
 
                     case FDISK_HFS:
@@ -898,8 +903,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                         break;
 
 #if UFS_SUPPORT
-                    case FDISK_BOOTER:
-                        booterUFS = newFDiskBVRef(
+			case FDISK_BOOTER:
+				booterUFS = newFDiskBVRef(
                                       biosdev, partno,
                                       ((part->relsect + spc - 1) / spc) * spc,
                                       part,
@@ -913,7 +918,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
                                       UFSFree,
                                       0,
                                       kBIOSDevTypeHardDrive, 0);
-                        break;
+				break;
 #endif
 
                     case FDISK_FAT32:
@@ -1650,25 +1655,32 @@ static void scanFSLevelBVRSettings(BVRef chain)
 	long  flags, time;
 	int   fh, fileSize, error;
 
-	for (bvr = chain; bvr; bvr = bvr->next) {
+	for (bvr = chain; bvr; bvr = bvr->next)
+	{
 		ret = -1;
 		error = 0;
     
 		//
 		// Check for alternate volume label on boot helper partitions.
 		//
-		if (bvr->flags & kBVFlagBooter) {
+		if (bvr->flags & kBVFlagBooter)
+		{
 			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
 			strcpy(fileSpec, ".disk_label.contentDetails");
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
-			if (!ret) {
+			if (!ret)
+			{
 				fh = open(strcat(dirSpec, fileSpec), 0);
 				fileSize = file_size(fh);
-				if (fileSize > 0 && fileSize < BVSTRLEN) {
-					if (read(fh, label, fileSize) != fileSize) {
+				if (fileSize > 0 && fileSize < BVSTRLEN)
+				{
+					if (read(fh, label, fileSize) != fileSize)
+					{
 						error = -1;
 					}
-				} else 	{
+				}
+				else
+				{
 					error = -1;
 				}
 
@@ -1691,6 +1703,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 				bvr->flags |= kBVFlagSystemVolume;
 			}
 		}
+
 	}
 }
 
@@ -1721,11 +1734,16 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
 		verbose("Resetting BIOS device %xh\n", biosdev);
 		// Reset the biosbuf cache
 		cache_valid = false;
-		if(map == gDiskBVMap) {
+		if(map == gDiskBVMap)
+		{
 			gDiskBVMap = map->next;
-		} else if(prevMap != NULL) {
+		}
+		else if(prevMap != NULL)
+		{
 			prevMap->next = map->next;
-		} else 	{
+		}
+		else
+		{
 			stop("");
 		}
 	}
@@ -1873,7 +1891,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			if ( (!allowFlags || newBVR->flags & allowFlags)
 				&& (!denyFlags || !(newBVR->flags & denyFlags) )
 				&& (newBVR->biosdev >= minBIOSDev && newBVR->biosdev <= maxBIOSDev)
-				) {
+				)
+			{
 				newBVR->visible = true;
 			}
 
@@ -1882,7 +1901,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			 * to be able to hide foreign partitions from the boot menu.
 			 *
 			 */
-			if ( (newBVR->flags & kBVFlagForeignBoot) ) {
+			if ( (newBVR->flags & kBVFlagForeignBoot) )
+			{
 				char *start, *next = val;
 				long len = 0;  
 				do
@@ -1899,18 +1919,21 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			/*
 			 * Use the first bvr entry as the starting chain pointer.
 			 */
-			if (!chain) {
+			if (!chain)
+			{
 				chain = newBVR;
 			}
 
 			/*
 			 * Update the previous bvr's link pointer to use the new memory area.
 			 */
-			if (prevBVR) {
+			if (prevBVR)
+			{
 				prevBVR->next = newBVR;
 			}
 
-			if (newBVR->visible) {
+			if (newBVR->visible)
+			{
 				bvCount++;
 			}
 		}

@@ -41,10 +41,10 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc -Wmost -Werror \
 endif
 
 
-UTILDIR = ../../util
-LIBSADIR = ../../libsa
-LIBSAIODIR = ../../libsaio
-BOOT2DIR = ../../boot2
+UTILDIR = ${SRCROOT}/i386/util
+LIBSADIR = ${SRCROOT}/i386/libsa
+LIBSAIODIR = ${SRCROOT}/i386/libsaio
+BOOT2DIR = ${SRCROOT}/i386/boot2
 
 MODULE_INCLUDES :=  $(foreach x,$(MODULE_DEPENDENCIES),-I$(SRCROOT)/i386/modules/$(x)/include/)
 

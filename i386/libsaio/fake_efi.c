@@ -717,7 +717,6 @@ void setupChosenNode()
 
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 
-
 	if(YOSEMITE)
 	{
 		//
@@ -772,6 +771,7 @@ void setupChosenNode()
 				}
 
 				cpuTick = getCPUTick();						// callq	0x121a7
+//				printf("value: 0x%llx\n", getCPUTick());
 				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
 				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx

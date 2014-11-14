@@ -192,18 +192,21 @@ static uint64_t measure_aperf_frequency(void)
 		pollCount = poll_PIT2_gate();
 		aperfEnd = rdmsr64(MSR_AMD_APERF);
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1) {
+		if (pollCount <= 1)
+		{
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the APERF delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC) {
+		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
+		{
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (aperfEnd - aperfStart) < aperfDelta ) {
+		if ( (aperfEnd - aperfStart) < aperfDelta )
+		{
 			aperfDelta = aperfEnd - aperfStart;
 		}
 	}
@@ -211,9 +214,12 @@ static uint64_t measure_aperf_frequency(void)
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
 
-	if (aperfDelta > (1ULL<<32)) {
+	if (aperfDelta > (1ULL<<32))
+	{
 		retval = 0;
-	} else {
+	}
+	else
+	{
 		retval = aperfDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -258,16 +264,21 @@ void scan_cpu(PlatformInfo_t *p)
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
 
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) {
+	if (p->CPU.CPUID[CPUID_0][0] >= 0x5)
+	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
-	if (p->CPU.CPUID[CPUID_0][0] >= 6) {
+	if (p->CPU.CPUID[CPUID_0][0] >= 6)
+	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}
-	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8) {
+	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+	{
 		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-	} else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1) {
+	}
+	else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+	{
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
@@ -601,6 +612,11 @@ void scan_cpu(PlatformInfo_t *p)
 					maxcoef = currcoef;
 				}
 
+				if (!currcoef)
+				{
+					currcoef = maxcoef;
+				}
+
 				if (maxcoef)
 				{
 					if (maxdiv)
@@ -745,24 +761,24 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\n---------------------------------------------\n");
    	DBG("------------------ CPU INFO -----------------\n");
 	DBG("---------------------------------------------\n");
-	DBG("Brand String:            %s\n",                 p->CPU.BrandString); // Processor name (BIOS)
-	DBG("Vendor:                  0x%x\n",               p->CPU.Vendor); // Vendor ex: GenuineIntel
-	DBG("Family:                  0x%x\n",               p->CPU.Family); // Family ex: 6 (06h)
-	DBG("ExtFamily:               0x%x\n",               p->CPU.ExtFamily);
-	DBG("Signature:               %x\n",                 p->CPU.Signature); // CPUID signature
-	DBG("Model:                   0x%x\n",               p->CPU.Model); // Model ex: 37 (025h)
-	DBG("ExtModel:                0x%x\n",               p->CPU.ExtModel);
-	DBG("Stepping:                0x%x\n",               p->CPU.Stepping); // Stepping ex: 5 (05h)
-	DBG("MaxCoef:                 0x%x\n",               p->CPU.MaxCoef);
-	DBG("CurrCoef:                0x%x\n",               p->CPU.CurrCoef);
-	DBG("MaxDiv:                  0x%x\n",               p->CPU.MaxDiv);
-	DBG("CurrDiv:                 0x%x\n",               p->CPU.CurrDiv);
-	DBG("TSCFreq:                 %dMHz\n",              p->CPU.TSCFrequency / 1000000);
-	DBG("FSBFreq:                 %dMHz\n",              p->CPU.FSBFrequency / 1000000);
-	DBG("CPUFreq:                 %dMHz\n",              p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",                 p->CPU.NoCores); // Cores
-	DBG("Logical processor:       %d\n",                 p->CPU.NoThreads); // Logical procesor
-	DBG("Features:                0x%08x\n",             p->CPU.Features);
+	DBG("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
+	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
+	DBG("Family:                  0x%x\n",		p->CPU.Family); // Family ex: 6 (06h)
+	DBG("ExtFamily:               0x%x\n",		p->CPU.ExtFamily);
+	DBG("Signature:               %x\n",		p->CPU.Signature); // CPUID signature
+	DBG("Model:                   0x%x\n",		p->CPU.Model); // Model ex: 37 (025h)
+	DBG("ExtModel:                0x%x\n",		p->CPU.ExtModel);
+	DBG("Stepping:                0x%x\n",		p->CPU.Stepping); // Stepping ex: 5 (05h)
+	DBG("MaxCoef:                 0x%x\n",		p->CPU.MaxCoef);
+	DBG("CurrCoef:                0x%x\n",		p->CPU.CurrCoef);
+	DBG("MaxDiv:                  0x%x\n",		p->CPU.MaxDiv);
+	DBG("CurrDiv:                 0x%x\n",		p->CPU.CurrDiv);
+	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
+	DBG("FSBFreq:                 %dMHz\n",		p->CPU.FSBFrequency / 1000000);
+	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
+	DBG("Cores:                   %d\n",		p->CPU.NoCores); // Cores
+	DBG("Logical processor:       %d\n",		p->CPU.NoThreads); // Logical procesor
+	DBG("Features:                0x%08x\n",	p->CPU.Features);
 
 	DBG("\n---------------------------------------------\n");
 #if DEBUG_CPU
