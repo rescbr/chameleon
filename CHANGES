@@ -1,3 +1,4 @@
+- bitshoveler : Make some constant arrays static; other minor fixes (acpi_patcher.c)
 - bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
 - ErmaC : Rollback changes for msdos.c (2327) thx to bltz
