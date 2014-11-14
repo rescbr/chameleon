@@ -307,8 +307,17 @@ extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u
 /*
  * lzvn.c
  */
-extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
-// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+extern size_t lzvn_decode(void *       dst,
+                          size_t       dst_size,
+                          const void * src,
+                          size_t       src_size);
+/*
+extern size_t lzvn_encode(void *       dst,
+                          size_t       dst_size,
+                          const void * src,
+                          size_t       src_size,
+                          void *       work);
+*/
 
 struct compressed_kernel_header {
 	u_int32_t signature;
