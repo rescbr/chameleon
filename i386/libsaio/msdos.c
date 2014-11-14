@@ -659,7 +659,7 @@ getdirpfrompath (CICell ih, char *dirspec, uint8_t *buf)
 }
 
 long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
-					  char ** name, long * flags, long * time,
+					  char ** name, long * flags, u_int32_t * time,
 					  FinderInfo * finderInfo, long * infoValid)
 {
 	struct msdosdirstate *st;

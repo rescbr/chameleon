@@ -4743,9 +4743,10 @@ EFI_STATUS setup_Acpi(void)
 	} 
     
 	{
-        long         ret, length, flags, time;
-        long long	 index = 0;
-        const char * name;
+		long long	index = 0;
+		long		ret, length, flags;
+		u_int32_t	time;
+		const char	* name;
         
 		U8 i = 0;
 		char dirspec[512];

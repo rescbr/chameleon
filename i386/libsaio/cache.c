@@ -43,7 +43,7 @@ typedef struct CacheEntry CacheEntry;
 #define kCacheMaxEntries      (kCacheSize / kCacheMinBlockSize)
 
 static CICell     gCacheIH;
-static long       gCacheBlockSize;
+static u_int32_t  gCacheBlockSize;
 static long       gCacheNumEntries;
 static long       gCacheTime;
 
@@ -66,7 +66,7 @@ void CacheReset()
 	gCacheIH = NULL;
 }
 
-void CacheInit( CICell ih, long blockSize )
+void CacheInit( CICell ih, u_int32_t blockSize )
 {
 #ifdef __i386__
 	if ((ih == gCacheIH) && (blockSize == gCacheBlockSize))
@@ -113,7 +113,7 @@ void CacheInit( CICell ih, long blockSize )
 	bzero(gCacheEntries, kCacheMaxEntries * sizeof(CacheEntry));
 }
 
-long CacheRead(CICell ih, char * buffer, long long offset, long length, long cache)
+u_int32_t CacheRead(CICell ih, char * buffer, long long offset, u_int32_t length, long cache)
 {
 	long cnt, oldestEntry = 0, oldestTime, loadCache = 0;
 	CacheEntry *entry;
