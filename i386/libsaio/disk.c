@@ -765,7 +765,7 @@ BVRef newGPTBVRef( int biosdev, int partno, unsigned int blkoff,
 				(*bvr->bv_free)(bvr);
 				bvr = NULL;
 			}
-			if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+			else if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
 			{
 				bvr->flags |= kBVFlagBootable;
 			}
@@ -1045,7 +1045,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 	 * an Apple partition map elsewhere.
 	 */
 #if UNUSED
-	if (map->bvrcnt == 0)
+	if (map && map->bvrcnt == 0)
 	{
 		static struct fdisk_part cdpart;
 		cdpart.systid = 0xCD;
@@ -1071,7 +1071,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 	}
 #endif
 	// Actually this should always be true given the above code
-	if(map == gDiskBVMap)
+	// (unless malloc failed above)
+	if(map && map == gDiskBVMap)
 	{
 		// Don't leave a null map in the chain
 		if(map->bvrcnt == 0 && map->bvr == NULL)
