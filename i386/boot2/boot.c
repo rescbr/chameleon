@@ -314,22 +314,28 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// If boot from a boot helper partition check the kernel cache file on it
 	if (gBootVolume->flags & kBVFlagBooter)
 	{
-		snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.P%s", kernelCacheFile);
+		snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
 		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 		if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 		{
-			snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.R%s", kernelCacheFile);
+			snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.R/%s", kernelCacheFile);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
-				snprintf(kernelCachePath, sizeof(kernelCachePath), "com.apple.boot.S%s", kernelCacheFile);
+				snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.S/%s", kernelCacheFile);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
-				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					ret = -1;
+					snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.recovery.boot/kernelcache", kernelCacheFile);
+					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+					if ((flags & kFileTypeMask) != kFileTypeFlat)
+					{
+						ret = -1;
+					}
 				}
 			}
 		}

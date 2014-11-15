@@ -1581,20 +1581,45 @@ static bool getOSVersion(BVRef bvr, char *str)
 	config_file_t systemVersion;
 	char  dirSpec[512];
 
-	sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	// OS X Recovery
+	sprintf(dirSpec, "hd(%d,%d)/com.apple.recovery.boot/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 	if (!loadConfigFile(dirSpec, &systemVersion))
 	{
+		bvr->OSisInstaller = true;
 		valid = true;
 	}
-	else
+
+	if (!valid)
 	{
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		// OS X Standard
+		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{
-			bvr->OSisServer = true;
+			bvr->OSisInstaller = true;
 			valid = true;
+		}
+		else
+		{
+			// OS X Server
+			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+
+			if (!loadConfigFile(dirSpec, &systemVersion))
+			{
+				bvr->OSisServer = true;
+				valid = true;
+			}
+/*			else
+			{
+				sprintf(dirSpec, "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
+
+				if (!loadConfigFile(dirSpec, &systemVersion))
+				{
+
+				}
+			}
+*/
 		}
 	}
 
@@ -1639,7 +1664,19 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else
 		{
-			close(fh);
+			sprintf(dirSpec, "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			fh = open(dirSpec, 0);
+
+			if (fh >= 0)
+			{
+				valid = true;
+				bvr->OSisInstaller = true;
+				strcpy(bvr->OSVersion, "10.9"); // 10.9 +
+			}
+			else
+			{
+				close(fh);
+			}
 		}
 	}
 	return valid;
