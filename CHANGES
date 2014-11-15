@@ -1,3 +1,5 @@
+- meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
+		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
 - ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
 - bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
 - bitshoveler : CacheInit(), CacheRead() prototypes: use u_int32_t instead of long where appropriate (saio_internal.h)

@@ -18,4 +18,7 @@ bit 16 set: This is not ELF, use the multiboot_header fields.
 
 #ifndef __ASSEMBLER__
 /* Put any desired prototypes or other C stuff here. */
+
+extern struct multiboot_info *gMI;
+
 #endif
