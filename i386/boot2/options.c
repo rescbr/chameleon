@@ -1245,6 +1245,7 @@ processBootOptions()
 		{
 			if( YOSEMITE ) // is 10.10
 			{
+
 				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
 				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
 			}

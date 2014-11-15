@@ -327,26 +327,26 @@ void scan_cpu(PlatformInfo_t *p)
 		 */
 		switch (p->CPU.Model)
 		{
-			case CPU_MODEL_NEHALEM:
-			case CPU_MODEL_FIELDS:
-			case CPU_MODEL_DALES:
-			case CPU_MODEL_NEHALEM_EX:
-			case CPU_MODEL_JAKETOWN:
-			case CPU_MODEL_SANDYBRIDGE:
-			case CPU_MODEL_IVYBRIDGE:
-			case CPU_MODEL_HASWELL:
-			case CPU_MODEL_HASWELL_SVR:
-			//case CPU_MODEL_HASWELL_H:
-			case CPU_MODEL_HASWELL_ULT:
-			case CPU_MODEL_CRYSTALWELL:
+			case CPUID_MODEL_NEHALEM:
+			case CPUID_MODEL_FIELDS:
+			case CPUID_MODEL_DALES:
+			case CPUID_MODEL_NEHALEM_EX:
+			case CPUID_MODEL_JAKETOWN:
+			case CPUID_MODEL_SANDYBRIDGE:
+			case CPUID_MODEL_IVYBRIDGE:
+			case CPUID_MODEL_HASWELL:
+			case CPUID_MODEL_HASWELL_SVR:
+			//case CPUID_MODEL_HASWELL_H:
+			case CPUID_MODEL_HASWELL_ULT:
+			case CPUID_MODEL_CRYSTALWELL:
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 				p->CPU.NoCores		= (uint8_t)bitfield((uint32_t)msr, 31, 16);
 				p->CPU.NoThreads	= (uint8_t)bitfield((uint32_t)msr, 15,  0);
 				break;
 
-			case CPU_MODEL_DALES_32NM:
-			case CPU_MODEL_WESTMERE:
-			case CPU_MODEL_WESTMERE_EX:
+			case CPUID_MODEL_DALES_32NM:
+			case CPUID_MODEL_WESTMERE:
+			case CPUID_MODEL_WESTMERE_EX:
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 				p->CPU.NoCores		= (uint8_t)bitfield((uint32_t)msr, 19, 16);
 				p->CPU.NoThreads	= (uint8_t)bitfield((uint32_t)msr, 15,  0);
@@ -403,7 +403,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	//workaround for N270. I don't know why it detected wrong
 	// MSR is *NOT* available on the Intel Atom CPU
-	if ((p->CPU.Model == CPU_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+	if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
 	{
 		p->CPU.NoCores		= 1;
 		p->CPU.NoThreads	= 2;
@@ -482,23 +482,23 @@ void scan_cpu(PlatformInfo_t *p)
 		if (p->CPU.Family == 0x06) {
 			/* Nehalem CPU model */
 			switch (p->CPU.Model) {
-				case CPU_MODEL_NEHALEM:
-				case CPU_MODEL_FIELDS:
-				case CPU_MODEL_DALES:
-				case CPU_MODEL_DALES_32NM:
-				case CPU_MODEL_WESTMERE:
-				case CPU_MODEL_NEHALEM_EX:
-				case CPU_MODEL_WESTMERE_EX:
+				case CPUID_MODEL_NEHALEM:
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_DALES_32NM:
+				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_WESTMERE_EX:
 /* --------------------------------------------------------- */
-				case CPU_MODEL_SANDYBRIDGE:
-				case CPU_MODEL_JAKETOWN:
-				case CPU_MODEL_IVYBRIDGE_XEON:
-				case CPU_MODEL_IVYBRIDGE:
-				case CPU_MODEL_HASWELL:
-				case CPU_MODEL_HASWELL_SVR:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_JAKETOWN:
+				case CPUID_MODEL_IVYBRIDGE_XEON:
+				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
 
-				case CPU_MODEL_HASWELL_ULT:
-				case CPU_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_CRYSTALWELL:
 /* --------------------------------------------------------- */
 					msr = rdmsr64(MSR_PLATFORM_INFO);
 					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
