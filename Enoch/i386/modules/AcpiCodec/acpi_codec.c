@@ -4743,58 +4743,59 @@ EFI_STATUS setup_Acpi(void)
 	} 
     
 	{
-        long long	index = 0;
-        long		ret, length, flags;
-        u_int32_t	time;
-        const char	* name;
+		long long	index = 0;
+		long		ret, length, flags;
+		u_int32_t	time;
+		const char	* name;
         
-	U8 i = 0;
-	char dirspec[512];
-	bool acpidir_found = false;
+		U8 i = 0;
+		char dirspec[512];
+		bool acpidir_found = false;
 		
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
-        if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
 		{
-            sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
-            acpidir_found = true;
-            
-        }
+			sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
+			acpidir_found = true;
+
+		}
 		else
 		{
 			
-            ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
-            if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+			ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
+			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 			{
-                sprintf(dirspec, "/Extra/Acpi/");
-                acpidir_found = true;
+				sprintf(dirspec, "/Extra/Acpi/");
+				acpidir_found = true;
 				
-            }
+			}
 			else
 			{
-                ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
-                if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+				ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
+				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 				{
-                    sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
-                    acpidir_found = true;
-					
-                } 
-            }
-        }
+					sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
+					acpidir_found = true;
+
+				} 
+			}
+		}
         
 		if (acpidir_found == true)
 		{
 #if ACPISGN
-            if (checkOem == true)
-            {
-                MakeAcpiSgn();
-            }
+			if (checkOem == true)
+			{
+				MakeAcpiSgn();
+			}
 #endif
             
-            while (1) {
-                ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
-                if (ret == -1) break;
+			while (1)
+			{
+				ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
+				if (ret == -1) break;
 #if DEBUG_ACPI
-                printf("testing %s\n", name);
+				printf("testing %s\n", name);
 #endif
                 // Make sure this is a directory.
                 if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;
