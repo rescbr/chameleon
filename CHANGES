@@ -24,7 +24,7 @@
 		Special thanks: Alex J, viv xix, zenith432 from http://forge.voodooprojects.org/p/chameleon/issues/375/
 		Testing and improvements: Pike R. Alpha, ErmaC, Bungo, blackosx, Micky1979, crazybirdy, oldnapalm, janek202, MinusZwei and Andy Vandijck.
 
-- Pike R. Alpha : dinamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- Pike R. Alpha : dynamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
 - ErmaC : getCPUTick() helper function ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
 - ErmaC : Add Yosemite Icons detection for chameleon UI
 - blackosx : Add chameleon UI Icons for Yosemite

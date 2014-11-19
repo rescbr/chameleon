@@ -4757,7 +4757,7 @@ EFI_STATUS setup_Acpi(void)
 		{
 			sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
 			acpidir_found = true;
-            
+
 		}
 		else
 		{
@@ -4776,7 +4776,7 @@ EFI_STATUS setup_Acpi(void)
 				{
 					sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
 					acpidir_found = true;
-					
+
 				} 
 			}
 		}
@@ -4784,17 +4784,18 @@ EFI_STATUS setup_Acpi(void)
 		if (acpidir_found == true)
 		{
 #if ACPISGN
-            if (checkOem == true)
-            {
-                MakeAcpiSgn();
-            }
+			if (checkOem == true)
+			{
+				MakeAcpiSgn();
+			}
 #endif
             
-            while (1) {
-                ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
-                if (ret == -1) break;
+			while (1)
+			{
+				ret = GetDirEntry(dirspec, &index, &name, &flags, &time);
+				if (ret == -1) break;
 #if DEBUG_ACPI
-                printf("testing %s\n", name);
+				printf("testing %s\n", name);
 #endif
                 // Make sure this is a directory.
                 if ((flags & kFileTypeMask) == kFileTypeDirectory) continue;

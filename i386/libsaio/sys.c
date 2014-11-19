@@ -961,7 +961,10 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		if (multiboot_skip_partition_set)
 		{
-			if (bvr->part_no == multiboot_skip_partition) continue;
+			if (bvr->part_no == multiboot_skip_partition)
+			{
+				continue;
+			}
 		}
 		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
 		{
