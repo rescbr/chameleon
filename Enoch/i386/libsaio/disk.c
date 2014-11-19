@@ -1581,6 +1581,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	config_file_t systemVersion;
 	char  dirSpec[512];
 
+	// OS X Recovery
 	sprintf(dirSpec, "hd(%d,%d)/com.apple.recovery.boot/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 	if (!loadConfigFile(dirSpec, &systemVersion))
@@ -1591,6 +1592,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 
 	if (!valid)
 	{
+		// OS X Standard
 		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
@@ -1600,6 +1602,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else
 		{
+			// OS X Server
 			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 			if (!loadConfigFile(dirSpec, &systemVersion))

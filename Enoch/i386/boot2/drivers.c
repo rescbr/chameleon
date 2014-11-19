@@ -907,6 +907,19 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			error("ERROR: kernel compression is bad!\n");
 			return -1;
 		}
+
+		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+		{
+			verbose ("Decompressing Kernel Using lzss\n");
+		}
+		else
+		{
+			if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
+			{
+				verbose ("Decompressing Kernel Using lzvn\n");
+			}
+		}
+
 #if NOTDEF
 		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
 		{

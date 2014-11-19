@@ -830,8 +830,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	
 	getDeviceDescription(ih, devStr);
 /*
-	verbose("Read FAT%d file: [%s/%s] %d bytes.\n",
-            msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
+	verbose("Read FAT%d file: [%s/%s] %d bytes.\n", msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
 */
 	free (buf);
 	if (toread<0)

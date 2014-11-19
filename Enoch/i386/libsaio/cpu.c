@@ -97,7 +97,7 @@ static uint64_t measure_tsc_frequency(void)
  * It pauses until the value is latched in the counter
  * and then reads the time stamp counter to return to the caller.
  */
-uint64_t timeRDTSC(void)
+static uint64_t timeRDTSC(void)
 {
 	int		attempts = 0;
 	uint64_t    latchTime;
@@ -159,10 +159,10 @@ restart:
 	intermediate *= scale[timerValue];	// rescale measured time spent
 	intermediate /= SAMPLE_NSECS;	// so its exactly 1/20 a second
 	intermediate += latchTime;		// add on our save fudge
-    
+
 	set_PIT2(0);			// reset timer 2 to be zero
 	disable_PIT2();			// turn off PIT 2
-	
+
 	//ml_set_interrupts_enabled(int_enabled);
 	return intermediate;
 }
@@ -247,9 +247,11 @@ void scan_cpu(PlatformInfo_t *p)
 	uint64_t	cpuFrequency = 0;
 	uint64_t	msr = 0;
 	uint64_t	flex_ratio = 0;
+
 	uint32_t	max_ratio = 0;
 	uint32_t	min_ratio = 0;
 	uint8_t		bus_ratio_max = 0;
+	uint8_t		bus_ratio_min = 0;
 	uint8_t		currdiv = 0;
 	uint8_t		currcoef = 0;
 	uint8_t		maxdiv = 0;
@@ -257,7 +259,6 @@ void scan_cpu(PlatformInfo_t *p)
 	const char	*newratio;
 	int		len = 0;
 	int		myfsb = 0;
-	uint8_t		bus_ratio_min = 0;
 
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
@@ -327,7 +328,8 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Family == 0x06 &&
 		p->CPU.Model >= CPUID_MODEL_NEHALEM &&
 		p->CPU.Model != CPUID_MODEL_ATOM		// MSR is *NOT* available on the Intel Atom CPU
-		) {
+		)
+	{
 		/*
 		 * Find the number of enabled cores and threads
 		 * (which determines whether SMT/Hyperthreading is active).
@@ -363,18 +365,22 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.NoCores   = bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 				p->CPU.NoThreads = (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
 				//workaround for N270. I don't know why it detected wrong
-				if ((p->CPU.Model == CPUID_MODEL_ATOM) &&
-					(p->CPU.Stepping == 2)) {
-				p->CPU.NoCores = 1;
-			}
-		break;
+				if ((p->CPU.Model == CPUID_MODEL_ATOM) && (p->CPU.Stepping == 2))
+				{
+					p->CPU.NoCores = 1;
+				}
+				break;
 
 		} // end switch
 
-	} else if (p->CPU.Vendor == CPUID_VENDOR_AMD) {
+	}
+	else if (p->CPU.Vendor == CPUID_VENDOR_AMD)
+	{
 		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
-	} else {
+	}
+	else
+	{
 		// Use previous method for Cores and Threads
 		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
 		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
@@ -387,7 +393,7 @@ void scan_cpu(PlatformInfo_t *p)
 		uint32_t	reg[4];
 		char		str[128], *s;
 		/*
-		 * The brand string 48 bytes (max), guaranteed to
+		 * The BrandString 48 bytes (max), guaranteed to
 		 * be NULL terminated.
 		 */
 		do_cpuid(0x80000002, reg);
@@ -469,18 +475,23 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
 		// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
-	} else {
+	}
+	else
+	{
 		// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
 	}
 
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
-	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f)))
+	{
 		int intelCPU = p->CPU.Model;
-		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))	{
+		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))
+		{
 			/* Nehalem CPU model */
-			switch (p->CPU.Model) {
+			switch (p->CPU.Model)
+			{
 				case CPUID_MODEL_NEHALEM:
 				case CPUID_MODEL_FIELDS:
 				case CPUID_MODEL_DALES:
@@ -609,6 +620,11 @@ void scan_cpu(PlatformInfo_t *p)
 					/* On lower models, currcoef defines TSC freq */
 					/* XXX */
 					maxcoef = currcoef;
+				}
+
+				if (!currcoef)
+				{
+					currcoef = maxcoef;
 				}
 
 				if (maxcoef)
@@ -753,7 +769,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	// keep formatted with spaces instead of tabs
 	DBG("\n---------------------------------------------\n");
-   	DBG("--------------- CPU INFO ---------------\n");
+   	DBG("------------------ CPU INFO -----------------\n");
 	DBG("---------------------------------------------\n");
 	DBG("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
 	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
