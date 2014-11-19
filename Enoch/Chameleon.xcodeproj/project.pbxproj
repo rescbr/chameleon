@@ -8,22 +8,6 @@
 
 /* Begin PBXFileReference section */
 		019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
-		3601D701177540B500AE44D2 /* networking.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = networking.c; sourceTree = "<group>"; };
-		3601D702177540B500AE44D2 /* networking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = networking.h; sourceTree = "<group>"; };
-		3617E23517503A6600AE753C /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
-		3617E23617503A6600AE753C /* efi_tables.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = efi_tables.c; sourceTree = "<group>"; };
-		3617E23717503A6600AE753C /* efi_tables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = efi_tables.h; sourceTree = "<group>"; };
-		3617E23817503A6600AE753C /* error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
-		3617E23917503A6600AE753C /* libsa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libsa.h; sourceTree = "<group>"; };
-		3617E23A17503A6600AE753C /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		3617E23B17503A6600AE753C /* memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
-		3617E23C17503A6600AE753C /* prf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = prf.c; sourceTree = "<group>"; };
-		3617E23D17503A6600AE753C /* printf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = printf.c; sourceTree = "<group>"; };
-		3617E23E17503A6600AE753C /* qsort.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = qsort.c; sourceTree = "<group>"; };
-		3617E23F17503A6600AE753C /* setjmp.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = setjmp.s; sourceTree = "<group>"; };
-		3617E24017503A6600AE753C /* string.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = string.c; sourceTree = "<group>"; };
-		3617E24117503A6600AE753C /* strtol.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = strtol.c; sourceTree = "<group>"; };
-		3617E24217503A6600AE753C /* zalloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zalloc.c; sourceTree = "<group>"; };
 		3617E24317503A9300AE753C /* appleboot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = appleboot.h; sourceTree = "<group>"; };
 		3617E24417503A9300AE753C /* appleClut8.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = appleClut8.h; sourceTree = "<group>"; };
 		3617E24517503A9300AE753C /* bmdecompress.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bmdecompress.c; sourceTree = "<group>"; };
@@ -101,67 +85,206 @@
 		369689D014BD0AF10013D77F /* BLOCKERS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BLOCKERS; sourceTree = "<group>"; };
 		369689D114BD0AF10013D77F /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
 		369689D214BD0B470013D77F /* version */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = version; sourceTree = "<group>"; };
-		36AB75A114BD0866005B8045 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
-		36AB75A214BD0866005B8045 /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
-		36AB75A314BD0866005B8045 /* device_befs_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_befs_o.png; sourceTree = "<group>"; };
-		36AB75A414BD0866005B8045 /* device_befs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_befs.png; sourceTree = "<group>"; };
-		36AB75A514BD0866005B8045 /* device_cdrom_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom_o.png; sourceTree = "<group>"; };
-		36AB75A614BD0866005B8045 /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
-		36AB75A714BD0866005B8045 /* device_ext3_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ext3_o.png; sourceTree = "<group>"; };
-		36AB75A814BD0866005B8045 /* device_ext3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ext3.png; sourceTree = "<group>"; };
-		36AB75A914BD0866005B8045 /* device_fat_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat_o.png; sourceTree = "<group>"; };
-		36AB75AA14BD0866005B8045 /* device_fat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat.png; sourceTree = "<group>"; };
-		36AB75AB14BD0866005B8045 /* device_freebsd_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_freebsd_o.png; sourceTree = "<group>"; };
-		36AB75AC14BD0866005B8045 /* device_freebsd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_freebsd.png; sourceTree = "<group>"; };
-		36AB75AD14BD0866005B8045 /* device_generic_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_generic_o.png; sourceTree = "<group>"; };
-		36AB75AE14BD0866005B8045 /* device_generic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_generic.png; sourceTree = "<group>"; };
-		36AB75AF14BD0866005B8045 /* device_hfsplus_leo_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_leo_o.png; sourceTree = "<group>"; };
-		36AB75B014BD0866005B8045 /* device_hfsplus_leo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_leo.png; sourceTree = "<group>"; };
-		36AB75B114BD0866005B8045 /* device_hfsplus_lion_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_lion_o.png; sourceTree = "<group>"; };
-		36AB75B214BD0866005B8045 /* device_hfsplus_lion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_lion.png; sourceTree = "<group>"; };
-		36AB75B314BD0866005B8045 /* device_hfsplus_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_o.png; sourceTree = "<group>"; };
-		36AB75B414BD0866005B8045 /* device_hfsplus_sl_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_sl_o.png; sourceTree = "<group>"; };
-		36AB75B514BD0866005B8045 /* device_hfsplus_sl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_sl.png; sourceTree = "<group>"; };
-		36AB75B614BD0866005B8045 /* device_hfsplus_tiger_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_tiger_o.png; sourceTree = "<group>"; };
-		36AB75B714BD0866005B8045 /* device_hfsplus_tiger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_tiger.png; sourceTree = "<group>"; };
-		36AB75B814BD0866005B8045 /* device_hfsplus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus.png; sourceTree = "<group>"; };
-		36AB75B914BD0866005B8045 /* device_hfsraid_leo_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_leo_o.png; sourceTree = "<group>"; };
-		36AB75BA14BD0866005B8045 /* device_hfsraid_leo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_leo.png; sourceTree = "<group>"; };
-		36AB75BB14BD0866005B8045 /* device_hfsraid_lion_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_lion_o.png; sourceTree = "<group>"; };
-		36AB75BC14BD0866005B8045 /* device_hfsraid_lion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_lion.png; sourceTree = "<group>"; };
-		36AB75BD14BD0866005B8045 /* device_hfsraid_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_o.png; sourceTree = "<group>"; };
-		36AB75BE14BD0866005B8045 /* device_hfsraid_sl_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_sl_o.png; sourceTree = "<group>"; };
-		36AB75BF14BD0866005B8045 /* device_hfsraid_sl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_sl.png; sourceTree = "<group>"; };
-		36AB75C014BD0866005B8045 /* device_hfsraid_tiger_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_tiger_o.png; sourceTree = "<group>"; };
-		36AB75C114BD0866005B8045 /* device_hfsraid_tiger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_tiger.png; sourceTree = "<group>"; };
-		36AB75C214BD0866005B8045 /* device_hfsraid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid.png; sourceTree = "<group>"; };
-		36AB75C314BD0866005B8045 /* device_ntfs_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ntfs_o.png; sourceTree = "<group>"; };
-		36AB75C414BD0866005B8045 /* device_ntfs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ntfs.png; sourceTree = "<group>"; };
-		36AB75C514BD0866005B8045 /* device_openbsd_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_openbsd_o.png; sourceTree = "<group>"; };
-		36AB75C614BD0866005B8045 /* device_openbsd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_openbsd.png; sourceTree = "<group>"; };
-		36AB75C714BD0866005B8045 /* device_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_next.png; sourceTree = "<group>"; };
-		36AB75C814BD0866005B8045 /* device_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_prev.png; sourceTree = "<group>"; };
-		36AB75C914BD0866005B8045 /* device_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_selection.png; sourceTree = "<group>"; };
-		36AB75CA14BD0866005B8045 /* font_console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_console.png; sourceTree = "<group>"; };
-		36AB75CB14BD0866005B8045 /* font_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_small.png; sourceTree = "<group>"; };
-		36AB75CC14BD0866005B8045 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
-		36AB75CD14BD0866005B8045 /* menu_boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_boot.png; sourceTree = "<group>"; };
-		36AB75CE14BD0866005B8045 /* menu_help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_help.png; sourceTree = "<group>"; };
-		36AB75CF14BD0866005B8045 /* menu_ignore_caches_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches_disabled.png; sourceTree = "<group>"; };
-		36AB75D014BD0866005B8045 /* menu_ignore_caches.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches.png; sourceTree = "<group>"; };
-		36AB75D114BD0866005B8045 /* menu_memory_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_memory_info.png; sourceTree = "<group>"; };
-		36AB75D214BD0866005B8045 /* menu_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_selection.png; sourceTree = "<group>"; };
-		36AB75D314BD0866005B8045 /* menu_single_user_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user_disabled.png; sourceTree = "<group>"; };
-		36AB75D414BD0866005B8045 /* menu_single_user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user.png; sourceTree = "<group>"; };
-		36AB75D514BD0866005B8045 /* menu_verbose_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose_disabled.png; sourceTree = "<group>"; };
-		36AB75D614BD0866005B8045 /* menu_verbose.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose.png; sourceTree = "<group>"; };
-		36AB75D714BD0866005B8045 /* menu_video_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_video_info.png; sourceTree = "<group>"; };
-		36AB75D814BD0866005B8045 /* progress_bar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar_background.png; sourceTree = "<group>"; };
-		36AB75D914BD0866005B8045 /* progress_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar.png; sourceTree = "<group>"; };
-		36AB75DA14BD0866005B8045 /* text_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_next.png; sourceTree = "<group>"; };
-		36AB75DB14BD0866005B8045 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_prev.png; sourceTree = "<group>"; };
-		36AB75DC14BD0866005B8045 /* theme.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = theme.plist; sourceTree = "<group>"; };
-		36AB75DD14BD0866005B8045 /* thumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumb.png; sourceTree = "<group>"; };
+		3696B1CE1A1D2DB5004272A6 /* acpi_patcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acpi_patcher.c; sourceTree = "<group>"; };
+		3696B1CF1A1D2DB5004272A6 /* acpi_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi_patcher.h; sourceTree = "<group>"; };
+		3696B1D01A1D2DB5004272A6 /* acpi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi.h; sourceTree = "<group>"; };
+		3696B1D11A1D2DB5004272A6 /* allocate.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = allocate.c; sourceTree = "<group>"; };
+		3696B1D21A1D2DB5004272A6 /* aml_generator.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aml_generator.c; sourceTree = "<group>"; };
+		3696B1D31A1D2DB5004272A6 /* aml_generator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aml_generator.h; sourceTree = "<group>"; };
+		3696B1D41A1D2DB5004272A6 /* asm.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = asm.s; sourceTree = "<group>"; };
+		3696B1D51A1D2DB5004272A6 /* ati_reg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ati_reg.h; sourceTree = "<group>"; };
+		3696B1D61A1D2DB5004272A6 /* ati.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
+		3696B1D71A1D2DB5004272A6 /* ati.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
+		3696B1D81A1D2DB5004272A6 /* base64-decode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "base64-decode.c"; sourceTree = "<group>"; };
+		3696B1D91A1D2DB5004272A6 /* befs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = befs.c; sourceTree = "<group>"; };
+		3696B1DA1A1D2DB5004272A6 /* befs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = befs.h; sourceTree = "<group>"; };
+		3696B1DB1A1D2DB5004272A6 /* bios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bios.h; sourceTree = "<group>"; };
+		3696B1DC1A1D2DB5004272A6 /* bios.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = bios.s; sourceTree = "<group>"; };
+		3696B1DD1A1D2DB5004272A6 /* biosfn.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = biosfn.c; sourceTree = "<group>"; };
+		3696B1DE1A1D2DB5004272A6 /* bootargs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
+		3696B1DF1A1D2DB5004272A6 /* bootstruct.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bootstruct.c; sourceTree = "<group>"; };
+		3696B1E01A1D2DB5004272A6 /* bootstruct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bootstruct.h; sourceTree = "<group>"; };
+		3696B1E11A1D2DB5004272A6 /* cache.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cache.c; sourceTree = "<group>"; };
+		3696B1E21A1D2DB5004272A6 /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
+		3696B1E31A1D2DB5004272A6 /* console.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
+		3696B1E41A1D2DB5004272A6 /* convert.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = convert.c; sourceTree = "<group>"; };
+		3696B1E51A1D2DB5004272A6 /* convert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = convert.h; sourceTree = "<group>"; };
+		3696B1E61A1D2DB5004272A6 /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
+		3696B1E71A1D2DB5004272A6 /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
+		3696B1E81A1D2DB5004272A6 /* device_inject.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = device_inject.c; sourceTree = "<group>"; };
+		3696B1E91A1D2DB5004272A6 /* device_inject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_inject.h; sourceTree = "<group>"; };
+		3696B1EA1A1D2DB5004272A6 /* device_tree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = device_tree.c; sourceTree = "<group>"; };
+		3696B1EB1A1D2DB5004272A6 /* device_tree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_tree.h; sourceTree = "<group>"; };
+		3696B1EC1A1D2DB5004272A6 /* disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = disk.c; sourceTree = "<group>"; };
+		3696B1ED1A1D2DB5004272A6 /* disk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = disk.h; sourceTree = "<group>"; };
+		3696B1EE1A1D2DB5004272A6 /* dram_controllers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dram_controllers.c; sourceTree = "<group>"; };
+		3696B1EF1A1D2DB5004272A6 /* dram_controllers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dram_controllers.h; sourceTree = "<group>"; };
+		3696B1F01A1D2DB5004272A6 /* efi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = efi.h; sourceTree = "<group>"; };
+		3696B1F11A1D2DB5004272A6 /* exfat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = exfat.c; sourceTree = "<group>"; };
+		3696B1F21A1D2DB5004272A6 /* exfat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exfat.h; sourceTree = "<group>"; };
+		3696B1F31A1D2DB5004272A6 /* ext2fs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ext2fs.c; sourceTree = "<group>"; };
+		3696B1F41A1D2DB5004272A6 /* ext2fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fs.h; sourceTree = "<group>"; };
+		3696B1F51A1D2DB5004272A6 /* fake_efi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fake_efi.c; sourceTree = "<group>"; };
+		3696B1F61A1D2DB5004272A6 /* fake_efi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fake_efi.h; sourceTree = "<group>"; };
+		3696B1F71A1D2DB5004272A6 /* fdisk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fdisk.h; sourceTree = "<group>"; };
+		3696B1F81A1D2DB5004272A6 /* freebsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = freebsd.c; sourceTree = "<group>"; };
+		3696B1F91A1D2DB5004272A6 /* freebsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = freebsd.h; sourceTree = "<group>"; };
+		3696B1FA1A1D2DB5004272A6 /* gma.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
+		3696B1FB1A1D2DB5004272A6 /* gma.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
+		3696B1FC1A1D2DB5004272A6 /* hda.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hda.c; sourceTree = "<group>"; };
+		3696B1FD1A1D2DB5004272A6 /* hda.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hda.h; sourceTree = "<group>"; };
+		3696B1FE1A1D2DB5004272A6 /* hfs_CaseTables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hfs_CaseTables.h; sourceTree = "<group>"; };
+		3696B1FF1A1D2DB5004272A6 /* hfs_compare.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hfs_compare.c; sourceTree = "<group>"; };
+		3696B2001A1D2DB5004272A6 /* hfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hfs.c; sourceTree = "<group>"; };
+		3696B2011A1D2DB5004272A6 /* hfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hfs.h; sourceTree = "<group>"; };
+		3696B2021A1D2DB5004272A6 /* hpet.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hpet.c; sourceTree = "<group>"; };
+		3696B2031A1D2DB5004272A6 /* hpet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hpet.h; sourceTree = "<group>"; };
+		3696B2041A1D2DB5004272A6 /* io_inline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = io_inline.h; sourceTree = "<group>"; };
+		3696B2051A1D2DB5004272A6 /* libsaio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libsaio.h; sourceTree = "<group>"; };
+		3696B2061A1D2DB5004272A6 /* load.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = load.c; sourceTree = "<group>"; };
+		3696B2071A1D2DB5004272A6 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		3696B2081A1D2DB5004272A6 /* md5c.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md5c.c; sourceTree = "<group>"; };
+		3696B2091A1D2DB5004272A6 /* memvendors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memvendors.h; sourceTree = "<group>"; };
+		3696B20A1A1D2DB5004272A6 /* misc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = misc.c; sourceTree = "<group>"; };
+		3696B20B1A1D2DB5004272A6 /* msdos_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msdos_private.h; sourceTree = "<group>"; };
+		3696B20C1A1D2DB5004272A6 /* msdos.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = msdos.c; sourceTree = "<group>"; };
+		3696B20D1A1D2DB5004272A6 /* msdos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msdos.h; sourceTree = "<group>"; };
+		3696B20E1A1D2DB5004272A6 /* nbp_cmd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nbp_cmd.h; sourceTree = "<group>"; };
+		3696B20F1A1D2DB5004272A6 /* nbp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nbp.c; sourceTree = "<group>"; };
+		3696B2101A1D2DB5004272A6 /* networking.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = networking.c; sourceTree = "<group>"; };
+		3696B2111A1D2DB5004272A6 /* networking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = networking.h; sourceTree = "<group>"; };
+		3696B2121A1D2DB5004272A6 /* ntfs_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs_private.h; sourceTree = "<group>"; };
+		3696B2131A1D2DB5004272A6 /* ntfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ntfs.c; sourceTree = "<group>"; };
+		3696B2141A1D2DB5004272A6 /* ntfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs.h; sourceTree = "<group>"; };
+		3696B2151A1D2DB5004272A6 /* nvidia_helper.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia_helper.c; sourceTree = "<group>"; };
+		3696B2161A1D2DB5004272A6 /* nvidia_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia_helper.h; sourceTree = "<group>"; };
+		3696B2171A1D2DB5004272A6 /* nvidia.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
+		3696B2181A1D2DB5004272A6 /* nvidia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
+		3696B2191A1D2DB5004272A6 /* openbsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = openbsd.c; sourceTree = "<group>"; };
+		3696B21A1A1D2DB5004272A6 /* openbsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = openbsd.h; sourceTree = "<group>"; };
+		3696B21B1A1D2DB5004272A6 /* pci_root.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci_root.c; sourceTree = "<group>"; };
+		3696B21C1A1D2DB5004272A6 /* pci_root.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pci_root.h; sourceTree = "<group>"; };
+		3696B21D1A1D2DB5004272A6 /* pci_setup.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci_setup.c; sourceTree = "<group>"; };
+		3696B21E1A1D2DB5004272A6 /* pci.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci.c; sourceTree = "<group>"; };
+		3696B21F1A1D2DB5004272A6 /* pci.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pci.h; sourceTree = "<group>"; };
+		3696B2201A1D2DB5004272A6 /* platform.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = platform.c; sourceTree = "<group>"; };
+		3696B2211A1D2DB5004272A6 /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = platform.h; sourceTree = "<group>"; };
+		3696B2221A1D2DB5004272A6 /* saio_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = saio_internal.h; sourceTree = "<group>"; };
+		3696B2231A1D2DB5004272A6 /* saio_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = saio_types.h; sourceTree = "<group>"; };
+		3696B2241A1D2DB5004272A6 /* sl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sl.h; sourceTree = "<group>"; };
+		3696B2251A1D2DB5004272A6 /* smbios_decode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios_decode.c; sourceTree = "<group>"; };
+		3696B2261A1D2DB5004272A6 /* smbios_getters.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios_getters.c; sourceTree = "<group>"; };
+		3696B2271A1D2DB5004272A6 /* smbios_getters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios_getters.h; sourceTree = "<group>"; };
+		3696B2281A1D2DB5004272A6 /* smbios.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios.c; sourceTree = "<group>"; };
+		3696B2291A1D2DB5004272A6 /* smbios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios.h; sourceTree = "<group>"; };
+		3696B22A1A1D2DB5004272A6 /* spd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spd.c; sourceTree = "<group>"; };
+		3696B22B1A1D2DB5004272A6 /* spd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spd.h; sourceTree = "<group>"; };
+		3696B22C1A1D2DB5004272A6 /* state_generator.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = state_generator.c; sourceTree = "<group>"; };
+		3696B22D1A1D2DB5004272A6 /* state_generator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state_generator.h; sourceTree = "<group>"; };
+		3696B22E1A1D2DB5004272A6 /* stringTable.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stringTable.c; sourceTree = "<group>"; };
+		3696B22F1A1D2DB5004272A6 /* sys.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sys.c; sourceTree = "<group>"; };
+		3696B2301A1D2DB5004272A6 /* table.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = table.c; sourceTree = "<group>"; };
+		3696B2311A1D2DB5004272A6 /* term.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = term.h; sourceTree = "<group>"; };
+		3696B2321A1D2DB5004272A6 /* ufs_byteorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ufs_byteorder.h; sourceTree = "<group>"; };
+		3696B2331A1D2DB5004272A6 /* ufs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ufs.h; sourceTree = "<group>"; };
+		3696B2341A1D2DB5004272A6 /* usb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = usb.c; sourceTree = "<group>"; };
+		3696B2351A1D2DB5004272A6 /* vbe.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vbe.c; sourceTree = "<group>"; };
+		3696B2361A1D2DB5004272A6 /* vbe.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vbe.h; sourceTree = "<group>"; };
+		3696B2371A1D2DB5004272A6 /* xml.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xml.c; sourceTree = "<group>"; };
+		3696B2381A1D2DB5004272A6 /* xml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xml.h; sourceTree = "<group>"; };
+		3696B2391A1D2DD1004272A6 /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
+		3696B23A1A1D2DD1004272A6 /* efi_tables.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = efi_tables.c; sourceTree = "<group>"; };
+		3696B23B1A1D2DD1004272A6 /* efi_tables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = efi_tables.h; sourceTree = "<group>"; };
+		3696B23C1A1D2DD1004272A6 /* error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
+		3696B23D1A1D2DD1004272A6 /* libsa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libsa.h; sourceTree = "<group>"; };
+		3696B23E1A1D2DD1004272A6 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		3696B23F1A1D2DD1004272A6 /* memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		3696B2401A1D2DD1004272A6 /* prf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = prf.c; sourceTree = "<group>"; };
+		3696B2411A1D2DD1004272A6 /* printf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = printf.c; sourceTree = "<group>"; };
+		3696B2421A1D2DD1004272A6 /* qsort.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = qsort.c; sourceTree = "<group>"; };
+		3696B2431A1D2DD1004272A6 /* setjmp.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = setjmp.s; sourceTree = "<group>"; };
+		3696B2441A1D2DD1004272A6 /* string.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = string.c; sourceTree = "<group>"; };
+		3696B2451A1D2DD1004272A6 /* strtol.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = strtol.c; sourceTree = "<group>"; };
+		3696B2461A1D2DD1004272A6 /* zalloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zalloc.c; sourceTree = "<group>"; };
+		3696B2481A1D2EAB004272A6 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
+		3696B2491A1D2EAB004272A6 /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
+		3696B24A1A1D2EAB004272A6 /* device_befs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_befs.png; sourceTree = "<group>"; };
+		3696B24B1A1D2EAB004272A6 /* device_befs_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_befs_o.png; sourceTree = "<group>"; };
+		3696B24C1A1D2EAB004272A6 /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
+		3696B24D1A1D2EAB004272A6 /* device_cdrom_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom_o.png; sourceTree = "<group>"; };
+		3696B24E1A1D2EAB004272A6 /* device_ext3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ext3.png; sourceTree = "<group>"; };
+		3696B24F1A1D2EAB004272A6 /* device_ext3_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ext3_o.png; sourceTree = "<group>"; };
+		3696B2501A1D2EAB004272A6 /* device_fat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat.png; sourceTree = "<group>"; };
+		3696B2511A1D2EAB004272A6 /* device_fat_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat_o.png; sourceTree = "<group>"; };
+		3696B2521A1D2EAB004272A6 /* device_freebsd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_freebsd.png; sourceTree = "<group>"; };
+		3696B2531A1D2EAB004272A6 /* device_freebsd_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_freebsd_o.png; sourceTree = "<group>"; };
+		3696B2541A1D2EAB004272A6 /* device_generic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_generic.png; sourceTree = "<group>"; };
+		3696B2551A1D2EAB004272A6 /* device_generic_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_generic_o.png; sourceTree = "<group>"; };
+		3696B2561A1D2EAB004272A6 /* device_hfsfusion_mav.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsfusion_mav.png; sourceTree = "<group>"; };
+		3696B2571A1D2EAB004272A6 /* device_hfsfusion_mav_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsfusion_mav_o.png; sourceTree = "<group>"; };
+		3696B2581A1D2EAB004272A6 /* device_hfsfusion_yos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsfusion_yos.png; sourceTree = "<group>"; };
+		3696B2591A1D2EAB004272A6 /* device_hfsfusion_yos_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsfusion_yos_o.png; sourceTree = "<group>"; };
+		3696B25A1A1D2EAB004272A6 /* device_hfsplus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus.png; sourceTree = "<group>"; };
+		3696B25B1A1D2EAB004272A6 /* device_hfsplus_leo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_leo.png; sourceTree = "<group>"; };
+		3696B25C1A1D2EAB004272A6 /* device_hfsplus_leo_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_leo_o.png; sourceTree = "<group>"; };
+		3696B25D1A1D2EAB004272A6 /* device_hfsplus_lion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_lion.png; sourceTree = "<group>"; };
+		3696B25E1A1D2EAB004272A6 /* device_hfsplus_lion_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_lion_o.png; sourceTree = "<group>"; };
+		3696B25F1A1D2EAB004272A6 /* device_hfsplus_mav.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_mav.png; sourceTree = "<group>"; };
+		3696B2601A1D2EAB004272A6 /* device_hfsplus_mav_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_mav_o.png; sourceTree = "<group>"; };
+		3696B2611A1D2EAB004272A6 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
+		3696B2621A1D2EAB004272A6 /* device_hfsplus_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml_o.png; sourceTree = "<group>"; };
+		3696B2631A1D2EAB004272A6 /* device_hfsplus_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_o.png; sourceTree = "<group>"; };
+		3696B2641A1D2EAB004272A6 /* device_hfsplus_recovery.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_recovery.png; sourceTree = "<group>"; };
+		3696B2651A1D2EAB004272A6 /* device_hfsplus_recovery_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_recovery_o.png; sourceTree = "<group>"; };
+		3696B2661A1D2EAB004272A6 /* device_hfsplus_sl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_sl.png; sourceTree = "<group>"; };
+		3696B2671A1D2EAB004272A6 /* device_hfsplus_sl_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_sl_o.png; sourceTree = "<group>"; };
+		3696B2681A1D2EAB004272A6 /* device_hfsplus_tiger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_tiger.png; sourceTree = "<group>"; };
+		3696B2691A1D2EAB004272A6 /* device_hfsplus_tiger_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_tiger_o.png; sourceTree = "<group>"; };
+		3696B26A1A1D2EAB004272A6 /* device_hfsplus_yos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_yos.png; sourceTree = "<group>"; };
+		3696B26B1A1D2EAB004272A6 /* device_hfsplus_yos_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_yos_o.png; sourceTree = "<group>"; };
+		3696B26C1A1D2EAB004272A6 /* device_hfsraid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid.png; sourceTree = "<group>"; };
+		3696B26D1A1D2EAB004272A6 /* device_hfsraid_leo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_leo.png; sourceTree = "<group>"; };
+		3696B26E1A1D2EAB004272A6 /* device_hfsraid_leo_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_leo_o.png; sourceTree = "<group>"; };
+		3696B26F1A1D2EAB004272A6 /* device_hfsraid_lion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_lion.png; sourceTree = "<group>"; };
+		3696B2701A1D2EAB004272A6 /* device_hfsraid_lion_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_lion_o.png; sourceTree = "<group>"; };
+		3696B2711A1D2EAB004272A6 /* device_hfsraid_mav.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_mav.png; sourceTree = "<group>"; };
+		3696B2721A1D2EAB004272A6 /* device_hfsraid_mav_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_mav_o.png; sourceTree = "<group>"; };
+		3696B2731A1D2EAB004272A6 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
+		3696B2741A1D2EAB004272A6 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
+		3696B2751A1D2EAB004272A6 /* device_hfsraid_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_o.png; sourceTree = "<group>"; };
+		3696B2761A1D2EAB004272A6 /* device_hfsraid_sl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_sl.png; sourceTree = "<group>"; };
+		3696B2771A1D2EAB004272A6 /* device_hfsraid_sl_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_sl_o.png; sourceTree = "<group>"; };
+		3696B2781A1D2EAB004272A6 /* device_hfsraid_tiger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_tiger.png; sourceTree = "<group>"; };
+		3696B2791A1D2EAB004272A6 /* device_hfsraid_tiger_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_tiger_o.png; sourceTree = "<group>"; };
+		3696B27A1A1D2EAB004272A6 /* device_hfsraid_yos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_yos.png; sourceTree = "<group>"; };
+		3696B27B1A1D2EAB004272A6 /* device_hfsraid_yos_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_yos_o.png; sourceTree = "<group>"; };
+		3696B27C1A1D2EAB004272A6 /* device_ntfs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ntfs.png; sourceTree = "<group>"; };
+		3696B27D1A1D2EAB004272A6 /* device_ntfs_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ntfs_o.png; sourceTree = "<group>"; };
+		3696B27E1A1D2EAB004272A6 /* device_openbsd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_openbsd.png; sourceTree = "<group>"; };
+		3696B27F1A1D2EAB004272A6 /* device_openbsd_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_openbsd_o.png; sourceTree = "<group>"; };
+		3696B2801A1D2EAB004272A6 /* device_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_next.png; sourceTree = "<group>"; };
+		3696B2811A1D2EAB004272A6 /* device_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_prev.png; sourceTree = "<group>"; };
+		3696B2821A1D2EAB004272A6 /* device_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_selection.png; sourceTree = "<group>"; };
+		3696B2831A1D2EAB004272A6 /* font_console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_console.png; sourceTree = "<group>"; };
+		3696B2841A1D2EAB004272A6 /* font_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_small.png; sourceTree = "<group>"; };
+		3696B2851A1D2EAB004272A6 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		3696B2861A1D2EAB004272A6 /* menu_boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_boot.png; sourceTree = "<group>"; };
+		3696B2871A1D2EAB004272A6 /* menu_help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_help.png; sourceTree = "<group>"; };
+		3696B2881A1D2EAB004272A6 /* menu_ignore_caches.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches.png; sourceTree = "<group>"; };
+		3696B2891A1D2EAB004272A6 /* menu_ignore_caches_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches_disabled.png; sourceTree = "<group>"; };
+		3696B28A1A1D2EAB004272A6 /* menu_memory_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_memory_info.png; sourceTree = "<group>"; };
+		3696B28B1A1D2EAB004272A6 /* menu_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_selection.png; sourceTree = "<group>"; };
+		3696B28C1A1D2EAB004272A6 /* menu_single_user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user.png; sourceTree = "<group>"; };
+		3696B28D1A1D2EAB004272A6 /* menu_single_user_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user_disabled.png; sourceTree = "<group>"; };
+		3696B28E1A1D2EAB004272A6 /* menu_verbose.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose.png; sourceTree = "<group>"; };
+		3696B28F1A1D2EAB004272A6 /* menu_verbose_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose_disabled.png; sourceTree = "<group>"; };
+		3696B2901A1D2EAB004272A6 /* menu_video_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_video_info.png; sourceTree = "<group>"; };
+		3696B2911A1D2EAB004272A6 /* progress_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar.png; sourceTree = "<group>"; };
+		3696B2921A1D2EAB004272A6 /* progress_bar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar_background.png; sourceTree = "<group>"; };
+		3696B2931A1D2EAB004272A6 /* text_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_next.png; sourceTree = "<group>"; };
+		3696B2941A1D2EAB004272A6 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_prev.png; sourceTree = "<group>"; };
+		3696B2951A1D2EAB004272A6 /* theme.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = theme.plist; sourceTree = "<group>"; };
+		3696B2961A1D2EAB004272A6 /* thumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumb.png; sourceTree = "<group>"; };
 		36AB75E114BD091C005B8045 /* InstallLog.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = InstallLog.sh; sourceTree = "<group>"; };
 		36AB75E314BD0925005B8045 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		36AB75E414BD092D005B8045 /* preinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = preinstall; sourceTree = "<group>"; };
@@ -174,111 +297,6 @@
 		36B83692167832FC00314162 /* Audio.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = Audio.txt; path = OptionalSettings/Audio.txt; sourceTree = "<group>"; };
 		36B836941678330900314162 /* HDEFLayout.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = HDEFLayout.txt; path = OptionalSettings/HDEFLayout.txt; sourceTree = "<group>"; };
 		36C9C9841739EF9900B28C9B /* IntelCapri.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelCapri.txt; path = OptionalSettings/IntelCapri.txt; sourceTree = "<group>"; };
-		36CA2F1B1758294E002E6F1E /* acpi_patcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acpi_patcher.c; sourceTree = "<group>"; };
-		36CA2F1C1758294E002E6F1E /* acpi_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi_patcher.h; sourceTree = "<group>"; };
-		36CA2F1D1758294E002E6F1E /* acpi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acpi.h; sourceTree = "<group>"; };
-		36CA2F1E1758294E002E6F1E /* allocate.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = allocate.c; sourceTree = "<group>"; };
-		36CA2F1F1758294E002E6F1E /* aml_generator.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = aml_generator.c; sourceTree = "<group>"; };
-		36CA2F201758294E002E6F1E /* aml_generator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = aml_generator.h; sourceTree = "<group>"; };
-		36CA2F211758294E002E6F1E /* asm.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = asm.s; sourceTree = "<group>"; };
-		36CA2F221758294E002E6F1E /* ati.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ati.c; sourceTree = "<group>"; };
-		36CA2F231758294E002E6F1E /* ati.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ati.h; sourceTree = "<group>"; };
-		36CA2F241758294E002E6F1E /* base64-decode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "base64-decode.c"; sourceTree = "<group>"; };
-		36CA2F251758294E002E6F1E /* befs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = befs.c; sourceTree = "<group>"; };
-		36CA2F261758294E002E6F1E /* befs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = befs.h; sourceTree = "<group>"; };
-		36CA2F271758294E002E6F1E /* bios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bios.h; sourceTree = "<group>"; };
-		36CA2F281758294E002E6F1E /* bios.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = bios.s; sourceTree = "<group>"; };
-		36CA2F291758294E002E6F1E /* biosfn.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = biosfn.c; sourceTree = "<group>"; };
-		36CA2F2A1758294E002E6F1E /* bootargs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bootargs.h; sourceTree = "<group>"; };
-		36CA2F2B1758294E002E6F1E /* bootstruct.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bootstruct.c; sourceTree = "<group>"; };
-		36CA2F2C1758294E002E6F1E /* bootstruct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bootstruct.h; sourceTree = "<group>"; };
-		36CA2F2D1758294E002E6F1E /* cache.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cache.c; sourceTree = "<group>"; };
-		36CA2F2E1758294E002E6F1E /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
-		36CA2F2F1758294E002E6F1E /* console.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = console.c; sourceTree = "<group>"; };
-		36CA2F301758294E002E6F1E /* convert.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = convert.c; sourceTree = "<group>"; };
-		36CA2F311758294E002E6F1E /* convert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = convert.h; sourceTree = "<group>"; };
-		36CA2F321758294E002E6F1E /* cpu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpu.c; sourceTree = "<group>"; };
-		36CA2F331758294E002E6F1E /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
-		36CA2F341758294E002E6F1E /* device_inject.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = device_inject.c; sourceTree = "<group>"; };
-		36CA2F351758294E002E6F1E /* device_inject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_inject.h; sourceTree = "<group>"; };
-		36CA2F361758294E002E6F1E /* device_tree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = device_tree.c; sourceTree = "<group>"; };
-		36CA2F371758294E002E6F1E /* device_tree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_tree.h; sourceTree = "<group>"; };
-		36CA2F381758294E002E6F1E /* disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = disk.c; sourceTree = "<group>"; };
-		36CA2F391758294E002E6F1E /* disk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = disk.h; sourceTree = "<group>"; };
-		36CA2F3A1758294E002E6F1E /* dram_controllers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dram_controllers.c; sourceTree = "<group>"; };
-		36CA2F3B1758294E002E6F1E /* dram_controllers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dram_controllers.h; sourceTree = "<group>"; };
-		36CA2F3D1758294E002E6F1E /* edid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = edid.c; sourceTree = "<group>"; };
-		36CA2F3E1758294E002E6F1E /* edid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = edid.h; sourceTree = "<group>"; };
-		36CA2F3F1758294E002E6F1E /* efi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = efi.h; sourceTree = "<group>"; };
-		36CA2F401758294E002E6F1E /* exfat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = exfat.c; sourceTree = "<group>"; };
-		36CA2F411758294E002E6F1E /* exfat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exfat.h; sourceTree = "<group>"; };
-		36CA2F421758294E002E6F1E /* ext2fs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ext2fs.c; sourceTree = "<group>"; };
-		36CA2F431758294E002E6F1E /* ext2fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fs.h; sourceTree = "<group>"; };
-		36CA2F441758294E002E6F1E /* fake_efi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fake_efi.c; sourceTree = "<group>"; };
-		36CA2F451758294E002E6F1E /* fake_efi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fake_efi.h; sourceTree = "<group>"; };
-		36CA2F461758294E002E6F1E /* fdisk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fdisk.h; sourceTree = "<group>"; };
-		36CA2F471758294E002E6F1E /* freebsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = freebsd.c; sourceTree = "<group>"; };
-		36CA2F481758294E002E6F1E /* freebsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = freebsd.h; sourceTree = "<group>"; };
-		36CA2F491758294E002E6F1E /* gma.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gma.c; sourceTree = "<group>"; };
-		36CA2F4A1758294E002E6F1E /* gma.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gma.h; sourceTree = "<group>"; };
-		36CA2F4B1758294E002E6F1E /* hfs_CaseTables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hfs_CaseTables.h; sourceTree = "<group>"; };
-		36CA2F4C1758294E002E6F1E /* hfs_compare.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hfs_compare.c; sourceTree = "<group>"; };
-		36CA2F4D1758294E002E6F1E /* hfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hfs.c; sourceTree = "<group>"; };
-		36CA2F4E1758294E002E6F1E /* hfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hfs.h; sourceTree = "<group>"; };
-		36CA2F4F1758294E002E6F1E /* hpet.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hpet.c; sourceTree = "<group>"; };
-		36CA2F501758294E002E6F1E /* hpet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hpet.h; sourceTree = "<group>"; };
-		36CA2F511758294E002E6F1E /* io_inline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = io_inline.h; sourceTree = "<group>"; };
-		36CA2F521758294E002E6F1E /* libsaio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libsaio.h; sourceTree = "<group>"; };
-		36CA2F531758294E002E6F1E /* load.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = load.c; sourceTree = "<group>"; };
-		36CA2F541758294E002E6F1E /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		36CA2F551758294E002E6F1E /* md5c.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = md5c.c; sourceTree = "<group>"; };
-		36CA2F561758294E002E6F1E /* memvendors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memvendors.h; sourceTree = "<group>"; };
-		36CA2F571758294E002E6F1E /* misc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = misc.c; sourceTree = "<group>"; };
-		36CA2F581758294E002E6F1E /* msdos_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msdos_private.h; sourceTree = "<group>"; };
-		36CA2F591758294E002E6F1E /* msdos.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = msdos.c; sourceTree = "<group>"; };
-		36CA2F5A1758294E002E6F1E /* msdos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msdos.h; sourceTree = "<group>"; };
-		36CA2F5B1758294E002E6F1E /* nbp_cmd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nbp_cmd.h; sourceTree = "<group>"; };
-		36CA2F5C1758294E002E6F1E /* nbp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nbp.c; sourceTree = "<group>"; };
-		36CA2F5D1758294E002E6F1E /* ntfs_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs_private.h; sourceTree = "<group>"; };
-		36CA2F5E1758294E002E6F1E /* ntfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ntfs.c; sourceTree = "<group>"; };
-		36CA2F5F1758294E002E6F1E /* ntfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs.h; sourceTree = "<group>"; };
-		36CA2F601758294E002E6F1E /* nvidia_helper.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia_helper.c; sourceTree = "<group>"; };
-		36CA2F611758294E002E6F1E /* nvidia_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia_helper.h; sourceTree = "<group>"; };
-		36CA2F621758294E002E6F1E /* nvidia.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
-		36CA2F631758294E002E6F1E /* nvidia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
-		36CA2F641758294E002E6F1E /* openbsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = openbsd.c; sourceTree = "<group>"; };
-		36CA2F651758294E002E6F1E /* openbsd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = openbsd.h; sourceTree = "<group>"; };
-		36CA2F661758294E002E6F1E /* pci_root.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci_root.c; sourceTree = "<group>"; };
-		36CA2F671758294E002E6F1E /* pci_root.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pci_root.h; sourceTree = "<group>"; };
-		36CA2F681758294E002E6F1E /* pci_setup.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci_setup.c; sourceTree = "<group>"; };
-		36CA2F691758294E002E6F1E /* pci.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pci.c; sourceTree = "<group>"; };
-		36CA2F6A1758294E002E6F1E /* pci.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pci.h; sourceTree = "<group>"; };
-		36CA2F6B1758294E002E6F1E /* platform.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = platform.c; sourceTree = "<group>"; };
-		36CA2F6C1758294E002E6F1E /* platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = platform.h; sourceTree = "<group>"; };
-		36CA2F6D1758294E002E6F1E /* saio_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = saio_internal.h; sourceTree = "<group>"; };
-		36CA2F6E1758294E002E6F1E /* saio_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = saio_types.h; sourceTree = "<group>"; };
-		36CA2F6F1758294E002E6F1E /* sl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sl.h; sourceTree = "<group>"; };
-		36CA2F701758294E002E6F1E /* smbios_decode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios_decode.c; sourceTree = "<group>"; };
-		36CA2F711758294E002E6F1E /* smbios_getters.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios_getters.c; sourceTree = "<group>"; };
-		36CA2F721758294E002E6F1E /* smbios_getters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios_getters.h; sourceTree = "<group>"; };
-		36CA2F731758294E002E6F1E /* smbios.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = smbios.c; sourceTree = "<group>"; };
-		36CA2F741758294E002E6F1E /* smbios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = smbios.h; sourceTree = "<group>"; };
-		36CA2F751758294E002E6F1E /* spd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = spd.c; sourceTree = "<group>"; };
-		36CA2F761758294E002E6F1E /* spd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spd.h; sourceTree = "<group>"; };
-		36CA2F771758294E002E6F1E /* state_generator.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = state_generator.c; sourceTree = "<group>"; };
-		36CA2F781758294E002E6F1E /* state_generator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state_generator.h; sourceTree = "<group>"; };
-		36CA2F791758294E002E6F1E /* stringTable.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stringTable.c; sourceTree = "<group>"; };
-		36CA2F7A1758294E002E6F1E /* sys.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sys.c; sourceTree = "<group>"; };
-		36CA2F7B1758294E002E6F1E /* table.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = table.c; sourceTree = "<group>"; };
-		36CA2F7C1758294E002E6F1E /* term.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = term.h; sourceTree = "<group>"; };
-		36CA2F7D1758294E002E6F1E /* ufs_byteorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ufs_byteorder.h; sourceTree = "<group>"; };
-		36CA2F7E1758294E002E6F1E /* ufs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ufs.h; sourceTree = "<group>"; };
-		36CA2F7F1758294E002E6F1E /* usb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = usb.c; sourceTree = "<group>"; };
-		36CA2F801758294E002E6F1E /* vbe.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vbe.c; sourceTree = "<group>"; };
-		36CA2F811758294E002E6F1E /* vbe.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vbe.h; sourceTree = "<group>"; };
-		36CA2F821758294E002E6F1E /* xml.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xml.c; sourceTree = "<group>"; };
-		36CA2F831758294E002E6F1E /* xml.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xml.h; sourceTree = "<group>"; };
-		36CA2F841758362B002E6F1E /* dsdt_patcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dsdt_patcher.c; sourceTree = "<group>"; };
 		36CF786716A0DD3D00EE5DC1 /* HDAULayout.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = HDAULayout.txt; path = OptionalSettings/HDAULayout.txt; sourceTree = "<group>"; };
 		36D621D016A41501006031F3 /* hda_controller.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = hda_controller.c; path = HDAEnabler/hda_controller.c; sourceTree = "<group>"; };
 		36D621D116A41501006031F3 /* hda_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hda_controller.h; path = HDAEnabler/hda_controller.h; sourceTree = "<group>"; };
@@ -319,8 +337,6 @@
 		52DF7A2F17EDFA5900A88D32 /* kernel_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = kernel_patcher.h; path = KernelPatcher/kernel_patcher.h; sourceTree = "<group>"; };
 		52DF7A3017EDFA5900A88D32 /* KernelPatcher.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = KernelPatcher.dylib; path = KernelPatcher/KernelPatcher.dylib; sourceTree = "<group>"; };
 		52DF7A3117EDFA5900A88D32 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = KernelPatcher/Makefile; sourceTree = "<group>"; };
-		52F9208217E9280E0039B7EB /* hda.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hda.c; sourceTree = "<group>"; };
-		52F9208317E9280E0039B7EB /* hda.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hda.h; sourceTree = "<group>"; };
 		6DBAFD1813B0D4590047ED33 /* _structs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _structs.h; sourceTree = "<group>"; };
 		6DBAFD1913B0D4590047ED33 /* _types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _types.h; sourceTree = "<group>"; };
 		6DBAFD1B13B0D4590047ED33 /* alignment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignment.h; sourceTree = "<group>"; };
@@ -1235,37 +1251,6 @@
 		B0056D8211F3868000754B65 /* APPLE_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = APPLE_LICENSE; sourceTree = "<group>"; };
 		B0056D8511F3868000754B65 /* Distribution */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Distribution; sourceTree = "<group>"; };
 		B0056DB911F3868000754B65 /* smbios.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = smbios.plist; sourceTree = "<group>"; };
-		B0056DBD11F3868000754B65 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
-		B0056DBE11F3868000754B65 /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
-		B0056DBF11F3868000754B65 /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
-		B0056DC011F3868000754B65 /* device_ext3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ext3.png; sourceTree = "<group>"; };
-		B0056DC111F3868000754B65 /* device_fat16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat16.png; sourceTree = "<group>"; };
-		B0056DC211F3868000754B65 /* device_fat32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_fat32.png; sourceTree = "<group>"; };
-		B0056DC311F3868000754B65 /* device_generic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_generic.png; sourceTree = "<group>"; };
-		B0056DC411F3868000754B65 /* device_hfsplus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus.png; sourceTree = "<group>"; };
-		B0056DC511F3868000754B65 /* device_ntfs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_ntfs.png; sourceTree = "<group>"; };
-		B0056DC611F3868000754B65 /* device_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_next.png; sourceTree = "<group>"; };
-		B0056DC711F3868000754B65 /* device_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_scroll_prev.png; sourceTree = "<group>"; };
-		B0056DC811F3868000754B65 /* device_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_selection.png; sourceTree = "<group>"; };
-		B0056DC911F3868000754B65 /* font_console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_console.png; sourceTree = "<group>"; };
-		B0056DCA11F3868000754B65 /* font_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = font_small.png; sourceTree = "<group>"; };
-		B0056DCB11F3868000754B65 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
-		B0056DCC11F3868000754B65 /* menu_boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_boot.png; sourceTree = "<group>"; };
-		B0056DCD11F3868000754B65 /* menu_help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_help.png; sourceTree = "<group>"; };
-		B0056DCE11F3868000754B65 /* menu_ignore_caches.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches.png; sourceTree = "<group>"; };
-		B0056DCF11F3868000754B65 /* menu_ignore_caches_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_ignore_caches_disabled.png; sourceTree = "<group>"; };
-		B0056DD011F3868000754B65 /* menu_memory_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_memory_info.png; sourceTree = "<group>"; };
-		B0056DD111F3868000754B65 /* menu_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_selection.png; sourceTree = "<group>"; };
-		B0056DD211F3868000754B65 /* menu_single_user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user.png; sourceTree = "<group>"; };
-		B0056DD311F3868000754B65 /* menu_single_user_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_single_user_disabled.png; sourceTree = "<group>"; };
-		B0056DD411F3868000754B65 /* menu_verbose.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose.png; sourceTree = "<group>"; };
-		B0056DD511F3868000754B65 /* menu_verbose_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_verbose_disabled.png; sourceTree = "<group>"; };
-		B0056DD611F3868000754B65 /* menu_video_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_video_info.png; sourceTree = "<group>"; };
-		B0056DD711F3868000754B65 /* progress_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar.png; sourceTree = "<group>"; };
-		B0056DD811F3868000754B65 /* progress_bar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = progress_bar_background.png; sourceTree = "<group>"; };
-		B0056DD911F3868000754B65 /* text_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_next.png; sourceTree = "<group>"; };
-		B0056DDA11F3868000754B65 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_prev.png; sourceTree = "<group>"; };
-		B0056DDB11F3868000754B65 /* theme.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = theme.plist; sourceTree = "<group>"; };
 		B0056E0811F3868000754B65 /* Users_Guide0.4.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Users_Guide0.4.pdf; sourceTree = "<group>"; };
 		B0056E0911F3868000754B65 /* Users_Guide_v0.3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Users_Guide_v0.3.pdf; sourceTree = "<group>"; };
 		B0056E0A11F3868000754B65 /* UsersGuide-v0.2.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "UsersGuide-v0.2.pdf"; sourceTree = "<group>"; };
@@ -1339,78 +1324,11 @@
 		B4189A2014BFBF1C00ED5B0B /* zconf.hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zconf.hash.c; path = config/zconf.hash.c; sourceTree = "<group>"; };
 		B4189A2114BFBF1C00ED5B0B /* zconf.tab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zconf.tab.c; path = config/zconf.tab.c; sourceTree = "<group>"; };
 		B4189A2414BFBFD100ED5B0B /* Cconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cconfig; sourceTree = "<group>"; };
-		B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml_o.png; sourceTree = "<group>"; };
-		B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_ml.png; sourceTree = "<group>"; };
-		B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml_o.png; sourceTree = "<group>"; };
-		B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsraid_ml.png; sourceTree = "<group>"; };
-		B442D9F515C216C900985ED1 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = embed/background.png; sourceTree = "<group>"; };
-		B442D9F615C216C900985ED1 /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = boot.png; path = embed/boot.png; sourceTree = "<group>"; };
-		B442D9F715C216C900985ED1 /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_cdrom.png; path = embed/device_cdrom.png; sourceTree = "<group>"; };
-		B442D9F815C216C900985ED1 /* device_ext3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_ext3.png; path = embed/device_ext3.png; sourceTree = "<group>"; };
-		B442D9F915C216C900985ED1 /* device_fat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_fat.png; path = embed/device_fat.png; sourceTree = "<group>"; };
-		B442D9FA15C216C900985ED1 /* device_generic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_generic.png; path = embed/device_generic.png; sourceTree = "<group>"; };
-		B442D9FB15C216C900985ED1 /* device_hfsplus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_hfsplus.png; path = embed/device_hfsplus.png; sourceTree = "<group>"; };
-		B442D9FC15C216C900985ED1 /* device_hfsraid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_hfsraid.png; path = embed/device_hfsraid.png; sourceTree = "<group>"; };
-		B442D9FD15C216C900985ED1 /* device_ntfs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_ntfs.png; path = embed/device_ntfs.png; sourceTree = "<group>"; };
-		B442D9FE15C216C900985ED1 /* device_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_scroll_next.png; path = embed/device_scroll_next.png; sourceTree = "<group>"; };
-		B442D9FF15C216C900985ED1 /* device_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_scroll_prev.png; path = embed/device_scroll_prev.png; sourceTree = "<group>"; };
-		B442DA0015C216C900985ED1 /* device_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_selection.png; path = embed/device_selection.png; sourceTree = "<group>"; };
-		B442DA0115C216C900985ED1 /* font_console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font_console.png; path = embed/font_console.png; sourceTree = "<group>"; };
-		B442DA0215C216C900985ED1 /* font_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font_small.png; path = embed/font_small.png; sourceTree = "<group>"; };
-		B442DA0315C216C900985ED1 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = embed/logo.png; sourceTree = "<group>"; };
-		B442DA0415C216C900985ED1 /* menu_boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_boot.png; path = embed/menu_boot.png; sourceTree = "<group>"; };
-		B442DA0515C216C900985ED1 /* menu_help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_help.png; path = embed/menu_help.png; sourceTree = "<group>"; };
-		B442DA0615C216C900985ED1 /* menu_ignore_caches_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_ignore_caches_disabled.png; path = embed/menu_ignore_caches_disabled.png; sourceTree = "<group>"; };
-		B442DA0715C216C900985ED1 /* menu_ignore_caches.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_ignore_caches.png; path = embed/menu_ignore_caches.png; sourceTree = "<group>"; };
-		B442DA0815C216C900985ED1 /* menu_memory_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_memory_info.png; path = embed/menu_memory_info.png; sourceTree = "<group>"; };
-		B442DA0915C216C900985ED1 /* menu_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_selection.png; path = embed/menu_selection.png; sourceTree = "<group>"; };
-		B442DA0A15C216C900985ED1 /* menu_single_user_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_single_user_disabled.png; path = embed/menu_single_user_disabled.png; sourceTree = "<group>"; };
-		B442DA0B15C216C900985ED1 /* menu_single_user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_single_user.png; path = embed/menu_single_user.png; sourceTree = "<group>"; };
-		B442DA0C15C216C900985ED1 /* menu_verbose_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_verbose_disabled.png; path = embed/menu_verbose_disabled.png; sourceTree = "<group>"; };
-		B442DA0D15C216C900985ED1 /* menu_verbose.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_verbose.png; path = embed/menu_verbose.png; sourceTree = "<group>"; };
-		B442DA0E15C216C900985ED1 /* menu_video_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_video_info.png; path = embed/menu_video_info.png; sourceTree = "<group>"; };
-		B442DA0F15C216C900985ED1 /* progress_bar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_bar_background.png; path = embed/progress_bar_background.png; sourceTree = "<group>"; };
-		B442DA1015C216C900985ED1 /* progress_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_bar.png; path = embed/progress_bar.png; sourceTree = "<group>"; };
-		B442DA1115C216C900985ED1 /* text_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = text_scroll_next.png; path = embed/text_scroll_next.png; sourceTree = "<group>"; };
-		B442DA1215C216C900985ED1 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = text_scroll_prev.png; path = embed/text_scroll_prev.png; sourceTree = "<group>"; };
-		B442DA1315C216C900985ED1 /* theme.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = theme.plist; path = embed/theme.plist; sourceTree = "<group>"; };
-		B442DA1415C216E500985ED1 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background.png; path = legacy/background.png; sourceTree = "<group>"; };
-		B442DA1515C216E500985ED1 /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = boot.png; path = legacy/boot.png; sourceTree = "<group>"; };
-		B442DA1615C216E500985ED1 /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_cdrom.png; path = legacy/device_cdrom.png; sourceTree = "<group>"; };
-		B442DA1715C216E500985ED1 /* device_ext3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_ext3.png; path = legacy/device_ext3.png; sourceTree = "<group>"; };
-		B442DA1815C216E500985ED1 /* device_fat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_fat.png; path = legacy/device_fat.png; sourceTree = "<group>"; };
-		B442DA1915C216E500985ED1 /* device_generic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_generic.png; path = legacy/device_generic.png; sourceTree = "<group>"; };
-		B442DA1A15C216E500985ED1 /* device_hfsplus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_hfsplus.png; path = legacy/device_hfsplus.png; sourceTree = "<group>"; };
-		B442DA1B15C216E500985ED1 /* device_ntfs.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_ntfs.png; path = legacy/device_ntfs.png; sourceTree = "<group>"; };
-		B442DA1C15C216E500985ED1 /* device_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_scroll_next.png; path = legacy/device_scroll_next.png; sourceTree = "<group>"; };
-		B442DA1D15C216E500985ED1 /* device_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_scroll_prev.png; path = legacy/device_scroll_prev.png; sourceTree = "<group>"; };
-		B442DA1E15C216E500985ED1 /* device_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_selection.png; path = legacy/device_selection.png; sourceTree = "<group>"; };
-		B442DA1F15C216E500985ED1 /* font_console.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font_console.png; path = legacy/font_console.png; sourceTree = "<group>"; };
-		B442DA2015C216E500985ED1 /* font_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = font_small.png; path = legacy/font_small.png; sourceTree = "<group>"; };
-		B442DA2115C216E500985ED1 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = legacy/logo.png; sourceTree = "<group>"; };
-		B442DA2215C216E500985ED1 /* menu_boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_boot.png; path = legacy/menu_boot.png; sourceTree = "<group>"; };
-		B442DA2315C216E500985ED1 /* menu_help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_help.png; path = legacy/menu_help.png; sourceTree = "<group>"; };
-		B442DA2415C216E500985ED1 /* menu_ignore_caches_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_ignore_caches_disabled.png; path = legacy/menu_ignore_caches_disabled.png; sourceTree = "<group>"; };
-		B442DA2515C216E500985ED1 /* menu_ignore_caches.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_ignore_caches.png; path = legacy/menu_ignore_caches.png; sourceTree = "<group>"; };
-		B442DA2615C216E500985ED1 /* menu_memory_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_memory_info.png; path = legacy/menu_memory_info.png; sourceTree = "<group>"; };
-		B442DA2715C216E500985ED1 /* menu_selection.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_selection.png; path = legacy/menu_selection.png; sourceTree = "<group>"; };
-		B442DA2815C216E500985ED1 /* menu_single_user_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_single_user_disabled.png; path = legacy/menu_single_user_disabled.png; sourceTree = "<group>"; };
-		B442DA2915C216E500985ED1 /* menu_single_user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_single_user.png; path = legacy/menu_single_user.png; sourceTree = "<group>"; };
-		B442DA2A15C216E500985ED1 /* menu_verbose_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_verbose_disabled.png; path = legacy/menu_verbose_disabled.png; sourceTree = "<group>"; };
-		B442DA2B15C216E500985ED1 /* menu_verbose.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_verbose.png; path = legacy/menu_verbose.png; sourceTree = "<group>"; };
-		B442DA2C15C216E500985ED1 /* menu_video_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu_video_info.png; path = legacy/menu_video_info.png; sourceTree = "<group>"; };
-		B442DA2D15C216E500985ED1 /* progress_bar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_bar_background.png; path = legacy/progress_bar_background.png; sourceTree = "<group>"; };
-		B442DA2E15C216E500985ED1 /* progress_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = progress_bar.png; path = legacy/progress_bar.png; sourceTree = "<group>"; };
-		B442DA2F15C216E500985ED1 /* text_scroll_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = text_scroll_next.png; path = legacy/text_scroll_next.png; sourceTree = "<group>"; };
-		B442DA3015C216E500985ED1 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = text_scroll_prev.png; path = legacy/text_scroll_prev.png; sourceTree = "<group>"; };
-		B442DA3115C216E500985ED1 /* theme.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = theme.plist; path = legacy/theme.plist; sourceTree = "<group>"; };
 		B45260B4153EFCF60018E994 /* po4a-chameleon.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "po4a-chameleon.cfg"; sourceTree = "<group>"; };
 		B4AABE5914C3B8B90055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5B14C3B8C70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5D14C3B8D70055ECD1 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		B4AABE5E14C3B8EF0055ECD1 /* clean_bootplist.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = clean_bootplist.pl; sourceTree = "<group>"; };
-		B4B3DD8D15B8E2F7002FAA73 /* device_hfsplus_recovery_o.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_recovery_o.png; sourceTree = "<group>"; };
-		B4B3DD8E15B8E2F7002FAA73 /* device_hfsplus_recovery.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_hfsplus_recovery.png; sourceTree = "<group>"; };
 		B4B3DD9015B8E347002FAA73 /* org.chameleon.Boot.nvidia.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = org.chameleon.Boot.nvidia.plist; sourceTree = "<group>"; };
 		B4B3DDA615B8E3CB002FAA73 /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; name = Cconfig; path = Sata/Cconfig; sourceTree = "<group>"; };
 		B4B3DDA815B8E3CB002FAA73 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = Sata/Makefile; sourceTree = "<group>"; };
@@ -1578,6 +1496,92 @@
 			);
 			name = Pre;
 			path = Scripts.templates/Pre;
+			sourceTree = "<group>";
+		};
+		3696B2471A1D2EAB004272A6 /* default */ = {
+			isa = PBXGroup;
+			children = (
+				3696B2481A1D2EAB004272A6 /* background.png */,
+				3696B2491A1D2EAB004272A6 /* boot.png */,
+				3696B24A1A1D2EAB004272A6 /* device_befs.png */,
+				3696B24B1A1D2EAB004272A6 /* device_befs_o.png */,
+				3696B24C1A1D2EAB004272A6 /* device_cdrom.png */,
+				3696B24D1A1D2EAB004272A6 /* device_cdrom_o.png */,
+				3696B24E1A1D2EAB004272A6 /* device_ext3.png */,
+				3696B24F1A1D2EAB004272A6 /* device_ext3_o.png */,
+				3696B2501A1D2EAB004272A6 /* device_fat.png */,
+				3696B2511A1D2EAB004272A6 /* device_fat_o.png */,
+				3696B2521A1D2EAB004272A6 /* device_freebsd.png */,
+				3696B2531A1D2EAB004272A6 /* device_freebsd_o.png */,
+				3696B2541A1D2EAB004272A6 /* device_generic.png */,
+				3696B2551A1D2EAB004272A6 /* device_generic_o.png */,
+				3696B2561A1D2EAB004272A6 /* device_hfsfusion_mav.png */,
+				3696B2571A1D2EAB004272A6 /* device_hfsfusion_mav_o.png */,
+				3696B2581A1D2EAB004272A6 /* device_hfsfusion_yos.png */,
+				3696B2591A1D2EAB004272A6 /* device_hfsfusion_yos_o.png */,
+				3696B25A1A1D2EAB004272A6 /* device_hfsplus.png */,
+				3696B25B1A1D2EAB004272A6 /* device_hfsplus_leo.png */,
+				3696B25C1A1D2EAB004272A6 /* device_hfsplus_leo_o.png */,
+				3696B25D1A1D2EAB004272A6 /* device_hfsplus_lion.png */,
+				3696B25E1A1D2EAB004272A6 /* device_hfsplus_lion_o.png */,
+				3696B25F1A1D2EAB004272A6 /* device_hfsplus_mav.png */,
+				3696B2601A1D2EAB004272A6 /* device_hfsplus_mav_o.png */,
+				3696B2611A1D2EAB004272A6 /* device_hfsplus_ml.png */,
+				3696B2621A1D2EAB004272A6 /* device_hfsplus_ml_o.png */,
+				3696B2631A1D2EAB004272A6 /* device_hfsplus_o.png */,
+				3696B2641A1D2EAB004272A6 /* device_hfsplus_recovery.png */,
+				3696B2651A1D2EAB004272A6 /* device_hfsplus_recovery_o.png */,
+				3696B2661A1D2EAB004272A6 /* device_hfsplus_sl.png */,
+				3696B2671A1D2EAB004272A6 /* device_hfsplus_sl_o.png */,
+				3696B2681A1D2EAB004272A6 /* device_hfsplus_tiger.png */,
+				3696B2691A1D2EAB004272A6 /* device_hfsplus_tiger_o.png */,
+				3696B26A1A1D2EAB004272A6 /* device_hfsplus_yos.png */,
+				3696B26B1A1D2EAB004272A6 /* device_hfsplus_yos_o.png */,
+				3696B26C1A1D2EAB004272A6 /* device_hfsraid.png */,
+				3696B26D1A1D2EAB004272A6 /* device_hfsraid_leo.png */,
+				3696B26E1A1D2EAB004272A6 /* device_hfsraid_leo_o.png */,
+				3696B26F1A1D2EAB004272A6 /* device_hfsraid_lion.png */,
+				3696B2701A1D2EAB004272A6 /* device_hfsraid_lion_o.png */,
+				3696B2711A1D2EAB004272A6 /* device_hfsraid_mav.png */,
+				3696B2721A1D2EAB004272A6 /* device_hfsraid_mav_o.png */,
+				3696B2731A1D2EAB004272A6 /* device_hfsraid_ml.png */,
+				3696B2741A1D2EAB004272A6 /* device_hfsraid_ml_o.png */,
+				3696B2751A1D2EAB004272A6 /* device_hfsraid_o.png */,
+				3696B2761A1D2EAB004272A6 /* device_hfsraid_sl.png */,
+				3696B2771A1D2EAB004272A6 /* device_hfsraid_sl_o.png */,
+				3696B2781A1D2EAB004272A6 /* device_hfsraid_tiger.png */,
+				3696B2791A1D2EAB004272A6 /* device_hfsraid_tiger_o.png */,
+				3696B27A1A1D2EAB004272A6 /* device_hfsraid_yos.png */,
+				3696B27B1A1D2EAB004272A6 /* device_hfsraid_yos_o.png */,
+				3696B27C1A1D2EAB004272A6 /* device_ntfs.png */,
+				3696B27D1A1D2EAB004272A6 /* device_ntfs_o.png */,
+				3696B27E1A1D2EAB004272A6 /* device_openbsd.png */,
+				3696B27F1A1D2EAB004272A6 /* device_openbsd_o.png */,
+				3696B2801A1D2EAB004272A6 /* device_scroll_next.png */,
+				3696B2811A1D2EAB004272A6 /* device_scroll_prev.png */,
+				3696B2821A1D2EAB004272A6 /* device_selection.png */,
+				3696B2831A1D2EAB004272A6 /* font_console.png */,
+				3696B2841A1D2EAB004272A6 /* font_small.png */,
+				3696B2851A1D2EAB004272A6 /* logo.png */,
+				3696B2861A1D2EAB004272A6 /* menu_boot.png */,
+				3696B2871A1D2EAB004272A6 /* menu_help.png */,
+				3696B2881A1D2EAB004272A6 /* menu_ignore_caches.png */,
+				3696B2891A1D2EAB004272A6 /* menu_ignore_caches_disabled.png */,
+				3696B28A1A1D2EAB004272A6 /* menu_memory_info.png */,
+				3696B28B1A1D2EAB004272A6 /* menu_selection.png */,
+				3696B28C1A1D2EAB004272A6 /* menu_single_user.png */,
+				3696B28D1A1D2EAB004272A6 /* menu_single_user_disabled.png */,
+				3696B28E1A1D2EAB004272A6 /* menu_verbose.png */,
+				3696B28F1A1D2EAB004272A6 /* menu_verbose_disabled.png */,
+				3696B2901A1D2EAB004272A6 /* menu_video_info.png */,
+				3696B2911A1D2EAB004272A6 /* progress_bar.png */,
+				3696B2921A1D2EAB004272A6 /* progress_bar_background.png */,
+				3696B2931A1D2EAB004272A6 /* text_scroll_next.png */,
+				3696B2941A1D2EAB004272A6 /* text_scroll_prev.png */,
+				3696B2951A1D2EAB004272A6 /* theme.plist */,
+				3696B2961A1D2EAB004272A6 /* thumb.png */,
+			);
+			path = default;
 			sourceTree = "<group>";
 		};
 		36B43E8114BCE91300D29461 /* OptionalSettings */ = {
@@ -3321,20 +3325,20 @@
 		B0056D1611F3868000754B65 /* libsa */ = {
 			isa = PBXGroup;
 			children = (
-				3617E23517503A6600AE753C /* Cconfig */,
-				3617E23617503A6600AE753C /* efi_tables.c */,
-				3617E23717503A6600AE753C /* efi_tables.h */,
-				3617E23817503A6600AE753C /* error.c */,
-				3617E23917503A6600AE753C /* libsa.h */,
-				3617E23A17503A6600AE753C /* Makefile */,
-				3617E23B17503A6600AE753C /* memory.h */,
-				3617E23C17503A6600AE753C /* prf.c */,
-				3617E23D17503A6600AE753C /* printf.c */,
-				3617E23E17503A6600AE753C /* qsort.c */,
-				3617E23F17503A6600AE753C /* setjmp.s */,
-				3617E24017503A6600AE753C /* string.c */,
-				3617E24117503A6600AE753C /* strtol.c */,
-				3617E24217503A6600AE753C /* zalloc.c */,
+				3696B2391A1D2DD1004272A6 /* Cconfig */,
+				3696B23A1A1D2DD1004272A6 /* efi_tables.c */,
+				3696B23B1A1D2DD1004272A6 /* efi_tables.h */,
+				3696B23C1A1D2DD1004272A6 /* error.c */,
+				3696B23D1A1D2DD1004272A6 /* libsa.h */,
+				3696B23E1A1D2DD1004272A6 /* Makefile */,
+				3696B23F1A1D2DD1004272A6 /* memory.h */,
+				3696B2401A1D2DD1004272A6 /* prf.c */,
+				3696B2411A1D2DD1004272A6 /* printf.c */,
+				3696B2421A1D2DD1004272A6 /* qsort.c */,
+				3696B2431A1D2DD1004272A6 /* setjmp.s */,
+				3696B2441A1D2DD1004272A6 /* string.c */,
+				3696B2451A1D2DD1004272A6 /* strtol.c */,
+				3696B2461A1D2DD1004272A6 /* zalloc.c */,
 			);
 			path = libsa;
 			sourceTree = "<group>";
@@ -3342,115 +3346,113 @@
 		B0056D2411F3868000754B65 /* libsaio */ = {
 			isa = PBXGroup;
 			children = (
-				36CA2F1B1758294E002E6F1E /* acpi_patcher.c */,
-				36CA2F1C1758294E002E6F1E /* acpi_patcher.h */,
-				36CA2F1D1758294E002E6F1E /* acpi.h */,
-				36CA2F1E1758294E002E6F1E /* allocate.c */,
-				36CA2F1F1758294E002E6F1E /* aml_generator.c */,
-				36CA2F201758294E002E6F1E /* aml_generator.h */,
-				36CA2F211758294E002E6F1E /* asm.s */,
-				36CA2F221758294E002E6F1E /* ati.c */,
-				36CA2F231758294E002E6F1E /* ati.h */,
-				36CA2F241758294E002E6F1E /* base64-decode.c */,
-				36CA2F251758294E002E6F1E /* befs.c */,
-				36CA2F261758294E002E6F1E /* befs.h */,
-				36CA2F271758294E002E6F1E /* bios.h */,
-				36CA2F281758294E002E6F1E /* bios.s */,
-				36CA2F291758294E002E6F1E /* biosfn.c */,
-				36CA2F2A1758294E002E6F1E /* bootargs.h */,
-				36CA2F2B1758294E002E6F1E /* bootstruct.c */,
-				36CA2F2C1758294E002E6F1E /* bootstruct.h */,
-				36CA2F2D1758294E002E6F1E /* cache.c */,
-				36CA2F2E1758294E002E6F1E /* Cconfig */,
-				36CA2F2F1758294E002E6F1E /* console.c */,
-				36CA2F301758294E002E6F1E /* convert.c */,
-				36CA2F311758294E002E6F1E /* convert.h */,
-				36CA2F321758294E002E6F1E /* cpu.c */,
-				36CA2F331758294E002E6F1E /* cpu.h */,
-				36CA2F341758294E002E6F1E /* device_inject.c */,
-				36CA2F351758294E002E6F1E /* device_inject.h */,
-				36CA2F361758294E002E6F1E /* device_tree.c */,
-				36CA2F371758294E002E6F1E /* device_tree.h */,
-				36CA2F381758294E002E6F1E /* disk.c */,
-				36CA2F391758294E002E6F1E /* disk.h */,
-				36CA2F3A1758294E002E6F1E /* dram_controllers.c */,
-				36CA2F3B1758294E002E6F1E /* dram_controllers.h */,
-				36CA2F841758362B002E6F1E /* dsdt_patcher.c */,
-				36CA2F3D1758294E002E6F1E /* edid.c */,
-				36CA2F3E1758294E002E6F1E /* edid.h */,
-				36CA2F3F1758294E002E6F1E /* efi.h */,
-				36CA2F401758294E002E6F1E /* exfat.c */,
-				36CA2F411758294E002E6F1E /* exfat.h */,
-				36CA2F421758294E002E6F1E /* ext2fs.c */,
-				36CA2F431758294E002E6F1E /* ext2fs.h */,
-				36CA2F441758294E002E6F1E /* fake_efi.c */,
-				36CA2F451758294E002E6F1E /* fake_efi.h */,
-				36CA2F461758294E002E6F1E /* fdisk.h */,
-				36CA2F471758294E002E6F1E /* freebsd.c */,
-				36CA2F481758294E002E6F1E /* freebsd.h */,
-				36CA2F491758294E002E6F1E /* gma.c */,
-				36CA2F4A1758294E002E6F1E /* gma.h */,
-				52F9208217E9280E0039B7EB /* hda.c */,
-				52F9208317E9280E0039B7EB /* hda.h */,
-				36CA2F4B1758294E002E6F1E /* hfs_CaseTables.h */,
-				36CA2F4C1758294E002E6F1E /* hfs_compare.c */,
-				36CA2F4D1758294E002E6F1E /* hfs.c */,
-				36CA2F4E1758294E002E6F1E /* hfs.h */,
-				36CA2F4F1758294E002E6F1E /* hpet.c */,
-				36CA2F501758294E002E6F1E /* hpet.h */,
-				36CA2F511758294E002E6F1E /* io_inline.h */,
-				36CA2F521758294E002E6F1E /* libsaio.h */,
-				36CA2F531758294E002E6F1E /* load.c */,
-				36CA2F541758294E002E6F1E /* Makefile */,
-				36CA2F551758294E002E6F1E /* md5c.c */,
-				36CA2F561758294E002E6F1E /* memvendors.h */,
-				36CA2F571758294E002E6F1E /* misc.c */,
-				36CA2F581758294E002E6F1E /* msdos_private.h */,
-				36CA2F591758294E002E6F1E /* msdos.c */,
-				36CA2F5A1758294E002E6F1E /* msdos.h */,
-				36CA2F5B1758294E002E6F1E /* nbp_cmd.h */,
-				36CA2F5C1758294E002E6F1E /* nbp.c */,
-				3601D701177540B500AE44D2 /* networking.c */,
-				3601D702177540B500AE44D2 /* networking.h */,
-				36CA2F5D1758294E002E6F1E /* ntfs_private.h */,
-				36CA2F5E1758294E002E6F1E /* ntfs.c */,
-				36CA2F5F1758294E002E6F1E /* ntfs.h */,
-				36CA2F601758294E002E6F1E /* nvidia_helper.c */,
-				36CA2F611758294E002E6F1E /* nvidia_helper.h */,
-				36CA2F621758294E002E6F1E /* nvidia.c */,
-				36CA2F631758294E002E6F1E /* nvidia.h */,
-				36CA2F641758294E002E6F1E /* openbsd.c */,
-				36CA2F651758294E002E6F1E /* openbsd.h */,
-				36CA2F661758294E002E6F1E /* pci_root.c */,
-				36CA2F671758294E002E6F1E /* pci_root.h */,
-				36CA2F681758294E002E6F1E /* pci_setup.c */,
-				36CA2F691758294E002E6F1E /* pci.c */,
-				36CA2F6A1758294E002E6F1E /* pci.h */,
-				36CA2F6B1758294E002E6F1E /* platform.c */,
-				36CA2F6C1758294E002E6F1E /* platform.h */,
-				36CA2F6D1758294E002E6F1E /* saio_internal.h */,
-				36CA2F6E1758294E002E6F1E /* saio_types.h */,
-				36CA2F6F1758294E002E6F1E /* sl.h */,
-				36CA2F701758294E002E6F1E /* smbios_decode.c */,
-				36CA2F711758294E002E6F1E /* smbios_getters.c */,
-				36CA2F721758294E002E6F1E /* smbios_getters.h */,
-				36CA2F731758294E002E6F1E /* smbios.c */,
-				36CA2F741758294E002E6F1E /* smbios.h */,
-				36CA2F751758294E002E6F1E /* spd.c */,
-				36CA2F761758294E002E6F1E /* spd.h */,
-				36CA2F771758294E002E6F1E /* state_generator.c */,
-				36CA2F781758294E002E6F1E /* state_generator.h */,
-				36CA2F791758294E002E6F1E /* stringTable.c */,
-				36CA2F7A1758294E002E6F1E /* sys.c */,
-				36CA2F7B1758294E002E6F1E /* table.c */,
-				36CA2F7C1758294E002E6F1E /* term.h */,
-				36CA2F7D1758294E002E6F1E /* ufs_byteorder.h */,
-				36CA2F7E1758294E002E6F1E /* ufs.h */,
-				36CA2F7F1758294E002E6F1E /* usb.c */,
-				36CA2F801758294E002E6F1E /* vbe.c */,
-				36CA2F811758294E002E6F1E /* vbe.h */,
-				36CA2F821758294E002E6F1E /* xml.c */,
-				36CA2F831758294E002E6F1E /* xml.h */,
+				3696B1CE1A1D2DB5004272A6 /* acpi_patcher.c */,
+				3696B1CF1A1D2DB5004272A6 /* acpi_patcher.h */,
+				3696B1D01A1D2DB5004272A6 /* acpi.h */,
+				3696B1D11A1D2DB5004272A6 /* allocate.c */,
+				3696B1D21A1D2DB5004272A6 /* aml_generator.c */,
+				3696B1D31A1D2DB5004272A6 /* aml_generator.h */,
+				3696B1D41A1D2DB5004272A6 /* asm.s */,
+				3696B1D51A1D2DB5004272A6 /* ati_reg.h */,
+				3696B1D61A1D2DB5004272A6 /* ati.c */,
+				3696B1D71A1D2DB5004272A6 /* ati.h */,
+				3696B1D81A1D2DB5004272A6 /* base64-decode.c */,
+				3696B1D91A1D2DB5004272A6 /* befs.c */,
+				3696B1DA1A1D2DB5004272A6 /* befs.h */,
+				3696B1DB1A1D2DB5004272A6 /* bios.h */,
+				3696B1DC1A1D2DB5004272A6 /* bios.s */,
+				3696B1DD1A1D2DB5004272A6 /* biosfn.c */,
+				3696B1DE1A1D2DB5004272A6 /* bootargs.h */,
+				3696B1DF1A1D2DB5004272A6 /* bootstruct.c */,
+				3696B1E01A1D2DB5004272A6 /* bootstruct.h */,
+				3696B1E11A1D2DB5004272A6 /* cache.c */,
+				3696B1E21A1D2DB5004272A6 /* Cconfig */,
+				3696B1E31A1D2DB5004272A6 /* console.c */,
+				3696B1E41A1D2DB5004272A6 /* convert.c */,
+				3696B1E51A1D2DB5004272A6 /* convert.h */,
+				3696B1E61A1D2DB5004272A6 /* cpu.c */,
+				3696B1E71A1D2DB5004272A6 /* cpu.h */,
+				3696B1E81A1D2DB5004272A6 /* device_inject.c */,
+				3696B1E91A1D2DB5004272A6 /* device_inject.h */,
+				3696B1EA1A1D2DB5004272A6 /* device_tree.c */,
+				3696B1EB1A1D2DB5004272A6 /* device_tree.h */,
+				3696B1EC1A1D2DB5004272A6 /* disk.c */,
+				3696B1ED1A1D2DB5004272A6 /* disk.h */,
+				3696B1EE1A1D2DB5004272A6 /* dram_controllers.c */,
+				3696B1EF1A1D2DB5004272A6 /* dram_controllers.h */,
+				3696B1F01A1D2DB5004272A6 /* efi.h */,
+				3696B1F11A1D2DB5004272A6 /* exfat.c */,
+				3696B1F21A1D2DB5004272A6 /* exfat.h */,
+				3696B1F31A1D2DB5004272A6 /* ext2fs.c */,
+				3696B1F41A1D2DB5004272A6 /* ext2fs.h */,
+				3696B1F51A1D2DB5004272A6 /* fake_efi.c */,
+				3696B1F61A1D2DB5004272A6 /* fake_efi.h */,
+				3696B1F71A1D2DB5004272A6 /* fdisk.h */,
+				3696B1F81A1D2DB5004272A6 /* freebsd.c */,
+				3696B1F91A1D2DB5004272A6 /* freebsd.h */,
+				3696B1FA1A1D2DB5004272A6 /* gma.c */,
+				3696B1FB1A1D2DB5004272A6 /* gma.h */,
+				3696B1FC1A1D2DB5004272A6 /* hda.c */,
+				3696B1FD1A1D2DB5004272A6 /* hda.h */,
+				3696B1FE1A1D2DB5004272A6 /* hfs_CaseTables.h */,
+				3696B1FF1A1D2DB5004272A6 /* hfs_compare.c */,
+				3696B2001A1D2DB5004272A6 /* hfs.c */,
+				3696B2011A1D2DB5004272A6 /* hfs.h */,
+				3696B2021A1D2DB5004272A6 /* hpet.c */,
+				3696B2031A1D2DB5004272A6 /* hpet.h */,
+				3696B2041A1D2DB5004272A6 /* io_inline.h */,
+				3696B2051A1D2DB5004272A6 /* libsaio.h */,
+				3696B2061A1D2DB5004272A6 /* load.c */,
+				3696B2071A1D2DB5004272A6 /* Makefile */,
+				3696B2081A1D2DB5004272A6 /* md5c.c */,
+				3696B2091A1D2DB5004272A6 /* memvendors.h */,
+				3696B20A1A1D2DB5004272A6 /* misc.c */,
+				3696B20B1A1D2DB5004272A6 /* msdos_private.h */,
+				3696B20C1A1D2DB5004272A6 /* msdos.c */,
+				3696B20D1A1D2DB5004272A6 /* msdos.h */,
+				3696B20E1A1D2DB5004272A6 /* nbp_cmd.h */,
+				3696B20F1A1D2DB5004272A6 /* nbp.c */,
+				3696B2101A1D2DB5004272A6 /* networking.c */,
+				3696B2111A1D2DB5004272A6 /* networking.h */,
+				3696B2121A1D2DB5004272A6 /* ntfs_private.h */,
+				3696B2131A1D2DB5004272A6 /* ntfs.c */,
+				3696B2141A1D2DB5004272A6 /* ntfs.h */,
+				3696B2151A1D2DB5004272A6 /* nvidia_helper.c */,
+				3696B2161A1D2DB5004272A6 /* nvidia_helper.h */,
+				3696B2171A1D2DB5004272A6 /* nvidia.c */,
+				3696B2181A1D2DB5004272A6 /* nvidia.h */,
+				3696B2191A1D2DB5004272A6 /* openbsd.c */,
+				3696B21A1A1D2DB5004272A6 /* openbsd.h */,
+				3696B21B1A1D2DB5004272A6 /* pci_root.c */,
+				3696B21C1A1D2DB5004272A6 /* pci_root.h */,
+				3696B21D1A1D2DB5004272A6 /* pci_setup.c */,
+				3696B21E1A1D2DB5004272A6 /* pci.c */,
+				3696B21F1A1D2DB5004272A6 /* pci.h */,
+				3696B2201A1D2DB5004272A6 /* platform.c */,
+				3696B2211A1D2DB5004272A6 /* platform.h */,
+				3696B2221A1D2DB5004272A6 /* saio_internal.h */,
+				3696B2231A1D2DB5004272A6 /* saio_types.h */,
+				3696B2241A1D2DB5004272A6 /* sl.h */,
+				3696B2251A1D2DB5004272A6 /* smbios_decode.c */,
+				3696B2261A1D2DB5004272A6 /* smbios_getters.c */,
+				3696B2271A1D2DB5004272A6 /* smbios_getters.h */,
+				3696B2281A1D2DB5004272A6 /* smbios.c */,
+				3696B2291A1D2DB5004272A6 /* smbios.h */,
+				3696B22A1A1D2DB5004272A6 /* spd.c */,
+				3696B22B1A1D2DB5004272A6 /* spd.h */,
+				3696B22C1A1D2DB5004272A6 /* state_generator.c */,
+				3696B22D1A1D2DB5004272A6 /* state_generator.h */,
+				3696B22E1A1D2DB5004272A6 /* stringTable.c */,
+				3696B22F1A1D2DB5004272A6 /* sys.c */,
+				3696B2301A1D2DB5004272A6 /* table.c */,
+				3696B2311A1D2DB5004272A6 /* term.h */,
+				3696B2321A1D2DB5004272A6 /* ufs_byteorder.h */,
+				3696B2331A1D2DB5004272A6 /* ufs.h */,
+				3696B2341A1D2DB5004272A6 /* usb.c */,
+				3696B2351A1D2DB5004272A6 /* vbe.c */,
+				3696B2361A1D2DB5004272A6 /* vbe.h */,
+				3696B2371A1D2DB5004272A6 /* xml.c */,
+				3696B2381A1D2DB5004272A6 /* xml.h */,
 			);
 			path = libsaio;
 			sourceTree = "<group>";
@@ -3501,124 +3503,9 @@
 		B0056DBB11F3868000754B65 /* themes */ = {
 			isa = PBXGroup;
 			children = (
-				B0056DBC11F3868000754B65 /* bullet */,
-				B0056DDC11F3868000754B65 /* default */,
-				B442D9F315C2164800985ED1 /* embed */,
-				B442D9F415C2166000985ED1 /* legacy */,
+				3696B2471A1D2EAB004272A6 /* default */,
 			);
 			path = themes;
-			sourceTree = "<group>";
-		};
-		B0056DBC11F3868000754B65 /* bullet */ = {
-			isa = PBXGroup;
-			children = (
-				B0056DBD11F3868000754B65 /* background.png */,
-				B0056DBE11F3868000754B65 /* boot.png */,
-				B0056DBF11F3868000754B65 /* device_cdrom.png */,
-				B0056DC011F3868000754B65 /* device_ext3.png */,
-				B0056DC111F3868000754B65 /* device_fat16.png */,
-				B0056DC211F3868000754B65 /* device_fat32.png */,
-				B0056DC311F3868000754B65 /* device_generic.png */,
-				B0056DC411F3868000754B65 /* device_hfsplus.png */,
-				B0056DC511F3868000754B65 /* device_ntfs.png */,
-				B0056DC611F3868000754B65 /* device_scroll_next.png */,
-				B0056DC711F3868000754B65 /* device_scroll_prev.png */,
-				B0056DC811F3868000754B65 /* device_selection.png */,
-				B0056DC911F3868000754B65 /* font_console.png */,
-				B0056DCA11F3868000754B65 /* font_small.png */,
-				B0056DCB11F3868000754B65 /* logo.png */,
-				B0056DCC11F3868000754B65 /* menu_boot.png */,
-				B0056DCD11F3868000754B65 /* menu_help.png */,
-				B0056DCE11F3868000754B65 /* menu_ignore_caches.png */,
-				B0056DCF11F3868000754B65 /* menu_ignore_caches_disabled.png */,
-				B0056DD011F3868000754B65 /* menu_memory_info.png */,
-				B0056DD111F3868000754B65 /* menu_selection.png */,
-				B0056DD211F3868000754B65 /* menu_single_user.png */,
-				B0056DD311F3868000754B65 /* menu_single_user_disabled.png */,
-				B0056DD411F3868000754B65 /* menu_verbose.png */,
-				B0056DD511F3868000754B65 /* menu_verbose_disabled.png */,
-				B0056DD611F3868000754B65 /* menu_video_info.png */,
-				B0056DD711F3868000754B65 /* progress_bar.png */,
-				B0056DD811F3868000754B65 /* progress_bar_background.png */,
-				B0056DD911F3868000754B65 /* text_scroll_next.png */,
-				B0056DDA11F3868000754B65 /* text_scroll_prev.png */,
-				B0056DDB11F3868000754B65 /* theme.plist */,
-			);
-			path = bullet;
-			sourceTree = "<group>";
-		};
-		B0056DDC11F3868000754B65 /* default */ = {
-			isa = PBXGroup;
-			children = (
-				36AB75A114BD0866005B8045 /* background.png */,
-				36AB75A214BD0866005B8045 /* boot.png */,
-				36AB75A314BD0866005B8045 /* device_befs_o.png */,
-				36AB75A414BD0866005B8045 /* device_befs.png */,
-				36AB75A514BD0866005B8045 /* device_cdrom_o.png */,
-				36AB75A614BD0866005B8045 /* device_cdrom.png */,
-				36AB75A714BD0866005B8045 /* device_ext3_o.png */,
-				36AB75A814BD0866005B8045 /* device_ext3.png */,
-				36AB75A914BD0866005B8045 /* device_fat_o.png */,
-				36AB75AA14BD0866005B8045 /* device_fat.png */,
-				36AB75AB14BD0866005B8045 /* device_freebsd_o.png */,
-				36AB75AC14BD0866005B8045 /* device_freebsd.png */,
-				36AB75AD14BD0866005B8045 /* device_generic_o.png */,
-				36AB75AE14BD0866005B8045 /* device_generic.png */,
-				36AB75AF14BD0866005B8045 /* device_hfsplus_leo_o.png */,
-				36AB75B014BD0866005B8045 /* device_hfsplus_leo.png */,
-				36AB75B114BD0866005B8045 /* device_hfsplus_lion_o.png */,
-				36AB75B214BD0866005B8045 /* device_hfsplus_lion.png */,
-				B43E407614EE869700CD79F9 /* device_hfsplus_ml_o.png */,
-				B43E407714EE869800CD79F9 /* device_hfsplus_ml.png */,
-				36AB75B314BD0866005B8045 /* device_hfsplus_o.png */,
-				36AB75B414BD0866005B8045 /* device_hfsplus_sl_o.png */,
-				36AB75B514BD0866005B8045 /* device_hfsplus_sl.png */,
-				36AB75B614BD0866005B8045 /* device_hfsplus_tiger_o.png */,
-				36AB75B714BD0866005B8045 /* device_hfsplus_tiger.png */,
-				36AB75B814BD0866005B8045 /* device_hfsplus.png */,
-				36AB75B914BD0866005B8045 /* device_hfsraid_leo_o.png */,
-				36AB75BA14BD0866005B8045 /* device_hfsraid_leo.png */,
-				36AB75BB14BD0866005B8045 /* device_hfsraid_lion_o.png */,
-				36AB75BC14BD0866005B8045 /* device_hfsraid_lion.png */,
-				B43E407814EE869A00CD79F9 /* device_hfsraid_ml_o.png */,
-				B43E407914EE869C00CD79F9 /* device_hfsraid_ml.png */,
-				36AB75BD14BD0866005B8045 /* device_hfsraid_o.png */,
-				B4B3DD8D15B8E2F7002FAA73 /* device_hfsplus_recovery_o.png */,
-				B4B3DD8E15B8E2F7002FAA73 /* device_hfsplus_recovery.png */,
-				36AB75BE14BD0866005B8045 /* device_hfsraid_sl_o.png */,
-				36AB75BF14BD0866005B8045 /* device_hfsraid_sl.png */,
-				36AB75C014BD0866005B8045 /* device_hfsraid_tiger_o.png */,
-				36AB75C114BD0866005B8045 /* device_hfsraid_tiger.png */,
-				36AB75C214BD0866005B8045 /* device_hfsraid.png */,
-				36AB75C314BD0866005B8045 /* device_ntfs_o.png */,
-				36AB75C414BD0866005B8045 /* device_ntfs.png */,
-				36AB75C514BD0866005B8045 /* device_openbsd_o.png */,
-				36AB75C614BD0866005B8045 /* device_openbsd.png */,
-				36AB75C714BD0866005B8045 /* device_scroll_next.png */,
-				36AB75C814BD0866005B8045 /* device_scroll_prev.png */,
-				36AB75C914BD0866005B8045 /* device_selection.png */,
-				36AB75CA14BD0866005B8045 /* font_console.png */,
-				36AB75CB14BD0866005B8045 /* font_small.png */,
-				36AB75CC14BD0866005B8045 /* logo.png */,
-				36AB75CD14BD0866005B8045 /* menu_boot.png */,
-				36AB75CE14BD0866005B8045 /* menu_help.png */,
-				36AB75CF14BD0866005B8045 /* menu_ignore_caches_disabled.png */,
-				36AB75D014BD0866005B8045 /* menu_ignore_caches.png */,
-				36AB75D114BD0866005B8045 /* menu_memory_info.png */,
-				36AB75D214BD0866005B8045 /* menu_selection.png */,
-				36AB75D314BD0866005B8045 /* menu_single_user_disabled.png */,
-				36AB75D414BD0866005B8045 /* menu_single_user.png */,
-				36AB75D514BD0866005B8045 /* menu_verbose_disabled.png */,
-				36AB75D614BD0866005B8045 /* menu_verbose.png */,
-				36AB75D714BD0866005B8045 /* menu_video_info.png */,
-				36AB75D814BD0866005B8045 /* progress_bar_background.png */,
-				36AB75D914BD0866005B8045 /* progress_bar.png */,
-				36AB75DA14BD0866005B8045 /* text_scroll_next.png */,
-				36AB75DB14BD0866005B8045 /* text_scroll_prev.png */,
-				36AB75DC14BD0866005B8045 /* theme.plist */,
-				36AB75DD14BD0866005B8045 /* thumb.png */,
-			);
-			path = default;
 			sourceTree = "<group>";
 		};
 		B0056E0611F3868000754B65 /* doc */ = {
@@ -3738,81 +3625,6 @@
 				B4189A0D14BFBF0A00ED5B0B /* yesno.c */,
 			);
 			name = lxdialog;
-			sourceTree = "<group>";
-		};
-		B442D9F315C2164800985ED1 /* embed */ = {
-			isa = PBXGroup;
-			children = (
-				B442D9F515C216C900985ED1 /* background.png */,
-				B442D9F615C216C900985ED1 /* boot.png */,
-				B442D9F715C216C900985ED1 /* device_cdrom.png */,
-				B442D9F815C216C900985ED1 /* device_ext3.png */,
-				B442D9F915C216C900985ED1 /* device_fat.png */,
-				B442D9FA15C216C900985ED1 /* device_generic.png */,
-				B442D9FB15C216C900985ED1 /* device_hfsplus.png */,
-				B442D9FC15C216C900985ED1 /* device_hfsraid.png */,
-				B442D9FD15C216C900985ED1 /* device_ntfs.png */,
-				B442D9FE15C216C900985ED1 /* device_scroll_next.png */,
-				B442D9FF15C216C900985ED1 /* device_scroll_prev.png */,
-				B442DA0015C216C900985ED1 /* device_selection.png */,
-				B442DA0115C216C900985ED1 /* font_console.png */,
-				B442DA0215C216C900985ED1 /* font_small.png */,
-				B442DA0315C216C900985ED1 /* logo.png */,
-				B442DA0415C216C900985ED1 /* menu_boot.png */,
-				B442DA0515C216C900985ED1 /* menu_help.png */,
-				B442DA0615C216C900985ED1 /* menu_ignore_caches_disabled.png */,
-				B442DA0715C216C900985ED1 /* menu_ignore_caches.png */,
-				B442DA0815C216C900985ED1 /* menu_memory_info.png */,
-				B442DA0915C216C900985ED1 /* menu_selection.png */,
-				B442DA0A15C216C900985ED1 /* menu_single_user_disabled.png */,
-				B442DA0B15C216C900985ED1 /* menu_single_user.png */,
-				B442DA0C15C216C900985ED1 /* menu_verbose_disabled.png */,
-				B442DA0D15C216C900985ED1 /* menu_verbose.png */,
-				B442DA0E15C216C900985ED1 /* menu_video_info.png */,
-				B442DA0F15C216C900985ED1 /* progress_bar_background.png */,
-				B442DA1015C216C900985ED1 /* progress_bar.png */,
-				B442DA1115C216C900985ED1 /* text_scroll_next.png */,
-				B442DA1215C216C900985ED1 /* text_scroll_prev.png */,
-				B442DA1315C216C900985ED1 /* theme.plist */,
-			);
-			name = embed;
-			sourceTree = "<group>";
-		};
-		B442D9F415C2166000985ED1 /* legacy */ = {
-			isa = PBXGroup;
-			children = (
-				B442DA1415C216E500985ED1 /* background.png */,
-				B442DA1515C216E500985ED1 /* boot.png */,
-				B442DA1615C216E500985ED1 /* device_cdrom.png */,
-				B442DA1715C216E500985ED1 /* device_ext3.png */,
-				B442DA1815C216E500985ED1 /* device_fat.png */,
-				B442DA1915C216E500985ED1 /* device_generic.png */,
-				B442DA1A15C216E500985ED1 /* device_hfsplus.png */,
-				B442DA1B15C216E500985ED1 /* device_ntfs.png */,
-				B442DA1C15C216E500985ED1 /* device_scroll_next.png */,
-				B442DA1D15C216E500985ED1 /* device_scroll_prev.png */,
-				B442DA1E15C216E500985ED1 /* device_selection.png */,
-				B442DA1F15C216E500985ED1 /* font_console.png */,
-				B442DA2015C216E500985ED1 /* font_small.png */,
-				B442DA2115C216E500985ED1 /* logo.png */,
-				B442DA2215C216E500985ED1 /* menu_boot.png */,
-				B442DA2315C216E500985ED1 /* menu_help.png */,
-				B442DA2415C216E500985ED1 /* menu_ignore_caches_disabled.png */,
-				B442DA2515C216E500985ED1 /* menu_ignore_caches.png */,
-				B442DA2615C216E500985ED1 /* menu_memory_info.png */,
-				B442DA2715C216E500985ED1 /* menu_selection.png */,
-				B442DA2815C216E500985ED1 /* menu_single_user_disabled.png */,
-				B442DA2915C216E500985ED1 /* menu_single_user.png */,
-				B442DA2A15C216E500985ED1 /* menu_verbose_disabled.png */,
-				B442DA2B15C216E500985ED1 /* menu_verbose.png */,
-				B442DA2C15C216E500985ED1 /* menu_video_info.png */,
-				B442DA2D15C216E500985ED1 /* progress_bar_background.png */,
-				B442DA2E15C216E500985ED1 /* progress_bar.png */,
-				B442DA2F15C216E500985ED1 /* text_scroll_next.png */,
-				B442DA3015C216E500985ED1 /* text_scroll_prev.png */,
-				B442DA3115C216E500985ED1 /* theme.plist */,
-			);
-			name = legacy;
 			sourceTree = "<group>";
 		};
 		B4526096153EFCE90018E994 /* po */ = {
