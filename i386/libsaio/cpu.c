@@ -87,10 +87,10 @@ restart:
 	intermediate *= scale[timerValue];	// rescale measured time spent
 	intermediate /= SAMPLE_NSECS;	// so its exactly 1/20 a second
 	intermediate += latchTime;		// add on our save fudge
-    
+
 	set_PIT2(0);			// reset timer 2 to be zero
 	disable_PIT2();			// turn off PIT 2
-	
+
 	//ml_set_interrupts_enabled(int_enabled);
 	return intermediate;
 }
@@ -241,19 +241,23 @@ void scan_cpu(PlatformInfo_t *p)
 	uint64_t	cpuFrequency = 0;
 	uint64_t	msr = 0;
 	uint64_t	flex_ratio = 0;
+
 	uint32_t	max_ratio = 0;
 	uint32_t	min_ratio = 0;
+	uint32_t	reg[4];
+
 	uint8_t		bus_ratio_max = 0;
+	uint8_t		bus_ratio_min = 0;
 	uint8_t		currdiv = 0;
 	uint8_t		currcoef = 0;
 	uint8_t		maxdiv = 0;
 	uint8_t		maxcoef = 0;
+
 	const char	*newratio;
+	char		str[128];
+
 	int		len = 0;
 	int		myfsb = 0;
-	uint8_t		bus_ratio_min = 0;
-	uint32_t	reg[4];
-	char		str[128];
 
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
@@ -319,7 +323,11 @@ void scan_cpu(PlatformInfo_t *p)
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 
-	if (p->CPU.Vendor == CPUID_VENDOR_INTEL)
+	if (p->CPU.Vendor == CPUID_VENDOR_INTEL &&
+		p->CPU.Family == 0x06 &&
+		p->CPU.Model >= CPUID_MODEL_NEHALEM &&
+		p->CPU.Model != CPUID_MODEL_ATOM		// MSR is *NOT* available on the Intel Atom CPU
+		)
 	{
 		/*
 		 * Find the number of enabled cores and threads
@@ -353,15 +361,28 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 
 			default:
-				p->CPU.NoCores = 0;
+				p->CPU.NoCores   = bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+				p->CPU.NoThreads = (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
+				//workaround for N270. I don't know why it detected wrong
+				if ((p->CPU.Model == CPUID_MODEL_ATOM) && (p->CPU.Stepping == 2))
+				{
+					p->CPU.NoCores = 1;
+				}
 				break;
-		} // end switch
-	}
 
-	if (p->CPU.NoCores == 0)
+		} // end switch
+
+	}
+	else if (p->CPU.Vendor == CPUID_VENDOR_AMD)
 	{
-		p->CPU.NoCores		= (uint8_t)(p->CPU.CoresPerPackage & 0xff);
-		p->CPU.NoThreads	= (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
+		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
+	}
+	else
+	{
+		// Use previous method for Cores and Threads
+		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
 
 	/* get BrandString (if supported) */
@@ -389,7 +410,7 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		strlcpy(p->CPU.BrandString, s, 48);
 
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1)))
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), (unsigned)strlen(CPU_STRING_UNKNOWN) + 1)))
 		{
 			/*
 			 * This string means we have a firmware-programmable brand string,
@@ -399,20 +420,6 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		p->CPU.BrandString[47] = '\0';
 //		DBG("Brandstring = %s\n", p->CPU.BrandString);
-	}
-
-	//workaround for N270. I don't know why it detected wrong
-	// MSR is *NOT* available on the Intel Atom CPU
-	if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
-	{
-		p->CPU.NoCores		= 1;
-		p->CPU.NoThreads	= 2;
-	}
-
-	if (p->CPU.Vendor == CPUID_VENDOR_AMD)
-	{
-		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
 	}
 
 	/* setup features */
@@ -470,18 +477,23 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
 		// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
-	} else {
+	}
+	else
+	{
 		// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
 	}
 
 	fsbFrequency = 0;
 	cpuFrequency = 0;
 
-	if (p->CPU.Vendor == CPUID_VENDOR_INTEL && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03))) {
+	if (p->CPU.Vendor == CPUID_VENDOR_INTEL && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)))
+	{
 		int intelCPU = p->CPU.Model;
-		if (p->CPU.Family == 0x06) {
+		if (p->CPU.Family == 0x06)
+		{
 			/* Nehalem CPU model */
-			switch (p->CPU.Model) {
+			switch (p->CPU.Model)
+			{
 				case CPUID_MODEL_NEHALEM:
 				case CPUID_MODEL_FIELDS:
 				case CPUID_MODEL_DALES:

@@ -12,7 +12,8 @@ char *strndup(const char *s, size_t n)
 	if (d)
 	{
 		memcpy(d, s, l);
-		d[n] = '\0';
 	}
+
+	d[n] = '\0';
 	return d;
 }
