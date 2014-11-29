@@ -1,4 +1,7 @@
+- ErmaC : Add UseIntelHDMI for hda-gfx = onboard-1 or 2 that vale will be injected into the GFX0 and HDEF devices. credits Clover Team
+- ErmaC : Improve gma detection for HD4600
 - cparm : Merge (security, stability, bugs fixes) improvements.
+- ErmaC : C6 & C7 States credits to Clover Team.
 - Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - Zenith432 : add EXFAT boot support by Zenith432
 - zenith432 : Merge patch from issue 386 (boot2 does not know how to read files from FAT partitions on GPT)

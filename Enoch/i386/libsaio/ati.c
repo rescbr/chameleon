@@ -9,6 +9,7 @@
 
 static value_t aty_name;
 static value_t aty_nameparent;
+static bool	doit	= false;
 card_t *card;
 
 card_config_t card_configs[] = {
@@ -1566,6 +1567,15 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		return false;
 	}
 	// -------------------------------------------------
+
+	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	}
+	else
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	}
 
 #if 0
 	uint64_t fb	= (uint32_t)card->fb;

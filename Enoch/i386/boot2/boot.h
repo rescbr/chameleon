@@ -124,8 +124,9 @@
 
 /* Slice: added this */
 #define kPS2RestartFix		"PS2RestartFix"		/* acpi_patcher.c */
-#define kInjectEDID		"InjectEDID"		/* ati.c*/
-#define kCustomEDID		"CustomEDID"		/* ati.c*/
+//#define kInjectEDID		"InjectEDID"		/* ati.c */
+//#define kCustomEDID		"CustomEDID"		/* ati.c */
+#define kUseIntelHDMI		"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 
 /* Signal64: added this key */
 #define kLegacyOff		"USBLegacyOff"		/* usb.c */
