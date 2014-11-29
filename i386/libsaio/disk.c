@@ -1492,15 +1492,15 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 					case FDISK_DOS12:
 					case FDISK_DOS16B:
 						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-						MSDOSInitPartition,
-						MSDOSLoadFile,
-						MSDOSReadFile,
-						MSDOSGetDirEntry,
-						MSDOSGetFileBlock,
-						MSDOSGetUUID,
-						MSDOSGetDescription,
-						MSDOSFree,
-						0, kBIOSDevTypeHardDrive, 0);
+								MSDOSInitPartition,
+								MSDOSLoadFile,
+								MSDOSReadFile,
+								MSDOSGetDirEntry,
+								MSDOSGetFileBlock,
+								MSDOSGetUUID,
+								MSDOSGetDescription,
+								MSDOSFree,
+								0, kBIOSDevTypeHardDrive, 0);
 						break;
 
 					default:
