@@ -79,9 +79,9 @@ Options useful in the org.chameleon.Boot.plist file:
   KeyLayout=keymap        Use to change the keyboard mapping of the bootloader
                             (e.g. KeyLayout=mac-fr)
 
-  HDAEnabler=Yes|No    Automatic device-properties generation for audio controllers.
-    HDEFLayoutID=<value>     Inject alternate value of layout-id for HDEF (HEX).
-    HDAULayoutID=<value>     Inject alternate value of layout-id for HDAU (HEX).
+  HDAEnabler=Yes|No         Automatic device-properties generation for audio controllers.
+    HDEFLayoutID=<value>    Inject alternate value of layout-id for HDEF (HEX).
+    HDAULayoutID=<value>    Inject alternate value of layout-id for HDAU (HEX).
 
   GraphicsEnabler=Yes|No    Automatic device-properties generation for graphics cards.
     SkipIntelGfx=Yes|No     Skip the Automatic device-properties generation for Intel cards.
@@ -162,6 +162,8 @@ Options useful in the org.chameleon.Boot.plist file:
   EnableC2State=Yes       Enable specific Processor power state, C2.
   EnableC3State=Yes       Enable specific Processor power state, C3.
   EnableC4State=Yes       Enable specific Processor power state, C4.
+  EnableC6State=Yes       Enable specific Processor power state, C6.
+  EnableC7State=Yes       Enable specific Processor power state, C7.
 
   PrivateData=No          Show masked data (serial number) in bdmesg log (enbaled by default).
 

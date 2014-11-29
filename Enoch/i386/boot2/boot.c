@@ -597,6 +597,10 @@ void common_boot(int biosdev)
 			{
 				archCpuType = CPU_TYPE_I386;
 			}
+			else
+			{
+				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n");
+			}
 		}
 
 		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
