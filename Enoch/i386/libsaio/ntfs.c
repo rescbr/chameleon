@@ -313,6 +313,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	{
 		return -1;
 	}
+	bzero(buf,MAX_BLOCK_SIZE);
 
 	/*
 	 * Read the boot sector, check signatures, and do some minimal
@@ -329,12 +330,14 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 )
 	{
 		// If not NTFS, maybe it is EXFAT
+		free(buf);
 		return EXFATGetUUID(ih, uuidStr);
 	}
 
 	// Check for non-null volume serial number
 	if( !boot->bf_volsn )
 	{
+		free(buf);
 		return -1;
 	}
 

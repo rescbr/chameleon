@@ -926,6 +926,10 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
+			if (!bvr)
+			{
+				break;
+			}
 			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev )
 			{
 				return bvr;
@@ -943,6 +947,10 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
+			if (!bvr)
+			{
+				break;
+			}
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
@@ -960,6 +968,10 @@ BVRef selectBootVolume( BVRef chain )
 	 */
 	for ( bvr = chain; bvr; bvr = bvr->next )
 	{
+		if (!bvr)
+		{
+			break;
+		}
 		if (multiboot_skip_partition_set)
 		{
 			if (bvr->part_no == multiboot_skip_partition)
@@ -999,6 +1011,10 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
 		{
+			if (!bvr)
+			{
+				break;
+			}
 			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev )
 			{
 				bvr1 = bvr;

@@ -1766,6 +1766,10 @@ static void scanFSLevelBVRSettings(BVRef chain)
 void rescanBIOSDevice(int biosdev)
 {
 	struct DiskBVMap *oldMap = diskResetBootVolumes(biosdev);
+	if (oldMap == NULL)
+	{
+		return;
+	}
 	CacheReset();
 	diskFreeMap(oldMap);
 	oldMap = NULL;
@@ -1798,7 +1802,8 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
 		}
 		else
 		{
-			stop("");
+			stop("diskResetBootVolumes error\n");
+			return NULL;
 		}
 	}
 	// Return the old map, either to be freed, or reinserted later
@@ -1934,6 +1939,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			{
 				continue;
 			}
+			bzero(newBVR,sizeof(*newBVR));
+
 			bcopy(bvr, newBVR, sizeof(*newBVR));
 
 			/*
@@ -1996,6 +2003,10 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 #if DEBUG //Azi: warning - too big for boot-log.. far too big.. i mean HUGE!! :P
 	for (bvr = chain; bvr; bvr = bvr->next)
 	{
+		if (!bvr)
+		{
+			break;
+		}
 		printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
 	}
 	printf("count: %d\n", bvCount);
@@ -2018,6 +2029,10 @@ int freeFilteredBVChain(const BVRef chain)
   
 	while (bvr)
 	{
+		if (!bvr)
+		{
+			break;
+		}
 		nextBVR = bvr->next;
 
 		if (bvr->filtered)

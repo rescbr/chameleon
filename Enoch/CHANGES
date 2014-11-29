@@ -1,3 +1,4 @@
+- cparm : Merge (security, stability, bugs fixes) improvements.
 - Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - Zenith432 : add EXFAT boot support by Zenith432
 - zenith432 : Merge patch from issue 386 (boot2 does not know how to read files from FAT partitions on GPT)
