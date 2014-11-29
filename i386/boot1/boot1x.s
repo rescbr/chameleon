@@ -90,8 +90,8 @@ gsFATCache: times FATCache_size db 0
 ;
 ; exFAT BPB
 ;
-gPartitionOffset: dq 0
-gVolumeLength: dq 0
+gPartitionOffset: dd 0, 0
+gVolumeLength: dd 0, 0
 gFATOffset: dd 0
 gFATLength: dd 0
 gClusterHeapOffset: dd 0
@@ -429,7 +429,7 @@ getRange:
 .loop:
 	cmp eax, 2
 	jb .finishup
-	cmp eax, kMaxCluster
+	cmp eax, -9 ;kMaxCluster
 	jnb .finishup
 	cmp bx, kMaxContigClusters
 	jnb .finishup

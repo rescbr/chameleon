@@ -76,6 +76,7 @@ dist-local image-local:
 	@cp -f ${SYMROOT}/i386/boot0xg ${IMGROOT}/usr/standalone/i386
 	@cp -f ${SYMROOT}/i386/boot1h ${IMGROOT}/usr/standalone/i386
 	@cp -f ${SYMROOT}/i386/boot1f32 ${IMGROOT}/usr/standalone/i386
+	@cp -f ${SYMROOT}/i386/boot1x ${IMGROOT}/usr/standalone/i386
 ifdef CONFIG_FDISK440
 	@cp -f ${SYMROOT}/i386/fdisk440 ${IMGROOT}/usr/bin
 endif
