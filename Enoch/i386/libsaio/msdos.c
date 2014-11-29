@@ -683,6 +683,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 		{
 			return -1;
 		}
+		bzero(st,sizeof (struct msdosdirstate) );
 		if (dirPath[0])
 		{
 			uint8_t *buf=malloc(msdosclustersize);
@@ -691,6 +692,8 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 				free (st);
 				return -1;
 			}
+			bzero(buf,msdosclustersize );
+
 			dirp = getdirpfrompath (ih, dirPath, buf);
 			if (!dirp || !(dirp->deAttributes & ATTR_DIRECTORY))
 			{
@@ -784,7 +787,7 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	}
 
 	// Calculate a fake timestamp using modification date and time values.
-	*time = ((dirp->deMDate & 0x7FFF) << 16) + dirp->deMTime;
+	*time = (dirp->deMDate & 0x7FFF) << (16 + dirp->deMTime); 
 	
 	if (infoValid)
 	{
@@ -821,6 +824,7 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	{
 		return -1;
 	}
+	bzero(buf,msdosclustersize);
 	dirp = getdirpfrompath (ih, filePath, buf);
 	
 	if (!dirp || (dirp->deAttributes & ATTR_DIRECTORY))
@@ -889,6 +893,8 @@ long MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock
 	{
 		return -1;
 	}
+	bzero(buf,msdosclustersize);
+
 	dirp = getdirpfrompath (ih, filePath, buf);
 	if (!dirp || (dirp->deAttributes & ATTR_DIRECTORY))
 	{
@@ -975,6 +981,9 @@ void MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 		return;
 	}
 
+	bzero(label,sizeof(label));
+	bzero(vfatlabel,sizeof(vfatlabel));
+
 	label[0] = '\0';
 	
 	initRoot (&st);
@@ -983,6 +992,8 @@ void MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 	{
 		return;
 	}
+	bzero(st.buf,msdosclustersize);
+
 	while ((dirp = getnextdirent (ih, vfatlabel, &st)))
 		if (dirp->deAttributes & ATTR_VOLUME) {
 			strncpy((char *)label, (char *)dirp->deName, LABEL_LENGTH);

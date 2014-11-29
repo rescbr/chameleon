@@ -285,6 +285,11 @@
 		3696B2941A1D2EAB004272A6 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_prev.png; sourceTree = "<group>"; };
 		3696B2951A1D2EAB004272A6 /* theme.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = theme.plist; sourceTree = "<group>"; };
 		3696B2961A1D2EAB004272A6 /* thumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumb.png; sourceTree = "<group>"; };
+		36A9C0021A2A26DA00EEDDF1 /* boot1-install.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "boot1-install.c"; path = "boot1-install/boot1-install.c"; sourceTree = "<group>"; };
+		36A9C0031A2A26DA00EEDDF1 /* Cconfig */ = {isa = PBXFileReference; lastKnownFileType = text; name = Cconfig; path = "boot1-install/Cconfig"; sourceTree = "<group>"; };
+		36A9C0041A2A26DA00EEDDF1 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = "boot1-install/Makefile"; sourceTree = "<group>"; };
+		36A9C0051A2A26E900EEDDF1 /* boot1x.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = boot1x.s; sourceTree = "<group>"; };
+		36A9C0061A2A26F300EEDDF1 /* boot0xg.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = boot0xg.s; sourceTree = "<group>"; };
 		36AB75E114BD091C005B8045 /* InstallLog.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = InstallLog.sh; sourceTree = "<group>"; };
 		36AB75E314BD0925005B8045 /* postinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = postinstall; sourceTree = "<group>"; };
 		36AB75E414BD092D005B8045 /* preinstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = preinstall; sourceTree = "<group>"; };
@@ -1582,6 +1587,16 @@
 				3696B2961A1D2EAB004272A6 /* thumb.png */,
 			);
 			path = default;
+			sourceTree = "<group>";
+		};
+		36A9C0011A2A26C900EEDDF1 /* boot1-install */ = {
+			isa = PBXGroup;
+			children = (
+				36A9C0021A2A26DA00EEDDF1 /* boot1-install.c */,
+				36A9C0031A2A26DA00EEDDF1 /* Cconfig */,
+				36A9C0041A2A26DA00EEDDF1 /* Makefile */,
+			);
+			name = "boot1-install";
 			sourceTree = "<group>";
 		};
 		36B43E8114BCE91300D29461 /* OptionalSettings */ = {
@@ -3241,6 +3256,7 @@
 				B0056CE711F3868000754B65 /* boot0.s */,
 				B41899FF14BFBE5D00ED5B0B /* boot0hfs.s */,
 				B41899FE14BFBE5200ED5B0B /* boot0md.s */,
+				36A9C0061A2A26F300EEDDF1 /* boot0xg.s */,
 				B41899FD14BFBE4500ED5B0B /* Cconfig */,
 				B0056CE811F3868000754B65 /* chain0.s */,
 				B0056CE911F3868000754B65 /* Makefile */,
@@ -3256,6 +3272,7 @@
 				B4189A0114BFBE8900ED5B0B /* boot1h.s */,
 				B0056CEF11F3868000754B65 /* boot1he.s */,
 				B0056CF011F3868000754B65 /* boot1hp.s */,
+				36A9C0051A2A26E900EEDDF1 /* boot1x.s */,
 				B4189A0014BFBE7D00ED5B0B /* Cconfig */,
 				B0056CF111F3868000754B65 /* Makefile */,
 			);
@@ -3461,6 +3478,7 @@
 			isa = PBXGroup;
 			children = (
 				A3561C8B1413FD7800E9B51E /* bdmesg.c */,
+				36A9C0011A2A26C900EEDDF1 /* boot1-install */,
 				B4189A2414BFBFD100ED5B0B /* Cconfig */,
 				A3561C8A1413FD7800E9B51E /* dyldsymboltool.c */,
 				A3561C721413FD7800E9B51E /* fdisk */,
