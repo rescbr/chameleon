@@ -1,0 +1,10 @@
+config BOOT1INSTALL
+	bool "boot1-install utility"
+	default y
+	help
+	  Say Y here if you want to compile the boot1-install program.
+	  boot1-install is a program 'boot1-install' that can install the stage 1 boot loader for all three file systems
+	  boot1f32 -> FAT32
+	  boot1h -> HFS+
+	  boot1x -> exFAT
+	  When in doubt, say "Y".

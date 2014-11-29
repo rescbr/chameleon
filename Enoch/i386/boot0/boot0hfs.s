@@ -20,7 +20,7 @@
 ; 
 ; @APPLE_LICENSE_HEADER_END@
 ;
-; Boot Loader: boot0
+; Boot Loader: boot0hfs
 ;
 ; A small boot sector program written in x86 assembly whose only
 ; responsibility is to locate the active partition, load the

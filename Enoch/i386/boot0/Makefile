@@ -12,7 +12,7 @@ include ${SRCROOT}/Make.rules
 
 DIRS_NEEDED = $(SYMROOT)
 
-OBJS  = boot0 boot0hfs boot0md chain0
+OBJS  = boot0 boot0hfs boot0md boot0xg chain0
 OBJS := $(addprefix $(SYMROOT)/, $(OBJS))
 
 all: $(DIRS_NEEDED) $(OBJS)
@@ -22,7 +22,7 @@ $(SYMROOT)/boot0: boot0.s
 
 $(OBJS): $(SRCROOT)/autoconf.inc
 	@echo "	[NASM] $(@F)"
-	@$(NASM) $(@F).s -o $@
+	@$(NASM) $(@F).s -o $@ -O3
 
 clean-local:
 	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "	[RM] $${o}"; fi; done

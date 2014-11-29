@@ -36,7 +36,7 @@ SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-SUBDIRS = fdisk
+SUBDIRS = fdisk boot1-install
 
 all: $(DIRS_NEEDED) $(SYMPROG) all-recursive
 

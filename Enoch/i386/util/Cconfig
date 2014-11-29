@@ -9,6 +9,8 @@ config BDMESG
 
 source "i386/util/fdisk/Cconfig"
 
+source "i386/util/boot1-install/Cconfig"
+
 config OPENUP
 	bool "openUp utility"
 	default n
