@@ -666,9 +666,15 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	struct direntry *dirp;
 	uint16_t		vfatname[WIN_MAXLEN+2*WIN_CHARS];
 	if (MSDOSInitPartition (ih)<0)
+	{
 		return -1;
+	}
+
 	if (dirPath[0] == '/')
+	{
 		dirPath++;
+	}
+
 	st =  (struct msdosdirstate *)(long) *dirIndex;
 	if (!st)
 	{
@@ -699,7 +705,10 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 			st->cluster = OSReadLittleInt16 ((dirp->deStartCluster),0);
 			st->vfatnumber = 0;
 			if (msdosfatbits == 32)
+			{
 				st->cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
+			}
+
 		}
 		else
 			initRoot (st);
@@ -738,15 +747,20 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 		}
 		for (i=7;i>=0;i--)
 			if (dirp->deName[i]!=' ')
+			{
 				break;
+			}
+
 		j=i+1;
 		tmp[i+1]=0;
 		for(;i>=0;i--)
 			tmp[i]=(dirp->deName[i]>=128)?cp850[dirp->deName[i]-128][0]:tolower(dirp->deName[i]);
 		for (i=2;i>=0;i--)
 			if (dirp->deName[8+i]!=' ')
+			{
 				break;
-		
+			}
+
 		if (i>=0)
 		{
 			tmp[j++]='.';
@@ -759,16 +773,23 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 		
 		utf_encodestr(tmp, j, (uint8_t*)*name, 25, OSHostByteOrder() );
 	}
+
 	if (dirp->deAttributes & ATTR_DIRECTORY)
+	{
 		*flags = kFileTypeDirectory;
+	}
 	else
+	{
 		*flags = kFileTypeFlat;
-	
+	}
+
 	// Calculate a fake timestamp using modification date and time values.
 	*time = ((dirp->deMDate & 0x7FFF) << 16) + dirp->deMTime;
 	
 	if (infoValid)
+	{
 		*infoValid = 1;
+	}
 
 	return 0;
 }
@@ -787,9 +808,14 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	char devStr[12];
 
 	if (MSDOSInitPartition (ih)<0)
+	{
 		return -1;
+	}
+
 	if (filePath[0] == '/')
+	{
 		filePath++;
+	}
 	buf = malloc(msdosclustersize);
 	if (!buf)
 	{
@@ -804,7 +830,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	}
 	cluster = OSReadLittleInt16 ((dirp->deStartCluster),0);
 	if (msdosfatbits == 32)
+	{
 		cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
+	}
+
 	size = (uint32_t)OSReadLittleInt32 ((dirp->deFileSize),0);
 	if (size<=offset)
 	{
@@ -817,7 +846,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	msdosreadcluster (ih, buf, msdosclustersize, &cluster);
 	toread=length;
 	if (length==0 || length>size-offset)
+	{
 		toread=size-offset;
+	}
+
 	wastoread=toread;
 	bcopy (buf+(offset%msdosclustersize),ptr,MIN((msdosclustersize-(offset%msdosclustersize)),(unsigned)toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
@@ -834,13 +866,16 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 */
 	free (buf);
 	if (toread<0)
+	{
 		return wastoread;
+	}
 	else
+	{
 		return wastoread-toread;
+	}
 }
 
-long 
-MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
+long MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
 {
 	uint8_t *buf;
 	off_t cluster;
@@ -900,8 +935,7 @@ long MSDOSLoadFile(CICell ih, char * filePath)
 }
 
 /* Fix up volume label. */
-static void
-fixLabel(uint8_t *label, char *str, long strMaxLen)
+static void fixLabel(uint8_t *label, char *str, long strMaxLen)
 {
 	int			i, len;
 	uint16_t		labelucs[13];
@@ -927,8 +961,7 @@ fixLabel(uint8_t *label, char *str, long strMaxLen)
 }
 
 
-void
-MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
+void MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 {
 	struct direntry		*dirp;
 	uint8_t			label[LABEL_LENGTH+1];

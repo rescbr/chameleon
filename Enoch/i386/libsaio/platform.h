@@ -360,7 +360,7 @@ typedef struct _PlatformInfo_t
 		uint32_t		MinRatio;				// Min Bus Ratio
 		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
 
-		uint32_t		MCodeVersion;           // CPU Microcode version
+		uint32_t		MCodeVersion;				// CPU Microcode version
 	} CPU;
 
 	struct RAM {
