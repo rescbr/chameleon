@@ -400,8 +400,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		return false;
 	}
 
-	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
-	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);
+	devprop_add_value(device, "model", (uint8_t *)model, (strlen(model) + 1));
+	devprop_add_value(device, "device_type", (uint8_t *)"display", 8);
 
 
 	switch ((device_id << 16) | vendor_id)
@@ -518,7 +518,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             device_id = 0x00000102;					// Inject a valid mobile GPU device id instead of patching kexts
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
-            devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
+            devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
             devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
@@ -531,7 +531,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
             device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
-            devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
+            devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
             devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
@@ -614,11 +614,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         //case 0x80860090:
         //case 0x80860091:
         //case 0x80860092:
+        case GMA_HASWELL_M_GT2: // 0416
+            device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
+            devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
+            devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
+            devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
+
         case GMA_HASWELL_D_GT1: // 0402
         case GMA_HASWELL_M_GT1: // 0406
         case GMA_HASWELL_S_GT1: // 040a
         case GMA_HASWELL_D_GT2: // 0412
-        case GMA_HASWELL_M_GT2: // 0416
         case GMA_HASWELL_S_GT2: // 041a
         case GMA_HASWELL_E_GT1: // 040e
         case GMA_HASWELL_E_GT2: // 041e
@@ -708,7 +713,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	}
 
 	verbose("---------------------------------------------\n");
-	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
+	memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 
 	return true;
