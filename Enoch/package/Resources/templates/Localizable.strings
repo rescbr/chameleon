@@ -575,6 +575,9 @@ Dependencies: none";
 "EnableHDMIAudio_title" = "EnableHDMIAudio=Yes";
 "EnableHDMIAudio_description" = "Inject HDMi audio for NVIDIA or AMD/ATI.";
 
+"UseIntelHDMI_title" = "UseIntelHDMI=Yes";
+"UseIntelHDMI_description" = "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present.";
+
 "UseAtiROM_title" = "UseAtiROM=Yes";
 "UseAtiROM_description" = "Enables UseAtiROM options.";
 
