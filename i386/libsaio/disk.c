@@ -1478,14 +1478,29 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 				{
 					case FDISK_NTFS:
 						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-						0, 0, 0, 0, 0, 0, NTFSGetDescription,
+						0, 0, 0, 0, 0, NTFSGetUUID, NTFSGetDescription,
 						(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
 						break;
 
 					case FDISK_LINUX:
 						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
-						0, 0, 0, 0, 0, 0, EX2GetDescription,
+						0, 0, 0, 0, 0, EX2GetUUID, EX2GetDescription,
 						(BVFree)free, 0, kBIOSDevTypeHardDrive, 0);
+						break;
+
+					case FDISK_FAT32:
+					case FDISK_DOS12:
+					case FDISK_DOS16B:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+						MSDOSInitPartition,
+						MSDOSLoadFile,
+						MSDOSReadFile,
+						MSDOSGetDirEntry,
+						MSDOSGetFileBlock,
+						MSDOSGetUUID,
+						MSDOSGetDescription,
+						MSDOSFree,
+						0, kBIOSDevTypeHardDrive, 0);
 						break;
 
 					default:
