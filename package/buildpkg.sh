@@ -1241,7 +1241,7 @@ makedistribution ()
     echo -e $COL_BLUE"  Stage:        "$COL_RESET"$CHAMELEON_STAGE"
     echo -e $COL_BLUE"  Date/Time:    "$COL_RESET"$CHAMELEON_BUILDDATE"
     echo -e $COL_BLUE"  Built by:     "$COL_RESET"$CHAMELEON_WHOBUILD"
-    echo -e $COL_BLUE"  Copyright $CHAMELEON_CPRYEAR ""$COL_RESET"
+    echo -e $COL_BLUE"  Copyright $CHAMELEON_CPRYEAR "$COL_RESET
     echo ""
 
 }
