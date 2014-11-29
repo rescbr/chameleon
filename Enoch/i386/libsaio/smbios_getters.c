@@ -454,7 +454,8 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	static int idx = -1;
 	int	map;
 
-	if (!bootInfo->memDetect) {
+	if (!bootInfo->memDetect)
+	{
 		return false;
 	}
 
@@ -479,7 +480,8 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 	static int idx = -1;
 	int	map;
 
-	if (!bootInfo->memDetect) {
+	if (!bootInfo->memDetect)
+	{
 		return false;
 	}
 
@@ -507,7 +509,8 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	static int idx = -1;
 	int	map;
 
-	if (!bootInfo->memDetect) {
+	if (!bootInfo->memDetect)
+	{
 		return false;
 	}
 
