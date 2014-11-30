@@ -20,7 +20,7 @@
 ;
 ; @APPLE_LICENSE_HEADER_END@
 ;
-; Boot Loader: boot0xg
+; Boot Loader: boot0
 ;
 ; A small boot sector program written in x86 assembly whose only
 ; responsibility is to locate the active partition, load the
@@ -30,17 +30,17 @@
 ; This boot loader must be placed in the Master Boot Record.
 ;
 ; In order to coexist with a fdisk partition table (64 bytes), and
-; leave room for a two byte signature (0xAA55) in the end, boot0xg is
-; restricted to 440 bytes (512 - 64 - 2 - 6). If boot0xg did not have to
+; leave room for a two byte signature (0xAA55) in the end, boot0 is
+; restricted to 446 bytes (512 - 64 - 2). If boot0 did not have to
 ; live in the MBR, then we would have 510 bytes to work with.
 ;
-; boot0xg is always loaded by the BIOS or another booter to 0:7C00h.
+; boot0 is always loaded by the BIOS or another booter to 0:7C00h.
 ;
 ; This code is written for the NASM assembler.
-;   nasm -f bin -DCONFIG_BOOT0_DEBUG=? -DCONFIG_BOOT0_VERBOSE=? boot0xg.s -o boot0xg
+;   nasm boot0.s -o boot0
 
 ;
-; This version of boot0xg implements hybrid GUID/MBR partition scheme support
+; This version of boot0 implements hybrid GUID/MBR partition scheme support
 ;
 ; Written by Tam‡s Kos‡rszky on 2008-03-10
 ;
@@ -102,8 +102,8 @@ kPartActive	        EQU  0x80			; active flag enabled
 kPartInactive	    EQU  0x00			; active flag disabled
 kHFSGUID	        EQU  0x48465300		; first 4 bytes of Apple HFS Partition Type GUID.
 kAppleGUID			EQU  0xACEC4365		; last 4 bytes of Apple type GUIDs.
-kMicrosoftGUID		EQU  0xC79926B7		; last 4 bytes of Microsoft Basic Data Partition Type GUID:
-										; EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
+kEFISystemGUID		EQU  0x3BC93EC9		; last 4 bytes of EFI System Partition Type GUID:
+										; C12A7328-F81F-11D2-BA4B-00A0C93EC93B
 
 %ifdef FLOPPY
 kDriveNumber		EQU  0x00
@@ -453,7 +453,7 @@ checkGPT:
 	; Turbo - also try EFI System Partition
 	;
 
-	cmp		eax, kMicrosoftGUID		; check current GUID Partition for Microsoft Basic Data Partition GUID type
+	cmp		eax, kEFISystemGUID		; check current GUID Partition for EFI System Partition GUID type
 	jne		.gpt_continue
 
 .gpt_ok:
@@ -508,10 +508,8 @@ loadBootSector:
 
 .checkHFSSignature:
 
-%if 0
 %if VERBOSE
     LogString(test_str)
-%endif
 %endif
 
 	;
@@ -522,13 +520,6 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-
-	;
-	; Looking for exFAT signature
-	;
-	mov		ax, [kBoot0LoadAddr + 3]
-	cmp		ax, 0x5845	; 'EX'
-	jz	.checkBootSignature
 
 	;
 	; Looking for boot1f32 magic string.
@@ -776,9 +767,7 @@ log_title_str		db  10, 13, 'boot0: ', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
-%if 0
 test_str		db  'test', 0
-%endif
 done_str		db  'done', 0
 %endif
 

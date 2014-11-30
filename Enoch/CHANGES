@@ -1,3 +1,4 @@
+- Zenith432 : Replace boot0 with boot0xg. Now boot0xg has all features of previous boot0. ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - ErmaC : Add UseIntelHDMI for hda-gfx = onboard-1 or 2 that vale will be injected into the GFX0 and HDEF devices. credits Clover Team
 - ErmaC : Improve gma detection for HD4600
 - cparm : Merge (security, stability, bugs fixes) improvements.

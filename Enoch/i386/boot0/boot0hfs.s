@@ -60,11 +60,6 @@ DEBUG				EQU  CONFIG_BOOT0_DEBUG
 VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
 
 ;
-; Set to 1 to enable unstretch mode
-;
-UNSTRETCH			EQU  CONFIG_BOOT0_UNSTRETCH
-
-;
 ; Various constants.
 ;
 kBoot0Segment		EQU  0x0000
@@ -234,10 +229,6 @@ start_reloc:
 %if DEBUG
     mov     al, dl
     call    print_hex
-%endif
-
-%if UNSTRETCH
-    call disable_scaler
 %endif
 
     ;
@@ -768,19 +759,7 @@ getc:
     ret
 %endif ;DEBUG
 	
-%if UNSTRETCH
-;--------------------------------------------------------------------------
-; Disable On-Chip Scaling for nVidia Cards
-;
-disable_scaler:
-    mov ax,4F14h ;VESA VBE OEM function
-    mov bl,2     ;Subfunction 02 = Set Panel Expansion/Centering
-    mov bh,1     ;00 = Return Current Setting, 01 = Set Centering/Expansion
-    mov cx,0001h ;Exp. mode: 00 = Scaled, 01 = Centered 1:1, 02 = Left Corner 1:1
-    int 10h      ;call VGA/VBE service
-    LogString(nv_scaler_str)
-    ret
-%endif
+
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
@@ -793,10 +772,6 @@ done_str		db  'done', 0
 %endif
 
 boot_error_str   	db  'error', 0
-
-%if UNSTRETCH
-nv_scaler_str		db  'Unstretch', 0
-%endif ;DEBUG
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last
