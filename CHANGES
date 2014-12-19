@@ -1,3 +1,5 @@
+- Zenith432 : Full implementation of exfat support for Chameleon's boot2 stage.
+- Micky1979 : Incorporated force umount option -u (boot1-install.c)
 - Zenith432 : Replace boot0 with boot0xg. Now boot0xg has all features of previous boot0. ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - Zenith432 : add EXFAT boot support by Zenith432

@@ -57,6 +57,7 @@
 #define FDISK_UFS		0xa8	/* Apple UFS partition */
 #define FDISK_HFS		0xaf	/* Apple HFS partition */
 #define FDISK_BOOTER		0xab	/* Apple booter partition */
+#define FDISK_PSEUDO_EXFAT	0x107	/* Shared with FDISK_NTFS */
 
 /*
  * Format of fdisk partion entry (if present).
