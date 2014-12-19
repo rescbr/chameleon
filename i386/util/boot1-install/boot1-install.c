@@ -4,6 +4,8 @@
  *
  *  Created by Zenith432 on November 19th, 2014.
  *  Copyright (c) 2014 Zenith432. All rights reserved.
+ *
+ *  Modified December 5th, 2014 by Micky1979: Added -u option to force umount.
  */
 
 #include <assert.h>
@@ -404,7 +406,7 @@ void umountCallback(DADiskRef disk __unused,
 }
 
 static
-int umount(char const* pathName)
+int umount(char const* pathName, int forceUmount)
 {
 	DASessionRef session;
 	DADiskRef disk;
@@ -415,7 +417,7 @@ int umount(char const* pathName)
 		return -1;
 	rc = 0;
 	DASessionScheduleWithRunLoop(session, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-	DADiskUnmount(disk, kDADiskUnmountOptionDefault, umountCallback, &rc);
+	DADiskUnmount(disk, forceUmount ? kDADiskUnmountOptionForce : kDADiskUnmountOptionDefault, umountCallback, &rc);
 	CFRunLoopRun();
 	DASessionUnscheduleFromRunLoop(session, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 	CFRelease(disk);
@@ -622,7 +624,7 @@ int checkDevicePath(char const* pathName)
 	assert(pathName);
 	if (strncmp(pathName, &devdisk[0], 9) != 0 &&
 		strncmp(pathName, &devrdisk[0], 10) != 0) {
-		fprintf(stderr, "disk must be of form /dev/rdiskUsS or /dev/diskUsS\n");
+		fprintf(stderr, "disk must be of form /dev/rdiskUsS or /dev/diskUsS\ndisk is %s\n", pathName);
 		return -1;
 	}
 	if (stat(pathName, &buf) < 0) {
@@ -662,10 +664,11 @@ static
 void usage(char const* self)
 {
 	assert(self);
-	fprintf(stderr, "Usage: %s [-yM] [-f boot_code_file] disk\n", self);
+	fprintf(stderr, "Usage: %s [-yMu] [-f boot_code_file] disk\n", self);
 	fprintf(stderr, "  boot_code_file is an optional boot template\n");
 	fprintf(stderr, "  -y: don't ask any questions\n");
 	fprintf(stderr, "  -M: keep volume mounted while proceeding (useful for root filesystem)\n");
+	fprintf(stderr, "  -u: force umount (suppresses -M option if given)\n");
 	fprintf(stderr, "disk is of the form /dev/rdiskUsS or /dev/diskUsS\n");
 	fprintf(stderr, "default boot files are\n");
 	fprintf(stderr, "  boot1h for HFS+\n");
@@ -690,14 +693,18 @@ int main(int argc, char* const argv[])
 	char const* devicePath = NULL;
 	int dontAsk = 0;
 	int keepMounted = 0;
+	int forceUmount = 0;
 
-	while ((ch = getopt(argc, argv, "yMf:")) != -1)
+	while ((ch = getopt(argc, argv, "yMuf:")) != -1)
 		switch (ch) {
 			case 'y':
 				dontAsk = 1;
 				break;
 			case 'M':
 				keepMounted = 1;
+				break;
+			case 'u':
+				forceUmount = 1;
 				break;
 			case 'f':
 				bootFile = optarg;
@@ -712,6 +719,8 @@ int main(int argc, char* const argv[])
 		fprintf(stderr, "This program must be run as root\n");
 		return -1;
 	}
+	if (forceUmount)
+		keepMounted = 0;
 #if 0
 	printf("bootFile %s, devicePath %s, dontAsk %d\n", bootFile, devicePath, dontAsk);
 #endif
@@ -734,8 +743,11 @@ int main(int argc, char* const argv[])
 		}
 		if (isVolumeMounted && keepMounted)
 			isVolumeMounted = 0;
-		if (isVolumeMounted && umount(devicePath) < 0) {
-			fprintf(stderr, "Unable to umount %s, please 'diskutil umount' manually before running this program\n", devicePath);
+		if (isVolumeMounted && umount(devicePath, forceUmount) < 0) {
+			if (forceUmount)
+				fprintf(stderr, "Unable to force umount %s, please try to umount it manually or reboot\n", devicePath);
+			else
+				fprintf(stderr, "Unable to umount %s, please 'diskutil umount' manually before running this program,\nor pass -u option to force umount it\n", devicePath);
 			return -1;
 		}
 	}
