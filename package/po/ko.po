@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-24 19:40+0000\n"
-"PO-Revision-Date: 2014-11-24 20:01-0000\n"
+"POT-Creation-Date: 2014-09-18 14:17+0100\n"
+"PO-Revision-Date: 2014-12-09 22:44+0100\n"
 "Last-Translator: Mill <ceruns@ymail.com>\n"
 "Language-Team: ko <ko@li.org>\n"
 "Language: ko\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388318425.0\n"
+"X-POOTLE-MTIME: 1418150892.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -264,8 +264,7 @@ msgstr ""
 "boot2 (드라이브의 루트 디렉토리에 있음) 커널 로딩 등 기타 담당."
 
 #. type: "Default_title"
-#: Resources/templates/Localizable.strings:25
-#: Resources/templates/Localizable.strings:681
+#: Resources/templates/Localizable.strings:25 Resources/templates/Localizable.strings:681
 #, no-wrap
 msgid "Standard"
 msgstr "일반"
@@ -381,8 +380,7 @@ msgstr ""
 "종속성: 없음"
 
 #. type: "Resolution_title"
-#: Resources/templates/Localizable.strings:60
-#: Resources/templates/Localizable.strings:714
+#: Resources/templates/Localizable.strings:60 Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "Resolution"
 msgstr "화면 해상도"
@@ -686,7 +684,7 @@ msgstr "ForceFullMemInfo=Yes"
 #: Resources/templates/Localizable.strings:145
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "SMBIOS Table 17을 27바이트 길이로 강제 설정"
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:147
@@ -1085,8 +1083,7 @@ msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "부팅 해상도를 1920x1200x32"
 
 #. type: "HDAULayoutIDx01_title"
-#: Resources/templates/Localizable.strings:252
-#: Resources/templates/Localizable.strings:358
+#: Resources/templates/Localizable.strings:252 Resources/templates/Localizable.strings:358
 #, no-wrap
 msgid "LayoutID=1"
 msgstr "LayoutID=1"
@@ -1102,8 +1099,7 @@ msgstr ""
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
-#: Resources/templates/Localizable.strings:256
-#: Resources/templates/Localizable.strings:362
+#: Resources/templates/Localizable.strings:256 Resources/templates/Localizable.strings:362
 #, no-wrap
 msgid "LayoutID=2"
 msgstr "LayoutID=2"
@@ -1119,8 +1115,7 @@ msgstr ""
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
-#: Resources/templates/Localizable.strings:260
-#: Resources/templates/Localizable.strings:366
+#: Resources/templates/Localizable.strings:260 Resources/templates/Localizable.strings:366
 #, no-wrap
 msgid "LayoutID=3"
 msgstr "LayoutID=3"
@@ -1136,8 +1131,7 @@ msgstr ""
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
-#: Resources/templates/Localizable.strings:264
-#: Resources/templates/Localizable.strings:370
+#: Resources/templates/Localizable.strings:264 Resources/templates/Localizable.strings:370
 #, no-wrap
 msgid "LayoutID=5"
 msgstr "LayoutID=5"
@@ -1149,12 +1143,11 @@ msgid ""
 "Set HDEF layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 5:\n"
+"HDEF layout-it 을 5로 설정:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
-#: Resources/templates/Localizable.strings:268
-#: Resources/templates/Localizable.strings:374
+#: Resources/templates/Localizable.strings:268 Resources/templates/Localizable.strings:374
 #, no-wrap
 msgid "LayoutID=7"
 msgstr "LayoutID=7"
@@ -1166,12 +1159,11 @@ msgid ""
 "Set HDEF layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 7:\n"
+"HDEF layout-it 을 7로 설정:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
-#: Resources/templates/Localizable.strings:272
-#: Resources/templates/Localizable.strings:378
+#: Resources/templates/Localizable.strings:272 Resources/templates/Localizable.strings:378
 #, no-wrap
 msgid "LayoutID=12"
 msgstr "LayoutID=12"
@@ -1187,8 +1179,7 @@ msgstr ""
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
-#: Resources/templates/Localizable.strings:276
-#: Resources/templates/Localizable.strings:382
+#: Resources/templates/Localizable.strings:276 Resources/templates/Localizable.strings:382
 #, no-wrap
 msgid "LayoutID=32"
 msgstr "LayoutID=32"
@@ -1204,8 +1195,7 @@ msgstr ""
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
-#: Resources/templates/Localizable.strings:280
-#: Resources/templates/Localizable.strings:386
+#: Resources/templates/Localizable.strings:280 Resources/templates/Localizable.strings:386
 #, no-wrap
 msgid "LayoutID=40"
 msgstr "LayoutID=40"
@@ -1221,8 +1211,7 @@ msgstr ""
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
-#: Resources/templates/Localizable.strings:284
-#: Resources/templates/Localizable.strings:390
+#: Resources/templates/Localizable.strings:284 Resources/templates/Localizable.strings:390
 #, no-wrap
 msgid "LayoutID=65"
 msgstr "LayoutID=65"
@@ -1238,8 +1227,7 @@ msgstr ""
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
-#: Resources/templates/Localizable.strings:288
-#: Resources/templates/Localizable.strings:394
+#: Resources/templates/Localizable.strings:288 Resources/templates/Localizable.strings:394
 #, no-wrap
 msgid "LayoutID=99"
 msgstr "LayoutID=99"
@@ -1255,8 +1243,7 @@ msgstr ""
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
-#: Resources/templates/Localizable.strings:292
-#: Resources/templates/Localizable.strings:398
+#: Resources/templates/Localizable.strings:292 Resources/templates/Localizable.strings:398
 #, no-wrap
 msgid "LayoutID=269"
 msgstr "LayoutID=269"
@@ -1272,8 +1259,7 @@ msgstr ""
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
-#: Resources/templates/Localizable.strings:296
-#: Resources/templates/Localizable.strings:402
+#: Resources/templates/Localizable.strings:296 Resources/templates/Localizable.strings:402
 #, no-wrap
 msgid "LayoutID=387"
 msgstr "LayoutID=387"
@@ -1289,8 +1275,7 @@ msgstr ""
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
-#: Resources/templates/Localizable.strings:300
-#: Resources/templates/Localizable.strings:406
+#: Resources/templates/Localizable.strings:300 Resources/templates/Localizable.strings:406
 #, no-wrap
 msgid "LayoutID=388"
 msgstr "LayoutID=388"
@@ -1306,8 +1291,7 @@ msgstr ""
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
-#: Resources/templates/Localizable.strings:304
-#: Resources/templates/Localizable.strings:410
+#: Resources/templates/Localizable.strings:304 Resources/templates/Localizable.strings:410
 #, no-wrap
 msgid "LayoutID=389"
 msgstr "LayoutID=389"
@@ -1323,8 +1307,7 @@ msgstr ""
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
-#: Resources/templates/Localizable.strings:308
-#: Resources/templates/Localizable.strings:414
+#: Resources/templates/Localizable.strings:308 Resources/templates/Localizable.strings:414
 #, no-wrap
 msgid "LayoutID=392"
 msgstr "LayoutID=392"
@@ -1340,8 +1323,7 @@ msgstr ""
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
-#: Resources/templates/Localizable.strings:312
-#: Resources/templates/Localizable.strings:418
+#: Resources/templates/Localizable.strings:312 Resources/templates/Localizable.strings:418
 #, no-wrap
 msgid "LayoutID=398"
 msgstr "LayoutID=398"
@@ -1357,8 +1339,7 @@ msgstr ""
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
-#: Resources/templates/Localizable.strings:316
-#: Resources/templates/Localizable.strings:422
+#: Resources/templates/Localizable.strings:316 Resources/templates/Localizable.strings:422
 #, no-wrap
 msgid "LayoutID=662"
 msgstr "LayoutID=662"
@@ -1374,8 +1355,7 @@ msgstr ""
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
-#: Resources/templates/Localizable.strings:320
-#: Resources/templates/Localizable.strings:426
+#: Resources/templates/Localizable.strings:320 Resources/templates/Localizable.strings:426
 #, no-wrap
 msgid "LayoutID=663"
 msgstr "LayoutID=663"
@@ -1391,8 +1371,7 @@ msgstr ""
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
-#: Resources/templates/Localizable.strings:324
-#: Resources/templates/Localizable.strings:430
+#: Resources/templates/Localizable.strings:324 Resources/templates/Localizable.strings:430
 #, no-wrap
 msgid "LayoutID=664"
 msgstr "LayoutID=664"
@@ -1408,8 +1387,7 @@ msgstr ""
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
-#: Resources/templates/Localizable.strings:328
-#: Resources/templates/Localizable.strings:434
+#: Resources/templates/Localizable.strings:328 Resources/templates/Localizable.strings:434
 #, no-wrap
 msgid "LayoutID=885"
 msgstr "LayoutID=885"
@@ -1425,8 +1403,7 @@ msgstr ""
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
-#: Resources/templates/Localizable.strings:332
-#: Resources/templates/Localizable.strings:438
+#: Resources/templates/Localizable.strings:332 Resources/templates/Localizable.strings:438
 #, no-wrap
 msgid "LayoutID=887"
 msgstr "LayoutID=887"
@@ -1442,8 +1419,7 @@ msgstr ""
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
-#: Resources/templates/Localizable.strings:336
-#: Resources/templates/Localizable.strings:442
+#: Resources/templates/Localizable.strings:336 Resources/templates/Localizable.strings:442
 #, no-wrap
 msgid "LayoutID=888"
 msgstr "LayoutID=888"
@@ -1459,8 +1435,7 @@ msgstr ""
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
-#: Resources/templates/Localizable.strings:340
-#: Resources/templates/Localizable.strings:446
+#: Resources/templates/Localizable.strings:340 Resources/templates/Localizable.strings:446
 #, no-wrap
 msgid "LayoutID=889"
 msgstr "LayoutID=889"
@@ -1476,8 +1451,7 @@ msgstr ""
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
-#: Resources/templates/Localizable.strings:344
-#: Resources/templates/Localizable.strings:450
+#: Resources/templates/Localizable.strings:344 Resources/templates/Localizable.strings:450
 #, no-wrap
 msgid "LayoutID=892"
 msgstr "LayoutID=892"
@@ -1493,8 +1467,7 @@ msgstr ""
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
-#: Resources/templates/Localizable.strings:348
-#: Resources/templates/Localizable.strings:454
+#: Resources/templates/Localizable.strings:348 Resources/templates/Localizable.strings:454
 #, no-wrap
 msgid "LayoutID=898"
 msgstr "LayoutID=898"
@@ -1510,8 +1483,7 @@ msgstr ""
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
-#: Resources/templates/Localizable.strings:352
-#: Resources/templates/Localizable.strings:458
+#: Resources/templates/Localizable.strings:352 Resources/templates/Localizable.strings:458
 #, no-wrap
 msgid "LayoutID=1981"
 msgstr "LayoutID=1981"
@@ -2220,10 +2192,9 @@ msgstr "NVIDIA 또는 AMD/ATI를 위한 HDMI 오디오 Inject"
 
 #. type: "UseIntelHDMI_title"
 #: Resources/templates/Localizable.strings:578
-#, fuzzy, no-wrap
-#| msgid "UseAtiROM=Yes"
+#, no-wrap
 msgid "UseIntelHDMI=Yes"
-msgstr "커스텀ATi롬 사용(UseAtiROM=Yes)"
+msgstr ""
 
 #. type: "UseIntelHDMI_description"
 #: Resources/templates/Localizable.strings:579
@@ -2337,7 +2308,7 @@ msgstr "NvidiaGeneric=Yes"
 #: Resources/templates/Localizable.strings:606
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
-msgstr ""
+msgstr "SystemProfiler에 기존 nVidia 이름 사용(기본적으로 비활성화되어있음)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:612
@@ -2462,7 +2433,7 @@ msgstr "kext-dev-mode=1"
 #: Resources/templates/Localizable.strings:642
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
-msgstr ""
+msgstr "Yosemite DP에서는, 서명되지 않거나 부적절하게 서명되지 않은 kext는 로드되지 않습니다. 개발 중에 이러한 kext를 사용하고자 한다면, 이러한 강제적 확인은 'kext-dev-mode=1' 부트 아규먼트로 비활성화 될 수 있습니다."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:644
@@ -2770,50 +2741,28 @@ msgstr ""
 #~ msgid "Install Type"
 #~ msgstr "설치 유형"
 
-#~ msgid ""
-#~ "Choose to perform a new installation or upgrade an existing installation."
+#~ msgid "Choose to perform a new installation or upgrade an existing installation."
 #~ msgstr "새 설치나 업그레이드 둘 중 하나를 선택하세요."
 
 #~ msgid "New Installation"
 #~ msgstr "새 설치"
 
-#~ msgid ""
-#~ "Backup an existing /Extra folder, if found on the target partition. A new "
-#~ "one will be created if any options are chosen from the installer, other "
-#~ "than the Bootloader."
-#~ msgstr ""
-#~ "Bootloader 이외의 옵션이 추가로 선택된 경우, 만약 설치할 파티션에 /Extra "
-#~ "폴더가 이미 존재하면, 다른 이름으로 백업한 후, 추가 선택한 옵션들이 포함"
-#~ "된 새로운 /Extra 폴더가 생성됩니다."
+#~ msgid "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader."
+#~ msgstr "Bootloader 이외의 옵션이 추가로 선택된 경우, 만약 설치할 파티션에 /Extra 폴더가 이미 존재하면, 다른 이름으로 백업한 후, 추가 선택한 옵션들이 포함된 새로운 /Extra 폴더가 생성됩니다."
 
 #~ msgid "Upgrade"
 #~ msgstr "업그레이드"
 
-#~ msgid ""
-#~ "Merge an existing /Extra folder, if found on the target, with any options "
-#~ "chosen from the installer, other than the Bootloader. The original /Extra "
-#~ "folder will be backed up."
-#~ msgstr ""
-#~ "Bootloader 이외의 옵션이 추가로 선택된 경우 만약 설치할 파티션에 /Extra 폴"
-#~ "더가 이미 존재하면, 다른 이름으로 백업한 후, 기존 /Extra 폴더에 추가 선택"
-#~ "한 옵션들이 더해집니다. (org.chameleon.Boot.plist 기존 항목들을 덮어 쓰기 "
-#~ "하지 않고 이미 없는 옵션들만 추가합니다.)"
+#~ msgid "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up."
+#~ msgstr "Bootloader 이외의 옵션이 추가로 선택된 경우 만약 설치할 파티션에 /Extra 폴더가 이미 존재하면, 다른 이름으로 백업한 후, 기존 /Extra 폴더에 추가 선택한 옵션들이 더해집니다. (org.chameleon.Boot.plist 기존 항목들을 덮어 쓰기 하지 않고 이미 없는 옵션들만 추가합니다.)"
 
-#~ msgid ""
-#~ "Install Chameleon's files to the normally hidden EFI system partition "
-#~ "using either boot0 or boot0md depending on your system and without "
-#~ "destroying any existing Windows installation if you have one."
-#~ msgstr ""
-#~ "평상 시 숨겨져있는 EFI 시스템 파티션에 카멜레온에 필요한 파일들을 사용자"
-#~ "의 시스템에 따라 boot0 또는 boot0md를 이용하여 설치합니다. 윈도우가 설치되"
-#~ "있더라도 영향을 주지 않습니다."
+#~ msgid "Install Chameleon's files to the normally hidden EFI system partition using either boot0 or boot0md depending on your system and without destroying any existing Windows installation if you have one."
+#~ msgstr "평상 시 숨겨져있는 EFI 시스템 파티션에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0 또는 boot0md를 이용하여 설치합니다. 윈도우가 설치되있더라도 영향을 주지 않습니다."
 
 #~ msgid "Keylayout"
 #~ msgstr "키레이아웃"
 
-#~ msgid ""
-#~ "This module permits the user to define the keyboard key mappings. This "
-#~ "module and associated keymaps are installed by default."
+#~ msgid "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default."
 #~ msgstr "이 모듈은 사용자 키보드 키 매핑 정의를 허용합니다."
 
 #~ msgid "Utilities"
