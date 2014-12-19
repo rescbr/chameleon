@@ -20,16 +20,15 @@
  * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
- */
-/* 
+ *
+ *
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
- */
-
-/*
+ *
+ *
  *          INTEL CORPORATION PROPRIETARY INFORMATION
  *
  *  This software is supplied under the terms of a license  agreement or 
@@ -37,14 +36,12 @@
  *  nor disclosed except in accordance with the terms of that agreement.
  *
  *  Copyright 1988, 1989 Intel Corporation
- */
-
-/*
+ *
+ *
  * Copyright 1993 NeXT Computer, Inc.
  * All rights reserved.
- */
-
-/*
+ *
+ *
  * Copyright 2007 VMware Inc.
  * "Preboot" ramdisk support added by David Elliott
  * GPT support added by David Elliott.  Based on IOGUIDPartitionScheme.cpp.
@@ -71,6 +68,7 @@
 #include "fdisk.h"
 #include "hfs.h"
 #include "ntfs.h"
+#include "exfat.h"
 #include "msdos.h"
 #include "ext2fs.h"
 #include "befs.h"
@@ -581,14 +579,32 @@ static BVRef newFDiskBVRef( int biosdev, int partno, unsigned int blkoff,
 				bvr = NULL;
 			}
 
-			if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
+			if ( bvr && readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
 			{
 				bvr->flags |= kBVFlagBootable;
 			}
 		}
 		else if ( readBootSector( biosdev, blkoff, (void *)0x7e00 ) == 0 )
 		{
-			bvr->flags |= kBVFlagForeignBoot;
+			/*
+			 * This is an ugly place to check for exfat/FDisk, but it reads
+			 *   the partition boot sector only once.
+			 */
+			if (bvr->part_type == FDISK_NTFS && EXFATProbe((void const *)0x7e00))
+			{
+				bvr->flags |= kBVFlagNativeBoot | kBVFlagBootable;
+				bvr->fs_loadfile    = EXFATLoadFile;
+				bvr->fs_readfile    = EXFATReadFile;
+				bvr->fs_getdirentry = EXFATGetDirEntry;
+				bvr->fs_getfileblock= EXFATGetFileBlock;
+				bvr->fs_getuuid     = EXFATGetUUID;
+				bvr->description    = EXFATGetDescription;
+				bvr->bv_free        = EXFATFree;
+			}
+			else
+			{
+				bvr->flags |= kBVFlagForeignBoot;
+			}
 		}
 		else
 		{
@@ -1250,6 +1266,11 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 		result = FDISK_BEFS;
 	}
 
+	else if (EXFATProbe(probeBuffer))
+	{
+		result = FDISK_PSEUDO_EXFAT;
+	}
+
 	else if (NTFSProbe(probeBuffer))
 	{
 		result = FDISK_NTFS;
@@ -1278,10 +1299,12 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 	}
 
 exit:
-	if (probeBuffer != NULL) free((void *)probeBuffer);
+	if (probeBuffer)
 	{
-		return result;
+		free((void *)probeBuffer);
 	}
+
+	return result;
 }
 
 //==============================================================================
@@ -1501,6 +1524,19 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 								MSDOSGetDescription,
 								MSDOSFree,
 								0, kBIOSDevTypeHardDrive, 0);
+						break;
+
+					case FDISK_PSEUDO_EXFAT:
+						bvr = newGPTBVRef(biosdev, gptID, gptMap->ent_lba_start, gptMap,
+										  EXFATInitPartition,
+										  EXFATLoadFile,
+										  EXFATReadFile,
+										  EXFATGetDirEntry,
+										  EXFATGetFileBlock,
+										  EXFATGetUUID,
+										  EXFATGetDescription,
+										  EXFATFree,
+										  0, kBIOSDevTypeHardDrive, 0);
 						break;
 
 					default:
