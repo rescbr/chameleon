@@ -623,11 +623,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         //case 0x80860090:
         //case 0x80860091:
         //case 0x80860092:
+        case GMA_HASWELL_M_GT2: // 0416
+            device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
+            devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
+            devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
+            devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
+
         case GMA_HASWELL_D_GT1: // 0402
         case GMA_HASWELL_M_GT1: // 0406
         case GMA_HASWELL_S_GT1: // 040a
         case GMA_HASWELL_D_GT2: // 0412
-        case GMA_HASWELL_M_GT2: // 0416
         case GMA_HASWELL_S_GT2: // 041a
         case GMA_HASWELL_E_GT1: // 040e
         case GMA_HASWELL_E_GT2: // 041e
