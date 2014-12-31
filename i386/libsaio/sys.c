@@ -595,6 +595,17 @@ int open_bvdev(const char *bvd, const char *path, int flags)
 		return -1;
 	}
 
+	if (path && path[2] == '(')
+	{
+		for (dp = &devsw[0]; dp->name; ++dp)
+		{
+			if (path[0] == dp->name[0] && path[1] == dp->name[1])
+			{
+				return -1;
+			}
+		}
+	}
+
 	for (dp=devsw; dp->name; dp++)
 	{
 		if (bvd[0] == dp->name[0] && bvd[1] == dp->name[1])
