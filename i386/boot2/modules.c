@@ -93,7 +93,7 @@ int init_module_system()
 	}
 
 	// Look for modules located in the multiboot header.
-	if(gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS)
+	if(gMI && (gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS))
 	{
 		if(gMI->mi_mods_count)
 		{
