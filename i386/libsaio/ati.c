@@ -7,6 +7,7 @@
 
 #include "ati.h"
 
+static bool	doit	= false;
 
 static const char *chip_family_name[] = {
 	"UNKNOW",
@@ -1705,39 +1706,39 @@ static radeon_card_info_t radeon_cards[] = {
 };
 
 dev_prop_t ati_devprop_list[] = {
-	{FLAGTRUE,	false,	"@0,AAPL,boot-display",		get_bootdisplay_val,	NULVAL							},
-//	{FLAGTRUE,	false,	"@0,ATY,EFIDisplay",		NULL,					STRVAL("TMDSA")					},
+	{FLAGTRUE,	false,	"@0,AAPL,boot-display",		get_bootdisplay_val,	NULVAL				},
+//	{FLAGTRUE,	false,	"@0,ATY,EFIDisplay",		NULL,			STRVAL("TMDSA")			},
 
-//	{FLAGTRUE,	true,	"@0,AAPL,vram-memory",		get_vrammemory_val,		NULVAL							},
-//	{FLAGTRUE,	true,	"@0,compatible",			get_name_val,			NULVAL							},
-//	{FLAGTRUE,	true,	"@0,connector-type",		get_conntype_val,		NULVAL							},
-//	{FLAGTRUE,	true,	"@0,device_type",			NULL,					STRVAL("display")				},
-//	{FLAGTRUE,	false,	"@0,display-connect-flags", NULL,					DWRVAL((uint32_t)0)				},
-//	{FLAGTRUE,	true,	"@0,display-type",			NULL,					STRVAL("NONE")					},
-	{FLAGTRUE,	true,	"@0,name",				get_name_val,			NULVAL							},
-//	{FLAGTRUE,	true,	"@0,VRAM,memsize",			get_vrammemsize_val,	NULVAL							},
+//	{FLAGTRUE,	true,	"@0,AAPL,vram-memory",		get_vrammemory_val,	NULVAL				},
+//	{FLAGTRUE,	true,	"@0,compatible",		get_name_val,		NULVAL				},
+//	{FLAGTRUE,	true,	"@0,connector-type",		get_conntype_val,	NULVAL				},
+//	{FLAGTRUE,	true,	"@0,device_type",		NULL,			STRVAL("display")		},
+//	{FLAGTRUE,	false,	"@0,display-connect-flags",	NULL,			DWRVAL((uint32_t)0)		},
+//	{FLAGTRUE,	true,	"@0,display-type",		NULL,			STRVAL("NONE")			},
+	{FLAGTRUE,	true,	"@0,name",			get_name_val,		NULVAL				},
+//	{FLAGTRUE,	true,	"@0,VRAM,memsize",		get_vrammemsize_val,	NULVAL				},
 
-//	{FLAGTRUE,	false,	"AAPL,aux-power-connected",		NULL,					DWRVAL((uint32_t)1)				},
-//	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,					DWRVAL((uint32_t)0)				},
-	{FLAGTRUE,	false,	"ATY,bin_image",			get_binimage_val,		NULVAL							},
-	{FLAGTRUE,	false,	"ATY,Copyright",			NULL,	STRVAL("Copyright AMD Inc. All Rights Reserved. 2005-2010") },
-	{FLAGTRUE,	false,	"ATY,Card#",				get_romrevision_val,	NULVAL							},
-	{FLAGTRUE,	false,	"ATY,VendorID",				NULL,					WRDVAL((uint16_t)0x1002)		},
-	{FLAGTRUE,	false,	"ATY,DeviceID",				get_deviceid_val,		NULVAL							},
+//	{FLAGTRUE,	false,	"AAPL,aux-power-connected",	NULL,			DWRVAL((uint32_t)1)		},
+//	{FLAGTRUE,	false,	"AAPL,backlight-control",	NULL,			DWRVAL((uint32_t)0)		},
+	{FLAGTRUE,	false,	"ATY,bin_image",		get_binimage_val,	NULVAL				},
+	{FLAGTRUE,	false,	"ATY,Copyright",		NULL,	STRVAL("Copyright AMD Inc. All Rights Reserved. 2005-2010") },
+	{FLAGTRUE,	false,	"ATY,Card#",			get_romrevision_val,	NULVAL				},
+	{FLAGTRUE,	false,	"ATY,VendorID",			NULL,			WRDVAL((uint16_t)0x1002)	},
+	{FLAGTRUE,	false,	"ATY,DeviceID",			get_deviceid_val,	NULVAL				},
 
-//	{FLAGTRUE,	false,	"ATY,MCLK",				get_mclk_val,			NULVAL							},
-//	{FLAGTRUE,	false,	"ATY,SCLK",				get_sclk_val,			NULVAL							},
-//	{FLAGTRUE,	false,	"ATY,RefCLK",				get_refclk_val,			DWRVAL((uint32_t)0x0a8c)		},
+//	{FLAGTRUE,	false,	"ATY,MCLK",			get_mclk_val,		NULVAL				},
+//	{FLAGTRUE,	false,	"ATY,SCLK",			get_sclk_val,		NULVAL				},
+//	{FLAGTRUE,	false,	"ATY,RefCLK",			get_refclk_val,		DWRVAL((uint32_t)0x0a8c)	},
 	
-//	{FLAGTRUE,	false,	"ATY,PlatformInfo",			get_platforminfo_val,	NULVAL							},
+//	{FLAGTRUE,	false,	"ATY,PlatformInfo",		get_platforminfo_val,	NULVAL				},
 
-	{FLAGTRUE,	false,	"name",					get_nameparent_val,		NULVAL							},
-	{FLAGTRUE,	false,	"device_type",				get_nameparent_val,		NULVAL							},
-	{FLAGTRUE,	false,	"model",				get_model_val,			STRVAL("ATI Radeon")			},
-//	{FLAGTRUE,	false,	"VRAM,totalsize",			get_vramtotalsize_val,	NULVAL							},
-	{FLAGTRUE,	false,	"hda-gfx",				get_hdmiaudio,	NULVAL},
+	{FLAGTRUE,	false,	"name",				get_nameparent_val,	NULVAL				},
+	{FLAGTRUE,	false,	"device_type",			get_nameparent_val,	NULVAL				},
+	{FLAGTRUE,	false,	"model",			get_model_val,		STRVAL("ATI Radeon")		},
+//	{FLAGTRUE,	false,	"VRAM,totalsize",		get_vramtotalsize_val,	NULVAL				},
+	{FLAGTRUE,	false,	"hda-gfx",			get_hdmiaudio,		NULVAL				},
 
-	{FLAGTRUE,	false,	NULL,					NULL,					NULVAL							}
+	{FLAGTRUE,	false,	NULL,				NULL,			NULVAL				}
 };
 
 bool get_hdmiaudio(value_t * val)
@@ -1866,7 +1867,7 @@ bool get_romrevision_val(value_t *val)
 	val->type = kPtr;
 	val->size = strlen((char *)rev);
 	val->data = malloc(val->size);
-	
+
 	if (!val->data)
 	{
 		return false;
@@ -2328,7 +2329,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	card->posted = radeon_card_posted();
 	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
-	
+	verbose("\n");
 	get_vram_size();
 	
 	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->chameleonConfig);
@@ -2434,6 +2435,15 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 	// -------------------------------------------------
 
+	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	}
+	else
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	}
+
 #if 0
 	uint64_t fb	= (uint32_t)card->fb;
 	uint64_t mmio	= (uint32_t)card->mmio;
@@ -2459,6 +2469,8 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
 			devicepath);
+
+	verbose("---------------------------------------------\n");
 
 	free(card);
 

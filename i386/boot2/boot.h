@@ -124,6 +124,7 @@
 
 /* Slice: added this */
 #define kPS2RestartFix		"PS2RestartFix"		/* acpi_patcher.c */
+#define kUseIntelHDMI		"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 
 /* Signal64: added this key */
 #define kLegacyOff		"USBLegacyOff"		/* usb.c */
