@@ -597,7 +597,7 @@ void print_drive_info(boot_drive_info_t *dp)
 //	printf("bus_type[4] = %x\n", dp->params. bus_type[4]);
 //	printf("interface_type[8] = %x\n", dp->params. interface_type[8]);
 //	printf("interface_path[8] = %x\n", dp->params. interface_path[8]);
-//	printf("dev_path[8] = %x\n", dp->params. dev_path[8]);
+//	printf("dev_path[16] = %x\n", dp->params. dev_path[16]);
 //	printf("reserved3 = %x\n", dp->params. reserved3);
 //	printf("checksum = %x\n", dp->params. checksum);
 	printf("io_port_base = %x\n", dp->dpte.io_port_base);

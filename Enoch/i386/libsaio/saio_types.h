@@ -100,7 +100,7 @@ struct boot_drive_info
 		unsigned char  bus_type[4];
 		unsigned char  interface_type[8];
 		unsigned char  interface_path[8];
-		unsigned char  dev_path[8];
+		unsigned char  dev_path[16];
 		unsigned char  reserved3;
 		unsigned char  checksum;
 	} params;

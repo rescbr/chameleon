@@ -60,8 +60,8 @@ char *strrchr(const char *s, int c)
  */
 int init_module_system()
 {
-    // Start any modules that were compiled in first.
-    start_built_in_modules();
+	// Start any modules that were compiled in first.
+	start_built_in_modules();
 
 
 	int retVal = 0;
@@ -93,7 +93,7 @@ int init_module_system()
 	}
 
 	// Look for modules located in the multiboot header.
-	if(gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS)
+	if(gMI && (gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS))
 	{
 		if(gMI->mi_mods_count)
 		{
@@ -119,7 +119,7 @@ int init_module_system()
 
 						char* name = strdup(last);
 						name[strlen(last) - sizeof("dylib")] = 0;
-						DBG("Loading multiboot module %s", name);
+						DBG("Loading multiboot module %s\n", name);
 
 						module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
 
@@ -178,7 +178,8 @@ void load_all_modules()
 			char* tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 
-			if(!load_module(tmp)) {
+			if(!load_module(tmp))
+			{
 				// failed to load
 				// free(tmp);
 			}
@@ -269,7 +270,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
 {
 	// This only can handle 32bit symbols
 	symbolList_t* entry;
-	//DBG("Adding symbol %s at 0x%X\n", symbol, addr);
+	DBG("Adding symbol %s at 0x%X\n", symbol, addr);
 
 	entry = malloc(sizeof(symbolList_t));
 	entry->next = moduleSymbols;
@@ -299,9 +300,9 @@ void module_loaded(const char* name, void* start, const char* author, const char
 
 	loadedModules = new_entry;
 
-    if(!name) name = "Unknown";
-    if(!author) author = "Unknown";
-    if(!description) description = "";
+	if(!name) name = "Unknown";
+	if(!author) author = "Unknown";
+	if(!description) description = "";
 
 	new_entry->name = name;
 	new_entry->author = author;
@@ -309,11 +310,11 @@ void module_loaded(const char* name, void* start, const char* author, const char
 	new_entry->version = version;
 	new_entry->compat = compat;
 
-	msglog("Module '%s' by '%s' Loaded.\n", name, author);
-	msglog("\tInitialization: 0x%X\n", start);
-	msglog("\tDescription: %s\n", description);
-	msglog("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
-	msglog("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
+	DBG("Module '%s' by '%s' Loaded.\n", name, author);
+	DBG("\tInitialization: 0x%X\n", start);
+	DBG("\tDescription: %s\n", description);
+	DBG("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
+	DBG("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
 }
 
 int is_module_loaded(const char* name)
@@ -482,7 +483,7 @@ void* parse_mach(void* binary,
                     }
                 }
 				break;
-			case LC_SEGMENT_64:	// 64bit macho's
+                case LC_SEGMENT_64:	// 64bit macho's
                 {
                     segCommand64 = binary + binaryIndex;
                     UInt32 sectionIndex;
