@@ -1632,6 +1632,14 @@ static bool getOSVersion(BVRef bvr, char *str)
 	config_file_t systemVersion;
 	char  dirSpec[512];
 
+	/*
+	 * Only look for OS Version on HFS+
+	 */
+	if (bvr->fs_readfile != HFSReadFile)
+	{
+		return valid;
+	}
+
 	// OS X Recovery
 	sprintf(dirSpec, "hd(%d,%d)/com.apple.recovery.boot/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 

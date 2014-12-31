@@ -1,3 +1,6 @@
+- Zenith432 : Change to disk.c - Prevent getOSVersion from looking for SystemVersion.plist on FAT32 or exFAT file systems - since those filesystems never serve as system volumes.
+UFS may serve as system volume, but there's no driver to read from it.
+Change to sys.c - Eliminate a dubious recursion in diskScanBootVolumes().  It recognises the filesystem, then calls getOSVersion, which attempts to open 5 files in order to find SystemVersion - then when parsing the device name - calls diskScanBootVolumes() - as a form of on-demand scanning.  This doesn't result in an infinite recursion - because the volume is already in the map.  However, this auto-scan is only useful if user enters an explicit hd(X,Y) device-spec that has never been scanned before - an unlikely occurrence.
 - Zenith432 : Patch from Issue 388, init_module_system() in modules.c dereferences NULL pointer
 - Zenith432 : Full implementation of exfat support for Chameleon's boot2 stage.
 - Micky1979 : Incorporated force umount option -u (boot1-install.c)

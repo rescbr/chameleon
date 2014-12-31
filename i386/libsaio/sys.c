@@ -1247,8 +1247,9 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 	else
 	{
 		// Fetch the volume list from the device.
-
+#if 0
 		scanBootVolumes( biosdev, NULL );
+#endif
 		bvrChain = getBVChainForBIOSDev(biosdev);
 
 		// Look for a perfect match based on device and partition number.
