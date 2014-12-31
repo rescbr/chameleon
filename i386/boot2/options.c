@@ -108,11 +108,11 @@ static bool flushKeyboardBuffer(void)
 
 static int countdown( const char * msg, int row, int timeout )
 {
-    unsigned long time;
-    int ch  = 0;
-    int col = strlen(msg) + 1;
-	
-    flushKeyboardBuffer();
+	unsigned long time;
+	int ch  = 0;
+	int col = strlen(msg) + 1;
+
+	flushKeyboardBuffer();
 
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
@@ -122,53 +122,53 @@ static int countdown( const char * msg, int row, int timeout )
 	} else {
 
 		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
-	
+
 		char dummy[80];
 		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
 		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
-		
+
 		// make this screen the new background
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
-		
+
 	}
 
 	int multi_buff = 18 * (timeout);
-    int multi = ++multi_buff;
+	int multi = ++multi_buff;
 
-    int lasttime=0;
+	int lasttime=0;
 
-    for ( time = time18(), timeout++; timeout > 0; )
-    {
+	for ( time = time18(), timeout++; timeout > 0; )
+	{
 		if( time18() > lasttime)
 		{
 			multi--; 
 			lasttime=time18();
 		}		
   
-        if ( (ch = readKeyboardStatus()) )
-            break;
+		if ( (ch = readKeyboardStatus()) )
+			break;
 
-        // Count can be interrupted by holding down shift,
-        // control or alt key
-        if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
+		// Count can be interrupted by holding down shift,
+		// control or alt key
+		if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
 		{
-            ch = 1;
-            break;
-        }
+			ch = 1;
+			break;
+		}
 
-        if ( time18() >= time )
-        {
-            time += 18;
-            timeout--;
+		if ( time18() >= time )
+		{
+			time += 18;
+			timeout--;
 
 			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 			{
 				moveCursor( col, row );
 				printf("(%d) ", timeout);
 			}
-        }
-	
+		}
+
 		if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 		{
 			drawProgressBar( gui.screen.pixmap, 100, gui.progressbar.pos , ( multi * 100 / multi_buff ) );
@@ -176,11 +176,11 @@ static int countdown( const char * msg, int row, int timeout )
 			updateVRAM();
 		}
 
-    }
+	}
 
-    flushKeyboardBuffer();
+	flushKeyboardBuffer();
 
-    return ch;
+	return ch;
 }
 
 //==========================================================================
@@ -196,7 +196,8 @@ static void clearBootArgs(void)
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
 
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		clearGraphicBootPrompt();
 	}
 	execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
@@ -219,26 +220,37 @@ static void showBootPrompt(int row, bool visible)
 	extern char bootPrompt[];
 	extern char bootRescanPrompt[];
 
-	if( bootArgs->Video.v_display == VGA_TEXT_MODE ) {
-		changeCursor( 0, row, kCursorTypeUnderline, 0 );    
+	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+	{
+		changeCursor( 0, row, kCursorTypeUnderline, 0 );
 		clearScreenRows( row, kScreenLastRow );
 	}
 
 	clearBootArgs();
 
-	if (visible) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			if (gEnableCDROMRescan) {
+	if (visible)
+	{
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			if (gEnableCDROMRescan)
+			{
 				printf( bootRescanPrompt );
-			} else {
+			}
+			else
+			{
 				printf( bootPrompt );
 				printf( gBootArgs );
 			}
 		}
-	} else {
-		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	}
+	else
+	{
+		if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+		{
 			clearGraphicBootPrompt();
-		} else {
+		}
+		else
+		{
 			printf("Press Enter to start up the foreign OS. ");
 		}
 	}
@@ -267,29 +279,31 @@ static void updateBootArgs( int key )
 			x--;
 		}
 
-				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
-				{
-					setCursorPosition( x, y, 0 );
-					putca(' ', 0x07, 1);
-				}
+		if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+		{
+			setCursorPosition( x, y, 0 );
+			putca(' ', 0x07, 1);
+		}
                 else
-                {
-                    updateGraphicBootPrompt();
-                }
-            }
+		{
+			updateGraphicBootPrompt();
+		}
+	}
 			break;
 
         default:
-            if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
-            {
-                *gBootArgsPtr++ = key;
+		if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
+		{
+			*gBootArgsPtr++ = key;
 
-                if( bootArgs->Video.v_display != VGA_TEXT_MODE ) updateGraphicBootPrompt();
-                else if ( key >= ' ' && key < 0x7f) putchar(key);
-			}
-            
-			break;
-    }
+			if( bootArgs->Video.v_display != VGA_TEXT_MODE )
+				updateGraphicBootPrompt();
+			else if ( key >= ' ' && key < 0x7f)
+				putchar(key);
+		}
+
+		break;
+	}
 }
 
 //==========================================================================
@@ -361,11 +375,11 @@ static void showMenu( const MenuItem * items, int count,
 	// Draw the visible items.
 
 	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
-	
+
 		drawDeviceList(gMenuStart, gMenuEnd, gMenuSelection);
 
 	else {
-		
+
 		changeCursor( 0, row, kCursorTypeHidden, &cursorState );
 
 		for ( i = gMenuTop; i <= gMenuBottom; i++ )
@@ -374,7 +388,7 @@ static void showMenu( const MenuItem * items, int count,
 		}
 
 		restoreCursor( &cursorState );
-    }
+	}
 }
 
 //==========================================================================

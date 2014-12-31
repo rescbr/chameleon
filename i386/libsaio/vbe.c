@@ -116,6 +116,8 @@ int setVBEDACFormat(unsigned char format)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 /*
  * Default GTF parameter values.
  */
@@ -152,6 +154,8 @@ double Sqrt( double y )
 	x = (1.5*x) - (x*x)*(x*z);
 	return x*y;
 }
+
+//==============================================================================
 
 int generateCRTCTiming( unsigned short     width,
                         unsigned short     height,
@@ -260,6 +264,8 @@ int generateCRTCTiming( unsigned short     width,
     return 0;
 }
 
+//==============================================================================
+
 int setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
 {
     bb.intno  = 0x10;
@@ -272,6 +278,8 @@ int setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
     bios(&bb);
     return(bb.eax.r.h);
 }
+
+//==============================================================================
 
 int setVBEPalette(void *palette)
 {
@@ -286,6 +294,8 @@ int setVBEPalette(void *palette)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 int getVBEPalette(void *palette)
 {
     bb.intno = 0x10;
@@ -299,6 +309,8 @@ int getVBEPalette(void *palette)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 int getVBECurrentMode(unsigned short *mode)
 {
     bb.intno = 0x10;
@@ -307,6 +319,8 @@ int getVBECurrentMode(unsigned short *mode)
     *mode = bb.ebx.rr;
     return(bb.eax.r.h);
 }
+
+//==============================================================================
 
 int getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
 {

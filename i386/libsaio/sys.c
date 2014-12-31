@@ -44,20 +44,15 @@
  * where everything is defaulted
  * Add routine, ptol(), to parse partition letters.
  *
- */
- 
-/*
  * Copyright (c) 1982, 1986 Regents of the University of California.
  * All rights reserved.  The Berkeley software License Agreement
  * specifies the terms and conditions for redistribution.
  *
  *	@(#)sys.c	7.1 (Berkeley) 6/5/86
+ *
+ * Copyright 2007 VMware Inc. "Preboot" ramdisk support added by David Elliott
+ *
  */
-
-/*  Copyright 2007 VMware Inc.
-    "Preboot" ramdisk support added by David Elliott
- */
-
 
 #include "libsaio.h"
 #include "boot.h"
@@ -88,7 +83,8 @@ extern int multiboot_partition_set;
 extern int multiboot_skip_partition;
 extern int multiboot_skip_partition_set;
 
-struct devsw {
+struct devsw
+{
 	const char *  name;
 	// size increased from char to short to handle non-BIOS internal devices
 	unsigned short biosdev;
@@ -120,6 +116,11 @@ static struct iob iob[NFILES];
 
 void * gFSLoadAddress = 0;
 
+#define LP '('
+#define RP ')'
+
+int gBIOSDev;
+
 // Turbo - save what we think is our original BIOS boot volume if we have one 0xab
 BVRef gBIOSBootVolume = NULL;
 BVRef gBootVolume;
@@ -129,30 +130,30 @@ static BVRef newBootVolumeRef( int biosdev, int partno );
 
 //==========================================================================
 // LoadVolumeFile - LOW-LEVEL FILESYSTEM FUNCTION.
-//            Load the specified file from the specified volume
-//            to the load buffer at LOAD_ADDR.
-//            If the file is fat, load only the i386 portion.
+// Load the specified file from the specified volume
+// to the load buffer at LOAD_ADDR.
+// If the file is fat, load only the i386 portion.
 
 long LoadVolumeFile(BVRef bvr, const char *filePath)
 {
-    long         fileSize;
+	long fileSize;
 
-    // Read file into load buffer. The data in the load buffer will be
-    // overwritten by the next LoadFile() call.
+	// Read file into load buffer. The data in the load buffer will be
+	// overwritten by the next LoadFile() call.
 
-    gFSLoadAddress = (void *) LOAD_ADDR;
+	gFSLoadAddress = (void *) LOAD_ADDR;
 
-    fileSize = bvr->fs_loadfile(bvr, (char *)filePath);
+	fileSize = bvr->fs_loadfile(bvr, (char *)filePath);
 
-    // Return the size of the file, or -1 if load failed.
+	// Return the size of the file, or -1 if load failed.
 
-    return fileSize;
+	return fileSize;
 }
 
 //==========================================================================
 // LoadFile - LOW-LEVEL FILESYSTEM FUNCTION.
-//            Load the specified file to the load buffer at LOAD_ADDR.
-//            If the file is fat, load only the i386 portion.
+// Load the specified file to the load buffer at LOAD_ADDR.
+// If the file is fat, load only the i386 portion.
 
 long LoadFile(const char * fileSpec)
 {
@@ -193,10 +194,11 @@ long ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint
 
 long LoadThinFatFile(const char *fileSpec, void **binary)
 {
-	const char	*filePath;
+	const char	*filePath = "";
 	FSReadFile	readFile;
 	BVRef		bvr;
-	unsigned long length, length2;
+	unsigned long	length;
+	unsigned long	length2;
 
 	// Resolve the boot volume from the file spec.
 
@@ -206,14 +208,14 @@ long LoadThinFatFile(const char *fileSpec, void **binary)
 	}
 
 	*binary = (void *)kLoadAddr;
-  
+
 	// Read file into load buffer. The data in the load buffer will be
 	// overwritten by the next LoadFile() call.
 
 	gFSLoadAddress = (void *) LOAD_ADDR;
 
 	readFile = bvr->fs_readfile;
-  
+
 	if (readFile != NULL)
 	{
 		// Read the first 4096 bytes (fat header)
@@ -274,7 +276,8 @@ long GetFSUUID(char *spec, char *uuidStr)
 		return -1;
 	}
 
-	if(bvr->fs_getuuid) {
+	if(bvr->fs_getuuid)
+	{
 		rval = bvr->fs_getuuid(bvr, uuidStr);
 	}
 
@@ -282,35 +285,37 @@ long GetFSUUID(char *spec, char *uuidStr)
 }
 #endif
 
+//==========================================================================
+
 // filesystem-specific getUUID functions call this shared string generator
 
 long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 {
-    unsigned  fmtbase, fmtidx, i;
-    uint8_t   uuidfmt[] = { 4, 2, 2, 2, 6 };
-    char     *p = uuidStr;
-    MD5_CTX   md5c;
-    uint8_t   mdresult[16];
+	unsigned	fmtbase, fmtidx, i;
+	uint8_t		uuidfmt[] = { 4, 2, 2, 2, 6 };
+	char		*p = uuidStr;
+	MD5_CTX		md5c;
+	uint8_t		mdresult[16];
 
-    bzero(mdresult, sizeof(mdresult));
+	bzero(mdresult, sizeof(mdresult));
 
-    // just like AppleFileSystemDriver
-    MD5Init(&md5c);
-    MD5Update(&md5c, kFSUUIDNamespaceSHA1, sizeof(kFSUUIDNamespaceSHA1));
-    MD5Update(&md5c, uubytes, nbytes);
-    MD5Final(mdresult, &md5c);
+	// just like AppleFileSystemDriver
+	MD5Init(&md5c);
+	MD5Update(&md5c, kFSUUIDNamespaceSHA1, sizeof(kFSUUIDNamespaceSHA1));
+	MD5Update(&md5c, uubytes, nbytes);
+	MD5Final(mdresult, &md5c);
 
-    // this UUID has been made version 3 style (i.e. via namespace)
-    // see "-uuid-urn-" IETF draft (which otherwise copies byte for byte)
-    mdresult[6] = 0x30 | ( mdresult[6] & 0x0F );
-    mdresult[8] = 0x80 | ( mdresult[8] & 0x3F );
+	// this UUID has been made version 3 style (i.e. via namespace)
+	// see "-uuid-urn-" IETF draft (which otherwise copies byte for byte)
+	mdresult[6] = 0x30 | ( mdresult[6] & 0x0F );
+	mdresult[8] = 0x80 | ( mdresult[8] & 0x3F );
 
 
-    // generate the text: e.g. 5EB1869F-C4FA-3502-BDEB-3B8ED5D87292
+	// generate the text: e.g. 5EB1869F-C4FA-3502-BDEB-3B8ED5D87292
 	i = 0;
 	fmtbase = 0;
 
-	for(fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++)
+	for (fmtidx = 0; fmtidx < sizeof(uuidfmt); fmtidx++)
 	{
 		for (i = 0; i < uuidfmt[fmtidx]; i++)
 		{
@@ -354,13 +359,12 @@ long CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr)
 
 //==========================================================================
 // GetDirEntry - LOW-LEVEL FILESYSTEM FUNCTION.
-//               Fetch the next directory entry for the given directory.
+// Fetch the next directory entry for the given directory.
 
-long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name, 
-                 long * flags, u_int32_t * time)
+long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name, long * flags, u_int32_t * time)
 {
-	const char * dirPath;
-	BVRef        bvr;
+	const char	*dirPath;
+	BVRef		bvr;
 
 	// Resolve the boot volume from the dir spec.
 
@@ -379,12 +383,11 @@ long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name,
 
 //==========================================================================
 // GetFileInfo - LOW-LEVEL FILESYSTEM FUNCTION.
-//               Get attributes for the specified file.
+// Get attributes for the specified file.
 
 static char* gMakeDirSpec;
 
-long GetFileInfo(const char * dirSpec, const char * name,
-                 long * flags, u_int32_t * time)
+long GetFileInfo(const char * dirSpec, const char * name, long * flags, u_int32_t * time)
 {
 	long long index = 0;
 	const char * entryName;
@@ -394,18 +397,26 @@ long GetFileInfo(const char * dirSpec, const char * name,
 		gMakeDirSpec = (char *)malloc(1024);
 	}
 
-	if (!dirSpec) {
-		long       idx, len;
-
+	if (!dirSpec)
+	{
+		long	idx;
+		long	len;
 		len = strlen(name);
 
 		for (idx = len; idx && (name[idx] != '/' && name[idx] != '\\'); idx--) {}
-		if (idx == 0) {
-			if(name[idx] == '/' || name[idx] == '\\') ++name;   // todo: ensure other functions handel \ properly
+
+		if (idx == 0)
+		{
+			if(name[idx] == '/' || name[idx] == '\\')
+			{
+				++name;   // todo: ensure other functions handel \ properly
+			}
 			gMakeDirSpec[0] = '/';
 			gMakeDirSpec[1] = '\0';
 			gMakeDirSpec[idx] = '\0';
-		} else {
+		}
+		else
+		{
 			idx++;
 			strncpy(gMakeDirSpec, name, idx);
 			gMakeDirSpec[idx] = '\0'; // ISSUE: http://forge.voodooprojects.org/p/chameleon/issues/270/
@@ -435,7 +446,8 @@ long GetFileBlock(const char *fileSpec, unsigned long long *firstBlock)
 
 	// Resolve the boot volume from the file spec.
 
-	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL) {
+	if ((bvr = getBootVolumeRef(fileSpec, &filePath)) == NULL)
+	{
 		// printf("Boot volume for '%s' is bogus\n", fileSpec);
 		return -1;
 	}
@@ -514,7 +526,8 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 	int		fdesc;
 	int		i;
 
-	if (bvr == NULL) {
+	if (bvr == NULL)
+	{
 		return -1;
 	}
 
@@ -527,17 +540,21 @@ static int open_bvr(BVRef bvr, const char *filePath, int flags)
 
 	// Find the next available memory block in the download buffer.
 	io->i_buf = (char *) LOAD_ADDR;
-	for (i = 0; i < NFILES; i++) {
-		if ((iob[i].i_flgs != F_ALLOC) || (i == fdesc)) {
+	for (i = 0; i < NFILES; i++)
+	{
+		if ((iob[i].i_flgs != F_ALLOC) || (i == fdesc))
+		{
 			continue;
 		}
+
 		io->i_buf = MAX(iob[i].i_filesize + iob[i].i_buf, io->i_buf);
 	}
 
 	// Load entire file into memory. Unnecessary open() calls must be avoided.
 	gFSLoadAddress = io->i_buf;
 	io->i_filesize = bvr->fs_loadfile(bvr, (char *)filePath);
-	if (io->i_filesize < 0) {
+	if (io->i_filesize < 0)
+	{
 		close(fdesc);
 		return -1;
 	}
@@ -557,15 +574,16 @@ int open(const char *path, int flags)
 	return -1;
 }
 
+//==========================================================================
 int open_bvdev(const char *bvd, const char *path, int flags)
 {
 	const struct devsw	*dp;
-	const char			*cp;
-	BVRef				bvr;
-	int					i;
-	int					len;
-	int					unit;
-	int					partition;
+	const char		*cp;
+	BVRef			bvr;
+	int			i;
+	int			len;
+	int			unit;
+	int			partition;
 
 	if ((i = open(path, flags)) >= 0)
 	{
@@ -629,7 +647,7 @@ int close(int fdesc)
 
 //==========================================================================
 // lseek() - Reposition the byte offset of the file descriptor from the
-//           beginning of the file. Returns the relocated offset.
+// beginning of the file. Returns the relocated offset.
 
 int b_lseek(int fdesc, int offset, int ptr)
 {
@@ -662,21 +680,24 @@ int tell(int fdesc)
 
 //==========================================================================
 // read() - Read up to 'count' bytes of data from the file descriptor
-//          into the buffer pointed to by buf.
+// into the buffer pointed to by buf.
 
 int read(int fdesc, char * buf, int count)
 {
 	struct iob * io;
 
-	if ((io = iob_from_fdesc(fdesc)) == NULL) {
+	if ((io = iob_from_fdesc(fdesc)) == NULL)
+	{
 		return (-1);
 	}
 
-	if ((io->i_offset + count) > (unsigned int)io->i_filesize) {
+	if ((io->i_offset + count) > (unsigned int)io->i_filesize)
+	{
 		count = io->i_filesize - io->i_offset;
 	}
 
-	if (count <= 0) {
+	if (count <= 0)
+	{
 		return 0;  // end of file
 	}
 
@@ -694,52 +715,56 @@ int read(int fdesc, char * buf, int count)
 int write(int fdesc, const char * buf, int count)
 {
     struct iob * io;
-    
+
     if ((io = iob_from_fdesc(fdesc)) == NULL)
         return (-1);
-	
+
     if ((io->i_offset + count) > (unsigned int)io->i_filesize)
         count = io->i_filesize - io->i_offset;
-	
+
     if (count <= 0)
         return 0;  // end of file
-	
+
     bcopy(buf, io->i_buf + io->i_offset, count);
-	
+
     io->i_offset += count;
-	
+
     return count;
 }
 
+//==========================================================================
+
 int writebyte(int fdesc, char value)
 {
-    struct iob * io;
-    
-    if ((io = iob_from_fdesc(fdesc)) == NULL)
+	struct iob * io;
+
+	if ((io = iob_from_fdesc(fdesc)) == NULL)
         return (-1);
-	
+
     if ((io->i_offset + 1) > (unsigned int)io->i_filesize)
         return 0;  // end of file
-	
+
     io->i_buf[io->i_offset++] = value;
-	
+
     return 1;
 }
+
+//==========================================================================
 
 int writeint(int fdesc, int value)
 {
     struct iob * io;
-    
+
     if ((io = iob_from_fdesc(fdesc)) == NULL)
         return (-1);
-	
+
     if ((io->i_offset + 4) > (unsigned int)io->i_filesize)
         return 0;  // end of file
-	
+
     bcopy(&value, io->i_buf + io->i_offset, 4);
-	
+
     io->i_offset += 4;
-	
+
     return 4;
 }
 
@@ -751,7 +776,8 @@ int file_size(int fdesc)
 {
 	struct iob * io;
 
-	if ((io = iob_from_fdesc(fdesc)) == 0) {
+	if ((io = iob_from_fdesc(fdesc)) == 0)
+	{
 		return 0;
 	}
 
@@ -791,45 +817,47 @@ struct dirstuff * opendir(const char * path)
 	const char *      dirPath;
 	BVRef             bvr;
 
-    if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
-        goto error;
+	if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
+		goto error;
 
-    dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
-    if (dirp == NULL)
-        goto error;
+	dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
+	if (dirp == NULL)
+		goto error;
 
-    dirp->dir_path = newString(dirPath);
-    if (dirp->dir_path == NULL)
-        goto error;
+	dirp->dir_path = newString(dirPath);
+	if (dirp->dir_path == NULL)
+		goto error;
 
-    dirp->dir_bvr = bvr;
+	dirp->dir_bvr = bvr;
 
     return dirp;
 
 error:
-    closedir(dirp);
-    return NULL;
+	closedir(dirp);
+
+	return NULL;
 }
 
 //==========================================================================
 
 int closedir(struct dirstuff * dirp)
 {
-	if (dirp) {
-		if (dirp->dir_path) {
+	if (dirp)
+	{
+		if (dirp->dir_path)
+		{
 			free(dirp->dir_path);
 		}
 
 		free(dirp);
 	}
 
-    return 0;
+	return 0;
 }
 
 //==========================================================================
 
-int readdir(struct dirstuff * dirp, const char ** name, long * flags,
-	u_int32_t * time)
+int readdir(struct dirstuff * dirp, const char ** name, long * flags, u_int32_t * time)
 {
 	return dirp->dir_bvr->fs_getdirentry(dirp->dir_bvr,
 		/* dirPath */   dirp->dir_path,
@@ -839,8 +867,7 @@ int readdir(struct dirstuff * dirp, const char ** name, long * flags,
 
 //==========================================================================
 
-int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
-	u_int32_t * time, FinderInfo *finderInfo, long *infoValid)
+int readdir_ext(struct dirstuff * dirp, const char ** name, long * flags, u_int32_t * time, FinderInfo *finderInfo, long *infoValid)
 {
 	return dirp->dir_bvr->fs_getdirentry( dirp->dir_bvr,
 			/* dirPath */   dirp->dir_path,
@@ -920,7 +947,7 @@ BVRef selectBootVolume( BVRef chain )
 	{
 		filteredChain = true;
 	}
-	
+
 	if (multiboot_partition_set)
 	{
 		for ( bvr = chain; bvr; bvr = bvr->next )
@@ -966,6 +993,7 @@ BVRef selectBootVolume( BVRef chain )
 				continue;
 			}
 		}
+
 		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
 		{
 			foundPrimary = true;
@@ -1008,18 +1036,15 @@ BVRef selectBootVolume( BVRef chain )
 			}
 		}
 	}
-	
+
 	bvr = bvr2 ? bvr2 :
 	bvr1 ? bvr1 : chain;
-	
+
 	return bvr;
 }
 
 //==========================================================================
 
-#define LP '('
-#define RP ')'
-int gBIOSDev;
 
 /*!
     This is like boot2's gBootVolume except it is for the internal use of
@@ -1027,6 +1052,8 @@ int gBIOSDev;
     This replaces bootInfo->kernDev as the carrier of this information.
  */
 static BVRef gRootVolume;
+
+//==========================================================================
 
 void setRootVolume(BVRef volume)
 {
@@ -1038,6 +1065,8 @@ void setRootVolume(BVRef volume)
 		gRootVolume = NULL;
 	}
 }
+
+//==========================================================================
 
 void setBootGlobals(BVRef chain)
 {
@@ -1053,6 +1082,7 @@ void setBootGlobals(BVRef chain)
 	setRootVolume(gBootVolume);
 }
 
+//==========================================================================
 /*!
     Extracts the volume selector from the pathname, returns the selected
     BVRef, and sets *outPath to the remainder of the path.
@@ -1063,20 +1093,22 @@ void setBootGlobals(BVRef chain)
  */
 BVRef getBootVolumeRef( const char * path, const char ** outPath )
 {
-    const char * cp;
-    BVRef bvr = gRootVolume;
-    int          biosdev = gBIOSDev;
+	const char	*cp;
+	BVRef bvr	= gRootVolume;
+	int biosdev	= gBIOSDev;
 
-    // Search for left parenthesis in the path specification.
+	// Search for left parenthesis in the path specification.
 
-	for (cp = path; *cp; cp++) {
+	for (cp = path; *cp; cp++)
+	{
 		if (*cp == LP || *cp == '/')
 		{
 			break;
 		}
 	}
 
-	if (*cp != LP) { // no left paren found
+	if (*cp != LP)  // no left paren found
+	{
 		cp = path;
 		// Path is using the implicit current device so if there is
 		// no current device, then we must fail.
@@ -1084,7 +1116,9 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 		{
 			return NULL;
 		}
-	} else if ((cp - path) == 2) { // found "xx("
+	}
+	else if ((cp - path) == 2)  // found "xx("
+	{
 		const struct devsw * dp;
 		const char * xp = path;
 
@@ -1109,7 +1143,7 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 			error("Unknown device '%c%c'\n", xp[0], xp[1]);
 			return NULL;
 		}
-        
+
 		// Extract the optional unit number from the specification.
 		// hd(unit) or hd(unit, part).
 
@@ -1227,6 +1261,7 @@ static BVRef newBootVolumeRef( int biosdev, int partno )
 			}
 
 			bvr1 = bvr;
+
 			if ( bvr->part_no == partno )
 			{
 				break;
@@ -1247,7 +1282,7 @@ int getDeviceDescription(BVRef bvr, char *str)
 	{
 		return 0;
 	}
-    
+
 	*str = '\0';
 
 	if (bvr)
@@ -1263,6 +1298,8 @@ int getDeviceDescription(BVRef bvr, char *str)
 			return sprintf(str, "%s(%d,%d)", dp->name, bvr->biosdev - dp->biosdev, bvr->part_no);
 		}
 	}
-	
+
 	return 0;
 }
+
+//==========================================================================
