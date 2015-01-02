@@ -28,6 +28,8 @@ boot2 (On the partition's root directory) for loading kernel etc.";
 "noboot_title" = "Don't install the Bootloader";
 "noboot_description" = "Useful if you only want to install the extra's.";
 
+"EFI_title" = "Install Chameleon in the ESP";
+"EFI_description" = "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system.";
 
 // ============================================================================
 // Modules
@@ -121,13 +123,28 @@ Dependencies: none";
 "Wait_title" = "Wait=Yes";
 "Wait_description" = "Pauses the boot process after Chameleon has finished it's setup then waits for a key press before it starts the mach kernel. Useful when combined with verbose boot for troubleshooting.";
 
+"PrivateData_title" = "PrivateData=No";
+"PrivateData_description" = "Show masked data (serial number) in bdmesg log (enbaled by default).";
+
 // ----------------------------------------------------------------------------
 
-"arch_title" = "arch=i386";
-"arch_description" = "Boots the kernel in 32bit mode rather than the default 64bit mode.";
+"USBBusFix_title" = "USBBusFix=Yes";
+"USBBusFix_description" = "Enable the XHCI, EHCI and UHCI fixes (disabled by default).";
+
+"USBLegacyOff_title" = "USBLegacyOff=Yes";
+"USBLegacyOff_description" = "Force USB Legacy off for XHCI and EHCI (disabled by default).";
+
+"XHCILegacyOff_title" = "XHCILegacyOff=Yes";
+"XHCILegacyOff_description" = "Force USB Legacy off for XHCI (disabled by default).";
+
+"UHCIreset_title" = "UHCIreset=Yes";
+"UHCIreset_description" = "Enables the option to reset UHCI controllers before starting OS X.";
 
 "EHCIacquire_title" = "EHCIacquire=Yes";
 "EHCIacquire_description" = "Enables the option to fix any EHCI ownership issues due to bad bioses.";
+
+"arch_title" = "arch=i386";
+"arch_description" = "Boots the kernel in 32bit mode rather than the default 64bit mode.";
 
 "EthernetBuiltIn_title" = "EthernetBuiltIn=Yes";
 "EthernetBuiltIn_description" = "Enables the option of adding 'built-in' to your ethernet devices.";
@@ -146,9 +163,6 @@ Dependencies: none";
 
 "RestartFix_title" = "RestartFix=No";
 "RestartFix_description" = "Disables the automatically enabled restart fix.";
-
-"UHCIreset_title" = "UHCIreset=Yes";
-"UHCIreset_description" = "Enables the option to reset UHCI controllers before starting OS X.";
 
 "UseMemDetect_title" = "UseMemDetect=No";
 "UseMemDetect_description" = "Disables the automatically enabled RAM recognition.";
@@ -742,7 +756,10 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 "Keymaps_title" = "KeyLayout";
 "Keymaps_description" = "Select one keylayout to use. This will also install the Keylayout module and keymaps.";
 
+// ============================================================================
 // Themes
+// ----------------------------------------------------------------------------
+
 "Themes_title" = "Themes";
 "Themes_description" = "A collection of sample themes
 More themes can be found at http://forum.voodooprojects.org/index.php/board,7.0.html";

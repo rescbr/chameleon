@@ -179,15 +179,6 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 		}
 		fi
 # -
-		if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
-		{
-			mkdir -p ${1}/AutoReso/Root
-			ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
-			echo "	[BUILD] Resolution "
-			buildpackage "${1}/AutoReso" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
-		}
-		fi
-# -
 		if [ -e ${1%/*}/i386/modules/uClibcxx.dylib ]; then
 		{
 			mkdir -p ${1}/uClibc/Root
@@ -195,6 +186,15 @@ outline[$((outlinecount++))]="${indent[$xmlindent]}<choices-outline>"
 			ditto --noextattr --noqtn ${1%/*}/i386/modules/klibc.dylib ${1}/uClibc/Root
 			echo "	[BUILD] uClibc++ "
 			buildpackage "${1}/uClibc" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
+		}
+		fi
+# -
+		if [ -e ${1%/*}/i386/modules/Resolution.dylib ]; then
+		{
+			mkdir -p ${1}/AutoReso/Root
+			ditto --noextattr --noqtn ${1%/*}/i386/modules/Resolution.dylib ${1}/AutoReso/Root
+			echo "	[BUILD] Resolution "
+			buildpackage "${1}/AutoReso" "/$chamTemp/Extra/modules" "" "start_selected=\"false\"" >/dev/null 2>&1
 		}
 		fi
 # -
@@ -367,6 +367,9 @@ makedistribution ()
 	popd >/dev/null
 
 #   Here is the place for assign a Icon to the pkg
+#   command use to generate the file:
+#   ditto -c -k --sequesterRsrc --keepParent Icon.icns Icon.zip
+# ----
     ditto -xk "${pkgroot}/Icons/pkg.zip" "${pkgroot}/Icons/"
     DeRez -only icns "${pkgroot}/Icons/Icons/pkg.icns" > tempicns.rsrc
     Rez -append tempicns.rsrc -o "${1%/*}/$packagename-${version}-r$revision.pkg"
