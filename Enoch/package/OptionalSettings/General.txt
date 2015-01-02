@@ -34,6 +34,7 @@ Bool@ForceWake:ForceWake=Yes
 Bool@ForceFullMemInfo:ForceFullMemInfo=Yes
 Bool@RestartFix:RestartFix=No
 Bool@UHCIreset:UHCIreset=Yes
+Bool@XHCILegacyOff:XHCILegacyOff=Yes
 Bool@UseMemDetect:UseMemDetect=No
 Bool@UseKernelCache:UseKernelCache=Yes
 Bool@Wake:Wake=Yes

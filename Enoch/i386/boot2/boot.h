@@ -119,6 +119,9 @@
 #define kEHCIhard		"EHCIhard"		/* usb.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
 
+/* Zenith432: added this */
+#define kXHCILegacyOff		"XHCILegacyOff"		/* usb.c */
+
 /* Duvel300: added this */
 #define kRestartFix		"RestartFix"		/* acpi_patcher.c */
 
@@ -182,8 +185,8 @@
 #define kEnableHDMIAudio	"EnableHDMIAudio"	/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
-#define kRebootOnPanic		"RebootOnPanic"
-#define kEnableHiDPI		"EnableHiDPI"		/* enable High resolution display (aka Retina) */
+//#define kRebootOnPanic		"RebootOnPanic"
+//#define kEnableHiDPI		"EnableHiDPI"		/* enable High resolution display (aka Retina) */
 
 /* ErmaC: added these keys */
 #define kEnableDualLink		"EnableDualLink"	/* ati.c && nvidia.c && gma.c*/
@@ -191,7 +194,7 @@
 #define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
 #define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
 #define kSkipAtiGfx		"SkipAtiGfx"		/* pci_setup.c */
-#define kUsbInject		"USBInject"		/* usb.c */
+//#define kUsbInject		"USBInject"		/* usb.c */
 #define kIntelCapriFB		"IntelCapriFB"		/* gma.c was HD4K-ig */
 #define kIntelAzulFB		"IntelAzulFB"		/* gma.c was HD5K-ig */
 #define kAAPLCustomIG		"InjectIntel-ig"	/* gma.c */

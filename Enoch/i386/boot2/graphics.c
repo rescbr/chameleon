@@ -1266,10 +1266,10 @@ int getVideoMode(void)
 // Display and clear the activity indicator.
 
 // BASIC Indicator
-static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
+//static char indicator[] = {'-', '\\', '|', '/', '\0'};
 
 // Bouncing ball .oOo.
-//static char indicator[] = {46, 111, 79, 248, 79, 111, '\0'};
+static char indicator[] = {46, 111, 79, 248, 79, 111, '\0'};
 
 // ┤┘┴└├┌┬┐
 //static char indicator[] = {180, 217, 193, 192, 195, 218, 194, 191, '\0'};

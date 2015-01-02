@@ -18,13 +18,13 @@ extern pci_dt_t *dram_controller_dev;
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
-	bool doit, do_eth_devprop, do_wifi_devprop, do_usb_devprop, do_gfx_devprop, do_enable_hpet, do_hda_devprop = false;
+	bool doit, do_eth_devprop, do_wifi_devprop, /*do_usb_devprop,*/ do_gfx_devprop, do_enable_hpet, do_hda_devprop = false;
 	pci_dt_t *current = pci_dt;
 
 	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kEnableWifi, &do_wifi_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
-	getBoolForKey(kUsbInject, &do_usb_devprop, &bootInfo->chameleonConfig);
+//	getBoolForKey(kUsbInject, &do_usb_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kHDAEnabler, &do_hda_devprop, &bootInfo->chameleonConfig);
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
