@@ -143,6 +143,8 @@
 #define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
 #define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
 #define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
+#define kEnableC6State		"EnableC6State"		/* acpi_patcher.c */
+#define kEnableC7State		"EnableC7State"		/* acpi_patcher.c */
 
 /* valv: added these keys */
 #define kbusratio		"busratio"		/* cpu.c */
