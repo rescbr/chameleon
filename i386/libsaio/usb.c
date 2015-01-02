@@ -31,9 +31,10 @@ struct pciList
 
 struct pciList* usbList = NULL;
 
-int legacy_off (pci_dt_t *pci_dev);
-int ehci_acquire (pci_dt_t *pci_dev);
-int uhci_reset (pci_dt_t *pci_dev);
+static int legacy_off (pci_dt_t *pci_dev);
+static int ehci_acquire (pci_dt_t *pci_dev);
+static int uhci_reset (pci_dt_t *pci_dev);
+static int xhci_legacy_off(pci_dt_t *pci_dev);
 
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
@@ -64,15 +65,16 @@ void notify_usb_dev(pci_dt_t *pci_dev)
 int usb_loop()
 {
 	int retVal = 1;
-	bool fix_ehci, fix_uhci, fix_usb, fix_legacy;
-	fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
+	bool fix_xhci, fix_ehci, fix_uhci, fix_usb, fix_legacy;
+	fix_xhci = fix_ehci = fix_uhci = fix_usb = fix_legacy = false;
 	
 	if (getBoolForKey(kUSBBusFix, &fix_usb, &bootInfo->chameleonConfig))
 	{
-		fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
+		fix_xhci = fix_ehci = fix_uhci = fix_legacy = fix_usb;	// Disable all if none set
 	}
 	else 
 	{
+		getBoolForKey(kXHCILegacyOff, &fix_xhci, &bootInfo->chameleonConfig);
 		getBoolForKey(kEHCIacquire, &fix_ehci, &bootInfo->chameleonConfig);
 		getBoolForKey(kUHCIreset, &fix_uhci, &bootInfo->chameleonConfig);
 		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->chameleonConfig);
@@ -84,15 +86,20 @@ int usb_loop()
 	{
 		switch (pci_config_read8(current->pciDev->dev.addr, PCI_CLASS_PROG))
 		{
+			// XHCI
+			case PCI_IF_XHCI:
+				if(fix_xhci || fix_legacy) retVal &= xhci_legacy_off(current->pciDev);
+				break;
+
 			// EHCI
-			case 0x20:
+			case PCI_IF_EHCI:
 		    	if(fix_ehci)   retVal &= ehci_acquire(current->pciDev);
 		    	if(fix_legacy) retVal &= legacy_off(current->pciDev);
 				
 				break;
 				
 			// UHCI
-			case 0x00:
+			case PCI_IF_UHCI:
 				if (fix_uhci) retVal &= uhci_reset(current->pciDev);
 
 				break;
@@ -103,7 +110,7 @@ int usb_loop()
 	return retVal;
 }
 
-int legacy_off (pci_dt_t *pci_dev)
+static int legacy_off (pci_dt_t *pci_dev)
 {
 	// Set usb legacy off modification by Signal64
 	// NOTE: This *must* be called after the last file is loaded from the drive in the event that we are booting form usb.
@@ -197,7 +204,7 @@ int legacy_off (pci_dt_t *pci_dev)
 	return 1;
 }
 
-int ehci_acquire (pci_dt_t *pci_dev)
+static int ehci_acquire (pci_dt_t *pci_dev)
 {
 	int		j, k;
 	uint32_t	base;
@@ -321,7 +328,7 @@ int ehci_acquire (pci_dt_t *pci_dev)
 	return 1;
 }
 
-int uhci_reset (pci_dt_t *pci_dev)
+static int uhci_reset (pci_dt_t *pci_dev)
 {
 	uint32_t base, port_base;
 	
@@ -340,5 +347,99 @@ int uhci_reset (pci_dt_t *pci_dev)
 	outw (port_base+4,0);
 	delay(10);
 	outw (port_base,0);
+	return 1;
+}
+
+static int xhci_legacy_off(pci_dt_t *pci_dev)
+{
+	uint32_t bar0, hccparams1, extendCap, value;
+	int32_t timeOut;
+
+	verbose("Setting Legacy USB Off on xHC [%04x:%04x] at %02x:%2x.%x\n",
+			pci_dev->vendor_id, pci_dev->device_id,
+			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
+
+	bar0 = pci_config_read32(pci_dev->dev.addr, 16);
+	/*
+	 * Check if memory bar
+	 */
+	if (bar0 & 1)
+	{
+		DBG("%s: BAR0 not a memory range\n", __FUNCTION__);
+		return 0;
+	}
+	/*
+	 * Check if outside 32-bit physical address space
+	 */
+	if (((bar0 & 6) == 4) &&
+		pci_config_read32(pci_dev->dev.addr, 20))
+	{
+		DBG("%s: BAR0 outside 32-bit physical address space\n", __FUNCTION__);
+		return 0;
+	}
+	bar0 &= ~15;
+
+	hccparams1 = *(uint32_t const volatile*) (bar0 + 16);
+	if (hccparams1 == ~0)
+	{
+		DBG("%s: hccparams1 invalid 0x%x\n", __FUNCTION__, hccparams1);
+		return 0;
+	}
+	extendCap = (hccparams1 >> 14) & 0x3fffc;
+	while (extendCap) {
+		value = *(uint32_t const volatile*) (bar0 + extendCap);
+		if (value == ~0)
+		{
+			break;
+		}
+		if ((value & 0xff) == 1) {
+#if DEBUG_USB
+			verbose("%s: Found USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
+					value, *(uint32_t const volatile*) (bar0 + extendCap + 4));
+#endif
+			value |= (1 << 24);
+			*(uint32_t volatile*) (bar0 + extendCap) = value;
+			timeOut = 40;
+			while (timeOut--)
+			{
+				delay(1);
+				value = *(uint32_t const volatile*) (bar0 + extendCap);
+				if (value == ~0)
+				{
+					timeOut = -1;
+					break;
+				}
+				if ((value & 0x01010000) == 0x01000000)
+				{
+					timeOut = -1;	/* Optional - always disable the SMI */
+					break;
+				}
+			}
+#if DEBUG_USB
+			verbose("%s: USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
+					value, *(uint32_t const volatile*) (bar0 + extendCap + 4));
+#endif
+			if (timeOut >= 0)
+			{
+				break;
+			}
+			/*
+			 * Disable the SMI in USBLEGCTLSTS if BIOS doesn't respond
+			 */
+			value = *(uint32_t const volatile*) (bar0 + extendCap + 4);
+			if (value == ~0)
+			{
+				break;
+			}
+			value &= 0x1f1fee;
+			value |= 0xe0000000;
+			*(uint32_t volatile*) (bar0 + extendCap + 4) = value;
+			break;
+		}
+		if (!(value & 0xff00))
+			break;
+		extendCap += ((value >> 6) & 0x3fc);
+	}
+	verbose("XHCI Legacy Off Done\n");
 	return 1;
 }

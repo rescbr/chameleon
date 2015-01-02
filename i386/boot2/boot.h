@@ -119,6 +119,9 @@
 #define kEHCIhard		"EHCIhard"		/* usb.c */
 #define kDefaultPartition	"Default Partition"	/* sys.c */
 
+/* Zenith432: added this */
+#define kXHCILegacyOff		"XHCILegacyOff"		/* usb.c */
+
 /* Duvel300: added this */
 #define kRestartFix		"RestartFix"		/* acpi_patcher.c */
 
