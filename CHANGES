@@ -1,3 +1,15 @@
+- meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
+		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
+- ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name
+- ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
+- ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
+- ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
+- bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
+- bitshoveler : CacheInit(), CacheRead() prototypes: use u_int32_t instead of long where appropriate (saio_internal.h)
+- bitshoveler : Improved defensiveness against malloc failure (disk.c)
+- bitshoveler : Use u_int32_t instead of long where appropriate (cache.c)
+- bitshoveler : Make some constant arrays static; other minor fixes (acpi_patcher.c)
+- bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
 - ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
@@ -12,7 +24,7 @@
 		Special thanks: Alex J, viv xix, zenith432 from http://forge.voodooprojects.org/p/chameleon/issues/375/
 		Testing and improvements: Pike R. Alpha, ErmaC, Bungo, blackosx, Micky1979, crazybirdy, oldnapalm, janek202, MinusZwei and Andy Vandijck.
 
-- Pike R. Alpha : dinamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- Pike R. Alpha : dynamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
 - ErmaC : getCPUTick() helper function ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
 - ErmaC : Add Yosemite Icons detection for chameleon UI
 - blackosx : Add chameleon UI Icons for Yosemite

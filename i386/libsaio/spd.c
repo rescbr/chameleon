@@ -272,7 +272,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev) {
 	RamSlotInfo_t*  slot;
 
 	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
-	DBG("SMBus CmdReg: 0x%x\n", cmd);
+	verbose("SMBus CmdReg: 0x%x\n", cmd);
 	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
 
 	mmio = pci_config_read32(smbus_dev->dev.addr, 0x10);// & ~0x0f;
@@ -291,7 +291,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev) {
 	for (i = 0; i <  MAX_RAM_SLOTS; i++) {
 		slot = &Platform.RAM.DIMM[i];
 		spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
-		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
+		verbose("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);
 		// Check spd is present
 		if (spd_size && (spd_size != 0xff)) {
 

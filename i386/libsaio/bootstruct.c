@@ -83,9 +83,9 @@ void initKernBootStruct( void )
 			// BIOS did not provide a memory map, systems with
 			// discontiguous memory or unusual memory hole locations
 			// may have problems.
-
-			bootInfo->convmem	= getConventionalMemorySize();
-			bootInfo->extmem	= getExtendedMemorySize();
+			
+			bootInfo->convmem = getConventionalMemorySize();
+			bootInfo->extmem  = getExtendedMemorySize();
 		}
 		
 		bootInfo->configEnd	   = bootInfo->config;
@@ -178,11 +178,10 @@ void finalizeBootStruct(void)
 				memoryMap->Type = kEfiReservedMemoryType;
 				break;
 		}
-
-		memoryMap->PhysicalStart	= range->base;
-		memoryMap->VirtualStart		= range->base;
-		memoryMap->NumberOfPages	= range->length >> I386_PGSHIFT;
-		memoryMap->Attribute		= 0;
+		memoryMap->PhysicalStart = range->base;
+		memoryMap->VirtualStart = range->base;
+		memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
+		memoryMap->Attribute = 0;
 	}
 
 	// copy bootFile into device tree
@@ -217,7 +216,7 @@ void finalizeBootStruct(void)
 
 	bootArgsPreLion->kaddr = bootArgs->kaddr;
 	bootArgsPreLion->ksize = bootArgs->ksize;
-
+	
 	bootArgsPreLion->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart;
 	bootArgsPreLion->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount;
 	bootArgsPreLion->efiSystemTable = bootArgs->efiSystemTable;

@@ -154,7 +154,7 @@ void build_pci_dt(void)
 
 #if DEBUG_PCI
 	dump_pci_dt(root_pci_dev->children);
-	pause();
+	pause("");
 #endif
 }
 

@@ -47,7 +47,7 @@ extern Node *gMemoryMapNode;
 /*
  * Maximum number of boot drivers that can be loaded.
  */
-#define NDRIVERS	500
+#define NDRIVERS  500
 
 #define CONFIG_SIZE (40 * 4096)
 

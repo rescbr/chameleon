@@ -2,7 +2,7 @@
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
  * Original Code as defined in and that are subject to the Apple Public
@@ -10,7 +10,7 @@
  * except in compliance with the License.  Please obtain a copy of the
  * License at http://www.apple.com/publicsource and read it before using
  * this file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -18,7 +18,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  */
 
@@ -80,24 +80,24 @@ extern void   copyKernBootStruct(void);
 extern void   finalizeBootStruct(void);
 
 /* cache.c */
-extern void		CacheReset();
-extern void		CacheInit(CICell ih, long blockSize);
-extern long		CacheRead(CICell ih, char *buffer, long long offset, long length, long cache);
+extern void      CacheReset();
+extern void      CacheInit(CICell ih, u_int32_t blockSize);
+extern u_int32_t CacheRead(CICell ih, char *buffer, long long offset, u_int32_t length, long cache);
 
 /* console.c */
 extern bool   gVerboseMode;
 extern bool   gErrors;
 extern void   initBooterLog(void);
-extern void   msglog(const char * format, ...);
+extern int    msglog(const char * format, ...);
 extern void   setupBooterLog(void);
 extern int    putchar(int ch);
 extern int    getchar(void);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
 extern int    verbose(const char *format, ...);
-extern void   stop(const char *format, ...);
+extern void   stop(const char *format, ...) __attribute__ ((noreturn));
 //Azi: replace getc/getchar with ? console.c
-extern void   pause();
+extern void   pause(const char *format, ...);
 extern uint64_t getRTCdatetime();
 
 /* disk.c */
@@ -176,9 +176,9 @@ extern long   LoadFile(const char *fileSpec);
 extern long   ReadFileAtOffset(const char * fileSpec, void *buffer, uint64_t offset, uint64_t length);
 extern long   LoadThinFatFile(const char *fileSpec, void **binary);
 extern long   GetDirEntry(const char *dirSpec, long long *dirIndex, const char **name,
-                          long *flags, long *time);
+                          long *flags, u_int32_t *time);
 extern long   GetFileInfo(const char *dirSpec, const char *name,
-                          long *flags, long *time);
+                          long *flags, u_int32_t *time);
 extern long   GetFileBlock(const char *fileSpec, unsigned long long *firstBlock);
 extern long   GetFSUUID(char *spec, char *uuidStr);
 extern long   CreateUUIDString(uint8_t uubytes[], int nbytes, char *uuidStr);
@@ -197,9 +197,9 @@ extern const char * systemConfigDir(void);
 extern struct dirstuff * opendir(const char *path);
 extern struct dirstuff * vol_opendir(BVRef bvr, const char *path);
 extern int    closedir(struct dirstuff *dirp);
-extern int    readdir(struct dirstuff *dirp, const char **name, long *flags, long *time);
+extern int    readdir(struct dirstuff *dirp, const char **name, long *flags, u_int32_t *time);
 extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * flags,
-                          long * time, FinderInfo *finderInfo, long *infoValid);
+                          u_int32_t * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
 extern void   scanDisks(int biosdev, int *count);
@@ -222,5 +222,10 @@ extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
 
 // Base64-decode.c
 char *BASE64Decode(const char* src, int in_len, int* out_len);
+
+// options.c
+extern char     gMacOSVersion[OSVERSTRLEN];
+extern uint32_t MacOSVerCurrent;
+extern uint32_t MacOSVer2Int(const char *osver);
 
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

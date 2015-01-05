@@ -395,8 +395,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 	struct DevPropDevice *device = devprop_add_device(string, devicepath);
 	if (!device) {
-		printf("Failed initializing dev-prop string dev-entry.\n");
-		pause();
+		error("[setup_gma_devprop] Failed initializing dev-prop string dev-entry!\n");
+		pause("");
 		return false;
 	}
 
@@ -594,9 +594,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 					break;
 
 				default:
-					printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
-					"The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
-					pause();
+					error("\nPlease specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
+                          "The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
+                    pause("");
 					return false;	// Exit early before the AAPL,ig-platform-id property is set.
 					break;
 			}
@@ -702,8 +702,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{
-		printf("No stringdata.\n");
-		pause();
+		error("[setup_gma_devprop] No stringdata!\n");
+		pause("");
 		return false;
 	}
 

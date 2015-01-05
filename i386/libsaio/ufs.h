@@ -24,7 +24,7 @@ extern long UFSInitPartition(CICell ih);
 extern long UFSLoadFile(CICell ih, char * filePath);
 extern long UFSReadFile( CICell ih, char * filePath, void * base, uint64_t offset, uint64_t length );
 extern long UFSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
-                           char ** name, long * flags, long * time,
+                           char ** name, long * flags, u_int32_t * time,
                            FinderInfo * finderInfo, long * infoValid);
 extern void UFSGetDescription(CICell ih, char *str, long strMaxLen);
 extern long UFSGetFileBlock(CICell ih, char *str, unsigned long long *firstBlock);

@@ -88,6 +88,7 @@ kGUIDLastDwordOffs	EQU  12				; last 4 byte offset of a GUID
 
 kPartCount			EQU  4				; number of paritions per table
 kPartTypeHFS		EQU  0xaf			; HFS+ Filesystem type
+kPartTypeABHFS		EQU  0xab			; Apple_Boot partition
 kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR (PMBR)
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
@@ -283,7 +284,7 @@ find_boot:
 										; to boot an inactive but boot1h aware HFS+ partition
 										; by scanning the MBR partition entries again.
 
-.start_scan:							
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -444,7 +445,7 @@ checkGPT:
 .gpt_loop:
 
     mov     eax, [si + gpta.PartitionTypeGUID + kGUIDLastDwordOffs]
-	
+
 	cmp		eax, kAppleGUID			; check current GUID Partition for Apple's GUID type
 	je		.gpt_ok
 
@@ -519,7 +520,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;
@@ -619,7 +620,7 @@ read_lba:
     ;   DS:SI = pointer to Disk Address Packet
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   carry = 0 success
     ;           1 error
     ;
@@ -763,13 +764,14 @@ getc:
 ; NULL terminated strings.
 ;
 log_title_str		db  10, 13, 'boot0: ', 0
-boot_error_str   	db  'error', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
 test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
+
+boot_error_str   	db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last

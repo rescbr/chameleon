@@ -110,9 +110,9 @@ void bzero(void * dst, size_t len)
 
 size_t strlen(const char * s)
 {
-  const char* save = s;
-  while (*s++);
-  return (--s) - save;
+	const char* save = s;
+	while (*s++);
+	return (--s) - save;
 }
 
 /*#endif*/
@@ -177,6 +177,7 @@ strncpy(char * s1, const char * s2, size_t n)
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
       --n;
+
 	if (n > 0) {
 		bzero(s1, n);
 	}

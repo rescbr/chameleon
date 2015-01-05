@@ -20,7 +20,9 @@ int main(int argc, char *argv[])
 	root = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/");
 
 	if (root)
+	{
 		bootLog = IORegistryEntryCreateCFProperty(root, CFSTR("boot-log"), kCFAllocatorDefault, 0);
+	}
 
 	if (!bootLog)
 	{
@@ -28,7 +30,9 @@ int main(int argc, char *argv[])
 		root = IORegistryEntryFromPath(kIOMasterPortDefault, "IODeviceTree:/efi/platform");
 
 		if (root)
+		{
 			bootLog = IORegistryEntryCreateCFProperty(root, CFSTR("boot-log"), kCFAllocatorDefault, 0);
+		}
 	}
 
 	if (!bootLog)
@@ -40,7 +44,11 @@ int main(int argc, char *argv[])
 	const UInt8 *msglog = CFDataGetBytePtr((CFDataRef)bootLog);
 
 	if (msglog)
+	{
 		printf("%s\n", msglog);
+	}
+
+	CFRelease(bootLog);
 
 	return 0;
 }

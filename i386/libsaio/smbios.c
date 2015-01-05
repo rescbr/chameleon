@@ -186,7 +186,7 @@ typedef struct {
 	uint8_t		chassisType;
 	char		*version;
 	char		*serialNumber;
-	char		*assetTag;   // Bungo: renamed folowing convention
+	char		*assetTag;
 	char		*skuNumber;
 } defaultChassis_t;
 
@@ -267,7 +267,7 @@ SMBValueSetter SMBSetters[] =
 		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber }, // SMboardserial - C02140302D5DMT31M
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTag),
-		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassetag - Base Board Asset Tag#
+		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassettag - Base Board Asset Tag#
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
 		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component
@@ -565,7 +565,7 @@ static SMBWord structureCount	= 0;
 //#define KDefauktMacProBoardAssetTagNumber		"Pro-Enclosure"
 //#define kDefaultMacProBoardType			"0xB" // 11
 
-#define kDefaultMacPro					"MacPro3,1"
+#define kDefaultMacPro                      "MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
 #define kDefaultMacProBIOSReleaseDate			"08/03/2010"
 //#define kDefaultMacProSystemVersion			"1.3"
@@ -618,9 +618,7 @@ static SMBWord structureCount	= 0;
 /* ============================================ */
 
 bool   useSMBIOSdefaults        = true;  // Bungo
-/*
-SMBByte PlatformType			= 1;  // Bungo: same as Platfom.Type in platform.h. Because can't get from ACPI FADT PM profile and platformCPUFeature(CPU_FEATURE_MOBILE)) doesn't work as expect, FIXING NEEDED.
-*/
+
 /* Rewrite this function */
 void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 {
@@ -641,7 +639,6 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 	defaultChassis.assetTag             = kDefaultAssetTag;
 	defaultChassis.skuNumber            = kDefaultSkuNumber;
 
-	// if (platformCPUFeature(CPU_FEATURE_MOBILE)) Bungo: doesn't recognise correctly, need fixing
 	if (Platform.Type == 2)
 	{
 		if (Platform.CPU.NoCores > 1) {
@@ -691,9 +688,9 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 					{
 						switch (Platform.CPU.Model)
 						{
-							case CPU_MODEL_FIELDS:			// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-							case CPU_MODEL_DALES:
-							case CPU_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+							case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+							case CPUID_MODEL_DALES:
+							case CPUID_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaultiMacNehalemBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
@@ -703,8 +700,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultChassis.chassisType      = kSMBchassisAllInOne;
 								break;
 
-							case CPU_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
-							case CPU_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
+							case CPUID_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
+							case CPUID_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
 								defaultBIOSInfo.version         = kDefaultiMacSandyBIOSVersion;
 								defaultBIOSInfo.releaseDate     = kDefaultiMacSandyBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
@@ -714,37 +711,37 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultChassis.chassisType      = kSMBchassisAllInOne;
 								break;
 
-							case CPU_MODEL_NEHALEM:			// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-							case CPU_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
-								defaultBIOSInfo.version		= kDefaultMacProNehalemBIOSVersion;
-								defaultBIOSInfo.releaseDate	= kDefaultMacProNehalemBIOSReleaseDate;
+							case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+							case CPUID_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+								defaultBIOSInfo.version         = kDefaultMacProNehalemBIOSVersion;
+								defaultBIOSInfo.releaseDate     = kDefaultMacProNehalemBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProNehalem;
 								defaultSystemInfo.version       = kDefaultMacProNahWestSystemVersion;
-								defaultSystemInfo.family	= kDefaultMacProFamily;
+								defaultSystemInfo.family        = kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProNehalemBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
 								defaultChassis.chassisType      = kSMBchassisTower;
 								break;
 
-							case CPU_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-							case CPU_MODEL_WESTMERE_EX:		// Intel Xeon E7
-							case CPU_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
-							case CPU_MODEL_IVYBRIDGE_XEON:		// Intel Core i7, Xeon E5 v2 LGA2011 (22nm)
-								defaultBIOSInfo.version		= kDefaultMacProWestmereBIOSVersion;
-								defaultBIOSInfo.releaseDate	= kDefaultMacProWestmereBIOSReleaseDate;
+							case CPUID_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+							case CPUID_MODEL_WESTMERE_EX:		// Intel Xeon E7
+							case CPUID_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
+							case CPUID_MODEL_IVYBRIDGE_EP:	// Intel Core i7, Xeon E5 v2 LGA2011 (22nm)
+								defaultBIOSInfo.version         = kDefaultMacProWestmereBIOSVersion;
+								defaultBIOSInfo.releaseDate     = kDefaultMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;
 								defaultSystemInfo.version       = kDefaultMacProNahWestSystemVersion;
-								defaultSystemInfo.family	= kDefaultMacProFamily;
+								defaultSystemInfo.family        = kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProWestmereBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
 								defaultChassis.chassisType      = kSMBchassisTower;
 								break;
 
 							default:
-								defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
-								defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
+								defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
+								defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacPro;
-								defaultSystemInfo.family	= kDefaultMacProFamily;
+								defaultSystemInfo.family        = kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 								defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -753,10 +750,10 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						break;
 					}
 					default:
-						defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
-						defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
-						defaultSystemInfo.productName	= kDefaultMacPro;
-						defaultSystemInfo.family	= kDefaultMacProFamily;
+						defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
+						defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
+						defaultSystemInfo.productName   = kDefaultMacPro;
+						defaultSystemInfo.family        = kDefaultMacProFamily;
 						defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 						defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 						defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -995,50 +992,54 @@ void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 /* =================================================
  OEM Processor Bus Speed (Apple Specific - Type 132)
  =================================================== */
-void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
+bool addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
 
-	switch (Platform.CPU.Family) 
-	{
+    if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL)
+        return false;
+        
+	switch (Platform.CPU.Family) {
 		case 0x06:
-		{
-			switch (Platform.CPU.Model)
-			{
+			switch (Platform.CPU.Model) {
 				case 0x19:			// Intel Core i5 650 @3.20 Ghz
-				case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-				case CPU_MODEL_DALES:
-				case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
-				case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-				case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
-				case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-				case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
-				case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
-				case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
-				case CPU_MODEL_IVYBRIDGE_XEON:
-				case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
-				case CPU_MODEL_HASWELL:
-				case CPU_MODEL_HASWELL_SVR:
-				case CPU_MODEL_HASWELL_ULT:
-				case CPU_MODEL_CRYSTALWELL:
-
-					break;
+				case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156, (45nm)
+				case CPUID_MODEL_DALES:     // Intel Core i5, i7, Xeon, (45nm), integrated GPU
+				case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5, Xeon, (32nm), integrated GPU
+				case CPUID_MODEL_NEHALEM:	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+				case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+				case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+				case CPUID_MODEL_WESTMERE_EX:	// Intel Xeon E7
+				case CPUID_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+				case CPUID_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+				case CPUID_MODEL_IVYBRIDGE_EP:
+				case CPUID_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_CRYSTALWELL:
+                    p->header.type		= kSMBTypeOemProcessorBusSpeed;
+                    p->header.length	= sizeof(SMBOemProcessorBusSpeed);
+                    p->header.handle	= handle++;
+                    
+                    setSMBValue(structPtr, numOfSetters - 1, (returnType *)&(p->ProcessorBusSpeed));
+                    
+                    structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
+                    tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
+                    structureCount++;
+                    
+					return true;
 
 				default:
-					return;
+					break;
 			}
-		}
+            break;
+            
+        default:
+            break;
 	}
-
-	p->header.type		= kSMBTypeOemProcessorBusSpeed;
-	p->header.length	= sizeof(SMBOemProcessorBusSpeed);
-	p->header.handle	= handle++;
-
-	setSMBValue(structPtr, numOfSetters -1, (returnType *)&(p->ProcessorBusSpeed));
-
-	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
-	tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
-	structureCount++;
+    
+    return false;
 }
 
 /* ==============================================
@@ -1065,7 +1066,7 @@ void addSMBEndOfTable(SMBStructPtrs *structPtr)
 {
 	structPtr->new->type	= kSMBTypeEndOfTable;
 	structPtr->new->length	= sizeof(SMBStructHeader);
-	structPtr->new->handle	= handle++;
+	structPtr->new->handle	= 0xFFFD; // real Macs set this value here // handle++;
 
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBStructHeader) + 2);
 	tableLength += sizeof(SMBStructHeader) + 2;
@@ -1216,12 +1217,12 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 }
 
 // Bungo: does fix system uuid in SMBIOS & EFI instead of in EFI (IODT/efi/platform/system-id) only
-uint8_t *FixSystemUUID()
+uint8_t *fixSystemUUID()
 {
 	uint8_t *ptr = (uint8_t *)neweps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)ptr;
 	int i, isZero, isOnes;
-	uint8_t FixedUUID[UUID_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
+	uint8_t fixedUUID[UUID_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 	const char *sysId = getStringForKey(kSMBSystemInformationUUIDKey, SMBPlist); // try to get user's uuid from smbios.plist
 	uint8_t *ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
 
@@ -1241,10 +1242,10 @@ uint8_t *FixSystemUUID()
 
 	if (!sysId || !ret) { // no or bad custom uuid,...
 		sysId = 0;
-		ret = Platform.UUID; // ...use original SMBIOS' system uuid
+		ret = Platform.UUID; // ...use original (factory) system uuid
 	}
 
-	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) // check if empty (zeroed) or setable (FFed), means: no uuid present
+	for (i = 0, isZero = 1, isOnes = 1; i < UUID_LEN; i++) // check if empty (zeroed) or setable (FFed), means: no uuid present
 	{
 		if (ret[i] != 0x00) {
 			isZero = 0;
@@ -1256,11 +1257,12 @@ uint8_t *FixSystemUUID()
 	}
 
 	if (isZero || isOnes)  { // if empty or setable...
-		ret = FixedUUID; // ...set a fixed value for system uuid: <00 11 22 33 44 55 66 77 88 98 AA BB CC DD EE FF>
-        DBG("System UUID: wrong or not present. Fixing [00112233-4455-6677-8899-AABBCCDDEEFF]\n");
+        verbose("System UUID: incorrect or not present. Fixing [00112233-4455-6677-8899-AABBCCDDEEFF]\n");
+        ret = fixedUUID; // ...set a fixed value for system uuid: <00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF>
 	}
 
 	memcpy(ptr, ret, UUID_LEN); // save uuid into the patched SMBIOS Table 1
+    
 	return ptr;
 }  // Bungo: end fix
 
@@ -1333,7 +1335,7 @@ void setupSMBIOS(void)
 
 	memcpy((void *)neweps->dmi.tableAddress, buffer, tableLength);
 
-	Platform.UUID = FixSystemUUID(); // Bungo: fix System UUID
+	Platform.UUID = fixSystemUUID(); // Bungo: fix System UUID
 
 	neweps->dmi.checksum		= 0;
 	neweps->dmi.checksum		= 0x100 - checksum8(&neweps->dmi, sizeof(DMIEntryPoint));
@@ -1343,13 +1345,14 @@ void setupSMBIOS(void)
 
 	free(buffer);
 	free(structPtr);
+    
+    verbose("\n");
+	verbose("SMBIOS orig: rev.: %d.%d, DMI rev.: %d.%d, @%08X\n", origeps->majorVersion, origeps->minorVersion, origeps->dmi.bcdRevision >> 4, origeps->dmi.bcdRevision & 0x0F, origeps);
+    verbose("SMBIOS new: rev.: %d.%d, DMI rev.: %d.%d, @%08X\n", neweps->majorVersion, neweps->minorVersion, neweps->dmi.bcdRevision >> 4, neweps->dmi.bcdRevision & 0x0F, neweps);
 
 	decodeSMBIOSTable(neweps);
-
-	DBG("SMBIOS orig was = 0x%08X\n", origeps);
-	DBG("SMBIOS new is   = 0x%08X\n", neweps);
     
-    smbios_p = (EFI_PTR32)neweps;
+    smbios_p = (EFI_PTR32)neweps; // save a patched smbios ptr for efi config table
 }
 
 void *getSmbios(int which)

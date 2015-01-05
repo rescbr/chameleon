@@ -112,7 +112,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	mH = (struct mach_header *)gBinaryAddress;
 
-    /*#if DEBUG
+/*#if DEBUG
 	DBG("magic:          0x%x\n", (unsigned)mH->magic);
 	DBG("cputype:        0x%x\n", (unsigned)mH->cputype);
 	DBG("cpusubtype:     0x%x\n", (unsigned)mH->cpusubtype);
@@ -122,7 +122,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	DBG("flags:          0x%x\n", (unsigned)mH->flags);
 	DBG("archCpuType:    0x%x\n", archCpuType);
 	//getchar();
-    #endif*/
+#endif*/
 
 	switch (archCpuType)
 	{

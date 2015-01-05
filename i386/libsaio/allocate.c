@@ -69,7 +69,7 @@ AllocateMemoryRange(char * rangeName, long start, long length, long type)
 long
 AllocateKernelMemory(long inSize)
 {
-	long addr;
+	long addr = 0;
 
 	if (gImageLastKernelAddr == 0) {
 		gImageLastKernelAddr = RoundPage(bootArgs->kaddr + bootArgs->ksize);

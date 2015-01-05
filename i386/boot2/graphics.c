@@ -87,10 +87,10 @@ char *getVBEInfoString()
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)
 		return 0;
-
+	
 	if ( strncmp( (char *)vbeInfo.VESASignature, "VESA", 4 ) )
 		return 0;
-
+	
 	buff = malloc(sizeof(char) * 256);
 	if (!buff) {
 		return 0;
@@ -99,12 +99,12 @@ char *getVBEInfoString()
 	small = (vbeInfo.TotalMemory < 16);
 
 	snprintf(buff, 256,
-		"VESA v%d.%d %d%s (%s)\n",
-		vbeInfo.VESAVersion >> 8,
-		vbeInfo.VESAVersion & 0xf,
-		small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
-		small ? "KB" : "MB",
-		VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
+             "VESA v%d.%d %d%s (%s)\n",
+             vbeInfo.VESAVersion >> 8,
+             vbeInfo.VESAVersion & 0xf,
+             small ? (vbeInfo.TotalMemory * 64) : (vbeInfo.TotalMemory / 16),
+             small ? "KB" : "MB",
+             VBEDecodeFP(const char *, vbeInfo.OEMStringPtr) );
 
 	return buff;
 }
@@ -138,14 +138,14 @@ printVBEModeInfo()
 
 	vbeInfoString = getVBEInfoString();
 	if (!vbeInfoString) {
-		printf("Error: getVBEInfoString failed\n");
+		error("[printVBEModeInfo] Error: getVBEInfoString failed\n");
 		return;
 	}
-	printf("%s", vbeInfoString);
+	verbose("vbeInfoString: %s", vbeInfoString);
 	free(vbeInfoString);
 	vbeInfoString = NULL;
 
-	printf("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
+	verbose("Video modes supported:\n", VBEDecodeFP(const char *, vbeInfo.OEMStringPtr));
 
 	// Loop through the mode list, and find the matching mode.
 
@@ -161,21 +161,22 @@ printVBEModeInfo()
 			continue;
 		}
 
-		printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
+		verbose("Mode %x: %dx%dx%d mm:%d attr:%x\n",
 			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
 			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
 			modeInfo.ModeAttributes);
 
 		if (line++ >= 20) {
-			pause();
+			pause("");
 			line = 0;
 			clearScreenRows(0, 24);
 			setCursorPosition( 0, 0, 1 );
 		}
-	}
+	}    
 	if (line != 0) {
-		pause();
+		pause("");
 	}
+
 	setActiveDisplayPage(0);
 }
 
@@ -194,6 +195,7 @@ char *getVBEModeInfoString()
 	if ( err != errSuccess ) {
 		return 0;
 	}
+
 	char *buff=malloc(sizeof(char)*3072);
 	if(!buff) {
 		return 0;
@@ -239,41 +241,38 @@ getVESAModeWithProperties( unsigned short	width,
                            unsigned short	*vesaVersion
 			)
 {
-	VBEInfoBlock     vbeInfo;
-	unsigned short * modePtr;
-	VBEModeInfoBlock modeInfo;
-	unsigned char    modeBitsPerPixel;
-	unsigned short   matchedMode = modeEndOfList;
-	int              err;
+    VBEInfoBlock     vbeInfo;
+    unsigned short * modePtr;
+    VBEModeInfoBlock modeInfo;
+    unsigned char    modeBitsPerPixel;
+    unsigned short   matchedMode = modeEndOfList;
+    int              err;
 
-	// Clear output mode info.
+    // Clear output mode info.
 
-	bzero( outModeInfo, sizeof(*outModeInfo) );
+    bzero( outModeInfo, sizeof(*outModeInfo) );
 
-	// Get VBE controller info containing the list of supported modes.
+    // Get VBE controller info containing the list of supported modes.
 
-	bzero( &vbeInfo, sizeof(vbeInfo) );
-	strcpy( (char*)&vbeInfo, "VBE2" );
-	err = getVBEInfo( &vbeInfo );
-	if ( err != errSuccess )
-	{
-		return modeEndOfList;
-	}
+    bzero( &vbeInfo, sizeof(vbeInfo) );
+    strcpy( (char*)&vbeInfo, "VBE2" );
+    err = getVBEInfo( &vbeInfo );
+    if ( err != errSuccess )
+    {
+        return modeEndOfList;
+    }
 
-	// Report the VESA major/minor version number.
+    // Report the VESA major/minor version number.
 
     if (vesaVersion) *vesaVersion = vbeInfo.VESAVersion;
 
     // Loop through the mode list, and find the matching mode.
     
-    GraphicsModeCurrent = getCurrentGraphicsMode();
-    
 //#if DEBUG
-    DBG("Graphics Modes [VESA %d.%d %dMB mode=0x%04X]:\n", vbeInfo.VESAVersion >> 8, vbeInfo.VESAVersion & 0xf, (vbeInfo.TotalMemory * 64)/1024, GraphicsModeCurrent);
+    verbose("\nGraphics Modes [VESA %d.%d %dMB mode=0x%04X]:\n", vbeInfo.VESAVersion >> 8, vbeInfo.VESAVersion & 0xf, (vbeInfo.TotalMemory * 64)/1024, getCurrentGraphicsMode());
 //#endif
     
-    for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-          *modePtr != modeEndOfList; modePtr++ )
+    for ( modePtr = VBEDecodeFP(unsigned short *, vbeInfo.VideoModePtr); *modePtr != modeEndOfList; modePtr++ )
     {
         // Get mode information.
 
@@ -282,99 +281,98 @@ getVESAModeWithProperties( unsigned short	width,
         err = getVBEModeInfo( *modePtr, &modeInfo );
         if ( err != errSuccess )
         {
-            DBG("\t%x: [ERROR: %d] mode not suported.\n", *modePtr, err);
+            verbose("\t%x: mode not suported. [ERROR: %d]\n", *modePtr, err);
             continue;
         }
 
 //#if DEBUG
-        DBG("\t0x%04X: res=%dx%dx%d, mm=%d, attr=0x%04X %s\n",
+        verbose("\t0x%04X: res=%dx%dx%d, mm=%d, attr=0x%04X %s\n",
                *modePtr, modeInfo.XResolution, modeInfo.YResolution,
                modeInfo.BitsPerPixel, modeInfo.MemoryModel,
                modeInfo.ModeAttributes, (*modePtr == GraphicsModeCurrent)? "<-":"");
 //#endif
 
-		// Filter out unwanted modes based on mode attributes.
+        // Filter out unwanted modes based on mode attributes.
 
-		if ( ( ( modeInfo.ModeAttributes & attributesSet ) != attributesSet )
+        if ( ( ( modeInfo.ModeAttributes & attributesSet ) != attributesSet )
         ||   ( ( modeInfo.ModeAttributes & attributesClear ) != 0 ) )
-		{
-			continue;
-		}
+        {
+            continue;
+        }
+        
+        // Pixel depth in bits.
 
-		// Pixel depth in bits.
+        modeBitsPerPixel = modeInfo.BitsPerPixel;
 
-		modeBitsPerPixel = modeInfo.BitsPerPixel;
+        if ( ( modeBitsPerPixel == 4 ) && ( modeInfo.MemoryModel == 0 ) )
+        {
+            // Text mode, 16 colors.
+        }
+        else if ( ( modeBitsPerPixel == 8 ) && ( modeInfo.MemoryModel == 4 ) )
+        {
+            // Packed pixel, 256 colors.
+        }
+        else if ( ( ( modeBitsPerPixel == 16 ) || ( modeBitsPerPixel == 15 ) )
+        &&   ( modeInfo.MemoryModel   == 6 )
+        &&   ( modeInfo.RedMaskSize   == 5 )
+        &&   ( modeInfo.GreenMaskSize == 5 )
+        &&   ( modeInfo.BlueMaskSize  == 5 ) )
+        {
+            // Direct color, 16 bpp (1:5:5:5).
+            modeInfo.BitsPerPixel = modeBitsPerPixel = 16;
+        }
+        else if ( ( modeBitsPerPixel == 32 )
+        &&   ( modeInfo.MemoryModel   == 6 )
+        &&   ( modeInfo.RedMaskSize   == 8 )
+        &&   ( modeInfo.GreenMaskSize == 8 )
+        &&   ( modeInfo.BlueMaskSize  == 8 ) )
+        {
+            // Direct color, 32 bpp (8:8:8:8).
+        }
+        else
+        {
+            continue; // Not a supported mode.
+        }
 
-		if ( ( modeBitsPerPixel == 4 ) && ( modeInfo.MemoryModel == 0 ) )
-		{
-			// Text mode, 16 colors.
-		}
-		else if ( ( modeBitsPerPixel == 8 ) && ( modeInfo.MemoryModel == 4 ) )
-		{
-			// Packed pixel, 256 colors.
-		}
-		else if ( ( ( modeBitsPerPixel == 16 ) || ( modeBitsPerPixel == 15 ) )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 5 )
-			&&   ( modeInfo.GreenMaskSize == 5 )
-			&&   ( modeInfo.BlueMaskSize  == 5 ) )
-		{
-			// Direct color, 16 bpp (1:5:5:5).
-			modeInfo.BitsPerPixel = modeBitsPerPixel = 16;
-		}
-		else if ( ( modeBitsPerPixel == 32 )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 8 )
-			&&   ( modeInfo.GreenMaskSize == 8 )
-			&&   ( modeInfo.BlueMaskSize  == 8 ) )
-		{
-			// Direct color, 32 bpp (8:8:8:8).
-		}
-		else
-		{
-			continue; // Not a supported mode.
-		}
+        // Modes larger than the specified dimensions are skipped.
 
-		// Modes larger than the specified dimensions are skipped.
+        if ( ( modeInfo.XResolution > width  ) ||
+             ( modeInfo.YResolution > height ) )
+        {
+            continue;
+        }
 
-		if ( ( modeInfo.XResolution > width  ) ||
-			( modeInfo.YResolution > height ) )
-		{
-			continue;
-		}
+        // Perfect match, we're done looking.
 
-		// Perfect match, we're done looking.
+        if ( ( modeInfo.XResolution == width  ) &&
+             ( modeInfo.YResolution == height ) &&
+             ( modeBitsPerPixel     == bitsPerPixel ) )
+        {
+            matchedMode = *modePtr;
+            bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+            break;
+        }
 
-		if ( ( modeInfo.XResolution == width  ) &&
-			( modeInfo.YResolution == height ) &&
-			( modeBitsPerPixel     == bitsPerPixel ) )
-		{
-			matchedMode = *modePtr;
-			bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
-			break;
-		}
+        // Save the next "best" mode in case a perfect match is not found.
 
-		// Save the next "best" mode in case a perfect match is not found.
+        if ( modeInfo.XResolution == outModeInfo->XResolution &&
+             modeInfo.YResolution == outModeInfo->YResolution &&
+             modeBitsPerPixel     <= outModeInfo->BitsPerPixel )
+        {
+            continue;  // Saved mode has more depth.
+        }
+        if ( modeInfo.XResolution < outModeInfo->XResolution ||
+             modeInfo.YResolution < outModeInfo->YResolution ||
+             modeBitsPerPixel     < outModeInfo->BitsPerPixel )
+        {
+            continue;  // Saved mode has more resolution.
+        }
 
-		if ( modeInfo.XResolution == outModeInfo->XResolution &&
-			modeInfo.YResolution == outModeInfo->YResolution &&
-			modeBitsPerPixel     <= outModeInfo->BitsPerPixel )
-		{
-			continue;  // Saved mode has more depth.
-		}
+        matchedMode = *modePtr;
+        bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+    }
 
-		if ( modeInfo.XResolution < outModeInfo->XResolution ||
-			modeInfo.YResolution < outModeInfo->YResolution ||
-			modeBitsPerPixel     < outModeInfo->BitsPerPixel )
-		{
-			continue;  // Saved mode has more resolution.
-		}
-
-		matchedMode = *modePtr;
-		bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
-	}
-
-	return matchedMode;
+    return matchedMode;
 }
 
 //==========================================================================
@@ -426,7 +424,8 @@ uint16_t getCurrentGraphicsMode()
 {
     if (getVBECurrentMode(&GraphicsModeCurrent) != errSuccess)
         GraphicsModeCurrent = 0;
-    return (GraphicsModeCurrent & 0x3FFF);
+    GraphicsModeCurrent &= 0x3FFF;
+    return GraphicsModeCurrent;
 }
 
 //==========================================================================
@@ -435,11 +434,12 @@ uint16_t getCurrentGraphicsMode()
 int getCurrentEDID()
 {
     struct EDID edid;
+    //edid_mode mode;
+    
     uint8_t status = getVBEEDID(&edid);
     
     if (status == errSuccess) {
         /*
-        edid_mode mode;
         if (fb_parse_edid(&edid, &mode)) {
             DBG("EDID first timing block info:\n");
             DBG("\tx_res=%d(native)\n", mode.h_active);
@@ -454,9 +454,10 @@ int getCurrentEDID()
         } else {
             DBG("[ERROR: 0x%02X] Failed to parse EDID!\n", status);
         }
+        DBG("EDID read!\n", status);
         */
     } else {
-        DBG("[ERROR: 0x%02X] Failed to get EDID!\n", status);
+        verbose("Failed to get EDID! [ERROR: 0x%02X]\n", status);
     }
     
     return status;
@@ -529,13 +530,14 @@ setVESAGraphicsMode( unsigned short width,
 
         // Set the mode with default refresh rate.
 
-        err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
+        err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
 
-        if ( err != errSuccess )
+        if (err != errSuccess)
         {
             break;
         }
-        DBG("Succesfuly set mode: 0x%04X (old mode: 0x%04X)\n", mode, modeOld);
+        
+        verbose("Succesfuly set mode: 0x%04X (old mode: 0x%04X)\n", getCurrentGraphicsMode(), modeOld);
 
         // Set 8-bit color palette.
 
@@ -877,9 +879,8 @@ void drawColorRectangle( unsigned short x,
     long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
     char * vram;
 
-    pixelBytes = VIDEO(depth) / 8;
-    vram       = (char *) VIDEO(baseAddr) +
-                 VIDEO(rowBytes) * y + pixelBytes * x;
+	pixelBytes = VIDEO(depth) / 8;
+	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
     width = MIN(width, VIDEO(width) - x);
     height = MIN(height, VIDEO(height) - y);
@@ -902,10 +903,9 @@ void drawDataRectangle( unsigned short  x,
                         unsigned short  height,
                         unsigned char * data )
 {
-    unsigned short drawWidth;
-    long   pixelBytes = VIDEO(depth) / 8;
-    unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) +
-        VIDEO(rowBytes) * y + pixelBytes * x;
+	unsigned short drawWidth;
+	long   pixelBytes = VIDEO(depth) / 8;
+	unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
     drawWidth = MIN(width, VIDEO(width) - x);
     height = MIN(height, VIDEO(height) - y);
@@ -997,10 +997,9 @@ void drawPreview(void *src, uint8_t * saveunder)
         drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
 	}
 
-
 	pixelShift = VIDEO (depth) >> 4;
 	if (pixelShift < 1) return;
-
+	
 	screen += ((VIDEO (width) 
 				- kIOHibernateProgressCount * (kIOHibernateProgressWidth + kIOHibernateProgressSpacing)) << (pixelShift - 1))
 	+ (VIDEO (height) - kIOHibernateProgressOriginY - kIOHibernateProgressHeight) * rowBytes;
@@ -1086,6 +1085,7 @@ void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 						in = saveunder[blob * kIOHibernateProgressSaveUnderSize + saveindex[blob]++];
 						result = ((255 - alpha) * in + alpha * result + 0xff) / 255;
 					}
+
 					if (1 == pixelShift)
 					{
 						result >>= 3;
@@ -1100,7 +1100,6 @@ void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 		}
 	}
 }
-
 
 //==========================================================================
 // setVESATextMode
@@ -1146,28 +1145,29 @@ static int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
-    char * propStr;
-    unsigned long    count = 0;
+    char            *propStr;
+    unsigned long   count       = 0;
 
-    propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
-    if ( propStr )
+    propStr = newStringForKey((char *)propKey , &bootInfo->chameleonConfig);
+    
+    if (propStr)
     {
-        char * delimiter = propStr;
-        char * p = propStr;
+        char *delimiter = propStr;
+        char *p         = propStr;
 
-        while ( count < maxArrayCount && *p != '\0' )
+        while ((count < maxArrayCount) && (*p != '\0'))
         {
-            unsigned long val = strtoul( p, &delimiter, 10 );
-            if ( p != delimiter )
+            unsigned long val = strtoul(p, &delimiter, 10);
+            if (p != delimiter)
             {
                 numbers[count++] = val;
                 p = delimiter;
             }
-            while ( ( *p != '\0' ) && !isdigit(*p) )
+            while ((*p != '\0') && !isdigit(*p))
                 p++;
         }
 
-        free( propStr );
+        free(propStr);
     }
 
     return count;
@@ -1181,7 +1181,7 @@ int initGraphicsMode ()
     int           count;
     
     params[3] = 0;
-    count = getNumberArrayFromProperty( kGraphicsModeKey, params, 4 );
+    count = getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
     
     // Try to find a resolution if "Graphics Mode" setting is not available.
     if ( count < 3 )
@@ -1220,7 +1220,7 @@ void setVideoMode( int mode, int drawgraphics)
 
     if ( mode == GRAPHICS_MODE )
     {
-  		if ( (err=initGraphicsMode ()) == errSuccess ) {
+  		if ( (err = initGraphicsMode()) == errSuccess ) {
             if (gVerboseMode) {
                 // Tell the kernel to use text mode on a linear frame buffer display
                 bootArgs->Video.v_display = FB_TEXT_MODE;
@@ -1232,39 +1232,40 @@ void setVideoMode( int mode, int drawgraphics)
 
     if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
     {
-        count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+        count = getNumberArrayFromProperty(kTextModeKey, params, 2);
         if ( count < 2 )
         {
             params[0] = 80;  // Default text mode is 80x25.
             params[1] = 25;
         }
 
-		setVESATextMode( params[0], params[1], 4 );
+		setVESATextMode(params[0], params[1], 4);
         bootArgs->Video.v_display = VGA_TEXT_MODE;
     }
 
     currentIndicator = 0;
 }
 
-void getGraphicModeParams(unsigned long params[]) {
-
+//==============================================================================
+void getGraphicModeParams(unsigned long params[])
+{
 	params[3] = 0;
 
 	VBEModeInfoBlock  minfo;
 
     unsigned short    vesaVersion;
     unsigned short    mode = modeEndOfList;
+	
+	getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
 
-	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
-
-	mode = getVESAModeWithProperties( params[0], params[1], params[2],
+	mode = getVESAModeWithProperties(params[0], params[1], params[2],
 									 maColorModeBit             |
 									 maModeIsSupportedBit       |
 									 maGraphicsModeBit          |
 									 maLinearFrameBufferAvailBit,
 									 0,
-									 &minfo, &vesaVersion );
-
+									 &minfo, &vesaVersion);
+	
 	params[0] = minfo.XResolution;
 	params[1] = minfo.YResolution;
 	params[2] = 32;
@@ -1281,6 +1282,7 @@ int getVideoMode(void)
 //==========================================================================
 // Display and clear the activity indicator.
 
+// BASIC Indicator
 static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
 
 // To prevent a ridiculously fast-spinning indicator,
@@ -1292,7 +1294,7 @@ static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
 void spinActivityIndicator(int sectors)
 {
     static unsigned long lastTickTime = 0, currentTickTime;
-   
+    
 	if (previewTotalSectors && previewSaveunder)
 	{
 		int blob, lastBlob;
@@ -1305,7 +1307,7 @@ void spinActivityIndicator(int sectors)
 			updateProgressBar (previewSaveunder, lastBlob, blob);
 		return;
 	}
- 
+
 	currentTickTime = time18(); // late binding
 	if (currentTickTime < lastTickTime + MIN_TICKS)
 	{
@@ -1315,7 +1317,7 @@ void spinActivityIndicator(int sectors)
 	{
 		lastTickTime = currentTickTime;
 	}
-	
+
 	if (getVideoMode() == VGA_TEXT_MODE)
 	{
 		if (currentIndicator >= sizeof(indicator))
@@ -1331,11 +1333,11 @@ void spinActivityIndicator(int sectors)
 
 void clearActivityIndicator( void )
 {
-	if ( getVideoMode() == VGA_TEXT_MODE )
-	{
+    if ( getVideoMode() == VGA_TEXT_MODE )
+    {
 		putchar(' ');
 		putchar('\b');
-	}
+    }
 }
 
 //==============================================================================

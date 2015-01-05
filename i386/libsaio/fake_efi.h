@@ -30,7 +30,13 @@
 
 /* Set up space for up to 10 configuration table entries */
 #define MAX_CONFIGURATION_TABLE_ENTRIES 10
-
+/*
+extern EFI_GUID const gEfiAcpiTableGuid;
+extern EFI_GUID const gEfiAcpi20TableGuid;
+extern EFI_GUID const gEfiSmbiosTableGuid;
+*/
 extern void setupFakeEfi(void);
+extern uint64_t acpi10_p;
+extern uint64_t acpi20_p;
 
 #endif /* !__LIBSAIO_FAKE_EFI_H */

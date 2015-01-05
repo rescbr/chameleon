@@ -35,9 +35,9 @@ typedef union {
 	unsigned int      rx;
 	unsigned short    rr;
 	struct {
-		unsigned char  l;
-		unsigned char  h;
-	}                  r;
+		unsigned char l;
+		unsigned char h;
+	} r;
 } machineRegister_t;
 
 typedef struct {

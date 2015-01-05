@@ -891,7 +891,7 @@ int initGUI(void)
 {
 	int		val;
 	int     len;
-	char	dirspec[256];
+	char	dirspec[512];
 
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->chameleonConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {
@@ -911,12 +911,14 @@ int initGUI(void)
 #endif
 	}
 	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && (val > 0)) {
 		screen_params[0] = val;
 	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && (val > 0)) {
 		screen_params[1] = val;
 	}
+    verbose("\ninitGUI: theme res.=%dx%d.\n", screen_params[0], screen_params[1]);
+    verbose("initGUI: gui res.=%dx%d.\n", gui.screen.width, gui.screen.height);
 
 	// Initalizing GUI strucutre.
 	bzero(&gui, sizeof(gui_t));
@@ -927,6 +929,7 @@ int initGUI(void)
 	// set our screen structure with the mode width & height
 	gui.screen.width = screen_params[0];	
 	gui.screen.height = screen_params[1];
+    verbose("\ninitGUI: gui res.=%dx%d.\n", gui.screen.width, gui.screen.height);
 
 	// load graphics otherwise fail and return
 	if (loadGraphics() == 0) {
@@ -988,16 +991,14 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 		{
 			case kPartitionTypeHFS:
 			{
-
 				// ErmaC : TODO test needed for recovery icon
-
 				// Use HFSRECOVERY icon.
-//				if (device->flags & kBVFlagBooter)
-//				{
-//					devicetype = iDeviceHFSRECOVERY;
-//				}
-//				else
-//				{
+				if (device->flags & kBVFlagBooter)
+				{
+					devicetype = iDeviceHFSRECOVERY;
+				}
+				else
+				{
 
 					// Use HFS or HFSRAID icon depending on bvr flags. Fallbacks are handled by alt_image above.
 					switch (device->OSVersion[3]) {
@@ -1032,7 +1033,7 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 							devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
 							break;
 					}
-//				}
+				}
 
 				break;
 
@@ -2192,6 +2193,8 @@ void drawBootGraphics(void)
 	} else {
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
+    verbose("\ndrawBootGraphics: gui res.=%dx%d.\n", gui.screen.width, gui.screen.height);
+    verbose("drawBootGraphics: boot res.=%dx%d.\n", screen_params[0], screen_params[1]);
 
 	// Save current screen resolution.
 	oldScreenWidth = gui.screen.width;
@@ -2202,6 +2205,8 @@ void drawBootGraphics(void)
 
 	// find best matching vesa mode for our requested width & height
 	getGraphicModeParams(screen_params);
+    verbose("\ndrawBootGraphics: gui res.=%dx%d.\n", gui.screen.width, gui.screen.height);
+    verbose("drawBootGraphics: boot res.=%dx%d.\n", screen_params[0], screen_params[1]);
 
 	// Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) ) {

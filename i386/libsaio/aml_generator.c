@@ -83,7 +83,7 @@ void aml_destroy_node(AML_CHUNK* node)
 	free(node);
 }
 
-AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, char* buffer, uint32_t size)
+AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, const char* buffer, uint32_t size)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 

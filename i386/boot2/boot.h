@@ -42,160 +42,159 @@
  * Paths used by chameleon
  */
 
-// kernel cache
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+//kernel cache
+#define kDefaultCachePathLeo        "/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow       "/System/Library/Caches/com.apple.kext.caches/Startup/"
 
 // Lion installer
-#define kLionInstallerDataFolder      "/Mac OS X Install Data/"
-#define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
+#define kLionInstallerDataFolder    "/Mac OS X Install Data/"
+#define kLionInstallerPlist         kLionInstallerDataFolder "com.apple.Boot.plist"
 
 // Mountain Lion installer
-#define kMLionInstallerDataFolder      "/OS X Install Data/"
-#define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+#define kMLionInstallerDataFolder   "/OS X Install Data/"
+#define kMLionInstallerPlist        kMLionInstallerDataFolder "com.apple.Boot.plist"
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
-#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and newer
 
 /*
  * Keys used in system Boot.plist
  */
-#define kGraphicsModeKey	"Graphics Mode"
-#define kTextModeKey		"Text Mode"
-#define kQuietBootKey		"Quiet Boot"
-#define kKernelFlagsKey		"Kernel Flags"
-#define kKernelArchKey		"Kernel Architecture"
-#define kMKextCacheKey		"MKext Cache"
-#define kKernelNameKey		"Kernel"
-#define kKernelCacheKey		"Kernel Cache"
-#define kUseKernelCache		"UseKernelCache"	/* boot.c */
-#define kBootDeviceKey		"Boot Device"
-#define kTimeoutKey		"Timeout"
-#define kRootDeviceKey		"rd"
-#define kBootUUIDKey		"boot-uuid"
-#define kHelperRootUUIDKey	"Root UUID"
-#define kPlatformKey		"platform"
-#define kACPIKey		"acpi"
-#define kCDROMPromptKey		"CD-ROM Prompt"
-#define kCDROMOptionKey		"CD-ROM Option Key"
-#define kRescanPromptKey	"Rescan Prompt"
-#define kRescanKey		"Rescan"
-#define kScanSingleDriveKey	"Scan Single Drive"
-#define kInstantMenuKey		"Instant Menu"
-#define kDefaultKernel		"mach_kernel"
-#define kOSXKernel		"kernel"		// Yosemite
-#define kGUIKey			"GUI"
-#define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"		/* gui.c */
-#define kWaitForKeypressKey	"Wait"
+#define kGraphicsModeKey            "Graphics Mode"
+#define kTextModeKey                "Text Mode"
+#define kQuietBootKey               "Quiet Boot"
+#define kKernelFlagsKey             "Kernel Flags"
+#define kKernelArchKey              "Kernel Architecture"
+#define kMKextCacheKey              "MKext Cache"
+#define kKernelNameKey              "Kernel"
+#define kKernelCacheKey             "Kernel Cache"
+#define kUseKernelCache             "UseKernelCache"	/* boot.c */
+#define kBootDeviceKey              "Boot Device"
+#define kTimeoutKey                 "Timeout"
+#define kRootDeviceKey              "rd"
+#define kBootUUIDKey                "boot-uuid"
+#define kHelperRootUUIDKey          "Root UUID"
+#define kPlatformKey                "platform"
+#define kACPIKey                    "acpi"
+#define kCDROMPromptKey             "CD-ROM Prompt"
+#define kCDROMOptionKey             "CD-ROM Option Key"
+#define kRescanPromptKey            "Rescan Prompt"
+#define kRescanKey                  "Rescan"
+#define kScanSingleDriveKey         "Scan Single Drive"
+#define kInstantMenuKey             "Instant Menu"
+#define kYosemiteKernel             "kernel"
+#define kDefaultKernel              "mach_kernel"
+#define kGUIKey                     "GUI"
+#define kBootBannerKey              "Boot Banner"
+#define kShowInfoKey                "ShowInfo"		// gui.c
+#define kWaitForKeypressKey         "Wait"
 
 /* AsereBLN: added these keys */
-#define kUseAtiROM		"UseAtiROM"		/* ati.c */
-#define kWake			"Wake"			/* boot.c */
-#define kForceWake		"ForceWake"		/* boot.c */
-#define kWakeImage		"WakeImage"		/* boot.c */
-#define kProductVersion     "ProductVersion"	/* disk.c */
-#define kProductUserVisibleVersion     "ProductUserVisibleVersion"	/* disk.c */
-#define karch               "arch"			/* boot.c */
-#define kDSDT               "DSDT"			/* acpi_patcher.c */
-#define kDropSSDT           "DropSSDT"		/* acpi_patcher.c */
-#define kDeviceProperties	"device-properties"	/* device_inject.c */
-#define kHidePartition		"Hide Partition"	/* disk.c */
-#define kRenamePartition	"Rename Partition"	/* disk.c */
-#define kSMBIOSKey		"SMBIOS"		/* fake_efi.c */
-//#define kSystemID		"SystemId"		/* fake_efi.c */
-#define kSystemType		"SystemType"		/* fake_efi.c */
-#define kUseNvidiaROM		"UseNvidiaROM"		/* nvidia.c */
-#define kVBIOS              "VBIOS"			/* nvidia.c && ati.c */
-#define kPCIRootUID         "PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn	"EthernetBuiltIn"	/* pci_setup.c */
-#define kGraphicsEnabler	"GraphicsEnabler"	/* pci_setup.c */
-#define kForceHPET          "ForceHPET"		/* pci_setup.c */
-#define kUseMemDetect		"UseMemDetect"		/* platform.c */
-#define kSMBIOSdefaults		"SMBIOSdefaults"	/* smbios_patcher.c */
-#define kUSBBusFix          "USBBusFix"		/* usb.c */
-#define kEHCIacquire		"EHCIacquire"		/* usb.c */
-#define kUHCIreset          "UHCIreset"		/* usb.c */
-#define kEHCIhard           "EHCIhard"		/* usb.c */
-#define kDefaultPartition	"Default Partition"	/* sys.c */
+#define kUseAtiROM                  "UseAtiROM"		/* ati.c */
+#define kWake                       "Wake"			/* boot.c */
+#define kForceWake                  "ForceWake"		/* boot.c */
+#define kWakeImage                  "WakeImage"		/* boot.c */
+#define kProductVersion             "ProductVersion"	/* disk.c */
+#define karch                       "arch"			/* boot.c */
+#define kDSDT                       "DSDT"			// path to custom DSDT.aml /* acpi_patcher.c */
+#define kDropSSDT                   "DropSSDT"		/* acpi_patcher.c */
+#define kDeviceProperties           "device-properties"	/* device_inject.c */
+#define kHidePartition              "Hide Partition"	/* disk.c */
+#define kRenamePartition            "Rename Partition"	/* disk.c */
+#define kSMBIOSKey                  "SMBIOS"		/* fake_efi.c */
+//#define kSystemID                 "SystemId"		/* fake_efi.c */
+#define kSystemType                 "SystemType"		/* fake_efi.c */
+#define kUseNvidiaROM               "UseNvidiaROM"		/* nvidia.c */
+#define kVBIOS                      "VBIOS"			/* nvidia.c && ati.c */
+#define kPCIRootUID                 "PCIRootUID"		/* pci_root.c */
+#define kEthernetBuiltIn            "EthernetBuiltIn"	/* pci_setup.c */
+#define kGraphicsEnabler            "GraphicsEnabler"	/* pci_setup.c */
+#define kForceHPET                  "ForceHPET"		/* pci_setup.c */
+#define kUseMemDetect               "UseMemDetect"		/* platform.c */
+#define kSMBIOSdefaults             "SMBIOSdefaults"	/* smbios_patcher.c */
+#define kUSBBusFix                  "USBBusFix"		/* usb.c */
+#define kEHCIacquire                "EHCIacquire"		/* usb.c */
+#define kUHCIreset                  "UHCIreset"		/* usb.c */
+#define kEHCIhard                   "EHCIhard"		/* usb.c */
+#define kDefaultPartition           "Default Partition"	/* sys.c */
 
 /* Duvel300: added this */
-#define kRestartFix		"RestartFix"		/* acpi_patcher.c */
+#define kRestartFix                 "RestartFix"		/* acpi_patcher.c */
 
 /* Slice: added this */
-#define kPS2RestartFix		"PS2RestartFix"		/* acpi_patcher.c */
+#define kPS2RestartFix              "PS2RestartFix"		/* acpi_patcher.c */
 
 /* Signal64: added this key */
-#define kLegacyOff		"USBLegacyOff"		/* usb.c */
+#define kLegacyOff                  "USBLegacyOff"		/* usb.c */
 
 /* Lebidou: added this key */
 
 /* Meklort: added this key */
-#define kMD0Image		"md0"			/* ramdisk.h */
+#define kMD0Image                   "md0"			/* ramdisk.h */
 
 /* Andyvand: added these keys */
 
 /* Mojodojo: added these keys */
-#define kGeneratePStates	"GeneratePStates"	/* acpi_patcher.c */
-#define kGenerateCStates	"GenerateCStates"	/* acpi_patcher.c */
-#define kCSTUsingSystemIO	"CSTUsingSystemIO"	/* acpi_patcher.c */
-#define kEnableC2State		"EnableC2State"		/* acpi_patcher.c */
-#define kEnableC3State		"EnableC3State"		/* acpi_patcher.c */
-#define kEnableC4State		"EnableC4State"		/* acpi_patcher.c */
+#define kGeneratePStates            "GeneratePStates"	/* acpi_patcher.c */
+#define kGenerateCStates            "GenerateCStates"	/* acpi_patcher.c */
+#define kCSTUsingSystemIO           "CSTUsingSystemIO"	/* acpi_patcher.c */
+#define kEnableC2State              "EnableC2State"		/* acpi_patcher.c */
+#define kEnableC3State              "EnableC3State"		/* acpi_patcher.c */
+#define kEnableC4State              "EnableC4State"		/* acpi_patcher.c */
 
 /* valv: added these keys */
-#define kbusratio		"busratio"		/* cpu.c */
-#define kDcfg0			"display_0"		/* nvidia.c */
-#define kDcfg1			"display_1"		/* nvidia.c */
+#define kbusratio                   "busratio"		/* cpu.c */
+#define kDcfg0                      "display_0"		/* nvidia.c */
+#define kDcfg1                      "display_1"		/* nvidia.c */
 
 /* Marchrius: added these keys */
-#define kEnableBacklight	"EnableBacklight"	/* nvidia.c */
+#define kEnableBacklight            "EnableBacklight"	/* nvidia.c */
 
 /* Kabyl: added these keys */
-#define kAtiConfig          "AtiConfig"		/* ati.c */
-#define kAtiPorts           "AtiPorts"		/* ati.c */
-#define kATYbinimage		"ATYbinimage"		/* ati.c */
+#define kAtiConfig                  "AtiConfig"		/* ati.c */
+#define kAtiPorts                   "AtiPorts"		/* ati.c */
+#define kATYbinimage                "ATYbinimage"		/* ati.c */
 
 /* cosmo1: added these keys */
-#define kEnableHDMIAudio	"EnableHDMIAudio"	/* ati.c && nvidia.c */
+#define kEnableHDMIAudio            "EnableHDMIAudio"	/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
 
 /* ErmaC: added these keys */
-#define kEnableDualLink		"EnableDualLink"	/* nvidia.c && gma.c*/
-#define kNvidiaGeneric		"NvidiaGeneric"		/* nvidia.c */
-#define kSkipIntelGfx		"SkipIntelGfx"		/* pci_setup.c */
-#define kSkipNvidiaGfx		"SkipNvidiaGfx"		/* pci_setup.c */
-#define kSkipAtiGfx         "SkipAtiGfx"		/* pci_setup.c */
-#define kIntelCapriFB		"IntelCapriFB"		/* gma.c was HD4K-ig */
-#define kIntelAzulFB		"IntelAzulFB"		/* gma.c was HD5K-ig */
-#define kAAPLCustomIG		"InjectIntel-ig"	/* gma.c */
-#define kHDAEnabler         "HDAEnabler"		/* pci_setup.c */
-#define kHDEFLayoutID		"HDEFLayoutID"		/* hda.c */
-#define kHDAULayoutID		"HDAULayoutID"		/* hda.c */
+#define kEnableDualLink             "EnableDualLink"	/* nvidia.c && gma.c*/
+#define kNvidiaGeneric              "NvidiaGeneric"		/* nvidia.c */
+#define kSkipIntelGfx               "SkipIntelGfx"		/* pci_setup.c */
+#define kSkipNvidiaGfx              "SkipNvidiaGfx"		/* pci_setup.c */
+#define kSkipAtiGfx                 "SkipAtiGfx"		/* pci_setup.c */
+#define kIntelCapriFB               "IntelCapriFB"		/* gma.c was HD4K-ig */
+#define kIntelAzulFB                "IntelAzulFB"		/* gma.c was HD5K-ig */
+#define kAAPLCustomIG               "InjectIntel-ig"	/* gma.c */
+#define kHDAEnabler                 "HDAEnabler"		/* pci_setup.c */
+#define kHDEFLayoutID               "HDEFLayoutID"		/* hda.c */
+#define kHDAULayoutID               "HDAULayoutID"		/* hda.c */
 
 /* Karas: added these keys */
-#define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
+#define kMemFullInfo                "ForceFullMemInfo"	/* smbios.c */
 
 /* Bungo: added these keys */
-// mask private data or no
-#define kPrivateData		"PrivateData"		/* smbios_decode.c */
+#define kPrivateData                "PrivateData"		/* smbios_decode.c */
+#define kProductUserVisibleVersion  "ProductUserVisibleVersion"	/* disk.c */
 
 /*
  * Flags to the booter or kernel
  */
-#define kVerboseModeFlag	"-v"
-#define kSafeModeFlag		"-x"
-#define kIgnoreCachesFlag	"-f"
-#define kIgnoreBootFileFlag	"-F"
-#define kSingleUserModeFlag	"-s"
+#define kVerboseModeFlag            "-v"
+#define kSafeModeFlag               "-x"
+#define kIgnoreCachesFlag           "-f"
+#define kIgnoreBootFileFlag         "-F"
+#define kSingleUserModeFlag         "-s"
 
 /*
  * Booter behavior control
  */
-#define kBootTimeout         -1
-#define kCDBootTimeout       8
+#define kBootTimeout                -1
+#define kCDBootTimeout              8
 
 /*
  * A global set by boot() to record the device that the booter was loaded from.
@@ -213,6 +212,7 @@ extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
 extern bool useGUI;
+extern char gDarwinBuildVerStr[256];
 
 /*
  * Boot Modes
@@ -226,7 +226,16 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
+extern bool checkOSVersion(const char * version);
+extern uint32_t getMacOSVerCurrent();
 
+/*
+ * acpi_patcher.c
+ */
+extern void *loadACPITable(const char *filename);
+// Bungo:
+extern void *new_dsdt,
+            *new_ecdt;
 /*
  * usb.c
  */
@@ -252,7 +261,7 @@ extern void drawDataRectangle(
                               unsigned short  y,
                               unsigned short  width,
                               unsigned short  height,
-                              unsigned char * data
+                              unsigned char   *data
                               );
 extern int
 convertImage( unsigned short width,
@@ -261,19 +270,18 @@ convertImage( unsigned short width,
               unsigned char **newImageData );
 extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
 extern void drawBootGraphics(void);
-extern void drawPreview(void *src, uint8_t * saveunder);
+extern void drawPreview(void *src, uint8_t *saveunder);
 extern int getVideoMode(void);
 extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
 
 /*
  * drivers.c
  */
-extern char *gDarwinBuildVerStr; // Bungo
 extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
-
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
+
 /*!
     Hookable function pointer called during the driver loading phase that
     allows other code to cause additional drivers to be loaded.
@@ -307,8 +315,14 @@ extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u
 /*
  * lzvn.c
  */
-extern size_t decompress_lzvn(void * _dest, size_t _dest_size, void * _src, size_t _src_size);
-// extern u_int8_t *compress_lzvn(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+extern size_t decompress_lzvn(void *dst, size_t dst_size, const void *src, size_t src_size);
+/*
+extern size_t lzvn_encode(void         *dst,
+                          size_t       dst_size,
+                          const void   *src,
+                          size_t       src_size,
+                          void         *work);
+*/
 
 struct compressed_kernel_header {
 	u_int32_t signature;
@@ -319,7 +333,7 @@ struct compressed_kernel_header {
 	u_int32_t reserved[11];
 	char      platform_name[64];
 	char      root_path[256];
-	u_int8_t  data[0];
+	 u_int8_t  data[0];
 };
 typedef struct compressed_kernel_header compressed_kernel_header;
 
@@ -327,8 +341,6 @@ typedef struct compressed_kernel_header compressed_kernel_header;
 void HibernateBoot(char *boot_device);
 
 /* bmdecompress.c */
-void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
-
-bool checkOSVersion(const char * version);
+void *DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
 #endif /* !__BOOT2_BOOT_H */

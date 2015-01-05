@@ -13,6 +13,18 @@
 #include <time.h>
 #include <unistd.h>
 
+char *
+int_stpncpy (dst, src, len)
+     char *dst;
+     const char *src;
+     size_t len;
+{
+	size_t n = strlen (src);
+	if (n > len)
+		n = len;
+	return strncpy (dst, src, len) + n;
+}
+
 #define LKC_DIRECT_LINK
 #include "lkc.h"
 
@@ -101,8 +113,9 @@ static char *conf_expand_value(const char *in)
 		char *name_ptr = name;
 		size_t n = min(res_rem, src - in);
 
-		res_ptr = stpncpy(res_ptr, in, n);
-		if (!(res_rem -= n)) {
+		res_ptr = int_stpncpy(res_ptr, in, n);
+		if (!(res_rem -= n))
+		{
 			return res_value; /* buffer full, quit now */
 		}
 		src++;
@@ -118,8 +131,9 @@ static char *conf_expand_value(const char *in)
 		symval = sym_get_string_value(sym);
 		n = min(res_rem, strlen(symval));
 
-		res_ptr = stpncpy(res_ptr, symval, n);
-		if (!(res_rem -= n)) {
+		res_ptr = int_stpncpy(res_ptr, symval, n);
+		if (!(res_rem -= n))
+		{
 			return res_value; /* buffer full, quit now */
 		}
 		in = src;

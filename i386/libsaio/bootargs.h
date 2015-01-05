@@ -131,14 +131,20 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsFlagRebootOnPanic	(1 << 0)
 #define kBootArgsFlagHiDPI		(1 << 1)
 #define kBootArgsFlagBlack		(1 << 2)
+#define kBootArgsFlagCSRActiveConfig	(1 << 3)
+#define kBootArgsFlagCSRPendingConfig	(1 << 4)
+#define kBootArgsFlagCSRBoot		(1 << 5)
+#define kBootArgsFlagBlackBg		(1 << 6)
+#define kBootArgsFlagLoginUI		(1 << 7)
 
-typedef struct boot_args {
+typedef struct boot_args
+{
     uint16_t    Revision;	/* Revision of boot_args structure */
     uint16_t    Version;	/* Version of boot_args structure */
 
     uint8_t     efiMode;    /* 32 means 32-bit mode, 64 means 64-bit mode */
     uint8_t     debugMode;  /* Bit field with behavior changes */
-    uint16_t    flags; //    uint8_t     __reserved1[2];
+    uint16_t    flags;
 
     char        CommandLine[BOOT_LINE_LENGTH];	/* Passed in command line */
 
@@ -159,25 +165,25 @@ typedef struct boot_args {
     uint32_t    efiRuntimeServicesPageCount;
     uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
 
-    uint32_t    efiSystemTable;		/* physical address of system table in runtime area */
-    uint32_t    kslide;			//    uint32_t    __reserved2;
+    uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
+    uint32_t    kslide;
 
     uint32_t    performanceDataStart; /* physical address of log */
     uint32_t    performanceDataSize;
 
     uint32_t    keyStoreDataStart; /* physical address of key store data */
     uint32_t    keyStoreDataSize;
-    uint64_t	bootMemStart;		/* physical address of interpreter boot memory */
+    uint64_t	bootMemStart;
     uint64_t	bootMemSize;
     uint64_t    PhysicalMemorySize;
     uint64_t    FSBFrequency;
-    //
+
     uint64_t    pciConfigSpaceBaseAddress;
     uint32_t    pciConfigSpaceStartBusNumber;
     uint32_t    pciConfigSpaceEndBusNumber;
-    uint32_t    __reserved4[730];
-    //
-//    uint32_t    __reserved4[734];
+    uint32_t	csrActiveConfig;
+    uint32_t	csrPendingConfig;
+    uint32_t    __reserved4[728];
 
 } boot_args;
 
@@ -213,9 +219,5 @@ typedef struct boot_args_pre_lion {
     uint32_t    __reserved3[2];
 
 } boot_args_pre_lion;
-
-extern char     gMacOSVersion[8];
-extern uint32_t MacOSVerCurrent;
-extern uint32_t MacOSVer2Int(const char *osver);
 
 #endif /* _PEXPERT_I386_BOOT_H */

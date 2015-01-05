@@ -41,10 +41,8 @@
 
 #if DEBUG_EXFAT
 #define DBG(x...)		printf(x)
-#define PAUSE()			getchar()
 #else
-#define DBG(x...)
-#define PAUSE()
+#define DBG(x...)		msglog(x)
 #endif
 
 #define	EXFAT_BBID	"EXFAT   "
@@ -108,7 +106,7 @@ EXFATGetDescription(CICell ih, char *str, long strMaxLen)
     struct direntry_label *dire = NULL;
     int loopControl = 0;
 
-    DBG("EXFAT: start %x:%x\n", ih->biosdev, ih->part_no);
+    //verbose("EXFAT: start %x:%x\n", ih->biosdev, ih->part_no);
 	
     buf = (char *)malloc(MAX_BLOCK_SIZE);
     if (buf == 0)
@@ -135,8 +133,7 @@ EXFATGetDescription(CICell ih, char *str, long strMaxLen)
      *    0xEC 0x?? 0x90
      * where 0x?? means any byte value is OK.
      */
-    if (boot->reserved1[0] != 0xE9
-        && (boot->reserved1[0] != 0xEB || boot->reserved1[2] != 0x90))
+    if (boot->reserved1[0] != 0xE9 && (boot->reserved1[0] != 0xEB || boot->reserved1[2] != 0x90))
     {
         goto error;
     }
@@ -152,29 +149,29 @@ EXFATGetDescription(CICell ih, char *str, long strMaxLen)
      * powers of two, and within reasonable ranges.
      */
     bytesPerSector = 1 << boot->bf_bpss;	/* Just one byte; no swapping needed */
-    DBG("EXFAT: bpss=%d, bytesPerSector=%d\n", boot->bf_bpss, bytesPerSector);
+    //verbose("EXFAT: bpss=%d, bytesPerSector=%d\n", boot->bf_bpss, bytesPerSector);
     if (boot->bf_bpss < 9 || boot->bf_bpss > 12)
     {
-        DBG("EXFAT: invalid bytes per sector shift(%d)\n", boot->bf_bpss);
+        verbose("EXFAT: invalid bytes per sector shift(%d)\n", boot->bf_bpss);
         goto error;
     }
 
     sectorsPerCluster = 1 << boot->bf_spcs;	/* Just one byte; no swapping needed */
-    DBG("EXFAT: spcs=%d, sectorsPerCluster=%d\n", boot->bf_spcs, sectorsPerCluster);
+    //verbose("EXFAT: spcs=%d, sectorsPerCluster=%d\n", boot->bf_spcs, sectorsPerCluster);
     if (boot->bf_spcs > (25 - boot->bf_bpss))
     {
-        DBG("EXFAT: invalid sectors per cluster shift (%d)\n", boot->bf_spcs);
+        verbose("EXFAT: invalid sectors per cluster shift (%d)\n", boot->bf_spcs);
         goto error;
     }
     
      // calculate root dir cluster offset
     rdirOffset = boot->bf_cloff + (boot->bf_rdircl - 2) * sectorsPerCluster;
-    DBG("EXFAT: rdirOffset=%d\n", rdirOffset);
+    //verbose("EXFAT: rdirOffset=%d\n", rdirOffset);
 
     // load MAX_BLOCK_SIZE bytes of root dir
     Seek(ih, rdirOffset * bytesPerSector);
     Read(ih, (long)buf, MAX_BLOCK_SIZE);
-    DBG("buf 0 1 2 = %x %x %x\n", 0x00ff & buf[0], 0x00ff & buf[1], 0x00ff & buf[2]);
+    //verbose("buf 0 1 2 = %x %x %x\n", 0x00ff & buf[0], 0x00ff & buf[1], 0x00ff & buf[2]);
 
     str[0] = '\0';
 
@@ -193,16 +190,19 @@ EXFATGetDescription(CICell ih, char *str, long strMaxLen)
     {
         utf_encodestr( dire->label, (int)dire->llen, (u_int8_t *)str, strMaxLen, OSLittleEndian );
     }
-    DBG("EXFAT: label=%s\n", str);
-
+    //verbose("EXFAT: label=%s\n", str);
+/*
     free(buf);
-    PAUSE();
+#if DEBUG_EXFAT
+    pause("");
+#endif
     return;
-
+*/
  error:
     if (buf) free(buf);
-    DBG("EXFAT: error\n");
-    PAUSE();
+#if DEBUG_EXFAT
+    pause("");
+#endif
     return;
 }
 
@@ -240,27 +240,27 @@ long EXFATGetUUID(CICell ih, char *uuidStr)
         return -1;
 
     // Use UUID like the one you get on Windows
-    sprintf(uuidStr, "%04X-%04X",   (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
-                                    (unsigned short)boot->bf_volsn & 0xFFFF);
+    sprintf(uuidStr, "%04X-%04X", (unsigned short)(boot->bf_volsn >> 16) & 0xFFFF,
+    							  (unsigned short)boot->bf_volsn & 0xFFFF);
 
-    DBG("EXFATGetUUID: %x:%x = %s\n", ih->biosdev, ih->part_no, uuidStr);
+    //verbose("EXFATGetUUID: %x:%x = %s\n", ih->biosdev, ih->part_no, uuidStr);
     return 0;
 }    
 
 /**
  * Returns true if given buffer is the boot rec of the EXFAT volume.
  */
-bool EXFATProbe(const void * buffer)
+bool EXFATProbe(const void *buffer)
 {
     bool result = false;
 
     // boot sector structure
-    const struct exfatbootfile	* boot = buffer;
+    const struct exfatbootfile	*boot = buffer;
 
     // Looking for EXFAT signature.
     if (memcmp((const char *)boot->bf_sysid, EXFAT_BBID, EXFAT_BBIDLEN) == 0)
         result = true;
 	
-    DBG("EXFATProbe: %d\n", result ? 1 : 0);
+    //verbose("EXFATProbe: %d\n", result ? 1 : 0);
     return result;
 }

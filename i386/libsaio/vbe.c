@@ -33,10 +33,8 @@
 
 static biosBuf_t bb;
 
-#if UNUSED
-
 //==============================================================================
-
+#if UNUSED
 static inline void
 outi (int port, int index, int val)
 {
@@ -68,12 +66,10 @@ rmwi(int port, int index, int clear, int set)
     outb (port, index);
     outb (port + 1, (inb (port + 1) & ~clear) | set);
 }
-
+#endif /* UNUSED */
 //==============================================================================
 
-#endif /* UNUSED */
-
-uint8_t getVBEInfo( void * infoBlock )
+uint8_t getVBEInfo( void *infoBlock )
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcGetControllerInfo;
@@ -163,9 +159,9 @@ uint8_t generateCRTCTiming( unsigned short     width,
                         int                paramType,
                         VBECRTCInfoBlock * timing )
 {
-    double h_period_est, h_freq, h_period, h_total_pixels, h_sync_pixels;
+    double h_period, h_total_pixels, h_sync_pixels;
     double h_active_pixels, h_ideal_duty_cycle, h_blank_pixels, pixel_freq = 0;
-    double v_sync_plus_bp = 0, v_total_lines = 0, v_field_rate_est, v_frame_rate = 0;
+    double v_sync_plus_bp = 0, v_total_lines = 0, v_frame_rate = 0;
     const double h_pixels = (double) width;
     const double v_lines  = (double) height;
 
@@ -195,9 +191,12 @@ uint8_t generateCRTCTiming( unsigned short     width,
         double v_field_rate_in = (double) paramValue;
 
         // Estimate the horizontal period
-        h_period_est = ((1 / v_field_rate_in) - kMinVSyncPlusBP / 1000000) /
-                        (v_lines + (2 * top_margin_lines) + kMinFrontPorch + interlace) * 
-                        1000000;
+        double h_period_est = ((1 / v_field_rate_in) - kMinVSyncPlusBP / 1000000) /
+          (v_lines + (2 * top_margin_lines) + kMinFrontPorch + interlace) * 
+          1000000;
+
+        // Estimate the vertical field frequency
+        double v_field_rate_est = 1 / h_period_est / v_total_lines * 1000000;
 
         // Number of lines in Vsync + back porch
         v_sync_plus_bp = Round(kMinVSyncPlusBP / h_period_est);
@@ -205,9 +204,6 @@ uint8_t generateCRTCTiming( unsigned short     width,
         // Total number of lines in Vetical field period
         v_total_lines = v_lines + top_margin_lines + bot_margin_lines +
                         v_sync_plus_bp + interlace + kMinFrontPorch;
-
-        // Estimate the vertical field frequency
-        v_field_rate_est = 1 / h_period_est / v_total_lines * 1000000;
 
         // Find the actual horizontal period
         h_period = h_period_est / (v_field_rate_in / v_field_rate_est);
@@ -230,7 +226,7 @@ uint8_t generateCRTCTiming( unsigned short     width,
     if (paramType == kCRTCParamPixelClock)
     {
         // Horizontal frequency
-        h_freq = pixel_freq / h_total_pixels * 1000;
+        double h_freq = pixel_freq / h_total_pixels * 1000;
 
         // Number of lines in V sync + back porch
         v_sync_plus_bp = Round(kMinVSyncPlusBP * h_freq / 1000);
@@ -326,12 +322,13 @@ uint8_t getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
 
 uint8_t getVBEEDID(void *edidBlock)
 {
+    bzero(&bb, sizeof(bb));
     bb.intno   = 0x10;
     bb.eax.rr  = 0x4F15;
-	bb.ebx.r.l = 0x00;
+	bb.ebx.r.l = 0x01;
     //bb.edx.rr  = 0x01;
-    //bb.es      = SEG(edidBlock);
-    //bb.edi.rr  = OFF(edidBlock);
+    bb.es      = SEG(edidBlock);
+    bb.edi.rr  = OFF(edidBlock);
     bios(&bb);
     return(bb.eax.r.h);
 }

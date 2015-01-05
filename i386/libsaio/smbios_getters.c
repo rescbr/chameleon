@@ -24,30 +24,28 @@ bool getProcessorInformationExternalClock(returnType *value)
 	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
 		switch (Platform.CPU.Family) {
 			case 0x06:
-			{
-				switch (Platform.CPU.Model)
-				{
-						// set external clock to 0 for SANDY
-						// removes FSB info from system profiler as on real mac's.
-					case CPU_MODEL_SANDYBRIDGE:
-					case CPU_MODEL_JAKETOWN:
-					case CPU_MODEL_IVYBRIDGE_XEON:
-					case CPU_MODEL_IVYBRIDGE:
-					case CPU_MODEL_HASWELL:
-					case CPU_MODEL_HASWELL_SVR:
-					case CPU_MODEL_HASWELL_ULT:
-					case CPU_MODEL_CRYSTALWELL:
-
+				switch (Platform.CPU.Model) {
+					// set external clock to 0 for SANDY
+					// removes FSB info from system profiler as on real mac's.
+					case CPUID_MODEL_SANDYBRIDGE:
+					case CPUID_MODEL_JAKETOWN:
+					case CPUID_MODEL_IVYBRIDGE_EP:
+					case CPUID_MODEL_IVYBRIDGE:
+					case CPUID_MODEL_HASWELL:
+					case CPUID_MODEL_HASWELL_SVR:
+					case CPUID_MODEL_HASWELL_ULT:
+					case CPUID_MODEL_CRYSTALWELL:
 						value->word = 0;
 						break;
 					default:
 						value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
+                        break;
 				}
-			}
 				break;
 
 			default:
 				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
+                break;
 		}
 	} else {
 		value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
@@ -67,82 +65,86 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
 		switch (Platform.CPU.Family) {
 			case 0x06:
-			{
 				switch (Platform.CPU.Model) {
-					case CPU_MODEL_PENTIUM_M:
-					case CPU_MODEL_DOTHAN:		// Intel Pentium M
-					case CPU_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
-					case CPU_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
-					case CPU_MODEL_PENRYN:		// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-					case CPU_MODEL_ATOM:		// Intel Atom (45nm)
+                        /*
+					case CPUID_MODEL_PENTIUM_M:
+					case CPUID_MODEL_DOTHAN:	// Intel Pentium M
+					case CPUID_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
+					case CPUID_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPUID_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+					case CPUID_MODEL_ATOM:		// Intel Atom (45nm)
 						return false;
-
+                        */
 					case 0x19:
-					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
-					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
-					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
-					case CPU_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
-					case CPU_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
-					case CPU_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
-					case CPU_MODEL_IVYBRIDGE_XEON:
-					case CPU_MODEL_HASWELL:
-					{
-						// thanks to dgobe for i3/i5/i7 bus speed detection
-						int nhm_bus = 0x3F;
-						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
-						unsigned long did, vid;
-						unsigned int i;
-						
-						// Nehalem supports Scrubbing
-						// First, locate the PCI bus where the MCH is located
-						for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++) {
-							vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
-							did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
-							vid &= 0xFFFF;
-							did &= 0xFF00;
-							
-							if(vid == 0x8086 && did >= 0x2C00) {
-								nhm_bus = possible_nhm_bus[i];
-							}
-						}
-
-						unsigned long qpimult, qpibusspeed;
-						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
-						qpimult &= 0x7F;
-						DBG("qpimult %d\n", qpimult);
-						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
-						// Rek: rounding decimals to match original mac profile info
-						if (qpibusspeed%100 != 0) {
-							qpibusspeed = ((qpibusspeed+50)/100)*100;
-						}
-						DBG("qpibusspeed %d\n", qpibusspeed);
-						value->word = qpibusspeed;
-						return true;
-					}
+					case CPUID_MODEL_NEHALEM:	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPUID_MODEL_DALES:
+                    case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+					case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPUID_MODEL_WESTMERE_EX:	// Intel Xeon E7
+					case CPUID_MODEL_SANDYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (32nm)
+					case CPUID_MODEL_JAKETOWN:	// Intel Core i7, Xeon E5 LGA2011 (32nm)
+					case CPUID_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
+					case CPUID_MODEL_IVYBRIDGE_EP:
+					case CPUID_MODEL_HASWELL:
+                        {
+                            // thanks to dgobe for i3/i5/i7 bus speed detection
+                            int nhm_bus = 0x3F;
+                            static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
+                            unsigned long did, vid;
+                            unsigned int i;
+                            
+                            // Nehalem supports Scrubbing
+                            // First, locate the PCI bus where the MCH is located
+                            for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++) {
+                                vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
+                                did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
+                                vid &= 0xFFFF;
+                                did &= 0xFF00;
+                                
+                                if(vid == 0x8086 && did >= 0x2C00) {
+                                    nhm_bus = possible_nhm_bus[i];
+                                }
+                            }
+                            
+                            unsigned long qpimult, qpibusspeed;
+                            qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
+                            qpimult &= 0x7F;
+                            verbose("qpimult %d\n", qpimult);
+                            qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
+                            // Rek: rounding decimals to match original mac profile info
+                            if (qpibusspeed%100 != 0) {
+                                qpibusspeed = ((qpibusspeed+50)/100)*100;
+                            }
+                            verbose("qpibusspeed %d\n", qpibusspeed);
+                            value->word = qpibusspeed;
+                            return true;
+                        }
+                        break;
+                        
 					default:
-						break; //Unsupported CPU type
+						break;
 				}
-			}
+                break;
+                
 			default:
 				break;
 		}
 	}
-	return false;
+    
+	return false; //Unsupported CPU type
 }
 
 uint16_t simpleGetSMBOemProcessorType(void)
 {
 	if (Platform.CPU.NoCores >= 4) {
-		return 0x501;	// 1281 - Quad-Core Xeon
-	} else if (Platform.CPU.NoCores == 1) {
-		return 0x201;	// 513 - Core Duo
-	};
+		return 0x402;	// 1026 - Quad-Core Xeon
+	} else if (Platform.CPU.NoCores == 2) {
+		return 0x301;	// 513 - Core 2 Duo
+	}
 	
-	return 0x301;		// 769 - Core 2 Duo
+	return 0x201;		// 769 - Core Duo
 }
 
 bool getSMBOemProcessorType(returnType *value)
@@ -158,29 +160,30 @@ bool getSMBOemProcessorType(returnType *value)
 		}
 		// Bungo: fixes Oem Processor Type - better matching IMHO, needs testing
 		switch (Platform.CPU.Family) {
-			case 0x0F:
 			case 0x06:
-			{
+			case 0x0F:
 				switch (Platform.CPU.Model) {
-					case CPU_MODEL_PENTIUM_M:
-					case CPU_MODEL_DOTHAN:				// 0x0D - Intel Pentium M model D
-					case CPU_MODEL_PRESCOTT:
-					case CPU_MODEL_NOCONA:
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
+					case CPUID_MODEL_PENTIUM_M:
+					case CPUID_MODEL_DOTHAN:			// 0x0D - Intel Pentium M model D
+                    case CPUID_MODEL_NOCONA:
+					case CPUID_MODEL_IRWINDALE:
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
 							value->word = 0x402;		// 1026 - Xeon
 						}
 						return true;
 
-					case CPU_MODEL_PRESLER:
-					case CPU_MODEL_CELERON:
-					case CPU_MODEL_YONAH:				// 0x0E - Intel Mobile Core Solo, Duo
+					case CPUID_MODEL_PRESLER:
+					case CPUID_MODEL_CELERON:
+					case CPUID_MODEL_YONAH:				// 0x0E - Intel Mobile Core Solo, Duo
 						value->word = 0x201;			// 513
 						return true;
 
-					case CPU_MODEL_MEROM:				// 0x0F - Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
-					case CPU_MODEL_XEON_MP:				// 0x1D - Six-Core Xeon 7400, "Dunnington", 45nm
-					case CPU_MODEL_PENRYN:				// 0x17 - Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
+					case CPUID_MODEL_MEROM:				// 0x0F - Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPUID_MODEL_XEON_MP:			// 0x1D - Six-Core Xeon 7400, "Dunnington", 45nm
+					case CPUID_MODEL_PENRYN:			// 0x17 - Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
 							value->word = 0x402;		// 1026 - Xeon
                             return true;
 						}
@@ -191,16 +194,17 @@ bool getSMBOemProcessorType(returnType *value)
 						}
 						return true;
 
-					case CPU_MODEL_LINCROFT:			// 0x27 - Intel Atom, "Lincroft", 45nm
-					case CPU_MODEL_ATOM:				// 0x1C - Intel Atom (45nm)
+					case CPUID_MODEL_LINCROFT:			// 0x27 - Intel Atom, "Lincroft", 45nm
+					case CPUID_MODEL_ATOM:				// 0x1C - Intel Atom (45nm)
 						return true;
 
-					case CPU_MODEL_NEHALEM_EX:			// 0x2E - Nehalem-ex, "Beckton", 45nm
-					case CPU_MODEL_NEHALEM:				// 0x1A - Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
-					case CPU_MODEL_FIELDS:				// 0x1E - Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPU_MODEL_DALES:					// 0x1F - Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
-							value->word = 0x501;			// 1281 - Lynnfiled Quad-Core Xeon
+					case CPUID_MODEL_NEHALEM_EX:			// 0x2E - Nehalem-ex, "Beckton", 45nm
+					case CPUID_MODEL_NEHALEM:			// 0x1A - Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
+					case CPUID_MODEL_FIELDS:			// 0x1E - Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
+					case CPUID_MODEL_DALES:				// 0x1F - Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
+							value->word = 0x501;		// 1281 - Lynnfiled Quad-Core Xeon
 							return true;
 						}
 						if (strstr(Platform.CPU.BrandString, "Core(TM) i3")) {
@@ -220,10 +224,11 @@ bool getSMBOemProcessorType(returnType *value)
 						}
 						return true;
 
-					case CPU_MODEL_DALES_32NM:			// 0x25 - Intel Core i3, i5 LGA1156 (32nm) (Clarkdale, Arrandale)
-					case CPU_MODEL_WESTMERE:			// 0x2C - Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
-					case CPU_MODEL_WESTMERE_EX:			// 0x2F - Intel Xeon E7
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
+					case CPUID_MODEL_DALES_32NM:			// 0x25 - Intel Core i3, i5 LGA1156 (32nm) (Clarkdale, Arrandale)
+					case CPUID_MODEL_WESTMERE:			// 0x2C - Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
+					case CPUID_MODEL_WESTMERE_EX:			// 0x2F - Intel Xeon E7
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
 							value->word = 0x501;		// 1281 - Xeon
 							return true;
 						}
@@ -244,9 +249,10 @@ bool getSMBOemProcessorType(returnType *value)
 						}
 						return true;
 
-					case CPU_MODEL_JAKETOWN:			// 0x2D - Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
-					case CPU_MODEL_SANDYBRIDGE:			// 0x2A - Intel Core i3, i5, i7 LGA1155 (32nm)
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
+					case CPUID_MODEL_JAKETOWN:			// 0x2D - Intel Core i7, Xeon E5-xxxx LGA2011 (32nm)
+					case CPUID_MODEL_SANDYBRIDGE:			// 0x2A - Intel Core i3, i5, i7 LGA1155 (32nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
 							value->word = 0x501;		// 1281 - Xeon
 							return true;
 						}
@@ -267,8 +273,9 @@ bool getSMBOemProcessorType(returnType *value)
 						}
 						return true;
 
-					case CPU_MODEL_IVYBRIDGE:			// 0x3A - Intel Core i3, i5, i7 LGA1155 (22nm)
-						if (strstr(Platform.CPU.BrandString, "Xeon")) {
+					case CPUID_MODEL_IVYBRIDGE:			// 0x3A - Intel Core i3, i5, i7 LGA1155 (22nm)
+						if (strstr(Platform.CPU.BrandString, "Xeon"))
+						{
 							value->word = 0xA01;		// 2561 - Xeon
 							return true;
 						}
@@ -289,14 +296,14 @@ bool getSMBOemProcessorType(returnType *value)
 						}
 						return true;
 
-					case CPU_MODEL_IVYBRIDGE_XEON:		// 0x3E - Mac Pro 6,1
-						value->word = 0xA01;		// 2561 - Xeon
+					case CPUID_MODEL_IVYBRIDGE_EP:		// 0x3E - Mac Pro 6,1
+						value->word = 0xA01;			// 2561 - Xeon
 						return true;
 
-					case CPU_MODEL_HASWELL:				// 0x3C -
-					case CPU_MODEL_HASWELL_SVR:			// 0x3F -
-					case CPU_MODEL_HASWELL_ULT:			// 0x45 -
-					case CPU_MODEL_CRYSTALWELL:			// 0x46
+					case CPUID_MODEL_HASWELL:			// 0x3C -
+					case CPUID_MODEL_HASWELL_SVR:			// 0x3F -
+					case CPUID_MODEL_HASWELL_ULT:			// 0x45 -
+					case CPUID_MODEL_CRYSTALWELL:			// 0x46
 						if (strstr(Platform.CPU.BrandString, "Xeon")) {
 							value->word = 0xA01;		// 2561 - Xeon
 							return true;
@@ -327,10 +334,11 @@ bool getSMBOemProcessorType(returnType *value)
 						value->word = 0x601;			// 1537 - Core i5
 						return true;
 					default:
-						break; //Unsupported CPU type
+						break;
 				}
-			}
-			default:
+                break;
+                
+            default:
 				break;
 		}
 	}
@@ -351,7 +359,7 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
 		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Type != 0) {
-			DBG("RAM Detected Type = %d\n", Platform.RAM.DIMM[map].Type);
+			verbose("RAM Detected Type = %d\n", Platform.RAM.DIMM[map].Type);
 			value->byte = Platform.RAM.DIMM[map].Type;
 			return true;
 		}
@@ -382,7 +390,7 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
 		if (Platform.RAM.DIMM[map].InUse && Platform.RAM.DIMM[map].Frequency != 0) {
-			DBG("RAM Detected Freq = %d Mhz\n", Platform.RAM.DIMM[map].Frequency);
+			verbose("RAM Detected Freq = %d Mhz\n", Platform.RAM.DIMM[map].Frequency);
 			value->dword = Platform.RAM.DIMM[map].Frequency;
 			return true;
 		}
@@ -407,7 +415,7 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
 		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].Vendor) > 0) {
-			DBG("RAM Detected Vendor[%d]='%s'\n", idx, Platform.RAM.DIMM[map].Vendor);
+			verbose("RAM Detected Vendor[%d]='%s'\n", idx, Platform.RAM.DIMM[map].Vendor);
 			value->string = Platform.RAM.DIMM[map].Vendor;
 			return true;
 		}
@@ -433,7 +441,7 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
 		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].SerialNo) > 0) {
-			DBG("map=%d,  RAM Detected SerialNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].SerialNo);
+			verbose("map=%d,  RAM Detected SerialNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].SerialNo);
 			value->string = Platform.RAM.DIMM[map].SerialNo;
 			return true;
 		}
@@ -456,7 +464,7 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
 		if (Platform.RAM.DIMM[map].InUse && strlen(Platform.RAM.DIMM[map].PartNo) > 0) {
-			DBG("map=%d,  RAM Detected PartNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].PartNo);
+			verbose("map=%d,  RAM Detected PartNo[%d]='%s'\n", map, idx, Platform.RAM.DIMM[map].PartNo);
 			value->string = Platform.RAM.DIMM[map].PartNo;
 			return true;
 		}
@@ -489,8 +497,8 @@ SMBEntryPoint *getAddressOfSmbiosTable(void)
 	    }
 		smbios = (SMBEntryPoint*)(((char*)smbios) + 16);
 	}
-	DBG("ERROR: Unable to find SMBIOS!\n");
-	pause();
+	error("ERROR: Unable to find SMBIOS!\n");
+	pause("");
 	return NULL;
 }
 

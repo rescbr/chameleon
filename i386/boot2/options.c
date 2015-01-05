@@ -38,7 +38,7 @@
 #define DBG(x...)	msglog(x)
 #endif
 
-char		gMacOSVersion[8];
+char		gMacOSVersion[OSVERSTRLEN];
 uint32_t    MacOSVerCurrent = 0;
 bool showBootBanner = true; //Azi:showinfo
 static bool shouldboot = false;
@@ -52,7 +52,8 @@ extern BVRef    bvChain;
 extern int		gDeviceCount;
 
 int			selectIndex = 0;
-MenuItem *  menuItems = NULL;
+
+MenuItem *menuItems = NULL;
 
 enum {
     kMenuTopRow    = 5,
@@ -60,22 +61,34 @@ enum {
     kScreenLastRow = 24
 };
 
-// 10.9.5 -> 0x0A090500
+extern char *msgbuf;
+
+void showTextBuffer(char *buf_orig, int size);
+
+//==========================================================================
+
+// MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
 uint32_t MacOSVer2Int(const char *osver)
 {
     uint32_t ret = 0;
-    uint8_t i = 0, k = 1, len = strlen(osver);
-    for (; len > 0; len--) {
-        if (osver[len-1] == '.') {
-            k = 1;
-            i++;
+    uint8_t retIndex = 0, f = 1;
+    int Index = strlen(osver) - 1;
+    for (; ((Index >= 0) && (Index <= OSVERSTRLEN)); Index--) {
+        if ((osver[Index] >= '0') && (osver[Index] <= '9')) {
+            ((uint8_t *)&ret)[retIndex] += (osver[Index] - '0') * f;
+            f *= 10;
         } else {
-            ((uint8_t *)&ret)[i] += (osver[len-1] - '0') * k;
-            k = k * 10;
+            if (osver[Index] == '.') {
+                f = 1;
+                retIndex++;
+            } else {
+                return 0;
+            }
         }
     }
     
-    return ret << (3 - i)*8;
+    if (retIndex > 0) return (ret << ((3 - retIndex) * 8));
+    else return 0;
 }
 
 //==========================================================================
@@ -631,8 +644,7 @@ static const char * extractKernelName( char ** cpp )
 
 //==========================================================================
 
-static void
-printMemoryInfo(void)
+static void printMemoryInfo(void)
 {
     int line;
     int i;
@@ -654,13 +666,13 @@ printMemoryInfo(void)
                (unsigned long)(mp->length),
                mp->type);
         if (line++ > 20) {
-            pause();
+            pause("");
             line = 0;
         }
         mp++;
     }
     if (line > 0) {
-        pause();
+        pause("");
     }
     
     setActiveDisplayPage(0);
@@ -705,7 +717,7 @@ void lspci(void)
 
 	dump_pci_dt(root_pci_dev->children);
 
-	pause();
+	pause("");
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setActiveDisplayPage(0);
@@ -908,7 +920,7 @@ int getBootOptions(bool firstRun)
 
 			// gDeviceCount is actually > 0, so menuItems[selectIndex] exists
 			menuBVR = (BVRef)(menuItems[selectIndex].param);
-			// what happen is bvChain is empty ?
+			// what happen if bvChain is empty ?
 		}
 	}
 
@@ -1002,6 +1014,8 @@ int getBootOptions(bool firstRun)
 					}
 				} else if (strcmp(booterCommand, "lspci") == 0) {
 					lspci();
+				} else if (strcmp(booterCommand, "log") == 0) {
+			                showTextBuffer(msgbuf, strlen(msgbuf));
 				} else if (strcmp(booterCommand, "more") == 0) {
 					showTextFile(booterParam);
 				} else if (strcmp(booterCommand, "rd") == 0) {
@@ -1132,13 +1146,13 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
         (*argP)++;
     }
 
-    strncpy( *argP, val, cnt );
-    *argP += cnt;
-    *argP[0] = ' ';
-    (*argP)++;
+	strncpy(*argP, val, cnt);
+	*argP += cnt;
+	*argP[0] = ' ';
+	(*argP)++;
+	*cntRemainingP -= len;
 
-    *cntRemainingP -= len;
-    return true;
+	return true;
 }
 
 // 
@@ -1177,8 +1191,7 @@ processBootArgument(
 // Maximum config table value size
 #define VALUE_SIZE 2048
 
-int
-processBootOptions()
+int processBootOptions()
 {
 	const char *cp  = gBootArgs;
 	const char *val = 0;
@@ -1195,9 +1208,9 @@ processBootOptions()
 	skipblanks( &cp );
 
 	// Update the unit and partition number.
-	if ( gBootVolume ) {
-		if (!( gBootVolume->flags & kBVFlagNativeBoot )) {
-			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
+	if (gBootVolume) {
+		if (!(gBootVolume->flags & kBVFlagNativeBoot)) {
+			readBootSector(gBootVolume->biosdev, gBootVolume->part_boff, (void *)0x7c00);
 			//
 			// Setup edx, and signal intention to chain load the
 			// foreign booter.
@@ -1217,7 +1230,17 @@ processBootOptions()
 	else {
 		return -1;
 	}
-
+    
+    // Save a version of mac os we're booting.
+    MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+    // so copy it and trim
+    gMacOSVersion[0] = 0;
+    if (MacOSVerCurrent >= MacOSVer2Int("10.10")) {
+        strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
+    } else {
+        strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
+    }
+    
 	// Load config table specified by the user, or use the default.
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
 		val = 0;
@@ -1228,10 +1251,6 @@ processBootOptions()
 	// and use its contents to override default bootConfig.
 	loadSystemConfig(&bootInfo->bootConfig);
 	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
-    
-    // Save a version of mac os we're booting.
-    strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
-    MacOSVerCurrent = MacOSVer2Int(gMacOSVersion);
 
 	// Use the kernel name specified by the user, or fetch the name
 	// in the config table, or use the default if not specified.
@@ -1246,47 +1265,25 @@ processBootOptions()
 	} else {
 		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
-		}
-		else
-		{
-			if( YOSEMITE ) // is 10.10
-			{
-
-				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
-				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
-			}
-			else
-			{ // OSX is not 10.10
-
+		} else {
+			if (MacOSVerCurrent >= MacOSVer2Int("10.10")) { // OS X is 10.10 or newer
+				strlcpy( bootInfo->bootFile, kYosemiteKernel, sizeof(bootInfo->bootFile) );
+			} else {
+				// or 10.9 and previous
 				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
-				//printf(HEADER "/%s\n", bootInfo->bootFile);
 			}
 		}
 	}
 
-	if (!YOSEMITE) // not 10.10 so 10.9 and previus
-	{
-		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
-		{
-	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
-	}
-	else
-	{ // OSX is 10.10
-		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
-		{
-        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
+	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kYosemiteKernel ) != 0)) {
+		gOverrideKernel = true;
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
 	argP = bootArgs->CommandLine;
 
 	// Get config kernel flags, if not ignored.
-	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
-            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig )) {
+	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) || !getValueForKey(kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig)) {
 		val = "";
 		cnt = 0;
 	}
@@ -1321,9 +1318,9 @@ processBootOptions()
 		// Try to get the volume uuid string
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
-			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
+    verbose("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
@@ -1352,7 +1349,7 @@ processBootOptions()
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
 */
-		strlcpy( gRootDevice, val, (cnt + 1));
+		strlcpy(gRootDevice, val, (cnt + 1));
 	}
 
 	/*

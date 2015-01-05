@@ -1,11 +1,11 @@
 #ifndef __LIBSAIO_ACPI_H
 #define __LIBSAIO_ACPI_H
 
-#define ACPI_RANGE_START    (0x0E0000)
-#define ACPI_RANGE_END      (0x0FFFFF)
-#define EBDA_RANGE_MIN      (0x080000)
-#define EBDA_RANGE_END      (0x09FFFF)
-#define BDA_EBDA_START      (0x040E)
+#define ACPI_RANGE_START    0x0E0000
+#define ACPI_RANGE_END      0x0FFFFF
+#define EBDA_RANGE_MIN      0x080000
+#define EBDA_RANGE_END      0x09FFFF
+#define BDA_EBDA_START      0x00040E
 
 #define UINT64_LE_FROM_CHARS(a,b,c,d,e,f,g,h) \
 (   ((uint64_t)h << 56) \
@@ -176,6 +176,7 @@ struct acpi_2_fadt
 /* Begin Asere */
 	//Reset Fix
 	uint32_t        Flags;
+    // Reset Register
 	uint8_t         Reset_SpaceID;
 	uint8_t         Reset_BitWidth;
 	uint8_t         Reset_BitOffset;

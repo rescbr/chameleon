@@ -37,6 +37,7 @@ void EX2GetDescription(CICell ih, char *str, long strMaxLen)
 	}
 	str[strMaxLen]=0;
 	strncpy (str, buf+0x478, MIN(strMaxLen, 16));
+    //verbose("EXT2: label=%s\n", str);
 	free (buf);
 }
 

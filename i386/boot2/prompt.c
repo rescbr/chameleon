@@ -28,7 +28,7 @@
 
 #include <vers.h>
 
-char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) r" I386BOOT_CHAMELEONREVISION " Build date: " I386BOOT_BUILDDATE "\n" "%dMB memory\n";
+char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) build: " I386BOOT_CHAMELEONREVISION ", date:" I386BOOT_BUILDDATE "\n" "%dMB memory\n";
 
 char bootPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"

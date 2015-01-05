@@ -88,12 +88,13 @@ kGUIDLastDwordOffs	EQU  12				; last 4 byte offset of a GUID
 
 kPartCount			EQU  4				; number of paritions per table
 kPartTypeHFS		EQU  0xaf			; HFS+ Filesystem type
+kPartTypeABHFS		EQU  0xab			; Apple_Boot partition
 kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR (PMBR)
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
 										; with existing tools that do not understand GPT partition structures.
-							  			; The Protective MBR has the same format as a legacy MBR
-					  					; and contains one partition entry with an OSType set to 0xEE
+										; The Protective MBR has the same format as a legacy MBR
+										; and contains one partition entry with an OSType set to 0xEE
 										; reserving the entire space used on the disk by the GPT partitions,
 										; including all headers.
 
@@ -283,7 +284,7 @@ find_boot:
 										; to boot an inactive but boot1h aware HFS+ partition
 										; by scanning the MBR partition entries again.
 
-.start_scan:							
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -322,12 +323,12 @@ find_boot:
 											        ; signature check.
     jmp     .tryToBoot
 
-.Pass2:    
+.Pass2:
     cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
                                                     ; equipped with boot1h in its boot record
                                                     ; regardless if it's active or not.
     jne     .continue
-  	mov 	dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
+    mov     dh, 1                					; Argument for loadBootSector to check HFS+ partition signature.
 
     DebugChar('*')
 
@@ -349,7 +350,7 @@ find_boot:
     ; Scanned all partitions but not found any with active flag enabled
     ; Anyway if we found a protective MBR before we still have a chance 
     ; for a possible GPT Header at LBA 1
-    ;    
+    ;
     dec	    bl
     jnz     .switchPass2					; didn't find Protective MBR before
     call    checkGPT
@@ -371,7 +372,7 @@ find_boot:
     ; Jump to partition booter. The drive number is already in register DL.
     ; SI is pointing to the modified partition entry.
     ;
-initBootLoader:    
+initBootLoader:
 
 DebugChar('J')
 
@@ -381,7 +382,6 @@ DebugChar('J')
 
     jmp     kBoot0LoadAddr
 
-    
     ; 
     ; Found Protective MBR Partition Type: 0xEE
     ; Check for 'EFI PART' string at the beginning
@@ -462,17 +462,18 @@ checkGPT:
     ;
 
     mov	    eax, [si + gpta.StartingLBA]			; load boot sector from StartingLBA
-    mov	    [my_lba], eax		
-	mov		dh, 1									; Argument for loadBootSector to check HFS+ partition signature.
+    mov	    [my_lba], eax
+    mov     dh, 1						; Argument for loadBootSector to check HFS+ partition signature.
     call    loadBootSector
-    jne	    .gpt_continue							; no boot loader signature
+    jne	    .gpt_continue					; no boot loader signature
 
-    mov	    si, kMBRPartTable						; fake the current GUID Partition
-    mov	    [si + part.lba], eax					; as MBR style partition for boot1h
+    mov	    si, kMBRPartTable					; fake the current GUID Partition
+    mov	    [si + part.lba], eax				; as MBR style partition for boot1h
     mov     BYTE [si + part.type], kPartTypeHFS		; with HFS+ filesystem type (0xAF)
-    jmp	    SHORT initBootLoader    
-    
+    jmp	    SHORT initBootLoader
+
 .gpt_continue:
+
     add	    si, bx									; advance SI to next partition entry
     loop    .gpt_loop								; loop through all partition entries	
 
@@ -504,7 +505,7 @@ loadBootSector:
 
 	or		dh, dh
 	jz		.checkBootSignature
-	
+
 .checkHFSSignature:
 
 %if VERBOSE
@@ -519,7 +520,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;
@@ -535,7 +536,9 @@ loadBootSector:
     cmp     WORD [di + kSectorBytes - 2], kBootSignature
 
 .exit:
+
     popa
+
     ret
 
 
@@ -607,7 +610,7 @@ read_lba:
     mov  eax, ecx
     call print_hex
 %endif
-        
+
     ;
     ; INT13 Func 42 - Extended Read Sectors
     ;
@@ -617,7 +620,7 @@ read_lba:
     ;   DS:SI = pointer to Disk Address Packet
     ;
     ; Returns:
-    ;   AH    = return status (sucess is 0)
+    ;   AH    = return status (success is 0)
     ;   carry = 0 success
     ;           1 error
     ;
@@ -737,7 +740,7 @@ print_hex:
 
     popad
     ret
-	
+
 print_nibble:
     and     al, 0x0f
     add     al, '0'
@@ -761,13 +764,14 @@ getc:
 ; NULL terminated strings.
 ;
 log_title_str		db  10, 13, 'boot0: ', 0
-boot_error_str   	db  'error', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
 test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
+
+boot_error_str   	db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last
@@ -777,7 +781,7 @@ done_str		db  'done', 0
 ; that the 'times' argument is negative.
 
 ;
-; According to EFI specification, maximum boot code size is 440 bytes 
+; According to EFI specification, maximum boot code size is 440 bytes
 ;
 
 ;

@@ -67,6 +67,18 @@ bool gErrors = false;
 char *msgbuf = 0;
 char *cursor = 0;
 
+// Bungo:
+typedef struct {
+    uint16_t year;
+    uint8_t  mon;
+    uint8_t  day;
+    uint8_t  hour;
+    uint8_t  mins;
+    uint8_t  secs;
+    uint8_t  dlight;
+} datetime_t;
+static datetime_t datetime;
+
 struct putc_info //Azi: exists on gui.c & printf.c
 {
 	char * str;
@@ -85,21 +97,10 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 	*(pi->str)++ = c;
 	return c;
 }
-// Bungo:
-typedef struct {
-    uint16_t year;
-    uint8_t  mon;
-    uint8_t  day;
-    uint8_t  hour;
-    uint8_t  mins;
-    uint8_t  secs;
-    uint8_t  dlight;
-} datetime_t;
 
 uint64_t getRTCdatetime() // 0xYYYYMMDDHHMMSS0L in decimal
 {
     biosBuf_t bb;
-    datetime_t datetime;
     
     bb.intno = 0x1a;
 	bb.eax.r.h = 0x04; // get RTC date
@@ -127,22 +128,22 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
-	msglog("%s\n", "Chameleon " I386BOOT_CHAMELEONVERSION " (Bungo branch) r" I386BOOT_CHAMELEONREVISION " [" I386BOOT_BUILDDATE "]");
-    uint64_t datetime = getRTCdatetime();
-    msglog("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", ((datetime_t*)&datetime)->year, ((datetime_t*)&datetime)->mon, ((datetime_t*)&datetime)->day, ((datetime_t*)&datetime)->hour, ((datetime_t*)&datetime)->mins, ((datetime_t*)&datetime)->secs);
+	verbose("%s\n", "Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) build: " I386BOOT_CHAMELEONREVISION ", date: " I386BOOT_BUILDDATE);
+    getRTCdatetime();
+    verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
 }
 
-void msglog(const char * fmt, ...)
+int msglog(const char * fmt, ...)
 {
 	va_list ap;
 	struct putc_info pi;
 
 	if (!msgbuf) {
-		return;
+		return 0;
 	}
 
 	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
-		return;
+		return 0;
 	}
 
 	va_start(ap, fmt);
@@ -151,6 +152,8 @@ void msglog(const char * fmt, ...)
 	prf(fmt, ap, sputc, &pi);
 	va_end(ap);
 	cursor += strlen((char *)cursor);
+    
+    return 0;
 }
 
 void setupBooterLog(void)
@@ -212,13 +215,14 @@ int getchar()
 int printf(const char * fmt, ...)
 {
 	va_list ap;
+    
 	va_start(ap, fmt);
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		prf(fmt, ap, putchar, 0);
 	} else {
 		vprf(fmt, ap);
 	}
-
+/*
 	{
 		// Kabyl: BooterLog
 		struct putc_info pi;
@@ -235,7 +239,7 @@ int printf(const char * fmt, ...)
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
-
+*/
 	va_end(ap);
 	return 0;
 }
@@ -323,9 +327,20 @@ void stop(const char * fmt, ...)
 	while (1);
 }
 
-/** Print a "Press a key to continue..." message and wait for a key press. */
-void pause() 
+/** Print user message and a "Press a key to continue..." message and wait for a key press. */
+void pause(const char * fmt, ...) // replace getchar() by pause() were useful.
 {
-    printf("Press a key to continue...\n");
-	getchar(); // replace getchar() by pause() were useful.
+    va_list ap;
+    
+	va_start(ap, fmt);
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+		prf(fmt, ap, putchar, 0);
+	} else {
+		vprf(fmt, ap);
+	}
+	va_end(ap);
+    
+    printf("Press a key to continue...");
+	getchar();
+    printf("\n");
 }

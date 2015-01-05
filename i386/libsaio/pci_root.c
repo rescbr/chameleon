@@ -45,14 +45,16 @@ static unsigned int findpciroot(unsigned char * dsdt,int len)
 
 int getPciRootUID(void)
 {
-	char dsdt_dirSpec[128];
-	void *new_dsdt = NULL;
+	char dsdt_dirSpec[256];
 	const char *val = "";
-	int len = 0,fsize = 0;
-	const char * dsdt_filename = "";
-	extern int search_and_get_acpi_fd(const char *, const char **);
+	int len = 0;
+	const char *dsdt_filename = "";
+	//extern int search_and_get_acpi_fd(const char *, const char **);
+    //extern void *loadACPITable (const char *filename);
 
-	if (rootuid < 10) return rootuid;
+	if (rootuid < 10)
+        return rootuid;
+    
 	rootuid = 0;	/* default _UID = 0 */
 
 	if (getValueForKey(kPCIRootUID, &val, &len, &bootInfo->chameleonConfig) && len) {
@@ -74,6 +76,26 @@ int getPciRootUID(void)
 		goto out;
 	}
 
+    if (new_dsdt != NULL) {
+        len = *(int *)(new_dsdt + 4);
+        verbose("PCIrootUID: custom DSDT already loaded @%08X, length=%d.\n", new_dsdt, len);
+    } else {
+        // Try using the file specified with the DSDT option
+        if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig) && len) {
+            snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
+        } else {
+            sprintf(dsdt_dirSpec, "DSDT.aml");
+        }
+        
+        verbose("PCIrootUID: attempting to load custom DSDT...\n");
+        if ((new_dsdt = loadACPITable(dsdt_dirSpec))) {
+            len = *(int *)(new_dsdt + 4);
+            verbose("PCIrootUID: custom DSDT loaded @%08X, length=%d\n", new_dsdt, len);
+        } else {
+            //verbose("PCIrootUID: custom DSDT not found!.\n");
+        }
+    }
+/*
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig) && len)
 	{
@@ -83,8 +105,9 @@ int getPciRootUID(void)
 	{
 		sprintf(dsdt_dirSpec, "DSDT.aml");
 	}
-	
-    DBG("PCIrootUID: trying DSDT.aml... ");
+
+    DBG("PCIrootUID: trying file DSDT.aml... ");
+
 	int fd = search_and_get_acpi_fd(dsdt_dirSpec, &dsdt_filename);
 
 	// Check booting partition
@@ -111,20 +134,23 @@ int getPciRootUID(void)
 	}
     
 	close (fd);
-
-	rootuid = findpciroot(new_dsdt, fsize);
+*/
+	if (len)
+        rootuid = findpciroot(new_dsdt, len);
+/*
 	free(new_dsdt);
-
+*/
 	// make sure it really works: 
-	if (rootuid == 11) rootuid=0; //usually when _UID isnt present, it means uid is zero
+	if (rootuid == 11)
+        rootuid = 0; //usually when _UID isn't present, it means uid is zero
 	else if (rootuid < 0 || rootuid > 9) 
 	{
-		DBG("PCIrootUID: proper value wasn't found. Using default value (0). Use -PciRootUID flag to force.\n");
+		verbose("PCIrootUID: proper value wasn't found. Using default value (0). Use -PciRootUID flag to force.\n");
 		rootuid = 0;
         return rootuid;
 	}
     
 out:
-    DBG("PCIrootUID=0x%02X: using.\n", rootuid);
+    verbose("PCIrootUID=0x%02X: using.\n", rootuid);
 	return rootuid;
 }

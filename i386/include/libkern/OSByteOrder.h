@@ -77,7 +77,7 @@ OSHostByteOrder(void) {
 #endif
 }
 
-#define OSReadBigInt(x, y)		OSReadBigInt32(x, y)
+#define OSReadBigInt(x, y)          OSReadBigInt32(x, y)
 #define OSWriteBigInt(x, y, z)		OSWriteBigInt32(x, y, z)
 #define OSSwapBigToHostInt(x)		OSSwapBigToHostInt32(x)
 #define OSSwapHostToBigInt(x)		OSSwapHostToBigInt32(x)

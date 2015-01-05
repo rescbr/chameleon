@@ -38,7 +38,7 @@
 
 // The original data was 16K in size (128x128) and would make the booter
 // cross a 64K segment boundary. boot0 cannot load more than 127 sectors
-// without changes. To eiminate that complexity, the data was run length
+// without changes. To eliminate that complexity, the data was run length
 // encoded to save space. The reduced size is 1372 bytes.
 
 const unsigned char gAppleBootPictRLE[] =

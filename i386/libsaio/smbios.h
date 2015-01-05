@@ -139,7 +139,7 @@ enum
 };
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - BIOS Information (Type 0)
+// Struct - BIOS Information (Type 0), Apple uses 24 bytes length
 typedef struct SMBBIOSInformation
 {
     SMB_STRUCT_HEADER
@@ -159,7 +159,7 @@ typedef struct SMBBIOSInformation
 } __attribute__((packed)) SMBBIOSInformation;
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - System Information (Type 1)
+// Struct - System Information (Type 1), Apple uses 27 bytes length
 typedef struct SMBSystemInformation
 {
     // 2.0+ spec (8 bytes)
@@ -198,7 +198,7 @@ typedef enum
     kSMBBaseBoardInterconnect          = 0x0D	// Interconnect board
 } BASE_BOARD_TYPE;
 
-// Struct - Base Board (or Module) Information (Type 2)
+// Struct - Base Board (or Module) Information (Type 2), Apple uses 16 bytes length
 typedef struct SMBBaseBoard
 {
 	SMB_STRUCT_HEADER               // Type 2
@@ -269,7 +269,7 @@ typedef enum {
     kSMBChassisSecurityStatusExternalInterfaceLockedEnabled = 0x05
 } MISC_CHASSIS_SECURITY_STATE;
 
-// Struct - System Enclosure (Type 3)
+// Struct - System Enclosure (Type 3), Apple uses 21 bytes length
 typedef struct SMBSystemEnclosure
 {
 	SMB_STRUCT_HEADER               // Type 3
@@ -286,9 +286,10 @@ typedef struct SMBSystemEnclosure
 	SMBByte    height;		// Height of the enclosure, in 'U's
 	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
 	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
-    //	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
-    //	SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
-    //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number (2.7+)
+    SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
+    //  SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
+    // 2.7+
+    //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number
 } __attribute__((packed)) SMBSystemEnclosure;
 
 //----------------------------------------------------------------------------------------------------------
@@ -543,7 +544,7 @@ typedef enum {
     kSMBprocessorUpgradeSocketFM2     = 0x2A
 } PROCESSOR_UPGRADE;
 
-// Struct - Processor Information (Type 4).
+// Struct - Processor Information (Type 4), Apple uses 35 bytes length
 typedef struct SMBProcessorInformation
 {
 	// 2.0+ spec (26 bytes)
@@ -568,10 +569,10 @@ typedef struct SMBProcessorInformation
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.5+ spec (40 bytes)
-	SMBByte    coreCount;
-	SMBByte    coreEnabled;
-	SMBByte    threadCount;
+	// 2.5+ spec (40 bytes)  Apple still uses 2.4 spec
+//	SMBByte    coreCount;
+//	SMBByte    coreEnabled;
+//	SMBByte    threadCount;
 //	SMBWord    processorFuncSupport;
 	// 2.6+ spec (42 bytes)
 //	SMBWord    processorFamily2;
@@ -611,7 +612,7 @@ typedef struct SMBMemoryModule
 #define kSMBMemoryModuleSizeNotInstalled    0x7F
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - Cache Information (Type 7)
+// Struct - Cache Information (Type 7), Apple uses 19 bytes length
 typedef struct SMBCacheInformation
 {
     SMB_STRUCT_HEADER               // Type 7
@@ -628,7 +629,7 @@ typedef struct SMBCacheInformation
 } __attribute__((packed)) SMBCacheInformation;
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - System Slots (Type 9)
+// Struct - System Slots (Type 9), Apple uses 13 bytes length
 typedef struct SMBSystemSlot
 {
     // 2.0+ spec (12 bytes)
@@ -649,7 +650,7 @@ typedef struct SMBSystemSlot
 } __attribute__((packed)) SMBSystemSlot;
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - OEM Strings (Type 11)
+// Struct - OEM Strings (Type 11), Apple uses 5 bytes length
 typedef struct SMBOEMStrings
 {
 	SMB_STRUCT_HEADER               // Type 11
@@ -685,7 +686,7 @@ typedef enum
     kSMBMemoryArrayErrorCorrectionTypeCRC           = 0x07
 } MEMORY_ERROR_CORRECTION;
 
-// Struct - Physical Memory Array (Type 16)
+// Struct - Physical Memory Array (Type 16), Apple uses 15 bytes length
 typedef struct SMBPhysicalMemoryArray
 {
 	// 2.1+ spec (15 bytes)
@@ -701,7 +702,7 @@ typedef struct SMBPhysicalMemoryArray
 } __attribute__((packed)) SMBPhysicalMemoryArray;
 
 //----------------------------------------------------------------------------------------------------------
-// Struct - Memory Device (Type 17)
+// Struct - Memory Device (Type 17), Apple uses 27 bytes length
 typedef struct SMBMemoryDevice
 {
 	// 2.1+ spec (21 bytes)
@@ -736,7 +737,7 @@ typedef struct SMBMemoryDevice
 
 //----------------------------------------------------------------------------------------------------------
 
-// Struct - Memory Array Mapped Address (Type 19)
+// Struct - Memory Array Mapped Address (Type 19), Apple uses 15 bytes length
 //typedef struct SMBMemoryArrayMappedAddress
 //{
     // 2.1+ spec
@@ -788,7 +789,7 @@ typedef struct FW_REGION_INFO
 	SMBDWord   EndAddress;
 } __attribute__((packed)) FW_REGION_INFO;
 
-// Struct - Firmware Volume Description (Apple Specific - Type 128)
+// Struct - Firmware Volume Description (Apple Specific - Type 128), Apple uses 88 bytes length
 typedef struct SMBFirmwareVolume
 {
 	SMB_STRUCT_HEADER			// Type 128
@@ -849,12 +850,6 @@ struct SMBOemPlatformFeature
 
 //----------------------------------------------------------------------------------------------------------
 
-#include "efi_tables.h"
-/* From Foundation/Efi/Guid/Smbios/SmBios.h */
-/* Modified to wrap Data4 array init with {} */
-#define EFI_SMBIOS_TABLE_GUID   {0xeb9d2d31, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-extern EFI_GUID const gEfiSmbiosTableGuid;
-
 #define SMBIOS_ORIGINAL		0
 #define SMBIOS_PATCHED		1
 
@@ -863,6 +858,5 @@ extern void *getSmbios(int which);
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
 extern void setupSMBIOS(void);
 extern void decodeSMBIOSTable(SMBEntryPoint *eps);
-
 
 #endif /* !__LIBSAIO_SMBIOS_H */

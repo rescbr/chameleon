@@ -190,8 +190,8 @@ bool getValueForConfigTableKey(config_file_t *config, const char *key, const cha
 {
 	if (config->dictionary != 0 ) {
 		// Look up key in XML dictionary
-		TagPtr value;
-		value = XMLGetProperty(config->dictionary, key);
+		//TagPtr value;
+		TagPtr value = XMLGetProperty(config->dictionary, key);
 		if (value != 0) {
 			if (value->type != kTagTypeString) {
 				error("Non-string tag '%s' found in config file\n", key);
@@ -331,11 +331,11 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
 }
 
 /* Return NULL if no option has been successfully retrieved, or the string otherwise */
-const char * getStringForKey(const char * key,  config_file_t *config)
+const char *getStringForKey(const char *key,  config_file_t *config)
 {
-	static const char* value =0;
-	int len=0;
-	if(!getValueForKey(key, &value, &len, config)) {
+	static const char *value = 0;
+	int len = 0;
+	if (!getValueForKey(key, &value, &len, config)) {
 		value = 0;
 	}
 	return value;
@@ -346,13 +346,13 @@ const char * getStringForKey(const char * key,  config_file_t *config)
  * The boolean value of the key is stored in 'val'.
  */
 
-bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
+bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 {
     const char *key_val;
     int size;
     
 	if (getValueForKey(key, &key_val, &size, config)) {
-		if ( (size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y') ) {
+		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y')) {
 			*result_val = true;
 		} else {
 			*result_val = false;
@@ -362,14 +362,14 @@ bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
 	return false;
 }
 
-bool getIntForKey( const char *key, int *value, config_file_t *config )
+bool getIntForKey(const char *key, int *value, config_file_t *config)
 {
 	const char *val;
 	int size, sum;
 	bool negative = false;
     
 	if (getValueForKey(key, &val, &size, config)) {
-		if ( size ) {
+		if (size) {
 			if (*val == '-') {
 				negative = true;
 				val++;
@@ -511,6 +511,7 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 			}
 		}
 	}
+    
 	return ret;
 }
 
@@ -546,7 +547,7 @@ printSystemConfig(char *p1)
 // (and does not modify dict pointer).
 // Prints an error message if there is a parsing error.
 //
-int ParseXMLFile( char * buffer, TagPtr * dict )
+int ParseXMLFile( char *buffer, TagPtr *dict )
 {
 	long       length, pos;
 	TagPtr     tag;
@@ -612,8 +613,11 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 int loadSystemConfig(config_file_t *config)
 {
 	char *dirspec[] = {
-		"/OS X Install Data/com.apple.Boot.plist",
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
+		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Installer (Lion 10.7)
+		"/OS X Install Data/com.apple.Boot.plist",				// OS X Installer (10.8+)
+		//"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",	// com.apple.Boot.plist
+		"/com.apple.recovery.boot/com.apple.Boot.plist"				// OS X Recovery
 	};
 
 	int i, fd, count, ret=-1;
@@ -693,10 +697,10 @@ int loadChameleonConfigForDevice(config_file_t *config, const char *device, cons
 	if ((fd = open(full_path, 0)) >= 0) {
 		// Check for depreciated file names and annoy the user about it.
 		if(strstr(full_path, "com.apple.Boot.plist")) {
-			printf("%s is depreciated.\n", full_path);
+			error("%s is depreciated.\n", full_path);
 			full_path[strlen(full_path) - strlen("com.apple.Boot.plist")] = 0;
-			printf("Please use the file %sorg.chameleon.Boot.plist instead.\n", full_path);
-			pause();
+			error("Please use the file %sorg.chameleon.Boot.plist instead.\n", full_path);
+			pause("");
 		}
 		// read file
 		read(fd, config->plist, IO_CONFIG_DATA_SIZE);

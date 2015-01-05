@@ -35,7 +35,7 @@ char *efi_inject_get_devprop_string(uint32_t *len)
 		*len = string->length;
 		return devprop_generate_string(string);
 	}
-	DBG("efi_inject_get_devprop_string: NULL, trying stringdata\n");
+	verbose("efi_inject_get_devprop_string NULL trying stringdata\n");
 	return NULL;
 }
 
@@ -418,7 +418,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 	char *devicepath = get_pci_dev_path(eth_dev);
 	DevPropDevice *device = NULL;
 
-	DBG("LAN Controller [%04x:%04x] :: %s.\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
+	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
 
 	if(!string) {
 		string = devprop_create_string();
@@ -426,7 +426,7 @@ void set_eth_builtin(pci_dt_t *eth_dev)
 
 	device = devprop_add_device(string, devicepath);
 	if(device) {
-		verbose("Setting up LAN keys.\n");
+		verbose("Setting up lan keys\n");
 		devprop_add_network_template(device, eth_dev->vendor_id);
 		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata) {
