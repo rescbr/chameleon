@@ -23,6 +23,11 @@ PROGRAMS += bdmesg
 OBJS += bdmesg.o32 bdmesg.o64
 endif
 
+ifeq (${CONFIG_SECTORSIZE}, y)
+PROGRAMS += sectorsize
+OBJS += sectorsize.o32 sectorsize.o64
+endif
+
 ifeq (${CONFIG_OPENUP}, y)
 PROGRAMS += openUp
 OBJS += openUp.o64 openUp.o32

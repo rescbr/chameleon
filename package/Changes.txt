@@ -1,4 +1,8 @@
+- Micky1979 - Add sectorsize is a tiny command line made to detect the Physical and logical sector size of your hard disk.
+
 - JrCs - boot1-install can show ntfs volume.
+
+- Zenith432 - Add boot1-install utility that can install the stage 1 boot loader.
 
 - ErmaC - Auto increase year for pkg resource.
 
