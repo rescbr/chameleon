@@ -11,6 +11,14 @@ source "i386/util/fdisk/Cconfig"
 
 source "i386/util/boot1-install/Cconfig"
 
+config SECTORSIZE
+	bool "sectorsize utility"
+	default y
+	help
+	  Say Y here if you want to compile the sectorsize utility.
+	  sectorsize is used to detect the Physical and logical sector size of your hard disk.
+	  When in doubt, say "N".
+
 config OPENUP
 	bool "openUp utility"
 	default n
