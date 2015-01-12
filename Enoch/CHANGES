@@ -1,3 +1,4 @@
+- Zenith432 : Use caching with ExFat filesystem
 - Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff)
 - Zenith432 : saio_types.h, biosfn.c - minor typo in bios-defined data structure that isn't actually used.
 fake_efi.c - eliminate redundant scan of bt(0,0) in setupSmbiosConfigFile.  loadConfigFile already does a fall-back scan of bt(0,0), so another scan isn't needed.
