@@ -227,7 +227,7 @@ struct direntry_name_extension
 #pragma mark -
 
 static
-int FATCacheInit(void)
+int FATCacheInit(int invalidate)
 {
 	if (!gFATCacheBuffer)
 	{
@@ -236,8 +236,12 @@ int FATCacheInit(void)
 		{
 			return -1;
 		}
+		invalidate = 1;
 	}
-	gCachedFATBlockAddress = INVALID_FAT_ADDRESS;
+	if (invalidate)
+	{
+		gCachedFATBlockAddress = INVALID_FAT_ADDRESS;
+	}
 	return 0;
 }
 
@@ -273,8 +277,11 @@ int getRange(uint32_t cluster, uint32_t maxContiguousClusters, uint32_t* pNextCl
 		lcba = cluster >> shift;
 		if (lcba != gCachedFATBlockAddress)
 		{
-			Seek(gCurrentIH, (((long long) gFATOffset) << gBPSShift) + (((long long) lcba) << gBPCBShift));
-			Read(gCurrentIH, (long) gFATCacheBuffer, CacheBlockSize());
+			CacheRead(gCurrentIH,
+					  (char*) gFATCacheBuffer,
+					  (((long long) gFATOffset) << gBPSShift) + (((long long) lcba) << gBPCBShift),
+					  CacheBlockSize(),
+					  1);
 			gCachedFATBlockAddress = lcba;
 		}
 		lcba = cluster + 1;
@@ -375,8 +382,11 @@ uint8_t const* nextDirEntry(struct exfat_dir_iterator* pIter)
 		toRead = (uint16_t) (1 << (gBPCBShift - gBPSShift));
 		if (pIter->lsa + toRead > pIter->lsa_end)
 			toRead = (uint16_t) (pIter->lsa_end - pIter->lsa);
-		Seek(gCurrentIH, (long long) (pIter->lsa << gBPSShift));
-		Read(gCurrentIH, (long) pIter->buffer, ((long) toRead) << gBPSShift);
+		CacheRead(gCurrentIH,
+				  (char*) pIter->buffer,
+				  (long long) (pIter->lsa << gBPSShift),
+				  ((uint32_t) toRead) << gBPSShift,
+				  1);
 		pIter->lsa += toRead;
 		pIter->entry_offset = 0;
 	}
@@ -630,7 +640,10 @@ EXFATInitPartition(CICell ih)
 	if (!ih)
 		return -1;
 	if (gCurrentIH == ih)
-		return FATCacheInit();
+	{
+		CacheInit(ih, CacheBlockSize());
+		return FATCacheInit(0);
+	}
 
 	buffer = (uint8_t*) malloc(BPS);
 	if (!buffer)
@@ -667,7 +680,8 @@ EXFATInitPartition(CICell ih)
 		return -1;
 	}
 
-	if (FATCacheInit() < 0) {
+	if (FATCacheInit(1) < 0)
+	{
 		free(buffer);
 		return -1;
 	}
@@ -684,6 +698,8 @@ EXFATInitPartition(CICell ih)
 		gBPCBShift = MAX_BLOCK_SIZE_SHIFT;
 
 	gCurrentIH = ih;
+
+	CacheInit(ih, CacheBlockSize());
 
 	free(buffer);
 	return 0;
