@@ -86,13 +86,18 @@ char *getVBEInfoString()
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
 	if (err != errSuccess)
+	{
 		return 0;
+	}
 	
 	if ( strncmp( (char *)vbeInfo.VESASignature, "VESA", 4 ) )
+	{
 		return 0;
+	}
 	
 	buff = malloc(sizeof(char) * 256);
-	if (!buff) {
+	if (!buff)
+	{
 		return 0;
 	}
 
@@ -166,14 +171,17 @@ printVBEModeInfo()
 			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
 			modeInfo.ModeAttributes);
 
-		if (line++ >= 20) {
+		if (line++ >= 20)
+		{
 			pause("");
 			line = 0;
 			clearScreenRows(0, 24);
 			setCursorPosition( 0, 0, 1 );
 		}
 	}    
-	if (line != 0) {
+
+	if (line != 0)
+	{
 		pause("");
 	}
 
@@ -192,12 +200,14 @@ char *getVBEModeInfoString()
   	bzero( &vbeInfo, sizeof(vbeInfo) );
 	strcpy( (char*)&vbeInfo, "VBE2" );
 	err = getVBEInfo( &vbeInfo );
-	if ( err != errSuccess ) {
+	if ( err != errSuccess )
+	{
 		return 0;
 	}
 
 	char *buff=malloc(sizeof(char)*3072);
-	if(!buff) {
+	if(!buff)
+	{
 		return 0;
 	}
 
@@ -212,7 +222,8 @@ char *getVBEModeInfoString()
 
 		bzero( &modeInfo, sizeof(modeInfo) );
 		err = getVBEModeInfo( *modePtr, &modeInfo );
-		if ( err != errSuccess ) {
+		if ( err != errSuccess )
+		{
 			continue;
 		}
 
@@ -264,7 +275,10 @@ getVESAModeWithProperties( unsigned short	width,
 
     // Report the VESA major/minor version number.
 
-    if (vesaVersion) *vesaVersion = vbeInfo.VESAVersion;
+	if (vesaVersion)
+	{
+		*vesaVersion = vbeInfo.VESAVersion;
+	}
 
     // Loop through the mode list, and find the matching mode.
     
@@ -361,6 +375,7 @@ getVESAModeWithProperties( unsigned short	width,
         {
             continue;  // Saved mode has more depth.
         }
+
         if ( modeInfo.XResolution < outModeInfo->XResolution ||
              modeInfo.YResolution < outModeInfo->YResolution ||
              modeBitsPerPixel     < outModeInfo->BitsPerPixel )
@@ -888,7 +903,11 @@ void drawColorRectangle( unsigned short x,
     while ( height-- )
     {
         int rem = ( pixelBytes * width ) % 4;
-        if ( rem ) bcopy( &color, vram, rem );
+		if ( rem )
+		{
+			bcopy( &color, vram, rem );
+		}
+
         stosl( vram + rem, color, pixelBytes * width / 4 );
         vram += VIDEO(rowBytes);
     }
@@ -909,7 +928,8 @@ void drawDataRectangle( unsigned short  x,
 
     drawWidth = MIN(width, VIDEO(width) - x);
     height = MIN(height, VIDEO(height) - y);
-    while ( height-- ) {
+	while ( height-- )
+	{
         bcopy( data, vram, drawWidth * pixelBytes );
         vram += VIDEO(rowBytes);
         data += width * pixelBytes;
@@ -982,7 +1002,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 	{
 		if (!setVESAGraphicsMode(origwidth, origheight, origbpx, 0))
 			if (initGraphicsMode () != errSuccess)
+			{
 				return;
+			}
+
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 		loadImageScale (uncomp, origwidth, origheight, origbpx, screen, VIDEO(width), VIDEO(height), VIDEO(depth), VIDEO (rowBytes));
@@ -990,7 +1013,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 	else
 	{
 		if (initGraphicsMode () != errSuccess)
+		{
 			return;
+		}
+
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 		// Set the screen to 75% grey.
@@ -998,7 +1024,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 	}
 
 	pixelShift = VIDEO (depth) >> 4;
-	if (pixelShift < 1) return;
+	if (pixelShift < 1)
+	{
+		return;
+	}
 	
 	screen += ((VIDEO (width) 
 				- kIOHibernateProgressCount * (kIOHibernateProgressWidth + kIOHibernateProgressSpacing)) << (pixelShift - 1))
@@ -1024,7 +1053,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 							in = (in << 3) | (in >> 2);
 						}
 						else
+						{
 							in = *((uint32_t *)out) & 0xff;	// 32
+						}
+
 						saveunder[blob * kIOHibernateProgressSaveUnderSize + saveindex[blob]++] = in;
 						result = ((255 - alpha) * in + alpha * result + 0xff) >> 8;
 					}
@@ -1034,7 +1066,10 @@ void drawPreview(void *src, uint8_t * saveunder)
 						*((uint16_t *)out) = (result << 10) | (result << 5) | result;	// 16
 					}
 					else
+					{
 						*((uint32_t *)out) = (result << 16) | (result << 8) | result;	// 32
+				}
+
 				}
 				out += (1 << pixelShift);
 			}
@@ -1092,7 +1127,9 @@ void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 						*((uint16_t *)out) = (result << 10) | (result << 5) | result;	// 16
 					}
 					else
+					{
 						*((uint32_t *)out) = (result << 16) | (result << 8) | result;	// 32
+				}
 				}
 				out += (1 << pixelShift);
 			}
@@ -1220,11 +1257,15 @@ void setVideoMode( int mode, int drawgraphics)
 
     if ( mode == GRAPHICS_MODE )
     {
-  		if ( (err = initGraphicsMode()) == errSuccess ) {
-            if (gVerboseMode) {
+  		if ( (err=initGraphicsMode ()) == errSuccess )
+		{
+			if (gVerboseMode)
+			{
                 // Tell the kernel to use text mode on a linear frame buffer display
                 bootArgs->Video.v_display = FB_TEXT_MODE;
-            } else {
+			}
+			else
+			{
                 bootArgs->Video.v_display = GRAPHICS_MODE;
             }
         }
@@ -1304,7 +1345,9 @@ void spinActivityIndicator(int sectors)
 		blob = (previewLoadedSectors * kIOHibernateProgressCount) / previewTotalSectors;
 		
 		if (blob!=lastBlob)
+		{
 			updateProgressBar (previewSaveunder, lastBlob, blob);
+		}
 		return;
 	}
 

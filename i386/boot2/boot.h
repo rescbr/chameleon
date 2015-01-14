@@ -85,9 +85,10 @@
 #define kInstantMenuKey             "Instant Menu"
 #define kYosemiteKernel             "kernel"
 #define kDefaultKernel              "mach_kernel"
+#define kOSXKernel                  "kernel"		// Yosemite
 #define kGUIKey                     "GUI"
 #define kBootBannerKey              "Boot Banner"
-#define kShowInfoKey                "ShowInfo"		// gui.c
+#define kShowInfoKey                "ShowInfo"		/* gui.c */
 #define kWaitForKeypressKey         "Wait"
 
 /* AsereBLN: added these keys */
@@ -119,11 +120,15 @@
 #define kEHCIhard                   "EHCIhard"		/* usb.c */
 #define kDefaultPartition           "Default Partition"	/* sys.c */
 
+/* Zenith432: added this */
+#define kXHCILegacyOff              "XHCILegacyOff"		/* usb.c */
+
 /* Duvel300: added this */
 #define kRestartFix                 "RestartFix"		/* acpi_patcher.c */
 
 /* Slice: added this */
 #define kPS2RestartFix              "PS2RestartFix"		/* acpi_patcher.c */
+#define kUseIntelHDMI               "UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 
 /* Signal64: added this key */
 #define kLegacyOff                  "USBLegacyOff"		/* usb.c */
@@ -142,6 +147,8 @@
 #define kEnableC2State              "EnableC2State"		/* acpi_patcher.c */
 #define kEnableC3State              "EnableC3State"		/* acpi_patcher.c */
 #define kEnableC4State              "EnableC4State"		/* acpi_patcher.c */
+#define kEnableC6State              "EnableC6State"		/* acpi_patcher.c */
+#define kEnableC7State              "EnableC7State"		/* acpi_patcher.c */
 
 /* valv: added these keys */
 #define kbusratio                   "busratio"		/* cpu.c */
@@ -212,7 +219,6 @@ extern char gRootDevice[];
 extern bool gEnableCDROMRescan;
 extern bool gScanSingleDrive;
 extern bool useGUI;
-extern char gDarwinBuildVerStr[256];
 
 /*
  * Boot Modes
@@ -236,6 +242,12 @@ extern void *loadACPITable(const char *filename);
 // Bungo:
 extern void *new_dsdt,
             *new_ecdt;
+
+/*
+ * smbios.c
+ */
+extern bool useSMBIOSdefaults;
+
 /*
  * usb.c
  */
@@ -281,6 +293,8 @@ extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
+// Bungo:
+extern char gDarwinBuildVerStr[256];
 
 /*!
     Hookable function pointer called during the driver loading phase that
@@ -315,7 +329,10 @@ extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u
 /*
  * lzvn.c
  */
-extern size_t decompress_lzvn(void *dst, size_t dst_size, const void *src, size_t src_size);
+extern size_t lzvn_decode(void *       dst,
+                          size_t       dst_size,
+                          const void * src,
+                          size_t       src_size);
 /*
 extern size_t lzvn_encode(void         *dst,
                           size_t       dst_size,

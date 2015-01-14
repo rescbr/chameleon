@@ -53,6 +53,7 @@
 #define DBG(x...)
 #endif
 
+static bool	doit	= false;
 static uint8_t default_aapl_ivy[]		=	{ 0x05,0x00,0x62,0x01 }; // ivy_bridge_ig_vals[5]
 #define AAPL_LEN_IVY ( sizeof(default_aapl_ivy) / sizeof(uint8_t) )
 static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_vals[7]
@@ -403,6 +404,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	devprop_add_value(device, "model", (uint8_t*)model, (strlen(model) + 1));
 	devprop_add_value(device, "device_type", (uint8_t*)"display", 8);
 
+	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	}
+	else
+	{
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	}
 
 	switch ((device_id << 16) | vendor_id)
 	{
@@ -410,7 +419,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_IRONLAKE_M_G: // 0046
             devprop_add_value(device, "built-in", &BuiltIn, 1);
             devprop_add_value(device, "class-code", ClassFix, 4);
-            devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,os-info",			HDx000_os_info, 20);
             break;
             /* 27A2, 27AE, 27A6, A001, A011, A012, */
@@ -469,7 +478,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             /* 0106 */
         case GMA_SANDYBRIDGE_M_GT1: // HD Graphics 2000 Mobile
             devprop_add_value(device, "class-code", ClassFix, 4);
-            devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL00,PixelFormat",		HD2000_vals[0], 4);
             devprop_add_value(device, "AAPL00,T1",			HD2000_vals[1], 4);
             devprop_add_value(device, "AAPL00,T2",			HD2000_vals[2], 4);
@@ -492,7 +501,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         case GMA_SANDYBRIDGE_M_GT2: // HD Graphics 3000 Mobile
         case GMA_SANDYBRIDGE_M_GT2_PLUS:
             devprop_add_value(device, "class-code",			ClassFix, 4);
-            devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL00,PixelFormat",		HD3000_vals[0], 4);
             devprop_add_value(device, "AAPL00,T1",			HD3000_vals[1], 4);
             devprop_add_value(device, "AAPL00,T2",			HD3000_vals[2], 4);
@@ -519,7 +528,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
             devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
-            devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
             break;
@@ -532,7 +541,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "class-code",			ClassFix, 4);
             device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
             devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
-            devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
             break;
@@ -606,7 +615,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
 		devprop_add_value(device, "built-in", &BuiltIn, 1);
 		devprop_add_value(device, "class-code", ClassFix, 4);
-		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+		//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
 		break;
 
         /* Haswell */
@@ -614,11 +623,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
         //case 0x80860090:
         //case 0x80860091:
         //case 0x80860092:
+        case GMA_HASWELL_M_GT2: // 0416
+            device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
+            devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
+            devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
+            devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
+
         case GMA_HASWELL_D_GT1: // 0402
         case GMA_HASWELL_M_GT1: // 0406
         case GMA_HASWELL_S_GT1: // 040a
         case GMA_HASWELL_D_GT2: // 0412
-        case GMA_HASWELL_M_GT2: // 0416
         case GMA_HASWELL_S_GT2: // 041a
         case GMA_HASWELL_E_GT1: // 040e
         case GMA_HASWELL_E_GT2: // 041e
@@ -692,7 +706,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
             devprop_add_value(device, "built-in", &BuiltIn, 1);
             devprop_add_value(device, "class-code", ClassFix, 4);
-            devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+            //devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
             break;
 
         default:

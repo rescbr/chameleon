@@ -85,9 +85,6 @@ static Property *freeProperties, *allocedProperties;
 Property *
 DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
-    uint8_t namelength = strlen(name);
-    if (!namelength || !length) return 0;
-    
 	Property *prop;
 
 	DPRINTF("DT__AddProperty([Node '%s'], '%s', %d, 0x%X)\n", DT__GetName(node), name, length, value);

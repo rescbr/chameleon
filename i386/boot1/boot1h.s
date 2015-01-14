@@ -1432,7 +1432,7 @@ nodeToSector:
 
 %if VERBOSE
 log_title_str		db		'boot1: ', NULL
-error_str		db		'error', NULL
+error_str           db		'error', NULL
 %endif
 
 searchCatalogKey	dd		kHFSRootFolderID

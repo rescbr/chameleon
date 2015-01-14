@@ -891,7 +891,7 @@ int initGUI(void)
 {
 	int		val;
 	int     len;
-	char	dirspec[512];
+	char	dirspec[256];
 
 	getValueForKey( "Theme", &theme_name, &len, &bootInfo->chameleonConfig );
 	if ((strlen(theme_name) + 27) > sizeof(dirspec)) {

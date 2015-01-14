@@ -92,7 +92,7 @@ int init_module_system()
 	}
 
 	// Look for modules located in the multiboot header.
-	if(gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS)
+	if(gMI && (gMI->mi_flags & MULTIBOOT_INFO_HAS_MODS))
 	{
 		if(gMI->mi_mods_count)
 		{
@@ -177,7 +177,8 @@ void load_all_modules()
 			char *tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 
-			if(!load_module(tmp)) {
+			if(!load_module(tmp))
+			{
 				// failed to load
 				// free(tmp);
 			}

@@ -128,7 +128,7 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
-	verbose("%s\n", "Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) build: " I386BOOT_CHAMELEONREVISION ", date: " I386BOOT_BUILDDATE);
+	verbose("%s\n", "Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) r" I386BOOT_CHAMELEONREVISION " [" I386BOOT_BUILDDATE "]");
     getRTCdatetime();
     verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
 }
@@ -217,9 +217,12 @@ int printf(const char * fmt, ...)
 	va_list ap;
     
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-	} else {
+	}
+	else
+	{
 		vprf(fmt, ap);
 	}
 /*
@@ -249,10 +252,14 @@ int verbose(const char * fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	if (gVerboseMode) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (gVerboseMode)
+	{
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
 			prf(fmt, ap, putchar, 0);
-		} else {
+		}
+		else
+		{
 			vprf(fmt, ap);
 		}
 	}
@@ -283,28 +290,32 @@ int error(const char * fmt, ...)
 	va_list ap;
 	gErrors = true;
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-	} else {
+	}
+	else
+	{
 		vprf(fmt, ap);
 	}
 
-    {
 		// Kabyl: BooterLog
 		struct putc_info pi;
 
-		if (!msgbuf) {
+	if (!msgbuf)
+	{
 			return 0;
 		}
 
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	{
 			return 0;
 		}
+
 		pi.str = cursor;
 		pi.last_str = 0;
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
-	}
 
 	va_end(ap);
 	return(0);
@@ -316,9 +327,12 @@ void stop(const char * fmt, ...)
 
 	printf("\n");
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-	} else {
+	}
+	else
+	{
 		vprf(fmt, ap);
 	}
 	va_end(ap);

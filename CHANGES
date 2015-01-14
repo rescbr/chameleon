@@ -1,3 +1,20 @@
+- Zenith432 : Use caching with ExFat filesystem
+- Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff)
+- ErmaC : C6 & C7 States credits to Clover Team.
+- ErmaC : define recursive cpu series for BrandString
+- Zenith432 : saio_types.h, biosfn.c - minor typo in bios-defined data structure that isn't actually used.
+fake_efi.c - eliminate redundant scan of bt(0,0) in setupSmbiosConfigFile.  loadConfigFile already does a fall-back scan of bt(0,0), so another scan isn't needed.
+sys.c - While scanning a volume, getOSVersion looks for 5 files and switches back-n-forth between hd(X,Y)/....SystemVersion.plist on the newly scanned volume and bt(0,0)/hd(X,Y)/...SystemVersion.plist - which is an invalid path - should always return an error.
+- Zenith432 : Change to disk.c - Prevent getOSVersion from looking for SystemVersion.plist on FAT32 or exFAT file systems - since those filesystems never serve as system volumes.
+UFS may serve as system volume, but there's no driver to read from it.
+Change to sys.c - Eliminate a dubious recursion in diskScanBootVolumes().  It recognises the filesystem, then calls getOSVersion, which attempts to open 5 files in order to find SystemVersion - then when parsing the device name - calls diskScanBootVolumes() - as a form of on-demand scanning.  This doesn't result in an infinite recursion - because the volume is already in the map.  However, this auto-scan is only useful if user enters an explicit hd(X,Y) device-spec that has never been scanned before - an unlikely occurrence.
+- Zenith432 : Patch from Issue 388, init_module_system() in modules.c dereferences NULL pointer
+- Zenith432 : Full implementation of exfat support for Chameleon's boot2 stage.
+- Micky1979 : Incorporated force umount option -u (boot1-install.c)
+- Zenith432 : Replace boot0 with boot0xg. Now boot0xg has all features of previous boot0. ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
+- Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
+- Zenith432 : add EXFAT boot support by Zenith432
+- zenith432 : Merge patch from issue 386 (boot2 does not know how to read files from FAT partitions on GPT)
 - meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
 		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
 - ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name

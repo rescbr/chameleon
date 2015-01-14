@@ -187,7 +187,8 @@ typedef struct boot_args
 
 } boot_args;
 
-typedef struct boot_args_pre_lion {
+typedef struct boot_args_pre_lion
+{
     uint16_t    Revision;	/* Revision of boot_args structure */
     uint16_t    Version;	/* Version of boot_args structure */
 

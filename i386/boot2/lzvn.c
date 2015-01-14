@@ -57,18 +57,17 @@ case 10: goto Llzvn_table10; break;  \
 } while (0)
 
 
-size_t
-decompress_lzvn(void * _dest,
-                size_t _dest_size,
-                void * _src,
-                size_t _src_size)
+size_t lzvn_decode(void * dst,
+			size_t dst_size,
+			const void * src,
+			size_t src_size)
 {
     size_t   rax = 0;
     
-    const uint64_t rdi = (const uint64_t)_dest;
-    uint64_t rsi       = _dest_size;
-    uint64_t rcx       = _src_size;
-    uint64_t rdx       = (uint64_t)_src;
+    const uint64_t rdi = (const uint64_t)dst;
+    uint64_t rsi       = dst_size;
+    uint64_t rcx       = src_size;
+    uint64_t rdx       = (uint64_t)src;
     
     uint64_t r8  = 0;
     uint64_t r9  = 0;

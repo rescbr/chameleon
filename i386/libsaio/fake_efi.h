@@ -36,6 +36,7 @@ extern EFI_GUID const gEfiAcpi20TableGuid;
 extern EFI_GUID const gEfiSmbiosTableGuid;
 */
 extern void setupFakeEfi(void);
+extern uint64_t smbios_p;
 extern uint64_t acpi10_p;
 extern uint64_t acpi20_p;
 

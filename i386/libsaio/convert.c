@@ -36,23 +36,26 @@ EFI_CHAR8*  getUUIDFromString(const char *source)
 	static EFI_CHAR8 uuid[UUID_LEN+1] = "";
 
 	buf[2] = '\0';
-	for (i = 0; i < UUID_LEN; i++) {
-		//if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1])) {
-        if (!isxdigit(p[0]) || !isxdigit(p[1])) {
+	for (i = 0; i < UUID_LEN; i++)
+	{
+		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
+		{
 			verbose("[ERROR] UUID='%s' syntax error.\n", source);
 			return 0;
 		}
 		buf[0] = *p++;
 		buf[1] = *p++;
 		uuid[i] = (unsigned char) strtoul(buf, NULL, 16);
-		if ((*p == '-') && ((i % 2) == 1) && (i < UUID_LEN - 1)) {
+		if ((*p == '-') && ((i % 2) == 1) && (i < UUID_LEN - 1))
+		{
 			p++;
 		}
 	}
 	uuid[UUID_LEN]='\0';
 
-	if (*p != '\0') {
-		verbose("[ERROR] UUID='%s' syntax error.\n", source);
+	if (*p != '\0')
+	{
+		verbose("[ERROR] UUID='%s' syntax error\n", source);
 		return 0;
 	}
 	return uuid;
@@ -92,6 +95,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
   {
     // the resulting binary will be the half size of the input hex string
     binStr = malloc(len / 2);
+
     binStrIdx = 0;
     hexNibbleIdx = 0;
     for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
@@ -101,7 +105,8 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
 	// ignore all chars except valid hex numbers
 	if ( (hexNibble >= '0' && hexNibble <= '9') ||
 		(hexNibble >= 'A' && hexNibble <= 'F') ||
-		(hexNibble >= 'a' && hexNibble <= 'f') ) {
+				(hexNibble >= 'a' && hexNibble <= 'f') )
+			{
         hexByte[hexNibbleIdx++] = hexNibble;
         
         // found both two nibbles, convert to binary
@@ -109,8 +114,10 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
         {
           binChar = 0;
           
-          for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++) {
-            if (hexNibbleIdx > 0) {
+				for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
+				{
+					if (hexNibbleIdx > 0)
+					{
 			binChar = binChar << 4;
 		}
 

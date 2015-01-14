@@ -7,6 +7,7 @@
 
 #include "ati.h"
 
+static bool	doit	= false;
 
 static const char *chip_family_name[] = {
 	"UNKNOW",
@@ -2328,7 +2329,7 @@ static bool init_card(pci_dt_t *pci_dev)
 	
 	card->posted = radeon_card_posted();
 	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
-	
+	verbose("\n");
 	get_vram_size();
 	
 	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->chameleonConfig);
@@ -2434,6 +2435,15 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	}
 	// -------------------------------------------------
 
+	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	}
+	else
+	{
+		devprop_add_value(card->device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+	}
+
 #if 0
 	uint64_t fb	= (uint32_t)card->fb;
 	uint64_t mmio	= (uint32_t)card->mmio;
@@ -2459,6 +2469,8 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
 			devicepath);
+
+	verbose("---------------------------------------------\n");
 
 	free(card);
 

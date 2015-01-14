@@ -41,13 +41,16 @@
 
 typedef unsigned long entry_t;
 
-typedef struct {
+typedef struct
+{
 	unsigned int sectors:8;
 	unsigned int heads:8;
 	unsigned int cylinders:16;
 } compact_diskinfo_t;
 
-struct driveParameters {
+
+struct driveParameters
+{
 	int cylinders;
 	int sectors;
 	int heads;
@@ -77,8 +80,10 @@ typedef struct {
 /*
  * BIOS drive information.
  */
-struct boot_drive_info {
-	struct drive_params {
+struct boot_drive_info
+{
+	struct drive_params
+	{
 		unsigned short buf_size;
 		unsigned short info_flags;
 		unsigned long  phys_cyls;
@@ -95,12 +100,13 @@ struct boot_drive_info {
 		unsigned char  bus_type[4];
 		unsigned char  interface_type[8];
 		unsigned char  interface_path[8];
-		unsigned char  dev_path[8];
+		unsigned char  dev_path[16];
 		unsigned char  reserved3;
 		unsigned char  checksum;
 	} params;
 
-	struct drive_dpte {
+	struct drive_dpte
+	{
 		unsigned short io_port_base;
 		unsigned short control_port_base;
 		unsigned char  head_flags;
@@ -120,7 +126,9 @@ struct boot_drive_info {
 } __attribute__((packed));
 typedef struct boot_drive_info boot_drive_info_t;
 
-struct driveInfo {
+
+struct driveInfo
+{
 	boot_drive_info_t di;
 
 	int uses_ebios;
@@ -129,7 +137,9 @@ struct driveInfo {
 	int valid;
 };
 
-typedef struct FinderInfo {
+
+typedef struct FinderInfo
+{
 	unsigned char data[16];
 } FinderInfo;
 
@@ -206,7 +216,8 @@ struct BootVolume {
 
 };
 
-enum {
+enum
+{
 	kBVFlagPrimary			= 0x01,
 	kBVFlagNativeBoot		= 0x02,
 	kBVFlagForeignBoot		= 0x04,
@@ -217,7 +228,8 @@ enum {
 	kBVFlagInstallVolume	= 0x80
 };
 
-enum {
+enum
+{
 	kBIOSDevTypeFloppy		= 0x00,
 	kBIOSDevTypeHardDrive	= 0x80,
 	kBIOSDevTypeNetwork		= 0xE0,
@@ -250,7 +262,8 @@ enum
 
 // KernBootStruct device types.
 
-enum {
+enum
+{
 	DEV_SD = 0,
 	DEV_HD = 1,
 	DEV_FD = 2,
@@ -279,7 +292,8 @@ enum {
 	kBlockDeviceType   = kBIOSDevTypeHardDrive
 }; //gBootFileType_t;
 
-enum {
+enum
+{
 	kCursorTypeHidden    = 0x0100,
 	kCursorTypeUnderline = 0x0607
 };

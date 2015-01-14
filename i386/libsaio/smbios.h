@@ -32,7 +32,6 @@ typedef uint16_t SMBWord;
 typedef uint32_t SMBDWord;
 typedef uint64_t SMBQWord;
 
-
 typedef struct DMIEntryPoint
 {
     SMBByte    anchor[5];
@@ -853,7 +852,6 @@ struct SMBOemPlatformFeature
 #define SMBIOS_ORIGINAL		0
 #define SMBIOS_PATCHED		1
 
-extern uint64_t smbios_p;
 extern void *getSmbios(int which);
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
 extern void setupSMBIOS(void);

@@ -437,17 +437,21 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 		bool c2_enabled = false;
 		bool c3_enabled = false;
 		bool c4_enabled = false;
+		bool c6_enabled = false;
+		bool c7_enabled = false;
 		bool cst_using_systemio = false;
 
 		getBoolForKey(kEnableC2State, &c2_enabled, &bootInfo->chameleonConfig);
 		getBoolForKey(kEnableC3State, &c3_enabled, &bootInfo->chameleonConfig);
 		getBoolForKey(kEnableC4State, &c4_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC6State, &c6_enabled, &bootInfo->chameleonConfig);
+		getBoolForKey(kEnableC7State, &c7_enabled, &bootInfo->chameleonConfig);
 		getBoolForKey(kCSTUsingSystemIO, &cst_using_systemio, &bootInfo->chameleonConfig);
 
 		c2_enabled = c2_enabled | (fadt->C2_Latency < 100);
 		c3_enabled = c3_enabled | (fadt->C3_Latency < 1000);
 
-		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + (c3_enabled ? 1 : 0);
+		unsigned char cstates_count = 1 + (c2_enabled ? 1 : 0) + ((c3_enabled || c4_enabled)? 1 : 0) + (c6_enabled ? 1 : 0) + (c7_enabled ? 1 : 0);
 
 		AML_CHUNK* root = aml_create_node(NULL);
 		aml_add_buffer(root, cst_ssdt_header, sizeof(cst_ssdt_header)); // SSDT header
@@ -507,8 +511,34 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 				resource_template_register_systemio[12] = p_blk_hi; // C3
 				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
 				aml_add_byte(tmpl, 0x03);		// C3
-				aml_add_word(tmpl, 0x0060);		// Latency
-				aml_add_dword(tmpl, 0x0000015e);	// Power
+				aml_add_word(tmpl, 0x0043);		// Latency
+				aml_add_dword(tmpl, 0x000001F4);	// Power
+			}
+			if (c6_enabled) // C6
+			{
+				p_blk_lo = acpi_cpu_p_blk + 5;
+				p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+
+				tmpl = aml_add_package(pack);
+				resource_template_register_systemio[11] = p_blk_lo; // C6
+				resource_template_register_systemio[12] = p_blk_hi; // C6
+				aml_add_buffer(tmpl, resource_template_register_systemio, sizeof(resource_template_register_systemio));
+				aml_add_byte(tmpl, 0x06);			// C6
+				aml_add_word(tmpl, 0x0046);			// Latency
+				aml_add_dword(tmpl, 0x0000015E);		// Power
+		}
+			if (c7_enabled) //C7
+			{
+				p_blk_lo = (acpi_cpu_p_blk + 6) & 0xff;
+				p_blk_hi = (acpi_cpu_p_blk + 5) >> 8;
+
+				tmpl = aml_add_package(pack);
+				resource_template_register_systemio[11] = p_blk_lo; // C4 or C7
+				resource_template_register_systemio[12] = p_blk_hi;
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x07);			// C7
+				aml_add_word(tmpl, 0xF5);			// Latency as in iMac14,1
+				aml_add_dword(tmpl, 0xC8);			// Power
 			}
 		}
 		else
@@ -551,8 +581,26 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 				resource_template_register_fixedhw[11] = 0x20; // C3
 				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
 				aml_add_byte(tmpl, 0x03);		// C3
-				aml_add_word(tmpl, 0x0060);		// Latency
-				aml_add_dword(tmpl, 0x0000015e);	// Power
+				aml_add_word(tmpl, 0x0043);		// Latency
+				aml_add_dword(tmpl, 0x000001F4);	// Power
+			}
+			if (c6_enabled) // C6
+			{
+				tmpl = aml_add_package(pack);
+				resource_template_register_fixedhw[11] = 0x20; // C6
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x06);			// C6
+				aml_add_word(tmpl, 0x0046);			// Latency as in MacPro6,1
+				aml_add_dword(tmpl, 0x0000015E);	// Power
+		}
+			if (c7_enabled) // C7
+			{
+				tmpl = aml_add_package(pack);
+				resource_template_register_fixedhw[11] = 0x30; // C4 or C7
+				aml_add_buffer(tmpl, resource_template_register_fixedhw, sizeof(resource_template_register_fixedhw));
+				aml_add_byte(tmpl, 0x07);			// C7
+				aml_add_word(tmpl, 0xF5);			// Latency as in iMac14,1
+				aml_add_dword(tmpl, 0xC8);	// Power
 			}
 		}
 

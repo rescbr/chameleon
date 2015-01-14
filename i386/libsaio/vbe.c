@@ -116,6 +116,8 @@ uint8_t setVBEDACFormat(unsigned char format)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 /*
  * Default GTF parameter values.
  */
@@ -152,6 +154,8 @@ double Sqrt( double y )
 	x = (1.5*x) - (x*x)*(x*z);
 	return x*y;
 }
+
+//==============================================================================
 
 uint8_t generateCRTCTiming( unsigned short     width,
                         unsigned short     height,
@@ -260,18 +264,23 @@ uint8_t generateCRTCTiming( unsigned short     width,
     return 0;
 }
 
+//==============================================================================
+
 uint8_t setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcSetMode;
     bb.ebx.rr = mode;
-    if (timing) {
+	if (timing)
+	{
         bb.es     = SEG(timing);
         bb.edi.rr = OFF(timing);
     }
     bios(&bb);
     return(bb.eax.r.h);
 }
+
+//==============================================================================
 
 uint8_t setVBEPalette(void *palette)
 {
@@ -286,6 +295,8 @@ uint8_t setVBEPalette(void *palette)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 uint8_t getVBEPalette(void *palette)
 {
     bb.intno = 0x10;
@@ -299,6 +310,8 @@ uint8_t getVBEPalette(void *palette)
     return(bb.eax.r.h);
 }
 
+//==============================================================================
+
 uint8_t getVBECurrentMode(unsigned short *mode)
 {
     bb.intno = 0x10;
@@ -307,6 +320,8 @@ uint8_t getVBECurrentMode(unsigned short *mode)
     *mode = bb.ebx.rr;
     return(bb.eax.r.h);
 }
+
+//==============================================================================
 
 uint8_t getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
 {
@@ -319,6 +334,8 @@ uint8_t getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
     *pixelClock = bb.ecx.rx;
     return(bb.eax.r.h);
 }
+
+//==============================================================================
 
 uint8_t getVBEEDID(void *edidBlock)
 {

@@ -23,8 +23,18 @@
  * dmazar, 14/7/2011
  * support for EXFAT volume label reading
  *
+ * Zenith432, Nov 30 2014
+ * support for reading files
  */
 
+extern void EXFATFree(CICell ih);
+extern long EXFATInitPartition(CICell ih);
+extern long EXFATGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
+							 char ** name, long * flags, u_int32_t * time,
+							 FinderInfo * finderInfo, long * infoValid);
+extern long EXFATReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t length);
+extern long EXFATGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock);
+extern long EXFATLoadFile(CICell ih, char * filePath);
 extern void EXFATGetDescription(CICell ih, char *str, long strMaxLen);
 extern bool EXFATProbe (const void *buf);
 extern long EXFATGetUUID(CICell ih, char *uuidStr);

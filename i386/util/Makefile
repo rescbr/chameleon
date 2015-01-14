@@ -23,6 +23,11 @@ PROGRAMS += bdmesg
 OBJS += bdmesg.o32 bdmesg.o64
 endif
 
+ifeq (${CONFIG_SECTORSIZE}, y)
+PROGRAMS += sectorsize
+OBJS += sectorsize.o32 sectorsize.o64
+endif
+
 ifeq (${CONFIG_OPENUP}, y)
 PROGRAMS += openUp
 OBJS += openUp.o64 openUp.o32
@@ -36,7 +41,7 @@ SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
 
 DIRS_NEEDED = $(OBJROOT) $(SYMROOT)
 
-SUBDIRS = fdisk
+SUBDIRS = fdisk boot1-install
 
 all: $(DIRS_NEEDED) $(SYMPROG) all-recursive
 

@@ -70,25 +70,31 @@ void showTextBuffer(char *buf_orig, int size);
 // MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
 uint32_t MacOSVer2Int(const char *osver)
 {
-    uint32_t ret = 0;
-    uint8_t retIndex = 0, f = 1;
-    int Index = strlen(osver) - 1;
-    for (; ((Index >= 0) && (Index <= OSVERSTRLEN)); Index--) {
-        if ((osver[Index] >= '0') && (osver[Index] <= '9')) {
-            ((uint8_t *)&ret)[retIndex] += (osver[Index] - '0') * f;
-            f *= 10;
-        } else {
-            if (osver[Index] == '.') {
-                f = 1;
-                retIndex++;
-            } else {
-                return 0;
-            }
-        }
+    uint32_t    result = 0;
+    uint8_t    *resptr = (uint8_t *)&result;
+    uint8_t     len = strlen(osver);
+    uint8_t     i, j, m;
+#define CHR2UINT(c) ((uint8_t)(c - '0'))
+#define ISDIGIT(c)  ((c >= '0') && (c <= '9'))
+#define ISDOT(c)    (c == '.')
+
+    if (!osver || (len < 4) || (len > OSVERSTRLEN - 1) || !ISDIGIT(osver[0]) || !ISDOT(osver[2]) || !ISDIGIT(osver[len - 1])) {
+        verbose("ERROR: wrong Mac OS version string syntax: '%s'\n", osver);
+        return 0;
     }
     
-    if (retIndex > 0) return (ret << ((3 - retIndex) * 8));
-    else return 0;
+    for (i = 0, j = 3, m = 1; i < len; i++) {
+        if (ISDIGIT(osver[i])) {
+            resptr[j] = resptr[j] * m + CHR2UINT(osver[i]);
+            m = 10;
+        } else if (ISDOT(osver[i])) {
+            if (j > 0) j--;
+            else return 0;
+            m = 1;
+        } else return 0;
+    }
+    
+    return result;
 }
 
 //==========================================================================
@@ -225,7 +231,8 @@ static void clearBootArgs(void)
 	gBootArgsPtr = gBootArgs;
 	memset(gBootArgs, '\0', BOOT_STRING_LEN);
 
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		clearGraphicBootPrompt();
 	}
 	execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
@@ -248,26 +255,37 @@ static void showBootPrompt(int row, bool visible)
 	extern char bootPrompt[];
 	extern char bootRescanPrompt[];
 
-	if( bootArgs->Video.v_display == VGA_TEXT_MODE ) {
+	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+	{
 		changeCursor( 0, row, kCursorTypeUnderline, 0 );    
 		clearScreenRows( row, kScreenLastRow );
 	}
 
 	clearBootArgs();
 
-	if (visible) {
-		if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
-			if (gEnableCDROMRescan) {
+	if (visible)
+	{
+		if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+		{
+			if (gEnableCDROMRescan)
+			{
 				printf( bootRescanPrompt );
-			} else {
+			}
+			else
+			{
 				printf( bootPrompt );
 				printf( gBootArgs );
 			}
 		}
-	} else {
-		if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	}
+	else
+	{
+		if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+		{
 			clearGraphicBootPrompt();
-		} else {
+		}
+		else
+		{
 			printf("Press Enter to start up the foreign OS. ");
 		}
 	}
@@ -313,8 +331,10 @@ static void updateBootArgs( int key )
             {
                 *gBootArgsPtr++ = key;
 
-                if( bootArgs->Video.v_display != VGA_TEXT_MODE ) updateGraphicBootPrompt();
-                else if ( key >= ' ' && key < 0x7f) putchar(key);
+			if( bootArgs->Video.v_display != VGA_TEXT_MODE )
+				updateGraphicBootPrompt();
+			else if ( key >= ' ' && key < 0x7f)
+				putchar(key);
 			}
             
 			break;
@@ -1129,17 +1149,20 @@ extern unsigned char chainbootflag;
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
     int argLen = argName ? strlen(argName) : 0;
-    int len = argLen + cnt + 1;  // +1 to account for space
+	int len = argLen + cnt + 1;  // + 1 to account for space.
 
 	if (argName)
+	{
 		len++; // +1 to account for '='
+	}
 
     if (len > *cntRemainingP) {
         error("Warning: boot arguments too long, truncating\n");
         return false;
     }
 
-    if (argName) {
+	if (argName)
+	{
         strncpy( *argP, argName, argLen );
         *argP += argLen;
         *argP[0] = '=';
@@ -1235,13 +1258,17 @@ int processBootOptions()
     MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
     // so copy it and trim
     gMacOSVersion[0] = 0;
-    if (MacOSVerCurrent >= MacOSVer2Int("10.10")) {
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	{
         strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
-    } else {
+	}
+	else
+	{
         strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
     }
     
 	// Load config table specified by the user, or use the default.
+
 	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
 		val = 0;
 		cnt = 0;
@@ -1249,6 +1276,7 @@ int processBootOptions()
 
 	// Load com.apple.Boot.plist from the selected volume
 	// and use its contents to override default bootConfig.
+
 	loadSystemConfig(&bootInfo->bootConfig);
 	loadChameleonConfig(&bootInfo->chameleonConfig, NULL);
 
@@ -1260,22 +1288,31 @@ int processBootOptions()
 	// to be used.
 
 	gOverrideKernel = false;
-	if (( kernel = extractKernelName((char **)&cp) )) {
+	if (( kernel = extractKernelName((char **)&cp) ))
+	{
 		strlcpy( bootInfo->bootFile, kernel, sizeof(bootInfo->bootFile) );
-	} else {
-		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+	}
+	else
+	{
+		if ( getValueForKey( kKernelNameKey, &val, &cnt, &bootInfo->bootConfig ) )
+		{
 			strlcpy( bootInfo->bootFile, val, cnt+1 );
-		} else {
+		}
+		else
+		{
 			if (MacOSVerCurrent >= MacOSVer2Int("10.10")) { // OS X is 10.10 or newer
 				strlcpy( bootInfo->bootFile, kYosemiteKernel, sizeof(bootInfo->bootFile) );
-			} else {
+			}
+			else
+			{
 				// or 10.9 and previous
 				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
 			}
 		}
 	}
 
-	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kYosemiteKernel ) != 0)) {
+	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kYosemiteKernel ) != 0))
+	{
 		gOverrideKernel = true;
 	}
 
@@ -1283,7 +1320,8 @@ int processBootOptions()
 	argP = bootArgs->CommandLine;
 
 	// Get config kernel flags, if not ignored.
-	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) || !getValueForKey(kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig)) {
+	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) || !getValueForKey(kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig))
+	{
 		val = "";
 		cnt = 0;
 	}
@@ -1292,52 +1330,67 @@ int processBootOptions()
 
 	// boot-uuid can be set either on the command-line or in the config file
 	if (!processBootArgument(kBootUUIDKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString))) {
+                             &argP, &cntRemaining, gBootUUIDString, sizeof(gBootUUIDString)))
+	{
 		//
 		// Try an alternate method for getting the root UUID on boot helper partitions.
 		//
-		if (gBootVolume->flags & kBVFlagBooter) {
+		if (gBootVolume->flags & kBVFlagBooter)
+		{
 			// Load the configuration store in the boot helper partition
-			if (loadHelperConfig(&bootInfo->helperConfig) == 0) {
+			if (loadHelperConfig(&bootInfo->helperConfig) == 0)
+			{
 				val = getStringForKey(kHelperRootUUIDKey, &bootInfo->helperConfig);
-				if (val != NULL) {
+				if (val != NULL)
+				{
 					strlcpy(gBootUUIDString, val, sizeof(gBootUUIDString));
 				}
 			}
 		}
 /* Bungo
 		// Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 */
 		// If we have the volume uuid add it to the commandline arguments
-		if (strlen(gBootUUIDString)) {
+		if (strlen(gBootUUIDString))
+		{
 			copyArgument(kBootUUIDKey, gBootUUIDString, strlen(gBootUUIDString), &argP, &cntRemaining);
 		}
 		// Try to get the volume uuid string
-		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid) {
+		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
+		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 	}
     verbose("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
-                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE)) {
+                             &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
+	{
 		cnt = 0;
-		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig)) {
+		if ( getValueForKey( kBootDeviceKey, &val, &cnt, &bootInfo->chameleonConfig))
+		{
 			valueBuffer[0] = '*';
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
-            if (cnt > 0) {
+			if (cnt > 0)
+			{
                 copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
             }
-		} else {
-			if (strlen(gBootUUIDString)) {
+		}
+		else
+		{
+			if (strlen(gBootUUIDString))
+			{
 				val = "*uuid";
 				cnt = 5;
-			} else {
+			}
+			else
+			{
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
@@ -1356,15 +1409,18 @@ int processBootOptions()
 	 * Removed. We don't need this anymore.
 	 *
 	if (!processBootArgument(kPlatformKey, cp, configKernelFlags, bootInfo->config,
-							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler))) {
+							 &argP, &cntRemaining, gPlatformName, sizeof(gCacheNameAdler)))
+	{
 		getPlatformName(gPlatformName);
 		copyArgument(kPlatformKey, gPlatformName, strlen(gPlatformName), &argP, &cntRemaining);
 	}
 	*/
 
 	if (!getValueForBootKey(cp, kSafeModeFlag, &val, &cnt) &&
-        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt)) {
-		if (gBootMode & kBootModeSafe) {
+        !getValueForBootKey(configKernelFlags, kSafeModeFlag, &val, &cnt))
+	{
+		if (gBootMode & kBootModeSafe)
+		{
 			copyArgument(0, kSafeModeFlag, strlen(kSafeModeFlag), &argP, &cntRemaining);
 		}
 	}
@@ -1372,8 +1428,10 @@ int processBootOptions()
 	// Store the merged kernel flags and boot args.
 
 	cnt = strlen(configKernelFlags);
-	if (cnt) {
-		if (cnt > cntRemaining) {
+	if (cnt)
+	{
+		if (cnt > cntRemaining)
+		{
 			error("Warning: boot arguments too long, truncating\n");
 			cnt = cntRemaining;
 		}
@@ -1382,28 +1440,34 @@ int processBootOptions()
 		cntRemaining -= cnt;
 	}
 	userCnt = strlen(cp);
-	if (userCnt > cntRemaining) {
+	if (userCnt > cntRemaining)
+	{
 		error("Warning: boot arguments too long, truncating\n");
 		userCnt = cntRemaining;
 	}
 	strncpy(&argP[cnt], cp, userCnt);
 	argP[cnt+userCnt] = '\0';
 
-	if(!shouldboot) {
+	if(!shouldboot)
+	{
 		gVerboseMode = getValueForKey( kVerboseModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ||
 			getValueForKey( kSingleUserModeFlag, &val, &cnt, &bootInfo->chameleonConfig );
 		
 		gBootMode = ( getValueForKey( kSafeModeFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) ?
 			kBootModeSafe : kBootModeNormal;
 
-		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) ) {
+		if ( getValueForKey( kIgnoreCachesFlag, &val, &cnt, &bootInfo->chameleonConfig ) )
+		{
 			gBootMode = kBootModeSafe;
 		}
 	}
 
-	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) ) {
+	if ( getValueForKey( kMKextCacheKey, &val, &cnt, &bootInfo->bootConfig ) )
+	{
 		strlcpy(gMKextName, val, cnt + 1);
-	} else {
+	}
+	else
+	{
 		gMKextName[0]=0;
 	}
 
@@ -1493,9 +1557,12 @@ void showTextBuffer(char *buf_orig, int size)
 
 void showHelp(void)
 {
-	if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+	{
 		showInfoBox("Help. Press q to quit.\n", (char *)BootHelp_txt);
-	} else {
+	}
+	else
+	{
 		showTextBuffer((char *)BootHelp_txt, BootHelp_txt_len);
 	}
 }
@@ -1507,14 +1574,16 @@ void showTextFile(const char * filename)
 	int	fd;
 	int	size;
  
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		printf("\nFile not found: %s\n", filename);
 		sleep(2);
 		return;
 	}
 
         size = file_size(fd);
-        if (size > MAX_TEXT_FILE_SIZE) {
+        if (size > MAX_TEXT_FILE_SIZE)
+	{
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
@@ -1541,9 +1610,11 @@ int selectAlternateBootDevice(int bootdevice)
 	printf("Enter two-digit hexadecimal boot device [%02x]: ", bootdevice);
 	do {
 		key = getchar();
-		switch (ASCII_KEY(key)) {
+		switch (ASCII_KEY(key))
+		{
 		case KEY_BKSP:
-			if (digitsI > 0) {
+			if (digitsI > 0)
+			{
 				int x, y, t;
 				getCursorPositionAndType(&x, &y, &t);
 				// Assume x is not 0;
@@ -1552,7 +1623,9 @@ int selectAlternateBootDevice(int bootdevice)
 				// Overwrite with space without moving cursor position
 				putca(' ', 0x07, 1);
 				digitsI--;
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1560,7 +1633,8 @@ int selectAlternateBootDevice(int bootdevice)
 		case KEY_ENTER:
 			digits[digitsI] = '\0';
 			newbootdevice = strtol(digits, &end, 16);
-			if (end == digits && *end == '\0') {
+			if (end == digits && *end == '\0')
+			{
 				// User entered empty string
 				printf("\nUsing default boot device %x\n", bootdevice);
 				key = 0;
@@ -1575,10 +1649,13 @@ int selectAlternateBootDevice(int bootdevice)
 			break;
 
 		default:
-			if (isxdigit(ASCII_KEY(key)) && digitsI < 2) {
+			if (isxdigit(ASCII_KEY(key)) && digitsI < 2)
+			{
 				putchar(ASCII_KEY(key));
 				digits[digitsI++] = ASCII_KEY(key);
-			} else {
+			}
+			else
+			{
 				// TODO: Beep or something
 			}
 			break;
@@ -1591,9 +1668,12 @@ int selectAlternateBootDevice(int bootdevice)
 bool promptForRescanOption(void)
 {
 	printf("\nWould you like to enable media rescan option?\nPress ENTER to enable or any key to skip.\n");
-	if (getchar() == KEY_ENTER) {
+	if (getchar() == KEY_ENTER)
+	{
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }

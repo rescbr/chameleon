@@ -8,8 +8,7 @@
 
 #include "libsaio.h"
 
-// extern uint64_t smbios_p; - moved to smbios.h
-
+// extern uint64_t smbios_p;
 boolean_t tableSign(void *table, const char *sgn);
 extern struct acpi_2_rsdp *getRSDPaddress();
 

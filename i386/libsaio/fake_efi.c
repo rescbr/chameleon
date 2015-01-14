@@ -118,6 +118,8 @@ EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
+// ==========================================================================
+
 EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
@@ -158,12 +160,12 @@ EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const 
 		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void *)pGuid);
 
 		// The "table" property is the 32-bit (in our implementation) physical address of the table
-		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
+		DT__AddProperty(tableNode, "table", sizeof(EFI_UINT64), table);
 
 		// Assume the alias pointer is a global or static piece of data
 		if (alias != NULL)
 		{
-			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char *)alias);
+			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (void *)alias);
 		}
         
         i++;
@@ -460,6 +462,7 @@ static const char DEV_PATHS_SUP_PROP[] = "DevicePathsSupported";
 static const char MACHINE_SIG_PROP[] = "machine-signature";
 static EFI_UINT32 const ZERO_U32 = 0;
 static EFI_UINT32 const ONE_U32 = 1;
+//static EFI_UINT32 const *VALUE[] = { &ZERO_U32 , &ONE_U32 };
 static const char RANDOM_SEED_PROP[] = "random-seed";
 /*
 static EFI_UINT8 const RANDOM_SEED_PROP_VALUE[] =
@@ -584,14 +587,23 @@ bool getKernelCompat(EFI_UINT8 *compat)
     
     //strlcpy(kernelFilePath, bootInfo->bootFile, sizeof(kernelFilePath)); // user defined path
     snprintf(kernelFilePath, sizeof(kernelFilePath), "%s", bootInfo->bootFile); // user defined path
-    if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
-    } else {
+	if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
+	{
+	}
+	else
+	{
         snprintf(kernelFilePath, sizeof(kernelFilePath), "/%s", bootInfo->bootFile); // append a leading '/'
-        if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
-        } else {
+		if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
+		{
+		}
+		else
+		{
             snprintf(kernelFilePath, sizeof(kernelFilePath), "/System/Library/Kernels/%s", bootInfo->bootFile); // Yosemite path
-            if ((kernelFileRef = open(kernelFilePath, 0)) >= 0) {
-            } else {
+			if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
+			{
+			}
+			else
+			{
                 verbose("EfiKernelCompat: can't find any kernel file!\n");
                 return false;
             }
@@ -601,7 +613,9 @@ bool getKernelCompat(EFI_UINT8 *compat)
     verbose("EfiKernelCompat: reading kernel header from file: %s ... ", kernelFilePath);
     if ((readBytes = read(kernelFileRef, kernelHeaderBuf, sizeof(struct fat_header) + 4*sizeof(struct fat_arch))) > 0) {
         verbose("OK, read %d bytes.\n", readBytes);
-    } else {
+	}
+	else
+	{
         verbose("EROR, can't read kernel file!\n");
         return false;
     }
@@ -611,7 +625,8 @@ bool getKernelCompat(EFI_UINT8 *compat)
     struct mach_header *thinHeaderPtr = (struct mach_header *)kernelHeaderBuf;
     bool swapit = false;
     
-    switch (fatHeaderPtr->magic) {
+	switch (fatHeaderPtr->magic)
+	{
         case FAT_CIGAM:
             swapit = true;
             fatHeaderPtr->nfat_arch = OSSwapInt32(fatHeaderPtr->nfat_arch);
@@ -708,7 +723,7 @@ void setupEfiNode(void)
 		stop("Couldn't get '/efi' node");
 	}
 
-/* Bungo: we have 64 bit ability fake efi but mode may be changed 32/64, like Macs
+/* Bungo: we have 64 bit ability fake efi but mode may be changed 32/64, like in Macs
 	if (archCpuType == CPU_TYPE_I386) {
 		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (EFI_CHAR8 *)FIRMWARE_ABI_32_PROP_VALUE);
 	} else { */
@@ -718,7 +733,7 @@ void setupEfiNode(void)
 	DT__AddProperty(efiNode, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
 
 	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32 *)&FIRMWARE_REVISION);
-	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)&FIRMWARE_VENDOR);
+	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)FIRMWARE_VENDOR);
 
 	// TODO: Fill in other efi properties if necessary
 
@@ -741,7 +756,8 @@ void setupEfiNode(void)
 	gEfiConfigurationTableNode = DT__AddChild(efiNode, "configuration-table");
 
 	// Set up the /efi/kernel-compatibility node only if 10.7 or better
-    if (MacOSVerCurrent >= MacOSVer2Int("10.7")) {
+	if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
+	{
         Node *EfiKernelCompatNode = DT__AddChild(efiNode, "kernel-compatibility");
         EFI_UINT8 compat = (archCpuType == CPU_TYPE_I386) ? 0b00000001 : 0b00000010;
         getKernelCompat(&compat);
@@ -812,7 +828,7 @@ void setupBoardId()
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
 	}
 }
 
@@ -845,7 +861,8 @@ void setupChosenNode()
 	DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
 
 	length = strlen(bootInfo->bootFile);
-    if (length) {
+	if (length)
+	{
         DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
     }
 //  TODO:
@@ -853,13 +870,11 @@ void setupChosenNode()
 //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
 //	DT__AddProperty(chosenNode, "boot-kernelchache-adler32", sizeof(adler32), adler32);
     
-	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(EFI_UINT32), (EFI_UINT32 *)&Platform.HWSignature);
+	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
     
     // add if Yosemite or better only
     if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
     {
-        //DT__AddProperty(node, RANDOM_SEED_PROP, sizeof(RANDOM_SEED_PROP_VALUE), (EFI_UINT8 *)&RANDOM_SEED_PROP_VALUE);
-        
         //
         // Pike R. Alpha - 12 October 2014
         //
@@ -869,7 +884,6 @@ void setupChosenNode()
         EFI_UINT32 ecx, esi, edi;
         EFI_UINT32 rcx, rdx, rsi, rdi;
         
-        EFI_UINT32 *seedPtr = (EFI_UINT32 *)RANDOM_SEED_PROP_VALUE;
         randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
         cpuTick = rcx = rdx = rsi = rdi = 0;
         
@@ -879,10 +893,12 @@ void setupChosenNode()
             //
             // i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
             //
-            //EFI_UINT32 seedBuffer[16] = {0};
+            // EFI_UINT32 seedBuffer[16] = {0};
             //
             // Main loop to get 16 qwords (four bytes each).
             //
+            EFI_UINT32 *seedPtr = (EFI_UINT32 *)RANDOM_SEED_PROP_VALUE;
+            
             for (index = 0; index < 16; index++)					// 0x17e12:
             {
                 randomValue = computeRand();					// callq	0x18e20
@@ -896,10 +912,12 @@ void setupChosenNode()
             //
             // All other processors without RDRAND support.
             //
-            //EFI_UINT8 seedBuffer[64] = {0};
+            // EFI_UINT8 seedBuffer[64] = {0};
             //
             // Main loop to get the 64 bytes.
             //
+            EFI_UINT8 *seedPtr = (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE;
+            
             do									// 0x17e55:
             {
                 PMTimerValue = inw(0x408);					// in		(%dx),	%ax
@@ -920,7 +938,8 @@ void setupChosenNode()
                 rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
                 rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
                 
-                RANDOM_SEED_PROP_VALUE[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
+                //RANDOM_SEED_PROP_VALUE[index] = (EFI_UINT8)(rdi & 0xff);	// mov		%dil,	(%r15,%r12,1)
+                seedPtr[index] = (EFI_UINT8)(rdi & 0xff);
                 
                 edi = (edi & 0x2f);						// and		$0x2f,	%edi
                 edi = (edi + esi);						// add		%esi,	%edi
@@ -930,7 +949,7 @@ void setupChosenNode()
             } while (index < 64);							// cmp		%r14d,	%r12d
             // jne		0x17e55		(next)
         }
-        DT__AddProperty(chosenNode, "random-seed", sizeof(RANDOM_SEED_PROP_VALUE), (EFI_UINT8 *)&RANDOM_SEED_PROP_VALUE);
+        DT__AddProperty(chosenNode, RANDOM_SEED_PROP, sizeof(RANDOM_SEED_PROP_VALUE), (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE);
     }
     
     // setup '/chosen/memory-map' node
@@ -956,9 +975,9 @@ void setupChosenNode()
 /*
  * Load the smbios.plist override config file if any
  */
-static void setupSmbiosConfigFile(const char *filename)
+static void setupSmbiosConfigFile()
 {
-	char		dirSpecSMBIOS[128];
+	//char		dirSpecSMBIOS[256];
 	const char	*override_pathname = NULL;
 	int		len = 0, err = 0;
 	extern void scan_mem();
@@ -966,25 +985,25 @@ static void setupSmbiosConfigFile(const char *filename)
 	// Take in account user overriding
 	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
 	{
-		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
-		sprintf(dirSpecSMBIOS, override_pathname);
-		err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+		// Specify a path to a file, e.g. SMBIOS=/Settings/macProXY.plist
+		//sprintf(dirSpecSMBIOS, override_pathname);
+		err = loadConfigFile(override_pathname, &bootInfo->smbiosConfig);
 	}
 	else
 	{
 		// Check selected volume's Extra.
-		sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
-		if ( (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig)) )
+		//sprintf(dirSpecSMBIOS, "/Extra/%s", filename);
+		//if ( (err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig)) )
 		{
 			// Check booter volume/rdbt Extra.
-			sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
-			err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
+			//sprintf(dirSpecSMBIOS, "bt(0,0)/Extra/%s", filename);
+			err = loadConfigFile("/Extra/smbios.plist", &bootInfo->smbiosConfig);
 		}
 	}
 
 	if (err)
 	{
-		verbose("setupSmbiosConfigFile: No SMBIOS replacement found.\n");
+        verbose("setupSmbiosConfigFile: no SMBIOS replacement found.\n");
 	}
 
 	// get a chance to scan mem dynamically if user asks for it while having the config options
@@ -1029,7 +1048,8 @@ char saveOriginalACPI()
     verbose("\nsaveOriginalACPI: Saving OEM tables into IODT:/chosen/acpi...\n");
     
     Node *node = DT__FindNode("/chosen/acpi", true);
-    if (!node) {
+	if (!node)
+	{
         verbose("saveOriginalACPI: node '/chosen/acpi' not found, can't save any OEM tables.\n\n");
         return 0;
     }
@@ -1240,7 +1260,7 @@ void setupFakeEfi(void)
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));
 
 	// load smbios.plist file if any
-	setupSmbiosConfigFile("smbios.plist");
+	setupSmbiosConfigFile();
     
     // Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();

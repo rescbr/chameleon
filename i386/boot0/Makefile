@@ -22,7 +22,7 @@ $(SYMROOT)/boot0: boot0.s
 
 $(OBJS): $(SRCROOT)/autoconf.inc
 	@echo "	[NASM] $(@F)"
-	@$(NASM) $(@F).s -o $@
+	@$(NASM) $(@F).s -o $@ -O3
 
 clean-local:
 	@for o in $(OBJS); do if [ -f "$${o}" ];then echo "	[RM] $${o}"; fi; done

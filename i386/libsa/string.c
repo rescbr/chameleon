@@ -145,10 +145,14 @@ int strncmp(const char * s1, const char * s2, size_t n)
     return 0;
   do {
     if (*s1 != *s2++)
-      return (*(const unsigned char *)s1 -
-              *(const unsigned char *)(s2 - 1));
+		{
+			return (*(const unsigned char *)s1 - *(const unsigned char *)(s2 - 1));
+		}
+
     if (!*s1++)
+		{
       break;
+		}
   } while (--n);
   return 0;
 }
@@ -165,7 +169,8 @@ strcpy(char * s1, const char * s2)
 char *
 stpcpy(char * s1, const char * s2)
 {
-	while ((*s1++ = *s2++)) {
+	while ((*s1++ = *s2++))
+	{
 		continue;
 	}
 	return --s1;
@@ -190,7 +195,9 @@ stpncpy(char * s1, const char * s2, size_t n)
 	while (n && (*s1++ = *s2++))
       --n;
 	if (n > 0)
+	{
       bzero(s1, n);
+	}
     return s1;
 }
 
@@ -257,7 +264,9 @@ char *strcat(char *s1, const char *s2)
 {
 	register char *ret = s1;
 	while (*s1)
+	{
 		s1++;
+	}
 	while ((*s1++ = *s2++));
 	return ret;
 }

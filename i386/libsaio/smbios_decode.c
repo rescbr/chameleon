@@ -228,11 +228,14 @@ static const int kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes) / size
 // Bungo: fixes random string readout if null in smbios to "Not Specified" as dmidecode displays
 char *SMBStringForField(SMBStructHeader *structHeader, uint8_t field, const bool mask)
 {
-	char  *str = getSMBStringForField(structHeader, field);
-    if (mask)
+	char  *str = NULL;
+	str = getSMBStringForField(structHeader, field);
+	if (!field) {
+		str = NotSpecifiedStr;
+	}
+	else if (mask) {
 		str = PrivateStr;
-    else if (!field)
-        str = NotSpecifiedStr;
+	}
 
 	return str;
 };
@@ -472,7 +475,8 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 	}
 // Total Width:
 // Data Width:
-    switch (((SMBMemoryDevice *)structHeader)->memorySize) {
+	switch (((SMBMemoryDevice *)structHeader)->memorySize)
+	{
         case 0:
             verbose("\tSize: No Module Installed\n");
             break;

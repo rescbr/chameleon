@@ -617,8 +617,10 @@ static SMBWord structureCount	= 0;
 
 /* ============================================ */
 
-bool   useSMBIOSdefaults        = true;  // Bungo
-
+bool useSMBIOSdefaults = true;  // Bungo
+/** FIXED
+SMBByte PlatformType			= 1;  // Bungo: same as Platfom.Type in platform.h. Because can't get from ACPI FADT PM profile and platformCPUFeature(CPU_FEATURE_MOBILE)) doesn't work as expect, FIXING NEEDED.
+**/
 /* Rewrite this function */
 void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 {
@@ -641,7 +643,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 
 	if (Platform.Type == 2)
 	{
-		if (Platform.CPU.NoCores > 1) {
+		if (Platform.CPU.NoCores > 1)
+		{
 			defaultSystemInfo.productName    = kDefaultMacBookPro;
 			defaultBIOSInfo.version          = kDefaultMacBookProBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookProBIOSReleaseDate;
@@ -649,7 +652,9 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.product         = kDefaultMacBookProBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
-		} else {
+		}
+		else
+		{
 			defaultSystemInfo.productName    = kDefaultMacBook;
 			defaultBIOSInfo.version          = kDefaultMacBookBIOSVersion;
 			defaultBIOSInfo.releaseDate      = kDefaultMacBookBIOSReleaseDate;
@@ -658,7 +663,9 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
 			defaultChassis.chassisType       = kSMBchassisUnknown;
 		}
-	} else {
+	}
+	else
+	{
 		switch (Platform.CPU.NoCores)
 		{
 			case 1:
@@ -794,13 +801,13 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 
 char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 {
-	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
-
-	if (!field) {
+	if (!field || !structHeader) {
 		return NULL;
 	}
+    
+    uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
-	for (field--; field != 0 && strlen((char *)stringPtr) > 0;
+	for (field--; (field > 0) && (*stringPtr > 0) &&(*(uint16_t *)stringPtr != 0);
 		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
 
 	return (char *)stringPtr;
@@ -821,7 +828,7 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 
 	strSize = strlen(string);
 
-	// remove any spaces found at the end but only in MemoryDevice
+	// remove any spaces found at the end but only in MemoryDevice avoiding errors
 	if (structHeader->type == kSMBTypeMemoryDevice) {
 		while ((strSize != 0) && (string[strSize - 1] == ' ')) {
 			strSize--;
@@ -860,8 +867,10 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				{
 					break;
 				} else {
-					if (structPtr->orig->type == kSMBTypeMemoryDevice) {	// MemoryDevice only
-						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL)) {
+					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
+					{
+						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
+						{
 							break;
 						}
 					}
@@ -999,9 +1008,11 @@ bool addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
     if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL)
         return false;
         
-	switch (Platform.CPU.Family) {
+	switch (Platform.CPU.Family)
+	{
 		case 0x06:
-			switch (Platform.CPU.Model) {
+			switch (Platform.CPU.Model)
+			{
 				case 0x19:			// Intel Core i5 650 @3.20 Ghz
 				case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156, (45nm)
 				case CPUID_MODEL_DALES:     // Intel Core i5, i7, Xeon, (45nm), integrated GPU
@@ -1292,9 +1303,10 @@ void setupSMBIOS(void)
 	bzero(buffer, SMB_ALLOC_SIZE);
 	structPtr->new = (SMBStructHeader *)buffer;
 
-	// getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);  Bungo
+	//Bungo:
+    //getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);
 	getBoolForKey(kSMBIOSdefaults, &useSMBIOSdefaults, &bootInfo->chameleonConfig);
-	// if (setSMB)  Bungo
+	// if (setSMB)
 	setDefaultSMBData();
 
 	setupNewSMBIOSTable(origeps, structPtr);

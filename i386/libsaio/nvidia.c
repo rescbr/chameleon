@@ -78,6 +78,7 @@
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
 static bool     showGeneric         = false;
+static bool	doit		= false;
 char generic_name[128];
 extern uint32_t devices_number;
 
@@ -2035,7 +2036,6 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	char				kNVCAP[12];
 	char				*model = NULL;
 	const char			*value;
-	bool				doit;
 
 	fill_card_list();
 
@@ -2166,6 +2166,15 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	if (devices_number == 1)
 	{
 		devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t *)&boot_display, 4);
+	}
+
+	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	}
+	else
+	{
+		devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
 	}
 
 	if (nvPatch == PATCH_ROM_SUCCESS_HAS_LVDS)

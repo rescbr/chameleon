@@ -222,18 +222,21 @@ static uint64_t measure_aperf_frequency(void)
 		pollCount = poll_PIT2_gate();
 		aperfEnd = rdmsr64(MSR_AMD_APERF);
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1) {
+		if (pollCount <= 1)
+		{
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the APERF delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC) {
+		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
+		{
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (aperfEnd - aperfStart) < aperfDelta ) {
+		if ( (aperfEnd - aperfStart) < aperfDelta )
+		{
 			aperfDelta = aperfEnd - aperfStart;
 		}
 	}
@@ -241,9 +244,12 @@ static uint64_t measure_aperf_frequency(void)
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
 	
-	if (aperfDelta > (1ULL<<32)) {
+	if (aperfDelta > (1ULL<<32))
+	{
 		retval = 0;
-	} else {
+	}
+	else
+	{
 		retval = aperfDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -457,28 +463,43 @@ void scan_cpu(PlatformInfo_t *p)
     }
     
     /* setup features */
-	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_MMX;
 	}
-	if ((bit(25) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(25) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE;
 	}
-	if ((bit(26) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(26) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE2;
 	}
-	if ((bit(0) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(0) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE3;
 	}
-	if ((bit(19) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(19) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE41;
 	}
-	if ((bit(20) & p->CPU.CPUID[CPUID_1][2]) != 0) {
+
+	if ((bit(20) & p->CPU.CPUID[CPUID_1][2]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_SSE42;
 	}
-	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0) {
+
+	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_EM64T;
 	}
-	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0) {
+
+	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0)
+	{
 		p->CPU.Features |= CPU_FEATURE_MSR;
 	}
     
@@ -557,36 +578,48 @@ void scan_cpu(PlatformInfo_t *p)
 					}
 				}
 
-				if (bus_ratio_max) {
+					if (bus_ratio_max)
+					{
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
 
 				//valv: Turbo Ratio Limit
-				if ((intelCPU != 0x2e) && (intelCPU != 0x2f)) {
+					if ((intelCPU != 0x2e) && (intelCPU != 0x2f))
+					{
 					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
-				} else {
+					}
+					else
+					{
 					cpuFrequency = tscFrequency;
 				}
-				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4)) {
+					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
+					{
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
-					if (len >= 3) {
+						if (len >= 3)
+						{
 						max_ratio = (max_ratio + 5);
 					}
 
 					//verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 					// extreme overclockers may love 320 ;)
-					if ((max_ratio >= min_ratio) && (max_ratio <= 320)) {
+						if ((max_ratio >= min_ratio) && (max_ratio <= 320))
+						{
 						cpuFrequency = (fsbFrequency * max_ratio) / 10;
-						if (len >= 3) {
+							if (len >= 3)
+							{
 							maxdiv = 1;
-						} else {
+							}
+							else
+							{
 							maxdiv = 0;
 						}
-					} else {
+						}
+						else
+						{
 						max_ratio = (bus_ratio_max * 10);
 					}
 				}
@@ -611,12 +644,15 @@ void scan_cpu(PlatformInfo_t *p)
 				currdiv = bitfield(msr, 14, 14);
 
 				// This will always be model >= 3
-				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f)) {
+				if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0e) || (p->CPU.Family == 0x0f))
+				{
 					/* On these models, maxcoef defines TSC freq */
 					maxcoef = bitfield(msr, 44, 40);
-				} else {
-					// On lower models, currcoef defines TSC freq
-					// XXX
+				}
+				else
+				{
+					/* On lower models, currcoef defines TSC freq */
+					/* XXX */
 					maxcoef = currcoef;
 				}
 
@@ -630,12 +666,18 @@ void scan_cpu(PlatformInfo_t *p)
 					if (maxdiv)
 					{
 						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
-					} else {
+					}
+					else
+					{
 						fsbFrequency = (tscFrequency / maxcoef);
 					}
-					if (currdiv) {
+
+					if (currdiv)
+					{
 						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
-					} else {
+					}
+					else
+					{
 						cpuFrequency = (fsbFrequency * currcoef);
 					}
 					//verbose("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
@@ -643,23 +685,28 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 			}
 		}
-		// Mobile CPU
-		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28)) {
+		/* Mobile CPU */
+		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
+		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
-	} else if ((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f)) {
-		switch(p->CPU.ExtFamily) {
-			case 0x00: //* K8 *//
+	}
+	else if ((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
+	{
+		switch(p->CPU.ExtFamily)
+		{
+			case 0x00: /* K8 */
 				msr = rdmsr64(K8_FIDVID_STATUS);
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) / 2 + 4;
 				break;
 
-			case 0x01: //* K10 *//
+			case 0x01: /* K10 */
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
-				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1) {
+				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1)
+				{
 					//uint64_t mperf = measure_mperf_frequency();
 					uint64_t aperf = measure_aperf_frequency();
 					cpuFrequency = aperf;
@@ -672,7 +719,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x05: //* K14 *//
+			case 0x05: /* K14 */
 				msr = rdmsr64(K10_COFVID_STATUS);
 				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
 				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
@@ -680,33 +727,44 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x02: //* K11 *//
+			case 0x02: /* K11 */
 				// not implimented
 				break;
 		}
 
-		if (maxcoef) {
-			if (currdiv) {
-				if (!currcoef) {
+		if (maxcoef)
+		{
+			if (currdiv)
+			{
+				if (!currcoef)
+				{
 					currcoef = maxcoef;
 				}
 
-				if (!cpuFrequency) {
+				if (!cpuFrequency)
+				{
 					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
-				} else {
+				}
+				else
+				{
 					fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
 				}
 				//verbose("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 			} else {
 				if (!cpuFrequency) {
 					fsbFrequency = (tscFrequency / maxcoef);
-				} else {
+				}
+				else
+				{
 					fsbFrequency = (cpuFrequency / maxcoef);
 				}
 				//verbose("%d\n", currcoef);
 			}
-		} else if (currcoef) {
-			if (currdiv) {
+		}
+		else if (currcoef)
+		{
+			if (currdiv)
+			{
 				fsbFrequency = ((tscFrequency * currdiv) / currcoef);
 				//verbose("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 			} else {
@@ -718,7 +776,8 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	
 #if 0
-	if (!fsbFrequency) {
+	if (!fsbFrequency)
+	{
 		fsbFrequency = (DEFAULT_FSB * 1000);
         verbose("CPU: fsbFrequency=0! using the default value for FSB!\n");
 		cpuFrequency = tscFrequency;

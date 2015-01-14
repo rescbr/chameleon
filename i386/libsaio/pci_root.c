@@ -46,9 +46,9 @@ static unsigned int findpciroot(unsigned char * dsdt,int len)
 int getPciRootUID(void)
 {
 	char dsdt_dirSpec[256];
-	const char *val = "";
+	const char *val = NULL;
 	int len = 0;
-	const char *dsdt_filename = "";
+	const char *dsdt_filename = NULL;
 	//extern int search_and_get_acpi_fd(const char *, const char **);
     //extern void *loadACPITable (const char *filename);
 
@@ -145,7 +145,7 @@ int getPciRootUID(void)
         rootuid = 0; //usually when _UID isn't present, it means uid is zero
 	else if (rootuid < 0 || rootuid > 9) 
 	{
-		verbose("PCIrootUID: proper value wasn't found. Using default value (0). Use -PciRootUID flag to force.\n");
+		verbose("PCIrootUID: proper value wasn't found. Using default value (0).\n");
 		rootuid = 0;
         return rootuid;
 	}

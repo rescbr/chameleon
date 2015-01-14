@@ -20,7 +20,7 @@
 ;
 ; @APPLE_LICENSE_HEADER_END@
 ;
-; Boot Loader: boot0
+; Boot Loader: boot0xg
 ;
 ; A small boot sector program written in x86 assembly whose only
 ; responsibility is to locate the active partition, load the
@@ -31,13 +31,13 @@
 ;
 ; In order to coexist with a fdisk partition table (64 bytes), and
 ; leave room for a two byte signature (0xAA55) in the end, boot0 is
-; restricted to 446 bytes (512 - 64 - 2). If boot0 did not have to
+; restricted to 440 bytes (512 - 64 - 2 - 6). If boot0 did not have to
 ; live in the MBR, then we would have 510 bytes to work with.
 ;
 ; boot0 is always loaded by the BIOS or another booter to 0:7C00h.
 ;
 ; This code is written for the NASM assembler.
-;   nasm boot0.s -o boot0
+;   nasm -DCONFIG_BOOT0_DEBUG=? -DCONFIG_BOOT0_VERBOSE=? boot0xg.s -o boot0xg
 
 ;
 ; This version of boot0 implements hybrid GUID/MBR partition scheme support
@@ -48,16 +48,18 @@
 ;
 ; Added KillerJK's switchPass2 modifications
 ;
+; Modified by Zenith432 November 2014 for exFAT
+;
 
 ;
 ; Set to 1 to enable obscure debug messages.
 ;
-DEBUG				EQU  CONFIG_BOOT0_DEBUG
+%define DEBUG			CONFIG_BOOT0_DEBUG
 
 ;
 ; Set to 1 to enable verbose mode
 ;
-VERBOSE				EQU  CONFIG_BOOT0_VERBOSE
+%define VERBOSE			CONFIG_BOOT0_VERBOSE
 
 ;
 ; Various constants.
@@ -80,6 +82,8 @@ kHFSPSignature		EQU  'H+'			; HFS+ volume signature
 kHFSPCaseSignature	EQU  'HX'			; HFS+ volume case-sensitive signature
 kFAT32BootCodeOffset EQU  0x5a			; offset of boot code in FAT32 boot sector
 kBoot1FAT32Magic	EQU  'BO'			; Magic string to detect our boot1f32 code
+kEXFATBootCodeOffset	EQU 3				; offset of exFAT signature in boot sector
+kEXFATBootCodeMagic	EQU 'EX'			; Magic string to detect exFAT
 
 
 kGPTSignatureLow	EQU  'EFI '			; GUID Partition Table Header Signature
@@ -88,7 +92,7 @@ kGUIDLastDwordOffs	EQU  12				; last 4 byte offset of a GUID
 
 kPartCount			EQU  4				; number of paritions per table
 kPartTypeHFS		EQU  0xaf			; HFS+ Filesystem type
-kPartTypeABHFS		EQU  0xab			; Apple_Boot partition
+;kPartTypeABHFS		EQU  0xab			; Apple_Boot partition
 kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR (PMBR)
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
@@ -100,16 +104,12 @@ kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR 
 
 kPartActive	        EQU  0x80			; active flag enabled
 kPartInactive	    EQU  0x00			; active flag disabled
-kHFSGUID	        EQU  0x48465300		; first 4 bytes of Apple HFS Partition Type GUID.
+;kHFSGUID	        EQU  0x48465300		; first 4 bytes of Apple HFS Partition Type GUID.
 kAppleGUID			EQU  0xACEC4365		; last 4 bytes of Apple type GUIDs.
 kEFISystemGUID		EQU  0x3BC93EC9		; last 4 bytes of EFI System Partition Type GUID:
 										; C12A7328-F81F-11D2-BA4B-00A0C93EC93B
-
-%ifdef FLOPPY
-kDriveNumber		EQU  0x00
-%else
-kDriveNumber		EQU  0x80
-%endif
+kMicrosoftGUID		EQU  0xC79926B7		; last 4 bytes of Microsoft Basic Data Partition Type GUID:
+										; EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
 
 ;
 ; Format of fdisk partition entry.
@@ -212,7 +212,7 @@ start:
     mov     di, kBoot0RelocAddr     ; di <- destination
     cld                             ; auto-increment SI and/or DI registers
     mov     cx, kSectorBytes/2      ; copy 256 words
-    repnz   movsw                   ; repeat string move (word) operation
+    rep     movsw                   ; repeat string move (word) operation
 
     ;
     ; Code relocated, jump to start_reloc in relocated location.
@@ -316,9 +316,9 @@ find_boot:
     jne	    .Pass2
 
 .Pass1:
-    cmp     BYTE [si + part.bootid], kPartActive	; In pass 1 we are walking on the standard path
+    test    BYTE [si + part.bootid], kPartActive	; In pass 1 we are walking on the standard path
                                                     ; by trying to hop on the active partition.
-    jne     .continue
+    jz      .continue
     xor	  	dh, dh               					; Argument for loadBootSector to skip HFS+ partition
 											        ; signature check.
     jmp     .tryToBoot
@@ -339,8 +339,8 @@ find_boot:
 .tryToBoot:
 
     call    loadBootSector
-    jne     .continue
-    jmp	    SHORT initBootLoader
+    je      SHORT initBootLoader
+    ; fall through to .continue
 
 .continue:
     add     si, BYTE part_size     			; advance SI to next partition entry
@@ -390,12 +390,11 @@ DebugChar('J')
 checkGPT:
     push    bx
 
-    mov	    di, kLBA1Buffer						; address of GUID Partition Table Header
-    cmp	    DWORD [di], kGPTSignatureLow		; looking for 'EFI '
+    mov	    si, kLBA1Buffer						; address of GUID Partition Table Header
+    cmp	    DWORD [si], kGPTSignatureLow		; looking for 'EFI '
     jne	    .exit								; not found. Giving up.
-    cmp	    DWORD [di + 4], kGPTSignatureHigh   ; looking for 'PART'
+    cmp	    DWORD [si + 4], kGPTSignatureHigh   ; looking for 'PART'
     jne	    .exit								; not found. Giving up indeed.
-    mov	    si, di
 
     ;
     ; Loading GUID Partition Table Array
@@ -454,6 +453,9 @@ checkGPT:
 	;
 
 	cmp		eax, kEFISystemGUID		; check current GUID Partition for EFI System Partition GUID type
+	je		.gpt_ok
+
+	cmp		eax, kMicrosoftGUID		; check current GUID Partition for Microsoft Basic Data Partition GUID type
 	jne		.gpt_continue
 
 .gpt_ok:
@@ -470,7 +472,7 @@ checkGPT:
     mov	    si, kMBRPartTable					; fake the current GUID Partition
     mov	    [si + part.lba], eax				; as MBR style partition for boot1h
     mov     BYTE [si + part.type], kPartTypeHFS		; with HFS+ filesystem type (0xAF)
-    jmp	    SHORT initBootLoader
+    jmp	    initBootLoader
 
 .gpt_continue:
 
@@ -508,7 +510,7 @@ loadBootSector:
 
 .checkHFSSignature:
 
-%if VERBOSE
+%if 0 && VERBOSE
     LogString(test_str)
 %endif
 
@@ -522,18 +524,22 @@ loadBootSector:
     je		.checkBootSignature
 
 	;
+	; Looking for exFAT signature
+	;
+	cmp word [bx + kEXFATBootCodeOffset], kEXFATBootCodeMagic
+	je	.checkBootSignature
+
+	;
 	; Looking for boot1f32 magic string.
 	;
-	mov		ax, [kBoot0LoadAddr + kFAT32BootCodeOffset]
-	cmp		ax, kBoot1FAT32Magic
+	cmp word [bx + kFAT32BootCodeOffset], kBoot1FAT32Magic
     jne     .exit
 
 .checkBootSignature:
     ;
     ; Check for boot block signature 0xAA55
     ;
-    mov	    di, bx
-    cmp     WORD [di + kSectorBytes - 2], kBootSignature
+    cmp     WORD [kBoot0LoadAddr + kSectorBytes - 2], kBootSignature
 
 .exit:
 
@@ -763,15 +769,17 @@ getc:
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
-log_title_str		db  10, 13, 'boot0: ', 0
+log_title_str	db  10, 13, 'boot0: ', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
+%if 0
 test_str		db  'test', 0
+%endif
 done_str		db  'done', 0
 %endif
 
-boot_error_str   	db  'error', 0
+boot_error_str  db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last
@@ -786,8 +794,8 @@ boot_error_str   	db  'error', 0
 
 ;
 ; XXX - compilation errors with debug enabled (see comment above about nasm)
-; Azi: boot0.s:808: error: TIMES value -111 is negative
-;      boot0.s:811: error: TIMES value -41 is negative
+; Azi: boot0xg.s:801: error: TIMES value -108 is negative
+;      boot0xg.s:804: error: TIMES value -38 is negative
 ;
 pad_boot:
     times 440-($-$$) db 0

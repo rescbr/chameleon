@@ -20,7 +20,7 @@
 ; 
 ; @APPLE_LICENSE_HEADER_END@
 ;
-; Boot Loader: boot0
+; Boot Loader: boot0hfs
 ;
 ; A small boot sector program written in x86 assembly whose only
 ; responsibility is to locate the active partition, load the
@@ -509,7 +509,7 @@ loadBootSector:
 .checkHFSSignature:
 
 %if VERBOSE
-    LogString(test_str)
+    ;LogString(test_str)
 %endif
 
 	;
@@ -763,15 +763,15 @@ getc:
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
-log_title_str		db  10, 13, 'boot0: ', 0
+log_title_str	db  10, 13, 'boot0: ', 0
 
 %if VERBOSE
 gpt_str			db  'GPT', 0
-test_str		db  'test', 0
+;test_str		db  'test', 0
 done_str		db  'done', 0
 %endif
 
-boot_error_str   	db  'error', 0
+boot_error_str  db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last

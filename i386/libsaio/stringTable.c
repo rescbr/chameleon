@@ -37,6 +37,7 @@ extern char *LoadableFamilies;
 bool sysConfigValid;
 
 #if UNUSED
+
 /*
  * Compare a string to a key with quoted characters
  */
@@ -335,7 +336,8 @@ const char *getStringForKey(const char *key,  config_file_t *config)
 {
 	static const char *value = 0;
 	int len = 0;
-	if (!getValueForKey(key, &value, &len, config)) {
+	if (!getValueForKey(key, &value, &len, config))
+	{
 		value = 0;
 	}
 	return value;
@@ -351,10 +353,14 @@ bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
     const char *key_val;
     int size;
     
-	if (getValueForKey(key, &key_val, &size, config)) {
-		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y')) {
+	if (getValueForKey(key, &key_val, &size, config))
+	{
+		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y'))
+		{
 			*result_val = true;
-		} else {
+		}
+		else
+		{
 			*result_val = false;
 		}
 		return true;
@@ -511,7 +517,6 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 			}
 		}
 	}
-    
 	return ret;
 }
 
@@ -592,7 +597,8 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
 
-	if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", configFile, 0)) < 0)
+	{
 		return -1;
 	}
 	// read file
@@ -622,8 +628,10 @@ int loadSystemConfig(config_file_t *config)
 
 	int i, fd, count, ret=-1;
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++) {
-		if ((fd = open(dirspec[i], 0)) >= 0) {
+	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	{
+		if ((fd = open(dirspec[i], 0)) >= 0)
+		{
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 			close(fd);
@@ -659,22 +667,30 @@ int loadChameleonConfig(config_file_t *config, BVRef chain)
 
 	int i;
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++) {
-		if ( loadChameleonConfigForDevice(config, "rd(0,0)", dirspec[i]) == 0 ) {
+	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	{
+		if ( loadChameleonConfigForDevice(config, "rd(0,0)", dirspec[i]) == 0 )
+		{
 			return 0;
 		}
-		if ( loadChameleonConfigForDevice(config, "", dirspec[i]) == 0 ) {
+
+		if ( loadChameleonConfigForDevice(config, "", dirspec[i]) == 0 )
+		{
 			return 0;
 		}
-		if ( loadChameleonConfigForDevice(config, "bt(0,0)", dirspec[i]) == 0 ) {
+
+		if ( loadChameleonConfigForDevice(config, "bt(0,0)", dirspec[i]) == 0 )
+		{
 			return 0;
 		}
 		BVRef bvr;
-		for ( bvr = chain; bvr; bvr = bvr->next ) { /* C99 Error */
+		for ( bvr = chain; bvr; bvr = bvr->next ) /* C99 Error */
+		{
 			char device[256];
 			getDeviceDescription(bvr, device);
 
-			if ( loadChameleonConfigForDevice(config, device, dirspec[i]) == 0 ) {
+			if ( loadChameleonConfigForDevice(config, device, dirspec[i]) == 0 )
+			{
 				return 0;
 			}
 		}
@@ -694,7 +710,8 @@ int loadChameleonConfigForDevice(config_file_t *config, const char *device, cons
 
 	snprintf(full_path, sizeof(full_path), "%s%s", device, path);
 
-	if ((fd = open(full_path, 0)) >= 0) {
+	if ((fd = open(full_path, 0)) >= 0)
+	{
 		// Check for depreciated file names and annoy the user about it.
 		if(strstr(full_path, "com.apple.Boot.plist")) {
 			error("%s is depreciated.\n", full_path);
@@ -729,8 +746,10 @@ int loadHelperConfig(config_file_t *config)
 
 	int i, fd, count, ret=-1;
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++) {
-		if ((fd = open(dirspec[i], 0)) >= 0) {
+	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	{
+		if ((fd = open(dirspec[i], 0)) >= 0)
+		{
 			// read file
 			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
 			close(fd);
@@ -747,9 +766,12 @@ int loadHelperConfig(config_file_t *config)
 
 char * newString(const char * oldString)
 {
-	if ( oldString ) {
+	if ( oldString )
+	{
 		return strcpy(malloc(strlen(oldString)+1), oldString);
-	} else {
+	}
+	else
+	{
 		return NULL;
 	}
 }
@@ -767,14 +789,16 @@ char * getNextArg(char ** argPtr, char * val)
 	*val = '\0';
 
 	// Scan for the next non-whitespace character.
-	while ( *ptr && (*ptr == ' ' || *ptr == '=') ) {
+	while ( *ptr && (*ptr == ' ' || *ptr == '=') )
+	{
 		ptr++;
 	}
   
 	strStart = ptr;
 
 	// Skip the leading double quote character.
-	if (*ptr == '\"') {
+	if (*ptr == '\"')
+	{
 		isQuoted = true;
 		ptr++;
 		strStart++;

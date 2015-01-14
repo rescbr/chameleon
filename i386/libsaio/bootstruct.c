@@ -145,21 +145,26 @@ void finalizeBootStruct(void)
 	MemoryRange *range;
 	int memoryMapCount = bootInfo->memoryMapCount;
 	
-	if (memoryMapCount == 0) {
+	if (memoryMapCount == 0)
+	{
 		// XXX could make a two-part map here
 		stop("Unable to convert memory map into proper format\n");
 	}
 
 	// convert memory map to boot_args memory map
 	memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
+
 	bootArgs->MemoryMap = (uint32_t)memoryMap;
 	bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
 	bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
 	bootArgs->MemoryMapDescriptorVersion = 0;
 	
-	for (i = 0; i < memoryMapCount; i++, memoryMap++) {
+	for (i = 0; i < memoryMapCount; i++, memoryMap++)
+	{
 		range = &bootInfo->memoryMap[i];
-		switch(range->type) {
+
+		switch(range->type)
+		{
 			case kMemoryRangeACPI:
 				memoryMap->Type = kEfiACPIReclaimMemory;
 				break;
@@ -178,6 +183,7 @@ void finalizeBootStruct(void)
 				memoryMap->Type = kEfiReservedMemoryType;
 				break;
 		}
+
 		memoryMap->PhysicalStart = range->base;
 		memoryMap->VirtualStart = range->base;
 		memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
@@ -193,7 +199,9 @@ void finalizeBootStruct(void)
 	// Flatten device tree
 	DT__FlattenDeviceTree(0, &size);
 	addr = (void *)AllocateKernelMemory(size);
-	if (addr == 0) {
+
+	if (addr == 0)
+	{
 		stop("Couldn't allocate device tree\n");
 	}
 

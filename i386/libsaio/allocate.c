@@ -49,7 +49,8 @@ AllocateMemoryRange(char * rangeName, long start, long length, long type)
 
 	buffer = malloc(2 * sizeof(uint32_t));
 
-	if (buffer == 0) {
+	if (buffer == 0)
+	{
 		free(nameBuf);
 		return -1;
 	}
@@ -69,15 +70,17 @@ AllocateMemoryRange(char * rangeName, long start, long length, long type)
 long
 AllocateKernelMemory(long inSize)
 {
-	long addr = 0;
+	long addr;
 
-	if (gImageLastKernelAddr == 0) {
+	if (gImageLastKernelAddr == 0)
+	{
 		gImageLastKernelAddr = RoundPage(bootArgs->kaddr + bootArgs->ksize);
 	}
 	addr = gImageLastKernelAddr;
 	gImageLastKernelAddr += RoundPage(inSize);
 
-	if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) ) {
+	if ( gImageLastKernelAddr >= (KERNEL_ADDR + KERNEL_LEN) )
+	{
 		stop ("AllocateKernelMemory error");
 	}
 

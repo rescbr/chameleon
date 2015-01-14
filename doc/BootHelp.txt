@@ -111,10 +111,11 @@ Options useful in the org.chameleon.Boot.plist file:
                           for ethernet interfaces.
   ForceHPET=Yes|No        Force HPET on (disabled by default).
 
-  USBBusFix=Yes             Enable the EHCI and UHCI fixes (disabled by default).
+  USBBusFix=Yes             Enable the XHCI, EHCI and UHCI fixes (disabled by default).
   EHCIacquire=Yes           Enable the EHCI fix (disabled by default).
   UHCIreset=Yes             Enable the UHCI fix (disabled by default).
-  USBLegacyOff=Yes          Force USB Legacy off (disabled by default).
+  USBLegacyOff=Yes          Force USB Legacy off for XHCI and EHCI (disabled by default).
+  XHCILegacyOff=Yes         Force USB Legacy off for XHCI (disabled by default).
 
   Wake=No                   Disable wake up after hibernation (enbaled by default).
   ForceWake=Yes             Force using the sleepimage (disabled by default).
@@ -136,6 +137,8 @@ Options useful in the org.chameleon.Boot.plist file:
   EnableC2State=Yes       Enable specific Processor power state, C2.
   EnableC3State=Yes       Enable specific Processor power state, C3.
   EnableC4State=Yes       Enable specific Processor power state, C4.
+  EnableC6State=Yes       Enable specific Processor power state, C6.
+  EnableC7State=Yes       Enable specific Processor power state, C7.
 
   PrivateData=No          Show masked data (serial number) in bdmesg log (enbaled by default).
 

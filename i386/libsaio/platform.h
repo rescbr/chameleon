@@ -147,7 +147,8 @@ typedef struct _RamSlotInfo_t
 
 //==============================================================================
 
-typedef struct _PlatformInfo_t {
+typedef struct _PlatformInfo_t
+{
 	struct CPU {
 		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint32_t		Vendor;					// Vendor

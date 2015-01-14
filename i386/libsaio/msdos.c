@@ -85,16 +85,20 @@ struct msdosdirstate
 /*
  * Check a volume label.
  */
-static int
-oklabel(const char *src)
+static int oklabel(const char *src);
+
+static int oklabel(const char *src)
 {
     int c, i;
 
-    for (i = 0, c = 0; i <= 11; i++) {
+	for (i = 0, c = 0; i <= 11; i++)
+	{
         c = (u_char)*src++;
         if (c < ' ' + !i || strchr("\"*+,./:;<=>?[\\]|", c))
+		{
             break;
     }
+	}
     return i && !c;
 }
 #endif /* UNUSED */
@@ -198,7 +202,9 @@ MSDOSInitPartition (CICell ih)
 		free (buf);
 		return -1;
 	}
-	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0) { /* It's FAT32 */
+	if (OSSwapLittleToHostInt16(b50->bpbRootDirEnts) == 0)
+	{
+		/* It's FAT32 */
 		if (memcmp(((struct extboot *)bsp->bs710.bsExt)->exFileSysType, "FAT32   ", 8))
 		{
 			free (buf);
@@ -211,11 +217,16 @@ MSDOSInitPartition (CICell ih)
 		msdosrootDirSectors = 0;
 		msdosfatbits = 32;
 	}
-	else if (((struct extboot *)bsp->bs50.bsExt)->exBootSignature == EXBOOTSIG) {
+	else if (((struct extboot *)bsp->bs50.bsExt)->exBootSignature == EXBOOTSIG)
+	{
 		if (!memcmp((char *)((struct extboot *)bsp->bs50.bsExt)->exFileSysType, "FAT16   ", 8))
+		{
 			msdosfatbits = 16;
+		}
 		else if (!memcmp((char *)((struct extboot *)bsp->bs50.bsExt)->exFileSysType, "FAT12   ", 8))
+		{
 			msdosfatbits = 12;
+		}
 		else
 		{
 			free (buf);
@@ -655,9 +666,15 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	struct direntry *dirp;
 	uint16_t		vfatname[WIN_MAXLEN+2*WIN_CHARS];
 	if (MSDOSInitPartition (ih)<0)
+	{
 		return -1;
+	}
+
 	if (dirPath[0] == '/')
+	{
 		dirPath++;
+	}
+
 	st =  (struct msdosdirstate *)(long) *dirIndex;
 	if (!st)
 	{
@@ -688,7 +705,10 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 			st->cluster = OSReadLittleInt16 ((dirp->deStartCluster),0);
 			st->vfatnumber = 0;
 			if (msdosfatbits == 32)
+			{
 				st->cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
+		}
+
 		}
 		else
 			initRoot (st);
@@ -727,14 +747,19 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 		}
 		for (i=7;i>=0;i--)
 			if (dirp->deName[i]!=' ')
+			{
 				break;
+			}
+
 		j=i+1;
 		tmp[i+1]=0;
 		for(;i>=0;i--)
 			tmp[i]=(dirp->deName[i]>=128)?cp850[dirp->deName[i]-128][0]:tolower(dirp->deName[i]);
 		for (i=2;i>=0;i--)
 			if (dirp->deName[8+i]!=' ')
+			{
 				break;
+			}
 		
 		if (i>=0)
 		{
@@ -750,15 +775,21 @@ long MSDOSGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 	}
 
 	if (dirp->deAttributes & ATTR_DIRECTORY)
+	{
 		*flags = kFileTypeDirectory;
+	}
 	else
+	{
 		*flags = kFileTypeFlat;
+	}
 	
 	// Calculate a fake timestamp using modification date and time values.
 	*time = ((dirp->deMDate & 0x7FFF) << 16) + dirp->deMTime;
 	
 	if (infoValid)
+	{
 		*infoValid = 1;
+	}
 
 	return 0;
 }
@@ -777,11 +808,17 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	char devStr[12];
 
 	if (MSDOSInitPartition (ih)<0)
+	{
 		return -1;
+	}
+
 	if (filePath[0] == '/')
+	{
 		filePath++;
+	}
 	buf = malloc(msdosclustersize);
-	if (!buf) {
+	if (!buf)
+	{
 		return -1;
 	}
 	dirp = getdirpfrompath (ih, filePath, buf);
@@ -793,9 +830,13 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	}
 	cluster = OSReadLittleInt16 ((dirp->deStartCluster),0);
 	if (msdosfatbits == 32)
+	{
 		cluster |= ((uint32_t)OSReadLittleInt16 ((dirp->deHighClust),0)) <<16;
+	}
+
 	size = (uint32_t)OSReadLittleInt32 ((dirp->deFileSize),0);
-	if (size<=offset) {
+	if (size<=offset)
+	{
 		free (buf);
 		return -1;
 	}
@@ -805,7 +846,10 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	msdosreadcluster (ih, buf, msdosclustersize, &cluster);
 	toread=length;
 	if (length==0 || length>size-offset)
+	{
 		toread=size-offset;
+	}
+
 	wastoread=toread;
 	bcopy (buf+(offset%msdosclustersize),ptr,MIN((msdosclustersize-(offset%msdosclustersize)),(unsigned)toread));
 	ptr+=msdosclustersize-(offset%msdosclustersize);
@@ -817,13 +861,16 @@ MSDOSReadFile(CICell ih, char * filePath, void *base, uint64_t offset, uint64_t 
 	}
 	
 	getDeviceDescription(ih, devStr);
-	verbose("Read FAT%d file: [%s/%s] %d bytes.\n",
-            msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
+	verbose("Read FAT%d file: [%s/%s] %d bytes.\n", msdosfatbits, devStr, filePath, (uint32_t)( toread<0 ) ? wastoread : wastoread-toread);
 	free (buf);
 	if (toread<0)
+	{
 		return wastoread;
+	}
 	else
+	{
 		return wastoread-toread;
+}
 }
 
 long MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock)
@@ -836,7 +883,8 @@ long MSDOSGetFileBlock(CICell ih, char *filePath, unsigned long long *firstBlock
 	if (filePath[0] == '/')
 		filePath++;
 	buf = malloc(msdosclustersize);
-	if (!buf) {
+	if (!buf)
+	{
 		return -1;
 	}
 	dirp = getdirpfrompath (ih, filePath, buf);
@@ -929,7 +977,8 @@ void MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 	
 	initRoot(&st);
 	st.buf = malloc(msdosclustersize);
-	if (!st.buf) {
+	if (!st.buf)
+	{
 		return;
 	}
 	while ((dirp = getnextdirent (ih, vfatlabel, &st)))
@@ -961,7 +1010,9 @@ void MSDOSGetDescription(CICell ih, char *str, long strMaxLen)
 		union bootsector *bsp = (union bootsector *)buf;
 		Seek(ih, 0);
 		Read(ih, (long)buf, 512);
-		if (msdosfatbits == 32) { /* It's FAT32 */
+		if (msdosfatbits == 32)
+		{
+			/* It's FAT32 */
 			strncpy((char *)label, (char *)((struct extboot *)bsp->bs710.bsExt)->exVolumeLabel, LABEL_LENGTH);
 		}
 		else if (msdosfatbits == 16)
@@ -980,7 +1031,8 @@ long
 MSDOSGetUUID(CICell ih, char *uuidStr)
 {
 	char *buf = malloc (512);
-	if (!buf) {
+	if (!buf)
+	{
 		return -1;
 	}
 	union bootsector *bsp = (union bootsector *)buf;

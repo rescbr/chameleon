@@ -16,7 +16,7 @@ DIRS_NEEDED = $(SYMROOT)
 VERS = `vers_string -f 5.0 | tr - .`
 NEW_VERS = Darwin boot1h v$(VERS)
 
-PROGRAMS  =  boot1hp boot1f32
+PROGRAMS  =  boot1hp boot1f32 boot1x
 
 ifeq (${CONFIG_BOOT1_HFS}, y)
 PROGRAMS += boot1h
@@ -37,7 +37,7 @@ $(SYMROOT)/boot1h: boot1h.s
 
 $(PROGRAMS): $(SRCROOT)/autoconf.inc
 	@echo "	[NASM] $(@F)" 
-	@$(NASM) $(@F).s -o $@
+	@$(NASM) $(@F).s -o $@ -O3
 
 install_i386:: all $(INSTALLDIR)
 	cp $(SYMROOT)/boot1h $(INSTALLDIR)/
