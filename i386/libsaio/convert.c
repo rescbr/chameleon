@@ -29,20 +29,20 @@ EFI_CHAR8*  getUUIDFromString(const char *source)
 	char	*p = (char *)source;
 	int	i;
 	char	buf[3];
-	static EFI_CHAR8 uuid[UUID_LEN+1]="";
+	static EFI_CHAR8 uuid[UUID_LEN+1] = "";
 
 	buf[2] = '\0';
-	for (i=0; i<UUID_LEN; i++)
+	for (i = 0; i < UUID_LEN; i++)
 	{
 		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
 		{
-			verbose("[ERROR] UUID='%s' syntax error\n", source);
+			verbose("[ERROR] UUID='%s' syntax error.\n", source);
 			return 0;
 		}
 		buf[0] = *p++;
 		buf[1] = *p++;
 		uuid[i] = (unsigned char) strtoul(buf, NULL, 16);
-		if (*p == '-' && (i % 2) == 1 && i < UUID_LEN - 1)
+		if ((*p == '-') && ((i % 2) == 1) && (i < UUID_LEN - 1))
 		{
 			p++;
 		}

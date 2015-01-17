@@ -41,22 +41,30 @@
 #define DISK_SIGNATURE		0xAA55	/* signature of the boot record */
 #define FDISK_NPART		4       /* number of entries in fdisk table */
 #define FDISK_ACTIVE		0x80	/* indicator of active partition */
-#define FDISK_NEXTNAME		0xA7	/* indicator of NeXT partition */
+
+
 #define FDISK_DOS12		0x01	/* 12-bit fat < 10MB dos partition */
 #define FDISK_DOS16S		0x04	/* 16-bit fat < 32MB dos partition */
 #define FDISK_DOSEXT		0x05	/* extended DOS partition */
 #define FDISK_DOS16B		0x06	/* 16-bit fat >= 32MB dos partition */
 #define FDISK_NTFS		0x07	/* NTFS partition */
-#define FDISK_SMALLFAT32	0x0b	/* FAT32 partition */
-#define FDISK_FAT32		0x0c	/* FAT32 partition */
-#define FDISK_DOS16SLBA		0x0e    /* 16-bit FAT, LBA-mapped */
+#define FDISK_SMALLFAT32	0x0B	/* DOS FAT32 partition */
+#define FDISK_FAT32		0x0C	/* Win FAT32 partition */
+#define FDISK_DOS16SLBA		0x0E    /* Win 16-bit FAT, LBA-mapped */
+#define FDISK_WIN_LDM		0x42	/* NTFS partition */
+#define FDISK_LINUX_SWAP	0x82    /* Linux swap */
 #define FDISK_LINUX		0x83    /* Linux native */
-#define FDISK_OPENBSD		0xa6    /* OpenBSD FFS partition */
-#define FDISK_FREEBSD		0xa5    /* FreeBSD UFS2 partition */
-#define FDISK_BEFS		0xeb    /* Haiku BeFS partition */
-#define FDISK_UFS		0xa8	/* Apple UFS partition */
-#define FDISK_HFS		0xaf	/* Apple HFS partition */
-#define FDISK_BOOTER		0xab	/* Apple booter partition */
+#define FDISK_LINUX_LVM		0x8E    /* Linux LVM */
+#define FDISK_FREEBSD		0xA5    /* FreeBSD UFS2 partition */
+#define FDISK_OPENBSD		0xA6    /* OpenBSD FFS partition */
+#define FDISK_NEXTNAME		0xA7	/* Indicator of NeXT partition */
+#define FDISK_UFS		0xA8	/* Apple UFS partition */
+#define FDISK_NETBSD		0xA9    /* NetBSD disk label */
+#define FDISK_BOOTER		0xAB	/* Apple booter partition */
+#define FDISK_ENCRYPTED		0xAE	/* Apple encrypted */
+#define FDISK_HFS		0xAF	/* Apple HFS partition */
+#define FDISK_BEFS		0xEB    /* Haiku BeFS partition */
+#define FDISK_LINUX_RAID	0xFD    /* Linux RAID */
 #define FDISK_PSEUDO_EXFAT	0x107	/* Shared with FDISK_NTFS */
 
 /*

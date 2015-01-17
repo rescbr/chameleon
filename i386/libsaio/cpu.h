@@ -11,7 +11,7 @@
 extern void scan_cpu(PlatformInfo_t *);
 
 #define bit(n)			(1ULL << (n))
-#define bitmask(h,l)		((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
+#define bitmask(h,l)		((bit(h) | (bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
 
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"

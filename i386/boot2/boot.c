@@ -93,7 +93,6 @@ static unsigned long	Adler32(unsigned char *buffer, long length);
 extern char* msgbuf;
 void showTextBuffer(char *buf, int size);
 
-
 //==========================================================================
 // Zero the BSS.
 
@@ -127,7 +126,7 @@ void initialize_runtime(void)
 }
 
 //==========================================================================
-// execKernel - Load the kernel image (mach-o) and jump to its entry point.
+// ExecKernel - Load the kernel image (mach-o) and jump to its entry point.
 
 static int ExecKernel(void *binary)
 {
@@ -135,12 +134,12 @@ static int ExecKernel(void *binary)
 	entry_t		kernelEntry;
 
 	bootArgs->kaddr = bootArgs->ksize = 0;
-	execute_hook("ExecKernel", (void*)binary, NULL, NULL, NULL);
+	execute_hook("ExecKernel", (void *)binary, NULL, NULL, NULL);
 
 	ret = DecodeKernel(binary,
 					   &kernelEntry,
 					   (char **) &bootArgs->kaddr,
-					   (int *)&bootArgs->ksize );
+					   (int *)&bootArgs->ksize);
 
 	if ( ret != 0 )
 	{
@@ -151,7 +150,7 @@ static int ExecKernel(void *binary)
 	reserveKernBootStruct();
 
 	// Notify modules that the kernel has been decoded
-	execute_hook("DecodedKernel", (void*)binary, (void*)bootArgs->kaddr, (void*)bootArgs->ksize, NULL);
+	execute_hook("DecodedKernel", (void *)binary, (void *)bootArgs->kaddr, (void *)bootArgs->ksize, NULL);
 
 	setupFakeEfi();
 
@@ -161,7 +160,7 @@ static int ExecKernel(void *binary)
 		LoadDrivers("/");
 	}
 
-	execute_hook("DriversLoaded", (void*)binary, NULL, NULL, NULL);
+	execute_hook("DriversLoaded", (void *)binary, NULL, NULL, NULL);
 
 	clearActivityIndicator();
 
@@ -180,7 +179,7 @@ static int ExecKernel(void *binary)
 	{
 		if ( (ret = nbpUnloadBaseCode()) != nbpStatusSuccess )
 		{
-			printf("nbpUnloadBaseCode error %d\n", (int) ret);
+			printf("nbpUnloadBaseCode error %d\n", (int)ret);
 			sleep(2);
 		}
 	}
@@ -198,7 +197,7 @@ static int ExecKernel(void *binary)
 	// verbose mode.
 	if (gVerboseMode)
 	{
-		setVideoMode( GRAPHICS_MODE, 0 );
+		setVideoMode(GRAPHICS_MODE, 0);
 	}
 	else
 	{
@@ -224,7 +223,7 @@ static int ExecKernel(void *binary)
 	else
 	{
 		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
 
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
@@ -259,7 +258,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	if (cacheFile[0] != 0)
 	{
 		strlcpy(kernelCacheFile, cacheFile, sizeof(kernelCacheFile));
-		verbose("Specified kernel cache file path = %s\n", cacheFile);
+		verbose("Specified kernel cache file path: %s\n", cacheFile);
 	}
 	else
 	{
@@ -271,7 +270,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 			snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
 			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
-			verbose("Reseted kernel cache file path = %s\n", kernelCacheFile);
+			verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);;
 		}
 		// Snow Leopard prelink kernel cache file
 		else if ( SNOW_LEOPARD )
@@ -279,32 +278,34 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
-			int	lnam = strlen(kernelCacheFile) + 9; //with adler32
-			char      *name;
-			u_int32_t prev_time = 0;
+				int	lnam = strlen(kernelCacheFile) + 9; //with adler32
+				char	*name;
+				u_int32_t prev_time = 0;
 
-			struct	dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
+				struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
 
-			/* TODO: handle error? */
-			if (cacheDir)
-			{
-				while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
+				/* TODO: handle error? */
+				if (cacheDir)
 				{
-					if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
-						&& strstr(name, kernelCacheFile) && (name[lnam] != '.'))
+					while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
 					{
-						snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s%s", kDefaultCachePathSnow, name);
-						prev_time = time;
+						if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
+							&& strstr(name, kernelCacheFile) && (name[lnam] != '.'))
+						{
+							snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s%s", kDefaultCachePathSnow, name);
+							prev_time = time;
+						}
 					}
+					verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
 				}
-				verbose("Snow Leopard kernel cache file path = %s\n", kernelCacheFile);
+				closedir(cacheDir);
 			}
-			closedir(cacheDir);
-		} else {
+			else
+			{
 			// Lion, Mountain Lion, Mavericks, and Yosemite prelink kernel cache file
 			// for 10.7 10.8 10.9 10.10
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("10.7, 10.8, 10.9 & 10.10 kernel cache file path = %s\n", kernelCacheFile);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);;
 		}
 	}
 
@@ -367,7 +368,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// Check if the kernel file is more recent than the cache file
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
 	{
-		DBG("Kernel file (%s) is more recent than Kernel Cache (%s)! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
+		DBG("Kernel file '%s' is more recent than Kernel Cache '%s'! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
 		return -1;
 	}
 
@@ -376,12 +377,12 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	// Check if the S/L/E directory time is more recent than the cache file
 	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
 	{
-		DBG("Folder: '/System/Library/Extensions' is more recent than Kernel Cache file (%s)! Ignoring Kernel Cache.\n", kernelCacheFile);
+		DBG("Folder '/System/Library/Extensions' is more recent than Kernel Cache file '%s'! Ignoring Kernel Cache.\n", kernelCacheFile);
 		return -1;
 	}
 
 	// Since the kernel cache file exists and is the most recent try to load it
-	DBG("Loading kernel cache: '%s'\n", kernelCachePath);
+	DBG("Loading Kernel Cache from: '%s'\n", kernelCachePath);
 
 	ret = LoadThinFatFile(kernelCachePath, binary);
 	return ret; // ret contain the length of the binary
@@ -478,8 +479,10 @@ void common_boot(int biosdev)
 		gEnableCDROMRescan = true;
 	}
 
-	// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
+	// Disable rescanPrompt option by default
 	rescanPrompt = false;
+
+	// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
 	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev))
 	{
 		gEnableCDROMRescan = promptForRescanOption();
@@ -510,10 +513,10 @@ void common_boot(int biosdev)
 	init_module_system();
 
 #if DEBUG
-	printf(" Default: %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
-			 gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-	printf(" bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: %d\n",
-			 gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+	printf("Default: %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n",
+		gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+	printf("bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n",
+		gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
 	getchar();
 #endif
 
@@ -667,42 +670,54 @@ void common_boot(int biosdev)
 		}
 
 		getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
-		if (useKernelCache) do {
-
-			// Determine the name of the Kernel Cache
-			if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig)) {
-				if (val[0] == '\\')
+		if (useKernelCache)
+		{
+			do
+			{
+				// Determine the name of the Kernel Cache
+				if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
 				{
-					len--;
-					val++;
+					if (val[0] == '\\')
+					{
+						len--;
+						val++;
+					}
+					/* FIXME: check len vs sizeof(kernelCacheFile) */
+					strlcpy(kernelCacheFile, val, len + 1);
 				}
-				/* FIXME: check len vs sizeof(kernelCacheFile) */
-				strlcpy(kernelCacheFile, val, len + 1);
-			}
-			else
-			{
-				kernelCacheFile[0] = 0; // Use default kernel cache file
-			}
+				else
+				{
+					kernelCacheFile[0] = 0; // Use default kernel cache file
+				}
 
-			if (gOverrideKernel && kernelCacheFile[0] == 0)
-			{
-				DBG("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n", bootInfo->bootFile);
-				useKernelCache = false;
-				break;
-			}
-			if (gMKextName[0] != 0)
-			{
-				DBG("Using a specific MKext Cache (%s), KernelCache will not be used\n",
-						gMKextName);
-				useKernelCache = false;
-				break;
-			}
-			if (gBootFileType != kBlockDeviceType)
-				useKernelCache = false;
+				if (gOverrideKernel && kernelCacheFile[0] == 0)
+				{
+					DBG("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n", bootInfo->bootFile);
+					useKernelCache = false;
+					break;
+				}
 
-		} while(0);
+				if (gMKextName[0] != 0)
+				{
+					DBG("Using a specific MKext Cache (%s), KernelCache will not be used\n", gMKextName);
+					useKernelCache = false;
+					break;
+				}
 
-		do {
+				if (gBootFileType != kBlockDeviceType)
+				{
+					useKernelCache = false;
+				}
+
+			} while(0);
+		}
+		else
+		{
+			verbose("Kernel Cache using disabled by user.");
+		}
+
+		do
+		{
 			if (useKernelCache)
 			{
 				ret = LoadKernelCache(kernelCacheFile, &binary);
@@ -724,16 +739,11 @@ void common_boot(int biosdev)
 			{
 				if ( !YOSEMITE )
 				{
-					//printf(HEADER " (%s).\n", bootInfo->bootFile);
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
-					//sleep(1);
 				}
 				else
 				{
-
-					//printf(HEADER " (%s).\n", bootInfo->bootFile);
 					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite
-					//sleep(1);
 				}
 			}
 			else
@@ -764,7 +774,7 @@ void common_boot(int biosdev)
 				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
 
-			DBG("Loading kernel: '%s'\n", bootFilePath);
+			DBG("Loading kernel from: '%s'\n", bootFilePath);
 			ret = LoadThinFatFile(bootFilePath, &binary);
 			if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
 			{
@@ -782,7 +792,7 @@ void common_boot(int biosdev)
 
 		if (ret <= 0)
 		{
-			printf("Can't find %s\n", bootFile);
+			printf("Can't find boot file: '%s'\n", bootFile);
 			sleep(1);
 
 			if (gBootFileType == kNetworkDeviceType)

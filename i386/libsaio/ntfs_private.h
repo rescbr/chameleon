@@ -94,6 +94,7 @@ struct fixuphdr {
 };
 
 #define NTFS_AF_INRUN	0x00000001
+
 struct attrhdr {
 	u_int32_t       a_type;
 	u_int32_t       reclen;
@@ -105,16 +106,18 @@ struct attrhdr {
 	u_int8_t        reserved2;
 	u_int16_t       a_index;
 };
-#define NTFS_A_STD	0x10
-#define NTFS_A_ATTRLIST	0x20
-#define NTFS_A_NAME	0x30
+
+#define NTFS_A_STD		0x10
+#define NTFS_A_ATTRLIST		0x20
+#define NTFS_A_NAME		0x30
 #define NTFS_A_VOLUMENAME	0x60
-#define NTFS_A_DATA	0x80
-#define	NTFS_A_INDXROOT	0x90
-#define	NTFS_A_INDX	0xA0
-#define NTFS_A_INDXBITMAP 0xB0
+#define NTFS_A_DATA		0x80
+#define	NTFS_A_INDXROOT		0x90
+#define	NTFS_A_INDX		0xA0
+#define NTFS_A_INDXBITMAP	0xB0
 
 #define NTFS_MAXATTRNAME	255
+
 struct attr {
 	struct attrhdr  a_hdr;
 	union {
@@ -266,7 +269,7 @@ struct bootfile {
 	u_int8_t        bf_spc;		/* sectors per cluster */
 	u_int8_t        reserved2[7];	/* unused (zeroed) */
 	u_int8_t        bf_media;	/* media desc. (0xF8) */
-	u_int8_t        reserved3[2];
+	u_int8_t        reserved3[2];	/* always 0 */
 	u_int16_t       bf_spt;		/* sectors per track */
 	u_int16_t       bf_heads;	/* number of heads */
 	u_int8_t        reserver4[12];
@@ -275,9 +278,9 @@ struct bootfile {
 	cn_t            bf_mftmirrcn;	/* $MFTMirr cn */
 	u_int8_t        bf_mftrecsz;	/* MFT record size (clust) */
 					/* 0xF6 inducates 1/4 */
-    u_int8_t        reserved5[3];
+	u_int8_t        reserved5[3];
 	u_int8_t        bf_ibsz;	/* index buffer size */
-    u_int8_t        reserved6[3];
+	u_int8_t        reserved6[3];
 	u_int64_t       bf_volsn;	/* volume ser. num. */
 };
 

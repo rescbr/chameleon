@@ -22,11 +22,13 @@
 // TODO Migrate
 struct acpi_2_rsdp
 {
+	// 1.0
 	char			Signature[8];
 	uint8_t			Checksum;
 	char			OEMID[6];
 	uint8_t			Revision;
 	uint32_t		RsdtAddress;
+	// 2.0
 	uint32_t		Length;
 	uint64_t		XsdtAddress;
 	uint8_t			ExtendedChecksum;
@@ -141,6 +143,7 @@ struct acpi_2_fadt
 /* Begin Asere */
 	//Reset Fix
 	uint32_t        Flags;
+	// Reset Register
 	uint8_t         Reset_SpaceID;
 	uint8_t         Reset_BitWidth;
 	uint8_t         Reset_BitOffset;

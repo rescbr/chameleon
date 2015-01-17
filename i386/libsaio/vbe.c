@@ -69,7 +69,7 @@ rmwi(int port, int index, int clear, int set)
 #endif /* UNUSED */
 //==============================================================================
 
-int getVBEInfo( void * infoBlock )
+int getVBEInfo( void *infoBlock )
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcGetControllerInfo;
@@ -81,7 +81,7 @@ int getVBEInfo( void * infoBlock )
 
 //==============================================================================
 
-int getVBEModeInfo( int mode, void * minfo_p )
+int getVBEModeInfo( int mode, void *minfo_p )
 {
     bb.intno  = 0x10;
     bb.eax.rr = funcGetModeInfo;
@@ -268,68 +268,69 @@ int generateCRTCTiming( unsigned short     width,
 
 int setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
 {
-    bb.intno  = 0x10;
-    bb.eax.rr = funcSetMode;
-    bb.ebx.rr = mode;
-    if (timing) {
-        bb.es     = SEG(timing);
-        bb.edi.rr = OFF(timing);
-    }
-    bios(&bb);
-    return(bb.eax.r.h);
+	bb.intno  = 0x10;
+	bb.eax.rr = funcSetMode;
+	bb.ebx.rr = mode;
+	if (timing)
+	{
+		bb.es     = SEG(timing);
+		bb.edi.rr = OFF(timing);
+	}
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 int setVBEPalette(void *palette)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetSetPaletteData;
-    bb.ebx.r.l = subfuncSet;
-    bb.ecx.rr = 256;
-    bb.edx.rr = 0;
-    bb.es = SEG(palette);
-    bb.edi.rr = OFF(palette);
-    bios(&bb);
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetSetPaletteData;
+	bb.ebx.r.l = subfuncSet;
+	bb.ecx.rr = 256;
+	bb.edx.rr = 0;
+	bb.es = SEG(palette);
+	bb.edi.rr = OFF(palette);
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 int getVBEPalette(void *palette)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetSetPaletteData;
-    bb.ebx.r.l = subfuncGet;
-    bb.ecx.rr = 256;
-    bb.edx.rr = 0;
-    bb.es = SEG(palette);
-    bb.edi.rr = OFF(palette);
-    bios(&bb);
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetSetPaletteData;
+	bb.ebx.r.l = subfuncGet;
+	bb.ecx.rr = 256;
+	bb.edx.rr = 0;
+	bb.es = SEG(palette);
+	bb.edi.rr = OFF(palette);
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 int getVBECurrentMode(unsigned short *mode)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetCurrentMode;
-    bios(&bb);
-    *mode = bb.ebx.rr;
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetCurrentMode;
+	bios(&bb);
+	*mode = bb.ebx.rr;
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 int getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
 {
-    bb.intno   = 0x10;
-    bb.eax.rr  = funcGetSetPixelClock;
-    bb.ebx.r.l = 0;
-    bb.ecx.rx  = *pixelClock;
-    bb.edx.rr  = mode;
-    bios(&bb);
-    *pixelClock = bb.ecx.rx;
-    return(bb.eax.r.h);
+	bb.intno   = 0x10;
+	bb.eax.rr  = funcGetSetPixelClock;
+	bb.ebx.r.l = 0;
+	bb.ecx.rx  = *pixelClock;
+	bb.edx.rr  = mode;
+	bios(&bb);
+	*pixelClock = bb.ecx.rx;
+	return(bb.eax.r.h);
 }

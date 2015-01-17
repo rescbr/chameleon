@@ -889,7 +889,7 @@ void loadThemeValues(config_file_t *theme)
 
 int initGUI(void)
 {
-	int		val;
+	int	val;
 	int	len;
 	char	dirspec[256];
 
@@ -911,10 +911,12 @@ int initGUI(void)
 #endif
 	}
 	// parse display size parameters
-	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && val > 0) {
+	if (getIntForKey("screen_width", &val, &bootInfo->themeConfig) && (val > 0))
+	{
 		screen_params[0] = val;
 	}
-	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && val > 0) {
+	if (getIntForKey("screen_height", &val, &bootInfo->themeConfig) && (val > 0))
+	{
 		screen_params[1] = val;
 	}
 

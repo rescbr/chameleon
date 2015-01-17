@@ -64,13 +64,14 @@ void setupDeviceProperties(Node *node)
 		binStr = convertHexStr2Binary(val, &cnt2);
 		if (cnt2 > 0) {
 			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
+			DBG("Adding device-properties string to DT");
 		}
 	}
 }
 
 DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString*)malloc(sizeof(struct DevPropString));
+	string = (struct DevPropString *)malloc(sizeof(struct DevPropString));
 
 	if(string == NULL) {
 		return NULL;

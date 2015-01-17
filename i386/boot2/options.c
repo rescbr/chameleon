@@ -50,7 +50,8 @@ extern BVRef    bvChain;
 extern int		gDeviceCount;
 
 int			selectIndex = 0;
-MenuItem *  menuItems = NULL;
+
+MenuItem *menuItems = NULL;
 
 enum {
     kMenuTopRow    = 5,
@@ -58,7 +59,7 @@ enum {
     kScreenLastRow = 24
 };
 
-extern char* msgbuf;
+extern char *msgbuf;
 
 void showTextBuffer(char *buf_orig, int size);
 
@@ -185,11 +186,11 @@ static int countdown( const char * msg, int row, int timeout )
 
 //==========================================================================
 
-char   gBootArgs[BOOT_STRING_LEN];
-static char * gBootArgsPtr = gBootArgs;
-static char * gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
-static char   booterCommand[BOOT_STRING_LEN];
-static char   booterParam[BOOT_STRING_LEN];
+char		gBootArgs[BOOT_STRING_LEN];
+static char	*gBootArgsPtr = gBootArgs;
+static char	*gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
+static char	booterCommand[BOOT_STRING_LEN];
+static char	booterParam[BOOT_STRING_LEN];
 
 static void clearBootArgs(void)
 {
@@ -260,49 +261,55 @@ static void showBootPrompt(int row, bool visible)
 
 static void updateBootArgs( int key )
 {
-    key = ASCII_KEY(key);
+	key = ASCII_KEY(key);
 
-    switch ( key )
-    {
-        case KEY_BKSP:
-            if ( gBootArgsPtr > gBootArgs )
-            {
-                *--gBootArgsPtr = '\0';
+	switch ( key )
+	{
+		case KEY_BKSP:
+			if ( gBootArgsPtr > gBootArgs )
+			{
+				*--gBootArgsPtr = '\0';
 
-                int x, y, t;
-                getCursorPositionAndType( &x, &y, &t );
-                if ( x == 0 && y )
-                {
-                    x = 80; y--;
-                }
-                if (x) {
-			x--;
-		}
+				int x, y, t;
+				getCursorPositionAndType( &x, &y, &t );
+				if ( x == 0 && y )
+				{
+					x = 80; y--;
+				}
 
-		if( bootArgs->Video.v_display == VGA_TEXT_MODE )
-		{
-			setCursorPosition( x, y, 0 );
-			putca(' ', 0x07, 1);
-		}
-                else
-		{
-			updateGraphicBootPrompt();
-		}
-	}
+				if (x)
+				{
+					x--;
+				}
+
+				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+				{
+					setCursorPosition( x, y, 0 );
+					putca(' ', 0x07, 1);
+				}
+				else
+				{
+					updateGraphicBootPrompt();
+				}
+			}
 			break;
 
-        default:
-		if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
-		{
-			*gBootArgsPtr++ = key;
+        	default:
+			if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
+			{
+				*gBootArgsPtr++ = key;
 
-			if( bootArgs->Video.v_display != VGA_TEXT_MODE )
-				updateGraphicBootPrompt();
-			else if ( key >= ' ' && key < 0x7f)
-				putchar(key);
-		}
+				if( bootArgs->Video.v_display != VGA_TEXT_MODE )
+				{
+					updateGraphicBootPrompt();
+				}
+				else if ( key >= ' ' && key < 0x7f)
+				{
+					putchar(key);
+				}
+			}
 
-		break;
+			break;
 	}
 }
 
@@ -375,11 +382,11 @@ static void showMenu( const MenuItem * items, int count,
 	// Draw the visible items.
 
 	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
-
+	{
 		drawDeviceList(gMenuStart, gMenuEnd, gMenuSelection);
-
-	else {
-
+	}
+	else
+	{
 		changeCursor( 0, row, kCursorTypeHidden, &cursorState );
 
 		for ( i = gMenuTop; i <= gMenuBottom; i++ )
@@ -905,7 +912,7 @@ int getBootOptions(bool firstRun)
 
 			// gDeviceCount is actually > 0, so menuItems[selectIndex] exists
 			menuBVR = (BVRef)(menuItems[selectIndex].param);
-			// what happen is bvChain is empty ?
+			// what happen if bvChain is empty ?
 		}
 	}
 
@@ -1114,14 +1121,15 @@ extern unsigned char chainbootflag;
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
 	int argLen = argName ? strlen(argName) : 0;
-	int len = argLen + cnt + 1;  // + 1 to account for space.
+	int len = argLen + cnt + 1;  // +1 to account for space
 
 	if (argName)
 	{
 		len++; // +1 to account for '='
 	}
 
-	if (len > *cntRemainingP) {
+	if (len > *cntRemainingP)
+	{
 		error("Warning: boot arguments too long, truncating\n");
 		return false;
 	}
@@ -1179,8 +1187,7 @@ processBootArgument(
 // Maximum config table value size
 #define VALUE_SIZE 2048
 
-int
-processBootOptions()
+int processBootOptions()
 {
 	const char *cp  = gBootArgs;
 	const char *val = 0;
@@ -1197,10 +1204,11 @@ processBootOptions()
 	skipblanks( &cp );
 
 	// Update the unit and partition number.
-
-	if ( gBootVolume ) {
-		if (!( gBootVolume->flags & kBVFlagNativeBoot )) {
-			readBootSector( gBootVolume->biosdev, gBootVolume->part_boff, (void *) 0x7c00 );
+	if (gBootVolume)
+	{
+		if (!(gBootVolume->flags & kBVFlagNativeBoot))
+		{
+			readBootSector(gBootVolume->biosdev, gBootVolume->part_boff, (void *)0x7c00);
 			//
 			// Setup edx, and signal intention to chain load the
 			// foreign booter.
@@ -1217,7 +1225,8 @@ processBootOptions()
 	}
 	// If no boot volume fail immediately because we're just going to fail
 	// trying to load the config file anyway.
-	else {
+	else
+	{
 		return -1;
 	}
 
@@ -1226,7 +1235,8 @@ processBootOptions()
 
 	// Load config table specified by the user, or use the default.
 
-	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+	if (!getValueForBootKey(cp, "config", &val, &cnt))
+	{
 		val = 0;
 		cnt = 0;
 	}
@@ -1259,15 +1269,12 @@ processBootOptions()
 		{
 			if( YOSEMITE ) // is 10.10
 			{
-
 				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
-				//printf(HEADER "/System/Library/Kernels/%s\n", bootInfo->bootFile);
 			}
 			else
 			{ // OSX is not 10.10
 
 				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
-				//printf(HEADER "/%s\n", bootInfo->bootFile);
 			}
 		}
 	}
@@ -1299,8 +1306,7 @@ processBootOptions()
 	argP = bootArgs->CommandLine;
 
 	// Get config kernel flags, if not ignored.
-	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) ||
-            !getValueForKey( kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig ))
+	if (getValueForBootKey(cp, kIgnoreBootFileFlag, &val, &cnt) || !getValueForKey(kKernelFlagsKey, &val, &cnt, &bootInfo->bootConfig))
 	{
 		val = "";
 		cnt = 0;
@@ -1378,7 +1384,7 @@ processBootOptions()
 		{
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
-		strlcpy( gRootDevice, val, (cnt + 1));
+		strlcpy(gRootDevice, val, (cnt + 1));
 	}
 
 	/*

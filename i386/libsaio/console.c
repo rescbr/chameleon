@@ -99,11 +99,13 @@ void msglog(const char * fmt, ...)
 	va_list ap;
 	struct putc_info pi;
 
-	if (!msgbuf) {
+	if (!msgbuf)
+	{
 		return;
 	}
 
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	{
 		return;
 	}
 
@@ -117,7 +119,8 @@ void msglog(const char * fmt, ...)
 
 void setupBooterLog(void)
 {
-	if (!msgbuf) {
+	if (!msgbuf)
+	{
 		return;
 	}
 
@@ -300,8 +303,8 @@ void stop(const char * fmt, ...)
 }
 
 /** Print a "Press a key to continue..." message and wait for a key press. */
-void pause() 
+void pause()
 {
-    printf("Press a key to continue...\n");
+	printf("Press a key to continue...\n");
 	getchar(); // replace getchar() by pause() were useful.
 }

@@ -123,7 +123,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	// We only do adds, not modifications and deletes like InstallConfigurationTable
 	if (i >= MAX_CONFIGURATION_TABLE_ENTRIES)
 	{
-		stop("Ran out of space for configuration tables.  Increase the reserved size in the code.\n");
+		stop("Fake EFI [ERROR]: Ran out of space for configuration tables [%d]. Increase the reserved size in the code.\n", i);
 	}
 
 	if (pGuid == NULL)
@@ -142,7 +142,7 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		Node *tableNode = DT__AddChild(gEfiConfigurationTableNode, mallocStringForGuid(pGuid));
 
 		// Use the pointer to the GUID we just stuffed into the system table
-		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void*)pGuid);
+		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void *)pGuid);
 
 		// The "table" property is the 32-bit (in our implementation) physical address of the table
 		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
@@ -551,15 +551,15 @@ static EFI_CHAR8* getSystemID()
  */
 
 /*
- * Must be called AFTER setup Acpi because we need to take care of correct
- * facp content to reflect in ioregs
+ * Must be called AFTER setupAcpi because we need to take care of correct
+ * FACP content to reflect in ioregs
  */
 void setupSystemType()
 {
 	Node *node = DT__FindNode("/", false);
 	if (node == 0)
 	{
-		stop("Couldn't get root node");
+		stop("Couldn't get root '/' node");
 	}
 	// we need to write this property after facp parsing
 	// Export system-type only if it has been overrriden by the SystemType option
@@ -676,7 +676,7 @@ void setupBoardId()
 	node = DT__FindNode("/", false);
 	if (node == 0)
 	{
-		stop("Couldn't get root node");
+		stop("Couldn't get root '/' node");
 	}
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
@@ -695,7 +695,7 @@ void setupChosenNode()
 	chosenNode = DT__FindNode("/chosen", false);
 	if (chosenNode == 0)
 	{
-		stop("Couldn't get chosen node");
+		stop("setupChosenNode: Couldn't get '/chosen' node");
 	}
 
 	int length = strlen(gBootUUIDString);

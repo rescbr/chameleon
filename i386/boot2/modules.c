@@ -76,7 +76,7 @@ int init_module_system()
 		// Module system  was compiled in (Symbols.dylib addr known)
 		module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
 
-		if(module_start && module_start != (void*)0xFFFFFFFF)
+		if(module_start && (module_start != (void*)0xFFFFFFFF))
 		{
 			// Notify the system that it was laoded
 			module_loaded(SYMBOLS_MODULE, module_start, SYMBOLS_AUTHOR, SYMBOLS_DESCRIPTION, SYMBOLS_VERSION, SYMBOLS_COMPAT);
@@ -88,7 +88,8 @@ int init_module_system()
 		else
 		{
 			// The module does not have a valid start function
-			printf("Unable to start %s at 0x%x\n", SYMBOLS_MODULE, module_data); pause();
+			printf("Unable to start %s at 0x%x\n", SYMBOLS_MODULE, module_data);
+			pause();
 		}
 	}
 
@@ -123,7 +124,7 @@ int init_module_system()
 
 						module_start = parse_mach(module_data, &load_module, &add_symbol, NULL);
 
-						if(module_start && module_start != (void*)0xFFFFFFFF)
+						if(module_start && (module_start != (void*)0xFFFFFFFF))
 						{
 							// Notify the system that it was laoded
 							module_loaded(name, module_start, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
@@ -164,18 +165,18 @@ void start_built_in_module(const char* name,
  */
 void load_all_modules()
 {
-	char* name;
+	char *name;
 	long flags;
 	u_int32_t time;
-	struct dirstuff* moduleDir = opendir("/Extra/modules/");
+	struct dirstuff *moduleDir = opendir("/Extra/modules/");
 	if(!moduleDir)
 	{
-		verbose("Warning: Unable to open modules folder at '/Extra/modules/'. Ignoring modules.\n");
+		verbose("[WARNING!] Unable to open modules folder at '/Extra/modules/'. Ignoring modules.\n");
 		return;
 	}
 	while (readdir(moduleDir, (const char**)&name, &flags, &time) >= 0) {
 		if(strcmp(&name[strlen(name) - sizeof("dylib")], ".dylib") == 0) {
-			char* tmp = malloc(strlen(name) + 1);
+			char *tmp = malloc(strlen(name) + 1);
 			strcpy(tmp, name);
 
 			if(!load_module(tmp))
@@ -208,6 +209,7 @@ int load_module(char* module)
 	// Check to see if the module has already been loaded
 	if(is_module_loaded(module))
 	{
+		DBG("Module '%s' already loaded.\n", module);
 		return 1;
 	}
 
@@ -215,16 +217,17 @@ int load_module(char* module)
 	fh = open(modString, 0);
 	if(fh < 0)
 	{
-		DBG("WARNING: Unable to locate module %s\n", modString); DBGPAUSE();
+		DBG("[WARNING!] Unable to locate module '%s'. Not loaded.\n", modString);
+		DBGPAUSE();
 		return 0;
 	}
 	unsigned int moduleSize = file_size(fh);
 
-    if(moduleSize == 0)
-    {
-        DBG("WARNING: The module %s has a file size of %d, the module will not be loaded.\n", modString, moduleSize);
-        return 0;
-    }
+	if(moduleSize == 0)
+	{
+		DBG("[WARNING!] The module '%s' has a file size=%d. Not loading.\n", modString, moduleSize);
+		return 0;
+	}
 
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
@@ -237,21 +240,23 @@ int load_module(char* module)
 			// Notify the system that it was laoded
 			module_loaded(module, module_start, NULL, NULL, 0, 0 /*moduleName, NULL, moduleVersion, moduleCompat*/);
 			(*module_start)();	// Start the module
-			DBG("Module %s Loaded.\n", module); DBGPAUSE();
+			DBG("Module %s Loaded.\n", module);
+			DBGPAUSE();
 		}
 #if CONFIG_MODULE_DEBUG
 		else // The module does not have a valid start function. This may be a library.
 		{
-			printf("WARNING: Unable to start %s\n", module);
+			printf("[WARNING!] Unable to start module '%s'.\n", module);
 			getchar();
 		}
 #else
-		else msglog("WARNING: Unable to start %s\n", module);
+		else msglog("[WARNING!] Unable to start module '%s'.\n", module);
 #endif
 	}
 	else
 	{
-		DBG("Unable to read in module %s\n.", module); DBGPAUSE();
+		DBG("[WARNING!] Unable to read in module '%s'.\n", module);
+		DBGPAUSE();
 		retVal = 0;
 	}
 
@@ -311,7 +316,7 @@ void module_loaded(const char* name, void* start, const char* author, const char
 	new_entry->compat = compat;
 
 	DBG("Module '%s' by '%s' Loaded.\n", name, author);
-	DBG("\tInitialization: 0x%X\n", start);
+	DBG("\tInitialization: 0x%08X\n", start);
 	DBG("\tDescription: %s\n", description);
 	DBG("\tVersion: %d\n", version); // todo: sperate to major.minor.bugfix
 	DBG("\tCompat:  %d\n", compat);  // todo: ^^^ major.minor.bugfix
@@ -320,12 +325,13 @@ void module_loaded(const char* name, void* start, const char* author, const char
 int is_module_loaded(const char* name)
 {
 	// todo sorted search
-	moduleList_t* entry = loadedModules;
+	moduleList_t *entry = loadedModules;
 	while(entry)
 	{
 		if(strcmp(entry->name, name) == 0)
 		{
-			DBG("Located module %s\n", name); DBGPAUSE();
+			DBG("Located module %s\n", name);
+			DBGPAUSE();
 			return 1;
 		}
 		else
@@ -335,7 +341,8 @@ int is_module_loaded(const char* name)
 
 	}
 
-	DBG("Module %s not loaded\n", name); DBGPAUSE();
+	DBG("Module %s not loaded\n", name);
+	DBGPAUSE();
 	return 0;
 }
 
@@ -365,7 +372,7 @@ unsigned int lookup_all_symbols(const char* name)
 	}
 
 #if CONFIG_MODULE_DEBUG
-	printf("Unable to locate symbol %s\n", name);
+	printf("[WARNING!] Unable to locate symbol %s.\n", name);
 	getchar();
 #endif
 
@@ -431,7 +438,7 @@ void* parse_mach(void* binary,
 	}
 	else
 	{
-		verbose("Invalid mach magic 0x%X\n", ((struct mach_header*)binary)->magic);
+		verbose("[ERROR!] Invalid mach magic: 0x%08X.\n", ((struct mach_header*)binary)->magic);
 		return NULL;
 	}
 
@@ -564,7 +571,7 @@ void* parse_mach(void* binary,
 				break;
 
 			default:
-				DBG("Unhandled loadcommand 0x%X\n", loadCommand->cmd & 0x7FFFFFFF);
+				DBG("[WARNING!] Unhandled loadcommand: 0x%08X.\n", loadCommand->cmd & 0x7FFFFFFF);
 				break;
 
 		}
@@ -925,7 +932,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("[ERROR!] Unable to bind symbol %s.\n", symbolName);
 					getchar();
 				}
 
@@ -944,7 +951,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("[ERROR!] Unable to bind symbol %s.\n", symbolName);
 					getchar();
 				}
 
@@ -962,7 +969,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("[ERROR!] Unable to bind symbol %s.\n", symbolName);
 					getchar();
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
@@ -987,7 +994,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				}
 				else
 				{
-					printf("Unable to bind symbol %s\n", symbolName);
+					printf("[ERROR!] Unable to bind symbol %s.\n", symbolName);
 					getchar();
 				}
 				break;
@@ -1072,7 +1079,8 @@ int replace_function(const char* symbol, void* newAddress)
 */
 int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	DBG("Attempting to execute hook '%s'\n", name); DBGPAUSE();
+	DBG("Attempting to execute hook '%s'...\n", name);
+	DBGPAUSE();
 	moduleHook_t* hook = hook_exists(name);
 
 	if(hook)
@@ -1086,13 +1094,14 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 			callbacks->callback(arg1, arg2, arg3, arg4);
 			callbacks = callbacks->next;
 		}
-		DBG("Hook '%s' executed.\n", name); DBGPAUSE();
+		DBG("Hook '%s' executed.\n", name);
+		DBGPAUSE();
 		return 1;
 	}
 	else
 	{
 		// Callback for this hook doesn't exist;
-		DBG("No callbacks for '%s' hook.\n", name);
+		DBG("No callbacks for hook '%s'.\n", name);
 		return 0;
 	}
 }
@@ -1108,22 +1117,25 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
  */
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {
-	DBG("Adding callback for '%s' hook.\n", name); DBGPAUSE();
+	DBG("Adding callback for '%s' hook... ", name);
+	DBGPAUSE();
 
-	moduleHook_t* hook = hook_exists(name);
+	moduleHook_t *hook = hook_exists(name);
 
 	if(hook)
 	{
 		// append
-		callbackList_t* newCallback = malloc(sizeof(callbackList_t));
+		callbackList_t *newCallback = malloc(sizeof(callbackList_t));
 		newCallback->next = hook->callbacks;
 		hook->callbacks = newCallback;
 		newCallback->callback = callback;
+		DBG("Added.\n");
 	}
 	else
 	{
 		// create new hook
-		moduleHook_t* newHook = malloc(sizeof(moduleHook_t));
+		DBG("Hook not exists, creating a new hook.\n");
+		moduleHook_t *newHook = malloc(sizeof(moduleHook_t));
 		newHook->name = name;
 		newHook->callbacks = malloc(sizeof(callbackList_t));
 		newHook->callbacks->callback = callback;
@@ -1183,7 +1195,7 @@ void print_hook_list()
 
 void dyld_stub_binder()
 {
-	printf("ERROR: dyld_stub_binder was called, should have been take care of by the linker.\n");
+	printf("[ERROR!] 'dyld_stub_binder' was called, should have been take care of by the linker.\n");
 	getchar();
 }
 
@@ -1206,13 +1218,13 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {
-	printf("WARNING: register_hook_callback is not supported when compiled in.\n");
+	printf("[WARNING!] 'register_hook_callback' is not supported when compiled in.\n");
 	pause();
 }
 
 int replace_function(const char* symbol, void* newAddress)
 {
-	printf("WARNING: replace_functions is not supported when compiled in.\n");
+	printf("[WARNING!] 'replace_functions' is not supported when compiled in.\n");
 	pause();
 	return 0;
 }

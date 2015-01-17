@@ -110,15 +110,17 @@ static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
 static long InitDriverSupport(void);
 
 ModulePtr gModuleHead, gModuleTail;
-static TagPtr    gPersonalityHead, gPersonalityTail;
-static char *    gExtensionsSpec;
-static char *    gDriverSpec;
-static char *    gFileSpec;
-static char *    gTempSpec;
-static char *    gFileName;
+static TagPtr	gPersonalityHead, gPersonalityTail;
+static char	*gExtensionsSpec;
+static char	*gDriverSpec;
+static char	*gFileSpec;
+static char	*gTempSpec;
+static char	*gFileName;
+// Bungo
+char *gDarwinBuildVerStr = "Darwin Kernel Version";
 
 /*static*/ unsigned long
-Adler32( unsigned char * buffer, long length )
+Adler32( unsigned char *buffer, long length )
 {
 	long          cnt;
 	unsigned long result, lowHalf, highHalf;
@@ -186,7 +188,7 @@ long LoadDrivers( char * dirSpec )
 	{
 		if (NetLoadDrivers(dirSpec) != 0)
 		{
-			error("Could not load drivers from the network\n");
+			error("LoadDrivers: Could not load drivers from the network\n");
 			return -1;
 		}
 	}
@@ -238,7 +240,7 @@ long LoadDrivers( char * dirSpec )
 
 			if (gMKextName[0] != '\0')
 			{
-				verbose("LoadDrivers: Loading from [%s]\n", gMKextName);
+				verbose("LoadDrivers: Loading from '%s'\n", gMKextName);
 				if ( LoadDriverMKext(gMKextName) != 0 )
 				{
 					error("Could not load %s\n", gMKextName);
@@ -295,7 +297,7 @@ static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 			|| (((gBootMode & kBootModeSafe) == 0) && (time == (time2 + 1))))
 		{
 			snprintf(gDriverSpec, sizeof(altDirSpec) + 18, "%sExtensions.mkext", altDirSpec);
-			verbose("LoadDrivers: Loading from [%s]\n", gDriverSpec);
+			verbose("LoadDrivers: Loading from '%s'\n", gDriverSpec);
 
 			if (LoadDriverMKext(gDriverSpec) == 0)
 			{
@@ -877,12 +879,10 @@ ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
 static char gPlatformName[64];
 #endif
 
-char *gDarwinBuildVerStr = "Darwin Kernel Version"; // Bungo
-
 long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 {
 	long ret = 0;
-	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
+	compressed_kernel_header *kernel_header = (compressed_kernel_header *)binary;
 	u_int32_t uncompressed_size = 0, size = 0, adler32 = 0;
 	void *buffer = NULL;
 	unsigned long len = 0;
@@ -899,7 +899,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
-		DBG("Decompressing Kernel: ");
+		DBG("Decompressing Kernel Cache");
 
 		if ((kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) &&
 			(kernel_header->compress_type != OSSwapBigToHostConstInt32('lzvn')))
@@ -912,12 +912,10 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		{
 			verbose ("Decompressing Kernel Using lzss\n");
 		}
-		else
+
+		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
 		{
-			if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
-			{
-				verbose ("Decompressing Kernel Using lzvn\n");
-			}
+			verbose ("Decompressing Kernel Using lzvn\n");
 		}
 
 #if NOTDEF
@@ -939,11 +937,11 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		switch (kernel_header->compress_type)
 		{
 			case OSSwapBigToHostConstInt32('lzvn'):
-				size = lzvn_decode( binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+				size = lzvn_decode(binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
 				break;
 
 			case OSSwapBigToHostConstInt32('lzss'):
-				size = decompress_lzss( (u_int8_t *)binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+				size = decompress_lzss((u_int8_t *)binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
 				break;
 
 			default:
@@ -955,12 +953,12 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		{
 			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
 			{
-				error("ERROR: size mismatch from lzvn (found: %x, expected: %x).\n", size, uncompressed_size);
+				error("ERROR! Size mismatch from lzvn (found: %x, expected: %x).\n", size, uncompressed_size);
 			}
 
 			if ( kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
 			{
-				error("ERROR: size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
+				error("ERROR! size mismatch from lzss (found: %x, expected: %x).\n", size, uncompressed_size);
 			}
 
 			return -1;
@@ -969,7 +967,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		adler32 = Adler32(binary, uncompressed_size);
 		if (OSSwapBigToHostInt32(kernel_header->adler32) != adler32)
 		{
-			error("ERROR: adler mismatch (found: %x, expected: %x).\n", adler32, OSSwapBigToHostInt32(kernel_header->adler32));
+			error("ERROR! Adler mismatch (found: %X, expected: %X).\n", adler32, OSSwapBigToHostInt32(kernel_header->adler32));
 			return -1;
 		}
 
@@ -991,7 +989,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	gDarwinBuildVerStr = (char *)binary + size;
 
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
-	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
+	execute_hook("DecodeKernel", (void *)binary, NULL, NULL, NULL);
 
 	ret = DecodeMachO(binary, rentry, raddr, rsize);
 	if (ret < 0 && archCpuType == CPU_TYPE_X86_64)

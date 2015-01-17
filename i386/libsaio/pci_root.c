@@ -97,12 +97,14 @@ int getPciRootUID(void)
 	
 	fsize = file_size(fd);
 
-	if (!(new_dsdt = malloc(fsize))) {
+	if (!(new_dsdt = malloc(fsize)))
+	{
 		verbose("[ERROR] alloc DSDT memory failed\n");
 		close (fd);
 		goto out;
 	}
-	if (read (fd, new_dsdt, fsize) != fsize) {
+	if (read (fd, new_dsdt, fsize) != fsize)
+	{
 		verbose("[ERROR] read %s failed\n", dsdt_filename);
 		free(new_dsdt);
 		close (fd);

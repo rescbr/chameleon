@@ -31,7 +31,6 @@ bool getProcessorInformationExternalClock(returnType *value)
 		switch (Platform.CPU.Family)
 		{
 			case 0x06:
-			{
 				switch (Platform.CPU.Model)
 				{
 					// set external clock to 0 for SANDY
@@ -49,12 +48,13 @@ bool getProcessorInformationExternalClock(returnType *value)
 						break;
 					default:
 						value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
+						break;
 				}
-			}
 				break;
 
 			default:
 				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
+				break;
 		}
 	}
 	else
@@ -78,7 +78,6 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 		switch (Platform.CPU.Family)
 		{
 			case 0x06:
-			{
 				switch (Platform.CPU.Model)
 				{
 					case CPUID_MODEL_PENTIUM_M:
@@ -138,15 +137,19 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						value->word = qpibusspeed;
 						return true;
 					}
+					break;
+
 					default:
-						break; //Unsupported CPU type
+						break;
 				}
-			}
+				break;
+
 			default:
 				break;
 		}
 	}
-	return false;
+
+	return false; //Unsupported CPU type
 }
 
 uint16_t simpleGetSMBOemProcessorType(void)
@@ -181,7 +184,7 @@ bool getSMBOemProcessorType(returnType *value)
 		{
 			case 0x0F:
 			case 0x06:
-			{
+
 				switch (Platform.CPU.Model)
 				{
 					case CPUID_MODEL_PENTIUM_M:
@@ -381,7 +384,8 @@ bool getSMBOemProcessorType(returnType *value)
 					default:
 						break; // Unsupported CPU type
 				}
-			}
+				break;
+
 			default:
 				break;
 		}

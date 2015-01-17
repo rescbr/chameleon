@@ -43,20 +43,20 @@
  */
 
 // kernel cache
-#define kDefaultCachePathLeo "/System/Library/Caches/com.apple.kernelcaches/"
-#define kDefaultCachePathSnow "/System/Library/Caches/com.apple.kext.caches/Startup/"
+#define kDefaultCachePathLeo		"/System/Library/Caches/com.apple.kernelcaches/"
+#define kDefaultCachePathSnow		"/System/Library/Caches/com.apple.kext.caches/Startup/"
 
 // Lion installer
-#define kLionInstallerDataFolder      "/Mac OS X Install Data/"
-#define kLionInstallerPlist           kLionInstallerDataFolder "com.apple.Boot.plist"
+#define kLionInstallerDataFolder	"/Mac OS X Install Data/"
+#define kLionInstallerPlist		kLionInstallerDataFolder "com.apple.Boot.plist"
 
 // Mountain Lion installer
-#define kMLionInstallerDataFolder      "/OS X Install Data/"
-#define kMLionInstallerPlist           kMLionInstallerDataFolder "com.apple.Boot.plist"
+#define kMLionInstallerDataFolder	"/OS X Install Data/"
+#define kMLionInstallerPlist		kMLionInstallerDataFolder "com.apple.Boot.plist"
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
-#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and newer
 
 /*
  * Keys used in system Boot.plist
@@ -87,7 +87,7 @@
 #define kOSXKernel		"kernel"		// Yosemite
 #define kGUIKey			"GUI"
 #define kBootBannerKey		"Boot Banner"
-#define kShowInfoKey		"ShowInfo"		/* gui.c */
+#define kShowInfoKey		"ShowInfo"		// gui.c
 #define kWaitForKeypressKey	"Wait"
 
 /* AsereBLN: added these keys */
@@ -184,8 +184,8 @@
 #define kMemFullInfo		"ForceFullMemInfo"	/* smbios.c */
 
 /* Bungo: added these keys */
-// mask private data or no
 #define kPrivateData		"PrivateData"		/* smbios_decode.c */
+
 
 /*
  * Flags to the booter or kernel
@@ -199,8 +199,8 @@
 /*
  * Booter behavior control
  */
-#define kBootTimeout         -1
-#define kCDBootTimeout       8
+#define kBootTimeout		-1
+#define kCDBootTimeout		8
 
 /*
  * A global set by boot() to record the device that the booter was loaded from.
@@ -231,7 +231,7 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-
+bool checkOSVersion(const char * version);
 /*
  * usb.c
  */
@@ -257,7 +257,7 @@ extern void drawDataRectangle(
                               unsigned short  y,
                               unsigned short  width,
                               unsigned short  height,
-                              unsigned char * data
+                              unsigned char   *data
                               );
 extern int
 convertImage( unsigned short width,
@@ -266,19 +266,19 @@ convertImage( unsigned short width,
               unsigned char **newImageData );
 extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
 extern void drawBootGraphics(void);
-extern void drawPreview(void *src, uint8_t * saveunder);
+extern void drawPreview(void *src, uint8_t *saveunder);
 extern int getVideoMode(void);
 extern void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or);
 
 /*
  * drivers.c
  */
-extern char *gDarwinBuildVerStr; // Bungo
 extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
-
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
+ // Bungo
+extern char *gDarwinBuildVerStr;
 /*!
     Hookable function pointer called during the driver loading phase that
     allows other code to cause additional drivers to be loaded.
@@ -289,7 +289,6 @@ extern long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
  * options.c
  */
 extern char gBootUUIDString[];
-
 extern int  getBootOptions(bool firstRun);
 extern int  processBootOptions();
 extern int  selectAlternateBootDevice(int bootdevice);
@@ -313,16 +312,16 @@ extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u
 /*
  * lzvn.c
  */
-extern size_t lzvn_decode(void *       dst,
-                          size_t       dst_size,
-                          const void * src,
-                          size_t       src_size);
+extern size_t lzvn_decode(void		*dst,
+                          size_t	dst_size,
+                          const void	*src,
+                          size_t	src_size);
 /*
-extern size_t lzvn_encode(void *       dst,
-                          size_t       dst_size,
-                          const void * src,
-                          size_t       src_size,
-                          void *       work);
+extern size_t lzvn_encode(void		*dst,
+                          size_t	dst_size,
+                          const void	*src,
+                          size_t	src_size,
+                          void		*work);
 */
 
 struct compressed_kernel_header {
@@ -342,8 +341,6 @@ typedef struct compressed_kernel_header compressed_kernel_header;
 void HibernateBoot(char *boot_device);
 
 /* bmdecompress.c */
-void * DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
-
-bool checkOSVersion(const char * version);
+void *DecompressData(void *srcbase, int *dw, int *dh, int *bytesPerPixel);
 
 #endif /* !__BOOT2_BOOT_H */

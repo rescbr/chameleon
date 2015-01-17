@@ -332,11 +332,12 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
 }
 
 /* Return NULL if no option has been successfully retrieved, or the string otherwise */
-const char * getStringForKey(const char * key,  config_file_t *config)
+const char *getStringForKey(const char *key,  config_file_t *config)
 {
-	static const char* value =0;
-	int len=0;
-	if(!getValueForKey(key, &value, &len, config)) {
+	static const char *value = 0;
+	int len = 0;
+	if (!getValueForKey(key, &value, &len, config))
+	{
 		value = 0;
 	}
 	return value;
@@ -347,15 +348,19 @@ const char * getStringForKey(const char * key,  config_file_t *config)
  * The boolean value of the key is stored in 'val'.
  */
 
-bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
+bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 {
     const char *key_val;
     int size;
     
-	if (getValueForKey(key, &key_val, &size, config)) {
-		if ( (size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y') ) {
+	if (getValueForKey(key, &key_val, &size, config))
+	{
+		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y'))
+		{
 			*result_val = true;
-		} else {
+		}
+		else
+		{
 			*result_val = false;
 		}
 		return true;
@@ -363,14 +368,14 @@ bool getBoolForKey( const char *key, bool *result_val, config_file_t *config )
 	return false;
 }
 
-bool getIntForKey( const char *key, int *value, config_file_t *config )
+bool getIntForKey(const char *key, int *value, config_file_t *config)
 {
 	const char *val;
 	int size, sum;
 	bool negative = false;
     
 	if (getValueForKey(key, &val, &size, config)) {
-		if ( size ) {
+		if (size) {
 			if (*val == '-') {
 				negative = true;
 				val++;
@@ -508,7 +513,7 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 			if (override) {
 				*val = overrideVal;
 				*size = overrideSize;
-				return true;
+				ret = true;
 			}
 		}
 	}
@@ -547,7 +552,7 @@ printSystemConfig(char *p1)
 // (and does not modify dict pointer).
 // Prints an error message if there is a parsing error.
 //
-int ParseXMLFile( char * buffer, TagPtr * dict )
+int ParseXMLFile( char *buffer, TagPtr *dict )
 {
 	long       length, pos;
 	TagPtr     tag;
@@ -617,7 +622,7 @@ int loadSystemConfig(config_file_t *config)
 		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Installer (Lion 10.7)
 		"/OS X Install Data/com.apple.Boot.plist",				// OS X Installer (10.8+)
 		"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",	// com.boot.Apple.plist
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",	// com.apple.Boot.plist
 		"/com.apple.recovery.boot/com.apple.Boot.plist"				// OS X Recovery
 	};
 

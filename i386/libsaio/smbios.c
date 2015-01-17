@@ -828,7 +828,7 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 
 	strSize = strlen(string);
 
-	// remove any spaces found at the end but only in MemoryDevice
+	// remove any spaces found at the end but only in MemoryDevice avoiding errors
 	if (structHeader->type == kSMBTypeMemoryDevice) {
 		while ((strSize != 0) && (string[strSize - 1] == ' ')) {
 			strSize--;
@@ -1103,7 +1103,7 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	if (handle < structPtr->orig->handle) {
 		handle = structPtr->orig->handle;
 	}
-	// Bungo: fix unsuported tables lengths from original smbios: extend smaller or truncate bigger - we use SMBIOS rev. 2.4 like Apple uses
+	// Bungo: fix unsuported tables lengths from original smbios: extend shorter or truncate longer - we use SMBIOS rev. 2.4 like Apple uses
 	switch (structPtr->orig->type) {
 		case kSMBTypeBIOSInformation:
 			structSize = sizeof(SMBBIOSInformation);
@@ -1245,12 +1245,12 @@ uint8_t *FixSystemUUID()
 
 	ptr = ((SMBSystemInformation *)structHeader)->uuid;
 
-	if (!sysId || !ret) { // no or bad custom UUID,...
+	if (!sysId || !ret) { // no or bad custom uuid,...
 		sysId = 0;
-		ret = Platform.UUID; // ...try bios dmi system uuid extraction
+		ret = Platform.UUID; // ...use original (factory) system uuid
 	}
 
-	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++) // check if empty or setable, means: no uuid present
+	for (i = 0, isZero = 1, isOnes = 1; i < UUID_LEN; i++) // check if empty (zeroed) or setable (FFed), means: no uuid present
 	{
 		if (ret[i] != 0x00) {
 			isZero = 0;
@@ -1266,7 +1266,8 @@ uint8_t *FixSystemUUID()
 		ret = FixedUUID; // ...set a fixed value for system-id = 000102030405060708090A0B0C0D0E0F
 	}
 
-	memcpy(ptr, ret, UUID_LEN); // fix uuid in the table
+	memcpy(ptr, ret, UUID_LEN); // save uuid into the patched SMBIOS Table 1
+
 	return ptr;
 }  // Bungo: end fix
 
@@ -1350,10 +1351,11 @@ void setupSMBIOSTable(void)
 	free(buffer);
 	free(structPtr);
 
-	decodeSMBIOSTable(neweps);
-
 	DBG("SMBIOS orig was = %x\n", origeps);
 	DBG("SMBIOS new is = %x\n", neweps);
+
+	decodeSMBIOSTable(neweps);
+
 }
 
 void *getSmbios(int which)

@@ -159,6 +159,7 @@ void build_pci_dt(void)
 }
 
 static char dev_path[256];
+
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	pci_dt_t	*current;

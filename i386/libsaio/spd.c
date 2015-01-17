@@ -128,7 +128,8 @@ int spd_indexes[] = {
 static void init_spd(char * spd, uint32_t base, int slot)
 {
 	int i;
-	for (i=0; i< SPD_INDEXES_SIZE; i++) {
+	for (i = 0; i < SPD_INDEXES_SIZE; i++)
+	{
 		READ_SPD(spd, base, slot, spd_indexes[i]);
 	}
 }
@@ -239,7 +240,9 @@ const char * getDDRPartNum(char* spd, uint32_t base, int slot)
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) {
 		start = 128;
-	} else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR) {
+	}
+	else if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR2 || spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR)
+	{
 		start = 73;
 	}
 	

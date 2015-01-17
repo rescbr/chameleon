@@ -145,8 +145,8 @@ typedef struct FinderInfo
 
 
 struct		BootVolume;
-typedef struct BootVolume * BVRef;
-typedef struct BootVolume * CICell;
+typedef struct	BootVolume *BVRef;
+typedef struct	BootVolume *CICell;
 
 typedef long (*FSInit)(CICell ih);
 typedef long (*FSLoadFile)(CICell ih, char * filePath);
@@ -206,7 +206,7 @@ struct BootVolume {
 	BVFree			bv_free;		/* BVFree function */
 	uint32_t		modTime;
 	char			label[BVSTRLEN];	/* partition volume label */
-	char			altlabel[BVSTRLEN];	/* partition volume label */
+	char			altlabel[BVSTRLEN];	/* alternate partition volume label */
 	bool			filtered;		/* newFilteredBVChain() will set to TRUE */
 	bool			visible;		/* will shown in the device list */
 	char			OSVersion[8];
