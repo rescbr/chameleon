@@ -157,8 +157,8 @@ void *loadACPITable (const char *filename)
 	return NULL;
 }
 
-uint8_t acpi_cpu_count = 0;
-uint32_t acpi_cpu_p_blk = 0;
+uint8_t acpi_cpu_count	= 0;
+uint32_t acpi_cpu_p_blk	= 0;
 char *acpi_cpu_name[32];
 
 void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)

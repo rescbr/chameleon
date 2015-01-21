@@ -154,27 +154,26 @@ static const struct NamedValue bios_errors[] =
 
 static const struct NamedValue fdiskTypes[] =
 {
-	{ FDISK_DOS12,		"DOS_FAT_12"           },
-	{ FDISK_DOS16S,		"DOS_FAT_16_S"         },
-	{ FDISK_DOS16B,		"DOS_FAT_16"           },
-	{ FDISK_NTFS,		"Windows NTFS"         },
-	{ FDISK_DOS16SLBA,	"Windows FAT16"        },
-
-	{ FDISK_FAT32,		"Windows FAT32"        },
-	{ FDISK_SMALLFAT32,	"Windows FAT32"        },
-
-	{ FDISK_LINUX,		"Linux"                },
-
-
-	{ FDISK_FREEBSD,	"FreeBSD"              },
-	{ FDISK_OPENBSD,	"OpenBSD"              },
+	{ FDISK_DOS12,		"DOS_FAT_12"           }, // 0x01
+	{ FDISK_DOS16S,		"DOS_FAT_16_S"         }, // 0x04
+	{ FDISK_DOS16B,		"DOS_FAT_16"           }, // 0x06
+	{ FDISK_NTFS,		"Windows NTFS"         }, // 0x07
+	{ FDISK_SMALLFAT32,	"DOS_FAT_32"           }, // 0x0B
+	{ FDISK_FAT32,		"Windows FAT_32"       }, // 0x0C
+	{ FDISK_DOS16SLBA,	"Windows FAT_16"       }, // 0x0E
+	{ FDISK_WIN_LDM,        "Windows_LDM"          }, // 0x42
+	{ FDISK_LINUX_SWAP,     "Linux_Swap"           }, // 0x82
+	{ FDISK_LINUX,		"Linux"                }, // 0x83
+	{ FDISK_LINUX_LVM,      "Linux_LVM"            }, // 0x8E
+	{ FDISK_FREEBSD,	"FreeBSD"              }, // 0xA5
+	{ FDISK_OPENBSD,	"OpenBSD"              }, // 0xA6
 	{ FDISK_NEXTNAME,       "Apple_Rhapsody_UFS"   }, // 0xA7
-	{ FDISK_UFS,		"Apple UFS"            },
+	{ FDISK_UFS,		"Apple UFS"            }, // 0xA8
 	{ FDISK_NETBSD,         "NetBSD"               }, // 0xA9
 	{ FDISK_BOOTER,		"Apple_Boot"           }, // 0xAB
 	{ FDISK_ENCRYPTED,      "Apple_Encrypted"      }, // 0xAE
 	{ FDISK_HFS,		"Apple HFS"            }, // 0xAF
-	{ 0xCD,			"CD-ROM"               },
+	{ 0xCD,			"CD-ROM"               }, // 0xCD
 	{ FDISK_BEFS,           "Haiku"                }, // 0xEB
 	{ FDISK_LINUX_RAID,     "Linux_RAID"           }, // 0xFD
 	{ 0x00,			NULL                   }  /* must be last */
@@ -593,17 +592,14 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 	{
 		result = FDISK_FREEBSD;
 	}
-
 	else if (OpenBSDProbe(probeBuffer))
 	{
 		result = FDISK_OPENBSD;
 	}
-
 	else if (BeFSProbe(probeBuffer))
 	{
 		result = FDISK_BEFS;
 	}
-
 	else if (NTFSProbe(probeBuffer))
 	{
 		result = FDISK_NTFS;
@@ -1529,7 +1525,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 		// NOTE: EFI_GUID's are in LE and we know we're on an x86.
 		// The IOGUIDPartitionScheme.cpp code uses byte-based UUIDs, we don't.
 
-		if (isPartitionUsed(gptMap)) {
+		if (isPartitionUsed(gptMap))
+		{
 			char stringuuid[100];
 			efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid);
 			verbose("Reading GPT partition %d, type %s\n", gptID, stringuuid);
@@ -1537,7 +1534,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 			// Getting fdisk like partition type.
 			fsType = probeFileSystem(biosdev, gptMap->ent_lba_start);
 
-			if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ) {
+			if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
+			{
 				bvrFlags = (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ? kBVFlagBooter : 0;
 				bvr = newGPTBVRef(biosdev,
 				gptID,
@@ -1645,7 +1643,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 					break;
 
 					default:
-					if (biosdev == gBIOSDev) {
+					if (biosdev == gBIOSDev)
+					{
 						gBIOSBootVolume = bvr;
 					}
 					break;
@@ -1752,6 +1751,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	{
 		const char *val;
 		int len;
+
 		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
@@ -1875,6 +1875,11 @@ static void scanFSLevelBVRSettings(BVRef chain)
 void rescanBIOSDevice(int biosdev)
 {
 	struct DiskBVMap *oldMap = diskResetBootVolumes(biosdev);
+	if (oldMap == NULL)
+	{
+		return;
+	}
+
 	CacheReset();
 	diskFreeMap(oldMap);
 	oldMap = NULL;
@@ -1907,7 +1912,8 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
 		}
 		else
 		{
-			stop("");
+			stop("diskResetBootVolumes error\n");
+			return NULL;
 		}
 	}
 	// Return the old map, either to be freed, or reinserted later
@@ -1958,6 +1964,7 @@ BVRef diskScanBootVolumes(int biosdev, int * countPtr)
 		{
 			bvr = diskScanFDiskBootVolumes(biosdev, &count);
 		}
+
 		if (bvr == NULL)
 		{
 			bvr = diskScanAPMBootVolumes(biosdev, &count);
@@ -2046,6 +2053,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 			{
 				continue;
 			}
+			bzero(newBVR,sizeof(*newBVR));
+
 			bcopy(bvr, newBVR, sizeof(*newBVR));
 
 			/*
@@ -2108,6 +2117,10 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 #if DEBUG //Azi: warning - too big for boot-log.. far too big.. i mean HUGE!! :P
 	for (bvr = chain; bvr; bvr = bvr->next)
 	{
+		if (!bvr)
+		{
+			break;
+		}
 		printf(" bvr: %d, dev: %d, part: %d, flags: %d, vis: %d\n", bvr, bvr->biosdev, bvr->part_no, bvr->flags, bvr->visible);
 	}
 	printf("count: %d\n", bvCount);
@@ -2130,6 +2143,11 @@ int freeFilteredBVChain(const BVRef chain)
   
 	while (bvr)
 	{
+		if (!bvr)
+		{
+			break;
+		}
+
 		nextBVR = bvr->next;
 
 		if (bvr->filtered)

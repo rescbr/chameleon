@@ -256,6 +256,7 @@ DT__Finalize(void)
 
 	for (prop = allocedProperties; prop != NULL; prop = prop->next)
 	{
+		free((void *)(prop->name));
 		free(prop->value);
 	}
 

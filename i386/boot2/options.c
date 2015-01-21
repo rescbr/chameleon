@@ -38,8 +38,8 @@
 #define DBG(x...)	msglog(x)
 #endif
 
-bool showBootBanner = true; //Azi:showinfo
-static bool shouldboot = false;
+bool		showBootBanner = true; //Azi:showinfo
+static bool	shouldboot = false;
 
 extern int multiboot_timeout;
 extern int multiboot_timeout_set;

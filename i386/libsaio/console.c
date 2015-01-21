@@ -177,6 +177,7 @@ int getchar()
 int printf(const char * fmt, ...)
 {
 	va_list ap;
+
 	va_start(ap, fmt);
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
