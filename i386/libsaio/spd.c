@@ -135,7 +135,7 @@ static void init_spd(char * spd, uint32_t base, int slot)
 }
 
 // Get Vendor Name from spd, 2 cases handled DDR3 and DDR2,
-// have different formats, always return a valid ptr.*/
+// have different formats, always return a valid ptr.
 const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 {
 	uint8_t bank = 0;
@@ -253,8 +253,9 @@ const char *getDDRSerial(const char* spd)
 /* Get DDR3 or DDR2 Part Number, always return a valid ptr */
 const char *getDDRPartNum(char *spd, uint32_t base, int slot)
 {
+	int i, start = 0, index = 0;
+	char c;
 	static char asciiPartNo[32];
-	int i, start=0, index = 0;
 
 	if (spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR3)
 	{
@@ -267,7 +268,6 @@ const char *getDDRPartNum(char *spd, uint32_t base, int slot)
 	
 	// Check that the spd part name is zero terminated and that it is ascii:
 	bzero(asciiPartNo, sizeof(asciiPartNo));
-	char c;
 	for (i = start; i < start + sizeof(asciiPartNo); i++)
 	{
 		READ_SPD(spd, base, slot, (uint8_t)i); // only read once the corresponding model part (ddr3 or ddr2)
@@ -289,14 +289,16 @@ const char *getDDRPartNum(char *spd, uint32_t base, int slot)
 int mapping []= {0,2,1,3,4,6,5,7,8,10,9,11};
 
 /* Read from smbus the SPD content and interpret it for detecting memory attributes */
-static void read_smb_intel(pci_dt_t *smbus_dev) {
-	int        i, speed;
-	uint8_t    spd_size, spd_type;
-	uint32_t   base, mmio, hostc;
-//	bool       dump = false;
-	RamSlotInfo_t*  slot;
+static void read_smb_intel(pci_dt_t *smbus_dev)
+{
+	int		i, speed;
+	uint8_t		spd_size, spd_type;
+	uint32_t	base, mmio, hostc;
+	uint16_t	cmd;
+//	bool		dump = false;
+	RamSlotInfo_t	*slot;
 
-	uint16_t cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
+	cmd = pci_config_read16(smbus_dev->dev.addr, 0x04);
 	DBG("SMBus CmdReg: 0x%x\n", cmd);
 	pci_config_write16(smbus_dev->dev.addr, 0x04, cmd | 1);
 
@@ -314,7 +316,8 @@ static void read_smb_intel(pci_dt_t *smbus_dev) {
 
 	char spdbuf[MAX_SPD_SIZE];
 	// Search MAX_RAM_SLOTS slots
-	for (i = 0; i <  MAX_RAM_SLOTS; i++) {
+	for (i = 0; i <  MAX_RAM_SLOTS; i++)
+	{
 		slot = &Platform.RAM.DIMM[i];
 		spd_size = smb_read_byte_intel(base, 0x50 + i, 0);
 		DBG("SPD[0] (size): %d @0x%x\n", spd_size, 0x50 + i);

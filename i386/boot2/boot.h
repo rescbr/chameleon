@@ -88,7 +88,7 @@
 #define kGUIKey				"GUI"
 #define kBootBannerKey			"Boot Banner"
 #define kShowInfoKey			"ShowInfo"		// gui.c
-#define kWaitForKeypressKey		"Wait" 
+#define kWaitForKeypressKey		"Wait"
 
 /* AsereBLN: added these keys */
 #define kUseAtiROM			"UseAtiROM"		/* ati.c */
