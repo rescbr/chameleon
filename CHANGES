@@ -1,3 +1,4 @@
+- Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service
 - Zenith432 : Use caching with ExFat filesystem
 - Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff)
 - ErmaC : C6 & C7 States credits to Clover Team.

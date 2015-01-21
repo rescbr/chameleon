@@ -67,6 +67,18 @@ bool gErrors = false;
 char *msgbuf = 0;
 char *cursor = 0;
 
+// Bungo:
+typedef struct {
+	uint16_t year;
+	uint8_t  mon;
+	uint8_t  day;
+	uint8_t  hour;
+	uint8_t  mins;
+	uint8_t  secs;
+	uint8_t  dlight;
+} datetime_t;
+static datetime_t datetime;
+
 struct putc_info //Azi: exists on gui.c & printf.c
 {
 	char * str;
@@ -84,6 +96,31 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 	}
 	*(pi->str)++ = c;
 	return c;
+}
+
+uint64_t getRTCdatetime() // 0xYYYYMMDDHHMMSS0L in decimal
+{
+	biosBuf_t bb;
+
+	bb.intno = 0x1a;
+	bb.eax.r.h = 0x04; // get RTC date
+	//bb.flags.cf = 0;
+	bios(&bb);
+	if (bb.flags.cf) return 0;
+	datetime.year = (bb.ecx.r.h >> 4) * 1000 + (bb.ecx.r.h & 0x0F) * 100 + (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+	datetime.mon = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+	datetime.day = (bb.edx.r.l >> 4) * 10 + (bb.edx.r.l & 0x0F) * 1;
+
+	bb.intno = 0x1a;
+	bb.eax.r.h = 0x02; // get RTC time
+	//bb.flags.cf = 0;
+	bios(&bb);
+	if (bb.flags.cf) return 0;
+	datetime.dlight = bb.edx.r.l & 0x0F;
+	datetime.hour = (bb.ecx.r.h >> 4) * 10 + (bb.ecx.r.h & 0x0F) * 1;
+	datetime.mins = (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+	datetime.secs = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+	return *(uint64_t *)&datetime;
 }
 
 void initBooterLog(void)
