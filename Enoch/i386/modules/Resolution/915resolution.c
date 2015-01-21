@@ -350,7 +350,9 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		} else {
 			verbose(", BT_ATI_2\n");
 		}
-	} else {
+	}
+	else
+	{
 		
 		/*
 		 * check if we have NVIDIA

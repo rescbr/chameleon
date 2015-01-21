@@ -69,10 +69,10 @@ char resource_template_register_systemio[] =
 	0x00, 0x00, 0x00, 0x79, 0x00,
 };
 
-struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
+struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 {
 
-	if (Platform.CPU.Vendor != 0x756E6547)
+	if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL) // 0x756E6547
 	{
 		DBG("Not an Intel platform: P-States will not be generated !!!\n");
 		return NULL;
@@ -355,10 +355,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt)
 	return NULL;
 }
 
-struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
+struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 {
 
-	if (Platform.CPU.Vendor != 0x756E6547)
+	if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL) // 0x756E6547
 	{
 		DBG("Not an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
@@ -370,7 +370,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt)
 		return NULL;
 	}
 
-	struct acpi_2_dsdt* dsdt = (void*)fadt->DSDT;
+	struct acpi_2_dsdt *dsdt = (void *)fadt->DSDT;
 
 	if (dsdt == NULL)
 	{

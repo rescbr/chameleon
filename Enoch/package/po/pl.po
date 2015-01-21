@@ -614,7 +614,7 @@ msgstr "Wstrzymuje proces uruchamiania. Gdy Chameleon zakończy przygotowanie do
 #: Resources/templates/Localizable.strings:126
 #, no-wrap
 msgid "PrivateData=No"
-msgstr ""
+msgstr "PrivateData=No"
 
 #. type: "PrivateData_description"
 #: Resources/templates/Localizable.strings:127
@@ -626,7 +626,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:131
 #, no-wrap
 msgid "USBBusFix=Yes"
-msgstr ""
+msgstr "USBBusFix=Yes"
 
 #. type: "USBBusFix_description"
 #: Resources/templates/Localizable.strings:132
@@ -636,10 +636,9 @@ msgstr ""
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:134
-#, fuzzy, no-wrap
-#| msgid "LegacyLogo=Yes"
+#, no-wrap
 msgid "USBLegacyOff=Yes"
-msgstr "LegacyLogo=Yes"
+msgstr "USBLegacyOff=Yes"
 
 #. type: "USBLegacyOff_description"
 #: Resources/templates/Localizable.strings:135
@@ -649,10 +648,9 @@ msgstr ""
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:137
-#, fuzzy, no-wrap
-#| msgid "LegacyLogo=Yes"
+#, no-wrap
 msgid "XHCILegacyOff=Yes"
-msgstr "LegacyLogo=Yes"
+msgstr "XHCILegacyOff=Yes"
 
 #. type: "XHCILegacyOff_description"
 #: Resources/templates/Localizable.strings:138

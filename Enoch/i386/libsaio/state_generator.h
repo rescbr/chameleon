@@ -15,8 +15,8 @@
 #include "aml_generator.h"
 #include "libsaio.h"
 
-void get_acpi_cpu_names(uint8_t* dsdt, uint32_t length);
-struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt* fadt);
-struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt* dsdt);
+void	get_acpi_cpu_names(uint8_t *dsdt, uint32_t length);
+struct	acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt);
+struct	acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt);
 
 #endif /* !__LIBSAIO_STATE_GENERATOR_H */

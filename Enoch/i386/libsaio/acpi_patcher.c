@@ -42,7 +42,7 @@ boolean_t tableSign(char *table, const char *sgn)
 }
 
 /* Gets the ACPI 1.0 RSDP address */
-static struct acpi_2_rsdp* getAddressOfAcpiTable()
+static struct acpi_2_rsdp *getAddressOfAcpiTable()
 {
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
@@ -65,13 +65,13 @@ static struct acpi_2_rsdp* getAddressOfAcpiTable()
 }
 
 /* Gets the ACPI 2.0 RSDP address */
-static struct acpi_2_rsdp* getAddressOfAcpi20Table()
+static struct acpi_2_rsdp *getAddressOfAcpi20Table()
 {
 	/* TODO: Before searching the BIOS space we are supposed to search the first 1K of the EBDA */
 
-	void *acpi_addr = (void*)ACPI_RANGE_START;
+	void *acpi_addr = (void *)ACPI_RANGE_START;
 
-	for(; acpi_addr <= (void*)ACPI_RANGE_END; acpi_addr += 16)
+	for(; acpi_addr <= (void *)ACPI_RANGE_END; acpi_addr += 16)
 	{
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
 		{
@@ -97,14 +97,14 @@ static struct acpi_2_rsdp* getAddressOfAcpi20Table()
 
 /* The folowing ACPI Table search algo. should be reused anywhere needed:*/
 /* WARNING: outDirspec string will be overwritten by subsequent calls! */
-int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
+int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 {
 	int fd = 0;
 	static char dirSpec[512];
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	snprintf(dirSpec, sizeof(dirSpec), "%s", filename); 
+	snprintf(dirSpec, sizeof(dirSpec), "%s", filename);
 	fd = open(dirSpec, 0);
 	if (fd < 0)
 	{
@@ -127,51 +127,51 @@ int search_and_get_acpi_fd(const char * filename, const char ** outDirspec)
 	return fd;
 }
 
-void *loadACPITable (const char * filename)
+void *loadACPITable (const char *filename)
 {
-	const char * dirspec=NULL;
+	const char *dirspec = NULL;
 
 	int fd = search_and_get_acpi_fd(filename, &dirspec);
 
 	if (fd >= 0)
 	{
-		void *tableAddr = (void*)AllocateKernelMemory(file_size (fd));
+		void *tableAddr = (void*)AllocateKernelMemory(file_size(fd));
 		if (tableAddr)
 		{
-			if (read (fd, tableAddr, file_size (fd))!=file_size (fd))
+			if (read(fd, tableAddr, file_size(fd)) != file_size(fd))
 			{
 				DBG("Couldn't read table %s\n",dirspec);
-				free (tableAddr);
-				close (fd);
+				free(tableAddr);
+				close(fd);
 				return NULL;
 			}
 
 			DBG("Table %s read and stored at: %x\n", dirspec, tableAddr);
-			close (fd);
+			close(fd);
 			return tableAddr;
 		}
-		close (fd);
+		close(fd);
 		DBG("Couldn't allocate memory for table \n", dirspec);
 	}  
 	//printf("Couldn't find table %s\n", filename);
 	return NULL;
 }
 
-uint8_t	acpi_cpu_count = 0;
-char* acpi_cpu_name[32];
-uint32_t acpi_cpu_p_blk = 0;
+uint8_t acpi_cpu_count	= 0;
+uint32_t acpi_cpu_p_blk	= 0;
+char *acpi_cpu_name[32];
 
-void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
+void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
 {
 	uint32_t i;
 
-	DBG("Start finding cpu names. length %d\n", length);
+	DBG("ACPIpatcher: start finding cpu names. Length %d\n", length);
 
 	for (i=0; i<length-7; i++)
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
-			DBG("DSDT: %x%x\n", dsdt[i], dsdt[i+1]);
+			DBG("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
 
 			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
 
@@ -186,7 +186,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 				if (!aml_isvalidchar(c))
 				{
 					add_name = false;
-					DBG("Invalid character found in ProcessorOP 0x%x!\n", c);
+					DBG("ACPIpatcher: invalid character found in ProcessorOP '0x%X'!\n", c);
 					break;
 				}
 			}
@@ -202,7 +202,7 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
 				}
 
-				DBG("Found ACPI CPU: %c%c%c%c\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+				DBG("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
 
 				if (++acpi_cpu_count == 32)
 				{
@@ -212,12 +212,12 @@ void get_acpi_cpu_names(unsigned char* dsdt, uint32_t length)
 		}
 	}
 
-	DBG("End finding cpu names: cpu names found: %d\n", acpi_cpu_count);
+	DBG("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
 }
 
 struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt)
 {
-	extern void setupSystemType(); 
+	extern void setupSystemType();
 
 	struct acpi_2_fadt *fadt_mod = NULL;
 	bool fadt_rev2_needed = false;
@@ -253,14 +253,14 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// Allocate new fadt table
 	if (fadt->Length < 0x84 && fadt_rev2_needed)
 	{
-		fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(0x84);
+		fadt_mod = (struct acpi_2_fadt *)AllocateKernelMemory(0x84);
 		memcpy(fadt_mod, fadt, fadt->Length);
 		fadt_mod->Length   = 0x84;
 		fadt_mod->Revision = 0x02; // FADT rev 2 (ACPI 1.0B MS extensions)
 	}
 	else
 	{
-		fadt_mod=(struct acpi_2_fadt *)AllocateKernelMemory(fadt->Length);
+		fadt_mod = (struct acpi_2_fadt *)AllocateKernelMemory(fadt->Length);
 		memcpy(fadt_mod, fadt, fadt->Length);
 	}
 	// Determine system type / PM_Model
@@ -511,7 +511,7 @@ int setupAcpi(void)
 	int  ssdt_count=0;
 
 	// SSDT Options
-	bool drop_ssdt=false, generate_pstates=false, generate_cstates=false;
+	bool drop_ssdt = false, generate_pstates = false, generate_cstates = false;
 
 	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
@@ -550,7 +550,7 @@ int setupAcpi(void)
 		int rsdplength;
 
 		// Find original rsdp
-		rsdp=(struct acpi_2_rsdp *)(version ? getAddressOfAcpi20Table() : getAddressOfAcpiTable());
+		rsdp = (struct acpi_2_rsdp *)(version ? getAddressOfAcpi20Table() : getAddressOfAcpiTable());
 		if (!rsdp)
 		{
 			DBG("No ACPI version %d found. Ignoring\n", version+1);
@@ -564,7 +564,7 @@ int setupAcpi(void)
 			}
 			continue;
 		}
-		rsdplength=version ? rsdp->Length : 20;
+		rsdplength = version ? rsdp->Length : 20;
 
 		DBG("RSDP version %d found @%x. Length=%d\n",version+1,rsdp,rsdplength);
 
@@ -573,26 +573,26 @@ int setupAcpi(void)
 		 * For more info see ACPI Specification pages 110 and following
 		 */
 
-		rsdp_mod=(struct acpi_2_rsdp *) AllocateKernelMemory(rsdplength);
+		rsdp_mod = (struct acpi_2_rsdp *) AllocateKernelMemory(rsdplength);
 		memcpy(rsdp_mod, rsdp, rsdplength);
 
-		rsdt=(struct acpi_2_rsdt *)(rsdp->RsdtAddress);
+		rsdt = (struct acpi_2_rsdt *)rsdp->RsdtAddress;
 
 		DBG("RSDT @%x, Length %d\n",rsdt, rsdt ? rsdt->Length : 0);
-		
-		if (rsdt && (uint32_t)rsdt !=0xffffffff && rsdt->Length<0x10000)
+
+		if (rsdt && (uint32_t)rsdt !=0xffffffff && rsdt->Length < 0x10000)
 		{
 			uint32_t *rsdt_entries;
 			int rsdt_entries_num;
 			int dropoffset=0, i;
 
 			// mozo: using malloc cos I didn't found how to free already allocated kernel memory
-			rsdt_mod=(struct acpi_2_rsdt *)malloc(rsdt->Length); 
-			memcpy (rsdt_mod, rsdt, rsdt->Length);
-			rsdp_mod->RsdtAddress=(uint32_t)rsdt_mod;
-			rsdt_entries_num=(rsdt_mod->Length-sizeof(struct acpi_2_rsdt))/4;
-			rsdt_entries=(uint32_t *)(rsdt_mod+1);
-			for (i=0;i<rsdt_entries_num;i++)
+			rsdt_mod = (struct acpi_2_rsdt *)malloc(rsdt->Length);
+			memcpy(rsdt_mod, rsdt, rsdt->Length);
+			rsdp_mod->RsdtAddress = (uint32_t)rsdt_mod;
+			rsdt_entries_num = (rsdt_mod->Length - sizeof(struct acpi_2_rsdt)) / 4;
+			rsdt_entries = (uint32_t *)(rsdt_mod + 1);
+			for (i = 0;i < rsdt_entries_num;i++)
 			{
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
@@ -616,7 +616,7 @@ int setupAcpi(void)
 					DBG("OEM HPET table was dropped\n");
 					dropoffset++;
 					continue;
-				}			
+				}
 
 				if (drop_slic && tableSign(table, "SLIC"))
 				{
@@ -756,7 +756,7 @@ int setupAcpi(void)
 					}
 					
 					fadt_mod = patch_fadt(fadt, new_dsdt);
-					rsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
+					rsdt_entries[i-dropoffset] = (uint32_t)fadt_mod;
 					
 					// Generate _CST SSDT
 					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
@@ -781,11 +781,12 @@ int setupAcpi(void)
 			// Allocate rsdt in Kernel memory area
 			rsdt_mod->Length += 4*ssdt_count - 4*dropoffset;
 			struct acpi_2_rsdt *rsdt_copy = (struct acpi_2_rsdt *)AllocateKernelMemory(rsdt_mod->Length);
-			memcpy (rsdt_copy, rsdt_mod, rsdt_mod->Length);
-			free(rsdt_mod); rsdt_mod = rsdt_copy;
-			rsdp_mod->RsdtAddress=(uint32_t)rsdt_mod;
-			rsdt_entries_num=(rsdt_mod->Length-sizeof(struct acpi_2_rsdt))/4;
-			rsdt_entries=(uint32_t *)(rsdt_mod+1);
+			memcpy(rsdt_copy, rsdt_mod, rsdt_mod->Length);
+			free(rsdt_mod);
+			rsdt_mod = rsdt_copy;
+			rsdp_mod->RsdtAddress = (uint32_t)rsdt_mod;
+			rsdt_entries_num = (rsdt_mod->Length-sizeof(struct acpi_2_rsdt)) / 4;
+			rsdt_entries = (uint32_t *)(rsdt_mod + 1);
 
 			// Mozodojo: Insert additional SSDTs into RSDT
 			if(ssdt_count > 0)
@@ -832,20 +833,20 @@ int setupAcpi(void)
 				int dropoffset=0;
 
 				// mozo: using malloc cos I didn't found how to free already allocated kernel memory
-				xsdt_mod=(struct acpi_2_xsdt*)malloc(xsdt->Length); 
+				xsdt_mod=(struct acpi_2_xsdt*)malloc(xsdt->Length);
 				memcpy(xsdt_mod, xsdt, xsdt->Length);
 
-				rsdp_mod->XsdtAddress=(uint32_t)xsdt_mod;
-				xsdt_entries_num=(xsdt_mod->Length-sizeof(struct acpi_2_xsdt))/8;
-				xsdt_entries=(uint64_t *)(xsdt_mod+1);
-				for (i=0;i<xsdt_entries_num;i++)
+				rsdp_mod->XsdtAddress = (uint32_t)xsdt_mod;
+				xsdt_entries_num = (xsdt_mod->Length - sizeof(struct acpi_2_xsdt)) / 8;
+				xsdt_entries = (uint64_t *)(xsdt_mod + 1);
+				for (i = 0;i < xsdt_entries_num;i++)
 				{
-					char *table=(char *)((uint32_t)(xsdt_entries[i]));
+					char *table = (char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
 					{
 						continue;
 					}
-					xsdt_entries[i-dropoffset]=xsdt_entries[i];
+					xsdt_entries[i - dropoffset] = xsdt_entries[i];
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
@@ -1060,10 +1061,11 @@ int setupAcpi(void)
 				xsdt_mod->Length += 8*ssdt_count - 8*dropoffset;
 				struct acpi_2_xsdt *xsdt_copy = (struct acpi_2_xsdt *)AllocateKernelMemory(xsdt_mod->Length);
 				memcpy(xsdt_copy, xsdt_mod, xsdt_mod->Length);
-				free(xsdt_mod); xsdt_mod = xsdt_copy;
-				rsdp_mod->XsdtAddress=(uint32_t)xsdt_mod;
-				xsdt_entries_num=(xsdt_mod->Length-sizeof(struct acpi_2_xsdt))/8;
-				xsdt_entries=(uint64_t *)(xsdt_mod+1);
+				free(xsdt_mod);
+				xsdt_mod = xsdt_copy;
+				rsdp_mod->XsdtAddress = (uint32_t)xsdt_mod;
+				xsdt_entries_num = (xsdt_mod->Length - sizeof(struct acpi_2_xsdt)) / 8;
+				xsdt_entries = (uint64_t *)(xsdt_mod + 1);
 
 				// Mozodojo: Insert additional SSDTs into XSDT
 				if(ssdt_count > 0)

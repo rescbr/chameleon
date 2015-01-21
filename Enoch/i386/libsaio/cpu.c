@@ -152,8 +152,8 @@ restart:
 		lastValue = timerValue;
 	} while (timerValue > 5);
 	printf("timerValue	  %d\n",timerValue);
-	printf("intermediate 0x%016llx\n",intermediate);
-	printf("saveTime	  0x%016llx\n",saveTime);
+	printf("intermediate  0x%016llX\n",intermediate);
+	printf("saveTime	  0x%016llX\n",saveTime);
     
 	intermediate -= saveTime;		// raw count for about 1/20 second
 	intermediate *= scale[timerValue];	// rescale measured time spent

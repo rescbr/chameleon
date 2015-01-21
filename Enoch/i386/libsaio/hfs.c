@@ -290,7 +290,7 @@ long HFSLoadFile(CICell ih, char * filePath)
 	return HFSReadFile(ih, filePath, (void *)gFSLoadAddress, 0, 0);
 }
 
-long HFSReadFile(CICell ih, char * filePath, void *base, u_int64_t offset,  u_int64_t length)
+long HFSReadFile(CICell ih, char *filePath, void *base, u_int64_t offset,  u_int64_t length)
 {
 	char entry[512];
 	char devStr[12];
@@ -453,7 +453,7 @@ void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 	nodeSize = SWAP_BE16(gBTHeaders[kBTreeCatalog]->nodeSize);
 	firstLeafNode = SWAP_BE32(gBTHeaders[kBTreeCatalog]->firstLeafNode);
 
-	dirIndex = (long long) firstLeafNode * nodeSize;
+	dirIndex = (long long)firstLeafNode * nodeSize;
 
 	GetCatalogEntry(&dirIndex, &name, &flags, &time, 0, 0);
 
@@ -505,7 +505,7 @@ long HFSGetFileBlock(CICell ih, char *filePath, u_int64_t *firstBlock)
 
 	if ((result == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 	{
-		printf("HFS: Resolve path %s failed\n", filePath);
+		printf("HFS: Resolve path '%s' failed\n", filePath);
 		return -1;
 	}
 
@@ -568,7 +568,7 @@ static long ReadFile(void * file, u_int64_t * length, void * base, u_int64_t off
 
 	if (offset > fileLength)
 	{
-		printf("Offset is too large.\n");
+		printf("ReadFile(HFS%c): Offset is too large.\n", gIsHFSPlus ? "+" : "");
 
 		return -1;
 	}

@@ -104,10 +104,13 @@ int prf(
 
 loop:
 	while ((c = *fmt++) != '%') {
-		if(c == '\0') {
+		if(c == '\0')
+		{
 			return len;
 		}
-		if (putfn_p) {
+
+		if (putfn_p)
+		{
 			(*putfn_p)(c, putfn_arg);
 		}
 		len++;
@@ -152,7 +155,8 @@ again:
 		case 'o': case 'O':
 			b = 8;
 		number:
-			if (putfn_p) {
+			if (putfn_p)
+			{
 				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
 			}
 			len++;
@@ -160,7 +164,8 @@ again:
 		case 's':
 			s = (char *)*adx;
 			while ((c = *s++)) {
-				if (putfn_p) {
+				if (putfn_p)
+				{
 					(*putfn_p)(c, putfn_arg);
 				}
 				len++;
@@ -168,14 +173,16 @@ again:
 			}
 			while (width++ < minwidth)
 			{
-				if (putfn_p) {
+				if (putfn_p)
+				{
 					(*putfn_p)(' ', putfn_arg);
 				}
 				len++;
 			}
 			break;
 		case 'c':
-			if (putfn_p) {
+			if (putfn_p)
+			{
 				(*putfn_p)((char)*adx, putfn_arg);
 			}
 			len++;

@@ -98,6 +98,7 @@ extern int    verbose(const char *format, ...);
 extern void   stop(const char *format, ...) __attribute__ ((noreturn));
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
+extern uint64_t getRTCdatetime();
 
 /* disk.c */
 extern void   rescanBIOSDevice(int biosdev);

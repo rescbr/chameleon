@@ -97,6 +97,7 @@ void initKernBootStruct( void )
 		if (node == 0) {
 			stop("Couldn't create root node");
 		}
+
 		getPlatformName(platformName);
 		nameLen = strlen(platformName) + 1;
 		DT__AddProperty(node, "compatible", nameLen, platformName);

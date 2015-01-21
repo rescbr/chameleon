@@ -31,7 +31,7 @@
  */
 #include "exfat.h"
 
-#define BYTE_ORDER_MARK	0xFEFF
+#define BYTE_ORDER_MARK		0xFEFF
 
 #include "ntfs_private.h"
 
@@ -41,14 +41,14 @@
 #define MAX_BLOCK_SIZE		2048
 #define MAX_CLUSTER_SIZE	32768
 
-#define LABEL_LENGTH	1024
-#define UNKNOWN_LABEL	"Untitled NTFS"
+#define LABEL_LENGTH		1024
+#define UNKNOWN_LABEL		"Untitled NTFS"
 
-#define FSUR_IO_FAIL -1
-#define FSUR_UNRECOGNIZED -1
-#define FSUR_RECOGNIZED 0
+#define FSUR_IO_FAIL		-1
+#define FSUR_UNRECOGNIZED	-1
+#define FSUR_RECOGNIZED		0
 
-#define ERROR -1
+#define ERROR			-1
 
 /*
  * Process per-sector "fixups" that NTFS uses to detect corruption of
@@ -347,11 +347,11 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	return 0;
 }
 
-bool NTFSProbe(const void * buffer)
+bool NTFSProbe(const void *buffer)
 {
 	bool result = false;
 
-	const struct bootfile	* part_bootfile = buffer;			// NTFS boot sector structure
+	const struct bootfile *part_bootfile = buffer;	// NTFS boot sector structure
 
 	// Looking for NTFS signature.
 	if (strncmp((const char *)part_bootfile->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) == 0)

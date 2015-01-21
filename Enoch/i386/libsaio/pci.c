@@ -75,17 +75,23 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 	uint8_t		secondary_bus;
 	uint8_t		header_type;
 
-	for (dev = 0; dev < 32; dev++) {
-		for (func = 0; func < 8; func++) {
+	for (dev = 0; dev < 32; dev++)
+	{
+		for (func = 0; func < 8; func++)
+		{
 			pci_addr = PCIADDR(bus, dev, func);
 			id = pci_config_read32(pci_addr, PCI_VENDOR_ID);
-			if (!id || id == 0xfffffffful) {
+			if (!id || id == 0xfffffffful)
+			{
 				continue;
 			}
+
 			new = (pci_dt_t*)malloc(sizeof(pci_dt_t));
-			if (!new) {
+			if (!new)
+			{
 				continue;
 			}
+
 			bzero(new, sizeof(pci_dt_t));
 
 			new->dev.addr				= pci_addr;
@@ -99,21 +105,25 @@ void scan_pci_bus(pci_dt_t *start, uint8_t bus)
 			new->parent	= start;
 
 			header_type = pci_config_read8(pci_addr, PCI_HEADER_TYPE);
-			switch (header_type & 0x7f) {
-			case PCI_HEADER_TYPE_BRIDGE:
-			case PCI_HEADER_TYPE_CARDBUS:
-				secondary_bus = pci_config_read8(pci_addr, PCI_SECONDARY_BUS);
-				if (secondary_bus != 0) {
-					scan_pci_bus(new, secondary_bus);
-				}
-				break;
-			default:
-				break;
+			switch (header_type & 0x7f)
+			{
+				case PCI_HEADER_TYPE_BRIDGE:
+				case PCI_HEADER_TYPE_CARDBUS:
+					secondary_bus = pci_config_read8(pci_addr, PCI_SECONDARY_BUS);
+					if (secondary_bus != 0)
+					{
+						scan_pci_bus(new, secondary_bus);
+					}
+					break;
+				default:
+					break;
 			}
+
 			*current = new;
 			current = &new->next;
 
-			if ((func == 0) && ((header_type & 0x80) == 0)) {
+			if ((func == 0) && ((header_type & 0x80) == 0))
+			{
 				break;
 			}
 		}
@@ -131,6 +141,7 @@ void enable_pci_devs(void)
 	{
 		return;
 	}
+
 	rcba = pci_config_read32(PCIADDR(0, 0x1f, 0), 0xf0) & ~1; //this is LPC host
 	fd = (uint32_t *)(rcba + 0x3418);
 	/* set SMBus Disable (SD) to 0 */
@@ -144,7 +155,8 @@ void build_pci_dt(void)
 {
 	root_pci_dev = malloc(sizeof(pci_dt_t));
 
-	if (!root_pci_dev) {
+	if (!root_pci_dev)
+	{
 		return;
 	}
 
@@ -159,11 +171,12 @@ void build_pci_dt(void)
 }
 
 static char dev_path[256];
+
 char *get_pci_dev_path(pci_dt_t *pci_dt)
 {
 	pci_dt_t	*current;
 	pci_dt_t	*end;
-	int         dev_path_len = 0;
+	int		dev_path_len = 0;
 
 	dev_path[0] = 0;
 	end = root_pci_dev;
@@ -175,11 +188,14 @@ char *get_pci_dev_path(pci_dt_t *pci_dt)
 		while (current->parent != end)
 			current = current->parent;			
 		end = current;
-		if (current->parent == root_pci_dev) {
+		if (current->parent == root_pci_dev)
+		{
 			dev_path_len += 
 				snprintf(dev_path + dev_path_len, sizeof(dev_path) - dev_path_len, "PciRoot(0x%x)/Pci(0x%x,0x%x)", uid, 
 				current->dev.bits.dev, current->dev.bits.func);
-		} else {
+		}
+		else
+		{
 			dev_path_len +=
 				snprintf(dev_path + dev_path_len, sizeof(dev_path) - dev_path_len, "/Pci(0x%x,0x%x)", 
 				current->dev.bits.dev, current->dev.bits.func);

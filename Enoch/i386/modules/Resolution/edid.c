@@ -265,10 +265,12 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		yResolution = val;
 	}
 */
-	if(!xResolution || !yResolution || !bpResolution) {
+	if(!xResolution || !yResolution || !bpResolution)
+	{
 		char* edidInfo = readEDID();
 		
-		if(!edidInfo) {
+		if(!edidInfo)
+		{
 			return;
 		}
 
@@ -278,10 +280,13 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		//yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4); 
 		//Slice - done here
 		
-		if(fb_parse_edid((struct EDID *)edidInfo, &mode) == 0) {
+		if(fb_parse_edid((struct EDID *)edidInfo, &mode) == 0)
+		{
 			xResolution = DEFAULT_SCREEN_WIDTH;
 			yResolution = DEFAULT_SCREEN_HEIGHT;
-		} else {
+		}
+		else
+		{
 			xResolution = mode.h_active;
 			yResolution = mode.v_active;
 		}
@@ -343,7 +348,8 @@ char* readEDID()
 		msglog("Buffer location: 0x%X status: %d\n", SEG(edidInfo) << 16 | OFF(edidInfo), status);
 
 		int j, i;
-		for (j = 0; j < 8; j++) {
+		for (j = 0; j < 8; j++)
+		{
 			for(i = 0; i < 16; i++) msglog(" 0x%02X", edidInfo[((i+1) * (j + 1)) - 1]);
 			msglog("\n");
 		}

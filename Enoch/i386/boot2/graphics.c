@@ -279,6 +279,7 @@ getVESAModeWithProperties( unsigned short	width,
 		// Get mode information.
 
 		bzero( &modeInfo, sizeof(modeInfo) );
+
 		err = getVBEModeInfo( *modePtr, &modeInfo );
 		if ( err != errSuccess )
 		{
@@ -427,23 +428,23 @@ setVESAGraphicsMode( unsigned short width,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
 {
-    VBEModeInfoBlock  minfo;
-    unsigned short    mode;
-    unsigned short    vesaVersion;
-    int               err = errFuncNotSupported;
+	VBEModeInfoBlock  minfo;
+	unsigned short    mode;
+	unsigned short    vesaVersion;
+	int               err = errFuncNotSupported;
 
-    do {
-        mode = getVESAModeWithProperties( width, height, bitsPerPixel,
+	do {
+		mode = getVESAModeWithProperties( width, height, bitsPerPixel,
                                           maColorModeBit             |
                                           maModeIsSupportedBit       |
                                           maGraphicsModeBit          |
                                           maLinearFrameBufferAvailBit,
                                           0,
                                           &minfo, &vesaVersion );
-        if ( mode == modeEndOfList )
-        {
-            break;
-        }
+		if ( mode == modeEndOfList )
+		{
+			break;
+		}
 
 //
 // FIXME : generateCRTCTiming() causes crash.
@@ -484,9 +485,9 @@ setVESAGraphicsMode( unsigned short width,
 
         // Set the mode with default refresh rate.
 
-        err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
+        err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
 
-        if ( err != errSuccess )
+        if (err != errSuccess)
         {
             break;
         }
@@ -520,8 +521,7 @@ setVESAGraphicsMode( unsigned short width,
         bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
         bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 
-    }
-    while ( 0 );
+	} while ( 0 );
 
     return err;
 }
@@ -1120,28 +1120,29 @@ static int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
-	char * propStr;
-	unsigned long    count = 0;
+	char            *propStr;
+	unsigned long   count       = 0;
 
-	propStr = newStringForKey( (char *) propKey , &bootInfo->chameleonConfig );
-	if ( propStr )
+	propStr = newStringForKey((char *)propKey , &bootInfo->chameleonConfig);
+
+	if (propStr)
 	{
-		char * delimiter = propStr;
-		char * p = propStr;
+		char *delimiter = propStr;
+		char *p         = propStr;
 
-		while ( count < maxArrayCount && *p != '\0' )
+		while ((count < maxArrayCount) && (*p != '\0'))
 		{
-			unsigned long val = strtoul( p, &delimiter, 10 );
-			if ( p != delimiter )
+			unsigned long val = strtoul(p, &delimiter, 10);
+			if (p != delimiter)
 			{
 				numbers[count++] = val;
 				p = delimiter;
 			}
-			while ( ( *p != '\0' ) && !isdigit(*p) )
+			while ((*p != '\0') && !isdigit(*p))
 				p++;
 		}
 
-		free( propStr );
+		free(propStr);
 	}
 
 	return count;
@@ -1163,7 +1164,7 @@ int initGraphicsMode ()
 		// Use the default resolution if we don't have an initialized GUI.
 		if (gui.screen.width == 0 || gui.screen.height == 0)
 		{
-			gui.screen.width = DEFAULT_SCREEN_WIDTH;	
+			gui.screen.width = DEFAULT_SCREEN_WIDTH;
 			gui.screen.height = DEFAULT_SCREEN_HEIGHT;
 		}
 
@@ -1183,7 +1184,7 @@ int initGraphicsMode ()
 	if ( params[2] == 888 )
 		params[2] = 32;
 
-	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );	
+	return setVESAGraphicsMode( params[0], params[1], params[2], params[3] );
 }
 
 //==========================================================================
@@ -1199,7 +1200,7 @@ void setVideoMode( int mode, int drawgraphics)
 
 	if ( mode == GRAPHICS_MODE )
 	{
-  		if ( (err=initGraphicsMode ()) == errSuccess )
+  		if ( (err = initGraphicsMode()) == errSuccess )
 		{
 			if (gVerboseMode)
 			{
@@ -1215,14 +1216,14 @@ void setVideoMode( int mode, int drawgraphics)
 
 	if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
 	{
-		count = getNumberArrayFromProperty( kTextModeKey, params, 2 );
+		count = getNumberArrayFromProperty(kTextModeKey, params, 2);
 		if ( count < 2 )
 		{
 			params[0] = 80;  // Default text mode is 80x25.
 			params[1] = 25;
 		}
 
-		setVESATextMode( params[0], params[1], 4 );
+		setVESATextMode(params[0], params[1], 4);
 		bootArgs->Video.v_display = VGA_TEXT_MODE;
 	}
 
@@ -1239,15 +1240,15 @@ void getGraphicModeParams(unsigned long params[])
 	unsigned short    vesaVersion;
 	unsigned short    mode = modeEndOfList;
 
-	getNumberArrayFromProperty( kGraphicsModeKey, params, 4);
+	getNumberArrayFromProperty(kGraphicsModeKey, params, 4);
 
-	mode = getVESAModeWithProperties( params[0], params[1], params[2],
+	mode = getVESAModeWithProperties(params[0], params[1], params[2],
 									 maColorModeBit             |
 									 maModeIsSupportedBit       |
 									 maGraphicsModeBit          |
 									 maLinearFrameBufferAvailBit,
 									 0,
-									 &minfo, &vesaVersion );
+									 &minfo, &vesaVersion);
 
 	params[0] = minfo.XResolution;
 	params[1] = minfo.YResolution;

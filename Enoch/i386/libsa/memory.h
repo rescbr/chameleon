@@ -90,7 +90,7 @@
 #define KERNEL_LEN        0x08000000
 
 #define ZALLOC_ADDR       0x08100000  // 256M zalloc area
-#define ZALLOC_LEN        0x10000000
+#define ZALLOC_LEN        0x14000000
 
 #define LOAD_ADDR         0x18100000  // 64M File load buffer
 #define LOAD_LEN          0x04000000

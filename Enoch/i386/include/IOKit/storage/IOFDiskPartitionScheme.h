@@ -56,7 +56,7 @@ struct fdisk_part
     UInt8   beghead;   /* (beginning head)                                    */
     UInt8   begsect;   /* (beginning sector; beginning cylinder, high 2 bits) */
     UInt8   begcyl;    /* (beginning cylinder, low 8 bits)                    */
-    UInt8   systid;    /* (type)                                              */
+    UInt8   systid;    /* (OS type)                                           */
     UInt8   endhead;   /* (ending head)                                       */
     UInt8   endsect;   /* (ending sector; ending cylinder, high 2 bits)       */
     UInt8   endcyl;    /* (ending cylinder, low 8 bits)                       */

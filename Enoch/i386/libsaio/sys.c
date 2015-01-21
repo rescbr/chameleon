@@ -85,7 +85,7 @@ extern int multiboot_skip_partition_set;
 
 struct devsw
 {
-	const char *  name;
+	const char    *name;
 	// size increased from char to short to handle non-BIOS internal devices
 	unsigned short biosdev;
 	int type;
@@ -386,12 +386,12 @@ long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name,
 // GetFileInfo - LOW-LEVEL FILESYSTEM FUNCTION.
 // Get attributes for the specified file.
 
-static char* gMakeDirSpec;
+static char *gMakeDirSpec;
 
-long GetFileInfo(const char * dirSpec, const char * name, long * flags, u_int32_t * time)
+long GetFileInfo(const char *dirSpec, const char *name, long *flags, u_int32_t *time)
 {
 	long long index = 0;
-	const char * entryName;
+	const char *entryName;
 
 	if (gMakeDirSpec == 0)
 	{
@@ -499,10 +499,10 @@ static struct iob * iob_from_fdesc(int fdesc)
 //==========================================================================
 // openmem()
 
-int openmem(char * buf, int len)
+int openmem(char *buf, int len)
 {
 	int          fdesc;
-	struct iob * io;
+	struct iob *io;
 
 	fdesc = GetFreeFd();
 	io = &iob[fdesc];
@@ -823,16 +823,16 @@ error:
 
 //==========================================================================
 
-struct dirstuff * opendir(const char * path)
+struct dirstuff *opendir(const char *path)
 {
-	struct dirstuff * dirp = 0;
-	const char *      dirPath;
-	BVRef             bvr;
+	struct dirstuff *dirp = 0;
+	const char      *dirPath;
+	BVRef            bvr;
 
 	if ((bvr = getBootVolumeRef(path, &dirPath)) == NULL)
 		goto error;
 
-	dirp = (struct dirstuff *) malloc(sizeof(struct dirstuff));
+	dirp = (struct dirstuff *)malloc(sizeof(struct dirstuff));
 	if (dirp == NULL)
 		goto error;
 
@@ -949,7 +949,7 @@ void scanDisks(int biosdev, int *count)
 
 //==========================================================================
 
-BVRef selectBootVolume( BVRef chain )
+BVRef selectBootVolume(BVRef chain)
 {
 	bool filteredChain = false;
 	bool foundPrimary = false;
@@ -968,7 +968,8 @@ BVRef selectBootVolume( BVRef chain )
 			{
 				break;
 			}
-			if ( bvr->part_no == multiboot_partition && bvr->biosdev == gBIOSDev )
+
+			if ( (bvr->part_no == multiboot_partition) && (bvr->biosdev == gBIOSDev) )
 			{
 				return bvr;
 			}
@@ -989,6 +990,7 @@ BVRef selectBootVolume( BVRef chain )
 			{
 				break;
 			}
+
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
@@ -999,7 +1001,7 @@ BVRef selectBootVolume( BVRef chain )
 	}
 
 	/*
-	 * Scannig the volume chain backwards and trying to find 
+	 * Scannig the volume chain backwards and trying to find
 	 * a HFS+ volume with valid boot record signature.
 	 * If not found any active partition then we will
 	 * select this volume as the boot volume.
@@ -1019,26 +1021,26 @@ BVRef selectBootVolume( BVRef chain )
 			}
 		}
 
-		if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
+		if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) )
 		{
 			foundPrimary = true;
 		}
 
 		// zhell -- Undo a regression that was introduced from r491 to 492.
 		// if gBIOSBootVolume is set already, no change is required
-		if ( bvr->flags & (kBVFlagBootable|kBVFlagSystemVolume)
+		if ( (bvr->flags & (kBVFlagBootable | kBVFlagSystemVolume))
 			&& gBIOSBootVolume
 			&& (!filteredChain || (filteredChain && bvr->visible))
-			&& bvr->biosdev == gBIOSDev )
+			&& (bvr->biosdev == gBIOSDev) )
 		{
 			bvr2 = bvr;
 		}
 
 		// zhell -- if gBIOSBootVolume is NOT set, we use the "if" statement
 		// from r491,
-		if ( bvr->flags & kBVFlagBootable
-			&& ! gBIOSBootVolume
-			&& bvr->biosdev == gBIOSDev )
+		if ( (bvr->flags & kBVFlagBootable)
+			&& !gBIOSBootVolume
+			&& (bvr->biosdev == gBIOSDev) )
 		{
 			bvr2 = bvr;
 		}
@@ -1055,11 +1057,12 @@ BVRef selectBootVolume( BVRef chain )
 			{
 				break;
 			}
-			if ( bvr->flags & kBVFlagNativeBoot && bvr->biosdev == gBIOSDev )
+
+			if ( (bvr->flags & kBVFlagNativeBoot) && (bvr->biosdev == gBIOSDev) )
 			{
 				bvr1 = bvr;
 			}
-			if ( bvr->flags & kBVFlagPrimary && bvr->biosdev == gBIOSDev )
+			if ( (bvr->flags & kBVFlagPrimary) && (bvr->biosdev == gBIOSDev) )
 			{
 				bvr2 = bvr;
 			}
@@ -1120,7 +1123,7 @@ void setBootGlobals(BVRef chain)
     is changed to the selected volume unless the volume selector is
     that of a ramdisk.
  */
-BVRef getBootVolumeRef( const char * path, const char ** outPath )
+BVRef getBootVolumeRef(const char *path, const char **outPath)
 {
 	const char	*cp;
 	BVRef bvr	= gRootVolume;
@@ -1148,8 +1151,8 @@ BVRef getBootVolumeRef( const char * path, const char ** outPath )
 	}
 	else if ((cp - path) == 2)  // found "xx("
 	{
-		const struct devsw * dp;
-		const char * xp = path;
+		const struct devsw  *dp;
+		const char          *xp = path;
 
 		int i;
 		int unit = -1;
