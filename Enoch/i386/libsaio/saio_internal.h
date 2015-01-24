@@ -88,7 +88,7 @@ extern u_int32_t CacheRead(CICell ih, char *buffer, long long offset, u_int32_t 
 extern bool   gVerboseMode;
 extern bool   gErrors;
 extern void   initBooterLog(void);
-extern void   msglog(const char * format, ...);
+extern int    msglog(const char * format, ...);
 extern void   setupBooterLog(void);
 extern int    putchar(int ch);
 extern int    getchar(void);

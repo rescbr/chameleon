@@ -242,20 +242,21 @@ static uint64_t measure_aperf_frequency(void)
  */
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency = 0;
-	uint64_t	fsbFrequency = 0;
-	uint64_t	cpuFrequency = 0;
-	uint64_t	msr = 0;
-	uint64_t	flex_ratio = 0;
+	uint64_t	tscFrequency	= 0;
+	uint64_t	fsbFrequency	= 0;
+	uint64_t	cpuFrequency	= 0;
+	uint64_t	msr		= 0;
+	uint64_t	flex_ratio	= 0;
 
-	uint32_t	max_ratio = 0;
-	uint32_t	min_ratio = 0;
-	uint8_t		bus_ratio_max = 0;
-	uint8_t		bus_ratio_min = 0;
-	uint8_t		currdiv = 0;
-	uint8_t		currcoef = 0;
-	uint8_t		maxdiv = 0;
-	uint8_t		maxcoef = 0;
+	uint32_t	max_ratio	= 0;
+	uint32_t	min_ratio	= 0;
+	uint8_t		bus_ratio_max	= 0;
+	uint8_t		bus_ratio_min	= 0;
+	uint8_t		currdiv		= 0;
+	uint8_t		currcoef	= 0;
+	uint8_t		maxdiv		= 0;
+	uint8_t		maxcoef		= 0;
+
 	const char	*newratio;
 	int		len = 0;
 	int		myfsb = 0;
@@ -315,12 +316,12 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.MCodeVersion	= (uint32_t)(rdmsr64(MSR_IA32_BIOS_SIGN_ID) >> 32);
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);     // stepping = cpu_feat_eax & 0xF;
-	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);     // model = (cpu_feat_eax >> 4) & 0xF;
-	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);    // family = (cpu_feat_eax >> 8) & 0xF;
-	//p->CPU.Type		= bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
-	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);   // ext_model = (cpu_feat_eax >> 16) & 0xF;
-	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
+	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
+	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);	// model = (cpu_feat_eax >> 4) & 0xF;
+	p->CPU.Family		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);	// family = (cpu_feat_eax >> 8) & 0xF;
+	//p->CPU.Type		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
+	p->CPU.ExtModel		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);	// ext_model = (cpu_feat_eax >> 16) & 0xF;
+	p->CPU.ExtFamily	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 
@@ -376,14 +377,14 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	else if (p->CPU.Vendor == CPUID_VENDOR_AMD)
 	{
-		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
+		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
 	}
 	else
 	{
 		// Use previous method for Cores and Threads
-		p->CPU.NoThreads	= bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-		p->CPU.NoCores		= bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
+		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
 	}
 
 	/* get BrandString (if supported) */
@@ -410,7 +411,7 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 		}
 
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), strlen(CPU_STRING_UNKNOWN) + 1)))
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), (unsigned)strlen(CPU_STRING_UNKNOWN) + 1)))
 		{
 			/*
 			 * This string means we have a firmware-programmable brand string,
@@ -652,7 +653,7 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 			}
 		}
-		/* Mobile CPU */
+		// Mobile CPU
 		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
 		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
@@ -662,13 +663,13 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		switch(p->CPU.ExtFamily)
 		{
-			case 0x00: /* K8 */
+			case 0x00: //* K8 *//
 				msr = rdmsr64(K8_FIDVID_STATUS);
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) / 2 + 4;
 				break;
 
-			case 0x01: /* K10 */
+			case 0x01: //* K10 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
@@ -686,7 +687,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x05: /* K14 */
+			case 0x05: //* K14 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
 				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
@@ -694,7 +695,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x02: /* K11 */
+			case 0x02: //* K11 *//
 				// not implimented
 				break;
 		}
@@ -771,11 +772,11 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\n---------------------------------------------\n");
    	DBG("------------------ CPU INFO -----------------\n");
 	DBG("---------------------------------------------\n");
-	DBG("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
-	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
-	DBG("Family:                  0x%x\n",		p->CPU.Family); // Family ex: 6 (06h)
+	DBG("Brand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
+	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
+	DBG("Family:                  0x%x\n",		p->CPU.Family);			// Family ex: 6 (06h)
 	DBG("ExtFamily:               0x%x\n",		p->CPU.ExtFamily);
-	DBG("Signature:               %x\n",		p->CPU.Signature); // CPUID signature
+	DBG("Signature:               %x\n",		p->CPU.Signature);		// CPUID signature
 	/*switch (p->CPU.Type) {
 		case PT_OEM:
 			DBG("Processor type:          Intel Original OEM Processor\n");
@@ -792,9 +793,9 @@ void scan_cpu(PlatformInfo_t *p)
 		default:
 			break;
 	}*/
-	DBG("Model:                   0x%x\n",		p->CPU.Model); // Model ex: 37 (025h)
+	DBG("Model:                   0x%x\n",		p->CPU.Model);			// Model ex: 37 (025h)
 	DBG("ExtModel:                0x%x\n",		p->CPU.ExtModel);
-	DBG("Stepping:                0x%x\n",		p->CPU.Stepping); // Stepping ex: 5 (05h)
+	DBG("Stepping:                0x%x\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
 	DBG("MaxCoef:                 0x%x\n",		p->CPU.MaxCoef);
 	DBG("CurrCoef:                0x%x\n",		p->CPU.CurrCoef);
 	DBG("MaxDiv:                  0x%x\n",		p->CPU.MaxDiv);
@@ -802,10 +803,10 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
 	DBG("FSBFreq:                 %dMHz\n",		(p->CPU.FSBFrequency + 500000) / 1000000);
 	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",		p->CPU.NoCores); // Cores
-	DBG("Logical processor:       %d\n",		p->CPU.NoThreads); // Logical procesor
+	DBG("Cores:                   %d\n",		p->CPU.NoCores);		// Cores
+	DBG("Logical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
 	DBG("Features:                0x%08x\n",	p->CPU.Features);
-	DBG("Microcode version:       %d\n",		p->CPU.MCodeVersion); // CPU microcode version
+	DBG("Microcode version:       %d\n",		p->CPU.MCodeVersion);		// CPU microcode version
 	DBG("\n---------------------------------------------\n");
 #if DEBUG_CPU
 	pause();

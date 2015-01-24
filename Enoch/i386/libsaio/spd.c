@@ -145,7 +145,6 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
 	{
-
 		bank = (spd[SPD_DDR3_MEMORY_BANK] & 0x07f); // constructors like Patriot use b7=1
 		code = spd[SPD_DDR3_MEMORY_CODE];
 		for (i=0; i < VEN_MAP_SIZE; i++)
@@ -192,22 +191,8 @@ const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
 /* Get Default Memory Module Speed (no overclocking handled) */
 int getDDRspeedMhz(const char * spd)
 {
-	if (spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR3)
-	{
-		switch(spd[12])
-		{
-			case 0x0f:
-				return 1066;
-			case 0x0c:
-				return 1333;
-			case 0x0a:
-				return 1600;
-			case 0x14:
-			default:
-				return 800;
-		}
-	}
-	else if ((spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR2) || (spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR))
+
+	if ((spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR2) || (spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR))
 	{
 		switch(spd[9])
 		{
@@ -222,6 +207,21 @@ int getDDRspeedMhz(const char * spd)
 				return 800;
 			case 0x1E:
 				return 1066;
+		}
+	}
+	else if (spd[SPD_MEMORY_TYPE] == SPD_MEMORY_TYPE_SDRAM_DDR3)
+	{
+		switch(spd[12])
+		{
+			case 0x0f:
+				return 1066;
+			case 0x0c:
+				return 1333;
+			case 0x0a:
+				return 1600;
+			case 0x14:
+			default:
+				return 800;
 		}
 	}
 	return  800; // default freq for unknown types

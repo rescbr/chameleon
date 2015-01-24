@@ -1829,7 +1829,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		if (bvr->flags & kBVFlagBooter)
 		{
 			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			sprintf(fileSpec, "%s", ".disk_label.contentDetails");
+			strcpy(fileSpec, ".disk_label.contentDetails");
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{

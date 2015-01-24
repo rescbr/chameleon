@@ -38,24 +38,43 @@ static inline void intel_waitforsts(void) {
 	while (rdmsr64(MSR_IA32_PERF_STATUS) & (1 << 21)) { if (!inline_timeout--) break; }
 }
 
+/* From Apple's cpuid.h */
+typedef enum { eax, ebx, ecx, edx } cpuid_register_t;
+
+static inline void cpuid(uint32_t *data)
+{
+	asm(
+		"cpuid" : "=a" (data[eax]),
+		"=b" (data[ebx]),
+		"=c" (data[ecx]),
+		"=d" (data[edx]) : "a"  (data[eax]),
+		"b"  (data[ebx]),
+		"c"  (data[ecx]),
+		"d"  (data[edx]));
+}
+
 static inline void do_cpuid(uint32_t selector, uint32_t *data)
 {
-	asm volatile ("cpuid"
-				  : "=a" (data[0]),
-				  "=b" (data[1]),
-				  "=c" (data[2]),
-				  "=d" (data[3])
-				  : "a" (selector));
+	asm(
+		"cpuid" : "=a" (data[eax]),
+		"=b" (data[ebx]),
+		"=c" (data[ecx]),
+		"=d" (data[edx]) : "a"(selector),
+		"b" (0),
+		"c" (0),
+		"d" (0));
 }
 
 static inline void do_cpuid2(uint32_t selector, uint32_t selector2, uint32_t *data)
 {
-	asm volatile ("cpuid"
-				  : "=a" (data[0]),
-				  "=b" (data[1]),
-				  "=c" (data[2]),
-				  "=d" (data[3])
-				  : "a" (selector), "c" (selector2));
+	asm volatile (
+		"cpuid" : "=a" (data[eax]),
+		"=b" (data[ebx]),
+		"=c" (data[ecx]),
+		"=d" (data[edx]) : "a" (selector),
+		"b" (0),
+		"c" (selector2),
+		"d" (0));
 }
 
 // DFE: enable_PIT2 and disable_PIT2 come from older xnu

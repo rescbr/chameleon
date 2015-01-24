@@ -129,21 +129,23 @@ void initBooterLog(void)
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
 	msglog("%s\n", "Enoch (r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
+	getRTCdatetime();
+	verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
 }
 
-void msglog(const char * fmt, ...)
+int msglog(const char * fmt, ...)
 {
 	va_list ap;
 	struct putc_info pi;
 
 	if (!msgbuf)
 	{
-		return;
+		return 0;
 	}
 
 	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 	{
-		return;
+		return 0;
 	}
 
 	va_start(ap, fmt);
@@ -152,6 +154,8 @@ void msglog(const char * fmt, ...)
 	prf(fmt, ap, sputc, &pi);
 	va_end(ap);
 	cursor += strlen((char *)cursor);
+
+	return 0;
 }
 
 void setupBooterLog(void)
@@ -224,7 +228,7 @@ int printf(const char * fmt, ...)
 	{
 		vprf(fmt, ap);
 	}
-
+/*
 	{
 		// Kabyl: BooterLog
 		struct putc_info pi;
@@ -241,7 +245,7 @@ int printf(const char * fmt, ...)
 		prf(fmt, ap, sputc, &pi);
 		cursor +=  strlen((char *)cursor);
 	}
-
+*/
 	va_end(ap);
 	return 0;
 }

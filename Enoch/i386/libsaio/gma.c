@@ -109,13 +109,13 @@ uint8_t haswell_ig_vals[16][4] = { /* - TESTING DATA --*/
 	{ 0x00,0x00,0x26,0x04 },	// 5 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - mobile GT3
 	{ 0x00,0x00,0x26,0x0a },	// 6 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x00,0x00,0x26,0x0c },	// 7 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - SDV mobile GT3
-	{ 0x00,0x00,0x26,0x0d },    // 8 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - CRW mobile GT3
+	{ 0x00,0x00,0x26,0x0d },	// 8 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - CRW mobile GT3
 	{ 0x02,0x00,0x16,0x04 },	// 9 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 1, Ports: 1, FBMem: 1 - mobile GT2
-	{ 0x03,0x00,0x22,0x0d },    // 10 "AAPL,ig-platform-id" //FB: 0MB, Pipes: 0, Ports: 0, FBMem: 0 - CRW Desktop GT3
+	{ 0x03,0x00,0x22,0x0d },	// 10 "AAPL,ig-platform-id" //FB: 0MB, Pipes: 0, Ports: 0, FBMem: 0 - CRW Desktop GT3
 //	{ 0x04,0x00,0x12,0x04 },	// ?? "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x05,0x00,0x26,0x0a },	// 11 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x06,0x00,0x26,0x0a },	// 12 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
-	{ 0x07,0x00,0x26,0x0d },    // 13 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 4, FBMem: 3 - CRW mobile GT3
+	{ 0x07,0x00,0x26,0x0d },	// 13 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 4, FBMem: 3 - CRW mobile GT3
 	{ 0x08,0x00,0x26,0x0a },	// 14 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x08,0x00,0x2e,0x0a },	// 15 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT reserved GT3
 };
@@ -618,99 +618,100 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
 		break;
 
-        /* Haswell */
-        /* HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile */
-        //case 0x80860090:
-        //case 0x80860091:
-        //case 0x80860092:
-        case GMA_HASWELL_M_GT2: // 0416
-            device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
-            devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
-            devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
-            devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
-
-        case GMA_HASWELL_D_GT1: // 0402
-        case GMA_HASWELL_M_GT1: // 0406
-        case GMA_HASWELL_S_GT1: // 040a
-        case GMA_HASWELL_D_GT2: // 0412
-        case GMA_HASWELL_S_GT2: // 041a
-        case GMA_HASWELL_E_GT1: // 040e
+	/* Haswell */
+	/* HD Graphics 5000, HD Graphics 5000 Mobile, HD Graphics P5000, HD Graphics 4600, HD Graphics 4600 Mobile */
+	//case 0x80860090:
+	//case 0x80860091:
+	//case 0x80860092:
+	case GMA_HASWELL_M_GT2: // 0416
         case GMA_HASWELL_E_GT2: // 041e
-        case GMA_HASWELL_E_GT3: // 042e
-        case GMA_HASWELL_D_GT3: // 0422
-        case GMA_HASWELL_M_GT3: // 0426
-        case GMA_HASWELL_S_GT3: // 042a
-        case GMA_HASWELL_ULT_M_GT1: // 0a06
-        case GMA_HASWELL_ULT_E_GT1: // 0a0e
         case GMA_HASWELL_ULT_M_GT2: // 0a16
         case GMA_HASWELL_ULT_E_GT2: // 0a1e
-        case GMA_HASWELL_ULT_D_GT3: // 0a22
-        case GMA_HASWELL_ULT_M_GT3: // 0a26
-        case GMA_HASWELL_ULT_S_GT3: // 0a2a
-        case GMA_HASWELL_ULT_E_GT3: // 0a2e
-        case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
-        case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
-        case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
-        case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
-        case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
-        case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
-        case GMA_HASWELL_CRW_D_GT1: // 0d02
-        case GMA_HASWELL_CRW_D_GT2: // 0d12
-        case GMA_HASWELL_CRW_D_GT3: // 0d22
-        case GMA_HASWELL_CRW_M_GT1: // 0d06
-        case GMA_HASWELL_CRW_M_GT2: // 0d16
-        case GMA_HASWELL_CRW_M_GT3: // 0d26
-        case GMA_HASWELL_CRW_S_GT1: // 0d0a
-        case GMA_HASWELL_CRW_S_GT2: // 0d1a
-        case GMA_HASWELL_CRW_S_GT3: // 0d2a
-        case GMA_HASWELL_CRW_B_GT1: // 0d0b
-        case GMA_HASWELL_CRW_B_GT2: // 0d1b
-        case GMA_HASWELL_CRW_B_GT3: // 0d2b
-        case GMA_HASWELL_CRW_E_GT1: // 0d0e
-        case GMA_HASWELL_CRW_E_GT2: // 0d1e
-        case GMA_HASWELL_CRW_E_GT3: // 0d2e
-        case GMA_HASWELL_CRW_M_GT2_PLUS_IG: // 0d36
+		verbose(" Inject a valid desktop GPU device id (0x0412) instead of patching kexts");
+		device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
+		devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
+		devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
+		devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 
-            if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_HSW * 2)
-            {
-                uint8_t new_aapl0[AAPL_LEN_HSW];
-                
-                if (hex2bin(value, new_aapl0, AAPL_LEN_HSW) == 0)
-                {
-                    memcpy(default_aapl_haswell, new_aapl0, AAPL_LEN_HSW);
-                    
-                    verbose("Using user supplied AAPL,ig-platform-id\n");
-                    verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
-                            default_aapl_haswell[0], default_aapl_haswell[1], default_aapl_haswell[2], default_aapl_haswell[3]);
-                }
-                devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_haswell, AAPL_LEN_HSW);
-            }
-            else if (getIntForKey(kIntelAzulFB, &n_igs, &bootInfo->chameleonConfig))
-            {
-                if ((n_igs >= 0) || (n_igs <= 15))
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
-                    devprop_add_value(device, "AAPL,ig-platform-id", haswell_ig_vals[n_igs], 4);
-                }
-                else
-                {
-                    verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 15.\n");
-                }
-            }
-            else
-            {
-		uint32_t ig_platform_id = 0x0000260c; // set the default platform ig
-		devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
-            }
+	case GMA_HASWELL_D_GT1: // 0402
+	case GMA_HASWELL_M_GT1: // 0406
+	case GMA_HASWELL_S_GT1: // 040a
+	case GMA_HASWELL_D_GT2: // 0412
+	case GMA_HASWELL_S_GT2: // 041a
+	case GMA_HASWELL_E_GT1: // 040e
+	case GMA_HASWELL_E_GT3: // 042e
+	case GMA_HASWELL_D_GT3: // 0422
+	case GMA_HASWELL_M_GT3: // 0426
+	case GMA_HASWELL_S_GT3: // 042a
+	case GMA_HASWELL_ULT_M_GT1: // 0a06
+	case GMA_HASWELL_ULT_E_GT1: // 0a0e
+	case GMA_HASWELL_ULT_D_GT3: // 0a22
+	case GMA_HASWELL_ULT_M_GT3: // 0a26
+	case GMA_HASWELL_ULT_S_GT3: // 0a2a
+	case GMA_HASWELL_ULT_E_GT3: // 0a2e
+	case GMA_HASWELL_SDV_D_GT1_IG: // 0c02
+	case GMA_HASWELL_SDV_M_GT1_IG: // 0c06
+	case GMA_HASWELL_SDV_D_GT2_IG: // 0c12
+	case GMA_HASWELL_SDV_M_GT2_IG: // 0c16
+	case GMA_HASWELL_SDV_D_GT2_PLUS_IG: // 0c22
+	case GMA_HASWELL_SDV_M_GT2_PLUS_IG: // 0c26
+	case GMA_HASWELL_CRW_D_GT1: // 0d02
+	case GMA_HASWELL_CRW_D_GT2: // 0d12
+	case GMA_HASWELL_CRW_D_GT3: // 0d22
+	case GMA_HASWELL_CRW_M_GT1: // 0d06
+	case GMA_HASWELL_CRW_M_GT2: // 0d16
+	case GMA_HASWELL_CRW_M_GT3: // 0d26
+	case GMA_HASWELL_CRW_S_GT1: // 0d0a
+	case GMA_HASWELL_CRW_S_GT2: // 0d1a
+	case GMA_HASWELL_CRW_S_GT3: // 0d2a
+	case GMA_HASWELL_CRW_B_GT1: // 0d0b
+	case GMA_HASWELL_CRW_B_GT2: // 0d1b
+	case GMA_HASWELL_CRW_B_GT3: // 0d2b
+	case GMA_HASWELL_CRW_E_GT1: // 0d0e
+	case GMA_HASWELL_CRW_E_GT2: // 0d1e
+	case GMA_HASWELL_CRW_E_GT3: // 0d2e
+	case GMA_HASWELL_CRW_M_GT2_PLUS_IG: // 0d36
 
-            devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
-            devprop_add_value(device, "built-in", &BuiltIn, 1);
-            devprop_add_value(device, "class-code", ClassFix, 4);
-            //devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
-            break;
+		if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_HSW * 2)
+		{
+			uint8_t new_aapl0[AAPL_LEN_HSW];
 
-        default:
-            break;
+			if (hex2bin(value, new_aapl0, AAPL_LEN_HSW) == 0)
+			{
+				memcpy(default_aapl_haswell, new_aapl0, AAPL_LEN_HSW);
+
+				verbose("Using user supplied AAPL,ig-platform-id\n");
+				verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_haswell[0], default_aapl_haswell[1], default_aapl_haswell[2], default_aapl_haswell[3]);
+			}
+			devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_haswell, AAPL_LEN_HSW);
+		}
+		else if (getIntForKey(kIntelAzulFB, &n_igs, &bootInfo->chameleonConfig))
+		{
+			if ((n_igs >= 0) || (n_igs <= 15))
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+				devprop_add_value(device, "AAPL,ig-platform-id", haswell_ig_vals[n_igs], 4);
+			}
+			else
+			{
+				verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 15.\n");
+			}
+		}
+		else
+		{
+			uint32_t ig_platform_id = 0x0000260c; // set the default platform ig
+			devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+		}
+
+		devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+		devprop_add_value(device, "built-in", &BuiltIn, 1);
+		devprop_add_value(device, "class-code", ClassFix, 4);
+		//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+		break;
+
+	default:
+		break;
 	}
 
 	stringdata = malloc(sizeof(uint8_t) * string->length);

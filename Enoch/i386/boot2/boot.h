@@ -132,7 +132,7 @@
 #define kUseIntelHDMI			"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 
 /* Signal64: added this key */
-#define kLegacyOff		"USBLegacyOff"		/* usb.c */
+#define kLegacyOff			"USBLegacyOff"		/* usb.c */
 
 /* Lebidou: added this key */
 
@@ -186,25 +186,25 @@
 
 /* cparm: added these keys */
 //#define kRebootOnPanic		"RebootOnPanic"
-//#define kEnableHiDPI			"EnableHiDPI"		/* enable High resolution display (aka Retina) */
+//#define kEnableHiDPI			"EnableHiDPI"			/* enable High resolution display (aka Retina) */
 
 /* ErmaC: added these keys */
-#define kEnableDualLink			"EnableDualLink"	/* ati.c && nvidia.c && gma.c*/
-#define kNvidiaGeneric			"NvidiaGeneric"		/* nvidia.c */
+#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
+#define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
 #define kSkipIntelGfx			"SkipIntelGfx"		/* pci_setup.c */
-#define kSkipNvidiaGfx			"SkipNvidiaGfx"		/* pci_setup.c */
-#define kSkipAtiGfx			"SkipAtiGfx"		/* pci_setup.c */
+#define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
+#define kSkipAtiGfx			"SkipAtiGfx"			/* pci_setup.c */
 //#define kUsbInject			"USBInject"		/* usb.c */
-#define kIntelCapriFB			"IntelCapriFB"		/* gma.c was HD4K-ig */
-#define kIntelAzulFB			"IntelAzulFB"		/* gma.c was HD5K-ig */
-#define kAAPLCustomIG			"InjectIntel-ig"	/* gma.c */
-#define kHDAEnabler			"HDAEnabler"		/* pci_setup.c */
-#define kHDEFLayoutID			"HDEFLayoutID"		/* hda.c */
-#define kHDAULayoutID			"HDAULayoutID"		/* hda.c */
-#define kBGRT				"BGRT"			/* acpi_patcher.c */
-#define kDropBGRT			"DropBGRT"		/* acpi_patcher.c */
-#define kDropMCFG			"DropMCFG"		/* acpi_patcher.c */
-#define kDropAPIC			"DropAPIC"		/* acpi_patcher.c */
+#define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
+#define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
+#define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
+#define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
+#define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
+#define kHDAULayoutID			"HDAULayoutID"			/* hda.c */
+#define kBGRT				"BGRT"				/* acpi_patcher.c */
+#define kDropBGRT			"DropBGRT"			/* acpi_patcher.c */
+#define kDropMCFG			"DropMCFG"			/* acpi_patcher.c */
+#define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
 
 /* Karas: added these keys */
 #define kMemFullInfo			"ForceFullMemInfo"		/* smbios.c */
