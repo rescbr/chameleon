@@ -104,7 +104,7 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	snprintf(dirSpec, sizeof(dirSpec), "%s", filename); 
+	snprintf(dirSpec, sizeof(dirSpec), "%s", filename);
 	fd = open(dirSpec, 0);
 	if (fd < 0)
 	{
