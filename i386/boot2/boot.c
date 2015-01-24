@@ -72,7 +72,11 @@
  */
 #define kBootErrorTimeout 5
 
-bool		gOverrideKernel, gEnableCDROMRescan, gScanSingleDrive, useGUI;
+bool		gOverrideKernel;
+bool		gEnableCDROMRescan;
+bool		gScanSingleDrive;
+bool		useGUI;
+
 static bool	gUnloadPXEOnExit = false;
 
 static char	gCacheNameAdler[64 + 256];
@@ -81,10 +85,14 @@ char		*gPlatformName = gCacheNameAdler;
 char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
 char		gMacOSVersion[8];
-int		bvCount = 0, gDeviceCount = 0;
+int		bvCount = 0;
+int		gDeviceCount = 0;
 //int		menucount = 0;
 long		gBootMode; /* defaults to 0 == kBootModeNormal */
-BVRef		bvr, menuBVR, bvChain;
+
+BVRef		bvr;
+BVRef		menuBVR;
+BVRef		bvChain;
 
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);

@@ -654,7 +654,7 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 			}
 		}
-		/* Mobile CPU */
+		// Mobile CPU
 		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
 		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
@@ -664,13 +664,13 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		switch(p->CPU.ExtFamily)
 		{
-			case 0x00: /* K8 */
+			case 0x00: //* K8 *//
 				msr = rdmsr64(K8_FIDVID_STATUS);
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) / 2 + 4;
 				break;
 
-			case 0x01: /* K10 */
+			case 0x01: //* K10 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
@@ -688,7 +688,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x05: /* K14 */
+			case 0x05: //* K14 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
 				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
@@ -696,7 +696,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x02: /* K11 */
+			case 0x02: //* K11 *//
 				// not implimented
 				break;
 		}
@@ -773,14 +773,14 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\n---------------------------------------------\n");
    	DBG("------------------ CPU INFO -----------------\n");
 	DBG("---------------------------------------------\n");
-	DBG("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
-	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
-	DBG("Family:                  0x%x\n",		p->CPU.Family); // Family ex: 6 (06h)
+	DBG("Brand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
+	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
+	DBG("Family:                  0x%x\n",		p->CPU.Family);			// Family ex: 6 (06h)
 	DBG("ExtFamily:               0x%x\n",		p->CPU.ExtFamily);
-	DBG("Signature:               %x\n",		p->CPU.Signature); // CPUID signature
-	DBG("Model:                   0x%x\n",		p->CPU.Model); // Model ex: 37 (025h)
+	DBG("Signature:               %x\n",		p->CPU.Signature);		// CPUID signature
+	DBG("Model:                   0x%x\n",		p->CPU.Model);			// Model ex: 37 (025h)
 	DBG("ExtModel:                0x%x\n",		p->CPU.ExtModel);
-	DBG("Stepping:                0x%x\n",		p->CPU.Stepping); // Stepping ex: 5 (05h)
+	DBG("Stepping:                0x%x\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
 	DBG("MaxCoef:                 0x%x\n",		p->CPU.MaxCoef);
 	DBG("CurrCoef:                0x%x\n",		p->CPU.CurrCoef);
 	DBG("MaxDiv:                  0x%x\n",		p->CPU.MaxDiv);
@@ -788,8 +788,8 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
 	DBG("FSBFreq:                 %dMHz\n",		p->CPU.FSBFrequency / 1000000);
 	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",		p->CPU.NoCores); // Cores
-	DBG("Logical processor:       %d\n",		p->CPU.NoThreads); // Logical procesor
+	DBG("Cores:                   %d\n",		p->CPU.NoCores);		// Cores
+	DBG("Logical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
 	DBG("Features:                0x%08x\n",	p->CPU.Features);
 
 	DBG("\n---------------------------------------------\n");

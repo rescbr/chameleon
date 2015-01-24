@@ -88,9 +88,9 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPU_FEATURE_MSR			0x00000200		// MSR Support
 
 /* SMBIOS Memory Types */ 
-#define SMB_MEM_TYPE_UNDEFINED	0
+#define SMB_MEM_TYPE_UNDEFINED		0
 #define SMB_MEM_TYPE_OTHER		1
-#define SMB_MEM_TYPE_UNKNOWN	2
+#define SMB_MEM_TYPE_UNKNOWN		2
 #define SMB_MEM_TYPE_DRAM		3
 #define SMB_MEM_TYPE_EDRAM		4
 #define SMB_MEM_TYPE_VRAM		5
