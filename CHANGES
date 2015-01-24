@@ -1,8 +1,9 @@
-- Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service
-- Zenith432 : Use caching with ExFat filesystem
-- Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff)
+- Bungo : Added Logging start time.
+- Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service.
+- Zenith432 : Use caching with ExFat filesystem.
+- Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff).
 - ErmaC : C6 & C7 States credits to Clover Team.
-- ErmaC : define recursive cpu series for BrandString
+- ErmaC : define recursive cpu series for BrandString.
 - Zenith432 : saio_types.h, biosfn.c - minor typo in bios-defined data structure that isn't actually used.
 fake_efi.c - eliminate redundant scan of bt(0,0) in setupSmbiosConfigFile.  loadConfigFile already does a fall-back scan of bt(0,0), so another scan isn't needed.
 sys.c - While scanning a volume, getOSVersion looks for 5 files and switches back-n-forth between hd(X,Y)/....SystemVersion.plist on the newly scanned volume and bt(0,0)/hd(X,Y)/...SystemVersion.plist - which is an invalid path - should always return an error.
