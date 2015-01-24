@@ -621,7 +621,7 @@ int loadSystemConfig(config_file_t *config)
 	char *dirspec[] = {
 		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Installer (Lion 10.7)
 		"/OS X Install Data/com.apple.Boot.plist",				// OS X Installer (10.8+)
-		"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer
+		//"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer
 		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",	// com.apple.Boot.plist
 		"/com.apple.recovery.boot/com.apple.Boot.plist"				// OS X Recovery
 	};
