@@ -236,22 +236,22 @@ static uint64_t measure_aperf_frequency(void)
  */
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency = 0;
-	uint64_t	fsbFrequency = 0;
-	uint64_t	cpuFrequency = 0;
-	uint64_t	msr = 0;
-	uint64_t	flex_ratio = 0;
+	uint64_t	tscFrequency	= 0;
+	uint64_t	fsbFrequency	= 0;
+	uint64_t	cpuFrequency	= 0;
+	uint64_t	msr		= 0;
+	uint64_t	flex_ratio	= 0;
 
-	uint32_t	max_ratio = 0;
-	uint32_t	min_ratio = 0;
+	uint32_t	max_ratio	= 0;
+	uint32_t	min_ratio	= 0;
 	uint32_t	reg[4];
 
-	uint8_t		bus_ratio_max = 0;
-	uint8_t		bus_ratio_min = 0;
-	uint8_t		currdiv = 0;
-	uint8_t		currcoef = 0;
-	uint8_t		maxdiv = 0;
-	uint8_t		maxcoef = 0;
+	uint8_t		bus_ratio_max	= 0;
+	uint8_t		bus_ratio_min	= 0;
+	uint8_t		currdiv		= 0;
+	uint8_t		currcoef	= 0;
+	uint8_t		maxdiv		= 0;
+	uint8_t		maxcoef		= 0;
 
 	const char	*newratio;
 	char		str[128];
