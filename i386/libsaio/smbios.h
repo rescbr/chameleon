@@ -566,7 +566,7 @@ typedef struct SMBProcessorInformation
 	SMBString  serialNumber;
 	SMBString  assetTag;
 	SMBString  partNumber;
-	// 2.5+ spec (40 bytes)
+	// 2.5+ spec (40 bytes)  Apple still uses 2.4 spec
 	SMBByte    coreCount;
 	SMBByte    coreEnabled;
 	SMBByte    threadCount;

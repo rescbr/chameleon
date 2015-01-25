@@ -1313,7 +1313,8 @@ uint8_t *FixSystemUUID()
 		}
 	}
 
-	if (isZero || isOnes)  { // if empty or setable...
+	if (isZero || isOnes) // if empty or setable...
+	{
 		verbose("No UUID present in SMBIOS System Information Table\n");
 		ret = FixedUUID; // ...set a fixed value for system-id = 000102030405060708090A0B0C0D0E0F
 	}
@@ -1472,7 +1473,7 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 						break;
 				}
 				break;
-				//
+
 			case kSMBTypePhysicalMemoryArray:
 				Platform.DMI.MaxMemorySlots += ((SMBPhysicalMemoryArray *)structHeader)->numMemoryDevices;
 				break;

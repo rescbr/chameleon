@@ -1120,8 +1120,8 @@ static int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
-	char            *propStr;
-	unsigned long   count       = 0;
+	char		*propStr;
+	unsigned long	count = 0;
 
 	propStr = newStringForKey((char *)propKey , &bootInfo->chameleonConfig);
 
@@ -1267,7 +1267,7 @@ int getVideoMode(void)
 // Display and clear the activity indicator.
 
 // BASIC Indicator
-static char indicator[] = {'-', '\\', '|', '/', '-', '\\', '|', '/', '\0'};
+static char indicator[] = {'-', '\\', '|', '/', '\0'};
 
 // To prevent a ridiculously fast-spinning indicator,
 // ensure a minimum of 1/9 sec between animation frames.

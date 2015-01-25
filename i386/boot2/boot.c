@@ -721,7 +721,7 @@ void common_boot(int biosdev)
 		}
 		else
 		{
-			verbose("Kernel Cache using disabled by user.");
+			DBG("Kernel Cache using disabled by user.\n");
 		}
 
 		do
