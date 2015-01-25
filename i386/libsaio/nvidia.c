@@ -1567,89 +1567,110 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 
 static int patch_nvidia_rom(uint8_t *rom)
 {
-	if (!rom)
-	{
-		printf("ROM not found\n");
-		return PATCH_ROM_FAILED;
-	}
-	if (rom[0] != 0x55 && rom[1] != 0xaa)
-	{
-		printf("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
-		return PATCH_ROM_FAILED;
-	}
-
-	uint16_t dcbptr = READ_LE_SHORT(rom, 0x36);
-
-	if (!dcbptr) {
-		printf("no dcb table found\n");
-		return PATCH_ROM_FAILED;
-	}
-//	else
-//		printf("dcb table at offset 0x%04x\n", dcbptr);
-
-	uint8_t *dcbtable	 = &rom[dcbptr];
-	uint8_t dcbtable_version = dcbtable[0];
-	uint8_t headerlength	 = 0;
-	uint8_t numentries	 = 0;
-	uint8_t recordlength	 = 0;
-	
-	if (dcbtable_version >= 0x20) {
-		uint32_t sig;
-		
-		if (dcbtable_version >= 0x30) {
-			headerlength = dcbtable[1];
-			numentries	 = dcbtable[2];
-			recordlength = dcbtable[3];
-
-			sig = READ_LE_INT(dcbtable, 6);
-		} else {
-			sig = READ_LE_INT(dcbtable, 4);
-			headerlength = 8;
-		}
-
-		if (sig != 0x4edcbdcb) {
-			printf("Bad display config block signature (0x%8x)\n", sig); //Azi: issue #48
-			return PATCH_ROM_FAILED;
-		}
-	} else if (dcbtable_version >= 0x14) { /* some NV15/16, and NV11+ */
-		char sig[8] = { 0 };
-		
-		strncpy(sig, (char *)&dcbtable[-7], 7);
-		recordlength = 10;
-
-		if (strcmp(sig, "DEV_REC")) {
-			printf("Bad Display Configuration Block signature (%s)\n", sig);
-			return PATCH_ROM_FAILED;
-		}
-	} else {
-		printf("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
-		return PATCH_ROM_FAILED;
-	}
-	
-	if (numentries >= MAX_NUM_DCB_ENTRIES) {
-		numentries = MAX_NUM_DCB_ENTRIES;
-	}
-
-	uint8_t num_outputs = 0, i = 0;
-
+	uint8_t		num_outputs	= 0;
+	uint8_t		i		= 0;
+	uint8_t		dcbtable_version;
+	uint8_t		headerlength	= 0;
+	uint8_t		numentries	= 0;
+	uint8_t		recordlength	= 0;
+	uint8_t		channel1	= 0;
+	uint8_t		channel2	= 0;
+	uint16_t	dcbptr;
+	uint8_t		*dcbtable;
+	uint8_t		*togroup;
+	int		has_lvds	= false;
 	struct dcbentry {
 		uint8_t type;
 		uint8_t index;
 		uint8_t *heads;
-	} entries[numentries];
+	} entries[MAX_NUM_DCB_ENTRIES];
 
-	for (i = 0; i < numentries; i++) {
+	DBG("patch_nvidia_rom.\n");
+	if (!rom || (rom[0] != 0x55 && rom[1] != 0xaa))
+	{
+		DBG("False ROM signature: 0x%02x%02x\n", rom[0], rom[1]);
+		return PATCH_ROM_FAILED;
+	}
+
+	dcbptr = *(uint16_t *)&rom[0x36];
+
+	if (!dcbptr)
+	{
+		DBG("no dcb table found\n");
+		return PATCH_ROM_FAILED;
+	}
+//	else
+//	{
+//		DBG("dcb table at offset 0x%04x\n", dcbptr);
+//	}
+
+	dcbtable		= &rom[dcbptr];
+	dcbtable_version	= dcbtable[0];
+
+	if (dcbtable_version >= 0x20)
+	{
+		uint32_t sig;
+		
+		if (dcbtable_version >= 0x30)
+		{
+			headerlength	= dcbtable[1];
+			numentries	= dcbtable[2];
+			recordlength	= dcbtable[3];
+
+			sig = *(uint32_t *)&dcbtable[6];
+		}
+		else
+		{
+			sig = *(uint32_t *)&dcbtable[4];
+			headerlength = 8;
+		}
+
+		if (sig != 0x4edcbdcb)
+		{
+			DBG("Bad display config block signature (0x%8x)\n", sig); //Azi: issue #48
+			return PATCH_ROM_FAILED;
+		}
+	}
+	else if (dcbtable_version >= 0x14) { /* some NV15/16, and NV11+ */
+		char sig[8];
+		
+		strncpy(sig, (char *)&dcbtable[-7], 7);
+		sig[7] = 0;
+		recordlength = 10;
+
+		if (strcmp(sig, "DEV_REC"))
+		{
+			DBG("Bad Display Configuration Block signature (%s)\n", sig);
+			return PATCH_ROM_FAILED;
+		}
+	}
+	else
+	{
+		DBG("ERROR: dcbtable_version is 0x%X\n", dcbtable_version);
+		return PATCH_ROM_FAILED;
+	}
+	
+	if (numentries >= MAX_NUM_DCB_ENTRIES)
+	{
+		numentries = MAX_NUM_DCB_ENTRIES;
+	}
+
+	for (i = 0; i < numentries; i++)
+	{
 		uint32_t connection;
-		connection = READ_LE_INT(dcbtable,headerlength + recordlength * i);
+		connection = *(uint32_t *)&dcbtable[headerlength + recordlength * i];
 
 		/* Should we allow discontinuous DCBs? Certainly DCB I2C tables can be discontinuous */
-		if ((connection & 0x0000000f) == 0x0000000f) { /* end of records */ 
+		if ((connection & 0x0000000f) == 0x0000000f) /* end of records */
+		{
 			continue;
 		}
-		if (connection == 0x00000000) { /* seen on an NV11 with DCB v1.5 */ 
+		if (connection == 0x00000000) /* seen on an NV11 with DCB v1.5 */
+		{
 			continue;
 		}
-		if ((connection & 0xf) == 0x6) { /* we skip type 6 as it doesnt appear on macbook nvcaps */
+		if ((connection & 0xf) == 0x6) /* we skip type 6 as it doesnt appear on macbook nvcaps */
+		{
 			continue;
 		}
 
@@ -1658,71 +1679,83 @@ static int patch_nvidia_rom(uint8_t *rom)
 		entries[num_outputs++].heads = (uint8_t*)&(dcbtable[(headerlength + recordlength * i) + 1]);
 
 	}
-	
-	int has_lvds = false;
-	uint8_t channel1 = 0, channel2 = 0;
 
-	for (i = 0; i < num_outputs; i++) {
-		if (entries[i].type == 3) {
+	for (i = 0; i < num_outputs; i++)
+	{
+		if (entries[i].type == 3)
+		{
 			has_lvds = true;
-			//printf("found LVDS\n");
-			channel1 |= ( 0x1 << entries[i].index);
+			//DBG("found LVDS\n");
+			channel1 |= ( 0x1 << entries[i].index );
 			entries[i].type = TYPE_GROUPED;
 		}
 	}
 
 	// if we have a LVDS output, we group the rest to the second channel
-	if (has_lvds) {
-		for (i = 0; i < num_outputs; i++) {
-			if (entries[i].type == TYPE_GROUPED) {
+	if (has_lvds)
+	{
+		for (i = 0; i < num_outputs; i++)
+		{
+			if (entries[i].type == TYPE_GROUPED)
+			{
 				continue;
 			}
 
-			channel2 |= ( 0x1 << entries[i].index);
+			channel2 |= ( 0x1 << entries[i].index );
 			entries[i].type = TYPE_GROUPED;
 		}
-	} else {
+	}
+	else
+	{
 		int x;
 		// we loop twice as we need to generate two channels
-		for (x = 0; x <= 1; x++) {
-			for (i=0; i<num_outputs; i++) {
-				if (entries[i].type == TYPE_GROUPED) {
+		for (x = 0; x <= 1; x++)
+		{
+			for (i=0; i<num_outputs; i++)
+			{
+				if (entries[i].type == TYPE_GROUPED)
+				{
 					continue;
 				}
 				// if type is TMDS, the prior output is ANALOG
 				// we always group ANALOG and TMDS
 				// if there is a TV output after TMDS, we group it to that channel as well
-				if (i && entries[i].type == 0x2) {
-					switch (x) {
+				if (i && entries[i].type == 0x2)
+				{
+					switch (x)
+					{
 						case 0:
-							//printf("group channel 1\n");
-							channel1 |= ( 0x1 << entries[i].index);
+							//DBG("group channel 1\n");
+							channel1 |= ( 0x1 << entries[i].index );
 							entries[i].type = TYPE_GROUPED;
 
-							if (entries[i-1].type == 0x0) {
-								channel1 |= ( 0x1 << entries[i-1].index);
+							if (entries[i-1].type == 0x0)
+							{
+								channel1 |= ( 0x1 << entries[i-1].index );
 								entries[i-1].type = TYPE_GROUPED;
 							}
 							// group TV as well if there is one
-							if ( ((i+1) < num_outputs) && (entries[i+1].type == 0x1) ) {
-								//	printf("group tv1\n");
-								channel1 |= ( 0x1 << entries[i+1].index);
+							if ( ((i+1) < num_outputs) && (entries[i+1].type == 0x1) )
+							{
+								//	DBG("group tv1\n");
+								channel1 |= ( 0x1 << entries[i+1].index );
 								entries[i+1].type = TYPE_GROUPED;
 							}
 							break;
 
 						case 1:
-							//printf("group channel 2 : %d\n", i);
-							channel2 |= ( 0x1 << entries[i].index);
+							//DBG("group channel 2 : %d\n", i);
+							channel2 |= ( 0x1 << entries[i].index );
 							entries[i].type = TYPE_GROUPED;
 
 							if (entries[i - 1].type == 0x0) {
-								channel2 |= ( 0x1 << entries[i-1].index);
+								channel2 |= ( 0x1 << entries[i-1].index );
 								entries[i-1].type = TYPE_GROUPED;
 							}
 							// group TV as well if there is one
-							if ( ((i+1) < num_outputs) && (entries[i+1].type == 0x1) ) {
-								//	printf("group tv2\n");
+							if ( ((i+1) < num_outputs) && (entries[i+1].type == 0x1) )
+							{
+								//	DBG("group tv2\n");
 								channel2 |= ( 0x1 << entries[i+1].index);
 								entries[i+1].type = TYPE_GROUPED;
 							}
@@ -1738,20 +1771,23 @@ static int patch_nvidia_rom(uint8_t *rom)
 	}
 	
 	// if we have left ungrouped outputs merge them to the empty channel
-	uint8_t *togroup;// = (channel1 ? (channel2 ? NULL : &channel2) : &channel1);
-	togroup = &channel2;
+	togroup = &channel2; // = (channel1 ? (channel2 ? NULL : &channel2) : &channel1);
 
-	for (i = 0; i < num_outputs; i++) {
-		if (entries[i].type != TYPE_GROUPED) {
-			//printf("%d not grouped\n", i);
-			if (togroup) {
+	for (i = 0; i < num_outputs; i++)
+	{
+		if (entries[i].type != TYPE_GROUPED)
+		{
+			//DBG("%d not grouped\n", i);
+			if (togroup)
+			{
 				*togroup |= ( 0x1 << entries[i].index);
 			}
 			entries[i].type = TYPE_GROUPED;
 		}
 	}
 	
-	if (channel1 > channel2) {
+	if (channel1 > channel2)
+	{
 		uint8_t buff = channel1;
 		channel1 = channel2;
 		channel2 = buff;
@@ -1924,7 +1960,8 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 
 unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
-	unsigned long long vram_size = 0;
+	uint64_t vram_size = 0;
+	// unsigned long long vram_size = 0;
 
 	// First check if any value exist in the plist
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
@@ -1991,15 +2028,16 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 	}
 
 	if (!vram_size)
-	{ // Finally, if vram_size still not set do the calculation with our own method
+	{
+		// Finally, if vram_size still not set do the calculation with our own method
 		if (nvCardType < NV_ARCH_50)
 		{
-			vram_size  = REG32(NV04_PFB_FIFO_DATA);
+			vram_size  = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
 			vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
 		}
 		else if (nvCardType < NV_ARCH_C0)
 		{
-			vram_size = REG32(NV04_PFB_FIFO_DATA);
+			vram_size = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
 			vram_size |= (vram_size & 0xff) << 32;
 			vram_size &= 0xffffffff00ll;
 		}
@@ -2009,32 +2047,35 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
 		}
 	}
-
+	DBG("mem_detected %ld\n", vram_size);
 	return vram_size;
 }
 
-static bool checkNvRomSig(uint8_t * aRom){
+static uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
+
+static bool checkNvRomSig(uint8_t * aRom)
+{
 	return aRom != NULL && (aRom[0] == 0x55 && aRom[1] == 0xaa);
 }
 
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
-	struct DevPropDevice		*device = NULL;
-	char				*devicepath = NULL;
+	struct DevPropDevice		*device		= NULL;
+	char				*devicepath	= NULL;
 	option_rom_pci_header_t		*rom_pci_header;
 	volatile uint8_t		*regs;
-	uint8_t				*rom = NULL;
-	uint8_t				nvCardType = 0;
-	unsigned long long		videoRam = 0;
+	uint8_t				*rom		= NULL;
+	uint8_t				nvCardType	= 0;
+	uint64_t			videoRam	= 0;
 	uint32_t			nvBiosOveride;
 	uint32_t			bar[7];
-	uint32_t			boot_display = 0;
+	uint32_t			boot_display	= 0;
 	int				nvPatch = 0;
 	int				len;
 	char				biosVersion[64];
 	char				nvFilename[64];
 	char				kNVCAP[12];
-	char				*model = NULL;
+	char				*model		= NULL;
 	const char			*value;
 
 	fill_card_list();
@@ -2159,6 +2200,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	{
 		string = devprop_create_string();
 	}
+
 	device = devprop_add_device(string, devicepath);
 
 	/* FIXME: for primary graphics card only */
@@ -2313,11 +2355,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	//http://forge.voodooprojects.org/p/chameleon/issues/67/
 	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit)
 	{
-		static uint8_t connector_type_1[]= {0x00, 0x08, 0x00, 0x00};
-		//devprop_add_value(device, "@0,connector-type",connector_type_1, 4);
 		devprop_add_value(device, "@1,connector-type",connector_type_1, 4);
-		//devprop_add_value(device, "@2,connector-type",connector_type_1, 4);
-		//devprop_add_value(device, "@3,connector-type",connector_type_1, 4);
 	}
 	/************************ End Audio *************************/
 
