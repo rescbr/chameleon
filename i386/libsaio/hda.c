@@ -92,107 +92,111 @@ uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 static hda_controller_devices know_hda_controller[] = {
 	//8086  Intel Corporation
-	{ HDA_INTEL_HASWELL,	"Haswell-ULT" },
-	{ HDA_INTEL_HASWELL2,	"Haswell" },
-	{ HDA_INTEL_CRYSTAL,	"Crystal Well" },
-	{ HDA_INTEL_CPT,	"6 Series/C200 Series Chipset Family" },
-	{ HDA_INTEL_PATSBURG,	"C600/X79 series chipset" },
-	{ HDA_INTEL_PPT1,	"7 Series/C210 Series Chipset Family" },
-	{ HDA_INTEL_82801F,	"82801FB/FBM/FR/FW/FRW (ICH6 Family)" },
-	{ HDA_INTEL_63XXESB,	"631x/631xESB/632xESB" },
-	{ HDA_INTEL_82801G,	"NM10/ICH7 Family" },
-	{ HDA_INTEL_82801H,	"82801H (ICH8 Family)" },
-	{ HDA_INTEL_82801I,	"82801I (ICH9 Family)" },
-	{ HDA_INTEL_82801JI,	"82801JI (ICH10 Family)" },
-	{ HDA_INTEL_82801JD,	"82801JD/DO (ICH10 Family) " },
-	{ HDA_INTEL_PCH,	"5 Series/3400 Series" },
-	{ HDA_INTEL_PCH2,	"5 Series/3400 Series" },
-	{ HDA_INTEL_SCH,	"System Controller Hub (SCH Poulsbo)" },
-	{ HDA_INTEL_SCH2,	"Wildcat Point" },
-	{ HDA_INTEL_LPT1,	"Wellsburg" },
-	{ HDA_INTEL_LPT2,	"Wellsburg" },
-	{ HDA_INTEL_LYNX,	"Lynx Point" },
-	{ HDA_INTEL_LYNX2,	"Lynx Point" },
+	{ HDA_INTEL_OAK,	"Oaktrail"	/*, 0, 0 */ },
+	{ HDA_INTEL_BAY,	"BayTrail"	/*, 0, 0 */ },
+	{ HDA_INTEL_HSW1,	"Haswell"	/*, 0, 0 */ },
+	{ HDA_INTEL_HSW2,	"Haswell"	/*, 0, 0 */ },
+	{ HDA_INTEL_HSW3,	"Haswell"	/*, 0, 0 */ },
+	{ HDA_INTEL_CPT,	"Cougar Point"	/*, 0, 0 */ },
+	{ HDA_INTEL_PATSBURG,	"Patsburg"	/*, 0, 0 */ },
+	{ HDA_INTEL_PPT1,	"Panther Point"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPT1,	"Lynx Point"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPT2,	"Lynx Point"	/*, 0, 0 */ },
+	{ HDA_INTEL_WCPT,	"Wildcat Point"	/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS1,	"Wellsburg"	/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS2,	"Wellsburg"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP1,	"Lynx Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP2,	"Lynx Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801F,	"82801F"	/*, 0, 0 */ },
+	{ HDA_INTEL_63XXESB,	"631x/632xESB"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801G,	"82801G"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801H,	"82801H"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801I,	"82801I"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801JI,	"82801JI"	/*, 0, 0 */ },
+	{ HDA_INTEL_82801JD,	"82801JD"	/*, 0, 0 */ },
+	{ HDA_INTEL_PCH,	"5 Series/3400 Series" /*, 0, 0 */ },
+	{ HDA_INTEL_PCH2,	"5 Series/3400 Series" /*, 0, 0 */ },
+	{ HDA_INTEL_SCH,	"SCH"		/*, 0, 0 */ },
 	//10de  NVIDIA Corporation
-	{ HDA_NVIDIA_MCP51,	"MCP51" },
-	{ HDA_NVIDIA_MCP55,	"MCP55" },
-	{ HDA_NVIDIA_MCP61_1, "MCP61" },
-	{ HDA_NVIDIA_MCP61_2, "MCP61" },
-	{ HDA_NVIDIA_MCP65_1, "MCP65" },
-	{ HDA_NVIDIA_MCP65_2, "MCP65" },
-	{ HDA_NVIDIA_MCP67_1, "MCP67" },
-	{ HDA_NVIDIA_MCP67_2, "MCP67" },
-	{ HDA_NVIDIA_MCP73_1, "MCP73" },
-	{ HDA_NVIDIA_MCP73_2, "MCP73" },
-	{ HDA_NVIDIA_MCP78_1, "MCP78" },
-	{ HDA_NVIDIA_MCP78_2, "MCP78" },
-	{ HDA_NVIDIA_MCP78_3, "MCP78" },
-	{ HDA_NVIDIA_MCP78_4, "MCP78" },
-	{ HDA_NVIDIA_MCP79_1, "MCP79" },
-	{ HDA_NVIDIA_MCP79_2, "MCP79" },
-	{ HDA_NVIDIA_MCP79_3, "MCP79" },
-	{ HDA_NVIDIA_MCP79_4, "MCP79" },
-	{ HDA_NVIDIA_MCP89_1, "MCP89" },
-	{ HDA_NVIDIA_MCP89_2, "MCP89" },
-	{ HDA_NVIDIA_MCP89_3, "MCP89" },
-	{ HDA_NVIDIA_MCP89_4, "MCP89" },
-	{ HDA_NVIDIA_0BE2,   "(0x0be2)" },
-	{ HDA_NVIDIA_0BE3,   "(0x0be3)" },
-	{ HDA_NVIDIA_0BE4,   "(0x0be4)" },
-	{ HDA_NVIDIA_GT100,  "GT100" },
-	{ HDA_NVIDIA_GT104,  "GT104" },
-	{ HDA_NVIDIA_GT106,  "GT106" },
-	{ HDA_NVIDIA_GT108,  "GT108" },
-	{ HDA_NVIDIA_GT116,  "GT116" },
-	{ HDA_NVIDIA_GF119,  "GF119" },
-	{ HDA_NVIDIA_GF110,  "GF110" },
-	{ HDA_NVIDIA_GF114,  "GF114" }, // HDMi
-	{ HDA_NVIDIA_GK110,  "GK110" },
-	{ HDA_NVIDIA_GK106,  "GK106" },
-	{ HDA_NVIDIA_GK107,  "GK107" },
-	{ HDA_NVIDIA_GK104,  "GK104" },
+	{ HDA_NVIDIA_MCP51,	"MCP51" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_MCP55,	"MCP55" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_MCP61_1,	"MCP61" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP61_2,	"MCP61" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP65_1,	"MCP65" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP65_2,	"MCP65" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP67_1,	"MCP67" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP67_2,	"MCP67" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP73_1,	"MCP73" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP73_2,	"MCP73" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP78_1,	"MCP78" /*, 0, HDAC_QUIRK_64BIT */ },
+	{ HDA_NVIDIA_MCP78_2,	"MCP78" /*, 0, HDAC_QUIRK_64BIT */ },
+	{ HDA_NVIDIA_MCP78_3,	"MCP78" /*, 0, HDAC_QUIRK_64BIT */ },
+	{ HDA_NVIDIA_MCP78_4,	"MCP78" /*, 0, HDAC_QUIRK_64BIT */ },
+	{ HDA_NVIDIA_MCP79_1,	"MCP79" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP79_2,	"MCP79" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP79_3,	"MCP79" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP79_4,	"MCP79" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP89_1,	"MCP89" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP89_2,	"MCP89" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP89_3,	"MCP89" /*, 0, 0 */ },
+	{ HDA_NVIDIA_MCP89_4,	"MCP89" /*, 0, 0 */ },
+	{ HDA_NVIDIA_0BE2,	"(0x0be2)" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_0BE3,	"(0x0be3)" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_0BE4,	"(0x0be4)" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GT100,	"GT100" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GT104,	"GT104" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GT106,	"GT106" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GT108,	"GT108" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GT116,	"GT116" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GF119,	"GF119" /*, 0, 0 */ },
+	{ HDA_NVIDIA_GF110_1,	"GF110" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GF110_2,	"GF110" /*, 0, HDAC_QUIRK_MSI */ },
+	{ HDA_NVIDIA_GK110,	"GK110" /*, 0, ? */ },
+	{ HDA_NVIDIA_GK106,	"GK106" /*, 0, ? */ },
+	{ HDA_NVIDIA_GK107,	"GK107" /*, 0, ? */ },
+	{ HDA_NVIDIA_GK104,	"GK104" /*, 0, ? */ },
 	//1002  Advanced Micro Devices [AMD] nee ATI Technologies Inc
-	{ HDA_ATI_SB450,     "IXP SB4x0" },
-	{ HDA_ATI_SB600,     "SB600" },
-	{ HDA_ATI_RS600,     "RS600" },
-	{ HDA_ATI_RS690,     "RS690" },
-	{ HDA_ATI_RS780,     "RS780" },
-	{ HDA_ATI_RS880,     "RS880" },
-	{ HDA_ATI_TRINITY,   "Trinity" },
-	{ HDA_ATI_R600,      "R600" },
-	{ HDA_ATI_RV610,     "RV610" },
-	{ HDA_ATI_RV620,     "RV620" },
-	{ HDA_ATI_RV630,     "RV630" },
-	{ HDA_ATI_RV635,     "RV635" },
-	{ HDA_ATI_RV710,     "RV710" },
-	{ HDA_ATI_RV730,     "RV730" },
-	{ HDA_ATI_RV740,     "RV740" },
-	{ HDA_ATI_RV770,     "RV770" },
-	{ HDA_ATI_RV810,     "RV810" },
-	{ HDA_ATI_RV830,     "RV830" },
-	{ HDA_ATI_RV840,     "RV840" },
-	{ HDA_ATI_RV870,     "RV870" },
-	{ HDA_ATI_RV910,     "Caicos" },
-	{ HDA_ATI_RV930,     "RV930" },
-	{ HDA_ATI_RV940,     "RV940" },
-	{ HDA_ATI_RV970,     "RV970" },
-	{ HDA_ATI_R1000,     "Tahiti XT" }, // HDMi
-	{ HDA_ATI_VERDE,     "Cape Verde" }, // HDMi
+	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
+	{ HDA_ATI_SB600,	"SB600" /*, 0, 0 */ },
+	{ HDA_ATI_RS600,	"RS600" /*, 0, 0 */ },
+	{ HDA_ATI_RS690,	"RS690" /*, 0, 0 */ },
+	{ HDA_ATI_RS780,	"RS780" /*, 0, 0 */ },
+	{ HDA_ATI_RS880,	"RS880" /*, 0, 0 */ },
+	{ HDA_ATI_TRINITY,	"Trinity" /*, 0, ? */ },
+	{ HDA_ATI_R600,		"R600" /*, 0, 0 */ },
+	{ HDA_ATI_RV610,	"RV610" /*, 0, 0 */ },
+	{ HDA_ATI_RV620,	"RV620" /*, 0, 0 */ },
+	{ HDA_ATI_RV630,	"RV630" /*, 0, 0 */ },
+	{ HDA_ATI_RV635,	"RV635" /*, 0, 0 */ },
+	{ HDA_ATI_RV710,	"RV710" /*, 0, 0 */ },
+	{ HDA_ATI_RV730,	"RV730" /*, 0, 0 */ },
+	{ HDA_ATI_RV740,	"RV740" /*, 0, 0 */ },
+	{ HDA_ATI_RV770,	"RV770" /*, 0, 0 */ },
+	{ HDA_ATI_RV810,	"RV810" /*, 0, 0 */ },
+	{ HDA_ATI_RV830,	"RV830" /*, 0, 0 */ },
+	{ HDA_ATI_RV840,	"RV840" /*, 0, 0 */ },
+	{ HDA_ATI_RV870,	"RV870" /*, 0, 0 */ },
+	{ HDA_ATI_RV910,	"RV910" /*, 0, 0 */ },
+	{ HDA_ATI_RV930,	"RV930" /*, 0, 0 */ },
+	{ HDA_ATI_RV940,	"RV940" /*, 0, 0 */ },
+	{ HDA_ATI_RV970,	"RV970" /*, 0, 0 */ },
+	{ HDA_ATI_R1000,	"R1000" /*, 0, 0 */ }, // HDMi
+	{ HDA_ATI_VERDE,	"Cape Verde" /*, 0, ? */ }, // HDMi
 	//17f3  RDC Semiconductor, Inc.
-	{ HDA_RDC_M3010,     "M3010" },
+	{ HDA_RDC_M3010,	"M3010" /*, 0, 0 */ },
 	//1106  VIA Technologies, Inc.
-	{ HDA_VIA_VT82XX,    "VT8251/8237A" },
+	{ HDA_VIA_VT82XX,	"VT8251/8237A" /*, 0, 0 */ },
 	//1039  Silicon Integrated Systems [SiS]
-	{ HDA_SIS_966,       "966" },
+	{ HDA_SIS_966,		"966" /*, 0, 0 */ },
 	//10b9  ULi Electronics Inc.(Split off ALi Corporation in 2003)
-	{ HDA_ULI_M5461,     "M5461" },
+	{ HDA_ULI_M5461,	"M5461" /*, 0, 0 */ },
 	/* Unknown */
-	{ HDA_INTEL_ALL,  "Unknown Intel device" },
-	{ HDA_NVIDIA_ALL, "Unknown NVIDIA device" },
-	{ HDA_ATI_ALL,    "Unknown ATI device" },
-	{ HDA_VIA_ALL,    "Unknown VIA device" },
-	{ HDA_SIS_ALL,    "Unknown SiS device" },
-	{ HDA_ULI_ALL,    "Unknown ULI device" },
+	{ HDA_INTEL_ALL,	"Unknown Intel device" /*, 0, 0 */ },
+	{ HDA_NVIDIA_ALL,	"Unknown NVIDIA device" /*, 0, 0 */ },
+	{ HDA_ATI_ALL,		"Unknown ATI device" /*, 0, 0 */ },
+	{ HDA_VIA_ALL,		"Unknown VIA device" /*, 0, 0 */ },
+	{ HDA_SIS_ALL,		"Unknown SiS device" /*, 0, 0 */ },
+	{ HDA_ULI_ALL,		"Unknown ULI device" /*, 0, 0 */ },
 };
 #define HDAC_DEVICES_LEN (sizeof(know_hda_controller) / sizeof(know_hda_controller[0]))
 
@@ -589,12 +593,21 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	/***********************************************************************
 	* The above case are intended as for HDEF device at address 0x001B0000
 	***********************************************************************/
-		case HDA_INTEL_HASWELL:
-		case HDA_INTEL_HASWELL2:
-		case HDA_INTEL_CRYSTAL:
+		case HDA_INTEL_OAK:
+		case HDA_INTEL_BAY:
+		case HDA_INTEL_HSW1:
+		case HDA_INTEL_HSW2:
+		case HDA_INTEL_HSW3:
 		case HDA_INTEL_CPT:
 		case HDA_INTEL_PATSBURG:
 		case HDA_INTEL_PPT1:
+		case HDA_INTEL_LPT1:
+		case HDA_INTEL_LPT2:
+		case HDA_INTEL_WCPT:
+		case HDA_INTEL_WELLS1:
+		case HDA_INTEL_WELLS2:
+		case HDA_INTEL_LPTLP1:
+		case HDA_INTEL_LPTLP2:
 		case HDA_INTEL_82801F:
 		case HDA_INTEL_63XXESB:
 		case HDA_INTEL_82801G:
@@ -605,11 +618,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_INTEL_PCH:
 		case HDA_INTEL_PCH2:
 		case HDA_INTEL_SCH:
-		case HDA_INTEL_SCH2:
-		case HDA_INTEL_LPT1:
-		case HDA_INTEL_LPT2:
-		case HDA_INTEL_LYNX:
-		case HDA_INTEL_LYNX2:
+
 	/* if the key value kHDEFLayoutID as a value set that value, if not will assign a default layout */
 	if (getValueForKey(kHDEFLayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDEF_LEN * 2)
 	{
@@ -639,10 +648,10 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	* The above case are intended as for HDAU (NVIDIA) device onboard audio for GFX card with Audio controller HDMi
 	****************************************************************************************************************/
 	case HDA_NVIDIA_GK107:
-	case HDA_NVIDIA_GF114:
+	case HDA_NVIDIA_GF110_1:
+	case HDA_NVIDIA_GF110_2:
 	case HDA_NVIDIA_GK106:
 	case HDA_NVIDIA_GK104:
-	case HDA_NVIDIA_GF110:
 	case HDA_NVIDIA_GF119:
 	case HDA_NVIDIA_GT116:
 	case HDA_NVIDIA_GT104:
