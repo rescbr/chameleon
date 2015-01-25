@@ -1016,6 +1016,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 0F90 - 0F9F
 	// 0FA0 - 0FAF
 	// 0FB0 - 0FBF
+	{ 0x10DE0FBB,	"GeForce GTX 970" },
 	// 0FC0 - 0FCF
 	{ 0x10DE0FC0,	"GeForce GT 640" },
 	{ 0x10DE0FC1,	"GeForce GT 640" },
@@ -1301,7 +1302,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1391,	"GeForce GTX 850M" },
 	{ 0x10DE1392,	"GeForce GTX 860M" },
 	{ 0x10DE1393,	"GeForce 840M" },
-	{ 0x10DE1398,	"GeForce N15S-GT1R" }, //
+	{ 0x10DE1398,	"GeForce 845M" }, //
 	{ 0x10DE13AD,	"GM107 INT52" }, //
 	{ 0x10DE13AE,	"GM107 CS1" }, //
 //	{ 0x10DE13AF,	"Graphics Device" }, // GM107GLM
@@ -1318,7 +1319,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 //	{ 0x10DE13C3,	"Graphics Device" }, // GM107GLM
 	{ 0x10DE13D7,	"GeForce GTX 980M" }, //
 	{ 0x10DE13D8,	"GeForce GTX 970M" }, //
-//	{ 0x10DE13D9,	"Graphics Device" }, //
+	{ 0x10DE13D9,	"GeForce GTX 965M" },
 //	{ 0x10DE13F0,	"Graphics Device" }, // GM107GLM
 //	{ 0x10DE13F1,	"Graphics Device" }, // GM107GLM
 //	{ 0x10DE1401,	"Graphics Device" }, //
@@ -1342,12 +1343,12 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 //	{ 0x10DE17BA,	"Quadro" }, //
 //	{ 0x10DE17BB,	"Quadro" }, //
 //	{ 0x10DE17BD,	"Graphics Device" }, //
-	{ 0x10DE17BE,	"GM107 CS1" } // GM107
+	{ 0x10DE17BE,	"GM107 CS1" }, // GM107
 //	{ 0x10DE17C1,	"Graphics Device" }, //
 //	{ 0x10DE17C2,	"Graphics Device" }, //
 //	{ 0x10DE17EE,	"Graphics Device" }, //
 //	{ 0x10DE17EF,	"Graphics Device" }, //
-//	{ 0x10DE17F0,	"Graphics Device" }, //
+	{ 0x10DE17F0,	"Quadro M6000" }
 //	{ 0x10DE17FF,	"Graphics Device" }, //
 };
 
@@ -1486,6 +1487,7 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 
 	{ 0x10DE0E23,	0x10B00401,	"Gainward GeForce GTX 460" },
 	// 0F00 - 0FFF
+	{ 0x10DE0FBB,	0x38422974,	"EVGA GTX 970 OC" },
 	{ 0x10DE0FD2,	0x10280595,	"Dell GeForce GT 640M LE" },
 	{ 0x10DE0FD2,	0x102805B2,	"Dell GeForce GT 640M LE" },
 	// 1000 - 10FF
