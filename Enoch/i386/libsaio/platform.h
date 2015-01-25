@@ -337,6 +337,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 /* Maximum number of ram slots */
 #define MAX_RAM_SLOTS			8
+
 #define RAM_SLOT_ENUMERATOR		{0, 2, 4, 1, 3, 5, 6, 8, 10, 7, 9, 11}
 
 /* Maximum number of SPD bytes */
@@ -347,15 +348,15 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 typedef struct _RamSlotInfo_t
 {
-	uint32_t		ModuleSize;					// Size of Module in MB
-	uint32_t		Frequency;					// in Mhz
+	uint32_t		ModuleSize;			// Size of Module in MB
+	uint32_t		Frequency;			// in Mhz
 	const char*		Vendor;
 	const char*		PartNo;
 	const char*		SerialNo;
-	char*			spd;						// SPD Dump
+	char*			spd;				// SPD Dump
 	bool			InUse;
 	uint8_t			Type;
-	uint8_t			BankConnections;			// table type 6, see (3.3.7)
+	uint8_t			BankConnections;		// table type 6, see (3.3.7)
 	uint8_t			BankConnCnt;
 } RamSlotInfo_t;
 
@@ -364,55 +365,55 @@ typedef struct _RamSlotInfo_t
 typedef struct _PlatformInfo_t
 {
 	struct CPU {
-		uint32_t		Vendor;					// Vendor - char Vendor[16];
-		char			BrandString[48];			// 48 Byte Branding String
-		//uint16_t		Type;					// Type
-		uint8_t			Family;					// Family
-		uint8_t			Model;					// Model
-		uint8_t			ExtModel;				// Extended Model
-		uint8_t			ExtFamily;				// Extended Family
-		uint8_t			Stepping;				// Stepping
-		uint64_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
+		uint32_t		Vendor;			// Vendor - char Vendor[16];
+		char			BrandString[48];	// 48 Byte Branding String
+		//uint16_t		Type;			// Type
+		uint8_t			Family;			// Family
+		uint8_t			Model;			// Model
+		uint8_t			ExtModel;		// Extended Model
+		uint8_t			ExtFamily;		// Extended Family
+		uint8_t			Stepping;		// Stepping
+		uint64_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint64_t		ExtFeatures;
 		uint32_t		CoresPerPackage;
 		uint32_t		LogicalPerPackage;
-		uint32_t		Signature;				// Processor Signature
+		uint32_t		Signature;		// Processor Signature
 		//uint8_t		Brand;
 		//uint8_t		ProcessorFlag;
 
-		uint32_t		NoCores;				// No Cores per Package
-		uint32_t		NoThreads;				// Threads per Package
+		uint32_t		NoCores;		// No Cores per Package
+		uint32_t		NoThreads;		// Threads per Package
 
 		//uint32_t		CacheSize[LCACHE_MAX];
 		//uint32_t		CacheLineSize;
 
-		//uint8_t		cache_info[64];				// list of cache descriptors
+		//uint8_t		cache_info[64];		// list of cache descriptors
 
-		uint8_t			MaxCoef;				// Max Multiplier
-		uint8_t			MaxDiv;					// Min Multiplier
-		uint8_t			CurrCoef;				// Current Multiplier
+		uint8_t			MaxCoef;		// Max Multiplier
+		uint8_t			MaxDiv;			// Min Multiplier
+		uint8_t			CurrCoef;		// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;				// TSC Frequency Hz
-		uint64_t		FSBFrequency;				// FSB Frequency Hz
-		uint64_t		CPUFrequency;				// CPU Frequency Hz
-		uint32_t		MaxRatio;				// Max Bus Ratio
-		uint32_t		MinRatio;				// Min Bus Ratio
-		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
+		uint64_t		TSCFrequency;		// TSC Frequency Hz
+		uint64_t		FSBFrequency;		// FSB Frequency Hz
+		uint64_t		CPUFrequency;		// CPU Frequency Hz
+		uint32_t		MaxRatio;		// Max Bus Ratio
+		uint32_t		MinRatio;		// Min Bus Ratio
+		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 
-		uint32_t		MCodeVersion;				// CPU Microcode version
+		uint32_t		MCodeVersion;		// CPU Microcode version
 	} CPU;
 
 	struct RAM {
-		uint64_t		Frequency;				// Ram Frequency
-		uint32_t		Divider;				// Memory divider
-		uint8_t			CAS;					// CAS 1/2/2.5/3/4/5/6/7
-		uint8_t			TRC;					
+		uint64_t		Frequency;		// Ram Frequency
+		uint32_t		Divider;		// Memory divider
+		uint8_t			CAS;			// CAS 1/2/2.5/3/4/5/6/7
+		uint8_t			TRC;	
 		uint8_t			TRP;
 		uint8_t			RAS;
-		uint8_t			Channels;				// Channel Configuration Single,Dual or Triple
-		uint8_t			NoSlots;				// Maximum no of slots available
-		uint8_t			Type;					// Standard SMBIOS v2.5 Memory Type
-		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];	// Information about each slot
+		uint8_t			Channels;		// Channel Configuration Single,Dual or Triple
+		uint8_t			NoSlots;		// Maximum no of slots available
+		uint8_t			Type;			// Standard SMBIOS v2.5 Memory Type
+		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];		// Information about each slot
 	} RAM;
 
 	struct DMI {
@@ -422,8 +423,9 @@ typedef struct _PlatformInfo_t
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
-	uint8_t				*UUID;
+	uint8_t				Type;			// system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				*UUID;			// system-id (SMBIOS Table 1: system uuid)
+
 } PlatformInfo_t;
 
 extern PlatformInfo_t Platform;

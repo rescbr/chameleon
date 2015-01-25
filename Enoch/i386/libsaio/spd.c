@@ -27,18 +27,19 @@
 
 static const char *spd_memory_types[] =
 {
-	"RAM",          /* 00h  Undefined */
-	"FPM",          /* 01h  FPM */
-	"EDO",          /* 02h  EDO */
-	"",		/* 03h  PIPELINE NIBBLE */
-	"SDRAM",        /* 04h  SDRAM */
-	"",		/* 05h  MULTIPLEXED ROM */
-	"DDR SGRAM",	/* 06h  SGRAM DDR */
-	"DDR SDRAM",	/* 07h  SDRAM DDR */
-	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
-	"",		/* 09h  Undefined */
-	"",		/* 0Ah  Undefined */
-	"DDR3 SDRAM"	/* 0Bh  SDRAM DDR 3 */
+	"RAM",				/* 00h  Undefined */
+	"STD FPM DRAM",			/* 01h  FPM */
+	"EDO",				/* 02h  EDO */
+	"PIPE NIBBLE",			/* 03h  PIPELINE NIBBLE */
+	"SDRAM",			/* 04h  SDRAM */
+	"ROM",				/* 05h  MULTIPLEXED ROM */
+	"DDR SGRAM"			/* 06h  SGRAM DDR */
+	"DDR SDRAM",			/* 07h  SDRAM DDR */
+	"DDR2 SDRAM",			/* 08h  SDRAM DDR 2 */
+	"DDR2 SDRAM FB-DIMM",		/* 09h  Undefined */
+	"DDR2 SDRAM FB-DIMM Probe",	/* 0Ah  Undefined */
+	"DDR3 SDRAM",			/* 0Bh  SDRAM DDR 3 */
+	"DDR4 SDRAM"			/* 0Ch  SDRAM DDR 4 */
 };
 
 #define UNKNOWN_MEM_TYPE 2
@@ -109,7 +110,7 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 
 	rdtsc(l1, h1);
 
-	while (!( inb(base + SMBHSTSTS) & 0x02))	// wait til command finished
+	while (!( inb(base + SMBHSTSTS) & 0x02))	// wait till command finished
 	{
 		rdtsc(l2, h2);
 		t = ((h2 - h1) * 0xffffffff + (l2 - l1)) / (Platform.CPU.TSCFrequency / 100);

@@ -24,7 +24,10 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 /** Parse an UUID string into an (EFI_CHAR8*) buffer */
 EFI_CHAR8*  getUUIDFromString(const char *source)
 {
-	if (!source) return 0;
+	if (!source)
+	{
+		return 0;
+	}
 
 	char	*p = (char *)source;
 	int	i;

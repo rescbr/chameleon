@@ -81,11 +81,11 @@ extern void		dump_pci_dt(pci_dt_t *);
 /* Option ROM header */
 typedef struct {
 	uint16_t		signature;		// 0xAA55
-	uint8_t			rom_size;		//in 512 bytes blocks
-	uint8_t			jump;			//0xE9 for ATI and Intel, 0xEB for NVidia
-	uint32_t		entry_point;
+	uint8_t			rom_size;		// in 512 bytes blocks
+	uint8_t			jump;			// 0xE9 for ATI and Intel, 0xEB for NVidia
+	uint8_t			entry_point[4];		// offset to
 	uint8_t			reserved[16];
-	uint16_t		pci_header_offset;	//@0x18
+	uint16_t		pci_header_offset;	// @0x18
 	uint16_t		expansion_header_offset;
 } option_rom_header_t;
 
@@ -937,7 +937,7 @@ typedef struct {
 #define PCI_CLASS_SIGNAL_OTHER					0x1180
 
 // values for the class_sub field for class_base = 0xff (Device does not fit any defined class)
-#define PCI_CLASS_OTHERS                        0xff
+#define PCI_CLASS_OTHERS					0xff
 
 /* Several ID's we need in the library */
 #define PCI_VENDOR_ID_LOGITECH					0x046d
