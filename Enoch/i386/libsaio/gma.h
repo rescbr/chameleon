@@ -243,10 +243,22 @@ typedef struct{
 //#define GMA_HASWELL_CRW_S_GT2_PLUS_IG    GFX_MODEL_CONSTRUCT(INTEL, 0x0D3A)
 
 #define GMA_BRODWELLL_BDW_U_GT1      GFX_MODEL_CONSTRUCT(INTEL, 0x1606) // BDW U GT1
-#define GMA_BRODWELLL_BDW_U_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x1616) // BDW U GT2
-#define GMA_BRODWELLL_BDW_U_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x1626) // BDW U GT3 15W
-#define GMA_BRODWELLL_BDW_U_GT3_2    GFX_MODEL_CONSTRUCT(INTEL, 0x162B) // BDW U GT3 28W
-#define GMA_BRODWELLL_BDW_Y_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x161E) // BDW Y GT2
+#define GMA_BRODWELLL_BDW_U_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x1616) // BDW U GT2 Intel(R) HD Graphics 5500 Drivers
+#define GMA_BRODWELLL_BDW_U_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x1626) // BDW U GT3 15W Intel(R) HD Graphics 6000 Drivers
+#define GMA_BRODWELLL_BDW_U_GT3_2    GFX_MODEL_CONSTRUCT(INTEL, 0x162B) // BDW U GT3 28W Intel(R) Iris(TM) Pro Graphics 6100 Drivers
+#define GMA_BRODWELLL_BDW_Y_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x161E) // BDW Y GT2 Intel(R) HD Graphics 5300 Drivers
+
+// 0x1602	Intel(R) HD Graphics Drivers
+// 0x160e	Intel(R) HD Graphics Drivers
+// 0x1612	Intel(R) HD Graphics 5600 Drivers
+// 0x1622	Intel(R) Iris(TM) Pro Graphics 6200 Drivers
+// 0x162a	Intel(R) Iris(TM) Pro Graphics 6300P Drivers
+// 0x162b	Intel(R) Iris(TM) Pro Graphics 6100 Drivers
+// 0x0bd0	Intel Broadwell HD Graphics HAS GT0 Drivers
+// 0x0bd1	Intel Broadwell HD Graphics HAS GT1 Drivers
+// 0x0bd2	Intel Broadwell HD Graphics HAS GT2 Drivers
+// 0x0bd3	Intel Broadwell HD Graphics HAS GT3 Drivers
+// 0x0bd4	Intel Broadwell HD Graphics HAS GT4 Drivers
 
 /* END */
 
