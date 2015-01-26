@@ -182,7 +182,8 @@ struct dirstuff {
 	BVRef		   dir_bvr;		/* volume reference */
 };
 
-#define BVSTRLEN 32
+#define BVSTRLEN 36 // changed from 32 to 36 due to gpt partition name length
+#define OSVERSTRLEN 9
 
 struct BootVolume {
 	BVRef			next;			/* list linkage pointer */
@@ -209,9 +210,9 @@ struct BootVolume {
 	char			altlabel[BVSTRLEN];	/* alternate partition volume label */
 	bool			filtered;		/* newFilteredBVChain() will set to TRUE */
 	bool			visible;		/* will shown in the device list */
-	char			OSVersion[8];
+	char			OSVersion[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' e.g. "10.10.10" - hope will not reach e.g. 111.222.333 soon:) If so, OSVERSTRLEN 9 change to 12 */
 	bool			OSisServer;		/* 1 = OS X server , 0 = OS X client */
-	bool			OSisInstaller;		/* 1 = OS X Install partition / recover partition , 0 = OS X Install */
+	bool			OSisInstaller;		/* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
 
 };
 

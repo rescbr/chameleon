@@ -119,7 +119,7 @@ void initKernBootStruct( void )
 
 void reserveKernBootStruct(void)
 {
-	if ( LION || MOUNTAIN_LION || MAVERICKS || YOSEMITE )
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.7") ) // OS X 10.7 and newer
 	{
 		// for 10.7 10.8 10.9 10.10
 		void *oldAddr = bootArgs;

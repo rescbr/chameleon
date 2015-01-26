@@ -585,9 +585,13 @@ void setupEfiDeviceTree(void)
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
 /* Bungo
-	if (archCpuType == CPU_TYPE_I386) {
+	if (archCpuType == CPU_TYPE_I386)
+	{
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
-	} else { */
+	}
+	else
+	{
+	*/
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
 //	}
 
@@ -602,14 +606,17 @@ void setupEfiDeviceTree(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(node, "runtime-services");
 
-	if (archCpuType == CPU_TYPE_I386) {
+	if (archCpuType == CPU_TYPE_I386)
+	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
 
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST32->RuntimeServices);
-	} else {
+	}
+	else
+	{
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(uint64_t), &gST64->RuntimeServices);
 	}
 
@@ -717,7 +724,7 @@ void setupChosenNode()
 
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 
-	if(YOSEMITE)
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
 	{
 		//
 		// Pike R. Alpha - 12 October 2014
@@ -729,7 +736,7 @@ void setupChosenNode()
 		EFI_UINT32 rcx, rdx, rsi, rdi;
 
 		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
-		rcx = rdx = rsi = rdi = cpuTick = 0;
+		cpuTick = rcx = rdx = rsi = rdi = 0;
 
 		// LEAF_1 - Feature Information (Function 01h).
 		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
@@ -895,7 +902,7 @@ void saveOriginalSMBIOS(void)
  */
 void setupFakeEfi(void)
 {
-	// Generate efi device strings 
+	// Generate efi device strings
 	setup_pci_devs(root_pci_dev);
 
 	readSMBIOSInfo(getSmbios(SMBIOS_ORIGINAL));

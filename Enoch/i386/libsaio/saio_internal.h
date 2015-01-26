@@ -224,4 +224,9 @@ extern int (*p_ramdiskReadBytes)( int biosdev, unsigned int blkno,
 // Base64-decode.c
 char *BASE64Decode(const char* src, int in_len, int* out_len);
 
+// options.c
+extern char     gMacOSVersion[OSVERSTRLEN];
+extern uint32_t MacOSVerCurrent;
+extern uint32_t MacOSVer2Int(const char *osver);
+
 #endif /* !__LIBSAIO_SAIO_INTERNAL_H */

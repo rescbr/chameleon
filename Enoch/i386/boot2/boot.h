@@ -30,13 +30,13 @@
 #include "libsaio.h"
 
 // OS X Versions
-#define YOSEMITE        checkOSVersion("10.10") // Yosemite
-#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
-#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
-#define LION            checkOSVersion("10.7")  // Lion
-#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
-#define LEOPARD         checkOSVersion("10.5")  // Leopard
-#define TIGER           checkOSVersion("10.4")  // Tiger
+//#define YOSEMITE        checkOSVersion("10.10") // Yosemite
+//#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
+//#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
+//#define LION            checkOSVersion("10.7")  // Lion
+//#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
+//#define LEOPARD         checkOSVersion("10.5")  // Leopard
+//#define TIGER           checkOSVersion("10.4")  // Tiger
 
 /*
  * Paths used by chameleon
@@ -191,10 +191,10 @@
 /* ErmaC: added these keys */
 #define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
-#define kSkipIntelGfx			"SkipIntelGfx"		/* pci_setup.c */
+#define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
 #define kSkipAtiGfx			"SkipAtiGfx"			/* pci_setup.c */
-//#define kUsbInject			"USBInject"		/* usb.c */
+//#define kUsbInject			"USBInject"			/* usb.c */
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
@@ -257,7 +257,9 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-bool checkOSVersion(const char * version);
+extern bool checkOSVersion(const char * version);
+extern uint32_t getMacOSVerCurrent();
+
 /*
  * usb.c
  */
@@ -303,8 +305,8 @@ extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
-// Bungo
-extern char *gDarwinBuildVerStr;
+// Bungo:
+extern char gDarwinBuildVerStr[256];
 
 /*!
     Hookable function pointer called during the driver loading phase that

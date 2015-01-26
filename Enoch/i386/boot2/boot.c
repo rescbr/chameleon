@@ -84,7 +84,6 @@ char		*gPlatformName = gCacheNameAdler;
 
 char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
-char		gMacOSVersion[8];
 int		bvCount = 0;
 int		gDeviceCount = 0;
 //int		menucount = 0;
@@ -220,10 +219,10 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ( LION || MOUNTAIN_LION || MAVERICKS || YOSEMITE )
+	if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
 	{
 		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgs, NULL, NULL);
+		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
 
 		// Masking out so that Lion doesn't doublefault
 
@@ -267,18 +266,19 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 	else
 	{
-		if ( LION || MOUNTAIN_LION || MAVERICKS  || YOSEMITE)
+		// Lion, Mountain Lion, Mavericks and Yosemite prelink kernel cache file
+		if (MacOSVerCurrent >= MacOSVer2Int("10.7")) // OSX is Lion (10.7) or newer
 		{
-			// Lion, Mountain Lion, Mavericks, and Yosemite prelink kernel cache file
-			// for 10.7 10.8 10.9 10.10
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);;
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 		}
 		// Snow Leopard prelink kernel cache file
-		else if ( SNOW_LEOPARD )
+		else
 		{
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
-				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
+			if (MacOSVerCurrent >= MacOSVer2Int("10.6"))  // OSX is Snow (10.6)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
+					(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
 				int	lnam = strlen(kernelCacheFile) + 9; //with adler32
 				char	*name;
@@ -304,12 +304,14 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 			}
 			else
 			{
-			// Reset cache name.
-			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-			snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
-			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
-			verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);;
+				// Leopard prelink kernel cache file
+				// Reset cache name.
+				bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+				snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+				adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
+				verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);
+			}
 		}
 	}
 
@@ -386,7 +388,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 
 	// Since the kernel cache file exists and is the most recent try to load it
-	DBG("Loading Kernel Cache from: '%s'\n", kernelCachePath);
+	DBG("Loading Kernel Cache from: '%s%s' (%s)\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name);
 
 	ret = LoadThinFatFile(kernelCachePath, binary);
 	return ret; // ret contain the length of the binary
@@ -604,7 +606,11 @@ void common_boot(int biosdev)
 
 		if (getValueForKey(karch, &val, &len, &bootInfo->chameleonConfig))
 		{
-			if (strncmp(val, "i386", 4) == 0)
+			if (strncmp(val, "x86_64", 4) == 0)
+			{
+				archCpuType = CPU_TYPE_X86_64;
+			}
+			else if (strncmp(val, "i386", 4) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;
 			}
@@ -745,13 +751,13 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE )
+				if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OSX is 10.10 or newer
 				{
-					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
+					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos "%s", bootInfo->bootFile); // Yosemite
 				}
 				else
 				{
-					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite
+					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading '/'
 				}
 			}
 			else
@@ -782,7 +788,7 @@ void common_boot(int biosdev)
 				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
 
-			DBG("Loading kernel from: '%s'\n", bootFilePath);
+			DBG("Loading kernel from: '%s' (%s)\n", gBootVolume->label, gBootVolume->type_name);
 			ret = LoadThinFatFile(bootFilePath, &binary);
 			if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
 			{
@@ -869,6 +875,12 @@ bool checkOSVersion(const char * version)
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 	}
+}
+
+uint32_t getMacOSVerCurrent()
+{
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	return MacOSVerCurrent;
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

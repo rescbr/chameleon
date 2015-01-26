@@ -239,7 +239,9 @@ typedef enum {
     kSMBchassisSubNotebook              = 0x0E,
     // ... fill up if needed ;-)
     kSMBchassisLunchBox                 = 0x10,
+    kSMBchassisMainServer               = 0x11,
     // ... fill up if needed ;-)
+    kSMBchassisBlade                    = 0x1C,
     kSMBchassisBladeEnclosing           = 0x1D
 } MISC_CHASSIS_TYPE;
 
@@ -283,7 +285,7 @@ typedef struct SMBSystemEnclosure
 	SMBByte    height;		// Height of the enclosure, in 'U's
 	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
 	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
-    //	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
+	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
     //	SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
     // 2.7+
     //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number

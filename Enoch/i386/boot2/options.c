@@ -38,8 +38,10 @@
 #define DBG(x...)	msglog(x)
 #endif
 
-bool showBootBanner = true; //Azi:showinfo
-static bool shouldboot = false;
+char		gMacOSVersion[OSVERSTRLEN];
+uint32_t	MacOSVerCurrent = 0;
+bool		showBootBanner = true; //Azi:showinfo
+static bool	shouldboot = false;
 
 extern int multiboot_timeout;
 extern int multiboot_timeout_set;
@@ -62,6 +64,53 @@ enum {
 extern char *msgbuf;
 
 void showTextBuffer(char *buf_orig, int size);
+
+//==========================================================================
+
+// MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
+uint32_t MacOSVer2Int(const char *osver)
+{
+	uint32_t    result = 0;
+	uint8_t    *resptr = (uint8_t *)&result;
+	uint8_t     len = strlen(osver);
+	uint8_t     i, j, m;
+#define CHR2UINT(c) ((uint8_t)(c - '0'))
+#define ISDIGIT(c)  ((c >= '0') && (c <= '9'))
+#define ISDOT(c)    (c == '.')
+
+	if (!osver || (len < 4) || (len > OSVERSTRLEN - 1) || !ISDIGIT(osver[0]) || !ISDOT(osver[2]) || !ISDIGIT(osver[len - 1]))
+	{
+		verbose("ERROR: wrong Mac OS version string syntax: '%s'\n", osver);
+		return 0;
+	}
+
+	for (i = 0, j = 3, m = 1; i < len; i++)
+	{
+		if (ISDIGIT(osver[i]))
+		{
+			resptr[j] = resptr[j] * m + CHR2UINT(osver[i]);
+			m = 10;
+		}
+		else if (ISDOT(osver[i]))
+		{
+			if (j > 0)
+			{
+				j--;
+			}
+			else
+			{
+				return 0;
+			}
+			m = 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	return result;
+}
 
 //==========================================================================
 
@@ -1230,8 +1279,18 @@ int processBootOptions()
 		return -1;
 	}
 
-	// Find out which version mac os we're booting.
-	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+	// Save a version of mac os we're booting.
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	// so copy it and trim
+	gMacOSVersion[0] = 0;
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	{
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
+	}
+	else
+	{
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
+	}
 
 	// Load config table specified by the user, or use the default.
 
@@ -1267,37 +1326,25 @@ int processBootOptions()
 		}
 		else
 		{
-			if( YOSEMITE ) // is 10.10
+			if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OS X is 10.10 or newer
 			{
 				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
 			}
 			else
-			{ // OSX is not 10.10
-
+			{
+				// or 10.9 and previous
 				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
 			}
 		}
 	}
 
-	if (!YOSEMITE) // not 10.10 so 10.9 and previus
+	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kOSXKernel ) != 0))
 	{
-		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
-		{
-	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
-	}
-	else
-	{ // OSX is 10.10
-		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
-		{
-        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
+		gOverrideKernel = true;
 	}
 
 	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
-	if( YOSEMITE ) // is 10.10
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OS X is 10.10 or newer
 	{
 		addBootArg("kext-dev-mode=1");
 	}
@@ -1349,9 +1396,9 @@ int processBootOptions()
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
 		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
-			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
+	DBG("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
@@ -1363,27 +1410,32 @@ int processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
+			if (cnt > 0)
+			{
+				copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+			}
 		}
 		else
-		{ /*
+		{
 			if (strlen(gBootUUIDString))
 			{
 				val = "*uuid";
 				cnt = 5;
 			}
 			else
-			{ */
+			{
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			/* } */
+			}
 		}
-
+/* Bungo
 		if (cnt > 0)
 		{
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
+*/
 		strlcpy(gRootDevice, val, (cnt + 1));
 	}
 
