@@ -83,7 +83,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								verbose("Skip Nvidia gfx device!\n");
 							}
-								else
+							else
 							{
 								setup_nvidia_devprop(current);
 							}
