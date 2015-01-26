@@ -1,3 +1,4 @@
+- Bungo : Fixed fixedUUID function (convert.c smbios.c).
 - Bungo : Added Logging start time.
 - Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service.
 - Zenith432 : Use caching with ExFat filesystem.

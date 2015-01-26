@@ -24,10 +24,19 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 /** Parse an UUID string into an (EFI_CHAR8*) buffer */
 EFI_CHAR8*  getUUIDFromString(const char *source)
 {
-	if (!source) return 0;
+	if (!source)
+	{
+		return 0;
+	}
+
+	int	i = strlen(source);
+	if (i != 36)
+	{ // e.g 00112233-4455-6677-8899-AABBCCDDEEFF
+		verbose("[ERROR] UUID='%s' has incorrect length=%d. Use format: 00112233-4455-6677-8899-AABBCCDDEEFF.\n", source, i);
+		return 0;
+	}
 
 	char	*p = (char *)source;
-	int	i;
 	char	buf[3];
 	static EFI_CHAR8 uuid[UUID_LEN+1] = "";
 

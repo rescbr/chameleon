@@ -807,14 +807,14 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 
 char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 {
-	if (!field)
+	if (!field || !structHeader)
 	{
 		return NULL;
 	}
 
 	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
-	for (field--; field != 0 && strlen((char *)stringPtr) > 0;
+	for (field--; (field > 0) && (*stringPtr > 0) &&(*(uint16_t *)stringPtr != 0);
 		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
 
 	return (char *)stringPtr;
@@ -1269,15 +1269,15 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 	addSMBEndOfTable(structPtr);
 }
 
-// Bungo: does fix system uuid in SMBIOS (and EFI) instead of in EFI only
-uint8_t *FixSystemUUID()
+// Bungo: does fix system uuid in SMBIOS & EFI instead of in EFI (IODT/efi/platform/system-id) only
+uint8_t *fixSystemUUID()
 {
 	uint8_t *ptr = (uint8_t *)neweps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)ptr;
 	int i, isZero, isOnes;
-	uint8_t FixedUUID[UUID_LEN] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
-	const char *sysId = getStringForKey(kSMBSystemInformationUUIDKey, SMBPlist);
-	uint8_t *ret = (uint8_t *)getUUIDFromString(sysId);
+	uint8_t fixedUUID[UUID_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
+	const char *sysId = getStringForKey(kSMBSystemInformationUUIDKey, SMBPlist); // try to get user's uuid from smbios.plist
+	uint8_t *ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
 
 	for (;(structHeader->type != kSMBTypeSystemInformation);) // find System Information Table (Type 1) in patched SMBIOS
 	{
@@ -1315,8 +1315,8 @@ uint8_t *FixSystemUUID()
 
 	if (isZero || isOnes) // if empty or setable...
 	{
-		verbose("No UUID present in SMBIOS System Information Table\n");
-		ret = FixedUUID; // ...set a fixed value for system-id = 000102030405060708090A0B0C0D0E0F
+		verbose("System UUID: incorrect or not present. Fixing [00112233-4455-6677-8899-AABBCCDDEEFF]\n");
+		ret = fixedUUID; // ...set a fixed value for system uuid: <00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF>
 	}
 
 	memcpy(ptr, ret, UUID_LEN); // save uuid into the patched SMBIOS Table 1
@@ -1398,7 +1398,7 @@ void setupSMBIOSTable(void)
 
 	memcpy((void *)neweps->dmi.tableAddress, buffer, tableLength);
 
-	Platform.UUID = FixSystemUUID(); // Bungo: fix System UUID
+	Platform.UUID = fixSystemUUID(); // Bungo: fix System UUID
 
 	neweps->dmi.checksum		= 0;
 	neweps->dmi.checksum		= 0x100 - checksum8(&neweps->dmi, sizeof(DMIEntryPoint));
@@ -1449,27 +1449,27 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 		switch (structHeader->type)
 		{
 			case kSMBTypeSystemInformation:
-				Platform.UUID = ((SMBSystemInformation *)structHeader)->uuid; // get factory system uuid
+				Platform.UUID = ((SMBSystemInformation *)structHeader)->uuid; // save factory system uuid
 				break;
 
 			case kSMBTypeSystemEnclosure: // Bungo: determine platform type
 				switch (((SMBSystemEnclosure *)structHeader)->chassisType)
 				{
-					case kSMBchassisDesktop:
-					case kSMBchassisLPDesktop:
-					case kSMBchassisAllInOne:
-					case kSMBchassisLunchBox:
-						PlatformType = 1; // desktop (iMac, MacMini)
-						break;
 					case kSMBchassisPortable:
 					case kSMBchassisLaptop:
 					case kSMBchassisNotebook:
 					case kSMBchassisHandHeld:
 					case kSMBchassisSubNotebook:
-						PlatformType = 2; // notebook (Mac Books)
-					    break;
-					default:
+						PlatformType = 2; // notebook (MacBooks/Pros)
+						break;
+					case kSMBchassisMiniTower:
+					case kSMBchassisTower:
+					case kSMBchassisBlade:
+					case kSMBchassisBladeEnclosing:
 						PlatformType = 3; // workstation (Mac Pro, Xserve)
+						break;
+					default:
+						PlatformType = 1; // defulting to 1 desktop (iMac, MacMini)
 						break;
 				}
 				break;
