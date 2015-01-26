@@ -390,7 +390,7 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 
 	// Since the kernel cache file exists and is the most recent try to load it
-	DBG("Loading Kernel Cache from: '%s'\n", kernelCachePath);
+	DBG("Loading Kernel Cache from: '%s%s' (%s)\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name);
 
 	ret = LoadThinFatFile(kernelCachePath, binary);
 	return ret; // ret contain the length of the binary
@@ -782,7 +782,7 @@ void common_boot(int biosdev)
 				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
 
-			DBG("Loading kernel from: '%s'\n", bootFilePath);
+			DBG("Loading kernel from: '%s' (%s)\n", gBootVolume->label, gBootVolume->type_name);
 			ret = LoadThinFatFile(bootFilePath, &binary);
 			if (ret <= 0 && archCpuType == CPU_TYPE_X86_64)
 			{

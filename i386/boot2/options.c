@@ -1279,8 +1279,18 @@ int processBootOptions()
 		return -1;
 	}
 
-	// Find out which version mac os we're booting.
-	strncpy(gMacOSVersion, gBootVolume->OSVersion, sizeof(gMacOSVersion));
+	// Save a version of mac os we're booting.
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	// so copy it and trim
+	gMacOSVersion[0] = 0;
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	{
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
+	}
+	else
+	{
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
+	}
 
 	// Load config table specified by the user, or use the default.
 
@@ -1386,9 +1396,9 @@ int processBootOptions()
 		if (!strlen(gBootUUIDString) && gBootVolume->fs_getuuid)
 		{
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
-			DBG("boot-uuid: %s\n", gBootUUIDString);
 		}
 	}
+	DBG("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
@@ -1400,27 +1410,32 @@ int processBootOptions()
 			cnt++;
 			strlcpy(valueBuffer + 1, val, cnt);
 			val = valueBuffer;
+			if (cnt > 0)
+			{
+				copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+			}
 		}
 		else
-		{ /*
+		{
 			if (strlen(gBootUUIDString))
 			{
 				val = "*uuid";
 				cnt = 5;
 			}
 			else
-			{ */
+			{
 				// Don't set "rd=.." if there is no boot device key
 				// and no UUID.
 				val = "";
 				cnt = 0;
-			/* } */
+			}
 		}
-
+/* Bungo
 		if (cnt > 0)
 		{
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
+*/
 		strlcpy(gRootDevice, val, (cnt + 1));
 	}
 

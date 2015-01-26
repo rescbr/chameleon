@@ -373,12 +373,16 @@ long GetDirEntry(const char * dirSpec, long long * dirIndex, const char ** name,
 		return -1;
 	}
 
-	// Return 0 on success, or -1 if there are no additional entries.
+	if (bvr->fs_getdirentry)
+	{
+		// Returns 0 on success or -1 when there are no additional entries.
+		return bvr->fs_getdirentry( bvr,
+			/* dirPath */   (char *)dirPath,
+			/* dirIndex */  dirIndex,
+			/* dirEntry */  (char **)name, flags, time, 0, 0 );
+	}
 
-	return bvr->fs_getdirentry( bvr,
-                /* dirPath */   (char *)dirPath,
-                /* dirIndex */  dirIndex,
-                /* dirEntry */  (char **)name, flags, time, 0, 0 );
+	return -1;
 }
 
 //==========================================================================
@@ -952,7 +956,12 @@ BVRef selectBootVolume(BVRef chain)
 {
 	bool filteredChain = false;
 	bool foundPrimary = false;
-	BVRef bvr, bvr1 = 0, bvr2 = 0;
+	BVRef bvr	= NULL;
+	BVRef bvr1	= NULL;
+	BVRef bvr2	= NULL;
+	char dirSpec[] = "hd(%d,%d)/", fileSpec[] = "Volumes", *label;
+	u_int32_t time, lasttime = 0;
+	long flags;
 	
 	if (chain->filtered)
 	{
@@ -970,6 +979,8 @@ BVRef selectBootVolume(BVRef chain)
 
 			if ( (bvr->part_no == multiboot_partition) && (bvr->biosdev == gBIOSDev) )
 			{
+				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
+				DBG("Multiboot partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 				return bvr;
 			}
 		}
@@ -993,12 +1004,42 @@ BVRef selectBootVolume(BVRef chain)
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
+				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
+				DBG("User default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 				return bvr;
 			}
 		}
 		free(val);
 	}
 
+	// Bungo: select last booted partition as the boot volume
+	// TODO: support other OSes (foreign boot)
+	for (bvr = chain; bvr; bvr = bvr->next) {
+		if (bvr->flags & (kBVFlagSystemVolume | kBVFlagForeignBoot))
+		{
+			time = 0;
+			flags = 0;
+			sprintf(dirSpec, "hd(%d,%d)/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			if ((GetFileInfo(dirSpec, fileSpec, &flags, &time) == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+			{
+				if (time > lasttime)
+				{
+					lasttime = time;
+					bvr1 = bvr;
+					label = bvr1->label[0] ? bvr1->label : (bvr1->altlabel[0] ? bvr1->altlabel : (bvr1->name[0] ? bvr1->name : "Untitled"));
+				}
+			}
+		}
+	}
+
+	if (bvr1)
+	{
+		DBG("Last booted volume: hd(%d,%d) '%s' set as default partition\n\n", BIOS_DEV_UNIT(bvr1), bvr1->part_no, label);
+		return bvr1;
+	}
+	// Bungo: code below selects first partition in the chain (last partition on disk),
+	// in my case Recovery HD, as boot volume, so I would prefer last booted partition
+	// as default boot volume - see the code above
 	/*
 	 * Scannig the volume chain backwards and trying to find
 	 * a HFS+ volume with valid boot record signature.
@@ -1068,9 +1109,9 @@ BVRef selectBootVolume(BVRef chain)
 		}
 	}
 
-	bvr = bvr2 ? bvr2 :
-	bvr1 ? bvr1 : chain;
-
+	bvr = bvr2 ? bvr2 : (bvr1 ? bvr1 : chain);
+	label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
+	DBG("Default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 	return bvr;
 }
 
